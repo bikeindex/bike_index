@@ -27,7 +27,7 @@ describe Admin::DashboardController do
     end
     context 'logged in as content admin' do
       it 'redirects' do
-        user = FactoryGirl.create(:confirmed_user, is_content_admin: true)
+        user = FactoryGirl.create(:user_confirmed, is_content_admin: true)
         set_current_user(user)
         get :index
         expect(response.code).to eq('302')

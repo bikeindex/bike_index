@@ -1,0 +1,112 @@
+http_interactions:
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=66666666%20foo%20street,%20Chicago,%20Q6,%2060647,%20D4&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Wed, 09 Jan 2019 22:26:56 GMT
+        Expires:
+          - Thu, 10 Jan 2019 22:26:56 GMT
+        Cache-Control:
+          - public, max-age=86400
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        Content-Length:
+          - "482"
+        X-Xss-Protection:
+          - 1; mode=block
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=242
+        Alt-Svc:
+          - quic=":443"; ma=2592000; v="44,43,39,35"
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "60647",
+                         "short_name" : "60647",
+                         "types" : [ "postal_code" ]
+                      },
+                      {
+                         "long_name" : "Chicago",
+                         "short_name" : "Chicago",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Cook County",
+                         "short_name" : "Cook County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "Illinois",
+                         "short_name" : "IL",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "Chicago, IL 60647, USA",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 41.9334571,
+                            "lng" : -87.673963
+                         },
+                         "southwest" : {
+                            "lat" : 41.9081301,
+                            "lng" : -87.726979
+                         }
+                      },
+                      "location" : {
+                         "lat" : 41.9215421,
+                         "lng" : -87.70248169999999
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 41.9334571,
+                            "lng" : -87.673963
+                         },
+                         "southwest" : {
+                            "lat" : 41.9081301,
+                            "lng" : -87.726979
+                         }
+                      }
+                   },
+                   "partial_match" : true,
+                   "place_id" : "ChIJ3fO3tQjND4gR1psfMQ0T28k",
+                   "types" : [ "postal_code" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      ? http_version
+    recorded_at: Wed, 09 Jan 2019 22:26:56 GMT
+recorded_with: VCR 4.0.0

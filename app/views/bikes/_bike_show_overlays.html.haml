@@ -44,7 +44,7 @@
           
           No one can see it but you
       %p
-        - if @bike.current_owner_exists
+        - if @bike.user?
           - if @bike.recovered
             Thank you for recovering this #{@bike.type}!
           - elsif @bike.stolen

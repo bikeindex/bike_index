@@ -24,7 +24,7 @@ describe FeedbacksController do
               proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
       }
     end
-    let(:user) { FactoryGirl.create(:confirmed_user) }
+    let(:user) { FactoryGirl.create(:user_confirmed) }
 
     context 'valid feedback' do
       it 'creates a feedback message' do

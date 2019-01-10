@@ -193,7 +193,7 @@ describe Organization do
     describe 'set_auto_user' do
       it 'sets the embedable user' do
         organization = FactoryGirl.create(:organization)
-        user = FactoryGirl.create(:confirmed_user, email: 'embed@org.com')
+        user = FactoryGirl.create(:user_confirmed, email: 'embed@org.com')
         FactoryGirl.create(:membership, organization: organization, user: user)
         organization.embedable_user_email = 'embed@org.com'
         organization.save
@@ -201,21 +201,21 @@ describe Organization do
       end
       it 'does not set the embedable user if user is not a member' do
         organization = FactoryGirl.create(:organization)
-        FactoryGirl.create(:confirmed_user, email: 'no_embed@org.com')
+        FactoryGirl.create(:user_confirmed, email: 'no_embed@org.com')
         organization.embedable_user_email = 'no_embed@org.com'
         organization.save
         expect(organization.reload.auto_user_id).to be_nil
       end
       it 'Makes a membership if the user is auto user' do
         organization = FactoryGirl.create(:organization)
-        user = FactoryGirl.create(:confirmed_user, email: ENV['AUTO_ORG_MEMBER'])
+        user = FactoryGirl.create(:user_confirmed, email: ENV['AUTO_ORG_MEMBER'])
         organization.embedable_user_email = ENV['AUTO_ORG_MEMBER']
         organization.save
         expect(organization.reload.auto_user_id).to eq(user.id)
       end
       it "sets the embedable user if it isn't set and the org has members" do
         organization = FactoryGirl.create(:organization)
-        user = FactoryGirl.create(:confirmed_user)
+        user = FactoryGirl.create(:user_confirmed)
         FactoryGirl.create(:membership, user: user, organization: organization)
         organization.save
         expect(organization.reload.auto_user_id).not_to be_nil
@@ -237,7 +237,7 @@ describe Organization do
       end
     end
     context 'no members' do
-      let(:auto_user) { FactoryGirl.create(:confirmed_user, email: ENV['AUTO_ORG_MEMBER']) }
+      let(:auto_user) { FactoryGirl.create(:user_confirmed, email: ENV['AUTO_ORG_MEMBER']) }
       before do
         expect(organization).to be_present
         expect(auto_user).to be_present

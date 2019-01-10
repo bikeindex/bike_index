@@ -47,7 +47,7 @@ describe WelcomeController do
     end
     context "user present" do
       it "renders" do
-        user = FactoryGirl.create(:confirmed_user)
+        user = FactoryGirl.create(:user_confirmed)
         set_current_user(user)
         get :choose_registration
         expect(response.status).to eq(200)
@@ -74,7 +74,7 @@ describe WelcomeController do
     end
 
     context "when user is present" do
-      let(:user) { FactoryGirl.create(:confirmed_user) }
+      let(:user) { FactoryGirl.create(:user_confirmed) }
       context "without anything" do
         it "renders" do
           set_current_user(user)

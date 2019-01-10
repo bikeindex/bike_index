@@ -95,6 +95,15 @@ describe Organized::ExportsController, type: :controller do
         expect(response).to render_template(:new)
         expect(flash).to_not be_present
       end
+      context "organization has all feature slugs" do
+        it "renders still" do
+          organization.update_column :paid_feature_slugs, ["csv_exports"] + PaidFeature::REG_FIELDS # Stub organization having features
+          get :new, organization_id: organization.to_param
+          expect(response.code).to eq("200")
+          expect(response).to render_template(:new)
+          expect(flash).to_not be_present
+        end
+      end
     end
 
     describe "destroy" do

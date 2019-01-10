@@ -1,6 +1,6 @@
 shared_context :existing_doorkeeper_app do
   let(:doorkeeper_app) { create_doorkeeper_app }
-  let(:application_owner) { FactoryGirl.create(:confirmed_user) }
+  let(:application_owner) { FactoryGirl.create(:user_confirmed) }
   let(:user) { application_owner } # So we don't waste time creating extra users
   let(:v2_access_id) { ENV["V2_ACCESSOR_ID"] = user.id.to_s }
   let(:token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }

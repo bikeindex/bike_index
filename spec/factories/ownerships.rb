@@ -1,7 +1,7 @@
 FactoryGirl.define do
   factory :ownership do
     bike { FactoryGirl.create(:bike, owner_email: owner_email) }
-    creator { FactoryGirl.create(:confirmed_user) }
+    creator { FactoryGirl.create(:user_confirmed) }
     current true
     sequence(:owner_email) { |n| "owner#{n}@example.com" }
     factory :organization_ownership do

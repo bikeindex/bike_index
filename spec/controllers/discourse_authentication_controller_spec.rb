@@ -14,7 +14,7 @@ describe DiscourseAuthenticationController do
     end
     context 'signed in' do
       before do
-        user = FactoryGirl.create(:confirmed_user)
+        user = FactoryGirl.create(:user_confirmed)
         set_current_user(user)
         sso = SingleSignOn.parse(discourse_query_string, ENV['DISCOURSE_SECRET'])
         sso.email = user.email

@@ -23,7 +23,7 @@ describe DocumentationController do
     end
     context 'user' do
       it 'redirects to home, message API deprecated' do
-        user = FactoryGirl.create(:confirmed_user)
+        user = FactoryGirl.create(:user_confirmed)
         set_current_user(user)
         get :api_v1
         expect(response).to redirect_to documentation_index_path

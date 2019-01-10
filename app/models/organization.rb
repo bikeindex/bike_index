@@ -88,11 +88,7 @@ class Organization < ActiveRecord::Base
   end
 
   def additional_registration_fields
-    [
-      paid_for?("reg_address") ? "reg_address" : nil,
-      paid_for?("reg_phone") ? "reg_phone" : nil,
-      paid_for?("reg_secondary_serial") ? "reg_secondary_serial" : nil
-    ].compact
+    PaidFeature::REG_FIELDS.select { |f| paid_for?(f) }
   end
 
   def include_field_reg_phone?(user = nil)

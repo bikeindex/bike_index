@@ -41,7 +41,7 @@ describe Organized::MessagesController, type: :controller do
 
       context "organization with geolocated messages" do
         context "user without organization membership" do
-          let(:user) { FactoryGirl.create(:confirmed_user) }
+          let(:user) { FactoryGirl.create(:user_confirmed) }
           it "does not create" do
             expect(organization.paid_for?(kind_slug)).to be_truthy
             expect do

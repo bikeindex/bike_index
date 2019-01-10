@@ -3,14 +3,15 @@ require 'sidekiq/testing'
 require 'vcr'
 
 VCR.configure do |config|
-  config.cassette_library_dir = 'spec/vcr_cassettes'
+  config.cassette_library_dir = "spec/vcr_cassettes"
   config.allow_http_connections_when_no_cassette = true
   config.hook_into :webmock
 end
 
-if ENV['CODECLIMATE_REPO_TOKEN']
-  require 'codeclimate-test-reporter'
-  CodeClimate::TestReporter.start
+# For codeclimate test coverage. Only enable if the environmental variable is set - i.e. on CI
+if ENV["COVERAGE"]
+  require 'simplecov'
+  SimpleCov.start "rails"
 end
 
 ENV['RAILS_ENV'] ||= 'test'

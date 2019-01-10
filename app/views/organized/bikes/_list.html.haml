@@ -44,7 +44,7 @@
             - unless bike.owner_email == bike.first_owner_email
               (sent to a new owner)
         / %td
-        /   = "&#x2713;".html_safe if bike.current_owner_exists
+        /   = "&#x2713;".html_safe if bike.user?
         - if @bike_code.present?
           %td
             %small

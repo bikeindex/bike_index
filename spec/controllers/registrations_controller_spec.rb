@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe RegistrationsController do
-  let(:user) { FactoryGirl.create(:confirmed_user) }
+  let(:user) { FactoryGirl.create(:user_confirmed) }
   let(:auto_user) { FactoryGirl.create(:organization_auto_user) }
   let(:organization) { auto_user.organizations.first }
   let(:renders_embed_without_xframe) do

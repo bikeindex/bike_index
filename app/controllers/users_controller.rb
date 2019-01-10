@@ -1,5 +1,5 @@
 class UsersController < ApplicationController
-  layout 'application_revised'
+  layout "application_revised"
   include Sessionable
   before_filter :authenticate_user, only: [:edit]
   before_filter :store_return_to, only: [:new]
@@ -26,7 +26,8 @@ class UsersController < ApplicationController
   end
 
   def please_confirm_email
-
+    layout = @partner == "bikehub" ? "application_revised_bikehub" : "application_revised"
+    # @user = 
   end
 
   def confirm

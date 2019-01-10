@@ -94,15 +94,6 @@ describe Bike do
   end
 
   describe 'owner' do
-    it 'receives owner from the last ownership' do
-      first_ownership = Ownership.new
-      second_ownership = Ownership.new
-      user = User.new
-      bike = Bike.new
-      allow(bike).to receive(:ownerships).and_return([first_ownership, second_ownership])
-      allow(second_ownership).to receive(:owner).and_return(user)
-      expect(bike.owner).to eq(user)
-    end
     it "doesn't break if the owner is deleted" do
       delete_user = FactoryGirl.create(:user)
       ownership = FactoryGirl.create(:ownership, user_id: delete_user.id)
@@ -115,13 +106,12 @@ describe Bike do
     end
   end
 
-  describe 'first_owner_email' do
-    it 'gets owner email from the first ownership' do
-      first_ownership = Ownership.new(owner_email: 'foo@example.com')
-      second_ownership = Ownership.new
-      bike = Bike.new
-      allow(bike).to receive(:ownerships).and_return([first_ownership, second_ownership])
-      expect(bike.first_owner_email).to eq('foo@example.com')
+  describe "first_owner_email" do
+    let(:ownership) { Ownership.new(owner_email: "foo@example.com") }
+    let(:bike) { Bike.new }
+    it "gets owner email from the first ownership" do
+      allow(bike).to receive(:first_ownership) { ownership }
+      expect(bike.first_owner_email).to eq("foo@example.com")
     end
   end
 
@@ -173,18 +163,19 @@ describe Bike do
     end
   end
 
-  describe 'current_owner_exists' do
+  describe 'user?' do
+    let(:bike) { Bike.new }
+    let(:ownership) { Ownership.new }
+    before { allow(bike).to receive(:current_ownership) { ownership } }
     it "returns false if ownership isn't claimed" do
-      bike = Bike.new
-      ownership = Ownership.new
-      allow(bike).to receive(:ownerships).and_return([ownership])
-      expect(bike.current_owner_exists).to be_falsey
+      expect(bike.user?).to be_falsey
     end
-    it 'returns true if ownership is claimed' do
-      bike = Bike.new
-      ownership = Ownership.new(claimed: true)
-      allow(bike).to receive(:ownerships).and_return([ownership])
-      expect(bike.current_owner_exists).to be_truthy
+    context "claimed" do
+      let(:user) { User.new }
+      let(:ownership) { Ownership.new(claimed: true, user: user) }
+      it 'returns true if ownership is claimed' do
+        expect(bike.user?).to be_truthy
+      end
     end
   end
 
@@ -193,7 +184,7 @@ describe Bike do
       it 'returns false' do
         user = User.new
         bike = Bike.new
-        allow(bike).to receive(:current_owner_exists).and_return(true)
+        allow(bike).to receive(:user?).and_return(true)
         expect(bike.can_be_claimed_by(user)).to be_falsey
       end
     end
@@ -204,7 +195,7 @@ describe Bike do
         bike = Bike.new
         allow(bike).to receive(:current_ownership).and_return(ownership)
         allow(ownership).to receive(:user).and_return(user)
-        allow(bike).to receive(:current_owner_exists).and_return(false)
+        allow(bike).to receive(:user?).and_return(false)
         expect(bike.can_be_claimed_by(user)).to be_truthy
       end
     end
@@ -556,6 +547,82 @@ describe Bike do
     end
   end
 
+  describe "user_name" do
+    let(:bike) { Bike.new }
+    let(:user) { User.new(name: "Fun McGee") }
+    context "user" do
+      let(:ownership) { Ownership.new(user: user) }
+      it "returns users name" do
+        allow(bike).to receive(:current_ownership) { ownership }
+        expect(ownership.first?).to be_truthy
+        expect(bike.user_name).to eq "Fun McGee"
+      end
+    end
+    context "b_param" do
+      let(:ownership) { Ownership.new }
+      let(:b_param) { BParam.new(params: { bike: { user_name: "Jane Yung" } }) }
+      before do
+        allow(bike).to receive(:current_ownership) { ownership }
+        allow(bike).to receive(:b_params) { [b_param] }
+      end
+      it "returns the phone" do
+        expect(bike.user_name).to eq "Jane Yung"
+      end
+      context "not first ownerships" do
+        it "is the users " do
+          allow(ownership).to receive(:first?) { false }
+          allow(bike).to receive(:current_ownership) { ownership }
+          expect(bike.user_name).to be_nil
+        end
+      end
+    end
+  end
+
+  describe "phone" do
+    let(:bike) { Bike.new }
+    let(:user) { User.new(phone: "888.888.8888") }
+    context "assigned phone" do
+      it "returns phone" do
+        bike.phone = user.phone
+        expect(bike.phone).to eq "888.888.8888"
+      end
+    end
+    context "user" do
+      let(:ownership) { Ownership.new(user: user) }
+      it "returns users phone" do
+        allow(bike).to receive(:current_ownership) { ownership }
+        expect(ownership.first?).to be_truthy
+        expect(user.phone).to eq "888.888.8888"
+        expect(bike.phone).to eq "888.888.8888"
+      end
+    end
+    context "b_param" do
+      let(:ownership) { Ownership.new }
+      let(:b_param) { BParam.new(params: { bike: { phone: "888.888.8888" } }) }
+      before do
+        allow(bike).to receive(:current_ownership) { ownership }
+        allow(bike).to receive(:b_params) { [b_param] }
+      end
+      it "returns the phone" do
+        expect(bike.phone).to eq "888.888.8888"
+      end
+      context "not first ownerships" do
+        it "is the users " do
+          allow(ownership).to receive(:first?) { false }
+          allow(bike).to receive(:current_ownership) { ownership }
+          expect(bike.phone).to be_nil
+        end
+      end
+    end
+    context "creator" do
+      let(:ownership) { Ownership.new(creator: user) }
+      it "returns nil" do
+        allow(bike).to receive(:current_ownership) { ownership }
+        expect(bike.phone).to be_nil
+      end
+    end
+  end
+
   describe 'set_paints' do
     it 'returns true if paint is a color' do
       FactoryGirl.create(:color, name: 'Bluety')
@@ -734,7 +801,7 @@ describe Bike do
       stolen_record = FactoryGirl.create(:stolen_record)
       bike = stolen_record.bike
       digits = (Time.now.year - 1).to_s[2, 3] # last two digits of last year
-      problem_date = Date.strptime("#{Time.now.month}-22-00#{digits}", '%m-%d-%Y')
+      problem_date = Date.strptime("#{Time.now.month}-22-00#{digits}", "%m-%d-%Y")
       bike.update_attribute :stolen, true
       stolen_record.update_attribute :date_stolen, problem_date
       bike.update_attribute :listing_order, bike.get_listing_order

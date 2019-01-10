@@ -58,9 +58,11 @@ class Bike < ActiveRecord::Base
   validates_presence_of :primary_frame_color_id
 
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications,
-    :phone, :image, :b_param_id, :embeded, :address,
+    :image, :b_param_id, :embeded, :address,
     :embeded_extended, :paint_name, :bike_image_cache, :send_email,
     :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
+
+  attr_writer :phone, :user_name # reading is managed by a method
 
   default_scope { where(example: false).where(hidden: false).order('listing_order desc') }
   scope :stolen, -> { where(stolen: true) }
@@ -146,38 +148,34 @@ class Bike < ActiveRecord::Base
     t
   end
 
-  def current_ownership
-    ownerships && ownerships.last
-  end
+  def current_ownership; ownerships.reorder(:created_at).last end
 
-  def owner
-    current_ownership && current_ownership.owner
-  end
+  # owner resolves to creator if user isn't present, or organization auto user. shouldn't ever be nil
+  def owner; current_ownership && current_ownership.owner end
 
-  def first_ownership
-    ownerships.first
-  end
+  # This can be nil!
+  def user; current_ownership&.user end
 
-  def first_owner_email
-    first_ownership.owner_email
-  end
+  def user?; user.present? end
 
   # This is for organizations - might be useful for admin as well. We want it to be nil if it isn't present
-  def owner_name
-    current_ownership.user&.name # User - not ownership, because we don't want registrar
+  # User - not ownership, because we don't want registrar
+  def user_name
+    return user.name if user&.name.present?
+    # Only grab the name from b_params if it's the first owner - or if no owner, which means testing probably
+    return nil unless current_ownership.blank? || current_ownership&.first?
+    b_params.map(&:user_name).reject(&:blank?).first
   end
 
-  def owner_name_or_email
-    current_ownership.user&.name || owner_email
-  end
+  def user_name_or_email; user_name || owner_email end
 
-  def current_owner_exists
-    current_ownership && current_ownership.claimed
-  end
+  def first_ownership; ownerships.reorder(:created_at).first end
+
+  def first_owner_email; first_ownership.owner_email end
 
   def can_be_claimed_by(u)
-    return false if current_owner_exists || current_ownership.blank?
-    current_ownership.user == u || current_ownership.can_be_claimed_by(u)
+    return false if current_ownership.blank? || current_ownership.claimed?
+    user == u || current_ownership.can_be_claimed_by(u)
   end
 
   def authorize_bike_for_user!(u)
@@ -192,7 +190,7 @@ class Bike < ActiveRecord::Base
   end
 
   def user_hidden
-    hidden && current_ownership && current_ownership.user_hidden
+    hidden && current_ownership&.user_hidden
   end
 
   def fake_deleted
@@ -200,15 +198,20 @@ class Bike < ActiveRecord::Base
   end
 
   def phone
-    # Include @phone because attr_accessor
-    @phone || owner&.phone || b_params.map(&:phone).reject(&:blank?).first
+    # use @phone because attr_accessor
+    @phone ||= user&.phone
+    # Only grab the phone number from b_params if it's the first owner - or if no owner, which means testing probably
+    if current_ownership.blank? || current_ownership&.first?
+      @phone ||= b_params.map(&:phone).reject(&:blank?).first
+    end
+    @phone
   end
 
-  def visible_by(user=nil)
+  def visible_by(passed_user=nil)
     return true unless hidden
-    if user.present?
-      return true if user.superuser
-      return true if owner == user && user_hidden
+    if passed_user.present?
+      return true if passed_user.superuser
+      return true if owner == passed_user && user_hidden
     end
     false
   end
@@ -360,7 +363,7 @@ class Bike < ActiveRecord::Base
   end
 
   def registration_address # Goes along with organization additional_registration_fields
-    b_params.map(&:fetch_formatted_address).reject(&:blank?).first || {}
+    @registration_address ||= b_params.map(&:fetch_formatted_address).reject(&:blank?).first || {}
   end
 
   def frame_colors
