@@ -5,7 +5,7 @@ FactoryGirl.define do
     password 'testthisthing7$'
     password_confirmation 'testthisthing7$'
     terms_of_service true
-    factory :confirmed_user do
+    factory :user_confirmed do
       after(:create) { |u| u.confirm(u.confirmation_token) }
       factory :user_bikehub_signup do
         partner_data { { sign_up: "bikehub" } }

@@ -10,19 +10,12 @@ class OwnershipCreator
     @user_hidden = creation_params[:user_hidden]
   end
 
-  def find_owner_email
-    @owner_email = @bike.owner_email unless @owner_email.present?
-    @owner_email
-  end
-
   def creator_id
-    @creator = @bike.creator unless @creator.present?
-    @creator.id 
+    @creator_id ||= @bike.creator&.id
   end
 
-  def owner_id
-    user = User.fuzzy_email_find(find_owner_email)
-    user.id if user
+  def user_id
+    @user_id ||= User.fuzzy_email_find(@bike.owner_email)&.id
   end
 
   def send_notification_email(ownership)
@@ -32,14 +25,14 @@ class OwnershipCreator
   end
 
   def self_made?
-    true if @creator.id == owner_id
+    true if creator_id == user_id
   end
 
   def new_ownership_params
-    ownership = {
+    {
       bike_id: @bike.id,
-      user_id: owner_id,
-      owner_email: find_owner_email,
+      user_id: user_id,
+      owner_email: @bike.owner_email,
       creator_id: creator_id,
       claimed: self_made?,
       example: @bike.example,
@@ -47,14 +40,12 @@ class OwnershipCreator
       send_email: @send_email,
       user_hidden: @user_hidden
     }
-    ownership
   end
 
   def mark_other_ownerships_not_current
-    if @bike.ownerships.any?
-      @bike.ownerships.each do |own|
-        own.update_attributes(current: false)
-      end
+    return true unless @bike.ownerships.any?
+    @bike.ownerships.each do |own|
+      own.update_attributes(current: false)
     end
   end
 
@@ -67,7 +58,7 @@ class OwnershipCreator
   end
 
   def current_is_hidden
-    @bike && @bike.user_hidden
+    @bike&.user_hidden
   end
 
   def create_ownership
@@ -81,6 +72,6 @@ class OwnershipCreator
       add_errors_to_bike(ownership)
       raise OwnershipNotSavedError, "Ownership wasn't saved. Are you sure the bike was created?"
     end
+    ownership
   end
-
 end

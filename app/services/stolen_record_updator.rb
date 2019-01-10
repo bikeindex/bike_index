@@ -7,16 +7,6 @@ class StolenRecordUpdator
     @date_stolen = TimeParser.parse(creation_params[:date_stolen])
     @user = creation_params[:user]
     @b_param = creation_params[:b_param]
-  end 
-
-  def updated_phone
-    if @bike.phone.present?
-      phone = @bike.phone 
-      if @user.present?
-        @user.update_attributes(phone: phone) unless @user.phone
-      end
-      return phone 
-    end
   end
 
   def mark_records_not_current
@@ -50,27 +40,27 @@ class StolenRecordUpdator
 
   def update_with_params(stolen_record)
     return stolen_record unless @b_param.present?
-    sr = @b_param['stolen_record']
-    if @b_param['bike'] && @b_param['bike']['stolen_records_attributes'] && @b_param['bike']['stolen_records_attributes'].values.first.is_a?(Hash)
-      @b_param['bike']['stolen_records_attributes'].each { |k, v| sr = v if v.present? }
-    end
+
+    sr = @b_param["stolen_record"]
+    nested_params = @b_param.dig("bike", "stolen_records_attributes")
+    sr = nested_params.values.reject(&:blank?).last if nested_params&.values&.first&.is_a?(Hash)
     return stolen_record unless sr.present?
+
     stolen_record.attributes = permitted_attributes(sr)
 
-    unless @date_stolen.present?
-      stolen_record.date_stolen = TimeParser.parse(sr["date_stolen"], sr["timezone"]) || Time.now
+    stolen_record.date_stolen = TimeParser.parse(sr["date_stolen"], sr["timezone"]) || Time.now unless @date_stolen.present?
+
+    if sr["country"].present?
+      country = Country.fuzzy_iso_find(sr["country"])
+      stolen_record.country_id = country&.id
     end
-    if sr['country'].present?
-      country = Country.fuzzy_iso_find(sr['country'])
-      stolen_record.country_id = country.id if country.present?
-    end
-    stolen_record.state_id = State.fuzzy_abbr_find(sr['state']).id if sr['state'].present?
-    if sr['phone_no_show']
-    	stolen_record.attributes = {
+    stolen_record.state_id = State.fuzzy_abbr_find(sr["state"])&.id if sr["state"].present?
+    if sr["phone_no_show"]
+      stolen_record.attributes = {
         phone_for_everyone: false,
-      	phone_for_users: false,
-      	phone_for_shops: false,
-      	phone_for_police: false
+        phone_for_users: false,
+        phone_for_shops: false,
+        phone_for_police: false
       }
     end
     stolen_record
@@ -79,10 +69,8 @@ class StolenRecordUpdator
   def create_new_record
     mark_records_not_current
     new_stolen_record = StolenRecord.new(bike: @bike, current: true, date_stolen: @date_stolen || Time.now)
-    if updated_phone.present?
-      new_stolen_record.phone = updated_phone
-    end
-    new_stolen_record.country_id = Country.united_states.id rescue (raise StolenRecordError, "US isn't instantiated - Stolen Record updater error")
+    new_stolen_record.phone = @bike.phone
+    new_stolen_record.country_id = Country.united_states&.id
     stolen_record = update_with_params(new_stolen_record)
     stolen_record.creation_organization_id = @bike.creation_organization_id
     if stolen_record.save
@@ -99,9 +87,9 @@ class StolenRecordUpdator
   private
 
   def permitted_params
-    %w(phone secondary_phone street city zipcode country_id state_id
+    %w[phone secondary_phone street city zipcode country_id state_id
        police_report_number police_report_department estimated_value
        theft_description locking_description lock_defeat_description
-       proof_of_ownership receive_notifications)
+       proof_of_ownership receive_notifications]
   end
 end

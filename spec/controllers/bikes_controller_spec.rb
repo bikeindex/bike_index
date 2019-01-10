@@ -212,7 +212,7 @@ describe BikesController do
     context "organized no bike" do
       let(:organization) { FactoryGirl.create(:organization) }
       let!(:bike_code2) { FactoryGirl.create(:bike_code, organization: organization, code: 900) }
-      let!(:user) { FactoryGirl.create(:confirmed_user) }
+      let!(:user) { FactoryGirl.create(:user_confirmed) }
       before { set_current_user(user) }
       it "renders the scanned page" do
         get :scanned, id: "000900", organization_id: organization.to_param
@@ -509,7 +509,7 @@ describe BikesController do
       context "with persisted email and non-member and parent organization" do
         let(:organization_parent) { FactoryGirl.create(:organization) }
         let(:organization) { FactoryGirl.create(:organization_with_auto_user, parent_organization_id: organization_parent.id) }
-        let!(:user2) { FactoryGirl.create(:confirmed_user) }
+        let!(:user2) { FactoryGirl.create(:user_confirmed) }
         it "registers a bike and redirects with persist_email" do
           set_current_user(user2)
           post :create, bike: bike_params.merge(manufacturer_id: "A crazy different thing"), persist_email: true
@@ -601,63 +601,63 @@ describe BikesController do
         end
       end
 
-      context 'no existing b_param and stolen' do
+      context "no existing b_param and stolen" do
         let(:wheel_size) { FactoryGirl.create(:wheel_size) }
         let(:country) { Country.united_states }
         let(:state) { FactoryGirl.create(:state, country: country) }
         let(:bike_params) do
           {
-            b_param_id_token: '',
+            b_param_id_token: "",
             cycle_type_id: CycleType.bike.id.to_s,
-            serial_number: 'example serial',
-            manufacturer_other: '',
-            year: '2016',
-            frame_model: 'Cool frame model',
+            serial_number: "example serial",
+            manufacturer_other: "",
+            year: "2016",
+            frame_model: "Cool frame model",
             primary_frame_color_id: color.id.to_s,
-            secondary_frame_color_id: '',
-            tertiary_frame_color_id: '',
-            owner_email: 'something@stuff.com',
-            phone: '312.379.9513',
+            secondary_frame_color_id: "",
+            tertiary_frame_color_id: "",
+            owner_email: "something@stuff.com",
+            phone: "312.379.9513",
             stolen: true
           }
         end
         let(:stolen_params) do
           {
             country_id: country.id,
-            street: '2459 W Division St',
-            city: 'Chicago',
-            zipcode: '60622',
+            street: "2459 W Division St",
+            city: "Chicago",
+            zipcode: "60622",
             state_id: state.id
           }
         end
-        before do
-          expect(BParam.all.count).to eq 0
-        end
-        context 'successful creation' do
+        before { expect(BParam.all.count).to eq 0 }
+        context "successful creation" do
+          include_context :geocoder_real
           it "creates a bike and doesn't create a b_param" do
-            success_params = bike_params.merge(manufacturer_id: manufacturer.slug)
-            bb_data = { bike: { rear_wheel_bsd: wheel_size.iso_bsd.to_s }, components: [] }.as_json
-            # We need to call clean_params on the BParam after bikebook update, so that
-            # the foreign keys are assigned correctly. This is how we test that we're
-            # This is also where we're testing bikebook assignment
-            expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
-            expect do
-              post :create, stolen: true, bike: success_params.as_json, stolen_record: stolen_params
-            end.to change(Bike, :count).by(1)
-            expect(flash[:success]).to be_present
-            expect(BParam.all.count).to eq 0
-            bike = Bike.last
-            bike_params.delete(:manufacturer_id)
-            bike_params.delete(:phone)
-            bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
-            expect(bike.manufacturer).to eq manufacturer
-            expect(bike.stolen).to be_truthy
-            user.reload
-            expect(user.phone).to eq '3123799513'
-            expect(bike.current_stolen_record.phone).to eq '3123799513'
-            stolen_record = bike.current_stolen_record
-            stolen_params.delete(:state_id) # this doesn't show up, don't care for now, shows up for real
-            stolen_params.each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+            bike_user = FactoryGirl.create(:user_confirmed, email: "something@stuff.com")
+            VCR.use_cassette("bikes_controller-create-stolen-web", match_requests_on: [:path]) do
+              success_params = bike_params.merge(manufacturer_id: manufacturer.slug)
+              bb_data = { bike: { rear_wheel_bsd: wheel_size.iso_bsd.to_s }, components: [] }.as_json
+              # We need to call clean_params on the BParam after bikebook update, so that
+              # the foreign keys are assigned correctly. This is how we test that we're
+              # This is also where we're testing bikebook assignment
+              expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
+              expect do
+                post :create, stolen: true, bike: success_params.as_json, stolen_record: stolen_params
+              end.to change(Bike, :count).by(1)
+              expect(flash[:success]).to be_present
+              expect(BParam.all.count).to eq 0
+              bike = Bike.last
+              bike_params.except(:manufacturer_id, :phone).each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+              expect(bike.manufacturer).to eq manufacturer
+              expect(bike.stolen).to be_truthy
+              bike_user.reload
+              expect(bike.current_stolen_record.phone).to eq "3123799513"
+              expect(bike_user.phone).to eq "3123799513"
+              stolen_record = bike.current_stolen_record
+              stolen_params.delete(:state_id) # this doesn't show up, don't care for now, shows up for real
+              stolen_params.each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+            end
           end
         end
         context 'failure' do
@@ -704,7 +704,6 @@ describe BikesController do
             # the foreign keys are assigned correctly. This is how we test that we're
             # This is also where we're testing bikebook assignment
             expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
-            Geocoder.configure(lookup: :test)
             expect do
               post :create, bike: {
                 manufacturer_id: manufacturer.slug,
@@ -728,6 +727,9 @@ describe BikesController do
             expect(bike.registration_address).to eq target_address.as_json
             expect(bike.additional_registration).to eq "XXXZZZ"
             expect(bike.phone).to eq "888.777.6666"
+            user.reload
+            expect(bike.owner).to eq user # NOTE: not bike user
+            expect(user.phone).to be_nil # Because the phone doesn't set for the creator
           end
         end
         context 'created bike' do
@@ -1056,7 +1058,7 @@ describe BikesController do
     end
     context 'owner present (who is allowed to edit)' do
       let(:color) { FactoryGirl.create(:color) }
-      let(:user) { FactoryGirl.create(:confirmed_user) }
+      let(:user) { FactoryGirl.create(:user_confirmed) }
       let(:ownership) { FactoryGirl.create(:organization_ownership, owner_email: user.email) }
       let(:bike) { ownership.bike }
       let(:organization) { bike.organizations.first }

@@ -6,9 +6,9 @@ describe SendNewsletterWorker do
   let(:instance) { subject.new }
 
   context 'no id passed' do
-    let(:user) { FactoryGirl.create(:confirmed_user, is_emailable: true, banned: false) }
-    let(:user_unemailable) { FactoryGirl.create(:confirmed_user, is_emailable: false) }
-    let(:user_banned) { FactoryGirl.create(:confirmed_user, is_emailable: true, banned: true) }
+    let(:user) { FactoryGirl.create(:user_confirmed, is_emailable: true, banned: false) }
+    let(:user_unemailable) { FactoryGirl.create(:user_confirmed, is_emailable: false) }
+    let(:user_banned) { FactoryGirl.create(:user_confirmed, is_emailable: true, banned: true) }
     let(:user_unconfirmed) { FactoryGirl.create(:user, is_emailable: true, banned: false) }
     it 'enqueues sending to emails' do
       expect([user.id, user_unemailable.id, user_banned.id, user_unconfirmed.id].count).to eq 4

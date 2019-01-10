@@ -37,12 +37,23 @@ describe OrganizationExportWorker do
       end
       context "xlsx format" do
         let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, file_format: "xlsx") }
-        it "raises because we haven't made it yet" do
+        it "exports" do
           instance.perform(export.id)
           export.reload
           expect(export.progress).to eq "finished"
           expect(export.file.read).to be_present
           expect(export.rows).to eq 1
+        end
+      end
+      context "avery export" do
+        let(:export) { FactoryGirl.create(:export_avery, progress: "pending", file: nil) }
+        it "exports, does not include bike that is missing name and email" do
+          expect(export.avery_export?).to be_truthy
+          instance.perform(export.id)
+          export.reload
+          expect(export.progress).to eq "finished"
+          expect(export.file.read.strip.split(/\n/).count).to eq 1 # Only has the headers exported, no bikes
+          expect(export.rows).to eq 0 # Also has correct count
         end
       end
     end
@@ -83,7 +94,7 @@ describe OrganizationExportWorker do
                            secondary_frame_color: secondary_color,
                            owner_email: email)
       end
-      let!(:ownership) { FactoryGirl.create(:ownership, bike: bike, creator: FactoryGirl.create(:confirmed_user, name: "other person"), user: FactoryGirl.create(:user, name: "George Smith", email: "testly@bikeindex.org")) }
+      let!(:ownership) { FactoryGirl.create(:ownership, bike: bike, creator: FactoryGirl.create(:user_confirmed, name: "other person"), user: FactoryGirl.create(:user, name: "George Smith", email: "testly@bikeindex.org")) }
       let(:csv_lines) { [export.headers, fancy_bike_values] }
       let(:fancy_bike_values) do
         [
@@ -99,7 +110,7 @@ describe OrganizationExportWorker do
           nil,
           email,
           "George Smith",
-          "George Smith" # Because of owner_name_with_fallback
+          "George Smith" # Because of user_name_with_fallback
         ]
       end
       let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"\",\"\",\"\",\"#{email}\",\"George Smith\",\"George Smith\"" }
@@ -135,6 +146,7 @@ describe OrganizationExportWorker do
       let(:bike) { FactoryGirl.create(:creation_organization_bike, organization: organization, additional_registration: "cool extra serial") }
       include_context :geocoder_real
       it "returns the expected values" do
+        expect(bike.phone).to eq "717.742.3423"
         expect(bike.additional_registration).to eq "cool extra serial"
         VCR.use_cassette("geohelper-formatted_address_hash") do
           instance.perform(export.id)

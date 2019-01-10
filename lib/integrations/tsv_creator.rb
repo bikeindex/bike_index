@@ -33,7 +33,7 @@ class TsvCreator
     row << "\t"
     row << "true" if bike.stolen 
     row << "\t"
-    row << bike.first_ownership.proper_owner_name if bike.first_ownership.proper_owner_name
+    row << bike.first_ownership.user&.name if bike.first_ownership.user
     row << "\t#{bike.first_owner_email}"
     row << "\t#{ENV['BASE_URL']}/bikes/#{bike.id}\n"
     "#{row}"

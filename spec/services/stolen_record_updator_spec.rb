@@ -3,49 +3,25 @@ require 'spec_helper'
 describe StolenRecordUpdator do
   describe 'create_new_record' do
     it 'creates a new stolen record' do
-      FactoryGirl.create(:country, iso: 'US')
       bike = FactoryGirl.create(:bike)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
-      expect(update_stolen_record).to receive(:updated_phone).at_least(1).times.and_return('1231234444')
       expect { update_stolen_record.create_new_record }.to change(StolenRecord, :count).by(1)
       expect(bike.stolen_records.count).to eq(1)
       expect(bike.current_stolen_record).to eq(bike.stolen_records.last)
     end
 
     it 'calls mark_records_not_current' do
-      FactoryGirl.create(:country, iso: 'US')
       bike = FactoryGirl.create(:bike, stolen: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
-      expect(update_stolen_record).to receive(:updated_phone).at_least(1).times.and_return('1231234444')
       expect(update_stolen_record).to receive(:mark_records_not_current)
       update_stolen_record.create_new_record
     end
   end
 
-  describe 'updated_phone' do
-    it 'does not set the phone if the user already has a phone' do
-      user = FactoryGirl.create(:user, phone: '0000000000')
-      bike = Bike.new
-      allow(bike).to receive(:phone).and_return('699.999.9999')
-      expect(StolenRecordUpdator.new(bike: bike, user: user).updated_phone).to eq('699.999.9999')
-      expect(user.phone).to eq('0000000000')
-    end
-
-    it "sets the owner's phone if one is passed in" do
-      user = FactoryGirl.create(:user)
-      bike = Bike.new
-      allow(bike).to receive(:phone).and_return('699.999.9999')
-      expect(StolenRecordUpdator.new(bike: bike, user: user).updated_phone).to eq('699.999.9999')
-      expect(user.phone).to eq('6999999999')
-    end
-  end
-
   describe 'update_records' do
     it "sets the current stolen record as not current if the bike isn't stolen" do
-      FactoryGirl.create(:country, iso: 'US')
       bike = FactoryGirl.create(:bike, stolen: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
-      expect(update_stolen_record).to receive(:updated_phone).at_least(1).times.and_return('1231234444')
       expect(update_stolen_record).to receive(:mark_records_not_current)
       update_stolen_record.update_records
     end

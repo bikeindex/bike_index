@@ -27,7 +27,7 @@ describe User do
 
   describe 'create user_email' do
     it 'creates a user_email on create' do
-      user = FactoryGirl.create(:confirmed_user)
+      user = FactoryGirl.create(:user_confirmed)
       expect(user.user_emails.count).to eq 1
       expect(user.email).to eq user.user_emails.first.email
     end
@@ -74,7 +74,7 @@ describe User do
       end
 
       it "doesn't let confirmed users have the same password" do
-        FactoryGirl.create(:confirmed_user, email: @user.email)
+        FactoryGirl.create(:user_confirmed, email: @user.email)
         expect(@user.valid?).to be_falsey
         expect(@user.errors.messages[:email]).to be_present
       end
@@ -163,7 +163,7 @@ describe User do
       expect(user).to be_present
     end
     context 'confirmed user' do
-      let(:user) { FactoryGirl.create(:confirmed_user, email: 'ned@foo.com') }
+      let(:user) { FactoryGirl.create(:user_confirmed, email: 'ned@foo.com') }
       context 'primary email' do
         it "finds users by email address when the case doesn't match" do
           expect(User.fuzzy_email_find('NeD@fOO.cOM ')).to eq(user)
@@ -224,7 +224,7 @@ describe User do
   end
 
   describe 'secondary_emails' do
-    let(:user) { FactoryGirl.create(:confirmed_user, email: 'cool@stuff.com') }
+    let(:user) { FactoryGirl.create(:user_confirmed, email: 'cool@stuff.com') }
     let(:user_email) { FactoryGirl.create(:user_email, user: user) }
     it 'lists the non-primary emails' do
       expect(user_email).to be_present
@@ -454,7 +454,7 @@ describe User do
   end
 
   describe 'additional_emails=' do
-    let(:user) { FactoryGirl.create(:confirmed_user) }
+    let(:user) { FactoryGirl.create(:user_confirmed) }
     before do
       expect(user.user_emails.count).to eq 1
     end

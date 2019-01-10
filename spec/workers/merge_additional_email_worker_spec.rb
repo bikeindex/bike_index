@@ -12,7 +12,7 @@ describe MergeAdditionalEmailWorker do
 
     context 'existing user account' do
       let(:bike) { FactoryGirl.create(:bike, creator_id: old_user.id) }
-      let(:old_user) { FactoryGirl.create(:confirmed_user, email: email) }
+      let(:old_user) { FactoryGirl.create(:user_confirmed, email: email) }
       let(:pre_created_ownership) { FactoryGirl.create(:ownership, creator_id: old_user.id) }
       let(:old_user_ownership) { FactoryGirl.create(:ownership, owner_email: email) }
 
