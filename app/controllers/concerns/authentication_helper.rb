@@ -3,6 +3,7 @@ module AuthenticationHelper
   def authenticate_user(msg = "Sorry, you have to log in", flash_type: :error)
     if current_user.present?
       return true if current_user.terms_of_service
+
       redirect_to accept_terms_url(subdomain: false) and return
     elsif unconfirmed_current_user.present?
       redirect_to please_confirm_email_users_path and return
@@ -75,19 +76,17 @@ module AuthenticationHelper
   end
 
   def require_admin!
-    unless current_user.is_admin_of?(current_organization)
-      flash[:error] = 'You have to be an organization administrator to do that!'
-      redirect_to user_home_url and return
-    end
+    return true if current_user.is_admin_of?(current_organization)
+    flash[:error] = "You have to be an organization administrator to do that!"
+    redirect_to user_home_url and return
   end
 
   def require_index_admin!
-    type = 'full'
-    content_accessible = ['news']
-    type = 'content' if content_accessible.include?(controller_name)
-    unless current_user.present? && current_user.admin_authorized(type)
-      flash[:error] = "You don't have permission to do that!"
-      redirect_to user_root_url
-    end
+    type = "full"
+    content_accessible = ["news"]
+    type = "content" if content_accessible.include?(controller_name)
+    return true if current_user.present? && current_user.admin_authorized(type)
+    flash[:error] = "You don't have permission to do that!"
+    redirect_to user_root_url and return
   end
 end
