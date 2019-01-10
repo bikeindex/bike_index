@@ -42,6 +42,7 @@ describe UsersController do
 
   describe "create" do
     context "legacy" do
+      let(:user_attributes) { FactoryGirl.attributes_for(:user, email: "poo@pile.com") }
       describe "success" do
         it "creates a non-confirmed record" do
           expect do
@@ -50,6 +51,7 @@ describe UsersController do
           expect(flash).to_not be_present
           expect(response).to redirect_to(please_confirm_email_users_path)
           user = User.order(:created_at).last
+          expect(User.from_auth(cookies.signed[:auth])).to eq user
           expect(user.partner_sign_up).to be_nil
           expect(user.partner_sign_up).to be_nil
           expect(user.unconfirmed?).to be_truthy
@@ -57,13 +59,12 @@ describe UsersController do
         it "creates a confirmed user, log in, and send welcome if user has org invite" do
           expect_any_instance_of(CreateUserJobs).to receive(:send_welcome_email)
           FactoryGirl.create(:organization_invitation, invitee_email: "poo@pile.com")
-          post :create, user: FactoryGirl.attributes_for(:user, email: "poo@pile.com"), partner: "somethingcool"
-          expect(User.from_auth(cookies.signed[:auth])).to eq(User.fuzzy_email_find("poo@pile.com"))
+          post :create, user: user_attributes, partner: "somethingcool"
           expect(response).to redirect_to("https://new.bikehub.com/account")
           expect(User.order(:created_at).last.partner_sign_up).to be_nil
+          expect(User.from_auth(cookies.signed[:auth])).to eq(User.fuzzy_email_find("poo@pile.com"))
         end
         context "with partner param" do
-          let(:user_attributes) { FactoryGirl.attributes_for(:user) }
           it "renders parter sign in page" do
             session[:partner] = "bikehub"
             expect do
@@ -72,11 +73,11 @@ describe UsersController do
             expect(flash).to_not be_present
             expect(response).to redirect_to("https://new.bikehub.com/account")
             expect(session[:partner]).to be_nil
-            expect(User.from_auth(cookies.signed[:auth])).to eq(User.fuzzy_email_find("poo@pile.com"))
             user = User.order(:created_at).last
             expect(user.email).to eq(user_attributes[:email])
             expect(user.partner_sign_up).to eq "bikehub"
             expect(user.partner_data).to eq({ sign_up: "bikehub" }.as_json)
+            expect(User.from_auth(cookies.signed[:auth])).to eq user
           end
         end
       end

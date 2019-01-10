@@ -8,7 +8,7 @@ class UsersController < ApplicationController
   def new
     @user ||= User.new
     if current_user.present?
-      flash[:success] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
+      flash[:success] = "You're already signed in! Log out by clicking on 'Your Account' in the upper right corner"
       redirect_to user_home_url and return
     end
     render_partner_or_default_signin_layout
@@ -18,7 +18,7 @@ class UsersController < ApplicationController
     @user = User.new(permitted_parameters)
     if @user.save
       session[:partner] = nil # So they can leave this signup page if they want
-      sign_in_and_redirect
+      sign_in_and_redirect(@user)
     else
       @page_errors = @user.errors
       render_partner_or_default_signin_layout(render_action: :new)
@@ -38,7 +38,7 @@ class UsersController < ApplicationController
         render_partner_or_default_signin_layout(redirect_path: new_session_path)
       else
         if @user.confirm(params[:code])
-          sign_in_and_redirect
+          sign_in_and_redirect(@user)
         else
           render :confirm_error_bad_token
         end
@@ -60,7 +60,7 @@ class UsersController < ApplicationController
       @user = User.find_by_password_reset_token(params[:token])
       if @user.present?
         session[:return_to] = 'password_reset'
-        sign_in_and_redirect
+        sign_in_and_redirect(@user)
       else
         flash[:error] = "We're sorry, but that link is no longer valid."
         render action: :request_password_reset
@@ -143,7 +143,7 @@ class UsersController < ApplicationController
         @user.generate_auth_token
         @user.set_password_reset_token
         @user.reload
-        default_session_set
+        default_session_set(@user)
       end
       flash[:success] = 'Your information was successfully updated.'
       redirect_to my_account_url(page: params[:page]) and return
