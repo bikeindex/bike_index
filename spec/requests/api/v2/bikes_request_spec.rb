@@ -44,9 +44,10 @@ describe 'Bikes API V2' do
     let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes") }
     before :each do
       FactoryGirl.create(:wheel_size, iso_bsd: 559)
-      FactoryGirl.create(:cycle_type, slug: 'bike')
-      FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
+      CycleType.bike
+      PropulsionType.foot_pedal
     end
+    include_context :geocoder_default_location
 
     it 'responds with 401' do
       post '/api/v2/bikes', bike_attrs.to_json
@@ -137,47 +138,48 @@ describe 'Bikes API V2' do
       expect(bike.is_for_sale).to be_falsey
     end
 
-    it 'creates a stolen bike through an organization and uses the passed phone' do
+    it "creates a stolen bike through an organization and uses the passed phone" do
       organization = FactoryGirl.create(:organization)
-      user.update_attribute :phone, '0987654321'
+      user.update_attribute :phone, "0987654321"
       FactoryGirl.create(:membership, user: user, organization: organization)
-      FactoryGirl.create(:country, iso: 'US')
-      FactoryGirl.create(:state, abbreviation: 'Palace')
+      FactoryGirl.create(:country, iso: "US")
+      FactoryGirl.create(:state, abbreviation: "NY")
       organization.save
       bike_attrs.merge!(organization_slug: organization.slug)
       date_stolen = 1357192800
       bike_attrs[:stolen_record] = {
-        phone: '1234567890',
+        phone: "1234567890",
         date_stolen: date_stolen,
         theft_description: "This bike was stolen and that's no fair.",
-        country: 'US',
-        city: 'Chicago',
-        street: 'Cortland and Ashland',
-        zipcode: '60622',
-        state: 'Palace',
-        police_report_number: '99999999',
-        police_report_department: 'Chicago',
-        # locking_description: 'some locking description',
-        # lock_defeat_description: 'broken in some crazy way'
+        country: "US",
+        city: "New York",
+        street: "278 Broadway",
+        zipcode: "10007",
+        state: "NY",
+        police_report_number: "99999999",
+        police_report_department: "New York"
+        # locking_description: "some locking description",
+        # lock_defeat_description: "broken in some crazy way"
       }
       expect do
         post "/api/v2/bikes?access_token=#{token.token}",
              bike_attrs.to_json,
              JSON_CONTENT
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
-      result = JSON.parse(response.body)['bike']
-      expect(result['serial']).to eq(bike_attrs[:serial])
-      expect(result['manufacturer_name']).to eq(bike_attrs[:manufacturer])
-      expect(result['stolen_record']['date_stolen']).to eq(date_stolen)
-      bike = Bike.find(result['id'])
+      result = JSON.parse(response.body)
+      expect(result).to include("bike")
+      expect(result["bike"]["serial"]).to eq(bike_attrs[:serial])
+      expect(result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
+      expect(result["bike"]["stolen_record"]["date_stolen"]).to eq(date_stolen)
+      bike = Bike.find(result["bike"]["id"])
       expect(bike.creation_organization).to eq(organization)
-      expect(bike.creation_state.origin).to eq 'api_v2'
+      expect(bike.creation_state.origin).to eq "api_v2"
       expect(bike.creation_state.organization).to eq organization
       expect(bike.creation_state.creator).to eq bike.creator
       expect(bike.stolen).to be_truthy
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
-      expect(bike.current_stolen_record.phone).to eq('1234567890')
+      expect(bike.current_stolen_record.phone).to eq("1234567890")
     end
 
     it 'does not register a stolen bike unless attrs are present' do

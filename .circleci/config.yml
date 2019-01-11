@@ -7,8 +7,8 @@ jobs:
     environment:
       RAILS_ENV: test
       RACK_ENV: test
-      # CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
-      # COVERAGE: true
+      CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
+      COVERAGE: true
     docker:
       - image: circleci/ruby:2.5.1-stretch-node
         environment:
@@ -81,14 +81,14 @@ jobs:
                               --out test-results/rspec/rspec.xml \
                               --format progress \
                               -- ${TESTFILES}
-      # - run:
-      #     name: Code Climate Test Coverage
-      #     command: |
-      #       ./cc-test-reporter format-coverage -t simplecov -o "coverage/ mate.$CIRCLE_NODE_INDEX.json"
+      - run:
+          name: Code Climate Test Coverage
+          command: |
+            ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
       - store_test_results:
           path: test-results
       - store_artifacts:
           path: test-artifacts
-      # - deploy:
-      #     command: |
-      #       ./cc-test-reporter sum-coverage --output - --parts $CIRCLE_NODE_TOTAL coverage/codeclimate.*.json | ./cc-test-reporter upload-coverage --debug --input -
+      - deploy:
+          command: |
+            ./cc-test-reporter sum-coverage --output - --parts 1 coverage/codeclimate.*.json | ./cc-test-reporter upload-coverage --debug --input -
