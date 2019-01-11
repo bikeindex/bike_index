@@ -127,24 +127,21 @@ describe SessionsController do
       end
     end
 
-    context 'unconfirmed' do
-      let(:user) { FactoryGirl.create(:user, confirmed: false) }
-      it 'does not log in unconfirmed users' do
-        post :create, session: { email: user.email }
-        expect(response).to render_template(:new)
-        expect(flash[:error]).to be_present
-        expect(cookies.signed[:auth]).to be_nil
-        expect(response).to render_with_layout('application_revised')
+    context "unconfirmed" do
+      let(:user) { FactoryGirl.create(:user) }
+      it "logs in, sends to please_confirm_email" do
+        expect(user.authenticate("testthisthing7$")).to be_truthy
+        post :create, session: { email: user.email, password: "testthisthing7$" }
+        expect(User.from_auth(cookies.signed[:auth])).to eq(user)
+        expect(response).to redirect_to(please_confirm_email_users_path)
       end
-      context 'with confirmed user_email' do
-        it 'does not log them in either' do
-          user_email = FactoryGirl.create(:user_email, user: user)
+      context "with confirmed user_email" do
+        let!(:user_email) { FactoryGirl.create(:user_email, user: user) }
+        it "sends them to the same spot" do
           expect(user_email.confirmed).to be_truthy
-          post :create, session: { email: user_email.email }
-          expect(response).to render_template(:new)
-          expect(flash[:error]).to be_present
-          expect(cookies.signed[:auth]).to be_nil
-          expect(response).to render_with_layout('application_revised')
+          post :create, session: { email: user.email, password: "testthisthing7$" }
+          expect(User.from_auth(cookies.signed[:auth])).to eq(user)
+          expect(response).to redirect_to(please_confirm_email_users_path)
         end
       end
     end

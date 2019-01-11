@@ -180,16 +180,6 @@ class User < ActiveRecord::Base
     end
   end
   
-  # We have a different authentication flow than has_secure_password because of email confirmation
-  # and banning
-  def signin(password)
-    if self.confirmed
-      self.authenticate(password)
-    else
-      return false
-    end
-  end
-
   def role(organization)
     m = Membership.where(user_id: id, organization_id: organization.id).first
     m && m.role

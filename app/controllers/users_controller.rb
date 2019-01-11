@@ -26,8 +26,8 @@ class UsersController < ApplicationController
   end
 
   def please_confirm_email
+    @user = unconfirmed_current_user
     layout = @partner == "bikehub" ? "application_revised_bikehub" : "application_revised"
-    # @user = 
   end
 
   def confirm
