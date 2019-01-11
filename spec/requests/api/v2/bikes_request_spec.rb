@@ -165,7 +165,7 @@ describe 'Bikes API V2' do
              JSON_CONTENT
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
       result = JSON.parse(response.body)
-      expect(result["bike"]).to be_present
+      expect(result).to include("bike")
       expect(result["bike"]["serial"]).to eq(bike_attrs[:serial])
       expect(result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       expect(result["bike"]["stolen_record"]["date_stolen"]).to eq(date_stolen)
