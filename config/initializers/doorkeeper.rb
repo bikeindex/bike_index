@@ -1,7 +1,6 @@
-OAUTH_SCOPES = [:public, :read_user, :read_bikes, :write_user, :write_bikes, :read_bikewise, :write_bikewise, :read_organization_membership]
-OAUTH_SCOPES_S = OAUTH_SCOPES.join(' ')
+OAUTH_SCOPES = %i[public read_user read_bikes write_user write_bikes read_bikewise write_bikewise read_organization_membership]
 if Rails.env.development? && defined?(User) && defined?(User.first)
-  ENV['V2_ACCESSOR_ID'] = (User.fuzzy_email_find('api@example.com') || User.first).id.to_s
+  ENV["V2_ACCESSOR_ID"] = (User.fuzzy_email_find("api@example.com") || User.first).id.to_s
 end
 Doorkeeper.configure do
   # Change the ORM that doorkeeper will use.
@@ -9,11 +8,9 @@ Doorkeeper.configure do
 
   # This block will be called to check whether the resource owner is authenticated or not.
   resource_owner_authenticator do
-    @user ||= User.from_auth(cookies.signed[:auth])
-    if @user
-      return @user if @user.confirmed?
-      # Check if app is confirmed
-    end
+    pp "&&&&&&&"
+    @user ||= User.confirmed.from_auth(cookies.signed[:auth])
+    return @user if @user.present?
     session[:return_to] = request.fullpath
     redirect_to(new_session_url)
   end

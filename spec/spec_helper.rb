@@ -36,6 +36,9 @@ RSpec.configure do |config|
   config.render_views
   config.infer_spec_type_from_file_location!
 
+  # Add our request spec helpers
+  config.include RequestSpecHelpers, type: :request
+
   config.before :suite do
     DatabaseCleaner.clean
   end

@@ -17,7 +17,7 @@ describe 'Me API V2' do
     before { expect(doorkeeper_app).to be_present }
 
     it "responds with all available attributes with full scoped token" do
-      token.update_attribute :scopes, OAUTH_SCOPES_S
+      token.update_attribute :scopes, all_scopes
       get "/api/v2/me", format: :json, access_token: token.token
       result = JSON.parse(response.body)
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
@@ -31,7 +31,7 @@ describe 'Me API V2' do
     end
 
     it 'responds with all available attributes with full scoped token' do
-      token.update_attribute :scopes, OAUTH_SCOPES_S
+      token.update_attribute :scopes, all_scopes
       get '/api/v2/me', format: :json, access_token: token.token
       expect(response.response_code).to eq(200)
       result = JSON.parse(response.body)

@@ -14,7 +14,7 @@ describe 'Users API V2' do
     let(:scopes) { "public" }
 
     context "all scopes" do
-      let(:scopes) { OAUTH_SCOPES_S }
+      let(:scopes) { all_scopes }
       it "responds with all available attributes with full scoped token" do
         get "/api/v2/users/current", format: :json, access_token: token.token
         expect(response.response_code).to eq(200)
