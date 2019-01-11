@@ -54,7 +54,7 @@ class UsersController < ApplicationController
   def password_reset
     if params[:token].present?
       @user = User.find_by_password_reset_token(params[:token])
-      if @user.present?
+      if @user.present? && !@user.reset_token_expired?
         session[:return_to] = "password_reset"
         sign_in_and_redirect(@user)
       else
@@ -99,9 +99,13 @@ class UsersController < ApplicationController
     @user = current_user
     if params[:user][:password_reset_token].present?
       if @user.password_reset_token != params[:user][:password_reset_token]
-        @user.errors.add(:base, "Doesn't match user's password reset token")
-      elsif @user.reset_token_time < (Time.now - 1.hours)
-        @user.errors.add(:base, 'Password reset token expired, try resetting password again')
+        remove_session
+        flash[:error] = "Doesn't match user's password reset token"
+        redirect_to user_home_url and return
+      elsif @user.reset_token_expired?
+        remove_session
+        flash[:error] = "Password reset token expired, try resetting password again"
+        redirect_to user_home_url and return
       end
     elsif params[:user][:password].present?
       unless @user.authenticate(params[:user][:current_password])

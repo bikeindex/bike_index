@@ -195,43 +195,21 @@ describe UsersController do
     end
   end
 
-  describe 'password_reset' do
-    describe 'if the token is present and valid' do
-      it 'logs in and redirects' do
-        user = FactoryGirl.create(:user_confirmed, email: 'ned@foo.com')
-        user.set_password_reset_token
-        post :password_reset, token: user.password_reset_token
-        expect(User.from_auth(cookies.signed[:auth])).to eq(user)
-        expect(response).to render_template :update_password
-      end
+  describe "password_reset" do
+    let!(:user) { FactoryGirl.create(:user_confirmed) }
+
+    it "enqueues a password reset email job" do
+      expect do
+        post :password_reset, email: user.email
+      end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
     end
 
-    it 'renders get request' do
-      user = FactoryGirl.create(:user_confirmed, email: 'ned@foo.com')
-      user.set_password_reset_token
-      get :password_reset, token: user.password_reset_token
-      expect(response.code).to eq('200')
-    end
-
-    it 'does not log in if the token is present and valid' do
-      post :password_reset, token: 'Not Actually a token'
-      expect(response).to render_template :request_password_reset
-    end
-
-    context 'confirmed user' do
-      it 'enqueues a password reset email job' do
-        user = FactoryGirl.create(:user_confirmed, email: 'something@boo.com')
-        expect do
-          post :password_reset, email: user.email
-        end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
-      end
-    end
-
-    context 'confirmed user secondary email' do
-      it 'enqueues a password reset email job' do
-        user_email = FactoryGirl.create(:user_email)
-        user = user_email.user
-        expect(user.email).to_not eq user_email.email
+    context "secondary email" do
+      let!(:user_email) { FactoryGirl.create(:user_email, user: user) }
+      it "enqueues a password reset email job" do
+        # user_email = FactoryGirl.create(:user_email)
+        # user = user_email.user
+        # expect(user.email).to_not eq user_email.email
         expect do
           post :password_reset, email: user_email.email
         end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
@@ -239,12 +217,54 @@ describe UsersController do
       end
     end
 
-    context 'unconfirmed user' do
-      it 'enqueues a password reset email job' do
-        user = FactoryGirl.create(:user, email: 'ned@foo.com')
+    context "unconfirmed user" do
+      let(:user) { FactoryGirl.create(:user) }
+      it "enqueues a password reset email job" do
         expect do
           post :password_reset, email: user.email
         end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
+      end
+    end
+
+    describe "token present (update password stage)" do
+      before { user.set_password_reset_token }
+      it "logs in and redirects" do
+        post :password_reset, token: user.password_reset_token
+        expect(User.from_auth(cookies.signed[:auth])).to eq(user)
+        expect(response).to render_template :update_password
+      end
+
+      context "unconfirmed user" do
+        let(:user) { FactoryGirl.create(:user) }
+        it "redirects" do
+          post :password_reset, token: user.password_reset_token
+          expect(response).to redirect_to please_confirm_email_users_path
+        end
+      end
+
+      context "get request" do
+        it "renders get request" do
+          user.set_password_reset_token
+          get :password_reset, token: user.password_reset_token
+          expect(response.code).to eq("200")
+        end
+      end
+
+      context "token expired" do
+        it "redirects to request password reset" do
+          user.set_password_reset_token((Time.now - 61.minutes).to_i)
+          post :password_reset, token: user.password_reset_token
+          expect(flash[:error]).to be_present
+          expect(cookies.signed[:auth]).to_not be_present
+          expect(response).to render_template :request_password_reset
+        end
+      end
+
+      context "token invalid" do
+        it "does not log in if the token is present and invalid" do
+          post :password_reset, token: "Not Actually a token"
+          expect(response).to render_template :request_password_reset
+        end
       end
     end
   end
@@ -396,6 +416,8 @@ describe UsersController do
                       password: 'new_pass',
                       password_confirmation: 'new_pass'
                     }
+      expect(response).to_not redirect_to(my_account_url)
+      expect(flash[:error]).to be_present
       expect(user.reload.authenticate('new_pass')).to be_falsey
       expect(user.password_reset_token).to eq(reset)
     end
@@ -412,7 +434,10 @@ describe UsersController do
                       password: "new_pass",
                       password_confirmation: "new_pass"
                     }
-      expect(user.reload.authenticate("new_pass")).not_to be_truthy
+      expect(response).to_not redirect_to(my_account_url)
+      expect(flash[:error]).to be_present
+      user.reload
+      expect(user.authenticate("new_pass")).not_to be_truthy
       expect(user.auth_token).to eq(auth)
       expect(user.password_reset_token).not_to eq("stuff")
       expect(cookies.signed[:auth]).to_not be_present
@@ -432,6 +457,7 @@ describe UsersController do
                       password_confirmation: 'new_pass'
                     }
       expect(response).to redirect_to(my_account_url)
+      expect(flash[:error]).to_not be_present
       expect(user.reload.authenticate('new_pass')).to be_truthy
       expect(user.auth_token).not_to eq(auth)
       expect(user.email).to eq(email)

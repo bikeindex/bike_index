@@ -152,6 +152,10 @@ class User < ActiveRecord::Base
     Time.at(t)
   end
 
+  def reset_token_expired?
+     reset_token_time < (Time.now - 1.hours)
+  end
+
   def set_password_reset_token(t=Time.now.to_i)
     self.password_reset_token = "#{t}-" + Digest::MD5.hexdigest("#{SecureRandom.hex(10)}-#{DateTime.now}")
     self.save
