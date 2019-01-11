@@ -55,9 +55,9 @@ describe Oauth::ApplicationsController do
       end
 
       context "logged in" do
-        include_context :logged_in_as_user
+        before { set_current_user(user) } # Do separately from logged_in_as, pulling doorkeeper user
         it "renders if owned by user" do
-          expect(doorkeeper_app.owner).to eq user
+          expect(doorkeeper_app.owner_id).to eq user.id
           get :edit, id: doorkeeper_app.id
           expect(response.code).to eq('200')
           expect(flash).not_to be_present
@@ -66,7 +66,7 @@ describe Oauth::ApplicationsController do
         context "other users app" do
           let(:user) { FactoryGirl.create(:user_confirmed) }
           it "redirects if not owned by user" do
-            expect(doorkeeper_app.owner).to_not eq user
+            expect(doorkeeper_app.owner_id).to_not eq user.id
             get :edit, id: doorkeeper_app.id
             expect(response).to redirect_to oauth_applications_url
             expect(flash).to be_present
@@ -76,7 +76,7 @@ describe Oauth::ApplicationsController do
         context "admin" do
           let(:user) { FactoryGirl.create(:admin) }
           it 'renders if superuser' do
-            expect(doorkeeper_app.owner).to_not eq user
+            expect(doorkeeper_app.owner_id).to_not eq user.id
             get :edit, id: doorkeeper_app.id
             expect(response.code).to eq('200')
             expect(flash).not_to be_present
@@ -86,9 +86,9 @@ describe Oauth::ApplicationsController do
     end
 
     describe "update" do
-      include_context :logged_in_as_user
+      before { set_current_user(user) } # Do separately from logged_in_as, pulling doorkeeper user
       it 'renders if owned by user' do
-        expect(doorkeeper_app.owner).to eq user
+        expect(doorkeeper_app.owner_id).to eq user.id
         put :update, id: doorkeeper_app.id, doorkeeper_application: { name: "new thing" }
         doorkeeper_app.reload
         expect(doorkeeper_app.name).to eq("new thing")
@@ -98,7 +98,7 @@ describe Oauth::ApplicationsController do
         let(:user) { FactoryGirl.create(:user_confirmed) }
         it "doesn't update" do
           og_name = doorkeeper_app.name
-          expect(doorkeeper_app.owner).to eq user
+          expect(doorkeeper_app.owner_id).to_not eq user.id
           put :update, id: doorkeeper_app.id, doorkeeper_application: { name: "new thing" }
           doorkeeper_app.reload
           expect(doorkeeper_app.name).to eq(og_name)
