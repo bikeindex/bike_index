@@ -1,15 +1,22 @@
-OAUTH_SCOPES = %i[public read_user read_bikes write_user write_bikes read_bikewise write_bikewise read_organization_membership]
+OAUTH_SCOPES = %i[public read_user write_user read_bikes write_bikes read_bikewise write_bikewise read_organization_membership unconfirmed]
 if Rails.env.development? && defined?(User) && defined?(User.first)
   ENV["V2_ACCESSOR_ID"] = (User.fuzzy_email_find("api@example.com") || User.first).id.to_s
 end
+
 Doorkeeper.configure do
   # Change the ORM that doorkeeper will use.
   orm :active_record
 
-  # This block will be called to check whether the resource owner is authenticated or not.
+  # This block is be called to check whether the resource owner is authenticated or not.
   resource_owner_authenticator do
-    @user ||= User.confirmed.from_auth(cookies.signed[:auth])
-    return @user if @user.present?
+    # Find the user
+    user = User.from_auth(cookies.signed[:auth])
+    # If unconfirmed - send the user to the confirm path
+    if user.unconfirmed?
+      redirect_to please_confirm_email_users_path and return
+    elsif user.present?
+      return user
+    end
     session[:return_to] = request.fullpath
     redirect_to(new_session_url)
   end
@@ -35,7 +42,7 @@ Doorkeeper.configure do
   use_refresh_token
 
   # Provide support for an owner to be assigned to each registered application (disabled by default)
-  enable_application_owner :confirmation => true
+  enable_application_owner confirmation: true
 
   # Define access token scopes for your provider
   # default_scopes  :public

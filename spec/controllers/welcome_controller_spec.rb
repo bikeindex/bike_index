@@ -70,7 +70,6 @@ describe WelcomeController do
 
       context "unconfirmed" do
         let(:user) { FactoryGirl.create(:user) }
-
         it "redirects" do
           get :user_home
           expect(flash).to_not be_present

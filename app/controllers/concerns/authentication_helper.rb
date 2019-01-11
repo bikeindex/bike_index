@@ -1,7 +1,8 @@
 # This isn't a concern so it can be included in the controller_helpers concern
 module AuthenticationHelper
   def authenticate_user(msg = "Sorry, you have to log in", flash_type: :error)
-    if unconfirmed_current_user.present?
+    # Someone unconfirmed users still get assigned to current_user. Check for them first, it's important
+    if unconfirmed_current_user.present? || current_user&.unconfirmed?
       redirect_to please_confirm_email_users_path and return
     elsif current_user.present?
       return true if current_user.terms_of_service

@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
   include Sessionable
-  layout 'application_revised'
+  layout "application_revised"
   before_action :skip_if_signed_in, only: [:new]
 
   def new
@@ -31,11 +31,11 @@ class SessionsController < ApplicationController
   def destroy
     remove_session
     if params[:redirect_location].present?
-      if params[:redirect_location].match('new_user')
-        redirect_to new_user_path, notice: 'Logged out!' and return
+      if params[:redirect_location].match("new_user")
+        redirect_to new_user_path, notice: "Logged out!" and return
       end
     end
-    redirect_to goodbye_url(subdomain: false), notice: 'Logged out!'
+    redirect_to goodbye_url(subdomain: false), notice: "Logged out!"
   end
 
   private
