@@ -5,9 +5,9 @@ module ControllerHelpers
   include AuthenticationHelper
 
   included do
-    helper_method :current_user, :current_organization, :user_root_url, :controller_namespace,
+    helper_method :current_user, :unconfirmed_current_user, :current_organization, :user_root_url,
                   :page_id, :remove_session, :ensure_preview_enabled!, :forwarded_ip_address,
-                  :recovered_bike_count
+                  :recovered_bike_count, :controller_namespace
     before_filter :enable_rack_profiler
   end
 
@@ -36,21 +36,30 @@ module ControllerHelpers
   end
 
   def current_organization
+    # We call this multiple times - make sure nil stays nil
     return @current_organization if defined?(@current_organization)
     @current_organization = Organization.friendly_find(params[:organization_id])
   end
 
-  def store_return_to
-    session[:return_to] = params[:return_to] if params[:return_to].present?
+  def current_user
+    # always reassign if nil - this value changes during sign in and removing ivars is scary
+    @current_user ||= User.confirmed.from_auth(cookies.signed[:auth])
+    @current_user&.confirmed? ? @current_user : nil # just make extra sure, critical we don't include unconfirmed
   end
 
-  def set_return_to(return_path)
-    session[:return_to] = return_path
+  def unconfirmed_current_user
+    @unconfirmed_current_user ||= User.unconfirmed.from_auth(cookies.signed[:auth])
+  end
+
+  # Generally this is implicitly set, via the passed parameters. However! it can also be explicitly set
+  def store_return_to(return_to = nil)
+    return_to ||= params[:return_to]
+    session[:return_to] = return_to if return_to.present?
   end
 
   def return_to_if_present
-    if session[:return_to].present? || cookies[:return_to].present?
-      target = session[:return_to] || cookies[:return_to]
+    if session[:return_to].present? || cookies[:return_to].present? || params[:return_to]
+      target = session[:return_to] || cookies[:return_to] || params[:return_to]
       session[:return_to] = nil
       cookies[:return_to] = nil
       case target.downcase

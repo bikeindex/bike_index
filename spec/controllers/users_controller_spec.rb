@@ -3,17 +3,29 @@ require "spec_helper"
 describe UsersController do
   describe "new" do
     context "already signed in" do
+      include_context :logged_in_as_user
       it "redirects and sets the flash" do
-        user = FactoryGirl.create(:user_confirmed)
-        set_current_user(user)
         get :new
         expect(response).to redirect_to(:user_home)
         expect(flash).to be_present
       end
+      context "return_to" do
+        it "redirects to return_to" do
+          get :new, return_to: "/bikes/12?contact_owner=true"
+          expect(response).to redirect_to "/bikes/12?contact_owner=true"
+        end
+      end
+      context "unconfirmed" do
+        let(:user) { FactoryGirl.create(:user) }
+        it "redirects to please_confirm_email" do
+          get :new, return_to: "/bikes/12?contact_owner=true"
+          expect(response).to redirect_to please_confirm_email_users_path
+          expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
+        end
+      end
     end
     context "not signed in" do
-      it "renders and calls set store_return_to" do
-        expect(controller).to receive(:store_return_to)
+      it "renders" do
         get :new
         expect(response.code).to eq("200")
         expect(response).to render_template("new")
@@ -27,7 +39,7 @@ describe UsersController do
           expect(response).to render_with_layout("application_revised_bikehub")
           expect(session[:partner]).to be_nil
         end
-        context "with partner param" do
+        context "with partner session" do
           it "actually sets it" do
             session[:partner] = "bikehub"
             get :new, return_to: "/bikes/12?contact_owner=true"
@@ -326,22 +338,24 @@ describe UsersController do
     it "doesn't update user if current password not present" do
       user = FactoryGirl.create(:user_confirmed, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
       set_current_user(user)
-      post :update, id: user.username, user: {
-                    password: 'new_pass',
-                    password_confirmation: 'new_pass'
-      }
+      post :update, id: user.username,
+                    user: {
+                      password: 'new_pass',
+                      password_confirmation: 'new_pass'
+                    }
       expect(user.reload.authenticate('new_pass')).to be_falsey
     end
 
     it "doesn't update user if password doesn't match" do
       user = FactoryGirl.create(:user_confirmed, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
       set_current_user(user)
-      post :update, id: user.username, user: {
-                    current_password: 'old_pass',
-                    password: 'new_pass',
-                    name: 'Mr. Slick',
-                    password_confirmation: 'new_passd'
-      }
+      post :update, id: user.username,
+                    user: {
+                      current_password: 'old_pass',
+                      password: 'new_pass',
+                      name: 'Mr. Slick',
+                      password_confirmation: 'new_passd'
+                    }
       expect(user.reload.authenticate('new_pass')).to be_falsey
       expect(user.name).not_to eq('Mr. Slick')
     end
@@ -353,12 +367,13 @@ describe UsersController do
       auth = user.auth_token
       email = user.email
       set_current_user(user)
-      post :update, id: user.username, user: {
-                    email: 'cool_new_email@something.com',
-                    password_reset_token: user.password_reset_token,
-                    password: 'new_pass',
-                    password_confirmation: 'new_pass'
-      }
+      post :update, id: user.username,
+                    user: {
+                      email: 'cool_new_email@something.com',
+                      password_reset_token: user.password_reset_token,
+                      password: 'new_pass',
+                      password_confirmation: 'new_pass'
+                    }
       expect(user.reload.authenticate('new_pass')).to be_truthy
       expect(user.email).to eq(email)
       expect(user.password_reset_token).not_to eq('stuff')
@@ -375,11 +390,12 @@ describe UsersController do
       user.auth_token
       user.email
       set_current_user(user)
-      post :update, id: user.username, user: {
-                    password_reset_token: 'something_else',
-                    password: 'new_pass',
-                    password_confirmation: 'new_pass'
-      }
+      post :update, id: user.username,
+                    user: {
+                      password_reset_token: 'something_else',
+                      password: 'new_pass',
+                      password_confirmation: 'new_pass'
+                    }
       expect(user.reload.authenticate('new_pass')).to be_falsey
       expect(user.password_reset_token).to eq(reset)
     end
@@ -390,11 +406,12 @@ describe UsersController do
       auth = user.auth_token
       user.email
       set_current_user(user)
-      post :update, id: user.username, user: {
-                    password_reset_token: user.password_reset_token,
-                    password: "new_pass",
-                    password_confirmation: "new_pass"
-      }
+      post :update, id: user.username,
+                    user: {
+                      password_reset_token: user.password_reset_token,
+                      password: "new_pass",
+                      password_confirmation: "new_pass"
+                    }
       expect(user.reload.authenticate("new_pass")).not_to be_truthy
       expect(user.auth_token).to eq(auth)
       expect(user.password_reset_token).not_to eq("stuff")
@@ -406,13 +423,14 @@ describe UsersController do
       auth = user.auth_token
       email = user.email
       set_current_user(user)
-      post :update, id: user.username, user: {
-                    email: 'cool_new_email@something.com',
-                    current_password: 'old_pass',
-                    password: 'new_pass',
-                    name: 'Mr. Slick',
-                    password_confirmation: 'new_pass'
-      }
+      post :update, id: user.username,
+                    user: {
+                      email: 'cool_new_email@something.com',
+                      current_password: 'old_pass',
+                      password: 'new_pass',
+                      name: 'Mr. Slick',
+                      password_confirmation: 'new_pass'
+                    }
       expect(response).to redirect_to(my_account_url)
       expect(user.reload.authenticate('new_pass')).to be_truthy
       expect(user.auth_token).not_to eq(auth)

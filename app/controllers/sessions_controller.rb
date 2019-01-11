@@ -1,8 +1,7 @@
 class SessionsController < ApplicationController
   include Sessionable
   layout 'application_revised'
-  before_filter :store_return_to, only: [:new]
-  before_filter :skip_if_signed_in, only: [:new]
+  before_action :skip_if_signed_in, only: [:new]
 
   def new
     render_partner_or_default_signin_layout

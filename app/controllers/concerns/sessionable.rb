@@ -1,8 +1,14 @@
 module Sessionable
   extend ActiveSupport::Concern
   def skip_if_signed_in
-    return nil unless current_user.present?
-    unless return_to_if_present
+    # Somehow this grabs current_user from somewhere other than ControllerHelpers (wtf??)
+    # so we still have to check confirmedness. This is insane, but whatever
+    store_return_to
+    if unconfirmed_current_user.present? || current_user&.unconfirmed?
+      redirect_to please_confirm_email_users_path and return
+    end
+    if current_user.present?
+      return if return_to_if_present # If this returns true, we're returning already
       flash[:success] = "You're already signed in!"
       redirect_to user_home_url and return
     end

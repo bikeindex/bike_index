@@ -1,16 +1,12 @@
 class UsersController < ApplicationController
   layout "application_revised"
   include Sessionable
-  before_filter :authenticate_user, only: [:edit]
-  before_filter :store_return_to, only: [:new]
-  before_filter :assign_edit_template, only: [:edit, :update]
-  
+  before_action :authenticate_user, only: [:edit]
+  before_action :skip_if_signed_in, only: [:new]
+  before_action :assign_edit_template, only: [:edit, :update]
+
   def new
     @user ||= User.new
-    if current_user.present?
-      flash[:success] = "You're already signed in! Log out by clicking on 'Your Account' in the upper right corner"
-      redirect_to user_home_url and return
-    end
     render_partner_or_default_signin_layout
   end
 
