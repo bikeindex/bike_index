@@ -327,8 +327,8 @@ describe UsersController do
       user = FactoryGirl.create(:user_confirmed, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
       set_current_user(user)
       post :update, id: user.username, user: {
-        password: 'new_pass',
-        password_confirmation: 'new_pass'
+                    password: 'new_pass',
+                    password_confirmation: 'new_pass'
       }
       expect(user.reload.authenticate('new_pass')).to be_falsey
     end
@@ -337,10 +337,10 @@ describe UsersController do
       user = FactoryGirl.create(:user_confirmed, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass')
       set_current_user(user)
       post :update, id: user.username, user: {
-        current_password: 'old_pass',
-        password: 'new_pass',
-        name: 'Mr. Slick',
-        password_confirmation: 'new_passd'
+                    current_password: 'old_pass',
+                    password: 'new_pass',
+                    name: 'Mr. Slick',
+                    password_confirmation: 'new_passd'
       }
       expect(user.reload.authenticate('new_pass')).to be_falsey
       expect(user.name).not_to eq('Mr. Slick')
@@ -354,10 +354,10 @@ describe UsersController do
       email = user.email
       set_current_user(user)
       post :update, id: user.username, user: {
-        email: 'cool_new_email@something.com',
-        password_reset_token: user.password_reset_token,
-        password: 'new_pass',
-        password_confirmation: 'new_pass'
+                    email: 'cool_new_email@something.com',
+                    password_reset_token: user.password_reset_token,
+                    password: 'new_pass',
+                    password_confirmation: 'new_pass'
       }
       expect(user.reload.authenticate('new_pass')).to be_truthy
       expect(user.email).to eq(email)
@@ -376,9 +376,9 @@ describe UsersController do
       user.email
       set_current_user(user)
       post :update, id: user.username, user: {
-        password_reset_token: 'something_else',
-        password: 'new_pass',
-        password_confirmation: 'new_pass'
+                    password_reset_token: 'something_else',
+                    password: 'new_pass',
+                    password_confirmation: 'new_pass'
       }
       expect(user.reload.authenticate('new_pass')).to be_falsey
       expect(user.password_reset_token).to eq(reset)
@@ -391,14 +391,14 @@ describe UsersController do
       user.email
       set_current_user(user)
       post :update, id: user.username, user: {
-        password_reset_token: user.password_reset_token,
-        password: 'new_pass',
-        password_confirmation: 'new_pass'
+                    password_reset_token: user.password_reset_token,
+                    password: "new_pass",
+                    password_confirmation: "new_pass"
       }
-      expect(user.reload.authenticate('new_pass')).not_to be_truthy
+      expect(user.reload.authenticate("new_pass")).not_to be_truthy
       expect(user.auth_token).to eq(auth)
-      expect(user.password_reset_token).not_to eq('stuff')
-      expect(cookies.signed[:auth][1]).to eq(user.auth_token)
+      expect(user.password_reset_token).not_to eq("stuff")
+      expect(cookies.signed[:auth]).to_not be_present
     end
 
     it 'resets users auth if password changed, updates current session' do
@@ -407,11 +407,11 @@ describe UsersController do
       email = user.email
       set_current_user(user)
       post :update, id: user.username, user: {
-        email: 'cool_new_email@something.com',
-        current_password: 'old_pass',
-        password: 'new_pass',
-        name: 'Mr. Slick',
-        password_confirmation: 'new_pass'
+                    email: 'cool_new_email@something.com',
+                    current_password: 'old_pass',
+                    password: 'new_pass',
+                    name: 'Mr. Slick',
+                    password_confirmation: 'new_pass'
       }
       expect(response).to redirect_to(my_account_url)
       expect(user.reload.authenticate('new_pass')).to be_truthy

@@ -137,7 +137,7 @@ describe SessionsController do
       end
       context "with confirmed user_email" do
         let!(:user_email) { FactoryGirl.create(:user_email, user: user) }
-        it "sends them to the same spot" do
+        it "logs in, sends to please_confirm_email" do
           expect(user_email.confirmed).to be_truthy
           post :create, session: { email: user.email, password: "testthisthing7$" }
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
