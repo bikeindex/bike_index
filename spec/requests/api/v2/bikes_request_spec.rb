@@ -46,6 +46,7 @@ describe 'Bikes API V2' do
       FactoryGirl.create(:cycle_type, slug: 'bike')
       FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
     end
+    include_context :geocoder_default_location
 
     it 'responds with 401' do
       post '/api/v2/bikes', bike_attrs.to_json
@@ -135,13 +136,12 @@ describe 'Bikes API V2' do
       expect(bike.example).to be_truthy
       expect(bike.is_for_sale).to be_falsey
     end
-
     it "creates a stolen bike through an organization and uses the passed phone" do
       organization = FactoryGirl.create(:organization)
       @user.update_attribute :phone, "0987654321"
       FactoryGirl.create(:membership, user: @user, organization: organization)
       FactoryGirl.create(:country, iso: "US")
-      FactoryGirl.create(:state, abbreviation: "Palace")
+      FactoryGirl.create(:state, abbreviation: "NY")
       organization.save
       bike_attrs.merge!(organization_slug: organization.slug)
       date_stolen = 1357192800
@@ -150,12 +150,12 @@ describe 'Bikes API V2' do
         date_stolen: date_stolen,
         theft_description: "This bike was stolen and that's no fair.",
         country: "US",
-        city: "Chicago",
-        street: "Cortland and Ashland",
-        zipcode: "60622",
-        state: "Palace",
+        city: "New York",
+        street: "278 Broadway",
+        zipcode: "10007",
+        state: "NY",
         police_report_number: "99999999",
-        police_report_department: "Chicago",
+        police_report_department: "New York"
         # locking_description: 'some locking description',
         # lock_defeat_description: 'broken in some crazy way'
       }
