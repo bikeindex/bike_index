@@ -1,4 +1,4 @@
-OAUTH_SCOPES = %i[public read_user write_user read_bikes write_bikes read_bikewise write_bikewise read_organization_membership unconfirmed]
+OAUTH_SCOPES = %i[public read_user write_user read_bikes write_bikes read_bikewise write_bikewise read_organization_membership unconfirmed].freeze
 if Rails.env.development? && defined?(User) && defined?(User.first)
   ENV["V2_ACCESSOR_ID"] = (User.fuzzy_email_find("api@example.com") || User.first).id.to_s
 end
@@ -9,14 +9,9 @@ Doorkeeper.configure do
 
   # This block is be called to check whether the resource owner is authenticated or not.
   resource_owner_authenticator do
-    # Find the user
     user = User.from_auth(cookies.signed[:auth])
-    # If unconfirmed - send the user to the confirm path
-    if user.unconfirmed?
-      redirect_to please_confirm_email_users_path and return
-    elsif user.present?
-      return user
-    end
+    # only return user if confirmed
+    return user if user.present? && user&.confirmed?
     session[:return_to] = request.fullpath
     redirect_to(new_session_url)
   end
@@ -66,7 +61,7 @@ Doorkeeper.configure do
   # (Similar behaviour: https://developers.google.com/accounts/docs/OAuth2InstalledApp#choosingredirecturi)
   #
   # native_redirect_uri 'urn:ietf:wg:oauth:2.0:oob'
-  
+
   # Forces the usage of the HTTPS protocol in non-native redirect uris (enabled
   # by default in non-development environments). OAuth2 delegates security in
   # communication to the HTTPS protocol so it is wise to keep this enabled.
@@ -83,7 +78,7 @@ Doorkeeper.configure do
   #
   # If not specified, Doorkeeper enables all the four grant flows.
   #
-  grant_flows %w(authorization_code implicit password client_credentials)
+  grant_flows %w[authorization_code implicit password client_credentials]
 
   # Under some circumstances you might want to have applications auto-approved,
   # so that the user skips the authorization step.

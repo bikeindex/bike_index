@@ -1,9 +1,8 @@
 module Sessionable
   extend ActiveSupport::Concern
   def skip_if_signed_in
-    # Somehow this grabs current_user from somewhere other than ControllerHelpers (wtf??)
-    # so we still have to check confirmedness. This is insane, but whatever
     store_return_to
+    # Make absolutely sure we don't have an unconfirmed user
     if unconfirmed_current_user.present? || current_user&.unconfirmed?
       redirect_to please_confirm_email_users_path and return
     end

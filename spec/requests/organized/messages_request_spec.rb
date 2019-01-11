@@ -4,7 +4,7 @@ describe "Organized::MessagesController" do
   include_context :geocoder_default_location
   include_context :organization_with_geolocated_messages
   let(:base_url) { "/o/#{organization.to_param}/messages" }
-  before { set_current_user(user) if user.present? }
+  before { set_current_user(user, request_spec: true) if user.present? }
 
   describe "messages root" do
     let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
