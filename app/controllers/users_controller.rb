@@ -59,7 +59,7 @@ class UsersController < ApplicationController
     if params[:token].present?
       @user = User.find_by_password_reset_token(params[:token])
       if @user.present?
-        session[:return_to] = 'password_reset'
+        session[:return_to] = "password_reset"
         sign_in_and_redirect(@user)
       else
         flash[:error] = "We're sorry, but that link is no longer valid."
@@ -74,7 +74,7 @@ class UsersController < ApplicationController
         render action: :request_password_reset
       end
     else
-      redirect_to '/users/request_password_reset'
+      redirect_to "/users/request_password_reset"
     end
   end
 

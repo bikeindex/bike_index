@@ -34,7 +34,7 @@ class @Alerts
         # fade out success alerts after 10 seconds
         else if $alert.hasClass('alert-success')
           $alert.removeClass('in')
-          @fadeAlert($alert, 5)
+          @fadeAlert($alert, 10)
     else
       # There aren't any alerts, so remove the fixed position block
       $('.primary-alert-block').addClass('faded')

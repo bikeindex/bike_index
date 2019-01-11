@@ -15,7 +15,6 @@ module Sessionable
     else
       default_session_set(user)
     end
-    remove_instance_variable(:@current_user) # remove current_user, so it can be re-memoized
 
     if params[:partner].present? || session[:partner].present? # Check present? of both in case one is empty
       session[:partner] = nil # Ensure they won't be redirected in the future

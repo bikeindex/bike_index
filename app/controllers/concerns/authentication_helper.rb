@@ -56,12 +56,10 @@ module AuthenticationHelper
   end
 
   def current_user
-    return @current_user if defined?(@current_user)
     @current_user ||= User.confirmed.from_auth(cookies.signed[:auth])
   end
 
   def unconfirmed_current_user
-    return @unconfirmed_current_user if defined?(@unconfirmed_current_user)
     @unconfirmed_current_user ||= User.unconfirmed.from_auth(cookies.signed[:auth])
   end
 
