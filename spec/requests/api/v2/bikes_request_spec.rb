@@ -164,10 +164,11 @@ describe 'Bikes API V2' do
              bike_attrs.to_json,
              JSON_CONTENT
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
-      result = JSON.parse(response.body)['bike']
-      expect(result['serial']).to eq(bike_attrs[:serial])
-      expect(result['manufacturer_name']).to eq(bike_attrs[:manufacturer])
-      expect(result['stolen_record']['date_stolen']).to eq(date_stolen)
+      result = JSON.parse(response.body)
+      expect(result["bike"]).to be_present
+      expect(result["bike"]["serial"]).to eq(bike_attrs[:serial])
+      expect(result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
+      expect(result["bike"]["stolen_record"]["date_stolen"]).to eq(date_stolen)
       bike = Bike.find(result['id'])
       expect(bike.creation_organization).to eq(organization)
       expect(bike.creation_state.origin).to eq 'api_v2'
