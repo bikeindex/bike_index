@@ -134,26 +134,26 @@ describe 'Bikes API V3' do
       expect(bike.is_for_sale).to be_falsey
     end
 
-    it 'creates a stolen bike through an organization and uses the passed phone' do
+    it "creates a stolen bike through an organization and uses the passed phone" do
       organization = FactoryGirl.create(:organization)
-      @user.update_attribute :phone, '0987654321'
+      @user.update_attribute :phone, "0987654321"
       FactoryGirl.create(:membership, user: @user, organization: organization)
-      FactoryGirl.create(:country, iso: 'US')
-      FactoryGirl.create(:state, abbreviation: 'Palace')
+      FactoryGirl.create(:country, iso: "US")
+      FactoryGirl.create(:state, abbreviation: "Palace")
       organization.save
       bike_attrs.merge!(organization_slug: organization.slug)
       date_stolen = 1357192800
       bike_attrs[:stolen_record] = {
-        phone: '1234567890',
+        phone: "1234567890",
         date_stolen: date_stolen,
         theft_description: "This bike was stolen and that's no fair.",
-        country: 'US',
-        city: 'Chicago',
-        street: 'Cortland and Ashland',
-        zipcode: '60622',
-        state: 'Palace',
-        police_report_number: '99999999',
-        police_report_department: 'Chicago',
+        country: "US",
+        city: "Chicago",
+        street: "Cortland and Ashland",
+        zipcode: "60622",
+        state: "Palace",
+        police_report_number: "99999999",
+        police_report_department: "Chicago",
         # locking_description: 'some locking description',
         # lock_defeat_description: 'broken in some crazy way'
       }
@@ -167,7 +167,7 @@ describe 'Bikes API V3' do
       expect(result["bike"]["serial"]).to eq(bike_attrs[:serial])
       expect(result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       expect(result["bike"]["stolen_record"]["date_stolen"]).to eq(date_stolen)
-      bike = Bike.find(result['id'])
+      bike = Bike.find(result["bike"]["id"])
       expect(bike.creation_organization).to eq(organization)
       # expect(bike.creation_state.origin).to eq 'api_v3'
       expect(bike.creation_state.organization).to eq organization
