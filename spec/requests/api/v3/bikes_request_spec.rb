@@ -70,9 +70,7 @@ describe 'Bikes API V3' do
       it "fails" do
         expect(user.unconfirmed?).to be_truthy
         expect(token.resource_owner_id).to eq user.id
-        # pp token
         post "/api/v3/bikes?access_token=#{token.token}", bike_attrs.to_json, json_headers
-        # pp json_result
         expect(response.code).to eq("403")
       end
     end
