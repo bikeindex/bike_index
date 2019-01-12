@@ -129,21 +129,17 @@ describe Organized::BulkImportsController, type: :controller do
         context "valid create" do
           let(:bulk_import_params) { { file: file, organization_id: 392, no_notify: "1" } }
           it "creates" do
-            # FIXME: Because travis isn't creating the sequential ids, something to do with the missmatched postgres versions
-            # Just don't run on travis :/
-            unless ENV["TRAVIS"].present?
-              expect do
-                post :create, organization_id: organization.to_param, bulk_import: bulk_import_params
-              end.to change(BulkImport, :count).by 1
+            expect do
+              post :create, organization_id: organization.to_param, bulk_import: bulk_import_params
+            end.to change(BulkImport, :count).by 1
 
-              bulk_import = BulkImport.last
-              expect(bulk_import.user).to eq user
-              expect(bulk_import.file_url).to be_present
-              expect(bulk_import.progress).to eq "pending"
-              expect(bulk_import.organization).to eq organization
-              expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
-              expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
-            end
+            bulk_import = BulkImport.last
+            expect(bulk_import.user).to eq user
+            expect(bulk_import.file_url).to be_present
+            expect(bulk_import.progress).to eq "pending"
+            expect(bulk_import.organization).to eq organization
+            expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
+            expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
           end
         end
         context "API create" do
@@ -160,21 +156,20 @@ describe Organized::BulkImportsController, type: :controller do
           end
           context "valid" do
             it "returns JSON message" do
-              unless ENV["TRAVIS"].present?
-                request.headers["Authorization"] = organization.access_token # Rspec doesn't support headers key here. TODO: Rails 5 update
-                post :create, organization_id: organization.to_param, file: file
-                expect(response.status).to eq(201)
-                json_result = JSON.parse(response.body)
-                expect(json_result["success"]).to be_present
+              expect(organization.auto_user).to be_present
+              request.headers["Authorization"] = organization.access_token # Rspec doesn't support headers key here. TODO: Rails 5 update
+              post :create, organization_id: organization.to_param, file: file
+              expect(response.status).to eq(201)
+              json_result = JSON.parse(response.body)
+              expect(json_result["success"]).to be_present
 
-                bulk_import = BulkImport.last
-                expect(bulk_import.user).to eq organization.auto_user
-                expect(bulk_import.file_url).to be_present
-                expect(bulk_import.progress).to eq "pending"
-                expect(bulk_import.organization).to eq organization
-                expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
-                expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
-              end
+              bulk_import = BulkImport.last
+              expect(bulk_import.user).to eq organization.auto_user
+              expect(bulk_import.file_url).to be_present
+              expect(bulk_import.progress).to eq "pending"
+              expect(bulk_import.organization).to eq organization
+              expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
+              expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
             end
           end
         end

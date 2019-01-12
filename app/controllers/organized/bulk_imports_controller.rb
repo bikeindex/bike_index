@@ -55,7 +55,7 @@ module Organized
     def ensure_can_create_import!
       @is_api = request.headers["Authorization"].present?
       if @is_api
-        @current_user = current_organization.auto_user
+        @current_user = current_organization.auto_user # Crazy override to make current user work
         return true if request.headers["Authorization"] == current_organization.access_token
         render json: { error: "Not permitted" }, status: 401 and return
       else
@@ -77,7 +77,7 @@ module Organized
         { file: params[:file] }
       else
         params.require(:bulk_import).permit([:file])
-      end.merge(user_id: current_user.id, organization_id: current_organization.id)
+      end.merge(user_id: (@current_user || current_user).id, organization_id: current_organization&.id)
     end
   end
 end

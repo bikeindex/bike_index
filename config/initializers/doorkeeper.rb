@@ -9,6 +9,7 @@ Doorkeeper.configure do
 
   # This block is be called to check whether the resource owner is authenticated or not.
   resource_owner_authenticator do |client|
+    pp client
     user = User.from_auth(cookies.signed[:auth])
     # only return user if confirmed
     return user if user.present? && user&.confirmed?

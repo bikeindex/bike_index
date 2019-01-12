@@ -52,14 +52,8 @@ RSpec.configure do |config|
   end
 end
 
-def set_current_user(user, request_spec: false)
-  # Request specs don't have cookies so we need to stub stuff if we're in request specs
-  # This is suboptimal, but hey, it gets us to request specs for now
-  if request_spec
-    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
-  else
-    cookies.signed[:auth] = { secure: true, httponly: true, value: [user.id, user.auth_token] }
-  end
+def set_current_user(user)
+  cookies.signed[:auth] = { secure: true, httponly: true, value: [user.id, user.auth_token] }
 end
 
 OmniAuth.config.mock_auth[:facebook] = OmniAuth::AuthHash.new('provider' => 'facebook',
