@@ -8,13 +8,20 @@ Doorkeeper.configure do
   orm :active_record
 
   # This block is be called to check whether the resource owner is authenticated or not.
-  resource_owner_authenticator do |client|
-    pp client
+  resource_owner_authenticator do |request_envi|
     user = User.from_auth(cookies.signed[:auth])
-    # only return user if confirmed
-    return user if user.present? && user&.confirmed?
-    session[:return_to] = request.fullpath
-    redirect_to(new_session_url)
+    if user.present? && user.confirmed?
+      user # Return user immediately, if user is confirmed
+    else
+      # If user isn't confirmed, check for unconfirmed scope. If it's present, return user even tho unconfirmed
+      unconfirmed_scope = request_envi&.params && request_envi.params[:scope].to_s[/unconfirmed/i].present?
+      if user.present? && unconfirmed_scope
+        user
+      else
+        session[:return_to] = request.fullpath
+        redirect_to(new_session_url)
+      end
+    end
   end
 
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
