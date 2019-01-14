@@ -97,12 +97,12 @@ describe 'Bikes API V3' do
         }
       ]
       bike_attrs.merge!(components: components,
-                   front_gear_type_slug: front_gear_type.slug,
-                   handlebar_type_slug: handlebar_type.slug,
-                   is_for_sale: true,
-                   is_bulk: true,
-                   is_new: true,
-                   is_pos: true)
+                        front_gear_type_slug: front_gear_type.slug,
+                        handlebar_type_slug: handlebar_type.slug,
+                        is_for_sale: true,
+                        is_bulk: true,
+                        is_new: true,
+                        is_pos: true)
       expect do
         post "/api/v3/bikes?access_token=#{token.token}",
              bike_attrs.to_json,
@@ -158,7 +158,7 @@ describe 'Bikes API V3' do
       FactoryGirl.create(:country, iso: "US")
       FactoryGirl.create(:state, abbreviation: "NY")
       organization.save
-      bike_attrs.merge!(organization_slug: organization.slug)
+      bike_attrs[:organization_slug] = organization.slug
       date_stolen = 1357192800
       bike_attrs[:stolen_record] = {
         phone: "1234567890",

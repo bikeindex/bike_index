@@ -24,7 +24,7 @@ describe FeedbacksController do
               proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
       }
     end
-    let(:user) { FactoryGirl.create(:user_confirmed) }
+    let!(:user) { FactoryGirl.create(:user_confirmed) }
 
     context 'valid feedback' do
       it 'creates a feedback message' do
@@ -32,7 +32,7 @@ describe FeedbacksController do
         set_current_user(user)
         expect do
           post :create, feedback: feedback_attrs.except(:email, :name)
-        end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(1)
+        end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(1)
         expect(response).to redirect_to help_path
         expect(flash[:success]).to be_present
         feedback = Feedback.last
@@ -40,6 +40,18 @@ describe FeedbacksController do
         expect(feedback.user).to eq user
         expect(feedback.email).to eq user.email
         expect(feedback.name).to eq user.name
+      end
+      context "unconfirmed user" do
+        let(:user) { FactoryGirl.create(:user) }
+        it "does not create, because spam" do
+          expect(user.confirmed?).to be_falsey
+          set_current_user(user)
+          expect(Feedback.count).to eq 0
+          expect do
+            post :create, feedback: feedback_attrs.except(:email, :name)
+          end.to_not change(EmailFeedbackNotificationWorker.jobs, :count)
+          expect(Feedback.count).to eq 0
+        end
       end
     end
 
@@ -53,7 +65,7 @@ describe FeedbacksController do
             email: 'example@example.com',
             body: 'ffff'
           }
-        end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(1)
+        end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(1)
         expect(response).to redirect_to 'http://localhost:3000/partyyyyy'
         expect(flash[:success]).to be_present
         feedback = Feedback.last
@@ -67,7 +79,7 @@ describe FeedbacksController do
       it 'creates a feedback message' do
         expect do
           post :create, feedback: feedback_attrs.merge(additional: 'stuff')
-        end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
+        end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(0)
         expect(flash[:error]).to match(/sign in/i)
         expect(response).to redirect_to feedbacks_path(anchor: 'contact_us_section')
       end
@@ -78,7 +90,7 @@ describe FeedbacksController do
         it 'does not create a feedback message' do
           expect do
             post :create, feedback: feedback_attrs.merge(email: '')
-          end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
+          end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(0)
           expect(response).to render_template(:index)
           feedback = assigns(:feedback)
           feedback_attrs.except(:email).each { |k, v| expect(feedback.send(k)).to eq(v) }
@@ -91,7 +103,7 @@ describe FeedbacksController do
           request.env['HTTP_REFERER'] = for_schools_url
           expect do
             post :create, feedback: feedback_attrs.merge(body: '')
-          end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
+          end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(0)
           expect(response).to render_template('landing_pages/for_schools')
           feedback = assigns(:feedback)
           feedback_attrs.except(:body).each { |k, v| expect(feedback.send(k)).to eq(v) }

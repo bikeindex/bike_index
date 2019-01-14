@@ -3,21 +3,21 @@ require "spec_helper"
 describe "Oauth::AuthorizationsController" do
   include_context :existing_doorkeeper_app
   before { expect(doorkeeper_app).to be_present }
+  let(:scope) { "read_bikes+read_user" }
+  let(:authorization_url) { "/oauth/authorize?redirect_uri=#{CGI.escape(doorkeeper_app.redirect_uri)}&client_id=#{doorkeeper_app.uid}&response_type=code&scope=#{scope}" }
 
   context "no current user present" do
     it "redirects to sign in" do
-      get "/oauth/authorize", response_type: "code", scope: "read_bikes+read_user",
-                              client_id: doorkeeper_app.uid, redirect_uri: doorkeeper_app.redirect_uri
+      get authorization_url
+      expect(response).to redirect_to new_session_url
       expect(session[:return_to]).to match(/#{doorkeeper_app.uid}/)
       expect(session[:partner]).to be_nil
     end
     context "partner parameter" do
       it "redirects to sign in with the partners parameter included" do
-        get "/oauth/authorize", response_type: "code", scope: "read_bikes+read_user",
-                                client_id: doorkeeper_app.uid, redirect_uri: doorkeeper_app.redirect_uri,
-                                partner: "bikehub"
-        expect(session[:return_to]).to match(/#{doorkeeper_app.uid}/)
+        get "#{authorization_url}&partner=bikehub"
         expect(response).to redirect_to new_session_url
+        expect(session[:return_to]).to match(/#{doorkeeper_app.uid}/)
         expect(session[:partner]).to eq "bikehub"
       end
     end
@@ -29,36 +29,37 @@ describe "Oauth::AuthorizationsController" do
     # TODO: Rails 5 update maybe...
     before { allow(User).to receive(:from_auth) { user_subject } } # Stubbing user lookup
     it "renders" do
-      get "/oauth/authorize", response_type: "code", scope: "read_bikes+read_user",
-                              client_id: doorkeeper_app.uid, redirect_uri: doorkeeper_app.redirect_uri
+      get authorization_url
       expect(response.code).to eq("200")
+      expect(response).to render_template(:new)
     end
 
-    # This should work. Need to figure out how to make it work though....
     context "internal app" do
       before { doorkeeper_app.update_attributes(is_internal: true) }
-      xit "redirects to redirect uri" do
-        get "/oauth/authorize", response_type: "code", scope: "read_bikes+read_user",
-                                client_id: doorkeeper_app.uid, redirect_uri: doorkeeper_app.redirect_uri
-        expect(response).to redirect_to doorkeeper_app.redirect_uri
+      it "redirects to redirect uri" do
+        expect(doorkeeper_app.is_internal).to be_truthy
+        get authorization_url
+        # Ensure the redirect_uri is correct so we can match correctly.
+        expect(doorkeeper_app.redirect_uri).to eq "https://app.com"
+        # It redirects to the redirect url plus the code
+        expect(response).to redirect_to(/\Ahttps:..app.com\?code=/)
       end
     end
 
     context "unconfirmed user" do
       let!(:user_subject) { FactoryGirl.create(:user) }
       it "redirects" do
-        expect(user_subject.confirmed?).to be_falsey
-        get "/oauth/authorize", response_type: "code", scope: "read_bikes+read_user",
-                                client_id: doorkeeper_app.uid, redirect_uri: doorkeeper_app.redirect_uri
+        get authorization_url
         # This will redirect to please_confirm_email_users_path after new_session realizes an unconfirmed user is present
         expect(response).to redirect_to new_session_path
       end
       context "with unconfirmed scope" do
+        let(:scope) { "read_bikes+read_user+unconfirmed" }
         it "renders" do
           expect(user_subject.confirmed?).to be_falsey
-          get "/oauth/authorize", response_type: "code", scope: "read_bikes+read_user+unconfirmed",
-                                  client_id: doorkeeper_app.uid, redirect_uri: doorkeeper_app.redirect_uri
+          get authorization_url
           expect(response.code).to eq("200")
+          expect(response).to render_template(:new)
         end
       end
     end

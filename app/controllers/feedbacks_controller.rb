@@ -3,7 +3,6 @@ class FeedbacksController < ApplicationController
   before_filter :set_feedback_active_section
   before_filter :block_the_spam!, only: [:create]
   before_filter :set_permitted_format
-  
 
   def index
     @feedback = Feedback.new
