@@ -3,37 +3,47 @@ module API
     class Me < API::Base
       include API::V2::Defaults
       resource :me, desc: "Operations about the current user" do
-        helpers do 
+        helpers do
+          # Because we respond with unconfirmed users here, provided it's permitted
+          def valid_current_user
+            return resource_owner if unconfirmed_scope? && resource_owner.present?
+            current_user
+          end
+
+          def unconfirmed_scope?
+            current_scopes.include?("unconfirmed")
+          end
+
           def user_info
-            return {} unless current_scopes.include?('read_user')
+            return {} unless current_scopes.include?("read_user")
             {
               user: {
-                username: current_user.username,
-                name: current_user.name,
-                email: current_user.email,
-                secondary_emails: current_user.secondary_emails,
-                twitter: (current_user.twitter if current_user.show_twitter),
-                image: (current_user.avatar_url if current_user.show_bikes)
-              }.merge(current_scopes.include?('unconfirmed') ? { confirmed: current_user.confirmed? } : {})
+                username: valid_current_user.username,
+                name: valid_current_user.name,
+                email: valid_current_user.email,
+                secondary_emails: valid_current_user.secondary_emails,
+                twitter: (valid_current_user.twitter if valid_current_user.show_twitter),
+                image: (valid_current_user.avatar_url if valid_current_user.show_bikes)
+              }.merge(unconfirmed_scope? ? { confirmed: valid_current_user.confirmed? } : {})
             }
           end
           
           def bike_ids
-            current_scopes.include?('read_bikes') ? { bike_ids: current_user.bike_ids } : {}
+            current_scopes.include?("read_bikes") ? { bike_ids: valid_current_user.bike_ids } : {}
           end
 
           def serialized_membership(membership)
             {
               organization_name: membership.organization.name,
-              organization_slug: membership.organization.slug, 
+              organization_slug: membership.organization.slug,
               organization_access_token: membership.organization.access_token,
-              user_is_organization_admin: (true ? membership.role == 'admin' : false)
+              user_is_organization_admin: membership.role == "admin"
             }
           end
 
           def organization_memberships
             return {} unless current_scopes.include?('read_organization_membership')
-            { memberships: current_user.memberships.map { |m| serialized_membership(m) } }
+            { memberships: valid_current_user.memberships.map { |m| serialized_membership(m) } }
           end
         end
 
@@ -49,7 +59,9 @@ module API
           NOTE
         }
         get '/' do
-          { id: current_user.id.to_s }.merge(user_info).merge(bike_ids).merge(organization_memberships)
+          { id: valid_current_user.id.to_s }.merge(user_info)
+                                            .merge(bike_ids)
+                                            .merge(organization_memberships)
         end
 
         desc "Current user's bikes<span class='accstr'>*</span>", {
@@ -62,7 +74,7 @@ module API
           NOTE
         }
         get '/bikes', each_serializer: BikeV2Serializer, root: 'bikes' do
-          current_user.bikes
+          valid_current_user.bikes
         end
       end
     end
