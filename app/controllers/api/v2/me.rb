@@ -14,7 +14,7 @@ module API
                 secondary_emails: current_user.secondary_emails,
                 twitter: (current_user.twitter if current_user.show_twitter),
                 image: (current_user.avatar_url if current_user.show_bikes)
-              }.merge(current_scopes.include?('unconfirmed') ? { confirmed: current_user.confirmed? } : {})
+              }
             }
           end
           

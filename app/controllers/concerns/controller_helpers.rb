@@ -17,13 +17,11 @@ module ControllerHelpers
   end
 
   def authenticate_user(msg = "Sorry, you have to log in", flash_type: :error)
-    # Make absolutely sure we don't have an unconfirmed user
-    if current_user.present? && current_user.confirmed?
-      return true if current_user.terms_of_service
-
-      redirect_to accept_terms_url(subdomain: false) and return
-    elsif unconfirmed_current_user.present? || current_user&.unconfirmed?
+    if unconfirmed_current_user.present?
       redirect_to please_confirm_email_users_path and return
+    elsif current_user.present?
+      return true if current_user.terms_of_service
+      redirect_to accept_terms_url(subdomain: false) and return
     else
       flash[flash_type] = msg
       if msg.match(/create an account/i).present?
@@ -120,7 +118,6 @@ module ControllerHelpers
   def current_user
     # always reassign if nil - this value changes during sign in and removing ivars is scary
     @current_user ||= User.confirmed.from_auth(cookies.signed[:auth])
-    @current_user&.confirmed? ? @current_user : nil # just make extra sure, critical we don't include unconfirmed
   end
 
   def unconfirmed_current_user
