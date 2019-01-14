@@ -17,11 +17,12 @@ module ControllerHelpers
   end
 
   def authenticate_user(msg = "Sorry, you have to log in", flash_type: :error)
-    if unconfirmed_current_user.present?
-      redirect_to please_confirm_email_users_path and return
-    elsif current_user.present?
+    # Make absolutely sure the current user is confirmed - mainly for testing
+    if current_user&.confirmed?
       return true if current_user.terms_of_service
       redirect_to accept_terms_url(subdomain: false) and return
+    elsif unconfirmed_current_user.present?
+      redirect_to please_confirm_email_users_path and return
     else
       flash[flash_type] = msg
       if msg.match(/create an account/i).present?

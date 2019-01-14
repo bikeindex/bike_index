@@ -73,7 +73,7 @@ Bikeindex::Application.routes.draw do
   resources :users, only: %i[new create show edit update] do
     collection do
       get "please_confirm_email"
-      get "confirm" # Get because needs to be called from a link
+      get "confirm" # Get because needs to be called from a link in an email
       get "request_password_reset"
       post "password_reset"
       get "password_reset"
