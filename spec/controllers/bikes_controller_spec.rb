@@ -402,7 +402,7 @@ describe BikesController do
       end
       context 'stolen' do
         let(:state) { FactoryGirl.create(:state) }
-        let(:country) { state.country }
+        let!(:country) { state.country }
         let(:target_time) { Time.now.to_i }
         let(:stolen_params) do
           {
@@ -420,6 +420,7 @@ describe BikesController do
             it 'creates a new ownership and bike from an organization' do
               expect do
                 post :create, bike: bike_params.merge(stolen: true), stolen_record: stolen_params
+                expect(assigns(:bike).errors&.full_messages).to_not be_present
               end.to change(Ownership, :count).by 1
               bike = Bike.last
               expect(bike).to be_present
@@ -438,6 +439,7 @@ describe BikesController do
             it 'creates a new ownership and bike from an organization' do
               expect do
                 post :create, bike: bike_params.merge(stolen: true), stolen_record: alt_stolen_params
+                expect(assigns(:bike).errors&.full_messages).to_not be_present
               end.to change(Ownership, :count).by 1
               bike = Bike.last
               expect(bike).to be_present
@@ -457,6 +459,7 @@ describe BikesController do
             expect do
               post :create, bike: bike_params.merge(stolen: '1', primary_frame_color: nil),
                             stolen_record: stolen_params
+              expect(assigns(:bike).errors&.full_messages).to be_present
             end.to change(Ownership, :count).by 0
             expect(response).to redirect_to target_path
             bike = assigns(:bike)
