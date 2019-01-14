@@ -311,10 +311,11 @@ class User < ActiveRecord::Base
   end
 
   def generate_username_confirmation_and_auth
-    begin
-      username = SecureRandom.urlsafe_base64
-    end while User.where(username: username).exists?
-    self.username = username
+    usrname = username || SecureRandom.urlsafe_base64
+    while User.where(username: usrname).where.not(id: id).exists?
+      usrname = SecureRandom.urlsafe_base64
+    end
+    self.username = usrname
     if !confirmed
       self.confirmation_token = (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.now.to_s}")
     end
