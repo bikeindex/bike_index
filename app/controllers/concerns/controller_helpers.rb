@@ -21,7 +21,7 @@ module ControllerHelpers
     if current_user&.confirmed?
       return true if current_user.terms_of_service
       redirect_to accept_terms_url(subdomain: false) and return
-    elsif unconfirmed_current_user.present?
+    elsif current_user&.unconfirmed? || unconfirmed_current_user.present?
       redirect_to please_confirm_email_users_path and return
     else
       flash[flash_type] = msg
