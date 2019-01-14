@@ -5,9 +5,9 @@ module ControllerHelpers
   extend ActiveSupport::Concern
 
   included do
-    helper_method :current_user, :unconfirmed_current_user, :current_organization, :user_root_url,
-                  :page_id, :remove_session, :ensure_preview_enabled!, :forwarded_ip_address,
-                  :recovered_bike_count, :controller_namespace
+    helper_method :current_user, :unconfirmed_current_user, :current_user_or_unconfirmed_user,
+                  :current_organization, :user_root_url, :controller_namespace, :page_id,
+                  :forwarded_ip_address, :ensure_preview_enabled!, :recovered_bike_count
     before_filter :enable_rack_profiler
   end
 
@@ -123,6 +123,12 @@ module ControllerHelpers
 
   def unconfirmed_current_user
     @unconfirmed_current_user ||= User.unconfirmed.from_auth(cookies.signed[:auth])
+  end
+
+  # Because we need to show unconfirmed users logout - and we should show them what they're missing in general
+  # Generally, this shouldn't be accessed. Almost always should be accessing current_user
+  def current_user_or_unconfirmed_user
+    current_user_or_unconfirmed_user = current_user || unconfirmed_current_user
   end
 
   def remove_session

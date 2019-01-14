@@ -17,8 +17,6 @@
           %a#primary_nav_hamburgler
             &#9776;
         %ul.primary-main-menu
-          / Because we need to show unconfirmed users logout - and we should show them what they're missing in general - make a special current_user object here
-          - current_user_or_unconfirmed_user = current_user || unconfirmed_current_user
           - if current_user_or_unconfirmed_user.present?
             - memberships = current_user_or_unconfirmed_user.memberships.includes(:organization)
             %li.primary-nav-item
