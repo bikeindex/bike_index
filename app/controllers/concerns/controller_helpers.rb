@@ -35,9 +35,6 @@ module ControllerHelpers
   end
 
   def render_partner_or_default_signin_layout(render_action: nil, redirect_path: nil)
-    # We set partner in session because of AuthorizationsController - but we don't want the session to stick around
-    # so people can navigate around the site and return to the sign in without unexpected results
-    # we ALWAYS want to remove the session partner
     layout = sign_in_partner == "bikehub" ? "application_revised_bikehub" : "application_revised"
     if redirect_path
       redirect_to redirect_path, layout: layout
@@ -133,6 +130,9 @@ module ControllerHelpers
 
   def sign_in_partner
     return @sign_in_partner if defined?(@sign_in_partner)
+    # We set partner in session because of AuthorizationsController - but we don't want the session to stick around
+    # so people can navigate around the site and return to the sign in without unexpected results
+    # we ALWAYS want to remove the session partner
     partner = session.delete(:partner)
     partner ||= params[:partner]
     # fallback to assigning via session, but if partner was set via param, still remove the session partner.

@@ -12,7 +12,6 @@ class BikeIndex.Views.Global extends Backbone.View
   initialize: ->
     # BikeIndex.hideFlash() # not sure that it's something we ever want
     @setElement($('#body'))
-    @initializeHeaderSearch() if document.getElementById('head-search-bikes')
     @loadFancySelects()
     @setLightspeedMovie() if $('#lightspeed-tutorial-video').length > 0
     if $('#what-spokecards-are').length > 0
@@ -245,6 +244,7 @@ class BikeIndex.Views.Global extends Backbone.View
   # Old layout things. Delete once everything is updated
 
   toggleCollapsibleHeader: ->
+    return false
     # This is for the content pages where the search header is hidden
     $('#total-top-header').find('.search-background').toggleClass('show')
     $('#total-top-header').find('.background-extend').toggleClass('show')
@@ -288,59 +288,3 @@ class BikeIndex.Views.Global extends Backbone.View
       anchor = if idx != -1 then url.substring(idx+1)
       if anchor?
         $("##{anchor}").collapse()
-
-   
-  # loadUserHeader: ->
-    # This is minified and inlined in the header in legacy pages
-    # 
-    # $('#header-tabs').prepend("<div id='tab-cover'></div>")
-    # $.ajax({
-    #   type: "GET"
-    #   url: '/api/v1/users/current'
-    #   success: (data, textStatus, jqXHR) ->
-    #     if data["user_present"]
-    #       $('#total-top-header .yes_user').removeClass('hidden')
-    #       if data["is_superuser"]
-    #         $('#total-top-header .super_user').removeClass('hidden')
-    #       if _.isArray(data["memberships"])
-    #         for membership in data["memberships"]
-    #           tab = """
-    #             <li class="expand_t">
-    #               <a href="##{membership["slug"]}">#{membership["short_name"]}</a>
-    #             </li>
-    #           """
-    #           links = """
-    #             <div class="tab-pane" id="#{membership["slug"]}">
-    #               <ul>
-    #                 <li>
-    #                   <a href="/bikes/new?creation_organization_id=#{membership["organization_id"]}">
-    #                     <strong>Add a bike</strong> through #{membership["organization_name"]}
-    #                   </a>
-    #                 </li>
-    #                 <li>
-    #                   <a href="#{membership["base_url"]}">
-    #                     #{membership["organization_name"]} Account
-    #                   </a>
-    #                 </li>
-    #           """
-    #           if membership["is_admin"]
-    #             links = links + """
-    #               <li>
-    #                 <a href="#{membership["base_url"]}/edit">
-    #                   Manage organization
-    #                 </a>
-    #               </li>
-    #             """
-    #           links = links + "</ul></div>"
-    #           $('#total-top-header .global-tabs').append(tab)
-    #           $('#total-top-header .tab-content').append(links)
-    #       $('#your_settings_n_stuff').text(data["email"]) if data["email"]
-    #       $('#tab-cover').fadeOut()
-    #     else
-    #       $('#total-top-header .no_user').removeClass('hidden')
-    #       $('#tab-cover').fadeOut()
-    #   error: (data, textStatus, jqXHR) ->
-    #     $('#total-top-header .no_user').removeClass('hidden')
-    #     $('#tab-cover').fadeOut()
-    #     BikeIndex.alertMessage("error", "User load error", "We're sorry, we failed to load your user information. Try reloading maybe?")
-    #   })
