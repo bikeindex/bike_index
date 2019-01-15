@@ -52,6 +52,31 @@ describe UsersController do
       end
     end
   end
+  
+  describe "please_confirm_email" do
+    it "renders (without a user)" do
+      get :please_confirm_email
+      expect(response.code).to eq("200")
+      expect(response).to render_template("please_confirm_email")
+      expect(flash).to_not be_present
+    end
+    context "with user" do
+      include_context :logged_in_as_user
+      it "redirects to user_home" do
+        get :please_confirm_email
+        expect(response).to redirect_to user_home_path
+      end
+      context "unconfirmed user" do
+        let(:user) { FactoryGirl.create(:user) }
+        it "renders" do
+          get :please_confirm_email
+          expect(response.code).to eq("200")
+          expect(response).to render_template("please_confirm_email")
+          expect(flash).to_not be_present
+        end
+      end
+    end
+  end
 
   describe "create" do
     context "legacy" do

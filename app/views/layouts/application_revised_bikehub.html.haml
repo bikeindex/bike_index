@@ -9,6 +9,7 @@
     = javascript_include_tag 'application_revised'
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
   %body{ id: page_id, class:  body_class, style: "padding-top: 0;" }
+    / This is either the signup or signin page
     - signup_page = controller_name != "sessions"
     %nav.navbar.nav.bikehub-nav
       .container-fluid
