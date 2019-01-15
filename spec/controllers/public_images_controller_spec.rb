@@ -37,7 +37,7 @@ describe PublicImagesController do
       end
       context 'not admin' do
         it 'does not create an image' do
-          set_current_user(FactoryGirl.create(:user))
+          set_current_user(FactoryGirl.create(:user_confirmed))
           expect do
             post :create, blog_id: blog.id, public_image: { name: 'cool name' }, format: :js
             expect(response.code).to eq('401')
@@ -88,7 +88,7 @@ describe PublicImagesController do
   describe 'destroy' do
     context 'with owner' do
       it 'allows the destroy of public_image' do
-        user = FactoryGirl.create(:user)
+        user = FactoryGirl.create(:user_confirmed)
         bike = FactoryGirl.create(:bike)
         FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
         public_image = FactoryGirl.create(:public_image, imageable: bike)
@@ -102,7 +102,7 @@ describe PublicImagesController do
         it 'rejects the destroy' do
           ownership = FactoryGirl.create(:ownership)
           bike = ownership.bike
-          non_owner = FactoryGirl.create(:user, name: 'Non Owner')
+          non_owner = FactoryGirl.create(:user_confirmed, name: 'Non Owner')
           public_image = FactoryGirl.create(:public_image, imageable: bike)
           set_current_user(non_owner)
           expect do
@@ -112,7 +112,7 @@ describe PublicImagesController do
       end
       context 'owner and hidden bike' do
         it 'allows the destroy' do
-          user = FactoryGirl.create(:user)
+          user = FactoryGirl.create(:user_confirmed)
           bike = FactoryGirl.create(:bike, hidden: true)
           FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
           public_image = FactoryGirl.create(:public_image, imageable: bike)
@@ -127,7 +127,7 @@ describe PublicImagesController do
     end
     context 'with owner' do
       it 'allows a the owner of a public_image to destroy the public_image' do
-        user = FactoryGirl.create(:user)
+        user = FactoryGirl.create(:user_confirmed)
         bike = FactoryGirl.create(:bike)
         FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
         public_image = FactoryGirl.create(:public_image, imageable: bike)
@@ -168,7 +168,7 @@ describe PublicImagesController do
     context 'normal update' do
       context 'with owner' do
         it 'updates things and go back to editing the bike' do
-          user = FactoryGirl.create(:user)
+          user = FactoryGirl.create(:user_confirmed)
           bike = FactoryGirl.create(:bike)
           FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
           public_image = FactoryGirl.create(:public_image, imageable: bike)
@@ -182,7 +182,7 @@ describe PublicImagesController do
       end
       context 'not owner' do
         it 'does not update' do
-          user = FactoryGirl.create(:user)
+          user = FactoryGirl.create(:user_confirmed)
           bike = FactoryGirl.create(:bike)
           FactoryGirl.create(:ownership, bike: bike)
           public_image = FactoryGirl.create(:public_image, imageable: bike, name: 'party')
@@ -195,7 +195,7 @@ describe PublicImagesController do
   end
 
   describe 'is_private' do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryGirl.create(:user_confirmed) }
     let(:bike) { FactoryGirl.create(:bike) }
     context 'with owner' do
       context 'is_private true' do

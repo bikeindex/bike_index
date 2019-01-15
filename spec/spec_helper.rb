@@ -36,6 +36,9 @@ RSpec.configure do |config|
   config.render_views
   config.infer_spec_type_from_file_location!
 
+  # Add our request spec helpers
+  config.include RequestSpecHelpers, type: :request
+
   config.before :suite do
     DatabaseCleaner.clean
   end
@@ -49,35 +52,8 @@ RSpec.configure do |config|
   end
 end
 
-def set_current_user(user, request_spec: false)
-  # Request specs don't have cookies so we need to stub stuff if we're in request specs
-  # This is suboptimal, but hey, it gets us to request specs for now
-  if request_spec
-    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
-  else
-    cookies.signed[:auth] = { secure: true, httponly: true, value: [user.id, user.auth_token] }
-  end
-end
-
-def create_doorkeeper(_opts = {})
-  @user = FactoryGirl.create(:user_confirmed)
-  @application = Doorkeeper::Application.new(name: 'MyApp', redirect_uri: 'https://app.com')
-  @application.owner = @user
-  @application.save
-  @application
-end
-
-def create_doorkeeper_app(opts = {})
-  create_doorkeeper(opts)
-  if opts[:with_v2_accessor]
-    accessor_id = create_v2_access_id.to_i
-    @accessor_token = Doorkeeper::AccessToken.create!(application_id: @application.id, resource_owner_id: accessor_id, scopes: 'write_bikes')
-  end
-  @token = Doorkeeper::AccessToken.create!(application_id: @application.id, resource_owner_id: @user.id, scopes: opts && opts[:scopes])
-end
-
-def create_v2_access_id
-  ENV['V2_ACCESSOR_ID'] = FactoryGirl.create(:user).id.to_s
+def set_current_user(user)
+  cookies.signed[:auth] = { secure: true, httponly: true, value: [user.id, user.auth_token] }
 end
 
 OmniAuth.config.mock_auth[:facebook] = OmniAuth::AuthHash.new('provider' => 'facebook',

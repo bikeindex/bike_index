@@ -2,14 +2,29 @@ require "spec_helper"
 
 describe SessionsController do
   describe "new" do
-    context "calls required things" do
-      it "renders and calls store_return_to" do
-        expect(controller).to receive(:store_return_to)
-        get :new
-        expect(response.code).to eq("200")
-        expect(response).to render_template("new")
-        expect(flash).to_not be_present
-        expect(response).to render_with_layout("application_revised")
+    it "renders and calls store_return_to" do
+      expect(controller).to receive(:store_return_to)
+      get :new
+      expect(response.code).to eq("200")
+      expect(response).to render_template("new")
+      expect(flash).to_not be_present
+      expect(response).to render_with_layout("application_revised")
+    end
+    context "signed in user" do
+      include_context :logged_in_as_user
+      it "redirects" do
+        get :new, return_to: "/bikes/12?contact_owner=true"
+        expect(response).to redirect_to "/bikes/12?contact_owner=true"
+      end
+      context "unconfirmed" do
+        let(:user) { FactoryGirl.create(:user) }
+        it "redirects to please_confirm_email" do
+          user.reload
+          expect(user.confirmed?).to be_falsey
+          get :new, return_to: "/bikes/12?contact_owner=true"
+          expect(response).to redirect_to please_confirm_email_users_path
+          expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
+        end
       end
     end
     context "setting return_to" do
@@ -35,14 +50,22 @@ describe SessionsController do
     end
   end
 
-  describe 'destroy' do
-    it 'logs out the current user' do
-      user = FactoryGirl.create(:user)
-      set_current_user(user)
+  describe "destroy" do
+    include_context :logged_in_as_user
+    it "logs out the current user" do
       get :destroy
       expect(cookies.signed[:auth]).to be_nil
       expect(session[:user_id]).to be_nil
       expect(response).to redirect_to goodbye_url
+    end
+    context "unconfirmed user" do
+      let(:user) { FactoryGirl.create(:user) }
+      it "logs out the user" do
+        get :destroy
+        expect(cookies.signed[:auth]).to be_nil
+        expect(session[:user_id]).to be_nil
+        expect(response).to redirect_to goodbye_url
+      end
     end
   end
 
@@ -127,24 +150,21 @@ describe SessionsController do
       end
     end
 
-    context 'unconfirmed' do
-      let(:user) { FactoryGirl.create(:user, confirmed: false) }
-      it 'does not log in unconfirmed users' do
-        post :create, session: { email: user.email }
-        expect(response).to render_template(:new)
-        expect(flash[:error]).to be_present
-        expect(cookies.signed[:auth]).to be_nil
-        expect(response).to render_with_layout('application_revised')
+    context "unconfirmed" do
+      let(:user) { FactoryGirl.create(:user) }
+      it "logs in, sends to please_confirm_email" do
+        expect(user.authenticate("testthisthing7$")).to be_truthy
+        post :create, session: { email: user.email, password: "testthisthing7$" }
+        expect(User.from_auth(cookies.signed[:auth])).to eq(user)
+        expect(response).to redirect_to(please_confirm_email_users_path)
       end
-      context 'with confirmed user_email' do
-        it 'does not log them in either' do
-          user_email = FactoryGirl.create(:user_email, user: user)
+      context "with confirmed user_email" do
+        let!(:user_email) { FactoryGirl.create(:user_email, user: user) }
+        it "logs in, sends to please_confirm_email" do
           expect(user_email.confirmed).to be_truthy
-          post :create, session: { email: user_email.email }
-          expect(response).to render_template(:new)
-          expect(flash[:error]).to be_present
-          expect(cookies.signed[:auth]).to be_nil
-          expect(response).to render_with_layout('application_revised')
+          post :create, session: { email: user.email, password: "testthisthing7$" }
+          expect(User.from_auth(cookies.signed[:auth])).to eq(user)
+          expect(response).to redirect_to(please_confirm_email_users_path)
         end
       end
     end

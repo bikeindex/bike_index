@@ -12,7 +12,7 @@ describe OrganizationsController do
     end
     context 'with user' do
       it 'renders with revised_layout' do
-        set_current_user(FactoryGirl.create(:user))
+        set_current_user(FactoryGirl.create(:user_confirmed))
         get :new
         expect(response.status).to eq(200)
         expect(response).to render_template(:new)
@@ -24,7 +24,7 @@ describe OrganizationsController do
   describe 'create' do
     it 'creates org, membership, filters approved attrs & redirect to org with current_user' do
       expect(Organization.count).to eq(0)
-      user = FactoryGirl.create(:user)
+      user = FactoryGirl.create(:user_confirmed)
       set_current_user(user)
       org_attrs = {
         name: 'a new org',
@@ -45,7 +45,7 @@ describe OrganizationsController do
 
     it 'creates org, membership, filters approved attrs & redirect to org with current_user' do
       expect(Organization.count).to eq(0)
-      user = FactoryGirl.create(:user)
+      user = FactoryGirl.create(:user_confirmed)
       set_current_user(user)
       org_attrs = {
         name: 'a new org',
@@ -66,7 +66,7 @@ describe OrganizationsController do
 
     it "Doesn't xss" do
       expect(Organization.count).to eq(0)
-      user = FactoryGirl.create(:user)
+      user = FactoryGirl.create(:user_confirmed)
       set_current_user(user)
       org_attrs = {
         name: '<script>alert(document.cookie)</script>',
@@ -83,7 +83,7 @@ describe OrganizationsController do
 
     it 'mails us' do
       Sidekiq::Testing.inline! do
-        user = FactoryGirl.create(:user)
+        user = FactoryGirl.create(:user_confirmed)
         set_current_user(user)
         org_attrs = {
           name: 'a new org',

@@ -115,37 +115,25 @@ class User < ActiveRecord::Base
     errors.add(:email, 'That email is already signed up on Bike Index.')
   end
 
-  def perform_create_jobs
-    CreateUserJobs.new(self).perform_create_jobs
-  end
+  def confirmed?; confirmed end
 
-  def superuser?
-    superuser
-  end
+  def unconfirmed?; !confirmed? end
 
-  def content?
-    is_content_admin
-  end
+  def perform_create_jobs; CreateUserJobs.new(self).perform_create_jobs end
 
-  def developer?
-    developer
-  end
+  def superuser?; superuser end
 
-  def display_name
-    name.present? ? name : email
-  end
+  def content?; is_content_admin end
 
-  def donations
-    payments.sum(:amount_cents)
-  end
+  def developer?; developer end
 
-  def donor?
-    donations > 900
-  end
+  def display_name; name.present? ? name : email end
 
-  def paid_org?
-    organizations.paid.any?
-  end
+  def donations; payments.sum(:amount_cents) end
+
+  def donor?; donations > 900 end
+
+  def paid_org?; organizations.paid.any? end
 
   def admin_authorized(type)
     return true if superuser
@@ -162,6 +150,10 @@ class User < ActiveRecord::Base
     t = password_reset_token && password_reset_token.split('-')[0]
     t = (t.present? && t.to_i > 1427848192) ? t.to_i : 1364777722
     Time.at(t)
+  end
+
+  def reset_token_expired?
+     reset_token_time < (Time.now - 1.hours)
   end
 
   def set_password_reset_token(t=Time.now.to_i)
@@ -192,16 +184,6 @@ class User < ActiveRecord::Base
     end
   end
   
-  # We have a different authentication flow than has_secure_password because of email confirmation
-  # and banning
-  def signin(password)
-    if self.confirmed
-      self.authenticate(password)
-    else
-      return false
-    end
-  end
-
   def role(organization)
     m = Membership.where(user_id: id, organization_id: organization.id).first
     m && m.role
@@ -329,10 +311,11 @@ class User < ActiveRecord::Base
   end
 
   def generate_username_confirmation_and_auth
-    begin
-      username = SecureRandom.urlsafe_base64
-    end while User.where(username: username).exists?
-    self.username = username
+    usrname = username || SecureRandom.urlsafe_base64
+    while User.where(username: usrname).where.not(id: id).exists?
+      usrname = SecureRandom.urlsafe_base64
+    end
+    self.username = usrname
     if !confirmed
       self.confirmation_token = (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.now.to_s}")
     end

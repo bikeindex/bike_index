@@ -1,21 +1,27 @@
-OAUTH_SCOPES = [:public, :read_user, :read_bikes, :write_user, :write_bikes, :read_bikewise, :write_bikewise, :read_organization_membership]
-OAUTH_SCOPES_S = OAUTH_SCOPES.join(' ')
+OAUTH_SCOPES = %i[public read_user write_user read_bikes write_bikes read_bikewise write_bikewise read_organization_membership unconfirmed].freeze
 if Rails.env.development? && defined?(User) && defined?(User.first)
-  ENV['V2_ACCESSOR_ID'] = (User.fuzzy_email_find('api@example.com') || User.first).id.to_s
+  ENV["V2_ACCESSOR_ID"] = (User.fuzzy_email_find("api@example.com") || User.first).id.to_s
 end
+
 Doorkeeper.configure do
   # Change the ORM that doorkeeper will use.
   orm :active_record
 
-  # This block will be called to check whether the resource owner is authenticated or not.
-  resource_owner_authenticator do
-    @user ||= User.from_auth(cookies.signed[:auth])
-    unless @user
-      session[:return_to] = request.fullpath
-      redirect_to(new_session_url)
+  # This block is be called to check whether the resource owner is authenticated or not.
+  resource_owner_authenticator do |request_envi|
+    user = User.from_auth(cookies.signed[:auth])
+    if user.present? && user.confirmed?
+      user # Return user immediately, if user is confirmed
+    else
+      # If user isn't confirmed, check for unconfirmed scope. If it's present, return user even tho unconfirmed
+      unconfirmed_scope = request_envi&.params && request_envi.params[:scope].to_s[/unconfirmed/i].present?
+      if user.present? && unconfirmed_scope
+        user
+      else
+        session[:return_to] = request.fullpath
+        redirect_to(new_session_url)
+      end
     end
-
-    @user
   end
 
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
@@ -39,11 +45,11 @@ Doorkeeper.configure do
   use_refresh_token
 
   # Provide support for an owner to be assigned to each registered application (disabled by default)
-  enable_application_owner :confirmation => true
+  enable_application_owner confirmation: true
 
   # Define access token scopes for your provider
   # default_scopes  :public
-  optional_scopes :public, :read_user, :write_user, :read_bikes, :write_bikes, :read_bikewise, :write_bikewise, :read_organization_membership
+  optional_scopes :public, :read_user, :write_user, :read_bikes, :write_bikes, :read_bikewise, :write_bikewise, :read_organization_membership, :unconfirmed
 
   # Change the way client credentials are retrieved from the request object.
   # By default it retrieves first from the `HTTP_AUTHORIZATION` header, then
@@ -63,7 +69,7 @@ Doorkeeper.configure do
   # (Similar behaviour: https://developers.google.com/accounts/docs/OAuth2InstalledApp#choosingredirecturi)
   #
   # native_redirect_uri 'urn:ietf:wg:oauth:2.0:oob'
-  
+
   # Forces the usage of the HTTPS protocol in non-native redirect uris (enabled
   # by default in non-development environments). OAuth2 delegates security in
   # communication to the HTTPS protocol so it is wise to keep this enabled.
@@ -80,7 +86,7 @@ Doorkeeper.configure do
   #
   # If not specified, Doorkeeper enables all the four grant flows.
   #
-  grant_flows %w(authorization_code implicit password client_credentials)
+  grant_flows %w[authorization_code implicit password client_credentials]
 
   # Under some circumstances you might want to have applications auto-approved,
   # so that the user skips the authorization step.

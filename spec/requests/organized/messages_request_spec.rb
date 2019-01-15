@@ -4,15 +4,22 @@ describe "Organized::MessagesController" do
   include_context :geocoder_default_location
   include_context :organization_with_geolocated_messages
   let(:base_url) { "/o/#{organization.to_param}/messages" }
-  before { set_current_user(user, request_spec: true) if user.present? }
+  # Request specs don't have cookies so we need to stub stuff if we're in request specs
+  # This is suboptimal, but hey, it gets us to request specs for now
+  before { allow(User).to receive(:from_auth) { user } }
 
   describe "messages root" do
     let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+    it "renders" do
+      get base_url, json_headers
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:index)
+    end
     context "json" do
       it "returns empty" do
         get base_url, format: :json
         expect(response.status).to eq(200)
-        expect(JSON.parse(response.body)).to eq("messages" => [])
+        expect(json_result).to eq("messages" => [])
         expect(response.headers['Access-Control-Allow-Origin']).not_to be_present
         expect(response.headers['Access-Control-Request-Method']).not_to be_present
       end
@@ -36,9 +43,9 @@ describe "Organized::MessagesController" do
         it "renders json, no cors present" do
           get base_url, format: :json
           expect(response.status).to eq(200)
-          result = JSON.parse(response.body)["messages"]
-          expect(result.count).to eq 1
-          expect(result.first).to eq target.as_json
+          messages = json_result["messages"]
+          expect(messages.count).to eq 1
+          expect(messages.first).to eq target.as_json
           expect(response.headers['Access-Control-Allow-Origin']).not_to be_present
           expect(response.headers['Access-Control-Request-Method']).not_to be_present
         end

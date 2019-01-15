@@ -6,10 +6,10 @@ class IntegrationsController < ApplicationController
     @integration = Integration.new(information: request.env['omniauth.auth'],
                                    access_token: request.env['omniauth.auth']['credentials']['token'],
                                    provider_name: request.env['omniauth.auth']['provider'])
-    @integration.associate_with_user
-    if @integration.save && @integration.user.present?
+    @integration.save
+    if @integration.valid? && @integration.user.present?
       @user = @integration.user
-      sign_in_and_redirect
+      sign_in_and_redirect(@user)
     else
       integrations_controller_creation_error
     end

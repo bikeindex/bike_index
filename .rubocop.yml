@@ -33,6 +33,9 @@ Style/StringLiterals:
   EnforcedStyle: double_quotes # Always do it, lower cost cognitively
   Enabled: false
 
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
 NumericLiterals:
   Enabled: false
 
