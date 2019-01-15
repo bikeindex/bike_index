@@ -36,6 +36,20 @@ describe WelcomeController do
       expect(response).to render_with_layout("application_revised")
       expect(flash).to_not be_present
     end
+    context "logged_in" do
+      include_context :logged_in_as_user
+      it "redirects" do
+        get :goodbye
+        expect(response).to redirect_to logout_url
+      end
+      context "unconfirmed user" do
+        let(:user) { FactoryGirl.create(:user) }
+        it "redirects" do
+          get :goodbye
+          expect(response).to redirect_to logout_url
+        end
+      end
+    end
   end
 
   describe "choose registration" do

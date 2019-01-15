@@ -52,7 +52,7 @@ describe UsersController do
       end
     end
   end
-  
+
   describe "please_confirm_email" do
     it "renders (without a user)" do
       get :please_confirm_email
