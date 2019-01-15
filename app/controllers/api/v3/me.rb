@@ -23,6 +23,7 @@ module API
                 email: valid_current_user.email,
                 secondary_emails: valid_current_user.secondary_emails,
                 twitter: (valid_current_user.twitter if valid_current_user.show_twitter),
+                created_at: valid_current_user.created_at.to_i,
                 image: (valid_current_user.avatar_url if valid_current_user.show_bikes)
               }.merge(unconfirmed_scope? ? { confirmed: valid_current_user.confirmed? } : {})
             }
