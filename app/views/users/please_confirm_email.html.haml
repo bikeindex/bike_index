@@ -4,9 +4,11 @@
   %h3
     Please verify your email
   %p
-    We sent an email to 
-    %strong.stolen-color
-      = @user.email
+    We sent an email
+    - if @user.present?
+      to 
+      %strong.stolen-color
+        = @user.email
     with a confirmation link in it. Follow the link in the email to finish signing up!
 
 :plain
