@@ -36,7 +36,8 @@ describe "Me API V3" do
     end
 
     context "unconfirmed user" do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:time) { Time.now - 1.month }
+      let(:user) { FactoryGirl.create(:user, created_at: time) }
       it "responds with unauthorized" do
         user.reload
         expect(user.confirmed?).to be_falsey
@@ -54,6 +55,7 @@ describe "Me API V3" do
           expect(json_result[:user][:secondary_emails]).to eq([])
           expect(json_result[:user][:confirmed]).to be_falsey
           expect(json_result[:id]).to eq(user.id.to_s)
+          expect(Time.at(json_result[:user][:created_at])).to be_within(1.second).of time
           expect(json_result[:user].is_a?(Hash)).to be_truthy
           expect(json_result.key?("bike_ids")).to be_falsey
           expect(json_result.key?("memberships")).to be_falsey
