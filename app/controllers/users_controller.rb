@@ -24,7 +24,7 @@ class UsersController < ApplicationController
   def please_confirm_email
     redirect_to(user_root_url) and return if current_user.present?
     @user = unconfirmed_current_user
-    layout = @partner == "bikehub" ? "application_revised_bikehub" : "application_revised"
+    layout = sign_in_partner == "bikehub" ? "application_revised_bikehub" : "application_revised"
   end
 
   def confirm

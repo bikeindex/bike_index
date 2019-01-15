@@ -1,5 +1,5 @@
-.sign-in-up{ class: (@partner.present? ? "with-partner" : "not-partner") }
-  - unless @partner.present?
+.sign-in-up{ class: (sign_in_partner.present? ? "with-partner" : "not-partner") }
+  - unless sign_in_partner.present?
     .sign-in-up-header.container
       .row
         %h1
@@ -27,14 +27,14 @@
             = t("sign_in_up.#{controller_name}_main_form_action")
             %small
               already have
-              - if @partner.present?
+              - if sign_in_partner.present?
                 a Bike Index
               - else
                 an
-              account? #{link_to 'log in', new_session_path(partner: @partner)}
+              account? #{link_to 'log in', new_session_path(partner: sign_in_partner)}
           = form_for @user do |f|
-            - if @partner
-              = hidden_field_tag :partner, @partner
+            - if sign_in_partner
+              = hidden_field_tag :partner, sign_in_partner
 
             .form-group
               = f.label :email, class: 'sr-only'
@@ -50,7 +50,7 @@
               %label
                 = f.check_box :terms_of_service
                 I agree to
-                - if @partner == "bikehub"
+                - if sign_in_partner == "bikehub"
                   BikeHub's
                   %a.no-tab{ data: { target: "https://basic.bikehub.com/terms.html" } }
                     terms and conditions
@@ -58,7 +58,7 @@
                 Bike Index
                 %a.no-tab{ data: { target: terms_url } }
                   terms and conditions
-            - unless @partner.present?
+            - unless sign_in_partner.present?
               .checkbox
                 %label
                   = f.check_box :is_emailable
