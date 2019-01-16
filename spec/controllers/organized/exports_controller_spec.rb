@@ -144,7 +144,7 @@ describe Organized::ExportsController, type: :controller do
       end
       context "organization with avery export, non-avery export" do
         before { organization.update_column :paid_feature_slugs, %w[csv_exports avery_export] } # Stub organization having features
-        let(:export_params) { valid_attrs.merge(file_format: "csv", avery_export: "0", end_at: "2016-02-10 02:00:00",) }
+        let(:export_params) { valid_attrs.merge(file_format: "csv", avery_export: "0", end_at: "2016-02-10 02:00:00") }
         it "creates a non-avery export" do
           expect(organization.paid_for?("avery_export")).to be_truthy
           expect do
@@ -173,7 +173,6 @@ describe Organized::ExportsController, type: :controller do
           let(:end_at) { 1457431200 }
           before { organization.update_column :paid_feature_slugs, %w[csv_exports avery_export] } # Stub organization having features
           let(:target_headers) { %w[owner_name_or_email registration_address] }
-          let(:target_redirect) {  }
           it "makes the avery export" do
             expect do
               post :create, export: valid_attrs.merge(end_at: "2016-03-08 02:00:00", avery_export: true), organization_id: organization.to_param

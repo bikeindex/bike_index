@@ -8,7 +8,7 @@ describe OrganizationExportWorker do
   let(:black) { FactoryGirl.create(:color, name: "Black") } # Because we use it as a default color
   let(:trek) { FactoryGirl.create(:manufacturer, name: "Trek") }
   let(:bike) { FactoryGirl.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
-  let(:basic_values) do
+  let(:bike_values) do
     [
       "http://test.host/bikes/#{bike.id}",
       bike.created_at.utc,
@@ -20,10 +20,10 @@ describe OrganizationExportWorker do
     ]
   end
   let(:csv_string) { csv_lines.map { |r| instance.comma_wrapped_string(r) }.join }
+  let(:csv_lines) { [export.headers, bike_values] }
 
   describe "perform" do
     context "success" do
-      let(:csv_lines) { [export.headers, basic_values] }
       before do
         expect(bike.organizations.pluck(:id)).to eq([organization.id])
         expect(export.file.present?).to be_falsey
@@ -47,13 +47,32 @@ describe OrganizationExportWorker do
       end
       context "avery export" do
         let(:export) { FactoryGirl.create(:export_avery, progress: "pending", file: nil) }
-        it "exports, does not include bike that is missing name and email" do
+        let(:bike_for_avery) { FactoryGirl.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
+        let!(:b_param) do
+          FactoryGirl.create(:b_param, created_bike_id: bike_for_avery.id,
+                                       params: { bike: { address: "102 Washington Pl, State College",
+                                                         user_name: "Maya Skripal" } })
+        end
+        let(:csv_lines) do
+          # We modify the headers during processing to separate out the address
+          [
+            %w[owner_name address city state zipcode],
+            ["Maya Skripal", "102 Washington Pl", "State College", "PA", "16801"]
+          ]
+        end
+        include_context :geocoder_real
+        it "exports only bike with name and email" do
+          export.update_attributes(file_format: "csv") # Manually switch to csv so that we can parse it more easily :/
+          expect(organization.bikes.pluck(:id)).to match_array([bike.id, bike_for_avery.id])
           expect(export.avery_export?).to be_truthy
-          instance.perform(export.id)
+          expect(export.headers).to eq Export::AVERY_HEADERS
+          VCR.use_cassette("organization_export_worker-avery") do
+            instance.perform(export.id)
+          end
           export.reload
           expect(export.progress).to eq "finished"
-          expect(export.file.read.strip.split(/\n/).count).to eq 1 # Only has the headers exported, no bikes
-          expect(export.rows).to eq 0 # Also has correct count
+          expect(export.rows).to eq 1 # The bike without a user_name and address isn't exported
+          expect(export.file.read).to eq(csv_string)
         end
       end
     end
@@ -95,8 +114,7 @@ describe OrganizationExportWorker do
                            owner_email: email)
       end
       let!(:ownership) { FactoryGirl.create(:ownership, bike: bike, creator: FactoryGirl.create(:user_confirmed, name: "other person"), user: FactoryGirl.create(:user, name: "George Smith", email: "testly@bikeindex.org")) }
-      let(:csv_lines) { [export.headers, fancy_bike_values] }
-      let(:fancy_bike_values) do
+      let(:bike_values) do
         [
           "http://test.host/bikes/#{bike.id}",
           bike.created_at.utc,
@@ -166,7 +184,7 @@ describe OrganizationExportWorker do
     describe "bike_to_row" do
       context "default" do
         it "returns the hash we want" do
-          expect(instance.bike_to_row(bike)).to eq basic_values
+          expect(instance.bike_to_row(bike)).to eq bike_values
         end
       end
     end
