@@ -21,7 +21,7 @@ module Organized
     end
 
     def create
-      if params.dig(:export, :avery_export)
+      if ActiveRecord::Type::Boolean.new.type_cast_from_database(params.dig(:export, :avery_export))
         if current_organization.paid_for?("avery_export")
           @export = avery_export
         else
