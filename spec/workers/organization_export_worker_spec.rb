@@ -54,7 +54,7 @@ describe OrganizationExportWorker do
                                                          user_name: "Maya Skripal" } })
         end
         let(:csv_lines) do
-          # We modify the headers during processing to separate out the address
+          # We modify the headers during processing to separate the address into multiple fields
           [
             %w[owner_name address city state zipcode],
             ["Maya Skripal", "102 Washington Pl", "State College", "PA", "16801"]
