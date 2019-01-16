@@ -26,7 +26,12 @@
   .form-group.row.mt-4
     = f.label :start_at, "Registered after", class: "org-form-label"
     .col-sm-4
-      = f.datetime_local_field :start_at, step: 60, class: "form-control"
+      %a.datetimefield-expander{ href: "#expandStartAt" }
+        Set time
+      .datetimefield-fields
+        = f.datetime_local_field :start_at, step: 60, class: "form-control"
+        %a.datetimefield-collapser{ href: "#expandStartAt" }
+          remove
   .form-group.row
     = f.label :end_at, "Registered before", class: "org-form-label"
     .col-sm-4
