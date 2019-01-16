@@ -13,7 +13,6 @@ class UsersController < ApplicationController
   def create
     @user = User.new(permitted_parameters)
     if @user.save
-      session[:partner] = nil # So they can leave this signup page if they want
       sign_in_and_redirect(@user)
     else
       @page_errors = @user.errors
@@ -179,12 +178,8 @@ class UsersController < ApplicationController
   private
 
   def permitted_parameters
-    params.require(:user).permit(User.old_attr_accessible).merge(permitted_partner_data)
-  end
-
-  def permitted_partner_data
-    return {} unless params[:partner].present? && params[:partner] == "bikehub"
-    { partner_data: { sign_up: "bikehub" } }
+    params.require(:user).permit(User.old_attr_accessible)
+          .merge(sign_in_partner.present? ? { partner_data: { sign_up: sign_in_partner } } : {})
   end
 
   def permitted_update_parameters
