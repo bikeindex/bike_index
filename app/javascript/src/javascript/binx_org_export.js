@@ -22,7 +22,7 @@ window.BinxAppOrgExport = class BinxAppOrgExport {
         $parent.find(".datetimefield-fields").slideDown("fast");
         $parent
           .find("input[type='datetime-local']")
-          .val(moment().format("YYYY-MM-DDThh:mm"));
+          .val(moment().format("YYYY-MM-DDTHH:mm"));
       });
     });
     // make the datetimefield collapse, remove the time
