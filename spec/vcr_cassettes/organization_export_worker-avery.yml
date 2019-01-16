@@ -1,0 +1,125 @@
+http_interactions:
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=102%20Washington%20Pl,%20State%20College&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Wed, 16 Jan 2019 18:12:57 GMT
+        Expires:
+          - Thu, 17 Jan 2019 18:12:57 GMT
+        Cache-Control:
+          - public, max-age=86400
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        Content-Length:
+          - "616"
+        X-Xss-Protection:
+          - 1; mode=block
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=541
+        Alt-Svc:
+          - quic=":443"; ma=2592000; v="44,43,39,35"
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "102",
+                         "short_name" : "102",
+                         "types" : [ "street_number" ]
+                      },
+                      {
+                         "long_name" : "Washington Place",
+                         "short_name" : "Washington Pl",
+                         "types" : [ "route" ]
+                      },
+                      {
+                         "long_name" : "State College",
+                         "short_name" : "State College",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Ferguson Township",
+                         "short_name" : "Ferguson Township",
+                         "types" : [ "administrative_area_level_3", "political" ]
+                      },
+                      {
+                         "long_name" : "Centre County",
+                         "short_name" : "Centre County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "Pennsylvania",
+                         "short_name" : "PA",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "16801",
+                         "short_name" : "16801",
+                         "types" : [ "postal_code" ]
+                      },
+                      {
+                         "long_name" : "3201",
+                         "short_name" : "3201",
+                         "types" : [ "postal_code_suffix" ]
+                      }
+                   ],
+                   "formatted_address" : "102 Washington Pl, State College, PA 16801, USA",
+                   "geometry" : {
+                      "location" : {
+                         "lat" : 40.7712875,
+                         "lng" : -77.87390359999999
+                      },
+                      "location_type" : "ROOFTOP",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 40.7726364802915,
+                            "lng" : -77.87255461970848
+                         },
+                         "southwest" : {
+                            "lat" : 40.7699385197085,
+                            "lng" : -77.8752525802915
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJH5WGh_CozokR1ltk1zyhUnE",
+                   "plus_code" : {
+                      "compound_code" : "Q4CG+GC State College, Pennsylvania, United States",
+                      "global_code" : "87G4Q4CG+GC"
+                   },
+                   "types" : [ "street_address" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      ? http_version
+    recorded_at: Wed, 16 Jan 2019 18:12:57 GMT
+recorded_with: VCR 4.0.0
