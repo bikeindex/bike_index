@@ -415,6 +415,7 @@ describe BikesController do
         let(:target_time) { Time.now.to_i }
         let(:stolen_params) { chicago_stolen_params.merge(date_stolen: (Time.now - 1.day).utc, timezone: "UTC") }
         context 'valid' do
+          include_context :geocoder_real
           context 'with old style date input' do
             it 'creates a new ownership and bike from an organization' do
               VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
