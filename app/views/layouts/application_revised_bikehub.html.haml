@@ -23,9 +23,9 @@
               = image_tag "logo.svg", class: "primary-nav", alt: "Bike Index home"
           %a.bikehub-nav-item.bikehub-nav-item-first{ href: "https://bikehub.com/contact/" }
             Contact
-          %a.bikehub-nav-item{ href: new_user_path(partner: params[:partner]), class: (signup_page ? "active" : "") }
+          %a.bikehub-nav-item{ href: new_user_path(partner: sign_in_partner), class: (signup_page ? "active" : "") }
             Sign up
-          %a.bikehub-nav-item{ href: new_session_path(partner: params[:partner]), class: (signup_page ? "" : "active") }
+          %a.bikehub-nav-item{ href: new_session_path(partner: sign_in_partner), class: (signup_page ? "" : "active") }
             Log in
     .container.bikehub-explanation.mb-4
       .row

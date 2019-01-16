@@ -21,9 +21,8 @@ module Sessionable
       default_session_set(user)
     end
 
-    if params[:partner].present? || session[:partner].present? # Check present? of both in case one is empty
-      session[:partner] = nil # Ensure they won't be redirected in the future
-      redirect_to "https://new.bikehub.com/account" and return
+    if sign_in_partner.present?
+      redirect_to "https://new.bikehub.com/account" and return # Only partner rn is bikehub, hardcode it
     elsif user.unconfirmed?
       render_partner_or_default_signin_layout(redirect_path: please_confirm_email_users_path) and return
     elsif !return_to_if_present

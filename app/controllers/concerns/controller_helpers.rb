@@ -7,7 +7,8 @@ module ControllerHelpers
   included do
     helper_method :current_user, :unconfirmed_current_user, :current_user_or_unconfirmed_user,
                   :current_organization, :user_root_url, :controller_namespace, :page_id,
-                  :forwarded_ip_address, :ensure_preview_enabled!, :recovered_bike_count
+                  :forwarded_ip_address, :ensure_preview_enabled!, :recovered_bike_count,
+                  :sign_in_partner
     before_filter :enable_rack_profiler
   end
 
@@ -26,22 +27,15 @@ module ControllerHelpers
     else
       flash[flash_type] = msg
       if msg.match(/create an account/i).present?
-        redirect_to new_user_url(subdomain: false, partner: params[:partner]) and return
+        redirect_to new_user_url(subdomain: false, partner: sign_in_partner) and return
       else
-        redirect_to new_session_url(subdomain: false, partner: params[:partner]) and return
+        redirect_to new_session_url(subdomain: false, partner: sign_in_partner) and return
       end
     end
   end
 
   def render_partner_or_default_signin_layout(render_action: nil, redirect_path: nil)
-    # We set partner in session because of AuthorizationsController - but we don't want the session to stick around
-    # so people can navigate around the site and return to the sign in without unexpected results
-    # we ALWAYS want to remove the session partner
-    partner = session.delete(:partner)
-    partner ||= params[:partner]
-    # fallback to assigning via session, but if partner was set via param, still remove the session partner.
-    @partner = partner&.downcase == "bikehub" ? "bikehub" : nil # For now, only permit bikehub partner
-    layout = @partner == "bikehub" ? "application_revised_bikehub" : "application_revised"
+    layout = sign_in_partner == "bikehub" ? "application_revised_bikehub" : "application_revised"
     if redirect_path
       redirect_to redirect_path, layout: layout
     elsif render_action
@@ -132,6 +126,17 @@ module ControllerHelpers
   # Generally, this shouldn't be accessed. Almost always should be accessing current_user
   def current_user_or_unconfirmed_user
     current_user_or_unconfirmed_user = current_user || unconfirmed_current_user
+  end
+
+  def sign_in_partner
+    return @sign_in_partner if defined?(@sign_in_partner)
+    # We set partner in session because of AuthorizationsController - but we don't want the session to stick around
+    # so people can navigate around the site and return to the sign in without unexpected results
+    # we ALWAYS want to remove the session partner
+    partner = session.delete(:partner)
+    partner ||= params[:partner]
+    # fallback to assigning via session, but if partner was set via param, still remove the session partner.
+    @sign_in_partner = partner&.downcase == "bikehub" ? "bikehub" : nil # For now, only permit bikehub partner
   end
 
   def remove_session

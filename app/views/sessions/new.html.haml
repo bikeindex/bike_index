@@ -1,5 +1,5 @@
-.sign-in-up{ class: (@partner.present? ? "with-partner" : "not-partner") }
-  - unless @partner.present?
+.sign-in-up{ class: (sign_in_partner.present? ? "with-partner" : "not-partner") }
+  - unless sign_in_partner.present?
     .sign-in-up-header.container
       .row
         %h1
@@ -26,14 +26,14 @@
           %h3.sign-in-up-main-form-header
             = t("sign_in_up.#{controller_name}_main_form_action")
             %small
-              - if @partner.present?
+              - if sign_in_partner.present?
                 no Bike Index
               - else
                 don't have an
-              account? #{ link_to 'sign up', new_user_path(partner: @partner) }
+              account? #{ link_to 'sign up', new_user_path(partner: sign_in_partner) }
           = form_for :session, url: session_url do |f|
-            - if @partner
-              = hidden_field_tag :partner, @partner
+            - if sign_in_partner
+              = hidden_field_tag :partner, sign_in_partner
             .form-group
               = f.label :email, class: 'sr-only'
               = f.email_field :email, placeholder: 'email', class: 'form-control'
