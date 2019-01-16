@@ -139,7 +139,7 @@ describe Organized::ExportsController, type: :controller do
         expect(export.user).to eq user
         expect(export.headers).to eq valid_attrs[:headers]
         expect(export.start_at.to_i).to be_within(1).of start_at
-        expect(export.end_at.to_i).to be_nil
+        expect(export.end_at).to_not be_present
         expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
       end
       context "organization with avery export, non-avery export" do
@@ -157,7 +157,7 @@ describe Organized::ExportsController, type: :controller do
           expect(export.user).to eq user
           expect(export.headers).to eq valid_attrs[:headers]
           expect(export.start_at.to_i).to be_within(1).of start_at
-          expect(export.end_at.to_i).to be_within(1).of start_at + 86_000
+          expect(export.end_at.to_i).to be_within(1).of start_at + 2.days.to_i
           expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
           expect(export.avery_export?).to be_falsey
         end
