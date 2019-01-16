@@ -132,6 +132,7 @@ describe Organized::ExportsController, type: :controller do
         expect do
           post :create, export: valid_attrs, organization_id: organization.to_param
         end.to change(Export, :count).by 1
+        expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
         export = Export.last
         expect(export.kind).to eq "organization"
         expect(export.file_format).to eq "xlsx"
@@ -139,6 +140,25 @@ describe Organized::ExportsController, type: :controller do
         expect(export.headers).to eq valid_attrs[:headers]
         expect(export.start_at.to_i).to be_within(1).of start_at
         expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+      end
+      context "organization with avery export, non-avery export" do
+        before { organization.update_column :paid_feature_slugs, %w[csv_exports avery_export] } # Stub organization having features
+        let(:export_params) { valid_attrs.merge(file_format: "csv", avery_export: "0") }
+        it "creates a non-avery export" do
+          expect(organization.paid_for?("avery_export")).to be_truthy
+          expect do
+            post :create, export: export_params, organization_id: organization.to_param
+          end.to change(Export, :count).by 1
+          expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
+          export = Export.last
+          expect(export.kind).to eq "organization"
+          expect(export.file_format).to eq "csv"
+          expect(export.user).to eq user
+          expect(export.headers).to eq valid_attrs[:headers]
+          expect(export.start_at.to_i).to be_within(1).of start_at
+          expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+          expect(export.avery_export?).to be_falsey
+        end
       end
       context "avery export" do
         it "fails" do

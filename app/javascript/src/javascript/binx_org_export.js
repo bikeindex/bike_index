@@ -18,16 +18,17 @@ window.BinxAppOrgExport = class BinxAppOrgExport {
     $(".datetimefield-expander").on("click", e => {
       e.preventDefault();
       let $parent = $(e.target).parents(".form-group");
-      log.debug($parent);
       $parent.find(".datetimefield-expander").slideUp("fast", function() {
         $parent.find(".datetimefield-fields").slideDown("fast");
+        $parent
+          .find("input[type='datetime-local']")
+          .val(moment().format("YYYY-MM-DDThh:mm"));
       });
     });
     // make the datetimefield collapse, remove the time
     $(".datetimefield-collapser").on("click", e => {
       e.preventDefault();
       let $parent = $(e.target).parents(".form-group");
-      log.debug($parent);
       $parent.find(".datetimefield-fields").slideUp("fast", function() {
         $parent.find(".datetimefield-expander").slideDown("fast");
         $parent.find("input[type='datetime-local']").val("");
