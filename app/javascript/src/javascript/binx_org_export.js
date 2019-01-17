@@ -20,9 +20,11 @@ window.BinxAppOrgExport = class BinxAppOrgExport {
       let $parent = $(e.target).parents(".form-group");
       $parent.find(".datetimefield-expander").slideUp("fast", function() {
         $parent.find(".datetimefield-fields").slideDown("fast");
-        $parent
-          .find("input[type='datetime-local']")
-          .val(moment().format("YYYY-MM-DDTHH:mm"));
+        $parent.find("input[type='datetime-local']").val(
+          moment()
+            .startOf("day")
+            .format("YYYY-MM-DDTHH:mm")
+        );
       });
     });
     // make the datetimefield collapse, remove the time

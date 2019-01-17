@@ -56,7 +56,7 @@ describe OrganizationExportWorker do
         let(:csv_lines) do
           # We modify the headers during processing to separate the address into multiple fields
           [
-            %w[owner_name address city state zipcode],
+            %w[owner_name_or_email address city state zipcode],
             ["Maya Skripal", "102 Washington Pl", "State College", "PA", "16801"]
           ]
         end

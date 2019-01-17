@@ -53,7 +53,7 @@
   #placeSearch {
     max-width: 60%;
     display: none;
-    .searchOnMap {
+    &.searchOnMap {
       display: block;
     }
     @include media-breakpoint-down(md) {
