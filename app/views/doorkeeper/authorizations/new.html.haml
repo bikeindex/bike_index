@@ -5,7 +5,7 @@
     .card.authorize-application-section{ role: 'main' }
       .card-block
         %h3.card-title
-          Hello #{@current_user.display_name},
+          Hello#{@current_user && @current_user.display_name},
         %p
           Would you like to authorize
           %strong.text-info

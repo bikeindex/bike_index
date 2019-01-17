@@ -6,7 +6,7 @@ class Admin::MembershipsController < Admin::BaseController
   before_filter :find_organization, only: [:show]
 
   def index
-    @memberships = Membership.all
+    @memberships = Membership.reorder(created_at: :desc)
   end
 
   def show

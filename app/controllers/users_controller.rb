@@ -1,32 +1,29 @@
 class UsersController < ApplicationController
-  layout 'application_revised'
+  layout "application_revised"
   include Sessionable
-  before_filter :authenticate_user, only: [:edit]
-  before_filter :store_return_to, only: [:new]
-  before_filter :assign_edit_template, only: [:edit, :update]
-  
+  before_action :authenticate_user, only: [:edit]
+  before_action :skip_if_signed_in, only: [:new]
+  before_action :assign_edit_template, only: [:edit, :update]
+
   def new
     @user ||= User.new
-    if current_user.present?
-      flash[:success] = "You're already signed in, silly! You can log out by clicking on 'Your Account' in the upper right corner"
-      redirect_to user_home_url and return
-    end
     render_partner_or_default_signin_layout
   end
 
   def create
     @user = User.new(permitted_parameters)
     if @user.save
-      session[:partner] = nil # So they can leave this signup page if they want
-      if @user.confirmed
-        sign_in_and_redirect
-      else
-        render_partner_or_default_signin_layout
-      end
+      sign_in_and_redirect(@user)
     else
       @page_errors = @user.errors
       render_partner_or_default_signin_layout(render_action: :new)
     end
+  end
+
+  def please_confirm_email
+    redirect_to(user_root_url) and return if current_user.present?
+    @user = unconfirmed_current_user
+    layout = sign_in_partner == "bikehub" ? "application_revised_bikehub" : "application_revised"
   end
 
   def confirm
@@ -37,7 +34,7 @@ class UsersController < ApplicationController
         render_partner_or_default_signin_layout(redirect_path: new_session_path)
       else
         if @user.confirm(params[:code])
-          sign_in_and_redirect
+          sign_in_and_redirect(@user)
         else
           render :confirm_error_bad_token
         end
@@ -57,9 +54,9 @@ class UsersController < ApplicationController
   def password_reset
     if params[:token].present?
       @user = User.find_by_password_reset_token(params[:token])
-      if @user.present?
-        session[:return_to] = 'password_reset'
-        sign_in_and_redirect
+      if @user.present? && !@user.reset_token_expired?
+        session[:return_to] = "password_reset"
+        sign_in_and_redirect(@user)
       else
         flash[:error] = "We're sorry, but that link is no longer valid."
         render action: :request_password_reset
@@ -73,7 +70,7 @@ class UsersController < ApplicationController
         render action: :request_password_reset
       end
     else
-      redirect_to '/users/request_password_reset'
+      redirect_to "/users/request_password_reset"
     end
   end
 
@@ -102,9 +99,13 @@ class UsersController < ApplicationController
     @user = current_user
     if params[:user][:password_reset_token].present?
       if @user.password_reset_token != params[:user][:password_reset_token]
-        @user.errors.add(:base, "Doesn't match user's password reset token")
-      elsif @user.reset_token_time < (Time.now - 1.hours)
-        @user.errors.add(:base, 'Password reset token expired, try resetting password again')
+        remove_session
+        flash[:error] = "Doesn't match user's password reset token"
+        redirect_to user_home_url and return
+      elsif @user.reset_token_expired?
+        remove_session
+        flash[:error] = "Password reset token expired, try resetting password again"
+        redirect_to user_home_url and return
       end
     elsif params[:user][:password].present?
       unless @user.authenticate(params[:user][:current_password])
@@ -142,7 +143,7 @@ class UsersController < ApplicationController
         @user.generate_auth_token
         @user.set_password_reset_token
         @user.reload
-        default_session_set
+        default_session_set(@user)
       end
       flash[:success] = 'Your information was successfully updated.'
       redirect_to my_account_url(page: params[:page]) and return
@@ -177,12 +178,8 @@ class UsersController < ApplicationController
   private
 
   def permitted_parameters
-    params.require(:user).permit(User.old_attr_accessible).merge(permitted_partner_data)
-  end
-
-  def permitted_partner_data
-    return {} unless params[:partner].present? && params[:partner] == "bikehub"
-    { partner_data: { sign_up: "bikehub" } }
+    params.require(:user).permit(User.old_attr_accessible)
+          .merge(sign_in_partner.present? ? { partner_data: { sign_up: sign_in_partner } } : {})
   end
 
   def permitted_update_parameters

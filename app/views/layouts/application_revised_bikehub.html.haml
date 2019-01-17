@@ -9,6 +9,7 @@
     = javascript_include_tag 'application_revised'
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
   %body{ id: page_id, class:  body_class, style: "padding-top: 0;" }
+    / This is either the signup or signin page
     - signup_page = controller_name != "sessions"
     %nav.navbar.nav.bikehub-nav
       .container-fluid
@@ -22,16 +23,16 @@
               = image_tag "logo.svg", class: "primary-nav", alt: "Bike Index home"
           %a.bikehub-nav-item.bikehub-nav-item-first{ href: "https://bikehub.com/contact/" }
             Contact
-          %a.bikehub-nav-item{ href: new_user_path(partner: params[:partner]), class: (signup_page ? "active" : "") }
+          %a.bikehub-nav-item{ href: new_user_path(partner: sign_in_partner), class: (signup_page ? "active" : "") }
             Sign up
-          %a.bikehub-nav-item{ href: new_session_path(partner: params[:partner]), class: (signup_page ? "" : "active") }
+          %a.bikehub-nav-item{ href: new_session_path(partner: sign_in_partner), class: (signup_page ? "" : "active") }
             Log in
     .container.bikehub-explanation.mb-4
       .row
         .col-sm-12
           %h1
             BikeHub
-            = signup_page ? "Log In" : "Sign up"
+            = signup_page ? "Sign up" : "Log In"
       .row
         .col-sm-12
           %p

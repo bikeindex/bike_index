@@ -3,6 +3,7 @@ class Export < ActiveRecord::Base
   VALID_KINDS = %i[organization stolen manufacturer].freeze
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
+  AVERY_HEADERS = %w[owner_name_or_email registration_address].freeze
   HIDDEN_HEADERS = %w[owner_name_or_email].freeze
   PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail registered_by registration_type owner_email owner_name] + HIDDEN_HEADERS).freeze
 
@@ -59,6 +60,14 @@ class Export < ActiveRecord::Base
 
   def avery_export?
     option?("avery_export")
+  end
+
+  def avery_export=(val)
+    if val
+      self.options = options.merge(avery_export: true)
+      self.attributes = { file_format: "xlsx", headers: AVERY_HEADERS }
+    end
+    true # Legacy concerns, so excited for TODO: Rails 5 update
   end
 
   def avery_export_url

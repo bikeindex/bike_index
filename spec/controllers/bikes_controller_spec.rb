@@ -174,7 +174,7 @@ describe BikesController do
           end
           context 'non-owner non-admin viewing' do
             it 'redirects' do
-              set_current_user(FactoryGirl.create(:user))
+              set_current_user(FactoryGirl.create(:user_confirmed))
               get :show, id: bike.id
               expect(response).to redirect_to(:root)
               expect(flash[:error]).to be_present
@@ -363,6 +363,17 @@ describe BikesController do
     let(:color) { FactoryGirl.create(:color) }
     let(:cycle_type) { FactoryGirl.create(:cycle_type) }
     let(:handlebar_type) { FactoryGirl.create(:handlebar_type) }
+    let(:state) { FactoryGirl.create(:state) }
+    let!(:country) { state.country }
+    let(:chicago_stolen_params) do
+      {
+        country_id: country.id,
+        street: "2459 W Division St",
+        city: "Chicago",
+        zipcode: "60622",
+        state_id: state.id
+      }
+    end
 
     describe 'embeded' do
       let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
@@ -401,53 +412,47 @@ describe BikesController do
         end
       end
       context 'stolen' do
-        let(:state) { FactoryGirl.create(:state) }
-        let(:country) { state.country }
         let(:target_time) { Time.now.to_i }
-        let(:stolen_params) do
-          {
-            country_id: country.id,
-            street: '2459 W Division St',
-            city: 'Chicago',
-            zipcode: '60622',
-            state_id: state.id,
-            date_stolen: (Time.now - 1.day).utc,
-            timezone: "UTC"
-          }
-        end
+        let(:stolen_params) { chicago_stolen_params.merge(date_stolen: (Time.now - 1.day).utc, timezone: "UTC") }
         context 'valid' do
+          include_context :geocoder_real
           context 'with old style date input' do
             it 'creates a new ownership and bike from an organization' do
-              expect do
-                post :create, bike: bike_params.merge(stolen: true), stolen_record: stolen_params
-              end.to change(Ownership, :count).by 1
-              bike = Bike.last
-              expect(bike).to be_present
-              expect(bike.creation_state.origin).to eq 'embed'
-              expect(bike.creation_state.organization).to eq organization
-              expect(bike.creation_state.creator).to eq bike.creator
-              testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
-              stolen_record = bike.current_stolen_record
-              stolen_params.except(:date_stolen, :timezone).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
-              expect(stolen_record.date_stolen.to_i).to be_within(1).of(Time.now.yesterday.to_i)
+              VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
+                expect do
+                  post :create, bike: bike_params.merge(stolen: true), stolen_record: stolen_params
+                  expect(assigns(:bike).errors&.full_messages).to_not be_present
+                end.to change(Ownership, :count).by 1
+                bike = Bike.last
+                expect(bike).to be_present
+                expect(bike.creation_state.origin).to eq 'embed'
+                expect(bike.creation_state.organization).to eq organization
+                expect(bike.creation_state.creator).to eq bike.creator
+                testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+                stolen_record = bike.current_stolen_record
+                stolen_params.except(:date_stolen, :timezone).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+                expect(stolen_record.date_stolen.to_i).to be_within(1).of(Time.now.yesterday.to_i)
+              end
             end
           end
           context 'new date input' do
             let(:alt_stolen_params) { stolen_params.merge(date_stolen: "2018-07-28T23:34:00", timezone: "America/New_York") }
             let(:target_time) { 1532835240 }
             it 'creates a new ownership and bike from an organization' do
-              expect do
-                post :create, bike: bike_params.merge(stolen: true), stolen_record: alt_stolen_params
-              end.to change(Ownership, :count).by 1
-              bike = Bike.last
-              expect(bike).to be_present
-              expect(bike.creation_state.origin).to eq 'embed'
-              expect(bike.creation_state.organization).to eq organization
-              expect(bike.creation_state.creator).to eq bike.creator
-              testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
-              stolen_record = bike.current_stolen_record
-              stolen_params.except(:date_stolen, :timezone).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
-              expect(stolen_record.date_stolen.to_i).to be_within(1).of target_time
+              VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
+                expect do
+                  post :create, bike: bike_params.merge(stolen: true), stolen_record: alt_stolen_params
+                end.to change(Ownership, :count).by 1
+                bike = Bike.last
+                expect(bike).to be_present
+                expect(bike.creation_state.origin).to eq 'embed'
+                expect(bike.creation_state.organization).to eq organization
+                expect(bike.creation_state.creator).to eq bike.creator
+                testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+                stolen_record = bike.current_stolen_record
+                stolen_params.except(:date_stolen, :timezone).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+                expect(stolen_record.date_stolen.to_i).to be_within(1).of target_time
+              end
             end
           end
         end
@@ -457,6 +462,7 @@ describe BikesController do
             expect do
               post :create, bike: bike_params.merge(stolen: '1', primary_frame_color: nil),
                             stolen_record: stolen_params
+              expect(assigns(:bike).errors&.full_messages).to be_present
             end.to change(Ownership, :count).by 0
             expect(response).to redirect_to target_path
             bike = assigns(:bike)
@@ -621,21 +627,12 @@ describe BikesController do
             stolen: true
           }
         end
-        let(:stolen_params) do
-          {
-            country_id: country.id,
-            street: "2459 W Division St",
-            city: "Chicago",
-            zipcode: "60622",
-            state_id: state.id
-          }
-        end
         before { expect(BParam.all.count).to eq 0 }
         context "successful creation" do
           include_context :geocoder_real
           it "creates a bike and doesn't create a b_param" do
             bike_user = FactoryGirl.create(:user_confirmed, email: "something@stuff.com")
-            VCR.use_cassette("bikes_controller-create-stolen-web", match_requests_on: [:path]) do
+            VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
               success_params = bike_params.merge(manufacturer_id: manufacturer.slug)
               bb_data = { bike: { rear_wheel_bsd: wheel_size.iso_bsd.to_s }, components: [] }.as_json
               # We need to call clean_params on the BParam after bikebook update, so that
@@ -643,7 +640,7 @@ describe BikesController do
               # This is also where we're testing bikebook assignment
               expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
               expect do
-                post :create, stolen: true, bike: success_params.as_json, stolen_record: stolen_params
+                post :create, stolen: true, bike: success_params.as_json, stolen_record: chicago_stolen_params
               end.to change(Bike, :count).by(1)
               expect(flash[:success]).to be_present
               expect(BParam.all.count).to eq 0
@@ -655,15 +652,14 @@ describe BikesController do
               expect(bike.current_stolen_record.phone).to eq "3123799513"
               expect(bike_user.phone).to eq "3123799513"
               stolen_record = bike.current_stolen_record
-              stolen_params.delete(:state_id) # this doesn't show up, don't care for now, shows up for real
-              stolen_params.each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+              chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
             end
           end
         end
         context 'failure' do
           it 'assigns a bike and a stolen record with the attrs passed' do
             expect do
-              post :create, stolen: true, bike: bike_params.as_json, stolen_record: stolen_params
+              post :create, stolen: true, bike: bike_params.as_json, stolen_record: chicago_stolen_params
             end.to change(Bike, :count).by(0)
             expect(BParam.all.count).to eq 1
             bike = assigns(:bike)
@@ -675,7 +671,7 @@ describe BikesController do
             # assigned correctly, but I don't know how - it needs to completely
             # render the new action
             # stolen_record = assigns(:stolen_record)
-            # stolen_params.each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+            # chicago_stolen_params.each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
           end
         end
       end
@@ -770,7 +766,7 @@ describe BikesController do
       end
     end
     context 'user present' do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryGirl.create(:user_confirmed) }
       before { set_current_user(user) }
       context "user present but isn't allowed to edit the bike" do
         it 'redirects and sets the flash' do
@@ -870,7 +866,7 @@ describe BikesController do
     context 'user is present but is not allowed to edit' do
       it 'does not update and redirects' do
         ownership = FactoryGirl.create(:ownership)
-        user = FactoryGirl.create(:user)
+        user = FactoryGirl.create(:user_confirmed)
         set_current_user(user)
         put :update, id: ownership.bike.id, bike: { serial_number: '69' }
         expect(response).to redirect_to bike_url(ownership.bike)

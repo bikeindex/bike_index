@@ -1,18 +1,17 @@
 class SessionsController < ApplicationController
   include Sessionable
-  layout 'application_revised'
-  before_filter :store_return_to, only: [:new]
-  before_filter :skip_if_signed_in, only: [:new]
+  layout "application_revised"
+  before_action :skip_if_signed_in, only: [:new]
 
   def new
     render_partner_or_default_signin_layout
   end
 
   def create
-    @user = User.fuzzy_email_find(permitted_parameters[:email])
-    if @user.present? && @user.confirmed?
+    @user = User.fuzzy_confirmed_or_unconfirmed_email_find(permitted_parameters[:email])
+    if @user.present?
       if @user.authenticate(permitted_parameters[:password])
-        sign_in_and_redirect
+        sign_in_and_redirect(@user)
       else
         # User couldn't authenticate, so password is invalid
         flash.now[:error] = "Invalid email/password"
@@ -22,10 +21,6 @@ class SessionsController < ApplicationController
         end
         render_partner_or_default_signin_layout(render_action: :new)
       end
-    elsif (@user && @user.confirmed?) || User.fuzzy_unconfirmed_primary_email_find(permitted_parameters[:email]).present?
-      # Email address is not confirmed
-      flash.now[:error] = "You must confirm your email address to continue"
-      render_partner_or_default_signin_layout(render_action: :new)
     else
       # Email address is not in the DB
       flash.now[:error] = "Invalid email/password"
@@ -36,11 +31,11 @@ class SessionsController < ApplicationController
   def destroy
     remove_session
     if params[:redirect_location].present?
-      if params[:redirect_location].match('new_user')
-        redirect_to new_user_path, notice: 'Logged out!' and return
+      if params[:redirect_location].match("new_user")
+        redirect_to new_user_path, notice: "Logged out!" and return
       end
     end
-    redirect_to goodbye_url(subdomain: false), notice: 'Logged out!'
+    redirect_to goodbye_url(subdomain: false), notice: "Logged out!"
   end
 
   private

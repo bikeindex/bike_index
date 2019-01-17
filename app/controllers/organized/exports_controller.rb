@@ -21,7 +21,7 @@ module Organized
     end
 
     def create
-      if params.dig(:export, :avery_export)
+      if ActiveRecord::Type::Boolean.new.type_cast_from_database(params.dig(:export, :avery_export))
         if current_organization.paid_for?("avery_export")
           @export = avery_export
         else
@@ -58,11 +58,7 @@ module Organized
     end
 
     def avery_export
-      export = Export.new(params.require(:export).permit(:timezone, :start_at, :end_at).merge(file_format: :xlsx))
-      # attributes that we set manually
-      export.headers = %w[owner_name_or_email registration_address]
-      export.options = export.options.merge(avery_export: true)
-      export
+      Export.new(params.require(:export).permit(:timezone, :start_at, :end_at).merge(avery_export: true))
     end
 
     def find_export

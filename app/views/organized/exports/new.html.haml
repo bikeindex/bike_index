@@ -5,6 +5,7 @@
     new export
 
 = form_for @export, { url: organization_exports_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
+  = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
   - if current_organization.paid_for?("avery_export")
     .form-group.row
       = f.label :avery_export, "Avery Label Export", class: "org-form-label"
@@ -26,11 +27,21 @@
   .form-group.row.mt-4
     = f.label :start_at, "Registered after", class: "org-form-label"
     .col-sm-4
-      = f.datetime_local_field :start_at, step: 60, class: "form-control"
+      %a.datetimefield-expander{ href: "#expandStartAt" }
+        Set after time
+      .datetimefield-fields
+        = f.datetime_local_field :start_at, step: 60, class: "form-control"
+        %a.datetimefield-collapser{ href: "#expandStartAt" }
+          remove
   .form-group.row
     = f.label :end_at, "Registered before", class: "org-form-label"
     .col-sm-4
-      = f.datetime_local_field :end_at, step: 60, class: "form-control"
+      %a.datetimefield-expander{ href: "#expandEndAt" }
+        Set before time
+      .datetimefield-fields
+        = f.datetime_local_field :end_at, step: 60, class: "form-control"
+        %a.datetimefield-collapser{ href: "#expandStartAt" }
+          remove
   .form-group.row.mt-2.hiddenOnAveryExport
     = f.label :format, "Export file format", class: "org-form-label"
     .col-sm-4
