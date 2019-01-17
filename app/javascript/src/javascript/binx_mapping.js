@@ -78,7 +78,7 @@ window.BinxMapping = class BinxMapping {
     let input = document.getElementById("placeSearch");
     binxMapping.searchBox = new google.maps.places.SearchBox(input);
     window.binxMap.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
-    $("#placeSearch").addClass("searchOnMap"); // search box is initially hidden - display it when rendered on map
+    $(input).addClass("searchOnMap"); // search box is initially hidden - display it when rendered on map
     // Bias SearchBox results towards current map's viewport.
     binxMap.addListener("bounds_changed", () =>
       binxMapping.searchBox.setBounds(binxMap.getBounds())
