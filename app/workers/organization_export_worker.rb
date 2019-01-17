@@ -68,6 +68,7 @@ class OrganizationExportWorker
   def export_bike?(bike)
     @avery_export ||= @export.avery_export?
     return true unless @avery_export
+    # Avery export includes owner_name_or_email - but actually requires user_name - TODO: make it just user_name & update avery to accept user_name
     bike.registration_address.present? && bike.user_name.present?
   end
 

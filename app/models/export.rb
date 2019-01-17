@@ -3,7 +3,7 @@ class Export < ActiveRecord::Base
   VALID_KINDS = %i[organization stolen manufacturer].freeze
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
-  AVERY_HEADERS = %w[owner_name registration_address].freeze
+  AVERY_HEADERS = %w[owner_name_or_email registration_address].freeze
   HIDDEN_HEADERS = %w[owner_name_or_email].freeze
   PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail registered_by registration_type owner_email owner_name] + HIDDEN_HEADERS).freeze
 
