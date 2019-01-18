@@ -47,7 +47,8 @@ class Geohelper
         address: address_array.join(", "),
         city: city,
         state: state,
-        zipcode: code
+        zipcode: code,
+        country: country
       }.with_indifferent_access
     end
   end

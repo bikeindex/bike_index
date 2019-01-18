@@ -1,0 +1,126 @@
+http_interactions:
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=Pier%2015%20The%20Embarcadero,%2094111&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Fri, 18 Jan 2019 02:08:43 GMT
+        Expires:
+          - Sat, 19 Jan 2019 02:08:43 GMT
+        Cache-Control:
+          - public, max-age=86400
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        Content-Length:
+          - "568"
+        X-Xss-Protection:
+          - 1; mode=block
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=398
+        Alt-Svc:
+          - quic=":443"; ma=2592000; v="44,43,39"
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "Pier 15",
+                         "short_name" : "Pier 15",
+                         "types" : [ "premise" ]
+                      },
+                      {
+                         "long_name" : "The Embarcadero",
+                         "short_name" : "The Embarcadero",
+                         "types" : [ "route" ]
+                      },
+                      {
+                         "long_name" : "Embarcadero",
+                         "short_name" : "Embarcadero",
+                         "types" : [ "neighborhood", "political" ]
+                      },
+                      {
+                         "long_name" : "San Francisco",
+                         "short_name" : "SF",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "San Francisco County",
+                         "short_name" : "San Francisco County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "California",
+                         "short_name" : "CA",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      },
+                      {
+                         "long_name" : "94111",
+                         "short_name" : "94111",
+                         "types" : [ "postal_code" ]
+                      }
+                   ],
+                   "formatted_address" : "Pier 15, The Embarcadero, San Francisco, CA 94111, USA",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 37.8025056,
+                            "lng" : -122.3962299
+                         },
+                         "southwest" : {
+                            "lat" : 37.8005995,
+                            "lng" : -122.3988648
+                         }
+                      },
+                      "location" : {
+                         "lat" : 37.8016649,
+                         "lng" : -122.397348
+                      },
+                      "location_type" : "ROOFTOP",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 37.80290153029149,
+                            "lng" : -122.3961983697085
+                         },
+                         "southwest" : {
+                            "lat" : 37.80020356970849,
+                            "lng" : -122.3988963302915
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJM4dNul6AhYARCScCuTSTJhg",
+                   "types" : [ "premise" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      ? http_version
+    recorded_at: Fri, 18 Jan 2019 02:08:43 GMT
+recorded_with: VCR 4.0.0

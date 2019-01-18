@@ -46,7 +46,7 @@ describe Geohelper do
 
     describe "formatted_address_hash" do
       let(:address_str) { "717 Market St, SF" }
-      let(:target) { { address: "717 Market St", city: "San Francisco", state: "CA", zipcode: "94103" } }
+      let(:target) { { address: "717 Market St", city: "San Francisco", state: "CA", zipcode: "94103", country: "USA" } }
       it "returns our desires" do
         VCR.use_cassette("geohelper-formatted_address_hash") do
           expect(Geohelper.formatted_address_hash(address_str)).to eq target.as_json
@@ -59,7 +59,7 @@ describe Geohelper do
     describe "address_hash_from_geocoder_result" do
       context "with secondary line" do
         let(:address_str) { "188 King St, UNIT 201, San Francisco, CA 94107, USA" }
-        let(:target) { { address: "188 King St, UNIT 201", city: "San Francisco", state: "CA", zipcode: "94107" } }
+        let(:target) { { address: "188 King St, UNIT 201", city: "San Francisco", state: "CA", zipcode: "94107", country: "USA" } }
         it "returns our desires" do
           expect(Geohelper.address_hash_from_geocoder_result(address_str)).to eq target.as_json
         end

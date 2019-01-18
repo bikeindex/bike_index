@@ -9,7 +9,7 @@ class User < ActiveRecord::Base
     %w(name username email password password_confirmation current_password terms_of_service
        vendor_terms_of_service when_vendor_terms_of_service phone zipcode title my_bikes_hash
        avatar avatar_cache description twitter show_twitter website show_website show_bikes
-       show_phone has_stolen_bikes can_send_many_stolen_notifications my_bikes_link_target
+       show_phone can_send_many_stolen_notifications my_bikes_link_target
        my_bikes_link_title is_emailable additional_emails).map(&:to_sym).freeze
  end
 
@@ -42,6 +42,8 @@ class User < ActiveRecord::Base
   has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :inviter
   has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :invitee
   belongs_to :bike_actions_organization, class_name: "Organization"
+  belongs_to :state
+  belongs_to :country
 
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
@@ -246,14 +248,6 @@ class User < ActiveRecord::Base
     if self.has_membership?
       self.memberships.current_membership
     end
-  end
-
-  def has_stolen?
-    stolen = false
-    self.bikes.each do |bike_id|
-      stolen = true if Bike.find(bike_id).stolen
-    end
-    return stolen
   end
 
   def set_calculated_attributes

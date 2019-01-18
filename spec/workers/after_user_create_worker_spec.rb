@@ -65,6 +65,50 @@ describe AfterUserCreateWorker do
     end
   end
 
+  context "extra user attributes" do
+    # Block traditional run, so we can do it separately }
+    before { allow_any_instance_of(User).to receive(:perform_create_jobs) { true } }
+    let(:user) { FactoryGirl.create(:user, email: "aftercreate@bikeindex.org") }
+    let!(:state) { FactoryGirl.create(:state, name: "California", abbreviation: "CA") }
+    let!(:country) { Country.united_states }
+    let!(:b_param) do
+      FactoryGirl.create(:b_param,
+                         created_bike_id: bike.id,
+                         creator: bike.creator,
+                         params: { bike: { address: "Pier 15 The Embarcadero, 94111", phone: "(111) 222-3333" } })
+    end
+    # We need to manually set the user in this ownership because otherwise rspec can't find it TODO: Rails 5 update maybe
+    let(:ownership) { FactoryGirl.create(:ownership, user: user, owner_email: "aftercreate@bikeindex.org") }
+    let!(:bike) { ownership.bike }
+    include_context :geocoder_real
+    it "assigns the extra user attributes" do
+      VCR.use_cassette("after_user_create_worker-import_user_attributes") do
+        instance.perform(user.id, "new")
+        ownership.reload
+        user.reload
+        expect(user.phone).to eq "1112223333"
+        expect(user.street).to eq "Pier 15, The Embarcadero"
+        expect(user.city).to eq "San Francisco"
+        expect(user.zipcode).to eq "94111"
+        expect(user.state).to eq state
+        expect(user.country).to eq country
+      end
+    end
+    context "existing attributes" do
+      let(:user) { FactoryGirl.create(:user, email: "aftercreate@bikeindex.org", phone: "929292", zipcode: "89999") }
+      it "doesn't import" do
+        instance.perform(user.id, "new")
+        user.reload
+        expect(user.phone).to eq "929292"
+        expect(user.street).to be_nil
+        expect(user.city).to be_nil
+        expect(user.zipcode).to eq "89999"
+        expect(user.state).to be_nil
+        expect(user.country).to be_nil
+      end
+    end
+  end
+
   describe "associate_membership_invites" do
     let!(:organization_invitation) { FactoryGirl.create(:organization_invitation, invitee_email: " #{user.email.upcase}") }
     let(:user) { FactoryGirl.build(:user, email: "owner1@A.COM") }

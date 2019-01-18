@@ -2,7 +2,7 @@
 class AfterUserCreateWorker
   include Sidekiq::Worker
   sidekiq_options queue: :updates, backtrace: true
-    
+
   # Generally, this is called inline - so it makes sense to pass in the user rather than just the user_id
   def perform(user_id, user_state, user: nil, email: nil)
     user ||= User.find(user_id)
@@ -20,6 +20,7 @@ class AfterUserCreateWorker
     # This may confirm the user. We auto-confirm users that belong to orgs.
     # Auto confirming the user actually ends up running perform_confirmed_jobs.
     associate_membership_invites(user, email)
+    import_user_attributes(user)
     send_welcoming_email(user)
   end
 
@@ -53,5 +54,29 @@ class AfterUserCreateWorker
     return false unless organization_invitations.any?
     organization_invitations.each { |i| i.assign_to(user) }
     user.confirm(user.confirmation_token) unless without_confirm
+  end
+
+  def import_user_attributes(user)
+    if user.phone.blank?
+      user.phone = user_bikes_for_attrs(user.id).map { |b| b.phone }.reject(&:blank?).last
+    end
+    # Only do address import if the user doesn't have an address present
+    unless [user.street, user.city, user.zipcode, user.state, user.country].reject(&:blank?).any?
+      address = user_bikes_for_attrs(user.id).map { |b| b.registration_address }.reject(&:blank?).last
+      if address.present?
+        user.attributes = { street: address["address"],
+                            zipcode: address["zipcode"],
+                            city: address["city"],
+                            state: State.fuzzy_find(address["state"]),
+                            country: Country.fuzzy_find(address["country"]) }
+      end
+    end
+    user.save if user.changed?
+  end
+
+  private
+
+  def user_bikes_for_attrs(user_id)
+    Ownership.where(user_id: user_id).order(:created_at).map(&:bike)
   end
 end

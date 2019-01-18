@@ -2107,7 +2107,6 @@ CREATE TABLE public.users (
     show_phone boolean DEFAULT true,
     show_bikes boolean DEFAULT false NOT NULL,
     username character varying(255),
-    has_stolen_bikes boolean,
     avatar character varying(255),
     description text,
     title text,
@@ -2127,7 +2126,12 @@ CREATE TABLE public.users (
     developer boolean DEFAULT false NOT NULL,
     bike_actions_organization_id integer,
     partner_data json,
-    address character varying
+    latitude double precision,
+    longitude double precision,
+    street character varying,
+    city character varying,
+    country_id integer,
+    state_id integer
 );
 
 
