@@ -4,7 +4,7 @@ FactoryBot.define do
     file { File.open(Rails.root.join("public", "import_only_required.csv")) }
     user { FactoryBot.create(:user) }
     factory :bulk_import_success do
-      progress "finished"
+      progress { "finished" }
     end
   end
 end

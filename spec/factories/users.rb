@@ -2,25 +2,25 @@ FactoryBot.define do
   factory :user do
     name
     email { generate(:unique_email) }
-    password 'testthisthing7$'
-    password_confirmation 'testthisthing7$'
-    terms_of_service true
+    password { 'testthisthing7$' }
+    password_confirmation { 'testthisthing7$' }
+    terms_of_service { true }
     factory :user_confirmed do
       after(:create) { |u| u.confirm(u.confirmation_token) }
       factory :user_bikehub_signup do
         partner_data { { sign_up: "bikehub" } }
       end
       factory :admin do
-        superuser true
+        superuser { true }
         factory :admin_developer do
-          developer true
+          developer { true }
         end
       end
       factory :content_admin do
-        is_content_admin true
+        is_content_admin { true }
       end
       factory :developer do
-        developer true
+        developer { true }
       end
       factory :organized_user do
         # This factory should not be used directly, it's here to wrap organization

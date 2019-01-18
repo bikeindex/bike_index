@@ -2,7 +2,7 @@ FactoryBot.define do
   factory :ownership do
     bike { FactoryBot.create(:bike, owner_email: owner_email) }
     creator { FactoryBot.create(:user_confirmed) }
-    current true
+    current { true }
     sequence(:owner_email) { |n| "owner#{n}@example.com" }
     factory :ownership_claimed do
       claimed { true }

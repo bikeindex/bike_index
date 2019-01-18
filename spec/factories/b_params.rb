@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :b_param do
     transient do
-      owner_email 'bike_owner@example.com'
+      owner_email { 'bike_owner@example.com' }
     end
     association :creator, factory: :user
     params { { bike: { owner_email: owner_email } } }
@@ -19,7 +19,7 @@ FactoryBot.define do
         transient do
           manufacturer { FactoryBot.create(:manufacturer) }
         end
-        origin "embed_partial"
+        origin { "embed_partial" }
         params do
           {
             bike: {

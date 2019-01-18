@@ -19,7 +19,7 @@ FactoryBot.define do
         latitude { 40.7143528 }
         longitude { -74.0059731 }
       end
-      stolen true
+      stolen { true }
       after(:create) do |bike, evaluator|
         create(:stolen_record,
                bike: bike,
@@ -29,7 +29,7 @@ FactoryBot.define do
         bike.reload
       end
       factory :recovered_bike do
-        recovered true
+        recovered { true }
       end
     end
 

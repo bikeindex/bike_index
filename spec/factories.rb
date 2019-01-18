@@ -30,7 +30,7 @@ FactoryBot.define do
 
   factory :manufacturer do
     name { FactoryBot.generate(:unique_name) }
-    frame_maker true
+    frame_maker { true }
   end
 
   factory :frame_material do
@@ -44,18 +44,18 @@ FactoryBot.define do
 
   factory :front_gear_type do
     name { FactoryBot.generate(:unique_name) }
-    count 1
+    count { 1 }
   end
 
   factory :rear_gear_type do
     name { FactoryBot.generate(:unique_name) }
-    count 1
+    count { 1 }
   end
 
   factory :wheel_size do
     name { FactoryBot.generate(:unique_name) }
     iso_bsd { FactoryBot.generate(:unique_iso) }
-    priority 1
+    priority { 1 }
     description { FactoryBot.generate(:unique_name) }
   end
 
@@ -66,7 +66,7 @@ FactoryBot.define do
 
   factory :color do
     name { FactoryBot.generate(:unique_name) }
-    priority 1
+    priority { 1 }
   end
 
   factory :paint do
@@ -111,11 +111,11 @@ FactoryBot.define do
   factory :organization_invitation do
     inviter { FactoryBot.create(:user) }
     organization { FactoryBot.create(:organization) }
-    invitee_email 'mike@test.com'
+    invitee_email { 'mike@test.com' }
   end
 
   factory :membership do
-    role 'member'
+    role { 'member' }
     factory :existing_membership do
       user { FactoryBot.create(:user) }
       organization { FactoryBot.create(:organization) }
@@ -123,7 +123,7 @@ FactoryBot.define do
   end
 
   factory :integration do
-    access_token '12345teststststs'
+    access_token { '12345teststststs' }
   end
 
   factory :public_image do |u|
@@ -133,31 +133,31 @@ FactoryBot.define do
 
   factory :blog do
     user
-    body 'Some sweet blog content that everyone loves'
+    body { 'Some sweet blog content that everyone loves' }
     sequence(:title) { |n| "Blog title #{n}" }
   end
 
   factory :feedback do
-    email 'foo@boy.com'
-    body 'This is a test email.'
-    title 'New Feedback Submitted'
-    name 'Bobby Joe'
+    email { 'foo@boy.com' }
+    body { 'This is a test email.' }
+    title { 'New Feedback Submitted' }
+    name { 'Bobby Joe' }
   end
 
   factory :stolen_notification do
     sender { FactoryBot.create(:user) }
     receiver { FactoryBot.create(:user) }
     bike { FactoryBot.create(:bike) }
-    message 'This is a test email.'
+    message { 'This is a test email.' }
   end
 
   factory :customer_contact do
     creator { FactoryBot.create(:user) }
     bike { FactoryBot.create(:bike) }
-    title 'Some title'
-    body 'some message'
-    creator_email 'something@example.com'
-    user_email 'something_else@example.com'
-    contact_type 'stolen_message'
+    title { 'Some title' }
+    body { 'some message' }
+    creator_email { 'something@example.com' }
+    user_email { 'something_else@example.com' }
+    contact_type { 'stolen_message' }
   end
 end
