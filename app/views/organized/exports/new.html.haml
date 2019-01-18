@@ -12,6 +12,11 @@
       .col-sm-4
         = f.check_box :avery_export
 
+    .form-group.row
+      = f.label :sticker_number_start, "Initial Sticker Number", class: "org-form-label"
+      .col-sm-4
+        = f.text_field :sticker_number_start, class: "form-control"
+
   .row.mt-2.hiddenOnAveryExport
     .col-lg-4
       %p.export-included-columns-label

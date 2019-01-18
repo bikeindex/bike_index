@@ -17,7 +17,7 @@ class Export < ActiveRecord::Base
 
   before_validation :set_calculated_attributes
 
-  attr_accessor :timezone, :avery_export # permit assignment
+  attr_accessor :timezone, :avery_export, :sticker_number_start # permit assignment
 
   def self.default_headers; DEFAULT_HEADERS end
 
