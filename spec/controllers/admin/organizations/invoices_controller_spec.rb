@@ -1,10 +1,10 @@
 require "spec_helper"
 
 describe Admin::Organizations::InvoicesController, type: :controller do
-  let(:organization) { FactoryGirl.create(:organization) }
-  let(:invoice) { FactoryGirl.create(:invoice, organization: organization) }
-  let(:paid_feature1) { FactoryGirl.create(:paid_feature) }
-  let(:paid_feature2) { FactoryGirl.create(:paid_feature) }
+  let(:organization) { FactoryBot.create(:organization) }
+  let(:invoice) { FactoryBot.create(:invoice, organization: organization) }
+  let(:paid_feature1) { FactoryBot.create(:paid_feature) }
+  let(:paid_feature2) { FactoryBot.create(:paid_feature) }
   let(:params) do
     {
       paid_feature_ids: [paid_feature1.id, paid_feature2.id].join(","),
@@ -46,8 +46,8 @@ describe Admin::Organizations::InvoicesController, type: :controller do
     end
 
     describe "update" do
-      let(:paid_feature3) { FactoryGirl.create(:paid_feature) }
-      let(:invoice) { FactoryGirl.create(:invoice, organization: organization, amount_due: 10) }
+      let(:paid_feature3) { FactoryBot.create(:paid_feature) }
+      let(:invoice) { FactoryBot.create(:invoice, organization: organization, amount_due: 10) }
       it "creates" do
         invoice.paid_feature_ids = [paid_feature3.id]
         invoice.reload
@@ -61,7 +61,7 @@ describe Admin::Organizations::InvoicesController, type: :controller do
         expect(invoice.subscription_end_at.to_i).to be_within(1.day).of 1562385600
       end
       context "create_following_invoice" do
-        let!(:invoice) { FactoryGirl.create(:invoice, organization: organization, subscription_start_at: Time.now - 2.years, force_active: true) }
+        let!(:invoice) { FactoryBot.create(:invoice, organization: organization, subscription_start_at: Time.now - 2.years, force_active: true) }
         it "creates following invoice" do
           expect do
             put :update, organization_id: organization.to_param, id: invoice.to_param, create_following_invoice: true

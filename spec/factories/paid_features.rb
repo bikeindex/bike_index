@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :paid_feature do
     kind "standard"
     sequence(:name) { |n| "Feature #{n}" }

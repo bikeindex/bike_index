@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :mail_snippet do
     name
     is_enabled true
@@ -10,7 +10,7 @@ FactoryGirl.define do
     end
     factory :organization_mail_snippet do
       sequence(:name) { |n| MailSnippet.organization_snippet_types[MailSnippet.organization_snippet_types.count%n] }
-      organization { FactoryGirl.create(:organization) }
+      organization { FactoryBot.create(:organization) }
     end
   end
 end

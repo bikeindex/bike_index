@@ -13,14 +13,14 @@ describe Location do
 
   describe 'set_phone' do
     it 'strips the non-digit numbers from the phone input' do
-      location = FactoryGirl.create(:location, phone: '773.83ddp+83(887)')
+      location = FactoryBot.create(:location, phone: '773.83ddp+83(887)')
       expect(location.phone).to eq('7738383887')
     end
   end
 
   describe 'address' do
     it 'strips the non-digit numbers from the phone input' do
-      location = FactoryGirl.create(:location)
+      location = FactoryBot.create(:location)
       expect(location.address).to be_a(String)
     end
     it "creates an address, ignoring blank fields" do
@@ -39,7 +39,7 @@ describe Location do
 
   describe 'org_location_id' do
     it 'creates a unique id that references the organization' do
-      location = FactoryGirl.create(:location)
+      location = FactoryBot.create(:location)
       expect(location.org_location_id).to eq("#{location.organization_id}_#{location.id}")
     end
   end

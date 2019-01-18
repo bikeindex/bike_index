@@ -1,16 +1,16 @@
 require 'spec_helper'
 
 describe OrganizedMailer do
-  let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
+  let(:organization) { FactoryBot.create(:organization_with_auto_user) }
   let(:header_mail_snippet) do
-    FactoryGirl.create(:organization_mail_snippet,
+    FactoryBot.create(:organization_mail_snippet,
                        name: 'header',
                        organization: organization,
                        body: '<p>HEADERXSNIPPET</p>')
   end
   describe 'partial_registration' do
     context 'without organization' do
-      let(:b_param) { FactoryGirl.create(:b_param_stolen) }
+      let(:b_param) { FactoryBot.create(:b_param_stolen) }
       it 'stolen renders, with reply to for the organization' do
         expect(b_param.owner_email).to be_present
         mail = OrganizedMailer.partial_registration(b_param)
@@ -20,9 +20,9 @@ describe OrganizedMailer do
       end
     end
     context 'with organization' do
-      let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
+      let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       context 'non-stolen, organization has mail snippet' do
-        let(:b_param) { FactoryGirl.create(:b_param_with_creation_organization, organization: organization) }
+        let(:b_param) { FactoryBot.create(:b_param_with_creation_organization, organization: organization) }
         it 'renders, with reply to for the organization' do
           expect(b_param.owner_email).to be_present
           expect(header_mail_snippet).to be_present
@@ -40,17 +40,17 @@ describe OrganizedMailer do
   describe 'finished_registration' do
     let(:mail) { OrganizedMailer.finished_registration(ownership) }
     context 'passed new ownership' do
-      let(:ownership) { FactoryGirl.create(:ownership) }
+      let(:ownership) { FactoryBot.create(:ownership) }
       it 'renders email' do
         expect(mail.subject).to match 'Confirm your Bike Index registration'
       end
     end
     context 'existing bike and ownership passed' do
-      let(:user) { FactoryGirl.create(:user) }
-      let(:ownership) { FactoryGirl.create(:ownership, bike: bike) }
+      let(:user) { FactoryBot.create(:user) }
+      let(:ownership) { FactoryBot.create(:ownership, bike: bike) }
       context 'non-stolen, multi-ownership' do
-        let(:ownership_1) { FactoryGirl.create(:ownership, user: user, bike: bike) }
-        let(:bike) { FactoryGirl.create(:bike, owner_email: 'someotheremail@stuff.com', creator_id: user.id) }
+        let(:ownership_1) { FactoryBot.create(:ownership, user: user, bike: bike) }
+        let(:bike) { FactoryBot.create(:bike, owner_email: 'someotheremail@stuff.com', creator_id: user.id) }
         it 'renders email' do
           expect(ownership_1).to be_present
           expect(mail.subject).to eq('Confirm your Bike Index registration')
@@ -58,7 +58,7 @@ describe OrganizedMailer do
         end
       end
       context 'claimed registration (e.g. self_made)' do
-        let(:bike) { FactoryGirl.create(:bike, creator_id: user.id) }
+        let(:bike) { FactoryBot.create(:bike, creator_id: user.id) }
         it 'renders email' do
           ownership.update_attribute :claimed, true
           ownership.reload
@@ -68,9 +68,9 @@ describe OrganizedMailer do
         end
       end
       context 'stolen' do
-        let(:cycle_type) { FactoryGirl.create(:cycle_type, name: 'sweet cycle type') }
-        let(:country) { FactoryGirl.create(:country) }
-        let(:bike) { FactoryGirl.create(:stolen_bike, cycle_type: cycle_type) }
+        let(:cycle_type) { FactoryBot.create(:cycle_type, name: 'sweet cycle type') }
+        let(:country) { FactoryBot.create(:country) }
+        let(:bike) { FactoryBot.create(:stolen_bike, cycle_type: cycle_type) }
         it 'renders email with the stolen title' do
           expect(mail.subject).to eq("Confirm your stolen #{cycle_type.name} on Bike Index")
           expect(mail.reply_to).to eq(['contact@bikeindex.org'])
@@ -80,18 +80,18 @@ describe OrganizedMailer do
     end
     context 'organized snippets' do
       let(:welcome_mail_snippet) do
-        FactoryGirl.create(:organization_mail_snippet,
+        FactoryBot.create(:organization_mail_snippet,
                            name: 'welcome',
                            organization: organization,
                            body: '<p>WELCOMEXSNIPPET</p>')
       end
       let(:security_mail_snippet) do
-        FactoryGirl.create(:organization_mail_snippet,
+        FactoryBot.create(:organization_mail_snippet,
                            name: 'security',
                            organization: organization,
                            body: '<p>SECURITYXSNIPPET</p>')
       end
-      let(:ownership) { FactoryGirl.create(:ownership, bike: bike) }
+      let(:ownership) { FactoryBot.create(:ownership, bike: bike) }
 
       before do
         expect([header_mail_snippet, welcome_mail_snippet, security_mail_snippet]).to be_present
@@ -99,7 +99,7 @@ describe OrganizedMailer do
         expect(organization.mail_snippets.count).to eq 3
       end
       context 'new non-stolen bike' do
-        let(:bike) { FactoryGirl.create(:organization_bike, creation_organization: organization) }
+        let(:bike) { FactoryBot.create(:organization_bike, creation_organization: organization) }
         it 'renders email and includes the snippets' do
           expect(mail.subject).to eq("Confirm your #{organization.short_name} Bike Index registration")
           expect(mail.body.encoded).to match header_mail_snippet.body
@@ -109,7 +109,7 @@ describe OrganizedMailer do
         end
       end
       context 'new stolen registration' do
-        let(:bike) { FactoryGirl.create(:stolen_bike, creation_organization: organization) }
+        let(:bike) { FactoryBot.create(:stolen_bike, creation_organization: organization) }
         it 'renders and includes the org name in the title' do
           expect(mail.body.encoded).to match header_mail_snippet.body
           expect(mail.body.encoded).to match welcome_mail_snippet.body
@@ -119,8 +119,8 @@ describe OrganizedMailer do
         end
       end
       context 'non-new (pre-existing ownership)' do
-        let(:bike) { FactoryGirl.create(:bike, creation_organization: organization) }
-        let(:pre_existing_ownership) { FactoryGirl.create(:ownership, bike: bike, created_at: Time.now - 1.minute) }
+        let(:bike) { FactoryBot.create(:bike, creation_organization: organization) }
+        let(:pre_existing_ownership) { FactoryBot.create(:ownership, bike: bike, created_at: Time.now - 1.minute) }
         before do
           expect(pre_existing_ownership).to be_present
         end
@@ -139,7 +139,7 @@ describe OrganizedMailer do
   end
 
   describe 'organization_invitation' do
-    let(:organization_invitation) { FactoryGirl.create(:organization_invitation, organization: organization) }
+    let(:organization_invitation) { FactoryBot.create(:organization_invitation, organization: organization) }
     let(:mail) { OrganizedMailer.organization_invitation(organization_invitation) }
     before do
       expect(header_mail_snippet).to be_present
@@ -153,7 +153,7 @@ describe OrganizedMailer do
 
   describe "custom_message" do
     context "geolocation" do
-      let(:organization_message) { FactoryGirl.create(:organization_message, organization: organization) }
+      let(:organization_message) { FactoryBot.create(:organization_message, organization: organization) }
       let(:mail) { OrganizedMailer.custom_message(organization_message) }
       before do
         expect(header_mail_snippet).to be_present

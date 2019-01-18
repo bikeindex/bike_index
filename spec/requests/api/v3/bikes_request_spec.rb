@@ -1,13 +1,13 @@
 require 'spec_helper'
 
 describe 'Bikes API V3' do
-  let(:manufacturer) { FactoryGirl.create(:manufacturer) }
-  let(:color) { FactoryGirl.create(:color) }
+  let(:manufacturer) { FactoryBot.create(:manufacturer) }
+  let(:color) { FactoryBot.create(:color) }
   include_context :existing_doorkeeper_app
 
   describe 'find by id' do
     it 'returns one with from an id' do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       get "/api/v3/bikes/#{bike.id}", format: :json
       result = JSON.parse(response.body)
       expect(response.code).to eq('200')
@@ -42,7 +42,7 @@ describe 'Bikes API V3' do
     end
     let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes") }
     before :each do
-      FactoryGirl.create(:wheel_size, iso_bsd: 559)
+      FactoryBot.create(:wheel_size, iso_bsd: 559)
       CycleType.bike
       PropulsionType.foot_pedal
     end
@@ -65,7 +65,7 @@ describe 'Bikes API V3' do
     end
 
     context "unconfirmed user" do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryBot.create(:user) }
       let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes unconfirmed") }
       it "fails" do
         expect(user.unconfirmed?).to be_truthy
@@ -76,11 +76,11 @@ describe 'Bikes API V3' do
     end
 
     it 'creates a non example bike, with components' do
-      manufacturer = FactoryGirl.create(:manufacturer)
-      FactoryGirl.create(:ctype, name: 'wheel')
-      FactoryGirl.create(:ctype, name: 'Headset')
-      front_gear_type = FactoryGirl.create(:front_gear_type)
-      handlebar_type = FactoryGirl.create(:handlebar_type)
+      manufacturer = FactoryBot.create(:manufacturer)
+      FactoryBot.create(:ctype, name: 'wheel')
+      FactoryBot.create(:ctype, name: 'Headset')
+      front_gear_type = FactoryBot.create(:front_gear_type)
+      handlebar_type = FactoryBot.create(:handlebar_type)
       components = [
         {
           manufacturer: manufacturer.name,
@@ -135,7 +135,7 @@ describe 'Bikes API V3' do
     end
 
     it 'creates an example bike' do
-      FactoryGirl.create(:organization, name: 'Example organization')
+      FactoryBot.create(:organization, name: 'Example organization')
       expect do
         post "/api/v3/bikes?access_token=#{token.token}",
              bike_attrs.merge(test: true).to_json,
@@ -152,11 +152,11 @@ describe 'Bikes API V3' do
     end
 
     it "creates a stolen bike through an organization and uses the passed phone" do
-      organization = FactoryGirl.create(:organization)
+      organization = FactoryBot.create(:organization)
       user.update_attribute :phone, "0987654321"
-      FactoryGirl.create(:membership, user: user, organization: organization)
-      FactoryGirl.create(:country, iso: "US")
-      FactoryGirl.create(:state, abbreviation: "NY")
+      FactoryBot.create(:membership, user: user, organization: organization)
+      FactoryBot.create(:country, iso: "US")
+      FactoryBot.create(:state, abbreviation: "NY")
       organization.save
       bike_attrs[:organization_slug] = organization.slug
       date_stolen = 1357192800
@@ -210,7 +210,7 @@ describe 'Bikes API V3' do
   end
 
   describe 'create v3_accessor' do
-    let(:organization) { FactoryGirl.create(:organization) }
+    let(:organization) { FactoryBot.create(:organization) }
     let(:bike_attrs) do
       {
         serial: '69 non-example',
@@ -225,21 +225,21 @@ describe 'Bikes API V3' do
     end
     let!(:tokenized_url) { "/api/v2/bikes?access_token=#{v2_access_token.token}" }
     before :each do
-      FactoryGirl.create(:wheel_size, iso_bsd: 559)
+      FactoryBot.create(:wheel_size, iso_bsd: 559)
       CycleType.bike
       PropulsionType.foot_pedal
     end
 
     context 'with membership' do
       before do
-        FactoryGirl.create(:membership, user: user, organization: organization, role: 'admin')
+        FactoryBot.create(:membership, user: user, organization: organization, role: 'admin')
         organization.save
         ActionMailer::Base.deliveries = []
       end
 
       context 'duplicated serial' do
-        let(:bike) { FactoryGirl.create(:bike, serial_number: bike_attrs[:serial], owner_email: email) }
-        let(:ownership) { FactoryGirl.create(:ownership, bike: bike, owner_email: email) }
+        let(:bike) { FactoryBot.create(:bike, serial_number: bike_attrs[:serial], owner_email: email) }
+        let(:ownership) { FactoryBot.create(:ownership, bike: bike, owner_email: email) }
 
         context 'matching email' do
           let(:email) { bike_attrs[:owner_email] }
@@ -308,11 +308,11 @@ describe 'Bikes API V3' do
   describe 'update' do
     let(:params) { { year: 1999, serial_number: 'XXX69XXX' } }
     let(:url) { "/api/v3/bikes/#{bike.id}?access_token=#{token.token}" }
-    let(:bike) { FactoryGirl.create(:ownership, creator_id: user.id).bike }
+    let(:bike) { FactoryBot.create(:ownership, creator_id: user.id).bike }
     let!(:token) { create_doorkeeper_token(scopes: "read_user read_bikes write_bikes") }
 
     it "doesn't update if user doesn't own the bike" do
-      bike.current_ownership.update_attributes(user_id: FactoryGirl.create(:user).id, claimed: true)
+      bike.current_ownership.update_attributes(user_id: FactoryBot.create(:user).id, claimed: true)
       allow_any_instance_of(Bike).to receive(:type).and_return('unicorn')
       put url, params.to_json, json_headers
       expect(response.body.match('do not own that unicorn')).to be_present
@@ -328,7 +328,7 @@ describe 'Bikes API V3' do
     end
 
     it "fails to update bike if required stolen attrs aren't present" do
-      FactoryGirl.create(:country, iso: 'US')
+      FactoryBot.create(:country, iso: 'US')
       expect(bike.year).to be_nil
       serial = bike.serial_number
       params[:stolen_record] = {
@@ -341,7 +341,7 @@ describe 'Bikes API V3' do
     end
 
     it "updates a bike, adds a stolen record, doesn't update locked attrs" do
-      FactoryGirl.create(:country, iso: 'US')
+      FactoryBot.create(:country, iso: 'US')
       expect(bike.year).to be_nil
       serial = bike.serial_number
       params[:stolen_record] = {
@@ -362,12 +362,12 @@ describe 'Bikes API V3' do
     end
 
     it 'updates a bike, adds and removes components' do
-      # FactoryGirl.create(:manufacturer, name: 'Other')
-      wheels = FactoryGirl.create(:ctype, name: 'wheel')
-      headsets = FactoryGirl.create(:ctype, name: 'Headset')
-      comp = FactoryGirl.create(:component, bike: bike, ctype: headsets)
-      comp2 = FactoryGirl.create(:component, bike: bike, ctype: wheels)
-      not_urs = FactoryGirl.create(:component)
+      # FactoryBot.create(:manufacturer, name: 'Other')
+      wheels = FactoryBot.create(:ctype, name: 'wheel')
+      headsets = FactoryBot.create(:ctype, name: 'Headset')
+      comp = FactoryBot.create(:component, bike: bike, ctype: headsets)
+      comp2 = FactoryBot.create(:component, bike: bike, ctype: wheels)
+      not_urs = FactoryBot.create(:component)
       # pp comp2
       bike.reload
       expect(bike.components.count).to eq(2)
@@ -408,9 +408,9 @@ describe 'Bikes API V3' do
     end
 
     it "doesn't remove components that aren't the bikes" do
-      manufacturer = FactoryGirl.create(:manufacturer)
-      comp = FactoryGirl.create(:component, bike: bike)
-      not_urs = FactoryGirl.create(:component)
+      manufacturer = FactoryBot.create(:manufacturer)
+      comp = FactoryBot.create(:component, bike: bike)
+      not_urs = FactoryBot.create(:component)
       components = [
         {
           id: comp.id,
@@ -433,7 +433,7 @@ describe 'Bikes API V3' do
 
     it 'claims a bike and updates if it should' do
       expect(bike.year).to be_nil
-      bike.current_ownership.update_attributes(owner_email: user.email, creator_id: FactoryGirl.create(:user).id, claimed: false)
+      bike.current_ownership.update_attributes(owner_email: user.email, creator_id: FactoryBot.create(:user).id, claimed: false)
       expect(bike.reload.owner).not_to eq(user)
       put url, params.to_json, json_headers
       expect(response.code).to eq('200')
@@ -447,7 +447,7 @@ describe 'Bikes API V3' do
   describe 'image' do
     let!(:token) { create_doorkeeper_token(scopes: "read_user write_bikes") }
     it "doesn't post an image to a bike if the bike isn't owned by the user" do
-      bike = FactoryGirl.create(:ownership).bike
+      bike = FactoryBot.create(:ownership).bike
       file = File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))
       url = "/api/v3/bikes/#{bike.id}/image?access_token=#{token.token}"
       expect(bike.public_images.count).to eq(0)
@@ -458,7 +458,7 @@ describe 'Bikes API V3' do
     end
 
     it 'errors on non whitelisted extensions' do
-      bike = FactoryGirl.create(:ownership, creator_id: user.id).bike
+      bike = FactoryBot.create(:ownership, creator_id: user.id).bike
       file = File.open(File.join(Rails.root, 'spec', 'spec_helper.rb'))
       url = "/api/v3/bikes/#{bike.id}/image?access_token=#{token.token}"
       expect(bike.public_images.count).to eq(0)
@@ -469,7 +469,7 @@ describe 'Bikes API V3' do
     end
 
     it 'posts an image' do
-      bike = FactoryGirl.create(:ownership, creator_id: user.id).bike
+      bike = FactoryBot.create(:ownership, creator_id: user.id).bike
       file = File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))
       url = "/api/v3/bikes/#{bike.id}/image?access_token=#{token.token}"
       expect(bike.public_images.count).to eq(0)
@@ -481,7 +481,7 @@ describe 'Bikes API V3' do
   end
 
   describe 'send_stolen_notification' do
-    let(:bike) { FactoryGirl.create(:ownership, creator_id: user.id).bike }
+    let(:bike) { FactoryBot.create(:ownership, creator_id: user.id).bike }
     let(:params) { { message: "Something I'm sending you" } }
     let(:url) { "/api/v3/bikes/#{bike.id}/send_stolen_notification?access_token=#{token.token}" }
     let!(:token) { create_doorkeeper_token(scopes: "read_user") }
@@ -504,7 +504,7 @@ describe 'Bikes API V3' do
     end
 
     it "fails if the bike isn't owned by the access token user" do
-      bike.current_ownership.update_attributes(user_id: FactoryGirl.create(:user).id, claimed: true)
+      bike.current_ownership.update_attributes(user_id: FactoryBot.create(:user).id, claimed: true)
       post url, params.to_json, json_headers
       expect(response.code).to eq('403')
       expect(response.body.match('application is not approved')).to be_present

@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe EmailUpdatedTermsWorker do
   it { is_expected.to be_processed_in :afterwards }
-  let(:user) { FactoryGirl.create(:organization_member) }
+  let(:user) { FactoryBot.create(:organization_member) }
   let(:subject) { EmailUpdatedTermsWorker.new }
   before do
     subject.redis.expire(subject.enqueued_emails_key, 0)

@@ -5,7 +5,7 @@ describe CacheAllStolenWorker do
 
   describe 'output_stolen' do
     it 'creates a stolen cache' do
-      FactoryGirl.create(:stolen_bike)
+      FactoryBot.create(:stolen_bike)
       FileCacheMaintainer.redis.expire(FileCacheMaintainer.info_id, 0)
       CacheAllStolenWorker.new.perform
       tsv_record = FileCacheMaintainer.files.last
@@ -15,7 +15,7 @@ describe CacheAllStolenWorker do
 
   describe 'write_stolen' do
     it 'outputs the correct stolen' do
-      FactoryGirl.create(:stolen_bike, serial_number: 'party seri8al')
+      FactoryBot.create(:stolen_bike, serial_number: 'party seri8al')
       cache_all_stolen_worker = CacheAllStolenWorker.new
       cache_all_stolen_worker.write_stolen
       result = JSON.parse(File.read(cache_all_stolen_worker.tmp_path))

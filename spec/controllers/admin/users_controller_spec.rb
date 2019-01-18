@@ -9,8 +9,8 @@ describe Admin::UsersController do
       end.to raise_error(ActionController::RoutingError)
     end
     it 'shows the edit page if the user exists' do
-      admin = FactoryGirl.create(:admin)
-      user = FactoryGirl.create(:user)
+      admin = FactoryBot.create(:admin)
+      user = FactoryBot.create(:user)
       set_current_user(admin)
       get :edit, id: user.username
       expect(response).to render_template :edit
@@ -20,8 +20,8 @@ describe Admin::UsersController do
   describe 'update' do
     context 'non developer' do
       it "updates all the things that can be edited (finding via user id)" do
-        admin = FactoryGirl.create(:admin)
-        user = FactoryGirl.create(:user, confirmed: false)
+        admin = FactoryBot.create(:admin)
+        user = FactoryBot.create(:user, confirmed: false)
         set_current_user(admin)
         post :update, id: user.id, user: {
           name: 'New Name',
@@ -44,9 +44,9 @@ describe Admin::UsersController do
     end
     context 'developer' do
       it 'updates developer' do
-        admin = FactoryGirl.create(:admin_developer)
+        admin = FactoryBot.create(:admin_developer)
         set_current_user(admin)
-        user = FactoryGirl.create(:user)
+        user = FactoryBot.create(:user)
 
         post :update, id: user.username, user: {
           developer: true,

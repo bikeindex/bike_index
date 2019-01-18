@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :user do
     name
     email { generate(:unique_email) }
@@ -26,22 +26,22 @@ FactoryGirl.define do
         # This factory should not be used directly, it's here to wrap organization
         # Use `organization_member` or `organization_admin`
         transient do
-          organization { FactoryGirl.create(:organization) }
+          organization { FactoryBot.create(:organization) }
         end
         factory :organization_member do
           after(:create) do |user, evaluator|
-            FactoryGirl.create(:membership, user: user, organization: evaluator.organization)
+            FactoryBot.create(:membership, user: user, organization: evaluator.organization)
           end
         end
         factory :organization_auto_user do
           after(:create) do |user, evaluator|
-            FactoryGirl.create(:membership, user: user, organization: evaluator.organization)
+            FactoryBot.create(:membership, user: user, organization: evaluator.organization)
             evaluator.organization.update_attribute :auto_user_id, user.id
           end
         end
         factory :organization_admin do
           after(:create) do |user, evaluator|
-            FactoryGirl.create(:membership, user: user, organization: evaluator.organization, role: 'admin')
+            FactoryBot.create(:membership, user: user, organization: evaluator.organization, role: 'admin')
           end
         end
       end

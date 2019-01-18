@@ -3,14 +3,14 @@ require "spec_helper"
 describe Organized::ExportsController, type: :controller do
   let(:root_path) { organization_bikes_path(organization_id: organization.to_param) }
   let(:exports_root_path) { organization_exports_path(organization_id: organization.to_param) }
-  let(:export) { FactoryGirl.create(:export_organization, organization: organization) }
+  let(:export) { FactoryBot.create(:export_organization, organization: organization) }
 
   before { set_current_user(user) if user.present? }
 
   context "organization without has_bike_codes" do
-    let(:organization) { FactoryGirl.create(:organization) }
+    let(:organization) { FactoryBot.create(:organization) }
     context "logged in as organization admin" do
-      let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       describe "index" do
         it "redirects" do
           get :index, organization_id: organization.to_param
@@ -29,7 +29,7 @@ describe Organized::ExportsController, type: :controller do
     end
 
     context "logged in as super admin" do
-      let(:user) { FactoryGirl.create(:admin) }
+      let(:user) { FactoryBot.create(:admin) }
       describe "index" do
         it "renders" do
           get :index, organization_id: organization.to_param
@@ -42,8 +42,8 @@ describe Organized::ExportsController, type: :controller do
   end
 
   context "organization with csv_exports" do
-    let!(:organization) { FactoryGirl.create(:organization) }
-    let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+    let!(:organization) { FactoryBot.create(:organization) }
+    let(:user) { FactoryBot.create(:organization_member, organization: organization) }
     before { organization.update_column :paid_feature_slugs, ["csv_exports"] } # Stub organization having paid feature
 
     describe "index" do
@@ -68,7 +68,7 @@ describe Organized::ExportsController, type: :controller do
         expect(flash).to_not be_present
       end
       context "not organization export" do
-        let(:export) { FactoryGirl.create(:export_organization) }
+        let(:export) { FactoryBot.create(:export_organization) }
         it "404s" do
           expect(export.organization.id).to_not eq organization.id
           expect do

@@ -6,7 +6,7 @@ describe BikeUpdator do
       expect { BikeUpdator.new(b_params: { id: 696969 }).find_bike }.to raise_error(BikeUpdatorError)
     end
     it 'finds the bike from the bike_params' do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       response = BikeUpdator.new(b_params: { id: bike.id }.as_json).find_bike
       expect(response).to eq(bike)
     end
@@ -14,14 +14,14 @@ describe BikeUpdator do
 
   describe 'ensure_ownership!' do
     it "raises an error if the user doesn't own the bike" do
-      ownership = FactoryGirl.create(:ownership)
-      user = FactoryGirl.create(:user)
+      ownership = FactoryBot.create(:ownership)
+      user = FactoryBot.create(:user)
       bike = ownership.bike
       expect { BikeUpdator.new(user: user, b_params: { id: bike.id }.as_json).ensure_ownership! }.to raise_error(BikeUpdatorError)
     end
 
     it 'returns true if the bike is owned by the user' do
-      ownership = FactoryGirl.create(:ownership)
+      ownership = FactoryBot.create(:ownership)
       user = ownership.creator
       bike = ownership.bike
       expect(BikeUpdator.new(user: user, b_params: { id: bike.id }.as_json).ensure_ownership!).to be_truthy
@@ -30,16 +30,16 @@ describe BikeUpdator do
 
   describe 'update_stolen_record' do
     it 'calls update_stolen_record with the date_stolen if it exists' do
-      FactoryGirl.create(:country, iso: 'US')
-      bike = FactoryGirl.create(:bike, stolen: true)
+      FactoryBot.create(:country, iso: 'US')
+      bike = FactoryBot.create(:bike, stolen: true)
       updator = BikeUpdator.new(b_params: { id: bike.id, bike: { date_stolen: 963205199 } }.as_json)
       updator.update_stolen_record
       csr = bike.find_current_stolen_record
       expect(csr.date_stolen.to_i).to be_within(1).of 963205199
     end
     it "creates a stolen record if one doesn't exist" do
-      FactoryGirl.create(:country, iso: 'US')
-      bike = FactoryGirl.create(:bike)
+      FactoryBot.create(:country, iso: 'US')
+      bike = FactoryBot.create(:bike)
       BikeUpdator.new(b_params: { id: bike.id, bike: { stolen: true } }.as_json).update_stolen_record
       expect(bike.stolen_records.count).not_to be_nil
     end
@@ -47,8 +47,8 @@ describe BikeUpdator do
 
   describe 'update_ownership' do
     it 'calls create_ownership if the email has changed' do
-      bike = FactoryGirl.create(:bike)
-      user = FactoryGirl.create(:user)
+      bike = FactoryBot.create(:bike)
+      user = FactoryBot.create(:user)
       expect(bike.updator_id).to be_nil
       update_bike = BikeUpdator.new(b_params: { id: bike.id, bike: { owner_email: 'another@email.co' } }.as_json, user: user)
       expect_any_instance_of(OwnershipCreator).to receive(:create_ownership)
@@ -58,7 +58,7 @@ describe BikeUpdator do
     end
 
     it "does not call create_ownership if the email hasn't changed" do
-      bike = FactoryGirl.create(:bike, owner_email: 'another@email.co')
+      bike = FactoryBot.create(:bike, owner_email: 'another@email.co')
       update_bike = BikeUpdator.new(b_params: { id: bike.id, bike: { owner_email: 'another@email.co' } }.as_json)
       expect_any_instance_of(OwnershipCreator).not_to receive(:create_ownership)
       update_bike.update_ownership
@@ -67,15 +67,15 @@ describe BikeUpdator do
 
   describe 'update_available_attributes' do
     it 'does not let protected attributes be updated' do
-      FactoryGirl.create(:country, iso: 'US')
-      organization = FactoryGirl.create(:organization)
-      bike = FactoryGirl.create(:bike,
+      FactoryBot.create(:country, iso: 'US')
+      organization = FactoryBot.create(:organization)
+      bike = FactoryBot.create(:bike,
                                 creation_organization_id: organization.id,
                                 example: true,
                                 owner_email: 'foo@bar.com')
-      ownership = FactoryGirl.create(:ownership, bike: bike)
+      ownership = FactoryBot.create(:ownership, bike: bike)
       user = ownership.creator
-      new_creator = FactoryGirl.create(:user)
+      new_creator = FactoryBot.create(:user)
       og_bike = bike
       bike_params = {
         description: 'something long',
@@ -102,11 +102,11 @@ describe BikeUpdator do
     end
 
     it 'marks a bike user hidden' do
-      organization = FactoryGirl.create(:organization)
-      bike = FactoryGirl.create(:bike, creation_organization_id: organization.id, example: true)
-      ownership = FactoryGirl.create(:ownership, bike: bike)
+      organization = FactoryBot.create(:organization)
+      bike = FactoryBot.create(:bike, creation_organization_id: organization.id, example: true)
+      ownership = FactoryBot.create(:ownership, bike: bike)
       user = ownership.creator
-      new_creator = FactoryGirl.create(:user)
+      new_creator = FactoryBot.create(:user)
       expect(bike.user_hidden).to be_falsey
       bike_params = { marked_user_hidden: true }
       BikeUpdator.new(user: user, b_params: { id: bike.id, bike: bike_params }.as_json).update_available_attributes
@@ -115,10 +115,10 @@ describe BikeUpdator do
     end
 
     it 'Actually, for now, we let anyone mark anything not stolen' do
-      bike = FactoryGirl.create(:bike, stolen: true)
-      ownership = FactoryGirl.create(:ownership, bike: bike)
+      bike = FactoryBot.create(:bike, stolen: true)
+      ownership = FactoryBot.create(:ownership, bike: bike)
       user = ownership.creator
-      new_creator = FactoryGirl.create(:user)
+      new_creator = FactoryBot.create(:user)
       bike_params = { stolen: false }
       update_bike = BikeUpdator.new(user: user, b_params: { id: bike.id, bike: bike_params }.as_json)
       expect(update_bike).to receive(:update_ownership).and_return(true)
@@ -127,10 +127,10 @@ describe BikeUpdator do
     end
 
     it 'updates the bike and set year to nothing if year nil' do
-      bike = FactoryGirl.create(:bike, year: 2014)
-      ownership = FactoryGirl.create(:ownership, bike: bike)
+      bike = FactoryBot.create(:bike, year: 2014)
+      ownership = FactoryBot.create(:ownership, bike: bike)
       user = ownership.creator
-      new_creator = FactoryGirl.create(:user)
+      new_creator = FactoryBot.create(:user)
       bike_params = { coaster_brake: true, year: nil, components_attributes: { '1387762503379' => { 'ctype_id' => '', 'front' => '0', 'rear' => '0', 'ctype_other' => '', 'description' => '', 'manufacturer_id' => '', 'model_name' => '', 'manufacturer_other' => '', 'year' => '', 'serial_number' => '', '_destroy' => '0' } } }
       update_bike = BikeUpdator.new(user: user, b_params: { id: bike.id, bike: bike_params }.as_json)
       expect(update_bike).to receive(:update_ownership).and_return(true)
@@ -141,10 +141,10 @@ describe BikeUpdator do
     end
 
     it 'updates the bike sets is_for_sale to false' do
-      bike = FactoryGirl.create(:bike, is_for_sale: true)
-      ownership = FactoryGirl.create(:ownership, bike: bike)
+      bike = FactoryBot.create(:bike, is_for_sale: true)
+      ownership = FactoryBot.create(:ownership, bike: bike)
       user = ownership.creator
-      new_creator = FactoryGirl.create(:user)
+      new_creator = FactoryBot.create(:user)
       update_bike = BikeUpdator.new(user: user, b_params: { id: bike.id, bike: { owner_email: new_creator.email } }.as_json)
       update_bike.update_available_attributes
       expect(bike.reload.is_for_sale).to be_falsey
@@ -153,10 +153,10 @@ describe BikeUpdator do
 
   it 'enque listing order working' do
     Sidekiq::Testing.fake!
-    bike = FactoryGirl.create(:bike, stolen: true)
-    ownership = FactoryGirl.create(:ownership, bike: bike)
+    bike = FactoryBot.create(:bike, stolen: true)
+    ownership = FactoryBot.create(:ownership, bike: bike)
     user = ownership.creator
-    new_creator = FactoryGirl.create(:user)
+    new_creator = FactoryBot.create(:user)
     bike_params = { stolen: false }
     update_bike = BikeUpdator.new(user: user, b_params: { id: bike.id, bike: bike_params }.as_json)
     expect(update_bike).to receive(:update_ownership).and_return(true)

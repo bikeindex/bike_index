@@ -11,7 +11,7 @@ describe Api::V1::UsersController do
 
     it 'returns user_present if a user is present' do
       # We need to test that cors isn't present
-      u = FactoryGirl.create(:user_confirmed)
+      u = FactoryBot.create(:user_confirmed)
       set_current_user(u)
       get :current, format: :json
       expect(response.code).to eq('200')
@@ -29,7 +29,7 @@ describe Api::V1::UsersController do
         # We don't test that this is being added to Sidekiq
         # Because we're testing that sidekiq does what it
         # Needs to do here. Slow tests, but we know it actually works :(
-        o = FactoryGirl.create(:ownership)
+        o = FactoryBot.create(:ownership)
         user = o.creator
         bike = o.bike
         delete_request = {
@@ -47,8 +47,8 @@ describe Api::V1::UsersController do
     end
     context 'manufacturer_update_manufacturer present' do
       it 'updates the manufacturer' do
-        o = FactoryGirl.create(:ownership)
-        manufacturer = FactoryGirl.create(:manufacturer)
+        o = FactoryBot.create(:ownership)
+        manufacturer = FactoryBot.create(:manufacturer)
         user = o.creator
         bike = o.bike
         update_manufacturer_request = {
@@ -68,7 +68,7 @@ describe Api::V1::UsersController do
 
     context 'manufacturer_update_manufacturer present' do
       it 'does not make nil manufacturer' do
-        o = FactoryGirl.create(:ownership)
+        o = FactoryBot.create(:ownership)
         user = o.creator
         bike = o.bike
         update_manufacturer_request = {
@@ -88,7 +88,7 @@ describe Api::V1::UsersController do
 
     context 'serial request mail' do
       it "doesn't create a new serial request mail" do
-        o = FactoryGirl.create(:ownership)
+        o = FactoryBot.create(:ownership)
         user = o.creator
         bike = o.bike
         serial_request = {
@@ -110,8 +110,8 @@ describe Api::V1::UsersController do
 
     it 'it untsvs a bike' do
       t = Time.now - 1.minute
-      stolen_record = FactoryGirl.create(:stolen_record, tsved_at: t)
-      o = FactoryGirl.create(:ownership, bike: stolen_record.bike)
+      stolen_record = FactoryBot.create(:stolen_record, tsved_at: t)
+      o = FactoryBot.create(:ownership, bike: stolen_record.bike)
       user = o.creator
       bike = o.bike
       bike.update_attribute :current_stolen_record_id, bike.find_current_stolen_record.id
@@ -133,9 +133,9 @@ describe Api::V1::UsersController do
     end
 
     describe 'recovery' do
-      let(:bike) { FactoryGirl.create(:stolen_bike) }
+      let(:bike) { FactoryBot.create(:stolen_bike) }
       let(:stolen_record) { bike.current_stolen_record }
-      let(:ownership) { FactoryGirl.create(:ownership, bike: bike) }
+      let(:ownership) { FactoryBot.create(:ownership, bike: bike) }
       let(:user) { ownership.creator }
       let(:recovery_request) do
         {
@@ -177,7 +177,7 @@ describe Api::V1::UsersController do
     end
 
     it "does not create a new serial request mailer if a user isn't present" do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       message = { request_bike_id: bike.id, serial_update_serial: 'some update', request_reason: 'Some reason' }
       # pp message
       post :send_request, message, format: :json
@@ -185,9 +185,9 @@ describe Api::V1::UsersController do
     end
 
     it 'does not create a new serial request mailer if wrong user user is present' do
-      o = FactoryGirl.create(:ownership)
+      o = FactoryBot.create(:ownership)
       bike = o.bike
-      user = FactoryGirl.create(:user_confirmed)
+      user = FactoryBot.create(:user_confirmed)
       set_current_user(user)
       params = { request_bike_id: bike.id, serial_update_serial: 'some update', request_reason: 'Some reason' }
       post :send_request, params

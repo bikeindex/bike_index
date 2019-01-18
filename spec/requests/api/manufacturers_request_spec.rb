@@ -3,8 +3,8 @@ require 'spec_helper'
 describe 'Manufacturers API V3' do
   describe 'root' do
     it 'responds on index with pagination' do
-      FactoryGirl.create(:manufacturer)
-      FactoryGirl.create(:manufacturer) unless Manufacturer.count == 2
+      FactoryBot.create(:manufacturer)
+      FactoryBot.create(:manufacturer) unless Manufacturer.count == 2
       get '/api/v3/manufacturers?per_page=1'
       expect(response.header['Total']).to eq('2')
       pagination_link = '<http://www.example.com/api/v3/manufacturers?page=2&per_page=1>; rel="last", <http://www.example.com/api/v3/manufacturers?page=2&per_page=1>; rel="next"'
@@ -17,7 +17,7 @@ describe 'Manufacturers API V3' do
 
   describe 'find by id or name' do
     before :all do
-      @manufacturer = FactoryGirl.create(:manufacturer)
+      @manufacturer = FactoryBot.create(:manufacturer)
     end
     it 'returns one with from an id' do
       get "/api/v3/manufacturers/#{@manufacturer.id}"
@@ -38,7 +38,7 @@ describe 'Manufacturers API V3' do
     it 'returns one from a name' do
       # THIS FAILS when we don't create a manufacturer in this block,
       # I've got no idea why
-      manufacturer = FactoryGirl.create(:manufacturer, name: 'awesome')
+      manufacturer = FactoryBot.create(:manufacturer, name: 'awesome')
       get '/api/v3/manufacturers/awesome'
       result = response.body
       expect(response.code).to eq('200')

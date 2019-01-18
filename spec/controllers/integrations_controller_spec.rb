@@ -15,7 +15,7 @@ describe IntegrationsController do
     end
 
     describe "when there is a user" do
-      let!(:user) { FactoryGirl.create(:user_confirmed, email: OmniAuth.config.mock_auth.dig(:facebook, :info, :email)) }
+      let!(:user) { FactoryBot.create(:user_confirmed, email: OmniAuth.config.mock_auth.dig(:facebook, :info, :email)) }
       before { request.env["omniauth.auth"] = OmniAuth.config.mock_auth[:facebook] }
 
       it "creates a new integration given a refresh token and access token" do

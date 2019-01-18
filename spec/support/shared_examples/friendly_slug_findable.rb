@@ -2,11 +2,11 @@ require 'spec_helper'
 
 RSpec.shared_examples 'friendly_slug_findable' do
   let(:model_sym) { subject.class.name.underscore.to_sym }
-  let(:instance) { FactoryGirl.create model_sym }
+  let(:instance) { FactoryBot.create model_sym }
 
   describe 'callbacks' do
     it 'calls set slug before create' do
-      obj = FactoryGirl.build(model_sym, name: 'something cool and things&')
+      obj = FactoryBot.build(model_sym, name: 'something cool and things&')
       expect(obj).to receive :set_slug
       obj.save
     end
@@ -15,7 +15,7 @@ RSpec.shared_examples 'friendly_slug_findable' do
   describe 'set_slug' do
     context 'name' do
       it 'slugs it' do
-        obj = FactoryGirl.build(model_sym, name: 'something cool and things&')
+        obj = FactoryBot.build(model_sym, name: 'something cool and things&')
         obj.slug = nil
         obj.set_slug
         expect(obj.slug).to eq Slugifyer.slugify('something cool and things&')
@@ -23,7 +23,7 @@ RSpec.shared_examples 'friendly_slug_findable' do
     end
     context 'existing' do
       it "doesn't overwrite" do
-        obj = FactoryGirl.build model_sym
+        obj = FactoryBot.build model_sym
         obj.slug = 'something cool'
         obj.set_slug
         expect(obj.slug).to eq 'something cool'

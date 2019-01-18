@@ -4,8 +4,8 @@ describe Payment do
   it_behaves_like "amountable"
   describe "create" do
     context "stripe" do
-      let(:user) { FactoryGirl.create(:user) }
-      let(:payment) { FactoryGirl.create(:payment, user: nil, email: user.email) }
+      let(:user) { FactoryBot.create(:user) }
+      let(:payment) { FactoryBot.create(:payment, user: nil, email: user.email) }
       it "enqueues an email job, associates the user" do
         expect do
           payment
@@ -16,8 +16,8 @@ describe Payment do
       end
     end
     context "check with organization_id but no user or email" do
-      let(:organization) { FactoryGirl.create(:organization) }
-      let(:payment) { FactoryGirl.create(:payment_check, user: nil, email: nil, organization: organization) }
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:payment) { FactoryBot.create(:payment_check, user: nil, email: nil, organization: organization) }
       it "does not enqueue an email" do
         expect do
           payment # it is created here

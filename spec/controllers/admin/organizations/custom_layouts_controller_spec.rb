@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Admin::Organizations::CustomLayoutsController, type: :controller do
-  let(:organization) { FactoryGirl.create(:organization) }
+  let(:organization) { FactoryBot.create(:organization) }
   context 'super admin' do
     include_context :logged_in_as_super_admin
 
@@ -15,7 +15,7 @@ describe Admin::Organizations::CustomLayoutsController, type: :controller do
   end
 
   context 'super admin and developer' do
-    let(:user) { FactoryGirl.create(:admin_developer) }
+    let(:user) { FactoryBot.create(:admin_developer) }
     before do
       set_current_user(user)
     end
@@ -68,7 +68,7 @@ describe Admin::Organizations::CustomLayoutsController, type: :controller do
       context 'mail_snippet' do
         let(:snippet_type) { MailSnippet.organization_snippet_types.last }
         let(:mail_snippet) do
-          FactoryGirl.create(:organization_mail_snippet,
+          FactoryBot.create(:organization_mail_snippet,
                              organization: organization,
                              name: snippet_type,
                              is_enabled: false)

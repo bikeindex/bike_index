@@ -56,8 +56,8 @@ describe StolenRecord do
       expect(StolenRecord.recovery_unposted.to_sql).to eq(StolenRecord.unscoped.where(current: false, recovery_posted: false).to_sql)
     end
     it 'scopes tsv_today' do
-      stolen1 = FactoryGirl.create(:stolen_record, current: true, tsved_at: Time.now)
-      stolen2 = FactoryGirl.create(:stolen_record, current: true, tsved_at: nil)
+      stolen1 = FactoryBot.create(:stolen_record, current: true, tsved_at: Time.now)
+      stolen2 = FactoryBot.create(:stolen_record, current: true, tsved_at: nil)
 
       expect(StolenRecord.tsv_today.pluck(:id)).to eq([stolen1.id, stolen2.id])
     end
@@ -105,7 +105,7 @@ describe StolenRecord do
 
   describe 'tsv_row' do
     it 'returns the tsv row' do
-      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record = FactoryBot.create(:stolen_record)
       stolen_record.bike.update_attribute :description, "I like tabs because i'm an \\tass\T right\N"
       row = stolen_record.tsv_row
       expect(row.split("\t").count).to eq(10)
@@ -113,7 +113,7 @@ describe StolenRecord do
     end
 
     it "doesn't show the serial for recovered bikes" do
-      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record = FactoryBot.create(:stolen_record)
       stolen_record.bike.update_attributes(serial_number: 'SERIAL_SERIAL', recovered: true)
       row = stolen_record.tsv_row
       expect(row).not_to match(/serial_serial/i)
@@ -122,7 +122,7 @@ describe StolenRecord do
 
   describe 'set_phone' do
     it 'it should set_phone' do
-      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record = FactoryBot.create(:stolen_record)
       stolen_record.phone = '000/000/0000'
       stolen_record.secondary_phone = '000/000/0000'
       stolen_record.set_phone
@@ -143,14 +143,14 @@ describe StolenRecord do
 
   describe 'titleize_city' do
     it 'it should titleize_city' do
-      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record = FactoryBot.create(:stolen_record)
       stolen_record.city = 'INDIANAPOLIS, IN USA'
       stolen_record.titleize_city
       expect(stolen_record.city).to eq('Indianapolis')
     end
 
     it "it shouldn't remove other things" do
-      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record = FactoryBot.create(:stolen_record)
       stolen_record.city = 'Georgian la'
       stolen_record.titleize_city
       expect(stolen_record.city).to eq('Georgian La')
@@ -176,7 +176,7 @@ describe StolenRecord do
       expect(stolen_record.date_stolen.year).to eq(2013)
     end
     it "it should set the year to the past year if the date hasn't happened yet" do
-      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record = FactoryBot.create(:stolen_record)
       next_year = (Time.now + 2.months)
       stolen_record.date_stolen = next_year
       stolen_record.fix_date
@@ -191,21 +191,21 @@ describe StolenRecord do
   describe 'update_tsved_at' do
     it 'does not reset on save' do
       t = Time.now - 1.minute
-      stolen_record = FactoryGirl.create(:stolen_record, tsved_at: t)
+      stolen_record = FactoryBot.create(:stolen_record, tsved_at: t)
       stolen_record.update_attributes(theft_description: 'Something new description wise')
       stolen_record.reload
       expect(stolen_record.tsved_at.to_i).to eq(t.to_i)
     end
     it 'resets from an update to police report' do
       t = Time.now - 1.minute
-      stolen_record = FactoryGirl.create(:stolen_record, tsved_at: t)
+      stolen_record = FactoryBot.create(:stolen_record, tsved_at: t)
       stolen_record.update_attributes(police_report_number: '89dasf89dasf')
       stolen_record.reload
       expect(stolen_record.tsved_at).to be_nil
     end
     it 'resets from an update to police report department' do
       t = Time.now - 1.minute
-      stolen_record = FactoryGirl.create(:stolen_record, tsved_at: t)
+      stolen_record = FactoryBot.create(:stolen_record, tsved_at: t)
       stolen_record.update_attributes(police_report_department: 'CPD')
       stolen_record.reload
       expect(stolen_record.tsved_at).to be_nil
@@ -213,7 +213,7 @@ describe StolenRecord do
   end
 
   describe 'add_recovery_information' do
-    let(:bike) { FactoryGirl.create(:stolen_bike) }
+    let(:bike) { FactoryBot.create(:stolen_bike) }
     let(:stolen_record) { bike.current_stolen_record }
     let(:recovery_info) do
       {

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Admin::ManufacturersController, type: :controller do
-  let(:subject) { FactoryGirl.create(:manufacturer) }
+  let(:subject) { FactoryBot.create(:manufacturer) }
   include_context :logged_in_as_super_admin
 
   let(:permitted_attributes) do

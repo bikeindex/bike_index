@@ -19,17 +19,17 @@ describe Manufacturer do
   end
 
   describe 'ensure_non_blocking_name' do
-    before { FactoryGirl.create(:color, name: 'Purple') }
+    before { FactoryBot.create(:color, name: 'Purple') }
     context 'name same as a color' do
       it 'adds an error' do
-        manufacturer = FactoryGirl.build(:manufacturer, name: ' pURple ')
+        manufacturer = FactoryBot.build(:manufacturer, name: ' pURple ')
         manufacturer.valid?
         expect(manufacturer.errors.full_messages.to_s).to match 'same as a color'
       end
     end
     context 'name includes a color' do
       it 'adds no error' do
-        manufacturer = FactoryGirl.build(:manufacturer, name: 'Purple bikes')
+        manufacturer = FactoryBot.build(:manufacturer, name: 'Purple bikes')
         manufacturer.valid?
         expect(manufacturer.errors.count).to eq 0
       end
@@ -38,18 +38,18 @@ describe Manufacturer do
 
   describe 'friendly_find' do
     it 'finds manufacturers by their slug' do
-      mnfg = FactoryGirl.create(:manufacturer, name: 'Poopy PANTERS')
+      mnfg = FactoryBot.create(:manufacturer, name: 'Poopy PANTERS')
       expect(Manufacturer.friendly_find('poopy panters')).to eq(mnfg)
     end
     it "removes Accell (because it's widespread mnfg)" do
-      mnfg = FactoryGirl.create(:manufacturer, name: 'Poopy PANTERS')
+      mnfg = FactoryBot.create(:manufacturer, name: 'Poopy PANTERS')
       expect(Manufacturer.friendly_find('poopy panters Accell')).to eq(mnfg)
     end
   end
 
   describe 'autocomplete_hash' do
     it 'returns what we expect' do
-      manufacturer = FactoryGirl.create(:manufacturer)
+      manufacturer = FactoryBot.create(:manufacturer)
       result = manufacturer.autocomplete_hash
       expect(result.keys).to eq(%w(id text category priority data))
       expect(result['data']['slug']).to eq manufacturer.slug
@@ -123,7 +123,7 @@ describe Manufacturer do
 
   describe 'friendly_id_find' do
     it 'gets id from name' do
-      manufacturer = FactoryGirl.create(:manufacturer)
+      manufacturer = FactoryBot.create(:manufacturer)
       result = Manufacturer.friendly_id_find(manufacturer.name)
       expect(result).to eq(manufacturer.id)
     end

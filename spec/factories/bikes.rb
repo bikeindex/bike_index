@@ -1,14 +1,14 @@
 # Warning: BikeCreator forces every bike to have an ownership
 # ... But this factory allows creating bikes without ownerships
-FactoryGirl.define do
+FactoryBot.define do
   factory :bike do
     # transient do # will be transient once we drop the deprecated creation attributes
-    #  creator { FactoryGirl.create(:user) }
+    #  creator { FactoryBot.create(:user) }
     # end
-    # creation_state { FactoryGirl.create(:creation_state, creator: creator) }
-    creator { FactoryGirl.create(:user) }
+    # creation_state { FactoryBot.create(:creation_state, creator: creator) }
+    creator { FactoryBot.create(:user) }
     serial_number
-    manufacturer { FactoryGirl.create(:manufacturer) }
+    manufacturer { FactoryBot.create(:manufacturer) }
     sequence(:owner_email) { |n| "bike_owner#{n}@example.com" }
     primary_frame_color { Color.black }
     cycle_type { CycleType.bike }
@@ -35,7 +35,7 @@ FactoryGirl.define do
 
     factory :organized_bikes do # don't use this factory exactly, it's used to wrap all the organized bikes
       transient do
-        organization { FactoryGirl.create(:organization) }
+        organization { FactoryBot.create(:organization) }
       end
       creation_organization { organization }
 
@@ -49,7 +49,7 @@ FactoryGirl.define do
       end
       factory :organization_bike do
         after(:create) do |bike, evaluator|
-          # FactoryGirl.create(:bike_organization, bike: bike, organization: evaluator.organization)
+          # FactoryBot.create(:bike_organization, bike: bike, organization: evaluator.organization)
           create(:bike_organization, organization: bike.creation_organization, bike: bike)
           bike.reload
         end

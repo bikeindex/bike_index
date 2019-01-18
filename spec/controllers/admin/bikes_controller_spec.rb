@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Admin::BikesController do
-  let(:user) { FactoryGirl.create(:admin) }
+  let(:user) { FactoryBot.create(:admin) }
   before do
     set_current_user(user)
   end
@@ -26,11 +26,11 @@ describe Admin::BikesController do
   end
 
   describe 'edit' do
-    let(:bike) { FactoryGirl.create(:stolen_bike) }
+    let(:bike) { FactoryBot.create(:stolen_bike) }
     let(:stolen_record) { bike.current_stolen_record }
     context 'standard' do
       it 'renders' do
-        get :edit, id: FactoryGirl.create(:bike).id
+        get :edit, id: FactoryBot.create(:bike).id
         expect(response.code).to eq('200')
         expect(response).to render_template('edit')
         expect(flash).to_not be_present
@@ -51,7 +51,7 @@ describe Admin::BikesController do
 
   describe 'destroy' do
     it 'destroys the bike' do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       expect do
         delete :destroy, id: bike.id
       end.to change(Bike, :count).by(-1)
@@ -63,11 +63,11 @@ describe Admin::BikesController do
 
   describe 'update' do
     context 'success' do
-      let(:organization) { FactoryGirl.create(:organization) }
+      let(:organization) { FactoryBot.create(:organization) }
       it 'updates the bike and calls update_ownership and serial_normalizer' do
         expect_any_instance_of(BikeUpdator).to receive(:update_ownership)
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
-        bike = FactoryGirl.create(:stolen_bike)
+        bike = FactoryBot.create(:stolen_bike)
         stolen_record = bike.find_current_stolen_record
         expect(stolen_record).to be_present
         expect(stolen_record.is_a?(StolenRecord)).to be_truthy
@@ -96,7 +96,7 @@ describe Admin::BikesController do
 
     context 'fast_attr_update' do
       it 'marks a stolen bike recovered and passes attr update through' do
-        bike = FactoryGirl.create(:stolen_bike)
+        bike = FactoryBot.create(:stolen_bike)
         stolen_record = bike.current_stolen_record
         bike.reload
         expect(bike.stolen).to be_truthy
@@ -124,7 +124,7 @@ describe Admin::BikesController do
 
     context 'valid return_to url' do
       it 'redirects' do
-        bike = FactoryGirl.create(:bike, serial_number: 'og serial')
+        bike = FactoryBot.create(:bike, serial_number: 'og serial')
         session[:return_to] = '/about'
         opts = {
           id: bike.id,
@@ -173,10 +173,10 @@ describe Admin::BikesController do
       request.env['HTTP_REFERER'] = 'http://localhost:3000/admin/bikes/missing_manufacturers'
     end
     it 'updates the products' do
-      bike1 = FactoryGirl.create(:bike, manufacturer_other: 'hahaha')
-      bike2 = FactoryGirl.create(:bike, manufacturer_other: '69')
-      bike3 = FactoryGirl.create(:bike, manufacturer_other: '69')
-      manufacturer = FactoryGirl.create(:manufacturer)
+      bike1 = FactoryBot.create(:bike, manufacturer_other: 'hahaha')
+      bike2 = FactoryBot.create(:bike, manufacturer_other: '69')
+      bike3 = FactoryBot.create(:bike, manufacturer_other: '69')
+      manufacturer = FactoryBot.create(:manufacturer)
       update_params = {
         manufacturer_id: manufacturer.id,
         bikes_selected: { bike1.id => bike1.id, bike2.id => bike2.id }
@@ -193,7 +193,7 @@ describe Admin::BikesController do
   end
 
   describe 'unrecover' do
-    let(:bike) { FactoryGirl.create(:stolen_bike) }
+    let(:bike) { FactoryBot.create(:stolen_bike) }
     let(:stolen_record) { bike.current_stolen_record }
     let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
     let(:recovered_description) { 'something cool and party and things and stuff and it came back!!! XOXO' }

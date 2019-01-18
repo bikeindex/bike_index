@@ -13,7 +13,7 @@ describe BParam do
       expect(b_param.bike['serial_number']).to eq('XXX')
     end
     it "does not fail if there isn't a bike" do
-      user = FactoryGirl.create(:user)
+      user = FactoryBot.create(:user)
       b_param = BParam.new(creator_id: user.id, params: { stolen: true })
       expect(b_param.save).to be_truthy
     end
@@ -73,7 +73,7 @@ describe BParam do
       expect(b_param.params['stolen_record']).not_to be_present
     end
     it 'gets the organization id' do
-      org = FactoryGirl.create(:organization, name: 'Something')
+      org = FactoryBot.create(:organization, name: 'Something')
       p = { organization_slug: org.slug }
       b_param = BParam.new(params: p, origin: 'api_v2')
       b_param.massage_if_v2
@@ -114,7 +114,7 @@ describe BParam do
 
   describe "manufacturer_name" do
     context "manufacturer_id" do
-      let(:manufacturer) { FactoryGirl.create(:manufacturer) }
+      let(:manufacturer) { FactoryBot.create(:manufacturer) }
       let(:b_param) { BParam.new(params: { bike: { manufacturer_id: manufacturer.id } }.to_json) }
       it "is the manufacturers name" do
         expect(b_param.mnfg_name).to eq manufacturer.name
@@ -130,7 +130,7 @@ describe BParam do
 
   describe 'set_wheel_size_key' do
     it 'sets rear_wheel_size_id to the bsd submitted' do
-      ws = FactoryGirl.create(:wheel_size, iso_bsd: 'Bike')
+      ws = FactoryBot.create(:wheel_size, iso_bsd: 'Bike')
       bike = { rear_wheel_bsd: ws.iso_bsd }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_wheel_size_key
@@ -140,7 +140,7 @@ describe BParam do
 
   describe 'set_cycle_type_key' do
     it 'sets cycle_type_id to the cycle type from name submitted' do
-      ct = FactoryGirl.create(:cycle_type, name: 'Boo Boo', slug: 'boop')
+      ct = FactoryBot.create(:cycle_type, name: 'Boo Boo', slug: 'boop')
       bike = { serial_number: 'gobble gobble', cycle_type_slug: ' booP ' }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_cycle_type_key
@@ -151,7 +151,7 @@ describe BParam do
 
   describe 'set_frame_material_key' do
     it 'sets cycle_type_id to the cycle type from name submitted' do
-      fm = FactoryGirl.create(:frame_material, name: 'goo goo', slug: 'goop')
+      fm = FactoryBot.create(:frame_material, name: 'goo goo', slug: 'goop')
       bike = { serial_number: 'gobble gobble', frame_material_slug: ' gooP ' }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_frame_material_key
@@ -162,7 +162,7 @@ describe BParam do
 
   describe 'set_handlebar_type_key' do
     it 'sets cycle_type_id to the cycle type from name submitted' do
-      ht = FactoryGirl.create(:handlebar_type, name: 'goo goo', slug: 'goopie')
+      ht = FactoryBot.create(:handlebar_type, name: 'goo goo', slug: 'goopie')
       bike = { serial_number: 'gobble gobble', handlebar_type_slug: ' gooPie ' }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_handlebar_type_key
@@ -184,7 +184,7 @@ describe BParam do
         end
       end
       context 'existing manufacturer' do
-        let(:manufacturer) { FactoryGirl.create(:manufacturer) }
+        let(:manufacturer) { FactoryBot.create(:manufacturer) }
         context 'manufacturer name' do
           it 'uses manufacturer' do
             bike = { manufacturer_id: manufacturer.id }
@@ -224,7 +224,7 @@ describe BParam do
       end
       context 'existing manufacturer' do
         it 'looks through book slug' do
-          manufacturer = FactoryGirl.create(:manufacturer, name: 'Something Cycles')
+          manufacturer = FactoryBot.create(:manufacturer, name: 'Something Cycles')
           bike = { manufacturer: 'something' }
           b_param = BParam.new(params: { bike: bike })
           b_param.set_manufacturer_key
@@ -237,7 +237,7 @@ describe BParam do
 
   describe 'gear_slugs' do
     it 'sets the rear gear slug' do
-      gear = FactoryGirl.create(:rear_gear_type)
+      gear = FactoryBot.create(:rear_gear_type)
       bike = { rear_gear_type_slug: gear.slug }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_rear_gear_type_slug
@@ -245,7 +245,7 @@ describe BParam do
       expect(b_param.params['bike']['rear_gear_type_id']).to eq(gear.id)
     end
     it 'sets the front gear slug' do
-      gear = FactoryGirl.create(:front_gear_type)
+      gear = FactoryBot.create(:front_gear_type)
       bike = { front_gear_type_slug: gear.slug }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_front_gear_type_slug
@@ -256,7 +256,7 @@ describe BParam do
 
   describe 'set_color_key' do
     it "sets the color if it's a color and remove the color attr" do
-      color = FactoryGirl.create(:color)
+      color = FactoryBot.create(:color)
       bike = { color: color.name }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_color_key
@@ -273,9 +273,9 @@ describe BParam do
 
   describe 'set_paint_key' do
     it 'associates the paint and set the color if it can' do
-      FactoryGirl.create(:color, name: 'Black')
-      color = FactoryGirl.create(:color, name: 'Yellow')
-      paint = FactoryGirl.create(:paint, name: 'pinkly butter', color_id: color.id)
+      FactoryBot.create(:color, name: 'Black')
+      color = FactoryBot.create(:color, name: 'Yellow')
+      paint = FactoryBot.create(:paint, name: 'pinkly butter', color_id: color.id)
       b_param = BParam.new(params: { bike: { color: paint.name } })
       b_param.set_paint_key(paint.name)
       expect(b_param.bike['paint_id']).to eq(paint.id)
@@ -283,7 +283,7 @@ describe BParam do
     end
 
     it "creates a paint and set the color to black if we don't know the color" do
-      black = FactoryGirl.create(:color, name: 'Black')
+      black = FactoryBot.create(:color, name: 'Black')
       b_param = BParam.new(params: { bike: {} })
       expect do
         b_param.set_paint_key('Paint 69')
@@ -293,8 +293,8 @@ describe BParam do
     end
 
     it "associates the manufacturer with the paint if it's a new bike" do
-      FactoryGirl.create(:color, name: 'Black')
-      m = FactoryGirl.create(:manufacturer)
+      FactoryBot.create(:color, name: 'Black')
+      m = FactoryBot.create(:manufacturer)
       bike = { is_pos: true, manufacturer_id: m.id }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_paint_key('paint 69')
@@ -317,7 +317,7 @@ describe BParam do
   #
   # Revised attrs
   describe 'find_or_new_from_token' do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
     #
     # Because for now we aren't updating the factory, use this let for b_params factory
     let(:b_param) { BParam.create }
@@ -342,7 +342,7 @@ describe BParam do
         end
         context 'with creator of different user' do
           it 'fails' do
-            other_user = FactoryGirl.create(:user)
+            other_user = FactoryBot.create(:user)
             b_param.update_attribute :creator_id, user.id
             result = BParam.find_or_new_from_token(b_param.id_token, user_id: other_user.id)
             expect(result.is_a?(BParam)).to be_truthy
@@ -424,7 +424,7 @@ describe BParam do
       end
     end
     context "with existing b_param with nil for id_token value - legacy issue" do
-      let(:b_param_nil) { FactoryGirl.create(:b_param, creator_id: user.id) }
+      let(:b_param_nil) { FactoryBot.create(:b_param, creator_id: user.id) }
       it "does not return that BParam" do
         b_param_nil.update_column :id_token, nil
         b_param_nil.reload

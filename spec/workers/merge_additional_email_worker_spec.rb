@@ -5,29 +5,29 @@ describe MergeAdditionalEmailWorker do
 
   context 'confirmed' do
     let(:email) { 'FOO@barexample.com' }
-    let(:ownership) { FactoryGirl.create(:ownership, owner_email: email) }
-    let(:user_email) { FactoryGirl.create(:user_email, email: email) }
+    let(:ownership) { FactoryBot.create(:ownership, owner_email: email) }
+    let(:user_email) { FactoryBot.create(:user_email, email: email) }
     let(:user) { user_email.user }
-    let(:organization_invitation) { FactoryGirl.create(:organization_invitation, invitee_email: "#{email.upcase} ") }
+    let(:organization_invitation) { FactoryBot.create(:organization_invitation, invitee_email: "#{email.upcase} ") }
 
     context 'existing user account' do
-      let(:bike) { FactoryGirl.create(:bike, creator_id: old_user.id) }
-      let(:old_user) { FactoryGirl.create(:user_confirmed, email: email) }
-      let(:pre_created_ownership) { FactoryGirl.create(:ownership, creator_id: old_user.id) }
-      let(:old_user_ownership) { FactoryGirl.create(:ownership, owner_email: email) }
+      let(:bike) { FactoryBot.create(:bike, creator_id: old_user.id) }
+      let(:old_user) { FactoryBot.create(:user_confirmed, email: email) }
+      let(:pre_created_ownership) { FactoryBot.create(:ownership, creator_id: old_user.id) }
+      let(:old_user_ownership) { FactoryBot.create(:ownership, owner_email: email) }
 
       let(:organization) { organization_invitation.organization }
-      let(:second_organization) { FactoryGirl.create(:organization, auto_user_id: old_user.id) }
-      let(:membership) { FactoryGirl.create(:membership, user: old_user, organization: second_organization) }
-      let(:third_organization) { FactoryGirl.create(:organization, auto_user_id: old_user.id) }
-      let(:old_membership) { FactoryGirl.create(:membership, user: old_user, organization: third_organization) }
-      let(:new_membership) { FactoryGirl.create(:membership, user: user, organization: third_organization) }
+      let(:second_organization) { FactoryBot.create(:organization, auto_user_id: old_user.id) }
+      let(:membership) { FactoryBot.create(:membership, user: old_user, organization: second_organization) }
+      let(:third_organization) { FactoryBot.create(:organization, auto_user_id: old_user.id) }
+      let(:old_membership) { FactoryBot.create(:membership, user: old_user, organization: third_organization) }
+      let(:new_membership) { FactoryBot.create(:membership, user: user, organization: third_organization) }
 
-      let(:integration) { FactoryGirl.create(:integration, user: old_user, information: { 'info' => { 'email' => email, name: 'blargh' } }) }
-      let(:lock) { FactoryGirl.create(:lock, user: old_user) }
-      let(:payment) { FactoryGirl.create(:payment, user: old_user) }
-      let(:customer_contact) { FactoryGirl.create(:customer_contact, user: old_user, creator: old_user) }
-      let(:stolen_notification) { FactoryGirl.create(:stolen_notification, sender: old_user, receiver: old_user) }
+      let(:integration) { FactoryBot.create(:integration, user: old_user, information: { 'info' => { 'email' => email, name: 'blargh' } }) }
+      let(:lock) { FactoryBot.create(:lock, user: old_user) }
+      let(:payment) { FactoryBot.create(:payment, user: old_user) }
+      let(:customer_contact) { FactoryBot.create(:customer_contact, user: old_user, creator: old_user) }
+      let(:stolen_notification) { FactoryBot.create(:stolen_notification, sender: old_user, receiver: old_user) }
       let(:oauth_application) { Doorkeeper::Application.create(name: 'MyApp', redirect_uri: 'https://app.com') }
       before do
         old_user.reload
@@ -125,8 +125,8 @@ describe MergeAdditionalEmailWorker do
 
   context 'unconfirmed' do
     it "doesn't merge" do
-      ownership = FactoryGirl.create(:ownership)
-      user_email = FactoryGirl.create(:user_email, email: ownership.owner_email, confirmation_token: 'token-stuff')
+      ownership = FactoryBot.create(:ownership)
+      user_email = FactoryBot.create(:user_email, email: ownership.owner_email, confirmation_token: 'token-stuff')
       expect(user_email.confirmed).to be_falsey
       MergeAdditionalEmailWorker.new.perform(user_email.id)
       user_email.reload

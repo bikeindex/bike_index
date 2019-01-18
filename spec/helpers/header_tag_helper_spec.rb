@@ -104,7 +104,7 @@ describe HeaderTagHelper do
     end
     context 'organized namespace' do
       let(:controller_namespace) { 'organized' }
-      let(:organization) { FactoryGirl.build(:organization, short_name: 'Sweet Bike Org') }
+      let(:organization) { FactoryBot.build(:organization, short_name: 'Sweet Bike Org') }
       before do
         allow(view).to receive(:current_organization) { organization }
       end
@@ -207,7 +207,7 @@ describe HeaderTagHelper do
     let(:controller_name) { 'landing_pages' }
     context 'show (organization landing page)' do
       let(:action_name) { 'show' }
-      let(:organization) { FactoryGirl.build(:organization, name: 'Sweet University') }
+      let(:organization) { FactoryBot.build(:organization, name: 'Sweet University') }
       it 'sets the page title' do
         allow(view).to receive(:current_organization) { organization }
         helper.landing_pages_header_tags
@@ -228,7 +228,7 @@ describe HeaderTagHelper do
         end
       end
       context 'current_user name' do
-        let(:user) { FactoryGirl.build(:user, name: 'John') }
+        let(:user) { FactoryBot.build(:user, name: 'John') }
         it 'sets the page title' do
           allow(view).to receive(:current_user) { user }
           helper.welcome_header_tags
@@ -251,7 +251,7 @@ describe HeaderTagHelper do
     let(:controller_name) { 'users' }
     let(:action_name) { 'show' }
     context 'with user title, and avatar' do
-      let(:user) { FactoryGirl.build(:user, name: 'John', title: "John's bikes") }
+      let(:user) { FactoryBot.build(:user, name: 'John', title: "John's bikes") }
       it 'returns the user avatar, title and titled description' do
         allow(avatar).to receive(:url) { 'http://something.com' }
         allow(user).to receive(:avatar) { avatar }
@@ -263,7 +263,7 @@ describe HeaderTagHelper do
       end
     end
     context 'with no user title and blank avatar' do
-      let(:user) { FactoryGirl.build(:user, name: 'John') }
+      let(:user) { FactoryBot.build(:user, name: 'John') }
       it 'has default image and a title' do
         allow(avatar).to receive(:url) { 'https://files.bikeindex.org/blank.png' }
         allow(user).to receive(:avatar) { avatar }
@@ -278,7 +278,7 @@ describe HeaderTagHelper do
   describe 'bikes_header_tags' do
     let(:bike) { Bike.new(stolen: true) }
     context 'new stolen bike' do
-      let(:user) { FactoryGirl.build(:user) }
+      let(:user) { FactoryBot.build(:user) }
       it 'says new stolen on new stolen' do
         allow(view).to receive(:current_user).and_return(user)
         allow(view).to receive(:action_name).and_return('new')
@@ -339,9 +339,9 @@ describe HeaderTagHelper do
       let(:action_name) { 'show' }
       let(:target_time) { (Time.now - 1.hour).utc }
       # Have to create user so it creates a path for the user
-      let(:user) { FactoryGirl.create(:user, name: 'John', twitter: 'stolenbikereg') }
+      let(:user) { FactoryBot.create(:user, name: 'John', twitter: 'stolenbikereg') }
       let(:blog) do
-        FactoryGirl.build(:blog,
+        FactoryBot.build(:blog,
                           title: 'Cool blog',
                           description_abbr: 'Bike Index did something cool',
                           published_at: target_time,

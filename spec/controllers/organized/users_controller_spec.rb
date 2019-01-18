@@ -21,7 +21,7 @@ describe Organized::UsersController, type: :controller do
 
     describe 'update' do
       context 'organization_invitation' do
-        let(:organization_invitation) { FactoryGirl.create(:organization_invitation, organization: organization, inviter: user) }
+        let(:organization_invitation) { FactoryBot.create(:organization_invitation, organization: organization, inviter: user) }
         let(:organization_invitation_params) do
           {
             membership_role: 'admin',
@@ -68,7 +68,7 @@ describe Organized::UsersController, type: :controller do
 
     describe 'edit' do
       context 'membership' do
-        let(:membership) { FactoryGirl.create(:existing_membership, organization: organization) }
+        let(:membership) { FactoryBot.create(:existing_membership, organization: organization) }
         it 'renders the page' do
           get :edit, organization_id: organization.to_param, id: membership.id
           expect(assigns(:membership)).to eq membership
@@ -78,7 +78,7 @@ describe Organized::UsersController, type: :controller do
         end
       end
       context 'organization_invitation' do
-        let(:invitation) { FactoryGirl.create(:organization_invitation, organization: organization) }
+        let(:invitation) { FactoryBot.create(:organization_invitation, organization: organization) }
         it 'renders the page' do
           get :edit, organization_id: organization.to_param, id: invitation.id, is_invitation: true
           expect(assigns(:organization_invitation)).to eq invitation
@@ -91,7 +91,7 @@ describe Organized::UsersController, type: :controller do
 
     describe 'update' do
       context 'organization_invitation' do
-        let(:organization_invitation) { FactoryGirl.create(:organization_invitation, organization: organization, inviter: user) }
+        let(:organization_invitation) { FactoryBot.create(:organization_invitation, organization: organization, inviter: user) }
         let(:organization_invitation_params) do
           {
             membership_role: 'admin',
@@ -118,7 +118,7 @@ describe Organized::UsersController, type: :controller do
       end
       context 'membership' do
         context 'other valid membership' do
-          let(:membership) { FactoryGirl.create(:existing_membership, organization: organization, role: 'member') }
+          let(:membership) { FactoryBot.create(:existing_membership, organization: organization, role: 'member') }
           let(:membership_params) { { role: 'admin', user_id: 333 } }
           it 'updates the role' do
             og_user = membership.user
@@ -148,7 +148,7 @@ describe Organized::UsersController, type: :controller do
 
     describe 'destroy' do
       context 'organization_invitation' do
-        let(:organization_invitation) { FactoryGirl.create(:organization_invitation, organization: organization, inviter: user) }
+        let(:organization_invitation) { FactoryBot.create(:organization_invitation, organization: organization, inviter: user) }
         it 'destroys' do
           expect(organization_invitation).to be_present
           count = organization.available_invitation_count
@@ -164,7 +164,7 @@ describe Organized::UsersController, type: :controller do
       end
       context 'membership' do
         context 'other valid membership' do
-          let(:membership) { FactoryGirl.create(:existing_membership, organization: organization, role: 'member') }
+          let(:membership) { FactoryBot.create(:existing_membership, organization: organization, role: 'member') }
           it 'destroys the membership' do
             expect(membership).to be_present
             count = organization.available_invitation_count

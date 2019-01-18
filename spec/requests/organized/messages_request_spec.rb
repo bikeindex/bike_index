@@ -9,7 +9,7 @@ describe "Organized::MessagesController" do
   before { allow(User).to receive(:from_auth) { user } }
 
   describe "messages root" do
-    let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+    let(:user) { FactoryBot.create(:organization_member, organization: organization) }
     it "renders" do
       get base_url, json_headers
       expect(response.status).to eq(200)
@@ -24,7 +24,7 @@ describe "Organized::MessagesController" do
         expect(response.headers['Access-Control-Request-Method']).not_to be_present
       end
       context "with a message" do
-        let!(:organization_message_1) { FactoryGirl.create(:organization_message, organization: organization, kind: "geolocated", created_at: Time.now - 1.hour) }
+        let!(:organization_message_1) { FactoryBot.create(:organization_message, organization: organization, kind: "geolocated", created_at: Time.now - 1.hour) }
         let(:bike) { organization_message_1.bike }
         let(:target) do
           {

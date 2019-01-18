@@ -24,7 +24,7 @@ describe FeedbacksController do
               proident, sunt in culpa qui officia deserunt mollit anim id est laborum.'
       }
     end
-    let!(:user) { FactoryGirl.create(:user_confirmed) }
+    let!(:user) { FactoryBot.create(:user_confirmed) }
 
     context 'valid feedback' do
       it 'creates a feedback message' do
@@ -42,7 +42,7 @@ describe FeedbacksController do
         expect(feedback.name).to eq user.name
       end
       context "unconfirmed user" do
-        let(:user) { FactoryGirl.create(:user) }
+        let(:user) { FactoryBot.create(:user) }
         it "does not create, because spam" do
           expect(user.confirmed?).to be_falsey
           set_current_user(user)

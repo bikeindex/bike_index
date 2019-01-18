@@ -61,7 +61,7 @@ describe Bike do
 
   describe 'recovered_records' do
     it 'default scopes to created_at desc' do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       expect(bike.recovered_records.to_sql).to eq(StolenRecord.unscoped.where(bike_id: bike.id, current: false).order('date_recovered desc').to_sql)
     end
   end
@@ -95,8 +95,8 @@ describe Bike do
 
   describe 'owner' do
     it "doesn't break if the owner is deleted" do
-      delete_user = FactoryGirl.create(:user)
-      ownership = FactoryGirl.create(:ownership, user_id: delete_user.id)
+      delete_user = FactoryBot.create(:user)
+      ownership = FactoryBot.create(:ownership, user_id: delete_user.id)
       ownership.mark_claimed
       bike = ownership.bike
       expect(bike.owner).to eq(delete_user)
@@ -220,10 +220,10 @@ describe Bike do
   describe 'authorize_bike_for_user!' do
     let(:bike) { ownership.bike }
     let(:creator) { ownership.creator }
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
     let(:bike) { ownership.bike }
     context 'un-organized' do
-      let(:ownership) { FactoryGirl.create(:ownership) }
+      let(:ownership) { FactoryBot.create(:ownership) }
       context 'no user' do
         it 'returns false' do
           expect(bike.authorize_bike_for_user!(nil)).to be_falsey
@@ -243,7 +243,7 @@ describe Bike do
         it 'returns true'
       end
       context 'can_be_claimed_by' do
-        let(:ownership) { FactoryGirl.create(:ownership, user: user) }
+        let(:ownership) { FactoryBot.create(:ownership, user: user) }
         it 'marks claimed and returns true' do
           expect(ownership.claimed).to be_falsey
           expect(ownership.owner).to eq creator
@@ -255,9 +255,9 @@ describe Bike do
       end
     end
     context 'creation organization' do
-      let(:ownership) { FactoryGirl.create(:organization_ownership) }
+      let(:ownership) { FactoryBot.create(:organization_ownership) }
       let(:organization) { bike.creation_organization }
-      let(:member) { FactoryGirl.create(:organization_member, organization: organization) }
+      let(:member) { FactoryBot.create(:organization_member, organization: organization) }
       before { expect(bike.creation_organization).to eq member.organizations.first }
       context 'unclaimed' do
         context 'member of organization' do
@@ -272,14 +272,14 @@ describe Bike do
         end
       end
       context 'claimed' do
-        let(:ownership) { FactoryGirl.create(:organization_ownership, user: user, claimed: true) }
+        let(:ownership) { FactoryBot.create(:organization_ownership, user: user, claimed: true) }
         it 'returns false' do
           expect(bike.owner).to eq user
           expect(bike.authorize_bike_for_user!(member)).to be_falsey
         end
       end
       context 'more than one ownership' do
-        let!(:ownership_2) { FactoryGirl.create(:organization_ownership, bike: bike, creator: user) }
+        let!(:ownership_2) { FactoryBot.create(:organization_ownership, bike: bike, creator: user) }
         it 'returns false' do
           bike.reload
           expect(bike.owner).to eq user
@@ -317,7 +317,7 @@ describe Bike do
 
   describe 'set_user_hidden' do
     it 'unmarks user hidden, saves ownership and marks self unhidden' do
-      ownership = FactoryGirl.create(:ownership, user_hidden: true)
+      ownership = FactoryBot.create(:ownership, user_hidden: true)
       bike = ownership.bike
       bike.hidden = true
       bike.marked_user_unhidden = true
@@ -327,7 +327,7 @@ describe Bike do
     end
 
     it 'marks updates ownership user hidden, marks self hidden' do
-      ownership = FactoryGirl.create(:ownership)
+      ownership = FactoryBot.create(:ownership)
       bike = ownership.bike
       bike.marked_user_hidden = true
       bike.set_user_hidden
@@ -391,8 +391,8 @@ describe Bike do
 
   describe 'type' do
     it 'returns the cycle type name' do
-      cycle_type = FactoryGirl.create(:cycle_type)
-      bike = FactoryGirl.create(:bike, cycle_type: cycle_type)
+      cycle_type = FactoryBot.create(:cycle_type)
+      bike = FactoryBot.create(:bike, cycle_type: cycle_type)
       expect(bike.type).to eq(cycle_type.name.downcase)
     end
   end
@@ -423,14 +423,14 @@ describe Bike do
 
   describe 'set_mnfg_name' do
     it 'sets a bikes mnfg_name' do
-      manufacturer = FactoryGirl.create(:manufacturer, name: 'SE Racing ( S E Bikes )')
+      manufacturer = FactoryBot.create(:manufacturer, name: 'SE Racing ( S E Bikes )')
       bike = Bike.new
       allow(bike).to receive(:manufacturer).and_return(manufacturer)
       bike.set_mnfg_name
       expect(bike.mnfg_name).to eq('SE Racing')
     end
     it 'sets a bikes mnfg_name' do
-      manufacturer = FactoryGirl.create(:manufacturer, name: 'Other')
+      manufacturer = FactoryBot.create(:manufacturer, name: 'Other')
       bike = Bike.new(manufacturer_other: '<a href="bad_site.js">stuff</a>')
       allow(bike).to receive(:manufacturer).and_return(manufacturer)
       bike.set_mnfg_name
@@ -460,9 +460,9 @@ describe Bike do
 
     context 'confirmed secondary email' do
       it 'sets email to the primary email' do
-        user_email = FactoryGirl.create(:user_email)
+        user_email = FactoryBot.create(:user_email)
         user = user_email.user
-        bike = FactoryGirl.build(:bike, owner_email: user_email.email)
+        bike = FactoryBot.build(:bike, owner_email: user_email.email)
         expect(user.email).to_not eq user_email.email
         expect(bike.owner_email).to eq user_email.email
         bike.normalize_attributes
@@ -472,11 +472,11 @@ describe Bike do
 
     context 'unconfirmed secondary email' do
       it 'sets owner email to primary email' do
-        user_email = FactoryGirl.create(:user_email, confirmation_token: '123456789')
+        user_email = FactoryBot.create(:user_email, confirmation_token: '123456789')
         user = user_email.user
         expect(user_email.unconfirmed).to be_truthy
         expect(user.email).to_not eq user_email.email
-        bike = FactoryGirl.build(:bike, owner_email: user_email.email)
+        bike = FactoryBot.build(:bike, owner_email: user_email.email)
         expect(bike.owner_email).to eq user_email.email
         bike.normalize_attributes
         expect(bike.owner_email).to eq user_email.email
@@ -497,14 +497,14 @@ describe Bike do
 
   describe 'pg search' do
     it 'returns a bike which has a matching part of its description' do
-      @bike = FactoryGirl.create(:bike, description: 'Phil wood hub')
+      @bike = FactoryBot.create(:bike, description: 'Phil wood hub')
       @bikes = Bike.text_search('phil wood hub')
       expect(@bikes).to include(@bike)
     end
 
     it 'returns the bikes in the default scope pattern if there is no query' do
-      bike = FactoryGirl.create(:bike, description: 'Phil wood hub')
-      FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike, description: 'Phil wood hub')
+      FactoryBot.create(:bike)
       bikes = Bike.text_search('')
       expect(bikes.first).to eq(bike)
     end
@@ -519,8 +519,8 @@ describe Bike do
       expect(bike.registration_address).to eq({})
     end
     context "with registration_address" do
-      let!(:b_param) { FactoryGirl.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
-      let(:bike) { FactoryGirl.create(:bike) }
+      let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
+      let(:bike) { FactoryBot.create(:bike) }
       let(:b_param_params) { { bike: { address: "2864 Milwaukee Ave" } } }
       let(:target) { { address: "2864 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60618" } }
       include_context :geocoder_real
@@ -536,7 +536,7 @@ describe Bike do
       end
       context "with multiple b_params" do
         let!(:b_param_params) { { formatted_address: target, bike: { address: "2864 Milwaukee Ave" } } }
-        let!(:b_param2) { FactoryGirl.create(:b_param, created_bike_id: bike.id, params: { bike: { address: "" } }) }
+        let!(:b_param2) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: { bike: { address: "" } }) }
         it "gets the one that has an address, doesn't lookup if formatted_address stored" do
           expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
           bike.reload
@@ -625,21 +625,21 @@ describe Bike do
 
   describe 'set_paints' do
     it 'returns true if paint is a color' do
-      FactoryGirl.create(:color, name: 'Bluety')
+      FactoryBot.create(:color, name: 'Bluety')
       bike = Bike.new
       allow(bike).to receive(:paint_name).and_return(' blueTy')
       expect { bike.set_paints }.not_to change(Paint, :count)
       expect(bike.paint).to be_nil
     end
     it 'removes paint id if paint_name is nil' do
-      paint = FactoryGirl.create(:paint)
+      paint = FactoryBot.create(:paint)
       bike = Bike.new(paint_id: paint.id)
       bike.paint_name = ''
       bike.set_paints
       expect(bike.paint).to be_nil
     end
     it 'sets the paint if it exists' do
-      FactoryGirl.create(:paint, name: 'poopy pile')
+      FactoryBot.create(:paint, name: 'poopy pile')
       bike = Bike.new
       allow(bike).to receive(:paint_name).and_return('Poopy PILE  ')
       expect { bike.set_paints }.not_to change(Paint, :count)
@@ -659,8 +659,8 @@ describe Bike do
   describe 'cache_photo' do
     context 'existing photo' do
       it 'caches the photo' do
-        bike = FactoryGirl.create(:bike)
-        FactoryGirl.create(:public_image, imageable: bike)
+        bike = FactoryBot.create(:bike)
+        FactoryBot.create(:public_image, imageable: bike)
         bike.reload
         bike.cache_photo
         expect(bike.thumb_path).not_to be_nil
@@ -677,8 +677,8 @@ describe Bike do
 
   describe 'components_cache_string' do
     it 'caches the components' do
-      bike = FactoryGirl.create(:bike)
-      c = FactoryGirl.create(:component, bike: bike)
+      bike = FactoryBot.create(:bike)
+      c = FactoryBot.create(:component, bike: bike)
       bike.save
       expect(bike.components_cache_string.to_s).to match(c.ctype.name)
     end
@@ -687,7 +687,7 @@ describe Bike do
   describe 'cache_stolen_attributes' do
     context 'current_stolen_record with lat and long' do
       it 'saves the stolen description to all description and set stolen_rec_id' do
-        stolen_record = FactoryGirl.create(:stolen_record, theft_description: 'some theft description', latitude: 40.7143528, longitude: -74.0059731)
+        stolen_record = FactoryBot.create(:stolen_record, theft_description: 'some theft description', latitude: 40.7143528, longitude: -74.0059731)
         bike = stolen_record.bike
         bike.description = 'I love my bike'
         bike.cache_stolen_attributes
@@ -710,7 +710,7 @@ describe Bike do
 
   describe 'cache_bike' do
     it 'calls cache photo and cache component and erase stolen_rec_id' do
-      bike = FactoryGirl.create(:bike, current_stolen_record_id: 69)
+      bike = FactoryBot.create(:bike, current_stolen_record_id: 69)
       expect(bike).to receive(:cache_photo)
       expect(bike).to receive(:cache_stolen_attributes)
       expect(bike).to receive(:components_cache_string)
@@ -718,13 +718,13 @@ describe Bike do
       expect(bike.current_stolen_record_id).to be_nil
     end
     it 'caches all the bike parts' do
-      type = FactoryGirl.create(:cycle_type, name: 'Unicycle')
-      handlebar = FactoryGirl.create(:handlebar_type)
-      material = FactoryGirl.create(:frame_material)
-      propulsion = FactoryGirl.create(:propulsion_type, name: 'Hand pedaled')
-      wheel_size = FactoryGirl.create(:wheel_size)
-      bike = FactoryGirl.create(:bike, cycle_type: type, propulsion_type_id: propulsion.id, rear_wheel_size: wheel_size)
-      stolen_record = FactoryGirl.create(:stolen_record, bike: bike)
+      type = FactoryBot.create(:cycle_type, name: 'Unicycle')
+      handlebar = FactoryBot.create(:handlebar_type)
+      material = FactoryBot.create(:frame_material)
+      propulsion = FactoryBot.create(:propulsion_type, name: 'Hand pedaled')
+      wheel_size = FactoryBot.create(:wheel_size)
+      bike = FactoryBot.create(:bike, cycle_type: type, propulsion_type_id: propulsion.id, rear_wheel_size: wheel_size)
+      stolen_record = FactoryBot.create(:stolen_record, bike: bike)
       bike.update_attributes(year: 1999, frame_material_id: material.id,
                              secondary_frame_color_id: bike.primary_frame_color_id,
                              tertiary_frame_color_id: bike.primary_frame_color_id,
@@ -798,7 +798,7 @@ describe Bike do
     end
 
     it 'does not get out of integer errors' do
-      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record = FactoryBot.create(:stolen_record)
       bike = stolen_record.bike
       digits = (Time.now.year - 1).to_s[2, 3] # last two digits of last year
       problem_date = Date.strptime("#{Time.now.month}-22-00#{digits}", "%m-%d-%Y")
@@ -822,7 +822,7 @@ describe Bike do
   describe 'validated_organization_id' do
     let(:bike) { Bike.new }
     context 'valid organization' do
-      let(:organization) { FactoryGirl.create(:organization) }
+      let(:organization) { FactoryBot.create(:organization) }
       context 'slug' do
         it 'returns true' do
           expect(bike.validated_organization_id(organization.slug)).to eq organization.id
@@ -835,7 +835,7 @@ describe Bike do
       end
     end
     context 'suspended organization' do
-      let(:organization) { FactoryGirl.create(:organization, is_suspended: true) }
+      let(:organization) { FactoryBot.create(:organization, is_suspended: true) }
       it 'adds an error to the bike' do
         expect(bike.validated_organization_id(organization.id)).to be_nil
       end
@@ -850,10 +850,10 @@ describe Bike do
   end
 
   describe 'assignment of bike_organization_ids' do
-    let(:bike) { FactoryGirl.create(:organization_bike) }
+    let(:bike) { FactoryBot.create(:organization_bike) }
     let(:organization) { bike.organizations.first }
     let(:bike_organization) { bike.bike_organizations.first }
-    let(:organization_2) { FactoryGirl.create(:organization) }
+    let(:organization_2) { FactoryBot.create(:organization) }
     before { expect(bike.bike_organization_ids).to eq([organization.id]) }
     context 'no organization_ids' do
       it 'removes bike organizations' do
@@ -869,7 +869,7 @@ describe Bike do
       end
     end
     context 'invalid organization_id' do
-      let(:organization_invalid) { FactoryGirl.create(:organization, is_suspended: true) }
+      let(:organization_invalid) { FactoryBot.create(:organization, is_suspended: true) }
       it 'adds valid organization but not invalid one' do
         bike.bike_organization_ids = [organization.id, organization_2.id, organization_invalid.id]
         expect(bike.bike_organization_ids).to eq([organization.id, organization_2.id])

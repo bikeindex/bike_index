@@ -19,7 +19,7 @@ describe "Me API V3" do
 
     context "fully scoped token" do
       let(:scopes) { all_scopes }
-      let!(:secondary_email) { FactoryGirl.create(:user_email, user: user, email: "d@f.co") }
+      let!(:secondary_email) { FactoryBot.create(:user_email, user: user, email: "d@f.co") }
       it "responds with all available attributes with full scoped token" do
         user.reload
         expect(user.secondary_emails).to eq(["d@f.co"])
@@ -37,7 +37,7 @@ describe "Me API V3" do
 
     context "unconfirmed user" do
       let(:time) { Time.now - 1.month }
-      let(:user) { FactoryGirl.create(:user, created_at: time) }
+      let(:user) { FactoryBot.create(:user, created_at: time) }
       it "responds with unauthorized" do
         user.reload
         expect(user.confirmed?).to be_falsey

@@ -3,7 +3,7 @@ require 'spec_helper'
 describe StolenRecordUpdator do
   describe 'create_new_record' do
     it 'creates a new stolen record' do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
       expect { update_stolen_record.create_new_record }.to change(StolenRecord, :count).by(1)
       expect(bike.stolen_records.count).to eq(1)
@@ -11,7 +11,7 @@ describe StolenRecordUpdator do
     end
 
     it 'calls mark_records_not_current' do
-      bike = FactoryGirl.create(:bike, stolen: true)
+      bike = FactoryBot.create(:bike, stolen: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
       expect(update_stolen_record).to receive(:mark_records_not_current)
       update_stolen_record.create_new_record
@@ -20,21 +20,21 @@ describe StolenRecordUpdator do
 
   describe 'update_records' do
     it "sets the current stolen record as not current if the bike isn't stolen" do
-      bike = FactoryGirl.create(:bike, stolen: true)
+      bike = FactoryBot.create(:bike, stolen: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
       expect(update_stolen_record).to receive(:mark_records_not_current)
       update_stolen_record.update_records
     end
 
     it "calls create if a stolen record doesn't exist" do
-      bike = FactoryGirl.create(:bike, stolen: true)
+      bike = FactoryBot.create(:bike, stolen: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
       expect(update_stolen_record).to receive(:create_new_record)
       update_stolen_record.update_records
     end
 
     it 'sets the date if date_stolen is present' do
-      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record = FactoryBot.create(:stolen_record)
       bike = stolen_record.bike
       bike.update_attributes(stolen: true)
       time = DateTime.strptime('01-01-1969 06', '%m-%d-%Y %H').end_of_day
@@ -43,7 +43,7 @@ describe StolenRecordUpdator do
     end
 
     it "marks all stolen records false and mark the bike unrecovered if the bike isn't stolen" do
-      bike = FactoryGirl.create(:bike, stolen: false, recovered: true)
+      bike = FactoryBot.create(:bike, stolen: false, recovered: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
       expect(update_stolen_record).to receive(:mark_records_not_current)
       update_stolen_record.update_records
@@ -53,11 +53,11 @@ describe StolenRecordUpdator do
 
   describe 'mark_records_not_current' do
     it 'marks all the records not current' do
-      bike = FactoryGirl.create(:bike)
-      stolen_record1 = FactoryGirl.create(:stolen_record, bike: bike)
+      bike = FactoryBot.create(:bike)
+      stolen_record1 = FactoryBot.create(:stolen_record, bike: bike)
       bike.save
       expect(bike.current_stolen_record_id).to eq(stolen_record1.id)
-      stolen_record2 = FactoryGirl.create(:stolen_record, bike: bike)
+      stolen_record2 = FactoryBot.create(:stolen_record, bike: bike)
       stolen_record1.update_attributes(current: true)
       stolen_record2.update_attributes(current: true)
       StolenRecordUpdator.new(bike: bike).mark_records_not_current
@@ -103,8 +103,8 @@ describe StolenRecordUpdator do
     end
 
     it "creates the associations that it's suppose to" do
-      country = FactoryGirl.create(:country)
-      state = FactoryGirl.create(:state, country: country)
+      country = FactoryBot.create(:country)
+      state = FactoryBot.create(:state, country: country)
       sr = {
         state: state.abbreviation,
         country: country.iso

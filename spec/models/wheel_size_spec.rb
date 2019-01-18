@@ -22,7 +22,7 @@ describe WheelSize do
   describe 'find_id_by_iso_bsd' do
     context 'string iso_bsd' do
       it 'returns the id' do
-        wheel_size = FactoryGirl.create(:wheel_size, iso_bsd: 622)
+        wheel_size = FactoryBot.create(:wheel_size, iso_bsd: 622)
         expect(WheelSize.id_for_bsd("\n622 ")).to eq wheel_size.id
       end
     end

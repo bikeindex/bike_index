@@ -22,9 +22,9 @@ describe BikeSearcher do
 
   describe 'search selectize options' do
     it 'returns the selectized items if passed through the expected things' do
-      manufacturer = FactoryGirl.create(:manufacturer)
-      color_1 = FactoryGirl.create(:color)
-      color_2 = FactoryGirl.create(:color)
+      manufacturer = FactoryBot.create(:manufacturer)
+      color_1 = FactoryBot.create(:color)
+      color_2 = FactoryBot.create(:color)
       params = { query: "c_#{color_1.id},c_#{color_2.id}%2Cm_#{manufacturer.id}%2Csomething+cool%2Cs%238xcvxcvcx%23" }
       searcher = BikeSearcher.new(params)
       searcher.matching_manufacturer(Bike.all)
@@ -62,22 +62,22 @@ describe BikeSearcher do
 
   describe 'matching_serial' do
     it 'finds matching bikes' do
-      bike = FactoryGirl.create(:bike, serial_number: 'st00d-ffer')
+      bike = FactoryBot.create(:bike, serial_number: 'st00d-ffer')
       search = BikeSearcher.new(serial: 'STood ffer')
       expect(search.matching_serial.first).to eq(bike)
     end
     it 'finds matching bikes' do
-      bike = FactoryGirl.create(:bike, serial_number: 'st00d-ffer')
+      bike = FactoryBot.create(:bike, serial_number: 'st00d-ffer')
       search = BikeSearcher.new(serial: 'STood')
       expect(search.matching_serial.first).to eq(bike)
     end
     it 'finds bikes with absent serials' do
-      bike = FactoryGirl.create(:bike, serial_number: 'absent')
+      bike = FactoryBot.create(:bike, serial_number: 'absent')
       search = BikeSearcher.new(serial: 'absent')
       expect(search.matching_serial.first).to eq(bike)
     end
     it 'fulls text search' do
-      bike = FactoryGirl.create(:bike, serial_number: 'K10DY00047-bkd')
+      bike = FactoryBot.create(:bike, serial_number: 'K10DY00047-bkd')
       search = BikeSearcher.new(serial: 'bkd-K1oDYooo47')
       expect(search.matching_serial.first).to eq(bike)
     end
@@ -85,23 +85,23 @@ describe BikeSearcher do
 
   describe 'matching_manufacturer' do
     it 'finds matching bikes from manufacturer without id' do
-      manufacturer = FactoryGirl.create(:manufacturer, name: 'Special bikes co.')
-      bike = FactoryGirl.create(:bike, manufacturer: manufacturer)
-      bike2 = FactoryGirl.create(:bike)
+      manufacturer = FactoryBot.create(:manufacturer, name: 'Special bikes co.')
+      bike = FactoryBot.create(:bike, manufacturer: manufacturer)
+      bike2 = FactoryBot.create(:bike)
       search = BikeSearcher.new(manufacturer: 'Special', query: '')
       expect(search.matching_manufacturer(Bike.all).first).to eq(bike)
       expect(search.matching_manufacturer(Bike.all).pluck(:id).include?(bike2.id)).to be_falsey
     end
 
     it "does not return any bikes if we can't find the manufacturer" do
-      manufacturer = FactoryGirl.create(:manufacturer, name: 'Special bikes co.')
-      bike = FactoryGirl.create(:bike, manufacturer: manufacturer)
+      manufacturer = FactoryBot.create(:manufacturer, name: 'Special bikes co.')
+      bike = FactoryBot.create(:bike, manufacturer: manufacturer)
       search = BikeSearcher.new(manufacturer: '69696969', query: '')
       expect(search.matching_manufacturer(Bike.all).count).to eq(0)
     end
 
     it 'finds matching bikes' do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       search = BikeSearcher.new(manufacturer_id: bike.manufacturer_id, query: 'something')
       expect(search.matching_manufacturer(Bike.all).first).to eq(bike)
     end
@@ -109,9 +109,9 @@ describe BikeSearcher do
 
   describe 'matching_colors' do
     it 'finds matching colors' do
-      color = FactoryGirl.create(:color)
-      bike = FactoryGirl.create(:bike, tertiary_frame_color_id: color.id)
-      FactoryGirl.create(:bike)
+      color = FactoryBot.create(:color)
+      bike = FactoryBot.create(:bike, tertiary_frame_color_id: color.id)
+      FactoryBot.create(:bike)
       search = BikeSearcher.new(colors: "something, #{color.name}").matching_colors(Bike.all)
       expect(search.count).to eq(1)
       expect(search.first).to eq(bike)
@@ -120,7 +120,7 @@ describe BikeSearcher do
 
   describe 'fuzzy_find_serial' do
     it 'finds matching serial segments' do
-      bike = FactoryGirl.create(:bike, serial_number: 'st00d-fferd')
+      bike = FactoryBot.create(:bike, serial_number: 'st00d-fferd')
       bike.create_normalized_serial_segments
       bike.normalized_serial_segments
       search = BikeSearcher.new(serial: 'fferds')
@@ -129,7 +129,7 @@ describe BikeSearcher do
       expect(result.count).to eq(1)
     end
     it "doesn't find exact matches" do
-      bike = FactoryGirl.create(:bike, serial_number: 'K10DY00047-bkd')
+      bike = FactoryBot.create(:bike, serial_number: 'K10DY00047-bkd')
       search = BikeSearcher.new(serial: 'bkd-K1oDYooo47')
       expect(search.fuzzy_find_serial).to be_empty
     end
@@ -137,8 +137,8 @@ describe BikeSearcher do
 
   describe 'matching_stolenness' do
     before :each do
-      @non_stolen = FactoryGirl.create(:bike)
-      @stolen = FactoryGirl.create(:bike, stolen: true)
+      @non_stolen = FactoryBot.create(:bike)
+      @stolen = FactoryBot.create(:bike, stolen: true)
     end
     it "selects only stolen bikes if non-stolen isn't selected" do
       search = BikeSearcher.new(stolen: 'on')

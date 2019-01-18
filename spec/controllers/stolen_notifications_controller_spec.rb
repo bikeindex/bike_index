@@ -1,10 +1,10 @@
 require "spec_helper"
 
 describe StolenNotificationsController do
-  let(:user) { FactoryGirl.create(:user_confirmed) }
-  let(:bike) { FactoryGirl.create(:bike) }
-  let(:user2) { FactoryGirl.create(:user) }
-  let!(:ownership) { FactoryGirl.create(:ownership_claimed, user: user2, bike: bike) }
+  let(:user) { FactoryBot.create(:user_confirmed) }
+  let(:bike) { FactoryBot.create(:bike) }
+  let(:user2) { FactoryBot.create(:user) }
+  let!(:ownership) { FactoryBot.create(:ownership_claimed, user: user2, bike: bike) }
   let(:stolen_notification_attributes) do
     {
       bike_id: bike.id,

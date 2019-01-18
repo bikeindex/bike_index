@@ -32,7 +32,7 @@ describe RecoveryDisplay do
     end
     it 'sets attrs from stolen record' do
       t = Time.now
-      stolen_record = FactoryGirl.create(:stolen_record, date_recovered: t, recovered_description: 'stuff', current: false)
+      stolen_record = FactoryBot.create(:stolen_record, date_recovered: t, recovered_description: 'stuff', current: false)
       recovery_display = RecoveryDisplay.new
       recovery_display.from_stolen_record(stolen_record.id)
       expect(recovery_display.quote).to eq('stuff')
@@ -40,9 +40,9 @@ describe RecoveryDisplay do
       expect(recovery_display.stolen_record_id).to eq(stolen_record.id)
     end
     it 'sets name from stolen record' do
-      user = FactoryGirl.create(:user, name: 'somebody special')
-      ownership = FactoryGirl.create(:ownership, creator: user, user: user)
-      stolen_record = FactoryGirl.create(:stolen_record, bike: ownership.bike)
+      user = FactoryBot.create(:user, name: 'somebody special')
+      ownership = FactoryBot.create(:ownership, creator: user, user: user)
+      stolen_record = FactoryBot.create(:stolen_record, bike: ownership.bike)
       recovery_display = RecoveryDisplay.new
       recovery_display.from_stolen_record(stolen_record.id)
       expect(recovery_display.quote_by).to eq('somebody special')

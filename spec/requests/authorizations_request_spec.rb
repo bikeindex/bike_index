@@ -24,7 +24,7 @@ describe "Oauth::AuthorizationsController" do
   end
 
   context "current user present" do
-    let!(:user_subject) { FactoryGirl.create(:user_confirmed) }
+    let!(:user_subject) { FactoryBot.create(:user_confirmed) }
     # Stubbing finding user via cookies because I'm not sure how to set cookies in request spec right now :/
     # TODO: Rails 5 update maybe...
     before { allow(User).to receive(:from_auth) { user_subject } } # Stubbing user lookup
@@ -47,7 +47,7 @@ describe "Oauth::AuthorizationsController" do
     end
 
     context "unconfirmed user" do
-      let!(:user_subject) { FactoryGirl.create(:user) }
+      let!(:user_subject) { FactoryBot.create(:user) }
       it "redirects" do
         get authorization_url
         # This will redirect to please_confirm_email_users_path after new_session realizes an unconfirmed user is present

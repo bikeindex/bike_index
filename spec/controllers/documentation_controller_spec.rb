@@ -12,9 +12,9 @@ describe DocumentationController do
   describe 'api_v1' do
     context 'developer user' do
       it 'renders' do
-        user = FactoryGirl.create(:developer)
+        user = FactoryBot.create(:developer)
         set_current_user(user)
-        FactoryGirl.create(:organization, name: 'Example organization') # Required because I'm an idiot
+        FactoryBot.create(:organization, name: 'Example organization') # Required because I'm an idiot
         get :api_v1
         expect(response.code).to eq('200')
         expect(response).to render_template('api_v1')
@@ -23,7 +23,7 @@ describe DocumentationController do
     end
     context 'user' do
       it 'redirects to home, message API deprecated' do
-        user = FactoryGirl.create(:user_confirmed)
+        user = FactoryBot.create(:user_confirmed)
         set_current_user(user)
         get :api_v1
         expect(response).to redirect_to documentation_index_path

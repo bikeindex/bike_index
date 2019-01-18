@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   sequence :unique_email do |n|
     "user#{n}s@bikeiasdndex.org"
   end
@@ -24,67 +24,67 @@ FactoryGirl.define do
   end
 
   factory :cycle_type do
-    name { FactoryGirl.generate(:unique_name) }
-    slug { FactoryGirl.generate(:unique_name) }
+    name { FactoryBot.generate(:unique_name) }
+    slug { FactoryBot.generate(:unique_name) }
   end
 
   factory :manufacturer do
-    name { FactoryGirl.generate(:unique_name) }
+    name { FactoryBot.generate(:unique_name) }
     frame_maker true
   end
 
   factory :frame_material do
-    name { FactoryGirl.generate(:unique_name) }
-    slug { FactoryGirl.generate(:unique_name) }
+    name { FactoryBot.generate(:unique_name) }
+    slug { FactoryBot.generate(:unique_name) }
   end
 
   factory :propulsion_type do
-    name { FactoryGirl.generate(:unique_name) }
+    name { FactoryBot.generate(:unique_name) }
   end
 
   factory :front_gear_type do
-    name { FactoryGirl.generate(:unique_name) }
+    name { FactoryBot.generate(:unique_name) }
     count 1
   end
 
   factory :rear_gear_type do
-    name { FactoryGirl.generate(:unique_name) }
+    name { FactoryBot.generate(:unique_name) }
     count 1
   end
 
   factory :wheel_size do
-    name { FactoryGirl.generate(:unique_name) }
-    iso_bsd { FactoryGirl.generate(:unique_iso) }
+    name { FactoryBot.generate(:unique_name) }
+    iso_bsd { FactoryBot.generate(:unique_iso) }
     priority 1
-    description { FactoryGirl.generate(:unique_name) }
+    description { FactoryBot.generate(:unique_name) }
   end
 
   factory :handlebar_type do
-    name { FactoryGirl.generate(:unique_name) }
-    slug { FactoryGirl.generate(:unique_name).downcase }
+    name { FactoryBot.generate(:unique_name) }
+    slug { FactoryBot.generate(:unique_name).downcase }
   end
 
   factory :color do
-    name { FactoryGirl.generate(:unique_name) }
+    name { FactoryBot.generate(:unique_name) }
     priority 1
   end
 
   factory :paint do
-    name { FactoryGirl.generate(:unique_name) }
+    name { FactoryBot.generate(:unique_name) }
   end
 
   factory :cgroup do
-    name { FactoryGirl.generate(:unique_name) }
+    name { FactoryBot.generate(:unique_name) }
   end
 
   factory :ctype do
     sequence(:name) { |n| "Component type#{n}" }
-    cgroup { FactoryGirl.create(:cgroup) }
+    cgroup { FactoryBot.create(:cgroup) }
   end
 
   factory :component do
-    bike { FactoryGirl.create(:bike) }
-    ctype { FactoryGirl.create(:ctype) }
+    bike { FactoryBot.create(:bike) }
+    ctype { FactoryBot.create(:ctype) }
   end
 
   factory :country do
@@ -94,31 +94,31 @@ FactoryGirl.define do
 
   factory :state do
     name
-    country { FactoryGirl.create(:country) }
+    country { FactoryBot.create(:country) }
     sequence(:abbreviation) { |n| "Q#{n}" }
   end
 
   factory :lock_type do
-    name { FactoryGirl.generate(:unique_name) }
+    name { FactoryBot.generate(:unique_name) }
   end
 
   factory :lock do
-    user { FactoryGirl.create(:user) }
-    manufacturer { FactoryGirl.create(:manufacturer) }
-    lock_type { FactoryGirl.create(:lock_type) }
+    user { FactoryBot.create(:user) }
+    manufacturer { FactoryBot.create(:manufacturer) }
+    lock_type { FactoryBot.create(:lock_type) }
   end
 
   factory :organization_invitation do
-    inviter { FactoryGirl.create(:user) }
-    organization { FactoryGirl.create(:organization) }
+    inviter { FactoryBot.create(:user) }
+    organization { FactoryBot.create(:organization) }
     invitee_email 'mike@test.com'
   end
 
   factory :membership do
     role 'member'
     factory :existing_membership do
-      user { FactoryGirl.create(:user) }
-      organization { FactoryGirl.create(:organization) }
+      user { FactoryBot.create(:user) }
+      organization { FactoryBot.create(:organization) }
     end
   end
 
@@ -128,7 +128,7 @@ FactoryGirl.define do
 
   factory :public_image do |u|
     u.image { File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg')) }
-    imageable { FactoryGirl.create(:bike) }
+    imageable { FactoryBot.create(:bike) }
   end
 
   factory :blog do
@@ -145,15 +145,15 @@ FactoryGirl.define do
   end
 
   factory :stolen_notification do
-    sender { FactoryGirl.create(:user) }
-    receiver { FactoryGirl.create(:user) }
-    bike { FactoryGirl.create(:bike) }
+    sender { FactoryBot.create(:user) }
+    receiver { FactoryBot.create(:user) }
+    bike { FactoryBot.create(:bike) }
     message 'This is a test email.'
   end
 
   factory :customer_contact do
-    creator { FactoryGirl.create(:user) }
-    bike { FactoryGirl.create(:bike) }
+    creator { FactoryBot.create(:user) }
+    bike { FactoryBot.create(:bike) }
     title 'Some title'
     body 'some message'
     creator_email 'something@example.com'

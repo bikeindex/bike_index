@@ -4,7 +4,7 @@ describe EmailLightspeedNotificationWorker do
   it { is_expected.to be_processed_in :notify }
 
   it 'sends an email' do
-    organization = FactoryGirl.create(:organization)
+    organization = FactoryBot.create(:organization)
     api_key = 'some key or something'
     ActionMailer::Base.deliveries = []
     EmailLightspeedNotificationWorker.new.perform(organization.id, api_key)

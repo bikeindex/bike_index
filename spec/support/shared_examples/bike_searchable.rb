@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 RSpec.shared_examples 'bike_searchable' do
-  let(:manufacturer) { FactoryGirl.create(:manufacturer) }
-  let(:color) { FactoryGirl.create(:color) }
+  let(:manufacturer) { FactoryBot.create(:manufacturer) }
+  let(:color) { FactoryBot.create(:color) }
   let(:multi_query_items) { [manufacturer.search_id, color.search_id, 'some other string', 'another string'] }
   let(:ip_address) { '127.0.0.1' }
   let(:interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: ip_address) }
@@ -31,8 +31,8 @@ RSpec.shared_examples 'bike_searchable' do
       end
     end
     context 'multiple manufacturer_id and color_ids' do
-      let(:manufacturer_2) { FactoryGirl.create(:manufacturer) }
-      let(:color_2) { FactoryGirl.create(:color) }
+      let(:manufacturer_2) { FactoryBot.create(:manufacturer) }
+      let(:color_2) { FactoryBot.create(:color) }
       let(:target) do
         {
           manufacturer: [manufacturer.id, manufacturer_2.id],
@@ -210,10 +210,10 @@ RSpec.shared_examples 'bike_searchable' do
   end
   describe 'search' do
     context 'color_ids of primary, secondary and tertiary' do
-      let(:color_2) { FactoryGirl.create(:color) }
-      let(:bike_1) { FactoryGirl.create(:bike, primary_frame_color: color) }
-      let(:bike_2) { FactoryGirl.create(:bike, secondary_frame_color: color, tertiary_frame_color: color_2) }
-      let(:bike_3) { FactoryGirl.create(:bike, tertiary_frame_color: color, manufacturer: manufacturer) }
+      let(:color_2) { FactoryBot.create(:color) }
+      let(:bike_1) { FactoryBot.create(:bike, primary_frame_color: color) }
+      let(:bike_2) { FactoryBot.create(:bike, secondary_frame_color: color, tertiary_frame_color: color_2) }
+      let(:bike_3) { FactoryBot.create(:bike, tertiary_frame_color: color, manufacturer: manufacturer) }
       let(:all_color_ids) do
         [
           bike_1.primary_frame_color_id,
@@ -254,7 +254,7 @@ RSpec.shared_examples 'bike_searchable' do
         expect(bike).to be_present
       end
       context 'stood-ffer' do
-        let(:bike) { FactoryGirl.create(:bike, serial_number: 'st00d-ffer') }
+        let(:bike) { FactoryBot.create(:bike, serial_number: 'st00d-ffer') }
         context 'full homoglyph match' do
           let(:query_params) { { serial: 'STood ffer', stolenness: 'all' } }
           it 'finds matching bikes' do
@@ -269,7 +269,7 @@ RSpec.shared_examples 'bike_searchable' do
         end
       end
       context 'reversed serial' do
-        let(:bike) { FactoryGirl.create(:bike, serial_number: 'K10DY00047-bkd') }
+        let(:bike) { FactoryBot.create(:bike, serial_number: 'K10DY00047-bkd') }
         let(:query_params) { { serial: 'bkd-K1oDYooo47', stolenness: 'all' } }
         it 'fulls text search' do
           expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
@@ -277,8 +277,8 @@ RSpec.shared_examples 'bike_searchable' do
       end
     end
     context 'query' do
-      let(:bike) { FactoryGirl.create(:bike, description: 'Booger') }
-      let(:bike_2) { FactoryGirl.create(:bike) }
+      let(:bike) { FactoryBot.create(:bike, description: 'Booger') }
+      let(:bike_2) { FactoryBot.create(:bike) }
       let(:query_params) { { query: 'booger', stolenness: 'all' } }
       before do
         expect([bike, bike_2].size).to eq 2
@@ -289,8 +289,8 @@ RSpec.shared_examples 'bike_searchable' do
     end
     context 'stolenness' do
       context 'non-proximity' do
-        let(:stolen_bike) { FactoryGirl.create(:stolen_bike) }
-        let(:non_stolen_bike) { FactoryGirl.create(:bike) }
+        let(:stolen_bike) { FactoryBot.create(:stolen_bike) }
+        let(:non_stolen_bike) { FactoryBot.create(:bike) }
         before do
           expect([stolen_bike, non_stolen_bike].size).to eq 2
         end
@@ -318,9 +318,9 @@ RSpec.shared_examples 'bike_searchable' do
       end
       context 'proximity' do
         include_context :geocoder_default_location
-        let(:bike_1) { FactoryGirl.create(:stolen_bike, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
+        let(:bike_1) { FactoryBot.create(:stolen_bike, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
         let(:stolen_record_1) { bike_1.find_current_stolen_record }
-        let(:bike_2) { FactoryGirl.create(:stolen_bike, latitude: 41.8961603, longitude: -87.677215) }
+        let(:bike_2) { FactoryBot.create(:stolen_bike, latitude: 41.8961603, longitude: -87.677215) }
         let(:stolen_record_2) { bike_2.find_current_stolen_record }
         let(:query_params) { { stolenness: 'proximity', location: 'New York, NY', distance: 200 } }
         before do
@@ -335,8 +335,8 @@ RSpec.shared_examples 'bike_searchable' do
       context 'organization bike' do
         let(:interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: 'd') }
 
-        let(:bike_1) { FactoryGirl.create(:bike) }
-        let(:bike_2) { FactoryGirl.create(:organization_bike) }
+        let(:bike_1) { FactoryBot.create(:bike) }
+        let(:bike_2) { FactoryBot.create(:organization_bike) }
         let(:organization) { bike_2.organizations.first }
         let(:query_params) { { stolenness: 'all' } }
         before do
@@ -351,8 +351,8 @@ RSpec.shared_examples 'bike_searchable' do
   end
 
   describe 'search_close_serials' do
-    let(:stolen_bike) { FactoryGirl.create(:stolen_bike, serial_number: 'O|ILSZB-111JJJG8', manufacturer: manufacturer) }
-    let(:non_stolen_bike) { FactoryGirl.create(:bike, serial_number: 'O|ILSZB-111JJJJJ') }
+    let(:stolen_bike) { FactoryBot.create(:stolen_bike, serial_number: 'O|ILSZB-111JJJG8', manufacturer: manufacturer) }
+    let(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: 'O|ILSZB-111JJJJJ') }
     before do
       expect([non_stolen_bike, stolen_bike].size).to eq 2
     end
@@ -381,10 +381,10 @@ RSpec.shared_examples 'bike_searchable' do
       end
     end
     context 'close serial on organization bikes' do
-      let(:organization) { FactoryGirl.create(:organization) }
+      let(:organization) { FactoryBot.create(:organization) }
       let(:query_params) { { serial: '011I528-111JJJk', stolenness: 'all' } }
       before do
-        FactoryGirl.create(:bike_organization, bike: stolen_bike, organization: organization)
+        FactoryBot.create(:bike_organization, bike: stolen_bike, organization: organization)
         stolen_bike.update_attribute :creation_organization_id, organization.id
         expect(organization.bikes.pluck(:id)).to eq([stolen_bike.id])
       end
