@@ -4,15 +4,6 @@ class User < ActiveRecord::Base
 
   has_secure_password
 
-  def self.old_attr_accessible
-    # :email, # Also maybe a all_emails field for searching.. 
-    %w(name username email password password_confirmation current_password terms_of_service
-       vendor_terms_of_service when_vendor_terms_of_service phone zipcode title my_bikes_hash
-       avatar avatar_cache description twitter show_twitter website show_website show_bikes
-       show_phone can_send_many_stolen_notifications my_bikes_link_target
-       my_bikes_link_title is_emailable additional_emails).map(&:to_sym).freeze
- end
-
   attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password
   # stripe_id, is_paid_member, paid_membership_info
 
@@ -47,6 +38,12 @@ class User < ActiveRecord::Base
 
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
+
+  geocoded_by :address
+  after_validation :geocode, if: ->(obj) do
+    (obj.city.present? || obj.zipcode.present? || obj.street.present?) &&
+      (obj.city_changed? || obj.zipcode_changed? || obj.street_changed?)
+  end
 
   validates_uniqueness_of :username, case_sensitive: false
   def to_param
@@ -286,6 +283,19 @@ class User < ActiveRecord::Base
       ""
     end
   end
+
+  def address(skip_default_country: false)
+    country_string = country&.iso
+    country_string = nil if skip_default_country && country_string == "US"
+    [
+      street,
+      city,
+      (state&.abbreviation),
+      zipcode,
+      country_string
+    ].reject(&:blank?).join(', ')
+  end
+
 
   def generate_auth_token
     begin

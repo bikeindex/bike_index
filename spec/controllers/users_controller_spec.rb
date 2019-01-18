@@ -468,7 +468,7 @@ describe UsersController do
                       current_password: 'old_pass',
                       password: 'new_pass',
                       name: 'Mr. Slick',
-                      password_confirmation: 'new_pass'
+                      password_confirmation: 'new_pass',
                     }
       expect(response).to redirect_to(my_account_url)
       expect(flash[:error]).to_not be_present
@@ -478,6 +478,37 @@ describe UsersController do
       expect(user.password_reset_token).not_to eq('stuff')
       expect(user.name).to eq('Mr. Slick')
       expect(cookies.signed[:auth][1]).to eq(user.auth_token)
+    end
+
+    context "setting address" do
+      let(:country) { Country.united_states }
+      let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
+      include_context :geocoder_default_location
+      it "sets address, geocodes" do
+        set_current_user(user)
+        expect(user.is_emailable).to be_falsey
+        post :update, id: user.username,
+                      user: {
+                        name: "Mr. Slick",
+                        country_id: country.id,
+                        state_id: state.id,
+                        city: "New York",
+                        street: "278 Broadway",
+                        zipcode: "10007",
+                        is_emailable: "1"
+                      }
+        expect(response).to redirect_to(my_account_url)
+        expect(flash[:error]).to_not be_present
+        user.reload
+        expect(user.name).to eq("Mr. Slick")
+        expect(user.country).to eq country
+        expect(user.state).to eq state
+        expect(user.street).to eq "278 Broadway"
+        expect(user.zipcode).to eq "10007"
+        expect(user.is_emailable).to be_truthy
+        expect(user.latitude).to eq default_location[:latitude]
+        expect(user.longitude).to eq default_location[:longitude]
+      end
     end
 
     it 'updates the terms of service' do
