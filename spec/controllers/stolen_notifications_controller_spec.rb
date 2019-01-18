@@ -1,45 +1,41 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe StolenNotificationsController do
-  before :each do
-    @user = FactoryGirl.create(:user_confirmed)
-    @user2 = FactoryGirl.create(:user_confirmed, name: 'User2')
-    @bike = FactoryGirl.create(:bike)
-    @ownership = FactoryGirl.create(:ownership, user: @user, bike: @bike, current: true)
+  let(:user) { FactoryGirl.create(:user_confirmed) }
+  let(:bike) { FactoryGirl.create(:bike) }
+  let(:user2) { FactoryGirl.create(:user) }
+  let!(:ownership) { FactoryGirl.create(:ownership_claimed, user: user2, bike: bike) }
+  let(:stolen_notification_attributes) do
+    {
+      bike_id: bike.id,
+      message: "I saw this bike on the street!",
+      reference_url: "https://party.com"
+    }
   end
-  describe 'create' do
-    describe 'success' do
-      let(:stolen_notification_attributes) do
-        stolen_notification = FactoryGirl.attributes_for(:stolen_notification)
-        stolen_notification[:bike_id] = @bike.id
-        stolen_notification
-      end
 
-      it 'creates a Stolen Notification record' do
-        set_current_user(@user)
-        expect do
-          post :create, stolen_notification: stolen_notification_attributes
-        end.to change(StolenNotification, :count).by(1)
-      end
-
-      it 'enqueues the stolen notification email job' do
-        set_current_user(@user)
-        expect do
-          post :create, stolen_notification: stolen_notification_attributes
-        end.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
-      end
+  describe "create" do
+    it "fails without user logged in" do
+      expect do
+        post :create, stolen_notification: stolen_notification_attributes
+      end.not_to change(StolenNotification, :count)
     end
 
-    describe 'failure' do
-      let(:stolen_notification_attributes) do
-        stolen_notification = FactoryGirl.attributes_for(:stolen_notification, receiver: nil, bike: @bike)
-        stolen_notification
-      end
-
-      it 'does not work unless there is a user logged in' do
+    describe "user logged in" do
+      it "creates a Stolen Notification record" do
+        set_current_user(user)
+        bike.reload
+        expect(bike.owner.id).to eq user2.id
         expect do
-          post :create, stolen_notification: stolen_notification_attributes
-        end.not_to change(StolenNotification, :count)
+          expect do
+            post :create, stolen_notification: stolen_notification_attributes
+          end.to change(StolenNotification, :count).by(1)
+        end.to change(EmailStolenNotificationWorker.jobs, :count).by(1)
+        stolen_notification = StolenNotification.last
+        expect(stolen_notification.bike).to eq bike
+        expect(stolen_notification.sender_id).to eq user.id
+        expect(stolen_notification.receiver_id).to eq user2.id
+        expect(stolen_notification.message).to eq stolen_notification_attributes[:message]
+        expect(stolen_notification.reference_url).to eq stolen_notification_attributes[:reference_url]
       end
     end
   end

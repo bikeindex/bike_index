@@ -22,11 +22,17 @@ describe Ownership do
     end
   end
 
-  describe 'mark_claimed' do
-    it 'associates with a user' do
-      o = FactoryGirl.create(:ownership)
-      o.mark_claimed
-      expect(o.claimed).to be_truthy
+  describe "mark_claimed" do
+    it "associates with a user" do
+      ownership = FactoryGirl.create(:ownership)
+      ownership.mark_claimed
+      expect(ownership.claimed?).to be_truthy
+    end
+    context "factory ownership_claimed" do
+      let!(:ownership) { FactoryGirl.create(:ownership_claimed) }
+      it "is claimed" do
+        expect(ownership.claimed?).to be_truthy
+      end
     end
   end
 
