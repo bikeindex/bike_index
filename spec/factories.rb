@@ -79,12 +79,12 @@ FactoryGirl.define do
 
   factory :ctype do
     sequence(:name) { |n| "Component type#{n}" }
-    association :cgroup
+    cgroup { FactoryGirl.create(:cgroup) }
   end
 
   factory :component do
-    association :bike, factory: :bike
-    association :ctype
+    bike { FactoryGirl.create(:bike) }
+    ctype { FactoryGirl.create(:ctype) }
   end
 
   factory :country do
@@ -94,7 +94,7 @@ FactoryGirl.define do
 
   factory :state do
     name
-    association :country
+    country { FactoryGirl.create(:country) }
     sequence(:abbreviation) { |n| "Q#{n}" }
   end
 
@@ -103,22 +103,22 @@ FactoryGirl.define do
   end
 
   factory :lock do
-    association :user
-    association :manufacturer
-    association :lock_type
+    user { FactoryGirl.create(:user) }
+    manufacturer { FactoryGirl.create(:manufacturer) }
+    lock_type { FactoryGirl.create(:lock_type) }
   end
 
   factory :organization_invitation do
-    association :inviter, factory: :user
-    association :organization
+    inviter { FactoryGirl.create(:user) }
+    organization { FactoryGirl.create(:organization) }
     invitee_email 'mike@test.com'
   end
 
   factory :membership do
     role 'member'
     factory :existing_membership do
-      association :user
-      association :organization
+      user { FactoryGirl.create(:user) }
+      organization { FactoryGirl.create(:organization) }
     end
   end
 
@@ -128,7 +128,7 @@ FactoryGirl.define do
 
   factory :public_image do |u|
     u.image { File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg')) }
-    association :imageable, factory: :bike
+    imageable { FactoryGirl.create(:bike) }
   end
 
   factory :blog do
@@ -145,15 +145,15 @@ FactoryGirl.define do
   end
 
   factory :stolen_notification do
-    association :sender, factory: :user
-    association :receiver, factory: :user
-    association :bike
+    sender { FactoryGirl.create(:user) }
+    receiver { FactoryGirl.create(:user) }
+    bike { FactoryGirl.create(:bike) }
     message 'This is a test email.'
   end
 
   factory :customer_contact do
-    association :creator, factory: :user
-    association :bike
+    creator { FactoryGirl.create(:user) }
+    bike { FactoryGirl.create(:bike) }
     title 'Some title'
     body 'some message'
     creator_email 'something@example.com'

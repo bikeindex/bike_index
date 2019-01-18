@@ -6,7 +6,7 @@ FactoryGirl.define do
     #  creator { FactoryGirl.create(:user) }
     # end
     # creation_state { FactoryGirl.create(:creation_state, creator: creator) }
-    association :creator, factory: :user
+    creator { FactoryGirl.create(:user) }
     serial_number
     manufacturer { FactoryGirl.create(:manufacturer) }
     sequence(:owner_email) { |n| "bike_owner#{n}@example.com" }

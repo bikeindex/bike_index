@@ -1,6 +1,6 @@
 FactoryGirl.define do
   factory :creation_state do
-    association :bike
-    # association :creator, factory: :user
+    bike { FactoryGirl.create(:bike) }
+    creator { FactoryGirl.create(:user) }
   end
 end

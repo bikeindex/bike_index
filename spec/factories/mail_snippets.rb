@@ -10,7 +10,7 @@ FactoryGirl.define do
     end
     factory :organization_mail_snippet do
       sequence(:name) { |n| MailSnippet.organization_snippet_types[MailSnippet.organization_snippet_types.count%n] }
-      association :organization
+      organization { FactoryGirl.create(:organization) }
     end
   end
 end
