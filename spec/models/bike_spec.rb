@@ -522,7 +522,7 @@ describe Bike do
       let!(:b_param) { FactoryGirl.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
       let(:bike) { FactoryGirl.create(:bike) }
       let(:b_param_params) { { bike: { address: "2864 Milwaukee Ave" } } }
-      let(:target) { { address: "2864 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60618" } }
+      let(:target) { { address: "2864 N Milwaukee Ave", city: "Chicago", state: "IL", zipcode: "60618", country: "USA" } }
       include_context :geocoder_real
       it "returns the fetched address" do
         expect(bike.b_params.pluck(:id)).to eq([b_param.id])

@@ -691,7 +691,7 @@ describe BikesController do
             }
           end
           include_context :geocoder_default_location
-          let(:target_address) { { address: "278 Broadway", city: "New York", state: "NY", zipcode: "10007" } }
+          let(:target_address) { { address: "278 Broadway", city: "New York", state: "NY", zipcode: "10007", country: "USA" } }
           it 'creates a bike' do
             b_param = BParam.create(params: { 'bike' => bike_params.as_json }, origin: 'embed_partial')
             expect(b_param.partial_registration?).to be_truthy
