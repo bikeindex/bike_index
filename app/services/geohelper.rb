@@ -10,8 +10,9 @@ class Geohelper
       result.first.formatted_address || result.first.address
     end
 
-    def coordinates_for(addy)
-      result = Geocoder.search(formatted_address(addy))
+    # Accept result so we don't have to lookup twice for formatted_address hash
+    def coordinates_for(addy, result: nil)
+      result ||= Geocoder.search(formatted_address(addy))
       return nil unless result&.any?
       geometry = result.first&.data && result.first.data["geometry"]
       if geometry && geometry["location"].present?
@@ -33,7 +34,9 @@ class Geohelper
     # Given a string, return a address hash for that location
     def formatted_address_hash(addy)
       result = Geocoder.search(formatted_address(addy))
+      coordinates = coordinates_for(addy, result: result)
       address_hash_from_geocoder_result(result&.first&.formatted_address)
+        .merge(coordinates.present? ? coordinates : {})
     end
 
     def address_hash_from_geocoder_result(addy)
