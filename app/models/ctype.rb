@@ -19,10 +19,6 @@ class Ctype < ActiveRecord::Base
     where(name: 'unknown', has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
   end
 
-  def self.old_attr_accessible
-    %w(name slug secondary_name image image_cache cgroup_id cgroup has_multiple cgroup_name).map(&:to_sym).freeze
-  end
-  
   before_create :set_calculated_attributes
   def set_calculated_attributes
     return true unless self.cgroup_name.present?

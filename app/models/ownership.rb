@@ -21,12 +21,12 @@ class Ownership < ActiveRecord::Base
     self.owner_email = EmailNormalizer.normalize(owner_email)
   end
 
-  def first?
-    bike&.ownerships&.reorder(:created_at)&.first&.id == id
-  end
+  def first?; bike&.ownerships&.reorder(:created_at)&.first&.id == id end
+
+  def claimed?; claimed end
 
   def owner
-    if claimed && user.present?
+    if claimed? && user.present?
       user
     elsif creator.present?
       creator
