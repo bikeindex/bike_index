@@ -25,7 +25,7 @@ class AfterUserCreateWorker
 
   def perform_merged_jobs(user, email)
     associate_ownerships(user, email)
-    associate_membership_invites(without_confirm: true)
+    associate_membership_invites(user, email, without_confirm: true)
   end
 
   def perform_confirmed_jobs(user, email)

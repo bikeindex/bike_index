@@ -97,7 +97,7 @@ describe UsersController do
         context "with organization_invitation, partner param" do
           let!(:organization_invitation) { FactoryGirl.create(:organization_invitation, invitee_email: "poo@pile.com") }
           it "creates a confirmed user, log in, and send welcome" do
-            expect_any_instance_of(CreateUserJobs).to receive(:send_welcome_email)
+            expect_any_instance_of(AfterUserCreateWorker).to receive(:send_welcoming_email)
             post :create, user: user_attributes, partner: "bikehub"
             expect(response).to redirect_to("https://new.bikehub.com/account")
             expect(User.order(:created_at).last.partner_sign_up).to eq "bikehub"

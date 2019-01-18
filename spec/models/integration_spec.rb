@@ -28,7 +28,7 @@ describe Integration do
 
       it 'creates a user, associate it if the emails match and run new user tasks' do
         expect do
-          expect_any_instance_of(CreateUserJobs).to receive(:perform_create_jobs).and_return(true)
+          expect_any_instance_of(AfterUserCreateWorker).to receive(:perform_confirmed_jobs)
           FactoryGirl.create(:integration, information: info)
         end.to change(User, :count).by 1
       end
@@ -60,7 +60,7 @@ describe Integration do
 
       it 'creates a user, associate it if the emails match and run new user tasks' do
         expect do
-          expect_any_instance_of(CreateUserJobs).to receive(:perform_create_jobs).and_return(true)
+          expect_any_instance_of(AfterUserCreateWorker).to receive(:perform_confirmed_jobs)
           FactoryGirl.create(:integration, information: info)
         end.to change(User, :count).by 1
       end
