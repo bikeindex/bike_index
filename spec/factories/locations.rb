@@ -1,9 +1,9 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :location do
     name
-    organization { FactoryGirl.create(:organization) }
-    country { FactoryGirl.create(:country) }
-    state { FactoryGirl.create(:state) }
+    organization { FactoryBot.create(:organization) }
+    country { FactoryBot.create(:country) }
+    state { FactoryBot.create(:state) }
     zipcode { "60647" }
     city { "Chicago" }
     street { "foo address" }

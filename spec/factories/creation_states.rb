@@ -1,6 +1,6 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :creation_state do
-    association :bike
-    # association :creator, factory: :user
+    bike { FactoryBot.create(:bike) }
+    creator { FactoryBot.create(:user) }
   end
 end

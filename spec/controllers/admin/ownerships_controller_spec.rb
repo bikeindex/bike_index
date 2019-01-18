@@ -3,8 +3,8 @@ require 'spec_helper'
 describe Admin::OwnershipsController do
   describe 'edit' do
     it 'renders' do
-      ownership = FactoryGirl.create(:ownership)
-      user = FactoryGirl.create(:admin)
+      ownership = FactoryBot.create(:ownership)
+      user = FactoryBot.create(:admin)
       set_current_user(user)
       get :edit, id: ownership.id
       expect(response.status).to eq(200)
@@ -14,9 +14,9 @@ describe Admin::OwnershipsController do
 
   describe 'update' do
     it 'updates ownership' do
-      ownership = FactoryGirl.create(:ownership)
+      ownership = FactoryBot.create(:ownership)
       og_creator = ownership.creator
-      user = FactoryGirl.create(:admin)
+      user = FactoryBot.create(:admin)
       set_current_user(user)
       update_params = {
         user_email: ownership.creator.email,

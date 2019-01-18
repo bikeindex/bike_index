@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Admin::OrganizationsController, type: :controller do
-  let(:organization) { FactoryGirl.create(:organization, approved: false) }
+  let(:organization) { FactoryBot.create(:organization, approved: false) }
   include_context :logged_in_as_super_admin
 
   describe 'index' do
@@ -21,10 +21,10 @@ describe Admin::OrganizationsController, type: :controller do
   end
 
   describe 'organization update' do
-    let(:state) { FactoryGirl.create(:state) }
+    let(:state) { FactoryBot.create(:state) }
     let(:country) { state.country }
-    let(:parent_organization) { FactoryGirl.create(:organization) }
-    let(:location_1) { FactoryGirl.create(:location, organization: organization, street: 'old street', name: 'cool name') }
+    let(:parent_organization) { FactoryBot.create(:organization) }
+    let(:location_1) { FactoryBot.create(:location, organization: organization, street: 'old street', name: 'cool name') }
     let(:update_attributes) do
       {
         name: 'new name thing stuff',

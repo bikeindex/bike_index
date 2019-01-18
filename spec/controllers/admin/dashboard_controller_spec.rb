@@ -27,7 +27,7 @@ describe Admin::DashboardController do
     end
     context 'logged in as content admin' do
       it 'redirects' do
-        user = FactoryGirl.create(:user_confirmed, is_content_admin: true)
+        user = FactoryBot.create(:user_confirmed, is_content_admin: true)
         set_current_user(user)
         get :index
         expect(response.code).to eq('302')
@@ -40,7 +40,7 @@ describe Admin::DashboardController do
     include_context :logged_in_as_super_admin
     describe 'invitations' do
       it 'renders' do
-        user = FactoryGirl.create(:admin)
+        user = FactoryBot.create(:admin)
         set_current_user(user)
         BParam.create(creator_id: user.id)
         get :invitations
@@ -51,10 +51,10 @@ describe Admin::DashboardController do
 
     describe 'maintenance' do
       it 'renders' do
-        FactoryGirl.create(:manufacturer, name: 'other')
-        FactoryGirl.create(:ctype, name: 'other')
-        FactoryGirl.create(:handlebar_type, slug: 'other')
-        user = FactoryGirl.create(:admin)
+        FactoryBot.create(:manufacturer, name: 'other')
+        FactoryBot.create(:ctype, name: 'other')
+        FactoryBot.create(:handlebar_type, slug: 'other')
+        user = FactoryBot.create(:admin)
         set_current_user(user)
         BParam.create(creator_id: user.id)
         get :maintenance
@@ -65,7 +65,7 @@ describe Admin::DashboardController do
 
     describe 'tsvs' do
       it 'renders and assigns tsvs' do
-        user = FactoryGirl.create(:admin)
+        user = FactoryBot.create(:admin)
         set_current_user(user)
         t = Time.now
         FileCacheMaintainer.reset_file_info('current_stolen_bikes.tsv', t)
@@ -81,7 +81,7 @@ describe Admin::DashboardController do
 
     describe 'update_tsv_blacklist' do
       it 'renders and updates' do
-        user = FactoryGirl.create(:admin)
+        user = FactoryBot.create(:admin)
         set_current_user(user)
         ids = "\n1\n2\n69\n200\n22222\n\n\n"
         put :update_tsv_blacklist, blacklist: ids

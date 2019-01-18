@@ -27,7 +27,7 @@ describe User do
 
   describe 'create user_email' do
     it 'creates a user_email on create' do
-      user = FactoryGirl.create(:user_confirmed)
+      user = FactoryBot.create(:user_confirmed)
       expect(user.user_emails.count).to eq 1
       expect(user.email).to eq user.user_emails.first.email
     end
@@ -36,7 +36,7 @@ describe User do
   describe 'validate' do
     describe 'create' do
       before :each do
-        @user = User.new(FactoryGirl.attributes_for(:user))
+        @user = User.new(FactoryBot.attributes_for(:user))
         expect(@user.valid?).to be_truthy
       end
 
@@ -68,20 +68,20 @@ describe User do
       end
 
       it "doesn't let unconfirmed users have the same password" do
-        FactoryGirl.create(:user, email: @user.email)
+        FactoryBot.create(:user, email: @user.email)
         expect(@user.valid?).to be_falsey
         expect(@user.errors.messages[:email]).to be_present
       end
 
       it "doesn't let confirmed users have the same password" do
-        FactoryGirl.create(:user_confirmed, email: @user.email)
+        FactoryBot.create(:user_confirmed, email: @user.email)
         expect(@user.valid?).to be_falsey
         expect(@user.errors.messages[:email]).to be_present
       end
     end
 
     describe 'confirm' do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryBot.create(:user) }
 
       it 'requires confirmation' do
         expect(user.confirmed).to be_falsey
@@ -110,7 +110,7 @@ describe User do
 
     describe 'update' do
       before :each do
-        @user = FactoryGirl.create(:user)
+        @user = FactoryBot.create(:user)
         expect(@user.valid?).to be_truthy
       end
 
@@ -138,8 +138,8 @@ describe User do
 
   describe 'admin_authorized' do
     before :all do
-      @content = FactoryGirl.create(:user, is_content_admin: true)
-      @admin = FactoryGirl.create(:admin)
+      @content = FactoryBot.create(:user, is_content_admin: true)
+      @admin = FactoryBot.create(:admin)
     end
 
     it 'auths full' do
@@ -163,7 +163,7 @@ describe User do
       expect(user).to be_present
     end
     context 'confirmed user' do
-      let(:user) { FactoryGirl.create(:user_confirmed, email: 'ned@foo.com') }
+      let(:user) { FactoryBot.create(:user_confirmed, email: 'ned@foo.com') }
       context 'primary email' do
         it "finds users by email address when the case doesn't match" do
           expect(User.fuzzy_email_find('NeD@fOO.cOM ')).to eq(user)
@@ -172,7 +172,7 @@ describe User do
       end
       context 'secondary email' do
         let(:email) { 'another@foo.com' }
-        let(:secondary_email) { FactoryGirl.create(:user_email, user: user, email: email) }
+        let(:secondary_email) { FactoryBot.create(:user_email, user: user, email: email) }
         it 'finds users by secondary email' do
           expect(secondary_email.confirmed).to be_truthy
           expect(secondary_email.user).to eq user
@@ -183,7 +183,7 @@ describe User do
       end
     end
     describe 'fuzzy_unconfirmed_primary_email_find' do
-      let(:user) { FactoryGirl.create(:user, email: 'ned@foo.com') }
+      let(:user) { FactoryBot.create(:user, email: 'ned@foo.com') }
       it 'finds user' do
         expect(user.confirmed).to be_falsey
         expect(User.fuzzy_unconfirmed_primary_email_find(' NeD@fOO.com ')).to eq user
@@ -197,7 +197,7 @@ describe User do
       expect(user).to be_present
     end
     context 'unconfirmed user partial match' do
-      let(:user) { FactoryGirl.create(:user, email: 'sample-stuff@e.us') }
+      let(:user) { FactoryBot.create(:user, email: 'sample-stuff@e.us') }
       it 'finds users' do
         expect(user.confirmed).to be_falsey
         expect(User.admin_text_search('sample-stuff ')).to eq([user])
@@ -205,9 +205,9 @@ describe User do
     end
     context 'secondary email partial match' do
       let(:user_email) do
-        FactoryGirl.create(:user_email,
+        FactoryBot.create(:user_email,
                            email: 'urrg@second.org',
-                           user: FactoryGirl.create(:user, name: 'FeconDDD'))
+                           user: FactoryBot.create(:user, name: 'FeconDDD'))
       end
       let(:user) { user_email.user }
       it 'finds users, deduping' do
@@ -215,7 +215,7 @@ describe User do
       end
     end
     context 'partial match for name' do
-      let(:user) { FactoryGirl.create(:user, name: 'XYLoPHONE') }
+      let(:user) { FactoryBot.create(:user, name: 'XYLoPHONE') }
       it 'finds user' do
         User.admin_text_search('ylop')
         expect(User.admin_text_search('ylop')).to eq([user])
@@ -224,8 +224,8 @@ describe User do
   end
 
   describe 'secondary_emails' do
-    let(:user) { FactoryGirl.create(:user_confirmed, email: 'cool@stuff.com') }
-    let(:user_email) { FactoryGirl.create(:user_email, user: user) }
+    let(:user) { FactoryBot.create(:user_confirmed, email: 'cool@stuff.com') }
+    let(:user_email) { FactoryBot.create(:user_email, user: user) }
     it 'lists the non-primary emails' do
       expect(user_email).to be_present
       expect(user.secondary_emails).to eq([user_email.email])
@@ -248,9 +248,9 @@ describe User do
       end
     end
     describe "bike_actions_organization" do
-      let!(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+      let!(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       context "organization without actions" do
-        let(:organization) { FactoryGirl.create(:organization) }
+        let(:organization) { FactoryBot.create(:organization) }
         it "sets nil if there is no organization with bike actions" do
           user.bike_actions_organization_id = organization.id
           user.save # Also just testing that this is called in a callback, because stuff
@@ -259,13 +259,13 @@ describe User do
       end
       context "two organizations with actions" do
         include_context :organization_with_geolocated_messages
-        let(:organization2) { FactoryGirl.create(:organization, name: "XXXXX") }
+        let(:organization2) { FactoryBot.create(:organization, name: "XXXXX") }
         it "It selects the first matching organization" do
           organization2.update_attribute :created_at, Time.now - 1.day
           # default_scope is by name, trying to test that we're sqling right and actually reordering
           # ... But it looks like rspec isn't honoring the default scope so whateves
           expect(Organization.with_bike_actions.pluck(:id)).to match_array([organization.id])
-          FactoryGirl.create(:membership, user: user, organization: organization2)
+          FactoryBot.create(:membership, user: user, organization: organization2)
           user.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
           user.reload
           expect(user.bike_actions_organization).to eq organization
@@ -276,27 +276,27 @@ describe User do
 
   describe 'bikes' do
     it 'returns nil if the user has no bikes' do
-      user = FactoryGirl.create(:user)
+      user = FactoryBot.create(:user)
       expect(user.bikes).to be_empty
     end
     it "returns the user's bikes if they have any hidden bikes without the hidden bikes" do
-      user = FactoryGirl.create(:user)
-      o = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id)
-      o2 = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id)
+      user = FactoryBot.create(:user)
+      o = FactoryBot.create(:ownership, owner_email: user.email, user_id: user.id)
+      o2 = FactoryBot.create(:ownership, owner_email: user.email, user_id: user.id)
       o2.bike.update_attribute :hidden, true
       expect(user.bike_ids.include?(o.bike.id)).to be_truthy
       expect(user.bike_ids.include?(o2.bike.id)).not_to be_truthy
       expect(user.bike_ids.count).to eq(1)
     end
     it "returns the user's bikes if they have any hidden bikes without the hidden bikes" do
-      user = FactoryGirl.create(:user)
-      ownership = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id, user_hidden: true)
+      user = FactoryBot.create(:user)
+      ownership = FactoryBot.create(:ownership, owner_email: user.email, user_id: user.id, user_hidden: true)
       ownership.bike.update_attribute :hidden, true
       expect(user.bike_ids.include?(ownership.bike.id)).to be_truthy
     end
     it "returns the user's bikes without hidden bikes if user_hidden" do
-      user = FactoryGirl.create(:user)
-      ownership = FactoryGirl.create(:ownership, owner_email: user.email, user_id: user.id, user_hidden: true)
+      user = FactoryBot.create(:user)
+      ownership = FactoryBot.create(:ownership, owner_email: user.email, user_id: user.id, user_hidden: true)
       ownership.bike.update_attribute :hidden, true
       expect(user.bike_ids(false).include?(ownership.bike.id)).to be_falsey
     end
@@ -304,7 +304,7 @@ describe User do
 
   describe 'generate_username_confirmation_and_auth' do
     it 'generates the required tokens' do
-      user = FactoryGirl.create(:user)
+      user = FactoryBot.create(:user)
       expect(user.auth_token).to be_present
       expect(user.username).to be_present
       expect(user.confirmation_token).to be_present
@@ -322,7 +322,7 @@ describe User do
       expect(user.access_tokens_for_application(nil)).to eq([])
     end
     it 'returns access tokens for the application' do
-      user = FactoryGirl.create(:user)
+      user = FactoryBot.create(:user)
       application = Doorkeeper::Application.new(name: 'test', redirect_uri: 'https://foo.bar')
       application2 = Doorkeeper::Application.new(name: 'other_test', redirect_uri: 'https://foo.bar')
       application.owner = user
@@ -350,7 +350,7 @@ describe User do
       expect(user.reset_token_time).to be > Time.now - 2.seconds
     end
     it 'uses input time' do
-      user = FactoryGirl.create(:user)
+      user = FactoryBot.create(:user)
       user.set_password_reset_token((Time.now - 61.minutes).to_i)
       expect(user.reload.reset_token_time).to be < (Time.now - 1.hours)
     end
@@ -358,7 +358,7 @@ describe User do
 
   describe 'send_password_reset_email' do
     it 'enqueues sending the password reset' do
-      user = FactoryGirl.create(:user)
+      user = FactoryBot.create(:user)
       expect(user.password_reset_token).to be_nil
       expect do
         user.send_password_reset_email
@@ -367,7 +367,7 @@ describe User do
     end
 
     it "doesn't send another one immediately" do
-      user = FactoryGirl.create(:user)
+      user = FactoryBot.create(:user)
       user.send_password_reset_email
       expect(user).not_to receive(:set_password_reset_token)
       user.send_password_reset_email
@@ -387,10 +387,10 @@ describe User do
   describe 'normalize_attributes' do
     it "doesn't let you overwrite usernames" do
       target = 'coolname'
-      user1 = FactoryGirl.create(:user)
+      user1 = FactoryBot.create(:user)
       user1.update_attribute :username, target
       expect(user1.reload.username).to eq(target)
-      user2 = FactoryGirl.create(:user)
+      user2 = FactoryBot.create(:user)
       user2.username = "#{target}'"
       expect(user2.save).to be_falsey
       expect(user2.errors.full_messages.to_s).to match('Username has already been taken')
@@ -404,7 +404,7 @@ describe User do
   end
 
   describe 'normalize_attributes' do
-    let(:user) { FactoryGirl.build(:user, phone: '773.83ddp+83(887)', email: "SOMethinG@example.com\n") }
+    let(:user) { FactoryBot.build(:user, phone: '773.83ddp+83(887)', email: "SOMethinG@example.com\n") }
     before(:each) { user.normalize_attributes }
 
     it 'strips the non-digit numbers from the phone input' do
@@ -417,7 +417,7 @@ describe User do
   end
 
   describe 'donations' do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
     it 'returns the payment amount' do
       Payment.create(user: user, amount_cents: 200)
       expect(user.donations).to eq 200
@@ -429,7 +429,7 @@ describe User do
 
   describe 'subscriptions' do
     it 'returns the payment if payment is subscription' do
-      user = FactoryGirl.create(:user)
+      user = FactoryBot.create(:user)
       Payment.create(is_recurring: true, user_id: user)
       expect(user.subscriptions).to eq(user.payments.where(is_recurring: true))
     end
@@ -454,7 +454,7 @@ describe User do
   end
 
   describe 'additional_emails=' do
-    let(:user) { FactoryGirl.create(:user_confirmed) }
+    let(:user) { FactoryBot.create(:user_confirmed) }
     before do
       expect(user.user_emails.count).to eq 1
     end
@@ -504,29 +504,29 @@ describe User do
   end
 
   describe 'is_member_of?' do
-    let(:organization) { FactoryGirl.create(:organization) }
+    let(:organization) { FactoryBot.create(:organization) }
     context 'admin of organization' do
-      let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       it 'returns true' do
         expect(user.is_member_of?(organization)).to be_truthy
       end
     end
     context 'member of organization' do
-      let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       it 'returns true' do
         expect(user.is_member_of?(organization)).to be_truthy
       end
     end
     context 'superadmin' do
-      let(:user) { FactoryGirl.create(:admin) }
+      let(:user) { FactoryBot.create(:admin) }
       it 'returns true' do
         expect(user.is_member_of?(organization)).to be_truthy
       end
     end
     context 'incorrect searching' do
-      let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       context 'non-member' do
-        let(:other_organization) { FactoryGirl.create(:organization) }
+        let(:other_organization) { FactoryBot.create(:organization) }
         it 'returns false' do
           expect(other_organization).to be_present
           expect(user.is_member_of?(other_organization)).to be_falsey
@@ -541,29 +541,29 @@ describe User do
   end
 
   describe 'is_admin_of?' do
-    let(:organization) { FactoryGirl.create(:organization) }
+    let(:organization) { FactoryBot.create(:organization) }
     context 'admin of organization' do
-      let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       it 'returns true' do
         expect(user.is_admin_of?(organization)).to be_truthy
       end
     end
     context 'member of organization' do
-      let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       it 'returns true' do
         expect(user.is_admin_of?(organization)).to be_falsey
       end
     end
     context 'superadmin' do
-      let(:user) { FactoryGirl.create(:admin) }
+      let(:user) { FactoryBot.create(:admin) }
       it 'returns true' do
         expect(user.is_admin_of?(organization)).to be_truthy
       end
     end
     context 'incorrect searching' do
-      let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       context 'non-member' do
-        let(:other_organization) { FactoryGirl.create(:organization) }
+        let(:other_organization) { FactoryBot.create(:organization) }
         it 'returns false' do
           expect(other_organization).to be_present
           expect(user.is_admin_of?(other_organization)).to be_falsey

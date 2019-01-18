@@ -3,9 +3,9 @@ require 'spec_helper'
 describe 'Bikes API V2' do
   describe 'bike search' do
     before :each do
-      @bike = FactoryGirl.create(:bike)
-      FactoryGirl.create(:bike)
-      FactoryGirl.create(:recovered_bike)
+      @bike = FactoryBot.create(:bike)
+      FactoryBot.create(:bike)
+      FactoryBot.create(:recovered_bike)
     end
     it 'all bikes (root) search works' do
       get '/api/v2/bikes_search?per_page=1', format: :json
@@ -26,7 +26,7 @@ describe 'Bikes API V2' do
     end
 
     it 'serial search works' do
-      bike = FactoryGirl.create(:bike, serial_number: '0000HEYBB')
+      bike = FactoryBot.create(:bike, serial_number: '0000HEYBB')
       get '/api/v2/bikes_search/?serial=0HEYBB', format: :json
       result = JSON.parse(response.body)
       expect(response.code).to eq('200')
@@ -35,7 +35,7 @@ describe 'Bikes API V2' do
     end
 
     it 'stolen search works' do
-      FactoryGirl.create(:stolen_bike)
+      FactoryBot.create(:stolen_bike)
       get '/api/v2/bikes_search/stolen?per_page=1', format: :json
       expect(response.code).to eq('200')
       expect(response.header['Total']).to eq('1')
@@ -46,7 +46,7 @@ describe 'Bikes API V2' do
 
   describe 'fuzzy serial search' do
     it 'finds a close one' do
-      bike = FactoryGirl.create(:bike, serial_number: 'Something1')
+      bike = FactoryBot.create(:bike, serial_number: 'Something1')
       bike.create_normalized_serial_segments
       get '/api/v2/bikes_search/close_serials?serial=s0meth1nglvv', format: :json
       result = JSON.parse(response.body)
@@ -58,8 +58,8 @@ describe 'Bikes API V2' do
 
   describe 'count' do
     it "returns the count hash for matching bikes, doesn't need access_token" do
-      FactoryGirl.create(:bike, serial_number: 'awesome')
-      FactoryGirl.create(:bike)
+      FactoryBot.create(:bike, serial_number: 'awesome')
+      FactoryBot.create(:bike)
       get '/api/v2/bikes_search/count?query=awesome', format: :json
       result = JSON.parse(response.body)
       expect(result['non_stolen']).to eq(1)
@@ -78,7 +78,7 @@ describe 'Bikes API V2' do
 
   describe 'all_stolen' do
     it 'returns the cached file' do
-      FactoryGirl.create(:stolen_bike)
+      FactoryBot.create(:stolen_bike)
       t = Time.now.to_i
       CacheAllStolenWorker.new.perform
       cached_all_stolen = FileCacheMaintainer.cached_all_stolen

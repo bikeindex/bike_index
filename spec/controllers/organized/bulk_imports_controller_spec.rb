@@ -2,12 +2,12 @@ require "spec_helper"
 
 describe Organized::BulkImportsController, type: :controller do
   let(:root_path) { organization_bikes_path(organization_id: organization.to_param) }
-  let(:bulk_import) { FactoryGirl.create(:bulk_import, organization: organization) }
+  let(:bulk_import) { FactoryBot.create(:bulk_import, organization: organization) }
 
   before { set_current_user(user) if user.present? }
 
   context "organization without show_bulk_import" do
-    let!(:organization) { FactoryGirl.create(:organization) }
+    let!(:organization) { FactoryBot.create(:organization) }
     context "not logged in" do
       let(:user) { nil }
       it "redirects" do
@@ -17,7 +17,7 @@ describe Organized::BulkImportsController, type: :controller do
     end
 
     context "logged in as organization admin" do
-      let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       describe "index" do
         it "redirects" do
           get :index, organization_id: organization.to_param
@@ -39,7 +39,7 @@ describe Organized::BulkImportsController, type: :controller do
     end
 
     context "logged in as super admin" do
-      let(:user) { FactoryGirl.create(:admin) }
+      let(:user) { FactoryBot.create(:admin) }
       describe "index" do
         it "renders" do
           get :index, organization_id: organization.to_param
@@ -63,9 +63,9 @@ describe Organized::BulkImportsController, type: :controller do
   end
 
   context "organization with show_bulk_import" do
-    let!(:organization) { FactoryGirl.create(:organization, show_bulk_import: true) }
+    let!(:organization) { FactoryBot.create(:organization, show_bulk_import: true) }
     context "logged in as organization member" do
-      let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       describe "index" do
         it "redirects" do
           get :index, organization_id: organization.to_param
@@ -86,7 +86,7 @@ describe Organized::BulkImportsController, type: :controller do
       end
     end
     context "logged_in_as_organization_admin" do
-      let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       describe "index" do
         it "renders" do
           get :index, organization_id: organization.to_param
@@ -115,7 +115,7 @@ describe Organized::BulkImportsController, type: :controller do
           expect(response).to render_with_layout("application_revised")
         end
         context "not organizations bulk_import" do
-          let(:bulk_import) { FactoryGirl.create(:bulk_import) }
+          let(:bulk_import) { FactoryBot.create(:bulk_import) }
           it "redirects" do
             expect(bulk_import.organization).to_not eq organization
             get :show, id: bulk_import.id, organization_id: organization.to_param
@@ -143,7 +143,7 @@ describe Organized::BulkImportsController, type: :controller do
           end
         end
         context "API create" do
-          let(:organization) { FactoryGirl.create(:organization_with_auto_user, show_bulk_import: true, api_access_approved: true) }
+          let(:organization) { FactoryBot.create(:organization_with_auto_user, show_bulk_import: true, api_access_approved: true) }
           let(:user) { nil }
           context "invalid API token" do
             it "returns JSON message" do

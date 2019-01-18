@@ -3,7 +3,7 @@ require "spec_helper"
 describe Api::V1::ManufacturersController do
   describe "index" do
     it "loads the request" do
-      m = FactoryGirl.create(:manufacturer, name: "AAAA manufacturer")
+      m = FactoryBot.create(:manufacturer, name: "AAAA manufacturer")
       get :index, format: :json
       expect(response.code).to eq("200")
       expect(JSON.parse(response.body)["manufacturers"].first["name"]).to eq(m.name)

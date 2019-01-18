@@ -17,7 +17,7 @@ describe SessionsController do
         expect(response).to redirect_to "/bikes/12?contact_owner=true"
       end
       context "unconfirmed" do
-        let(:user) { FactoryGirl.create(:user) }
+        let(:user) { FactoryBot.create(:user) }
         it "redirects to please_confirm_email" do
           user.reload
           expect(user.confirmed?).to be_falsey
@@ -59,7 +59,7 @@ describe SessionsController do
       expect(response).to redirect_to goodbye_url
     end
     context "unconfirmed user" do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryBot.create(:user) }
       it "logs out the user" do
         get :destroy
         expect(cookies.signed[:auth]).to be_nil
@@ -72,7 +72,7 @@ describe SessionsController do
   describe 'create' do
     describe 'when user is found' do
       before do
-        @user = FactoryGirl.create(:user, confirmed: true)
+        @user = FactoryBot.create(:user, confirmed: true)
         expect(User).to receive(:fuzzy_email_find).and_return(@user)
       end
 
@@ -151,7 +151,7 @@ describe SessionsController do
     end
 
     context "unconfirmed" do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryBot.create(:user) }
       it "logs in, sends to please_confirm_email" do
         expect(user.authenticate("testthisthing7$")).to be_truthy
         post :create, session: { email: user.email, password: "testthisthing7$" }
@@ -159,7 +159,7 @@ describe SessionsController do
         expect(response).to redirect_to(please_confirm_email_users_path)
       end
       context "with confirmed user_email" do
-        let!(:user_email) { FactoryGirl.create(:user_email, user: user) }
+        let!(:user_email) { FactoryBot.create(:user_email, user: user) }
         it "logs in, sends to please_confirm_email" do
           expect(user_email.confirmed).to be_truthy
           post :create, session: { email: user.email, password: "testthisthing7$" }

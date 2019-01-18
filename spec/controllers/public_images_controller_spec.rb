@@ -3,7 +3,7 @@ require 'spec_helper'
 describe PublicImagesController do
   describe 'create' do
     context 'bike' do
-      let(:ownership) { FactoryGirl.create(:ownership) }
+      let(:ownership) { FactoryBot.create(:ownership) }
       let(:bike) { ownership.bike }
       let(:user) { ownership.creator }
       context 'valid owner' do
@@ -25,10 +25,10 @@ describe PublicImagesController do
       end
     end
     context 'blog' do
-      let(:blog) { FactoryGirl.create(:blog) }
+      let(:blog) { FactoryBot.create(:blog) }
       context 'admin authorized' do
         it 'creates an image' do
-          user = FactoryGirl.create(:content_admin)
+          user = FactoryBot.create(:content_admin)
           set_current_user(user)
           post :create, blog_id: blog.id, public_image: { name: 'cool name' }, format: :js
           blog.reload
@@ -37,7 +37,7 @@ describe PublicImagesController do
       end
       context 'not admin' do
         it 'does not create an image' do
-          set_current_user(FactoryGirl.create(:user_confirmed))
+          set_current_user(FactoryBot.create(:user_confirmed))
           expect do
             post :create, blog_id: blog.id, public_image: { name: 'cool name' }, format: :js
             expect(response.code).to eq('401')
@@ -46,7 +46,7 @@ describe PublicImagesController do
       end
     end
     context 'organization' do
-      let(:organization) { FactoryGirl.create(:organization) }
+      let(:organization) { FactoryBot.create(:organization) }
       context 'admin authorized' do
         include_context :logged_in_as_super_admin
         it 'creates an image' do
@@ -66,7 +66,7 @@ describe PublicImagesController do
       end
     end
     context 'mail_snippet' do
-      let(:mail_snippet) { FactoryGirl.create(:mail_snippet) }
+      let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
       context 'admin authorized' do
         include_context :logged_in_as_super_admin
         it 'creates an image' do
@@ -88,10 +88,10 @@ describe PublicImagesController do
   describe 'destroy' do
     context 'with owner' do
       it 'allows the destroy of public_image' do
-        user = FactoryGirl.create(:user_confirmed)
-        bike = FactoryGirl.create(:bike)
-        FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
-        public_image = FactoryGirl.create(:public_image, imageable: bike)
+        user = FactoryBot.create(:user_confirmed)
+        bike = FactoryBot.create(:bike)
+        FactoryBot.create(:ownership, bike: bike, creator: user, owner_email: user.email)
+        public_image = FactoryBot.create(:public_image, imageable: bike)
         expect(bike.reload.owner).to eq(user)
         set_current_user(user)
         expect do
@@ -100,10 +100,10 @@ describe PublicImagesController do
       end
       context 'non owner' do
         it 'rejects the destroy' do
-          ownership = FactoryGirl.create(:ownership)
+          ownership = FactoryBot.create(:ownership)
           bike = ownership.bike
-          non_owner = FactoryGirl.create(:user_confirmed, name: 'Non Owner')
-          public_image = FactoryGirl.create(:public_image, imageable: bike)
+          non_owner = FactoryBot.create(:user_confirmed, name: 'Non Owner')
+          public_image = FactoryBot.create(:public_image, imageable: bike)
           set_current_user(non_owner)
           expect do
             delete :destroy, id: public_image.id
@@ -112,10 +112,10 @@ describe PublicImagesController do
       end
       context 'owner and hidden bike' do
         it 'allows the destroy' do
-          user = FactoryGirl.create(:user_confirmed)
-          bike = FactoryGirl.create(:bike, hidden: true)
-          FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
-          public_image = FactoryGirl.create(:public_image, imageable: bike)
+          user = FactoryBot.create(:user_confirmed)
+          bike = FactoryBot.create(:bike, hidden: true)
+          FactoryBot.create(:ownership, bike: bike, creator: user, owner_email: user.email)
+          public_image = FactoryBot.create(:public_image, imageable: bike)
           expect(bike.reload.owner).to eq(user)
           set_current_user(user)
           expect do
@@ -127,10 +127,10 @@ describe PublicImagesController do
     end
     context 'with owner' do
       it 'allows a the owner of a public_image to destroy the public_image' do
-        user = FactoryGirl.create(:user_confirmed)
-        bike = FactoryGirl.create(:bike)
-        FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
-        public_image = FactoryGirl.create(:public_image, imageable: bike)
+        user = FactoryBot.create(:user_confirmed)
+        bike = FactoryBot.create(:bike)
+        FactoryBot.create(:ownership, bike: bike, creator: user, owner_email: user.email)
+        public_image = FactoryBot.create(:public_image, imageable: bike)
         expect(bike.reload.owner).to eq(user)
         set_current_user(user)
         expect do
@@ -143,7 +143,7 @@ describe PublicImagesController do
 
   describe 'show' do
     it 'renders' do
-      image = FactoryGirl.create(:public_image)
+      image = FactoryBot.create(:public_image)
       get :show, id: image.id
       expect(response.code).to eq('200')
       expect(response).to render_template('show')
@@ -153,10 +153,10 @@ describe PublicImagesController do
 
   describe 'edit' do
     it 'renders' do
-      ownership = FactoryGirl.create(:ownership)
+      ownership = FactoryBot.create(:ownership)
       user = ownership.owner
       set_current_user(user)
-      image = FactoryGirl.create(:public_image, imageable: ownership.bike)
+      image = FactoryBot.create(:public_image, imageable: ownership.bike)
       get :edit, id: image.id
       expect(response.code).to eq('200')
       expect(response).to render_template('edit')
@@ -168,10 +168,10 @@ describe PublicImagesController do
     context 'normal update' do
       context 'with owner' do
         it 'updates things and go back to editing the bike' do
-          user = FactoryGirl.create(:user_confirmed)
-          bike = FactoryGirl.create(:bike)
-          FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
-          public_image = FactoryGirl.create(:public_image, imageable: bike)
+          user = FactoryBot.create(:user_confirmed)
+          bike = FactoryBot.create(:bike)
+          FactoryBot.create(:ownership, bike: bike, creator: user, owner_email: user.email)
+          public_image = FactoryBot.create(:public_image, imageable: bike)
           expect(bike.reload.owner).to eq(user)
           set_current_user(user)
           put :update, id: public_image.id, public_image: { name: 'Food' }
@@ -182,10 +182,10 @@ describe PublicImagesController do
       end
       context 'not owner' do
         it 'does not update' do
-          user = FactoryGirl.create(:user_confirmed)
-          bike = FactoryGirl.create(:bike)
-          FactoryGirl.create(:ownership, bike: bike)
-          public_image = FactoryGirl.create(:public_image, imageable: bike, name: 'party')
+          user = FactoryBot.create(:user_confirmed)
+          bike = FactoryBot.create(:bike)
+          FactoryBot.create(:ownership, bike: bike)
+          public_image = FactoryBot.create(:public_image, imageable: bike, name: 'party')
           set_current_user(user)
           put :update, id: public_image.id, public_image: { name: 'Food' }
           expect(public_image.reload.name).to eq('party')
@@ -195,13 +195,13 @@ describe PublicImagesController do
   end
 
   describe 'is_private' do
-    let(:user) { FactoryGirl.create(:user_confirmed) }
-    let(:bike) { FactoryGirl.create(:bike) }
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:bike) { FactoryBot.create(:bike) }
     context 'with owner' do
       context 'is_private true' do
         it 'marks image private' do
-          FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
-          public_image = FactoryGirl.create(:public_image, imageable: bike)
+          FactoryBot.create(:ownership, bike: bike, creator: user, owner_email: user.email)
+          public_image = FactoryBot.create(:public_image, imageable: bike)
           expect(bike.reload.owner).to eq(user)
           set_current_user(user)
           post :is_private, id: public_image.id, is_private: 'true'
@@ -212,8 +212,8 @@ describe PublicImagesController do
       end
       context 'is_private false' do
         it 'marks bike not private' do
-          FactoryGirl.create(:ownership, bike: bike, creator: user, owner_email: user.email)
-          public_image = FactoryGirl.create(:public_image, imageable: bike, is_private: true)
+          FactoryBot.create(:ownership, bike: bike, creator: user, owner_email: user.email)
+          public_image = FactoryBot.create(:public_image, imageable: bike, is_private: true)
           expect(bike.reload.owner).to eq(user)
           set_current_user(user)
           post :is_private, id: public_image.id, is_private: false
@@ -225,8 +225,8 @@ describe PublicImagesController do
     end
     context 'non owner' do
       it 'does not update' do
-        FactoryGirl.create(:ownership, bike: bike)
-        public_image = FactoryGirl.create(:public_image, imageable: bike, name: 'party')
+        FactoryBot.create(:ownership, bike: bike)
+        public_image = FactoryBot.create(:public_image, imageable: bike, name: 'party')
         set_current_user(user)
         post :is_private, id: public_image.id, is_private: 'true'
         expect(public_image.is_private).to be_falsey
@@ -235,14 +235,14 @@ describe PublicImagesController do
   end
 
   describe 'order' do
-    let(:bike) { FactoryGirl.create(:bike) }
-    let(:ownership) { FactoryGirl.create(:ownership, bike: bike) }
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:ownership) { FactoryBot.create(:ownership, bike: bike) }
     let(:user) { ownership.creator }
-    let(:other_ownership) { FactoryGirl.create(:ownership) }
-    let(:public_image_1) { FactoryGirl.create(:public_image, imageable: bike) }
-    let(:public_image_2) { FactoryGirl.create(:public_image, imageable: bike, listing_order: 2) }
-    let(:public_image_3) { FactoryGirl.create(:public_image, imageable: bike, listing_order: 3) }
-    let(:public_image_other) { FactoryGirl.create(:public_image, imageable: other_ownership.bike, listing_order: 0) }
+    let(:other_ownership) { FactoryBot.create(:ownership) }
+    let(:public_image_1) { FactoryBot.create(:public_image, imageable: bike) }
+    let(:public_image_2) { FactoryBot.create(:public_image, imageable: bike, listing_order: 2) }
+    let(:public_image_3) { FactoryBot.create(:public_image, imageable: bike, listing_order: 3) }
+    let(:public_image_other) { FactoryBot.create(:public_image, imageable: other_ownership.bike, listing_order: 0) }
 
     it 'updates the listing order' do
       expect([public_image_1, public_image_2, public_image_3, public_image_other]).to be_present

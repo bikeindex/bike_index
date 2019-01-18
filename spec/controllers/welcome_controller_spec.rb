@@ -43,7 +43,7 @@ describe WelcomeController do
         expect(response).to redirect_to logout_url
       end
       context "unconfirmed user" do
-        let(:user) { FactoryGirl.create(:user) }
+        let(:user) { FactoryBot.create(:user) }
         it "redirects" do
           get :goodbye
           expect(response).to redirect_to logout_url
@@ -61,7 +61,7 @@ describe WelcomeController do
     end
     context "user present" do
       it "renders" do
-        user = FactoryGirl.create(:user_confirmed)
+        user = FactoryBot.create(:user_confirmed)
         set_current_user(user)
         get :choose_registration
         expect(response.status).to eq(200)
@@ -83,7 +83,7 @@ describe WelcomeController do
       before { set_current_user(user) }
 
       context "unconfirmed" do
-        let(:user) { FactoryGirl.create(:user) }
+        let(:user) { FactoryBot.create(:user) }
         it "redirects" do
           get :user_home
           expect(flash).to_not be_present
@@ -92,7 +92,7 @@ describe WelcomeController do
       end
 
       context "confirmed" do
-        let(:user) { FactoryGirl.create(:user_confirmed) }
+        let(:user) { FactoryBot.create(:user_confirmed) }
         context "without anything" do
           it "renders" do
             get :user_home
@@ -102,10 +102,10 @@ describe WelcomeController do
           end
         end
         context "with stuff" do
-          let(:ownership) { FactoryGirl.create(:ownership, user_id: user.id, current: true) }
+          let(:ownership) { FactoryBot.create(:ownership, user_id: user.id, current: true) }
           let(:bike) { ownership.bike }
-          let(:bike_2) { FactoryGirl.create(:bike) }
-          let(:lock) { FactoryGirl.create(:lock, user: user) }
+          let(:bike_2) { FactoryBot.create(:bike) }
+          let(:lock) { FactoryBot.create(:lock, user: user) }
           before do
             allow_any_instance_of(User).to receive(:bikes) { [bike, bike_2] }
             allow_any_instance_of(User).to receive(:locks) { [lock] }

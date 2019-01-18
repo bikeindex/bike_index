@@ -1,13 +1,13 @@
 require "spec_helper"
 
 describe Admin::BulkImportsController do
-  let(:user) { FactoryGirl.create(:admin) }
+  let(:user) { FactoryBot.create(:admin) }
   before do
     set_current_user(user)
   end
 
   describe "index" do
-    let!(:bulk_import) { FactoryGirl.create(:bulk_import) }
+    let!(:bulk_import) { FactoryBot.create(:bulk_import) }
     it "renders" do
       get :index
       expect(response).to be_success
@@ -17,7 +17,7 @@ describe Admin::BulkImportsController do
   end
 
   describe "show" do
-    let!(:bulk_import) { FactoryGirl.create(:bulk_import) }
+    let!(:bulk_import) { FactoryBot.create(:bulk_import) }
     it "renders" do
       get :show, id: bulk_import.id
       expect(response).to be_success
@@ -37,7 +37,7 @@ describe Admin::BulkImportsController do
 
   describe "create" do
     context "valid create" do
-      let(:organization) { FactoryGirl.create(:organization) }
+      let(:organization) { FactoryBot.create(:organization) }
       let(:file) { Rack::Test::UploadedFile.new(File.open(File.join("public", "import_all_optional_fields.csv"))) }
       let(:valid_attrs) { { file: file, organization_id: organization.id, no_notify: "1" } }
       it "creates" do

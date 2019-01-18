@@ -30,7 +30,7 @@ describe UserEmail do
       end
     end
     context 'already existing' do
-      let(:user) { FactoryGirl.create(:user_confirmed, email: 'cool@stuff.com') }
+      let(:user) { FactoryBot.create(:user_confirmed, email: 'cool@stuff.com') }
       it 'creates a new user_email' do
         expect(user.confirmed).to be_truthy
         expect(user.user_emails.count).to eq 1
@@ -43,7 +43,7 @@ describe UserEmail do
   end
 
   describe 'fuzzy_user_id_find' do
-    let(:user) { FactoryGirl.create(:user_confirmed, email: 'mommy@stuff.com') }
+    let(:user) { FactoryBot.create(:user_confirmed, email: 'mommy@stuff.com') }
     before do
       expect(user).to be_present
     end
@@ -65,7 +65,7 @@ describe UserEmail do
   end
 
   describe 'fuzzy_user_find' do
-    let(:user) { FactoryGirl.create(:user_confirmed, email: 'mommy@stuff.com') }
+    let(:user) { FactoryBot.create(:user_confirmed, email: 'mommy@stuff.com') }
     before do
       expect(user).to be_present
     end
@@ -85,7 +85,7 @@ describe UserEmail do
       end
     end
     context 'secondary email' do
-      let(:secondary_email) { FactoryGirl.create(:user_email, user: user, email: '2@dddd') }
+      let(:secondary_email) { FactoryBot.create(:user_email, user: user, email: '2@dddd') }
       it 'returns the user' do
         expect(secondary_email.user).to eq user
         expect(secondary_email.confirmed).to be_truthy

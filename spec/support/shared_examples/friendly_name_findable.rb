@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.shared_examples 'friendly_name_findable' do
   let(:model_sym) { subject.class.name.underscore.to_sym }
-  let(:instance) { FactoryGirl.create model_sym }
+  let(:instance) { FactoryBot.create model_sym }
 
   describe 'friendly_find' do
     before do

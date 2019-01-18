@@ -4,7 +4,7 @@ describe ComponentCreator do
   describe 'set_manufacturer_key' do
     context 'manufacturer in db' do
       it 'sets the manufacturer_id' do
-        m = FactoryGirl.create(:manufacturer, name: 'SRAM')
+        m = FactoryBot.create(:manufacturer, name: 'SRAM')
         c = { manufacturer: 'sram' }
         component = ComponentCreator.new.set_manufacturer_key(c)
         expect(component[:manufacturer_id]).to eq(m.id)
@@ -13,7 +13,7 @@ describe ComponentCreator do
     end
     context 'unknown manufacturer' do
       it 'adds other manufacturer name and set the set the foreign keys' do
-        m = FactoryGirl.create(:manufacturer, name: 'Other')
+        m = FactoryBot.create(:manufacturer, name: 'Other')
         c = { manufacturer: 'Gobbledy Gooky' }
         component = ComponentCreator.new.set_manufacturer_key(c)
         expect(component[:manufacturer_id]).to eq(m.id)
@@ -23,7 +23,7 @@ describe ComponentCreator do
     end
     context 'manufacturer_id a manufacturer name' do
       it 'sets manufacturer_id correctly' do
-        m = FactoryGirl.create(:manufacturer, name: 'SRAM')
+        m = FactoryBot.create(:manufacturer, name: 'SRAM')
         c = { manufacturer_id: 'sram' }
         component = ComponentCreator.new.set_manufacturer_key(c)
         expect(component[:manufacturer_id]).to eq(m.id)
@@ -34,7 +34,7 @@ describe ComponentCreator do
 
   describe 'set_component_type' do
     it 'sets the component_type from a string' do
-      ctype = FactoryGirl.create(:ctype, name: 'Stuff blows')
+      ctype = FactoryBot.create(:ctype, name: 'Stuff blows')
       c = { component_type: 'sTuff Blows ' }
       component = ComponentCreator.new.set_component_type(c)
       expect(component[:ctype_id]).to eq(ctype.id)
@@ -51,8 +51,8 @@ describe ComponentCreator do
 
   describe 'create_component' do
     it 'creates the component' do
-      bike = FactoryGirl.create(:bike)
-      manufacturer = FactoryGirl.create(:manufacturer, name: 'Somecool THING')
+      bike = FactoryBot.create(:bike)
+      manufacturer = FactoryBot.create(:manufacturer, name: 'Somecool THING')
       component = { description: 'Stuff', mnfg_name: 'Somecool thing' }
       component_creator = ComponentCreator.new(bike: bike)
       component_creator.create_component(component)
@@ -60,7 +60,7 @@ describe ComponentCreator do
       expect(bike.components.last.manufacturer).to eq(manufacturer)
     end
     it "creates the component and ignore attributes it shouldn't use" do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       component = { description: 'Stuff', cgroup: 'Drivetrain and brakes' }
       component_creator = ComponentCreator.new(bike: bike)
       component_creator.create_component(component)

@@ -3,7 +3,7 @@ require "spec_helper"
 describe LandingPagesController do
   include_context :page_content_values
   describe "show" do
-    let!(:organization) { FactoryGirl.create(:organization, short_name: "University") }
+    let!(:organization) { FactoryBot.create(:organization, short_name: "University") }
     it "renders revised_layout" do
       get :show, organization_id: "university"
       expect(response.status).to eq(200)

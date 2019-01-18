@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Admin::NewsController, type: :controller do
-  let(:subject) { FactoryGirl.create(:blog) }
+  let(:subject) { FactoryBot.create(:blog) }
   include_context :logged_in_as_super_admin
 
   describe 'index' do

@@ -4,7 +4,7 @@ RSpec.describe Export, type: :model do
   let(:organization) { export.organization }
 
   describe "scope and method for stolen_no_blacklist" do
-    let(:export) { FactoryGirl.create(:export, options: { with_blacklist: true, headers: %w[party registered_at] }) }
+    let(:export) { FactoryBot.create(:export, options: { with_blacklist: true, headers: %w[party registered_at] }) }
     it "is with blacklist" do
       expect(export.stolen?).to be_truthy
       expect(export.option?(:with_blacklist)).to be_truthy
@@ -15,7 +15,7 @@ RSpec.describe Export, type: :model do
     end
   end
   describe "organization" do
-    let(:export) { FactoryGirl.create(:export_organization) }
+    let(:export) { FactoryBot.create(:export_organization) }
     it "is as expected" do
       expect(export.options).to eq(Export.default_options("organization"))
       expect(export.stolen?).to be_falsey
@@ -25,7 +25,7 @@ RSpec.describe Export, type: :model do
       expect(export.bikes_scoped.to_sql).to eq organization.bikes.to_sql
     end
     context "no organization" do
-      let(:export) { FactoryGirl.build(:export_organization, organization: nil) }
+      let(:export) { FactoryBot.build(:export_organization, organization: nil) }
       it "is invalid without organization" do
         export.save
         expect(export.valid?).to be_falsey
@@ -35,7 +35,7 @@ RSpec.describe Export, type: :model do
   end
 
   describe "tmp_file" do
-    let(:export) { FactoryGirl.build(:export, file_format: "csv") }
+    let(:export) { FactoryBot.build(:export, file_format: "csv") }
     it "has the correct format" do
       expect(export.kind).to eq "stolen"
       expect(export.tmp_file.path.to_s).to match(/\.csv\z/)
@@ -50,7 +50,7 @@ RSpec.describe Export, type: :model do
     let(:target_start) { 1517378276 }
     let(:target_end) { 1535086316 }
     let(:timezone) { "America/Chicago" }
-    let(:export) { FactoryGirl.build(:export) }
+    let(:export) { FactoryBot.build(:export) }
     it "assigns correctly" do
       export.update_attributes(timezone: timezone, start_at: time_start, end_at: time_end, headers: %w[party registered_at])
       expect(export.start_at.to_i).to be_within(1).of target_start
@@ -82,7 +82,7 @@ RSpec.describe Export, type: :model do
     #   it "matches existing tsv scopes"
     # end
     context "organization" do
-      let(:export) { FactoryGirl.create(:export_organization, file: nil) }
+      let(:export) { FactoryBot.create(:export_organization, file: nil) }
       let(:start_time) { Time.now - 20.hours }
       let(:end_time) { Time.now - 5.minutes }
       it "has the scopes we expect" do

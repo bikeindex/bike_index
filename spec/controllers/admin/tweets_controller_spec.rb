@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Admin::TweetsController do
-  let(:subject) { FactoryGirl.create(:tweet) }
-  let(:user) { FactoryGirl.create(:admin) }
+  let(:subject) { FactoryBot.create(:tweet) }
+  let(:user) { FactoryBot.create(:admin) }
   before { set_current_user(user) }
 
   describe 'index' do

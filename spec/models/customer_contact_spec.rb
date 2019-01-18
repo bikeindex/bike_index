@@ -17,7 +17,7 @@ describe CustomerContact do
 
   describe 'normalize_email_and_find_user' do
     it 'finds email and associate' do
-      user = FactoryGirl.create(:user)
+      user = FactoryBot.create(:user)
       cc = CustomerContact.new
       allow(cc).to receive(:user_email).and_return(user.email)
       cc.normalize_email_and_find_user

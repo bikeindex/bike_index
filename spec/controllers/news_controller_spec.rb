@@ -11,7 +11,7 @@ describe NewsController do
     end
 
     describe 'show' do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryBot.create(:user) }
       let(:blog) { Blog.create(title: 'foo title', body: 'ummmmm good', user_id: user.id, old_title_slug: 'an-older-title') }
       context 'title slug' do
         it 'renders' do
@@ -62,7 +62,7 @@ describe NewsController do
     end
 
     describe 'show' do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryBot.create(:user) }
       let(:blog) { Blog.create(title: 'foo title', body: 'ummmmm good', user_id: user.id, old_title_slug: 'an-older-title') }
       it 'renders' do
         get :show, id: blog.title_slug

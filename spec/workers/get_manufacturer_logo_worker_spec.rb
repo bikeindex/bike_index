@@ -11,7 +11,7 @@ describe GetManufacturerLogoWorker do
   # Test is failing inexplicably - http://logo.clearbit.com/trekbikes.com?size=400 still works
   # Since it degrades nicely and isn't required, just ignoring
   xit 'Adds a logo, sets source' do
-    manufacturer = FactoryGirl.create(:manufacturer, website: 'https://trekbikes.com')
+    manufacturer = FactoryBot.create(:manufacturer, website: 'https://trekbikes.com')
     GetManufacturerLogoWorker.new.perform(manufacturer.id)
     manufacturer.reload
     expect(manufacturer.logo).to be_present
@@ -19,7 +19,7 @@ describe GetManufacturerLogoWorker do
   end
 
   it "Doesn't break if no logo present" do
-    manufacturer = FactoryGirl.create(:manufacturer, website: 'bbbbbbbbbbbbbbsafasds.net')
+    manufacturer = FactoryBot.create(:manufacturer, website: 'bbbbbbbbbbbbbbsafasds.net')
     GetManufacturerLogoWorker.new.perform(manufacturer.id)
     manufacturer.reload
     expect(manufacturer.logo).to_not be_present
@@ -27,13 +27,13 @@ describe GetManufacturerLogoWorker do
   end
 
   it 'returns true if no website present' do
-    manufacturer = FactoryGirl.create(:manufacturer)
+    manufacturer = FactoryBot.create(:manufacturer)
     expect(GetManufacturerLogoWorker.new.perform(manufacturer.id)).to be_truthy
   end
 
   it 'returns true if no website present' do
     local_image = File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))
-    manufacturer = FactoryGirl.create(:manufacturer, logo: local_image, website: 'http://example.com')
+    manufacturer = FactoryBot.create(:manufacturer, logo: local_image, website: 'http://example.com')
     expect(manufacturer.logo).to be_present
     expect(GetManufacturerLogoWorker.new.perform(manufacturer.id)).to be_truthy
   end

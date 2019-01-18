@@ -21,6 +21,7 @@ class StolenNotificationsController < ApplicationController
   private
 
   def permitted_parameters
-    params.require(:stolen_notification).permit(StolenNotification.old_attr_accessible)
+    params.require(:stolen_notification)
+          .permit(:subject, :reference_url, :message, :bike_id, :receiver_email, :send_dates, :application_id)
   end
 end

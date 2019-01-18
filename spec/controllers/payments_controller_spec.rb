@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe PaymentsController do
-  let(:user) { FactoryGirl.create(:user_confirmed) }
+  let(:user) { FactoryBot.create(:user_confirmed) }
 
   describe "new" do
     context "with user" do

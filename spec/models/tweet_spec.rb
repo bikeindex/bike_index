@@ -8,7 +8,7 @@ RSpec.describe Tweet, type: :model do
   end
 
   describe 'friendly_find' do
-    let!(:tweet) { FactoryGirl.create(:tweet) }
+    let!(:tweet) { FactoryBot.create(:tweet) }
     let(:twitter_id) { tweet.twitter_id }
     context 'twitter_id' do
       it 'finds the tweet' do

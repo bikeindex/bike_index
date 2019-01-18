@@ -57,10 +57,10 @@ RSpec.describe CreationState, type: :model do
   end
 
   describe 'create_bike_organization' do
-    let(:bike) { FactoryGirl.create(:bike) }
-    let(:organization) { FactoryGirl.create(:organization) }
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:organization) { FactoryBot.create(:organization) }
     context 'no organization' do
-      let(:creation_state) { FactoryGirl.create(:creation_state, bike: bike) }
+      let(:creation_state) { FactoryBot.create(:creation_state, bike: bike) }
       it 'returns true' do
         expect do
           creation_state.create_bike_organization
@@ -68,7 +68,7 @@ RSpec.describe CreationState, type: :model do
       end
     end
     context 'with organization' do
-      let(:creation_state) { FactoryGirl.create(:creation_state, bike: bike) }
+      let(:creation_state) { FactoryBot.create(:creation_state, bike: bike) }
       it 'creates the bike_organization' do
         creation_state.organization = organization
         expect do
@@ -83,9 +83,9 @@ RSpec.describe CreationState, type: :model do
       end
     end
     context 'already existing bike_organization' do
-      let(:creation_state) { FactoryGirl.create(:creation_state, bike: bike) }
+      let(:creation_state) { FactoryBot.create(:creation_state, bike: bike) }
       it 'does not error or duplicate' do
-        FactoryGirl.create(:bike_organization, bike: bike, organization: organization)
+        FactoryBot.create(:bike_organization, bike: bike, organization: organization)
         creation_state.organization = organization
         expect do
           creation_state.create_bike_organization
@@ -100,7 +100,7 @@ RSpec.describe CreationState, type: :model do
 
   context 'set_reflexive_association' do
     it 'sets the creation_state_id on bike' do
-      creation_state = FactoryGirl.create(:creation_state)
+      creation_state = FactoryBot.create(:creation_state)
       bike = creation_state.bike
       bike.reload
       expect(bike.creation_state_id).to eq creation_state.id
