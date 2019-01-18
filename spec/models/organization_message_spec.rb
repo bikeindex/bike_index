@@ -2,7 +2,7 @@ require "spec_helper"
 
 RSpec.describe OrganizationMessage, type: :model do
   describe "factory" do
-    let(:organization_message) { FactoryGirl.create(:organization_message) }
+    let(:organization_message) { FactoryBot.create(:organization_message) }
     it "is valid" do
       expect(organization_message.valid?).to be_truthy
       expect(organization_message.id).to be_present
@@ -12,9 +12,9 @@ RSpec.describe OrganizationMessage, type: :model do
   describe "set_calculated_attributes" do
     include_context :geocoder_default_location
     context "geolocated" do
-      let(:ownership) { FactoryGirl.create(:ownership, owner_email: "stuff@stuff.com") }
+      let(:ownership) { FactoryBot.create(:ownership, owner_email: "stuff@stuff.com") }
       let(:bike) { ownership.bike }
-      let(:organization_message) { FactoryGirl.build(:organization_message, email: nil, kind: :geolocated, bike: bike, latitude: nil, longitude: nil, address: nil) }
+      let(:organization_message) { FactoryBot.build(:organization_message, email: nil, kind: :geolocated, bike: bike, latitude: nil, longitude: nil, address: nil) }
       it "sets the email from the bike, fails without location" do
         expect(bike.owner_email).to eq "stuff@stuff.com"
         organization_message.save
@@ -25,7 +25,7 @@ RSpec.describe OrganizationMessage, type: :model do
       end
     end
     context "no address" do
-      let(:organization_message) { FactoryGirl.build(:organization_message, kind: :geolocated, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
+      let(:organization_message) { FactoryBot.build(:organization_message, kind: :geolocated, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
       it "sets address" do
         organization_message.save
         expect(organization_message.address).to be_present
@@ -37,7 +37,7 @@ RSpec.describe OrganizationMessage, type: :model do
     context "no location, but address" do
       let(:latitude) { 41.9202384 }
       let(:longitude) { -87.7158185 }
-      let(:organization_message) { FactoryGirl.build(:organization_message, kind: :geolocated, latitude: nil, longitude: nil, address: "3554 W Shakespeare Ave, 60647") }
+      let(:organization_message) { FactoryBot.build(:organization_message, kind: :geolocated, latitude: nil, longitude: nil, address: "3554 W Shakespeare Ave, 60647") }
       include_context :geocoder_real
       it "sets location" do
         VCR.use_cassette("organization_message-address_lookup") do

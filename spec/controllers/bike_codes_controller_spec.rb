@@ -2,8 +2,8 @@ require "spec_helper"
 
 describe BikeCodesController do
   describe "update" do
-    let(:bike_code) { FactoryGirl.create(:bike_code) }
-    let(:bike) { FactoryGirl.create(:bike) }
+    let(:bike_code) { FactoryBot.create(:bike_code) }
+    let(:bike) { FactoryBot.create(:bike) }
     context "no user" do
       it "responds with 401" do
         put :update, id: bike_code.code, bike_id: "9"
@@ -44,8 +44,8 @@ describe BikeCodesController do
         end
       end
       context "already claimed bike" do
-        let(:bike_code) { FactoryGirl.create(:bike_code, bike_id: bike.id) }
-        let(:bike2) { FactoryGirl.create(:bike) }
+        let(:bike_code) { FactoryBot.create(:bike_code, bike_id: bike.id) }
+        let(:bike2) { FactoryBot.create(:bike) }
         it "responds with flash error" do
           put :update, id: bike_code.code, bike_id: "https://bikeindex.org/bikes/#{bike2.id} "
           expect(flash[:error]).to be_present
@@ -53,9 +53,9 @@ describe BikeCodesController do
           expect(bike_code.bike).to eq bike
         end
         context "organized" do
-          let(:organization) { FactoryGirl.create(:organization) }
-          let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
-          let(:bike_code) { FactoryGirl.create(:bike_code, bike_id: bike.id, organization: organization) }
+          let(:organization) { FactoryBot.create(:organization) }
+          let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+          let(:bike_code) { FactoryBot.create(:bike_code, bike_id: bike.id, organization: organization) }
           it "succeeds" do
             put :update, id: bike_code.code, bike_id: "  #{bike2.id} "
             expect(flash[:success]).to be_present

@@ -21,7 +21,7 @@ describe Paint do
 
   describe 'friendly_find' do
     it "finds color when the case doesn't match" do
-      paint = FactoryGirl.create(:paint, name: 'Poopy PAiNTERS')
+      paint = FactoryBot.create(:paint, name: 'Poopy PAiNTERS')
       expect(Paint.friendly_find('poopy painters')).to eq(paint)
     end
   end
@@ -30,7 +30,7 @@ describe Paint do
     before(:each) do
       bi_colors = ['Black', 'Blue', 'Brown', 'Green', 'Orange', 'Pink', 'Purple', 'Red', 'Silver, Gray or Bare Metal', 'Stickers tape or other cover-up', 'Teal', 'White', 'Yellow or Gold']
       bi_colors.each do |col|
-        FactoryGirl.create(:color, name: col)
+        FactoryBot.create(:color, name: col)
       end
     end
     it 'associates paint with reasonable colors' do

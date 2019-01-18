@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe CtypeSerializer do
-  let(:ctype) { FactoryGirl.create(:ctype, has_multiple: true) }
+  let(:ctype) { FactoryBot.create(:ctype, has_multiple: true) }
   subject { CtypeSerializer.new(ctype) }
 
   it { expect(subject.name).to eq(ctype.name) }

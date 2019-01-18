@@ -1,7 +1,7 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :organization_invitation do
-    inviter { FactoryGirl.create(:user) }
-    organization { FactoryGirl.create(:organization) }
+    inviter { FactoryBot.create(:user) }
+    organization { FactoryBot.create(:organization) }
     invitee_email { "mike@test.com" }
   end
 end

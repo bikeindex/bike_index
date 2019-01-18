@@ -2,7 +2,7 @@ require 'spec_helper'
 
 RSpec.shared_examples 'autocomplete_hashable' do
   let(:model_sym) { subject.class.name.underscore.to_sym }
-  let(:instance) { FactoryGirl.create model_sym }
+  let(:instance) { FactoryBot.create model_sym }
 
   describe 'autocomplete_result_hash' do
     it 'it is the expected hash' do

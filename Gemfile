@@ -142,7 +142,7 @@ end
 
 group :test do
   gem "simplecov", require: false
-  gem "factory_girl_rails"
+  gem "factory_bot_rails"
   gem "rspec-sidekiq"
   gem "guard"
   gem "guard-rspec"

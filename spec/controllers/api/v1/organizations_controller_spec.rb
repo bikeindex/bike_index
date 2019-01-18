@@ -3,13 +3,13 @@ require 'spec_helper'
 describe Api::V1::OrganizationsController do
   describe 'show' do
     it 'returns unauthorized unless organizations api token present' do
-      organization = FactoryGirl.create(:organization)
+      organization = FactoryBot.create(:organization)
       get :show, id: organization.slug, format: :json
       expect(response.code).to eq('401')
     end
 
     it 'returns the organization info if the token is present' do
-      organization = FactoryGirl.create(:organization)
+      organization = FactoryBot.create(:organization)
       options = { id: organization.slug, access_token: ENV['ORGANIZATIONS_API_ACCESS_TOKEN'] }
       get :show, options, format: :json
       expect(response.code).to eq('200')
@@ -19,7 +19,7 @@ describe Api::V1::OrganizationsController do
     end
 
     it 'returns the organization info if the org token is present' do
-      organization = FactoryGirl.create(:organization)
+      organization = FactoryBot.create(:organization)
       options = { id: organization.slug, access_token: organization.access_token }
       get :show, options, format: :json
       expect(response.code).to eq('200')

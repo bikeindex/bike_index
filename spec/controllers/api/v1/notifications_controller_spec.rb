@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Api::V1::NotificationsController do
   describe 'send_notification_email' do
     it 'returns correct code if authentication fails' do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       options = { some_stuff: 'things',
                   other_stuff: 'Things',
                   bike_id: bike.id
@@ -14,7 +14,7 @@ describe Api::V1::NotificationsController do
 
     it 'sends an email if the authorization works' do
       expect(CustomerContact.count).to eq(0)
-      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record = FactoryBot.create(:stolen_record)
       options = {
         access_token: ENV['NOTIFICATIONS_API_KEY'],
         notification_hash: {
@@ -41,7 +41,7 @@ describe Api::V1::NotificationsController do
 
     it 'sends a recovered email if the authorization works' do
       expect(CustomerContact.count).to eq(0)
-      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record = FactoryBot.create(:stolen_record)
       bike = stolen_record.bike
       bike.update_attribute :recovered, true
       options = {

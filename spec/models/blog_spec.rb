@@ -11,7 +11,7 @@ describe Blog do
 
   describe 'set_title_slug' do
     it 'makes the title 70 char long and character safe for params' do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       blog = Blog.new(title: 'A really really really really loooooooooooooooooooooooooooooooooooong title that absolutely rocks so hard', body: 'some things', user_id: @user.id, published_at: Time.now)
       blog.save
       expect(blog.title_slug).to eq('a-really-really-really-really-loooooooooooooooooooooooooooooooooooong')
@@ -20,7 +20,7 @@ describe Blog do
 
   describe 'update_title_save' do
     it 'makes the title 70 char long and character safe for params' do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       blog = Blog.new(title: 'A really really really really loooooooooooooooooooooooooooooooooooong title that absolutely rocks so hard', body: 'some things', user_id: @user.id, published_at: Time.now)
       blog.save
       blog.title = 'New Title'
@@ -33,7 +33,7 @@ describe Blog do
 
   describe 'create_abbreviation' do
     it 'makes the text 200 char long or less and remove any new lines' do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       blog = Blog.new(title: 'Blog title', user_id: @user.id, published_at: Time.now)
       blog.body = ''"
       Lorem ipsum dolor sit amet! Consectetur adipisicing elit, sed do eiusmod
@@ -54,7 +54,7 @@ describe Blog do
     end
 
     it 'creates the body abbr from a listicle' do
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       blog = Blog.create(title: 'Blog title', user_id: @user.id, published_at: Time.now, body: 'stuff', is_listicle: true)
       Listicle.create(blog_id: blog.id, body: "View the link\n[here](http://something)\n\n<img class='post-image' src='https://files.bikeindex.org/uploads/Pu/1003/large_photo__6_.JPG' alt='Bike Index shirt and stickers'>\n![PBR, a bike bag and drawings](http://imgur.com/e4zzEjP.jpg) and also this")
       blog.reload.save
@@ -64,7 +64,7 @@ describe Blog do
     it 'removes any link information and images' do
       # TODO: remove markdown images
       # Also, it would be cool if we could end on a word instead of in the middle of one...
-      @user = FactoryGirl.create(:user)
+      @user = FactoryBot.create(:user)
       blog = Blog.new(title: 'Blog title', user_id: @user.id, published_at: Time.now)
       blog.body = "View the link\n[here](http://something)\n\n<img class='post-image' src='https://files.bikeindex.org/uploads/Pu/1003/large_photo__6_.JPG' alt='Bike Index shirt and stickers'>\n![PBR, a bike bag and drawings](http://imgur.com/e4zzEjP.jpg) and also this"
       blog.save
@@ -74,16 +74,16 @@ describe Blog do
 
   describe 'set_index_image' do
     it 'sets the public image for a blog' do
-      blog = FactoryGirl.create(:blog)
-      public_image = FactoryGirl.create(:public_image, imageable: blog)
+      blog = FactoryBot.create(:blog)
+      public_image = FactoryBot.create(:public_image, imageable: blog)
       blog.reload # Reload so it knows about association
       blog.set_index_image
       expect(blog.index_image_id).to eq(public_image.id)
     end
 
     it "doesn't break if image doesn't exist" do
-      blog = FactoryGirl.create(:blog)
-      public_image = FactoryGirl.create(:public_image, imageable: blog)
+      blog = FactoryBot.create(:blog)
+      public_image = FactoryBot.create(:public_image, imageable: blog)
       blog.reload # Reload so it knows about association
       blog.index_image_id = 3399
       blog.set_index_image

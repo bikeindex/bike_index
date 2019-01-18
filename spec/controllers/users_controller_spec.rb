@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe UsersController do
-  let(:user) { FactoryGirl.create(:user_confirmed) }
+  let(:user) { FactoryBot.create(:user_confirmed) }
   describe "new" do
     context "already signed in" do
       include_context :logged_in_as_user
@@ -17,7 +17,7 @@ describe UsersController do
         end
       end
       context "unconfirmed" do
-        let(:user) { FactoryGirl.create(:user) }
+        let(:user) { FactoryBot.create(:user) }
         it "redirects to please_confirm_email" do
           get :new, return_to: "/bikes/12?contact_owner=true"
           expect(response).to redirect_to please_confirm_email_users_path
@@ -67,7 +67,7 @@ describe UsersController do
         expect(response).to redirect_to user_home_path
       end
       context "unconfirmed user" do
-        let(:user) { FactoryGirl.create(:user) }
+        let(:user) { FactoryBot.create(:user) }
         it "renders" do
           get :please_confirm_email
           expect(response.code).to eq("200")
@@ -80,11 +80,11 @@ describe UsersController do
 
   describe "create" do
     context "legacy" do
-      let(:user_attributes) { FactoryGirl.attributes_for(:user, email: "poo@pile.com") }
+      let(:user_attributes) { FactoryBot.attributes_for(:user, email: "poo@pile.com") }
       describe "success" do
         it "creates a non-confirmed record" do
           expect do
-            post :create, user: FactoryGirl.attributes_for(:user)
+            post :create, user: FactoryBot.attributes_for(:user)
           end.to change(User, :count).by(1)
           expect(flash).to_not be_present
           expect(response).to redirect_to(please_confirm_email_users_path)
@@ -95,7 +95,7 @@ describe UsersController do
           expect(user.unconfirmed?).to be_truthy
         end
         context "with organization_invitation, partner param" do
-          let!(:organization_invitation) { FactoryGirl.create(:organization_invitation, invitee_email: "poo@pile.com") }
+          let!(:organization_invitation) { FactoryBot.create(:organization_invitation, invitee_email: "poo@pile.com") }
           it "creates a confirmed user, log in, and send welcome" do
             expect_any_instance_of(AfterUserCreateWorker).to receive(:send_welcoming_email)
             post :create, user: user_attributes, partner: "bikehub"
@@ -124,7 +124,7 @@ describe UsersController do
 
       describe "failure" do
         let(:user_attributes) do
-          user = FactoryGirl.attributes_for(:user)
+          user = FactoryBot.attributes_for(:user)
           user[:password_confirmation] = "bazoo"
           user
         end
@@ -154,7 +154,7 @@ describe UsersController do
         end
 
         describe 'user not yet confirmed' do
-          let(:user) { FactoryGirl.create(:user) }
+          let(:user) { FactoryBot.create(:user) }
 
           before :each do
             expect(User).to receive(:find).and_return(user)
@@ -229,7 +229,7 @@ describe UsersController do
     end
 
     context "secondary email" do
-      let!(:user_email) { FactoryGirl.create(:user_email, user: user) }
+      let!(:user_email) { FactoryBot.create(:user_email, user: user) }
       it "enqueues a password reset email job" do
         expect do
           post :password_reset, email: user_email.email
@@ -239,7 +239,7 @@ describe UsersController do
     end
 
     context "unconfirmed user" do
-      let(:user) { FactoryGirl.create(:user) }
+      let(:user) { FactoryBot.create(:user) }
       it "enqueues a password reset email job" do
         expect do
           post :password_reset, email: user.email
@@ -256,7 +256,7 @@ describe UsersController do
       end
 
       context "unconfirmed user" do
-        let(:user) { FactoryGirl.create(:user) }
+        let(:user) { FactoryBot.create(:user) }
         it "redirects" do
           post :password_reset, token: user.password_reset_token
           expect(response).to redirect_to please_confirm_email_users_path
@@ -361,7 +361,7 @@ describe UsersController do
   end
 
   describe 'update' do
-    let!(:user) { FactoryGirl.create(:user_confirmed, terms_of_service: false, password: "old_pass", password_confirmation: "old_pass", username: "something") }
+    let!(:user) { FactoryBot.create(:user_confirmed, terms_of_service: false, password: "old_pass", password_confirmation: "old_pass", username: "something") }
     context "nil username" do
       it "doesn't update username" do
         user.reload
@@ -458,7 +458,7 @@ describe UsersController do
     end
 
     it 'resets users auth if password changed, updates current session' do
-      user = FactoryGirl.create(:user_confirmed, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass', password_reset_token: 'stuff')
+      user = FactoryBot.create(:user_confirmed, terms_of_service: false, password: 'old_pass', password_confirmation: 'old_pass', password_reset_token: 'stuff')
       auth = user.auth_token
       email = user.email
       set_current_user(user)
@@ -488,10 +488,10 @@ describe UsersController do
     end
 
     it 'updates the vendor terms of service and emailable' do
-      user = FactoryGirl.create(:user_confirmed, terms_of_service: false, is_emailable: false)
+      user = FactoryBot.create(:user_confirmed, terms_of_service: false, is_emailable: false)
       expect(user.is_emailable).to be_falsey
-      org = FactoryGirl.create(:organization)
-      FactoryGirl.create(:membership, organization: org, user: user)
+      org = FactoryBot.create(:organization)
+      FactoryBot.create(:membership, organization: org, user: user)
       set_current_user(user)
       post :update, id: user.username, user: { vendor_terms_of_service: '1', is_emailable: true }
       expect(response.code).to eq('302')
@@ -509,7 +509,7 @@ describe UsersController do
   end
   describe 'unsubscribe' do
     context "subscribed unconfirmed user" do
-      let(:user) { FactoryGirl.create(:user, is_emailable: true) }
+      let(:user) { FactoryBot.create(:user, is_emailable: true) }
       it "updates is_emailable" do
         expect(user.is_emailable).to be_truthy
         expect(user.confirmed?).to be_falsey
@@ -529,7 +529,7 @@ describe UsersController do
       end
     end
     context 'user already unsubscribed' do
-      let(:user) { FactoryGirl.create(:user_confirmed, is_emailable: false) }
+      let(:user) { FactoryBot.create(:user_confirmed, is_emailable: false) }
       it 'does nothing' do
         expect(user.is_emailable).to be_falsey
         get :unsubscribe, id: user.username

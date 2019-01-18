@@ -12,7 +12,7 @@ describe OrganizationInvitation do
 
   describe 'create' do
     before :each do
-      @o = FactoryGirl.create(:organization_invitation)
+      @o = FactoryBot.create(:organization_invitation)
     end
 
     it 'creates a valid organization_invitation' do
@@ -20,8 +20,8 @@ describe OrganizationInvitation do
     end
 
     it 'assigns to user if the user exists' do
-      @user = FactoryGirl.create(:user_confirmed)
-      @o1 = FactoryGirl.create(:organization_invitation, invitee_email: @user.email)
+      @user = FactoryBot.create(:user_confirmed)
+      @o1 = FactoryBot.create(:organization_invitation, invitee_email: @user.email)
       expect(@user.memberships.count).to eq(1)
       expect(@o1.redeemed).to be_truthy
     end
@@ -29,7 +29,7 @@ describe OrganizationInvitation do
 
   it 'enqueues an email job' do
     expect do
-      FactoryGirl.create(:organization_invitation)
+      FactoryBot.create(:organization_invitation)
     end.to change(EmailOrganizationInvitationWorker.jobs, :size).by(1)
   end
 
@@ -43,9 +43,9 @@ describe OrganizationInvitation do
 
   describe 'assign_to(user)' do
     before :each do
-      @organization = FactoryGirl.create(:organization)
-      @o = FactoryGirl.create(:organization_invitation, organization: @organization, invitee_email: 'EMAIL@email.com')
-      @user = FactoryGirl.create(:user_confirmed, email: 'EMAIL@email.com')
+      @organization = FactoryBot.create(:organization)
+      @o = FactoryBot.create(:organization_invitation, organization: @organization, invitee_email: 'EMAIL@email.com')
+      @user = FactoryBot.create(:user_confirmed, email: 'EMAIL@email.com')
       @o.reload
       @user.reload
     end
@@ -58,8 +58,8 @@ describe OrganizationInvitation do
     end
 
     it "sets the user's name if the name is blank" do
-      @user2 = FactoryGirl.create(:user_confirmed, name: nil)
-      @o2 = FactoryGirl.create(:organization_invitation, organization: @organization, invitee_email: @user2.email, invitee_name: 'Biker Name')
+      @user2 = FactoryBot.create(:user_confirmed, name: nil)
+      @o2 = FactoryBot.create(:organization_invitation, organization: @organization, invitee_email: @user2.email, invitee_name: 'Biker Name')
       expect(@user2.reload.name).to eq('Biker Name')
     end
 
@@ -78,8 +78,8 @@ describe OrganizationInvitation do
     end
 
     it 'lets users have multiple memberships to different organizations' do
-      @organization2 = FactoryGirl.create(:organization)
-      FactoryGirl.create(:membership, organization: @organization2, user: @user)
+      @organization2 = FactoryBot.create(:organization)
+      FactoryBot.create(:membership, organization: @organization2, user: @user)
       expect(@user.memberships.count).to eq(2)
     end
   end

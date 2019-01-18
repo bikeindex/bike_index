@@ -3,7 +3,7 @@ require 'spec_helper'
 describe OwnershipsController do
   describe 'show' do
     it 'sets the flash with absent user for create account' do
-      ownership = FactoryGirl.create(:ownership)
+      ownership = FactoryBot.create(:ownership)
       put :show, id: ownership.id
       expect(response).to redirect_to(:new_user)
       expect(flash[:error].match('to claim')).to be_present
@@ -11,8 +11,8 @@ describe OwnershipsController do
     end
 
     it 'sets the flash with sign in for owner exists' do
-      user = FactoryGirl.create(:user)
-      ownership = FactoryGirl.create(:ownership, user: user)
+      user = FactoryBot.create(:user)
+      ownership = FactoryBot.create(:ownership, user: user)
       put :show, id: ownership.id
       expect(response).to redirect_to(:new_session)
       expect(flash[:error].match('to claim')).to be_present
@@ -21,8 +21,8 @@ describe OwnershipsController do
 
     describe 'user present' do
       before :each do
-        @user = FactoryGirl.create(:user_confirmed)
-        @ownership = FactoryGirl.create(:ownership)
+        @user = FactoryBot.create(:user_confirmed)
+        @ownership = FactoryBot.create(:ownership)
         set_current_user(@user)
       end
 

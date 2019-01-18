@@ -12,7 +12,7 @@ describe Admin::PaintsController do
 
   describe 'edit' do
     it 'renders' do
-      paint = FactoryGirl.create(:paint)
+      paint = FactoryBot.create(:paint)
       get :edit, id: paint.id
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)

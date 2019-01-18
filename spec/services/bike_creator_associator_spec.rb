@@ -53,7 +53,7 @@ describe BikeCreatorAssociator do
   describe 'add_other_listings' do
     it 'calls create stolen record' do
       b_param = BParam.new
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       urls = ['http://some_blog.com', 'http://some_thing.com']
       allow(b_param).to receive(:params).and_return({ bike: { other_listing_urls: urls } }.as_json)
       subject.new(b_param).add_other_listings(bike)
@@ -63,8 +63,8 @@ describe BikeCreatorAssociator do
 
   describe 'attach_photo' do
     it 'creates public images for the attached image' do
-      bike = FactoryGirl.create(:bike)
-      b_param = FactoryGirl.create(:b_param)
+      bike = FactoryBot.create(:bike)
+      b_param = FactoryBot.create(:b_param)
       test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg')))
       b_param.image = test_photo
       b_param.save
@@ -77,8 +77,8 @@ describe BikeCreatorAssociator do
 
   # describe 'add_uploaded_image' do
   #   it "associates the public image" do
-  #     bike = FactoryGirl.create(:bike)
-  #     b_param = FactoryGirl.create(:b_param)
+  #     bike = FactoryBot.create(:bike)
+  #     b_param = FactoryBot.create(:b_param)
   #     b_param.params = {bike: {bike_image: File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg'))}}
   #     b_param.save
   #     subject.new(b_param).add_uploaded_image(bike)
@@ -87,7 +87,7 @@ describe BikeCreatorAssociator do
   # end
 
   describe "updated_phone" do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
     let(:bike) { Bike.new(phone: "699.999.9999") }
     before { allow(bike).to receive(:user) { user } }
     it "sets the owner's phone if one is passed in" do
@@ -96,7 +96,7 @@ describe BikeCreatorAssociator do
       expect(user.phone).to eq("6999999999")
     end
     context "user already has a phone" do
-      let(:user) { FactoryGirl.create(:user, phone: "0000000000") }
+      let(:user) { FactoryBot.create(:user, phone: "0000000000") }
       it 'does not set the phone if the user already has a phone' do
         instance.assign_user_attributes(bike)
         user.reload

@@ -2,7 +2,7 @@ require "spec_helper"
 
 describe OrganizedMessageSerializer, type: :lib do
   let(:subject) { OrganizedMessageSerializer }
-  let(:obj) { FactoryGirl.create(:organization_message) }
+  let(:obj) { FactoryBot.create(:organization_message) }
   let(:serializer) { subject.new(obj, root: false) }
 
   it "works" do

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Bikes::RecoveryController, type: :controller do
-  let(:bike) { FactoryGirl.create(:stolen_bike) }
+  let(:bike) { FactoryBot.create(:stolen_bike) }
   let(:stolen_record) { bike.current_stolen_record }
   let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
 

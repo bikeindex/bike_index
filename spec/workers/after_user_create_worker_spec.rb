@@ -6,7 +6,7 @@ describe AfterUserCreateWorker do
 
   it { is_expected.to be_processed_in :updates }
 
-  let!(:user) { FactoryGirl.create(:user, email: "owner1@A.COM") }
+  let!(:user) { FactoryBot.create(:user, email: "owner1@A.COM") }
   let(:email) { user.email }
 
   describe "perform" do
@@ -45,12 +45,12 @@ describe AfterUserCreateWorker do
   end
 
   describe "associate_ownerships" do
-    let(:bike) { FactoryGirl.create(:bike, owner_email: "owner1@a.com") }
-    let!(:ownership) { FactoryGirl.create(:ownership, owner_email: "OWner1@a.com", bike: bike) }
-    let(:bike2) { FactoryGirl.create(:bike, owner_email: "owner1@a.com") }
-    let!(:ownership2) { FactoryGirl.create(:ownership, owner_email: "owner1@a.com", bike: bike2) }
-    let(:bike3) { FactoryGirl.create(:bike, owner_email: "owner1@a.com") }
-    let!(:ownership3) { FactoryGirl.create(:ownership, owner_email: "owner1@a.com", bike: bike3) }
+    let(:bike) { FactoryBot.create(:bike, owner_email: "owner1@a.com") }
+    let!(:ownership) { FactoryBot.create(:ownership, owner_email: "OWner1@a.com", bike: bike) }
+    let(:bike2) { FactoryBot.create(:bike, owner_email: "owner1@a.com") }
+    let!(:ownership2) { FactoryBot.create(:ownership, owner_email: "owner1@a.com", bike: bike2) }
+    let(:bike3) { FactoryBot.create(:bike, owner_email: "owner1@a.com") }
+    let!(:ownership3) { FactoryBot.create(:ownership, owner_email: "owner1@a.com", bike: bike3) }
 
     it "assigns any ownerships that match the user email" do
       expect(user).to be_present
@@ -68,17 +68,17 @@ describe AfterUserCreateWorker do
   context "extra user attributes" do
     # Block traditional run, so we can do it separately }
     before { allow_any_instance_of(User).to receive(:perform_create_jobs) { true } }
-    let(:user) { FactoryGirl.create(:user, email: "aftercreate@bikeindex.org") }
-    let!(:state) { FactoryGirl.create(:state, name: "California", abbreviation: "CA") }
+    let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org") }
+    let!(:state) { FactoryBot.create(:state, name: "California", abbreviation: "CA") }
     let!(:country) { Country.united_states }
     let!(:b_param) do
-      FactoryGirl.create(:b_param,
+      FactoryBot.create(:b_param,
                          created_bike_id: bike.id,
                          creator: bike.creator,
                          params: { bike: { address: "Pier 15 The Embarcadero, 94111", phone: "(111) 222-3333" } })
     end
     # We need to manually set the user in this ownership because otherwise rspec can't find it TODO: Rails 5 update maybe
-    let(:ownership) { FactoryGirl.create(:ownership, user: user, owner_email: "aftercreate@bikeindex.org") }
+    let(:ownership) { FactoryBot.create(:ownership, user: user, owner_email: "aftercreate@bikeindex.org") }
     let!(:bike) { ownership.bike }
     include_context :geocoder_real
     it "assigns the extra user attributes" do
@@ -95,7 +95,7 @@ describe AfterUserCreateWorker do
       end
     end
     context "existing attributes" do
-      let(:user) { FactoryGirl.create(:user, email: "aftercreate@bikeindex.org", phone: "929292", zipcode: "89999") }
+      let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org", phone: "929292", zipcode: "89999") }
       it "doesn't import" do
         instance.perform(user.id, "new")
         user.reload
@@ -110,8 +110,8 @@ describe AfterUserCreateWorker do
   end
 
   describe "associate_membership_invites" do
-    let!(:organization_invitation) { FactoryGirl.create(:organization_invitation, invitee_email: " #{user.email.upcase}") }
-    let(:user) { FactoryGirl.build(:user, email: "owner1@A.COM") }
+    let!(:organization_invitation) { FactoryBot.create(:organization_invitation, invitee_email: " #{user.email.upcase}") }
+    let(:user) { FactoryBot.build(:user, email: "owner1@A.COM") }
     it "assigns any organization invitations that match the user email, and mark user confirmed if invited" do
       user.save
       expect(organization_invitation.created_at < user.created_at).to be_truthy

@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe CustomerMailer do
-  let(:user) { FactoryGirl.create(:user) }
+  let(:user) { FactoryBot.create(:user) }
 
   describe 'welcome_email' do
     it 'renders an email' do
@@ -20,7 +20,7 @@ describe CustomerMailer do
       expect(mail.from).to eq(["contact@bikeindex.org"])
     end
     context "partner signup" do
-      let(:user) { FactoryGirl.create(:user_bikehub_signup) }
+      let(:user) { FactoryBot.create(:user_bikehub_signup) }
       it "renders bikehub partner email" do
         expect(user.partner_sign_up).to eq "bikehub"
         mail = CustomerMailer.confirmation_email(user)
@@ -42,7 +42,7 @@ describe CustomerMailer do
   end
 
   describe 'additional_email_confirmation' do
-    let(:user_email) { FactoryGirl.create(:user_email) }
+    let(:user_email) { FactoryBot.create(:user_email) }
     it 'renders email' do
       mail = CustomerMailer.additional_email_confirmation(user_email)
       expect(mail.subject).to match(/confirm/i)
@@ -52,7 +52,7 @@ describe CustomerMailer do
 
   describe 'invoice_email' do
     context 'donation' do
-      let(:payment) { FactoryGirl.create(:payment, user: user) }
+      let(:payment) { FactoryBot.create(:payment, user: user) }
       it 'renders email' do
         mail = CustomerMailer.invoice_email(payment)
         expect(mail.subject).to eq('Thank you for supporting Bike Index!')
@@ -62,7 +62,7 @@ describe CustomerMailer do
       end
     end
     context 'payment' do
-      let(:payment) { FactoryGirl.create(:payment, user: user, is_payment: true) }
+      let(:payment) { FactoryBot.create(:payment, user: user, is_payment: true) }
       it 'renders email' do
         mail = CustomerMailer.invoice_email(payment)
         expect(mail.subject).to eq('Thank you for supporting Bike Index!')
@@ -74,8 +74,8 @@ describe CustomerMailer do
   end
 
   describe 'stolen_bike_alert_email' do
-    let!(:ownership) { FactoryGirl.create(:ownership, bike: stolen_record.bike) }
-    let(:stolen_record) { FactoryGirl.create(:stolen_record) }
+    let!(:ownership) { FactoryBot.create(:ownership, bike: stolen_record.bike) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record) }
     let(:notification_hash) do
       {
         notification_type: 'stolen_twitter_alerter',
@@ -89,7 +89,7 @@ describe CustomerMailer do
         retweet_screen_names: %w(someother_screename and_another)
       }
     end
-    let(:customer_contact) { FactoryGirl.create(:customer_contact, info_hash: notification_hash, title: 'CUSTOM CUSTOMER contact Title', bike: stolen_record.bike) }
+    let(:customer_contact) { FactoryBot.create(:customer_contact, info_hash: notification_hash, title: 'CUSTOM CUSTOMER contact Title', bike: stolen_record.bike) }
     it 'renders email' do
       mail = CustomerMailer.stolen_bike_alert_email(customer_contact)
       expect(mail.to).to eq([customer_contact.user_email])
@@ -99,10 +99,10 @@ describe CustomerMailer do
   end
 
   describe 'recovered_from_link' do
-    let(:cycle_type) { FactoryGirl.create(:cycle_type, name: 'Sikk Trike') }
-    let(:bike) { FactoryGirl.create(:stolen_bike, cycle_type: cycle_type) }
+    let(:cycle_type) { FactoryBot.create(:cycle_type, name: 'Sikk Trike') }
+    let(:bike) { FactoryBot.create(:stolen_bike, cycle_type: cycle_type) }
     let(:stolen_record) { bike.current_stolen_record }
-    let!(:ownership) { FactoryGirl.create(:ownership, bike: stolen_record.bike) }
+    let!(:ownership) { FactoryBot.create(:ownership, bike: stolen_record.bike) }
     let(:recovered_description) { 'Bike Index helped me find my stolen bike and get it back!' }
     before { stolen_record.add_recovery_information(recovered_description: recovered_description) }
     it 'renders email' do
@@ -115,9 +115,9 @@ describe CustomerMailer do
   end
 
   describe 'admin_contact_stolen_email' do
-    let!(:ownership) { FactoryGirl.create(:ownership, bike: stolen_record.bike) }
-    let(:stolen_record) { FactoryGirl.create(:stolen_record) }
-    let(:user) { FactoryGirl.create(:admin, email: 'something@stuff.com') }
+    let!(:ownership) { FactoryBot.create(:ownership, bike: stolen_record.bike) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record) }
+    let(:user) { FactoryBot.create(:admin, email: 'something@stuff.com') }
     let(:customer_contact) do
       CustomerContact.create(user_email: stolen_record.bike.owner_email,
                              creator_email: user.email,
@@ -136,9 +136,9 @@ describe CustomerMailer do
   end
 
   describe 'stolen_notification_email' do
-    let(:stolen_record) { FactoryGirl.create(:stolen_record) }
-    let!(:ownership) { FactoryGirl.create(:ownership, bike: stolen_record.bike) }
-    let(:stolen_notification) { FactoryGirl.create(:stolen_notification, message: 'Test Message', reference_url: 'something.com', bike: stolen_record.bike) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record) }
+    let!(:ownership) { FactoryBot.create(:ownership, bike: stolen_record.bike) }
+    let(:stolen_notification) { FactoryBot.create(:stolen_notification, message: 'Test Message', reference_url: 'something.com', bike: stolen_record.bike) }
     it 'renders email and update sent_dates' do
       mail = CustomerMailer.stolen_notification_email(stolen_notification)
       expect(mail.subject).to eq(stolen_notification.default_subject)
@@ -158,7 +158,7 @@ describe CustomerMailer do
   end
 
   describe 'updated_terms_email' do
-    let(:user) { FactoryGirl.create(:user) }
+    let(:user) { FactoryBot.create(:user) }
     it 'renders email' do
       mail = CustomerMailer.updated_terms_email(user)
       expect(mail.subject).to eq 'Bike Index Terms and Privacy Policy Update'

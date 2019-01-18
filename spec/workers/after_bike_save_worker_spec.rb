@@ -5,7 +5,7 @@ describe AfterBikeSaveWorker do
   let(:instance) { subject.new }
 
   describe 'enqueuing jobs' do
-    let(:bike_id) { FactoryGirl.create(:ownership, user_hidden: true).bike_id }
+    let(:bike_id) { FactoryBot.create(:ownership, user_hidden: true).bike_id }
     it 'enqueues the duplicate_bike_finder_worker' do
       expect do
         instance.perform(bike_id)
@@ -19,7 +19,7 @@ describe AfterBikeSaveWorker do
 
   context 'changed listing order' do
     it 'updates the listing order' do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       bike.update_attribute :listing_order, -22
       instance.perform(bike.id)
       bike.reload
@@ -29,7 +29,7 @@ describe AfterBikeSaveWorker do
 
   context 'unchanged listing order' do
     it 'does not update the listing order or enqueue afterbikesave' do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       bike.update_attribute :listing_order, bike.get_listing_order
       expect_any_instance_of(Bike).to_not receive(:update_attribute)
       instance.perform(bike.id)
@@ -37,7 +37,7 @@ describe AfterBikeSaveWorker do
   end
 
   describe "serialized" do
-    let!(:bike) { FactoryGirl.create(:stolen_bike) }
+    let!(:bike) { FactoryBot.create(:stolen_bike) }
     it "calls the things we expect it to call" do
       ENV["BIKE_WEBHOOK_AUTH_TOKEN"] = "xxxx"
       serialized = instance.serialized(bike)
@@ -49,8 +49,8 @@ describe AfterBikeSaveWorker do
   end
 
   describe "remove_partial_registrations" do
-    let!(:partial_registration) { FactoryGirl.create(:b_param_partial_registration, owner_email: "stuff@things.COM") }
-    let(:bike) { FactoryGirl.create(:bike, owner_email: "stuff@things.com") }
+    let!(:partial_registration) { FactoryBot.create(:b_param_partial_registration, owner_email: "stuff@things.COM") }
+    let(:bike) { FactoryBot.create(:bike, owner_email: "stuff@things.com") }
     it "removes the partial registration" do
       expect(partial_registration.partial_registration?).to be_truthy
       expect(partial_registration.with_bike?).to be_falsey
@@ -61,7 +61,7 @@ describe AfterBikeSaveWorker do
     end
     context "with a more accurate match" do
       let(:manufacturer) { bike.manufacturer }
-      let!(:partial_registration_accurate) { FactoryGirl.create(:b_param_partial_registration, owner_email: "STUFF@things.com", manufacturer: manufacturer) }
+      let!(:partial_registration_accurate) { FactoryBot.create(:b_param_partial_registration, owner_email: "STUFF@things.com", manufacturer: manufacturer) }
       it "only removes the more accurate match" do
         expect(partial_registration.partial_registration?).to be_truthy
         expect(partial_registration.with_bike?).to be_falsey
