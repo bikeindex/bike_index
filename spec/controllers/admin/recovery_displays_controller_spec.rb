@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe Admin::RecoveryDisplaysController do
   before do
-    user = FactoryGirl.create(:admin)
+    user = FactoryBot.create(:admin)
     set_current_user(user)
   end
 

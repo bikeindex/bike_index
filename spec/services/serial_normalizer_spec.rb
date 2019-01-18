@@ -36,19 +36,19 @@ describe SerialNormalizer do
 
   describe 'save_segments' do
     it 'saves normalized segments with the bike_id and not break if we resave' do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       SerialNormalizer.new(serial: 'some + : serial').save_segments(bike.id)
       expect(NormalizedSerialSegment.where(bike_id: bike.id).count).to eq(2)
     end
 
     it 'does not save absent segments' do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       SerialNormalizer.new(serial: 'absent').save_segments(bike.id)
       expect(NormalizedSerialSegment.where(bike_id: bike.id).count).to eq(0)
     end
 
     it 'rewrites the segments if we save them a second time' do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       SerialNormalizer.new(serial: 'some + : serial').save_segments(bike.id)
       expect(NormalizedSerialSegment.where(bike_id: bike.id).count).to eq(2)
       SerialNormalizer.new(serial: 'another + : THING').save_segments(bike.id)
@@ -60,7 +60,7 @@ describe SerialNormalizer do
     end
 
     it 'does not make any if the bike is an example bike' do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       bike.update_attributes(example: true)
       SerialNormalizer.new(serial: 'some + : serial').save_segments(bike.id)
       expect(NormalizedSerialSegment.where(bike_id: bike.id).count).to eq(0)

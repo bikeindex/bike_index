@@ -7,7 +7,7 @@ describe OwnershipCreator do
       expect(subject.user_id).to be_nil
     end
     context "user exists" do
-      let!(:user) { FactoryGirl.create(:user_confirmed, email: "foo@email.com") }
+      let!(:user) { FactoryBot.create(:user_confirmed, email: "foo@email.com") }
       it "finds the user" do
         expect(subject.user_id).to eq(user.id)
       end
@@ -44,9 +44,9 @@ describe OwnershipCreator do
 
   describe 'mark_other_ownerships_not_current' do
     it 'marks existing ownerships as not current' do
-      ownership1 = FactoryGirl.create(:ownership)
+      ownership1 = FactoryBot.create(:ownership)
       bike = ownership1.bike
-      ownership2 = FactoryGirl.create(:ownership, bike: bike)
+      ownership2 = FactoryBot.create(:ownership, bike: bike)
       ownership_creator = OwnershipCreator.new(bike: bike).mark_other_ownerships_not_current
       expect(ownership1.reload.current).to be_falsey
       expect(ownership2.reload.current).to be_falsey
@@ -55,7 +55,7 @@ describe OwnershipCreator do
 
   describe 'current_is_hidden' do
     it 'returns true if existing ownerships is user hidden' do
-      ownership = FactoryGirl.create(:ownership, user_hidden: true)
+      ownership = FactoryBot.create(:ownership, user_hidden: true)
       bike = ownership.bike
       bike.update_attribute :hidden, true
       ownership_creator = OwnershipCreator.new(bike: bike)

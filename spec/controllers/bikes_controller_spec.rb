@@ -3,10 +3,10 @@ require 'spec_helper'
 describe BikesController do
   describe 'index' do
     include_context :geocoder_default_location
-    let!(:non_stolen_bike) { FactoryGirl.create(:bike, serial_number: '1234567890') }
-    let!(:stolen_bike) { FactoryGirl.create(:stolen_bike, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
+    let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: '1234567890') }
+    let!(:stolen_bike) { FactoryBot.create(:stolen_bike, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
     let(:serial) { '1234567890' }
-    let!(:stolen_bike_2) { FactoryGirl.create(:stolen_bike, latitude: 41.8961603, longitude: -87.677215) }
+    let!(:stolen_bike_2) { FactoryBot.create(:stolen_bike, latitude: 41.8961603, longitude: -87.677215) }
     let(:ip_address) { '127.0.0.1' }
     let(:target_location) { ['New York', 'NY', 'US'] }
     let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: ip_address) }
@@ -114,7 +114,7 @@ describe BikesController do
   end
 
   describe 'show' do
-    let(:ownership) { FactoryGirl.create(:ownership) }
+    let(:ownership) { FactoryBot.create(:ownership) }
     let(:user) { ownership.creator }
     let(:bike) { ownership.bike }
     context 'legacy' do
@@ -163,7 +163,7 @@ describe BikesController do
           end
           context 'Admin viewing' do
             it 'responds with success' do
-              set_current_user(FactoryGirl.create(:admin))
+              set_current_user(FactoryBot.create(:admin))
               get :show, id: ownership.bike_id
               expect(response.status).to eq(200)
               expect(response).to render_template(:show)
@@ -174,7 +174,7 @@ describe BikesController do
           end
           context 'non-owner non-admin viewing' do
             it 'redirects' do
-              set_current_user(FactoryGirl.create(:user_confirmed))
+              set_current_user(FactoryBot.create(:user_confirmed))
               get :show, id: bike.id
               expect(response).to redirect_to(:root)
               expect(flash[:error]).to be_present
@@ -200,19 +200,19 @@ describe BikesController do
 
   describe 'spokecard' do
     it 'renders the page from bike id' do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       get :spokecard, id: bike.id
       expect(response.code).to eq('200')
     end
   end
 
   describe "scanned" do
-    let(:bike) { FactoryGirl.create(:bike) }
-    let!(:bike_code) { FactoryGirl.create(:bike_code, bike: bike, code: 900) }
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:bike_code) { FactoryBot.create(:bike_code, bike: bike, code: 900) }
     context "organized no bike" do
-      let(:organization) { FactoryGirl.create(:organization) }
-      let!(:bike_code2) { FactoryGirl.create(:bike_code, organization: organization, code: 900) }
-      let!(:user) { FactoryGirl.create(:user_confirmed) }
+      let(:organization) { FactoryBot.create(:organization) }
+      let!(:bike_code2) { FactoryBot.create(:bike_code, organization: organization, code: 900) }
+      let!(:user) { FactoryBot.create(:user_confirmed) }
       before { set_current_user(user) }
       it "renders the scanned page" do
         get :scanned, id: "000900", organization_id: organization.to_param
@@ -222,7 +222,7 @@ describe BikesController do
         expect(assigns(:show_organization_bikes)).to be_falsey
       end
       context "user part of organization" do
-        let!(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+        let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
         it "makes current_organization the organization" do
           get :scanned, id: "000900", organization_id: organization.to_param
           expect(assigns(:bike_code)).to eq bike_code2
@@ -240,7 +240,7 @@ describe BikesController do
       end
     end
     context "code_id" do
-      let!(:bike_code) { FactoryGirl.create(:bike_code, code: "sss", bike: bike) }
+      let!(:bike_code) { FactoryBot.create(:bike_code, code: "sss", bike: bike) }
       it "redirects to the proper page" do
         get :scanned, scanned_id: "sss"
         expect(response).to redirect_to bike_url(bike)
@@ -267,8 +267,8 @@ describe BikesController do
 
     context 'signed in' do
       include_context :logged_in_as_user
-      let(:manufacturer) { FactoryGirl.create(:manufacturer) }
-      let(:color) { FactoryGirl.create(:color) }
+      let(:manufacturer) { FactoryBot.create(:manufacturer) }
+      let(:color) { FactoryBot.create(:color) }
       context 'passed stolen param' do
         it 'renders a new stolen bike' do
           get :new, stolen: true
@@ -315,7 +315,7 @@ describe BikesController do
           end
         end
         context 'partial registration by organization' do
-          let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
+          let(:organization) { FactoryBot.create(:organization_with_auto_user) }
           let(:organized_bike_attrs) { bike_attrs.merge(creation_organization_id: organization.id) }
           it 'renders for the user (even though a different creator)' do
             b_param = BParam.create(params: { bike: organized_bike_attrs.merge('revised_new' => true) })
@@ -334,7 +334,7 @@ describe BikesController do
         end
         context 'invalid b_param' do
           it 'renders a new bike, has a flash message' do
-            b_param = BParam.create(creator_id: FactoryGirl.create(:user).id)
+            b_param = BParam.create(creator_id: FactoryBot.create(:user).id)
             expect(b_param.id_token).to be_present
             get :new, b_param_token: b_param.id_token
             bike = assigns(:bike)
@@ -346,7 +346,7 @@ describe BikesController do
         end
       end
       context "created bike" do
-        let(:bike) { FactoryGirl.create(:bike) }
+        let(:bike) { FactoryBot.create(:bike) }
         let(:b_param) { BParam.create(params: { bike: {} }, created_bike_id: bike.id, creator_id: user.id) }
         it "redirects to the bike" do
           expect(b_param.created_bike).to be_present
@@ -359,11 +359,11 @@ describe BikesController do
 
   describe 'create' do
     # This is the create action for bikes controller
-    let(:manufacturer) { FactoryGirl.create(:manufacturer) }
-    let(:color) { FactoryGirl.create(:color) }
-    let(:cycle_type) { FactoryGirl.create(:cycle_type) }
-    let(:handlebar_type) { FactoryGirl.create(:handlebar_type) }
-    let(:state) { FactoryGirl.create(:state) }
+    let(:manufacturer) { FactoryBot.create(:manufacturer) }
+    let(:color) { FactoryBot.create(:color) }
+    let(:cycle_type) { FactoryBot.create(:cycle_type) }
+    let(:handlebar_type) { FactoryBot.create(:handlebar_type) }
+    let(:state) { FactoryBot.create(:state) }
     let!(:country) { state.country }
     let(:chicago_stolen_params) do
       {
@@ -376,7 +376,7 @@ describe BikesController do
     end
 
     describe 'embeded' do
-      let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
+      let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       let(:user) { organization.auto_user }
       let(:b_param) { BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true }) }
       let(:bike_params) do
@@ -477,7 +477,7 @@ describe BikesController do
     end
 
     describe 'extended embeded submission' do
-      let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
+      let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       let(:bike_params) do
         {
           serial_number: '69',
@@ -513,9 +513,9 @@ describe BikesController do
         end
       end
       context "with persisted email and non-member and parent organization" do
-        let(:organization_parent) { FactoryGirl.create(:organization) }
-        let(:organization) { FactoryGirl.create(:organization_with_auto_user, parent_organization_id: organization_parent.id) }
-        let!(:user2) { FactoryGirl.create(:user_confirmed) }
+        let(:organization_parent) { FactoryBot.create(:organization) }
+        let(:organization) { FactoryBot.create(:organization_with_auto_user, parent_organization_id: organization_parent.id) }
+        let!(:user2) { FactoryBot.create(:user_confirmed) }
         it "registers a bike and redirects with persist_email" do
           set_current_user(user2)
           post :create, bike: bike_params.merge(manufacturer_id: "A crazy different thing"), persist_email: true
@@ -531,9 +531,9 @@ describe BikesController do
         end
       end
       context "with organization bike code and signed in member" do
-        let!(:user) { FactoryGirl.create(:organization_member, organization: organization) }
-        let!(:bike_code) { FactoryGirl.create(:bike_code, organization: organization, code: "aaa", kind: "sticker") }
-        let!(:wrong_bike_code) { FactoryGirl.create(:bike_code, code: "aaa", kind: "sticker") }
+        let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "aaa", kind: "sticker") }
+        let!(:wrong_bike_code) { FactoryBot.create(:bike_code, code: "aaa", kind: "sticker") }
         it "registers a bike under signed in user and redirects with persist_email" do
           set_current_user(user)
           post :create, bike: bike_params.merge(bike_code: "AAA")
@@ -566,7 +566,7 @@ describe BikesController do
             cycle_type_id: cycle_type.id,
             manufacturer_id: manufacturer.name,
             rear_tire_narrow: 'true',
-            rear_wheel_size_id: FactoryGirl.create(:wheel_size).id,
+            rear_wheel_size_id: FactoryBot.create(:wheel_size).id,
             primary_frame_color_id: color.id,
             handlebar_type_id: handlebar_type.id,
             owner_email: user.email
@@ -574,8 +574,8 @@ describe BikesController do
         end
 
         context 'b_param not owned by user' do
-          let(:other_user) { FactoryGirl.create(:user) }
-          let(:b_param) { FactoryGirl.create(:b_param, creator: other_user) }
+          let(:other_user) { FactoryBot.create(:user) }
+          let(:b_param) { FactoryBot.create(:b_param, creator: other_user) }
           it "does not use the b_param if isn't owned by user" do
             post :create, bike: bike_params
             b_param.reload
@@ -584,9 +584,9 @@ describe BikesController do
         end
 
         context 'stolen b_param from user' do
-          let(:b_param) { FactoryGirl.create(:b_param, creator: user) }
+          let(:b_param) { FactoryBot.create(:b_param, creator: user) }
           it 'creates a new stolen bike and assigns the user phone' do
-            FactoryGirl.create(:country, iso: 'US')
+            FactoryBot.create(:country, iso: 'US')
             expect do
               post :create, stolen: 'true', bike: bike_params.merge(phone: '312.379.9513')
             end.to change(StolenRecord, :count).by(1)
@@ -596,8 +596,8 @@ describe BikesController do
           end
         end
         context 'organization b_param' do
-          let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
-          let(:b_param) { FactoryGirl.create(:b_param, creator: organization.auto_user) }
+          let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+          let(:b_param) { FactoryBot.create(:b_param, creator: organization.auto_user) }
           it 'creates a new ownership and bike from an organization' do
             expect do
               post :create, bike: bike_params.merge(creation_organization_id: organization.id)
@@ -608,9 +608,9 @@ describe BikesController do
       end
 
       context "no existing b_param and stolen" do
-        let(:wheel_size) { FactoryGirl.create(:wheel_size) }
+        let(:wheel_size) { FactoryBot.create(:wheel_size) }
         let(:country) { Country.united_states }
-        let(:state) { FactoryGirl.create(:state, country: country) }
+        let(:state) { FactoryBot.create(:state, country: country) }
         let(:bike_params) do
           {
             b_param_id_token: "",
@@ -631,7 +631,7 @@ describe BikesController do
         context "successful creation" do
           include_context :geocoder_real
           it "creates a bike and doesn't create a b_param" do
-            bike_user = FactoryGirl.create(:user_confirmed, email: "something@stuff.com")
+            bike_user = FactoryBot.create(:user_confirmed, email: "something@stuff.com")
             VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
               success_params = bike_params.merge(manufacturer_id: manufacturer.slug)
               bb_data = { bike: { rear_wheel_bsd: wheel_size.iso_bsd.to_s }, components: [] }.as_json
@@ -730,7 +730,7 @@ describe BikesController do
         end
         context 'created bike' do
           it 'redirects to the bike' do
-            bike = FactoryGirl.create(:bike)
+            bike = FactoryBot.create(:bike)
             b_param = BParam.create(params: { bike: {} }, created_bike_id: bike.id, creator_id: user.id)
             expect(b_param.created_bike).to be_present
             post :create, bike: { b_param_id_token: b_param.id_token }
@@ -742,7 +742,7 @@ describe BikesController do
   end
 
   describe 'edit' do
-    let(:ownership) { FactoryGirl.create(:ownership) }
+    let(:ownership) { FactoryBot.create(:ownership) }
     let(:bike) { ownership.bike }
     let(:edit_templates) do
       {
@@ -766,11 +766,11 @@ describe BikesController do
       end
     end
     context 'user present' do
-      let(:user) { FactoryGirl.create(:user_confirmed) }
+      let(:user) { FactoryBot.create(:user_confirmed) }
       before { set_current_user(user) }
       context "user present but isn't allowed to edit the bike" do
         it 'redirects and sets the flash' do
-          FactoryGirl.create(:user)
+          FactoryBot.create(:user)
           get :edit, id: bike.id
           expect(response).to redirect_to bike_path(bike)
           expect(flash[:error]).to be_present
@@ -788,9 +788,9 @@ describe BikesController do
         end
       end
       context 'not-creator but member of creation_organization' do
-        let(:ownership) { FactoryGirl.create(:organization_ownership) }
+        let(:ownership) { FactoryBot.create(:organization_ownership) }
         let(:organization) { bike.creation_organization }
-        let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
         it 'renders' do
           expect(bike.owner).to_not eq user
           expect(bike.creation_organization).to eq user.organizations.first
@@ -865,8 +865,8 @@ describe BikesController do
   describe 'update' do
     context 'user is present but is not allowed to edit' do
       it 'does not update and redirects' do
-        ownership = FactoryGirl.create(:ownership)
-        user = FactoryGirl.create(:user_confirmed)
+        ownership = FactoryBot.create(:ownership)
+        user = FactoryBot.create(:user_confirmed)
         set_current_user(user)
         put :update, id: ownership.bike.id, bike: { serial_number: '69' }
         expect(response).to redirect_to bike_url(ownership.bike)
@@ -875,7 +875,7 @@ describe BikesController do
     end
 
     context 'creator present (who is allowed to edit)' do
-      let(:ownership) { FactoryGirl.create(:ownership) }
+      let(:ownership) { FactoryBot.create(:ownership) }
       let(:user) { ownership.creator }
       let(:bike) { ownership.bike }
       before do
@@ -885,7 +885,7 @@ describe BikesController do
         it 'allows you to edit an example bike' do
           # Also test that we don't don't blank bike_organizations
           # if bike_organization_ids aren't passed
-          organization = FactoryGirl.create(:organization)
+          organization = FactoryBot.create(:organization)
           ownership.bike.update_attributes(example: true, bike_organization_ids: [organization.id])
           bike.reload
           expect(bike.bike_organization_ids).to eq([organization.id])
@@ -897,8 +897,8 @@ describe BikesController do
         end
 
         it 'updates the bike and components' do
-          component1 = FactoryGirl.create(:component, bike: bike)
-          handlebar_type_id = FactoryGirl.create(:handlebar_type).id
+          component1 = FactoryBot.create(:component, bike: bike)
+          handlebar_type_id = FactoryBot.create(:handlebar_type).id
           ctype_id = component1.ctype_id
           bike.reload
           component2_attrs = {
@@ -975,9 +975,9 @@ describe BikesController do
         # Also, that we can apply stolen changes to hidden bikes
         # And finally, that it redirects to the correct page
         context "stolen update" do
-          let(:state) { FactoryGirl.create(:state) }
+          let(:state) { FactoryBot.create(:state) }
           let(:country) { state.country }
-          let(:stolen_record) { FactoryGirl.create(:stolen_record, bike: bike, city: "party") }
+          let(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike, city: "party") }
           let(:target_time) { 1454925600 }
           let(:stolen_attrs) do
             {
@@ -1053,12 +1053,12 @@ describe BikesController do
       end
     end
     context 'owner present (who is allowed to edit)' do
-      let(:color) { FactoryGirl.create(:color) }
-      let(:user) { FactoryGirl.create(:user_confirmed) }
-      let(:ownership) { FactoryGirl.create(:organization_ownership, owner_email: user.email) }
+      let(:color) { FactoryBot.create(:color) }
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      let(:ownership) { FactoryBot.create(:organization_ownership, owner_email: user.email) }
       let(:bike) { ownership.bike }
       let(:organization) { bike.organizations.first }
-      let(:organization_2) { FactoryGirl.create(:organization) }
+      let(:organization_2) { FactoryBot.create(:organization) }
       let(:allowed_attributes) do
         {
           description: '69 description',
@@ -1069,8 +1069,8 @@ describe BikesController do
           handlebar_type_id: HandlebarType.flat.id,
           coaster_brake: true,
           belt_drive: true,
-          front_gear_type_id: FactoryGirl.create(:front_gear_type).id,
-          rear_gear_type_id: FactoryGirl.create(:rear_gear_type).id,
+          front_gear_type_id: FactoryBot.create(:front_gear_type).id,
+          rear_gear_type_id: FactoryBot.create(:rear_gear_type).id,
           owner_email: 'new_email@stuff.com',
           year: 1993,
           frame_model: 'A sweet model named things',
@@ -1103,7 +1103,7 @@ describe BikesController do
   end
 
   describe 'show with recovery token present' do
-    let(:bike) { FactoryGirl.create(:stolen_bike) }
+    let(:bike) { FactoryBot.create(:stolen_bike) }
     let(:stolen_record) { bike.current_stolen_record }
     let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
     it 'renders a mark recovered modal, and deletes the session recovery_link_token' do

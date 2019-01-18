@@ -3,9 +3,9 @@ require 'spec_helper'
 describe Admin::CustomerContactsController do
   describe 'create' do
     it 'creates the contact, send the email and redirect to the bike' do
-      stolen_record = FactoryGirl.create(:stolen_record)
+      stolen_record = FactoryBot.create(:stolen_record)
       # pp stolen_record.bike.id
-      user = FactoryGirl.create(:admin)
+      user = FactoryBot.create(:admin)
       customer_contact = {
         user_email: stolen_record.bike.owner_email,
         creator_email: user.email,

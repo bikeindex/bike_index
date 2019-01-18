@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'Selections API V3' do
   describe 'colors' do
     it 'responds on index' do
-      selection = FactoryGirl.create(:color)
+      selection = FactoryBot.create(:color)
       get '/api/v3/selections/colors'
       expect(response.code).to eq('200')
       result = JSON.parse(response.body)['colors'][0]
@@ -13,7 +13,7 @@ describe 'Selections API V3' do
 
   describe 'component_types' do
     it 'responds on index with pagination' do
-      selection = FactoryGirl.create(:ctype)
+      selection = FactoryBot.create(:ctype)
       get '/api/v3/selections/component_types'
       expect(response.code).to eq('200')
       result = JSON.parse(response.body)['component_types'][0]
@@ -23,7 +23,7 @@ describe 'Selections API V3' do
 
   describe 'cycle_types' do
     it 'responds on index with pagination' do
-      selection = FactoryGirl.create(:cycle_type)
+      selection = FactoryBot.create(:cycle_type)
       get '/api/v3/selections/cycle_types'
       expect(response.code).to eq('200')
       result = JSON.parse(response.body)['cycle_types'][0]
@@ -33,7 +33,7 @@ describe 'Selections API V3' do
 
   describe 'frame_materials' do
     it 'responds on index with pagination' do
-      selection = FactoryGirl.create(:frame_material)
+      selection = FactoryBot.create(:frame_material)
       get '/api/v3/selections/frame_materials'
       expect(response.code).to eq('200')
       result = JSON.parse(response.body)['frame_materials'][0]
@@ -43,7 +43,7 @@ describe 'Selections API V3' do
 
   describe 'front_gear_types' do
     it 'responds on index with pagination' do
-      selection = FactoryGirl.create(:front_gear_type)
+      selection = FactoryBot.create(:front_gear_type)
       get '/api/v3/selections/front_gear_types'
       expect(response.code).to eq('200')
       result = JSON.parse(response.body)['front_gear_types'][0]
@@ -53,7 +53,7 @@ describe 'Selections API V3' do
 
   describe 'rear_gear_types' do
     it 'responds on index with pagination' do
-      selection = FactoryGirl.create(:rear_gear_type)
+      selection = FactoryBot.create(:rear_gear_type)
       get '/api/v3/selections/rear_gear_types'
       expect(response.code).to eq('200')
       result = JSON.parse(response.body)['rear_gear_types'][0]
@@ -63,7 +63,7 @@ describe 'Selections API V3' do
 
   describe 'handlebar_types' do
     it 'responds on index with pagination' do
-      selection = FactoryGirl.create(:handlebar_type)
+      selection = FactoryBot.create(:handlebar_type)
       get '/api/v3/selections/handlebar_types'
       expect(response.code).to eq('200')
       result = JSON.parse(response.body)['handlebar_types'][0]
@@ -73,7 +73,7 @@ describe 'Selections API V3' do
 
   describe 'propulsion_types' do
     it 'responds on index with pagination' do
-      selection = FactoryGirl.create(:propulsion_type)
+      selection = FactoryBot.create(:propulsion_type)
       get '/api/v3/selections/propulsion_types'
       expect(response.code).to eq('200')
       result = JSON.parse(response.body)['propulsion_types'][0]
@@ -83,8 +83,8 @@ describe 'Selections API V3' do
 
   describe 'wheel_size' do
     it 'responds on index with pagination' do
-      wheel_size = FactoryGirl.create(:wheel_size)
-      FactoryGirl.create(:wheel_size)
+      wheel_size = FactoryBot.create(:wheel_size)
+      FactoryBot.create(:wheel_size)
       get '/api/v3/selections/wheel_sizes?per_page=1'
       expect(response.header['Total']).to eq('2')
       pagination_link = '<http://www.example.com/api/v3/selections/wheel_sizes?page=2&per_page=1>; rel="last", <http://www.example.com/api/v3/selections/wheel_sizes?page=2&per_page=1>; rel="next"'

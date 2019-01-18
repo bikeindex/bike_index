@@ -4,7 +4,7 @@ RSpec.describe Invoice, type: :model do
   let(:organization) { invoice.organization }
 
   describe "friendly_find" do
-    let!(:invoice) { FactoryGirl.create(:invoice) }
+    let!(:invoice) { FactoryBot.create(:invoice) }
     it "finds or doesn't appropriately" do
       expect(Invoice.friendly_find(invoice.id)).to eq invoice
       expect(Invoice.friendly_find("Invoice ##{invoice.id}")).to eq invoice
@@ -25,7 +25,7 @@ RSpec.describe Invoice, type: :model do
   end
 
   describe "previous_invoice" do
-    let(:invoice) { FactoryGirl.create(:invoice, subscription_start_at: Time.now - 4.years, force_active: true) }
+    let(:invoice) { FactoryBot.create(:invoice, subscription_start_at: Time.now - 4.years, force_active: true) }
     let(:invoice2) { invoice.create_following_invoice }
     let(:invoice3) { invoice2.create_following_invoice }
     it "returns correct invoices" do
@@ -46,7 +46,7 @@ RSpec.describe Invoice, type: :model do
 
   describe "create_following_invoice" do
     context "with not active invoice" do
-      let(:invoice) { FactoryGirl.create(:invoice, is_active: false) }
+      let(:invoice) { FactoryBot.create(:invoice, is_active: false) }
       it "returns nil" do
         expect(invoice.renewal_invoice?).to be_falsey
         expect(invoice.active?).to be_falsey
@@ -54,9 +54,9 @@ RSpec.describe Invoice, type: :model do
       end
     end
     context "with active invoice" do
-      let(:invoice) { FactoryGirl.create(:invoice, subscription_start_at: Time.now - 4.years, force_active: true) }
-      let(:paid_feature) { FactoryGirl.create(:paid_feature, kind: "standard") }
-      let(:paid_feature_one_time) { FactoryGirl.create(:paid_feature_one_time) }
+      let(:invoice) { FactoryBot.create(:invoice, subscription_start_at: Time.now - 4.years, force_active: true) }
+      let(:paid_feature) { FactoryBot.create(:paid_feature, kind: "standard") }
+      let(:paid_feature_one_time) { FactoryBot.create(:paid_feature_one_time) }
       it "returns invoice" do
         expect(organization.paid_feature_slugs).to eq([])
         invoice.update_attributes(paid_feature_ids: [paid_feature.id, paid_feature_one_time.id])
@@ -75,10 +75,10 @@ RSpec.describe Invoice, type: :model do
   end
 
   describe "paid_feature_ids" do
-    let(:invoice) { FactoryGirl.create(:invoice, amount_due_cents: nil, subscription_start_at: Time.now - 1.week) }
-    let(:paid_feature) { FactoryGirl.create(:paid_feature, amount_cents: 100_000) }
-    let(:paid_feature2) { FactoryGirl.create(:paid_feature) }
-    let(:paid_feature_one_time) { FactoryGirl.create(:paid_feature_one_time, name: "one Time Feature") }
+    let(:invoice) { FactoryBot.create(:invoice, amount_due_cents: nil, subscription_start_at: Time.now - 1.week) }
+    let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 100_000) }
+    let(:paid_feature2) { FactoryBot.create(:paid_feature) }
+    let(:paid_feature_one_time) { FactoryBot.create(:paid_feature_one_time, name: "one Time Feature") }
     it "adds the paid feature ids and updates amount_due_cents" do
       expect(invoice.amount_due_cents).to be_nil
       invoice.update_attributes(paid_feature_ids: paid_feature.id)

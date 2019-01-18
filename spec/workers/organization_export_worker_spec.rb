@@ -3,11 +3,11 @@ require "spec_helper"
 describe OrganizationExportWorker do
   let(:subject) { OrganizationExportWorker }
   let(:instance) { subject.new }
-  let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil) }
+  let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil) }
   let(:organization) { export.organization }
-  let(:black) { FactoryGirl.create(:color, name: "Black") } # Because we use it as a default color
-  let(:trek) { FactoryGirl.create(:manufacturer, name: "Trek") }
-  let(:bike) { FactoryGirl.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
+  let(:black) { FactoryBot.create(:color, name: "Black") } # Because we use it as a default color
+  let(:trek) { FactoryBot.create(:manufacturer, name: "Trek") }
+  let(:bike) { FactoryBot.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
   let(:bike_values) do
     [
       "http://test.host/bikes/#{bike.id}",
@@ -36,7 +36,7 @@ describe OrganizationExportWorker do
         expect(export.rows).to eq 1
       end
       context "xlsx format" do
-        let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, file_format: "xlsx") }
+        let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, file_format: "xlsx") }
         it "exports" do
           instance.perform(export.id)
           export.reload
@@ -46,10 +46,10 @@ describe OrganizationExportWorker do
         end
       end
       context "avery export" do
-        let(:export) { FactoryGirl.create(:export_avery, progress: "pending", file: nil) }
-        let(:bike_for_avery) { FactoryGirl.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
+        let(:export) { FactoryBot.create(:export_avery, progress: "pending", file: nil) }
+        let(:bike_for_avery) { FactoryBot.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
         let!(:b_param) do
-          FactoryGirl.create(:b_param, created_bike_id: bike_for_avery.id,
+          FactoryBot.create(:b_param, created_bike_id: bike_for_avery.id,
                                        params: { bike: { address: "102 Washington Pl, State College",
                                                          user_name: "Maya Skripal" } })
         end
@@ -77,7 +77,7 @@ describe OrganizationExportWorker do
       end
     end
     context "bulk import already processed" do
-      let(:export) { FactoryGirl.create(:export, progress: "finished") }
+      let(:export) { FactoryBot.create(:export, progress: "finished") }
       it "returns true" do
         expect(instance).to_not receive(:create_csv)
         instance.perform(export.id)
@@ -85,7 +85,7 @@ describe OrganizationExportWorker do
     end
     context "no bikes" do
       let(:csv_lines) { [export.headers] }
-      let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, end_at: Time.now - 1.week) }
+      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, end_at: Time.now - 1.week) }
       it "finishes export" do
         expect(bike.organizations.pluck(:id)).to eq([organization.id])
         instance.perform(export.id)
@@ -98,11 +98,11 @@ describe OrganizationExportWorker do
 
     context "all headers" do
       # Setting up what we have, rather than waiting on everything
-      let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, options: { headers: Export::PERMITTED_HEADERS }) }
-      let(:secondary_color) { FactoryGirl.create(:color) }
+      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: { headers: Export::PERMITTED_HEADERS }) }
+      let(:secondary_color) { FactoryBot.create(:color) }
       let(:email) { "testly@bikeindex.org" }
       let(:bike) do
-        FactoryGirl.create(:creation_organization_bike,
+        FactoryBot.create(:creation_organization_bike,
                            organization: organization,
                            manufacturer: Manufacturer.other,
                            frame_model: '",,,\"<script>XSSSSS</script>',
@@ -113,7 +113,7 @@ describe OrganizationExportWorker do
                            secondary_frame_color: secondary_color,
                            owner_email: email)
       end
-      let!(:ownership) { FactoryGirl.create(:ownership, bike: bike, creator: FactoryGirl.create(:user_confirmed, name: "other person"), user: FactoryGirl.create(:user, name: "George Smith", email: "testly@bikeindex.org")) }
+      let!(:ownership) { FactoryBot.create(:ownership, bike: bike, creator: FactoryBot.create(:user_confirmed, name: "other person"), user: FactoryBot.create(:user, name: "George Smith", email: "testly@bikeindex.org")) }
       let(:bike_values) do
         [
           "http://test.host/bikes/#{bike.id}",
@@ -156,12 +156,12 @@ describe OrganizationExportWorker do
           "94103"
         ]
       end
-      let(:export) { FactoryGirl.create(:export_organization, progress: "pending", file: nil, options: { headers: %w[link phone additional_registration_number registration_address] }) }
-      let(:paid_feature) { FactoryGirl.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv_exports"]) }
-      let(:invoice) { FactoryGirl.create(:invoice_paid, amount_due: 0) }
-      let!(:b_param) { FactoryGirl.create(:b_param, created_bike_id: bike.id, params: { bike: { address: "717 Market St, SF", phone: "717.742.3423" } }) }
+      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: { headers: %w[link phone additional_registration_number registration_address] }) }
+      let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv_exports"]) }
+      let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0) }
+      let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: { bike: { address: "717 Market St, SF", phone: "717.742.3423" } }) }
       let(:target_headers) { %w[link phone additional_registration_number address city state zipcode] }
-      let(:bike) { FactoryGirl.create(:creation_organization_bike, organization: organization, additional_registration: "cool extra serial") }
+      let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, additional_registration: "cool extra serial") }
       include_context :geocoder_real
       it "returns the expected values" do
         expect(bike.phone).to eq "717.742.3423"

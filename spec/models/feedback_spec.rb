@@ -13,25 +13,25 @@ describe Feedback do
   describe 'create' do
     it 'enqueues an email job' do
       expect do
-        FactoryGirl.create(:feedback)
+        FactoryBot.create(:feedback)
       end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(1)
     end
 
     it 'enqueues an email job for delete requests' do
       expect do
-        FactoryGirl.create(:feedback, feedback_type: 'bike_delete_request')
+        FactoryBot.create(:feedback, feedback_type: 'bike_delete_request')
       end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(1)
     end
 
     it "doesn't enqueue an email job for serial updates" do
       expect do
-        FactoryGirl.create(:feedback, feedback_type: 'serial_update_request')
+        FactoryBot.create(:feedback, feedback_type: 'serial_update_request')
       end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
     end
 
     it "doesn't enqueue an email job for manufacturer updates" do
       expect do
-        FactoryGirl.create(:feedback, feedback_type: 'manufacturer_update_request')
+        FactoryBot.create(:feedback, feedback_type: 'manufacturer_update_request')
       end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(0)
     end
   end

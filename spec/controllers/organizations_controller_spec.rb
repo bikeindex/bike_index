@@ -12,7 +12,7 @@ describe OrganizationsController do
     end
     context 'with user' do
       it 'renders with revised_layout' do
-        set_current_user(FactoryGirl.create(:user_confirmed))
+        set_current_user(FactoryBot.create(:user_confirmed))
         get :new
         expect(response.status).to eq(200)
         expect(response).to render_template(:new)
@@ -24,7 +24,7 @@ describe OrganizationsController do
   describe 'create' do
     it 'creates org, membership, filters approved attrs & redirect to org with current_user' do
       expect(Organization.count).to eq(0)
-      user = FactoryGirl.create(:user_confirmed)
+      user = FactoryBot.create(:user_confirmed)
       set_current_user(user)
       org_attrs = {
         name: 'a new org',
@@ -45,7 +45,7 @@ describe OrganizationsController do
 
     it 'creates org, membership, filters approved attrs & redirect to org with current_user' do
       expect(Organization.count).to eq(0)
-      user = FactoryGirl.create(:user_confirmed)
+      user = FactoryBot.create(:user_confirmed)
       set_current_user(user)
       org_attrs = {
         name: 'a new org',
@@ -66,7 +66,7 @@ describe OrganizationsController do
 
     it "Doesn't xss" do
       expect(Organization.count).to eq(0)
-      user = FactoryGirl.create(:user_confirmed)
+      user = FactoryBot.create(:user_confirmed)
       set_current_user(user)
       org_attrs = {
         name: '<script>alert(document.cookie)</script>',
@@ -83,7 +83,7 @@ describe OrganizationsController do
 
     it 'mails us' do
       Sidekiq::Testing.inline! do
-        user = FactoryGirl.create(:user_confirmed)
+        user = FactoryBot.create(:user_confirmed)
         set_current_user(user)
         org_attrs = {
           name: 'a new org',
@@ -98,10 +98,10 @@ describe OrganizationsController do
   end
 
   describe 'legacy embeds' do
-    let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
+    let(:organization) { FactoryBot.create(:organization_with_auto_user) }
     before do
-      FactoryGirl.create(:cycle_type, slug: 'bike')
-      FactoryGirl.create(:propulsion_type, name: 'Foot pedal')
+      FactoryBot.create(:cycle_type, slug: 'bike')
+      FactoryBot.create(:propulsion_type, name: 'Foot pedal')
     end
     context 'non-stolen' do
       it 'renders embed without xframe block' do
@@ -150,7 +150,7 @@ describe OrganizationsController do
           }
         }
       end
-      let(:b_param) { FactoryGirl.create(:b_param, params: b_param_attrs) }
+      let(:b_param) { FactoryBot.create(:b_param, params: b_param_attrs) }
       it 'renders' do
         expect(b_param).to be_present
         get :embed, id: organization.slug, b_param_id_token: b_param.id_token

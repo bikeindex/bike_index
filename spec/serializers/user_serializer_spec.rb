@@ -1,9 +1,9 @@
 require 'spec_helper'
 
 describe UserSerializer do
-  let(:user) { FactoryGirl.create(:user) }
-  let(:organization) { FactoryGirl.create(:organization) }
-  let(:membership) { FactoryGirl.create(:membership, user: user, organization: organization) }
+  let(:user) { FactoryBot.create(:user) }
+  let(:organization) { FactoryBot.create(:organization) }
+  let(:membership) { FactoryBot.create(:membership, user: user, organization: organization) }
   subject { UserSerializer.new(user) }
 
   it { expect(subject.user_present).to be_truthy }

@@ -4,9 +4,9 @@ describe Organized::MessagesController, type: :controller do
   include_context :geocoder_default_location
   include_context :organization_with_geolocated_messages
   let(:root_path) { organization_messages_path(organization_id: organization.to_param, kind: kind_slug) }
-  let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
-  let(:bike) { FactoryGirl.create(:bike, owner_email: "party_time@stuff.com") }
-  let(:organization) { FactoryGirl.create(:organization, is_paid: false) }
+  let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+  let(:bike) { FactoryBot.create(:bike, owner_email: "party_time@stuff.com") }
+  let(:organization) { FactoryBot.create(:organization, is_paid: false) }
   let(:kind_slug) { "geolocated_messages" }
 
   before { set_current_user(user) if user.present? }
@@ -25,7 +25,7 @@ describe Organized::MessagesController, type: :controller do
 
     context "geolocated" do
       context "organization without geolocated messages" do
-        let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+        let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
         let(:paid_feature) { nil }
 
         it "does not create" do
@@ -41,7 +41,7 @@ describe Organized::MessagesController, type: :controller do
 
       context "organization with geolocated messages" do
         context "user without organization membership" do
-          let(:user) { FactoryGirl.create(:user_confirmed) }
+          let(:user) { FactoryBot.create(:user_confirmed) }
           it "does not create" do
             expect(organization.paid_for?(kind_slug)).to be_truthy
             expect do
@@ -89,7 +89,7 @@ describe Organized::MessagesController, type: :controller do
 
   describe "index" do
     context "organization without geolocated messages" do
-      let(:user) { FactoryGirl.create(:organization_admin, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       let(:paid_feature) { nil }
       it "redirects" do
         expect(organization.paid_for?(kind_slug)).to be_falsey
@@ -109,7 +109,7 @@ describe Organized::MessagesController, type: :controller do
   end
 
   describe "show" do
-    let(:organization_message) { FactoryGirl.create(:organization_message, organization: organization) }
+    let(:organization_message) { FactoryBot.create(:organization_message, organization: organization) }
     it "renders" do
       get :show, organization_id: organization.to_param, id: organization_message.id
       expect(response.status).to eq(200)

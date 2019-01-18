@@ -9,13 +9,13 @@ describe BikeBookUpdateWorker do
   end
 
   it "Doesn't break if the bike isn't on bikebook" do
-    bike = FactoryGirl.create(:bike)
+    bike = FactoryBot.create(:bike)
     BikeBookUpdateWorker.new.perform(bike.id)
   end
 
   it "grabs the components and doesn't overwrite components nothing if the bike isn't on bikebook" do
-    manufacturer = FactoryGirl.create(:manufacturer, name: 'SE Bikes')
-    bike = FactoryGirl.create(:bike,
+    manufacturer = FactoryBot.create(:manufacturer, name: 'SE Bikes')
+    bike = FactoryBot.create(:bike,
                               manufacturer_id: manufacturer.id,
                               year: 2014,
                               frame_model: 'Draft'
@@ -31,12 +31,12 @@ describe BikeBookUpdateWorker do
      'stem',
      'grips/tape',
      'saddle',
-     'seatpost'].each { |name| FactoryGirl.create(:ctype, name: name) }
-    component1 = FactoryGirl.create(:component,
+     'seatpost'].each { |name| FactoryBot.create(:ctype, name: name) }
+    component1 = FactoryBot.create(:component,
                                     bike: bike, ctype_id: Ctype.friendly_find('fork').id,
                                     description: 'SE straight Leg Hi-Ten w/ Fender Mounts & Wide Tire Clearance')
     expect(component1.is_stock).to be_falsey
-    component2 = FactoryGirl.create(:component,
+    component2 = FactoryBot.create(:component,
                                     bike: bike, ctype_id: Ctype.friendly_find('crankset').id,
                                     description: 'Sweet cranks')
     BikeBookUpdateWorker.new.perform(bike.id)

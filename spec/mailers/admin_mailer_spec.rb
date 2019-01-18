@@ -3,7 +3,7 @@ require 'spec_helper'
 describe AdminMailer do
   describe 'feedback_notification_email' do
     before :each do
-      @feedback = FactoryGirl.create(:feedback)
+      @feedback = FactoryBot.create(:feedback)
       @mail = AdminMailer.feedback_notification_email(@feedback)
     end
     it 'renders email' do
@@ -15,8 +15,8 @@ describe AdminMailer do
 
   describe 'special_feedback_notification_email' do
     before :each do
-      @bike = FactoryGirl.create(:bike)
-      @feedback = FactoryGirl.create(:feedback, feedback_hash: { bike_id: @bike.id })
+      @bike = FactoryBot.create(:bike)
+      @feedback = FactoryBot.create(:feedback, feedback_hash: { bike_id: @bike.id })
     end
     it 'sends a delete request email' do
       @feedback.update_attributes(feedback_type: 'bike_delete_request')
@@ -45,9 +45,9 @@ describe AdminMailer do
       expect(mail.reply_to).to eq([@feedback.email])
     end
     it 'sends a new org email' do
-      organization = FactoryGirl.create(:organization)
-      user = FactoryGirl.create(:user)
-      FactoryGirl.create(:membership, user: user, organization: organization)
+      organization = FactoryBot.create(:organization)
+      user = FactoryBot.create(:user)
+      FactoryBot.create(:membership, user: user, organization: organization)
       @feedback.update_attributes(feedback_hash: { organization_id: organization.id }, feedback_type: 'organization_created')
       mail = AdminMailer.feedback_notification_email(@feedback)
       expect(mail.reply_to).to eq([@feedback.email])
@@ -55,9 +55,9 @@ describe AdminMailer do
   end
 
   context 'user_hidden bike' do
-    let(:ownership) { FactoryGirl.create(:ownership, user_hidden: true) }
+    let(:ownership) { FactoryBot.create(:ownership, user_hidden: true) }
     let(:bike) { ownership.bike }
-    let(:feedback) { FactoryGirl.create(:feedback, feedback_hash: { bike_id: bike.id }, feedback_type: 'bike_delete_request') }
+    let(:feedback) { FactoryBot.create(:feedback, feedback_hash: { bike_id: bike.id }, feedback_type: 'bike_delete_request') }
     it "doesn't explode" do
       bike.update_attribute :hidden, true
       bike.reload
@@ -71,7 +71,7 @@ describe AdminMailer do
 
   describe 'no_admins_notification_email' do
     before :each do
-      @organization = FactoryGirl.create(:organization)
+      @organization = FactoryBot.create(:organization)
       @mail = AdminMailer.no_admins_notification_email(@organization)
     end
 
@@ -83,7 +83,7 @@ describe AdminMailer do
 
   describe 'blocked_stolen_notification_email' do
     before :each do
-      @stolen_notification = FactoryGirl.create(:stolen_notification, message: 'Test Message', subject: 'Test subject')
+      @stolen_notification = FactoryBot.create(:stolen_notification, message: 'Test Message', subject: 'Test subject')
       @mail = AdminMailer.blocked_stolen_notification_email(@stolen_notification)
     end
 

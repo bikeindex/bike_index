@@ -1,11 +1,11 @@
 require 'spec_helper'
 
 describe 'Search API V3' do
-  let(:manufacturer) { FactoryGirl.create(:manufacturer) }
-  let(:color) { FactoryGirl.create(:color) }
+  let(:manufacturer) { FactoryBot.create(:manufacturer) }
+  let(:color) { FactoryBot.create(:color) }
   describe '/' do
-    let!(:bike) { FactoryGirl.create(:bike, manufacturer: manufacturer) }
-    let!(:bike_2) { FactoryGirl.create(:stolen_bike, manufacturer: manufacturer) }
+    let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
+    let!(:bike_2) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer) }
     let(:query_params) { { query_items: [manufacturer.search_id] } }
     context 'with per_page' do
       it 'returns matching bikes, defaults to stolen' do
@@ -18,7 +18,7 @@ describe 'Search API V3' do
     end
   end
   describe '/close_serials' do
-    let!(:bike) { FactoryGirl.create(:bike, manufacturer: manufacturer, serial_number: 'something') }
+    let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer, serial_number: 'something') }
     let(:query_params) { { serial: 'somethind', stolenness: 'non' } }
     let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: nil) }
     context 'with per_page' do
@@ -55,9 +55,9 @@ describe 'Search API V3' do
       # Use the interpreted params, because they come with proximity data - it"s what we do in the API
       let(:stolen_interpreted_params) { proximity_interpreted_params.merge(stolenness: "stolen") }
       let(:non_stolen_interpreted_params) { proximity_interpreted_params.merge(stolenness: "non") }
-      let!(:non_stolen) { FactoryGirl.create(:bike, manufacturer: manufacturer, primary_frame_color: color, serial_number: "s") }
-      let!(:stolen) { FactoryGirl.create(:stolen_bike, manufacturer: manufacturer, primary_frame_color: color, serial_number: "5") }
-      let!(:stolen_proximity) { FactoryGirl.create(:stolen_bike, manufacturer: manufacturer, secondary_frame_color: color, serial_number: "S", latitude: 41.8624488, longitude: -87.6591502) }
+      let!(:non_stolen) { FactoryBot.create(:bike, manufacturer: manufacturer, primary_frame_color: color, serial_number: "s") }
+      let!(:stolen) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer, primary_frame_color: color, serial_number: "5") }
+      let!(:stolen_proximity) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer, secondary_frame_color: color, serial_number: "S", latitude: 41.8624488, longitude: -87.6591502) }
       include_context :geocoder_real
       it "calls Bike Search with the expected interpreted_params" do
         VCR.use_cassette("v3_bike_search-count") do
@@ -76,8 +76,8 @@ describe 'Search API V3' do
       end
     end
     context 'with query items' do
-      let!(:bike) { FactoryGirl.create(:bike, manufacturer: manufacturer) }
-      let!(:bike_2) { FactoryGirl.create(:bike) }
+      let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
+      let!(:bike_2) { FactoryBot.create(:bike) }
       let(:query_params) { { query_items: [manufacturer.search_id] } }
       it 'succeeds' do
         get '/api/v3/search/count', query_params, format: :json

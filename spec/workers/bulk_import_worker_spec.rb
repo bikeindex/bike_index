@@ -4,8 +4,8 @@ describe BulkImportWorker do
   let(:subject) { BulkImportWorker }
   let(:instance) { subject.new }
   it { is_expected.to be_processed_in :afterwards }
-  let(:bulk_import) { FactoryGirl.create(:bulk_import, progress: "pending") }
-  let!(:black) { FactoryGirl.create(:color, name: "Black") } # Because we use it as a default color
+  let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending") }
+  let!(:black) { FactoryBot.create(:color, name: "Black") } # Because we use it as a default color
 
   let(:sample_csv_lines) do
     [
@@ -25,7 +25,7 @@ describe BulkImportWorker do
 
   describe "perform" do
     context "bulk import already processed" do
-      let(:bulk_import) { FactoryGirl.create(:bulk_import, progress: "finished") }
+      let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "finished") }
       it "returns true" do
         allow_any_instance_of(BulkImport).to receive(:open_file) { csv_string }
         expect(instance).to_not receive(:register_bike)
@@ -33,7 +33,7 @@ describe BulkImportWorker do
       end
     end
     context "valid bike and an invalid bike with substituted header" do
-      let!(:color) { FactoryGirl.create(:color, name: "White") }
+      let!(:color) { FactoryBot.create(:color, name: "White") }
       let(:target_line_error) { [2, ["Owner email can't be blank"]] }
       let(:csv_lines) do
         [
@@ -77,14 +77,14 @@ describe BulkImportWorker do
       end
     end
     context "valid file" do
-      let!(:green) { FactoryGirl.create(:color, name: "Green") }
-      let!(:white) { FactoryGirl.create(:color, name: "White") }
-      let!(:surly) { FactoryGirl.create(:manufacturer, name: "Surly") }
-      let!(:trek) { FactoryGirl.create(:manufacturer, name: "Trek") }
+      let!(:green) { FactoryBot.create(:color, name: "Green") }
+      let!(:white) { FactoryBot.create(:color, name: "White") }
+      let!(:surly) { FactoryBot.create(:manufacturer, name: "Surly") }
+      let!(:trek) { FactoryBot.create(:manufacturer, name: "Trek") }
       let(:file_url) { "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_all_optional_fields.csv" }
-      let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
+      let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
-      let!(:bulk_import) { FactoryGirl.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
+      let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
       include_context :geocoder_default_location
       it "creates the bikes, doesn't have any errors" do
         # In production, we actually use remote files rather than local files.
@@ -217,8 +217,8 @@ describe BulkImportWorker do
           end
         end
         context "with organization" do
-          let(:organization) { FactoryGirl.create(:organization) }
-          let!(:bulk_import) { FactoryGirl.create(:bulk_import, organization: organization, no_notify: true) }
+          let(:organization) { FactoryBot.create(:organization) }
+          let!(:bulk_import) { FactoryBot.create(:bulk_import, organization: organization, no_notify: true) }
           it "registers with organization" do
             expect(instance.row_to_b_param_hash(row)[:bike]).to eq target.merge(send_email: false, creation_organization_id: organization.id)
           end
@@ -227,10 +227,10 @@ describe BulkImportWorker do
     end
 
     describe "register bike" do
-      let!(:manufacturer) { FactoryGirl.create(:manufacturer, name: "Surly") }
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Surly") }
       context "valid organization bike" do
-        let(:organization) { FactoryGirl.create(:organization_with_auto_user) }
-        let!(:bulk_import) { FactoryGirl.create(:bulk_import, organization: organization) }
+        let(:organization) { FactoryBot.create(:organization_with_auto_user) }
+        let!(:bulk_import) { FactoryBot.create(:bulk_import, organization: organization) }
         let(:row) { { manufacturer: " Surly", serial_number: "na", color: nil, owner_email: "test2@bikeindex.org", year: "2018", model: "Midnight Special" } }
         it "registers a bike" do
           expect(organization.auto_user).to_not eq bulk_import.user

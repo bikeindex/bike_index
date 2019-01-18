@@ -1,7 +1,7 @@
 require "spec_helper"
 
 describe Admin::PaidFeaturesController, type: :controller do
-  let(:subject) { FactoryGirl.create(:paid_feature) }
+  let(:subject) { FactoryBot.create(:paid_feature) }
   include_context :logged_in_as_super_admin
   let(:passed_params) { { amount: 222.22, description: "Some really long description or wahtttt", details_link: "https://example.com", kind: "custom_one_time", name: "another name stuff" } }
 
@@ -39,7 +39,7 @@ describe Admin::PaidFeaturesController, type: :controller do
       passed_params.each { |k, v| expect(subject.send(k)).to eq(v) }
     end
     context "feature_slugs" do
-      let(:subject) { FactoryGirl.create(:paid_feature) }
+      let(:subject) { FactoryBot.create(:paid_feature) }
       it "does not update feature_slugs" do
         put :update, id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports")
         subject.reload
@@ -47,7 +47,7 @@ describe Admin::PaidFeaturesController, type: :controller do
         expect(subject.feature_slugs).to eq([])
       end
       context "developer" do
-        let(:user) { FactoryGirl.create(:admin_developer) }
+        let(:user) { FactoryBot.create(:admin_developer) }
         it "does not update feature_slugs" do
           put :update, id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, MessagES,geolocated_messages, blarg")
           subject.reload
@@ -65,7 +65,7 @@ describe Admin::PaidFeaturesController, type: :controller do
         passed_params.each { |k, v| expect(subject.send(k)).to_not eq(v) }
       end
       context "developer" do
-        let(:user) { FactoryGirl.create(:admin_developer) }
+        let(:user) { FactoryBot.create(:admin_developer) }
         it "does not update feature_slugs" do
           put :update, id: subject.to_param, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, MessagES,geolocated_messages, blarg")
           subject.reload

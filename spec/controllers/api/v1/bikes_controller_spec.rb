@@ -3,7 +3,7 @@ require 'spec_helper'
 describe Api::V1::BikesController do
   describe 'index' do
     it 'loads the page and have the correct headers' do
-      FactoryGirl.create(:bike)
+      FactoryBot.create(:bike)
       get :index, format: :json
       expect(response.code).to eq('200')
     end
@@ -11,18 +11,18 @@ describe Api::V1::BikesController do
 
   describe 'stolen_ids' do
     it 'returns correct code if no org' do
-      c = FactoryGirl.create(:color)
+      c = FactoryBot.create(:color)
       get :stolen_ids, format: :json
       expect(response.code).to eq('401')
     end
 
     it 'should return an array of ids' do
-      bike = FactoryGirl.create(:bike)
-      stole1 = FactoryGirl.create(:stolen_record)
-      stole2 = FactoryGirl.create(:stolen_record, approved: true)
-      organization = FactoryGirl.create(:organization)
-      user = FactoryGirl.create(:user)
-      FactoryGirl.create(:membership, user: user, organization: organization)
+      bike = FactoryBot.create(:bike)
+      stole1 = FactoryBot.create(:stolen_record)
+      stole2 = FactoryBot.create(:stolen_record, approved: true)
+      organization = FactoryBot.create(:organization)
+      user = FactoryBot.create(:user)
+      FactoryBot.create(:membership, user: user, organization: organization)
       options = { stolen: true, organization_slug: organization.slug, access_token: organization.access_token }
       get :stolen_ids, options.as_json
       expect(response.code).to eq('200')
@@ -34,7 +34,7 @@ describe Api::V1::BikesController do
 
   describe 'show' do
     it 'loads the page' do
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       get :show, id: bike.id, format: :json
       expect(response.code).to eq('200')
     end
@@ -42,16 +42,16 @@ describe Api::V1::BikesController do
 
   describe 'create' do
     before do
-      FactoryGirl.create(:wheel_size, iso_bsd: 559)
-      FactoryGirl.create(:ctype, name: 'wheel')
-      FactoryGirl.create(:ctype, name: 'headset')
+      FactoryBot.create(:wheel_size, iso_bsd: 559)
+      FactoryBot.create(:ctype, name: 'wheel')
+      FactoryBot.create(:ctype, name: 'headset')
     end
     context 'pos_integrator rear_gear_type_slug error' do
-      let(:auto_user) { FactoryGirl.create(:organization_auto_user) }
+      let(:auto_user) { FactoryBot.create(:organization_auto_user) }
       let(:organization) { auto_user.organizations.first }
-      let(:manufacturer) { FactoryGirl.create(:manufacturer, name: 'Specialized') }
-      let(:black) { FactoryGirl.create(:color, name: 'Black') }
-      let(:red) { FactoryGirl.create(:color, name: 'Red') }
+      let(:manufacturer) { FactoryBot.create(:manufacturer, name: 'Specialized') }
+      let(:black) { FactoryBot.create(:color, name: 'Black') }
+      let(:red) { FactoryBot.create(:color, name: 'Red') }
       let(:bike_hash) do
         {
           organization_slug: organization.slug,
@@ -105,43 +105,43 @@ describe Api::V1::BikesController do
     end
     context 'legacy tests' do
       before :each do
-        @organization = FactoryGirl.create(:organization)
-        user = FactoryGirl.create(:user)
-        FactoryGirl.create(:membership, user: user, organization: @organization)
+        @organization = FactoryBot.create(:organization)
+        user = FactoryBot.create(:user)
+        FactoryBot.create(:membership, user: user, organization: @organization)
         @organization.save
       end
 
       it 'returns correct code if not logged in' do
-        c = FactoryGirl.create(:color)
+        c = FactoryBot.create(:color)
         post :create, { bike: { serial_number: '69', color: c.name } }
         expect(response.code).to eq('401')
       end
 
       it 'returns correct code if bike has errors' do
-        c = FactoryGirl.create(:color)
+        c = FactoryBot.create(:color)
         post :create, { bike: { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
         expect(response.code).to eq('422')
       end
 
       it "emails us if it can't create a record" do
-        c = FactoryGirl.create(:color)
+        c = FactoryBot.create(:color)
         expect do
           post :create, { bike: { serial_number: '69', color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
         end.to change(Feedback, :count).by(1)
       end
 
       it 'creates a record and reset example' do
-        manufacturer = FactoryGirl.create(:manufacturer)
-        rear_gear_type = FactoryGirl.create(:rear_gear_type)
-        front_gear_type = FactoryGirl.create(:front_gear_type)
-        handlebar_type = FactoryGirl.create(:handlebar_type)
+        manufacturer = FactoryBot.create(:manufacturer)
+        rear_gear_type = FactoryBot.create(:rear_gear_type)
+        front_gear_type = FactoryBot.create(:front_gear_type)
+        handlebar_type = FactoryBot.create(:handlebar_type)
         f_count = Feedback.count
         bike_attrs = {
           serial_number: '69 non-example',
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: 'true',
           rear_wheel_bsd: 559,
-          color: FactoryGirl.create(:color).name,
+          color: FactoryBot.create(:color).name,
           example: true,
           year: '1969',
           owner_email: 'fun_times@examples.com',
@@ -214,14 +214,14 @@ describe Api::V1::BikesController do
       end
 
       it 'creates a photos even if one fails' do
-        manufacturer = FactoryGirl.create(:manufacturer)
+        manufacturer = FactoryBot.create(:manufacturer)
         f_count = Feedback.count
         bike_attrs = {
           serial_number: '69 photo-test',
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: 'true',
           rear_wheel_bsd: '559',
-          color: FactoryGirl.create(:color).name,
+          color: FactoryBot.create(:color).name,
           example: true,
           year: '1969',
           owner_email: 'fun_times@examples.com'
@@ -242,16 +242,16 @@ describe Api::V1::BikesController do
       include_context :geocoder_real
       it "creates a stolen record" do
         VCR.use_cassette("v1_bikes_create-stolen") do
-          manufacturer = FactoryGirl.create(:manufacturer)
+          manufacturer = FactoryBot.create(:manufacturer)
           @organization.users.first.update_attribute :phone, "123-456-6969"
-          FactoryGirl.create(:country, iso: "US")
-          FactoryGirl.create(:state, abbreviation: "IL", name: "Illinois")
+          FactoryBot.create(:country, iso: "US")
+          FactoryBot.create(:state, abbreviation: "IL", name: "Illinois")
           bike_attrs = {
             serial_number: "69 stolen bike",
             manufacturer_id: manufacturer.id,
             rear_tire_narrow: "true",
             rear_wheel_size: 559,
-            primary_frame_color_id: FactoryGirl.create(:color).id,
+            primary_frame_color_id: FactoryBot.create(:color).id,
             owner_email: "fun_times@examples.com",
             stolen: "true",
             phone: "9999999",
@@ -291,21 +291,21 @@ describe Api::V1::BikesController do
       end
 
       it 'creates an example bike if the bike is from example, and include all the options' do
-        FactoryGirl.create(:color, name: 'Black')
-        org = FactoryGirl.create(:organization, name: 'Example organization')
-        user = FactoryGirl.create(:user)
-        FactoryGirl.create(:membership, user: user, organization: org)
-        manufacturer = FactoryGirl.create(:manufacturer)
+        FactoryBot.create(:color, name: 'Black')
+        org = FactoryBot.create(:organization, name: 'Example organization')
+        user = FactoryBot.create(:user)
+        FactoryBot.create(:membership, user: user, organization: org)
+        manufacturer = FactoryBot.create(:manufacturer)
         org.save
         bike_attrs = {
           serial_number: '69 example bikez',
-          cycle_type_id: FactoryGirl.create(:cycle_type, slug: 'gluey').id,
+          cycle_type_id: FactoryBot.create(:cycle_type, slug: 'gluey').id,
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: 'true',
           rear_wheel_size: 559,
           color: 'grazeen',
-          handlebar_type_slug: FactoryGirl.create(:handlebar_type, slug: 'foo').slug,
-          frame_material_slug: FactoryGirl.create(:frame_material, slug: 'whatevah').slug,
+          handlebar_type_slug: FactoryBot.create(:handlebar_type, slug: 'foo').slug,
+          frame_material_slug: FactoryBot.create(:frame_material, slug: 'whatevah').slug,
           description: 'something else',
           owner_email: 'fun_times@examples.com'
         }
@@ -327,14 +327,14 @@ describe Api::V1::BikesController do
       end
 
       it 'creates a record even if the post is a string' do
-        manufacturer = FactoryGirl.create(:manufacturer)
+        manufacturer = FactoryBot.create(:manufacturer)
         f_count = Feedback.count
         bike_attrs = {
           serial_number: '69 string',
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: 'true',
           rear_wheel_bsd: '559',
-          color: FactoryGirl.create(:color).name,
+          color: FactoryBot.create(:color).name,
           owner_email: 'jsoned@examples.com'
         }
         options = { bike: bike_attrs.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
@@ -348,14 +348,14 @@ describe Api::V1::BikesController do
       end
 
       it 'does not send an ownership email if it has no_email set' do
-        manufacturer = FactoryGirl.create(:manufacturer)
+        manufacturer = FactoryBot.create(:manufacturer)
         f_count = Feedback.count
         bike = {
           serial_number: '69 string',
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: 'true',
           rear_wheel_bsd: '559',
-          color: FactoryGirl.create(:color).name,
+          color: FactoryBot.create(:color).name,
           owner_email: 'jsoned@examples.com',
           send_email: 'false'
         }

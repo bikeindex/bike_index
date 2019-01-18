@@ -96,7 +96,7 @@ describe ApplicationDecorator do
   describe 'ass_name' do
     it 'grabs the association name' do
       bike = Bike.new
-      handlebar_type = FactoryGirl.create(:handlebar_type, name: 'cool bars')
+      handlebar_type = FactoryBot.create(:handlebar_type, name: 'cool bars')
       allow(bike).to receive(:handlebar_type).and_return(handlebar_type)
       expect(ApplicationDecorator.new(bike).ass_name('handlebar_type')).to eq('cool bars')
     end

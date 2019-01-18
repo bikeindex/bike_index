@@ -4,7 +4,7 @@ describe Admin::FlavorTextsController do
   describe 'destroy' do
     it 'destroys' do
       text = FlavorText.create(message: 'lulz')
-      user = FactoryGirl.create(:admin)
+      user = FactoryBot.create(:admin)
       set_current_user(user)
       expect do
         delete :destroy, id: text.id
@@ -15,7 +15,7 @@ describe Admin::FlavorTextsController do
   describe 'update' do
     describe 'success' do
       it 'updates' do
-        user = FactoryGirl.create(:admin)
+        user = FactoryBot.create(:admin)
         set_current_user(user)
         post :create, flavor_text: { message: 'lulz' }
         expect(response).to redirect_to(:admin_root)

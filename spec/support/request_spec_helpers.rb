@@ -1,15 +1,15 @@
 shared_context :logged_in_as_user do
-  let(:user) { FactoryGirl.create(:user_confirmed) }
+  let(:user) { FactoryBot.create(:user_confirmed) }
   before { set_current_user(user) }
 end
 
 shared_context :logged_in_as_super_admin do
-  let(:user) { FactoryGirl.create(:admin) }
+  let(:user) { FactoryBot.create(:admin) }
   before { set_current_user(user) }
 end
 
 shared_context :logged_in_as_organization_admin do
-  let(:user) { FactoryGirl.create(:organization_admin) }
+  let(:user) { FactoryBot.create(:organization_admin) }
   let(:organization) { user.organizations.first }
   before :each do
     set_current_user(user)
@@ -17,7 +17,7 @@ shared_context :logged_in_as_organization_admin do
 end
 
 shared_context :logged_in_as_organization_member do
-  let(:user) { FactoryGirl.create(:organization_member) }
+  let(:user) { FactoryBot.create(:organization_member) }
   let(:organization) { user.organizations.first }
   before :each do
     set_current_user(user)
@@ -26,7 +26,7 @@ end
 
 shared_context :existing_doorkeeper_app do
   let(:doorkeeper_app) { create_doorkeeper_app }
-  let(:application_owner) { FactoryGirl.create(:user_confirmed) }
+  let(:application_owner) { FactoryBot.create(:user_confirmed) }
   let(:user) { application_owner } # So we don't waste time creating extra users
   let(:v2_access_id) { ENV["V2_ACCESSOR_ID"] = user.id.to_s }
   let(:token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }

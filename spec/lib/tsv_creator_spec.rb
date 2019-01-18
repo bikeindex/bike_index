@@ -11,7 +11,7 @@ describe TsvCreator do
 
   describe 'create_organization_count' do
     it 'creates tsv with output bikes' do
-      ownership = FactoryGirl.create(:organization_ownership)
+      ownership = FactoryBot.create(:organization_ownership)
       organization = ownership.bike.creation_organization
       creator = TsvCreator.new
       target = "#{creator.org_counts_header}#{creator.org_count_row(ownership.bike)}"
@@ -37,7 +37,7 @@ describe TsvCreator do
 
   describe 'create_daily_tsvs' do
     it 'calls create_stolen and create_stolen_with_reports with scoped query' do
-      stolen_record = FactoryGirl.create(:stolen_record, current: true, tsved_at: nil)
+      stolen_record = FactoryBot.create(:stolen_record, current: true, tsved_at: nil)
       tsv_creator = TsvCreator.new
       expect(tsv_creator).to receive(:create_stolen_with_reports).with(true, stolen_records: StolenRecord.approveds_with_reports.tsv_today)
       expect(tsv_creator).to receive(:create_stolen).with(true, stolen_records: StolenRecord.approveds.tsv_today)

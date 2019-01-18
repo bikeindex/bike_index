@@ -16,7 +16,7 @@ describe Oauth::ApplicationsController do
         expect(response).to render_template(:index)
       end
       context "unconfirmed" do
-        let!(:user) { FactoryGirl.create(:user) }
+        let!(:user) { FactoryBot.create(:user) }
         it "redirects to please_confirm_users_path" do
           expect(user.confirmed?).to be_falsey
           get :index
@@ -64,7 +64,7 @@ describe Oauth::ApplicationsController do
         end
 
         context "other users app" do
-          let(:user) { FactoryGirl.create(:user_confirmed) }
+          let(:user) { FactoryBot.create(:user_confirmed) }
           it "redirects if not owned by user" do
             expect(doorkeeper_app.owner_id).to_not eq user.id
             get :edit, id: doorkeeper_app.id
@@ -74,7 +74,7 @@ describe Oauth::ApplicationsController do
         end
 
         context "admin" do
-          let(:user) { FactoryGirl.create(:admin) }
+          let(:user) { FactoryBot.create(:admin) }
           it 'renders if superuser' do
             expect(doorkeeper_app.owner_id).to_not eq user.id
             get :edit, id: doorkeeper_app.id
@@ -95,7 +95,7 @@ describe Oauth::ApplicationsController do
       end
 
       context "other user" do
-        let(:user) { FactoryGirl.create(:user_confirmed) }
+        let(:user) { FactoryBot.create(:user_confirmed) }
         it "doesn't update" do
           og_name = doorkeeper_app.name
           expect(doorkeeper_app.owner_id).to_not eq user.id

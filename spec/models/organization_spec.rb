@@ -25,13 +25,13 @@ describe Organization do
 
   describe 'admin text search' do
     context 'by name' do
-      let!(:organization) { FactoryGirl.create(:organization, name: 'University of Maryland') }
+      let!(:organization) { FactoryBot.create(:organization, name: 'University of Maryland') }
       it 'finds the organization' do
         expect(Organization.admin_text_search('maryl')).to eq([organization])
       end
     end
     context 'by slug' do
-      let!(:organization) { FactoryGirl.create(:organization, short_name: 'UMD') }
+      let!(:organization) { FactoryBot.create(:organization, short_name: 'UMD') }
       it 'finds the organization' do
         expect(Organization.admin_text_search('umd')).to eq([organization])
       end
@@ -39,14 +39,14 @@ describe Organization do
     context 'through locations' do
       let!(:organization) { location.organization }
       context 'by location name' do
-        let(:location) { FactoryGirl.create(:location, name: 'Sweet spot') }
+        let(:location) { FactoryBot.create(:location, name: 'Sweet spot') }
         it 'finds the organization' do
           expect(Organization.admin_text_search('sweet Spot')).to eq([organization])
         end
       end
       context 'by location city' do
-        let(:location) { FactoryGirl.create(:location, city: 'Chicago') }
-        let!(:location_2) { FactoryGirl.create(:location, city: 'Chicago', organization: organization) }
+        let(:location) { FactoryBot.create(:location, city: 'Chicago') }
+        let!(:location_2) { FactoryBot.create(:location, city: 'Chicago', organization: organization) }
         it 'finds the organization' do
           expect(Organization.admin_text_search('chi')).to eq([organization])
         end
@@ -61,7 +61,7 @@ describe Organization do
       expect(Organization.new.map_focus_coordinates).to eq(latitude: 37.7870322, longitude: -122.4061122)
     end
     context "organization with a location" do
-      let(:location) { FactoryGirl.create(:location) }
+      let(:location) { FactoryBot.create(:location) }
       let!(:organization) { location.organization }
       it "is the locations coordinates" do
         organization.reload # Somehow doesn't pick this up - TODO: Rails 5 update
@@ -71,10 +71,10 @@ describe Organization do
   end
 
   describe "is_paid and paid_for? calculations" do
-    let(:paid_feature) { FactoryGirl.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv_exports"]) }
-    let(:invoice) { FactoryGirl.create(:invoice_paid, amount_due: 0) }
+    let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv_exports"]) }
+    let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0) }
     let(:organization) { invoice.organization }
-    let(:organization_child) { FactoryGirl.create(:organization) }
+    let(:organization_child) { FactoryBot.create(:organization) }
     it "uses associations to determine is_paid" do
       expect(organization.paid_for?("csv_exports")).to be_falsey
       invoice.update_attributes(paid_feature_ids: [paid_feature.id])
@@ -93,8 +93,8 @@ describe Organization do
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
     end
     context "messages" do
-      let!(:paid_feature2) { FactoryGirl.create(:paid_feature, name: "abandoned message", feature_slugs: %w[messages abandoned_bike_messages]) }
-      let!(:user) { FactoryGirl.create(:organization_member, organization: organization) }
+      let!(:paid_feature2) { FactoryBot.create(:paid_feature, name: "abandoned message", feature_slugs: %w[messages abandoned_bike_messages]) }
+      let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
       it "returns empty for non-geolocated_emails" do
         expect(organization.message_kinds).to eq([])
         expect(organization.paid_for?(nil)).to be_falsey
@@ -118,10 +118,10 @@ describe Organization do
   end
 
   describe 'organization recoveries' do
-    let(:organization) { FactoryGirl.create(:organization) }
-    let(:bike) { FactoryGirl.create(:stolen_bike, creation_organization_id: organization.id) }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:bike) { FactoryBot.create(:stolen_bike, creation_organization_id: organization.id) }
     let(:stolen_record) { bike.find_current_stolen_record }
-    let!(:bike_organization) { FactoryGirl.create(:bike_organization, bike: bike, organization: organization) }
+    let!(:bike_organization) { FactoryBot.create(:bike_organization, bike: bike, organization: organization) }
     let(:recovery_information) do
       {
         recovered_description: 'recovered it on a special corner',
@@ -169,8 +169,8 @@ describe Organization do
       expect(organization.slug).to eq('bicycle-shop-2')
     end
     describe 'set_locations_shown' do
-      let(:country) { FactoryGirl.create(:country) }
-      let(:organization) { FactoryGirl.create(:organization, show_on_map: true, approved: true) }
+      let(:country) { FactoryBot.create(:country) }
+      let(:organization) { FactoryBot.create(:organization, show_on_map: true, approved: true) }
       let(:location) { Location.create(country_id: country.id, city: 'Chicago', name: 'stuff', organization_id: organization.id, shown: true) }
       context 'organization approved' do
         it 'sets the locations shown to be org shown on save' do
@@ -192,31 +192,31 @@ describe Organization do
 
     describe 'set_auto_user' do
       it 'sets the embedable user' do
-        organization = FactoryGirl.create(:organization)
-        user = FactoryGirl.create(:user_confirmed, email: 'embed@org.com')
-        FactoryGirl.create(:membership, organization: organization, user: user)
+        organization = FactoryBot.create(:organization)
+        user = FactoryBot.create(:user_confirmed, email: 'embed@org.com')
+        FactoryBot.create(:membership, organization: organization, user: user)
         organization.embedable_user_email = 'embed@org.com'
         organization.save
         expect(organization.reload.auto_user_id).to eq(user.id)
       end
       it 'does not set the embedable user if user is not a member' do
-        organization = FactoryGirl.create(:organization)
-        FactoryGirl.create(:user_confirmed, email: 'no_embed@org.com')
+        organization = FactoryBot.create(:organization)
+        FactoryBot.create(:user_confirmed, email: 'no_embed@org.com')
         organization.embedable_user_email = 'no_embed@org.com'
         organization.save
         expect(organization.reload.auto_user_id).to be_nil
       end
       it 'Makes a membership if the user is auto user' do
-        organization = FactoryGirl.create(:organization)
-        user = FactoryGirl.create(:user_confirmed, email: ENV['AUTO_ORG_MEMBER'])
+        organization = FactoryBot.create(:organization)
+        user = FactoryBot.create(:user_confirmed, email: ENV['AUTO_ORG_MEMBER'])
         organization.embedable_user_email = ENV['AUTO_ORG_MEMBER']
         organization.save
         expect(organization.reload.auto_user_id).to eq(user.id)
       end
       it "sets the embedable user if it isn't set and the org has members" do
-        organization = FactoryGirl.create(:organization)
-        user = FactoryGirl.create(:user_confirmed)
-        FactoryGirl.create(:membership, user: user, organization: organization)
+        organization = FactoryBot.create(:organization)
+        user = FactoryBot.create(:user_confirmed)
+        FactoryBot.create(:membership, user: user, organization: organization)
         organization.save
         expect(organization.reload.auto_user_id).not_to be_nil
       end
@@ -224,9 +224,9 @@ describe Organization do
   end
 
   describe 'ensure_auto_user' do
-    let(:organization) { FactoryGirl.create(:organization) }
+    let(:organization) { FactoryBot.create(:organization) }
     context 'existing members' do
-      let(:member) { FactoryGirl.create(:organization_member, organization: organization) }
+      let(:member) { FactoryBot.create(:organization_member, organization: organization) }
       before do
         expect(member).to be_present
       end
@@ -237,7 +237,7 @@ describe Organization do
       end
     end
     context 'no members' do
-      let(:auto_user) { FactoryGirl.create(:user_confirmed, email: ENV['AUTO_ORG_MEMBER']) }
+      let(:auto_user) { FactoryBot.create(:user_confirmed, email: ENV['AUTO_ORG_MEMBER']) }
       before do
         expect(organization).to be_present
         expect(auto_user).to be_present
@@ -268,25 +268,25 @@ describe Organization do
   end
 
   describe 'mail_snippet_body' do
-    let(:organization) { FactoryGirl.create(:organization) }
+    let(:organization) { FactoryBot.create(:organization) }
     before do
       expect((organization && mail_snippet).present?).to be_truthy
       expect(organization.mail_snippets).to be_present
     end
     context 'not included snippet type' do
-      let(:mail_snippet) { FactoryGirl.create(:organization_mail_snippet, organization: organization, name: 'fool') }
+      let(:mail_snippet) { FactoryBot.create(:organization_mail_snippet, organization: organization, name: 'fool') }
       it 'returns nil for not-allowed snippet type' do
         expect(organization.mail_snippet_body('fool')).to be nil
       end
     end
     context 'non-enabled snippet type' do
-      let(:mail_snippet) { FactoryGirl.create(:organization_mail_snippet, organization: organization, is_enabled: false) }
+      let(:mail_snippet) { FactoryBot.create(:organization_mail_snippet, organization: organization, is_enabled: false) }
       it 'returns nil for not-enabled snippet' do
         expect(organization.mail_snippet_body(mail_snippet.name)).to be nil
       end
     end
     context 'enabled snippet' do
-      let(:mail_snippet) { FactoryGirl.create(:organization_mail_snippet, organization: organization, name: 'security') }
+      let(:mail_snippet) { FactoryBot.create(:organization_mail_snippet, organization: organization, name: 'security') }
       it 'returns nil for not-enabled snippet' do
         expect(organization.mail_snippet_body(mail_snippet.name)).to eq mail_snippet.body
       end

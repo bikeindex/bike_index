@@ -28,8 +28,8 @@ describe Component do
 
   describe 'set_front_or_rear' do
     it 'returns the name of the ctype other if it should' do
-      bike = FactoryGirl.create(:bike)
-      FactoryGirl.create(:component, bike: bike, front_or_rear: 'both')
+      bike = FactoryBot.create(:bike)
+      FactoryBot.create(:component, bike: bike, front_or_rear: 'both')
       expect(bike.reload.components.count).to eq(2)
     end
   end
@@ -55,7 +55,7 @@ describe Component do
 
   describe 'set_is_stock' do
     it 'sets not stock if description changed' do
-      component = FactoryGirl.create(:component, is_stock: true)
+      component = FactoryBot.create(:component, is_stock: true)
       expect(component.is_stock).to be_truthy
       component.year = 1987
       expect(component.is_stock).to be_truthy
@@ -67,14 +67,14 @@ describe Component do
       expect(component.is_stock).to be_falsey
     end
     it 'sets not stock if cmodel_name changed' do
-      component = FactoryGirl.create(:component, is_stock: true)
+      component = FactoryBot.create(:component, is_stock: true)
       expect(component.is_stock).to be_truthy
       component.cmodel_name = 'New mode'
       component.set_is_stock
       expect(component.is_stock).to be_falsey
     end
     it 'skips if setting_is_stock' do
-      component = FactoryGirl.create(:component, is_stock: true)
+      component = FactoryBot.create(:component, is_stock: true)
       expect(component.is_stock).to be_truthy
       component.setting_is_stock = true
       component.cmodel_name = 'New mode'
@@ -89,7 +89,7 @@ describe Component do
   describe 'fuzzy_assign_mnfg' do
     context 'manufacturer_id a manufacturer name' do
       it 'sets manufacturer_id correctly' do
-        m = FactoryGirl.create(:manufacturer, name: 'SRAM')
+        m = FactoryBot.create(:manufacturer, name: 'SRAM')
         c = { manufacturer_id: 'sram' }
         component = ComponentCreator.new.set_manufacturer_key(c)
         expect(component[:manufacturer_id]).to eq m.id

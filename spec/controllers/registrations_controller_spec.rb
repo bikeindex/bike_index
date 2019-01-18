@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe RegistrationsController do
-  let(:user) { FactoryGirl.create(:user_confirmed) }
-  let(:auto_user) { FactoryGirl.create(:organization_auto_user) }
+  let(:user) { FactoryBot.create(:user_confirmed) }
+  let(:auto_user) { FactoryBot.create(:organization_auto_user) }
   let(:organization) { auto_user.organizations.first }
   let(:renders_embed_without_xframe) do
     expect(response.status).to eq(200)
@@ -66,7 +66,7 @@ describe RegistrationsController do
         end
       end
       context 'with user' do
-        let!(:organization_child) { FactoryGirl.create(:organization, parent_organization_id: organization.id) }
+        let!(:organization_child) { FactoryBot.create(:organization, parent_organization_id: organization.id) }
         it 'renders, testing variables' do
           set_current_user(user)
           get :embed, organization_id: organization.id, stolen: true, select_child_organization: true
@@ -90,8 +90,8 @@ describe RegistrationsController do
     end
   end
   describe 'create' do
-    let(:manufacturer) { FactoryGirl.create(:manufacturer) }
-    let(:color) { FactoryGirl.create(:color) }
+    let(:manufacturer) { FactoryBot.create(:manufacturer) }
+    let(:color) { FactoryBot.create(:color) }
     context 'invalid creation' do
       context 'email not set, sets simple_header' do
         it 'does not create a bparam, rerenders new with all assigned values' do

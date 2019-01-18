@@ -65,7 +65,7 @@ describe FileCacheMaintainer do
 
   describe 'remove_file' do
     it 'deletes the file' do
-      FactoryGirl.create(:stolen_bike)
+      FactoryBot.create(:stolen_bike)
       FileCacheMaintainer.reset_file_info('1456863086_all_stolen_cache.json', 1456863086)
       CacheAllStolenWorker.new.perform
       files_count = FileCacheMaintainer.files.count

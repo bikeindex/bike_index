@@ -18,6 +18,6 @@ class Admin::FlavorTextsController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:flavor_text).permit(FlavorText.old_attr_accessible)
+    params.require(:flavor_text).permit(:message)
   end
 end

@@ -8,9 +8,9 @@ describe LocksController do
       LockType.create(name: name)
     end
   end
-  let(:manufacturer) { FactoryGirl.create(:manufacturer) }
-  let(:lock) { FactoryGirl.create(:lock) }
-  let(:owner_lock) { FactoryGirl.create(:lock, user: user) }
+  let(:manufacturer) { FactoryBot.create(:manufacturer) }
+  let(:lock) { FactoryBot.create(:lock) }
+  let(:owner_lock) { FactoryBot.create(:lock, user: user) }
   let(:lock_type) { LockType.last }
   let(:valid_attributes) do
     {

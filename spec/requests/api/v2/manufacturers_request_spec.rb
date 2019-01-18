@@ -3,9 +3,9 @@ require "spec_helper"
 describe "Manufacturers API V2" do
   describe "root" do
     it "responds on index with pagination" do
-      manufacturer = FactoryGirl.create(:manufacturer, name: "AAAAAzz") # make sure it's the first manufacturer
-      FactoryGirl.create(:manufacturer) unless Manufacturer.count >= 2
-      FactoryGirl.create(:manufacturer) unless Manufacturer.count >= 2
+      manufacturer = FactoryBot.create(:manufacturer, name: "AAAAAzz") # make sure it's the first manufacturer
+      FactoryBot.create(:manufacturer) unless Manufacturer.count >= 2
+      FactoryBot.create(:manufacturer) unless Manufacturer.count >= 2
       count = Manufacturer.count
       get "/api/v2/manufacturers?per_page=1"
       expect(response.header["Total"]).to eq(count.to_s)
@@ -19,7 +19,7 @@ describe "Manufacturers API V2" do
   end
 
   describe "find by id or name" do
-    let!(:manufacturer) { FactoryGirl.create(:manufacturer) }
+    let!(:manufacturer) { FactoryBot.create(:manufacturer) }
     it "returns one with from an id" do
       get "/api/v2/manufacturers/#{manufacturer.id}"
       result = response.body
@@ -37,7 +37,7 @@ describe "Manufacturers API V2" do
     end
 
     describe "show" do
-      let!(:manufacturer) { FactoryGirl.create(:manufacturer, name: 'awesome') }
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: 'awesome') }
       it "returns one from a name" do
         get "/api/v2/manufacturers/awesome"
         result = response.body

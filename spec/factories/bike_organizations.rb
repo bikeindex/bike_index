@@ -1,6 +1,6 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :bike_organization do
-    association :bike
-    association :organization
+    bike { FactoryBot.create(:bike) }
+    organization { FactoryBot.create(:organization) }
   end
 end

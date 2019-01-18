@@ -95,7 +95,7 @@ describe Organized::ManageController, type: :controller do
             is_paid: false
           }
         end
-        let(:user_2) { FactoryGirl.create(:organization_member, organization: organization) }
+        let(:user_2) { FactoryBot.create(:organization_member, organization: organization) }
         let(:update_attributes) do
           {
             # slug: 'short_name',
@@ -142,9 +142,9 @@ describe Organized::ManageController, type: :controller do
         end
       end
       context 'with locations and normal show_on_map' do
-        let(:state) { FactoryGirl.create(:state) }
+        let(:state) { FactoryBot.create(:state) }
         let(:country) { state.country }
-        let(:location_1) { FactoryGirl.create(:location, organization: organization, street: 'old street', name: 'cool name') }
+        let(:location_1) { FactoryBot.create(:location, organization: organization, street: 'old street', name: 'cool name') }
         let(:update_attributes) do
           {
             name: organization.name,

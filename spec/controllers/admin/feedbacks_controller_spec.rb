@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 describe Admin::FeedbacksController, type: :controller do
-  let(:subject) { FactoryGirl.create(:feedback) }
+  let(:subject) { FactoryBot.create(:feedback) }
   include_context :logged_in_as_super_admin
 
   describe 'index' do

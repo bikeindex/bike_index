@@ -14,12 +14,12 @@ RSpec.describe BikeCode, type: :model do
   end
 
   describe "basic stuff" do
-    let(:bike) { FactoryGirl.create(:bike) }
-    let(:organization) { FactoryGirl.create(:organization, name: "Bike all night long", short_name: "bikenight") }
-    let!(:spokecard) { FactoryGirl.create(:bike_code, kind: "spokecard", code: 12, bike: bike) }
-    let!(:sticker) { FactoryGirl.create(:bike_code, code: 12, organization_id: organization.id) }
-    let!(:sticker_dupe) { FactoryGirl.build(:bike_code, code: "00012", organization_id: organization.id) }
-    let!(:spokecard_text) { FactoryGirl.create(:bike_code, kind: "spokecard", code: "a31b", bike: bike) }
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:organization) { FactoryBot.create(:organization, name: "Bike all night long", short_name: "bikenight") }
+    let!(:spokecard) { FactoryBot.create(:bike_code, kind: "spokecard", code: 12, bike: bike) }
+    let!(:sticker) { FactoryBot.create(:bike_code, code: 12, organization_id: organization.id) }
+    let!(:sticker_dupe) { FactoryBot.build(:bike_code, code: "00012", organization_id: organization.id) }
+    let!(:spokecard_text) { FactoryBot.create(:bike_code, kind: "spokecard", code: "a31b", bike: bike) }
 
     it "calls the things we expect and finds the things we expect" do
       expect(BikeCode.claimed.count).to eq 2
@@ -42,15 +42,15 @@ RSpec.describe BikeCode, type: :model do
   end
 
   describe "duplication and integers" do
-    let(:organization) { FactoryGirl.create(:organization) }
-    let!(:sticker) { FactoryGirl.create(:bike_code, kind: "sticker", code: 12, organization_id: organization.id) }
-    let!(:sticker2) { FactoryGirl.create(:bike_code, kind: "sticker", code: " 12", organization: FactoryGirl.create(:organization)) }
-    let!(:spokecard) { FactoryGirl.create(:bike_code, kind: "spokecard", code: "00000012") }
-    let!(:spokecard2) { FactoryGirl.create(:bike_code, kind: "sticker", code: "a00000012") }
-    let(:sticker_dupe_number) { FactoryGirl.build(:bike_code, kind: "sticker", code: "00012", organization_id: organization.id) }
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:sticker) { FactoryBot.create(:bike_code, kind: "sticker", code: 12, organization_id: organization.id) }
+    let!(:sticker2) { FactoryBot.create(:bike_code, kind: "sticker", code: " 12", organization: FactoryBot.create(:organization)) }
+    let!(:spokecard) { FactoryBot.create(:bike_code, kind: "spokecard", code: "00000012") }
+    let!(:spokecard2) { FactoryBot.create(:bike_code, kind: "sticker", code: "a00000012") }
+    let(:sticker_dupe_number) { FactoryBot.build(:bike_code, kind: "sticker", code: "00012", organization_id: organization.id) }
     # Note: unique across kinds, so just check that here
-    let(:spokecard_dupe_letter) { FactoryGirl.build(:bike_code, kind: "sticker", code: " A00000012") }
-    let(:spokecard_empty) { FactoryGirl.build(:bike_code, kind: "sticker", code: " ") }
+    let(:spokecard_dupe_letter) { FactoryBot.build(:bike_code, kind: "sticker", code: " A00000012") }
+    let(:spokecard_empty) { FactoryBot.build(:bike_code, kind: "sticker", code: " ") }
 
     it "doesn't permit duplicates" do
       expect(sticker.code).to eq "12"
@@ -67,9 +67,9 @@ RSpec.describe BikeCode, type: :model do
   end
 
   describe "claimable_by?" do
-    let(:user) { FactoryGirl.create(:user) }
-    let(:organization) { FactoryGirl.create(:organization) }
-    let(:membership) { FactoryGirl.create(:membership, user: user, organization: organization) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:membership) { FactoryBot.create(:membership, user: user, organization: organization) }
     before { stub_const("BikeCode::MAX_UNORGANIZED", 1) }
     it "is truthy" do
       expect(BikeCode.new.claimable_by?(user)).to be_truthy
@@ -77,7 +77,7 @@ RSpec.describe BikeCode, type: :model do
       expect(BikeCode.new(bike_id: 1243).claimable_by?(user)).to be_falsey
     end
     context "user has too many bike_codes" do
-      let!(:bike_code) { FactoryGirl.create(:bike_code, user_id: user.id) }
+      let!(:bike_code) { FactoryBot.create(:bike_code, user_id: user.id) }
       it "has expected values" do
         expect(BikeCode.new.claimable_by?(user)).to be_falsey
         expect(membership).to be_present
@@ -99,7 +99,7 @@ RSpec.describe BikeCode, type: :model do
       end
     end
     context "user has too many organized bike_code" do
-      let!(:bike_code) { FactoryGirl.create(:bike_code, user_id: user.id, organization_id: organization.id) }
+      let!(:bike_code) { FactoryBot.create(:bike_code, user_id: user.id, organization_id: organization.id) }
       it "has expected values" do
         expect(BikeCode.new.claimable_by?(user)).to be_falsey
         expect(membership).to be_present # Once user is part of the organization, they're permitted to link
@@ -110,9 +110,9 @@ RSpec.describe BikeCode, type: :model do
   end
 
   describe "claim" do
-    let(:bike) { FactoryGirl.create(:bike) }
-    let(:user) { FactoryGirl.create(:user) }
-    let(:bike_code) { FactoryGirl.create(:bike_code) }
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:user) { FactoryBot.create(:user) }
+    let(:bike_code) { FactoryBot.create(:bike_code) }
     it "claims, doesn't update when unable to parse" do
       bike_code.claim(user, bike.id)
       expect(bike_code.user).to eq user
@@ -136,9 +136,9 @@ RSpec.describe BikeCode, type: :model do
       end
     end
     context "organized" do
-      let(:organization) { FactoryGirl.create(:organization) }
-      let(:user) { FactoryGirl.create(:organization_member, organization: organization) }
-      let(:bike_code) { FactoryGirl.create(:bike_code, bike: bike, organization: organization) }
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:bike_code) { FactoryBot.create(:bike_code, bike: bike, organization: organization) }
       it "permits unclaiming of organized bikes if already claimed" do
         bike_code.reload
         expect(bike_code.errors.full_messages).to_not be_present
@@ -161,7 +161,7 @@ RSpec.describe BikeCode, type: :model do
       end
 
       context "unorganized" do
-        let(:bike_code) { FactoryGirl.create(:bike_code, bike: bike, organization: FactoryGirl.create(:organization)) }
+        let(:bike_code) { FactoryBot.create(:bike_code, bike: bike, organization: FactoryBot.create(:organization)) }
         it "can't unclaim other orgs bikes" do
           bike_code.claim(user, nil)
           expect(bike_code.errors.full_messages).to be_present

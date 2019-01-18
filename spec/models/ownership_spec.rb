@@ -22,17 +22,23 @@ describe Ownership do
     end
   end
 
-  describe 'mark_claimed' do
-    it 'associates with a user' do
-      o = FactoryGirl.create(:ownership)
-      o.mark_claimed
-      expect(o.claimed).to be_truthy
+  describe "mark_claimed" do
+    it "associates with a user" do
+      ownership = FactoryBot.create(:ownership)
+      ownership.mark_claimed
+      expect(ownership.claimed?).to be_truthy
+    end
+    context "factory ownership_claimed" do
+      let!(:ownership) { FactoryBot.create(:ownership_claimed) }
+      it "is claimed" do
+        expect(ownership.claimed?).to be_truthy
+      end
     end
   end
 
   describe 'owner' do
     it 'returns the current owner if the ownership is claimed' do
-      user = FactoryGirl.create(:user_confirmed)
+      user = FactoryBot.create(:user_confirmed)
       ownership = Ownership.new
       allow(ownership).to receive(:claimed).and_return(true)
       allow(ownership).to receive(:user).and_return(user)
@@ -40,7 +46,7 @@ describe Ownership do
     end
 
     it "returns the creator if it isn't claimed" do
-      user = FactoryGirl.create(:user_confirmed)
+      user = FactoryBot.create(:user_confirmed)
       ownership = Ownership.new
       allow(ownership).to receive(:claimed).and_return(false)
       allow(ownership).to receive(:creator).and_return(user)
@@ -48,14 +54,14 @@ describe Ownership do
     end
 
     it 'returns auto user if creator is deleted' do
-      user = FactoryGirl.create(:user_confirmed, email: ENV['AUTO_ORG_MEMBER'])
+      user = FactoryBot.create(:user_confirmed, email: ENV['AUTO_ORG_MEMBER'])
       ownership = Ownership.new
       expect(ownership.owner).to eq(user)
     end
   end
 
   describe 'can_be_claimed_by' do
-    let(:user) { FactoryGirl.create(:user_confirmed) }
+    let(:user) { FactoryBot.create(:user_confirmed) }
     it 'true if user email matches' do
       ownership = Ownership.new(owner_email: " #{user.email.upcase}")
       expect(ownership.can_be_claimed_by(user)).to be_truthy

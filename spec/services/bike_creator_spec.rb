@@ -7,8 +7,8 @@ describe BikeCreator do
       expect(creator.add_bike_book_data).to be_nil
     end
     it 'adds se bike data if it exists' do
-      manufacturer = FactoryGirl.create(:manufacturer, name: 'SE Bikes')
-      color = FactoryGirl.create(:color)
+      manufacturer = FactoryBot.create(:manufacturer, name: 'SE Bikes')
+      color = FactoryBot.create(:color)
       bike = {
         serial_number: 'Some serial',
         description: 'Input description',
@@ -17,7 +17,7 @@ describe BikeCreator do
         frame_model: 'Draft',
         primary_frame_color_id: color.id
       }
-      b_param = FactoryGirl.create(:b_param, params: { bike: bike })
+      b_param = FactoryBot.create(:b_param, params: { bike: bike })
       BikeCreator.new(b_param).add_bike_book_data
 
       b_param.reload
@@ -60,7 +60,7 @@ describe BikeCreator do
   describe 'clear_bike' do
     it 'removes the existing bike and transfer the errors to a new active record object' do
       b_param = BParam.new
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       bike.errors.add(:rando_error, 'LOLZ')
       expect_any_instance_of(BikeCreatorBuilder).to receive(:build).and_return(Bike.new)
       creator = BikeCreator.new(b_param).clear_bike(bike)
@@ -83,7 +83,7 @@ describe BikeCreator do
     it 'calls delete the already existing bike if one exists' do
       # This is to clean up duplicates, people press the 'add bike button' many times when its slow to respond
       b_param = BParam.new
-      bike = FactoryGirl.create(:bike)
+      bike = FactoryBot.create(:bike)
       bike1 = Bike.new
       allow(b_param).to receive(:created_bike).and_return(bike1)
       expect(BikeCreator.new(b_param).validate_record(bike)).to eq(bike1)
@@ -101,11 +101,11 @@ describe BikeCreator do
       BikeCreator.new(b_param).validate_record(bike)
     end
     describe 'no_duplicate' do
-      let(:existing_bike) { FactoryGirl.create(:bike, serial_number: 'some serial number', owner_email: email) }
-      let(:new_bike) { FactoryGirl.create(:bike, serial_number: 'some serial number', owner_email: new_email) }
+      let(:existing_bike) { FactoryBot.create(:bike, serial_number: 'some serial number', owner_email: email) }
+      let(:new_bike) { FactoryBot.create(:bike, serial_number: 'some serial number', owner_email: new_email) }
       let!(:ownerships) do
-        FactoryGirl.create(:ownership, bike: existing_bike, owner_email: email)
-        FactoryGirl.create(:ownership, bike: new_bike, owner_email: new_email)
+        FactoryBot.create(:ownership, bike: existing_bike, owner_email: email)
+        FactoryBot.create(:ownership, bike: new_bike, owner_email: new_email)
       end
       let(:params) do
         {
@@ -116,7 +116,7 @@ describe BikeCreator do
           }
         }
       end
-      let(:b_param) { FactoryGirl.create(:b_param, creator: existing_bike.current_ownership.creator, params: params) }
+      let(:b_param) { FactoryBot.create(:b_param, creator: existing_bike.current_ownership.creator, params: params) }
       context 'same email' do
         let(:email) { 'something@gmail.com' }
         let(:new_email) { 'Something@GMAIL.com' }
@@ -150,14 +150,14 @@ describe BikeCreator do
   describe 'save_bike' do
     Sidekiq::Testing.inline! do
       it 'creates a bike with the parameters it is passed and returns it' do
-        propulsion_type = FactoryGirl.create(:propulsion_type)
-        cycle_type = FactoryGirl.create(:cycle_type)
-        organization = FactoryGirl.create(:organization)
-        user = FactoryGirl.create(:user)
-        manufacturer = FactoryGirl.create(:manufacturer)
-        color = FactoryGirl.create(:color)
-        handlebar_type = FactoryGirl.create(:handlebar_type)
-        wheel_size = FactoryGirl.create(:wheel_size)
+        propulsion_type = FactoryBot.create(:propulsion_type)
+        cycle_type = FactoryBot.create(:cycle_type)
+        organization = FactoryBot.create(:organization)
+        user = FactoryBot.create(:user)
+        manufacturer = FactoryBot.create(:manufacturer)
+        color = FactoryBot.create(:color)
+        handlebar_type = FactoryBot.create(:handlebar_type)
+        wheel_size = FactoryBot.create(:wheel_size)
         b_param = BParam.new(origin: 'api_v1')
         creator = BikeCreator.new(b_param)
         bike = Bike.new
@@ -187,7 +187,7 @@ describe BikeCreator do
       Sidekiq::Testing.fake! do
         b_param = BParam.new
         creator = BikeCreator.new(b_param)
-        bike = FactoryGirl.create(:bike)
+        bike = FactoryBot.create(:bike)
         expect(creator).to receive(:create_associations).and_return(bike)
         expect(creator).to receive(:validate_record).and_return(bike)
         expect do
