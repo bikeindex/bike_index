@@ -108,12 +108,6 @@ FactoryBot.define do
     lock_type { FactoryBot.create(:lock_type) }
   end
 
-  factory :organization_invitation do
-    inviter { FactoryBot.create(:user) }
-    organization { FactoryBot.create(:organization) }
-    invitee_email { 'mike@test.com' }
-  end
-
   factory :membership do
     role { 'member' }
     factory :existing_membership do
