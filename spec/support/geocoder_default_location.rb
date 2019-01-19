@@ -18,7 +18,8 @@ shared_context :geocoder_default_location do
       address: "278 Broadway",
       city: "New York",
       state: "NY",
-      zipcode: "10007"
+      zipcode: "10007",
+      country: "USA"
     }.as_json
   end
 

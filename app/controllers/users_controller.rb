@@ -178,7 +178,11 @@ class UsersController < ApplicationController
   private
 
   def permitted_parameters
-    params.require(:user).permit(User.old_attr_accessible)
+    params.require(:user)
+          .permit(:name, :username, :email, :is_emailable, :additional_emails, :title, :description,
+                  :phone, :street, :city, :zipcode, :country_id, :state_id, :avatar, :avatar_cache,
+                  :twitter, :show_twitter, :website, :show_website, :show_bikes, :show_phone,
+                  :my_bikes_link_target, :my_bikes_link_title, :password, :password_confirmation)
           .merge(sign_in_partner.present? ? { partner_data: { sign_up: sign_in_partner } } : {})
   end
 

@@ -4,15 +4,6 @@ class User < ActiveRecord::Base
 
   has_secure_password
 
-  def self.old_attr_accessible
-    # :email, # Also maybe a all_emails field for searching.. 
-    %w(name username email password password_confirmation current_password terms_of_service
-       vendor_terms_of_service when_vendor_terms_of_service phone zipcode title my_bikes_hash
-       avatar avatar_cache description twitter show_twitter website show_website show_bikes
-       show_phone has_stolen_bikes can_send_many_stolen_notifications my_bikes_link_target
-       my_bikes_link_title is_emailable additional_emails).map(&:to_sym).freeze
- end
-
   attr_accessor :my_bikes_link_target, :my_bikes_link_title, :current_password
   # stripe_id, is_paid_member, paid_membership_info
 
@@ -42,14 +33,13 @@ class User < ActiveRecord::Base
   has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :inviter
   has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :invitee
   belongs_to :bike_actions_organization, class_name: "Organization"
+  belongs_to :state
+  belongs_to :country
 
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
 
   validates_uniqueness_of :username, case_sensitive: false
-  def to_param
-    username
-  end
 
   validates :password,
     presence: true,
@@ -74,6 +64,15 @@ class User < ActiveRecord::Base
   before_create :generate_username_confirmation_and_auth
   after_create :perform_create_jobs
   before_save :set_calculated_attributes
+
+  attr_accessor :skip_geocode
+
+  geocoded_by :address
+  after_validation :geocode, if: ->(obj) do
+    !skip_geocode &&
+      (obj.city.present? || obj.zipcode.present? || obj.street.present?) &&
+      (obj.city_changed? || obj.zipcode_changed? || obj.street_changed?)
+  end
 
   class << self
     def fuzzy_email_find(email)
@@ -119,13 +118,15 @@ class User < ActiveRecord::Base
 
   def unconfirmed?; !confirmed? end
 
-  def perform_create_jobs; CreateUserJobs.new(self).perform_create_jobs end
+  def perform_create_jobs; AfterUserCreateWorker.new.perform(id, "new", user: self) end
 
   def superuser?; superuser end
 
   def content?; is_content_admin end
 
   def developer?; developer end
+
+  def to_param; username end
 
   def display_name; name.present? ? name : email end
 
@@ -179,7 +180,7 @@ class User < ActiveRecord::Base
       self.confirmation_token = nil
       self.confirmed = true
       self.save
-      CreateUserJobs.new(self).perform_confirmed_jobs
+      AfterUserCreateWorker.new.perform(id, "confirmed", user: self)
       true
     end
   end
@@ -248,14 +249,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  def has_stolen?
-    stolen = false
-    self.bikes.each do |bike_id|
-      stolen = true if Bike.find(bike_id).stolen
-    end
-    return stolen
-  end
-
   def set_calculated_attributes
     self.title = strip_tags(title) if title.present?
     if website
@@ -292,6 +285,19 @@ class User < ActiveRecord::Base
       ""
     end
   end
+
+  def address(skip_default_country: false)
+    country_string = country&.iso
+    country_string = nil if skip_default_country && country_string == "US"
+    [
+      street,
+      city,
+      (state&.abbreviation),
+      zipcode,
+      country_string
+    ].reject(&:blank?).join(', ')
+  end
+
 
   def generate_auth_token
     begin
