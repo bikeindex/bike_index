@@ -69,15 +69,7 @@ describe Geohelper do
     describe "address_hash_from_geocoder_result" do
       context "with secondary line" do
         let(:address_str) { "188 King St, UNIT 201, San Francisco, CA 94107, USA" }
-        let(:target) do
-          {
-            address: "188 King St, UNIT 201",
-            city: "San Francisco",
-            state: "CA",
-            zipcode: "94107",
-            country: "USA"
-          }
-        end
+        let(:target) { { address: "188 King St, UNIT 201", city: "San Francisco", state: "CA", zipcode: "94107", country: "USA" } }
         it "returns our desires" do
           expect(Geohelper.address_hash_from_geocoder_result(address_str)).to eq target.as_json
         end
