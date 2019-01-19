@@ -83,6 +83,7 @@ describe AfterUserCreateWorker do
     include_context :geocoder_real
     it "assigns the extra user attributes" do
       VCR.use_cassette("after_user_create_worker-import_user_attributes") do
+        expect(user).to be_present
         instance.perform(user.id, "new")
         ownership.reload
         user.reload
@@ -92,11 +93,12 @@ describe AfterUserCreateWorker do
         expect(user.zipcode).to eq "94111"
         expect(user.state).to eq state
         expect(user.country).to eq country
+        expect([user.latitude, user.longitude]).to eq([37.8016649, -122.397348])
       end
     end
     context "existing attributes" do
-      let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org", phone: "929292", zipcode: "89999") }
-      xit "doesn't import" do
+      let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org", phone: "929292", zipcode: "89999", skip_geocode: true) }
+      it "doesn't import" do
         instance.perform(user.id, "new")
         user.reload
         expect(user.phone).to eq "929292"

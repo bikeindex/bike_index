@@ -64,11 +64,14 @@ class AfterUserCreateWorker
     unless [user.street, user.city, user.zipcode, user.state, user.country].reject(&:blank?).any?
       address = user_bikes_for_attrs(user.id).map { |b| b.registration_address }.reject(&:blank?).last
       if address.present?
-        user.attributes = { street: address["address"],
+        user.attributes = { skip_geocode: true,
+                            street: address["address"],
                             zipcode: address["zipcode"],
                             city: address["city"],
                             state: State.fuzzy_find(address["state"]),
-                            country: Country.fuzzy_find(address["country"]) }
+                            country: Country.fuzzy_find(address["country"]),
+                            latitude: address["latitude"],
+                            longitude: address["longitude"] }
       end
     end
     user.save if user.changed?

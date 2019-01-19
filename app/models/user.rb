@@ -39,16 +39,7 @@ class User < ActiveRecord::Base
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
 
-  geocoded_by :address
-  after_validation :geocode, if: ->(obj) do
-    (obj.city.present? || obj.zipcode.present? || obj.street.present?) &&
-      (obj.city_changed? || obj.zipcode_changed? || obj.street_changed?)
-  end
-
   validates_uniqueness_of :username, case_sensitive: false
-  def to_param
-    username
-  end
 
   validates :password,
     presence: true,
@@ -73,6 +64,15 @@ class User < ActiveRecord::Base
   before_create :generate_username_confirmation_and_auth
   after_create :perform_create_jobs
   before_save :set_calculated_attributes
+
+  attr_accessor :skip_geocode
+
+  geocoded_by :address
+  after_validation :geocode, if: ->(obj) do
+    !skip_geocode &&
+      (obj.city.present? || obj.zipcode.present? || obj.street.present?) &&
+      (obj.city_changed? || obj.zipcode_changed? || obj.street_changed?)
+  end
 
   class << self
     def fuzzy_email_find(email)
@@ -125,6 +125,8 @@ class User < ActiveRecord::Base
   def content?; is_content_admin end
 
   def developer?; developer end
+
+  def to_param; username end
 
   def display_name; name.present? ? name : email end
 
