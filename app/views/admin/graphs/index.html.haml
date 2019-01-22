@@ -28,7 +28,6 @@
 %hr#pageContainerFluid.padded
 
 - if @kind == "general"
-  - cache("admin_general_graphs", expires_in: 1.hour) do
     %section
       %h2 Users past week
       = line_chart User.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count

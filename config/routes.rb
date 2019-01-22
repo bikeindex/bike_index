@@ -1,4 +1,4 @@
-  require 'soulheart/server'
+require 'soulheart/server'
 require 'sidekiq/web'
 Sidekiq::Web.set :session_secret, Rails.application.secrets[:secret_key_base]
 Bikeindex::Application.routes.draw do
