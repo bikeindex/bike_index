@@ -34,7 +34,7 @@ class BikeIndex.Views.Global extends Backbone.View
       if preciseTime then time.format("YYYY-MM-DD h:mma") else time.format("YYYY-MM-DD")
 
   localizeTimes: ->
-    window.timezone ||= moment.tz.guess()
+    window.timezone = moment.tz.guess()
     moment.tz.setDefault(window.timezone)
     window.yesterday = moment().subtract(1, "day").startOf("day")
     window.today = moment().startOf("day")

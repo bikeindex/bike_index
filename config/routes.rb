@@ -1,4 +1,4 @@
-require 'soulheart/server'
+  require 'soulheart/server'
 require 'sidekiq/web'
 Sidekiq::Web.set :session_secret, Rails.application.secrets[:secret_key_base]
 Bikeindex::Application.routes.draw do
@@ -166,6 +166,7 @@ Bikeindex::Application.routes.draw do
         get :bikes
         get :users
         get :stolen_locations
+        get :variable
       end
     end
     resources :failed_bikes, only: [:index, :show]

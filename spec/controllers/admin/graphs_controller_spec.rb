@@ -10,10 +10,11 @@ describe Admin::GraphsController, type: :controller do
         expect(response).to render_template(:index)
       end
     end
-    context 'tables' do
-      it 'redirects to tables' do
-        get :index, tables: true
-        expect(response).to redirect_to(:tables_admin_graphs)
+    context "kind" do
+      it "renders" do
+        get :index, kind: "users"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:index)
       end
     end
   end
@@ -23,6 +24,16 @@ describe Admin::GraphsController, type: :controller do
       get :tables
       expect(response.status).to eq(200)
       expect(response).to render_template(:tables)
+    end
+  end
+
+  describe "variable" do
+    it "returns json" do
+      get :variable
+      expect(response.status).to eq(200)
+      result = JSON.parse(response.body)
+      pp result
+      expect(result.keys.count).to be > 0
     end
   end
 
