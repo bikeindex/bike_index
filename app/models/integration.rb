@@ -2,9 +2,6 @@ class IntegrationAssociationError < StandardError
 end
 
 class Integration < ActiveRecord::Base
-  def self.old_attr_accessible
-    %w(access_token provider_name user_id user information).map(&:to_sym).freeze
-  end
 
   validates_presence_of :access_token
   validates_presence_of :information

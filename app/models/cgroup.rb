@@ -4,10 +4,6 @@ class Cgroup < ActiveRecord::Base
 
   has_many :ctypes
 
-  def self.old_attr_accessible
-    %w(name slug description).map(&:to_sym).freeze
-  end
-
   def self.additional_parts
     where(name: 'Additional parts').first_or_create
   end

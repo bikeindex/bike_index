@@ -61,6 +61,6 @@ class Admin::RecoveriesController < Admin::BaseController
   private
 
   def permitted_parameters
-    params.require(:stolen_record).permit(StolenRecord.old_attr_accessible)
+    params.require(:stolen_record).permit(:zipcode, :city, :theft_description, :bike_id, :current, :street, :latitude, :longitude, :date_stolen, :phone, :phone_for_everyone, :phone_for_users, :phone_for_shops, :phone_for_police, :police_report_number, :locking_description, :lock_defeat_description, :country_id, :police_report_department, :state_id, :creation_organization_id, :secondary_phone, :approved, :recieve_notifications, :proof_of_ownership, :date_recovered, :recovered_description, :index_helped_recovery, :can_share_recovery, :recovery_posted, :recovery_tweet, :recovery_share, :create_open311, :estimated_value, :recovery_link_token)
   end
 end

@@ -41,7 +41,7 @@ class Admin::AdsController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:ad).permit(Ad.old_attr_accessible)
+    params.require(:ad).permit(:title, :body, :target_url, :organization_id, :image)
   end
 
   def find_ad

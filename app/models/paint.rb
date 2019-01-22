@@ -1,8 +1,5 @@
 class Paint < ActiveRecord::Base
   include FriendlyNameFindable
-  def self.old_attr_accessible
-    %w(name color_id secondary_color_id tertiary_color_id manufacturer_id).map(&:to_sym).freeze
-  end
 
   validates_presence_of :name
   validates_uniqueness_of :name

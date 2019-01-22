@@ -61,7 +61,7 @@ class Admin::PaintsController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:paint).permit(Paint.old_attr_accessible)
+    params.require(:paint).permit(:name, :color_id, :manufacturer_id, :secondary_color_id, :tertiary_color_id, :bikes_count)
   end
 
   def find_paint

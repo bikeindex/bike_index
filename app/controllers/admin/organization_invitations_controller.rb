@@ -61,7 +61,7 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:organization_invitation).permit(OrganizationInvitation.old_attr_accessible)
+    params.require(:organization_invitation).permit(:invitee_email, :invitee_name, :invitee_id, :organization_id, :inviter_id, :redeemed, :membership_role)
   end
 
   def find_organization_invitation
