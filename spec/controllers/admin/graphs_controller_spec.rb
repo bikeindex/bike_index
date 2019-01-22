@@ -46,16 +46,17 @@ describe Admin::GraphsController, type: :controller do
         expect(assigns(:group_period)).to eq "month"
       end
       context "passed date and time" do
-        let(:end_at) { Time.at(1548193680) }
-        let(:start_at) { Time.at(1547592480) }
+        let(:end_at) { 1548193680 }
+        let(:start_at) { 1547592480 }
         it "returns json" do
-          get :variable, kind: "users", start_at: start_at.strftime("%Y-%m-%dT%H:%M"),
-                         end_at: end_at.strftime("%Y-%m-%dT%H:%M"), timezone: "America/Los_Angeles"
+          get :variable, kind: "users", start_at: Time.at(start_at).strftime("%Y-%m-%dT%H:%M"),
+                         end_at: Time.at(end_at).strftime("%Y-%m-%dT%H:%M"), timezone: "America/Los_Angeles"
           expect(response.status).to eq(200)
           json_result = JSON.parse(response.body)
           expect(json_result.keys.count).to be > 0
-          expect(assigns(:start_at).to_i).to be_within(1).of start_at.to_i
-          expect(assigns(:end_at).to_i).to be_within(1).of end_at.to_i
+          Time.zone = TimeParser.parse_timezone("America/Los_Angeles")
+          expect(assigns(:start_at)).to be_within(1.second).of Time.zone.at(start_at)
+          expect(assigns(:end_at)).to be_within(1.second).of Time.zone.at(end_at)
           expect(assigns(:group_period)).to eq "day"
         end
       end
