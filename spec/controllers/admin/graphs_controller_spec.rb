@@ -31,9 +31,34 @@ describe Admin::GraphsController, type: :controller do
     it "returns json" do
       get :variable
       expect(response.status).to eq(200)
-      result = JSON.parse(response.body)
-      pp result
-      expect(result.keys.count).to be > 0
+      json_result = JSON.parse(response.body)
+      expect(json_result["error"]).to be_present # Because kind is general, which doesn't get a graph
+    end
+    context "users" do
+      it "returns json" do
+        get :variable, kind: "users", timezone: "America/Los_Angeles"
+        expect(response.status).to eq(200)
+        json_result = JSON.parse(response.body)
+        expect(json_result["error"]).to_not be_present
+        expect(json_result.keys.count).to be > 0
+        expect(assigns(:start_at)).to be_within(1.day).of Time.parse("2007-01-01 1:00")
+        expect(assigns(:end_at)).to be_within(1.minute).of Time.now
+        expect(assigns(:group_period)).to eq "month"
+      end
+      context "passed date and time" do
+        let(:end_at) { Time.at(1548193680) }
+        let(:start_at) { Time.at(1547592480) }
+        it "returns json" do
+          get :variable, kind: "users", start_at: start_at.strftime("%Y-%m-%dT%H:%M"),
+                         end_at: end_at.strftime("%Y-%m-%dT%H:%M"), timezone: "America/Los_Angeles"
+          expect(response.status).to eq(200)
+          json_result = JSON.parse(response.body)
+          expect(json_result.keys.count).to be > 0
+          expect(assigns(:start_at)).to be_within(1.second).of start_at
+          expect(assigns(:end_at)).to be_within(1.second).of end_at
+          expect(assigns(:group_period)).to eq "day"
+        end
+      end
     end
   end
 

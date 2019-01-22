@@ -8,9 +8,15 @@ class Admin::GraphsController < Admin::BaseController
     set_variable_graph_kind
     set_variable_graphing_timing
     if @kind == "users"
-      chart_data = User.group_by_period(@group_period, :created_at, time_zone: @timezone)
+      chart_data = User.where(created_at: @start_at..@end_at)
+                       .group_by_period(@group_period, :created_at, time_zone: @timezone)
+                       .count
     end
-    render json: chart_data.count
+    if chart_data.present?
+      render json: chart_data
+    else
+      render json: { error: "unable to parse chart" }
+    end
   end
 
   def tables
