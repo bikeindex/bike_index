@@ -28,25 +28,25 @@
 %hr#pageContainerFluid.padded
 
 - if @kind == "general"
-    %section
-      %h2 Users past week
-      = line_chart User.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count
+  %section
+    %h2 Users past week
+    = line_chart User.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count
 
-    %section
-      %h2
-        Users since start
-      = line_chart users_admin_graphs_path
+  %section
+    %h2
+      Users since start
+    = line_chart users_admin_graphs_path
 
-    %section
-      %h2
-        Bikes past year
-      = line_chart bikes_admin_graphs_path(start_at: 'past_year')
+  %section
+    %h2
+      Bikes past year
+    = line_chart bikes_admin_graphs_path(start_at: 'past_year')
 
-    %section
-      %h2
-        Bikes since start
+  %section
+    %h2
+      Bikes since start
 
-      = line_chart bikes_admin_graphs_path
+    = line_chart bikes_admin_graphs_path
 - else
   = form_tag admin_graphs_path, method: :get, class: "variable-admin-graphs-form" do
     = hidden_field_tag :kind, @kind

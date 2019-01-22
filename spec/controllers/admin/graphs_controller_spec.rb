@@ -54,6 +54,7 @@ describe Admin::GraphsController, type: :controller do
           expect(response.status).to eq(200)
           json_result = JSON.parse(response.body)
           expect(json_result.keys.count).to be > 0
+          Time.zone = TimeParser.parse_timezone("America/Los_Angeles")
           expect(assigns(:start_at)).to be_within(1.second).of start_at
           expect(assigns(:end_at)).to be_within(1.second).of end_at
           expect(assigns(:group_period)).to eq "day"
