@@ -27,13 +27,13 @@ class Bike < ActiveRecord::Base
   has_many :bike_organizations, dependent: :destroy
   has_many :organizations, through: :bike_organizations
   has_one :creation_state, dependent: :destroy
-  delegate :creation_description, to: :creation_state, allow_nil: true
+  delegate :creation_description, :bulk_import, to: :creation_state, allow_nil: true
   # delegate :creator, to: :creation_state, source: :creator
   # has_one :creation_organization, through: :creation_state, source: :organization
   has_many :stolen_notifications, dependent: :destroy
   has_many :stolen_records, dependent: :destroy
   has_many :other_listings
-  has_many :normalized_serial_segments
+  has_many :normalized_serial_segments, dependent: :destroy
   has_many :ownerships, dependent: :destroy
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :components, dependent: :destroy
