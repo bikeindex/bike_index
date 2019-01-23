@@ -30,7 +30,7 @@ class BulkImportWorker
     csv = CSV.new(open_file, headers: headers)
     while (row = csv.shift)
       row_index += 1 # row_index is current line number
-      @bulk_import.reload if row_index%50 == 0 # reload the import every so often to check to see if the import is finished (external trip switch)
+      @bulk_import.reload if (row_index % 50).zero? # reload import every so often to check if import is finished (external trip switch)
       break false if @bulk_import.finished? # Means there was an error or we marked finished separately, so noop
 
       bike = register_bike(row_to_b_param_hash(row.to_h))
@@ -38,6 +38,9 @@ class BulkImportWorker
 
       @line_errors << [row_index, bike.cleaned_error_messages]
     end
+  rescue => e
+    @bulk_import.add_file_error(e)
+    raise e
   end
 
   def register_bike(b_param_hash)
