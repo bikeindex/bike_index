@@ -3,7 +3,7 @@ require 'csv'
 class BulkImportWorker
   include Sidekiq::Worker
   sidekiq_options queue: "afterwards" # Because it's low priority!
-  sidekiq_options backtrace: true
+  sidekiq_options backtrace: true, retry: false
 
   attr_accessor :bulk_import, :line_errors # Only necessary for testing
 
@@ -29,14 +29,18 @@ class BulkImportWorker
     row_index = 1 # We've already remove the first line, so it doesn't count. and we want lines to start at 1, not 0
     csv = CSV.new(open_file, headers: headers)
     while (row = csv.shift)
-      break false if @bulk_import.finished? # Means there was an error or something, so noop
-
       row_index += 1 # row_index is current line number
+      @bulk_import.reload if (row_index % 50).zero? # reload import every so often to check if import is finished (external trip switch)
+      break false if @bulk_import.finished? # Means there was an error or we marked finished separately, so noop
+
       bike = register_bike(row_to_b_param_hash(row.to_h))
       next if bike.id.present?
 
       @line_errors << [row_index, bike.cleaned_error_messages]
     end
+  rescue => e
+    @bulk_import.add_file_error(e)
+    raise e
   end
 
   def register_bike(b_param_hash)

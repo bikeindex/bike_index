@@ -61,8 +61,13 @@
 
         %td.not-tiny-screens
           .less-strong-hold
-            = bike.creation_organization.name if bike.creation_organization.present?
+            - if bike.creation_organization.present?
+              = link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization)
             - if bike.creation_description
               %span.less-strong-right
-                = bike.creation_description
+                - if bike.bulk_import.present?
+                  = link_to "bulk import", admin_bulk_import_path(bike.bulk_import), class: "less-strong"
+                - else
+                  = bike.creation_description
+
           
