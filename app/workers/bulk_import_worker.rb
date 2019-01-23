@@ -97,7 +97,7 @@ class BulkImportWorker
   end
 
   def convert_headers(str)
-    headers = str.split(",").map { |h| h.strip.gsub(/\s/, "_").downcase.to_sym }
+    headers = str.split(",").map { |h| h.gsub(/\"|\'/, "").strip.gsub(/\s/, "_").downcase.to_sym }
     header_name_map.each do |value, replacements|
       next if headers.include?(value)
 

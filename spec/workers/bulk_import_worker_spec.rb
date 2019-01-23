@@ -294,6 +294,13 @@ describe BulkImportWorker do
         it "returns the symbol if the symbol exists, without overwriting better terms" do
           expect(instance.convert_headers(header_string)).to eq target
         end
+        context "quote wrapped" do
+          let(:header_string) { '"Product Description","Brand","Color","Size","Serial Number","Customer Last Name","Customer First Name","Customer Email"' }
+          let(:target) { %i[description manufacturer color frame_size serial_number customer_last_name customer_first_name owner_email] }
+          it "leaves things alone" do
+            expect(instance.convert_headers(header_string)).to eq target
+          end
+        end
       end
     end
   end
