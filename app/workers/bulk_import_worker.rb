@@ -115,11 +115,12 @@ class BulkImportWorker
   private
 
   def validate_headers(attrs)
-    valid_headers = (attrs & %i[manufacturer owner_email serial_number]).count == 3
+    required_headers = %i[manufacturer owner_email serial_number]
+    valid_headers = (attrs & required_headers).count == 3
     # Update progress here, since we're successfully processing the file now - and we update here if invalid headers
     return @bulk_import.update_attribute :progress, "ongoing" if valid_headers
-
-    @bulk_import.add_file_error("Invalid CSV Headers: #{attrs}")
+    missing_headers = required_headers - (attrs & required_headers)
+    @bulk_import.add_file_error("Invalid CSV Headers: #{attrs.join(", ")} - missing #{missing_headers.join(", ")}")
   end
 
   def header_name_map
