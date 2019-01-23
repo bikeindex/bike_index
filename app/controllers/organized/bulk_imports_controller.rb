@@ -18,7 +18,9 @@ module Organized
         flash[:error] = "Unable to find that import"
         redirect_to organization_bulk_imports_path(organization_id: current_organization.to_param) and return
       end
-      @bikes = @bulk_import.bikes
+      page = params[:page] || 1
+      per_page = params[:per_page] || 25
+      @bikes = @bulk_import.bikes.order(created_at: :desc).page(page).per(per_page)
     end
 
     def new
