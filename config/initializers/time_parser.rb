@@ -17,6 +17,7 @@ class TimeParser
 
   def self.parse_timezone(timezone_str)
     return nil unless timezone_str.present?
+    return timezone_str if timezone_str.is_a?(ActiveSupport::TimeZone) # in case we were given a timezone obj
     # tzinfo requires non-whitespaced strings, so try that if the normal lookup fails
     ActiveSupport::TimeZone[timezone_str] || ActiveSupport::TimeZone[timezone_str.strip.gsub("\s", "_")]
   end

@@ -1,6 +1,22 @@
 class Admin::GraphsController < Admin::BaseController
   def index
-    redirect_to tables_admin_graphs_path if params[:tables]
+    set_variable_graph_kind
+    set_variable_graphing_timing unless @kind == "general"
+  end
+
+  def variable
+    set_variable_graph_kind
+    set_variable_graphing_timing
+    if @kind == "users"
+      chart_data = User.where(created_at: @start_at..@end_at)
+                       .group_by_period(@group_period, :created_at, time_zone: @timezone)
+                       .count
+    end
+    if chart_data.present?
+      render json: chart_data
+    else
+      render json: { error: "unable to parse chart" }
+    end
   end
 
   def tables
@@ -53,8 +69,34 @@ class Admin::GraphsController < Admin::BaseController
 
   protected
 
+  # Default start time
   def bike_index_start
     Time.zone.parse('2007-01-01 1:00')
+  end
+
+  def set_variable_graph_kind
+    @graph_kinds = %w[general users]
+    @kind = @graph_kinds.include?(params[:kind]) ? params[:kind] : @graph_kinds.first
+  end
+
+  def set_variable_graphing_timing
+    @timezone = TimeParser.parse_timezone(params[:timezone] || "America/Los_Angeles")
+    @start_at = params[:start_at].present? ? TimeParser.parse(params[:start_at], @timezone) : bike_index_start
+    @end_at = params[:end_at].present? ? TimeParser.parse(params[:end_at], @timezone) : Time.now
+    @group_period = calculated_group_period(@start_at, @end_at)
+  end
+
+  def calculated_group_period(start_at, end_at)
+    difference_in_seconds = (end_at - start_at).to_i
+    if difference_in_seconds < 2.days.to_i
+      "hour"
+    elsif difference_in_seconds < 1.month.to_i
+      "day"
+    elsif difference_in_seconds < 1.year.to_i
+      "week"
+    else
+      "month"
+    end
   end
 
   def date_range(start_date)
