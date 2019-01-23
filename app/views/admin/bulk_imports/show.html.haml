@@ -20,7 +20,9 @@
   Organization:
   - if @bulk_import.organization.present?
     = link_to @bulk_import.organization.name, admin_organization_path(@bulk_import.organization)
-    \-
+    %br
+    / alignment - so it is indented along with the org link above
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     %strong
       = link_to "Organization view of import", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param)
   - else
