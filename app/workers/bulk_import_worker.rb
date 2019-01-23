@@ -29,9 +29,10 @@ class BulkImportWorker
     row_index = 1 # We've already remove the first line, so it doesn't count. and we want lines to start at 1, not 0
     csv = CSV.new(open_file, headers: headers)
     while (row = csv.shift)
-      break false if @bulk_import.finished? # Means there was an error or something, so noop
-
       row_index += 1 # row_index is current line number
+      @bulk_import.reload if row_index%50 == 0 # reload the import every so often to check to see if the import is finished (external trip switch)
+      break false if @bulk_import.finished? # Means there was an error or we marked finished separately, so noop
+
       bike = register_bike(row_to_b_param_hash(row.to_h))
       next if bike.id.present?
 
