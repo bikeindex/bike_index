@@ -107,14 +107,8 @@ class Bike < ActiveRecord::Base
         components_attributes b_param_id embeded embeded_extended example hidden
         card_id stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
         marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids
-        ).map(&:to_sym) + [stolen_records_attributes: StolenRecord.(%w(police_report_number police_report_department locking_description lock_defeat_description
-       timezone date_stolen bike creation_organization_id country_id state_id street zipcode city latitude
-       longitude theft_description current phone secondary_phone phone_for_everyone
-       phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
-       approved date_recovered recovered_description index_helped_recovery can_share_recovery
-       recovery_posted tsved_at estimated_value).map(&:to_sym).freeze),
-            components_attributes: Component.(%w(id cmodel_name year ctype ctype_id ctype_other manufacturer manufacturer_id mnfg_name
-       manufacturer_other description bike_id bike serial_number front rear front_or_rear _destroy).map(&:to_sym).freeze)]).freeze
+        ).map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
+            components_attributes: Component.old_attr_accessible]).freeze
     end
     
     def text_search(query)
