@@ -282,17 +282,27 @@ describe BulkImportWorker do
 
     describe "convert_header" do
       context "headers match" do
-        let(:header_string) { "ManufaCTURER,MODEL, YEAR, Stuff\n" }
-        let(:target) { %i[manufacturer model year stuff] }
+        let(:header_string) { "ManufaCTURER,MODEL, YEAR, owner_email, serial Number, Stuff\n" }
+        let(:target) { %i[manufacturer model year owner_email serial_number stuff] }
         it "leaves things alone" do
           expect(instance.convert_headers(header_string)).to eq target
+          expect(instance.bulk_import.import_errors?).to be_falsey
         end
       end
       context "conversions" do
-        let(:header_string) { "BRAnd, vendor,MODEL,frame_model, frame YEAR, Stuff\n" }
-        let(:target) { %i[manufacturer vendor model frame_model year stuff] }
+        let(:header_string) { "BRAnd, vendor,MODEL,frame_model, frame YEAR,email, serial, Stuff\n" }
+        let(:target) { %i[manufacturer vendor model frame_model year owner_email serial_number stuff] }
         it "returns the symbol if the symbol exists, without overwriting better terms" do
           expect(instance.convert_headers(header_string)).to eq target
+          expect(instance.bulk_import.import_errors?).to be_falsey
+        end
+        context "quote wrapped" do
+          let(:header_string) { '"Product Description","Brand","Color","Size","Serial Number","Customer Last Name","Customer First Name","Customer Email"' }
+          let(:target) { %i[description manufacturer color frame_size serial_number customer_last_name customer_first_name owner_email] }
+          it "leaves things alone" do
+            expect(instance.convert_headers(header_string)).to eq target
+            expect(instance.bulk_import.import_errors?).to be_falsey
+          end
         end
       end
     end
