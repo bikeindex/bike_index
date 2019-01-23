@@ -35,6 +35,10 @@
     = @bulk_import.import_errors
 
 %hr
-%h2 Bikes
+%h2
+  Bikes - #{@bulk_import.bikes.count}
+  - if @bulk_import.bikes.count > 25
+    %small
+      Last 25 shown <em>use organization view for paginated list</em>
 %table.table.table-striped.table-bordered
-  = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: @bulk_import.bikes }
+  = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: @bulk_import.bikes.reorder(created_at: :desc).limit(25) }
