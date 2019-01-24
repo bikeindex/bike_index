@@ -1,6 +1,7 @@
 %p
-  Created: 
-  = @bulk_import.created_at.strftime("%-I:%M %p on %-m/%-d/%Y")
+  Created:
+  %span.convertTime.preciseTime
+    = l @bulk_import.created_at, format: :convert_time
 
 %p
   Progress:
