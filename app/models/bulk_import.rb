@@ -21,6 +21,14 @@ class BulkImport < ActiveRecord::Base
     import_errors["file"]
   end
 
+  def file_import_error_lines
+    import_errors["file_lines"]
+  end
+
+  def file_import_errors_with_lines
+    file_import_errors.zip(file_import_error_lines)
+  end
+
   def line_import_errors
     import_errors["line"]
   end
@@ -33,10 +41,20 @@ class BulkImport < ActiveRecord::Base
     import_errors["bikes"] == "none_imported"
   end
 
-  def add_file_error(error_msg)
+  def add_file_error(error_msg, line_error = "")
     self.progress = "finished"
+    updated_file_error_data = {
+      "file" => [file_import_errors, error_msg].compact.flatten,
+      "file_lines" => [file_import_error_lines, line_error].flatten
+    }
     # Using update_attribute here to avoid validation checks that sometimes block updating postgres json in rails
-    update_attribute :import_errors, (import_errors || {}).merge("file" => [file_import_errors, error_msg].compact)
+    update_attribute :import_errors, (import_errors || {}).merge(updated_file_error_data)
+  end
+
+  # If the bulk import failed on a line, start after that line, otherwise it's 1. See BulkImportWorker
+  def starting_line
+    error_line = file_import_error_lines&.compact&.last
+    error_line.present? ? error_line + 1 : 1
   end
 
   def send_email

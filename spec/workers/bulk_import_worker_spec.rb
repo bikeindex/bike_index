@@ -32,27 +32,10 @@ describe BulkImportWorker do
         instance.perform(bulk_import.id)
       end
     end
-    context "valid bike and an invalid bike with substituted header" do
+    context "erroring" do
       let!(:color) { FactoryBot.create(:color, name: "White") }
-      let(:target_line_error) { [2, ["Owner email can't be blank"]] }
-      let(:csv_lines) do
-        [
-          "Product Description,Vendor,Brand,Color,Size,Serial Number,Customer Last Name,Customer First Name,Customer Email",
-          '"Blah","Blah","Surly","","","XXXXX","","",""',
-          '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"'
-        ]
-      end
       after { tempfile.close && tempfile.unlink }
-      it "registers bike, adds row that is an error" do
-        allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
-        expect do
-          instance.perform(bulk_import.id)
-        end.to change(Bike, :count).by 1
-        bulk_import.reload
-        expect(bulk_import.line_import_errors).to eq([target_line_error])
-        expect(bulk_import.import_errors).to eq({ line: [target_line_error] }.as_json)
-        expect(bulk_import.bikes.count).to eq 1
-        bike = bulk_import.bikes.first
+      def bike_matches_target(bike)
         expect(bike.manufacturer).to eq Manufacturer.other
         expect(bike.manufacturer_other).to eq "Surly"
         expect(bike.primary_frame_color).to eq color
@@ -60,8 +43,49 @@ describe BulkImportWorker do
         expect(bike.serial_number).to eq "ZZZZ"
         expect(bike.owner_email).to eq "test2@bikeindex.org"
         expect(bike.description).to eq "Midnight Special"
-        expect(BulkImport.line_errors.pluck(:id)).to eq([bulk_import.id])
       end
+      context "valid bike and an invalid bike with substituted header" do
+        let(:target_line_error) { [2, ["Owner email can't be blank"]] }
+        let(:csv_lines) do
+          [
+            "Product Description,Vendor,Brand,Color,Size,Serial Number,Customer Last Name,Customer First Name,Customer Email",
+            '"Blah","Blah","Surly","","","XXXXX","","",""',
+            '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"'
+          ]
+        end
+        it "registers bike, adds row that is an error" do
+          allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
+          expect do
+            instance.perform(bulk_import.id)
+          end.to change(Bike, :count).by 1
+          bulk_import.reload
+          expect(bulk_import.line_import_errors).to eq([target_line_error])
+          expect(bulk_import.import_errors).to eq({ line: [target_line_error] }.as_json)
+          expect(bulk_import.bikes.count).to eq 1
+          expect(BulkImport.line_errors.pluck(:id)).to eq([bulk_import.id])
+        end
+      end
+      # context "invalid file" do
+      #   let(:csv_lines) do
+      #     [
+      #       "Product Description,Vendor,Brand,Color,Size,Serial Number,Customer Last Name,Customer First Name,Customer Email",
+      #       '"\"","\'","Surly","","","XXXXX","","","","'
+      #       '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"'
+      #     ]
+      #   end
+      #   it "stores error line, resumes post errored line successfully" do
+      #     allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
+      #     expect do
+      #       instance.perform(bulk_import.id)
+      #     end.to change(Bike, :count).by 0
+      #     bulk_import.reload
+      #     expect(bulk_import.line_import_errors).to eq([target_line_error])
+      #     expect(bulk_import.import_errors).to eq({ line: [target_line_error] }.as_json)
+      #     expect(bulk_import.bikes.count).to eq 1
+      #     bike_matches_target(bulk_import.bikes.first)
+      #     expect(BulkImport.line_errors.pluck(:id)).to eq([bulk_import.id])
+      #   end
+      # end
     end
     context "empty import" do
       let(:csv_lines) { [sample_csv_lines[0].join(","), ""] }
