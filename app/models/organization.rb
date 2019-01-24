@@ -152,7 +152,13 @@ class Organization < ActiveRecord::Base
 
   def school?; org_type == "school" end
   def current_invoice; invoices.active.last || parent_organization&.current_invoice end # Parent invoice serves as invoice
+  def child_ids; child_organizations.pluck(:id) end
 
+  def incomplete_b_params
+    BParam.where(organization_id: child_ids + [id]).partial_registrations.without_bike
+  end
+
+  # TODO: THIS IS DEPRECATED AND SHOULD BE REPLACED WITH paid_for?
   # I'm trying to ammass a list of paid features here (also in admin organization show)
   def bike_search?; has_bike_search end
   def show_recoveries?; has_bike_search end

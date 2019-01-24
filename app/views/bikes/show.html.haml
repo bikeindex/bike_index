@@ -3,6 +3,11 @@
 - if current_user.present? && (current_user.bike_actions_organization&.present? || @bike.owner == current_user)
   = render partial: "bike_show_overlays"
 
+- if current_user&.superuser && @bike.user_hidden
+  %h2.text-danger.mb-4.text-center{ style: "text-align: center;" }
+    HIDDEN by owner
+    %small.less-strong
+      no one but the user (and Bike Index admins) can see it
 
 / Caching should go here:
 / - cache(@bike) do

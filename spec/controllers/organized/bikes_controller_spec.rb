@@ -101,21 +101,30 @@ describe Organized::BikesController, type: :controller do
       describe "incompletes" do
         let(:partial_reg_attrs) do
           {
-            bike: {
-              manufacturer_id: Manufacturer.other.id,
-              primary_frame_color_id: Color.black.id,
-              owner_email: "something@stuff.com",
-              creation_organization_id: organization.id
-            }
+            manufacturer_id: Manufacturer.other.id,
+            primary_frame_color_id: Color.black.id,
+            owner_email: "something@stuff.com",
+            creation_organization_id: organization.id
           }
         end
-        let!(:partial_registration) { BParam.create(params: partial_reg_attrs, origin: "embed_partial") }
+        let!(:partial_registration) { BParam.create(params: { bike: partial_reg_attrs }, origin: "embed_partial") }
         it "renders" do
           expect(partial_registration.organization).to eq organization
           get :incompletes, organization_id: organization.to_param
           expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
           expect(response.status).to eq(200)
           expect(response).to render_template :incompletes
+        end
+        context "suborganization incomplete" do
+          let(:organization_child) { FactoryBot.create(:organization_child, parent_organization: organization) }
+          let!(:partial_registration) { BParam.create(params: { bike: partial_reg_attrs.merge(creation_organization_id: organization_child.id) }, origin: "embed_partial") }
+          it "renders" do
+            expect(partial_registration.organization).to eq organization_child
+            get :incompletes, organization_id: organization.to_param
+            expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
+            expect(response.status).to eq(200)
+            expect(response).to render_template :incompletes
+          end
         end
       end
     end
