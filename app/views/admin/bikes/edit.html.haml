@@ -52,6 +52,11 @@
 
           = @bike.dl_from_attribute('cached_data')
     %hr
+    - if @bike.user_hidden
+      %h2.text-danger.mb-4{ style: "margin-bottom: 2rem; text-align: center;" }
+        Marked HIDDEN by the user
+        %small
+          no one but the user (and bike index admins) can see it
     = form_for [:admin, @bike], html: { class: 'form form-horizontal admin-bike-edit' } do |f|
       = hidden_field_tag :fast_attr_update, @fast_attr_update
     
@@ -99,10 +104,13 @@
             .controls
               = f.text_field :card_id
           .control-group
-            = f.label :hidden, "Hidden (fake delete)", class: "control-label"
+            = f.label :hidden, class: "control-label" do
+              - if @bike.user_hidden
+                User hidden
+              - else
+                Hidden (fake delete)
             .controls
               = f.check_box :hidden
-
         .bike-fields
           .control-group
             = f.label :frame_model, class: "control-label"
