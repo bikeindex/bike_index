@@ -4,7 +4,6 @@ class BikeDeleterWorker
   sidekiq_options backtrace: true
 
   def perform(bike_id)
-    bike = Bike.where(id: bike_id).first
-    bike && bike.destroy
+    Bike.where(id: bike_id).first&.destroy
   end
 end
