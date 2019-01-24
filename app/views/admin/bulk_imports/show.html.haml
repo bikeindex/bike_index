@@ -8,7 +8,8 @@
 
 %p
   File:
-  = link_to @bulk_import.file_url.truncate(25), @bulk_import.file_url
+  %small
+    = link_to @bulk_import.file_url, @bulk_import.file_url
 
 %p
   User:

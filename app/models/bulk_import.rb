@@ -51,6 +51,10 @@ class BulkImport < ActiveRecord::Base
     "#{organization}_import_#{id}"
   end
 
+  def file_filename
+    file&.path&.split("/")&.last
+  end
+
   def set_calculated_attributes
     unless creator.present?
       add_file_error("Needs to have a user or an organization with an auto user")

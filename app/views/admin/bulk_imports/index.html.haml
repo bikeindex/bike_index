@@ -20,7 +20,7 @@
       %th
         Creator
       %th
-        Organization
+        Organization & file
       %th
         Bikes
     %tbody
@@ -45,5 +45,8 @@
               = link_to bulk_import.organization.name, admin_bulk_imports_url(organization_id: bulk_import.organization_id)
             - else
               = link_to "none", admin_bulk_imports_url(organization_id: "none"), style: "color: #ccc"
+            %br
+            %small
+              = bulk_import.file_filename
           %td
             = bulk_import.creation_states.count # Don't need to do bikes through creation states
