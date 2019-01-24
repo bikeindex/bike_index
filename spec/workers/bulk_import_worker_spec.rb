@@ -65,27 +65,38 @@ describe BulkImportWorker do
           expect(BulkImport.line_errors.pluck(:id)).to eq([bulk_import.id])
         end
       end
-      # context "invalid file" do
-      #   let(:csv_lines) do
-      #     [
-      #       "Product Description,Vendor,Brand,Color,Size,Serial Number,Customer Last Name,Customer First Name,Customer Email",
-      #       '"\"","\'","Surly","","","XXXXX","","","","'
-      #       '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"'
-      #     ]
-      #   end
-      #   it "stores error line, resumes post errored line successfully" do
-      #     allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
-      #     expect do
-      #       instance.perform(bulk_import.id)
-      #     end.to change(Bike, :count).by 0
-      #     bulk_import.reload
-      #     expect(bulk_import.line_import_errors).to eq([target_line_error])
-      #     expect(bulk_import.import_errors).to eq({ line: [target_line_error] }.as_json)
-      #     expect(bulk_import.bikes.count).to eq 1
-      #     bike_matches_target(bulk_import.bikes.first)
-      #     expect(BulkImport.line_errors.pluck(:id)).to eq([bulk_import.id])
-      #   end
-      # end
+      context "invalid file" do
+        let(:csv_lines) do
+          [
+            "Product Description,Vendor,Brand,Color,Size,Serial Number,Customer Last Name,Customer First Name,Customer Email",
+            '"\"","\'","Surly","","","XXXXX","","","","',
+            '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"'
+          ]
+        end
+        it "stores error line, resumes post errored line successfully" do
+          allow_any_instance_of(BulkImport).to receive(:open_file) { File.open(tempfile.path, "r") }
+          # It should throw an error and not create a bike
+          expect do
+            expect { instance.perform(bulk_import.id) }.to raise_error(CSV::MalformedCSVError)
+          end.to change(Bike, :count).by 0
+          bulk_import.reload
+          expect(bulk_import.progress).to eq "finished"
+          expect(bulk_import.line_import_errors).to be_nil
+          expect(bulk_import.file_import_errors_with_lines).to eq([["Missing or stray quote in line 1", 1]])
+          # Note: we don't have auto-resume built in right now. You have to manually go in through the console
+          # and set the progress to be "ongoing", then re-enqueue
+          bulk_import.update_attribute :progress, "ongoing"
+          expect do
+            instance.perform(bulk_import.id)
+          end.to change(Bike, :count).by 1
+          bulk_import.reload
+          expect(bulk_import.bikes.count).to eq 1
+          bike_matches_target(bulk_import.bikes.first)
+          # And make sure it hasn't updated the file_import_errors
+          expect(bulk_import.file_import_errors_with_lines).to eq([["Missing or stray quote in line 1", 1]])
+          expect(bulk_import.progress).to eq "finished"
+        end
+      end
     end
     context "empty import" do
       let(:csv_lines) { [sample_csv_lines[0].join(","), ""] }

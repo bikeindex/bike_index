@@ -10,7 +10,6 @@ class BulkImportWorker
   def perform(bulk_import_id)
     @bulk_import = BulkImport.find(bulk_import_id)
     process_csv(@bulk_import.open_file)
-    return false if @bulk_import.import_errors?
 
     @bulk_import.progress = "finished"
     return @bulk_import.save unless @line_errors.any?
@@ -29,6 +28,8 @@ class BulkImportWorker
     # The reason the starting_line is 1, if there hasn't been a file error:
     # We've already removed the first line, so it doesn't count. and we want lines to start at 1, not 0
     row_index = @bulk_import.starting_line
+    # fast forward file to the point we want to start
+    (row_index - 1).times { open_file.gets }
     csv = CSV.new(open_file, headers: headers)
     while (row = csv.shift)
       row_index += 1 # row_index is current line number
