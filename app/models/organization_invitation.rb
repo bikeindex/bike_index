@@ -1,8 +1,5 @@
 class OrganizationInvitation < ActiveRecord::Base
-  def self.old_attr_accessible
-    %w(invitee_email inviter_id invitee_name organization organization_id inviter
-       inviter_id membership_role admin_org_id).map(&:to_sym).freeze
-  end
+
 
   attr_accessor :admin_org_id
 

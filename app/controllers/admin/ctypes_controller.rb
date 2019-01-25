@@ -46,7 +46,7 @@ class Admin::CtypesController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:ctype).permit(Ctype.old_attr_accessible)
+    params.require(:ctype).permit(:name, :slug, :secondary_name, :image, :image_cache, :cgroup_id, :cgroup, :has_multiple, :cgroup_name)
   end
 
   def find_ctypes

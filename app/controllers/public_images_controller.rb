@@ -94,7 +94,7 @@ class PublicImagesController < ApplicationController
   end
 
   def permitted_parameters
-    params.require(:public_image).permit(PublicImage.old_attr_accessible)
+    params.require(:public_image).permit(:image, :name, :imageable, :listing_order, :remote_image_url, :is_private)
   end
 
   def find_image_if_owned

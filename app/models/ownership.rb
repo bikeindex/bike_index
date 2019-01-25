@@ -1,7 +1,5 @@
 class Ownership < ActiveRecord::Base
-  def self.old_attr_accessible
-    %w[owner_email bike_id creator_id current user_id claimed example user_hidden send_email].map(&:to_sym).freeze
-  end
+
 
   attr_accessor :creator_email, :user_email
 
@@ -21,12 +19,12 @@ class Ownership < ActiveRecord::Base
     self.owner_email = EmailNormalizer.normalize(owner_email)
   end
 
-  def first?
-    bike&.ownerships&.reorder(:created_at)&.first&.id == id
-  end
+  def first?; bike&.ownerships&.reorder(:created_at)&.first&.id == id end
+
+  def claimed?; claimed end
 
   def owner
-    if claimed && user.present?
+    if claimed? && user.present?
       user
     elsif creator.present?
       creator

@@ -31,6 +31,6 @@ class Admin::OwnershipsController < Admin::BaseController
   end
 
   def permitted_parameters
-    params.require(:ownership).permit(Ownership.old_attr_accessible)
+    params.require(:ownership).permit(:bike_id, :user_id, :owner_email, :creator_id, :current, :claimed, :example, :send_email, :user_hidden)
   end
 end

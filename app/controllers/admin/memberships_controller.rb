@@ -54,7 +54,7 @@ class Admin::MembershipsController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:membership).permit(Membership.old_attr_accessible)
+    params.require(:membership).permit(:organization_id, :user_id, :role, :invited_email)
   end
 
   def find_membership

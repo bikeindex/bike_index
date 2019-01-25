@@ -1,7 +1,4 @@
 class UserEmail < ActiveRecord::Base
-  def self.old_attr_accessible
-    %w(email user_id old_user_id confirmation_token).map(&:to_sym).freeze
-  end
   belongs_to :user, touch: true
   belongs_to :old_user, class_name: 'User', touch: true
   validates_presence_of :user_id, :email
