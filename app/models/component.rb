@@ -1,5 +1,6 @@
 class Component < ActiveRecord::Base
   include ActiveModel::Dirty
+
   def self.old_attr_accessible
     %w(id cmodel_name year ctype ctype_id ctype_other manufacturer manufacturer_id mnfg_name
        manufacturer_other description bike_id bike serial_number front rear front_or_rear _destroy).map(&:to_sym).freeze

@@ -1,6 +1,9 @@
 class StolenRecord < ActiveRecord::Base
   include ActiveModel::Dirty
   include Phonifyerable
+
+  attr_accessor :timezone # Just to provide a backup and permit assignment
+
   def self.old_attr_accessible
     # recovery_tweet, recovery_share # We edit this in the admin panel
     %w(police_report_number police_report_department locking_description lock_defeat_description
@@ -10,8 +13,6 @@ class StolenRecord < ActiveRecord::Base
        approved date_recovered recovered_description index_helped_recovery can_share_recovery
        recovery_posted tsved_at estimated_value).map(&:to_sym).freeze
   end
-
-  attr_accessor :timezone # Just to provide a backup and permit assignment
 
   belongs_to :bike
   has_one :current_bike, class_name: 'Bike', foreign_key: :current_stolen_record_id
