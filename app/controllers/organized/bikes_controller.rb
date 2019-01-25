@@ -21,7 +21,7 @@ module Organized
       redirect_to current_index_path and return unless current_organization.show_partial_registrations?
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      b_params = current_organization.b_params.partial_registrations.without_bike
+      b_params = current_organization.incomplete_b_params
       b_params = b_params.email_search(params[:query]) if params[:query].present?
       @b_params = b_params.order(created_at: :desc).page(@page).per(@per_page)
     end
@@ -31,7 +31,7 @@ module Organized
     private
 
     def organization_bikes
-      current_organization.bikes.reorder('bikes.created_at desc')
+      current_organization.bikes.reorder("bikes.created_at desc")
     end
 
     def current_index_path

@@ -3,14 +3,13 @@ require 'csv'
 class BulkImportWorker
   include Sidekiq::Worker
   sidekiq_options queue: "afterwards" # Because it's low priority!
-  sidekiq_options backtrace: true
+  sidekiq_options backtrace: true, retry: false
 
   attr_accessor :bulk_import, :line_errors # Only necessary for testing
 
   def perform(bulk_import_id)
     @bulk_import = BulkImport.find(bulk_import_id)
     process_csv(@bulk_import.open_file)
-    return false if @bulk_import.import_errors?
 
     @bulk_import.progress = "finished"
     return @bulk_import.save unless @line_errors.any?
@@ -26,17 +25,25 @@ class BulkImportWorker
     # Grab the first line of the csv (which is the header line) and transform it
     headers = convert_headers(open_file.readline)
     # Stream process the rest of the csv
-    row_index = 1 # We've already remove the first line, so it doesn't count. and we want lines to start at 1, not 0
+    # The reason the starting_line is 1, if there hasn't been a file error:
+    # We've already removed the first line, so it doesn't count. and we want lines to start at 1, not 0
+    row_index = @bulk_import.starting_line
+    # fast forward file to the point we want to start
+    (row_index - 1).times { open_file.gets }
     csv = CSV.new(open_file, headers: headers)
     while (row = csv.shift)
-      break false if @bulk_import.finished? # Means there was an error or something, so noop
-
       row_index += 1 # row_index is current line number
+      @bulk_import.reload if (row_index % 50).zero? # reload import every so often to check if import is finished (external trip switch)
+      break false if @bulk_import.finished? # Means there was an error or we marked finished separately, so noop
+
       bike = register_bike(row_to_b_param_hash(row.to_h))
       next if bike.id.present?
 
       @line_errors << [row_index, bike.cleaned_error_messages]
     end
+  rescue => e
+    @bulk_import.add_file_error(e, row_index)
+    raise e
   end
 
   def register_bike(b_param_hash)
@@ -97,7 +104,7 @@ class BulkImportWorker
   end
 
   def convert_headers(str)
-    headers = str.split(",").map { |h| h.strip.gsub(/\s/, "_").downcase.to_sym }
+    headers = str.split(",").map { |h| h.gsub(/\"|\'/, "").strip.gsub(/\s/, "_").downcase.to_sym }
     header_name_map.each do |value, replacements|
       next if headers.include?(value)
 
@@ -115,11 +122,12 @@ class BulkImportWorker
   private
 
   def validate_headers(attrs)
-    valid_headers = (attrs & %i[manufacturer owner_email serial_number]).count == 3
+    required_headers = %i[manufacturer owner_email serial_number]
+    valid_headers = (attrs & required_headers).count == 3
     # Update progress here, since we're successfully processing the file now - and we update here if invalid headers
     return @bulk_import.update_attribute :progress, "ongoing" if valid_headers
-
-    @bulk_import.add_file_error("Invalid CSV Headers: #{attrs}")
+    missing_headers = required_headers - (attrs & required_headers)
+    @bulk_import.add_file_error("Invalid CSV Headers: #{attrs.join(", ")} - missing #{missing_headers.join(", ")}")
   end
 
   def header_name_map

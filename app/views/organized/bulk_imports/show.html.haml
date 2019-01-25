@@ -40,7 +40,13 @@
       = @bulk_import.import_errors
   %hr
 
-%h2 Bikes
+.paginate-container
+  %h2.float-left{ style: "margin-top: 28px;" }
+    Bikes
+    %small
+      = @bikes.total_count
+  .paginate{ style: "margin: 12px auto 12px 0;" }
+    = paginate @bikes
 
 %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
   %thead.small-header

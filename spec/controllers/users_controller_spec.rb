@@ -468,7 +468,7 @@ describe UsersController do
                       current_password: 'old_pass',
                       password: 'new_pass',
                       name: 'Mr. Slick',
-                      password_confirmation: 'new_pass',
+                      password_confirmation: 'new_pass'
                     }
       expect(response).to redirect_to(my_account_url)
       expect(flash[:error]).to_not be_present
@@ -495,7 +495,8 @@ describe UsersController do
                         city: "New York",
                         street: "278 Broadway",
                         zipcode: "10007",
-                        is_emailable: "1"
+                        is_emailable: "1",
+                        phone: "3223232"
                       }
         expect(response).to redirect_to(my_account_url)
         expect(flash[:error]).to_not be_present
@@ -508,6 +509,7 @@ describe UsersController do
         expect(user.is_emailable).to be_truthy
         expect(user.latitude).to eq default_location[:latitude]
         expect(user.longitude).to eq default_location[:longitude]
+        expect(user.phone).to eq "3223232"
       end
     end
 

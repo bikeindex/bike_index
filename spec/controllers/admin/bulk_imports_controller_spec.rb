@@ -32,6 +32,21 @@ describe Admin::BulkImportsController do
       expect(response).to be_success
       expect(response).to render_template(:new)
       expect(flash).to_not be_present
+      bulk_import = assigns(:bulk_import)
+      expect(bulk_import.organization_id).to be_nil
+      expect(bulk_import.no_notify).to be_falsey
+    end
+    context "passed params" do
+      let(:organization) { FactoryBot.create(:organization) }
+      it "includes them" do
+        get :new, organization_id: organization.slug, no_notify: 1
+        expect(response).to be_success
+        expect(response).to render_template(:new)
+        expect(flash).to_not be_present
+        bulk_import = assigns(:bulk_import)
+        expect(bulk_import.organization_id).to eq organization.id
+        expect(bulk_import.no_notify).to be_truthy
+      end
     end
   end
 

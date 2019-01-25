@@ -21,6 +21,7 @@
         .actions
           = submit_tag "Search", class: "btn btn-primary"
 
+- include_child_org = current_organization.child_ids.any?
 %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
   %thead.small-header
     %th
@@ -41,6 +42,9 @@
           = b_param.mnfg_name
         %td
           = b_param.owner_email
+          - if include_child_org && b_param.organization != current_organization
+            %small.less-strong{ style: "display: block; line-height: 1;" }
+              through #{b_param.organization.short_name}
 
 .paginate-container.paginate-container-bottom
   = paginate @b_params

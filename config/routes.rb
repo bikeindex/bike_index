@@ -166,6 +166,7 @@ Bikeindex::Application.routes.draw do
         get :bikes
         get :users
         get :stolen_locations
+        get :variable
       end
     end
     resources :failed_bikes, only: [:index, :show]

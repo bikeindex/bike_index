@@ -15,19 +15,23 @@
     %label.form-well-input
       = f.check_box :is_emailable
       Receive Bike Index newsletter
+  .form-group.row
+    = f.label :phone, class: "form-well-label"
+    .form-well-input
+      = f.text_field :phone, value: Phonifyer.display(@user.phone), class: "form-control"
   .form-group.row.fancy-select.unfancy
     = f.label :country_id, class: "form-well-label" do
       Address
     .form-well-input#stolen_record_us_id{ data: { usid: Country.united_states.id } }
-      = f.collection_select(:country_id, Country.all, :id, :name, { required: true, prompt: "Choose country" }, { class: "country-select-input form-control" } )
+      = f.collection_select(:country_id, Country.all, :id, :name, { prompt: "Choose country" }, { class: "country-select-input form-control" } )
   .form-group.row
     %label.form-well-label
     .form-well-input
-      = f.text_field :street, required: true, placeholder: "Address", class: "form-control"
+      = f.text_field :street, placeholder: "Address", class: "form-control"
   .form-group.row
     %label.form-well-label
     .form-well-input
-      = f.text_field :city, required: true, placeholder: "City", class: "form-control"
+      = f.text_field :city, placeholder: "City", class: "form-control"
   - state_class = (@user.country_id == Country.united_states.id) ? "unhidden" : ""
   .form-group.row.fancy-select-placeholder.unfancy.hidden-other{ class: state_class }
     %label.form-well-label

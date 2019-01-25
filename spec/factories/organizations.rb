@@ -10,5 +10,8 @@ FactoryBot.define do
         FactoryBot.create(:membership, user: organization.auto_user, organization: organization)
       end
     end
+    factory :organization_child do
+      parent_organization { FactoryBot.create(:organization) }
+    end
   end
 end

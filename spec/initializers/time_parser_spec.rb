@@ -37,5 +37,11 @@ describe TimeParser do
         expect(TimeParser.parse_timezone("Eastern Time (US & Canada)").utc_offset).to eq target_timezone.utc_offset
       end
     end
+    context "timezone obj" do
+      let(:target_timezone) { ActiveSupport::TimeZone["America/Los_Angeles"] }
+      it "returns correctly" do
+        expect(TimeParser.parse_timezone(target_timezone).utc_offset).to eq target_timezone.utc_offset
+      end
+    end
   end
 end
