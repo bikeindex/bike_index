@@ -40,12 +40,11 @@
           %strong
             = b_param.primary_frame_color
           = b_param.mnfg_name
-          - if include_child_org && b_param.organization != current_organization
-            %br
-            %small.less-strong
-              = b_param.organization.short_name
         %td
           = b_param.owner_email
+          - if include_child_org && b_param.organization != current_organization
+            %small.less-strong{ style: "display: block; line-height: 1;" }
+              through #{b_param.organization.short_name}
 
 .paginate-container.paginate-container-bottom
   = paginate @b_params
