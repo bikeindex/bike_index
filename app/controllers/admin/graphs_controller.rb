@@ -26,6 +26,10 @@ class Admin::GraphsController < Admin::BaseController
     render json: User.group_by_month(:created_at).count
   end
 
+  def payments
+    render json: Payment.group_by_month(:created_at).count
+  end
+
   def bikes
     bikes = Bike.unscoped
     case params[:start_at]

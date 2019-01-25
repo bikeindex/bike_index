@@ -165,6 +165,7 @@ Bikeindex::Application.routes.draw do
         get :tables
         get :bikes
         get :users
+        get :payments
         get :stolen_locations
         get :variable
       end
