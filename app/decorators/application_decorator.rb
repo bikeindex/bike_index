@@ -84,15 +84,14 @@ class ApplicationDecorator < Draper::Decorator
     html
   end
 
-  def display_phone(p = nil)
-    phone ||= object.phone
-    return nil unless phone.present?
-    if p[/\+/]
-      phone = number_to_phone(p.gsub(/\+\d*/,''), country_code: p[/\A.\d*/].gsub('+',''), delimiter: ' ' )
+  def display_phone(str = nil)
+    str ||= object&.phone
+    if str.blank?
+      nil
+    elsif str[/\+/]
+      number_to_phone(str.gsub(/\+\d*/,''), country_code: str[/\A.\d*/].gsub('+',''), delimiter: ' ' )
     else
-      phone = number_to_phone(p, delimiter: ' ')
+      number_to_phone(str, delimiter: ' ')
     end
-    phone
   end
-
 end
