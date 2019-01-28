@@ -150,7 +150,8 @@ class Bike < ActiveRecord::Base
 
   def current_ownership; ownerships.reorder(:created_at).last end
 
-  def claimed?; current_ownership.claimed? end
+  # Use present? to ensure true/flase rather than nil
+  def claimed?; current_ownership.claimed.present? end
 
   # owner resolves to creator if user isn't present, or organization auto user. shouldn't ever be nil
   def owner; current_ownership && current_ownership.owner end
@@ -173,7 +174,10 @@ class Bike < ActiveRecord::Base
 
   def first_ownership; ownerships.reorder(:created_at).first end
 
-  def first_ownership?; current_ownership.blank? || current_ownership == first_ownership end
+  # check if this is the first ownership - or if no owner, which means testing probably
+  def first_ownership?; current_ownership&.blank? || current_ownership == first_ownership end
+
+  def creation_organization_authorized?; first_ownership? && creation_organization.present? end
 
   def first_owner_email; first_ownership.owner_email end
 
@@ -185,9 +189,7 @@ class Bike < ActiveRecord::Base
   def authorize_bike_for_user(u)
     return true if u == owner || can_be_claimed_by(u)
     return false if u.blank? || current_ownership.claimed
-    # If the organization is only 
-    return false unless first_ownership? && creation_organization.present?
-    u.is_member_of?(creation_organization)
+    creation_organization_authorized? && u.is_member_of?(creation_organization)
   end
 
   def authorize_bike_for_user!(u)
@@ -207,7 +209,7 @@ class Bike < ActiveRecord::Base
   def phone
     # use @phone because attr_accessor
     @phone ||= user&.phone
-    # Only grab the phone number from b_params if it's the first owner - or if no owner, which means testing probably
+    # Only grab the phone number from b_params if this is the first_ownership
     if first_ownership?
       @phone ||= b_params.map(&:phone).reject(&:blank?).first
     end

@@ -257,13 +257,13 @@ describe Bike do
       context "can_be_claimed_by" do
         let(:ownership) { FactoryBot.create(:ownership, user: user) }
         it "marks claimed and returns true" do
+          expect(ownership.claimed?).to be_falsey
           expect(bike.claimed?).to be_falsey
-          expect(ownership.claimed).to be_falsey
           expect(ownership.owner).to eq creator
           expect(bike.authorize_bike_for_user!(creator)).to be_truthy
           expect(bike.authorize_bike_for_user(user)).to be_truthy
-          expect(bike.claimed?).to be_truthy
           expect(bike.authorize_bike_for_user!(user)).to be_truthy
+          expect(bike.claimed?).to be_truthy
           expect(bike.authorize_bike_for_user!(creator)).to be_falsey
           ownership.reload
           expect(ownership.owner).to eq user
@@ -306,7 +306,6 @@ describe Bike do
         it "returns false" do
           bike.reload
           expect(bike.owner).to eq user
-          expect(bike.claimed?).to be_truthy
           expect(bike.authorize_bike_for_user(member)).to be_falsey
           expect(bike.authorize_bike_for_user!(member)).to be_falsey
         end
@@ -629,12 +628,12 @@ describe Bike do
         allow(bike).to receive(:b_params) { [b_param] }
       end
       it "returns the phone" do
+        allow(bike).to receive(:first_ownership) { ownership }
         expect(bike.phone).to eq "888.888.8888"
       end
       context "not first ownerships" do
         it "is the users " do
-          allow(ownership).to receive(:first?) { false }
-          allow(bike).to receive(:current_ownership) { ownership }
+          allow(bike).to receive(:first_ownership) { Ownership.new } # A different ownership
           expect(bike.phone).to be_nil
         end
       end
