@@ -207,7 +207,7 @@ class Bike < ActiveRecord::Base
   def authorize_bike_for_user!(u)
     return authorize_bike_for_user(u) unless can_be_claimed_by(u)
     current_ownership.mark_claimed
-    return true
+    true
   end
 
   def phone
