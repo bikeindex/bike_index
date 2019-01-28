@@ -11,7 +11,7 @@ describe TsvCreator do
 
   describe 'create_organization_count' do
     it 'creates tsv with output bikes' do
-      ownership = FactoryBot.create(:organization_ownership)
+      ownership = FactoryBot.create(:ownership_organization_bike)
       organization = ownership.bike.creation_organization
       creator = TsvCreator.new
       target = "#{creator.org_counts_header}#{creator.org_count_row(ownership.bike)}"
