@@ -4,42 +4,21 @@
     <span class="donor-icon">D</span>
   - if @user.paid_org?
     <span class="paid-org-icon">O</span>
-%h3
-  Donations
-%section.full-screen-table{ style: 'padding-top: 0;' }
-  %table.table.table-striped.table-bordered
-    %thead
-      %th
-        Date
-      %th
-        Amount
-      %th
-        Payment?
-    - @user.payments.each do |payment|
-      %tr
-        %td
-          %span.convertTime
-            = l payment.created_at, format: :convert_time
-          %small.convertTimezone
-        %td
-          = payment.amount
-        %td
-          = "&#x2713;".html_safe if payment.is_payment
 
-.row-fluid
-  .span6.padded
-    .form.form-horizontal
-      = form_for [:admin, @user] do |f|
-        - if @user.errors.any?
-          #alert-block
-            .alert.alert-error
-              %h4
-                Please fix the following 
-                = pluralize(@user.errors.count, "error")
-              %ul
-                - @user.errors.full_messages.each do |msg|
-                  %li
-                    = msg
+= form_for [:admin, @user] do |f|
+  .row-fluid
+    - if @user.errors.any?
+      #alert-block
+        .alert.alert-error
+          %h4
+            Please fix the following 
+            = pluralize(@user.errors.count, "error")
+          %ul
+            - @user.errors.full_messages.each do |msg|
+              %li
+                = msg
+    .span6.padded
+      .form.form-horizontal
         %h3
           User attributes
         .control-group.padded
@@ -59,12 +38,14 @@
         .control-group
           %label.control-label
             Secondary Emails
-          .controls{ style: "width: 100%;" }
-            = text_area_tag :secondary_emails, @user.secondary_emails.join(", "), disabled: true, rows: 1, style: "width: 100%; font-size: 80%;"
+          .controls
+            = text_area_tag :secondary_emails, @user.secondary_emails.join(", "), disabled: true, rows: 2, style: "width: 100%; font-size: 80%;"
         .control-group
           = f.label :username, class: "control-label"
           .controls
             = f.text_field :username
+    .span6.padded
+      .form.form-horizontal
         .control-group
           = f.label :confirmed, class: "control-label"
           .controls
@@ -96,6 +77,27 @@
 
       
 
+%h3
+  Donations
+%section.full-screen-table{ style: 'padding-top: 0;' }
+  %table.table.table-striped.table-bordered
+    %thead
+      %th
+        Date
+      %th
+        Amount
+      %th
+        Payment?
+    - @user.payments.reorder(created_at: :desc).each do |payment|
+      %tr
+        %td
+          %span.convertTime
+            = l payment.created_at, format: :convert_time
+          %small.convertTimezone
+        %td
+          = payment.amount
+        %td
+          = "&#x2713;".html_safe if payment.is_payment
 
 - if @bikes.present?
   %h2.pull-left
@@ -158,6 +160,38 @@
 - else
   %p
     #{@user.email} has no Bikes
+
+- if @user.memberships.count > 0
+  %section.full-screen-table
+    %h2
+      = @user.memberships.count
+      Current memberships
+    %table#admin-users-table.table.table-striped.table-bordered
+      %thead
+        %th
+          Id&nbsp;
+        %th.medium-screens
+          Created&nbsp;<small class="convertTimezone"></small>
+        %th
+          Email
+        %th
+          Organization
+        %th.large-screens
+          Management links
+      %tbody
+        - @user.memberships.each do |membership|
+          %tr
+            %td
+              = link_to membership.id, admin_membership_url(membership)
+            %td.medium-screens
+              %span.convertTime
+                = l membership.created_at, format: :convert_time
+            %td
+              = membership.user.email
+            %td
+              = link_to membership.organization.name, admin_organization_path(membership.organization)
+            %td.large-screens
+              #{link_to 'Edit', edit_admin_membership_url(membership)}
 
 - if @user.user_emails.count > 1
   %h2 User emails

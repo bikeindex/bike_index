@@ -27,8 +27,8 @@ class Admin::UsersController < Admin::BaseController
   def edit
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @bikes = @user.bikes.page(page).per(per_page)
-    @ownerships = @user.ownerships.page(page).per(per_page)
+    @bikes = @user.bikes.reorder(created_at: :desc).page(page).per(per_page)
+    @ownerships = @user.ownerships.reorder(created_at: :desc).page(page).per(per_page)
   end
 
   def update
