@@ -161,6 +161,18 @@ class Bike < ActiveRecord::Base
 
   def user?; user.present? end
 
+  def stolen_recovery?; recovered_records.any? end
+
+  # Small helper because we call this a lot
+  def type; cycle_type && cycle_type.name.downcase end
+
+  # this should be put somewhere else sometime
+  def serial; serial_number unless recovered end
+
+  def user_hidden; hidden && current_ownership&.user_hidden end
+
+  def fake_deleted; hidden && !user_hidden end
+
   # This is for organizations - might be useful for admin as well. We want it to be nil if it isn't present
   # User - not ownership, because we don't want registrar
   def user_name
@@ -196,14 +208,6 @@ class Bike < ActiveRecord::Base
     return authorize_bike_for_user(u) unless can_be_claimed_by(u)
     current_ownership.mark_claimed
     return true
-  end
-
-  def user_hidden
-    hidden && current_ownership&.user_hidden
-  end
-
-  def fake_deleted
-    hidden && !user_hidden
   end
 
   def phone
@@ -349,14 +353,6 @@ class Bike < ActiveRecord::Base
     true
   end
 
-  def serial
-    serial_number unless recovered
-  end
-
-  def stolen_recovery?
-    recovered_records.any?
-  end
-
   def set_paints
     self.paint_id = nil if paint_id.present? && paint_name.blank? && paint_name != nil
     return true unless paint_name.present?
@@ -381,10 +377,6 @@ class Bike < ActiveRecord::Base
       secondary_frame_color && secondary_frame_color.name,
       tertiary_frame_color && tertiary_frame_color.name
     ].compact
-  end
-
-  def type # Small helper because we call this a lot
-    cycle_type && cycle_type.name.downcase
   end
 
   def cgroup_array # list of cgroups so that we can arrange them
