@@ -150,6 +150,9 @@ class Bike < ActiveRecord::Base
 
   def current_ownership; ownerships.reorder(:created_at).last end
 
+  # Use present? to ensure true/flase rather than nil
+  def claimed?; current_ownership.claimed.present? end
+
   # owner resolves to creator if user isn't present, or organization auto user. shouldn't ever be nil
   def owner; current_ownership && current_ownership.owner end
 
@@ -157,6 +160,18 @@ class Bike < ActiveRecord::Base
   def user; current_ownership&.user end
 
   def user?; user.present? end
+
+  def stolen_recovery?; recovered_records.any? end
+
+  # Small helper because we call this a lot
+  def type; cycle_type && cycle_type.name.downcase end
+
+  # this should be put somewhere else sometime
+  def serial; serial_number unless recovered end
+
+  def user_hidden; hidden && current_ownership&.user_hidden end
+
+  def fake_deleted; hidden && !user_hidden end
 
   # This is for organizations - might be useful for admin as well. We want it to be nil if it isn't present
   # User - not ownership, because we don't want registrar
@@ -171,37 +186,35 @@ class Bike < ActiveRecord::Base
 
   def first_ownership; ownerships.reorder(:created_at).first end
 
+  # check if this is the first ownership - or if no owner, which means testing probably
+  def first_ownership?; current_ownership&.blank? || current_ownership == first_ownership end
+
+  def creation_organization_authorized?; first_ownership? && creation_organization.present? end
+
   def first_owner_email; first_ownership.owner_email end
 
   def can_be_claimed_by(u)
-    return false if current_ownership.blank? || current_ownership.claimed?
+    return false if u.blank? || current_ownership.blank? || current_ownership.claimed?
     user == u || current_ownership.can_be_claimed_by(u)
   end
 
-  def authorize_bike_for_user!(u)
-    return true if u == owner
+  def authorize_bike_for_user(u)
+    return true if u == owner || can_be_claimed_by(u)
     return false if u.blank? || current_ownership.claimed
-    if can_be_claimed_by(u)
-      current_ownership.mark_claimed
-      return true
-    end
-    return false unless ownerships.count == 1 && creation_organization.present?
-    u.is_member_of?(creation_organization)
+    creation_organization_authorized? && u.is_member_of?(creation_organization)
   end
 
-  def user_hidden
-    hidden && current_ownership&.user_hidden
-  end
-
-  def fake_deleted
-    hidden && !user_hidden
+  def authorize_bike_for_user!(u)
+    return authorize_bike_for_user(u) unless can_be_claimed_by(u)
+    current_ownership.mark_claimed
+    true
   end
 
   def phone
     # use @phone because attr_accessor
     @phone ||= user&.phone
-    # Only grab the phone number from b_params if it's the first owner - or if no owner, which means testing probably
-    if current_ownership.blank? || current_ownership&.first?
+    # Only grab the phone number from b_params if this is the first_ownership
+    if first_ownership?
       @phone ||= b_params.map(&:phone).reject(&:blank?).first
     end
     @phone
@@ -340,14 +353,6 @@ class Bike < ActiveRecord::Base
     true
   end
 
-  def serial
-    serial_number unless recovered
-  end
-
-  def stolen_recovery?
-    recovered_records.any?
-  end
-
   def set_paints
     self.paint_id = nil if paint_id.present? && paint_name.blank? && paint_name != nil
     return true unless paint_name.present?
@@ -372,10 +377,6 @@ class Bike < ActiveRecord::Base
       secondary_frame_color && secondary_frame_color.name,
       tertiary_frame_color && tertiary_frame_color.name
     ].compact
-  end
-
-  def type # Small helper because we call this a lot
-    cycle_type && cycle_type.name.downcase
   end
 
   def cgroup_array # list of cgroups so that we can arrange them

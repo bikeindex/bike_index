@@ -788,7 +788,7 @@ describe BikesController do
         end
       end
       context 'not-creator but member of creation_organization' do
-        let(:ownership) { FactoryBot.create(:organization_ownership) }
+        let(:ownership) { FactoryBot.create(:ownership_organization_bike) }
         let(:organization) { bike.creation_organization }
         let(:user) { FactoryBot.create(:organization_member, organization: organization) }
         it 'renders' do
@@ -1055,7 +1055,7 @@ describe BikesController do
     context 'owner present (who is allowed to edit)' do
       let(:color) { FactoryBot.create(:color) }
       let(:user) { FactoryBot.create(:user_confirmed) }
-      let(:ownership) { FactoryBot.create(:organization_ownership, owner_email: user.email) }
+      let(:ownership) { FactoryBot.create(:ownership_organization_bike, owner_email: user.email) }
       let(:bike) { ownership.bike }
       let(:organization) { bike.organizations.first }
       let(:organization_2) { FactoryBot.create(:organization) }

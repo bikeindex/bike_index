@@ -8,7 +8,7 @@ FactoryBot.define do
       claimed { true }
       user { FactoryBot.create(:user, email: owner_email) }
     end
-    factory :organization_ownership do
+    factory :ownership_organization_bike do
       bike { FactoryBot.create(:creation_organization_bike) }
     end
   end
