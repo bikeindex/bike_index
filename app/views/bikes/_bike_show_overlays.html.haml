@@ -1,9 +1,6 @@
 / There are two types of overlays: the organization message overlay and the edit bike overlay
 / Both can be displayed at the same time. The organization message overlay also needs a modal form that pops up
 
-- organization_message_overlay = current_user.bike_actions_organization&.present?
-- edit_overlay = @bike.authorize_bike_for_user(current_user)
-
 - if organization_message_overlay # Render the modal!
   - modal_body = capture_haml do
     .modal-body
