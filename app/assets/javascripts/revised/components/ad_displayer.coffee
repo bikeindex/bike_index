@@ -2,7 +2,7 @@ class @AdDisplayer
   photo_ads = ['right300x600']
   other_ads = ['top468x60']
 
-  boomerang_ad = "<a href=\"https://boomerangbike.com/\"><img src=\"/ads/boomerang_v3.jpg\" alt=\"Boomerang\"></a>"
+  boomerang_ad = "<a href=\"https://boomerangbike.com/\"><img src=\"/ads/boomerang_v4.jpg\" alt=\"Boomerang\"></a>"
 
   lemonade_ad = '<h3><a href="https://bikeindex.org/news/bike-index-partners-with-renters-and-homeowners-insurance-company-lemo">Bike Index Approved:</a></h3>' +
                    "<a href=\"https://www.lemonade.com/l/bike-index?utm_medium=partners&utm_source=bike-index&utm_campaign=website\" onclick=\"trackOutboundLink('https://www.lemonade.com/l/bike-index?utm_medium=partners&utm_source=bike-index&utm_campaign=website'); return false;\"><img src=\"https://files.bikeindex.org/partner/Lemonade-Tile.jpg\" alt=\"Lemonade\" style=\"margin-bottom: 30px;\"></a>"
