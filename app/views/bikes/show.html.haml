@@ -1,7 +1,10 @@
 = render partial: "initial_modal_for_show"
 
-- if current_user.present? && (current_user.bike_actions_organization&.present? || @bike.owner == current_user)
-  = render partial: "bike_show_overlays"
+- if current_user.present?
+  - organization_message_overlay = current_user.bike_actions_organization&.present?
+  - edit_overlay = @bike.authorize_bike_for_user(current_user)
+  - if organization_message_overlay || edit_overlay
+    = render partial: "bike_show_overlays", locals: { organization_message_overlay: organization_message_overlay, edit_overlay: edit_overlay}
 
 - if current_user&.superuser && @bike.user_hidden
   %h2.text-danger.mb-4.text-center{ style: "text-align: center;" }
