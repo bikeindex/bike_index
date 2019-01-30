@@ -84,7 +84,7 @@ class Bike < ActiveRecord::Base
       serial_number: 'A',
       cached_data:   'B',
       all_description:   'C'
-    }, using: { tsearch: { dictionary: 'english', prefix: true } }
+    }
 
   pg_search_scope :admin_search,
     against: { owner_email: 'A' },
