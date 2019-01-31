@@ -15,12 +15,10 @@ class Admin::GraphsController < Admin::BaseController
       chart_data = Payment.where(created_at: @start_at..@end_at)
                        .group_by_period(@group_period, :created_at, time_zone: @timezone)
                        .count
-                       p "!!!!!!!"
-                       p chart_data.keys.first.class
-                       p chart_data.values.first.class
-                       p "!!!!!!"
     end
     if chart_data.present?
+      p "!!!"
+      p chart_data.keys.first.is_a?(String)
       render json: chart_data
     else
       render json: { error: "unable to parse chart" }
