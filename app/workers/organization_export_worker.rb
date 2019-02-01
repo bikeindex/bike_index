@@ -84,7 +84,7 @@ class OrganizationExportWorker
     end
     if @export.assign_bike_codes?
       @export_headers << "sticker"
-      @bike_code = BikeCode.lookup(@export.options["bike_code_start"], organization_id: @export.organization_id)
+      @bike_code = BikeCode.lookup(@export.bike_code_start, organization_id: @export.organization_id)
     end
     @export_headers
   end
@@ -110,10 +110,15 @@ class OrganizationExportWorker
     when "city" then bike.registration_address["city"]
     when "state" then bike.registration_address["state"]
     when "zipcode" then bike.registration_address["zipcode"]
-    when "sticker" then
-      code = @bike_code&.code || ""
-      @bike_code = @bike_code&.next_unclaimed_code
-      code
+    when "sticker" then assign_bike_code_and_increment(bike)
     end
+  end
+
+  def assign_bike_code_and_increment(bike)
+    return "" unless @bike_code.present?
+    code = @bike_code.code
+    @bike_code.claim(@export.user, bike.id, claiming_bike: bike)
+    @bike_code = @bike_code.next_unclaimed_code
+    code
   end
 end

@@ -49,10 +49,14 @@ window.BinxAppOrgExport = class BinxAppOrgExport {
     let isAvery = $("#export_avery_export").is(":checked");
     if (isAvery) {
       $(".hiddenOnAveryExport").slideUp("fast");
+      $(".shownOnAveryExport")
+        .slideDown("fast")
+        .css("display", "flex");
     } else {
       $(".hiddenOnAveryExport")
         .slideDown("fast")
         .css("display", "flex");
+      $(".shownOnAveryExport").slideUp("fast");
     }
   }
 

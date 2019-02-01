@@ -56,9 +56,9 @@ RSpec.describe Export, type: :model do
       expect(export.start_at.to_i).to be_within(1).of target_start
       expect(export.end_at.to_i).to be_within(1).of target_end
       expect(export.headers).to eq(["registered_at"])
-      expect(export.options["bike_code_start"]).to be_nil
+      expect(export.bike_code_start).to be_nil
       export.bike_code_start = "https://bikeindex.org/bikes/scanned/B21006000?organization_id=psu"
-      expect(export.options["bike_code_start"]).to eq "B21006000"
+      expect(export.bike_code_start).to eq "B21006000"
     end
   end
 

@@ -46,7 +46,8 @@ describe OrganizationExportWorker do
         end
       end
       context "avery export" do
-        let(:export) { FactoryBot.create(:export_avery, progress: "pending", file: nil, bike_code_start: "a1111 ") }
+        let(:user) { FactoryBot.create(:admin) }
+        let(:export) { FactoryBot.create(:export_avery, progress: "pending", file: nil, bike_code_start: "a1111 ", user: user) }
         let(:bike_for_avery) { FactoryBot.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
         let!(:b_param) do
           FactoryBot.create(:b_param, created_bike_id: bike_for_avery.id,
@@ -63,6 +64,7 @@ describe OrganizationExportWorker do
         let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "a1111") }
         include_context :geocoder_real
         it "exports only bike with name and email" do
+          expect(bike_code.claimed?).to be_falsey
           export.update_attributes(file_format: "csv") # Manually switch to csv so that we can parse it more easily :/
           expect(organization.bikes.pluck(:id)).to match_array([bike.id, bike_for_avery.id])
           expect(export.avery_export?).to be_truthy
@@ -74,6 +76,11 @@ describe OrganizationExportWorker do
           expect(export.progress).to eq "finished"
           expect(export.rows).to eq 1 # The bike without a user_name and address isn't exported
           expect(export.file.read).to eq(csv_string)
+          bike_code.reload
+          expect(bike_code.claimed?).to be_truthy
+          expect(bike_code.bike).to eq bike_for_avery
+          expect(bike_code.user).to eq export.user
+          expect(bike_code.claimed_at).to be_within(1.second).of Time.now
         end
       end
     end

@@ -56,7 +56,9 @@ class Export < ActiveRecord::Base
 
   def avery_export?; option?("avery_export") end
 
-  def assign_bike_codes?; option?("bike_code_start").present? end
+  def bike_code_start; options["bike_code_start"] end
+
+  def assign_bike_codes?; bike_code_start.present? end
 
   def option?(str);
     options[str.to_s].present?

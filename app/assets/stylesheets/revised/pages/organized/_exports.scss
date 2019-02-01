@@ -9,9 +9,11 @@
 .datetimefield-fields {
   display: none;
 }
-
 .datetimefield-collapser {
   @extend small;
   display: block;
   text-align: right;
+}
+.shownOnAveryExport {
+  display: none;
 }
