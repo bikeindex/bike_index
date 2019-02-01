@@ -50,7 +50,7 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:organization).permit(:name, :website, :org_type, show_on_map_if_permitted,
+      params.require(:organization).permit(:name, :website, :kind, show_on_map_if_permitted,
                                            :embedable_user_email, paid_attributes,
                                            locations_attributes: permitted_locations_params)
     end

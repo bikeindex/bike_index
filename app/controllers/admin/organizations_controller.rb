@@ -8,7 +8,7 @@ class Admin::OrganizationsController < Admin::BaseController
     orgs = Organization.all
     orgs = orgs.paid if params[:is_paid].present?
     orgs = orgs.admin_text_search(params[:query]) if params[:query].present?
-    orgs = orgs.where(org_type: params[:org_type]) if params[:org_type].present?
+    orgs = orgs.where(kind: params[:kind]) if params[:kind].present?
     @organizations = orgs.reorder("#{@sort} #{@sort_direction}").page(page).per(per_page)
     @organizations_count = orgs.count
   end
@@ -68,15 +68,15 @@ class Admin::OrganizationsController < Admin::BaseController
   protected
 
   def permitted_parameters
-    params.require(:organization).permit(permitted_organization_params)
-  end
-
-  def permitted_organization_params
-    (%w(available_invitation_count sent_invitation_count name short_name slug website
-       show_on_map is_suspended org_type embedable_user_email auto_user_id lock_show_on_map
-       api_access_approved access_token new_bike_notification avatar avatar_cache parent_organization_id
-       lightspeed_cloud_api_key approved is_paid show_bulk_import
-      ).map(&:to_sym) + [locations_attributes: permitted_locations_params]).freeze
+    approved_kind = params.dig(:organization, :kind)
+    approved_kind = "other" unless Organization.kinds.include?(approved_kind)
+    params.require(:organization)
+          .permit(:available_invitation_count, :sent_invitation_count, :name, :short_name, :slug, :website,
+                  :show_on_map, :is_suspended, :embedable_user_email, :auto_user_id, :lock_show_on_map,
+                  :api_access_approved, :access_token, :new_bike_notification, :avatar, :avatar_cache,
+                  :parent_organization_id, :lightspeed_cloud_api_key, :approved, :is_paid, :show_bulk_import,
+                  [locations_attributes: permitted_locations_params])
+          .merge(kind: approved_kind)
   end
 
   def set_sort_and_direction

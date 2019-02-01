@@ -65,7 +65,7 @@
           %td.medium-screens
             = organization.memberships.count
           %td
-            = link_to organization.org_type, admin_organizations_path(org_type: organization.org_type)
+            = link_to organization.kind, admin_organizations_path(kind: organization.kind)
           %td.large-screens
             .less-strong-hold
               

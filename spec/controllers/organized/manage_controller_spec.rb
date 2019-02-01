@@ -110,7 +110,7 @@ describe Organized::ManageController, type: :controller do
             new_bike_notification: 'things8',
             website: ' www.drseuss.org',
             name: 'some new name',
-            org_type: 'shop',
+            kind: 'shop',
             is_paid: true,
             lock_show_on_map: false,
             show_on_map: true,
@@ -118,7 +118,7 @@ describe Organized::ManageController, type: :controller do
           }
         end
         # Website is also permitted, but we're manually setting it
-        let(:permitted_update_keys) { [:org_type, :auto_user_id, :embedable_user_email, :name, :website] }
+        let(:permitted_update_keys) { [:kind, :auto_user_id, :embedable_user_email, :name, :website] }
         before do
           expect(user_2).to be_present
           organization.update_attributes(org_attributes)
@@ -149,7 +149,7 @@ describe Organized::ManageController, type: :controller do
           {
             name: organization.name,
             show_on_map: true,
-            org_type: 'shop',
+            kind: 'shop',
             locations_attributes: {
               '0' => {
                 id: location_1.id,

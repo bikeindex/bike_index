@@ -44,32 +44,13 @@
 
           .form-group.row
             %label.org-form-label
-              Organization type
+              Organization kind
             .col-sm-4
-              .radio
-                %label
-                  = f.radio_button :org_type, 'shop'
-                  Bike shop
-              .radio
-                %label
-                  = f.radio_button :org_type, 'advocacy'
-                  Advocacy group
-              .radio
-                %label
-                  = f.radio_button :org_type, 'police'
-                  Police department
-              .radio
-                %label
-                  = f.radio_button :org_type, 'school'
-                  School
-              .radio
-                %label
-                  = f.radio_button :org_type, 'manufacturer'
-                  Manufacturer
-              .radio
-                %label
-                  = f.radio_button :org_type, 'property'
-                  Property Manager
+              - Organization.kinds.each do |kind|
+                .radio
+                  %label
+                    = f.radio_button :kind, kind
+                    = kind.humanize
           .form-group.row
             .col-sm-4.col-sm-push-4
               = f.submit 'add organization', class: 'btn btn-success'

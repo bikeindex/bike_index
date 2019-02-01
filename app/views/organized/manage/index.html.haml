@@ -27,26 +27,11 @@
     %label.org-form-label
       Organization type
     .col-sm-4
-      .radio
-        %label
-          = f.radio_button :org_type, 'shop'
-          Bike shop
-      .radio
-        %label
-          = f.radio_button :org_type, 'advocacy'
-          Advocacy group
-      .radio
-        %label
-          = f.radio_button :org_type, 'police'
-          Police department
-      .radio
-        %label
-          = f.radio_button :org_type, 'school'
-          University, College or school
-      .radio
-        %label
-          = f.radio_button :org_type, 'manufacturer'
-          Manufacturer
+      - Organization.kinds.each do |kind|
+        .radio
+          %label
+            = f.radio_button :kind, kind
+            = kind.humanize
 
   .form-group.row
     = f.label :website, class: 'org-form-label'

@@ -25,15 +25,9 @@ class OrganizationsController < ApplicationController
   end
 
   def create
-    user = current_user
-    @organization = Organization.new(
-      name: params[:organization][:name].strip,
-      website: params[:organization][:website],
-      org_type: params[:organization][:org_type]
-    )
+    @organization = Organization.new(permitted_create_params)
     if @organization.save
-      membership = Membership.create(user_id: user.id, role: 'admin', organization_id: @organization.id)
-      @organization.update_attribute :auto_user_id, user.id
+      membership = Membership.create(user_id: current_user.id, role: 'admin', organization_id: @organization.id)
       notify_admins('organization_created')
       flash[:success] = 'Organization Created successfully!'
       if current_user.present?
@@ -104,6 +98,14 @@ class OrganizationsController < ApplicationController
     DateTime.strptime("#{str} 06", '%m-%d-%Y %H') if str.present?
     rescue ArgumentError
     Time.zone.now
+  end
+
+  def permitted_create_params
+    approved_kind = params.dig(:organization, :kind)
+    approved_kind = "other" unless Organization.kinds.include?(approved_kind)
+    params.require(:organization)
+          .permit(:name, :website)
+          .merge(auto_user_id: current_user.id, kind: approved_kind)
   end
 
   def find_organization

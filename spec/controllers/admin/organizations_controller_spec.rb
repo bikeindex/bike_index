@@ -29,7 +29,7 @@ describe Admin::OrganizationsController, type: :controller do
       {
         name: 'new name thing stuff',
         show_on_map: true,
-        org_type: 'shop',
+        kind: 'shop',
         is_paid: 'true',
         parent_organization_id: parent_organization.id,
         locations_attributes: {

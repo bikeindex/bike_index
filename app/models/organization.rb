@@ -1,12 +1,14 @@
 class Organization < ActiveRecord::Base
   include ActionView::Helpers::SanitizeHelper
   KIND_ENUM = {
-    shop: 0,
-    advocacy: 1,
-    police: 2,
+    bike_shop: 0,
+    bike_advocacy: 1,
+    law_enforcement: 2,
     school: 3,
-    bicycle_manufacturer: 4,
-    software: 5
+    bike_manufacturer: 4,
+    software: 5,
+    property_management: 6,
+    other: 7
   }.freeze
 
   acts_as_paranoid
@@ -34,7 +36,7 @@ class Organization < ActiveRecord::Base
   accepts_nested_attributes_for :mail_snippets
   accepts_nested_attributes_for :locations, allow_destroy: true
 
-  # enum kind: KIND_ENUM
+  enum kind: KIND_ENUM
 
   validates_presence_of :name
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact admin@bikeindex.org"
@@ -42,11 +44,6 @@ class Organization < ActiveRecord::Base
   default_scope { order(:name) }
 
   scope :shown_on_map, -> { where(show_on_map: true, approved: true) }
-  scope :shop, -> { where(org_type: 'shop') }
-  scope :police, -> { where(org_type: 'police') }
-  scope :advocacy, -> { where(org_type: 'advocacy') }
-  scope :school, -> { where(org_type: 'school') }
-  scope :manufacturer, -> { where(org_type: 'manufacturer') }
   scope :paid, -> { where(is_paid: true) }
   scope :valid, -> { where(is_suspended: false) }
   scope :valid, -> { where(is_suspended: false) }
@@ -58,7 +55,7 @@ class Organization < ActiveRecord::Base
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
 
-  def self.kinds; KIND_ENUM.values.map(&:to_s) end
+  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
   def self.friendly_find(n)
     return nil unless n.present?
@@ -133,6 +130,7 @@ class Organization < ActiveRecord::Base
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = (short_name || name).truncate(30)
     self.is_paid = true if current_invoice&.paid_in_full?
+    self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
     self.paid_feature_slugs = current_invoice&.feature_slugs || []
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
@@ -158,7 +156,6 @@ class Organization < ActiveRecord::Base
     save
   end
 
-  def school?; org_type == "school" end
   def current_invoice; invoices.active.last || parent_organization&.current_invoice end # Parent invoice serves as invoice
   def child_ids; child_organizations.pluck(:id) end
 
