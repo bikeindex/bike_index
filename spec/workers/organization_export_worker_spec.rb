@@ -154,14 +154,15 @@ describe OrganizationExportWorker do
           "717 Market St",
           "San Francisco",
           "CA",
-          "94103"
+          "94103",
+          ""
         ]
       end
-      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: { headers: %w[link phone additional_registration_number registration_address] }) }
+      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: { headers: %w[link phone additional_registration_number registration_address], bike_code_start: "8z" }) }
       let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv_exports"]) }
       let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0) }
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: { bike: { address: "717 Market St, SF", phone: "717.742.3423" } }) }
-      let(:target_headers) { %w[link phone additional_registration_number address city state zipcode] }
+      let(:target_headers) { %w[link phone additional_registration_number address city state zipcode sticker] }
       let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, additional_registration: "cool extra serial") }
       include_context :geocoder_real
       it "returns the expected values" do

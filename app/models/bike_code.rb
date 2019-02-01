@@ -18,6 +18,7 @@ class BikeCode < ActiveRecord::Base
   before_validation :set_calculated_attributes
 
   def self.normalize_code(str = nil)
+    return nil unless str.present?
     code = str.to_s.upcase.strip
     if code.match(/BIKEINDEX.ORG/)
       code = code.gsub(/\A.*BIKEINDEX.ORG\/BIKES/, "").gsub(/\?.*/, "") # Remove the start and query string
@@ -47,12 +48,14 @@ class BikeCode < ActiveRecord::Base
 
   def url
     [
-      "#{ENV["BASE_URL"]}/scanned/bikes/#{code}",
+      "#{ENV['BASE_URL']}/scanned/bikes/#{code}",
       organization.present? ? "?organization_id=#{organization.slug}" : nil
-   ].compact.join("")
- end
+    ].compact.join("")
+  end
 
-  def next_code
+  def next_unclaimed_code
+    BikeCode.unclaimed.where(organization_id: organization_id).reorder(:created_at)
+            .where("id > ?", id).first
   end
 
   def claimable_by?(user)

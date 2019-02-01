@@ -111,8 +111,8 @@ class OrganizationExportWorker
     when "state" then bike.registration_address["state"]
     when "zipcode" then bike.registration_address["zipcode"]
     when "sticker" then
-      code = @bike_code.code
-      @bike_code = @bike_code.next_code
+      code = @bike_code&.code || ""
+      @bike_code = @bike_code&.next_unclaimed_code
       code
     end
   end

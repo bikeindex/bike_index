@@ -110,8 +110,14 @@ RSpec.describe BikeCode, type: :model do
   end
 
   describe "next_unassigned" do
-    it "finds next unassigned" do
-      fail
+    let!(:bike_code) { FactoryBot.create(:bike_code, organization_id: 12, code: "zzzz") }
+    let!(:bike_code1) { FactoryBot.create(:bike_code, organization_id: 12, code: "a1111") }
+    let!(:bike_code2) { FactoryBot.create(:bike_code, code: "a1112") }
+    let!(:bike_code3) { FactoryBot.create(:bike_code, organization_id: 12, code: "a1113", bike_id: 12) }
+    let!(:bike_code4) { FactoryBot.create(:bike_code, organization_id: 12, code: "a111") }
+    it "finds next unassigned, returns nil if not found" do
+      expect(bike_code1.next_unclaimed_code).to eq bike_code4
+      expect(bike_code2.next_unclaimed_code).to be_nil
     end
   end
 
