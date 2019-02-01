@@ -967,7 +967,8 @@ CREATE TABLE public.invoices (
     amount_due_cents integer,
     amount_paid_cents integer,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    notes text
 );
 
 
@@ -1517,7 +1518,8 @@ CREATE TABLE public.organizations (
     has_bike_search boolean DEFAULT false NOT NULL,
     show_partial_registrations boolean DEFAULT false NOT NULL,
     paid_feature_slugs jsonb,
-    parent_organization_id integer
+    parent_organization_id integer,
+    kind integer
 );
 
 
@@ -4093,4 +4095,6 @@ INSERT INTO schema_migrations (version) VALUES ('20181205180633');
 INSERT INTO schema_migrations (version) VALUES ('20181213224936');
 
 INSERT INTO schema_migrations (version) VALUES ('20190110210704');
+
+INSERT INTO schema_migrations (version) VALUES ('20190201193608');
 
