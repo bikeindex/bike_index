@@ -18,10 +18,11 @@ class BikeCode < ActiveRecord::Base
   before_validation :set_calculated_attributes
 
   def self.normalize_code(str = nil)
+    return nil unless str.present?
     code = str.to_s.upcase.strip
-    if code.match(/BIKEINDEX.ORG/)
-      code = code.gsub(/\A.*BIKEINDEX.ORG\/BIKES/, "").gsub(/\?.*/, "") # Remove the start and query string
-      code = code.gsub(/\/SCANNED\/?/, "").gsub(/\A\//, "") # Remove scanned, wherever it is, and a trailing / if it exists
+    if code.match?(/BIKEINDEX.ORG/)
+      code = code.gsub(%r{\A.*BIKEINDEX.ORG/BIKES}, "").gsub(/\?.*/, "") # Remove the start and query string
+      code = code.gsub(%r{/SCANNED/?}, "").gsub(%r{(\A/)|(/\z)}, "") # Remove scanned, wherever it is, and a trailing / if it exists
     end
     code.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them
   end
@@ -42,14 +43,20 @@ class BikeCode < ActiveRecord::Base
   end
 
   def claimed?; bike_id.present? end
+
   def unclaimed?; !claimed? end
 
   def url
     [
-      "#{ENV["BASE_URL"]}/scanned/bikes/#{code}",
+      "#{ENV['BASE_URL']}/scanned/bikes/#{code}",
       organization.present? ? "?organization_id=#{organization.slug}" : nil
-   ].compact.join("")
- end
+    ].compact.join("")
+  end
+
+  def next_unclaimed_code
+    BikeCode.unclaimed.where(organization_id: organization_id).reorder(:created_at)
+            .where("id > ?", id).first
+  end
 
   def claimable_by?(user)
     return false unless user.present?
@@ -67,14 +74,14 @@ class BikeCode < ActiveRecord::Base
     errors.none? && claimed? && organization.present? && user.is_member_of?(organization)
   end
 
-  def claim(user, bike_str)
+  def claim(user, bike_str, claiming_bike: nil)
     errors.add(:user, "not found") unless user.present?
-    new_bike = Bike.friendly_find(bike_str)
+    claiming_bike ||= Bike.friendly_find(bike_str)
     # Check bike_str, not bike_id, because we don't want to allow people adding bikes
-    if bike_str.blank? && unclaimable_by?(user)
+    if bike_str.blank? && claiming_bike.blank? && unclaimable_by?(user)
       update(bike_id: nil, user_id: nil, claimed_at: nil)
-    elsif new_bike.present?
-      update(bike_id: new_bike.id, user_id: user.id, claimed_at: Time.now) unless errors.any?
+    elsif claiming_bike.present?
+      update(bike_id: claiming_bike.id, user_id: user.id, claimed_at: Time.now) unless errors.any?
     else
       errors.add(:bike, "\"#{bike_str}\" not found")
     end

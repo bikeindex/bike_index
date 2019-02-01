@@ -4,12 +4,15 @@ RSpec.describe BikeCode, type: :model do
   describe "normalize_code" do
     let(:url) { "https://bikeindex.org/bikes/scanned/000012?organization_id=palo-party" }
     let(:url2) { "bikeindex.org/bikes/000012/scanned?organization_id=bikeindex" }
-    let(:url2) { "www.bikeindex.org/bikes/12/scanned?organization_id=bikeindex" }
+    let(:url3) { "www.bikeindex.org/bikes/12/scanned?organization_id=bikeindex" }
+    let(:url4) { "https://bikeindex.org/bikes/scanned/000012/" }
     let(:code) { "bike_code999" }
     it "strips the right stuff" do
       expect(BikeCode.normalize_code(code)).to eq "BIKE_CODE999"
       expect(BikeCode.normalize_code(url)).to eq "12"
       expect(BikeCode.normalize_code(url2)).to eq "12"
+      expect(BikeCode.normalize_code(url3)).to eq "12"
+      expect(BikeCode.normalize_code(url4)).to eq "12"
     end
   end
 
@@ -106,6 +109,18 @@ RSpec.describe BikeCode, type: :model do
         user.reload
         expect(BikeCode.new.claimable_by?(user)).to be_truthy
       end
+    end
+  end
+
+  describe "next_unassigned" do
+    let!(:bike_code) { FactoryBot.create(:bike_code, organization_id: 12, code: "zzzz") }
+    let!(:bike_code1) { FactoryBot.create(:bike_code, organization_id: 12, code: "a1111") }
+    let!(:bike_code2) { FactoryBot.create(:bike_code, code: "a1112") }
+    let!(:bike_code3) { FactoryBot.create(:bike_code, organization_id: 12, code: "a1113", bike_id: 12) }
+    let!(:bike_code4) { FactoryBot.create(:bike_code, organization_id: 12, code: "a111") }
+    it "finds next unassigned, returns nil if not found" do
+      expect(bike_code1.next_unclaimed_code).to eq bike_code4
+      expect(bike_code2.next_unclaimed_code).to be_nil
     end
   end
 

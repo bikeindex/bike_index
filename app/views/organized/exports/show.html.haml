@@ -81,7 +81,7 @@
         Columns in csv
       %td
         %ul
-          - @export.headers.each do |header|
+          - @export.written_headers.each do |header|
             %li
               = header.humanize
 

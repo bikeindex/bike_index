@@ -52,10 +52,13 @@ RSpec.describe Export, type: :model do
     let(:timezone) { "America/Chicago" }
     let(:export) { FactoryBot.build(:export) }
     it "assigns correctly" do
-      export.update_attributes(timezone: timezone, start_at: time_start, end_at: time_end, headers: %w[party registered_at])
+      export.update_attributes(timezone: timezone, start_at: time_start, end_at: time_end, headers: %w[party registered_at], bike_code_start: "")
       expect(export.start_at.to_i).to be_within(1).of target_start
       expect(export.end_at.to_i).to be_within(1).of target_end
       expect(export.headers).to eq(["registered_at"])
+      expect(export.bike_code_start).to be_nil
+      export.bike_code_start = "https://bikeindex.org/bikes/scanned/B21006000?organization_id=psu"
+      expect(export.bike_code_start).to eq "B21006000"
     end
   end
 
@@ -70,8 +73,11 @@ RSpec.describe Export, type: :model do
       export.options = { avery_export: true }
       expect(export.avery_export?).to be_truthy
       expect(export.avery_export_url).to be_nil
+      expect(export.assign_bike_codes?).to be_falsey
       export.progress = :finished
       expect(export.avery_export_url).to eq target_url
+      export.options = export.options.merge(bike_code_start: "1111")
+      expect(export.assign_bike_codes?).to be_truthy
     end
   end
 

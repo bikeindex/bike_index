@@ -11,7 +11,12 @@
       = f.label :avery_export, "Avery Label Export", class: "org-form-label"
       .col-sm-4
         = f.check_box :avery_export
-
+    .form-group.row.shownOnAveryExport
+      = f.label :bike_code_start, "Initial Sticker #", class: 'org-form-label'
+      .col-sm-6
+        = f.text_field :bike_code_start, class: "form-control"
+        %span.below-input-help
+          Starting with given input, stickers will be incrementally assigned to bikes. Leave blank to skip assigning stickers to bikes
   .row.mt-2.hiddenOnAveryExport
     .col-lg-4
       %p.export-included-columns-label

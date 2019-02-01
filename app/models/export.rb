@@ -3,7 +3,7 @@ class Export < ActiveRecord::Base
   VALID_KINDS = %i[organization stolen manufacturer].freeze
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
-  AVERY_HEADERS = %w[owner_name_or_email registration_address].freeze
+  AVERY_HEADERS = %w[owner_name registration_address].freeze
   HIDDEN_HEADERS = %w[owner_name_or_email].freeze
   PERMITTED_HEADERS = (DEFAULT_HEADERS + %w[thumbnail registered_by registration_type owner_email owner_name] + HIDDEN_HEADERS).freeze
 
@@ -54,12 +54,14 @@ class Export < ActiveRecord::Base
 
   def headers; options["headers"] end
 
+  def avery_export?; option?("avery_export") end
+
+  def bike_code_start; options["bike_code_start"] end
+
+  def assign_bike_codes?; bike_code_start.present? end
+
   def option?(str)
     options[str.to_s].present?
-  end
-
-  def avery_export?
-    option?("avery_export")
   end
 
   def avery_export=(val)
@@ -68,6 +70,17 @@ class Export < ActiveRecord::Base
       self.attributes = { file_format: "xlsx", headers: AVERY_HEADERS }
     end
     true # Legacy concerns, so excited for TODO: Rails 5 update
+  end
+
+  def bike_code_start=(val)
+    return true unless val.present?
+    self.options = options.merge(bike_code_start: BikeCode.normalize_code(val))
+  end
+
+  def written_headers
+    # Initially didn't record "written headers", so provide a fallback
+    # ... but it's nice to actually have the final output headers, since we do some modifications
+    option?("written_headers") ? options["written_headers"] : headers
   end
 
   def avery_export_url

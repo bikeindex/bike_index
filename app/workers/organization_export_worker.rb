@@ -82,6 +82,11 @@ class OrganizationExportWorker
     if @export_headers.include?("registration_address")
       @export_headers = @export_headers.reject { |v| v == "registration_address" } + %w[address city state zipcode]
     end
+    if @export.assign_bike_codes?
+      @export_headers << "sticker"
+      @bike_code = BikeCode.lookup(@export.bike_code_start, organization_id: @export.organization_id)
+    end
+    @export.options = @export.options.merge(written_headers: @export_headers) # Write the actual headers so we have them
     @export_headers
   end
 
@@ -106,6 +111,15 @@ class OrganizationExportWorker
     when "city" then bike.registration_address["city"]
     when "state" then bike.registration_address["state"]
     when "zipcode" then bike.registration_address["zipcode"]
+    when "sticker" then assign_bike_code_and_increment(bike)
     end
+  end
+
+  def assign_bike_code_and_increment(bike)
+    return "" unless @bike_code.present?
+    code = @bike_code.code
+    @bike_code.claim(@export.user, bike.id, claiming_bike: bike)
+    @bike_code = @bike_code.next_unclaimed_code
+    code
   end
 end

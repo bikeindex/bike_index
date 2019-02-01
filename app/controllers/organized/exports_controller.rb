@@ -11,9 +11,7 @@ module Organized
 
     def show
       @avery_export_redirect = params[:avery_redirect].present?
-      if @avery_export_redirect && @export.avery_export_url.present?
-        redirect_to @export.avery_export_url
-      end
+      redirect_to @export.avery_export_url if @avery_export_redirect && @export.avery_export_url.present?
     end
 
     def new
@@ -23,7 +21,7 @@ module Organized
     def create
       if ActiveRecord::Type::Boolean.new.type_cast_from_database(params.dig(:export, :avery_export))
         if current_organization.paid_for?("avery_export")
-          @export = avery_export
+          @export = Export.new(avery_export_parameters)
         else
           flash[:error] = "You don't have permission to make that sort of export! Please contact support@bikeindex.org"
         end
@@ -57,8 +55,9 @@ module Organized
       params.require(:export).permit(:timezone, :start_at, :end_at, :file_format, headers: [])
     end
 
-    def avery_export
-      Export.new(params.require(:export).permit(:timezone, :start_at, :end_at).merge(avery_export: true))
+    def avery_export_parameters
+      params.require(:export).permit(:timezone, :start_at, :end_at, :bike_code_start)
+            .merge(avery_export: true)
     end
 
     def find_export
