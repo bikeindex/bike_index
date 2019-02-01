@@ -84,5 +84,4 @@ class BikeDecorator < ApplicationDecorator
       object.serial
     end
   end
-
 end

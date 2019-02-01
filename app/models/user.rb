@@ -205,11 +205,11 @@ class User < ActiveRecord::Base
   end
 
   def has_police_membership?
-    organizations.police.any?
+    organizations.law_enforcement.any?
   end
 
   def has_shop_membership?
-    organizations.shop.any?
+    organizations.bike_shop.any?
   end
 
   def partner_sign_up

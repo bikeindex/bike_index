@@ -110,7 +110,7 @@ describe Organized::ManageController, type: :controller do
             new_bike_notification: 'things8',
             website: ' www.drseuss.org',
             name: 'some new name',
-            kind: 'shop',
+            kind: 'bike_shop',
             is_paid: true,
             lock_show_on_map: false,
             show_on_map: true,
@@ -149,7 +149,7 @@ describe Organized::ManageController, type: :controller do
           {
             name: organization.name,
             show_on_map: true,
-            kind: 'shop',
+            kind: 'bike_shop',
             locations_attributes: {
               '0' => {
                 id: location_1.id,
