@@ -57,7 +57,7 @@ describe OrganizationExportWorker do
         let(:csv_lines) do
           # We modify the headers during processing to separate the address into multiple fields
           [
-            %w[owner_name_or_email address city state zipcode sticker],
+            %w[owner_name address city state zipcode sticker],
             ["Maya Skripal", "102 Washington Pl", "State College", "PA", "16801", "A1111"]
           ]
         end
@@ -76,6 +76,7 @@ describe OrganizationExportWorker do
           expect(export.progress).to eq "finished"
           expect(export.rows).to eq 1 # The bike without a user_name and address isn't exported
           expect(export.file.read).to eq(csv_string)
+          expect(export.written_headers).to eq(%w[owner_name address city state zipcode sticker])
           bike_code.reload
           expect(bike_code.claimed?).to be_truthy
           expect(bike_code.bike).to eq bike_for_avery
@@ -155,6 +156,7 @@ describe OrganizationExportWorker do
     context "special headers" do
       let(:special_bike_values) do
         [
+          bike.owner_email,
           "http://test.host/bikes/#{bike.id}",
           "717.742.3423",
           "cool extra serial",
@@ -165,11 +167,11 @@ describe OrganizationExportWorker do
           ""
         ]
       end
-      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: { headers: %w[link phone additional_registration_number registration_address], bike_code_start: "8z" }) }
+      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: { headers: %w[owner_name_or_email link phone additional_registration_number registration_address], bike_code_start: "8z" }) }
       let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv_exports"]) }
       let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0) }
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: { bike: { address: "717 Market St, SF", phone: "717.742.3423" } }) }
-      let(:target_headers) { %w[link phone additional_registration_number address city state zipcode sticker] }
+      let(:target_headers) { %w[owner_name_or_email link phone additional_registration_number address city state zipcode sticker] }
       let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization, additional_registration: "cool extra serial") }
       include_context :geocoder_real
       it "returns the expected values" do

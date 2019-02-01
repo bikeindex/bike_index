@@ -148,7 +148,7 @@ describe Organized::ExportsController, type: :controller do
         it "creates a non-avery export" do
           expect(organization.paid_for?("avery_export")).to be_truthy
           expect do
-            post :create, export: export_params, organization_id: organization.to_param
+            post :create, export: export_params.merge(bike_code_start: 1), organization_id: organization.to_param
           end.to change(Export, :count).by 1
           expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
           export = Export.last
@@ -158,14 +158,16 @@ describe Organized::ExportsController, type: :controller do
           expect(export.headers).to eq valid_attrs[:headers]
           expect(export.start_at.to_i).to be_within(1).of start_at
           expect(export.end_at.to_i).to be_within(1).of start_at + 2.days.to_i
+          expect(export.bike_code_start).to be_nil
           expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
           expect(export.avery_export?).to be_falsey
         end
       end
       context "avery export" do
+        let(:avery_params) { valid_attrs.merge(end_at: "2016-03-08 02:00:00", avery_export: true, bike_code_start: "a221C ") }
         it "fails" do
           expect do
-            post :create, export: valid_attrs.merge(avery_export: true), organization_id: organization.to_param
+            post :create, export: avery_params, organization_id: organization.to_param
           end.to_not change(Export, :count)
           expect(flash[:error]).to be_present
         end
@@ -174,7 +176,7 @@ describe Organized::ExportsController, type: :controller do
           before { organization.update_column :paid_feature_slugs, %w[csv_exports avery_export] } # Stub organization having features
           it "makes the avery export" do
             expect do
-              post :create, export: valid_attrs.merge(end_at: "2016-03-08 02:00:00", avery_export: true), organization_id: organization.to_param
+              post :create, export: avery_params, organization_id: organization.to_param
             end.to change(Export, :count).by 1
             export = Export.last
             expect(response).to redirect_to organization_export_path(organization_id: organization.to_param, id: export.id, avery_redirect: true)
@@ -185,6 +187,7 @@ describe Organized::ExportsController, type: :controller do
             expect(export.avery_export?).to be_truthy
             expect(export.start_at.to_i).to be_within(1).of start_at
             expect(export.end_at.to_i).to be_within(1).of end_at
+            expect(export.bike_code_start).to eq "A221C"
             expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
           end
         end

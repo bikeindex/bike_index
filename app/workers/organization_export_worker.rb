@@ -86,6 +86,7 @@ class OrganizationExportWorker
       @export_headers << "sticker"
       @bike_code = BikeCode.lookup(@export.bike_code_start, organization_id: @export.organization_id)
     end
+    @export.options = @export.options.merge(written_headers: @export_headers) # Write the actual headers so we have them
     @export_headers
   end
 
