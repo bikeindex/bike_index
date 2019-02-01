@@ -47,6 +47,7 @@
       Bikes since start
 
     = line_chart bikes_admin_graphs_path
+
 - else
   = form_tag admin_graphs_path, method: :get, class: "variable-admin-graphs-form" do
     = hidden_field_tag :kind, @kind

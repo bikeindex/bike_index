@@ -11,6 +11,10 @@ class Admin::GraphsController < Admin::BaseController
       chart_data = User.where(created_at: @start_at..@end_at)
                        .group_by_period(@group_period, :created_at, time_zone: @timezone)
                        .count
+    elsif @kind == "payments"
+      chart_data = Payment.where(created_at: @start_at..@end_at)
+                       .group_by_period(@group_period, :created_at, time_zone: @timezone)
+                       .count
     end
     if chart_data.present?
       render json: chart_data
@@ -75,7 +79,7 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def set_variable_graph_kind
-    @graph_kinds = %w[general users]
+    @graph_kinds = %w[general users payments]
     @kind = @graph_kinds.include?(params[:kind]) ? params[:kind] : @graph_kinds.first
   end
 
