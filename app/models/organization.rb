@@ -1,11 +1,22 @@
 class Organization < ActiveRecord::Base
   include ActionView::Helpers::SanitizeHelper
+  KIND_ENUM = {
+    shop: 0,
+    advocacy: 1,
+    police: 2,
+    school: 3,
+    bicycle_manufacturer: 4,
+    software: 5
+  }.freeze
 
-  attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
   acts_as_paranoid
-
   mount_uploader :avatar, AvatarUploader
 
+  belongs_to :parent_organization, class_name: "Organization"
+  belongs_to :auto_user, class_name: 'User'
+
+  has_many :recovered_records, through: :bikes
+  has_many :locations, dependent: :destroy
   has_many :memberships, dependent: :destroy
   has_many :mail_snippets
   has_many :users, through: :memberships
@@ -16,21 +27,14 @@ class Organization < ActiveRecord::Base
   has_many :b_params
   has_many :invoices
   has_many :payments
-  belongs_to :parent_organization, class_name: "Organization"
   has_many :child_organizations, class_name: "Organization", foreign_key: :parent_organization_id
-  # has_many :bikes, foreign_key: 'creation_organization_id'
   has_many :creation_states
   has_many :created_bikes, through: :creation_states, source: :bike
-  belongs_to :auto_user, class_name: 'User'
+  has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other paid features
   accepts_nested_attributes_for :mail_snippets
-
-  has_many :recovered_records, through: :bikes
-
-  has_many :locations, dependent: :destroy
   accepts_nested_attributes_for :locations, allow_destroy: true
 
-  # For organization landing
-  has_many :public_images, as: :imageable, dependent: :destroy
+  # enum kind: KIND_ENUM
 
   validates_presence_of :name
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact admin@bikeindex.org"
@@ -51,6 +55,10 @@ class Organization < ActiveRecord::Base
 
   before_validation :set_calculated_attributes
   after_commit :update_user_bike_actions_organizations
+
+  attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
+
+  def self.kinds; KIND_ENUM.values.map(&:to_s) end
 
   def self.friendly_find(n)
     return nil unless n.present?
