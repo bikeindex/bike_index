@@ -27,7 +27,10 @@
           %strong
             Not shown
 
-      = @organization.dl_from_attribute("org_type", "Type")
+      %dt
+        Kind
+      %dd
+        = @organization.kind.humanize
       %dt
         Slug
       %dd

@@ -1,11 +1,24 @@
 class Organization < ActiveRecord::Base
   include ActionView::Helpers::SanitizeHelper
+  KIND_ENUM = {
+    bike_shop: 0,
+    bike_advocacy: 1,
+    law_enforcement: 2,
+    school: 3,
+    bike_manufacturer: 4,
+    software: 5,
+    property_management: 6,
+    other: 7
+  }.freeze
 
-  attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
   acts_as_paranoid
-
   mount_uploader :avatar, AvatarUploader
 
+  belongs_to :parent_organization, class_name: "Organization"
+  belongs_to :auto_user, class_name: 'User'
+
+  has_many :recovered_records, through: :bikes
+  has_many :locations, dependent: :destroy
   has_many :memberships, dependent: :destroy
   has_many :mail_snippets
   has_many :users, through: :memberships
@@ -16,21 +29,14 @@ class Organization < ActiveRecord::Base
   has_many :b_params
   has_many :invoices
   has_many :payments
-  belongs_to :parent_organization, class_name: "Organization"
   has_many :child_organizations, class_name: "Organization", foreign_key: :parent_organization_id
-  # has_many :bikes, foreign_key: 'creation_organization_id'
   has_many :creation_states
   has_many :created_bikes, through: :creation_states, source: :bike
-  belongs_to :auto_user, class_name: 'User'
+  has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other paid features
   accepts_nested_attributes_for :mail_snippets
-
-  has_many :recovered_records, through: :bikes
-
-  has_many :locations, dependent: :destroy
   accepts_nested_attributes_for :locations, allow_destroy: true
 
-  # For organization landing
-  has_many :public_images, as: :imageable, dependent: :destroy
+  enum kind: KIND_ENUM
 
   validates_presence_of :name
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact admin@bikeindex.org"
@@ -38,11 +44,6 @@ class Organization < ActiveRecord::Base
   default_scope { order(:name) }
 
   scope :shown_on_map, -> { where(show_on_map: true, approved: true) }
-  scope :shop, -> { where(org_type: 'shop') }
-  scope :police, -> { where(org_type: 'police') }
-  scope :advocacy, -> { where(org_type: 'advocacy') }
-  scope :school, -> { where(org_type: 'school') }
-  scope :manufacturer, -> { where(org_type: 'manufacturer') }
   scope :paid, -> { where(is_paid: true) }
   scope :valid, -> { where(is_suspended: false) }
   scope :valid, -> { where(is_suspended: false) }
@@ -51,6 +52,10 @@ class Organization < ActiveRecord::Base
 
   before_validation :set_calculated_attributes
   after_commit :update_user_bike_actions_organizations
+
+  attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
+
+  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
   def self.friendly_find(n)
     return nil unless n.present?
@@ -125,6 +130,7 @@ class Organization < ActiveRecord::Base
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = (short_name || name).truncate(30)
     self.is_paid = true if current_invoice&.paid_in_full?
+    self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
     self.paid_feature_slugs = current_invoice&.feature_slugs || []
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
@@ -150,7 +156,6 @@ class Organization < ActiveRecord::Base
     save
   end
 
-  def school?; org_type == "school" end
   def current_invoice; invoices.active.last || parent_organization&.current_invoice end # Parent invoice serves as invoice
   def child_ids; child_organizations.pluck(:id) end
 

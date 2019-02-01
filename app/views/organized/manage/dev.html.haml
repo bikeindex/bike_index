@@ -13,7 +13,7 @@
 /     = image_tag("org_manage_screencast_screenshot.png")
 
 .row
-  - if current_organization.org_type == 'shop' && current_organization.access_token.present?
+  - if current_organization.bike_shop? && current_organization.access_token.present?
     .col-md-6
       .card.card-block
         %h3.card-title

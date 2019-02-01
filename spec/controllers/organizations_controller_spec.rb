@@ -22,78 +22,60 @@ describe OrganizationsController do
   end
 
   describe 'create' do
+    let(:org_attrs) do
+      {
+        name: "a new org",
+        kind: "bike_shop",
+      }
+    end
     it 'creates org, membership, filters approved attrs & redirect to org with current_user' do
       expect(Organization.count).to eq(0)
       user = FactoryBot.create(:user_confirmed)
       set_current_user(user)
-      org_attrs = {
-        name: 'a new org',
-        org_type: 'shop',
-        api_access_approved: 'true',
-        approved: 'false'
-      }
       post :create, organization: org_attrs
       expect(Organization.count).to eq(1)
-      organization = Organization.where(name: 'a new org').first
+      organization = Organization.where(name: "a new org").first
       expect(response).to redirect_to organization_manage_index_path(organization_id: organization.to_param)
       expect(organization.approved).to be_truthy
       expect(organization.api_access_approved).to be_falsey
       expect(organization.auto_user_id).to eq(user.id)
       expect(organization.memberships.count).to eq(1)
       expect(organization.memberships.first.user_id).to eq(user.id)
+      expect(organization.kind).to eq "bike_shop"
     end
 
-    it 'creates org, membership, filters approved attrs & redirect to org with current_user' do
-      expect(Organization.count).to eq(0)
-      user = FactoryBot.create(:user_confirmed)
-      set_current_user(user)
-      org_attrs = {
-        name: 'a new org',
-        org_type: 'property',
-        api_access_approved: 'true',
-        approved: 'false'
-      }
-      post :create, organization: org_attrs
-      expect(Organization.count).to eq(1)
-      organization = Organization.where(name: 'a new org').first
-      expect(response).to redirect_to organization_manage_index_path(organization_id: organization.to_param)
-      expect(organization.approved).to be_truthy
-      expect(organization.api_access_approved).to be_falsey
-      expect(organization.auto_user_id).to eq(user.id)
-      expect(organization.memberships.count).to eq(1)
-      expect(organization.memberships.first.user_id).to eq(user.id)
+    it 'creates org, membership, filters approved attrs & redirect to org with current_user and mails' do
+      Sidekiq::Testing.inline! do
+        expect(Organization.count).to eq(0)
+        user = FactoryBot.create(:user_confirmed)
+        set_current_user(user)
+        ActionMailer::Base.deliveries = []
+        post :create, organization: org_attrs.merge(kind: "property_management", approved: false, api_access_approved: true)
+        expect(ActionMailer::Base.deliveries).not_to be_empty
+        expect(Organization.count).to eq(1)
+        organization = Organization.where(name: "a new org").first
+        expect(response).to redirect_to organization_manage_index_path(organization_id: organization.to_param)
+        expect(organization.approved).to be_truthy
+        expect(organization.api_access_approved).to be_falsey
+        expect(organization.auto_user_id).to eq(user.id)
+        expect(organization.memberships.count).to eq(1)
+        expect(organization.memberships.first.user_id).to eq(user.id)
+        expect(organization.kind).to eq "property_management"
+      end
     end
 
     it "Doesn't xss" do
       expect(Organization.count).to eq(0)
       user = FactoryBot.create(:user_confirmed)
       set_current_user(user)
-      org_attrs = {
-        name: '<script>alert(document.cookie)</script>',
-        website: '<script>alert(document.cookie)</script>',
-        org_type: 'shop',
-        api_access_approved: 'true'
-      }
-      post :create, organization: org_attrs
+      post :create, organization: org_attrs.merge(name: "<script>alert(document.cookie)</script>",
+                                                  website: "<script>alert(document.cookie)</script>",
+                                                  kind: "cooooooolll_software")
       expect(Organization.count).to eq(1)
       organization = Organization.last
-      expect(organization.name).not_to eq('<script>alert(document.cookie)</script>')
-      expect(organization.website).not_to eq('<script>alert(document.cookie)</script>')
-    end
-
-    it 'mails us' do
-      Sidekiq::Testing.inline! do
-        user = FactoryBot.create(:user_confirmed)
-        set_current_user(user)
-        org_attrs = {
-          name: 'a new org',
-          org_type: 'shop',
-          api_access_approved: 'true'
-        }
-        ActionMailer::Base.deliveries = []
-        post :create, organization: org_attrs
-        expect(ActionMailer::Base.deliveries).not_to be_empty
-      end
+      expect(organization.name).not_to eq("<script>alert(document.cookie)</script>")
+      expect(organization.website).not_to eq("<script>alert(document.cookie)</script>")
+      expect(organization.kind).to eq "other"
     end
   end
 
