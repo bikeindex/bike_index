@@ -52,6 +52,21 @@ describe Admin::GraphsController, type: :controller do
         expect(assigns(:end_at)).to be_within(1.minute).of Time.now
         expect(assigns(:group_period)).to eq "month"
       end
+        context "passed date and time" do
+          let(:end_at) { "2019-01-22T13:48" }
+          let(:start_at) { "2019-01-15T14:48" }
+          it "returns json" do
+            get :variable, kind: "users", start_at: start_at,
+                           end_at: end_at, timezone: "America/Los_Angeles"
+            expect(response.status).to eq(200)
+            json_result = JSON.parse(response.body)
+            expect(json_result.keys.count).to be > 0
+            Time.zone = TimeParser.parse_timezone("America/Los_Angeles")
+            expect(assigns(:start_at).strftime("%Y-%m-%dT%H:%M")).to eq start_at
+            expect(assigns(:end_at).strftime("%Y-%m-%dT%H:%M")).to eq end_at
+            expect(assigns(:group_period)).to eq "day"
+          end
+        end
       context "payments" do
       let!(:payment) { FactoryBot.create(:payment)}
         it "returns json" do
