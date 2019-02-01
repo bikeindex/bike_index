@@ -18,7 +18,7 @@ class Admin::GraphsController < Admin::BaseController
     end
     if chart_data.present?
       p "!!!"
-      p chart_data.keys.first.is_a?(String)
+      p chart_data.keys.first.is_a?(Date)
       render json: chart_data
     else
       render json: { error: "unable to parse chart" }
