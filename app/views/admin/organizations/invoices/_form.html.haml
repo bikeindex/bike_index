@@ -67,19 +67,25 @@
               Discount
             %td
               $<span id="discountCost"></span>
-
+    .row-fluid
+      .span6
+        .control-group
+          = f.label :subscription_start_at, "Coverage starts", class: "control-label"
+          .controls
+            - @invoice.subscription_start_at = TimeParser.round(@invoice.subscription_start_at || Time.now, "seconds")
+            = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
+            = f.datetime_local_field :subscription_start_at, step: 60, required: true, class: "form-control"
+        - if @invoice.id.present? && @invoice.subscription_start_at.present?
+          .control-group
+            = f.label :subscription_end_at, "Coverage ends", class: "control-label"
+            .controls
+              - @invoice.subscription_end_at = TimeParser.round(@invoice.subscription_end_at || Time.now, "seconds")
+              = f.datetime_local_field :subscription_end_at, step: 60, required: true, class: "form-control"
+      .span6
+        .control-group
+          = f.label :notes, class: "control-label"
+          .controls
+            = f.text_area :notes, rows: 4, style: "width: 100%;"
     .control-group
-      = label :subscription_start_at, "Coverage starts", class: "control-label"
-      .controls
-        - @invoice.subscription_start_at = TimeParser.round(@invoice.subscription_start_at || Time.now, "seconds")
-        = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
-        = f.datetime_local_field :subscription_start_at, step: 60, required: true, class: "form-control"
-    - if @invoice.id.present? && @invoice.subscription_start_at.present?
-      .control-group
-        = label :subscription_end_at, "Coverage ends", class: "control-label"
-        .controls
-          - @invoice.subscription_end_at = TimeParser.round(@invoice.subscription_end_at || Time.now, "seconds")
-          = f.datetime_local_field :subscription_end_at, step: 60, required: true, class: "form-control"
-    .control-group
-    = f.submit "Save", class: 'button-green'
+      = f.submit "Save", class: 'button-green'
 

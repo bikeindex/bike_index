@@ -10,7 +10,8 @@ describe Admin::Organizations::InvoicesController, type: :controller do
       paid_feature_ids: [paid_feature1.id, paid_feature2.id].join(","),
       amount_due: "1220",
       timezone: "EST",
-      subscription_start_at: "2018-09-05T23:00:00"
+      subscription_start_at: "2018-09-05T23:00:00",
+      notes: "some cool note about when something was paid"
     }
   end
   context "super admin" do
@@ -42,6 +43,7 @@ describe Admin::Organizations::InvoicesController, type: :controller do
         expect(invoice.amount_due).to eq 1220
         # TimeParser isn't storing records perfectly - for now, just ignoring since fix can be separate
         expect(invoice.subscription_start_at.to_i).to be_within(1.day).of 1536202800
+        expect(invoice.notes).to eq params[:notes]
       end
     end
 
@@ -59,6 +61,7 @@ describe Admin::Organizations::InvoicesController, type: :controller do
         # TimeParser isn't storing records perfectly - for now, just ignoring since fix can be separate
         expect(invoice.subscription_start_at.to_i).to be_within(1.day).of 1536202800
         expect(invoice.subscription_end_at.to_i).to be_within(1.day).of 1562385600
+        expect(invoice.notes).to eq params[:notes]
       end
       context "create_following_invoice" do
         let!(:invoice) { FactoryBot.create(:invoice, organization: organization, subscription_start_at: Time.now - 2.years, force_active: true) }
@@ -69,6 +72,7 @@ describe Admin::Organizations::InvoicesController, type: :controller do
           invoice.reload
           following_invoice = invoice.following_invoice
           expect(following_invoice.previous_invoice).to eq invoice
+          expect(following_invoice.notes).to be_nil
         end
       end
     end
