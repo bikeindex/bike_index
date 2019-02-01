@@ -109,6 +109,12 @@ RSpec.describe BikeCode, type: :model do
     end
   end
 
+  describe "next_unassigned" do
+    it "finds next unassigned" do
+      fail
+    end
+  end
+
   describe "claim" do
     let(:bike) { FactoryBot.create(:bike) }
     let(:user) { FactoryBot.create(:user) }

@@ -54,12 +54,12 @@ class Export < ActiveRecord::Base
 
   def headers; options["headers"] end
 
-  def option?(str)
-    options[str.to_s].present?
-  end
+  def avery_export?; option?("avery_export") end
 
-  def avery_export?
-    option?("avery_export")
+  def assign_bike_codes?; option?("bike_code_start").present? end
+
+  def option?(str);
+    options[str.to_s].present?
   end
 
   def avery_export=(val)
@@ -68,6 +68,11 @@ class Export < ActiveRecord::Base
       self.attributes = { file_format: "xlsx", headers: AVERY_HEADERS }
     end
     true # Legacy concerns, so excited for TODO: Rails 5 update
+  end
+
+  def bike_code_start=(val)
+    return true unless val.present?
+    self.options = options.merge(bike_code_start: BikeCode.normalize_code(val))
   end
 
   def avery_export_url

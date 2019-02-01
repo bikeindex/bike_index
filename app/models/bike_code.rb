@@ -42,6 +42,7 @@ class BikeCode < ActiveRecord::Base
   end
 
   def claimed?; bike_id.present? end
+
   def unclaimed?; !claimed? end
 
   def url
@@ -50,6 +51,9 @@ class BikeCode < ActiveRecord::Base
       organization.present? ? "?organization_id=#{organization.slug}" : nil
    ].compact.join("")
  end
+
+  def next_code
+  end
 
   def claimable_by?(user)
     return false unless user.present?
