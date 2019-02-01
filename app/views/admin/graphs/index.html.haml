@@ -49,6 +49,7 @@
     = line_chart bikes_admin_graphs_path
 
 - else
+  = select(:email, :status,{ "Past day" => "past_day", "Past week" => "past_week", "Past month"=>"past_month", "Past six months" => "past_6_months", "Past year" => "past_year", "Custom" => "custom"})
   = form_tag admin_graphs_path, method: :get, class: "variable-admin-graphs-form" do
     = hidden_field_tag :kind, @kind
     = hidden_field_tag :timezone, "", class: "hiddenFieldTimezone"
