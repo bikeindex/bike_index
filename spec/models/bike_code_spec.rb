@@ -4,12 +4,15 @@ RSpec.describe BikeCode, type: :model do
   describe "normalize_code" do
     let(:url) { "https://bikeindex.org/bikes/scanned/000012?organization_id=palo-party" }
     let(:url2) { "bikeindex.org/bikes/000012/scanned?organization_id=bikeindex" }
-    let(:url2) { "www.bikeindex.org/bikes/12/scanned?organization_id=bikeindex" }
+    let(:url3) { "www.bikeindex.org/bikes/12/scanned?organization_id=bikeindex" }
+    let(:url4) { "https://bikeindex.org/bikes/scanned/000012/" }
     let(:code) { "bike_code999" }
     it "strips the right stuff" do
       expect(BikeCode.normalize_code(code)).to eq "BIKE_CODE999"
       expect(BikeCode.normalize_code(url)).to eq "12"
       expect(BikeCode.normalize_code(url2)).to eq "12"
+      expect(BikeCode.normalize_code(url3)).to eq "12"
+      expect(BikeCode.normalize_code(url4)).to eq "12"
     end
   end
 

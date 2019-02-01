@@ -20,9 +20,9 @@ class BikeCode < ActiveRecord::Base
   def self.normalize_code(str = nil)
     return nil unless str.present?
     code = str.to_s.upcase.strip
-    if code.match(/BIKEINDEX.ORG/)
-      code = code.gsub(/\A.*BIKEINDEX.ORG\/BIKES/, "").gsub(/\?.*/, "") # Remove the start and query string
-      code = code.gsub(/\/SCANNED\/?/, "").gsub(/\A\//, "") # Remove scanned, wherever it is, and a trailing / if it exists
+    if code.match?(/BIKEINDEX.ORG/)
+      code = code.gsub(%r{\A.*BIKEINDEX.ORG/BIKES}, "").gsub(/\?.*/, "") # Remove the start and query string
+      code = code.gsub(%r{/SCANNED/?}, "").gsub(%r{(\A/)|(/\z)}, "") # Remove scanned, wherever it is, and a trailing / if it exists
     end
     code.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them
   end
