@@ -1504,7 +1504,6 @@ CREATE TABLE public.organizations (
     deleted_at timestamp without time zone,
     is_suspended boolean DEFAULT false NOT NULL,
     auto_user_id integer,
-    org_type character varying(255) DEFAULT 'shop'::character varying NOT NULL,
     access_token character varying(255),
     new_bike_notification text,
     api_access_approved boolean DEFAULT false NOT NULL,
@@ -4097,4 +4096,6 @@ INSERT INTO schema_migrations (version) VALUES ('20181213224936');
 INSERT INTO schema_migrations (version) VALUES ('20190110210704');
 
 INSERT INTO schema_migrations (version) VALUES ('20190201193608');
+
+INSERT INTO schema_migrations (version) VALUES ('20190201214042');
 
