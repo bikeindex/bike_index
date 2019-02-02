@@ -1,5 +1,6 @@
 import * as log from "loglevel";
 if (process.env.NODE_ENV != "production") log.setLevel("debug");
+import moment from "moment-timezone";
 
 window.BinxAdmin = class BinxAdmin {
   init() {
@@ -14,3 +15,10 @@ window.BinxAdmin = class BinxAdmin {
     }
   }
 };
+
+$( document ).ready(function() {
+    $("select#graph_date_option_choice").on("click", e => {
+      e.preventDefault();
+      console.log($(this))
+    })
+});
