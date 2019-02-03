@@ -34,7 +34,7 @@ class DocumentationController < ApplicationController
 
   def render_swagger_for_page
     if current_user.present?
-      @applications = current_user.oauth_applications.reorder(:created_at)
+      @applications = current_user.oauth_applications.reorder(created_at: :desc)
     else
       cookies[:return_to] = api_v3_documentation_index_url
     end
