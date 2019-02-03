@@ -1,4 +1,4 @@
-- applications = Doorkeeper::Application.order("created_at desc")
+- applications = Doorkeeper::Application.order(created_at: :desc)
 %hr.margined
 
 %h1.margined.padded
@@ -26,7 +26,8 @@
     - applications.each do |application|
       %tr{:id => "application_#{application.id}"}
         %td
-          =l application.created_at, format: :short_with_hour
+          %span.convertTime
+            = l application.created_at, format: :convert_time
         %td
           .less-strong-hold
             = application.name
@@ -38,11 +39,11 @@
           - else
             no owner
         %td
-          .less-strong-hold
+          %small.less-strong-hold
             = application.redirect_uri
             %br
           
-            %span.less-strong-right
-              #{link_to "view", oauth_application_url(application)} | #{link_to 'edit', edit_oauth_application_url(application)}
+          %span.less-strong-right
+            #{link_to "view", oauth_application_url(application)} | #{link_to 'edit', edit_oauth_application_url(application)}
         %td
           = application.access_tokens.count
