@@ -4,6 +4,7 @@ import moment from "moment-timezone";
 
 window.BinxAdmin = class BinxAdmin {
   init() {
+    console.log(window.location)
     // If there is an element on the page with id pageContainerFluid, make the page container full width
     if ($("#pageContainerFluid").length) {
       $("#admin-content > .receptacle").css("max-width", "100%");
@@ -13,12 +14,10 @@ window.BinxAdmin = class BinxAdmin {
         .parents(".receptacle")
         .css("max-width", "100%");
     }
+    //if on graphs page, use init graphs
   }
+      initGraphs(){
+        $("select#graph_date_option_choice").on("click", e => {
+          e.preventDefault();
+        });
 };
-
-$( document ).ready(function() {
-    $("select#graph_date_option_choice").on("click", e => {
-      e.preventDefault();
-      console.log($(this))
-    })
-});
