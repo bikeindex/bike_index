@@ -1,5 +1,6 @@
 import * as log from "loglevel";
 if (process.env.NODE_ENV != "production") log.setLevel("debug");
+import moment from "moment-timezone";
 
 window.BinxAdmin = class BinxAdmin {
   init() {
