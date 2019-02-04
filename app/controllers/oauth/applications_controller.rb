@@ -5,7 +5,7 @@ module Oauth
     before_filter :ensure_app_owner!, except: [:index, :new, :create]
 
     def index
-      @applications = current_user.oauth_applications
+      @applications = current_user.oauth_applications.order(created_at: :desc)
     end
 
     # only needed if each application must have some owner

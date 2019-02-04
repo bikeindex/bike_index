@@ -6,6 +6,7 @@
 %table.table.table-striped.margined
   %thead
     %tr
+      %th Created
       %th Name
       %th Callback URL
       %th
@@ -14,9 +15,13 @@
     - @applications.each do |application|
       %tr{:id => "application_#{application.id}"}
         %td
+          %span.convertTime
+            = l application.created_at, format: :convert_time
+        %td
           = application.name
         %td
-          = application.redirect_uri
+          %small
+            = application.redirect_uri
         %td
           = link_to "View", oauth_application_url(application), class: 'btn binxbtn-default'
         %td

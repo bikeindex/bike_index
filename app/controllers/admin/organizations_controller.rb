@@ -8,7 +8,7 @@ class Admin::OrganizationsController < Admin::BaseController
     orgs = Organization.all
     orgs = orgs.paid if params[:is_paid].present?
     orgs = orgs.admin_text_search(params[:query]) if params[:query].present?
-    orgs = orgs.where(kind: params[:kind]) if params[:kind].present?
+    orgs = orgs.where(kind: kind_for_organizations) if params[:kind].present?
     @organizations = orgs.reorder("#{@sort} #{@sort_direction}").page(page).per(per_page)
     @organizations_count = orgs.count
   end
@@ -84,6 +84,11 @@ class Admin::OrganizationsController < Admin::BaseController
     @sort = 'created_at' unless %w(name created_at approved).include?(@sort)
     @sort_direction = params[:sort_direction]
     @sort_direction = 'desc' unless %w(asc desc).include?(@sort_direction)
+  end
+
+  def kind_for_organizations
+    # Legacy enum issue so excited for TODO: Rails 5 update
+    Organization::KIND_ENUM[params[:kind].to_sym] || 0
   end
 
   def permitted_locations_params
