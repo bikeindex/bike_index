@@ -16,7 +16,7 @@ window.BinxAdmin = class BinxAdmin {
   }
   initGraphs() {
     if (window.location.href.match('\\admin/graphs')){
-      console.log("Why")
+      
     }
   }
 };
