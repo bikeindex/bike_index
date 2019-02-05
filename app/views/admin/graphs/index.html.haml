@@ -52,9 +52,9 @@
   = form_tag admin_graphs_path, method: :get, class: "variable-admin-graphs-form" do
     = hidden_field_tag :kind, @kind
     = hidden_field_tag :timezone, "", class: "hiddenFieldTimezone"
-    = hidden_field_tag :graph_time_selection, "", class: "hiddenGraphDate"
+    = hidden_field_tag :current_date, "", class: "hiddenGraphDate"
     %section.graph_time_select
-      = select(:graph_date_option, :choice,{ "Past day" => "1, 'days'", "Past week" => "7, 'days'", "Past month"=>"1, 'months", "Past six months" => "6, 'months", "Past year" => "1, 'years'", "Custom" => "custom"})
+      = select(:graph_date_option, :choice,{ "Past day" => "Past day", "Past week" => "Past week", "Past month"=>"Past month", "Past six months" => "Past 6 months", "Past year" => "Past year", "Custom" => "custom"})
       = submit_tag "Update chart", class: "button-green"
     .clearfix
     - if @custom_date
