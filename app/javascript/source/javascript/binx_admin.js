@@ -17,15 +17,15 @@ window.BinxAdmin = class BinxAdmin {
   }
   initGraphs() {
     if (window.location.href.match('\\admin/graphs')){
-      $('select#graph_date_option_choice').on("change", e => {
-        e.preventDefault();
+      window.onload = function(e) {
         $(".hiddenGraphDate").val(
           moment()
           .startOf("day")
           .format("YYYY-MM-DDTHH:mm")
         )
         console.log($(".hiddenGraphDate")[0].value)
-      });
+      };
     }
   }
 };
+
