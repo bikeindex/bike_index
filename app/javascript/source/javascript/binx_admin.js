@@ -1,6 +1,7 @@
 import * as log from "loglevel";
 if (process.env.NODE_ENV != "production") log.setLevel("debug");
-import moment from "moment-timezone";
+import moment from 'moment';
+// import moment from "moment-timezone";
 
 window.BinxAdmin = class BinxAdmin {
   init() {
@@ -18,12 +19,11 @@ window.BinxAdmin = class BinxAdmin {
     if (window.location.href.match('\\admin/graphs')){
       $('select#graph_date_option_choice').on("change", e => {
         e.preventDefault();
-        let $option = $('select#graph_date_option_choice').val()
         $(".hiddenGraphDate").val(
           moment()
-            .subtract($option)
-            .calendar()
-            .format("YYYY-MM-DDTHH:mm"))
+          .startOf("day")
+          .format("YYYY-MM-DDTHH:mm")
+        )
         console.log($(".hiddenGraphDate")[0].value)
       });
     }
