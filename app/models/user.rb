@@ -217,7 +217,9 @@ class User < ActiveRecord::Base
   end
 
   def bikes(user_hidden=true)
-    Bike.unscoped.where(id: bike_ids(user_hidden))
+    Bike.unscoped
+    .includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record, :cycle_type)
+    .where(id: bike_ids(user_hidden))
   end
 
   def rough_approx_bikes # Rough fix for users with large numbers of bikes
@@ -225,7 +227,7 @@ class User < ActiveRecord::Base
   end
 
   def bike_ids(user_hidden=true)
-    ows = ownerships.where(example: false).where(current: true)
+    ows = ownerships.includes(:bike).where(example: false, current: true)
     if user_hidden
       ows = ows.map{ |o| o.bike_id if o.user_hidden || o.bike }
     else

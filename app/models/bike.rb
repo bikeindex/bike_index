@@ -64,7 +64,11 @@ class Bike < ActiveRecord::Base
 
   attr_writer :phone, :user_name # reading is managed by a method
 
-  default_scope { where(example: false).where(hidden: false).order('listing_order desc') }
+  default_scope { 
+    includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record, :cycle_type)
+    .where(example: false, hidden: false)
+    .order('listing_order desc') 
+  }
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
   scope :with_serial, -> { where('serial_number != ?', 'absent') }

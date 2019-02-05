@@ -46,13 +46,21 @@ Rails.application.configure do
   config.assets.raise_runtime_errors = true
 
   config.lograge.enabled = true
-  config.log_level = :info
+  config.log_level = :debug
   config.lograge.formatter = Lograge::Formatters::Logstash.new # Use logstash format
   config.lograge.custom_options = lambda do |event|
     {
       remote_ip: event.payload[:ip],
       params: event.payload[:params].except('controller', 'action', 'format', 'id')
     }
+  end
+
+  # Bullet for n+1's
+  config.after_initialize do
+    Bullet.enable = true
+    Bullet.bullet_logger = true
+    Bullet.console = true
+    Bullet.rails_logger = true
   end
 
   # Raises error for missing translations

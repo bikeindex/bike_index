@@ -67,6 +67,9 @@ GEM
       autoprefixer-rails (>= 6.0.3)
       sass (>= 3.4.19)
     builder (3.2.3)
+    bullet (5.9.0)
+      activesupport (>= 3.0.0)
+      uniform_notifier (~> 1.11)
     carrierwave (0.11.2)
       activemodel (>= 3.2.0)
       activesupport (>= 3.2.0)
@@ -312,6 +315,8 @@ GEM
     pry (0.12.2)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
+    pry-rails (0.3.9)
+      pry (>= 0.10.4)
     rack (1.6.11)
     rack-accept (0.4.5)
       rack (>= 0.4)
@@ -508,6 +513,7 @@ GEM
     unicorn-worker-killer (0.4.4)
       get_process_mem (~> 0)
       unicorn (>= 4, < 6)
+    uniform_notifier (1.12.1)
     user_agent_parser (2.3.0)
     vcr (4.0.0)
     vegas (0.1.11)
@@ -543,6 +549,7 @@ DEPENDENCIES
   backbone-on-rails (~> 0.9.10.0)
   bcrypt (~> 3.1.7)
   bootstrap (~> 4.0.0.alpha3)
+  bullet
   bundler (>= 1.8.4)
   carrierwave
   carrierwave_backgrounder
@@ -593,6 +600,7 @@ DEPENDENCIES
   pg
   pg_search
   premailer-rails
+  pry-rails
   rack-contrib
   rack-mini-profiler
   rack-throttle

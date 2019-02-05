@@ -3078,6 +3078,13 @@ CREATE INDEX index_bikes_on_cycle_type_id ON public.bikes USING btree (cycle_typ
 
 
 --
+-- Name: index_bikes_on_listing_order; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_listing_order ON public.bikes USING btree (listing_order DESC);
+
+
+--
 -- Name: index_bikes_on_manufacturer_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4098,4 +4105,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190110210704');
 INSERT INTO schema_migrations (version) VALUES ('20190201193608');
 
 INSERT INTO schema_migrations (version) VALUES ('20190201214042');
+
+INSERT INTO schema_migrations (version) VALUES ('20190206044915');
 
