@@ -16,7 +16,16 @@ window.BinxAdmin = class BinxAdmin {
   }
   initGraphs() {
     if (window.location.href.match('\\admin/graphs')){
-      
+      $('select#graph_date_option_choice').on("change", e => {
+        e.preventDefault();
+        let $option = $('select#graph_date_option_choice').val()
+        $(".hiddenGraphDate").val(
+          moment()
+            .subtract($option)
+            .calendar()
+            .format("YYYY-MM-DDTHH:mm"))
+        console.log($(".hiddenGraphDate")[0].value)
+      });
     }
   }
 };
