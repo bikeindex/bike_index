@@ -60,6 +60,19 @@ class Export < ActiveRecord::Base
 
   def assign_bike_codes?; bike_code_start.present? end
 
+  def bike_codes_removed?; option?("bike_codes_removed") end
+
+  # 'options' is a weird place to put the assigned bike_codes - but whatever, it's there, just using it
+  def bike_codes; options["bike_codes_assigned"] || [] end
+
+  def remove_bike_codes!
+    return true unless assign_bike_codes? && !bike_codes_removed?
+    bike_codes.each do |code|
+      BikeCode.lookup(code, organization_id: organization_id)&.unclaim!
+    end
+    update_attribute :options, options.merge(bike_codes_removed: true)
+  end
+
   def option?(str)
     options[str.to_s].present?
   end

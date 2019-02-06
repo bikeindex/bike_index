@@ -77,6 +77,8 @@ describe OrganizationExportWorker do
           expect(export.rows).to eq 1 # The bike without a user_name and address isn't exported
           expect(export.file.read).to eq(csv_string)
           expect(export.written_headers).to eq(%w[owner_name address city state zipcode sticker])
+          expect(export.bike_codes).to eq(["A1111"])
+          expect(export.bike_codes_removed?).to be_falsey
           bike_code.reload
           expect(bike_code.claimed?).to be_truthy
           expect(bike_code.bike).to eq bike_for_avery

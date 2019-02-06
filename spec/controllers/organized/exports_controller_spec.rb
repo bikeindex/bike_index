@@ -193,5 +193,31 @@ describe Organized::ExportsController, type: :controller do
         end
       end
     end
+
+    describe "update bike_codes_removed" do
+      let(:export) { FactoryBot.build(:export_avery, progress: "pending", file: nil, bike_code_start: "z ", organization: organization, user: user) }
+      let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization) }
+      let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "z") }
+      it "removes the bike codes" do
+        export.options = export.options.merge(bike_codes_assigned: ["Z"])
+        bike_code.claim(user, bike.id, claiming_bike: bike)
+        export.save
+        export.reload
+        bike_code.reload
+        expect(export.assign_bike_codes?).to be_truthy
+        expect(export.bike_codes).to eq(["Z"])
+        expect(export.bike_codes_removed?).to be_falsey
+        expect(bike_code.claimed?).to be_truthy
+        expect(bike_code.bike).to eq bike
+        put :update, organization_id: organization.to_param, id: export.id, remove_bike_codes: true
+        export.reload
+        bike_code.reload
+        expect(export.assign_bike_codes?).to be_truthy
+        expect(export.bike_codes).to eq(["Z"])
+        expect(export.bike_codes_removed?).to be_truthy
+        expect(bike_code.claimed?).to be_falsey
+        expect(bike_code.bike).to be_nil
+      end
+    end
   end
 end
