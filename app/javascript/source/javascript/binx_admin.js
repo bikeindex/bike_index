@@ -4,6 +4,10 @@ import moment from 'moment';
 // import moment from "moment-timezone";
 
 window.BinxAdmin = class BinxAdmin {
+  initGraph() {
+    console.debug("Hello")
+  }
+
   init() {
     // If there is an element on the page with id pageContainerFluid, make the page container full width
     if ($("#pageContainerFluid").length) {
@@ -14,18 +18,8 @@ window.BinxAdmin = class BinxAdmin {
         .parents(".receptacle")
         .css("max-width", "100%");
     }
-  }
-  initGraphs() {
     if (window.location.href.match('\\admin/graphs')){
-      window.onload = function(e) {
-        $(".hiddenGraphDate").val(
-          moment()
-          .startOf("day")
-          .format("YYYY-MM-DDTHH:mm")
-        )
-        console.log($(".hiddenGraphDate")[0].value)
-      };
-    }
+      console.debug("Hello")
+    };
   }
 };
-

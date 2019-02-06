@@ -101,7 +101,6 @@ $(document).ready(function() {
       if ($("#admin-content").length > 0) {
         window.binxAdmin = new BinxAdmin();
         binxAdmin.init();
-        binxAdmin.initGraphs();
       }
   }
 });
