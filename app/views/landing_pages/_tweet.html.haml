@@ -1,7 +1,7 @@
 - tweet_id ||= nil # ensure we don't explode when not passed key thing
 - tweet = Tweet.friendly_find(tweet_id)
 - if tweet.present?
-  .landing-page-tweet
+  .embeded-tweet
     = image_tag tweet.image
     .tweet-display{ class: "tweet-align-#{tweet.alignment}" }
       %a.tweetor-header{ href: tweet.tweetor_link, target: '_blank' }
