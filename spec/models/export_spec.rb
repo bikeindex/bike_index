@@ -74,10 +74,14 @@ RSpec.describe Export, type: :model do
       expect(export.avery_export?).to be_truthy
       expect(export.avery_export_url).to be_nil
       expect(export.assign_bike_codes?).to be_falsey
+      expect(export.bike_codes).to eq([])
+      expect(export.bike_codes_removed?).to be_falsey
       export.progress = :finished
       expect(export.avery_export_url).to eq target_url
       export.options = export.options.merge(bike_code_start: "1111")
       expect(export.assign_bike_codes?).to be_truthy
+      expect(export.bike_codes).to eq([])
+      expect(export.bike_codes_removed?).to be_falsey
     end
   end
 

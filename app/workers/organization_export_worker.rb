@@ -13,6 +13,7 @@ class OrganizationExportWorker
     write_spreadsheet(@export.file_format, @export.tmp_file)
     @export.file = @export.tmp_file
     @export.progress = "finished"
+    @export.options = @export.options.merge(bike_codes_assigned: @bike_codes) if @export.assign_bike_codes?
     @export.save
     @export.tmp_file.unlink # Remove it and unlink
     @export
@@ -84,6 +85,7 @@ class OrganizationExportWorker
     end
     if @export.assign_bike_codes?
       @export_headers << "sticker"
+      @bike_codes = []
       @bike_code = BikeCode.lookup(@export.bike_code_start, organization_id: @export.organization_id)
     end
     @export.options = @export.options.merge(written_headers: @export_headers) # Write the actual headers so we have them
@@ -119,6 +121,7 @@ class OrganizationExportWorker
     return "" unless @bike_code.present?
     code = @bike_code.code
     @bike_code.claim(@export.user, bike.id, claiming_bike: bike)
+    @bike_codes << code
     @bike_code = @bike_code.next_unclaimed_code
     code
   end

@@ -1,7 +1,7 @@
 module Organized
   class ExportsController < Organized::BaseController
     before_action :ensure_access_to_exports!
-    before_action :find_export, only: %i[show destroy]
+    before_action :find_export, except: %i[index new create]
 
     def index
       @page = params[:page] || 1
@@ -41,6 +41,16 @@ module Organized
         @export ||= Export.new
         render :new
       end
+    end
+
+    def update
+      if params[:remove_bike_codes] && @export.assign_bike_codes?
+        @export.remove_bike_codes!
+        flash[:success] = "Bike codes removed!"
+      else
+        flash[:error] = "Unknown update action!"
+      end
+      redirect_to organization_export_path(organization_id: current_organization.to_param, id: @export.id)
     end
 
     def destroy
