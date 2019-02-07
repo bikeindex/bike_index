@@ -122,21 +122,6 @@ class Admin::GraphsController < Admin::BaseController
     values
   end
 
-  def set_start_time
-    if params[:graph_date_option][:choice] == "Past day"
-      time = TimeParser.parse(params[:current_date]) - 1.day
-    elsif params[:graph_date_option][:choice] == "Past week"
-      time = TimeParser.parse(params[:current_date]) - 7.day
-    elsif params[:graph_date_option][:choice] == "Past month"
-      time = TimeParser.parse(params[:current_date]) - 1.month
-    elsif params[:graph_date_option][:choice] == "Past 6 months"
-      time = TimeParser.parse(params[:current_date]) - 6.month
-    elsif params[:graph_date_option][:choice] == "Past year"
-      time = TimeParser.parse(params[:current_date]) - 365.day
-    end
-    time
-  end
-
   def bikes_value(date)
     Ownership.where(["created_at < ?", date.end_of_month.end_of_day]).count
   end
