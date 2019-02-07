@@ -66,7 +66,6 @@
         .controls
           = datetime_local_field_tag :end_at, @end_at.strftime("%Y-%m-%dT%H:%M"), step: 60
       .control-group{ style: "padding-top: 19px" }
-        = submit_tag "Update chart", class: "button-green"
     = line_chart variable_admin_graphs_path(params)
     %em.small.less-strong
       graph is grouped by #{@group_period}
