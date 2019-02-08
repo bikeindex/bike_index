@@ -17,7 +17,6 @@ class Admin::GraphsController < Admin::BaseController
                        .count
     end
     if chart_data.present?
-      p "hi"
       render json: chart_data
     else
       render json: { error: "unable to parse chart" }
