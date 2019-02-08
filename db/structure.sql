@@ -341,7 +341,8 @@ CREATE TABLE public.bulk_imports (
     no_notify boolean DEFAULT false,
     import_errors json DEFAULT '{}'::json,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    is_ascend boolean DEFAULT false
 );
 
 
@@ -1518,7 +1519,8 @@ CREATE TABLE public.organizations (
     show_partial_registrations boolean DEFAULT false NOT NULL,
     paid_feature_slugs jsonb,
     parent_organization_id integer,
-    kind integer
+    kind integer,
+    ascend_name character varying
 );
 
 
@@ -4107,4 +4109,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190201193608');
 INSERT INTO schema_migrations (version) VALUES ('20190201214042');
 
 INSERT INTO schema_migrations (version) VALUES ('20190206044915');
+
+INSERT INTO schema_migrations (version) VALUES ('20190208195902');
 

@@ -14,16 +14,17 @@ class BulkImport < ActiveRecord::Base
   scope :line_errors, -> { where("(import_errors -> 'line') is not null") }
   scope :no_bikes, -> { where("(import_errors -> 'bikes') is not null") }
   scope :with_bikes, -> { where.not("(import_errors -> 'bikes') is not null") }
+  scope :ascend, -> { where(is_ascend: true) }
 
   before_save :set_calculated_attributes
 
-  def file_import_errors
-    import_errors["file"]
+  def self.ascend_api_token
+    ENV["ASCEND_API_TOKEN"]
   end
 
-  def line_import_errors
-    import_errors["line"]
-  end
+  def file_import_errors; import_errors["file"] end
+
+  def line_import_errors; import_errors["line"] end
 
   def file_import_errors_with_lines
     return nil unless file_import_errors.present?
@@ -31,25 +32,21 @@ class BulkImport < ActiveRecord::Base
   end
 
   # Always return an array, because it's simpler to deal with - NOTE: different from above error methods which return nil
-  def file_import_error_lines
-    import_errors["file_lines"] || []
-  end
+  def file_import_error_lines; import_errors["file_lines"] || [] end
 
+  def import_errors?; line_import_errors.present? || file_import_errors.present? end
 
-  def import_errors?
-    line_import_errors.present? || file_import_errors.present?
-  end
+  def no_bikes?; import_errors["bikes"] == "none_imported" end
 
-  def no_bikes?
-    import_errors["bikes"] == "none_imported"
-  end
+  def ascend?; is_ascend end
 
-  def add_file_error(error_msg, line_error = "")
+  def add_file_error(error_msg, line_error = "", skip_save: false)
     self.progress = "finished"
     updated_file_error_data = {
       "file" => [file_import_errors, error_msg.to_s].compact.flatten,
       "file_lines" => [file_import_error_lines, line_error].flatten
     }
+    return true if skip_save # Don't get stuck in a loop during creation
     # Using update_attribute here to avoid validation checks that sometimes block updating postgres json in rails
     update_attribute :import_errors, (import_errors || {}).merge(updated_file_error_data)
   end
@@ -65,7 +62,7 @@ class BulkImport < ActiveRecord::Base
   end
 
   def creator
-    organization && organization.auto_user || user
+    organization&.auto_user || user
   end
 
   def filename
@@ -77,8 +74,11 @@ class BulkImport < ActiveRecord::Base
   end
 
   def set_calculated_attributes
+    self.is_ascend = false unless is_ascend # Ensure no null
+    # we're managing ascend errors separately because we need to lookup organization
+    return true if ascend? && organization_id.blank?
     unless creator.present?
-      add_file_error("Needs to have a user or an organization with an auto user")
+      add_file_error("Needs to have a user or an organization with an auto user", skip_save: true)
     end
     if finished? && bikes.count == 0
       import_errors["bikes"] = "none_imported"

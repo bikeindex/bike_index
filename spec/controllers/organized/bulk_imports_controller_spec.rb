@@ -164,12 +164,47 @@ describe Organized::BulkImportsController, type: :controller do
               expect(json_result["success"]).to be_present
 
               bulk_import = BulkImport.last
+              expect(bulk_import.is_ascend).to be_falsey
               expect(bulk_import.user).to eq organization.auto_user
               expect(bulk_import.file_url).to be_present
               expect(bulk_import.progress).to eq "pending"
               expect(bulk_import.organization).to eq organization
               expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
               expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+            end
+          end
+          context "ascend token" do
+            before { allow(BulkImport).to receive(:ascend_api_token) { "XXXZZZ" } }
+            it "returns JSON message" do
+              request.headers["Authorization"] = "a9s0dfsdf" # Rspec doesn't support headers key here. TODO: Rails 5 update
+              expect do
+                post :create, organization_id: "ascend", file: file
+              end.to change(BulkImport, :count).by 0
+              expect(response.status).to eq(401)
+              json_result = JSON.parse(response.body)
+              expect(json_result["error"]).to be_present
+            end
+            context "valid ascend token" do
+              it "returns JSON message" do
+                request.headers["Authorization"] = "XXXZZZ" # Rspec doesn't support headers key here. TODO: Rails 5 update
+                expect do
+                  post :create, organization_id: "ascend", file: file
+                end.to change(BulkImport, :count).by 1
+                expect(response.status).to eq(201)
+                json_result = JSON.parse(response.body)
+                expect(json_result["success"]).to be_present
+
+                bulk_import = BulkImport.last
+                expect(bulk_import.is_ascend).to be_truthy
+                expect(bulk_import.import_errors?).to be_blank
+                expect(bulk_import.user).to be_blank
+                expect(bulk_import.user).to be_blank
+                expect(bulk_import.file_url).to be_present
+                expect(bulk_import.progress).to eq "pending"
+                expect(bulk_import.organization).to be_blank
+                expect(bulk_import.send_email).to be_truthy # Because no_notify isn't permitted here, only in admin
+                expect(BulkImportWorker).to have_enqueued_sidekiq_job(bulk_import.id)
+              end
             end
           end
         end
