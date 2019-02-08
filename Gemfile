@@ -151,4 +151,5 @@ group :test do
   gem "guard-rubocop", require: false
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
+  gem "airborne"
 end
