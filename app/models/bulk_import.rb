@@ -22,7 +22,7 @@ class BulkImport < ActiveRecord::Base
     ENV["ASCEND_API_TOKEN"]
   end
 
-  def file_import_errors; import_errors["file"] end
+  def file_import_errors; import_errors["file"] || import_errors["ascend"] end
 
   def line_import_errors; import_errors["line"] end
 
@@ -73,6 +73,29 @@ class BulkImport < ActiveRecord::Base
     file&.path&.split("/")&.last
   end
 
+  def ascend_name
+    file_filename.split("_-_").last.gsub(".csv", "")
+  end
+
+  def ascend_import_processable?
+    self.import_errors["ascend"] = nil
+    self.organization_id ||= organization_for_ascend_name&.id
+    return true if organization_id.present?
+    self.import_errors["ascend"] = "Unable to find an Organization with ascend_name = #{ascend_name}"
+    save
+    UnknownOrganizationForAscendImportWorker.perform_async(id)
+    false
+  end
+
+  def organization_for_ascend_name
+    org = Organization.where(ascend_name: ascend_name).first
+    return org if org.present?
+    regex_matcher = ascend_name.gsub(/-|_|\s/, "")
+    Organization.bike_shop.where.not(ascend_name: nil).select do |org|
+      org.ascend_name.present? && org.ascend_name.gsub(/-|_|\s/, "").match(/#{regex_matcher}/i)
+    end.first
+  end
+
   def set_calculated_attributes
     self.is_ascend = false unless is_ascend # Ensure no null
     # we're managing ascend errors separately because we need to lookup organization
@@ -81,7 +104,7 @@ class BulkImport < ActiveRecord::Base
       add_file_error("Needs to have a user or an organization with an auto user", skip_save: true)
     end
     if finished? && bikes.count == 0
-      import_errors["bikes"] = "none_imported"
+      self.import_errors["bikes"] = "none_imported"
     end
     true
   end

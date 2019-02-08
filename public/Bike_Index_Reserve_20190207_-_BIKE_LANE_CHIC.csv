@@ -1,3 +1,1 @@
 manufacturer,model,color,email,serial,year,description,address,phone,secondary_serial,owner_name,frame_size,photo
-"Trek","Roscoe 8","Green","test@bikeindex.org","xyz_test","2019","I love this, it's my favorite","New York, NY, USA","(888) 777-6666"," ",,29,
-"Surly","Midnight Special","White","test2@bikeindex.org","example",,,,,"extra serial number","Sally",M,"https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg"
