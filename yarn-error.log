@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/bin/node /usr/share/yarn/bin/yarn.js add moment
+  /usr/bin/node /usr/share/yarn/bin/yarn.js add jsprettier
 
 PATH: 
   /home/bobby/.rvm/gems/ruby-2.5.1/bin:/home/bobby/.rvm/gems/ruby-2.5.1@global/bin:/usr/share/rvm/rubies/ruby-2.5.1/bin:/usr/share/rvm/bin:/home/bobby/.rvm/gems/ruby-2.5.1/bin:/home/bobby/.rvm/gems/ruby-2.5.1@global/bin:/home/bobby/.local/share/umake/bin:/home/bobby/bin:/home/bobby/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/bobby/.rvm/bin:/snap/bin:/home/bobby/.rvm/bin:/home/bobby/bin
@@ -14,7 +14,17 @@ Platform:
   linux x64
 
 Trace: 
-  Error: EACCES: permission denied, unlink '/home/bobby/code/bike_index/node_modules/.yarn-integrity'
+  Error: https://registry.yarnpkg.com/jsprettier: Not found
+      at Request.params.callback [as _callback] (/usr/share/yarn/lib/cli.js:66255:18)
+      at Request.self.callback (/usr/share/yarn/lib/cli.js:129397:22)
+      at emitTwo (events.js:126:13)
+      at Request.emit (events.js:214:7)
+      at Request.<anonymous> (/usr/share/yarn/lib/cli.js:130369:10)
+      at emitOne (events.js:116:13)
+      at Request.emit (events.js:211:7)
+      at IncomingMessage.<anonymous> (/usr/share/yarn/lib/cli.js:130291:12)
+      at Object.onceWrapper (events.js:313:30)
+      at emitNone (events.js:111:20)
 
 npm manifest: 
   {
@@ -23,7 +33,7 @@ npm manifest:
       "jquery": "^3.3.1",
       "lodash": "^4.17.11",
       "loglevel": "^1.6.1",
-      "moment": "^2.22.2",
+      "moment": "^2.24.0",
       "moment-timezone": "^0.5.23"
     },
     "devDependencies": {
@@ -3432,10 +3442,15 @@ Lockfile:
     dependencies:
       moment ">= 2.9.0"
   
-  "moment@>= 2.9.0", moment@^2.22.2:
+  "moment@>= 2.9.0":
     version "2.22.2"
     resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
     integrity sha1-PCV/mDn8DpP/UxSWMiOeuQeD/2Y=
+  
+  moment@^2.24.0:
+    version "2.24.0"
+    resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
+    integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
   
   move-concurrently@^1.0.1:
     version "1.0.1"

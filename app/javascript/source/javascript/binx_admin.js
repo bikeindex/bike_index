@@ -36,7 +36,7 @@ window.BinxAdmin = class BinxAdmin {
             .subtract(amount, unit)
             .format("YYYY-MM-DDTHH:mm")
           )
-      }
+        }
     });
   }
 };
