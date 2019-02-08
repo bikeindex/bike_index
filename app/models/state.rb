@@ -1,6 +1,8 @@
 class State < ActiveRecord::Base
-  validates_presence_of :name, :abbreviation, :country_id
-  validates_uniqueness_of :name, :abbreviation
+
+  validates :country_id, presence: true
+  validates :name, :abbreviation, uniqueness: true, presence: true
+  validates :name, inclusion: { in: Proc.new { State.valid_names } }
 
   belongs_to :country
   has_many :locations
@@ -15,5 +17,9 @@ class State < ActiveRecord::Base
 
   def self.fuzzy_abbr_find(str)
     str && where("lower(abbreviation) = ?", str.downcase.strip).first
+  end
+
+  def self.valid_names
+    StatesAndCountries.states.map{ |s| s[:name] }
   end
 end
