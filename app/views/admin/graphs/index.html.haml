@@ -56,7 +56,7 @@
     %section.graph_time_select
       = select(:graph_date_option, :choice,{ "Past day" => "1,days", "Past week" => "1,weeks", "Past month"=>"1,months", "Past six months" => "6,months", "Past year" => "1,years", "Custom" => "custom"})
       = submit_tag "Update chart", class: "button-green"
-    .clearfix{style: "display: none"}
+    .clearfix{style: "display: none", id: "calendar-box"}
       .control-group
         = label_tag :start_at, "Start at", class: "control-label"
         .controls

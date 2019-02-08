@@ -26,7 +26,7 @@ window.BinxAdmin = class BinxAdmin {
         $("#calendar-box").slideDown()
       }
       else {
-        $(".clearfix").slideUp()
+        $("#calendar-box").slideUp()
         let $this = $('#start_at')
         let graphSelected = $("select#graph_date_option_choice")[0].value.split(",")
         let amount = Number(graphSelected[0])
