@@ -18,9 +18,7 @@ class BulkImport < ActiveRecord::Base
 
   before_save :set_calculated_attributes
 
-  def self.ascend_api_token
-    ENV["ASCEND_API_TOKEN"]
-  end
+  def self.ascend_api_token; ENV["ASCEND_API_TOKEN"] end
 
   def file_import_errors; import_errors["file"] || import_errors["ascend"] end
 
