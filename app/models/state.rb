@@ -1,8 +1,6 @@
 class State < ActiveRecord::Base
-
-  validates :country_id, presence: true
+  validates :country, presence: true
   validates :name, :abbreviation, uniqueness: true, presence: true
-  validates :name, inclusion: { in: Proc.new { State.valid_names } }
 
   belongs_to :country
   has_many :locations

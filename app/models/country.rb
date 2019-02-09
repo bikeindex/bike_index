@@ -1,7 +1,6 @@
 class Country < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :name, :iso
-  validates :name, inclusion: { in: Proc.new { Country.valid_names } }
 
   has_many :stolen_records
   has_many :locations

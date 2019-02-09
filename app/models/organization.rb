@@ -18,7 +18,7 @@ class Organization < ActiveRecord::Base
   belongs_to :auto_user, class_name: 'User'
 
   has_many :recovered_records, through: :bikes
-  has_many :locations, dependent: :destroy
+  has_many :locations, inverse_of: :organization, dependent: :destroy
   has_many :memberships, dependent: :destroy
   has_many :mail_snippets
   has_many :users, through: :memberships
