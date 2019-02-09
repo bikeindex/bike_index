@@ -92,4 +92,14 @@ describe AdminMailer do
       expect(@mail.body.encoded).to match(@stolen_notification.message)
     end
   end
+
+  describe "unknown_organization_for_ascend_import" do
+    let(:bulk_import) { FactoryBot.create(:bulk_import_ascend) }
+    let(:mail) { AdminMailer.unknown_organization_for_ascend_import(bulk_import) }
+
+    it "renders email" do
+      expect(mail.to).to eq(["lily@bikeindex.org", "craig@bikeindex.org"])
+      expect(mail.subject).to match("Unknown organization for ascend import")
+    end
+  end
 end

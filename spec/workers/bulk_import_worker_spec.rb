@@ -32,6 +32,22 @@ describe BulkImportWorker do
         instance.perform(bulk_import.id)
       end
     end
+    context "bulk import ascend no org" do
+      let(:bulk_import) { FactoryBot.create(:bulk_import_ascend) }
+      it "returns enqueues email, returns true" do
+        Sidekiq::Worker.clear_all
+        bulk_import.reload
+        expect(bulk_import.import_errors?).to be_falsey
+        expect(instance).to_not receive(:register_bike)
+        expect do
+          instance.perform(bulk_import.id)
+        end.to change(UnknownOrganizationForAscendImportWorker.jobs, :count).by 1
+        bulk_import.reload
+        expect(bulk_import.pending?).to be_truthy
+        expect(bulk_import.import_errors?).to be_truthy
+        expect(UnknownOrganizationForAscendImportWorker.jobs.map { |j| j["args"] }.flatten).to eq([bulk_import.id])
+      end
+    end
     context "erroring" do
       let!(:color) { FactoryBot.create(:color, name: "White") }
       after { tempfile.close && tempfile.unlink }
@@ -109,6 +125,29 @@ describe BulkImportWorker do
         expect(bulk_import.no_bikes?).to be_truthy
         expect(bulk_import.import_errors?).to be_falsey
         expect(BulkImport.no_bikes.pluck(:id)).to eq([bulk_import.id])
+      end
+      context "ascend import" do
+        let!(:bulk_import) { FactoryBot.create(:bulk_import_ascend) }
+        let(:organization) { FactoryBot.create(:organization_with_auto_user, ascend_name: "BIKELaneChiC", kind: "bike_shop") }
+        it "resolves error, assigns organization and processes" do
+          bulk_import.check_ascend_import_processable!
+          bulk_import.reload
+          expect(bulk_import.import_errors?).to be_truthy
+          # Create organization here
+          expect(organization).to be_present
+          expect(bulk_import.organization).to_not be_present
+          expect do
+            instance.perform(bulk_import.id)
+          end.to_not change(UnknownOrganizationForAscendImportWorker.jobs, :count)
+          bulk_import.reload
+          expect(bulk_import.no_bikes?).to be_truthy
+          expect(bulk_import.import_errors?).to be_falsey
+          expect(BulkImport.no_bikes.pluck(:id)).to eq([bulk_import.id])
+          expect(bulk_import.organization_id).to eq organization.id
+          expect(bulk_import.creator).to eq organization.auto_user
+          # Only has bikes key - no ascend nil key
+          expect(bulk_import.import_errors.keys).to eq(["bikes"])
+        end
       end
     end
     context "valid file" do

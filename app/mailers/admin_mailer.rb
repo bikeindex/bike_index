@@ -23,6 +23,11 @@ class AdminMailer < ActionMailer::Base
     mail(to: 'bryan@bikeindex.org', bcc: 'contact@bikeindex.org', subject: 'Stolen notification blocked!')
   end
 
+  def unknown_organization_for_ascend_import(bulk_import)
+    @bulk_import = bulk_import
+    mail(to: ["lily@bikeindex.org", "craig@bikeindex.org"], subject: "Unknown organization for ascend import")
+  end
+
   def lightspeed_notification_email(organization, api_key)
     @organization = organization
     @api_key = api_key

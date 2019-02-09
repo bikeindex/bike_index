@@ -19,4 +19,9 @@ class AdminMailerPreview < ActionMailer::Preview
     organization = Organization.last
     AdminMailer.lightspeed_notification_email(organization, 'asdfasdf')
   end
+
+  def unknown_organization_for_ascend_import
+    bulk_import = BulkImport.ascend.last || BulkImport.last
+    AdminMailer.unknown_organization_for_ascend_import(bulk_import)
+  end
 end

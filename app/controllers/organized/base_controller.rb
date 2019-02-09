@@ -16,10 +16,9 @@ module Organized
       redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
     end
 
-    private
-
     def ensure_current_organization!
-      fail ActiveRecord::RecordNotFound unless current_organization.present?
+      return true if current_organization.present?
+      fail ActiveRecord::RecordNotFound
     end
   end
 end

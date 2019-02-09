@@ -2,7 +2,6 @@
   Created:
   %span.convertTime.preciseTime
     = l @bulk_import.created_at, format: :convert_time
-
 %p
   Progress:
   = @bulk_import.progress
@@ -30,7 +29,25 @@
   - else
     None
 
-%hr
+%p
+  Ascend:
+  = @bulk_import.ascend?
+
+- if @bulk_import.ascend_unprocessable?
+  %p.mt-2
+    Bulk Import <span class="text-danger">failed to process</span> because no organization was found with the ascend name of <strong>#{@bulk_import.ascend_name}</strong>
+  %p
+    Fix this by:
+  %ol
+    %li Go to #{link_to "organizations", admin_organizations_path}
+    %li Find the organization this bulk import should have been assigned to
+    %li Edit the organization and add the ascend name <code>#{@bulk_import.ascend_name}</code>
+    %li Return here and click the "reprocess import" button below
+
+.clearfix{ style: "padding: 20px 0;" }
+  = link_to "Reprocess Import", admin_bulk_import_path(@bulk_import, reprocess: true), method: 'PUT', class: "btn btn-secondary pull-right"
+
+%hr.mt-4
 %h2 Errors
 - if @bulk_import.import_errors.present?
   %pre

@@ -11,6 +11,11 @@
 %section
   .dl-holder.padded
     %dl.dl-horizontal
+      - if current_user.developer?
+        %dt ID
+        %dd 
+          %span.less-strong
+            = @organization.id
       %dt Map
       %dd
         - unless @organization.approved
@@ -87,6 +92,17 @@
       = link_to "Edit/Create Invoices", admin_organization_invoices_path(organization_id: @organization.to_param)
     %em.less-strong
       #{@organization.name} has #{pluralize(@organization.invoices.count, "invoice")}
+  - if @organization.bike_shop?
+    %p
+      %span.less-strong
+        POS integration information:
+      %br
+      Ascend name:
+      - if @organization.ascend_name.present?
+        %code
+          = @organization.ascend_name
+      %br
+      %small.less-strong more to come soon...
 
   - if @organization.is_paid
     .well

@@ -1,6 +1,7 @@
 module Organized
   class BulkImportsController < Organized::BaseController
     skip_before_filter :ensure_member!
+    skip_before_filter :ensure_current_organization!, only: [:create]
     skip_before_filter :verify_authenticity_token, only: [:create]
     before_action :ensure_access_to_bulk_import!, except: [:create] # Because this checks ensure_admin
 
@@ -56,17 +57,24 @@ module Organized
 
     def ensure_can_create_import!
       @is_api = request.headers["Authorization"].present?
-      if @is_api
+      unless @is_api
+        verify_authenticity_token
+        return ensure_access_to_bulk_import!
+      end
+
+      if params[:organization_id] == "ascend"
+        @ascend_import = true
+        return true if request.headers["Authorization"] == BulkImport.ascend_api_token
+      else
+        ensure_current_organization!
         @current_user = current_organization.auto_user # Crazy override to make current user work
         return true if request.headers["Authorization"] == current_organization.access_token
-        render json: { error: "Not permitted" }, status: 401 and return
-      else
-        verify_authenticity_token
-        ensure_access_to_bulk_import!
       end
+      render json: { error: "Not permitted" }, status: 401 and return
     end
 
     def ensure_access_to_bulk_import!
+      return unless ensure_current_organization!
       return false unless ensure_admin! # Need to return so we don't double render
       return true if current_user.superuser? # ensure_admin! passes with superuser - this allow superuser to see even if org not enabled
       return true if current_organization.show_bulk_import?
@@ -79,7 +87,15 @@ module Organized
         { file: params[:file] }
       else
         params.require(:bulk_import).permit([:file])
-      end.merge(user_id: (@current_user || current_user).id, organization_id: current_organization&.id)
+      end.merge(creator_attributes)
+    end
+
+    def creator_attributes
+      if @ascend_import
+        { is_ascend: true }
+      else
+        { user_id: (@current_user || current_user).id, organization_id: current_organization&.id }
+      end
     end
   end
 end
