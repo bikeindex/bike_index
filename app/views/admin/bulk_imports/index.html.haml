@@ -41,6 +41,12 @@
           %td
             - if bulk_import.user_id.present?
               = bulk_import.user.display_name
+            - if bulk_import.ascend?
+              %small.less-strong
+                ascend
+              - if bulk_import.ascend_unprocessable?
+                %span.text-danger
+                  Missing Ascend Organization!
           %td
             - if bulk_import.organization.present?
               = link_to bulk_import.organization.name, admin_bulk_imports_url(organization_id: bulk_import.organization_id)

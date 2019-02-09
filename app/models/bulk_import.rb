@@ -40,6 +40,8 @@ class BulkImport < ActiveRecord::Base
 
   def ascend?; is_ascend end
 
+  def ascend_unprocessable?; ascend? && organization_id.blank? end
+
   def add_file_error(error_msg, line_error = "", skip_save: false)
     self.progress = "finished"
     updated_file_error_data = {
@@ -77,8 +79,8 @@ class BulkImport < ActiveRecord::Base
     file_filename.split("_-_").last.gsub(".csv", "")
   end
 
-  def ascend_import_processable?
-    self.import_errors["ascend"] = nil
+  def check_ascend_import_processable!
+    self.import_errors = (import_errors || {}).except("ascend")
     self.organization_id ||= organization_for_ascend_name&.id
     return true if organization_id.present?
     self.import_errors["ascend"] = "Unable to find an Organization with ascend_name = #{ascend_name}"
@@ -100,7 +102,7 @@ class BulkImport < ActiveRecord::Base
   def set_calculated_attributes
     self.is_ascend = false unless is_ascend # Ensure no null
     # we're managing ascend errors separately because we need to lookup organization
-    return true if ascend? && organization_id.blank?
+    return true if ascend_unprocessable?
     unless creator.present?
       add_file_error("Needs to have a user or an organization with an auto user", skip_save: true)
     end

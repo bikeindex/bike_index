@@ -128,7 +128,7 @@ group :development do
   # gem 'test-unit', '~> 3.0'
   gem 'rerun'
   gem 'bullet'
-  gem 'pry-rails'
+  # gem 'pry-rails'
 end
 
 group :development, :test do

@@ -59,13 +59,13 @@ RSpec.describe BulkImport, type: :model do
     end
   end
 
-  describe "ascend_import_processable?" do
+  describe "check_ascend_import_processable!" do
     let!(:bulk_import) { FactoryBot.build(:bulk_import_ascend) }
     before { Sidekiq::Worker.clear_all }
     it "adds an ascend error, sends email" do
       expect(bulk_import.created_at).to_not be_present # Bulk import is saved
       expect do
-        expect(bulk_import.ascend_import_processable?).to be_falsey
+        expect(bulk_import.check_ascend_import_processable!).to be_falsey
       end.to change(UnknownOrganizationForAscendImportWorker.jobs, :count).by 1
       expect(bulk_import.created_at).to be_present # Bulk import is saved
       expect(bulk_import.import_errors.to_s).to match(/ascend/)
@@ -78,7 +78,7 @@ RSpec.describe BulkImport, type: :model do
         expect(bulk_import.created_at).to_not be_present # Bulk import is saved
         expect(bulk_import.import_errors?).to be_truthy
         expect do
-          expect(bulk_import.ascend_import_processable?).to be_truthy
+          expect(bulk_import.check_ascend_import_processable!).to be_truthy
         end.to_not change(UnknownOrganizationForAscendImportWorker.jobs, :count)
         expect(bulk_import.import_errors?).to be_falsey
         expect(bulk_import.created_at).to_not be_present # Bulk import is not saved
@@ -90,7 +90,7 @@ RSpec.describe BulkImport, type: :model do
         bulk_import.import_errors["ascend"] = "Unable to find an Organization with ascend_name"
         expect(bulk_import.import_errors?).to be_truthy
         expect do
-          expect(bulk_import.ascend_import_processable?).to be_truthy
+          expect(bulk_import.check_ascend_import_processable!).to be_truthy
         end.to_not change(UnknownOrganizationForAscendImportWorker.jobs, :count)
         expect(bulk_import.organization_id).to eq organization.id
         expect(bulk_import.creator).to eq organization.auto_user

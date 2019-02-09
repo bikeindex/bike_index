@@ -9,7 +9,7 @@ class BulkImportWorker
 
   def perform(bulk_import_id)
     @bulk_import = BulkImport.find(bulk_import_id)
-    return true if @bulk_import.ascend? && !@bulk_import.ascend_import_processable?
+    return true if @bulk_import.ascend? && !@bulk_import.check_ascend_import_processable!
     process_csv(@bulk_import.open_file)
 
     @bulk_import.progress = "finished"

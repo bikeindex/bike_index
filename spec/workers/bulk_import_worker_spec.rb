@@ -130,7 +130,7 @@ describe BulkImportWorker do
         let!(:bulk_import) { FactoryBot.create(:bulk_import_ascend) }
         let(:organization) { FactoryBot.create(:organization_with_auto_user, ascend_name: "BIKELaneChiC", kind: "bike_shop") }
         it "resolves error, assigns organization and processes" do
-          bulk_import.ascend_import_processable?
+          bulk_import.check_ascend_import_processable!
           bulk_import.reload
           expect(bulk_import.import_errors?).to be_truthy
           # Create organization here
@@ -145,6 +145,8 @@ describe BulkImportWorker do
           expect(BulkImport.no_bikes.pluck(:id)).to eq([bulk_import.id])
           expect(bulk_import.organization_id).to eq organization.id
           expect(bulk_import.creator).to eq organization.auto_user
+          # Only has bikes key - no ascend nil key
+          expect(bulk_import.import_errors.keys).to eq(["bikes"])
         end
       end
     end

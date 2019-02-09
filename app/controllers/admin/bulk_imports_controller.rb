@@ -1,5 +1,5 @@
 class Admin::BulkImportsController < Admin::BaseController
-  before_filter :find_bulk_import, only: [:show]
+  before_filter :find_bulk_import, only: [:show, :update]
 
   def index
     page = params[:page] || 1
@@ -10,7 +10,8 @@ class Admin::BulkImportsController < Admin::BaseController
     else
       bulk_imports = BulkImport.all
     end
-    @bulk_imports = bulk_imports.order(created_at: :desc).includes(:creation_states)
+    @bulk_imports = bulk_imports.includes(:organization, :user, :creation_states)
+                                .order(created_at: :desc).includes(:creation_states)
                                 .page(page).per(per_page)
   end
 
@@ -19,6 +20,16 @@ class Admin::BulkImportsController < Admin::BaseController
   def new
     organization_id = Organization.friendly_find(params[:organization_id])&.id
     @bulk_import = BulkImport.new(organization_id: organization_id, no_notify: params[:no_notify])
+  end
+
+  def update
+    if params[:reprocess]
+      BulkImportWorker.perform_async(@bulk_import.id)
+      flash[:success] = "Bulk Import enqueued for processing"
+    else
+      flash[:error] = "Ooooops, can't do that, how the hell did you manage to?"
+    end
+    redirect_to admin_bulk_import_url(@bulk_import)
   end
 
   def create

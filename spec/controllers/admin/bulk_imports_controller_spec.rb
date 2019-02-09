@@ -70,4 +70,16 @@ describe Admin::BulkImportsController do
       end
     end
   end
+
+  describe "update" do
+    let(:bulk_import) { FactoryBot.create(:bulk_import) }
+    it "reenqueues" do
+      Sidekiq::Worker.clear_all
+      expect do
+        put :update, id: bulk_import.id, reprocess: true
+      end.to change(BulkImportWorker.jobs, :count).by 1
+      expect(flash[:success]).to be_present
+      expect(BulkImportWorker.jobs.map { |j| j["args"] }.flatten).to eq([bulk_import.id])
+    end
+  end
 end
