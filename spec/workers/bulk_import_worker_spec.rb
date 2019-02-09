@@ -128,7 +128,7 @@ describe BulkImportWorker do
       end
       context "ascend import" do
         let!(:bulk_import) { FactoryBot.create(:bulk_import_ascend) }
-        let(:organization) { FactoryBot.create(:organization, ascend_name: "BIKELaneChi") }
+        let(:organization) { FactoryBot.create(:organization_with_auto_user, ascend_name: "BIKELaneChiC", kind: "bike_shop") }
         it "resolves error, assigns organization and processes" do
           bulk_import.ascend_import_processable?
           bulk_import.reload
