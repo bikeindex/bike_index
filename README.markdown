@@ -62,7 +62,9 @@ CREATE EXTENSION fuzzystrmatch;
 
 ## Vagrant development box
 
-For your convenience, this repository contains a Vagrantfile which is used to automatically set up and configure a virtual local (Ubuntu Xenial) development environment with all of the required dependencies preinstalled.
+In general, we recommend installing and running the app without Vagrant for local development  
+
+If, however, you would prefer to have a virtual environment, this repository contains a Vagrantfile which is used to automatically set up and configure a virtual local (Ubuntu Xenial) development environment with all of the required dependencies preinstalled.
 
 ### Dependencies/Requirements
 - A computer that supports hardware virtualization (Intel VT-x/AMD-V)
