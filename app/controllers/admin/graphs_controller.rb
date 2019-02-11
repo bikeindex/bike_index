@@ -79,7 +79,7 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def set_variable_graph_kind
-    @graph_kinds = %w[general users payments recoveries]
+    @graph_kinds = %w[general users payments]
     @kind = @graph_kinds.include?(params[:kind]) ? params[:kind] : @graph_kinds.first
   end
 
