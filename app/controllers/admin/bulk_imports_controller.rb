@@ -3,7 +3,7 @@ class Admin::BulkImportsController < Admin::BaseController
 
   def index
     page = params[:page] || 1
-    per_page = params[:per_page] || 25
+    per_page = params[:per_page] || 10
     if params[:organization_id].present?
       organization_id = params[:organization_id] == "none" ? nil : params[:organization_id]
       bulk_imports = BulkImport.where(organization_id: organization_id)
