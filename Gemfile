@@ -1,4 +1,5 @@
 source 'https://rubygems.org'
+# If you bump the Ruby version, make sure to update the Vagrantfile appropriately 
 ruby "2.5.1"
 gem "rails", "4.2.11"
 
