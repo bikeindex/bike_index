@@ -207,6 +207,61 @@ describe 'Bikes API V3' do
       result = JSON.parse(response.body)
       expect(result['error']).to be_present
     end
+
+
+    it "should be idempotent" do
+      post "/api/v3/bikes?access_token=#{token.token}",
+            bike_attrs.to_json,
+            json_headers
+
+      expect(response.code).to eq('201')
+      result_of_first_req = JSON.parse(response.body)['bike']
+      post "/api/v3/bikes?access_token=#{token.token}",
+            bike_attrs.to_json,
+            json_headers
+      result_of_second_req = JSON.parse(response.body)['bike']
+
+      expect(response.code).to eq('200')
+      expect(result_of_first_req['id']).to eq(result_of_second_req['id'])
+    end
+
+
+    it "should update fields if the bike has already been registered" do
+      post "/api/v3/bikes?access_token=#{token.token}",
+            bike_attrs.to_json,
+            json_headers
+      expect(response.code).to eq('201')
+      result_of_first_req = JSON.parse(response.body)['bike']
+      
+      bike_attrs.merge!(year: 2019)
+
+      post "/api/v3/bikes?access_token=#{token.token}",
+            bike_attrs.to_json,
+            json_headers
+      result_of_second_req = JSON.parse(response.body)['bike']
+
+      expect(response.code).to eq('200')
+      expect(result_of_first_req['id']).to eq(result_of_second_req['id'])
+      bike = Bike.find(result_of_second_req['id'])
+      expect(bike.year).to eq(2019)
+    end
+
+    it "shouldn't access the DB if the BParams are invalid" do
+      expect(true).to be_falsey
+    end
+
+    it "should use normalized serial numbers, not exact serial numbers" do
+      expect(true).to be_falsey
+    end
+
+    it "should update bike if matched with secondary email" do
+      expect(true).to be_falsey
+    end
+
+    it "should do something if multiple bikes are found" do
+      expect(true).to be_falsey
+    end
+
   end
 
   describe 'create v3_accessor' do
