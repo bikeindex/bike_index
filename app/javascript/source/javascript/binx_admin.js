@@ -22,21 +22,31 @@ window.BinxAdmin = class BinxAdmin {
     $("select#graph_date_option_choice").on("change", e => {
       e.preventDefault();
       if ($("select#graph_date_option_choice")[0].value === "custom") {
-        $("#calendar-box").slideDown();
+        this.slide("Down");
       } else {
-        $("#calendar-box").slideUp();
-        let $this = $("#start_at");
-        let graphSelected = $("select#graph_date_option_choice")[0].value.split(
-          ","
-        );
-        let amount = Number(graphSelected[0]);
-        let unit = graphSelected[1];
-        $this.val(
-          moment()
-            .subtract(amount, unit)
-            .format("YYYY-MM-DDTHH:mm")
-        );
+        this.slide("Up");
+        this.startTimeSet();
       }
     });
+  }
+  startTimeSet() {
+    let graphSelected = $("select#graph_date_option_choice")[0].value.split(
+      ","
+    );
+    let amount = Number(graphSelected[0]);
+    let unit = graphSelected[1];
+    $("#calendar-box").val(
+      moment()
+        .subtract(amount, unit)
+        .format("YYYY-MM-DDTHH:mm")
+    );
+  }
+
+  slide(direction) {
+    if (direction === "Up") {
+      $("#calendar-box").slideUp();
+    } else if (direction === "Down") {
+      $("#calendar-box").slideDown();
+    }
   }
 };
