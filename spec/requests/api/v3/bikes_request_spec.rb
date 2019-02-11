@@ -103,6 +103,7 @@ describe 'Bikes API V3' do
                         is_bulk: true,
                         is_new: true,
                         is_pos: true)
+      p bike_attrs
       expect do
         post "/api/v3/bikes?access_token=#{token.token}",
              bike_attrs.to_json,

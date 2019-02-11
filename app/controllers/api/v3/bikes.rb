@@ -1,6 +1,7 @@
 module API
   module V3
     class Bikes < API::Base
+      include API::V2::Defaults
 
       helpers do
         params :bike_attrs do
@@ -53,9 +54,54 @@ module API
           optional :serial, type: String, desc: "Component serial"
           optional :front_or_rear, type: String, desc: "Component front_or_rear"
         end
+
+        def creation_user_id
+          if current_user.id == ENV['V2_ACCESSOR_ID'].to_i
+            org = params[:organization_slug].present? && Organization.friendly_find(params[:organization_slug])
+            if org && current_token.application.owner && current_token.application.owner.is_admin_of?(org)
+              return org.auto_user_id
+            end
+            error!("Permanent tokens can only be used to create bikes for organizations your are an admin of", 403)
+          end  
+          current_user.id
+        end
+
+        def creation_state_params
+          {
+            is_bulk: params[:is_bulk],
+            is_pos: params[:is_pos],
+            is_new: params[:is_new],
+            no_duplicate: params[:no_duplicate]
+          }
+        end
+
+        def find_bike
+          @bike = Bike.unscoped.find(params[:id])
+        end
+
+        def authorize_bike_for_user(addendum='')
+          return true if @bike.authorize_bike_for_user!(current_user)
+          error!("You do not own that #{@bike.type}#{addendum}", 403)
+        end
+
+        def ensure_required_stolen_attrs(hash)
+          return true unless hash['bike']['stolen']
+          %w(phone city).each do |k|
+            error!("Could not create stolen record: missing #{k}", 401) unless hash['stolen_record'][k].present?
+          end
+        end
       end
 
       resource :bikes do
+        desc "View bike with a given ID"
+        params do
+          requires :id, type: Integer, desc: 'Bike id'
+        end
+        get ':id', serializer: BikeV2ShowSerializer, root:  'bike' do 
+          find_bike
+        end
+
+
         desc "Add a bike to the Index!<span class='accstr'>*</span>", {
           authorizations: { oauth2: [{ scope: :write_bikes }] },
           notes: <<-NOTE
@@ -90,27 +136,11 @@ module API
           optional :components, type: Array do
             use :components_attrs
           end
-
-
-          def authorize_bike_for_user(addendum='')
-            return true if @bike.authorize_bike_for_user!(current_user)
-            error!("You do not own that #{@bike.type}#{addendum}", 403)
-          end
-  
-          def ensure_required_stolen_attrs(hash)
-            return true unless hash['bike']['stolen']
-            %w(phone city).each do |k|
-              error!("Could not create stolen record: missing #{k}", 401) unless hash['stolen_record'][k].present?
-            end
-          end
         end
         post '/', serializer: BikeV2ShowSerializer, root: 'bike' do
-
-          #https://guides.rubyonrails.org/active_record_querying.html#find-or-create-by
           declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
-          b_param = BParam.create(creator_id: creation_user_id, params: declared_p['declared_params'], origin: 'api_v3')
+          b_param = BParam.create(creator_id: creation_user_id, params: {'bike': declared_p['declared_params']}, origin: 'api_v3')
           ensure_required_stolen_attrs(b_param.params)
-
           # Prevents unnecessary DB hits
           if b_param.errors.present? or b_param.bike_errors.present?
             e = b_param.errors
@@ -118,14 +148,11 @@ module API
           end
 
           existing_bike = Bike.find_by(serial_normalized: SerialNormalizer.new({serial: b_param[:serial]}).normalized)
-          p "query done"
 
           # Assume only one bike for now, but may need to check len of existing bike later depending on what Seth says
           if existing_bike.present?
-            p "as expected"
             # Does this check secondary emails?
             authorize_bike_for_user
-            p "authorized"
             begin
               BikeUpdator.new(user: current_user, bike: existing_bike, b_params: b_param).update_available_attributes
             rescue => e
@@ -133,6 +160,7 @@ module API
             end
             existing_bike.reload
           end
+
 
           bike = BikeCreator.new(b_param).create_bike
           if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
