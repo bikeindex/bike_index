@@ -45,7 +45,8 @@
     %li Return here and click the "reprocess import" button below
 
 .clearfix{ style: "padding: 20px 0;" }
-  = link_to "Reprocess Import", admin_bulk_import_path(@bulk_import, reprocess: true), method: 'PUT', class: "btn btn-secondary pull-right"
+  - if @bulk_import.creation_states.count < 1 || params[:show_reprocess]
+    = link_to "Reprocess Import", admin_bulk_import_path(@bulk_import, reprocess: true), method: "PUT", class: "btn btn-secondary pull-right"
 
 %hr.mt-4
 %h2 Errors
