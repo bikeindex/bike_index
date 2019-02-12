@@ -12,7 +12,6 @@ class Admin::GraphsController < Admin::BaseController
                        .group_by_period(@group_period, :created_at, time_zone: @timezone)
                        .count
     elsif @kind == "payments"
-      @payments = Payment.where(is_payment: true)
       chart_data =[
                     {name: "All" , data: Payment.where(created_at: @start_at..@end_at)
                        .group_by_period(@group_period, :created_at, time_zone: @timezone)
@@ -24,7 +23,19 @@ class Admin::GraphsController < Admin::BaseController
                                     .group_by_period(@group_period, :created_at, time_zone: @timezone)
                                     .count}
                   ]
-    end
+      elsif @kind == "bikes"
+        bikes = Bike.unscoped
+        chart_data =[
+                      {name: "Registered" , data: bikes.where(created_at: @start_at..@end_at)
+                        .group_by_period(@group_period, :created_at, time_zone: @timezone)
+                        .count},
+                      {name: "Stolen bikes" , data: StolenRecord.where(created_at: @start_at..@end_at)
+                        .group_by_period(@group_period, :created_at, time_zone: @timezone)
+                        .count}
+                    ]
+      elsif @kind == "recoveries"
+        chart_data = StolenRecord.where(date_recovered: @start_at..@end_at)
+      end
     if chart_data.present?
       render json: chart_data.chart_json
     else
@@ -88,7 +99,7 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def set_variable_graph_kind
-    @graph_kinds = %w[general users payments recoveries]
+    @graph_kinds = %w[general users payments bikes recoveries]
     @kind = @graph_kinds.include?(params[:kind]) ? params[:kind] : @graph_kinds.first
   end
 
