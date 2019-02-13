@@ -246,6 +246,26 @@ describe 'Bikes API V3' do
       expect(bike.year).to eq(2019)
     end
 
+
+    # This test currently passes because it looks at the API current user, *not* the email provided. 
+    # Will need refactoring.
+    it "shouldn't update the bike through this route if the user has no ownership" do
+      post "/api/v3/bikes?access_token=#{token.token}",
+            bike_attrs.to_json,
+            json_headers
+      expect(response.code).to eq('201')
+      result_of_first_req = JSON.parse(response.body)['bike']
+
+      bike_attrs[:owner_email] = 'malice@example.com'
+      bike_attrs[:year] = 1901
+
+
+      post "/api/v3/bikes?access_token=#{token.token}",
+            bike_attrs.to_json,
+            json_headers
+      expect(response.code).to eq('403')
+    end
+
     # it "shouldn't access the DB if the BParams are invalid" do
     #   expect(true).to be_falsey
     # end

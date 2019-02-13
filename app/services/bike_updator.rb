@@ -65,7 +65,6 @@ class BikeUpdator
   end
 
   def set_protected_attributes
-    p @bike_params
     @bike_params['bike']['serial_number'] = @bike.serial_number
     @bike_params['bike']['manufacturer_id'] = @bike.manufacturer_id
     @bike_params['bike']['manufacturer_other'] = @bike.manufacturer_other
