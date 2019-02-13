@@ -7,6 +7,10 @@ class Admin::GraphsController < Admin::BaseController
   def variable
     set_variable_graph_kind
     set_variable_graphing_timing
+    p "!!!!"
+    p params
+    p "!!!!"
+
     if @kind == "users"
       chart_data = User.where(created_at: @start_at..@end_at)
                        .group_by_period(@group_period, :created_at, time_zone: @timezone)
