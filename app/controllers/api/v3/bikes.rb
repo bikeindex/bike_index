@@ -171,7 +171,7 @@ module API
               error!("Unable to update bike: #{e}", 401)
             end
             # Manually set the return code in a feeble attempt to be more ~~semantic~~
-            status 200
+            status :ok
             return existing_bike.reload
           end
 
