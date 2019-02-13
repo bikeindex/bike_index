@@ -84,7 +84,7 @@ describe Admin::GraphsController, type: :controller do
           expect(json_result[2]["error"]).to_not be_present
           expect(json_result[2].keys.count).to be > 0
           expect(json_result[2].keys.first.class).to eq(String)
-          expect(json_result[2].values.first.class).to eq(String)
+          expect(json_result[0].values.first.class).to eq(String)
           expect(assigns(:start_at)).to be_within(1.day).of Time.parse("2007-01-01 1:00")
           expect(assigns(:end_at)).to be_within(1.minute).of Time.now
           expect(assigns(:group_period)).to eq "month"
