@@ -2,8 +2,7 @@ module API
   module V3
     class Organizations < API::Base
       include API::V2::Defaults
-      MAX_CREATE_LOCATIONS = 5
-
+      
       resource :organizations do
         helpers do
           def allowed_write_organizations
@@ -17,7 +16,7 @@ module API
           notes: <<-NOTES
           **Requires** `write_organizations` **in the access token** you use to create the organization.
           <hr> 
-          **Location:** You may optionally include up to five `locations` for the organization.
+          **Location:** You may optionally include `locations` for the organization.
 
           <hr>
           **Note:** Access to this endpoint is only available to select api clients.
@@ -49,7 +48,7 @@ module API
           )
 
           if locations = permitted.locations
-            relations = locations.first(MAX_CREATE_LOCATIONS).map do |loc|
+            relations = locations.map do |loc|
               state = State.where(name: loc.state).first
               country = Country.where(name: loc.country).first
               loc.merge(state: state, country: country).to_hash

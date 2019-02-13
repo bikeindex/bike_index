@@ -143,16 +143,6 @@ describe 'Organization API V3' do
           expect(response).to be_successful
           expect_status 201
         end
-
-        it "will not include any locations that exceed the creation limit" do
-          limit = API::V3::Organizations::MAX_CREATE_LOCATIONS
-          exceeded_limit = limit + 1
-          locations = Array.new(exceeded_limit) { location_2 }
-          org_json = organization_attrs.merge!(locations: locations).to_json
-          post url, org_json, json_headers
-          expect(response).to be_successful
-          expect_json_sizes("organization.locations", limit)
-        end
       end
     end
   end
