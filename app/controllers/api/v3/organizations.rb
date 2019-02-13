@@ -17,7 +17,7 @@ module API
           notes: <<-NOTES
           **Requires** `write_organizations` **in the access token** you use to create the organization.
           <hr> 
-          **Location:** You may optionally include up to five `location`'s for the organization.
+          **Location:** You may optionally include up to five `locations` for the organization.
 
           <hr>
           **Note:** Access to this endpoint is only available to select api clients.
