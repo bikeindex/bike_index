@@ -149,18 +149,29 @@ module API
             e = b_param.errors
             return error!(e.full_messages.to_sentence, 401)
           end
-          existing_bike = Bike.find_by(serial_normalized: SerialNormalizer.new({serial: b_param[:serial]}).normalized)
-          
+
+          p SerialNormalizer.new({serial: b_param.serial_number}).normalized
+          existing_bike = Bike.find_by(serial_normalized: SerialNormalizer.new({serial: b_param.serial_number}).normalized)
+          p existing_bike
+          p "existing bike"
           # Assume only one bike for now, but may need to check len of existing bike later depending on what Seth says
           if existing_bike.present?
+            p "here we go!"
+            @bike = existing_bike
             # Does this check secondary emails?
             authorize_bike_for_user
+            
+            # can't update this field -- probably others that we will need to filter out as well.
+            # appears rear_wheel_bsd also isn't working locally for update
+            filtered_params = declared_p['declared_params'].except(:manufacturer, :color, :cycle_type_name, :rear_wheel_bsd, :is_bulk, :is_pos, :is_new, :no_duplicate)
+            temp = BParam.v2_params(filtered_params.as_json)
+
             begin
-              BikeUpdator.new(user: current_user, bike: existing_bike, b_params: b_param).update_available_attributes
+              BikeUpdator.new(user: current_user, bike: existing_bike, b_params: temp).update_available_attributes
             rescue => e
               error!("Unable to update bike: #{e}", 401)
             end
-            existing_bike.reload
+            return existing_bike.reload
           end
 
           bike = BikeCreator.new(b_param).create_bike
