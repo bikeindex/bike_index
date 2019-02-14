@@ -35,7 +35,7 @@ window.BinxAdmin = class BinxAdmin {
     );
     let amount = Number(graphSelected[0]);
     let unit = graphSelected[1];
-    $("#calendar-box").val(
+    $("#start_at").val(
       moment()
         .subtract(amount, unit)
         .format("YYYY-MM-DDTHH:mm")
@@ -44,9 +44,9 @@ window.BinxAdmin = class BinxAdmin {
 
   slide(direction) {
     if (direction === "Up") {
-      $("#calendar-box").slideUp();
+      $(".calendar-box").slideUp();
     } else if (direction === "Down") {
-      $("#calendar-box").slideDown();
+      $(".calendar-box").slideDown();
     }
   }
 };

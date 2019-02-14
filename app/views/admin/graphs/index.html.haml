@@ -55,17 +55,17 @@
     = hidden_field_tag :current_date, "", class: "hiddenGraphDate"
     %section.graph_time_select
       = select(:graph_date_option, :choice,{ "Past day" => "1,days", "Past week" => "1,weeks", "Past month"=>"1,months", "Past six months" => "6,months", "Past year" => "1,years", "Custom" => "custom"})
-      = submit_tag "Update chart", class: "button-green"
-    .clearfix{style: "display: none", id: "calendar-box"}
-      .control-group
+    .clearfix{id: "calendar-box"}
+      .control-group.calendar-box{style: "display: none"}
         = label_tag :start_at, "Start at", class: "control-label"
         .controls
           = datetime_local_field_tag :start_at, @start_at.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
-      .control-group
+      .control-group.calendar-box{style: "display: none"}
         = label_tag :end_at, "End at", class: "control-label"
         .controls
           = datetime_local_field_tag :end_at, @end_at.strftime("%Y-%m-%dT%H:%M"), step: 60
       .control-group{ style: "padding-top: 19px" }
+        = submit_tag "Update chart", class: "button-green"
     = line_chart variable_admin_graphs_path(params)
     %em.small.less-strong
       graph is grouped by #{@group_period}
