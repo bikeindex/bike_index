@@ -5,23 +5,34 @@ AllCops:
     - "db/schema.rb"
     - "db/migrate/**/*"
 
-Style/Documentation:
-  Enabled: false
-
 FrozenStringLiteralComment:
-  Enabled: false
-
-Style/SymbolProc:
   Enabled: false
 
 Metrics/LineLength:
   Enabled: false
 
+Metrics/MethodLength:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/ModuleLength:
+  Exclude:
+    - "**/*_spec.rb"
+
+Metrics/BlockLength:
+  Exclude:
+    - "**/*_spec.rb"
+
 Style/AndOr:
   Enabled: false
 
-ParameterLists:
-  CountKeywordArgs: false
+Style/Documentation:
+  Enabled: false
+
+Style/SymbolProc:
+  Enabled: false
 
 # I'm a fan of defining convenience methods in single lines
 Style/SingleLineMethods:
@@ -33,16 +44,15 @@ Style/StringLiterals:
   EnforcedStyle: double_quotes # Always do it, lower cost cognitively
   Enabled: false
 
+ Style/NumericPredicate:
+  Enabled: false
+
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
 
 NumericLiterals:
   Enabled: false
 
-Metrics/ModuleLength:
-  Exclude:
-    - "**/*_spec.rb"
+ParameterLists:
+  CountKeywordArgs: false
 
-Metrics/BlockLength:
-  Exclude:
-    - "**/*_spec.rb"
