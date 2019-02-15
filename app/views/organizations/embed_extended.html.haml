@@ -101,9 +101,9 @@
       .controls
         = f.text_field :bike_code, value: ""
     .control-group.special-select-single
-      = f.label :frame_material_id, "Primary frame material", class: "control-label"
+      = f.label :frame_material, "Primary frame material", class: "control-label"
       .controls
-        = collection_select( :bike, :frame_material_id, FrameMaterial.all, :id, :name, prompt: "Choose material" )
+        = select(:bike, :frame_material, FrameMaterial.select_options , { include_blank: true, prompt: "Choose material"})
   .input-group
     .control-group.special-select-single
       = f.label :handlebar_type_id, class: "control-label"

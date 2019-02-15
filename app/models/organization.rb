@@ -18,7 +18,7 @@ class Organization < ActiveRecord::Base
   belongs_to :auto_user, class_name: 'User'
 
   has_many :recovered_records, through: :bikes
-  has_many :locations, dependent: :destroy
+  has_many :locations, inverse_of: :organization, dependent: :destroy
   has_many :memberships, dependent: :destroy
   has_many :mail_snippets
   has_many :users, through: :memberships
@@ -46,7 +46,6 @@ class Organization < ActiveRecord::Base
 
   scope :shown_on_map, -> { where(show_on_map: true, approved: true) }
   scope :paid, -> { where(is_paid: true) }
-  scope :valid, -> { where(is_suspended: false) }
   scope :valid, -> { where(is_suspended: false) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
   scope :with_bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: ["messages"]) }
@@ -166,8 +165,8 @@ class Organization < ActiveRecord::Base
 
   # TODO: these are DEPRECATED and should be REPLACED with paid_for?
   # I'm trying to ammass a list of paid features here (also in admin organization show)
-  def bike_search?; has_bike_search end
-  def show_recoveries?; has_bike_search end
+  def bike_search?; paid_for?("bike_search") end
+  def show_recoveries?; bike_search? end
   def show_bulk_import?; show_bulk_import end
   def show_partial_registrations?; show_partial_registrations end
 

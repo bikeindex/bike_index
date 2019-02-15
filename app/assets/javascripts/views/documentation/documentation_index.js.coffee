@@ -70,7 +70,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
       rear_tire_narrow: false
       owner_email: "cargo_bike_owner@bikeindex.org"
       cycle_type_slug: "cargo"
-      frame_material_slug: "steel"
+      frame_material: "steel"
       handlebar_type_slug: "flat"
       description: "Amazing cargo bike. Has made me car free!"
     photos = [

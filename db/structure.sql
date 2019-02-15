@@ -261,7 +261,8 @@ CREATE TABLE public.bikes (
     made_without_serial boolean DEFAULT false NOT NULL,
     stolen_lat double precision,
     stolen_long double precision,
-    creation_state_id integer
+    creation_state_id integer,
+    frame_material integer
 );
 
 
@@ -1515,7 +1516,6 @@ CREATE TABLE public.organizations (
     landing_html text,
     show_bulk_import boolean DEFAULT false,
     has_bike_codes boolean DEFAULT false NOT NULL,
-    has_bike_search boolean DEFAULT false NOT NULL,
     show_partial_registrations boolean DEFAULT false NOT NULL,
     paid_feature_slugs jsonb,
     parent_organization_id integer,
@@ -4112,3 +4112,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190206044915');
 
 INSERT INTO schema_migrations (version) VALUES ('20190208195902');
 
+INSERT INTO schema_migrations (version) VALUES ('20190214192448');
+
+INSERT INTO schema_migrations (version) VALUES ('20190301020053');

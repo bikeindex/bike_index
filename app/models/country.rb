@@ -1,7 +1,7 @@
 class Country < ActiveRecord::Base
   validates_presence_of :name
-  validates_uniqueness_of :name
-  validates_uniqueness_of :iso
+  validates_uniqueness_of :name, :iso
+
   has_many :stolen_records
   has_many :locations
 
@@ -17,5 +17,9 @@ class Country < ActiveRecord::Base
 
   def self.united_states
     where(name: "United States", iso: "US").first_or_create
+  end
+
+  def self.valid_names
+    StatesAndCountries.countries.map{ |c| c[:name] }
   end
 end

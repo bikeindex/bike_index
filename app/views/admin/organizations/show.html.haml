@@ -111,7 +111,7 @@
           %dt
             Bike Search
           %dd
-            - if @organization.has_bike_search
+            - if @organization.bike_search?
               yes
             - else
               <small class="less-strong">no</small>

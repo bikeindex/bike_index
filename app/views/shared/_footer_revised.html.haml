@@ -62,12 +62,34 @@
   %nav.terms-and-stuff
     .container
       %p
-        %span{data: {license: "https://github.com/bikeindex/bike_index/blob/master/LICENSE"}}
-          #{Time.zone.now.year} &copy; Bike Index, a 501(c)(3) nonprofit.
         - if current_user.present? && current_user.has_membership?
           #{link_to "Privacy policy", privacy_path}, #{link_to "vendor terms", vendor_terms_path}
         - else
           #{link_to "Privacy policy", privacy_path}
         and #{link_to "terms and conditions", terms_path}.
+        %br
+        %span{data: {license: "https://github.com/bikeindex/bike_index/blob/master/LICENSE"}}
+          #{Time.zone.now.year} &copy; Bike Index, a 501(c)(3) nonprofit - EIN 81-4296194
 - cache 'facebook_pixel' do
   = render '/shared/facebook_pixel'
+
+:javascript
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+  ga('create', 'UA-38316708-1', 'auto');
+  ga('send', 'pageview');
+
+  var trackOutboundLink = function(url) {
+    ga("send", "event", "outbound", "click", url, {
+      transport: "beacon",
+      hitCallback: function() {
+        document.location = url;
+      }
+    });
+  };
+
+  (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-K88RMWC');
+
+<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K88RMWC" height="0" width="0" style="display:none;visibility:hidden"></iframe>

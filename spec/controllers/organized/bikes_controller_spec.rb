@@ -31,11 +31,8 @@ describe Organized::BikesController, type: :controller do
 
   context 'logged_in_as_organization_member' do
     include_context :logged_in_as_organization_member
-    context 'paid organization' do
-      before do
-        organization.update_attributes(is_paid: true, has_bike_search: true, show_partial_registrations: true)
-        expect(organization.bike_search?).to be_truthy
-      end
+    context "paid organization" do
+      before { organization.update_columns(is_paid: true, show_partial_registrations: true, paid_feature_slugs: ["bike_search"]) } # Stub organization having paid feature
       describe 'index' do
         context 'with params' do
           let(:query_params) do
@@ -111,9 +108,9 @@ describe Organized::BikesController, type: :controller do
         it "renders" do
           expect(partial_registration.organization).to eq organization
           get :incompletes, organization_id: organization.to_param
-          expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
           expect(response.status).to eq(200)
           expect(response).to render_template :incompletes
+          expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
         end
         context "suborganization incomplete" do
           let(:organization_child) { FactoryBot.create(:organization_child, parent_organization: organization) }
@@ -121,9 +118,9 @@ describe Organized::BikesController, type: :controller do
           it "renders" do
             expect(partial_registration.organization).to eq organization_child
             get :incompletes, organization_id: organization.to_param
-            expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
             expect(response.status).to eq(200)
             expect(response).to render_template :incompletes
+            expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
           end
         end
       end

@@ -43,10 +43,9 @@
           = render partial: '/bikes/bike_fields/revised_colors', locals: { f: f }
 
           .form-group.row.unnested-field
-            = f.label :frame_material_id, 'Main frame material', class: 'form-well-label'
+            = f.label :frame_material, 'Main frame material', class: 'form-well-label'
             .form-well-input.fancy-select-placeholder.unfancy
-              = f.collection_select(:frame_material_id, FrameMaterial.all, :id, :name, prompt: 'Choose material')
-
+              = select(:bike, :frame_material, FrameMaterial.select_options , { include_blank: true, prompt: "Choose material"})
           .related-fields
             .form-group.row.frame-sizes{ class: ('unexpanded-unit-size' unless %w(cm in).include?(@bike.frame_size_unit)) }
               %label.form-well-label

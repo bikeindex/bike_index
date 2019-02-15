@@ -1,4 +1,16 @@
-OAUTH_SCOPES = %i[public read_user write_user read_bikes write_bikes read_bikewise write_bikewise read_organization_membership unconfirmed].freeze
+OAUTH_SCOPES = %i[
+  public 
+  read_user 
+  write_user 
+  read_bikes 
+  write_bikes 
+  read_bikewise 
+  write_bikewise 
+  read_organization_membership 
+  write_organizations
+  unconfirmed 
+].freeze
+
 if Rails.env.development? && defined?(User) && defined?(User.first)
   ENV["V2_ACCESSOR_ID"] = (User.fuzzy_email_find("api@example.com") || User.first).id.to_s
 end
@@ -49,7 +61,7 @@ Doorkeeper.configure do
 
   # Define access token scopes for your provider
   # default_scopes  :public
-  optional_scopes :public, :read_user, :write_user, :read_bikes, :write_bikes, :read_bikewise, :write_bikewise, :read_organization_membership, :unconfirmed
+  optional_scopes :public, :read_user, :write_user, :read_bikes, :write_bikes, :read_bikewise, :write_bikewise, :read_organization_membership, :write_organizations, :unconfirmed
 
   # Change the way client credentials are retrieved from the request object.
   # By default it retrieves first from the `HTTP_AUTHORIZATION` header, then

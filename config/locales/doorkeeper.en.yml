@@ -54,6 +54,7 @@ en:
       read_bikewise: "Permission to see information from Bikewise.org"
       write_bikewise: "Permission to *update* information for Bikewise.org"
       read_organization_membership: "Permission to see the organizations you belong to"
+      write_organizations: "Permission to *create* organizations on Bike Index"
       unconfirmed: "Permission to get unconfirmed users and ability to see if user is confirmed"
     applications:
       confirmations:

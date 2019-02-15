@@ -66,7 +66,7 @@ class BParam < ActiveRecord::Base
 
   def self.skipped_bike_attrs # Attrs that need to be skipped on bike assignment
     %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_code address
-       handlebar_type_slug frame_material_slug is_bulk is_new is_pos no_duplicate)
+       handlebar_type_slug is_bulk is_new is_pos no_duplicate)
   end
 
   def self.email_search(str)
@@ -149,7 +149,6 @@ class BParam < ActiveRecord::Base
     set_rear_gear_type_slug if bike['rear_gear_type_slug'].present?
     set_front_gear_type_slug if bike['front_gear_type_slug'].present?
     set_handlebar_type_key if bike['handlebar_type_slug'].present?
-    set_frame_material_key if bike['frame_material_slug'].present?
   end
 
   def set_cycle_type_key
@@ -160,12 +159,6 @@ class BParam < ActiveRecord::Base
     end
     params['bike']['cycle_type_id'] = ct.id if ct.present?
     params['bike'].delete('cycle_type_slug') || params['bike'].delete('cycle_type_name')
-  end
-
-  def set_frame_material_key
-    fm = FrameMaterial.friendly_find(bike['frame_material_slug'].downcase.strip)
-    params['bike']['frame_material_id'] = fm.id if fm.present?
-    params['bike'].delete('frame_material_slug')
   end
 
   def set_handlebar_type_key

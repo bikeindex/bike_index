@@ -13,7 +13,6 @@ class Bike < ActiveRecord::Base
   belongs_to :front_wheel_size, class_name: 'WheelSize'
   belongs_to :rear_gear_type
   belongs_to :front_gear_type
-  belongs_to :frame_material
   belongs_to :propulsion_type
   belongs_to :cycle_type
   belongs_to :paint, counter_cache: true
@@ -63,6 +62,8 @@ class Bike < ActiveRecord::Base
     :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
 
   attr_writer :phone, :user_name # reading is managed by a method
+
+  enum frame_material: FrameMaterial::ENUMS
 
   default_scope { 
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record, :cycle_type)
@@ -421,7 +422,7 @@ class Bike < ActiveRecord::Base
       (primary_frame_color && primary_frame_color.name),
       (secondary_frame_color && secondary_frame_color.name),
       (tertiary_frame_color && tertiary_frame_color.name),
-      (frame_material && frame_material.name),
+      (frame_material && frame_material_name),
       frame_size,
       frame_model,
       (rear_wheel_size && "#{rear_wheel_size.name} wheel"),
@@ -430,5 +431,9 @@ class Bike < ActiveRecord::Base
       (type == 'bike' ? nil : type),
       components_cache_string
     ].flatten.reject(&:blank?).join(' ')
+  end
+
+  def frame_material_name
+    FrameMaterial.new(frame_material).name
   end
 end
