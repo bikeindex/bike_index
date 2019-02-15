@@ -233,15 +233,17 @@ describe 'Bikes API V3' do
       expect(response.code).to eq('201')
       result_of_first_req = JSON.parse(response.body)['bike']
       
-      bike_attrs.merge!(year: 2019)
+      bike_attrs[:year] = 2019
 
       post "/api/v3/bikes?access_token=#{token.token}",
             bike_attrs.to_json,
             json_headers
+      expect(response.code).to eq('200')
       result_of_second_req = JSON.parse(response.body)['bike']
 
       expect(response.code).to eq('200')
       expect(result_of_first_req['id']).to eq(result_of_second_req['id'])
+      expect(result_of_second_req['year']).to eq(2019)
       bike = Bike.find(result_of_second_req['id'])
       expect(bike.year).to eq(2019)
     end
@@ -266,6 +268,44 @@ describe 'Bikes API V3' do
       expect(response.code).to eq('403')
     end
 
+
+    it "should update the bike when a secondary email is provided" do
+      post "/api/v3/bikes?access_token=#{token.token}",
+            bike_attrs.to_json,
+            json_headers
+      expect(response.code).to eq('201')
+      result_of_first_req = JSON.parse(response.body)['bike']
+
+      bike = Bike.find_by(id: result_of_first_req['id'])
+      
+      bike.owner.additional_emails=('secondary_email@example.com')
+
+      bike_attrs[:owner_email] = 'secondary_email@example.com'
+
+      post "/api/v3/bikes?access_token=#{token.token}",
+            bike_attrs.to_json,
+            json_headers
+      expect(response.code).to eq('200')    
+    end
+
+    it "properly normalizes when testing for email ownership" do
+      post "/api/v3/bikes?access_token=#{token.token}",
+            bike_attrs.to_json,
+            json_headers
+      expect(response.code).to eq('201')
+      result_of_first_req = JSON.parse(response.body)['bike']
+
+      bike_attrs[:owner_email] = 'fun_TimeS@examples.com'
+      bike_attrs[:year] = 1901
+
+
+      post "/api/v3/bikes?access_token=#{token.token}",
+            bike_attrs.to_json,
+            json_headers
+      expect(response.code).to eq('200')
+    end
+
+
     # it "shouldn't access the DB if the BParams are invalid" do
     #   expect(true).to be_falsey
     # end
@@ -288,9 +328,28 @@ describe 'Bikes API V3' do
     # end
 
 
-    # it "should only create one set of BParams" do
-    #   expect(true).to be_falsey
-    # end
+    it "should only create one set of BParams for each call to endpoint, even in the update case" do
+      post "/api/v3/bikes?access_token=#{token.token}",
+            bike_attrs.to_json,
+            json_headers
+      expect(response.code).to eq('201')
+      result_of_first_req = JSON.parse(response.body)['bike']
+      
+      bike_attrs.merge!(year: 2019)
+
+      expect do
+        post "/api/v3/bikes?access_token=#{token.token}",
+              bike_attrs.to_json,
+              json_headers
+      end.to change(BParam, :count).by 1
+    #   result_of_second_req = JSON.parse(response.body)['bike']
+
+    #   expect(response.code).to eq('200')
+    #   expect(result_of_first_req['id']).to eq(result_of_second_req['id'])
+    #   expect(result_of_second_req['year']).to eq(2019)
+    #   bike = Bike.find(result_of_second_req['id'])
+    #   expect(bike.year).to eq(2019)
+    end
   end
 
   describe 'create v3_accessor' do

@@ -84,9 +84,21 @@ module API
           error!("You do not own that #{@bike.type}#{addendum}", 403)
         end
 
-        def email_attached_to_bike()
-          return true
-          error!("You do not own that #{@bike.type}", 403)
+        def email_is_attached_to_bike_owner(email)
+          normalized_email = EmailNormalizer.normalize(email)
+          
+          # check primary email first in case we can short-circuit
+          if @bike.owner_email == normalized_email
+            return true
+          end
+
+          secondary_emails = @bike.owner.secondary_emails
+
+          if secondary_emails.include?(normalized_email)
+            return true
+          end
+
+          error!("#{email} does not own that #{@bike.type}", 403)
         end
 
         def ensure_required_stolen_attrs(hash)
@@ -164,7 +176,7 @@ module API
             authorize_bike_for_user
             
             # Additionally, check to ensure the email is attached to the bike (either as primary or secondary)
-            # email_attached_to_bike
+            email_is_attached_to_bike_owner(b_param['params']['bike']['owner_email'])
 
             begin
               # We only want to update the Bike Attrs, which is a subset of the creation parameters
@@ -173,8 +185,9 @@ module API
               error!("Unable to update bike: #{e}", 401)
             end
             # Manually set the return code in a feeble attempt to be more ~~semantic~~
+            existing_bike.reload
             status :ok
-            return existing_bike.reload
+            return existing_bike
           end
 
           bike = BikeCreator.new(b_param).create_bike
