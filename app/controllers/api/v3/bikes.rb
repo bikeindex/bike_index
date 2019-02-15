@@ -84,6 +84,11 @@ module API
           error!("You do not own that #{@bike.type}#{addendum}", 403)
         end
 
+        def email_attached_to_bike()
+          return true
+          error!("You do not own that #{@bike.type}", 403)
+        end
+
         def ensure_required_stolen_attrs(hash)
           return true unless hash['bike']['stolen']
           %w(phone city).each do |k|
@@ -155,18 +160,15 @@ module API
           # Assume only one bike for now, but may need to check len of existing bike later depending on what Seth says
           if existing_bike.present?
             @bike = existing_bike
-            # Does this check secondary emails?
+            # Check organization ownership
             authorize_bike_for_user
             
-            # can't update this field -- probably others that we will need to filter out as well.
-            # appears rear_wheel_bsd also isn't working locally for update
-
-            # TODO -- Should color still be a required field?
-            filtered_params = declared_p['declared_params'].except(:manufacturer, :color, :cycle_type_name, :rear_wheel_bsd, :is_bulk, :is_pos, :is_new, :no_duplicate)
-            temp = BParam.v2_params(filtered_params.as_json)
+            # Additionally, check to ensure the email is attached to the bike (either as primary or secondary)
+            # email_attached_to_bike
 
             begin
-              BikeUpdator.new(user: current_user, bike: existing_bike, b_params: temp).update_available_attributes
+              # We only want to update the Bike Attrs, which is a subset of the creation parameters
+              BikeUpdator.new(user: current_user, bike: existing_bike, b_params: BParam.v2_params(declared_p['declared_params'].slice(:bike_attrs).as_json)).update_available_attributes
             rescue => e
               error!("Unable to update bike: #{e}", 401)
             end

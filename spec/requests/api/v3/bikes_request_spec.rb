@@ -282,6 +282,15 @@ describe 'Bikes API V3' do
     #   expect(true).to be_falsey
     # end
 
+
+    # it "should do something if multiple bikes are found" do
+    #   expect(true).to be_falsey
+    # end
+
+
+    # it "should only create one set of BParams" do
+    #   expect(true).to be_falsey
+    # end
   end
 
   describe 'create v3_accessor' do
