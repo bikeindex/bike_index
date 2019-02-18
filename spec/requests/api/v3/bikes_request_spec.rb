@@ -442,6 +442,19 @@ describe 'Bikes API V3' do
       expect(bike.owner).to eq(user)
       expect(bike.year).to eq(params[:year])
     end
+
+    it 'can update rear_wheel_bsd' do
+      params[:rear_wheel_bsd] = '559'
+      params[:rear_wheel_narrow] =  'true'
+
+      expect(bike.rear_wheel_bsd).to be_nil
+      expect(bike.rear_wheel_narrow).to be_nil
+      put url, params.to_json, json_headers
+      expect(response.code).to eq('200')
+      expect(response.headers['Content-Type'].match('json')).to be_present
+      expect(bike.reload.rear_wheel_bsd).to eq('559')
+      expect(bike.rear_wheel_narrow).to eq('true')
+    end
   end
 
   describe 'image' do
