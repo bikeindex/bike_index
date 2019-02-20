@@ -10,6 +10,7 @@ module API
       rescue_from :all do |e|
         API::Base.respond_to_error(e)
       end
+      mount API::V3::Organizations
       mount API::V3::Search
       mount API::V2::Bikes
       mount API::V3::Me

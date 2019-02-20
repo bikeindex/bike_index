@@ -6,9 +6,9 @@ describe Location do
     it { is_expected.to belong_to :country }
     it { is_expected.to belong_to :state }
     it { is_expected.to validate_presence_of :name }
-    it { is_expected.to validate_presence_of :organization_id }
+    it { is_expected.to validate_presence_of :organization }
     it { is_expected.to validate_presence_of :city }
-    it { is_expected.to validate_presence_of :country_id }
+    it { is_expected.to validate_presence_of :country }
   end
 
   describe 'set_phone' do

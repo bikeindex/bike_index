@@ -1,5 +1,4 @@
 class OrganizationSerializer < ActiveModel::Serializer
-  attributes :name, :slug, :url
+  attributes :name, :website, :kind
   has_many :locations
-  
 end
