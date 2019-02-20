@@ -73,18 +73,12 @@ describe Admin::GraphsController, type: :controller do
           get :variable, kind: "payments", timezone: "America/Los_Angeles"
           expect(response.status).to eq(200)
           json_result = JSON.parse(response.body)
-          expect(json_result[0]["error"]).to_not be_present
-          expect(json_result[0].keys.count).to be > 0
-          expect(json_result[0].keys.first.class).to eq(String)
-          expect(json_result[0].values.first.class).to eq(String)
-          expect(json_result[1]["error"]).to_not be_present
-          expect(json_result[1].keys.count).to be > 0
-          expect(json_result[1].keys.first.class).to eq(String)
-          expect(json_result[1].values.first.class).to eq(String)
-          expect(json_result[2]["error"]).to_not be_present
-          expect(json_result[2].keys.count).to be > 0
-          expect(json_result[2].keys.first.class).to eq(String)
-          expect(json_result[0].values.first.class).to eq(String)
+          json_result.each do |data_group|
+            expect(data_group.keys.count).to be > 0
+            expect(data_group.keys.first.class).to eq(String)
+            expect(data_group.values.first.class).to eq(String)
+            expect(data_group["error"]).to_not be_present
+          end
           expect(assigns(:start_at)).to be_within(1.day).of Time.parse("2007-01-01 1:00")
           expect(assigns(:end_at)).to be_within(1.minute).of Time.now
           expect(assigns(:group_period)).to eq "month"
