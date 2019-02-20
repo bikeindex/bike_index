@@ -1,0 +1,31 @@
+.ascend-image {
+  width: 100%;
+  margin: 0 0 2 * $vertical-height;
+  clear: both;
+  svg,
+  img {
+    padding-top: 100px;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+}
+
+.related-pages-banner {
+  color: white;
+  text-transform: uppercase;
+  font-size: 30px;
+}
+
+.related-pages {
+  // margin-top: 18px;
+  // margin-left: -20px;
+  // margin-right: -20px;
+  // margin-bottom: -44px;
+  background: white;
+  p {
+    font-weight: bold;
+    text-indent: 20px;
+  }
+}
+
