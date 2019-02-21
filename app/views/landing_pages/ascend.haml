@@ -25,7 +25,10 @@
           %li
             Go into Reports, click SQL Query icon on up top.
           %li
-            Paste <a target="none" href="file:///Users/lilywilliams/Downloads/BikeIndex.txt">this query text</a> into the top box.
+            Paste
+            %a{ href: "#", data: { toggle: "modal", target: "#ascend-query-modal" } }
+              this query text
+            into the top box.
           %li
             Click Execute and the Save, name the query.
           %li
@@ -34,13 +37,13 @@
             Fill out the delivery form like this:
             %ul{style: "list-style-type:none"}
               %li
-                FTP address: ftp://ascendftp.bikeindex.org:20
+                FTP address: <code>ftp://ascendftp.bikeindex.org:20</code>
               %li
-                Username: ascendftp
+                Username: <code>ascendftp</code>
               %li
-                Port: 2
+                Port: <code>20</code>
               %li
-                Plug in help@ascendrms.com as a recipient email under the email tab (two above the *RTP/SFTP tab on the left)
+                Plug in <code>help@ascendrms.com</code> as a recipient email under the email tab (two above the "*RTP/SFTP" tab on the left)
               %li
                 Password:
                 %em
@@ -59,7 +62,7 @@
         %p
           And that's it.
         %p
-          Email #{link_to "bikeshops@bikeindex.org", "mailto:bikeshops@bikeindex.org"} if you have any questions. Thank you for registering bikes in Bike Index.
+          Email #{link_to "bikeshops@bikeindex.org", "mailto:bikeshops@bikeindex.org"} if you have any questions. Thank you for registering bikes in Bike Index!
 
 
 
@@ -77,3 +80,62 @@
       /         Info for Shops
 
   = render '/landing_pages/footer'
+- modal_body = capture_haml do
+  .modal-body
+    %textarea.form-control.code{ rows: "15", style: "color: #bd4147; background: #f7f7f9; font-size: 90%;" }
+
+      :plain
+        WITH Idx AS
+        (
+        SELECT Si.SalesID
+        FROM Sales S 
+        JOIN SalesItems Si ON S.ID=Si.SalesID
+        JOIN Products P ON Si.ProductID=P.ID
+        WHERE S.Hide=0
+        AND S.Quote=0
+        AND Si.Hide=0
+        AND S.FinishDate IS NOT NULL
+        AND P.[Store UPC]='NO BIKE INDEX'
+        ),
+        Bik AS
+        (
+        SELECT Categories.ID
+        FROM Categories 
+        WHERE Categories.Topic='Bikes'
+        UNION
+        SELECT C1.ID
+        FROM Categories C1
+        JOIN Categories C2 ON C1.TopParentID=C2.ID
+        WHERE C2.Topic='Bikes'
+        )
+        SELECT  [Product Description]= P.Description
+                ,[Vendor]= V.Name
+                ,[Brand]= P.Brand
+                ,[Color]= P.Color
+                ,[Size]= P.Size
+                ,[Serial Number]= Sn.SerialNo
+                ,[Customer Last Name]= C.LastName
+                ,[Customer First Name]= C.FirstName
+                ,[Customer Email]= C.Email
+        FROM Sales S
+        JOIN SalesItems Si ON S.ID=Si.SalesID
+        JOIN Products P ON Si.ProductID=P.ID
+        JOIN VendorProducts Vp ON P.ID=Vp.ProductID
+        JOIN Vendors V ON V.ID=Vp.VendorID
+        LEFT JOIN Customers C ON S.CustomerID=C.ID
+        LEFT JOIN SerialNos Sn ON Si.SerialID=Sn.ID
+        WHERE S.Hide=0
+        AND S.Quote=0
+        AND S.FinishDate BETWEEN <<StartDate>> AND <<EndDate>>
+        AND Si.Hide=0
+        AND Si.Quantity > 0
+        AND Vp.Hide=0
+        AND V.Hide=0
+        AND P.TopicID IN (SELECT ID FROM Bik)
+        AND S.ID NOT IN (SELECT SalesID FROM Idx)
+        AND C.EMail IS NOT NULL
+        AND C.EMail <> ''
+        ORDER BY [Customer Last Name], [Customer First Name]
+
+
+= render partial: '/shared/modal', locals: { title: "Ascend Query Text", id: "ascend-query-modal", modal_body: modal_body }
