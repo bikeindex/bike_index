@@ -52,10 +52,9 @@
   = form_tag admin_graphs_path, method: :get, class: "variable-admin-graphs-form" do
     = hidden_field_tag :kind, @kind
     = hidden_field_tag :timezone, "", class: "hiddenFieldTimezone"
-    = hidden_field_tag :current_date, "", class: "hiddenGraphDate"
     %section.graph_time_select
       = select(:graph_date_option, :choice,{ "Past day" => "1,days", "Past week" => "1,weeks", "Past month"=>"1,months", "Past six months" => "6,months", "Past year" => "1,years", "Custom" => "custom"})
-    .clearfix{id: "calendar-box"}
+    .clearfix
       .control-group.calendar-box{style: "display: none"}
         = label_tag :start_at, "Start at", class: "control-label"
         .controls
