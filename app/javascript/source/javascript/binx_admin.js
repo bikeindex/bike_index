@@ -14,6 +14,7 @@ window.BinxAdmin = class BinxAdmin {
         .css("max-width", "100%");
     }
     if (window.location.href.match("\\admin/graphs")) {
+      window.binxAdmin.setState();
       this.initGraph();
     }
   }
@@ -21,7 +22,7 @@ window.BinxAdmin = class BinxAdmin {
   initGraph() {
     $("select#graph_date_option_choice").on("change", e => {
       e.preventDefault();
-      window.binxAdmin.setState();
+      this.setState();
     });
   }
   startTimeSet() {
