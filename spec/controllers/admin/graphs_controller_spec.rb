@@ -73,7 +73,7 @@ describe Admin::GraphsController, type: :controller do
           get :variable, kind: "payments", timezone: "America/Los_Angeles"
           expect(response.status).to eq(200)
           json_result = JSON.parse(response.body)
-          json_result.each do |data_group|
+          json_result.each do |data_group| 
             expect(data_group.keys.count).to be > 0
             expect(data_group.keys.first.class).to eq(String)
             expect(data_group.values.first.class).to eq(String)
