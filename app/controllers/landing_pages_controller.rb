@@ -15,7 +15,7 @@ class LandingPagesController < ApplicationController
 
   def for_schools; end
 
-  def for_ascend; end
+  def ascend; @page_title ||= "Ascend POS on Bike Index" end
 
   def ambassadors_current; @page_title ||= 'Current Ambassadors' end
 
