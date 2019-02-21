@@ -1,0 +1,77 @@
+- landing_page_target = 'ascend'
+.signup-landing-page{ class: "signup-landing-page-#{landing_page_target}" }
+
+  .container
+    .row.main-body-row
+      .landing-why-col.ascend-how
+        .ascend-image
+          = render "/landing_pages/icons/header_#{landing_page_target}_svg"
+        %h1
+          Automatic Bicycle Registration for Bike Shops using Ascend POS
+        %h3
+          Link your Ascend Retail and Bike Index Accounts for free
+        %p
+          We have a new, free bicycle registration for bike shops. If you’re a shop that uses Ascend as your POS, our new Ascend point of sale integration will allow you to register each bike you sell automatically. Setup takes about 10 minutes.
+        %p
+          If your shop uses Lightspeed, check out our Lightspeed POS integration <a target="none" href="https://bikeindex.org/lightspeed">here</a>
+        %p
+          Once you’ve set up the Trek Ascend POS bicycle registration, you’re done! Each day, Bike Index will pull newly-sold bike information from Ascend to create Bike Index accounts for your customers. Their new bikes will be waiting for them upon login. They just have to check their email, and their new bike will be waiting for them.
+        %p
+          Then, if a customer’s bike goes missing, their bike’s information and serial number will be stored for them to access. But don’t worry: <a target="none" href="https://bikeindex.org/privacy">we will never give out any of your customer data</a>.
+        %h2{style: "text-transform: none !important" }
+          Bike Index integration setup instructions in Ascend:
+
+        %ol
+          %li
+            Go into Reports, click SQL Query icon on up top.
+          %li
+            Paste <a target="none" href="file:///Users/lilywilliams/Downloads/BikeIndex.txt">this query text</a> into the top box.
+          %li
+            Click Execute and the Save, name the query.
+          %li
+            After it is saved you should be able to click on Delivery.
+          %li
+            Fill out the delivery form like this:
+            %ul{style: "list-style-type:none"}
+              %li
+                FTP address: ftp://ascendftp.bikeindex.org:20
+              %li
+                Username: ascendftp
+              %li
+                Port: 2
+              %li
+                Plug in help@ascendrms.com as a recipient email under the email tab (two above the *RTP/SFTP tab on the left)
+              %li
+                Password:
+                %em
+                  email #{link_to "lily@bikeindex.org", "mailto:lily@bikeindex.org"} for the password.
+        %p
+          A shop participating in this integration with Bike Index should create a product with a SKU of 'NO BIKE INDEX' for the rare customers who do not want to register their bikes in Bike Index:
+          %ul
+            %li
+              This SKU should be added to any sale where the customer wishes to opt out of registering their bike with bike index
+            %li
+              The query will return the relevant customer information for any bike sold that does not have the ‘NO BIKE INDEX’ SKU on the same transaction.
+        %p
+          At Bike Index we want to work with cycling businesses and organizations to make bike registration easy. For shops that means creating free, seamless tech with systems you’re already using. You can link your Ascend with Bike Index in just five clicks.
+        %p
+          And that's it.
+        %p
+          Email #{link_to "lily@bikeindex.org", "mailto:lily@bikeindex.org"} if you have any questions. Thank you for registering bikes in Bike Index.
+
+
+
+
+      / .next-steps-col
+      /   .next-steps-wrap
+      /     .banner-text.related-pages-banner
+      /       Related Pages
+      /     .related-pages
+      /       %p
+      /         Bike Index & Lightspeed POS
+      /       %p
+      /         Bike Index Partners
+      /       %p
+      /         Info for Shops
+
+  = render '/landing_pages/footer'
