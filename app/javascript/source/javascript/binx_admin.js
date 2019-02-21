@@ -21,12 +21,7 @@ window.BinxAdmin = class BinxAdmin {
   initGraph() {
     $("select#graph_date_option_choice").on("change", e => {
       e.preventDefault();
-      if ($("select#graph_date_option_choice")[0].value === "custom") {
-        this.slide("Down");
-      } else {
-        this.slide("Up");
-        this.startTimeSet();
-      }
+      window.binxAdmin.setState();
     });
   }
   startTimeSet() {
@@ -47,6 +42,15 @@ window.BinxAdmin = class BinxAdmin {
       $(".calendar-box").slideUp();
     } else if (direction === "Down") {
       $(".calendar-box").slideDown();
+    }
+  }
+
+  setState() {
+    if ($("select#graph_date_option_choice")[0].value === "custom") {
+      this.slide("Down");
+    } else {
+      this.slide("Up");
+      this.startTimeSet();
     }
   }
 };
