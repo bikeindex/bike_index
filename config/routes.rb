@@ -28,7 +28,11 @@ Bikeindex::Application.routes.draw do
     get slug, to: 'landing_pages#show', organization_id: slug
   end
 
+<<<<<<< HEAD
   %w(for_shops for_advocacy for_law_enforcement for_schools ambassadors_how_to ambassadors_current for_ascend).freeze.each do |page|
+=======
+  %w(for_shops for_advocacy for_law_enforcement for_schools ambassadors_how_to ambassadors_current ascend).freeze.each do |page|
+>>>>>>> fd0968c216e48a2b13d9f25268662d67e978729a
     get page, controller: 'landing_pages', action: page
   end
 

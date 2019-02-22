@@ -22,7 +22,7 @@ describe LandingPagesController do
     end
   end
 
-  %w[for_shops for_advocacy for_law_enforcement for_schools].each do |landing_type|
+  %w[for_shops for_advocacy for_law_enforcement for_schools ascend].each do |landing_type|
     describe landing_type do
       it "renders with correct title" do
         get landing_type.to_sym, preview: true
@@ -31,6 +31,8 @@ describe LandingPagesController do
         expect(response).to render_with_layout("application_revised")
         if landing_type == "for_advocacy"
           expect(title).to eq "Bike Index for Advocacy Organizations"
+        elsif landing_type == "ascend"
+          expect(title).to eq "Ascend POS on Bike Index"
         else
           expect(title).to eq "Bike Index #{landing_type.titleize.gsub(/\AF/, 'f')}"
         end
