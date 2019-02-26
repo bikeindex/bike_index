@@ -79,7 +79,6 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def set_variable_graph_kind
-    @graph_default_option = params[:graph_date_option]
     @graph_kinds = %w[general users payments]
     @kind = @graph_kinds.include?(params[:kind]) ? params[:kind] : @graph_kinds.first
   end

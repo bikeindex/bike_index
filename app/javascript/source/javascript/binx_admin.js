@@ -13,23 +13,20 @@ window.BinxAdmin = class BinxAdmin {
         .parents(".receptacle")
         .css("max-width", "100%");
     }
-    if (
-      window.location.href.match("\\admin/graphs") &&
-      !window.location.href.match("\\kind=general")
-    ) {
-      window.binxAdmin.setState();
-      this.initGraph();
+    if ($(".calendar-box")[0]) {
+      window.binxAdmin.setCustomGraphStartAndSlide();
+      this.changeGraphCalendarBox();
     }
   }
 
-  initGraph() {
+  changeGraphCalendarBox() {
     $("select#graph_date_option").on("change", e => {
       e.preventDefault();
-      this.setState();
+      this.setCustomGraphStartAndSlide();
     });
   }
 
-  startTimeSet() {
+  startGraphTimeSet() {
     let graphSelected = $("select#graph_date_option")[0].value.split(",");
     let amount = Number(graphSelected[0]);
     let unit = graphSelected[1];
@@ -40,12 +37,12 @@ window.BinxAdmin = class BinxAdmin {
     );
   }
 
-  setState() {
+  setCustomGraphStartAndSlide() {
     if ($("select#graph_date_option")[0].value === "custom") {
       $(".calendar-box").slideDown();
     } else {
       $(".calendar-box").slideUp();
-      this.startTimeSet();
+      this.startGraphTimeSet();
     }
   }
 };
