@@ -48,6 +48,4 @@ window.BinxAdmin = class BinxAdmin {
       this.startTimeSet();
     }
   }
-
-  setShownOption() {}
 };
