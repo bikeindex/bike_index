@@ -14,7 +14,6 @@ window.BinxAdmin = class BinxAdmin {
         .css("max-width", "100%");
     }
     if (window.location.href.match("\\admin/graphs")) {
-      window.binxAdmin.setShownOption();
       window.binxAdmin.setState();
       this.initGraph();
     }
@@ -38,45 +37,15 @@ window.BinxAdmin = class BinxAdmin {
     );
   }
 
-  slide(direction) {
-    if (direction === "Up") {
-      $(".calendar-box").slideUp();
-    } else if (direction === "Down") {
-      $(".calendar-box").slideDown();
-    }
-  }
-
   setState() {
     if ($("select#graph_date_option")[0].value === "custom") {
-      this.slide("Down");
+      $(".calendar-box").slideDown();
     } else {
-      this.slide("Up");
+      $(".calendar-box").slideUp();
       this.startTimeSet();
     }
+    console.log("Chill");
   }
-  queryParameters() {
-    let result = {};
-    let params = window.location.search.split(/\?|\&/);
-    params.forEach(function(it) {
-      if (it) {
-        let param = it.split("=");
-        result[param[0]] = param[1];
-      }
-    });
-    return result.graph_date_option;
-  }
-  setShownOption() {
-    let choice = this.queryParameters();
-    if (choice === "1%Cdays") {
-      $("select#graph_date_option")[0].value = "1,days";
-    } else if (choice === "1%2Cweeks") {
-      $("select#graph_date_option")[0].value = "1,weeks";
-    } else if (choice === "1%2Cmonths") {
-      $("select#graph_date_option")[0].value = "1,months";
-    } else if (choice === "6%2Cmonths") {
-      $("select#graph_date_option")[0].value = "6,months";
-    } else if (choice === "1%2Cyears") {
-      $("select#graph_date_option")[0].value = "1,years";
-    }
-  }
+
+  setShownOption() {}
 };

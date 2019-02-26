@@ -7,6 +7,8 @@ class Admin::GraphsController < Admin::BaseController
   def variable
     set_variable_graph_kind
     set_variable_graphing_timing
+    p "!!!"
+    p @graph_default_option
     if @kind == "users"
       chart_data = User.where(created_at: @start_at..@end_at)
                        .group_by_period(@group_period, :created_at, time_zone: @timezone)
@@ -79,6 +81,7 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def set_variable_graph_kind
+    @graph_default_option = params[:graph_date_option]
     @graph_kinds = %w[general users payments]
     @kind = @graph_kinds.include?(params[:kind]) ? params[:kind] : @graph_kinds.first
   end
