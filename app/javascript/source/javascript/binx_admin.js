@@ -66,15 +66,16 @@ window.BinxAdmin = class BinxAdmin {
     return result;
   }
   setShownOption() {
-    if (this.queryParameters().graph_date_option === "%1Cdays") {
+    let choice = this.queryParameters().graph_date_option;
+    if (choice === "1%Cdays") {
       $("select#graph_date_option")[0].value = "1,days";
-    } else if (this.queryParameters().graph_date_option === "1%2Cweeks") {
+    } else if (choice === "1%2Cweeks") {
       $("select#graph_date_option")[0].value = "1,weeks";
-    } else if (this.queryParameters().graph_date_option === "1%2Cmonths") {
+    } else if (choice === "1%2Cmonths") {
       $("select#graph_date_option")[0].value = "1,months";
-    } else if (this.queryParameters().graph_date_option === "6%2Cmonths") {
+    } else if (choice === "6%2Cmonths") {
       $("select#graph_date_option")[0].value = "6,months";
-    } else if (this.queryParameters().graph_date_option === "1%2Cyears") {
+    } else if (choice === "1%2Cyears") {
       $("select#graph_date_option")[0].value = "1,years";
     }
   }
