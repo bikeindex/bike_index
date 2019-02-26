@@ -63,10 +63,10 @@ window.BinxAdmin = class BinxAdmin {
         result[param[0]] = param[1];
       }
     });
-    return result;
+    return result.graph_date_option;
   }
   setShownOption() {
-    let choice = this.queryParameters().graph_date_option;
+    let choice = this.queryParameters();
     if (choice === "1%Cdays") {
       $("select#graph_date_option")[0].value = "1,days";
     } else if (choice === "1%2Cweeks") {
