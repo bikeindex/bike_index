@@ -14,21 +14,21 @@ window.BinxAdmin = class BinxAdmin {
         .css("max-width", "100%");
     }
     if (window.location.href.match("\\admin/graphs")) {
+      window.binxAdmin.setShownOption();
       window.binxAdmin.setState();
       this.initGraph();
     }
   }
 
   initGraph() {
-    $("select#graph_date_option_choice").on("change", e => {
+    $("select#graph_date_option").on("change", e => {
       e.preventDefault();
       this.setState();
     });
   }
+
   startTimeSet() {
-    let graphSelected = $("select#graph_date_option_choice")[0].value.split(
-      ","
-    );
+    let graphSelected = $("select#graph_date_option")[0].value.split(",");
     let amount = Number(graphSelected[0]);
     let unit = graphSelected[1];
     $("#start_at").val(
@@ -47,11 +47,35 @@ window.BinxAdmin = class BinxAdmin {
   }
 
   setState() {
-    if ($("select#graph_date_option_choice")[0].value === "custom") {
+    if ($("select#graph_date_option")[0].value === "custom") {
       this.slide("Down");
     } else {
       this.slide("Up");
       this.startTimeSet();
+    }
+  }
+  queryParameters() {
+    let result = {};
+    let params = window.location.search.split(/\?|\&/);
+    params.forEach(function(it) {
+      if (it) {
+        let param = it.split("=");
+        result[param[0]] = param[1];
+      }
+    });
+    return result;
+  }
+  setShownOption() {
+    if (this.queryParameters().graph_date_option === "%1Cdays") {
+      $("select#graph_date_option")[0].value = "1,days";
+    } else if (this.queryParameters().graph_date_option === "1%2Cweeks") {
+      $("select#graph_date_option")[0].value = "1,weeks";
+    } else if (this.queryParameters().graph_date_option === "1%2Cmonths") {
+      $("select#graph_date_option")[0].value = "1,months";
+    } else if (this.queryParameters().graph_date_option === "6%2Cmonths") {
+      $("select#graph_date_option")[0].value = "6,months";
+    } else if (this.queryParameters().graph_date_option === "1%2Cyears") {
+      $("select#graph_date_option")[0].value = "1,years";
     }
   }
 };

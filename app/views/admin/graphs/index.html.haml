@@ -53,7 +53,7 @@
     = hidden_field_tag :kind, @kind
     = hidden_field_tag :timezone, "", class: "hiddenFieldTimezone"
     %section.graph_time_select
-      = select(:graph_date_option, :choice,{"Custom" => "custom", "Past day" => "1,days", "Past week" => "1,weeks", "Past month"=>"1,months", "Past six months" => "6,months", "Past year" => "1,years"})
+      = select_tag(:graph_date_option, options_for_select([["Custom","custom"],["Past day", "1,days"],["Past week", "1,weeks"], ["Past month", "1,months"], ["Past six months", "6,months"], ["Past year", "1,years"]]))
     .clearfix
       .control-group.calendar-box{style: "display: none"}
         = label_tag :start_at, "Start at", class: "control-label"
