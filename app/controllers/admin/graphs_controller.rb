@@ -7,7 +7,6 @@ class Admin::GraphsController < Admin::BaseController
   def variable
     set_variable_graph_kind
     set_variable_graphing_timing
-    p "!!!"
     p @graph_default_option
     if @kind == "users"
       chart_data = User.where(created_at: @start_at..@end_at)

@@ -13,7 +13,10 @@ window.BinxAdmin = class BinxAdmin {
         .parents(".receptacle")
         .css("max-width", "100%");
     }
-    if (window.location.href.match("\\admin/graphs")) {
+    if (
+      window.location.href.match("\\admin/graphs") &&
+      !window.location.href.match("\\kind=general")
+    ) {
       window.binxAdmin.setState();
       this.initGraph();
     }
@@ -44,7 +47,6 @@ window.BinxAdmin = class BinxAdmin {
       $(".calendar-box").slideUp();
       this.startTimeSet();
     }
-    console.log("Chill");
   }
 
   setShownOption() {}
