@@ -1,4 +1,4 @@
-= javascript_include_tag "//www.google.com/jsapi", "chartkick" 
+= javascript_include_tag "//www.google.com/jsapi", "chartkick"
 
 / inline scss is wrong and shouldn't be done - but because we're avoiding adding new things to the existing admin stylesheets, putting it here anyway
 / TODO: put into admin stylesheets when we update admin stylesheets
@@ -52,17 +52,20 @@
   = form_tag admin_graphs_path, method: :get, class: "variable-admin-graphs-form" do
     = hidden_field_tag :kind, @kind
     = hidden_field_tag :timezone, "", class: "hiddenFieldTimezone"
+
+    %section.graph_time_select
+      = select_tag(:graph_date_option, options_for_select([["Custom","custom"],["Past day", "1,days"],["Past week", "1,weeks"], ["Past month", "1,months"], ["Past six months", "6,months"], ["Past year", "1,years"]], params[:graph_date_option]))
+      = submit_tag "Update chart", class: "button-green"
     .clearfix
-      .control-group
+      .control-group.calendar-box{style: "display: none"}
         = label_tag :start_at, "Start at", class: "control-label"
         .controls
           = datetime_local_field_tag :start_at, @start_at.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
-      .control-group
+      .control-group.calendar-box{style: "display: none"}
         = label_tag :end_at, "End at", class: "control-label"
         .controls
           = datetime_local_field_tag :end_at, @end_at.strftime("%Y-%m-%dT%H:%M"), step: 60
       .control-group{ style: "padding-top: 19px" }
-        = submit_tag "Update chart", class: "button-green"
     = line_chart variable_admin_graphs_path(params)
     %em.small.less-strong
       graph is grouped by #{@group_period}
