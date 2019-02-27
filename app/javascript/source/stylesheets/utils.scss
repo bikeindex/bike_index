@@ -1,0 +1,37 @@
+// Handy helper classes
+.less-strong {
+  opacity: 0.65;
+}
+.gray-link {
+  color: $gray-600 !important;
+  opacity: 0.65;
+  text-decoration: underline;
+  &:hover,
+  &:active,
+  &.active {
+    opacity: 0.9;
+  }
+}
+
+label {
+  cursor: pointer;
+}
+.em {
+  font-style: italic;
+}
+
+.hidden-sm-down {
+  @include media-breakpoint-down(sm) {
+    display: none;
+  }
+}
+
+.hidden-xs-down {
+  @include media-breakpoint-down(xs) {
+    display: none;
+  }
+}
+
+.convertedTime {
+  white-space: nowrap;
+}
