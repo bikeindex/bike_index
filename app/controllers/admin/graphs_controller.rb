@@ -35,7 +35,10 @@ class Admin::GraphsController < Admin::BaseController
                         .count}
                     ]
       elsif @kind == "recoveries"
-        chart_data = StolenRecord.where(date_recovered: @start_at..@end_at)
+        recoveries = StolenRecord.unscoped
+        chart_data = recoveries.where(date_recovered: @start_at..@end_at)
+                         .group_by_period(@group_period, :date_recovered, time_zone: @timezone)
+                         .count
       end
     if chart_data.present?
       render json: chart_data.chart_json
