@@ -13,91 +13,53 @@
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   - body_class = "news-page" if controller_name == "news"
   %body{ id: page_id, class:  body_class }
+    .navheaderwhatever
+      - if current_user.superuser?
+        %h2.new-title
+          = admin_nav_link "Go hard", admin_root_path
+        %ul
+          %li
+            = admin_nav_link "Organizations", admin_organizations_path
 
-    %nav.navbar.navbar-expand-sm.navbar-dark.bg-secondary
-      %button.navbar-toggler{"data-target" => "#navbar8", "data-toggle" => "collapse", :type => "button"}
-        %span.navbar-toggler-icon
-      %span.navbar-text  
-      #navbar8.navbar-collapse.collapse
-        %ul.navbar-nav.abs-center-x
-          %li.nav-item.px-2
-            = admin_nav_link "Organizations", admin_organizations_path
-          %li.nav-item.px-2
-            = admin_nav_link "Organizations", admin_organizations_path
-          %li.nav-item.px-2
+          %li
             = admin_nav_link "Users", admin_users_path
-          %li.nav-item.px-2
+
+          %li
             = admin_nav_link "Memberships", admin_memberships_path
-          %li.nav-item.px-2
+
+          %li
             = admin_nav_link "Manufacturers", admin_manufacturers_path
-          %li.nav-item.px-2
+
+          %li
             = admin_nav_link "Bikes", admin_bikes_path
-          %li.nav-item.px-2
+
+          %li
             = admin_nav_link "Invitations", admin_invitations_path
-          %li.nav-item.px-2
+
+          %li
             = admin_nav_link "News", admin_news_index_path
-          %li.nav-item.px-2
+          %li
             = admin_nav_link "Stolen", admin_stolen_bikes_path
-          %li.nav-item.px-2
+          / %li
+          /   = admin_nav_link "Recoveries", admin_recoveries_path
+          %li
             = admin_nav_link "Recovery displays", admin_recovery_displays_path
-          %li.nav-item.px-2
+          %li
             = admin_nav_link "Paid Features", admin_paid_features_path
-        %ul.navbar-nav.ml-auto
-          %li.nav-item
-            %a.nav-link{:href => "#"} Link
-          %li.nav-item
-            %a.nav-link{:href => "//codeply.com"} Codeply
-          %li.nav-item
-            %a.nav-link{:href => "#"} Link
-
-    .navbar.navbar-default
-      .navbar.navbar-expand
-        - if current_user.superuser?
-          %h2.new-title
-            = admin_nav_link "Go hard", admin_root_path
-          %ul.nav.navbar-nav
-            %li.px-2
-              = admin_nav_link "Organizations", admin_organizations_path
-
-            %li.px-2
-              = admin_nav_link "Users", admin_users_path
-
-            %li.px-2
-              = admin_nav_link "Memberships", admin_memberships_path
-
-            %li.px-2
-              = admin_nav_link "Manufacturers", admin_manufacturers_path
-
-            %li.px-2
-              = admin_nav_link "Bikes", admin_bikes_path
-
-            %li.px-2
-              = admin_nav_link "Invitations", admin_invitations_path
-
-            %li.px-2
-              = admin_nav_link "News", admin_news_index_path
-            %li.px-2
-              = admin_nav_link "Stolen", admin_stolen_bikes_path
-            / %li
-            /   = admin_nav_link "Recoveries", admin_recoveries_path
-            %li.px-2
-              = admin_nav_link "Recovery displays", admin_recovery_displays_path
-            %li.px-2
-              = admin_nav_link "Paid Features", admin_paid_features_path
-            %li.px-2
-              = admin_nav_link "Payments", admin_payments_path
-            %li.px-2
-              = admin_nav_link "Invoices", admin_invoices_path
+          %li
+            = admin_nav_link "Payments", admin_payments_path
+          %li
+            = admin_nav_link "Invoices", admin_invoices_path
 
           - if Rails.env.development?
             %li
               Mailers: #{admin_nav_link "organized", '/rails/mailers/organized_mailer'}, #{admin_nav_link "admin", '/rails/mailers/admin_mailer'}, #{admin_nav_link "customer", '/rails/mailers/customer_mailer'}
-          - elsif current_user.is_content_admin?
-            %h2.new-title
-              = admin_nav_link "Go hard", admin_news_index_path
-            %ul
-              %li
-                = admin_nav_link "News", admin_news_index_path
+      - elsif current_user.is_content_admin?
+        %h2.new-title
+          = admin_nav_link "Go hard", admin_news_index_path
+        %ul
+          %li
+            = admin_nav_link "News", admin_news_index_path
     = render 'layouts/revised_messages'
 
     %section#admin-content
