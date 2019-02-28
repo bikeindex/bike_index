@@ -1,4 +1,4 @@
-%header.with-subtitle
+%header.with-subtitle.has-danger
   %h1
     #{link_to 'Feedback and messages', admin_feedbacks_path}
 %h4
@@ -53,11 +53,11 @@
             = feedback.name
           %td.large-screens
             = feedback.body.truncate(100)
-        
+
 .paginate-container
   = paginate @feedbacks
 
-= javascript_include_tag "//www.google.com/jsapi", "chartkick" 
+= javascript_include_tag "//www.google.com/jsapi", "chartkick"
 %pre
   = params.to_yaml
 = line_chart graphs_admin_feedbacks_path(params.merge(start_at: params[:start_at]).except(:controller, :action))
