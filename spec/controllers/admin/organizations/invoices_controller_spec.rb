@@ -10,7 +10,7 @@ describe Admin::Organizations::InvoicesController, type: :controller do
       paid_feature_ids: [paid_feature1.id, paid_feature2.id].join(","),
       amount_due: "1220",
       timezone: "EST",
-      subscription_start_at: "2018-09-05T23:00:00",
+      start_at: "2018-09-05T23:00:00",
       notes: "some cool note about when something was paid"
     }
   end
@@ -54,7 +54,7 @@ describe Admin::Organizations::InvoicesController, type: :controller do
         invoice.paid_feature_ids = [paid_feature3.id]
         invoice.reload
         expect(invoice.paid_features.pluck(:id)).to eq([paid_feature3.id])
-        put :update, organization_id: organization.to_param, id: invoice.to_param, invoice: params.merge(subscription_end_at: "2019-07-05T23:00:00")
+        put :update, organization_id: organization.to_param, id: invoice.to_param, invoice: params.merge(end_at: "2019-07-05T23:00:00")
         invoice.reload
         expect(invoice.paid_feature_ids).to match_array([paid_feature1.id, paid_feature2.id])
         expect(invoice.amount_due).to eq 1220

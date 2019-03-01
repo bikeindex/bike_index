@@ -21,6 +21,8 @@ class Invoice < ActiveRecord::Base
   scope :current, -> { active.where("subscription_end_at > ?", Time.now) }
   scope :expired, -> { active.where("subscription_end_at < ?", Time.now) }
 
+  attr_accessor :timezone
+
   def self.friendly_find(str)
     str = str[/\d+/] if str.is_a?(String)
     where(id: str).first
@@ -38,6 +40,8 @@ class Invoice < ActiveRecord::Base
   def subscription_first_invoice; first_invoice || self end
   def subscription_invoices; self.class.where(first_invoice_id: subscription_first_invoice_id).where.not(id: id) end
   def display_name; "Invoice ##{id}" end
+  def start_at; subscription_start_at end
+  def start_at; subscription_end_at end
 
   def paid_feature_ids; invoice_paid_features.pluck(:paid_feature_id) end
 
@@ -63,6 +67,14 @@ class Invoice < ActiveRecord::Base
         end
       end
     end
+  end
+
+  def start_at=(val)
+    self.subscription_start_at = TimeParser.parse(val, timezone)
+  end
+
+  def end_at=(val)
+    self.subscription_end_at = TimeParser.parse(val, timezone)
   end
 
   def amount_due
@@ -106,7 +118,7 @@ class Invoice < ActiveRecord::Base
   def create_following_invoice
     return nil unless active? || was_active?
     return following_invoice if following_invoice.present?
-    new_invoice = organization.invoices.create(subscription_start_at: subscription_end_at,
+    new_invoice = organization.invoices.create(start_at: subscription_end_at,
                                                first_invoice_id: subscription_first_invoice_id)
     new_invoice.paid_feature_ids = paid_features.recurring.pluck(:id)
     new_invoice.reload
