@@ -54,7 +54,7 @@ module Organized
     end
 
     def ensure_access_to_bike_codes!
-      return true if current_organization.has_bike_codes || current_user.superuser?
+      return true if current_organization.bike_codes? || current_user.superuser?
       flash[:error] = "Your organization doesn't have access to that, please contact Bike Index support"
       redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
     end

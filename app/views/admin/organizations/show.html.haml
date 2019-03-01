@@ -152,7 +152,7 @@
           %dt
             Stickers
           %dd
-            - if @organization.has_bike_codes
+            - if @organization.bike_codes?
               = link_to "Has stickers", organization_stickers_path(organization_id: @organization.to_param)
             - else
               %small.less-strong
