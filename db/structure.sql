@@ -266,6 +266,76 @@ CREATE TABLE public.bikes (
 
 
 --
+-- Name: COLUMN bikes.name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.bikes.name IS 'anon: lorem_word';
+
+
+--
+-- Name: COLUMN bikes.serial_number; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.bikes.serial_number IS 'anon: ugcid';
+
+
+--
+-- Name: COLUMN bikes.cached_data; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.bikes.cached_data IS 'anon: lorem_sentence';
+
+
+--
+-- Name: COLUMN bikes.description; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.bikes.description IS 'anon: lorem_sentence';
+
+
+--
+-- Name: COLUMN bikes.owner_email; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.bikes.owner_email IS 'anon: email';
+
+
+--
+-- Name: COLUMN bikes.pdf; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.bikes.pdf IS 'anon: lorem_word';
+
+
+--
+-- Name: COLUMN bikes.serial_normalized; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.bikes.serial_normalized IS 'anon: ugcid';
+
+
+--
+-- Name: COLUMN bikes.all_description; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.bikes.all_description IS 'anon: ugcid';
+
+
+--
+-- Name: COLUMN bikes.stolen_lat; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.bikes.stolen_lat IS 'anon: latitude';
+
+
+--
+-- Name: COLUMN bikes.stolen_long; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.bikes.stolen_long IS 'anon: longitude';
+
+
+--
 -- Name: bikes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -4112,4 +4182,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190206044915');
 INSERT INTO schema_migrations (version) VALUES ('20190208195902');
 
 INSERT INTO schema_migrations (version) VALUES ('20190301020053');
+
+INSERT INTO schema_migrations (version) VALUES ('20190301200609');
 
