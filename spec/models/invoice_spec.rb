@@ -36,10 +36,10 @@ RSpec.describe Invoice, type: :model do
       expect(invoice2.active?).to be_falsey
       expect(invoice2.was_active?).to be_truthy
       expect(invoice3.subscription_first_invoice).to eq invoice
-      expect(invoice2.subscription_start_at).to be_within(1.minute).of Time.now - 3.years
+      expect(invoice2.subscription_start_at).to be_within(1.day).of Time.now - 3.years
       expect(invoice2.renewal_invoice?).to be_truthy
       expect(invoice2.previous_invoice).to eq invoice
-      expect(invoice3.subscription_start_at).to be_within(1.minute).of Time.now - 2.years
+      expect(invoice3.subscription_start_at).to be_within(1.day).of Time.now - 2.years
       expect(invoice3.previous_invoice).to eq invoice2
     end
   end
