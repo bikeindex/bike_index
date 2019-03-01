@@ -25,7 +25,7 @@ RSpec.describe Invoice, type: :model do
   end
 
   describe "previous_invoice" do
-    let(:invoice) { FactoryBot.create(:invoice, subscription_start_at: Time.now - 4.years, force_active: true) }
+    let(:invoice) { FactoryBot.create(:invoice, start_at: Time.now - 4.years, force_active: true) }
     let(:invoice2) { invoice.create_following_invoice }
     let(:invoice3) { invoice2.create_following_invoice }
     it "returns correct invoices" do
