@@ -164,11 +164,12 @@ class Organization < ActiveRecord::Base
   end
 
   # TODO: these are DEPRECATED and should be REPLACED with paid_for?
-  # I'm trying to ammass a list of paid features here (also in admin organization show)
+  # Once all the following methods have been moved fully to paid_for?, remove methods and just use paid_for
   def bike_search?; paid_for?("bike_search") end
-  def show_recoveries?; bike_search? end
-  def show_bulk_import?; show_bulk_import end
-  def show_partial_registrations?; show_partial_registrations end
+  def bike_codes?; has_bike_codes end
+  def bulk_import?; show_bulk_import end
+  def partial_registrations?; show_partial_registrations end
+  def show_recoveries?; bike_search? end # This now has a paid_feature slug, should be converted to that
 
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates
