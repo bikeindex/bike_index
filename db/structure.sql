@@ -108,6 +108,55 @@ CREATE TABLE public.b_params (
 
 
 --
+-- Name: COLUMN b_params.old_params; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.b_params.old_params IS 'anon: empty_string';
+
+
+--
+-- Name: COLUMN b_params.bike_errors; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.b_params.bike_errors IS 'anon: lorem_sentence';
+
+
+--
+-- Name: COLUMN b_params.image; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.b_params.image IS 'anon: lorem_word';
+
+
+--
+-- Name: COLUMN b_params.image_tmp; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.b_params.image_tmp IS 'anon: lorem_word';
+
+
+--
+-- Name: COLUMN b_params.id_token; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.b_params.id_token IS 'anon: md5';
+
+
+--
+-- Name: COLUMN b_params.params; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.b_params.params IS 'anon: empty_curly';
+
+
+--
+-- Name: COLUMN b_params.email; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.b_params.email IS 'anon: email';
+
+
+--
 -- Name: b_params_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -141,6 +190,13 @@ CREATE TABLE public.bike_codes (
     updated_at timestamp without time zone NOT NULL,
     claimed_at timestamp without time zone
 );
+
+
+--
+-- Name: COLUMN bike_codes.code; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.bike_codes.code IS 'anon: ugcid';
 
 
 --
@@ -301,6 +357,13 @@ COMMENT ON COLUMN public.bikes.owner_email IS 'anon: email';
 
 
 --
+-- Name: COLUMN bikes.thumb_path; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.bikes.thumb_path IS 'anon: url';
+
+
+--
 -- Name: COLUMN bikes.pdf; Type: COMMENT; Schema: public; Owner: -
 --
 
@@ -414,6 +477,13 @@ CREATE TABLE public.bulk_imports (
     updated_at timestamp without time zone NOT NULL,
     is_ascend boolean DEFAULT false
 );
+
+
+--
+-- Name: COLUMN bulk_imports.file; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.bulk_imports.file IS 'anon: lorem_word';
 
 
 --
@@ -670,6 +740,27 @@ CREATE TABLE public.customer_contacts (
 
 
 --
+-- Name: COLUMN customer_contacts.user_email; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.customer_contacts.user_email IS 'anon: email';
+
+
+--
+-- Name: COLUMN customer_contacts.creator_email; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.customer_contacts.creator_email IS 'anon: email';
+
+
+--
+-- Name: COLUMN customer_contacts.info_hash; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.customer_contacts.info_hash IS 'anon: empty_string';
+
+
+--
 -- Name: customer_contacts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -806,6 +897,34 @@ CREATE TABLE public.feedbacks (
     feedback_hash text,
     user_id integer
 );
+
+
+--
+-- Name: COLUMN feedbacks.name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.feedbacks.name IS 'anon: full_name';
+
+
+--
+-- Name: COLUMN feedbacks.email; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.feedbacks.email IS 'anon: email';
+
+
+--
+-- Name: COLUMN feedbacks.title; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.feedbacks.title IS 'anon: lorem_word';
+
+
+--
+-- Name: COLUMN feedbacks.body; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.feedbacks.body IS 'anon: lorem_sentence';
 
 
 --
@@ -973,6 +1092,20 @@ CREATE TABLE public.integrations (
 
 
 --
+-- Name: COLUMN integrations.access_token; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.integrations.access_token IS 'anon: md5';
+
+
+--
+-- Name: COLUMN integrations.information; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.integrations.information IS 'anon: empty_string';
+
+
+--
 -- Name: integrations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -1041,6 +1174,13 @@ CREATE TABLE public.invoices (
     updated_at timestamp without time zone NOT NULL,
     notes text
 );
+
+
+--
+-- Name: COLUMN invoices.notes; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.invoices.notes IS 'anon: lorem_sentence';
 
 
 --
@@ -1128,6 +1268,27 @@ CREATE TABLE public.locations (
 
 
 --
+-- Name: COLUMN locations.name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.locations.name IS 'anon: company_name';
+
+
+--
+-- Name: COLUMN locations.latitude; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.locations.latitude IS 'anon: latitude';
+
+
+--
+-- Name: COLUMN locations.longitude; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.locations.longitude IS 'anon: longitude';
+
+
+--
 -- Name: locations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -1197,6 +1358,20 @@ CREATE TABLE public.locks (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
+
+
+--
+-- Name: COLUMN locks.key_serial; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.locks.key_serial IS 'anon: ugcid';
+
+
+--
+-- Name: COLUMN locks.notes; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.locks.notes IS 'anon: lorem_sentence';
 
 
 --
@@ -1349,6 +1524,13 @@ CREATE TABLE public.normalized_serial_segments (
 
 
 --
+-- Name: COLUMN normalized_serial_segments.segment; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.normalized_serial_segments.segment IS 'anon: ugcid';
+
+
+--
 -- Name: normalized_serial_segments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -1385,6 +1567,20 @@ CREATE TABLE public.oauth_access_grants (
 
 
 --
+-- Name: COLUMN oauth_access_grants.token; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.oauth_access_grants.token IS 'anon: md5';
+
+
+--
+-- Name: COLUMN oauth_access_grants.redirect_uri; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.oauth_access_grants.redirect_uri IS 'anon: url';
+
+
+--
 -- Name: oauth_access_grants_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -1418,6 +1614,20 @@ CREATE TABLE public.oauth_access_tokens (
     created_at timestamp without time zone NOT NULL,
     scopes character varying(255)
 );
+
+
+--
+-- Name: COLUMN oauth_access_tokens.token; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.oauth_access_tokens.token IS 'anon: md5';
+
+
+--
+-- Name: COLUMN oauth_access_tokens.refresh_token; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.oauth_access_tokens.refresh_token IS 'anon: md5';
 
 
 --
@@ -1460,6 +1670,34 @@ CREATE TABLE public.oauth_applications (
 
 
 --
+-- Name: COLUMN oauth_applications.name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.oauth_applications.name IS 'anon: company_name';
+
+
+--
+-- Name: COLUMN oauth_applications.uid; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.oauth_applications.uid IS 'anon: md5';
+
+
+--
+-- Name: COLUMN oauth_applications.secret; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.oauth_applications.secret IS 'anon: md5';
+
+
+--
+-- Name: COLUMN oauth_applications.redirect_uri; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.oauth_applications.redirect_uri IS 'anon: url';
+
+
+--
 -- Name: oauth_applications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -1495,6 +1733,20 @@ CREATE TABLE public.organization_invitations (
     updated_at timestamp without time zone NOT NULL,
     deleted_at timestamp without time zone
 );
+
+
+--
+-- Name: COLUMN organization_invitations.invitee_email; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organization_invitations.invitee_email IS 'anon: email';
+
+
+--
+-- Name: COLUMN organization_invitations.invitee_name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organization_invitations.invitee_name IS 'anon: full_name';
 
 
 --
@@ -1536,6 +1788,41 @@ CREATE TABLE public.organization_messages (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
+
+
+--
+-- Name: COLUMN organization_messages.email; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organization_messages.email IS 'anon: email';
+
+
+--
+-- Name: COLUMN organization_messages.body; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organization_messages.body IS 'anon: lorem_sentence';
+
+
+--
+-- Name: COLUMN organization_messages.address; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organization_messages.address IS 'anon: address_line_1';
+
+
+--
+-- Name: COLUMN organization_messages.latitude; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organization_messages.latitude IS 'anon: latitude';
+
+
+--
+-- Name: COLUMN organization_messages.longitude; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organization_messages.longitude IS 'anon: longitude';
 
 
 --
@@ -1591,6 +1878,41 @@ CREATE TABLE public.organizations (
     kind integer,
     ascend_name character varying
 );
+
+
+--
+-- Name: COLUMN organizations.name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organizations.name IS 'anon: company_name';
+
+
+--
+-- Name: COLUMN organizations.slug; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organizations.slug IS 'anon: lorem_word';
+
+
+--
+-- Name: COLUMN organizations.website; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organizations.website IS 'anon: url';
+
+
+--
+-- Name: COLUMN organizations.short_name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organizations.short_name IS 'anon: lorem_word';
+
+
+--
+-- Name: COLUMN organizations.access_token; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organizations.access_token IS 'anon: md5';
 
 
 --
@@ -1663,6 +1985,13 @@ CREATE TABLE public.ownerships (
     send_email boolean DEFAULT true,
     user_hidden boolean DEFAULT false NOT NULL
 );
+
+
+--
+-- Name: COLUMN ownerships.owner_email; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.ownerships.owner_email IS 'anon: email';
 
 
 --
@@ -1777,6 +2106,20 @@ CREATE TABLE public.payments (
     organization_id integer,
     invoice_id integer
 );
+
+
+--
+-- Name: COLUMN payments.stripe_id; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.payments.stripe_id IS 'anon: md5';
+
+
+--
+-- Name: COLUMN payments.email; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.payments.email IS 'anon: email';
 
 
 --
@@ -2000,6 +2343,27 @@ CREATE TABLE public.stolen_notifications (
 
 
 --
+-- Name: COLUMN stolen_notifications.message; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.stolen_notifications.message IS 'anon: lorem_sentence';
+
+
+--
+-- Name: COLUMN stolen_notifications.receiver_email; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.stolen_notifications.receiver_email IS 'anon: email';
+
+
+--
+-- Name: COLUMN stolen_notifications.reference_url; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.stolen_notifications.reference_url IS 'anon: url';
+
+
+--
 -- Name: stolen_notifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -2064,6 +2428,48 @@ CREATE TABLE public.stolen_records (
     estimated_value integer,
     recovery_link_token text
 );
+
+
+--
+-- Name: COLUMN stolen_records.street; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.stolen_records.street IS 'anon: address_line_1';
+
+
+--
+-- Name: COLUMN stolen_records.latitude; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.stolen_records.latitude IS 'anon: latitude';
+
+
+--
+-- Name: COLUMN stolen_records.longitude; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.stolen_records.longitude IS 'anon: longitude';
+
+
+--
+-- Name: COLUMN stolen_records.phone; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.stolen_records.phone IS 'anon: phone_number';
+
+
+--
+-- Name: COLUMN stolen_records.police_report_number; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.stolen_records.police_report_number IS 'anon: ugcid';
+
+
+--
+-- Name: COLUMN stolen_records.secondary_phone; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.stolen_records.secondary_phone IS 'anon: phone_number';
 
 
 --
@@ -2136,6 +2542,13 @@ CREATE TABLE public.user_emails (
 
 
 --
+-- Name: COLUMN user_emails.email; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.user_emails.email IS 'anon: email';
+
+
+--
 -- Name: user_emails_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -2205,6 +2618,146 @@ CREATE TABLE public.users (
     country_id integer,
     state_id integer
 );
+
+
+--
+-- Name: COLUMN users.name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.name IS 'anon: full_name';
+
+
+--
+-- Name: COLUMN users.email; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.email IS 'anon: email';
+
+
+--
+-- Name: COLUMN users.password; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.password IS 'anon: password';
+
+
+--
+-- Name: COLUMN users.password_digest; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.password_digest IS 'anon: bcrypt_password';
+
+
+--
+-- Name: COLUMN users.phone; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.phone IS 'anon: phone_number';
+
+
+--
+-- Name: COLUMN users.twitter; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.twitter IS 'anon: url';
+
+
+--
+-- Name: COLUMN users.website; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.website IS 'anon: url';
+
+
+--
+-- Name: COLUMN users.username; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.username IS 'anon: lorem_word';
+
+
+--
+-- Name: COLUMN users.description; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.description IS 'anon: lorem_sentence';
+
+
+--
+-- Name: COLUMN users.title; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.title IS 'anon: lorem_word';
+
+
+--
+-- Name: COLUMN users.confirmation_token; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.confirmation_token IS 'anon: md5';
+
+
+--
+-- Name: COLUMN users.auth_token; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.auth_token IS 'anon: md5';
+
+
+--
+-- Name: COLUMN users.stripe_id; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.stripe_id IS 'anon: md5';
+
+
+--
+-- Name: COLUMN users.paid_membership_info; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.paid_membership_info IS 'anon: empty_string';
+
+
+--
+-- Name: COLUMN users.my_bikes_hash; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.my_bikes_hash IS 'anon: empty_string';
+
+
+--
+-- Name: COLUMN users.partner_data; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.partner_data IS 'anon: empty_curly';
+
+
+--
+-- Name: COLUMN users.latitude; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.latitude IS 'anon: latitude';
+
+
+--
+-- Name: COLUMN users.longitude; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.longitude IS 'anon: longitude';
+
+
+--
+-- Name: COLUMN users.street; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.street IS 'anon: address_line_1';
+
+
+--
+-- Name: COLUMN users.city; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.city IS 'anon: address_city';
 
 
 --
