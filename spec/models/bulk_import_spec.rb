@@ -33,6 +33,26 @@ RSpec.describe BulkImport, type: :model do
     end
   end
 
+  describe "blocking_error?" do
+    let(:bulk_import) { BulkImport.new(import_errors: { line: [2, "dddd"] }.as_json) }
+    it "is be_falsey" do
+      expect(bulk_import.blocking_error?).to be_falsey
+    end
+    context "file error" do
+      let(:bulk_import) { BulkImport.new(import_errors: { file: "dddd" }.as_json) }
+      it "is be_falsey" do
+        expect(bulk_import.blocking_error?).to be_truthy
+      end
+    end
+    context "pending and more than a minute old" do
+      let(:bulk_import) { BulkImport.new(created_at: Time.now - 10.minutes, progress: "pending") }
+      it "is truthy" do
+        # Fallback because we failed to parse it
+        expect(bulk_import.blocking_error?).to be_truthy
+      end
+    end
+  end
+
   describe "organization_for_ascend_name" do
     let!(:bulk_import) { BulkImport.new }
     before { allow(bulk_import).to receive(:file_filename) { "Bike_Index_Reserve_20190207_-_BIKE_LANE_CHIC.csv" } }
