@@ -13,6 +13,18 @@ namespace :db do
     system "psql -d #{config['database']} -f #{dump_path}"
   end
 
+  desc "Updates an anon user with credentials for development."
+  task setup_anon_user: :environment do
+    anon_user = User
+    .joins(:owned_bikes)
+    .group("users.id").having("count('owned_bikes') > 100")
+    .first
+
+    anon_attrs = { username: "tester123", email: "tester123@example.com", password: "secret" }
+    anon_user.update_attributes!(anon_attrs)
+    puts "[+] Setup anon user: #{anon_attrs.inspect}"
+  end
+
   private
 
   def config
