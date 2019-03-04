@@ -34,7 +34,7 @@ class BulkImport < ActiveRecord::Base
 
   def import_errors?; line_import_errors.present? || file_import_errors.present? end
 
-  def blocking_error?; file_import_errors.present? || created_at && created_at < Time.now - 5.minutes end
+  def blocking_error?; file_import_errors.present? || pending? && created_at && created_at < Time.now - 5.minutes end
 
   def no_bikes?; import_errors["bikes"] == "none_imported" end
 
