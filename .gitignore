@@ -43,3 +43,6 @@ manufacturer.tsv
 /node_modules
 yarn-debug.log*
 .yarn-integrity
+
+# Ignore pg dump
+db/anon.psql

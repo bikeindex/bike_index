@@ -129,7 +129,7 @@ group :development do
   # gem 'test-unit', '~> 3.0'
   gem 'rerun'
   gem 'bullet'
-  gem 'fake_pipe'
+  gem 'fake_pipe', require: false
   gem 'migration_comments'
   # gem 'pry-rails'
 end

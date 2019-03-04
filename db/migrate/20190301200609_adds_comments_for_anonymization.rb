@@ -89,8 +89,7 @@ class AddsCommentsForAnonymization < ActiveRecord::Migration
 
     change_table :invoices do |t|
       t.change_comment :notes, "anon: lorem_sentence"
-      # TODO: t.change_comment :amount_due_cents, "anon: number"
-      # TODO: t.change_comment :acoumt_paid_cents, "anon: number" 
+      # TODO: t.change_comment :amount_paid_cents, "anon: number" 
     end
 
     change_table :locations do |t|
