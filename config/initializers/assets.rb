@@ -8,5 +8,5 @@ Rails.application.config.assets.precompile += %w(
   application_revised.js registrations.js
   spokecard.css embed_styles.css embed_user_styles.css registration_pdf.css
   documentation_v2.css revised.css og_application.css admin.css
-  registrations.css email.css
+  registrations.css email.css new_admin.css
 )

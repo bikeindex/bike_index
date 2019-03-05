@@ -1,0 +1,12 @@
+img {
+  height: 35px;
+  width: 35px;
+}
+
+.paginate-container {
+  display: inline;
+}
+.pagination li {
+  display: inline;
+  margin-right: 8px;
+}
