@@ -14,7 +14,7 @@
   - body_class = "news-page" if controller_name == "news"
   %body{ id: page_id, class:  body_class }
     %nav.navbar.navbar-expand-md.navbar-light.bg-light
-      %a.navbar-brand
+      %a.navbar-brand.nav-logo
         = image_tag "logo.svg"
       - if current_user.superuser?
         %span.font-weight-bold
