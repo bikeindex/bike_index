@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/gadogado/fake_pipe.git
-  revision: 9f64d173f53328e4d61491d9dcfb74ec2c024606
+  revision: 09adde8b765ae5307153730ad3cd680b63ee71a0
   branch: number
   specs:
     fake_pipe (0.2.3)
