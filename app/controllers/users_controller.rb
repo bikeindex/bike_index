@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   before_action :assign_edit_template, only: [:edit, :update]
 
   def new
-    @user ||= User.new
+    @user ||= User.new(email: params[:email])
     render_partner_or_default_signin_layout
   end
 

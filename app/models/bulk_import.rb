@@ -34,6 +34,8 @@ class BulkImport < ActiveRecord::Base
 
   def import_errors?; line_import_errors.present? || file_import_errors.present? end
 
+  def blocking_error?; file_import_errors.present? || pending? && created_at && created_at < Time.now - 5.minutes end
+
   def no_bikes?; import_errors["bikes"] == "none_imported" end
 
   def ascend?; is_ascend end
@@ -120,7 +122,8 @@ class BulkImport < ActiveRecord::Base
   # also so we can separately deal with the header line
   def open_file
     @open_file ||= local_file? ? File.open(file.path, "r") : open(file.url)
-  rescue OpenURI::HTTPError => e # This probably isn't the error that will happen, replace it with the one that is
+  rescue => e
     add_file_error(e.message)
+    raise e
   end
 end

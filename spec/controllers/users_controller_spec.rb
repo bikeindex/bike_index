@@ -35,7 +35,8 @@ describe UsersController do
       end
       context "with partner param" do
         it "actually sets it" do
-          get :new, return_to: "/bikes/12?contact_owner=true", partner: "bikehub"
+          get :new, email: "seth@bikes.com", return_to: "/bikes/12?contact_owner=true", partner: "bikehub"
+          expect(assigns(:user).email).to eq "seth@bikes.com"
           expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
           expect(response).to render_with_layout("application_revised_bikehub")
           expect(session[:partner]).to be_nil

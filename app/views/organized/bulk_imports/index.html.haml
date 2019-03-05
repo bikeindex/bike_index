@@ -31,9 +31,13 @@
           %a.convertTime{ href: organization_bulk_import_path(bulk_import, organization_id: current_organization.to_param) }
             = l bulk_import.created_at, format: :convert_time
         %td
-          - bulk_import_progress_class = bulk_import.progress == "finished" ? "text-success" : ""
-          %span{ class: bulk_import_progress_class }
-            = bulk_import.progress
+          - if bulk_import.blocking_error?
+            %span.text-danger
+              Unable to process
+          - else
+            - bulk_import_progress_class = bulk_import.progress == "finished" ? "text-success" : ""
+            %span{ class: bulk_import_progress_class }
+              = bulk_import.progress
         %td
           - if bulk_import.line_import_errors.present?
             <span class="text-danger">Line</span>
@@ -46,4 +50,4 @@
           = bulk_import.creation_states.count # Don't need to do bikes through creation states
 
 %p.text-right
-  = link_to "New import", new_organization_bulk_import_path(organization_id: current_organization.to_param), class: "btn btn-secondary"
+  = link_to "New import", new_organization_bulk_import_path(organization_id: current_organization.to_param), class: "btn btn-primary"

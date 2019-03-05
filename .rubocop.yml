@@ -44,7 +44,7 @@ Style/StringLiterals:
   EnforcedStyle: double_quotes # Always do it, lower cost cognitively
   Enabled: false
 
- Style/NumericPredicate:
+Style/NumericPredicate:
   Enabled: false
 
 Layout/EmptyLineAfterGuardClause:
