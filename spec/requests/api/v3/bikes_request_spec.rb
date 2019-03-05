@@ -37,7 +37,8 @@ describe 'Bikes API V3' do
         rear_wheel_bsd: '559',
         color: color.name,
         year: '1969',
-        owner_email: 'fun_times@examples.com'
+        owner_email: 'fun_times@examples.com',
+        frame_material: 'steel'
       }
     end
     let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes") }
@@ -115,6 +116,7 @@ describe 'Bikes API V3' do
       bike = Bike.find(result['id'])
       expect(bike.example).to be_falsey
       expect(bike.is_for_sale).to be_truthy
+      expect(bike.frame_material).to eq(bike_attrs[:frame_material])
       expect(bike.components.count).to eq(3)
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.pluck(:ctype_id).uniq.count).to eq(2)

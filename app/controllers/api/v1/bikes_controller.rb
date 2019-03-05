@@ -12,7 +12,7 @@ module Api
         tags = []
         Color.unscoped.commonness.each { |i| tags << i.name }
         HandlebarType.all.each { |i| tags << i.name }
-        FrameMaterial.all.each  { |i| tags << i.name }
+        FrameMaterial::NAMES.values.each  { |name| tags << name }
         WheelSize.unscoped.commonness.each { |i| tags << "#{i.name} wheel" }
         Manufacturer.all.each { |i| tags << i.name }
         CycleType.all.each { |i| tags << i.name }

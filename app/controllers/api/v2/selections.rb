@@ -22,7 +22,7 @@ module API
 
         desc "Frame materials"
         get '/frame_materials', root: 'frame_materials' do
-          FrameMaterial.all
+          FrameMaterial.legacy_selections
         end
 
         desc "Front gear types"

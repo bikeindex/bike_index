@@ -33,11 +33,11 @@ describe 'Selections API V2' do
 
   describe 'frame_materials' do
     it 'responds on index with pagination' do
-      selection = FactoryBot.create(:frame_material)
       get '/api/v2/selections/frame_materials'
+      selection = FrameMaterial.legacy_selections[0]
       expect(response.code).to eq('200')
       result = JSON.parse(response.body)['frame_materials'][0]
-      expect(result['name']).to eq(selection.name)
+      expect(result['name']).to eq(selection[:name])
     end
   end
 

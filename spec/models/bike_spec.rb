@@ -12,7 +12,6 @@ describe Bike do
     it { is_expected.to belong_to :front_wheel_size }
     it { is_expected.to belong_to :rear_gear_type }
     it { is_expected.to belong_to :front_gear_type }
-    it { is_expected.to belong_to :frame_material }
     it { is_expected.to belong_to :propulsion_type }
     it { is_expected.to belong_to :paint }
     it { is_expected.to belong_to :cycle_type }
@@ -744,19 +743,18 @@ describe Bike do
     it 'caches all the bike parts' do
       type = FactoryBot.create(:cycle_type, name: 'Unicycle')
       handlebar = FactoryBot.create(:handlebar_type)
-      material = FactoryBot.create(:frame_material)
       propulsion = FactoryBot.create(:propulsion_type, name: 'Hand pedaled')
       wheel_size = FactoryBot.create(:wheel_size)
       bike = FactoryBot.create(:bike, cycle_type: type, propulsion_type_id: propulsion.id, rear_wheel_size: wheel_size)
       stolen_record = FactoryBot.create(:stolen_record, bike: bike)
-      bike.update_attributes(year: 1999, frame_material_id: material.id,
+      bike.update_attributes(year: 1999, frame_material: "steel",
                              secondary_frame_color_id: bike.primary_frame_color_id,
                              tertiary_frame_color_id: bike.primary_frame_color_id,
                              stolen: true,
-                             frame_size: '56', frame_size_unit: 'ballsacks',
+                             frame_size: '56', frame_size_unit: 'foo',
                              frame_model: 'Some model', handlebar_type_id: handlebar.id)
       bike.cache_bike
-      expect(bike.cached_data).to eq("#{bike.mnfg_name} Hand pedaled 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{material.name} 56ballsacks #{bike.frame_model} #{wheel_size.name} wheel unicycle")
+      expect(bike.cached_data).to eq("#{bike.mnfg_name} Hand pedaled 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material_name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle")
       expect(bike.current_stolen_record_id).to eq(stolen_record.id)
     end
     it 'has before_save_callback_method defined as a before_save callback' do

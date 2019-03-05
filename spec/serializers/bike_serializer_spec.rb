@@ -21,7 +21,7 @@ describe BikeSerializer do
     it { expect(subject.serial).to eq(bike.serial_number) }
     it { expect(subject.front_wheel_size).to eq(bike.front_wheel_size) }
     it { expect(subject.handlebar_type).to eq(bike.handlebar_type) }
-    it { expect(subject.frame_material).to eq(bike.frame_material) }
+    it { expect(subject.frame_material).to eq(bike.frame_material_name) }
     it { expect(subject.front_gear_type).to eq(bike.front_gear_type) }
     it { expect(subject.rear_gear_type).to eq(bike.rear_gear_type) }
     it { expect(subject.stolen_record).to eq(bike.current_stolen_record) }
