@@ -1,3 +1,12 @@
+GIT
+  remote: https://github.com/gadogado/fake_pipe.git
+  revision: 9f64d173f53328e4d61491d9dcfb74ec2c024606
+  branch: number
+  specs:
+    fake_pipe (0.2.3)
+      activesupport
+      faker
+
 GEM
   remote: https://rubygems.org/
   remote: https://rails-assets.org/
@@ -138,9 +147,6 @@ GEM
     factory_bot_rails (4.11.1)
       factory_bot (~> 4.11.1)
       railties (>= 3.0.0)
-    fake_pipe (0.2.3)
-      activesupport
-      faker
     faker (1.9.3)
       i18n (>= 0.7)
     faraday (0.9.2)
@@ -588,7 +594,7 @@ DEPENDENCIES
   draper
   eventmachine
   factory_bot_rails
-  fake_pipe
+  fake_pipe!
   fast_blank (~> 1.0)
   flamegraph
   fog-aws

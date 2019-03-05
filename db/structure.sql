@@ -1177,6 +1177,20 @@ CREATE TABLE public.invoices (
 
 
 --
+-- Name: COLUMN invoices.amount_due_cents; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.invoices.amount_due_cents IS 'anon: large_number';
+
+
+--
+-- Name: COLUMN invoices.amount_paid_cents; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.invoices.amount_paid_cents IS 'anon: small_number';
+
+
+--
 -- Name: COLUMN invoices.notes; Type: COMMENT; Schema: public; Owner: -
 --
 
