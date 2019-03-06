@@ -304,7 +304,7 @@ describe Api::V1::BikesController do
           rear_tire_narrow: 'true',
           rear_wheel_size: 559,
           color: 'grazeen',
-          frame_material_slug: "steel",
+          frame_material_slug: "Steel",
           handlebar_type_slug: FactoryBot.create(:handlebar_type, slug: 'foo').slug,
           description: 'something else',
           owner_email: 'fun_times@examples.com'
