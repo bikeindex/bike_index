@@ -317,7 +317,8 @@ CREATE TABLE public.bikes (
     made_without_serial boolean DEFAULT false NOT NULL,
     stolen_lat double precision,
     stolen_long double precision,
-    creation_state_id integer
+    creation_state_id integer,
+    frame_material integer
 );
 
 
@@ -4748,7 +4749,10 @@ INSERT INTO schema_migrations (version) VALUES ('20190206044915');
 
 INSERT INTO schema_migrations (version) VALUES ('20190208195902');
 
-INSERT INTO schema_migrations (version) VALUES ('20190301020053');
+INSERT INTO schema_migrations (version) VALUES ('20190214192448');
 
 INSERT INTO schema_migrations (version) VALUES ('20190301200609');
 
+INSERT INTO schema_migrations (version) VALUES ('20190301020053');
+
+INSERT INTO schema_migrations (version) VALUES ('20190301200609');

@@ -661,6 +661,7 @@ DEPENDENCIES
   rspec-rails (~> 3.3.0)
   rspec-sidekiq
   rspec_junit_formatter
+  rubocop
   secure_headers (~> 2.5.0)
   shoulda-matchers (~> 2.8.0)
   sidekiq (~> 4.2.10)

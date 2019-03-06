@@ -11,6 +11,10 @@ class TsvUploader < CarrierWave::Uploader::Base
     storage :fog
   end
 
+  def cache_dir
+    Rails.root.join("tmp", "uploads", "cache")
+  end
+
   def store_dir
     "#{base_store_dir}tsvs"
   end
@@ -18,5 +22,4 @@ class TsvUploader < CarrierWave::Uploader::Base
   def base_store_dir
     "uploads/"
   end
-
 end

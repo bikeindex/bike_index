@@ -1,4 +1,6 @@
-# ![BIKE INDEX](https://github.com/bikeindex/bike_index/blob/master/bike_index.png?raw=true)  [Bike Index](https://www.bikeindex.org) 🚲 [![CircleCI](https://circleci.com/gh/bikeindex/bike_index/tree/master.svg?style=svg)](https://circleci.com/gh/bikeindex/bike_index/tree/master) [![Test Coverage](https://codeclimate.com/github/bikeindex/bike_index/badges/coverage.svg)](https://codeclimate.com/github/bikeindex/bike_index) [![View performance data on Skylight](https://badges.skylight.io/status/j93iQ4K2pxCP.svg)](https://oss.skylight.io/app/applications/j93iQ4K2pxCP)
+# ![BIKE INDEX](https://github.com/bikeindex/bike_index/blob/master/bike_index.png?raw=true)  [Bike Index](https://www.bikeindex.org) 🚲 [![CircleCI](https://circleci.com/gh/bikeindex/bike_index/tree/master.svg?style=svg)](https://circleci.com/gh/bikeindex/bike_index/tree/master) [![View performance data on Skylight](https://badges.skylight.io/status/j93iQ4K2pxCP.svg)](https://oss.skylight.io/app/applications/j93iQ4K2pxCP)
+
+<!-- unfortunately, codeclimate doesn't work for parallelized loads right now. If/when it does work, add it back in: [![Test Coverage](https://codeclimate.com/github/bikeindex/bike_index/badges/coverage.svg)](https://codeclimate.com/github/bikeindex/bike_index) -->
 
 Bike registration that works: online, powerful, free.
 

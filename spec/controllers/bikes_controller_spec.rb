@@ -1074,7 +1074,6 @@ describe BikesController do
           owner_email: 'new_email@stuff.com',
           year: 1993,
           frame_model: 'A sweet model named things',
-          frame_material_id: FrameMaterial.steel.id,
           frame_size: '56cm',
           name: 'a sweet name for a bike',
           additional_registration: 'some weird other number',

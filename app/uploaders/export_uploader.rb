@@ -10,6 +10,10 @@ class ExportUploader < CarrierWave::Uploader::Base
     storage :fog
   end
 
+  def cache_dir
+    Rails.root.join("tmp", "uploads", "cache")
+  end
+
   def store_dir
     "#{base_store_dir}exports/#{model.id}"
   end

@@ -23,9 +23,9 @@
           .controls
             = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, :required =>true )
         .control-group.chosen-select
-          = f.label :frame_material_id, "Frame material", class: "control-label"
+          = f.label :frame_material, "Frame material", class: "control-label"
           .controls
-            = collection_select( :bike, :frame_material_id, FrameMaterial.all, :id, :name, include_blank: true, prompt: "Choose material")
+            = select(:bike, :frame_material, FrameMaterial.select_options , { include_blank: true, prompt: "Choose material"})
         .control-group.chosen-select
           = f.label :handlebar_type_id, class: "control-label"
           .controls

@@ -33,11 +33,6 @@ FactoryBot.define do
     frame_maker { true }
   end
 
-  factory :frame_material do
-    name { FactoryBot.generate(:unique_name) }
-    slug { FactoryBot.generate(:unique_name) }
-  end
-
   factory :propulsion_type do
     name { FactoryBot.generate(:unique_name) }
   end

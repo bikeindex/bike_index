@@ -13,7 +13,6 @@ class Bike < ActiveRecord::Base
   belongs_to :front_wheel_size, class_name: 'WheelSize'
   belongs_to :rear_gear_type
   belongs_to :front_gear_type
-  belongs_to :frame_material
   belongs_to :propulsion_type
   belongs_to :cycle_type
   belongs_to :paint, counter_cache: true
@@ -64,6 +63,8 @@ class Bike < ActiveRecord::Base
 
   attr_writer :phone, :user_name # reading is managed by a method
 
+  enum frame_material: FrameMaterial::SLUGS
+
   default_scope { 
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record, :cycle_type)
     .where(example: false, hidden: false)
@@ -101,7 +102,7 @@ class Bike < ActiveRecord::Base
       (%w(cycle_type_id manufacturer_id manufacturer_other serial_number 
         serial_normalized has_no_serial made_without_serial additional_registration
         creation_organization_id manufacturer year thumb_path name stolen
-        current_stolen_record_id recovered frame_material_id frame_model number_of_seats
+        current_stolen_record_id recovered frame_material frame_material_id frame_model number_of_seats
         handlebar_type_id handlebar_type_other frame_size frame_size_number frame_size_unit
         rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow 
         primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
@@ -421,7 +422,7 @@ class Bike < ActiveRecord::Base
       (primary_frame_color && primary_frame_color.name),
       (secondary_frame_color && secondary_frame_color.name),
       (tertiary_frame_color && tertiary_frame_color.name),
-      (frame_material && frame_material.name),
+      (frame_material && frame_material_name),
       frame_size,
       frame_model,
       (rear_wheel_size && "#{rear_wheel_size.name} wheel"),
@@ -430,5 +431,9 @@ class Bike < ActiveRecord::Base
       (type == 'bike' ? nil : type),
       components_cache_string
     ].flatten.reject(&:blank?).join(' ')
+  end
+
+  def frame_material_name
+    FrameMaterial.new(frame_material).name
   end
 end

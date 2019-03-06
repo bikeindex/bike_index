@@ -5,7 +5,7 @@ module Api
       after_filter :cors_set_access_control_headers
 
       def index
-        respond_with FrameMaterial.all
+        respond_with FrameMaterial::NAMES
       end
     end
   end

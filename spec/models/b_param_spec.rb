@@ -93,7 +93,6 @@ describe BParam do
   describe 'set_foreign_keys' do
     it 'calls set_foreign_keys' do
       bike = {
-        frame_material_slug: 'something',
         handlebar_type_slug: 'else',
         cycle_type_slug: 'entirely',
         rear_gear_type_slug: 'gears awesome',
@@ -107,7 +106,6 @@ describe BParam do
       expect(b_param).to receive(:set_rear_gear_type_slug).and_return(true)
       expect(b_param).to receive(:set_front_gear_type_slug).and_return(true)
       expect(b_param).to receive(:set_handlebar_type_key).and_return(true)
-      expect(b_param).to receive(:set_frame_material_key).and_return(true)
       b_param.set_foreign_keys
     end
   end
@@ -146,17 +144,6 @@ describe BParam do
       b_param.set_cycle_type_key
       expect(b_param.bike['cycle_type_id']).to eq(ct.id)
       expect(b_param.bike['cycle_type_slug'].present?).to be_falsey
-    end
-  end
-
-  describe 'set_frame_material_key' do
-    it 'sets cycle_type_id to the cycle type from name submitted' do
-      fm = FactoryBot.create(:frame_material, name: 'goo goo', slug: 'goop')
-      bike = { serial_number: 'gobble gobble', frame_material_slug: ' gooP ' }
-      b_param = BParam.new(params: { bike: bike })
-      b_param.set_frame_material_key
-      expect(b_param.bike['frame_material_slug'].present?).to be_falsey
-      expect(b_param.bike['frame_material_id']).to eq(fm.id)
     end
   end
 

@@ -69,7 +69,7 @@ describe Api::V1::BikesController do
             rear_wheel_size: nil,
             rear_gear_type_slug: nil,
             handlebar_type_slug: nil,
-            frame_material_slug: nil,
+            frame_material_slug: "",
             description: 'Diverge Elite DSW (58)',
             is_pos: true,
             is_new: true,
@@ -304,8 +304,8 @@ describe Api::V1::BikesController do
           rear_tire_narrow: 'true',
           rear_wheel_size: 559,
           color: 'grazeen',
+          frame_material_slug: "Steel",
           handlebar_type_slug: FactoryBot.create(:handlebar_type, slug: 'foo').slug,
-          frame_material_slug: FactoryBot.create(:frame_material, slug: 'whatevah').slug,
           description: 'something else',
           owner_email: 'fun_times@examples.com'
         }
@@ -322,7 +322,8 @@ describe Api::V1::BikesController do
         expect(bike.rear_wheel_size.iso_bsd).to eq 559
         expect(bike.paint.name).to eq('grazeen')
         expect(bike.description).to eq('something else')
-        expect(bike.frame_material.slug).to eq('whatevah')
+        expect(bike.frame_material_name).to eq('Steel')
+        expect(bike.frame_material).to eq('steel')
         expect(bike.handlebar_type.slug).to eq('foo')
       end
 

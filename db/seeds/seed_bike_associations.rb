@@ -63,18 +63,6 @@ handlebar_types.each do |h|
   handlebar_type.save
 end
 
-# Seed the Frame materials
-frame_materials = [
-  { name: 'Steel', slug: 'steel' },
-  { name: 'Aluminum', slug: 'aluminum' },
-  { name: 'Carbon or composite', slug: 'composite' },
-  { name: 'Titanium', slug: 'titanium' },
-  { name: 'Wood', slug: 'wood' }]
-frame_materials.each do |m|
-  frame_material = FrameMaterial.create(name: m[:name], slug: m[:slug])
-  frame_material.save
-end
-
 # Seed the propulsion types
 propulsions = ['Foot pedal', 'Hand pedal', 'Sail', 'Insufflation', 'Electric Assist', 'Electric throttle', 'Gas', 'Other style']
 propulsions.each do |prop|

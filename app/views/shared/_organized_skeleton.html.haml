@@ -54,7 +54,7 @@
               = active_link "Locations", locations_organization_manage_index_path(organization_id: current_organization.to_param), class_name: "nav-link"
               %li
                 = active_link "Dev resources", dev_organization_manage_index_path(organization_id: current_organization.to_param), class_name: "nav-link"
-            - if current_organization.show_bulk_import?
+            - if current_organization.bulk_import?
               %ul.organized-submenu
                 %li
                   = active_link "Bulk Imports", organization_bulk_imports_path(organization_id: current_organization.to_param), class_name: "nav-link", match_controller: true
