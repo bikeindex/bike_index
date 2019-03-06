@@ -12,7 +12,7 @@ class TsvUploader < CarrierWave::Uploader::Base
   end
 
   def cache_dir
-    Rails.root.join("tmp", "uploads", "cache")
+    Rails.root.join("tmp", "cache")
   end
 
   def store_dir
