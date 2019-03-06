@@ -207,7 +207,6 @@ CREATE TABLE public.bikes (
     frame_model character varying(255),
     manufacturer_id integer,
     rear_tire_narrow boolean DEFAULT true,
-    frame_material_id integer,
     number_of_seats integer,
     propulsion_type_id integer,
     creation_organization_id integer,
@@ -4115,3 +4114,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190208195902');
 INSERT INTO schema_migrations (version) VALUES ('20190214192448');
 
 INSERT INTO schema_migrations (version) VALUES ('20190301020053');
+
+INSERT INTO schema_migrations (version) VALUES ('20190306223523');
+
