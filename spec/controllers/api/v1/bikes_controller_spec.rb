@@ -69,7 +69,7 @@ describe Api::V1::BikesController do
             rear_wheel_size: nil,
             rear_gear_type_slug: nil,
             handlebar_type_slug: nil,
-            frame_material_slug: nil,
+            frame_material_slug: "",
             description: 'Diverge Elite DSW (58)',
             is_pos: true,
             is_new: true,
