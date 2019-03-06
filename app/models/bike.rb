@@ -63,7 +63,7 @@ class Bike < ActiveRecord::Base
 
   attr_writer :phone, :user_name # reading is managed by a method
 
-  enum frame_material: FrameMaterial::ENUMS
+  enum frame_material: FrameMaterial::SLUGS
 
   default_scope { 
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record, :cycle_type)

@@ -149,6 +149,7 @@ class BParam < ActiveRecord::Base
     set_rear_gear_type_slug if bike['rear_gear_type_slug'].present?
     set_front_gear_type_slug if bike['front_gear_type_slug'].present?
     set_handlebar_type_key if bike['handlebar_type_slug'].present?
+    set_frame_material_key # Even if the value isn't present, since we need to remove the key
   end
 
   def set_cycle_type_key
@@ -179,6 +180,12 @@ class BParam < ActiveRecord::Base
     fbsd = params['bike'].delete("front#{key}")
     params['bike']['rear_wheel_size_id'] = WheelSize.id_for_bsd(rbsd)
     params['bike']['front_wheel_size_id'] = WheelSize.id_for_bsd(fbsd)
+  end
+
+  def set_frame_material_key
+    frame_material = FrameMaterial.friendly_find(bike["frame_material_slug"])
+    params["bike"]["frame_material"] = frame_material.slug if frame_material.present?
+    params["bike"].delete("frame_material_slug")
   end
 
   def set_manufacturer_key

@@ -100,6 +100,5 @@ module Api
         params.as_json
       end
     end
-
   end
 end
