@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.3 (Ubuntu 10.3-1.pgdg16.04+1)
--- Dumped by pg_dump version 10.3 (Ubuntu 10.3-1.pgdg16.04+1)
+-- Dumped from database version 10.3
+-- Dumped by pg_dump version 10.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -4101,4 +4101,3 @@ INSERT INTO schema_migrations (version) VALUES ('20190208195902');
 INSERT INTO schema_migrations (version) VALUES ('20190214192448');
 
 INSERT INTO schema_migrations (version) VALUES ('20190301020053');
-
