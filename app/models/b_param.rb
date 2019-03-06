@@ -149,7 +149,7 @@ class BParam < ActiveRecord::Base
     set_rear_gear_type_slug if bike['rear_gear_type_slug'].present?
     set_front_gear_type_slug if bike['front_gear_type_slug'].present?
     set_handlebar_type_key if bike['handlebar_type_slug'].present?
-    set_frame_material if bike["frame_material_slug"].present?
+    set_frame_material_key if bike["frame_material_slug"].present?
   end
 
   def set_cycle_type_key

@@ -45,7 +45,5 @@ class FrameMaterial
     NAMES[slug]
   end
 
-  protected
-
   attr_reader :slug, :id
 end
