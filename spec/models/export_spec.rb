@@ -34,6 +34,29 @@ RSpec.describe Export, type: :model do
     end
   end
 
+  describe "calculated_progress" do
+    let(:export) { Export.new(created_at: Time.now, progress: "pending") }
+    it "returns the progress it is given" do
+      expect(export.pending?).to be_truthy
+      expect(export.calculated_progress).to eq "pending"
+      export.progress = "finished"
+      expect(export.calculated_progress).to eq "finished"
+      export.progress = "errored"
+      expect(export.calculated_progress).to eq "errored"
+    end
+    context "export created a lil bit ago" do
+      let(:export) { Export.new(created_at: Time.now - 10.minutes, progress: "pending") }
+      it "returns what it's given, unless incomplete" do
+        expect(export.pending?).to be_truthy
+        expect(export.calculated_progress).to eq "errored"
+        export.progress = "ongoing"
+        expect(export.calculated_progress).to eq "errored"
+        export.progress = "finished"
+        expect(export.calculated_progress).to eq "finished"
+      end
+    end
+  end
+
   describe "tmp_file" do
     let(:export) { FactoryBot.build(:export, file_format: "csv") }
     it "has the correct format" do

@@ -17,4 +17,9 @@ module OrganizedHelper
       end
     end
   end
+
+  def export_progress_class(export)
+    return "text-danger" if export.calculated_progress == "errored"
+    export.calculated_progress == "finished" ? "text-success" : "text-warning"
+  end
 end
