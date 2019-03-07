@@ -88,6 +88,12 @@
       = f.label :phone, "Owner's phone"
       .controls
         = f.text_field :phone, required: true
+  - if @organization&.include_field_reg_affiliation?
+    .input-group
+      = f.label :school_affiliation, "#{@organization.short_name} affiliation"
+      - affiliation_options = @organization.affiliation_options.map { |a| [a.humanize, a] }
+      .controls
+        = f.select :school_affiliation, affiliation_options, required: true
   .input-group
     .submit-registration
       = submit_tag "Register this", class: "button-submit"

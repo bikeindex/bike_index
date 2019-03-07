@@ -99,6 +99,13 @@
               .form-well-input
                 = f.text_field :additional_registration, autocomplete: "off", autocorrect: "off", autocapitalize: "off", class: "form-control"
 
+          - if @organization&.include_field_reg_affiliation?(current_user)
+            .form-group.row.unnested-field.no-divider-row.fancy-select.unfancy
+              = f.label :organization_affiliation, "#{@organization.short_name} affiliation", class: "form-well-label"
+              .form-well-input
+                - affiliation_options = @organization.reg_affiliation_options.map { |a| [a.humanize, a] }
+                = f.select :organization_affiliation, affiliation_options, class: "form-control"
+
           .form-group.row.unnested-field.no-divider-row
             = f.label :owner_email, class: 'form-well-label'
             .form-well-input

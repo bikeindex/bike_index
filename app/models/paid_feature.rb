@@ -6,7 +6,7 @@ class PaidFeature < ActiveRecord::Base
   # Organizations have paid_feature_slugs as an array attribute to track which features should be enabled
   # Every feature slug that is used in the code should be in this array
   # Only slugs that are used in the code should be in this array
-  REG_FIELDS = %w[reg_address reg_secondary_serial reg_phone].freeze
+  REG_FIELDS = %w[reg_address reg_secondary_serial reg_phone reg_affiliation].freeze
   EXPECTED_SLUGS = (%w[csv_exports messages geolocated_messages abandoned_bike_messages avery_export bike_search
                        recovered_bikes bike_codes bulk_import partial_registrations] + REG_FIELDS).freeze
 
