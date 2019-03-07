@@ -27,10 +27,11 @@ class BikesController < ApplicationController
   def show
     @components = @bike.components.decorate
     if @bike.stolen and @bike.current_stolen_record.present?
+      # Show contact owner box on load - happens if user has clicked on it and then logged in
+      @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
       @stolen_record = @bike.current_stolen_record.decorate
     end
     @bike = @bike.decorate
-    @stolen_notification = StolenNotification.new if @bike.stolen
     respond_to do |format|
       format.html { render :show }
       format.gif  { render qrcode: bike_url(@bike), level: :h, unit: 50 }

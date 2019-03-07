@@ -319,12 +319,14 @@ describe Bike do
       expect(bike.contact_owner?).to be_falsey
       expect(bike.contact_owner?(User.new)).to be_falsey
       expect(bike.contact_owner?(admin)).to be_truthy
+      expect(bike.display_contact_owner?).to be_falsey
     end
     context "stolen bike" do
       let(:bike) { Bike.new(stolen: true, current_stolen_record: StolenRecord.new) }
       it "is truthy" do
         expect(bike.contact_owner?).to be_falsey
         expect(bike.contact_owner?(User.new)).to be_truthy
+        expect(bike.display_contact_owner?).to be_truthy
       end
     end
   end
