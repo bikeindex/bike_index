@@ -1,5 +1,5 @@
 class Export < ActiveRecord::Base
-  VALID_PROGRESSES = %i[pending ongoing finished].freeze
+  VALID_PROGRESSES = %i[pending ongoing finished errored].freeze
   VALID_KINDS = %i[organization stolen manufacturer].freeze
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
@@ -157,7 +157,14 @@ class Export < ActiveRecord::Base
   def set_calculated_attributes
     self.options = validated_options(options)
     errors.add :organization_id, "required" if kind == "organization" && organization_id.blank?
+    self.progress = calculated_progress
     true # TODO: Rails 5 update
+  end
+
+  # Generally, use calculated_progress rather than progress directly for display
+  def calculated_progress
+    return progress unless pending? || ongoing?
+    (created_at || Time.now) < Time.now - 6.minutes ? "errored" : progress
   end
 
   def validated_options(opts)

@@ -36,9 +36,8 @@
             - if export.user.present?
               = export.user.display_name
           %td
-            - export_progress_class = export.progress == "finished" ? "text-success" : "text-warning"
-            %span{ class: export_progress_class }
-              = export.progress
+            %span{ class: export_progress_class(export) }
+              = export.calculated_progress
           %td
             - if export.finished?
               = number_with_delimiter(export.rows)
