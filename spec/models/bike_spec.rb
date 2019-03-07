@@ -312,6 +312,23 @@ describe Bike do
     end
   end
 
+  describe "display_contact_owner?" do
+    let(:bike) { Bike.new }
+    let(:admin) { User.new(superuser: true) }
+    it "is falsey if bike doesn't have stolen record" do
+      expect(bike.contact_owner?).to be_falsey
+      expect(bike.contact_owner?(User.new)).to be_falsey
+      expect(bike.contact_owner?(admin)).to be_truthy
+    end
+    context "stolen bike" do
+      let(:bike) { Bike.new(stolen: true, current_stolen_record: StolenRecord.new) }
+      it "is truthy" do
+        expect(bike.contact_owner?).to be_falsey
+        expect(bike.contact_owner?(User.new)).to be_truthy
+      end
+    end
+  end
+
   describe 'user_hidden' do
     it 'is true if bike is hidden and ownership is user hidden' do
       bike = Bike.new(hidden: true)

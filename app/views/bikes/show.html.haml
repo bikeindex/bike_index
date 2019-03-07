@@ -182,6 +182,7 @@
               Write them a message
 
           .collapse#new_stolen_message{ class: ('in' if @contact_owner_open) }
+            - @stolen_notification ||= StolenNotification.new(bike: @bike)
             = form_for @stolen_notification do |f|
               = f.hidden_field :bike_id, value: @bike.id
               = f.text_area :message, required: true, placeholder: "Where did you see this #{@bike.type}? If you're contacting about an ad you found online, include a link in the field below", rows: 6, class: 'form-control'
@@ -189,7 +190,7 @@
 
               .send-message
                 = f.submit 'Send message', class: 'btn btn-primary btn-lg'
-          - if @bike.phoneable_by(current_user)
+          - if @bike.phoneable_by?(current_user)
             %p.phoneable-by
               %em
                 Or call
