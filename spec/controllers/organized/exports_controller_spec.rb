@@ -159,11 +159,11 @@ describe Organized::ExportsController, type: :controller do
           expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
           export = Export.last
           expect(export.kind).to eq "organization"
-          expect(export.file_format).to eq "xlsx"
+          expect(export.file_format).to eq "csv"
           expect(export.user).to eq user
           expect(export.headers).to eq crushed_datetime_attrs[:headers]
-          expect(export.start_at.to_i).to be_within(1).of Date.parse("08/25/2018")
-          expect(export.end_at.to_i).to be_within(1).of Date.parse("08/25/2018")
+          expect(export.start_at.to_i).to be_within(1).of 1535173200
+          expect(export.end_at.to_i).to be_within(1).of 1538283600 # Explicitly testing this in TimeParser
           expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
         end
       end
