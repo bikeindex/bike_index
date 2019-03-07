@@ -25,8 +25,8 @@
           = link_to 'Landing page', edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: 'landing_page')
           %small.less-strong
             page  #{ link_to 'previewable here', organization_landing_path(organization_id: @organization.to_param) }, even if "off"
-        %td
-          = @organization.landing_html.present?
+        %td.table-cell-check
+          = "&#x2713;".html_safe if @organization.landing_html.present?
         %td
           = link_to LandingPages::ORGANIZATIONS.include?(@organization.slug), 'https://github.com/bikeindex/bike_index/blob/master/config/landing_pages.rb'
       - MailSnippet.organization_snippets.each do |snippet_name, snippet_description|

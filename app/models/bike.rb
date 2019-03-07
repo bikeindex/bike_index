@@ -72,6 +72,7 @@ class Bike < ActiveRecord::Base
   }
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
+  scope :organized, -> { where.not(creation_organization_id: nil) }
   scope :with_serial, -> { where('serial_number != ?', 'absent') }
   # "Recovered" bikes are bikes that were found and are waiting to be claimed. This is confusing and should be fixed
   # so that it no longer is the same word as stolen recoveries
