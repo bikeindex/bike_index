@@ -13,40 +13,94 @@
   - body_class = "news-page" if controller_name == "news"
   %body{ id: page_id, class:  body_class }
     %nav.navbar.navbar-expand-md.navbar-light.bg-light
-      %a.navbar-brand.nav-logo
-        = image_tag "logo.svg"
+      %span.navbar-brand.nav-logo
+        = link_to (image_tag("logo.svg")), admin_root_path
       - if current_user.superuser?
-        %span.font-weight-bold
-          = admin_nav_link "Go hard", admin_root_path
+        -# %span.font-weight-bold
+        -#   = admin_nav_link "Go hard", admin_root_path
         %button.navbar-toggler{"aria-controls" => "navbarSupportedContent", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-target" => "#collapse_target", "data-toggle" => "collapse", :type => "button"}
           %span.navbar-toggler-icon
         .collapse.navbar-collapse#collapse_target
-          %ul.navbar-nav
+          %ul.navbar-nav.admin-nav
             %li.nav-item.px-2
-              = admin_nav_link "Organizations", admin_organizations_path
+              %button.btn.btn-default
+                = admin_nav_link "Users", admin_users_path
             %li.nav-item.px-2
-              = admin_nav_link "Users", admin_users_path
+              %button.btn.btn-default
+                = admin_nav_link "Bikes", admin_bikes_path
             %li.nav-item.px-2
+              %button.btn.btn-default
+                = admin_nav_link "Organizations", admin_organizations_path
+            .dropdown
+              %button.btn.btn-default.dropdown-toggle{"type" => "button", "id" => "dropdownmenu", "data-toggle" => "dropdown"}
+                -# What do I call this?
+                Some Stuff
+              %ul.dropdown-menu
+                %li
+                  = admin_nav_link "Memberships", admin_memberships_path
+                %li
+                  = admin_nav_link "Manufacturers", admin_manufacturers_path
+                %li
+                  = admin_nav_link "Stolen", admin_stolen_bikes_path
+                %li
+                  = admin_nav_link "Recoveries", admin_recoveries_path
+                %li
+                  = admin_nav_link "Recovery displays", admin_recovery_displays_path
+                %li
+                  = admin_nav_link "Payments", admin_payments_path
+                %li
+                  = admin_nav_link "Paid Features", admin_paid_features_path
+                %li
+                  = admin_nav_link "Invoices", admin_invoices_path
+                %li
+                  = admin_nav_link "Invitations", admin_invitations_path
+                %li
+                  = admin_nav_link "News", admin_news_index_path
+            .dropdown
+              %button.btn.btn-default.dropdown-toggle{"type" => "button", "id" => "dropdownmenu", "data-toggle" => "dropdown"}
+                -# What do I call this?!?! It's all stuff from the bottom of the dashboard.
+                A little more stuff
+              %ul.dropdown-menu
+                %li
+                  = link_to 'TSV Exports', admin_tsvs_url
+                %li
+                  = link_to 'Maintenance', admin_maintenance_url
+                %li
+                  = link_to 'Failed bikes', admin_failed_bikes_url
+                %li
+                  = link_to 'Component types', admin_ctypes_url
+                %li
+                  = link_to 'Graphs', admin_graphs_url
+                %li
+                  = link_to 'Edit paints', admin_paints_url
+                %li
+                  = link_to 'feedbacks', admin_feedbacks_url
+                %li
+                  = link_to 'Tweets', admin_tweets_url
+                %li
+                  = link_to 'Stolen Twitterbot URL', ENV['STOLEN_TWITTERBOT_URL'].gsub(/bikes\z/, '')
+                %li
+                  = link_to 'Bulk Imports', admin_bulk_imports_url
+
+            -# %li.nav-item.px-2
               = admin_nav_link "Memberships", admin_memberships_path
-            %li.nav-item.px-2
+            -# %li.nav-item.px-2
               = admin_nav_link "Manufacturers", admin_manufacturers_path
-            %li.nav-item.px-2
-              = admin_nav_link "Bikes", admin_bikes_path
-            %li.nav-item.px-2
+            -# %li.nav-item.px-2
               = admin_nav_link "Invitations", admin_invitations_path
-            %li.nav-item.px-2
+            -# %li.nav-item.px-2
               = admin_nav_link "News", admin_news_index_path
-            %li.nav-item.px-2
+            -# %li.nav-item.px-2
               = admin_nav_link "Stolen", admin_stolen_bikes_path
             / %li
             /   = admin_nav_link "Recoveries", admin_recoveries_path
-            %li.nav-item.px-2
+            -# %li.nav-item.px-2
               = admin_nav_link "Recovery displays", admin_recovery_displays_path
-            %li.nav-item.px-2
+            -# %li.nav-item.px-2
               = admin_nav_link "Paid Features", admin_paid_features_path
-            %li.nav-item.px-2
+            -# %li.nav-item.px-2
               = admin_nav_link "Payments", admin_payments_path
-            %li.nav-item.px-2
+            -# %li.nav-item.px-2
               = admin_nav_link "Invoices", admin_invoices_path
             - if Rails.env.development?
               %li

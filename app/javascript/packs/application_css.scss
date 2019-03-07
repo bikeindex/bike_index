@@ -6,7 +6,15 @@
 footer.primary-footer {
   display: none;
 }
-.nav-logo img {
-  height: 35px;
-  width: 35px;
+.nav-logo {
+  img {
+    height: 35px;
+    width: 35px;
+  }
+}
+
+.admin-nav {
+  li a {
+    color: black;
+  }
 }
