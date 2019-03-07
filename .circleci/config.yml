@@ -9,6 +9,7 @@ jobs:
       RACK_ENV: test
       CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
       COVERAGE: true
+      TZ: /usr/share/zoneinfo/America/Chicago
     docker:
       - image: circleci/ruby:2.5.1-stretch-node
         environment:
