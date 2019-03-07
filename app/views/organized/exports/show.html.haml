@@ -33,7 +33,7 @@
         Progress
       %td#exportProgress{ class: @export.progress, "data-createdat" => @export.created_at.to_i }
         %span{ class: export_progress_class(@export) }
-          = @export.progress
+          = @export.calculated_progress
 
     %tr
       %td

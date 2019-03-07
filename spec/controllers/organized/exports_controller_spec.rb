@@ -142,6 +142,31 @@ describe Organized::ExportsController, type: :controller do
         expect(export.end_at).to_not be_present
         expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
       end
+      context "with IE 11 datetime params" do
+        let(:crushed_datetime_attrs) do
+          {
+            start_at: "08/25/2018",
+            end_at: "09/30/2018",
+            timezone: "",
+            file_format: "csv",
+            headers: %w[link registered_at] + Export.additional_registration_fields.values
+          }
+        end
+        it "creates the expected export" do
+          expect do
+            post :create, export: crushed_datetime_attrs, organization_id: organization.to_param
+          end.to change(Export, :count).by 1
+          expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
+          export = Export.last
+          expect(export.kind).to eq "organization"
+          expect(export.file_format).to eq "xlsx"
+          expect(export.user).to eq user
+          expect(export.headers).to eq crushed_datetime_attrs[:headers]
+          expect(export.start_at.to_i).to be_within(1).of Date.parse("08/25/2018")
+          expect(export.end_at.to_i).to be_within(1).of Date.parse("08/25/2018")
+          expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+        end
+      end
       context "organization with avery export, non-avery export" do
         before { organization.update_column :paid_feature_slugs, %w[csv_exports avery_export] } # Stub organization having features
         let(:export_params) { valid_attrs.merge(file_format: "csv", avery_export: "0", end_at: "2016-02-10 02:00:00") }

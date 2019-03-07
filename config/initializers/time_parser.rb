@@ -13,10 +13,23 @@ class TimeParser
       Time.zone = DEFAULT_TIMEZONE
       time
     end
+  rescue ArgumentError => e
+    # Try to parse some other, unexpected formats
+    if time_str[%r{\d+/\d+/\d}] # IE 11 sends this format
+      Time.zone = parse_timezone(timezone_str)
+      # Time zones are hell
+      time = Time.strptime(time_str, "%m/%d/%Y")
+                 .in_time_zone(parse_timezone(timezone_str))
+                 .beginning_of_day
+      Time.zone = DEFAULT_TIMEZONE
+      time
+    else
+      raise e
+    end
   end
 
   def self.parse_timezone(timezone_str)
-    return nil unless timezone_str.present?
+    return DEFAULT_TIMEZONE unless timezone_str.present?
     return timezone_str if timezone_str.is_a?(ActiveSupport::TimeZone) # in case we were given a timezone obj
     # tzinfo requires non-whitespaced strings, so try that if the normal lookup fails
     ActiveSupport::TimeZone[timezone_str] || ActiveSupport::TimeZone[timezone_str.strip.gsub("\s", "_")]

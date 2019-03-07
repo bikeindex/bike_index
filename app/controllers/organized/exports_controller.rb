@@ -29,7 +29,7 @@ module Organized
         @export = Export.new(permitted_parameters)
       end
       if flash[:error].blank? && @export.update_attributes(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
-        # OrganizationExportWorker.perform_async(@export.id)
+        OrganizationExportWorker.perform_async(@export.id)
         if @export.avery_export? # Send to the show page, with avery export parameter set so we can redirect when the processing is finished
           flash[:success] = "Export Created. Once it's finished processing you will be automatically directed to download the Avery labels"
           redirect_to organization_export_path(organization_id: current_organization.to_param, id: @export.id, avery_redirect: true)
