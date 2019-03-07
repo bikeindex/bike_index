@@ -66,8 +66,8 @@
     - else
       and edit it, upload photos and make sure you never lose track of your trusty steed!
 
-- if @organization && @organization.mail_snippet_body('security').present?
-  = @organization.mail_snippet_body('security').html_safe
+- if @organization && @organization.mail_snippet_body("security").present?
+  = @organization.mail_snippet_body("security").html_safe
 - else
   - unless @bike.recovered
     / Just to keep things wrapped up

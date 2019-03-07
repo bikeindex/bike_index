@@ -10,8 +10,7 @@ class OrganizedMailerPreview < ActionMailer::Preview
   end
 
   def finished_registration_organization
-    # render_finished_registration(Bike.organized)
-    render_finished_registration(Bike.where(creation_organization_id: 553))
+    render_finished_registration(Bike.organized)
   end
 
   def finished_registration_stolen
