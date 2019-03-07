@@ -27,8 +27,8 @@
             page  #{ link_to 'previewable here', organization_landing_path(organization_id: @organization.to_param) }, even if "off"
         %td.table-cell-check
           = "&#x2713;".html_safe if @organization.landing_html.present?
-        %td
-          = link_to LandingPages::ORGANIZATIONS.include?(@organization.slug), 'https://github.com/bikeindex/bike_index/blob/master/config/landing_pages.rb'
+        %td.table-cell-check
+          = link_to LandingPages::ORGANIZATIONS.include?(@organization.slug).to_s, "https://github.com/bikeindex/bike_index/blob/master/config/landing_pages.rb"
       - MailSnippet.organization_snippets.each do |snippet_name, snippet_description|
         - snippet = @organization.mail_snippets.where(name: snippet_name).first
         %tr

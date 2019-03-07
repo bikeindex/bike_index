@@ -96,6 +96,12 @@ class Organization < ActiveRecord::Base
     PaidFeature::REG_FIELDS.select { |f| paid_for?(f) }
   end
 
+  def include_field_reg_affiliation?(user = nil)
+    additional_registration_fields.include?("reg_affiliation")
+  end
+
+  def reg_affiliation_options; %w[student employee community_member] end
+
   def include_field_reg_phone?(user = nil)
     return false unless additional_registration_fields.include?("reg_phone")
     !user&.phone&.present?

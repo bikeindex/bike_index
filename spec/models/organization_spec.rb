@@ -299,23 +299,26 @@ describe Organization do
       expect(organization.additional_registration_fields.include?("reg_secondary_serial")).to be_falsey
       expect(organization.additional_registration_fields.include?("reg_address")).to be_falsey
       expect(organization.additional_registration_fields.include?("reg_phone")).to be_falsey
+      expect(organization.additional_registration_fields.include?("reg_affiliation")).to be_falsey
       expect(organization.include_field_reg_phone?).to be_falsey
       expect(organization.include_field_reg_address?).to be_falsey
       expect(organization.include_field_reg_secondary_serial?).to be_falsey
+      expect(organization.include_field_reg_affiliation?).to be_falsey
     end
     context "with paid_features" do
-      let(:organization) { Organization.new(paid_feature_slugs: %w[reg_secondary_serial reg_address reg_phone]) }
+      let(:organization) { Organization.new(paid_feature_slugs: %w[reg_secondary_serial reg_address reg_phone reg_affiliation]) }
       let(:user) { User.new }
       it "is true" do
         expect(organization.additional_registration_fields.include?("reg_secondary_serial")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_phone")).to be_truthy
+        expect(organization.additional_registration_fields.include?("reg_affiliation")).to be_truthy
         expect(organization.include_field_reg_phone?).to be_truthy
         expect(organization.include_field_reg_phone?(user)).to be_truthy
         expect(organization.include_field_reg_address?).to be_truthy
         expect(organization.include_field_reg_address?(user)).to be_truthy
         expect(organization.include_field_reg_secondary_serial?).to be_truthy
-        expect(organization.include_field_reg_secondary_serial?(user)).to be_truthy
+        expect(organization.include_field_reg_affiliation?(user)).to be_truthy
       end
       context "with user with attributes" do
         let(:user) { User.new(phone: "888.888.8888") }
