@@ -32,8 +32,9 @@ class OrganizedMailer < ActionMailer::Base
     @organization_invitation = organization_invitation
     @organization = @organization_invitation.organization
     @inviter = @organization_invitation.inviter
-    @new_user = User.fuzzy_email_find(@organization_invitation.invitee_email).present?
-    mail('Reply-To' => reply_to, to: @organization_invitation.invitee_email, subject: default_i18n_subject(default_subject_vars))
+    @vars = { email: @organization_invitation.invitee_email }
+    @new_user = User.fuzzy_email_find(@vars[:email]).present?
+    mail('Reply-To' => reply_to, to: @vars[:email], subject: default_i18n_subject(default_subject_vars))
   end
 
   def custom_message(organization_message)
