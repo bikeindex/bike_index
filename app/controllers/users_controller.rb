@@ -170,7 +170,7 @@ class UsersController < ApplicationController
 
   def unsubscribe
     user = User.find_by_username(params[:id])
-    user.update_attribute :is_emailable, false if user.present?
+    user.update_attribute :notification_newsletters, false if user.present?
     flash[:success] = 'You have been unsubscribed from Bike Index updates'
     redirect_to user_root_url and return
   end
@@ -179,10 +179,10 @@ class UsersController < ApplicationController
 
   def permitted_parameters
     params.require(:user)
-          .permit(:name, :username, :email, :is_emailable, :additional_emails, :title, :description,
-                  :phone, :street, :city, :zipcode, :country_id, :state_id, :avatar, :avatar_cache,
-                  :twitter, :show_twitter, :website, :show_website, :show_bikes, :show_phone,
-                  :my_bikes_link_target, :my_bikes_link_title, :password, :password_confirmation)
+          .permit(:name, :username, :email, :notification_newsletters, :notification_unstollen,
+                  :additional_emails, :title, :description, :phone, :street, :city, :zipcode, :country_id,
+                  :state_id, :avatar, :avatar_cache, :twitter, :show_twitter, :website, :show_website,
+                  :show_bikes, :show_phone, :my_bikes_link_target, :my_bikes_link_title, :password, :password_confirmation)
           .merge(sign_in_partner.present? ? { partner_data: { sign_up: sign_in_partner } } : {})
   end
 

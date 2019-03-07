@@ -136,6 +136,8 @@ class User < ActiveRecord::Base
 
   def paid_org?; organizations.paid.any? end
 
+  def notification_unstolen?; !notification_unstolen_blocked end
+
   def admin_authorized(type)
     return true if superuser
     return case type

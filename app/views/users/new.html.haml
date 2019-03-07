@@ -61,7 +61,7 @@
             - unless sign_in_partner.present?
               .checkbox
                 %label
-                  = f.check_box :is_emailable
+                  = f.check_box :notification_newsletters
                   Get Bike Index's Newsletter
 
             = f.submit t("sign_in_up.#{controller_name}_main_form_action"), class: 'btn btn-primary btn-lg'

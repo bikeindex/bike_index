@@ -2125,7 +2125,7 @@ CREATE TABLE public.users (
     paid_membership_info text,
     is_content_admin boolean DEFAULT false NOT NULL,
     my_bikes_hash text,
-    is_emailable boolean DEFAULT false NOT NULL,
+    notification_newsletters boolean DEFAULT false NOT NULL,
     developer boolean DEFAULT false NOT NULL,
     bike_actions_organization_id integer,
     partner_data json,
@@ -2134,7 +2134,8 @@ CREATE TABLE public.users (
     street character varying,
     city character varying,
     country_id integer,
-    state_id integer
+    state_id integer,
+    notification_unstolen boolean DEFAULT true
 );
 
 
@@ -4115,3 +4116,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190208195902');
 INSERT INTO schema_migrations (version) VALUES ('20190214192448');
 
 INSERT INTO schema_migrations (version) VALUES ('20190301020053');
+
+INSERT INTO schema_migrations (version) VALUES ('20190307232718');
+
