@@ -153,7 +153,6 @@ describe Organized::ExportsController, type: :controller do
           }
         end
         it "creates the expected export" do
-          expect(Time.zone).to eq TimeParser::DEFAULT_TIMEZONE
           expect do
             post :create, export: crushed_datetime_attrs, organization_id: organization.to_param
           end.to change(Export, :count).by 1
