@@ -7,7 +7,6 @@ describe Bike do
     it { is_expected.to belong_to :primary_frame_color }
     it { is_expected.to belong_to :secondary_frame_color }
     it { is_expected.to belong_to :tertiary_frame_color }
-    it { is_expected.to belong_to :handlebar_type }
     it { is_expected.to belong_to :rear_wheel_size }
     it { is_expected.to belong_to :front_wheel_size }
     it { is_expected.to belong_to :rear_gear_type }
@@ -797,7 +796,6 @@ describe Bike do
     end
     it 'caches all the bike parts' do
       type = FactoryBot.create(:cycle_type, name: 'Unicycle')
-      handlebar = FactoryBot.create(:handlebar_type)
       propulsion = FactoryBot.create(:propulsion_type, name: 'Hand pedaled')
       wheel_size = FactoryBot.create(:wheel_size)
       bike = FactoryBot.create(:bike, cycle_type: type, propulsion_type_id: propulsion.id, rear_wheel_size: wheel_size)
@@ -806,8 +804,9 @@ describe Bike do
                              secondary_frame_color_id: bike.primary_frame_color_id,
                              tertiary_frame_color_id: bike.primary_frame_color_id,
                              stolen: true,
+                             handlebar_type: "bmx",
                              frame_size: '56', frame_size_unit: 'foo',
-                             frame_model: 'Some model', handlebar_type_id: handlebar.id)
+                             frame_model: 'Some model')
       bike.cache_bike
       expect(bike.cached_data).to eq("#{bike.mnfg_name} Hand pedaled 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material_name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle")
       expect(bike.current_stolen_record_id).to eq(stolen_record.id)
@@ -957,6 +956,14 @@ describe Bike do
         bike.bike_organization_ids = "#{organization_2.id}, "
         expect(bike.bike_organization_ids).to eq([organization_2.id])
       end
+    end
+  end
+
+  describe 'handlebar_type_name' do
+    let(:bike) { FactoryBot.create(:bike, handlebar_type: "bmx") }
+    it "returns the normalized name" do
+      normalized_name = HandlebarType.new(bike.handlebar_type).name
+      expect(bike.handlebar_type_name).to eq(normalized_name)
     end
   end
 end

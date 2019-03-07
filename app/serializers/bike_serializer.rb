@@ -22,7 +22,8 @@ class BikeSerializer < ActiveModel::Serializer
     :thumb,
     :title,
     :type_of_cycle,
-    :frame_material
+    :frame_material,
+    :handlebar_type
 
   has_one :rear_wheel_size,
     :front_wheel_size,
@@ -87,5 +88,9 @@ class BikeSerializer < ActiveModel::Serializer
 
   def frame_material
     object.frame_material_name
+  end
+
+  def handlebar_type
+    object.handlebar_type_name
   end
 end

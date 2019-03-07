@@ -8,7 +8,6 @@ class Bike < ActiveRecord::Base
   belongs_to :primary_frame_color, class_name: 'Color'
   belongs_to :secondary_frame_color, class_name: 'Color'
   belongs_to :tertiary_frame_color, class_name: 'Color'
-  belongs_to :handlebar_type
   belongs_to :rear_wheel_size, class_name: 'WheelSize'
   belongs_to :front_wheel_size, class_name: 'WheelSize'
   belongs_to :rear_gear_type
@@ -64,6 +63,7 @@ class Bike < ActiveRecord::Base
   attr_writer :phone, :user_name # reading is managed by a method
 
   enum frame_material: FrameMaterial::SLUGS
+  enum handlebar_type: HandlebarType::SLUGS
 
   default_scope { 
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record, :cycle_type)
@@ -104,7 +104,7 @@ class Bike < ActiveRecord::Base
         serial_normalized has_no_serial made_without_serial additional_registration
         creation_organization_id manufacturer year thumb_path name stolen
         current_stolen_record_id recovered frame_material frame_model number_of_seats
-        handlebar_type_id handlebar_type_other frame_size frame_size_number frame_size_unit
+        handlebar_type frame_size frame_size_number frame_size_unit
         rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow 
         primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
         propulsion_type_id propulsion_type_other zipcode country_id belt_drive
@@ -454,5 +454,9 @@ class Bike < ActiveRecord::Base
 
   def frame_material_name
     FrameMaterial.new(frame_material).name
+  end
+
+  def handlebar_type_name
+    HandlebarType.new(handlebar_type).name
   end
 end

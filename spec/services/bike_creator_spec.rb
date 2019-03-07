@@ -156,7 +156,6 @@ describe BikeCreator do
         user = FactoryBot.create(:user)
         manufacturer = FactoryBot.create(:manufacturer)
         color = FactoryBot.create(:color)
-        handlebar_type = FactoryBot.create(:handlebar_type)
         wheel_size = FactoryBot.create(:wheel_size)
         b_param = BParam.new(origin: 'api_v1')
         creator = BikeCreator.new(b_param)
@@ -173,7 +172,7 @@ describe BikeCreator do
           'rear_tire_narrow' => 'true',
           'rear_wheel_size_id' => wheel_size.id,
           'primary_frame_color_id' => color.id,
-          'handlebar_type_id' => handlebar_type,
+          'handlebar_type' => 'bmx',
           'creator' => user
         )
         expect do
