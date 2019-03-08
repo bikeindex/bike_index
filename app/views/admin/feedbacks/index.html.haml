@@ -1,13 +1,16 @@
 %header.with-subtitle
-  %h1.text-right
+  %h1
     #{link_to 'Feedback and messages', admin_feedbacks_path}
-%h4.text-right
+%h4
   = Feedback.count
   messages
   - if @matching_count.present?
     %strong
       \- #{@matching_count}
     #{params[:type]}
+
+.paginate-container.feedbacks-paginate.float-right
+  = paginate @feedbacks, views_prefix: 'admin'
 
 %section.full-screen-table
   %table.table.table-striped.table-bordered
@@ -52,7 +55,7 @@
           %td.large-screens
             = feedback.body.truncate(100)
 
-.paginate-container.feedbacks-paginate
+.paginate-container.float-right
   = paginate @feedbacks, views_prefix: 'admin'
 
 
