@@ -6,7 +6,7 @@
 footer.primary-footer {
   display: none;
 }
-.nav-logo {
+.admin-nav-logo {
   img {
     height: 35px;
     width: 35px;
@@ -16,5 +16,14 @@ footer.primary-footer {
 .admin-nav {
   li a {
     color: black;
+  }
+}
+
+.admin-nav-dropdown {
+  .dropdown-item a {
+    color: black;
+  }
+  .active {
+    color: red !important;
   }
 }
