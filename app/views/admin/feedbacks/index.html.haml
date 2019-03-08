@@ -53,7 +53,8 @@
             = feedback.body.truncate(100)
 
 .paginate-container.feedbacks-paginate
-  = paginate @feedbacks
+  = paginate @feedbacks, views_prefix: 'admin'
+
 
 %h5.mt-5.mb-0.ml-5
   Feedback and messages by date

@@ -1,6 +1,6 @@
 - if page.current?
-  %li.active
+  %li.active.list-inline-item
     = content_tag :a, page, remote: remote, rel: (page.next? ? 'next' : (page.prev? ? 'prev' : nil))
 - else
-  %li
+  %li.list-inline-item
     = link_to page, url, remote: remote, rel: (page.next? ? 'next' : (page.prev? ? 'prev' : nil))
