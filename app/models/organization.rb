@@ -172,7 +172,7 @@ class Organization < ActiveRecord::Base
   # TODO: these are DEPRECATED and should be REPLACED with paid_for?
   # Once all the following methods have been moved fully to paid_for?, remove methods and just use paid_for
   def bike_search?; paid_for?("bike_search") end
-  def bike_codes?; has_bike_codes end
+  def bike_codes?; paid_for?("bike_codes") end
   def bulk_import?; show_bulk_import end
   def partial_registrations?; show_partial_registrations end
   def show_recoveries?; bike_search? end # This now has a paid_feature slug, should be converted to that
