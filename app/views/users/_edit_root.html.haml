@@ -17,11 +17,13 @@
       Receive Bike Index newsletter
   .form-group.row.unnested-field
     %label.form-well-label
-    %label.form-well-input
+    %label.form-well-input{ style: "line-height: 1.5em;" }
       = f.check_box :notification_unstolen
       Bike Index has permission to contact you if we believe your bike has been stolen,
       %em
-        even if it hasn't been marked stolen yet
+        even if it hasn't been marked stolen yet -
+      %strong
+        #{link_to "Read why", "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen"}
   .form-group.row
     = f.label :phone, class: "form-well-label"
     .form-well-input
