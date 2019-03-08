@@ -12,13 +12,15 @@ footer.primary-footer {
     width: 35px;
   }
 }
-.nav-dropdown {
-  color: blue;
-}
 
 .admin-nav {
-  a.active {
-    font-weight: bold;
+  li a {
+    color: black;
+  }
+}
+
+.admin-nav-dropdown {
+  .dropdown-item a {
     color: black;
   }
 }
