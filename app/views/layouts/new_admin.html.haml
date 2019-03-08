@@ -80,7 +80,7 @@
                 .dropdown-item{ class: controller_name == "feedbacks" ? "bg-info" : "" }
                   = revised_active_link 'Feedbacks', admin_feedbacks_url
                 .dropdown-item{ class: controller_name == "tweets" ? "bg-info" : "" }
-                  = revised_active_link 'Tweets', admin_tweets_url
+                  = revised_active_link 'Tweets', admin_tweets_url 
                 .dropdown-item{ class: controller_name == "bulk_imports" ? "bg-info" : "" }
                   = revised_active_link 'Bulk Imports', admin_bulk_imports_url
             - if Rails.env.development?
