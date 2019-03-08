@@ -34,7 +34,7 @@ class StolenNotification < ActiveRecord::Base
   end
 
   def set_calculated_attributes
-    self.receiver_email ||= bike.contact_owner_email
+    self.receiver_email ||= bike&.contact_owner_email
     self.receiver ||= bike.owner
     self.send_dates ||= [].to_json
   end
