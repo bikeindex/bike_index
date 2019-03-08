@@ -1,8 +1,24 @@
 - @bike = @stolen_notification.bike
-
 .stolen-notification-from
   %p
-    #{@stolen_notification.sender.email} sent you a message about your #{link_to "stolen #{@bike.type}", bike_url(@bike)}!
+    - if @bike.stolen?
+      #{@stolen_notification.sender.email} sent you a message about your #{link_to "stolen #{@bike.type}", bike_url(@bike)}!
+    - else
+      - if @bike.contact_owner_user?
+        #{@stolen_notification.sender.email} sent you a message about your #{link_to "#{@bike.type}", bike_url(@bike)}!
+        %br
+        %strong.stolen-color
+          They believe it is stolen!
+      - else
+        Please help #{@stolen_notification.sender.display_name} contact the owner of this #{link_to @bike.type, bike_url(@bike)}, they believe it is <span class="stolen-color">stolen</span>!
+        %br
+        %span{ style: "display: block; line-height: 1.5; margin-top: 0.5rem; font-style: normal;" }
+          You can just forward this message to the owner's email address: #{@bike.owner_email}
+        %br
+        %small.less-strong{ style: "display: block; line-height: 1.5;" }
+          You registered this #{@bike.type} on #{l @bike.current_ownership.created_at, format: :dotted}. The owner hasn't claimed it yet and it isn't marked stolen, so you have received this email to authorize contacting them.
+      %small.less-strong{ style: "display: block; line-height: 1; margin: 1em 0 -0.5rem;" }
+        If you believe this email is illegitimate, please contact support@bikeindex.org
 
 %p
   = @stolen_notification.message
@@ -18,6 +34,6 @@
 %hr{ style: 'margin: 40px 0;' }
 
 %p.less-strong.center-text
-  This email is about the #{@bike.type} registered on Bike Index on #{@bike.created_at.strftime('%m.%d.%y')}
+  This email is about the #{@bike.type} registered on Bike Index on #{l @bike.created_at, format: :dotted}
 
 = render partial: '/shared/email_bike_box'

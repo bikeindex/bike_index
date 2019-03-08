@@ -216,6 +216,24 @@ class Bike < ActiveRecord::Base
     true
   end
 
+  def display_contact_owner?(u = nil)
+    stolen? && current_stolen_record.present? || contact_owner?(u)
+  end
+
+  def contact_owner?(u = nil)
+    return false unless u.present?
+    return true if stolen? && current_stolen_record.present?
+    u.send_unstolen_notifications? && owner&.notification_unstolen
+  end
+
+  def contact_owner_user?
+    user? || stolen?
+  end
+
+  def contact_owner_email
+    contact_owner_user? ? owner_email : creator&.email
+  end
+
   def phone
     # use @phone because attr_accessor
     @phone ||= user&.phone

@@ -206,7 +206,7 @@ describe UsersController do
           email: 'foo1@bar.com',
           password: 'coolpasswprd$$$$$',
           terms_of_service: '0',
-          is_emailable: '0'
+          notification_newsletters: '0'
         }
       end
 
@@ -487,7 +487,7 @@ describe UsersController do
       include_context :geocoder_default_location
       it "sets address, geocodes" do
         set_current_user(user)
-        expect(user.is_emailable).to be_falsey
+        expect(user.notification_newsletters).to be_falsey
         post :update, id: user.username,
                       user: {
                         name: "Mr. Slick",
@@ -496,7 +496,7 @@ describe UsersController do
                         city: "New York",
                         street: "278 Broadway",
                         zipcode: "10007",
-                        is_emailable: "1",
+                        notification_newsletters: "1",
                         phone: "3223232"
                       }
         expect(response).to redirect_to(my_account_url)
@@ -507,7 +507,7 @@ describe UsersController do
         expect(user.state).to eq state
         expect(user.street).to eq "278 Broadway"
         expect(user.zipcode).to eq "10007"
-        expect(user.is_emailable).to be_truthy
+        expect(user.notification_newsletters).to be_truthy
         expect(user.latitude).to eq default_location[:latitude]
         expect(user.longitude).to eq default_location[:longitude]
         expect(user.phone).to eq "3223232"
@@ -521,16 +521,26 @@ describe UsersController do
       expect(user.reload.terms_of_service).to be_truthy
     end
 
+    it "updates notification" do
+      set_current_user(user)
+      expect(user.notification_unstolen).to be_truthy # Because it's set to true by default
+      post :update, id: user.username, user: { notification_newsletters: "1", notification_unstolen: "0" }
+      expect(response).to redirect_to my_account_url
+      user.reload
+      expect(user.notification_newsletters).to be_truthy
+      expect(user.notification_unstolen).to be_falsey
+    end
+
     it 'updates the vendor terms of service and emailable' do
-      user = FactoryBot.create(:user_confirmed, terms_of_service: false, is_emailable: false)
-      expect(user.is_emailable).to be_falsey
+      user = FactoryBot.create(:user_confirmed, terms_of_service: false, notification_newsletters: false)
+      expect(user.notification_newsletters).to be_falsey
       org = FactoryBot.create(:organization)
       FactoryBot.create(:membership, organization: org, user: user)
       set_current_user(user)
-      post :update, id: user.username, user: { vendor_terms_of_service: '1', is_emailable: true }
+      post :update, id: user.username, user: { vendor_terms_of_service: '1', notification_newsletters: true }
       expect(response.code).to eq('302')
       expect(user.reload.vendor_terms_of_service).to be_truthy
-      expect(user.is_emailable).to be_truthy
+      expect(user.notification_newsletters).to be_truthy
     end
 
     it 'enqueues job (it enqueues job whenever update is successful)' do
@@ -543,15 +553,15 @@ describe UsersController do
   end
   describe 'unsubscribe' do
     context "subscribed unconfirmed user" do
-      let(:user) { FactoryBot.create(:user, is_emailable: true) }
-      it "updates is_emailable" do
-        expect(user.is_emailable).to be_truthy
+      let(:user) { FactoryBot.create(:user, notification_newsletters: true) }
+      it "updates notification_newsletters" do
+        expect(user.notification_newsletters).to be_truthy
         expect(user.confirmed?).to be_falsey
         get :unsubscribe, id: user.username
         expect(response.code).to eq("302")
         expect(flash[:success]).to be_present
         user.reload
-        expect(user.is_emailable).to be_falsey
+        expect(user.notification_newsletters).to be_falsey
         expect(user.confirmed).to be_falsey
       end
     end
@@ -563,14 +573,14 @@ describe UsersController do
       end
     end
     context 'user already unsubscribed' do
-      let(:user) { FactoryBot.create(:user_confirmed, is_emailable: false) }
+      let(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: false) }
       it 'does nothing' do
-        expect(user.is_emailable).to be_falsey
+        expect(user.notification_newsletters).to be_falsey
         get :unsubscribe, id: user.username
         expect(response.code).to eq('302')
         expect(flash[:success]).to be_present
         user.reload
-        expect(user.is_emailable).to be_falsey
+        expect(user.notification_newsletters).to be_falsey
       end
     end
   end
