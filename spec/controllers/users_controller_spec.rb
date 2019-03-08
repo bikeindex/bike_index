@@ -524,7 +524,7 @@ describe UsersController do
     it "updates notification" do
       set_current_user(user)
       expect(user.notification_unstolen).to be_truthy # Because it's set to true by default
-      post :update, id: user.username, user: { notification_newsletters: "1", notification_unstolen: "1" }
+      post :update, id: user.username, user: { notification_newsletters: "1", notification_unstolen: "0" }
       expect(response).to redirect_to my_account_url
       user.reload
       expect(user.notification_newsletters).to be_truthy
