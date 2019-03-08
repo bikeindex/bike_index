@@ -29,7 +29,7 @@
             %li.nav-item.px-3.btn.btn-default
               = revised_active_link "News", admin_news_index_path
             .dropdown
-              %button.btn.btn-default.dropdown-toggle{"type" => "button", "data-toggle" => "dropdown"}
+              %button.btn.btn-default.dropdown-toggle.nav-dropdown{"type" => "button", "data-toggle" => "dropdown"}
                 Stolen
               .dropdown-menu.admin-nav-dropdown
                 .dropdown-item
@@ -42,7 +42,7 @@
                   = revised_active_link 'Stolen Twitterbot URL', ENV['STOLEN_TWITTERBOT_URL'].gsub(/bikes\z/, '')
 
             .dropdown
-              %button.btn.btn-default.dropdown-toggle{"type" => "button", "data-toggle" => "dropdown"}
+              %button.btn.btn-default.dropdown-toggle.nav-dropdown{"type" => "button", "data-toggle" => "dropdown"}
                 Paid
               .dropdown-menu.admin-nav-dropdown
                 .dropdown-item
@@ -53,7 +53,7 @@
                   = revised_active_link "Invoices", admin_invoices_path
 
             .dropdown
-              %button.btn.btn-default.dropdown-toggle{"type" => "button", "data-toggle" => "dropdown"}
+              %button.btn.btn-default.dropdown-toggle.nav-dropdown{"type" => "button", "data-toggle" => "dropdown"}
                 Other
               .dropdown-menu.admin-nav-dropdown
                 .dropdown-item
@@ -82,7 +82,7 @@
                   = revised_active_link 'Bulk Imports', admin_bulk_imports_url
             - if Rails.env.development?
               .dropdown
-                %button.btn.btn-default.dropdown-toggle{"type" => "button", "data-toggle" => "dropdown"}
+                %button.btn.btn-default.dropdown-toggle.nav-dropdown{"type" => "button", "data-toggle" => "dropdown"}
                   Mailers
                 .dropdown-menu.admin-nav-dropdown
                   .dropdown-item

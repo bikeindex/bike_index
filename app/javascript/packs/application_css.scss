@@ -12,18 +12,13 @@ footer.primary-footer {
     width: 35px;
   }
 }
-
-.admin-nav {
-  li a {
-    color: black;
-  }
+.nav-dropdown {
+  color: blue;
 }
 
-.admin-nav-dropdown {
-  .dropdown-item a {
+.admin-nav {
+  a.active {
+    font-weight: bold;
     color: black;
-  }
-  .active {
-    color: red !important;
   }
 }
