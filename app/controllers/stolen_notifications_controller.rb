@@ -9,7 +9,10 @@ class StolenNotificationsController < ApplicationController
     @stolen_notification = StolenNotification.new(permitted_parameters)
     @stolen_notification.sender = current_user
     @bike = @stolen_notification.bike
-    if @stolen_notification.save
+    if !@bike.contact_owner?(current_user)
+      flash[:error] = "You don't have permission to send that notification! Please contact support@bikeindex.org"
+      redirect_to @bike
+    elsif @stolen_notification.save
       flash[:success] = 'Thanks for looking out!'
       redirect_to @bike
     else

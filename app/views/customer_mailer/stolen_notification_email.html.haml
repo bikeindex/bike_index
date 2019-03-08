@@ -1,9 +1,21 @@
 - @bike = @stolen_notification.bike
-
 .stolen-notification-from
   %p
-    #{@stolen_notification.sender.email} sent you a message about your #{link_to "stolen #{@bike.type}", bike_url(@bike)}!
-
+    - if @bike.stolen?
+      #{@stolen_notification.sender.email} sent you a message about your #{link_to "stolen #{@bike.type}", bike_url(@bike)}!
+    - else
+      - if @bike.contact_owner_user?
+        #{@stolen_notification.sender.email} sent you a message about your #{link_to "#{@bike.type}", bike_url(@bike)}
+        %br
+        %strong.stolen-color
+          They believe it is stolen!
+      - else
+        Please help #{@stolen_notification.sender.email} get in contact with the owner of this #{link_to "#{@bike.type}", bike_url(@bike)}.
+        %br
+        They believe this bike, which you sent to #{@bike.owner_email} at XXXXX, is currently <span class="stolen-color">stolen</p>
+        %br
+        %small.less-strong
+          You can just just forward this message to the above email address
 %p
   = @stolen_notification.message
 
