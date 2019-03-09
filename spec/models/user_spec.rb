@@ -240,7 +240,8 @@ describe User do
       it "does not add http:// to twitter if it's already there" do
         user = User.new(show_twitter: true, twitter: 'http://somewhere.com', show_website: true, website: 'somewhere', my_bikes_link_target: 'https://something.com')
         user.set_calculated_attributes
-        expect(user.my_bikes_hash[:link_target]).to eq('https://something.com')
+        expect(user.my_bikes_hash["link_target"]).to eq('https://something.com')
+        expect(user.mb_link_target).to eq('https://something.com')
         expect(user.twitter).to eq('http://somewhere.com')
         expect(user.bike_actions_organization).to be_nil
       end

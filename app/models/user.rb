@@ -255,8 +255,8 @@ class User < ActiveRecord::Base
     self.website = Urlifyer.urlify(website) if website.present?
     if my_bikes_link_target.present? || my_bikes_link_title.present?
       mbh = my_bikes_hash || {}
-      mbh[:link_target] = Urlifyer.urlify(my_bikes_link_target) if my_bikes_link_target.present?
-      mbh[:link_title] = my_bikes_link_title if my_bikes_link_title.present?
+      mbh["link_target"] = Urlifyer.urlify(my_bikes_link_target) if my_bikes_link_target.present?
+      mbh["link_title"] = my_bikes_link_title if my_bikes_link_title.present?
       self.my_bikes_hash = mbh
     end
     self.bike_actions_organization_id = organizations.with_bike_actions.reorder(:created_at).pluck(:id).first
@@ -264,11 +264,11 @@ class User < ActiveRecord::Base
   end
 
   def mb_link_target
-    my_bikes_hash && my_bikes_hash[:link_target]
+    my_bikes_hash && my_bikes_hash["link_target"]
   end
 
   def mb_link_title
-    (my_bikes_hash && my_bikes_hash[:link_title]) || mb_link_target
+    (my_bikes_hash && my_bikes_hash["link_title"]) || mb_link_target
   end
 
   def normalize_attributes
