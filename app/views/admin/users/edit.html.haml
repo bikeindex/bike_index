@@ -1,10 +1,29 @@
 %h1
   Editing #{@user.email}
-  - if @user.donor?
-    <span class="donor-icon">D</span>
-  - if @user.paid_org?
-    <span class="paid-org-icon">O</span>
 
+.row-fluid
+  .span6
+    %table.table-list
+      %tbody
+        %tr
+          %td
+            Donor
+          %td
+            - if @user.donor?
+              <span class="donor-icon">D</span>
+            - if @user.paid_org?
+              <span class="paid-org-icon">O</span>
+
+        %tr
+          %td
+            Email: Newsletters
+          %td
+            = "&#x2713;".html_safe if @user.notification_newsletters
+        %tr
+          %td
+            Email: Unstolen
+          %td
+            = "&#x2713;".html_safe if @user.notification_unstolen
 = form_for [:admin, @user] do |f|
   .row-fluid
     - if @user.errors.any?

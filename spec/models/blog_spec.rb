@@ -9,6 +9,23 @@ describe Blog do
   #   it { should validate_uniqueness_of :title_slug }
   # end
 
+  describe "friendly_find" do
+    let(:user) { FactoryBot.create(:user) }
+    let!(:blog) { Blog.create(title: 'foo title', body: 'ummmmm good', user_id: user.id, old_title_slug: 'an-elder-statesman-title') }
+    it "finds by the things we expect it to" do
+      expect(blog.title_slug).to eq "foo-title"
+      expect(Blog.friendly_find("foo title").id).to eq blog.id
+      expect(Blog.friendly_find("foo-title").id).to eq blog.id
+      expect(Blog.friendly_find(blog.id).id).to eq blog.id
+      expect(Blog.friendly_find("an-elder-statesman-title").id).to eq blog.id
+      # These should work, to give us a little bit better edge, but for now, whatever
+      # expect(Blog.friendly_find("an-elder-statesman").id).to eq blog.id
+      # blog2 = FactoryBot.create(:blog, title: "an elder statesman")
+      # expect(blog2).to be_present
+      # expect(Blog.friendly_find("an-elder-statesman").id).to eq blog2.id
+    end
+  end
+
   describe 'set_title_slug' do
     it 'makes the title 70 char long and character safe for params' do
       @user = FactoryBot.create(:user)
@@ -88,10 +105,6 @@ describe Blog do
       blog.index_image_id = 3399
       blog.set_index_image
       expect(blog.index_image_id).to eq(public_image.id)
-    end
-
-    it 'has before_save_callback_method defined for set_index_image' do
-      expect(Blog._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_index_image)).to eq(true)
     end
   end
 

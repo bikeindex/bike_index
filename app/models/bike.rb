@@ -103,7 +103,7 @@ class Bike < ActiveRecord::Base
       (%w(cycle_type_id manufacturer_id manufacturer_other serial_number 
         serial_normalized has_no_serial made_without_serial additional_registration
         creation_organization_id manufacturer year thumb_path name stolen
-        current_stolen_record_id recovered frame_material frame_material_id frame_model number_of_seats
+        current_stolen_record_id recovered frame_material frame_model number_of_seats
         handlebar_type_id handlebar_type_other frame_size frame_size_number frame_size_unit
         rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow 
         primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
@@ -214,6 +214,24 @@ class Bike < ActiveRecord::Base
     return authorize_bike_for_user(u) unless can_be_claimed_by(u)
     current_ownership.mark_claimed
     true
+  end
+
+  def display_contact_owner?(u = nil)
+    stolen? && current_stolen_record.present? || contact_owner?(u)
+  end
+
+  def contact_owner?(u = nil)
+    return false unless u.present?
+    return true if stolen? && current_stolen_record.present?
+    u.send_unstolen_notifications? && owner&.notification_unstolen
+  end
+
+  def contact_owner_user?
+    user? || stolen?
+  end
+
+  def contact_owner_email
+    contact_owner_user? ? owner_email : creator&.email
   end
 
   def phone

@@ -207,7 +207,6 @@ CREATE TABLE public.bikes (
     frame_model character varying(255),
     manufacturer_id integer,
     rear_tire_narrow boolean DEFAULT true,
-    frame_material_id integer,
     number_of_seats integer,
     propulsion_type_id integer,
     creation_organization_id integer,
@@ -2121,11 +2120,8 @@ CREATE TABLE public.users (
     can_send_many_stolen_notifications boolean DEFAULT false NOT NULL,
     auth_token character varying(255),
     stripe_id character varying(255),
-    is_paid_member boolean DEFAULT false NOT NULL,
-    paid_membership_info text,
     is_content_admin boolean DEFAULT false NOT NULL,
-    my_bikes_hash text,
-    is_emailable boolean DEFAULT false NOT NULL,
+    notification_newsletters boolean DEFAULT false NOT NULL,
     developer boolean DEFAULT false NOT NULL,
     bike_actions_organization_id integer,
     partner_data json,
@@ -2134,7 +2130,9 @@ CREATE TABLE public.users (
     street character varying,
     city character varying,
     country_id integer,
-    state_id integer
+    state_id integer,
+    notification_unstolen boolean DEFAULT true,
+    my_bikes_hash json
 );
 
 
@@ -4115,3 +4113,10 @@ INSERT INTO schema_migrations (version) VALUES ('20190208195902');
 INSERT INTO schema_migrations (version) VALUES ('20190214192448');
 
 INSERT INTO schema_migrations (version) VALUES ('20190301020053');
+
+INSERT INTO schema_migrations (version) VALUES ('20190306223523');
+
+INSERT INTO schema_migrations (version) VALUES ('20190307232718');
+
+INSERT INTO schema_migrations (version) VALUES ('20190308235449');
+
