@@ -4,6 +4,10 @@ describe AfterBikeSaveWorker do
   let(:subject) { AfterBikeSaveWorker }
   let(:instance) { subject.new }
 
+  it "is the correct queue" do
+    expect(subject.sidekiq_options["queue"]).to eq "low_priority"
+  end
+
   describe 'enqueuing jobs' do
     let(:bike_id) { FactoryBot.create(:ownership, user_hidden: true).bike_id }
     it 'enqueues the duplicate_bike_finder_worker' do

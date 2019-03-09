@@ -1,7 +1,6 @@
 class UnusedOwnershipRemovalWorker
   include Sidekiq::Worker
-  sidekiq_options queue: 'afterwards'
-  sidekiq_options backtrace: true
+  sidekiq_options queue: "low_priority", backtrace: true
     
   def perform(id)
     ownership = Ownership.find(id)

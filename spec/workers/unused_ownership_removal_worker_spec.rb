@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe UnusedOwnershipRemovalWorker do
-  it { is_expected.to be_processed_in :afterwards }
-
   it 'enqueues listing ordering job' do
     UnusedOwnershipRemovalWorker.perform_async
     expect(UnusedOwnershipRemovalWorker).to have_enqueued_sidekiq_job

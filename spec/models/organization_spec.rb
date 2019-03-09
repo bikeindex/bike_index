@@ -86,8 +86,9 @@ describe Organization do
       organization_child.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - after_commit
       expect(organization_child.is_paid).to be_falsey
       organization_child.update_attributes(parent_organization: organization)
+      organization_child.reload
       expect(organization_child.is_paid).to be_truthy
-      expect(organization_child.current_invoice).to eq invoice
+      expect(organization_child.current_invoices.first).to eq invoice
       expect(organization_child.paid_feature_slugs).to eq(["csv_exports"])
       expect(organization_child.paid_for?("csv_exports")).to be_truthy # It also checks for the full name version
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
@@ -113,6 +114,25 @@ describe Organization do
         # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
         user.update_attributes(updated_at: Time.now)
         expect(user.bike_actions_organization_id).to eq organization.id
+      end
+    end
+  end
+
+  describe "show_bulk_import?" do
+    let(:organization) { Organization.new }
+    it "is falsey" do
+      expect(organization.show_bulk_import?).to be_falsey
+    end
+    context "paid_for" do
+      let(:organization) { Organization.new(paid_feature_slugs: ["show_bulk_import"]) }
+      it "is truthy" do
+        expect(organization.show_bulk_import?).to be_truthy
+      end
+    end
+    context "with ascend name" do
+      let(:organization) { Organization.new(ascend_name: "xxxzzaz") }
+      it "is truthy" do
+        expect(organization.show_bulk_import?).to be_truthy
       end
     end
   end

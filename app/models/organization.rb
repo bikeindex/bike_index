@@ -135,10 +135,10 @@ class Organization < ActiveRecord::Base
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = (short_name || name).truncate(30)
-    self.is_paid = true if current_invoice&.paid_in_full?
+    self.is_paid = current_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
-    self.paid_feature_slugs = current_invoice&.feature_slugs || []
+    self.paid_feature_slugs = current_invoices.map(&:feature_slugs).flatten
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
@@ -162,20 +162,16 @@ class Organization < ActiveRecord::Base
     save
   end
 
-  def current_invoice; invoices.active.last || parent_organization&.current_invoice end # Parent invoice serves as invoice
   def child_ids; child_organizations.pluck(:id) end
+  # Parent invoice serves as invoice
+  def current_invoices; parent_organization.present? ? parent_organization.current_invoices : invoices.active end
 
   def incomplete_b_params
     BParam.where(organization_id: child_ids + [id]).partial_registrations.without_bike
   end
 
-  # TODO: these are DEPRECATED and should be REPLACED with paid_for?
-  # Once all the following methods have been moved fully to paid_for?, remove methods and just use paid_for
-  def bike_search?; paid_for?("bike_search") end
-  def bike_codes?; has_bike_codes end
-  def bulk_import?; show_bulk_import end
-  def partial_registrations?; show_partial_registrations end
-  def show_recoveries?; bike_search? end # This now has a paid_feature slug, should be converted to that
+  # Enable this if they have paid for showing it, or if they use ascend
+  def show_bulk_import?; paid_for?("show_bulk_import") || ascend_name.present? end
 
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates

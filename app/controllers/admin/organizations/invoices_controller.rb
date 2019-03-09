@@ -22,7 +22,7 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
     if @invoice.save
       # Invoice has to be created before it can get paid_feature_ids
       @invoice.paid_feature_ids = permitted_parameters[:paid_feature_ids]
-      flash[:success] = "Invoice created"
+      flash[:success] = "Invoice created! #{invoice_is_active_notice(@invoice)}"
       redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
     else
       render :new
@@ -32,13 +32,13 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
   def update
     if params[:create_following_invoice]
       if @invoice.create_following_invoice
-        flash[:success] = "Invoice created"
+        flash[:success] = "Invoice updated! #{invoice_is_active_notice(@invoice)}"
       else
         flash[:error] = "unable to create following invoice. Was this invoice active?"
       end
       redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
     elsif @invoice.update_attributes(permitted_parameters)
-      flash[:success] = "Invoice created"
+      flash[:success] = "Invoice updated! #{invoice_is_active_notice(@invoice)}"
       redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
     else
       render :edit
@@ -64,5 +64,13 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
 
   def find_invoice
     @invoice = @organization.invoices.find(params[:id])
+  end
+
+  def invoice_is_active_notice(invoice)
+    if invoice.is_active?
+      "Invoice is ACTIVE"
+    else
+      "Invoice is NOT active"
+    end
   end
 end

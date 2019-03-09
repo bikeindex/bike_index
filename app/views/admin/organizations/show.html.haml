@@ -111,7 +111,7 @@
           %dt
             Bike Search
           %dd
-            - if @organization.bike_search?
+            - if @organization.paid_for?("bike_search")
               yes
             - else
               <small class="less-strong">no</small>
@@ -152,7 +152,7 @@
           %dt
             Stickers
           %dd
-            - if @organization.bike_codes?
+            - if @organization.paid_for?("bike_codes")
               = link_to "Has stickers", organization_stickers_path(organization_id: @organization.to_param)
             - else
               %small.less-strong
@@ -160,7 +160,7 @@
           %dt
             Partial reg list
           %dd
-            - if @organization.show_partial_registrations
+            - if @organization.paid_for?("show_partial_registrations")
               yes
             - else
               <small class="less-strong">no</small>
