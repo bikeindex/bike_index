@@ -19,8 +19,6 @@ describe User do
     it { is_expected.to have_many :oauth_applications }
     it { is_expected.to have_many :sent_stolen_notifications }
     it { is_expected.to have_many :received_stolen_notifications }
-    it { is_expected.to serialize :paid_membership_info }
-    it { is_expected.to serialize :my_bikes_hash }
     it { is_expected.to validate_presence_of :email }
     # it { is_expected.to validate_uniqueness_of :email }
   end
@@ -242,7 +240,8 @@ describe User do
       it "does not add http:// to twitter if it's already there" do
         user = User.new(show_twitter: true, twitter: 'http://somewhere.com', show_website: true, website: 'somewhere', my_bikes_link_target: 'https://something.com')
         user.set_calculated_attributes
-        expect(user.my_bikes_hash[:link_target]).to eq('https://something.com')
+        expect(user.my_bikes_hash["link_target"]).to eq('https://something.com')
+        expect(user.mb_link_target).to eq('https://something.com')
         expect(user.twitter).to eq('http://somewhere.com')
         expect(user.bike_actions_organization).to be_nil
       end
@@ -381,6 +380,35 @@ describe User do
     it 'fails with nil' do
       result = User.friendly_id_find('some stuff')
       expect(result).to be_nil
+    end
+  end
+
+  describe "send_unstolen_notifications?" do
+    let(:user) { User.new }
+    it "is falsey, truthy for superuser" do
+      expect(user.send_unstolen_notifications?).to be_falsey
+      user.superuser = true
+      expect(user.send_unstolen_notifications?).to be_truthy
+    end
+    context "organization" do
+      let(:user) { FactoryBot.create(:organization_member) }
+      let(:organization) { user.organizations.first }
+      let!(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization) }
+      let!(:paid_feature) { FactoryBot.create(:paid_feature, name: "unstolen notifications", feature_slugs: ["unstolen_notifications"]) }
+      it "is true if the organization has that paid feature" do
+        user.reload
+        expect(user.bike_actions_organization_id).to be_blank
+        expect(user.send_unstolen_notifications?).to be_falsey
+        invoice.update_attributes(paid_feature_ids: [paid_feature.id])
+        organization.update_attributes(updated_at: Time.now) # TODO: Rails 5 update, after_commit
+        expect(organization.bike_actions?).to be_truthy
+        expect(Organization.with_bike_actions.pluck(:id)).to eq([organization.id])
+        # Also, it bubbles up. BUT TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
+        user.update_attributes(updated_at: Time.now)
+        user.reload
+        expect(user.bike_actions_organization_id).to eq organization.id
+        expect(user.send_unstolen_notifications?).to be_truthy
+      end
     end
   end
 
