@@ -18,6 +18,7 @@ class Invoice < ActiveRecord::Base
   scope :first_invoice, -> { where(first_invoice_id: nil) }
   scope :renewal_invoice, -> { where.not(first_invoice_id: nil) }
   scope :active, -> { where(is_active: true) }
+  scope :inactive, -> { where(is_active: false) }
   scope :current, -> { active.where("subscription_end_at > ?", Time.now) }
   scope :expired, -> { where.not(subscription_start_at: nil).where("subscription_end_at < ?", Time.now) }
   scope :should_expire, -> { where(is_active: true).where("subscription_end_at < ?", Time.now) }
