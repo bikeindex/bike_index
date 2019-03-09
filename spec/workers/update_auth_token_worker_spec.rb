@@ -1,7 +1,11 @@
 require 'spec_helper'
 
 describe UpdateAuthTokenWorker do
-  it { is_expected.to be_processed_in :updates }
+  let(:subject) { UpdateAuthTokenWorker }
+
+  it "is the correct queue" do
+    expect(subject.sidekiq_options["queue"]).to eq "high_priority"
+  end
 
   it 'updates the auth token' do
     user = FactoryBot.create(:user)

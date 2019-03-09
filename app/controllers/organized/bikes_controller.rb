@@ -11,14 +11,14 @@ module Organized
     end
 
     def recoveries
-      redirect_to current_index_path and return unless current_organization.show_recoveries?
+      redirect_to current_index_path and return unless current_organization.paid_for?("show_recoveries")
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      @recoveries = current_organization.recovered_records.order('date_recovered desc').page(@page).per(@per_page)
+      @recoveries = current_organization.recovered_records.order(date_recovered: :desc).page(@page).per(@per_page)
     end
 
     def incompletes
-      redirect_to current_index_path and return unless current_organization.partial_registrations?
+      redirect_to current_index_path and return unless current_organization.paid_for?("show_partial_registrations")
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       b_params = current_organization.incomplete_b_params

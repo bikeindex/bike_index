@@ -160,7 +160,7 @@
           %dt
             Partial reg list
           %dd
-            - if @organization.show_partial_registrations
+            - if @organization.paid_for?("show_partial_registrations")
               yes
             - else
               <small class="less-strong">no</small>

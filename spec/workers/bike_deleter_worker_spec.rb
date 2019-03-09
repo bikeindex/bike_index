@@ -3,7 +3,6 @@ require 'spec_helper'
 describe BikeDeleterWorker do
   let(:subject) { BikeDeleterWorker }
   let(:instance) { subject.new }
-  it { is_expected.to be_processed_in :afterwards }
 
   let(:ownership) { FactoryBot.create(:ownership) }
   let!(:bike) { ownership.bike }

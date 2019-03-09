@@ -1,6 +1,6 @@
 class BikeDeleterWorker
   include Sidekiq::Worker
-  sidekiq_options queue: "afterwards"
+  sidekiq_options queue: "low_priority"
   sidekiq_options backtrace: true
 
   def perform(bike_id)

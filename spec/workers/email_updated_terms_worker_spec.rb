@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe EmailUpdatedTermsWorker do
-  it { is_expected.to be_processed_in :afterwards }
   let(:user) { FactoryBot.create(:organization_member) }
   let(:subject) { EmailUpdatedTermsWorker.new }
   before do

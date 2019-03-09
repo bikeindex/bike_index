@@ -1513,9 +1513,6 @@ CREATE TABLE public.organizations (
     is_paid boolean DEFAULT false NOT NULL,
     lock_show_on_map boolean DEFAULT false NOT NULL,
     landing_html text,
-    show_bulk_import boolean DEFAULT false,
-    has_bike_codes boolean DEFAULT false NOT NULL,
-    show_partial_registrations boolean DEFAULT false NOT NULL,
     paid_feature_slugs jsonb,
     parent_organization_id integer,
     kind integer,
@@ -4119,4 +4116,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190306223523');
 INSERT INTO schema_migrations (version) VALUES ('20190307232718');
 
 INSERT INTO schema_migrations (version) VALUES ('20190308235449');
+
+INSERT INTO schema_migrations (version) VALUES ('20190309021455');
 

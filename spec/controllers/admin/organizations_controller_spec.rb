@@ -30,7 +30,6 @@ describe Admin::OrganizationsController, type: :controller do
         name: 'new name thing stuff',
         show_on_map: true,
         kind: 'shop',
-        is_paid: 'true',
         parent_organization_id: parent_organization.id,
         ascend_name: "party on",
         locations_attributes: {
@@ -76,7 +75,6 @@ describe Admin::OrganizationsController, type: :controller do
       organization.reload
       expect(organization.parent_organization).to eq parent_organization
       expect(organization.name).to eq update_attributes[:name]
-      expect(organization.is_paid).to be_truthy
       expect(organization.ascend_name).to eq "party on"
       # Existing location is updated
       location_1.reload

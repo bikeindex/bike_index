@@ -1,7 +1,6 @@
 class OrganizationExportWorker
   include Sidekiq::Worker
-  sidekiq_options queue: "afterwards" # Because it's low priority!
-  sidekiq_options backtrace: true
+  sidekiq_options queue: "low_priority", backtrace: true
   LINK_BASE = "#{ENV['BASE_URL']}/bikes/".freeze
 
   attr_accessor :export # Only necessary for testing

@@ -1,7 +1,11 @@
 require 'spec_helper'
 
 describe MergeAdditionalEmailWorker do
-  it { is_expected.to be_processed_in :updates }
+  let(:subject) { MergeAdditionalEmailWorker }
+
+  it "is the correct queue" do
+    expect(subject.sidekiq_options["queue"]).to eq "high_priority"
+  end
 
   context 'confirmed' do
     let(:email) { 'FOO@barexample.com' }
