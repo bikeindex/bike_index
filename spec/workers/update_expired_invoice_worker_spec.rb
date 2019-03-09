@@ -25,7 +25,7 @@ describe UpdateExpiredInvoiceWorker, type: :lib do
       invoice_active.reload
       expect(invoice_active.updated_at).to be_within(1.second).of invoice_active_updated_at
       expect(organization1.is_paid).to be_truthy
-      expect(organization1.current_invoice.paid_in_full?).to be_truthy
+      expect(organization1.current_invoices.first.paid_in_full?).to be_truthy
       # Manually make invoice expired
       invoice_expired.update_column :subscription_end_at, Time.now - 1.day
       invoice_expired.reload
@@ -34,8 +34,8 @@ describe UpdateExpiredInvoiceWorker, type: :lib do
       expect(invoice_expired.expired?).to be_truthy
       # expired invoice is still active for the organization
       expect(organization2.is_paid).to be_truthy
-      expect(organization2.current_invoice.paid_in_full?).to be_truthy
-      expect(organization2.current_invoice.active?).to be_truthy
+      expect(organization2.current_invoices.first.paid_in_full?).to be_truthy
+      expect(organization2.current_invoices.first.active?).to be_truthy
       instance.perform
       # TODO: Rails 5 update - after commit.
       organization1.reload
@@ -45,14 +45,14 @@ describe UpdateExpiredInvoiceWorker, type: :lib do
       invoice_active.reload
       invoice_expired.reload
       expect(organization1.is_paid).to be_truthy
-      expect(organization1.current_invoice.paid_in_full?).to be_truthy
+      expect(organization1.current_invoices.first.paid_in_full?).to be_truthy
       # the active invoice updated_at hasn't been bumped
       expect(invoice_active.updated_at).to be_within(1.second).of invoice_active_updated_at
       # And expired invoice has been updated
       expect(invoice_expired.active?).to be_falsey
       expect(invoice_expired.expired?).to be_truthy
       expect(organization2.is_paid).to be_falsey
-      expect(organization2.current_invoice).to_not be_present
+      expect(organization2.current_invoices.first).to_not be_present
     end
   end
 end

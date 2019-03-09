@@ -135,10 +135,10 @@ class Organization < ActiveRecord::Base
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = (short_name || name).truncate(30)
-    self.is_paid = current_invoice.present?
+    self.is_paid = current_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
-    self.paid_feature_slugs = current_invoice&.feature_slugs || []
+    self.paid_feature_slugs = current_invoices.map(&:feature_slugs).flatten
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
@@ -162,7 +162,7 @@ class Organization < ActiveRecord::Base
     save
   end
 
-  def current_invoice; invoices.active.last || parent_organization&.current_invoice end # Parent invoice serves as invoice
+  def current_invoices; invoices.active || parent_organization&.current_invoices end # Parent invoice serves as invoice
   def child_ids; child_organizations.pluck(:id) end
 
   def incomplete_b_params
