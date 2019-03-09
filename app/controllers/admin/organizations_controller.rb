@@ -74,7 +74,7 @@ class Admin::OrganizationsController < Admin::BaseController
           .permit(:available_invitation_count, :sent_invitation_count, :name, :short_name, :slug, :website,
                   :ascend_name, :show_on_map, :is_suspended, :embedable_user_email, :auto_user_id, :lock_show_on_map,
                   :api_access_approved, :access_token, :new_bike_notification, :avatar, :avatar_cache,
-                  :parent_organization_id, :lightspeed_cloud_api_key, :approved, :is_paid, :show_bulk_import,
+                  :parent_organization_id, :lightspeed_cloud_api_key, :approved,
                   [locations_attributes: permitted_locations_params])
           .merge(kind: approved_kind)
   end
