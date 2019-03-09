@@ -117,6 +117,25 @@ describe Organization do
     end
   end
 
+  describe "show_bulk_import?" do
+    let(:organization) { Organization.new }
+    it "is falsey" do
+      expect(organization.show_bulk_import?).to be_falsey
+    end
+    context "paid_for" do
+      let(:organization) { Organization.new(paid_feature_slugs: ["show_bulk_import"]) }
+      it "is truthy" do
+        expect(organization.show_bulk_import?).to be_truthy
+      end
+    end
+    context "with ascend name" do
+      let(:organization) { Organization.new(ascend_name: "xxxzzaz") }
+      it "is truthy" do
+        expect(organization.show_bulk_import?).to be_truthy
+      end
+    end
+  end
+
   describe 'organization recoveries' do
     let(:organization) { FactoryBot.create(:organization) }
     let(:bike) { FactoryBot.create(:stolen_bike, creation_organization_id: organization.id) }
