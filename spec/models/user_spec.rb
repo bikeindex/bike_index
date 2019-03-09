@@ -384,6 +384,32 @@ describe User do
     end
   end
 
+  describe "send_unstolen_notifications?" do
+    let(:user) { User.new }
+    it "is falsey, truthy for superuser" do
+      expect(user.send_unstolen_notifications?).to be_falsey
+      user.superuser = true
+      expect(user.send_unstolen_notifications?).to be_truthy
+    end
+    context "organization" do
+      let(:user) { FactoryBot.create(:organization_member) }
+      let(:organization) { user.organizations.first }
+      let(:paid_feature) { FactoryBot.build(:paid_feature, name: "unstolen notifications", feature_slugs: ["unstolen_notifications"], organization: organization) }
+      it "is true if the organization has that paid feature" do
+        user.reload
+        expect(user.bike_actions_organization_id).to be_blank
+        expect(user.send_unstolen_notifications?).to be_falsey
+        paid_feature.save
+        expect(Organization.with_bike_actions.pluck(:id)).to eq organization.id
+        # Also, it bubbles up. BUT TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
+        user.update_attributes(updated_at: Time.now)
+        user.reload
+        expect(user.bike_actions_organization_id).to eq organization
+        expect(user.send_unstolen_notifications?).to be_truthy
+      end
+    end
+  end
+
   describe 'normalize_attributes' do
     it "doesn't let you overwrite usernames" do
       target = 'coolname'
