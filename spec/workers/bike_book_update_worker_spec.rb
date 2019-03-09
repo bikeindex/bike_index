@@ -1,7 +1,11 @@
 require 'spec_helper'
 
 describe BikeBookUpdateWorker do
-  it { is_expected.to be_processed_in :updates }
+  let(:subject) { BikeBookUpdateWorker }
+
+  it "is the correct queue" do
+    expect(subject.sidekiq_options["queue"]).to eq "high_priority"
+  end
 
   it 'enqueues listing ordering job' do
     BikeBookUpdateWorker.perform_async

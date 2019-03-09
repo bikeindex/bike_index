@@ -1,7 +1,7 @@
 # TODO: eventually this should merge with after_user_change_worker.rb, or something
 class AfterUserCreateWorker
   include Sidekiq::Worker
-  sidekiq_options queue: :updates, backtrace: true
+  sidekiq_options queue: "high_priority", backtrace: true
 
   # Generally, this is called inline - so it makes sense to pass in the user rather than just the user_id
   def perform(user_id, user_state, user: nil, email: nil)

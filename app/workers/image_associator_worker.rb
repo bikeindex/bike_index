@@ -1,7 +1,6 @@
 class ImageAssociatorWorker
   include Sidekiq::Worker
-  sidekiq_options queue: 'updates'
-  sidekiq_options backtrace: true
+  sidekiq_options queue: "high_priority", backtrace: true
     
   def perform
     BParam.where(image_processed: false).where('image IS NOT NULL').each do |b_param|

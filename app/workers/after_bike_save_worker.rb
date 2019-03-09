@@ -3,7 +3,7 @@
 
 class AfterBikeSaveWorker
   include Sidekiq::Worker
-  sidekiq_options queue: "afterwards", backtrace: true, retry: false
+  sidekiq_options queue: "low_priority", backtrace: true, retry: false
   POST_URL = ENV["BIKE_WEBHOOK_URL"]
   AUTH_TOKEN = ENV["BIKE_WEBHOOK_AUTH_TOKEN"]
 

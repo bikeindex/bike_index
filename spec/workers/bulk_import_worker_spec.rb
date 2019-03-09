@@ -3,7 +3,6 @@ require "spec_helper"
 describe BulkImportWorker do
   let(:subject) { BulkImportWorker }
   let(:instance) { subject.new }
-  it { is_expected.to be_processed_in :afterwards }
   let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending") }
   let!(:black) { FactoryBot.create(:color, name: "Black") } # Because we use it as a default color
 

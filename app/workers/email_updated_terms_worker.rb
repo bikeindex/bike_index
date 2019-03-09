@@ -1,6 +1,6 @@
 class EmailUpdatedTermsWorker
   include Sidekiq::Worker
-  sidekiq_options queue: 'afterwards'
+  sidekiq_options queue: "low_priority"
   sidekiq_options backtrace: true
   sidekiq_options retry: false
 
