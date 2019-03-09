@@ -3,7 +3,7 @@ module Organized
     def index
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      if current_organization.bike_search?
+      if current_organization.paid_for?("bike_search")
         search_organization_bikes
       else
         @bikes = organization_bikes.order("bikes.created_at desc").page(@page).per(@per_page)

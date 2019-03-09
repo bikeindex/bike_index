@@ -13,7 +13,7 @@
           Bikes
         %ul.organized-submenu
           %li
-            = active_link (current_organization.bike_search? ? "Search" : "List"), organization_bikes_path(organization_id: current_organization.to_param), class_name: "nav-link"
+            = active_link (current_organization.paid_for?("bike_search") ? "Search" : "List"), organization_bikes_path(organization_id: current_organization.to_param), class_name: "nav-link"
           - if current_organization.show_recoveries?
             %li
               = active_link "Recoveries", recoveries_organization_bikes_path(current_organization), class_name: "nav-link"
