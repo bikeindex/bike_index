@@ -37,7 +37,6 @@ class ScheduledWorker
   end
 
   def self.should_enqueue?
-    pp enqueued?, last_started.blank?
     return false if enqueued?
     last_started.blank? || Time.parse(last_started) + frequency < Time.now
   end

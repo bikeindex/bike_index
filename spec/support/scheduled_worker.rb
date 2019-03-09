@@ -11,7 +11,6 @@ shared_context :scheduled_worker do
     describe "scheduling" do
       it 'does not need to run immediately after running' do
         clear_scheduled_history
-        pp subject.last_finished
         expect(subject.should_enqueue?).to be_truthy
         instance.perform
         expect(subject.should_enqueue?).to be_falsey
