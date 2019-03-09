@@ -32,7 +32,7 @@ describe Organized::BikesController, type: :controller do
   context 'logged_in_as_organization_member' do
     include_context :logged_in_as_organization_member
     context "paid organization" do
-      before { organization.update_columns(is_paid: true, show_partial_registrations: true, paid_feature_slugs: ["bike_search"]) } # Stub organization having paid feature
+      before { organization.update_columns(is_paid: true, paid_feature_slugs: %w[bike_search show_recoveries show_partial_registrations]) } # Stub organization having paid feature
       describe 'index' do
         context 'with params' do
           let(:query_params) do
@@ -90,8 +90,8 @@ describe Organized::BikesController, type: :controller do
         it 'renders, assigns search_query_present and stolenness all' do
           expect(recovered_record2.date_recovered.to_date).to eq Date.parse("2016-01-10")
           get :recoveries, organization_id: organization.to_param
-          expect(assigns(:recoveries).pluck(:id)).to eq([recovered_record.id, recovered_record2.id])
           expect(response.status).to eq(200)
+          expect(assigns(:recoveries).pluck(:id)).to eq([recovered_record.id, recovered_record2.id])
           expect(response).to render_template :recoveries
         end
       end
