@@ -19,8 +19,6 @@ describe User do
     it { is_expected.to have_many :oauth_applications }
     it { is_expected.to have_many :sent_stolen_notifications }
     it { is_expected.to have_many :received_stolen_notifications }
-    it { is_expected.to serialize :paid_membership_info }
-    it { is_expected.to serialize :my_bikes_hash }
     it { is_expected.to validate_presence_of :email }
     # it { is_expected.to validate_uniqueness_of :email }
   end
@@ -394,17 +392,20 @@ describe User do
     context "organization" do
       let(:user) { FactoryBot.create(:organization_member) }
       let(:organization) { user.organizations.first }
-      let(:paid_feature) { FactoryBot.build(:paid_feature, name: "unstolen notifications", feature_slugs: ["unstolen_notifications"], organization: organization) }
+      let!(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization) }
+      let!(:paid_feature) { FactoryBot.create(:paid_feature, name: "unstolen notifications", feature_slugs: ["unstolen_notifications"]) }
       it "is true if the organization has that paid feature" do
         user.reload
         expect(user.bike_actions_organization_id).to be_blank
         expect(user.send_unstolen_notifications?).to be_falsey
-        paid_feature.save
-        expect(Organization.with_bike_actions.pluck(:id)).to eq organization.id
+        invoice.update_attributes(paid_feature_ids: [paid_feature.id])
+        organization.update_attributes(updated_at: Time.now) # TODO: Rails 5 update, after_commit
+        expect(organization.bike_actions?).to be_truthy
+        expect(Organization.with_bike_actions.pluck(:id)).to eq([organization.id])
         # Also, it bubbles up. BUT TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
         user.update_attributes(updated_at: Time.now)
         user.reload
-        expect(user.bike_actions_organization_id).to eq organization
+        expect(user.bike_actions_organization_id).to eq organization.id
         expect(user.send_unstolen_notifications?).to be_truthy
       end
     end

@@ -57,9 +57,6 @@ class User < ActiveRecord::Base
   validates_presence_of :email
   validates_uniqueness_of :email, case_sensitive: false
 
-  serialize :paid_membership_info
-  serialize :my_bikes_hash
-
   before_validation :normalize_attributes
   before_create :generate_username_confirmation_and_auth
   after_create :perform_create_jobs
@@ -136,7 +133,7 @@ class User < ActiveRecord::Base
 
   def paid_org?; organizations.paid.any? end
 
-  def send_unstolen_notifications?; superuser end
+  def send_unstolen_notifications?; superuser || bike_actions_organization&.paid_for?("unstolen_notifications") end
 
   def admin_authorized(type)
     return true if superuser
@@ -255,13 +252,13 @@ class User < ActiveRecord::Base
 
   def set_calculated_attributes
     self.title = strip_tags(title) if title.present?
-    if website
-      self.website = Urlifyer.urlify(website)
+    self.website = Urlifyer.urlify(website) if website.present?
+    if my_bikes_link_target.present? || my_bikes_link_title.present?
+      mbh = my_bikes_hash || {}
+      mbh[:link_target] = Urlifyer.urlify(my_bikes_link_target) if my_bikes_link_target.present?
+      mbh[:link_title] = my_bikes_link_title if my_bikes_link_title.present?
+      self.my_bikes_hash = mbh
     end
-    mbh = my_bikes_hash || {}
-    mbh[:link_target] = Urlifyer.urlify(my_bikes_link_target) if my_bikes_link_target.present?
-    mbh[:link_title] = my_bikes_link_title if my_bikes_link_title.present?
-    self.my_bikes_hash = mbh
     self.bike_actions_organization_id = organizations.with_bike_actions.reorder(:created_at).pluck(:id).first
     true
   end

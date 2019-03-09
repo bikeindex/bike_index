@@ -2121,7 +2121,6 @@ CREATE TABLE public.users (
     auth_token character varying(255),
     stripe_id character varying(255),
     is_content_admin boolean DEFAULT false NOT NULL,
-    my_bikes_hash text,
     notification_newsletters boolean DEFAULT false NOT NULL,
     developer boolean DEFAULT false NOT NULL,
     bike_actions_organization_id integer,
@@ -2132,7 +2131,8 @@ CREATE TABLE public.users (
     city character varying,
     country_id integer,
     state_id integer,
-    notification_unstolen boolean DEFAULT true
+    notification_unstolen boolean DEFAULT true,
+    my_bikes_hash json
 );
 
 

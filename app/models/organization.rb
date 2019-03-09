@@ -48,7 +48,7 @@ class Organization < ActiveRecord::Base
   scope :paid, -> { where(is_paid: true) }
   scope :valid, -> { where(is_suspended: false) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
-  scope :with_bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: ["messages"]) }
+  scope :with_bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications]) }
 
   before_validation :set_calculated_attributes
   after_commit :update_user_bike_actions_organizations
@@ -116,7 +116,7 @@ class Organization < ActiveRecord::Base
   end
 
   def bike_actions? # Eventually there will be other actions beside organization_messages, so use this as general reference
-    message_kinds.any?
+    message_kinds.any? || paid_for?("unstolen_notifications")
   end
 
   def paid_for?(feature_name)
