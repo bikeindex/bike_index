@@ -12,14 +12,14 @@
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   - body_class = "news-page" if controller_name == "news"
   %body{ id: page_id, class:  body_class }
-    %nav.navbar.navbar-expand-md.navbar-light.bg-light.sticky-top
-      %span.navbar-brand.admin-nav-logo
+    %nav.navbar.navbar-expand-md.navbar-light.bg-light.sticky-top.admin-navbar
+      %span.navbar-brand
         = link_to (image_tag("logo.svg")), admin_root_path
       - if current_user.superuser?
         %button.navbar-toggler{"aria-controls" => "navbarSupportedContent", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-target" => "#collapsible-admin-nav", "data-toggle" => "collapse", :type => "button"}
           %span.navbar-toggler-icon
         .collapse.navbar-collapse#collapsible-admin-nav
-          %ul.navbar-nav.admin-nav
+          %ul.navbar-nav
             %li.nav-item
               = revised_active_link "Users", admin_users_path, :role => "button", :class => "btn btn-light li nav-item px-3"
             %li.nav-item
@@ -67,7 +67,7 @@
                   = link_to "Organized", '/rails/mailers/organized_mailer' , :role => "button", :class => "btn btn-light dropdown-item"
                   = link_to "Admin", '/rails/mailers/admin_mailer' , :role => "button", :class => "btn btn-light dropdown-item"
                   = link_to "Customer", '/rails/mailers/customer_mailer' , :role => "button", :class => "btn btn-light dropdown-item"
-          %ul.navbar-nav.ml-auto.admin-nav
+          %ul.navbar-nav.ml-auto
             %li.nav-item
               = link_to "Exit Admin", root_path, :role => "button", :class => "btn btn-light li nav-item"
 
