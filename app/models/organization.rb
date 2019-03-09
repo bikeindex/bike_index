@@ -162,8 +162,9 @@ class Organization < ActiveRecord::Base
     save
   end
 
-  def current_invoices; invoices.active || parent_organization&.current_invoices end # Parent invoice serves as invoice
   def child_ids; child_organizations.pluck(:id) end
+  # Parent invoice serves as invoice
+  def current_invoices; parent_organization.present? ? parent_organization.current_invoices : invoices.active end
 
   def incomplete_b_params
     BParam.where(organization_id: child_ids + [id]).partial_registrations.without_bike

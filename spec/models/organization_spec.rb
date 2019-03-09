@@ -86,6 +86,7 @@ describe Organization do
       organization_child.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - after_commit
       expect(organization_child.is_paid).to be_falsey
       organization_child.update_attributes(parent_organization: organization)
+      organization_child.reload
       expect(organization_child.is_paid).to be_truthy
       expect(organization_child.current_invoices.first).to eq invoice
       expect(organization_child.paid_feature_slugs).to eq(["csv_exports"])
