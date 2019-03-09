@@ -21,30 +21,30 @@
         .collapse.navbar-collapse#collapsible-admin-nav
           %ul.navbar-nav
             %li.nav-item
-              = revised_active_link "Users", admin_users_path, :role => "button", :class => "btn btn-light li nav-item px-3"
+              = revised_active_link "Users", admin_users_path, :role => "button", :class => "nav-link nav-item px-2"
             %li.nav-item
-              = revised_active_link "Bikes", admin_bikes_path, :role => "button", :class => "btn btn-light li nav-item px-3"
+              = revised_active_link "Bikes", admin_bikes_path, :role => "button", :class => "nav-link nav-item px-2"
             %li.nav-item
-              = revised_active_link "Organizations", admin_organizations_path, :role => "button", :class => "btn btn-light li nav-item px-3"
+              = revised_active_link "Organizations", admin_organizations_path, :role => "button", :class => "nav-link nav-item px-2"
             %li.nav-item
-              = revised_active_link "News", admin_news_index_path, :role => "button", :class => "btn btn-light li nav-item px-3"
-            .dropdown
-              %button.btn.btn-light.dropdown-toggle.nav-dropdown{"type" => "button", "data-toggle" => "dropdown"}
+              = revised_active_link "News", admin_news_index_path, :role => "button", :class => "nav-link nav-item px-2"
+            %li.dropdown.nav-item
+              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown"}
                 Stolen
               .dropdown-menu.admin-nav-dropdown
                 = revised_active_link "Stolen", admin_stolen_bikes_path, :role => "button", :class => "btn btn-light dropdown-item"
                 = revised_active_link "Recoveries", admin_recoveries_path, :role => "button", :class => "btn btn-light dropdown-item"
                 = revised_active_link "Recovery Displays", admin_recovery_displays_path, :role => "button", :class => "btn btn-light dropdown-item"
                 = revised_active_link "Stolen Twitterbot URL", ENV['STOLEN_TWITTERBOT_URL'].gsub(/bikes\z/, ''), :role => "button", :class => "btn btn-light dropdown-item"
-            .dropdown
-              %button.btn.btn-light.dropdown-toggle.nav-dropdown{"type" => "button", "data-toggle" => "dropdown"}
+            %li.dropdown
+              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown", "aria-labelledby" => "dropdownMenu2"}
                 Paid
               .dropdown-menu.admin-nav-dropdown
                 = revised_active_link "Payments", admin_payments_path, :role => "button", :class => "btn btn-light dropdown-item"
                 = revised_active_link "Paid Features", admin_paid_features_path, :role => "button", :class => "btn btn-light dropdown-item"
                 = revised_active_link "Invoices", admin_invoices_path, :role => "button", :class => "btn btn-light dropdown-item"
-            .dropdown
-              %button.btn.btn-light.dropdown-toggle.nav-dropdown{"type" => "button", "data-toggle" => "dropdown"}
+            %li.dropdown
+              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown"}
                 Other
               .dropdown-menu.admin-nav-dropdown
                 = revised_active_link "Memberships", admin_memberships_path, :role => "button", :class => "btn btn-light dropdown-item"
@@ -61,7 +61,7 @@
                 = revised_active_link "Bulk Imports", admin_bulk_imports_url, :role => "button", :class => "btn btn-light dropdown-item"
             - if Rails.env.development?
               .dropdown
-                %button.btn.btn-light.dropdown-toggle.nav-dropdown{"type" => "button", "data-toggle" => "dropdown"}
+                %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown"}
                   Mailers
                 .dropdown-menu.admin-nav-dropdown
                   = link_to "Organized", '/rails/mailers/organized_mailer' , :role => "button", :class => "btn btn-light dropdown-item"
@@ -69,7 +69,7 @@
                   = link_to "Customer", '/rails/mailers/customer_mailer' , :role => "button", :class => "btn btn-light dropdown-item"
           %ul.navbar-nav.ml-auto
             %li.nav-item
-              = link_to "Exit Admin", root_path, :role => "button", :class => "btn btn-light li nav-item"
+              = link_to "Exit Admin", root_path, :role => "button", :class => "nav-link nav-item px-2"
 
       - elsif current_user.is_content_admin?
         %span.font-weight-bold
