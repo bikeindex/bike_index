@@ -52,6 +52,23 @@ describe Organization do
         end
       end
     end
+    describe "with_paid_feature_slugs" do
+      let(:organization1) { FactoryBot.create(:organization) }
+      let(:organization2) { FactoryBot.create(:organization) }
+      before do
+        organization1.update_column :paid_feature_slugs, %w[show_bulk_import reg_phone]
+        organization2.update_column :paid_feature_slugs, %w[show_bulk_import show_recoveries]
+      end
+      it "finds the organizations" do
+        organization1.reload
+        organization2.reload
+        expect(Organization.with_paid_feature_slugs("show_bulk_import").pluck(:id)).to match_array([organization1.id, organization2.id])
+        expect(Organization.with_paid_feature_slugs(%w[show_bulk_import show_recoveries]).pluck(:id)).to eq([organization2.id])
+        expect(Organization.with_paid_feature_slugs("show_bulk_import reg_phone").pluck(:id)).to eq([organization1.id])
+        expect(Organization.admin_text_search(" show_bulk_import").pluck(:id)).to match_array([organization1.id, organization2.id])
+        expect(Organization.admin_text_search(" show_bulk_import show_recoveries").pluck(:id)).to eq([organization2.id])
+      end
+    end
   end
 
   describe "map_coordinates" do
