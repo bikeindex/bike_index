@@ -116,9 +116,26 @@ describe Organized::ExportsController, type: :controller do
         expect(flash[:success]).to be_present
       end
       context "with assigned bike codes" do
-        # it "removes the stickers before destroying" do
-        #   fail
-        # end
+        let(:bike) { FactoryBot.create(:bike) }
+        let!(:bike_code) { FactoryBot.create(:bike_code_claimed, organization: organization, code: "a1111") }
+        let(:export) { FactoryBot.create(:export_avery, organization: organization, bike_code_start: "a1111") }
+        it "removes the stickers before destroying" do
+          export.update_attributes(options: export.options.merge(bike_codes_assigned: ["a1111"]))
+          bike_code.reload
+          export.reload
+          expect(bike_code.claimed?).to be_truthy
+          expect([bike_code.user_id, bike_code.claimed_at, bike_code.bike_id].reject(&:blank?).count).to eq 3
+          expect(export.avery_export?).to be_truthy
+          expect(export.assign_bike_codes?).to be_truthy
+          expect(export.bike_codes).to eq(["a1111"])
+          expect do
+            delete :destroy, id: export.id, organization_id: organization.to_param
+          end.to change(Export, :count).by(-1)
+          expect(response).to redirect_to exports_root_path
+          expect(flash[:success]).to be_present
+          bike_code.reload
+          expect([bike_code.user_id, bike_code.claimed_at, bike_code.bike_id].reject(&:blank?).count).to eq 0
+        end
       end
     end
 
@@ -222,16 +239,16 @@ describe Organized::ExportsController, type: :controller do
             expect(export.bike_code_start).to eq "A221C"
             expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
           end
-          # context "avery export with already assigned bike_code" do
-          #   let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "a221C", bike_id: 111) }
-          #   it "makes the avery export" do
-          #     expect(bike_code.claimed?).to be_truthy
-          #     expect do
-          #       post :create, export: avery_params, organization_id: organization.to_param
-          #     end.to_not change(Export, :count)
-          #     expect(flash[:error]).to match(/sticker/)
-          #   end
-          # end
+          context "avery export with already assigned bike_code" do
+            let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "a221C", bike_id: 111) }
+            it "makes the avery export" do
+              expect(bike_code.claimed?).to be_truthy
+              expect do
+                post :create, export: avery_params, organization_id: organization.to_param
+              end.to_not change(Export, :count)
+              expect(flash[:error]).to match(/sticker/)
+            end
+          end
         end        
       end
     end

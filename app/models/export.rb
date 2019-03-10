@@ -16,6 +16,7 @@ class Export < ActiveRecord::Base
   enum file_format: VALID_FILE_FORMATS
 
   before_validation :set_calculated_attributes
+  before_destroy :remove_bike_codes!
 
   attr_accessor :timezone, :avery_export # permit assignment
 
@@ -51,6 +52,8 @@ class Export < ActiveRecord::Base
     additional_headers = organization == "include_paid" ? additional_registration_fields.keys : organization.additional_registration_fields
     PERMITTED_HEADERS + additional_headers.map { |f| additional_registration_fields[f.to_sym] }
   end
+
+  def finished_processing?; %w[finished errored].include?(progress) end
 
   def headers; options["headers"] end
 
@@ -164,7 +167,7 @@ class Export < ActiveRecord::Base
   # Generally, use calculated_progress rather than progress directly for display
   def calculated_progress
     return progress unless pending? || ongoing?
-    (created_at || Time.now) < Time.now - 6.minutes ? "errored" : progress
+    (created_at || Time.now) < Time.now - 10.minutes ? "errored" : progress
   end
 
   def validated_options(opts)

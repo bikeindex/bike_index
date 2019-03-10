@@ -7,7 +7,7 @@ class OrganizationExportWorker
 
   def perform(export_id)
     @export = Export.find(export_id)
-    return true if @export.finished?
+    return true if @export.finished_processing?
     @export.update_attribute :progress, "ongoing"
     write_spreadsheet(@export.file_format, @export.tmp_file)
     @export.file = @export.tmp_file
@@ -34,13 +34,14 @@ class OrganizationExportWorker
     axlsx_package = Axlsx::Package.new
     axlsx_package.workbook.add_worksheet(name: "Basic Worksheet") do |sheet|
       sheet.add_row(export_headers)
-      rows = 0
+      row_index = 0
       @export.bikes_scoped.find_each(batch_size: 100) do |bike|
+        check_export_ebrake(row_index) # Run first thing in case it's already broken
         next unless export_bike?(bike)
-        rows += 1
+        row_index += 1
         sheet.add_row(bike_to_row(bike))
       end
-      @export.rows = rows
+      @export.row_index = row_index
     end
     file.write(axlsx_package.to_stream.read)
     @export.tmp_file.close
@@ -50,8 +51,11 @@ class OrganizationExportWorker
   def write_csv(file)
     require "csv"
     file.write(comma_wrapped_string(export_headers))
+    row_index = 0
     @export.bikes_scoped.find_each(batch_size: 100) do |bike|
+      check_export_ebrake(row_index) # Run first thing in case it's already broken
       next unless export_bike?(bike)
+      row_index += 1
       file.write(comma_wrapped_string(bike_to_row(bike)))
     end
     true
@@ -67,7 +71,7 @@ class OrganizationExportWorker
   # Currently avery_exports are the only ones that need to do this
   def export_bike?(bike)
     @avery_export ||= @export.avery_export?
-    return true unless @avery_export
+    return true unless @avery_export || @export_ebraked
     # Avery export includes owner_name_or_email - but actually requires user_name - TODO: make it just user_name & update avery to accept user_name
     bike.registration_address.present? && bike.user_name.present?
   end
@@ -114,6 +118,17 @@ class OrganizationExportWorker
     when "zipcode" then bike.registration_address["zipcode"]
     when "sticker" then assign_bike_code_and_increment(bike)
     end
+  end
+
+  def check_export_ebrake(row)
+    # only check this every so often, so we can halt processing via an external trip switch
+    return true unless (row % 50).zero?
+    reloaded_export = Export.where(id: @export.id).first
+    # Specifically - if this export has been deleted, errored or somehow finished, halt processing
+    return true unless reloaded_export.blank? || reloaded_export.finished_processing?
+    @export_ebraked = true
+    # And because this might have processed some additional bike_codes, after the export was deleted, remove them all
+    @export.remove_bike_codes!
   end
 
   def assign_bike_code_and_increment(bike)
