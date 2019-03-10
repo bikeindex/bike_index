@@ -141,7 +141,9 @@ class OrganizationExportWorker
     # Specifically - if this export has been deleted, errored or somehow finished, halt processing
     return true unless reloaded_export.blank? || reloaded_export.finished_processing?
     @export_ebraked = true
-    # And because this might have processed some additional bike_codes, after the export was deleted, remove them all
+    # And because this might have processed some bike_codes after the export was deleted, remove them here
+    return true unless @export.assign_bike_codes?
+    @export.options = @export.options.merge(bike_codes_assigned: @bike_codes)
     @export.remove_bike_codes
   end
 end
