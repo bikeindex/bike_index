@@ -101,7 +101,7 @@
   .input-group
     %h3
       Optional additions
-    - if @organization.paid_for?("has_bike_codes")
+    - if @organization.paid_for?("bike_codes")
       .control-group.special-select-single
       = f.label :bike_code, "Sticker id", class: "control-label"
       .controls
