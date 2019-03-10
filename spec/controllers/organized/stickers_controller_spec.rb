@@ -39,7 +39,7 @@ describe Organized::StickersController, type: :controller do
     end
   end
 
-  context "organization with has_bike_codes" do
+  context "organization with bike_codes" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:user) { FactoryBot.create(:organization_member, organization: organization) }
     before { organization.update_column :paid_feature_slugs, ["bike_codes"] }

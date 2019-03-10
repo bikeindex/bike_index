@@ -25,7 +25,7 @@
               = active_link "Exports", organization_exports_path(organization_id: current_organization.to_param), class_name: "nav-link", match_controller: true
           %li
             = active_link "Add a bike", new_organization_bike_path(current_organization), class_name: "nav-link"
-      - if current_organization.paid_for?("has_bike_codes")
+      - if current_organization.paid_for?("bike_codes")
         %li
           %span.menu-item.top-level{ class: ("active" if controller_name == "stickers") }
             Stickers

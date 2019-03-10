@@ -7,7 +7,7 @@ describe Organized::ExportsController, type: :controller do
 
   before { set_current_user(user) if user.present? }
 
-  context "organization without has_bike_codes" do
+  context "organization without bike_codes" do
     let(:organization) { FactoryBot.create(:organization) }
     context "logged in as organization admin" do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
@@ -177,7 +177,7 @@ describe Organized::ExportsController, type: :controller do
           expect(export.avery_export?).to be_falsey
         end
         context "with IE 11 datetime params" do
-          let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "01") }
+          let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "a221C") }
           let(:crushed_datetime_attrs) do
             {
               start_at: "08/25/2018",
@@ -222,7 +222,17 @@ describe Organized::ExportsController, type: :controller do
             expect(export.bike_code_start).to eq "A221C"
             expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
           end
-        end
+          # context "avery export with already assigned bike_code" do
+          #   let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "a221C", bike_id: 111) }
+          #   it "makes the avery export" do
+          #     expect(bike_code.claimed?).to be_truthy
+          #     expect do
+          #       post :create, export: avery_params, organization_id: organization.to_param
+          #     end.to_not change(Export, :count)
+          #     expect(flash[:error]).to match(/sticker/)
+          #   end
+          # end
+        end        
       end
     end
 
