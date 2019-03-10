@@ -25,7 +25,7 @@ class Admin::PaidFeaturesController < Admin::BaseController
   end
 
   def create
-    @paid_feature = PaidFeature.new(permitted_parameters)
+    @paid_feature = PaidFeature.new(permitted_update_parameters)
     if @paid_feature.save
       flash[:success] = "Feature created"
       redirect_to admin_paid_features_path
@@ -42,6 +42,7 @@ class Admin::PaidFeaturesController < Admin::BaseController
   end
 
   def permitted_update_parameters
+    permitted_parameters = params.require(:paid_feature).permit(:amount, :description, :details_link, :kind, :name)
     if current_user.developer?
       permitted_parameters.merge(params.require(:paid_feature).permit(:feature_slugs_string))
     elsif @paid_feature&.id&.present? && @paid_feature.locked?
@@ -50,10 +51,6 @@ class Admin::PaidFeaturesController < Admin::BaseController
     else
       permitted_parameters
     end
-  end
-
-  def permitted_parameters
-    params.require(:paid_feature).permit(:amount, :description, :details_link, :kind, :name)
   end
 
   def find_paid_feature

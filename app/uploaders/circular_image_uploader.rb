@@ -28,7 +28,7 @@ class CircularImageUploader < CarrierWave::Uploader::Base
   end
 
   def cache_dir
-    Rails.root.join("tmp", "uploads", "cache")
+    Rails.root.join("tmp", "cache")
   end
   
   def base_store_dir

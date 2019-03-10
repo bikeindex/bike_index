@@ -20,11 +20,7 @@ module Organized
 
     def create
       if ActiveRecord::Type::Boolean.new.type_cast_from_database(params.dig(:export, :avery_export))
-        if current_organization.paid_for?("avery_export")
-          @export = Export.new(avery_export_parameters)
-        else
-          flash[:error] = "You don't have permission to make that sort of export! Please contact support@bikeindex.org"
-        end
+        create_avery_export
       else
         @export = Export.new(permitted_parameters)
       end
@@ -45,7 +41,7 @@ module Organized
 
     def update
       if params[:remove_bike_codes] && @export.assign_bike_codes?
-        @export.remove_bike_codes!
+        @export.remove_bike_codes_and_record!
         flash[:success] = "Bike codes removed!"
       else
         flash[:error] = "Unknown update action!"
@@ -54,12 +50,25 @@ module Organized
     end
 
     def destroy
+      @export.remove_bike_codes
       @export.destroy
       flash[:success] = "export was successfully deleted!"
       redirect_to organization_exports_path(organization_id: current_organization.to_param)
     end
 
     private
+
+    def create_avery_export
+      if current_organization.paid_for?("avery_export")
+        @export = Export.new(avery_export_parameters)
+        bike_code = current_organization.bike_codes.lookup(@export.bike_code_start) if @export.bike_code_start.present?
+        if bike_code.present? && bike_code.claimed?
+          flash[:error] = "That sticker has already been assigned! Please choose a new initial Sticker"
+        end
+      else
+        flash[:error] = "You don't have permission to make that sort of export! Please contact support@bikeindex.org"
+      end
+    end
 
     def permitted_parameters
       params.require(:export).permit(:timezone, :start_at, :end_at, :file_format, headers: [])

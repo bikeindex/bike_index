@@ -1,6 +1,6 @@
 class GetManufacturerLogoWorker
   include Sidekiq::Worker
-  sidekiq_options queue: 'afterwards', backtrace: true, :retry => false
+  sidekiq_options queue: "low_priority", backtrace: true, :retry => false
     
   def perform(id)
     manufacturer = Manufacturer.find(id)

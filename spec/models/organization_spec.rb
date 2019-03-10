@@ -52,6 +52,24 @@ describe Organization do
         end
       end
     end
+    describe "with_paid_feature_slugs" do
+      let(:organization1) { FactoryBot.create(:organization) }
+      let(:organization2) { FactoryBot.create(:organization) }
+      before do
+        organization1.update_column :paid_feature_slugs, %w[show_bulk_import reg_phone]
+        organization2.update_column :paid_feature_slugs, %w[show_bulk_import show_recoveries]
+      end
+      it "finds the organizations" do
+        organization1.reload
+        organization2.reload
+        expect(Organization.with_paid_feature_slugs(" ")).to be_nil # If we don't have a matching slug, return nil - otherwise it's confusing
+        expect(Organization.with_paid_feature_slugs("show_bulk_import").pluck(:id)).to match_array([organization1.id, organization2.id])
+        expect(Organization.with_paid_feature_slugs(%w[show_bulk_import show_recoveries]).pluck(:id)).to eq([organization2.id])
+        expect(Organization.with_paid_feature_slugs("show_bulk_import reg_phone").pluck(:id)).to eq([organization1.id])
+        expect(Organization.admin_text_search(" show_bulk_import").pluck(:id)).to match_array([organization1.id, organization2.id])
+        expect(Organization.admin_text_search(" show_bulk_import show_recoveries").pluck(:id)).to eq([organization2.id])
+      end
+    end
   end
 
   describe "map_coordinates" do
@@ -86,8 +104,9 @@ describe Organization do
       organization_child.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - after_commit
       expect(organization_child.is_paid).to be_falsey
       organization_child.update_attributes(parent_organization: organization)
+      organization_child.reload
       expect(organization_child.is_paid).to be_truthy
-      expect(organization_child.current_invoice).to eq invoice
+      expect(organization_child.current_invoices.first).to eq invoice
       expect(organization_child.paid_feature_slugs).to eq(["csv_exports"])
       expect(organization_child.paid_for?("csv_exports")).to be_truthy # It also checks for the full name version
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
@@ -113,6 +132,25 @@ describe Organization do
         # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
         user.update_attributes(updated_at: Time.now)
         expect(user.bike_actions_organization_id).to eq organization.id
+      end
+    end
+  end
+
+  describe "show_bulk_import?" do
+    let(:organization) { Organization.new }
+    it "is falsey" do
+      expect(organization.show_bulk_import?).to be_falsey
+    end
+    context "paid_for" do
+      let(:organization) { Organization.new(paid_feature_slugs: ["show_bulk_import"]) }
+      it "is truthy" do
+        expect(organization.show_bulk_import?).to be_truthy
+      end
+    end
+    context "with ascend name" do
+      let(:organization) { Organization.new(ascend_name: "xxxzzaz") }
+      it "is truthy" do
+        expect(organization.show_bulk_import?).to be_truthy
       end
     end
   end
@@ -299,23 +337,26 @@ describe Organization do
       expect(organization.additional_registration_fields.include?("reg_secondary_serial")).to be_falsey
       expect(organization.additional_registration_fields.include?("reg_address")).to be_falsey
       expect(organization.additional_registration_fields.include?("reg_phone")).to be_falsey
+      expect(organization.additional_registration_fields.include?("reg_affiliation")).to be_falsey
       expect(organization.include_field_reg_phone?).to be_falsey
       expect(organization.include_field_reg_address?).to be_falsey
       expect(organization.include_field_reg_secondary_serial?).to be_falsey
+      expect(organization.include_field_reg_affiliation?).to be_falsey
     end
     context "with paid_features" do
-      let(:organization) { Organization.new(paid_feature_slugs: %w[reg_secondary_serial reg_address reg_phone]) }
+      let(:organization) { Organization.new(paid_feature_slugs: %w[reg_secondary_serial reg_address reg_phone reg_affiliation]) }
       let(:user) { User.new }
       it "is true" do
         expect(organization.additional_registration_fields.include?("reg_secondary_serial")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_address")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_phone")).to be_truthy
+        expect(organization.additional_registration_fields.include?("reg_affiliation")).to be_truthy
         expect(organization.include_field_reg_phone?).to be_truthy
         expect(organization.include_field_reg_phone?(user)).to be_truthy
         expect(organization.include_field_reg_address?).to be_truthy
         expect(organization.include_field_reg_address?(user)).to be_truthy
         expect(organization.include_field_reg_secondary_serial?).to be_truthy
-        expect(organization.include_field_reg_secondary_serial?(user)).to be_truthy
+        expect(organization.include_field_reg_affiliation?(user)).to be_truthy
       end
       context "with user with attributes" do
         let(:user) { User.new(phone: "888.888.8888") }

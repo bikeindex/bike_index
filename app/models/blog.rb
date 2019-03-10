@@ -17,12 +17,38 @@ class Blog < ActiveRecord::Base
   scope :listicle_blogs, -> { where(is_listicle: true) }
   default_scope { order("published_at desc") }
 
-  before_create :set_published_at
-  def set_published_at
-    self.published_at ||= Time.now # We need to have a published time...
+  before_save :set_calculated_attributes
+  before_create :set_title_slug
+
+  def self.slugify_title(str)
+    # Truncate, slugify, also - remove last char if a dash (slugify should take care of removing the dash now, but whatever)
+    return nil unless str.present?
+    Slugifyer.slugify(str)[0, 70].gsub(/\-$/, "")
   end
 
-  before_save :set_published_at_and_published
+  def self.integer_slug?(n)
+    n.is_a?(Integer) || n.match(/\A\d*\z/).present?
+  end
+
+  def self.friendly_find(str)
+    return nil unless str.present?
+    return find(str) if integer_slug?(str)
+    slug = slugify_title(str)
+    find_by_title_slug(slug) || find_by_old_title_slug(slug)
+  end
+
+  def to_param
+    title_slug
+  end
+
+  def set_calculated_attributes
+    self.published_at ||= Time.now # We need to have a published time...
+    set_published_at_and_published
+    update_title_save
+    create_abbreviation
+    set_index_image
+  end
+
   def set_published_at_and_published
     if self.post_date.present?
       self.published_at = TimeParser.parse(post_date, timezone)
@@ -49,7 +75,6 @@ class Blog < ActiveRecord::Base
     end
   end
 
-  before_save :update_title_save
   def update_title_save
     return true unless update_title.present?
     return true if update_title == false || update_title == '0'
@@ -57,16 +82,12 @@ class Blog < ActiveRecord::Base
     set_title_slug
   end
 
-  before_create :set_title_slug
   def set_title_slug
     # We want to only set this once, and not change it, so that links don't break
-    t_slug = truncate(Slugifyer.slugify(self.title), length: 70, omission: '')
-    # also - remove last char if a dash
-    self.title_slug = t_slug.gsub(/\-$/, '')
+    self.title_slug = self.class.slugify_title(title)
   end
 
 
-  before_save :create_abbreviation
   def create_abbreviation
     if description_abbr.present?
       self.body_abbr = description_abbr
@@ -86,7 +107,6 @@ class Blog < ActiveRecord::Base
     true
   end
 
-  before_save :set_index_image
   def set_index_image
     self.index_image_id = nil unless PublicImage.where(id: index_image_id).present?
     if index_image_id.present?
@@ -116,9 +136,4 @@ class Blog < ActiveRecord::Base
     end
     true
   end
-
-  def to_param
-    title_slug
-  end
-
 end

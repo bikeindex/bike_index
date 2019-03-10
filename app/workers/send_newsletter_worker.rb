@@ -14,7 +14,7 @@ class SendNewsletterWorker
   end
 
   def enqueue_mailing(template)
-    User.confirmed.where(is_emailable: true).where.not(banned: true).pluck(:id)
+    User.confirmed.where(notification_newsletters: true).where.not(banned: true).pluck(:id)
         .each { |id| SendNewsletterWorker.perform_async(template, id) }
   end
 

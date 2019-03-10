@@ -99,4 +99,22 @@ RSpec.describe Invoice, type: :model do
       expect(organization.paid_feature_slugs).to eq([])
     end
   end
+
+  describe "two invoices" do
+    let(:paid_feature1) { FactoryBot.create(:paid_feature, feature_slugs: ["bike_search"]) }
+    let(:paid_feature2) { FactoryBot.create(:paid_feature, feature_slugs: ["reg_secondary_serial"]) }
+    let(:invoice1) { FactoryBot.create(:invoice, amount_due_cents: 0, subscription_start_at: Time.now - 1.week) }
+    let(:organization) { invoice1.organization }
+    let(:invoice2) { FactoryBot.build(:invoice, amount_due_cents: 0, subscription_start_at: Time.now - 1.day, organization: organization) }
+    it "adds the paid features" do
+      invoice1.update_attributes(paid_feature_ids: [paid_feature1.id])
+      # TODO: Rails 5 update
+      organization.update_attributes(updated_at: Time.now)
+      expect(organization.paid_feature_slugs).to eq(["bike_search"])
+      invoice2.save
+      invoice2.update_attributes(paid_feature_ids: [paid_feature2.id])
+      organization.update_attributes(updated_at: Time.now)
+      expect(organization.paid_feature_slugs).to match_array %w[bike_search reg_secondary_serial]
+    end
+  end
 end

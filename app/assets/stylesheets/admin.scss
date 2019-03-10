@@ -82,3 +82,28 @@ thead.sortable {
   line-height: 1em;
   border-radius: 0.5em;
 }
+
+// Just copied over from new styles
+.table-list {
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(222, 226, 230);
+  border-image: initial;
+  width: 100%;
+  margin-bottom: 1rem;
+  background-color: transparent;
+  border-collapse: collapse;
+  tbody tr:nth-of-type(2n + 1) {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  td {
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgb(222, 226, 230);
+    border-image: initial;
+  }
+  tr td:first-child {
+    font-size: 80%;
+    font-style: italic;
+  }
+}

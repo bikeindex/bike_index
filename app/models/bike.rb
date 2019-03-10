@@ -57,7 +57,7 @@ class Bike < ActiveRecord::Base
   validates_presence_of :primary_frame_color_id
 
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications,
-    :image, :b_param_id, :embeded, :address,
+    :image, :b_param_id, :embeded, :address, :organization_affiliation,
     :embeded_extended, :paint_name, :bike_image_cache, :send_email,
     :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
 
@@ -72,6 +72,7 @@ class Bike < ActiveRecord::Base
   }
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
+  scope :organized, -> { where.not(creation_organization_id: nil) }
   scope :with_serial, -> { where('serial_number != ?', 'absent') }
   # "Recovered" bikes are bikes that were found and are waiting to be claimed. This is confusing and should be fixed
   # so that it no longer is the same word as stolen recoveries
@@ -102,7 +103,7 @@ class Bike < ActiveRecord::Base
       (%w(cycle_type_id manufacturer_id manufacturer_other serial_number 
         serial_normalized has_no_serial made_without_serial additional_registration
         creation_organization_id manufacturer year thumb_path name stolen
-        current_stolen_record_id recovered frame_material frame_material_id frame_model number_of_seats
+        current_stolen_record_id recovered frame_material frame_model number_of_seats
         handlebar_type_id handlebar_type_other frame_size frame_size_number frame_size_unit
         rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow 
         primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
@@ -213,6 +214,24 @@ class Bike < ActiveRecord::Base
     return authorize_bike_for_user(u) unless can_be_claimed_by(u)
     current_ownership.mark_claimed
     true
+  end
+
+  def display_contact_owner?(u = nil)
+    stolen? && current_stolen_record.present? || contact_owner?(u)
+  end
+
+  def contact_owner?(u = nil)
+    return false unless u.present?
+    return true if stolen? && current_stolen_record.present?
+    u.send_unstolen_notifications? && owner&.notification_unstolen
+  end
+
+  def contact_owner_user?
+    user? || stolen?
+  end
+
+  def contact_owner_email
+    contact_owner_user? ? owner_email : creator&.email
   end
 
   def phone

@@ -31,7 +31,7 @@
                 a Bike Index
               - else
                 an
-              account? #{link_to 'log in', new_session_path(partner: sign_in_partner)}
+              account? #{link_to 'log in', new_session_path(partner: sign_in_partner, email: params[:email])}
           = form_for @user do |f|
             - if sign_in_partner
               = hidden_field_tag :partner, sign_in_partner
@@ -61,7 +61,7 @@
             - unless sign_in_partner.present?
               .checkbox
                 %label
-                  = f.check_box :is_emailable
+                  = f.check_box :notification_newsletters
                   Get Bike Index's Newsletter
 
             = f.submit t("sign_in_up.#{controller_name}_main_form_action"), class: 'btn btn-primary btn-lg'
