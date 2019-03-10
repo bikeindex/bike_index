@@ -62,6 +62,7 @@ describe Organization do
       it "finds the organizations" do
         organization1.reload
         organization2.reload
+        expect(Organization.with_paid_feature_slugs(" ")).to be_nil # If we don't have a matching slug, return nil - otherwise it's confusing
         expect(Organization.with_paid_feature_slugs("show_bulk_import").pluck(:id)).to match_array([organization1.id, organization2.id])
         expect(Organization.with_paid_feature_slugs(%w[show_bulk_import show_recoveries]).pluck(:id)).to eq([organization2.id])
         expect(Organization.with_paid_feature_slugs("show_bulk_import reg_phone").pluck(:id)).to eq([organization1.id])

@@ -9,7 +9,7 @@
     .control-group
       = f.label :serial_number, class: "control-label"
       .controls
-        = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
+        = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
       - if @organization&.include_field_reg_secondary_serial?
         = f.label :additional_registration, "Additional serial/sticker number", class: "control-label"
         .controls

@@ -79,7 +79,9 @@ class Organization < ActiveRecord::Base
   end
 
   def self.with_paid_feature_slugs(slugs)
-    where("paid_feature_slugs ?& array[:keys]", keys: PaidFeature.matching_slugs(slugs))
+    matching_slugs = PaidFeature.matching_slugs(slugs)
+    return nil unless matching_slugs.present?
+    where("paid_feature_slugs ?& array[:keys]", keys: matching_slugs)
   end
 
   def to_param

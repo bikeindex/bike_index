@@ -52,6 +52,8 @@ class Export < ActiveRecord::Base
     PERMITTED_HEADERS + additional_headers.map { |f| additional_registration_fields[f.to_sym] }
   end
 
+  def finished_processing?; %w[finished errored].include?(progress) end
+
   def headers; options["headers"] end
 
   def avery_export?; option?("avery_export") end
@@ -65,12 +67,16 @@ class Export < ActiveRecord::Base
   # 'options' is a weird place to put the assigned bike_codes - but whatever, it's there, just using it
   def bike_codes; options["bike_codes_assigned"] || [] end
 
-  def remove_bike_codes!
+  def remove_bike_codes_and_record!
     return true unless assign_bike_codes? && !bike_codes_removed?
-    bike_codes.each do |code|
+    remove_bike_codes
+    update_attribute :options, options.merge(bike_codes_removed: true)
+  end
+
+  def remove_bike_codes
+    (bike_codes || []).each do |code|
       BikeCode.lookup(code, organization_id: organization_id)&.unclaim!
     end
-    update_attribute :options, options.merge(bike_codes_removed: true)
   end
 
   def option?(str)
@@ -164,7 +170,7 @@ class Export < ActiveRecord::Base
   # Generally, use calculated_progress rather than progress directly for display
   def calculated_progress
     return progress unless pending? || ongoing?
-    (created_at || Time.now) < Time.now - 6.minutes ? "errored" : progress
+    (created_at || Time.now) < Time.now - 10.minutes ? "errored" : progress
   end
 
   def validated_options(opts)
