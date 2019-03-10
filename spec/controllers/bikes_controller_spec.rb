@@ -209,13 +209,13 @@ describe BikesController do
   describe "scanned" do
     let(:bike) { FactoryBot.create(:bike) }
     let!(:bike_code) { FactoryBot.create(:bike_code, bike: bike, code: 900) }
+    let(:organization) { FactoryBot.create(:organization) }
     context "organized no bike" do
-      let(:organization) { FactoryBot.create(:organization) }
-      let!(:bike_code2) { FactoryBot.create(:bike_code, organization: organization, code: 900) }
+      let!(:bike_code2) { FactoryBot.create(:bike_code, organization: organization, code: "0900") }
       let!(:user) { FactoryBot.create(:user_confirmed) }
       before { set_current_user(user) }
       it "renders the scanned page" do
-        get :scanned, id: "000900", organization_id: organization.to_param
+        get :scanned, id: "000#{bike_code2.code}", organization_id: organization.to_param
         expect(assigns(:bike_code)).to eq bike_code2
         expect(response).to render_template(:scanned)
         expect(response.code).to eq("200")
@@ -224,12 +224,25 @@ describe BikesController do
       context "user part of organization" do
         let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
         it "makes current_organization the organization" do
-          get :scanned, id: "000900", organization_id: organization.to_param
+          get :scanned, id: "000#{bike_code2.code}", organization_id: organization.to_param
           expect(assigns(:bike_code)).to eq bike_code2
           expect(response).to render_template(:scanned)
           expect(response.code).to eq("200")
           expect(assigns(:current_organization)).to eq organization
           expect(assigns(:show_organization_bikes)).to be_truthy
+        end
+        context "passed a different organization id" do
+          let!(:other_organization) { FactoryBot.create(:organization, short_name: "BikeIndex") }
+          it "makes current_organization the organization" do
+            expect(user.memberships&.pluck(:organization_id)).to eq([organization.id])
+            expect(bike_code2.organization).to eq organization
+            get :scanned, id: "000#{bike_code2.code}", organization_id: "BikeIndex"
+            expect(assigns(:bike_code)).to eq bike_code2
+            expect(response).to render_template(:scanned)
+            expect(response.code).to eq("200")
+            expect(assigns(:current_organization)).to eq organization
+            expect(assigns(:show_organization_bikes)).to be_truthy
+          end
         end
       end
     end

@@ -44,6 +44,23 @@ RSpec.describe BikeCode, type: :model do
     end
   end
 
+  describe "lookup_with_fallback" do
+    let(:organization1) { FactoryBot.create(:organization, short_name: "BikeIndex") }
+    let(:organization2) { FactoryBot.create(:organization) }
+    let!(:bikecode) { FactoryBot.create(:bike_code, code: "a0010", organization: organization2) }
+    let(:bikecode_duplicate) { FactoryBot.create(:bike_code, code: "a0010", organization: organization1) }
+    let!(:user) { FactoryBot.create(:organization_member, organization: organization2) }
+    it "looks up, falling back to the orgs for the user, falling back to any org" do
+      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex")).to eq bikecode
+      # It finds the bike_code that exists, even though it doesn't match the organization passed
+      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex", user: nil)).to eq bikecode
+      expect(bikecode_duplicate).to be_present
+      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex", user: nil)).to eq bikecode_duplicate
+      # It finds bike_code that matches the users organizations
+      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex", user: user)).to eq bikecode
+    end
+  end
+
   describe "duplication and integers" do
     let(:organization) { FactoryBot.create(:organization) }
     let!(:sticker) { FactoryBot.create(:bike_code, kind: "sticker", code: 12, organization_id: organization.id) }

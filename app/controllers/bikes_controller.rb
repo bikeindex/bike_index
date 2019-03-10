@@ -59,7 +59,7 @@ class BikesController < ApplicationController
   end
 
   def scanned
-    @bike_code = BikeCode.lookup(scanned_id, organization_id: params[:organization_id])
+    @bike_code = BikeCode.lookup_with_fallback(scanned_id, organization_id: params[:organization_id], user: current_user)
     if @bike_code.blank?
       raise ActiveRecord::RecordNotFound
     elsif @bike_code.bike.present?
