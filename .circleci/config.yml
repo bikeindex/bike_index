@@ -49,11 +49,14 @@ jobs:
           name: Yarn Install
           command: yarn install --cache-folder ~/.cache/yarn
       - run: bundle exec rake assets:precompile
-      - run:
-          name: Install Code Climate Test Reporter
-          command: |
-            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-            chmod +x ./cc-test-reporter
+      # unfortunately, codeclimate doesn't work for parallelized loads right now. If/when it does work, add it back in
+      # uncommenting the code climate lines that are commented out in here
+      # uncomment the badge in README.markdown
+      # - run:
+      #     name: Install Code Climate Test Reporter
+      #     command: |
+      #       curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+      #       chmod +x ./cc-test-reporter
       - run:
           name: Wait for PostgreSQL to start
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
@@ -82,14 +85,14 @@ jobs:
                               --out test-results/rspec/rspec.xml \
                               --format progress \
                               -- ${TESTFILES}
-      - run:
-          name: Code Climate Test Coverage
-          command: |
-            ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
+      # - run:
+      #     name: Code Climate Test Coverage
+      #     command: |
+      #       ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
       - store_test_results:
           path: test-results
       - store_artifacts:
           path: test-artifacts
-      - deploy:
-          command: |
-            ./cc-test-reporter sum-coverage --output - --parts 1 coverage/codeclimate.*.json | ./cc-test-reporter upload-coverage --debug --input -
+      # - deploy:
+      #     command: |
+      #       ./cc-test-reporter sum-coverage --output - --parts 1 coverage/codeclimate.*.json | ./cc-test-reporter upload-coverage --debug --input -
