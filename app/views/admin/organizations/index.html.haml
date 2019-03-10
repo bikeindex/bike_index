@@ -15,7 +15,7 @@
       %label{ style: 'display: inline-block; margin-right: 1em;' }
         = check_box_tag :is_paid, true, params[:is_paid]
         paid only
-      = text_field_tag :query, params[:query], placeholder: 'Find by name or city'
+      = text_field_tag :query, params[:query], placeholder: "Find by name, location #{current_user.developer? ? 'or paid feature' : '' }"
       = submit_tag 'Search', name: 'search', class: 'button-blue'
 
 

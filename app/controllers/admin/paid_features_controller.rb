@@ -25,7 +25,7 @@ class Admin::PaidFeaturesController < Admin::BaseController
   end
 
   def create
-    @paid_feature = PaidFeature.new(permitted_parameters)
+    @paid_feature = PaidFeature.new(permitted_update_parameters)
     if @paid_feature.save
       flash[:success] = "Feature created"
       redirect_to admin_paid_features_path
