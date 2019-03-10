@@ -16,7 +16,6 @@ class Export < ActiveRecord::Base
   enum file_format: VALID_FILE_FORMATS
 
   before_validation :set_calculated_attributes
-  before_destroy :remove_bike_codes
 
   attr_accessor :timezone, :avery_export # permit assignment
 

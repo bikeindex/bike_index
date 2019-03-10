@@ -1,6 +1,6 @@
 class OrganizationExportWorker
   include Sidekiq::Worker
-  sidekiq_options queue: "low_priority", backtrace: true
+  sidekiq_options queue: "low_priority", backtrace: true, retry: false
   LINK_BASE = "#{ENV['BASE_URL']}/bikes/".freeze
 
   attr_accessor :export # Only necessary for testing
@@ -10,6 +10,7 @@ class OrganizationExportWorker
     return true if @export.finished_processing?
     @export.update_attribute :progress, "ongoing"
     write_spreadsheet(@export.file_format, @export.tmp_file)
+    return if @export_ebraked
     @export.file = @export.tmp_file
     @export.progress = "finished"
     @export.options = @export.options.merge(bike_codes_assigned: @bike_codes) if @export.assign_bike_codes?
@@ -43,6 +44,7 @@ class OrganizationExportWorker
       end
       @export.rows = row_index
     end
+    return if @export_ebraked
     file.write(axlsx_package.to_stream.read)
     @export.tmp_file.close
     true

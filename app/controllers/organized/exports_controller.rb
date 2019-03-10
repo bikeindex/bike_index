@@ -50,6 +50,7 @@ module Organized
     end
 
     def destroy
+      @export.remove_bike_codes
       @export.destroy
       flash[:success] = "export was successfully deleted!"
       redirect_to organization_exports_path(organization_id: current_organization.to_param)
