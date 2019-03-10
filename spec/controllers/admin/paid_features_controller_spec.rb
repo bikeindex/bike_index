@@ -79,10 +79,22 @@ describe Admin::PaidFeaturesController, type: :controller do
   describe "create" do
     it "succeeds" do
       expect do
-        post :create, paid_feature: passed_params
+        post :create, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, show_bulk_import")
       end.to change(PaidFeature, :count).by 1
       paid_feature = PaidFeature.last
       passed_params.each { |k, v| expect(paid_feature.send(k)).to eq(v) }
+      expect(paid_feature.feature_slugs).to eq([])
+    end
+    context "developer" do
+      let(:user) { FactoryBot.create(:admin_developer) }
+      it "succeeds" do
+        expect do
+          post :create, paid_feature: passed_params.merge(feature_slugs_string: "csv_exports, show_bulk_import")
+        end.to change(PaidFeature, :count).by 1
+        paid_feature = PaidFeature.last
+        passed_params.each { |k, v| expect(paid_feature.send(k)).to eq(v) }
+        expect(paid_feature.feature_slugs).to eq %w[csv_exports show_bulk_import]
+      end
     end
   end
 end

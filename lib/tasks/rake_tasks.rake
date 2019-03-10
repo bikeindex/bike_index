@@ -1,6 +1,6 @@
 # NEWLY ADDED SCHEDULER TASK! All tasks should be moved into scheduled workers
 task run_scheduler: :environment do
-  ScheduledWorkerRunner.perform_async
+  ScheduledWorkerRunner.perform_async if ScheduledWorkerRunner.should_enqueue?
 end
 
 task :slow_save => :environment do

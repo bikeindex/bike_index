@@ -91,7 +91,12 @@
     %strong
       = link_to "Edit/Create Invoices", admin_organization_invoices_path(organization_id: @organization.to_param)
     %em.less-strong
-      #{@organization.name} has #{pluralize(@organization.invoices.count, "invoice")}
+      #{@organization.name} has #{pluralize(@organization.invoices.count, "total invoice")}
+    - if @organization.invoices.count > 0
+      and
+      %strong
+        #{@organization.invoices.active.count} active
+
   - if @organization.bike_shop?
     %p
       %span.less-strong
@@ -157,14 +162,13 @@
             - else
               %small.less-strong
                 no
-          %dt
-            Partial reg list
-          %dd
-            - if @organization.paid_for?("show_partial_registrations")
-              yes
-            - else
-              <small class="less-strong">no</small>
 
+          %dt
+            Features
+          %dd
+            - @organization.paid_feature_slugs.each do |slug|
+              %code
+                = slug
 
 
 - if @bikes.present?
