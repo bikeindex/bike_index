@@ -42,6 +42,12 @@ class BikeCode < ActiveRecord::Base
     where("code ILIKE ?", "%#{code}%")
   end
 
+  def self.next_unclaimed_code(after_id = nil)
+    after_id ||= claimed.order(:id).last&.id || 1 # So we can pass in the id to iterate from.
+    # If there aren't any claimed stickers, we need to include a number or this returns nil
+    unclaimed.reorder(:id).where("id > ?", after_id || 1).first
+  end
+
   def claimed?; bike_id.present? end
 
   def unclaimed?; !claimed? end
@@ -54,8 +60,7 @@ class BikeCode < ActiveRecord::Base
   end
 
   def next_unclaimed_code
-    BikeCode.unclaimed.where(organization_id: organization_id).reorder(:created_at)
-            .where("id > ?", id).first
+    BikeCode.where(organization_id: organization_id).next_unclaimed_code(id)
   end
 
   def claimable_by?(user)
