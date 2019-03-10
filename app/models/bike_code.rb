@@ -27,19 +27,31 @@ class BikeCode < ActiveRecord::Base
     code.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them
   end
 
+  # organization_id can be any organization identifier (name, slug, id)
+  # generally don't pass in normalized_code
   def self.lookup(str, organization_id: nil)
-    code = normalize_code(str)
+    normalized_code = normalize_code(str)
     if organization_id.present?
       org = Organization.friendly_find(organization_id)
-      return where(code: code, organization_id: org.id).first if org.present?
+      return where(code: normalized_code, organization_id: org.id).first if org.present?
     end
-    where(code: code).first
+    where(code: normalized_code).first
+  end
+
+  def self.lookup_with_fallback(str, organization_id: nil, user: nil)
+    normalized_code = normalize_code(str)
+    user_organization_ids = user&.memberships&.pluck(:organization_id) || []
+    if user_organization_ids.any?
+      bike_code = where(code: normalized_code, organization_id: user_organization_ids).first
+    end
+    bike_code ||= lookup(normalized_code, organization_id: organization_id)
+    bike_code ||= where(code: normalized_code).first
   end
 
   def self.admin_text_search(str)
-    code = normalize_code(str)
-    return all unless code.present?
-    where("code ILIKE ?", "%#{code}%")
+    normalized_code = normalize_code(str)
+    return all unless normalized_code.present?
+    where("code ILIKE ?", "%#{normalized_code}%")
   end
 
   def self.next_unclaimed_code(after_id = nil)
