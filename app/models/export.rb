@@ -16,7 +16,7 @@ class Export < ActiveRecord::Base
   enum file_format: VALID_FILE_FORMATS
 
   before_validation :set_calculated_attributes
-  before_destroy :remove_bike_codes!
+  before_destroy :remove_bike_codes
 
   attr_accessor :timezone, :avery_export # permit assignment
 
@@ -68,12 +68,16 @@ class Export < ActiveRecord::Base
   # 'options' is a weird place to put the assigned bike_codes - but whatever, it's there, just using it
   def bike_codes; options["bike_codes_assigned"] || [] end
 
-  def remove_bike_codes!
+  def remove_bike_codes_and_record!
     return true unless assign_bike_codes? && !bike_codes_removed?
-    bike_codes.each do |code|
+    remove_bike_codes
+    update_attribute :options, options.merge(bike_codes_removed: true)
+  end
+
+  def remove_bike_codes
+    (bike_codes || []).each do |code|
       BikeCode.lookup(code, organization_id: organization_id)&.unclaim!
     end
-    update_attribute :options, options.merge(bike_codes_removed: true)
   end
 
   def option?(str)

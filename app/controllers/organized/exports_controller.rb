@@ -41,7 +41,7 @@ module Organized
 
     def update
       if params[:remove_bike_codes] && @export.assign_bike_codes?
-        @export.remove_bike_codes!
+        @export.remove_bike_codes_and_record!
         flash[:success] = "Bike codes removed!"
       else
         flash[:error] = "Unknown update action!"
@@ -62,7 +62,7 @@ module Organized
         @export = Export.new(avery_export_parameters)
         bike_code = current_organization.bike_codes.lookup(@export.bike_code_start) if @export.bike_code_start.present?
         if bike_code.present? && bike_code.claimed?
-          flash[:error] = "That sticker has already been assigned! Please choose a new initial sticker #"
+          flash[:error] = "That sticker has already been assigned! Please choose a new initial Sticker"
         end
       else
         flash[:error] = "You don't have permission to make that sort of export! Please contact support@bikeindex.org"

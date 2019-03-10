@@ -41,7 +41,7 @@ class OrganizationExportWorker
         row_index += 1
         sheet.add_row(bike_to_row(bike))
       end
-      @export.row_index = row_index
+      @export.rows = row_index
     end
     file.write(axlsx_package.to_stream.read)
     @export.tmp_file.close
@@ -70,8 +70,9 @@ class OrganizationExportWorker
   # If we have to load the bike record to check if it's a valid export, check conditions here
   # Currently avery_exports are the only ones that need to do this
   def export_bike?(bike)
+    return false if @export_ebraked
     @avery_export ||= @export.avery_export?
-    return true unless @avery_export || @export_ebraked
+    return true unless @avery_export
     # Avery export includes owner_name_or_email - but actually requires user_name - TODO: make it just user_name & update avery to accept user_name
     bike.registration_address.present? && bike.user_name.present?
   end
@@ -120,17 +121,6 @@ class OrganizationExportWorker
     end
   end
 
-  def check_export_ebrake(row)
-    # only check this every so often, so we can halt processing via an external trip switch
-    return true unless (row % 50).zero?
-    reloaded_export = Export.where(id: @export.id).first
-    # Specifically - if this export has been deleted, errored or somehow finished, halt processing
-    return true unless reloaded_export.blank? || reloaded_export.finished_processing?
-    @export_ebraked = true
-    # And because this might have processed some additional bike_codes, after the export was deleted, remove them all
-    @export.remove_bike_codes!
-  end
-
   def assign_bike_code_and_increment(bike)
     return "" unless @bike_code.present?
     code = @bike_code.code
@@ -138,5 +128,18 @@ class OrganizationExportWorker
     @bike_codes << code
     @bike_code = @bike_code.next_unclaimed_code
     code
+  end
+
+  # This is difficult to test in an automated fashion, it's been tested by running it - so be careful about modifying 
+  def check_export_ebrake(row)
+    return true if @export_ebraked # If it's already braked, don't check again
+    # only check every so often, so we can halt processing via an external trip switch
+    return true unless (row % 50).zero?
+    reloaded_export = Export.where(id: @export.id).first
+    # Specifically - if this export has been deleted, errored or somehow finished, halt processing
+    return true unless reloaded_export.blank? || reloaded_export.finished_processing?
+    @export_ebraked = true
+    # And because this might have processed some additional bike_codes, after the export was deleted, remove them all
+    @export.remove_bike_codes
   end
 end
