@@ -33,9 +33,8 @@
                 - if paid_feature.details_link.present?
                   %br
                   = link_to paid_feature.details_link, paid_feature.details_link
-            - if current_user.developer
-              %small.less-strong
-                <span class="large-screens">feature</span> slugs: #{paid_feature.feature_slugs_string}
+            %small.less-strong
+              <span class="large-screens">feature</span> slugs: <span style="color: purple;">#{paid_feature.feature_slugs_string}</span>
 
           %td
             %small

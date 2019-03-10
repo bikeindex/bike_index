@@ -68,11 +68,18 @@ class Organization < ActiveRecord::Base
   end
 
   def self.admin_text_search(n)
+    return nil unless n.present?
+    # Only search for paid features if the text is paid features
+    return with_paid_feature_slugs(n) if PaidFeature.matching_slugs(n).present?
     str = "%#{n.strip}%"
     match_cols = %w(organizations.name organizations.short_name locations.name locations.city)
     joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
       .distinct
       .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(' OR '), { str: str })
+  end
+
+  def self.with_paid_feature_slugs(slugs)
+    where("paid_feature_slugs ?& array[:keys]", keys: PaidFeature.matching_slugs(slugs))
   end
 
   def to_param

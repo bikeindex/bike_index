@@ -24,6 +24,13 @@ class PaidFeature < ActiveRecord::Base
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
+  # used by organization right now, but might be useful in other places
+  def self.matching_slugs(slugs)
+    slug_array = slugs.is_a?(Array) ? slugs : slugs.split(" ").reject(&:blank?)
+    matching_slugs = EXPECTED_SLUGS & slug_array
+    matching_slugs.any? ? matching_slugs : nil
+  end
+
   def one_time?; standard_one_time? || custom_one_time? end
 
   def recurring?; !one_time? end
