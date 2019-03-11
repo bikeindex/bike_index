@@ -7,7 +7,7 @@ describe Organized::StickersController, type: :controller do
 
   before { set_current_user(user) if user.present? }
 
-  context "organization without has_bike_codes" do
+  context "organization without bike_codes" do
     let!(:organization) { FactoryBot.create(:organization) }
     context "logged in as organization admin" do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
@@ -39,9 +39,10 @@ describe Organized::StickersController, type: :controller do
     end
   end
 
-  context "organization with has_bike_codes" do
-    let!(:organization) { FactoryBot.create(:organization, has_bike_codes: true) }
+  context "organization with bike_codes" do
+    let(:organization) { FactoryBot.create(:organization) }
     let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+    before { organization.update_column :paid_feature_slugs, ["bike_codes"] }
 
     context "logged in as organization member" do
       describe "index" do

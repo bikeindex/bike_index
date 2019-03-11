@@ -17,9 +17,11 @@ class Invoice < ActiveRecord::Base
 
   scope :first_invoice, -> { where(first_invoice_id: nil) }
   scope :renewal_invoice, -> { where.not(first_invoice_id: nil) }
-  scope :active, -> { where(is_active: true).where.not(subscription_start_at: nil) }
+  scope :active, -> { where(is_active: true) }
+  scope :inactive, -> { where(is_active: false) }
   scope :current, -> { active.where("subscription_end_at > ?", Time.now) }
-  scope :expired, -> { active.where("subscription_end_at < ?", Time.now) }
+  scope :expired, -> { where.not(subscription_start_at: nil).where("subscription_end_at < ?", Time.now) }
+  scope :should_expire, -> { where(is_active: true).where("subscription_end_at < ?", Time.now) }
 
   attr_accessor :timezone
 
@@ -30,10 +32,11 @@ class Invoice < ActiveRecord::Base
 
   def subscription_duration; 1.year end # Static, at least for now
   def renewal_invoice?; first_invoice_id.present? end
-  def active?; is_active && subscription_start_at.present? end # Alias - don't directly access the db attribute, because it might change
+  def active?; is_active end # Alias - don't directly access the db attribute, because it might change
   def was_active?; expired? && force_active || subscription_start_at.present? && paid_in_full? end
   def current?; active? && subscription_end_at > Time.now end
   def expired?; subscription_end_at && subscription_end_at < Time.now end
+  def should_expire?; is_active && expired? end # Use db attribute here, because that's what matters
   def discount_cents; feature_cost_cents - (amount_due_cents || 0) end
   def paid_in_full?; amount_paid_cents.present? && amount_due_cents.present? && amount_paid_cents >= amount_due_cents end
   def subscription_first_invoice_id; first_invoice_id || id end
@@ -69,6 +72,9 @@ class Invoice < ActiveRecord::Base
     end
   end
 
+  # So that we can read and write
+  def start_at; subscription_start_at end
+  def end_at; subscription_end_at end
   def start_at=(val)
     self.subscription_start_at = TimeParser.parse(val, timezone)
   end

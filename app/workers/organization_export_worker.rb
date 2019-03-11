@@ -1,16 +1,16 @@
 class OrganizationExportWorker
   include Sidekiq::Worker
-  sidekiq_options queue: "afterwards" # Because it's low priority!
-  sidekiq_options backtrace: true
+  sidekiq_options queue: "low_priority", backtrace: true, retry: false
   LINK_BASE = "#{ENV['BASE_URL']}/bikes/".freeze
 
   attr_accessor :export # Only necessary for testing
 
   def perform(export_id)
     @export = Export.find(export_id)
-    return true if @export.finished?
+    return true if @export.finished_processing?
     @export.update_attribute :progress, "ongoing"
     write_spreadsheet(@export.file_format, @export.tmp_file)
+    return if @export_ebraked
     @export.file = @export.tmp_file
     @export.progress = "finished"
     @export.options = @export.options.merge(bike_codes_assigned: @bike_codes) if @export.assign_bike_codes?
@@ -35,14 +35,16 @@ class OrganizationExportWorker
     axlsx_package = Axlsx::Package.new
     axlsx_package.workbook.add_worksheet(name: "Basic Worksheet") do |sheet|
       sheet.add_row(export_headers)
-      rows = 0
+      row_index = 0
       @export.bikes_scoped.find_each(batch_size: 100) do |bike|
+        check_export_ebrake(row_index) # Run first thing in case it's already broken
         next unless export_bike?(bike)
-        rows += 1
+        row_index += 1
         sheet.add_row(bike_to_row(bike))
       end
-      @export.rows = rows
+      @export.rows = row_index
     end
+    return if @export_ebraked
     file.write(axlsx_package.to_stream.read)
     @export.tmp_file.close
     true
@@ -51,8 +53,11 @@ class OrganizationExportWorker
   def write_csv(file)
     require "csv"
     file.write(comma_wrapped_string(export_headers))
+    row_index = 0
     @export.bikes_scoped.find_each(batch_size: 100) do |bike|
+      check_export_ebrake(row_index) # Run first thing in case it's already broken
       next unless export_bike?(bike)
+      row_index += 1
       file.write(comma_wrapped_string(bike_to_row(bike)))
     end
     true
@@ -67,6 +72,7 @@ class OrganizationExportWorker
   # If we have to load the bike record to check if it's a valid export, check conditions here
   # Currently avery_exports are the only ones that need to do this
   def export_bike?(bike)
+    return false if @export_ebraked
     @avery_export ||= @export.avery_export?
     return true unless @avery_export
     # Avery export includes owner_name_or_email - but actually requires user_name - TODO: make it just user_name & update avery to accept user_name
@@ -124,5 +130,20 @@ class OrganizationExportWorker
     @bike_codes << code
     @bike_code = @bike_code.next_unclaimed_code
     code
+  end
+
+  # This is difficult to test in an automated fashion, it's been tested by running it - so be careful about modifying 
+  def check_export_ebrake(row)
+    return true if @export_ebraked # If it's already braked, don't check again
+    # only check every so often, so we can halt processing via an external trip switch
+    return true unless (row % 50).zero?
+    reloaded_export = Export.where(id: @export.id).first
+    # Specifically - if this export has been deleted, errored or somehow finished, halt processing
+    return true unless reloaded_export.blank? || reloaded_export.finished_processing?
+    @export_ebraked = true
+    # And because this might have processed some bike_codes after the export was deleted, remove them here
+    return true unless @export.assign_bike_codes?
+    @export.options = @export.options.merge(bike_codes_assigned: @bike_codes)
+    @export.remove_bike_codes
   end
 end

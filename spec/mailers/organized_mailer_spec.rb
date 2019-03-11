@@ -33,6 +33,25 @@ describe OrganizedMailer do
           expect(mail.reply_to).to eq([organization.auto_user.email])
           expect(mail.body.encoded).to match header_mail_snippet.body
         end
+        context "with partial snippet" do
+          let!(:partial_mail_snippet) do
+            FactoryBot.create(:organization_mail_snippet,
+                               name: "partial",
+                               organization: organization,
+                               body: '<p>PARTIALYXSNIPPET</p>')
+          end
+          it "includes mail snippet" do
+            expect(b_param.owner_email).to be_present
+            expect(header_mail_snippet).to be_present
+            organization.reload
+            mail = OrganizedMailer.partial_registration(b_param)
+            expect(mail.subject).to eq("Finish your #{organization.short_name} Bike Index registration!")
+            expect(mail.to).to eq([b_param.owner_email])
+            expect(mail.reply_to).to eq([organization.auto_user.email])
+            expect(mail.body.encoded).to match header_mail_snippet.body
+            expect(mail.body.encoded).to match partial_mail_snippet.body
+          end
+        end
       end
     end
   end

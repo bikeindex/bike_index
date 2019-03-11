@@ -35,6 +35,17 @@ describe ApplicationHelper do
     end
   end
 
+  describe "revised_active_link" do
+    context "match_controller" do
+      let(:request) { double("request", url: admin_organizations_path) }
+      before { allow(helper).to receive(:request).and_return(request) }
+      it "returns the link active with match_controller if on the controller" do
+        expect(revised_active_link("Organizations", admin_organizations_path, class: "seeeeeeee", id: "something", match_controller: true))
+          .to eq '<a class="seeeeeeee active" id="something" href="' + admin_organizations_path + '">Organizations</a>'
+      end
+    end
+  end
+
   describe 'current_page_skeleton' do
     before { allow(view).to receive(:controller_namespace) { controller_namespace } }
     let(:controller_namespace) { nil }

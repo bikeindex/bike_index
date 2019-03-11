@@ -12,7 +12,14 @@ class Admin::PaymentsController < Admin::BaseController
   def invoices
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @invoices = Invoice.includes(:organization, :payments)
+    if params[:query] == "active"
+      invoices = Invoice.active
+    elsif params[:query] == "inactive"
+      invoices = Invoice.inactive
+    else
+      invoices = Invoice
+    end
+    @invoices = invoices.includes(:organization, :payments)
                        .reorder(sort_column + " " + sort_direction).page(page).per(per_page)
   end
 

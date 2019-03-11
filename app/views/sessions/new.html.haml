@@ -30,13 +30,13 @@
                 no Bike Index
               - else
                 don't have an
-              account? #{ link_to 'sign up', new_user_path(partner: sign_in_partner) }
+              account? #{link_to 'sign up', new_user_path(partner: sign_in_partner, email: params[:email])}
           = form_for :session, url: session_url do |f|
             - if sign_in_partner
               = hidden_field_tag :partner, sign_in_partner
             .form-group
               = f.label :email, class: 'sr-only'
-              = f.email_field :email, placeholder: 'email', class: 'form-control'
+              = f.email_field :email, value: params[:email], placeholder: 'email', class: 'form-control'
             .form-group
               = f.label :password, class: 'sr-only'
               = f.password_field :password, placeholder: 'password', class: 'form-control'

@@ -7,7 +7,7 @@ describe Organized::ExportsController, type: :controller do
 
   before { set_current_user(user) if user.present? }
 
-  context "organization without has_bike_codes" do
+  context "organization without bike_codes" do
     let(:organization) { FactoryBot.create(:organization) }
     context "logged in as organization admin" do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
@@ -115,6 +115,28 @@ describe Organized::ExportsController, type: :controller do
         expect(response).to redirect_to exports_root_path
         expect(flash[:success]).to be_present
       end
+      context "with assigned bike codes" do
+        let(:bike) { FactoryBot.create(:bike) }
+        let!(:bike_code) { FactoryBot.create(:bike_code_claimed, organization: organization, code: "a1111") }
+        let(:export) { FactoryBot.create(:export_avery, organization: organization, bike_code_start: "a1111") }
+        it "removes the stickers before destroying" do
+          export.update_attributes(options: export.options.merge(bike_codes_assigned: ["a1111"]))
+          bike_code.reload
+          export.reload
+          expect(bike_code.claimed?).to be_truthy
+          expect([bike_code.user_id, bike_code.claimed_at, bike_code.bike_id].reject(&:blank?).count).to eq 3
+          expect(export.avery_export?).to be_truthy
+          expect(export.assign_bike_codes?).to be_truthy
+          expect(export.bike_codes).to eq(["a1111"])
+          expect do
+            delete :destroy, id: export.id, organization_id: organization.to_param
+          end.to change(Export, :count).by(-1)
+          expect(response).to redirect_to exports_root_path
+          expect(flash[:success]).to be_present
+          bike_code.reload
+          expect([bike_code.user_id, bike_code.claimed_at, bike_code.bike_id].reject(&:blank?).count).to eq 0
+        end
+      end
     end
 
     describe "create" do
@@ -128,6 +150,7 @@ describe Organized::ExportsController, type: :controller do
           headers: %w[link registered_at manufacturer model registered_by]
         }
       end
+      let(:avery_params) { valid_attrs.merge(end_at: "2016-03-08 02:00:00", avery_export: true, bike_code_start: "a221C ") }
       it "creates the expected export" do
         expect do
           post :create, export: valid_attrs, organization_id: organization.to_param
@@ -142,8 +165,16 @@ describe Organized::ExportsController, type: :controller do
         expect(export.end_at).to_not be_present
         expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
       end
-      context "organization with avery export, non-avery export" do
-        before { organization.update_column :paid_feature_slugs, %w[csv_exports avery_export] } # Stub organization having features
+      context "avery export without feature" do
+        it "fails" do
+          expect do
+            post :create, export: avery_params, organization_id: organization.to_param
+          end.to_not change(Export, :count)
+          expect(flash[:error]).to be_present
+        end
+      end
+      context "organization with avery export" do
+        before { organization.update_columns(paid_feature_slugs: %w[csv_exports avery_export geolocated_messages bike_codes]) } # Stub organization having features
         let(:export_params) { valid_attrs.merge(file_format: "csv", avery_export: "0", end_at: "2016-02-10 02:00:00") }
         it "creates a non-avery export" do
           expect(organization.paid_for?("avery_export")).to be_truthy
@@ -162,18 +193,36 @@ describe Organized::ExportsController, type: :controller do
           expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
           expect(export.avery_export?).to be_falsey
         end
-      end
-      context "avery export" do
-        let(:avery_params) { valid_attrs.merge(end_at: "2016-03-08 02:00:00", avery_export: true, bike_code_start: "a221C ") }
-        it "fails" do
-          expect do
-            post :create, export: avery_params, organization_id: organization.to_param
-          end.to_not change(Export, :count)
-          expect(flash[:error]).to be_present
+        context "with IE 11 datetime params" do
+          let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "a221C") }
+          let(:crushed_datetime_attrs) do
+            {
+              start_at: "08/25/2018",
+              end_at: "09/30/2018",
+              timezone: "",
+              file_format: "csv",
+              bike_code_start: "01", # Avery export organizations always submit a number here
+              headers: %w[link registered_at] + Export.additional_registration_fields.values
+            }
+          end
+          it "creates the expected export" do
+            expect do
+              post :create, export: crushed_datetime_attrs, organization_id: organization.to_param
+            end.to change(Export, :count).by 1
+            expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
+            export = Export.last
+            expect(export.kind).to eq "organization"
+            expect(export.file_format).to eq "csv"
+            expect(export.user).to eq user
+            expect(export.headers).to eq crushed_datetime_attrs[:headers]
+            expect(export.start_at.to_i).to be_within(1).of 1535173200
+            expect(export.end_at.to_i).to be_within(1).of 1538283600 # Explicitly testing this in TimeParser
+            expect(export.assign_bike_codes?).to be_falsey
+            expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
+          end
         end
-        context "organization with avery export" do
+        context "avery export" do
           let(:end_at) { 1457431200 }
-          before { organization.update_column :paid_feature_slugs, %w[csv_exports avery_export] } # Stub organization having features
           it "makes the avery export" do
             expect do
               post :create, export: avery_params, organization_id: organization.to_param
@@ -190,7 +239,17 @@ describe Organized::ExportsController, type: :controller do
             expect(export.bike_code_start).to eq "A221C"
             expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
           end
-        end
+          context "avery export with already assigned bike_code" do
+            let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "a221C", bike_id: 111) }
+            it "makes the avery export" do
+              expect(bike_code.claimed?).to be_truthy
+              expect do
+                post :create, export: avery_params, organization_id: organization.to_param
+              end.to_not change(Export, :count)
+              expect(flash[:error]).to match(/sticker/)
+            end
+          end
+        end        
       end
     end
 

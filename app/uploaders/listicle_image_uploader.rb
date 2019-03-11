@@ -23,6 +23,10 @@ class ListicleImageUploader < CarrierWave::Uploader::Base
     true # nothing, the dir is not empty
   end
 
+  def cache_dir
+    Rails.root.join("tmp", "cache")
+  end
+
   def store_dir
     "#{base_store_dir}/#{model.id}"
   end

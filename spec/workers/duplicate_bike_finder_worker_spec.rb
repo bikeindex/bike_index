@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe DuplicateBikeFinderWorker do
-  it { is_expected.to be_processed_in :afterwards }
-
   it 'takes a bike id and search for groups' do
     bike1 = FactoryBot.create(:bike, serial_number: 'applejacks cereal')
     bike1.create_normalized_serial_segments

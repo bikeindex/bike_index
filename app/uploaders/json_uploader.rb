@@ -11,6 +11,10 @@ class JsonUploader < CarrierWave::Uploader::Base
     storage :fog
   end
 
+  def cache_dir
+    Rails.root.join("tmp", "cache")
+  end
+
   def store_dir
     "#{base_store_dir}json"
   end

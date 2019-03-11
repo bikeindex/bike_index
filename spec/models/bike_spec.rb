@@ -312,6 +312,61 @@ describe Bike do
     end
   end
 
+  describe "display_contact_owner?" do
+    let(:bike) { Bike.new }
+    let(:admin) { User.new(superuser: true) }
+    it "is falsey if bike doesn't have stolen record" do
+      allow(bike).to receive(:owner) { User.new }
+      expect(bike.contact_owner?).to be_falsey
+      expect(bike.contact_owner?(User.new)).to be_falsey
+      expect(bike.contact_owner?(admin)).to be_truthy
+      expect(bike.display_contact_owner?).to be_falsey
+    end
+    context "with owner with notification_unstolen false" do
+      it "is falsey" do
+        allow(bike).to receive(:owner) { User.new(notification_unstolen: false) }
+        expect(bike.contact_owner?).to be_falsey
+        expect(bike.contact_owner?(User.new)).to be_falsey
+        expect(bike.contact_owner?(admin)).to be_falsey
+        expect(bike.display_contact_owner?(admin)).to be_falsey
+      end
+    end
+    context "stolen bike" do
+      let(:bike) { Bike.new(stolen: true, current_stolen_record: StolenRecord.new) }
+      it "is truthy" do
+        expect(bike.contact_owner?).to be_falsey
+        expect(bike.contact_owner?(User.new)).to be_truthy
+        expect(bike.display_contact_owner?).to be_truthy
+      end
+    end
+  end
+
+  describe "contact_owner_user?" do
+    let(:owner_email) { "party@party.com" }
+    let(:creator) { FactoryBot.create(:user, email: "notparty@party.com") }
+    let(:bike) { FactoryBot.create(:bike, owner_email: owner_email, creator: creator) }
+    let!(:ownership) { FactoryBot.create(:ownership_claimed, bike: bike, owner_email: owner_email, creator: creator) }
+    it "is true" do
+      expect(bike.contact_owner_user?).to be_truthy
+      expect(bike.contact_owner_email).to eq owner_email
+    end
+    context "ownership not claimed" do
+      let!(:ownership) { FactoryBot.create(:ownership, bike: bike, owner_email: owner_email, creator: creator) }
+      it "is false" do
+        expect(bike.contact_owner_user?).to be_falsey
+        expect(bike.contact_owner_email).to eq "notparty@party.com"
+      end
+      context "registered as stolen" do
+        let(:bike) { FactoryBot.create(:stolen_bike, owner_email: owner_email, creator: creator) }
+        it "is truthy" do
+          expect(bike.stolen?).to be_truthy
+          expect(bike.contact_owner_user?).to be_truthy
+          expect(bike.contact_owner_email).to eq owner_email
+        end
+      end
+    end
+  end
+
   describe 'user_hidden' do
     it 'is true if bike is hidden and ownership is user hidden' do
       bike = Bike.new(hidden: true)

@@ -9,8 +9,11 @@ class StolenNotificationsController < ApplicationController
     @stolen_notification = StolenNotification.new(permitted_parameters)
     @stolen_notification.sender = current_user
     @bike = @stolen_notification.bike
-    if @stolen_notification.save
-      flash[:success] = 'Thanks for looking out!'
+    if !@bike.contact_owner?(current_user)
+      flash[:error] = "You don't have permission to send that notification! Please contact support@bikeindex.org"
+      redirect_to @bike
+    elsif @stolen_notification.save
+      flash[:success] = "Thanks for looking out!"
       redirect_to @bike
     else
       flash[:error] = "Crap! We couldn't send your notification. Please try again."
@@ -22,6 +25,6 @@ class StolenNotificationsController < ApplicationController
 
   def permitted_parameters
     params.require(:stolen_notification)
-          .permit(:subject, :reference_url, :message, :bike_id, :receiver_email, :send_dates, :application_id)
+          .permit(:subject, :reference_url, :message, :bike_id)
   end
 end

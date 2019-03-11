@@ -4,8 +4,6 @@ describe AfterUserCreateWorker do
   let(:subject) { AfterUserCreateWorker }
   let(:instance) { subject.new }
 
-  it { is_expected.to be_processed_in :updates }
-
   let!(:user) { FactoryBot.create(:user, email: "owner1@A.COM") }
   let(:email) { user.email }
 

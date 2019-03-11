@@ -1,8 +1,6 @@
 require 'spec_helper'
 
 describe GetManufacturerLogoWorker do
-  it { is_expected.to be_processed_in :afterwards }
-
   it 'enqueues listing ordering job' do
     GetManufacturerLogoWorker.perform_async
     expect(GetManufacturerLogoWorker).to have_enqueued_sidekiq_job

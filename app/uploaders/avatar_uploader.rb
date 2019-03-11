@@ -29,6 +29,10 @@ class AvatarUploader < CarrierWave::Uploader::Base
     'https://files.bikeindex.org/blank.png'
   end
 
+  def cache_dir
+    Rails.root.join("tmp", "cache")
+  end
+
   def store_dir
     "#{base_store_dir}/#{model.id}"
   end

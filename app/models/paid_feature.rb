@@ -6,9 +6,10 @@ class PaidFeature < ActiveRecord::Base
   # Organizations have paid_feature_slugs as an array attribute to track which features should be enabled
   # Every feature slug that is used in the code should be in this array
   # Only slugs that are used in the code should be in this array
-  REG_FIELDS = %w[reg_address reg_secondary_serial reg_phone].freeze
+  REG_FIELDS = %w[reg_address reg_secondary_serial reg_phone reg_affiliation].freeze
   EXPECTED_SLUGS = (%w[csv_exports messages geolocated_messages abandoned_bike_messages avery_export bike_search
-                       recovered_bikes bike_codes bulk_import partial_registrations] + REG_FIELDS).freeze
+                       show_bulk_import show_recoveries show_partial_registrations
+                       unstolen_notifications bike_codes] + REG_FIELDS).freeze
 
   has_many :invoice_paid_features
   has_many :invoices, through: :invoice_paid_features
@@ -22,6 +23,13 @@ class PaidFeature < ActiveRecord::Base
   scope :upfront, -> { where(kind: %w[standard_upfront custom_upfront]) }
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+
+  # used by organization right now, but might be useful in other places
+  def self.matching_slugs(slugs)
+    slug_array = slugs.is_a?(Array) ? slugs : slugs.split(" ").reject(&:blank?)
+    matching_slugs = EXPECTED_SLUGS & slug_array
+    matching_slugs.any? ? matching_slugs : nil
+  end
 
   def one_time?; standard_one_time? || custom_one_time? end
 

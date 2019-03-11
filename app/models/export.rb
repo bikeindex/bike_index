@@ -1,5 +1,5 @@
 class Export < ActiveRecord::Base
-  VALID_PROGRESSES = %i[pending ongoing finished].freeze
+  VALID_PROGRESSES = %i[pending ongoing finished errored].freeze
   VALID_KINDS = %i[organization stolen manufacturer].freeze
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
   DEFAULT_HEADERS = %w[link registered_at manufacturer model color serial is_stolen].freeze
@@ -26,7 +26,7 @@ class Export < ActiveRecord::Base
   end
 
   def self.additional_registration_fields
-    { reg_address: "registration_address", reg_secondary_serial: "additional_registration_number", reg_phone: "phone" }
+    { reg_address: "registration_address", reg_secondary_serial: "additional_registration_number", reg_phone: "phone", reg_affiliation: "organization_affiliation" }
   end
 
   def self.default_kind_options
@@ -52,6 +52,8 @@ class Export < ActiveRecord::Base
     PERMITTED_HEADERS + additional_headers.map { |f| additional_registration_fields[f.to_sym] }
   end
 
+  def finished_processing?; %w[finished errored].include?(progress) end
+
   def headers; options["headers"] end
 
   def avery_export?; option?("avery_export") end
@@ -65,12 +67,16 @@ class Export < ActiveRecord::Base
   # 'options' is a weird place to put the assigned bike_codes - but whatever, it's there, just using it
   def bike_codes; options["bike_codes_assigned"] || [] end
 
-  def remove_bike_codes!
+  def remove_bike_codes_and_record!
     return true unless assign_bike_codes? && !bike_codes_removed?
-    bike_codes.each do |code|
+    remove_bike_codes
+    update_attribute :options, options.merge(bike_codes_removed: true)
+  end
+
+  def remove_bike_codes
+    (bike_codes || []).each do |code|
       BikeCode.lookup(code, organization_id: organization_id)&.unclaim!
     end
-    update_attribute :options, options.merge(bike_codes_removed: true)
   end
 
   def option?(str)
@@ -157,7 +163,14 @@ class Export < ActiveRecord::Base
   def set_calculated_attributes
     self.options = validated_options(options)
     errors.add :organization_id, "required" if kind == "organization" && organization_id.blank?
+    self.progress = calculated_progress
     true # TODO: Rails 5 update
+  end
+
+  # Generally, use calculated_progress rather than progress directly for display
+  def calculated_progress
+    return progress unless pending? || ongoing?
+    (created_at || Time.now) < Time.now - 10.minutes ? "errored" : progress
   end
 
   def validated_options(opts)

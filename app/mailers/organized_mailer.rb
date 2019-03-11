@@ -18,21 +18,23 @@ class OrganizedMailer < ActionMailer::Base
     @bike = Bike.unscoped.find(@ownership.bike_id)
     @vars = {
       new_bike: (@bike.ownerships.count == 1),
+      email: @ownership.owner_email,
       new_user: User.fuzzy_email_find(@ownership.owner_email).present?,
       registered_by_owner: (@ownership.user.present? && @bike.creator_id == @ownership.user_id),
     }
     @organization = @bike.creation_organization if @bike.creation_organization.present? && @vars[:new_bike]
     @vars[:donation_message] = @bike.stolen? && !(@organization && !@organization.is_paid?)
     subject = t("organized_mailer.finished#{finished_registration_type}_registration.subject", default_subject_vars)
-    mail('Reply-To' => reply_to, to: @ownership.owner_email, subject: subject)
+    mail('Reply-To' => reply_to, to: @vars[:email], subject: subject)
   end
 
   def organization_invitation(organization_invitation)
     @organization_invitation = organization_invitation
     @organization = @organization_invitation.organization
     @inviter = @organization_invitation.inviter
-    @new_user = User.fuzzy_email_find(@organization_invitation.invitee_email).present?
-    mail('Reply-To' => reply_to, to: @organization_invitation.invitee_email, subject: default_i18n_subject(default_subject_vars))
+    @vars = { email: @organization_invitation.invitee_email }
+    @new_user = User.fuzzy_email_find(@vars[:email]).present?
+    mail('Reply-To' => reply_to, to: @vars[:email], subject: default_i18n_subject(default_subject_vars))
   end
 
   def custom_message(organization_message)

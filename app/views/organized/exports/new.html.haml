@@ -14,7 +14,7 @@
     .form-group.row.shownOnAveryExport
       = f.label :bike_code_start, "Initial Sticker #", class: 'org-form-label'
       .col-sm-6
-        = f.text_field :bike_code_start, class: "form-control"
+        = f.text_field :bike_code_start, value: current_organization.bike_codes.next_unclaimed_code&.code, class: "form-control"
         %span.below-input-help
           Starting with given input, stickers will be incrementally assigned to bikes. Leave blank to skip assigning stickers to bikes
   .row.mt-2.hiddenOnAveryExport
@@ -28,7 +28,7 @@
           .form-group.col-xs-6.col-md-4
             %label.checkbox
               = f.check_box :headers, { multiple: true, checked: Export.default_headers.include?(header) }, header, 1
-              = header.titleize
+              = header.titleize # This will break when a new reg field is added - which is a plus ;)
   .form-group.row.mt-4
     = f.label :start_at, "Registered after", class: "org-form-label"
     .col-sm-4

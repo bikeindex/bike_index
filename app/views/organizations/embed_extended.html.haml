@@ -9,7 +9,7 @@
     .control-group
       = f.label :serial_number, class: "control-label"
       .controls
-        = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
+        = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
       - if @organization&.include_field_reg_secondary_serial?
         = f.label :additional_registration, "Additional serial/sticker number", class: "control-label"
         .controls
@@ -88,6 +88,12 @@
       = f.label :phone, "Owner's phone"
       .controls
         = f.text_field :phone, required: true
+  - if @organization&.include_field_reg_affiliation?
+    .input-group
+      = f.label :organization_affiliation, "#{@organization.short_name} affiliation"
+      .controls
+        - affiliation_options = @organization.reg_affiliation_options.map { |a| [a.humanize, a] }
+        = f.select :organization_affiliation, affiliation_options, class: "form-control"
   .input-group
     .submit-registration
       = submit_tag "Register this", class: "button-submit"
@@ -95,7 +101,7 @@
   .input-group
     %h3
       Optional additions
-    - if @organization.has_bike_codes
+    - if @organization.paid_for?("bike_codes")
       .control-group.special-select-single
       = f.label :bike_code, "Sticker id", class: "control-label"
       .controls

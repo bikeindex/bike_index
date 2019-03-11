@@ -63,7 +63,9 @@ describe Organized::BulkImportsController, type: :controller do
   end
 
   context "organization with show_bulk_import" do
-    let!(:organization) { FactoryBot.create(:organization, show_bulk_import: true) }
+    let!(:organization) { FactoryBot.create(:organization) }
+    before { organization.update_column :paid_feature_slugs, ["show_bulk_import"] } # Stub organization having paid feature
+
     context "logged in as organization member" do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       describe "index" do
@@ -143,7 +145,7 @@ describe Organized::BulkImportsController, type: :controller do
           end
         end
         context "API create" do
-          let(:organization) { FactoryBot.create(:organization_with_auto_user, show_bulk_import: true, api_access_approved: true) }
+          let(:organization) { FactoryBot.create(:organization_with_auto_user, api_access_approved: true) }
           let(:user) { nil }
           context "invalid API token" do
             it "returns JSON message" do

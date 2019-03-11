@@ -48,7 +48,7 @@ class Organization < ActiveRecord::Base
   scope :paid, -> { where(is_paid: true) }
   scope :valid, -> { where(is_suspended: false) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
-  scope :with_bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: ["messages"]) }
+  scope :with_bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications]) }
 
   before_validation :set_calculated_attributes
   after_commit :update_user_bike_actions_organizations
@@ -68,11 +68,20 @@ class Organization < ActiveRecord::Base
   end
 
   def self.admin_text_search(n)
+    return nil unless n.present?
+    # Only search for paid features if the text is paid features
+    return with_paid_feature_slugs(n) if PaidFeature.matching_slugs(n).present?
     str = "%#{n.strip}%"
     match_cols = %w(organizations.name organizations.short_name locations.name locations.city)
     joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
       .distinct
       .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(' OR '), { str: str })
+  end
+
+  def self.with_paid_feature_slugs(slugs)
+    matching_slugs = PaidFeature.matching_slugs(slugs)
+    return nil unless matching_slugs.present?
+    where("paid_feature_slugs ?& array[:keys]", keys: matching_slugs)
   end
 
   def to_param
@@ -96,6 +105,12 @@ class Organization < ActiveRecord::Base
     PaidFeature::REG_FIELDS.select { |f| paid_for?(f) }
   end
 
+  def include_field_reg_affiliation?(user = nil)
+    additional_registration_fields.include?("reg_affiliation")
+  end
+
+  def reg_affiliation_options; %w[student employee community_member] end
+
   def include_field_reg_phone?(user = nil)
     return false unless additional_registration_fields.include?("reg_phone")
     !user&.phone&.present?
@@ -110,7 +125,7 @@ class Organization < ActiveRecord::Base
   end
 
   def bike_actions? # Eventually there will be other actions beside organization_messages, so use this as general reference
-    message_kinds.any?
+    message_kinds.any? || paid_for?("unstolen_notifications")
   end
 
   def paid_for?(feature_name)
@@ -129,10 +144,10 @@ class Organization < ActiveRecord::Base
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = (short_name || name).truncate(30)
-    self.is_paid = true if current_invoice&.paid_in_full?
+    self.is_paid = current_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
-    self.paid_feature_slugs = current_invoice&.feature_slugs || []
+    self.paid_feature_slugs = current_invoices.map(&:feature_slugs).flatten
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
@@ -156,20 +171,16 @@ class Organization < ActiveRecord::Base
     save
   end
 
-  def current_invoice; invoices.active.last || parent_organization&.current_invoice end # Parent invoice serves as invoice
   def child_ids; child_organizations.pluck(:id) end
+  # Parent invoice serves as invoice
+  def current_invoices; parent_organization.present? ? parent_organization.current_invoices : invoices.active end
 
   def incomplete_b_params
     BParam.where(organization_id: child_ids + [id]).partial_registrations.without_bike
   end
 
-  # TODO: these are DEPRECATED and should be REPLACED with paid_for?
-  # Once all the following methods have been moved fully to paid_for?, remove methods and just use paid_for
-  def bike_search?; paid_for?("bike_search") end
-  def bike_codes?; has_bike_codes end
-  def bulk_import?; show_bulk_import end
-  def partial_registrations?; show_partial_registrations end
-  def show_recoveries?; bike_search? end # This now has a paid_feature slug, should be converted to that
+  # Enable this if they have paid for showing it, or if they use ascend
+  def show_bulk_import?; paid_for?("show_bulk_import") || ascend_name.present? end
 
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates

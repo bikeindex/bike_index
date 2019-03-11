@@ -44,6 +44,23 @@ RSpec.describe BikeCode, type: :model do
     end
   end
 
+  describe "lookup_with_fallback" do
+    let(:organization1) { FactoryBot.create(:organization, short_name: "BikeIndex") }
+    let(:organization2) { FactoryBot.create(:organization) }
+    let!(:bikecode) { FactoryBot.create(:bike_code, code: "a0010", organization: organization2) }
+    let(:bikecode_duplicate) { FactoryBot.create(:bike_code, code: "a0010", organization: organization1) }
+    let!(:user) { FactoryBot.create(:organization_member, organization: organization2) }
+    it "looks up, falling back to the orgs for the user, falling back to any org" do
+      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex")).to eq bikecode
+      # It finds the bike_code that exists, even though it doesn't match the organization passed
+      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex", user: nil)).to eq bikecode
+      expect(bikecode_duplicate).to be_present
+      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex", user: nil)).to eq bikecode_duplicate
+      # It finds bike_code that matches the users organizations
+      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex", user: user)).to eq bikecode
+    end
+  end
+
   describe "duplication and integers" do
     let(:organization) { FactoryBot.create(:organization) }
     let!(:sticker) { FactoryBot.create(:bike_code, kind: "sticker", code: 12, organization_id: organization.id) }
@@ -113,14 +130,24 @@ RSpec.describe BikeCode, type: :model do
   end
 
   describe "next_unassigned" do
-    let!(:bike_code) { FactoryBot.create(:bike_code, organization_id: 12, code: "zzzz") }
-    let!(:bike_code1) { FactoryBot.create(:bike_code, organization_id: 12, code: "a1111") }
-    let!(:bike_code2) { FactoryBot.create(:bike_code, code: "a1112") }
-    let!(:bike_code3) { FactoryBot.create(:bike_code, organization_id: 12, code: "a1113", bike_id: 12) }
-    let!(:bike_code4) { FactoryBot.create(:bike_code, organization_id: 12, code: "a111") }
+    let(:bike_code) { FactoryBot.create(:bike_code, organization_id: 12, code: "zzzz") }
+    let(:bike_code1) { FactoryBot.create(:bike_code, organization_id: 12, code: "a1111") }
+    let(:bike_code2) { FactoryBot.create(:bike_code, organization_id: 11, code: "a1112") }
+    let(:bike_code3) { FactoryBot.create(:bike_code, organization_id: 12, code: "a1113", bike_id: 12) }
+    let(:bike_code4) { FactoryBot.create(:bike_code, organization_id: 12, code: "a111") }
     it "finds next unassigned, returns nil if not found" do
+      [bike_code, bike_code1, bike_code2, bike_code3, bike_code4]
       expect(bike_code1.next_unclaimed_code).to eq bike_code4
       expect(bike_code2.next_unclaimed_code).to be_nil
+    end
+    context "an unassigned lower code" do
+      let!(:earlier_unclaimed) { FactoryBot.create(:bike_code, organization_id: 12, code: "a1110") }
+      it "grabs the next one anyway" do
+        [earlier_unclaimed, bike_code, bike_code1, bike_code2, bike_code3, bike_code4]
+        expect(earlier_unclaimed.id).to be < bike_code4.id
+        # expect(BikeCode.where(organization_id: 12).next_unclaimed_code).to eq bike_code4
+        expect(BikeCode.where(organization_id: 11).next_unclaimed_code).to eq bike_code2
+      end
     end
   end
 
