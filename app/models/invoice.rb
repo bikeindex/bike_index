@@ -72,6 +72,9 @@ class Invoice < ActiveRecord::Base
     end
   end
 
+  # So that we can read and write
+  def start_at; subscription_start_at end
+  def end_at; subscription_end_at end
   def start_at=(val)
     self.subscription_start_at = TimeParser.parse(val, timezone)
   end
