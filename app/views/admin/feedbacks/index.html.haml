@@ -87,7 +87,7 @@
           #{params[:type]}
       .paginate-container.feedbacks-paginate.float-right
         = paginate @feedbacks, views_prefix: 'admin'
-    %table.table.table-fit
+    %table.table.table-striped.table-responsive
       %thead
         %tr
           %th{:scope => "col"} Created
@@ -124,5 +124,19 @@
               = feedback.name
             %td
               = feedback.body.truncate(100)
-  .paginate-container.feedbacks-paginate.float-right
-    = paginate @feedbacks, views_prefix: 'admin'
+  .row
+    .paginate-container.ml-auto
+      = paginate @feedbacks, views_prefix: 'admin'
+  .row
+    .col-sm
+      %h3
+        Feedbacks Graph
+        = javascript_include_tag "//www.google.com/jsapi", "chartkick"
+  .row
+    %pre
+    = line_chart graphs_admin_feedbacks_path(params.merge(start_at: params[:start_at]).except(:controller, :action))
+  .row.justify-content-center
+    %ul.list-inline
+      - %w(all_time past_year past_month past_week).each do |start_at|
+        %li.list-inline-item
+          = link_to start_at.humanize, admin_feedbacks_path(params.merge(start_at: start_at).except(:controller, :action))
