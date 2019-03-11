@@ -8,7 +8,7 @@
   - if current_user.memberships.count > 0
     - org = current_user.organizations.first
     %h3.padded
-      You are already a member of #{link_to org.name, organization_url(org.slug)}.
+      You are already a member of #{link_to org.name, organizations_root_path(org.slug)}.
     %p.padded
       %a.collapsed{ href: "#org-add-panel", data: { toggle: "collapse"} }
         Click here

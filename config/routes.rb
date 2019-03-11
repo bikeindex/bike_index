@@ -264,7 +264,7 @@ Bikeindex::Application.routes.draw do
   # prepends a :organization_id/ to every nested URL.
   # Down here so that it doesn't override any other routes
   resources :organizations, only: [], path: 'o', module: 'organized' do
-    get '/', to: 'bikes#index', as: :root
+    root to: "bikes#index"
     get 'landing', to: 'manage#landing', as: :landing
     resources :bikes, only: %i[index new show] do
       collection do
