@@ -14,14 +14,14 @@
           #{params[:type]}
       .paginate-container.feedbacks-paginate.float-right
         = paginate @feedbacks, views_prefix: 'admin'
-    %table.table.table-striped.table-grid.table-bordered
-      %thead
+    %table.table.table-bordered.table-hover
+      %thead.thead-light
         %tr
-          %th{:scope => "col"} Created
+          %th.w-25{:scope => "col"} Created
           %th{:scope => "col"} User
           %th{:scope => "col"} Type
           %th{:scope => "col"} Name
-          %th{:scope => "col"} Body
+          %th.w-25{:scope => "col"} Body
       %tbody
         - @feedbacks.each do |feedback|
           %tr
