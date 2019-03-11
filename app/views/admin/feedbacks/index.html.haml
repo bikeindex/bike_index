@@ -1,72 +1,128 @@
-%header.with-subtitle
-  %h1
-    #{link_to 'Feedback and messages', admin_feedbacks_path}
-%h4
-  = Feedback.count
-  messages
-  - if @matching_count.present?
-    %strong
-      \- #{@matching_count}
-    #{params[:type]}
+-# %header.with-subtitle
+-#   %h1
+-#     #{link_to 'Feedback and messages', admin_feedbacks_path}
+-# %h4
+-#   = Feedback.count
+-#   messages
+-# - if @matching_count.present?
+-#   %strong
+-#     \- #{@matching_count}
+-#   #{params[:type]}
+-#
+-# .paginate-container.feedbacks-paginate.float-right
+-#   = paginate @feedbacks, views_prefix: 'admin'
+-#
+-# %section.full-screen-table
+-#   %table.table.table-striped.table-bordered
+-#     %thead
+-#       %th
+-#         Created
+-#       %th
+-#         User
+-#       %th
+-#         Type
+-#       %th.medium-screens
+-#         Name
+-#       %th.large-screens
+-#         Body
+-#     %tbody
+-#       - @feedbacks.each do |feedback|
+-#         %tr
+-#           %td
+-#             - if feedback.created_at.today?
+-#               %span.hidden
+-#                 = feedback.created_at.strftime("%-m.%-d.%Y %-H.%M")
+-#               - created_text = "Today at #{feedback.created_at.strftime("%-I %p")}"
+-#             - elsif Date.yesterday().beginning_of_day() <= feedback.created_at
+-#               %span.hidden
+-#                 = feedback.created_at.strftime("%-m.%-d.%Y %-H.%M")
+-#               - created_text = "Yesterday at #{feedback.created_at.strftime("%-I %p")}"
+-#             - else
+-#               %span.hidden
+-#                 = feedback.created_at.strftime("%-m.%-d.%Y %-H.%M")
+-#               - created_text = "#{feedback.created_at.strftime("%-m/%-d/%Y at %-I %p")}"
+-#             = link_to created_text, admin_feedback_path(feedback)
+-#           %td
+-#             - if feedback.user
+-#               = link_to feedback.user.display_name, edit_admin_user_path(feedback.user)
+-#             - else
+-#               = link_to feedback.email, admin_users_path(user_query: feedback.email)
+-#           %td
+-#             - feedback_type = feedback.feedback_type || 'msg'
+-#             = link_to feedback_type, admin_feedbacks_path(type: feedback_type)
+-#           %td.medium-screens
+-#             = feedback.name
+-#           %td.large-screens
+-#             = feedback.body.truncate(100)
+-#
+-# .paginate-container.float-right
+-#   = paginate @feedbacks, views_prefix: 'admin'
+-#
+-# %h3
+-#   Feedbacks Graph
+-#
+-# = javascript_include_tag "//www.google.com/jsapi", "chartkick"
+-# %pre
+-# = line_chart graphs_admin_feedbacks_path(params.merge(start_at: params[:start_at]).except(:controller, :action))
+-# %p{ style: "text-align: center;" }
+-#   - %w(all_time past_year past_month past_week).each do |start_at|
+-#     \-
+-#     = link_to start_at.humanize, admin_feedbacks_path(params.merge(start_at: start_at).except(:controller, :action))
+-#   \-
 
-.paginate-container.feedbacks-paginate.float-right
-  = paginate @feedbacks, views_prefix: 'admin'
 
-%section.full-screen-table
-  %table.table.table-striped.table-bordered
-    %thead
-      %th
-        Created
-      %th
-        User
-      %th
-        Type
-      %th.medium-screens
-        Name
-      %th.large-screens
-        Body
-    %tbody
-      - @feedbacks.each do |feedback|
+.container
+  .row
+    .col-sm
+      %h1
+        #{link_to 'Feedback and messages', admin_feedbacks_path}
+  .row
+    .col-sm
+      %h4
+        = Feedback.count
+        messages
+        - if @matching_count.present?
+          %strong
+            \- #{@matching_count}
+          #{params[:type]}
+      .paginate-container.feedbacks-paginate.float-right
+        = paginate @feedbacks, views_prefix: 'admin'
+    %table.table.table-fit
+      %thead
         %tr
-          %td
-            - if feedback.created_at.today?
-              %span.hidden
-                = feedback.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              - created_text = "Today at #{feedback.created_at.strftime("%-I %p")}"
-            - elsif Date.yesterday().beginning_of_day() <= feedback.created_at
-              %span.hidden
-                = feedback.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              - created_text = "Yesterday at #{feedback.created_at.strftime("%-I %p")}"
-            - else
-              %span.hidden
-                = feedback.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              - created_text = "#{feedback.created_at.strftime("%-m/%-d/%Y at %-I %p")}"
-            = link_to created_text, admin_feedback_path(feedback)
-          %td
-            - if feedback.user
-              = link_to feedback.user.display_name, edit_admin_user_path(feedback.user)
-            - else
-              = link_to feedback.email, admin_users_path(user_query: feedback.email)
-          %td
-            - feedback_type = feedback.feedback_type || 'msg'
-            = link_to feedback_type, admin_feedbacks_path(type: feedback_type)
-          %td.medium-screens
-            = feedback.name
-          %td.large-screens
-            = feedback.body.truncate(100)
-
-.paginate-container.float-right
-  = paginate @feedbacks, views_prefix: 'admin'
-
-
-%h5.mt-5.mb-0.ml-5
-  Feedback and messages by date
-
-= javascript_include_tag "//www.google.com/jsapi", "chartkick"
-%pre
-= line_chart graphs_admin_feedbacks_path(params.merge(start_at: params[:start_at]).except(:controller, :action))
-%p{ style: "text-align: center;" }
-  - %w(all_time past_year past_month past_week).each do |start_at|
-    \-
-    = link_to start_at.humanize, admin_feedbacks_path(params.merge(start_at: start_at).except(:controller, :action))
-  \-
+          %th{:scope => "col"} Created
+          %th{:scope => "col"} User
+          %th{:scope => "col"} Type
+          %th{:scope => "col"} Name
+          %th{:scope => "col"} Body
+      %tbody
+        - @feedbacks.each do |feedback|
+          %tr
+            %td
+              - if feedback.created_at.today?
+                %span.hidden
+                  = feedback.created_at.strftime("%-m.%-d.%Y %-H.%M")
+                - created_text = "Today at #{feedback.created_at.strftime("%-I %p")}"
+              - elsif Date.yesterday().beginning_of_day() <= feedback.created_at
+                %span.hidden
+                  = feedback.created_at.strftime("%-m.%-d.%Y %-H.%M")
+                - created_text = "Yesterday at #{feedback.created_at.strftime("%-I %p")}"
+              - else
+                %span.hidden
+                  = feedback.created_at.strftime("%-m.%-d.%Y %-H.%M")
+                - created_text = "#{feedback.created_at.strftime("%-m/%-d/%Y at %-I %p")}"
+              = link_to created_text, admin_feedback_path(feedback)
+            %td
+              - if feedback.user
+                = link_to feedback.user.display_name, edit_admin_user_path(feedback.user)
+              - else
+                = link_to feedback.email, admin_users_path(user_query: feedback.email)
+            %td
+              - feedback_type = feedback.feedback_type || 'msg'
+              = link_to feedback_type, admin_feedbacks_path(type: feedback_type)
+            %td
+              = feedback.name
+            %td
+              = feedback.body.truncate(100)
+  .paginate-container.feedbacks-paginate.float-right
+    = paginate @feedbacks, views_prefix: 'admin'
