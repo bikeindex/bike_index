@@ -911,7 +911,7 @@ describe BikesController do
 
         it 'updates the bike and components' do
           component1 = FactoryBot.create(:component, bike: bike)
-          another_handlebar_type = "bmx"
+          another_handlebar_type = "drop"
           ctype_id = component1.ctype_id
           bike.reload
           component2_attrs = {

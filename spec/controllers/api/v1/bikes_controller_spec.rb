@@ -150,7 +150,7 @@ describe Api::V1::BikesController do
           frame_size_unit: nil,
           rear_gear_type_slug: rear_gear_type.slug,
           front_gear_type_slug: front_gear_type.slug,
-          handlebar_type_slug: "other",
+          handlebar_type_slug: "forward",
           registered_new: true
         }
         components = [
