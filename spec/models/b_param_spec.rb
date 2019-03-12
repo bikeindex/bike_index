@@ -149,12 +149,11 @@ describe BParam do
 
   describe 'set_handlebar_type_key' do
     it 'sets cycle_type_id to the cycle type from name submitted' do
-      ht = FactoryBot.create(:handlebar_type, name: 'goo goo', slug: 'goopie')
-      bike = { serial_number: 'gobble gobble', handlebar_type_slug: ' gooPie ' }
+      bike = { serial_number: 'gobble gobble', handlebar_type_slug: ' bmx ' }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_handlebar_type_key
       expect(b_param.bike['handlebar_type_slug'].present?).to be_falsey
-      expect(b_param.bike['handlebar_type_id']).to eq(ht.id)
+      expect(b_param.bike['handlebar_type']).to eq(:bmx)
     end
   end
 

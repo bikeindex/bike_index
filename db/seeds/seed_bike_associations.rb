@@ -50,19 +50,6 @@ colors.each do |c|
   color.save
 end
 
-# Seed the handlebar types
-handlebar_types = [
-  { name: 'Flat or riser', slug: 'flat' },
-  { name: 'Drop', slug: 'drop' },
-  { name: 'Forward facing', slug: 'forward' },
-  { name: 'Rear facing', slug: 'rearward' },
-  { name: 'BMX style', slug: 'bmx' },
-  { name: 'Not handlebars', slug: 'other' }]
-handlebar_types.each do |h|
-  handlebar_type = HandlebarType.create(name: h[:name], slug: h[:slug])
-  handlebar_type.save
-end
-
 # Seed the propulsion types
 propulsions = ['Foot pedal', 'Hand pedal', 'Sail', 'Insufflation', 'Electric Assist', 'Electric throttle', 'Gas', 'Other style']
 propulsions.each do |prop|

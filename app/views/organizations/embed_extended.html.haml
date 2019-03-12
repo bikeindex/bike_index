@@ -112,9 +112,9 @@
         = select(:bike, :frame_material, FrameMaterial.select_options , { include_blank: true, prompt: "Choose material"})
   .input-group
     .control-group.special-select-single
-      = f.label :handlebar_type_id, class: "control-label"
+      = f.label :handlebar_type, class: "control-label"
       .controls
-        = collection_select( :bike, :handlebar_type_id, HandlebarType.all, :id, :name, label: "Handlebar Style", required: true, prompt: "Choose handlebar" )
+        = select(:bike, :handlebar_type, HandlebarType.select_options, { include_blank: true, required: true, prompt: "Choose handlebar" })
   .input-group
     .control-group
       = f.label :description, "Other defining features", class: "control-label"

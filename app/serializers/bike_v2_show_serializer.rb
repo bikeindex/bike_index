@@ -63,7 +63,7 @@ class BikeV2ShowSerializer < BikeV2Serializer
   end
 
   def handlebar_type_slug
-    object.handlebar_type && object.handlebar_type.slug
+    object.handlebar_type
   end
 
   def front_gear_type_slug

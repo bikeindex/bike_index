@@ -148,7 +148,7 @@ class BParam < ActiveRecord::Base
     set_cycle_type_key if bike['cycle_type_slug'].present? || bike['cycle_type_name'].present?
     set_rear_gear_type_slug if bike['rear_gear_type_slug'].present?
     set_front_gear_type_slug if bike['front_gear_type_slug'].present?
-    set_handlebar_type_key if bike['handlebar_type_slug'].present?
+    set_handlebar_type_key 
     set_frame_material_key # Even if the value isn't present, since we need to remove the key
   end
 
@@ -163,8 +163,9 @@ class BParam < ActiveRecord::Base
   end
 
   def set_handlebar_type_key
-    ht = HandlebarType.friendly_find(bike['handlebar_type_slug'])
-    params['bike']['handlebar_type_id'] = ht.id if ht.present?
+    key = bike['handlebar_type'] || bike['handlebar_type_slug']
+    ht = HandlebarType.friendly_find(key)
+    params['bike']['handlebar_type'] = ht&.slug
     params['bike'].delete('handlebar_type_slug')
   end
 
