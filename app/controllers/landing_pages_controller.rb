@@ -7,6 +7,8 @@ class LandingPagesController < ApplicationController
     raise ActionController::RoutingError, 'Not found' unless current_organization.present?
   end
 
+  def campus_packages; @page_title||= "Campus packages" end
+
   def for_shops; end
 
   def for_advocacy; end
