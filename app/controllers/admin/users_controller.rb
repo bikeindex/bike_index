@@ -18,7 +18,6 @@ class Admin::UsersController < Admin::BaseController
       @users = users.page(page).per(per_page)
     end
     @user_count = users.count
-    render layout: "new_admin"
   end
 
   def show

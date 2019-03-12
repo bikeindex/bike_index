@@ -21,6 +21,8 @@ class LandingPagesController < ApplicationController
 
   def ambassadors_how_to; @page_title ||= 'Ambassadors' end
 
+  def campus_packages; end
+
   protected
 
   def instantiate_feedback
