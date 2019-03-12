@@ -70,83 +70,107 @@ describe SessionsController do
   end
 
   describe 'create' do
+    let(:user) { FactoryBot.create(:user_confirmed) }
     describe 'when user is found' do
       before do
-        @user = FactoryBot.create(:user, confirmed: true)
-        expect(User).to receive(:fuzzy_email_find).and_return(@user)
+        expect(User).to receive(:fuzzy_email_find).and_return(user)
       end
 
       describe "when authentication works" do
         it "authenticates and removes partner session" do
           session[:partner] = "bikehub"
-          expect(@user).to receive(:authenticate).and_return(true)
+          expect(user).to receive(:authenticate).and_return(true)
           request.env["HTTP_REFERER"] = user_home_url
           post :create, session: { password: "would be correct" }
-          expect(cookies.signed[:auth][1]).to eq(@user.auth_token)
+          expect(cookies.signed[:auth][1]).to eq(user.auth_token)
           expect(response).to redirect_to "https://new.bikehub.com/account"
           expect(session[:partner]).to be_nil
         end
 
-        it 'authenticates and redirects to admin' do
-          @user.update_attribute :is_content_admin, true
-          expect(@user).to receive(:authenticate).and_return(true)
-          request.env['HTTP_REFERER'] = user_home_url
-          post :create, session: { password: 'would be correct' }
-          expect(cookies.signed[:auth][1]).to eq(@user.auth_token)
-          expect(response).to redirect_to admin_news_index_url
+        context "content admin" do
+          let(:user) { FactoryBot.create(:content_admin) }
+          it 'authenticates and redirects to admin' do
+            expect(user).to receive(:authenticate).and_return(true)
+            request.env['HTTP_REFERER'] = user_home_url
+            post :create, session: { password: 'would be correct' }
+            expect(cookies.signed[:auth][1]).to eq(user.auth_token)
+            expect(response).to redirect_to admin_news_index_url
+          end
         end
 
         it "redirects to discourse_authentication url if it's a valid oauth url" do
-          expect(@user).to receive(:authenticate).and_return(true)
+          expect(user).to receive(:authenticate).and_return(true)
           session[:discourse_redirect] = 'sso=foo&sig=bar'
           post :create, session: { hmmm: 'yeah' }
-          expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
+          expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(response).to redirect_to discourse_authentication_url
         end
 
         it "redirects to return_to if it's a valid oauth url" do
-          expect(@user).to receive(:authenticate).and_return(true)
+          expect(user).to receive(:authenticate).and_return(true)
           session[:return_to] = oauth_authorization_url(cool_thing: true)
           post :create, session: { stuff: 'lololol' }
-          expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
+          expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(session[:return_to]).to be_nil
           expect(response).to redirect_to oauth_authorization_url(cool_thing: true)
         end
 
         it 'redirects to facebook.com/bikeindex' do
-          expect(@user).to receive(:authenticate).and_return(true)
+          expect(user).to receive(:authenticate).and_return(true)
           session[:return_to] = 'https://facebook.com/bikeindex'
           post :create, session: { thing: 'asdfasdf' }
-          expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
+          expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(session[:return_to]).to be_nil
           expect(response).to redirect_to 'https://facebook.com/bikeindex'
         end
 
         it 'does not redirect to a random facebook page' do
-          expect(@user).to receive(:authenticate).and_return(true)
+          expect(user).to receive(:authenticate).and_return(true)
           session[:return_to] = 'https://facebook.com/bikeindex-mean-place'
           post :create, session: { thing: 'asdfasdf' }
-          expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
+          expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(session[:return_to]).to be_nil
           expect(response).to redirect_to user_home_url
         end
 
         it "doesn't redirect and clears the session if not a valid oauth url" do
-          expect(@user).to receive(:authenticate).and_return(true)
+          expect(user).to receive(:authenticate).and_return(true)
           session[:return_to] = "http://testhost.com/bad_place?f=#{oauth_authorization_url(cool_thing: true)}"
           post :create, session: { thing: 'asdfasdf' }
-          expect(User.from_auth(cookies.signed[:auth])).to eq(@user)
+          expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(session[:return_to]).to be_nil
           expect(response).to redirect_to user_home_url
         end
       end
 
       it 'does not authenticate the user when user authentication fails' do
-        expect(@user).to receive(:authenticate).and_return(false)
+        expect(user).to receive(:authenticate).and_return(false)
         post :create, session: { password: 'something incorrect' }
         expect(session[:user_id]).to be_nil
         expect(response).to render_template('new')
         expect(response).to render_with_layout('application_revised')
+      end
+      context "user is organization admin" do
+        let(:organization) { FactoryBot.create(:organization, kind: organization_kind) }
+        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let(:organization_kind) { "bike_shop" }
+        it "signs in" do
+          expect(user).to receive(:authenticate).and_return(true)
+          request.env["HTTP_REFERER"] = user_home_url
+          post :create, session: { password: "would be correct" }
+          expect(cookies.signed[:auth][1]).to eq(user.auth_token)
+          expect(session[:render_donation_request]).to be_falsey
+        end
+        context "organization is police" do
+          let(:organization_kind) { "law_enforcement" }
+          it "sets flash of render_donation_request" do
+            expect(user).to receive(:authenticate).and_return(true)
+            request.env["HTTP_REFERER"] = user_home_url
+            post :create, session: { password: "would be correct" }
+            expect(cookies.signed[:auth][1]).to eq(user.auth_token)
+            expect(session[:render_donation_request]).to eq "law_enforcement"
+          end
+        end
       end
     end
 

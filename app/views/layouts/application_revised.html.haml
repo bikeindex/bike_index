@@ -98,4 +98,8 @@
     - else
       = yield
 
+    / grab (and remove) the donation modal if it's there
+    - donation_request = session.delete(:render_donation_request)
+    = render "/shared/donate_modal", locals: { kind: donation_request } if donation_request.present?
+
     = render 'shared/footer_revised'
