@@ -13,7 +13,6 @@ class Bike < ActiveRecord::Base
   belongs_to :rear_gear_type
   belongs_to :front_gear_type
   belongs_to :propulsion_type
-  belongs_to :cycle_type
   belongs_to :paint, counter_cache: true
   belongs_to :updator, class_name: 'User'
   belongs_to :invoice
@@ -64,9 +63,10 @@ class Bike < ActiveRecord::Base
 
   enum frame_material: FrameMaterial::SLUGS
   enum handlebar_type: HandlebarType::SLUGS
+  enum cycle_type: CycleType::SLUGS
 
   default_scope { 
-    includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record, :cycle_type)
+    includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
     .where(example: false, hidden: false)
     .order('listing_order desc') 
   }
@@ -170,7 +170,7 @@ class Bike < ActiveRecord::Base
   def stolen_recovery?; recovered_records.any? end
 
   # Small helper because we call this a lot
-  def type; cycle_type && cycle_type.name.downcase end
+  def type; cycle_type && cycle_type_name.downcase end
 
   # this should be put somewhere else sometime
   def serial; serial_number unless recovered end
@@ -458,5 +458,9 @@ class Bike < ActiveRecord::Base
 
   def handlebar_type_name
     HandlebarType.new(handlebar_type).name
+  end
+
+  def cycle_type_name
+    CycleType.new(cycle_type).name
   end
 end

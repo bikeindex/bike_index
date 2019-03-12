@@ -1,26 +1,3 @@
-# Seed the cycle types
-cycle_types = [
-  { name: 'Bike', slug: 'bike' },
-  { name: 'Tandem', slug: 'tandem' },
-  { name: 'Unicycle', slug: 'unicycle' },
-  { name: 'Tricycle', slug: 'tricycle' },
-  { name: 'Recumbent', slug: 'recumbent' },
-  { name: 'Pedi Cab (rickshaw)', slug: 'pedi-cab' },
-  { name: 'Cargo Bike (front storage)', slug: 'cargo' },
-  { name: 'Cargo Bike (rear storage)', slug: 'cargo-rear' },
-  { name: 'Cargo Tricycle (front storage)', slug: 'cargo-trike' },
-  { name: 'Cargo Tricycle (rear storage)', slug: 'cargo-trike-rear' },
-  { name: 'Bike Trailer', slug: 'trailer' },
-  { name: 'Trail behind (half bike)', slug: 'trail-behind' },
-  { name: 'Tall Bike', slug: 'tall-bike' },
-  { name: 'Penny Farthing', slug: 'penny-farthing' },
-  { name: 'Wheelchair', slug: 'wheelchair' },
-  { name: 'Stroller', slug: 'stroller' }]
-cycle_types.each do |ct|
-  cycle_type = CycleType.create(name: ct[:name], slug: ct[:slug])
-  cycle_type.save
-end
-
 # Seed the lock types
 
 lock_types = ['U-lock', 'Chain with lock', 'Cable', 'Locking skewer', 'Other style']
