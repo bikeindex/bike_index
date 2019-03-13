@@ -23,7 +23,8 @@ class BikeSerializer < ActiveModel::Serializer
     :title,
     :type_of_cycle,
     :frame_material,
-    :handlebar_type
+    :handlebar_type,
+    :cycle_type
 
   has_one :rear_wheel_size,
     :front_wheel_size,
@@ -33,7 +34,7 @@ class BikeSerializer < ActiveModel::Serializer
     :stolen_record
 
   def type_of_cycle
-    object.cycle_type.name
+    object.cycle_type_name
   end
 
   def manufacturer_name
@@ -92,5 +93,9 @@ class BikeSerializer < ActiveModel::Serializer
 
   def handlebar_type
     object.handlebar_type_name
+  end
+
+  def cycle_type
+    object.cycle_type_name
   end
 end

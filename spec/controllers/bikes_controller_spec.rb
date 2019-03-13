@@ -374,7 +374,7 @@ describe BikesController do
     # This is the create action for bikes controller
     let(:manufacturer) { FactoryBot.create(:manufacturer) }
     let(:color) { FactoryBot.create(:color) }
-    let(:cycle_type) { FactoryBot.create(:cycle_type) }
+    let(:cycle_type) { "tandem" }
     let(:handlebar_type) { "bmx" }
     let(:state) { FactoryBot.create(:state) }
     let!(:country) { state.country }
@@ -399,7 +399,7 @@ describe BikesController do
           creation_organization_id: organization.id,
           embeded: true,
           additional_registration: 'Testly secondary',
-          cycle_type_id: cycle_type.id,
+          cycle_type_slug: " Tricycle ",
           manufacturer_id: manufacturer.id,
           manufacturer_other: '',
           primary_frame_color_id: color.id,
@@ -407,7 +407,7 @@ describe BikesController do
           owner_email: 'flow@goodtimes.com'
         }
       end
-      let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded) }
+      let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded, :cycle_type_slug) }
       context 'non-stolen' do
         it 'creates a new ownership and bike from an organization' do
           expect(user).to be_present
@@ -418,6 +418,7 @@ describe BikesController do
           expect(bike.creation_state.origin).to eq "embed"
           expect(bike.creation_state.organization).to eq organization
           expect(bike.creation_state.creator).to eq bike.creator
+          expect(bike.cycle_type).to eq "tricycle"
           testable_bike_params.each do |k, v|
             pp k unless bike.send(k).to_s == v.to_s
             expect(bike.send(k).to_s).to eq v.to_s
@@ -498,7 +499,7 @@ describe BikesController do
           creation_organization_id: organization.id,
           embeded: true,
           embeded_extended: true,
-          cycle_type_id: cycle_type.id,
+          cycle_type: 'pedi-cab',
           manufacturer_id: manufacturer.slug,
           primary_frame_color_id: color.id,
           handlebar_type: handlebar_type,
@@ -521,6 +522,7 @@ describe BikesController do
             expect(bike.creation_state.origin).to eq 'embed_extended'
             expect(bike.creation_state.organization).to eq organization
             expect(bike.creation_state.creator).to eq bike.creator
+            expect(bike.cycle_type_name).to eq 'Pedi Cab (rickshaw)'
             expect(bike.manufacturer).to eq manufacturer
           end
         end
@@ -576,7 +578,7 @@ describe BikesController do
           {
             serial_number: '1234567890',
             b_param_id_token: b_param.id_token,
-            cycle_type_id: cycle_type.id,
+            cycle_type: 'stroller',
             manufacturer_id: manufacturer.name,
             rear_tire_narrow: 'true',
             rear_wheel_size_id: FactoryBot.create(:wheel_size).id,
@@ -627,7 +629,7 @@ describe BikesController do
         let(:bike_params) do
           {
             b_param_id_token: "",
-            cycle_type_id: CycleType.bike.id.to_s,
+            cycle_type: "tall-bike",
             serial_number: "example serial",
             manufacturer_other: "",
             year: "2016",
@@ -692,7 +694,7 @@ describe BikesController do
         context 'no bike' do
           let(:bike_params) do
             {
-              cycle_type_id: CycleType.bike.id.to_s,
+              cycle_type: 'cargo-rear',
               serial_number: 'example serial',
               manufacturer_other: '',
               year: '2016',

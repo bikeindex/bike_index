@@ -1,7 +1,7 @@
 class AddCycleTypeToBikes < ActiveRecord::Migration
 
   def up
-    add_column :bikes, :cycle_type, :integer
+    add_column :bikes, :cycle_type, :integer, default: 0
 
     
     Deprecated::CycleType.find_each do |ct|

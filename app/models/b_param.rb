@@ -165,7 +165,6 @@ class BParam < ActiveRecord::Base
       params['bike']['cycle_type'] = ct&.slug
       params['bike'].delete('cycle_type_slug')
       params['bike'].delete('cycle_type_name')
-
     end
   end
 

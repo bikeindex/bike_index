@@ -249,7 +249,7 @@ CREATE TABLE public.bikes (
     creation_state_id integer,
     frame_material integer,
     handlebar_type integer,
-    cycle_type integer
+    cycle_type integer DEFAULT 0
 );
 
 

@@ -46,6 +46,7 @@ class Bike < ActiveRecord::Base
 
   validates_presence_of :serial_number
   validates_presence_of :propulsion_type_id
+  validates_presence_of :cycle_type
   validates_presence_of :creator
   # validates_presence_of :creation_state_id
   validates_presence_of :manufacturer_id

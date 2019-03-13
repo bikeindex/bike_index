@@ -15,7 +15,7 @@ module Api
         FrameMaterial::NAMES.values.each  { |name| tags << name }
         WheelSize.unscoped.commonness.each { |i| tags << "#{i.name} wheel" }
         Manufacturer.all.each { |i| tags << i.name }
-        CycleType.all.each { |i| tags << i.name }
+        CycleType::NAMES.values.each { |name| tags << name }
         respond_with tags, root: 'tags'
       end
 

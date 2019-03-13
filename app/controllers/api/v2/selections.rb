@@ -17,7 +17,7 @@ module API
 
         desc "Types of cycles"
         get '/cycle_types', root: 'cycle_types' do
-          CycleType.all
+          CycleType.legacy_selections
         end
 
         desc "Frame materials"

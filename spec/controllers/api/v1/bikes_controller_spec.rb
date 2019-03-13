@@ -61,6 +61,7 @@ describe Api::V1::BikesController do
             serial_number: 'SSOMESERIAL',
             manufacturer: 'Specialized',
             frame_model: 'Diverge Elite DSW (58)',
+            cycle_type: 'trail-behind',
             color: 'Black/Red',
             send_email: true,
             frame_size: '58',
@@ -145,6 +146,7 @@ describe Api::V1::BikesController do
           year: '1969',
           owner_email: 'fun_times@examples.com',
           frame_model: "Tricruiser Tricycle",
+          cycle_type: 'trail-behind',
           send_email: true,
           frame_size: '56cm',
           frame_size_unit: nil,
@@ -223,7 +225,8 @@ describe Api::V1::BikesController do
           color: FactoryBot.create(:color).name,
           example: true,
           year: '1969',
-          owner_email: 'fun_times@examples.com'
+          owner_email: 'fun_times@examples.com',
+          cycle_type: 'wheelchair'
         }
         photos = [
           'http://i.imgur.com/lybYl1l.jpg',
@@ -298,7 +301,7 @@ describe Api::V1::BikesController do
         org.save
         bike_attrs = {
           serial_number: '69 example bikez',
-          cycle_type_id: FactoryBot.create(:cycle_type, slug: 'gluey').id,
+          cycle_type_slug: 'unicycle',
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: 'true',
           rear_wheel_size: 559,
@@ -324,6 +327,8 @@ describe Api::V1::BikesController do
         expect(bike.frame_material_name).to eq('Steel')
         expect(bike.frame_material).to eq('steel')
         expect(bike.handlebar_type).to eq('other')
+        expect(bike.cycle_type).to eq('unicycle')
+        expect(bike.cycle_type_name).to eq('Unicycle')
       end
 
       it 'creates a record even if the post is a string' do
@@ -335,7 +340,8 @@ describe Api::V1::BikesController do
           rear_tire_narrow: 'true',
           rear_wheel_bsd: '559',
           color: FactoryBot.create(:color).name,
-          owner_email: 'jsoned@examples.com'
+          owner_email: 'jsoned@examples.com',
+          cycle_type: 'tandem'
         }
         options = { bike: bike_attrs.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
         expect do
@@ -357,7 +363,8 @@ describe Api::V1::BikesController do
           rear_wheel_bsd: '559',
           color: FactoryBot.create(:color).name,
           owner_email: 'jsoned@examples.com',
-          send_email: 'false'
+          send_email: 'false',
+          cycle_type_name: ' trailer '
         }
         options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
         expect do
