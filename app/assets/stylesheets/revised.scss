@@ -278,3 +278,76 @@ body {
 .pull-left {
   float: right;
 }
+
+
+.campus-packages-page {
+  font-family: Open Sans !important;
+  .header {
+    position: relative;
+  }
+  img {
+    position: absolute;
+    left: 0;
+    top: 0;
+    text-align: center;
+  }
+  .banner {
+    z-index: 100;
+    position: absolute;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    left: 150px;
+    top: 350px;
+    color: red;
+    text-align: center;
+  }
+  .banner p, h1 {
+    color: white;
+  }
+
+  .header-package-box {
+    margin-left: 6px;
+    margin-right: 6px;
+    display: absolute;
+    display: inline-block;
+    border-style: solid;
+    width: 150px;
+    height: 240px;
+    text-align: center;
+    background: white;
+    color:black;
+    p.price {
+      color: blue;
+      font-size: 30px;
+      font-style: bold;
+      margin-bottom: 0px;
+    }
+    p.who-is-this-for{
+      font-style:italic;
+      margin-bottom: 0px;
+      color:#9B9B9B;
+    }
+    h4{
+      background: black;
+      color: white;
+      margin-bottom: 0px;
+      font-size: 13px;
+      height: 40px;
+      font-style: bold;
+    }
+    p.annually{
+      margin-bottom: 0px;
+      font-style: italic;
+      color:black;
+      font-size:12px;
+    }
+    .try-for-free {
+      width:120px;
+      font-size: 13px;
+      font-style: bold;
+      text-transform: none;
+    }
+  }
+}
+
