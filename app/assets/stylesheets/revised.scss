@@ -280,13 +280,31 @@ body {
 }
 
 
-.campus-packages-page {
-  font-family: Open Sans !important;
+
+
+
+
+
+
+
+
+/*.campus-packages-page {
+  .top-border{
+    border-top: solid;
+    border-width: 1px;
+    border-color: #c0c1c4;
+  }
+  .try-for-free {
+      border-radius: 4px;
+      width:120px;
+      font-size: 13px;
+      font-style: bold;
+      text-transform: none;
+  }
   .header {
     position: relative;
   }
   img {
-    position: absolute;
     left: 0;
     top: 0;
     text-align: center;
@@ -342,12 +360,40 @@ body {
       color:black;
       font-size:12px;
     }
-    .try-for-free {
-      width:120px;
-      font-size: 13px;
-      font-style: bold;
-      text-transform: none;
+  }
+  table {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  table.packages-table {
+    th.column-info {
+      border-style: solid;
+      border-width: 1px;
+      text-align: center;
+      border-color: #c0c1c4;
+    }
+    td {
+      border-style: solid;
+      border-width: 1px;
+      border-color: #c0c1c4;
+    }
+    th.blank {
+      background: white;
+    }
+    th.column-info {
+      border-top: solid;
+      border-color: #c0c1c4;
+      border-width: 1px;
+      p.price {
+        color: blue;
+        font-size: 30px;
+        font-style: bold;
+        margin-bottom: 0px;
+      }
+      p.package{
+        margin-bottom:0px;
+      }
     }
   }
-}
-
+}*/
