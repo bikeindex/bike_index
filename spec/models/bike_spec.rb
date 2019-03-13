@@ -966,4 +966,12 @@ describe Bike do
       expect(bike.handlebar_type_name).to eq(normalized_name)
     end
   end
+
+  describe 'cycle_type_name' do
+    let(:bike) { FactoryBot.create(:bike, cycle_type: "cargo") }
+    it "returns the normalized name" do
+      normalized_name = CycleType.new(bike.cycle_type).name
+      expect(bike.cycle_type_name).to eq(normalized_name)
+    end
+  end
 end

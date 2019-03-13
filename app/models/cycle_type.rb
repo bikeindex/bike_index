@@ -1,24 +1,24 @@
 class CycleType
   include Enumable
 
-  SLUGS = %i[
-    bike
-    tandem
-    unicycle
-    tricycle
-    stroller
-    recumbent
-    trailer
-    wheelchair
-    cargo
-    tall-bike
-    penny-farthing
-    cargo-rear
-    cargo-trike
-    cargo-trike-rear
-    trail-behind
-    pedi-cab
-  ].freeze
+  SLUGS = {
+    bike: 0,
+    tandem: 1,
+    unicycle: 2,
+    tricycle: 3,
+    stroller: 4,
+    recumbent: 5,
+    trailer: 6,
+    wheelchair: 7,
+    cargo: 8,
+    'tall-bike': 9,
+    'penny-farthing': 10,
+    'cargo-rear': 11,
+    'cargo-trike': 12,
+    'cargo-trike-rear': 13,
+    'trail-behind': 14,
+    'pedi-cab': 15
+  }.freeze
 
   NAMES = {
     bike: "Bike",

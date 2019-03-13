@@ -145,21 +145,11 @@ class BParam < ActiveRecord::Base
     set_wheel_size_key
     set_manufacturer_key
     set_color_key unless bike['primary_frame_color_id'].present?
-    set_cycle_type_key if bike['cycle_type_slug'].present? || bike['cycle_type_name'].present?
+    set_cycle_type_key 
     set_rear_gear_type_slug if bike['rear_gear_type_slug'].present?
     set_front_gear_type_slug if bike['front_gear_type_slug'].present?
     set_handlebar_type_key 
     set_frame_material_key # Even if the value isn't present, since we need to remove the key
-  end
-
-  def set_cycle_type_key
-    if bike['cycle_type_name'].present?
-      ct = CycleType.friendly_find(bike['cycle_type_name'])
-    else
-      ct = CycleType.friendly_find(bike['cycle_type_slug'])
-    end
-    params['bike']['cycle_type_id'] = ct.id if ct.present?
-    params['bike'].delete('cycle_type_slug') || params['bike'].delete('cycle_type_name')
   end
 
   def set_handlebar_type_key
@@ -167,6 +157,16 @@ class BParam < ActiveRecord::Base
     ht = HandlebarType.friendly_find(key)
     params['bike']['handlebar_type'] = ht&.slug
     params['bike'].delete('handlebar_type_slug')
+  end
+
+  def set_cycle_type_key
+    if key = (bike['cycle_type'] || bike['cycle_type_slug'] || bike['cycle_type_name']).presence
+      ct = CycleType.friendly_find(key)
+      params['bike']['cycle_type'] = ct&.slug
+      params['bike'].delete('cycle_type_slug')
+      params['bike'].delete('cycle_type_name')
+
+    end
   end
 
   def set_wheel_size_key
@@ -278,12 +278,7 @@ class BParam < ActiveRecord::Base
   def safe_bike_attrs(param_overrides)
     bike.merge(param_overrides).select { |k, v| self.class.assignable_attrs.include?(k.to_s) }
         .merge('b_param_id' => id,
-               'creator_id' => creator_id,
-               'cycle_type_id' => cycle_type_id)
-  end
-
-  def cycle_type_id
-    (bike['cycle_type_id'].present? && bike['cycle_type_id']) || CycleType.bike.id
+               'creator_id' => creator_id)
   end
 
   def revised_new?

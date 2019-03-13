@@ -46,7 +46,6 @@ class Bike < ActiveRecord::Base
 
   validates_presence_of :serial_number
   validates_presence_of :propulsion_type_id
-  validates_presence_of :cycle_type_id
   validates_presence_of :creator
   # validates_presence_of :creation_state_id
   validates_presence_of :manufacturer_id
@@ -100,7 +99,7 @@ class Bike < ActiveRecord::Base
   class << self
     def old_attr_accessible
       # made_without_serial - GUARANTEE there was no serial
-      (%w(cycle_type_id manufacturer_id manufacturer_other serial_number 
+      (%w(manufacturer_id manufacturer_other serial_number 
         serial_normalized has_no_serial made_without_serial additional_registration
         creation_organization_id manufacturer year thumb_path name stolen
         current_stolen_record_id recovered frame_material frame_model number_of_seats

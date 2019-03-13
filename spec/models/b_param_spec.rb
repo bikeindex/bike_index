@@ -137,18 +137,17 @@ describe BParam do
   end
 
   describe 'set_cycle_type_key' do
-    it 'sets cycle_type_id to the cycle type from name submitted' do
-      ct = FactoryBot.create(:cycle_type, name: 'Boo Boo', slug: 'boop')
-      bike = { serial_number: 'gobble gobble', cycle_type_slug: ' booP ' }
+    it 'sets cycle_type to the cycle type from name submitted' do
+      bike = { serial_number: 'gobble gobble', cycle_type_slug: ' strolLeR ' }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_cycle_type_key
-      expect(b_param.bike['cycle_type_id']).to eq(ct.id)
+      expect(b_param.bike['cycle_type']).to eq(:stroller)
       expect(b_param.bike['cycle_type_slug'].present?).to be_falsey
     end
   end
 
   describe 'set_handlebar_type_key' do
-    it 'sets cycle_type_id to the cycle type from name submitted' do
+    it 'sets handlebar_type to the handlebar type from name submitted' do
       bike = { serial_number: 'gobble gobble', handlebar_type_slug: ' bmx ' }
       b_param = BParam.new(params: { bike: bike })
       b_param.set_handlebar_type_key
@@ -431,6 +430,7 @@ describe BParam do
           owner_email: 'something@stuff.com',
           stolen: false,
           creator_id: 1,
+          cycle_type_slug: 'cargo',
           b_param_id: 79999,
           creation_organization_id: 888,
           something_else_cool: 'party'
@@ -444,7 +444,6 @@ describe BParam do
           stolen: true,
           creator_id: 777,
           b_param_id: 122,
-          cycle_type_id: CycleType.bike.id,
           creation_organization_id: 888
         }.with_indifferent_access
         expect(b_param.safe_bike_attrs(stolen: true).with_indifferent_access).to eq(target)
