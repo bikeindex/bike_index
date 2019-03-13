@@ -6,7 +6,7 @@ describe CycleType do
 
     it "returns the slug's normalized name" do
       ht = CycleType.new(slug)
-      expect(ht.name).to eq("Trailer")
+      expect(ht.name).to eq("Bike Trailer")
     end
   end
 
@@ -14,7 +14,7 @@ describe CycleType do
     context "slug" do
       let(:name) { "Trailer " }
       it "tries to find the slug, given a name" do
-        finder = HandlebarType.friendly_find(name)
+        finder = CycleType.friendly_find(name)
         expect(finder.slug).to eq :trailer
       end
     end

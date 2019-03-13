@@ -29,13 +29,12 @@ describe BikeCreatorBuilder do
 
   describe 'add_required_attributes' do
     it 'calls the methods it needs to call' do
-      cycle_type = FactoryBot.create(:cycle_type, name: 'Bike', slug: 'bike')
       propulsion_type = FactoryBot.create(:propulsion_type, name: 'Foot pedal')
       bike = Bike.new
       b_param = BParam.new
       creator = BikeCreatorBuilder.new(b_param)
       creator.add_required_attributes(bike)
-      expect(bike.cycle_type).to eq(cycle_type)
+      expect(bike.cycle_type).to eq("bike")
       expect(bike.propulsion_type).to eq(propulsion_type)
     end
   end
