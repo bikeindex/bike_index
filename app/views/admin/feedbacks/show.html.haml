@@ -11,6 +11,7 @@
         User:
         = @feedback.name
     %p.card-body
+
       = @feedback.body.truncate(100)
 
   %table.table.table-striped.table-bordered
@@ -18,7 +19,7 @@
       %tr
         %td
           Created:
-          %a.convertTime{ href: admin_feedback_url(@feedback) }
+          %a.convertTime.preciseTime{ href: admin_feedback_url(@feedback) }
             = l @feedback.created_at, format: :convert_time
         %td
           By:
