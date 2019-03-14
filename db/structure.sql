@@ -28,19 +28,19 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
---  
--- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -    
---  
 
- CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;   
+--
+-- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
 
 
- -- 
--- Name: EXTENSION fuzzystrmatch; Type: COMMENT; Schema: -; Owner: -    
---  
+--
+-- Name: EXTENSION fuzzystrmatch; Type: COMMENT; Schema: -; Owner: -
+--
 
- COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance between strings';   
-
+COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance between strings';
 
 
 SET default_tablespace = '';
