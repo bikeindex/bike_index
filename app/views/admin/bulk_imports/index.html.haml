@@ -9,8 +9,9 @@
   - if current_organization.present?
     %h4.mt-4
       #{link_to current_organization.name, admin_organization_path(current_organization)} bulk imports
-      %small.less-strong
-        view #{link_to "organizations view", organization_bulk_imports_path(organization_id: current_organization.to_param)}
+      %br
+      %small
+        = link_to "view orgs view", organization_bulk_imports_path(organization_id: current_organization.to_param), class: "less-strong"
 
   .paginate-container
     = paginate @bulk_imports
@@ -36,6 +37,9 @@
             %td
               %a.convertTime{ href: admin_bulk_import_url(bulk_import) }
                 = l bulk_import.created_at, format: :convert_time
+              - if bulk_import.organization_id.present?
+                %small.less-strong
+                  = link_to "org view", organization_bulk_import_path(bulk_import, organization_id: bulk_import.organization.to_param), class: "em less-strong"
             %td
               - bulk_import_progress_class = bulk_import.progress == "finished" ? "text-success" : ""
               %span{ class: bulk_import_progress_class }
@@ -56,7 +60,7 @@
                     Missing Ascend Organization!
             %td
               - if bulk_import.organization.present?
-                = link_to bulk_import.organization.name, admin_bulk_imports_url(organization_id: bulk_import.to_param)
+                = link_to bulk_import.organization.name, admin_bulk_imports_url(organization_id: bulk_import.organization.to_param)
               - else
                 = link_to "none", admin_bulk_imports_url(organization_id: "none"), style: "color: #ccc"
               %br
