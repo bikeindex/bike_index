@@ -26,7 +26,7 @@
         - @feedbacks.each do |feedback|
           %tr
             %td
-              %a.convertTime.preciseTime{ href: admin_feedback_url(feedback) }
+              %a.convertTime{ href: admin_feedback_url(feedback) }
                 = l feedback.created_at, format: :convert_time
             %td
               - if feedback.user
