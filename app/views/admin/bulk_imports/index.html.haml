@@ -3,8 +3,14 @@
     %h1
       Bulk Imports
     = link_to "New bulk import", new_admin_bulk_import_url, class: "button-green sharing-links"
-  %p 
-    #{pluralize(BulkImport.count, "bulk imports")}
+  %p
+    #{pluralize(@bulk_imports.total_count, "matching bulk import")}
+
+  - if current_organization.present?
+    %h4.mt-4
+      #{link_to current_organization.name, admin_organization_path(current_organization)} bulk imports
+      %small.less-strong
+        view #{link_to "organizations view", organization_bulk_imports_path(organization_id: current_organization.to_param)}
 
   .paginate-container
     = paginate @bulk_imports
@@ -50,7 +56,7 @@
                     Missing Ascend Organization!
             %td
               - if bulk_import.organization.present?
-                = link_to bulk_import.organization.name, admin_bulk_imports_url(organization_id: bulk_import.organization_id)
+                = link_to bulk_import.organization.name, admin_bulk_imports_url(organization_id: bulk_import.to_param)
               - else
                 = link_to "none", admin_bulk_imports_url(organization_id: "none"), style: "color: #ccc"
               %br
