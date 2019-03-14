@@ -14,6 +14,8 @@ class Admin::BulkImportsController < Admin::BaseController
                                 .page(page).per(per_page)
   end
 
+  def show; end
+
   def new
     organization_id = Organization.friendly_find(params[:organization_id])&.id
     @bulk_import = BulkImport.new(organization_id: organization_id, no_notify: params[:no_notify])
