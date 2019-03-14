@@ -85,7 +85,6 @@ import "./binx_org_export.js";
 // I'm absolutely sure there is a best practice that I'm ignoring, but just doing it for now.
 $(document).ready(function() {
   binxApp.localizeTimes()
-
   // Load the page specific things
   let body_id = document.getElementsByTagName("body")[0].id;
   switch (body_id) {
