@@ -42,7 +42,7 @@ module API
 
         desc "Propulsion types"
         get '/propulsion_types', root: 'propulsion_types' do
-          PropulsionType.all
+          PropulsionType.legacy_selections
         end
         
         desc "Wheel sizes (paginated)", {

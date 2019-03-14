@@ -27,14 +27,6 @@ colors.each do |c|
   color.save
 end
 
-# Seed the propulsion types
-propulsions = ['Foot pedal', 'Hand pedal', 'Sail', 'Insufflation', 'Electric Assist', 'Electric throttle', 'Gas', 'Other style']
-propulsions.each do |prop|
-  propulsion_type = PropulsionType.create(name: prop)
-  propulsion_type.slug = 'other' if prop == 'Other style'
-  propulsion_type.save
-end
-
 # Seed the gear types
 
 f_gear_types = [

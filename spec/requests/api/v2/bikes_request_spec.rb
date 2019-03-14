@@ -43,7 +43,6 @@ describe 'Bikes API V2' do
     let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes") }
     before :each do
       FactoryBot.create(:wheel_size, iso_bsd: 559)
-      PropulsionType.foot_pedal
     end
     include_context :geocoder_default_location
 
@@ -213,7 +212,6 @@ describe 'Bikes API V2' do
     let!(:tokenized_url) { "/api/v2/bikes?access_token=#{v2_access_token.token}" }
     before :each do
       FactoryBot.create(:wheel_size, iso_bsd: 559)
-      FactoryBot.create(:propulsion_type, name: 'Foot pedal')
     end
 
     it 'also sets front wheel bsd' do

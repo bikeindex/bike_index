@@ -81,9 +81,7 @@ describe OrganizationsController do
 
   describe 'legacy embeds' do
     let(:organization) { FactoryBot.create(:organization_with_auto_user) }
-    before do
-      FactoryBot.create(:propulsion_type, name: 'Foot pedal')
-    end
+    
     context 'non-stolen' do
       it 'renders embed without xframe block' do
         get :embed, id: organization.slug
