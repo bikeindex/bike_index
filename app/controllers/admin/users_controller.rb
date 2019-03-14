@@ -1,3 +1,5 @@
+
+  
 class Admin::UsersController < Admin::BaseController
   before_filter :find_user, only: [:edit, :update, :destroy]
 
@@ -12,13 +14,12 @@ class Admin::UsersController < Admin::BaseController
         users = User.where(superuser: true)
       elsif params[:content_admins]
         users = User.where(is_content_admin: true)
-      else
+      else 
         users = User.order("created_at desc")
       end
       @users = users.page(page).per(per_page)
     end
     @user_count = users.count
-    render layout: "new_admin"
   end
 
   def show
@@ -55,7 +56,7 @@ class Admin::UsersController < Admin::BaseController
     @user.destroy
     redirect_to admin_users_url, notice: 'User Deleted.'
   end
-
+  
 
   protected
 
