@@ -5,7 +5,7 @@ module Api
       after_filter :cors_set_access_control_headers
 
       def index
-        respond_with HandlebarType.all
+        respond_with HandlebarType::NAMES
       end
     end
   end

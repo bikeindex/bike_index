@@ -19,7 +19,7 @@ class Admin::DashboardController < Admin::BaseController
     @component_mnfgs = Component.where(manufacturer_id: mnfg_other_id)
     @bike_mnfgs = Bike.where(manufacturer_id: mnfg_other_id)
     @component_types = Component.where(ctype_id: Ctype.other.id)
-    @handlebar_types = Bike.where(handlebar_type_id: HandlebarType.other.id)
+    @handlebar_types = Bike.where(handlebar_type: Bike.handlebar_types[:other])
     @paint = Paint.where('color_id IS NULL')
   end
 

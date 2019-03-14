@@ -375,7 +375,7 @@ describe BikesController do
     let(:manufacturer) { FactoryBot.create(:manufacturer) }
     let(:color) { FactoryBot.create(:color) }
     let(:cycle_type) { FactoryBot.create(:cycle_type) }
-    let(:handlebar_type) { FactoryBot.create(:handlebar_type) }
+    let(:handlebar_type) { "bmx" }
     let(:state) { FactoryBot.create(:state) }
     let!(:country) { state.country }
     let(:chicago_stolen_params) do
@@ -403,7 +403,7 @@ describe BikesController do
           manufacturer_id: manufacturer.id,
           manufacturer_other: '',
           primary_frame_color_id: color.id,
-          handlebar_type_id: handlebar_type.id,
+          handlebar_type: handlebar_type,
           owner_email: 'flow@goodtimes.com'
         }
       end
@@ -501,7 +501,7 @@ describe BikesController do
           cycle_type_id: cycle_type.id,
           manufacturer_id: manufacturer.slug,
           primary_frame_color_id: color.id,
-          handlebar_type_id: handlebar_type.id,
+          handlebar_type: handlebar_type,
           owner_email: 'Flow@goodtimes.com'
         }
       end
@@ -581,7 +581,7 @@ describe BikesController do
             rear_tire_narrow: 'true',
             rear_wheel_size_id: FactoryBot.create(:wheel_size).id,
             primary_frame_color_id: color.id,
-            handlebar_type_id: handlebar_type.id,
+            handlebar_type: handlebar_type,
             owner_email: user.email
           }
         end
@@ -911,7 +911,7 @@ describe BikesController do
 
         it 'updates the bike and components' do
           component1 = FactoryBot.create(:component, bike: bike)
-          handlebar_type_id = FactoryBot.create(:handlebar_type).id
+          another_handlebar_type = "drop"
           ctype_id = component1.ctype_id
           bike.reload
           component2_attrs = {
@@ -926,7 +926,7 @@ describe BikesController do
           }
           bike_attrs = {
             description: '69',
-            handlebar_type_id: handlebar_type_id,
+            handlebar_type: another_handlebar_type,
             components_attributes: {
               '0' => {
                 '_destroy' => '1',
@@ -939,7 +939,7 @@ describe BikesController do
           bike.reload
           expect(bike.description).to eq('69')
           expect(response).to redirect_to edit_bike_url(bike)
-          expect(bike.handlebar_type_id).to eq handlebar_type_id
+          expect(bike.handlebar_type).to eq another_handlebar_type
           expect(assigns(:bike)).to be_decorated
           expect(bike.hidden).to be_falsey
 
@@ -1079,7 +1079,7 @@ describe BikesController do
           primary_frame_color_id: color.id,
           secondary_frame_color_id: color.id,
           tertiary_frame_color_id: Color.black.id,
-          handlebar_type_id: HandlebarType.flat.id,
+          handlebar_type: "other",
           coaster_brake: true,
           belt_drive: true,
           front_gear_type_id: FactoryBot.create(:front_gear_type).id,

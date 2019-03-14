@@ -37,7 +37,7 @@ module API
 
         desc "Handlebars"
         get '/handlebar_types', root: 'handlebar_types' do
-          HandlebarType.all
+          HandlebarType.legacy_selections
         end
 
         desc "Propulsion types"

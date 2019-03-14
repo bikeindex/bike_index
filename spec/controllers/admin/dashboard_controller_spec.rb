@@ -53,7 +53,6 @@ describe Admin::DashboardController do
       it 'renders' do
         FactoryBot.create(:manufacturer, name: 'other')
         FactoryBot.create(:ctype, name: 'other')
-        FactoryBot.create(:handlebar_type, slug: 'other')
         user = FactoryBot.create(:admin)
         set_current_user(user)
         BParam.create(creator_id: user.id)

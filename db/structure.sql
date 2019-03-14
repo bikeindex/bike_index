@@ -261,7 +261,8 @@ CREATE TABLE public.bikes (
     stolen_lat double precision,
     stolen_long double precision,
     creation_state_id integer,
-    frame_material integer
+    frame_material integer,
+    handlebar_type integer
 );
 
 
@@ -4112,6 +4113,8 @@ INSERT INTO schema_migrations (version) VALUES ('20190214192448');
 INSERT INTO schema_migrations (version) VALUES ('20190301020053');
 
 INSERT INTO schema_migrations (version) VALUES ('20190306223523');
+
+INSERT INTO schema_migrations (version) VALUES ('20190306232544');
 
 INSERT INTO schema_migrations (version) VALUES ('20190307232718');
 

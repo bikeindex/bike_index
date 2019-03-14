@@ -89,6 +89,8 @@ class Organization < ActiveRecord::Base
     slug
   end
 
+  def ascend_imports?; ascend_name.present? end
+
   def mail_snippet_body(type)
     return nil unless MailSnippet.organization_snippet_types.include?(type)
     snippet = mail_snippets.enabled.where(name: type).first
@@ -181,7 +183,7 @@ class Organization < ActiveRecord::Base
   end
 
   # Enable this if they have paid for showing it, or if they use ascend
-  def show_bulk_import?; paid_for?("show_bulk_import") || ascend_name.present? end
+  def show_bulk_import?; paid_for?("show_bulk_import") || ascend_imports? end
 
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates

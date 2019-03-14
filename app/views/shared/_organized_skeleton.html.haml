@@ -57,7 +57,8 @@
             - if current_organization.show_bulk_import?
               %ul.organized-submenu
                 %li
-                  = active_link "Bulk Imports", organization_bulk_imports_path(organization_id: current_organization.to_param), class_name: "nav-link", match_controller: true
+                  - bulk_link_name = current_organization.ascend_imports? ? "Ascend Imports" : "Bulk Imports"
+                  = active_link bulk_link_name, organization_bulk_imports_path(organization_id: current_organization.to_param), class_name: "nav-link", match_controller: true
 
 .organized-wrap
   .container

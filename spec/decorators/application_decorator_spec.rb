@@ -25,28 +25,6 @@ describe ApplicationDecorator do
     end
   end
 
-  describe 'dl_from_attribute_othered' do
-    it 'returns the attribute dl' do
-      bike = Bike.new
-      handlebar_type = HandlebarType.new
-      allow(bike).to receive(:handlebar_type).and_return(handlebar_type)
-      allow(handlebar_type).to receive(:name).and_return('Cookie')
-      decorator = ApplicationDecorator.new(bike)
-      expect(decorator).to receive(:dl_list_item).with('Cookie', 'Handlebar Type')
-      decorator.dl_from_attribute_othered('handlebar_type')
-    end
-    it 'returns the other attribute dl' do
-      bike = Bike.new
-      handlebar_type = HandlebarType.new
-      allow(bike).to receive(:handlebar_type).and_return(handlebar_type)
-      allow(bike).to receive(:handlebar_type_other).and_return('Another type')
-      allow(handlebar_type).to receive(:name).and_return('Other style')
-      decorator = ApplicationDecorator.new(bike)
-      expect(decorator).to receive(:dl_list_item).with('Another type', 'Handlebar Type')
-      decorator.dl_from_attribute_othered('handlebar_type')
-    end
-  end
-
   describe 'if_present' do
     it "returns the attribute if it's present" do
       lock = Lock.new
@@ -95,10 +73,9 @@ describe ApplicationDecorator do
 
   describe 'ass_name' do
     it 'grabs the association name' do
-      bike = Bike.new
-      handlebar_type = FactoryBot.create(:handlebar_type, name: 'cool bars')
-      allow(bike).to receive(:handlebar_type).and_return(handlebar_type)
-      expect(ApplicationDecorator.new(bike).ass_name('handlebar_type')).to eq('cool bars')
+      wheel_size = FactoryBot.create(:wheel_size, name: 'foobar', iso_bsd: 559)
+      bike = Bike.new(front_wheel_size: wheel_size)
+      expect(ApplicationDecorator.new(bike).ass_name('front_wheel_size')).to eq('foobar')
     end
   end
 
