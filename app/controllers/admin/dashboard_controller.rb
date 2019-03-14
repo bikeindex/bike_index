@@ -1,6 +1,6 @@
 class Admin::DashboardController < Admin::BaseController
   def index
-    @bikes = Bike.unscoped.includes(:creation_organization, :cycle_type, :manufacturer, :paint).order('created_at desc').limit(10)
+    @bikes = Bike.unscoped.includes(:creation_organization, :manufacturer, :paint).order('created_at desc').limit(10)
     @users = User.includes(:memberships => [:organization]).limit(5).order("created_at desc")
     @flavors = FlavorText.all
     @flavor = FlavorText.new

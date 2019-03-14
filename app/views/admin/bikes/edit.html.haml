@@ -74,7 +74,7 @@
                     %li
                       = msg
           .control-group
-            = f.label :cycle_type_id, "Cycle type", class: "control-label"
+            = f.label :cycle_type, "Cycle type", class: "control-label"
             .controls
               = select(:bike, :cycle_type, CycleType.select_options, { required: true })
 

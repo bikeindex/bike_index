@@ -103,7 +103,7 @@ class Bike < ActiveRecord::Base
       (%w(manufacturer_id manufacturer_other serial_number 
         serial_normalized has_no_serial made_without_serial additional_registration
         creation_organization_id manufacturer year thumb_path name stolen
-        current_stolen_record_id recovered frame_material frame_model number_of_seats
+        current_stolen_record_id recovered frame_material cycle_type frame_model number_of_seats
         handlebar_type frame_size frame_size_number frame_size_unit
         rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow 
         primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
