@@ -56,7 +56,6 @@ class Admin::UsersController < Admin::BaseController
     redirect_to admin_users_url, notice: 'User Deleted.'
   end
 
-
   protected
 
   def find_user
