@@ -25,7 +25,7 @@ class BikeV2ShowSerializer < BikeV2Serializer
   has_many :components
   
   def type_of_cycle
-    object.cycle_type.name
+    object.cycle_type_name
   end  
   
   def url

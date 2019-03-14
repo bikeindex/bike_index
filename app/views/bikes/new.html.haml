@@ -18,9 +18,9 @@
       .col-lg-8.offset-lg-2.form-well
         .form-wrap
           .form-group.row.unnested-field
-            = f.label :cycle_type_id, 'This is a', class: 'form-well-label'
+            = f.label :cycle_type, 'This is a', class: 'form-well-label'
             .form-well-input.fancy-select.unfancy
-              = f.collection_select(:cycle_type_id, CycleType.all, :id, :name, required: true, class: 'form-control')
+              = select(:bike, :cycle_type, CycleType.select_options, { required: true, class: 'form-control'})
 
           .form-group.row.unnested-field
             = f.label :serial_number, class: 'form-well-label'

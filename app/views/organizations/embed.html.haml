@@ -166,7 +166,8 @@
       = submit_tag "Register", class: "button-submit"
       %span.what-you-register
         this
-      = collection_select(:bike, :cycle_type_id, CycleType.all, :id, :name, required: true)
+      = select(:bike, :cycle_type, CycleType.select_options, { required: true })
+      
   .input-group.optional-group.form-photo-group
     - if @b_param.image.present? or @b_param.image_tmp.present?
       %strong

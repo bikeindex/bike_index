@@ -44,7 +44,6 @@ describe 'Bikes API V3' do
     let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes") }
     before :each do
       FactoryBot.create(:wheel_size, iso_bsd: 559)
-      CycleType.bike
       PropulsionType.foot_pedal
     end
     include_context :geocoder_default_location
@@ -222,13 +221,13 @@ describe 'Bikes API V3' do
         color: color.name,
         year: '1969',
         owner_email: 'fun_times@examples.com',
-        organization_slug: organization.slug
+        organization_slug: organization.slug,
+        cycle_type: 'bike'
       }
     end
     let!(:tokenized_url) { "/api/v2/bikes?access_token=#{v2_access_token.token}" }
     before :each do
       FactoryBot.create(:wheel_size, iso_bsd: 559)
-      CycleType.bike
       PropulsionType.foot_pedal
     end
 
@@ -251,7 +250,6 @@ describe 'Bikes API V3' do
               post tokenized_url, bike_attrs.merge(no_duplicate: true).to_json, json_headers
             end.to change(Bike, :count).by 0
             result = JSON.parse(response.body)['bike']
-
             expect(response.code).to eq('201')
             expect(result['id']).to eq bike.id
             EmailOwnershipInvitationWorker.drain

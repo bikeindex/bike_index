@@ -37,7 +37,7 @@ class CustomerMailer < ActionMailer::Base
     @customer_contact = customer_contact
     @info = customer_contact.info_hash
     @bike = customer_contact.bike
-    @biketype = CycleType.find(@bike.cycle_type_id).name.downcase
+    @biketype = @bike.cycle_type_name&.downcase
     mail(to: @customer_contact.user_email, subject: @customer_contact.title)
   end
 
@@ -57,7 +57,7 @@ class CustomerMailer < ActionMailer::Base
   def recovered_from_link(stolen_record)
     @stolen_record = stolen_record
     @bike = stolen_record.bike
-    @biketype = CycleType.find(@bike.cycle_type_id).name.downcase
+    @biketype = @bike.cycle_type_name&.downcase
     mail(to: [@bike.owner_email],
          from: 'bryan@bikeindex.org',
          subject: "Your #{@biketype} has been marked recovered!")

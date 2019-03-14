@@ -13,7 +13,8 @@ class BikeV2Serializer < ActiveModel::Serializer
     :stolen_location,
     :date_stolen,
     :frame_material,
-    :handlebar_type
+    :handlebar_type,
+    :cycle_type
 
   def manufacturer_name
     object.mnfg_name
@@ -58,6 +59,10 @@ class BikeV2Serializer < ActiveModel::Serializer
   end
 
   def handlebar_type
+    object.handlebar_type_name
+  end
+  
+  def cycle_type
     object.handlebar_type_name
   end
 end

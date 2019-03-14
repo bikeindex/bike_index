@@ -304,7 +304,7 @@ describe BulkImportWorker do
       context "valid organization bike" do
         let(:organization) { FactoryBot.create(:organization_with_auto_user) }
         let!(:bulk_import) { FactoryBot.create(:bulk_import, organization: organization) }
-        let(:row) { { manufacturer: " Surly", serial_number: "na", color: nil, owner_email: "test2@bikeindex.org", year: "2018", model: "Midnight Special" } }
+        let(:row) { { manufacturer: " Surly", serial_number: "na", color: nil, owner_email: "test2@bikeindex.org", year: "2018", model: "Midnight Special", cycle_type: 'tandem' } }
         it "registers a bike" do
           expect(organization.auto_user).to_not eq bulk_import.user
           expect(Bike.count).to eq 0

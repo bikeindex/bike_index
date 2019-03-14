@@ -217,7 +217,7 @@ class User < ActiveRecord::Base
 
   def bikes(user_hidden=true)
     Bike.unscoped
-    .includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record, :cycle_type)
+    .includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
     .where(id: bike_ids(user_hidden))
   end
 

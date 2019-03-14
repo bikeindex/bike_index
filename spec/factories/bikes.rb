@@ -11,7 +11,7 @@ FactoryBot.define do
     manufacturer { FactoryBot.create(:manufacturer) }
     sequence(:owner_email) { |n| "bike_owner#{n}@example.com" }
     primary_frame_color { Color.black }
-    cycle_type { CycleType.bike }
+    cycle_type { CycleType.slugs.first }
     propulsion_type { PropulsionType.foot_pedal }
 
     factory :stolen_bike do

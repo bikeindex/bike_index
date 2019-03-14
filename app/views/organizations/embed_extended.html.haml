@@ -97,7 +97,7 @@
   .input-group
     .submit-registration
       = submit_tag "Register this", class: "button-submit"
-      = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, required: true)
+      = select(:bike, :cycle_type, CycleType.select_options, { required: true })
   .input-group
     %h3
       Optional additions
