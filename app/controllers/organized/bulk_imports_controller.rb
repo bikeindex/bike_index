@@ -9,7 +9,8 @@ module Organized
       page = params[:page] || 1
       per_page = params[:per_page] || 25
       shown_imports = bulk_imports.includes(:creation_states).order(created_at: :desc)
-      shown_imports = shown_imports.with_bikes unless params[:with_empty]
+      @show_empty = !ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:without_empty])
+      shown_imports = shown_imports.with_bikes unless @show_empty
       @bulk_imports = shown_imports.page(page).per(per_page)
     end
 
