@@ -28,10 +28,6 @@ FactoryBot.define do
     frame_maker { true }
   end
 
-  factory :propulsion_type do
-    name { FactoryBot.generate(:unique_name) }
-  end
-
   factory :front_gear_type do
     name { FactoryBot.generate(:unique_name) }
     count { 1 }
