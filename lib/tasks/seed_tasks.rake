@@ -38,10 +38,10 @@ task seed_test_users_and_bikes: :environment do
       propulsion_type_id: @propulsion_type_id,
       manufacturer_id: (rand(Manufacturer.frames.count) + 1),
       rear_tire_narrow: true,
+      handlebar_type: HandlebarType.slugs.first,
       rear_wheel_size_id: (rand(WheelSize.count) + 1),
       front_wheel_size_id: (rand(WheelSize.count) + 1),
       primary_frame_color_id: (rand(Color.count) + 1),
-      handlebar_type_id: (rand(HandlebarType.count) + 1),
       creator: @user,
       owner_email: @user.email
     )
@@ -78,7 +78,7 @@ task seed_dup_bikes: :environment do
       rear_tire_narrow: true,
       rear_wheel_size_id: WheelSize.first.id,
       primary_frame_color_id: Color.first.id,
-      handlebar_type_id: HandlebarType.first.id,
+      handlebar_type: HandlebarType.slugs.first,
       creator: @user,
       owner_email: @user.email,
       serial_number: @serial_number,

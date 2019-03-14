@@ -23,11 +23,11 @@ describe 'Selections API V2' do
 
   describe 'cycle_types' do
     it 'responds on index with pagination' do
-      selection = FactoryBot.create(:cycle_type)
+      selection = CycleType.legacy_selections[0]
       get '/api/v2/selections/cycle_types'
       expect(response.code).to eq('200')
       result = JSON.parse(response.body)['cycle_types'][0]
-      expect(result['name']).to eq(selection.name)
+      expect(result['name']).to eq(selection[:name])
     end
   end
 
@@ -63,11 +63,11 @@ describe 'Selections API V2' do
 
   describe 'handlebar_types' do
     it 'responds on index with pagination' do
-      selection = FactoryBot.create(:handlebar_type)
+      selection = HandlebarType.legacy_selections[0]
       get '/api/v2/selections/handlebar_types'
       expect(response.code).to eq('200')
       result = JSON.parse(response.body)['handlebar_types'][0]
-      expect(result['name']).to eq(selection.name)
+      expect(result['name']).to eq(selection[:name])
     end
   end
 

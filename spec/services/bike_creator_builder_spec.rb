@@ -17,10 +17,8 @@ describe BikeCreatorBuilder do
 
   describe 'add_front_wheel_size' do
     it "sets the front wheel equal to the rear wheel if it's present" do
-      cycle_type = FactoryBot.create(:cycle_type, name: 'Bike', slug: 'bike')
       bike = Bike.new
       b_param = BParam.new
-      allow(bike).to receive(:cycle_type_id).and_return(cycle_type.id)
       allow(bike).to receive(:rear_wheel_size_id).and_return(1)
       allow(bike).to receive(:rear_tire_narrow).and_return(true)
       BikeCreatorBuilder.new(b_param).add_front_wheel_size(bike)
@@ -31,13 +29,12 @@ describe BikeCreatorBuilder do
 
   describe 'add_required_attributes' do
     it 'calls the methods it needs to call' do
-      cycle_type = FactoryBot.create(:cycle_type, name: 'Bike', slug: 'bike')
       propulsion_type = FactoryBot.create(:propulsion_type, name: 'Foot pedal')
       bike = Bike.new
       b_param = BParam.new
       creator = BikeCreatorBuilder.new(b_param)
       creator.add_required_attributes(bike)
-      expect(bike.cycle_type).to eq(cycle_type)
+      expect(bike.cycle_type).to eq("bike")
       expect(bike.propulsion_type).to eq(propulsion_type)
     end
   end

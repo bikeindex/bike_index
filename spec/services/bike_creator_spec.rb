@@ -151,12 +151,10 @@ describe BikeCreator do
     Sidekiq::Testing.inline! do
       it 'creates a bike with the parameters it is passed and returns it' do
         propulsion_type = FactoryBot.create(:propulsion_type)
-        cycle_type = FactoryBot.create(:cycle_type)
         organization = FactoryBot.create(:organization)
         user = FactoryBot.create(:user)
         manufacturer = FactoryBot.create(:manufacturer)
         color = FactoryBot.create(:color)
-        handlebar_type = FactoryBot.create(:handlebar_type)
         wheel_size = FactoryBot.create(:wheel_size)
         b_param = BParam.new(origin: 'api_v1')
         creator = BikeCreator.new(b_param)
@@ -167,13 +165,13 @@ describe BikeCreator do
         new_bike = Bike.new(
           creation_organization_id: organization.id,
           propulsion_type_id: propulsion_type.id,
-          'cycle_type_id' => cycle_type.id,
+          'cycle_type' => 'stroller',
           'serial_number' => 'BIKE TOKENd',
           'manufacturer_id' => manufacturer.id,
-          'rear_tire_narrow' => 'true',
+          'rear_tire_narrow' => 'wheelchair',
           'rear_wheel_size_id' => wheel_size.id,
           'primary_frame_color_id' => color.id,
-          'handlebar_type_id' => handlebar_type,
+          'handlebar_type' => 'bmx',
           'creator' => user
         )
         expect do

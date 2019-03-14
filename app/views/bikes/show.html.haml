@@ -97,7 +97,7 @@
               - rear_tire_width = @bike.rear_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
               = @bike.attr_list_item(@bike.ass_name('rear_wheel_size', rear_tire_width), 'Rear wheel diameter', with_colon: true)
           = @bike.attr_list_item(@bike.frame_material_name, 'Frame Material', with_colon: true)
-          = @bike.attr_list_item(@bike.ass_name('handlebar_type'), 'Handlebar type', with_colon: true)
+          = @bike.attr_list_item(@bike.handlebar_type_name, 'Handlebar type', with_colon: true)
         - if @bike.description.present?
           %h3
             Distinguishing features

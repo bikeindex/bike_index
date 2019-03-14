@@ -17,7 +17,7 @@ module API
 
         desc "Types of cycles"
         get '/cycle_types', root: 'cycle_types' do
-          CycleType.all
+          CycleType.legacy_selections
         end
 
         desc "Frame materials"
@@ -37,7 +37,7 @@ module API
 
         desc "Handlebars"
         get '/handlebar_types', root: 'handlebar_types' do
-          HandlebarType.all
+          HandlebarType.legacy_selections
         end
 
         desc "Propulsion types"
