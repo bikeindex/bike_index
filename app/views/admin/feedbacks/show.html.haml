@@ -2,25 +2,25 @@
   %h1
     #{link_to 'Feedback and messages', admin_feedbacks_path}
 
-%section.full-screen-table
+%section.full-screen-table.pt-2
+  .card
+    .card-header
+      %h4.card-title
+        #{link_to @feedback.feedback_type, admin_feedbacks_path(type: @feedback.feedback_type)}: #{@feedback.title}
+      %h5.card-subtitle
+        User:
+        = @feedback.name
+    %p.card-body
+
+      = @feedback.body.truncate(100)
+
   %table.table.table-striped.table-bordered
     %tbody
       %tr
         %td
           Created:
-          - if @feedback.created_at.today?
-            %span.hidden
-              = @feedback.created_at.strftime("%-m.%-d.%Y %-H.%M")
-            - created_text = "Today at #{@feedback.created_at.strftime("%-I %p")}"
-          - elsif Date.yesterday().beginning_of_day() <= @feedback.created_at
-            %span.hidden
-              = @feedback.created_at.strftime("%-m.%-d.%Y %-H.%M")
-            - created_text = "Yesterday at #{@feedback.created_at.strftime("%-I %p")}"
-          - else
-            %span.hidden
-              = @feedback.created_at.strftime("%-m.%-d.%Y %-H.%M")
-            - created_text = "#{@feedback.created_at.strftime("%-m/%-d/%Y at %-I %p")}"
-          = link_to created_text, admin_feedback_path(@feedback)
+          %a.convertTime.preciseTime{ href: admin_feedback_url(@feedback) }
+            = l @feedback.created_at, format: :convert_time
         %td
           By:
           - if @feedback.user
@@ -28,14 +28,8 @@
             user present
           - else
             = link_to @feedback.email, admin_users_path(user_query: @feedback.email)
-      %tr
-        %td
-          #{link_to @feedback.feedback_type, admin_feedbacks_path(type: @feedback.feedback_type)}: #{@feedback.title}
-        %td
-          = @feedback.name
 
-%p
-  = @feedback.body.truncate(100)
+
 .padded
 - if @feedback.feedback_hash.present?
   %pre

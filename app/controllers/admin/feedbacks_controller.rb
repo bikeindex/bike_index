@@ -12,6 +12,7 @@ class Admin::FeedbacksController < Admin::BaseController
 
   def show
     @feedback = Feedback.find(params[:id])
+    render layout: "new_admin"
   end
 
   def graphs
