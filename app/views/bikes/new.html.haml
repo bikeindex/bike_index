@@ -74,7 +74,7 @@
           = render partial: '/bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
 
           - if @bike.stolen || @organization&.include_field_reg_phone?(current_user)
-            - label_phone = @organization.additional_registration_fields_label("reg_phone") || "Phone"
+            - label_phone = @organization.registration_field_label("reg_phone") || "Phone"
             .form-group.row.unnested-field
               = f.label :phone, label_phone, class: "form-well-label"
               .form-well-input
@@ -86,7 +86,7 @@
 
           - if @organization&.include_field_reg_address?(current_user)
             .form-group.row.unnested-field.no-divider-row
-              - address_label = @organization.additional_registration_fields_label("reg_address") || "Street address"
+              - address_label = @organization.registration_field_label("reg_address") || "Street address"
               = f.label :address, address_label, class: 'form-well-label'
               .form-well-input
                 = f.text_field :address, required: true, placeholder: 'required', class: 'form-control'
@@ -94,7 +94,7 @@
                   Your address is required by #{@organization.short_name}
 
           - if @organization&.include_field_reg_secondary_serial?(current_user)
-            - label_secondary_serial = @organization.additional_registration_fields_label("reg_secondary_serial") || "Additional serial/sticker number"
+            - label_secondary_serial = @organization.registration_field_label("reg_secondary_serial") || "Additional serial/sticker number"
             .form-group.row.unnested-field.no-divider-row
               = f.label :additional_registration, label_secondary_serial, class: "form-well-label"
               .form-well-input
@@ -102,7 +102,7 @@
 
           - if @organization&.include_field_reg_affiliation?(current_user)
             .form-group.row.unnested-field.no-divider-row.fancy-select.unfancy
-              - label_affiliation = @organization.additional_registration_fields_label("reg_affiliation") || "#{@organization.short_name} affiliation"
+              - label_affiliation = @organization.registration_field_label("reg_affiliation") || "#{@organization.short_name} affiliation"
               = f.label :organization_affiliation, label_affiliation, class: "form-well-label"
               .form-well-input
                 - affiliation_options = @organization.reg_affiliation_options.map { |a| [a.humanize, a] }
