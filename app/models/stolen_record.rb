@@ -49,14 +49,14 @@ class StolenRecord < ActiveRecord::Base
   def address(skip_default_country: false)
     country_string = country && country.iso
     if skip_default_country
-      country_string = nil if country_string == 'US'
+      country_string = nil if country_string == "US"
     else
       return nil unless country
     end
     [
-      street,
+      show_address ? street : nil,
       city,
-      (state && state.abbreviation),
+      state&.abbreviation,
       zipcode,
       country_string
     ].reject(&:blank?).join(', ')

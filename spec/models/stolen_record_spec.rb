@@ -74,18 +74,21 @@ describe StolenRecord do
                                        state_id: state.id,
                                        zipcode: '60647',
                                        country_id: country.id)
+      expect(stolen_record.address).to eq('Chicago, XXX, 60647, NEVVVV')
+      stolen_record.show_address = true
       expect(stolen_record.address).to eq('2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV')
     end
     it 'is ok with missing information' do
       stolen_record = StolenRecord.new(street: '2200 N Milwaukee Ave',
                                        zipcode: '60647',
                                        country_id: country.id)
+      expect(stolen_record.address).to eq('60647, NEVVVV')
+      stolen_record.show_address = true
       expect(stolen_record.address).to eq('2200 N Milwaukee Ave, 60647, NEVVVV')
     end
     it 'returns nil if there is no country' do
       stolen_record = StolenRecord.new(street: '302666 Richmond Blvd')
       expect(stolen_record.address).to be_nil
-
     end
   end
 
