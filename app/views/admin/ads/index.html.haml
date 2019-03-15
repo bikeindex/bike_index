@@ -32,9 +32,9 @@
             = ad.organization.name if ad.organization.present?
           %td.ad-body-cell.w-25
             %h3
-              = link_to ad.title, edit_admin_ad_url(ad)
+              = link_to ad.title, edit_admin_ad_url(ad), class: "text-dark"
             %p
-              = link_to ad.body, edit_admin_ad_url(ad)
+              = link_to ad.body, edit_admin_ad_url(ad), class: "text-dark"
           %td.hidden-sm-down.w-25
             - if ad.image.present?
               = image_tag ad.image_url(:small)
