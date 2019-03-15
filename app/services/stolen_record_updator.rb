@@ -90,6 +90,6 @@ class StolenRecordUpdator
     %w[phone secondary_phone street city zipcode country_id state_id
        police_report_number police_report_department estimated_value
        theft_description locking_description lock_defeat_description
-       proof_of_ownership receive_notifications]
+       proof_of_ownership receive_notifications show_address]
   end
 end

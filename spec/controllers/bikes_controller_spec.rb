@@ -446,6 +446,7 @@ describe BikesController do
                 stolen_record = bike.current_stolen_record
                 stolen_params.except(:date_stolen, :timezone).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
                 expect(stolen_record.date_stolen.to_i).to be_within(1).of(Time.now.yesterday.to_i)
+                expect(stolen_record.show_address).to be_falsey
               end
             end
           end
@@ -655,7 +656,7 @@ describe BikesController do
               # This is also where we're testing bikebook assignment
               expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
               expect do
-                post :create, stolen: true, bike: success_params.as_json, stolen_record: chicago_stolen_params
+                post :create, stolen: true, bike: success_params.as_json, stolen_record: chicago_stolen_params.merge(show_address: true)
               end.to change(Bike, :count).by(1)
               expect(flash[:success]).to be_present
               expect(BParam.all.count).to eq 0
@@ -668,6 +669,7 @@ describe BikesController do
               expect(bike_user.phone).to eq "3123799513"
               stolen_record = bike.current_stolen_record
               chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+              expect(stolen_record.show_address).to be_truthy
             end
           end
         end
