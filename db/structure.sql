@@ -1993,7 +1993,8 @@ CREATE TABLE public.stolen_records (
     create_open311 boolean DEFAULT false NOT NULL,
     tsved_at timestamp without time zone,
     estimated_value integer,
-    recovery_link_token text
+    recovery_link_token text,
+    show_address boolean DEFAULT false
 );
 
 
@@ -4130,4 +4131,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190312185621');
 INSERT INTO schema_migrations (version) VALUES ('20190314182139');
 
 INSERT INTO schema_migrations (version) VALUES ('20190315183047');
+
+INSERT INTO schema_migrations (version) VALUES ('20190315213846');
 
