@@ -34,7 +34,7 @@ class StolenRecord < ActiveRecord::Base
   scope :displayable, -> { recovered.where(can_share_recovery: true) }
   scope :recovery_unposted, -> { unscoped.where(current: false, recovery_posted: false) }
 
-  geocoded_by :address
+  geocoded_by :address_override_show_address
   after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
 
   def self.find_matching_token(bike_id:, recovery_link_token:)
@@ -42,11 +42,11 @@ class StolenRecord < ActiveRecord::Base
     unscoped.where(bike_id: bike_id, recovery_link_token: recovery_link_token).first
   end
 
-  def recovered?
-    !current?
-  end
+  def recovered?; !current? end
 
-  def address(skip_default_country: false)
+  def address_override_show_address; address(override_show_address: true) end
+
+  def address(skip_default_country: false, override_show_address: false)
     country_string = country && country.iso
     if skip_default_country
       country_string = nil if country_string == "US"
@@ -54,7 +54,7 @@ class StolenRecord < ActiveRecord::Base
       return nil unless country
     end
     [
-      show_address ? street : nil,
+      (override_show_address || show_address) ? street : nil,
       city,
       state&.abbreviation,
       zipcode,
