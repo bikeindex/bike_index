@@ -77,8 +77,7 @@ describe OrganizationExportWorker do
           expect(export.headers).to eq Export::AVERY_HEADERS
           VCR.use_cassette("organization_export_worker-avery") do
             instance.perform(export.id)
-            pp bike_not_avery.registration_address
-            expect(bike_not_avery.registration_address.street.present?).to be_falsey
+            expect(bike_not_avery.registration_address["address"].present?).to be_falsey
           end
           export.reload
           expect(export.progress).to eq "finished"
