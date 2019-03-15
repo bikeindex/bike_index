@@ -19,13 +19,15 @@
       = link_to "Content admins", admin_users_path(content_admins: true)
 
 - if @users.present?
-  .paginate-container
-    = paginate @users, views_prefix: "admin"
+  .row
+    .paginate-container.ml-auto
+      = paginate @users, views_prefix: "admin"
 
   = render partial: "/admin/users/table"
 
-  .paginate-container
-    = paginate @users
+  .row
+    .paginate-container.ml-auto
+      = paginate @users, views_prefix: "admin"
 - else
   %h1.padded
     No users found!
