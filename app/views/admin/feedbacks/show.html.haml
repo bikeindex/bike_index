@@ -1,8 +1,8 @@
-%header.with-subtitle#admin-recoveries
+%header
   %h1
     #{link_to 'Feedback and messages', admin_feedbacks_path}
 
-%section.full-screen-table.pt-2
+%section.pt-2
   .card
     .card-header
       %h4.card-title
@@ -11,7 +11,6 @@
         User:
         = @feedback.name
     %p.card-body
-
       = @feedback.body.truncate(100)
 
   %table.table.table-striped.table-bordered
@@ -30,7 +29,7 @@
             = link_to @feedback.email, admin_users_path(user_query: @feedback.email)
 
 
-.padded
+%div
 - if @feedback.feedback_hash.present?
   %pre
     = @feedback.feedback_hash.to_yaml

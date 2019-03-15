@@ -1,57 +1,58 @@
-.container
-  .row
-    .col-sm
-      %h1
-        #{link_to 'Feedback and messages', admin_feedbacks_path}
-  .row
-    .col-sm
-      %h4
-        = Feedback.count
-        messages
-        - if @matching_count.present?
-          %strong
-            \- #{@matching_count}
-          #{params[:type]}
-      .paginate-container.feedbacks-paginate.float-right
-        = paginate @feedbacks, views_prefix: 'admin'
-    %table.table.table-bordered.table-striped
-      %thead.thead-light
+.row
+  .col-sm
+    %h1
+      #{link_to 'Feedback and messages', admin_feedbacks_path}
+.row
+  .col-sm
+    %h4
+      = Feedback.count
+      messages
+      - if @matching_count.present?
+        %strong
+          \- #{@matching_count}
+        #{params[:type]}
+.row
+  .paginate-container.ml-auto
+    = paginate @feedbacks, views_prefix: 'admin'
+.full-screen-table-wrapper
+  %table.table.table-bordered.table-striped
+    %thead.thead-light
+      %tr
+        %th.w-25{:scope => "col"} Created
+        %th{:scope => "col"} User
+        %th{:scope => "col"} Type
+        %th{:scope => "col"} Name
+        %th.w-25{:scope => "col"} Body
+    %tbody
+      - @feedbacks.each do |feedback|
         %tr
-          %th.w-25{:scope => "col"} Created
-          %th{:scope => "col"} User
-          %th{:scope => "col"} Type
-          %th{:scope => "col"} Name
-          %th.w-25{:scope => "col"} Body
-      %tbody
-        - @feedbacks.each do |feedback|
-          %tr
-            %td
-              %a.convertTime{ href: admin_feedback_url(feedback) }
-                = l feedback.created_at, format: :convert_time
-            %td
-              - if feedback.user
-                = link_to feedback.user.display_name, edit_admin_user_path(feedback.user)
-              - else
-                = link_to feedback.email, admin_users_path(user_query: feedback.email)
-            %td
-              - feedback_type = feedback.feedback_type || 'msg'
-              = link_to feedback_type, admin_feedbacks_path(type: feedback_type)
-            %td
-              = feedback.name
-            %td
-              = feedback.body.truncate(100)
-  .row
-    .paginate-container.ml-auto
-      = paginate @feedbacks, views_prefix: 'admin'
-  .row
-    .col-sm
-      %h3
-        Feedbacks Graph
-        = javascript_include_tag "//www.google.com/jsapi", "chartkick"
-    %pre
-    = line_chart graphs_admin_feedbacks_path(params.merge(start_at: params[:start_at]).except(:controller, :action))
-  .row.justify-content-center
-    %ul.list-inline
-      - %w(all_time past_year past_month past_week).each do |start_at|
-        %li.list-inline-item
-          = link_to start_at.humanize, admin_feedbacks_path(params.merge(start_at: start_at).except(:controller, :action))
+          %td
+            %a.convertTime{ href: admin_feedback_url(feedback) }
+              = l feedback.created_at, format: :convert_time
+          %td
+            - if feedback.user
+              = link_to feedback.user.display_name, edit_admin_user_path(feedback.user)
+            - else
+              = link_to feedback.email, admin_users_path(user_query: feedback.email)
+          %td
+            - feedback_type = feedback.feedback_type || 'msg'
+            = link_to feedback_type, admin_feedbacks_path(type: feedback_type)
+          %td
+            = feedback.name
+          %td
+            = feedback.body.truncate(100)
+.row
+  .paginate-container.ml-auto
+    = paginate @feedbacks, views_prefix: 'admin'
+.row
+  .col-sm
+    %h3
+      Feedbacks Graph
+      = javascript_include_tag "//www.google.com/jsapi", "chartkick"
+  %pre
+  = line_chart graphs_admin_feedbacks_path(params.merge(start_at: params[:start_at]).except(:controller, :action))
+.row.justify-content-center
+  %ul.list-inline
+    - %w(all_time past_year past_month past_week).each do |start_at|
+      %li.list-inline-item
+        = link_to start_at.humanize, admin_feedbacks_path(params.merge(start_at: start_at).except(:controller, :action))
