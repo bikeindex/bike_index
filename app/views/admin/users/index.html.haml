@@ -1,21 +1,26 @@
 %h1
-  Manage #{link_to "users", admin_users_path}
-
-.special-search-field-container
-  .special-search-field
-    = form_tag admin_users_path, method: :get do
-      = text_field_tag :user_query, params[:user_query], placeholder: "Find by name or email"
-      = submit_tag "Search", name: "search", class: "button-blue"
+  Manage
+  = link_to "users", admin_users_path
 
   %h4
     #{number_with_delimiter(@user_count)} users
     = params[:user_query].present? ? 'matching query' : 'have signed up'
 
-.pull-right
-  #{link_to "Superusers", admin_users_path(superusers: true)}|#{link_to "content admins", admin_users_path(content_admins: true)}
+
+.container.mb-2
+  .row
+    = form_tag admin_users_path, method: :get, class: "form-inline ml-auto" do
+      = text_field_tag :user_query, params[:user_query], placeholder: "Find by name or email", class: "form-control mr-sm-2"
+      = submit_tag "Search", name: "search", class: "btn btn-outline-primary btn-rounded my-0"
+  .row
+    .ml-auto
+      = link_to "Superusers", admin_users_path(superusers: true)
+      |
+      = link_to "Content admins", admin_users_path(content_admins: true)
+
 - if @users.present?
   .paginate-container
-    = paginate @users
+    = paginate @users, template: "admin"
 
   = render partial: "/admin/users/table"
 
