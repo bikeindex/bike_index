@@ -1,6 +1,6 @@
 class Admin::FeedbacksController < Admin::BaseController
   before_filter :find_feedback_for_params, except: [:show]
-  layout :new_admin
+  layout 'new_admin'
 
   def index
     @matching_count = @feedbacks.count if params[:type].present?
