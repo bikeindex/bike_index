@@ -74,7 +74,7 @@
           = render partial: '/bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
 
           - if @bike.stolen || @organization&.include_field_reg_phone?(current_user)
-            - label_phone = @organization.registration_field_label("reg_phone") || "Phone"
+            - label_phone = @organization&.registration_field_label("reg_phone") || "Phone"
             .form-group.row.unnested-field
               = f.label :phone, label_phone, class: "form-well-label"
               .form-well-input
