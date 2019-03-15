@@ -46,5 +46,5 @@
         %td.hidden-md-down
           = "super" if user.superuser?
           = "content" if user.content?
-        %td.hidden-md-down
+        %td.hidden-md-down.table-cell-check
           = "&#x2713;".html_safe if user.confirmed

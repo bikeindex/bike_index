@@ -20,7 +20,7 @@
 
 - if @users.present?
   .paginate-container
-    = paginate @users, template: "admin"
+    = paginate @users, views_prefix: "admin"
 
   = render partial: "/admin/users/table"
 
