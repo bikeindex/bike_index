@@ -1,6 +1,6 @@
-%header
-  %h1
-    #{link_to 'Feedback and messages', admin_feedbacks_path}
+
+%h1
+  #{link_to 'Feedback and messages', admin_feedbacks_path}
 
 %section.pt-2
   .card
@@ -29,8 +29,6 @@
             = link_to @feedback.email, admin_users_path(user_query: @feedback.email)
 
 
-%div
 - if @feedback.feedback_hash.present?
   %pre
     = @feedback.feedback_hash.to_yaml
-      
