@@ -1,20 +1,21 @@
 require 'spec_helper'
 
 describe PropulsionType do
-  it_behaves_like "friendly_slug_findable"
+  describe "normalized name" do
+    let(:slug) { :insufflation }
 
-  describe 'foot_pedal' do
-    context 'not-existing' do
-      it 'creates it on first pass' do
-        expect { PropulsionType.foot_pedal }.to change(PropulsionType, :count).by(1)
-      end
+    it "returns the slug's normalized name" do
+      pt = PropulsionType.new(slug)
+      expect(pt.name).to eq("Insufflation")
     end
-    context 'existing' do
-      before do
-        PropulsionType.foot_pedal
-      end
-      it 'does not create' do
-        expect { PropulsionType.foot_pedal }.to change(PropulsionType, :count).by(0)
+  end
+
+  describe "friendly_find" do
+    context "slug" do
+      let(:name) { "Other style" }
+      it "tries to find the slug, given a name" do
+        finder = PropulsionType.friendly_find(name)
+        expect(finder.slug).to eq :"other-style"
       end
     end
   end

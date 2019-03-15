@@ -12,7 +12,7 @@ FactoryBot.define do
     sequence(:owner_email) { |n| "bike_owner#{n}@example.com" }
     primary_frame_color { Color.black }
     cycle_type { CycleType.slugs.first }
-    propulsion_type { PropulsionType.foot_pedal }
+    propulsion_type "foot-pedal"
 
     factory :stolen_bike do
       transient do

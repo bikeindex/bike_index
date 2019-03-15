@@ -12,7 +12,6 @@ class Bike < ActiveRecord::Base
   belongs_to :front_wheel_size, class_name: 'WheelSize'
   belongs_to :rear_gear_type
   belongs_to :front_gear_type
-  belongs_to :propulsion_type
   belongs_to :paint, counter_cache: true
   belongs_to :updator, class_name: 'User'
   belongs_to :invoice
@@ -45,7 +44,7 @@ class Bike < ActiveRecord::Base
   after_validation :geocode, if: lambda { |o| false } # Never geocode, it's from stolen_record
 
   validates_presence_of :serial_number
-  validates_presence_of :propulsion_type_id
+  validates_presence_of :propulsion_type
   validates_presence_of :cycle_type
   validates_presence_of :creator
   # validates_presence_of :creation_state_id
@@ -64,6 +63,7 @@ class Bike < ActiveRecord::Base
   enum frame_material: FrameMaterial::SLUGS
   enum handlebar_type: HandlebarType::SLUGS
   enum cycle_type: CycleType::SLUGS
+  enum propulsion_type: PropulsionType::SLUGS
 
   default_scope { 
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
@@ -107,7 +107,7 @@ class Bike < ActiveRecord::Base
         handlebar_type frame_size frame_size_number frame_size_unit
         rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow 
         primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
-        propulsion_type_id propulsion_type_other zipcode country_id belt_drive
+        propulsion_type zipcode country_id belt_drive
         coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
         timezone date_stolen receive_notifications phone creator creator_id image
         components_attributes b_param_id embeded embeded_extended example hidden
@@ -436,7 +436,7 @@ class Bike < ActiveRecord::Base
     cache_photo
     self.cached_data = [
       mnfg_name,
-      (propulsion_type.name == 'Foot pedal' ? nil : propulsion_type.name),
+      (propulsion_type_name == 'Foot pedal' ? nil : propulsion_type_name),
       year,
       (primary_frame_color && primary_frame_color.name),
       (secondary_frame_color && secondary_frame_color.name),
@@ -462,5 +462,9 @@ class Bike < ActiveRecord::Base
 
   def cycle_type_name
     CycleType.new(cycle_type).name
+  end
+
+  def propulsion_type_name
+    PropulsionType.new(propulsion_type).name
   end
 end

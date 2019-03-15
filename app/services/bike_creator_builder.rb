@@ -15,7 +15,7 @@ class BikeCreatorBuilder
   end
 
   def add_required_attributes(bike)
-    bike.propulsion_type_id ||= PropulsionType.foot_pedal.id
+    bike.propulsion_type ||= "foot-pedal"
     bike 
   end
 
