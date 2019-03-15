@@ -54,6 +54,12 @@ describe OrganizationExportWorker do
                                       params: { bike: { address: "102 Washington Pl, State College",
                                                         user_name: "Maya Skripal" } })
         end
+        let(:bike_not_avery) { FactoryBot.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
+        let!(:b_param_partial) do
+          FactoryBot.create(:b_param, created_bike_id: bike_not_avery.id,
+                                      params: { bike: { address: "State College, PA",
+                                                        user_name: "George Washington" } })
+        end
         let(:csv_lines) do
           # We modify the headers during processing to separate the address into multiple fields
           [
@@ -63,14 +69,16 @@ describe OrganizationExportWorker do
         end
         let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "a1111") }
         include_context :geocoder_real
-        it "exports only bike with name and email" do
+        it "exports only bike with name, email and address" do
           expect(bike_code.claimed?).to be_falsey
           export.update_attributes(file_format: "csv") # Manually switch to csv so that we can parse it more easily :/
-          expect(organization.bikes.pluck(:id)).to match_array([bike.id, bike_for_avery.id])
+          expect(organization.bikes.pluck(:id)).to match_array([bike.id, bike_for_avery.id, bike_not_avery.id])
           expect(export.avery_export?).to be_truthy
           expect(export.headers).to eq Export::AVERY_HEADERS
           VCR.use_cassette("organization_export_worker-avery") do
             instance.perform(export.id)
+            pp bike_not_avery.registration_address
+            expect(bike_not_avery.registration_address.street.present?).to be_falsey
           end
           export.reload
           expect(export.progress).to eq "finished"
