@@ -4,6 +4,7 @@ class Admin::AdsController < Admin::BaseController
 
   def index
     @ads = Ad.all
+    render layout: "new_admin"
   end
 
   def show
@@ -11,7 +12,7 @@ class Admin::AdsController < Admin::BaseController
   end
 
   def edit
-    
+
   end
 
   def update

@@ -1,43 +1,40 @@
-%header.with-subtitle
-  %h1
-    Manage Ads
-  = link_to 'New ad', new_admin_ad_url, class: "button-green sharing-links"
+.container
+  .row
+    %h1
+      = link_to "Manage Ads", admin_ads_url
+  .row
+    = link_to 'New ad', new_admin_ad_url, class: "btn btn-success ml-auto"
+  .row
+  %h4.padded
+    = @ads.count
+    ads are in the system so far!
 
-%h4.padded
-  = @ads.count
-  ads are in the system so far!
 
-
-%section.full-screen-table
-  %table#admin-ads-table.table.table-striped.table-bordered
+%section
+  %table.table.table-bordered.table-striped
     %thead
-      %th.medium-screens
+      %th.hidden-sm-down.w-25
         Created
-      %th.large-screens
+      %th.hidden-md-down.w-25
         Organization
-      %th
+      %th.w-25
         Text
-      %th.medium-screens
+      %th.hidden-sm-down.w25
         image
-      
+
     %tbody
       - @ads.each do |ad|
         %tr
-          %td.medium-screens
-            - if ad.created_at.today?
-              - ad_created = 'Today'
-            - elsif Date.yesterday().beginning_of_day() <= ad.created_at
-              - ad_created = 'Today'
-            - else
-              - ad_created = ad.created_at.strftime("%d.%m")
-            = link_to ad_created, edit_admin_ad_url(ad)
-          %td.large-screens
+          %td.hidden-sm-down.w-25
+            %a.convertTime{href: edit_admin_ad_url(ad)}
+              = l ad.created_at, format: :convert_time
+          %td.hidden-md-down.w-25
             = ad.organization.name if ad.organization.present?
-          %td.ad-body-cell
+          %td.ad-body-cell.w-25
             %h3
               = link_to ad.title, edit_admin_ad_url(ad)
             %p
               = link_to ad.body, edit_admin_ad_url(ad)
-          %td.medium-screens
+          %td.hidden-sm-down.w-25
             - if ad.image.present?
               = image_tag ad.image_url(:small)

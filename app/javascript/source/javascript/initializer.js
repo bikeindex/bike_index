@@ -84,7 +84,7 @@ import "./binx_org_export.js";
 // and make the instance of class (which I'm storing on window) the same name without the first letter capitalized
 // I'm absolutely sure there is a best practice that I'm ignoring, but just doing it for now.
 $(document).ready(function() {
-  // We don't need to localizeTimes here, because we're already doing it in the existing init script
+  binxApp.localizeTimes();
 
   // Load the page specific things
   let body_id = document.getElementsByTagName("body")[0].id;
