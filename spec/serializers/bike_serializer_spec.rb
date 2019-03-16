@@ -26,6 +26,7 @@ describe BikeSerializer do
     it { expect(subject.rear_gear_type).to eq(bike.rear_gear_type) }
     it { expect(subject.stolen_record).to eq(bike.current_stolen_record) }
     it { expect(subject.frame_size).to eq('42cm') }
+    it { expect(subject.additional_registration).to eq(bike.additional_registration) }
     # it { subject.photo.should == bike.reload.public_images.first.image_url(:large) }
     # it { subject.thumb.should == bike.reload.public_images.first.image_url(:small) }
   end
