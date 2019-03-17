@@ -50,10 +50,6 @@ FactoryBot.define do
     slug { FactoryBot.generate(:unique_name).downcase }
   end
 
-  factory :additional_registration do
-    name { FactoryBot.generate(:unique_name) }
-  end
-
   factory :color do
     name { FactoryBot.generate(:unique_name) }
     priority { 1 }

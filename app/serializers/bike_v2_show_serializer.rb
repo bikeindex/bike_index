@@ -10,7 +10,7 @@ class BikeV2ShowSerializer < BikeV2Serializer
     :description,
     :rear_tire_narrow,
     :front_tire_narrow,
-    :type_of_cycle, 
+    :type_of_cycle,
     :test_bike,
     :rear_wheel_size_iso_bsd,
     :front_wheel_size_iso_bsd,
