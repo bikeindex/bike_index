@@ -28,7 +28,7 @@ describe BikeV2ShowSerializer do
         registration_updated_at: bike.updated_at.to_i,
         url: "http://test.host/bikes/#{bike.id}",
         api_url: "http://test.host/api/v1/bikes/#{bike.id}",
-        manufacturer_id: 1,
+        manufacturer_id: bike.manufacturer_id,
         paint_description: nil,
         name: nil,
         frame_size: "42cm",
