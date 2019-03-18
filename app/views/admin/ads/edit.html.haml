@@ -25,10 +25,36 @@
             = f.check_box :live, class: "form-check inline-block form-check-input ml-2"
         = f.submit "Update", class: 'btn btn-success float-right'
 
-  -#
-  -# %label Ad Image
-  -# - if @ad.image?
-  -#   = image_tag(@ad.image_url(:small))
-  -# - else
-  -#   %p
-  -#   No Picture!
+
+-# %h1.padded
+-#   Edit Ad
+-#
+-# .admin-ad-preview
+-#   = render 'shared/ad'
+-#
+-# .form.form-horizontal
+-#   = form_for [:admin, @ad] do |f|
+-#     = render partial: 'form', locals: { f: f }
+-#
+-#     .well.span6.ad-form-actions
+-#       .control-group.avatar-upload
+-#         %label.control-label
+-#           Ad image
+-#         .controls
+-#           .avatar-img
+-#             - if @ad.image?
+-#               = image_tag(@ad.image_url(:small))
+-#             - else
+-#               %p
+-#                 No picture!
+-#           = f.file_field :image
+-#           = f.hidden_field :image_cache
+-#
+-#       .control-group
+-#         .control-label
+-#           = f.label :live
+-#         .controls
+-#           = f.check_box :live
+-#     .span5
+-#       .control-group.actions.big-action
+-#         = f.submit "Update", class: 'button-green big-action'
