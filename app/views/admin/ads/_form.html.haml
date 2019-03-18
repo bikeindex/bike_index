@@ -1,11 +1,14 @@
 - if @ad.errors.any?
-  %h4.text-danger
-    Please fix the following
-    = pluralize(@ad.errors.count, "error")
-  %ul
-    - @ad.errors.full_messages.each do |msg|
-      %li.text-danger
-        = msg
+  .card
+    .card-header
+      %h4.text-danger
+        Please fix the following
+        = pluralize(@ad.errors.count, "error")
+    .card-body
+      %ul
+        - @ad.errors.full_messages.each do |msg|
+          %li.text-danger
+            = msg
 
 
 %label Select Organization
