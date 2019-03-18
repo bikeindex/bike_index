@@ -1,5 +1,6 @@
 class Admin::BulkImportsController < Admin::BaseController
   before_filter :find_bulk_import, only: [:show, :update]
+  layout 'new_admin'
 
   def index
     page = params[:page] || 1
