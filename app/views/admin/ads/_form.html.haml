@@ -1,23 +1,18 @@
-.ad-edit-form#chosen-container
-  - if @ad.errors.any?
-    #alert-block
-      .alert.alert-error
-        %h4
-          Please fix the following
-          = pluralize(@ad.errors.count, "error")
-        %ul
-          - @ad.errors.full_messages.each do |msg|
-            %li
-              = msg
-  .ad-split-fields
-    .blog-field.chosen-select
-      = collection_select( :ad, :organization_id, @organizations, :id, :name, :required =>true, prompt: "Choose an organization")
+- if @ad.errors.any?
+  %h4.text-danger
+    Please fix the following
+    = pluralize(@ad.errors.count, "error")
+  %ul
+    - @ad.errors.full_messages.each do |msg|
+      %li.text-danger
+        = msg
 
-    .blog-field
-      = f.text_field :target_url, placeholder: 'Target url'
 
-  .blog-field
-    = f.text_field :title, placeholder: "Title"
-    
-  .blog-field.ad-body
-    = f.text_area :body, placeholder: 'ad body copy'
+%label Select Organization
+= collection_select( :ad, :organization_id, @organizations, :id, :name, {}, class: "form-control w-50")
+%label URL
+= f.text_field :target_url, placeholder: 'Target url', class: "form-control w-50"
+%label Title
+= f.text_field :title, placeholder: "Title", class: "form-control w-50"
+%label.w-100 Body
+= f.text_area :body, placeholder: 'ad body copy', class: "form control w-50 block"

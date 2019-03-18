@@ -1,32 +1,34 @@
 %h1.padded
   Edit Ad
 
-.admin-ad-preview
-  = render 'shared/ad'
 
-.form.form-horizontal
+= render 'revised_shared/ad'
+
+%form
   = form_for [:admin, @ad] do |f|
     = render partial: 'form', locals: { f: f }
-
-    .well.span6.ad-form-actions
-      .control-group.avatar-upload
-        %label.control-label
-          Ad image
-        .controls
-          .avatar-img
-            - if @ad.image? 
-              = image_tag(@ad.image_url(:small))
-            - else
-              %p
-                No picture!
-          = f.file_field :image
+    %label.w-100
+      Ad image
+    - if @ad.image?
+      = image_tag(@ad.image_url(:small))
+    - else
+      %p
+        No picture!
+      %ul.list-inline
+        %li.list-inline-item
+          = f.file_field :image, class: "btn btn-light"
           = f.hidden_field :image_cache
+        %li.list-inline-item
+          .form-check.form-check-inline
+            %p.form-check-label
+              Live?
+            = f.check_box :live, class: "form-check inline-block form-check-input ml-2"
+        = f.submit "Update", class: 'btn btn-success float-right'
 
-      .control-group
-        .control-label
-          = f.label :live
-        .controls
-          = f.check_box :live
-    .span5
-      .control-group.actions.big-action
-        = f.submit "Update", class: 'button-green big-action'
+  -#
+  -# %label Ad Image
+  -# - if @ad.image?
+  -#   = image_tag(@ad.image_url(:small))
+  -# - else
+  -#   %p
+  -#   No Picture!
