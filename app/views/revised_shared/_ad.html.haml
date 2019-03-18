@@ -1,14 +1,18 @@
 .card
-  .card-header
-    %a{ href: @ad.target_url }
-      = image_tag @ad.image_url(:large) if @ad.image.present?
-  .card-body
-    %a{href: @ad.target_url}
-      %h3
-        = @ad.title
+  %ul.list-group.list-group-flush
+    - if @ad.image.present?
+      %li.list-group-item
+        %a{ href: @ad.target_url }
+          = image_tag @ad.image_url(:large) if @ad.image.present?
+    %li.list-group-item
+      %a{href: @ad.target_url}
+        %h3
+          = @ad.title
+    %li.list-group-item
       %p
         = @ad.body
 
+-# Not sure if this stays or goes, please ADVISE
 :plain
   <script>
   $('.partner-block a').click(function(e) {
