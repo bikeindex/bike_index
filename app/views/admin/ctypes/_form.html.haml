@@ -1,42 +1,32 @@
-.form.form-horizontal#chosen-container
-  = form_for [:admin, @ctype] do |f|
-    - if @ctype.errors.any?
-      #alert-block
-        .alert.alert-error
-          %h4
-            Please fix the following 
-            = pluralize(@ctype.errors.count, "error")
-          %ul
-            - @ctype.errors.full_messages.each do |msg|
-              %li
-                = msg
-    .control-group.padded
-      = f.label :name, class: "control-label"
-      .controls
-        = f.text_field :name
 
-    .control-group
-      = f.label :secondary_name, class: "control-label"
-      .controls
-        = f.text_field :secondary_name
-    
-    .control-group.avatar-upload
-      = f.label :image, "Component type avatar", class: "control-label"
-      .controls
-        .avatar-img
-          - if @ctype.image?
-            = image_tag(@ctype.image_url(:thumb))
-          - else
-            %p
-              No picture!
-        = f.file_field :image
-        = f.hidden_field :image_cache
-    .control-group
-      %label.control-label
-        Select Component group(s)
-      .controls
-        = collection_select :ctype, :cgroup_id, Cgroup.all, :id, :name, prompt: "Select the component group"  
-    .padded
-      = f.submit 'Save', class: 'button-green pull-right'
+= form_for [:admin, @ctype], html: {class: "form-group"} do |f|
+  - if @ctype.errors.any?
+    %h4
+      Please fix the following
+      = pluralize(@ctype.errors.count, "error")
+    %ul
+      - @ctype.errors.full_messages.each do |msg|
+        %li
+          = msg
 
-  
+  = f.label :name, "Name"
+  = f.text_field :name, class: "form-control w-25"
+
+  = f.label :secondary_name, "Secondary Name"
+  = f.text_field :secondary_name, class: "form-control w-25"
+
+  = f.label :cgroup, "Component Group"
+  = collection_select :ctype, :cgroup_id, Cgroup.all, :id, :name, {prompt: "Select the component group"}, class: "form-control w-25"
+
+  = f.label :image, "Component type avatar", class: "mt-2"
+  - if @ctype.image?
+    = image_tag(@ctype.image_url(:thumb))
+  - else
+    %p
+      No picture!
+
+  = f.file_field :image, class: "w-100"
+  = f.hidden_field :image_cache
+
+  .mt-4
+    = f.submit 'Save', class: 'btn btn-success'
