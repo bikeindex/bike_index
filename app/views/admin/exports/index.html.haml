@@ -1,22 +1,21 @@
-%section.full-screen-table
-  %header.with-subtitle
-    %h1
-      Export
-  %p
-    #{pluralize(@exports.total_count, "Matching Export")}
 
-  - if current_organization.present?
-    %h4.mt-4
-      #{link_to current_organization.name, admin_organization_path(current_organization)} Exports
-      %br
-      %small
-        = link_to "view orgs view", organization_exports_path(organization_id: current_organization.to_param), class: "less-strong"
+%h1
+  Exports
+%p
+  #{pluralize(@exports.total_count, "Matching Export")}
 
-  .paginate-container
-    = paginate @exports
+- if current_organization.present?
+  %h4.mt-4
+    #{link_to current_organization.name, admin_organization_path(current_organization)} Exports
+    %small
+      = link_to "view orgs view", organization_exports_path(organization_id: current_organization.to_param), class: "less-strong"
 
-  %table.table.table-striped.table-bordered.padded
-    %thead
+
+= paginate @exports, views_prefix: "admin"
+
+.full-screen-table-wrapper
+  %table.table.table-striped.table-bordered.mt-4
+    %thead.thead-light
       %th
         Date
       %th
@@ -44,9 +43,10 @@
               = link_to export.organization.name, admin_exports_url(organization_id: export.organization.to_param)
             - else
               = link_to "none", admin_exports_url(organization_id: "none"), style: "color: #ccc"
-            %br
             %small
               = export.file.url
           %td
             - if export.finished?
               = number_with_delimiter(export.rows)
+
+= paginate @exports, views_prefix: "admin"
