@@ -13,7 +13,7 @@ class Admin::UsersController < Admin::BaseController
       elsif params[:content_admins]
         users = User.where(is_content_admin: true)
       else 
-        users = User.order("created_at desc")
+        users = User.includes(memberships: [:organization]).order("created_at desc")
       end
       @users = users.page(page).per(per_page)
     end

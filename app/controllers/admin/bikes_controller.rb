@@ -2,7 +2,7 @@ class Admin::BikesController < Admin::BaseController
   before_filter :find_bike, only: [:edit, :destroy, :update, :get_destroy]
 
   def index
-    bikes = Bike.unscoped.includes(:creation_organization, :manufacturer, :paint, :primary_frame_color, :secondary_frame_color, :tertiary_frame_color)
+    bikes = Bike.unscoped.includes(:creation_organization, :creation_state, :paint)
     if params[:email]
       bikes = bikes.admin_text_search(params[:email])
     else
