@@ -17,9 +17,8 @@
 
   = f.label :organization_id
   = f.collection_select(:organization_id, Organization.all, :id, :name, {}, class: "form-control w-50")
-  %label CSV:
+  = f.label :file, "CSV:"
   = f.file_field :file, class: "form-control-file mb-2"
-  %label
-    = f.check_box :no_notify
-    Don't send emails to registrations
+  = f.label :no_notify, "Don't send emails to registrations"
+  = f.check_box :no_notify
   = f.submit 'Create', class: "btn btn-success float-right"
