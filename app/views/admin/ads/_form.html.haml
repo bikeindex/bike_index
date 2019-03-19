@@ -10,12 +10,11 @@
           %li.text-danger
             = msg
 
-
-%label Select Organization
-= collection_select( :ad, :organization_id, @organizations, :id, :name, {}, class: "form-control w-50")
-%label URL
-= f.text_field :target_url, placeholder: 'Target url', class: "form-control w-50"
-%label Title
-= f.text_field :title, placeholder: "Title", class: "form-control w-50"
-%label.w-100 Body
-= f.text_area :body, placeholder: 'ad body copy', class: "form control w-50 block"
+= f.label :organization
+= collection_select( :ad, :organization_id, @organizations, :id, :name, {:include_blank => "Please select org"}, class: "form-control w-50 mb-2")
+= f.label :url
+= f.text_field :target_url, placeholder: 'Target url', class: "form-control w-50 mb-2"
+= f.label :title
+= f.text_field :title, placeholder: "Title", class: "form-control w-50 mb-2"
+= f.label :body, class: "w-100"
+= f.text_area :body, placeholder: 'Ad body copy', class: "form-control w-50 block"

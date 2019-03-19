@@ -1,4 +1,4 @@
-.card
+.card.mb-2
   %ul.list-group.list-group-flush
     - if @ad.image.present?
       %li.list-group-item
@@ -12,7 +12,7 @@
       %p
         = @ad.body
 
--# Not sure if this stays or goes, please ADVISE
+
 :plain
   <script>
   $('.partner-block a').click(function(e) {
