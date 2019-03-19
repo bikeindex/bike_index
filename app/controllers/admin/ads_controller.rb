@@ -12,7 +12,7 @@ class Admin::AdsController < Admin::BaseController
   end
 
   def edit
-    
+
   end
 
   def update
