@@ -41,10 +41,6 @@ class CircularImageUploader < CarrierWave::Uploader::Base
   process :strip # Remove EXIF data, because we don't need it
   process convert: "jpg"
   
-  # def default_url
-  #   'https://files.bikeindex.org/blank.png'
-  # end
-
   version :large do
     process :round_image
   end
@@ -64,7 +60,7 @@ class CircularImageUploader < CarrierWave::Uploader::Base
   def round_image
     manipulate! do |img|
       path = img.path
-      new_tmp_path = File.join(Rails.root, "tmp", "cache", "/round_#{File.basename(path)}")
+      new_tmp_path = File.join(cache_dir, "round_#{File.basename(path)}")
       width, height = img[:dimensions]
       radius_point = ((width > height) ? [width / 2, height] : [width, height / 2]).join(",")
       imagemagick_command = ["convert",
