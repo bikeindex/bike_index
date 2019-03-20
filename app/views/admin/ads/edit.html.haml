@@ -12,9 +12,11 @@
   - else
     %p
       No picture!
-    = f.label :image
-    = f.file_field :image, class: "btn btn-light"
-    = f.hidden_field :image_cache
-    = f.label :live, class: "mr-2"
-    = f.check_box :live
+    .form-group
+      = f.label :image
+      = f.file_field :image, class: "btn btn-light"
+      = f.hidden_field :image_cache
+    .form-group
+      = f.label :live, class: "mr-2"
+      = f.check_box :live
   = f.submit "Update", class: 'btn btn-success float-right'
