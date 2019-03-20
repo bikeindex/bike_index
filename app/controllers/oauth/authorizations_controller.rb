@@ -6,7 +6,6 @@ module Oauth
     private
 
     def authenticate_user_permit_unconfirmed_scope
-      raise StandardError
       # We don't need to authenticate the users if unconfirmed users are permitted
       if params[:scope].to_s[/unconfirmed/i].present?
         return true if unconfirmed_current_user.present?
