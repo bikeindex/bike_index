@@ -56,6 +56,7 @@ describe "Oauth::AuthorizationsController" do
       context "with unconfirmed scope" do
         let(:scope) { "read_bikes+read_user+unconfirmed" }
         it "renders" do
+          fail
           expect(user_subject.confirmed?).to be_falsey
           get authorization_url
           expect(response.code).to eq("200")
