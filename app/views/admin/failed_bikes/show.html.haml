@@ -1,17 +1,17 @@
 %p
-  ID: 
+  ID:
   = @b_param.id
 %p
-  Creator: 
+  Creator:
   - if @b_param.creator.present?
     = @b_param.creator.email
   - else
     No creator
 %p
-  Created: 
+  Created:
   = @b_param.created_at.strftime("%-I:%M %p on %-m/%-d/%Y")
 %p
-  Modified: 
+  Modified:
   = @b_param.updated_at.strftime("%-I:%M %p on %-m/%-d/%Y")
 
 
@@ -23,7 +23,7 @@
   = @b_param.params.to_yaml
 
 
-  
+
 %h3.padded
   Bike Errors
 
