@@ -1,6 +1,6 @@
 
 = form_for [:admin, @ctype], html: {class: "form-group"} do |f|
-  - if @payment.errors.any?
+  - if @ctype.errors.any?
     = render partial: "/shared/errors", locals: { name: "Component Type", obj: @ctype }
   .form-group
     = f.label :name, "Name"
