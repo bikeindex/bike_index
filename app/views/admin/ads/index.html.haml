@@ -1,40 +1,38 @@
-.container
-  .row
-    %h1
-      = link_to "Manage Ads", admin_ads_url
-  .row
-    = link_to 'New ad', new_admin_ad_url, class: "btn btn-success ml-auto"
-  .row
-  %h4.padded
-    = @ads.count
-    ads are in the system so far!
+%h1
+  = link_to "Manage Ads", admin_ads_url
+
+= link_to 'New ad', new_admin_ad_url, class: "btn btn-success float-right mb-2"
+
+%h4
+  = @ads.count
+  ads are in the system so far!
 
 
-%section
+.full-screen-table-wrapper
   %table.table.table-bordered.table-striped
     %thead
-      %th.hidden-sm-down.w-25
+      %th.w-25
         Created
-      %th.hidden-md-down.w-25
+      %th.w-25
         Organization
       %th.w-25
         Text
-      %th.hidden-sm-down.w25
+      %th.w25
         image
 
     %tbody
       - @ads.each do |ad|
         %tr
-          %td.hidden-sm-down.w-25
+          %td.w-25
             %a.convertTime{href: edit_admin_ad_url(ad)}
               = l ad.created_at, format: :convert_time
-          %td.hidden-md-down.w-25
+          %td.w-25
             = ad.organization.name if ad.organization.present?
-          %td.ad-body-cell.w-25
+          %td.w-25
             %h3
-              = link_to ad.title, edit_admin_ad_url(ad)
+              = link_to ad.title, edit_admin_ad_url(ad), class: "text-dark"
             %p
-              = link_to ad.body, edit_admin_ad_url(ad)
-          %td.hidden-sm-down.w-25
+              = link_to ad.body, edit_admin_ad_url(ad), class: "text-dark"
+          %td.w-25
             - if ad.image.present?
               = image_tag ad.image_url(:small)
