@@ -4,21 +4,15 @@
 
 
   - if @bulk_import.errors.any?
-    .card
-      .card-header
-        %h4.text-danger
-          Please fix the following
-          = pluralize(@bulk_import.errors.count, "error")
-      .card-body
-        %ul
-          - @bulk_import.errors.full_messages.each do |msg|
-            %li.text-danger
-              = msg
+    = render partial: "/shared/errors", locals: { name: "Bulk Import", obj: @bulk_import }
 
-  = f.label :organization_id
-  = f.collection_select(:organization_id, Organization.all, :id, :name, {}, class: "form-control w-50")
-  = f.label :file, "CSV:"
-  = f.file_field :file, class: "form-control-file mb-2"
-  = f.label :no_notify, "Don't send emails to registrations"
-  = f.check_box :no_notify
+  .form-group
+    = f.label :organization_id
+    = f.collection_select(:organization_id, Organization.all, :id, :name, {}, class: "form-control w-50")
+  .form-group
+    = f.label :file, "CSV:"
+    = f.file_field :file, class: "form-control-file mb-2"
+  .form-group
+    = f.label :no_notify, "Don't send emails to registrations"
+    = f.check_box :no_notify
   = f.submit 'Create', class: "btn btn-success float-right"
