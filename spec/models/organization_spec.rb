@@ -344,7 +344,8 @@ describe Organization do
       expect(organization.include_field_reg_affiliation?).to be_falsey
     end
     context "with paid_features" do
-      let(:organization) { Organization.new(paid_feature_slugs: %w[reg_secondary_serial reg_address reg_phone reg_affiliation]) }
+      let(:labels) { { reg_phone: "You have to put this in, jerk", reg_secondary_serial: "XXXZZZZ" }.as_json }
+      let(:organization) { Organization.new(paid_feature_slugs: %w[reg_secondary_serial reg_address reg_phone reg_affiliation], registration_field_labels: labels) }
       let(:user) { User.new }
       it "is true" do
         expect(organization.additional_registration_fields.include?("reg_secondary_serial")).to be_truthy
@@ -357,6 +358,11 @@ describe Organization do
         expect(organization.include_field_reg_address?(user)).to be_truthy
         expect(organization.include_field_reg_secondary_serial?).to be_truthy
         expect(organization.include_field_reg_affiliation?(user)).to be_truthy
+        # And test the lables
+        expect(organization.registration_field_label("reg_secondary_serial")).to eq "XXXZZZZ"
+        expect(organization.registration_field_label("reg_address")).to be_nil
+        expect(organization.registration_field_label("reg_phone")).to eq labels["reg_phone"]
+        expect(organization.registration_field_label("reg_affiliation")).to be_nil
       end
       context "with user with attributes" do
         let(:user) { User.new(phone: "888.888.8888") }

@@ -21,7 +21,7 @@ describe CacheAllStolenWorker do
       result = JSON.parse(File.read(cache_all_stolen_worker.tmp_path))
       expect(result['bikes'].count).to eq(1)
       expect(result['bikes'][0]['serial']).to eq('party seri8al')
-      bike_v2_serializer_keys = %w(id title serial manufacturer_name frame_model year frame_colors thumb large_img is_stock_img stolen stolen_location date_stolen frame_material handlebar_type cycle_type)
+      bike_v2_serializer_keys = %w(id title serial manufacturer_name frame_model year frame_colors thumb large_img is_stock_img stolen stolen_location date_stolen frame_material handlebar_type)
       expect(result['bikes'][0].keys).to eq bike_v2_serializer_keys
     end
   end

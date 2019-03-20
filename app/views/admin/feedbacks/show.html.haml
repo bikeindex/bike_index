@@ -1,18 +1,17 @@
-%header.with-subtitle#admin-recoveries
-  %h1
-    #{link_to 'Feedback and messages', admin_feedbacks_path}
 
-%section.full-screen-table.pt-2
-  .card
-    .card-header
-      %h4.card-title
-        #{link_to @feedback.feedback_type, admin_feedbacks_path(type: @feedback.feedback_type)}: #{@feedback.title}
-      %h5.card-subtitle
-        User:
-        = @feedback.name
-    %p.card-body
+%h1
+  #{link_to 'Feedback and messages', admin_feedbacks_path}
 
-      = @feedback.body.truncate(100)
+
+.card
+  .card-header
+    %h4.card-title
+      #{link_to @feedback.feedback_type, admin_feedbacks_path(type: @feedback.feedback_type)}: #{@feedback.title}
+    %h5.card-subtitle
+      User:
+      = @feedback.name
+  %p.card-body
+    = @feedback.body.truncate(100)
 
   %table.table.table-striped.table-bordered
     %tbody
@@ -30,8 +29,6 @@
             = link_to @feedback.email, admin_users_path(user_query: @feedback.email)
 
 
-.padded
 - if @feedback.feedback_hash.present?
   %pre
     = @feedback.feedback_hash.to_yaml
-      

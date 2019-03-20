@@ -22,3 +22,8 @@
     %label.form-well-label
     .form-well-input
       = srecord.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: 'State' }, { class: 'form-control' })
+  .form-group.row
+    %label.form-well-label
+    %label.form-well-input
+      = srecord.check_box :show_address
+      Publicly display exact address theft occurred

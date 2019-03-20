@@ -168,6 +168,7 @@ describe 'Bikes API V3' do
         city: "New York",
         street: "278 Broadway",
         zipcode: "10007",
+        show_address: true,
         state: "NY",
         police_report_number: "99999999",
         police_report_department: "New York"
@@ -191,6 +192,7 @@ describe 'Bikes API V3' do
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
       expect(bike.current_stolen_record.phone).to eq("1234567890")
+      expect(bike.current_stolen_record.show_address).to be_truthy
     end
 
     it 'does not register a stolen bike unless attrs are present' do
@@ -345,6 +347,7 @@ describe 'Bikes API V3' do
       params[:stolen_record] = {
         city: 'Chicago',
         phone: '1234567890',
+        show_address: true,
         police_report_number: '999999'
       }
       params[:owner_email] = 'foo@new_owner.com'
@@ -357,6 +360,7 @@ describe 'Bikes API V3' do
       expect(bike.stolen).to be_truthy
       expect(bike.current_stolen_record.date_stolen.to_i).to be > Time.now.to_i - 10
       expect(bike.current_stolen_record.police_report_number).to eq('999999')
+      expect(bike.current_stolen_record.show_address).to be_truthy
     end
 
     it 'updates a bike, adds and removes components' do

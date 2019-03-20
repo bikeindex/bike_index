@@ -126,6 +126,10 @@ class Organization < ActiveRecord::Base
     additional_registration_fields.include?("reg_secondary_serial")
   end
 
+  def registration_field_label(field_slug)
+    registration_field_labels && registration_field_labels[field_slug.to_s]
+  end
+
   def bike_actions? # Eventually there will be other actions beside organization_messages, so use this as general reference
     message_kinds.any? || paid_for?("unstolen_notifications")
   end

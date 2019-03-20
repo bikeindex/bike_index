@@ -33,7 +33,7 @@
         .control-group
           = f.label :date_recovered, class: "control-label"
           .controls
-            - f.object.date_recovered = Time.now
+            - f.object.date_recovered ||= Time.now
             = f.datetime_local_field :date_recovered, max: Time.now + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(f.object.date_recovered, format: :convert_time)
         .control-group.avatar-upload
           = f.label :image, "Recovery photo", class: "control-label"
