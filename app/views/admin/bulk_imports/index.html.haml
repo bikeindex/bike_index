@@ -35,7 +35,7 @@
               %a.convertTime{ href: admin_bulk_import_url(bulk_import) }
                 = l bulk_import.created_at, format: :convert_time
               - if bulk_import.organization_id.present?
-                %small
+                %small.less-strong
                   = link_to "org view", organization_bulk_import_path(bulk_import, organization_id: bulk_import.organization.to_param), class: "em less-strong"
             %td
               - bulk_import_progress_class = bulk_import.progress == "finished" ? "text-success" : ""
@@ -50,7 +50,7 @@
               - if bulk_import.user_id.present?
                 = bulk_import.user.display_name
               - if bulk_import.ascend?
-                %small
+                %small.less-strong
                   ascend
                 - if bulk_import.ascend_unprocessable?
                   %span.text-danger
