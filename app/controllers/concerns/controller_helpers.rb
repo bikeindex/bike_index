@@ -135,6 +135,7 @@ module ControllerHelpers
     # we ALWAYS want to remove the session partner
     partner = session.delete(:partner)
     partner ||= params[:partner]
+    partner ||= session[:return_to] && session[:return_to].match(/https...(new)?bikehub.com/i).present? ? "bikehub" : nil
     # fallback to assigning via session, but if partner was set via param, still remove the session partner.
     @sign_in_partner = partner&.downcase == "bikehub" ? "bikehub" : nil # For now, only permit bikehub partner
   end

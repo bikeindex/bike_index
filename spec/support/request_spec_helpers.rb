@@ -31,6 +31,7 @@ shared_context :existing_doorkeeper_app do
   let(:v2_access_id) { ENV["V2_ACCESSOR_ID"] = user.id.to_s }
   let(:token) { Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: user.id) }
   let(:all_scopes) { OAUTH_SCOPES.join(" ") }
+  let(:redirect_uri) { "https://app.com" }
 
   let(:v2_access_token) do
     Doorkeeper::AccessToken.create!(application_id: doorkeeper_app.id, resource_owner_id: v2_access_id, scopes: "write_bikes")
@@ -41,7 +42,7 @@ shared_context :existing_doorkeeper_app do
   end
 
   def create_doorkeeper_app(_opts = {})
-    application = Doorkeeper::Application.new(name: "MyApp", redirect_uri: "https://app.com")
+    application = Doorkeeper::Application.new(name: "MyApp", redirect_uri: redirect_uri)
     application.owner = application_owner
     application.save
     application

@@ -9,6 +9,8 @@ class SessionsController < ApplicationController
 
   def create
     @user = User.fuzzy_confirmed_or_unconfirmed_email_find(permitted_parameters[:email])
+    pp session.as_json
+
     if @user.present?
       if @user.authenticate(permitted_parameters[:password])
         sign_in_and_redirect(@user)

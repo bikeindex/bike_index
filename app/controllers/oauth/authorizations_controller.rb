@@ -6,7 +6,12 @@ module Oauth
     private
 
     def authenticate_user_permit_unconfirmed_scope
-      authenticate_user unless params[:scope].to_s[/unconfirmed/i].present? && unconfirmed_current_user.present?
+      raise StandardError
+      # We don't need to authenticate the users if unconfirmed users are permitted
+      if params[:scope].to_s[/unconfirmed/i].present?
+        return true if unconfirmed_current_user.present?
+      end
+      authenticate_user
     end
 
     # Overriding doorkeepers default, so we can add partner to the session
