@@ -1,43 +1,31 @@
-.form.form-horizontal#chosen-container
-  = form_for [:admin, @organization_invitation] do |f|
-    - if @organization_invitation.errors.any?
-      #alert-block
-        .alert.alert-error
-          %h4
-            Please fix the following 
-            = pluralize(@organization_invitation.errors.count, "error")
-          %ul
-            - @organization_invitation.errors.full_messages.each do |msg|
-              %li
-                = msg
-    %h3
-      Send organization invitation
-    
-    .control-group.chosen-select.padded
-      %label.control-label
-        Organization select
-      .controls
-        = collection_select( :organization_invitation, :organization_id, @organizations, :id, :name, :required =>true, prompt: "Choose an organization")
-          
-    .control-group.padded
-      = f.label :invitee_email, "Email you're inviting", class: "control-label"
-      .controls
-        = f.email_field :invitee_email, :required =>true
 
-    .control-group
-      = f.label :invitee_name, "Name", class: "control-label"
-      .controls
-        = f.text_field :invitee_name, :required =>true
+= form_for [:admin, @organization_invitation] do |f|
+  - if @organization_invitation.errors.any?
+    = render partial: "/shared/errors", locals: { name: "Payment", obj: @organization_invitation }
 
-    .control-group
-      = f.label :membership_role, class: "control-label"
-      .controls.radio-controls
-        %label.radio
-          = f.radio_button :membership_role, "admin"
-          Admin of organization
-        %label.radio
-          = f.radio_button :membership_role, "member"
-          Member of organization
+  %h3
+    Send organization invitation
 
-    .control-group.actions
-      = f.submit 'Send invitation', class: 'button-green'
+  .form-group
+    = f.label :organization
+    = collection_select :organization_invitation, :organization_id, @organizations, :id, :name, {prompt: "Select the Organization"}, class: "form-control w-25"
+
+  .form-group
+    = f.label :invitee_email, "Email you're inviting"
+    = f.email_field :invitee_email, :required =>true, class: "form-control w-25"
+
+  .form-group
+    = f.label :invitee_name, "Name"
+    = f.text_field :invitee_name, :required =>true, class: "form-control w-25"
+
+  .form-group
+    = f.label :membership_role, "Membership role: "
+    %label
+      = f.radio_button :membership_role, "admin"
+      Admin
+    %label
+      = f.radio_button :membership_role, "member"
+      Member
+
+  .control-group.actions
+    = f.submit 'Send invitation', class: 'btn btn-success'
