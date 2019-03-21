@@ -1,64 +1,41 @@
-.form.form-horizontal
-  = form_for [:admin, @manufacturer] do |f|
-    - if @manufacturer.errors.any?
-      #alert-block
-        .alert.alert-error
-          %h4
-            Please fix the following 
-            = pluralize(@manufacturer.errors.count, "error")
-          %ul
-            - @manufacturer.errors.full_messages.each do |msg|
-              %li
-                = msg
 
-    .control-group.padded
-      .control-label
-        = f.label :name
-      .controls
-        = f.text_field :name
+= form_for [:admin, @manufacturer] do |f|
+  - if @manufacturer.errors.any?
+    = render partial: "/shared/errors", locals: { name: "Payment", obj: @manufacturer }
 
-    .control-group.padded
-      .control-label
-        = f.label :website
-      .controls
-        = f.text_field :website
+  .form-group
+    = f.label :name
+    = f.text_field :name, class: "form-control w-25"
 
-    .control-group.padded
-      .control-label
-        = f.label :frame_maker
-      .controls
-        = f.check_box :frame_maker
+  .form-group
+    = f.label :website
+    = f.text_field :website, class: "form-control w-25"
 
-    .control-group.padded
-      .control-label
-        = f.label :open_year
-      .controls
-        = f.text_field :open_year
 
-    .control-group.padded
-      .control-label
-        = f.label :close_year
-      .controls
-        = f.text_field :close_year
+  .form-group
+    = f.label :open_year
+    = f.text_field :open_year, class: "form-control w-25"
 
-    .control-group.avatar-upload
-      %label.control-label
-        Logo
-      .controls
-        .avatar-img
-          - if @manufacturer.logo? 
-            = image_tag(@manufacturer.logo_url(:thumb))
-          - else
-            %p
-              No logo!
-        = f.file_field :logo
-        = f.hidden_field :logo_cache
+  .form-group
+    = f.label :close_year
+    = f.text_field :close_year, class: "form-control w-25"
 
-    .control-group.padded
-      .control-label
-        = f.label :description
-      .controls
-        = f.text_area :description, rows: 7
+    .form-group
+    = f.label :frame_maker
+    = f.check_box :frame_maker
 
-    = f.submit "Submit", class: 'button-green'
+    .form-group
+      = f.label :logo
+      - if @manufacturer.logo?
+        = image_tag(@manufacturer.logo_url(:thumb))
+      - else
+        %p
+          No logo!
+      = f.file_field :logo
+      = f.hidden_field :logo_cache
 
+  .form-group
+    = f.label :description
+    = f.text_area :description, rows: 7, class: "form-control w-25"
+
+  = f.submit "Submit", class: 'btn btn-success mb-4'
