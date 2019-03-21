@@ -8,6 +8,10 @@ class Admin::MembershipsController < Admin::BaseController
 
   def index
     @memberships = Membership.includes(:organization, :user).reorder(created_at: :desc)
+    page = params[:page] || 1
+    per_page = params[:per_page] || 50
+    @memberships = @memberships.order(created_at: :desc)
+                           .page(page).per(per_page)
   end
 
   def show

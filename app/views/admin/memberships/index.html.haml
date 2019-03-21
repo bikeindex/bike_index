@@ -5,6 +5,8 @@
 %h2
   = @memberships.count
   Current memberships
+
+= paginate @memberships, views_prefix: 'admin'
 .full-screen-table-wrapper
   %table.table.table-striped.table-bordered
     %thead.thead-light
@@ -32,3 +34,4 @@
             = link_to membership.organization.name, admin_organization_path(membership.organization)
           %td
             #{link_to 'Edit', edit_admin_membership_url(membership)}
+= paginate @memberships, views_prefix: 'admin'
