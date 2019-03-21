@@ -1,5 +1,6 @@
 class Admin::ManufacturersController < Admin::BaseController
   before_filter :find_manufacturer, only: [:edit, :update, :destroy, :show]
+  layout 'new_admin'
 
   def index
     @manufacturers = Manufacturer.all

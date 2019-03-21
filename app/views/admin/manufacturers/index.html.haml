@@ -1,24 +1,25 @@
-%header.with-subtitle
-  %h1 Manage Manufacturers
-  = link_to 'New Manufacturer', new_admin_manufacturer_url, class: "button-green sharing-links"
+
+%h1 Manage Manufacturers
+= link_to 'New Manufacturer', new_admin_manufacturer_url, class: "btn btn-success float-right"
 
 %h4
-  #{@manufacturers.count} total, 
+  #{@manufacturers.count} total,
   %span.less-strong
     #{Manufacturer.with_websites.count} with websites,
     #{Manufacturer.with_logos.count} with logos.
 
-%ul 
-%section.full-screen-table
-  %table#admin-manufacturers-list.table.table-striped.table-bordered
-    %thead
+.full-screen-table-wrapper.mt-4
+  %table.table.table-striped.table-bordered
+    %thead.thead-light
       %th
         Name
       %th
         Frames
-      %th.large-screens
+      -# Available on large screens
+      %th
         Website
-      %th.large-screens
+      -# Available on large screens
+      %th
         Added
     %tbody
       - @manufacturers.each do |manufacturer|
@@ -27,19 +28,17 @@
             = link_to manufacturer.name, admin_manufacturer_url(manufacturer)
           %td.table-cell-check
             = "&#x2713;".html_safe if manufacturer.frame_maker
-          %td.large-screens
+            -# Available on large screens
+          %td
             - if manufacturer.website
               = link_to "Company website", manufacturer.website
           %td
             %span.convertTime
               = l manufacturer.created_at, format: :convert_time
 
-.form
-  = form_tag import_admin_manufacturers_path, multipart: true do
-    .control-group.padded
-      .control-label
-        %label
-          Upload CSV of Manufacturers list
-      .controls
-        = file_field_tag :file
-    = submit_tag "Import CSV of Manufacturers", class: "button-yellow"
+
+= form_tag import_admin_manufacturers_path, multipart: true do
+  .form-group
+    = label :csv, "Upload CSV of Manufacturers list"
+    = file_field_tag :file
+  = submit_tag "Import CSV of Manufacturers", class: "btn btn-warning float-right mb-4"
