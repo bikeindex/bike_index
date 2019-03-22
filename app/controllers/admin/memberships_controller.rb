@@ -4,9 +4,14 @@ class Admin::MembershipsController < Admin::BaseController
   before_filter :find_user, only: [:show]
   before_filter :find_organizations
   before_filter :find_organization, only: [:show]
+  layout "new_admin"
 
   def index
     @memberships = Membership.includes(:organization, :user).reorder(created_at: :desc)
+    page = params[:page] || 1
+    per_page = params[:per_page] || 50
+    @memberships = @memberships.order(created_at: :desc)
+                           .page(page).per(per_page)
   end
 
   def show
@@ -68,7 +73,7 @@ class Admin::MembershipsController < Admin::BaseController
   def find_user
     @user = User.find(@membership[:user_id])
   end
-  
+
   def find_organizations
     @organizations = Organization.all
   end
