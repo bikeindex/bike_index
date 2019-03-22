@@ -20,7 +20,7 @@
         %p
           Anyone can help Bike Index. We are always in need of donations, connections to local bike shops and other organizations, and shares on social media. But maybe you know of a great shop or a budding advocacy group in your town that would love to register bikes for their users and constituents. Or maybe your local police department is looking to upgrade their registry. (Or maybe they don’t even have one yet).
 
-        %p
+        %p.mb-4
           You bring the ideas, make the connections, and we’ll make sure you have the resources to get stuff done.
 
         = link_to "Apply to be an ambassador here", "https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform", class: "btn btn-primary"
@@ -42,7 +42,7 @@
         %p
           To become a Bike Index Ambassador, fill out the application above. If we approve your application - and why wouldn’t we?! - Then, all you need to do is connect us with your local cycling organizations. No organization is off the table, so be creative.
 
-        %h3
+        %h3#ambassador_activities
           Typical ambassador activities include:
 
         %ul
@@ -73,8 +73,8 @@
         %p
           = link_to "Be a bike saver", "https://bikeindex.org/news/be-a-bike-saver---donate-to-bike-index-on-giving-tuesday"
 
-        %h3
-          =link_to "View current ambassadors", "https://bikeindex.org/ambassadors_current"
+        %h3#current_ambassadors
+          =link_to "View current ambassadors", ambassadors_current_path
 
         .mobile-contact-link
           %a.btn.btn-primary.btn-lg{ href: 'mailto:lily@bikeindex.org' }
@@ -93,11 +93,8 @@
                 %a{ href: '#ambassadors_how', class: 'scroll-to-ref', data: { offset: -80 } }
                   How it works
               %li
-                %a{ href: '#ambassadors_kits', class: 'scroll-to-ref', data: { offset: -80 } }
-                  Ambassador kits
-              %li
-                %a{ href: '#ambassadors_scholarships', class: 'scroll-to-ref', data: { offset: -80 } }
-                  Scholarships
+                %a{ href: '#ambassador_activities', class: 'scroll-to-ref', data: { offset: -80 } }
+                  Typical ambassador activities
               %li
                 %a{ href: ambassadors_current_path }
                   Current ambassadors
