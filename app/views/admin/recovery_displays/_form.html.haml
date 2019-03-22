@@ -26,25 +26,25 @@
       %p
         No picture!
     = f.file_field :image, class: "float-right"
-    .form-group
-      - if @recovery_display.image.present?
-        = f.label :remove_image
-        = f.check_box :remove_image
-      - elsif @bike.present? && @recovery_display.image.blank?
-        - if @bike.public_images.present? || @bike.stock_photo_url.present?
-          - if @bike.public_images.present?
-            - text = "has image"
-            - url = @bike.public_images.first.image_url
-          - else
-            - text = "has stock image"
-            - url = @bike.stock_photo_url
-          #{link_to "Bike", bike_url(@bike), target: "_blank"} #{text}
-          %a.btn.btn-default{ href: '#', data: {url: url}}
-            Use first image
-            = f.hidden_field :remote_image_url
+  .form-group
+    - if @recovery_display.image.present?
+      = f.label :remove_image
+      = f.check_box :remove_image
+    - elsif @bike.present? && @recovery_display.image.blank?
+      - if @bike.public_images.present? || @bike.stock_photo_url.present?
+        - if @bike.public_images.present?
+          - text = "has image"
+          - url = @bike.public_images.first.image_url
         - else
-          .controls
-            Bike has no image
+          - text = "has stock image"
+          - url = @bike.stock_photo_url
+        #{link_to "Bike", bike_url(@bike), target: "_blank"} #{text}
+        %a.btn.btn-default{ href: '#', data: {url: url}}
+          Use first image
+          = f.hidden_field :remote_image_url
+      - else
+        .controls
+          Bike has no image
     .form-group
       = f.label :body
       = f.text_area :quote, placeholder: 'Quote about recovery', rows: 4, class: "form-control w-50"
