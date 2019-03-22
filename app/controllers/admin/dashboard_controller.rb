@@ -1,4 +1,3 @@
-
 class Admin::DashboardController < Admin::BaseController
   def index
     @bikes = Bike.unscoped.includes(:creation_organization, :creation_state, :paint).order('created_at desc').limit(10)
@@ -9,8 +8,8 @@ class Admin::DashboardController < Admin::BaseController
   end
 
   def invitations
-    @organizations = Organization.all
-    @organization_invitation = OrganizationInvitation.new
+    @organizations = Organization.all 
+    @organization_invitation = OrganizationInvitation.new 
   end
 
   def maintenance

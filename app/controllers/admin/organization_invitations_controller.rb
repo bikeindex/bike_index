@@ -1,11 +1,12 @@
+
 class Admin::OrganizationInvitationsController < Admin::BaseController
   before_filter :find_organization
   before_filter :find_organization_invitation, only: [:edit, :update, :destroy]
-
+  
   def index
     @organization_invitations = OrganizationInvitation.all
   end
-
+  
   def new
     @organization_invitation = OrganizationInvitation.new
     @organizations = Organization.all
@@ -33,7 +34,7 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
   def create
     @organization_invitation = OrganizationInvitation.new(permitted_parameters)
     @organization_invitation.inviter = current_user
-
+    
     @organization = @organization_invitation.organization
     if @organization.available_invitation_count > 0
       if @organization_invitation.save
