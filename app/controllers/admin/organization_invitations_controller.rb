@@ -1,7 +1,6 @@
 class Admin::OrganizationInvitationsController < Admin::BaseController
   before_filter :find_organization
   before_filter :find_organization_invitation, only: [:edit, :update, :destroy]
-  layout "new_admin"
 
   def index
     @organization_invitations = OrganizationInvitation.all
