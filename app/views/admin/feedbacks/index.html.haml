@@ -11,7 +11,7 @@
     #{params[:type]}
 
 
-  = paginate @feedbacks, views_prefix: 'admin'
+  = paginate @feedbacks, views_prefix: 'admin', window: 3
 
 .full-screen-table-wrapper
   %table.table.table-bordered.table-striped
