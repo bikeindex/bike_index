@@ -46,6 +46,7 @@ class Organization < ActiveRecord::Base
 
   scope :shown_on_map, -> { where(show_on_map: true, approved: true) }
   scope :paid, -> { where(is_paid: true) }
+  scope :unpaid, -> { where(is_paid: true) }
   scope :valid, -> { where(is_suspended: false) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
   scope :with_bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications]) }
@@ -88,6 +89,8 @@ class Organization < ActiveRecord::Base
     slug
   end
 
+  def ascend_imports?; ascend_name.present? end
+
   def mail_snippet_body(type)
     return nil unless MailSnippet.organization_snippet_types.include?(type)
     snippet = mail_snippets.enabled.where(name: type).first
@@ -122,6 +125,10 @@ class Organization < ActiveRecord::Base
 
   def include_field_reg_secondary_serial?(user = nil)
     additional_registration_fields.include?("reg_secondary_serial")
+  end
+
+  def registration_field_label(field_slug)
+    registration_field_labels && registration_field_labels[field_slug.to_s]
   end
 
   def bike_actions? # Eventually there will be other actions beside organization_messages, so use this as general reference
@@ -180,7 +187,7 @@ class Organization < ActiveRecord::Base
   end
 
   # Enable this if they have paid for showing it, or if they use ascend
-  def show_bulk_import?; paid_for?("show_bulk_import") || ascend_name.present? end
+  def show_bulk_import?; paid_for?("show_bulk_import") || ascend_imports? end
 
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates

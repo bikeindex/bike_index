@@ -2,6 +2,8 @@
 - title ||= false
 - id ||= ''
 - data_hash ||= {}
+- start_open ||= false
+
 .modal.fade{ id: id, data: data_hash }
   .modal-dialog{ role: 'document' }
     .modal-content
@@ -14,3 +16,7 @@
                 &times;
           %hr
       = modal_body
+
+- if start_open && id.present?
+  :javascript
+    $(document).ready(function() { $("##{id}").modal("show"); });

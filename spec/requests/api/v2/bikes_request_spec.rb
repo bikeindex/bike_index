@@ -43,8 +43,6 @@ describe 'Bikes API V2' do
     let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes") }
     before :each do
       FactoryBot.create(:wheel_size, iso_bsd: 559)
-      CycleType.bike
-      PropulsionType.foot_pedal
     end
     include_context :geocoder_default_location
 
@@ -64,7 +62,7 @@ describe 'Bikes API V2' do
       FactoryBot.create(:ctype, name: 'wheel')
       FactoryBot.create(:ctype, name: 'Headset')
       front_gear_type = FactoryBot.create(:front_gear_type)
-      handlebar_type = FactoryBot.create(:handlebar_type)
+      handlebar_type_slug = "bmx"
       components = [
         {
           manufacturer: manufacturer.name,
@@ -82,7 +80,7 @@ describe 'Bikes API V2' do
       ]
       bike_attrs.merge!(components: components,
                    front_gear_type_slug: front_gear_type.slug,
-                   handlebar_type_slug: handlebar_type.slug,
+                   handlebar_type_slug: handlebar_type_slug,
                    is_for_sale: true,
                    is_bulk: true,
                    is_new: true,
@@ -103,7 +101,7 @@ describe 'Bikes API V2' do
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.pluck(:ctype_id).uniq.count).to eq(2)
       expect(bike.front_gear_type).to eq(front_gear_type)
-      expect(bike.handlebar_type).to eq(handlebar_type)
+      expect(bike.handlebar_type).to eq(handlebar_type_slug)
       creation_state = bike.creation_state
       expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
       expect(creation_state.origin).to eq 'api_v2'
@@ -214,8 +212,6 @@ describe 'Bikes API V2' do
     let!(:tokenized_url) { "/api/v2/bikes?access_token=#{v2_access_token.token}" }
     before :each do
       FactoryBot.create(:wheel_size, iso_bsd: 559)
-      FactoryBot.create(:cycle_type, slug: 'bike')
-      FactoryBot.create(:propulsion_type, name: 'Foot pedal')
     end
 
     it 'also sets front wheel bsd' do

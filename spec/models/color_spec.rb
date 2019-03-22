@@ -52,13 +52,5 @@ describe Color do
         expect { Color.black }.to change(Color, :count).by(1)
       end
     end
-    context 'existing' do
-      before do
-        Color.black
-      end
-      it 'does not create' do
-        expect { Color.black }.to change(PropulsionType, :count).by(0)
-      end
-    end
   end
 end

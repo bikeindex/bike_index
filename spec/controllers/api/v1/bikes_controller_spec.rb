@@ -61,6 +61,7 @@ describe Api::V1::BikesController do
             serial_number: 'SSOMESERIAL',
             manufacturer: 'Specialized',
             frame_model: 'Diverge Elite DSW (58)',
+            cycle_type: 'trail-behind',
             color: 'Black/Red',
             send_email: true,
             frame_size: '58',
@@ -134,7 +135,6 @@ describe Api::V1::BikesController do
         manufacturer = FactoryBot.create(:manufacturer)
         rear_gear_type = FactoryBot.create(:rear_gear_type)
         front_gear_type = FactoryBot.create(:front_gear_type)
-        handlebar_type = FactoryBot.create(:handlebar_type)
         f_count = Feedback.count
         bike_attrs = {
           serial_number: '69 non-example',
@@ -146,12 +146,13 @@ describe Api::V1::BikesController do
           year: '1969',
           owner_email: 'fun_times@examples.com',
           frame_model: "Tricruiser Tricycle",
+          cycle_type: 'trail-behind',
           send_email: true,
           frame_size: '56cm',
           frame_size_unit: nil,
           rear_gear_type_slug: rear_gear_type.slug,
           front_gear_type_slug: front_gear_type.slug,
-          handlebar_type_slug: handlebar_type.slug,
+          handlebar_type_slug: "forward",
           registered_new: true
         }
         components = [
@@ -205,7 +206,7 @@ describe Api::V1::BikesController do
         expect(bike.primary_frame_color.name).to eq bike_attrs[:color]
         expect(bike.rear_gear_type.slug).to eq bike_attrs[:rear_gear_type_slug]
         expect(bike.front_gear_type.slug).to eq bike_attrs[:front_gear_type_slug]
-        expect(bike.handlebar_type.slug).to eq bike_attrs[:handlebar_type_slug]
+        expect(bike.handlebar_type).to eq bike_attrs[:handlebar_type_slug]
         creation_state = bike.creation_state
         expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([false, false, false])
         expect(creation_state.organization).to eq @organization
@@ -224,7 +225,8 @@ describe Api::V1::BikesController do
           color: FactoryBot.create(:color).name,
           example: true,
           year: '1969',
-          owner_email: 'fun_times@examples.com'
+          owner_email: 'fun_times@examples.com',
+          cycle_type: 'wheelchair'
         }
         photos = [
           'http://i.imgur.com/lybYl1l.jpg',
@@ -299,13 +301,13 @@ describe Api::V1::BikesController do
         org.save
         bike_attrs = {
           serial_number: '69 example bikez',
-          cycle_type_id: FactoryBot.create(:cycle_type, slug: 'gluey').id,
+          cycle_type_slug: 'unicycle',
           manufacturer_id: manufacturer.id,
           rear_tire_narrow: 'true',
           rear_wheel_size: 559,
           color: 'grazeen',
           frame_material_slug: "Steel",
-          handlebar_type_slug: FactoryBot.create(:handlebar_type, slug: 'foo').slug,
+          handlebar_type_slug: "Other",
           description: 'something else',
           owner_email: 'fun_times@examples.com'
         }
@@ -324,7 +326,9 @@ describe Api::V1::BikesController do
         expect(bike.description).to eq('something else')
         expect(bike.frame_material_name).to eq('Steel')
         expect(bike.frame_material).to eq('steel')
-        expect(bike.handlebar_type.slug).to eq('foo')
+        expect(bike.handlebar_type).to eq('other')
+        expect(bike.cycle_type).to eq('unicycle')
+        expect(bike.cycle_type_name).to eq('Unicycle')
       end
 
       it 'creates a record even if the post is a string' do
@@ -336,7 +340,8 @@ describe Api::V1::BikesController do
           rear_tire_narrow: 'true',
           rear_wheel_bsd: '559',
           color: FactoryBot.create(:color).name,
-          owner_email: 'jsoned@examples.com'
+          owner_email: 'jsoned@examples.com',
+          cycle_type: 'tandem'
         }
         options = { bike: bike_attrs.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
         expect do
@@ -358,7 +363,8 @@ describe Api::V1::BikesController do
           rear_wheel_bsd: '559',
           color: FactoryBot.create(:color).name,
           owner_email: 'jsoned@examples.com',
-          send_email: 'false'
+          send_email: 'false',
+          cycle_type_name: ' trailer '
         }
         options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
         expect do

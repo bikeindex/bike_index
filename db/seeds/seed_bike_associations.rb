@@ -1,26 +1,3 @@
-# Seed the cycle types
-cycle_types = [
-  { name: 'Bike', slug: 'bike' },
-  { name: 'Tandem', slug: 'tandem' },
-  { name: 'Unicycle', slug: 'unicycle' },
-  { name: 'Tricycle', slug: 'tricycle' },
-  { name: 'Recumbent', slug: 'recumbent' },
-  { name: 'Pedi Cab (rickshaw)', slug: 'pedi-cab' },
-  { name: 'Cargo Bike (front storage)', slug: 'cargo' },
-  { name: 'Cargo Bike (rear storage)', slug: 'cargo-rear' },
-  { name: 'Cargo Tricycle (front storage)', slug: 'cargo-trike' },
-  { name: 'Cargo Tricycle (rear storage)', slug: 'cargo-trike-rear' },
-  { name: 'Bike Trailer', slug: 'trailer' },
-  { name: 'Trail behind (half bike)', slug: 'trail-behind' },
-  { name: 'Tall Bike', slug: 'tall-bike' },
-  { name: 'Penny Farthing', slug: 'penny-farthing' },
-  { name: 'Wheelchair', slug: 'wheelchair' },
-  { name: 'Stroller', slug: 'stroller' }]
-cycle_types.each do |ct|
-  cycle_type = CycleType.create(name: ct[:name], slug: ct[:slug])
-  cycle_type.save
-end
-
 # Seed the lock types
 
 lock_types = ['U-lock', 'Chain with lock', 'Cable', 'Locking skewer', 'Other style']
@@ -48,27 +25,6 @@ colors = [
 colors.each do |c|
   color = Color.create(name: c[:name], priority: c[:priority], display: c[:display])
   color.save
-end
-
-# Seed the handlebar types
-handlebar_types = [
-  { name: 'Flat or riser', slug: 'flat' },
-  { name: 'Drop', slug: 'drop' },
-  { name: 'Forward facing', slug: 'forward' },
-  { name: 'Rear facing', slug: 'rearward' },
-  { name: 'BMX style', slug: 'bmx' },
-  { name: 'Not handlebars', slug: 'other' }]
-handlebar_types.each do |h|
-  handlebar_type = HandlebarType.create(name: h[:name], slug: h[:slug])
-  handlebar_type.save
-end
-
-# Seed the propulsion types
-propulsions = ['Foot pedal', 'Hand pedal', 'Sail', 'Insufflation', 'Electric Assist', 'Electric throttle', 'Gas', 'Other style']
-propulsions.each do |prop|
-  propulsion_type = PropulsionType.create(name: prop)
-  propulsion_type.slug = 'other' if prop == 'Other style'
-  propulsion_type.save
 end
 
 # Seed the gear types

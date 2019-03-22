@@ -1,13 +1,13 @@
-%section.full-screen-table
-  %header.with-subtitle
-    %h1
-      Component Types
-    = link_to "New Component type", new_admin_ctype_url, class: "button-green sharing-links"
-  %p 
-    There are #{pluralize(@ctypes.count, "component type")}.
 
-  %table.table.table-striped.table-bordered.padded
-    %thead
+%h1
+  Component Types
+= link_to "New Component type", new_admin_ctype_url, class: "btn btn-success float-right"
+%h4
+  There are #{pluralize(@ctypes.count, "component type")}.
+
+.full-screen-table-wrapper.mt-4.mb-4
+  %table.table.table-striped.table-bordered
+    %thead.thead-light
       %th
         Name
       %th
@@ -27,4 +27,3 @@
             = ctype.cgroup.name.titleize
           %td.large-screens
             = "&#x2713;".html_safe if ctype.image?
-          

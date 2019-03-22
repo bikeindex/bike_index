@@ -1,12 +1,28 @@
-class HandlebarType < ActiveRecord::Base
-  include FriendlySlugFindable
-  has_many :bikes
+class HandlebarType
+  include Enumable
 
-  def self.other
-    where(name: 'Not handlebars', slug: 'other').first_or_create
+  SLUGS = {
+    drop: 5,
+    forward: 4,
+    rearward: 3,
+    other: 2,
+    bmx: 1,
+    flat: 0
+  }.freeze
+
+  NAMES = {
+    drop: "Drop",
+    forward: "Forward facing",
+    rearward: "Rear facing",
+    other: "Not handlebars",
+    bmx: "BMX style",
+    flat: "Flat or riser"
+  }.freeze
+
+  def initialize(slug)
+    @slug = slug&.to_sym
+    @id = SLUGS[@slug]
   end
 
-  def self.flat
-    where(name: 'Flat or riser', slug: 'flat').first_or_create
-  end
+  attr_reader :slug, :id
 end

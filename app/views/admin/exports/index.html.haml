@@ -1,0 +1,52 @@
+
+%h1
+  Exports
+%p
+  #{pluralize(@exports.total_count, "Matching Export")}
+
+- if current_organization.present?
+  %h4.mt-4
+    #{link_to current_organization.name, admin_organization_path(current_organization)} Exports
+    %small
+      = link_to "view orgs view", organization_exports_path(organization_id: current_organization.to_param), class: "less-strong"
+
+
+= paginate @exports, views_prefix: "admin"
+
+.full-screen-table-wrapper
+  %table.table.table-striped.table-bordered.mt-4
+    %thead.thead-light
+      %th
+        Date
+      %th
+        Progress
+      %th
+        Creator
+      %th
+        Organization
+      %th
+        Rows
+    %tbody
+      - @exports.each do |export|
+        %tr
+          %td
+            %a.convertTime{ href: organization_export_path(export, organization_id: export.organization.to_param) }
+              = l export.created_at, format: :convert_time
+          %td
+            %span{ class: export_progress_class(export) }
+              = export.calculated_progress
+          %td
+            - if export.user_id.present?
+              = export.user.display_name
+          %td
+            - if export.organization.present?
+              = link_to export.organization.name, admin_exports_url(organization_id: export.organization.to_param)
+            - else
+              = link_to "none", admin_exports_url(organization_id: "none"), style: "color: #ccc"
+            %small
+              = export.file.url
+          %td
+            - if export.finished?
+              = number_with_delimiter(export.rows)
+
+= paginate @exports, views_prefix: "admin"

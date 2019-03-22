@@ -1,12 +1,12 @@
 class Admin::BulkImportsController < Admin::BaseController
   before_filter :find_bulk_import, only: [:show, :update]
+  layout 'new_admin'
 
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 10
     if params[:organization_id].present?
-      organization_id = params[:organization_id] == "none" ? nil : params[:organization_id]
-      bulk_imports = BulkImport.where(organization_id: organization_id)
+      bulk_imports = BulkImport.where(organization_id: current_organization.id)
     else
       bulk_imports = BulkImport.all
     end

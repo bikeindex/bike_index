@@ -44,8 +44,6 @@ describe 'Bikes API V3' do
     let!(:token) { create_doorkeeper_token(scopes: "read_bikes write_bikes") }
     before :each do
       FactoryBot.create(:wheel_size, iso_bsd: 559)
-      CycleType.bike
-      PropulsionType.foot_pedal
     end
     include_context :geocoder_default_location
 
@@ -81,7 +79,7 @@ describe 'Bikes API V3' do
       FactoryBot.create(:ctype, name: 'wheel')
       FactoryBot.create(:ctype, name: 'Headset')
       front_gear_type = FactoryBot.create(:front_gear_type)
-      handlebar_type = FactoryBot.create(:handlebar_type)
+      handlebar_type_slug = "bmx"
       components = [
         {
           manufacturer: manufacturer.name,
@@ -99,7 +97,7 @@ describe 'Bikes API V3' do
       ]
       bike_attrs.merge!(components: components,
                         front_gear_type_slug: front_gear_type.slug,
-                        handlebar_type_slug: handlebar_type.slug,
+                        handlebar_type_slug: handlebar_type_slug,
                         is_for_sale: true,
                         is_bulk: true,
                         is_new: true,
@@ -121,7 +119,7 @@ describe 'Bikes API V3' do
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.pluck(:ctype_id).uniq.count).to eq(2)
       expect(bike.front_gear_type).to eq(front_gear_type)
-      expect(bike.handlebar_type).to eq(handlebar_type)
+      expect(bike.handlebar_type).to eq(handlebar_type_slug)
       creation_state = bike.creation_state
       expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
       # expect(creation_state.origin).to eq 'api_v3'
@@ -170,6 +168,7 @@ describe 'Bikes API V3' do
         city: "New York",
         street: "278 Broadway",
         zipcode: "10007",
+        show_address: true,
         state: "NY",
         police_report_number: "99999999",
         police_report_department: "New York"
@@ -193,6 +192,7 @@ describe 'Bikes API V3' do
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
       expect(bike.current_stolen_record.phone).to eq("1234567890")
+      expect(bike.current_stolen_record.show_address).to be_truthy
     end
 
     it 'does not register a stolen bike unless attrs are present' do
@@ -222,14 +222,13 @@ describe 'Bikes API V3' do
         color: color.name,
         year: '1969',
         owner_email: 'fun_times@examples.com',
-        organization_slug: organization.slug
+        organization_slug: organization.slug,
+        cycle_type: 'bike'
       }
     end
     let!(:tokenized_url) { "/api/v2/bikes?access_token=#{v2_access_token.token}" }
     before :each do
       FactoryBot.create(:wheel_size, iso_bsd: 559)
-      CycleType.bike
-      PropulsionType.foot_pedal
     end
 
     context 'with membership' do
@@ -251,7 +250,6 @@ describe 'Bikes API V3' do
               post tokenized_url, bike_attrs.merge(no_duplicate: true).to_json, json_headers
             end.to change(Bike, :count).by 0
             result = JSON.parse(response.body)['bike']
-
             expect(response.code).to eq('201')
             expect(result['id']).to eq bike.id
             EmailOwnershipInvitationWorker.drain
@@ -349,6 +347,7 @@ describe 'Bikes API V3' do
       params[:stolen_record] = {
         city: 'Chicago',
         phone: '1234567890',
+        show_address: true,
         police_report_number: '999999'
       }
       params[:owner_email] = 'foo@new_owner.com'
@@ -361,6 +360,7 @@ describe 'Bikes API V3' do
       expect(bike.stolen).to be_truthy
       expect(bike.current_stolen_record.date_stolen.to_i).to be > Time.now.to_i - 10
       expect(bike.current_stolen_record.police_report_number).to eq('999999')
+      expect(bike.current_stolen_record.show_address).to be_truthy
     end
 
     it 'updates a bike, adds and removes components' do

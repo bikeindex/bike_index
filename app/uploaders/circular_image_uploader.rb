@@ -3,8 +3,6 @@
 class CircularImageUploader < CarrierWave::Uploader::Base
   include ::CarrierWave::Backgrounder::Delay
   include CarrierWave::MiniMagick
-  # include Sprockets::Helpers::RailsHelper # Deprecated. Should be removed
-  # include Sprockets::Helpers::IsolatedHelper # Deprecated. Should be removed
  
   if Rails.env.test? || Rails.env.development?
     storage :file
@@ -41,12 +39,8 @@ class CircularImageUploader < CarrierWave::Uploader::Base
 
   process :fix_exif_rotation
   process :strip # Remove EXIF data, because we don't need it
-  process :convert => 'jpg'
+  process convert: "jpg"
   
-  # def default_url
-  #   'https://files.bikeindex.org/blank.png'
-  # end  
-
   version :large do
     process :round_image
   end
@@ -65,27 +59,19 @@ class CircularImageUploader < CarrierWave::Uploader::Base
 
   def round_image
     manipulate! do |img|
-
       path = img.path
-
-      new_tmp_path = File.join(Rails.root, 'tmp/uploads', "/round_#{File.basename(path)}")
-
+      new_tmp_path = File.join(cache_dir, "round_#{File.basename(path)}")
       width, height = img[:dimensions]
-
-      radius_point = ((width > height) ? [width / 2, height] : [width, height / 2]).join(',')
-
-      imagemagick_command = ['convert',
+      radius_point = ((width > height) ? [width / 2, height] : [width, height / 2]).join(",")
+      imagemagick_command = ["convert",
                            "-size #{ width }x#{ height }",
                            'xc:transparent',
                            "-fill #{ path }",
                            "-draw 'circle #{ width / 2 },#{ height / 2 } #{ radius_point }'",
-                           "+repage #{new_tmp_path}"].join(' ')
+                           "+repage #{new_tmp_path}"].join(" ")
 
       system(imagemagick_command)
       MiniMagick::Image.open(new_tmp_path)
     end
   end
-
-
-
 end

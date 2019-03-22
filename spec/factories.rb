@@ -23,18 +23,9 @@ FactoryBot.define do
     "#{n}0"
   end
 
-  factory :cycle_type do
-    name { FactoryBot.generate(:unique_name) }
-    slug { FactoryBot.generate(:unique_name) }
-  end
-
   factory :manufacturer do
     name { FactoryBot.generate(:unique_name) }
     frame_maker { true }
-  end
-
-  factory :propulsion_type do
-    name { FactoryBot.generate(:unique_name) }
   end
 
   factory :front_gear_type do

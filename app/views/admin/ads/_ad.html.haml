@@ -1,14 +1,18 @@
-.container.partner-block-container
-  .partner-block
-    %a.partner-image{ href: @ad.target_url }
-      = image_tag @ad.image_url(:large) if @ad.image.present?
-      %span.ad-label
-        Ad
-    %a.partner-text{ href: @ad.target_url }
-      %h3
-        = @ad.title
+.card.mb-2
+  %ul.list-group.list-group-flush
+    - if @ad.image.present?
+      %li.list-group-item
+        %a{ href: @ad.target_url }
+          = image_tag @ad.image_url(:large) if @ad.image.present?
+    %li.list-group-item
+      %a{href: @ad.target_url}
+        %h3
+          = @ad.title
+    %li.list-group-item
       %p
         = @ad.body
+
+
 :plain
   <script>
   $('.partner-block a').click(function(e) {

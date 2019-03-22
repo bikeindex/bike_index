@@ -75,12 +75,11 @@
             - @invoice.subscription_start_at = TimeParser.round(@invoice.subscription_start_at || Time.now, "seconds")
             = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
             = f.datetime_local_field :start_at, step: 60, required: true, class: "form-control"
-        - if @invoice.id.present? && @invoice.subscription_start_at.present?
-          .control-group
-            = f.label :end_at, "Coverage ends", class: "control-label"
-            .controls
-              - @invoice.subscription_end_at = TimeParser.round(@invoice.subscription_end_at || Time.now, "seconds")
-              = f.datetime_local_field :end_at, step: 60, required: true, class: "form-control"
+        .control-group
+          = f.label :end_at, "Coverage ends", class: "control-label"
+          .controls
+            - @invoice.subscription_end_at = TimeParser.round(@invoice.subscription_end_at || Time.now + 1.year, "seconds")
+            = f.datetime_local_field :end_at, step: 60, required: true, class: "form-control"
       .span6
         .control-group
           = f.label :notes, class: "control-label"

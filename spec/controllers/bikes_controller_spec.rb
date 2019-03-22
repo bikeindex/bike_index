@@ -374,8 +374,8 @@ describe BikesController do
     # This is the create action for bikes controller
     let(:manufacturer) { FactoryBot.create(:manufacturer) }
     let(:color) { FactoryBot.create(:color) }
-    let(:cycle_type) { FactoryBot.create(:cycle_type) }
-    let(:handlebar_type) { FactoryBot.create(:handlebar_type) }
+    let(:cycle_type) { "tandem" }
+    let(:handlebar_type) { "bmx" }
     let(:state) { FactoryBot.create(:state) }
     let!(:country) { state.country }
     let(:chicago_stolen_params) do
@@ -399,15 +399,15 @@ describe BikesController do
           creation_organization_id: organization.id,
           embeded: true,
           additional_registration: 'Testly secondary',
-          cycle_type_id: cycle_type.id,
+          cycle_type_slug: " Tricycle ",
           manufacturer_id: manufacturer.id,
           manufacturer_other: '',
           primary_frame_color_id: color.id,
-          handlebar_type_id: handlebar_type.id,
+          handlebar_type: handlebar_type,
           owner_email: 'flow@goodtimes.com'
         }
       end
-      let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded) }
+      let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded, :cycle_type_slug) }
       context 'non-stolen' do
         it 'creates a new ownership and bike from an organization' do
           expect(user).to be_present
@@ -418,6 +418,7 @@ describe BikesController do
           expect(bike.creation_state.origin).to eq "embed"
           expect(bike.creation_state.organization).to eq organization
           expect(bike.creation_state.creator).to eq bike.creator
+          expect(bike.cycle_type).to eq "tricycle"
           testable_bike_params.each do |k, v|
             pp k unless bike.send(k).to_s == v.to_s
             expect(bike.send(k).to_s).to eq v.to_s
@@ -445,6 +446,7 @@ describe BikesController do
                 stolen_record = bike.current_stolen_record
                 stolen_params.except(:date_stolen, :timezone).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
                 expect(stolen_record.date_stolen.to_i).to be_within(1).of(Time.now.yesterday.to_i)
+                expect(stolen_record.show_address).to be_falsey
               end
             end
           end
@@ -498,10 +500,10 @@ describe BikesController do
           creation_organization_id: organization.id,
           embeded: true,
           embeded_extended: true,
-          cycle_type_id: cycle_type.id,
+          cycle_type: 'pedi-cab',
           manufacturer_id: manufacturer.slug,
           primary_frame_color_id: color.id,
-          handlebar_type_id: handlebar_type.id,
+          handlebar_type: handlebar_type,
           owner_email: 'Flow@goodtimes.com'
         }
       end
@@ -521,6 +523,7 @@ describe BikesController do
             expect(bike.creation_state.origin).to eq 'embed_extended'
             expect(bike.creation_state.organization).to eq organization
             expect(bike.creation_state.creator).to eq bike.creator
+            expect(bike.cycle_type_name).to eq 'Pedi Cab (rickshaw)'
             expect(bike.manufacturer).to eq manufacturer
           end
         end
@@ -576,12 +579,12 @@ describe BikesController do
           {
             serial_number: '1234567890',
             b_param_id_token: b_param.id_token,
-            cycle_type_id: cycle_type.id,
+            cycle_type: 'stroller',
             manufacturer_id: manufacturer.name,
             rear_tire_narrow: 'true',
             rear_wheel_size_id: FactoryBot.create(:wheel_size).id,
             primary_frame_color_id: color.id,
-            handlebar_type_id: handlebar_type.id,
+            handlebar_type: handlebar_type,
             owner_email: user.email
           }
         end
@@ -627,7 +630,7 @@ describe BikesController do
         let(:bike_params) do
           {
             b_param_id_token: "",
-            cycle_type_id: CycleType.bike.id.to_s,
+            cycle_type: "tall-bike",
             serial_number: "example serial",
             manufacturer_other: "",
             year: "2016",
@@ -653,7 +656,7 @@ describe BikesController do
               # This is also where we're testing bikebook assignment
               expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
               expect do
-                post :create, stolen: true, bike: success_params.as_json, stolen_record: chicago_stolen_params
+                post :create, stolen: true, bike: success_params.as_json, stolen_record: chicago_stolen_params.merge(show_address: true)
               end.to change(Bike, :count).by(1)
               expect(flash[:success]).to be_present
               expect(BParam.all.count).to eq 0
@@ -666,6 +669,7 @@ describe BikesController do
               expect(bike_user.phone).to eq "3123799513"
               stolen_record = bike.current_stolen_record
               chicago_stolen_params.except(:state_id).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
+              expect(stolen_record.show_address).to be_truthy
             end
           end
         end
@@ -692,7 +696,7 @@ describe BikesController do
         context 'no bike' do
           let(:bike_params) do
             {
-              cycle_type_id: CycleType.bike.id.to_s,
+              cycle_type: 'cargo-rear',
               serial_number: 'example serial',
               manufacturer_other: '',
               year: '2016',
@@ -911,7 +915,7 @@ describe BikesController do
 
         it 'updates the bike and components' do
           component1 = FactoryBot.create(:component, bike: bike)
-          handlebar_type_id = FactoryBot.create(:handlebar_type).id
+          another_handlebar_type = "drop"
           ctype_id = component1.ctype_id
           bike.reload
           component2_attrs = {
@@ -926,7 +930,7 @@ describe BikesController do
           }
           bike_attrs = {
             description: '69',
-            handlebar_type_id: handlebar_type_id,
+            handlebar_type: another_handlebar_type,
             components_attributes: {
               '0' => {
                 '_destroy' => '1',
@@ -939,7 +943,7 @@ describe BikesController do
           bike.reload
           expect(bike.description).to eq('69')
           expect(response).to redirect_to edit_bike_url(bike)
-          expect(bike.handlebar_type_id).to eq handlebar_type_id
+          expect(bike.handlebar_type).to eq another_handlebar_type
           expect(assigns(:bike)).to be_decorated
           expect(bike.hidden).to be_falsey
 
@@ -1079,7 +1083,7 @@ describe BikesController do
           primary_frame_color_id: color.id,
           secondary_frame_color_id: color.id,
           tertiary_frame_color_id: Color.black.id,
-          handlebar_type_id: HandlebarType.flat.id,
+          handlebar_type: "other",
           coaster_brake: true,
           belt_drive: true,
           front_gear_type_id: FactoryBot.create(:front_gear_type).id,

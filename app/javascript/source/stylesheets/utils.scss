@@ -35,3 +35,14 @@ label {
 .convertedTime {
   white-space: nowrap;
 }
+
+.table-list {
+  @extend .table;
+  @extend .table-striped;
+  @extend .table-bordered;
+  @extend .table-sm;
+  tr td:first-child {
+    font-size: 80%;
+    font-style: italic;
+  }
+}

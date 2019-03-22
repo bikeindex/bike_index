@@ -21,9 +21,7 @@
   Organization:
   - if @bulk_import.organization.present?
     = link_to @bulk_import.organization.name, admin_organization_path(@bulk_import.organization)
-    %br
-    / alignment - so it is indented along with the org link above
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    |
     %strong
       = link_to "Organization view of import", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param)
   - else
@@ -44,17 +42,17 @@
     %li Edit the organization and add the ascend name <code>#{@bulk_import.ascend_name}</code>
     %li Return here and click the "reprocess import" button below
 
-.clearfix{ style: "padding: 20px 0;" }
-  - if @bulk_import.creation_states.count < 1 || params[:show_reprocess]
-    = link_to "Reprocess Import", admin_bulk_import_path(@bulk_import, reprocess: true), method: "PUT", class: "btn btn-secondary pull-right"
+- if @bulk_import.creation_states.count < 1 || params[:show_reprocess]
+  = link_to "Reprocess Import", admin_bulk_import_path(@bulk_import, reprocess: true), method: "PUT", class: "btn btn-secondary float-right"
 
-%hr.mt-4
-%h2 Errors
+
 - if @bulk_import.import_errors.present?
-  %pre
+  %h2.text-danger
+    Errors
+  %pre.text-danger
     = @bulk_import.import_errors
 
-%hr
+
 %h2
   Bikes - #{@bulk_import.bikes.count}
   - if @bulk_import.bikes.count > 25
