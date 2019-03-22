@@ -250,6 +250,11 @@ class User < ActiveRecord::Base
     end
   end
 
+  def render_donation_request
+    return nil unless has_police_membership? && !organizations.law_enforcement.paid.any?
+    "law_enforcement"
+  end
+
   def set_calculated_attributes
     self.title = strip_tags(title) if title.present?
     self.website = Urlifyer.urlify(website) if website.present?
