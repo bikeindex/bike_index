@@ -1,0 +1,62 @@
+.signup-landing-page-campus-packages {
+  .banner-header .campus-packages-main-title {
+    h1,
+    h2 {
+      text-align: center;
+      display: block;
+      width: 100%;
+    }
+  }
+
+  .campus-packages-price-list {
+    list-style-type: none;
+    margin: 0 -15px;
+    padding: 2 * $vertical-height 0;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    text-align: center;
+    & > li {
+      // Make it a flex column
+      width: 100%;
+      -webkit-box-flex: 0;
+      -ms-flex: 0 0 20%;
+      flex: 0 0 20%;
+      max-width: 20%;
+      padding: 0 15px;
+    }
+    h4 {
+      color: #fff;
+      padding: $vertical-height;
+      background: #000;
+      text-transform: none;
+      margin: 0;
+      font-size: 17px;
+    }
+    .btn-primary,
+    .btn {
+      text-transform: none;
+      margin-top: 2 * $vertical-height;
+    }
+    h3 {
+      color: $header-font-color;
+      font-size: 60px;
+      text-align: center;
+      line-height: 1;
+      margin: 0;
+    }
+    p {
+      font-style: italic;
+      opacity: 0.9;
+      margin: $vertical-height 0;
+      line-height: 1.5;
+    }
+    .campus-packages-package {
+      background: #fff;
+      border: 2px solid #000;
+      padding: $vertical-height;
+    }
+  }
+}

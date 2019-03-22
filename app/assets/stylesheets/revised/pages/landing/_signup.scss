@@ -9,7 +9,7 @@
 }
 
 $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
-  "ambassadors-how-to", "ambassadors-current";
+  "ambassadors-how-to", "ambassadors-current", "campus-packages";
 @each $target in $landing-page-targets {
   .signup-landing-page-#{$target} {
     .banner-header {
