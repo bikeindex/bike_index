@@ -19,13 +19,17 @@
     - f.object.date_recovered ||= Time.now
     = f.datetime_local_field :date_recovered, max: Time.now + 1.day, step: 60, required: true, class: 'form-control w-25 dateInputUpdateZone', "data-initialtime" => l(f.object.date_recovered, format: :convert_time)
   .form-group
-    = f.label :image, "Recovery photo"
-    - if @recovery_display.image?
-      = image_tag(@recovery_display.image_url(:thumb))
-    - else
-      %p
-        No picture!
-    = f.file_field :image, class: "float-right"
+    .row
+      .col-sm
+        = f.label :image, "Recovery photo"
+        - if @recovery_display.image?
+          = image_tag(@recovery_display.image_url(:thumb))
+        - else
+          %p
+            No picture!
+      .col-sm
+        = f.file_field :image, class: "float-right"
+      .col-sm
   .form-group
     - if @recovery_display.image.present?
       = f.label :remove_image
