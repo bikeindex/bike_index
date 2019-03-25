@@ -1,25 +1,24 @@
-%section.full-screen-table
-  %header.with-subtitle
-    %h1
-      Recoveries to display
-    = link_to "New recovery display", new_admin_recovery_display_url, class: "button-green sharing-links"
-  %p 
-    #{pluralize(RecoveryDisplay.count, "recovery display")}
 
-  .paginate-container
-    = paginate @recovery_displays
+%h1
+  Recoveries to display
+  = link_to "New recovery display", new_admin_recovery_display_url, class: "btn btn-success float-right"
+%p
+  #{pluralize(RecoveryDisplay.count, "recovery display")}
 
+
+= paginate @recovery_displays, views_prefix: "admin"
+.full-screen-table-wrapper
   %table.table.table-striped.table-bordered.padded
-    %thead
+    %thead.thead-light
       %th
         Date&nbsp;<small class="convertTimezone"></small>
       %th
         Quote
-      %th.large-screens
+      %th
         Quoter
       %th
         image?
-      %th.large-screens
+      %th
         Association?
     %tbody
       - @recovery_displays.each do |recovery_display|
@@ -32,7 +31,7 @@
                 = recovery_display.bike && recovery_display.bike.id
           %td
             = truncate(recovery_display.quote, length: 70)
-          %td.large-screens
+          %td
             = recovery_display.quote_by
           %td.table-cell-check
             = "&#x2713;".html_safe if recovery_display.image?

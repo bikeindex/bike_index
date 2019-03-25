@@ -1,5 +1,6 @@
 class Admin::RecoveryDisplaysController < Admin::BaseController
   before_filter :find_recovery_displays, only: [:edit, :update, :destroy]
+  layout "new_admin"
 
   def index
     page = params[:page] || 1
@@ -15,7 +16,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
     end
   end
 
-  def show 
+  def show
     redirect_to edit_admin_recovery_display_url
   end
 
