@@ -113,10 +113,10 @@ module ControllerHelpers
 
   # current_organization is the organization set for the user - which is persisted in session
   # The user may or may not be interacting with the active_organization in any given request
-  # def current_organization
-  #   return @current_organization if defined?(@current_organization)
-  #   @current_organization = session[:current_organization_id].present? ? Organization.friendly_find(session[:current_organization_id]) : nil
-  # end
+  def current_organization
+    return @current_organization if defined?(@current_organization)
+    @current_organization = session[:current_organization_id].present? ? Organization.friendly_find(session[:current_organization_id]) : nil
+  end
 
   # active_organization is the organization currently being used.
   # If set, the user *is* interacting with the organization in said request 
@@ -124,7 +124,7 @@ module ControllerHelpers
     # We call this multiple times - make sure nil stays nil
     return @active_organization if defined?(@active_organization)
     @active_organization = Organization.friendly_find(params[:organization_id])
-    # set_current_organization(@organization)
+    set_current_organization(@active_organization)
   end
 
   def current_user

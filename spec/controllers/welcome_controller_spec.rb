@@ -112,7 +112,7 @@ describe WelcomeController do
             allow_any_instance_of(User).to receive(:locks) { [lock] }
           end
           it "renders and user things are assigned" do
-            session[:active_organization_id] = organization.id # Even though the user isn't part of the organization
+            session[:current_organization_id] = organization.id # Even though the user isn't part of the organization
             get :user_home, per_page: 1
             expect(response.status).to eq(200)
             expect(response).to render_template("user_home")
@@ -121,8 +121,8 @@ describe WelcomeController do
             expect(assigns(:per_page).to_s).to eq "1"
             expect(assigns(:bikes).first).to eq(bike)
             expect(assigns(:locks).first).to eq(lock)
-            expect(session[:active_organization_id]).to eq organization.id
-            expect(assigns[:active_organization]).to eq organization
+            expect(session[:current_organization_id]).to eq organization.id
+            expect(assigns[:current_organization]).to eq organization
           end
         end
       end

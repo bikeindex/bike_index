@@ -14,20 +14,20 @@ describe Organized::BikesController, type: :controller do
       get :index, organization_id: organization.to_param
       expect(response.location).to eq user_home_url
       expect(flash[:error]).to be_present
-      # expect(session[:current_organization_id]).to be_nil # Removes it, because the user can't auth
+      expect(session[:current_organization_id]).to be_nil # Removes it, because the user can't auth
     end
     context "admin user" do
       let(:user) { FactoryBot.create(:admin) }
       it "renders, doesn't reassign current_organization_id" do
-        session[:current_organization_id] = organization.id # Even though the user isn't part of the organization
+        session[:current_organization_id] = organization.to_param # Admin, so user has access
         get :index, organization_id: organization.to_param
         expect(response.status).to eq(200)
         expect(response).to render_template :index
         expect(response).to render_with_layout('application_revised')
         expect(assigns(:active_organization)).to eq organization
         expect(assigns(:page_id)).to eq 'organized_bikes_index'
-        # expect(assigns(:current_organization)).to eq organization
-        # expect(session[:current_organization_id]).to eq organization.to_param
+        expect(assigns(:current_organization)).to eq organization
+        expect(session[:current_organization_id]).to eq organization.id
       end
     end
   end

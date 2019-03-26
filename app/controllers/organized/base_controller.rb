@@ -6,6 +6,7 @@ module Organized
 
     def ensure_member!
       return true if current_user && current_user.is_member_of?(active_organization)
+      set_current_organization(nil) # remove the active organization, because it failed so don't show it anymore
       flash[:error] = "You're not a member of that organization!"
       redirect_to user_home_url(subdomain: false) and return
     end
