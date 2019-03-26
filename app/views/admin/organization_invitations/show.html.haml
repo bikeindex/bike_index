@@ -16,7 +16,7 @@
     %br
     and has 
     = @organization.available_invitation_count
-    remaining #{"invitation".pluralize(current_organization.available_invitation_count)}.
+    remaining #{"invitation".pluralize(active_organization.available_invitation_count)}.
   %hr
 
 - if @organization.organization_invitations.any?

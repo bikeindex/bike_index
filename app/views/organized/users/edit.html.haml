@@ -6,7 +6,7 @@
 %p
   .clearfix
     - id = (@organization_invitation || @membership).id
-    = link_to 'remove from organization', organization_user_path(id: id, organization_id: current_organization.to_param, is_invitation: @is_invitation), method: :delete, confirm: "Are you sure you want to remove #{@name} from #{current_organization.name}? (They will still be to use their personal account)", class: 'btn btn-danger pull-right'
+    = link_to 'remove from organization', organization_user_path(id: id, organization_id: active_organization.to_param, is_invitation: @is_invitation), method: :delete, confirm: "Are you sure you want to remove #{@name} from #{active_organization.name}? (They will still be to use their personal account)", class: 'btn btn-danger pull-right'
   - if @is_invitation
     %p
       Invited
@@ -23,7 +23,7 @@
         = l @membership.created_at, format: :short_with_year
 
 - if @is_invitation
-  = form_for @organization_invitation, { as: :organization_invitation, url: organization_user_path(id: @organization_invitation.id, organization_id: current_organization.to_param, is_invitation: @is_invitation), action: 'update', html: { class: 'organized-form' } } do |f|
+  = form_for @organization_invitation, { as: :organization_invitation, url: organization_user_path(id: @organization_invitation.id, organization_id: active_organization.to_param, is_invitation: @is_invitation), action: 'update', html: { class: 'organized-form' } } do |f|
 
     .form-group.row
       = f.label :invitee_email, 'Email', class: 'org-form-label'
@@ -58,7 +58,7 @@
         = f.submit 'Update', class: 'btn btn-success btn-lg'
 
 - else
-  = form_for @membership, { as: :organization_invitation, url: organization_user_path(id: @membership.id, organization_id: current_organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
+  = form_for @membership, { as: :organization_invitation, url: organization_user_path(id: @membership.id, organization_id: active_organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
 
     .form-group.row
       %label.org-form-label

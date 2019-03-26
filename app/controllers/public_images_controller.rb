@@ -22,7 +22,7 @@ class PublicImagesController < ApplicationController
       elsif params[:mail_snippet_id]
         @public_image.imageable = MailSnippet.find(params[:mail_snippet_id])
       else
-        @public_image.imageable = current_organization
+        @public_image.imageable = active_organization
       end
       @public_image.save
       render 'create' and return

@@ -84,12 +84,12 @@
               %ul{ style: "font-size: 80%;" }
                 - @export.bike_codes.each_with_index do |code, index|
                   %li
-                    = link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param)
+                    = link_to code, edit_organization_sticker_path(code, organization_id: active_organization.to_param)
               - if @export.bike_codes_removed?
                 %em.text-danger
                   Stickers have been unassigned
               - else
-                = link_to "Unassign stickers", organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_codes: true), method: :put, class: "btn btn-warning float-right"
+                = link_to "Unassign stickers", organization_export_path(@export.id, organization_id: active_organization.to_param, remove_bike_codes: true), method: :put, class: "btn btn-warning float-right"
             - else
               %small.less-strong
                 No stickers assigned

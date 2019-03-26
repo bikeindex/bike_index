@@ -6,9 +6,8 @@ module ControllerHelpers
 
   included do
     helper_method :current_user, :unconfirmed_current_user, :current_user_or_unconfirmed_user,
-                  :current_organization, :user_root_url, :controller_namespace, :page_id,
-                  :forwarded_ip_address, :ensure_preview_enabled!, :recovered_bike_count,
-                  :sign_in_partner
+                  :user_root_url, :sign_in_partner, :active_organization, :current_organization,
+                  :controller_namespace, :page_id, :forwarded_ip_address, :recovered_bike_count
     before_filter :enable_rack_profiler
   end
 
@@ -105,12 +104,27 @@ module ControllerHelpers
     redirect_to user_root_url and return
   end
 
+  def set_current_organization(organization)
+    session[:current_organization_id] = organization&.id
+    @current_organization = organization
+  end
+
   protected
 
-  def current_organization
+  # current_organization is the organization set for the user - which is persisted in session
+  # The user may or may not be interacting with the active_organization in any given request
+  # def current_organization
+  #   return @current_organization if defined?(@current_organization)
+  #   @current_organization = session[:current_organization_id].present? ? Organization.friendly_find(session[:current_organization_id]) : nil
+  # end
+
+  # active_organization is the organization currently being used.
+  # If set, the user *is* interacting with the organization in said request 
+  def active_organization
     # We call this multiple times - make sure nil stays nil
-    return @current_organization if defined?(@current_organization)
-    @current_organization = Organization.friendly_find(params[:organization_id])
+    return @active_organization if defined?(@active_organization)
+    @active_organization = Organization.friendly_find(params[:organization_id])
+    # set_current_organization(@organization)
   end
 
   def current_user
@@ -148,13 +162,13 @@ module ControllerHelpers
   end
 
   def require_member!
-    return true if current_user.is_member_of?(current_organization)
+    return true if current_user.is_member_of?(active_organization)
     flash[:error] = "You're not a member of that organization!"
     redirect_to user_home_url(subdomain: false) and return
   end
 
   def require_admin!
-    return true if current_user.is_admin_of?(current_organization)
+    return true if current_user.is_admin_of?(active_organization)
     flash[:error] = "You have to be an organization administrator to do that!"
     redirect_to user_home_url and return
   end

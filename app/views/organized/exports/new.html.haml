@@ -1,12 +1,12 @@
 .organized-page-header
   %h1
     %em
-      = current_organization.name
+      = active_organization.name
     new export
 
-= form_for @export, { url: organization_exports_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
+= form_for @export, { url: organization_exports_path(organization_id: active_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
   = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
-  - if current_organization.paid_for?("avery_export")
+  - if active_organization.paid_for?("avery_export")
     .form-group.row
       = f.label :avery_export, "Avery Label Export", class: "org-form-label"
       .col-sm-4
@@ -14,7 +14,7 @@
     .form-group.row.shownOnAveryExport
       = f.label :bike_code_start, "Initial Sticker #", class: 'org-form-label'
       .col-sm-6
-        = f.text_field :bike_code_start, value: current_organization.bike_codes.next_unclaimed_code&.code, class: "form-control"
+        = f.text_field :bike_code_start, value: active_organization.bike_codes.next_unclaimed_code&.code, class: "form-control"
         %span.below-input-help
           Starting with given input, stickers will be incrementally assigned to bikes. Leave blank to skip assigning stickers to bikes
   .row.mt-2.hiddenOnAveryExport
@@ -23,7 +23,7 @@
         Included columns:
     .col-lg-8
       .row
-        - Export.permitted_headers(current_organization).each do |header|
+        - Export.permitted_headers(active_organization).each do |header|
           - next if Export::HIDDEN_HEADERS.include?(header)
           .form-group.col-xs-6.col-md-4
             %label.checkbox
