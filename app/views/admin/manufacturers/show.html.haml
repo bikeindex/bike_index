@@ -1,7 +1,7 @@
 
 %h1
   = @manufacturer.name
-  
+
 %hr
   %table.table-list
     %tbody
@@ -30,7 +30,7 @@
           %th
             Manufacturer website
           %td
-            = @manufacturer.dl_list_item(link_to(@manufacturer.website, @manufacturer.website), "Website")
+            = link_to @manufacturer.website, @manufacturer.website
       %tr
         %th
           Description
