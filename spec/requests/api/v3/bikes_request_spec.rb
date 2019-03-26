@@ -101,7 +101,8 @@ describe 'Bikes API V3' do
                         is_for_sale: true,
                         is_bulk: true,
                         is_new: true,
-                        is_pos: true)
+                        is_pos: true, 
+                        description: "<svg/onload=alert(document.cookie)>")
       expect do
         post "/api/v3/bikes?access_token=#{token.token}",
              bike_attrs.to_json,
@@ -123,6 +124,10 @@ describe 'Bikes API V3' do
       creation_state = bike.creation_state
       expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
       # expect(creation_state.origin).to eq 'api_v3'
+
+      # We return things will alert if they're written directly to the dom - worth noting, since it might be a problem
+      expect(result['description']).to eq "<svg/onload=alert(document.cookie)>"
+      expect(bike.description).to eq "<svg/onload=alert(document.cookie)>"
     end
 
     it "doesn't send an email" do
