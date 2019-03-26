@@ -5,7 +5,7 @@
       = @bike_code.code
   - if @bike_code.claimed?
     %p.text-right
-      = link_to "Remove Bike link", organization_sticker_path(id: @bike_code.code, organization_id: current_organization.to_param, bike_id: nil), method: :put, class: "btn btn-danger"
+      = link_to "Remove Bike link", organization_sticker_path(id: @bike_code.code, organization_id: active_organization.to_param, bike_id: nil), method: :put, class: "btn btn-danger"
 %p
   Bike:
   - if @bike_code.claimed?
@@ -25,7 +25,7 @@
 
 %hr.mt-4.mb-4
 
-= form_for @bike_code, { url: organization_sticker_path(id: @bike_code.code, organization_id: current_organization.to_param), action: "update", html: { class: "organized-form" } } do |f|
+= form_for @bike_code, { url: organization_sticker_path(id: @bike_code.code, organization_id: active_organization.to_param), action: "update", html: { class: "organized-form" } } do |f|
 
   .form-group.row
     = f.label :bike_id, "Bike ID/URL", class: "org-form-label"

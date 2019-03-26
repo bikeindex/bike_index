@@ -54,7 +54,7 @@ class ApplicationController < ActionController::Base
     @search_query_present = permitted_org_bike_search_params.except(:stolenness).values.reject(&:blank?).any?
     @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
 
-    bikes = current_organization.bikes.reorder("bikes.created_at desc").search(@interpreted_params)
+    bikes = active_organization.bikes.reorder("bikes.created_at desc").search(@interpreted_params)
     bikes = bikes.organized_email_search(params[:email]) if params[:email].present?
     @bikes = bikes.order("bikes.created_at desc").page(@page).per(@per_page)
     if @interpreted_params[:serial]

@@ -23,10 +23,10 @@ module Organized
           flash[:error] = @bike_code.errors.full_messages.to_sentence
         else
           flash[:success] = "#{@bike_code.kind.titleize} #{@bike_code.claimed? ? "claimed" : "unclaimed"}"
-          redirect_to organization_stickers_path(organization_id: current_organization.to_param) and return
+          redirect_to organization_stickers_path(organization_id: active_organization.to_param) and return
         end
       end
-      redirect_to edit_organization_sticker_path(organization_id: current_organization.to_param, id: @bike_code.code)
+      redirect_to edit_organization_sticker_path(organization_id: active_organization.to_param, id: @bike_code.code)
     end
 
     private
@@ -35,12 +35,12 @@ module Organized
       @bike_code = bike_codes.lookup(params[:id])
       unless @bike_code.present?
         flash[:error] = "Unable to find that sticker"
-        redirect_to organization_stickers_path(organization_id: current_organization.to_param) and return
+        redirect_to organization_stickers_path(organization_id: active_organization.to_param) and return
       end
     end
 
     def bike_codes
-      BikeCode.where(organization_id: current_organization.id)
+      BikeCode.where(organization_id: active_organization.id)
     end
 
     def searched
@@ -54,9 +54,9 @@ module Organized
     end
 
     def ensure_access_to_bike_codes!
-      return true if current_organization.paid_for?("bike_codes") || current_user.superuser?
+      return true if active_organization.paid_for?("bike_codes") || current_user.superuser?
       flash[:error] = "Your organization doesn't have access to that, please contact Bike Index support"
-      redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
+      redirect_to organization_bikes_path(organization_id: active_organization.to_param) and return
     end
   end
 end

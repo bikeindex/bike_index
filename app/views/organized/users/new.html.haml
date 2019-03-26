@@ -4,13 +4,13 @@
   %p
     You have invited
     %strong
-      #{ pluralize(current_organization.sent_invitation_count, 'user') },
+      #{ pluralize(active_organization.sent_invitation_count, 'user') },
     %br
     And can add
     %strong
-      #{current_organization.available_invitation_count} more.
+      #{active_organization.available_invitation_count} more.
 
-= form_for @organization_invitation, { as: :organization_invitation, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
+= form_for @organization_invitation, { as: :organization_invitation, url: organization_users_path(organization_id: active_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
 
   .form-group.row
     = f.label :invitee_email, "Email you're inviting", class: 'org-form-label'

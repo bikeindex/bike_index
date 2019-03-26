@@ -244,7 +244,7 @@ class User < ActiveRecord::Base
     MarkForSubscriptionRequestWorker.perform_in(1.days, id)
   end
 
-  def current_organization
+  def active_organization
     if self.has_membership?
       self.memberships.current_membership
     end

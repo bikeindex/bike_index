@@ -69,7 +69,7 @@ class BikesController < ApplicationController
       @per_page = params[:per_page] || 25
       if current_user.is_member_of?(@bike_code.organization)
         @show_organization_bikes = true
-        @current_organization = @bike_code.organization
+        @active_organization = @bike_code.organization
         search_organization_bikes
       else
         @bikes = current_user.bikes.reorder(created_at: :desc).limit(100)

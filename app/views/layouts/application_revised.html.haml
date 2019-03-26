@@ -18,6 +18,7 @@
             &#9776;
         %ul.primary-main-menu
           - if current_user_or_unconfirmed_user.present?
+            - current_organization.present? # stub check to hydrate the organization if possible
             - memberships = current_user_or_unconfirmed_user.memberships.includes(:organization)
             %li.primary-nav-item
               %a.nav-link.settings-link.primary-nav-link-with-submenu#setting_submenu{ 'aria-haspopup' => "true", 'aria-expanded' => "false", data: { toggle: 'dropdown' } }

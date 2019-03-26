@@ -223,24 +223,24 @@ describe BikesController do
       end
       context "user part of organization" do
         let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
-        it "makes current_organization the organization" do
+        it "makes active_organization the organization" do
           get :scanned, id: "000#{bike_code2.code}", organization_id: organization.to_param
           expect(assigns(:bike_code)).to eq bike_code2
           expect(response).to render_template(:scanned)
           expect(response.code).to eq("200")
-          expect(assigns(:current_organization)).to eq organization
+          expect(assigns(:active_organization)).to eq organization
           expect(assigns(:show_organization_bikes)).to be_truthy
         end
         context "passed a different organization id" do
           let!(:other_organization) { FactoryBot.create(:organization, short_name: "BikeIndex") }
-          it "makes current_organization the organization" do
+          it "makes active_organization the organization" do
             expect(user.memberships&.pluck(:organization_id)).to eq([organization.id])
             expect(bike_code2.organization).to eq organization
             get :scanned, id: "000#{bike_code2.code}", organization_id: "BikeIndex"
             expect(assigns(:bike_code)).to eq bike_code2
             expect(response).to render_template(:scanned)
             expect(response.code).to eq("200")
-            expect(assigns(:current_organization)).to eq organization
+            expect(assigns(:active_organization)).to eq organization
             expect(assigns(:show_organization_bikes)).to be_truthy
           end
         end
