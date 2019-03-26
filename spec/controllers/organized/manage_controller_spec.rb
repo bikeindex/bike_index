@@ -48,7 +48,7 @@ describe Organized::ManageController, type: :controller do
         expect(response).to render_with_layout('application_revised')
         expect(assigns(:active_organization)).to eq organization
         expect(assigns(:current_organization)).to eq organization
-        expect(session[:current_organization_id]).to eq organization.to_param
+        expect(session[:current_organization_id]).to eq organization.id
       end
     end
 
@@ -60,7 +60,7 @@ describe Organized::ManageController, type: :controller do
         expect(response).to render_with_layout('application_revised')
         expect(assigns(:active_organization)).to eq organization
         expect(assigns(:current_organization)).to eq organization
-        expect(session[:current_organization_id]).to eq organization.to_param
+        expect(session[:current_organization_id]).to eq organization.id
       end
     end
 
@@ -72,7 +72,7 @@ describe Organized::ManageController, type: :controller do
         expect(response).to render_with_layout('application_revised')
         expect(assigns(:active_organization)).to eq organization
         expect(assigns(:current_organization)).to eq organization
-        expect(session[:current_organization_id]).to eq organization.to_param
+        expect(session[:current_organization_id]).to eq organization.id
       end
     end
 
