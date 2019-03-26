@@ -116,6 +116,7 @@ module ControllerHelpers
   def current_organization
     return @current_organization if defined?(@current_organization)
     @current_organization = session[:current_organization_id].present? ? Organization.friendly_find(session[:current_organization_id]) : nil
+    @current_organization ||= set_current_organization(current_user&.organizations&.first)
   end
 
   # active_organization is the organization currently being used.
