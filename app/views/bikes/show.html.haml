@@ -166,7 +166,7 @@
           - else
             Share it!
         = render '/shared/share_this'
-      - if @bike.display_contact_owner?(current_user)
+      - if @bike.display_contact_owner?(current_user, current_organization)
         .contact-the-owner
           %p.preface
             - if @bike.stolen?

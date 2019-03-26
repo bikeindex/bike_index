@@ -318,6 +318,9 @@ describe Bike do
       expect(bike.contact_owner?(admin)).to be_truthy
       expect(bike.display_contact_owner?).to be_falsey
     end
+    context "organizations" do
+      let(:organization) { FactoryBot.create(:organization) }
+    end
     context "with owner with notification_unstolen false" do
       it "is falsey" do
         allow(bike).to receive(:owner) { User.new(notification_unstolen: false) }

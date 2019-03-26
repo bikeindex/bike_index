@@ -52,7 +52,6 @@ class Organization < ActiveRecord::Base
   scope :with_bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications]) }
 
   before_validation :set_calculated_attributes
-  after_commit :update_user_bike_actions_organizations
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
 
@@ -167,7 +166,6 @@ class Organization < ActiveRecord::Base
     end
     generate_access_token unless self.access_token.present?
     set_auto_user
-    update_user_bike_actions_organizations
     locations.each { |l| l.save unless l.shown == allowed_show }
     true # TODO: Rails 5 update
   end
@@ -210,14 +208,6 @@ class Organization < ActiveRecord::Base
       return nil unless users.any?
       self.auto_user_id = users.first.id
     end
-  end
-
-  def update_user_bike_actions_organizations
-    if bike_actions?
-      users.where("bike_actions_organization_id IS NULL or bike_actions_organization_id != ?", id)
-    else
-      users.where(bike_actions_organization_id: id)
-    end.each { |u| u.update_attributes(updated_at: Time.now) } # Force updating
   end
 
   def allowed_show

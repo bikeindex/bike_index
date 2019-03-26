@@ -216,14 +216,17 @@ class Bike < ActiveRecord::Base
     true
   end
 
-  def display_contact_owner?(u = nil)
-    stolen? && current_stolen_record.present? || contact_owner?(u)
+  def display_contact_owner?(u = nil, organization = nil)
+    stolen? && current_stolen_record.present? || organization
   end
 
-  def contact_owner?(u = nil)
+  def contact_owner?(u = nil, organization = nil)
     return false unless u.present?
     return true if stolen? && current_stolen_record.present?
-    u.send_unstolen_notifications? && owner&.notification_unstolen
+    return false unless owner&.notification_unstolen
+    if organization.present?
+      organization.paid_for?("unstolen_notifications")
+    u.send_unstolen_notifications?
   end
 
   def contact_owner_user?
