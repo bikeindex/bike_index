@@ -224,9 +224,8 @@ class Bike < ActiveRecord::Base
     return false unless u.present?
     return true if stolen? && current_stolen_record.present?
     return false unless owner&.notification_unstolen
-    if organization.present?
-      organization.paid_for?("unstolen_notifications")
-    u.send_unstolen_notifications?
+    return u.send_unstolen_notifications? unless organization.present? # Passed organization overrides user setting to speed stuff up
+    organization.paid_for?("unstolen_notifications") && u.is_member_of?(organization)
   end
 
   def contact_owner_user?

@@ -320,6 +320,31 @@ describe Bike do
     end
     context "organizations" do
       let(:organization) { FactoryBot.create(:organization) }
+      let(:user) { FactoryBot.create(:organized_user, organization: organization) }
+      let(:user_unorganized) { User.new }
+      let(:organization_unstolen) do
+        o = FactoryBot.create(:organization)
+        o.update_attribute :paid_feature_slugs, %w[unstolen_notifications]
+        o
+      end
+      it "is truthy for the organization with unstollen" do
+        allow(bike).to receive(:owner) { User.new }
+        expect(bike.contact_owner?).to be_falsey
+        expect(bike.contact_owner?(user)).to be_falsey
+        expect(bike.contact_owner?(user, organization)).to be_falsey
+        expect(bike.display_contact_owner?(user, organization)).to be_falsey
+        # Add user to the unstolen org
+        FactoryBot.create(:membership, user: user, organization: organization_unstolen)
+        expect(bike.contact_owner?(user)).to be_truthy
+        expect(bike.contact_owner?(user, organization_unstolen)).to be_truthy
+        expect(bike.display_contact_owner?(user, organization_unstolen)).to be_truthy
+        # But still false if passing old organization
+        expect(bike.contact_owner?(user, organization)).to be_falsey
+        expect(bike.display_contact_owner?(user, organization)).to be_falsey
+        # Passing the organization doesn't permit the user to do something unpermitted
+        expect(bike.dcontact_owner?(user_unorganized, organization_unstolen)).to be_truthy
+        expect(bike.display_contact_owner?(user_unorganized, organization_unstolen)).to be_truthy
+      end
     end
     context "with owner with notification_unstolen false" do
       it "is falsey" do
