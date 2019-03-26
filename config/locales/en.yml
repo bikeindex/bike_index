@@ -119,8 +119,10 @@ en:
     pagination:
       first: "&laquo;"
       last: "&raquo;"
-      previous: "&lsaquo;"
-      next: "&rsaquo;"
+      small-previous: "&lsaquo;"
+      small-next: "&rsaquo;"
+      previous: "&lsaquo; Prev"
+      next: "Next &rsaquo;"
       truncate: "&hellip;"
   helpers:
     page_entries_info:
