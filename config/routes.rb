@@ -195,9 +195,10 @@ Bikeindex::Application.routes.draw do
     namespace :v1 do
       resources :bikes, only: [:index, :show, :create] do
         collection do
-          get 'search_tags'
-          get 'close_serials'
-          get 'stolen_ids'
+          get "search_tags"
+          get "close_serials"
+          get "stolen_ids"
+          get "multi_search"
         end
       end
       resources :stolen_locking_response_suggestions, only: [:index]
