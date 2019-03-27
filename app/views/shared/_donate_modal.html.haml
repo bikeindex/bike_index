@@ -1,0 +1,24 @@
+- kind ||= "law_enforcement"
+
+- modal_body = capture_haml do
+  - law_enforcement_org = current_user&.organizations&.law_enforcement&.unpaid&.first
+  - org_name = law_enforcement_org.present? ? law_enforcement_org.name : "your organization"
+  .modal-body
+    %p
+      Hello #{current_user&.display_name},
+    %p
+      Thank you so much for using Bike Index!
+    %p
+      We have a number of features specifically designed for law enforcement officers:
+    %ul
+      %li
+        = link_to "Contact bike owners before their bikes are marked stolen", "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen", target: "_blank"
+      / %li
+      /   Multiple serial search pane
+    %p
+      Email #{link_to "support@bikeindex.org", "mailto:support@bikeindex.org"} to get access.
+    %p.less-strong.text-center{ style: "text-align: center;" }
+      %em
+        Bike Index is a 501(c)(3) nonprofit. We depend on donations to provide these services. We recommend law enforcement agencies like #{org_name} donate at least $20 a year to help support our efforts.
+
+= render partial: "/shared/modal", locals: { title: "Thanks for using Bike Index!", modal_body: modal_body, id: "donateMessageModal", start_open: true }

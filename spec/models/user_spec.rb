@@ -397,6 +397,7 @@ describe User do
       let!(:paid_feature) { FactoryBot.create(:paid_feature, name: "unstolen notifications", feature_slugs: ["unstolen_notifications"]) }
       it "is true if the organization has that paid feature" do
         user.reload
+        expect(user.render_donation_request).to be_nil
         expect(user.bike_actions_organization_id).to be_blank
         expect(user.send_unstolen_notifications?).to be_falsey
         invoice.update_attributes(paid_feature_ids: [paid_feature.id])
@@ -408,6 +409,35 @@ describe User do
         user.reload
         expect(user.bike_actions_organization_id).to eq organization.id
         expect(user.send_unstolen_notifications?).to be_truthy
+      end
+    end
+  end
+
+  describe "render_donation_request" do
+    let(:organization) { FactoryBot.create(:organization, kind: "bike_advocacy") }
+    let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+    it "is nil" do
+      expect(User.new.render_donation_request).to be_nil
+    end
+    context "user part of a advocacy group" do
+      it "is nil" do
+        user.reload
+        expect(user.render_donation_request).to be_nil
+      end
+    end
+    context "user is part of a police department" do
+      let(:organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
+      it "is nil" do
+        user.reload
+        expect(user.render_donation_request).to eq "law_enforcement"
+      end
+      context "police department paid" do
+        before { organization.update_column :is_paid, true }
+        it "is 'law_enforcement'" do
+          user.reload
+          expect(user.organizations.paid.count).to eq 1
+          expect(user.render_donation_request).to be_nil
+        end
       end
     end
   end

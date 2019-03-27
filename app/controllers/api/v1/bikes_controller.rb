@@ -11,11 +11,11 @@ module Api
       def search_tags
         tags = []
         Color.unscoped.commonness.each { |i| tags << i.name }
-        HandlebarType.all.each { |i| tags << i.name }
+        HandlebarType::NAMES.values.each { |name| tags << name }
         FrameMaterial::NAMES.values.each  { |name| tags << name }
         WheelSize.unscoped.commonness.each { |i| tags << "#{i.name} wheel" }
         Manufacturer.all.each { |i| tags << i.name }
-        CycleType.all.each { |i| tags << i.name }
+        CycleType::NAMES.values.each { |name| tags << name }
         respond_with tags, root: 'tags'
       end
 

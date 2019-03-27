@@ -1,6 +1,9 @@
 .mb-4
   %h1
-    Bulk import
+    - if @bulk_import.ascend?
+      Ascend import
+    - else
+      Bulk import
 %table.organized-list-table
   %tbody
     %tr
@@ -29,7 +32,7 @@
         - if @bulk_import.user.present?
           = @bulk_import.user.display_name
         - else
-          None
+          \-
 
 %hr{ style: "margin: 15px 0;" }
 - if @bulk_import.import_errors?

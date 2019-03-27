@@ -1,5 +1,6 @@
 class Admin::FeedbacksController < Admin::BaseController
   before_filter :find_feedback_for_params, except: [:show]
+  layout "new_admin"
 
   def index
     @matching_count = @feedbacks.count if params[:type].present?
@@ -7,7 +8,6 @@ class Admin::FeedbacksController < Admin::BaseController
     per_page = params[:per_page] || 50
     @feedbacks = @feedbacks.order(created_at: :desc)
                            .page(page).per(per_page)
-    render layout: "new_admin"
   end
 
   def show

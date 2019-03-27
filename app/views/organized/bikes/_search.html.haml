@@ -1,5 +1,5 @@
 / If no url_for_search passed in, default to organization bike search
-- path_for_search ||= organization_bikes_path(organization_id: current_organization.to_param)
+- path_for_search ||= organization_bikes_path(organization_id: active_organization.to_param)
 - skip_view_just_stolen ||= false
 
 .mb-4
@@ -32,7 +32,7 @@
     matching
   - else
     #{ pluralize(@bikes.total_count, 'bike') } registered
-  - search_params = @interpreted_params.merge(organization_id: current_organization.to_param)
+  - search_params = @interpreted_params.merge(organization_id: active_organization.to_param)
 
   - unless skip_view_just_stolen
     - if @stolenness == 'all'

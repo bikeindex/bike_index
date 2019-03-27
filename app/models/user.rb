@@ -217,7 +217,7 @@ class User < ActiveRecord::Base
 
   def bikes(user_hidden=true)
     Bike.unscoped
-    .includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record, :cycle_type)
+    .includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
     .where(id: bike_ids(user_hidden))
   end
 
@@ -244,10 +244,15 @@ class User < ActiveRecord::Base
     MarkForSubscriptionRequestWorker.perform_in(1.days, id)
   end
 
-  def current_organization
+  def active_organization
     if self.has_membership?
       self.memberships.current_membership
     end
+  end
+
+  def render_donation_request
+    return nil unless has_police_membership? && !organizations.law_enforcement.paid.any?
+    "law_enforcement"
   end
 
   def set_calculated_attributes

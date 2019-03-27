@@ -114,8 +114,8 @@ module HeaderTagHelper
   end
 
   def landing_pages_header_tags
-    if current_organization
-      args = { default: '', organization: current_organization.short_name }
+    if active_organization
+      args = { default: '', organization: active_organization.short_name }
       self.page_title = translation_title(translation_args: args)
       self.page_description = translation_description(translation_args: args)
     end
@@ -165,7 +165,7 @@ module HeaderTagHelper
 
   def default_translation_args
     return { default: '' } unless controller_namespace == 'organized'
-    { default: '', organization: current_organization.short_name }
+    { default: '', organization: active_organization.short_name }
   end
 
   def translation_title(location: nil, translation_args: default_translation_args)
@@ -193,7 +193,7 @@ module HeaderTagHelper
     if controller_namespace == 'admin'
       'Admin |'
     elsif controller_namespace == 'organized'
-      current_organization.short_name
+      active_organization.short_name
     end
   end
 

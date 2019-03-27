@@ -74,9 +74,9 @@
                     %li
                       = msg
           .control-group
-            = f.label :cycle_type_id, "Cycle type", class: "control-label"
+            = f.label :cycle_type, "Cycle type", class: "control-label"
             .controls
-              = collection_select( :bike, :cycle_type_id, CycleType.all, :id, :name, :required =>true )
+              = select(:bike, :cycle_type, CycleType.select_options, { required: true })
 
           .control-group
             = f.label :serial_number, class: "control-label"

@@ -1,10 +1,10 @@
 .organized-page-header.mb-4
   %h1
     %em
-      = current_organization.name
+      = active_organization.name
     Stickers
 
-= form_tag organization_stickers_path(organization_id: current_organization.to_param), method: :get, class: "stickers-form" do
+= form_tag organization_stickers_path(organization_id: active_organization.to_param), method: :get, class: "stickers-form" do
   .row
     .col-md-4
       = text_field_tag :query, params[:query], placeholder: "Search Sticker ID", class: "form-control"
@@ -46,7 +46,7 @@
       - @bike_codes.each do |bike_code|
         %tr
           %td
-            %a.convertTime{ href: edit_organization_sticker_path(organization_id: current_organization.id, id: bike_code.code) }
+            %a.convertTime{ href: edit_organization_sticker_path(organization_id: active_organization.id, id: bike_code.code) }
               = l bike_code.created_at, format: :convert_time
           %td
             - if bike_code.claimed? && bike_code.claimed_at.present?
@@ -57,7 +57,7 @@
               / For these, use bike_id to avoid loading association
               = organized_bike_text(bike_code.bike)
           %td
-            = link_to bike_code.code, "/bikes/scanned/#{bike_code.code}?organization_id=#{current_organization.to_param}"
+            = link_to bike_code.code, "/bikes/scanned/#{bike_code.code}?organization_id=#{active_organization.to_param}"
 
 .paginate-container.paginate-container-bottom
   = paginate @bike_codes

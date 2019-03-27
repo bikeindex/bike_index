@@ -1,6 +1,7 @@
 class Admin::MailSnippetsController < Admin::BaseController
   before_filter :find_snippet, except: [:index, :new, :create]
-  
+  layout "new_admin"
+
   def index
     @mail_snippets = MailSnippet.without_organizations
   end
@@ -10,7 +11,7 @@ class Admin::MailSnippetsController < Admin::BaseController
   end
 
   def edit
-    
+
   end
 
   def update

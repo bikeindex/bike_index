@@ -7,14 +7,11 @@ describe Bike do
     it { is_expected.to belong_to :primary_frame_color }
     it { is_expected.to belong_to :secondary_frame_color }
     it { is_expected.to belong_to :tertiary_frame_color }
-    it { is_expected.to belong_to :handlebar_type }
     it { is_expected.to belong_to :rear_wheel_size }
     it { is_expected.to belong_to :front_wheel_size }
     it { is_expected.to belong_to :rear_gear_type }
     it { is_expected.to belong_to :front_gear_type }
-    it { is_expected.to belong_to :propulsion_type }
     it { is_expected.to belong_to :paint }
-    it { is_expected.to belong_to :cycle_type }
     it { is_expected.to belong_to :updator }
     it { is_expected.to have_many :bike_organizations }
     it { is_expected.to have_many(:organizations).through(:bike_organizations) }
@@ -36,8 +33,7 @@ describe Bike do
     it { is_expected.to accept_nested_attributes_for :components }
     # it { is_expected.to validate_presence_of :creation_state_id }
     it { is_expected.to validate_presence_of :creator }
-    it { is_expected.to validate_presence_of :cycle_type_id }
-    it { is_expected.to validate_presence_of :propulsion_type_id }
+    it { is_expected.to validate_presence_of :propulsion_type }
     it { is_expected.to validate_presence_of :serial_number }
     it { is_expected.to validate_presence_of :manufacturer_id }
     it { is_expected.to validate_presence_of :primary_frame_color_id }
@@ -469,9 +465,8 @@ describe Bike do
 
   describe 'type' do
     it 'returns the cycle type name' do
-      cycle_type = FactoryBot.create(:cycle_type)
-      bike = FactoryBot.create(:bike, cycle_type: cycle_type)
-      expect(bike.type).to eq(cycle_type.name.downcase)
+      bike = FactoryBot.create(:bike, cycle_type: "trailer")
+      expect(bike.type).to eq(bike.cycle_type_name.downcase)
     end
   end
 
@@ -796,20 +791,20 @@ describe Bike do
       expect(bike.current_stolen_record_id).to be_nil
     end
     it 'caches all the bike parts' do
-      type = FactoryBot.create(:cycle_type, name: 'Unicycle')
-      handlebar = FactoryBot.create(:handlebar_type)
-      propulsion = FactoryBot.create(:propulsion_type, name: 'Hand pedaled')
       wheel_size = FactoryBot.create(:wheel_size)
-      bike = FactoryBot.create(:bike, cycle_type: type, propulsion_type_id: propulsion.id, rear_wheel_size: wheel_size)
+      bike = FactoryBot.create(:bike, rear_wheel_size: wheel_size)
       stolen_record = FactoryBot.create(:stolen_record, bike: bike)
       bike.update_attributes(year: 1999, frame_material: "steel",
                              secondary_frame_color_id: bike.primary_frame_color_id,
                              tertiary_frame_color_id: bike.primary_frame_color_id,
                              stolen: true,
+                             handlebar_type: "bmx",
+                             propulsion_type: "sail",
+                             cycle_type: "unicycle",
                              frame_size: '56', frame_size_unit: 'foo',
-                             frame_model: 'Some model', handlebar_type_id: handlebar.id)
+                             frame_model: 'Some model')
       bike.cache_bike
-      expect(bike.cached_data).to eq("#{bike.mnfg_name} Hand pedaled 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material_name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle")
+      expect(bike.cached_data).to eq("#{bike.mnfg_name} Sail 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material_name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle")
       expect(bike.current_stolen_record_id).to eq(stolen_record.id)
     end
     it 'has before_save_callback_method defined as a before_save callback' do
@@ -957,6 +952,30 @@ describe Bike do
         bike.bike_organization_ids = "#{organization_2.id}, "
         expect(bike.bike_organization_ids).to eq([organization_2.id])
       end
+    end
+  end
+
+  describe 'handlebar_type_name' do
+    let(:bike) { FactoryBot.create(:bike, handlebar_type: "bmx") }
+    it "returns the normalized name" do
+      normalized_name = HandlebarType.new(bike.handlebar_type).name
+      expect(bike.handlebar_type_name).to eq(normalized_name)
+    end
+  end
+
+  describe 'cycle_type_name' do
+    let(:bike) { FactoryBot.create(:bike, cycle_type: "cargo") }
+    it "returns the normalized name" do
+      normalized_name = CycleType.new(bike.cycle_type).name
+      expect(bike.cycle_type_name).to eq(normalized_name)
+    end
+  end
+
+  describe 'propulsion_type_name' do
+    let(:bike) { FactoryBot.create(:bike, propulsion_type: "electric-assist") }
+    it "returns the normalized name" do
+      normalized_name = PropulsionType.new(bike.propulsion_type).name
+      expect(bike.propulsion_type_name).to eq(normalized_name)
     end
   end
 end

@@ -20,7 +20,7 @@
     %li
       Doing an import for the first time? Try importing a sample of your CSV with just 1 or 2 rows, and replace the email with your own email - so if the bikes don't import correctly, you can make adjustments and delete the bikes, without having to delete a large number of bikes.
 
-= form_for @bulk_import, { url: organization_bulk_imports_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
+= form_for @bulk_import, { url: organization_bulk_imports_path(organization_id: active_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
   .card.col-sm-6
     .card-block
       = f.label :file, "CSV File with bikes"

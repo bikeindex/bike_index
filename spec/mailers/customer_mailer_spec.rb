@@ -99,8 +99,7 @@ describe CustomerMailer do
   end
 
   describe 'recovered_from_link' do
-    let(:cycle_type) { FactoryBot.create(:cycle_type, name: 'Sikk Trike') }
-    let(:bike) { FactoryBot.create(:stolen_bike, cycle_type: cycle_type) }
+    let(:bike) { FactoryBot.create(:stolen_bike, cycle_type: 'tall-bike') }
     let(:stolen_record) { bike.current_stolen_record }
     let!(:ownership) { FactoryBot.create(:ownership, bike: stolen_record.bike) }
     let(:recovered_description) { 'Bike Index helped me find my stolen bike and get it back!' }
@@ -108,7 +107,7 @@ describe CustomerMailer do
     it 'renders email' do
       mail = CustomerMailer.recovered_from_link(stolen_record)
       expect(mail.to).to eq([bike.owner_email])
-      expect(mail.subject).to eq 'Your sikk trike has been marked recovered!'
+      expect(mail.subject).to eq 'Your tall bike has been marked recovered!'
       expect(mail.from).to eq(['bryan@bikeindex.org'])
       expect(mail.body.encoded).to match recovered_description
     end

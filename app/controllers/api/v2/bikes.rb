@@ -33,6 +33,7 @@ module API
 
             optional :police_report_number, type: String, desc: 'Police report number'
             optional :police_report_department, type: String, desc: 'Police department reported to (include if report number present)'
+            optional :show_address, type: Boolean, desc: "Display the exact address the theft happened at"
 
           #   # link to LOCKING options!
           #   # optional :locking_description_slug, type: String, desc: 'Locking description. description.'

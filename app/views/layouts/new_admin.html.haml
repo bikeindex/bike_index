@@ -7,63 +7,82 @@
     = javascript_pack_tag "admin_application"
     = stylesheet_pack_tag "application_css"
 
-
   / manually override body_class in a few situations :/
   - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   - body_class = "news-page" if controller_name == "news"
   %body{ id: page_id, class:  body_class }
-    .navheaderwhatever
+    %nav.navbar.navbar-expand-md.navbar-light.bg-light.sticky-top.admin-navbar
+      %span.navbar-brand
+        = link_to (image_tag("logo.svg")), admin_root_path
       - if current_user.superuser?
-        %h2.new-title 
-          = admin_nav_link "Go hard", admin_root_path
-        %ul
-          %li
-            = admin_nav_link "Organizations", admin_organizations_path
+        %button.navbar-toggler{"aria-controls" => "navbarSupportedContent", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-target" => "#collapsible-admin-nav", "data-toggle" => "collapse", :type => "button"}
+          %span.navbar-toggler-icon
+        .collapse.navbar-collapse#collapsible-admin-nav
+          %ul.navbar-nav
+            %li.nav-item
+              = revised_active_link "Users", admin_users_path, :role => "button", :class => "nav-link nav-item px-2"
+            %li.nav-item
+              = revised_active_link "Bikes", admin_bikes_path, :role => "button", :class => "nav-link nav-item px-2"
+            %li.nav-item
+              = revised_active_link "Organizations", admin_organizations_path, :role => "button", :class => "nav-link nav-item px-2"
+            %li.nav-item
+              = revised_active_link "News", admin_news_index_path, :role => "button", :class => "nav-link nav-item px-2"
+            %li.dropdown.nav-item
+              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown"}
+                Stolen
+              .dropdown-menu.admin-nav-dropdown
+                = revised_active_link "Stolen", admin_stolen_bikes_path, :role => "button", :class => "btn btn-light dropdown-item"
+                = revised_active_link "Recoveries", admin_recoveries_path, :role => "button", :class => "btn btn-light dropdown-item"
+                = revised_active_link "Recovery Displays", admin_recovery_displays_path, :role => "button", :class => "btn btn-light dropdown-item"
+                = revised_active_link "Stolen Twitterbot URL", ENV['STOLEN_TWITTERBOT_URL'].gsub(/bikes\z/, ''), :role => "button", :class => "btn btn-light dropdown-item"
+            %li.dropdown
+              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown", "aria-labelledby" => "dropdownMenu2"}
+                Paid
+              .dropdown-menu.admin-nav-dropdown
+                = revised_active_link "Payments", admin_payments_path, :role => "button", :class => "btn btn-light dropdown-item"
+                = revised_active_link "Paid Features", admin_paid_features_path, :role => "button", :class => "btn btn-light dropdown-item"
+                = revised_active_link "Invoices", admin_invoices_path, :role => "button", :class => "btn btn-light dropdown-item"
+            %li.dropdown
+              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown"}
+                Other
+              .dropdown-menu.admin-nav-dropdown
+                = revised_active_link "Memberships", admin_memberships_path, :role => "button", :class => "btn btn-light dropdown-item"
+                = revised_active_link "Manufacturers", admin_manufacturers_path, :role => "button", :class => "btn btn-light dropdown-item"
+                = revised_active_link "Invitations", admin_invitations_path, :role => "button", :class => "btn btn-light dropdown-item"
+                = link_to "TSV Exports", admin_tsvs_url, :role => "button", :class => "btn btn-light dropdown-item #{action_name == 'tsvs' ? 'active' : ''}"
+                = link_to "Maintenance", admin_maintenance_url, :role => "button", :class => "btn btn-light dropdown-item #{action_name == 'maintenance' ? 'active' : ''}"
+                = revised_active_link "Failed Bikes", admin_failed_bikes_url, :role => "button", :class => "btn btn-light dropdown-item"
+                = revised_active_link "Component Types", admin_ctypes_url, :role => "button", :class => "btn btn-light dropdown-item"
+                = revised_active_link "Graphs", admin_graphs_url, :role => "button", :class => "btn btn-light dropdown-item"
+                = revised_active_link "Edit Paints", admin_paints_url, :role => "button", :class => "btn btn-light dropdown-item"
+                = revised_active_link "Feedbacks", admin_feedbacks_url, :role => "button", :class => "btn btn-light dropdown-item"
+                = revised_active_link "Tweets", admin_tweets_url, :role => "button", :class => "btn btn-light dropdown-item"
+                = revised_active_link "Exports", admin_exports_url, :role => "button", :class => "btn btn-light dropdown-item"
+                = revised_active_link "Bulk Imports", admin_bulk_imports_url, :role => "button", :class => "btn btn-light dropdown-item"
+            - if Rails.env.development?
+              .dropdown
+                %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown"}
+                  Mailers
+                .dropdown-menu.admin-nav-dropdown
+                  = link_to "Organized", '/rails/mailers/organized_mailer' , :role => "button", :class => "btn btn-light dropdown-item"
+                  = link_to "Admin", '/rails/mailers/admin_mailer' , :role => "button", :class => "btn btn-light dropdown-item"
+                  = link_to "Customer", '/rails/mailers/customer_mailer' , :role => "button", :class => "btn btn-light dropdown-item"
+          %ul.navbar-nav.ml-auto
+            %li.nav-item
+              = link_to "Exit Admin", root_path, :role => "button", :class => "nav-link nav-item px-2"
 
-          %li
-            = admin_nav_link "Users", admin_users_path
-
-          %li
-            = admin_nav_link "Memberships", admin_memberships_path
-
-          %li
-            = admin_nav_link "Manufacturers", admin_manufacturers_path
-
-          %li
-            = admin_nav_link "Bikes", admin_bikes_path
-
-          %li
-            = admin_nav_link "Invitations", admin_invitations_path
-
-          %li
-            = admin_nav_link "News", admin_news_index_path
-          %li
-            = admin_nav_link "Stolen", admin_stolen_bikes_path
-          / %li
-          /   = admin_nav_link "Recoveries", admin_recoveries_path
-          %li
-            = admin_nav_link "Recovery displays", admin_recovery_displays_path
-          %li
-            = admin_nav_link "Paid Features", admin_paid_features_path
-          %li
-            = admin_nav_link "Payments", admin_payments_path
-          %li
-            = admin_nav_link "Invoices", admin_invoices_path
-
-          - if Rails.env.development?
-            %li
-              Mailers: #{admin_nav_link "organized", '/rails/mailers/organized_mailer'}, #{admin_nav_link "admin", '/rails/mailers/admin_mailer'}, #{admin_nav_link "customer", '/rails/mailers/customer_mailer'}
       - elsif current_user.is_content_admin?
-        %h2.new-title 
-          = admin_nav_link "Go hard", admin_news_index_path
+        %span.font-weight-bold
+          = link_to "Go hard", admin_news_index_path
         %ul
           %li
-            = admin_nav_link "News", admin_news_index_path
+            = link_to "News", admin_news_index_path
+
     = render 'layouts/revised_messages'
 
     %section#admin-content
-      .container
+      .container.mt-4
         = yield
 
     = render 'shared/footer_revised'

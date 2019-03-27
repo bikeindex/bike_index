@@ -1,3 +1,4 @@
+---
 http_interactions:
   - request:
       method: get
@@ -20,9 +21,9 @@ http_interactions:
         Content-Type:
           - application/json; charset=UTF-8
         Date:
-          - Wed, 16 Jan 2019 18:12:57 GMT
+          - Fri, 15 Mar 2019 21:14:22 GMT
         Expires:
-          - Thu, 17 Jan 2019 18:12:57 GMT
+          - Sat, 16 Mar 2019 21:14:22 GMT
         Cache-Control:
           - public, max-age=86400
         Access-Control-Allow-Origin:
@@ -36,9 +37,9 @@ http_interactions:
         X-Frame-Options:
           - SAMEORIGIN
         Server-Timing:
-          - gfet4t7; dur=541
+          - gfet4t7; dur=553
         Alt-Svc:
-          - quic=":443"; ma=2592000; v="44,43,39,35"
+          - quic=":443"; ma=2592000; v="46,44,43,39"
       body:
         encoding: ASCII-8BIT
         string: |
@@ -120,6 +121,110 @@ http_interactions:
              ],
              "status" : "OK"
           }
-      ? http_version
-    recorded_at: Wed, 16 Jan 2019 18:12:57 GMT
+      http_version:
+    recorded_at: Fri, 15 Mar 2019 21:14:22 GMT
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=State%20College,%20PA&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Fri, 15 Mar 2019 21:14:23 GMT
+        Expires:
+          - Sat, 16 Mar 2019 21:14:23 GMT
+        Cache-Control:
+          - public, max-age=86400
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        Content-Length:
+          - "447"
+        X-Xss-Protection:
+          - 1; mode=block
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=512
+        Alt-Svc:
+          - quic=":443"; ma=2592000; v="46,44,43,39"
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [
+                {
+                   "address_components" : [
+                      {
+                         "long_name" : "State College",
+                         "short_name" : "State College",
+                         "types" : [ "locality", "political" ]
+                      },
+                      {
+                         "long_name" : "Centre County",
+                         "short_name" : "Centre County",
+                         "types" : [ "administrative_area_level_2", "political" ]
+                      },
+                      {
+                         "long_name" : "Pennsylvania",
+                         "short_name" : "PA",
+                         "types" : [ "administrative_area_level_1", "political" ]
+                      },
+                      {
+                         "long_name" : "United States",
+                         "short_name" : "US",
+                         "types" : [ "country", "political" ]
+                      }
+                   ],
+                   "formatted_address" : "State College, PA, USA",
+                   "geometry" : {
+                      "bounds" : {
+                         "northeast" : {
+                            "lat" : 40.8075369,
+                            "lng" : -77.8191779
+                         },
+                         "southwest" : {
+                            "lat" : 40.7684919,
+                            "lng" : -77.885965
+                         }
+                      },
+                      "location" : {
+                         "lat" : 40.7933949,
+                         "lng" : -77.8600012
+                      },
+                      "location_type" : "APPROXIMATE",
+                      "viewport" : {
+                         "northeast" : {
+                            "lat" : 40.8075369,
+                            "lng" : -77.8191779
+                         },
+                         "southwest" : {
+                            "lat" : 40.7684919,
+                            "lng" : -77.885965
+                         }
+                      }
+                   },
+                   "place_id" : "ChIJc9s7wZmozokRkYA8g8LG4Zw",
+                   "types" : [ "locality", "political" ]
+                }
+             ],
+             "status" : "OK"
+          }
+      http_version:
+    recorded_at: Fri, 15 Mar 2019 21:14:23 GMT
 recorded_with: VCR 4.0.0

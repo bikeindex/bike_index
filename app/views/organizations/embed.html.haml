@@ -18,7 +18,8 @@
       .controls
         = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
       - if @organization.include_field_reg_secondary_serial?
-        = f.label :additional_registration, "Additional serial/sticker number", class: "control-label"
+        - label_secondary_serial = @organization.registration_field_label("reg_secondary_serial") || "Additional serial/sticker number"
+        = f.label :additional_registration, label_secondary_serial, class: "control-label"
         .controls
           = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
     .has-no-serial.optional-block
@@ -146,13 +147,15 @@
                 %span
                   eg if we tweet about or someone searches for it's serial number
   - if @organization&.include_field_reg_address?
+    - label_address = @organization.registration_field_label("reg_address") || "Your street address"
     .input-group
-      = f.label :address, "Your street address"
+      = f.label :address, label_address
       .controls
         = f.text_field :address, required: true
   - if @organization&.include_field_reg_phone?
+    - label_phone = @organization.registration_field_label("reg_phone") || "Your phone number"
     .input-group
-      = f.label :phone, "Your phone number"
+      = f.label :phone, label_phone
       .controls
         = f.text_field :phone, required: true
 
@@ -166,7 +169,8 @@
       = submit_tag "Register", class: "button-submit"
       %span.what-you-register
         this
-      = collection_select(:bike, :cycle_type_id, CycleType.all, :id, :name, required: true)
+      = select(:bike, :cycle_type, CycleType.select_options, { required: true })
+      
   .input-group.optional-group.form-photo-group
     - if @b_param.image.present? or @b_param.image_tmp.present?
       %strong

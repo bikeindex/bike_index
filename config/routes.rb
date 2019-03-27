@@ -140,7 +140,7 @@ Bikeindex::Application.routes.draw do
     get 'bust_z_cache', to: 'dashboard#bust_z_cache'
     get 'destroy_example_bikes', to: 'dashboard#destroy_example_bikes'
     get "invoices", to: 'payments#invoices', as: :invoices
-    resources :memberships, :organization_invitations, :bulk_imports,
+    resources :memberships, :organization_invitations, :bulk_imports, :exports,
               :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments
     resources :organizations do
       resources :custom_layouts, only: [:index, :edit, :update], controller: "organizations/custom_layouts"
@@ -264,7 +264,7 @@ Bikeindex::Application.routes.draw do
   # prepends a :organization_id/ to every nested URL.
   # Down here so that it doesn't override any other routes
   resources :organizations, only: [], path: 'o', module: 'organized' do
-    get '/', to: 'bikes#index', as: :root
+    get "/", to: "bikes#index", as: :root
     get 'landing', to: 'manage#landing', as: :landing
     resources :bikes, only: %i[index new show] do
       collection do

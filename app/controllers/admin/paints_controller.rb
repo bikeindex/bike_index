@@ -23,7 +23,7 @@ class Admin::PaintsController < Admin::BaseController
   end
 
   def edit
-    @bikes = @paint.bikes.includes(:cycle_type, :paint, :manufacturer, :creation_organization)
+    @bikes = @paint.bikes.includes(:paint, :manufacturer, :creation_organization)
   end
 
   def update

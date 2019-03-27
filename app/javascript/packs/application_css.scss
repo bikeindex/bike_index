@@ -6,3 +6,17 @@
 footer.primary-footer {
   display: none;
 }
+
+.admin-navbar {
+  .navbar-brand img {
+    height: 35px;
+    width: 35px;
+  }
+  .dropdown-toggle {
+    cursor: pointer;
+  }
+}
+
+.full-screen-table-wrapper {
+  overflow-x: scroll;
+}
