@@ -15,6 +15,10 @@ $primary-logo-fullsize-height: 84px;
 $primary-logo-padding: 0.5 * $vertical-height;
 $primary-logo-padding-mobile: $vertical-height;
 
+.current-organization-link {
+  float: left;
+}
+
 // Header nav
 .primary-header-nav {
   background: $primary-nav-background;
