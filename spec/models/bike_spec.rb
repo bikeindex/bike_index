@@ -320,7 +320,7 @@ describe Bike do
     end
     context "organizations" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:user) { FactoryBot.create(:organized_user, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:user_unorganized) { User.new }
       let(:organization_unstolen) do
         o = FactoryBot.create(:organization)
