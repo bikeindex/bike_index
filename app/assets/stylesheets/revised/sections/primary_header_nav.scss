@@ -15,10 +15,6 @@ $primary-logo-fullsize-height: 84px;
 $primary-logo-padding: 0.5 * $vertical-height;
 $primary-logo-padding-mobile: $vertical-height;
 
-.current-organization-link {
-  float: left;
-}
-
 // Header nav
 .primary-header-nav {
   background: $primary-nav-background;
@@ -62,7 +58,8 @@ $primary-logo-padding-mobile: $vertical-height;
   li.divider-nav-item {
     display: none;
   }
-  .primary-submenu li.divider-nav-item {
+  .primary-submenu li.divider-nav-item,
+  .current-org-submenu li.divider-nav-item {
     display: block;
     width: 94%;
     margin: 6px auto;
@@ -312,5 +309,31 @@ $mainmenu-open-zindex: 10;
         bottom: 2 * $vertical-height;
       }
     }
+  }
+}
+
+.current-org-submenu-btn {
+  float: left;
+}
+
+.current-org-submenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  display: none;
+  float: left;
+  min-width: 400px;
+  padding: 5px 0;
+  margin: 2px 0 0;
+  font-size: 1rem;
+  text-align: left;
+  list-style: none;
+  background-color: $primary-nav-background;
+  background-clip: padding-box;
+  border: 1px solid rgba($gray, 0.3);
+  border-radius: $border-radius;
+  z-index: 1;
+  li {
+    font-size: 80%;
   }
 }

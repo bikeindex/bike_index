@@ -11,9 +11,9 @@
     %nav.primary-header-nav
       .container
         %a.primary-logo{ href: user_root_url }
-          = image_tag 'revised/logo.svg', class: 'primary-nav', alt: 'Bike Index home'
+          = image_tag "revised/logo.svg", class: "primary-nav", alt: "Bike Index home"
         - if current_organization.present?
-          %a.current-organization-link#current_organization_submenu{ "aria-haspopup" => "true", "aria-expanded" => "false", data: { toggle: 'dropdown' } }
+          %a.current-organization-link#current_organization_submenu{ "aria-haspopup" => "true", "aria-expanded" => "false", data: { toggle: "dropdown" } }
             = current_organization.short_name
           %ul.primary-submenu{ "aria-labelledby" => "#current_organization_submenu" }
             %li
