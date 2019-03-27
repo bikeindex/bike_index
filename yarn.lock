@@ -651,7 +651,7 @@
     "@emotion/utils" "0.11.1"
     "@emotion/weak-memoize" "0.2.2"
 
-"@emotion/core@^10.0.4":
+"@emotion/core@^10.0.10", "@emotion/core@^10.0.4":
   version "10.0.10"
   resolved "https://registry.yarnpkg.com/@emotion/core/-/core-10.0.10.tgz#8d3114e5a2f8b178a7067c603a2937516f180b08"
   dependencies:
@@ -3670,6 +3670,10 @@ eslint-plugin-jsx-a11y@^6.2.1:
     emoji-regex "^7.0.2"
     has "^1.0.3"
     jsx-ast-utils "^2.0.1"
+
+eslint-plugin-react-hooks@^1.6.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react-hooks/-/eslint-plugin-react-hooks-1.6.0.tgz#348efcda8fb426399ac7b8609607c7b4025a6f5f"
 
 eslint-plugin-react@^7.12.4:
   version "7.12.4"

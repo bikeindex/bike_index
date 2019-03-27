@@ -15,12 +15,12 @@
       - cache('stolen_home_organizations', expires_in: 1.day) do
         So far we have <strong>#{Organization.count} partner bike shops, police departments, </strong> and <strong>bike advocacy organizations</strong>.
 .container
-  #multiserial-search
+  #multi-serial-search
 
   %h4.multi-search-toggle
     %a#show_multi_search{ href: '#' }
       show multi-serial search
-  .multiserial-form#ms_form_section
+  .multiserial-form#ms_form_section.hidden
     .padded
     %h3
       Multiple Serial Search
