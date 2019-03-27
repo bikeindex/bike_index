@@ -213,8 +213,7 @@ class User < ActiveRecord::Base
   end
 
   def default_organization
-    memberships.order(:created_at).first.organization
-    organizations&.first # Maybe
+    organizations&.first # Maybe at some point use memberships to get the most recent, for now, speed
   end
 
   def partner_sign_up
