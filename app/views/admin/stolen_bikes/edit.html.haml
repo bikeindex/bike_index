@@ -24,107 +24,108 @@
 
     = f.submit 'Send it!', class: 'btn btn-success mb-4'
 
-  %ul.bike-boxes
+  %ul.list-unstyled
     -# Should I create a new partial here?
-    = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
-  .row
-    - if @stolen_record.present?
-      %table.table-list
-        %tbody
+    = render partial: "admin/bikes/bike", locals: {bike: @bike, target: "show" }
+  - if @stolen_record.present?
+    %h3.mt-4
+      Stolen Details
+    %table.table-list
+      %tbody
+        %tr
+          %td
+            Theft description
+          %td
+            = @stolen_record.theft_description
+        %tr
+          %td
+            Created
+          %td
+            = @bike.created_at.strftime("%m-%d-%Y")
+        %tr
+          %td
+            Owner email
+          %td
+            = @bike.owner_email
+        %tr
+          %td
+            Current owner
+          %td
+            -# Unsure of what to put here
+            = @bike.owner_email
+        -if @bike.creation_organization_id.present?
           %tr
             %td
-              Theft description
+              Organization name
             %td
-              = @stolen_record.theft_description
-          %tr
-            %td
-              Created
-            %td
-              = @bike.created_at.strftime("%m-%d-%Y")
-          %tr
-            %td
-              Owner email
-            %td
-              = @bike.owner_email
-          %tr
-            %td
-              Current owner
-            %td
-              -# Unsure of what to put here
-              = @bike.owner_email
-          -if @bike.creation_organization_id.present?
-            %tr
-              %td
-                Organization name
-              %td
-                = @bike.creation_organization.name
-          %tr
-            %td
-              Callable by
-            %td
-              - if @stolen_record.phone_for_everyone
-                %strong
-                  Everyone
-              -else
-                = "Users" if @stolen_record.phone_for_users
-                = "Shops" if @stolen_record.phone_for_shops
-                = "Police" if @stolen_record.phone_for_police
-          %tr
-            %td
-              Link to recover
-            %td
-              %input{ disabled: true, type: 'text', value: edit_bike_recovery_url(bike_id: @bike.id, token: @stolen_record.find_or_create_recovery_link_token).to_s }
-          %tr
-            %td
-              Approved?
-            %td
-              - if @stolen_record.approved
-                Check
-              - else
-                = link_to 'Approve listing', approve_admin_stolen_bike_url(@bike), method: :post, confirm: "Approving will:\n\n- Send out a tweet\n- The #{@bike.type} will be posted to any pertinent blogs.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
-          %tr
-            %td
-              Stolen on
-            %td
-              = @stolen_record.date_stolen.strftime("%m-%d-%Y")
-          %tr
-            %td
-              Address
-            %td
-              = @stolen_record.address
-          %tr
-            %td
-              Phone
-            %td
-              = @stolen_record.phone
-              = @stolen_record.secondary_phone
-          %tr
-            %td
-              Police Department
-            %td
-              = @stolen_record.police_report_department
-          %tr
-            %td
-              Police Report
-            %td
-              = @stolen_record.police_report_number
-          %tr
-            %td
-              Estimated $
-            %td
-              = @stolen_record.estimated_value
+              = @bike.creation_organization.name
+        %tr
+          %td
+            Callable by
+          %td
+            - if @stolen_record.phone_for_everyone
+              %strong
+                Everyone
+            -else
+              = "Users" if @stolen_record.phone_for_users
+              = "Shops" if @stolen_record.phone_for_shops
+              = "Police" if @stolen_record.phone_for_police
+        %tr
+          %td
+            Link to recover
+          %td
+            %input{ disabled: true, type: 'text', value: edit_bike_recovery_url(bike_id: @bike.id, token: @stolen_record.find_or_create_recovery_link_token).to_s }
+        %tr
+          %td
+            Approved?
+          %td
+            - if @stolen_record.approved
+              Check
+            - else
+              = link_to 'Approve listing', approve_admin_stolen_bike_url(@bike), method: :post, confirm: "Approving will:\n\n- Send out a tweet\n- The #{@bike.type} will be posted to any pertinent blogs.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
+        %tr
+          %td
+            Stolen on
+          %td
+            = @stolen_record.date_stolen.strftime("%m-%d-%Y")
+        %tr
+          %td
+            Address
+          %td
+            = @stolen_record.address
+        %tr
+          %td
+            Phone
+          %td
+            = @stolen_record.phone
+            = @stolen_record.secondary_phone
+        %tr
+          %td
+            Police Department
+          %td
+            = @stolen_record.police_report_department
+        %tr
+          %td
+            Police Report
+          %td
+            = @stolen_record.police_report_number
+        %tr
+          %td
+            Estimated $
+          %td
+            = @stolen_record.estimated_value
 
-    - else
-      %h1.mt-4
-        Stolen record not created yet.
-      %p
-        Wait a minute or two and it will be here!
+  - else
+    %h1.mt-4
+      Stolen record not created yet.
+    %p
+      Wait a minute or two and it will be here!
 
-      %hr.mt-4
-      = link_to "Standard edit page", edit_admin_bike_url(@bike)
-      - @bike.public_images.each do |img|
-        .pull-left
-          = image_tag img.image_url(:small)
+    %hr.mt-4
+    = link_to "Standard edit page", edit_admin_bike_url(@bike)
+    - @bike.public_images.each do |img|
+      .pull-left
+        = image_tag img.image_url(:small)
 - else
   %h1
     Something is broken on this page
