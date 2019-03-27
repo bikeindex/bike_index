@@ -212,6 +212,11 @@ class User < ActiveRecord::Base
     organizations.bike_shop.any?
   end
 
+  def default_organization
+    memberships.order(:created_at).first.organization
+    organizations&.first # Maybe
+  end
+
   def partner_sign_up
     partner_data && partner_data["sign_up"].present? ? partner_data["sign_up"] : nil
   end
