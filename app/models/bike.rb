@@ -217,7 +217,7 @@ class Bike < ActiveRecord::Base
   end
 
   def display_contact_owner?(u = nil, organization = nil)
-    stolen? && current_stolen_record.present? || organization
+    stolen? && current_stolen_record.present? || contact_owner?(u, organization)
   end
 
   def contact_owner?(u = nil, organization = nil)

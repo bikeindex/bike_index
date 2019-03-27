@@ -99,7 +99,7 @@ describe WelcomeController do
             expect(response.status).to eq(200)
             expect(response).to render_template("user_home")
             expect(response).to render_with_layout("application_revised")
-            expect(session[:current_organization_id]).to be_nil
+            expect(session[:current_organization_id]).to eq "0"
             expect(assigns[:current_organization]).to be_nil
           end
         end

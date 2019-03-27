@@ -130,7 +130,6 @@ describe Organization do
         expect(organization.paid_for?("weird_type")).to be_falsey
         expect(organization.paid_for?(%w[geolocated abandoned_bike weird_type])).to be_falsey
         expect(Organization.bike_actions.pluck(:id)).to eq([organization.id])
-        # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
         user.reload
         expect(user.send_unstolen_notifications?).to be_truthy
       end
