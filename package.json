@@ -2,8 +2,18 @@
   "scripts": {
     "lint": "./node_modules/.bin/eslint app/javascript/packs/multi_serial_search"
   },
+  "babel": {
+    "presets": [
+      "env",
+      "airbnb",
+      "stage-2"
+    ]
+  },
   "dependencies": {
     "@rails/webpacker": "3.5",
+    "axios": "^0.18.0",
+    "babel": "^6.23.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-react": "^6.24.1",
     "bootstrap": "^4.1.3",
     "dayjs": "^1.8.11",
@@ -17,9 +27,11 @@
     "rails-ujs": "^5.2.1",
     "react": "^16.8.5",
     "react-dom": "^16.8.5",
+    "react-spinners": "^0.5.3",
     "sass": "^1.15.2"
   },
   "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.4.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.5.0",
     "babel-plugin-transform-class-properties": "^6.24.1",
