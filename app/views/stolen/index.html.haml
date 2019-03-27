@@ -1,3 +1,5 @@
+= javascript_pack_tag 'multi_serial_search/index'
+
 .home-subhead
   .container
     %h2
@@ -13,6 +15,8 @@
       - cache('stolen_home_organizations', expires_in: 1.day) do
         So far we have <strong>#{Organization.count} partner bike shops, police departments, </strong> and <strong>bike advocacy organizations</strong>.
 .container
+  #multiserial-search
+
   %h4.multi-search-toggle
     %a#show_multi_search{ href: '#' }
       show multi-serial search
