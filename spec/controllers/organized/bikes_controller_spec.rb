@@ -151,6 +151,13 @@ describe Organized::BikesController, type: :controller do
           end
         end
       end
+      describe "multi_search" do
+        it "renders" do
+          get :multi_search, organization_id: organization.to_param
+          expect(response.status).to eq(200)
+          expect(response).to render_template :multi_search
+        end
+      end
     end
     context 'unpaid organization' do
       before do

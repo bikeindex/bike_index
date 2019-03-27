@@ -28,6 +28,8 @@ module Organized
 
     def new; end
 
+    def multi_search; end
+
     private
 
     def organization_bikes
