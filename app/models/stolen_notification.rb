@@ -19,7 +19,7 @@ class StolenNotification < ActiveRecord::Base
   end
 
   def unstolen_blocked?
-    !bike.stolen? && bike.contact_owner?(sender)
+    !bike.stolen? && !bike.contact_owner?(sender)
   end
 
   def default_subject
