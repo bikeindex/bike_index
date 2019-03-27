@@ -1,131 +1,130 @@
 - if @customer_contact.present?
-  = form_for [:admin, @customer_contact], html: { class: "form form-horizontal admin-bike-edit" } do |f|
+  = form_for [:admin, @customer_contact] do |f|
     - if @customer_contact.errors.any?
       = render partial: "/shared/errors", locals: { name: "Customer contact", obj: @customer_contact}
 
     %h4
       Send bike owner an email
-    .form-group
-      = f.label :current_user
-      = f.email_field :creator_email, value: current_user.email, class: "form-control w-25"
-    .form-group
-      = f.label :user_email
-      = f.email_field :user_email, value: @bike.owner_email, class: "form-control w-25"
-    .form-group
-      = f.label :bike, "Your stolen bike"
-      = f.text_field :title, value: "Your stolen #{@bike.title_string}", class: "form-control w-25"
-    = f.hidden_field :contact_type, value: 'stolen_contact'
-    = f.hidden_field :creator_id, value: current_user.id
-    = f.hidden_field :bike_id, value: @bike.id
-    .form-group
-      = f.label :notification_body
-      = f.text_area :body, placeholder: "You can write HTML in here. There will be a link to the #{@bike.type} included automatically.", rows: 7, class: "form-control w-25"
     .row
-      .col-sm
-      .col-sm
-      .col-sm
-        = f.submit 'Send it!', class: 'btn btn-success'
+      .form-group.col-lg-3.col-md-6.col-sm-6.col-xs-12
+        = f.label :current_user
+        = f.email_field :creator_email, value: current_user.email, class: "form-control"
+      .form-group.col-lg-3.col-md-6.col-sm-6.col-xs-12
+        = f.label :user_email
+        = f.email_field :user_email, value: @bike.owner_email, class: "form-control"
+      .form-group.col-lg-3.col-md-6.col-sm-6.col-xs-12
+        = f.label :bike, "Your stolen bike"
+        = f.text_field :title, value: "Your stolen #{@bike.title_string}", class: "form-control"
+      = f.hidden_field :contact_type, value: 'stolen_contact'
+      = f.hidden_field :creator_id, value: current_user.id
+      = f.hidden_field :bike_id, value: @bike.id
+      .form-group.col-lg-3.col-md-6.col-sm-6.col-xs-12
+        = f.label :notification_body
+        = f.text_area :body, placeholder: "You can write HTML in here. There will be a link to the #{@bike.type} included automatically.", rows: 7, class: "form-control"
+
+    = f.submit 'Send it!', class: 'btn btn-success mb-4'
 
   %ul.bike-boxes
     -# Should I create a new partial here?
     = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
-  - if @stolen_record.present?
-    %table.table-list
-      %tbody
-        %tr
-          %td
-            Theft description
-          %td
-            = @stolen_record.theft_description
-        %tr
-          %td
-            Created
-          %td
-            = @bike.created_at.strftime("%m-%d-%Y")
-        %tr
-          %td
-            Owner email
-          %td
-            = @bike.owner_email
-        %tr
-          %td
-            Current owner
-          %td
-            -# Unsure of what to put here
-            = @bike.owner_email
-        -if @bike.creation_organization_id.present?
+  .row
+    - if @stolen_record.present?
+      %table.table-list
+        %tbody
           %tr
             %td
-              Organization name
+              Theft description
             %td
-              = @bike.creation_organization.name
-        %tr
-          %td
-            Callable by
-          %td
-            - if @stolen_record.phone_for_everyone
-              %strong
-                Everyone
-            -else
-              = "Users" if @stolen_record.phone_for_users
-              = "Shops" if @stolen_record.phone_for_shops
-              = "Police" if @stolen_record.phone_for_police
-        %tr
-          %td
-            Link to recover
-          %td
-            %input{ disabled: true, type: 'text', value: edit_bike_recovery_url(bike_id: @bike.id, token: @stolen_record.find_or_create_recovery_link_token).to_s }
-        %tr
-          %td
-            Approved?
-          %td
-            - if @stolen_record.approved
-              Check
-            - else
-              = link_to 'Approve listing', approve_admin_stolen_bike_url(@bike), method: :post, confirm: "Approving will:\n\n- Send out a tweet\n- The #{@bike.type} will be posted to any pertinent blogs.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
-        %tr
-          %td
-            Stolen on
-          %td
-            = @stolen_record.date_stolen.strftime("%m-%d-%Y")
-        %tr
-          %td
-            Address
-          %td
-            = @stolen_record.address
-        %tr
-          %td
-            Phone
-          %td
-            = @stolen_record.phone
-            = @stolen_record.secondary_phone
-        %tr
-          %td
-            Police Department
-          %td
-            = @stolen_record.police_report_department
-        %tr
-          %td
-            Police Report
-          %td
-            = @stolen_record.police_report_number
-        %tr
-          %td
-            Estimated $
-          %td
-            = @stolen_record.estimated_value
+              = @stolen_record.theft_description
+          %tr
+            %td
+              Created
+            %td
+              = @bike.created_at.strftime("%m-%d-%Y")
+          %tr
+            %td
+              Owner email
+            %td
+              = @bike.owner_email
+          %tr
+            %td
+              Current owner
+            %td
+              -# Unsure of what to put here
+              = @bike.owner_email
+          -if @bike.creation_organization_id.present?
+            %tr
+              %td
+                Organization name
+              %td
+                = @bike.creation_organization.name
+          %tr
+            %td
+              Callable by
+            %td
+              - if @stolen_record.phone_for_everyone
+                %strong
+                  Everyone
+              -else
+                = "Users" if @stolen_record.phone_for_users
+                = "Shops" if @stolen_record.phone_for_shops
+                = "Police" if @stolen_record.phone_for_police
+          %tr
+            %td
+              Link to recover
+            %td
+              %input{ disabled: true, type: 'text', value: edit_bike_recovery_url(bike_id: @bike.id, token: @stolen_record.find_or_create_recovery_link_token).to_s }
+          %tr
+            %td
+              Approved?
+            %td
+              - if @stolen_record.approved
+                Check
+              - else
+                = link_to 'Approve listing', approve_admin_stolen_bike_url(@bike), method: :post, confirm: "Approving will:\n\n- Send out a tweet\n- The #{@bike.type} will be posted to any pertinent blogs.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
+          %tr
+            %td
+              Stolen on
+            %td
+              = @stolen_record.date_stolen.strftime("%m-%d-%Y")
+          %tr
+            %td
+              Address
+            %td
+              = @stolen_record.address
+          %tr
+            %td
+              Phone
+            %td
+              = @stolen_record.phone
+              = @stolen_record.secondary_phone
+          %tr
+            %td
+              Police Department
+            %td
+              = @stolen_record.police_report_department
+          %tr
+            %td
+              Police Report
+            %td
+              = @stolen_record.police_report_number
+          %tr
+            %td
+              Estimated $
+            %td
+              = @stolen_record.estimated_value
 
-  - else
-    %h1.mt-4
-      Stolen record not created yet.
-    %p
-      Wait a minute or two and it will be here!
+    - else
+      %h1.mt-4
+        Stolen record not created yet.
+      %p
+        Wait a minute or two and it will be here!
 
-    %hr.mt-4
-    = link_to "Standard edit page", edit_admin_bike_url(@bike)
-    - @bike.public_images.each do |img|
-      .pull-left
-        = image_tag img.image_url(:small)
+      %hr.mt-4
+      = link_to "Standard edit page", edit_admin_bike_url(@bike)
+      - @bike.public_images.each do |img|
+        .pull-left
+          = image_tag img.image_url(:small)
 - else
   %h1
     Something is broken on this page
