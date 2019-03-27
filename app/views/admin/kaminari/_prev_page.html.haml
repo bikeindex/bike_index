@@ -1,5 +1,5 @@
-%li.list-inline-item.pt-2.d-none.d-md-inline
-  = link_to_unless current_page.first?, raw(t 'views.pagination.previous'), url, :rel => 'prev', :remote => remote, class: "btn btn-secondary", role: "button"
-
-%li.list-inline-item.pt-2.d-md-none
-  = link_to_unless current_page.first?, raw(t 'views.pagination.small-previous'), url, :rel => 'prev', :remote => remote, class: "btn btn-secondary", role: "button"
+- unless current_page.first?
+  = link_to url, :rel => 'prev', :remote => remote, class: "btn btn-secondary", role: "button" do
+    &#8249;
+    %span.d-none.d-md-inline
+      = raw(t 'views.pagination.previous')
