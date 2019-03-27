@@ -11,30 +11,55 @@
 
     .ribbon
       .container
-        %h2 Provide your customers just one, easy registry.
+        %h2 Do right by your customers in just 5 clicks.
   .container
     .row.main-body-row
       .landing-why-col
-        %h3 Why Bike Index?
-        %p
-          Bike Index is the nation’s most widely used and most effective bicycle registration and recovery service. By partnering with Bike Index, your shop will be able to provide your customers easy and official access to a network of over 120,000 users keeping an eye out for stolen bikes. 
-
-        %p
-          Also we're free, and a non-profit. Our only goal is to help the community counter bike theft and know their bike's information. Anyone who rides a bike knows how integral bike shops are to any local cycling community.  
-
-        = render partial: '/landing_pages/tweet', locals: { tweet_id: 840324239425073152 }
-
         %h3 Register bikes for your customers
-        
         %p
-          We offer an easy way for you to register your customer's bikes - new or old. All you need at the point of sale is the bike's serial number, manufacturer, color and customer's email. And with their permission, we'll send them an email with all the pertinent information and their bicycle will be protected, forever, for free.
+          For completely free we provide you with the tools needed to automatically register each bike you sell in Bike Index through your POS. All it takes is a few minutes of setup, either with your Ascend or Lightspeed Retail account.
+
+        %p
+          Build goodwill with your customers with a service you can offer at no cost. Recover a stolen bike, and you’ll have a customer for life.
+
+        %p
+          Join our
+          = link_to "network of shop partners.", "http://bikeindex.org/where"
+          Sign up for a free Bike Index account for your shop
+          = link_to "here.", "https://bikeindex.org/organizations/new"
+          Once you do this, link your account to your Lightspeed or register bikes in Bike Index through Ascend.
 
         = image_tag 'lightspeed_logo.png', class: 'landing-lightspeed-logo', alt: 'Lightspeed logo'
         %h3 Use Lightspeed Retail?
         %p
-          We've made an official Lightspeed add-on to provide entirely automated registration for every bike you sell. All you have to do is make sure you input the serial number and take the customer's email.
+          Our official Lightspeed integration provides entirely automated registration for every bike you sell. All you have to do is make sure you input the serial number and take the customer's email.
+
         %p
-          <a href="/lightspeed">Learn more</a> or <a href="/connect_lightspeed">connect your Lightspeed account</a>.
+          = link_to "Learn more", "https://bikeindex.org/lightspeed"
+          or
+          = link_to "connect your Lightspeed account", "https://bikeindex.org/connect_lightspeed"
+
+        %h3
+          Ascend Retail
+
+        %p
+          Connect your Ascend account and your Bike Index shop account. Each night, Ascend will export the bikes you’ve sold, and we’ll import them into Bike Index for your customers. Other than setup, you’re done! Learn more about the Ascend integration
+          = link_to "here.", "https://bikeindex.org/ascend"
+
+        = render partial: '/landing_pages/tweet', locals: { tweet_id: 840324239425073152 }
+
+        %p
+          Don't use Ascend or Lightspeed POS? Ask us about
+          = link_to "printed materials", "https://bikeindex.myshopify.com/"
+
+        %p
+          Relevant posts:
+
+        %p
+          = link_to "Driving service revenues with bicycle registration", "https://bikeindex.org/news/driving-service-revenues-with-bicycle-registration"
+        %p
+          = link_to "5 ways to grow community for your bike shop", "https://bikeindex.org/news/5-ways-to-grow-community-for-your-bike-shop"
+
 
         .mobile-contact-link
           %a.btn.btn-primary.btn-lg{ href: new_organization_path }
@@ -59,7 +84,7 @@
                 = image_tag 'landing_pages/partners/City-Bikes-DC.png', alt: 'City Bikes DC'
               %li
                 = image_tag 'landing_pages/partners/Ferris-Wheels.png', alt: 'Ferris Wheels'
-              
+
           = shop_partners
 
       .next-steps-col
@@ -72,5 +97,5 @@
             %h3
               Used everywhere
             = shop_partners
-            
+
   = render '/landing_pages/footer'
