@@ -195,10 +195,9 @@ Bikeindex::Application.routes.draw do
     namespace :v1 do
       resources :bikes, only: [:index, :show, :create] do
         collection do
-          get "search_tags"
-          get "close_serials"
-          get "stolen_ids"
-          get "multi_search"
+          get :search_tags
+          get :close_serials
+          get :stolen_ids
         end
       end
       resources :stolen_locking_response_suggestions, only: [:index]
@@ -213,9 +212,9 @@ Bikeindex::Application.routes.draw do
       resources :organizations, only: [:show]
       resources :users do
         collection do
-          get 'current'
-          post 'request_serial_update'
-          post 'send_request'
+          get :current
+          post :request_serial_update
+          post :send_request
         end
       end
       get 'not_found', to: 'api_v1#not_found'
@@ -271,6 +270,7 @@ Bikeindex::Application.routes.draw do
       collection do
         get :recoveries
         get :incompletes
+        get :multi_search
       end
     end
     resources :exports, except: [:edit]
