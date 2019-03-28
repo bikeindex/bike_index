@@ -76,11 +76,13 @@ describe Organized::BikesController, type: :controller do
           end
           let(:organization_bikes) { organization.bikes }
           it 'sends all the params and renders search template to organization_bikes' do
+            session[:current_organization_id] = "0" # Because, who knows! Maybe they don't have org access at some point.
             get :index, query_params.merge(organization_id: organization.to_param)
             expect(response.status).to eq(200)
             expect(assigns(:active_organization)).to eq organization
             expect(assigns(:search_query_present)).to be_truthy
             expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
+            expect(session[:current_organization_id]).to eq organization.id
           end
         end
         context 'without params' do
