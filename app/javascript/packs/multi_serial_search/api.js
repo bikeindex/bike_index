@@ -29,6 +29,4 @@ const fetchSerialResults = async serial => {
   return results;
 };
 
-export {
-  fetchSerialResults,
-};
+export { fetchSerialResults };
