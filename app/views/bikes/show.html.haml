@@ -1,7 +1,7 @@
 = render partial: "initial_modal_for_show"
 
 - if current_user.present?
-  - organization_message_overlay = current_user.bike_actions_organization&.present?
+  - organization_message_overlay = current_organization&.bike_actions?
   - edit_overlay = @bike.authorize_bike_for_user(current_user)
   - if organization_message_overlay || edit_overlay
     = render partial: "bike_show_overlays", locals: { organization_message_overlay: organization_message_overlay, edit_overlay: edit_overlay}
@@ -166,7 +166,7 @@
           - else
             Share it!
         = render '/shared/share_this'
-      - if @bike.display_contact_owner?(current_user)
+      - if @bike.display_contact_owner?(current_user, current_organization)
         .contact-the-owner
           %p.preface
             - if @bike.stolen?

@@ -112,26 +112,26 @@ describe Organization do
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
     end
     context "messages" do
-      let!(:paid_feature2) { FactoryBot.create(:paid_feature, name: "abandoned message", feature_slugs: %w[messages abandoned_bike_messages]) }
+      let!(:paid_feature2) { FactoryBot.create(:paid_feature, name: "abandoned message", feature_slugs: %w[messages abandoned_bike_messages unstolen_notifications]) }
       let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
       it "returns empty for non-geolocated_emails" do
         expect(organization.message_kinds).to eq([])
         expect(organization.paid_for?(nil)).to be_falsey
         expect(organization.paid_for?("messages")).to be_falsey
         expect(organization.paid_for?("geolocated_messages")).to be_falsey
-        expect(user.bike_actions_organization_id).to eq nil
+        expect(user.send_unstolen_notifications?).to be_falsey
         invoice.update_attributes(paid_feature_ids: [paid_feature.id, paid_feature2.id])
         organization.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - after_commit
         expect(organization.paid_for?("messages")).to be_truthy
         expect(organization.paid_for?("geolocated_messages")).to be_falsey
         expect(organization.paid_for?("abandoned_bike_messages")).to be_truthy
         expect(organization.message_kinds).to eq(["abandoned_bike_messages"])
+        expect(organization.paid_for?("unstolen_notifications")).to be_truthy
         expect(organization.paid_for?("weird_type")).to be_falsey
         expect(organization.paid_for?(%w[geolocated abandoned_bike weird_type])).to be_falsey
-        expect(Organization.with_bike_actions.pluck(:id)).to eq([organization.id])
-        # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
-        user.update_attributes(updated_at: Time.now)
-        expect(user.bike_actions_organization_id).to eq organization.id
+        expect(Organization.bike_actions.pluck(:id)).to eq([organization.id])
+        user.reload
+        expect(user.send_unstolen_notifications?).to be_truthy
       end
     end
   end

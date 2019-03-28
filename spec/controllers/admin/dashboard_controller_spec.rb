@@ -22,7 +22,7 @@ describe Admin::DashboardController do
       it 'redirects' do
         get :index
         expect(response.code).to eq('302')
-        expect(response).to redirect_to(user_home_url)
+        expect(response).to redirect_to organization_bikes_path(organization_id: user.default_organization.to_param)
       end
     end
     context 'logged in as content admin' do

@@ -1994,7 +1994,6 @@ CREATE TABLE public.users (
     is_content_admin boolean DEFAULT false NOT NULL,
     notification_newsletters boolean DEFAULT false NOT NULL,
     developer boolean DEFAULT false NOT NULL,
-    bike_actions_organization_id integer,
     partner_data json,
     latitude double precision,
     longitude double precision,
@@ -3232,13 +3231,6 @@ CREATE INDEX index_user_emails_on_user_id ON public.user_emails USING btree (use
 
 
 --
--- Name: index_users_on_bike_actions_organization_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_users_on_bike_actions_organization_id ON public.users USING btree (bike_actions_organization_id);
-
-
---
 -- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3937,4 +3929,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190315183047');
 INSERT INTO schema_migrations (version) VALUES ('20190315213846');
 
 INSERT INTO schema_migrations (version) VALUES ('20190317191821');
+
+INSERT INTO schema_migrations (version) VALUES ('20190327164432');
 

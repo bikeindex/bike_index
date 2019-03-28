@@ -1,19 +1,29 @@
 // Padding to deal with header nav.
 // Also set in the landing/organizations scss
-body, .organized-left-menu { padding-top: 8*$vertical-height; }
+body,
+.organized-left-menu {
+  padding-top: 8 * $vertical-height;
+}
 @media (min-width: $grid-breakpoint-lg) {
-  body, .organized-left-menu { padding-top: 12*$vertical-height; }
+  body,
+  .organized-left-menu {
+    padding-top: 12 * $vertical-height;
+  }
 }
 
 $primary-logo-fullsize-height: 84px;
-$primary-logo-padding: .5*$vertical-height;
+$primary-logo-padding: 0.5 * $vertical-height;
 $primary-logo-padding-mobile: $vertical-height;
+$mainmenu-transform-speed: 200ms;
+$mainmenu-width: 80%;
+$mainmenu-open-zindex: 10;
 
 // Header nav
 .primary-header-nav {
   background: $primary-nav-background;
   position: fixed;
-  top: 0; left: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   z-index: $zindex-navbar-fixed;
   .primary-logo {
@@ -40,30 +50,129 @@ $primary-logo-padding-mobile: $vertical-height;
       cursor: pointer;
       color: $primary-nav-text-color;
       display: block;
-      transition: color .05s linear;
-      &:hover, &:active, &.active { color: #fff; }
+      transition: color 0.05s linear;
+      &:hover,
+      &:active,
+      &.active {
+        color: #fff;
+      }
     }
   }
-  .hamburgler { font-family: courier; }
-  .settings-link svg { display: none; }
+  .divider-nav-item,
+  .nonprofit-subtitle {
+    display: none;
+  }
+  .primary-submenu .divider-nav-item,
+  .current-organization-submenu .divider-nav-item {
+    display: block;
+    width: 94%;
+    margin: 6px auto;
+    border-top: 1px solid #666;
+  }
+  .hamburgler {
+    font-family: courier;
+  }
+  .settings-link svg {
+    display: none;
+  }
+
+  // Current org nav and dropdown
+  .current-organization-nav-item {
+    float: left;
+    display: block;
+    margin: 0 0 0 2rem;
+    padding: $vertical-height 24px 0;
+    transition: padding $mainmenu-transform-speed linear;
+    a {
+      @extend .header-font;
+      color: #fff;
+      font-size: 12px;
+      line-height: 18px;
+      cursor: pointer;
+      display: block;
+      padding: 8px 15px;
+      &:hover,
+      &:active,
+      &.active {
+        color: #fff;
+        .caret-down {
+          color: #fff;
+        }
+      }
+    }
+    .caret-down {
+      font-size: 75%;
+      color: darken($primary-nav-text-color, 10%);
+      font-weight: 800;
+      display: inline-block;
+      margin-left: 0.2rem;
+    }
+  }
+  &.headroom--pinned .current-organization-nav-item,
+  &.headroom--unpinned .current-organization-nav-item {
+    padding: $vertical-height 24px 0;
+    a.active::after {
+      bottom: 0;
+    }
+  }
+  .open > .current-organization-submenu {
+    display: block;
+  }
+  .current-organization-submenu {
+    position: absolute;
+    top: 100%;
+    display: none;
+    min-width: 400px;
+    padding: 5px 0;
+    margin: 0;
+    font-size: 1rem;
+    text-align: left;
+    list-style: none;
+    background-color: #222222;
+    background-clip: padding-box;
+    border: 1px solid rgba($gray, 0.3);
+    border-radius: $border-radius;
+    z-index: 1;
+    li {
+      font-size: 80%;
+    }
+  }
+  .current-organization-submenu a,
+  .primary-submenu a {
+    font-family: $body-font-family;
+    color: $primary-nav-text-color;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 15px;
+    text-transform: none;
+    &:hover,
+    &:active,
+    &.active {
+      color: #fff;
+      text-decoration: none;
+    }
+  }
 }
 
-// 
+//
 // Small Screen Styles
-$mainmenu-transform-speed: 200ms;
-$mainmenu-width: 80%;
-$mainmenu-open-zindex: 10;
 @media (max-width: $grid-breakpoint-lg - 1px) {
   .primary-header-nav {
-    transition: transform 200ms linear;
-    &.headroom--pinned { transform: translate(0, 0%); }
-    &.headroom--unpinned { transform: translate(0, -100%); }
-    .primary-logo { padding: $primary-logo-padding-mobile 0; }
+    transition: transform $mainmenu-transform-speed linear;
+    &.headroom--pinned {
+      transform: translate(0, 0%);
+    }
+    &.headroom--unpinned {
+      transform: translate(0, -100%);
+    }
+    .primary-logo {
+      padding: $primary-logo-padding-mobile 0;
+    }
     .hamburgler {
       float: right;
       position: relative;
       transition: padding $mainmenu-transform-speed linear;
-      padding: 1.5*$vertical-height 0;
+      padding: 1.5 * $vertical-height 0;
       z-index: $mainmenu-open-zindex + 3;
       a {
         font-size: 36px;
@@ -72,54 +181,72 @@ $mainmenu-open-zindex: 10;
         color: $gray;
         background: $primary-nav-background;
         transition: transform 100ms linear;
-        &:hover { 
+        &:hover {
           color: #fff;
           text-decoration: none;
         }
-        &:active { }
-        &:active, &.active {
+        &:active {
+        }
+        &:active,
+        &.active {
           color: #fff;
           text-decoration: none;
         }
-        &:active, &.active:active { transform: rotate(45deg) }
-        &.active { 
-          transform: rotate(90deg)
+        &:active,
+        &.active:active {
+          transform: rotate(45deg);
+        }
+        &.active {
+          transform: rotate(90deg);
         }
       }
     }
-    .primary-main-menu { 
+    .primary-main-menu {
       display: none;
       background: $primary-nav-background;
       position: fixed;
       right: 0;
-      top: 4*$vertical-height;
+      top: 4 * $vertical-height;
       transform: translate(100%, 0);
       width: $mainmenu-width;
       height: 100%;
       transition: transform $mainmenu-transform-speed linear;
       z-index: $mainmenu-open-zindex;
       overflow-y: auto;
-      padding: 2*$vertical-height 0 100px;
+      padding: 2 * $vertical-height 0 100px;
     }
     .primary-nav-item {
-      a.primary-nav-link-with-submenu { // headers of lists aren't links on small screens
+      a.primary-nav-link-with-submenu {
+        // headers of lists aren't links on small screens
         cursor: default;
-        &:hover, &:active { background: $primary-nav-background; color: $primary-nav-text-color; }
+        &:hover,
+        &:active {
+          background: $primary-nav-background;
+          color: $primary-nav-text-color;
+        }
       }
       a {
-        padding: $vertical-height 2*$vertical-height;
-        &:active, &.active {
+        padding: $vertical-height 2 * $vertical-height;
+        &:active,
+        &.active {
           background: $gray-light;
           text-decoration: none;
         }
-
       }
     }
-    .primary-submenu { padding-left: 12px; }
+    .divider-nav-item {
+      display: block;
+      width: 94%;
+      margin: 6px auto;
+      border-top: 1px solid #666;
+    }
+    .primary-submenu {
+      padding-left: 12px;
+    }
     #menu-opened-backdrop {
       display: none;
       position: fixed;
-      top: 5*$vertical-height;
+      top: 5 * $vertical-height;
       left: 0;
       width: 100%;
       height: 100%;
@@ -128,43 +255,70 @@ $mainmenu-open-zindex: 10;
     }
   }
   // So that mobile browsers don't show it all the time, like assholes
-  .primary-header-nav.enabled .primary-main-menu { display: block; }
+  .primary-header-nav.enabled .primary-main-menu {
+    display: block;
+  }
   //
   // Mobile menu visible
-  body.menu-in { overflow: hidden; }
+  body.menu-in {
+    overflow: hidden;
+    .current-organization-nav-item {
+      display: none;
+    }
+  }
+  .current-organization-nav-item {
+    padding-top: 2px + $vertical-height !important; // Somehow, makes things lineup more
+  }
   .primary-header-nav.menu-in {
-    #menu-opened-backdrop { display: block; }
-    .hamburgler { padding-right: $mainmenu-width - 5%; }
-    .primary-main-menu { transform: translate(0%, 0); }
+    #menu-opened-backdrop {
+      display: block;
+    }
+    .hamburgler {
+      padding-right: $mainmenu-width - 5%;
+    }
+    .primary-main-menu {
+      transform: translate(0%, 0);
+    }
   }
 }
 
-// 
+//
 // Large screen styles
 @media (min-width: $grid-breakpoint-lg) {
   .primary-header-nav {
-    &.headroom--pinned, &.headroom--unpinned {
-      .primary-logo img { height: 48px; }
+    &.headroom--pinned,
+    &.headroom--unpinned {
+      .primary-logo img {
+        height: 48px;
+      }
       .primary-nav-item {
         padding: $vertical-height 0 0;
-        a.active::after { bottom: 0; }
+        a.active::after {
+          bottom: 0;
+        }
       }
     }
-    .primary-logo img { transition: height 200ms linear; }
-    .hamburgler { display: none; }
+    .primary-logo img {
+      transition: height $mainmenu-transform-speed linear;
+    }
+    .hamburgler {
+      display: none;
+    }
     .primary-nav-item {
       float: right;
       position: relative;
-      padding: $vertical-height 0 0;
-      transition: padding 200ms linear;
+      transition: padding $mainmenu-transform-speed linear;
       a {
-        padding: 8px 0.5*$grid-gutter-width;
-        &.active, &:active { text-decoration: none; }
+        padding: 8px 0.5 * $grid-gutter-width;
+        &.active,
+        &:active {
+          text-decoration: none;
+        }
       }
       // Only apply to primary nav items, not submenus
-      &>a.active::after {
-        transition: bottom 200ms linear;
-        content: '';
+      & > a.active::after {
+        transition: bottom $mainmenu-transform-speed linear;
+        content: "";
         position: absolute;
         left: 50%;
         height: 2px;
@@ -176,26 +330,32 @@ $mainmenu-open-zindex: 10;
       .signup-link {
         border-radius: 4px;
         border: 1px solid $link-color;
-        transition: background .05s linear;
+        transition: background 0.05s linear;
         &:hover {
-          background: rgba(white, .1);
+          background: rgba(white, 0.1);
           color: $primary-nav-text-color;
         }
-        &.active::after { display: none; }
+        &.active::after {
+          display: none;
+        }
       }
       .settings-link {
-        padding-top: .5*$vertical-height;
-        padding-bottom: .5*$vertical-height;
-        .settings-text { display: none; }
+        padding-top: 0.5 * $vertical-height;
+        padding-bottom: 0.5 * $vertical-height;
+        .settings-text {
+          display: none;
+        }
         svg {
           display: block;
-          height: 2*$vertical-height;
+          height: 2 * $vertical-height;
           width: auto;
         }
       }
     }
   }
-  .open > .primary-submenu { display: block; }
+  .open > .primary-submenu {
+    display: block;
+  }
   .primary-submenu {
     position: absolute;
     top: 100%;
@@ -210,7 +370,7 @@ $mainmenu-open-zindex: 10;
     list-style: none;
     background-color: $primary-nav-background;
     background-clip: padding-box;
-    border: 1px solid rgba($gray, .3);
+    border: 1px solid rgba($gray, 0.3);
     border-radius: $border-radius;
     z-index: 1;
     li {
@@ -218,13 +378,50 @@ $mainmenu-open-zindex: 10;
     }
   }
   // To prevent flashing on initial load, before JS arrives
-  .primary-header-nav, .primary-header-nav.headroom--top, 
+  .primary-header-nav,
+  .primary-header-nav.headroom--top,
   .primary-header-nav.headroom--top.headroom--pinned {
-    .primary-logo img { height: $primary-logo-fullsize-height - 2*$primary-logo-padding; }
+    .primary-logo img {
+      height: $primary-logo-fullsize-height - 2 * $primary-logo-padding;
+    }
+    .current-organization-nav-item,
     .primary-nav-item {
       // nav-items are 34px tall.
-      padding: .5*($primary-logo-fullsize-height - 34px) 0 2*$vertical-height;
-      a.active::after { bottom: 2*$vertical-height; }
+      padding: 0.5 * ($primary-logo-fullsize-height - 34px) 0 2 *
+        $vertical-height;
+      a.active::after {
+        bottom: 2 * $vertical-height;
+      }
+    }
+  }
+}
+
+// Only display nonprofit subtitle on xtra large screens
+@media (min-width: $grid-breakpoint-xl) {
+  .primary-header-nav {
+    .nonprofit-subtitle {
+      display: block;
+      float: left;
+      padding: 0 6px;
+      border-left: 1px solid #3498db;
+      color: #d8d8d8;
+      line-height: 1.15;
+      font-size: 12px;
+      font-family: "Open Sans";
+      font-style: italic;
+      text-decoration: none;
+      margin: 11px $vertical-height 0 $vertical-height;
+      transition: margin $mainmenu-transform-speed linear;
+    }
+    &.headroom--pinned .nonprofit-subtitle,
+    &.headroom--unpinned .nonprofit-subtitle {
+      margin-top: 11px;
+    }
+    // To prevent moving on initial load, before JS arrives
+    .nonprofit-subtitle,
+    &.headroom--top.headroom--pinned .nonprofit-subtitle,
+    &.headroom--top .nonprofit-subtitle {
+      margin-top: 18px;
     }
   }
 }

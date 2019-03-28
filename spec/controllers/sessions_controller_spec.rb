@@ -160,6 +160,7 @@ describe SessionsController do
           post :create, session: { password: "would be correct" }
           expect(cookies.signed[:auth][1]).to eq(user.auth_token)
           expect(session[:render_donation_request]).to be_falsey
+          expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param)
         end
         context "organization is police" do
           let(:organization_kind) { "law_enforcement" }
@@ -169,6 +170,7 @@ describe SessionsController do
             post :create, session: { password: "would be correct" }
             expect(cookies.signed[:auth][1]).to eq(user.auth_token)
             expect(session[:render_donation_request]).to eq "law_enforcement"
+            expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param)
           end
         end
       end

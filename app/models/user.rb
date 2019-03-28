@@ -32,7 +32,6 @@ class User < ActiveRecord::Base
 
   has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :inviter
   has_many :organization_invitations, class_name: 'OrganizationInvitation', inverse_of: :invitee
-  belongs_to :bike_actions_organization, class_name: "Organization"
   belongs_to :state
   belongs_to :country
 
@@ -133,7 +132,9 @@ class User < ActiveRecord::Base
 
   def paid_org?; organizations.paid.any? end
 
-  def send_unstolen_notifications?; superuser || bike_actions_organization&.paid_for?("unstolen_notifications") end
+  def send_unstolen_notifications?
+    superuser || organizations.any? { |o| o.paid_for?("unstolen_notifications") }
+  end
 
   def admin_authorized(type)
     return true if superuser
@@ -211,6 +212,11 @@ class User < ActiveRecord::Base
     organizations.bike_shop.any?
   end
 
+  def default_organization
+    return @default_organization if defined?(@default_organization) # Memoize, permit nil
+    @default_organization = organizations&.first # Maybe at some point use memberships to get the most recent, for now, speed
+  end
+
   def partner_sign_up
     partner_data && partner_data["sign_up"].present? ? partner_data["sign_up"] : nil
   end
@@ -244,12 +250,6 @@ class User < ActiveRecord::Base
     MarkForSubscriptionRequestWorker.perform_in(1.days, id)
   end
 
-  def active_organization
-    if self.has_membership?
-      self.memberships.current_membership
-    end
-  end
-
   def render_donation_request
     return nil unless has_police_membership? && !organizations.law_enforcement.paid.any?
     "law_enforcement"
@@ -264,7 +264,6 @@ class User < ActiveRecord::Base
       mbh["link_title"] = my_bikes_link_title if my_bikes_link_title.present?
       self.my_bikes_hash = mbh
     end
-    self.bike_actions_organization_id = organizations.with_bike_actions.reorder(:created_at).pluck(:id).first
     true
   end
 
