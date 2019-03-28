@@ -11,8 +11,21 @@ const MultiSerialSearch = () => {
 
   const onSearchSerials = async e => {
     e.preventDefault();
+    if (!searchTokens) return;
     setLoading(true);
-    const { bikes: results } = await fetchSerialResults(searchTokens);
+    const tokens = searchTokens.split(/,|\n/);
+    const uniqSerials = [...new Set(tokens)];
+
+    /* parallel request all serials */
+    const all = await Promise.all(
+      uniqSerials.map(serial => fetchSerialResults(serial))
+    );
+    const results = all.map(({ bikes }, index) => (
+      {
+        bikes,
+        serial: uniqSerials[index],
+      }
+    ));
     setSerialResults(results);
     setLoading(false);
   };
@@ -53,6 +66,27 @@ const MultiSerialSearch = () => {
             >
               <img alt="search" src={searchIcon} />
             </button>
+
+            <section id="ms_search_section">
+              <span className="padded" />
+              <div className="multiserial-response">
+                <h2>
+                  Multi serial search results
+                </h2>
+
+                <ul id="serials_submitted" className="multiserials-list">
+                  {serialResults.map(({ serial, results }) => (
+                    <li
+                      key={serial}
+                      className={!results && 'ms-nomatch'}
+                      name={serial}
+                    >
+                      {serial}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
           </div>
         ))}
     </Fragment>
@@ -62,7 +96,7 @@ const MultiSerialSearch = () => {
 export default MultiSerialSearch;
 
 
-/* 
+/*
   TODO:
     - append li results for each serial
       - #ms_search_section
@@ -73,6 +107,6 @@ export default MultiSerialSearch;
     - loading state for close matching serials
     - fix search button style
     - replace jQuery animations
-    - 
+    -
 
 */
