@@ -27,7 +27,6 @@
   .row
     .col-xs-12.col-lg-6
       %ul.list-unstyled
-        -# Should I create a new partial here?
         = render partial: "admin/bikes/bike", locals: {bike: @bike, target: "show" }
   - if @stolen_record.present?
     %h3.mt-4
@@ -55,7 +54,6 @@
               %td
                 Current owner
               %td
-                -# Unsure of what to put here
                 = @bike.owner_email
             -if @bike.creation_organization_id.present?
               %tr
