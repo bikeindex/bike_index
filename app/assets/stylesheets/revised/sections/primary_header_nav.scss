@@ -75,11 +75,13 @@ $mainmenu-open-zindex: 10;
   .settings-link svg {
     display: none;
   }
+
   // Current org nav and dropdown
   .current-organization-nav-item {
     float: left;
     display: block;
-    margin: 0;
+    margin: 0 0 0 2rem;
+    padding: $vertical-height 24px 0;
     transition: padding $mainmenu-transform-speed linear;
     a {
       @extend .header-font;
@@ -92,9 +94,18 @@ $mainmenu-open-zindex: 10;
       &:hover,
       &:active,
       &.active {
-        text-decoration: underline;
         color: #fff;
+        .caret-down {
+          color: #fff;
+        }
       }
+    }
+    .caret-down {
+      font-size: 75%;
+      color: darken($primary-nav-text-color, 10%);
+      font-weight: 800;
+      display: inline-block;
+      margin-left: 0.2rem;
     }
   }
   &.headroom--pinned .current-organization-nav-item,
@@ -102,6 +113,43 @@ $mainmenu-open-zindex: 10;
     padding: $vertical-height 24px 0;
     a.active::after {
       bottom: 0;
+    }
+  }
+  .open > .current-organization-submenu {
+    display: block;
+  }
+  .current-organization-submenu {
+    position: absolute;
+    top: 100%;
+    display: none;
+    min-width: 400px;
+    padding: 5px 0;
+    margin: 0;
+    font-size: 1rem;
+    text-align: left;
+    list-style: none;
+    background-color: #222222;
+    background-clip: padding-box;
+    border: 1px solid rgba($gray, 0.3);
+    border-radius: $border-radius;
+    z-index: 1;
+    li {
+      font-size: 80%;
+    }
+  }
+  .current-organization-submenu a,
+  .primary-submenu a {
+    font-family: $body-font-family;
+    color: $primary-nav-text-color;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 15px;
+    text-transform: none;
+    &:hover,
+    &:active,
+    &.active {
+      color: #fff;
+      text-decoration: none;
     }
   }
 }
@@ -214,6 +262,12 @@ $mainmenu-open-zindex: 10;
   // Mobile menu visible
   body.menu-in {
     overflow: hidden;
+    .current-organization-nav-item {
+      display: none;
+    }
+  }
+  .current-organization-nav-item {
+    padding-top: 2px + $vertical-height !important; // Somehow, makes things lineup more
   }
   .primary-header-nav.menu-in {
     #menu-opened-backdrop {
@@ -369,27 +423,5 @@ $mainmenu-open-zindex: 10;
     &.headroom--top .nonprofit-subtitle {
       margin-top: 18px;
     }
-  }
-}
-
-.current-org-submenu {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  display: none;
-  float: left;
-  min-width: 400px;
-  padding: 5px 0;
-  margin: 2px 0 0;
-  font-size: 1rem;
-  text-align: left;
-  list-style: none;
-  background-color: $primary-nav-background;
-  background-clip: padding-box;
-  border: 1px solid rgba($gray, 0.3);
-  border-radius: $border-radius;
-  z-index: 1;
-  li {
-    font-size: 80%;
   }
 }
