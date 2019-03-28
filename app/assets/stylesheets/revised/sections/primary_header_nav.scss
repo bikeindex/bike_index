@@ -14,6 +14,9 @@ body,
 $primary-logo-fullsize-height: 84px;
 $primary-logo-padding: 0.5 * $vertical-height;
 $primary-logo-padding-mobile: $vertical-height;
+$mainmenu-transform-speed: 200ms;
+$mainmenu-width: 80%;
+$mainmenu-open-zindex: 10;
 
 // Header nav
 .primary-header-nav {
@@ -72,16 +75,42 @@ $primary-logo-padding-mobile: $vertical-height;
   .settings-link svg {
     display: none;
   }
+  // Current org nav and dropdown
+  .current-organization-nav-item {
+    float: left;
+    display: block;
+    margin: 0;
+    transition: padding $mainmenu-transform-speed linear;
+    a {
+      @extend .header-font;
+      color: #fff;
+      font-size: 12px;
+      line-height: 18px;
+      cursor: pointer;
+      display: block;
+      padding: 8px 15px;
+      &:hover,
+      &:active,
+      &.active {
+        text-decoration: underline;
+        color: #fff;
+      }
+    }
+  }
+  &.headroom--pinned .current-organization-nav-item,
+  &.headroom--unpinned .current-organization-nav-item {
+    padding: $vertical-height 24px 0;
+    a.active::after {
+      bottom: 0;
+    }
+  }
 }
 
 //
 // Small Screen Styles
-$mainmenu-transform-speed: 200ms;
-$mainmenu-width: 80%;
-$mainmenu-open-zindex: 10;
 @media (max-width: $grid-breakpoint-lg - 1px) {
   .primary-header-nav {
-    transition: transform 200ms linear;
+    transition: transform $mainmenu-transform-speed linear;
     &.headroom--pinned {
       transform: translate(0, 0%);
     }
@@ -216,7 +245,7 @@ $mainmenu-open-zindex: 10;
       }
     }
     .primary-logo img {
-      transition: height 200ms linear;
+      transition: height $mainmenu-transform-speed linear;
     }
     .hamburgler {
       display: none;
@@ -224,8 +253,7 @@ $mainmenu-open-zindex: 10;
     .primary-nav-item {
       float: right;
       position: relative;
-      padding: $vertical-height 0 0;
-      transition: padding 200ms linear;
+      transition: padding $mainmenu-transform-speed linear;
       a {
         padding: 8px 0.5 * $grid-gutter-width;
         &.active,
@@ -235,7 +263,7 @@ $mainmenu-open-zindex: 10;
       }
       // Only apply to primary nav items, not submenus
       & > a.active::after {
-        transition: bottom 200ms linear;
+        transition: bottom $mainmenu-transform-speed linear;
         content: "";
         position: absolute;
         left: 50%;
@@ -302,6 +330,7 @@ $mainmenu-open-zindex: 10;
     .primary-logo img {
       height: $primary-logo-fullsize-height - 2 * $primary-logo-padding;
     }
+    .current-organization-nav-item,
     .primary-nav-item {
       // nav-items are 34px tall.
       padding: 0.5 * ($primary-logo-fullsize-height - 34px) 0 2 *
@@ -328,7 +357,7 @@ $mainmenu-open-zindex: 10;
       font-style: italic;
       text-decoration: none;
       margin: 11px $vertical-height 0 $vertical-height;
-      transition: margin 200ms linear;
+      transition: margin $mainmenu-transform-speed linear;
     }
     &.headroom--pinned .nonprofit-subtitle,
     &.headroom--unpinned .nonprofit-subtitle {
@@ -341,11 +370,6 @@ $mainmenu-open-zindex: 10;
       margin-top: 18px;
     }
   }
-}
-
-// Current org nav and dropdown
-.current-organization-nav {
-  float: left;
 }
 
 .current-org-submenu {
