@@ -24,6 +24,7 @@
     "loglevel": "^1.6.1",
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.23",
+    "pluralize": "^7.0.0",
     "popper.js": "^1.14.4",
     "prop-types": "^15.7.2",
     "rails-ujs": "^5.2.1",

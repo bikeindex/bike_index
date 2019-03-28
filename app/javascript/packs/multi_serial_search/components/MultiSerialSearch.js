@@ -7,7 +7,7 @@ import { fetchSerialResults } from '../api';
 
 const MultiSerialSearch = () => {
   const [serialResults, setSerialResults] = useState(null);
-  const [searchTokens, setSearchTokens] = useState(null);
+  const [searchTokens, setSearchTokens] = useState('');
   const [visibility, setVisibility] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -19,14 +19,20 @@ const MultiSerialSearch = () => {
     const tokens = searchTokens.split(/,|\n/);
     const uniqSerials = [...new Set(tokens)];
 
-    /* parallel request all serials */
+    /*
+      parallelized Promise.all request for all serials
+    */
     const all = await Promise.all(
       uniqSerials.map(serial => fetchSerialResults(serial)),
     );
-    const results = all.map(({ bikes }, index) => ({
-      bikes,
-      serial: uniqSerials[index],
-    }));
+    const results = all.map(({ bikes }, index) => {
+      const serial = uniqSerials[index];
+      return {
+        bikes,
+        serial,
+        anchor: `#${encodeURI(serial)}`,
+      };
+    });
     setSerialResults(results);
     setLoading(false);
   };
@@ -61,7 +67,12 @@ const MultiSerialSearch = () => {
             onChange={onChangeSearchTokens}
             placeholder="Enter multiple serial numbers. Separate them with commas or new lines"
           />
-          <button type="submit" className="sbrbtn" onClick={onSearchSerials}>
+          <button
+            type="submit"
+            className="sbrbtn"
+            disabled={loading}
+            onClick={onSearchSerials}
+          >
             <img alt="search" src={searchIcon} />
           </button>
 
@@ -77,15 +88,7 @@ export default MultiSerialSearch;
 
 /*
   TODO:
-    - append li results for each serial
-      - #ms_search_section
-      - #serials_submitted append if > 1 serial
-    - no match with 'ms-nomatch'
-    - add close matching serials
-    - ensure li achors work as expected
-    - loading state for close matching serials
-    - fix search button style
-    - replace jQuery animations
-    -
-
+    - Close matching serials
+    - Search button style
+    - jQuery animations
 */
