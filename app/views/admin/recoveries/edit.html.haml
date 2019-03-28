@@ -6,7 +6,7 @@
 %p
   = link_to "Edit bike", edit_admin_bike_path(@bike)
 %ul.bike-boxes
-  = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
+  = render partial: "/admin/bikes/bike", locals: {bike: @bike, target: "show" }
 .dl-holder
   %dl.dl-horizontal
     = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
@@ -22,7 +22,7 @@
       - if @recovery.recovery_display.present?
         = link_to "Recovery displayed", edit_admin_recovery_display_url(@recovery.recovery_display)
       - else
-        = link_to 'Display recovery', new_admin_recovery_display_url(stolen_record_id: @recovery.id), class: 'button-blue padded'        
+        = link_to 'Display recovery', new_admin_recovery_display_url(stolen_record_id: @recovery.id), class: 'button-blue padded'
         - if @recovery.recovery_posted
           Recovery posted
 
@@ -38,7 +38,7 @@
     #alert-block
       .alert.alert-error
         %h4
-          Please fix the following 
+          Please fix the following
           = pluralize(@recovery.errors.count, "error")
         %ul
           - @recovery.errors.full_messages.each do |msg|
@@ -48,7 +48,7 @@
     = f.label :index_helped_recovery, class: "control-label"
     .controls
       = f.check_box :index_helped_recovery
-  
+
   .control-group
     = f.label :can_share_recovery, class: "control-label"
     .controls
@@ -77,4 +77,4 @@
   / .actions
   /   .control-group
   /     = submit_tag "Update the recovery", class: "button-green"
-  /     
+  /
