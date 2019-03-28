@@ -55,11 +55,12 @@ $primary-logo-padding-mobile: $vertical-height;
       }
     }
   }
-  li.divider-nav-item {
+  .divider-nav-item,
+  .nonprofit-subtitle {
     display: none;
   }
-  .primary-submenu li.divider-nav-item,
-  .current-org-submenu li.divider-nav-item {
+  .primary-submenu .divider-nav-item,
+  .current-organization-submenu .divider-nav-item {
     display: block;
     width: 94%;
     margin: 6px auto;
@@ -156,7 +157,7 @@ $mainmenu-open-zindex: 10;
         }
       }
     }
-    li.divider-nav-item {
+    .divider-nav-item {
       display: block;
       width: 94%;
       margin: 6px auto;
@@ -312,7 +313,38 @@ $mainmenu-open-zindex: 10;
   }
 }
 
-.current-org-submenu-btn {
+// Only display nonprofit subtitle on xtra large screens
+@media (min-width: $grid-breakpoint-xl) {
+  .primary-header-nav {
+    .nonprofit-subtitle {
+      display: block;
+      float: left;
+      padding: 0 6px;
+      border-left: 1px solid #3498db;
+      color: #d8d8d8;
+      line-height: 1.15;
+      font-size: 12px;
+      font-family: "Open Sans";
+      font-style: italic;
+      text-decoration: none;
+      margin: 11px $vertical-height 0 $vertical-height;
+      transition: margin 200ms linear;
+    }
+    &.headroom--pinned .nonprofit-subtitle,
+    &.headroom--unpinned .nonprofit-subtitle {
+      margin-top: 11px;
+    }
+    // To prevent moving on initial load, before JS arrives
+    .nonprofit-subtitle,
+    &.headroom--top.headroom--pinned .nonprofit-subtitle,
+    &.headroom--top .nonprofit-subtitle {
+      margin-top: 18px;
+    }
+  }
+}
+
+// Current org nav and dropdown
+.current-organization-nav {
   float: left;
 }
 
