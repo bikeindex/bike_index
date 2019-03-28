@@ -107,7 +107,7 @@ module ApplicationHelper
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
     fields = f.fields_for(association, new_object, child_index: id) do |builder|
-      render('/admin/bikes/bike_fields/component_fields', f: builder, component_group: component_scope)
+      render('/bikes/bike_fields/component_fields', f: builder, component_group: component_scope)
     end
     link_to(name, '#', class: 'add_fields button-blue', data: { id: id, fields: fields.gsub("\n", '') })
   end
@@ -116,7 +116,7 @@ module ApplicationHelper
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
     fields = f.fields_for(association, new_object, child_index: id) do |builder|
-      render('/admin/bikes/bike_fields/revised_component_fields', f: builder, ctype_id: Ctype.unknown.id)
+      render('/bikes/bike_fields/revised_component_fields', f: builder, ctype_id: Ctype.unknown.id)
     end
     text = "<span class='context-display-help'>+</span>#{name}"
     link_to(text.html_safe, '#', class: 'add_fields', data: { id: id, fields: fields.gsub("\n", '') })
