@@ -51,7 +51,8 @@ module ControllerHelpers
     elsif current_user.is_content_admin
       admin_news_index_url
     else
-      user_home_url(subdomain: false)
+      return user_home_url(subdomain: false) unless current_user.default_organization.present?
+      organization_bikes_path(organization_id: current_user.default_organization.to_param)
     end
   end
 

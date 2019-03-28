@@ -98,11 +98,13 @@ describe UsersController do
         context "with organization_invitation, partner param" do
           let!(:organization_invitation) { FactoryBot.create(:organization_invitation, invitee_email: "poo@pile.com") }
           it "creates a confirmed user, log in, and send welcome" do
+            session[:current_organization_id] = "0"
             expect_any_instance_of(AfterUserCreateWorker).to receive(:send_welcoming_email)
             post :create, user: user_attributes, partner: "bikehub"
             expect(response).to redirect_to("https://new.bikehub.com/account")
             expect(User.order(:created_at).last.partner_sign_up).to eq "bikehub"
             expect(User.from_auth(cookies.signed[:auth])).to eq(User.fuzzy_email_find("poo@pile.com"))
+            expect(session[:current_organization_id]).to eq organization_invitation.organization_id
           end
         end
         context "with partner session" do

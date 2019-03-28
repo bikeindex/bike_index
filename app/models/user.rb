@@ -213,7 +213,8 @@ class User < ActiveRecord::Base
   end
 
   def default_organization
-    organizations&.first # Maybe at some point use memberships to get the most recent, for now, speed
+    return @default_organization if defined?(@default_organization) # Memoize, permit nil
+    @default_organization = organizations&.first # Maybe at some point use memberships to get the most recent, for now, speed
   end
 
   def partner_sign_up
