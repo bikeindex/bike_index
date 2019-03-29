@@ -29,7 +29,6 @@ const MultiSerialSearch = () => {
       .split(/,|\n/)
       .map(s => s.trim())
       .filter(s => s);
-    const tokens = searchTokens.split(/,|\n/);
     const uniqSerials = [...new Set(tokens)];
 
     try {
@@ -74,10 +73,10 @@ const MultiSerialSearch = () => {
       /*
         parallel request fuzzy results and merge
       */
-      const fuzzyAll = Promise.all(
-        serialResults.map(serial => fetchSerialResults(serial)),
+      const fuzzyAll = await Promise.all(
+        serialResults.map(({ serial }) => fetchFuzzyResults(serial)),
       );
-      const updatedResults = fuzzyAll.map((fuzzy, index) => {
+      const updatedResults = fuzzyAll.map(({ bikes: fuzzy }, index) => {
         const serialResult = serialResults[index];
         return Object.assign(serialResult, { fuzzy });
       });
