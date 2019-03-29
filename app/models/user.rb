@@ -118,8 +118,6 @@ class User < ActiveRecord::Base
 
   def superuser?; superuser end
 
-  def content?; is_content_admin end
-
   def developer?; developer end
 
   def to_param; username end
@@ -132,19 +130,15 @@ class User < ActiveRecord::Base
 
   def paid_org?; organizations.paid.any? end
 
-  def send_unstolen_notifications?
-    superuser || organizations.any? { |o| o.paid_for?("unstolen_notifications") }
+  def authorized?(obj)
+    return true if superuser?
+    return obj.authorize_for_user(self) if obj.is_a?(Bike)
+    return member_of?(obj) if obj.is_a?(Organization)
+    false
   end
 
-  def admin_authorized(type)
-    return true if superuser
-    return case type
-    when 'content'
-      true if is_content_admin
-    when 'any'
-      true if is_content_admin
-    end
-    false
+  def send_unstolen_notifications?
+    superuser || organizations.any? { |o| o.paid_for?("unstolen_notifications") }
   end
 
   def reset_token_time

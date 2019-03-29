@@ -280,6 +280,7 @@ describe Bike do
         expect(bike.claimed?).to be_falsey
         # And test authorized_by_organization?
         expect(bike.authorized_by_organization?).to be_truthy
+        expect(member.authorized?(bike)).to be_truthy
         expect(bike.authorized_by_organization?(u: member)).to be_truthy
         expect(bike.authorized_by_organization?(u: member, org: organization)).to be_truthy
         expect(bike.authorized_by_organization?(org: organization)).to be_truthy
@@ -306,6 +307,7 @@ describe Bike do
           expect(bike.claimed?).to be_truthy
           expect(bike.owner).to eq user
           expect(bike.authorize_for_user(member)).to be_falsey
+          expect(member.authorized?(bike)).to be_falsey
           expect(bike.authorized_by_organization?).to be_falsey
           expect(bike.claimed?).to be_truthy
           expect(bike.organized?).to be_truthy
