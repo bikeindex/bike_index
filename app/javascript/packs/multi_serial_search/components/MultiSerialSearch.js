@@ -3,7 +3,7 @@
 import React, { useState, Fragment } from 'react';
 import searchIcon from 'images/stolen/search';
 import SearchResults from './SearchResults';
-import { fetchSerialResults } from '../api';
+import { fetchSerialResults, fetchFuzzyResults } from '../api';
 
 const MultiSerialSearch = () => {
   const [serialResults, setSerialResults] = useState(null);
@@ -13,11 +13,16 @@ const MultiSerialSearch = () => {
   const [fuzzySearching, setFuzzySearching] = useState(false);
 
   const onSearchSerials = async () => {
-    // e.preventDefault();
     if (!searchTokens) return;
-
     setLoading(true);
-    const tokens = searchTokens.split(/,|\n/);
+
+    /*
+      normalize the textarea input
+    */
+    const tokens = searchTokens
+      .split(/,|\n/)
+      .map(s => s.trim())
+      .filter(s => s);
     const uniqSerials = [...new Set(tokens)];
 
     /*
@@ -55,17 +60,17 @@ const MultiSerialSearch = () => {
     setLoading(true);
 
     /*
-      parallel request fuzzy results and merge
+      parallel request fuzzy results and merge serialResults
     */
-    const fuzzyAll = Promise.all(
-      serialResults.map(serial => fetchSerialResults(serial)),
+    const fuzzyAll = await Promise.all(
+      serialResults.map(({ serial }) => fetchFuzzyResults(serial)),
     );
     const updatedResults = fuzzyAll.map((fuzzy, index) => {
       const serialResult = serialResults[index];
       return Object.assign(serialResult, { fuzzy });
     });
-    setFuzzySearching(true);
     setSerialResults(updatedResults);
+    setFuzzySearching(true);
     setLoading(false);
   };
 
@@ -114,7 +119,6 @@ export default MultiSerialSearch;
 
 /*
   TODO:
-    - Close matching serials
     - Search button style
     - jQuery animations
 */

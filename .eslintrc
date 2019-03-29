@@ -15,10 +15,12 @@
     "react/require-default-props": 0,
     "import/prefer-default-export": 0,
     "consistent-return": 0,
-    "jsx-a11y/anchor-is-valid": 0, // TODO
+    "no-shadow": 0, 
+    "jsx-a11y/anchor-is-valid": 0,
+    "jsx-a11y/anchor-has-content": 0
   },
   "plugins": ["react"],
   "settings": {
-    "import/resolver": "webpack",
+    "import/resolver": "webpack"
   }
 }

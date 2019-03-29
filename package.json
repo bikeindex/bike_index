@@ -12,7 +12,6 @@
   "dependencies": {
     "@emotion/core": "^10.0.10",
     "@rails/webpacker": "3.5",
-    "axios": "^0.18.0",
     "babel": "^6.23.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-react": "^6.24.1",

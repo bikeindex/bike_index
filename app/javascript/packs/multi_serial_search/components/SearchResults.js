@@ -1,5 +1,3 @@
-/* eslint jsx-a11y/anchor-has-content: 0 */
-
 import React from 'react';
 import PropTypes from 'prop-types';
 import pluralize from 'pluralize';
@@ -35,7 +33,20 @@ const SearchResults = ({
         })}
       </ul>
 
-      {/* Search result list per serial */}
+      {/* Fuzzy search button  */}
+      {!fuzzySearching && serialResults.some(sr => sr.bikes.length > 0) && (
+        <div className="multiserial-fuzzy-box">
+          <button
+            type="submit"
+            className="btn-primary"
+            onClick={onFuzzySearch}
+          >
+            Include closely matching serials in results
+          </button>
+        </div>
+      )}
+
+      {/* List of serials */}
       <div id="bikes_returned">
         {serialResults.map(({ serial, bikes, anchor }) => {
           if (bikes.length === 0) return;
@@ -44,10 +55,10 @@ const SearchResults = ({
             <div id={anchor} className="multiserial-results">
               <div>
                 <h3>
-                  <span className="serial-text">{serial}</span>
-                  {' - '}
+                  <span className="serial-text">{serial} - </span>
                   {resultsTitle} {pluralize('results', bikes.length)}
                 </h3>
+                {/* List of Results per serial number */}
                 <ul>
                   {bikes.map(({ stolen, url, title }) => (
                     <li key={serial}>

@@ -1,5 +1,3 @@
-/* eslint no-shadow: 0 */
-
 /*
   Private
 */
