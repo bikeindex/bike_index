@@ -224,11 +224,11 @@ class User < ActiveRecord::Base
   def bikes(user_hidden=true)
     Bike.unscoped
     .includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
-    .where(id: bike_ids(user_hidden))
+    .where(id: bike_ids(user_hidden)).reorder(:created_at)
   end
 
   def rough_approx_bikes # Rough fix for users with large numbers of bikes
-    Bike.includes(:ownerships).where(ownerships: { current: true, user_id: id })
+    Bike.includes(:ownerships).where(ownerships: { current: true, user_id: id }).reorder(:created_at)
   end
 
   def bike_ids(user_hidden=true)

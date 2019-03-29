@@ -32,6 +32,10 @@
               - if current_organization.message_kinds.any?
                 %li
                   = active_link "GeoMessaging", organization_messages_path(organization_id: current_organization.to_param), class_name: "nav-link"
+              - if current_user.superuser?
+                %li.divider-nav-item
+                %li
+                  = link_to "Super Admin view #{current_organization.short_name}", admin_organization_path(current_organization)
             
         %a#menu-opened-backdrop
         .hamburgler

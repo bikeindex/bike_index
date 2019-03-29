@@ -1,11 +1,5 @@
 = render partial: "bike_show_overlays"
 
-- if current_user.present? && current_organization.present?
-  - if current_user.member_of?(current_organization) # Authorize here, because otherwise we're displaying user data
-    = render partial: "organization_section"
-  - else # If they aren't authorized, nix their current_organization
-    - set_current_organization(current_user.default_organization) # maybe this breaks, but whatever, they're being creepers
-
 - if current_user&.superuser && @bike.user_hidden
   %h2.text-danger.mb-4.text-center{ style: "text-align: center;" }
     HIDDEN by owner
@@ -43,6 +37,13 @@
           = link_to "View user's other registrations", user_path(@bike.owner.username)
     .col-md-4.ad-col
       .ad-block#top468x60
+
+  - if current_user.present? && current_organization.present?
+    - if current_user.member_of?(current_organization) # Authorize here, because otherwise we're displaying user data
+      = render partial: "organization_section"
+    - else # If they aren't authorized, nix their current_organization
+      - set_current_organization(current_user.default_organization) # maybe this breaks, but whatever, they're being creepers
+
   .row
     / Bike Photo!
     .col-md-8
@@ -84,6 +85,7 @@
           - unless @bike.type == 'bike'
             = @bike.attr_list_item(@bike.type.titleize, 'Cycle type', with_colon: true)
           = @bike.attr_list_item(@bike.mnfg_name, 'Manufacturer', with_colon: true)
+          = @bike.attr_list_item(@bike.name, 'Name', with_colon: true)
           = @bike.attr_list_item(@bike.frame_model, 'Model', with_colon: true)
           = @bike.attr_list_item(@bike.year.to_s, 'Year', with_colon: true)
           = @bike.attr_list_item(@bike.frame_colors.to_sentence, 'Primary colors', with_colon: true)
