@@ -1,11 +1,12 @@
 class Admin::RecoveriesController < Admin::BaseController
+  layout "new_admin"
   def index
     if params[:posted]
       @posted = true
       recoveries = StolenRecord.recovery_unposted.includes(:bike).order("date_recovered desc")
     elsif params[:all_recoveries]
       recoveries = StolenRecord.recovered.includes(:bike).order("date_recovered desc")
-    else 
+    else
       recoveries = StolenRecord.displayable.includes(:bike).order("date_recovered desc")
     end
     page = params[:page] || 1
@@ -47,7 +48,7 @@ class Admin::RecoveriesController < Admin::BaseController
       end
       if enqueued
         flash[:success] = "Recovery notifications enqueued. Recoveries marked 'can share' haven't been posted, because they need your loving caress."
-      else 
+      else
         flash[:error] = "No recoveries were selected (or only recoveries you need to caress were)"
       end
       redirect_to admin_recoveries_url
