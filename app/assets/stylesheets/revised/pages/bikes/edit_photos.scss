@@ -2,7 +2,7 @@
   .edit-photo-display-list {
     @include list-unstyled;
     .edit-photo-display-wrap {
-      padding: 0 .5*$vertical-height;
+      padding: 0 0.5 * $vertical-height;
       background: white;
       border: 1px solid $form-well-border-color;
       img {
@@ -23,33 +23,48 @@
       font-size: 11px;
       color: $gray-light;
       margin-bottom: 0;
-      input { margin-left: .5em; }
+      input {
+        margin-left: 0.5em;
+      }
     }
     .processing {
       position: absolute;
-      left: 0; top: 50%;
+      left: 0;
+      top: 50%;
       width: 100%;
       text-align: center;
       color: $gray-light;
       z-index: 1;
     }
     .trash-can-icon {
-      @include trash-can-icon($gray-light, $link-color, white, 2*$vertical-height);
+      @include trash-can-icon(
+        $gray-light,
+        $link-color,
+        white,
+        2 * $vertical-height
+      );
       display: inline-block;
     }
     .photo-remove {
       display: block;
+      position: relative;
       width: 100%;
       text-align: center;
-      margin-top: .5*$vertical-height;
+      margin-top: 0.5 * $vertical-height;
+      // make sure zindex sets it above the "processing" text - so you can click it
+      z-index: 100;
       // Hovering anywhere on the link colors the trash-can-icon
-      &:hover, &:active, &.active {
-        .hover-colorize { background-color: $link-color; }
+      &:hover,
+      &:active,
+      &.active {
+        .hover-colorize {
+          background-color: $link-color;
+        }
       }
     }
   }
   .edit-photo-upload {
-    padding-top: 2*$vertical-height;
+    padding-top: 2 * $vertical-height;
     label.file {
       float: right;
     }
@@ -85,7 +100,7 @@
   .placeholder {
     @extend .edit-photo-display-list-item;
     height: 280px;
-    border: 3px dashed #CCC;
+    border: 3px dashed #ccc;
   }
 
   // Actual item that is in the air, being dragged by you
@@ -102,11 +117,14 @@
     background: white;
     width: 80%;
     margin: 10px 10% 0;
-    padding: $vertical-height .5*$vertical-height;
-    .progress, .alert-success { margin-bottom: 0;}
+    padding: $vertical-height 0.5 * $vertical-height;
+    .progress,
+    .alert-success {
+      margin-bottom: 0;
+    }
     p {
       @include textoverflow;
-      margin-bottom: .5*$vertical-height;
+      margin-bottom: 0.5 * $vertical-height;
     }
   }
 }

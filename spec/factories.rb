@@ -94,14 +94,6 @@ FactoryBot.define do
     lock_type { FactoryBot.create(:lock_type) }
   end
 
-  factory :membership do
-    role { 'member' }
-    factory :existing_membership do
-      user { FactoryBot.create(:user) }
-      organization { FactoryBot.create(:organization) }
-    end
-  end
-
   factory :integration do
     access_token { '12345teststststs' }
   end

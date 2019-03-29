@@ -1,0 +1,143 @@
+.card.organized-access-panel
+  .card-block
+    .card-title
+      .row
+        .col-xs-6
+          %h3.header-font-alt
+            %span.hidden-sm-down
+              = current_organization.name
+            Access Menu
+        .col-xs-6
+          - if @bike.organized?(current_organization)
+            %p.text-success.text-right
+              %span.hidden-md-down
+                This #{@bike.type} is registered with #{current_organization.short_name}
+              %span.hidden-lg-up
+                Registered with you
+          - else
+            %p.text-warning.text-right
+              %span.hidden-md-down
+                This #{@bike.type} is <em>not</em> registered with #{current_organization.short_name}
+              %span.hidden-lg-up
+                <em>Not</em> reged with you
+    .card-body
+      .row
+        - display_unstolen_notification_form = !@bike.stolen? && current_organization.paid_for?("unstolen_notifications")
+        - if @bike.organized?(current_organization)
+          - if @bike.authorized_by_organization?(org: current_organization)
+            .col-xs-12.mb-2
+              .text-right.less-strong
+                %em
+                  %span.hidden-md-down
+                    #{current_organization.short_name} registered this #{@bike.type} and it is
+                not claimed yet,
+                %em
+                  so you can
+                = link_to "Edit it", edit_bike_path(@bike), class: "btn btn-success btn-sm"
+          .mb-2{ class: display_unstolen_notification_form ? "col-md-7" : "col-sm-12" }
+            %ul.attr-list{ class: display_unstolen_notification_form ? "" : "split-sm" }
+              = @bike.attr_list_item(@bike.user&.name, "Owner name", with_colon: true)
+              = @bike.attr_list_item(@bike.owner_email, "Owner email", with_colon: true)
+              %li
+                %span.attr-title Registered:
+                %span.convertTime
+                  = l @bike.created_at, format: :convert_time
+              %li
+                %span.attr-title Creator:
+                = @bike.creator&.display_name
+                %em.small.less-strong
+                  = @bike.creation_description
+              - if current_organization.paid_for?("bike_codes")
+                %li
+                  %span.attr-title
+                    Sticker:
+                  - @bike.bike_codes.each do |bike_code|
+                    = link_to bike_code.code, edit_organization_sticker_path(id: bike_code.code, organization_id: bike_code.organization&.to_param)
+
+              - current_organization.additional_registration_fields.each do |reg_field|
+                - bike_attr = Export.additional_registration_fields[reg_field.to_sym]
+                - if bike_attr == "registration_address"
+                  %li
+                    %span.attr-title
+                      Entered address:
+                    = @bike.b_params.map { |bp| bp.bike["address"] }.reject(&:blank?).first
+                  %li
+                    %span.attr-title{ style: "line-height: 1.25;" }
+                      Formatted address:
+                    - address = @bike.registration_address
+                    - if address.present?
+                      %br
+                      &nbsp;&nbsp;&nbsp;#{address["address"]}
+                      %br
+                      &nbsp;&nbsp;&nbsp;#{address["city"]}, #{address["state"]} #{address["zipcode"]}
+                - else
+                  %li
+                    %span.attr-title
+                      #{(bike_attr || reg_field).humanize}:
+                    - if reg_field == "reg_secondary_serial"
+                      = @bike.additional_registration
+                    - elsif reg_field == "phone"
+                      = @bike.phone
+                    - elsif reg_field == "reg_affiliation" # this doesn't have a reader from bike yet :(
+                      &nbsp;
+
+
+        - else
+          %div{ class: display_unstolen_notification_form ? "col-md-7" : "col-sm-12" }
+            %p.less-strong
+              %em
+                Unable to display additional information because bicycle is not registered with #{current_organization.name}
+        - if display_unstolen_notification_form
+          .col-md-5.unstolen-notification-box
+            %p
+              %em
+                #{@bike.type.titleize} is not marked stolen.
+              %strong
+                Believe it is anyway?
+            %h3
+              Contact the owner
+            - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
+            #write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }
+              %a.btn.btn-primary.btn-lg{ href: '#new_stolen_message', 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse' }
+                Write them a message
+
+            .collapse#new_stolen_message{ class: ("in" if @contact_owner_open) }
+              - @stolen_notification ||= StolenNotification.new(bike: @bike)
+              = form_for @stolen_notification do |f|
+                = f.hidden_field :bike_id, value: @bike.id
+                = f.text_area :message, required: true, placeholder: "Where did you see this #{@bike.type}? If you're contacting about an ad you found online, include a link in the field below", rows: 6, class: "form-control"
+                = f.text_field :reference_url, placeholder: 'Link url', class: "form-control additional-field"
+
+                .send-message
+                  = f.submit "Send message", class: 'btn btn-primary btn-lg'
+
+  - if current_organization.message_kinds.any?
+    .geomessages-wrap
+      %span
+        Send
+      - current_organization.message_kinds.each do |kind|
+        %a.btn.btn-secondary.openMessageModal{ "data-kind" => kind }
+          - if kind == "geolocated_messages"
+            GeoMessage
+          - else
+            #{kind.humanize}
+
+- if current_organization.message_kinds.any?
+  - modal_body = capture_haml do
+    .modal-body
+      = form_for OrganizationMessage.new(bike_id: @bike.id), url: organization_messages_path(organization_id: current_organization) do |f|
+        = f.hidden_field :bike_id
+        = f.hidden_field :kind_slug
+        = f.hidden_field :latitude
+        = f.hidden_field :longitude
+        = f.hidden_field :accuracy
+        .form-group
+          = f.label :body, "Additional message"
+          = f.text_area :body, class: 'form-control'
+        .modal-btn-footer
+          = submit_tag "Send message", class: "btn btn-success", id: "submitMessageBtn", disabled: true
+          %span.less-strong#waitingOnLocationText
+            Waiting on device location
+
+  = render partial: "/shared/modal", locals: { title: "Message #{@bike.type} owner", modal_body: modal_body, id: "organizationMessageModal" }
+

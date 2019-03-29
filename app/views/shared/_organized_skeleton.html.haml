@@ -40,7 +40,7 @@
             - active_organization.message_kinds.each do |message_kind|
               %li
                 = link_to message_kind.titleize, organization_messages_path(organization_id: active_organization.to_param, kind: message_kind), class: "nav-link #{ params[:kind] == message_kind ? "active" : "" }"
-      - if current_user.is_admin_of?(active_organization) || current_user.superuser?
+      - if current_user.admin_of?(active_organization) || current_user.superuser?
         %li
           - manage_active = %w(users manage emails).include?(controller_name)
           %span.menu-item.top-level{ class: ("active" if manage_active) }

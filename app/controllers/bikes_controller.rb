@@ -67,7 +67,7 @@ class BikesController < ApplicationController
     elsif current_user.present?
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      if current_user.is_member_of?(@bike_code.organization)
+      if current_user.member_of?(@bike_code.organization)
         @show_organization_bikes = true
         @active_organization = @bike_code.organization
         search_organization_bikes
@@ -223,7 +223,7 @@ class BikesController < ApplicationController
   def ensure_user_allowed_to_edit
     @current_ownership = @bike.current_ownership
     type = @bike && @bike.type || 'bike'
-    return true if @bike.authorize_bike_for_user!(current_user)
+    return true if @bike.authorize_for_user!(current_user)
     if current_user.present?
       error = "Oh no! It looks like you don't own that #{type}."
     else

@@ -117,77 +117,120 @@ describe BikesController do
     let(:ownership) { FactoryBot.create(:ownership) }
     let(:user) { ownership.creator }
     let(:bike) { ownership.bike }
-    context 'legacy' do
-      context 'showing' do
-        it 'shows the bike' do
+    let(:organization) { FactoryBot.create(:organization) }
+    it "shows the bike" do
+      get :show, id: bike.id
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
+      expect(response).to render_with_layout("application_revised")
+      expect(assigns(:bike)).to be_decorated
+      expect(flash).to_not be_present
+    end
+    context "illegally set current_organization" do
+      include_context :logged_in_as_user
+      it "renders, resets current_organization_id" do
+        session[:current_organization_id] = organization.id
+        get :show, id: bike.id
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(response).to render_with_layout("application_revised")
+        expect(assigns(:bike)).to be_decorated
+        expect(flash).to_not be_present
+        expect(session[:current_organization_id]).to eq "0"
+      end
+    end
+    context "example bike" do
+      it "shows the bike" do
+        ownership.bike.update_attributes(example: true)
+        get :show, id: bike.id
+        expect(response).to render_template(:show)
+        expect(response).to render_with_layout("application_revised")
+        expect(assigns(:bike)).to be_decorated
+      end
+    end
+    context 'hidden bikes' do
+      context 'admin hidden (fake delete)' do
+        it 'redirects and sets the flash' do
+          ownership.bike.update_attributes(hidden: true)
           get :show, id: bike.id
-          expect(response.status).to eq(200)
-          expect(response).to render_template(:show)
-          expect(response).to render_with_layout('application_revised')
-          expect(assigns(:bike)).to be_decorated
-          expect(flash).to_not be_present
+          expect(response).to redirect_to(:root)
+          expect(flash[:error]).to be_present
         end
       end
-      context 'example bike' do
-        it 'shows the bike' do
-          ownership.bike.update_attributes(example: true)
-          get :show, id: bike.id
-          expect(response).to render_template(:show)
-          expect(response).to render_with_layout('application_revised')
-          expect(assigns(:bike)).to be_decorated
+      context "user hidden bike" do
+        before do
+          set_current_user(user)
+          ownership.bike.update_attributes(marked_user_hidden: "true")
         end
-      end
-      context 'hidden bikes' do
-        context 'admin hidden (fake delete)' do
-          it 'redirects and sets the flash' do
-            ownership.bike.update_attributes(hidden: true)
+        context "owner of bike viewing" do
+          it "responds with success" do
+            get :show, id: bike.id
+            expect(response.status).to eq(200)
+            expect(response).to render_template(:show)
+            expect(response).to render_with_layout("application_revised")
+            expect(assigns(:bike)).to be_decorated
+            expect(flash).to_not be_present
+          end
+        end
+        context "Admin viewing" do
+          let(:user) { FactoryBot.create(:admin) }
+          it "responds with success" do
+            get :show, id: bike.id
+            expect(response.status).to eq(200)
+            expect(response).to render_template(:show)
+            expect(response).to render_with_layout("application_revised")
+            expect(assigns(:bike)).to be_decorated
+            expect(flash).to_not be_present
+          end
+        end
+        context "non-owner non-admin viewing" do
+          let(:user) { FactoryBot.create(:user_confirmed) }
+          it "redirects" do
             get :show, id: bike.id
             expect(response).to redirect_to(:root)
             expect(flash[:error]).to be_present
           end
         end
-        context 'user hidden bike' do
-          before do
-            ownership.bike.update_attributes(marked_user_hidden: 'true')
-          end
-          context 'owner of bike viewing' do
-            it 'responds with success' do
-              set_current_user(user)
-              get :show, id: ownership.bike_id
-              expect(response.status).to eq(200)
-              expect(response).to render_template(:show)
-              expect(response).to render_with_layout('application_revised')
-              expect(assigns(:bike)).to be_decorated
-              expect(flash).to_not be_present
-            end
-          end
-          context 'Admin viewing' do
-            it 'responds with success' do
-              set_current_user(FactoryBot.create(:admin))
-              get :show, id: ownership.bike_id
-              expect(response.status).to eq(200)
-              expect(response).to render_template(:show)
-              expect(response).to render_with_layout('application_revised')
-              expect(assigns(:bike)).to be_decorated
-              expect(flash).to_not be_present
-            end
-          end
-          context 'non-owner non-admin viewing' do
-            it 'redirects' do
-              set_current_user(FactoryBot.create(:user_confirmed))
-              get :show, id: bike.id
-              expect(response).to redirect_to(:root)
-              expect(flash[:error]).to be_present
-            end
-          end
+      end
+    end
+    # Because we're doing some special stuff with organization bike viewing
+    context "organized user viewing bike" do
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      before { set_current_user(user) }
+      it "renders" do
+        get :show, id: bike.id
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(flash).to_not be_present
+        expect(session[:current_organization_id]).to eq organization.id
+      end
+      context "bike created by organization" do
+        let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
+        it "renders" do
+          get :show, id: ownership.bike_id
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:show)
+          expect(flash).to_not be_present
+          expect(session[:current_organization_id]).to eq organization.id
         end
       end
-      context 'too large of integer bike_id' do
-        it 'responds with not found' do
-          expect do
-            get :show, id: 57549641769762268311552
-          end.to raise_error(ActiveRecord::RecordNotFound)
+      context "bike owned by organization" do
+        let(:bike) { FactoryBot.create(:organization_bike, organization: organization) }
+        let(:ownership) { FactoryBot.create(:ownership_claimed, bike: bike) }
+        it "renders" do
+          get :show, id: ownership.bike_id
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:show)
+          expect(flash).to_not be_present
+          expect(session[:current_organization_id]).to eq organization.id
         end
+      end
+    end
+    context 'too large of integer bike_id' do
+      it 'responds with not found' do
+        expect do
+          get :show, id: 57549641769762268311552
+        end.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
     context 'qr code gif' do

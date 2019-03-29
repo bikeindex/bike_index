@@ -33,6 +33,7 @@ class Bike < ActiveRecord::Base
   has_many :ownerships, dependent: :destroy
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :components, dependent: :destroy
+  has_many :bike_codes
   has_many :b_params, foreign_key: :created_bike_id, dependent: :destroy
   has_many :duplicate_bike_groups, through: :normalized_serial_segments
   has_many :recovered_records, -> { recovered }, class_name: 'StolenRecord'
@@ -190,12 +191,24 @@ class Bike < ActiveRecord::Base
 
   def user_name_or_email; user_name || owner_email end
 
-  def first_ownership; ownerships.reorder(:created_at).first end
+  def first_ownership; ownerships.reorder(:id).first end
+
+  def organized?(org = nil)
+    org.present? ? bike_organization_ids.include?(org.id) : bike_organizations.any?
+  end
 
   # check if this is the first ownership - or if no owner, which means testing probably
   def first_ownership?; current_ownership&.blank? || current_ownership == first_ownership end
 
-  def creation_organization_authorized?; first_ownership? && creation_organization.present? end
+  def authorized_by_organization?(u: nil, org: nil)
+    return false unless first_ownership? && organized? && !claimed?
+    return true unless u.present? || org.present?
+    return creation_organization == org if org.present? && u.blank?
+    # so, we know a user was passed
+    return false if can_be_claimed_by(u) # this is authorized by owner, not organization
+    return organizations.any? { |o| u.member_of?(o) } unless org.present?
+    creation_organization == org && u.member_of?(org)
+  end
 
   def first_owner_email; first_ownership.owner_email end
 
@@ -204,20 +217,20 @@ class Bike < ActiveRecord::Base
     user == u || current_ownership.can_be_claimed_by(u)
   end
 
-  def authorize_bike_for_user(u)
+  def authorize_for_user(u)
     return true if u == owner || can_be_claimed_by(u)
     return false if u.blank? || current_ownership.claimed
-    creation_organization_authorized? && u.is_member_of?(creation_organization)
+    authorized_by_organization?(u: u)
   end
 
-  def authorize_bike_for_user!(u)
-    return authorize_bike_for_user(u) unless can_be_claimed_by(u)
+  def authorize_for_user!(u)
+    return authorize_for_user(u) unless can_be_claimed_by(u)
     current_ownership.mark_claimed
     true
   end
 
-  def display_contact_owner?(u = nil, organization = nil)
-    stolen? && current_stolen_record.present? || contact_owner?(u, organization)
+  def display_contact_owner?(u = nil)
+    stolen? && current_stolen_record.present?
   end
 
   def contact_owner?(u = nil, organization = nil)
@@ -225,7 +238,7 @@ class Bike < ActiveRecord::Base
     return true if stolen? && current_stolen_record.present?
     return false unless owner&.notification_unstolen
     return u.send_unstolen_notifications? unless organization.present? # Passed organization overrides user setting to speed stuff up
-    organization.paid_for?("unstolen_notifications") && u.is_member_of?(organization)
+    organization.paid_for?("unstolen_notifications") && u.member_of?(organization)
   end
 
   def contact_owner_user?

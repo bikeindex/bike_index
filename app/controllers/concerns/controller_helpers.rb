@@ -5,9 +5,9 @@ module ControllerHelpers
   extend ActiveSupport::Concern
 
   included do
-    helper_method :current_user, :unconfirmed_current_user, :current_user_or_unconfirmed_user,
-                  :user_root_url, :sign_in_partner, :active_organization, :current_organization,
-                  :controller_namespace, :page_id, :forwarded_ip_address, :recovered_bike_count
+    helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
+                  :active_organization, :current_organization, :set_current_organization,
+                  :controller_namespace, :page_id, :recovered_bike_count
     before_filter :enable_rack_profiler
   end
 
@@ -167,13 +167,13 @@ module ControllerHelpers
   end
 
   def require_member!
-    return true if current_user.is_member_of?(active_organization)
+    return true if current_user.member_of?(active_organization)
     flash[:error] = "You're not a member of that organization!"
     redirect_to user_home_url(subdomain: false) and return
   end
 
   def require_admin!
-    return true if current_user.is_admin_of?(active_organization)
+    return true if current_user.admin_of?(active_organization)
     flash[:error] = "You have to be an organization administrator to do that!"
     redirect_to user_home_url and return
   end

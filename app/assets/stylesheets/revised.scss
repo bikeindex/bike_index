@@ -255,16 +255,16 @@ body {
   text-align: right;
 }
 .mt-4 {
-  padding-top: 2 * $vertical-height;
+  margin-top: 2 * $vertical-height;
 }
 .mt-2 {
-  padding-top: $vertical-height;
+  margin-top: $vertical-height;
 }
 .mb-4 {
-  padding-bottom: 2 * $vertical-height;
+  margin-bottom: 2 * $vertical-height;
 }
 .mb-2 {
-  padding-bottom: $vertical-height;
+  margin-bottom: $vertical-height;
 }
 .small {
   @extend small;

@@ -59,7 +59,7 @@ module API
         def creation_user_id
           if current_user.id == ENV['V2_ACCESSOR_ID'].to_i
             org = params[:organization_slug].present? && Organization.friendly_find(params[:organization_slug])
-            if org && current_token.application.owner && current_token.application.owner.is_admin_of?(org)
+            if org && current_token.application.owner && current_token.application.owner.admin_of?(org)
               return org.auto_user_id
             end
             error!("Permanent tokens can only be used to create bikes for organizations your are an admin of", 403)
@@ -81,7 +81,7 @@ module API
         end
 
         def authorize_bike_for_user(addendum='')
-          return true if @bike.authorize_bike_for_user!(current_user)
+          return true if @bike.authorize_for_user!(current_user)
           error!("You do not own that #{@bike.type}#{addendum}", 403)
         end
 

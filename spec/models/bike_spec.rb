@@ -212,30 +212,29 @@ describe Bike do
     end
   end
 
-  describe "authorize_bike_for_user(!)" do
+  describe "authorize_for_user(!)" do
     let(:bike) { ownership.bike }
     let(:creator) { ownership.creator }
     let(:user) { FactoryBot.create(:user) }
-    let(:bike) { ownership.bike }
 
     context "un-organized" do
       let(:ownership) { FactoryBot.create(:ownership) }
       context "no user" do
         it "returns false" do
-          expect(bike.authorize_bike_for_user(nil)).to be_falsey
-          expect(bike.authorize_bike_for_user!(nil)).to be_falsey
+          expect(bike.authorize_for_user(nil)).to be_falsey
+          expect(bike.authorize_for_user!(nil)).to be_falsey
         end
       end
       context "unauthorized" do
         it "returns false" do
-          expect(bike.authorize_bike_for_user(user)).to be_falsey
-          expect(bike.authorize_bike_for_user!(user)).to be_falsey
+          expect(bike.authorize_for_user(user)).to be_falsey
+          expect(bike.authorize_for_user!(user)).to be_falsey
         end
       end
       context "creator" do
         it "returns true" do
-          expect(bike.authorize_bike_for_user(creator)).to be_truthy
-          expect(bike.authorize_bike_for_user!(creator)).to be_truthy
+          expect(bike.authorize_for_user(creator)).to be_truthy
+          expect(bike.authorize_for_user!(creator)).to be_truthy
         end
       end
       context "claimed" do
@@ -243,10 +242,10 @@ describe Bike do
         let(:user) { ownership.user }
         it "returns true for user, not creator" do
           expect(bike.claimed?).to be_truthy
-          expect(bike.authorize_bike_for_user(creator)).to be_falsey
-          expect(bike.authorize_bike_for_user(user)).to be_truthy
-          expect(bike.authorize_bike_for_user!(creator)).to be_falsey
-          expect(bike.authorize_bike_for_user!(user)).to be_truthy
+          expect(bike.authorize_for_user(creator)).to be_falsey
+          expect(bike.authorize_for_user(user)).to be_truthy
+          expect(bike.authorize_for_user!(creator)).to be_falsey
+          expect(bike.authorize_for_user!(user)).to be_truthy
         end
       end
       context "can_be_claimed_by" do
@@ -255,11 +254,11 @@ describe Bike do
           expect(ownership.claimed?).to be_falsey
           expect(bike.claimed?).to be_falsey
           expect(ownership.owner).to eq creator
-          expect(bike.authorize_bike_for_user!(creator)).to be_truthy
-          expect(bike.authorize_bike_for_user(user)).to be_truthy
-          expect(bike.authorize_bike_for_user!(user)).to be_truthy
+          expect(bike.authorize_for_user!(creator)).to be_truthy
+          expect(bike.authorize_for_user(user)).to be_truthy
+          expect(bike.authorize_for_user!(user)).to be_truthy
           expect(bike.claimed?).to be_truthy
-          expect(bike.authorize_bike_for_user!(creator)).to be_falsey
+          expect(bike.authorize_for_user!(creator)).to be_falsey
           ownership.reload
           expect(ownership.owner).to eq user
           expect(bike.ownerships.count).to eq 1
@@ -267,42 +266,64 @@ describe Bike do
       end
     end
     context "creation organization" do
-      let(:ownership) { FactoryBot.create(:ownership_organization_bike) }
-      let(:organization) { bike.creation_organization }
+      let(:owner) { FactoryBot.create(:organization_member) }
+      let(:organization) { owner.organizations.first }
+      let(:ownership) { FactoryBot.create(:ownership_organization_bike, user: owner, organization: organization) }
       let(:member) { FactoryBot.create(:organization_member, organization: organization) }
       before { expect(bike.creation_organization).to eq member.organizations.first }
-      context "unclaimed" do
-        context "member of organization" do
-          it "returns true" do
-            expect(bike.claimed?).to be_falsey
-            expect(bike.authorize_bike_for_user!(member)).to be_truthy
-            expect(bike.authorize_bike_for_user!(member)).to be_truthy
-            expect(bike.claimed?).to be_falsey
-          end
-        end
-        context "non-member" do
-          it "returns false" do
-            expect(bike.authorize_bike_for_user(user)).to be_falsey
-            expect(bike.authorize_bike_for_user!(user)).to be_falsey
-          end
-        end
+      it "returns correctly for all sorts of convoluted things" do
+        bike.reload
+        expect(bike.creation_organization).to eq organization
+        expect(bike.claimed?).to be_falsey
+        expect(bike.authorize_for_user!(member)).to be_truthy
+        expect(bike.authorize_for_user!(member)).to be_truthy
+        expect(bike.claimed?).to be_falsey
+        # And test authorized_by_organization?
+        expect(bike.authorized_by_organization?).to be_truthy
+        expect(bike.authorized_by_organization?(u: member)).to be_truthy
+        expect(bike.authorized_by_organization?(u: member, org: organization)).to be_truthy
+        expect(bike.authorized_by_organization?(org: organization)).to be_truthy
+        expect(bike.authorized_by_organization?(u: member, org: Organization.new)).to be_falsey
+        # If the member has multiple memberships, it should only work for the correct organization
+        new_membership = FactoryBot.create(:membership, user: member)
+        expect(bike.authorized_by_organization?).to be_truthy
+        expect(bike.authorized_by_organization?(u: member)).to be_truthy
+        expect(bike.authorized_by_organization?(u: member, org: new_membership.organization)).to be_falsey
+        # It should be authorized for the owner, but not be authorized_by_organization
+        expect(bike.authorize_for_user(owner)).to be_truthy
+        expect(bike.authorized_by_organization?(u: owner)).to be_falsey # Because this bike is authorized by owning it, not organization
+        expect(bike.authorized_by_organization?(u: member)).to be_truthy # Sanity check - we haven't broken this
+        # And it isn't authorized for a random user or a random org
+        expect(bike.authorized_by_organization?(u: user)).to be_falsey
+        expect(bike.authorized_by_organization?(u: user, org: organization)).to be_falsey
+        expect(bike.authorized_by_organization?(org: Organization.new)).to be_falsey
+        expect(bike.authorize_for_user(user)).to be_falsey
+        expect(bike.authorize_for_user!(user)).to be_falsey
       end
       context "claimed" do
-        let(:ownership) { FactoryBot.create(:ownership_organization_bike, user: user, claimed: true) }
+        let(:ownership) { FactoryBot.create(:ownership_organization_bike, user: user, claimed: true, organization: organization) }
         it "returns false" do
           expect(bike.claimed?).to be_truthy
           expect(bike.owner).to eq user
-          expect(bike.authorize_bike_for_user(member)).to be_falsey
+          expect(bike.authorize_for_user(member)).to be_falsey
+          expect(bike.authorized_by_organization?).to be_falsey
           expect(bike.claimed?).to be_truthy
+          expect(bike.organized?).to be_truthy
+          expect(bike.organized?(organization)).to be_truthy
+          expect(bike.organized?(Organization.new)).to be_falsey
         end
       end
-      context "more than one ownership" do
+      context "multiple ownerships" do
         let!(:ownership_2) { FactoryBot.create(:ownership_organization_bike, bike: bike, creator: user) }
         it "returns false" do
           bike.reload
+          expect(bike.claimed?).to be_falsey
           expect(bike.owner).to eq user
-          expect(bike.authorize_bike_for_user(member)).to be_falsey
-          expect(bike.authorize_bike_for_user!(member)).to be_falsey
+          expect(bike.ownerships.count).to eq 2
+          expect(bike.authorized_by_organization?).to be_falsey
+          expect(bike.authorize_for_user(member)).to be_falsey
+          expect(bike.authorize_for_user!(member)).to be_falsey
+          expect(bike.claimed?).to be_falsey
         end
       end
     end
@@ -317,44 +338,6 @@ describe Bike do
       expect(bike.contact_owner?(User.new)).to be_falsey
       expect(bike.contact_owner?(admin)).to be_truthy
       expect(bike.display_contact_owner?).to be_falsey
-    end
-    context "organizations" do
-      let(:organization) { FactoryBot.create(:organization) }
-      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-      let(:user_unorganized) { User.new }
-      let(:organization_unstolen) do
-        o = FactoryBot.create(:organization)
-        o.update_attribute :paid_feature_slugs, %w[unstolen_notifications]
-        o
-      end
-      it "is truthy for the organization with unstollen" do
-        allow(bike).to receive(:owner) { User.new }
-        expect(bike.contact_owner?).to be_falsey
-        expect(bike.contact_owner?(user)).to be_falsey
-        expect(bike.contact_owner?(user, organization)).to be_falsey
-        expect(bike.display_contact_owner?(user, organization)).to be_falsey
-        # Add user to the unstolen org
-        FactoryBot.create(:membership, user: user, organization: organization_unstolen)
-        user.reload
-        expect(bike.contact_owner?(user)).to be_truthy
-        expect(bike.contact_owner?(user, organization_unstolen)).to be_truthy
-        expect(bike.display_contact_owner?(user, organization_unstolen)).to be_truthy
-        # But still false if passing old organization
-        expect(bike.contact_owner?(user, organization)).to be_falsey
-        expect(bike.display_contact_owner?(user, organization)).to be_falsey
-        # Passing the organization doesn't permit the user to do something unpermitted
-        expect(bike.contact_owner?(user_unorganized, organization_unstolen)).to be_falsey
-        expect(bike.display_contact_owner?(user_unorganized, organization_unstolen)).to be_falsey
-      end
-    end
-    context "with owner with notification_unstolen false" do
-      it "is falsey" do
-        allow(bike).to receive(:owner) { User.new(notification_unstolen: false) }
-        expect(bike.contact_owner?).to be_falsey
-        expect(bike.contact_owner?(User.new)).to be_falsey
-        expect(bike.contact_owner?(admin)).to be_falsey
-        expect(bike.display_contact_owner?(admin)).to be_falsey
-      end
     end
     context "stolen bike" do
       let(:bike) { Bike.new(stolen: true, current_stolen_record: StolenRecord.new) }
@@ -388,6 +371,49 @@ describe Bike do
           expect(bike.contact_owner_user?).to be_truthy
           expect(bike.contact_owner_email).to eq owner_email
         end
+      end
+    end
+    context "organizations" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user_unorganized) { User.new }
+      let(:owner) { User.new }
+      let(:organization_unstolen) do
+        o = FactoryBot.create(:organization)
+        o.update_attribute :paid_feature_slugs, %w[unstolen_notifications]
+        o
+      end
+      it "is truthy for the organization with unstollen" do
+        allow(bike).to receive(:owner) { owner }
+        expect(bike.contact_owner?).to be_falsey
+        expect(bike.contact_owner?(user)).to be_falsey
+        expect(bike.contact_owner?(user, organization)).to be_falsey
+        expect(bike.display_contact_owner?(user)).to be_falsey
+        # Add user to the unstolen org
+        FactoryBot.create(:membership, user: user, organization: organization_unstolen)
+        user.reload
+        expect(bike.contact_owner?(user)).to be_truthy
+        expect(bike.contact_owner?(user, organization_unstolen)).to be_truthy
+        expect(bike.display_contact_owner?(user)).to be_falsey
+        # But still false if passing old organization
+        expect(bike.contact_owner?(user, organization)).to be_falsey
+        expect(bike.display_contact_owner?(user)).to be_falsey
+        # Passing the organization doesn't permit the user to do something unpermitted
+        expect(bike.contact_owner?(user_unorganized, organization_unstolen)).to be_falsey
+        expect(bike.display_contact_owner?(user_unorganized)).to be_falsey
+        # And if the owner has set notification_unstolen to false, block organization access
+        owner.notification_unstolen = false
+        expect(bike.contact_owner?(user, organization_unstolen)).to be_falsey
+      end
+    end
+    context "with owner with notification_unstolen false" do
+      let(:admin) { User.new(superuser: true) }
+      it "is falsey" do
+        allow(bike).to receive(:owner) { User.new(notification_unstolen: false) }
+        expect(bike.contact_owner?).to be_falsey
+        expect(bike.contact_owner?(User.new)).to be_falsey
+        expect(bike.contact_owner?(admin)).to be_falsey
+        expect(bike.display_contact_owner?(admin)).to be_falsey
       end
     end
   end
