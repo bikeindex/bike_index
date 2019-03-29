@@ -51,7 +51,7 @@
           .col-xs-6.col-xs-push-3
             %a.btn.btn-success{ href: "/ownerships/#{@bike.current_ownership.id}" }
               Claim #{@bike.type} 
-  - elsif @bike.authorize_for_user(current_user) && !@bike.creation_organization_authorized?(u: current_user)
+  - elsif @bike.authorize_for_user(current_user) && !@bike.authorized_by_organization?(u: current_user)
     .bike-overlay-wrapper
       .bike-edit-overlay
         %p
