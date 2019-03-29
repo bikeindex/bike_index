@@ -533,24 +533,24 @@ describe User do
     end
   end
 
-  describe 'is_member_of?' do
+  describe 'member_of?' do
     let(:organization) { FactoryBot.create(:organization) }
     context 'admin of organization' do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       it 'returns true' do
-        expect(user.is_member_of?(organization)).to be_truthy
+        expect(user.member_of?(organization)).to be_truthy
       end
     end
     context 'member of organization' do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       it 'returns true' do
-        expect(user.is_member_of?(organization)).to be_truthy
+        expect(user.member_of?(organization)).to be_truthy
       end
     end
     context 'superadmin' do
       let(:user) { FactoryBot.create(:admin) }
       it 'returns true' do
-        expect(user.is_member_of?(organization)).to be_truthy
+        expect(user.member_of?(organization)).to be_truthy
       end
     end
     context 'incorrect searching' do
@@ -559,35 +559,35 @@ describe User do
         let(:other_organization) { FactoryBot.create(:organization) }
         it 'returns false' do
           expect(other_organization).to be_present
-          expect(user.is_member_of?(other_organization)).to be_falsey
+          expect(user.member_of?(other_organization)).to be_falsey
         end
       end
       context 'no organization' do
         it 'returns false' do
-          expect(user.is_member_of?(nil)).to be_falsey
+          expect(user.member_of?(nil)).to be_falsey
         end
       end
     end
   end
 
-  describe 'is_admin_of?' do
+  describe 'admin_of?' do
     let(:organization) { FactoryBot.create(:organization) }
     context 'admin of organization' do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       it 'returns true' do
-        expect(user.is_admin_of?(organization)).to be_truthy
+        expect(user.admin_of?(organization)).to be_truthy
       end
     end
     context 'member of organization' do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       it 'returns true' do
-        expect(user.is_admin_of?(organization)).to be_falsey
+        expect(user.admin_of?(organization)).to be_falsey
       end
     end
     context 'superadmin' do
       let(:user) { FactoryBot.create(:admin) }
       it 'returns true' do
-        expect(user.is_admin_of?(organization)).to be_truthy
+        expect(user.admin_of?(organization)).to be_truthy
       end
     end
     context 'incorrect searching' do
@@ -596,12 +596,12 @@ describe User do
         let(:other_organization) { FactoryBot.create(:organization) }
         it 'returns false' do
           expect(other_organization).to be_present
-          expect(user.is_admin_of?(other_organization)).to be_falsey
+          expect(user.admin_of?(other_organization)).to be_falsey
         end
       end
       context 'no organization' do
         it 'returns false' do
-          expect(user.is_admin_of?(nil)).to be_falsey
+          expect(user.admin_of?(nil)).to be_falsey
         end
       end
     end

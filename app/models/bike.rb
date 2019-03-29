@@ -207,7 +207,7 @@ class Bike < ActiveRecord::Base
   def authorize_bike_for_user(u)
     return true if u == owner || can_be_claimed_by(u)
     return false if u.blank? || current_ownership.claimed
-    creation_organization_authorized? && u.is_member_of?(creation_organization)
+    creation_organization_authorized? && u.member_of?(creation_organization)
   end
 
   def authorize_bike_for_user!(u)
@@ -225,7 +225,7 @@ class Bike < ActiveRecord::Base
     return true if stolen? && current_stolen_record.present?
     return false unless owner&.notification_unstolen
     return u.send_unstolen_notifications? unless organization.present? # Passed organization overrides user setting to speed stuff up
-    organization.paid_for?("unstolen_notifications") && u.is_member_of?(organization)
+    organization.paid_for?("unstolen_notifications") && u.member_of?(organization)
   end
 
   def contact_owner_user?

@@ -190,12 +190,12 @@ class User < ActiveRecord::Base
     m && m.role
   end
 
-  def is_member_of?(organization)
+  def member_of?(organization)
     return false unless organization.present?
     Membership.where(user_id: id, organization_id: organization.id).present? || superuser?
   end
 
-  def is_admin_of?(organization)
+  def admin_of?(organization)
     return false unless organization.present?
     Membership.where(user_id: id, organization_id: organization.id, role: 'admin').present? || superuser?
   end

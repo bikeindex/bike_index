@@ -88,7 +88,7 @@ class BikeCode < ActiveRecord::Base
   end
 
   def unclaimable_by?(user)
-    errors.none? && claimed? && organization.present? && user.is_member_of?(organization)
+    errors.none? && claimed? && organization.present? && user.member_of?(organization)
   end
 
   def unclaim!

@@ -67,7 +67,7 @@ class BikesController < ApplicationController
     elsif current_user.present?
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      if current_user.is_member_of?(@bike_code.organization)
+      if current_user.member_of?(@bike_code.organization)
         @show_organization_bikes = true
         @active_organization = @bike_code.organization
         search_organization_bikes
