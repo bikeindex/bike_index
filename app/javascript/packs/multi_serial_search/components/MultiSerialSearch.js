@@ -4,6 +4,7 @@ import React, { useState, Fragment } from 'react';
 import searchIcon from 'images/stolen/search';
 import SearchResults from './SearchResults';
 import { fetchSerialResults, fetchFuzzyResults } from '../api';
+import honeybadger from '../../utils/honeybadger';
 
 const MultiSerialSearch = () => {
   const [serialResults, setSerialResults] = useState(null);
@@ -11,6 +12,11 @@ const MultiSerialSearch = () => {
   const [visibility, setVisibility] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fuzzySearching, setFuzzySearching] = useState(false);
+
+  const handleEventErrors = error => {
+    honeybadger.notify(error, { component: 'MultiSerialSearch' });
+    setLoading(false);
+  };
 
   const onSearchSerials = async () => {
     if (!searchTokens) return;
@@ -23,24 +29,29 @@ const MultiSerialSearch = () => {
       .split(/,|\n/)
       .map(s => s.trim())
       .filter(s => s);
+    const tokens = searchTokens.split(/,|\n/);
     const uniqSerials = [...new Set(tokens)];
 
-    /*
-      parallel request all serials
-    */
-    const all = await Promise.all(
-      uniqSerials.map(serial => fetchSerialResults(serial)),
-    );
-    const results = all.map(({ bikes }, index) => {
-      const serial = uniqSerials[index];
-      return {
-        bikes,
-        serial,
-        anchor: `#${encodeURI(serial)}`,
-      };
-    });
-    setSerialResults(results);
-    setLoading(false);
+    try {
+      /*
+        parallel request all serials
+      */
+      const all = await Promise.all(
+        uniqSerials.map(serial => fetchSerialResults(serial)),
+      );
+      const results = all.map(({ bikes }, index) => {
+        const serial = uniqSerials[index];
+        return {
+          bikes,
+          serial,
+          anchor: `#${encodeURI(serial)}`,
+        };
+      });
+      setSerialResults(results);
+      setLoading(false);
+    } catch (e) {
+      handleEventErrors(e);
+    }
   };
 
   const toggleVisibility = e => {
@@ -59,19 +70,23 @@ const MultiSerialSearch = () => {
     if (!serialResults) return;
     setLoading(true);
 
-    /*
-      parallel request fuzzy results and merge serialResults
-    */
-    const fuzzyAll = await Promise.all(
-      serialResults.map(({ serial }) => fetchFuzzyResults(serial)),
-    );
-    const updatedResults = fuzzyAll.map((fuzzy, index) => {
-      const serialResult = serialResults[index];
-      return Object.assign(serialResult, { fuzzy });
-    });
-    setSerialResults(updatedResults);
-    setFuzzySearching(true);
-    setLoading(false);
+    try {
+      /*
+        parallel request fuzzy results and merge
+      */
+      const fuzzyAll = Promise.all(
+        serialResults.map(serial => fetchSerialResults(serial)),
+      );
+      const updatedResults = fuzzyAll.map((fuzzy, index) => {
+        const serialResult = serialResults[index];
+        return Object.assign(serialResult, { fuzzy });
+      });
+      setSerialResults(updatedResults);
+      setFuzzySearching(true);
+      setLoading(false);
+    } catch (e) {
+      handleEventErrors(e);
+    }
   };
 
   return (
@@ -119,6 +134,7 @@ export default MultiSerialSearch;
 
 /*
   TODO:
+    - Close matching serials
     - Search button style
     - jQuery animations
 */
