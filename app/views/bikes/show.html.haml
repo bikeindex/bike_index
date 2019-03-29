@@ -1,13 +1,10 @@
-= render partial: "initial_modal_for_show"
+= render partial: "bike_show_overlays"
 
-- if current_user.present?
-  - if @bike.authorize_bike_for_user(current_user)
-    = render partial: "bike_show_overlay"
-  - if current_organization.present?
-    - if current_user.member_of?(current_organization) # Authorize here, because otherwise we're displaying user data
-      = render partial: "organization_section"
-    - else # If they aren't authorized, nix their current_organization
-      - set_current_organization(current_user.default_organization) # maybe this breaks, but whatever, they're being creepers
+- if current_user.present? && current_organization.present?
+  - if current_user.member_of?(current_organization) # Authorize here, because otherwise we're displaying user data
+    = render partial: "organization_section"
+  - else # If they aren't authorized, nix their current_organization
+    - set_current_organization(current_user.default_organization) # maybe this breaks, but whatever, they're being creepers
 
 - if current_user&.superuser && @bike.user_hidden
   %h2.text-danger.mb-4.text-center{ style: "text-align: center;" }
