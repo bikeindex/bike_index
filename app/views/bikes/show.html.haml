@@ -6,9 +6,12 @@
     %small.less-strong
       no one but the user (and Bike Index admins) can see it
 
-/ Caching should go here:
-/ - cache(@bike) do
 .container
+  - if current_user.present? && current_organization.present?
+    - if current_user.member_of?(current_organization) # Authorize here, because otherwise we're displaying user data
+      = render partial: "organization_section"
+    - else # If they aren't authorized, nix their current_organization
+      - set_current_organization(current_user.default_organization) # maybe this breaks, but whatever, they're being creepers
   .row
     .col-md-8
       %h1
@@ -37,13 +40,6 @@
           = link_to "View user's other registrations", user_path(@bike.owner.username)
     .col-md-4.ad-col
       .ad-block#top468x60
-
-  - if current_user.present? && current_organization.present?
-    - if current_user.member_of?(current_organization) # Authorize here, because otherwise we're displaying user data
-      = render partial: "organization_section"
-    - else # If they aren't authorized, nix their current_organization
-      - set_current_organization(current_user.default_organization) # maybe this breaks, but whatever, they're being creepers
-
   .row
     / Bike Photo!
     .col-md-8
@@ -171,12 +167,8 @@
       - if @bike.display_contact_owner?(current_user)
         .contact-the-owner
           %p.preface
-            - if @bike.stolen?
-              %em
-                Know something about this #{@bike.type}?
-            - else
-              %em
-                Believe this #{@bike.type} is stolen, even though it hasn't been marked stolen?
+            %em
+              Know something about this #{@bike.type}?
           %h3
             Contact the owner
           - if @bike.recovered

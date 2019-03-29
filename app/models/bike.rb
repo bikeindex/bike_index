@@ -33,6 +33,7 @@ class Bike < ActiveRecord::Base
   has_many :ownerships, dependent: :destroy
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :components, dependent: :destroy
+  has_many :bike_codes
   has_many :b_params, foreign_key: :created_bike_id, dependent: :destroy
   has_many :duplicate_bike_groups, through: :normalized_serial_segments
   has_many :recovered_records, -> { recovered }, class_name: 'StolenRecord'
@@ -192,17 +193,20 @@ class Bike < ActiveRecord::Base
 
   def first_ownership; ownerships.reorder(:id).first end
 
+  def organized?(org = nil)
+    org.present? ? bike_organization_ids.include?(org.id) : bike_organizations.any?
+  end
+
   # check if this is the first ownership - or if no owner, which means testing probably
   def first_ownership?; current_ownership&.blank? || current_ownership == first_ownership end
 
   def authorized_by_organization?(u: nil, org: nil)
-    return false unless first_ownership? && organizations.any? && !claimed?
+    return false unless first_ownership? && organized? && !claimed?
     return true unless u.present? || org.present?
-    if u.present?
-      return false if can_be_claimed_by(u) # this is authorized by owner, not organization
-      return organizations.any? { |o| u.member_of?(o) } unless org.present?
-    end
     return creation_organization == org if org.present? && u.blank?
+    # so, we know a user was passed
+    return false if can_be_claimed_by(u) # this is authorized by owner, not organization
+    return organizations.any? { |o| u.member_of?(o) } unless org.present?
     creation_organization == org && u.member_of?(org)
   end
 

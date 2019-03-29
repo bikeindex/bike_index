@@ -96,6 +96,34 @@
   .component-typess {
     margin-top: $vertical-height;
   }
+
+  .organized-access-panel {
+    margin: 2 * $vertical-height 0;
+    .card-block {
+      padding: 15px;
+    }
+    .card-title {
+      p,
+      h3 {
+        margin: 0;
+      }
+    }
+    .unstolen-notification-box {
+      border: 1px solid $gray-lightish;
+      border-right: 0 none;
+      padding-bottom: $vertical-height;
+    }
+    .geomessages-wrap {
+      text-align: center;
+      padding: 8px 15px;
+      background: $gray-lighter;
+      border-top: 1px solid $gray-lightish;
+      span {
+        display: inline-block;
+        padding-right: 1rem;
+      }
+    }
+  }
 }
 
 // On small screens, use the tabbed interface for components

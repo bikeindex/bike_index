@@ -308,6 +308,9 @@ describe Bike do
           expect(bike.authorize_for_user(member)).to be_falsey
           expect(bike.authorized_by_organization?).to be_falsey
           expect(bike.claimed?).to be_truthy
+          expect(bike.organized?).to be_truthy
+          expect(bike.organized?(organization)).to be_truthy
+          expect(bike.organized?(Organization.new)).to be_falsey
         end
       end
       context "multiple ownerships" do
