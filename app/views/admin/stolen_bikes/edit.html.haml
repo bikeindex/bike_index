@@ -139,3 +139,6 @@
     This bike doesn't have an owner
   %p
     Talk to a developer
+
+= link_to "Edit Bike", edit_admin_bike_url(@bike), class:"btn btn-primary mb-4"
+= link_to "Delete", admin_bike_url(@bike), method: :delete, confirm: "Are you sure?", class: "btn btn-danger mb-4"
