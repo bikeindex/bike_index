@@ -1,57 +1,47 @@
-#chosen-container
-  %header.with-subtitle
+.row
+  .col-lg-6.col-sm-12
     %h1
       Edit paint
     %p
       = link_to "Back to all paints", admin_paints_path
+  .col-lg-6.col-sm-12
+    .card
+      .card-header.text-danger
+        Probably don't edit this.
+      .card-body
+        Otherwise future bikes posted with this paint won't be able to find this paint, and will recreate it.
 
-  .paint-form.clearfix.padded
-    = form_for [:admin, @paint], html: { class: "form form-horizontal span6" } do |f|
-      - if @paint.errors.any?
-        #alert-block
-          .alert.alert-error
-            %h4
-              Please fix the following 
-              = pluralize(@paint.errors.count, "error")
-            %ul
-              - @paint.errors.full_messages.each do |msg|
-                %li
-                  = msg
 
-      .well
-        %p.stolen-color
-          Probably don't edit this.
-        %p
-          %em
-            Otherwise future bikes posted with this paint won't be able to find this paint, and will recreate it.
-        .control-group
-          = f.label :name, 'Description', class: "control-label"
-          .controls
-            = f.text_field :name
-
-      .control-group.chosen-select
-        = f.label :color_id, class: "control-label"
-        .controls
-          = collection_select( :paint, :color_id, Color.all, :id, :name, prompt: "Choose color" )
-      .control-group.chosen-select
-        = f.label :secondary_color_id, class: "control-label"
-        .controls
-          = collection_select( :paint, :secondary_color_id, Color.all, :id, :name, prompt: "Choose color" )
-      .control-group.chosen-select
+= form_for [:admin, @paint], html: { class: "form form-horizontal span6" } do |f|
+  - if @paint.errors.any?
+    = render partial: "/shared/errors", locals: { name: "Paint", obj: @paint }
+  .row
+    .col-lg-3.col-md-6.col-sm-12
+      .form-group
+        = f.label :name, 'Description'
+        = f.text_field :name, class: "form-control"
+    .col-lg-3.col-md-6.col-sm-12
+      .form-group
+        = f.label :color_id
+        = collection_select( :paint, :color_id, Color.all, :id, :name, {prompt: "Choose color"}, class: "form-control" )
+    .col-lg-3.col-md-6.col-sm-12
+      .form-group
+        = f.label :secondary_color_id
+        = collection_select( :paint, :secondary_color_id, Color.all, :id, :name, {prompt: "Choose color"}, class: "form-control" )
+    .col-lg-3.col-md-6.col-sm-12
+      .form-group
         = f.label :tertiary_color_id, class: "control-label"
-        .controls
-          = collection_select( :paint, :tertiary_color_id, Color.all, :id, :name, prompt: "Choose color" )
+        = collection_select( :paint, :tertiary_color_id, Color.all, :id, :name, {prompt: "Choose color"}, class: "form-control" )
 
-      .actions
-        .control-group
-          = submit_tag "Update the color", class: "button-green"
-  %hr      
+  .actions
+    .control-group
+      = submit_tag "Update the color", class: "btn btn-success"
+%hr
 
-  - if @bikes.present?
-    %section.full-screen-table
-      %table#truncated-data-table.table.table-striped.table-bordered
-        = render partial: "/admin/bikes/admin_bikes_table"
+- if @bikes.present?
+  .full-screen-table-wrapper
+    %table.table-striped.table-bordered
+      = render partial: "/admin/bikes/admin_bikes_table"
 
-  - else
-    .actions.padded
-      = link_to "Delete!", admin_paint_url(@paint), method: :delete, class: "button-red"
+- else
+  = link_to "Delete!", admin_paint_url(@paint), method: :delete, class: "btn btn-danger"

@@ -1,10 +1,11 @@
 class Admin::PaintsController < Admin::BaseController
   before_filter :find_paint, only: [:show, :edit, :update, :destroy]
+  layout 'new_admin'
 
   def index
     if params[:name]
       paints = Paint.where('name LIKE ?', "%#{params[:name]}%")
-    else 
+    else
       paints = Paint.order("bikes_count DESC")
     end
     page = params[:page] || 1
