@@ -7,7 +7,7 @@
     - if current_user.member_of?(current_organization) # Authorize here, because otherwise we're displaying user data
       = render partial: "organization_section"
     - else # If they aren't authorized, nix their current_organization
-      - session[:current_organization_id] = "0" # maybe this breaks, but whatever, they're being creepers
+      - set_current_organization(current_user.default_organization) # maybe this breaks, but whatever, they're being creepers
 
 - if current_user&.superuser && @bike.user_hidden
   %h2.text-danger.mb-4.text-center{ style: "text-align: center;" }
