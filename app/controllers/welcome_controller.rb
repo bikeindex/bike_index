@@ -36,10 +36,21 @@ class WelcomeController < ApplicationController
     @locks = LockDecorator.decorate_collection(current_user.locks)
   end
 
-  def choose_registration
-  end
+  def choose_registration; end
+
+  helper_method :recovered_bike_count
 
   private
+
+  def recovered_bike_count
+    if Rails.env.production?
+      Rails.cache.fetch "recovered_bike_count_#{Date.today.to_formatted_s(:number)}" do
+        StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count
+      end
+    else
+      3_021
+    end
+  end
 
   def authenticate_user_for_welcome_controller
     authenticate_user('Please create an account', flash_type: :info)
