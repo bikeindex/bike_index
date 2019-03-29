@@ -26,10 +26,14 @@
         - if @bike.organized?(current_organization)
           - if @bike.authorized_by_organization?(org: current_organization)
             .col-xs-12.mb-2
-              .text-right
+              .text-right.less-strong
                 %em
-                  not yet claimed, you can
-                = link_to "Edit", edit_bike_path(@bike), class: "btn btn-success btn-sm"
+                  %span.hidden-md-down
+                    #{current_organization.short_name} registered this #{@bike.type} and it is
+                not claimed yet,
+                %em
+                  so you can
+                = link_to "Edit it", edit_bike_path(@bike), class: "btn btn-success btn-sm"
           .mb-2{ class: display_unstolen_notification_form ? "col-md-7" : "col-sm-12" }
             %ul.attr-list{ class: display_unstolen_notification_form ? "" : "split-sm" }
               = @bike.attr_list_item(@bike.user&.name, "Owner name", with_colon: true)
