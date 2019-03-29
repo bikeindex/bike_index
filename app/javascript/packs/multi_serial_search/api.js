@@ -1,17 +1,20 @@
-/* TODO: put some of the private implementation into a utility helper */
+/* eslint no-shadow: 0 */
 
 /*
   Private
 */
 
-const isDevelopment = process.env.RAILS_ENV === 'development';
+const url = urn => (process.env.RAILS_ENV === 'development'
+  ? `http://localhost:3001/${urn}`
+  : `https://bikeindex.org/${urn}`);
 
-const serialSearchUrl = serial => {
-  const urn = `api/v1/bikes?multi_serial_search=true&serial=${serial}`;
-  return isDevelopment
-    ? `http://localhost:3001/${urn}`
-    : `https://bikeindex.org/${urn}`;
-};
+const serialSearchUrl = serial => url(
+  `api/v1/bikes?multi_serial_search=true&serial=${serial}`,
+);
+
+const fuzzySearchUrl = serial => url(
+  `api/v1/bikes/close_serials?multi_serial_search=true&serial=${serial}`,
+);
 
 const request = async url => {
   const resp = await fetch(url);
@@ -23,10 +26,17 @@ const request = async url => {
   Public
 */
 
-const fetchSerialResults = async serial => {
+const fetchSerialResults = serial => {
   const url = serialSearchUrl(serial);
-  const results = await request(url);
-  return results;
+  return request(url);
 };
 
-export { fetchSerialResults };
+const fetchFuzzyResults = serial => {
+  const url = fuzzySearchUrl(serial);
+  return request(url);
+};
+
+export {
+  fetchSerialResults,
+  fetchFuzzyResults,
+};

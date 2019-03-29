@@ -10,9 +10,10 @@ const MultiSerialSearch = () => {
   const [searchTokens, setSearchTokens] = useState('');
   const [visibility, setVisibility] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [fuzzySearching, setFuzzySearching] = useState(false);
 
-  const onSearchSerials = async e => {
-    e.preventDefault();
+  const onSearchSerials = async () => {
+    // e.preventDefault();
     if (!searchTokens) return;
 
     setLoading(true);
@@ -20,7 +21,7 @@ const MultiSerialSearch = () => {
     const uniqSerials = [...new Set(tokens)];
 
     /*
-      parallelized Promise.all request for all serials
+      parallel request all serials
     */
     const all = await Promise.all(
       uniqSerials.map(serial => fetchSerialResults(serial)),
@@ -46,6 +47,26 @@ const MultiSerialSearch = () => {
     e.preventDefault();
     const tokens = e.target.value;
     setSearchTokens(tokens);
+  };
+
+  const onFuzzySearch = async () => {
+    if (fuzzySearching) return;
+    if (!serialResults) return;
+    setLoading(true);
+
+    /*
+      parallel request fuzzy results and merge
+    */
+    const fuzzyAll = Promise.all(
+      serialResults.map(serial => fetchSerialResults(serial)),
+    );
+    const updatedResults = fuzzyAll.map((fuzzy, index) => {
+      const serialResult = serialResults[index];
+      return Object.assign(serialResult, { fuzzy });
+    });
+    setFuzzySearching(true);
+    setSerialResults(updatedResults);
+    setLoading(false);
   };
 
   return (
@@ -77,7 +98,12 @@ const MultiSerialSearch = () => {
           </button>
 
           {/* Search Results */}
-          <SearchResults serialResults={serialResults} loading={loading} />
+          <SearchResults
+            loading={loading}
+            serialResults={serialResults}
+            fuzzySearching={fuzzySearching}
+            onFuzzySearch={onFuzzySearch}
+          />
         </div>
       )}
     </Fragment>

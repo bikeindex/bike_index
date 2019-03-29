@@ -5,7 +5,9 @@ import PropTypes from 'prop-types';
 import pluralize from 'pluralize';
 import Loading from './Loading';
 
-const SearchResults = ({ serialResults, loading }) => (loading ? (
+const SearchResults = ({
+  serialResults, loading, onFuzzySearch, fuzzySearching,
+}) => (loading ? (
   <Loading />
 ) : (
   serialResults && (
@@ -72,6 +74,8 @@ const SearchResults = ({ serialResults, loading }) => (loading ? (
 SearchResults.propTypes = {
   serialResults: PropTypes.arrayOf(PropTypes.object),
   loading: PropTypes.bool,
+  fuzzySearching: PropTypes.bool,
+  onFuzzySearch: PropTypes.func,
 };
 
 export default SearchResults;
