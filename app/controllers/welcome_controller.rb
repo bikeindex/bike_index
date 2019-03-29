@@ -30,7 +30,7 @@ class WelcomeController < ApplicationController
       bikes = current_user.rough_approx_bikes.page(page).per(@per_page)
       @bikes = bikes.decorate
     else
-      bikes = current_user.bikes
+      bikes = Kaminari.paginate_array(current_user.bikes).page(page).per(@per_page)
       @bikes = BikeDecorator.decorate_collection(bikes)
     end
     @locks = LockDecorator.decorate_collection(current_user.locks)

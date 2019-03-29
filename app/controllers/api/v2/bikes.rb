@@ -81,7 +81,7 @@ module API
         end
 
         def authorize_bike_for_user(addendum='')
-          return true if @bike.authorize_bike_for_user!(current_user)
+          return true if @bike.authorize_for_user!(current_user)
           error!("You do not own that #{@bike.type}#{addendum}", 403)
         end
 

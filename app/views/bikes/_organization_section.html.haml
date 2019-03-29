@@ -4,7 +4,22 @@
       .card-body
         %h3.header-font-alt
           = current_organization.name
-          access
+          access panel
+
+        This bike is part of your organization
+        - if part
+          user email
+          user name
+          created_at
+          creator
+          creation description
+
+          edit if organization edit_response
+
+          organization.additional attrs each |display|
+
+        - if unstolen notifications - display if access
+
         - if current_organization.message_kinds.any?
           %p
             Send

@@ -190,12 +190,21 @@ class Bike < ActiveRecord::Base
 
   def user_name_or_email; user_name || owner_email end
 
-  def first_ownership; ownerships.reorder(:created_at).first end
+  def first_ownership; ownerships.reorder(:id).first end
 
   # check if this is the first ownership - or if no owner, which means testing probably
   def first_ownership?; current_ownership&.blank? || current_ownership == first_ownership end
 
-  def creation_organization_authorized?; first_ownership? && creation_organization.present? end
+  def authorized_by_organization?(u: nil, org: nil)
+    return false unless first_ownership? && organizations.any? && !claimed?
+    return true unless u.present? || org.present?
+    if u.present?
+      return false if can_be_claimed_by(u) # this is authorized by owner, not organization
+      return organizations.any? { |o| u.member_of?(o) } unless org.present?
+    end
+    return creation_organization == org if org.present? && u.blank?
+    creation_organization == org && u.member_of?(org)
+  end
 
   def first_owner_email; first_ownership.owner_email end
 
@@ -204,20 +213,20 @@ class Bike < ActiveRecord::Base
     user == u || current_ownership.can_be_claimed_by(u)
   end
 
-  def authorize_bike_for_user(u)
+  def authorize_for_user(u)
     return true if u == owner || can_be_claimed_by(u)
     return false if u.blank? || current_ownership.claimed
-    creation_organization_authorized? && u.member_of?(creation_organization)
+    authorized_by_organization?(u: u)
   end
 
-  def authorize_bike_for_user!(u)
-    return authorize_bike_for_user(u) unless can_be_claimed_by(u)
+  def authorize_for_user!(u)
+    return authorize_for_user(u) unless can_be_claimed_by(u)
     current_ownership.mark_claimed
     true
   end
 
-  def display_contact_owner?(u = nil, organization = nil)
-    stolen? && current_stolen_record.present? || contact_owner?(u, organization)
+  def display_contact_owner?(u = nil)
+    stolen? && current_stolen_record.present?
   end
 
   def contact_owner?(u = nil, organization = nil)

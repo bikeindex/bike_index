@@ -51,7 +51,7 @@
           .col-xs-6.col-xs-push-3
             %a.btn.btn-success{ href: "/ownerships/#{@bike.current_ownership.id}" }
               Claim #{@bike.type} 
-  - elsif @bike.authorize_bike_for_user(current_user)
+  - elsif @bike.authorize_for_user(current_user) && !@bike.creation_organization_authorized?(u: current_user)
     .bike-overlay-wrapper
       .bike-edit-overlay
         %p
@@ -77,10 +77,7 @@
                 - else
                   Add a picture of it, so everyone can admire its beauty!
           - else # The bike has been sent to someone other than the current_user
-            - if @bike.creation_organization_authorized?
-              This #{@bike.type} was registered by #{@bike.creation_organization.short_name} for
-            - else
-              You sent this #{@bike.type} to
+            You sent this #{@bike.type} to
             %em
               = @bike.current_ownership.owner_email
             and it hasn't been claimed yet. You can update it
