@@ -33,9 +33,8 @@
         = f.label :tertiary_color_id, class: "control-label"
         = collection_select( :paint, :tertiary_color_id, Color.all, :id, :name, {prompt: "Choose color"}, class: "form-control" )
 
-  .actions
-    .control-group
-      = submit_tag "Update the color", class: "btn btn-success"
+  = submit_tag "Update the color", class: "btn btn-success"
+
 %hr
 
 - if @bikes.present?

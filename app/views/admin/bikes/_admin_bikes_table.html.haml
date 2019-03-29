@@ -2,16 +2,16 @@
 - no_show_header ||= false
 - show_serial ||= false
 - unless no_show_header
-  %thead
+  %thead.thead-light
     %th
       Added&nbsp;<small class="convertTimezone"></small>
-    %th.medium-screens
+    %th
       Sent to
     %th
       Manufacturer
-    %th.large-screens
+    %th
       Info
-    %th.not-tiny-screens
+    %th
       Created by
 
 %tbody
@@ -20,15 +20,15 @@
       %tr
         %td
           .less-strong-hold
-            %span.less-strong-right.medium-screens
+            %span.less-strong-right
               - if bike.example
-                %span.table-error
+                %span
                   = bike.id
               - else
-                = bike.id 
+                = bike.id
           %a.convertTime{ href: edit_admin_bike_url(bike) }
             = l bike.created_at, format: :convert_time
-        %td.medium-screens
+        %td
           = bike.owner_email
           - if bike.user?
             - if bike.owner.donor?
@@ -43,7 +43,7 @@
               = bike.manufacturer_other
           - else
             = bike.mnfg_name
-        %td.large-screens
+        %td
           .less-strong-hold
             = [bike.year, bike.frame_model].join(' ')
             = "(#{bike.type})" unless bike.type == 'bike'
@@ -59,7 +59,7 @@
               %span.less-strong
                 = bike.serial_number
 
-        %td.not-tiny-screens
+        %td
           .less-strong-hold
             - if bike.creation_organization.present?
               = link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization)
@@ -69,5 +69,3 @@
                   = link_to "bulk import", admin_bulk_import_path(bike.bulk_import), class: "less-strong"
                 - else
                   = bike.creation_description
-
-          
