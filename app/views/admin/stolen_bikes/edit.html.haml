@@ -76,7 +76,7 @@
               %td
                 Link to recover
               %td
-                %input{ disabled: true, type: 'text', value: edit_bike_recovery_url(bike_id: @bike.id, token: @stolen_record.find_or_create_recovery_link_token).to_s }
+                %input.form-control{ disabled: true, type: 'text', value: edit_bike_recovery_url(bike_id: @bike.id, token: @stolen_record.find_or_create_recovery_link_token).to_s }
       .col-lg-6.col-xs-12
         %table.table-list
           %tbody
