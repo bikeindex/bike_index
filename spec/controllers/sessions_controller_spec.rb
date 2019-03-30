@@ -94,7 +94,7 @@ describe SessionsController do
             request.env['HTTP_REFERER'] = user_home_url
             post :create, session: { password: 'would be correct' }
             expect(cookies.signed[:auth][1]).to eq(user.auth_token)
-            expect(response).to redirect_to admin_news_index_url
+            expect(response).to redirect_to admin_root_url
           end
         end
 
