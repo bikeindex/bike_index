@@ -28,7 +28,7 @@ describe PublicImagesController do
       let(:blog) { FactoryBot.create(:blog) }
       context 'admin authorized' do
         it 'creates an image' do
-          user = FactoryBot.create(:content_admin)
+          user = FactoryBot.create(:admin)
           set_current_user(user)
           post :create, blog_id: blog.id, public_image: { name: 'cool name' }, format: :js
           blog.reload

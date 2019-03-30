@@ -5,7 +5,7 @@
         .col-xs-6
           %h3.header-font-alt
             %span.hidden-sm-down
-              = current_organization.name
+              = current_organization.short_name
             Access Menu
         .col-xs-6
           - if @bike.organized?(current_organization)

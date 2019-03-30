@@ -134,25 +134,21 @@ describe User do
     end
   end
 
-  describe 'admin_authorized' do
-    before :all do
-      @content = FactoryBot.create(:user, is_content_admin: true)
-      @admin = FactoryBot.create(:admin)
-    end
-
-    it 'auths full' do
-      expect(@admin.admin_authorized('full')).to be_truthy
-      expect(@content.admin_authorized('full')).to be_falsey
-    end
-
-    it 'auths content' do
-      expect(@admin.admin_authorized('content')).to be_truthy
-      expect(@content.admin_authorized('content')).to be_truthy
-    end
-
-    it 'auths any' do
-      expect(@admin.admin_authorized('any')).to be_truthy
-      expect(@content.admin_authorized('any')).to be_truthy
+  describe "authorized?" do
+    let(:user) { FactoryBot.create(:user) }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
+    let(:bike) { ownership.bike }
+    let(:admin) { User.new(superuser: true) }
+    it "returns expected values" do
+      expect(user.authorized?(bike)).to be_falsey
+      expect(user.authorized?(organization)).to be_falsey
+      expect(admin.authorized?(bike)).to be_truthy
+      expect(admin.authorized?(organization)).to be_truthy
+      expect(ownership.creator.authorized?(bike)).to be_truthy
+      expect(organization_member.authorized?(bike)).to be_truthy
+      expect(organization_member.authorized?(organization)).to be_truthy
     end
   end
 

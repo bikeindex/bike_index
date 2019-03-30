@@ -87,14 +87,14 @@ describe SessionsController do
           expect(session[:partner]).to be_nil
         end
 
-        context "content admin" do
-          let(:user) { FactoryBot.create(:content_admin) }
+        context "admin" do
+          let(:user) { FactoryBot.create(:admin) }
           it 'authenticates and redirects to admin' do
             expect(user).to receive(:authenticate).and_return(true)
             request.env['HTTP_REFERER'] = user_home_url
             post :create, session: { password: 'would be correct' }
             expect(cookies.signed[:auth][1]).to eq(user.auth_token)
-            expect(response).to redirect_to admin_news_index_url
+            expect(response).to redirect_to admin_root_url
           end
         end
 

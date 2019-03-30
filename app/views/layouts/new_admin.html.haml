@@ -72,13 +72,6 @@
             %li.nav-item
               = link_to "Exit Admin", root_path, :role => "button", :class => "nav-link nav-item px-2"
 
-      - elsif current_user.is_content_admin?
-        %span.font-weight-bold
-          = link_to "Go hard", admin_news_index_path
-        %ul
-          %li
-            = link_to "News", admin_news_index_path
-
     = render 'layouts/revised_messages'
 
     %section#admin-content

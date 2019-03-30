@@ -1991,7 +1991,6 @@ CREATE TABLE public.users (
     can_send_many_stolen_notifications boolean DEFAULT false NOT NULL,
     auth_token character varying(255),
     stripe_id character varying(255),
-    is_content_admin boolean DEFAULT false NOT NULL,
     notification_newsletters boolean DEFAULT false NOT NULL,
     developer boolean DEFAULT false NOT NULL,
     partner_data json,
@@ -3931,4 +3930,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190315213846');
 INSERT INTO schema_migrations (version) VALUES ('20190317191821');
 
 INSERT INTO schema_migrations (version) VALUES ('20190327164432');
+
+INSERT INTO schema_migrations (version) VALUES ('20190329233031');
 

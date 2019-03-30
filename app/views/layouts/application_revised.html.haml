@@ -65,7 +65,7 @@
                       %a.nav-link{ href: organization_bikes_path(organization_id: organization.to_param) }
                         View #{organization.name}
             %li.divider-nav-item
-            - if current_user_or_unconfirmed_user.admin_authorized('any')
+            - if current_user_or_unconfirmed_user.superuser?
               %li.primary-nav-item
                 = active_link 'Admin', user_root_url, class_name: 'nav-link'
               %li.divider-nav-item

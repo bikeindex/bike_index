@@ -9,4 +9,8 @@ class UserSerializer < ActiveModel::Serializer
   def is_superuser
     true if object.superuser
   end
+
+  def is_content_admin
+    false
+  end
 end

@@ -46,14 +46,9 @@ module ControllerHelpers
 
   def user_root_url
     return root_url unless current_user.present?
-    if current_user.superuser
-      admin_root_url
-    elsif current_user.is_content_admin
-      admin_news_index_url
-    else
-      return user_home_url(subdomain: false) unless current_user.default_organization.present?
-      organization_bikes_path(organization_id: current_user.default_organization.to_param)
-    end
+    return admin_root_url if current_user.superuser
+    return user_home_url(subdomain: false) unless current_user.default_organization.present?
+    organization_bikes_path(organization_id: current_user.default_organization.to_param)
   end
 
   # Generally this is implicitly set, via the passed parameters - however! it can also be explicitly set
@@ -182,7 +177,7 @@ module ControllerHelpers
     type = "full"
     content_accessible = ["news"]
     type = "content" if content_accessible.include?(controller_name)
-    return true if current_user.present? && current_user.admin_authorized(type)
+    return true if current_user.present? && current_user.superuser?
     flash[:error] = "You don't have permission to do that!"
     redirect_to user_root_url and return
   end
