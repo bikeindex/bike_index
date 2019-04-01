@@ -16,7 +16,7 @@
           the non-profit
           %br
           bike registry
-        - if current_organization.present?
+        - if current_organization.present? && current_user.present?
           %span.current-organization-nav-item
             %a#current_organization_submenu{ "aria-haspopup" => "true", "aria-expanded" => "false", data: { toggle: "dropdown" } }
               = current_organization.short_name
