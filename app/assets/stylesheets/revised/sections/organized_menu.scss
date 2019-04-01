@@ -3,9 +3,14 @@ $organized-menu-bg: $gray-lighter;
   display: none;
   .divider-above {
     border-top: 1px solid #e4e4e4;
+    margin-top: $vertical-height;
   }
   .divider-below {
+    padding-bottom: $vertical-height;
     border-bottom: 1px solid #e4e4e4;
+  }
+  li:last-of-type {
+    @extend .divider-below;
   }
   header {
     margin-top: -2 * $vertical-height;
@@ -48,13 +53,8 @@ $organized-menu-bg: $gray-lighter;
       ul {
         @include list-unstyled;
         overflow-x: hidden;
-        a,
-        a:hover {
-          text-decoration: none;
-          font-weight: $strong-font-weight;
-        }
         li {
-          margin-top: $vertical-height;
+          padding-top: $vertical-height;
         }
       }
       .menu-item {
@@ -63,19 +63,24 @@ $organized-menu-bg: $gray-lighter;
         padding: 0.5 * $vertical-height $vertical-height;
         color: $header-font-nocolor;
         text-decoration: none;
+        font-size: 14px;
+        &:hover {
+          text-decoration: none;
+          font-weight: $strong-font-weight;
+          padding-right: 0; // Because otherwise the shift to bold can break line
+        }
       }
       .disabled-menu-item {
         color: $gray-light;
         display: block;
+        &:hover {
+          font-weight: normal;
+        }
       }
       .active {
         color: $blue;
         position: relative;
         font-weight: bold;
-        &:hover {
-          font-weight: $normal-font-weight;
-          cursor: default;
-        }
         &:before {
           content: "";
           display: block;
