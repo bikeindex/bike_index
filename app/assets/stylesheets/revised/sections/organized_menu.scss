@@ -34,7 +34,6 @@ $organized-menu-bg: $gray-lighter;
 
 @media (min-width: $grid-breakpoint-md) {
   .organized-body {
-    // @include clearfix;
     position: relative;
     .primary-footer {
       position: relative;
@@ -48,22 +47,28 @@ $organized-menu-bg: $gray-lighter;
       display: block;
       ul {
         @include list-unstyled;
-      }
-      .organized-mainmenu {
+        overflow-x: hidden;
         a,
-        .menu-item {
-          width: 100%;
-          display: block;
-          padding: 0.5 * $vertical-height $vertical-height;
-          color: $header-font-nocolor;
-          text-decoration: none;
-        }
         a:hover {
           text-decoration: none;
           font-weight: $strong-font-weight;
         }
+        li {
+          margin-top: $vertical-height;
+        }
       }
-      .top-level.active {
+      .menu-item {
+        width: 100%;
+        display: block;
+        padding: 0.5 * $vertical-height $vertical-height;
+        color: $header-font-nocolor;
+        text-decoration: none;
+      }
+      .disabled-menu-item {
+        color: $gray-light;
+        display: block;
+      }
+      .active {
         color: $blue;
         position: relative;
         font-weight: bold;
@@ -90,10 +95,5 @@ $organized-menu-bg: $gray-lighter;
       width: 100%;
       padding-left: 15%;
     }
-    // .organized-mainmenu {}
-    // .container.organized-main-container {
-    //   float: right;
-    //   width: 85%;
-    // }
   }
 }

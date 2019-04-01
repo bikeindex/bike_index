@@ -281,7 +281,6 @@ Bikeindex::Application.routes.draw do
     # Organized Admin resources (below here controllers should inherit Organized::AdminController)
     resources :manage, only: %i[index update destroy] do
       collection do
-        get :dev
         get :locations
       end
     end

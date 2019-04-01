@@ -13,9 +13,9 @@
         %a.primary-logo{ href: user_root_url }
           = image_tag "revised/logo.svg", class: "primary-nav", alt: "Bike Index home"
         %a.nonprofit-subtitle{ href: "https://bikeindex.org/news/bike-index--now-a-nonprofit" }
-          a non-profit
+          the non-profit
           %br
-          company
+          bike registry
         - if current_organization.present?
           %span.current-organization-nav-item
             %a#current_organization_submenu{ "aria-haspopup" => "true", "aria-expanded" => "false", data: { toggle: "dropdown" } }

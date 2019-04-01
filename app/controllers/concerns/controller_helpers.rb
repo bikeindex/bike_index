@@ -102,6 +102,7 @@ module ControllerHelpers
 
   def set_current_organization(organization)
     session[:current_organization_id] = organization&.id || "0"
+    @active_organization = organization
     @current_organization = organization
   end
 
@@ -123,8 +124,7 @@ module ControllerHelpers
   def active_organization
     # We call this multiple times - make sure nil stays nil
     return @active_organization if defined?(@active_organization)
-    @active_organization = Organization.friendly_find(params[:organization_id])
-    set_current_organization(@active_organization)
+    set_current_organization(Organization.friendly_find(params[:organization_id]))
   end
 
   def current_user

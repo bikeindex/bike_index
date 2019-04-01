@@ -8,10 +8,11 @@ class BikeIndex.NavHeader extends BikeIndex
     $('nav.primary-header-nav').headroom(@headroomOptions)
 
     # TODO: fix when new bootstrap applied - right now, on iphone, clicking doesn't always work, so we're catching it here
-    $(".current-organization-submenu").click (e) =>
-      $target = $(event.target)
-      if $target.attr("href")
-        window.location = $target.attr("href")
+    if /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      $(".current-organization-submenu").click (e) =>
+        $target = $(event.target)
+        if $target.attr("href")
+          window.location = $target.attr("href")
 
   initializeHamburgler: ->
     # toggleMenu = @toggleMenu
