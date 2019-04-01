@@ -7,11 +7,17 @@ class BikeIndex.NavHeader extends BikeIndex
     # Instantiate headroom - scroll to hide header
     $('nav.primary-header-nav').headroom(@headroomOptions)
 
+    # TODO: fix when new bootstrap applied - right now, on iphone, clicking doesn't always work, so we're catching it here
+    $(".current-organization-submenu").click (e) =>
+      $target = $(event.target)
+      if $target.attr("href")
+        window.location = $target.attr("href")
+
   initializeHamburgler: ->
     # toggleMenu = @toggleMenu
     $('.hamburgler').click (e) =>
       e.preventDefault()
-      $('.hamburgler a').toggleClass('active')
+      $('.hamburgler a').toggleClass('active') # prevent hamburglar flicker back and forth
       @toggleMenu($('nav.primary-header-nav').hasClass('menu-in') )
 
     $('#menu-opened-backdrop').click (e) =>
@@ -19,6 +25,7 @@ class BikeIndex.NavHeader extends BikeIndex
 
   toggleMenu: (is_open = false)->
     if is_open
+      $('.hamburgler a').removeClass('active')
       $('nav.primary-header-nav')
         .removeClass('menu-in')
         .headroom(@headroomOptions)

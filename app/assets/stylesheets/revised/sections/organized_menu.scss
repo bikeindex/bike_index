@@ -1,12 +1,20 @@
 $organized-menu-bg: $gray-lighter;
 .organized-left-menu {
   display: none;
+  .divider-above {
+    border-top: 1px solid #e4e4e4;
+  }
+  .divider-below {
+    border-bottom: 1px solid #e4e4e4;
+  }
   header {
     margin-top: -2 * $vertical-height;
-    padding: $vertical-height;
+    padding: 0 $vertical-height;
+    @extend .divider-below;
+    overflow-x: hidden;
     h3 {
       font-size: 18px;
-      line-height: 1.2;
+      line-height: 1.5;
       span {
         display: block;
         font-weight: bold;
@@ -49,18 +57,11 @@ $organized-menu-bg: $gray-lighter;
           padding: 0.5 * $vertical-height $vertical-height;
           color: $header-font-nocolor;
           text-decoration: none;
-          border-bottom: 1px solid #e4e4e4;
         }
         a:hover {
           text-decoration: none;
           font-weight: $strong-font-weight;
         }
-      }
-      .divider-above {
-        border-top: 1px solid #e4e4e4;
-      }
-      .divider-below {
-        border-bottom: 1px solid #e4e4e4;
       }
       .top-level.active {
         color: $blue;
