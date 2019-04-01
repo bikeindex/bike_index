@@ -134,7 +134,5 @@ export default MultiSerialSearch;
 
 /*
   TODO:
-    - Close matching serials
-    - Search button style
     - jQuery animations
 */

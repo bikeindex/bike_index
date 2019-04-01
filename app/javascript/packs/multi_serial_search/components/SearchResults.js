@@ -48,12 +48,24 @@ const SearchResults = ({
 
       {/* Bike Results */}
       <div id="bikes_returned">
-        {serialResults.map(({ bikes, serial, anchor }) => {
+        {serialResults.map(({
+          bikes, fuzzyBikes, serial, anchor,
+        }) => {
           if (bikes.length === 0) return;
+          const id = anchor.slice(1);
           return (
-            <div key={anchor} id={anchor} className="multiserial-results">
+            <div key={id} id={id} className="multiserial-results">
               <BikeList serial={serial} bikes={bikes} />
-              {/* TODO fuzzyBikes ... */}
+
+              {fuzzySearching && fuzzyBikes
+                && (
+                <BikeList
+                  serial={serial}
+                  bikes={fuzzyBikes}
+                  fuzzySearching={fuzzySearching}
+                />
+                )
+              }
             </div>
           );
         })}
