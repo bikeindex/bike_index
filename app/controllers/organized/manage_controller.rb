@@ -20,9 +20,6 @@ module Organized
       end
     end
 
-    def dev
-    end
-
     def destroy
       organization_name = active_organization.name
       if active_organization.is_paid

@@ -263,6 +263,7 @@ describe BikesController do
         expect(response).to render_template(:scanned)
         expect(response.code).to eq("200")
         expect(assigns(:show_organization_bikes)).to be_falsey
+        expect(session[:current_organization_id]).to eq "0"
       end
       context "user part of organization" do
         let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
@@ -273,6 +274,18 @@ describe BikesController do
           expect(response.code).to eq("200")
           expect(assigns(:active_organization)).to eq organization
           expect(assigns(:show_organization_bikes)).to be_truthy
+          expect(session[:current_organization_id]).to eq organization.id
+        end
+        context "searching" do
+          it "renders the matching bikes" do
+            session[:current_organization_id] = organization.id
+            get :scanned, id: "000#{bike_code2.code}", organization_id: organization.to_param, query: "XCXCVXCV*DS"
+            expect(response).to render_template(:scanned)
+            expect(response.code).to eq("200")
+            expect(assigns(:bikes)).to eq([]) # Because nothing matches our query
+            expect(assigns(:active_organization)).to eq organization
+            expect(assigns(:show_organization_bikes)).to be_truthy
+          end
         end
         context "passed a different organization id" do
           let!(:other_organization) { FactoryBot.create(:organization, short_name: "BikeIndex") }
@@ -285,6 +298,7 @@ describe BikesController do
             expect(response.code).to eq("200")
             expect(assigns(:active_organization)).to eq organization
             expect(assigns(:show_organization_bikes)).to be_truthy
+            expect(session[:current_organization_id]).to eq organization.id
           end
         end
       end
