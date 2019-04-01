@@ -47,6 +47,7 @@ const MultiSerialSearch = () => {
         };
       });
       setSerialResults(results);
+      setFuzzySearching(false);
       setLoading(false);
     } catch (e) {
       handleEventErrors(e);
@@ -76,9 +77,9 @@ const MultiSerialSearch = () => {
       const fuzzyAll = await Promise.all(
         serialResults.map(({ serial }) => fetchFuzzyResults(serial)),
       );
-      const updatedResults = fuzzyAll.map(({ bikes: fuzzy }, index) => {
+      const updatedResults = fuzzyAll.map(({ bikes: fuzzyBikes }, index) => {
         const serialResult = serialResults[index];
-        return Object.assign(serialResult, { fuzzy });
+        return Object.assign(serialResult, { fuzzyBikes });
       });
       setSerialResults(updatedResults);
       setFuzzySearching(true);

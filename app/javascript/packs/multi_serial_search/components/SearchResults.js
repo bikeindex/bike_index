@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import pluralize from 'pluralize';
 import Loading from './Loading';
+import BikeList from './BikeList';
 
 const SearchResults = ({
   serialResults, loading, onFuzzySearch, fuzzySearching,
@@ -46,32 +46,14 @@ const SearchResults = ({
         </div>
       )}
 
-      {/* List of serials */}
+      {/* Bike Results */}
       <div id="bikes_returned">
-        {serialResults.map(({ serial, bikes, anchor }) => {
+        {serialResults.map(({ bikes, serial, anchor }) => {
           if (bikes.length === 0) return;
-          const resultsTitle = bikes.length > 19 ? 'First 20 of many' : bikes.length;
           return (
-            <div id={anchor} className="multiserial-results">
-              <div>
-                <h3>
-                  <span className="serial-text">{serial} - </span>
-                  {resultsTitle} {pluralize('results', bikes.length)}
-                </h3>
-                {/* List of Results per serial number */}
-                <ul>
-                  {bikes.map(({ stolen, url, title }) => (
-                    <li key={serial}>
-                      {stolen && <span className="stolen-color">Stolen</span>}
-                      {' '}
-                      <a href={url} target="_blank" rel="noopener noreferrer">
-                        {title}
-                      </a>
-                      <span className="serial-text">{serial}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+            <div key={anchor} id={anchor} className="multiserial-results">
+              <BikeList serial={serial} bikes={bikes} />
+              {/* TODO fuzzyBikes ... */}
             </div>
           );
         })}
