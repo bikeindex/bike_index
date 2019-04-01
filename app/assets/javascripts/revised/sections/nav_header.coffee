@@ -11,6 +11,7 @@ class BikeIndex.NavHeader extends BikeIndex
     # toggleMenu = @toggleMenu
     $('.hamburgler').click (e) =>
       e.preventDefault()
+      $('.hamburgler a').toggleClass('active')
       @toggleMenu($('nav.primary-header-nav').hasClass('menu-in') )
 
     $('#menu-opened-backdrop').click (e) =>
@@ -18,7 +19,6 @@ class BikeIndex.NavHeader extends BikeIndex
 
   toggleMenu: (is_open = false)->
     if is_open
-      $('.hamburgler a').removeClass('active')
       $('nav.primary-header-nav')
         .removeClass('menu-in')
         .headroom(@headroomOptions)

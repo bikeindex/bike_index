@@ -53,10 +53,19 @@ describe SessionsController do
   describe "destroy" do
     include_context :logged_in_as_user
     it "logs out the current user" do
+      session[:return_to] = "/bikes/12?contact_owner=true"
+      session[:partner] = "bikehub"
+      session[:current_organization_id] = 12
+      session[:whatever] = "XXXXXX"
       get :destroy
       expect(cookies.signed[:auth]).to be_nil
       expect(session[:user_id]).to be_nil
       expect(response).to redirect_to goodbye_url
+      expect(flash[:notice]).to be_present
+      expect(session[:return_to]).to be_nil
+      expect(session[:partner]).to be_nil
+      expect(session[:current_organization_id]).to be_nil
+      expect(session[:whatever]).to be_nil
     end
     context "unconfirmed user" do
       let(:user) { FactoryBot.create(:user) }

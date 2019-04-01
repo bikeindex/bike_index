@@ -154,6 +154,7 @@ module ControllerHelpers
   end
 
   def remove_session
+    session.keys.each { |k| session.delete(k) } # Get rid of everything we've been storing
     cookies.delete(:auth)
   end
 

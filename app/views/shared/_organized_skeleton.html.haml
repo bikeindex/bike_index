@@ -4,9 +4,10 @@
       - if active_organization.display_avatar
         = image_tag active_organization.avatar.url(:medium)
       %h3
-        = active_organization.name
-        %br
         Admin panel
+        %span
+          = active_organization.name
+        
     %ul.organized-mainmenu
       %li
         %span.menu-item.top-level{ class: ("active" if controller_name == "bikes") }
