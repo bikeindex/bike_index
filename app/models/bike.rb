@@ -59,7 +59,7 @@ class Bike < ActiveRecord::Base
     :bike_image_cache, :send_email, :marked_user_hidden,
     :marked_user_unhidden, :b_param_id_token
 
-  attr_writer :phone, :user_name, :organization_affiliation# reading is managed by a method
+  attr_writer :phone, :user_name, :organization_affiliation # reading is managed by a method
 
   enum frame_material: FrameMaterial::SLUGS
   enum handlebar_type: HandlebarType::SLUGS
