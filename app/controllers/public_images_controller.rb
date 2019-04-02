@@ -81,7 +81,7 @@ class PublicImagesController < ApplicationController
     end
     # Otherwise, it's a blog image or an organization image (or someone messing about),
     # so ensure the current user is admin authorized
-    return true if current_user && current_user.admin_authorized('any')
+    return true if current_user && current_user.superuser?
     render json: { error: 'Access denied' }, status: 401 and return
   end
 
@@ -89,7 +89,7 @@ class PublicImagesController < ApplicationController
     if public_image.imageable_type == 'Bike'
       Bike.unscoped.find(public_image.imageable_id).owner == current_user
     elsif public_image.imageable_type == 'Blog'
-      current_user && current_user.admin_authorized('content')
+      current_user && current_user.superuser?
     end
   end
 

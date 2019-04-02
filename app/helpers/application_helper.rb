@@ -1,10 +1,12 @@
 module ApplicationHelper
-  def active_link(link_text, link_path, match_controller: false, class_name: '', id: '')
-    class_name += ' active' if current_page_active(link_path, match_controller: match_controller)
-    link_to(raw(link_text), link_path, class: class_name, id: id).html_safe
+  def active_link(link_text, link_path, html_options = {})
+    match_controller = html_options.delete(:match_controller)
+    html_options[:class] ||= ""
+    html_options[:class] += " active" if current_page_active?(link_path, match_controller)
+    link_to(raw(link_text), link_path, html_options).html_safe
   end
 
-  def current_page_active(link_path, match_controller: false)
+  def current_page_active?(link_path, match_controller = false)
     if match_controller
       begin
         link_controller = Rails.application.routes.recognize_path(link_path)[:controller]
@@ -15,13 +17,6 @@ module ApplicationHelper
     else
       current_page?(link_path)
     end
-  end
-
-  def revised_active_link(link_text, link_path, html_options = {})
-    match_controller = html_options.delete(:match_controller)
-    html_options[:class] ||= ""
-    html_options[:class] += " active" if current_page_active(link_path, match_controller: match_controller)
-    link_to(raw(link_text), link_path, html_options).html_safe
   end
 
   # Used to render the page wrapper

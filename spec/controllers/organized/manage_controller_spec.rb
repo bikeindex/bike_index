@@ -11,14 +11,6 @@ describe Organized::ManageController, type: :controller do
       end
     end
 
-    describe 'dev' do
-      it 'redirects' do
-        get :dev, organization_id: organization.to_param
-        expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
-        expect(flash[:error]).to be_present
-      end
-    end
-
     describe 'locations' do
       it 'redirects' do
         get :locations, organization_id: organization.to_param
@@ -57,18 +49,6 @@ describe Organized::ManageController, type: :controller do
         session[:current_organization_id] = "XXXYYY"
         get :landing, organization_id: organization.to_param
         expect(response.status).to eq(200)
-        expect(response).to render_with_layout('application_revised')
-        expect(assigns(:active_organization)).to eq organization
-        expect(assigns(:current_organization)).to eq organization
-        expect(session[:current_organization_id]).to eq organization.id
-      end
-    end
-
-    describe 'dev' do
-      it 'renders' do
-        get :dev, organization_id: organization.to_param
-        expect(response.status).to eq(200)
-        expect(response).to render_template :dev
         expect(response).to render_with_layout('application_revised')
         expect(assigns(:active_organization)).to eq organization
         expect(assigns(:current_organization)).to eq organization

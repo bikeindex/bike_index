@@ -46,6 +46,6 @@
                 = link_to "#{membership.organization.name} ", admin_membership_url(membership)
           %td.large-screens
             = "super" if user.superuser?
-            = "content" if user.content?
+            = "developer" if user.developer?
           %td.large-screens.table-cell-check
             = "&#x2713;".html_safe if user.confirmed

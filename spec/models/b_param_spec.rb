@@ -220,6 +220,35 @@ describe BParam do
     end
   end
 
+  describe "additional_registration_fields" do
+    let(:params_hash) do
+      {
+        bike: {
+          serial_number: "zzz",
+          organization_affiliation: "employee",
+          bike_code: "xxxx",
+          phone: "919929333",
+          address: "123 Main St",
+          address_city: "Nevernever Land",
+          address_zipcode: "11111",
+          address_state: "CA"
+        }
+      }.as_json
+    end
+    let(:b_param) { BParam.new(params: params_hash) }
+    let(:target_address) { { address: "123 Main St", city: "Nevernever Land", zipcode: "11111", state: "CA" }.as_json }
+    it "has the expected fields" do
+      expect(b_param.fetch_formatted_address).to eq target_address
+      expect(b_param.bike_code).to eq "xxxx"
+      expect(b_param.organization_affiliation).to eq "employee"
+      expect(b_param.phone).to eq "919929333"
+      expect(b_param.address("address")).to eq "123 Main St"
+      expect(b_param.address("city")).to eq "Nevernever Land"
+      expect(b_param.address("address_zipcode")).to eq "11111"
+      expect(b_param.address("state")).to eq "CA" 
+    end
+  end
+
   describe 'gear_slugs' do
     it 'sets the rear gear slug' do
       gear = FactoryBot.create(:rear_gear_type)

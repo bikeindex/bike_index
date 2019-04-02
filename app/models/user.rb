@@ -118,8 +118,6 @@ class User < ActiveRecord::Base
 
   def superuser?; superuser end
 
-  def content?; is_content_admin end
-
   def developer?; developer end
 
   def to_param; username end
@@ -132,19 +130,15 @@ class User < ActiveRecord::Base
 
   def paid_org?; organizations.paid.any? end
 
-  def send_unstolen_notifications?
-    superuser || organizations.any? { |o| o.paid_for?("unstolen_notifications") }
+  def authorized?(obj)
+    return true if superuser?
+    return obj.authorize_for_user(self) if obj.is_a?(Bike)
+    return member_of?(obj) if obj.is_a?(Organization)
+    false
   end
 
-  def admin_authorized(type)
-    return true if superuser
-    return case type
-    when 'content'
-      true if is_content_admin
-    when 'any'
-      true if is_content_admin
-    end
-    false
+  def send_unstolen_notifications?
+    superuser || organizations.any? { |o| o.paid_for?("unstolen_notifications") }
   end
 
   def reset_token_time
@@ -190,12 +184,12 @@ class User < ActiveRecord::Base
     m && m.role
   end
 
-  def is_member_of?(organization)
+  def member_of?(organization)
     return false unless organization.present?
     Membership.where(user_id: id, organization_id: organization.id).present? || superuser?
   end
 
-  def is_admin_of?(organization)
+  def admin_of?(organization)
     return false unless organization.present?
     Membership.where(user_id: id, organization_id: organization.id, role: 'admin').present? || superuser?
   end
@@ -224,11 +218,11 @@ class User < ActiveRecord::Base
   def bikes(user_hidden=true)
     Bike.unscoped
     .includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
-    .where(id: bike_ids(user_hidden))
+    .where(id: bike_ids(user_hidden)).reorder(:created_at)
   end
 
   def rough_approx_bikes # Rough fix for users with large numbers of bikes
-    Bike.includes(:ownerships).where(ownerships: { current: true, user_id: id })
+    Bike.includes(:ownerships).where(ownerships: { current: true, user_id: id }).reorder(:created_at)
   end
 
   def bike_ids(user_hidden=true)

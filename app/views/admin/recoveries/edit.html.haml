@@ -1,62 +1,79 @@
-%header.with-subtitle#admin-recoveries
-  %h1
-    Edit recovery for #{@bike.type}
-  %p
-    = link_to "Back to recoveries", admin_recoveries_url
-%p
-  = link_to "Edit bike", edit_admin_bike_path(@bike)
-%ul.bike-boxes
-  = render partial: "/admin/bikes/bike", locals: {bike: @bike, target: "show" }
-.dl-holder
-  %dl.dl-horizontal
-    = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
-    = @bike.dl_from_attribute("owner_email")
-    = @bike.dl_list_item(@bike.owner.email, "Current Owner")
-    = @bike.dl_from_attribute("cached_data")
-    %dt
-      Location
-    %dd
-      = @recovery.address
-  .dl-holder
-    %h2
-      - if @recovery.recovery_display.present?
-        = link_to "Recovery displayed", edit_admin_recovery_display_url(@recovery.recovery_display)
-      - else
-        = link_to 'Display recovery', new_admin_recovery_display_url(stolen_record_id: @recovery.id), class: 'button-blue padded'
-        - if @recovery.recovery_posted
-          Recovery posted
 
-        / - elsif @recovery.can_share_recovery == true
-        /   = link_to 'Share recovery', approve_admin_recoveries_url(id: @recovery.id), method: :post, confirm: "Approval will\n\n- Send out a tweet\n- And post to facebook.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
-        / - else
-        /   = link_to 'Post recovery (no share)', approve_admin_recoveries_url(id: @recovery.id), method: :post, class: 'button-blue padded'
+%h1
+  Edit recovery for #{@bike.type}
+%p
+  = link_to "Back to recoveries", admin_recoveries_url
+%p
+  = link_to "Edit bike", edit_admin_bike_path(@bike), class: "btn btn-success float-right mb-4"
+
+
+
+%ul.list-unstyled
+  = render partial: "/admin/bikes/bike", locals: {bike: @bike, target: "show" }
+.row
+  .col-sm-12.col-lg-6
+    %table.table-list
+      %tbody
+        %tr
+          %td
+            Created at
+          %td
+            %a.convertTime{ href: admin_bike_url(@bike) }
+              = l @bike.created_at, format: :convert_time
+        %tr
+          %td
+            Owner Email
+          %td
+            = @bike.owner_email
+        %tr
+          %td
+            Current Owner
+          %td
+            = @bike.owner.email
+        %tr
+          %td
+            Cached Data
+          %td
+            = @bike.cached_data
+        %tr
+          %td
+            Location
+          %td
+            = @recovery.address
+  .col-sm-12.col-lg-6
+    .card.mt-4.mb-4
+      .card-header
+        Recovery Description
+      .card-body
+        = @recovery.recovered_description
+%h2
+  - if @recovery.recovery_display.present?
+    = link_to "Recovery displayed", edit_admin_recovery_display_url(@recovery.recovery_display)
+  - else
+    = link_to 'Display recovery', new_admin_recovery_display_url(stolen_record_id: @recovery.id), class: 'btn btn-primary mb-4'
+    - if @recovery.recovery_posted
+      Recovery posted
+
+
+  / - elsif @recovery.can_share_recovery == true
+  /   = link_to 'Share recovery', approve_admin_recoveries_url(id: @recovery.id), method: :post, confirm: "Approval will\n\n- Send out a tweet\n- And post to facebook.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
+  / - else
+  /   = link_to 'Post recovery (no share)', approve_admin_recoveries_url(id: @recovery.id), method: :post, class: 'button-blue padded'
 
 %hr
 - url = {action: "update", controller: "recoveries"}
 = form_for([:admin, @recovery], :url => url , html: { class: "form form-horizontal" }) do |f|
   - if @recovery.errors.any?
-    #alert-block
-      .alert.alert-error
-        %h4
-          Please fix the following
-          = pluralize(@recovery.errors.count, "error")
-        %ul
-          - @recovery.errors.full_messages.each do |msg|
-            %li
-              = msg
-  .control-group
-    = f.label :index_helped_recovery, class: "control-label"
-    .controls
-      = f.check_box :index_helped_recovery
+    = render partial: "/shared/errors", locals: { name: "Recovery", obj: @recovery}
+  .form-group
+    = f.label :index_helped_recovery
+    = f.check_box :index_helped_recovery
 
-  .control-group
-    = f.label :can_share_recovery, class: "control-label"
-    .controls
-      = f.check_box :can_share_recovery
+  .form-group
+    = f.label :can_share_recovery
+    = f.check_box :can_share_recovery
 
-  .padded
-    %p
-      = @recovery.recovered_description
+
   / .control-group.recovery-input-field
   /   = f.label :recovery_share, "Story to share",   class: "control-label"
   /   .controls
