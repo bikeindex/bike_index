@@ -86,8 +86,8 @@
                       = @bike.additional_registration
                     - elsif reg_field == "phone"
                       = @bike.phone
-                    - elsif reg_field == "reg_affiliation" # this doesn't have a reader from bike yet :(
-                      &nbsp;
+                    - elsif reg_field == "reg_affiliation"
+                      = @bike.organization_affiliation
 
           - if !@bike.organized?(current_organization) # Apologize, bike isn't organizations
             %p.less-strong.mt-4

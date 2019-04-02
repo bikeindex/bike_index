@@ -55,11 +55,11 @@ class Bike < ActiveRecord::Base
   validates_presence_of :primary_frame_color_id
 
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications,
-    :image, :b_param_id, :embeded, :address, :organization_affiliation,
-    :embeded_extended, :paint_name, :bike_image_cache, :send_email,
-    :marked_user_hidden, :marked_user_unhidden, :b_param_id_token
+    :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
+    :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
+    :b_param_id_token, :address, :address_city, :address_state, :address_zipcode
 
-  attr_writer :phone, :user_name # reading is managed by a method
+  attr_writer :phone, :user_name, :organization_affiliation # reading is managed by a method
 
   enum frame_material: FrameMaterial::SLUGS
   enum handlebar_type: HandlebarType::SLUGS
@@ -408,6 +408,10 @@ class Bike < ActiveRecord::Base
 
   def registration_address # Goes along with organization additional_registration_fields
     @registration_address ||= b_params.map(&:fetch_formatted_address).reject(&:blank?).first || {}
+  end
+
+  def organization_affiliation
+    b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
   end
 
   def frame_colors
