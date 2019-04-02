@@ -7,8 +7,9 @@ class BikeIndex.NavHeader extends BikeIndex
     # Instantiate headroom - scroll to hide header
     $('nav.primary-header-nav').headroom(@headroomOptions)
 
-    # TODO: fix when new bootstrap applied - right now, on iphone, clicking doesn't always work, so we're catching it here
-    if /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    # TODO: fix when new bootstrap applied - right now, on iphone, clicking doesn't always work,
+    # we're trying to catch it here
+    if $(window).width() < 768
       $(".current-organization-submenu").click (e) =>
         $target = $(event.target)
         if $target.attr("href")
