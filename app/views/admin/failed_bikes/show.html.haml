@@ -16,12 +16,12 @@
     %tr
       %td
         created_at
-      %td.convertTime
+      %td.convertTime.preciseTime
         = l @b_param.created_at, format: :convert_time
     %tr
       %td
         Modified at
-      %td.convertTime
+      %td.convertTime.preciseTime
         = l @b_param.updated_at, format: :convert_time
 
 

@@ -24,7 +24,7 @@
       - @b_params.each do |b_param|
         %tr
           %td
-            %a.convertTime{ href: admin_failed_bike_url(b_param.id) }
+            %a.convertTime.preciseTime{ href: admin_failed_bike_url(b_param.id) }
               = l b_param.created_at, format: :convert_time
           %td
             = b_param.creator.email if b_param.creator
