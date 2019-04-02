@@ -1,6 +1,6 @@
-%header
-  %h3
-    = link_to 'View all tweets', admin_tweets_url
+
+%h3
+  = link_to 'View all tweets', admin_tweets_url
 
 .row-fluid
   .form.form-horizontal
@@ -26,7 +26,7 @@
       #alert-block
         .alert.alert-error
           %h4
-            Please fix the following 
+            Please fix the following
             = pluralize(@tweet.errors.count, 'error')
           %ul
             - @tweet.errors.full_messages.each do |msg|
