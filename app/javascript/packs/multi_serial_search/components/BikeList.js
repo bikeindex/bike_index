@@ -10,7 +10,7 @@ const BikeList = ({ bikes, serial, fuzzySearching }) => {
       <h3>
         {fuzzySearching && 'Close to serial '}
         <span className="serial-text">{serial} - </span>
-        {resultsTitle} {pluralize('results', bikes.length)}
+        {resultsTitle}  {pluralize('results', bikes.length)}
       </h3>
       <ul>
         {bikes.map(({

@@ -16,8 +16,10 @@ const SearchResults = ({
 
       {/* Serial search chips */}
       <ul id="serials_submitted" className="multiserials-list">
-        {serialResults.map(({ serial, bikes, anchor }) => {
-          const hasResults = bikes && bikes.length > 0;
+        {serialResults.map(({
+          serial, anchor, bikes, fuzzyBikes,
+        }) => {
+          const hasResults = bikes.length > 0 || fuzzyBikes.length > 0;
           return (
             <li
               key={serial}
@@ -34,7 +36,7 @@ const SearchResults = ({
       </ul>
 
       {/* Fuzzy search button  */}
-      {!fuzzySearching && serialResults.some(sr => sr.bikes.length > 0) && (
+      {!fuzzySearching && (
         <div className="multiserial-fuzzy-box">
           <button
             type="submit"
@@ -51,20 +53,19 @@ const SearchResults = ({
         {serialResults.map(({
           bikes, fuzzyBikes, serial, anchor,
         }) => {
-          if (bikes.length === 0) return;
+          if (bikes.length === 0 && fuzzyBikes.length === 0) return;
           const id = anchor.slice(1);
           return (
             <div key={id} id={id} className="multiserial-results">
               <BikeList serial={serial} bikes={bikes} />
 
-              {fuzzySearching && fuzzyBikes
-                && (
+              {fuzzySearching && (
                 <BikeList
                   serial={serial}
                   bikes={fuzzyBikes}
                   fuzzySearching={fuzzySearching}
                 />
-                )
+              )
               }
             </div>
           );

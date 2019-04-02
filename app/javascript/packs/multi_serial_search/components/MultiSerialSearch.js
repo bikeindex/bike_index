@@ -33,7 +33,7 @@ const MultiSerialSearch = () => {
 
     try {
       /*
-        parallel request all serials
+        parallel request serials
       */
       const all = await Promise.all(
         uniqSerials.map(serial => fetchSerialResults(serial)),
@@ -43,6 +43,7 @@ const MultiSerialSearch = () => {
         return {
           bikes,
           serial,
+          fuzzyBikes: [],
           anchor: `#${encodeURI(serial)}`,
         };
       });
@@ -72,7 +73,7 @@ const MultiSerialSearch = () => {
 
     try {
       /*
-        parallel request fuzzy results and merge
+        parallel request fuzzy serials and merge
       */
       const fuzzyAll = await Promise.all(
         serialResults.map(({ serial }) => fetchFuzzyResults(serial)),
