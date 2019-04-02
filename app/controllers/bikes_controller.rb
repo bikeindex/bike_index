@@ -92,6 +92,8 @@ class BikesController < ApplicationController
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
     flash[:info] = "Oops! We couldn't find that registration, please re-enter the information here" if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= @b_param.bike_from_attrs(is_stolen: params[:stolen], recovered: params[:recovered])
+    # Fallback to active (i.e. passed organization_id), then current_organization
+    @bike.creation_organization ||= active_organization || current_organization
     @organization = @bike.creation_organization
     if @bike.stolen
       @stolen_record = @bike.stolen_records.build(@b_param.params['stolen_record'])

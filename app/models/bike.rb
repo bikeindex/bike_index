@@ -411,7 +411,7 @@ class Bike < ActiveRecord::Base
   end
 
   def organization_affiliation
-    b_params.map { |bp| bp.bike["organization_affiliation"] }.compact.join(", ")
+    b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
   end
 
   def frame_colors

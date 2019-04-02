@@ -322,6 +322,7 @@ describe BikesController do
       include_context :logged_in_as_user
       let(:manufacturer) { FactoryBot.create(:manufacturer) }
       let(:color) { FactoryBot.create(:color) }
+      let(:organization) { FactoryBot.create(:organization) }
       context 'passed stolen param' do
         it 'renders a new stolen bike' do
           get :new, stolen: true
@@ -334,6 +335,23 @@ describe BikesController do
           get :new, recovered: true
           expect(response.code).to eq('200')
           expect(assigns(:bike).recovered).to be_truthy
+        end
+      end
+      context "with organization id" do
+        it "renders and assigns creation organization" do
+          get :new, organization_id: organization.to_param
+          expect(response.code).to eq('200')
+          expect(assigns(:bike).creation_organization).to eq organization
+          expect(assigns[:current_organization]).to be_nil # Because the user isn't necessarily a member of an org
+        end
+      end
+      context "with organization member" do
+        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        it "renders and assigns creation_organization" do
+          get :new
+          expect(response.code).to eq('200')
+          expect(assigns(:bike).creation_organization).to eq organization
+          expect(assigns[:current_organization]).to eq organization
         end
       end
       context 'stolen from params' do
