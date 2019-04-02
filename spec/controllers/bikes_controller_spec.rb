@@ -763,6 +763,7 @@ describe BikesController do
                 b_param_id_token: b_param.id_token,
                 address: default_location[:address],
                 additional_registration: "XXXZZZ",
+                organization_affiliation: "employee",
                 phone: "888.777.6666"
               }
             end.to change(Bike, :count).by(1)
@@ -779,6 +780,7 @@ describe BikesController do
             expect(bike.creation_state.creator).to eq bike.creator
             expect(bike.registration_address).to eq target_address.as_json
             expect(bike.additional_registration).to eq "XXXZZZ"
+            expect(bike.organization_affiliation).to eq "employee"
             expect(bike.phone).to eq "888.777.6666"
             user.reload
             expect(bike.owner).to eq user # NOTE: not bike user

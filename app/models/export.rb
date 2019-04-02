@@ -25,6 +25,7 @@ class Export < ActiveRecord::Base
     { "headers" => default_headers }.merge(default_kind_options[kind.to_s])
   end
 
+  # This is what the methods on bike are named. why the fuck they need to be transposed, I don't remember
   def self.additional_registration_fields
     { reg_address: "registration_address", reg_secondary_serial: "additional_registration_number", reg_phone: "phone", reg_affiliation: "organization_affiliation" }
   end
