@@ -9,7 +9,7 @@
 .container
   - if current_user.present? && current_organization.present?
     - if current_user.authorized?(current_organization) # Authorize here, because otherwise we're displaying user data
-      = render partial: "organization_access_menu"
+      = render partial: "organized_access_panel"
     - else # If they aren't authorized, nix their current_organization
       - set_current_organization(current_user.default_organization) # maybe this breaks, but whatever, they're being creepers
   .row

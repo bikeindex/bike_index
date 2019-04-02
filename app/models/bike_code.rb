@@ -39,6 +39,7 @@ class BikeCode < ActiveRecord::Base
   end
 
   def self.lookup_with_fallback(str, organization_id: nil, user: nil)
+    return nil unless str.present?
     normalized_code = normalize_code(str)
     user_organization_ids = user&.memberships&.pluck(:organization_id) || []
     if user_organization_ids.any?
@@ -46,6 +47,8 @@ class BikeCode < ActiveRecord::Base
     end
     bike_code ||= lookup(normalized_code, organization_id: organization_id)
     bike_code ||= where(code: normalized_code).first
+    bike_code ||= where(organization_id: organization_id).where("code ILIKE ?", "%#{normalized_code}%").first
+    bike_code ||= where("code ILIKE ?", "%#{normalized_code}%").first
   end
 
   def self.admin_text_search(str)
@@ -88,10 +91,12 @@ class BikeCode < ActiveRecord::Base
   end
 
   def unclaimable_by?(user)
-    errors.none? && claimed? && organization.present? && user.member_of?(organization)
+    return false unless errors.none? && claimed?
+    organization.present? && user.member_of?(organization) || user.authorized?(bike)
   end
 
   def unclaim!
+    self.previous_bike_id = bike_id if bike_id.present?
     update(bike_id: nil, user_id: nil, claimed_at: nil)
   end
 
@@ -102,6 +107,7 @@ class BikeCode < ActiveRecord::Base
     if bike_str.blank? && claiming_bike.blank? && unclaimable_by?(user)
       unclaim!
     elsif claiming_bike.present?
+      self.previous_bike_id = bike_id || previous_bike_id # Don't erase previous_bike_id if double unclaiming
       update(bike_id: claiming_bike.id, user_id: user.id, claimed_at: Time.now) unless errors.any?
     else
       errors.add(:bike, "\"#{bike_str}\" not found")

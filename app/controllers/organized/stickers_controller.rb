@@ -2,6 +2,7 @@ module Organized
   class StickersController < Organized::BaseController
     before_action :ensure_access_to_bike_codes!, except: [:create] # Because this checks ensure_admin
     before_action :find_bike_code, only: [:edit, :update]
+    rescue_from ActionController::RedirectBackError, with: :redirect_back # Gross. TODO: Rails 5 update
 
     def index
       @page = params[:page] || 1
@@ -23,20 +24,24 @@ module Organized
           flash[:error] = @bike_code.errors.full_messages.to_sentence
         else
           flash[:success] = "#{@bike_code.kind.titleize} #{@bike_code.claimed? ? "claimed" : "unclaimed"}"
-          redirect_to organization_stickers_path(organization_id: active_organization.to_param) and return
         end
       end
-      redirect_to edit_organization_sticker_path(organization_id: active_organization.to_param, id: @bike_code.code)
+      redirect_to :back
     end
 
     private
 
+    def bike_code_code
+      params.dig(:bike_code, :code) || params[:id]
+    end
+
     def find_bike_code
-      @bike_code = bike_codes.lookup(params[:id])
-      unless @bike_code.present?
-        flash[:error] = "Unable to find that sticker"
-        redirect_to organization_stickers_path(organization_id: active_organization.to_param) and return
-      end
+      bike_code = BikeCode.lookup_with_fallback(bike_code_code, organization_id: active_organization.id, user: current_user)
+      # use the loosest lookup, but only permit it if the user can claim that
+      @bike_code = bike_code if bike_code.present? && bike_code.claimable_by?(current_user)
+      return @bike_code if @bike_code.present?
+      flash[:error] = "Unable to find sticker with code: #{bike_code_code}"
+      redirect_to organization_stickers_path(organization_id: active_organization.to_param) and return
     end
 
     def bike_codes
@@ -57,6 +62,12 @@ module Organized
       return true if active_organization.paid_for?("bike_codes") || current_user.superuser?
       flash[:error] = "Your organization doesn't have access to that, please contact Bike Index support"
       redirect_to organization_bikes_path(organization_id: active_organization.to_param) and return
+    end
+
+    def redirect_back
+      redirect_back_path = @bike_code.present? ? edit_organization_sticker_path(organization_id: active_organization.to_param, id: @bike_code.code) : organization_stickers_path(organization_id: params[:organization_id])
+      redirect_to redirect_back_path
+      return
     end
   end
 end
