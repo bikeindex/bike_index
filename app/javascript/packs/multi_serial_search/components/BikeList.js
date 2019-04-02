@@ -14,7 +14,7 @@ const BikeList = ({ bikes, serial, fuzzySearching }) => {
       </h3>
       <ul>
         {bikes.map(({
-          stolen, url, id, title,
+          stolen, url, id, title, serial
         }) => (
           <li key={id}>
             {stolen && <span className="stolen-color">Stolen</span>}
