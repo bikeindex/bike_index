@@ -749,14 +749,16 @@ describe BikesController do
           end
           include_context :geocoder_default_location
           let(:target_address) { { address: "278 Broadway", city: "New York", state: "NY", zipcode: "10007", country: "USA" } }
-          it 'creates a bike' do
-            b_param = BParam.create(params: { 'bike' => bike_params.as_json }, origin: 'embed_partial')
+          let(:b_param) { BParam.create(params: { 'bike' => bike_params.as_json }, origin: 'embed_partial') }
+          before do
             expect(b_param.partial_registration?).to be_truthy
             bb_data = { bike: {} }
             # We need to call clean_params on the BParam after bikebook update, so that
             # the foreign keys are assigned correctly. This is how we test that we're
             # This is also where we're testing bikebook assignment
             expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
+          end
+          it 'creates a bike' do
             expect do
               post :create, bike: {
                 manufacturer_id: manufacturer.slug,
@@ -785,6 +787,41 @@ describe BikesController do
             user.reload
             expect(bike.owner).to eq user # NOTE: not bike user
             expect(user.phone).to be_nil # Because the phone doesn't set for the creator
+          end
+          context "updated address" do
+            # Too many mistakes with the old method, so switching to some new shiz
+            let(:target_address) { { address: "212 Main St", city: "Chicago", state: "IL", zipcode: "60647" } }
+            it "creates the bike and does the updated address thing" do
+              expect do
+                post :create, bike: {
+                  manufacturer_id: manufacturer.slug,
+                  b_param_id_token: b_param.id_token,
+                  address: "212 Main St",
+                  address_city: "Chicago",
+                  address_state: "IL",
+                  address_zipcode: "60647",
+                  additional_registration: " ",
+                  organization_affiliation: "student",
+                  phone: "8887776666"
+                }
+              end.to change(Bike, :count).by(1)
+              expect(flash[:success]).to be_present
+              bike = Bike.last
+              b_param.reload
+              expect(b_param.created_bike_id).to eq bike.id
+              bike_params.delete(:manufacturer_id)
+              bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
+              expect(bike.manufacturer).to eq manufacturer
+              expect(bike.creation_state.origin).to eq 'embed_partial'
+              expect(bike.creation_state.creator).to eq bike.creator
+              expect(bike.registration_address).to eq target_address.as_json
+              expect(bike.additional_registration).to be_blank
+              expect(bike.organization_affiliation).to eq "student"
+              expect(bike.phone).to eq "8887776666"
+              user.reload
+              expect(bike.owner).to eq user # NOTE: not bike user
+              expect(user.phone).to be_nil # Because the phone doesn't set for the creator
+            end
           end
         end
         context 'created bike' do

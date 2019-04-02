@@ -85,6 +85,12 @@
       = f.label :address, label_address
       .controls
         = f.text_field :address, required: true
+      .controls.extra-field
+        = builder.text_field :address_city, placeholder: "City"
+      .controls.extra-field
+        = builder.text_field :address_zipcode, placeholder: "Zipcode"
+      #state-select.controls.extra-field.special-select-single
+        = builder.collection_select(:address_state, State.all, :id, :name, include_blank: true, prompt: "State" )
   - if @organization&.include_field_reg_phone?
     - label_phone = @organization.registration_field_label("reg_phone") || "Owner's phone"
     .input-group
