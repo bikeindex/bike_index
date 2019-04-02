@@ -1,30 +1,40 @@
-%p
-  ID:
-  = @b_param.id
-%p
-  Creator:
-  - if @b_param.creator.present?
-    = @b_param.creator.email
-  - else
-    No creator
-%p
-  Created:
-  = @b_param.created_at.strftime("%-I:%M %p on %-m/%-d/%Y")
-%p
-  Modified:
-  = @b_param.updated_at.strftime("%-I:%M %p on %-m/%-d/%Y")
+%table.table-list
+  %tbody
+    %tr
+      %td
+        ID
+      %td
+        = @b_param.id
+    %tr
+      %td
+        Creator
+      %td
+        -if @b_param.creator.present?
+          = @b_param.creator.email
+        -else
+          No Creator
+    %tr
+      %td
+        created_at
+      %td.convertTime
+        = l @b_param.created_at, format: :convert_time
+    %tr
+      %td
+        Modified at
+      %td.convertTime
+        = l @b_param.updated_at, format: :convert_time
 
 
 
 
-%h3.padded
+%h3.mt-4
   Bike
 %pre
   = @b_param.params.to_yaml
 
 
 
-%h3.padded
+%h3.mt-4
   Bike Errors
 
 %pre
