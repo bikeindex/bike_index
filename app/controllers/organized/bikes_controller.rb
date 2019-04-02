@@ -3,6 +3,7 @@ module Organized
     def index
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
+      @bike_code = BikeCode.lookup_with_fallback(params[:bike_code], organization_id: active_organization.id) if params[:bike_code].present?
       if active_organization.paid_for?("bike_search")
         search_organization_bikes
       else

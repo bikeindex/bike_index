@@ -10,7 +10,8 @@
         
     %ul.organized-mainmenu
       %li
-        = active_link "#{active_organization.short_name} Bikes", organization_bikes_path(organization_id: active_organization.to_param), class: "menu-item"
+        - on_bikes_path = controller_name == "bikes" && action_name == "index" # Because we want to ignore queries and stuff
+        = link_to "#{active_organization.short_name} Bikes", organization_bikes_path(organization_id: active_organization.to_param), match_controller: true, class: "menu-item #{on_bikes_path ? 'active' : ''}"
       %li
         = active_link "Add a bike", new_organization_bike_path(active_organization), class: "menu-item"
       %li

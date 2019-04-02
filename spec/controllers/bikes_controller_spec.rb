@@ -271,7 +271,7 @@ describe BikesController do
           get :scanned, id: "000#{bike_code2.code}", organization_id: organization.to_param
           expect(assigns(:bike_code)).to eq bike_code2
           expect(session[:current_organization_id]).to eq organization.id
-          expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, code: bike_code2.code)
+          expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_code: bike_code2.code)
         end
         context "passed a different organization id" do
           let!(:other_organization) { FactoryBot.create(:organization, short_name: "BikeIndex") }
@@ -281,7 +281,7 @@ describe BikesController do
             get :scanned, id: "000#{bike_code2.code}", organization_id: "BikeIndex"
             expect(assigns(:bike_code)).to eq bike_code2
             expect(session[:current_organization_id]).to eq organization.id
-            expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, code: bike_code2.code)
+            expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_code: bike_code2.code)
           end
         end
       end
