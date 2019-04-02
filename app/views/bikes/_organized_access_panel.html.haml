@@ -15,13 +15,13 @@
               %span.hidden-md-down
                 This #{@bike.type} is registered with #{current_organization.short_name}
               %span.hidden-lg-up
-                Registered with you
+                reged with #{current_organization.short_name}
           - else
             %p.text-warning.text-right
               %span.hidden-md-down
                 This #{@bike.type} is <em>not</em> registered with #{current_organization.short_name}
               %span.hidden-lg-up
-                <em>Not</em> reged with #{current_organization.short_name}
+                <em>not</em> reged with #{current_organization.short_name}
     .card-body
       .row
         - display_unstolen_notification_form = !@bike.stolen? && current_organization.paid_for?("unstolen_notifications")
@@ -151,10 +151,10 @@
 - if show_sticker_modal
   - sticker_modal_body = capture_haml do
     .modal-body
-      = form_for BikeCode.new, { url: organization_sticker_path(id: "code", organization_id: current_organization.to_param), action: "update" } do |f|
-        = f.hidden_field :bike_id
+      = form_for BikeCode.new, { url: organization_sticker_path(id: "code", organization_id: current_organization.to_param), action: "update", method: "PUT" } do |f|
+        = f.hidden_field :bike_id, value: @bike.id
         .form-group
-          = f.label :code  , "Sticker Code", class: "org-form-label"
+          = f.label :code, "Sticker Code", class: "org-form-label"
           = f.text_field :code, required: true, class: "form-control"
         .modal-btn-footer
           .form-submit-button
