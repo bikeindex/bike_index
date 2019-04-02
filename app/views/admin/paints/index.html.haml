@@ -38,7 +38,7 @@
         - @paints.each do |paint|
           %tr
             %td
-              %a.convertTime{ href: admin_paint_url(paint) }
+              %a.convertTime.preciseTime{ href: admin_paint_url(paint) }
                 = l paint.created_at, format: :convert_time
             %td
               - if paint.manufacturer_id.present?
