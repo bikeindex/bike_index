@@ -94,7 +94,7 @@ describe Organized::StickersController, type: :controller do
           put :update, id: bike_code.code, organization_id: organization.id, bike_code: { bike_id: "https://bikeindex.org/bikes/#{bike2.id} " }
           expect(assigns(:active_organization)).to eq organization
           expect(flash[:success]).to be_present
-          expect(response).to redirect_to edit_organization_sticker_path(organization_id: organization.to_param, id: bike_code.code)
+          expect(response).to redirect_to bike_path(bike2)
           bike_code.reload
           expect(bike_code.bike_id).to eq bike2.id
           expect(bike_code.previous_bike_id).to eq bike.id

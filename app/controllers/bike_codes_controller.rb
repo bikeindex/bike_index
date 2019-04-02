@@ -10,7 +10,10 @@ class BikeCodesController < ApplicationController
       if @bike_code.errors.any?
         flash[:error] = @bike_code.errors.full_messages.to_sentence
       else
-        flash[:success] = "#{@bike_code.kind.titleize} #{@bike_code.claimed? ? "claimed" : "unclaimed"}"
+        flash[:success] = "#{@bike_code.kind.titleize} #{@bike_code.code} - #{@bike_code.claimed? ? 'claimed' : 'unclaimed'}"
+        if @bike_code.bike.present?
+          redirect_to bike_path(@bike_code.bike_id) and return
+        end
       end
     end
     redirect_to :back
