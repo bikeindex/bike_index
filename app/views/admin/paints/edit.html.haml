@@ -12,7 +12,7 @@
         Otherwise future bikes posted with this paint won't be able to find this paint, and will recreate it.
 
 
-= form_for [:admin, @paint], html: { class: "form form-horizontal span6" } do |f|
+= form_for [:admin, @paint] do |f|
   - if @paint.errors.any?
     = render partial: "/shared/errors", locals: { name: "Paint", obj: @paint }
   .row
