@@ -1,6 +1,6 @@
 / If no url_for_search passed in, default to organization bike search
 - path_for_search ||= organization_bikes_path(organization_id: active_organization.to_param)
-- skip_view_just_stolen ||= false
+- skip_view_just_stolen ||= @bike_code.present?
 
 .mb-4
   = form_tag path_for_search, id: 'bikes_search_form', class: 'bikes-search-form', method: :get do

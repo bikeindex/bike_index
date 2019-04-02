@@ -39,7 +39,7 @@
               - if current_organization.paid_for?("bike_codes")
                 %li.divider-nav-item
                 %li
-                  = active_link "Registration stickers", organization_stickers_path(organization_id: current_organization.to_param), class: "nav-link"
+                  = active_link "Registration stickers", organization_stickers_path(organization_id: current_organization.to_param), match_controller: true, class: "nav-link"
                 - if current_organization.paid_for?("csv_exports")
                   %li
                     = active_link "Exports", organization_exports_path(organization_id: current_organization.to_param), match_controller: true, class: "nav-link"

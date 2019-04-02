@@ -270,22 +270,8 @@ describe BikesController do
         it "makes active_organization the organization" do
           get :scanned, id: "000#{bike_code2.code}", organization_id: organization.to_param
           expect(assigns(:bike_code)).to eq bike_code2
-          expect(response).to render_template(:scanned)
-          expect(response.code).to eq("200")
-          expect(assigns(:active_organization)).to eq organization
-          expect(assigns(:show_organization_bikes)).to be_truthy
           expect(session[:current_organization_id]).to eq organization.id
-        end
-        context "searching" do
-          it "renders the matching bikes" do
-            session[:current_organization_id] = organization.id
-            get :scanned, id: "000#{bike_code2.code}", organization_id: organization.to_param, query: "XCXCVXCV*DS"
-            expect(response).to render_template(:scanned)
-            expect(response.code).to eq("200")
-            expect(assigns(:bikes)).to eq([]) # Because nothing matches our query
-            expect(assigns(:active_organization)).to eq organization
-            expect(assigns(:show_organization_bikes)).to be_truthy
-          end
+          expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_code: bike_code2.code)
         end
         context "passed a different organization id" do
           let!(:other_organization) { FactoryBot.create(:organization, short_name: "BikeIndex") }
@@ -294,11 +280,8 @@ describe BikesController do
             expect(bike_code2.organization).to eq organization
             get :scanned, id: "000#{bike_code2.code}", organization_id: "BikeIndex"
             expect(assigns(:bike_code)).to eq bike_code2
-            expect(response).to render_template(:scanned)
-            expect(response.code).to eq("200")
-            expect(assigns(:active_organization)).to eq organization
-            expect(assigns(:show_organization_bikes)).to be_truthy
             expect(session[:current_organization_id]).to eq organization.id
+            expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_code: bike_code2.code)
           end
         end
       end

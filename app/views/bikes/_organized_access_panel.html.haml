@@ -1,3 +1,5 @@
+- show_sticker_modal = false
+
 .card.organized-access-panel
   .card-block
     .card-title
@@ -6,36 +8,49 @@
           %h3.header-font-alt
             %span.hidden-sm-down
               = current_organization.short_name
-            Access Menu
+            Access Panel
         .col-xs-6
           - if @bike.organized?(current_organization)
             %p.text-success.text-right
               %span.hidden-md-down
                 This #{@bike.type} is registered with #{current_organization.short_name}
               %span.hidden-lg-up
-                Registered with you
+                reged with #{current_organization.short_name}
           - else
             %p.text-warning.text-right
               %span.hidden-md-down
                 This #{@bike.type} is <em>not</em> registered with #{current_organization.short_name}
               %span.hidden-lg-up
-                <em>Not</em> reged with you
+                <em>not</em> reged with #{current_organization.short_name}
     .card-body
       .row
         - display_unstolen_notification_form = !@bike.stolen? && current_organization.paid_for?("unstolen_notifications")
-        - if @bike.organized?(current_organization)
-          - if @bike.authorized_by_organization?(org: current_organization)
-            .col-xs-12.mb-2
-              .text-right.less-strong
-                %em
-                  %span.hidden-md-down
-                    #{current_organization.short_name} registered this #{@bike.type} and it is
-                not claimed yet,
-                %em
-                  so you can
-                = link_to "Edit it", edit_bike_path(@bike), class: "btn btn-success btn-sm"
-          .mb-2{ class: display_unstolen_notification_form ? "col-md-7" : "col-sm-12" }
-            %ul.attr-list{ class: display_unstolen_notification_form ? "" : "split-sm" }
+        - if @bike.authorized_by_organization?(org: current_organization)
+          .col-xs-12.mb-2
+            .text-right.less-strong
+              %em
+                %span.hidden-md-down
+                  #{current_organization.short_name} registered this #{@bike.type} and it is
+              not claimed yet,
+              %em
+                so you can
+              = link_to "Edit it", edit_bike_path(@bike), class: "btn btn-success btn-sm"
+        .mb-2{ class: display_unstolen_notification_form ? "col-md-7" : "col-sm-12" }
+          %ul.attr-list{ class: display_unstolen_notification_form ? "" : "split-sm" }
+            - if current_organization.paid_for?("bike_codes") # Always display stickers if org has paid for them
+              %li
+                %span.attr-title
+                  Sticker:
+                - @bike.bike_codes.each do |bike_code|
+                  - if bike_code.organization.present?
+                    = link_to bike_code.code, edit_organization_sticker_path(id: bike_code.code, organization_id: bike_code.organization&.to_param)
+                  - else
+                    = bike_code.code
+                - if @bike.bike_codes.none?
+                  - show_sticker_modal = true
+                  %a{ href: "#", style: "opacity: 0.8; text-align: right;", data: { toggle: "modal", target: "#assignStickerModal" } }
+                    Link Sticker
+            - if @bike.organized?(current_organization) # Only display information about the bike if bike is registered through org
               = @bike.attr_list_item(@bike.user&.name, "Owner name", with_colon: true)
               = @bike.attr_list_item(@bike.owner_email, "Owner email", with_colon: true)
               %li
@@ -47,13 +62,6 @@
                 = @bike.creator&.display_name
                 %em.small.less-strong
                   = @bike.creation_description
-              - if current_organization.paid_for?("bike_codes")
-                %li
-                  %span.attr-title
-                    Sticker:
-                  - @bike.bike_codes.each do |bike_code|
-                    = link_to bike_code.code, edit_organization_sticker_path(id: bike_code.code, organization_id: bike_code.organization&.to_param)
-
               - current_organization.additional_registration_fields.each do |reg_field|
                 - bike_attr = Export.additional_registration_fields[reg_field.to_sym]
                 - if bike_attr == "registration_address"
@@ -81,12 +89,10 @@
                     - elsif reg_field == "reg_affiliation" # this doesn't have a reader from bike yet :(
                       &nbsp;
 
-
-        - else
-          %div{ class: display_unstolen_notification_form ? "col-md-7" : "col-sm-12" }
-            %p.less-strong
+          - if !@bike.organized?(current_organization) # Apologize, bike isn't organizations
+            %p.less-strong.mt-4
               %em
-                Unable to display additional information because bicycle is not registered with #{current_organization.name}
+                Unable to display additional information because #{@bike.type} is not registered with #{current_organization.name}
         - if display_unstolen_notification_form
           .col-md-5.unstolen-notification-box
             %p
@@ -116,6 +122,7 @@
       %span
         Send
       - current_organization.message_kinds.each do |kind|
+        / %a.btn.btn-secondary.openMessageModal{ target: "#organizationMessageModal", "data-kind" => kind, "data-toggle" => "modal" }
         %a.btn.btn-secondary.openMessageModal{ "data-kind" => kind }
           - if kind == "geolocated_messages"
             GeoMessage
@@ -141,3 +148,16 @@
 
   = render partial: "/shared/modal", locals: { title: "Message #{@bike.type} owner", modal_body: modal_body, id: "organizationMessageModal" }
 
+- if show_sticker_modal
+  - sticker_modal_body = capture_haml do
+    .modal-body
+      = form_for BikeCode.new, { url: organization_sticker_path(id: "code", organization_id: current_organization.to_param), action: "update", method: "PUT" } do |f|
+        = f.hidden_field :bike_id, value: @bike.id
+        .form-group
+          = f.label :code, "Sticker Code", class: "org-form-label"
+          = f.text_field :code, required: true, class: "form-control"
+        .modal-btn-footer
+          .form-submit-button
+            = f.submit "Assign sticker", class: "btn btn-success btn-lg"
+
+  = render partial: "/shared/modal", locals: { title: "Assign sticker", modal_body: sticker_modal_body, id: "assignStickerModal" }
