@@ -84,7 +84,7 @@
                 %li
                   = active_link "#{current_user_or_unconfirmed_user.email} settings", my_account_path, class: 'nav-link'
                 %li
-                  = link_to 'Logout', session_path, method: :delete, class: 'nav-link'
+                  = link_to 'Logout', goodbye_path, class: 'nav-link'
                 - memberships = current_user_or_unconfirmed_user.memberships.includes(:organization)
                 - if memberships.any?
                   %li.divider-nav-item
