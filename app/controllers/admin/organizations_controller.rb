@@ -1,6 +1,7 @@
 class Admin::OrganizationsController < Admin::BaseController
   before_filter :find_organization, only: [:show, :edit, :update, :destroy]
   before_filter :set_sort_and_direction, only: [:index]
+  layout 'new_admin'
 
   def index
     page = params[:page] || 1
