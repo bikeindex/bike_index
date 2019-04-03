@@ -6,7 +6,7 @@
     = link_to "Resend", resend_admin_stolen_notification_url(@stolen_notification, pretty_please: true), class: 'btn btn-success mt-4 mb-4'
 %h4
   Created
-  %a.convertTime{ href: admin_stolen_notification_url(@stolen_notification) }
+  %a.convertTime.preciseTime{ href: admin_stolen_notification_url(@stolen_notification) }
     = l @stolen_notification.created_at, format: :convert_time
 %table.table-list
   %tbody
