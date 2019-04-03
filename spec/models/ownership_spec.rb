@@ -60,19 +60,19 @@ describe Ownership do
     end
   end
 
-  describe 'can_be_claimed_by' do
+  describe 'claimable_by?' do
     let(:user) { FactoryBot.create(:user_confirmed) }
     it 'true if user email matches' do
       ownership = Ownership.new(owner_email: " #{user.email.upcase}")
-      expect(ownership.can_be_claimed_by(user)).to be_truthy
+      expect(ownership.claimable_by?(user)).to be_truthy
     end
     it 'true if user matches' do
       ownership = Ownership.new(user_id: user.id)
-      expect(ownership.can_be_claimed_by(user)).to be_truthy
+      expect(ownership.claimable_by?(user)).to be_truthy
     end
     it "false if it can't be claimed by user" do
       ownership = Ownership.new(owner_email: "fake#{user.email.titleize}")
-      expect(ownership.can_be_claimed_by(user)).to be_falsey
+      expect(ownership.claimable_by?(user)).to be_falsey
     end
   end
 end

@@ -10,7 +10,7 @@ class AfterBikeSaveWorker
   def perform(bike_id)
     bike = Bike.unscoped.where(id: bike_id).first
     return true unless bike.present?
-    load_external_images(bike)
+    bike.load_external_images
     update_matching_partial_registrations(bike)
     DuplicateBikeFinderWorker.perform_async(bike_id)
     if bike.present? && bike.listing_order != bike.get_listing_order
@@ -18,13 +18,6 @@ class AfterBikeSaveWorker
     end
     return true unless bike.stolen # For now, only hooking on stolen bikes
     post_bike_to_webhook(serialized(bike))
-  end
-
-  def load_external_images(bike)
-    bike.external_image_urls.each do |url|
-      next if bike.public_images.where(external_image_url: url).present?
-      bike.public_images.create(external_image_url: url)
-    end
   end
 
   def post_bike_to_webhook(post_body)

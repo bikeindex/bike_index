@@ -173,13 +173,13 @@ describe Bike do
     end
   end
 
-  describe 'can_be_claimed_by' do
+  describe 'claimable_by?' do
     context 'already claimed' do
       it 'returns false' do
         user = User.new
         bike = Bike.new
         allow(bike).to receive(:user?).and_return(true)
-        expect(bike.can_be_claimed_by(user)).to be_falsey
+        expect(bike.claimable_by?(user)).to be_falsey
       end
     end
     context 'can be claimed' do
@@ -190,14 +190,14 @@ describe Bike do
         allow(bike).to receive(:current_ownership).and_return(ownership)
         allow(ownership).to receive(:user).and_return(user)
         allow(bike).to receive(:user?).and_return(false)
-        expect(bike.can_be_claimed_by(user)).to be_truthy
+        expect(bike.claimable_by?(user)).to be_truthy
       end
     end
     context 'no current_ownership' do # AKA Something is broken. Bikes should always have ownerships
       it 'does not explode' do
         user = User.new
         bike = Bike.new
-        expect(bike.can_be_claimed_by(user)).to be_falsey
+        expect(bike.claimable_by?(user)).to be_falsey
       end
     end
   end
@@ -247,7 +247,7 @@ describe Bike do
           expect(bike.authorize_for_user!(user)).to be_truthy
         end
       end
-      context "can_be_claimed_by" do
+      context "claimable_by?" do
         let(:ownership) { FactoryBot.create(:ownership, user: user) }
         it "marks claimed and returns true" do
           expect(ownership.claimed?).to be_falsey

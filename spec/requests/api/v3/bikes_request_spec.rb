@@ -337,7 +337,6 @@ describe 'Bikes API V3' do
     it "fails to update bike if required stolen attrs aren't present" do
       FactoryBot.create(:country, iso: 'US')
       expect(bike.year).to be_nil
-      serial = bike.serial_number
       params[:stolen_record] = {
         phone: '',
         city: 'Chicago'
@@ -450,6 +449,34 @@ describe 'Bikes API V3' do
       expect(bike.reload.current_ownership.claimed).to be_truthy
       expect(bike.owner).to eq(user)
       expect(bike.year).to eq(params[:year])
+    end
+
+    context "organization bike" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:params) { { year: 1999, external_image_urls: ["https://files.bikeindex.org/email_assets/logo.png"] } }
+      let(:bike) { ownership.bike }
+      let!(:token) { create_doorkeeper_token(scopes: "read_user read_bikes write_bikes") }
+      it "permits updating" do
+        bike.reload
+        expect(bike.public_images.count).to eq 0
+        expect(bike.owner).to_not eq(user)
+        expect(bike.authorized_by_organization?(u: user)).to be_truthy
+        expect(bike.authorize_for_user(user)).to be_truthy
+        expect(bike.claimed?).to be_falsey
+        expect(bike.current_ownership.claimed?).to be_falsey
+        put url, params.to_json, json_headers
+        expect(response.code).to eq("200")
+        expect(response.headers["Content-Type"].match("json")).to be_present
+        bike.reload
+        expect(bike.claimed?).to be_falsey
+        expect(bike.authorized_by_organization?(u: user)).to be_truthy
+        expect(bike.reload.owner).to_not eq user
+        expect(bike.year).to eq params[:year]
+        expect(bike.external_image_urls).to eq([]) # Because we haven't created another bparam - this could change though
+        expect(bike.public_images.count).to eq 1
+      end
     end
   end
 
