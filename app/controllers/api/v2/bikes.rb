@@ -21,6 +21,7 @@ module API
           optional :no_notify, type: Boolean, desc: "On create or ownership change, don't notify the new owner."
           optional :is_for_sale, type: Boolean
           optional :frame_material, type: String, values: Bike.frame_materials.keys, desc: "Frame material type"
+          optional :external_image_urls, type: Array, desc: "Image urls to include with registration, if images are already on the internet"
           
           optional :stolen_record, type: Hash do
             optional :phone, type: String, desc: "Owner's phone number, **required to create stolen**"

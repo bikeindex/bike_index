@@ -147,6 +147,8 @@ class BParam < ActiveRecord::Base
 
   def organization_affiliation; bike["organization_affiliation"] end
 
+  def external_image_urls; bike["external_image_urls"] || [] end
+
   def address(field); key = field[/\Aaddress/].present? ? bike[field] : bike["address_#{field}"] end
 
   # For revised form. If there aren't errors and there is an email, then we don't need to show

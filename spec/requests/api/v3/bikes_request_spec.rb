@@ -74,7 +74,7 @@ describe 'Bikes API V3' do
       end
     end
 
-    it 'creates a non example bike, with components' do
+    it "creates a non example bike, with components and " do
       manufacturer = FactoryBot.create(:manufacturer)
       FactoryBot.create(:ctype, name: 'wheel')
       FactoryBot.create(:ctype, name: 'Headset')
@@ -101,7 +101,8 @@ describe 'Bikes API V3' do
                         is_for_sale: true,
                         is_bulk: true,
                         is_new: true,
-                        is_pos: true, 
+                        is_pos: true,
+                        external_image_urls: ["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"],
                         description: "<svg/onload=alert(document.cookie)>")
       expect do
         post "/api/v3/bikes?access_token=#{token.token}",
@@ -121,6 +122,7 @@ describe 'Bikes API V3' do
       expect(bike.components.pluck(:ctype_id).uniq.count).to eq(2)
       expect(bike.front_gear_type).to eq(front_gear_type)
       expect(bike.handlebar_type).to eq(handlebar_type_slug)
+      expect(bike.external_image_urls).to eq(["https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"])
       creation_state = bike.creation_state
       expect([creation_state.is_pos, creation_state.is_new, creation_state.is_bulk]).to eq([true, true, true])
       # expect(creation_state.origin).to eq 'api_v3'

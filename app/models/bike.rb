@@ -59,7 +59,7 @@ class Bike < ActiveRecord::Base
     :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
     :b_param_id_token, :address, :address_city, :address_state, :address_zipcode
 
-  attr_writer :phone, :user_name, :organization_affiliation # reading is managed by a method
+  attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
 
   enum frame_material: FrameMaterial::SLUGS
   enum handlebar_type: HandlebarType::SLUGS
@@ -79,12 +79,7 @@ class Bike < ActiveRecord::Base
   # so that it no longer is the same word as stolen recoveries
   scope :non_recovered, -> { where(recovered: false) }
 
-  before_save :clean_frame_size
-  before_save :set_mnfg_name
-  before_save :set_user_hidden
-  before_save :normalize_attributes
-  before_save :set_paints
-  before_save :cache_bike
+  before_save :set_calculated_attributes
 
   include PgSearch
   pg_search_scope :pg_search, against: {
@@ -150,9 +145,8 @@ class Bike < ActiveRecord::Base
 
   def get_listing_order
     return current_stolen_record.date_stolen.to_time.to_i.abs if stolen && current_stolen_record.present?
-    t = updated_at.to_time.to_i/10000
-    t = t/100 unless stock_photo_url.present? or public_images.present?
-    t
+    t = (updated_at || Time.now).to_i/10000
+    stock_photo_url.present? || public_images.present? ? t : t/100
   end
 
   def current_ownership; ownerships.reorder(:created_at).last end
@@ -414,6 +408,10 @@ class Bike < ActiveRecord::Base
     b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
   end
 
+  def external_image_urls
+    b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
+  end
+
   def frame_colors
     [
       primary_frame_color && primary_frame_color.name,
@@ -428,6 +426,16 @@ class Bike < ActiveRecord::Base
 
   def cache_photo
     self.thumb_path = public_images && public_images.first && public_images.first.image_url(:small)
+  end
+
+  def set_calculated_attributes
+    self.listing_order = get_listing_order
+    clean_frame_size
+    set_mnfg_name
+    set_user_hidden
+    normalize_attributes
+    set_paints
+    cache_bike
   end
 
   def components_cache_string

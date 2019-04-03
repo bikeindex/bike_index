@@ -226,6 +226,7 @@ describe BParam do
         bike: {
           serial_number: "zzz",
           organization_affiliation: "employee",
+          external_image_urls: ["xxxxx"],
           bike_code: "xxxx",
           phone: "919929333",
           address: "123 Main St",
@@ -245,7 +246,8 @@ describe BParam do
       expect(b_param.address("address")).to eq "123 Main St"
       expect(b_param.address("city")).to eq "Nevernever Land"
       expect(b_param.address("address_zipcode")).to eq "11111"
-      expect(b_param.address("state")).to eq "CA" 
+      expect(b_param.address("state")).to eq "CA"
+      expect(b_param.external_image_urls).to eq(["xxxxx"])
     end
   end
 
