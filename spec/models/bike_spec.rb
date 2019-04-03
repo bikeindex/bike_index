@@ -151,11 +151,6 @@ describe Bike do
       expect(bike.frame_size).to eq('m')
       expect(bike.frame_size_unit).to eq('ordinal')
     end
-
-    it 'has before_save_callback_method defined for clean_frame_size' do
-      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }
-        .map(&:raw_filter).include?(:clean_frame_size)).to eq(true)
-    end
   end
 
   describe 'user?' do
@@ -465,10 +460,6 @@ describe Bike do
       expect(bike.hidden).to be_truthy
       expect(ownership.reload.user_hidden).to be_truthy
     end
-
-    it 'has before_save_callback_method defined for set_user_hidden' do
-      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_user_hidden)).to eq(true)
-    end
   end
 
   describe 'find_current_stolen_record' do
@@ -566,9 +557,6 @@ describe Bike do
       bike.set_mnfg_name
       expect(bike.mnfg_name).to eq("stuff")
     end
-    it 'has before_save_callback_method defined for set_mnfg_name' do
-      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_mnfg_name)).to eq(true)
-    end
   end
 
   describe 'set_normalized_attributes' do
@@ -583,9 +571,6 @@ describe Bike do
       bike = Bike.new(owner_email: '  somethinG@foo.orG')
       bike.normalize_attributes
       expect(bike.owner_email).to eq('something@foo.org')
-    end
-    it 'has before_save_callback_method defined' do
-      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:normalize_attributes)).to eq(true)
     end
 
     context 'confirmed secondary email' do
@@ -763,9 +748,9 @@ describe Bike do
     end
     it 'removes paint id if paint_name is nil' do
       paint = FactoryBot.create(:paint)
-      bike = Bike.new(paint_id: paint.id)
+      bike = FactoryBot.build(:bike, paint_id: paint.id)
       bike.paint_name = ''
-      bike.set_paints
+      bike.save
       expect(bike.paint).to be_nil
     end
     it 'sets the paint if it exists' do
@@ -780,9 +765,6 @@ describe Bike do
       bike.paint_name = ['Food Time SOOON']
       expect { bike.set_paints }.to change(Paint, :count).by(1)
       expect(bike.paint.name).to eq('food time sooon')
-    end
-    it 'has before_save_callback_method defined as a before_save callback' do
-      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_paints)).to eq(true)
     end
   end
 
@@ -864,9 +846,6 @@ describe Bike do
       expect(bike.cached_data).to eq("#{bike.mnfg_name} Sail 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material_name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle")
       expect(bike.current_stolen_record_id).to eq(stolen_record.id)
     end
-    it 'has before_save_callback_method defined as a before_save callback' do
-      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:cache_bike)).to eq(true)
-    end
   end
 
   describe 'frame_colors' do
@@ -900,10 +879,8 @@ describe Bike do
   describe 'get_listing_order' do
     it 'is 1/1000 of the current timestamp' do
       bike = Bike.new
-      time = Time.now
-      allow(bike).to receive(:updated_at).and_return(time)
-      lo = bike.get_listing_order
-      expect(lo).to eq(time.to_time.to_i / 1000000)
+      pp Time.now.to_i / 1000000
+      expect(bike.get_listing_order).to eq(Time.now.to_i / 1000000)
     end
 
     it 'is the current stolen record date stolen * 1000' do

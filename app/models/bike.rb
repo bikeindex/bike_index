@@ -80,12 +80,6 @@ class Bike < ActiveRecord::Base
   scope :non_recovered, -> { where(recovered: false) }
 
   before_save :set_calculated_attributes
-  before_save :clean_frame_size
-  before_save :set_mnfg_name
-  before_save :set_user_hidden
-  before_save :normalize_attributes
-  before_save :set_paints
-  before_save :cache_bike
 
   include PgSearch
   pg_search_scope :pg_search, against: {
@@ -432,6 +426,12 @@ class Bike < ActiveRecord::Base
 
   def set_calculated_attributes
     self.listing_order = get_listing_order
+    clean_frame_size
+    set_mnfg_name
+    set_user_hidden
+    normalize_attributes
+    set_paints
+    cache_bike
   end
 
   def components_cache_string
