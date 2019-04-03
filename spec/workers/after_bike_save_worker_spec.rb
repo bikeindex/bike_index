@@ -43,11 +43,12 @@ describe AfterBikeSaveWorker do
 
   describe "download external_image_urls" do
     let(:external_image_urls) { ["https://files.bikeindex.org/email_assets/logo.png", "https://files.bikeindex.org/email_assets/logo.png", "https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"] }
+    let(:passed_external_image_urls) { external_image_urls }
     let(:bike) { FactoryBot.create(:bike) }
     let!(:b_param) do
       FactoryBot.create(:b_param,
                         created_bike_id: bike.id,
-                        params: { bike: { owner_email: bike.owner_email, external_image_urls: external_image_urls } }) 
+                        params: { bike: { owner_email: bike.owner_email, external_image_urls: passed_external_image_urls } }) 
     end
     it "creates and downloads the images" do
       expect do
@@ -61,9 +62,12 @@ describe AfterBikeSaveWorker do
       # TODO: Rails 5 update - after commit doesn't run :( - uncomment when upgraded
       # expect(ExternalImageUrlStoreWorker.jobs.count).to eq 2
     end
-    context "images already exist" do
+    context "images already exist, passed some blank values" do
+      let(:passed_external_image_urls) { external_image_urls + [nil, ""] }
       it "doesn't create new images" do
         external_image_urls.uniq.each { |url| bike.public_images.create(external_image_url: url) }
+        bike.reload
+        expect(bike.external_image_urls).to eq external_image_urls.uniq
         expect do
           instance.perform(bike.id)
         end.to_not change(PublicImage, :count)
