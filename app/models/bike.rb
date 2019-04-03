@@ -409,12 +409,11 @@ class Bike < ActiveRecord::Base
   end
 
   def external_image_urls
-    @external_image_urls ||= b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
+    b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
   end
 
-  # external_image_urls is overridden and written in api/v2/bikes updating action, so this method can be called there
-  def load_external_images
-    external_image_urls.reject(&:blank?).each do |url|
+  def load_external_images(urls = nil)
+    (urls || external_image_urls).reject(&:blank?).each do |url|
       next if public_images.where(external_image_url: url).present?
       public_images.create(external_image_url: url)
     end
