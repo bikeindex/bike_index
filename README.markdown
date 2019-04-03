@@ -96,10 +96,13 @@ Keep track of development and community news.
 
 ## Contributing
 
-Open a Pull request! The earlier you open the pull request, the earlier it's possible to discuss the direction of the changes.
+Open a Pull request!
+
+Don't wait until you have a finished feature before before opening the PR, unfinished pull requests are welcome! The earlier you open the pull request, the earlier it's possible to discuss the direction of the changes.
+
+Once the PR is ready for review, request review from the relevant person.
 
 If your pull request contains Ruby patches or features, you must include relevant rspec tests.
-
 
 
 ... and go hard
