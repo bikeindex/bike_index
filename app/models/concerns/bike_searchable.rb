@@ -23,9 +23,8 @@ module BikeSearchable
       bike_service = BikeSearchableService.new(interpreted_params).selected_query_items_options
     end
 
-    private
-      def permitted_search_params
-        [:query, :manufacturer, :location, :distance, :serial, :stolenness, :query_items => [], :colors => []]
-      end
+    def permitted_search_params
+      [:query, :manufacturer, :location, :distance, :serial, :stolenness, :query_items => [], :colors => []]
+    end
   end
 end

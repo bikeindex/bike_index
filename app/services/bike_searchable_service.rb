@@ -1,43 +1,49 @@
 class BikeSearchableService
-  attr_accessor :params
+  attr_accessor :params, :records
 
   SERIAL_NORMALIZED_COUNT = 3
 
   def initialize(params)
     @params = params
+    @records = Bike.joins(:manufacturer)
   end
 
   def interpreted_params(ip)
     filtered_params = {}
 
-    filtered_params.merge(items_query)
-    filtered_params.merge(items_manufacturer)
-    filtered_params.merge(items_colors)
-    filtered_params.merge(searchable_query_stolenness(ip))
+    filtered_params = filtered_params.merge(items_query)
+                                     .merge(items_manufacturer)
+                                     .merge(items_colors)
+                                     .merge(searchable_query_stolenness(ip))
 
     filtered_params
   end
 
   def search
-    search_matching_serial.non_serial_matches
+    search_matching_serial
+    non_serial_matches
   end
 
   def close_serials
-    return nil unless params[:serial]
+    return nil if params[:serial].blank?
 
-    where.not(id: search.pluck(:id))
-      .non_serial_matches
-      .search_matching_close_serials(params[:serial])
+    records = Bike.where.not(id: search) if params[:serial].present?
+
+    records = non_serial_matches if params[:serial].blank?
+
+    records = search_matching_close_serials(params[:serial]) if records.present?
+
+    records
   end
 
   def selected_query_items_options
     items = []
 
     items += [params[:query]] if params[:query].present?
-    items += Manufacturer.friendly_find([params[:manufacturer]].flatten)
-              .map(&:autocomplete_result_hash) if params[:manufacturer]
-    items += Color.friendly_find(params[:colors])
-              .map(&:autocomplete_result_hash) if params[:colors]
+    items += [params[:manufacturer]].flatten.map { |id| Manufacturer.friendly_find(id) }
+             .compact.map(&:autocomplete_result_hash) if params[:manufacturer]
+    items += params[:colors].map { |id| Color.friendly_find(id) }
+             .compact.map(&:autocomplete_result_hash) if params[:colors]
 
     items.flatten.compact
   end
@@ -54,11 +60,13 @@ class BikeSearchableService
       manufacturer_ids = extracted_query_items_manufacturer_id
 
       if manufacturer_ids && !manufacturer_ids.is_a?(Integer)
-        manufacturer_ids = [manufacturer_ids].flatten.select { |id| id.is_a?(Integer) || id.strip =~ /\A\d*\z/ }
+        manufacturer_record_ids = [manufacturer_ids].flatten.map do |m_id|
+          next m_id.to_i if m_id.is_a?(Integer) || m_id.strip =~ /\A\d*\z/
 
-        manufacturer_record_ids = Manufacturer.friendly_id_find(manufacturer_ids)
+          Manufacturer.friendly_id_find(m_id)
+        end.compact
 
-        manufacturer_record_ids = manufacturer_record_ids.first if manufacturer_record_ids.length == 1
+        manufacturer_record_ids = manufacturer_record_ids.first if manufacturer_record_ids&.length == 1
       end
 
       manufacturer_record_ids ? { manufacturer: manufacturer_record_ids } : {}
@@ -68,12 +76,13 @@ class BikeSearchableService
       color_ids = extracted_query_items_color_ids
 
       if color_ids && !color_ids.is_a?(Integer)
-        color_ids = color_ids.select { |id| id.is_a?(Integer) || id.strip =~ /\A\d*\z/ }
-
-        color_record_ids = Color.friendly_id_find(color_ids)
+        color_ids = color_ids.map do |c_id|
+          next c_id.to_i if c_id.is_a?(Integer) || c_id.strip =~ /\A\d*\z/
+          Color.friendly_id_find(c_id)
+        end
       end
 
-      color_record_ids ? { colors: color_record_ids } : {}
+      color_ids ? { colors: color_ids } : {}
     end
 
     def searchable_query_stolenness(ip)
@@ -125,23 +134,26 @@ class BikeSearchableService
     end
 
     def search_matching_serial
-      return all_records unless params[:serial]
+      return all_records if params[:serial].blank?
 
-      Bike.where('serial_normalized @@ ?', params[:serial])
+      records = Bike.where('serial_normalized @@ ?', params[:serial])
+
+      records
     end
 
     def non_serial_matches
-      # We can refactor this further if I would know the complete flow and requirements of these constraints
       records = search_matching_color_ids
-        .search_matching_stolenness
-        .search_matching_query(params[:query])
-        .where(params[:manufacturer] ? { manufacturer_id: params[:manufacturer] } : {})
+      records = search_matching_stolenness if records.present? && params[:stolenness].present?
+      records = search_matching_query if records.present? && params[:query].present?
+      records = records.where(params[:manufacturer] ? { manufacturer_id: params[:manufacturer] } : {}) if records.present?
+
+      records
     end
 
     def search_matching_color_ids
-      return all_records unless params[:colors]
+      return all_records if params[:colors].blank?
 
-      where('primary_frame_color_id = ANY(ARRAY[:colour_ids]) OR secondary_frame_color_id = ANY(ARRAY[:colour_ids]) OR tertiary_frame_color_id = ANY(ARRAY[:colour_ids])', { colour_ids: params[:colors] })
+      records.where('primary_frame_color_id = ANY(ARRAY[:colour_ids]) OR secondary_frame_color_id = ANY(ARRAY[:colour_ids]) OR tertiary_frame_color_id = ANY(ARRAY[:colour_ids])', { colour_ids: params[:colors] })
     end
 
     def search_matching_stolenness
@@ -149,20 +161,20 @@ class BikeSearchableService
         when 'all'
           all_records
         when 'non'
-          where(stolen: false)
+          records.where(stolen: false)
         when 'proximity'
-          where(stolen: true).within_bounding_box(params[:bounding_box])
+          records.where(stolen: true).within_bounding_box(params[:bounding_box])
         else
-          where(stolen: true)
+          records.where(stolen: true)
       end
     end
 
-    def search_matching_query(query)
-      query && pg_search(query) || all_records
+    def search_matching_query
+      params[:query] && records.pg_search(params[:query]) || records
     end
 
     def search_matching_close_serials(serial)
-      where('LEVENSHTEIN(serial_normalized, ?) < ?', serial, SERIAL_NORMALIZED_COUNT)
+      records.where('LEVENSHTEIN(serial_normalized, ?) < ?', serial, SERIAL_NORMALIZED_COUNT)
     end
 
     def all_records
