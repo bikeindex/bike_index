@@ -12,10 +12,9 @@
   %tbody
     %tr
       %td
-        Name
+        Bike
       %td
-        %a{href: edit_admin_stolen_bike_url(@bike)}
-          =@bike.title_string
+        = link_to @bike.title_string, edit_admin_stolen_bike_url(@bike)
     %tr
       %td
         Receiver Name
@@ -38,7 +37,7 @@
         %td
           Times:
         %td
-          %ul
+          %ul.pl-0
             - @stolen_notification.send_dates_parsed.each do |stamp|
               %li.list-unstyled
                 %a.convertTime.preciseTime{ href: admin_stolen_notification_url(stamp) }
