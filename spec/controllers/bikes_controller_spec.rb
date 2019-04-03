@@ -1213,6 +1213,25 @@ describe BikesController do
         expect(bike.bike_organization_ids).to eq([organization.id, organization_2.id])
       end
     end
+    context "organized bike, member present" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:bike) { ownership.bike }
+      before { set_current_user(user) }
+      it "updates the bike" do
+        bike.reload
+        expect(bike.owner).to_not eq(user)
+        expect(bike.authorized_by_organization?(u: user)).to be_truthy
+        put :update, id: bike.id, bike: { description: "new description", handlebar_type: "forward" }
+        expect(response).to redirect_to edit_bike_url(bike)
+        expect(assigns(:bike)).to be_decorated
+        bike.reload
+        expect(bike.hidden).to be_falsey
+        expect(bike.description).to eq "new description"
+        expect(bike.handlebar_type).to eq "forward"
+      end
+    end
   end
 
   describe 'show with recovery token present' do
