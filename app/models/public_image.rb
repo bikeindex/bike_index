@@ -7,7 +7,7 @@ class PublicImage < ActiveRecord::Base
   scope :bikes, -> { where(imageable_type: 'Bike') }
 
   before_save :set_calculated_attributes
-  after_commit :update_bike_listing_order
+  after_commit :enqueue_after_commit_jobs
 
   def default_name
     if imageable_type == "Bike"
@@ -23,7 +23,7 @@ class PublicImage < ActiveRecord::Base
     self.listing_order = imageable&.public_images&.length || 0 
   end
 
-  def update_bike_listing_order
+  def enqueue_after_commit_jobs
     if external_image_url.present? && image.blank?
       return ExternalImageUrlStoreWorker.perform_async(id)
     end

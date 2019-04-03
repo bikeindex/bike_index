@@ -36,12 +36,12 @@ describe PublicImage do
     end
   end
 
-  describe 'update_bike_listing_order' do
+  describe 'enqueue_after_commit_jobs' do
     context 'non-bike' do
       let(:public_image) { PublicImage.new(imageable_type: 'Blog', imageable_id: 12) }
       it 'does not enqueue after_bike_save_worker' do
         expect do
-          public_image.update_bike_listing_order
+          public_image.enqueue_after_commit_jobs
         end.to change(AfterBikeSaveWorker.jobs, :size).by(0)
       end
     end
@@ -50,36 +50,32 @@ describe PublicImage do
       it 'enqueues after_bike_save_worker' do
         expect do
           expect do
-            public_image.update_bike_listing_order
+            public_image.enqueue_after_commit_jobs
           end.to change(AfterBikeSaveWorker.jobs, :size).by(1)
         end.to_not change(ExternalImageUrlStoreWorker.jobs, :size)
       end
     end
-  end
-
-  describe "assign remote image urls" do
-    let(:bike) { FactoryBot.create(:bike) }
-    let(:public_image) { PublicImage.new(imageable: bike, external_image_url: "http://example.com/image.png") }
-    it "enqueues, not after_bike_save_worker" do
-      # TODO: Rails 5 update - after commit doesn't run :(
-      expect(public_image.save).to be_truthy
-      expect do
-        public_image.update_bike_listing_order
-      end.to change(ExternalImageUrlStoreWorker.jobs, :size).by(1)
-    end
-    context "image present" do
-      let(:public_image) { PublicImage.new(imageable: bike, external_image_url: "http://example.com/image.png", image: File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))) }
-      it "enqueues after_bike_save_worker" do
+    context "remote_image_url" do
+      let(:bike) { FactoryBot.create(:bike) }
+      let(:public_image) { PublicImage.new(imageable: bike, external_image_url: "http://example.com/image.png") }
+      it "enqueues, not after_bike_save_worker" do
         # TODO: Rails 5 update - after commit doesn't run :(
         expect(public_image.save).to be_truthy
         expect do
-          public_image.update_bike_listing_order
+          public_image.enqueue_after_commit_jobs
         end.to change(ExternalImageUrlStoreWorker.jobs, :size).by(1)
-        expect do
+      end
+      context "image present" do
+        let(:public_image) { PublicImage.new(imageable: bike, external_image_url: "http://example.com/image.png", image: File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))) }
+        it "enqueues after_bike_save_worker" do
+          # TODO: Rails 5 update - after commit doesn't run :(
+          expect(public_image.save).to be_truthy
           expect do
-            public_image.save
-          end.to change(AfterBikeSaveWorker.jobs, :size).by(1)
-        end.to_not change(ExternalImageUrlStoreWorker.jobs, :size)
+            expect do
+              public_image.enqueue_after_commit_jobs
+            end.to change(AfterBikeSaveWorker.jobs, :size).by(1)
+          end.to_not change(ExternalImageUrlStoreWorker.jobs, :size)
+        end
       end
     end
   end
