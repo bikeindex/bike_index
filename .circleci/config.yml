@@ -2,7 +2,7 @@ version: 2
 jobs:
   build:
     working_directory: ~/bikeindex/bike_index
-    parallelism: 4
+    parallelism: 5
     shell: /bin/bash --login
     environment:
       RAILS_ENV: test
@@ -121,4 +121,4 @@ workflows:
       - build
       - upload-coverage:
           requires:
-             - build
+            - build
