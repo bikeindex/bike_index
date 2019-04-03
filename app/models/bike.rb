@@ -79,6 +79,7 @@ class Bike < ActiveRecord::Base
   # so that it no longer is the same word as stolen recoveries
   scope :non_recovered, -> { where(recovered: false) }
 
+  before_save :set_calculated_attributes
   before_save :clean_frame_size
   before_save :set_mnfg_name
   before_save :set_user_hidden
@@ -150,9 +151,8 @@ class Bike < ActiveRecord::Base
 
   def get_listing_order
     return current_stolen_record.date_stolen.to_time.to_i.abs if stolen && current_stolen_record.present?
-    t = updated_at.to_time.to_i/10000
-    t = t/100 unless stock_photo_url.present? or public_images.present?
-    t
+    t = (updated_at || Time.now).to_i/10000
+    stock_photo_url.present? || public_images.present? ? t : t/100
   end
 
   def current_ownership; ownerships.reorder(:created_at).last end
@@ -428,6 +428,10 @@ class Bike < ActiveRecord::Base
 
   def cache_photo
     self.thumb_path = public_images && public_images.first && public_images.first.image_url(:small)
+  end
+
+  def set_calculated_attributes
+    self.listing_order = get_listing_order
   end
 
   def components_cache_string
