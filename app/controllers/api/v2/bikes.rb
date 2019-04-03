@@ -178,6 +178,10 @@ module API
           authorize_bike_for_user
           hash = BParam.v2_params(declared_p['declared_params'].as_json)
           ensure_required_stolen_attrs(hash) if hash['stolen_record'].present? && @bike.stolen != true
+          if hash.dig("bike", "external_image_urls").present?
+            @bike.external_image_urls = hash["bike"]["external_image_urls"]
+            @bike.load_external_images
+          end
           begin
             BikeUpdator.new(user: current_user, bike: @bike, b_params: hash).update_available_attributes
           rescue => e

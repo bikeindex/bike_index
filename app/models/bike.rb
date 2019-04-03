@@ -199,26 +199,26 @@ class Bike < ActiveRecord::Base
     return true unless u.present? || org.present?
     return creation_organization == org if org.present? && u.blank?
     # so, we know a user was passed
-    return false if can_be_claimed_by(u) # this is authorized by owner, not organization
+    return false if claimable_by?(u) # this is authorized by owner, not organization
     return organizations.any? { |o| u.member_of?(o) } unless org.present?
     creation_organization == org && u.member_of?(org)
   end
 
   def first_owner_email; first_ownership.owner_email end
 
-  def can_be_claimed_by(u)
+  def claimable_by?(u)
     return false if u.blank? || current_ownership.blank? || current_ownership.claimed?
-    user == u || current_ownership.can_be_claimed_by(u)
+    user == u || current_ownership.claimable_by?(u)
   end
 
   def authorize_for_user(u)
-    return true if u == owner || can_be_claimed_by(u)
+    return true if u == owner || claimable_by?(u)
     return false if u.blank? || current_ownership&.claimed
     authorized_by_organization?(u: u)
   end
 
   def authorize_for_user!(u)
-    return authorize_for_user(u) unless can_be_claimed_by(u)
+    return authorize_for_user(u) unless claimable_by?(u)
     current_ownership.mark_claimed
     true
   end
@@ -409,7 +409,15 @@ class Bike < ActiveRecord::Base
   end
 
   def external_image_urls
-    b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
+    @external_image_urls ||= b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
+  end
+
+  # external_image_urls is overridden and written in api/v2/bikes updating action, so this method can be called there
+  def load_external_images
+    external_image_urls.reject(&:blank?).each do |url|
+      next if public_images.where(external_image_url: url).present?
+      public_images.create(external_image_url: url)
+    end
   end
 
   def frame_colors
