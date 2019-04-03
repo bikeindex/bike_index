@@ -59,7 +59,7 @@ class Bike < ActiveRecord::Base
     :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
     :b_param_id_token, :address, :address_city, :address_state, :address_zipcode
 
-  attr_writer :phone, :user_name, :organization_affiliation # reading is managed by a method
+  attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
 
   enum frame_material: FrameMaterial::SLUGS
   enum handlebar_type: HandlebarType::SLUGS
@@ -406,6 +406,10 @@ class Bike < ActiveRecord::Base
 
   def organization_affiliation
     b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
+  end
+
+  def external_image_urls
+    b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
   end
 
   def frame_colors

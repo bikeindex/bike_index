@@ -3,6 +3,7 @@ require 'spec_helper'
 describe AfterBikeSaveWorker do
   let(:subject) { AfterBikeSaveWorker }
   let(:instance) { subject.new }
+  before { Sidekiq::Worker.clear_all }
 
   it "is the correct queue" do
     expect(subject.sidekiq_options["queue"]).to eq "low_priority"
@@ -21,22 +22,53 @@ describe AfterBikeSaveWorker do
     instance.perform(96)
   end
 
-  context 'changed listing order' do
-    it 'updates the listing order' do
+  describe "update listing order" do
+    it "updates the listing order" do
       bike = FactoryBot.create(:bike)
       bike.update_attribute :listing_order, -22
       instance.perform(bike.id)
       bike.reload
       expect(bike.listing_order).to eq bike.get_listing_order
     end
+
+    context "unchanged listing order" do
+      it "does not update the listing order or enqueue afterbikesave" do
+        bike = FactoryBot.create(:bike)
+        bike.update_attribute :listing_order, bike.get_listing_order
+        expect_any_instance_of(Bike).to_not receive(:update_attribute)
+        instance.perform(bike.id)
+      end
+    end
   end
 
-  context 'unchanged listing order' do
-    it 'does not update the listing order or enqueue afterbikesave' do
-      bike = FactoryBot.create(:bike)
-      bike.update_attribute :listing_order, bike.get_listing_order
-      expect_any_instance_of(Bike).to_not receive(:update_attribute)
-      instance.perform(bike.id)
+  describe "download external_image_urls" do
+    let(:external_image_urls) { ["https://files.bikeindex.org/email_assets/logo.png", "https://files.bikeindex.org/email_assets/logo.png", "https://files.bikeindex.org/email_assets/bike_photo_placeholder.png"] }
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:b_param) do
+      FactoryBot.create(:b_param,
+                        created_bike_id: bike.id,
+                        params: { bike: { owner_email: bike.owner_email, external_image_urls: external_image_urls } }) 
+    end
+    it "creates and downloads the images" do
+      expect do
+        instance.perform(bike.id)
+      end.to change(PublicImage, :count).by 2
+      bike.reload
+      # The public images have been created with the matching urls
+      expect(bike.public_images.pluck(:external_image_url)).to match_array external_image_urls.uniq
+      # Processing occurs in the processing job - not inline
+      expect(bike.public_images.any? { |i| i.image.present? }).to be_falsey
+      # TODO: Rails 5 update - after commit doesn't run :( - uncomment when upgraded
+      # expect(ExternalImageUrlStoreWorker.jobs.count).to eq 2
+    end
+    context "images already exist" do
+      it "doesn't create new images" do
+        external_image_urls.uniq.each { |url| bike.public_images.create(external_image_url: url) }
+        expect do
+          instance.perform(bike.id)
+        end.to_not change(PublicImage, :count)
+        bike.reload
+      end
     end
   end
 
