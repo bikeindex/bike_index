@@ -1,50 +1,72 @@
-%header.with-subtitle
-  %h1
-    Stolen Notification
+.row
+  .col-lg-11.col-sm-12
+    %h1
+      Stolen Notification
+  .col-lg-1.col-sm-12
+    = link_to "Resend", resend_admin_stolen_notification_url(@stolen_notification, pretty_please: true), class: 'btn btn-success mt-4 mb-4'
 %h4
   Created
-  
-  - if @stolen_notification.created_at.today?
-    Today at #{@stolen_notification.created_at.strftime("%-I %p")}
-  - elsif Date.yesterday().beginning_of_day() <= @stolen_notification.created_at          
-    Yesterday at #{@stolen_notification.created_at.strftime("%-I %p")}
-  - else
-    = @stolen_notification.created_at.strftime("%-m.%-d.%Y")
-.well.padded
-  .dl-holder
-    %dl.dl-horizontal
-      = @stolen_notification.dl_list_item((link_to @bike.title_string, edit_admin_stolen_bike_url(@bike)), "Bike")
-      = @stolen_notification.dl_list_item(@stolen_notification.receiver_email, "Receiver email")
-      - if @bike.current_stolen_record.present?
-        = @stolen_notification.dl_list_item(@bike.current_stolen_record.phone, "Bike phone")
-      %dt
-        Sent #{@stolen_notification.send_dates_parsed.count} times
-      %dd
-        - if @stolen_notification.send_dates_parsed.any?
-          
-          - @stolen_notification.send_dates_parsed.each do |stamp|
-            %p
-              - send_date = Time.at(stamp).to_datetime
-              - if send_date.today?
-                Today at #{send_date.strftime("%-I %p")}
-              - elsif Date.yesterday().beginning_of_day() <= send_date
-                Yesterday at #{send_date.strftime("%-I %p")}
-              - else
-                = send_date.strftime("%-m.%-d.%Y")
-        - else
-          %strong
-            Has not been sent!
-    %dl.dl-horizontal
-      - if @stolen_notification.sender.name.present?
-        = @stolen_notification.dl_list_item((link_to @stolen_notification.sender.name, edit_admin_user_url(@stolen_notification.sender)), "Sender")
-      - else
-        = @stolen_notification.dl_list_item((link_to @stolen_notification.sender.email, edit_admin_user_url(@stolen_notification.sender)), "Sender")
-      = @stolen_notification.dl_list_item(@stolen_notification.sender.sent_stolen_notifications.count, "User sent count")
-      
-  %p.padded
+  %a.convertTime.preciseTime{ href: admin_stolen_notification_url(@stolen_notification) }
+    = l @stolen_notification.created_at, format: :convert_time
+%table.table-list
+  %tbody
+    %tr
+      %td
+        Bike
+      %td
+        = link_to @bike.title_string, edit_admin_stolen_bike_url(@bike)
+    %tr
+      %td
+        Receiver Name
+      %td
+        = @stolen_notification.receiver_email
+    -if @bike.current_stolen_record.present?
+      %tr
+        %td
+          Bike phone
+        %td
+          = @bike.current_stolen_record.phone
+    %tr
+      %td
+        Sent #
+      %td
+        = @stolen_notification.send_dates_parsed.count
+        times
+    - if @stolen_notification.send_dates_parsed.any?
+      %tr
+        %td
+          Times:
+        %td
+          %ul.pl-0
+            - @stolen_notification.send_dates_parsed.each do |stamp|
+              %li.list-unstyled
+                %a.convertTime.preciseTime{ href: admin_stolen_notification_url(stamp) }
+                  = l Time.at(stamp).to_datetime, format: :convert_time
+    - else
+      %strong
+        Has not been sent!
+    - if @stolen_notification.sender.name.present?
+      %tr
+        %td
+          Sender
+        %td
+          = link_to @stolen_notification.sender.name, edit_admin_user_url(@stolen_notification.sender)
+    - else
+      %tr
+        %td
+          Sender
+        %td
+          = link_to @stolen_notification.sender.email, edit_admin_user_url(@stolen_notification.sender)
+    %tr
+      %td
+        User sent count
+      %td
+        = @stolen_notification.sender.sent_stolen_notifications.count
+
+
+
+.card.bg-light.mb-4.mt-4
+  .card-header
+    Notification Message
+  .card-body
     = @stolen_notification.message
-      
-
-
-    
-= link_to "resend", resend_admin_stolen_notification_url(@stolen_notification, pretty_please: true), class: 'button-green'
