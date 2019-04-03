@@ -65,8 +65,7 @@ const SearchResults = ({
                   bikes={fuzzyBikes}
                   fuzzySearching={fuzzySearching}
                 />
-              )
-              }
+              )}
             </div>
           );
         })}
