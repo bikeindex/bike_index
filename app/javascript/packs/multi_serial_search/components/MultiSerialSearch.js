@@ -132,8 +132,3 @@ const MultiSerialSearch = () => {
 };
 
 export default MultiSerialSearch;
-
-/*
-  TODO:
-    - jQuery animations
-*/
