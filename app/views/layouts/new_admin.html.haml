@@ -6,10 +6,11 @@
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     = javascript_pack_tag "admin_application"
     = stylesheet_pack_tag "application_css"
-    - stolen_links = %w[stolen_bikes recoveries recovery_displays]
-    - paid_links = %w[payments paid_features invoices]
-    - other_links = %w[memberships manufacturers invitations tsvs maintenance failed_bikes ctypes graphs paints feedbacks tweets exports bulk_imports ]
 
+  -# To check for active page for dropdown menus
+  - stolen_links = %w[stolen_bikes recoveries recovery_displays]
+  - paid_links = %w[payments paid_features invoices]
+  - other_links = %w[memberships manufacturers invitations tsvs maintenance failed_bikes ctypes graphs paints feedbacks tweets exports bulk_imports ]
 
   / manually override body_class in a few situations :/
   - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
