@@ -6,6 +6,10 @@
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     = javascript_pack_tag "admin_application"
     = stylesheet_pack_tag "application_css"
+    - stolen_links = %w[stolen_bikes recoveries recovery_displays]
+    - paid_links = %w[payments paid_features invoices]
+    - other_links = %w[memberships manufacturers invitations tsvs maintenance failed_bikes ctypes graphs paints feedbacks tweets exports bulk_imports ]
+
 
   / manually override body_class in a few situations :/
   - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
@@ -28,23 +32,23 @@
               = active_link "Organizations", admin_organizations_path, :role => "button", :class => "nav-link nav-item px-2"
             %li.nav-item
               = active_link "News", admin_news_index_path, :role => "button", :class => "nav-link nav-item px-2"
-            %li.dropdown.nav-item.ml-2
-              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown", class: controller_name == 'stolen_bikes' || controller_name == 'recoveries' || controller_name == 'recovery_displays' ? 'active' : ''}
+            %li.dropdown.ml-2
+              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown", class: stolen_links.include?(controller_name) ? 'active' : ''}
                 Stolen
               .dropdown-menu.admin-nav-dropdown
                 = active_link "Stolen", admin_stolen_bikes_path, :role => "button", :class => "btn btn-light dropdown-item"
                 = active_link "Recoveries", admin_recoveries_path, :role => "button", :class => "btn btn-light dropdown-item"
                 = active_link "Recovery Displays", admin_recovery_displays_path, :role => "button", :class => "btn btn-light dropdown-item"
                 = active_link "Stolen Twitterbot URL", ENV['STOLEN_TWITTERBOT_URL'].gsub(/bikes\z/, ''), :role => "button", :class => "btn btn-light dropdown-item"
-            %li.dropdown.nav-item.ml-2
-              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown",  class: controller_name == 'payments' || controller_name == 'paid_features' || controller_name == 'invoices' ? 'active' : ''}
+            %li.dropdown.ml-2
+              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown",  class: paid_links.include?(controller_name) ? 'active' : ''}
                 Paid
               .dropdown-menu.admin-nav-dropdown
                 = active_link "Payments", admin_payments_path, :role => "button", :class => "btn btn-light dropdown-item"
                 = active_link "Paid Features", admin_paid_features_path, :role => "button", :class => "btn btn-light dropdown-item"
                 = active_link "Invoices", admin_invoices_path, :role => "button", :class => "btn btn-light dropdown-item"
-            %li.dropdown.nav-item.ml-2
-              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown",  class: controller_name == 'memberships' || controller_name == 'manufacturers' || controller_name == 'invitations' ||action_name == 'tsvs' || action_name == "maintenance" || controller_name == 'failed_bikes' || controller_name == 'ctypes' || controller_name == 'graphs' || controller_name == 'paints' || controller_name == 'feedbacks' || controller_name == "tweets" || controller_name == "exports" || controller_name == "bulk_imports" ? 'active' : ""}
+            %li.dropdown.ml-2
+              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown", class: other_links.include?(controller_name || action_name) ? 'active' : ""}
                 Other
               .dropdown-menu.admin-nav-dropdown
                 = active_link "Memberships", admin_memberships_path, :role => "button", :class => "btn btn-light dropdown-item"
