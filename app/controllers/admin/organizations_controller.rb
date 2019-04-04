@@ -11,6 +11,7 @@ class Admin::OrganizationsController < Admin::BaseController
     orgs = orgs.where(kind: kind_for_organizations) if params[:kind].present?
     @organizations = orgs.reorder("#{@sort} #{@sort_direction}").page(page).per(per_page)
     @organizations_count = orgs.count
+    render layout: "new_admin"
   end
 
   def show
