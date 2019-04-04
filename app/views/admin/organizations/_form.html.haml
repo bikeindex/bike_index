@@ -1,119 +1,88 @@
-- if @organization.errors.any?
-  #alert-block
-    .alert.alert-error
-      %h4
-        Please fix the following
-        = pluralize(@organization.errors.count, "error")
-      %ul
-        - @organization.errors.full_messages.each do |msg|
-          %li
-            = msg
+.card.bg-light
+  .card-body
+    - if @organization.errors.any?
+      = render partial: "/shared/errors", locals: { name: "Organization", obj: @organization}
 
-/ Using .admin-bike-edit because avoiding redoing css
-.clearfix.admin-bike-edit
-  .bike-fields
-    .control-group.padded
-      .control-label
+
+    .row
+      .form-group.col-md-6
         = f.label :name
-      .controls
-        = f.text_field :name
+        = f.text_field :name, class: "form-control"
 
-    .control-group.padded
-      .control-label
+      .form-group.col-md-6
         = f.label :available_invitation_count, "Available invitations"
-      .controls
-        = f.number_field :available_invitation_count
-      .controls.extra-field
+        = f.number_field :available_invitation_count, class: "form-control"
         %p
           = "Invitations sent: #{@organization.sent_invitation_count}"
+    .row
+      .col-md-6
+        .form-group.mt-4
+          = f.label :short_name, "Short name (15 letters or less)"
+          = f.text_field :short_name, class: "form-control"
+      .col-md-6
+        .form-group.mt-4
+          = f.label :ascend_name
+          = f.text_field :ascend_name, class: "form-control"
 
-    .control-group
-      .control-label
-        %label
-          Short Name
-          %br
-          (15 characters or less)
-      .controls
-        = f.text_field :short_name
+    .row
+      .col-md-6
+        .form-group.mt-4
+          = f.label :website
+          = f.text_field :website, class: "form-control"
+        - if @organization.id.present?
+          - emails = @organization.users.pluck(:email)
+          - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
+          .form-group
+            = f.label :embedable_user_email
+            = f.select :embedable_user_email, emails, {prompt: "Select email", selected: @embedable_email}, class: "form-control"
+            .less-strong
+              - if @organization.memberships.count == 0
+                You can use #{ENV['AUTO_ORG_MEMBER']} if
+                %br
+                there are no members of the organization
+      .col-md-6.mt-4
+        %fieldset{:disabled => "disabled"}
+          .form-group
+            = f.label :slug, "Slug:"
+            %p
+              = @organization.slug
+    .row
+      .col-md-6.pl-4
+        .form-group
+          %label
+            Kind
+          %ul.list-unstyled
+            - Organization.kinds.each do |kind|
+              %li
+                = f.radio_button :kind, kind
+                = kind.humanize
+      .col-md-6
+        .form-group
+          = f.label :show_on_map
+          = f.check_box :show_on_map
 
-    .control-group
-      .control-label
-        = f.label :ascend_name
-      .controls
-        = f.text_field :ascend_name
+        .form-group
+          = f.label :lock_show_on_map, 'Lock shown on map'
+          = f.check_box :lock_show_on_map
+          %small.less-strong
+            Restrict org from updating show on map above (e.g. they're known bad actors)
+        .form-group
+          = f.label :api_access_approved
+          = f.check_box :api_access_approved
+          %small.less-strong
+            to be able to post updates via API, check this too
 
-    .control-group
-      = f.label :slug, "Slug", class: "control-label"
-      .controls
-        %p
-          = @organization.slug
+        .form-group
+          = f.label :approved, 'Validated & approved'
+          = f.check_box :approved
+    .row
+      .col-md-6
+        .form-group
+          = f.label :parent_organization_id
+          = f.collection_select(:parent_organization_id, Organization.all, :id, :name, {prompt: "Choose organization"}, class: "form-control")
 
-    .control-group
-      .control-label
-        = f.label :website
-      .controls
-        = f.text_field :website
-    - if @organization.id.present?
-      - emails = @organization.users.pluck(:email)
-      - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
-      .control-group.chosen-select
-        .control-label
-          = f.label :embedable_user_email
-        .controls
-          = f.select :embedable_user_email, emails, prompt: "Select email", selected: @embedable_email
-        .controls.extra-field
-          .less-strong
-            - if @organization.memberships.count == 0
-              You can use #{ENV['AUTO_ORG_MEMBER']} if 
-              %br
-              there are no members of the organization
-
-    .control-group
-      .control-label
-        %label
-          Kind
-      .controls.radio-controls
-        - Organization.kinds.each do |kind|
-          %label.radio
-            = f.radio_button :kind, kind
-            = kind.humanize
-  .bike-fields
-    .control-group.padded
-      .control-label
-        = f.label :show_on_map
-      .controls
-        = f.check_box :show_on_map
-
-    .control-group.padded
-      .control-label
-        = f.label :lock_show_on_map, 'Lock shown on map'
-      .controls
-        = f.check_box :lock_show_on_map, style: "margin: 4px .5em 0 0;"
-        %small.less-strong
-          Restrict org from updating show on map above (e.g. they're known bad actors)
-    .control-group.padded
-      .control-label
-        = f.label :api_access_approved
-      .controls
-        = f.check_box :api_access_approved
-        %small.less-strong
-          to be able to post updates via API, check this too
-
-    .control-group.padded
-      .control-label
-        = f.label :approved, 'Validated & approved'
-      .controls
-        = f.check_box :approved
-
-    .control-group.chosen-select
-      .control-label
-        = f.label :parent_organization_id
-      .controls
-        = f.collection_select(:parent_organization_id, Organization.all, :id, :name, prompt: "Choose organization")
-
-/ .control-group.padded
-/   .control-label
-/     = f.label :is_suspended
-/   .controls
-/     = f.check_box :is_suspended
-
+  / .control-group.padded
+  /   .control-label
+  /     = f.label :is_suspended
+  /   .controls
+  /     = f.check_box :is_suspended
