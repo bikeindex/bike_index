@@ -20,3 +20,14 @@ footer.primary-footer {
 .full-screen-table-wrapper {
   overflow-x: scroll;
 }
+
+@media screen and (min-width: 600px) {
+  .sticky-admin-nav-md-screens {
+    position: fixed;
+    top: 0;
+    width: 100%;
+  }
+  #admin-content {
+    padding-top: 60px;
+  }
+}
