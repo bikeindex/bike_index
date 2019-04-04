@@ -1,102 +1,9 @@
-%header.with-subtitle.padded
-  %h1
-    Viewing
-    = @organization.name
-  %p
-    = link_to "Edit organization", edit_admin_organization_url(@organization)
-  - if current_user.developer?
-    %p.pull-right
-      = link_to 'edit custom layouts', admin_organization_custom_layouts_path(organization_id: @organization.to_param)
-
-%section
-  .dl-holder.padded
-    %dl.dl-horizontal
-      - if current_user.developer?
-        %dt ID
-        %dd 
-          %span.less-strong
-            = @organization.id
-      %dt Map
-      %dd
-        - unless @organization.approved
-          %strong
-            Not Approved
-          %small
-            therefor hidden
-          %br
-          %em
-            Would be
-        - if @organization.show_on_map
-          Shown on map
-        - else
-          %strong
-            Not shown
-
-      %dt
-        Kind
-      %dd
-        = @organization.kind.humanize
-      %dt
-        Slug
-      %dd
-        #{@organization.slug} (#{ link_to 'embed', embed_registrations_url(organization_id: @organization.to_param) }, #{ link_to "org's manage", organization_manage_index_path(organization_id: @organization.to_param)})
-      = @organization.dl_from_attribute("access_token")
-      %dt Auto user email
-      %dd
-        = @organization.auto_user.email if @organization.auto_user.present?
-      %dt
-        Created at
-      %dd
-        %span.convertTime.preciseTime
-          = l @organization.created_at, format: :convert_time
-        %small.convertTimezone
-
-    %dl.dl-horizontal
-      = @organization.dl_list_item(@organization.users.count, "Users")
-      = @organization.dl_list_item(@organization.sent_invitation_count, "Sent invites")
-      = @organization.dl_list_item(link_to(@organization.available_invitation_count, admin_organization_invitation_url(organization_id: @organization.to_param)), link_to("Remaining invites", admin_organization_invitation_url(organization_id: @organization.to_param)))
-      = @organization.dl_from_attribute("website")
-      %dt Paid
-      %dd
-        - if @organization.is_paid
-          <strong>true</strong>
-        - else
-          - if LandingPages::ORGANIZATIONS.include?(@organization.slug)
-            %alert.alert-danger
-              IS NOT MARKED PAID BUT HAS A LANGING PAGE
-          - else
-            false
-        %em.less-strong
-          Set this via #{link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param)}
-
-      %dt
-        Parent
-      %dd
-        - if @organization.parent_organization.present?
-          = link_to @organization.parent_organization.name, admin_organization_path(@organization.parent_organization)
-          %small.less-strong
-            if parent's paid, so's this
-        - else
-          &nbsp;
-      %dt
-        Children
-      %dd
-        - @organization.child_organizations.each do |org|
-          = link_to org.name, admin_organization_path(org)
-
-    - if @organization.is_suspended
-      %h2.red-text
-        Organization is suspended
-  %p
-    %strong
-      = link_to "Edit/Create Invoices", admin_organization_invoices_path(organization_id: @organization.to_param)
-    %em.less-strong
-      #{@organization.name} has #{pluralize(@organization.invoices.count, "total invoice")}
-    - if @organization.invoices.count > 0
-      and
-      %strong
-        #{@organization.invoices.active.count} active
-
+.row
+  .col-md-6
+    %h1
+      Viewing
+      = @organization.name
+  .col-md-6
   - if @organization.bike_shop?
     %p
       %span.less-strong
@@ -108,6 +15,134 @@
           = @organization.ascend_name
       %br
       %small.less-strong more to come soon...
+%p
+  = link_to "Edit organization", edit_admin_organization_url(@organization)
+- if current_user.developer?
+  %p.float-right
+    = link_to 'edit custom layouts', admin_organization_custom_layouts_path(organization_id: @organization.to_param), class: "btn btn-success"
+
+%table.table-list
+  %tbody
+    - if current_user.developer?
+      %tr
+        %td
+          ID
+        %td
+          %spand.less-strong
+            = @organization.id
+    %tr
+      %td
+        Map
+      %td
+        - unless @organization.approved
+          %strong
+            Not approved
+          %small
+            therefor hidden
+          %em
+            Would be
+        -if @organization.show_on_map
+          Shown on map
+        -else
+          %strong
+            Not Shown
+    %tr
+      %td
+        Kind
+      %td
+        = @organization.kind.humanize
+    %tr
+      %td
+        Slug
+      %td
+        = @organization.slug
+        ,
+        = link_to "embed", embed_registrations_url(organization_id: @organization.to_param)
+        ,
+        = link_to "org's manage", organization_manage_index_path(organization_id: @organization.to_param)
+  %tr
+    %td
+      Auto user email
+    %td
+      = @organization.auto_user.email if @organization.auto_user.present?
+  %tr
+    %td
+      Created at
+    %td
+      %span.convertTime.preciseTime
+        = l @organization.created_at, format: :convert_time
+      %small.convertTimezone
+  %tr
+    %td
+      Users
+    %td
+      = @organization.users.count
+  %tr
+    %td
+      Sent Invites
+    %td
+      = @organization.sent_invitation_count
+  %tr
+    %td
+      Remaining invites
+    %td
+      = link_to @organization.available_invitation_count, admin_invitations_url(organization_id: @organization.to_param)
+      ,
+      = link_to "Remaining invites", admin_organization_invitation_url(organization_id: @organization.to_param)
+  %tr
+    %td
+      Website
+    %td
+      = @organization.website
+  %tr
+    %td
+      Paid
+    %td
+      -if @organization.is_paid
+        %strong
+          True
+      -else
+        - if LandingPages::ORGANIZATIONS.include?(@organization.slug)
+          %p.text-danger
+            IS NOT MARKED PAID BUT HAS A LANDING PAGE
+        -else
+          False
+      %em.less-strong
+        Set this via #{link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param)}
+  %tr
+    %td
+      Parent
+    %td
+      - if @organization.parent_organization.present?
+        = link_to @organization.parent_organization.name, admin_organization_path(@organization.parent_organization)
+        %small.less-strong
+          If parent's paid, so's this
+      - else
+        &nbsp;
+  - if @organization.child_organizations.present?
+    %tr
+      %td
+        Children
+      %td
+        = @organization.child_organizations.each do |org|
+          =link_to org.name, admin_organization_url(org)
+
+- if @organization.is_suspended
+  %h2.text-danger
+    Organization is suspended
+
+%p
+  %strong
+    = link_to "Edit/Create Invoices", admin_organization_invoices_path(organization_id: @organization.to_param)
+    %em.less-strong
+      #{@organization.name} has #{pluralize(@organization.invoices.count, "total invoice")}
+    - if @organization.invoices.count > 0
+      and
+      %strong
+        #{@organization.invoices.active.count} active
+
+
+%section
 
   - if @organization.is_paid
     .well
