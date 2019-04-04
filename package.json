@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "lint": "./node_modules/.bin/eslint ./app/javascript/packs/{utils,multi_serial_search}",
+    "lint": "./node_modules/.bin/eslint ./app/javascript/packs",
     "test": "jest"
   },
   "dependencies": {

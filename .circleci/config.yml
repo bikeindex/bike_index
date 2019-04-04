@@ -85,9 +85,6 @@ jobs:
           name: "eslint"
           command: "yarn lint"
       - run:
-          name: "Jest"
-          command: "yarn test"
-      - run:
           name: Code Climate Test Coverage
           command: |
             ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"

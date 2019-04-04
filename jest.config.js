@@ -83,8 +83,8 @@ module.exports = {
   // moduleNameMapper: {},
 
   moduleNameMapper: {
-    "\\.(svg|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/app/javascript/packs/jest/__mocks__/fileMock.js",
-    "\\.(css|less|scss)$": "<rootDir>/app/javascript/packs/jest/__mocks__/styleMock.js"
+    "\\.(svg|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/app/jest/__mocks__/fileMock.js",
+    "\\.(css|less|scss)$": "<rootDir>/app/jest/__mocks__/styleMock.js"
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
@@ -131,7 +131,7 @@ module.exports = {
   // The paths to modules that run some code to configure or set up the testing environment before each test
   // setupFiles: [],
   setupFiles: [
-    "<rootDir>/app/javascript/packs/jest/setup.js"
+    "<rootDir>/app/jest/setup.js"
   ],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
