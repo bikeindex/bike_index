@@ -69,7 +69,7 @@ jobs:
           command: |
             bundle exec rake db:create db:structure:load
       - run:
-          name: Rspec
+          name: Run tests
           command: |
             mkdir -p test-results/rspec test-artifacts
             ./cc-test-reporter before-build
@@ -84,6 +84,14 @@ jobs:
       - run:
           name: "eslint"
           command: "yarn lint"
+      - run:
+          name: "Jest: Install junit coverage" 
+          command: yarn add --dev jest-junit
+      - run:
+          name: "Jest: Run tests"
+          command: yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
+          environment:
+            JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
       - run:
           name: Code Climate Test Coverage
           command: |

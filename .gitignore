@@ -46,4 +46,4 @@ yarn-error.log
 .yarn-integrity
 
 # Ignore jest coverage files
-jest-coverage
+coverage
