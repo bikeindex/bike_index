@@ -24,6 +24,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def show_deleted
     @organizations = Organization.only_deleted.all
+    render layout: "new_admin"
   end
 
   def recover
