@@ -30,10 +30,10 @@ task seed_test_users_and_bikes: :environment do
   @user = User.find_by_email('user@example.com')
   @member = User.find_by_email('member@example.com')
   @org = Organization.first
-  @cycle_type_id = CycleType.find_by_name('Bike').id
+  @cycle_type_id = CycleType::SLUGS[:bike]
   50.times do
     bike = Bike.new(
-      cycle_type_id: @cycle_type_id,
+      cycle_type: @cycle_type_id,
       propulsion_type: 'foot-pedal',
       manufacturer_id: (rand(Manufacturer.frames.count) + 1),
       rear_tire_narrow: true,
