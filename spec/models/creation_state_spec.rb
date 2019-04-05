@@ -30,6 +30,12 @@ RSpec.describe CreationState, type: :model do
   end
 
   describe 'creation_description' do
+    context 'post and bulk' do
+      let(:creation_state) { CreationState.new(is_bulk: true, is_pos: true, origin: 'api_v12') }
+      it 'returns bulk reg' do
+        expect(creation_state.creation_description).to eq 'Ascend POS'
+      end
+    end
     context 'bulk' do
       let(:creation_state) { CreationState.new(is_bulk: true, origin: 'api_v12') }
       it 'returns bulk reg' do
@@ -39,7 +45,7 @@ RSpec.describe CreationState, type: :model do
     context 'pos' do
       let(:creation_state) { CreationState.new(is_pos: true, origin: 'embed_extended') }
       it 'returns pos reg' do
-        expect(creation_state.creation_description).to eq 'pos'
+        expect(creation_state.creation_description).to eq 'Lightspeed POS'
       end
     end
     context 'embed_extended' do

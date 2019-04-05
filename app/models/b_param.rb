@@ -117,7 +117,7 @@ class BParam < ActiveRecord::Base
 
   def stolen; bike['stolen'] end
 
-  def is_pos; bike['is_pos'] || false end
+  def is_pos; bike['is_pos'] || bike['is_bulk'] || false end
 
   def is_new; bike['is_new'] || false end
 

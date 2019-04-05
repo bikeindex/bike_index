@@ -9,7 +9,8 @@ class CreationState < ActiveRecord::Base
   end
 
   def creation_description
-    return "pos" if is_pos
+    return "Ascend POS" if is_pos && bulk_import&.ascend?
+    return "Lightspeed POS" if is_pos
     return "bulk reg" if is_bulk
     return origin.humanize.downcase if origin
   end
