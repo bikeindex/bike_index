@@ -22,7 +22,7 @@ footer.primary-footer {
   overflow-x: scroll;
 }
 
-@media screen and (min-width: 600px) {
+@include media-breakpoint-up(md) {
   .sticky-admin-nav-md-screens {
     position: fixed;
     top: 0;
