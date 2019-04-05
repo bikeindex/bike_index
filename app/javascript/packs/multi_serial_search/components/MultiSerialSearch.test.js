@@ -28,7 +28,7 @@ describe('<MultiSerialSearch /> shallow rendered', () => {
     expect(wrap.exists('.multiserial-form')).toBe(true);
   });
 
-  it('makes an api request to search serials', () => {
+  it('searches multiple serials', () => {
     jest.spyOn(api, 'fetchSerialResults');
 
     // - toggle form visibility
