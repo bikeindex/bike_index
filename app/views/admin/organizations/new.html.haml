@@ -1,10 +1,8 @@
 %h1 New Organizaton
 
+.form.form-horizontal
+  = form_for [:admin, @organization] do |f|
+    = render partial: 'form', locals: { f: f }
 
-= form_for [:admin, @organization] do |f|
-  = render partial: 'form', locals: { f: f }
-
-  .row
-    .col-sm-10
-    .col-sm-2
-      = f.submit "Create", class: 'btn btn-success mb-4 mt-4 float-right'
+    .control-group.actions
+      = f.submit "Create", class: 'button-green'
