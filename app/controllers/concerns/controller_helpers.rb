@@ -124,10 +124,10 @@ module ControllerHelpers
   def active_organization
     # We call this multiple times - make sure nil stays nil
     return @active_organization if defined?(@active_organization)
-    @active_organization = Organization.friendly_find(params[:organization_id])
-    # Only set current_organization if user is authorized for said organization
-    return @active_organization unless @active_organization.present? && current_user&.authorized?(@active_organization)
-    set_current_organization(@active_organization)
+    active_organization = Organization.friendly_find(params[:organization_id])
+    # set current_organization and active_organization together, but only if current_user is authorized
+    active_organization = nil unless active_organization.present? && current_user&.authorized?(active_organization)
+    set_current_organization(active_organization)
   end
 
   def current_user

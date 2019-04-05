@@ -14,6 +14,7 @@ describe Organized::BikesController, type: :controller do
       get :index, organization_id: organization.to_param
       expect(response.location).to eq user_home_url
       expect(flash[:error]).to be_present
+      expect(assigns(:active_organization)).to be_nil
       expect(session[:current_organization_id]).to eq "0" # sets it to zero so we don't look it up again
     end
     context "admin user" do

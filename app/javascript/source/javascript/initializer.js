@@ -32,6 +32,10 @@ binxApp.displayLocalDate = function(time, preciseTime) {
   }
 };
 
+binxApp.preciseTimeSeconds(time) {
+  return time.format("YYYY-MM-DD h:mm:ss a");
+}
+
 binxApp.localizeTimes = function() {
   if (!window.timezone) {
     window.timezone = moment.tz.guess();
@@ -62,9 +66,9 @@ binxApp.localizeTimes = function() {
     if (!time.isValid) {
       return;
     }
-    return $this.text(
-      binxApp.displayLocalDate(time, $this.hasClass("preciseTime"))
-    );
+    $this
+      .text(binxApp.displayLocalDate(time, $this.hasClass("preciseTime")))
+      .attr("title", binxApp.preciseTimeSeconds(time));
   });
 
   // Write timezone
