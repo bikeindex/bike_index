@@ -6,6 +6,7 @@ class WelcomeController < ApplicationController
   skip_before_filter :set_x_frame_options_header, only: [:bike_creation_graph, :index]
 
   def index
+    @recovery_displays = RecoveryDisplay.limit(5)
   end
 
   def bike_creation_graph
@@ -41,7 +42,7 @@ class WelcomeController < ApplicationController
 
   def recovery_stories
     page = params[:page] || 1
-    @per_page = params[:per_page] || 20
+    @per_page = params[:per_page] || 5
     @recovery_displays = RecoveryDisplay.page(page).per(@per_page)
   end
 
