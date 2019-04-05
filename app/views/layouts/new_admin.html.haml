@@ -33,7 +33,7 @@
               = active_link "Organizations", admin_organizations_path, role: "button", class: "nav-link nav-item px-2"
             %li.nav-item
               = active_link "News", admin_news_index_path, role: "button", class: "nav-link nav-item px-2"
-            %li.dropdown.ml-2
+            %li.nav-item.dropdown.ml-2
               %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown", class: stolen_links.include?(controller_name) ? 'active' : ''}
                 Stolen
               .dropdown-menu.admin-nav-dropdown
@@ -41,14 +41,14 @@
                 = active_link "Recoveries", admin_recoveries_path, role: "button", class: "btn btn-light dropdown-item"
                 = active_link "Recovery Displays", admin_recovery_displays_path, role: "button", class: "btn btn-light dropdown-item"
                 = active_link "Stolen Twitterbot URL", ENV['STOLEN_TWITTERBOT_URL'].gsub(/bikes\z/, ''), role: "button", class: "btn btn-light dropdown-item"
-            %li.dropdown.ml-2
+            %li.nav-item.dropdown.ml-2
               %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown",  class: paid_links.include?(controller_name) ? 'active' : ''}
                 Paid
               .dropdown-menu.admin-nav-dropdown
                 = active_link "Payments", admin_payments_path, role: "button", class: "btn btn-light dropdown-item"
                 = active_link "Paid Features", admin_paid_features_path, role: "button", class: "btn btn-light dropdown-item"
                 = active_link "Invoices", admin_invoices_path, role: "button", class: "btn btn-light dropdown-item"
-            %li.dropdown.ml-2
+            %li.nav-item.dropdown.ml-2
               %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown", class: other_links.include?(controller_name || action_name) ? 'active' : ""}
                 Other
               .dropdown-menu.admin-nav-dropdown
@@ -66,8 +66,8 @@
                 = active_link "Exports", admin_exports_url, role: "button", class: "btn btn-light dropdown-item"
                 = active_link "Bulk Imports", admin_bulk_imports_url, role: "button", class: "btn btn-light dropdown-item"
             - if Rails.env.development?
-              .dropdown
-                %a.dropdown-toggle.nav-link.ml-2{"data-toggle" => "dropdown"}
+              %li.nav-item.dropdown.ml-2
+                %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown"}
                   Mailers
                 .dropdown-menu.admin-nav-dropdown
                   = link_to "Organized", '/rails/mailers/organized_mailer' , role: "button", class: "btn btn-light dropdown-item"
