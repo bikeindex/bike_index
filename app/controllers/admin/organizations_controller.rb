@@ -33,12 +33,10 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def new
     @organization = Organization.new
-    render layout: "new_admin"
   end
 
   def edit
     @embedable_email = @organization.auto_user.email if @organization.auto_user
-    render layout: "new_admin"
   end
 
   def update
