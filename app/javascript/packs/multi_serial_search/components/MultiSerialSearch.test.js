@@ -1,33 +1,30 @@
+/* eslint import/no-unresolved: 0 */
 
 import React from 'react';
-import { mount, shallow } from 'enzyme';
+import { shallow } from 'enzyme';
 import toJson from 'enzyme-to-json';
+import { bikeResponse } from 'helpers/bikes';
+import { event } from 'helpers/utils';
 import * as api from '../api';
 import MultiSerialSearch from './MultiSerialSearch';
 
-
-jest.mock('../api');
-
 /*
-  event helper
+  api mocks
 */
-const event = fns => Object.assign(
-  jest.fn(),
-  {
-    ...fns,
-    preventDefault: () => {},
-  },
-);
+jest.mock('../api');
+api.fetchSerialResults.mockImplementation(() => (
+  new Promise(resolve => resolve(bikeResponse))
+));
 
-describe('<MultiSerialSearch /> mount rendered', () => {
+describe('<MultiSerialSearch /> shallow rendered', () => {
   it('matches the snapshot', () => {
-    const tree = mount(<MultiSerialSearch />);
+    const tree = shallow(<MultiSerialSearch />);
     expect(toJson(tree)).toMatchSnapshot();
   });
 
   it('toggles the form visibility', () => {
-    const wrap = mount(<MultiSerialSearch />);
-    wrap.find('.multi-search-toggle a').simulate('click');
+    const wrap = shallow(<MultiSerialSearch />);
+    wrap.find('.multi-search-toggle a').simulate('click', event());
     expect(wrap.exists('.multiserial-form')).toBe(true);
   });
 

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<MultiSerialSearch /> mount rendered matches the snapshot 1`] = `
-<MultiSerialSearch>
+exports[`<MultiSerialSearch /> shallow rendered matches the snapshot 1`] = `
+<Fragment>
   <h4
     className="multi-search-toggle"
   >
@@ -13,5 +13,5 @@ exports[`<MultiSerialSearch /> mount rendered matches the snapshot 1`] = `
        Multiple Serial Search
     </a>
   </h4>
-</MultiSerialSearch>
+</Fragment>
 `;
