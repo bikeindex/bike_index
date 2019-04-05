@@ -1,6 +1,7 @@
 class BikeIndex.RecoveryStories extends BikeIndex
   constructor: ->
-    $('#recovery-stories-container').slick
+    $recovery_stories = $('#recovery-stories-container')
+    $recovery_stories.slick
       lazyLoad: 'ondemand'
-      slidesToShow: $('#recovery_displays_count').val()
+      slidesToShow: $recovery_stories.data('stories-count')
       vertical: true

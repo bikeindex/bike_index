@@ -3,12 +3,9 @@
     %h3
       Recovery Stories
 
-  -# Read by BikeIndex.RecoveryStories to configure slick
-  %input{type: :hidden, id: :recovery_displays_count, value: @recovery_displays.length}
-
   #recovery-stories-listing
     .container
-      #recovery-stories-container
+      #recovery-stories-container{data: {stories_count: @recovery_displays.length}}
         = render @recovery_displays
 
     .paginate-container.paginate-container-bottom
