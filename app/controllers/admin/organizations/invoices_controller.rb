@@ -5,6 +5,7 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
 
   def index
     @invoices = @organization.invoices.reorder(id: :desc)
+    render layout: "new_admin"
   end
 
   def new

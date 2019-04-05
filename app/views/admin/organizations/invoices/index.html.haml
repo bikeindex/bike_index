@@ -1,7 +1,10 @@
-%header.with-subtitle.padded
-  %h1
-    #{ link_to @organization.name, admin_organization_path(@organization) } Invoices
-  = link_to "New Invoice", new_admin_organization_invoice_path(organization_id: @organization.to_param), class: "button-green sharing-links"
+
+.row.mb-4
+  .col-lg-10
+    %h1
+      #{ link_to @organization.name, admin_organization_path(@organization) } Invoices
+  .col-lg-2
+    = link_to "New Invoice", new_admin_organization_invoice_path(organization_id: @organization.to_param), class: "btn btn-success"
 
 = render partial: "/admin/organizations/invoices/table", locals: { invoices: @organization.invoices }
 
@@ -11,9 +14,9 @@
 %p.less-strong
   You can add invoices to payments by editing them. If you don't see a payment in this list, #{link_to "search the payments", admin_payments_path } and add it by editing it.
 
-%section.full-screen-table
+.full-screen-table-wrapper
   %table.table.table-striped.table-bordered
-    %thead
+    %thead.thead-light
       %th
         Paid&nbsp;at
       %th
