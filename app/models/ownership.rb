@@ -40,7 +40,7 @@ class Ownership < ActiveRecord::Base
     save
   end
 
-  def can_be_claimed_by(u)
+  def claimable_by?(u)
     u == User.fuzzy_email_find(owner_email) || u == user
   end
 end

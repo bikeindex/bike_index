@@ -4,7 +4,7 @@
   #bike_edit_root_url.hidden{data: { url: ENV['BASE_URL'] }}
   #chosen-container
     %ul.bike-boxes
-      = render partial: "/bikes/bike", locals: { bike: @bike, target: "show" }
+      = render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show" }
     - if @bike.stolen
       %h4
         = link_to 'Stolen edit page', edit_admin_stolen_bike_url(@bike)
@@ -59,15 +59,15 @@
           no one but the user (and bike index admins) can see it
     = form_for [:admin, @bike], html: { class: 'form form-horizontal admin-bike-edit' } do |f|
       = hidden_field_tag :fast_attr_update, @fast_attr_update
-    
-    
+
+
       .clearfix
         .bike-fields
           - if @bike.errors.any?
             #alert-block
               .alert.alert-error
                 %h4
-                  Please fix the following 
+                  Please fix the following
                   = pluralize(@bike.errors.count, "error")
                 %ul
                   - @bike.errors.full_messages.each do |msg|
@@ -82,7 +82,7 @@
             = f.label :serial_number, class: "control-label"
             .controls
               = f.text_field :serial_number, :required =>true
-          
+
           .control-group
             = f.label :has_no_serial, class: "control-label"
             .controls
@@ -98,7 +98,7 @@
             = f.label :manufacturer_other, "Other frame manufacturer", class: "control-label"
             .controls
               = f.text_field :manufacturer_other
-          
+
           .control-group
             = f.label :card_id, "Spokecard id", class: "control-label"
             .controls
@@ -147,7 +147,7 @@
             = f.label :owner_email, class: "control-label"
             .controls
               = f.text_field :owner_email, :required =>true
-          
+
       .actions
         .control-group
           = submit_tag "Update the bike", class: "button-green"
@@ -214,7 +214,7 @@
                     Can we share?
                   .controls
                     = check_box_tag :can_share_recovery, true
-              
+
 
 
 

@@ -138,7 +138,7 @@ RSpec.describe Export, type: :model do
       expect(Export.permitted_headers).to eq permitted_headers
       expect(Export.permitted_headers(organization)).to eq permitted_headers
       expect(Export.permitted_headers(organization_secondary_reg)).to eq permitted_headers + ["additional_registration_number"]
-      expect(Export.permitted_headers(organization_full)).to eq permitted_headers + %w[registration_address additional_registration_number]
+      expect(Export.permitted_headers(organization_full)).to eq permitted_headers + %w[additional_registration_number registration_address]
     end
   end
 end

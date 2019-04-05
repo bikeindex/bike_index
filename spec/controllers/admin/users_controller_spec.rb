@@ -29,7 +29,6 @@ describe Admin::UsersController do
           confirmed: true,
           superuser: true,
           developer: true,
-          is_content_admin: true,
           can_send_many_stolen_notifications: true,
           banned: true
         }
@@ -52,7 +51,6 @@ describe Admin::UsersController do
           developer: true,
           email: user.email,
           superuser: false,
-          is_content_admin: true,
           can_send_many_stolen_notifications: true,
           banned: true
         }

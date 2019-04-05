@@ -22,16 +22,7 @@ describe Admin::DashboardController do
       it 'redirects' do
         get :index
         expect(response.code).to eq('302')
-        expect(response).to redirect_to(user_home_url)
-      end
-    end
-    context 'logged in as content admin' do
-      it 'redirects' do
-        user = FactoryBot.create(:user_confirmed, is_content_admin: true)
-        set_current_user(user)
-        get :index
-        expect(response.code).to eq('302')
-        expect(response).to redirect_to(admin_news_index_url)
+        expect(response).to redirect_to organization_bikes_path(organization_id: user.default_organization.to_param)
       end
     end
   end

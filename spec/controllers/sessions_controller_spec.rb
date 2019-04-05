@@ -53,10 +53,19 @@ describe SessionsController do
   describe "destroy" do
     include_context :logged_in_as_user
     it "logs out the current user" do
+      session[:return_to] = "/bikes/12?contact_owner=true"
+      session[:partner] = "bikehub"
+      session[:current_organization_id] = 12
+      session[:whatever] = "XXXXXX"
       get :destroy
       expect(cookies.signed[:auth]).to be_nil
       expect(session[:user_id]).to be_nil
       expect(response).to redirect_to goodbye_url
+      expect(flash[:notice]).to be_present
+      expect(session[:return_to]).to be_nil
+      expect(session[:partner]).to be_nil
+      expect(session[:current_organization_id]).to be_nil
+      expect(session[:whatever]).to be_nil
     end
     context "unconfirmed user" do
       let(:user) { FactoryBot.create(:user) }
@@ -87,14 +96,14 @@ describe SessionsController do
           expect(session[:partner]).to be_nil
         end
 
-        context "content admin" do
-          let(:user) { FactoryBot.create(:content_admin) }
+        context "admin" do
+          let(:user) { FactoryBot.create(:admin) }
           it 'authenticates and redirects to admin' do
             expect(user).to receive(:authenticate).and_return(true)
             request.env['HTTP_REFERER'] = user_home_url
             post :create, session: { password: 'would be correct' }
             expect(cookies.signed[:auth][1]).to eq(user.auth_token)
-            expect(response).to redirect_to admin_news_index_url
+            expect(response).to redirect_to admin_root_url
           end
         end
 
@@ -160,6 +169,7 @@ describe SessionsController do
           post :create, session: { password: "would be correct" }
           expect(cookies.signed[:auth][1]).to eq(user.auth_token)
           expect(session[:render_donation_request]).to be_falsey
+          expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param)
         end
         context "organization is police" do
           let(:organization_kind) { "law_enforcement" }
@@ -169,6 +179,7 @@ describe SessionsController do
             post :create, session: { password: "would be correct" }
             expect(cookies.signed[:auth][1]).to eq(user.auth_token)
             expect(session[:render_donation_request]).to eq "law_enforcement"
+            expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param)
           end
         end
       end

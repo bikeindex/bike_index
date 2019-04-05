@@ -134,25 +134,21 @@ describe User do
     end
   end
 
-  describe 'admin_authorized' do
-    before :all do
-      @content = FactoryBot.create(:user, is_content_admin: true)
-      @admin = FactoryBot.create(:admin)
-    end
-
-    it 'auths full' do
-      expect(@admin.admin_authorized('full')).to be_truthy
-      expect(@content.admin_authorized('full')).to be_falsey
-    end
-
-    it 'auths content' do
-      expect(@admin.admin_authorized('content')).to be_truthy
-      expect(@content.admin_authorized('content')).to be_truthy
-    end
-
-    it 'auths any' do
-      expect(@admin.admin_authorized('any')).to be_truthy
-      expect(@content.admin_authorized('any')).to be_truthy
+  describe "authorized?" do
+    let(:user) { FactoryBot.create(:user) }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
+    let(:bike) { ownership.bike }
+    let(:admin) { User.new(superuser: true) }
+    it "returns expected values" do
+      expect(user.authorized?(bike)).to be_falsey
+      expect(user.authorized?(organization)).to be_falsey
+      expect(admin.authorized?(bike)).to be_truthy
+      expect(admin.authorized?(organization)).to be_truthy
+      expect(ownership.creator.authorized?(bike)).to be_truthy
+      expect(organization_member.authorized?(bike)).to be_truthy
+      expect(organization_member.authorized?(organization)).to be_truthy
     end
   end
 
@@ -243,32 +239,6 @@ describe User do
         expect(user.my_bikes_hash["link_target"]).to eq('https://something.com')
         expect(user.mb_link_target).to eq('https://something.com')
         expect(user.twitter).to eq('http://somewhere.com')
-        expect(user.bike_actions_organization).to be_nil
-      end
-    end
-    describe "bike_actions_organization" do
-      let!(:user) { FactoryBot.create(:organization_admin, organization: organization) }
-      context "organization without actions" do
-        let(:organization) { FactoryBot.create(:organization) }
-        it "sets nil if there is no organization with bike actions" do
-          user.bike_actions_organization_id = organization.id
-          user.save # Also just testing that this is called in a callback, because stuff
-          expect(user.bike_actions_organization_id).to be_nil
-        end
-      end
-      context "two organizations with actions" do
-        include_context :organization_with_geolocated_messages
-        let(:organization2) { FactoryBot.create(:organization, name: "XXXXX") }
-        it "It selects the first matching organization" do
-          organization2.update_attribute :created_at, Time.now - 1.day
-          # default_scope is by name, trying to test that we're sqling right and actually reordering
-          # ... But it looks like rspec isn't honoring the default scope so whateves
-          expect(Organization.with_bike_actions.pluck(:id)).to match_array([organization.id])
-          FactoryBot.create(:membership, user: user, organization: organization2)
-          user.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
-          user.reload
-          expect(user.bike_actions_organization).to eq organization
-        end
       end
     end
   end
@@ -398,16 +368,14 @@ describe User do
       it "is true if the organization has that paid feature" do
         user.reload
         expect(user.render_donation_request).to be_nil
-        expect(user.bike_actions_organization_id).to be_blank
         expect(user.send_unstolen_notifications?).to be_falsey
         invoice.update_attributes(paid_feature_ids: [paid_feature.id])
         organization.update_attributes(updated_at: Time.now) # TODO: Rails 5 update, after_commit
         expect(organization.bike_actions?).to be_truthy
-        expect(Organization.with_bike_actions.pluck(:id)).to eq([organization.id])
+        expect(Organization.bike_actions.pluck(:id)).to eq([organization.id])
         # Also, it bubbles up. BUT TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
         user.update_attributes(updated_at: Time.now)
         user.reload
-        expect(user.bike_actions_organization_id).to eq organization.id
         expect(user.send_unstolen_notifications?).to be_truthy
       end
     end
@@ -561,24 +529,24 @@ describe User do
     end
   end
 
-  describe 'is_member_of?' do
+  describe 'member_of?' do
     let(:organization) { FactoryBot.create(:organization) }
     context 'admin of organization' do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       it 'returns true' do
-        expect(user.is_member_of?(organization)).to be_truthy
+        expect(user.member_of?(organization)).to be_truthy
       end
     end
     context 'member of organization' do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       it 'returns true' do
-        expect(user.is_member_of?(organization)).to be_truthy
+        expect(user.member_of?(organization)).to be_truthy
       end
     end
     context 'superadmin' do
       let(:user) { FactoryBot.create(:admin) }
       it 'returns true' do
-        expect(user.is_member_of?(organization)).to be_truthy
+        expect(user.member_of?(organization)).to be_truthy
       end
     end
     context 'incorrect searching' do
@@ -587,35 +555,35 @@ describe User do
         let(:other_organization) { FactoryBot.create(:organization) }
         it 'returns false' do
           expect(other_organization).to be_present
-          expect(user.is_member_of?(other_organization)).to be_falsey
+          expect(user.member_of?(other_organization)).to be_falsey
         end
       end
       context 'no organization' do
         it 'returns false' do
-          expect(user.is_member_of?(nil)).to be_falsey
+          expect(user.member_of?(nil)).to be_falsey
         end
       end
     end
   end
 
-  describe 'is_admin_of?' do
+  describe 'admin_of?' do
     let(:organization) { FactoryBot.create(:organization) }
     context 'admin of organization' do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       it 'returns true' do
-        expect(user.is_admin_of?(organization)).to be_truthy
+        expect(user.admin_of?(organization)).to be_truthy
       end
     end
     context 'member of organization' do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       it 'returns true' do
-        expect(user.is_admin_of?(organization)).to be_falsey
+        expect(user.admin_of?(organization)).to be_falsey
       end
     end
     context 'superadmin' do
       let(:user) { FactoryBot.create(:admin) }
       it 'returns true' do
-        expect(user.is_admin_of?(organization)).to be_truthy
+        expect(user.admin_of?(organization)).to be_truthy
       end
     end
     context 'incorrect searching' do
@@ -624,12 +592,12 @@ describe User do
         let(:other_organization) { FactoryBot.create(:organization) }
         it 'returns false' do
           expect(other_organization).to be_present
-          expect(user.is_admin_of?(other_organization)).to be_falsey
+          expect(user.admin_of?(other_organization)).to be_falsey
         end
       end
       context 'no organization' do
         it 'returns false' do
-          expect(user.is_admin_of?(nil)).to be_falsey
+          expect(user.admin_of?(nil)).to be_falsey
         end
       end
     end

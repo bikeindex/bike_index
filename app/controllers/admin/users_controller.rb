@@ -10,8 +10,6 @@ class Admin::UsersController < Admin::BaseController
     else
       if params[:superusers]
         users = User.where(superuser: true)
-      elsif params[:content_admins]
-        users = User.where(is_content_admin: true)
       else 
         users = User.includes(memberships: [:organization]).order("created_at desc")
       end
@@ -36,7 +34,6 @@ class Admin::UsersController < Admin::BaseController
     @user.email = params[:user][:email]
     @user.superuser = params[:user][:superuser]
     @user.developer = params[:user][:developer] if current_user.developer?
-    @user.is_content_admin = params[:user][:is_content_admin]
     @user.banned = params[:user][:banned]
     @user.username = params[:user][:username]
     @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]

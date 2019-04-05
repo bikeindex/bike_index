@@ -94,32 +94,65 @@ class BParam < ActiveRecord::Base
   def primary_frame_color_id=(val)
     params['bike']['primary_frame_color_id'] = val
   end
+
   def secondary_frame_color_id=(val)
     params['bike']['secondary_frame_color_id'] = val
   end
+
   def tertiary_frame_color_id=(val)
     params['bike']['tertiary_frame_color_id'] = val
   end
 
   def with_bike?; created_bike_id.present? end
+
   def bike; (params && params['bike'] || {}).with_indifferent_access end
+
   def primary_frame_color_id; bike['primary_frame_color_id'] end
+
   def secondary_frame_color_id; bike['secondary_frame_color_id'] end
+
   def tertiary_frame_color_id; bike['tertiary_frame_color_id'] end
+
   def manufacturer_id; bike['manufacturer_id'] end
+
   def stolen; bike['stolen'] end
+
   def is_pos; bike['is_pos'] || false end
+
   def is_new; bike['is_new'] || false end
+
   def is_bulk; bike['is_bulk'] || false end
+
   def no_duplicate; bike['no_duplicate'] || false end
+
   def bike_code; bike["bike_code"] end
+
   def phone; bike["phone"] end
+
   def user_name; bike["user_name"] end
 
   def creation_organization; Organization.friendly_find(creation_organization_id) end
+
   def manufacturer; bike['manufacturer_id'] && Manufacturer.friendly_find(bike['manufacturer_id']) end
+
   def partial_registration?; origin == "embed_partial" end
+
   def primary_frame_color; primary_frame_color_id.present? && Color.find(primary_frame_color_id)&.name end
+
+  def revised_new?; params && params['revised_new'] end
+
+  def creation_organization_id; bike && bike["creation_organization_id"] || params && params["creation_organization_id"] end
+
+  def owner_email; bike && bike['owner_email'] end
+
+  def organization_affiliation; bike["organization_affiliation"] end
+
+  def external_image_urls; bike["external_image_urls"] || [] end
+
+  def address(field); key = field[/\Aaddress/].present? ? bike[field] : bike["address_#{field}"] end
+
+  # For revised form. If there aren't errors and there is an email, then we don't need to show
+  def display_email?; true unless owner_email.present? && bike_errors.blank? end
 
   # Right now this is a partial update. It's improved from where it was, but it still uses the BikeCreator
   # code for protection. Ideally, we would use the revised merge code to ensure we aren't letting users
@@ -280,26 +313,14 @@ class BParam < ActiveRecord::Base
                'creator_id' => creator_id)
   end
 
-  def revised_new?
-    params && params['revised_new']
-  end
-
-  def creation_organization_id
-    bike && bike["creation_organization_id"] || params && params["creation_organization_id"]
-  end
-
-  def owner_email
-    bike && bike['owner_email']
-  end
-
-  def display_email? # For revised form. If there aren't errors and there is an email, then we don't need to show
-    true unless owner_email.present? && bike_errors.blank?
-  end
-
   def fetch_formatted_address
     return {} unless bike["address"].present?
     return params["formatted_address"] if params["formatted_address"].present?
-    formatted_address = Geohelper.formatted_address_hash(bike["address"])
+    if address("city").present?
+      formatted_address = { address: address("address"), city: address("city"), state: address("state"), zipcode: address("zipcode") }.as_json
+    else
+      formatted_address = Geohelper.formatted_address_hash(bike["address"])
+    end
     return {} unless formatted_address.present?
     update_attribute :params, params.merge(formatted_address: formatted_address)
     formatted_address

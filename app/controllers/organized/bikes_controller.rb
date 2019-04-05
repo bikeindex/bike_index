@@ -3,6 +3,7 @@ module Organized
     def index
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
+      @bike_code = BikeCode.lookup_with_fallback(params[:bike_code], organization_id: active_organization.id) if params[:bike_code].present?
       if active_organization.paid_for?("bike_search")
         search_organization_bikes
       else
@@ -28,6 +29,8 @@ module Organized
 
     def new; end
 
+    def multi_search; end
+
     private
 
     def organization_bikes
@@ -36,6 +39,23 @@ module Organized
 
     def current_index_path
       organization_bikes_path(organization_id: active_organization.to_param)
+    end
+
+    def search_organization_bikes
+      @search_query_present = permitted_org_bike_search_params.except(:stolenness).values.reject(&:blank?).any?
+      @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      org = active_organization || current_organization
+      if org.present?
+        bikes = org.bikes.reorder("bikes.created_at desc").search(@interpreted_params)
+        bikes = bikes.organized_email_search(params[:email]) if params[:email].present?
+      else
+        bikes = Bike.reorder("bikes.created_at desc").search(@interpreted_params)
+      end
+      @bikes = bikes.order("bikes.created_at desc").page(@page).per(@per_page)
+      if @interpreted_params[:serial]
+        @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
+      end
+      @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
     end
   end
 end

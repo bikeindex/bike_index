@@ -67,10 +67,9 @@ class BikesController < ApplicationController
     elsif current_user.present?
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      if current_user.is_member_of?(@bike_code.organization)
-        @show_organization_bikes = true
-        @active_organization = @bike_code.organization
-        search_organization_bikes
+      if current_user.member_of?(@bike_code.organization)
+        set_current_organization(@bike_code.organization)
+        redirect_to organization_bikes_path(organization_id: current_organization.to_param, bike_code: @bike_code.code) and return
       else
         @bikes = current_user.bikes.reorder(created_at: :desc).limit(100)
       end
@@ -93,6 +92,8 @@ class BikesController < ApplicationController
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
     flash[:info] = "Oops! We couldn't find that registration, please re-enter the information here" if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= @b_param.bike_from_attrs(is_stolen: params[:stolen], recovered: params[:recovered])
+    # Fallback to active (i.e. passed organization_id), then current_organization
+    @bike.creation_organization ||= active_organization || current_organization
     @organization = @bike.creation_organization
     if @bike.stolen
       @stolen_record = @bike.stolen_records.build(@b_param.params['stolen_record'])
@@ -223,7 +224,7 @@ class BikesController < ApplicationController
   def ensure_user_allowed_to_edit
     @current_ownership = @bike.current_ownership
     type = @bike && @bike.type || 'bike'
-    return true if @bike.authorize_bike_for_user!(current_user)
+    return true if @bike.authorize_for_user!(current_user)
     if current_user.present?
       error = "Oh no! It looks like you don't own that #{type}."
     else

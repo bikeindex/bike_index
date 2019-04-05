@@ -33,8 +33,8 @@ gem 'redcarpet' # Something to do with swagger? Guess we needed another markdown
 gem 'kaminari' # pagination
 gem 'pg_search'
 gem 'nokogiri', '~> 1.8.1'
-gem 'carrierwave'
-gem 'carrierwave_backgrounder'
+gem "carrierwave", "~> 0.11.2"
+gem "carrierwave_backgrounder"
 gem 'rmagick'
 gem 'mini_magick' # a smaller implementation of rmagick, required for rqrcode
 gem 'rqrcode-rails3'

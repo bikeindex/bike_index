@@ -1,6 +1,11 @@
 <h2 style="font-weight: 400;"><%= @stolen_notification.sender.email %> sent a message about this stolen <%= @stolen_notification.bike.type %>!</h2>
 
-<p>They have sent more stolen notifications than they are allowed.</p>
+<% if @stolen_notification.unstolen_blocked? %>
+  <p>They shouldn't have been able to send this notification to an unstolen bike. <strong>Please contact seth</strong>!</p>
+<% else %>
+  <p>They have sent more stolen notifications than they are allowed.</p>
+<% end %>
+
 
 <p><%= @stolen_notification.message %></p>
 

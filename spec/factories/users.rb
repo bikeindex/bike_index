@@ -16,9 +16,6 @@ FactoryBot.define do
           developer { true }
         end
       end
-      factory :content_admin do
-        is_content_admin { true }
-      end
       factory :developer do
         developer { true }
       end

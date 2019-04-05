@@ -10,6 +10,7 @@ class AfterBikeSaveWorker
   def perform(bike_id)
     bike = Bike.unscoped.where(id: bike_id).first
     return true unless bike.present?
+    bike.load_external_images
     update_matching_partial_registrations(bike)
     DuplicateBikeFinderWorker.perform_async(bike_id)
     if bike.present? && bike.listing_order != bike.get_listing_order

@@ -9,7 +9,10 @@ FactoryBot.define do
       user { FactoryBot.create(:user, email: owner_email) }
     end
     factory :ownership_organization_bike do
-      bike { FactoryBot.create(:creation_organization_bike) }
+      transient do
+        organization { FactoryBot.create(:organization) }
+      end
+      bike { FactoryBot.create(:creation_organization_bike, organization: organization) }
     end
   end
 end
