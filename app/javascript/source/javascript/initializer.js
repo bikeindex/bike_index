@@ -32,9 +32,9 @@ binxApp.displayLocalDate = function(time, preciseTime) {
   }
 };
 
-binxApp.preciseTimeSeconds(time) {
-  return time.format("YYYY-MM-DD h:mm:ss a");
-}
+binxApp.preciseTimeSeconds = function(time) {
+  return time.format("YYYY-MM-DD h:mm:ssa");
+};
 
 binxApp.localizeTimes = function() {
   if (!window.timezone) {
@@ -79,6 +79,21 @@ binxApp.localizeTimes = function() {
   });
 };
 
+binxApp.enableFilenameForUploads = function() {
+  $("input.custom-file-input[type=file]").on("change", function(e) {
+    // The issue is that the files list isn't actually an array. So we can't map it
+    let files = [];
+    let i = 0;
+    while (i < e.target.files.length) {
+      files.push(e.target.files[i].name);
+      i++;
+    }
+    $(this)
+      .next(".custom-file-label")
+      .text(files.join(", "));
+  });
+};
+
 import "./binx_mapping.js";
 import "./binx_org_messages.js";
 import "./binx_admin.js";
@@ -88,7 +103,12 @@ import "./binx_org_export.js";
 // and make the instance of class (which I'm storing on window) the same name without the first letter capitalized
 // I'm absolutely sure there is a best practice that I'm ignoring, but just doing it for now.
 $(document).ready(function() {
-  binxApp.localizeTimes()
+  binxApp.localizeTimes();
+  // Load admin, whatever
+  if ($("#admin-content").length > 0) {
+    window.binxAdmin = new BinxAdmin();
+    binxAdmin.init();
+  }
   // Load the page specific things
   let body_id = document.getElementsByTagName("body")[0].id;
   switch (body_id) {
@@ -100,10 +120,5 @@ $(document).ready(function() {
     case "organized_exports_new":
       window.binxAppOrgExport = new BinxAppOrgExport();
       binxAppOrgExport.init();
-    case "body":
-      if ($("#admin-content").length > 0) {
-        window.binxAdmin = new BinxAdmin();
-        binxAdmin.init();
-      }
   }
 });
