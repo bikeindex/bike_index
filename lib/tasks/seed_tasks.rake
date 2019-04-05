@@ -34,12 +34,12 @@ task seed_test_users_and_bikes: :environment do
     bike = Bike.new(
       cycle_type: :bike,
       propulsion_type: 'foot-pedal',
-      manufacturer_id: (rand(Manufacturer.frames.count) + 1),
+      manufacturer_id: (rand(Manufacturer.frames.count) - 1),
       rear_tire_narrow: true,
       handlebar_type: HandlebarType.slugs.first,
-      rear_wheel_size_id: (rand(WheelSize.count) + 1),
-      front_wheel_size_id: (rand(WheelSize.count) + 1),
-      primary_frame_color_id: (rand(Color.count) + 1),
+      rear_wheel_size_id: (rand(WheelSize.count) - 1),
+      front_wheel_size_id: (rand(WheelSize.count) - 1),
+      primary_frame_color_id: (rand(Color.count) - 1),
       creator: @user,
       owner_email: @user.email
     )
