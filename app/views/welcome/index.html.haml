@@ -42,7 +42,7 @@
     .root-landing-recovery-stories
       .container
         #recovery-stories-container.extras-hidden
-          - RecoveryDisplay.limit(10).each_with_index do |recovery, i|
+          - RecoveryDisplay.limit(5).each_with_index do |recovery, i|
             - cache(recovery) do
               .recovery-block{ class: "recovery-#{recovery.id}" }
                 %p.recovery-quote
@@ -66,6 +66,8 @@
                         = txt.html_safe
                     - else
                       = txt.html_safe
+        %a{href: recovery_stories_path}
+          Read more recovery stories here
 
     .root-landing-how-it-works
       .container
@@ -149,5 +151,3 @@
             = image_tag 'landing_pages/partners/BYU.png', alt: 'Brigham Young University'
           .root-landing-who-square
             = image_tag 'landing_pages/partners/Bike-Portland.png', alt: 'Bike Portland'
-
-

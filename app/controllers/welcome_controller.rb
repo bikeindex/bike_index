@@ -39,6 +39,12 @@ class WelcomeController < ApplicationController
   def choose_registration
   end
 
+  def recovery_stories
+    page = params[:page] || 1
+    @per_page = params[:per_page] || 20
+    @recovery_displays = RecoveryDisplay.page(page).per(@per_page)
+  end
+
   private
 
   def authenticate_user_for_welcome_controller
