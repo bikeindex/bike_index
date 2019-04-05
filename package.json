@@ -60,6 +60,7 @@
     "jest-json": "^1.0.2",
     "jest-junit": "^6.3.0",
     "postcss-cssnext": "^3.1.0",
+    "react-testing-library": "^6.0.4",
     "webpack-cli": "^3.3.0",
     "webpack-dev-server": "^3.2.1"
   }
