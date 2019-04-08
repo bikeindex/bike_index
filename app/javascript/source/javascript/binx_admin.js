@@ -17,7 +17,7 @@ window.BinxAdmin = class BinxAdmin {
       window.binxAdmin.setCustomGraphStartAndSlide();
       this.changeGraphCalendarBox();
     }
-    if ($("#use_image_for_display")) {
+    if ($("#use_image_for_display").length > 0) {
       this.useBikeImageForDisplay();
     }
     // Enable bootstrap custom file upload boxes
@@ -66,23 +66,6 @@ window.BinxAdmin = class BinxAdmin {
       return imageBtn.toggleClass('using_bikes');
     })
   }
-
-
-  // useBikeImageForDisplay() {
-  //   var image_btn;
-  //   e.preventDefault();
-  //   image_btn = $('#use_image_for_display');
-  //   if (image_btn.hasClass('using_bikes')) {
-  //     $('.avatar-upload').slideDown();
-  //     $('#recovery_display_remote_image_url').val('');
-  //     image_btn.text('Use first image');
-  //   } else {
-  //     $('.avatar-upload').slideUp();
-  //     $('#recovery_display_remote_image_url').val(image_btn.attr('data-url'));
-  //     image_btn.text('nvrmind');
-  //   }
-  //   return image_btn.toggleClass('using_bikes');
-  // };
 };
 
 
