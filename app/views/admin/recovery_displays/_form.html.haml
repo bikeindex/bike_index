@@ -3,7 +3,7 @@
     = render partial: "/shared/errors", locals: { name: "Recovery Display", obj: @recovery_display }
   - if @recovery_display.stolen_record_id.present?
     = f.hidden_field :stolen_record_id, value: @recovery_display.stolen_record_id
-  .card.mb-4
+  .card.mb-4.bg-light
     .card-body
       .row
         .col-lg-6
@@ -19,7 +19,7 @@
           .form-group
             = f.label :date_recovered
             - f.object.date_recovered ||= Time.now
-            = f.datetime_local_field :date_recovered, max: Time.now + 1.day, step: 60, required: true, class: 'form-control w-25 dateInputUpdateZone', "data-initialtime" => l(f.object.date_recovered, format: :convert_time)
+            = f.datetime_local_field :date_recovered, max: Time.now + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(f.object.date_recovered, format: :convert_time)
         .col-lg-6
           - if @bike.present?
             .form-group
