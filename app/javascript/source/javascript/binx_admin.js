@@ -17,6 +17,8 @@ window.BinxAdmin = class BinxAdmin {
       window.binxAdmin.setCustomGraphStartAndSlide();
       this.changeGraphCalendarBox();
     }
+    // Enable bootstrap custom file upload boxes
+    binxApp.enableFilenameForUploads();
   }
 
   changeGraphCalendarBox() {

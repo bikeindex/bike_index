@@ -85,13 +85,28 @@
               = render partial: '/bikes/bike_fields/stolen_location', locals: { srecord: srecord }
 
           - if @organization&.include_field_reg_address?(current_user)
-            .form-group.row.unnested-field.no-divider-row
-              - address_label = @organization.registration_field_label("reg_address") || "Street address"
-              = f.label :address, address_label, class: 'form-well-label'
-              .form-well-input
-                = f.text_field :address, required: true, placeholder: 'required', class: 'form-control'
-                %span.below-input-help
-                  Your address is required by #{@organization.short_name}
+            .related-fields
+              .form-group.row
+                - label_address = @organization.registration_field_label("reg_address") || "Mailing address"
+                / Set all the bike address attrs
+                - @bike.attributes = { address: @b_param.address("address"), address_city: @b_param.address("city"), address_zipcode: @b_param.address("zipcode"), address_state: @b_param.address("state") }
+                = f.label :address, label_address, class: 'form-well-label'
+                .form-well-input
+                  = f.text_field :address, required: true, placeholder: "Street address", class: 'form-control'
+                  %span.below-input-help
+                    Your full address is required by #{@organization.short_name}
+              .form-group.row
+                %label.form-well-label
+                .form-well-input
+                  = f.text_field :address_city, required: true, placeholder: "City", class: "form-control"
+              .form-group.row
+                %label.form-well-label
+                .form-well-input
+                  = f.text_field :address_zipcode, required: true, placeholder: "Zipcode", class: "form-control"
+              .form-group.row.fancy-select-placeholder.unfancy
+                %label.form-well-label
+                .form-well-input
+                  = f.collection_select(:address_state, State.all, :abbreviation, :name, { include_blank: true, required: true, prompt: "State" }, { class: "form-control" })
 
           - if @organization&.include_field_reg_secondary_serial?(current_user)
             - label_secondary_serial = @organization.registration_field_label("reg_secondary_serial") || "Additional serial/sticker number"

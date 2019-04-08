@@ -21,6 +21,7 @@ module API
           optional :no_notify, type: Boolean, desc: "On create or ownership change, don't notify the new owner."
           optional :is_for_sale, type: Boolean
           optional :frame_material, type: String, values: Bike.frame_materials.keys, desc: "Frame material type"
+          optional :external_image_urls, type: Array, desc: "Image urls to include with registration, if images are already on the internet"
           
           optional :stolen_record, type: Hash do
             optional :phone, type: String, desc: "Owner's phone number, **required to create stolen**"
@@ -177,6 +178,7 @@ module API
           authorize_bike_for_user
           hash = BParam.v2_params(declared_p['declared_params'].as_json)
           ensure_required_stolen_attrs(hash) if hash['stolen_record'].present? && @bike.stolen != true
+          @bike.load_external_images(hash["bike"]["external_image_urls"]) if hash.dig("bike", "external_image_urls").present?
           begin
             BikeUpdator.new(user: current_user, bike: @bike, b_params: hash).update_available_attributes
           rescue => e

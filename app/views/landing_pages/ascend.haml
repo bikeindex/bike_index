@@ -18,122 +18,19 @@
           Once you’ve set up the Trek Ascend POS bicycle registration, you’re done! Each day, Bike Index will pull newly-sold bike information from Ascend to create Bike Index accounts for your customers. Their new bikes will be waiting for them upon login. They just have to check their email, and their new bike will be waiting for them.
         %p
           Then, if a customer’s bike goes missing, their bike’s information and serial number will be stored for them to access. But don’t worry: <a target="none" href="https://bikeindex.org/privacy">we will never give out any of your customer data</a>.
-        %h2{style: "text-transform: none !important" }
-          Bike Index integration setup instructions in Ascend:
+        %p
+          %strong
+            
 
         %ol
           %li
-            Go into Reports, click SQL Query icon on up top.
+            Sign up as a #{link_to "new bike shop organization", new_organization_path} on Bike Index
           %li
-            Paste
-            %a{ href: "#", data: { toggle: "modal", target: "#ascend-query-modal" } }
-              this query text
-            into the top box.
+            Follow the setup instructions on 
+            %strong
+              = link_to "Acend's Knowledge base article", "https://ascendrms.uservoice.com/knowledgebase/articles/1904050"
+            on Bike Index
           %li
-            Click Execute and the Save, name the query.
-          %li
-            After it is saved you should be able to click on Delivery.
-          %li
-            Fill out the delivery form like this:
-            %ul{style: "list-style-type:none"}
-              %li
-                FTP address: <code>ftp://ascendftp.bikeindex.org:20</code>
-              %li
-                Username: <code>ascendftp</code>
-              %li
-                Port: <code>20</code>
-              %li
-                Plug in <code>Your Email Address</code> as a recipient email under the email tab (two above the "*RTP/SFTP" tab on the left)
-              %li
-                Password:
-                %em
-                  email #{link_to "bikeshops@bikeindex.org", "mailto:bikeshops@bikeindex.org"} for the password.
-        %p
-          A shop participating in this integration with Bike Index should create a product with a SKU of 'NO BIKE INDEX' for the rare customers who do not want to register their bikes in Bike Index:
-          %ul
-            %li
-              This SKU should be added to any sale where the customer wishes to opt out of registering their bike with bike index
-            %li
-              The query will return the relevant customer information for any bike sold that does not have the ‘NO BIKE INDEX’ SKU on the same transaction.
-        %p
-          At Bike Index we want to work with cycling businesses and organizations to make bike registration easy. For shops that means creating free, seamless tech with systems you’re already using. You can link your Ascend with Bike Index in just five clicks.
-        %p
-          And that's it.
+            Email us the password to finish setting up!
         %p
           Email #{link_to "bikeshops@bikeindex.org", "mailto:bikeshops@bikeindex.org"} if you have any questions. Thank you for registering bikes in Bike Index!
-
-
-
-
-      / .next-steps-col
-      /   .next-steps-wrap
-      /     .banner-text.related-pages-banner
-      /       Related Pages
-      /     .related-pages
-      /       %p
-      /         Bike Index & Lightspeed POS
-      /       %p
-      /         Bike Index Partners
-      /       %p
-      /         Info for Shops
-
-  = render '/landing_pages/footer'
-- modal_body = capture_haml do
-  .modal-body
-    %textarea.form-control.code{ rows: "15", style: "color: #bd4147; background: #f7f7f9; font-size: 90%;" }
-
-      :plain
-        WITH Idx AS
-        (
-        SELECT Si.SalesID
-        FROM Sales S 
-        JOIN SalesItems Si ON S.ID=Si.SalesID
-        JOIN Products P ON Si.ProductID=P.ID
-        WHERE S.Hide=0
-        AND S.Quote=0
-        AND Si.Hide=0
-        AND S.FinishDate IS NOT NULL
-        AND P.[Store UPC]='NO BIKE INDEX'
-        ),
-        Bik AS
-        (
-        SELECT Categories.ID
-        FROM Categories 
-        WHERE Categories.Topic='Bikes'
-        UNION
-        SELECT C1.ID
-        FROM Categories C1
-        JOIN Categories C2 ON C1.TopParentID=C2.ID
-        WHERE C2.Topic='Bikes'
-        )
-        SELECT  [Product Description]= P.Description
-                ,[Vendor]= V.Name
-                ,[Brand]= P.Brand
-                ,[Color]= P.Color
-                ,[Size]= P.Size
-                ,[Serial Number]= Sn.SerialNo
-                ,[Customer Last Name]= C.LastName
-                ,[Customer First Name]= C.FirstName
-                ,[Customer Email]= C.Email
-        FROM Sales S
-        JOIN SalesItems Si ON S.ID=Si.SalesID
-        JOIN Products P ON Si.ProductID=P.ID
-        JOIN VendorProducts Vp ON P.ID=Vp.ProductID
-        JOIN Vendors V ON V.ID=Vp.VendorID
-        LEFT JOIN Customers C ON S.CustomerID=C.ID
-        LEFT JOIN SerialNos Sn ON Si.SerialID=Sn.ID
-        WHERE S.Hide=0
-        AND S.Quote=0
-        AND S.FinishDate BETWEEN <<StartDate>> AND <<EndDate>>
-        AND Si.Hide=0
-        AND Si.Quantity > 0
-        AND Vp.Hide=0
-        AND V.Hide=0
-        AND P.TopicID IN (SELECT ID FROM Bik)
-        AND S.ID NOT IN (SELECT SalesID FROM Idx)
-        AND C.EMail IS NOT NULL
-        AND C.EMail <> ''
-        ORDER BY [Customer Last Name], [Customer First Name]
-
-
-= render partial: '/shared/modal', locals: { title: "Ascend Query Text", id: "ascend-query-modal", modal_body: modal_body }

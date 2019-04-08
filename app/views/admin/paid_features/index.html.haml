@@ -1,15 +1,17 @@
-%header.with-subtitle
-  %h1 Paid Features
-  = link_to "New Feature", new_admin_paid_feature_url, class: "button-green sharing-links"
+.row
+  .col-lg-10.col-sm-12
+    %h1 Paid Features
+  .col-lg-2.col-sm-12
+    = link_to "New Feature", new_admin_paid_feature_url, class: "btn btn-success float-right"
 
-%span#pageContainerFluid
+
 
 %h4
   #{@paid_features.count} total
 
-%section.full-screen-table
-  %table.table.table-striped.table-bordered.sortable
-    %thead
+.full-screen-table-wrapper
+  %table.table.table-striped.table-bordered
+    %thead.thead-light
       %th
         = sortable "created_at", "Added"
       %th
@@ -27,14 +29,16 @@
           %td
             = link_to paid_feature.name, edit_admin_paid_feature_url(paid_feature)
             %br
-            .large-screens
               %small
                 = paid_feature.description
                 - if paid_feature.details_link.present?
                   %br
                   = link_to paid_feature.details_link, paid_feature.details_link
             %small.less-strong
-              <span class="large-screens">feature</span> slugs: <span style="color: purple;">#{paid_feature.feature_slugs_string}</span>
+              %span
+                Feature slugs:
+                %span{style: "color: purple;"}
+                  = paid_feature.feature_slugs_string
 
           %td
             %small

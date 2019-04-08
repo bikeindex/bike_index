@@ -102,6 +102,7 @@ module ControllerHelpers
 
   def set_current_organization(organization)
     session[:current_organization_id] = organization&.id || "0"
+    @active_organization = organization
     @current_organization = organization
   end
 
@@ -124,6 +125,8 @@ module ControllerHelpers
     # We call this multiple times - make sure nil stays nil
     return @active_organization if defined?(@active_organization)
     @active_organization = Organization.friendly_find(params[:organization_id])
+    # Only set current_organization if user is authorized for said organization
+    return @active_organization unless @active_organization.present? && current_user&.authorized?(@active_organization)
     set_current_organization(@active_organization)
   end
 
@@ -154,6 +157,7 @@ module ControllerHelpers
   end
 
   def remove_session
+    session.keys.each { |k| session.delete(k) } # Get rid of everything we've been storing
     cookies.delete(:auth)
   end
 

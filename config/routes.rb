@@ -43,6 +43,7 @@ Bikeindex::Application.routes.draw do
   get 'choose_registration', to: 'welcome#choose_registration'
   get 'goodbye', to: 'welcome#goodbye'
   get 'bike_creation_graph', to: 'welcome#bike_creation_graph'
+  get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
 
   resource :session, only: [:new, :create, :destroy]
   get 'logout', to: 'sessions#destroy'
@@ -281,7 +282,6 @@ Bikeindex::Application.routes.draw do
     # Organized Admin resources (below here controllers should inherit Organized::AdminController)
     resources :manage, only: %i[index update destroy] do
       collection do
-        get :dev
         get :locations
       end
     end
