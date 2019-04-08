@@ -32,9 +32,7 @@
           %td Website
       %tbody
         - @states.each do |state|
-          - next unless state.locations.where(shown: true).any?
-          - state.locations.each do |location|
-            - next unless location.shown
+          - state.locations.shown.each do |location|
             - location = location.decorate
 
             %tr
@@ -51,9 +49,7 @@
                     = location.display_phone
               %td= link_to "#{location.organization.name} website", location.organization.website, target: "_blank", class: "shop-site"
         - @countries.each do |country|
-          - next unless country.locations.where(shown: true).any?
-          - country.locations.each do |location|
-            - next unless location.shown
+          - country.locations.shown.each do |location|
             - location = location.decorate
 
             %tr
@@ -77,4 +73,4 @@
 
 
 :javascript
-  $('.organizations-datatable').dataTable();
+  $('.organizations-datatable').dataTable({order: []});
