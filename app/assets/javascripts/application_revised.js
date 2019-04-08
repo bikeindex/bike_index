@@ -19,8 +19,11 @@
 //= require moment
 //= require moment-timezone
 //= require external_scripts/zoom.js
-//= require dataTables/jquery.dataTables
-//= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+
+// Use bootstrap 4 datatables instead
+//= require datatables
+// = require dataTables/jquery.dataTables
+// = require dataTables/bootstrap/3/jquery.dataTables.bootstrap
 
 // Legacy carousel. Used on homepage. 
 // Can use if we need a carousel, though would be nice to use rails-assets version instead 

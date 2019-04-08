@@ -18,97 +18,63 @@
     .map-of-shops
       = render '/shared/shops_map'
   %h3.padded
-    US Partner organizations
+    Partner organizations
 
   %article.where-shops-list#list_of_partners
-    - @states.each do |state|
-      - next unless state.locations.where(shown: true).any?
-      %p.state-name
-        = state.name
-      %ul.state-list
-        - state.locations.each do |location|
-          - next unless location.shown
-          - location = location.decorate
-          %li
-            .collapse-faq
-              %a.shop-title-link.collapsed{ href: "#shop#{location.org_location_id}", data: { toggle: "collapse"} }
-                %span
-                  &#x25B6;
-                = location.display_name
-                %em
-                  &nbsp;&nbsp;#{location.city}
-            .shop-info.collapse{ id: "shop#{location.org_location_id}" }
-              - if location.street.present?
-                %a.where-shop-location{data: { lat: location.latitude, long: location.longitude } }
-                  Show #{location.display_name} on map
-                %p
-                  #{location.street}, #{location.city}, #{location.state.abbreviation} #{location.zipcode}
-              - if location.phone
-                %p
+    %table.organizations-datatable
+      %thead
+        %tr
+          %td Country
+          %td State
+          %td Name
+          %td Address
+          %td Phone
+          %td Website
+      %tbody
+        - @states.each do |state|
+          - next unless state.locations.where(shown: true).any?
+          - state.locations.each do |location|
+            - next unless location.shown
+            - location = location.decorate
+
+            %tr
+              %td US
+              %td= state.name
+              %td
+                - if location.street.present?
+                  %a.where-shop-location{data: { lat: location.latitude, long: location.longitude } }
+                    Show #{location.display_name} on map
+              %td #{location.street}, #{location.city}, #{location.state.abbreviation} #{location.zipcode}
+              %td
+                - if location.phone
                   %a{ href: "tel:#{ location.phone }" }
                     = location.display_phone
-              - if location.organization.website.present?
-                %p
-                  = link_to "#{location.organization.name} website", location.organization.website, target: "_blank", class: "shop-site"
-              .map-window
-                .window-content
-                  %h3
-                    = location.display_name
-                  %p
-                    = location.street
-                    %br
-                    #{location.city}, #{location.state.abbreviation} #{location.zipcode}
-                  - if location.phone
-                    .map-telephone
-                      %a{ href: "tel:#{ location.phone }" }
-                        = number_to_phone(location.phone)
-    %h3.padded
-      International Partner organizations
+              %td= link_to "#{location.organization.name} website", location.organization.website, target: "_blank", class: "shop-site"
+        - @countries.each do |country|
+          - next unless country.locations.where(shown: true).any?
+          - country.locations.each do |location|
+            - next unless location.shown
+            - location = location.decorate
 
-    - @countries.each do |country|
-      - next unless country.locations.where(shown: true).any?
-      %p.state-name
-        = country.name
-      %ul.state-list
-        - country.locations.each do |location|
-          - next unless location.shown
-          - location = location.decorate
-          %li
-            .collapse-faq
-              %a.shop-title-link.collapsed{ href: "#shop#{location.org_location_id}", data: { toggle: "collapse"} }
-                %span
-                  &#x25B6;
-                = location.display_name
-                %em
-                  &nbsp;&nbsp;#{location.city}
-            .shop-info.collapse{ id: "shop#{location.org_location_id}" }
-              - if location.street.present?
-                %a.where-shop-location{data: { lat: location.latitude, long: location.longitude } }
-                  Show #{location.display_name} on map
-                %p
-                  #{location.street}, #{location.city}, #{location.zipcode}, #{location.country.name}
-              - if location.phone
-                %p
+            %tr
+              %td= country.name
+              %td= location.city
+              %td
+                - if location.street.present?
+                  %a.where-shop-location{data: { lat: location.latitude, long: location.longitude } }
+                    Show #{location.display_name} on map
+              %td #{location.street}, #{location.city}, #{location.zipcode}, #{location.country.name}
+              %td
+                - if location.phone
                   %a{ href: "tel:#{ location.phone }" }
                     = location.display_phone
-              - if location.organization.website.present?
-                %p
-                  = link_to "#{location.organization.name} website", location.organization.website, target: "_blank", class: "shop-site"
-              .map-window
-                .window-content
-                  %h3
-                    = location.display_name
-                  %p
-                    = location.street
-                    %br
-                    #{location.city}, #{location.zipcode}, #{location.country.name}
-                  - if location.phone
-                    .map-telephone
-                      %a{ href: "tel:#{ location.phone }" }
-                        = number_to_phone(location.phone)
-
+              %td= link_to "#{location.organization.name} website", location.organization.website, target: "_blank", class: "shop-site"
 
   %hr.where-add-shops
 
   %p
     If you're a bike shop and would like to join us, check out our #{link_to "signup page", new_organization_path}.
+
+
+:javascript
+  $('.organizations-datatable').dataTable();
