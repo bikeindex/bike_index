@@ -2,9 +2,7 @@
   Private
 */
 
-const url = urn => (process.env.RAILS_ENV === 'development'
-  ? `http://localhost:3001/${urn}`
-  : `https://bikeindex.org/${urn}`);
+const url = urn => [process.env.BASE_URL, urn].join('/');
 
 const serialSearchUrl = serial => url(
   `api/v1/bikes?multi_serial_search=true&serial=${serial}`,
