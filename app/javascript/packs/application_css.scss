@@ -14,8 +14,6 @@ footer.primary-footer {
   .dropdown-toggle {
     cursor: pointer;
   }
-  // I added this because several elements actually would show up above the navbar
-  z-index: 999;
 }
 
 .full-screen-table-wrapper {
