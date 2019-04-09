@@ -36,9 +36,12 @@
               %p
                 No picture!
           .col-sm
-            .form-group
-              %label{:for => "recovery_upload"} Recovery Photo upload
-              %input#recovery_upload.form-control-file{:type => "file"}/
+            .input-group.mb-3
+              .input-group-prepend
+                %span#recovery_photo_addon.input-group-text Upload
+              .custom-file
+                %input#recovery_photo_file.custom-file-input{"aria-describedby" => "recovery_photo_addon", :type => "file"}/
+                %label.custom-file-label{:for => "recovery_photo_file"} Choose file
       .form-group.avatar-upload
         .avatar-img
           - if @recovery_display.image.present?
