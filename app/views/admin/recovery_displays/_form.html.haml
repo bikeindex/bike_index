@@ -26,43 +26,45 @@
               %label
                 Bike url
               %input.less-strong.w-100{ type: 'text', value: bike_url(@recovery_display.bike) }
-      .form-group.mt-4
-        .row
-          .col-sm
-            = f.label :image, "Recovery photo"
-            - if @recovery_display.image?
-              = image_tag(@recovery_display.image_url(:thumb))
-            - else
-              %p
-                No picture!
-          .col-sm
-            .input-group.mb-3
-              .input-group-prepend
-                %span#recovery_photo_addon.input-group-text Upload
-              .custom-file
-                %input#recovery_photo_file.custom-file-input{"aria-describedby" => "recovery_photo_addon", :type => "file"}/
-                %label.custom-file-label{:for => "recovery_photo_file"} Choose file
-      .form-group.avatar-upload
-        .avatar-img
-          - if @recovery_display.image.present?
-            = f.label :remove_image
-            = f.check_box :remove_image
-          - elsif @bike.present? && @recovery_display.image.blank?
-            - if @bike.public_images.present? || @bike.stock_photo_url.present?
-              - if @bike.public_images.present?
-                - text = "has image"
-                - url = @bike.public_images.first.image_url
-              - else
-                - text = "has stock image"
-                - url = @bike.stock_photo_url
-              %label
-                #{link_to "Bike", bike_url(@bike), target: "_blank"} #{text}
-              %a.btn.btn-success#use_image_for_display{ href: '#', data: {url: url}}
-                Use first image
-                = f.hidden_field :remote_image_url
-            - else
-              Bike has no image
-      .form-group
-        = f.label :body
-        = f.text_area :quote, placeholder: 'Quote about recovery', rows: 4, class: "form-control w-50"
+      .row
+        .col-lg-6
+          .form-group.mt-4
+          = f.label :image, "Recovery photo"
+          - if @recovery_display.image?
+            = image_tag(@recovery_display.image_url(:thumb))
+          - else
+            %p
+              No picture!
+        .col-lg-6
+          .input-group.mb-3
+            .input-group-prepend
+              %span#recovery_photo_addon.input-group-text.d-none.d-sm-block Upload
+            .custom-file
+              %input#recovery_photo_file.custom-file-input{"aria-describedby" => "recovery_photo_addon", :type => "file"}/
+              %label.custom-file-label{:for => "recovery_photo_file"} Choose file
+          .form-group.avatar-upload
+            .avatar-img
+              - if @recovery_display.image.present?
+                = f.label :remove_image
+                = f.check_box :remove_image
+              - elsif @bike.present? && @recovery_display.image.blank?
+                - if @bike.public_images.present? || @bike.stock_photo_url.present?
+                  - if @bike.public_images.present?
+                    - text = "has image"
+                    - url = @bike.public_images.first.image_url
+                  - else
+                    - text = "has stock image"
+                    - url = @bike.stock_photo_url
+                  %label
+                    #{link_to "Bike", bike_url(@bike), target: "_blank"} #{text}
+                  %a.btn.btn-success#use_image_for_display{ href: '#', data: {url: url}}
+                    Use first image
+                    = f.hidden_field :remote_image_url
+                - else
+                  Bike has no image
+      .row
+        .col-lg-6
+          .form-group
+            = f.label :body
+            = f.text_area :quote, placeholder: 'Quote about recovery', rows: 4, class: "form-control"
       = f.submit 'Save', class: 'btn btn-success float-right'
