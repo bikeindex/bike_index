@@ -9,8 +9,9 @@ const config = {
 const honeybadger = Honeybadger.configure(config);
 
 Honeybadger.beforeNotify(notice => {
-  if (process.env.RAILS_ENV !== 'development') return;
-  log.debug('<development> Honeybadger Error', notice);
+  if (process.env.RAILS_ENV === 'development') {
+    return log.debug('Error', notice);
+  }
 });
 
 export default honeybadger;

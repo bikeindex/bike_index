@@ -5,11 +5,11 @@
 const url = urn => [process.env.BASE_URL, urn].join('/');
 
 const serialSearchUrl = serial => url(
-  `api/v1/bikes?multi_serial_search=true&serial=${serial}`,
+  `api/v2/bikes_search?serial=${serial}`,
 );
 
 const fuzzySearchUrl = serial => url(
-  `api/v1/bikes/close_serials?multi_serial_search=true&serial=${serial}`,
+  `api/v2/bikes_search/close_serials?serial=${serial}`,
 );
 
 const request = async url => {

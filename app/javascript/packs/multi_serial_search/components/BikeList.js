@@ -14,17 +14,22 @@ const BikeList = ({ bikes, serial, fuzzySearching }) => {
       </h3>
       <ul>
         {bikes.map(({
-          stolen, url, id, title, serial,
-        }) => (
-          <li key={id}>
-            {stolen && <span className="stolen-color">Stolen</span>}
-            {' '}
-            <a href={url} target="_blank" rel="noopener noreferrer">
-              {title}
-            </a>
-            <span className="serial-text">{serial}</span>
-          </li>
-        ))}
+          stolen, id, title, serial, frame_colors: frameColors,
+        }) => {
+          const url = [process.env.BASE_URL, 'bikes', id].join('/');
+          const description = `${title} (${frameColors.join(',')})`;
+
+          return (
+            <li key={id}>
+              {stolen && <span className="stolen-color">Stolen</span>}
+              {' '}
+              <a href={url} target="_blank" rel="noopener noreferrer">
+                {description}
+              </a>
+              <span className="serial-text">{serial}</span>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
