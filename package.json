@@ -1,6 +1,7 @@
 {
   "scripts": {
     "lint": "./node_modules/.bin/eslint ./app/javascript/packs",
+    "pretty": "./app/javascript/packs/*/*.js prettier --write",
     "test": "jest"
   },
   "dependencies": {
@@ -20,6 +21,7 @@
     "moment-timezone": "^0.5.23",
     "pluralize": "^7.0.0",
     "popper.js": "^1.14.4",
+    "prettier": "^1.16.4",
     "prop-types": "^15.7.2",
     "rails-ujs": "^5.2.1",
     "react": "^16.8.5",

@@ -4,9 +4,9 @@
 // TODO: Once the coffeescript has been converted and everything is in webpack, the application.js pack should look like this
 //       and this can be removed
 
-import Rails from 'rails-ujs';
-import 'bootstrap/dist/js/bootstrap';
-import '../source/javascript/initializer';
+import Rails from "rails-ujs";
+import "bootstrap/dist/js/bootstrap";
+import "./pages/initializer";
 
 Rails.start();
 

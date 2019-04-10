@@ -187,6 +187,8 @@ class Organization < ActiveRecord::Base
   # Enable this if they have paid for showing it, or if they use ascend
   def show_bulk_import?; paid_for?("show_bulk_import") || ascend_imports? end
 
+  def show_multi_serial?; %w[law_enforcement].include?(kind); end
+
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates
     location = locations&.first
