@@ -85,18 +85,26 @@ RSpec.describe Export, type: :model do
     end
   end
 
-  description "custom_bike_ids=" do
+  describe "custom_bike_ids=" do
     let(:organization) { FactoryBot.create(:organization) }
-    let!(:bike1) { FactoryBot.create(:organization_bike, organization: organization) }
+    let!(:bike1) { FactoryBot.create(:organization_bike, organization: organization, created_at: Time.now - 1.day) }
     let!(:bike2) { FactoryBot.create(:organization_bike, organization: organization) }
-    let!(:bike_non_organized) { FactoryBot.create(:bike) }
-    let(:export) { FactoryBot.build(:export_organization, organization: organization) }
+    let!(:bike3) { FactoryBot.create(:bike) }
+    let(:export) { FactoryBot.build(:export_organization, organization: organization, end_at: Time.now - 1.hour) }
     it "assigns the bike ids" do
-      export.custom_bike_ids = "https://bikeindex.org/bikes/#{bike1.id}  \n#{bike_non_organized.id}, https://bikeindex.org/bikes/#{bike2.id}  "
-      expect(export.custom_bike_ids).to match_array([bike1.id, bike2.id])
+      bike1.reload
+      expect(bike1.created_at).to be < export.end_at
+      export.custom_bike_ids = "https://bikeindex.org/bikes/#{bike1.id}  \n#{bike3.id}, https://bikeindex.org/bikes/#{bike2.id}  "
+      expect(export.custom_bike_ids).to match_array([bike1.id, bike2.id, bike3.id])
+      pp export.bikes_scoped.to_sql
+      expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id, bike2.id])
+      # Bike2 is within the time parameters - so with no custom bikes, it returns that
       export.custom_bike_ids = ""
-      expect(export.custom_bike_ids).to match_array([])
-      export.custom_bike_ids = "bikeindex.org/bikes/#{bike1.id}  \nhttps://bikeindex.org/bikes/#{bike_non_organized.id}\n /bikes/#{bike2.id}  "
+      expect(export.custom_bike_ids).to be_nil
+      expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id])
+      export.custom_bike_ids = "bikeindex.org/bikes/#{bike3.id}  \n /bikes/#{bike2.id}, #{bike2.id}  "
+      expect(export.custom_bike_ids).to match_array([bike2.id, bike3.id])
+      expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id, bike2.id])
     end
   end
 
