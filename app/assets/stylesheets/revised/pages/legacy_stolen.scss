@@ -1,3 +1,5 @@
+@import "revised/mixins/buttons";
+
 #stolen_index .stolen-bike-merge-alert {
   margin: 30px auto;
   max-width: 600px;
@@ -431,8 +433,6 @@ $multserial-textheight: 8em;
       }
     }
   }
-
-  #ms_form_section, #ms_search_section { display: none; }
 
   .multi-search-toggle {
     font-size: 18px;

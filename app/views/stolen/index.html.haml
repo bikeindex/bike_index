@@ -1,3 +1,5 @@
+= javascript_pack_tag 'multi_serial_search/index'
+
 .home-subhead
   .container
     %h2
@@ -13,30 +15,7 @@
       - cache('stolen_home_organizations', expires_in: 1.day) do
         So far we have <strong>#{Organization.count} partner bike shops, police departments, </strong> and <strong>bike advocacy organizations</strong>.
 .container
-  %h4.multi-search-toggle
-    %a#show_multi_search{ href: '#' }
-      show multi-serial search
-  .multiserial-form#ms_form_section
-    .padded
-    %h3
-      Multiple Serial Search
-    = text_area_tag :multi_serial_search, nil, placeholder: 'Enter multiple serial numbers. Separate them with commas or new lines', class: 'form-control'
-    %a#search_serials.sbrbtn{ href: '#', data: { target: api_v1_bikes_url } }
-      = image_tag 'stolen/search.svg'
-    %section#ms_search_section.hidden
-      .padded
-      .multiserial-response
-        %h2
-          Multi serial search results
-        %ul#serials_submitted.multiserials-list
-        .multiserial-fuzzy-box
-          %a#multiserial_fuzzy.button-green{ href: '#', data: { target: close_serials_api_v1_bikes_url }}
-            %span
-              Find nearly matching serials (in case of a mis-entry)
-            %span.ms-short-fuzzy
-              Find near matches
-        
-        #bikes_returned.padded
+  #multi-serial-search
 
 / .container
 / google ad went here
@@ -83,14 +62,23 @@
               .contact-actions.control-group
                 = f.email_field :email, placeholder: "Your email address", class: 'form-control'
                 = f.submit 'Send alert!', class: 'btn pull-right'
+                
+        -# Stolen Bike Widget
+        %script{type: "text/javascript", src: "https://widget.bikeindex.org/stolen-widget.js"}
+        :javascript
+          $(document).ready(function() {
+            BikeIndex.init({
+              height: 350,
+              location: 'ip',
+              elementId: 'binx_stolen_widget'
+            });
+          });
 
         .involve-widget
           %h3
             List recent stolen bikes on your site
-          
-          
-          #binx_stolen_widget{ data: { location: 'ip', height: '350px' } }
-          <script src="https://binx-widget.herokuapp.com/include.js"></script>
+          #binx_stolen_widget
+
                 
     / %section
     /   .container
