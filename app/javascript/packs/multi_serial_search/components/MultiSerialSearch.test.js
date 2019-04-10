@@ -22,18 +22,8 @@ describe("<MultiSerialSearch /> shallow rendered", () => {
     expect(toJson(tree)).toMatchSnapshot();
   });
 
-  it("toggles the form visibility", () => {
-    const wrap = shallow(<MultiSerialSearch />);
-    wrap.find(".multi-search-toggle a").simulate("click", event());
-    expect(wrap.exists(".multiserial-form")).toBe(true);
-  });
-
   it("searches multiple serials", () => {
     jest.spyOn(api, "fetchSerialResults");
-
-    // - toggle form visibility
-    const wrap = shallow(<MultiSerialSearch />);
-    wrap.find(".multi-search-toggle a").simulate("click", event());
 
     // - enter and submit multiple serials
     const input = wrap.find("textarea");
