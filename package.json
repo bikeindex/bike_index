@@ -1,7 +1,6 @@
 {
   "scripts": {
     "lint": "./node_modules/.bin/eslint ./app/javascript/packs",
-    "pretty": "./app/javascript/packs/*/*.js prettier --write",
     "test": "jest"
   },
   "dependencies": {
