@@ -149,10 +149,6 @@ RSpec.describe Export, type: :model do
         expect(export.bikes_scoped.to_sql).to eq organization.bikes.where(created_at: export.start_at..export.end_at).to_sql
       end
     end
-    context "passed organization bikes" do
-      xit "adds those bikes" do
-      end
-    end
   end
 
   describe "permitted_headers_for" do
