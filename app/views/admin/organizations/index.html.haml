@@ -23,8 +23,8 @@
       .col-md-1
         = submit_tag 'Search', name: 'search', class: 'btn btn-primary mt-4'
 
-- if @organizations.present?
-  = paginate @organizations, views_prefixs: "admin"
+
+= paginate @organizations, views_prefix: "admin"
 
 .full-screen-table-wrapper
   %table.table.table-striped.table-bordered
@@ -75,6 +75,8 @@
               - if organization.show_on_map
                 %span.less-strong-right
                   Mapped
+
+  = paginate @organizations, views_prefix: "admin"
 
 
 :coffeescript
