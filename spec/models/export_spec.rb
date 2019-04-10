@@ -85,6 +85,21 @@ RSpec.describe Export, type: :model do
     end
   end
 
+  description "custom_bike_ids=" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:bike1) { FactoryBot.create(:organization_bike, organization: organization) }
+    let!(:bike2) { FactoryBot.create(:organization_bike, organization: organization) }
+    let!(:bike_non_organized) { FactoryBot.create(:bike) }
+    let(:export) { FactoryBot.build(:export_organization, organization: organization) }
+    it "assigns the bike ids" do
+      export.custom_bike_ids = "https://bikeindex.org/bikes/#{bike1.id}  \n#{bike_non_organized.id}, https://bikeindex.org/bikes/#{bike2.id}  "
+      expect(export.custom_bike_ids).to match_array([bike1.id, bike2.id])
+      export.custom_bike_ids = ""
+      expect(export.custom_bike_ids).to match_array([])
+      export.custom_bike_ids = "bikeindex.org/bikes/#{bike1.id}  \nhttps://bikeindex.org/bikes/#{bike_non_organized.id}\n /bikes/#{bike2.id}  "
+    end
+  end
+
   describe "avery_export" do
     let(:export) { Export.new }
     let(:target_url) { "https://avery.com?mergeDataURL=https%3A%2F%2Ffiles.bikeindex.org%2Fexports%2F820181214ccc.xlsx" }
@@ -124,6 +139,10 @@ RSpec.describe Export, type: :model do
         expect(export.bikes_scoped.to_sql).to eq organization.bikes.where("bikes.created_at > ?", export.start_at).to_sql
         export.options = export.options.merge("end_at" => end_time)
         expect(export.bikes_scoped.to_sql).to eq organization.bikes.where(created_at: export.start_at..export.end_at).to_sql
+      end
+    end
+    context "passed organization bikes" do
+      xit "adds those bikes" do
       end
     end
   end
