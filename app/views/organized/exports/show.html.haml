@@ -72,11 +72,11 @@
               - @export.custom_bike_ids.each do |custom_id|
                 %li
                   - if included_bike_ids.include?(custom_id)
-                    = link_to custom_id, bikes_path(custom_id)
+                    = link_to custom_id, bike_path(custom_id)
                   - else
-                    %span.text-warning
-                      = link_to custom_id, bikes_path(custom_id), class: "less-strong"
-                      %em.small
+                    %small.text-warning
+                      #{link_to custom_id, bike_path(custom_id), class: "less-strong text-warning"}:
+                      %em
                         Unable to export, not part of your organization
 
       - if @export.avery_export?
