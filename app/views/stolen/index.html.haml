@@ -63,16 +63,16 @@
                 = f.email_field :email, placeholder: "Your email address", class: 'form-control'
                 = f.submit 'Send alert!', class: 'btn pull-right'
                 
-        -# Stolen Bike Widget
-        %script{type: "text/javascript", src: "https://widget.bikeindex.org/stolen-widget.js"}
-        :javascript
-          $(document).ready(function() {
-            BikeIndex.init({
-              height: 350,
-              location: 'ip',
-              elementId: 'binx_stolen_widget'
-            });
-          });
+        / # Stolen Bike Widget
+        / %script{type: "text/javascript", src: "https://widget.bikeindex.org/stolen-widget.js"}
+        / :javascript
+        /   $(document).ready(function() {
+        /     BikeIndex.init({
+        /       height: 350,
+        /       location: 'ip',
+        /       elementId: 'binx_stolen_widget'
+        /     });
+        /   });
 
         .involve-widget
           %h3
