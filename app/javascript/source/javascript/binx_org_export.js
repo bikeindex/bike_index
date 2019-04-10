@@ -15,11 +15,11 @@ window.BinxAppOrgExport = class BinxAppOrgExport {
 
   initNewForm() {
     // make the datetimefield expand, set the time
-    $(".datetimefield-expander").on("click", e => {
+    $(".field-expander").on("click", e => {
       e.preventDefault();
       let $parent = $(e.target).parents(".form-group");
-      $parent.find(".datetimefield-expander").slideUp("fast", function() {
-        $parent.find(".datetimefield-fields").slideDown("fast");
+      $parent.find(".field-expander").slideUp("fast", function() {
+        $parent.find(".collapsed-fields").slideDown("fast");
         $parent.find("input[type='datetime-local']").val(
           moment()
             .startOf("day")
@@ -28,11 +28,11 @@ window.BinxAppOrgExport = class BinxAppOrgExport {
       });
     });
     // make the datetimefield collapse, remove the time
-    $(".datetimefield-collapser").on("click", e => {
+    $(".field-collapser").on("click", e => {
       e.preventDefault();
       let $parent = $(e.target).parents(".form-group");
-      $parent.find(".datetimefield-fields").slideUp("fast", function() {
-        $parent.find(".datetimefield-expander").slideDown("fast");
+      $parent.find(".collapsed-fields").slideUp("fast", function() {
+        $parent.find(".field-expander").slideDown("fast");
         $parent.find("input[type='datetime-local']").val("");
       });
     });
