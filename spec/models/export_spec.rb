@@ -97,10 +97,11 @@ RSpec.describe Export, type: :model do
       export.custom_bike_ids = "https://bikeindex.org/bikes/#{bike1.id}  \n#{bike3.id}, https://bikeindex.org/bikes/#{bike2.id}  "
       expect(export.custom_bike_ids).to match_array([bike1.id, bike2.id, bike3.id])
       expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id, bike2.id])
-      # Bike2 is within the time parameters - so with no custom bikes, it returns that
+      # Bike1 is within the time parameters - so with no custom bikes, it returns that
       export.custom_bike_ids = ""
       expect(export.custom_bike_ids).to be_nil
       expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id])
+      # And it also returns the bike that is from the time period in addition to any custom bikes that are assigned
       export.custom_bike_ids = "bikeindex.org/bikes/#{bike3.id}  \n /bikes/#{bike2.id}, #{bike2.id}  "
       expect(export.custom_bike_ids).to match_array([bike2.id, bike3.id])
       expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id, bike2.id])
