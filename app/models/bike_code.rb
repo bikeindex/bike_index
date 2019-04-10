@@ -53,7 +53,7 @@ class BikeCode < ActiveRecord::Base
 
   def self.admin_text_search(str)
     normalized_code = normalize_code(str)
-    return all unless normalized_code.present?
+    return self unless normalized_code.present?
     where("code ILIKE ?", "%#{normalized_code}%")
   end
 
