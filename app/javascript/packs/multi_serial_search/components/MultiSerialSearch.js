@@ -96,14 +96,16 @@ const MultiSerialSearch = () => {
           onChange={onChangeSearchTokens}
           placeholder="Enter multiple serial numbers. Separate them with commas or new lines"
         />
-        <button
-          type="submit"
-          className="sbrbtn"
-          disabled={loading}
-          onClick={onSearchSerials}
-        >
-          <img alt="search" src={searchIcon} />
-        </button>
+        <div className="clearfix">
+          <button
+            type="submit"
+            className="multiserialsearch-btn btn btn-primary float-right mt-2"
+            disabled={loading}
+            onClick={onSearchSerials}
+          >
+            <img alt="search" src={searchIcon} />
+          </button>
+        </div>
 
         {/* Search Results */}
         <SearchResults
@@ -113,7 +115,6 @@ const MultiSerialSearch = () => {
           onFuzzySearch={onFuzzySearch}
         />
       </div>
-      )}
     </Fragment>
   );
 };

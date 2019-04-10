@@ -172,6 +172,7 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import "revised/pages/bikes/index";
 @import "revised/pages/bikes/show";
 @import "revised/pages/bikes/show_photo"; // separated because it's a lot
+@import "revised/pages/bikes/multi_serial_search";
 
 // User pages
 @import "revised/pages/user/home";
