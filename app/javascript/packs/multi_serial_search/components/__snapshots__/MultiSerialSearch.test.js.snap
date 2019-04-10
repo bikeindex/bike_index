@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<MultiSerialSearch /> shallow rendered matches the snapshot 1`] = `
+<Fragment>
+  <h4
+    className="multi-search-toggle"
+  >
+    <a
+      href=""
+      onClick={[Function]}
+    >
+      Show
+       Multiple Serial Search
+    </a>
+  </h4>
+</Fragment>
+`;
