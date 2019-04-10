@@ -17,7 +17,13 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   end
 
   def show
-    redirect_to edit_admin_recovery_display_url
+    if params[:id] == "bust_cache"
+      clear_index_wrap_cache
+      flash[:success] = "Recovery Display Cache busted"
+      redirect_to admin_recovery_displays_url
+    else
+      redirect_to edit_admin_recovery_display_url
+    end
   end
 
   def edit

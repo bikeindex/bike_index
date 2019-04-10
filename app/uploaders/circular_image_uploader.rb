@@ -1,13 +1,12 @@
 # encoding: utf-8
 
 class CircularImageUploader < CarrierWave::Uploader::Base
-  include ::CarrierWave::Backgrounder::Delay
   include CarrierWave::MiniMagick
  
-  if Rails.env.test? || Rails.env.development?
-    storage :file
-  else
+  if Rails.env.production?
     storage :fog
+  else
+    storage :file
   end
   
   after :remove, :delete_empty_upstream_dirs  
