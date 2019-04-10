@@ -12,7 +12,7 @@
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   - body_class = "news-page" if controller_name == "news"
   %body{ id: page_id, class:  body_class }
-    %nav.navbar.navbar-expand-md.navbar-light.bg-light.admin-navbar.zindex-sticky
+    %nav.navbar.navbar-expand-md.navbar-light.bg-light.admin-navbar
       %span.navbar-brand
         = link_to (image_tag("logo.svg")), admin_root_path
       - if current_user.superuser?
