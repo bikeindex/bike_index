@@ -25,6 +25,9 @@ describe("<MultiSerialSearch /> shallow rendered", () => {
   it("searches multiple serials", () => {
     jest.spyOn(api, "fetchSerialResults");
 
+    // - toggle form visibility
+    const wrap = shallow(<MultiSerialSearch />);
+
     // - enter and submit multiple serials
     const input = wrap.find("textarea");
     input.simulate("change", event({ target: { value: "one,two,three" } }));
