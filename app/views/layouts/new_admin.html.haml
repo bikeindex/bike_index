@@ -7,16 +7,12 @@
     = javascript_pack_tag "admin_application"
     = stylesheet_pack_tag "application_css"
 
-  -# To check for active page for dropdown menus
-  - paid_links = %w[payments paid_features invoices]
-  - other_links = %w[memberships manufacturers invitations tsvs maintenance failed_bikes ctypes graphs paints feedbacks tweets exports bulk_imports ]
-
   / manually override body_class in a few situations :/
   - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   - body_class = "news-page" if controller_name == "news"
   %body{ id: page_id, class:  body_class }
-    %nav.navbar.navbar-expand-md.navbar-light.bg-light.sticky-admin-nav-md-screens.admin-navbar.zindex-sticky
+    %nav.navbar.navbar-expand-md.navbar-light.bg-light.admin-navbar.zindex-sticky
       %span.navbar-brand
         = link_to (image_tag("logo.svg")), admin_root_path
       - if current_user.superuser?

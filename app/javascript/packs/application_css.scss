@@ -8,6 +8,12 @@ footer.primary-footer {
 }
 
 .admin-navbar {
+  @include media-breakpoint-up(md) {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+  }
   .navbar-brand img {
     height: 35px;
   }
@@ -18,15 +24,4 @@ footer.primary-footer {
 
 .full-screen-table-wrapper {
   overflow-x: scroll;
-}
-
-@include media-breakpoint-up(md) {
-  .sticky-admin-nav-md-screens {
-    position: fixed;
-    top: 0;
-    width: 100%;
-  }
-  #admin-content {
-    padding-top: 60px;
-  }
 }
