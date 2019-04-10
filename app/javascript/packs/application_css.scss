@@ -8,9 +8,14 @@ footer.primary-footer {
 }
 
 .admin-navbar {
+  @include media-breakpoint-up(md) {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: $zindex-sticky;
+  }
   .navbar-brand img {
     height: 35px;
-    width: 35px;
   }
   .dropdown-toggle {
     cursor: pointer;
