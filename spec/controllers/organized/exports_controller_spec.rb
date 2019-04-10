@@ -179,7 +179,8 @@ describe Organized::ExportsController, type: :controller do
         it "creates a non-avery export" do
           expect(organization.paid_for?("avery_export")).to be_truthy
           expect do
-            post :create, export: export_params.merge(bike_code_start: 1), organization_id: organization.to_param
+            post :create, export: export_params.merge(bike_code_start: 1, custom_bike_ids: "1222, https://bikeindex.org/bikes/999"),
+                          organization_id: organization.to_param
           end.to change(Export, :count).by 1
           expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
           export = Export.last
@@ -192,6 +193,7 @@ describe Organized::ExportsController, type: :controller do
           expect(export.bike_code_start).to be_nil
           expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
           expect(export.avery_export?).to be_falsey
+          expect(export.custom_bike_ids).to eq([1222, 999])
         end
         context "with IE 11 datetime params" do
           let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "a221C") }
