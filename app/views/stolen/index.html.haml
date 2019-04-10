@@ -64,12 +64,14 @@
                 = f.submit 'Send alert!', class: 'btn pull-right'
                 
         -# Stolen Bike Widget
-        %script{type: "text/javascript", src: "http://widget.bikeindex.org/stolen-widget.js"}
+        %script{type: "text/javascript", src: "https://widget.bikeindex.org/stolen-widget.js"}
         :javascript
-          BikeIndex.init({
-            height: 350,
-            location: 'ip',
-            elementId: 'binx_stolen_widget'
+          $(document).ready(function() {
+            BikeIndex.init({
+              height: 350,
+              location: 'ip',
+              elementId: 'binx_stolen_widget'
+            });
           });
 
         .involve-widget
