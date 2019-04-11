@@ -38,10 +38,10 @@
         .col-lg-6
           .input-group.mb-3
             .input-group-prepend
-              %span#recovery_photo_addon.input-group-text.d-none.d-sm-block Upload
+              %span#b.input-group-text.d-none.d-sm-block Upload
             .custom-file
-              %input#recovery_photo_file.custom-file-input{"aria-describedby" => "recovery_photo_addon", :type => "file"}/
-              %label.custom-file-label{:for => "recovery_photo_file"} Choose file
+              = f.label :image, "Choose file", class: "custom-file-label"
+              = f.file_field :image
           .form-group.avatar-upload
             .avatar-img
               - if @recovery_display.image.present?
@@ -59,7 +59,7 @@
                     #{link_to "Bike", bike_url(@bike), target: "_blank"} #{text}
                   %a.btn.btn-success#use_image_for_display{ href: '#', data: {url: url}}
                     Use first image
-                    = f.hidden_field :remote_image_url
+
                 - else
                   Bike has no image
       .row
@@ -67,4 +67,5 @@
           .form-group
             = f.label :body
             = f.text_area :quote, placeholder: 'Quote about recovery', rows: 4, class: "form-control"
+      = f.hidden_field :remote_image_url
       = f.submit 'Save', class: 'btn btn-success float-right'

@@ -37,3 +37,5 @@
             = "&#x2713;".html_safe if recovery_display.image?
           %td.large-screens.table-cell-check
             = "&#x2713;".html_safe if recovery_display.stolen_record_id.present?
+
+= paginate @recovery_displays, views_prefix: "admin"
