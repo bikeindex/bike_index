@@ -20,6 +20,9 @@
         - else
           %span.disabled-menu-item.menu-item
             Incomplete registrations
+      - if active_organization.show_multi_serial?
+        %li
+          = active_link "Multi serial search", multi_serial_search_organization_bikes_path(active_organization), class: "menu-item"
       - if active_organization.paid_for?("show_recoveries") # I don't want to show a grayed link for this
         %li
           = active_link "Recoveries", recoveries_organization_bikes_path(active_organization), class: "menu-item"

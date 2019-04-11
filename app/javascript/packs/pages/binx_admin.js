@@ -50,23 +50,21 @@ window.BinxAdmin = class BinxAdmin {
       this.startGraphTimeSet();
     }
   }
-  
-  useBikeImageForDisplay(){
+
+  useBikeImageForDisplay() {
     $("#use_image_for_display").on("click", e => {
       e.preventDefault();
-      const image_btn = $('#use_image_for_display');
-      if (image_btn.hasClass('using_bikes')) {
-        $('.avatar-upload').slideDown();
-        $('#recovery_display_remote_image_url').val('');
-        image_btn.text('Use first image');
+      const image_btn = $("#use_image_for_display");
+      if (image_btn.hasClass("using_bikes")) {
+        $(".avatar-upload").slideDown();
+        $("#recovery_display_remote_image_url").val("");
+        image_btn.text("Use first image");
       } else {
-        $('.avatar-upload').slideUp();
-        $('#recovery_display_remote_image_url').val(image_btn.attr('data-url'));
-        image_btn.text('nvrmind');
+        $(".avatar-upload").slideUp();
+        $("#recovery_display_remote_image_url").val(image_btn.attr("data-url"));
+        image_btn.text("nvrmind");
       }
-      return image_btn.toggleClass('using_bikes');
-    })
+      return image_btn.toggleClass("using_bikes");
+    });
   }
 };
-
-

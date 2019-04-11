@@ -2,15 +2,12 @@
   Private
 */
 
-const url = urn => [process.env.BASE_URL, urn].join('/');
+const url = urn => [process.env.BASE_URL, urn].join("/");
 
-const serialSearchUrl = serial => url(
-  `api/v2/bikes_search?serial=${serial}`,
-);
+const serialSearchUrl = serial => url(`api/v2/bikes_search?serial=${serial}`);
 
-const fuzzySearchUrl = serial => url(
-  `api/v2/bikes_search/close_serials?serial=${serial}`,
-);
+const fuzzySearchUrl = serial =>
+  url(`api/v2/bikes_search/close_serials?serial=${serial}`);
 
 const request = async url => {
   const resp = await fetch(url);
@@ -32,7 +29,4 @@ const fetchFuzzyResults = serial => {
   return request(url);
 };
 
-export {
-  fetchSerialResults,
-  fetchFuzzyResults,
-};
+export { fetchSerialResults, fetchFuzzyResults };

@@ -271,7 +271,7 @@ Bikeindex::Application.routes.draw do
       collection do
         get :recoveries
         get :incompletes
-        get :multi_search
+        get :multi_serial_search
       end
     end
     resources :exports, except: [:edit]

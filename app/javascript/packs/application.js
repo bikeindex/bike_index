@@ -1,1 +1,1 @@
-import '../source/javascript/initializer';
+import "./pages/initializer";
