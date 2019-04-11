@@ -22,4 +22,7 @@ hr.delete-organization-section {
     font-size: 0.75rem;
     line-height: 2rem;
   }
+  tr td:last-child {
+    width: 85%; // This is effectively min-width for tables
+  }
 }

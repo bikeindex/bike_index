@@ -153,11 +153,11 @@ describe Organized::BikesController, type: :controller do
           end
         end
       end
-      describe "multi_search" do
+      describe "multi_serial_search" do
         it "renders" do
-          get :multi_search, organization_id: organization.to_param
+          get :multi_serial_search, organization_id: organization.to_param
           expect(response.status).to eq(200)
-          expect(response).to render_template :multi_search
+          expect(response).to render_template :multi_serial_search
         end
       end
     end

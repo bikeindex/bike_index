@@ -141,5 +141,17 @@ describe WelcomeController do
         end
       end
     end
+
+    describe "recovery_stories" do
+      it "renders recovery stories" do
+        FactoryBot.create_list(:recovery_display, 3)
+        get :recovery_stories, per_page: 2
+        expect(assigns(:recovery_displays).count).to eq 2
+        expect(response.status).to eq(200)
+        expect(response).to render_template("recovery_stories")
+        expect(response).to render_with_layout("application_revised")
+        expect(flash).to_not be_present
+      end
+    end
   end
 end

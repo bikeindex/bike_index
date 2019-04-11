@@ -30,10 +30,12 @@
               %span.less-strong-right.medium-screens
                 = recovery_display.bike && recovery_display.bike.id
           %td
-            = truncate(recovery_display.quote, length: 70)
+            = truncate(recovery_display.quote, length: 140)
           %td
             = recovery_display.quote_by
           %td.table-cell-check
             = "&#x2713;".html_safe if recovery_display.image?
           %td.large-screens.table-cell-check
             = "&#x2713;".html_safe if recovery_display.stolen_record_id.present?
+
+= paginate @recovery_displays, views_prefix: "admin"

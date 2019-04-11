@@ -30,17 +30,16 @@ task seed_test_users_and_bikes: :environment do
   @user = User.find_by_email('user@example.com')
   @member = User.find_by_email('member@example.com')
   @org = Organization.first
-  @cycle_type_id = CycleType.find_by_name('Bike').id
   50.times do
     bike = Bike.new(
-      cycle_type_id: @cycle_type_id,
+      cycle_type: :bike,
       propulsion_type: 'foot-pedal',
-      manufacturer_id: (rand(Manufacturer.frames.count) + 1),
+      manufacturer_id: (rand(Manufacturer.frames.count) - 1),
       rear_tire_narrow: true,
       handlebar_type: HandlebarType.slugs.first,
-      rear_wheel_size_id: (rand(WheelSize.count) + 1),
-      front_wheel_size_id: (rand(WheelSize.count) + 1),
-      primary_frame_color_id: (rand(Color.count) + 1),
+      rear_wheel_size_id: (rand(WheelSize.count) - 1),
+      front_wheel_size_id: (rand(WheelSize.count) - 1),
+      primary_frame_color_id: (rand(Color.count) - 1),
       creator: @user,
       owner_email: @user.email
     )
@@ -65,12 +64,12 @@ task seed_dup_bikes: :environment do
   @user = User.find_by_email('user@example.com')
   @member = User.find_by_email('member@example.com')
   @org = Organization.first
-  @cycle_type_id = CycleType.find_by_name('Bike').id
+  @cycle_type = CycleType.new(:bike)
   @serial_number = (0...10).map { (65 + rand(26)).chr }.join
   @manufacturer_id = (rand(Manufacturer.frames.count) + 1)
   500.times do
     bike = Bike.new(
-      cycle_type_id: @cycle_type_id,
+      cycle_type: :bike,
       propulsion_type: 'foot-pedal',
       manufacturer_id: @manufacturer_id,
       rear_tire_narrow: true,
