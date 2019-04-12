@@ -4,31 +4,39 @@
   = link_to "New recovery display", new_admin_recovery_display_url, class: "btn btn-success float-right"
 %p
   #{pluralize(RecoveryDisplay.count, "recovery display")}
+  %span.float-right
+    = link_to "bust cache", admin_recovery_display_path("bust_cache"), class: "less-strong"
 
 
 = paginate @recovery_displays, views_prefix: "admin"
 .full-screen-table-wrapper
-  %table.table.table-striped.table-bordered.padded
+  %table.table.table-striped.table-bordered.padded.table-sm
     %thead.thead-light
       %th
         Date&nbsp;<small class="convertTimezone"></small>
+      %th
+        Updated
       %th
         Quote
       %th
         Quoter
       %th
-        image?
+        %small
+          image?
       %th
-        Association?
+        %small
+          Association?
     %tbody
       - @recovery_displays.each do |recovery_display|
         %tr
           %td
             %a.convertTime{ href: edit_admin_recovery_display_url(recovery_display) }
               = l recovery_display.date_recovered, format: :convert_time
-            .less-strong-hold
-              %span.less-strong-right.medium-screens
-                = recovery_display.bike && recovery_display.bike.id
+            %small.text-right.less-strong
+              = recovery_display.bike && recovery_display.bike.id
+          %td
+            %small.convertTime
+              = l recovery_display.updated_at, format: :convert_time
           %td
             = truncate(recovery_display.quote, length: 140)
           %td

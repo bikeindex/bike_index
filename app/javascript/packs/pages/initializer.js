@@ -89,7 +89,8 @@ binxApp.enableFilenameForUploads = function() {
       i++;
     }
     $(this)
-      .next(".custom-file-label")
+      .parent()
+      .find(".custom-file-label")
       .text(files.join(", "));
   });
 };
