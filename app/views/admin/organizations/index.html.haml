@@ -29,18 +29,12 @@
 .full-screen-table-wrapper
   %table.table.table-striped.table-bordered
     %thead.thead-light
-      - ['name', 'approved', 'created_at'].each do |col|
-        - active_col = @sort == col
-        %th
-          %a{ href: '#', class: ('active' if active_col), style: 'display: block;', data: { sort: col, direction: (active_col && @sort_direction == 'desc' ? 'asc' : 'desc') } }
-            = col.titleize
-            - if col == "created_at"
-              <small class="convertTimezone"></small>
-            - if active_col
-              .pull-right
-                %small
-                  = (@sort_direction == 'asc' ? '&#x2193;' : '&#x2191;').html_safe
-
+      %th
+        = sortable "name"
+      %th
+        = sortable "approved"
+      %th
+        = sortable "created_at", "Added"
       %th
         Bikes
       %th
