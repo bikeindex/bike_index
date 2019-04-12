@@ -37,11 +37,9 @@
               No picture!
         .col-lg-6
           .input-group.mb-3
-            .input-group-prepend
-              %span#b.input-group-text.d-none.d-sm-block Upload
             .custom-file
               = f.label :image, "Choose file", class: "custom-file-label"
-              = f.file_field :image
+              = f.file_field :image, class: "custom-file-input"
           .form-group.avatar-upload
             .avatar-img
               - if @recovery_display.image.present?

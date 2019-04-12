@@ -49,3 +49,9 @@ label {
     width: 85%; // This is effectively min-width for tables
   }
 }
+
+table .table-cell-check {
+  font-family: Courier;
+  text-align: center;
+  font-weight: bold;
+}
