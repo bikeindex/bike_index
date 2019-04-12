@@ -1,5 +1,6 @@
+$compare-plans-table-border: rgb(178, 178, 178);
 .signup-landing-page-campus-packages {
-  .banner-header .campus-packages-main-title {
+  .banner-header {
     h1,
     h2 {
       text-align: center;
@@ -10,7 +11,6 @@
 
   .campus-packages-price-list {
     list-style-type: none;
-    margin: 0 -15px;
     padding: 2 * $vertical-height 0;
     display: -webkit-box;
     display: -ms-flexbox;
@@ -18,14 +18,20 @@
     -ms-flex-wrap: wrap;
     flex-wrap: wrap;
     text-align: center;
-    & > li {
+    flex-align: center;
+    justify-content: space-between;
+    li {
       // Make it a flex column
       width: 100%;
       -webkit-box-flex: 0;
-      -ms-flex: 0 0 20%;
-      flex: 0 0 20%;
-      max-width: 20%;
-      padding: 0 15px;
+      -ms-flex: 0 0 19%;
+      flex: 0 0 19%;
+      max-width: 19%;
+      padding: 0;
+    }
+    h5 {
+      color: $gray-light;
+      font-style: italic;
     }
     h4 {
       color: #fff;
@@ -42,10 +48,13 @@
     }
     h3 {
       color: $header-font-color;
-      font-size: 60px;
+      font-size: 50px;
       text-align: center;
       line-height: 1;
       margin: 0;
+      span {
+        font-size: 75%;
+      }
     }
     p {
       font-style: italic;
@@ -56,7 +65,71 @@
     .campus-packages-package {
       background: #fff;
       border: 2px solid #000;
-      padding: $vertical-height;
+      padding: $vertical-height $vertical-height 2 * $vertical-height;
     }
+  }
+  .btn {
+    border-radius: 4px;
+  }
+  table.compare-plans-table {
+    th,
+    td {
+      border-right: 2px solid $compare-plans-table-border;
+    }
+    thead {
+      th {
+        border-top: 2px solid $compare-plans-table-border;
+        border-bottom: 2px solid $compare-plans-table-border;
+        &:first-of-type {
+          border-top-color: transparent;
+          border-left-color: transparent;
+        }
+      }
+    }
+    tr {
+      td:first-of-type {
+        padding-top: 0;
+        padding-bottom: 0;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      &:last-of-type {
+        td {
+          border-bottom: 2px solid $compare-plans-table-border;
+        }
+        td:first-of-type {
+          border-bottom-color: transparent;
+        }
+      }
+    }
+    tbody td {
+      vertical-align: middle;
+    }
+    .table-cell-check {
+      font-family: Courier;
+      text-align: center;
+      font-weight: bold;
+      font-size: 30px;
+      color: $gray-light;
+      .included-feature {
+        color: $blue-dark;
+      }
+    }
+  }
+  .most-popular-option {
+    position: relative;
+  }
+  .most-popular-note {
+    font-size: 12px;
+    font-weight: 300;
+    line-height: 1;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: -21px;
+    text-align: center;
+    color: #fff;
+    padding: 4px 0;
+    background: #000;
   }
 }

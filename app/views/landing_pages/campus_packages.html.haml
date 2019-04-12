@@ -1,7 +1,7 @@
 .signup-landing-page.signup-landing-page-campus-packages
   %header.banner-header
     .container
-      .row.campus-packages-main-title
+      .campus-packages-main-title
         %h1
           Bike Index for Colleges & Universities
         %h2
@@ -17,7 +17,7 @@
             %h5
               &nbsp;
             %h3
-              $0
+              <span>$</span>0
             %p
               \/Month
             %a.btn.btn-primary{ href: "#" }
@@ -30,141 +30,171 @@
             %h5
               Keep us peddling
             %h3
-              $25
+              <span>$</span>25
             %p
               \/Month
             %a.btn.btn-primary{ href: "#" }
               Try For Free
 
-      %li
+        %li
           %h4
             Small Campus
           .campus-packages-package
             %h5
               0-10k Members
             %h3
+              <span>$</span>330
+            %p
+              \/Month
+            %a.btn.btn-primary{ href: "#" }
+              Try For Free
+
+          %li
+            %h4
+              Medium Campus
+            .campus-packages-package
+              %h5
+                10k-20k Members
+              %h3
+                <span>$</span>500
+              %p
+                \/Month
+              %a.btn.btn-primary{ href: "#" }
+                Try For Free
+
+          %li
+            %h4
+              Large Campus
+            .campus-packages-package
+              %h5
+                20k+ Members
+              %h3
+                <span>$</span>750
+              %p
+                \/Month
+              %a.btn.btn-primary{ href: "#" }
+                Try For Free
+  .container
+    %h2
+      Compare Plans and Features
+    %table.table.compare-plans-table.table-striped
+      %thead
+        %tr
+          %th
+          %th
+            %p
+              Free Forever
+            %p
+              $0
+            %p
+              (USD/Month billed annually)
+            %a.btn.btn-primary{ href: "#" }
+              Sign Up Now
+
+
+          %th
+            %p
+              Supporting School
+            %p
+              $25
+            %p
+              (USD/Month billed annually)
+            %a.btn.btn-primary{ href: "#" }
+              Try For Free
+
+          %th
+            %p
+              Small Campus
+            %p
               $330
             %p
-              \/Month
+              (USD/Month billed annually)
             %a.btn.btn-primary{ href: "#" }
               Try For Free
 
-        %li
-          %h4
-            Medium Campus
-          .campus-packages-package
-            %h5
-              10k-20k Members
-            %h3
+          %th.most-popular-option
+            .most-popular-note
+              Most Popular
+            %p
+              Medium Campus
+            %p
               $500
             %p
-              \/Month
+              (USD/Month billed annually)
             %a.btn.btn-primary{ href: "#" }
               Try For Free
 
-        %li
-          %h4
-            Large Campus
-          .campus-packages-package
-            %h5
-              20k+ Members
-            %h3
+          %th
+            %p
+              Large Campus
+            %p
               $750
             %p
-              \/Month
+              (USD/Month billed annually)
             %a.btn.btn-primary{ href: "#" }
               Try For Free
+      %tbody
+        %tr
+          %td
+            Email&nbsp;Support
+          %td.table-cell-check
+            %span.included-feature
+              &#8226;
+          %td.table-cell-check
+            %span.included-feature
+              &#8226;
+          %td.table-cell-check
+            %span.included-feature
+              &#8226;
+          %td.table-cell-check
+            %span.included-feature
+              &#8226;
+          %td.table-cell-check
+            %span.included-feature
+              &#8226;
 
-  %h2
-    Compare Plans and Features
-  %table
-    %tr
-      %th
-      %th
-        %p
-          Free Forever
-        %p
-          $0
-        %p
-          (USD/Month billed annually)
-        %button
-          Sign Up Now
-
-
-      %th
-        %p
-          Supporting School
-        %p
-          $25
-        %p
-          (USD/Month billed annually)
-        %button
-          Try For Free
-
-      %th
-        %p
-          Small Campus
-        %p
-          $330
-        %p
-          (USD/Month billed annually)
-        %button
-          Try For Free
-
-      %th
-        %p
-          Medium Campus
-        %p
-          $500
-        %p
-          (USD/Month billed annually)
-        %button
-          Try For Free
-
-      %th
-        %p
-          Large Campus
-        %p
-          $750
-        %p
-          (USD/Month billed annually)
-        %button
-          Try For Free
-
-    %tr
-      %th
-        Email Support
-      %td
-        &#8226;
-      %td
-        &#8226;
-      %td
-        &#8226;
-      %td
-        &#8226;
-      %td
-        &#8226;
-
-    %tr
-      %th
-        Email support
-      %td
-        &#8226;
-      %td
-        &#8226;
-      %td
-        &#8226;
-      %td
-        &#8226;
-      %td
-        &#8226;
+        %tr
+          %td
+            Feature description that is extra long
+          %td.table-cell-check
+            %span.included-feature
+              &#8226;
+          %td.table-cell-check
+            %span.included-feature
+              &#8226;
+          %td.table-cell-check
+            %span.included-feature
+              &#8226;
+          %td.table-cell-check
+            %span.included-feature
+              &#8226;
+          %td.table-cell-check
+            %span.included-feature
+              &#8226;
+        %tr
+          %td
+            Email support
+          %td.table-cell-check
+            &mdash;
+          %td.table-cell-check
+            %span.included-feature
+              &#8226;
+          %td.table-cell-check
+            %span.included-feature
+              &#8226;
+          %td.table-cell-check
+            %span.included-feature
+              &#8226;
+          %td.table-cell-check
+            %span.included-feature
+              &#8226;
 
 
-  %p
-    A la carte features and custom development available. Get in touch to find out more
-
-  .container
     %p
-      Questions? Want to get started?
-    %button
-      Contact us
+      A la carte features and custom development available. Get in touch to find out more
+
+    .container
+      %p
+        Questions? Want to get started?
+      %button
+        Contact us
