@@ -38,7 +38,7 @@
     .col-sm-4
       = f.text_field :website, class: 'form-control'
 
-  - if current_organization.is_paid
+  - if active_organization.is_paid
     .form-group.row.avatar-upload-wrapper
       %label.org-form-label
         Organization logo
@@ -59,11 +59,11 @@
       = f.submit 'Update', class: 'btn btn-success btn-lg'
 
 
-- unless current_organization.is_paid
+- unless active_organization.is_paid
   %hr.delete-organization-section
   %p.text-md-center
     %a.collapsed{ href: '#', data: { toggle: 'collapse', target: '#delete-organization' } }
       I would like to terminate my account with Bike Index
   #delete-organization.collapse
     .text-md-center
-      = link_to 'Delete organization', organization_manage_path(id: current_organization.id, organization_id: current_organization.to_param), method: :delete, confirm: "Are you positive you want to remove #{current_organization.name} from Bike Index?", class: 'btn btn-danger'
+      = link_to 'Delete organization', organization_manage_path(id: active_organization.id, organization_id: active_organization.to_param), method: :delete, confirm: "Are you positive you want to remove #{active_organization.name} from Bike Index?", class: 'btn btn-danger'

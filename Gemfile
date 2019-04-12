@@ -33,8 +33,8 @@ gem 'redcarpet' # Something to do with swagger? Guess we needed another markdown
 gem 'kaminari' # pagination
 gem 'pg_search'
 gem 'nokogiri', '~> 1.8.1'
-gem 'carrierwave'
-gem 'carrierwave_backgrounder'
+gem "carrierwave", "~> 0.11.2"
+gem "carrierwave_backgrounder"
 gem 'rmagick'
 gem 'mini_magick' # a smaller implementation of rmagick, required for rqrcode
 gem 'rqrcode-rails3'
@@ -88,7 +88,7 @@ gem 'chartkick' # Display charts
 gem 'groupdate' # Required for charts
 gem 'bootstrap', '~> 4.0.0.alpha3' # Bootstrap 4 - used for revised stylesheets
 gem 'jquery-datatables-rails', '~>3.4.0'
-gem 'webpacker', '~> 3.5' #Webpacker - used to transpile and compact javascript assets
+gem 'webpacker', '~> 4.x'
 
 # Show performance metrics
 gem 'stackprof', require: false

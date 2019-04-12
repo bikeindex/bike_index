@@ -99,6 +99,20 @@ describe WelcomeController do
             expect(response.status).to eq(200)
             expect(response).to render_template("user_home")
             expect(response).to render_with_layout("application_revised")
+            expect(session[:current_organization_id]).to eq "0"
+            expect(assigns[:current_organization]).to be_nil
+          end
+        end
+        context "with organization" do
+          let(:organization) { FactoryBot.create(:organization) }
+          let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+          it "sets current_organization_id" do
+            get :user_home
+            expect(response.status).to eq(200)
+            expect(response).to render_template("user_home")
+            expect(response).to render_with_layout("application_revised")
+            expect(session[:current_organization_id]).to eq organization.id
+            expect(assigns[:current_organization]).to eq organization
           end
         end
         context "with stuff" do
@@ -106,11 +120,13 @@ describe WelcomeController do
           let(:bike) { ownership.bike }
           let(:bike_2) { FactoryBot.create(:bike) }
           let(:lock) { FactoryBot.create(:lock, user: user) }
+          let(:organization) { FactoryBot.create(:organization) }
           before do
             allow_any_instance_of(User).to receive(:bikes) { [bike, bike_2] }
             allow_any_instance_of(User).to receive(:locks) { [lock] }
           end
           it "renders and user things are assigned" do
+            session[:current_organization_id] = organization.id # Even though the user isn't part of the organization, permit it
             get :user_home, per_page: 1
             expect(response.status).to eq(200)
             expect(response).to render_template("user_home")
@@ -119,8 +135,22 @@ describe WelcomeController do
             expect(assigns(:per_page).to_s).to eq "1"
             expect(assigns(:bikes).first).to eq(bike)
             expect(assigns(:locks).first).to eq(lock)
+            expect(session[:current_organization_id]).to eq organization.id
+            expect(assigns[:current_organization]).to eq organization
           end
         end
+      end
+    end
+
+    describe "recovery_stories" do
+      it "renders recovery stories" do
+        FactoryBot.create_list(:recovery_display, 3)
+        get :recovery_stories, per_page: 2
+        expect(assigns(:recovery_displays).count).to eq 2
+        expect(response.status).to eq(200)
+        expect(response).to render_template("recovery_stories")
+        expect(response).to render_with_layout("application_revised")
+        expect(flash).to_not be_present
       end
     end
   end

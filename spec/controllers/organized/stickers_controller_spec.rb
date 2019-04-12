@@ -33,7 +33,7 @@ describe Organized::StickersController, type: :controller do
           get :index, organization_id: organization.to_param
           expect(response).to render_template(:index)
           expect(response).to render_with_layout("application_revised")
-          expect(assigns(:current_organization)).to eq organization
+          expect(assigns(:active_organization)).to eq organization
         end
       end
     end
@@ -50,7 +50,7 @@ describe Organized::StickersController, type: :controller do
           get :index, organization_id: organization.to_param
           expect(response).to render_template(:index)
           expect(response).to render_with_layout("application_revised")
-          expect(assigns(:current_organization)).to eq organization
+          expect(assigns(:active_organization)).to eq organization
           expect(assigns(:bike_codes).pluck(:id)).to eq([bike_code.id])
         end
         context "with query search" do
@@ -60,7 +60,7 @@ describe Organized::StickersController, type: :controller do
           it "renders" do
             get :index, organization_id: organization.to_param, claimedness: "unclaimed", query: "part"
             expect(response).to render_template(:index)
-            expect(assigns(:current_organization)).to eq organization
+            expect(assigns(:active_organization)).to eq organization
             expect(assigns(:bike_codes).pluck(:id)).to eq([bike_code.id])
           end
         end
@@ -72,7 +72,7 @@ describe Organized::StickersController, type: :controller do
             expect(BikeCode.where(bike_id: bike.id).pluck(:id)).to eq([bike_code_claimed.id])
             get :index, organization_id: organization.to_param, bike_query: "https://bikeindex.org/bikes/#{bike.id}/edit?cool=stuff"
             expect(response).to render_template(:index)
-            expect(assigns(:current_organization)).to eq organization
+            expect(assigns(:active_organization)).to eq organization
             expect(assigns(:bike_codes).pluck(:id)).to eq([bike_code_claimed.id])
           end
         end
@@ -82,7 +82,7 @@ describe Organized::StickersController, type: :controller do
         it "renders" do
           get :edit, id: bike_code.code, organization_id: organization.to_param
           expect(response).to render_template(:edit)
-          expect(assigns(:current_organization)).to eq organization
+          expect(assigns(:active_organization)).to eq organization
         end
       end
 
@@ -92,11 +92,47 @@ describe Organized::StickersController, type: :controller do
         let(:bike2) { FactoryBot.create(:bike) }
         it "updates" do
           put :update, id: bike_code.code, organization_id: organization.id, bike_code: { bike_id: "https://bikeindex.org/bikes/#{bike2.id} " }
-          expect(assigns(:current_organization)).to eq organization
+          expect(assigns(:active_organization)).to eq organization
           expect(flash[:success]).to be_present
-          expect(response).to redirect_to stickers_root_path
+          expect(response).to redirect_to bike_path(bike2)
           bike_code.reload
           expect(bike_code.bike_id).to eq bike2.id
+          expect(bike_code.previous_bike_id).to eq bike.id
+        end
+        context "passed code rather than id" do
+          it "updates" do
+            request.env["HTTP_REFERER"] = bike_path(bike2)
+            put :update, id: "code", organization_id: organization.id, bike_code: { bike_id: bike2.id, code: bike_code.code }
+            expect(assigns(:active_organization)).to eq organization
+            expect(flash[:success]).to be_present
+            expect(response).to redirect_to bike_path(bike2)
+            bike_code.reload
+            expect(bike_code.bike_id).to eq bike2.id
+            expect(bike_code.previous_bike_id).to eq bike.id
+          end
+          context "code blank" do
+            it "redirects back" do
+              request.env["HTTP_REFERER"] = bike_path(bike2)
+              put :update, id: "code", organization_id: organization.id, bike_code: { bike_id: bike2.id, code: "" }
+              expect(assigns(:active_organization)).to eq organization
+              expect(flash[:error]).to be_present
+              bike_code.reload
+              expect(bike_code.bike_id).to eq bike.id
+            end
+          end
+          context "incomplete code" do
+            let(:bike_code) { FactoryBot.create(:bike_code, bike_id: bike.id, organization_id: organization.id, code: "AA0000151515") }
+            it "updates" do
+              request.env["HTTP_REFERER"] = bike_path(bike2)
+              put :update, id: "code", organization_id: organization.id, bike_code: { bike_id: bike2.id, code: "151515" }
+              expect(assigns(:active_organization)).to eq organization
+              expect(flash[:success]).to be_present
+              expect(response).to redirect_to bike_path(bike2)
+              bike_code.reload
+              expect(bike_code.bike_id).to eq bike2.id
+              expect(bike_code.previous_bike_id).to eq bike.id
+            end
+          end
         end
         context "other organization bike_code" do
           let(:bike_code) { FactoryBot.create(:bike_code, bike_id: bike.id) }
@@ -112,11 +148,12 @@ describe Organized::StickersController, type: :controller do
           it "updates and removes the assignment" do
             put :update, id: bike_code.code, bike_id: nil, organization_id: organization.id
             expect(flash[:success]).to be_present
-            expect(response).to redirect_to stickers_root_path
+            expect(response).to redirect_to edit_organization_sticker_path(organization_id: organization.to_param, id: bike_code.code)
             bike_code.reload
             expect(bike_code.claimed_at).to be_nil
             expect(bike_code.bike_id).to be_nil
             expect(bike_code.user_id).to be_nil
+            expect(bike_code.previous_bike_id).to eq bike.id
           end
         end
       end

@@ -5,7 +5,7 @@ class Admin::ExportsController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 10
     if params[:organization_id].present?
-      exports = Export.where(organization_id: current_organization.id)
+      exports = Export.where(organization_id: active_organization.id)
     else
       exports = Export.all
     end

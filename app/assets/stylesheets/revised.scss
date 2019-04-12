@@ -172,6 +172,7 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import "revised/pages/bikes/index";
 @import "revised/pages/bikes/show";
 @import "revised/pages/bikes/show_photo"; // separated because it's a lot
+@import "revised/pages/bikes/multi_serial_search";
 
 // User pages
 @import "revised/pages/user/home";
@@ -256,16 +257,16 @@ body {
   text-align: right;
 }
 .mt-4 {
-  padding-top: 2 * $vertical-height;
+  margin-top: 2 * $vertical-height;
 }
 .mt-2 {
-  padding-top: $vertical-height;
+  margin-top: $vertical-height;
 }
 .mb-4 {
-  padding-bottom: 2 * $vertical-height;
+  margin-bottom: 2 * $vertical-height;
 }
 .mb-2 {
-  padding-bottom: $vertical-height;
+  margin-bottom: $vertical-height;
 }
 .small {
   @extend small;
@@ -278,4 +279,15 @@ body {
 .float-left,
 .pull-left {
   float: right;
+}
+
+.text-right {
+  text-align: right;
+}
+.text-left {
+  text-align: left;
+}
+
+.text-center {
+  text-align: center;
 }

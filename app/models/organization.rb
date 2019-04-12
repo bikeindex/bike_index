@@ -49,10 +49,9 @@ class Organization < ActiveRecord::Base
   scope :unpaid, -> { where(is_paid: true) }
   scope :valid, -> { where(is_suspended: false) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
-  scope :with_bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications]) }
+  scope :bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications]) }
 
   before_validation :set_calculated_attributes
-  after_commit :update_user_bike_actions_organizations
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
 
@@ -167,7 +166,6 @@ class Organization < ActiveRecord::Base
     end
     generate_access_token unless self.access_token.present?
     set_auto_user
-    update_user_bike_actions_organizations
     locations.each { |l| l.save unless l.shown == allowed_show }
     true # TODO: Rails 5 update
   end
@@ -189,6 +187,8 @@ class Organization < ActiveRecord::Base
   # Enable this if they have paid for showing it, or if they use ascend
   def show_bulk_import?; paid_for?("show_bulk_import") || ascend_imports? end
 
+  def show_multi_serial?; paid_for?("show_multi_serial") || %w[law_enforcement].include?(kind); end
+
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates
     location = locations&.first
@@ -201,7 +201,7 @@ class Organization < ActiveRecord::Base
   def set_auto_user
     if embedable_user_email.present?
       u = User.fuzzy_email_find(embedable_user_email)
-      self.auto_user_id = u.id if u && u.is_member_of?(self)
+      self.auto_user_id = u.id if u && u.member_of?(self)
       if auto_user_id.blank? && embedable_user_email == ENV['AUTO_ORG_MEMBER']
         Membership.create(user_id: u.id, organization_id: id, role: 'member')
         self.auto_user_id = u.id
@@ -210,14 +210,6 @@ class Organization < ActiveRecord::Base
       return nil unless users.any?
       self.auto_user_id = users.first.id
     end
-  end
-
-  def update_user_bike_actions_organizations
-    if bike_actions?
-      users.where("bike_actions_organization_id IS NULL or bike_actions_organization_id != ?", id)
-    else
-      users.where(bike_actions_organization_id: id)
-    end.each { |u| u.update_attributes(updated_at: Time.now) } # Force updating
   end
 
   def allowed_show

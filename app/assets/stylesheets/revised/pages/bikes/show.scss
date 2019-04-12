@@ -12,7 +12,6 @@
     .btn {
       margin-left: 20px;
     }
-    .organization-actions-overlay,
     .bike-edit-overlay {
       @include box-shadow(0 0 2px rgba(black, 0.2));
       padding: $vertical-height;
@@ -20,9 +19,6 @@
   }
   .bike-edit-overlay {
     background: rgba($blue, 0.92);
-  }
-  .organization-actions-overlay {
-    background: rgba($red, 0.92);
   }
 
   h1 {
@@ -96,6 +92,40 @@
   .component-typess {
     margin-top: $vertical-height;
   }
+
+  .organized-access-panel {
+    margin: 2 * $vertical-height 0;
+    .card-block {
+      padding: 15px;
+    }
+    .card-title {
+      p,
+      h3 {
+        margin: 0;
+      }
+      padding-bottom: 0.5 * $vertical-height;
+      border-bottom: 1px solid $gray-lightish;
+    }
+    .unstolen-notification-box {
+      @extend .clearfix;
+      border-left: 1px solid $gray-lightish;
+      padding-bottom: $vertical-height;
+      .form-control {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+    }
+    .geomessages-wrap {
+      text-align: center;
+      padding: 8px 15px;
+      background: $gray-lighter;
+      border-top: 1px solid $gray-lightish;
+      span {
+        display: inline-block;
+        padding-right: 1rem;
+      }
+    }
+  }
 }
 
 // On small screens, use the tabbed interface for components
@@ -114,6 +144,12 @@
     .cgroup-name {
       display: none;
     }
+    // contact box is a pull out, rather than full width
+    .organized-access-panel {
+      .unstolen-notification-box {
+        border-left: 0 none;
+      }
+    }
   }
 }
 
@@ -129,7 +165,7 @@
   }
 }
 
-// // On medium screens and bigger, display all the components
+// On medium screens and bigger, display all the components
 @media (min-width: $grid-breakpoint-md) {
   #bikes_show {
     .nav-tabs.component-types {

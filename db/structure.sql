@@ -139,7 +139,8 @@ CREATE TABLE public.bike_codes (
     user_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    claimed_at timestamp without time zone
+    claimed_at timestamp without time zone,
+    previous_bike_id integer
 );
 
 
@@ -1643,7 +1644,8 @@ CREATE TABLE public.public_images (
     imageable_type character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    is_private boolean DEFAULT false NOT NULL
+    is_private boolean DEFAULT false NOT NULL,
+    external_image_url text
 );
 
 
@@ -1991,10 +1993,8 @@ CREATE TABLE public.users (
     can_send_many_stolen_notifications boolean DEFAULT false NOT NULL,
     auth_token character varying(255),
     stripe_id character varying(255),
-    is_content_admin boolean DEFAULT false NOT NULL,
     notification_newsletters boolean DEFAULT false NOT NULL,
     developer boolean DEFAULT false NOT NULL,
-    bike_actions_organization_id integer,
     partner_data json,
     latitude double precision,
     longitude double precision,
@@ -3232,13 +3232,6 @@ CREATE INDEX index_user_emails_on_user_id ON public.user_emails USING btree (use
 
 
 --
--- Name: index_users_on_bike_actions_organization_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_users_on_bike_actions_organization_id ON public.users USING btree (bike_actions_organization_id);
-
-
---
 -- Name: index_users_on_password_reset_token; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3937,4 +3930,12 @@ INSERT INTO schema_migrations (version) VALUES ('20190315183047');
 INSERT INTO schema_migrations (version) VALUES ('20190315213846');
 
 INSERT INTO schema_migrations (version) VALUES ('20190317191821');
+
+INSERT INTO schema_migrations (version) VALUES ('20190327164432');
+
+INSERT INTO schema_migrations (version) VALUES ('20190329233031');
+
+INSERT INTO schema_migrations (version) VALUES ('20190401233010');
+
+INSERT INTO schema_migrations (version) VALUES ('20190402230848');
 

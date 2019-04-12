@@ -110,51 +110,50 @@ describe Bike do
     end
   end
 
-  describe 'frame_size' do
-    it 'removes crap from bike size strings' do
-      bike = Bike.new(frame_size: '19\\\\"')
-      bike.clean_frame_size
-      expect(bike.frame_size_number).to eq(19)
-      expect(bike.frame_size).to eq('19in')
-      expect(bike.frame_size_unit).to eq('in')
+  describe "frame_size" do
+    let(:bike) { Bike.new(frame_size: frame_size) }
+    context "crap in size string" do
+      let(:frame_size) { '19\\\\"' }
+      it "removes crap" do
+        bike.clean_frame_size
+        expect(bike.frame_size_number).to eq(19)
+        expect(bike.frame_size).to eq("19in")
+        expect(bike.frame_size_unit).to eq("in")
+      end
     end
-    it 'sets things' do
-      bike = Bike.new(frame_size_number: '19.5sa', frame_size_unit: 'in')
-      bike.clean_frame_size
-      expect(bike.frame_size_number).to eq(19.5)
-      expect(bike.frame_size).to eq('19.5in')
-      expect(bike.frame_size_unit).to eq('in')
+    context "passed cm number" do
+      let(:frame_size) { "Med/54cm" }
+      it "figures out that it's cm" do
+        bike.clean_frame_size
+        expect(bike.frame_size_number).to eq(54)
+        expect(bike.frame_size).to eq("54cm")
+        expect(bike.frame_size_unit).to eq("cm")
+      end
     end
-    it 'removes extra numbers and other things from size strings' do
-      bike = Bike.new(frame_size: '19.5 somethingelse medium 54cm')
-      bike.clean_frame_size
-      expect(bike.frame_size_number).to eq(19.5)
-      expect(bike.frame_size).to eq('19.5in')
-      expect(bike.frame_size_unit).to eq('in')
+    context "ordinal letter" do
+      let(:frame_size) { "M" }
+      it "is cool with ordinal sizing" do
+        bike.clean_frame_size
+        expect(bike.frame_size).to eq("m")
+        expect(bike.frame_size_unit).to eq("ordinal")
+      end
     end
-    it "figures out that it's cm" do
-      bike = Bike.new(frame_size: 'Med/54cm')
-      bike.clean_frame_size
-      expect(bike.frame_size_number).to eq(54)
-      expect(bike.frame_size).to eq('54cm')
-      expect(bike.frame_size_unit).to eq('cm')
+    context "ordinal string" do
+      let(:frame_size) { "Med" }
+      it "is sets on save" do
+        bike.clean_frame_size
+        expect(bike.frame_size).to eq("m")
+        expect(bike.frame_size_unit).to eq("ordinal")
+      end
     end
-    it 'is cool with ordinal sizing' do
-      bike = Bike.new(frame_size: 'Med')
-      bike.clean_frame_size
-      expect(bike.frame_size).to eq('m')
-      expect(bike.frame_size_unit).to eq('ordinal')
-    end
-    it 'is cool with ordinal sizing' do
-      bike = Bike.new(frame_size: 'M')
-      bike.clean_frame_size
-      expect(bike.frame_size).to eq('m')
-      expect(bike.frame_size_unit).to eq('ordinal')
-    end
-
-    it 'has before_save_callback_method defined for clean_frame_size' do
-      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }
-        .map(&:raw_filter).include?(:clean_frame_size)).to eq(true)
+    context "passed things" do
+      let(:bike) { FactoryBot.create(:bike, frame_size_number: "19.5sa", frame_size_unit: "in") }
+      it "sets on save" do
+        bike.reload
+        expect(bike.frame_size_number).to eq(19.5)
+        expect(bike.frame_size).to eq("19.5in")
+        expect(bike.frame_size_unit).to eq("in")
+      end
     end
   end
 
@@ -174,13 +173,13 @@ describe Bike do
     end
   end
 
-  describe 'can_be_claimed_by' do
+  describe 'claimable_by?' do
     context 'already claimed' do
       it 'returns false' do
         user = User.new
         bike = Bike.new
         allow(bike).to receive(:user?).and_return(true)
-        expect(bike.can_be_claimed_by(user)).to be_falsey
+        expect(bike.claimable_by?(user)).to be_falsey
       end
     end
     context 'can be claimed' do
@@ -191,14 +190,14 @@ describe Bike do
         allow(bike).to receive(:current_ownership).and_return(ownership)
         allow(ownership).to receive(:user).and_return(user)
         allow(bike).to receive(:user?).and_return(false)
-        expect(bike.can_be_claimed_by(user)).to be_truthy
+        expect(bike.claimable_by?(user)).to be_truthy
       end
     end
     context 'no current_ownership' do # AKA Something is broken. Bikes should always have ownerships
       it 'does not explode' do
         user = User.new
         bike = Bike.new
-        expect(bike.can_be_claimed_by(user)).to be_falsey
+        expect(bike.claimable_by?(user)).to be_falsey
       end
     end
   end
@@ -212,30 +211,29 @@ describe Bike do
     end
   end
 
-  describe "authorize_bike_for_user(!)" do
+  describe "authorize_for_user(!)" do
     let(:bike) { ownership.bike }
     let(:creator) { ownership.creator }
     let(:user) { FactoryBot.create(:user) }
-    let(:bike) { ownership.bike }
 
     context "un-organized" do
       let(:ownership) { FactoryBot.create(:ownership) }
       context "no user" do
         it "returns false" do
-          expect(bike.authorize_bike_for_user(nil)).to be_falsey
-          expect(bike.authorize_bike_for_user!(nil)).to be_falsey
+          expect(bike.authorize_for_user(nil)).to be_falsey
+          expect(bike.authorize_for_user!(nil)).to be_falsey
         end
       end
       context "unauthorized" do
         it "returns false" do
-          expect(bike.authorize_bike_for_user(user)).to be_falsey
-          expect(bike.authorize_bike_for_user!(user)).to be_falsey
+          expect(bike.authorize_for_user(user)).to be_falsey
+          expect(bike.authorize_for_user!(user)).to be_falsey
         end
       end
       context "creator" do
         it "returns true" do
-          expect(bike.authorize_bike_for_user(creator)).to be_truthy
-          expect(bike.authorize_bike_for_user!(creator)).to be_truthy
+          expect(bike.authorize_for_user(creator)).to be_truthy
+          expect(bike.authorize_for_user!(creator)).to be_truthy
         end
       end
       context "claimed" do
@@ -243,23 +241,23 @@ describe Bike do
         let(:user) { ownership.user }
         it "returns true for user, not creator" do
           expect(bike.claimed?).to be_truthy
-          expect(bike.authorize_bike_for_user(creator)).to be_falsey
-          expect(bike.authorize_bike_for_user(user)).to be_truthy
-          expect(bike.authorize_bike_for_user!(creator)).to be_falsey
-          expect(bike.authorize_bike_for_user!(user)).to be_truthy
+          expect(bike.authorize_for_user(creator)).to be_falsey
+          expect(bike.authorize_for_user(user)).to be_truthy
+          expect(bike.authorize_for_user!(creator)).to be_falsey
+          expect(bike.authorize_for_user!(user)).to be_truthy
         end
       end
-      context "can_be_claimed_by" do
+      context "claimable_by?" do
         let(:ownership) { FactoryBot.create(:ownership, user: user) }
         it "marks claimed and returns true" do
           expect(ownership.claimed?).to be_falsey
           expect(bike.claimed?).to be_falsey
           expect(ownership.owner).to eq creator
-          expect(bike.authorize_bike_for_user!(creator)).to be_truthy
-          expect(bike.authorize_bike_for_user(user)).to be_truthy
-          expect(bike.authorize_bike_for_user!(user)).to be_truthy
+          expect(bike.authorize_for_user!(creator)).to be_truthy
+          expect(bike.authorize_for_user(user)).to be_truthy
+          expect(bike.authorize_for_user!(user)).to be_truthy
           expect(bike.claimed?).to be_truthy
-          expect(bike.authorize_bike_for_user!(creator)).to be_falsey
+          expect(bike.authorize_for_user!(creator)).to be_falsey
           ownership.reload
           expect(ownership.owner).to eq user
           expect(bike.ownerships.count).to eq 1
@@ -267,42 +265,66 @@ describe Bike do
       end
     end
     context "creation organization" do
-      let(:ownership) { FactoryBot.create(:ownership_organization_bike) }
-      let(:organization) { bike.creation_organization }
+      let(:owner) { FactoryBot.create(:organization_member) }
+      let(:organization) { owner.organizations.first }
+      let(:ownership) { FactoryBot.create(:ownership_organization_bike, user: owner, organization: organization) }
       let(:member) { FactoryBot.create(:organization_member, organization: organization) }
       before { expect(bike.creation_organization).to eq member.organizations.first }
-      context "unclaimed" do
-        context "member of organization" do
-          it "returns true" do
-            expect(bike.claimed?).to be_falsey
-            expect(bike.authorize_bike_for_user!(member)).to be_truthy
-            expect(bike.authorize_bike_for_user!(member)).to be_truthy
-            expect(bike.claimed?).to be_falsey
-          end
-        end
-        context "non-member" do
-          it "returns false" do
-            expect(bike.authorize_bike_for_user(user)).to be_falsey
-            expect(bike.authorize_bike_for_user!(user)).to be_falsey
-          end
-        end
+      it "returns correctly for all sorts of convoluted things" do
+        bike.reload
+        expect(bike.creation_organization).to eq organization
+        expect(bike.claimed?).to be_falsey
+        expect(bike.authorize_for_user!(member)).to be_truthy
+        expect(bike.authorize_for_user!(member)).to be_truthy
+        expect(bike.claimed?).to be_falsey
+        # And test authorized_by_organization?
+        expect(bike.authorized_by_organization?).to be_truthy
+        expect(member.authorized?(bike)).to be_truthy
+        expect(bike.authorized_by_organization?(u: member)).to be_truthy
+        expect(bike.authorized_by_organization?(u: member, org: organization)).to be_truthy
+        expect(bike.authorized_by_organization?(org: organization)).to be_truthy
+        expect(bike.authorized_by_organization?(u: member, org: Organization.new)).to be_falsey
+        # If the member has multiple memberships, it should only work for the correct organization
+        new_membership = FactoryBot.create(:membership, user: member)
+        expect(bike.authorized_by_organization?).to be_truthy
+        expect(bike.authorized_by_organization?(u: member)).to be_truthy
+        expect(bike.authorized_by_organization?(u: member, org: new_membership.organization)).to be_falsey
+        # It should be authorized for the owner, but not be authorized_by_organization
+        expect(bike.authorize_for_user(owner)).to be_truthy
+        expect(bike.authorized_by_organization?(u: owner)).to be_falsey # Because this bike is authorized by owning it, not organization
+        expect(bike.authorized_by_organization?(u: member)).to be_truthy # Sanity check - we haven't broken this
+        # And it isn't authorized for a random user or a random org
+        expect(bike.authorized_by_organization?(u: user)).to be_falsey
+        expect(bike.authorized_by_organization?(u: user, org: organization)).to be_falsey
+        expect(bike.authorized_by_organization?(org: Organization.new)).to be_falsey
+        expect(bike.authorize_for_user(user)).to be_falsey
+        expect(bike.authorize_for_user!(user)).to be_falsey
       end
       context "claimed" do
-        let(:ownership) { FactoryBot.create(:ownership_organization_bike, user: user, claimed: true) }
+        let(:ownership) { FactoryBot.create(:ownership_organization_bike, user: user, claimed: true, organization: organization) }
         it "returns false" do
           expect(bike.claimed?).to be_truthy
           expect(bike.owner).to eq user
-          expect(bike.authorize_bike_for_user(member)).to be_falsey
+          expect(bike.authorize_for_user(member)).to be_falsey
+          expect(member.authorized?(bike)).to be_falsey
+          expect(bike.authorized_by_organization?).to be_falsey
           expect(bike.claimed?).to be_truthy
+          expect(bike.organized?).to be_truthy
+          expect(bike.organized?(organization)).to be_truthy
+          expect(bike.organized?(Organization.new)).to be_falsey
         end
       end
-      context "more than one ownership" do
+      context "multiple ownerships" do
         let!(:ownership_2) { FactoryBot.create(:ownership_organization_bike, bike: bike, creator: user) }
         it "returns false" do
           bike.reload
+          expect(bike.claimed?).to be_falsey
           expect(bike.owner).to eq user
-          expect(bike.authorize_bike_for_user(member)).to be_falsey
-          expect(bike.authorize_bike_for_user!(member)).to be_falsey
+          expect(bike.ownerships.count).to eq 2
+          expect(bike.authorized_by_organization?).to be_falsey
+          expect(bike.authorize_for_user(member)).to be_falsey
+          expect(bike.authorize_for_user!(member)).to be_falsey
+          expect(bike.claimed?).to be_falsey
         end
       end
     end
@@ -317,15 +339,6 @@ describe Bike do
       expect(bike.contact_owner?(User.new)).to be_falsey
       expect(bike.contact_owner?(admin)).to be_truthy
       expect(bike.display_contact_owner?).to be_falsey
-    end
-    context "with owner with notification_unstolen false" do
-      it "is falsey" do
-        allow(bike).to receive(:owner) { User.new(notification_unstolen: false) }
-        expect(bike.contact_owner?).to be_falsey
-        expect(bike.contact_owner?(User.new)).to be_falsey
-        expect(bike.contact_owner?(admin)).to be_falsey
-        expect(bike.display_contact_owner?(admin)).to be_falsey
-      end
     end
     context "stolen bike" do
       let(:bike) { Bike.new(stolen: true, current_stolen_record: StolenRecord.new) }
@@ -361,6 +374,49 @@ describe Bike do
         end
       end
     end
+    context "organizations" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:user_unorganized) { User.new }
+      let(:owner) { User.new }
+      let(:organization_unstolen) do
+        o = FactoryBot.create(:organization)
+        o.update_attribute :paid_feature_slugs, %w[unstolen_notifications]
+        o
+      end
+      it "is truthy for the organization with unstollen" do
+        allow(bike).to receive(:owner) { owner }
+        expect(bike.contact_owner?).to be_falsey
+        expect(bike.contact_owner?(user)).to be_falsey
+        expect(bike.contact_owner?(user, organization)).to be_falsey
+        expect(bike.display_contact_owner?(user)).to be_falsey
+        # Add user to the unstolen org
+        FactoryBot.create(:membership, user: user, organization: organization_unstolen)
+        user.reload
+        expect(bike.contact_owner?(user)).to be_truthy
+        expect(bike.contact_owner?(user, organization_unstolen)).to be_truthy
+        expect(bike.display_contact_owner?(user)).to be_falsey
+        # But still false if passing old organization
+        expect(bike.contact_owner?(user, organization)).to be_falsey
+        expect(bike.display_contact_owner?(user)).to be_falsey
+        # Passing the organization doesn't permit the user to do something unpermitted
+        expect(bike.contact_owner?(user_unorganized, organization_unstolen)).to be_falsey
+        expect(bike.display_contact_owner?(user_unorganized)).to be_falsey
+        # And if the owner has set notification_unstolen to false, block organization access
+        owner.notification_unstolen = false
+        expect(bike.contact_owner?(user, organization_unstolen)).to be_falsey
+      end
+    end
+    context "with owner with notification_unstolen false" do
+      let(:admin) { User.new(superuser: true) }
+      it "is falsey" do
+        allow(bike).to receive(:owner) { User.new(notification_unstolen: false) }
+        expect(bike.contact_owner?).to be_falsey
+        expect(bike.contact_owner?(User.new)).to be_falsey
+        expect(bike.contact_owner?(admin)).to be_falsey
+        expect(bike.display_contact_owner?(admin)).to be_falsey
+      end
+    end
   end
 
   describe 'user_hidden' do
@@ -390,27 +446,23 @@ describe Bike do
   end
 
   describe 'set_user_hidden' do
-    it 'unmarks user hidden, saves ownership and marks self unhidden' do
-      ownership = FactoryBot.create(:ownership, user_hidden: true)
-      bike = ownership.bike
-      bike.hidden = true
-      bike.marked_user_unhidden = true
-      bike.set_user_hidden
-      expect(bike.hidden).to be_falsey
-      expect(ownership.reload.user_hidden).to be_falsey
-    end
-
-    it 'marks updates ownership user hidden, marks self hidden' do
-      ownership = FactoryBot.create(:ownership)
-      bike = ownership.bike
+    let(:ownership) { FactoryBot.create(:ownership) }
+    let(:bike) { ownership.bike }
+    it "marks updates ownership user hidden, marks self hidden" do
       bike.marked_user_hidden = true
       bike.set_user_hidden
       expect(bike.hidden).to be_truthy
       expect(ownership.reload.user_hidden).to be_truthy
     end
 
-    it 'has before_save_callback_method defined for set_user_hidden' do
-      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_user_hidden)).to eq(true)
+    context "already user hidden" do
+      let(:ownership) { FactoryBot.create(:ownership, user_hidden: true) }
+      it "unmarks user hidden, saves ownership and marks self unhidden on save" do
+        bike.update_attributes(hidden: true, marked_user_unhidden: true)
+        bike.reload
+        expect(bike.hidden).to be_falsey
+        expect(ownership.reload.user_hidden).to be_falsey
+      end
     end
   end
 
@@ -433,40 +485,43 @@ describe Bike do
     end
   end
 
-  describe 'set_mnfg_name' do
-    it 'returns the value of manufacturer_other if manufacturer is other' do
-      bike = Bike.new
-      other_manufacturer = Manufacturer.new
-      allow(other_manufacturer).to receive(:name).and_return('Other')
-      allow(bike).to receive(:manufacturer).and_return(other_manufacturer)
-      allow(bike).to receive(:manufacturer_other).and_return('Other manufacturer name')
+  describe "set_mnfg_name" do
+    let(:manufacturer_other) { Manufacturer.new(name: "Other") }
+    let(:manufacturer) { Manufacturer.new(name: "Mnfg name") }
+    it "returns the value of manufacturer_other if manufacturer is other" do
+      bike = Bike.new(manufacturer: manufacturer_other, manufacturer_other: "Other manufacturer name")
       bike.set_mnfg_name
-      expect(bike.mnfg_name).to eq('Other manufacturer name')
+      expect(bike.mnfg_name).to eq("Other manufacturer name")
     end
 
     it "returns the name of the manufacturer if it isn't other" do
-      bike = Bike.new
-      manufacturer = Manufacturer.new
-      allow(manufacturer).to receive(:name).and_return('Mnfg name')
-      allow(bike).to receive(:manufacturer).and_return(manufacturer)
+      bike = Bike.new(manufacturer: manufacturer)
       bike.set_mnfg_name
-      expect(bike.mnfg_name).to eq('Mnfg name')
+      expect(bike.mnfg_name).to eq("Mnfg name")
     end
 
-    it 'returns Just SE Bikes' do
-      bike = Bike.new
-      manufacturer = Manufacturer.new
-      allow(manufacturer).to receive(:name).and_return('SE Racing (S E Bikes)')
-      allow(bike).to receive(:manufacturer).and_return(manufacturer)
-      bike.set_mnfg_name
-      expect(bike.mnfg_name).to eq('SE Racing')
+    context "malicious" do
+      let(:bike) { Bike.new(manufacturer: manufacturer_other, manufacturer_other: '<a href="bad_site.js">stuff</a>') }
+      it "removes bad things" do
+        bike.set_mnfg_name
+        expect(bike.mnfg_name).to eq("stuff")
+      end
+    end
+
+    context "manufacturer with parens" do
+      let(:manufacturer) { FactoryBot.create(:manufacturer, name: "SE Racing (S E Bikes)") }
+      let(:bike) { FactoryBot.build(:bike, manufacturer: manufacturer) }
+      it 'returns Just SE Bikes (and does it on save)' do
+        bike.save
+        expect(bike.mnfg_name).to eq("SE Racing")
+      end
     end
   end
 
   describe 'type' do
     it 'returns the cycle type name' do
       bike = FactoryBot.create(:bike, cycle_type: "trailer")
-      expect(bike.type).to eq(bike.cycle_type_name.downcase)
+      expect(bike.type).to eq("bike trailer")
     end
   end
 
@@ -494,45 +549,22 @@ describe Bike do
     end
   end
 
-  describe 'set_mnfg_name' do
-    it 'sets a bikes mnfg_name' do
-      manufacturer = FactoryBot.create(:manufacturer, name: 'SE Racing ( S E Bikes )')
-      bike = Bike.new
-      allow(bike).to receive(:manufacturer).and_return(manufacturer)
-      bike.set_mnfg_name
-      expect(bike.mnfg_name).to eq('SE Racing')
-    end
-    it 'sets a bikes mnfg_name' do
-      manufacturer = FactoryBot.create(:manufacturer, name: 'Other')
-      bike = Bike.new(manufacturer_other: '<a href="bad_site.js">stuff</a>')
-      allow(bike).to receive(:manufacturer).and_return(manufacturer)
-      bike.set_mnfg_name
-      expect(bike.mnfg_name).to eq("stuff")
-    end
-    it 'has before_save_callback_method defined for set_mnfg_name' do
-      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_mnfg_name)).to eq(true)
-    end
-  end
-
-  describe 'set_normalized_attributes' do
-    it 'sets a bikes normalized_serial and switches unknown to absent' do
-      bike = Bike.new(serial_number: ' UNKNOWn ')
-      expect_any_instance_of(SerialNormalizer).to receive(:normalized).and_return('normal')
+  describe "set_normalized_attributes" do
+    it "sets a bikes normalized_serial and switches unknown to absent" do
+      bike = Bike.new(serial_number: " UNKNOWn ")
+      expect_any_instance_of(SerialNormalizer).to receive(:normalized).and_return("normal")
       bike.normalize_attributes
-      expect(bike.serial_number).to eq('absent')
-      expect(bike.serial_normalized).to eq('normal')
+      expect(bike.serial_number).to eq("absent")
+      expect(bike.serial_normalized).to eq("normal")
     end
-    it 'sets normalized owner email' do
-      bike = Bike.new(owner_email: '  somethinG@foo.orG')
+    it "sets normalized owner email" do
+      bike = Bike.new(owner_email: "  somethinG@foo.orG")
       bike.normalize_attributes
-      expect(bike.owner_email).to eq('something@foo.org')
-    end
-    it 'has before_save_callback_method defined' do
-      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:normalize_attributes)).to eq(true)
+      expect(bike.owner_email).to eq("something@foo.org")
     end
 
-    context 'confirmed secondary email' do
-      it 'sets email to the primary email' do
+    context "confirmed secondary email" do
+      it "sets email to the primary email" do
         user_email = FactoryBot.create(:user_email)
         user = user_email.user
         bike = FactoryBot.build(:bike, owner_email: user_email.email)
@@ -543,15 +575,15 @@ describe Bike do
       end
     end
 
-    context 'unconfirmed secondary email' do
-      it 'sets owner email to primary email' do
-        user_email = FactoryBot.create(:user_email, confirmation_token: '123456789')
+    context "unconfirmed secondary email" do
+      it "sets owner email to primary email (on save)" do
+        user_email = FactoryBot.create(:user_email, confirmation_token: "123456789")
         user = user_email.user
         expect(user_email.unconfirmed).to be_truthy
         expect(user.email).to_not eq user_email.email
         bike = FactoryBot.build(:bike, owner_email: user_email.email)
         expect(bike.owner_email).to eq user_email.email
-        bike.normalize_attributes
+        bike.save
         expect(bike.owner_email).to eq user_email.email
       end
     end
@@ -706,9 +738,9 @@ describe Bike do
     end
     it 'removes paint id if paint_name is nil' do
       paint = FactoryBot.create(:paint)
-      bike = Bike.new(paint_id: paint.id)
+      bike = FactoryBot.build(:bike, paint_id: paint.id)
       bike.paint_name = ''
-      bike.set_paints
+      bike.save
       expect(bike.paint).to be_nil
     end
     it 'sets the paint if it exists' do
@@ -723,9 +755,6 @@ describe Bike do
       bike.paint_name = ['Food Time SOOON']
       expect { bike.set_paints }.to change(Paint, :count).by(1)
       expect(bike.paint.name).to eq('food time sooon')
-    end
-    it 'has before_save_callback_method defined as a before_save callback' do
-      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_paints)).to eq(true)
     end
   end
 
@@ -782,18 +811,11 @@ describe Bike do
   end
 
   describe 'cache_bike' do
-    it 'calls cache photo and cache component and erase stolen_rec_id' do
-      bike = FactoryBot.create(:bike, current_stolen_record_id: 69)
-      expect(bike).to receive(:cache_photo)
-      expect(bike).to receive(:cache_stolen_attributes)
-      expect(bike).to receive(:components_cache_string)
-      bike.cache_bike
-      expect(bike.current_stolen_record_id).to be_nil
-    end
+    let(:wheel_size) { FactoryBot.create(:wheel_size) }
+    let(:bike) { FactoryBot.create(:bike, rear_wheel_size: wheel_size) }
+    let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike) }
+    let(:target_cached_string) { "#{bike.mnfg_name} Sail 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material_name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle" }
     it 'caches all the bike parts' do
-      wheel_size = FactoryBot.create(:wheel_size)
-      bike = FactoryBot.create(:bike, rear_wheel_size: wheel_size)
-      stolen_record = FactoryBot.create(:stolen_record, bike: bike)
       bike.update_attributes(year: 1999, frame_material: "steel",
                              secondary_frame_color_id: bike.primary_frame_color_id,
                              tertiary_frame_color_id: bike.primary_frame_color_id,
@@ -803,12 +825,9 @@ describe Bike do
                              cycle_type: "unicycle",
                              frame_size: '56', frame_size_unit: 'foo',
                              frame_model: 'Some model')
-      bike.cache_bike
-      expect(bike.cached_data).to eq("#{bike.mnfg_name} Sail 1999 #{bike.primary_frame_color.name} #{bike.secondary_frame_color.name} #{bike.tertiary_frame_color.name} #{bike.frame_material_name} 56foo #{bike.frame_model} #{wheel_size.name} wheel unicycle")
+      bike.reload
+      expect(bike.cached_data).to eq target_cached_string
       expect(bike.current_stolen_record_id).to eq(stolen_record.id)
-    end
-    it 'has before_save_callback_method defined as a before_save callback' do
-      expect(Bike._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:cache_bike)).to eq(true)
     end
   end
 
@@ -840,44 +859,44 @@ describe Bike do
     end
   end
 
-  describe 'get_listing_order' do
-    it 'is 1/1000 of the current timestamp' do
-      bike = Bike.new
-      time = Time.now
-      allow(bike).to receive(:updated_at).and_return(time)
-      lo = bike.get_listing_order
-      expect(lo).to eq(time.to_time.to_i / 1000000)
+  describe "get_listing_order" do
+    let(:bike) { Bike.new }
+    it "is 1/1000 of the current timestamp" do
+      expect(bike.get_listing_order).to eq(Time.now.to_i / 1000000)
     end
 
-    it 'is the current stolen record date stolen * 1000' do
-      bike = Bike.new
+    it "is the current stolen record date stolen * 1000" do
       allow(bike).to receive(:stolen).and_return(true)
       stolen_record = StolenRecord.new
       yesterday = Time.now - 1.days
       allow(stolen_record).to receive(:date_stolen).and_return(yesterday)
       allow(bike).to receive(:current_stolen_record).and_return(stolen_record)
-      lo = bike.get_listing_order
-      expect(lo).to eq(yesterday.to_time.to_i)
+      expect(bike.get_listing_order).to eq(yesterday.to_time.to_i)
     end
 
-    it 'is the updated_at' do
-      bike = Bike.new
+    it "is the updated_at" do
       last_week = Time.now - 7.days
-      allow(bike).to receive(:updated_at).and_return(last_week)
-      allow(bike).to receive(:stock_photo_url).and_return('https://some_photo.cum')
-      lo = bike.get_listing_order
-      expect(lo).to eq(last_week.to_time.to_i / 10000)
+      bike.updated_at = last_week
+      allow(bike).to receive(:stock_photo_url).and_return("https://some_photo.cum")
+      expect(bike.get_listing_order).to eq(last_week.to_time.to_i / 10000)
     end
 
-    it 'does not get out of integer errors' do
-      stolen_record = FactoryBot.create(:stolen_record)
-      bike = stolen_record.bike
-      digits = (Time.now.year - 1).to_s[2, 3] # last two digits of last year
-      problem_date = Date.strptime("#{Time.now.month}-22-00#{digits}", "%m-%d-%Y")
-      bike.update_attribute :stolen, true
-      stolen_record.update_attribute :date_stolen, problem_date
-      bike.update_attribute :listing_order, bike.get_listing_order
-      expect(bike.listing_order).to be > (Time.now - 13.months).to_time.to_i
+    context "problem date" do
+      let(:problem_date) do
+        digits = (Time.now.year - 1).to_s[2, 3] # last two digits of last year
+        problem_date = Date.strptime("#{Time.now.month}-22-00#{digits}", "%m-%d-%Y")
+      end
+      let(:bike) { FactoryBot.create(:stolen_bike) }
+      it "does not get out of integer errors" do
+        expect(bike.listing_order).to be < 10000
+        # We protect against this on stolen record now, so manually set this (still doesn't work :/)
+        bike.current_stolen_record.update_attribute :date_stolen, problem_date
+        # TODO: Rails 5 update - enable this, rspec doesn't correctly manage after_commit right now -
+        # but stolen records don't actually have an after_commit hook to update bikes (they probably should though)
+        # This is just checking this is called correctly on save
+        bike.update_attributes(updated_at: Time.now)
+        expect(bike.listing_order).to be > (Time.now - 13.months).to_i
+      end
     end
   end
 

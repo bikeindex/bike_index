@@ -1,6 +1,6 @@
 / If no url_for_search passed in, default to organization bike search
-- path_for_search ||= organization_bikes_path(organization_id: current_organization.to_param)
-- skip_view_just_stolen ||= false
+- path_for_search ||= organization_bikes_path(organization_id: active_organization.to_param)
+- skip_view_just_stolen ||= @bike_code.present?
 
 .mb-4
   = form_tag path_for_search, id: 'bikes_search_form', class: 'bikes-search-form', method: :get do
@@ -22,6 +22,7 @@
         :plain
           <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
     = hidden_field_tag :stolenness, @stolenness
+    = hidden_field_tag :organization_id, current_organization&.to_param
 
 %hr{ style: "opacity: .3;" }
 
@@ -32,7 +33,7 @@
     matching
   - else
     #{ pluralize(@bikes.total_count, 'bike') } registered
-  - search_params = @interpreted_params.merge(organization_id: current_organization.to_param)
+  - search_params = @interpreted_params.merge(organization_id: active_organization.to_param)
 
   - unless skip_view_just_stolen
     - if @stolenness == 'all'

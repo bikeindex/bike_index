@@ -6,7 +6,7 @@ class Admin::BulkImportsController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 10
     if params[:organization_id].present?
-      bulk_imports = BulkImport.where(organization_id: current_organization.id)
+      bulk_imports = BulkImport.where(organization_id: active_organization.id)
     else
       bulk_imports = BulkImport.all
     end

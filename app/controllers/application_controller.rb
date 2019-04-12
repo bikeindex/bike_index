@@ -49,20 +49,6 @@ class ApplicationController < ActionController::Base
     request.format = "html"
   end
 
-  # Needs to be callable by BikesController for scanning as well as BikesController, fastest easiest way to share
-  def search_organization_bikes
-    @search_query_present = permitted_org_bike_search_params.except(:stolenness).values.reject(&:blank?).any?
-    @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
-
-    bikes = current_organization.bikes.reorder("bikes.created_at desc").search(@interpreted_params)
-    bikes = bikes.organized_email_search(params[:email]) if params[:email].present?
-    @bikes = bikes.order("bikes.created_at desc").page(@page).per(@per_page)
-    if @interpreted_params[:serial]
-      @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
-    end
-    @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
-  end
-
   private
 
   def permitted_org_bike_search_params

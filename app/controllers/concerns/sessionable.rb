@@ -16,6 +16,7 @@ module Sessionable
   def sign_in_and_redirect(user)
     session[:last_seen] = Time.now
     session[:render_donation_request] = user.render_donation_request if user&.render_donation_request
+    set_current_organization(user.default_organization) # Set that organization!
     if ActiveRecord::Type::Boolean.new.type_cast_from_database(params.dig(:session, :remember_me))
       cookies.permanent.signed[:auth] = cookie_options(user)
     else

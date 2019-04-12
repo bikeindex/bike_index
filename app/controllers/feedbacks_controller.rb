@@ -22,8 +22,10 @@ class FeedbacksController < ApplicationController
     else
       @page_errors = @feedback.errors
       re_path = Rails.application.routes.recognize_path(request.referer)
-      @force_landing_page_render = re_path[:controller] == 'landing_pages'
-      render template: "#{re_path[:controller]}/#{re_path[:action]}"
+      template = "#{re_path[:controller]}/#{re_path[:action]}"
+      @force_landing_page_render = re_path[:controller] == "landing_pages"
+      @recovery_displays = RecoveryDisplay.limit(5) if template == "welcome/index"
+      render template: template
     end
   end
 

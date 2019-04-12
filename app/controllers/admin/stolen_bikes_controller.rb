@@ -1,5 +1,6 @@
 class Admin::StolenBikesController < Admin::BaseController
   before_filter :find_bike, only: [:edit, :destroy, :approve, :update]
+  layout "new_admin"
 
   def index
     if params[:unapproved]
