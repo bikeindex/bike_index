@@ -64,7 +64,7 @@
         .controls.extra-field
           .less-strong
             - if @organization.memberships.count == 0
-              You can use #{ENV['AUTO_ORG_MEMBER']} if 
+              You can use #{ENV['AUTO_ORG_MEMBER']} if
               %br
               there are no members of the organization
 
@@ -116,4 +116,3 @@
 /     = f.label :is_suspended
 /   .controls
 /     = f.check_box :is_suspended
-
