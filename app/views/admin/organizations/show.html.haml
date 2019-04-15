@@ -117,8 +117,10 @@
           %td
             Children
           %td
-            - @organization.child_organizations.each do |org|
-              = link_to org.name, admin_organization_url(org)
+            .ul
+              - @organization.child_organizations.each do |org|
+                .li
+                  = link_to org.name, admin_organization_url(org)
 
   - if @organization.bike_shop?
     .col-md-6
