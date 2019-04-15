@@ -1,19 +1,16 @@
 class Admin::OrganizationsController < Admin::BaseController
   include SortableTable
   before_filter :find_organization, only: [:show, :edit, :update, :destroy]
-  before_filter :set_sort_and_direction, only: [:index]
 
   def index
-    # page = params[:page] || 1
-    # per_page = params[:per_page] || 25
-    # orgs = Organization.all
-    # orgs = orgs.paid if params[:is_paid].present?
-    # orgs = orgs.admin_text_search(params[:query]) if params[:query].present?
-    # orgs = orgs.where(kind: kind_for_organizations) if params[:kind].present?
-    # @organizations = orgs.reorder("#{@sort} #{@sort_direction}").page(page).per(per_page)
-    # @organizationss = Organization.order(sort_direction)
-    @organizations = orgs.order(sort_column + " " + sort_direction)
+    page = params[:page] || 1
+    per_page = params[:per_page] || 25
+    orgs = Organization.all
+    orgs = orgs.paid if params[:is_paid].present?
+    orgs = orgs.admin_text_search(params[:query]) if params[:query].present?
+    orgs = orgs.where(kind: kind_for_organizations) if params[:kind].present?
     @organizations_count = orgs.count
+    @organizations = orgs.order(sort_column + " " + sort_direction).page(page).per(per_page)
     render layout: "new_admin"
   end
 
@@ -85,14 +82,7 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def sortable_columns
-    %w[created_at name approved]
-  end
-
-  def set_sort_and_direction
-    @sort = params[:sort]
-    @sort = 'created_at' unless %w(name created_at approved).include?(@sort)
-    @sort_direction = params[:sort_direction]
-    @sort_direction = 'desc' unless %w(asc desc).include?(@sort_direction)
+    %w[name approved created_at]
   end
 
   def kind_for_organizations
