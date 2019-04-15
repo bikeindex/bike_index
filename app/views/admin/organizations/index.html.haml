@@ -26,7 +26,7 @@
 = paginate @organizations, views_prefix: "admin"
 
 .full-screen-table-wrapper
-  %table.table.table-striped.table-bordered
+  %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
       %th
         = sortable "name"
@@ -71,14 +71,6 @@
 
   = paginate @organizations, views_prefix: "admin"
 
-
-:coffeescript
-  $('.column_sort_update').click (e) ->
-    e.preventDefault()
-    target = $(e.target)
-    $('.special-search-field #sort').val($(target).attr('data-sort'))
-    $('.special-search-field #sort_direction').val($(target).attr('data-direction'))
-    $('.special-search-field form').submit()
 
 %hr
   = link_to "View deleted organizations", admin_show_deleted_organizations_url, class: "btn btn-danger"
