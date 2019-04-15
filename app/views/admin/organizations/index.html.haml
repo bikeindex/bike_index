@@ -12,8 +12,6 @@
   = form_tag admin_organizations_path, method: :get do
     .row
       .col-md-6
-        = hidden_field_tag :sort, @sort
-        = hidden_field_tag :sort_direction, @sort_direction
       .col-md-2
         %label.mt-4
           = check_box_tag :is_paid, true, params[:is_paid]

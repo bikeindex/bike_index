@@ -5,12 +5,12 @@ class Admin::OrganizationsController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 25
-    orgs = Organization.all
+    orgs = Organization.order(sort_column + " " + sort_direction).page(page).per(per_page)
     orgs = orgs.paid if params[:is_paid].present?
     orgs = orgs.admin_text_search(params[:query]) if params[:query].present?
     orgs = orgs.where(kind: kind_for_organizations) if params[:kind].present?
     @organizations_count = orgs.count
-    @organizations = orgs.order(sort_column + " " + sort_direction).page(page).per(per_page)
+    @organizations = orgs.reorder(sort_column + " " + sort_direction).page(page).per(per_page)
     render layout: "new_admin"
   end
 
