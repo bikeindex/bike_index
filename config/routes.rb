@@ -43,6 +43,7 @@ Bikeindex::Application.routes.draw do
   get 'choose_registration', to: 'welcome#choose_registration'
   get 'goodbye', to: 'welcome#goodbye'
   get 'bike_creation_graph', to: 'welcome#bike_creation_graph'
+  get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
 
   resource :session, only: [:new, :create, :destroy]
   get 'logout', to: 'sessions#destroy'
@@ -270,7 +271,7 @@ Bikeindex::Application.routes.draw do
       collection do
         get :recoveries
         get :incompletes
-        get :multi_search
+        get :multi_serial_search
       end
     end
     resources :exports, except: [:edit]

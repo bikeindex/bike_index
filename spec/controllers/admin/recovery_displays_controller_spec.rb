@@ -15,6 +15,26 @@ describe Admin::RecoveryDisplaysController do
     end
   end
 
+  describe "show" do
+    context "bust_cache" do
+      it "busts the cache" do
+        get :show, id: "bust_cache"
+        expect(response).to redirect_to admin_recovery_displays_path
+        expect(flash[:success]).to match(/cache/i)
+      end
+    end
+  end
+
+  describe "edit" do
+    let(:recovery_display) { FactoryBot.create(:recovery_display) }
+    it "renders" do
+      get :edit, id: recovery_display.id
+      expect(response).to be_success
+      expect(response).to render_template(:edit)
+      expect(flash).to_not be_present
+    end
+  end
+
   describe 'create' do
     context 'valid create' do
       let(:valid_attrs) { { quote: 'something that is nice and short and stuff' } }
