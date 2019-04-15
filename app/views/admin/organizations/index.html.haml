@@ -12,10 +12,11 @@
   = form_tag admin_organizations_path, method: :get do
     .row
       .col-md-6
-      .col-md-2
-        %label.mt-4
-          = check_box_tag :is_paid, true, params[:is_paid]
-          Paid only
+      .col-md-2.align-self-end
+        .form-check.text-center
+          = check_box_tag :is_paid, class: "form-check-input"
+          %label.form-check-label{for: "is_paid"}
+            Paid only?
       .col-md-3
         = text_field_tag :query, params[:query], placeholder: "Find name, location #{current_user.developer? ? 'or paid features' : '' }", class: "form-control mt-4"
       .col-md-1
