@@ -42,10 +42,7 @@
               = f.file_field :image, class: "custom-file-input"
           .form-group.avatar-upload
             .avatar-img
-              - if @recovery_display.image.present?
-                = f.label :remove_image
-                = f.check_box :remove_image
-              - elsif @bike.present? && @recovery_display.image.blank?
+              - if @bike.present? && @recovery_display.image.blank?
                 - if @bike.public_images.present? || @bike.stock_photo_url.present?
                   - if @bike.public_images.present?
                     - text = "has image"
@@ -57,9 +54,14 @@
                     #{link_to "Bike", bike_url(@bike), target: "_blank"} #{text}
                   %a.btn.btn-success#use_image_for_display{ href: '#', data: {url: url}}
                     Use first image
-
                 - else
                   Bike has no image
+      - if @recovery_display.image.present?
+        .row.mb-4.mt-4
+          .col-lg-6
+            .form-check
+              = f.check_box :remove_image, class: "form-check-input"
+              = f.label :remove_image, class: "form-check-label"
       .row
         .col-lg-6
           .form-group
