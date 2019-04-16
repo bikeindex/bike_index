@@ -3,14 +3,15 @@ $compare-packages-blue: rgb(19, 71, 106);
 
 // I think contact-us-callout is going to go on other pages, but scope to just this page for now
 .signup-landing-page-campus-packages {
+  // Also has styles in the large-screen section
   .contact-us-callout-wrapper {
     position: relative;
     width: 100%;
     padding-top: 2 * $vertical-height;
     @extend .clearfix;
     .contact-us-callout {
+      width: 100%;
       background: $compare-packages-blue;
-      float: right;
       padding: $vertical-height 2 * $vertical-height;
       p {
         margin: 0;
@@ -23,157 +24,191 @@ $compare-packages-blue: rgb(19, 71, 106);
   }
 }
 
-.signup-landing-page-campus-packages .banner-header {
-  h1,
-  h2 {
-    text-align: center;
-    display: block;
-    width: 100%;
+// Mike is inconsistent
+.signup-landing-page-campus-packages {
+  .btn {
+    text-transform: none;
+    border-radius: 4px;
+  }
+}
+
+.signup-landing-page-campus-packages {
+  .banner-header {
+    h1,
+    h2 {
+      text-align: center;
+      display: block;
+      width: 100%;
+      text-shadow: 1px 1px 10px rgba(51, 51, 51, 0.7);
+    }
   }
 
-  .campus-packages-price-list {
-    list-style-type: none;
-    padding: 2 * $vertical-height 0;
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -ms-flex-wrap: wrap;
-    flex-wrap: wrap;
-    text-align: center;
-    flex-align: center;
-    justify-content: space-between;
-    li {
-      // Make it a flex column
-      width: 100%;
-      -webkit-box-flex: 0;
-      -ms-flex: 0 0 19%;
-      flex: 0 0 19%;
-      max-width: 19%;
-      padding: 0;
+  .campus-packages-price-list,
+  table.compare-packages-table {
+    display: none;
+  }
+
+  .main-compare-packages-container {
+    margin-top: 4 * $vertical-height;
+  }
+}
+
+// Large screen styles
+@media (min-width: $grid-breakpoint-lg) {
+  .signup-landing-page-campus-packages {
+    .contact-us-callout-wrapper .contact-us-callout {
+      float: right;
     }
-    h5 {
-      color: $gray-light;
-      font-style: italic;
-    }
-    h4 {
-      color: #fff;
-      padding: $vertical-height 0;
-      background: #000;
-      text-transform: none;
-      margin: 0;
-      font-size: 17px;
-    }
-    .btn-primary,
-    .btn {
-      text-transform: none;
-      margin-top: 2 * $vertical-height;
-    }
-    h3 {
-      color: $compare-packages-blue;
-      font-size: 50px;
+    .campus-packages-price-list {
+      list-style-type: none;
+      padding: 2 * $vertical-height 0;
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
       text-align: center;
-      line-height: 1;
-      margin: 0;
-      span {
-        font-size: 75%;
+      flex-align: center;
+      justify-content: space-between;
+      li {
+        // Make it a flex column
+        width: 100%;
+        -webkit-box-flex: 0;
+        -ms-flex: 0 0 19%;
+        flex: 0 0 19%;
+        max-width: 19%;
+        padding: 0;
+      }
+      h5 {
+        color: $gray-light;
+        font-style: italic;
+      }
+      h4 {
+        color: #fff;
+        padding: $vertical-height 0;
+        background: #000;
+        text-transform: none;
+        margin: 0;
+        font-size: 17px;
+      }
+      .btn-primary,
+      .btn {
+        margin-top: 2 * $vertical-height;
+      }
+      h3 {
+        color: $compare-packages-blue;
+        font-size: 50px;
+        text-align: center;
+        line-height: 1;
+        margin: 0;
+        span {
+          font-size: 75%;
+        }
+      }
+      p {
+        font-style: italic;
+        opacity: 0.9;
+        margin: $vertical-height 0;
+        line-height: 1.5;
+      }
+      .campus-packages-package {
+        background: #fff;
+        border: 2px solid #000;
+        padding: $vertical-height $vertical-height 2 * $vertical-height;
       }
     }
-    p {
-      font-style: italic;
-      opacity: 0.9;
-      margin: $vertical-height 0;
-      line-height: 1.5;
-    }
-    .campus-packages-package {
-      background: #fff;
-      border: 2px solid #000;
-      padding: $vertical-height $vertical-height 2 * $vertical-height;
+
+    table.compare-packages-table {
+      th,
+      td {
+        border-right: 2px solid $compare-packages-table-border;
+      }
+      thead {
+        h4,
+        h3,
+        a,
+        p {
+          text-align: center;
+          margin: 0 0 0.5 * $vertical-height;
+        }
+        th {
+          border-top: 2px solid $compare-packages-table-border;
+          border-bottom: 2px solid $compare-packages-table-border;
+          &:first-of-type {
+            border-top-color: transparent;
+            border-left-color: transparent;
+          }
+        }
+        h4 {
+          text-transform: none;
+          line-height: 1.5;
+        }
+        h3 {
+          font-size: 27px;
+          line-height: 1.5;
+        }
+        p {
+          font-size: 9px;
+          line-height: 1.5;
+          font-style: italic;
+          line-height: 13px;
+        }
+      }
+      tr {
+        td:first-of-type {
+          padding-top: 0;
+          padding-bottom: 0;
+          font-size: 14px;
+          line-height: 1.5;
+        }
+        &:last-of-type {
+          td {
+            border-bottom: 2px solid $compare-packages-table-border;
+          }
+          td:first-of-type {
+            border-bottom-color: transparent;
+          }
+        }
+      }
+      tbody td {
+        vertical-align: middle;
+      }
+      .table-cell-check {
+        font-family: Courier;
+        text-align: center;
+        font-weight: bold;
+        font-size: 30px;
+        color: $gray-light;
+        .included-feature {
+          color: $blue-dark;
+        }
+      }
+      .most-popular-option {
+        position: relative;
+      }
+      .most-popular-note {
+        font-size: 12px;
+        font-weight: 300;
+        line-height: 1;
+        position: absolute;
+        width: 100%;
+        left: 0;
+        top: -21px;
+        text-align: center;
+        color: #fff;
+        padding: 4px 0;
+        background: #000;
+      }
     }
   }
 }
 
-.main-compare-packages-container {
-  margin-top: 4 * $vertical-height;
-  table.compare-packages-table {
-    th,
-    td {
-      border-right: 2px solid $compare-packages-table-border;
+// Small screens styles
+@media (max-width: $grid-breakpoint-lg - 1px) {
+  .signup-landing-page-campus-packages {
+    // On small screens, we need to make sure the image always covers everything
+    .banner-header {
+      background-size: cover;
     }
-    thead {
-      h4,
-      h3,
-      a,
-      p {
-        text-align: center;
-        margin: 0 0 0.5 * $vertical-height;
-      }
-      th {
-        border-top: 2px solid $compare-packages-table-border;
-        border-bottom: 2px solid $compare-packages-table-border;
-        &:first-of-type {
-          border-top-color: transparent;
-          border-left-color: transparent;
-        }
-      }
-      h4 {
-        text-transform: none;
-        line-height: 1.5;
-      }
-      h3 {
-        font-size: 27px;
-        line-height: 1.5;
-      }
-      p {
-        font-size: 9px;
-        line-height: 1.5;
-        font-style: italic;
-        line-height: 13px;
-      }
-    }
-    tr {
-      td:first-of-type {
-        padding-top: 0;
-        padding-bottom: 0;
-        font-size: 14px;
-        line-height: 1.5;
-      }
-      &:last-of-type {
-        td {
-          border-bottom: 2px solid $compare-packages-table-border;
-        }
-        td:first-of-type {
-          border-bottom-color: transparent;
-        }
-      }
-    }
-    tbody td {
-      vertical-align: middle;
-    }
-    .table-cell-check {
-      font-family: Courier;
-      text-align: center;
-      font-weight: bold;
-      font-size: 30px;
-      color: $gray-light;
-      .included-feature {
-        color: $blue-dark;
-      }
-    }
-  }
-  .most-popular-option {
-    position: relative;
-  }
-  .most-popular-note {
-    font-size: 12px;
-    font-weight: 300;
-    line-height: 1;
-    position: absolute;
-    width: 100%;
-    left: 0;
-    top: -21px;
-    text-align: center;
-    color: #fff;
-    padding: 4px 0;
-    background: #000;
   }
 }
