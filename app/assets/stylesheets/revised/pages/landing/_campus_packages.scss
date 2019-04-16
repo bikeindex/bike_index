@@ -1,12 +1,34 @@
-$compare-plans-table-border: rgb(178, 178, 178);
+$compare-packages-table-border: rgb(178, 178, 178);
+$compare-packages-blue: rgb(19, 71, 106);
+
+// I think contact-us-callout is going to go on other pages, but scope to just this page for now
 .signup-landing-page-campus-packages {
-  .banner-header {
-    h1,
-    h2 {
-      text-align: center;
-      display: block;
-      width: 100%;
+  .contact-us-callout-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 2 * $vertical-height;
+    @extend .clearfix;
+    .contact-us-callout {
+      background: $compare-packages-blue;
+      float: right;
+      padding: $vertical-height 2 * $vertical-height;
+      p {
+        margin: 0;
+        color: #fff;
+      }
+      .btn {
+        margin-left: 0.5rem;
+      }
     }
+  }
+}
+
+.signup-landing-page-campus-packages .banner-header {
+  h1,
+  h2 {
+    text-align: center;
+    display: block;
+    width: 100%;
   }
 
   .campus-packages-price-list {
@@ -35,7 +57,7 @@ $compare-plans-table-border: rgb(178, 178, 178);
     }
     h4 {
       color: #fff;
-      padding: $vertical-height;
+      padding: $vertical-height 0;
       background: #000;
       text-transform: none;
       margin: 0;
@@ -47,7 +69,7 @@ $compare-plans-table-border: rgb(178, 178, 178);
       margin-top: 2 * $vertical-height;
     }
     h3 {
-      color: $header-font-color;
+      color: $compare-packages-blue;
       font-size: 50px;
       text-align: center;
       line-height: 1;
@@ -68,22 +90,44 @@ $compare-plans-table-border: rgb(178, 178, 178);
       padding: $vertical-height $vertical-height 2 * $vertical-height;
     }
   }
-  .btn {
-    border-radius: 4px;
-  }
-  table.compare-plans-table {
+}
+
+.main-compare-packages-container {
+  margin-top: 4 * $vertical-height;
+  table.compare-packages-table {
     th,
     td {
-      border-right: 2px solid $compare-plans-table-border;
+      border-right: 2px solid $compare-packages-table-border;
     }
     thead {
+      h4,
+      h3,
+      a,
+      p {
+        text-align: center;
+        margin: 0 0 0.5 * $vertical-height;
+      }
       th {
-        border-top: 2px solid $compare-plans-table-border;
-        border-bottom: 2px solid $compare-plans-table-border;
+        border-top: 2px solid $compare-packages-table-border;
+        border-bottom: 2px solid $compare-packages-table-border;
         &:first-of-type {
           border-top-color: transparent;
           border-left-color: transparent;
         }
+      }
+      h4 {
+        text-transform: none;
+        line-height: 1.5;
+      }
+      h3 {
+        font-size: 27px;
+        line-height: 1.5;
+      }
+      p {
+        font-size: 9px;
+        line-height: 1.5;
+        font-style: italic;
+        line-height: 13px;
       }
     }
     tr {
@@ -95,7 +139,7 @@ $compare-plans-table-border: rgb(178, 178, 178);
       }
       &:last-of-type {
         td {
-          border-bottom: 2px solid $compare-plans-table-border;
+          border-bottom: 2px solid $compare-packages-table-border;
         }
         td:first-of-type {
           border-bottom-color: transparent;

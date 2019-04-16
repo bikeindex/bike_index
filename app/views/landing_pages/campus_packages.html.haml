@@ -74,17 +74,17 @@
                 \/Month
               %a.btn.btn-primary{ href: "#" }
                 Try For Free
-  .container
+  .container.main-compare-packages-container
     %h2
       Compare Plans and Features
-    %table.table.compare-plans-table.table-striped
+    %table.table.compare-packages-table.table-striped
       %thead
         %tr
           %th
           %th
-            %p
+            %h4
               Free Forever
-            %p
+            %h3
               $0
             %p
               (USD/Month billed annually)
@@ -93,9 +93,9 @@
 
 
           %th
-            %p
+            %h4
               Supporting School
-            %p
+            %h3
               $25
             %p
               (USD/Month billed annually)
@@ -103,9 +103,9 @@
               Try For Free
 
           %th
-            %p
+            %h4
               Small Campus
-            %p
+            %h3
               $330
             %p
               (USD/Month billed annually)
@@ -115,9 +115,9 @@
           %th.most-popular-option
             .most-popular-note
               Most Popular
-            %p
+            %h4
               Medium Campus
-            %p
+            %h3
               $500
             %p
               (USD/Month billed annually)
@@ -125,9 +125,9 @@
               Try For Free
 
           %th
-            %p
+            %h4
               Large Campus
-            %p
+            %h3
               $750
             %p
               (USD/Month billed annually)
@@ -190,11 +190,12 @@
               &#8226;
 
 
-    %p
-      A la carte features and custom development available. Get in touch to find out more
+    %p.mt-4
+      %em.less-strong
+        A la carte features and custom development available. Get in touch to find out more
 
-    .container
+  .contact-us-callout-wrapper
+    .contact-us-callout
       %p
         Questions? Want to get started?
-      %button
-        Contact us
+        = link_to "Contact us", "#", class: "btn btn-primary"
