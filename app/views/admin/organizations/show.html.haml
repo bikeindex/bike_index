@@ -128,30 +128,30 @@
                 .li
                   = link_to org.name, admin_organization_url(org)
 
-- if @organization.bike_shop?
-  .col-md-6
-    %table.table-list
-      %tr
-        %td
-          POS integration:
-        %td
-          - if @organization.ascend_imports?
-            Ascend
-          - else
-            %small.less-strong
-              Unknown
-      - if @organization.ascend_imports?
+  - if @organization.bike_shop?
+    .col-md-6
+      %table.table-list
         %tr
           %td
-            Ascend name
+            POS integration:
           %td
-            %code
-              = @organization.ascend_name
-      %tr
-        %td
-          Info
-        %td
-          More to come soon
+            - if @organization.ascend_imports?
+              Ascend
+            - else
+              %small.less-strong
+                Unknown
+        - if @organization.ascend_imports?
+          %tr
+            %td
+              Ascend name
+            %td
+              %code
+                = @organization.ascend_name
+        %tr
+          %td
+            Info
+          %td
+            More to come soon
 .row.mt-4
   .col-md-6
     %p
