@@ -6,7 +6,7 @@
 
 
 .full-screen-table-wrapper
-  %table.table.table-striped.table-bordered
+  %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
       %th
         Created
@@ -30,8 +30,7 @@
           %td
             = organization.memberships.count
           %td
-            = button_to "Restore", remote: true, action: "recover", id: organization.id
-
+            = button_to "Restore", {remote: true, action: "recover"}, {id: organization.id, class: "btn btn-warning"}
 
 %hr
   = link_to "Back to undeleted organizations", admin_organizations_url, class: "btn btn-success"
