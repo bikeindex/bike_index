@@ -1,0 +1,12 @@
+.container
+  .row
+    %h3
+      Recovery Stories
+
+  #recovery-stories-listing
+    .container
+      #recovery-stories-container{data: {stories_count: @recovery_displays.length}}
+        = render @recovery_displays
+
+    .paginate-container.paginate-container-bottom
+      = paginate @recovery_displays

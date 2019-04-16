@@ -2,7 +2,6 @@ class Tweet < ActiveRecord::Base
   validates_presence_of :twitter_id
   has_many :public_images, as: :imageable, dependent: :destroy
   mount_uploader :image, ImageUploader
-  process_in_background :image, CarrierWaveProcessWorker
   before_save :set_body_from_response
   before_validation :ensure_valid_alignment
 

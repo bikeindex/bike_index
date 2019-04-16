@@ -20,6 +20,7 @@ class Admin::OrganizationsController < Admin::BaseController
     per_page = params[:per_page] || 25
     @bikes = bikes.page(page).per(per_page)
     @organization = @organization.decorate
+    render layout: "new_admin"
   end
 
   def show_deleted

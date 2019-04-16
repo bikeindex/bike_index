@@ -313,7 +313,9 @@ class Bike < ActiveRecord::Base
   end
 
   def set_mnfg_name
-    if manufacturer.name == 'Other' && manufacturer_other.present?
+    if manufacturer.blank?
+      n = ""
+    elsif manufacturer.name == "Other" && manufacturer_other.present?
       n = Rails::Html::FullSanitizer.new.sanitize(manufacturer_other)
     else
       n = manufacturer.simple_name

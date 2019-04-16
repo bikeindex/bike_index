@@ -8,7 +8,7 @@ class PaidFeature < ActiveRecord::Base
   # Only slugs that are used in the code should be in this array
   REG_FIELDS = %w[reg_affiliation reg_secondary_serial reg_phone reg_address].freeze
   EXPECTED_SLUGS = (%w[csv_exports messages geolocated_messages abandoned_bike_messages avery_export bike_search
-                       show_bulk_import show_recoveries show_partial_registrations
+                       show_bulk_import show_recoveries show_partial_registrations show_multi_serial
                        unstolen_notifications bike_codes] + REG_FIELDS).freeze
 
   has_many :invoice_paid_features

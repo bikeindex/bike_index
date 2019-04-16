@@ -29,7 +29,7 @@ module Organized
 
     def new; end
 
-    def multi_search; end
+    def multi_serial_search; end
 
     private
 

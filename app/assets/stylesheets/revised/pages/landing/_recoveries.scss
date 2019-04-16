@@ -3,6 +3,12 @@
   padding: 4*$vertical-height 0;
 }
 
+#recovery-stories-listing {
+  .recovery-block {
+    margin: 1rem auto;
+  }
+}
+
 #recovery-stories-container {
   width: 90%;
   margin: 0 auto;
