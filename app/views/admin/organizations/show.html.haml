@@ -57,11 +57,17 @@
             = @organization.auto_user.email if @organization.auto_user.present?
         %tr
           %td
-            Created at
+            Created
           %td
             %span.convertTime.preciseTime
               = l @organization.created_at, format: :convert_time
             %small.convertTimezone
+        %tr
+          %td
+            Updated
+          %td
+            %span.convertTime.preciseTime
+              = l @organization.updated_at, format: :convert_time
 
   .col-md-6
     %table.table-list

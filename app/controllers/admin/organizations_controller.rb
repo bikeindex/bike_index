@@ -29,7 +29,7 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def recover
-    @organization = Organization.only_deleted.find(params[:id]).recover
+    @organization = Organization.only_deleted.find(params[:id]).restore(recursive: true)
     redirect_to admin_organizations_url
   end
 
