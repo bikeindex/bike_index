@@ -55,6 +55,7 @@ class User < ActiveRecord::Base
 
   validates_presence_of :email
   validates_uniqueness_of :email, case_sensitive: false
+  validate :ensure_unique_email
 
   before_validation :normalize_attributes
   before_create :generate_username_confirmation_and_auth
@@ -103,7 +104,6 @@ class User < ActiveRecord::Base
     user_emails.where.not(email: email).pluck(:email)
   end
 
-  validate :ensure_unique_email
   def ensure_unique_email
     return true unless self.class.fuzzy_confirmed_or_unconfirmed_email_find(email)
     return true if id.present? # Because existing users shouldn't see this error
