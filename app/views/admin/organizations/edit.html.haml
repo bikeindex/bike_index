@@ -5,14 +5,13 @@
 
 = form_for [:admin, @organization] do |f|
   = render partial: 'form', locals: { f: f }
-
   .row.mt-4
     .col-md-6.mb-4
-      .card
-        .card-body
-          = fields_for :locations do |builder|
+      %fieldset
+        #admin-locations-fields
+          = f.fields_for :locations do |builder|
             = render '/admin/organizations/location_fields', f: builder
-          = link_to_add_fields "Add a location", f, :locations
+          = revised_link_to_add_fields "Add a location", f, :locations, class_name: "btn btn-primary"
 
     .col-md-4
       %a.btn.btn-primary{"aria-controls" => "new_bike_notification", "aria-expanded" => "false", "data-toggle" => "collapse", :href => "#new_bike_notification"}
@@ -21,11 +20,11 @@
         .form-group
         = f.label :new_bike_notification
         = f.text_area :new_bike_notification, class: "form-control"
-    .col-md-2.mt-4
+    .col-md-2
       %p
         %strong
           Locations
-      %p
+      %p#us-country-code
         = Country.united_states.id
 
   - if @organization.new_bike_notification.present?
