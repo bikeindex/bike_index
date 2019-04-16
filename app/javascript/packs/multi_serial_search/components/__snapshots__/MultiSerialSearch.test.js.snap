@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<MultiSerialSearch /> shallow rendered matches the snapshot 1`] = `
+<Fragment>
+  <div
+    className="multiserial-form"
+  >
+    <span
+      className="padded"
+    />
+    <h3>
+      Multiple Serial Search
+    </h3>
+    <textarea
+      className="form-control"
+      onChange={[Function]}
+      placeholder="Enter multiple serial numbers. Separate them with commas or new lines"
+      value=""
+    />
+    <div
+      className="clearfix"
+    >
+      <button
+        className="multiserialsearch-btn btn btn-primary float-right mt-2"
+        disabled={false}
+        onClick={[Function]}
+        type="submit"
+      >
+        <img
+          alt="search"
+          src={Object {}}
+        />
+      </button>
+    </div>
+    <SearchResults
+      fuzzySearching={false}
+      loading={false}
+      onFuzzySearch={[Function]}
+      serialResults={null}
+    />
+  </div>
+</Fragment>
+`;

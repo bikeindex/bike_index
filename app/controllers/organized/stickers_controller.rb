@@ -47,12 +47,8 @@ module Organized
       redirect_to organization_stickers_path(organization_id: active_organization.to_param) and return
     end
 
-    def bike_codes
-      BikeCode.where(organization_id: active_organization.id)
-    end
-
     def searched
-      searched_codes = bike_codes
+      searched_codes = BikeCode.where(organization_id: active_organization.id)
       if params[:bike_query].present?
         searched_codes = searched_codes.claimed.where(bike_id: Bike.friendly_find(params[:bike_query])&.id)
       elsif params[:claimedness] && params[:claimedness] != "all"

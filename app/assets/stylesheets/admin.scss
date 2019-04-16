@@ -106,4 +106,7 @@ thead.sortable {
     font-size: 80%;
     font-style: italic;
   }
+  tr td:last-child {
+    width: 85%; // This is effectively min-width for tables
+  }
 }

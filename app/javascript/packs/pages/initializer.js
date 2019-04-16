@@ -32,6 +32,10 @@ binxApp.displayLocalDate = function(time, preciseTime) {
   }
 };
 
+binxApp.preciseTimeSeconds = function(time) {
+  return time.format("YYYY-MM-DD h:mm:ssa");
+};
+
 binxApp.localizeTimes = function() {
   if (!window.timezone) {
     window.timezone = moment.tz.guess();
@@ -62,9 +66,9 @@ binxApp.localizeTimes = function() {
     if (!time.isValid) {
       return;
     }
-    return $this.text(
-      binxApp.displayLocalDate(time, $this.hasClass("preciseTime"))
-    );
+    $this
+      .text(binxApp.displayLocalDate(time, $this.hasClass("preciseTime")))
+      .attr("title", binxApp.preciseTimeSeconds(time));
   });
 
   // Write timezone
@@ -72,6 +76,22 @@ binxApp.localizeTimes = function() {
     const $this = $(this);
     $this.text(moment().format("z"));
     return $this.removeClass("convertTimezone");
+  });
+};
+
+binxApp.enableFilenameForUploads = function() {
+  $("input.custom-file-input[type=file]").on("change", function(e) {
+    // The issue is that the files list isn't actually an array. So we can't map it
+    let files = [];
+    let i = 0;
+    while (i < e.target.files.length) {
+      files.push(e.target.files[i].name);
+      i++;
+    }
+    $(this)
+      .parent()
+      .find(".custom-file-label")
+      .text(files.join(", "));
   });
 };
 
@@ -84,7 +104,12 @@ import "./binx_org_export.js";
 // and make the instance of class (which I'm storing on window) the same name without the first letter capitalized
 // I'm absolutely sure there is a best practice that I'm ignoring, but just doing it for now.
 $(document).ready(function() {
-  binxApp.localizeTimes()
+  binxApp.localizeTimes();
+  // Load admin, whatever
+  if ($("#admin-content").length > 0) {
+    window.binxAdmin = new BinxAdmin();
+    binxAdmin.init();
+  }
   // Load the page specific things
   let body_id = document.getElementsByTagName("body")[0].id;
   switch (body_id) {
@@ -96,10 +121,5 @@ $(document).ready(function() {
     case "organized_exports_new":
       window.binxAppOrgExport = new BinxAppOrgExport();
       binxAppOrgExport.init();
-    case "body":
-      if ($("#admin-content").length > 0) {
-        window.binxAdmin = new BinxAdmin();
-        binxAdmin.init();
-      }
   }
 });
