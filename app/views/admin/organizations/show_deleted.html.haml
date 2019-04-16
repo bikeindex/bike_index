@@ -30,7 +30,8 @@
           %td
             = organization.memberships.count
           %td
-            = button_to "Restore", {remote: true, action: "recover"}, {id: organization.id, class: "btn btn-warning"}
+            = link_to "Recover", admin_recover_organization_path(id: organization.id), class: "btn btn-warning"
+            -# = button_to "Restore", admin_recover__organization_path {remote: true, action: "recover"}, {id: organization.id, class: "btn btn-warning"}
 
 %hr
   = link_to "Back to undeleted organizations", admin_organizations_url, class: "btn btn-success"
