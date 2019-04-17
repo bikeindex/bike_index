@@ -75,17 +75,6 @@
               = f.email_field :email, placeholder: "Your email address", class: 'form-control'
               = f.submit 'Send alert!', class: 'btn pull-right'
               
-      / # Stolen Bike Widget
-      / %script{type: "text/javascript", src: "https://widget.bikeindex.org/stolen-widget.js"}
-      / :javascript
-      /   $(document).ready(function() {
-      /     BikeIndex.init({
-      /       height: 350,
-      /       location: 'ip',
-      /       elementId: 'binx_stolen_widget'
-      /     });
-      /   });
-
       .involve-widget
         %h3.header-font-alt
           List recent stolen bikes on your site with our #{link_to "stolen widget", "https://github.com/bikeindex/stolen_bikes_widget_html"}
@@ -94,3 +83,14 @@
   #multi-serial-search
 
 = javascript_pack_tag "multi_serial_search/index"
+
+/ Stolen Bike Widget
+%script{type: "text/javascript", src: "https://widget.bikeindex.org/stolen-widget.js"}
+:javascript
+  $(document).ready(function() {
+    BikeIndexWidget.init({
+      height: 350,
+      location: 'ip',
+      elementId: 'binx_stolen_widget'
+    });
+  });
