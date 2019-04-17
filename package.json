@@ -25,7 +25,8 @@
     "react": "^16.8.5",
     "react-dom": "^16.8.5",
     "react-spinners": "^0.5.3",
-    "sass": "^1.15.2"
+    "sass": "^1.15.2",
+    "selectize": "^0.12.6"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
