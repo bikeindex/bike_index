@@ -1,6 +1,6 @@
-import * as log from "loglevel";
-if (process.env.NODE_ENV != "production") log.setLevel("debug");
+import log from "../utils/log";
 import moment from "moment-timezone";
+import LoadFancySelects from "../utils/LoadFancySelects";
 
 window.BinxAdmin = class BinxAdmin {
   init() {
@@ -25,6 +25,7 @@ window.BinxAdmin = class BinxAdmin {
     }
     // Enable bootstrap custom file upload boxes
     binxApp.enableFilenameForUploads();
+    LoadFancySelects();
   }
 
   changeGraphCalendarBox() {
