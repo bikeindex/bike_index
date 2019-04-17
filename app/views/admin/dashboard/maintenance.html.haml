@@ -31,12 +31,8 @@
         - @component_mnfgs.each do |f|
           %tr
             %td
-              - if f.created_at.today?
-                Today at #{f.created_at.strftime("%-I %p")}
-              - elsif Date.yesterday().beginning_of_day() <= f.created_at
-                Yesterday at #{f.created_at.strftime("%-I %p")}
-              - else
-                = f.created_at.strftime("%-m/%-d/%Y")
+              %span.convertTime
+                = l f.created_at, format: :convert_time
 
             %td
               Type:
@@ -77,12 +73,8 @@
         - @handlebar_types.each do |f|
           %tr
             %td
-              - if f.created_at.today?
-                Today at #{f.created_at.strftime("%-I %p")}
-              - elsif Date.yesterday().beginning_of_day() <= f.created_at
-                Yesterday at #{f.created_at.strftime("%-I %p")}
-              - else
-                = f.created_at.strftime("%-m/%-d/%Y")
+              %span.convertTime
+                = l f.created_at, format: :convert_time
 
             %td
               = f.handlebar_type_other
