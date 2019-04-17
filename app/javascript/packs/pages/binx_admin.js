@@ -60,7 +60,6 @@ window.BinxAdmin = class BinxAdmin {
         $("#recovery_display_remote_image_url").val("");
         image_btn.text("Use first image");
       } else {
-        $("#recovery-photo-upload-input").slideUp();
         $("#recovery_display_remote_image_url").val(image_btn.attr("data-url"));
         image_btn.text("nvrmind");
       }
