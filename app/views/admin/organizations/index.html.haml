@@ -24,18 +24,15 @@
       .col-md-1
         = submit_tag 'Search', name: 'search', class: 'btn btn-primary mt-4'
 
-
 = paginate @organizations, views_prefix: "admin"
 
 .full-screen-table-wrapper
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
-      %th
-        = sortable "name"
-      %th
-        = sortable "approved"
-      %th
-        = sortable "created_at"
+      - @sortable_columns.each do |column|
+        - active_col = @sort == col
+        %th
+          = sortable column, class: ('active' if active_col), data: { sort: col, direction: (active_col && @sort_direction == 'desc' ? 'asc' : 'desc') }
       %th
         Bikes
       %th
