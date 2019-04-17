@@ -10,7 +10,6 @@ class Admin::OrganizationsController < Admin::BaseController
     orgs = orgs.admin_text_search(params[:query]) if params[:query].present?
     orgs = orgs.where(kind: kind_for_organizations) if params[:kind].present?
     @sortable_columns = sortable_columns
-    @hidden_sort_fields = {sort: params[:sort], sort_direction: params[:direction]}
     @organizations_count = orgs.count
     @organizations = orgs.reorder(sort_column + " " + sort_direction).page(page).per(per_page)
     render layout: "new_admin"

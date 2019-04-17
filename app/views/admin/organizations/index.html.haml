@@ -12,8 +12,8 @@
   = form_tag admin_organizations_path, method: :get do
     .row
       .col-md-6
-        = hidden_field_tag :sort, @hidden_sort_fields[:sort]
-        = hidden_field_tag :sort_direction, @hidden_sort_fields[:sort_direction]
+        = hidden_field_tag :sort, sort_column
+        = hidden_field_tag :sort_direction, sort_direction
       .col-md-2.align-self-end
         .form-check.text-center
           = check_box_tag :is_paid, class: "form-check-input"
