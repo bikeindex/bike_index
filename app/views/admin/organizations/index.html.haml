@@ -28,9 +28,12 @@
 .full-screen-table-wrapper
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
-      - @sortable_columns.each do |column|
-        %th
-          = sortable column
+      %th
+        = sortable "name"
+      %th
+        = sortable "approved"
+      %th
+        = sortable "created_at"
       %th
         Bikes
       %th
