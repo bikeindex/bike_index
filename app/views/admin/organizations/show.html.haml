@@ -31,9 +31,9 @@
                 therefor hidden
               %em
                 Would be
-            -if @organization.show_on_map
+            - if @organization.show_on_map
               Shown on map
-            -else
+            - else
               %strong
                 Not Shown
         %tr
@@ -57,11 +57,17 @@
             = @organization.auto_user.email if @organization.auto_user.present?
         %tr
           %td
-            Created at
+            Created
           %td
             %span.convertTime.preciseTime
               = l @organization.created_at, format: :convert_time
             %small.convertTimezone
+        %tr
+          %td
+            Updated
+          %td
+            %span.convertTime.preciseTime
+              = l @organization.updated_at, format: :convert_time
 
   .col-md-6
     %table.table-list
@@ -120,6 +126,7 @@
             .ul
               - @organization.child_organizations.each do |org|
                 .li
+                  = link_to org.name, admin_organization_url(org)
 
   - if @organization.bike_shop?
     .col-md-6

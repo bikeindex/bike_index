@@ -25,10 +25,11 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def show_deleted
     @organizations = Organization.only_deleted.all
+    render layout: "new_admin"
   end
 
   def recover
-    @organization = Organization.only_deleted.find(params[:id]).recover
+    @organization = Organization.only_deleted.find(params[:id]).restore(recursive: true)
     redirect_to admin_organizations_url
   end
 
