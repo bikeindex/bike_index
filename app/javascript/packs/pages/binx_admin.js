@@ -56,7 +56,6 @@ window.BinxAdmin = class BinxAdmin {
       e.preventDefault();
       const image_btn = $("#use_image_for_display");
       if (image_btn.hasClass("using_bikes")) {
-        $("#recovery-photo-upload-input").slideDown();
         $("#recovery_display_remote_image_url").val("");
         image_btn.text("Use first image");
       } else {
