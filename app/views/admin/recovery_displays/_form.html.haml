@@ -26,20 +26,19 @@
               %label
                 Bike url
               %input.less-strong.w-100{ type: 'text', value: bike_url(@recovery_display.bike) }
-      .row
         .col-lg-6
-          .form-group.mt-4
-          = f.label :image, "Recovery photo"
-          - if @recovery_display.image?
-            = image_tag(@recovery_display.image_url(:thumb))
-          - else
-            %p
-              No picture!
-        .col-lg-6
-          .input-group.mb-3#recovery-photo-upload-input
-            .custom-file
-              = f.label :image, "Choose file", class: "custom-file-label"
-              = f.file_field :image, class: "custom-file-input"
+          #recovery-photo-upload-input
+            .form-group.mt-4
+            = f.label :image, "Recovery photo"
+            - if @recovery_display.image?
+              = image_tag(@recovery_display.image_url(:thumb))
+            - else
+              %p
+                No picture!
+            .input-group.mb-3
+              .custom-file
+                = f.label :image, "Choose file", class: "custom-file-label"
+                = f.file_field :image, class: "custom-file-input"
           .form-group.avatar-upload
             .avatar-img
               - if @bike.present? && @recovery_display.image.blank?
