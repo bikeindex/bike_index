@@ -1,5 +1,4 @@
-import * as log from "loglevel";
-if (process.env.NODE_ENV != "production") log.setLevel("debug");
+import log from '../utils/log';
 import _ from "lodash";
 
 window.BinxMapping = class BinxMapping {

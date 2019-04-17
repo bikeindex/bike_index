@@ -1,4 +1,3 @@
-import log from "../utils/log";
 import moment from "moment-timezone";
 import LoadFancySelects from "../utils/LoadFancySelects";
 
