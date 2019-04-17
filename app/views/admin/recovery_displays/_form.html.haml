@@ -26,6 +26,11 @@
               %label
                 Bike url
               %input.less-strong.w-100{ type: 'text', value: bike_url(@recovery_display.bike) }
+      .row
+        .col-lg-6
+          .form-group
+            = f.label :body
+            = f.text_area :quote, placeholder: 'Quote about recovery', rows: 4, class: "form-control"
         .col-lg-6
           #recovery-photo-upload-input
             .form-group.mt-4
@@ -61,10 +66,6 @@
             .form-check
               = f.check_box :remove_image, class: "form-check-input"
               = f.label :remove_image, class: "form-check-label"
-      .row
-        .col-lg-6
-          .form-group
-            = f.label :body
-            = f.text_area :quote, placeholder: 'Quote about recovery', rows: 4, class: "form-control"
+
       = f.hidden_field :remote_image_url
-      = f.submit 'Save', class: 'btn btn-success float-right'
+      = f.submit 'Save', class: 'btn btn-success float-right mt-4'
