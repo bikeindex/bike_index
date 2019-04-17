@@ -58,5 +58,5 @@
   - if @bulk_import.bikes.count > 25
     %small
       Last 25 shown <em>use organization view for paginated list</em>
-%table.table.table-striped.table-bordered
-  = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: @bulk_import.bikes.reorder(created_at: :desc).limit(25) }
+
+= render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: @bulk_import.bikes.reorder(created_at: :desc).limit(25) }

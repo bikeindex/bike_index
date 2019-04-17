@@ -1,10 +1,10 @@
-= javascript_include_tag "//www.google.com/jsapi", "chartkick" 
+= javascript_include_tag "//www.google.com/jsapi", "chartkick"
 %section.full-screen-table
   %h2
     Recent
     = link_to "Bikes", admin_bikes_url
-  %table.table.table-striped.table-bordered
-    = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: @bikes }
+
+  = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: @bikes }
   %p.pull-right
     #{Bike.count} bikes total
     %em
@@ -31,7 +31,7 @@
 
 %section.full-screen-table
   %h2
-    Suspicious 
+    Suspicious
     = link_to "DUPED bikes", duplicates_admin_bikes_url
   - @duplicate_groups.each do |duplicate_group|
     %p

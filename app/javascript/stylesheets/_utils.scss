@@ -2,6 +2,19 @@
 .less-strong {
   opacity: 0.65;
 }
+
+.less-strong-hold{
+  position:relative;
+}
+
+.less-strong-right{
+  color:#b1b1b1;
+  position:absolute;
+  right:-.3em;bottom:-.8em;
+  font-size:.8em;
+}
+
+
 .gray-link {
   color: $gray-600 !important;
   opacity: 0.65;
