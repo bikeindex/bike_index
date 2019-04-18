@@ -15,11 +15,10 @@
     #{ link_to "Nearby stolen widget", "https://github.com/bikeindex/stolen_bikes_widget_html" } (on GitHub)
   %li
     - url_for_embed = current_user ? user_embed_path(current_user) : new_user_url(return_to: dev_and_design_path)
-    #{ link_to "Personal bike display widget", url_for_embed } (must be logged in - also, has no usage instructions...)
+    #{link_to "Personal bike display widget", url_for_embed} (must be logged in - also, has no usage instructions...)
   %li
-    #{link_to "OAuth Applications you've made", oauth_applications_path } (must be logged in)
+    #{link_to "OAuth Applications you've made", oauth_applications_path} (must be logged in)
   %li
-    #{ link_to "OAuth Applications you've authorized", oauth_authorized_applications_path } (must be logged in)
+    #{link_to "OAuth Applications you've authorized", oauth_authorized_applications_path} (must be logged in)
   %li
-    #{link_to "front", "http://files.bikeindex.org/stored/Bike-Index_Tri-fold_inside.pdf"} and #{link_to "back", "http://files.bikeindex.org/stored/Bike-Index_Tri-fold_outside.pdf"}
-    {{LINK:Trifold Flyer}} - print color and double-sided (don't rescale, let the printer print as close the edge as it can)
+    #{link_to "Trifold Flyer", "https://files.bikeindex.org/stored/Bike-Index-TriFold.pdf"} - Print color & double-sided (<em>do not</em> rescale, have printer print as close to the edges as it can)
