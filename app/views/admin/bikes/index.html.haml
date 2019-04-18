@@ -12,7 +12,7 @@
       %p
         There are currently #{number_with_delimiter(PublicImage.count)} bike images
         %em
-          (#{PublicImage.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today
+          (#{PublicImage.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
 
   .row
     .col-lg-9
