@@ -1,40 +1,45 @@
-%header.with-subtitle
-  %h1
-    Manage Bikes
-  = link_to "Manage component types", admin_ctypes_url, class: "sharing-links"
+
+%h1
+  Manage Bikes
+= link_to "Manage component types", admin_ctypes_url
 - unless @unknown
   %p
     = link_to "Bikes with unknown manufacturers", missing_manufacturer_admin_bikes_url
-.special-search-field-container
-  .special-search-field
-    = form_tag admin_bikes_path, method: :get do
-      = text_field_tag :email, params[:email], placeholder: "Search bikes by email"
-      = submit_tag "Search", name: "search", class: "button-blue"
 
-  %p
-    There are currently #{number_with_delimiter(PublicImage.count)} bike images
-    %em
-      (#{PublicImage.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
-  %h4
-    = number_with_delimiter(Bike.all.count)
-    indexed,
-    %em
-      (#{Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
-    = number_with_delimiter(Ownership.where(current: true).where(claimed: true).count)
-    are claimed
+= form_tag admin_bikes_path, method: :get do
+  .row
+    .col-auto
+      %p
+        There are currently #{number_with_delimiter(PublicImage.count)} bike images
+        %em
+          (#{PublicImage.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
 
+  .row
+    .col-lg-9
+      %h4
+        = number_with_delimiter(Bike.all.count)
+        indexed,
+        %em
+          (#{Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+        = number_with_delimiter(Ownership.where(current: true).where(claimed: true).count)
+        are claimed
+    .col-lg-2
+      = text_field_tag :email, params[:email], placeholder: "Search bikes by email", class: "form-control float-right"
+    .col-lg-1
+      = submit_tag "Search", name: "search", class: "btn btn-primary"
 
 - if @bikes.present?
-  .paginate-container
-    = paginate @bikes
-    %h4.pull-left
-      = pluralize(@bikes.total_count, 'Matching Bike')
-    - if params[:multi_delete]
-      = render partial: "/admin/bikes/admin_bikes_table_multidelete"
-    - else
-      = render partial: "/admin/bikes/admin_bikes_table"
-  .paginate-container
-    = paginate @bikes
+  .row.align-items-end
+    .col-lg-5
+      %h4
+        = pluralize(@bikes.total_count, 'Matching Bike')
+    .col-lg-7
+      = paginate @bikes, views_prefix: "admin"
+  - if params[:multi_delete]
+    = render partial: "/admin/bikes/admin_bikes_table_multidelete"
+  - else
+    = render partial: "/admin/bikes/admin_bikes_table"
+    = paginate @bikes, views_prefix: "admin"
 - else
-  %h1.padded
+  %h1.mt-4
     No bikes found!
