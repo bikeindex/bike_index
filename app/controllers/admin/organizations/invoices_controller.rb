@@ -10,6 +10,7 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
 
   def new
     @invoice ||= @organization.invoices.new
+    render layout: "new_admin"
   end
 
   def show
