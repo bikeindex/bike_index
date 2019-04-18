@@ -27,7 +27,7 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
       flash[:success] = "Invoice created! #{invoice_is_active_notice(@invoice)}"
       redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
     else
-      render :new
+      render :new, layout: "new_admin"
     end
   end
 
