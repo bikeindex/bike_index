@@ -91,7 +91,7 @@ window.BinxAdmin = class BinxAdmin {
         if (!(n.val().length > 0)) { n.val($('#organization_name').val()); }
       }
 
-      return $('.chosen-select select').select2();
+      LoadFancySelects();
     });
   }
 };

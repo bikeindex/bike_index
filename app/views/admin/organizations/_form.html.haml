@@ -1,85 +1,90 @@
-.card.bg-light
-  .card-body
-    - if @organization.errors.any?
-      = render partial: "/shared/errors", locals: { name: "Organization", obj: @organization}
+- if @organization.errors.any?
+  = render partial: "/shared/errors", locals: { name: "Organization", obj: @organization}
 
 
-    .row
-      .form-group.col-md-6
-        = f.label :name
-        = f.text_field :name, class: "form-control"
+.row
+  .form-group.col-md-6
+    = f.label :name
+    = f.text_field :name, class: "form-control"
 
-      .form-group.col-md-6
-        = f.label :available_invitation_count, "Available invitations"
-        = f.number_field :available_invitation_count, class: "form-control"
+  .form-group.col-md-6
+    = f.label :available_invitation_count, "Available invitations"
+    = f.number_field :available_invitation_count, class: "form-control"
+    %p.text-success
+      = "Invitations sent: #{@organization.sent_invitation_count}"
+.row
+  .col-md-6
+    .form-group
+      = f.label :short_name, "Short name (15 letters or less)"
+      = f.text_field :short_name, class: "form-control"
+  .col-md-6
+    .form-group
+      = f.label :ascend_name
+      = f.text_field :ascend_name, class: "form-control"
+
+.row
+  .col-md-6
+    .form-group.mt-4
+      = f.label :website
+      = f.text_field :website, class: "form-control"
+    - if @organization.id.present?
+      - emails = @organization.users.pluck(:email)
+      - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
+      .form-group.fancy-select.unfancy
+        = f.label :embedable_user_email
+        = f.select :embedable_user_email, emails, {prompt: "Select email", selected: @embedable_email}, class: "form-control"
+        .less-strong
+          - if @organization.memberships.count == 0
+            You can use #{ENV['AUTO_ORG_MEMBER']} if
+            %br
+            there are no members of the organization
+  .col-md-6.mt-4
+    %fieldset{:disabled => "disabled"}
+      .form-group
+        = f.label :slug, "Slug:"
         %p
-          = "Invitations sent: #{@organization.sent_invitation_count}"
-    .row
-      .col-md-6
-        .form-group.mt-4
-          = f.label :short_name, "Short name (15 letters or less)"
-          = f.text_field :short_name, class: "form-control"
-      .col-md-6
-        .form-group.mt-4
-          = f.label :ascend_name
-          = f.text_field :ascend_name, class: "form-control"
+          = @organization.slug
+.row
+  .col-md-6.pl-4
+    .form-group
+      %label
+      Organization Type
+      -# .btn-group.btn-group-toggle{"data-toggle" => "buttons"}
+      -#   - Organization.kinds.each do |kind|
+      -#     = f.label "kind_#{kind}", kind.humanize, class: "btn btn-secondary ml-2" do
+      -#       = f.radio_button "kind", kind
+      -#       = kind.humanize
+      - Organization.kinds.each do |kind|
+        .form-check
+          = f.radio_button "kind", kind, class: "form-check-input"
+          = f.label "kind_#{kind}", kind.humanize, class: "form-check-label"
 
-    .row
-      .col-md-6
-        .form-group.mt-4
-          = f.label :website
-          = f.text_field :website, class: "form-control"
-        - if @organization.id.present?
-          - emails = @organization.users.pluck(:email)
-          - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
-          .form-group
-            = f.label :embedable_user_email
-            = f.select :embedable_user_email, emails, {prompt: "Select email", selected: @embedable_email}, class: "form-control"
-            .less-strong
-              - if @organization.memberships.count == 0
-                You can use #{ENV['AUTO_ORG_MEMBER']} if
-                %br
-                there are no members of the organization
-      .col-md-6.mt-4
-        %fieldset{:disabled => "disabled"}
-          .form-group
-            = f.label :slug, "Slug:"
-            %p
-              = @organization.slug
-    .row
-      .col-md-6.pl-4
-        .form-group
-          %label
-            Kind
-          %ul.list-unstyled
-            - Organization.kinds.each do |kind|
-              %li
-                = f.radio_button :kind, kind
-                = kind.humanize
-      .col-md-6
-        .form-group
-          = f.label :show_on_map
-          = f.check_box :show_on_map
 
-        .form-group
-          = f.label :lock_show_on_map, 'Lock shown on map'
-          = f.check_box :lock_show_on_map
-          %small.less-strong
-            Restrict org from updating show on map above (e.g. they're known bad actors)
-        .form-group
-          = f.label :api_access_approved
-          = f.check_box :api_access_approved
-          %small.less-strong
-            to be able to post updates via API, check this too
 
-        .form-group
-          = f.label :approved, 'Validated & approved'
-          = f.check_box :approved
-    .row
-      .col-md-6
-        .form-group
-          = f.label :parent_organization_id
-          = f.collection_select(:parent_organization_id, Organization.all, :id, :name, {prompt: "Choose organization"}, class: "form-control")
+
+  .col-md-6
+    .form-group
+      = f.check_box :show_on_map
+      = f.label :show_on_map
+    .form-group
+      = f.check_box :lock_show_on_map
+      = f.label :lock_show_on_map, 'Lock shown on map'
+      %small.less-strong
+        Restrict org from updating show on map above (e.g. they're known bad actors)
+    .form-group
+      = f.check_box :api_access_approved
+      = f.label :api_access_approved
+      %small.less-strong
+        to be able to post updates via API, check this too
+
+    .form-group
+      = f.check_box :approved
+      = f.label :approved, 'Validated & approved'
+.row
+  .col-md-6
+    .form-group
+      = f.label :parent_organization_id
+      = f.collection_select(:parent_organization_id, Organization.all, :id, :name, {prompt: "Choose organization"}, class: "form-control")
 
   / .control-group.padded
   /   .control-label

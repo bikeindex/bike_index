@@ -50,7 +50,7 @@ class Admin::OrganizationsController < Admin::BaseController
       flash[:success] = 'Organization Saved!'
       redirect_to admin_organization_url(@organization)
     else
-      render action: :edit
+      render action: :edit, layout: "new_admin"
     end
   end
 
@@ -61,7 +61,7 @@ class Admin::OrganizationsController < Admin::BaseController
       flash[:success] = 'Organization Created!'
       redirect_to edit_admin_organization_url(@organization)
     else
-      render action: :new
+      render action: :new, layout: "new_admin"
     end
   end
 
