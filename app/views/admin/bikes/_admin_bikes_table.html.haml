@@ -21,14 +21,14 @@
           %tr
             %td
               .less-strong-hold
+                %a.convertTime{ href: edit_admin_bike_url(bike) }
+                  = l bike.created_at, format: :convert_time
                 %span.less-strong-right
                   - if bike.example
                     %span
                       = bike.id
                   - else
                     = bike.id
-              %a.convertTime{ href: edit_admin_bike_url(bike) }
-                = l bike.created_at, format: :convert_time
             %td.d-none.d-md-table-cell
               = bike.owner_email
               - if bike.user?

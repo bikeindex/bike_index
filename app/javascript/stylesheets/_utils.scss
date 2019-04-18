@@ -3,29 +3,6 @@
   opacity: 0.65;
 }
 
-.less-strong-hold {
-  position: relative;
-}
-
-.less-strong-right {
-  color: #b1b1b1;
-  position: absolute;
-  right: -0.3em;
-  bottom: -0.8em;
-  font-size: 0.8em;
-}
-
-.gray-link {
-  color: $gray-600 !important;
-  opacity: 0.65;
-  text-decoration: underline;
-  &:hover,
-  &:active,
-  &.active {
-    opacity: 0.9;
-  }
-}
-
 label {
   cursor: pointer;
 }
@@ -47,24 +24,4 @@ label {
 
 .convertedTime {
   white-space: nowrap;
-}
-
-.table-list {
-  @extend .table;
-  @extend .table-striped;
-  @extend .table-bordered;
-  @extend .table-sm;
-  tr td:first-child {
-    font-size: 80%;
-    font-style: italic;
-  }
-  tr td:last-child {
-    width: 85%; // This is effectively min-width for tables
-  }
-}
-
-table .table-cell-check {
-  font-family: Courier;
-  text-align: center;
-  font-weight: bold;
 }

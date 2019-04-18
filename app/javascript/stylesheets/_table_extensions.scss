@@ -1,0 +1,32 @@
+.table-list {
+  @extend .table;
+  @extend .table-striped;
+  @extend .table-bordered;
+  @extend .table-sm;
+  tr td:first-child {
+    font-size: 80%;
+    font-style: italic;
+  }
+  tr td:last-child {
+    width: 85%; // This is effectively min-width for tables
+  }
+}
+
+table .table-cell-check {
+  font-family: Courier;
+  text-align: center;
+  font-weight: bold;
+}
+
+.less-strong-hold {
+  position: relative;
+}
+
+.less-strong-right {
+  position: absolute;
+  right: -0.3em;
+  line-height: 1;
+  bottom: -0.2em;
+  font-size: 0.8em;
+  @extend .less-strong;
+}

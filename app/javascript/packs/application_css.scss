@@ -2,6 +2,7 @@
 @import "~selectize/dist/css/selectize.bootstrap3";
 
 @import "../stylesheets/utils";
+@import "../stylesheets/table_extensions";
 
 // For now, because we don't want to replicate all the styles immediately, we're hiding the footer
 footer.primary-footer {
