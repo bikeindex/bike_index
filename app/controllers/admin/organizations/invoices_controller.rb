@@ -16,7 +16,9 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
     redirect_to edit_admin_organization_invoice_path
   end
 
-  def edit; end
+  def edit
+    render layout: "new_admin"
+  end
 
   def create
     @invoice = @organization.invoices.build(permitted_parameters.except(:paid_feature_ids))
