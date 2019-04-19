@@ -14,11 +14,11 @@ function BinxAdmin() {
           .css("max-width", "100%");
       }
       if ($(".calendar-box")[0]) {
-        setCustomGraphStartAndSlide();
-        changeGraphCalendarBox();
+        this.setCustomGraphStartAndSlide();
+        this.changeGraphCalendarBox();
       }
       if ($("#use_image_for_display").length > 0) {
-        useBikeImageForDisplay();
+        this.useBikeImageForDisplay();
       }
       // Enable bootstrap custom file upload boxes
       binxApp.enableFilenameForUploads();
@@ -28,7 +28,7 @@ function BinxAdmin() {
     changeGraphCalendarBox() {
       $("select#graph_date_option").on("change", e => {
         e.preventDefault();
-        setCustomGraphStartAndSlide();
+        this.setCustomGraphStartAndSlide();
       });
     },
 
@@ -48,7 +48,7 @@ function BinxAdmin() {
         $(".calendar-box").slideDown();
       } else {
         $(".calendar-box").slideUp();
-        startGraphTimeSet();
+        this.startGraphTimeSet();
       }
     },
 
