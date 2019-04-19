@@ -1,5 +1,9 @@
 // This is stuff that needs to happen on page load.
 import moment from "moment-timezone";
+import BinxMapping from "./binx_mapping.js";
+import BinxAppOrgExport from "./binx_org_export.js";
+import BinxAppOrgMescvvvvsages from "./binx_org_messages.js";
+import BinxAdmin from "./binx_admin.js";
 
 window.binxApp || (window.binxApp = {});
 
@@ -93,11 +97,6 @@ binxApp.enableFilenameForUploads = function() {
   });
 };
 
-import "./binx_mapping.js";
-import "./binx_org_messages.js";
-import "./binx_org_export.js";
-import BinxAdmin from "./binx_admin.js";
-
 // I've made the choice to have classes' first letter capitalized
 // and make the instance of class (which I'm storing on window) the same name without the first letter capitalized
 // I'm absolutely sure there is a best practice that I'm ignoring, but just doing it for now.
@@ -109,8 +108,8 @@ $(document).ready(function() {
     binxAdmin.init();
   }
   // Load the page specific things
-  let body_id = document.getElementsByTagName("body")[0].id;
-  switch (body_id) {
+  const bodyId = document.getElementsByTagName("body")[0].id;
+  switch (bodyId) {
     case "organized_messages_index":
       window.binxMapping = new BinxMapping("geolocated_messages");
       window.binxAppOrgMessages = new BinxAppOrgMessages();
