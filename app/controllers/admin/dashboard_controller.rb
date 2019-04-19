@@ -5,11 +5,12 @@ class Admin::DashboardController < Admin::BaseController
     @flavors = FlavorText.all
     @flavor = FlavorText.new
     @duplicate_groups = DuplicateBikeGroup.unignored.order('created_at desc').limit(5)
+    render layout: "new_admin"
   end
 
   def invitations
-    @organizations = Organization.all 
-    @organization_invitation = OrganizationInvitation.new 
+    @organizations = Organization.all
+    @organization_invitation = OrganizationInvitation.new
   end
 
   def maintenance
