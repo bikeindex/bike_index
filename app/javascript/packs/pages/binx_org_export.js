@@ -1,13 +1,13 @@
 import moment from "moment-timezone";
 
-window.BinxAppOrgExport = class BinxAppOrgExport {
+export default class BinxAppOrgExport {
   init() {
     let body_id = document.getElementsByTagName("body")[0].id;
 
     if (body_id == "organized_exports_new") {
-      binxAppOrgExport.initNewForm();
+      this.initNewForm();
     } else {
-      binxAppOrgExport.reloadIfUnfinished();
+      this.reloadIfUnfinished();
     }
   }
 
@@ -36,10 +36,10 @@ window.BinxAppOrgExport = class BinxAppOrgExport {
     });
 
     // Show avery
-    binxAppOrgExport.showOrHideNonAvery();
+    this.showOrHideNonAvery();
     // and on future changes, trigger the update
     $("#export_avery_export").on("change", e => {
-      binxAppOrgExport.showOrHideNonAvery();
+      this.showOrHideNonAvery();
     });
   }
 
@@ -63,7 +63,7 @@ window.BinxAppOrgExport = class BinxAppOrgExport {
       // Reload the page after 2 seconds unless the export is more than 5 minutes old - at which point we assume something is broken
       let created = parseInt($("#exportProgress").attr("data-createdat"));
       if (moment().unix() - created < 300) {
-        window.setTimeout(() => {
+        setTimeout(() => {
           location.reload(true);
         }, 5000);
       }
