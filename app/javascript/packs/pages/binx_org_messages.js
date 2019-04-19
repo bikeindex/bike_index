@@ -1,6 +1,6 @@
 import log from '../utils/log';
 
-window.BinxAppOrgMessages = class BinxAppOrgMessages {
+export default class BinxAppOrgMessages {
   constructor() {
     this.fetchedMessages = false;
     this.mapReady = false;
@@ -12,7 +12,7 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
   init() {
     // load the maps API
     binxMapping.loadMap("binxAppOrgMessages.mapOrganizedMessages");
-    binxAppOrgMessages.fetchMessages([["per_page", 50]]);
+    this.fetchMessages([["per_page", 50]]);
   }
 
   fetchMessages(opts) {
@@ -25,11 +25,11 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
       dataType: "json",
       url: url,
       success(data, textStatus, jqXHR) {
-        binxAppOrgMessages.fetchedMessages = true;
-        binxAppOrgMessages.renderOrganizedMessages(data.messages);
+        this.fetchedMessages = true;
+        this.renderOrganizedMessages(data.messages);
       },
       error(data, textStatus, jqXHR) {
-        binxAppOrgMessages.fetchedMessages = true;
+        this.fetchedMessages = true;
         log.debug(data);
       }
     });
@@ -37,41 +37,37 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
 
   // Grabs the visible markers, looks up the messages from them and returns that list
   visibleMessages() {
-    return _.map(binxMapping.markersInViewport(), function(marker) {
-      return _.find(binxAppOrgMessages.messages, function(message) {
-        return marker.binxId == message.id;
-      });
+    return binxMapping.markersInViewport().map(marker => {
+      return this.messages.find(message => marker.binxId == message.id);
     });
   }
 
   // this loops and calls itself again if we haven't finished rendering the map and the messages
   mapOrganizedMessages() {
     // if we have already rendered the messagesMapRendered, then we're done!
-    if (binxAppOrgMessages.messagesMapRendered) {
+    if (this.messagesMapRendered) {
       return true;
     }
     if (binxMapping.googleMapsLoaded()) {
-      if (!binxAppOrgMessages.mapReady) {
+      if (!this.mapReady) {
         binxMapping.render(
           window.pageInfo.map_center_lat,
           window.pageInfo.map_center_lng
         );
-        binxAppOrgMessages.mapReady = true;
+        this.mapReady = true;
       }
       // If the message list is rendered, it means we could be finished rendering!
       // Otherwise we haven't finished rendering and we need to loop this method
-      if (binxAppOrgMessages.messagesListRendered) {
+      if (this.messagesListRendered) {
         // The messages are loaded, so process the messages into markers
-        binxAppOrgMessages.addMarkerPointsForMessages(
-          binxAppOrgMessages.messages
-        );
+        this.addMarkerPointsForMessages();
         // Then render the points
-        return binxAppOrgMessages.inititalizeMapMarkers();
+        return this.inititalizeMapMarkers();
       }
     }
     // call this again in .5 seconds, unless we returned prematurely (because things have rendered)
     log.debug("looping mapOrganizedMessages");
-    setTimeout(binxAppOrgMessages.mapOrganizedMessages, 500);
+    setTimeout(this.mapOrganizedMessages, 500);
   }
 
   // When the link button is clicked on the table, scroll up to the map and open the applicable marker
@@ -90,12 +86,8 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
           "Unable to find that message!"
         );
       }
-      let message = _.find(binxAppOrgMessages.messages, function(message) {
-        return messageId == message.id;
-      });
-      let marker = _.find(binxMapping.markersRendered, function(marker) {
-        return messageId == marker.binxId;
-      });
+      let message = this.messages.find(message => messageId === message.id);
+      let marker = binxMapping.markersRendered.find(marker => messageId == marker.binxId);
       binxMapping.openInfoWindow(marker, messageId, message);
       $("body, html").animate(
         {
@@ -108,16 +100,14 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
 
   inititalizeMapMarkers() {
     binxMapping.addMarkers({ fitMap: true });
-    binxAppOrgMessages.messagesMapRendered = true;
+    this.messagesMapRendered = true;
     // Add a trigger to the map when the viewport changes (after it has finished moving)
-    google.maps.event.addListener(binxMap, "idle", function() {
+    google.maps.event.addListener(binxMap, "idle", () => {
       // This is grabbing the markers in viewport and logging the ids for them.
       // We actually need to rerender the the marker table
-      binxAppOrgMessages.renderMessagesTable(
-        binxAppOrgMessages.visibleMessages()
-      );
+      this.renderMessagesTable();
     });
-    binxAppOrgMessages.addTableMapLinkHandler();
+    this.addTableMapLinkHandler();
   }
 
   tableRowForMessage(message) {
@@ -137,21 +127,22 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
   }
 
   geolocatedMessageMapPopup(point) {
-    let message = _.find(binxAppOrgMessages.messages, ["id", point.id]);
+    let message = messages.find(message => message.id === point.id);
     let tableTop =
       '<table class="table table table-striped table-hover table-bordered table-sm"><tbody>';
     tableTop +=
       '<tr><td class="map-cell"></td><td>Sent</td><td>Bike</td><td>Sender</td></tr>';
-    return `${tableTop}${binxAppOrgMessages.tableRowForMessage(
+    return `${tableTop}${this.tableRowForMessage(
       message
     )}</tbody></table>`;
   }
 
-  renderMessagesTable(messages) {
+  renderMessagesTable() {
     let body_html = "";
 
+    const messages = this.visibleMessages();
     for (let message of Array.from(messages)) {
-      body_html += binxAppOrgMessages.tableRowForMessage(message);
+      body_html += this.tableRowForMessage(message);
     }
     if (body_html.length < 2) {
       // If there aren't any messages that were added, render a note about there not being any messages
@@ -172,8 +163,8 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
     }
   }
 
-  addMarkerPointsForMessages(messages) {
-    binxMapping.markerPointsToRender = messages.map(function(message) {
+  addMarkerPointsForMessages() {
+    binxMapping.markerPointsToRender = this.messages.map(message => {
       return {
         id: message.id,
         lat: message.lat,
@@ -185,16 +176,14 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
 
   renderOrganizedMessages(messages) {
     // Don't rerender the list if it's already rendered
-    if (binxAppOrgMessages.messagesListRendered) {
-      return true;
-    }
+    if (this.messagesListRendered) return true;
     // Store the messages on the window class so we have them
-    binxAppOrgMessages.messages = messages;
-    // Render the table of messages
-    binxAppOrgMessages.renderMessagesTable(messages);
+    this.messages = messages;
+    // Render the table of visible messages
+    this.renderMessagesTable();
     // Set the updated statuses based on what we rendered
-    binxAppOrgMessages.messagesListRendered = true;
+    this.messagesListRendered = true;
     // call map organized messages - so that we can render it
-    binxAppOrgMessages.mapOrganizedMessages();
+    this.mapOrganizedMessages();
   }
 };
