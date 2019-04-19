@@ -1,3 +1,6 @@
+import * as Sortable from "sortablejs";
+
+
 class BikeIndex.BikesEditPhotos extends BikeIndex
   constructor: ->
     @initializeEventListeners()
@@ -55,7 +58,7 @@ class BikeIndex.BikesEditPhotos extends BikeIndex
     sortable_list_items = $sortable_container.children('li')
     # This is a list comprehension for the list of all the sortable items, to make an array
     array_of_photo_ids = ($(list_item).prop('id') for list_item in sortable_list_items)
-    new_item_order = 
+    new_item_order =
       list_of_photos: array_of_photo_ids
     # list_of_items is an array containing the ordered list of image_ids
     # Then we post the result of the list comprehension to the url to update

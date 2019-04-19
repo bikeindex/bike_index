@@ -9,6 +9,7 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
     unless @edit_template == 'landing_page' # Otherwise, we're rendering a snippet
       @mail_snippet = @organization.mail_snippets.where(name: @edit_template).first_or_create
     end
+    render layout: "new_admin"
   end
 
   def update
