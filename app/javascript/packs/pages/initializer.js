@@ -95,8 +95,8 @@ binxApp.enableFilenameForUploads = function() {
 
 import "./binx_mapping.js";
 import "./binx_org_messages.js";
-import "./binx_admin.js";
 import "./binx_org_export.js";
+import BinxAdmin from "./binx_admin.js";
 
 // I've made the choice to have classes' first letter capitalized
 // and make the instance of class (which I'm storing on window) the same name without the first letter capitalized
@@ -105,7 +105,7 @@ $(document).ready(function() {
   binxApp.localizeTimes();
   // Load admin, whatever
   if ($("#admin-content").length > 0) {
-    window.binxAdmin = new BinxAdmin();
+    const binxAdmin = BinxAdmin();
     binxAdmin.init();
   }
   // Load the page specific things
