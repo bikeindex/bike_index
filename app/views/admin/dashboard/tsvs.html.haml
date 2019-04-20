@@ -20,9 +20,9 @@
               = tsv_info[:description]
 
 = form_tag admin_update_tsv_blacklist_path, method: :put, multipart: true do
-  = label_tag :tsv_blacklist, class: 'control-label' do
+  = label_tag :tsv_blacklist do
     Blacklist Bike Urls, <strong>1 per line</strong>. These can be the id (the number in the url), the bike url, admin url or edit url
     .form-group
       = text_area_tag :blacklist, @blacklist.map{|i| "#{ENV['BASE_URL']}/bikes/#{i}"}.join("\n"), rows: 10, class: 'form-control'
 
-= submit_tag "Save changes", class: "btn btn-success submit-bike-update"
+  = submit_tag "Save changes", class: "btn btn-success submit-bike-update"
