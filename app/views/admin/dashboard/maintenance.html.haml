@@ -1,23 +1,26 @@
-%header.with-subtitle
-  %h1 Maintaining things
 
-%section.full-screen-table
-  %header.with-subtitle
-    %h2
-      Recent example bikes
-    = link_to "Delete example bikes", admin_destroy_example_bikes_url, class: "sharing-links"
+%h1 Maintaining things
+
+.full-screen-table-wrapper
+  %h2
+    Recent example bikes
+    = link_to "Delete example bikes", admin_destroy_example_bikes_url
   - if @bikes.any?
-
     = render partial: "/admin/bikes/admin_bikes_table"
-    %p.pull-right
-      #{Bike.unscoped.where(example: true).count} example bikes total
+    .row
+      .col-lg-8
+      .col-lg-4
+        %p.float-right
+          #{Bike.unscoped.where(example: true).count} example bikes total
 
   - else
     No example bikes right now!
 
-  %section.full-screen-table
-    %table.table.table-striped.table-bordered
-      %thead
+  %h2
+    Component types
+  .full-screen-table-wrapper
+    %table.table.table-striped.table-bordered.table-sm
+      %thead.thead-light
         %th
           Date
         %th
@@ -59,10 +62,11 @@
             %td
               = link_to f.bike_id, edit_admin_bike_url(f.bike_id)
 
-
-  %section.full-screen-table
-    %table.table.table-striped.table-bordered
-      %thead
+  %h2
+    Handlebar Types
+  .full-screen-table-wrapper
+    %table.table.table-striped.table-bordered.table-sm
+      %thead.thead-light
         %th
           Date
         %th
