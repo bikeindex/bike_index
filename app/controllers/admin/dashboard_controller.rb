@@ -8,8 +8,8 @@ class Admin::DashboardController < Admin::BaseController
   end
 
   def invitations
-    @organizations = Organization.all 
-    @organization_invitation = OrganizationInvitation.new 
+    @organizations = Organization.all
+    @organization_invitation = OrganizationInvitation.new
   end
 
   def maintenance
@@ -42,6 +42,7 @@ class Admin::DashboardController < Admin::BaseController
   def tsvs
     @blacklist = FileCacheMaintainer.blacklist
     @tsvs = FileCacheMaintainer.files
+    render layout: "new_admin"
   end
 
   def update_tsv_blacklist

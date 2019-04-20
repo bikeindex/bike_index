@@ -20,6 +20,9 @@ window.BinxAdmin = class BinxAdmin {
     if ($("#use_image_for_display").length > 0) {
       this.useBikeImageForDisplay();
     }
+    if ($(".submit-bike-update").length > 0) {
+      this.checkIfPhoneBlank()
+    }
     // Enable bootstrap custom file upload boxes
     binxApp.enableFilenameForUploads();
     LoadFancySelects();
@@ -67,5 +70,15 @@ window.BinxAdmin = class BinxAdmin {
       }
       return image_btn.toggleClass("using_bikes");
     });
+  }
+  checkIfPhoneBlank(){
+    $(".submit-bike-update").on("click", e => {
+      const phone_input = $('#bike_stolen_records_attributes_0_phone');
+      if (phone_input.length > 0) {
+        if (!(phone_input.val().length > 0)) {
+          return BikeIndex.alertMessage('error', 'Phone number required', "<p>A phone number is required for stolen listings. We want to be able to contact you if your bike is found!</p><p>Your phone number will be private unless you choose to show it in <em>Show phone number to</em></p>");
+        }
+      }
+    })
   }
 };
