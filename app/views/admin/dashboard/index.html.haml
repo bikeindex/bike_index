@@ -43,51 +43,50 @@
 
 %hr
 
-%h2
-  Suspicious
-  = link_to "DUPED bikes", duplicates_admin_bikes_url
-- @duplicate_groups.each do |duplicate_group|
-  %p
-    %strong
-      #{duplicate_group.segment}
-    = link_to "ignore #{duplicate_group.segment}", ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id), method: 'PUT', class: 'pull-right less-strong'
-  %table.table.table-striped.table-bordered
-    = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: duplicate_group.bikes, no_show_header: true, show_serial: true }
-
-%hr
-
-
-= form_for [:admin, @flavor] do |f|
-  .row
-    .col-md-8
-      %h2
-        Flavor
-    .col-md-3
-      .form-group.float-right
-        = f.text_field :message, placeholder: "FLAVOR!!!!!", class: "form-control"
-    .col-md-1
-      .form-group
-        = f.submit "Add", class: "btn btn-primary"
-
-  %table.table.table-striped.table-bordered.table-sm.mb-4
+%h2.mt-4
+  Recent
+  = link_to "Organizations", admin_organizations_url
+.full-screen-table-wrapper
+  %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
       %th
-        Text
+        Name
       %th
-        Date Added
+        Approved
       %th
-        &nbsp;
-
-
+        Created At
+      %th
+        Bikes
+      %th
+        Memberships
+      %th
+        Type
+      %th
+        Locations
     %tbody
-      - @flavors.each do |flavor|
+      - @organizations.each do |organization|
         %tr
           %td
-            = flavor.message
-          %td.convertTime
-            = l flavor.created_at, format: :convert_time
+            = link_to organization.name, admin_organization_url(organization)
+            %small.less-strong
+              = "paid" if organization.is_paid
           %td
-            = link_to "delete", admin_flavor_text_url(flavor), method: :delete
+            = "&#x2713;".html_safe if organization.approved
+          %td
+            %span.convertTime
+              = l organization.created_at, format: :convert_time
+          %td
+            = organization.bikes.count
+          %td
+            = organization.memberships.count
+          %td
+            = link_to organization.kind.humanize, admin_organizations_path(kind: organization.kind)
+          %td
+            .less-strong-hold
 
+              = organization.locations.count
+              - if organization.show_on_map
+                %span.less-strong-right
+                  Mapped
 
   / # = link_to "Clear cache", admin_bust_z_cache_url, class: "button-blue"
