@@ -78,7 +78,6 @@ describe Organized::ManageController, type: :controller do
             show_on_map: false,
             api_access_approved: false,
             access_token: 'stuff7',
-            new_bike_notification: 'stuff8',
             lock_show_on_map: true,
             is_paid: false
           }
@@ -95,7 +94,6 @@ describe Organized::ManageController, type: :controller do
             embedable_user_email: user_2.email,
             api_access_approved: true,
             access_token: 'things7',
-            new_bike_notification: 'things8',
             website: ' www.drseuss.org',
             name: 'some new name',
             kind: 'bike_shop',
