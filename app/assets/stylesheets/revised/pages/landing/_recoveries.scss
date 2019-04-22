@@ -103,6 +103,12 @@ $recovery-text-bg: #fff;
       line-height: 1.2em;
     }
   }
+  .see-more-link {
+    font-size: 2rem;
+    display: flex;
+    justify-content: center;
+    margin: 17%;
+  }
 }
 
 @media (min-width: $grid-breakpoint-sm+1) {
@@ -173,6 +179,9 @@ $recovery-tri-2: 15px;
         border-bottom: $recovery-tri-2*1.5 solid transparent; 
         border-right: $recovery-tri-2 solid $gray;
       }
+    }
+    .see-more-link {
+      margin: 35%;
     }
   }
 }
