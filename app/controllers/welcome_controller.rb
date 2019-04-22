@@ -53,6 +53,8 @@ class WelcomeController < ApplicationController
     authenticate_user('Please create an account', flash_type: :info)
   end
 
+  # Split the given array `list` into two halves
+  # Return a tuple with each half as an array.
   def list_halves(list)
     slice_size = (list.length / 2.0).ceil
     slice1, slice2 = list.each_slice(slice_size).entries
