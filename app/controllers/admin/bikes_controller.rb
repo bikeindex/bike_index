@@ -71,6 +71,7 @@ class Admin::BikesController < Admin::BaseController
     @bike = @bike.decorate
     @fast_attr_update = params[:fast_attr_update]
     @recoveries = @bike.recovered_records
+    render layout: "new_admin"
   end
 
   def update
@@ -96,7 +97,7 @@ class Admin::BikesController < Admin::BaseController
         redirect_to edit_admin_bike_url(@bike) and return
       end
     else
-      render action: "edit"
+      render action: "edit", layout: "new_admin"
     end
   end
 

@@ -20,6 +20,9 @@ window.BinxAdmin = class BinxAdmin {
     if ($("#use_image_for_display").length > 0) {
       this.useBikeImageForDisplay();
     }
+    if ($("#admin-recovery-fields")) {
+      this.setRecoveryStuff();
+    }
     // Enable bootstrap custom file upload boxes
     binxApp.enableFilenameForUploads();
     LoadFancySelects();
@@ -67,5 +70,12 @@ window.BinxAdmin = class BinxAdmin {
       }
       return image_btn.toggleClass("using_bikes");
     });
+  }
+  setRecoveryStuff() {
+    if ($("#bike-stolen").is(":checked")) {
+      $("#admin-recovery-fields").slideUp()
+    } else {
+      $("#admin-recovery-fields").slideDown()
+    }
   }
 };
