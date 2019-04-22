@@ -5,10 +5,10 @@
 
   #recovery-stories-listing
     .container.clearfix
-      .recovery-stories-container{data: {stories_count: @left.length}}
-        = render @left
-      .recovery-stories-container{data: {stories_count: @right.length}}
-        = render @right
+      .recovery-stories-container{data: {stories_count: @slice1.length}}
+        = render @slice1
+      .recovery-stories-container{data: {stories_count: @slice2.length}}
+        = render @slice2
 
     .paginate-container.paginate-container-bottom
       = paginate @recovery_displays

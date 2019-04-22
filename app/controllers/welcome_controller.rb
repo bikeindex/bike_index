@@ -44,15 +44,18 @@ class WelcomeController < ApplicationController
     page = params[:page] || 1
     @per_page = params[:per_page] || 10
     @recovery_displays = RecoveryDisplay.page(page).per(@per_page)
-
-    slice_size = (@recovery_displays.length / 2.0).ceil
-    @left, @right = @recovery_displays.each_slice(slice_size).entries
-    @right ||= []
+    @slice1, @slice2 = list_halves(@recovery_displays)
   end
 
   private
 
   def authenticate_user_for_welcome_controller
     authenticate_user('Please create an account', flash_type: :info)
+  end
+
+  def list_halves(list)
+    slice_size = (list.length / 2.0).ceil
+    slice1, slice2 = list.each_slice(slice_size).entries
+    [slice1, slice2 || []]
   end
 end
