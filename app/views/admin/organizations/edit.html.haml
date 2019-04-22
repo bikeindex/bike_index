@@ -12,29 +12,12 @@
           = f.fields_for :locations do |builder|
             = render '/admin/organizations/location_fields', f: builder
           = revised_link_to_add_fields "Add a location", f, :locations, class_name: "btn btn-primary"
-    .col-md-3
-      %a.btn.btn-primary{"aria-controls" => "new_bike_notification", "aria-expanded" => "false", "data-toggle" => "collapse", :href => "#new_bike_notification"}
-        New bike notification
-      .card.bg-light#new_bike_notification.collapse
-        .card-body
-          .form-group
-            = f.label :new_bike_notification
-            = f.text_area :new_bike_notification, class: "form-control"
-    .col-md-3
-      - if @organization.new_bike_notification.present?
-        .card.bg-light
-          .card-header
-            Notification:
-          .card-body
-            %img{src: "https://files.bikeindex.org/bikeindex-white-tilt.png"}
-            %p
-              = @organization.new_bike_notification.html_safe
-  .row
+
+  .row.d-none
     .col-md-2
       %p
-        %a{"aria-controls" => "new_bike_notification", "aria-expanded" => "false", "data-toggle" => "collapse", :href => "#us-country-code"}
-          Locations
-      %p#us-country-code.collapse
+        Locations
+      %p#us-country-code
         = Country.united_states.id
   .mt-4
     = f.submit "Update", class: 'btn-lg btn-success float-right'

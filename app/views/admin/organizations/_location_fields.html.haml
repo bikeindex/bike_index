@@ -26,7 +26,8 @@
         .col-lg-6
           .form-group.fancy-select.unfancy
             = f.collection_select(:country_id, Country.all, :id, :name, {prompt: "Choose country"}, class: "form-control mt-1" )
-      .form-group.mt-4.text-center
-        = f.check_box :_destroy, class: "d-none"
-        = f.label :_destroy, "Remove", class: "remove_fields btn btn-danger"
+        .col-lg-6
+          .form-group.text-center
+            = f.check_box :_destroy, class: "d-none"
+            = f.label :_destroy, "Remove", class: "remove_fields btn btn-danger"
   %hr
