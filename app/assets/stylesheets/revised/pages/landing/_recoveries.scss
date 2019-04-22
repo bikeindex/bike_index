@@ -111,6 +111,16 @@ $recovery-text-bg: #fff;
   }
 }
 
+@media (min-width: $grid-breakpoint-xl) {
+  #recovery-stories-listing {
+    .recovery-stories-container {
+      width: 48%;
+      margin: 10px;
+      float: left;
+    }
+  }
+}
+
 @media (min-width: $grid-breakpoint-sm+1) {
   .recovery-block {
     .recovery-user {

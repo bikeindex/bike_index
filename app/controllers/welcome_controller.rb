@@ -44,6 +44,10 @@ class WelcomeController < ApplicationController
     page = params[:page] || 1
     @per_page = params[:per_page] || 10
     @recovery_displays = RecoveryDisplay.page(page).per(@per_page)
+
+    slice_size = (@recovery_displays.length / 2.0).ceil
+    @left, @right = @recovery_displays.each_slice(slice_size).entries
+    @right ||= []
   end
 
   private
