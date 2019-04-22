@@ -8,8 +8,9 @@ class Admin::DashboardController < Admin::BaseController
   end
 
   def invitations
-    @organizations = Organization.all 
-    @organization_invitation = OrganizationInvitation.new 
+    @organizations = Organization.all
+    @organization_invitation = OrganizationInvitation.new
+    render layout: "new_admin"
   end
 
   def maintenance
