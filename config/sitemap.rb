@@ -53,7 +53,12 @@ SitemapGenerator::Sitemap.create do
   end
 
   group(filename: :contact) do
-    paths = ['/help']
+    paths = ["help"]
+    paths.each { |i| add "/#{i}", priority: 0.8 }
+  end
+
+  group(filename: :recovery_stories) do
+    paths = ["recovery_stories"]
     paths.each { |i| add "/#{i}", priority: 0.8 }
   end
 
