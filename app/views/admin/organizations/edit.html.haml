@@ -13,11 +13,11 @@
             = render '/admin/organizations/location_fields', f: builder
           = revised_link_to_add_fields "Add a location", f, :locations, class_name: "btn btn-primary"
 
-  .row.d-none
+  .row
     .col-md-2
-      %p
+      %h4
         Locations
-      %p#us-country-code
+      %p#us-country-code.d-none
         = Country.united_states.id
   .mt-4
     = f.submit "Update", class: 'btn-lg btn-success float-right'
