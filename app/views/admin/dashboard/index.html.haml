@@ -46,47 +46,6 @@
 %h2.mt-4
   Recent
   = link_to "Organizations", admin_organizations_url
-.full-screen-table-wrapper
-  %table.table.table-striped.table-bordered.table-sm
-    %thead.thead-light
-      %th
-        Name
-      %th
-        Approved
-      %th
-        Created At
-      %th
-        Bikes
-      %th
-        Memberships
-      %th
-        Type
-      %th
-        Locations
-    %tbody
-      - @organizations.each do |organization|
-        %tr
-          %td
-            = link_to organization.name, admin_organization_url(organization)
-            %small.less-strong
-              = "paid" if organization.is_paid
-          %td
-            = "&#x2713;".html_safe if organization.approved
-          %td
-            %span.convertTime
-              = l organization.created_at, format: :convert_time
-          %td
-            = organization.bikes.count
-          %td
-            = organization.memberships.count
-          %td
-            = link_to organization.kind.humanize, admin_organizations_path(kind: organization.kind)
-          %td
-            .less-strong-hold
-
-              = organization.locations.count
-              - if organization.show_on_map
-                %span.less-strong-right
-                  Mapped
+= render partial: "/admin/organizations/admin_organizations_table"
 
   / # = link_to "Clear cache", admin_bust_z_cache_url, class: "button-blue"
