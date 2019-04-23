@@ -74,25 +74,28 @@ We use the following tools to automate code formatting and linting:
 ### EditorConfig
 
 EditorConfig ensures whitespace consistency. See the [Download a
-Plugin](https://editorconfig.org/#download) section of the EditorConfig site to
-find a plugin appropriate to your browser.
+Plugin][editorconfig-plugin] section of the EditorConfig docs to find a plugin
+appropriate to your editor.
+
+[editorconfig-plugin]: https://editorconfig.org/#download
 
 ### Rufo
 
 Rufo is an opinionated Ruby formatter we use to maintain consistent style with
-minimum configuration. See the [Editor
-support](https://github.com/ruby-formatter/rufo#editor-support) section of the
+minimum configuration. See the [Editor support][rufo-plugin] section of the
 project README to find a suitable editor plugin.
+
+[rufo-plugin]: https://github.com/ruby-formatter/rufo#editor-support
 
 ### RuboCop
 
-RuboCop is a linter it's configured to ignore style and layout (deferring to
-Rufo) and focus on code complexity, performance, and suggested best practices.
+RuboCop is configured to ignore Ruby style and layout (deferring to Rufo) and focus
+on code complexity, performance, and suggested best practices.
 
 To run it from the command line, issue `bundle exec rubocop`, optionally passing
 a specific file(s). For a performance boost, you can also start a rubocop daemon
-with `bundle exec rubocop-daemon start`, and lint with `bundle exec
-rubocop-daemon exec`.
+with `bundle exec rubocop-daemon start`, in which case you'd lint with
+`bundle exec rubocop-daemon exec`.
 
 See the [Editor integration][rubocop-editor] section of the rubocop docs to find
 an appropriate plugin for on-the-fly linting.
