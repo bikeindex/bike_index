@@ -15,6 +15,7 @@ class BulkImport < ActiveRecord::Base
   scope :no_bikes, -> { where("(import_errors -> 'bikes') is not null") }
   scope :with_bikes, -> { where.not("(import_errors -> 'bikes') is not null") }
   scope :ascend, -> { where(is_ascend: true) }
+  scope :not_ascend, -> { where(is_ascend: false) }
 
   before_save :set_calculated_attributes
 

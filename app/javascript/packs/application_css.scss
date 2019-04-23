@@ -24,6 +24,16 @@ footer.primary-footer {
   }
 }
 
+.admin-subnav {
+  @extend .mt-4;
+  @extend .mb-4;
+  @extend .row;
+  ul {
+    @extend .nav;
+    @extend .nav-pills;
+  }
+}
+
 .full-screen-table-wrapper {
   overflow-x: scroll;
 }
