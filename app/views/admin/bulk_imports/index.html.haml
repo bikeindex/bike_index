@@ -8,13 +8,13 @@
     %ul
       %li.nav-item
         - all_active = (params.keys & %w[ascend not_ascend organization_id]).blank?
-        = link_to "All", admin_bulk_imports_path(sortable_search_params.except(:ascend, :not_ascend)), class: "nav-link #{all_active ? 'active' : ''}"
+        = link_to "All", admin_bulk_imports_path(sortable_search_params), class: "nav-link #{all_active ? 'active' : ''}"
       %li.nav-item
         = link_to "Only Ascend", admin_bulk_imports_path(sortable_search_params.merge(ascend: true)), class: "nav-link #{params[:ascend].present? ? 'active' : ''}"
       %li.nav-item
         = link_to "Not Ascend", admin_bulk_imports_path(sortable_search_params.merge(not_ascend: true)), class: "nav-link #{params[:not_ascend].present? ? 'active' : ''}"
       %li.nav-item
-        = link_to "New bulk import", new_admin_bulk_import_url, class: "nav-link ml-auto"
+        = link_to "New bulk import", new_admin_bulk_import_url, class: "nav-link"
   - if active_organization.present?
     %p.subtitle
       #{link_to active_organization.name, admin_organization_path(active_organization)} bulk imports
