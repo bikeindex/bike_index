@@ -43,14 +43,17 @@ class WelcomeController < ApplicationController
   def recovery_stories
     page = params[:page] || 1
     @per_page = params[:per_page] || 10
+
     @recovery_displays = RecoveryDisplay.page(page).per(@per_page)
     @slice1, @slice2 = list_halves(@recovery_displays)
+
+    flash[:notice] = "No recovery stories to display" if @recovery_displays.empty?
   end
 
   private
 
   def authenticate_user_for_welcome_controller
-    authenticate_user('Please create an account', flash_type: :info)
+    authenticate_user("Please create an account", flash_type: :info)
   end
 
   # Split the given array `list` into two halves
