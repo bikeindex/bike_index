@@ -43,8 +43,9 @@
       .container
         #recovery-stories-container.extras-hidden
           = render @recovery_displays
-          %a.float-right{href: recovery_stories_path}
-            Read more recovery stories
+          .recovery-block.recovery-see-more
+            %a.see-more-link{href: recovery_stories_path}
+              Read more recovery stories
 
     .root-landing-how-it-works
       .container
