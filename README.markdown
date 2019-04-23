@@ -51,20 +51,61 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
 
 ## Testing
- 
+
 We use [RSpec](https://github.com/rspec/rspec) and [Guard](https://github.com/guard/guard) for testing.
-    
+
 - Run the test suit in the background with `bundle exec guard`
 
 - You may have to manually add the fuzzystrmatch extension, which we use for near serial searches, to your databases. The migration should take care of this but sometimes doesn't. Open the databases in postgres (`psql bikeindex_development` and `psql bikeindex_test`) and add the extension.
-    
+
 ```
 CREATE EXTENSION fuzzystrmatch;
 ```
 
+## Code Hygiene
+
+We use the following tools to automate code formatting and linting:
+
+- [EditorConfig](https://editorconfig.org/)
+- [Rufo](https://github.com/ruby-formatter/rufo)
+- [Rubocop](https://github.com/rubocop-hq/rubocop)
+- [ESlint](https://eslint.org/)
+
+### EditorConfig
+
+EditorConfig ensures whitespace consistency. See the [Download a
+Plugin](https://editorconfig.org/#download) section of the EditorConfig site to
+find a plugin appropriate to your browser.
+
+### Rufo
+
+Rufo is an opinionated Ruby formatter we use to maintain consistent style with
+minimum configuration. See the [Editor
+support](https://github.com/ruby-formatter/rufo#editor-support) section of the
+project README to find a suitable editor plugin.
+
+### RuboCop
+
+RuboCop is a linter it's configured to ignore style and layout (deferring to
+Rufo) and focus on code complexity, performance, and suggested best practices.
+
+To run it from the command line, issue `bundle exec rubocop`, optionally passing
+a specific file(s). For a performance boost, you can also start a rubocop daemon
+with `bundle exec rubocop-daemon start`, and lint with `bundle exec
+rubocop-daemon exec`.
+
+See the [Editor integration][rubocop-editor] section of the rubocop docs to find
+an appropriate plugin for on-the-fly linting.
+
+[rubocop-editor]: https://rubocop.readthedocs.io/en/latest/integration_with_other_tools/#editor-integration
+
+### ESLint
+
+ESlint is configured to run on project JavaScript. To run it, issue `yarn lint`.
+
 ## Vagrant development box
 
-In general, we recommend installing and running the app without Vagrant for local development  
+In general, we recommend installing and running the app without Vagrant for local development
 
 If, however, you would prefer to have a virtual environment, this repository contains a Vagrantfile which is used to automatically set up and configure a virtual local (Ubuntu Xenial) development environment with all of the required dependencies preinstalled.
 
