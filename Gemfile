@@ -141,6 +141,10 @@ group :development, :test do
   gem "foreman"
   gem "database_cleaner"
   gem "dotenv-rails"
+  gem "rubocop", "~> 0.67", require: false
+  gem "rubocop-daemon", "~> 0.3.1", require: false
+  gem "rubocop-performance", "~> 1.1.0", require: false
+  gem "rufo", "~> 0.6.0", require: false
 end
 
 group :test do
@@ -149,7 +153,6 @@ group :test do
   gem "rspec-sidekiq"
   gem "guard"
   gem "guard-rspec"
-  gem "rubocop", require: false
   gem "guard-rubocop", require: false
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
