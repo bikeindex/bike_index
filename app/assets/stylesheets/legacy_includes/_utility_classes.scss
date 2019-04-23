@@ -12,14 +12,21 @@
   margin: 0 auto;
   padding: 0 $singlePad;
 }
+
 .inner-recep {
   @include clearfix;
-  position: relative;
-  width: 100% ;
-}
-.overfloating { overflow: visible; }
 
-label { cursor: pointer; }
+  position: relative;
+  width: 100%;
+}
+
+.overfloating {
+  overflow: visible;
+}
+
+label {
+  cursor: pointer;
+}
 
 .pull-left {
   float: left;
@@ -31,10 +38,12 @@ label { cursor: pointer; }
 
 .footnote-ref {
   color: $blueLight;
-  font-size: .9em;
+  font-size: 0.9em;
 }
+
 .footnotes {
   padding: 40px 0 60px;
+
   li {
     line-height: 1.3em;
     margin: 1em 0;
@@ -49,7 +58,9 @@ label { cursor: pointer; }
   padding-bottom: 200px;
 }
 
-.placeholder { color: $placeholder; }
+.placeholder {
+  color: $placeholder;
+}
 
 .subheading-text {
   display: block;
@@ -60,27 +71,42 @@ label { cursor: pointer; }
 }
 
 // Visibility
-.invisible { visibility: hidden; }
+.invisible {
+  visibility: hidden;
+}
 
 // For Affix plugin
-.affix { position: fixed; }
+.affix {
+  position: fixed;
+}
 
-.clickable, .no-tab { cursor: pointer; }
+.clickable,
+.no-tab {
+  cursor: pointer;
+}
 
-.unclickable { cursor: default; }
+.unclickable {
+  cursor: default;
+}
 
-.less-strong { color: darken($grayMed, 5%); }
+.less-strong {
+  color: darken($grayMed, 5%);
+}
 
 input.less-strong {
   border: none;
   background: transparent;
-  font-size: .8em;
+  font-size: 0.8em;
   box-shadow: none;
 }
 
-.overflow-text { @include text-overflow();}
+.overflow-text {
+  @include text-overflow;
+}
 
-.initially-hidden, .hidden, .hide {
+.initially-hidden,
+.hidden,
+.hide {
   display: none;
 }
 
@@ -93,9 +119,11 @@ hr {
 
 .horizontal-list {
   @include clearfix;
+
   margin: 0;
   padding: 0;
   list-style-type: none;
+
   li {
     float: left;
   }
@@ -103,30 +131,34 @@ hr {
 
 .delineated-horizontal-list {
   @extend .horizontal-list;
+
   li {
     margin: 0;
   }
+
   a {
     display: inline-block;
     line-height: 1em;
-    padding: 0 .4em;
+    padding: 0 0.4em;
     text-decoration: none;
     color: $textColor;
     border-right: 1px solid $grayDarker;
+
     &:hover {
       text-decoration: underline;
     }
   }
+
   & li:last-of-type a {
     border-right: 0;
   }
 }
 
 .short-transition {
-  -webkit-transition: all .1s linear;
-  -moz-transition: all .1s linear;
-  -o-transition: all .1s linear;
-  transition: all .1s linear;
+  -webkit-transition: all 0.1s linear;
+  -moz-transition: all 0.1s linear;
+  -o-transition: all 0.1s linear;
+  transition: all 0.1s linear;
 }
 
 .hide-text {
@@ -139,10 +171,9 @@ hr {
   text-decoration: none;
 }
 
-
-
 .logo {
   display: block;
+
   h1 {
     display: none;
   }
@@ -154,26 +185,31 @@ hr {
 //
 //________________________
 
-
-
 .dl-horizontal {
- dd {
-   font-weight: normal;
+  dd {
+    font-weight: normal;
   }
+
   dt {
     font-weight: normal;
     text-align: left;
     margin-bottom: 6px;
     color: #999;
   }
-   dd {
+
+  dd {
     font-weight: normal;
+
     // max-width: 460px;
     margin-bottom: 6px;
-    textarea {width: 100%;}
+
+    textarea {
+      width: 100%;
+    }
+
     .highlight {
       display: inline-block;
-      padding: .5em .5em .25em;
+      padding: 0.5em 0.5em 0.25em;
       background: $grayLighter;
     }
   }
@@ -182,27 +218,33 @@ hr {
 @media (min-width: 768px) {
   .dl-holder {
     @include clearfix;
+
     position: relative;
+
     .dl-horizontal {
       width: $sixColumn;
       float: left;
       margin-left: $gutterW;
-      &:nth-of-type(2n+1) {
+
+      &:nth-of-type(2n + 1) {
         margin-left: 0;
         clear: left;
       }
     }
+
     dl:first-of-type {
       margin-left: 0;
     }
+
     dd {
       margin: 0 0 6px 0;
       padding-left: 30%;
     }
+
     dt {
       width: 30%;
       padding-right: 5%;
-      margin: 0 0 .3em 0;
+      margin: 0 0 0.3em 0;
     }
   }
 }
@@ -210,21 +252,25 @@ hr {
 @media (max-width: 767px) {
   .dl-holder {
     @include clearfix;
+
     position: relative;
+
     .dl-horizontal {
       width: 100%;
       float: none;
       margin-left: 0;
     }
+
     dd {
       width: 70%;
-      margin: 0 0 .3em 0;
+      margin: 0 0 0.3em 0;
       float: left;
     }
+
     dt {
       width: 29%;
       padding-right: 2%;
-      margin: 0 0 .3em 0;
+      margin: 0 0 0.3em 0;
       float: left;
     }
   }
@@ -234,23 +280,30 @@ hr {
   .dl-holder {
     dt {
       width: 35%;
+
       // margin-bottom: 0;
     }
+
     dd {
       width: 65%;
+
       // margin-bottom: .5em;
     }
   }
 }
 
-
 @media (min-width: 768px) {
-  .dl-holder .dl-wider-dt, .dl-wider-dt {
-    dt { width: 28%; }
-    dd { margin-left: 30%; }
+  .dl-holder .dl-wider-dt,
+  .dl-wider-dt {
+    dt {
+      width: 28%;
+    }
+
+    dd {
+      margin-left: 30%;
+    }
   }
 }
-
 
 //     dt, dd {
 //       width: 100%;
@@ -266,31 +319,46 @@ hr {
 
 header.with-subtitle {
   padding-bottom: 0;
+
   @include clearfix;
-  h1, h2, h3 {
+
+  h1,
+  h2,
+  h3 {
     float: left;
     font-size: $standardFontSize * 2.5;
   }
+
   p {
     display: inline-block;
     margin: 1.85em 0 0 1em;
   }
+
   .sharing-links {
     display: block;
     float: right;
     margin: 1.85em 0 0 1em;
   }
+
   .sharing-section {
     float: right;
     width: 250px;
   }
+
   .subtitle-form {
     @include clearfix;
+
     float: right;
     width: 257px;
     margin-top: 22px;
-    form { margin: 0; }
-    input { margin: 0;}
+
+    form {
+      margin: 0;
+    }
+
+    input {
+      margin: 0;
+    }
   }
 }
 
@@ -300,9 +368,11 @@ header.with-subtitle {
       float: none;
       clear: both;
     }
+
     p {
-      margin: 0 0 10px .5em;
+      margin: 0 0 10px 0.5em;
     }
+
     .sharing-links {
       float: right;
       margin: 0 0 10px 1em;
@@ -312,20 +382,27 @@ header.with-subtitle {
 
 @media (max-width: 800px) {
   header.with-subtitle {
-    h1, h2, h3 { font-size: $standardFontSize * 2; }
+    h1,
+    h2,
+    h3 {
+      font-size: $standardFontSize * 2;
+    }
   }
 }
-
 
 @media (max-width: 650px) {
   header.with-subtitle {
-    h1, h2, h3 { font-size: $standardFontSize * 1.5; }
+    h1,
+    h2,
+    h3 {
+      font-size: $standardFontSize * 1.5;
+    }
   }
 }
 
-
 .well-yellow {
   @include border-radius(2px);
+
   background: $bi-stripes;
   border: 1px solid $biYellow;
   padding: 10px;
@@ -334,6 +411,7 @@ header.with-subtitle {
 
 .well-blue {
   @include border-radius(2px);
+
   background: $blueLight;
   border: 1px solid $blue;
   color: white;
@@ -345,27 +423,39 @@ header.with-subtitle {
   background: $stolenBackground;
 }
 
-.stolen-color { color: $stolenColor; }
-
-.recovered-color { color: $stolenColor; }
-
-.smaller-text {
-  font-size: .8em;
+.stolen-color {
+  color: $stolenColor;
 }
 
-.centered-form-well { margin: 0 auto; float: none; }
+.recovered-color {
+  color: $stolenColor;
+}
+
+.smaller-text {
+  font-size: 0.8em;
+}
+
+.centered-form-well {
+  margin: 0 auto;
+  float: none;
+}
 
 @media (max-width: 480px) {
   .form-horizontal.form-horizontal-collapse {
-    .control-label { float: none; text-align: left; }
-  }   
+    .control-label {
+      float: none;
+      text-align: left;
+    }
+  }
 }
 
 @media (min-width: 480px) {
   .form-horizontal.form-horizontal-collapse {
     .controls {
-      select, input { max-width: 80%; }
+      select,
+      input {
+        max-width: 80%;
+      }
     }
   }
 }
-
