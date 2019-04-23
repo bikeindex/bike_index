@@ -4,8 +4,9 @@ AllCops:
     - "bin/**/*"
     - "db/schema.rb"
     - "db/migrate/**/*"
+    - "node_modules/**/*"
 
-FrozenStringLiteralComment:
+Layout:
   Enabled: false
 
 Metrics/LineLength:
@@ -25,34 +26,8 @@ Metrics/BlockLength:
   Exclude:
     - "**/*_spec.rb"
 
-Style/AndOr:
-  Enabled: false
-
-Style/Documentation:
-  Enabled: false
-
-Style/SymbolProc:
-  Enabled: false
-
-# I'm a fan of defining convenience methods in single lines
-Style/SingleLineMethods:
-  Enabled: false
-
-# https://anti-pattern.com/always-use-double-quoted-strings-in-ruby
-# All future updates should use double quotes, don't enforce so there aren't a ton of errors
-Style/StringLiterals:
-  EnforcedStyle: double_quotes # Always do it, lower cost cognitively
-  Enabled: false
-
-Style/NumericPredicate:
-  Enabled: false
-
-Layout/EmptyLineAfterGuardClause:
-  Enabled: false
-
-NumericLiterals:
-  Enabled: false
-
-ParameterLists:
+Metrics/ParameterLists:
   CountKeywordArgs: false
 
+Style:
+  Enabled: false
