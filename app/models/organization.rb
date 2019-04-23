@@ -43,7 +43,6 @@ class Organization < ActiveRecord::Base
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact admin@bikeindex.org"
 
   default_scope { order(:name) }
-
   scope :shown_on_map, -> { where(show_on_map: true, approved: true) }
   scope :paid, -> { where(is_paid: true) }
   scope :unpaid, -> { where(is_paid: true) }
