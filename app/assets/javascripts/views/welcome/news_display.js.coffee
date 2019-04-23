@@ -1,5 +1,5 @@
 class BikeIndex.Views.NewsDisplay extends Backbone.View
-    
+
   initialize: ->
     @setElement($('#body'))
     @setAds()

@@ -13,7 +13,7 @@ class @CheckEmail # Use mailcheck to find emails with problems
       $("##{msg_selector}").slideUp 'fast', ->
         $("##{msg_selector}").remove()
       @runMailcheck($target)
-      
+
 
   runMailcheck: ($target) ->
     Mailcheck.run

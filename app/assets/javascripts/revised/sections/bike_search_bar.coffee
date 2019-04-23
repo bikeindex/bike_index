@@ -101,7 +101,7 @@ class BikeIndex.BikeSearchBar extends BikeIndex
     # window.bike_search_submit = true
     $('.bikes-search-form .select2-selection').on 'keyup', (e) ->
       # Only trigger submit on enter if:
-      #  - Enter key pressed last (13) 
+      #  - Enter key pressed last (13)
       #  - Escape key pressed last (27)
       #  - no keys have been pressed (selected with the mouse, instantiated true)
       return window.bike_search_submit = true if e.keyCode == 27

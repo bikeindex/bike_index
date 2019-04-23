@@ -1,12 +1,12 @@
 class BikeIndex.Views.LocksForm extends Backbone.View
-  events: 
+  events:
     'change #lock_has_key': 'updateLockFields'
     'change #lock_has_combination': 'updateLockFields'
     'change input[name="lock_types_select"]': 'updateLockType'
     'change .manufacturer-select select': 'showOtherIfRequired'
     'click .lock-picture': 'openLockPicture'
-    
-  
+
+
   initialize: ->
     @setElement($('#body'))
     @selectCorrectLock()
@@ -32,15 +32,15 @@ class BikeIndex.Views.LocksForm extends Backbone.View
     hidden_other = $(event.target).parents('.input-field').find('.hidden-other')
     if parseInt(current_value) == parseInt(other_value)
       hidden_other.slideDown().addClass('unhidden')
-    else 
+    else
       if hidden_other.hasClass('unhidden')
         hidden_other.find('input').val('')
         hidden_other.removeClass('unhidden').slideUp()
-    
+
   updateLockType: ->
     lock_type = $('input[name="lock_types_select"]:checked').data("value")
     $('#lock_lock_type_id').val(lock_type)
-    
+
 
   updateLockFields: ->
     if $('input[name="lock[has_key]"]:checked').length > 0
