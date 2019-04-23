@@ -1,5 +1,5 @@
 class LocksController < ApplicationController
-  layout 'application_revised'
+  layout "application_revised"
   before_filter :authenticate_user
   before_filter :find_lock, only: [:edit, :update, :destroy]
 
@@ -22,8 +22,8 @@ class LocksController < ApplicationController
   def create
     @lock = current_user.locks.build(permitted_parameters)
     if @lock.save
-      flash[:success] = 'Lock created successfully!'
-      redirect_to user_home_path(active_tab: 'locks')
+      flash[:success] = "Lock created successfully!"
+      redirect_to user_home_path(active_tab: "locks")
     else
       @page_errors = @lock.errors
       render action: :new
@@ -32,7 +32,7 @@ class LocksController < ApplicationController
 
   def destroy
     @lock.destroy
-    redirect_to user_home_path(active_tab: 'locks')
+    redirect_to user_home_path(active_tab: "locks")
   end
 
   private

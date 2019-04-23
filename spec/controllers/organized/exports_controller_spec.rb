@@ -147,7 +147,7 @@ describe Organized::ExportsController, type: :controller do
           end_at: nil,
           file_format: "xlsx",
           timezone: "America/Los Angeles",
-          headers: %w[link registered_at manufacturer model registered_by]
+          headers: %w[link registered_at manufacturer model registered_by],
         }
       end
       let(:avery_params) { valid_attrs.merge(end_at: "2016-03-08 02:00:00", avery_export: true, bike_code_start: "a221C ") }
@@ -204,7 +204,7 @@ describe Organized::ExportsController, type: :controller do
               timezone: "",
               file_format: "csv",
               bike_code_start: "01", # Avery export organizations always submit a number here
-              headers: %w[link registered_at] + Export.additional_registration_fields.values
+              headers: %w[link registered_at] + Export.additional_registration_fields.values,
             }
           end
           it "creates the expected export" do
@@ -251,7 +251,7 @@ describe Organized::ExportsController, type: :controller do
               expect(flash[:error]).to match(/sticker/)
             end
           end
-        end        
+        end
       end
     end
 

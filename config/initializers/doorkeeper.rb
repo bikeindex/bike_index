@@ -1,14 +1,14 @@
 OAUTH_SCOPES = %i[
-  public 
-  read_user 
-  write_user 
-  read_bikes 
-  write_bikes 
-  read_bikewise 
-  write_bikewise 
-  read_organization_membership 
+  public
+  read_user
+  write_user
+  read_bikes
+  write_bikes
+  read_bikewise
+  write_bikewise
+  read_organization_membership
   write_organizations
-  unconfirmed 
+  unconfirmed
 ].freeze
 
 if Rails.env.development? && defined?(User) && defined?(User.first)

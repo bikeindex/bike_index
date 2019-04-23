@@ -7,7 +7,7 @@ class HandlebarType
     rearward: 3,
     other: 2,
     bmx: 1,
-    flat: 0
+    flat: 0,
   }.freeze
 
   NAMES = {
@@ -16,7 +16,7 @@ class HandlebarType
     rearward: "Rear facing",
     other: "Not handlebars",
     bmx: "BMX style",
-    flat: "Flat or riser"
+    flat: "Flat or riser",
   }.freeze
 
   def initialize(slug)

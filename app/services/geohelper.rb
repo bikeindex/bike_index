@@ -51,7 +51,7 @@ class Geohelper
         city: city,
         state: state,
         zipcode: code,
-        country: country
+        country: country,
       }.with_indifferent_access
     end
   end

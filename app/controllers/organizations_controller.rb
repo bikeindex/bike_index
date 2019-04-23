@@ -1,7 +1,7 @@
 class OrganizationsController < ApplicationController
   before_filter :set_bparam, only: [:embed, :embed_extended]
   skip_before_filter :set_x_frame_options_header, only: [:embed, :embed_extended, :embed_create_success]
-  layout 'application_revised'
+  layout "application_revised"
 
   def new
     session[:return_to] ||= new_organization_url unless current_user.present?
@@ -11,7 +11,7 @@ class OrganizationsController < ApplicationController
 
   def connect_lightspeed
     if current_user && current_user.organizations.any?
-      redirect_to 'https://posintegration.bikeindex.org' and return
+      redirect_to "https://posintegration.bikeindex.org" and return
     end
 
     session[:return_to] = connect_lightspeed_path
@@ -27,9 +27,9 @@ class OrganizationsController < ApplicationController
   def create
     @organization = Organization.new(permitted_create_params)
     if @organization.save
-      membership = Membership.create(user_id: current_user.id, role: 'admin', organization_id: @organization.id)
-      notify_admins('organization_created')
-      flash[:success] = 'Organization Created successfully!'
+      membership = Membership.create(user_id: current_user.id, role: "admin", organization_id: @organization.id)
+      notify_admins("organization_created")
+      flash[:success] = "Organization Created successfully!"
       if current_user.present?
         redirect_to organization_manage_index_path(organization_id: @organization.to_param)
       end
@@ -37,7 +37,7 @@ class OrganizationsController < ApplicationController
       render action: :new and return
     end
   end
-  
+
   def embed
     @bike = BikeCreator.new(@b_param).new_bike
     @bike.owner_email = params[:email] if params[:email].present?
@@ -62,7 +62,7 @@ class OrganizationsController < ApplicationController
   def embed_create_success
     find_organization
     @bike = Bike.find(params[:bike_id]).decorate
-    render layout: 'embed_layout'
+    render layout: "embed_layout"
   end
 
   protected
@@ -79,15 +79,15 @@ class OrganizationsController < ApplicationController
       hash = {
         creation_organization_id: @organization.id,
         embeded: true,
-        bike: { stolen: params[:stolen] }
+        bike: { stolen: params[:stolen] },
       }
       @b_param = BParam.create(creator_id: @organization.auto_user.id, params: hash)
     end
   end
 
   def built_stolen_record
-    if @b_param.params && @b_param.params['stolen_record'].present?
-      stolen_attrs = @b_param.params['stolen_record'].except('phone_no_show')
+    if @b_param.params && @b_param.params["stolen_record"].present?
+      stolen_attrs = @b_param.params["stolen_record"].except("phone_no_show")
     else
       stolen_attrs = { country_id: Country.united_states.id, date_stolen: Time.zone.now }
     end
@@ -95,8 +95,8 @@ class OrganizationsController < ApplicationController
   end
 
   def built_stolen_record_date(str)
-    DateTime.strptime("#{str} 06", '%m-%d-%Y %H') if str.present?
-    rescue ArgumentError
+    DateTime.strptime("#{str} 06", "%m-%d-%Y %H") if str.present?
+  rescue ArgumentError
     Time.zone.now
   end
 

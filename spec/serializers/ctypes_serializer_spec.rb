@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe CtypeSerializer do
   let(:ctype) { FactoryBot.create(:ctype, has_multiple: true) }

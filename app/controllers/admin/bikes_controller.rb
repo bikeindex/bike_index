@@ -17,7 +17,7 @@ class Admin::BikesController < Admin::BaseController
   def missing_manufacturer
     session[:missing_manufacturer_time_order] = params[:time_ordered] if params[:time_ordered].present?
     bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id)
-    bikes = session[:missing_manufacturer_time_order] ? bikes.order('created_at desc') : bikes.order('manufacturer_other ASC')
+    bikes = session[:missing_manufacturer_time_order] ? bikes.order("created_at desc") : bikes.order("manufacturer_other ASC")
     page = params[:page] || 1
     per_page = params[:per_page] || 100
     @bikes = bikes.page(page).per(per_page)
@@ -29,10 +29,10 @@ class Admin::BikesController < Admin::BaseController
       params[:bikes_selected].keys.each do |bid|
         Bike.find(bid).update_attributes(manufacturer_id: manufacturer_id, manufacturer_other: nil)
       end
-      flash[:success] = 'Success. Bikes updated'
+      flash[:success] = "Success. Bikes updated"
       redirect_to :back and return
     end
-    flash[:notice] = 'Sorry, you need to add bikes and a manufacturer'
+    flash[:notice] = "Sorry, you need to add bikes and a manufacturer"
     redirect_to :back
   end
 
@@ -51,7 +51,7 @@ class Admin::BikesController < Admin::BaseController
     duplicate_bike_group = DuplicateBikeGroup.find(params[:id])
     duplicate_bike_group.ignore = !duplicate_bike_group.ignore
     duplicate_bike_group.save
-    flash[:success] = "Successfully marked #{duplicate_bike_group.segment} #{duplicate_bike_group.ignore ? 'ignored' : 'Un-ignored'}"
+    flash[:success] = "Successfully marked #{duplicate_bike_group.segment} #{duplicate_bike_group.ignore ? "ignored" : "Un-ignored"}"
     redirect_to :back
   end
 
@@ -83,7 +83,7 @@ class Admin::BikesController < Admin::BaseController
       @bike.current_stolen_record.add_recovery_information(
         recovered_description: params[:mark_recovered_reason],
         index_helped_recovery: params[:mark_recovered_we_helped],
-        can_share_recovery: params[:can_share_recovery]
+        can_share_recovery: params[:can_share_recovery],
       )
     end
     if @bike.update_attributes(permitted_parameters.except(:stolen_records_attributes))
@@ -123,7 +123,7 @@ class Admin::BikesController < Admin::BaseController
   def destroy_bike
     @bike.destroy
     AfterBikeSaveWorker.perform_async(@bike.id)
-    flash[:success] = 'Bike deleted!'
+    flash[:success] = "Bike deleted!"
     if params[:multi_delete]
       redirect_to admin_root_url
       # redirect_to admin_bikes_url(page: params[:multi_delete], multi_delete: 1)

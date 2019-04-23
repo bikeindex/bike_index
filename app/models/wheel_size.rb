@@ -20,6 +20,6 @@ class WheelSize < ActiveRecord::Base
   end
 
   def popularity
-    WheelSize.popularities[priority-1]
+    WheelSize.popularities[priority - 1]
   end
 end

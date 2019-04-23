@@ -20,6 +20,6 @@ class JsonUploader < CarrierWave::Uploader::Base
   end
 
   def base_store_dir
-    'uploads/'
+    "uploads/"
   end
 end

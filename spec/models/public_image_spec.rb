@@ -1,23 +1,23 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe PublicImage do
-  describe 'validations' do
+  describe "validations" do
     it { is_expected.to belong_to :imageable }
   end
 
-  describe 'default_name' do
-    it 'sets a default name from filename if not bike' do
+  describe "default_name" do
+    it "sets a default name from filename if not bike" do
       public_image = PublicImage.new
-      allow(public_image).to receive(:imageable_type).and_return('Nope')
-      allow(public_image).to receive(:name).and_return('Boop')
+      allow(public_image).to receive(:imageable_type).and_return("Nope")
+      allow(public_image).to receive(:name).and_return("Boop")
       public_image.default_name
-      expect(public_image.name).to eq('Boop')
+      expect(public_image.name).to eq("Boop")
     end
 
     it "returns the name of the manufacturer if it isn't other" do
       public_image = PublicImage.new
-      bike = FactoryBot.create(:bike, year: 1969, frame_model: 'Hobo')
-      allow(public_image).to receive(:imageable_type).and_return('Bike')
+      bike = FactoryBot.create(:bike, year: 1969, frame_model: "Hobo")
+      allow(public_image).to receive(:imageable_type).and_return("Bike")
       allow(public_image).to receive(:imageable).and_return(bike)
       public_image.default_name
       expect(public_image.name).to eq("#{bike.title_string} #{bike.frame_colors.to_sentence}")
@@ -36,18 +36,18 @@ describe PublicImage do
     end
   end
 
-  describe 'enqueue_after_commit_jobs' do
-    context 'non-bike' do
-      let(:public_image) { PublicImage.new(imageable_type: 'Blog', imageable_id: 12) }
-      it 'does not enqueue after_bike_save_worker' do
+  describe "enqueue_after_commit_jobs" do
+    context "non-bike" do
+      let(:public_image) { PublicImage.new(imageable_type: "Blog", imageable_id: 12) }
+      it "does not enqueue after_bike_save_worker" do
         expect do
           public_image.enqueue_after_commit_jobs
         end.to change(AfterBikeSaveWorker.jobs, :size).by(0)
       end
     end
-    context 'bike' do
-      let(:public_image) { PublicImage.new(imageable_type: 'Bike', imageable_id: 12) }
-      it 'enqueues after_bike_save_worker' do
+    context "bike" do
+      let(:public_image) { PublicImage.new(imageable_type: "Bike", imageable_id: 12) }
+      it "enqueues after_bike_save_worker" do
         expect do
           expect do
             public_image.enqueue_after_commit_jobs

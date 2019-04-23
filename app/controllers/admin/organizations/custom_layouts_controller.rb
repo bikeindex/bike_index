@@ -6,7 +6,7 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
 
   def edit
     @edit_template = edit_layout_pages.include?(params[:id]) ? params[:id] : edit_layout_pages.first
-    unless @edit_template == 'landing_page' # Otherwise, we're rendering a snippet
+    unless @edit_template == "landing_page" # Otherwise, we're rendering a snippet
       @mail_snippet = @organization.mail_snippets.where(name: @edit_template).first_or_create
     end
   end
@@ -34,7 +34,7 @@ class Admin::Organizations::CustomLayoutsController < Admin::BaseController
   def find_and_authorize_organization
     @organization = Organization.friendly_find(params[:organization_id])
     unless current_user.developer?
-      flash[:info] = 'Sorry, you must be a developer to access that page.'
+      flash[:info] = "Sorry, you must be a developer to access that page."
       redirect_to admin_organization_url(@organization) and return
     end
     unless @organization

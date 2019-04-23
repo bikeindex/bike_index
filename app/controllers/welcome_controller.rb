@@ -1,5 +1,5 @@
 class WelcomeController < ApplicationController
-  layout 'application_revised'
+  layout "application_revised"
   before_action :force_html_response
   before_filter :authenticate_user_for_welcome_controller, only: [:user_home, :choose_registration]
   # Allow iframes on the index URL because safari is an asshole, and doesn't honor our iframe options
@@ -15,7 +15,7 @@ class WelcomeController < ApplicationController
   end
 
   def update_browser
-    render action: 'update_browser', layout: false
+    render action: "update_browser", layout: false
   end
 
   def goodbye
@@ -24,7 +24,7 @@ class WelcomeController < ApplicationController
 
   def user_home
     page = params[:page] || 1
-    @locks_active_tab = params[:active_tab] == 'locks'
+    @locks_active_tab = params[:active_tab] == "locks"
     @per_page = params[:per_page] || 20
     # If there are over 100 bikes created by the user, we'll have problems loading and sorting them
     if current_user.creation_states.limit(101).count > 100
