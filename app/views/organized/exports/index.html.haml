@@ -2,11 +2,11 @@
   .organized-page-header
     %h1
       %em
-        = active_organization.name
+        = current_organization.name
       Exports
 
   .text-right
-    = link_to "New Export", new_organization_export_path(organization_id: active_organization.to_param), class: "btn btn-secondary pull-right"
+    = link_to "New Export", new_organization_export_path(organization_id: current_organization.to_param), class: "btn btn-secondary pull-right"
 
   .table-responsive.mt-4
     %p{ style: "margin-bottom: 0;" }
@@ -31,7 +31,7 @@
         - @exports.each do |export|
           %tr
             %td
-              %a.convertTime{ href: organization_export_path(export, organization_id: active_organization.to_param) }
+              %a.convertTime{ href: organization_export_path(export, organization_id: current_organization.to_param) }
                 = l export.created_at, format: :convert_time
             %td
               - if export.user.present?
@@ -47,7 +47,7 @@
                 = link_to "Download", export.file.url
             %td
               %small
-                = link_to "Delete", organization_export_path(export, organization_id: active_organization.to_param), method: :delete 
+                = link_to "Delete", organization_export_path(export, organization_id: current_organization.to_param), method: :delete
 
 
 

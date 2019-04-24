@@ -9,7 +9,7 @@ class RegistrationsController < ApplicationController
   end
 
   def embed # Attributes assigned in the partial, but can be overridden so it can be used anywhere
-    @organization = active_organization
+    @organization = current_organization
     @owner_email = current_user && current_user.email
     @selectable_child_organizations = find_selectable_child_organizations
     @stolen = params[:stolen] ? 1 : 0

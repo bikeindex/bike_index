@@ -106,7 +106,7 @@ describe HeaderTagHelper do
       let(:controller_namespace) { "organized" }
       let(:organization) { FactoryBot.build(:organization, short_name: "Sweet Bike Org") }
       before do
-        allow(view).to receive(:active_organization) { organization }
+        allow(view).to receive(:current_organization) { organization }
       end
       describe "bikes" do
         let(:controller_name) { "bikes" }
@@ -209,7 +209,7 @@ describe HeaderTagHelper do
       let(:action_name) { "show" }
       let(:organization) { FactoryBot.build(:organization, name: "Sweet University") }
       it "sets the page title" do
-        allow(view).to receive(:active_organization) { organization }
+        allow(view).to receive(:current_organization) { organization }
         helper.landing_pages_header_tags
         expect(helper.page_title).to eq "Sweet University Bike Registration"
         expect(helper.page_description).to eq "Register your bicycle with Sweet University - powered by Bike Index"

@@ -137,8 +137,8 @@ class Admin::BikesController < Admin::BaseController
 
   def matching_bikes
     return @matching_bikes if defined?(@matching_bikes)
-    if current_organization.present?
-      bikes = current_organization.bikes.includes(:creation_organization, :creation_states, :paint)
+    if passive_organization.present?
+      bikes = passive_organization.bikes.includes(:creation_organization, :creation_states, :paint)
     else
       bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint)
     end

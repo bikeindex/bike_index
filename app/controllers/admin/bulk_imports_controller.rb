@@ -64,9 +64,9 @@ class Admin::BulkImportsController < Admin::BaseController
     elsif params[:not_ascend].present?
       bulk_imports = bulk_imports.not_ascend
     end
-        
+
     if params[:organization_id].present?
-      bulk_imports = bulk_imports.where(organization_id: active_organization.id)
+      bulk_imports = bulk_imports.where(organization_id: current_organization.id)
     end
     @matching_bulk_imports = bulk_imports
   end

@@ -4,7 +4,7 @@ class LandingPagesController < ApplicationController
   before_filter :instantiate_feedback, except: [:show]
 
   def show
-    raise ActionController::RoutingError, "Not found" unless active_organization.present?
+    raise ActionController::RoutingError, "Not found" unless current_organization.present?
   end
 
   def for_shops; end

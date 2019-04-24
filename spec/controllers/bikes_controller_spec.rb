@@ -126,17 +126,17 @@ describe BikesController do
       expect(assigns(:bike)).to be_decorated
       expect(flash).to_not be_present
     end
-    context "illegally set current_organization" do
+    context "illegally set passive_organization" do
       include_context :logged_in_as_user
-      it "renders, resets current_organization_id" do
-        session[:current_organization_id] = organization.id
+      it "renders, resets passive_organization_id" do
+        session[:passive_organization_id] = organization.id
         get :show, id: bike.id
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
         expect(response).to render_with_layout("application_revised")
         expect(assigns(:bike)).to be_decorated
         expect(flash).to_not be_present
-        expect(session[:current_organization_id]).to eq "0"
+        expect(session[:passive_organization_id]).to eq "0"
       end
     end
     context "example bike" do
@@ -202,7 +202,7 @@ describe BikesController do
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
-        expect(session[:current_organization_id]).to eq organization.id
+        expect(session[:passive_organization_id]).to eq organization.id
       end
       context "bike created by organization" do
         let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
@@ -211,7 +211,7 @@ describe BikesController do
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
           expect(flash).to_not be_present
-          expect(session[:current_organization_id]).to eq organization.id
+          expect(session[:passive_organization_id]).to eq organization.id
         end
       end
       context "bike owned by organization" do
@@ -222,7 +222,7 @@ describe BikesController do
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
           expect(flash).to_not be_present
-          expect(session[:current_organization_id]).to eq organization.id
+          expect(session[:passive_organization_id]).to eq organization.id
         end
       end
     end
@@ -263,24 +263,24 @@ describe BikesController do
         expect(response).to render_template(:scanned)
         expect(response.code).to eq("200")
         expect(assigns(:show_organization_bikes)).to be_falsey
-        expect(session[:current_organization_id]).to eq "0"
+        expect(session[:passive_organization_id]).to eq "0"
       end
       context "user part of organization" do
         let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
-        it "makes active_organization the organization" do
+        it "makes current_organization the organization" do
           get :scanned, id: "000#{bike_code2.code}", organization_id: organization.to_param
           expect(assigns(:bike_code)).to eq bike_code2
-          expect(session[:current_organization_id]).to eq organization.id
+          expect(session[:passive_organization_id]).to eq organization.id
           expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_code: bike_code2.code)
         end
         context "passed a different organization id" do
           let!(:other_organization) { FactoryBot.create(:organization, short_name: "BikeIndex") }
-          it "makes active_organization the organization" do
+          it "makes current_organization the organization" do
             expect(user.memberships&.pluck(:organization_id)).to eq([organization.id])
             expect(bike_code2.organization).to eq organization
             get :scanned, id: "000#{bike_code2.code}", organization_id: "BikeIndex"
             expect(assigns(:bike_code)).to eq bike_code2
-            expect(session[:current_organization_id]).to eq organization.id
+            expect(session[:passive_organization_id]).to eq organization.id
             expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_code: bike_code2.code)
           end
         end
@@ -342,7 +342,7 @@ describe BikesController do
           get :new, organization_id: organization.to_param
           expect(response.code).to eq("200")
           expect(assigns(:bike).creation_organization).to eq organization
-          expect(assigns[:current_organization]).to be_nil # Because the user isn't necessarily a member of an org
+          expect(assigns[:passive_organization]).to be_nil # Because the user isn't necessarily a member of an org
         end
       end
       context "with organization member" do
@@ -351,7 +351,7 @@ describe BikesController do
           get :new
           expect(response.code).to eq("200")
           expect(assigns(:bike).creation_organization).to eq organization
-          expect(assigns[:current_organization]).to eq organization
+          expect(assigns[:passive_organization]).to eq organization
         end
       end
       context "stolen from params" do
