@@ -72,7 +72,7 @@ updateSerial = (e) ->
   if $(e.target).prop('checked') == true
     $('#bike_serial_number').val('absent').addClass('absent-serial')
   else
-    $('#bike_serial_number').val('').removeClass('absent-serial')    
+    $('#bike_serial_number').val('').removeClass('absent-serial')
 
 optionalFormUpdate = (e) ->
   # $(@).find('a').data('target')
@@ -93,7 +93,7 @@ otherManufacturerDisplay = (current_value) ->
   if current_value == expand_value
     # show the bugger!
     hidden_other.slideDown().addClass('unhidden')
-  else 
+  else
     # if it's visible, clear it and slide up
     if hidden_other.hasClass('unhidden')
       hidden_other.find('input').selectize()[0].selectize.setValue('')
@@ -131,7 +131,7 @@ $(document).ready ->
 
   $('#bike_has_no_serial').change (e) ->
     updateSerial(e)
-  
+
   $('#alert-block .close').click ->
     $('#alert-block').fadeOut('fast')
 
@@ -162,9 +162,9 @@ $(document).ready ->
   # Update any hidden fields with current timezone
   window.timezone ||= moment.tz.guess()
   $(".hiddenFieldTimezone").val(window.timezone)
-  
+
   # prevent double posting
-  $('#new_bike').submit -> 
+  $('#new_bike').submit ->
     $this = $(this)
     if $this.data().isSubmitted
       return false

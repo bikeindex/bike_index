@@ -49,7 +49,7 @@ class BikeDecorator < ApplicationDecorator
   end
 
   def list_link_url(target = nil)
-    if target == 'edit'
+    if target == "edit"
       "/bikes/#{object.id}/edit"
     else
       h.bike_path(object)
@@ -60,17 +60,17 @@ class BikeDecorator < ApplicationDecorator
     if object.thumb_path
       h.image_tag(object.thumb_path, alt: title_string)
     elsif object.stock_photo_url.present?
-      small = object.stock_photo_url.split('/')
+      small = object.stock_photo_url.split("/")
       ext = "/small_" + small.pop
-      h.image_tag(small.join('/') + ext, alt: title_string)
+      h.image_tag(small.join("/") + ext, alt: title_string)
     else
-      h.image_tag('revised/bike_photo_placeholder.svg', alt: title_string, title: 'No image', class: 'no-image')
+      h.image_tag("revised/bike_photo_placeholder.svg", alt: title_string, title: "No image", class: "no-image")
     end
   end
 
   def list_image(target = nil)
-    h.content_tag :div, class: "blist-image-holder" do 
-      h.link_to(list_link_url(target)) do 
+    h.content_tag :div, class: "blist-image-holder" do
+      h.link_to(list_link_url(target)) do
         thumb_image
       end
     end
@@ -78,8 +78,8 @@ class BikeDecorator < ApplicationDecorator
 
   def serial_display
     return "Hidden" if object.recovered
-    if object.serial.match('absent')
-      object.made_without_serial ? 'Has no serial' : 'Unknown'
+    if object.serial.match("absent")
+      object.made_without_serial ? "Has no serial" : "Unknown"
     else
       object.serial
     end

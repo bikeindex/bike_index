@@ -44,21 +44,21 @@ class BikeCreatorAssociator
     @b_param.update_attributes(image_processed: true)
     bike.reload
   end
-  
+
   def attach_photos(bike)
-    return nil unless @b_param.params['photos'].present?
-    photos = @b_param.params['photos'].uniq.take(7)
+    return nil unless @b_param.params["photos"].present?
+    photos = @b_param.params["photos"].uniq.take(7)
     photos.each { |p| PublicImage.create(imageable: bike, remote_image_url: p) }
   end
 
   def add_other_listings(bike)
-    return nil unless @b_param.params['bike']['other_listing_urls'].present?
-    urls = @b_param.params['bike']['other_listing_urls']
+    return nil unless @b_param.params["bike"]["other_listing_urls"].present?
+    urls = @b_param.params["bike"]["other_listing_urls"]
     urls.each { |url| OtherListing.create(url: url, bike_id: bike.id) }
   end
 
   def associate(bike)
-    begin 
+    begin
       ownership = create_ownership(bike)
       create_components(bike)
       create_normalized_serial_segments(bike)

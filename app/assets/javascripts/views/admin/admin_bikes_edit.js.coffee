@@ -2,7 +2,7 @@ class BikeIndex.Views.AdminBikesEdit extends Backbone.View
   events:
     'click #frame-sizer button': 'updateFrameSize'
     'keyup': 'submitOnControlEnter'
-    
+
   initialize: ->
     window.root_url = $('#bike_edit_root_url').attr('data-url')
     @setElement($('#body'))
@@ -17,7 +17,7 @@ class BikeIndex.Views.AdminBikesEdit extends Backbone.View
     if $('.fast-attr-update').length > 0
       $('#bike_cycle_type_id').focus()
       @setFrameSize()
-    
+
   initializeFrameMaker: (target) ->
     $target = $(target)
     initial_opts = []

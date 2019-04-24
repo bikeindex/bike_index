@@ -19,7 +19,7 @@ class PublicImage < ActiveRecord::Base
   def set_calculated_attributes
     self.name = (name || default_name).truncate(100)
     return true if listing_order && listing_order > 0
-    self.listing_order = imageable&.public_images&.length || 0 
+    self.listing_order = imageable&.public_images&.length || 0
   end
 
   def enqueue_after_commit_jobs

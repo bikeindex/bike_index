@@ -1,26 +1,26 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Organized::ManageController, type: :controller do
-  context 'logged_in_as_organization_member' do
+  context "logged_in_as_organization_member" do
     include_context :logged_in_as_organization_member
-    describe 'index' do
-      it 'redirects' do
+    describe "index" do
+      it "redirects" do
         get :index, organization_id: organization.to_param
         expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
         expect(flash[:error]).to be_present
       end
     end
 
-    describe 'locations' do
-      it 'redirects' do
+    describe "locations" do
+      it "redirects" do
         get :locations, organization_id: organization.to_param
         expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
         expect(flash[:error]).to be_present
       end
     end
 
-    describe 'standard organization' do
-      it 'does not destroy' do
+    describe "standard organization" do
+      it "does not destroy" do
         expect do
           delete :destroy, id: organization.id, organization_id: organization.to_param
         end.to change(Organization, :count).by(0)
@@ -29,45 +29,45 @@ describe Organized::ManageController, type: :controller do
       end
     end
   end
-  context 'logged_in_as_organization_admin' do
+  context "logged_in_as_organization_admin" do
     include_context :logged_in_as_organization_admin
-    describe 'index' do
-      it 'renders, sets active organization' do
-        session[:current_organization_id] = "XXXYYY"
+    describe "index" do
+      it "renders, sets active organization" do
+        session[:passive_organization_id] = "XXXYYY"
         get :index, organization_id: organization.to_param
         expect(response.status).to eq(200)
         expect(response).to render_template :index
-        expect(response).to render_with_layout('application_revised')
-        expect(assigns(:active_organization)).to eq organization
+        expect(response).to render_with_layout("application_revised")
         expect(assigns(:current_organization)).to eq organization
-        expect(session[:current_organization_id]).to eq organization.id
+        expect(assigns(:passive_organization)).to eq organization
+        expect(session[:passive_organization_id]).to eq organization.id
       end
     end
 
-    describe 'landing' do
-      it 'renders' do
-        session[:current_organization_id] = "XXXYYY"
+    describe "landing" do
+      it "renders" do
+        session[:passive_organization_id] = "XXXYYY"
         get :landing, organization_id: organization.to_param
         expect(response.status).to eq(200)
-        expect(response).to render_with_layout('application_revised')
-        expect(assigns(:active_organization)).to eq organization
+        expect(response).to render_with_layout("application_revised")
         expect(assigns(:current_organization)).to eq organization
-        expect(session[:current_organization_id]).to eq organization.id
+        expect(assigns(:passive_organization)).to eq organization
+        expect(session[:passive_organization_id]).to eq organization.id
       end
     end
 
-    describe 'locations' do
-      it 'renders' do
+    describe "locations" do
+      it "renders" do
         get :locations, organization_id: organization.to_param
         expect(response.status).to eq(200)
         expect(response).to render_template :locations
-        expect(response).to render_with_layout('application_revised')
-        expect(assigns(:active_organization)).to eq organization
+        expect(response).to render_with_layout("application_revised")
+        expect(assigns(:current_organization)).to eq organization
       end
     end
 
-    describe 'update' do
-      context 'dissallowed attributes' do
+    describe "update" do
+      context "dissallowed attributes" do
         let(:org_attributes) do
           {
             available_invitation_count: 10,
@@ -77,32 +77,32 @@ describe Organized::ManageController, type: :controller do
             auto_user_id: user.id,
             show_on_map: false,
             api_access_approved: false,
-            access_token: 'stuff7',
-            new_bike_notification: 'stuff8',
+            access_token: "stuff7",
+            new_bike_notification: "stuff8",
             lock_show_on_map: true,
-            is_paid: false
+            is_paid: false,
           }
         end
         let(:user_2) { FactoryBot.create(:organization_member, organization: organization) }
         let(:update_attributes) do
           {
             # slug: 'short_name',
-            slug: 'cool name and stuffffff',
-            available_invitation_count: '20',
-            sent_invitation_count: '0',
+            slug: "cool name and stuffffff",
+            available_invitation_count: "20",
+            sent_invitation_count: "0",
             is_suspended: true,
             auto_user_id: user.id,
             embedable_user_email: user_2.email,
             api_access_approved: true,
-            access_token: 'things7',
-            new_bike_notification: 'things8',
-            website: ' www.drseuss.org',
-            name: 'some new name',
-            kind: 'bike_shop',
+            access_token: "things7",
+            new_bike_notification: "things8",
+            website: " www.drseuss.org",
+            name: "some new name",
+            kind: "bike_shop",
             is_paid: true,
             lock_show_on_map: false,
             show_on_map: true,
-            locations_attributes: []
+            locations_attributes: [],
           }
         end
         # Website is also permitted, but we're manually setting it
@@ -111,7 +111,7 @@ describe Organized::ManageController, type: :controller do
           expect(user_2).to be_present
           organization.update_attributes(org_attributes)
         end
-        it 'updates, sends message about maps' do
+        it "updates, sends message about maps" do
           put :update, organization_id: organization.to_param, id: organization.to_param, organization: update_attributes
           expect(response).to redirect_to organization_manage_index_path(organization_id: organization.to_param)
           expect(flash[:success]).to be_present
@@ -122,55 +122,55 @@ describe Organized::ManageController, type: :controller do
           end
           # Test that the website and auto_user_id are set correctly
           expect(organization.auto_user_id).to eq user_2.id
-          expect(organization.website).to eq('http://www.drseuss.org')
+          expect(organization.website).to eq("http://www.drseuss.org")
           # Ensure we're protecting the correct attributes
           org_attributes.except(*permitted_update_keys).each do |key, value|
             expect(organization.send(key)).to eq value
           end
         end
       end
-      context 'with locations and normal show_on_map' do
+      context "with locations and normal show_on_map" do
         let(:state) { FactoryBot.create(:state) }
         let(:country) { state.country }
-        let(:location_1) { FactoryBot.create(:location, organization: organization, street: 'old street', name: 'cool name') }
+        let(:location_1) { FactoryBot.create(:location, organization: organization, street: "old street", name: "cool name") }
         let(:update_attributes) do
           {
             name: organization.name,
             show_on_map: true,
-            kind: 'bike_shop',
+            kind: "bike_shop",
             locations_attributes: {
-              '0' => {
+              "0" => {
                 id: location_1.id,
-                name: 'First shop',
-                zipcode: '2222222',
-                city: 'First city',
+                name: "First shop",
+                zipcode: "2222222",
+                city: "First city",
                 state_id: state.id,
                 country_id: country.id,
-                street: 'some street 2',
-                phone: '7272772727272',
-                email: 'stuff@goooo.com',
+                street: "some street 2",
+                phone: "7272772727272",
+                email: "stuff@goooo.com",
                 latitude: 22_222,
                 longitude: 11_111,
                 organization_id: 844,
                 shown: false,
-                _destroy: 0
+                _destroy: 0,
               },
               Time.zone.now.to_i.to_s => {
                 created_at: Time.zone.now.to_f.to_s,
-                name: 'Second shop',
-                zipcode: '12243444',
-                city: 'cool city',
+                name: "Second shop",
+                zipcode: "12243444",
+                city: "cool city",
                 state_id: state.id,
                 country_id: country.id,
-                street: 'some street 2',
-                phone: '7272772727272',
-                email: 'stuff@goooo.com',
+                street: "some street 2",
+                phone: "7272772727272",
+                email: "stuff@goooo.com",
                 latitude: 22_222,
                 longitude: 11_111,
                 organization_id: 844,
-                shown: false
-              }
-            }
+                shown: false,
+              },
+            },
           }
         end
         before do
@@ -178,8 +178,8 @@ describe Organized::ManageController, type: :controller do
           expect(organization.show_on_map).to be_falsey
           expect(organization.lock_show_on_map).to be_falsey
         end
-        context 'update' do
-          it 'updates and adds the locations and shows on map' do
+        context "update" do
+          it "updates and adds the locations and shows on map" do
             expect do
               put :update, organization_id: organization.to_param, id: organization.to_param, organization: update_attributes
             end.to change(Location, :count).by 1
@@ -188,11 +188,11 @@ describe Organized::ManageController, type: :controller do
             # Existing location is updated
             location_1.reload
             expect(location_1.organization).to eq organization
-            update_attributes[:locations_attributes]['0'].except(:latitude, :longitude, :organization_id, :shown, :created_at, :_destroy).each do |k, v|
+            update_attributes[:locations_attributes]["0"].except(:latitude, :longitude, :organization_id, :shown, :created_at, :_destroy).each do |k, v|
               expect(location_1.send(k)).to eq v
             end
             # ensure we are not permitting crazy assignment for first location
-            update_attributes[:locations_attributes]['0'].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
+            update_attributes[:locations_attributes]["0"].slice(:latitude, :longitude, :organization_id, :shown).each do |k, v|
               expect(location_1.send(k)).to_not eq v
             end
 
@@ -208,10 +208,10 @@ describe Organized::ManageController, type: :controller do
             end
           end
         end
-        context 'remove' do
-          it 'removes the location' do
+        context "remove" do
+          it "removes the location" do
             # update_attributes = update_attributes.dup
-            update_attributes[:locations_attributes]['0'][:_destroy] = 1
+            update_attributes[:locations_attributes]["0"][:_destroy] = 1
             expect do
               put :update, organization_id: organization.to_param, id: organization.to_param, organization: update_attributes
             end.to change(Location, :count).by 0
@@ -221,10 +221,10 @@ describe Organized::ManageController, type: :controller do
       end
     end
 
-    describe 'destroy' do
-      context 'standard organization' do
-        it 'destroys' do
-          expect_any_instance_of(AdminNotifier).to receive(:for_organization).with(organization: organization, user: user, type: 'organization_destroyed')
+    describe "destroy" do
+      context "standard organization" do
+        it "destroys" do
+          expect_any_instance_of(AdminNotifier).to receive(:for_organization).with(organization: organization, user: user, type: "organization_destroyed")
           expect do
             delete :destroy, id: organization.id, organization_id: organization.to_param
           end.to change(Organization, :count).by(-1)
@@ -232,8 +232,8 @@ describe Organized::ManageController, type: :controller do
           expect(flash[:info]).to be_present
         end
       end
-      context 'paid organization' do
-        it 'does not destroy' do
+      context "paid organization" do
+        it "does not destroy" do
           organization.update_attribute :is_paid, true
           expect do
             delete :destroy, id: organization.id, organization_id: organization.to_param

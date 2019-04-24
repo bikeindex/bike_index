@@ -1,5 +1,4 @@
 class AddsFrameMaterialToBikes < ActiveRecord::Migration
-
   def up
     add_column :bikes, :frame_material, :integer
 

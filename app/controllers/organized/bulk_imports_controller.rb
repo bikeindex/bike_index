@@ -1,7 +1,7 @@
 module Organized
   class BulkImportsController < Organized::BaseController
     skip_before_filter :ensure_member!
-    skip_before_filter :ensure_active_organization!, only: [:create]
+    skip_before_filter :ensure_current_organization!, only: [:create]
     skip_before_filter :verify_authenticity_token, only: [:create]
     before_action :ensure_access_to_bulk_import!, except: [:create] # Because this checks ensure_admin
 
@@ -18,7 +18,7 @@ module Organized
       @bulk_import = bulk_imports.where(id: params[:id]).first
       unless @bulk_import.present?
         flash[:error] = "Unable to find that import"
-        redirect_to organization_bulk_imports_path(organization_id: active_organization.to_param) and return
+        redirect_to organization_bulk_imports_path(organization_id: current_organization.to_param) and return
       end
       page = params[:page] || 1
       per_page = params[:per_page] || 25
@@ -38,7 +38,7 @@ module Organized
           render json: { success: "File imported" }, status: 201
         else
           flash[:success] = "Bulk Import created!"
-          redirect_to organization_bulk_imports_path(organization_id: active_organization.to_param)
+          redirect_to organization_bulk_imports_path(organization_id: current_organization.to_param)
         end
       else
         if @is_api
@@ -53,7 +53,7 @@ module Organized
     private
 
     def bulk_imports
-      BulkImport.where(organization_id: active_organization.id)
+      BulkImport.where(organization_id: current_organization.id)
     end
 
     def ensure_can_create_import!
@@ -67,20 +67,20 @@ module Organized
         @ascend_import = true
         return true if request.headers["Authorization"] == BulkImport.ascend_api_token
       else
-        ensure_active_organization!
-        @current_user = active_organization.auto_user # Crazy override to make current user work
-        return true if request.headers["Authorization"] == active_organization.access_token
+        ensure_current_organization!
+        @current_user = current_organization.auto_user # Crazy override to make current user work
+        return true if request.headers["Authorization"] == current_organization.access_token
       end
       render json: { error: "Not permitted" }, status: 401 and return
     end
 
     def ensure_access_to_bulk_import!
-      return unless ensure_active_organization!
+      return unless ensure_current_organization!
       return false unless ensure_admin! # Need to return so we don't double render
       return true if current_user.superuser? # ensure_admin! passes with superuser - this allow superuser to see even if org not enabled
-      return true if active_organization.show_bulk_import?
+      return true if current_organization.show_bulk_import?
       flash[:error] = "Your organization doesn't have access to that, please contact Bike Index support"
-      redirect_to organization_bikes_path(organization_id: active_organization.to_param) and return
+      redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
     end
 
     def permitted_parameters
@@ -95,7 +95,7 @@ module Organized
       if @ascend_import
         { is_ascend: true }
       else
-        { user_id: (@current_user || current_user).id, organization_id: active_organization&.id }
+        { user_id: (@current_user || current_user).id, organization_id: current_organization&.id }
       end
     end
   end

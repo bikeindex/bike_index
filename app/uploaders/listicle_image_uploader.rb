@@ -9,11 +9,12 @@ class ListicleImageUploader < CarrierWave::Uploader::Base
     storage :file
   end
 
-  after :remove, :delete_empty_upstream_dirs  
+  after :remove, :delete_empty_upstream_dirs
+
   def delete_empty_upstream_dirs
     path = ::File.expand_path(store_dir, root)
     Dir.delete(path) # fails if path not empty dir
-    
+
     path = ::File.expand_path(base_store_dir, root)
     Dir.delete(path) # fails if path not empty dir
   rescue SystemCallError
@@ -27,7 +28,7 @@ class ListicleImageUploader < CarrierWave::Uploader::Base
   def store_dir
     "#{base_store_dir}/#{model.id}"
   end
-  
+
   def base_store_dir
     "uploads/#{model.class.to_s[0, 2]}"
   end
@@ -48,7 +49,7 @@ class ListicleImageUploader < CarrierWave::Uploader::Base
   end
 
   version :thumb, :from_version => :medium do
-    process resize_to_fill: [100,100]
+    process resize_to_fill: [100, 100]
   end
 
   def extension_white_list
@@ -66,5 +67,4 @@ class ListicleImageUploader < CarrierWave::Uploader::Base
       img
     end
   end
-
 end

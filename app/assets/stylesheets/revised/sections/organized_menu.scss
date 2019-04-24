@@ -1,32 +1,43 @@
 $organized-menu-bg: $gray-lighter;
+
 .organized-left-menu {
   display: none;
+
   .divider-above {
     border-top: 1px solid #e4e4e4;
     margin-top: $vertical-height;
   }
+
   .divider-below {
     padding-bottom: $vertical-height;
     border-bottom: 1px solid #e4e4e4;
   }
+
   li:last-of-type {
     @extend .divider-below;
   }
+
   header {
     margin-top: -2 * $vertical-height;
     padding: 0 $vertical-height;
+
     @extend .divider-below;
+
     overflow-x: hidden;
+
     h3 {
       font-size: 18px;
       line-height: 1.5;
+
       span {
         display: block;
         font-weight: bold;
         color: #2d2d2d;
+
         @extend .header-font-alt;
       }
     }
+
     img {
       width: 70%;
       max-width: 150px;
@@ -40,9 +51,12 @@ $organized-menu-bg: $gray-lighter;
 @media (min-width: $grid-breakpoint-md) {
   .organized-body {
     position: relative;
+
     .primary-footer {
       position: relative;
-    } // To make it go over the menu
+    }
+
+    // To make it go over the menu
     .organized-left-menu {
       background: $organized-menu-bg;
       width: 15%;
@@ -50,37 +64,48 @@ $organized-menu-bg: $gray-lighter;
       position: absolute;
       top: 0;
       display: block;
+
       ul {
         @include list-unstyled;
+
         overflow-x: hidden;
+
         li {
           padding-top: $vertical-height;
         }
       }
+
       .menu-item {
         width: 100%;
         display: block;
-        padding: 0.5 * $vertical-height $vertical-height;
+        padding: (0.5 * $vertical-height) $vertical-height;
         color: $header-font-nocolor;
         text-decoration: none;
         font-size: 14px;
+
         &:hover {
           text-decoration: none;
           font-weight: $strong-font-weight;
-          padding-right: 0; // Because otherwise the shift to bold can break line
+          padding-right: 0;
+
+          // Because otherwise the shift to bold can break line
         }
       }
+
       .disabled-menu-item {
         color: $gray-light;
         display: block;
+
         &:hover {
           font-weight: normal;
         }
       }
+
       .active {
         color: $blue;
         position: relative;
         font-weight: bold;
+
         &:before {
           content: "";
           display: block;
@@ -96,6 +121,7 @@ $organized-menu-bg: $gray-lighter;
         }
       }
     }
+
     .organized-wrap {
       width: 100%;
       padding-left: 15%;

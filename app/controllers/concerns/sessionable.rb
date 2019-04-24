@@ -1,5 +1,6 @@
 module Sessionable
   extend ActiveSupport::Concern
+
   def skip_if_signed_in
     store_return_to
     # Make absolutely sure we don't have an unconfirmed user
@@ -16,7 +17,7 @@ module Sessionable
   def sign_in_and_redirect(user)
     session[:last_seen] = Time.now
     session[:render_donation_request] = user.render_donation_request if user&.render_donation_request
-    set_current_organization(user.default_organization) # Set that organization!
+    set_passive_organization(user.default_organization) # Set that organization!
     if ActiveRecord::Type::Boolean.new.type_cast_from_database(params.dig(:session, :remember_me))
       cookies.permanent.signed[:auth] = cookie_options(user)
     else
@@ -42,7 +43,7 @@ module Sessionable
   def cookie_options(user)
     c = {
       httponly: true,
-      value: [user.id, user.auth_token]
+      value: [user.id, user.auth_token],
     }
     # In development, secure: true breaks the cookie storage. Only add if production
     Rails.env.production? ? c.merge(secure: true) : c

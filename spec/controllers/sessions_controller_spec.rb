@@ -55,7 +55,7 @@ describe SessionsController do
     it "logs out the current user" do
       session[:return_to] = "/bikes/12?contact_owner=true"
       session[:partner] = "bikehub"
-      session[:current_organization_id] = 12
+      session[:passive_organization_id] = 12
       session[:whatever] = "XXXXXX"
       get :destroy
       expect(cookies.signed[:auth]).to be_nil
@@ -64,7 +64,7 @@ describe SessionsController do
       expect(flash[:notice]).to be_present
       expect(session[:return_to]).to be_nil
       expect(session[:partner]).to be_nil
-      expect(session[:current_organization_id]).to be_nil
+      expect(session[:passive_organization_id]).to be_nil
       expect(session[:whatever]).to be_nil
     end
     context "unconfirmed user" do
@@ -78,9 +78,9 @@ describe SessionsController do
     end
   end
 
-  describe 'create' do
+  describe "create" do
     let(:user) { FactoryBot.create(:user_confirmed) }
-    describe 'when user is found' do
+    describe "when user is found" do
       before do
         expect(User).to receive(:fuzzy_email_find).and_return(user)
       end
@@ -98,10 +98,10 @@ describe SessionsController do
 
         context "admin" do
           let(:user) { FactoryBot.create(:admin) }
-          it 'authenticates and redirects to admin' do
+          it "authenticates and redirects to admin" do
             expect(user).to receive(:authenticate).and_return(true)
-            request.env['HTTP_REFERER'] = user_home_url
-            post :create, session: { password: 'would be correct' }
+            request.env["HTTP_REFERER"] = user_home_url
+            post :create, session: { password: "would be correct" }
             expect(cookies.signed[:auth][1]).to eq(user.auth_token)
             expect(response).to redirect_to admin_root_url
           end
@@ -109,8 +109,8 @@ describe SessionsController do
 
         it "redirects to discourse_authentication url if it's a valid oauth url" do
           expect(user).to receive(:authenticate).and_return(true)
-          session[:discourse_redirect] = 'sso=foo&sig=bar'
-          post :create, session: { hmmm: 'yeah' }
+          session[:discourse_redirect] = "sso=foo&sig=bar"
+          post :create, session: { hmmm: "yeah" }
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(response).to redirect_to discourse_authentication_url
         end
@@ -118,25 +118,25 @@ describe SessionsController do
         it "redirects to return_to if it's a valid oauth url" do
           expect(user).to receive(:authenticate).and_return(true)
           session[:return_to] = oauth_authorization_url(cool_thing: true)
-          post :create, session: { stuff: 'lololol' }
+          post :create, session: { stuff: "lololol" }
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(session[:return_to]).to be_nil
           expect(response).to redirect_to oauth_authorization_url(cool_thing: true)
         end
 
-        it 'redirects to facebook.com/bikeindex' do
+        it "redirects to facebook.com/bikeindex" do
           expect(user).to receive(:authenticate).and_return(true)
-          session[:return_to] = 'https://facebook.com/bikeindex'
-          post :create, session: { thing: 'asdfasdf' }
+          session[:return_to] = "https://facebook.com/bikeindex"
+          post :create, session: { thing: "asdfasdf" }
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(session[:return_to]).to be_nil
-          expect(response).to redirect_to 'https://facebook.com/bikeindex'
+          expect(response).to redirect_to "https://facebook.com/bikeindex"
         end
 
-        it 'does not redirect to a random facebook page' do
+        it "does not redirect to a random facebook page" do
           expect(user).to receive(:authenticate).and_return(true)
-          session[:return_to] = 'https://facebook.com/bikeindex-mean-place'
-          post :create, session: { thing: 'asdfasdf' }
+          session[:return_to] = "https://facebook.com/bikeindex-mean-place"
+          post :create, session: { thing: "asdfasdf" }
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(session[:return_to]).to be_nil
           expect(response).to redirect_to user_home_url
@@ -145,19 +145,19 @@ describe SessionsController do
         it "doesn't redirect and clears the session if not a valid oauth url" do
           expect(user).to receive(:authenticate).and_return(true)
           session[:return_to] = "http://testhost.com/bad_place?f=#{oauth_authorization_url(cool_thing: true)}"
-          post :create, session: { thing: 'asdfasdf' }
+          post :create, session: { thing: "asdfasdf" }
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(session[:return_to]).to be_nil
           expect(response).to redirect_to user_home_url
         end
       end
 
-      it 'does not authenticate the user when user authentication fails' do
+      it "does not authenticate the user when user authentication fails" do
         expect(user).to receive(:authenticate).and_return(false)
-        post :create, session: { password: 'something incorrect' }
+        post :create, session: { password: "something incorrect" }
         expect(session[:user_id]).to be_nil
-        expect(response).to render_template('new')
-        expect(response).to render_with_layout('application_revised')
+        expect(response).to render_template("new")
+        expect(response).to render_with_layout("application_revised")
       end
       context "user is organization admin" do
         let(:organization) { FactoryBot.create(:organization, kind: organization_kind) }
@@ -204,11 +204,11 @@ describe SessionsController do
       end
     end
 
-    it 'does not log in the user when the user is not found' do
-      post :create, session: { email: 'notThere@example.com' }
+    it "does not log in the user when the user is not found" do
+      post :create, session: { email: "notThere@example.com" }
       expect(cookies.signed[:auth]).to be_nil
       expect(response).to render_template(:new)
-      expect(response).to render_with_layout('application_revised')
+      expect(response).to render_with_layout("application_revised")
     end
   end
 end

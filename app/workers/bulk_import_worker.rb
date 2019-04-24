@@ -1,4 +1,4 @@
-require 'csv'
+require "csv"
 
 class BulkImportWorker
   include Sidekiq::Worker
@@ -81,10 +81,10 @@ class BulkImportWorker
         user_name: row[:owner_name],
         additional_registration: row[:secondary_serial],
         send_email: @bulk_import.send_email,
-        creation_organization_id: @bulk_import.organization_id
+        creation_organization_id: @bulk_import.organization_id,
       },
       # Photo need to be an array - only include if photo has a value
-      photos: row[:photo].present? ? [row[:photo]] : nil
+      photos: row[:photo].present? ? [row[:photo]] : nil,
     }
   end
 
@@ -140,7 +140,7 @@ class BulkImportWorker
       photo: %i[photo_url],
       owner_email: %i[email customer_email],
       frame_size: %i[size],
-      description: %i[product_description]
+      description: %i[product_description],
     }
   end
 end

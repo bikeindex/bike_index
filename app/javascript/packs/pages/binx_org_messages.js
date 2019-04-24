@@ -1,4 +1,4 @@
-import log from '../utils/log';
+import log from "../utils/log";
 
 export default class BinxAppOrgMessages {
   constructor() {
@@ -87,7 +87,9 @@ export default class BinxAppOrgMessages {
         );
       }
       let message = this.messages.find(message => messageId === message.id);
-      let marker = binxMapping.markersRendered.find(marker => messageId == marker.binxId);
+      let marker = binxMapping.markersRendered.find(
+        marker => messageId == marker.binxId
+      );
       binxMapping.openInfoWindow(marker, messageId, message);
       $("body, html").animate(
         {
@@ -132,9 +134,7 @@ export default class BinxAppOrgMessages {
       '<table class="table table table-striped table-hover table-bordered table-sm"><tbody>';
     tableTop +=
       '<tr><td class="map-cell"></td><td>Sent</td><td>Bike</td><td>Sender</td></tr>';
-    return `${tableTop}${this.tableRowForMessage(
-      message
-    )}</tbody></table>`;
+    return `${tableTop}${this.tableRowForMessage(message)}</tbody></table>`;
   }
 
   renderMessagesTable() {
@@ -186,4 +186,4 @@ export default class BinxAppOrgMessages {
     // call map organized messages - so that we can render it
     this.mapOrganizedMessages();
   }
-};
+}

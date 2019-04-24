@@ -3,15 +3,17 @@ $btn-green: #5cb85c;
 $red: #e74c3c;
 
 $blue-dark: #2c3e50;
-$blue-darkish: #2980B9;
+$blue-darkish: #2980b9;
 $blue: #3498db;
 $blue-light: #92c8ec;
 
 $gray-darker: #333333;
 $gray-dark: #222;
 $gray: #666;
-$gray-light: #A4A4A4;
-$gray-lightish: #e4e4e4; // border on things that are gray-lighter
+$gray-light: #a4a4a4;
+$gray-lightish: #e4e4e4;
+
+// border on things that are gray-lighter
 $gray-lighter: #f2f2f2;
 
 $form-well-background: $gray-lighter;
@@ -31,4 +33,6 @@ $black-off: #111;
 $primary-nav-background: $black-off;
 $primary-nav-text-color: $gray-light;
 
-.stolen-color { color: $red; }
+.stolen-color {
+  color: $red;
+}

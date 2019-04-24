@@ -1,3 +1,7 @@
+.full-screen-table-wrapper {
+  overflow-x: scroll;
+}
+
 .table-list {
   @extend .table;
   @extend .table-striped;
@@ -29,4 +33,28 @@ table .table-cell-check {
   bottom: -0.2em;
   font-size: 0.8em;
   @extend .less-strong;
+}
+
+thead.sortable {
+  th {
+    font-weight: normal;
+    a.sortable-link {
+      display: block;
+      position: relative;
+      // To give a spot for the sortable direction
+      &.active {
+        padding-right: 1.5rem;
+      }
+      span.sortable-direction {
+        display: block;
+        position: absolute;
+        right: 0;
+        top: 0;
+      }
+      &.active {
+        font-weight: strong;
+        text-decoration: underline;
+      }
+    }
+  }
 }

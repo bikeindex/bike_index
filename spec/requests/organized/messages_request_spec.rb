@@ -20,8 +20,8 @@ describe "Organized::MessagesController" do
         get base_url, format: :json
         expect(response.status).to eq(200)
         expect(json_result).to eq("messages" => [])
-        expect(response.headers['Access-Control-Allow-Origin']).not_to be_present
-        expect(response.headers['Access-Control-Request-Method']).not_to be_present
+        expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
+        expect(response.headers["Access-Control-Request-Method"]).not_to be_present
       end
       context "with a message" do
         let!(:organization_message_1) { FactoryBot.create(:organization_message, organization: organization, kind: "geolocated", created_at: Time.now - 1.hour) }
@@ -36,8 +36,8 @@ describe "Organized::MessagesController" do
             sender_id: organization_message_1.sender_id,
             bike: {
               id: bike.id,
-              title: bike.title_string
-            }
+              title: bike.title_string,
+            },
           }
         end
         it "renders json, no cors present" do
@@ -46,8 +46,8 @@ describe "Organized::MessagesController" do
           messages = json_result["messages"]
           expect(messages.count).to eq 1
           expect(messages.first).to eq target.as_json
-          expect(response.headers['Access-Control-Allow-Origin']).not_to be_present
-          expect(response.headers['Access-Control-Request-Method']).not_to be_present
+          expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
+          expect(response.headers["Access-Control-Request-Method"]).not_to be_present
         end
       end
     end

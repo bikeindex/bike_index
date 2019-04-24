@@ -95,36 +95,36 @@ FactoryBot.define do
   end
 
   factory :integration do
-    access_token { '12345teststststs' }
+    access_token { "12345teststststs" }
   end
 
   factory :blog do
     user
-    body { 'Some sweet blog content that everyone loves' }
+    body { "Some sweet blog content that everyone loves" }
     sequence(:title) { |n| "Blog title #{n}" }
   end
 
   factory :feedback do
-    email { 'foo@boy.com' }
-    body { 'This is a test email.' }
-    title { 'New Feedback Submitted' }
-    name { 'Bobby Joe' }
+    email { "foo@boy.com" }
+    body { "This is a test email." }
+    title { "New Feedback Submitted" }
+    name { "Bobby Joe" }
   end
 
   factory :stolen_notification do
     sender { FactoryBot.create(:user) }
     receiver { FactoryBot.create(:user) }
     bike { FactoryBot.create(:bike) }
-    message { 'This is a test email.' }
+    message { "This is a test email." }
   end
 
   factory :customer_contact do
     creator { FactoryBot.create(:user) }
     bike { FactoryBot.create(:bike) }
-    title { 'Some title' }
-    body { 'some message' }
-    creator_email { 'something@example.com' }
-    user_email { 'something_else@example.com' }
-    contact_type { 'stolen_message' }
+    title { "Some title" }
+    body { "some message" }
+    creator_email { "something@example.com" }
+    user_email { "something_else@example.com" }
+    contact_type { "stolen_message" }
   end
 end
