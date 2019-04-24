@@ -31,7 +31,7 @@ class ComponentCreator
       component[:ctype_id] = ctype.id
     else
       component[:ctype_id] = Ctype.unknown.id
-      component[:ctype_other] = name 
+      component[:ctype_other] = name
     end
     component.delete :component_type
     component
@@ -50,7 +50,7 @@ class ComponentCreator
       ctype_other: component[:ctype_other],
       manufacturer_id: component[:manufacturer_id],
       manufacturer_other: component[:manufacturer_other],
-      mnfg_name: component[:manufacturer_name] || component[:manufacturer_name] || component[:mnfg_name]
+      mnfg_name: component[:manufacturer_name] || component[:manufacturer_name] || component[:mnfg_name],
     }
     comp_attributes.select { |k, v| v.present? }
   end
@@ -62,10 +62,10 @@ class ComponentCreator
   end
 
   def update_components_from_params
-    @b_param['components'].each_with_index do |comp, index|
-      if comp['id'].present?
-        component = @bike.components.find(comp['id'])
-        (component.destroy && next) if comp['destroy'] || comp['_destroy'] == '1'
+    @b_param["components"].each_with_index do |comp, index|
+      if comp["id"].present?
+        component = @bike.components.find(comp["id"])
+        (component.destroy && next) if comp["destroy"] || comp["_destroy"] == "1"
       else
         component = @bike.components.new
       end
@@ -76,12 +76,12 @@ class ComponentCreator
   end
 
   def create_components_from_params
-    if @b_param.present? && @b_param.params.present? && @b_param.params['components'].present?
-      (0...@b_param.params['components'].count).to_a.each do |c_number|
-        if @b_param.params['components'].kind_of?(Array)
-          component = @b_param.params['components'][c_number].with_indifferent_access
+    if @b_param.present? && @b_param.params.present? && @b_param.params["components"].present?
+      (0...@b_param.params["components"].count).to_a.each do |c_number|
+        if @b_param.params["components"].kind_of?(Array)
+          component = @b_param.params["components"][c_number].with_indifferent_access
         else
-          component = @b_param.params['components'][c_number.to_s].with_indifferent_access
+          component = @b_param.params["components"][c_number.to_s].with_indifferent_access
         end
         component = set_manufacturer_key(component)
         component = set_component_type(component)
@@ -89,5 +89,4 @@ class ComponentCreator
       end
     end
   end
-
 end

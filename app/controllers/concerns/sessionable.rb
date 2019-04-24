@@ -1,5 +1,6 @@
 module Sessionable
   extend ActiveSupport::Concern
+
   def skip_if_signed_in
     store_return_to
     # Make absolutely sure we don't have an unconfirmed user
@@ -42,7 +43,7 @@ module Sessionable
   def cookie_options(user)
     c = {
       httponly: true,
-      value: [user.id, user.auth_token]
+      value: [user.id, user.auth_token],
     }
     # In development, secure: true breaks the cookie storage. Only add if production
     Rails.env.production? ? c.merge(secure: true) : c

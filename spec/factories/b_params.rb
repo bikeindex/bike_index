@@ -26,8 +26,8 @@ FactoryBot.define do
               revised_new: true,
               manufacturer_id: manufacturer.id,
               owner_email: owner_email,
-              creation_organization_id: organization.id
-            }
+              creation_organization_id: organization.id,
+            },
           }
         end
       end
@@ -36,8 +36,8 @@ FactoryBot.define do
           {
             bike: {
               owner_email: owner_email,
-              creation_organization_id: organization.id
-            }
+              creation_organization_id: organization.id,
+            },
           }
         end
       end
@@ -47,8 +47,8 @@ FactoryBot.define do
             bike: {
               owner_email: owner_email,
               creation_organization_id: organization.id,
-              stolen: true
-            }
+              stolen: true,
+            },
           }
         end
       end

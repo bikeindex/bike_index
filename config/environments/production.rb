@@ -1,6 +1,6 @@
 Rails.application.configure do
   # Verifies that versions and hashed value of the package contents in the project's package.json
-config.webpacker.check_yarn_integrity = false
+  config.webpacker.check_yarn_integrity = false
 
   # Settings specified here will take precedence over those in config/application.rb.
   # Use lograge for logging to production
@@ -10,7 +10,7 @@ config.webpacker.check_yarn_integrity = false
   config.lograge.custom_options = lambda do |event|
     {
       remote_ip: event.payload[:ip],
-      params: event.payload[:params].except('controller', 'action', 'format', 'id')
+      params: event.payload[:params].except("controller", "action", "format", "id"),
     }
   end
 
@@ -27,7 +27,7 @@ config.webpacker.check_yarn_integrity = false
   config.eager_load = true
 
   # Full error reports are disabled and caching is turned on.
-  config.consider_all_requests_local       = false
+  config.consider_all_requests_local = false
   config.action_controller.perform_caching = true
   config.cache_store = :dalli_store, { namespace: Bikeindex, expires_in: 0, compress: true }
 
@@ -39,7 +39,7 @@ config.webpacker.check_yarn_integrity = false
 
   # Disable serving static files from the `/public` folder by default since
   # Apache or NGINX already handles this.
-  config.serve_static_files = ENV['RAILS_SERVE_STATIC_FILES'].present?
+  config.serve_static_files = ENV["RAILS_SERVE_STATIC_FILES"].present?
 
   # Compress JavaScripts and CSS.
   config.assets.js_compressor = :uglifier
@@ -81,6 +81,6 @@ config.webpacker.check_yarn_integrity = false
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  config.action_mailer.default_url_options = { protocol: 'https', host: 'bikeindex.org' }
+  config.action_mailer.default_url_options = { protocol: "https", host: "bikeindex.org" }
   config.action_mailer.delivery_method = :smtp
 end

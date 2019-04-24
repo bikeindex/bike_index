@@ -7,7 +7,7 @@
         = recovery_display.quote.html_safe
     %span.recovery-user
       - if recovery_display.image.present?
-        %img{ data: { lazy: recovery_display.image_url(:medium) }}
+        %img{ src: recovery_display.image_url(:medium)}
       - else
         %span.no-image-spacer
       - if recovery_display.quote_by

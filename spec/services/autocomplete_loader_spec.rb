@@ -1,8 +1,8 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe AutocompleteLoader do
-  describe 'reload' do
-    it 'calls all the things' do
+  describe "reload" do
+    it "calls all the things" do
       autocomplete_loader = AutocompleteLoader.new
       expect(autocomplete_loader).to receive(:clear)
       expect(autocomplete_loader).to receive(:load_colors)

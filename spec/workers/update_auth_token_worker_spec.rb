@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe UpdateAuthTokenWorker do
   let(:subject) { UpdateAuthTokenWorker }
@@ -7,7 +7,7 @@ describe UpdateAuthTokenWorker do
     expect(subject.sidekiq_options["queue"]).to eq "high_priority"
   end
 
-  it 'updates the auth token' do
+  it "updates the auth token" do
     user = FactoryBot.create(:user)
     old_t = user.auth_token
     UpdateAuthTokenWorker.new.perform(user.id)

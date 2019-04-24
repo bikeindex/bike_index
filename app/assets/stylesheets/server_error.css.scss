@@ -2,7 +2,7 @@
 
 body {
   font-size: 100%;
-  background: url('https://files.bikeindex.org/background-diagonal.png');
+  background: url("https://files.bikeindex.org/background-diagonal.png");
   font-family: "Helvetica", arial, sans-serif;
 }
 
@@ -10,6 +10,7 @@ a {
   cursor: pointer;
   text-decoration: none;
   color: #08c;
+
   &:hover {
     text-decoration: underline;
     color: darken(#08c, 10%);
@@ -31,13 +32,14 @@ a {
 }
 
 p {
-  margin: 0 0 .5em;
+  margin: 0 0 0.5em;
   width: 100%;
   text-align: center;
 }
+
 h4 {
   font-size: 1.2em;
-  margin: .5em 0 1em;
+  margin: 0.5em 0 1em;
   text-align: center;
 }
 
@@ -45,8 +47,9 @@ h4 {
   .ascii {
     font-size: 45px;
   }
+
   h4 {
     font-size: 1.8em;
-    margin-bottom: .2em;
+    margin-bottom: 0.2em;
   }
 }

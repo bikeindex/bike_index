@@ -1,13 +1,12 @@
 
 # This is deprecated and should be removed or refactored eventually. Check AfterBikeSaveWorker
 class WebhookRunner
+  require "httparty"
 
-  require 'httparty'
-  
   def make_request(url)
     begin
       response = HTTParty.get(url,
-        :headers => { 'Content-Type' => 'application/json' } )
+                              :headers => { "Content-Type" => "application/json" })
       JSON.parse(response.body)
     rescue => e
       e.message
@@ -39,5 +38,4 @@ class WebhookRunner
   def redis
     Redis.current
   end
-
 end

@@ -1,73 +1,73 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Admin::OrganizationsController, type: :controller do
   let(:organization) { FactoryBot.create(:organization, approved: false) }
   include_context :logged_in_as_super_admin
 
-  describe 'index' do
-    it 'renders' do
+  describe "index" do
+    it "renders" do
       get :index
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
     end
   end
 
-  describe 'edit' do
-    it 'renders' do
+  describe "edit" do
+    it "renders" do
       get :edit, id: organization.to_param
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)
     end
   end
 
-  describe 'organization update' do
+  describe "organization update" do
     let(:state) { FactoryBot.create(:state) }
     let(:country) { state.country }
     let(:parent_organization) { FactoryBot.create(:organization) }
-    let(:location_1) { FactoryBot.create(:location, organization: organization, street: 'old street', name: 'cool name') }
+    let(:location_1) { FactoryBot.create(:location, organization: organization, street: "old street", name: "cool name") }
     let(:update_attributes) do
       {
-        name: 'new name thing stuff',
+        name: "new name thing stuff",
         show_on_map: true,
-        kind: 'shop',
+        kind: "shop",
         parent_organization_id: parent_organization.id,
         ascend_name: "party on",
         locations_attributes: {
-          '0' => {
+          "0" => {
             id: location_1.id,
-            name: 'First shop',
-            zipcode: '2222222',
-            city: 'First city',
+            name: "First shop",
+            zipcode: "2222222",
+            city: "First city",
             state_id: state.id,
             country_id: country.id,
-            street: 'some street 2',
-            phone: '7272772727272',
-            email: 'stuff@goooo.com',
+            street: "some street 2",
+            phone: "7272772727272",
+            email: "stuff@goooo.com",
             latitude: 22_222,
             longitude: 11_111,
             organization_id: 844,
             shown: false,
-            _destroy: 0
+            _destroy: 0,
           },
           Time.zone.now.to_i.to_s => {
             created_at: Time.zone.now.to_f.to_s,
-            name: 'Second shop',
-            zipcode: '12243444',
-            city: 'cool city',
+            name: "Second shop",
+            zipcode: "12243444",
+            city: "cool city",
             state_id: state.id,
             country_id: country.id,
-            street: 'some street 2',
-            phone: '7272772727272',
-            email: 'stuff@goooo.com',
+            street: "some street 2",
+            phone: "7272772727272",
+            email: "stuff@goooo.com",
             latitude: 22_222,
             longitude: 11_111,
             organization_id: 844,
-            shown: false
-          }
-        }
+            shown: false,
+          },
+        },
       }
     end
-    it 'updates the organization' do
+    it "updates the organization" do
       expect(location_1).to be_present
       expect do
         put :update, organization_id: organization.to_param, id: organization.to_param, organization: update_attributes
@@ -79,7 +79,7 @@ describe Admin::OrganizationsController, type: :controller do
       # Existing location is updated
       location_1.reload
       expect(location_1.organization).to eq organization
-      update_attributes[:locations_attributes]['0'].except(:latitude, :longitude, :organization_id, :created_at, :_destroy).each do |k, v|
+      update_attributes[:locations_attributes]["0"].except(:latitude, :longitude, :organization_id, :created_at, :_destroy).each do |k, v|
         expect(location_1.send(k)).to eq v
       end
       # still existing location

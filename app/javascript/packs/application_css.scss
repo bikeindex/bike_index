@@ -24,6 +24,18 @@ footer.primary-footer {
   }
 }
 
-.full-screen-table-wrapper {
-  overflow-x: scroll;
+.admin-subnav {
+  @extend .mt-4;
+  @extend .mb-4;
+  @extend .row;
+  border-bottom: 1px solid $gray-400;
+  padding-bottom: 20px;
+  ul {
+    @extend .nav;
+    @extend .nav-pills;
+  }
+  .subtitle {
+    @extend .mt-4;
+    @extend .col-12;
+  }
 }

@@ -8,7 +8,7 @@ class BikeIndex.Views.Global extends Backbone.View
     'click .no-tab':                        'openNewWindow'
     'click #expand_user':                   'expandUserNav'
     'click #most_recent_stolen_bikes':      'mostRecentStolen'
-    
+
   initialize: ->
     # BikeIndex.hideFlash() # not sure that it's something we ever want
     @setElement($('#body'))
@@ -55,7 +55,7 @@ class BikeIndex.Views.Global extends Backbone.View
       $this.text(moment().format("z"))
       $this.removeClass("convertTimezone")
     $(".hiddenFieldTimezone").val(window.timezone)
-    
+
   openNewWindow: (e) ->
     e.preventDefault()
     target = $(e.target)
@@ -79,8 +79,8 @@ class BikeIndex.Views.Global extends Backbone.View
   scrollToRef: (event) ->
     event.preventDefault()
     target = $(event.target).attr('href')
-    $('body').animate( 
-      scrollTop: ($(target).offset().top - 20), 'fast' 
+    $('body').animate(
+      scrollTop: ($(target).offset().top - 20), 'fast'
     )
 
   #
@@ -175,7 +175,7 @@ class BikeIndex.Views.Global extends Backbone.View
         item: (item, escape) ->
           if item.id == 'serial'
             "<div><span class='search_span_s'>serial</span> #{item.text}</div>"
-          else  
+          else
             "<div> #{item.text}</div>"
         option_create: (data, escape) ->
           # For some reason, without &hellip; at the end of this it breaks
@@ -187,7 +187,7 @@ class BikeIndex.Views.Global extends Backbone.View
       onType: (str) ->
         for k in Object.keys(this.options)
           # If they are serial ids
-          if k.match /^s\#/ 
+          if k.match /^s\#/
             # if the serials are longer than the current str, delete them
             # Also delete them if we're down to 2 chars
             delete this.options[k] if (k.length > str + 3) || str.length < 3
@@ -217,8 +217,8 @@ class BikeIndex.Views.Global extends Backbone.View
         'entered'
     "<div>#{prefix} <span class='label'>" + escape(item.text) + '</span></div>'
 
-  # 
-  # 
+  #
+  #
   # Page specific things I've been too lazy to make separate backbone views
 
   setLightspeedMovie: ->
@@ -235,12 +235,12 @@ class BikeIndex.Views.Global extends Backbone.View
       dataType: "jsonp",
       success: (location) ->
         $('#stolen-proximity #proximity').val("#{location.region_name}")
-        loadStolenWidget(location) if $('#sbr-body').length > 0      
+        loadStolenWidget(location) if $('#sbr-body').length > 0
 
 
 
-  # 
-  # 
+  #
+  #
   # Old layout things. Delete once everything is updated
 
   toggleCollapsibleHeader: ->
@@ -262,17 +262,17 @@ class BikeIndex.Views.Global extends Backbone.View
       $('#header-tabs .global-tabs li').removeClass('active')
       $('#header-tabs').removeClass('visibled')
       $('#total-top-header').removeClass('header-tabs-in')
-    else 
+    else
       # console.log(target)
       # $('#session_email').focus() if target.hasClass('.expand-sign-in')
       # console.log('hihih')
       window.setTimeout (->
         $('#session_email').focus()
       ), 500
-      
-      
+
+
       $('#total-top-header').addClass('header-tabs-in')
-      if $('#header-tabs .tab-content').hasClass('visibled') 
+      if $('#header-tabs .tab-content').hasClass('visibled')
         target.tab('show')
       else
         $('#header-tabs').addClass('visibled')

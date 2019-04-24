@@ -1,44 +1,62 @@
 .form-well {
   .form-wrap {
-    padding: 2 * $vertical-height 0 4 * $vertical-height;
+    padding: (2 * $vertical-height) 0 (4 * $vertical-height);
   }
+
   .form-well-input-static {
-    @include make-col-ready();
+    @include make-col-ready;
+
     @extend .form-control-static;
+
     font-weight: $strong-font-weight;
-    line-height: 1.5; // to match the height of inputs
-    padding-left: 1.6875rem; // static padding: 0.9375 + input padding: 0.75
+    line-height: 1.5;
+
+    // to match the height of inputs
+    padding-left: 1.6875rem;
+
+    // static padding: 0.9375 + input padding: 0.75
     padding-right: 1.6875rem;
   }
+
   .form-well-input-static-full-width {
     @extend .form-well-input-static;
   }
+
   .right-input-help.right-text-help {
     font-style: italic;
     line-height: 1.2;
+
     a {
       color: $body-font-color;
       cursor: pointer;
+
       &:hover,
       &:active,
       &.active {
         color: $link-color;
       }
     }
+
     &.full-width {
       max-width: 100%;
       margin-top: -0.6rem;
     }
   }
+
   .full-width-checkbox-help {
     @extend .below-input-help;
+
     margin: -1em 0 0 17px;
   }
+
   .selectize-control {
     line-height: 0;
-  } // label isn't lined up
+  }
+
+  // label isn't lined up
   .inline-input-help {
     @extend .form-circle-item;
+
     display: block;
     border: 2px solid $gray;
     position: absolute;
@@ -47,6 +65,7 @@
     font-weight: $strong-font-weight;
     z-index: 100;
     transition: all 0.05s linear;
+
     &:hover,
     &:active,
     &.active {
@@ -55,43 +74,56 @@
       color: $link-color;
     }
   }
+
   .fancy-select .inline-input-help {
     right: 2.75em;
-  } // To not cover up select pointer
+  }
+
+  // To not cover up select pointer
   .form-well-label {
     @extend .form-control-label;
+
     line-height: 1.2em;
     padding-top: 0.65rem;
   }
+
   .form-well-label,
   .form-well-input,
   .form-well-input-large,
   .right-input-help {
-    @include make-col-ready();
+    @include make-col-ready;
   }
+
   .related-fields {
     .form-group {
       padding-top: 0.5 * $vertical-height;
       margin-bottom: 0;
+
       &:first-of-type {
         padding-top: 0;
       }
     }
+
     padding-bottom: 1.5 * $vertical-height;
   }
+
   .full-width-section {
     // pad the sides so that it fits the row.
     padding-left: $row-side-padding;
     padding-right: $row-side-padding;
   }
+
   .form-group {
     clear: both;
+
     .checkbox-inline {
       padding-top: 0.5em;
     }
+
     .form-well-input .checkbox-inline {
       padding-top: 0;
     }
+
     .radio-inline,
     .checkbox-inline {
       input[type="radio"],
@@ -100,17 +132,21 @@
       }
     }
   }
+
   .row.collapse.in {
     display: flex;
   }
+
   .full-width-button {
-    padding: 2 * $vertical-height 0;
+    padding: (2 * $vertical-height) 0;
+
     .btn {
       display: block;
       margin: 0 auto;
       max-width: 450px;
     }
   }
+
   hr {
     clear: both;
     margin-top: 3 * $vertical-height;
@@ -124,48 +160,64 @@
     .form-well-input {
       @include make-col(8);
     }
+
     .form-well-label {
       @include make-col(4);
     }
+
     .form-well-input-large,
     .form-well-label-large-input {
       @include make-col(12);
     }
+
     .form-well-label-large-input {
       padding-top: 0;
     }
+
     .right-input-help {
       @include make-col-offset(4);
+
       @include make-col(8);
+
       margin-top: -0.5em;
+
       label {
         padding-top: 0.5em;
-      } // To pad checkboxes a bit
+      }
+
+      // To pad checkboxes a bit
       text-align: right;
     }
+
     .unnested-field::after,
     .related-fields::after {
       content: "";
       display: block;
-      margin: 0 15px 2 * $vertical-height 10%;
+      margin: 0 15px (2 * $vertical-height) 10%;
       border-bottom: 1px $form-well-divider-color solid;
       padding-top: $vertical-height;
     }
+
     // .related-fields::after aren't the same width as unnessted-fields because they aren't rows
     // This is a fairly good approximation of their differences is widths - a few px off tho
     .related-fields::after {
       width: 90%;
     }
+
     .unnested-field::after {
       width: 87.5%;
       margin-left: 12.5%;
     }
+
     .no-divider-row::after {
       display: none;
     }
+
     hr {
       margin-top: 5 * $vertical-height;
-    } // It isn't cleared correctly on small screens
+    }
+
+    // It isn't cleared correctly on small screens
   }
 }
 
@@ -177,15 +229,19 @@
     .form-well-input-static {
       @include make-col(6);
     }
+
     .form-well-input-large,
     .form-well-input-static-full-width {
       @include make-col(8);
     }
+
     .form-well-label {
       @include make-col(3);
     }
+
     .right-input-help {
       @include make-col(3);
+
       &.full-width {
         text-align: right;
         flex: 0 0 100%;
@@ -198,10 +254,12 @@
   .form-well-container.container {
     max-width: 100%;
     background: $form-well-background;
+
     .form-well {
       width: 100%;
     }
   }
+
   // This is the selector we put everything under, don't overpower by including in
   // .form-well-container.container above - that's for a special case
   // .form-well { }
@@ -211,6 +269,7 @@
   .form-well {
     background: $form-well-background;
     border: 1px solid $form-well-border-color;
+
     // label is 3 columns.
   }
 }
@@ -220,16 +279,20 @@
     padding-left: 2 * $row-side-padding;
     padding-right: 2 * $row-side-padding;
   }
+
   // because we have to use floats instead of flex with sticky (affixing edit menu)
   .form-well-container.container > .row {
     display: block;
+
     @include clearfix;
+
     .col-md-8.form-well {
       display: block;
       float: right;
       width: 66.66667%;
     }
   }
+
   // To properly space the sides of the containers
   .form-wrap .row {
     margin-left: 0;
@@ -244,6 +307,7 @@
   .form-well-container.container {
     margin-bottom: -$primary-footer-top-margin;
   }
+
   // Remove some padding between the forms
   .form-well {
     .form-wrap.secondary-form-wrap {
@@ -260,6 +324,7 @@
     border: none;
     background: none;
   }
+
   .form-well {
     .form-wrap {
       background: $form-well-background;
@@ -267,19 +332,23 @@
       padding-top: 4 * $vertical-height;
       width: 100%;
       position: relative;
+
       .form-control-label {
         text-align: right;
       }
+
       // Add some space between the forms
       &.secondary-form-wrap {
         margin-top: 3 * $vertical-height;
       }
     }
+
     // label is 3 columns
 
     .form-well-input-static {
       @include make-col(6);
     }
+
     .form-well-input-static-full-width {
       @include make-col(9);
     }

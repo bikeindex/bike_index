@@ -44,11 +44,11 @@ class Manufacturer < ActiveRecord::Base
     end
 
     def other
-      where(name: 'Other', frame_maker: true).first_or_create
+      where(name: "Other", frame_maker: true).first_or_create
     end
 
     def fill_stripped(n)
-      n.gsub!(/accell/i, '') if n.match(/accell/i).present?
+      n.gsub!(/accell/i, "") if n.match(/accell/i).present?
       Slugifyer.manufacturer(n)
     end
 
@@ -77,22 +77,23 @@ class Manufacturer < ActiveRecord::Base
   # Also, probably just a good idea in general
   def ensure_non_blocking_name
     return true unless name
-    errors.add(:name, 'Cannot be the same as a color name') if Color.pluck(:name).map(&:downcase).include?(name.strip.downcase)
+    errors.add(:name, "Cannot be the same as a color name") if Color.pluck(:name).map(&:downcase).include?(name.strip.downcase)
   end
 
   before_save :set_slug, :set_website_and_logo_source
+
   def set_slug
     self.slug = Slugifyer.manufacturer(name)
   end
 
   def set_website_and_logo_source
     self.website = website.present? ? Urlifyer.urlify(website) : nil
-    self.logo_source = logo.present? ? (logo_source || 'manual') : nil
+    self.logo_source = logo.present? ? (logo_source || "manual") : nil
     true
   end
 
   def autocomplete_hash_category
-    frame_maker ? 'frame_mnfg' : 'mnfg'
+    frame_maker ? "frame_mnfg" : "mnfg"
   end
 
   def autocomplete_hash_priority
@@ -110,8 +111,8 @@ class Manufacturer < ActiveRecord::Base
       data: {
         slug: slug,
         priority: autocomplete_hash_priority,
-        search_id: search_id
-      }
+        search_id: search_id,
+      },
     }.as_json
   end
 

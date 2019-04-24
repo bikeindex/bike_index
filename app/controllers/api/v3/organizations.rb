@@ -2,18 +2,18 @@ module API
   module V3
     class Organizations < API::Base
       include API::V2::Defaults
-      
+
       resource :organizations do
         helpers do
           def allowed_write_organizations
             application_uid = current_token&.application&.uid
-            ENV['ALLOWED_WRITE_ORGANIZATIONS'].split(',').any?(application_uid)
+            ENV["ALLOWED_WRITE_ORGANIZATIONS"].split(",").any?(application_uid)
           end
         end
 
         desc "Add an Organization to Bike Index<span class='accstr'>*</span>", {
           authorizations: { oauth2: [{ scope: :write_organizations }] },
-          notes: <<-NOTES
+          notes: <<-NOTES,
           **Requires** `write_organizations` **in the access token** you use to create the organization.
           <hr> 
           **Location:** You may optionally include `locations` for the organization.
@@ -35,11 +35,11 @@ module API
             requires :country, type: String, desc: "The location's country", values: Country.valid_names
             optional :zipcode, type: String, desc: "The location's zipcode"
             optional :phone, type: String, desc: "The location's phone number"
-          end 
+          end
         end
 
         # POST /api/v3/organizations
-        post serializer: OrganizationSerializer, root: 'organization' do
+        post serializer: OrganizationSerializer, root: "organization" do
           error!("Unauthorized. Cannot write organiztions", 401) if !allowed_write_organizations
 
           permitted = declared(params, include_missing: false)

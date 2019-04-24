@@ -24,27 +24,27 @@ class BikeV2ShowSerializer < BikeV2Serializer
 
   has_many :public_images
   has_many :components
-  
+
   def type_of_cycle
     object.cycle_type_name
-  end  
-  
+  end
+
   def url
-    "#{ENV['BASE_URL']}/bikes/#{object.id}"
+    "#{ENV["BASE_URL"]}/bikes/#{object.id}"
   end
 
   def api_url
-    "#{ENV['BASE_URL']}/api/v1/bikes/#{object.id}"
+    "#{ENV["BASE_URL"]}/api/v1/bikes/#{object.id}"
   end
 
   def test_bike
     object.example
   end
-  
+
   def registration_created_at
     object.created_at.to_i
   end
-  
+
   def registration_updated_at
     object.updated_at.to_i
   end

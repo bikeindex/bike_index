@@ -19,7 +19,7 @@ describe Organized::MessagesController, type: :controller do
         bike_id: bike.to_param,
         latitude: default_location[:latitude],
         longitude: default_location[:longitude],
-        accuracy: 12
+        accuracy: 12,
       }
     end
 

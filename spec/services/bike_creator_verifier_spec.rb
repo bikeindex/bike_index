@@ -1,5 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe BikeCreatorVerifier do
-
 end
