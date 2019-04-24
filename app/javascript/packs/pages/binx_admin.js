@@ -20,6 +20,9 @@ window.BinxAdmin = class BinxAdmin {
     if ($("#use_image_for_display").length > 0) {
       this.useBikeImageForDisplay();
     }
+    if ($("#admin-locations-fields").length > 0){
+    this.adminLocations()
+    }
     // Enable bootstrap custom file upload boxes
     binxApp.enableFilenameForUploads();
     LoadFancySelects();
@@ -66,6 +69,31 @@ window.BinxAdmin = class BinxAdmin {
         image_btn.text("nvrmind");
       }
       return image_btn.toggleClass("using_bikes");
+    });
+  }
+  adminLocations() {
+    $('form').on('click', '.remove_fields', function(event) {
+      // We don't need to do anything except slide the input up, because the label is on it.
+      return $(this).closest('fieldset').slideUp();
+    });
+      // event.preventDefault()
+    return $('form').on('click', '.add_fields', function(event) {
+      const time = new Date().getTime();
+      const regexp = new RegExp($(this).data('id'), 'g');
+      $(this).before($(this).data('fields').replace(regexp, time));
+      event.preventDefault();
+      const us_val = parseInt($('#us-country-code').text(), 10);
+      for (let location of Array.from($(this).closest('fieldset').find('.country_select_container select'))) {
+        const l = $(location);
+        if (!(l.val().length > 0)) { l.val(us_val); }
+      }
+      const names = $(this).closest('fieldset').find('.location-name-field input');
+      for (let name of Array.from(names)) {
+        const n = $(name);
+        if (!(n.val().length > 0)) { n.val($('#organization_name').val()); }
+      }
+
+      LoadFancySelects();
     });
   }
 };
