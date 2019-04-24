@@ -21,7 +21,7 @@ describe Admin::DashboardController do
 
   context "logged in as admin" do
     include_context :logged_in_as_super_admin
-    description "index" do
+    describe "index" do
       it "renders" do
         # Create the things we look at, so that we ensure it doesn't break
         FactoryBot.create(:ownership)
