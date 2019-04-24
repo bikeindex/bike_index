@@ -306,14 +306,14 @@ describe ApplicationHelper do
     context "direction, sort" do
       let(:passed_params) { { direction: "asc", sort: "stolen", party: "long" } }
       let(:target) { { direction: "asc", sort: "stolen" } }
-      it "returns an empty hash" do
+      it "returns target hash" do
         expect(sortable_search_params.to_unsafe_h).to eq(target.as_json)
       end
     end
     context "direction, sort, search param" do
-      let(:passed_params) { { direction: "asc", sort: "stolen", party: "long", search_stuff: "xxx" } }
-      let(:target) { { direction: "asc", sort: "stolen", search_stuff: "xxx" } }
-      it "returns an empty hash" do
+      let(:passed_params) { { direction: "asc", sort: "stolen", party: "long", search_stuff: "xxx", user_id: 21, organization_id: "xxx" } }
+      let(:target) { { direction: "asc", sort: "stolen", search_stuff: "xxx", user_id: 21, organization_id: "xxx" } }
+      it "returns target hash" do
         expect(sortable_search_params.to_unsafe_h).to eq(target.as_json)
       end
     end
