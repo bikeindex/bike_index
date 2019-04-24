@@ -1,17 +1,11 @@
 require 'spec_helper'
 
 RSpec.describe CreationState, type: :model do
-  describe 'validations' do
-    it { is_expected.to belong_to :bike }
-    it { is_expected.to belong_to :creator }
-    it { is_expected.to belong_to :organization }
-  end
-
-  describe 'origin' do
+  describe 'set_calculated_attributes' do
     context 'unknown origin' do
       it 'ignores an unknown origin' do
         creation_state = CreationState.new(origin: 'SOMEwhere', bike_id: 2)
-        creation_state.ensure_permitted_origin
+        creation_state.set_calculated_attributes
         expect(creation_state.origin).to be_nil
       end
     end
@@ -19,39 +13,67 @@ RSpec.describe CreationState, type: :model do
       let(:origin) { CreationState.origins.last }
       it 'uses the origin' do
         creation_state = CreationState.new(origin: origin)
-        creation_state.ensure_permitted_origin
+        creation_state.set_calculated_attributes
         expect(creation_state.origin).to eq origin
       end
-    end
-    it 'has a before_save callback for ensure_permitted_origin' do
-      expect(CreationState._validation_callbacks.select { |cb| cb.kind.eql?(:before) }
-        .map(&:raw_filter).include?(:ensure_permitted_origin)).to be_truthy
     end
   end
 
   describe 'creation_description' do
+    let(:creation_state) { CreationState.new(organization_id: 1, creator_id: 1) }
+    it 'returns nil' do
+      expect(creation_state.creation_description).to be_nil
+    end
     context 'bulk' do
       let(:creation_state) { CreationState.new(is_bulk: true, origin: 'api_v12') }
       it 'returns bulk reg' do
         expect(creation_state.creation_description).to eq 'bulk reg'
+        expect(creation_state.is_pos).to be_falsey
       end
     end
-    context 'pos' do
-      let(:creation_state) { CreationState.new(is_pos: true, origin: 'embed_extended') }
-      it 'returns pos reg' do
-        expect(creation_state.creation_description).to eq 'pos'
+    context "pos" do
+      let(:creation_state) { CreationState.new(is_pos: true, pos_kind: "lightspeed_pos", origin: 'embed_extended') }
+      before { creation_state.set_calculated_attributes }
+      it "returns pos reg" do
+        expect(creation_state.creation_description).to eq "Lightspeed"
+      end
+      context "ascend" do
+        let(:bulk_import) { BulkImport.new(is_ascend: true) }
+        let(:creation_state) { CreationState.new(bulk_import: bulk_import) }
+        it "returns pos reg" do
+          expect(creation_state.creation_description).to eq "Ascend"
+        end
       end
     end
-    context 'embed_extended' do
-      let(:creation_state) { CreationState.new(origin: 'embed_extended') }
-      it 'returns pos reg' do
-        expect(creation_state.creation_description).to eq 'embed extended'
+    context "embed_extended" do
+      let(:creation_state) { CreationState.new(origin: "embed_extended") }
+      it "returns pos reg" do
+        expect(creation_state.creation_description).to eq "embed extended"
       end
     end
-    context 'nil' do
-      let(:creation_state) { CreationState.new(organization_id: 1, creator_id: 1) }
-      it 'returns nil' do
-        expect(creation_state.creation_description).to be_nil
+  end
+
+  describe "calculated_pos_kind" do
+    let(:creation_state) { CreationState.new }
+    it "returns not_pos" do
+      expect(creation_state.send("calculated_pos_kind")).to eq "not_pos"
+    end
+    context "is_pos" do
+      # We're defaulting to Lightspeed right now, because it's what exists in the database
+      # TODO: make it so we explicitly set bikes to lightspeed_pos from the integration, and all others to other_pos
+      let(:creation_state) { CreationState.new(is_pos: true) }
+      it "returns lightspeed" do
+        expect(creation_state.send("calculated_pos_kind")).to eq "lightspeed_pos"
+      end
+    end
+    context "ascend bulk import" do
+      let(:bulk_import) { BulkImport.new(is_ascend: true) }
+      let(:creation_state) { CreationState.new(bulk_import: bulk_import) }
+      it "returns ascend" do
+        expect(bulk_import.ascend?).to be_truthy
+        expect(creation_state.is_pos).to be_falsey
+        expect(creation_state.send("calculated_pos_kind")).to eq "ascend_pos"
+        expect(creation_state.is_pos).to be_truthy
       end
     end
   end
