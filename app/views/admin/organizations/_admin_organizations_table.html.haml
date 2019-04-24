@@ -34,7 +34,7 @@
             = link_to organization.name, admin_organization_url(organization)
             %small.less-strong
               = "paid" if organization.is_paid
-          %td
+          %td.table-cell-check
             = "&#x2713;".html_safe if organization.approved
           %td
             %span.convertTime
