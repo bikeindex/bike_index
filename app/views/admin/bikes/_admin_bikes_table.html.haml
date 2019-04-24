@@ -1,15 +1,25 @@
 - bikes ||= @bikes
 - no_show_header ||= false
 - show_serial ||= false
+- sortable ||= false
 - unless no_show_header
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
       %th
-        Added&nbsp;<small class="convertTimezone"></small>
+        - if sortable
+          = sortable "id", "Registered"
+        - else
+          Registered
       %th.d-none.d-md-table-cell
-        Sent to
+        - if sortable
+          = sortable "owner_email", "Sent to"
+        - else
+          Sent to
       %th
-        Manufacturer
+        - if sortable
+          = sortable "manufacturer_id"
+        - else
+          Manufacturer
       %th.d-none.d-lg-table-cell
         Info
       %th.d-none.d-sm-table-cell
@@ -63,10 +73,10 @@
             %td.d-none.d-sm-table-cell
               .less-strong-hold
                 - if bike.creation_organization.present?
-                  = link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization)
+                  = link_to bike.creation_organization.name, admin_bikes_path(organization_id: bike.creation_organization.to_param)
                 - if bike.creation_description
                   %span.less-strong-right
                     - if bike.bulk_import.present?
-                      = link_to "bulk import", admin_bulk_import_path(bike.bulk_import), class: "less-strong"
+                      = link_to bike.creation_description, admin_bulk_import_path(bike.bulk_import), class: "less-strong"
                     - else
                       = bike.creation_description
