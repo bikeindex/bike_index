@@ -6,7 +6,7 @@ module ControllerHelpers
 
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
-                  :active_organization, :current_organization, :set_current_organization,
+                  :active_organization, :current_organization,
                   :controller_namespace, :page_id, :recovered_bike_count
     before_filter :enable_rack_profiler
   end
