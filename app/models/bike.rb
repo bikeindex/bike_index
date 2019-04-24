@@ -53,9 +53,9 @@ class Bike < ActiveRecord::Base
   validates_presence_of :primary_frame_color_id
 
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications,
-    :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
-    :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
-    :b_param_id_token, :address, :address_city, :address_state, :address_zipcode
+                :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
+                :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
+                :b_param_id_token, :address, :address_city, :address_state, :address_zipcode
 
   attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
 
@@ -90,9 +90,9 @@ class Bike < ActiveRecord::Base
                               }
 
   pg_search_scope :admin_search,
-    against: { owner_email: "A" },
-    associated_against: { ownerships: :owner_email, creator: :email },
-    using: { tsearch: { dictionary: "english", prefix: true } }
+                  against: { owner_email: "A" },
+                  associated_against: { ownerships: :owner_email, creator: :email },
+                  using: { tsearch: { dictionary: "english", prefix: true } }
 
   class << self
     def old_attr_accessible
@@ -153,7 +153,7 @@ class Bike < ActiveRecord::Base
   def creation_state; creation_states.first end
 
   def creation_description; creation_state&.creation_description end
-  
+
   def bulk_import; creation_state&.bulk_import end
 
   def pos_kind; creation_state&.pos_kind end
