@@ -74,6 +74,26 @@ describe "Bikes API V3" do
       end
     end
 
+    context "given the bike being created already exists" do
+      it "does not create a new record" do
+        token = create_doorkeeper_token(scopes: "read_bikes write_bikes unconfirmed")
+
+        post "/api/v3/bikes?access_token=#{token.token}", bike_attrs.to_json, json_headers
+        bike_1_id = JSON.parse(response.body)&.[]("bike")&.[]("id")
+        expect(response.code).to eq("201")
+        expect(response).to be_created
+
+        post "/api/v3/bikes?access_token=#{token.token}", bike_attrs.to_json, json_headers
+        bike_2_id = JSON.parse(response.body)&.[]("bike")&.[]("id")
+        expect(bike_2_id).to eq(bike_1_id)
+
+        expect(response.code).to eq("302")
+        expect(response).to be_found
+      end
+
+      it "updates the pre-existing record if the bike has already been registered"
+    end
+
     it "creates a non example bike, with components and " do
       manufacturer = FactoryBot.create(:manufacturer)
       FactoryBot.create(:ctype, name: "wheel")
