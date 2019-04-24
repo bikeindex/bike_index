@@ -6,6 +6,7 @@ class Feedback < ActiveRecord::Base
   attr_accessor :additional # spam block attribute
 
   after_create :notify_admins
+
   def notify_admins
     return true if no_notification_types.include?(feedback_type)
     EmailFeedbackNotificationWorker.perform_async(id)
@@ -32,6 +33,6 @@ class Feedback < ActiveRecord::Base
 
   def lead_type
     return nil unless feedback_type && feedback_type =~ /lead_for_/
-    feedback_type.gsub(/lead_for_/, '').humanize
+    feedback_type.gsub(/lead_for_/, "").humanize
   end
 end

@@ -1,14 +1,14 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Admin::UsersController do
-  describe 'edit' do
+  describe "edit" do
     xit "404s if the user doesn't exist" do
       # I have no idea why this fails. It works really, but not in tests!
       expect do
-        get :edit, id: 'STUFFFFFF'
+        get :edit, id: "STUFFFFFF"
       end.to raise_error(ActionController::RoutingError)
     end
-    it 'shows the edit page if the user exists' do
+    it "shows the edit page if the user exists" do
       admin = FactoryBot.create(:admin)
       user = FactoryBot.create(:user)
       set_current_user(admin)
@@ -17,23 +17,23 @@ describe Admin::UsersController do
     end
   end
 
-  describe 'update' do
-    context 'non developer' do
+  describe "update" do
+    context "non developer" do
       it "updates all the things that can be edited (finding via user id)" do
         admin = FactoryBot.create(:admin)
         user = FactoryBot.create(:user, confirmed: false)
         set_current_user(admin)
         post :update, id: user.id, user: {
-          name: 'New Name',
-          email: 'newemailexample.com',
-          confirmed: true,
-          superuser: true,
-          developer: true,
-          can_send_many_stolen_notifications: true,
-          banned: true
-        }
-        expect(user.reload.name).to eq('New Name')
-        expect(user.email).to eq('newemailexample.com')
+                        name: "New Name",
+                        email: "newemailexample.com",
+                        confirmed: true,
+                        superuser: true,
+                        developer: true,
+                        can_send_many_stolen_notifications: true,
+                        banned: true,
+                      }
+        expect(user.reload.name).to eq("New Name")
+        expect(user.email).to eq("newemailexample.com")
         expect(user.confirmed).to be_truthy
         expect(user.superuser).to be_truthy
         expect(user.developer).to be_falsey
@@ -41,19 +41,19 @@ describe Admin::UsersController do
         expect(user.banned).to be_truthy
       end
     end
-    context 'developer' do
-      it 'updates developer' do
+    context "developer" do
+      it "updates developer" do
         admin = FactoryBot.create(:admin_developer)
         set_current_user(admin)
         user = FactoryBot.create(:user)
 
         post :update, id: user.username, user: {
-          developer: true,
-          email: user.email,
-          superuser: false,
-          can_send_many_stolen_notifications: true,
-          banned: true
-        }
+                        developer: true,
+                        email: user.email,
+                        superuser: false,
+                        can_send_many_stolen_notifications: true,
+                        banned: true,
+                      }
         user.reload
         expect(user.developer).to be_truthy
       end

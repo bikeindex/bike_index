@@ -1,6 +1,6 @@
 class EmailRecoveredFromLinkWorker
   include Sidekiq::Worker
-  sidekiq_options queue: 'notify'
+  sidekiq_options queue: "notify"
   sidekiq_options backtrace: true
 
   def perform(stolen_record_id)

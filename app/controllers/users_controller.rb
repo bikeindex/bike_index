@@ -77,7 +77,7 @@ class UsersController < ApplicationController
   def show
     user = User.find_by_username(params[:id])
     unless user
-      raise ActionController::RoutingError.new('Not Found')
+      raise ActionController::RoutingError.new("Not Found")
     end
     @owner = user
     @user = user.decorate
@@ -115,28 +115,28 @@ class UsersController < ApplicationController
     if !@user.errors.any? && @user.update_attributes(permitted_update_parameters)
       AfterUserChangeWorker.perform_async(@user.id)
       if params[:user][:terms_of_service].present?
-        if params[:user][:terms_of_service] == '1'
+        if params[:user][:terms_of_service] == "1"
           @user.terms_of_service = true
           @user.save
-          flash[:success] = 'Thanks! Now you can use Bike Index'
+          flash[:success] = "Thanks! Now you can use Bike Index"
           redirect_to user_home_url and return
         else
-          flash[:notice] = 'You have to accept the Terms of Service if you would like to use Bike Index'
+          flash[:notice] = "You have to accept the Terms of Service if you would like to use Bike Index"
           redirect_to accept_vendor_terms_url and return
         end
       elsif params[:user][:vendor_terms_of_service].present?
-        if params[:user][:vendor_terms_of_service] == '1'
+        if params[:user][:vendor_terms_of_service] == "1"
           @user.accept_vendor_terms_of_service
           if @user.memberships.any?
             flash[:success] = "Thanks! Now you can use Bike Index as #{@user.memberships.first.organization.name}"
           else
-            flash[:success] = 'Thanks for accepting the terms of service!'
+            flash[:success] = "Thanks for accepting the terms of service!"
           end
           redirect_to user_home_url and return
           # TODO: Redirect to the correct page, somehow this breaks things right now though.
           # redirect_to organization_home and return
         else
-          redirect_to accept_vendor_terms_url, notice: 'You have to accept the Terms of Service if you would like to use Bike Index as through the organization' and return
+          redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as through the organization" and return
         end
       end
       if params[:user][:password].present?
@@ -145,7 +145,7 @@ class UsersController < ApplicationController
         @user.reload
         default_session_set(@user)
       end
-      flash[:success] = 'Your information was successfully updated.'
+      flash[:success] = "Your information was successfully updated."
       redirect_to my_account_url(page: params[:page]) and return
     end
     @page_errors = @user.errors.full_messages
@@ -171,7 +171,7 @@ class UsersController < ApplicationController
   def unsubscribe
     user = User.find_by_username(params[:id])
     user.update_attribute :notification_newsletters, false if user.present?
-    flash[:success] = 'You have been unsubscribed from Bike Index updates'
+    flash[:success] = "You have been unsubscribed from Bike Index updates"
     redirect_to user_root_url and return
   end
 
@@ -188,17 +188,17 @@ class UsersController < ApplicationController
 
   def permitted_update_parameters
     pparams = permitted_parameters.except(:email, :password_reset_token)
-    if pparams.keys.include?('username')
-      pparams.delete('username') unless pparams['username'].present?
+    if pparams.keys.include?("username")
+      pparams.delete("username") unless pparams["username"].present?
     end
     pparams
   end
 
   def edit_templates
     @edit_templates ||= {
-      root: 'User Settings',
-      password: 'Password',
-      sharing: 'Sharing + Personal Page'
+      root: "User Settings",
+      password: "Password",
+      sharing: "Sharing + Personal Page",
     }.as_json
   end
 

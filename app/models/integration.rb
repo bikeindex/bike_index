@@ -2,7 +2,6 @@ class IntegrationAssociationError < StandardError
 end
 
 class Integration < ActiveRecord::Base
-
   validates_presence_of :access_token
   validates_presence_of :information
 
@@ -11,10 +10,11 @@ class Integration < ActiveRecord::Base
   belongs_to :user
 
   before_create :associate_with_user
+
   def associate_with_user
-    self.provider_name ||= information['provider']
-    if provider_name == 'facebook' || provider_name == 'strava'
-      update_or_create_user(email: information['info']['email'], name: information['info']['name'])
+    self.provider_name ||= information["provider"]
+    if provider_name == "facebook" || provider_name == "strava"
+      update_or_create_user(email: information["info"]["email"], name: information["info"]["name"])
     end
   end
 

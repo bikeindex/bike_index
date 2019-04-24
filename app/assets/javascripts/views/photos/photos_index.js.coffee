@@ -1,5 +1,5 @@
 class BikeIndex.Views.PhotosIndex extends Backbone.View
-    
+
   initialize: ->
     @initializeFlipPhotos()
 
@@ -16,7 +16,7 @@ class BikeIndex.Views.PhotosIndex extends Backbone.View
     for num in photo_numbers
       delay = delay + (200*Math.random())
       @photoFlip(num, delay)
-      
+
 
   photoFlip: (photo_number, delay) ->
     if $("#photo#{photo_number}").length > 0
@@ -25,10 +25,10 @@ class BikeIndex.Views.PhotosIndex extends Backbone.View
       $("#photo#{photo_number} .back").html("<img src='#{img_src}'>")
       setTimeout ( ->
         $("#photo#{photo_number}").fadeTo(200, 1)
-        setTimeout ( -> 
+        setTimeout ( ->
           $("#photo#{photo_number}").addClass('uncover')
         ), 300
-        setTimeout ( -> 
+        setTimeout ( ->
           # $("#photo#{photo_number} .front-behind").fadeIn()
           $("#photo#{photo_number} .front-behind").append("<img src='#{img_src}'>").fadeIn()
         ), 900

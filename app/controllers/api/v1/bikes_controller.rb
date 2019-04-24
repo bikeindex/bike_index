@@ -12,17 +12,17 @@ module Api
         tags = []
         Color.unscoped.commonness.each { |i| tags << i.name }
         HandlebarType::NAMES.values.each { |name| tags << name }
-        FrameMaterial::NAMES.values.each  { |name| tags << name }
+        FrameMaterial::NAMES.values.each { |name| tags << name }
         WheelSize.unscoped.commonness.each { |i| tags << "#{i.name} wheel" }
         Manufacturer.all.each { |i| tags << i.name }
         CycleType::NAMES.values.each { |name| tags << name }
-        respond_with tags, root: 'tags'
+        respond_with tags, root: "tags"
       end
 
       def index
-        if params[:proximity] == 'ip'
-          if Rails.env == 'production'
-            params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(',')[0]
+        if params[:proximity] == "ip"
+          if Rails.env == "production"
+            params[:proximity] = request.env["HTTP_X_FORWARDED_FOR"].split(",")[0]
           else
             params[:proximity] = request.remote_ip
           end
@@ -50,7 +50,7 @@ module Api
       end
 
       def close_serials
-        response = {bikes: []}
+        response = { bikes: [] }
         response = BikeSearcher.new(params).close_serials.limit(20) if params[:serial].present?
         respond_with response
       end
@@ -63,21 +63,21 @@ module Api
         params = de_string_params
         raise StandardError unless params[:bike].present?
         params[:bike][:creation_organization_id] = @organization.id
-        @b_param = BParam.create(creator_id: @organization.auto_user.id, params: permitted_b_params, origin: 'api_v1')
+        @b_param = BParam.create(creator_id: @organization.auto_user.id, params: permitted_b_params, origin: "api_v1")
         bike = BikeCreator.new(@b_param).create_bike
         if @b_param.errors.blank? && @b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
-          render json: {bike: { web_url: bike_url(bike), api_url: api_v1_bike_url(bike)}} and return
+          render json: { bike: { web_url: bike_url(bike), api_url: api_v1_bike_url(bike) } } and return
         else
           if bike.present?
             e = bike.errors.full_messages.to_sentence
           else
             e = @b_param.errors.full_messages.to_sentence
           end
-          Feedback.create(email: 'contact@bikeindex.org', name: 'Error mailer', title: 'API Bike Creation error!', body: e)
+          Feedback.create(email: "contact@bikeindex.org", name: "Error mailer", title: "API Bike Creation error!", body: e)
           render json: e, status: :unprocessable_entity and return
         end
       end
-   
+
       def authenticate_organization
         organization = Organization.friendly_find(params[:organization_slug])
         if organization.present? && organization.access_token == params[:access_token]

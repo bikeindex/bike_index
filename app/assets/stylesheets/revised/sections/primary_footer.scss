@@ -1,56 +1,91 @@
-$primary-footer-top-margin: 6*$vertical-height; // Because sometimes we cover this up other places
+$primary-footer-top-margin: 6 * $vertical-height;
+
+// Because sometimes we cover this up other places
 .primary-footer {
   margin-top: $primary-footer-top-margin;
-  .primary-footer-nav, .terms-and-stuff {
-    padding: 3*$vertical-height 0;
+
+  .primary-footer-nav,
+  .terms-and-stuff {
+    padding: (3 * $vertical-height) 0;
   }
+
   a {
     text-decoration: none;
-    &:hover, &:active, &.active { text-decoration: underline; }
+
+    &:hover,
+    &:active,
+    &.active {
+      text-decoration: underline;
+    }
   }
-  .primary-footer-nav h4 a, .terms-and-stuff a {
+
+  .primary-footer-nav h4 a,
+  .terms-and-stuff a {
     color: $blue-light;
-    &:hover, &:active, &.active { color: $blue-light; }
+
+    &:hover,
+    &:active,
+    &.active {
+      color: $blue-light;
+    }
   }
+
   .primary-footer-nav {
     background: $gray-dark;
-    a { color: $gray-light; }
-    h4 { 
-      margin-bottom: 0.5*$vertical-height;
+
+    a {
+      color: $gray-light;
+    }
+
+    h4 {
+      margin-bottom: 0.5 * $vertical-height;
       font-size: 15px;
     }
+
     ul {
       @include list-unstyled;
+
       margin: 0;
     }
+
     .social-nav {
       text-align: center;
+
       li {
         display: block;
         float: left;
         width: 33.33%;
       }
+
       svg {
         display: inline-block;
-        max-height: 4*$vertical-height;
+        max-height: 4 * $vertical-height;
       }
-      .svgpath { 
+
+      .svgpath {
         fill: $gray-light;
-        transition: color .05s linear;
+        transition: color 0.05s linear;
       }
+
       a {
         display: block;
         position: relative;
-        &:hover, &:active {
-          .svgpath { fill: lighten($gray-light, 15%); }
+
+        &:hover,
+        &:active {
+          .svgpath {
+            fill: lighten($gray-light, 15%);
+          }
         }
       }
     }
   }
+
   .terms-and-stuff {
     background: $black-off;
     color: $gray-light;
     text-align: center;
+
     p {
       margin: 0;
       font-size: 12px;
@@ -59,10 +94,10 @@ $primary-footer-top-margin: 6*$vertical-height; // Because sometimes we cover th
   }
 }
 
-// 
+//
 // Small Screen Styles
 @media (max-width: $grid-breakpoint-lg - 1px) {
   .primary-footer-nav nav {
-    margin-top: 3.5*$vertical-height;
+    margin-top: 3.5 * $vertical-height;
   }
 }

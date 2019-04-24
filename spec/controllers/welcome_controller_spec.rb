@@ -152,6 +152,16 @@ describe WelcomeController do
         expect(response).to render_with_layout("application_revised")
         expect(flash).to_not be_present
       end
+
+      it "renders no recovery stories if requested page exceeds valid range" do
+        FactoryBot.create_list(:recovery_display, 2)
+        get :recovery_stories, per_page: 2, page: 2
+        expect(assigns(:recovery_displays)).to be_empty
+        expect(response.status).to eq(200)
+        expect(response).to render_template("recovery_stories")
+        expect(response).to render_with_layout("application_revised")
+        expect(flash).to be_present
+      end
     end
   end
 end

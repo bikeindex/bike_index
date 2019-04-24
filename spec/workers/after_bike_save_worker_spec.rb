@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe AfterBikeSaveWorker do
   let(:subject) { AfterBikeSaveWorker }
@@ -9,9 +9,9 @@ describe AfterBikeSaveWorker do
     expect(subject.sidekiq_options["queue"]).to eq "low_priority"
   end
 
-  describe 'enqueuing jobs' do
+  describe "enqueuing jobs" do
     let(:bike_id) { FactoryBot.create(:ownership, user_hidden: true).bike_id }
-    it 'enqueues the duplicate_bike_finder_worker' do
+    it "enqueues the duplicate_bike_finder_worker" do
       expect do
         instance.perform(bike_id)
       end.to change(DuplicateBikeFinderWorker.jobs, :size).by 1
@@ -48,7 +48,7 @@ describe AfterBikeSaveWorker do
     let!(:b_param) do
       FactoryBot.create(:b_param,
                         created_bike_id: bike.id,
-                        params: { bike: { owner_email: bike.owner_email, external_image_urls: passed_external_image_urls } }) 
+                        params: { bike: { owner_email: bike.owner_email, external_image_urls: passed_external_image_urls } })
     end
     it "creates and downloads the images" do
       expect do

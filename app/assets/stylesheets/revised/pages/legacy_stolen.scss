@@ -9,10 +9,12 @@
   h3 {
     font-size: $h5-font-size;
   }
+
   h1 {
     font-size: $h3-font-size;
   }
 }
+
 //________________________
 //
 // Stolen styles
@@ -27,15 +29,19 @@ $sbr-background: #f9f9f9;
   // input { font-family: $headerFont; }
   background: $sbr-background;
   color: #7a7a7a;
+
   .list-stolen-bike {
     margin-top: 3px;
     float: right;
+
     // color: #7a7a7a;
     // color: $link-color;
   }
+
   section {
     border-bottom: 1px solid $gray;
     padding: 30px 0;
+
     &:nth-of-type(2n) {
       background: #fff;
     }
@@ -46,16 +52,19 @@ $sbr-background: #f9f9f9;
   .alert h4 {
     font-size: 24px;
   }
+
   .stolen-registry-logo {
     width: 200px;
     margin: 0 auto;
     padding: 2.5em 0 30px;
+
     img {
       display: block;
       width: 100%;
       height: auto;
     }
   }
+
   h1 {
     font-size: 30px;
     text-align: center;
@@ -63,6 +72,7 @@ $sbr-background: #f9f9f9;
     padding: 0 0 40px;
   }
 }
+
 // @media (min-width: 600px) {
 //   #stolen_index .sbr-main-section {
 //     h1 { font-size: 40px; }
@@ -86,22 +96,27 @@ $sbr-background: #f9f9f9;
 
 #stolen_index .sbr-search-fields {
   @include clearfix;
+
   max-width: 800px;
   margin: 0 auto;
   padding-bottom: 40px;
+
   input {
     box-shadow: none;
     border: 1px solid #cccdc8;
     background: #fff;
     color: darken(#7a7a7a, 20%);
     margin-bottom: 0.75em;
+
     &:focus {
       box-shadow: none;
       border-color: #cccdc8;
     }
   }
+
   .proximity {
     clear: both;
+
     input {
       background: none;
       border: none;
@@ -114,18 +129,22 @@ $sbr-background: #f9f9f9;
       border-bottom: 1px dashed #cccdc8;
     }
   }
+
   .sbr-search-inputs {
     position: relative;
   }
+
   .sbr-bike-search {
     box-shadow: none;
     padding: 0.4em 0.7em;
     width: 100%;
     float: left;
     border-radius: 2px;
+
     // border-left: none;
     margin-top: 5px;
   }
+
   .search-type-tab {
     background: #e6e6e6;
     padding: 5px 10px 3px 10px;
@@ -136,17 +155,21 @@ $sbr-background: #f9f9f9;
     border-bottom: none;
     position: relative;
     z-index: 10;
+
     &:first-of-type {
       margin-left: 10px;
     }
+
     &.active {
       background: #fff;
       padding-bottom: 5px;
       border-bottom: 1px solid #fff;
+
       &:hover {
         background: #fff;
       }
     }
+
     &:hover {
       // background: darken(#f9f9f9, 10%);
       background: $sbr-background;
@@ -154,6 +177,7 @@ $sbr-background: #f9f9f9;
     }
   }
 }
+
 #stolen_index .sbrbtn {
   height: 1.9em;
   position: absolute;
@@ -164,11 +188,13 @@ $sbr-background: #f9f9f9;
   background: none;
   font-size: 19px;
   border-radius: 2px;
+
   img {
     display: block;
     height: 100%;
     width: auto;
   }
+
   &:hover,
   &:active,
   &:focus {
@@ -177,6 +203,7 @@ $sbr-background: #f9f9f9;
     border: none;
     outline: none;
   }
+
   &:active {
     background: #d25627;
   }
@@ -187,6 +214,7 @@ $sbr-background: #f9f9f9;
     .sbrbtn {
       top: 0.4em;
     }
+
     .proximity input {
       width: 8em;
     }
@@ -206,10 +234,13 @@ $sbr-background: #f9f9f9;
     .banner {
       text-align: center;
       padding: 20px 0 60px;
+
       // font-weight: 400;
       // font-size: 20px;
     }
+
     @include clearfix;
+
     h1 {
       text-align: center;
       margin: 0 0 1em;
@@ -222,12 +253,15 @@ $sbr-background: #f9f9f9;
     border-radius: 4px;
     padding: 20px 10px;
     color: #fff;
+
     form {
       margin: 0;
     }
+
     input {
       background: #fff;
     }
+
     input[type="email"],
     textarea {
       // font-size: 16px;
@@ -238,15 +272,18 @@ $sbr-background: #f9f9f9;
       background: $sbr-background;
       color: darken(#7a7a7a, 20%);
       margin-bottom: 0.75em;
+
       // &:focus, &:active {
       //   background: #fff;
       // }
       // &:focus { box-shadow: none; border-color: #cccdc8; }
     }
+
     .contact-text {
       padding-top: 1em;
       width: 100%;
       position: relative;
+
       textarea {
         display: block;
         width: 100%;
@@ -254,10 +291,13 @@ $sbr-background: #f9f9f9;
         padding: 0.5em;
       }
     }
+
     .contact-actions {
       @include clearfix;
+
       width: 100%;
       position: relative;
+
       input[type="email"] {
         display: block;
         width: 70%;
@@ -265,6 +305,7 @@ $sbr-background: #f9f9f9;
         padding-left: 0.5em;
         padding-right: 0.5em;
       }
+
       .btn {
         // font-size: 16px;
         // border-radius: 3px;
@@ -272,6 +313,7 @@ $sbr-background: #f9f9f9;
         float: left;
         width: 28%;
         margin: 0 0 0 2%;
+
         // padding: .3em .5em;
       }
     }
@@ -297,14 +339,18 @@ $sbr-background: #f9f9f9;
   #stolen_index {
     .involve-yerself {
       @include clearfix;
+
       padding-bottom: 60px;
+
       h3 {
         margin-top: 0;
       }
     }
+
     .involve-report {
       width: 60%;
       float: left;
+
       .involve-report-form {
         height: 350px;
       }
@@ -316,6 +362,7 @@ $sbr-background: #f9f9f9;
       margin-left: 2%;
     }
   }
+
   // .stolen-recent-widget {
   //   max-height: 350px;
   //   overflow: auto;
@@ -336,25 +383,31 @@ $sbr-background: #f9f9f9;
   .sticker-wells {
     margin: 30px 0;
   }
+
   .sticker-well {
     select {
       margin-top: 0.5em;
     }
+
     .sticker-image {
       @include box-shadow(1px 1px 2px rgba(black, 0.4));
+
       margin-bottom: 1em;
     }
   }
 }
+
 @media (min-width: 800px) {
   #stolen_index {
     .sticker-wells {
       @include clearfix;
     }
+
     .sticker-well {
       width: 49%;
       float: left;
       min-height: 350px;
+
       &:nth-of-type(2) {
         margin-left: 2%;
       }

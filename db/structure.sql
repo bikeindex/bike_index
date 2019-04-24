@@ -507,7 +507,8 @@ CREATE TABLE public.creation_states (
     is_pos boolean DEFAULT false NOT NULL,
     is_new boolean DEFAULT false NOT NULL,
     creator_id integer,
-    bulk_import_id integer
+    bulk_import_id integer,
+    pos_kind integer DEFAULT 0
 );
 
 
@@ -3925,3 +3926,4 @@ INSERT INTO schema_migrations (version) VALUES ('20190401233010');
 INSERT INTO schema_migrations (version) VALUES ('20190402230848');
 
 INSERT INTO schema_migrations (version) VALUES ('20190422221408');
+

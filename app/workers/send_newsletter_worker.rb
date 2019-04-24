@@ -1,7 +1,7 @@
 class SendNewsletterWorker
   include Sidekiq::Worker
-  sidekiq_options queue: 'notify', backtrace: true, retry: false
-  API_KEY = ENV['SPARKPOST_API_KEY']
+  sidekiq_options queue: "notify", backtrace: true, retry: false
+  API_KEY = ENV["SPARKPOST_API_KEY"]
 
   def client; @client ||= SimpleSpark::Client.new(api_key: API_KEY) end
 
@@ -22,16 +22,16 @@ class SendNewsletterWorker
     {
       options: { open_tracking: true, click_tracking: true },
       campaign_id: "#{template}_campaign",
-      return_path: 'support@bikeindex.org',
+      return_path: "support@bikeindex.org",
       content: {
         template_id: template,
-        use_draft_template: true
+        use_draft_template: true,
       },
-      recipients:  [{ 
+      recipients: [{
         address: { email: user.email, name: user.display_name },
         metadata: {},
-        substitution_data: { name: user.name || '', user_id: user.username }
-      }]
+        substitution_data: { name: user.name || "", user_id: user.username },
+      }],
     }
   end
 end

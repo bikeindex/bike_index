@@ -4,7 +4,7 @@ class BikeIndex.Views.AdminRecoveries extends Backbone.View
     'change #stolen_record_recovery_tweet':   'updateTweetLength'
     'keydown #stolen_record_recovery_tweet': 'updateTweetLength'
     'click #use_image_for_display':          'useBikeImageForDisplay'
-    
+
   initialize: ->
     @setElement($('#body'))
 

@@ -37,5 +37,4 @@ class OwnershipsController < ApplicationController
   def find_ownership
     @ownership = Ownership.find(params[:id])
   end
-
 end
