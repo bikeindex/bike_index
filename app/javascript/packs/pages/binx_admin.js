@@ -1,3 +1,4 @@
+import log from "../utils/log";
 import moment from "moment-timezone";
 import LoadFancySelects from "../utils/LoadFancySelects";
 
@@ -81,7 +82,6 @@ function BinxAdmin() {
           .closest("fieldset")
           .slideUp();
       });
-      // event.preventDefault()
       return $("form").on("click", ".add_fields", function(event) {
         const time = new Date().getTime();
         const regexp = new RegExp($(this).data("id"), "g");

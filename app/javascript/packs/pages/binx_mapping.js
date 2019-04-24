@@ -1,4 +1,5 @@
-import log from '../utils/log';
+import log from "../utils/log";
+import _ from "lodash";
 
 export default class BinxMapping {
   // The page instance of this class is modified to store the current list of points for rendering
@@ -29,7 +30,7 @@ export default class BinxMapping {
       zoom = 13;
     }
     this.zoom = zoom;
-    const myOptions = {
+    let myOptions = {
       zoom: zoom,
       center: new google.maps.LatLng(lat, lng),
       gestureHandling: "cooperative",
@@ -67,8 +68,9 @@ export default class BinxMapping {
   }
 
   renderAddressSearch() {
-    if (this.searchBox != null) return true;
-
+    if (this.searchBox != null) {
+      return true;
+    }
     $("#map").before(
       '<input id="placeSearch" class="controls form-control" type="text" placeholder="Search map">'
     );
@@ -78,22 +80,22 @@ export default class BinxMapping {
     $(input).addClass("searchOnMap"); // search box is initially hidden - display it when rendered on map
     // Bias SearchBox results towards current map's viewport.
     binxMap.addListener("bounds_changed", () =>
-      this.searchBox.setBounds(binxMap.getBounds())
+      binxMapping.searchBox.setBounds(binxMap.getBounds())
     );
 
-    this.searchBox.addListener("places_changed", () => {
-      let places = this.searchBox.getPlaces();
+    this.searchBox.addListener("places_changed", function() {
+      let places = binxMapping.searchBox.getPlaces();
       if (places.length === 0) {
         log.debug("Unable to find that address");
       }
       // For each place, get the icon, name and location.
       let bounds = new google.maps.LatLngBounds();
-      places.forEach(place => {
+      places.forEach(function(place) {
         if (!place.geometry) {
           log.debug("Returned place contains no geometry");
         }
         // Create a marker for each place
-        this.searchMarkers.push(
+        binxMapping.searchMarkers.push(
           new google.maps.Marker({
             map: binxMap,
             icon:
@@ -109,16 +111,16 @@ export default class BinxMapping {
   }
 
   clearMarkers() {
-    if (!this.markersRendered) {
-      this.markersRendered = [];
+    if (!binxMapping.markersRendered) {
+      binxMapping.markersRendered = [];
     }
 
     if (window.infoWindow != null) {
       window.infoWindow.close();
     }
     // Useful when the page reloads without fully reloading
-    if (this.markersRendered.length) {
-      for (let i of Array.from(this.markersRendered)) {
+    if (binxMapping.markersRendered.length) {
+      for (let i of Array.from(binxMapping.markersRendered)) {
         i != null && i.setMap(null);
       }
     }
@@ -128,17 +130,17 @@ export default class BinxMapping {
 
   markersInViewport() {
     let bounds = binxMap.getBounds();
-    return this.markersRendered.filter(m => {
+    return _.filter(binxMapping.markersRendered, function(m) {
       return bounds.contains(m.getPosition());
     });
   }
 
   renderMarker(point) {
     let popupContent = "";
-    if (this.kind == "geolocated_messages") {
+    if (binxMapping.kind == "geolocated_messages") {
       popupContent = binxAppOrgMessages.geolocatedMessageMapPopup(point);
     } else {
-      log.debug(this.kind);
+      log.debug(binxMapping.kind);
       popupContent = "Missing template!";
     }
     window.infoWindow.setContent(popupContent);
@@ -149,9 +151,9 @@ export default class BinxMapping {
   openInfoWindow(marker, markerId, point) {
     window.infoWindow.setContent("");
     window.infoWindow.open(window.binxMap, marker);
-    this.enableEscapeForInfoWindows();
+    binxMapping.enableEscapeForInfoWindows();
     // For an unclear reason, this needs to return the rendered marker
-    return this.renderMarker(point);
+    return binxMapping.renderMarker(point);
   }
 
   enableEscapeForInfoWindows() {
@@ -175,11 +177,10 @@ export default class BinxMapping {
 
   addMarkers({ fitMap = false, renderAddressSearch = true }) {
     log.debug(`adding markers - fitMap: ${fitMap}`);
-    while (this.markerPointsToRender.length > 0) {
-      let point = this.markerPointsToRender.shift();
+    while (binxMapping.markerPointsToRender.length > 0) {
+      let point = binxMapping.markerPointsToRender.shift();
       let markerId = point.id;
-      const alreadyRendered = this.markersRendered.some(marker => marker.id === point.id);
-      if (alreadyRendered) {
+      if (_.find(binxMapping.markersRendered, ["id", point.id])) {
         log.debug(`already rendered point: ${point.id}`);
       } else {
         let marker = new google.maps.Marker({
@@ -193,19 +194,19 @@ export default class BinxMapping {
           "click",
           ((marker, markerId) =>
             function() {
-              return this.openInfoWindow(marker, markerId, point);
+              return binxMapping.openInfoWindow(marker, markerId, point);
             })(marker, markerId)
         );
-        this.markersRendered.push(marker);
+        binxMapping.markersRendered.push(marker);
       }
     }
     // If we're suppose to fit the map to the markers - and if there are markers that have been rendered - fit it
-    if (fitMap == true && this.markersRendered.length > 0) {
-      this.fitMap();
+    if (fitMap == true && binxMapping.markersRendered.length > 0) {
+      binxMapping.fitMap();
     }
     // If we're suppose to include the address search, do it
     if (renderAddressSearch == true) {
-      this.renderAddressSearch();
+      binxMapping.renderAddressSearch();
     }
   }
-};
+}
