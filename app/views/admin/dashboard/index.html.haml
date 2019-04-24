@@ -10,10 +10,9 @@
 = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: @bikes }
 
 
-.row
-  .col-md-7
-  .col-md-5
-    %p.float-right
+.row.justify-content-end
+  .col-auto
+    %p
       #{Bike.count} bikes total
       %em
         - today = Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count
@@ -31,10 +30,9 @@
   Recent
   = link_to "Users", admin_users_url
 = render partial: "/admin/users/table"
-.row
-  .col-md-7
-  .col-md-5
-    %p.float-right
+.row.justify-content-end
+  .col-auto
+    %p
       #{User.count} users total
       - today = User.where("created_at >= ?", Time.zone.now.beginning_of_day).count
       - yesterday = (User.where("created_at >= ?", Time.zone.now.beginning_of_day - 1.day).count) - today
@@ -47,3 +45,11 @@
   Recent
   = link_to "Organizations", admin_organizations_url
 = render partial: "/admin/organizations/admin_organizations_table"
+.row.justify-content-end
+  .col-auto
+    %p
+      #{Organization.count} Organizations total
+      - today = Organization.where("created_at >= ?", Time.zone.now.beginning_of_day).count
+      - yesterday = (Organization.where("created_at >= ?", Time.zone.now.beginning_of_day - 1.day).count) - today
+      %em
+        (#{today} today, #{yesterday} yesterday)
