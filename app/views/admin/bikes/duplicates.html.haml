@@ -1,9 +1,10 @@
 
-%header.with-subtitle
-  %h1
-    Possible duplicate bikes
+
+%h1
+  Possible duplicate bikes
 
 = paginate @duplicate_groups, views_prefix: "admin"
+
 - @duplicate_groups.each do |duplicate_group|
   .row
     .col-lg-6
