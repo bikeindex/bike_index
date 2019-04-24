@@ -10,9 +10,9 @@
       %li.nav-item
         = link_to "unknown manufacturers", missing_manufacturer_admin_bikes_path, class: "nav-link #{@unknown ? 'active' : ''}"
       %li.nav-item
-        = link_to "Ascend", admin_bikes_path(sortable_search_params.merge(ascend: true)), class: "nav-link #{params[:ascend].present? ? 'active' : ''}"
+        = link_to "Ascend", admin_bikes_path(sortable_search_params.merge(ascend_pos: true)), class: "nav-link #{params[:ascend_pos].present? ? 'active' : ''}"
       %li.nav-item
-        = link_to "Lightspeed", admin_bikes_path(sortable_search_params.merge(lightspeed: true)), class: "nav-link #{params[:lightspeed].present? ? 'active' : ''}"
+        = link_to "Lightspeed", admin_bikes_path(sortable_search_params.merge(lightspeed_pos: true)), class: "nav-link #{params[:lightspeed_pos].present? ? 'active' : ''}"
 
 .row
   .col-auto
@@ -39,7 +39,7 @@
   .col-md-7
     = form_tag admin_bikes_path, method: :get, class: "form-inline" do
       .form-group.ml-auto.mr-2.mb-2
-        = text_field_tag :email, params[:email], placeholder: "Search bikes by email", class: "form-control"
+        = text_field_tag :email, params[:search_email], placeholder: "Search bikes by email", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
 .row.mt-4

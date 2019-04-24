@@ -47,8 +47,9 @@ class CreationState < ActiveRecord::Base
 
   def set_reflexive_association
     # Just for the time being, to make migration easier
-    b = Bike.unscoped.find(bike_id)
-    b.update_attribute :creation_state_id, id unless b.creation_state_id == id
+    b = Bike.unscoped.where(id: bike_id).first
+    b.update_attribute(:creation_state_id, id) if b.present? && b&.creation_state_id != id
+    true
   end
 
   private
