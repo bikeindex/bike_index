@@ -12,14 +12,15 @@ class Ctype < ActiveRecord::Base
   has_many :components
 
   def self.other
-    where(name: 'other', has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
+    where(name: "other", has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
   end
 
   def self.unknown
-    where(name: 'unknown', has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
+    where(name: "unknown", has_multiple: false, cgroup_id: Cgroup.additional_parts.id).first_or_create
   end
 
   before_create :set_calculated_attributes
+
   def set_calculated_attributes
     return true unless self.cgroup_name.present?
     self.cgroup_id = Cgroup.friendly_find(cgroup_name)&.id

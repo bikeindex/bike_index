@@ -11,7 +11,7 @@ class Urlifyer
   end
 
   def self.is_url(string)
-    true if uri?('http://' + string)
+    true if uri?("http://" + string)
   end
 
   def self.uri?(string)
@@ -22,5 +22,4 @@ class Urlifyer
   rescue URI::InvalidURIError
     false
   end
-
 end

@@ -2,19 +2,24 @@
   .checkbox input {
     margin-top: 0.6em;
   }
+
   .form-well-input {
     @include media-breakpoint-down(xs) {
-      @include make-col-ready();
+      @include make-col-ready;
+
       @include make-col(12);
     }
   }
+
   .org-form-label {
     @extend .col-sm-4;
+
     @include media-breakpoint-up(sm) {
       text-align: right;
       margin-top: 0.25rem;
     }
   }
+
   // Because of increasing the margin to align text-box labels,
   // make the margin larger on non-text box fields
   .static-form-control,
@@ -26,56 +31,72 @@
       }
     }
   }
+
   .form-submit-button {
-    @include make-col-ready();
+    @include make-col-ready;
+
     @include media-breakpoint-up(sm) {
       @include make-col(8);
+
       @include make-col-offset(4);
     }
   }
+
   .export-included-columns-label {
     @extend .less-strong;
+
     margin-bottom: 0;
+
     @include media-breakpoint-up(lg) {
       text-align: right;
       margin-top: 0.25rem;
     }
   }
+
   .locations-where-and-add {
     padding-bottom: $vertical-height;
+
     .btn {
       margin-top: -6px;
     }
   }
+
   .locations-fieldset-wrapper {
     @extend .row;
+
     fieldset {
       display: flex;
     }
+
     .address-group {
       label {
         margin-bottom: 0;
       }
+
       .selectize-control,
       input {
         margin-top: 0.5em;
       }
     }
+
     .countrystatezip {
       @include media-breakpoint-up(sm) {
         .col-sm-4:first-of-type {
           padding-right: 0;
         }
+
         .col-sm-4:last-of-type {
           padding-left: 0;
         }
       }
     }
   }
+
   .remove-control {
     input {
       display: none;
     }
+
     label {
       display: block;
       text-align: right;
@@ -83,6 +104,7 @@
       width: auto;
       color: $link-color;
       cursor: pointer;
+
       &:hover {
         text-decoration: underline;
       }

@@ -1,7 +1,7 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe OrganizationInvitation do
-  describe 'validations' do
+  describe "validations" do
     it { is_expected.to belong_to :inviter }
     it { is_expected.to belong_to :invitee }
     it { is_expected.to validate_presence_of :invitee_email }
@@ -10,16 +10,16 @@ describe OrganizationInvitation do
     it { is_expected.to validate_presence_of :membership_role }
   end
 
-  describe 'create' do
+  describe "create" do
     before :each do
       @o = FactoryBot.create(:organization_invitation)
     end
 
-    it 'creates a valid organization_invitation' do
+    it "creates a valid organization_invitation" do
       expect(@o.valid?).to be_truthy
     end
 
-    it 'assigns to user if the user exists' do
+    it "assigns to user if the user exists" do
       @user = FactoryBot.create(:user_confirmed)
       @o1 = FactoryBot.create(:organization_invitation, invitee_email: @user.email)
       expect(@user.memberships.count).to eq(1)
@@ -27,30 +27,30 @@ describe OrganizationInvitation do
     end
   end
 
-  it 'enqueues an email job' do
+  it "enqueues an email job" do
     expect do
       FactoryBot.create(:organization_invitation)
     end.to change(EmailOrganizationInvitationWorker.jobs, :size).by(1)
   end
 
-  describe 'normalize_email' do
-    it 'removes leading and trailing whitespace and downcase email' do
+  describe "normalize_email" do
+    it "removes leading and trailing whitespace and downcase email" do
       oi = OrganizationInvitation.new
-      allow(oi).to receive(:invitee_email).and_return('   SomE@dd.com ')
-      expect(oi.normalize_email).to eq('some@dd.com')
+      allow(oi).to receive(:invitee_email).and_return("   SomE@dd.com ")
+      expect(oi.normalize_email).to eq("some@dd.com")
     end
   end
 
-  describe 'assign_to(user)' do
+  describe "assign_to(user)" do
     before :each do
       @organization = FactoryBot.create(:organization)
-      @o = FactoryBot.create(:organization_invitation, organization: @organization, invitee_email: 'EMAIL@email.com')
-      @user = FactoryBot.create(:user_confirmed, email: 'EMAIL@email.com')
+      @o = FactoryBot.create(:organization_invitation, organization: @organization, invitee_email: "EMAIL@email.com")
+      @user = FactoryBot.create(:user_confirmed, email: "EMAIL@email.com")
       @o.reload
       @user.reload
     end
     # These are performed automatically as part of create_user_jobs, but we still want to test
-    it 'sets the user if the email matches and redeems' do
+    it "sets the user if the email matches and redeems" do
       @o.reload
       # @o.assign_to(@user)
       expect(@o.invitee.id).to eq(@user.id)
@@ -59,17 +59,17 @@ describe OrganizationInvitation do
 
     it "sets the user's name if the name is blank" do
       @user2 = FactoryBot.create(:user_confirmed, name: nil)
-      @o2 = FactoryBot.create(:organization_invitation, organization: @organization, invitee_email: @user2.email, invitee_name: 'Biker Name')
-      expect(@user2.reload.name).to eq('Biker Name')
+      @o2 = FactoryBot.create(:organization_invitation, organization: @organization, invitee_email: @user2.email, invitee_name: "Biker Name")
+      expect(@user2.reload.name).to eq("Biker Name")
     end
 
-    it 'is not able to be used again once it has been redeemed' do
+    it "is not able to be used again once it has been redeemed" do
       @o.assign_to(@user)
       @o.assign_to(@user)
       expect(@user.memberships.count).to eq(1)
     end
 
-    it 'does not let users have more than one membership to a single organization' do
+    it "does not let users have more than one membership to a single organization" do
       @user.reload
       @o.reload
       expect(@user.memberships.count).to eq 1
@@ -77,7 +77,7 @@ describe OrganizationInvitation do
       expect(@user.memberships.count).to eq 1
     end
 
-    it 'lets users have multiple memberships to different organizations' do
+    it "lets users have multiple memberships to different organizations" do
       @organization2 = FactoryBot.create(:organization)
       FactoryBot.create(:membership, organization: @organization2, user: @user)
       expect(@user.memberships.count).to eq(2)

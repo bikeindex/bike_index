@@ -2,8 +2,8 @@ FactoryBot.define do
   factory :user do
     name
     email { generate(:unique_email) }
-    password { 'testthisthing7$' }
-    password_confirmation { 'testthisthing7$' }
+    password { "testthisthing7$" }
+    password_confirmation { "testthisthing7$" }
     terms_of_service { true }
     factory :user_confirmed do
       after(:create) { |u| u.confirm(u.confirmation_token) }
@@ -38,7 +38,7 @@ FactoryBot.define do
         end
         factory :organization_admin do
           after(:create) do |user, evaluator|
-            FactoryBot.create(:membership, user: user, organization: evaluator.organization, role: 'admin')
+            FactoryBot.create(:membership, user: user, organization: evaluator.organization, role: "admin")
           end
         end
       end

@@ -16,7 +16,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def show
     @locations = @organization.locations.decorate
-    bikes = Bike.where(creation_organization_id: @organization.id).reorder('created_at desc')
+    bikes = Bike.where(creation_organization_id: @organization.id).reorder("created_at desc")
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     @bikes = bikes.page(page).per(per_page)
@@ -45,7 +45,7 @@ class Admin::OrganizationsController < Admin::BaseController
   def update
     # Needs to update approved before saving so set_locations_shown is applied on save
     if @organization.update_attributes(permitted_parameters)
-      flash[:success] = 'Organization Saved!'
+      flash[:success] = "Organization Saved!"
       redirect_to admin_organization_url(@organization)
     else
       render action: :edit
@@ -56,7 +56,7 @@ class Admin::OrganizationsController < Admin::BaseController
     @organization = Organization.new(permitted_parameters)
     @organization.approved = true
     if @organization.save
-      flash[:success] = 'Organization Created!'
+      flash[:success] = "Organization Created!"
       redirect_to edit_admin_organization_url(@organization)
     else
       render action: :new

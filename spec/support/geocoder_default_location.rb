@@ -8,7 +8,7 @@ shared_context :geocoder_default_location do
       state: "New York",
       state_code: "NY",
       country: "United States",
-      country_code: "US"
+      country_code: "US",
     }
   end
 
@@ -19,14 +19,14 @@ shared_context :geocoder_default_location do
       city: "New York",
       state: "NY",
       zipcode: "10007",
-      country: "USA"
+      country: "USA",
     }.as_json
   end
 
   let(:geo_hash) do
     {
       data: ["US", "NY", "New York", default_location[:latitude].to_s, default_location[:longitude].to_s],
-      cache_hit: true
+      cache_hit: true,
     }
   end
   let(:legacy_production_ip_search_result) { [geo_hash] }

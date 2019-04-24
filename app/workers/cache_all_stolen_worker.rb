@@ -1,6 +1,6 @@
 class CacheAllStolenWorker
   include Sidekiq::Worker
-  sidekiq_options queue: 'carrierwave', backtrace: true, retry: false
+  sidekiq_options queue: "carrierwave", backtrace: true, retry: false
   attr_reader :filename
 
   def perform
@@ -18,7 +18,7 @@ class CacheAllStolenWorker
   end
 
   def file_prefix
-    Rails.env.test? ? '/spec/fixtures/tsv_creation/' : ''
+    Rails.env.test? ? "/spec/fixtures/tsv_creation/" : ""
   end
 
   def filename
@@ -30,12 +30,12 @@ class CacheAllStolenWorker
   end
 
   def write_stolen
-    File.open(tmp_path, 'w') {}
-    File.open(tmp_path, 'a+') do |file|
+    File.open(tmp_path, "w") { }
+    File.open(tmp_path, "a+") do |file|
       file << '{"bikes": ['
-      Bike.stolen.find_each { |bike| file << BikeV2Serializer.new(bike, root: false).to_json + ',' }
+      Bike.stolen.find_each { |bike| file << BikeV2Serializer.new(bike, root: false).to_json + "," }
     end
     File.truncate(tmp_path, File.size(tmp_path) - 1) # remove final comma
-    File.open(tmp_path, 'a+') { |file| file << ']}' }
+    File.open(tmp_path, "a+") { |file| file << "]}" }
   end
 end

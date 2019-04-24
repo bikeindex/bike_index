@@ -1,3 +1,3 @@
-class StolenRecordDecorator < ApplicationDecorator 
+class StolenRecordDecorator < ApplicationDecorator
   delegate_all
 end

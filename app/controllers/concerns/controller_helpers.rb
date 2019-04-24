@@ -63,12 +63,12 @@ module ControllerHelpers
       session[:return_to] = nil
       cookies[:return_to] = nil
       case target.downcase
-      when 'password_reset'
+      when "password_reset"
         flash[:success] = "You've been logged in. Please reset your password"
         render action: :update_password and return true
-      when /\A#{ENV['BASE_URL']}/, %r{\A/} # Either starting with our URL or /
+      when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
         redirect_to(target) and return true
-      when 'https://facebook.com/bikeindex'
+      when "https://facebook.com/bikeindex"
         redirect_to(target) and return true
       end
     elsif session[:discourse_redirect]
@@ -81,7 +81,7 @@ module ControllerHelpers
   end
 
   def page_id
-    @page_id ||= [controller_namespace, controller_name, action_name].compact.join('_')
+    @page_id ||= [controller_namespace, controller_name, action_name].compact.join("_")
   end
 
   def recovered_bike_count
@@ -120,7 +120,7 @@ module ControllerHelpers
   end
 
   # active_organization is the organization currently being used.
-  # If set, the user *is* interacting with the organization in said request 
+  # If set, the user *is* interacting with the organization in said request
   def active_organization
     # We call this multiple times - make sure nil stays nil
     return @active_organization if defined?(@active_organization)

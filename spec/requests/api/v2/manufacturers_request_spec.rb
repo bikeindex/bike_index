@@ -37,7 +37,7 @@ describe "Manufacturers API V2" do
     end
 
     describe "show" do
-      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: 'awesome') }
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "awesome") }
       it "returns one from a name" do
         get "/api/v2/manufacturers/awesome"
         result = response.body

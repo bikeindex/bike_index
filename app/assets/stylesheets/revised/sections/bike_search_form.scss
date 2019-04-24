@@ -1,50 +1,77 @@
 .bikes-search-form {
-  @include make-row();
-  // 
+  @include make-row;
+
+  //
   // Query field (main search field)
   .query-field-wrap {
     flex: 0 0 83.33333%;
     padding-left: 0.9375rem;
+
     // Space between search bar and button
     padding-right: 10px;
   }
-  .query-field { 
+
+  .query-field {
     width: 100%;
-    &#serial { margin-top: 0.5*$vertical-height; }
+
+    &#serial {
+      margin-top: 0.5 * $vertical-height;
+    }
   }
-  .select2-container { margin-bottom: 0; }
+
+  .select2-container {
+    margin-bottom: 0;
+  }
 
   // If the email field is there too, we want to put the two search bars together for large screens
   .sidebyside-queries {
-    .email-field-too { margin-top: 0.5*$vertical-height; } // Always give both fields a top margin
+    .email-field-too {
+      margin-top: 0.5 * $vertical-height;
+    }
+
+    // Always give both fields a top margin
     @include media-breakpoint-up(md) {
       display: flex;
       flex-wrap: wrap;
+
       .email-field-too {
         width: 49%;
-        &:last-of-type { margin-left: 2%; }
+
+        &:last-of-type {
+          margin-left: 2%;
+        }
       }
     }
   }
 
-
   .select2-results__options {
-    .sch_s { display: inline-block; }
-    .sch_m, .sch_ { color: #ccc; }
-    .sch_special { border-bottom: 1px solid #ddd; }
+    .sch_s {
+      display: inline-block;
+    }
+
+    .sch_m,
+    .sch_ {
+      color: #ccc;
+    }
+
+    .sch_special {
+      border-bottom: 1px solid #ddd;
+    }
+
     .sch_c {
       color: #bbb;
       display: inline-block;
     }
+
     .sclr {
       border-radius: 3px;
       display: inline-block;
       width: 24px;
       height: 24px;
       border: 1px solid white;
-      line-height: .8em;
+      line-height: 0.8em;
       margin: 0 6px -6px;
-      font-size: .5em;
+      font-size: 0.5em;
       text-align: center;
       padding-top: 1em;
     }
@@ -55,77 +82,125 @@
     flex: 0 0 16.66667%;
     padding-right: 0.9375rem;
   }
+
   .searchit {
     height: 100%;
     position: relative;
-    min-height: 6.6666*$vertical-height;
+    min-height: 6.6666 * $vertical-height;
     padding: 0;
     text-align: center;
     width: 100%;
+
     svg {
       height: auto;
       width: 50%;
-      max-width: 60px; // so it doesn't break organization search
+      max-width: 60px;
+
+      // so it doesn't break organization search
       margin-top: 5%;
       display: inline-block;
     }
   }
+
   // Location fields
   .stolen-search-fields {
-    @include make-col-ready();
+    @include make-col-ready;
+
     @include make-col(12);
-    padding-top: .5em;
-    input, span {
+
+    padding-top: 0.5em;
+
+    input,
+    span {
       display: block;
       float: right;
-      padding: .25em .5em;
+      padding: 0.25em 0.5em;
     }
+
     input {
       background: $gray-lighter;
       border-radius: $border-radius;
       border: none;
     }
-    span { color: $gray-light; }
-    .stolen-radius { width: 4.2em; }
-    .stolen-proximity { width: 30%; }
+
+    span {
+      color: $gray-light;
+    }
+
+    .stolen-radius {
+      width: 4.2em;
+    }
+
+    .stolen-proximity {
+      width: 30%;
+    }
   }
-  // Hide things by default - so that our search is more functional 
+
+  // Hide things by default - so that our search is more functional
   // when JS isn't working
-  .nojs #query_items { display: none; }
+  .nojs #query_items {
+    display: none;
+  }
 }
 
 @media (max-width: 600px) {
   .bikes-search-form {
     .selectize-dropdown-content {
-      .sch_s, .sch_m, .sch_ {
+      .sch_s,
+      .sch_m,
+      .sch_ {
         font-size: 14px;
-        span { display: none; }
+
+        span {
+          display: none;
+        }
       }
     }
   }
 }
 
-// 
+//
 // Nav search tabs
 .search-type-tabs .nav.nav-tabs {
   @include binx-nav-tabs;
+
   display: flex;
   flex-wrap: wrap;
-  margin: 2*$vertical-height 0;
+  margin: (2 * $vertical-height) 0;
   text-align: center;
   font-size: 12px;
+
   li {
-    a { padding-left: 0; padding-right: 0; }
-    a.active { font-weight: $strong-font-weight; }
-    &#stolenness_tab_proximity { flex: 0 0 40%; } // location info takes up the most space
-    &#stolenness_tab_stolen { flex: 0 0 27%; } 
-    &#stolenness_tab_non { flex: 0 0 33%; } // 'Not marked stolen' is longer than 'Stolen anywhere'
+    a {
+      padding-left: 0;
+      padding-right: 0;
+    }
+
+    a.active {
+      font-weight: $strong-font-weight;
+    }
+
+    &#stolenness_tab_proximity {
+      flex: 0 0 40%;
+    }
+
+    // location info takes up the most space
+    &#stolenness_tab_stolen {
+      flex: 0 0 27%;
+    }
+
+    &#stolenness_tab_non {
+      flex: 0 0 33%;
+    }
+
+    // 'Not marked stolen' is longer than 'Stolen anywhere'
   }
 }
 
-@media(max-width: $grid-breakpoint-lg) {
+@media (max-width: $grid-breakpoint-lg) {
   .search-type-tabs .nav.nav-tabs {
-    @include binx-nav-tabs-vertical; 
+    @include binx-nav-tabs-vertical;
+
     text-align: left;
   }
 }

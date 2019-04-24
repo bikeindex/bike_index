@@ -1,17 +1,25 @@
 .edit-bike-page-accessories {
   // Separate the components
-  .additional-component { border-top: 1px $form-well-divider-color solid; }
+  .additional-component {
+    border-top: 1px $form-well-divider-color solid;
+  }
+
   // Separator for components that are added to the page with js
   .add-additional-fields-block .additional-component {
     border-top: none;
     border-bottom: 1px $form-well-divider-color solid;
   }
+
   .remove-part {
     float: right;
+
     label {
       cursor: pointer;
       margin-bottom: 0;
     }
-    input { display: none; }
+
+    input {
+      display: none;
+    }
   }
 }

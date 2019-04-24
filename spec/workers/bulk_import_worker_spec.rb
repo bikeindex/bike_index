@@ -10,7 +10,7 @@ describe BulkImportWorker do
     [
       %w[manufacturer model year color owner_email serial_number],
       ["Trek", "Roscoe 8", "2019", "Green", "test@bikeindex.org", "xyz_test"],
-      ["Surly", "Midnight Special", "2018", "White", "test2@bikeindex.org", "example"]
+      ["Surly", "Midnight Special", "2018", "White", "test2@bikeindex.org", "example"],
     ]
   end
   let(:csv_lines) { sample_csv_lines }
@@ -50,6 +50,7 @@ describe BulkImportWorker do
     context "erroring" do
       let!(:color) { FactoryBot.create(:color, name: "White") }
       after { tempfile.close && tempfile.unlink }
+
       def bike_matches_target(bike)
         expect(bike.manufacturer).to eq Manufacturer.other
         expect(bike.manufacturer_other).to eq "Surly"
@@ -59,13 +60,14 @@ describe BulkImportWorker do
         expect(bike.owner_email).to eq "test2@bikeindex.org"
         expect(bike.description).to eq "Midnight Special"
       end
+
       context "valid bike and an invalid bike with substituted header" do
         let(:target_line_error) { [2, ["Owner email can't be blank"]] }
         let(:csv_lines) do
           [
             "Product Description,Vendor,Brand,Color,Size,Serial Number,Customer Last Name,Customer First Name,Customer Email",
             '"Blah","Blah","Surly","","","XXXXX","","",""',
-            '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"'
+            '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"',
           ]
         end
         it "registers bike, adds row that is an error" do
@@ -85,7 +87,7 @@ describe BulkImportWorker do
           [
             "Product Description,Vendor,Brand,Color,Size,Serial Number,Customer Last Name,Customer First Name,Customer Email",
             '"\"","\'","Surly","","","XXXXX","","","","',
-            '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"'
+            '"Midnight Special","","Surly","White","19","ZZZZ","","","test2@bikeindex.org"',
           ]
         end
         it "stores error line, resumes post errored line successfully" do
@@ -279,7 +281,7 @@ describe BulkImportWorker do
           additional_registration: nil,
           user_name: nil,
           send_email: true,
-          creation_organization_id: nil
+          creation_organization_id: nil,
         }
       end
       describe "row_to_b_param_hash" do
@@ -304,7 +306,7 @@ describe BulkImportWorker do
       context "valid organization bike" do
         let(:organization) { FactoryBot.create(:organization_with_auto_user) }
         let!(:bulk_import) { FactoryBot.create(:bulk_import, organization: organization) }
-        let(:row) { { manufacturer: " Surly", serial_number: "na", color: nil, owner_email: "test2@bikeindex.org", year: "2018", model: "Midnight Special", cycle_type: 'tandem' } }
+        let(:row) { { manufacturer: " Surly", serial_number: "na", color: nil, owner_email: "test2@bikeindex.org", year: "2018", model: "Midnight Special", cycle_type: "tandem" } }
         it "registers a bike" do
           expect(organization.auto_user).to_not eq bulk_import.user
           expect(Bike.count).to eq 0

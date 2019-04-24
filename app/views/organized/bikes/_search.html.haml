@@ -29,10 +29,13 @@
 %p.mt-4
   - if @search_query_present
     %strong
-      #{ pluralize(@bikes.total_count, 'bike') }
+      = number_with_delimiter(@bikes.total_count)
+      = "bike".pluralize(@bikes.total_count)
     matching
   - else
-    #{ pluralize(@bikes.total_count, 'bike') } registered
+    = number_with_delimiter(@bikes.total_count)
+    = "bike".pluralize(@bikes.total_count)
+    registered
   - search_params = @interpreted_params.merge(organization_id: active_organization.to_param)
 
   - unless skip_view_just_stolen
