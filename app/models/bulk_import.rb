@@ -47,7 +47,7 @@ class BulkImport < ActiveRecord::Base
     self.progress = "finished"
     updated_file_error_data = {
       "file" => [file_import_errors, error_msg.to_s].compact.flatten,
-      "file_lines" => [file_import_error_lines, line_error].flatten
+      "file_lines" => [file_import_error_lines, line_error].flatten,
     }
     return true if skip_save # Don't get stuck in a loop during creation
     # Using update_attribute here to avoid validation checks that sometimes block updating postgres json in rails

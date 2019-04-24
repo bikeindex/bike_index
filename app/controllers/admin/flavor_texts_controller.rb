@@ -1,5 +1,4 @@
 class Admin::FlavorTextsController < Admin::BaseController
-
   def create
     @flavor_text = FlavorText.new(permitted_parameters)
     if @flavor_text.save

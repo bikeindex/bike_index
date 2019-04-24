@@ -1,6 +1,6 @@
 class EmailPartialRegistrationWorker
   include Sidekiq::Worker
-  sidekiq_options queue: 'notify'
+  sidekiq_options queue: "notify"
   sidekiq_options backtrace: true
 
   def perform(b_param_id)

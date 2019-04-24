@@ -2,16 +2,23 @@
   // max-width: 300px;
   margin: 0 auto;
   display: block;
-  padding-top: 2*$vertical-height;
+  padding-top: 2 * $vertical-height;
+
   a {
     display: block;
     text-align: center;
     cursor: pointer;
     color: $body-font-color;
-    &:hover, &:active, &.active {
+
+    &:hover,
+    &:active,
+    &.active {
       color: $link-color;
       text-decoration: none;
     }
   }
-  .add_fields { margin-top: $vertical-height; }
+
+  .add_fields {
+    margin-top: $vertical-height;
+  }
 }

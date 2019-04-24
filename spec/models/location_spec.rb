@@ -1,7 +1,7 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Location do
-  describe 'validations' do
+  describe "validations" do
     it { is_expected.to belong_to :organization }
     it { is_expected.to belong_to :country }
     it { is_expected.to belong_to :state }
@@ -11,15 +11,15 @@ describe Location do
     it { is_expected.to validate_presence_of :country }
   end
 
-  describe 'set_phone' do
-    it 'strips the non-digit numbers from the phone input' do
-      location = FactoryBot.create(:location, phone: '773.83ddp+83(887)')
-      expect(location.phone).to eq('7738383887')
+  describe "set_phone" do
+    it "strips the non-digit numbers from the phone input" do
+      location = FactoryBot.create(:location, phone: "773.83ddp+83(887)")
+      expect(location.phone).to eq("7738383887")
     end
   end
 
-  describe 'address' do
-    it 'strips the non-digit numbers from the phone input' do
+  describe "address" do
+    it "strips the non-digit numbers from the phone input" do
       location = FactoryBot.create(:location)
       expect(location.address).to be_a(String)
     end
@@ -37,8 +37,8 @@ describe Location do
     end
   end
 
-  describe 'org_location_id' do
-    it 'creates a unique id that references the organization' do
+  describe "org_location_id" do
+    it "creates a unique id that references the organization" do
       location = FactoryBot.create(:location)
       expect(location.org_location_id).to eq("#{location.organization_id}_#{location.id}")
     end

@@ -1,7 +1,8 @@
 .ascend-image {
   width: 100%;
-  margin: 0 0 2 * $vertical-height;
+  margin: 0 0 (2 * $vertical-height);
   clear: both;
+
   svg,
   img {
     padding-top: 100px;
@@ -23,9 +24,9 @@
   // margin-right: -20px;
   // margin-bottom: -44px;
   background: white;
+
   p {
     font-weight: bold;
     text-indent: 20px;
   }
 }
-

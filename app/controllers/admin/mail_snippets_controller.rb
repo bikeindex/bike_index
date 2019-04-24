@@ -11,12 +11,11 @@ class Admin::MailSnippetsController < Admin::BaseController
   end
 
   def edit
-
   end
 
   def update
     if @mail_snippet.update_attributes(permitted_parameters)
-      flash[:success] = 'Snippet Saved!'
+      flash[:success] = "Snippet Saved!"
       redirect_to edit_admin_mail_snippet_url(@mail_snippet)
     else
       render action: :edit
@@ -30,13 +29,12 @@ class Admin::MailSnippetsController < Admin::BaseController
   def create
     @mail_snippet = MailSnippet.create(permitted_parameters)
     if @mail_snippet.save
-      flash[:success] = 'Snippet Created!'
+      flash[:success] = "Snippet Created!"
       redirect_to edit_admin_mail_snippet_url(@mail_snippet)
     else
       render action: :new
     end
   end
-
 
   protected
 

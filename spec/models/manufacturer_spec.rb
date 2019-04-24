@@ -1,8 +1,8 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Manufacturer do
-  it_behaves_like 'autocomplete_hashable'
-  describe 'validations' do
+  it_behaves_like "autocomplete_hashable"
+  describe "validations" do
     it { is_expected.to validate_presence_of :name }
     it { is_expected.to validate_uniqueness_of :name }
     it { is_expected.to validate_uniqueness_of :slug }
@@ -12,78 +12,78 @@ describe Manufacturer do
     it { is_expected.to have_many :paints }
   end
 
-  describe 'default_scope is alphabetized' do
-    it 'default scopes to created_at desc' do
+  describe "default_scope is alphabetized" do
+    it "default scopes to created_at desc" do
       expect(Manufacturer.all.to_sql).to eq(Manufacturer.unscoped.order(:name).to_sql)
     end
   end
 
-  describe 'ensure_non_blocking_name' do
-    before { FactoryBot.create(:color, name: 'Purple') }
-    context 'name same as a color' do
-      it 'adds an error' do
-        manufacturer = FactoryBot.build(:manufacturer, name: ' pURple ')
+  describe "ensure_non_blocking_name" do
+    before { FactoryBot.create(:color, name: "Purple") }
+    context "name same as a color" do
+      it "adds an error" do
+        manufacturer = FactoryBot.build(:manufacturer, name: " pURple ")
         manufacturer.valid?
-        expect(manufacturer.errors.full_messages.to_s).to match 'same as a color'
+        expect(manufacturer.errors.full_messages.to_s).to match "same as a color"
       end
     end
-    context 'name includes a color' do
-      it 'adds no error' do
-        manufacturer = FactoryBot.build(:manufacturer, name: 'Purple bikes')
+    context "name includes a color" do
+      it "adds no error" do
+        manufacturer = FactoryBot.build(:manufacturer, name: "Purple bikes")
         manufacturer.valid?
         expect(manufacturer.errors.count).to eq 0
       end
     end
   end
 
-  describe 'friendly_find' do
-    it 'finds manufacturers by their slug' do
-      mnfg = FactoryBot.create(:manufacturer, name: 'Poopy PANTERS')
-      expect(Manufacturer.friendly_find('poopy panters')).to eq(mnfg)
+  describe "friendly_find" do
+    it "finds manufacturers by their slug" do
+      mnfg = FactoryBot.create(:manufacturer, name: "Poopy PANTERS")
+      expect(Manufacturer.friendly_find("poopy panters")).to eq(mnfg)
     end
     it "removes Accell (because it's widespread mnfg)" do
-      mnfg = FactoryBot.create(:manufacturer, name: 'Poopy PANTERS')
-      expect(Manufacturer.friendly_find('poopy panters Accell')).to eq(mnfg)
+      mnfg = FactoryBot.create(:manufacturer, name: "Poopy PANTERS")
+      expect(Manufacturer.friendly_find("poopy panters Accell")).to eq(mnfg)
     end
   end
 
-  describe 'autocomplete_hash' do
-    it 'returns what we expect' do
+  describe "autocomplete_hash" do
+    it "returns what we expect" do
       manufacturer = FactoryBot.create(:manufacturer)
       result = manufacturer.autocomplete_hash
       expect(result.keys).to eq(%w(id text category priority data))
-      expect(result['data']['slug']).to eq manufacturer.slug
-      expect(result['data']['search_id']).to eq("m_#{manufacturer.id}")
+      expect(result["data"]["slug"]).to eq manufacturer.slug
+      expect(result["data"]["search_id"]).to eq("m_#{manufacturer.id}")
     end
   end
 
-  describe 'autocomplete_hash_category' do
-    context '0 bikes or components' do
-      it 'returns 0' do
+  describe "autocomplete_hash_category" do
+    context "0 bikes or components" do
+      it "returns 0" do
         manufacturer = Manufacturer.new
         allow(manufacturer).to receive(:bikes) { [] }
         allow(manufacturer).to receive(:components) { [] }
         expect(manufacturer.autocomplete_hash_priority).to eq(0)
       end
     end
-    context '1 component' do
-      it 'returns 10' do
+    context "1 component" do
+      it "returns 10" do
         manufacturer = Manufacturer.new
         allow(manufacturer).to receive(:bikes) { [] }
         allow(manufacturer).to receive(:components) { [2] }
         expect(manufacturer.autocomplete_hash_priority).to eq(10)
       end
     end
-    context '25 bikes and 50 components' do
-      it 'returns 15' do
+    context "25 bikes and 50 components" do
+      it "returns 15" do
         manufacturer = Manufacturer.new
         allow(manufacturer).to receive(:bikes) { Array(0..24) }
         allow(manufacturer).to receive(:components) { Array(0..50) }
         expect(manufacturer.autocomplete_hash_priority).to eq(15)
       end
     end
-    context '1020 bikes' do
-      it 'returns 100' do
+    context "1020 bikes" do
+      it "returns 100" do
         manufacturer = Manufacturer.new
         allow(manufacturer).to receive(:bikes) { Array(1..1020) }
         allow(manufacturer).to receive(:components) { [2, 2, 2] }
@@ -92,68 +92,68 @@ describe Manufacturer do
     end
   end
 
-  describe 'import csv' do
-    it 'adds manufacturers to the list' do
-      import_file = File.open(Rails.root.to_s + '/spec/fixtures/manufacturer-test-import.csv')
+  describe "import csv" do
+    it "adds manufacturers to the list" do
+      import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
       expect do
         Manufacturer.import(import_file)
       end.to change(Manufacturer, :count).by(2)
     end
 
-    it 'adds in all the attributes that are listed' do
-      import_file = File.open(Rails.root.to_s + '/spec/fixtures/manufacturer-test-import.csv')
+    it "adds in all the attributes that are listed" do
+      import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
       Manufacturer.import(import_file)
-      manufacturer = Manufacturer.find_by_slug('surly')
-      expect(manufacturer.website).to eq('http://surlybikes.com')
+      manufacturer = Manufacturer.find_by_slug("surly")
+      expect(manufacturer.website).to eq("http://surlybikes.com")
       expect(manufacturer.frame_maker).to be_truthy
       expect(manufacturer.open_year).to eq(1900)
       expect(manufacturer.close_year).to eq(3000)
-      manufacturer2 = Manufacturer.find_by_slug('wethepeople')
-      expect(manufacturer2.website).to eq('http://wethepeople.com')
+      manufacturer2 = Manufacturer.find_by_slug("wethepeople")
+      expect(manufacturer2.website).to eq("http://wethepeople.com")
     end
 
-    it 'updates attributes on a second upload' do
-      import_file = File.open(Rails.root.to_s + '/spec/fixtures/manufacturer-test-import.csv')
+    it "updates attributes on a second upload" do
+      import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import.csv")
       Manufacturer.import(import_file)
-      second_import_file = File.open(Rails.root.to_s + '/spec/fixtures/manufacturer-test-import-second.csv')
+      second_import_file = File.open(Rails.root.to_s + "/spec/fixtures/manufacturer-test-import-second.csv")
       Manufacturer.import(second_import_file)
-      manufacturer = Manufacturer.find_by_slug('surly-bikes')
+      manufacturer = Manufacturer.find_by_slug("surly-bikes")
     end
   end
 
-  describe 'friendly_id_find' do
-    it 'gets id from name' do
+  describe "friendly_id_find" do
+    it "gets id from name" do
       manufacturer = FactoryBot.create(:manufacturer)
       result = Manufacturer.friendly_id_find(manufacturer.name)
       expect(result).to eq(manufacturer.id)
     end
-    it 'fails with nil' do
-      result = Manufacturer.friendly_id_find('some stuff')
+    it "fails with nil" do
+      result = Manufacturer.friendly_id_find("some stuff")
       expect(result).to be_nil
     end
   end
 
-  describe 'set_website_and_logo_source' do
-    it 'has before_save_callback_method defined for set_website' do
+  describe "set_website_and_logo_source" do
+    it "has before_save_callback_method defined for set_website" do
       expect(Manufacturer._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_website_and_logo_source)).to eq(true)
     end
 
-    it 'sets logo source' do
+    it "sets logo source" do
       manufacturer = Manufacturer.new
-      allow(manufacturer).to receive(:logo).and_return('http://example.com/logo.png')
+      allow(manufacturer).to receive(:logo).and_return("http://example.com/logo.png")
       manufacturer.set_website_and_logo_source
-      expect(manufacturer.logo_source).to eq('manual')
+      expect(manufacturer.logo_source).to eq("manual")
     end
 
     it "doesn't overwrite logo source" do
-      manufacturer = Manufacturer.new(logo_source: 'something cool')
-      allow(manufacturer).to receive(:logo).and_return('http://example.com/logo.png')
+      manufacturer = Manufacturer.new(logo_source: "something cool")
+      allow(manufacturer).to receive(:logo).and_return("http://example.com/logo.png")
       manufacturer.set_website_and_logo_source
-      expect(manufacturer.logo_source).to eq('something cool')
+      expect(manufacturer.logo_source).to eq("something cool")
     end
 
-    it 'empties if no logo' do
-      manufacturer = Manufacturer.new(logo_source: 'something cool')
+    it "empties if no logo" do
+      manufacturer = Manufacturer.new(logo_source: "something cool")
       manufacturer.set_website_and_logo_source
       expect(manufacturer.logo_source).to be_nil
     end

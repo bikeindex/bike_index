@@ -1,7 +1,7 @@
 class Admin::BulkImportsController < Admin::BaseController
   include SortableTable
   before_filter :find_bulk_import, only: [:show, :update]
-  layout 'new_admin'
+  layout "new_admin"
 
   def index
     page = params[:page] || 1
