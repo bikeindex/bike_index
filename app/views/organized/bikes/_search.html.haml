@@ -53,9 +53,9 @@
     settings
 
 .collapse#organizedSearchSettings.settings-list
-  %h4
-    Columns to view
-  - renaming = {"created_at_cell" => "Registered", "updated_at_cell" => "Updated", "stolen_cell" => "Stolen", "manufacturer_cell" => "Manufacturer", "model_cell" => "Model", "color_cell" => "Color", "owner_email_cell" => "Sent to", "owner_name_cell" => "Owner name", "reg_affiliation" => "Affiliation", "reg_secondary_serial" => "Secondary#", "reg_phone" => "Phone", "reg_address" => "address"}
+  %h3.header-font-alt
+    Visible columns
+  - renaming = {"created_at_cell" => "Registered", "updated_at_cell" => "Updated", "stolen_cell" => "Stolen", "manufacturer_cell" => "Manufacturer", "model_cell" => "Model", "color_cell" => "Color", "owner_email_cell" => "Sent to", "owner_name_cell" => "Owner name", "reg_affiliation" => "Affiliation", "reg_secondary_serial" => "Secondary#", "reg_phone" => "Phone", "reg_address" => "Address"}
   .row
     - (%w[created_at_cell updated_at_cell stolen_cell manufacturer_cell model_cell color_cell owner_email_cell owner_name_cell] + current_organization.additional_registration_fields).each do |cell_name|
       .col-6.col-md-4
