@@ -5,7 +5,7 @@ class Admin::BikesController < Admin::BaseController
   def index
     @page = params[:page] || 1
     per_page = params[:per_page] || 100
-    @bikes = matching_bikes.reorder('bikes.' + sort_column + " " + sort_direction).page(@page).per(per_page)
+    @bikes = matching_bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(per_page)
     render layout: "new_admin"
   end
 
