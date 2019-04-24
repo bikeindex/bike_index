@@ -13,14 +13,13 @@
 .row.justify-content-end
   .col-auto
     %p
-      #{Bike.count} bikes total
+      = number_with_delimiter(Bike.count)
+      bikes total
       %em
         - today = Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count
         - yesterday = (Bike.where("created_at >= ?", Time.zone.now.beginning_of_day - 1.day).count) - today
         (#{today} today, #{yesterday} yesterday)
     - bikes = [ { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count }, { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count }]
-
-%hr
 
 = line_chart bikes
 
@@ -33,7 +32,8 @@
 .row.justify-content-end
   .col-auto
     %p
-      #{User.count} users total
+      = number_with_delimiter(User.count)
+      users total
       - today = User.where("created_at >= ?", Time.zone.now.beginning_of_day).count
       - yesterday = (User.where("created_at >= ?", Time.zone.now.beginning_of_day - 1.day).count) - today
       %em
@@ -48,7 +48,8 @@
 .row.justify-content-end
   .col-auto
     %p
-      #{Organization.count} Organizations total
+      = number_with_delimiter(Organization.count)
+      Organizations total
       - today = Organization.where("created_at >= ?", Time.zone.now.beginning_of_day).count
       - yesterday = (Organization.where("created_at >= ?", Time.zone.now.beginning_of_day - 1.day).count) - today
       %em
