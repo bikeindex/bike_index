@@ -63,5 +63,6 @@
           = active_link "#{current_organization.short_name} locations", locations_organization_manage_index_path(organization_id: current_organization.to_param), class: "menu-item"
 
 .organized-wrap
-  .container
+  - orgcontainer = "container-fluid" if controller_name == "bikes" && action_name == "index" || controller_name == "messages"
+  %div{ class: orgcontainer || "container" }
     = yield

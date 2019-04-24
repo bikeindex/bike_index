@@ -1,5 +1,7 @@
 module Organized
   class BikesController < Organized::BaseController
+    include SortableTable
+
     def index
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
@@ -33,6 +35,10 @@ module Organized
 
     private
 
+    def sortable_columns
+      %w[id updated_at owner_email manufacturer_id frame_model stolen]
+    end
+
     def organization_bikes
       current_organization.bikes.reorder("bikes.created_at desc")
     end
@@ -46,12 +52,12 @@ module Organized
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       org = current_organization || passive_organization
       if org.present?
-        bikes = org.bikes.reorder("bikes.created_at desc").search(@interpreted_params)
+        bikes = org.bikes.search(@interpreted_params)
         bikes = bikes.organized_email_search(params[:email]) if params[:email].present?
       else
-        bikes = Bike.reorder("bikes.created_at desc").search(@interpreted_params)
+        bikes = Bike.search(@interpreted_params)
       end
-      @bikes = bikes.order("bikes.created_at desc").page(@page).per(@per_page)
+      @bikes = bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(@per_page)
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)
       end

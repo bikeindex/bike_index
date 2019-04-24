@@ -1,0 +1,19 @@
+#organized_bikes_index {
+  .organized-bikes-settings-toggle {
+    color: $gray-light;
+  }
+  .settings-list {
+    padding: $vertical-height;
+    background: $gray-lighter;
+    border: $gray-light;
+    &.in {
+      margin: $vertical-height 0;
+    }
+    label {
+      cursor: pointer;
+    }
+    .form-group {
+      margin-bottom: 0;
+    }
+  }
+}
