@@ -11,24 +11,24 @@ module Organized
 
     def update
       if @organization.update_attributes(permitted_parameters)
-        flash[:success] = "#{active_organization.name} updated successfully"
-        redirect_path = params[:locations_page] ? locations_organization_manage_index_path(organization_id: active_organization.to_param) : current_index_path
+        flash[:success] = "#{current_organization.name} updated successfully"
+        redirect_path = params[:locations_page] ? locations_organization_manage_index_path(organization_id: current_organization.to_param) : current_index_path
         redirect_to redirect_path
       else
         @page_errors = @organization.errors
-        flash[:error] = "We're sorry, we had trouble updating #{active_organization.name}"
+        flash[:error] = "We're sorry, we had trouble updating #{current_organization.name}"
         render :index
       end
     end
 
     def destroy
-      organization_name = active_organization.name
-      if active_organization.is_paid
+      organization_name = current_organization.name
+      if current_organization.is_paid
         flash[:info] = "Please contact support@bikeindex.org to delete #{organization_name}"
         redirect_to current_index_path and return
       end
       notify_admins("organization_destroyed")
-      active_organization.destroy
+      current_organization.destroy
       flash[:info] = "Deleted #{organization_name}"
       redirect_to user_root_url
     end
@@ -40,11 +40,11 @@ module Organized
     private
 
     def assign_organization
-      @organization = active_organization
+      @organization = current_organization
     end
 
     def current_index_path
-      organization_manage_index_path(organization_id: active_organization.to_param)
+      organization_manage_index_path(organization_id: current_organization.to_param)
     end
 
     def permitted_parameters
@@ -54,11 +54,11 @@ module Organized
     end
 
     def show_on_map_if_permitted
-      active_organization.lock_show_on_map ? [] : [:show_on_map]
+      current_organization.lock_show_on_map ? [] : [:show_on_map]
     end
 
     def paid_attributes
-      active_organization.is_paid ? [:avatar] : []
+      current_organization.is_paid ? [:avatar] : []
     end
 
     def permitted_locations_params
@@ -66,7 +66,7 @@ module Organized
     end
 
     def notify_admins(type)
-      AdminNotifier.new.for_organization(organization: active_organization, user: current_user, type: type)
+      AdminNotifier.new.for_organization(organization: current_organization, user: current_user, type: type)
     end
   end
 end

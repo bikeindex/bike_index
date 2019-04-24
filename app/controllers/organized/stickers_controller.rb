@@ -39,16 +39,16 @@ module Organized
     end
 
     def find_bike_code
-      bike_code = BikeCode.lookup_with_fallback(bike_code_code, organization_id: active_organization.id, user: current_user)
+      bike_code = BikeCode.lookup_with_fallback(bike_code_code, organization_id: current_organization.id, user: current_user)
       # use the loosest lookup, but only permit it if the user can claim that
       @bike_code = bike_code if bike_code.present? && bike_code.claimable_by?(current_user)
       return @bike_code if @bike_code.present?
       flash[:error] = "Unable to find sticker with code: #{bike_code_code}"
-      redirect_to organization_stickers_path(organization_id: active_organization.to_param) and return
+      redirect_to organization_stickers_path(organization_id: current_organization.to_param) and return
     end
 
     def searched
-      searched_codes = BikeCode.where(organization_id: active_organization.id)
+      searched_codes = BikeCode.where(organization_id: current_organization.id)
       if params[:bike_query].present?
         searched_codes = searched_codes.claimed.where(bike_id: Bike.friendly_find(params[:bike_query])&.id)
       elsif params[:claimedness] && params[:claimedness] != "all"
@@ -58,13 +58,13 @@ module Organized
     end
 
     def ensure_access_to_bike_codes!
-      return true if active_organization.paid_for?("bike_codes") || current_user.superuser?
+      return true if current_organization.paid_for?("bike_codes") || current_user.superuser?
       flash[:error] = "Your organization doesn't have access to that, please contact Bike Index support"
-      redirect_to organization_bikes_path(organization_id: active_organization.to_param) and return
+      redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
     end
 
     def redirect_back
-      redirect_back_path = @bike_code.present? ? edit_organization_sticker_path(organization_id: active_organization.to_param, id: @bike_code.code) : organization_stickers_path(organization_id: params[:organization_id])
+      redirect_back_path = @bike_code.present? ? edit_organization_sticker_path(organization_id: current_organization.to_param, id: @bike_code.code) : organization_stickers_path(organization_id: params[:organization_id])
       redirect_to redirect_back_path
       return
     end

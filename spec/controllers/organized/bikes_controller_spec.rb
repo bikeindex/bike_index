@@ -9,25 +9,25 @@ describe Organized::BikesController, type: :controller do
   context "not organization member" do
     include_context :logged_in_as_user
     let!(:organization) { FactoryBot.create(:organization) }
-    it "redirects the user, reassigns current_organization_id" do
-      session[:current_organization_id] = organization.id # Even though the user isn't part of the organization
+    it "redirects the user, reassigns passive_organization_id" do
+      session[:passive_organization_id] = organization.id # Even though the user isn't part of the organization
       get :index, organization_id: organization.to_param
       expect(response.location).to eq user_home_url
       expect(flash[:error]).to be_present
-      expect(session[:current_organization_id]).to eq "0" # sets it to zero so we don't look it up again
+      expect(session[:passive_organization_id]).to eq "0" # sets it to zero so we don't look it up again
     end
     context "admin user" do
       let(:user) { FactoryBot.create(:admin) }
-      it "renders, doesn't reassign current_organization_id" do
-        session[:current_organization_id] = organization.to_param # Admin, so user has access
+      it "renders, doesn't reassign passive_organization_id" do
+        session[:passive_organization_id] = organization.to_param # Admin, so user has access
         get :index, organization_id: organization.to_param
         expect(response.status).to eq(200)
         expect(response).to render_template :index
         expect(response).to render_with_layout("application_revised")
-        expect(assigns(:active_organization)).to eq organization
-        expect(assigns(:page_id)).to eq "organized_bikes_index"
         expect(assigns(:current_organization)).to eq organization
-        expect(session[:current_organization_id]).to eq organization.id
+        expect(assigns(:page_id)).to eq "organized_bikes_index"
+        expect(assigns(:passive_organization)).to eq organization
+        expect(session[:passive_organization_id]).to eq organization.id
       end
     end
   end
@@ -40,7 +40,7 @@ describe Organized::BikesController, type: :controller do
         expect(response.status).to eq(200)
         expect(response).to render_template :index
         expect(response).to render_with_layout("application_revised")
-        expect(assigns(:active_organization)).to eq organization
+        expect(assigns(:current_organization)).to eq organization
         expect(assigns(:page_id)).to eq "organized_bikes_index"
       end
     end
@@ -51,7 +51,7 @@ describe Organized::BikesController, type: :controller do
         expect(response.status).to eq(200)
         expect(response).to render_template :new
         expect(response).to render_with_layout("application_revised")
-        expect(assigns(:active_organization)).to eq organization
+        expect(assigns(:current_organization)).to eq organization
       end
     end
   end
@@ -76,13 +76,13 @@ describe Organized::BikesController, type: :controller do
           end
           let(:organization_bikes) { organization.bikes }
           it "sends all the params and renders search template to organization_bikes" do
-            session[:current_organization_id] = "0" # Because, who knows! Maybe they don't have org access at some point.
+            session[:passive_organization_id] = "0" # Because, who knows! Maybe they don't have org access at some point.
             get :index, query_params.merge(organization_id: organization.to_param)
             expect(response.status).to eq(200)
-            expect(assigns(:active_organization)).to eq organization
+            expect(assigns(:current_organization)).to eq organization
             expect(assigns(:search_query_present)).to be_truthy
             expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
-            expect(session[:current_organization_id]).to eq organization.id
+            expect(session[:passive_organization_id]).to eq organization.id
           end
         end
         context "without params" do
@@ -90,7 +90,7 @@ describe Organized::BikesController, type: :controller do
             get :index, organization_id: organization.to_param
             expect(response.status).to eq(200)
             expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
-            expect(assigns(:active_organization)).to eq organization
+            expect(assigns(:current_organization)).to eq organization
             expect(assigns(:search_query_present)).to be_falsey
             expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
           end
@@ -172,7 +172,7 @@ describe Organized::BikesController, type: :controller do
           expect(response.status).to eq(200)
           expect(response).to render_template :index
           expect(response).to render_with_layout("application_revised")
-          expect(assigns(:active_organization)).to eq organization
+          expect(assigns(:current_organization)).to eq organization
           expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
         end
       end
@@ -196,7 +196,7 @@ describe Organized::BikesController, type: :controller do
         expect(response.status).to eq(200)
         expect(response).to render_template :new
         expect(response).to render_with_layout("application_revised")
-        expect(assigns(:active_organization)).to eq organization
+        expect(assigns(:current_organization)).to eq organization
       end
     end
   end

@@ -7,11 +7,11 @@
       no one but the user (and Bike Index admins) can see it
 
 .container
-  - if current_user.present? && current_organization.present?
-    - if current_user.authorized?(current_organization) # Authorize here, because otherwise we're displaying user data
+  - if current_user.present? && passive_organization.present?
+    - if current_user.authorized?(passive_organization) # Authorize here, because otherwise we're displaying user data
       = render partial: "organized_access_panel"
-    - else # If they aren't authorized, nix their current_organization
-      - set_current_organization(current_user.default_organization) # maybe this breaks, but whatever, they're being creepers
+    - else # If they aren't authorized, nix their passive_organization
+      - set_passive_organization(current_user.default_organization) # maybe this breaks, but whatever, they're being creepers
   .row
     .col-md-8
       %h1
