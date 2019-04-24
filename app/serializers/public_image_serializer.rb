@@ -1,5 +1,5 @@
 class PublicImageSerializer < ActiveModel::Serializer
-  self.root = 'images'
+  self.root = "images"
   attributes :name,
     :full,
     :large,
@@ -17,9 +17,8 @@ class PublicImageSerializer < ActiveModel::Serializer
   def medium
     object.image_url(:medium)
   end
-  
+
   def thumb
     object.image_url(:small)
   end
-  
 end

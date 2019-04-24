@@ -1,5 +1,5 @@
 class BikeIndex.Views.UsersEdit extends Backbone.View
-   
+
   initialize: ->
     @setElement($('#body'))
     @loadUserForm()

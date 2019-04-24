@@ -1,7 +1,7 @@
 # Be sure to restart your server when you modify this file.
 
 # Version of your assets, change this if you want to expire all your assets.
-Rails.application.config.assets.version = '1.2'
+Rails.application.config.assets.version = "1.2"
 
 Rails.application.config.assets.precompile += %w(
   graphs.js embed.js embed_user.js documentation_v2_and_v3.js

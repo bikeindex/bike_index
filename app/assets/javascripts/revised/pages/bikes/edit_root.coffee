@@ -47,7 +47,7 @@ class BikeIndex.BikesEditRoot extends BikeIndex
     if size == 'cm' or size == 'in'
       $('#bike_frame_size_unit').val(size)
       unless $hidden_other.hasClass('unhidden')
-        $hidden_other.slideDown 'fast', -> 
+        $hidden_other.slideDown 'fast', ->
           $hidden_other.addClass('unhidden')
           $('.ordinal-sizes .btn').removeClass('active')
           $('.frame-sizes').removeClass('unexpanded-unit-size') # For small display setup. Remove space after appear

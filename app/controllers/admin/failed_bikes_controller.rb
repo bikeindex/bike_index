@@ -1,5 +1,6 @@
 class Admin::FailedBikesController < Admin::BaseController
   layout "new_admin"
+
   def index
     @b_params = BParam.where("created_bike_id IS NOT NULL").order("created_at desc")
   end
@@ -7,5 +8,4 @@ class Admin::FailedBikesController < Admin::BaseController
   def show
     @b_param = BParam.find(params[:id])
   end
-
 end

@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe CycleType do
   describe "normalized name" do

@@ -2,7 +2,7 @@ module Organized
   class BaseController < ApplicationController
     before_filter :ensure_active_organization!
     before_filter :ensure_member!
-    layout 'application_revised'
+    layout "application_revised"
 
     def ensure_member!
       return true if current_user && current_user.member_of?(active_organization)
@@ -13,7 +13,7 @@ module Organized
 
     def ensure_admin!
       return true if current_user && current_user.admin_of?(active_organization)
-      flash[:error] = 'You have to be an organization administrator to do that!'
+      flash[:error] = "You have to be an organization administrator to do that!"
       redirect_to organization_bikes_path(organization_id: active_organization.to_param) and return
     end
 

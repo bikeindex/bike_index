@@ -69,8 +69,8 @@ class BikeCode < ActiveRecord::Base
 
   def url
     [
-      "#{ENV['BASE_URL']}/scanned/bikes/#{code}",
-      organization.present? ? "?organization_id=#{organization.slug}" : nil
+      "#{ENV["BASE_URL"]}/scanned/bikes/#{code}",
+      organization.present? ? "?organization_id=#{organization.slug}" : nil,
     ].compact.join("")
   end
 

@@ -8,14 +8,14 @@ class Organization < ActiveRecord::Base
     bike_manufacturer: 4,
     software: 5,
     property_management: 6,
-    other: 7
+    other: 7,
   }.freeze
 
   acts_as_paranoid
   mount_uploader :avatar, AvatarUploader
 
   belongs_to :parent_organization, class_name: "Organization"
-  belongs_to :auto_user, class_name: 'User'
+  belongs_to :auto_user, class_name: "User"
 
   has_many :recovered_records, through: :bikes
   has_many :locations, inverse_of: :organization, dependent: :destroy
@@ -75,7 +75,7 @@ class Organization < ActiveRecord::Base
     match_cols = %w(organizations.name organizations.short_name locations.name locations.city)
     joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
       .distinct
-      .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(' OR '), { str: str })
+      .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(" OR "), { str: str })
   end
 
   def self.with_paid_feature_slugs(slugs)
@@ -99,7 +99,7 @@ class Organization < ActiveRecord::Base
   def message_kinds # Matches organization_message kinds
     [
       paid_for?("geolocated_messages") ? "geolocated_messages" : nil,
-      paid_for?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil
+      paid_for?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil,
     ].compact
   end
 
@@ -154,10 +154,10 @@ class Organization < ActiveRecord::Base
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
     self.paid_feature_slugs = current_invoices.map(&:feature_slugs).flatten
-    new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
+    new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, "")
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
-      orgs = id.present? ? Organization.where('id != ?', id) : Organization.all
+      orgs = id.present? ? Organization.where("id != ?", id) : Organization.all
       while orgs.where(slug: new_slug).exists?
         i = i.present? ? i + 1 : 2
         new_slug = "#{new_slug}-#{i}"
@@ -172,11 +172,12 @@ class Organization < ActiveRecord::Base
 
   def ensure_auto_user
     return true if auto_user.present?
-    self.embedable_user_email = users.first && users.first.email || ENV['AUTO_ORG_MEMBER']
+    self.embedable_user_email = users.first && users.first.email || ENV["AUTO_ORG_MEMBER"]
     save
   end
 
   def child_ids; child_organizations.pluck(:id) end
+
   # Parent invoice serves as invoice
   def current_invoices; parent_organization.present? ? parent_organization.current_invoices : invoices.active end
 
@@ -194,7 +195,7 @@ class Organization < ActiveRecord::Base
     location = locations&.first
     {
       latitude: location&.latitude || 37.7870322,
-      longitude: location&.longitude || -122.4061122
+      longitude: location&.longitude || -122.4061122,
     }
   end
 
@@ -202,8 +203,8 @@ class Organization < ActiveRecord::Base
     if embedable_user_email.present?
       u = User.fuzzy_email_find(embedable_user_email)
       self.auto_user_id = u.id if u && u.member_of?(self)
-      if auto_user_id.blank? && embedable_user_email == ENV['AUTO_ORG_MEMBER']
-        Membership.create(user_id: u.id, organization_id: id, role: 'member')
+      if auto_user_id.blank? && embedable_user_email == ENV["AUTO_ORG_MEMBER"]
+        Membership.create(user_id: u.id, organization_id: id, role: "member")
         self.auto_user_id = u.id
       end
     elsif auto_user_id.blank?

@@ -19,8 +19,8 @@ class MembershipSerializer < ActiveModel::Serializer
     object.organization.id
   end
 
-  def slug 
-    object.organization.slug 
+  def slug
+    object.organization.slug
   end
 
   def is_admin
@@ -30,17 +30,16 @@ class MembershipSerializer < ActiveModel::Serializer
   def base_url
     "/organizations/#{object.organization.slug}"
   end
-  
+
   def locations
     l = []
     if object.organization.locations && object.organization.locations.length > 1
-      object.organization.locations.each do  |location|
-        l.push({ name: location.name, id: location.id})
+      object.organization.locations.each do |location|
+        l.push({ name: location.name, id: location.id })
       end
     else
       l.push({ name: organization_name, id: nil })
     end
     return l
   end
-
 end

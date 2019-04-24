@@ -14,13 +14,18 @@
 
 // Core variables and mixins
 @import "bootstrap/variables";
-$enable-flex: true; // Flexbox!!
+
+$enable-flex: true;
+
+// Flexbox!!
 $half-gutter: $grid-gutter-width / 2;
+
 //
 // Overrides
 $border-radius: 1px;
 $border-radius-lg: 1px;
 $border-radius-sm: 1px;
+
 @import "revised/mixins/colors";
 
 //
@@ -33,9 +38,11 @@ $border-radius-sm: 1px;
 
 // Core CSS
 @import "bootstrap/reboot";
+
 // @import "bootstrap/type";
 @import "bootstrap/images";
 @import "bootstrap/code";
+
 .code {
   .code-label {
     border-radius: $border-radius $border-radius 0 0;
@@ -48,6 +55,7 @@ $border-radius-sm: 1px;
     font-size: 15px;
     font-weight: bold;
   }
+
   pre {
     border-radius: 0 0 $border-radius $border-radius;
     box-shadow: inset 0 0 1px rgba(black, 0.2);
@@ -55,12 +63,16 @@ $border-radius-sm: 1px;
     border-top: 0;
   }
 }
+
 @import "bootstrap/grid";
 @import "bootstrap/tables";
+
 .table-compact-long {
   line-height: 1.2em;
 }
+
 @import "bootstrap/forms";
+
 // @import "bootstrap/buttons"; // Override buttons with our own buttons
 
 // Components
@@ -73,9 +85,11 @@ $border-radius-sm: 1px;
 @import "bootstrap/navbar";
 @import "bootstrap/card";
 @import "bootstrap/breadcrumb";
+
 // @import "bootstrap/pagination"; // Overriden with our own
 // @import "bootstrap/tags";
 @import "bootstrap/jumbotron";
+
 // @import "bootstrap/alert"; // Overriden with our own
 @import "bootstrap/progress";
 @import "bootstrap/media";
@@ -86,6 +100,7 @@ $border-radius-sm: 1px;
 // Components w/ JavaScript
 $modal-backdrop-bg: $blue-dark;
 $modal-backdrop-opacity: 0.8;
+
 @import "bootstrap/modal";
 @import "bootstrap/tooltip";
 @import "bootstrap/popover";
@@ -97,10 +112,13 @@ $modal-backdrop-opacity: 0.8;
 //
 // Other (non-bootstrap) external styles
 @import "legacy_includes/zoom.scss";
+
 $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
+
 .zoom-overlay {
   z-index: $zindex-navbar-fixed + 99;
 }
+
 .zoom-img-wrap {
   z-index: $zoom-img-wrap-z-index;
 }
@@ -148,12 +166,15 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import "revised/sections/side_boxes";
 @import "revised/sections/tables";
 @import "revised/sections/embeded_tweet";
+
 // Shared organized styles
 @import "revised/pages/organized/forms";
 @import "revised/pages/organized/shared";
 @import "revised/pages/organized/messages";
 @import "revised/pages/organized/exports";
-@import "revised/sections/organized_menu"; // left hand organized menu
+@import "revised/sections/organized_menu";
+
+// left hand organized menu
 
 //
 // Page styles
@@ -171,13 +192,19 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 // Bike show & search pages
 @import "revised/pages/bikes/index";
 @import "revised/pages/bikes/show";
-@import "revised/pages/bikes/show_photo"; // separated because it's a lot
+@import "revised/pages/bikes/show_photo";
+
+// separated because it's a lot
 @import "revised/pages/bikes/multi_serial_search";
 
 // User pages
 @import "revised/pages/user/home";
-@import "revised/pages/user/edit"; // my_account page
-@import "revised/pages/user/show"; // public show page
+@import "revised/pages/user/edit";
+
+// my_account page
+@import "revised/pages/user/show";
+
+// public show page
 
 // Error pages
 @import "revised/pages/errors";
@@ -211,19 +238,27 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import "revised/pages/landing/recoveries";
 
 // LEGACY PAGES general styles - replace as soon as all pages have been restyled
-@import "revised/sections/legacy_content"; // general legacy content styles
-@import "revised/pages/legacy_stolen"; // legacy stolen page - including multi-serial search
+@import "revised/sections/legacy_content";
+
+// general legacy content styles
+@import "revised/pages/legacy_stolen";
+
+// legacy stolen page - including multi-serial search
 @import "revised/sections/oauth";
 
 html {
   background: $black-off;
 }
+
 .currently-hidden {
   display: none;
 }
+
 img {
   max-width: 100%;
-} // don't break random stuff images!
+}
+
+// don't break random stuff images!
 body {
   min-height: 400px;
 }
@@ -242,9 +277,11 @@ body {
   bottom: 0;
   left: 0;
   text-align: center;
+
   p {
     margin: 0;
   }
+
   h4 {
     color: $red;
     margin: 0 0 $vertical-height;
@@ -255,26 +292,33 @@ body {
 .text-right {
   text-align: right;
 }
+
 .mt-4 {
   margin-top: 2 * $vertical-height;
 }
+
 .mt-2 {
   margin-top: $vertical-height;
 }
+
 .mb-4 {
   margin-bottom: 2 * $vertical-height;
 }
+
 .mb-2 {
   margin-bottom: $vertical-height;
 }
+
 .small {
   @extend small;
 }
+
 // pull-right and pull-left should be replaced by float-right and float-left
 .float-right,
 .pull-right {
   float: right;
 }
+
 .float-left,
 .pull-left {
   float: right;
@@ -283,6 +327,7 @@ body {
 .text-right {
   text-align: right;
 }
+
 .text-left {
   text-align: left;
 }

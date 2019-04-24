@@ -31,7 +31,7 @@ class AfterBikeSaveWorker
     {
       auth_token: AUTH_TOKEN,
       bike: BikeV2ShowSerializer.new(bike, root: false).as_json,
-      update: bike.created_at > Time.now - 30.seconds
+      update: bike.created_at > Time.now - 30.seconds,
     }
   end
 
