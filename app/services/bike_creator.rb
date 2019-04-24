@@ -71,7 +71,7 @@ class BikeCreator
     @bike = create_associations(bike)
     validate_record(@bike)
     if @bike.present? && @bike.id.present?
-      @bike.create_creation_state(creation_state_attributes)
+      @bike.creation_states.create(creation_state_attributes)
       AfterBikeSaveWorker.perform_async(@bike.id)
       if @b_param.bike_code.present? && @bike.creation_organization.present?
         bike_code = BikeCode.lookup(@b_param.bike_code, organization_id: @bike.creation_organization.id)

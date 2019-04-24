@@ -15,11 +15,7 @@ describe Bike do
     it { is_expected.to belong_to :updator }
     it { is_expected.to have_many :bike_organizations }
     it { is_expected.to have_many(:organizations).through(:bike_organizations) }
-    it { is_expected.to have_one :creation_state }
-    it { is_expected.to delegate_method(:creation_description).to(:creation_state) }
     it { is_expected.to belong_to :creation_organization }
-    # it { is_expected.to delegate_method(:creator).to(:creation_state) }
-    # it { is_expected.to have_one(:creation_organization).through(:creation_state) }
     it { is_expected.to belong_to :current_stolen_record }
     it { is_expected.to have_many :duplicate_bike_groups }
     it { is_expected.to have_many :b_params }
@@ -31,7 +27,6 @@ describe Bike do
     it { is_expected.to have_many :other_listings }
     it { is_expected.to accept_nested_attributes_for :stolen_records }
     it { is_expected.to accept_nested_attributes_for :components }
-    # it { is_expected.to validate_presence_of :creation_state_id }
     it { is_expected.to validate_presence_of :creator }
     it { is_expected.to validate_presence_of :propulsion_type }
     it { is_expected.to validate_presence_of :serial_number }
