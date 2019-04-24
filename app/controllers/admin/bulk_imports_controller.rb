@@ -1,18 +1,14 @@
 class Admin::BulkImportsController < Admin::BaseController
+  include SortableTable
   before_filter :find_bulk_import, only: [:show, :update]
   layout "new_admin"
 
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 10
-    if params[:organization_id].present?
-      bulk_imports = BulkImport.where(organization_id: active_organization.id)
-    else
-      bulk_imports = BulkImport.all
-    end
-    @bulk_imports = bulk_imports.includes(:organization, :user, :creation_states)
-                                .order(created_at: :desc).includes(:creation_states)
-                                .page(page).per(per_page)
+    @bulk_imports = matching_bulk_imports.includes(:organization, :user, :creation_states)
+                                         .reorder(sort_column + " " + sort_direction)
+                                         .page(page).per(per_page)
   end
 
   def show; end
@@ -44,6 +40,8 @@ class Admin::BulkImportsController < Admin::BaseController
     end
   end
 
+  helper_method :matching_bulk_imports
+
   protected
 
   def permitted_parameters
@@ -52,5 +50,24 @@ class Admin::BulkImportsController < Admin::BaseController
 
   def find_bulk_import
     @bulk_import = BulkImport.find(params[:id])
+  end
+
+  def sortable_columns
+    %w[created_at progress user_id]
+  end
+
+  def matching_bulk_imports
+    return @matching_bulk_imports if defined?(@matching_bulk_imports)
+    bulk_imports = BulkImport
+    if params[:ascend].present?
+      bulk_imports = bulk_imports.ascend
+    elsif params[:not_ascend].present?
+      bulk_imports = bulk_imports.not_ascend
+    end
+        
+    if params[:organization_id].present?
+      bulk_imports = bulk_imports.where(organization_id: active_organization.id)
+    end
+    @matching_bulk_imports = bulk_imports
   end
 end

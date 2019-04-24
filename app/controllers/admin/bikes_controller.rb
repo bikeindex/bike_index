@@ -1,16 +1,11 @@
 class Admin::BikesController < Admin::BaseController
+  include SortableTable
   before_filter :find_bike, only: [:edit, :destroy, :update, :get_destroy]
 
   def index
-    bikes = Bike.unscoped.includes(:creation_organization, :creation_state, :paint)
-    if params[:email]
-      bikes = bikes.admin_text_search(params[:email])
-    else
-      bikes = bikes.order("created_at desc")
-    end
     @page = params[:page] || 1
     per_page = params[:per_page] || 100
-    @bikes = bikes.page(@page).per(per_page)
+    @bikes = matching_bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(per_page)
     render layout: "new_admin"
   end
 
@@ -116,6 +111,10 @@ class Admin::BikesController < Admin::BaseController
 
   protected
 
+  def sortable_columns
+    %w[id owner_email manufacturer_id]
+  end
+
   def permitted_parameters
     params.require(:bike).permit(Bike.old_attr_accessible + [bike_organization_ids: []])
   end
@@ -134,5 +133,18 @@ class Admin::BikesController < Admin::BaseController
 
   def find_bike
     @bike = Bike.unscoped.find(params[:id])
+  end
+
+  def matching_bikes
+    return @matching_bikes if defined?(@matching_bikes)
+    if current_organization.present?
+      bikes = current_organization.bikes.includes(:creation_organization, :creation_states, :paint)
+    else
+      bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint)
+    end
+    bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email]
+    bikes = bikes.ascend_pos if params[:ascend_pos].present?
+    bikes = bikes.lightspeed_pos if params[:lightspeed_pos].present?
+    @matching_bikes = bikes
   end
 end

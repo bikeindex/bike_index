@@ -1,6 +1,6 @@
 class Admin::DashboardController < Admin::BaseController
   def index
-    @bikes = Bike.unscoped.includes(:creation_organization, :creation_state, :paint).order("created_at desc").limit(10)
+    @bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint).order("created_at desc").limit(10)
     @users = User.includes(:memberships => [:organization]).limit(5).order("created_at desc")
     @flavors = FlavorText.all
     @flavor = FlavorText.new
@@ -10,7 +10,6 @@ class Admin::DashboardController < Admin::BaseController
   def invitations
     @organizations = Organization.all
     @organization_invitation = OrganizationInvitation.new
-    render layout: "new_admin"
   end
 
   def maintenance

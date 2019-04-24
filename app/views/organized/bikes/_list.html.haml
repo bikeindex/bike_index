@@ -6,7 +6,8 @@
   %p
     %strong
       - count = defined?(@bikes.total_count) ? @bikes.total_count : @bikes.count
-      #{ pluralize(count, 'bike') }
+      = number_with_delimiter(count)
+      = "bike".pluralize(count)
     registered
 
 %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border

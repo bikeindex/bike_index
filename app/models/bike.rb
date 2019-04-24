@@ -22,8 +22,7 @@ class Bike < ActiveRecord::Base
 
   has_many :bike_organizations, dependent: :destroy
   has_many :organizations, through: :bike_organizations
-  has_one :creation_state, dependent: :destroy
-  delegate :creation_description, :bulk_import, to: :creation_state, allow_nil: true
+  has_many :creation_states, dependent: :destroy
   # delegate :creator, to: :creation_state, source: :creator
   # has_one :creation_organization, through: :creation_state, source: :organization
   has_many :stolen_notifications, dependent: :destroy
@@ -48,7 +47,6 @@ class Bike < ActiveRecord::Base
   validates_presence_of :propulsion_type
   validates_presence_of :cycle_type
   validates_presence_of :creator
-  # validates_presence_of :creation_state_id
   validates_presence_of :manufacturer_id
 
   validates_uniqueness_of :card_id, allow_nil: true
@@ -78,6 +76,9 @@ class Bike < ActiveRecord::Base
   # "Recovered" bikes are bikes that were found and are waiting to be claimed. This is confusing and should be fixed
   # so that it no longer is the same word as stolen recoveries
   scope :non_recovered, -> { where(recovered: false) }
+  # TODO: Rails 5 update - use left_joins method and the text version of enum
+  scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 2 }) }
+  scope :ascend_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 3 }) }
 
   before_save :set_calculated_attributes
 
@@ -148,6 +149,16 @@ class Bike < ActiveRecord::Base
     t = (updated_at || Time.now).to_i / 10000
     stock_photo_url.present? || public_images.present? ? t : t / 100
   end
+
+  def creation_state; creation_states.first end
+
+  def creation_description; creation_state&.creation_description end
+  
+  def bulk_import; creation_state&.bulk_import end
+
+  def pos_kind; creation_state&.pos_kind end
+
+  def pos?; pos_kind != "not_pos" end
 
   def current_ownership; ownerships.reorder(:created_at).last end
 

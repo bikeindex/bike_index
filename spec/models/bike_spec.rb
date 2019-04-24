@@ -15,11 +15,7 @@ describe Bike do
     it { is_expected.to belong_to :updator }
     it { is_expected.to have_many :bike_organizations }
     it { is_expected.to have_many(:organizations).through(:bike_organizations) }
-    it { is_expected.to have_one :creation_state }
-    it { is_expected.to delegate_method(:creation_description).to(:creation_state) }
     it { is_expected.to belong_to :creation_organization }
-    # it { is_expected.to delegate_method(:creator).to(:creation_state) }
-    # it { is_expected.to have_one(:creation_organization).through(:creation_state) }
     it { is_expected.to belong_to :current_stolen_record }
     it { is_expected.to have_many :duplicate_bike_groups }
     it { is_expected.to have_many :b_params }
@@ -31,7 +27,6 @@ describe Bike do
     it { is_expected.to have_many :other_listings }
     it { is_expected.to accept_nested_attributes_for :stolen_records }
     it { is_expected.to accept_nested_attributes_for :components }
-    # it { is_expected.to validate_presence_of :creation_state_id }
     it { is_expected.to validate_presence_of :creator }
     it { is_expected.to validate_presence_of :propulsion_type }
     it { is_expected.to validate_presence_of :serial_number }
@@ -52,12 +47,19 @@ describe Bike do
     it "non_recovered scopes to only non_recovered bikes" do
       expect(Bike.non_recovered.to_sql).to eq(Bike.where(recovered: false).to_sql)
     end
-  end
-
-  describe "recovered_records" do
-    it "default scopes to created_at desc" do
+    it "recovered_records default scopes to created_at desc" do
       bike = FactoryBot.create(:bike)
       expect(bike.recovered_records.to_sql).to eq(StolenRecord.unscoped.where(bike_id: bike.id, current: false).order("date_recovered desc").to_sql)
+    end
+    context "actual tests for ascend and lightspeed" do
+      let!(:bike_lightspeed_pos) { FactoryBot.create(:bike_lightspeed_pos) }
+      let!(:bike_ascend_pos) { FactoryBot.create(:bike_ascend_pos) }
+      it "scopes correctly" do
+        expect(bike_lightspeed_pos.pos_kind).to eq "lightspeed_pos"
+        expect(bike_ascend_pos.pos_kind).to eq "ascend_pos"
+        expect(Bike.lightspeed_pos.pluck(:id)).to eq([bike_lightspeed_pos.id])
+        expect(Bike.ascend_pos.pluck(:id)).to eq([bike_ascend_pos.id])
+      end
     end
   end
 
