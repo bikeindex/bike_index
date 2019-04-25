@@ -1,3 +1,6 @@
+// Trying to avoid merge conflicts, this should get put up above with the other imports
+import BinxAppOrgBikes from "./binx_org_bikes.js";
+
 // This is stuff that needs to happen on page load.
 import * as log from "loglevel";
 if (process.env.NODE_ENV != "production") log.setLevel("debug");
@@ -121,5 +124,8 @@ $(document).ready(function() {
     case "organized_exports_new":
       window.binxAppOrgExport = new BinxAppOrgExport();
       binxAppOrgExport.init();
+    case "organized_bikes_index":
+      const binxAppOrgBikes = BinxAppOrgBikes();
+      binxAppOrgBikes.init();
   }
 });

@@ -2,6 +2,9 @@
   .organized-bikes-settings-toggle {
     color: $gray-light;
   }
+  &.javascriptFunctioning .hiddenColumn {
+    display: none;
+  }
   .settings-list {
     padding: $vertical-height;
     background: $gray-lighter;
