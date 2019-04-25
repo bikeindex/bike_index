@@ -147,6 +147,6 @@ module ApplicationHelper
 
   def sortable_search_params
     search_param_keys = params.keys.select { |k| k.to_s.match(/\Asearch_/) }
-    params.permit(:direction, :sort, :user_id, :organization_id, :is_paid, *search_param_keys)
+    params.permit(:direction, :sort, :user_id, :organization_id, *search_param_keys)
   end
 end
