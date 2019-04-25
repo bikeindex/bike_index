@@ -5,8 +5,8 @@ module BikeFinder
   # (TODO: on any serial number normalization?)
   # Matching is scoped to the user record associated with `owner_email`.
   #
-  # Return a boolean
-  def self.exists?(serial:, owner_email:)
+  # Return an Bike object, or nil
+  def self.find_matching(serial:, owner_email:)
     candidate_user_ids =
       User
         .joins("LEFT JOIN user_emails ON user_emails.user_id = users.id")
@@ -14,7 +14,7 @@ module BikeFinder
         .select(:id)
         .uniq
 
-    return false if candidate_user_ids.blank?
+    return if candidate_user_ids.blank?
 
     normalized_serial =
       SerialNormalizer
@@ -22,9 +22,9 @@ module BikeFinder
         .normalized
 
     Bike
-      .includes(:ownerships)
+      .joins("RIGHT JOIN ownerships ON bikes.id = ownerships.bike_id")
       .where(serial_number: [serial, normalized_serial])
       .where("ownerships.user_id IN (?) OR ownerships.creator_id IN (?)", candidate_user_ids, candidate_user_ids)
-      .exists?
+      .first
   end
 end
