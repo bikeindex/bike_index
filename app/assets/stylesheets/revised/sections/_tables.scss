@@ -19,9 +19,26 @@ thead.sortable {
       }
 
       &.active {
-        font-weight: strong;
+        font-weight: bold;
         text-decoration: underline;
       }
     }
+  }
+}
+
+table .table-cell-check {
+  font-family: Courier;
+  text-align: center;
+  font-weight: bold;
+}
+
+.fullscreen-table-wrapper {
+  // Enable scrolling
+  overflow-x: scroll;
+
+  // Make it edge to edge on sm screens
+  @include media-breakpoint-down(sm) {
+    margin-left: -15px;
+    margin-right: -15px;
   }
 }

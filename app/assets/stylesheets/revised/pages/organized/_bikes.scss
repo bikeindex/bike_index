@@ -1,0 +1,23 @@
+#organized_bikes_index {
+  .organized-bikes-settings-toggle {
+    color: $gray-light;
+  }
+  &.javascriptFunctioning .hiddenColumn {
+    display: none;
+  }
+  .settings-list {
+    padding: $vertical-height;
+    background: $gray-lighter;
+    border: $gray-light;
+    &.in {
+      margin: $vertical-height 0;
+    }
+    label {
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+    .form-group {
+      margin-bottom: 0;
+    }
+  }
+}
