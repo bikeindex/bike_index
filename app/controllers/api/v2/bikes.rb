@@ -139,16 +139,26 @@ module API
           end
         end
         post "/", serializer: BikeV2ShowSerializer, root: "bike" do
-          declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
-          b_param = BParam.create(creator_id: creation_user_id, params: declared_p["declared_params"], origin: "api_v2")
-          ensure_required_stolen_attrs(b_param.params)
-          bike = BikeCreator.new(b_param).create_bike
-          if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
-            bike
-          else
-            e = bike.present? ? bike.errors : b_param.errors
-            error!(e.full_messages.to_sentence, 401)
+          # Search for a bike matching the provided serial number / owner email
+          bike_attrs = %w{serial owner_email}.map { |key| [key.to_sym, params[key]] }.to_h
+          found_bike = BikeFinder.find_matching(**bike_attrs)
+
+          if found_bike.blank?
+            declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
+            b_param = BParam.create(creator_id: creation_user_id, params: declared_p["declared_params"], origin: "api_v2")
+            ensure_required_stolen_attrs(b_param.params)
+            bike = BikeCreator.new(b_param).create_bike
+
+            if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
+              return bike
+            else
+              e = bike.present? ? bike.errors : b_param.errors
+              return error!(e.full_messages.to_sentence, 401)
+            end
           end
+
+          # found_bike is present, update instead
+          # TODO
         end
 
         desc "Update a bike owned by the access token<span class='accstr'>*</span>", {
