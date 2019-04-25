@@ -16,7 +16,9 @@
           the non-profit
           %br
           bike registry
-        - if passive_organization.present? && current_user.present?
+        - if current_user.present? && (current_organization.present? || passive_organization.present?)
+          / Make it possible to manually override the passive organization on any page
+          - set_passive_organization(current_organization) if current_organization.present? && current_organization != passive_organization
           %span.current-organization-nav-item
             %a#passive_organization_submenu{ "aria-haspopup" => "true", "aria-expanded" => "false", data: { toggle: "dropdown" } }
               = passive_organization.short_name
@@ -66,7 +68,7 @@
                 %li.divider-nav-item
                 %li
                   = link_to "Super Admin view #{passive_organization.short_name}", admin_organization_path(passive_organization)
-            
+
         %a#menu-opened-backdrop
         .hamburgler
           %a#primary_nav_hamburgler
