@@ -157,8 +157,36 @@ module API
             end
           end
 
-          # found_bike is present, update instead
-          # TODO
+          if found_bike.present?
+            # found_bike is present, update instead
+            declared_p = { "declared_params" => declared(params, include_missing: false) }
+
+            # TODO: current_user?
+            if !found_bike.authorize_for_user!(found_bike.creator)
+              error!("You do not own that #{found_bike.type}", 403)
+            end
+
+            hash = BParam.v2_params(declared_p["declared_params"].as_json)
+
+            if hash["stolen_record"].present? && found_bike.stolen != true
+              ensure_required_stolen_attrs(hash)
+            end
+
+            if hash.dig("bike", "external_image_urls").present?
+              found_bike.load_external_images(hash["bike"]["external_image_urls"])
+            end
+
+            begin
+              # TODO: current_user?
+              BikeUpdator
+                .new(user: found_bike.creator, bike: found_bike, b_params: hash)
+                .update_available_attributes
+            rescue => e
+              error!("Unable to update bike: #{e}", 401)
+            end
+
+            found_bike.reload
+          end
         end
 
         desc "Update a bike owned by the access token<span class='accstr'>*</span>", {
