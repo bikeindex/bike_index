@@ -9,7 +9,7 @@ RSpec.describe BikeFinder do
       expect(UserEmail.exists?(email: absent_email)).to eq(false)
 
       result = BikeFinder.exists?(
-        serial_number: bike.serial_number,
+        serial: bike.serial_number,
         owner_email: absent_email,
       )
 
@@ -23,7 +23,7 @@ RSpec.describe BikeFinder do
       expect(UserEmail.exists?(email: bike.creator.email)).to eq(false)
 
       result = BikeFinder.exists?(
-        serial_number: bike.serial_number,
+        serial: bike.serial_number,
         owner_email: bike.creator.email,
       )
 
@@ -37,7 +37,7 @@ RSpec.describe BikeFinder do
       expect(UserEmail.exists?(email: bike.creator.email)).to eq(true)
 
       result = BikeFinder.exists?(
-        serial_number: bike.serial_number,
+        serial: bike.serial_number,
         owner_email: bike.creator.email,
       )
 
@@ -48,7 +48,7 @@ RSpec.describe BikeFinder do
       bike = FactoryBot.create(:ownership).bike
 
       result = BikeFinder.exists?(
-        serial_number: "bad-serial-number",
+        serial: "bad-serial-number",
         owner_email: bike.creator.email,
       )
 
@@ -62,7 +62,7 @@ RSpec.describe BikeFinder do
       bike.update(serial_number: normalized_serial)
 
       result = BikeFinder.exists?(
-        serial_number: serial,
+        serial: serial,
         owner_email: bike.creator.email,
       )
 
@@ -75,7 +75,7 @@ RSpec.describe BikeFinder do
       bike.update(serial_number: serial)
 
       result = BikeFinder.exists?(
-        serial_number: serial,
+        serial: serial,
         owner_email: bike.creator.email,
       )
 
