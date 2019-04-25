@@ -16,57 +16,60 @@
           the non-profit
           %br
           bike registry
-        - if passive_organization.present? && current_user.present?
-          %span.current-organization-nav-item
-            %a#passive_organization_submenu{ "aria-haspopup" => "true", "aria-expanded" => "false", data: { toggle: "dropdown" } }
-              = passive_organization.short_name
-              <span class="caret-down">v</span>
-            %ul.current-organization-submenu{ "aria-labelledby" => "#passive_organization_submenu" }
-              %li
-                = active_link "#{passive_organization.short_name} Bikes", organization_bikes_path(organization_id: passive_organization.to_param), class: "nav-link"
-              %li
-                = active_link "Add a bike", new_organization_bike_path(passive_organization), class: "nav-link"
-              - if passive_organization.paid_for?("show_partial_registrations")
+        - if current_user.present? && (current_organization.present? || passive_organization.present?)
+          / Make it possible to manually override the passive organization on any page
+          - set_passive_organization(current_organization) if current_organization.present? && current_organization != passive_organization
+          - if passive_organization.present? # Maybe there isn't a passive organization anymore!
+            %span.current-organization-nav-item
+              %a#passive_organization_submenu{ "aria-haspopup" => "true", "aria-expanded" => "false", data: { toggle: "dropdown" } }
+                = passive_organization.short_name
+                <span class="caret-down">v</span>
+              %ul.current-organization-submenu{ "aria-labelledby" => "#passive_organization_submenu" }
                 %li
-                  = active_link "Incomplete registrations", incompletes_organization_bikes_path(passive_organization), class: "nav-link"
-              - if passive_organization.paid_for?("show_recoveries") # I don't want to show a grayed link for this
+                  = active_link "#{passive_organization.short_name} Bikes", organization_bikes_path(organization_id: passive_organization.to_param), class: "nav-link"
                 %li
-                  = active_link "Recoveries", recoveries_organization_bikes_path(passive_organization), class: "nav-link"
-
-              - if passive_organization.show_bulk_import?
-                %li
-                  - bulk_link_name = passive_organization.ascend_imports? ? "Ascend Imports" : "Bulk Imports"
-                  = active_link bulk_link_name, organization_bulk_imports_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
-              - if passive_organization.paid_for?("bike_codes")
-                %li.divider-nav-item
-                %li
-                  = active_link "Registration stickers", organization_stickers_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
-              - if passive_organization.paid_for?("csv_exports")
-                %li
-                  = active_link "Exports", organization_exports_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
-              - if passive_organization.message_kinds.any?
-                %li.divider-nav-item
-                - passive_organization.message_kinds.each_with_index do |message_kind, index|
+                  = active_link "Add a bike", new_organization_bike_path(passive_organization), class: "nav-link"
+                - if passive_organization.paid_for?("show_partial_registrations")
                   %li
-                    / (params[:kind] == message_kind ? "active" : "")
-                    - if message_kind == "geolocated_messages"
-                      - link_title = "GeoMessaging"
-                    - else
-                      - link_title = message_kind.gsub("_messages", "").titleize
-                    = active_link link_title, organization_messages_path(organization_id: passive_organization.to_param, kind: message_kind), class: "nav-link"
-              - if current_user.admin_of?(passive_organization) || current_user.superuser?
-                %li.divider-nav-item
-                %li
-                  = active_link "Users", organization_users_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
-                %li
-                  = active_link "#{passive_organization.short_name} profile", organization_manage_index_path(organization_id: passive_organization.to_param), class: "nav-link"
-                %li
-                  = active_link "#{passive_organization.short_name} locations", locations_organization_manage_index_path(organization_id: passive_organization.to_param), class: "nav-link"
-              - if current_user&.superuser?
-                %li.divider-nav-item
-                %li
-                  = link_to "Super Admin view #{passive_organization.short_name}", admin_organization_path(passive_organization)
-            
+                    = active_link "Incomplete registrations", incompletes_organization_bikes_path(passive_organization), class: "nav-link"
+                - if passive_organization.paid_for?("show_recoveries") # I don't want to show a grayed link for this
+                  %li
+                    = active_link "Recoveries", recoveries_organization_bikes_path(passive_organization), class: "nav-link"
+
+                - if passive_organization.show_bulk_import?
+                  %li
+                    - bulk_link_name = passive_organization.ascend_imports? ? "Ascend Imports" : "Bulk Imports"
+                    = active_link bulk_link_name, organization_bulk_imports_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
+                - if passive_organization.paid_for?("bike_codes")
+                  %li.divider-nav-item
+                  %li
+                    = active_link "Registration stickers", organization_stickers_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
+                - if passive_organization.paid_for?("csv_exports")
+                  %li
+                    = active_link "Exports", organization_exports_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
+                - if passive_organization.message_kinds.any?
+                  %li.divider-nav-item
+                  - passive_organization.message_kinds.each_with_index do |message_kind, index|
+                    %li
+                      / (params[:kind] == message_kind ? "active" : "")
+                      - if message_kind == "geolocated_messages"
+                        - link_title = "GeoMessaging"
+                      - else
+                        - link_title = message_kind.gsub("_messages", "").titleize
+                      = active_link link_title, organization_messages_path(organization_id: passive_organization.to_param, kind: message_kind), class: "nav-link"
+                - if current_user.admin_of?(passive_organization) || current_user.superuser?
+                  %li.divider-nav-item
+                  %li
+                    = active_link "Users", organization_users_path(organization_id: passive_organization.to_param), match_controller: true, class: "nav-link"
+                  %li
+                    = active_link "#{passive_organization.short_name} profile", organization_manage_index_path(organization_id: passive_organization.to_param), class: "nav-link"
+                  %li
+                    = active_link "#{passive_organization.short_name} locations", locations_organization_manage_index_path(organization_id: passive_organization.to_param), class: "nav-link"
+                - if current_user&.superuser?
+                  %li.divider-nav-item
+                  %li
+                    = link_to "Super Admin view #{passive_organization.short_name}", admin_organization_path(passive_organization)
+
         %a#menu-opened-backdrop
         .hamburgler
           %a#primary_nav_hamburgler
