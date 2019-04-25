@@ -1,7 +1,7 @@
 .admin-subnav
   .col-md-9
     %h1
-      Manage Organizations
+      Manage Organization
   .col-md-3
     = link_to 'New Organization', new_admin_organization_url, class: "btn btn-success float-right"
 .row.mb-4
@@ -15,7 +15,7 @@
       = hidden_field_tag :sort, sort_column
       = hidden_field_tag :sort_direction, sort_direction
       .form-check.ml-auto.mr-2.ml-2.align-self-end
-        = check_box_tag :is_paid, true, false, class:"form-check-input"
+        = check_box_tag :is_paid, true, checked = sortable_search_params[:is_paid] ? true : false, class:"form-check-input"
         = label_tag :is_paid, "Paid only"
       .form-group
         = text_field_tag :query, params[:query], placeholder: "Search name/location#{current_user.developer? ? '/paid features' : '' }", class: "form-control mt-4"
