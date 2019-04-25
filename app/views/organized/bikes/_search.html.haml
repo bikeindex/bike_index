@@ -51,12 +51,14 @@
         view all bikes
   %a.float-right.less-strong.hidden-xs-down{ href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin: 0 .5rem; color: #bbb" }
     settings
-- column_renames = {"created_at_cell" => "Registered", "updated_at_cell" => "Updated", "stolen_cell" => "Stolen", "manufacturer_cell" => "Manufacturer", "model_cell" => "Model", "color_cell" => "Color", "owner_email_cell" => "Sent to", "owner_name_cell" => "Owner name", "reg_affiliation_cell" => "Affiliation", "reg_secondary_serial_cell" => "Secondary#", "reg_phone_cell" => "Phone", "reg_address_cell" => "Address"}
+- column_renames = { "created_at_cell" => "Registered", "updated_at_cell" => "Updated", "stolen_cell" => "Stolen", "manufacturer_cell" => "Manufacturer", "model_cell" => "Model", "color_cell" => "Color", "owner_email_cell" => "Sent to", "owner_name_cell" => "Owner name", "reg_affiliation_cell" => "Affiliation", "reg_secondary_serial_cell" => "Secondary#", "reg_phone_cell" => "Phone", "reg_address_cell" => "Address", "sticker_cell" => "Sticker" }
 .collapse#organizedSearchSettings.settings-list
   %h3.header-font-alt
     Visible columns
   .row
-    - (%w[created_at_cell stolen_cell manufacturer_cell model_cell color_cell owner_email_cell updated_at_cell owner_name_cell] + current_organization.additional_registration_fields.map { |f| "#{f}_cell" }).each do |cell_name|
+    - optional_columns = current_organization.paid_for?("bike_codes") ? ["sticker_cell"] : []
+    - optional_columns += current_organization.additional_registration_fields.map { |f| "#{f}_cell" }
+    - (%w[created_at_cell stolen_cell manufacturer_cell model_cell color_cell owner_email_cell updated_at_cell owner_name_cell] + optional_columns).each do |cell_name|
       .col-6.col-md-4
         .form-group
           %label
@@ -107,57 +109,57 @@
             Sticker
     %tbody
       - @bikes.each do |bike|
-        / We should be caching here...
         %tr
-          %td.hiddenColumn.created_at_cell
-            %a.convertTime{ href: bike_path(bike) }
-              = l bike.created_at, format: :convert_time
-          %td.hiddenColumn.updated_at_cell.hidden-xs-down
-            %small.convertTime
-              = l bike.updated_at, format: :convert_time
-          %td.hiddenColumn.hidden-xs-down.table-cell-check.stolen_cell
-            = bike.stolen ? "&#x2713;".html_safe : ""
-          %td.hiddenColumn.hidden-xs-down.manufacturer_cell
-            = bike.mnfg_name
-          %td.hiddenColumn.hidden-xs-down.model_cell
-            = bike.frame_model
-          %td.hiddenColumn.hidden-xs-down.color_cell
-            %span.less-strong
-              = bike.frame_colors.join(", ")
-          %td.hiddenColumn.owner_email_cell
-            %small.hidden-sm-up
-              = organized_bike_text(bike)
-              %br
-            = bike.owner_email
-            - if bike.creation_description
-              %small.less-strong
-                = bike.creation_description
-          %td.hiddenColumn.owner_name_cell.hidden-xs-down
-            - if bike.user_name.present?
-              %em
-                = bike.user_name
-          - current_organization.additional_registration_fields.each do |field_name|
-            %td.hiddenColumn.hidden-xs-down{ class: "#{field_name}_cell" }
-              - if field_name == "reg_address"
-                = bike.b_params.map { |bp| bp.bike["address"] }.reject(&:blank?).first
-              - elsif field_name == "reg_secondary_serial"
-                = bike.additional_registration
-              - elsif field_name == "phone"
-                = bike.phone
-              - elsif field_name == "reg_affiliation"
-                = bike.organization_affiliation
-          / - if current_organization.paid_for?("avery_export")
-          /   %td.hiddenColumn{ class: "avery_export" }
-          - if current_organization.paid_for?("bike_codes")
-            %td.hidden-xs-down{ class: "sticker_cell" }
-              - bike.bike_codes.each_with_index do |bike_code, index|
-                - if bike_code.organization.present?
-                  = link_to bike_code.code, edit_organization_sticker_path(id: bike_code.code, organization_id: bike_code.organization&.to_param), class: "small"
-                - else
-                  %small
-                    = bike_code.code
-                - if index > 0
-                  %br
+          - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}") do
+            %td.hiddenColumn.created_at_cell
+              %a.convertTime{ href: bike_path(bike) }
+                = l bike.created_at, format: :convert_time
+            %td.hiddenColumn.updated_at_cell.hidden-xs-down
+              %small.convertTime
+                = l bike.updated_at, format: :convert_time
+            %td.hiddenColumn.hidden-xs-down.table-cell-check.stolen_cell
+              = bike.stolen ? "&#x2713;".html_safe : ""
+            %td.hiddenColumn.hidden-xs-down.manufacturer_cell
+              = bike.mnfg_name
+            %td.hiddenColumn.hidden-xs-down.model_cell
+              = bike.frame_model
+            %td.hiddenColumn.hidden-xs-down.color_cell
+              %span.less-strong
+                = bike.frame_colors.join(", ")
+            %td.hiddenColumn.owner_email_cell
+              %small.hidden-sm-up
+                = organized_bike_text(bike)
+                %br
+              = bike.owner_email
+              - if bike.creation_description
+                %small.less-strong
+                  = bike.creation_description
+            %td.hiddenColumn.owner_name_cell.hidden-xs-down
+              - if bike.user_name.present?
+                %em
+                  = bike.user_name
+            - current_organization.additional_registration_fields.each do |field_name|
+              %td.hiddenColumn.hidden-xs-down{ class: "#{field_name}_cell" }
+                - if field_name == "reg_address"
+                  = bike.b_params.map { |bp| bp.bike["address"] }.reject(&:blank?).first
+                - elsif field_name == "reg_secondary_serial"
+                  = bike.additional_registration
+                - elsif field_name == "phone"
+                  = bike.phone
+                - elsif field_name == "reg_affiliation"
+                  = bike.organization_affiliation
+            / - if current_organization.paid_for?("avery_export")
+            /   %td.hiddenColumn{ class: "avery_export" }
+            - if current_organization.paid_for?("bike_codes")
+              %td.hidden-xs-down{ class: "sticker_cell" }
+                - bike.bike_codes.each_with_index do |bike_code, index|
+                  - if bike_code.organization.present?
+                    = link_to bike_code.code, edit_organization_sticker_path(id: bike_code.code, organization_id: bike_code.organization&.to_param), class: "small"
+                  - else
+                    %small
+                      = bike_code.code
+                  - if index > 0
+                    %br
 
           - if @bike_code.present?
             %td
