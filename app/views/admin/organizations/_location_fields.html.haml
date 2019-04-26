@@ -26,7 +26,7 @@
         .row
           .col-lg-6
             .form-group.fancy-select.unfancy
-              = f.collection_select(:country_id, Country.all, :id, :name, {:selected => Country.united_states.id}, class: "form-control mt-1" )
+              = f.collection_select(:country_id, Country.all, :id, :name, {:selected => f.object.country_id ||= @organization.locations.first&.country_id || Country.united_states.id}, class: "form-control mt-1" )
           .col-lg-6
             .form-group.text-center
               = f.check_box :_destroy, class: "d-none"
