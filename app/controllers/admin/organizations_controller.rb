@@ -6,8 +6,8 @@ class Admin::OrganizationsController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     orgs = Organization.all
-    orgs = orgs.paid if params[:is_paid].present?
-    orgs = orgs.admin_text_search(params[:query]) if params[:query].present?
+    orgs = orgs.paid if params[:search_is_paid].present?
+    orgs = orgs.admin_text_search(params[:search_query]) if params[:search_query].present?
     orgs = orgs.where(kind: kind_for_organizations) if params[:kind].present?
     @organizations_count = orgs.count
     @organizations = orgs.reorder(sort_column + " " + sort_direction).page(page).per(per_page)
