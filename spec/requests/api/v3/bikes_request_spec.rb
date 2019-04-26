@@ -37,7 +37,7 @@ describe "Bikes API V3" do
         rear_wheel_bsd: "559",
         color: color.name,
         year: "1969",
-        owner_email: "fun_times@examples.com",
+        owner_email: user.email,
         frame_material: "steel",
       }
     end
@@ -74,28 +74,24 @@ describe "Bikes API V3" do
       end
     end
 
-    context "given the bike being created already exists" do
+    context "if the bike being created already exists" do
       it "does not create a new record" do
-        pre_existing_bike = FactoryBot.create(:ownership).bike
-        color = FactoryBot.build_stubbed(:color)
-        bike_attrs = {
-          serial: pre_existing_bike.serial_number,
-          manufacturer: pre_existing_bike.manufacturer.name,
-          rear_tire_narrow: "true",
-          rear_wheel_bsd: "559",
-          color: color.name,
-          year: "1969",
-          owner_email: pre_existing_bike.owner.email,
-          frame_material: "steel",
-        }
-        token = create_doorkeeper_token(scopes: "read_bikes write_bikes unconfirmed")
+        post "/api/v3/bikes?access_token=#{token.token}",
+             bike_attrs.to_json,
+             json_headers
 
-        post "/api/v3/bikes?access_token=#{token.token}", bike_attrs.to_json, json_headers
-        bike_id = JSON.parse(response.body)&.[]("bike")&.[]("id")
-        expect(bike_id).to eq(pre_existing_bike.id)
+        expect(response.status).to eq(201)
+        expect(response.status_message).to eq("Created")
+        bike1 = JSON.parse(response.body)["bike"]
 
-        expect(response.code).to eq("302")
-        expect(response).to be_found
+        post "/api/v3/bikes?access_token=#{token.token}",
+             bike_attrs.to_json,
+             json_headers
+
+        bike2 = JSON.parse(response.body)["bike"]
+        expect(response.status).to eq(302)
+        expect(response.status_message).to eq("Found")
+        expect(bike1["id"]).to eq(bike2["id"])
       end
 
       it "updates the pre-existing record if the bike has already been registered"

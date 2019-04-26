@@ -139,13 +139,15 @@ module API
           end
         end
         post "/", serializer: BikeV2ShowSerializer, root: "bike" do
+          declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
+          b_param = BParam.create(creator_id: creation_user_id, params: declared_p["declared_params"], origin: "api_v2")
+
           # Search for a bike matching the provided serial number / owner email
           bike_attrs = %w{serial owner_email}.map { |key| [key.to_sym, params[key]] }.to_h
           found_bike = BikeFinder.find_matching(**bike_attrs)
 
+          # bike was not found, create it
           if found_bike.blank?
-            declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
-            b_param = BParam.create(creator_id: creation_user_id, params: declared_p["declared_params"], origin: "api_v2")
             ensure_required_stolen_attrs(b_param.params)
             bike = BikeCreator.new(b_param).create_bike
 
@@ -157,35 +159,12 @@ module API
             end
           end
 
+          # bike was found, update instead of creating
           if found_bike.present?
-            # found_bike is present, update instead
-            declared_p = { "declared_params" => declared(params, include_missing: false) }
-
-            # TODO: current_user?
-            if !found_bike.authorize_for_user!(found_bike.creator)
-              error!("You do not own that #{found_bike.type}", 403)
-            end
-
-            hash = BParam.v2_params(declared_p["declared_params"].as_json)
-
-            if hash["stolen_record"].present? && found_bike.stolen != true
-              ensure_required_stolen_attrs(hash)
-            end
-
-            if hash.dig("bike", "external_image_urls").present?
-              found_bike.load_external_images(hash["bike"]["external_image_urls"])
-            end
-
-            begin
-              # TODO: current_user?
-              BikeUpdator
-                .new(user: found_bike.creator, bike: found_bike, b_params: hash)
-                .update_available_attributes
-            rescue => e
-              error!("Unable to update bike: #{e}", 401)
-            end
-
-            found_bike.reload
+            @bike = found_bike
+            # TODO: Update bike record
+            status :found
+            return found_bike
           end
         end
 
