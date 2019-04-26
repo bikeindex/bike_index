@@ -49,11 +49,6 @@
     .form-group
       %label
       Organization Type
-      -# .btn-group.btn-group-toggle{"data-toggle" => "buttons"}
-      -#   - Organization.kinds.each do |kind|
-      -#     = f.label "kind_#{kind}", kind.humanize, class: "btn btn-secondary ml-2" do
-      -#       = f.radio_button "kind", kind
-      -#       = kind.humanize
       - Organization.kinds.each do |kind|
         .form-check
           = f.radio_button "kind", kind, class: "form-check-input"
@@ -82,7 +77,7 @@
       = f.label :approved, 'Validated & approved'
 .row
   .col-md-6
-    .form-group
+    .form-group.fancy-select.unfancy
       = f.label :parent_organization_id
       = f.collection_select(:parent_organization_id, Organization.all, :id, :name, {prompt: "Choose organization"}, class: "form-control")
 
