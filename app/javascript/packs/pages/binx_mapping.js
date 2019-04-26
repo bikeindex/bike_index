@@ -1,8 +1,7 @@
-import * as log from "loglevel";
-if (process.env.NODE_ENV != "production") log.setLevel("debug");
+import log from "../utils/log";
 import _ from "lodash";
 
-window.BinxMapping = class BinxMapping {
+export default class BinxMapping {
   // The page instance of this class is modified to store the current list of points for rendering
   constructor(kind) {
     this.kind = kind;
@@ -30,8 +29,8 @@ window.BinxMapping = class BinxMapping {
     if (zoom == null) {
       zoom = 13;
     }
-    binxMapping.zoom = zoom;
-    var myOptions = {
+    this.zoom = zoom;
+    let myOptions = {
       zoom: zoom,
       center: new google.maps.LatLng(lat, lng),
       gestureHandling: "cooperative",
@@ -53,7 +52,7 @@ window.BinxMapping = class BinxMapping {
   fitMap() {
     let bounds = new google.maps.LatLngBounds();
     // Fit to markers
-    for (let marker of Array.from(binxMapping.markersRendered)) {
+    for (let marker of Array.from(this.markersRendered)) {
       if (marker) {
         bounds.extend(marker.getPosition());
       }
@@ -69,14 +68,14 @@ window.BinxMapping = class BinxMapping {
   }
 
   renderAddressSearch() {
-    if (binxMapping.searchBox != null) {
+    if (this.searchBox != null) {
       return true;
     }
     $("#map").before(
       '<input id="placeSearch" class="controls form-control" type="text" placeholder="Search map">'
     );
     let input = document.getElementById("placeSearch");
-    binxMapping.searchBox = new google.maps.places.SearchBox(input);
+    this.searchBox = new google.maps.places.SearchBox(input);
     window.binxMap.controls[google.maps.ControlPosition.TOP_RIGHT].push(input);
     $(input).addClass("searchOnMap"); // search box is initially hidden - display it when rendered on map
     // Bias SearchBox results towards current map's viewport.
@@ -84,7 +83,7 @@ window.BinxMapping = class BinxMapping {
       binxMapping.searchBox.setBounds(binxMap.getBounds())
     );
 
-    binxMapping.searchBox.addListener("places_changed", function() {
+    this.searchBox.addListener("places_changed", function() {
       let places = binxMapping.searchBox.getPlaces();
       if (places.length === 0) {
         log.debug("Unable to find that address");
@@ -210,4 +209,4 @@ window.BinxMapping = class BinxMapping {
       binxMapping.renderAddressSearch();
     }
   }
-};
+}
