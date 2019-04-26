@@ -33,6 +33,7 @@ Bikeindex::Application.routes.draw do
   end
 
   get "ambassadors", to: redirect("/ambassadors_how_to") # Because convenience
+  get "ambassadors/new", to: redirect("https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform"), as: :new_ambassador
 
   %w(update_browser user_home choose_registration goodbye bike_creation_graph).freeze.each do |page|
     get page, controller: "welcome", action: page
