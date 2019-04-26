@@ -12,12 +12,6 @@
 
     = revised_link_to_add_fields "Add a location", f, :locations, class_name: "mx-auto"
 
-  .row
-    .col-md-2
-      %h4
-        Locations
-      %p#us-country-code.d-none
-        = Country.united_states.id
   .mt-4
     = f.submit "Update", class: 'btn-lg btn-success float-right'
 
