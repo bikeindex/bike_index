@@ -94,7 +94,32 @@ describe "Bikes API V3" do
         expect(bike1["id"]).to eq(bike2["id"])
       end
 
-      it "updates the pre-existing record if the bike has already been registered"
+      it "updates the pre-existing record if the bike has already been registered" do
+        color = FactoryBot.create(:color)
+        manufacturer = FactoryBot.create(:manufacturer)
+        bike1 = FactoryBot.create(:bike, creator: user, owner_email: user.email)
+        FactoryBot.create(:ownership, bike: bike1, creator: user, owner_email: user.email)
+
+        bike_attrs = {
+          serial: bike1.serial_number,
+          manufacturer: manufacturer.name,
+          rear_tire_narrow: "true",
+          rear_wheel_bsd: "559",
+          color: color.name,
+          year: "1969",
+          owner_email: user.email,
+          frame_material: "steel",
+        }
+
+        post "/api/v3/bikes?access_token=#{token.token}",
+             bike_attrs.to_json,
+             json_headers
+
+        bike2 = JSON.parse(response.body)["bike"]
+        expect(response.status).to eq(302)
+        expect(response.status_message).to eq("Found")
+        expect(bike1.id).to eq(bike2["id"])
+      end
     end
 
     it "creates a non example bike, with components and " do
