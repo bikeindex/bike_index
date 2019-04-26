@@ -96,7 +96,6 @@ describe "Bikes API V3" do
 
       it "updates the pre-existing record if the bike has already been registered" do
         color = FactoryBot.create(:color)
-        old_manufacturer = FactoryBot.create(:manufacturer, name: "Old Bikes")
         old_year = 1969
 
         bike1 = FactoryBot.create(
@@ -104,18 +103,16 @@ describe "Bikes API V3" do
           creator: user,
           owner_email: user.email,
           year: old_year,
-          manufacturer: old_manufacturer,
+          manufacturer: manufacturer,
         )
 
         FactoryBot.create(:ownership, bike: bike1, creator: user, owner_email: user.email)
         expect(bike1.year).to eq(old_year)
-        expect(bike1.manufacturer).to eq(old_manufacturer)
 
-        new_manufacturer = FactoryBot.create(:manufacturer, name: "New Bikes")
         new_year = 2001
         bike_attrs = {
           serial: bike1.serial_number,
-          manufacturer: new_manufacturer.name,
+          manufacturer: manufacturer.name,
           rear_tire_narrow: "true",
           rear_wheel_bsd: 556,
           color: color.name,
@@ -128,12 +125,13 @@ describe "Bikes API V3" do
              bike_attrs.to_json,
              json_headers
 
-        bike2 = JSON.parse(response.body)["bike"]
+        json = JSON.parse(response.body)
+        expect(json["error"]).to be_blank
 
+        bike2 = json["bike"]
         expect(bike2["id"]).to eq(bike1.id)
         expect(bike2["serial"]).to eq(bike1.serial)
         expect(bike2["year"]).to eq(new_year)
-        expect(bike2["manufacturer"]).to eq(manufacturer.name)
       end
     end
 

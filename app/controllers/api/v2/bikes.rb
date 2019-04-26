@@ -162,9 +162,39 @@ module API
           # bike was found, update instead of creating
           if found_bike.present?
             @bike = found_bike
-            # TODO: Update bike record
+            authorize_bike_for_user
+
+            hash = BParam.v2_params(declared_p["declared_params"].as_json)
+            if hash["stolen_record"].present? && @bike.stolen != true
+              ensure_required_stolen_attrs(hash)
+            end
+
+            if hash.dig("bike", "external_image_urls").present?
+              @bike.load_external_images(hash["bike"]["external_image_urls"])
+            end
+
+            hash["bike"]["manufacturer"] =
+              Manufacturer.find_by(name: hash["bike"]["manufacturer"])
+
+            # TODO: Fix this
+            hash["bike"].delete("color")
+            hash["bike"].delete("cycle_type_name")
+            hash["bike"].delete("rear_wheel_bsd")
+            hash["bike"].delete("is_bulk")
+            hash["bike"].delete("is_pos")
+            hash["bike"].delete("is_new")
+            hash["bike"].delete("no_duplicate")
+
+            begin
+              BikeUpdator
+                .new(user: current_user, bike: @bike, b_params: hash)
+                .update_available_attributes
+            rescue => e
+              error!("Unable to update bike: #{e}", 401)
+            end
+
             status :found
-            return found_bike
+            return @bike.reload
           end
         end
 
@@ -262,4 +292,21 @@ module API
       end
     end
   end
+end
+
+def email_is_attached_to_bike_owner(email)
+  normalized_email = EmailNormalizer.normalize(email)
+
+  # check primary email first in case we can short-circuit
+  if @bike.owner_email == normalized_email
+    return true
+  end
+
+  secondary_emails = @bike.owner.secondary_emails
+
+  if secondary_emails.include?(normalized_email)
+    return true
+  end
+
+  error!("#{email} does not own that #{@bike.type}", 403)
 end
