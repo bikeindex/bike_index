@@ -5,13 +5,12 @@
 
 = form_for [:admin, @organization] do |f|
   = render partial: 'form', locals: { f: f }
-  .row.mt-4
-    .col-md-6.mb-4
-      %fieldset
-        #admin-locations-fields
-          = f.fields_for :locations do |builder|
-            = render '/admin/organizations/location_fields', f: builder
-          = revised_link_to_add_fields "Add a location", f, :locations, class_name: "btn btn-primary"
+  .row.mt-4#admin-locations-fields
+    = f.fields_for :locations do |builder|
+      = render '/admin/organizations/location_fields', f: builder
+
+
+    = revised_link_to_add_fields "Add a location", f, :locations, class_name: "mx-auto"
 
   .row
     .col-md-2
