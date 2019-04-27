@@ -45,7 +45,7 @@ binxApp.localizeTimes = function() {
   if (!window.timezone) {
     window.timezone = moment.tz.guess();
   }
-  moment.tz.setDefault(window.timezone);
+  // moment.tz.setDefault(window.timezone);
   window.yesterday = moment()
     .subtract(1, "day")
     .startOf("day");

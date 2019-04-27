@@ -1,4 +1,6 @@
 class Admin::GraphsController < Admin::BaseController
+  layout "new_admin"
+
   def index
     set_variable_graph_kind
     set_variable_graphing_timing unless @kind == "general"
