@@ -24,9 +24,24 @@ function BinxAdmin() {
       if ($("#admin-locations-fields").length > 0) {
         this.adminLocations();
       }
+      if ($("#bike_stolen").length > 0 ) {
+        this.bikesEditRecoverySlide();
+      }
       // Enable bootstrap custom file upload boxes
       binxApp.enableFilenameForUploads();
       LoadFancySelects();
+    },
+
+    bikesEditRecoverySlide(){
+      const $this = $("#bike_stolen")
+      $this.on("change", e => {
+        e.preventDefault()
+        if ($this.prop('checked')) {
+          $("#admin-recovery-fields").slideUp()
+        } else {
+          $("#admin-recovery-fields").slideDown()
+        }
+      })
     },
 
     changeGraphCalendarBox() {
