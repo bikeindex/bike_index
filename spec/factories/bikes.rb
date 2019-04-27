@@ -33,6 +33,20 @@ FactoryBot.define do
       end
     end
 
+    factory :bike_lightspeed_pos do
+      after(:create) do |bike, _evaluator|
+        create(:creation_state, creator: bike.creator, bike: bike, is_pos: true, pos_kind: "lightspeed_pos")
+      end
+    end
+    factory :bike_ascend_pos do
+      transient do
+        bulk_import { FactoryBot.create(:bulk_import_ascend) }
+      end
+      after(:create) do |bike, evaluator|
+        create(:creation_state, creator: bike.creator, bike: bike, is_pos: true, pos_kind: "ascend_pos", bulk_import: evaluator.bulk_import)
+      end
+    end
+
     factory :organized_bikes do # don't use this factory exactly, it's used to wrap all the organized bikes
       transient do
         organization { FactoryBot.create(:organization) }

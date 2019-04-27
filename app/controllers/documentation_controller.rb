@@ -1,15 +1,16 @@
 class DocumentationController < ApplicationController
   before_filter :render_swagger_for_page, only: [:api_v3, :api_v2]
+
   def index
     redirect_to controller: :documentation, action: :api_v3
   end
 
   def api_v1
     unless current_user&.developer?
-      flash[:notice] = 'API V1 is deprecated, please use our current API version'
+      flash[:notice] = "API V1 is deprecated, please use our current API version"
       redirect_to documentation_index_path and return
     end
-    @root = ENV['BASE_URL']
+    @root = ENV["BASE_URL"]
     render layout: false
   end
 

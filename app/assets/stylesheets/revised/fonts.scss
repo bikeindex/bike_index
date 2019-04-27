@@ -23,15 +23,19 @@ $btn-font-size: 15px;
   line-height: 2em;
   color: $body-font-color;
   text-transform: none;
+
   em {
     font-style: italic;
   }
+
   strong {
     font-weight: $strong-font-weight;
   }
+
   a {
     color: $link-color;
     text-decoration: none;
+
     &:hover,
     &:active,
     &.active {
@@ -44,6 +48,7 @@ $btn-font-size: 15px;
 .light-italic {
   font-weight: $light-italic-weight;
   font-style: italic;
+
   strong {
     font-style: normal;
     font-weight: $strong-font-weight;
@@ -56,12 +61,14 @@ body {
 
 p {
   @extend .body-font;
-  margin: 0 0 2 * $vertical-height;
+
+  margin: 0 0 (2 * $vertical-height);
 }
 
 // p.intro on typecast
 h5 {
   @extend .body-font;
+
   font-size: $h5-font-size;
   font-weight: normal;
   line-height: 1.5em;
@@ -69,6 +76,7 @@ h5 {
 
 .pullquote {
   @extend .body-font;
+
   font-weight: 300;
   font-style: italic;
   font-size: 18px;
@@ -81,11 +89,14 @@ h5 {
   font-style: normal;
   text-transform: uppercase;
   color: $header-font-color;
+
   strong {
     font-weight: $strong-font-weight;
   }
+
   a {
     color: $link-color;
+
     &:hover,
     &:active,
     &.active {
@@ -97,6 +108,7 @@ h5 {
 
 .header-font-alt {
   @extend .header-font;
+
   font-family: $body-font-family;
   color: $body-font-color;
   text-transform: none !important;
@@ -104,10 +116,12 @@ h5 {
 
 h1 {
   @extend .header-font;
-  margin: 0 0 2 * $vertical-height;
+
+  margin: 0 0 (2 * $vertical-height);
   letter-spacing: -1px;
   font-size: $h1-font-size;
   line-height: 1.12em;
+
   @include media-breakpoint-down(md) {
     font-size: $h1-font-size-md;
   }
@@ -115,9 +129,11 @@ h1 {
 
 h2 {
   @extend .header-font;
-  margin: 0 0 2 * $vertical-height;
+
+  margin: 0 0 (2 * $vertical-height);
   font-size: $h2-font-size;
   line-height: 1em;
+
   @include media-breakpoint-down(md) {
     font-size: $h2-font-size-md;
   }
@@ -125,7 +141,8 @@ h2 {
 
 h3 {
   @extend .header-font;
-  margin: 0 0 2 * $vertical-height;
+
+  margin: 0 0 (2 * $vertical-height);
   font-size: $h3-font-size;
   line-height: 1em;
 }
@@ -133,13 +150,10 @@ h3 {
 // Primary menu header height
 h4 {
   @extend .header-font;
-  margin: 0 0 2 * $vertical-height;
+
+  margin: 0 0 (2 * $vertical-height);
   font-size: $h4-font-size;
   line-height: 18px;
-}
-
-.less-strong {
-  color: $less-strong-font-color;
 }
 
 // Stop fucking prefixing. - textarea[placeholder], input[placeholder]

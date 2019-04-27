@@ -1,7 +1,7 @@
-import * as log from "loglevel";
-if (process.env.NODE_ENV != "production") log.setLevel("debug");
+import log from "../utils/log";
+import _ from "lodash";
 
-window.BinxAppOrgMessages = class BinxAppOrgMessages {
+export default class BinxAppOrgMessages {
   constructor() {
     this.fetchedMessages = false;
     this.mapReady = false;
@@ -13,7 +13,7 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
   init() {
     // load the maps API
     binxMapping.loadMap("binxAppOrgMessages.mapOrganizedMessages");
-    binxAppOrgMessages.fetchMessages([["per_page", 50]]);
+    this.fetchMessages([["per_page", 50]]);
   }
 
   fetchMessages(opts) {
@@ -38,10 +38,8 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
 
   // Grabs the visible markers, looks up the messages from them and returns that list
   visibleMessages() {
-    return _.map(binxMapping.markersInViewport(), function(marker) {
-      return _.find(binxAppOrgMessages.messages, function(message) {
-        return marker.binxId == message.id;
-      });
+    return binxMapping.markersInViewport().map(marker => {
+      return this.messages.find(message => marker.binxId == message.id);
     });
   }
 
@@ -109,7 +107,7 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
 
   inititalizeMapMarkers() {
     binxMapping.addMarkers({ fitMap: true });
-    binxAppOrgMessages.messagesMapRendered = true;
+    this.messagesMapRendered = true;
     // Add a trigger to the map when the viewport changes (after it has finished moving)
     google.maps.event.addListener(binxMap, "idle", function() {
       // This is grabbing the markers in viewport and logging the ids for them.
@@ -118,7 +116,7 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
         binxAppOrgMessages.visibleMessages()
       );
     });
-    binxAppOrgMessages.addTableMapLinkHandler();
+    this.addTableMapLinkHandler();
   }
 
   tableRowForMessage(message) {
@@ -186,16 +184,16 @@ window.BinxAppOrgMessages = class BinxAppOrgMessages {
 
   renderOrganizedMessages(messages) {
     // Don't rerender the list if it's already rendered
-    if (binxAppOrgMessages.messagesListRendered) {
+    if (this.messagesListRendered) {
       return true;
     }
     // Store the messages on the window class so we have them
-    binxAppOrgMessages.messages = messages;
+    this.messages = messages;
     // Render the table of messages
-    binxAppOrgMessages.renderMessagesTable(messages);
+    this.renderMessagesTable(messages);
     // Set the updated statuses based on what we rendered
-    binxAppOrgMessages.messagesListRendered = true;
+    this.messagesListRendered = true;
     // call map organized messages - so that we can render it
-    binxAppOrgMessages.mapOrganizedMessages();
+    this.mapOrganizedMessages();
   }
-};
+}

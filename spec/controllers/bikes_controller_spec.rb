@@ -1,42 +1,42 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe BikesController do
-  describe 'index' do
+  describe "index" do
     include_context :geocoder_default_location
-    let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: '1234567890') }
+    let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "1234567890") }
     let!(:stolen_bike) { FactoryBot.create(:stolen_bike, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
-    let(:serial) { '1234567890' }
+    let(:serial) { "1234567890" }
     let!(:stolen_bike_2) { FactoryBot.create(:stolen_bike, latitude: 41.8961603, longitude: -87.677215) }
-    let(:ip_address) { '127.0.0.1' }
-    let(:target_location) { ['New York', 'NY', 'US'] }
+    let(:ip_address) { "127.0.0.1" }
+    let(:target_location) { ["New York", "NY", "US"] }
     let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: ip_address) }
-    context 'with subdomain' do
-      it 'redirects to no subdomain' do
-        @request.host = 'stolen.example.com'
+    context "with subdomain" do
+      it "redirects to no subdomain" do
+        @request.host = "stolen.example.com"
         get :index
         expect(response).to redirect_to bikes_url(subdomain: false)
       end
     end
-    describe 'assignment' do
-      context 'no params' do
-        it 'assigns defaults, stolenness: stolen' do
+    describe "assignment" do
+      context "no params" do
+        it "assigns defaults, stolenness: stolen" do
           get :index
           expect(response.status).to eq 200
           expect(response).to render_template(:index)
-          expect(response).to render_with_layout('application_revised')
+          expect(response).to render_with_layout("application_revised")
           expect(flash).to_not be_present
-          expect(assigns(:interpreted_params)).to eq(stolenness: 'stolen')
+          expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
           expect(assigns(:selected_query_items_options)).to eq([])
           expect(assigns(:bikes).map(&:id)).to match_array([stolen_bike.id, stolen_bike_2.id])
-          expect(assigns(:page_id)).to eq 'bikes_index'
+          expect(assigns(:page_id)).to eq "bikes_index"
         end
       end
-      context 'query_items and serial search' do
+      context "query_items and serial search" do
         let(:manufacturer) { non_stolen_bike.manufacturer }
         let(:color) { non_stolen_bike.primary_frame_color }
-        let(:query_params) { { serial: "#{serial}0d", query_items: [color.search_id, manufacturer.search_id], stolenness: 'non' } }
+        let(:query_params) { { serial: "#{serial}0d", query_items: [color.search_id, manufacturer.search_id], stolenness: "non" } }
         let(:target_selected_query_items_options) { Bike.selected_query_items_options(target_interpreted_params) }
-        it 'assigns passed parameters, assigns close_serials' do
+        it "assigns passed parameters, assigns close_serials" do
           get :index, query_params
           expect(response.status).to eq 200
           expect(assigns(:interpreted_params)).to eq target_interpreted_params
@@ -45,10 +45,10 @@ describe BikesController do
           expect(assigns(:close_serials).map(&:id)).to eq([non_stolen_bike.id])
         end
       end
-      context 'ip proximity' do
-        let(:query_params) { { location: 'yoU', distance: 1, stolenness: 'proximity' } }
-        context 'found location' do
-          it 'assigns passed parameters and close_serials' do
+      context "ip proximity" do
+        let(:query_params) { { location: "yoU", distance: 1, stolenness: "proximity" } }
+        context "found location" do
+          it "assigns passed parameters and close_serials" do
             expect_any_instance_of(BikesController).to receive(:forwarded_ip_address) { ip_address }
             allow(Geocoder).to receive(:search) { legacy_production_ip_search_result }
             get :index, query_params
@@ -57,9 +57,9 @@ describe BikesController do
             expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
           end
         end
-        context 'ip passed as parameter' do
-          let(:ip_query_params) { query_params.merge(location: 'IP') }
-          it 'assigns passed parameters and close_serials' do
+        context "ip passed as parameter" do
+          let(:ip_query_params) { query_params.merge(location: "IP") }
+          it "assigns passed parameters and close_serials" do
             expect_any_instance_of(BikesController).to receive(:forwarded_ip_address) { ip_address }
             allow(Geocoder).to receive(:search) { production_ip_search_result }
             get :index, ip_query_params
@@ -68,9 +68,9 @@ describe BikesController do
             expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
           end
         end
-        context 'no location' do
-          let(:ip_query_params) { query_params.merge(location: '   ') }
-          it 'assigns passed parameters and close_serials' do
+        context "no location" do
+          let(:ip_query_params) { query_params.merge(location: "   ") }
+          it "assigns passed parameters and close_serials" do
             expect_any_instance_of(BikesController).to receive(:forwarded_ip_address) { ip_address }
             allow(Geocoder).to receive(:search) { production_ip_search_result }
             get :index, ip_query_params
@@ -79,33 +79,33 @@ describe BikesController do
             expect(assigns(:bikes).map(&:id)).to eq([stolen_bike.id])
           end
         end
-        context 'unknown location' do
+        context "unknown location" do
           let(:bounding_box) { [66.00, -84.22, 67.000, (0.0 / 0)] } # Override bounding box stub in geocoder_default_location
-          it 'includes a flash[:info] for unknown location, renders non-proximity' do
+          it "includes a flash[:info] for unknown location, renders non-proximity" do
             get :index, query_params
             expect(response.status).to eq 200
             expect(flash[:info]).to match(/location/)
-            expect(query_params[:stolenness]).to eq 'proximity'
-            expect(assigns(:interpreted_params)[:stolenness]).to eq 'stolen'
+            expect(query_params[:stolenness]).to eq "proximity"
+            expect(assigns(:interpreted_params)[:stolenness]).to eq "stolen"
           end
         end
       end
-      context 'passed all permitted params' do
+      context "passed all permitted params" do
         let(:query_params) do
           {
-            query: '1',
-            manufacturer: '2',
+            query: "1",
+            manufacturer: "2",
             colors: %w[3 4],
-            location: '5',
-            distance: '6',
-            serial: '9',
+            location: "5",
+            distance: "6",
+            serial: "9",
             query_items: %w[7 8],
-            stolenness: 'all'
+            stolenness: "all",
           }.as_json
         end
-        it 'sends all the params we want to searchable_interpreted_params' do
-          expect_any_instance_of(BikesController).to receive(:forwarded_ip_address) { 'special' }
-          expect(Bike).to receive(:searchable_interpreted_params).with(query_params, ip: 'special') { {} }
+        it "sends all the params we want to searchable_interpreted_params" do
+          expect_any_instance_of(BikesController).to receive(:forwarded_ip_address) { "special" }
+          expect(Bike).to receive(:searchable_interpreted_params).with(query_params, ip: "special") { {} }
           get :index, query_params
           expect(response.status).to eq 200
         end
@@ -113,7 +113,7 @@ describe BikesController do
     end
   end
 
-  describe 'show' do
+  describe "show" do
     let(:ownership) { FactoryBot.create(:ownership) }
     let(:user) { ownership.creator }
     let(:bike) { ownership.bike }
@@ -126,17 +126,17 @@ describe BikesController do
       expect(assigns(:bike)).to be_decorated
       expect(flash).to_not be_present
     end
-    context "illegally set current_organization" do
+    context "illegally set passive_organization" do
       include_context :logged_in_as_user
-      it "renders, resets current_organization_id" do
-        session[:current_organization_id] = organization.id
+      it "renders, resets passive_organization_id" do
+        session[:passive_organization_id] = organization.id
         get :show, id: bike.id
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
         expect(response).to render_with_layout("application_revised")
         expect(assigns(:bike)).to be_decorated
         expect(flash).to_not be_present
-        expect(session[:current_organization_id]).to eq "0"
+        expect(session[:passive_organization_id]).to eq "0"
       end
     end
     context "example bike" do
@@ -148,9 +148,9 @@ describe BikesController do
         expect(assigns(:bike)).to be_decorated
       end
     end
-    context 'hidden bikes' do
-      context 'admin hidden (fake delete)' do
-        it 'redirects and sets the flash' do
+    context "hidden bikes" do
+      context "admin hidden (fake delete)" do
+        it "redirects and sets the flash" do
           ownership.bike.update_attributes(hidden: true)
           get :show, id: bike.id
           expect(response).to redirect_to(:root)
@@ -202,7 +202,7 @@ describe BikesController do
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
-        expect(session[:current_organization_id]).to eq organization.id
+        expect(session[:passive_organization_id]).to eq organization.id
       end
       context "bike created by organization" do
         let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
@@ -211,7 +211,7 @@ describe BikesController do
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
           expect(flash).to_not be_present
-          expect(session[:current_organization_id]).to eq organization.id
+          expect(session[:passive_organization_id]).to eq organization.id
         end
       end
       context "bike owned by organization" do
@@ -222,30 +222,30 @@ describe BikesController do
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
           expect(flash).to_not be_present
-          expect(session[:current_organization_id]).to eq organization.id
+          expect(session[:passive_organization_id]).to eq organization.id
         end
       end
     end
-    context 'too large of integer bike_id' do
-      it 'responds with not found' do
+    context "too large of integer bike_id" do
+      it "responds with not found" do
         expect do
           get :show, id: 57549641769762268311552
         end.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
-    context 'qr code gif' do
-      it 'renders' do
+    context "qr code gif" do
+      it "renders" do
         get :show, id: bike.id, format: :gif
         expect(response.status).to eq(200)
       end
     end
   end
 
-  describe 'spokecard' do
-    it 'renders the page from bike id' do
+  describe "spokecard" do
+    it "renders the page from bike id" do
       bike = FactoryBot.create(:bike)
       get :spokecard, id: bike.id
-      expect(response.code).to eq('200')
+      expect(response.code).to eq("200")
     end
   end
 
@@ -263,24 +263,24 @@ describe BikesController do
         expect(response).to render_template(:scanned)
         expect(response.code).to eq("200")
         expect(assigns(:show_organization_bikes)).to be_falsey
-        expect(session[:current_organization_id]).to eq "0"
+        expect(session[:passive_organization_id]).to eq "0"
       end
       context "user part of organization" do
         let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
-        it "makes active_organization the organization" do
+        it "makes current_organization the organization" do
           get :scanned, id: "000#{bike_code2.code}", organization_id: organization.to_param
           expect(assigns(:bike_code)).to eq bike_code2
-          expect(session[:current_organization_id]).to eq organization.id
+          expect(session[:passive_organization_id]).to eq organization.id
           expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_code: bike_code2.code)
         end
         context "passed a different organization id" do
           let!(:other_organization) { FactoryBot.create(:organization, short_name: "BikeIndex") }
-          it "makes active_organization the organization" do
+          it "makes current_organization the organization" do
             expect(user.memberships&.pluck(:organization_id)).to eq([organization.id])
             expect(bike_code2.organization).to eq organization
             get :scanned, id: "000#{bike_code2.code}", organization_id: "BikeIndex"
             expect(assigns(:bike_code)).to eq bike_code2
-            expect(session[:current_organization_id]).to eq organization.id
+            expect(session[:passive_organization_id]).to eq organization.id
             expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_code: bike_code2.code)
           end
         end
@@ -307,89 +307,89 @@ describe BikesController do
     end
   end
 
-  describe 'new' do
-    context 'not signed in' do
-      it 'sets redirect_to' do
-        get :new, stolen: true, b_param_token: 'cool-token-thing'
+  describe "new" do
+    context "not signed in" do
+      it "sets redirect_to" do
+        get :new, stolen: true, b_param_token: "cool-token-thing"
         expect(response).to redirect_to new_user_url
         # expect(Rack::Utils.parse_query(session[:discourse_redirect])).to eq(discourse_params)
         expect(flash[:info]).to be_present
-        expect(session[:return_to]).to eq new_bike_path(stolen: true, b_param_token: 'cool-token-thing')
+        expect(session[:return_to]).to eq new_bike_path(stolen: true, b_param_token: "cool-token-thing")
       end
     end
 
-    context 'signed in' do
+    context "signed in" do
       include_context :logged_in_as_user
       let(:manufacturer) { FactoryBot.create(:manufacturer) }
       let(:color) { FactoryBot.create(:color) }
       let(:organization) { FactoryBot.create(:organization) }
-      context 'passed stolen param' do
-        it 'renders a new stolen bike' do
+      context "passed stolen param" do
+        it "renders a new stolen bike" do
           get :new, stolen: true
-          expect(response.code).to eq('200')
+          expect(response.code).to eq("200")
           expect(assigns(:bike).stolen).to be_truthy
         end
       end
-      context 'passed recovered param' do
-        it 'renders a new recovered bike' do
+      context "passed recovered param" do
+        it "renders a new recovered bike" do
           get :new, recovered: true
-          expect(response.code).to eq('200')
+          expect(response.code).to eq("200")
           expect(assigns(:bike).recovered).to be_truthy
         end
       end
       context "with organization id" do
         it "renders and assigns creation organization" do
           get :new, organization_id: organization.to_param
-          expect(response.code).to eq('200')
+          expect(response.code).to eq("200")
           expect(assigns(:bike).creation_organization).to eq organization
-          expect(assigns[:current_organization]).to be_nil # Because the user isn't necessarily a member of an org
+          expect(assigns[:passive_organization]).to be_nil # Because the user isn't necessarily a member of an org
         end
       end
       context "with organization member" do
         let(:user) { FactoryBot.create(:organization_member, organization: organization) }
         it "renders and assigns creation_organization" do
           get :new
-          expect(response.code).to eq('200')
+          expect(response.code).to eq("200")
           expect(assigns(:bike).creation_organization).to eq organization
-          expect(assigns[:current_organization]).to eq organization
+          expect(assigns[:passive_organization]).to eq organization
         end
       end
-      context 'stolen from params' do
-        it 'renders a new stolen bike' do
+      context "stolen from params" do
+        it "renders a new stolen bike" do
           get :new, stolen: true
-          expect(response.code).to eq('200')
+          expect(response.code).to eq("200")
           expect(assigns(:bike).stolen).to be_truthy
           b_param = assigns(:b_param)
           expect(b_param.revised_new?).to be_truthy
           expect(response).to render_template(:new)
-          expect(response).to render_with_layout('application_revised')
+          expect(response).to render_with_layout("application_revised")
         end
       end
-      context 'bike through b_param' do
+      context "bike through b_param" do
         let(:bike_attrs) do
           {
             manufacturer_id: manufacturer.id,
             primary_frame_color_id: color.id,
-            owner_email: 'something@stuff.com'
+            owner_email: "something@stuff.com",
           }
         end
-        context 'valid b_param' do
-          it 'renders the bike from b_param' do
-            b_param = BParam.create(params: { bike: bike_attrs.merge('revised_new' => true) })
+        context "valid b_param" do
+          it "renders the bike from b_param" do
+            b_param = BParam.create(params: { bike: bike_attrs.merge("revised_new" => true) })
             expect(b_param.id_token).to be_present
             get :new, b_param_token: b_param.id_token
             bike = assigns(:bike)
             expect(assigns(:b_param)).to eq b_param
             expect(bike.is_a?(Bike)).to be_truthy
             bike_attrs.each { |k, v| expect(bike.send(k)).to eq(v) }
-            expect(response).to render_with_layout('application_revised')
+            expect(response).to render_with_layout("application_revised")
           end
         end
-        context 'partial registration by organization' do
+        context "partial registration by organization" do
           let(:organization) { FactoryBot.create(:organization_with_auto_user) }
           let(:organized_bike_attrs) { bike_attrs.merge(creation_organization_id: organization.id) }
-          it 'renders for the user (even though a different creator)' do
-            b_param = BParam.create(params: { bike: organized_bike_attrs.merge('revised_new' => true) })
+          it "renders for the user (even though a different creator)" do
+            b_param = BParam.create(params: { bike: organized_bike_attrs.merge("revised_new" => true) })
             expect(b_param.id_token).to be_present
             get :new, b_param_token: b_param.id_token
             bike = assigns(:bike)
@@ -399,19 +399,19 @@ describe BikesController do
               pp k unless bike.send(k) == v
               expect(bike.send(k)).to eq(v)
             end
-            expect(response).to render_with_layout('application_revised')
+            expect(response).to render_with_layout("application_revised")
             expect(assigns(:organization)).to eq organization
           end
         end
-        context 'invalid b_param' do
-          it 'renders a new bike, has a flash message' do
+        context "invalid b_param" do
+          it "renders a new bike, has a flash message" do
             b_param = BParam.create(creator_id: FactoryBot.create(:user).id)
             expect(b_param.id_token).to be_present
             get :new, b_param_token: b_param.id_token
             bike = assigns(:bike)
             expect(bike.is_a?(Bike)).to be_truthy
             expect(assigns(:b_param)).to_not eq b_param
-            expect(response).to render_with_layout('application_revised')
+            expect(response).to render_with_layout("application_revised")
             expect(flash[:info]).to match(/couldn.t find/i)
           end
         end
@@ -428,7 +428,7 @@ describe BikesController do
     end
   end
 
-  describe 'create' do
+  describe "create" do
     # This is the create action for bikes controller
     let(:manufacturer) { FactoryBot.create(:manufacturer) }
     let(:color) { FactoryBot.create(:color) }
@@ -442,32 +442,32 @@ describe BikesController do
         street: "2459 W Division St",
         city: "Chicago",
         zipcode: "60622",
-        state_id: state.id
+        state_id: state.id,
       }
     end
 
-    describe 'embeded' do
+    describe "embeded" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       let(:user) { organization.auto_user }
       let(:b_param) { BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true }) }
       let(:bike_params) do
         {
-          serial_number: '69',
+          serial_number: "69",
           b_param_id_token: b_param.id_token,
           creation_organization_id: organization.id,
           embeded: true,
-          additional_registration: 'Testly secondary',
+          additional_registration: "Testly secondary",
           cycle_type_slug: " Tricycle ",
           manufacturer_id: manufacturer.id,
-          manufacturer_other: '',
+          manufacturer_other: "",
           primary_frame_color_id: color.id,
           handlebar_type: handlebar_type,
-          owner_email: 'flow@goodtimes.com'
+          owner_email: "flow@goodtimes.com",
         }
       end
       let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded, :cycle_type_slug) }
-      context 'non-stolen' do
-        it 'creates a new ownership and bike from an organization' do
+      context "non-stolen" do
+        it "creates a new ownership and bike from an organization" do
           expect(user).to be_present
           expect do
             post :create, bike: bike_params
@@ -483,13 +483,13 @@ describe BikesController do
           end
         end
       end
-      context 'stolen' do
+      context "stolen" do
         let(:target_time) { Time.now.to_i }
         let(:stolen_params) { chicago_stolen_params.merge(date_stolen: (Time.now - 1.day).utc, timezone: "UTC") }
-        context 'valid' do
+        context "valid" do
           include_context :geocoder_real
-          context 'with old style date input' do
-            it 'creates a new ownership and bike from an organization' do
+          context "with old style date input" do
+            it "creates a new ownership and bike from an organization" do
               VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
                 expect do
                   post :create, bike: bike_params.merge(stolen: true), stolen_record: stolen_params
@@ -497,7 +497,7 @@ describe BikesController do
                 end.to change(Ownership, :count).by 1
                 bike = Bike.last
                 expect(bike).to be_present
-                expect(bike.creation_state.origin).to eq 'embed'
+                expect(bike.creation_state.origin).to eq "embed"
                 expect(bike.creation_state.organization).to eq organization
                 expect(bike.creation_state.creator).to eq bike.creator
                 testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
@@ -508,17 +508,17 @@ describe BikesController do
               end
             end
           end
-          context 'new date input' do
+          context "new date input" do
             let(:alt_stolen_params) { stolen_params.merge(date_stolen: "2018-07-28T23:34:00", timezone: "America/New_York") }
             let(:target_time) { 1532835240 }
-            it 'creates a new ownership and bike from an organization' do
+            it "creates a new ownership and bike from an organization" do
               VCR.use_cassette("bikes_controller-create-stolen-chicago", match_requests_on: [:path]) do
                 expect do
                   post :create, bike: bike_params.merge(stolen: true), stolen_record: alt_stolen_params
                 end.to change(Ownership, :count).by 1
                 bike = Bike.last
                 expect(bike).to be_present
-                expect(bike.creation_state.origin).to eq 'embed'
+                expect(bike.creation_state.origin).to eq "embed"
                 expect(bike.creation_state.organization).to eq organization
                 expect(bike.creation_state.creator).to eq bike.creator
                 testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
@@ -529,11 +529,11 @@ describe BikesController do
             end
           end
         end
-        context 'invalid' do
-          it 'renders the stolen form with all the attributes' do
+        context "invalid" do
+          it "renders the stolen form with all the attributes" do
             target_path = embed_organization_path(id: organization.slug, b_param_id_token: b_param.id_token)
             expect do
-              post :create, bike: bike_params.merge(stolen: '1', primary_frame_color: nil),
+              post :create, bike: bike_params.merge(stolen: "1", primary_frame_color: nil),
                             stolen_record: stolen_params
               expect(assigns(:bike).errors&.full_messages).to be_present
             end.to change(Ownership, :count).by 0
@@ -549,39 +549,39 @@ describe BikesController do
       end
     end
 
-    describe 'extended embeded submission' do
+    describe "extended embeded submission" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       let(:bike_params) do
         {
-          serial_number: '69',
+          serial_number: "69",
           b_param_id_token: b_param.id_token,
           creation_organization_id: organization.id,
           embeded: true,
           embeded_extended: true,
-          cycle_type: 'pedi-cab',
+          cycle_type: "pedi-cab",
           manufacturer_id: manufacturer.slug,
           primary_frame_color_id: color.id,
           handlebar_type: handlebar_type,
-          owner_email: 'Flow@goodtimes.com'
+          owner_email: "Flow@goodtimes.com",
         }
       end
       let(:b_param) { BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true }) }
       before do
         expect(b_param).to be_present
       end
-      context 'with an image' do
-        it 'registers a bike and uploads an image' do
+      context "with an image" do
+        it "registers a bike and uploads an image" do
           Sidekiq::Testing.inline! do
-            test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, 'spec', 'fixtures', 'bike.jpg')))
+            test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")))
             expect_any_instance_of(ImageAssociatorWorker).to receive(:perform).and_return(true)
             post :create, bike: bike_params.merge(image: test_photo)
             expect(response).to redirect_to(embed_extended_organization_url(organization))
             bike = Bike.last
             expect(bike.owner_email).to eq bike_params[:owner_email].downcase
-            expect(bike.creation_state.origin).to eq 'embed_extended'
+            expect(bike.creation_state.origin).to eq "embed_extended"
             expect(bike.creation_state.organization).to eq organization
             expect(bike.creation_state.creator).to eq bike.creator
-            expect(bike.cycle_type_name).to eq 'Pedi Cab (rickshaw)'
+            expect(bike.cycle_type_name).to eq "Pedi Cab (rickshaw)"
             expect(bike.manufacturer).to eq manufacturer
           end
         end
@@ -629,25 +629,25 @@ describe BikesController do
       end
     end
 
-    context 'standard web form submission' do
+    context "standard web form submission" do
       include_context :logged_in_as_user
 
-      context 'legacy b_param' do
+      context "legacy b_param" do
         let(:bike_params) do
           {
-            serial_number: '1234567890',
+            serial_number: "1234567890",
             b_param_id_token: b_param.id_token,
-            cycle_type: 'stroller',
+            cycle_type: "stroller",
             manufacturer_id: manufacturer.name,
-            rear_tire_narrow: 'true',
+            rear_tire_narrow: "true",
             rear_wheel_size_id: FactoryBot.create(:wheel_size).id,
             primary_frame_color_id: color.id,
             handlebar_type: handlebar_type,
-            owner_email: user.email
+            owner_email: user.email,
           }
         end
 
-        context 'b_param not owned by user' do
+        context "b_param not owned by user" do
           let(:other_user) { FactoryBot.create(:user) }
           let(:b_param) { FactoryBot.create(:b_param, creator: other_user) }
           it "does not use the b_param if isn't owned by user" do
@@ -657,22 +657,22 @@ describe BikesController do
           end
         end
 
-        context 'stolen b_param from user' do
+        context "stolen b_param from user" do
           let(:b_param) { FactoryBot.create(:b_param, creator: user) }
-          it 'creates a new stolen bike and assigns the user phone' do
-            FactoryBot.create(:country, iso: 'US')
+          it "creates a new stolen bike and assigns the user phone" do
+            FactoryBot.create(:country, iso: "US")
             expect do
-              post :create, stolen: 'true', bike: bike_params.merge(phone: '312.379.9513')
+              post :create, stolen: "true", bike: bike_params.merge(phone: "312.379.9513")
             end.to change(StolenRecord, :count).by(1)
             expect(b_param.reload.created_bike_id).not_to be_nil
             expect(b_param.reload.bike_errors).to be_nil
-            expect(user.reload.phone).to eq('3123799513')
+            expect(user.reload.phone).to eq("3123799513")
           end
         end
-        context 'organization b_param' do
+        context "organization b_param" do
           let(:organization) { FactoryBot.create(:organization_with_auto_user) }
           let(:b_param) { FactoryBot.create(:b_param, creator: organization.auto_user) }
-          it 'creates a new ownership and bike from an organization' do
+          it "creates a new ownership and bike from an organization" do
             expect do
               post :create, bike: bike_params.merge(creation_organization_id: organization.id)
             end.to change(Ownership, :count).by(1)
@@ -698,7 +698,7 @@ describe BikesController do
             tertiary_frame_color_id: "",
             owner_email: "something@stuff.com",
             phone: "312.379.9513",
-            stolen: true
+            stolen: true,
           }
         end
         before { expect(BParam.all.count).to eq 0 }
@@ -731,8 +731,8 @@ describe BikesController do
             end
           end
         end
-        context 'failure' do
-          it 'assigns a bike and a stolen record with the attrs passed' do
+        context "failure" do
+          it "assigns a bike and a stolen record with the attrs passed" do
             expect do
               post :create, stolen: true, bike: bike_params.as_json, stolen_record: chicago_stolen_params
             end.to change(Bike, :count).by(0)
@@ -750,24 +750,24 @@ describe BikesController do
           end
         end
       end
-      context 'existing b_param' do
-        context 'no bike' do
+      context "existing b_param" do
+        context "no bike" do
           let(:bike_params) do
             {
-              cycle_type: 'cargo-rear',
-              serial_number: 'example serial',
-              manufacturer_other: '',
-              year: '2016',
-              frame_model: 'Cool frame model',
+              cycle_type: "cargo-rear",
+              serial_number: "example serial",
+              manufacturer_other: "",
+              year: "2016",
+              frame_model: "Cool frame model",
               primary_frame_color_id: color.id.to_s,
-              secondary_frame_color_id: '',
-              tertiary_frame_color_id: '',
-              owner_email: 'something@stuff.com'
+              secondary_frame_color_id: "",
+              tertiary_frame_color_id: "",
+              owner_email: "something@stuff.com",
             }
           end
           include_context :geocoder_default_location
           let(:target_address) { { address: "278 Broadway", city: "New York", state: "NY", zipcode: "10007", country: "USA" } }
-          let(:b_param) { BParam.create(params: { 'bike' => bike_params.as_json }, origin: 'embed_partial') }
+          let(:b_param) { BParam.create(params: { "bike" => bike_params.as_json }, origin: "embed_partial") }
           before do
             expect(b_param.partial_registration?).to be_truthy
             bb_data = { bike: {} }
@@ -776,16 +776,16 @@ describe BikesController do
             # This is also where we're testing bikebook assignment
             expect_any_instance_of(BikeBookIntegration).to receive(:get_model) { bb_data }
           end
-          it 'creates a bike' do
+          it "creates a bike" do
             expect do
               post :create, bike: {
-                manufacturer_id: manufacturer.slug,
-                b_param_id_token: b_param.id_token,
-                address: default_location[:address],
-                additional_registration: "XXXZZZ",
-                organization_affiliation: "employee",
-                phone: "888.777.6666"
-              }
+                              manufacturer_id: manufacturer.slug,
+                              b_param_id_token: b_param.id_token,
+                              address: default_location[:address],
+                              additional_registration: "XXXZZZ",
+                              organization_affiliation: "employee",
+                              phone: "888.777.6666",
+                            }
             end.to change(Bike, :count).by(1)
             expect(flash[:success]).to be_present
             bike = Bike.last
@@ -796,7 +796,7 @@ describe BikesController do
             bike_params.delete(:manufacturer_id)
             bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
             expect(bike.manufacturer).to eq manufacturer
-            expect(bike.creation_state.origin).to eq 'embed_partial'
+            expect(bike.creation_state.origin).to eq "embed_partial"
             expect(bike.creation_state.creator).to eq bike.creator
             expect(bike.registration_address).to eq target_address.as_json
             expect(bike.additional_registration).to eq "XXXZZZ"
@@ -812,16 +812,16 @@ describe BikesController do
             it "creates the bike and does the updated address thing" do
               expect do
                 post :create, bike: {
-                  manufacturer_id: manufacturer.slug,
-                  b_param_id_token: b_param.id_token,
-                  address: "212 Main St",
-                  address_city: "Chicago",
-                  address_state: "IL",
-                  address_zipcode: "60647",
-                  additional_registration: " ",
-                  organization_affiliation: "student",
-                  phone: "8887776666"
-                }
+                                manufacturer_id: manufacturer.slug,
+                                b_param_id_token: b_param.id_token,
+                                address: "212 Main St",
+                                address_city: "Chicago",
+                                address_state: "IL",
+                                address_zipcode: "60647",
+                                additional_registration: " ",
+                                organization_affiliation: "student",
+                                phone: "8887776666",
+                              }
               end.to change(Bike, :count).by(1)
               expect(flash[:success]).to be_present
               bike = Bike.last
@@ -830,7 +830,7 @@ describe BikesController do
               bike_params.delete(:manufacturer_id)
               bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v }
               expect(bike.manufacturer).to eq manufacturer
-              expect(bike.creation_state.origin).to eq 'embed_partial'
+              expect(bike.creation_state.origin).to eq "embed_partial"
               expect(bike.creation_state.creator).to eq bike.creator
               expect(bike.registration_address).to eq target_address.as_json
               expect(bike.additional_registration).to be_blank
@@ -842,8 +842,8 @@ describe BikesController do
             end
           end
         end
-        context 'created bike' do
-          it 'redirects to the bike' do
+        context "created bike" do
+          it "redirects to the bike" do
             bike = FactoryBot.create(:bike)
             b_param = BParam.create(params: { bike: {} }, created_bike_id: bike.id, creator_id: user.id)
             expect(b_param.created_bike).to be_present
@@ -855,35 +855,35 @@ describe BikesController do
     end
   end
 
-  describe 'edit' do
+  describe "edit" do
     let(:ownership) { FactoryBot.create(:ownership) }
     let(:bike) { ownership.bike }
     let(:edit_templates) do
       {
-        root: 'Bike Details',
-        photos: 'Photos',
-        drivetrain: 'Wheels + Drivetrain',
-        accessories: 'Accessories + Components',
-        ownership: 'Groups + Ownership',
-        remove: 'Hide or Delete'
+        root: "Bike Details",
+        photos: "Photos",
+        drivetrain: "Wheels + Drivetrain",
+        accessories: "Accessories + Components",
+        ownership: "Groups + Ownership",
+        remove: "Hide or Delete",
       }
     end
-    let(:non_stolen_edit_templates) { edit_templates.merge(stolen: 'Report Stolen or Missing') }
-    let(:stolen_edit_templates) { { stolen: 'Theft details' }.merge(edit_templates) }
-    let(:recovery_edit_templates) { { stolen: 'Recovery details' }.merge(edit_templates) }
+    let(:non_stolen_edit_templates) { edit_templates.merge(stolen: "Report Stolen or Missing") }
+    let(:stolen_edit_templates) { { stolen: "Theft details" }.merge(edit_templates) }
+    let(:recovery_edit_templates) { { stolen: "Recovery details" }.merge(edit_templates) }
 
-    context 'no user' do
-      it 'redirects and sets the flash' do
+    context "no user" do
+      it "redirects and sets the flash" do
         get :edit, id: bike.id
         expect(response).to redirect_to bike_path(bike)
         expect(flash[:error]).to be_present
       end
     end
-    context 'user present' do
+    context "user present" do
       let(:user) { FactoryBot.create(:user_confirmed) }
       before { set_current_user(user) }
       context "user present but isn't allowed to edit the bike" do
-        it 'redirects and sets the flash' do
+        it "redirects and sets the flash" do
           FactoryBot.create(:user)
           get :edit, id: bike.id
           expect(response).to redirect_to bike_path(bike)
@@ -891,68 +891,68 @@ describe BikesController do
         end
       end
       context "user present but hasn't claimed the bike" do
-        it 'claims and renders' do
+        it "claims and renders" do
           ownership.update_attribute :user_id, user.id
           expect(bike.owner).to_not eq user
           get :edit, id: bike.id
           bike.reload
           expect(bike.owner).to eq user
           expect(response).to be_success
-          expect(assigns(:edit_template)).to eq 'root'
+          expect(assigns(:edit_template)).to eq "root"
         end
       end
-      context 'not-creator but member of creation_organization' do
+      context "not-creator but member of creation_organization" do
         let(:ownership) { FactoryBot.create(:ownership_organization_bike) }
         let(:organization) { bike.creation_organization }
         let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-        it 'renders' do
+        it "renders" do
           expect(bike.owner).to_not eq user
           expect(bike.creation_organization).to eq user.organizations.first
           get :edit, id: bike.id
           expect(response).to be_success
-          expect(assigns(:edit_template)).to eq 'root'
+          expect(assigns(:edit_template)).to eq "root"
         end
       end
     end
-    context 'user allowed to edit the bike' do
+    context "user allowed to edit the bike" do
       let(:user) { ownership.creator }
-      context 'revised' do
+      context "revised" do
         before { set_current_user(user) }
-        context 'root' do
-          context 'non-stolen bike' do
-            it 'renders the bike_details template' do
+        context "root" do
+          context "non-stolen bike" do
+            it "renders the bike_details template" do
               get :edit, id: bike.id
-              expect(response).to render_with_layout 'application_revised'
+              expect(response).to render_with_layout "application_revised"
               expect(response).to be_success
-              expect(assigns(:edit_template)).to eq 'root'
+              expect(assigns(:edit_template)).to eq "root"
               expect(assigns(:edit_templates)).to eq non_stolen_edit_templates.as_json
-              expect(response).to render_template 'edit_root'
+              expect(response).to render_template "edit_root"
             end
           end
-          context 'stolen bike' do
-            it 'renders with stolen as first template, different description' do
+          context "stolen bike" do
+            it "renders with stolen as first template, different description" do
               bike.update_attribute :stolen, true
               bike.reload
               expect(bike.stolen).to be_truthy
               get :edit, id: bike.id
-              expect(response).to render_with_layout 'application_revised'
+              expect(response).to render_with_layout "application_revised"
               expect(response).to be_success
-              expect(assigns(:edit_template)).to eq 'stolen'
+              expect(assigns(:edit_template)).to eq "stolen"
               expect(assigns(:edit_templates)).to eq stolen_edit_templates.as_json
-              expect(response).to render_template 'edit_stolen'
+              expect(response).to render_template "edit_stolen"
             end
           end
-          context 'recovered bike' do
-            it 'renders with recovered as first template, different description' do
+          context "recovered bike" do
+            it "renders with recovered as first template, different description" do
               bike.update_attributes(stolen: true, recovered: true)
               bike.reload
               expect(bike.recovered).to be_truthy
               get :edit, id: bike.id
-              expect(response).to render_with_layout 'application_revised'
+              expect(response).to render_with_layout "application_revised"
               expect(response).to be_success
-              expect(assigns(:edit_template)).to eq 'stolen'
+              expect(assigns(:edit_template)).to eq "stolen"
               expect(assigns(:edit_templates)).to eq recovery_edit_templates.as_json
-              expect(response).to render_template 'edit_stolen'
+              expect(response).to render_template "edit_stolen"
             end
           end
         end
@@ -962,13 +962,13 @@ describe BikesController do
         bc.instance_variable_set(:@bike, Bike.new)
         bc.edit_templates_hash.keys.map(&:to_s).each do |template|
           context template do
-            it 'renders the template' do
+            it "renders the template" do
               get :edit, id: bike.id, page: template
-              expect(response).to render_with_layout('application_revised')
+              expect(response).to render_with_layout("application_revised")
               expect(response).to be_success
               expect(response).to render_template("edit_#{template}")
               expect(assigns(:edit_template)).to eq(template)
-              expect(assigns(:private_images)).to eq([]) if template == 'photos'
+              expect(assigns(:private_images)).to eq([]) if template == "photos"
             end
           end
         end
@@ -976,69 +976,69 @@ describe BikesController do
     end
   end
 
-  describe 'update' do
-    context 'user is present but is not allowed to edit' do
-      it 'does not update and redirects' do
+  describe "update" do
+    context "user is present but is not allowed to edit" do
+      it "does not update and redirects" do
         ownership = FactoryBot.create(:ownership)
         user = FactoryBot.create(:user_confirmed)
         set_current_user(user)
-        put :update, id: ownership.bike.id, bike: { serial_number: '69' }
+        put :update, id: ownership.bike.id, bike: { serial_number: "69" }
         expect(response).to redirect_to bike_url(ownership.bike)
         expect(flash[:error]).to be_present
       end
     end
 
-    context 'creator present (who is allowed to edit)' do
+    context "creator present (who is allowed to edit)" do
       let(:ownership) { FactoryBot.create(:ownership) }
       let(:user) { ownership.creator }
       let(:bike) { ownership.bike }
       before do
         set_current_user(user)
       end
-      context 'legacy' do
-        it 'allows you to edit an example bike' do
+      context "legacy" do
+        it "allows you to edit an example bike" do
           # Also test that we don't don't blank bike_organizations
           # if bike_organization_ids aren't passed
           organization = FactoryBot.create(:organization)
           ownership.bike.update_attributes(example: true, bike_organization_ids: [organization.id])
           bike.reload
           expect(bike.bike_organization_ids).to eq([organization.id])
-          put :update, id: bike.id, bike: { description: '69' }
+          put :update, id: bike.id, bike: { description: "69" }
           expect(response).to redirect_to edit_bike_url(bike)
           bike.reload
-          expect(bike.description).to eq('69')
+          expect(bike.description).to eq("69")
           expect(bike.bike_organization_ids).to eq([organization.id])
         end
 
-        it 'updates the bike and components' do
+        it "updates the bike and components" do
           component1 = FactoryBot.create(:component, bike: bike)
           another_handlebar_type = "drop"
           ctype_id = component1.ctype_id
           bike.reload
           component2_attrs = {
-            _destroy: '0',
+            _destroy: "0",
             ctype_id: ctype_id,
-            description: 'sdfsdfsdf',
+            description: "sdfsdfsdf",
             manufacturer_id: bike.manufacturer_id.to_s,
-            manufacturer_other: 'stuffffffff',
-            cmodel_name: 'asdfasdf',
-            year: '1995',
-            serial_number: 'simple_serial'
+            manufacturer_other: "stuffffffff",
+            cmodel_name: "asdfasdf",
+            year: "1995",
+            serial_number: "simple_serial",
           }
           bike_attrs = {
-            description: '69',
+            description: "69",
             handlebar_type: another_handlebar_type,
             components_attributes: {
-              '0' => {
-                '_destroy' => '1',
-                id: component1.id.to_s
+              "0" => {
+                "_destroy" => "1",
+                id: component1.id.to_s,
               },
-              Time.zone.now.to_i.to_s => component2_attrs
-            }
+              Time.zone.now.to_i.to_s => component2_attrs,
+            },
           }
           put :update, id: bike.id, bike: bike_attrs
           bike.reload
-          expect(bike.description).to eq('69')
+          expect(bike.description).to eq("69")
           expect(response).to redirect_to edit_bike_url(bike)
           expect(bike.handlebar_type).to eq another_handlebar_type
           expect(assigns(:bike)).to be_decorated
@@ -1052,38 +1052,38 @@ describe BikesController do
           end
         end
 
-        it 'marks the bike unhidden' do
-          bike.update_attribute :marked_user_hidden, '1'
+        it "marks the bike unhidden" do
+          bike.update_attribute :marked_user_hidden, "1"
           bike.reload
           expect(bike.hidden).to be_truthy
-          put :update, id: bike.id, bike: { marked_user_unhidden: 'true' }
+          put :update, id: bike.id, bike: { marked_user_unhidden: "true" }
           expect(bike.reload.hidden).to be_falsey
         end
 
-        it 'creates a new ownership if the email changes' do
+        it "creates a new ownership if the email changes" do
           expect do
-            put :update, id: bike.id, bike: { owner_email: 'new@email.com' }
+            put :update, id: bike.id, bike: { owner_email: "new@email.com" }
           end.to change(Ownership, :count).by(1)
         end
 
         it "redirects to return_to if it's a valid url" do
-          session[:return_to] = '/about'
-          put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
-          expect(bike.reload.description).to eq('69')
-          expect(response).to redirect_to '/about'
+          session[:return_to] = "/about"
+          put :update, id: bike.id, bike: { description: "69", marked_user_hidden: "0" }
+          expect(bike.reload.description).to eq("69")
+          expect(response).to redirect_to "/about"
           expect(session[:return_to]).to be_nil
         end
 
         it "doesn't redirect and clears the session if not a valid url" do
-          session[:return_to] = 'http://testhost.com/bad_place'
-          put :update, id: bike.id, bike: { description: '69', marked_user_hidden: '0' }
+          session[:return_to] = "http://testhost.com/bad_place"
+          put :update, id: bike.id, bike: { description: "69", marked_user_hidden: "0" }
           bike.reload
-          expect(bike.description).to eq('69')
+          expect(bike.description).to eq("69")
           expect(session[:return_to]).to be_nil
           expect(response).to redirect_to edit_bike_url
         end
       end
-      context 'revised' do
+      context "revised" do
         # We're testing a few things in here:
         # Firstly, new stolen update code paths
         # Also, that we can apply stolen changes to hidden bikes
@@ -1111,15 +1111,15 @@ describe BikesController do
               secondary_phone: "8888888888",
               proof_of_ownership: 1,
               receive_notifications: 0,
-              estimated_value: "1200"
+              estimated_value: "1200",
             }
           end
           let(:bike_attrs) do
             {
               stolen: true,
               stolen_records_attributes: {
-                "0" => stolen_attrs
-              }
+                "0" => stolen_attrs,
+              },
             }
           end
           let(:skipped_attrs) { %w[proof_of_ownership receive_notifications timezone date_stolen estimated_value].map(&:to_sym) }
@@ -1160,13 +1160,13 @@ describe BikesController do
               end
             end
           end
-          context 'recovered bike' do
-            it 'marks the bike recovered'
+          context "recovered bike" do
+            it "marks the bike recovered"
           end
         end
       end
     end
-    context 'owner present (who is allowed to edit)' do
+    context "owner present (who is allowed to edit)" do
       let(:color) { FactoryBot.create(:color) }
       let(:user) { FactoryBot.create(:user_confirmed) }
       let(:ownership) { FactoryBot.create(:ownership_organization_bike, owner_email: user.email) }
@@ -1175,8 +1175,8 @@ describe BikesController do
       let(:organization_2) { FactoryBot.create(:organization) }
       let(:allowed_attributes) do
         {
-          description: '69 description',
-          marked_user_hidden: '0',
+          description: "69 description",
+          marked_user_hidden: "0",
           primary_frame_color_id: color.id,
           secondary_frame_color_id: color.id,
           tertiary_frame_color_id: Color.black.id,
@@ -1185,13 +1185,13 @@ describe BikesController do
           belt_drive: true,
           front_gear_type_id: FactoryBot.create(:front_gear_type).id,
           rear_gear_type_id: FactoryBot.create(:rear_gear_type).id,
-          owner_email: 'new_email@stuff.com',
+          owner_email: "new_email@stuff.com",
           year: 1993,
-          frame_model: 'A sweet model named things',
-          frame_size: '56cm',
-          name: 'a sweet name for a bike',
-          additional_registration: 'some weird other number',
-          bike_organization_ids: "#{organization_2.id}, #{organization.id}"
+          frame_model: "A sweet model named things",
+          frame_size: "56cm",
+          name: "a sweet name for a bike",
+          additional_registration: "some weird other number",
+          bike_organization_ids: "#{organization_2.id}, #{organization.id}",
         }
       end
       let(:skipped_attrs) { %w[marked_user_hidden bike_organization_ids].map(&:to_sym) }
@@ -1200,7 +1200,7 @@ describe BikesController do
         set_current_user(user)
         expect(ownership.owner).to eq user
       end
-      it 'updates the bike with the allowed_attributes' do
+      it "updates the bike with the allowed_attributes" do
         put :update, id: bike.id, bike: allowed_attributes
         expect(response).to redirect_to edit_bike_url(bike)
         expect(assigns(:bike)).to be_decorated
@@ -1234,11 +1234,11 @@ describe BikesController do
     end
   end
 
-  describe 'show with recovery token present' do
+  describe "show with recovery token present" do
     let(:bike) { FactoryBot.create(:stolen_bike) }
     let(:stolen_record) { bike.current_stolen_record }
     let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
-    it 'renders a mark recovered modal, and deletes the session recovery_link_token' do
+    it "renders a mark recovered modal, and deletes the session recovery_link_token" do
       session[:recovery_link_token] = recovery_link_token
       get :show, id: bike.id
       expect(response.body).to match(recovery_link_token)

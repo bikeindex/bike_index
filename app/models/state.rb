@@ -18,6 +18,6 @@ class State < ActiveRecord::Base
   end
 
   def self.valid_names
-    StatesAndCountries.states.map{ |s| s[:name] }
+    StatesAndCountries.states.map { |s| s[:name] }
   end
 end

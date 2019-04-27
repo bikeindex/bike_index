@@ -6,8 +6,8 @@ class Admin::OrganizationsController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     orgs = Organization.all
-    orgs = orgs.paid if params[:is_paid].present?
-    orgs = orgs.admin_text_search(params[:query]) if params[:query].present?
+    orgs = orgs.paid if params[:search_is_paid].present?
+    orgs = orgs.admin_text_search(params[:search_query]) if params[:search_query].present?
     orgs = orgs.where(kind: kind_for_organizations) if params[:kind].present?
     @organizations_count = orgs.count
     @organizations = orgs.reorder(sort_column + " " + sort_direction).page(page).per(per_page)
@@ -16,7 +16,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def show
     @locations = @organization.locations.decorate
-    bikes = Bike.where(creation_organization_id: @organization.id).reorder('created_at desc')
+    bikes = Bike.where(creation_organization_id: @organization.id).reorder("created_at desc")
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     @bikes = bikes.page(page).per(per_page)
@@ -36,19 +36,21 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def new
     @organization = Organization.new
+    render layout: "new_admin"
   end
 
   def edit
     @embedable_email = @organization.auto_user.email if @organization.auto_user
+    render layout: "new_admin"
   end
 
   def update
     # Needs to update approved before saving so set_locations_shown is applied on save
     if @organization.update_attributes(permitted_parameters)
-      flash[:success] = 'Organization Saved!'
+      flash[:success] = "Organization Saved!"
       redirect_to admin_organization_url(@organization)
     else
-      render action: :edit
+      render action: :edit, layout: "new_admin"
     end
   end
 
@@ -56,10 +58,10 @@ class Admin::OrganizationsController < Admin::BaseController
     @organization = Organization.new(permitted_parameters)
     @organization.approved = true
     if @organization.save
-      flash[:success] = 'Organization Created!'
+      flash[:success] = "Organization Created!"
       redirect_to edit_admin_organization_url(@organization)
     else
-      render action: :new
+      render action: :new, layout: "new_admin"
     end
   end
 

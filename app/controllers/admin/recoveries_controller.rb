@@ -1,5 +1,6 @@
 class Admin::RecoveriesController < Admin::BaseController
   layout "new_admin"
+
   def index
     if params[:posted]
       @posted = true
@@ -26,7 +27,7 @@ class Admin::RecoveriesController < Admin::BaseController
   def update
     @stolen_record = StolenRecord.unscoped.find(params[:id])
     if @stolen_record.update_attributes(permitted_parameters)
-      flash[:success] = 'Recovery Saved!'
+      flash[:success] = "Recovery Saved!"
       redirect_to admin_recoveries_url
     else
       raise StandardError
@@ -54,7 +55,7 @@ class Admin::RecoveriesController < Admin::BaseController
       redirect_to admin_recoveries_url
     else
       RecoveryNotifyWorker.perform_async(params[:id].to_i)
-      flash[:success] = 'Recovery notification enqueued.'
+      flash[:success] = "Recovery notification enqueued."
       redirect_to admin_recoveries_url
     end
   end

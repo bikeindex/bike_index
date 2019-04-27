@@ -1,4 +1,3 @@
-class ComponentDecorator < ApplicationDecorator 
+class ComponentDecorator < ApplicationDecorator
   delegate_all
-
 end

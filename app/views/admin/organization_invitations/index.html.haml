@@ -1,9 +1,9 @@
 %header.with-subtitle
   %h1 Manage Organization Invitations
-  = link_to 'Send an invitation', new_admin_organization_invitation_url(organization_id: active_organization.to_param), class: "button-green sharing-links"
+  = link_to 'Send an invitation', new_admin_organization_invitation_url(organization_id: current_organization.to_param), class: "button-green sharing-links"
 
 
-  
+
 %h3.invitations-sent
   #{ pluralize(OrganizationInvitation.unclaimed.count, "invitation") } haven't been claimed yet
 
@@ -29,7 +29,7 @@
       - @organization_invitations.each do |org_invite|
         %tr
           %td
-            = link_to org_invite.id, edit_admin_organization_invitation_url(org_invite.id, organization_id: active_organization.to_param)
+            = link_to org_invite.id, edit_admin_organization_invitation_url(org_invite.id, organization_id: current_organization.to_param)
           %td.large-screens
             %span.convert-time
               = l org_invite.created_at, format: :convert_time

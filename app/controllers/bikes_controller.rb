@@ -10,11 +10,11 @@ class BikesController < ApplicationController
   before_filter :render_ad, only: [:index, :show]
   before_filter :store_return_to, only: [:edit]
   before_filter :remove_subdomain, only: [:index]
-  layout 'application_revised'
+  layout "application_revised"
 
   def index
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
-    if params[:stolenness] == 'proximity' && @interpreted_params[:stolenness] != 'proximity'
+    if params[:stolenness] == "proximity" && @interpreted_params[:stolenness] != "proximity"
       flash[:info] = "Sorry, we don't know the location \"#{params[:location]}\". Please try a different location to search nearby stolen bikes"
     end
     @bikes = Bike.search(@interpreted_params).page(params[:page] || 1).per(params[:per_page] || 10).decorate
@@ -34,7 +34,7 @@ class BikesController < ApplicationController
     @bike = @bike.decorate
     respond_to do |format|
       format.html { render :show }
-      format.gif  { render qrcode: bike_url(@bike), level: :h, unit: 50 }
+      format.gif { render qrcode: bike_url(@bike), level: :h, unit: 50 }
     end
   end
 
@@ -45,9 +45,9 @@ class BikesController < ApplicationController
     @bike = @bike.decorate
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]
     unless @bike.pdf.present? && @bike.pdf.file.filename == "#{filename}.pdf"
-      pdf = render_to_string pdf: filename, template: 'bikes/pdf'
+      pdf = render_to_string pdf: filename, template: "bikes/pdf"
       save_path = "#{Rails.root}/tmp/#{filename}.pdf"
-      File.open(save_path, 'wb') do |file|
+      File.open(save_path, "wb") do |file|
         file << pdf
       end
       # @bike.pdf = File.open(pdf, 'wb') { |file| file << pdf }
@@ -68,8 +68,8 @@ class BikesController < ApplicationController
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
       if current_user.member_of?(@bike_code.organization)
-        set_current_organization(@bike_code.organization)
-        redirect_to organization_bikes_path(organization_id: current_organization.to_param, bike_code: @bike_code.code) and return
+        set_passive_organization(@bike_code.organization)
+        redirect_to organization_bikes_path(organization_id: passive_organization.to_param, bike_code: @bike_code.code) and return
       else
         @bikes = current_user.bikes.reorder(created_at: :desc).limit(100)
       end
@@ -84,7 +84,7 @@ class BikesController < ApplicationController
   def new
     unless current_user.present?
       store_return_to(new_bike_path(b_param_token: params[:b_param_token], stolen: params[:stolen]))
-      flash[:info] = 'You have to sign in to register a bike'
+      flash[:info] = "You have to sign in to register a bike"
       redirect_to new_user_path and return
     end
     find_or_new_b_param
@@ -92,11 +92,11 @@ class BikesController < ApplicationController
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
     flash[:info] = "Oops! We couldn't find that registration, please re-enter the information here" if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= @b_param.bike_from_attrs(is_stolen: params[:stolen], recovered: params[:recovered])
-    # Fallback to active (i.e. passed organization_id), then current_organization
-    @bike.creation_organization ||= active_organization || current_organization
+    # Fallback to active (i.e. passed organization_id), then passive_organization
+    @bike.creation_organization ||= current_organization || passive_organization
     @organization = @bike.creation_organization
     if @bike.stolen
-      @stolen_record = @bike.stolen_records.build(@b_param.params['stolen_record'])
+      @stolen_record = @bike.stolen_records.build(@b_param.params["stolen_record"])
       @stolen_record.country_id ||= Country.united_states.id
     end
     @page_errors = @b_param.bike_errors
@@ -115,7 +115,7 @@ class BikesController < ApplicationController
         params[:bike].delete(:image)
       end
       @b_param.update_attributes(params: permitted_bparams,
-                                 origin: (params[:bike][:embeded_extended] ? 'embed_extended' : 'embed'))
+                                 origin: (params[:bike][:embeded_extended] ? "embed_extended" : "embed"))
       @bike = BikeCreator.new(@b_param).create_bike
       if @bike.errors.any?
         @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
@@ -144,7 +144,7 @@ class BikesController < ApplicationController
         @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
         redirect_to new_bike_url(b_param_token: @b_param.id_token)
       else
-        flash[:success] = 'Bike successfully added to the index!'
+        flash[:success] = "Bike successfully added to the index!"
         redirect_to edit_bike_url(@bike)
       end
     end
@@ -153,12 +153,11 @@ class BikesController < ApplicationController
   def edit
     @page_errors = @bike.errors
     @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
-    if @edit_template == 'photos'
-      @private_images = PublicImage.unscoped.where(imageable_type: 'Bike').where(imageable_id: @bike.id).where(is_private: true)
+    if @edit_template == "photos"
+      @private_images = PublicImage.unscoped.where(imageable_type: "Bike").where(imageable_id: @bike.id).where(is_private: true)
     end
     render "edit_#{@edit_template}".to_sym
   end
-
 
   def update
     begin
@@ -170,22 +169,22 @@ class BikesController < ApplicationController
     if @bike.errors.any? || flash[:error].present?
       edit and return
     else
-      flash[:success] = 'Bike successfully updated!'
+      flash[:success] = "Bike successfully updated!"
       return if return_to_if_present
       redirect_to edit_bike_url(@bike, page: params[:edit_template]) and return
     end
   end
 
   def edit_templates_hash
-    stolen_type = @bike.recovered ? 'Recovery' : 'Theft'
+    stolen_type = @bike.recovered ? "Recovery" : "Theft"
     hash = {
-      root: 'Bike Details',
-      photos: 'Photos',
-      drivetrain: 'Wheels + Drivetrain',
-      accessories: 'Accessories + Components',
-      ownership: 'Groups + Ownership',
-      remove: 'Hide or Delete',
-      stolen: (@bike.stolen ? "#{stolen_type} details" : 'Report Stolen or Missing')
+      root: "Bike Details",
+      photos: "Photos",
+      drivetrain: "Wheels + Drivetrain",
+      accessories: "Accessories + Components",
+      ownership: "Groups + Ownership",
+      remove: "Hide or Delete",
+      stolen: (@bike.stolen ? "#{stolen_type} details" : "Report Stolen or Missing"),
     }
     # To make stolen the first key if bike is stolen. using as_json for string keys instead of sym
     (@bike.stolen ? hash.to_a.rotate(-1).to_h : hash).as_json
@@ -209,7 +208,7 @@ class BikesController < ApplicationController
     end
     if @bike.hidden
       unless current_user.present? && @bike.visible_by(current_user)
-        flash[:error] = 'Bike deleted'
+        flash[:error] = "Bike deleted"
         redirect_to root_url and return
       end
     end
@@ -223,7 +222,7 @@ class BikesController < ApplicationController
 
   def ensure_user_allowed_to_edit
     @current_ownership = @bike.current_ownership
-    type = @bike && @bike.type || 'bike'
+    type = @bike && @bike.type || "bike"
     return true if @bike.authorize_for_user!(current_user)
     if current_user.present?
       error = "Oh no! It looks like you don't own that #{type}."
@@ -238,7 +237,7 @@ class BikesController < ApplicationController
       flash[:error] = error
       redirect_to bike_path(@bike) and return
     end
-    authenticate_user('Please create an account', flash_type: :info)
+    authenticate_user("Please create an account", flash_type: :info)
   end
 
   def render_ad

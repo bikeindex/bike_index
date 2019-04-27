@@ -34,7 +34,7 @@ describe LandingPagesController do
         elsif landing_type == "ascend"
           expect(title).to eq "Ascend POS on Bike Index"
         else
-          expect(title).to eq "Bike Index #{landing_type.titleize.gsub(/\AF/, 'f')}"
+          expect(title).to eq "Bike Index #{landing_type.titleize.gsub(/\AF/, "f")}"
         end
       end
     end
