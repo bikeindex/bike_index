@@ -47,51 +47,43 @@
         = f.label :handlebar_type
         = select(:bike, :handlebar_type, HandlebarType.select_options, { include_blank: true, required: true, prompt: "Handlebar Style", input_html: { class: "has-hidden-other" }})
   .row
-    .form-group
-      = label :drive_train, "Drivetrain"
-      - fixed = @bike.rear_gear_type == RearGearType.fixed
-      %label.checkbox
-        %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
-        Fixed gear
-      %label.checkbox.not-fixed
-        = f.check_box :coaster_brake, class: 'drive-check'
-        Coaster brake (backpedal to brake)
-      %label.checkbox.not-fixed
-        = f.check_box :belt_drive
-        Belt drive
+    .col-auto
+      = label :drivetrain, "Drivetrain"
+  .form-inline
+    - fixed = @bike.rear_gear_type == RearGearType.fixed
+    .form-check.mr-2
+      = label :fixed, "fixed", class: "form-check-label"
+      = check_box :fixed, "fixed", class: "form-check-input ml-2"
+    .form-check.mr-2
+      = label :coaster_brake, "coaster_brake", class: "form-check-label"
+      = check_box :coaster_brake, "coaster_brake", class: "form-check-input ml-2"
+    .form-check.mr-2
+      = label :belt_drive, "belt_drive", class: "form-check-label"
+      = check_box :belt_drive, "belt_drive", class: "form-check-input ml-2"
 
-  / .input-group.not-fixed
-  .control-group
-    %label.control-label{ for: 'front_gear_select'}
-      Front gears
-    .controls
-
-      = collection_select( :bike, :front_gear_type_id, FrontGearType.all, :id, :name, prompt: "Chainrings?")
-  .control-group
+  .form-group.mt-4
+    = label :front_gear_select, "Front gear"
+    = collection_select( :bike, :front_gear_type_id, FrontGearType.all, :id, :name, prompt: "Chainrings?")
+  .form-group
     %label.control-label{ for: 'rear_gear_select' }
       Rear gears
-    .controls
-      = collection_select( :bike, :rear_gear_type_id, RearGearType.all, :id, :name, prompt: "Rear cogs?")
-  .control-group.select-jsonified
+    = collection_select( :bike, :rear_gear_type_id, RearGearType.all, :id, :name, prompt: "Rear cogs?")
+  .form-group.select-jsonified
     = f.label :manufacturer_id, class: "control-label"
-    .controls
-      = f.text_field :manufacturer_id, data: { initial: { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json }
+    = f.text_field :manufacturer_id, data: { initial: { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json }
 
-  .control-group
+  .form-group
     = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
-    .controls
-      = f.text_field :manufacturer_other
+    = f.text_field :manufacturer_other
 
-  .control-group
+  .form-group
     = f.label :frame_model, class: "control-label"
-    .controls
-      = f.text_field :frame_model
-  .control-group
+    = f.text_field :frame_model
+  .form-group
     = f.label :year, class: "control-label"
-    .controls
-      = f.text_field :year
+    = f.text_field :year
   - if @bike.creation_organization.present?
-    .control-group
+    .form-group
       = f.label :creation_organization_id, "Creation org", class: "control-label"
       .controls
         %span.less-strong
