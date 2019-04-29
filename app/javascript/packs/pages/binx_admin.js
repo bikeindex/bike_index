@@ -91,27 +91,6 @@ function BinxAdmin() {
             .replace(regexp, time)
         );
         event.preventDefault();
-        const us_val = parseInt($("#us-country-code").text(), 10);
-        for (let location of Array.from(
-          $(this)
-            .closest("fieldset")
-            .find(".country_select_container select")
-        )) {
-          const l = $(location);
-          if (!(l.val().length > 0)) {
-            l.val(us_val);
-          }
-        }
-        const names = $(this)
-          .closest("fieldset")
-          .find(".location-name-field input");
-        for (let name of Array.from(names)) {
-          const n = $(name);
-          if (!(n.val().length > 0)) {
-            n.val($("#organization_name").val());
-          }
-        }
-
         LoadFancySelects();
       });
     }
