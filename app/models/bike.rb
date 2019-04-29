@@ -223,12 +223,14 @@ class Bike < ActiveRecord::Base
   end
 
   def authorize_for_user(u)
+    binding.pry
     return true if u == owner || claimable_by?(u)
     return false if u.blank? || current_ownership&.claimed
     authorized_by_organization?(u: u)
   end
 
   def authorize_for_user!(u)
+    binding.pry
     return authorize_for_user(u) unless claimable_by?(u)
     current_ownership.mark_claimed
     true
