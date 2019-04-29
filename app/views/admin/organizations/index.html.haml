@@ -1,28 +1,26 @@
-.row
+.admin-subnav
   .col-md-9
     %h1
-      Manage Organizations
+      Manage Organization
   .col-md-3
     = link_to 'New Organization', new_admin_organization_url, class: "btn btn-success float-right"
+.row.mb-4
+  .col-md-5
+    %p
+      There are currently #{number_with_delimiter(Organization.count)} organizations
+      %em
+        (#{Organization.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+  .col-md-7
+    = form_tag admin_organizations_path, method: :get, class: "form-inline" do
+      = hidden_field_tag :sort, sort_column
+      = hidden_field_tag :sort_direction, sort_direction
+      .form-check.ml-auto.mr-2.ml-2.align-self-end
+        = check_box_tag :search_is_paid, true, checked = sortable_search_params[:search_is_paid] ? true : false, class:"form-check-input"
+        = label_tag :search_is_paid, "Paid only"
+      .form-group
+        = text_field_tag :search_query, params[:search_query], placeholder: "Name/Location#{current_user.developer? ? '/Paid features' : '' }", class: "form-control mt-4"
 
-%h3
-  #{number_with_delimiter(@organizations_count)} organizations
-  = (params[:query].present? || params[:is_paid].present?) ? 'matching' : 'in the system'
-
-  = form_tag admin_organizations_path, method: :get do
-    .row
-      .col-md-6
-        = hidden_field_tag :sort, sort_column
-        = hidden_field_tag :sort_direction, sort_direction
-      .col-md-2.align-self-end
-        .form-check.text-center
-          = check_box_tag :is_paid, class: "form-check-input"
-          %label.form-check-label{for: "is_paid"}
-            Paid only?
-      .col-md-3
-        = text_field_tag :query, params[:query], placeholder: "Find name, location #{current_user.developer? ? 'or paid features' : '' }", class: "form-control mt-4"
-      .col-md-1
-        = submit_tag 'Search', name: 'search', class: 'btn btn-primary mt-4'
+      = submit_tag 'Search', name: 'search', class: 'btn btn-primary mt-4 ml-2'
 
 = paginate @organizations, views_prefix: "admin"
 
