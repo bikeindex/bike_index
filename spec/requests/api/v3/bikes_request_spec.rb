@@ -37,7 +37,7 @@ describe "Bikes API V3" do
         rear_wheel_bsd: "559",
         color: color.name,
         year: "1969",
-        owner_email: user.email,
+        owner_email: "fun_times@examples.com",
         frame_material: "steel",
       }
     end
