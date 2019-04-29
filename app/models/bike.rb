@@ -199,7 +199,12 @@ class Bike < ActiveRecord::Base
   def first_ownership; ownerships.reorder(:id).first end
 
   def organized?(org = nil)
-    org.present? ? bike_organization_ids.include?(org.id) : bike_organizations.any?
+    if org.present?
+      bike_organization_ids.include?(org.id)
+    else
+      binding.pry
+      bike_organizations.any?
+    end
   end
 
   # check if this is the first ownership - or if no owner, which means testing probably
@@ -223,14 +228,12 @@ class Bike < ActiveRecord::Base
   end
 
   def authorize_for_user(u)
-    binding.pry
     return true if u == owner || claimable_by?(u)
     return false if u.blank? || current_ownership&.claimed
     authorized_by_organization?(u: u)
   end
 
   def authorize_for_user!(u)
-    binding.pry
     return authorize_for_user(u) unless claimable_by?(u)
     current_ownership.mark_claimed
     true
