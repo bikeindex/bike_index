@@ -293,20 +293,3 @@ module API
     end
   end
 end
-
-def email_is_attached_to_bike_owner(email)
-  normalized_email = EmailNormalizer.normalize(email)
-
-  # check primary email first in case we can short-circuit
-  if @bike.owner_email == normalized_email
-    return true
-  end
-
-  secondary_emails = @bike.owner.secondary_emails
-
-  if secondary_emails.include?(normalized_email)
-    return true
-  end
-
-  error!("#{email} does not own that #{@bike.type}", 403)
-end
