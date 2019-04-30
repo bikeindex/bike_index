@@ -73,7 +73,6 @@ module API
             is_bulk: params[:is_bulk],
             is_pos: params[:is_pos],
             is_new: params[:is_new],
-            no_duplicate: params[:no_duplicate],
           }
         end
 
@@ -187,7 +186,6 @@ module API
             hash["bike"].delete("is_bulk")
             hash["bike"].delete("is_pos")
             hash["bike"].delete("is_new")
-            hash["bike"].delete("no_duplicate")
 
             begin
               BikeUpdator
