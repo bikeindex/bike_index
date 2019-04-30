@@ -70,7 +70,7 @@ describe "Bikes API V2" do
           component_type: "headset",
           description: "yeah yay!",
           serial_number: "69",
-          model_name: "Richie rich",
+          model: "Richie rich",
         },
         {
           manufacturer: "BLUE TEETH",
@@ -100,6 +100,7 @@ describe "Bikes API V2" do
       expect(bike.components.count).to eq(3)
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.pluck(:ctype_id).uniq.count).to eq(2)
+      expect(bike.components.map(&:cmodel_name).compact).to eq(["Richie rich"])
       expect(bike.front_gear_type).to eq(front_gear_type)
       expect(bike.handlebar_type).to eq(handlebar_type_slug)
       creation_state = bike.creation_state
@@ -332,23 +333,21 @@ describe "Bikes API V2" do
     end
 
     it "updates a bike, adds and removes components" do
-      # FactoryBot.create(:manufacturer, name: 'Other')
       wheels = FactoryBot.create(:ctype, name: "wheel")
       headsets = FactoryBot.create(:ctype, name: "Headset")
       comp = FactoryBot.create(:component, bike: bike, ctype: headsets)
       comp2 = FactoryBot.create(:component, bike: bike, ctype: wheels)
       FactoryBot.create(:component)
-      # pp comp2
       bike.reload
       expect(bike.components.count).to eq(2)
       components = [
         {
-          manufacturer: manufacturer.name,
+          manufacturer: manufacturer.slug,
           year: "1999",
           component_type: "headset",
           description: "Second component",
           serial_number: "69",
-          model_name: "Richie rich",
+          model: "Richie rich",
         }, {
           manufacturer: "BLUE TEETH",
           front_or_rear: "Rear",
@@ -362,10 +361,8 @@ describe "Bikes API V2" do
           description: "First component",
         },
       ]
-      params[:is_for_sale] = true
-      params[:components] = components
       expect do
-        put url, params.to_json, json_headers
+        put url, params.merge(is_for_sale: true, components: components).to_json, json_headers
       end.to change(Ownership, :count).by(0)
       expect(response.code).to eq("200")
       bike.reload
@@ -373,6 +370,10 @@ describe "Bikes API V2" do
       expect(bike.is_for_sale).to be_truthy
       expect(bike.year).to eq(params[:year])
       expect(comp2.reload.year).to eq(1999)
+      pp "---"
+      pp bike.components.pluck(:cmodel_name), bike.components.map(&:manufacturer_name)
+      expect(bike.components.pluck(:cmodel_name)).to match_array([nil, nil, "Richie rich"])
+      expect(bike.components.map(&:manufacturer_name).compact).to match_array(["BLUE TEETH", manufacturer.name])
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.count).to eq(3)
     end

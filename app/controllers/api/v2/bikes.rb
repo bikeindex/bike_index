@@ -73,7 +73,7 @@ module API
             is_bulk: params[:is_bulk],
             is_pos: params[:is_pos],
             is_new: params[:is_new],
-          }
+          }.as_json
         end
 
         def find_bike
@@ -141,14 +141,14 @@ module API
           # Search for a bike matching the provided serial number / owner email
           bike_attrs = %w{serial owner_email}.map { |key| [key.to_sym, params[key]] }.to_h
           found_bike = BikeFinder.find_matching(**bike_attrs)
-          declared_p = { "declared_params" => declared(params, include_missing: false) }
+          declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
           b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
           b_param.clean_params
+          ensure_required_stolen_attrs(b_param.params)
 
           # bike was not found, create it
           if found_bike.blank?
-            ensure_required_stolen_attrs(b_param.params)
-            b_param.update_attributes(params: b_param.params.merge(creation_state_params))
+            b_param.save
             bike = BikeCreator.new(b_param).create_bike
 
             if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
@@ -164,37 +164,13 @@ module API
             @bike = found_bike
             authorize_bike_for_user
 
-            declared_p = { "declared_params" => declared(params, include_missing: false) }
-            hash = BParam.v2_params(declared_p["declared_params"].as_json)
-            if hash["stolen_record"].present? && @bike.stolen != true
-              ensure_required_stolen_attrs(hash)
+            if b_param.params.dig("bike", "external_image_urls").present?
+              @bike.load_external_images(b_param.params["bike"]["external_image_urls"])
             end
-
-            if hash.dig("bike", "external_image_urls").present?
-              @bike.load_external_images(hash["bike"]["external_image_urls"])
-            end
-
-            # hash["bike"]["primary_frame_color"] =
-            #   Color.find_by(name: hash["bike"].delete("color"))
-
-            # hash["bike"]["cycle_type"] =
-            #   CycleType.friendly_find(hash["bike"].delete("cycle_type_name")).id
-
-            # # binding.pry
-            # rear_size = hash["bike"].delete("rear_wheel_bsd")
-            # front_size = hash["bike"].delete("front_wheel_bsd")
-            # hash["bike"]["front_wheel_size_id"] = front_size
-            # hash["bike"]["rear_wheel_size_id"] = rear_size
-
-            # # Don't update
-            # hash["bike"].delete("manufacturer")
-            # hash["bike"].delete("is_bulk")
-            # hash["bike"].delete("is_pos")
-            # hash["bike"].delete("is_new")
 
             begin
               BikeUpdator
-                .new(user: current_user, bike: @bike, b_params: b_param.params)
+                .new(user: current_user, bike: @bike, b_params: b_param.params.except(*creation_state_params.keys))
                 .update_available_attributes
             rescue => e
               error!("Unable to update bike: #{e}", 401)
@@ -228,7 +204,9 @@ module API
           declared_p = { "declared_params" => declared(params, include_missing: false) }
           find_bike
           authorize_bike_for_user
-          hash = BParam.new(params: declared_p["declared_params"].as_json, origin: "api_v2").clean_params.params
+          b_param = BParam.new(params: declared_p["declared_params"].as_json, origin: "api_v2")
+          b_param.clean_params
+          hash = b_param.params
           ensure_required_stolen_attrs(hash) if hash["stolen_record"].present? && @bike.stolen != true
           @bike.load_external_images(hash["bike"]["external_image_urls"]) if hash.dig("bike", "external_image_urls").present?
           begin
