@@ -176,8 +176,10 @@ module API
             hash["bike"]["manufacturer"] =
               Manufacturer.find_by(name: hash["bike"]["manufacturer"])
 
+            hash["bike"]["primary_frame_color"] =
+              Color.find_by(name: hash["bike"].delete("color"))
+
             # TODO: Fix this
-            hash["bike"].delete("color")
             hash["bike"].delete("cycle_type_name")
             hash["bike"].delete("rear_wheel_bsd")
             hash["bike"].delete("is_bulk")
