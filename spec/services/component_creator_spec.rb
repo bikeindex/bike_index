@@ -14,6 +14,7 @@ describe ComponentCreator do
       let(:target) { { manufacturer_id: Manufacturer.other.id, manufacturer_other: "Gobbledy Gooky" } }
       it "adds other manufacturer name and set the set the foreign keys" do
         expect(ComponentCreator.new.manufacturer_hash(manufacturer: "Gobbledy Gooky")).to eq target
+        # If it's already existing, it should stay the same
         expect(ComponentCreator.new.manufacturer_hash(target)).to eq target
       end
     end
@@ -29,17 +30,15 @@ describe ComponentCreator do
       ctype = FactoryBot.create(:ctype, name: "Stuff blows")
       c = { component_type: "sTuff Blows " }
       expect(ComponentCreator.new.component_type_hash(c)).to eq(ctype_id: ctype.id)
-      expect(component[:ctype_id]).to eq(ctype.id)
-      expect(component[:component_type]).not_to be_present
     end
     context "unknown component type" do
-      let(:target) { { ctype_id: Ctype.unknown.id, ctype_other: "Spiked Hubs" } }
+      let(:target) { { ctype_id: Ctype.other.id, ctype_other: "Spiked Hubs" } }
       it "creates a new component type if we don't recognize it" do
         expect(ComponentCreator.new.component_type_hash(component_type: "Spiked Hubs")).to eq target
       end
     end
     context "already has ctype_id" do
-      target = { ctype_id: Ctype.unknown.id, ctype_other: "Some other component" }
+      target = { ctype_id: Ctype.other.id, ctype_other: "Some other component" }
       it "creates a new component type if we don't recognize it" do
         expect(ComponentCreator.new.component_type_hash(target)).to eq target
       end

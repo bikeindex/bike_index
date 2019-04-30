@@ -7,25 +7,15 @@ class ComponentCreator
     @b_param = creation_params[:b_param]
   end
 
-  def set_component_type(component)
-    name = component[:component_type]
-    return component unless name.present?
-    ctype = Ctype.friendly_find(name)
-    if ctype.present?
-      component[:ctype_id] = ctype.id
-    else
-      component[:ctype_id] = Ctype.unknown.id
-      component[:ctype_other] = name
-    end
-    component.delete :component_type
-    component
-  end
-
   def component_type_hash(component)
-    {}
+    return component.slice(:ctype_id, :ctype_other) unless component[:component_type].present?
+    ctype = Ctype.friendly_find(component[:component_type])
+    return { ctype_id: ctype.id } if ctype.present?
+    { ctype_id: Ctype.other.id, ctype_other: component[:component_type] }
   end
 
   def manufacturer_hash(component)
+    return component.slice(:manufacturer_id, :manufacturer_other) if component[:manufacturer_other].present?
     mnfg_input = component[:manufacturer_id] || component[:manufacturer]
     return {} unless mnfg_input.present?
     manufacturer = Manufacturer.friendly_find(mnfg_input)
@@ -46,7 +36,6 @@ class ComponentCreator
       front_or_rear: component[:front_or_rear],
       ctype_id: component[:ctype_id],
       ctype_other: component[:ctype_other],
-      mnfg_name: component[:manufacturer_name] || component[:manufacturer_name] || component[:mnfg_name],
     }.merge(manufacturer_hash(component)).merge(component_type_hash(component))
     comp_attributes.select { |k, v| v.present? }
   end
@@ -63,8 +52,7 @@ class ComponentCreator
       else
         component = @bike.components.new
       end
-      comp = set_component_type(comp)
-      component.update_attributes whitelist_attributes(comp.with_indifferent_access)
+      component.update_attributes(whitelist_attributes(comp.with_indifferent_access))
     end
   end
 
@@ -76,8 +64,6 @@ class ComponentCreator
         else
           component = @b_param.params["components"][c_number.to_s].with_indifferent_access
         end
-        component = set_manufacturer_key(component)
-        component = set_component_type(component)
         create_component(component)
       end
     end
