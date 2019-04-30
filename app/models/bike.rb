@@ -202,7 +202,6 @@ class Bike < ActiveRecord::Base
     if org.present?
       bike_organization_ids.include?(org.id)
     else
-      binding.pry
       bike_organizations.any?
     end
   end
