@@ -87,7 +87,7 @@ describe "Bikes API V3" do
         post "/api/v3/bikes?access_token=#{token.token}",
              bike_attrs.to_json,
              json_headers
-
+        pp json_result
         bike2 = JSON.parse(response.body)["bike"]
         expect(response.status).to eq(302)
         expect(response.status_message).to eq("Found")
@@ -144,12 +144,10 @@ describe "Bikes API V3" do
         post "/api/v3/bikes?access_token=#{token.token}",
              bike_attrs.to_json,
              json_headers
-
         json = JSON.parse(response.body)
         expect(json["error"]).to be_blank
 
         bike2 = json["bike"]
-        p bike2
         expect(bike2["id"]).to eq(bike1.id)
         expect(bike2["serial"]).to eq(bike1.serial)
         expect(bike2["year"]).to eq(new_year)
