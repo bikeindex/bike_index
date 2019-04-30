@@ -178,7 +178,6 @@ module API
             hash["bike"]["cycle_type"] =
               CycleType.friendly_find(hash["bike"].delete("cycle_type_name")).id
 
-            binding.pry
             rear_size = hash["bike"].delete("rear_wheel_bsd")
             front_size = hash["bike"].delete("front_wheel_bsd")
             hash["bike"]["front_wheel_size_id"] = front_size

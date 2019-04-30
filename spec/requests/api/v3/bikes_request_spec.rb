@@ -149,7 +149,6 @@ describe "Bikes API V3" do
         expect(json["error"]).to be_blank
 
         bike2 = json["bike"]
-        p bike2
         expect(bike2["id"]).to eq(bike1.id)
         expect(bike2["serial"]).to eq(bike1.serial)
         expect(bike2["year"]).to eq(new_year)
