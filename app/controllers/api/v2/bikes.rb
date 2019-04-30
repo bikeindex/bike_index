@@ -178,11 +178,10 @@ module API
             hash["bike"]["cycle_type"] =
               CycleType.friendly_find(hash["bike"].delete("cycle_type_name")).id
 
-            # Don't update manufacturer
-            hash["bike"].delete("manufacturer")
-
-            # TODO: Fix this
             hash["bike"].delete("rear_wheel_bsd")
+
+            # Don't update
+            hash["bike"].delete("manufacturer")
             hash["bike"].delete("is_bulk")
             hash["bike"].delete("is_pos")
             hash["bike"].delete("is_new")

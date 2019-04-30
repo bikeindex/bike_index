@@ -103,6 +103,8 @@ describe "Bikes API V3" do
         new_cycle_type = CycleType.new("tricycle")
         old_manufacturer = FactoryBot.create(:manufacturer, name: "old_manufacturer")
         new_manufacturer = FactoryBot.create(:manufacturer, name: "new_manufacturer")
+        old_rear_wheel_size = FactoryBot.create(:wheel_size, name: "old_wheel_size", iso_bsd: 10)
+        new_rear_wheel_size = FactoryBot.create(:wheel_size, name: "new_wheel_size", iso_bsd: 11)
 
         bike1 = FactoryBot.create(
           :bike,
@@ -112,20 +114,21 @@ describe "Bikes API V3" do
           manufacturer: old_manufacturer,
           primary_frame_color: old_color,
           cycle_type: old_cycle_type.id,
+          rear_wheel_size: old_rear_wheel_size,
         )
         expect(bike1.year).to eq(old_year)
         expect(bike1.primary_frame_color.name).to eq(old_color.name)
         expect(bike1.cycle_type).to eq(old_cycle_type.slug.to_s)
         expect(bike1.manufacturer.name).to eq(old_manufacturer.name)
-
+        expect(bike1.rear_wheel_size.name).to eq(old_rear_wheel_size.name)
+        expect(bike1.rear_wheel_size.iso_bsd).to eq(old_rear_wheel_size.iso_bsd)
         FactoryBot.create(:ownership, bike: bike1, creator: user, owner_email: user.email)
-        expect(bike1.year).to eq(old_year)
 
         bike_attrs = {
           serial: bike1.serial_number,
           manufacturer: new_manufacturer.name,
           rear_tire_narrow: "true",
-          rear_wheel_bsd: 556,
+          rear_wheel_bsd: new_rear_wheel_size.iso_bsd,
           color: new_color.name,
           year: new_year,
           owner_email: user.email,
@@ -148,6 +151,7 @@ describe "Bikes API V3" do
         expect(bike2["frame_colors"].first).to eq(new_color.name)
         expect(bike2["type_of_cycle"]).to eq(new_cycle_type.name)
         expect(bike2["manufacturer_id"]).to eq(old_manufacturer.id)
+        expect(bike2["rear_wheel_size_iso_bsd"]).to eq(new_rear_wheel_size.iso_bsd)
       end
     end
 
