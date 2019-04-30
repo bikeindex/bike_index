@@ -101,25 +101,29 @@ describe "Bikes API V3" do
         new_year = 2001
         old_cycle_type = CycleType.new("unicycle")
         new_cycle_type = CycleType.new("tricycle")
+        old_manufacturer = FactoryBot.create(:manufacturer, name: "old_manufacturer")
+        new_manufacturer = FactoryBot.create(:manufacturer, name: "new_manufacturer")
 
         bike1 = FactoryBot.create(
           :bike,
           creator: user,
           owner_email: user.email,
           year: old_year,
-          manufacturer: manufacturer,
+          manufacturer: old_manufacturer,
           primary_frame_color: old_color,
           cycle_type: old_cycle_type.id,
         )
+        expect(bike1.year).to eq(old_year)
         expect(bike1.primary_frame_color.name).to eq(old_color.name)
         expect(bike1.cycle_type).to eq(old_cycle_type.slug.to_s)
+        expect(bike1.manufacturer.name).to eq(old_manufacturer.name)
 
         FactoryBot.create(:ownership, bike: bike1, creator: user, owner_email: user.email)
         expect(bike1.year).to eq(old_year)
 
         bike_attrs = {
           serial: bike1.serial_number,
-          manufacturer: manufacturer.name,
+          manufacturer: new_manufacturer.name,
           rear_tire_narrow: "true",
           rear_wheel_bsd: 556,
           color: new_color.name,
@@ -143,6 +147,7 @@ describe "Bikes API V3" do
         expect(bike2["year"]).to eq(new_year)
         expect(bike2["frame_colors"].first).to eq(new_color.name)
         expect(bike2["type_of_cycle"]).to eq(new_cycle_type.name)
+        expect(bike2["manufacturer_id"]).to eq(old_manufacturer.id)
       end
     end
 

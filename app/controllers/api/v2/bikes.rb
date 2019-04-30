@@ -172,14 +172,14 @@ module API
               @bike.load_external_images(hash["bike"]["external_image_urls"])
             end
 
-            hash["bike"]["manufacturer"] =
-              Manufacturer.find_by(name: hash["bike"]["manufacturer"])
-
             hash["bike"]["primary_frame_color"] =
               Color.find_by(name: hash["bike"].delete("color"))
 
             hash["bike"]["cycle_type"] =
               CycleType.friendly_find(hash["bike"].delete("cycle_type_name")).id
+
+            # Don't update manufacturer
+            hash["bike"].delete("manufacturer")
 
             # TODO: Fix this
             hash["bike"].delete("rear_wheel_bsd")
