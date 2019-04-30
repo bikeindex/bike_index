@@ -19,10 +19,8 @@ class ComponentCreator
     mnfg_input = component[:manufacturer_id] || component[:manufacturer]
     return {} unless mnfg_input.present?
     manufacturer = Manufacturer.friendly_find(mnfg_input)
-    unless manufacturer.present?
-      return { manufacturer_id: Manufacturer.other.id, manufacturer_other: mnfg_input }
-    end
-    { manufacturer_id: manufacturer.id }
+    return { manufacturer_id: manufacturer.id } if manufacturer.present?
+    { manufacturer_id: Manufacturer.other.id, manufacturer_other: mnfg_input }
   end
 
   def whitelist_attributes(component)
