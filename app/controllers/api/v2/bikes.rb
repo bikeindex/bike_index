@@ -139,15 +139,14 @@ module API
           end
         end
         post "/", serializer: BikeV2ShowSerializer, root: "bike" do
-          declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
-          b_param = BParam.create(creator_id: creation_user_id, params: declared_p["declared_params"], origin: "api_v2")
-
           # Search for a bike matching the provided serial number / owner email
           bike_attrs = %w{serial owner_email}.map { |key| [key.to_sym, params[key]] }.to_h
           found_bike = BikeFinder.find_matching(**bike_attrs)
 
           # bike was not found, create it
           if found_bike.blank?
+            declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
+            b_param = BParam.create(creator_id: creation_user_id, params: declared_p["declared_params"], origin: "api_v2")
             ensure_required_stolen_attrs(b_param.params)
             bike = BikeCreator.new(b_param).create_bike
 
@@ -164,6 +163,7 @@ module API
             @bike = found_bike
             authorize_bike_for_user
 
+            declared_p = { "declared_params" => declared(params, include_missing: false) }
             hash = BParam.v2_params(declared_p["declared_params"].as_json)
             if hash["stolen_record"].present? && @bike.stolen != true
               ensure_required_stolen_attrs(hash)
@@ -179,8 +179,10 @@ module API
             hash["bike"]["primary_frame_color"] =
               Color.find_by(name: hash["bike"].delete("color"))
 
+            hash["bike"]["cycle_type"] =
+              CycleType.friendly_find(hash["bike"].delete("cycle_type_name")).id
+
             # TODO: Fix this
-            hash["bike"].delete("cycle_type_name")
             hash["bike"].delete("rear_wheel_bsd")
             hash["bike"].delete("is_bulk")
             hash["bike"].delete("is_pos")
