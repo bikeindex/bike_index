@@ -1,0 +1,11 @@
+files:
+  - <%= ENV['STACK_BASE'] %>/shared/log/production.log
+  - <%= ENV['STACK_BASE'] %>/shared/log/nginx_error.log
+  - <%= ENV['STACK_BASE'] %>/shared/log/unicorn.stderr.log
+  - <%= ENV['STACK_BASE'] %>/shared/log/unicorn.stdout.log
+  - <%= ENV['STACK_BASE'] %>/shared/log/user_hard_worker_1.log
+  - <%= ENV['STACK_BASE'] %>/shared/log/user_hard_worker_pill.log
+destination:
+  host: logs2.papertrailapp.com
+  port: 13062
+  protocol: tls

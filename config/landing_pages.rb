@@ -1,3 +1,3 @@
 module LandingPages
-  ORGANIZATIONS = %w(ikes university).freeze
+  ORGANIZATIONS = ENV["ORGANIZATIONS_WITH_LANDING_PAGES"].split(" ").freeze
 end
