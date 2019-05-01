@@ -5,11 +5,12 @@ class BikeUpdatorError < StandardError
 end
 
 class BikesController < ApplicationController
-  before_filter :find_bike, only: [:show, :edit, :update, :pdf]
-  before_filter :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
-  before_filter :render_ad, only: [:index, :show]
-  before_filter :store_return_to, only: [:edit]
-  before_filter :remove_subdomain, only: [:index]
+  before_action :find_bike, only: [:show, :edit, :update, :pdf]
+  before_action :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
+  before_action :render_ad, only: [:index, :show]
+  before_action :store_return_to, only: [:edit]
+  before_action :remove_subdomain, only: [:index]
+  before_action :current_organization # Make it possible to force assign organization w/ organization_id parameter. Useful for superusers
   layout "application_revised"
 
   def index
