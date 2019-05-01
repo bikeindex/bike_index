@@ -58,6 +58,9 @@
                 %span.convertTime
                   = l @bike.created_at, format: :convert_time
               %li
+                %span.attr-title Claimed:
+                = @bike.claimed?
+              %li
                 %span.attr-title Creator:
                 = @bike.creator&.display_name
                 %em.small.less-strong
