@@ -80,13 +80,13 @@ describe "Bikes API V3" do
 
         expect(response.status).to eq(201)
         expect(response.status_message).to eq("Created")
-        bike1 = JSON.parse(response.body)["bike"]
+        bike1 = json_result["bike"]
 
         post "/api/v3/bikes?access_token=#{token.token}",
              bike_attrs.to_json,
              json_headers
-        pp json_result
-        bike2 = JSON.parse(response.body)["bike"]
+
+        bike2 = json_result["bike"]
         expect(response.status).to eq(302)
         expect(response.status_message).to eq("Found")
         expect(bike1["id"]).to eq(bike2["id"])
@@ -220,7 +220,6 @@ describe "Bikes API V3" do
         post "/api/v3/bikes?access_token=#{token.token}",
              bike_attrs.merge(no_notify: true).to_json,
              json_headers
-        pp json_result
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
       expect(response.code).to eq("201")
     end
@@ -461,7 +460,6 @@ describe "Bikes API V3" do
       comp = FactoryBot.create(:component, bike: bike, ctype: headsets)
       comp2 = FactoryBot.create(:component, bike: bike, ctype: wheels)
       not_urs = FactoryBot.create(:component)
-      # pp comp2
       bike.reload
       expect(bike.components.count).to eq(2)
       components = [

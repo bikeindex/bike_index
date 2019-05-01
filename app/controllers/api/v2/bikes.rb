@@ -141,14 +141,16 @@ module API
           # Search for a bike matching the provided serial number / owner email
           bike_attrs = %w{serial owner_email}.map { |key| [key.to_sym, params[key]] }.to_h
           found_bike = BikeFinder.find_matching(**bike_attrs)
-          declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
-          b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
-          b_param.clean_params
-          ensure_required_stolen_attrs(b_param.params)
 
           # bike was not found, create it
           if found_bike.blank?
+            # prepare params
+            declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
+            b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
+            b_param.clean_params
+            ensure_required_stolen_attrs(b_param.params)
             b_param.save
+
             bike = BikeCreator.new(b_param).create_bike
 
             if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
@@ -161,6 +163,12 @@ module API
 
           # bike was found, update instead of creating
           if found_bike.present?
+            # prepare params
+            declared_p = { "declared_params" => declared(params, include_missing: false) }
+            b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
+            b_param.clean_params
+            ensure_required_stolen_attrs(b_param.params)
+
             @bike = found_bike
             authorize_bike_for_user
 
@@ -170,7 +178,7 @@ module API
 
             begin
               BikeUpdator
-                .new(user: current_user, bike: @bike, b_params: b_param.params.except(*creation_state_params.keys))
+                .new(user: current_user, bike: @bike, b_params: b_param.params)
                 .update_available_attributes
             rescue => e
               error!("Unable to update bike: #{e}", 401)
