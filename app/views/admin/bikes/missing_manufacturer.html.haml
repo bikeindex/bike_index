@@ -1,9 +1,9 @@
-%h1
-  Multi manufacturer update
-%label.checkbox.disabled
-  = check_box_tag :time_ordered, 'time_ordered', session[:missing_manufacturer_time_order]
-  Time ordered
-
+.admin-subnav
+  .col-md-6
+    %h1
+      Multi manufacturer update
+  .col-md-6
+    = link_to "Time ordered", missing_manufacturer_admin_bikes_path(time_ordered: true), class: "btn btn-primary"
 
 = form_tag update_manufacturers_admin_bikes_path, id: 'multi_bike_manufacturer_update' do
   .row
