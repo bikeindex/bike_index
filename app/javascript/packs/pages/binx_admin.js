@@ -24,24 +24,28 @@ function BinxAdmin() {
       if ($("#admin-locations-fields").length > 0) {
         this.adminLocations();
       }
-      if ($("#bike_stolen").length > 0 ) {
+      if ($("#bike_stolen").length > 0) {
         this.bikesEditRecoverySlide();
+      }
+      if ($("#frame-sizer").length > 0) {
+        this.updateFrameSize();
+        this.setFrameSize()
       }
       // Enable bootstrap custom file upload boxes
       binxApp.enableFilenameForUploads();
       LoadFancySelects();
     },
 
-    bikesEditRecoverySlide(){
-      const $this = $("#bike_stolen")
+    bikesEditRecoverySlide() {
+      const $this = $("#bike_stolen");
       $this.on("change", e => {
-        e.preventDefault()
-        if ($this.prop('checked')) {
-          $("#admin-recovery-fields").slideUp()
+        e.preventDefault();
+        if ($this.prop("checked")) {
+          $("#admin-recovery-fields").slideUp();
         } else {
-          $("#admin-recovery-fields").slideDown()
+          $("#admin-recovery-fields").slideDown();
         }
-      })
+      });
     },
 
     changeGraphCalendarBox() {
@@ -107,6 +111,41 @@ function BinxAdmin() {
         );
         event.preventDefault();
         LoadFancySelects();
+      });
+    },
+
+    setFrameSize() {
+      const unit = $("#bike_frame_size_unit").val();
+      if (unit !== "ordinal" && unit.length > 0) {
+        $("#frame-sizer .hidden-other")
+          .slideDown()
+          .addClass("unhidden");
+        return $("#frame-sizer .groupedbtn-group").addClass("ex-size");
+      }
+    },
+
+    updateFrameSize() {
+      $("#frame-sizer").on("click", e => {
+        e.preventDefault();
+        const size = $(e.target).attr("data-size");
+        const hidden_other = $("#frame-sizer .hidden-other");
+        if (size === "cm" || size === "in") {
+          $("#bike_frame_size_unit").val(size);
+          if (!hidden_other.hasClass("unhidden")) {
+            hidden_other.slideDown("fast").addClass("unhidden");
+            $("#bike_frame_size").val("");
+            $("#bike_frame_size_number").val("");
+            return $("#frame-sizer .groupedbtn-group").addClass("ex-size");
+          }
+        } else {
+          $("#bike_frame_size_unit").val("ordinal");
+          $("#bike_frame_size_number").val("");
+          $("#bike_frame_size").val(size);
+          if (hidden_other.hasClass("unhidden")) {
+            hidden_other.removeClass("unhidden").slideUp("fast");
+            return $("#frame-sizer .groupedbtn-group").removeClass("ex-size");
+          }
+        }
       });
     }
   };

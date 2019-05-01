@@ -60,80 +60,80 @@
     .form-check.mr-2
       = label :belt_drive, "belt_drive", class: "form-check-label"
       = check_box :belt_drive, "belt_drive", class: "form-check-input ml-2"
-
-  .form-group.mt-4
-    = label :front_gear_select, "Front gear"
-    = collection_select( :bike, :front_gear_type_id, FrontGearType.all, :id, :name, prompt: "Chainrings?")
-  .form-group
-    %label.control-label{ for: 'rear_gear_select' }
-      Rear gears
-    = collection_select( :bike, :rear_gear_type_id, RearGearType.all, :id, :name, prompt: "Rear cogs?")
-  .form-group.select-jsonified
-    = f.label :manufacturer_id, class: "control-label"
-    = f.text_field :manufacturer_id, data: { initial: { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json }
-
-  .form-group
-    = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
-    = f.text_field :manufacturer_other
-
-  .form-group
-    = f.label :frame_model, class: "control-label"
-    = f.text_field :frame_model
-  .form-group
-    = f.label :year, class: "control-label"
-    = f.text_field :year
+  .row.mt-4
+    .col-md-6
+      .form-group.fancy-select.unfancy
+        = label :front_gear_select, "Front gear"
+        = collection_select( :bike, :front_gear_type_id, FrontGearType.all, :id, :name, prompt: "Chainrings?")
+    .col-md-6
+      .form-group.fancy-select.unfancy
+        = label :rear_gears, "Rear gears"
+        = collection_select( :bike, :rear_gear_type_id, RearGearType.all, :id, :name, prompt: "Rear cogs?")
+  .row
+    .col-md-6
+      .form-group
+        = f.label :manufacturer_id, class: "control-label"
+        = f.text_field :manufacturer_id, data: { initial: { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json }, class: "form-control"
+    .col-md-6
+      .form-group
+        = f.label :manufacturer_other, "Other manufacturer"
+        = f.text_field :manufacturer_other, class: "form-control"
+  .row
+    .col-md-6
+      .form-group
+        = f.label :frame_model
+        = f.text_field :frame_model, class: "form-control"
+    .col-md-6
+      .form-group
+        = f.label :year
+        = f.text_field :year, class: "form-control"
   - if @bike.creation_organization.present?
     .form-group
-      = f.label :creation_organization_id, "Creation org", class: "control-label"
-      .controls
-        %span.less-strong
-        = @bike.creation_organization.name
-        - if @bike.registered_new
-          %br
-          %strong
-            Registered at POS
+      = f.label :creation_organization_id, "Creation org"
+      %span.less-strong
+      = @bike.creation_organization.name
+      - if @bike.registered_new
+        %br
+        %strong
+          Registered at POS
 
-  .control-group
-    = f.label :description, class: "control-label"
-    .controls
-      = f.text_area :description
-  .input-group.with-additional-block#frame-sizer
-    .control-group
+  .form-group
+    = f.label :description
+    = f.text_area :description, class: "form-control"
+  #frame-sizer
+    .form-group
       %label.control-label.unclickable
         Frame size
-      .controls
-        .groupedbtn-group{ data:  { toggle: "buttons-radio" }}
-          .btn-group
-            %button.btn{ type: "button", :'data-size' => 'xs', class: ( 'active' if @bike.frame_size == 'xs' ) }
-              XS
-            %button.btn{ type: "button", :'data-size' => 's', class: ( 'active' if @bike.frame_size == 's' ) }
-              S
-            %button.btn{ type: "button", :'data-size' => 'm', class: ( 'active' if @bike.frame_size == 'm' ) }
-              M
-            %button.btn{ type: "button", :'data-size' => 'l', class: ( 'active' if @bike.frame_size == 'l' ) }
-              L
-            %button.btn{ type: "button", :'data-size' => 'xl', class: ( 'active' if @bike.frame_size == 'xl' ) }
-              XL
-          .btn-group
-            %button.btn{ type: "button", :'data-size' => 'cm', class: ( 'active' if @bike.frame_size_unit == 'cm' ) }
-              CM
-            %button.btn{ type: "button", :'data-size' => 'in', class: ( 'active' if @bike.frame_size_unit == 'in' ) }
-              IN
-    .hidden-other.control-group
+      .groupedbtn-group{ data:  { toggle: "buttons-radio" }}
+        .btn-group
+          %button.btn{ type: "button", :'data-size' => 'xs', class: ( 'active' if @bike.frame_size == 'xs' ) }
+            XS
+          %button.btn{ type: "button", :'data-size' => 's', class: ( 'active' if @bike.frame_size == 's' ) }
+            S
+          %button.btn{ type: "button", :'data-size' => 'm', class: ( 'active' if @bike.frame_size == 'm' ) }
+            M
+          %button.btn{ type: "button", :'data-size' => 'l', class: ( 'active' if @bike.frame_size == 'l' ) }
+            L
+          %button.btn{ type: "button", :'data-size' => 'xl', class: ( 'active' if @bike.frame_size == 'xl' ) }
+            XL
+        .btn-group
+          %button.btn{ type: "button", :'data-size' => 'cm', class: ( 'active' if @bike.frame_size_unit == 'cm' ) }
+            CM
+          %button.btn{ type: "button", :'data-size' => 'in', class: ( 'active' if @bike.frame_size_unit == 'in' ) }
+            IN
+    .hidden-other.mb-4
       = f.label :frame_size, "Seat tube length", class: "control-label"
-      .controls
-        = f.hidden_field :frame_size_unit
-        = f.hidden_field :frame_size
-        = f.number_field :frame_size_number
-  .actions
-    .control-group
-      = submit_tag "Update the bike", class: "button-green"
-      = link_to "Normal edit", edit_admin_bike_url(@bike)
-.padded
+      = f.hidden_field :frame_size_unit
+      = f.hidden_field :frame_size
+      = f.number_field :frame_size_number
+
+  = submit_tag "Update the bike", class: "btn btn-success"
+  = link_to "Normal edit", edit_admin_bike_url(@bike)
+.mt-4
 %hr
-%section.full-screen-table
-  %table.table.table-striped.table-bordered
-    %thead
+.full-screen-table-wrapper
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
       %th
         Ownership history
       %th
@@ -154,18 +154,8 @@
           %td
             = ownership.id
           %td
-            - if ownership.created_at.today?
-              %span.hidden
-                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Today at #{ownership.created_at.strftime("%-I %p")}
-            - elsif Date.yesterday().beginning_of_day() <= ownership.created_at
-              %span.hidden
-                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Yesterday at #{ownership.created_at.strftime("%-I %p")}
-            - else
-              %span.hidden
-                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              = ownership.created_at.strftime("%-m/%-d/%Y at %-I %p")
+            %a.convertTime
+              = l ownership.created_at, format: :convert_time
           %td
             - u = ownership.creator
             - if u.name.present?
