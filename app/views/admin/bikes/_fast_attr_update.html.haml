@@ -60,16 +60,17 @@
     .form-check.mr-2
       = label :belt_drive, "belt_drive", class: "form-check-label"
       = check_box :belt_drive, "belt_drive", class: "form-check-input ml-2"
+  #not-fixed
+    .row.mt-4
+      .col-md-6
+        .form-group.fancy-select.unfancy
+          = label :front_gear_select, "Front gear"
+          = collection_select( :bike, :front_gear_type_id, FrontGearType.all, :id, :name, prompt: "Chainrings?")
+      .col-md-6
+        .form-group.fancy-select.unfancy
+          = label :rear_gears, "Rear gears"
+          = collection_select( :bike, :rear_gear_type_id, RearGearType.all, :id, :name, prompt: "Rear cogs?")
   .row.mt-4
-    .col-md-6
-      .form-group.fancy-select.unfancy
-        = label :front_gear_select, "Front gear"
-        = collection_select( :bike, :front_gear_type_id, FrontGearType.all, :id, :name, prompt: "Chainrings?")
-    .col-md-6
-      .form-group.fancy-select.unfancy
-        = label :rear_gears, "Rear gears"
-        = collection_select( :bike, :rear_gear_type_id, RearGearType.all, :id, :name, prompt: "Rear cogs?")
-  .row
     .col-md-6
       .form-group
         = f.label :manufacturer_id, class: "control-label"
@@ -78,7 +79,7 @@
       .form-group
         = f.label :manufacturer_other, "Other manufacturer"
         = f.text_field :manufacturer_other, class: "form-control"
-  .row
+  .row.mt-4
     .col-md-6
       .form-group
         = f.label :frame_model

@@ -29,7 +29,8 @@ function BinxAdmin() {
       }
       if ($("#frame-sizer").length > 0) {
         this.updateFrameSize();
-        this.setFrameSize()
+        this.setFrameSize();
+        this.fixieSlide();
       }
       // Enable bootstrap custom file upload boxes
       binxApp.enableFilenameForUploads();
@@ -147,6 +148,16 @@ function BinxAdmin() {
           }
         }
       });
+    },
+
+    fixieSlide() {
+      $("#fixed_fixed").on("change", e => {
+        if ($("#fixed_fixed").prop("checked")){
+          $("#not-fixed").slideUp();
+        } else {
+          $("#not-fixed").slideDown();
+        }
+      })
     }
   };
 }
