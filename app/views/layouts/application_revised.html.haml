@@ -116,7 +116,7 @@
           %li.primary-nav-item
             = active_link 'Blog', news_index_path, class: 'nav-link', match_controller: true
           %li.primary-nav-item
-            = active_link 'Search bikes', bikes_path(location: 'ip', stolenness: 'proximity'), class: 'nav-link', id: 'search_bikes_header_link', match_controller: true
+            = active_link 'Search bikes', default_bike_search_path, class: 'nav-link', id: 'search_bikes_header_link', match_controller: true
     = render 'layouts/revised_messages'
 
     - if current_page_skeleton

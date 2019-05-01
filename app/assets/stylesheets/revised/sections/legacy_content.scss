@@ -101,4 +101,15 @@
       }
     }
   }
+
+  .serial-search-screenshot {
+    display: block;
+    width: 100%;
+    img {
+      display: block;
+      max-width: 750px;
+      width: 80%;
+      margin: 0 auto;
+    }
+  }
 }

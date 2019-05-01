@@ -106,12 +106,16 @@ h5 {
   }
 }
 
-.header-font-alt {
+.header-font-uncap {
   @extend .header-font;
+  text-transform: none !important;
+}
+
+.header-font-alt {
+  @extend .header-font-uncap;
 
   font-family: $body-font-family;
   color: $body-font-color;
-  text-transform: none !important;
 }
 
 h1 {
