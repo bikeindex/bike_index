@@ -3,11 +3,11 @@
     %h1
       Tweets
   .col-sm-3.col-md-2
-    = link_to 'new tweet', new_admin_tweet_path, class: "btn btn-success float-right"
+    = link_to 'New Tweet', new_admin_tweet_path, class: "btn btn-success float-right"
 %h4
   #{Tweet.count} tweets stored
 .full-screen-table-wrapper
-  %table.table.table-striped.table-bordered
+  %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
       %th
         Created
@@ -23,19 +23,8 @@
       - @tweets.each do |tweet|
         %tr
           %td
-            - if tweet.created_at.today?
-              %span.hidden
-                = tweet.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              - created_text = "Today at #{tweet.created_at.strftime("%-I %p")}"
-            - elsif Date.yesterday().beginning_of_day() <= tweet.created_at
-              %span.hidden
-                = tweet.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              - created_text = "Yesterday at #{tweet.created_at.strftime("%-I %p")}"
-            - else
-              %span.hidden
-                = tweet.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              - created_text = "#{tweet.created_at.strftime("%-m/%-d/%Y at %-I %p")}"
-            = link_to created_text, admin_tweet_path(tweet.twitter_id)
+            %a.convertTime{ href: admin_tweet_path(tweet.twitter_id) }
+              = l tweet.created_at, format: :convert_time
           %td
             %small.less-strong
               = tweet.twitter_id
