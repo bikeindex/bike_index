@@ -46,63 +46,43 @@ describe BParam do
         expect(b_param.params["stolen_record"]["phone"]).to eq("171-829-2625")
       end
     end
+
     it "has before_save_callback_method of clean_params" do
       expect(BParam._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:clean_params)).to eq(true)
     end
-    context "run multiple times" do
-      let(:initial_params) do
-        { "serial" => "69 non-example",
-          "manufacturer" => "Special_name3",
-          "owner_email" => "fun_times@examples.com",
-          "color" => "Special_name4",
-          "cycle_type_name" => "bike",
-          "rear_wheel_bsd" => 559,
-          "rear_tire_narrow" => true,
-          "year" => 1969,
-          "frame_material" => "steel",
-          "is_bulk" => nil,
-          "is_pos" => nil,
-          "is_new" => nil }
-      end
-      let(:target_params) do
-        { "bike" => {
-          "serial_number" => "69 non-example",
-          "manufacturer_id" => manufacturer.id,
-          "owner_email" => "fun_times@examples.com",
-          "primary_frame_color_id" => color.id,
-          "cycle_type" => :bike,
-          "front_wheel_size_id" => nil,
-          "rear_wheel_size_id" => wheel_size.id,
-          "rear_tire_narrow" => true,
-          "handlebar_type" => nil,
-          "year" => 1969,
-          "frame_material" => "steel",
-          "is_bulk" => nil,
-          "is_pos" => nil,
-          "is_new" => nil,
-          "send_email" => true,
-        },
-          "test" => nil,
-          "id" => nil,
-          "components" => nil }
-      end
-      let(:b_param) { BParam.new(params: initial_params, origin: "api_v2") }
-      let!(:wheel_size) { FactoryBot.create(:wheel_size, iso_bsd: 559) }
-      let!(:color) { FactoryBot.create(:color, name: "Special_name4") }
-      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Special name3") }
-      it "returns the same thing" do
-        b_param.clean_params
-        expect(b_param.params.keys).to eq target_params.keys
-        expect(b_param.params["bike"].keys).to match_array target_params["bike"].keys
-        expect(b_param.params).to eq target_params
-        b_param.clean_params
-        expect(b_param.params["bike"].keys).to match_array target_params["bike"].keys
-        b_param.params["bike"].keys.each do |k|
-          pp k
-          expect(b_param.params["bike"][k]).to eq target_params["bike"][k]
-        end
-        expect(b_param.params).to eq target_params
-      end
+
+    it "cleans params idempotently if invoked multiple times" do
+      wheel_size = FactoryBot.create(:wheel_size, iso_bsd: 559)
+      color = FactoryBot.create(:color, name: "Special_name4")
+      manufacturer = FactoryBot.create(:manufacturer, name: "Special name3")
+      params = {
+        "serial" => "69 non-example",
+        "manufacturer" => manufacturer.name,
+        "owner_email" => "fun_times@examples.com",
+        "color" => color.name,
+        "cycle_type_name" => "bike",
+        "rear_wheel_bsd" => wheel_size.iso_bsd,
+        "rear_tire_narrow" => true,
+        "year" => 1969,
+        "frame_material" => "steel",
+        "is_bulk" => nil,
+        "is_pos" => nil,
+        "is_new" => nil,
+      }
+      b_param = BParam.new(params: params, origin: "api_v2")
+
+      b_param.clean_params
+      clean_params1 = b_param.params
+
+      b_param.clean_params
+      clean_params2 = b_param.params
+
+      clean_params2["bike"]
+        .sort
+        .zip(clean_params1["bike"].sort)
+        .each { |(k1, v1), (_, v2)| expect(v1).to eq(v2), "#{k1} : #{v1} != #{v2}" }
+      expect(clean_params2["bike"].keys).to match_array(clean_params1["bike"].keys)
+      expect(clean_params2).to eq(clean_params1)
     end
   end
 
