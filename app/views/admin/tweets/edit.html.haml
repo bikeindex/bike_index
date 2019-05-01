@@ -6,7 +6,7 @@
   .col-auto
     %small
     = link_to @tweet.tweet_link.gsub(/https?..\//, ''), @tweet.tweet_link, target: '_blank'
-.row
+.row.mt-
   .col-md-2
     .form-group
       = label :tweet_by, "Tweet by"
@@ -59,13 +59,13 @@
     .col-auto
       = f.submit 'Save', class: 'btn btn-success'
 
-.padded
+.mt-4
 %hr
 %h3
   Landing page rendering:
 = stylesheet_link_tag 'revised', media: 'all'
 
-.padded.cleafix
+.mt-4
 
 .signup-landing-page
   .container
@@ -73,10 +73,10 @@
       .landing-why-col
         = render partial: '/landing_pages/tweet', locals: { tweet_id: @tweet.id }
 
-.padded
+.mt-4
 %hr
-.control-group.padded
-%label.control-label
+.mt-4
+%label
   Twitter response data
 %pre
   = @tweet.twitter_response.to_yaml
