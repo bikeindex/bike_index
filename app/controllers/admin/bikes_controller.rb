@@ -10,8 +10,7 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def missing_manufacturer
-    p "!!!!"
-    p params
+    session.delete(:missing_manufacturer_time_order) if params[:reset_view].present?
     session[:missing_manufacturer_time_order] = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:time_ordered]) if params[:time_ordered].present?
     bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id)
     bikes = session[:missing_manufacturer_time_order] ? bikes.order("created_at desc") : bikes.order("manufacturer_other ASC")

@@ -3,7 +3,11 @@
     %h1
       Multi manufacturer update
   .col-md-6
-    = link_to "Time ordered", missing_manufacturer_admin_bikes_path(time_ordered: true), class: "btn btn-primary"
+    -if session[:missing_manufacturer_time_order]
+      = link_to "Normal view", missing_manufacturer_admin_bikes_path(reset_view: true), class: "btn btn-primary"
+    -else
+      = link_to "Time ordered view", missing_manufacturer_admin_bikes_path(time_ordered: true), class: "btn btn-primary"
+
 
 = form_tag update_manufacturers_admin_bikes_path, id: 'multi_bike_manufacturer_update' do
   .row
