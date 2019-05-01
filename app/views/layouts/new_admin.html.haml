@@ -27,7 +27,7 @@
             %li.nav-item
               = active_link "Organizations", admin_organizations_path, role: "button", class: "nav-link", match_controller: true
             %li.nav-item
-              = active_link "News", admin_news_index_path, role: "button", class: controller_name == "news" ? "nav-link active" : "nav-link"
+              = active_link "News", admin_news_index_path, role: "button", class: "nav-link", match_controller: true
             %li.dropdown.nav-item
               - stolen_links = {"Stolen": admin_stolen_bikes_path, "Recoveries": admin_recoveries_path, "Recovery Displays": admin_recovery_displays_path, "Stolen Twitterbot URL": ENV['STOLEN_TWITTERBOT_URL'].gsub(/bikes\z/, '')  }
               %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown", class: stolen_links.has_value?(request.path) ? "active" : ""}
