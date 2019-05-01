@@ -85,7 +85,7 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def sortable_columns
-    %w[name approved created_at]
+    %w[created_at name approved]
   end
 
   def kind_for_organizations
