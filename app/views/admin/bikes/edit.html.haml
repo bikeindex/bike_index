@@ -19,11 +19,11 @@
           Current Email
         %td
           = link_to @bike.owner.email, edit_admin_user_url(@bike.owner)
-    -# %tr
-    -#   %td
-    -#     Donor
-    -#     - if @bike.owner.donor?
-    -#       TRUE!
+      %tr
+        %td
+          Donor
+          - if @bike.owner.donor?
+            TRUE!
     %tr
       %td
         Paid Org
