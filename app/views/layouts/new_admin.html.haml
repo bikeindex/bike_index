@@ -21,11 +21,11 @@
         .collapse.navbar-collapse#collapsible-admin-nav
           %ul.navbar-nav
             %li.nav-item
-              = active_link "Users", admin_users_path, role: "button", class: controller_name == "users" ? "nav-link active" : "nav-link"
+              = active_link "Users", admin_users_path, role: "button", class: "nav-link users", match_controller: true
             %li.nav-item
-              = active_link "Bikes", admin_bikes_path, role: "button", class: controller_name == "bikes" ? "nav-link active" : "nav-link"
+              = active_link "Bikes", admin_bikes_path, role: "button", class:"nav-link bikes", match_controller: true
             %li.nav-item
-              = active_link "Organizations", admin_organizations_path, role: "button", class: controller_name == "organizations" ? "nav-link active" : "nav-link"
+              = active_link "Organizations", admin_organizations_path, role: "button", class: "nav-link", match_controller: true
             %li.nav-item
               = active_link "News", admin_news_index_path, role: "button", class: controller_name == "news" ? "nav-link active" : "nav-link"
             %li.dropdown.nav-item
