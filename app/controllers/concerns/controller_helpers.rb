@@ -6,8 +6,8 @@ module ControllerHelpers
 
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
-                  :current_organization, :passive_organization, :set_passive_organization,
-                  :controller_namespace, :page_id, :recovered_bike_count
+                  :current_organization, :passive_organization, :controller_namespace, :page_id,
+                  :recovered_bike_count
     before_filter :enable_rack_profiler
   end
 
@@ -102,8 +102,7 @@ module ControllerHelpers
 
   def set_passive_organization(organization)
     session[:passive_organization_id] = organization&.id || "0"
-    @current_organization = organization
-    @passive_organization = organization
+    @current_organization = @passive_organization = organization
   end
 
   protected
@@ -125,7 +124,7 @@ module ControllerHelpers
     # We call this multiple times - make sure nil stays nil
     return @current_organization if defined?(@current_organization)
     @current_organization = Organization.friendly_find(params[:organization_id])
-    # Only set passive_organization if user is authorized for said organization
+    # Sometimes (e.g. embed registration), it's ok if current_user isn't authorized - but only set passive_organization if authorized
     return @current_organization unless @current_organization.present? && current_user&.authorized?(@current_organization)
     set_passive_organization(@current_organization)
   end
@@ -142,7 +141,7 @@ module ControllerHelpers
   # Because we need to show unconfirmed users logout - and we should show them what they're missing in general
   # Generally, this shouldn't be accessed. Almost always should be accessing current_user
   def current_user_or_unconfirmed_user
-    current_user_or_unconfirmed_user = current_user || unconfirmed_current_user
+    current_user || unconfirmed_current_user
   end
 
   def sign_in_partner

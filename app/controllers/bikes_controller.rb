@@ -10,7 +10,7 @@ class BikesController < ApplicationController
   before_action :render_ad, only: [:index, :show]
   before_action :store_return_to, only: [:edit]
   before_action :remove_subdomain, only: [:index]
-  before_action :current_organization # Make it possible to force assign organization w/ organization_id parameter. Useful for superusers
+  before_action :assign_current_organization, only: [:index, :show, :edit]
   layout "application_revised"
 
   def index
@@ -196,6 +196,14 @@ class BikesController < ApplicationController
   end
 
   protected
+
+  # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers
+  def assign_current_organization
+    return true unless params[:organization_id].present?
+    # If current_user isn't authorized for the passed organization, force assign default_organization to current_organization
+    return true unless current_organization.present? && !current_user&.authorized?(current_organization)
+    set_passive_organization(current_user&.default_organization)
+  end
 
   def permitted_search_params
     params.permit(*Bike.permitted_search_params)
