@@ -40,6 +40,7 @@ class Admin::BikesController < Admin::BaseController
     @page = params[:page] || 1
     per_page = params[:per_page] || 25
     @duplicate_groups = duplicate_groups.page(@page).per(per_page)
+    render layout: "new_admin"
   end
 
   def ignore_duplicate_toggle
@@ -143,8 +144,8 @@ class Admin::BikesController < Admin::BaseController
       bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint)
     end
     bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email]
-    bikes = bikes.ascend_pos if params[:ascend_pos].present?
-    bikes = bikes.lightspeed_pos if params[:lightspeed_pos].present?
+    bikes = bikes.ascend_pos if params[:search_ascend].present?
+    bikes = bikes.lightspeed_pos if params[:search_lightspeed].present?
     @matching_bikes = bikes
   end
 end

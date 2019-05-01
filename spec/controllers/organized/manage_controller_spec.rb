@@ -33,26 +33,26 @@ describe Organized::ManageController, type: :controller do
     include_context :logged_in_as_organization_admin
     describe "index" do
       it "renders, sets active organization" do
-        session[:current_organization_id] = "XXXYYY"
+        session[:passive_organization_id] = "XXXYYY"
         get :index, organization_id: organization.to_param
         expect(response.status).to eq(200)
         expect(response).to render_template :index
         expect(response).to render_with_layout("application_revised")
-        expect(assigns(:active_organization)).to eq organization
         expect(assigns(:current_organization)).to eq organization
-        expect(session[:current_organization_id]).to eq organization.id
+        expect(assigns(:passive_organization)).to eq organization
+        expect(session[:passive_organization_id]).to eq organization.id
       end
     end
 
     describe "landing" do
       it "renders" do
-        session[:current_organization_id] = "XXXYYY"
+        session[:passive_organization_id] = "XXXYYY"
         get :landing, organization_id: organization.to_param
         expect(response.status).to eq(200)
         expect(response).to render_with_layout("application_revised")
-        expect(assigns(:active_organization)).to eq organization
         expect(assigns(:current_organization)).to eq organization
-        expect(session[:current_organization_id]).to eq organization.id
+        expect(assigns(:passive_organization)).to eq organization
+        expect(session[:passive_organization_id]).to eq organization.id
       end
     end
 
@@ -62,7 +62,7 @@ describe Organized::ManageController, type: :controller do
         expect(response.status).to eq(200)
         expect(response).to render_template :locations
         expect(response).to render_with_layout("application_revised")
-        expect(assigns(:active_organization)).to eq organization
+        expect(assigns(:current_organization)).to eq organization
       end
     end
 

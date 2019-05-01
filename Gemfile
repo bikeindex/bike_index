@@ -129,13 +129,15 @@ group :development do
   # gem 'test-unit', '~> 3.0'
   gem "bullet"
   gem "rerun"
-  # gem 'pry-rails'
 end
 
 group :development, :test do
   gem "database_cleaner"
   gem "dotenv-rails"
   gem "foreman"
+  gem "jazz_fingers"
+  gem "pry-byebug"
+  gem "pry-rails"
   gem "rb-fsevent", "~> 0.9.1"
   gem "rspec", "~> 3.3.0"
   gem "rspec-rails", "~> 3.3.0"

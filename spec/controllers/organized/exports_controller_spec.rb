@@ -35,7 +35,7 @@ describe Organized::ExportsController, type: :controller do
           get :index, organization_id: organization.to_param
           expect(response).to render_template(:index)
           expect(response).to render_with_layout("application_revised")
-          expect(assigns(:active_organization)).to eq organization
+          expect(assigns(:current_organization)).to eq organization
         end
       end
     end
@@ -55,7 +55,7 @@ describe Organized::ExportsController, type: :controller do
         expect(response.code).to eq("200")
         expect(response).to render_with_layout("application_revised")
         expect(response).to render_template(:index)
-        expect(assigns(:active_organization)).to eq organization
+        expect(assigns(:current_organization)).to eq organization
         expect(assigns(:exports).pluck(:id)).to eq([export.id])
       end
     end

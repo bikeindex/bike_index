@@ -2,14 +2,6 @@ require "spec_helper"
 
 describe Admin::DashboardController do
   describe "index" do
-    context "logged in as admin" do
-      include_context :logged_in_as_super_admin
-      it "renders" do
-        get :index
-        expect(response.code).to eq "200"
-        expect(response).to render_template(:index)
-      end
-    end
     context "not logged in" do
       it "redirects" do
         get :index
@@ -29,6 +21,18 @@ describe Admin::DashboardController do
 
   context "logged in as admin" do
     include_context :logged_in_as_super_admin
+    describe "index" do
+      it "renders" do
+        # Create the things we look at, so that we ensure it doesn't break
+        FactoryBot.create(:ownership)
+        FactoryBot.create(:user)
+        FactoryBot.create(:organization)
+        get :index
+        expect(response.code).to eq "200"
+        expect(response).to render_template(:index)
+      end
+    end
+
     describe "invitations" do
       it "renders" do
         user = FactoryBot.create(:admin)

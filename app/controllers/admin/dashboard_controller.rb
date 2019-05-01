@@ -1,10 +1,11 @@
 class Admin::DashboardController < Admin::BaseController
   def index
-    @bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint).order("created_at desc").limit(10)
+    @organizations = Organization.unscoped.order("created_at DESC").limit(10)
+    @bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint).order('created_at desc').limit(10)
     @users = User.includes(:memberships => [:organization]).limit(5).order("created_at desc")
     @flavors = FlavorText.all
     @flavor = FlavorText.new
-    @duplicate_groups = DuplicateBikeGroup.unignored.order("created_at desc").limit(5)
+    render layout: "new_admin"
   end
 
   def invitations

@@ -57,7 +57,7 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
   protected
 
   def find_organization
-    @organization = active_organization
+    @organization = current_organization
   end
 
   def permitted_parameters

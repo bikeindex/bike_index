@@ -6,8 +6,8 @@ class Admin::OrganizationsController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     orgs = Organization.all
-    orgs = orgs.paid if params[:is_paid].present?
-    orgs = orgs.admin_text_search(params[:query]) if params[:query].present?
+    orgs = orgs.paid if params[:search_is_paid].present?
+    orgs = orgs.admin_text_search(params[:search_query]) if params[:search_query].present?
     orgs = orgs.where(kind: kind_for_organizations) if params[:kind].present?
     @organizations_count = orgs.count
     @organizations = orgs.reorder(sort_column + " " + sort_direction).page(page).per(per_page)
@@ -36,10 +36,12 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def new
     @organization = Organization.new
+    render layout: "new_admin"
   end
 
   def edit
     @embedable_email = @organization.auto_user.email if @organization.auto_user
+    render layout: "new_admin"
   end
 
   def update
@@ -48,7 +50,7 @@ class Admin::OrganizationsController < Admin::BaseController
       flash[:success] = "Organization Saved!"
       redirect_to admin_organization_url(@organization)
     else
-      render action: :edit
+      render action: :edit, layout: "new_admin"
     end
   end
 
@@ -59,7 +61,7 @@ class Admin::OrganizationsController < Admin::BaseController
       flash[:success] = "Organization Created!"
       redirect_to edit_admin_organization_url(@organization)
     else
-      render action: :new
+      render action: :new, layout: "new_admin"
     end
   end
 
@@ -83,7 +85,7 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def sortable_columns
-    %w[name approved created_at]
+    %w[created_at name approved]
   end
 
   def kind_for_organizations

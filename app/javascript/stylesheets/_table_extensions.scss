@@ -1,5 +1,12 @@
-.full-screen-table-wrapper {
+.fullscreen-table-wrapper {
+  // Enable scrolling
   overflow-x: scroll;
+
+  // Make it edge to edge on xs screens
+  @include media-breakpoint-down(xs) {
+    margin-left: -15px;
+    margin-right: -15px;
+  }
 }
 
 .table-list {
