@@ -200,7 +200,7 @@ class BikesController < ApplicationController
   # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers
   def assign_current_organization
     return true unless params[:organization_id].present?
-    # If current_user isn't authorized for the passed organization, force assign default_organization to current_organization
+    # If current_user isn't authorized for the passed organization, force assign default_organization
     return true unless current_organization.present? && !current_user&.authorized?(current_organization)
     set_passive_organization(current_user&.default_organization)
   end
