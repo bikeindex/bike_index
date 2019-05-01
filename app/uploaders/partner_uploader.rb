@@ -1,25 +1,20 @@
 # encoding: utf-8
 
 class PartnerUploader < CarrierWave::Uploader::Base
-  include ::CarrierWave::Backgrounder::Delay
   include CarrierWave::MiniMagick
 
-  # include Sprockets::Helpers::RailsHelper # Deprecated. Should be removed
-  # include Sprockets::Helpers::IsolatedHelper # Deprecated. Should be removed
- 
-  if Rails.env.test?
-    storage :file
-  elsif Rails.env.development?
-    storage :file
-  else
+  if Rails.env.production?
     storage :fog
+  else
+    storage :file
   end
-  
-  after :remove, :delete_empty_upstream_dirs  
+
+  after :remove, :delete_empty_upstream_dirs
+
   def delete_empty_upstream_dirs
     path = ::File.expand_path(store_dir, root)
     Dir.delete(path) # fails if path not empty dir
-    
+
     path = ::File.expand_path(base_store_dir, root)
     Dir.delete(path) # fails if path not empty dir
   rescue SystemCallError
@@ -33,7 +28,7 @@ class PartnerUploader < CarrierWave::Uploader::Base
   def store_dir
     "#{base_store_dir}/#{model.id}"
   end
-  
+
   def base_store_dir
     "partner/"
   end
@@ -50,11 +45,10 @@ class PartnerUploader < CarrierWave::Uploader::Base
   end
 
   version :medium, from_version: :large do
-    process resize_to_fit: [300,100]
+    process resize_to_fit: [300, 100]
   end
 
   version :small, from_version: :medium do
-    process resize_to_fill: [100,100]
+    process resize_to_fill: [100, 100]
   end
-
 end

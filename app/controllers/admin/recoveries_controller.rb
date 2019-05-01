@@ -1,11 +1,13 @@
 class Admin::RecoveriesController < Admin::BaseController
+  layout "new_admin"
+
   def index
     if params[:posted]
       @posted = true
       recoveries = StolenRecord.recovery_unposted.includes(:bike).order("date_recovered desc")
     elsif params[:all_recoveries]
       recoveries = StolenRecord.recovered.includes(:bike).order("date_recovered desc")
-    else 
+    else
       recoveries = StolenRecord.displayable.includes(:bike).order("date_recovered desc")
     end
     page = params[:page] || 1
@@ -25,7 +27,7 @@ class Admin::RecoveriesController < Admin::BaseController
   def update
     @stolen_record = StolenRecord.unscoped.find(params[:id])
     if @stolen_record.update_attributes(permitted_parameters)
-      flash[:success] = 'Recovery Saved!'
+      flash[:success] = "Recovery Saved!"
       redirect_to admin_recoveries_url
     else
       raise StandardError
@@ -47,13 +49,13 @@ class Admin::RecoveriesController < Admin::BaseController
       end
       if enqueued
         flash[:success] = "Recovery notifications enqueued. Recoveries marked 'can share' haven't been posted, because they need your loving caress."
-      else 
+      else
         flash[:error] = "No recoveries were selected (or only recoveries you need to caress were)"
       end
       redirect_to admin_recoveries_url
     else
       RecoveryNotifyWorker.perform_async(params[:id].to_i)
-      flash[:success] = 'Recovery notification enqueued.'
+      flash[:success] = "Recovery notification enqueued."
       redirect_to admin_recoveries_url
     end
   end

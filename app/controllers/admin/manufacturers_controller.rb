@@ -1,13 +1,13 @@
 class Admin::ManufacturersController < Admin::BaseController
   before_filter :find_manufacturer, only: [:edit, :update, :destroy, :show]
-  layout 'new_admin'
+  layout "new_admin"
 
   def index
     @manufacturers = Manufacturer.all
   end
 
   def show
-    raise ActionController::RoutingError.new('Not Found') unless @manufacturer.present?
+    raise ActionController::RoutingError.new("Not Found") unless @manufacturer.present?
     @manufacturer = @manufacturer.decorate
   end
 
@@ -20,9 +20,9 @@ class Admin::ManufacturersController < Admin::BaseController
 
   def update
     if @manufacturer.update_attributes(permitted_parameters)
-      flash[:success] = 'Manufacturer Saved!'
-      expire_fragment 'header_search'
-      AutocompleteLoaderWorker.perform_async('load_manufacturers')
+      flash[:success] = "Manufacturer Saved!"
+      expire_fragment "header_search"
+      AutocompleteLoaderWorker.perform_async("load_manufacturers")
       redirect_to admin_manufacturer_url(@manufacturer)
     else
       render action: :edit
@@ -32,9 +32,9 @@ class Admin::ManufacturersController < Admin::BaseController
   def create
     @manufacturer = Manufacturer.create(permitted_parameters)
     if @manufacturer.save
-      flash[:success] = 'Manufacturer Created!'
-      expire_fragment 'header_search'
-      AutocompleteLoaderWorker.perform_async('load_manufacturers')
+      flash[:success] = "Manufacturer Created!"
+      expire_fragment "header_search"
+      AutocompleteLoaderWorker.perform_async("load_manufacturers")
       redirect_to admin_manufacturer_url(@manufacturer)
     else
       render action: :new
@@ -46,14 +46,13 @@ class Admin::ManufacturersController < Admin::BaseController
     redirect_to admin_manufacturers_url
   end
 
-
   def import
     if params[:file]
       Manufacturer.import(params[:file])
-      flash[:success] = 'Manufacturers imported'
+      flash[:success] = "Manufacturers imported"
       redirect_to admin_manufacturers_url
     else
-      flash[:notice] = 'You gotta choose a file to import!'
+      flash[:notice] = "You gotta choose a file to import!"
       redirect_to admin_manufacturers_url
     end
   end
@@ -66,6 +65,6 @@ class Admin::ManufacturersController < Admin::BaseController
 
   def find_manufacturer
     @manufacturer = Manufacturer.friendly_find(params[:id])
-    raise ActionController::RoutingError.new('Not Found') unless @manufacturer.present?
+    raise ActionController::RoutingError.new("Not Found") unless @manufacturer.present?
   end
 end

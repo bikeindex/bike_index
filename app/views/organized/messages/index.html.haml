@@ -21,14 +21,14 @@
         Sender
     %tbody
 
-- serialized_members = active_organization.users.map { |u| u && [u.id.to_s, { name: u.display_name }] }.compact.to_h.to_json
+- serialized_members = current_organization.users.map { |u| u && [u.id.to_s, { name: u.display_name }] }.compact.to_h.to_json
 :javascript
   window.pageInfo = {
     "google_maps_key": "#{ENV["GOOGLE_MAPS"]}",
-    "map_center_lat": #{active_organization.map_focus_coordinates[:latitude]},
-    "map_center_lng": #{active_organization.map_focus_coordinates[:longitude]},
+    "map_center_lat": #{current_organization.map_focus_coordinates[:latitude]},
+    "map_center_lng": #{current_organization.map_focus_coordinates[:longitude]},
     "members": #{serialized_members},
-    "message_root_path": "#{organization_messages_path(organization_id: active_organization.to_param)}"
+    "message_root_path": "#{organization_messages_path(organization_id: current_organization.to_param)}"
   }
 
 = javascript_pack_tag "application"

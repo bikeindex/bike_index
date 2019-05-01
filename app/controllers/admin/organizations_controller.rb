@@ -1,51 +1,56 @@
 class Admin::OrganizationsController < Admin::BaseController
+  include SortableTable
   before_filter :find_organization, only: [:show, :edit, :update, :destroy]
-  before_filter :set_sort_and_direction, only: [:index]
 
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     orgs = Organization.all
-    orgs = orgs.paid if params[:is_paid].present?
-    orgs = orgs.admin_text_search(params[:query]) if params[:query].present?
+    orgs = orgs.paid if params[:search_is_paid].present?
+    orgs = orgs.admin_text_search(params[:search_query]) if params[:search_query].present?
     orgs = orgs.where(kind: kind_for_organizations) if params[:kind].present?
-    @organizations = orgs.reorder("#{@sort} #{@sort_direction}").page(page).per(per_page)
     @organizations_count = orgs.count
+    @organizations = orgs.reorder(sort_column + " " + sort_direction).page(page).per(per_page)
+    render layout: "new_admin"
   end
 
   def show
     @locations = @organization.locations.decorate
-    bikes = Bike.where(creation_organization_id: @organization.id).reorder('created_at desc')
+    bikes = Bike.where(creation_organization_id: @organization.id).reorder("created_at desc")
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     @bikes = bikes.page(page).per(per_page)
     @organization = @organization.decorate
+    render layout: "new_admin"
   end
 
   def show_deleted
     @organizations = Organization.only_deleted.all
+    render layout: "new_admin"
   end
 
   def recover
-    @organization = Organization.only_deleted.find(params[:id]).recover
+    @organization = Organization.only_deleted.find(params[:id]).restore(recursive: true)
     redirect_to admin_organizations_url
   end
 
   def new
     @organization = Organization.new
+    render layout: "new_admin"
   end
 
   def edit
     @embedable_email = @organization.auto_user.email if @organization.auto_user
+    render layout: "new_admin"
   end
 
   def update
     # Needs to update approved before saving so set_locations_shown is applied on save
     if @organization.update_attributes(permitted_parameters)
-      flash[:success] = 'Organization Saved!'
+      flash[:success] = "Organization Saved!"
       redirect_to admin_organization_url(@organization)
     else
-      render action: :edit
+      render action: :edit, layout: "new_admin"
     end
   end
 
@@ -53,10 +58,10 @@ class Admin::OrganizationsController < Admin::BaseController
     @organization = Organization.new(permitted_parameters)
     @organization.approved = true
     if @organization.save
-      flash[:success] = 'Organization Created!'
+      flash[:success] = "Organization Created!"
       redirect_to edit_admin_organization_url(@organization)
     else
-      render action: :new
+      render action: :new, layout: "new_admin"
     end
   end
 
@@ -79,11 +84,8 @@ class Admin::OrganizationsController < Admin::BaseController
           .merge(kind: approved_kind)
   end
 
-  def set_sort_and_direction
-    @sort = params[:sort]
-    @sort = 'created_at' unless %w(name created_at approved).include?(@sort)
-    @sort_direction = params[:sort_direction]
-    @sort_direction = 'desc' unless %w(asc desc).include?(@sort_direction)
+  def sortable_columns
+    %w[created_at name approved]
   end
 
   def kind_for_organizations

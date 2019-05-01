@@ -12,72 +12,54 @@
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   - body_class = "news-page" if controller_name == "news"
   %body{ id: page_id, class:  body_class }
-    %nav.navbar.navbar-expand-md.navbar-light.bg-light.sticky-top.admin-navbar
+    %nav.navbar.navbar-expand-md.navbar-light.bg-light.admin-navbar
       %span.navbar-brand
         = link_to (image_tag("logo.svg")), admin_root_path
       - if current_user.superuser?
-        %button.navbar-toggler{"aria-controls" => "navbarSupportedContent", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-target" => "#collapsible-admin-nav", "data-toggle" => "collapse", :type => "button"}
+        %button.navbar-toggler{"aria-controls" => "navbarSupportedContent", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-target" => "#collapsible-admin-nav", "data-toggle" => "collapse", type: "button"}
           %span.navbar-toggler-icon
         .collapse.navbar-collapse#collapsible-admin-nav
           %ul.navbar-nav
             %li.nav-item
-              = revised_active_link "Users", admin_users_path, :role => "button", :class => "nav-link nav-item px-2"
+              = active_link "Users", admin_users_path, role: "button", class: "nav-link"
             %li.nav-item
-              = revised_active_link "Bikes", admin_bikes_path, :role => "button", :class => "nav-link nav-item px-2"
+              = active_link "Bikes", admin_bikes_path, role: "button", class: "nav-link"
             %li.nav-item
-              = revised_active_link "Organizations", admin_organizations_path, :role => "button", :class => "nav-link nav-item px-2"
+              = active_link "Organizations", admin_organizations_path, role: "button", class: "nav-link"
             %li.nav-item
-              = revised_active_link "News", admin_news_index_path, :role => "button", :class => "nav-link nav-item px-2"
+              = active_link "News", admin_news_index_path, role: "button", class: "nav-link"
             %li.dropdown.nav-item
-              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown"}
+              - stolen_links = {"Stolen": admin_stolen_bikes_path, "Recoveries": admin_recoveries_path, "Recovery Displays": admin_recovery_displays_path, "Stolen Twitterbot URL": ENV['STOLEN_TWITTERBOT_URL'].gsub(/bikes\z/, '')  }
+              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown", class: stolen_links.has_value?(request.path) ? "active" : ""}
                 Stolen
               .dropdown-menu.admin-nav-dropdown
-                = revised_active_link "Stolen", admin_stolen_bikes_path, :role => "button", :class => "btn btn-light dropdown-item"
-                = revised_active_link "Recoveries", admin_recoveries_path, :role => "button", :class => "btn btn-light dropdown-item"
-                = revised_active_link "Recovery Displays", admin_recovery_displays_path, :role => "button", :class => "btn btn-light dropdown-item"
-                = revised_active_link "Stolen Twitterbot URL", ENV['STOLEN_TWITTERBOT_URL'].gsub(/bikes\z/, ''), :role => "button", :class => "btn btn-light dropdown-item"
-            %li.dropdown
-              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown", "aria-labelledby" => "dropdownMenu2"}
+                - stolen_links.each do |link, path|
+                  = active_link link, path, role: "button", class: "btn btn-light dropdown-item"
+            %li.dropdown.nav-item
+              - paid_links = {"Payments": admin_payments_path, "Paid Features": admin_paid_features_path, "Invoices": admin_invoices_path}
+              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown",  class: paid_links.has_value?(request.path) ? "active" : ""}
                 Paid
               .dropdown-menu.admin-nav-dropdown
-                = revised_active_link "Payments", admin_payments_path, :role => "button", :class => "btn btn-light dropdown-item"
-                = revised_active_link "Paid Features", admin_paid_features_path, :role => "button", :class => "btn btn-light dropdown-item"
-                = revised_active_link "Invoices", admin_invoices_path, :role => "button", :class => "btn btn-light dropdown-item"
-            %li.dropdown
-              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown"}
+                - paid_links.each do |link, path|
+                  = active_link link, path, role: "button", class: "btn btn-light dropdown-item"
+            %li.dropdown.nav-item
+              - other_links = {"Memberships": admin_memberships_path, "Manufacturers": admin_manufacturers_path, "Invitations": admin_invitations_path, "TSV Exports": admin_tsvs_path, "Maintenance": admin_maintenance_path, "Failed Bikes": admin_failed_bikes_path, "Component Types": admin_ctypes_path, "Graphs": admin_graphs_path, "Edit Paints": admin_paints_path, "Feedbacks": admin_feedbacks_path, "Tweets": admin_tweets_path, "Exports": admin_exports_path, "Bulk Imports": admin_bulk_imports_path, "Duplicates": duplicates_admin_bikes_path}
+              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown",  class: other_links.has_value?(request.path) ? "active" : ""}
                 Other
               .dropdown-menu.admin-nav-dropdown
-                = revised_active_link "Memberships", admin_memberships_path, :role => "button", :class => "btn btn-light dropdown-item"
-                = revised_active_link "Manufacturers", admin_manufacturers_path, :role => "button", :class => "btn btn-light dropdown-item"
-                = revised_active_link "Invitations", admin_invitations_path, :role => "button", :class => "btn btn-light dropdown-item"
-                = link_to "TSV Exports", admin_tsvs_url, :role => "button", :class => "btn btn-light dropdown-item #{action_name == 'tsvs' ? 'active' : ''}"
-                = link_to "Maintenance", admin_maintenance_url, :role => "button", :class => "btn btn-light dropdown-item #{action_name == 'maintenance' ? 'active' : ''}"
-                = revised_active_link "Failed Bikes", admin_failed_bikes_url, :role => "button", :class => "btn btn-light dropdown-item"
-                = revised_active_link "Component Types", admin_ctypes_url, :role => "button", :class => "btn btn-light dropdown-item"
-                = revised_active_link "Graphs", admin_graphs_url, :role => "button", :class => "btn btn-light dropdown-item"
-                = revised_active_link "Edit Paints", admin_paints_url, :role => "button", :class => "btn btn-light dropdown-item"
-                = revised_active_link "Feedbacks", admin_feedbacks_url, :role => "button", :class => "btn btn-light dropdown-item"
-                = revised_active_link "Tweets", admin_tweets_url, :role => "button", :class => "btn btn-light dropdown-item"
-                = revised_active_link "Exports", admin_exports_url, :role => "button", :class => "btn btn-light dropdown-item"
-                = revised_active_link "Bulk Imports", admin_bulk_imports_url, :role => "button", :class => "btn btn-light dropdown-item"
+                -other_links.each do |link, path|
+                  = active_link link, path, role: "button", class: "btn btn-light dropdown-item"
             - if Rails.env.development?
-              .dropdown
+              %li.dropdown.nav-item
                 %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown"}
                   Mailers
                 .dropdown-menu.admin-nav-dropdown
-                  = link_to "Organized", '/rails/mailers/organized_mailer' , :role => "button", :class => "btn btn-light dropdown-item"
-                  = link_to "Admin", '/rails/mailers/admin_mailer' , :role => "button", :class => "btn btn-light dropdown-item"
-                  = link_to "Customer", '/rails/mailers/customer_mailer' , :role => "button", :class => "btn btn-light dropdown-item"
+                  = link_to "Organized", '/rails/mailers/organized_mailer' , role: "button", class: "btn btn-light dropdown-item"
+                  = link_to "Admin", '/rails/mailers/admin_mailer' , role: "button", class: "btn btn-light dropdown-item"
+                  = link_to "Customer", '/rails/mailers/customer_mailer' , role: "button", class: "btn btn-light dropdown-item"
           %ul.navbar-nav.ml-auto
             %li.nav-item
-              = link_to "Exit Admin", root_path, :role => "button", :class => "nav-link nav-item px-2"
-
-      - elsif current_user.is_content_admin?
-        %span.font-weight-bold
-          = link_to "Go hard", admin_news_index_path
-        %ul
-          %li
-            = link_to "News", admin_news_index_path
+              = link_to "Exit Admin", root_path, role: "button", class: "nav-link"
 
     = render 'layouts/revised_messages'
 

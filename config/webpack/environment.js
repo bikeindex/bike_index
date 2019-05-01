@@ -9,4 +9,13 @@ environment.plugins.append(
   })
 );
 
+const ignoreLoader = {
+  module: {
+    rules: [
+       { test: /\.test\.js$/, use: 'ignore-loader' }
+    ]
+  }
+};
+environment.config.merge(ignoreLoader)
+
 module.exports = environment;

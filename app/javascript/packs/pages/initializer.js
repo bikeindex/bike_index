@@ -1,7 +1,12 @@
+// Trying to avoid merge conflicts, this should get put up above with the other imports
+import BinxAppOrgBikes from "./binx_org_bikes.js";
+
 // This is stuff that needs to happen on page load.
-import * as log from "loglevel";
-if (process.env.NODE_ENV != "production") log.setLevel("debug");
 import moment from "moment-timezone";
+import BinxMapping from "./binx_mapping.js";
+import BinxAppOrgExport from "./binx_org_export.js";
+import BinxAppOrgMessages from "./binx_org_messages.js";
+import BinxAdmin from "./binx_admin.js";
 
 window.binxApp || (window.binxApp = {});
 
@@ -30,6 +35,10 @@ binxApp.displayLocalDate = function(time, preciseTime) {
       return time.format("YYYY-MM-DD");
     }
   }
+};
+
+binxApp.preciseTimeSeconds = function(time) {
+  return time.format("YYYY-MM-DD h:mm:ssa");
 };
 
 binxApp.localizeTimes = function() {
@@ -62,9 +71,9 @@ binxApp.localizeTimes = function() {
     if (!time.isValid) {
       return;
     }
-    return $this.text(
-      binxApp.displayLocalDate(time, $this.hasClass("preciseTime"))
-    );
+    $this
+      .text(binxApp.displayLocalDate(time, $this.hasClass("preciseTime")))
+      .attr("title", binxApp.preciseTimeSeconds(time));
   });
 
   // Write timezone
@@ -75,19 +84,35 @@ binxApp.localizeTimes = function() {
   });
 };
 
-import "./binx_mapping.js";
-import "./binx_org_messages.js";
-import "./binx_admin.js";
-import "./binx_org_export.js";
+binxApp.enableFilenameForUploads = function() {
+  $("input.custom-file-input[type=file]").on("change", function(e) {
+    // The issue is that the files list isn't actually an array. So we can't map it
+    let files = [];
+    let i = 0;
+    while (i < e.target.files.length) {
+      files.push(e.target.files[i].name);
+      i++;
+    }
+    $(this)
+      .parent()
+      .find(".custom-file-label")
+      .text(files.join(", "));
+  });
+};
 
 // I've made the choice to have classes' first letter capitalized
 // and make the instance of class (which I'm storing on window) the same name without the first letter capitalized
 // I'm absolutely sure there is a best practice that I'm ignoring, but just doing it for now.
 $(document).ready(function() {
-  binxApp.localizeTimes()
+  binxApp.localizeTimes();
+  // Load admin, whatever
+  if ($("#admin-content").length > 0) {
+    const binxAdmin = BinxAdmin();
+    binxAdmin.init();
+  }
   // Load the page specific things
-  let body_id = document.getElementsByTagName("body")[0].id;
-  switch (body_id) {
+  const bodyId = document.getElementsByTagName("body")[0].id;
+  switch (bodyId) {
     case "organized_messages_index":
       window.binxMapping = new BinxMapping("geolocated_messages");
       window.binxAppOrgMessages = new BinxAppOrgMessages();
@@ -96,10 +121,8 @@ $(document).ready(function() {
     case "organized_exports_new":
       window.binxAppOrgExport = new BinxAppOrgExport();
       binxAppOrgExport.init();
-    case "body":
-      if ($("#admin-content").length > 0) {
-        window.binxAdmin = new BinxAdmin();
-        binxAdmin.init();
-      }
+    case "organized_bikes_index":
+      const binxAppOrgBikes = BinxAppOrgBikes();
+      binxAppOrgBikes.init();
   }
 });

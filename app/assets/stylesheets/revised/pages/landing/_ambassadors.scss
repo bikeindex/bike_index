@@ -3,38 +3,50 @@
   .banner-header .ribbon .noribbon {
     height: 1px;
   }
+
   .ambassadors-blank-footer {
     padding-bottom: 4 * $vertical-height;
+
     @include media-breakpoint-up(md) {
       padding-bottom: 10 * $vertical-height;
     }
   }
+
   .next-steps-col .next-steps-wrap {
     padding-top: $vertical-height;
   }
+
   .trusted-by-next-steps {
     margin-top: 0;
+
     h3 {
       padding-top: 18px;
       font-size: 18px;
-      margin-bottom: 6px; // because line-height
+      margin-bottom: 6px;
+
+      // because line-height
     }
+
     ul {
       padding-bottom: 1.5 * $vertical-height;
       margin: 0;
     }
+
     li {
       display: block;
       flex: 0 0 100%;
       padding: 0;
       position: relative;
+
       a {
         display: block;
-        padding: 0 0 0 2 * $vertical-height;
+        padding: 0 0 0 (2 * $vertical-height);
         width: 100%;
         color: $body-font-color;
+
         &.current {
           text-decoration: underline;
+
           &:before {
             position: absolute;
             left: 8px;
@@ -53,87 +65,112 @@
 .signup-landing-page-ambassadors-current {
   .banner-header {
     .icon-wrapper {
-      margin: 0 auto 2 * $vertical-height auto;
+      margin: 0 auto (2 * $vertical-height) auto;
     }
+
     h1,
     h3 {
       width: 100%;
       text-align: center;
     }
+
     h1 {
       margin-bottom: 6px;
     }
+
     h3 {
       margin-bottom: 36px;
     }
+
     .btn {
       font-size: 18px;
       margin: 0 auto;
     }
   }
+
   .ambassadors-list {
     padding-top: 4 * $vertical-height;
     padding-bottom: 4 * $vertical-height;
     text-align: center;
+
     .row {
       // Read comment in HTML
       justify-content: space-around;
     }
+
     img {
       display: block;
       width: 100%;
       height: auto;
-      margin: 0 0 2 * $vertical-height;
+      margin: 0 0 (2 * $vertical-height);
       clip-path: circle(50%);
+
       &.no-clip {
         clip-path: none;
       }
     }
+
     .ambassador-question {
       font-weight: bold;
       margin-bottom: $vertical-height;
     }
+
     h2,
     h3,
     h4 {
       line-height: 1.2rem;
     }
+
     h2 {
       font-size: 24px;
     }
+
     h3 {
       @extend .body-font;
+
       font-size: 2 * $vertical-height;
     }
+
     h3,
     p {
       font-style: italic;
       color: $gray-light;
     }
+
     h4 {
       @extend .body-font;
+
       font-weight: bold;
     }
   }
 }
 
-$sponsor-tri-1: 20px; // lifted from _recoveries.scss
+$sponsor-tri-1: 20px;
+
+// lifted from _recoveries.scss
 $sponsor-border-color: $gray-lighter;
+
 .signup-landing-page-ambassadors-current {
   .sponsored-by-block {
-    margin-top: 124px; // gross hack, it looks better to me
+    margin-top: 124px;
+
+    // gross hack, it looks better to me
     border: 5px solid $sponsor-border-color;
     padding: 10px;
+
     p {
       line-height: 1.5;
     }
+
     em {
       text-decoration: none;
       color: $header-font-color;
     }
+
     img {
       margin-bottom: 0;
     }
+
     &:before {
       content: "";
       height: 0;

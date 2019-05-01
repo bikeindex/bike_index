@@ -12,7 +12,7 @@
     = params[:user_query].present? ? 'matching query' : 'have signed up'
 
 .pull-right
-  #{link_to "Superusers", admin_users_path(superusers: true)}|#{link_to "content admins", admin_users_path(content_admins: true)}
+  #{link_to "Superusers", admin_users_path(superusers: true)}
 - if @users.present?
   .paginate-container
     = paginate @users

@@ -10,6 +10,7 @@ class AfterBikeSaveWorker
   def perform(bike_id)
     bike = Bike.unscoped.where(id: bike_id).first
     return true unless bike.present?
+    bike.load_external_images
     update_matching_partial_registrations(bike)
     DuplicateBikeFinderWorker.perform_async(bike_id)
     if bike.present? && bike.listing_order != bike.get_listing_order
@@ -30,7 +31,7 @@ class AfterBikeSaveWorker
     {
       auth_token: AUTH_TOKEN,
       bike: BikeV2ShowSerializer.new(bike, root: false).as_json,
-      update: bike.created_at > Time.now - 30.seconds
+      update: bike.created_at > Time.now - 30.seconds,
     }
   end
 

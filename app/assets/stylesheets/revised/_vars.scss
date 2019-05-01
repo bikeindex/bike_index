@@ -1,4 +1,3 @@
-
 // Because Mike Oleon is obsessed with the imperial system
 // or something wack like that
 $vertical-height: 12px;
@@ -9,7 +8,7 @@ $grid-breakpoint-sm: 544px;
 $grid-breakpoint-md: 768px;
 $grid-breakpoint-lg: 992px;
 $grid-breakpoint-xl: 1200px;
-$grid-sizes: 'xs', 'sm', 'md', 'lg', 'xl';
-$grid-breakpoints-var: $grid-breakpoint-xs, $grid-breakpoint-sm, $grid-breakpoint-md, $grid-breakpoint-lg, $grid-breakpoint-xl;
+$grid-sizes: "xs", "sm", "md", "lg", "xl";
+$grid-breakpoints-var: $grid-breakpoint-xs, $grid-breakpoint-sm,
+  $grid-breakpoint-md, $grid-breakpoint-lg, $grid-breakpoint-xl;
 $row-side-padding: 0.9375rem;
-

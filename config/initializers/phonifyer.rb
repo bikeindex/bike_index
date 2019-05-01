@@ -3,9 +3,9 @@ class Phonifyer
     return nil unless string.present?
     if string.strip[/\A\+/]
       cc = string.strip[/\A\+\d*/]
-      "#{cc} #{string.strip.gsub(cc, '').gsub(/\D/, '')}"
+      "#{cc} #{string.strip.gsub(cc, "").gsub(/\D/, "")}"
     else
-      string.strip.gsub(/\D/, '')
+      string.strip.gsub(/\D/, "")
     end
   end
 
@@ -16,7 +16,7 @@ class Phonifyer
     # Split at 3rd character, again 3 characters later, again with all the chars
     formatted = [3, 3, 10].each_with_index.collect do |amount, index|
       end_num[(index * 3), amount]
-    end.join('.')
-    [str[/\A\+\d*/], formatted].reject(&:blank?).join(' ')
+    end.join(".")
+    [str[/\A\+\d*/], formatted].reject(&:blank?).join(" ")
   end
 end

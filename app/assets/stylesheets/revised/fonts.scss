@@ -1,5 +1,5 @@
-$body-font-family: 'Open Sans', sans-serif;
-$header-font-family: 'Montserrat', sans-serif;;
+$body-font-family: "Open Sans", sans-serif;
+$header-font-family: "Montserrat", sans-serif;
 $normal-font-weight: 400;
 $strong-font-weight: 700;
 $light-italic-weight: 300;
@@ -23,12 +23,22 @@ $btn-font-size: 15px;
   line-height: 2em;
   color: $body-font-color;
   text-transform: none;
-  em { font-style: italic; }
-  strong { font-weight: $strong-font-weight; }
+
+  em {
+    font-style: italic;
+  }
+
+  strong {
+    font-weight: $strong-font-weight;
+  }
+
   a {
     color: $link-color;
     text-decoration: none;
-    &:hover, &:active, &.active {
+
+    &:hover,
+    &:active,
+    &.active {
       text-decoration: underline;
       color: $link-color;
     }
@@ -38,19 +48,27 @@ $btn-font-size: 15px;
 .light-italic {
   font-weight: $light-italic-weight;
   font-style: italic;
-  strong { font-style: normal; font-weight: $strong-font-weight; }
+
+  strong {
+    font-style: normal;
+    font-weight: $strong-font-weight;
+  }
 }
 
-body { @extend .body-font; }
+body {
+  @extend .body-font;
+}
 
 p {
   @extend .body-font;
-  margin: 0 0 2*$vertical-height;
+
+  margin: 0 0 (2 * $vertical-height);
 }
 
 // p.intro on typecast
 h5 {
   @extend .body-font;
+
   font-size: $h5-font-size;
   font-weight: normal;
   line-height: 1.5em;
@@ -58,6 +76,7 @@ h5 {
 
 .pullquote {
   @extend .body-font;
+
   font-weight: 300;
   font-style: italic;
   font-size: 18px;
@@ -70,36 +89,60 @@ h5 {
   font-style: normal;
   text-transform: uppercase;
   color: $header-font-color;
-  strong { font-weight: $strong-font-weight; }
+
+  strong {
+    font-weight: $strong-font-weight;
+  }
+
   a {
     color: $link-color;
-    &:hover, &:active, &.active {
+
+    &:hover,
+    &:active,
+    &.active {
       text-decoration: underline;
       color: $link-color;
     }
   }
 }
 
+.header-font-alt {
+  @extend .header-font;
+
+  font-family: $body-font-family;
+  color: $body-font-color;
+  text-transform: none !important;
+}
+
 h1 {
   @extend .header-font;
-  margin: 0 0 2*$vertical-height;
+
+  margin: 0 0 (2 * $vertical-height);
   letter-spacing: -1px;
   font-size: $h1-font-size;
   line-height: 1.12em;
-  @include media-breakpoint-down(md) { font-size: $h1-font-size-md; }
+
+  @include media-breakpoint-down(md) {
+    font-size: $h1-font-size-md;
+  }
 }
 
 h2 {
   @extend .header-font;
-  margin: 0 0 2*$vertical-height;
+
+  margin: 0 0 (2 * $vertical-height);
   font-size: $h2-font-size;
   line-height: 1em;
-  @include media-breakpoint-down(md) { font-size: $h2-font-size-md; }
+
+  @include media-breakpoint-down(md) {
+    font-size: $h2-font-size-md;
+  }
 }
 
 h3 {
   @extend .header-font;
-  margin: 0 0 2*$vertical-height;
+
+  margin: 0 0 (2 * $vertical-height);
   font-size: $h3-font-size;
   line-height: 1em;
 }
@@ -107,17 +150,17 @@ h3 {
 // Primary menu header height
 h4 {
   @extend .header-font;
-  margin: 0 0 2*$vertical-height;
+
+  margin: 0 0 (2 * $vertical-height);
   font-size: $h4-font-size;
   line-height: 18px;
 }
 
-.less-strong { color: $less-strong-font-color; }
-
 // Stop fucking prefixing. - textarea[placeholder], input[placeholder]
 // This breaks things in chrome though, it never stops being placeholder
 // text, even if you type in the field :(
-.form-control::placeholder { // and this doesn't really work, but tough luck
+.form-control::placeholder {
+  // and this doesn't really work, but tough luck
   color: $gray-light;
   font-style: italic;
 }

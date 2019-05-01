@@ -1,6 +1,6 @@
-ENV['BASE_URL'] = 'http://test.host' # Assign here because only one .env file
-require 'sidekiq/testing'
-require 'vcr'
+ENV["BASE_URL"] = "http://test.host" # Assign here because only one .env file
+require "sidekiq/testing"
+require "vcr"
 
 VCR.configure do |config|
   config.cassette_library_dir = "spec/vcr_cassettes"
@@ -10,22 +10,22 @@ end
 
 # For codeclimate test coverage. Only enable if the environmental variable is set - i.e. on CI
 if ENV["COVERAGE"]
-  require 'simplecov'
+  require "simplecov"
   SimpleCov.start "rails"
 end
 
-ENV['RAILS_ENV'] ||= 'test'
-require File.expand_path('../../config/environment', __FILE__)
-require 'rspec/rails'
+ENV["RAILS_ENV"] ||= "test"
+require File.expand_path("../../config/environment", __FILE__)
+require "rspec/rails"
 # require 'rspec/autorun'
-require 'shoulda-matchers'
-require 'database_cleaner'
+require "shoulda-matchers"
+require "database_cleaner"
 
 DatabaseCleaner.strategy = :truncation
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
-Dir[Rails.root.join('spec', 'support', '**', '*.rb')].each { |f| require f }
+Dir[Rails.root.join("spec", "support", "**", "*.rb")].each { |f| require f }
 
 RSpec.configure do |config|
   # Use color in STDOUT

@@ -1,67 +1,89 @@
-/ There are two types of overlays: the organization message overlay and the edit bike overlay
-/ Both can be displayed at the same time. The organization message overlay also needs a modal form that pops up
+- if @bike.stolen && session[:recovery_link_token].present?
+  - stolen_record = StolenRecord.find_matching_token(bike_id: @bike.id, recovery_link_token: session.delete(:recovery_link_token)) # Delete token so modal doesn't keep rendering
+  - if stolen_record.present?
+    / Similar form exists in edit_stolen
+    - modal_title = "Mark your #{@bike.type} recovered!"
+    - modal_body = capture_haml do
+      .modal-body
+        %p
+          Please tell us how you got your #{@bike.type} back, we really care! 
+          %br
+          %strong
+            It's also how we get better at recovering bikes.
+        = form_for @stolen_record, url: bike_recovery_path(bike_id: @bike.id) do |f|
+          = hidden_field_tag :token, stolen_record.recovery_link_token
+          .form-group
+            = f.label :recovered_description, 'How did you get it back?'
+            = f.text_area :recovered_description, class: 'form-control'
+          .form-group
+            = f.label :date_recovered, 'When did you recover it?', class: 'form-well-label'
+            - f.object.date_recovered = TimeParser.round(f.object.date_recovered || Time.now)
+            = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
+            = f.datetime_local_field :date_recovered, max: Time.now.end_of_day, step: 3600, required: true, class: 'form-control'
+          .checkbox
+            %label
+              = f.check_box :index_helped_recovery
+              Did we help?
+          .checkbox
+            %label
+              = f.check_box :can_share_recovery
+              Can we share your story?
+          .modal-btn-footer
+            .row
+              .col-xs-6.col-xs-push-6
+                = submit_tag 'Mark recovered', class: 'btn btn-success'
+              .col-xs-6.col-xs-pull-6
+                %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
+                  Nevermind
+              
 
-- if organization_message_overlay # Render the modal!
-  - modal_body = capture_haml do
-    .modal-body
-      = form_for OrganizationMessage.new(bike_id: @bike.id), url: organization_messages_path(organization_id: current_organization) do |f|
-        = f.hidden_field :bike_id
-        = f.hidden_field :kind_slug
-        = f.hidden_field :latitude
-        = f.hidden_field :longitude
-        = f.hidden_field :accuracy
-        .form-group
-          = f.label :body, "Additional message"
-          = f.text_area :body, class: 'form-control'
-        .modal-btn-footer
-          = submit_tag "Send message", class: "btn btn-success", id: "submitMessageBtn", disabled: true
-          %span.less-strong#waitingOnLocationText
-            Waiting on device location
-
-  = render partial: "/shared/modal", locals: { title: "Message #{@bike.type} owner", modal_body: modal_body, id: "organizationMessageModal" }
-
-.bike-overlay-wrapper
-  - if organization_message_overlay
-    .organization-actions-overlay
-      %p
-        Send
-        - current_organization.message_kinds.each do |kind|
-          %a.btn.btn-secondary.openMessageModal{ "data-kind" => kind }
-            - if kind == "geolocated"
-              Location notice
-            - else
-              #{kind.humanize}
-
-  - if edit_overlay
-    .bike-edit-overlay
-      %p
-        / If the bike user is actually the current bike owner, do this
-        - if @bike.user == current_user
-          - if @bike.user_hidden
-            %strong
-              This #{@bike.type} is hidden.
-            No one can see it but you
-          - if @bike.user?
-            - if @bike.recovered
-              Thank you for recovering this #{@bike.type}!
-            - elsif @bike.stolen
-              We're really bummed your #{@bike.type} was stolen.
-            - else
-              Whoah, this awesome #{@bike.type} is yours!
-
-            - if @bike.public_images.any?
-              Add some more information about it.
-            - else
-              - if @bike.stolen
-                Add a picture so people know what to look for!
+- elsif current_user.present?
+  - if @bike.claimable_by?(current_user)
+    - modal_title = "Your #{@bike.type}"
+    - modal_body = capture_haml do
+      .modal-body
+        %p
+          We're honored to have your #{@bike.type} on the Index.  
+        %p
+          Claim it so you can update your listing.
+      .modal-btn-footer
+        .row
+          .col-xs-6.col-xs-push-3
+            %a.btn.btn-success{ href: "/ownerships/#{@bike.current_ownership.id}" }
+              Claim #{@bike.type} 
+  - elsif @bike.authorize_for_user(current_user) && !@bike.authorized_by_organization?(u: current_user)
+    .bike-overlay-wrapper
+      .bike-edit-overlay
+        %p
+          / If the bike user is actually the current bike owner, do this
+          - if @bike.user == current_user
+            - if @bike.user_hidden
+              %strong
+                This #{@bike.type} is hidden.
+              No one can see it but you
+            - if @bike.user?
+              - if @bike.recovered
+                Thank you for recovering this #{@bike.type}!
+              - elsif @bike.stolen
+                We're really bummed your #{@bike.type} was stolen.
               - else
-                Add a picture of it, so everyone can admire its beauty!
-        - else # The bike has been sent to someone other than the current_user
-          - if @bike.creation_organization_authorized?
-            This #{@bike.type} was registered by #{@bike.creation_organization.short_name} for
-          - else
+                Whoah, this awesome #{@bike.type} is yours!
+
+              - if @bike.public_images.any?
+                Add some more information about it.
+              - else
+                - if @bike.stolen
+                  Add a picture so people know what to look for!
+                - else
+                  Add a picture of it, so everyone can admire its beauty!
+          - else # The bike has been sent to someone other than the current_user
             You sent this #{@bike.type} to
-          %em
-            = @bike.current_ownership.owner_email
-          and it hasn't been claimed yet. You can update it
-        = link_to  "Edit", edit_bike_path, class: "btn btn-secondary"
+            %em
+              = @bike.current_ownership.owner_email
+            and it hasn't been claimed yet. You can update it
+          = link_to  "Edit", edit_bike_path, class: "btn btn-secondary"
+
+
+
+- if modal_title.present? # This is for stolen modal or claim modal
+  = render partial: '/shared/modal', locals: { title: modal_title, id: 'initial-open-modal', modal_body: modal_body }

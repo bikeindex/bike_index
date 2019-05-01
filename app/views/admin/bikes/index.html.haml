@@ -1,42 +1,59 @@
-%header.with-subtitle
-  %h1
-    Manage Bikes
-  = link_to "Manage component types", admin_ctypes_url, class: "sharing-links"
-- unless @unknown
-  %p
-    = link_to "Bikes with unknown manufacturers", missing_manufacturer_admin_bikes_url
-.special-search-field-container
-  .special-search-field
-    = form_tag admin_bikes_path, method: :get do
-      = text_field_tag :email, params[:email], placeholder: "Search bikes by email"
-      = submit_tag "Search", name: "search", class: "button-blue"
+.admin-subnav
+  .col-md-6
+    %h1
+      Manage Bikes
+  .col-md-6
+    %ul
+      %li.nav-item
+        - all_active = !@unknown && sortable_search_params.keys.blank?
+        = link_to "All", admin_bikes_path, class: "nav-link #{all_active ? 'active' : ''}"
+      %li.nav-item
+        = link_to "Unknown Manufacturers", missing_manufacturer_admin_bikes_path, class: "nav-link #{@unknown ? 'active' : ''}"
+      %li.nav-item
+        = link_to "Ascend", admin_bikes_path(sortable_search_params.merge(search_lightspeed: nil, search_ascend: true)), class: "nav-link #{params[:search_ascend].present? ? 'active' : ''}"
+      %li.nav-item
+        = link_to "Lightspeed", admin_bikes_path(sortable_search_params.merge(search_ascend: nil, search_lightspeed: true)), class: "nav-link #{params[:search_lightspeed].present? ? 'active' : ''}"
+  - if current_organization.present?
+    %p.subtitle
+      #{link_to current_organization.name, admin_organization_path(current_organization.to_param)} bikes
+      %em.small
+        = link_to "orgs view", organization_bikes_path(organization_id: current_organization.to_param), class: "less-strong"
 
+- if all_active
   %p
     There are currently #{number_with_delimiter(PublicImage.count)} bike images
     %em
       (#{PublicImage.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
-  %h4
-    = number_with_delimiter(Bike.all.count)
-    indexed,
+
+  %p
+    = number_with_delimiter(Bike.count)
+    publicly registered,
     %em
       (#{Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
     = number_with_delimiter(Ownership.where(current: true).where(claimed: true).count)
     are claimed
 
+.row.mt-4
+  .col-md-5
+    %h4
+      = number_with_delimiter(@bikes.total_count)
+      = "Matching Bike".pluralize(@bikes.total_count)
+  .col-md-7
+    = form_tag admin_bikes_path, method: :get, class: "form-inline" do
+      = hidden_field_tag :sort
+      = hidden_field_tag :direction
+      = hidden_field_tag :organization_id
+      .form-group.ml-auto.mr-2.mb-2
+        = text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "form-control"
+      = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-- if @bikes.present?
-  .paginate-container
-    = paginate @bikes
-    %h4.pull-left
-      = pluralize(@bikes.total_count, 'Matching Bike')
-  %section.full-screen-table
-    %table.table.table-striped.table-bordered#admin-bikes-index
-      - if params[:multi_delete]
-        = render partial: "/admin/bikes/admin_bikes_table_multidelete"
-      - else
-        = render partial: "/admin/bikes/admin_bikes_table"
-  .paginate-container
-    = paginate @bikes
+.row.mt-4
+  .col
+    = paginate @bikes, views_prefix: "admin"
+
+- if params[:multi_delete]
+  = render partial: "/admin/bikes/admin_bikes_table_multidelete"
 - else
-  %h1.padded
-    No bikes found!
+  = render partial: "/admin/bikes/admin_bikes_table", locals: { sortable: true }
+
+= paginate @bikes, views_prefix: "admin"

@@ -17,7 +17,13 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   end
 
   def show
-    redirect_to edit_admin_recovery_display_url
+    if params[:id] == "bust_cache"
+      clear_index_wrap_cache
+      flash[:success] = "Recovery Display Cache busted"
+      redirect_to admin_recovery_displays_url
+    else
+      redirect_to edit_admin_recovery_display_url
+    end
   end
 
   def edit
@@ -27,7 +33,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   def update
     if @recovery_display.update_attributes(permitted_parameters)
       clear_index_wrap_cache
-      flash[:success] = 'Recovery display saved!'
+      flash[:success] = "Recovery display saved!"
       redirect_to admin_recovery_displays_url
     else
       render action: :edit
@@ -38,7 +44,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
     @recovery_display = RecoveryDisplay.create(permitted_parameters)
     if @recovery_display.save
       clear_index_wrap_cache
-      flash[:success] = 'Recovery display created!'
+      flash[:success] = "Recovery display created!"
       redirect_to admin_recovery_displays_url
     else
       render action: :new
@@ -59,12 +65,12 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   end
 
   def clear_index_wrap_cache
-    expire_fragment 'root_head_wrap'
-    expire_fragment 'root_body_wrap'
+    expire_fragment "root_head_wrap"
+    expire_fragment "root_body_wrap"
   end
 
   def find_recovery_displays
     @recovery_display = RecoveryDisplay.find(params[:id])
-    raise ActionController::RoutingError.new('Not Found') unless @recovery_display.present?
+    raise ActionController::RoutingError.new("Not Found") unless @recovery_display.present?
   end
 end

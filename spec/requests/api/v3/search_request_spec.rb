@@ -1,41 +1,41 @@
-require 'spec_helper'
+require "spec_helper"
 
-describe 'Search API V3' do
+describe "Search API V3" do
   let(:manufacturer) { FactoryBot.create(:manufacturer) }
   let(:color) { FactoryBot.create(:color) }
-  describe '/' do
+  describe "/" do
     let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
     let!(:bike_2) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer) }
     let(:query_params) { { query_items: [manufacturer.search_id] } }
-    context 'with per_page' do
-      it 'returns matching bikes, defaults to stolen' do
+    context "with per_page" do
+      it "returns matching bikes, defaults to stolen" do
         expect(Bike.count).to eq 2
-        get '/api/v3/search', query_params.merge(per_page: 1), format: :json
-        expect(response.header['Total']).to eq('1')
+        get "/api/v3/search", query_params.merge(per_page: 1), format: :json
+        expect(response.header["Total"]).to eq("1")
         result = JSON.parse(response.body)
-        expect(result['bikes'][0]['id']).to eq bike_2.id
+        expect(result["bikes"][0]["id"]).to eq bike_2.id
       end
     end
   end
-  describe '/close_serials' do
-    let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer, serial_number: 'something') }
-    let(:query_params) { { serial: 'somethind', stolenness: 'non' } }
+  describe "/close_serials" do
+    let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer, serial_number: "something") }
+    let(:query_params) { { serial: "somethind", stolenness: "non" } }
     let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: nil) }
-    context 'with per_page' do
-      it 'returns matching bikes, defaults to stolen' do
-        get '/api/v3/search/close_serials', query_params, format: :json
+    context "with per_page" do
+      it "returns matching bikes, defaults to stolen" do
+        get "/api/v3/search/close_serials", query_params, format: :json
         result = JSON.parse(response.body)
-        expect(result['bikes'][0]['id']).to eq bike.id
-        expect(response.header['Total']).to eq('1')
+        expect(result["bikes"][0]["id"]).to eq bike.id
+        expect(response.header["Total"]).to eq("1")
       end
     end
   end
-  describe '/count' do
-    context 'incorrect stolenness value' do
-      it 'returns an error message' do
-        get '/api/v3/search/count', stolenness: 'something else', format: :json
+  describe "/count" do
+    context "incorrect stolenness value" do
+      it "returns an error message" do
+        get "/api/v3/search/count", stolenness: "something else", format: :json
         result = JSON.parse(response.body)
-        expect(result['error']).to match(/stolenness/i)
+        expect(result["error"]).to match(/stolenness/i)
         expect(response.status).to eq(400)
       end
     end
@@ -47,7 +47,7 @@ describe 'Search API V3' do
           color_ids: [color.id],
           location: "Chicago, IL",
           distance: 20,
-          stolenness: "stolen"
+          stolenness: "stolen",
         }
       end
       let(:proximity_query_params) { request_query_params.merge(stolenness: "proximity") }
@@ -68,21 +68,21 @@ describe 'Search API V3' do
         end
       end
     end
-    context 'nil params' do
-      it 'succeeds' do
-        get '/api/v3/search/count', { stolenness: '', query_items: [], serial: '' }, format: :json
+    context "nil params" do
+      it "succeeds" do
+        get "/api/v3/search/count", { stolenness: "", query_items: [], serial: "" }, format: :json
         # JSON.parse(response.body)
         expect(response.status).to eq(200)
       end
     end
-    context 'with query items' do
+    context "with query items" do
       let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer) }
       let!(:bike_2) { FactoryBot.create(:bike) }
       let(:query_params) { { query_items: [manufacturer.search_id] } }
-      it 'succeeds' do
-        get '/api/v3/search/count', query_params, format: :json
+      it "succeeds" do
+        get "/api/v3/search/count", query_params, format: :json
         result = JSON.parse(response.body)
-        expect(result['non']).to eq 1
+        expect(result["non"]).to eq 1
         expect(response.status).to eq(200)
       end
     end

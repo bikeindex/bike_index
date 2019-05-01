@@ -1,5 +1,5 @@
 hr.delete-organization-section {
-  margin: 4 * $vertical-height 0 2 * $vertical-height;
+  margin: (4 * $vertical-height) 0 (2 * $vertical-height);
 }
 
 // This isn't actually applying styles yet, but will be
@@ -9,17 +9,30 @@ hr.delete-organization-section {
 
 .organized-list-table {
   @extend .table;
+
   @extend .table-striped;
+
   @extend .table-bordered;
+
   @extend .table-sm;
+
   tr td:first-child {
     @extend .less-strong;
+
     font-style: italic;
     text-align: right;
+
     // A little more whitespace
     padding-right: 0.5rem;
+
     // Make the text line up with the other side of the table
     font-size: 0.75rem;
     line-height: 2rem;
+  }
+
+  tr td:last-child {
+    width: 85%;
+
+    // This is effectively min-width for tables
   }
 }
