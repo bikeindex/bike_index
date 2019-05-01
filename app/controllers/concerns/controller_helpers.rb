@@ -102,7 +102,8 @@ module ControllerHelpers
 
   def set_passive_organization(organization)
     session[:passive_organization_id] = organization&.id || "0"
-    @current_organization = @passive_organization = organization
+    @current_organization = organization
+    @passive_organization = organization
   end
 
   protected

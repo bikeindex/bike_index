@@ -129,6 +129,7 @@ describe BikesController do
     context "illegally set passive_organization" do
       include_context :logged_in_as_user
       it "renders, resets passive_organization_id" do
+        expect(user.default_organization).to be_nil
         session[:passive_organization_id] = organization.id
         get :show, id: bike.id
         expect(response.status).to eq(200)
@@ -136,6 +137,8 @@ describe BikesController do
         expect(response).to render_with_layout("application_revised")
         expect(assigns(:bike)).to be_decorated
         expect(flash).to_not be_present
+        expect(assigns[:current_organization]).to be_nil
+        expect(assigns[:passive_organization]).to be_nil
         expect(session[:passive_organization_id]).to eq "0"
       end
     end
