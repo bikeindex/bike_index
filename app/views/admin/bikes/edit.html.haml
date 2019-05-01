@@ -24,16 +24,16 @@
           Donor
           - if @bike.owner.donor?
             TRUE!
-    %tr
-      %td
-        Paid Org
-      %td
-        -if @bike.owner.paid_org?
-          - @bike.owner.organizations.paid.each do |organization|
-            <small>#{link_to organization.name, admin_organization_path(organization)}</small>
-        - else
-          %strong
-            Missing owner!
+      %tr
+        %td
+          Paid Org
+        %td
+          -if @bike.owner.paid_org?
+            - @bike.owner.organizations.paid.each do |organization|
+              <small>#{link_to organization.name, admin_organization_path(organization)}</small>
+          - else
+            %strong
+              Missing owner!
     - if @bike.current_stolen_record.present?
       %tr
         %td
