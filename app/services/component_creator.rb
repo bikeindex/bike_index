@@ -9,7 +9,7 @@ class ComponentCreator
 
   def manufacturer_hash(component)
     return component.slice(:manufacturer_id, :manufacturer_other) if component[:manufacturer_other].present?
-    mnfg_input = component[:manufacturer_id] || component[:manufacturer]
+    mnfg_input = component[:manufacturer_id] || component[:manufacturer] || component[:mnfg_name]
     return {} unless mnfg_input.present?
     manufacturer = Manufacturer.friendly_find(mnfg_input)
     return { manufacturer_id: manufacturer.id } if manufacturer.present?
