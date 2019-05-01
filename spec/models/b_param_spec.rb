@@ -189,14 +189,6 @@ describe BParam do
       b_param.set_wheel_size_key
       expect(b_param.bike["rear_wheel_size_id"]).to eq(ws.id)
     end
-
-    it "sets rear_wheel_size_id to the bsd submitted" do
-      ws = FactoryBot.create(:wheel_size, iso_bsd: "Bike")
-      bike = { rear_wheel_bsd: ws.iso_bsd }
-      b_param = BParam.new(params: { bike: bike })
-      b_param.set_wheel_size_key
-      expect(b_param.bike["rear_wheel_size_id"]).to eq(ws.id)
-    end
   end
 
   describe "set_cycle_type_key" do
