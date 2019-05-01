@@ -85,7 +85,7 @@ describe "Bikes API V3" do
         post "/api/v3/bikes?access_token=#{token.token}",
              bike_attrs.to_json,
              json_headers
-
+        pp json_result
         bike2 = JSON.parse(response.body)["bike"]
         expect(response.status).to eq(302)
         expect(response.status_message).to eq("Found")
@@ -142,7 +142,6 @@ describe "Bikes API V3" do
         post "/api/v3/bikes?access_token=#{token.token}",
              bike_attrs.to_json,
              json_headers
-
         json = JSON.parse(response.body)
         expect(json["error"]).to be_blank
 
@@ -171,7 +170,7 @@ describe "Bikes API V3" do
           component_type: "headset",
           description: "yeah yay!",
           serial_number: "69",
-          model_name: "Richie rich",
+          model: "Richie rich",
         },
         {
           manufacturer: "BLUE TEETH",
@@ -221,6 +220,7 @@ describe "Bikes API V3" do
         post "/api/v3/bikes?access_token=#{token.token}",
              bike_attrs.merge(no_notify: true).to_json,
              json_headers
+        pp json_result
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
       expect(response.code).to eq("201")
     end
@@ -471,7 +471,7 @@ describe "Bikes API V3" do
           component_type: "headset",
           description: "Second component",
           serial_number: "69",
-          model_name: "Richie rich",
+          model: "Sram GXP Eagle",
         }, {
           manufacturer: "BLUE TEETH",
           front_or_rear: "Rear",
@@ -497,6 +497,7 @@ describe "Bikes API V3" do
       expect(bike.year).to eq(params[:year])
       expect(comp2.reload.year).to eq(1999)
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
+      expect(bike.components.map(&:cmodel_name).compact).to eq(["Sram GXP Eagle"])
       expect(bike.components.count).to eq(3)
     end
 
