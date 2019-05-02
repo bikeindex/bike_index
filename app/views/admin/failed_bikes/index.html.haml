@@ -1,15 +1,12 @@
-
 %h1
   Manage Failed Bikes
 
 %h4
-  = @b_params.count
+  = number_with_delimiter(@b_params.total_count, delimiter: ',')
   failed bikes,
   %em
     = @b_params.where(BParam.arel_table[:created_at].gt(Date.yesterday)).count
     today
-
-
 
 .full-screen-table-wrapper
   %table.table.table-striped.table-bordered
@@ -30,9 +27,12 @@
             = b_param.creator.email if b_param.creator
           %td
             - if b_param.bike_errors.present?
-              = b_param.bike_errors.each_key { |f| f.to_s.humanize}
+              = b_param.bike_errors.each { |f| f.to_s.humanize}
             - if b_param.errors.present?
               = b_param.errors.each_key { |f| f.to_s.humanize}
             / - if b_param.params.creation_organization_id && b_param.params.creation_organization_id
             /   - organization = Organization.find(b_param.params.creation_organization_id)
             /   = organization.name
+
+.paginate-container
+  = paginate @b_params

@@ -1,8 +1,12 @@
 @import "~bootstrap/scss/bootstrap";
 @import "~selectize/dist/css/selectize.bootstrap3";
 
+// General styles
 @import "../stylesheets/utils";
 @import "../stylesheets/table_extensions";
+
+// Specific section styles
+@import "../stylesheets/admin";
 
 // For now, because we don't want to replicate all the styles immediately, we're hiding the footer
 footer.primary-footer {
@@ -43,3 +47,4 @@ footer.primary-footer {
     @extend .col-12;
   }
 }
+

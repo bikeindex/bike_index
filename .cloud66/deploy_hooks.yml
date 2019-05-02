@@ -1,0 +1,28 @@
+production:
+  after_symlink:
+    # Make the uploads cache folder writable
+    - command: chown nginx:app_writers $RAILS_STACK_PATH/tmp/cache && chmod -R 775 $RAILS_STACK_PATH/tmp/cache
+      target: rails
+      run_on: all_servers
+      sudo: true
+
+  after_rails:
+    # Make papertrail connected
+    - source: /.cloud66/log_files.yml
+      destination: /etc/log_files.yml
+      sudo: true
+      target: rails
+      apply_during: build_only
+
+    - source: /.cloud66/remote_syslog.init.d
+      destination: /etc/init.d/remote_syslog
+      sudo: true
+      target: rails
+      apply_during: build_only
+
+    - source: /.cloud66/papertrail.sh
+      destination: /tmp/papertrail.sh
+      target: rails
+      sudo: true
+      execute: true
+      apply_during: build_only

@@ -7,11 +7,9 @@
       no one but the user (and Bike Index admins) can see it
 
 .container
-  - if current_user.present? && passive_organization.present?
-    - if current_user.authorized?(passive_organization) # Authorize here, because otherwise we're displaying user data
-      = render partial: "organized_access_panel"
-    - else # If they aren't authorized, nix their passive_organization
-      - set_passive_organization(current_user.default_organization) # maybe this breaks, but whatever, they're being creepers
+  / Authorize check here, even though we're checking in controller too, because otherwise we're displaying user data
+  - if current_user.present? && passive_organization.present? && current_user.authorized?(passive_organization)
+    = render partial: "organized_access_panel"
   .row
     .col-md-8
       %h1
@@ -121,7 +119,7 @@
             %p
               = @stolen_record.theft_description
 
-    
+
       - cgroups = @bike.cgroup_array.map { |id| { name: Cgroup.find(id).name, id: id } }
       - if cgroups.any?
         %ul.nav.nav-tabs.component-types{ role: 'tablist' }

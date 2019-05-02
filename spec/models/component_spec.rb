@@ -85,16 +85,4 @@ describe Component do
       expect(Component._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_is_stock)).to eq(true)
     end
   end
-
-  describe "fuzzy_assign_mnfg" do
-    context "manufacturer_id a manufacturer name" do
-      it "sets manufacturer_id correctly" do
-        m = FactoryBot.create(:manufacturer, name: "SRAM")
-        c = { manufacturer_id: "sram" }
-        component = ComponentCreator.new.set_manufacturer_key(c)
-        expect(component[:manufacturer_id]).to eq m.id
-        expect(component[:manufacturer]).to_not be_present
-      end
-    end
-  end
 end

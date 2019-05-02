@@ -5,11 +5,12 @@ class BikeUpdatorError < StandardError
 end
 
 class BikesController < ApplicationController
-  before_filter :find_bike, only: [:show, :edit, :update, :pdf]
-  before_filter :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
-  before_filter :render_ad, only: [:index, :show]
-  before_filter :store_return_to, only: [:edit]
-  before_filter :remove_subdomain, only: [:index]
+  before_action :find_bike, only: [:show, :edit, :update, :pdf]
+  before_action :ensure_user_allowed_to_edit, only: [:edit, :update, :pdf]
+  before_action :render_ad, only: [:index, :show]
+  before_action :store_return_to, only: [:edit]
+  before_action :remove_subdomain, only: [:index]
+  before_action :assign_current_organization, only: [:index, :show, :edit]
   layout "application_revised"
 
   def index
@@ -195,6 +196,15 @@ class BikesController < ApplicationController
   end
 
   protected
+
+  # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers
+  # Also provides testable protection against seeing organization info on bikes
+  def assign_current_organization
+    org = current_organization || passive_organization
+    # If current_user isn't authorized for the organization, force assign nil
+    return true if org.blank? || org.present? && current_user&.authorized?(org)
+    set_passive_organization(nil)
+  end
 
   def permitted_search_params
     params.permit(*Bike.permitted_search_params)
