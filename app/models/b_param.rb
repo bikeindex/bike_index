@@ -212,7 +212,6 @@ class BParam < ActiveRecord::Base
     end
     rbsd = params["bike"].delete("rear#{key}")
     fbsd = params["bike"].delete("front#{key}")
-    # binding.pry
     params["bike"]["rear_wheel_size_id"] = WheelSize.id_for_bsd(rbsd)
     params["bike"]["front_wheel_size_id"] = WheelSize.id_for_bsd(fbsd)
   end
