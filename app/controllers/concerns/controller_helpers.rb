@@ -7,7 +7,7 @@ module ControllerHelpers
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
                   :current_organization, :passive_organization, :controller_namespace, :page_id,
-                  :recovered_bike_count
+                  :recovered_bike_count, :default_bike_search_path
     before_filter :enable_rack_profiler
   end
 
@@ -49,6 +49,10 @@ module ControllerHelpers
     return admin_root_url if current_user.superuser
     return user_home_url(subdomain: false) unless current_user.default_organization.present?
     organization_bikes_path(organization_id: current_user.default_organization.to_param)
+  end
+
+  def default_bike_search_path
+    bikes_path(location: "ip", stolenness: "proximity")
   end
 
   # Generally this is implicitly set, via the passed parameters - however! it can also be explicitly set
