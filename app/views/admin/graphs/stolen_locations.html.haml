@@ -1,4 +1,4 @@
-= javascript_include_tag "//www.google.com/jsapi", "chartkick" 
+= javascript_include_tag "//www.google.com/jsapi", "chartkick"
 
 %section
   %h1
@@ -6,11 +6,11 @@
 
 #graph-holder
   %h2
-    Stolen countries past year
+    Stolen states past year
 
-  - countries = StolenRecord.unscoped.where("created_at >= ?", Time.zone.now.beginning_of_year).where('country_id IS NOT NULL').group(:country).count
+  - states = StolenRecord.unscoped.where("created_at >= ?", 1.years.ago).where(country_id: us).where('state_id IS NOT NULL').group(:state).count
   - groups = {}
-  - countries.keys.each { |c| groups[c.name] = countries[c] if c.present? }
+  - states.keys.each { |state| display += ",['#{state.name}', #{states[state]}]" }
 
 
   = geo_chart groups
@@ -20,7 +20,7 @@
       %li
         #{location[0]}: #{location[1]}
 
-    
+
 %section
   %h2
     Stolen states past year

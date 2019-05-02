@@ -91,7 +91,8 @@ module ControllerHelpers
   def recovered_bike_count
     if Rails.env.production?
       Rails.cache.fetch "recovered_bike_count_#{Date.today.to_formatted_s(:number)}" do
-        StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count
+        # StolenBikeRegistry.com had just over 2k recoveries prior to merging. The recoveries weren't imported, so manually calculate
+        StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count + 2_041
       end
     else
       3_021
