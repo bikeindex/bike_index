@@ -2,7 +2,7 @@
   Manage Failed Bikes
 
 %h4
-  = @b_params.count
+  = number_with_delimiter(@b_params_total_count, delimiter: ',')
   failed bikes,
   %em
     = @b_params.where(BParam.arel_table[:created_at].gt(Date.yesterday)).count

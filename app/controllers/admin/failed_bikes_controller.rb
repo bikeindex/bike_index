@@ -5,6 +5,8 @@ class Admin::FailedBikesController < Admin::BaseController
     page = params.fetch(:page, 1)
     per_page = params.fetch(:per_page, 25)
 
+    @b_params_total_count = BParam.where("created_bike_id IS NOT NULL").count
+
     @b_params =
       BParam
         .where("created_bike_id IS NOT NULL")
