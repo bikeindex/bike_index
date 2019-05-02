@@ -68,9 +68,11 @@
   %li
     Certain numbers and letters are difficult or impossible to distinguish between (e.g. 0 and O, S and 5). We treat all these numbers the same way - <em>a search for <code>005LLL</code> will match a bike with the serial <code>OOS111</code></em>.
   %li
-    We split things up by spaces, and search each group separately. If the owner of the bicycle has entered the full serial number - <em>given the serial from the </em>multiple serial numbers<em> example above, searching for <code>M4106I9CA1</code> or <code>200910427-2A</code> will find the bike</em>.
+    We split bike serials up by spaces and store each separately. If you see multiple numbers on a bicycle - such as in the photo of the Look bike above - try searching for <strong>just one</strong> of the numbers at a time. Searching for <em>either</em> <code>M4106I9CA1</code> or <code>200910427-2A</code> will find the bike.
   %li
     We do close serial matching - bikes with serial numbers that are close to the serial you entered are shown below the matching results under the heading "Serial Numbers Close to ..." - <em>given a search of a serial number with a couple numbers/letters that are different or missing</em>.
+  %li
+    We do not currently do partial serial searches. If you search for <code>1234</code>, you will only find bikes with serial numbers of <code>1234</code> and serials close to that - not a bike with serial number of <code>12345689</code>.
 
 = render '/shared/content_footer_ad'
 
