@@ -140,6 +140,7 @@ class Bike < ActiveRecord::Base
     end
 
     def bike_code(organization_id) # This method only accepts numerical org ids
+      includes(:bike_codes).where(bike_: { pos_kind: 2 })
     end
   end
 
