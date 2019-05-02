@@ -47,7 +47,6 @@ function BinxOrgBikes() {
           visibleCells = this.defaultCells;
         }
       }
-      log.debug(visibleCells);
 
       visibleCells.forEach(cellClass =>
         $(`input#${cellClass}`).prop("checked", true)
