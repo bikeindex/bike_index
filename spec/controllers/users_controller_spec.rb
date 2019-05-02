@@ -95,10 +95,12 @@ describe UsersController do
           expect(user.partner_sign_up).to be_nil
           expect(user.unconfirmed?).to be_truthy
         end
-        context "with organization_invitation" do
+        context "with organization_invitation and an example bike" do
           let(:email) { "test@stuff.com" }
           let(:organization_invitation) { FactoryBot.create(:organization_invitation, invitee_email: " #{email.upcase}", membership_role: "member") }
           let!(:organization) { organization_invitation.organization }
+          let(:bike) { FactoryBot.create(:bike, example: true, owner_email: email) }
+          let!(:ownership) { FactoryBot.create(:ownership, bike: bike, owner_email: email) }
           let(:user_attributes) do
             { "email" => email,
               "name" => "SAMPLE",
@@ -106,8 +108,10 @@ describe UsersController do
               "terms_of_service" => "1",
               "notification_newsletters" => "0" }
           end
-          it "creates a confirmed user, logs in, and send welcome" do
+          it "creates a confirmed user, logs in, and send welcome even with an example bike" do
             expect(session[:passive_organization_id]).to be_blank
+            bike.reload
+            expect(bike.user).to be_blank
             expect do
               post :create, user: user_attributes
             end.to change(EmailWelcomeWorker.jobs, :count)
@@ -116,6 +120,8 @@ describe UsersController do
             expect(user.email).to eq email
             expect(User.from_auth(cookies.signed[:auth])).to eq user
             expect(session[:passive_organization_id]).to eq organization.id
+            bike.reload
+            expect(bike.user).to eq user
           end
         end
         context "with organization_invitation, partner param" do
