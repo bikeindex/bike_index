@@ -1,9 +1,9 @@
 - bikes ||= @bikes
 - no_show_header ||= false
-- show_serial ||= false
+- show_serial ||= params[:show_serial].present?
 - sortable ||= false
 
-%table.table.table-striped.table-bordered.table-sm
+%table.table.table-striped.table-bordered.table-sm{ class: show_serial ? "show-admin-bike-table-serial-cell" : "" }
   - unless no_show_header
     %thead.thead-light.sortable
       %th
@@ -23,6 +23,8 @@
           Manufacturer
       %th.d-none.d-lg-table-cell
         Info
+      %th.admin-bike-table-serial-cell
+        Serial
       %th.d-none.d-sm-table-cell
         Created by
 
@@ -34,9 +36,9 @@
             .less-strong-hold
               %a.convertTime{ href: edit_admin_bike_url(bike) }
                 = l bike.created_at, format: :convert_time
-              %span.less-strong-right
+              %span.less-strong-right.d-none.d-md-table-cell
                 - if bike.example
-                  %span
+                  %span.text-danger
                     = bike.id
                 - else
                   = bike.id
@@ -49,9 +51,7 @@
                 <span class="paid-org-icon">O</span>
           %td
             - if bike.manufacturer_other.present?
-              %span.table-error
-                %span.hidden
-                  0 1
+              %span.text-danger
                 = bike.manufacturer_other
             - else
               = bike.mnfg_name
@@ -60,17 +60,15 @@
               = [bike.year, bike.frame_model].join(' ')
               = "(#{bike.type})" unless bike.type == 'bike'
               - if bike.paint.present? && bike.paint.color_id.blank?
-                .less-strong
+                %span.less-strong
                   = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
                   = bike.frame_colors.to_sentence
               - if bike.stolen
                 %span.less-strong-right
                   stolen
-              - if show_serial
-                %br
-                %span.less-strong
-                  = bike.serial_number
-
+          %td.admin-bike-table-serial-cell
+            %small.less-strong
+              = bike.serial_number
           %td.d-none.d-sm-table-cell
             .less-strong-hold
               - if bike.creation_organization.present?
