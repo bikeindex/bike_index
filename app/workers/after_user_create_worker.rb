@@ -80,6 +80,8 @@ class AfterUserCreateWorker
   private
 
   def user_bikes_for_attrs(user_id)
-    Ownership.where(user_id: user_id).order(:created_at).map(&:bike)
+    # Deal with example bikes
+    Ownership.where(user_id: user_id).where.not(user_id: nil).order(:created_at).pluck(:bike_id)
+      .map { |id| Bike.unscoped.where(id: id).first }.compact
   end
 end
