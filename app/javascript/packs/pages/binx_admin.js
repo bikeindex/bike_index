@@ -27,11 +27,6 @@ function BinxAdmin() {
       if ($("#bike_stolen").length > 0) {
         this.bikesEditRecoverySlide();
       }
-      if ($("#frame-sizer").length > 0) {
-        this.updateFrameSize();
-        this.setFrameSize();
-        this.fixieSlide();
-      }
       // Enable bootstrap custom file upload boxes
       binxApp.enableFilenameForUploads();
       LoadFancySelects();
