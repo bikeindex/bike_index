@@ -77,10 +77,7 @@ describe BParam do
       b_param.clean_params
       clean_params2 = b_param.params
 
-      clean_params2["bike"]
-        .sort
-        .zip(clean_params1["bike"].sort)
-        .each { |(k1, v1), (_, v2)| expect(v1).to eq(v2), "#{k1} : #{v1} != #{v2}" }
+      expect_hashes_to_match(clean_params2["bike"], clean_params1["bike"])
       expect(clean_params2["bike"].keys).to match_array(clean_params1["bike"].keys)
       expect(clean_params2).to eq(clean_params1)
     end
