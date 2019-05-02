@@ -2,16 +2,6 @@ import log from "../utils/log";
 
 function BinxOrgBikes() {
   return {
-    defaultCells() {
-      [
-        "created_at_cell",
-        "stolen_cell",
-        "manufacturer_cell",
-        "model_cell",
-        "color_cell",
-        "owner_email_cell"
-      ];
-    },
     init() {
       // I'm concerned about javascript breaking, and the bikes being hidden and unable to be shown.
       // To prevent that, only hide columns after adding this class
@@ -34,17 +24,24 @@ function BinxOrgBikes() {
     },
 
     selectStoredVisibleColumns() {
+      const defaultCells = [
+        "created_at_cell",
+        "stolen_cell",
+        "manufacturer_cell",
+        "model_cell",
+        "color_cell",
+        "owner_email_cell"
+      ];
       let visibleCells = localStorage.getItem("organizationBikeColumns");
-      log.debug(visibleCells);
       // If we have stored cells, select them. Otherwise,
       if (typeof visibleCells === "undefined") {
-        visibleCells = this.defaultCells;
+        visibleCells = defaultCells;
       } else {
         if (typeof visibleCells == "string") {
           visibleCells = JSON.parse(visibleCells);
         }
         if (visibleCells.length < 1) {
-          visibleCells = this.defaultCells;
+          visibleCells = defaultCells;
         }
       }
 

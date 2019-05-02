@@ -50,6 +50,10 @@ module Organized
     def search_organization_bikes
       @search_query_present = permitted_org_bike_search_params.except(:stolenness).values.reject(&:blank?).any?
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
+      @search_stickers = false
+      if params[:search_stickers].present?
+        @search_stickers = params[:search_stickers] == "none" ? "none" : "with"
+      end
       org = current_organization || passive_organization
       if org.present?
         bikes = org.bikes.search(@interpreted_params)

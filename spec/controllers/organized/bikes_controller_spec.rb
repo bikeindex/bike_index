@@ -59,7 +59,7 @@ describe Organized::BikesController, type: :controller do
   context "logged_in_as_organization_member" do
     include_context :logged_in_as_organization_member
     context "paid organization" do
-      before { organization.update_columns(is_paid: true, paid_feature_slugs: %w[bike_search show_recoveries show_partial_registrations]) } # Stub organization having paid feature
+      before { organization.update_columns(is_paid: true, paid_feature_slugs: %w[bike_search show_recoveries show_partial_registrations bike_codes]) } # Stub organization having paid feature
       describe "index" do
         context "with params" do
           let(:query_params) do
@@ -82,6 +82,20 @@ describe Organized::BikesController, type: :controller do
             expect(assigns(:current_organization)).to eq organization
             expect(assigns(:search_query_present)).to be_truthy
             expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
+            expect(session[:passive_organization_id]).to eq organization.id
+          end
+        end
+        context "with search_stickers" do
+          let!(:bike_with_sticker) { FactoryBot.create(:organization_bike, organization: organization) }
+          let!(:bike_code) { FactoryBot.create(:bike_code_claimed, bike: bike_with_sticker) }
+          it "searches for bikes with stickers" do
+            expect(bike_with_sticker.bike_code?).to be_truthy
+            expect(organization_bikes.pluck(:id).count).to be > 1
+            get :index, { organization_id: organization.to_param, search_stickers: "with" }
+            expect(response.status).to eq(200)
+            expect(assigns(:current_organization)).to eq organization
+            expect(assigns(:search_query_present)).to be_truthy
+            expect(assigns(:bikes).pluck(:id)).to eq([bike_with_sticker.id])
             expect(session[:passive_organization_id]).to eq organization.id
           end
         end

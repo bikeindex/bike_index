@@ -59,11 +59,20 @@
     - optional_columns = current_organization.paid_for?("bike_codes") ? ["sticker_cell"] : []
     - optional_columns += current_organization.additional_registration_fields.map { |f| "#{f}_cell" }
     - (%w[created_at_cell stolen_cell manufacturer_cell model_cell color_cell owner_email_cell updated_at_cell owner_name_cell] + optional_columns).each do |cell_name|
-      .col-6.col-md-4
+      .col-xs-6.col-md-4
         .form-group
           %label
             = check_box_tag cell_name, cell_name
             = column_renames[cell_name]
+  - if current_organization.paid_for?("bike_codes")
+    %hr.mt-4
+    %p.mt-2
+      Stickers
+      = link_to "All", organization_bikes_path(search_params.merge(search_stickers: nil)), class: "btn btn-secondary #{@search_stickers.blank? ? 'active' : ''}"
+      = link_to organization_bikes_path(search_params.merge(search_stickers: "with")), class: "btn btn-secondary #{@search_stickers == 'with' ? 'active' : ''}" do
+        Only <strong>with</strong> stickers
+      = link_to organization_bikes_path(search_params.merge(search_stickers: "none")), class: "btn btn-secondary #{@search_stickers == 'none' ? 'active' : ''}" do
+        Only <strong>no</strong> sticker
 
 .fullscreen-table-wrapper
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
@@ -98,6 +107,15 @@
         - if current_organization.paid_for?("bike_codes")
           %th.hiddenColumn.hidden-xs-down{ class: "sticker_cell" }
             Sticker
+            - if params[:search_stickers].present?
+              %small
+                %a.less-strong{ href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse" }
+                  - if @search_stickers == "with"
+                    Only with
+                  - if @search_stickers == "none"
+                    Only without
+
+
         / I don't know how to do this in a performant way :/
         / - if current_organization.paid_for?("avery_export")
         /   %th{ class: "avery_export_cell" }

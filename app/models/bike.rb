@@ -153,7 +153,7 @@ class Bike < ActiveRecord::Base
   def creation_state; creation_states.first end
 
   def creation_description; creation_state&.creation_description end
-  
+
   def bulk_import; creation_state&.bulk_import end
 
   def pos_kind; creation_state&.pos_kind end
@@ -232,6 +232,10 @@ class Bike < ActiveRecord::Base
     return authorize_for_user(u) unless claimable_by?(u)
     current_ownership.mark_claimed
     true
+  end
+
+  def bike_code?(organization_id)
+    bike_codes.any? # Check for organization
   end
 
   def display_contact_owner?(u = nil)
