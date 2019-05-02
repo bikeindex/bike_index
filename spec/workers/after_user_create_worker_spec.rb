@@ -40,6 +40,23 @@ describe AfterUserCreateWorker do
         instance.perform(user.id, "merged", user: user)
       end
     end
+
+    context "membership invitation present" do
+      let(:email) { "test@stuff.com" }
+      let(:organization_invitation) { FactoryBot.create(:organization_invitation, invitee_email: " #{email.upcase}") }
+      let!(:organization) { organization_invitation.organization }
+      let(:user) { FactoryBot.build(:user, email: email) }
+      xit "associates correctly" do
+        expect(organization_invitation.redeemed?).to be_truthy
+        user.save
+        user.reload
+        organization_invitation.reload
+        expect(organization_invitation.redeemed?).to be_truthy
+        expect(user.id).to be_present
+        expect(user.organizations.pluck(:id)).to eq([organization.id])
+        fail
+      end
+    end
   end
 
   describe "associate_ownerships" do
