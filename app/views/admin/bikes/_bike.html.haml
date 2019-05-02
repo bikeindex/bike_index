@@ -1,32 +1,40 @@
+
 %li
-  - if bike.thumb_path.present?
-    %img{:alt => bike.title, src: bike.thumb_path}
-  %h3
-    = link_to bike.title_string, bike.list_link_url(target)
-  %table.table-list
-    %tbody
-      %tr
-        %td
-          Serial number
-        %td
-          = bike.serial_number
-      %tr
-        %td
-          Colors
-        %td
-          = bike.frame_colors.to_sentence
-      - if bike.stolen and bike.current_stolen_record.present?
-        %tr
-          %td
-            Stolen at
-          %td
-            %span.convertTime.preciseTime
-              = l bike.current_stolen_record.date_stolen, format: :convert_time
-        %tr
-          %td
-            From
-          %td
-            = bike.short_address(bike.current_stolen_record)
+  .row.align-items-end
+    .col-md-2
+      #admin-bike-box
+        - if bike.thumb_path.present?
+          %img{:alt => bike.title, src: bike.thumb_path}
+    .col-md-10
+      %h3.mb-0
+        = link_to bike.title_string, bike.list_link_url(target)
+      %table.table-list.mb-0
+        %tbody
+          %tr
+            %td
+              Serial number
+            %td
+              = bike.serial_number
+          %tr
+            %td
+              Colors
+            %td
+              = bike.frame_colors.to_sentence
+          - if bike.stolen and bike.current_stolen_record.present?
+            %tr
+              %td
+                Stolen at
+              %td
+                %span.convertTime.preciseTime
+                  = l bike.current_stolen_record.date_stolen, format: :convert_time
+            %tr
+              %td
+                From
+              %td
+                = bike.short_address(bike.current_stolen_record)
+
+
+
       - pdf ||= false
       -if pdf
         = link_to "Printable registration", pdf_bike_url(bike)
