@@ -7,7 +7,6 @@ import BinxMapping from "./binx_mapping.js";
 import BinxAppOrgExport from "./binx_org_export.js";
 import BinxAppOrgMessages from "./binx_org_messages.js";
 import BinxAdmin from "./binx_admin.js";
-import BinxAdminBikesEdit from "./binx_admin_bikes_edit.js";
 
 window.binxApp || (window.binxApp = {});
 
@@ -107,10 +106,6 @@ binxApp.enableFilenameForUploads = function() {
 $(document).ready(function() {
   binxApp.localizeTimes();
   // Load admin, whatever
-  if ($("#frame-sizer").length > 0) {
-    const binxAdminEditBikes = BinxAdminEditBikes();
-    binxAdminEditBikes.init();
-  }
   if ($("#admin-content").length > 0) {
     const binxAdmin = BinxAdmin();
     binxAdmin.init();

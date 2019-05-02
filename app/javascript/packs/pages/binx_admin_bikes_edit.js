@@ -1,13 +1,12 @@
 import log from "../utils/log";
 import LoadFancySelects from "../utils/LoadFancySelects";
 
-function BinxAdmin() {
+function BinxAdminBikesEdit() {
   return {
     init() {
         this.updateFrameSize();
         this.setFrameSize();
         this.fixieSlide();
-        LoadFancySelects();
     },
     setFrameSize() {
       const unit = $("#bike_frame_size_unit").val();
