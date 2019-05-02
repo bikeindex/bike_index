@@ -138,6 +138,9 @@ class Bike < ActiveRecord::Base
       end
       where(id: bike_id).first
     end
+
+    def bike_code(organization_id) # This method only accepts numerical org ids
+    end
   end
 
   def cleaned_error_messages # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
@@ -234,8 +237,8 @@ class Bike < ActiveRecord::Base
     true
   end
 
-  def bike_code?(organization_id)
-    bike_codes.any? # Check for organization
+  def bike_code?(organization_id = nil) # This method only accepts numerical org ids
+    bike_codes.where(organization_id.present? ? { organization_id: organization_id } : {}).any?
   end
 
   def display_contact_owner?(u = nil)

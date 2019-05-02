@@ -65,9 +65,8 @@
             = check_box_tag cell_name, cell_name
             = column_renames[cell_name]
   - if current_organization.paid_for?("bike_codes")
-    %hr.mt-4
-    %p.mt-2
-      Stickers
+    %p.stickers-sort-btns
+      Stickers:
       = link_to "All", organization_bikes_path(search_params.merge(search_stickers: nil)), class: "btn btn-secondary #{@search_stickers.blank? ? 'active' : ''}"
       = link_to organization_bikes_path(search_params.merge(search_stickers: "with")), class: "btn btn-secondary #{@search_stickers == 'with' ? 'active' : ''}" do
         Only <strong>with</strong> stickers
@@ -108,12 +107,12 @@
           %th.hiddenColumn.hidden-xs-down{ class: "sticker_cell" }
             Sticker
             - if params[:search_stickers].present?
-              %small
+              %em.small
                 %a.less-strong{ href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse" }
                   - if @search_stickers == "with"
-                    Only with
+                    only with
                   - if @search_stickers == "none"
-                    Only without
+                    only no sticker
 
 
         / I don't know how to do this in a performant way :/

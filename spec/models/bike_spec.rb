@@ -468,6 +468,30 @@ describe Bike do
     end
   end
 
+  describe "bike_code" do
+    let(:organization1) { FactoryBot.create(:organization) }
+    let(:organization2) { FactoryBot.create(:organization) }
+    let(:bike1) { FactoryBot.create(:organization_bike, organization: organization1) }
+    let(:bike2) { FactoryBot.create(:organization_bike, organization: organization1) }
+    let!(:bike3) { FactoryBot.create(:organization_bike, organization: organization1) }
+    let!(:bike_code1) { FactoryBot.create(:bike_code_claimed, bike: bike1, organization: organization1) }
+    let!(:bike_code2) { FactoryBot.create(:bike_code_claimed, bike: bike2) }
+    it "returns appropriately" do
+      expect(bike2.bike_code?).to be_truthy
+      expect(bike2.bike_code?(organization1.id)).to be_falsey
+      expect(bike2.bike_code?(organization2.id)).to be_falsey
+      # And with an bike_code with an organization
+      expect(bike1.bike_code?).to be_truthy
+      expect(bike1.bike_code?(organization1.id)).to be_truthy
+      expect(bike1.bike_code?(organization2.id)).to be_falsey
+      # We only accept numerical ids here
+      expect(bike1.bike_code?(organization1.slug)).to be_falsey
+      expect(organization.bikes.bike_code.pluck(:id)).to eq([bike_code1.id, bike_code2.id])
+      expect(organization.bikes.bike_code(organization1.id).pluck(:id)).to eq([bike_code1.id])
+      expect(Bike.bike_code(organization1.id).pluck(:id)).to eq([bike_code1.id])
+    end
+  end
+
   describe "find_current_stolen_record" do
     it "returns the last current stolen record if bike is stolen" do
       @bike = Bike.new
