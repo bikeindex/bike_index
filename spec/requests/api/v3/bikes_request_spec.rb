@@ -95,16 +95,15 @@ describe "Bikes API V3" do
       it "updates the pre-existing record if the bike has already been registered" do
         old_color = FactoryBot.create(:color, name: "old_color")
         new_color = FactoryBot.create(:color, name: "new_color")
-        old_year = 1969
-        new_year = 2001
-        old_cycle_type = CycleType.new("unicycle")
-        new_cycle_type = CycleType.new("tricycle")
         old_manufacturer = FactoryBot.create(:manufacturer, name: "old_manufacturer")
         new_manufacturer = FactoryBot.create(:manufacturer, name: "new_manufacturer")
         old_wheel_size = FactoryBot.create(:wheel_size, name: "old_wheel_size", iso_bsd: 10)
         new_rear_wheel_size = FactoryBot.create(:wheel_size, name: "new_rear_wheel_size", iso_bsd: 11)
         new_front_wheel_size = FactoryBot.create(:wheel_size, name: "new_front_wheel_size", iso_bsd: 12)
-
+        old_cycle_type = CycleType.new("unicycle")
+        new_cycle_type = CycleType.new("tricycle")
+        old_year = 1969
+        new_year = 2001
         bike1 = FactoryBot.create(
           :bike,
           creator: user,
@@ -116,14 +115,6 @@ describe "Bikes API V3" do
           rear_wheel_size: old_wheel_size,
           front_wheel_size: old_wheel_size,
         )
-        expect(bike1.year).to eq(old_year)
-        expect(bike1.primary_frame_color.name).to eq(old_color.name)
-        expect(bike1.cycle_type).to eq(old_cycle_type.slug.to_s)
-        expect(bike1.manufacturer.name).to eq(old_manufacturer.name)
-        expect(bike1.rear_wheel_size.name).to eq(old_wheel_size.name)
-        expect(bike1.rear_wheel_size.iso_bsd).to eq(old_wheel_size.iso_bsd)
-        expect(bike1.front_wheel_size.name).to eq(old_wheel_size.name)
-        expect(bike1.front_wheel_size.iso_bsd).to eq(old_wheel_size.iso_bsd)
         FactoryBot.create(:ownership, bike: bike1, creator: user, owner_email: user.email)
 
         bike_attrs = {
@@ -138,12 +129,9 @@ describe "Bikes API V3" do
           frame_material: "steel",
           cycle_type_name: new_cycle_type.slug.to_s,
         }
-
         post "/api/v3/bikes?access_token=#{token.token}",
              bike_attrs.to_json,
              json_headers
-        json = JSON.parse(response.body)
-        expect(json["error"]).to be_blank
 
         bike2 = json["bike"]
         expect(bike2["id"]).to eq(bike1.id)

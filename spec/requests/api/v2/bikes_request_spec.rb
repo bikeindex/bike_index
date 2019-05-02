@@ -361,8 +361,6 @@ describe "Bikes API V2" do
       expect(bike.is_for_sale).to be_truthy
       expect(bike.year).to eq(params[:year])
       expect(comp2.reload.year).to eq(1999)
-      pp "---"
-      pp bike.components.pluck(:cmodel_name), bike.components.map(&:manufacturer_name)
       expect(bike.components.pluck(:cmodel_name)).to match_array([nil, nil, "Richie rich"])
       expect(bike.components.map(&:manufacturer_name).compact).to match_array(["BLUE TEETH", manufacturer.name])
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
@@ -386,8 +384,6 @@ describe "Bikes API V2" do
       put url, params.to_json, json_headers
       expect(response.code).to eq("401")
       expect(response.headers["Content-Type"].match("json")).to be_present
-      # response.headers['Access-Control-Allow-Origin'].should eq('*')
-      # response.headers['Access-Control-Request-Method'].should eq('*')
       expect(bike.reload.components.reload.count).to eq(1)
       expect(bike.components.pluck(:year).first).to eq(1999) # Feature, not a bug?
       expect(not_urs.reload.id).to be_present
