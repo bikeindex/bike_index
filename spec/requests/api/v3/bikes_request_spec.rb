@@ -135,7 +135,7 @@ describe "Bikes API V3" do
              bike_attrs.to_json,
              json_headers
 
-        bike2 = json["bike"]
+        bike2 = json_result["bike"]
         expect(bike2["id"]).to eq(bike1.id)
         expect(bike2["serial"]).to eq(bike1.serial)
         expect(bike2["year"]).to eq(new_year)
