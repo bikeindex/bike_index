@@ -2,7 +2,7 @@
   Manage Failed Bikes
 
 %h4
-  = number_with_delimiter(@b_params_total_count, delimiter: ',')
+  = number_with_delimiter(@b_params.total_count, delimiter: ',')
   failed bikes,
   %em
     = @b_params.where(BParam.arel_table[:created_at].gt(Date.yesterday)).count
@@ -18,7 +18,7 @@
       %th
         Errors
     %tbody
-      - @b_params.includes(:creator).each do |b_param|
+      - @b_params.each do |b_param|
         %tr
           %td
             %a.convertTime.preciseTime{ href: admin_failed_bike_url(b_param.id) }
