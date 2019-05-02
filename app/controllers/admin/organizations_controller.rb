@@ -99,9 +99,8 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def find_organization
     @organization = Organization.friendly_find(params[:id])
-    unless @organization
-      flash[:error] = "Sorry! That organization doesn't exist"
-      redirect_to admin_organizations_url and return
-    end
+    return true if @organization.present?
+    flash[:error] = "Sorry! That organization doesn't exist"
+    redirect_to admin_organizations_url and return
   end
 end
