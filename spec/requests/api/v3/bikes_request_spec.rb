@@ -9,9 +9,8 @@ describe "Bikes API V3" do
     it "returns one with from an id" do
       bike = FactoryBot.create(:bike)
       get "/api/v3/bikes/#{bike.id}", format: :json
-      result = JSON.parse(response.body)
       expect(response.code).to eq("200")
-      expect(result["bike"]["id"]).to eq(bike.id)
+      expect(json_result["bike"]["id"]).to eq(bike.id)
       expect(response.headers["Content-Type"].match("json")).to be_present
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
@@ -19,9 +18,8 @@ describe "Bikes API V3" do
 
     it "responds with missing" do
       get "/api/v3/bikes/10", format: :json
-      result = JSON(response.body)
       expect(response.code).to eq("404")
-      expect(result["error"].present?).to be_truthy
+      expect(json_result["error"].present?).to be_truthy
       expect(response.headers["Content-Type"].match("json")).to be_present
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
@@ -110,7 +108,7 @@ describe "Bikes API V3" do
              json_headers
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
       expect(response.code).to eq("201")
-      result = JSON.parse(response.body)["bike"]
+      result = json_result["bike"]
       expect(result["serial"]).to eq(bike_attrs[:serial])
       expect(result["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       bike = Bike.find(result["id"])
@@ -149,7 +147,7 @@ describe "Bikes API V3" do
              json_headers
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
       expect(response.code).to eq("201")
-      result = JSON.parse(response.body)["bike"]
+      result = json_result["bike"]
       expect(result["serial"]).to eq(bike_attrs[:serial])
       expect(result["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       bike = Bike.unscoped.find(result["id"])
@@ -213,8 +211,7 @@ describe "Bikes API V3" do
              bike_attrs.to_json,
              json_headers
       end.to change(Ownership, :count).by 0
-      result = JSON.parse(response.body)
-      expect(result["error"]).to be_present
+      expect(json_result["error"]).to be_present
     end
   end
 
@@ -256,7 +253,7 @@ describe "Bikes API V3" do
             expect do
               post tokenized_url, bike_attrs.merge(no_duplicate: true).to_json, json_headers
             end.to change(Bike, :count).by 0
-            result = JSON.parse(response.body)["bike"]
+            result = json_result["bike"]
             expect(response.code).to eq("201")
             expect(result["id"]).to eq bike.id
             EmailOwnershipInvitationWorker.drain
@@ -271,7 +268,7 @@ describe "Bikes API V3" do
             expect do
               post tokenized_url, bike_attrs.to_json, json_headers
             end.to change(Bike, :count).by 1
-            result = JSON.parse(response.body)["bike"]
+            result = json_result["bike"]
 
             expect(response.code).to eq("201")
             bike = Bike.find(result["id"])
@@ -292,11 +289,8 @@ describe "Bikes API V3" do
 
       it "doesn't create a bike without an organization with v3_accessor" do
         post tokenized_url, bike_attrs.except(:organization_slug).to_json, json_headers
-        result = JSON.parse(response.body)
-
         expect(response.code).to eq("403")
-        result = JSON.parse(response.body)
-        expect(result["error"].is_a?(String)).to be_truthy
+        expect(json_result["error"].is_a?(String)).to be_truthy
         EmailOwnershipInvitationWorker.drain
         expect(ActionMailer::Base.deliveries).to be_empty
       end
@@ -305,10 +299,8 @@ describe "Bikes API V3" do
     it "fails to create a bike if the app owner isn't a member of the organization" do
       expect(user.has_membership?).to be_falsey
       post tokenized_url, bike_attrs.to_json, json_headers
-      result = JSON.parse(response.body)
       expect(response.code).to eq("403")
-      result = JSON.parse(response.body)
-      expect(result["error"].is_a?(String)).to be_truthy
+      expect(json_result["error"].is_a?(String)).to be_truthy
     end
   end
 

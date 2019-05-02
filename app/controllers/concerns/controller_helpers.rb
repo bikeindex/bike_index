@@ -6,8 +6,8 @@ module ControllerHelpers
 
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
-                  :current_organization, :passive_organization, :set_passive_organization,
-                  :controller_namespace, :page_id, :recovered_bike_count
+                  :current_organization, :passive_organization, :controller_namespace, :page_id,
+                  :recovered_bike_count, :default_bike_search_path
     before_filter :enable_rack_profiler
   end
 
@@ -51,6 +51,10 @@ module ControllerHelpers
     organization_bikes_path(organization_id: current_user.default_organization.to_param)
   end
 
+  def default_bike_search_path
+    bikes_path(location: "ip", stolenness: "proximity")
+  end
+
   # Generally this is implicitly set, via the passed parameters - however! it can also be explicitly set
   def store_return_to(return_to = nil)
     return_to ||= params[:return_to]
@@ -87,7 +91,8 @@ module ControllerHelpers
   def recovered_bike_count
     if Rails.env.production?
       Rails.cache.fetch "recovered_bike_count_#{Date.today.to_formatted_s(:number)}" do
-        StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count
+        # StolenBikeRegistry.com had just over 2k recoveries prior to merging. The recoveries weren't imported, so manually calculate
+        StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count + 2_041
       end
     else
       3_021
@@ -125,7 +130,7 @@ module ControllerHelpers
     # We call this multiple times - make sure nil stays nil
     return @current_organization if defined?(@current_organization)
     @current_organization = Organization.friendly_find(params[:organization_id])
-    # Only set passive_organization if user is authorized for said organization
+    # Sometimes (e.g. embed registration), it's ok if current_user isn't authorized - but only set passive_organization if authorized
     return @current_organization unless @current_organization.present? && current_user&.authorized?(@current_organization)
     set_passive_organization(@current_organization)
   end
@@ -142,7 +147,7 @@ module ControllerHelpers
   # Because we need to show unconfirmed users logout - and we should show them what they're missing in general
   # Generally, this shouldn't be accessed. Almost always should be accessing current_user
   def current_user_or_unconfirmed_user
-    current_user_or_unconfirmed_user = current_user || unconfirmed_current_user
+    current_user || unconfirmed_current_user
   end
 
   def sign_in_partner

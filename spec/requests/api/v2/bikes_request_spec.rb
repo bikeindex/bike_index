@@ -9,9 +9,8 @@ describe "Bikes API V2" do
     it "returns one with from an id" do
       bike = FactoryBot.create(:bike)
       get "/api/v2/bikes/#{bike.id}", format: :json
-      result = JSON.parse(response.body)
       expect(response.code).to eq("200")
-      expect(result["bike"]["id"]).to eq(bike.id)
+      expect(json_result["bike"]["id"]).to eq(bike.id)
       expect(response.headers["Content-Type"].match("json")).to be_present
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
@@ -19,9 +18,8 @@ describe "Bikes API V2" do
 
     it "responds with missing" do
       get "/api/v2/bikes/10", format: :json
-      result = JSON(response.body)
       expect(response.code).to eq("404")
-      expect(result["error"].present?).to be_truthy
+      expect(json_result["error"].present?).to be_truthy
       expect(response.headers["Content-Type"].match("json")).to be_present
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
@@ -91,7 +89,7 @@ describe "Bikes API V2" do
              json_headers
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
       expect(response.code).to eq("201")
-      result = JSON.parse(response.body)["bike"]
+      result = json_result["bike"]
       expect(result["serial"]).to eq(bike_attrs[:serial])
       expect(result["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       bike = Bike.find(result["id"])
@@ -125,7 +123,7 @@ describe "Bikes API V2" do
              json_headers
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
       expect(response.code).to eq("201")
-      result = JSON.parse(response.body)["bike"]
+      result = json_result["bike"]
       expect(result["serial"]).to eq(bike_attrs[:serial])
       expect(result["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       bike = Bike.unscoped.find(result["id"])
@@ -163,7 +161,7 @@ describe "Bikes API V2" do
              bike_attrs.to_json,
              json_headers
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
-      result = JSON.parse(response.body)
+      result = json_result
       expect(result).to include("bike")
       expect(result["bike"]["serial"]).to eq(bike_attrs[:serial])
       expect(result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
@@ -190,8 +188,7 @@ describe "Bikes API V2" do
              bike_attrs.to_json,
              json_headers
       end.to change(Ownership, :count).by 0
-      result = JSON.parse(response.body)
-      expect(result["error"]).to be_present
+      expect(json_result["error"]).to be_present
     end
   end
 
@@ -223,7 +220,7 @@ describe "Bikes API V2" do
         front_tire_narrow: false,
       }
       post tokenized_url, bike_attrs.merge(additional_attrs).to_json, json_headers
-      result = JSON.parse(response.body)["bike"]
+      result = json_result["bike"]
       expect(response.code).to eq("201")
       bike = Bike.find(result["id"])
       expect(bike.primary_frame_color).to eq color
@@ -238,7 +235,7 @@ describe "Bikes API V2" do
       FactoryBot.create(:membership, user: user, organization: organization, role: "admin")
       organization.save
       post tokenized_url, bike_attrs.to_json, json_headers
-      result = JSON.parse(response.body)["bike"]
+      result = json_result["bike"]
       expect(response.code).to eq("201")
       bike = Bike.find(result["id"])
       expect(bike.creation_organization).to eq(organization)
@@ -258,20 +255,15 @@ describe "Bikes API V2" do
       organization.save
       bike_attrs.delete(:organization_slug)
       post tokenized_url, bike_attrs.to_json, json_headers
-      result = JSON.parse(response.body)
-
       expect(response.code).to eq("403")
-      result = JSON.parse(response.body)
-      expect(result["error"].is_a?(String)).to be_truthy
+      expect(json_result["error"].is_a?(String)).to be_truthy
     end
 
     it "fails to create a bike if the app owner isn't a member of the organization" do
       expect(user.has_membership?).to be_falsey
       post tokenized_url, bike_attrs.to_json, json_headers
-      result = JSON.parse(response.body)
       expect(response.code).to eq("403")
-      result = JSON.parse(response.body)
-      expect(result["error"].is_a?(String)).to be_truthy
+      expect(json_result["error"].is_a?(String)).to be_truthy
     end
   end
 
@@ -300,7 +292,6 @@ describe "Bikes API V2" do
     it "fails to update bike if required stolen attrs aren't present" do
       FactoryBot.create(:country, iso: "US")
       expect(bike.year).to be_nil
-      serial = bike.serial_number
       params[:stolen_record] = {
         phone: "",
         city: "Chicago",
@@ -378,7 +369,7 @@ describe "Bikes API V2" do
     end
 
     it "doesn't remove components that aren't the bikes" do
-      manufacturer = FactoryBot.create(:manufacturer)
+      FactoryBot.create(:manufacturer)
       comp = FactoryBot.create(:component, bike: bike)
       not_urs = FactoryBot.create(:component)
       components = [

@@ -229,6 +229,7 @@ Bikeindex::Application.routes.draw do
   resources :stolen, only: [:index, :show] do
     collection do
       get "current_tsv"
+      get "current_tsv_rapid"
     end
   end
 

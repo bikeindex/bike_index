@@ -94,6 +94,12 @@ $primary-footer-top-margin: 6 * $vertical-height;
   }
 }
 
+.footnotes {
+  padding-top: 2 * $vertical-height;
+  margin-top: 3 * $vertical-height;
+  border-top: $gray-lighter 1px solid;
+}
+
 //
 // Small Screen Styles
 @media (max-width: $grid-breakpoint-lg - 1px) {

@@ -48,7 +48,7 @@ class TsvCreator
     row = "#{mnfg.id}\t#{mnfg.name}\t"
     row << (mnfg.frame_maker ? "Frame manufacturer" : "Manufacturer")
     row << "\t"
-    row << "#{mnfg.bikes.count}"
+    row << "#{popularity}"
     row << "\t"
     row << "#{mnfg.website}"
     row << "\t"

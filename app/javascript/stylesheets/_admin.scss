@@ -1,0 +1,60 @@
+.admin-navbar {
+  @include media-breakpoint-up(md) {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: $zindex-sticky;
+  }
+  .navbar-brand img {
+    height: 35px;
+  }
+  .dropdown-toggle {
+    cursor: pointer;
+  }
+}
+
+.admin-subnav {
+  @extend .mt-4;
+  @extend .mb-4;
+  @extend .row;
+  border-bottom: 1px solid $gray-400;
+  padding-bottom: 20px;
+  ul {
+    @extend .nav;
+    @extend .nav-pills;
+  }
+  .subtitle {
+    @extend .mt-4;
+    @extend .col-12;
+  }
+}
+
+// Admin bike table specials
+.admin-bike-table-serial-cell {
+  display: none;
+}
+.show-admin-bike-table-serial-cell .admin-bike-table-serial-cell {
+  display: table-cell;
+}
+
+.paginate-container {
+  display: flex;
+  flex: wrap;
+  justify-content: center;
+
+  .pagination {
+    flex: 0 1 auto;
+    display: inline-block;
+    padding-left: 0;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  ul {
+    list-item-type: none;
+  }
+
+  li {
+    display: inline;
+  }
+}
