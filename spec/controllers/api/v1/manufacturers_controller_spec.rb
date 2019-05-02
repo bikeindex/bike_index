@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe Api::V1::ManufacturersController do
+describe Api::V1::ManufacturersController, type: :controller do
   describe "index" do
     it "loads the request" do
       m = FactoryBot.create(:manufacturer, name: "AAAA manufacturer")
