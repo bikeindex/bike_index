@@ -3,31 +3,24 @@ require "spec_helper"
 describe ComponentCreator do
   describe "set_manufacturer_key" do
     context "manufacturer in db" do
+      let(:manufacturer) { FactoryBot.create(:manufacturer, name: "SRAM") }
+      let(:target) { { manufacturer_id: manufacturer.id } }
       it "sets the manufacturer_id" do
-        m = FactoryBot.create(:manufacturer, name: "SRAM")
-        c = { manufacturer: "sram" }
-        component = ComponentCreator.new.set_manufacturer_key(c)
-        expect(component[:manufacturer_id]).to eq(m.id)
-        expect(component[:manufacturer]).not_to be_present
+        expect(ComponentCreator.new.manufacturer_hash(manufacturer: manufacturer.slug)).to eq target
+        expect(ComponentCreator.new.manufacturer_hash(manufacturer_id: "#{manufacturer.name} ")).to eq target
       end
     end
     context "unknown manufacturer" do
+      let(:target) { { manufacturer_id: Manufacturer.other.id, manufacturer_other: "Gobbledy Gooky" } }
       it "adds other manufacturer name and set the set the foreign keys" do
-        m = FactoryBot.create(:manufacturer, name: "Other")
-        c = { manufacturer: "Gobbledy Gooky" }
-        component = ComponentCreator.new.set_manufacturer_key(c)
-        expect(component[:manufacturer_id]).to eq(m.id)
-        expect(component[:manufacturer]).not_to be_present
-        expect(component[:manufacturer_other]).to eq("Gobbledy Gooky")
+        expect(ComponentCreator.new.manufacturer_hash(manufacturer: "Gobbledy Gooky")).to eq target
+        # If it's already existing, it should stay the same
+        expect(ComponentCreator.new.manufacturer_hash(target)).to eq target
       end
     end
-    context "manufacturer_id a manufacturer name" do
-      it "sets manufacturer_id correctly" do
-        m = FactoryBot.create(:manufacturer, name: "SRAM")
-        c = { manufacturer_id: "sram" }
-        component = ComponentCreator.new.set_manufacturer_key(c)
-        expect(component[:manufacturer_id]).to eq(m.id)
-        expect(component[:manufacturer]).not_to be_present
+    context "no manufacturer" do
+      it "returns empty" do
+        expect(ComponentCreator.new.manufacturer_hash(model_name: "FFFF")).to eq({})
       end
     end
   end
@@ -36,16 +29,19 @@ describe ComponentCreator do
     it "sets the component_type from a string" do
       ctype = FactoryBot.create(:ctype, name: "Stuff blows")
       c = { component_type: "sTuff Blows " }
-      component = ComponentCreator.new.set_component_type(c)
-      expect(component[:ctype_id]).to eq(ctype.id)
-      expect(component[:component_type]).not_to be_present
+      expect(ComponentCreator.new.component_type_hash(c)).to eq(ctype_id: ctype.id)
     end
-    it "creates a new component type if we don't recognize it" do
-      c = { component_type: "Hubs" }
-      component = ComponentCreator.new.set_component_type(c)
-      expect(component[:ctype_id]).to eq(Ctype.unknown.id)
-      expect(component[:ctype_other]).to eq("Hubs")
-      expect(component[:component_type]).not_to be_present
+    context "unknown component type" do
+      let(:target) { { ctype_id: Ctype.other.id, ctype_other: "Spiked Hubs" } }
+      it "creates a new component type if we don't recognize it" do
+        expect(ComponentCreator.new.component_type_hash(component_type: "Spiked Hubs")).to eq target
+      end
+    end
+    context "already has ctype_id" do
+      target = { ctype_id: Ctype.other.id, ctype_other: "Some other component" }
+      it "creates a new component type if we don't recognize it" do
+        expect(ComponentCreator.new.component_type_hash(target)).to eq target
+      end
     end
   end
 
@@ -80,8 +76,6 @@ describe ComponentCreator do
       components = [{ component_type: "something" }, { component_type: "something" }]
       allow(b_param).to receive(:params).and_return({ components: components }.as_json)
       component_creator = ComponentCreator.new(b_param: b_param)
-      expect(component_creator).to receive(:set_manufacturer_key).at_least(2).times.and_return(true)
-      expect(component_creator).to receive(:set_component_type).at_least(2).times.and_return(true)
       expect(component_creator).to receive(:create_component).at_least(2).times.and_return(true)
       component_creator.create_components_from_params
     end

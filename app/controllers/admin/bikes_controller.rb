@@ -10,12 +10,14 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def missing_manufacturer
-    session[:missing_manufacturer_time_order] = params[:time_ordered] if params[:time_ordered].present?
+    session.delete(:missing_manufacturer_time_order) if params[:reset_view].present?
+    session[:missing_manufacturer_time_order] = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:time_ordered]) if params[:time_ordered].present?
     bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id)
     bikes = session[:missing_manufacturer_time_order] ? bikes.order("created_at desc") : bikes.order("manufacturer_other ASC")
     page = params[:page] || 1
     per_page = params[:per_page] || 100
     @bikes = bikes.page(page).per(per_page)
+    render layout: "new_admin"
   end
 
   def update_manufacturers
