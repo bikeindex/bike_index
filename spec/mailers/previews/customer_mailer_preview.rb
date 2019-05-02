@@ -28,7 +28,7 @@ class CustomerMailerPreview < ActionMailer::Preview
   end
 
   def admin_contact_stolen_email
-    customer_contact = CustomerContact.where(contact_type: 'stolen_contact').last
+    customer_contact = CustomerContact.where(contact_type: "stolen_contact").last
     CustomerMailer.admin_contact_stolen_email(customer_contact)
   end
 

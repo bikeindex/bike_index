@@ -7,7 +7,6 @@ module Api
         message = { :'error' => "404 - Couldn't find that shit" }
         respond_with message, status: 404
       end
-      
     end
   end
 end

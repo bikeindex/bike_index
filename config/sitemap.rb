@@ -1,13 +1,13 @@
 # Set the host name for URL creation
-SitemapGenerator::Sitemap.default_host = 'https://bikeindex.org'
-SitemapGenerator::Sitemap.sitemaps_host = 'https://bikeindex.org'
+SitemapGenerator::Sitemap.default_host = "https://bikeindex.org"
+SitemapGenerator::Sitemap.sitemaps_host = "https://bikeindex.org"
 SitemapGenerator::Sitemap.public_path = "#{Rails.root}/tmp/uploads"
-SitemapGenerator::Sitemap.sitemaps_path = 'sitemaps/'
+SitemapGenerator::Sitemap.sitemaps_path = "sitemaps/"
 SitemapGenerator::Sitemap.adapter = SitemapGenerator::WaveAdapter.new
 
 SitemapGenerator::Sitemap.create do
   group(filename: :about) do
-    paths = ['about']
+    paths = ["about"]
     paths.each { |i| add "/#{i}", priority: 0.9 }
   end
   group(filename: :organizations) do
@@ -15,29 +15,29 @@ SitemapGenerator::Sitemap.create do
   end
 
   group(filename: :news) do
-    add '/blogs', priority: 0.9, changefreq: 'daily'
+    add "/blogs", priority: 0.9, changefreq: "daily"
     Blog.published.each do |b|
       add("/news/#{b.title_slug}",
           priority: 0.9,
           news: {
-            publication_name: 'Bike Index Blog',
-            publication_language: 'en',
+            publication_name: "Bike Index Blog",
+            publication_language: "en",
             title: b.title,
-            publication_date: b.published_at.strftime('%Y-%m-%dT%H:%M:%S+00:00')
+            publication_date: b.published_at.strftime("%Y-%m-%dT%H:%M:%S+00:00"),
           })
     end
   end
   group(filename: :partners) do
-    paths = ['where', 'organizations/new']
+    paths = ["where", "organizations/new"]
     paths.each { |i| add "/#{i}", priority: 0.9 }
   end
 
   group(filename: :documentation) do
-    add '/documentation/api_v2'
+    add "/documentation/api_v2"
   end
 
   group(filename: :bikes) do
-    Bike.all.each { |b| add bike_path(b), changefreq: 'daily', priority: 0.9 }
+    Bike.all.each { |b| add bike_path(b), changefreq: "daily", priority: 0.9 }
   end
 
   group(filename: :images) do
@@ -53,7 +53,12 @@ SitemapGenerator::Sitemap.create do
   end
 
   group(filename: :contact) do
-    paths = ['/help']
+    paths = ["help"]
+    paths.each { |i| add "/#{i}", priority: 0.8 }
+  end
+
+  group(filename: :recovery_stories) do
+    paths = ["recovery_stories"]
     paths.each { |i| add "/#{i}", priority: 0.8 }
   end
 

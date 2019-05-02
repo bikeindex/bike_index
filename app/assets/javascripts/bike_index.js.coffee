@@ -31,7 +31,7 @@ updateInvoiceCalculations = ->
   if recurring.length > 0
     recurringCost = recurring.reduce (x,y) -> x+y
   else
-    recurringCost = 0  
+    recurringCost = 0
   oneTime = $(".paidFeatureCheck input.oneTime:checked").get().map (i) -> parseInt($(i).attr("data-amount"), 10)
   if oneTime.length > 0
     oneTimeCost = oneTime.reduce (x,y) -> x+y
@@ -60,9 +60,9 @@ $(document).ready ->
   new BikeIndex.Views.Global
 
   if document.getElementById('home_headies')
-    new BikeIndex.Views.Home 
+    new BikeIndex.Views.Home
   if document.getElementById('news_display')
-    new BikeIndex.Views.NewsDisplay 
+    new BikeIndex.Views.NewsDisplay
 
   else if document.getElementById('documentation-menu')
     new BikeIndex.Views.DocumentationIndex
@@ -72,7 +72,7 @@ $(document).ready ->
       new BikeIndex.Views.ContentWhere
     if document.getElementById('manufacturers-list')
       new BikeIndex.Views.ContentManufacturers
-  
+
   else if document.getElementById('choose-registration-type')
     new BikeIndex.Views.BikesChooseRegistration
 
@@ -90,7 +90,7 @@ $(document).ready ->
 
   else if document.getElementById('user-home-page')
     new BikeIndex.Views.DataTables
-  
+
   else if document.getElementById('edit-bike-form')
     new BikeIndex.Views.BikesEdit
 
@@ -117,10 +117,10 @@ $(document).ready ->
       new BikeIndex.Views.AdminGraphs
     else if document.getElementById('invoiceForm')
       initializeInvoiceForm()
-  
+
   else if document.getElementById('photo-page')
     new BikeIndex.Views.PhotosIndex
 
   if document.getElementById('multi_serial_search')
     new BikeIndex.Views.StolenMultiSerialSearch
-    
+

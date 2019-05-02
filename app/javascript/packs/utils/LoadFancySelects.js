@@ -1,4 +1,3 @@
-import log from "./log";
 import selectize from "selectize";
 
 // Right now we're using selectize.js (https://selectize.github.io/selectize.js/) to make our select boxes fancy.

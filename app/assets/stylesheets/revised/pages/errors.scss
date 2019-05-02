@@ -4,7 +4,11 @@
     font-size: 200px;
     text-align: center;
   }
-  .error-explanation { text-align: center; }
+
+  .error-explanation {
+    text-align: center;
+  }
+
   .go-back {
     cursor: pointer;
     text-align: center;
@@ -12,7 +16,7 @@
   }
 }
 
- @media (max-width: 550px) {
+@media (max-width: 550px) {
   #error-page-wrap {
     .error-text {
       font-size: 100px;

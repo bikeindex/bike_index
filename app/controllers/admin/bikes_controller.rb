@@ -1,26 +1,23 @@
 class Admin::BikesController < Admin::BaseController
+  include SortableTable
   before_filter :find_bike, only: [:edit, :destroy, :update, :get_destroy]
 
   def index
-    bikes = Bike.unscoped.includes(:creation_organization, :creation_state, :paint)
-    if params[:email]
-      bikes = bikes.admin_text_search(params[:email])
-    else
-      bikes = bikes.order("created_at desc")
-    end
     @page = params[:page] || 1
     per_page = params[:per_page] || 100
-    @bikes = bikes.page(@page).per(per_page)
+    @bikes = matching_bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(per_page)
     render layout: "new_admin"
   end
 
   def missing_manufacturer
-    session[:missing_manufacturer_time_order] = params[:time_ordered] if params[:time_ordered].present?
+    session.delete(:missing_manufacturer_time_order) if params[:reset_view].present?
+    session[:missing_manufacturer_time_order] = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:time_ordered]) if params[:time_ordered].present?
     bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id)
-    bikes = session[:missing_manufacturer_time_order] ? bikes.order('created_at desc') : bikes.order('manufacturer_other ASC')
+    bikes = session[:missing_manufacturer_time_order] ? bikes.order("created_at desc") : bikes.order("manufacturer_other ASC")
     page = params[:page] || 1
     per_page = params[:per_page] || 100
     @bikes = bikes.page(page).per(per_page)
+    render layout: "new_admin"
   end
 
   def update_manufacturers
@@ -29,10 +26,10 @@ class Admin::BikesController < Admin::BaseController
       params[:bikes_selected].keys.each do |bid|
         Bike.find(bid).update_attributes(manufacturer_id: manufacturer_id, manufacturer_other: nil)
       end
-      flash[:success] = 'Success. Bikes updated'
+      flash[:success] = "Success. Bikes updated"
       redirect_to :back and return
     end
-    flash[:notice] = 'Sorry, you need to add bikes and a manufacturer'
+    flash[:notice] = "Sorry, you need to add bikes and a manufacturer"
     redirect_to :back
   end
 
@@ -45,13 +42,14 @@ class Admin::BikesController < Admin::BaseController
     @page = params[:page] || 1
     per_page = params[:per_page] || 25
     @duplicate_groups = duplicate_groups.page(@page).per(per_page)
+    render layout: "new_admin"
   end
 
   def ignore_duplicate_toggle
     duplicate_bike_group = DuplicateBikeGroup.find(params[:id])
     duplicate_bike_group.ignore = !duplicate_bike_group.ignore
     duplicate_bike_group.save
-    flash[:success] = "Successfully marked #{duplicate_bike_group.segment} #{duplicate_bike_group.ignore ? 'ignored' : 'Un-ignored'}"
+    flash[:success] = "Successfully marked #{duplicate_bike_group.segment} #{duplicate_bike_group.ignore ? "ignored" : "Un-ignored"}"
     redirect_to :back
   end
 
@@ -83,7 +81,7 @@ class Admin::BikesController < Admin::BaseController
       @bike.current_stolen_record.add_recovery_information(
         recovered_description: params[:mark_recovered_reason],
         index_helped_recovery: params[:mark_recovered_we_helped],
-        can_share_recovery: params[:can_share_recovery]
+        can_share_recovery: params[:can_share_recovery],
       )
     end
     if @bike.update_attributes(permitted_parameters.except(:stolen_records_attributes))
@@ -116,6 +114,10 @@ class Admin::BikesController < Admin::BaseController
 
   protected
 
+  def sortable_columns
+    %w[id owner_email manufacturer_id]
+  end
+
   def permitted_parameters
     params.require(:bike).permit(Bike.old_attr_accessible + [bike_organization_ids: []])
   end
@@ -123,7 +125,7 @@ class Admin::BikesController < Admin::BaseController
   def destroy_bike
     @bike.destroy
     AfterBikeSaveWorker.perform_async(@bike.id)
-    flash[:success] = 'Bike deleted!'
+    flash[:success] = "Bike deleted!"
     if params[:multi_delete]
       redirect_to admin_root_url
       # redirect_to admin_bikes_url(page: params[:multi_delete], multi_delete: 1)
@@ -134,5 +136,18 @@ class Admin::BikesController < Admin::BaseController
 
   def find_bike
     @bike = Bike.unscoped.find(params[:id])
+  end
+
+  def matching_bikes
+    return @matching_bikes if defined?(@matching_bikes)
+    if current_organization.present?
+      bikes = current_organization.bikes.includes(:creation_organization, :creation_states, :paint)
+    else
+      bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint)
+    end
+    bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email]
+    bikes = bikes.ascend_pos if params[:search_ascend].present?
+    bikes = bikes.lightspeed_pos if params[:search_lightspeed].present?
+    @matching_bikes = bikes
   end
 end

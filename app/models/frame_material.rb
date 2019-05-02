@@ -1,12 +1,12 @@
 class FrameMaterial
-  include Enumable 
-  
+  include Enumable
+
   SLUGS = {
     organic: 4,
     composite: 3,
     titanium: 2,
     aluminum: 1,
-    steel: 0
+    steel: 0,
   }.freeze
 
   NAMES = {
@@ -14,7 +14,7 @@ class FrameMaterial
     composite: "Carbon or composite",
     organic: "Wood or organic material",
     steel: "Steel",
-    titanium: "Titanium"
+    titanium: "Titanium",
   }.freeze
 
   def initialize(slug)

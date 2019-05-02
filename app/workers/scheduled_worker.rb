@@ -23,7 +23,7 @@ class ScheduledWorker
   end
 
   def self.redis_queue
-    "queue:#{sidekiq_options['queue']}".freeze
+    "queue:#{sidekiq_options["queue"]}".freeze
   end
 
   def self.enqueued?

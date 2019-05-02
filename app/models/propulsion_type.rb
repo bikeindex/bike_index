@@ -9,7 +9,7 @@ class PropulsionType
     "electric-assist": 4,
     "electric-throttle": 5,
     gas: 6,
-    "other-style": 7
+    "other-style": 7,
   }.freeze
 
   NAMES = {
@@ -20,7 +20,7 @@ class PropulsionType
     "electric-assist": "Electric Assist",
     "electric-throttle": "Electric throttle",
     gas: "Gas",
-    "other-style": "Other style"
+    "other-style": "Other style",
   }.freeze
 
   def initialize(slug)

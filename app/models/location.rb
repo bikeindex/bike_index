@@ -31,8 +31,8 @@ class Location < ActiveRecord::Base
       street,
       city,
       state.present? ? state.abbreviation : nil,
-      zipcode, 
-      country.name
+      zipcode,
+      country.name,
     ].compact.reject(&:blank?).join(", ")
   end
 
