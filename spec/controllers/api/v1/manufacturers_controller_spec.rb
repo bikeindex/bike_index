@@ -6,7 +6,7 @@ describe Api::V1::ManufacturersController do
       m = FactoryBot.create(:manufacturer, name: "AAAA manufacturer")
       get :index, format: :json
       expect(response.code).to eq("200")
-      expect(JSON.parse(response.body)["manufacturers"].first["name"]).to eq(m.name)
+      expect(json_result["manufacturers"].first["name"]).to eq(m.name)
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Allow-Methods"]).to eq("POST, PUT, GET, OPTIONS")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
