@@ -1,11 +1,15 @@
 %h1
-  Serial numbers
+  Bike Serial numbers
+
 %p#fnref-all-bikes-serials
-  All bikes 
+  All bikes
   %sup
     %a.footnote-ref{ href: '#fn-all-bikes-serials' }
       1
   all have unique serial numbers.
+
+%h3.header-font-uncap#find-serial-number.mt-4
+  Finding a bicycle serial number
 
 %p
   Most bicycles have their serial number engraved beneath their bottom bracket, but sometimes serial numbers are found in other places. Here are some examples of where and what to look for:
@@ -15,47 +19,67 @@
   %li
     = link_to image_tag('serials/serial_bb.jpg', alt: 'Bike with bottom bracket circled'), image_path('serials/serial_bb.jpg'), class: 'serial-image'
     %p
-      The bottom bracket (where serial numbers are typically located) is circled.
+      The <em>bottom bracket</em> (where serial numbers are typically located) is circled.
   %li
     = link_to image_tag('serials/serial_peters.jpg', alt: 'Standard serial number'), image_path('serials/serial_peters.jpg'), class: 'serial-image'
     %p
-      A serial number on the underside of a bottom bracket.
+      A serial number on the underside of a <em>bottom bracket</em>.
   %li
     = link_to image_tag('serials/serial_fixie.jpg', alt: 'Another standard serial number. Sometime to be replaced with a serial number covered up by routing.'), image_path('serials/serial_fixie.jpg'), class: 'serial-image'
     %p
-      Another serial number beneath the bottom bracket, aligned parallel to the frame.
+      Another serial number beneath the <em>bottom bracket</em>, aligned parallel to the frame.
   %li
     = link_to image_tag('serials/serial_headtube.jpg', alt: 'Schwinn Serial.'), image_path('serials/serial_headtube.jpg'), class: 'serial-image'
     %p
-      Some Schwinn bicycles have the unique identifying number on their head tube (which is on the front of the bike).
-  
+      Some Schwinn bicycles have the unique identifying number (their serial number) on the <em>head tube</em>. This is on the front of the bike.
+
   %li
     = link_to image_tag('serials/serial_pinsch.jpg', alt: 'Doberman dropout serial number'), image_path('serials/serial_pinsch.jpg'), class: 'serial-image'
     %p
-      A serial number located on a rear drop out. Some BMX bikes and a few Schwinn bicycles place the serial on the rear dropout.  On older Schwinns there are numbers stamped on both the drive side and non-drive side rear dropouts; the one on the non-drive side dropout is the serial number.
-
+      A serial number located on a <em>rear dropout</em>. Some BMX bikes and a few Schwinn bicycles place the serial on the rear dropout.  On older Schwinns there are numbers stamped on both the drive side and non-drive side rear dropouts; the one on the non-drive side dropout is the serial number.
 
   %li#fnref-all-bikes-serials
     = link_to image_tag('serials/serial_look.jpg', alt: 'Look serial number'), image_path('serials/serial_look.jpg'), class: 'serial-image'
     %p
-      Some bikes have multiple serial numbers.
+      Some bikes have <em>multiple serial numbers</em>.
       %sup
         %a.footnote-ref{ href: '#fn-second-serial-number' }
           2
       When adding a bike to the Index, it's best to enter all the groups of numbers and letters separated by spaces.
 
 %p
-  Hopefully you can find the serial number on the bicycle you're looking at,
+  Hopefully you can find the serial number on the bicycle you're looking at -
   / # = link_to 'Check out the forum', discuss_url
   email #{link_to 'contact@bikeindex.org', 'mailto:contact@bikeindex.org'}
   if you're having trouble.
+
+%h3.header-font-uncap#searching-bike-index-serials.mt-4
+  Searching serials on Bike Index
+
+%p
+  Finding bicycles by serial number on Bike Index is a <em>critical</em> part of our functionality. When searching for a serial number, use our serial search bar - it's the second bar on #{link_to "our search form", default_bike_search_path}.
+
+= link_to image_tag("serials/serial_search_bar.png", alt: "Serial search input"), default_bike_search_path, class: "serial-search-screenshot"
+
+%p.mt-2{ style: "margin-bottom: 0;" }
+  We've done a few things to make it more likely that you'll find the bike you're looking for.
+
+%ul
+  %li
+    Certain numbers and letters are difficult or impossible to distinguish between (e.g. 0 and O, S and 5). We treat all these numbers the same way - <em>a search for <code>005LLL</code> will match a bike with the serial <code>OOS111</code></em>.
+  %li
+    We split bike serials up by spaces and store each separately. If you see multiple numbers on a bicycle - such as in the photo of the Look bike above - try searching for <strong>just one</strong> of the numbers at a time. Searching for <em>either</em> <code>M4106I9CA1</code> or <code>200910427-2A</code> will find the bike.
+  %li
+    We do close serial matching - bikes with serial numbers that are close to the serial you entered are shown below the matching results under the heading "Serial Numbers Close to ..." - <em>given a search of a serial number with a couple numbers/letters that are different or missing</em>.
+  %li
+    We do not currently do partial serial searches. If you search for <code>1234</code>, you will only find bikes with serial numbers of <code>1234</code> and serials close to that - not a bike with serial number of <code>12345689</code>.
 
 = render '/shared/content_footer_ad'
 
 .footnotes
   %ol
     %li#fn-all-bikes-serials
-      Okay, fine, so 
+      Okay, fine, so
       %em
         maybe
       there are a few bikes without serial numbers, but this is rare and typical only on hand made bikes or really old bicycles.
@@ -67,4 +91,4 @@
         200910427-2A
       is a manufacturer number and not a serial number. However, to make bikes as easy as possible to find, we'd love it if you entered all numbers you encounter.
       %a.footnote-back-link{ href: "#fnref-second-serial-number", title: "Jump back to footnote 2 in the text."}
-        &#8617;    
+        &#8617;
