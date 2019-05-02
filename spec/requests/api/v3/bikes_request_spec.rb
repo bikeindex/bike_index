@@ -114,13 +114,15 @@ describe "Bikes API V3" do
           cycle_type: old_cycle_type.id,
           rear_wheel_size: old_wheel_size,
           front_wheel_size: old_wheel_size,
+          rear_tire_narrow: false,
+          frame_material: "aluminum",
         )
         FactoryBot.create(:ownership, bike: bike1, creator: user, owner_email: user.email)
 
         bike_attrs = {
           serial: bike1.serial_number,
           manufacturer: new_manufacturer.name,
-          rear_tire_narrow: "true",
+          rear_tire_narrow: true,
           front_wheel_bsd: new_front_wheel_size.iso_bsd,
           rear_wheel_bsd: new_rear_wheel_size.iso_bsd,
           color: new_color.name,
@@ -142,6 +144,8 @@ describe "Bikes API V3" do
         expect(bike2["manufacturer_id"]).to eq(old_manufacturer.id)
         expect(bike2["front_wheel_size_iso_bsd"]).to eq(new_front_wheel_size.iso_bsd)
         expect(bike2["rear_wheel_size_iso_bsd"]).to eq(new_rear_wheel_size.iso_bsd)
+        expect(bike2["rear_tire_narrow"]).to eq(true)
+        expect(bike2["frame_material"]).to eq("Steel")
       end
     end
 
