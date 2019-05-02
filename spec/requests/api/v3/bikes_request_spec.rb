@@ -329,9 +329,11 @@ describe "Bikes API V3" do
 
       context "duplicated serial" do
         context "matching email" do
-          it "returns existing bike if no_duplicate set", skip: "Investigating" do
+          it "returns existing bike if authorized by organization" do
             email = bike_attrs[:owner_email]
             bike = FactoryBot.create(:bike, serial_number: bike_attrs[:serial], owner_email: email)
+            bike.organizations << organization
+            bike.save
             ownership = FactoryBot.create(:ownership, bike: bike, owner_email: email)
 
             expect(ownership.claimed).to be_falsey
@@ -343,7 +345,8 @@ describe "Bikes API V3" do
             }.to change(Bike, :count).by 0
 
             result = json_result["bike"]
-            expect(response.code).to eq("201")
+            expect(response.status).to eq(302)
+            expect(response.status_message).to eq("Found")
             expect(result["id"]).to eq bike.id
 
             EmailOwnershipInvitationWorker.drain
