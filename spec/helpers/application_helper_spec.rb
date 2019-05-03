@@ -318,4 +318,32 @@ describe ApplicationHelper do
       end
     end
   end
+
+  describe "group_by_method" do
+    context "hourly" do
+      it "returns group_by_minute" do
+        expect(group_by_method((Time.now - 1.hour)..Time.now)).to eq :group_by_minute
+      end
+    end
+    context "daily" do
+      it "returns group_by_hour" do
+        expect(group_by_method((Time.now - 1.day)..Time.now)).to eq :group_by_hour
+      end
+    end
+    context "weekly" do
+      it "returns group_by_day" do
+        expect(group_by_method((Time.now - 6.days)..Time.now)).to eq :group_by_day
+      end
+    end
+    context "6 months" do
+      it "returns group_by_week" do
+        expect(group_by_method((Time.now - 6.months)..Time.now)).to eq :group_by_week
+      end
+    end
+    context "2 years" do
+      it "returns group_by_month" do
+        expect(group_by_method((Time.now - 2.years)..Time.now)).to eq :group_by_month
+      end
+    end
+  end
 end

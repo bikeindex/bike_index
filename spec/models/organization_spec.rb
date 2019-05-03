@@ -155,11 +155,12 @@ describe Organization do
     end
   end
 
-  describe "organization recoveries" do
+  describe "organization bikes and recoveries" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:bike) { FactoryBot.create(:stolen_bike, creation_organization_id: organization.id) }
     let(:stolen_record) { bike.find_current_stolen_record }
     let!(:bike_organization) { FactoryBot.create(:bike_organization, bike: bike, organization: organization) }
+    let!(:bike_unorganized) { FactoryBot.create(:stolen_bike) }
     let(:recovery_information) do
       {
         recovered_description: "recovered it on a special corner",
@@ -171,6 +172,10 @@ describe Organization do
       organization.reload
       expect(organization.bikes).to eq([bike])
       expect(organization.bikes.stolen).to eq([bike])
+      # Check the inverse lookup
+      expect((Bike.organization(organization))).to eq([bike])
+      expect((Bike.organization(organization.name))).to eq([bike])
+      # Check recovered
       stolen_record.add_recovery_information(recovery_information)
       bike.reload
       expect(bike.stolen_recovery?).to be_truthy

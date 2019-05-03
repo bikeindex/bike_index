@@ -79,6 +79,7 @@ class Bike < ActiveRecord::Base
   # TODO: Rails 5 update - use left_joins method and the text version of enum
   scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 2 }) }
   scope :ascend_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 3 }) }
+  scope :non_example, -> { where(example: false) }
 
   before_save :set_calculated_attributes
 
@@ -146,6 +147,11 @@ class Bike < ActiveRecord::Base
 
     def no_bike_code # This method doesn't accept org_id because Seth got lazy
       includes(:bike_codes).where(bike_codes: { bike_id: nil })
+    end
+
+    def organization(org_or_org_id)
+      organization = org_or_org_id.is_a?(Organization) ? org_or_org_id : Organization.friendly_find(org_or_org_id)
+      includes(:bike_organizations).where(bike_organizations: { organization_id: organization.id })
     end
   end
 
