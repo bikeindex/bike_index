@@ -468,14 +468,15 @@ describe Bike do
     end
   end
 
-  describe "bike_code" do
+  describe "bike_code and no_bike_code" do
     let(:organization1) { FactoryBot.create(:organization) }
     let(:organization2) { FactoryBot.create(:organization) }
     let(:bike1) { FactoryBot.create(:organization_bike, organization: organization1) }
     let(:bike2) { FactoryBot.create(:organization_bike, organization: organization1) }
     let!(:bike3) { FactoryBot.create(:organization_bike, organization: organization1) }
+    let!(:bike4) { FactoryBot.create(:organization_bike, organization: organization2) }
     let!(:bike_code1) { FactoryBot.create(:bike_code_claimed, bike: bike1, organization: organization1) }
-    let!(:bike_code2) { FactoryBot.create(:bike_code_claimed, bike: bike2) }
+    let!(:bike_code2) { FactoryBot.create(:bike_code_claimed, bike: bike2, organization: nil) }
     it "returns appropriately" do
       expect(bike2.bike_code?).to be_truthy
       expect(bike2.bike_code?(organization1.id)).to be_falsey
@@ -486,9 +487,19 @@ describe Bike do
       expect(bike1.bike_code?(organization2.id)).to be_falsey
       # We only accept numerical ids here
       expect(bike1.bike_code?(organization1.slug)).to be_falsey
-      expect(organization.bikes.bike_code.pluck(:id)).to eq([bike_code1.id, bike_code2.id])
-      expect(organization.bikes.bike_code(organization1.id).pluck(:id)).to eq([bike_code1.id])
-      expect(Bike.bike_code(organization1.id).pluck(:id)).to eq([bike_code1.id])
+      # Class method scope/search for bike codes
+      expect(Bike.bike_code.pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(organization1.bikes.pluck(:id)).to match_array([bike1.id, bike2.id, bike3.id])
+      expect(organization1.bikes.bike_code.pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(organization1.bikes.bike_code(organization1.id).pluck(:id)).to eq([bike1.id])
+      expect(organization2.bikes.bike_code.pluck(:id)).to eq([])
+      expect(Bike.bike_code(organization1.id).pluck(:id)).to eq([bike1.id])
+      # And class method scope/search for bikes without code
+      expect(Bike.no_bike_code.pluck(:id)).to match_array([bike3.id, bike4.id])
+      expect(organization1.bikes.no_bike_code.pluck(:id)).to match_array([bike3.id])
+      expect(organization1.bikes.no_bike_code(organization1.id).pluck(:id)).to eq([bike2.id, bike3.id])
+      expect(organization2.bikes.no_bike_code.pluck(:id)).to eq([bike4.id])
+      expect(Bike.no_bike_code(organization1.id).pluck(:id)).to eq([bike2.id])
     end
   end
 

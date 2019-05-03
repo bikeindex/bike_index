@@ -139,8 +139,14 @@ class Bike < ActiveRecord::Base
       where(id: bike_id).first
     end
 
-    def bike_code(organization_id) # This method only accepts numerical org ids
-      includes(:bike_codes).where(bike_: { pos_kind: 2 })
+    def bike_code(organization_id = nil) # This method only accepts numerical org ids
+      return includes(:bike_codes).where.not(bike_codes: { bike_id: nil }) if organization_id.blank?
+      includes(:bike_codes).where(bike_codes: { organization_id: organization_id })
+    end
+
+    def no_bike_code(organization_id = nil) # This method only accepts numerical org ids
+      return includes(:bike_codes).where(bike_codes: { bike_id: nil }) if organization_id.blank?
+      includes(:bike_codes).where(bike_codes: { organization_id: organization_id, bike_id: nil })
     end
   end
 
