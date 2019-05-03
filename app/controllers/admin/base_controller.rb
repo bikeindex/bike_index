@@ -7,19 +7,19 @@ class Admin::BaseController < ApplicationController
     case @period
     when "hour"
       @start_time = Time.now - 1.hour
-    when "day"
-      @start_time = Time.now - 1.day
+    when "week"
+      @start_time = Time.now - 7.days
     when "month"
       @start_time = Time.now - 30.days
     when "all"
       if current_organization.present?
         @start_time = current_organization.created_at
       else
-        @start_time = Time.at(1394146473) # Earliest organization created at
+        @start_time = Time.at(1134972000) # Earliest bike created at
       end
     else
-      @period = "week"
-      @start_time = Time.now - 7.days
+      @period = "day"
+      @start_time = Time.now - 1.day
     end
     @time_range = @start_time..Time.now
   end

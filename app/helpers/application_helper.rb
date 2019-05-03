@@ -149,4 +149,18 @@ module ApplicationHelper
     search_param_keys = params.keys.select { |k| k.to_s.match(/\Asearch_/) }
     params.permit(:direction, :sort, :user_id, :organization_id, :period, *search_param_keys)
   end
+
+  def group_by_method(timeperiod)
+    if timeperiod.last - timeperiod.first < 3601
+      :group_by_minute
+    elsif timeperiod.last - timeperiod.first < 500_000
+      :group_by_hour
+    elsif timeperiod.last - timeperiod.first < 5_000_000 # around 60 days
+      :group_by_day
+    elsif timeperiod.last - timeperiod.first < 30_000_000 # around a year
+      :group_by_week
+    else
+      :group_by_month
+    end
+  end
 end
