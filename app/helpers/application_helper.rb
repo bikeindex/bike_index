@@ -157,7 +157,7 @@ module ApplicationHelper
       :group_by_hour
     elsif timeperiod.last - timeperiod.first < 5_000_000 # around 60 days
       :group_by_day
-    elsif timeperiod.last - timeperiod.first < 30_000_000 # around a year
+    elsif timeperiod.last - timeperiod.first < 32_000_000 # A little over a year
       :group_by_week
     else
       :group_by_month
