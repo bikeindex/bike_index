@@ -72,6 +72,83 @@ describe "Bikes API V3" do
       end
     end
 
+    context "if the bike being created already exists" do
+      it "does not create a new record" do
+        post "/api/v3/bikes?access_token=#{token.token}",
+             bike_attrs.to_json,
+             json_headers
+
+        expect(response.status).to eq(201)
+        expect(response.status_message).to eq("Created")
+        bike1 = json_result["bike"]
+
+        post "/api/v3/bikes?access_token=#{token.token}",
+             bike_attrs.to_json,
+             json_headers
+
+        bike2 = json_result["bike"]
+        expect(response.status).to eq(302)
+        expect(response.status_message).to eq("Found")
+        expect(bike1["id"]).to eq(bike2["id"])
+      end
+
+      it "updates the pre-existing record if the bike has already been registered" do
+        old_color = FactoryBot.create(:color, name: "old_color")
+        new_color = FactoryBot.create(:color, name: "new_color")
+        old_manufacturer = FactoryBot.create(:manufacturer, name: "old_manufacturer")
+        new_manufacturer = FactoryBot.create(:manufacturer, name: "new_manufacturer")
+        old_wheel_size = FactoryBot.create(:wheel_size, name: "old_wheel_size", iso_bsd: 10)
+        new_rear_wheel_size = FactoryBot.create(:wheel_size, name: "new_rear_wheel_size", iso_bsd: 11)
+        new_front_wheel_size = FactoryBot.create(:wheel_size, name: "new_front_wheel_size", iso_bsd: 12)
+        old_cycle_type = CycleType.new("unicycle")
+        new_cycle_type = CycleType.new("tricycle")
+        old_year = 1969
+        new_year = 2001
+        bike1 = FactoryBot.create(
+          :bike,
+          creator: user,
+          owner_email: user.email,
+          year: old_year,
+          manufacturer: old_manufacturer,
+          primary_frame_color: old_color,
+          cycle_type: old_cycle_type.id,
+          rear_wheel_size: old_wheel_size,
+          front_wheel_size: old_wheel_size,
+          rear_tire_narrow: false,
+          frame_material: "aluminum",
+        )
+        FactoryBot.create(:ownership, bike: bike1, creator: user, owner_email: user.email)
+
+        bike_attrs = {
+          serial: bike1.serial_number,
+          manufacturer: new_manufacturer.name,
+          rear_tire_narrow: true,
+          front_wheel_bsd: new_front_wheel_size.iso_bsd,
+          rear_wheel_bsd: new_rear_wheel_size.iso_bsd,
+          color: new_color.name,
+          year: new_year,
+          owner_email: user.email,
+          frame_material: "steel",
+          cycle_type_name: new_cycle_type.slug.to_s,
+        }
+        post "/api/v3/bikes?access_token=#{token.token}",
+             bike_attrs.to_json,
+             json_headers
+
+        bike2 = json_result["bike"]
+        expect(bike2["id"]).to eq(bike1.id)
+        expect(bike2["serial"]).to eq(bike1.serial)
+        expect(bike2["year"]).to eq(new_year)
+        expect(bike2["frame_colors"].first).to eq(new_color.name)
+        expect(bike2["type_of_cycle"]).to eq(new_cycle_type.name)
+        expect(bike2["manufacturer_id"]).to eq(old_manufacturer.id)
+        expect(bike2["front_wheel_size_iso_bsd"]).to eq(new_front_wheel_size.iso_bsd)
+        expect(bike2["rear_wheel_size_iso_bsd"]).to eq(new_rear_wheel_size.iso_bsd)
+        expect(bike2["rear_tire_narrow"]).to eq(true)
+        expect(bike2["frame_material"]).to eq("Steel")
+      end
+    end
+
     it "creates a non example bike, with components and " do
       manufacturer = FactoryBot.create(:manufacturer)
       FactoryBot.create(:ctype, name: "wheel")
@@ -85,7 +162,7 @@ describe "Bikes API V3" do
           component_type: "headset",
           description: "yeah yay!",
           serial_number: "69",
-          model_name: "Richie rich",
+          model: "Richie rich",
         },
         {
           manufacturer: "BLUE TEETH",
@@ -243,19 +320,27 @@ describe "Bikes API V3" do
       end
 
       context "duplicated serial" do
-        let(:bike) { FactoryBot.create(:bike, serial_number: bike_attrs[:serial], owner_email: email) }
-        let(:ownership) { FactoryBot.create(:ownership, bike: bike, owner_email: email) }
-
         context "matching email" do
-          let(:email) { bike_attrs[:owner_email] }
-          it "returns existing bike if no_duplicate set" do
+          it "returns existing bike if authorized by organization" do
+            email = bike_attrs[:owner_email]
+            bike = FactoryBot.create(:bike, serial_number: bike_attrs[:serial], owner_email: email)
+            bike.organizations << organization
+            bike.save
+            ownership = FactoryBot.create(:ownership, bike: bike, owner_email: email)
+
             expect(ownership.claimed).to be_falsey
-            expect do
-              post tokenized_url, bike_attrs.merge(no_duplicate: true).to_json, json_headers
-            end.to change(Bike, :count).by 0
+
+            expect {
+              post tokenized_url,
+                   bike_attrs.merge(no_duplicate: true).to_json,
+                   json_headers
+            }.to change(Bike, :count).by 0
+
             result = json_result["bike"]
-            expect(response.code).to eq("201")
+            expect(response.status).to eq(302)
+            expect(response.status_message).to eq("Found")
             expect(result["id"]).to eq bike.id
+
             EmailOwnershipInvitationWorker.drain
             expect(ActionMailer::Base.deliveries).to be_empty
           end
@@ -264,6 +349,8 @@ describe "Bikes API V3" do
         context "non-matching email" do
           let(:email) { "another_email@example.com" }
           it "creates a bike for organization with v3_accessor" do
+            bike = FactoryBot.create(:bike, serial_number: bike_attrs[:serial], owner_email: email)
+            ownership = FactoryBot.create(:ownership, bike: bike, owner_email: email)
             expect(ownership.claimed).to be_falsey
             expect do
               post tokenized_url, bike_attrs.to_json, json_headers
@@ -368,7 +455,6 @@ describe "Bikes API V3" do
       comp = FactoryBot.create(:component, bike: bike, ctype: headsets)
       comp2 = FactoryBot.create(:component, bike: bike, ctype: wheels)
       not_urs = FactoryBot.create(:component)
-      # pp comp2
       bike.reload
       expect(bike.components.count).to eq(2)
       components = [
@@ -378,7 +464,7 @@ describe "Bikes API V3" do
           component_type: "headset",
           description: "Second component",
           serial_number: "69",
-          model_name: "Richie rich",
+          model: "Sram GXP Eagle",
         }, {
           manufacturer: "BLUE TEETH",
           front_or_rear: "Rear",
@@ -404,6 +490,7 @@ describe "Bikes API V3" do
       expect(bike.year).to eq(params[:year])
       expect(comp2.reload.year).to eq(1999)
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
+      expect(bike.components.map(&:cmodel_name).compact).to eq(["Sram GXP Eagle"])
       expect(bike.components.count).to eq(3)
     end
 

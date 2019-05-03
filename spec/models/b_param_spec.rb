@@ -46,8 +46,40 @@ describe BParam do
         expect(b_param.params["stolen_record"]["phone"]).to eq("171-829-2625")
       end
     end
+
     it "has before_save_callback_method of clean_params" do
       expect(BParam._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:clean_params)).to eq(true)
+    end
+
+    it "cleans params idempotently if invoked multiple times" do
+      wheel_size = FactoryBot.create(:wheel_size, iso_bsd: 559)
+      color = FactoryBot.create(:color, name: "Special_name4")
+      manufacturer = FactoryBot.create(:manufacturer, name: "Special name3")
+      params = {
+        "serial" => "69 non-example",
+        "manufacturer" => manufacturer.name,
+        "owner_email" => "fun_times@examples.com",
+        "color" => color.name,
+        "cycle_type_name" => "bike",
+        "rear_wheel_bsd" => wheel_size.iso_bsd,
+        "rear_tire_narrow" => true,
+        "year" => 1969,
+        "frame_material" => "steel",
+        "is_bulk" => nil,
+        "is_pos" => nil,
+        "is_new" => nil,
+      }
+      b_param = BParam.new(params: params, origin: "api_v2")
+
+      b_param.clean_params
+      clean_params1 = b_param.params
+
+      b_param.clean_params
+      clean_params2 = b_param.params
+
+      expect_hashes_to_match(clean_params2["bike"], clean_params1["bike"])
+      expect(clean_params2["bike"].keys).to match_array(clean_params1["bike"].keys)
+      expect(clean_params2).to eq(clean_params1)
     end
   end
 
