@@ -10,5 +10,11 @@ import "./pages/initializer";
 
 Rails.start();
 
+// And also include chartkick
+import Chartkick from "chartkick";
+window.Chartkick = Chartkick;
+import Chart from "chart.js";
+Chartkick.addAdapter(Chart);
+
 // Add jQuery to the window so it's accessible in the console, and just in general
 window.$ = window.jQuery = jQuery;
