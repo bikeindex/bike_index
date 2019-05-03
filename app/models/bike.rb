@@ -138,6 +138,15 @@ class Bike < ActiveRecord::Base
       end
       where(id: bike_id).first
     end
+
+    def bike_code(organization_id = nil) # This method only accepts numerical org ids
+      return includes(:bike_codes).where.not(bike_codes: { bike_id: nil }) if organization_id.blank?
+      includes(:bike_codes).where(bike_codes: { organization_id: organization_id })
+    end
+
+    def no_bike_code # This method doesn't accept org_id because Seth got lazy
+      includes(:bike_codes).where(bike_codes: { bike_id: nil })
+    end
   end
 
   def cleaned_error_messages # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
@@ -153,7 +162,7 @@ class Bike < ActiveRecord::Base
   def creation_state; creation_states.first end
 
   def creation_description; creation_state&.creation_description end
-  
+
   def bulk_import; creation_state&.bulk_import end
 
   def pos_kind; creation_state&.pos_kind end
@@ -232,6 +241,10 @@ class Bike < ActiveRecord::Base
     return authorize_for_user(u) unless claimable_by?(u)
     current_ownership.mark_claimed
     true
+  end
+
+  def bike_code?(organization_id = nil) # This method only accepts numerical org ids
+    bike_codes.where(organization_id.present? ? { organization_id: organization_id } : {}).any?
   end
 
   def display_contact_owner?(u = nil)
