@@ -124,13 +124,13 @@ jobs:
           command: |
             ./cc-test-reporter sum-coverage --output - codeclimate.*.json | ./cc-test-reporter upload-coverage --debug --input -
 
-  deployment:
-    production:
-      branch: master
-      steps:
-        - run:
-            name: Deploying
-            command: curl -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
+  deploy:
+    steps:
+      - checkout
+      - run:
+          name: Deploying master to Cloud66
+          command: |
+            curl -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
 
 workflows:
   version: 2
@@ -141,4 +141,9 @@ workflows:
       - upload-coverage:
           requires:
             - build
-      - deployment
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
