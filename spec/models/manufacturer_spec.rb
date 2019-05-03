@@ -45,6 +45,11 @@ describe Manufacturer do
       mnfg = FactoryBot.create(:manufacturer, name: "Poopy PANTERS")
       expect(Manufacturer.friendly_find("poopy panters Accell")).to eq(mnfg)
     end
+    context "liv" do
+      it "finds giant" do
+        fail
+      end
+    end
   end
 
   describe "autocomplete_hash" do
