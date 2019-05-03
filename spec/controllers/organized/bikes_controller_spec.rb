@@ -58,7 +58,6 @@ describe Organized::BikesController, type: :controller do
 
   context "logged_in_as_organization_member" do
     include_context :logged_in_as_organization_member
-    let(:organization_bikes) { organization.bikes }
     context "paid organization" do
       before { organization.update_columns(is_paid: true, paid_feature_slugs: %w[bike_search show_recoveries show_partial_registrations bike_codes]) } # Stub organization having paid feature
       describe "index" do
@@ -75,6 +74,7 @@ describe Organized::BikesController, type: :controller do
               stolenness: "stolen",
             }.as_json
           end
+          let(:organization_bikes) { organization.bikes }
           it "sends all the params and renders search template to organization_bikes" do
             session[:passive_organization_id] = "0" # Because, who knows! Maybe they don't have org access at some point.
             get :index, query_params.merge(organization_id: organization.to_param)
@@ -90,11 +90,10 @@ describe Organized::BikesController, type: :controller do
           let!(:bike_code) { FactoryBot.create(:bike_code_claimed, bike: bike_with_sticker) }
           it "searches for bikes with stickers" do
             expect(bike_with_sticker.bike_code?).to be_truthy
-            expect(organization_bikes.pluck(:id).count).to be > 1
             get :index, { organization_id: organization.to_param, search_stickers: "none" }
             expect(response.status).to eq(200)
             expect(assigns(:current_organization)).to eq organization
-            expect(assigns(:search_query_present)).to be_truthy
+            expect(assigns(:search_stickers)).to eq "none"
             expect(assigns(:bikes).pluck(:id)).to eq([])
             expect(session[:passive_organization_id]).to eq organization.id
           end
