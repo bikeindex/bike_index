@@ -1,11 +1,13 @@
 class Admin::BikesController < Admin::BaseController
   include SortableTable
   before_filter :find_bike, only: [:edit, :destroy, :update, :get_destroy]
+  before_action :set_period, only: [:index]
 
   def index
     @page = params[:page] || 1
     per_page = params[:per_page] || 100
-    @bikes = matching_bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(per_page)
+    @render_chart = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:render_chart])
+    @bikes = matching_bikes.includes(:creation_organization, :creation_states, :paint).reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(per_page)
     render layout: "new_admin"
   end
 
@@ -142,14 +144,18 @@ class Admin::BikesController < Admin::BaseController
     return @matching_bikes if defined?(@matching_bikes)
     # Do example scoping up here, because it unscopes
     if current_organization.present?
-      bikes = current_organization.bikes.includes(:creation_organization, :creation_states, :paint)
+      bikes = current_organization.bikes
     else
-      bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint)
+      bikes = Bike.unscoped
     end
     bikes = bikes.non_example if params[:search_non_example].present?
     bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email]
     bikes = bikes.ascend_pos if params[:search_ascend].present?
     bikes = bikes.lightspeed_pos if params[:search_lightspeed].present?
     @matching_bikes = bikes
+  end
+
+  def available_bikes
+    matching_bikes.where(created_at: @time_range)
   end
 end

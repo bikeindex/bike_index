@@ -27,6 +27,8 @@ function BinxAdmin() {
       // Enable bootstrap custom file upload boxes
       binxApp.enableFilenameForUploads();
       LoadFancySelects();
+
+      this.enablePeriodSelection();
     },
 
     changeGraphCalendarBox() {
@@ -92,6 +94,20 @@ function BinxAdmin() {
         );
         event.preventDefault();
         LoadFancySelects();
+      });
+    },
+
+    enablePeriodSelection() {
+      $("#timeSelectionBtnGroup button").on("click", function(e) {
+        let joiner;
+        const period = $(e.target).attr("data-period");
+        const root = location.href.replace(/(\&|\?)period=[^&]*/, "");
+        if (root.match(/\?/)) {
+          joiner = "&";
+        } else {
+          joiner = "?";
+        }
+        return (location.href = `${root}${joiner}period=${period}`);
       });
     }
   };

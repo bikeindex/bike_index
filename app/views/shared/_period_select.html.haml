@@ -1,0 +1,13 @@
+.col-12.mb-2
+  .row.justify-content-end
+    #timeSelectionBtnGroup.col.text-right{ role: "group" }
+      %button.btn.btn-outline-secondary.btn-sm{ class: ("active" if @period == "hour"), data: { period: "hour" } }
+        last hour
+      %button.btn.btn-outline-secondary.btn-sm{ class: ("active" if @period == "day"), data: { period: "day" } }
+        last day
+      %button.btn.btn-outline-secondary.btn-sm{ class: ("active" if @period == "week"), data: { period: "week" } }
+        last 7 days
+      %button.btn.btn-outline-secondary.btn-sm{ class: ("active" if @period == "month"), data: { period: "month" } }
+        last 30 days
+      %button.btn.btn-outline-secondary.btn-sm{ class: ("active" if @period == "all"), data: { period: "all" } }
+        All
