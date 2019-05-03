@@ -1,6 +1,20 @@
-# ![BIKE INDEX](https://github.com/bikeindex/bike_index/blob/master/bike_index.png?raw=true)  [Bike Index](https://www.bikeindex.org) 🚲 [![CircleCI](https://circleci.com/gh/bikeindex/bike_index/tree/master.svg?style=svg)](https://circleci.com/gh/bikeindex/bike_index/tree/master) [![Test Coverage](https://codeclimate.com/github/bikeindex/bike_index/badges/coverage.svg)](https://codeclimate.com/github/bikeindex/bike_index) [![View performance data on Skylight](https://badges.skylight.io/status/j93iQ4K2pxCP.svg)](https://oss.skylight.io/app/applications/j93iQ4K2pxCP)
+![BIKE INDEX][bike-index-logo] [Bike Index][bike-index] 🚲
+==========================================================
 
-![Cloud66 Deployment Status](https://app.cloud66.com/stacks/badge/ff54cf1d55d7eb91ef09c90f125ae4f1.svg)
+[![CircleCI][circleci-badge]][circleci]
+[![Test Coverage][codeclimate-badge]][codeclimate]
+[![View performance data on Skylight][skylight-badge]][skylight]
+![Cloud66 Deployment Status][cloud66-badge]
+
+[bike-index-logo]: https://github.com/bikeindex/bike_index/blob/master/bike_index.png?raw=true
+[circleci]: https://circleci.com/gh/bikeindex/bike_index/tree/master
+[circleci-badge]: https://circleci.com/gh/bikeindex/bike_index/tree/master.svg?style=svg
+[codeclimate]: https://codeclimate.com/github/bikeindex/bike_index
+[codeclimate-badge]: https://codeclimate.com/github/bikeindex/bike_index/badges/coverage.svg
+[skylight]: https://oss.skylight.io/app/applications/j93iQ4K2pxCP
+[skylight-badge]: https://badges.skylight.io/status/j93iQ4K2pxCP.svg
+[bike-index]: https://www.bikeindex.org
+[cloud66-badge]: https://app.cloud66.com/stacks/badge/ff54cf1d55d7eb91ef09c90f125ae4f1.svg
 
 Bike registration that works: online, powerful, free.
 
