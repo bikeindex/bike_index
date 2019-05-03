@@ -85,7 +85,7 @@ jobs:
           name: "eslint"
           command: "yarn lint"
       - run:
-          name: "Jest: Install junit coverage" 
+          name: "Jest: Install junit coverage"
           command: yarn add --dev jest-junit
       - run:
           name: "Jest: Tests"
@@ -124,6 +124,12 @@ jobs:
           command: |
             ./cc-test-reporter sum-coverage --output - codeclimate.*.json | ./cc-test-reporter upload-coverage --debug --input -
 
+  deployment:
+    production:
+      branch: master
+      commands:
+        - curl -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
+
 workflows:
   version: 2
 
@@ -133,3 +139,4 @@ workflows:
       - upload-coverage:
           requires:
             - build
+      - deployment
