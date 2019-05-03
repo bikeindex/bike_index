@@ -1,5 +1,9 @@
-![BIKE INDEX][bike-index-logo] [Bike Index][bike-index] 🚲
-==========================================================
+<p align="center">
+![BIKE INDEX][bike-index-logo]
+</p>
+
+[Bike Index][bike-index] 🚲
+===========================
 
 ![Cloud66 Deployment Status][cloud66-badge]
 [![CircleCI][circleci-badge]][circleci]
