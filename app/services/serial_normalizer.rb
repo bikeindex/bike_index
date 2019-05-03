@@ -4,6 +4,10 @@ class SerialNormalizer
     @bike_id = bike_id
   end
 
+  def serial_unknown_absent_corrected(str)
+    "??"
+  end
+
   def normalized
     return "absent" if @serial.blank? || @serial == "ABSENT"
     normed = @serial.dup
