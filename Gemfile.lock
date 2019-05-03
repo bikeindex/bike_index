@@ -86,7 +86,7 @@ GEM
       mimemagic (>= 0.3.0)
     carrierwave_backgrounder (0.4.2)
       carrierwave (~> 0.5)
-    chartkick (2.0.0)
+    chartkick (3.0.2)
     chunky_png (1.3.6)
     coderay (1.1.2)
     coercible (1.0.0)

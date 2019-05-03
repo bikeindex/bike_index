@@ -51,6 +51,18 @@ describe Bike do
       bike = FactoryBot.create(:bike)
       expect(bike.recovered_records.to_sql).to eq(StolenRecord.unscoped.where(bike_id: bike.id, current: false).order("date_recovered desc").to_sql)
     end
+    context "unknown, absent serials" do
+      let(:bike_with_serial) { FactoryBot.create(:bike, serial_number: "CCcc99FFF") }
+      let(:bike_with_absent_serial) { FactoryBot.create(:bike, serial_number: "aBsent  ") }
+      let(:bike_with_unknown_serial) { FactoryBot.create(:bike, serial_number: "????  \n") }
+      it "corrects poorly entered serial numbers" do
+        [bike_with_serial, bike_with_absent_serial, bike_with_unknown_serial].each { |b| b.reload }
+        expect(bike_with_serial.serial_number).to eq "CCcc99FFF"
+        expect(bike_with_absent_serial.serial_number).to eq "absent"
+        expect(bike_with_unknown_serial.serial_number).to eq "unknown"
+        expect(Bike.with_serial.pluck(:id)).to eq([bike_with_serial.id])
+      end
+    end
     context "actual tests for ascend and lightspeed" do
       let!(:bike_lightspeed_pos) { FactoryBot.create(:bike_lightspeed_pos) }
       let!(:bike_ascend_pos) { FactoryBot.create(:bike_ascend_pos) }
@@ -468,6 +480,43 @@ describe Bike do
     end
   end
 
+  describe "bike_code and no_bike_code" do
+    let(:organization1) { FactoryBot.create(:organization) }
+    let(:organization2) { FactoryBot.create(:organization) }
+    let(:bike1) { FactoryBot.create(:organization_bike, organization: organization1) }
+    let(:bike2) { FactoryBot.create(:organization_bike, organization: organization1) }
+    let!(:bike3) { FactoryBot.create(:organization_bike, organization: organization1) }
+    let!(:bike4) { FactoryBot.create(:organization_bike, organization: organization2) }
+    let!(:bike_code1) { FactoryBot.create(:bike_code_claimed, bike: bike1, organization: organization1) }
+    let!(:bike_code2) { FactoryBot.create(:bike_code_claimed, bike: bike2, organization: nil) }
+    it "returns appropriately" do
+      expect(bike2.bike_code?).to be_truthy
+      expect(bike2.bike_code?(organization1.id)).to be_falsey
+      expect(bike2.bike_code?(organization2.id)).to be_falsey
+      # And with an bike_code with an organization
+      expect(bike1.bike_code?).to be_truthy
+      expect(bike1.bike_code?(organization1.id)).to be_truthy
+      expect(bike1.bike_code?(organization2.id)).to be_falsey
+      # We only accept numerical ids here
+      expect(bike1.bike_code?(organization1.slug)).to be_falsey
+      # Class method scope/search for bike codes
+      expect(Bike.bike_code.pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(organization1.bikes.pluck(:id)).to match_array([bike1.id, bike2.id, bike3.id])
+      expect(organization1.bikes.bike_code.pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(organization1.bikes.bike_code(organization1.id).pluck(:id)).to eq([bike1.id])
+      expect(organization2.bikes.bike_code.pluck(:id)).to eq([])
+      expect(Bike.bike_code(organization1.id).pluck(:id)).to eq([bike1.id])
+      # And class method scope/search for bikes without code
+      expect(Bike.no_bike_code.pluck(:id)).to match_array([bike3.id, bike4.id])
+      expect(organization1.bikes.no_bike_code.pluck(:id)).to match_array([bike3.id])
+      # I got lazy on implementing this. We don't really need to pass organization_id in, and I couldn't figure out the join,
+      # So I just skipped it. Leaving these specs just in case this becomes a thing we need - Seth
+      # expect(organization1.bikes.no_bike_code(organization1.id).pluck(:id)).to eq([bike2.id, bike3.id])
+      # expect(organization2.bikes.no_bike_code.pluck(:id)).to eq([bike4.id])
+      # expect(Bike.no_bike_code(organization1.id).pluck(:id)).to eq([bike2.id])
+    end
+  end
+
   describe "find_current_stolen_record" do
     it "returns the last current stolen record if bike is stolen" do
       @bike = Bike.new
@@ -556,7 +605,7 @@ describe Bike do
       bike = Bike.new(serial_number: " UNKNOWn ")
       expect_any_instance_of(SerialNormalizer).to receive(:normalized).and_return("normal")
       bike.normalize_attributes
-      expect(bike.serial_number).to eq("absent")
+      expect(bike.serial_number).to eq("unknown")
       expect(bike.serial_normalized).to eq("normal")
     end
     it "sets normalized owner email" do

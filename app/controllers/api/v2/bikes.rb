@@ -73,8 +73,7 @@ module API
             is_bulk: params[:is_bulk],
             is_pos: params[:is_pos],
             is_new: params[:is_new],
-            no_duplicate: params[:no_duplicate],
-          }
+          }.as_json
         end
 
         def find_bike
@@ -139,15 +138,54 @@ module API
           end
         end
         post "/", serializer: BikeV2ShowSerializer, root: "bike" do
-          declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
-          b_param = BParam.create(creator_id: creation_user_id, params: declared_p["declared_params"], origin: "api_v2")
-          ensure_required_stolen_attrs(b_param.params)
-          bike = BikeCreator.new(b_param).create_bike
-          if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
-            bike
-          else
-            e = bike.present? ? bike.errors : b_param.errors
-            error!(e.full_messages.to_sentence, 401)
+          # Search for a bike matching the provided serial number / owner email
+          bike_attrs = %w{serial owner_email}.map { |key| [key.to_sym, params[key]] }.to_h
+          found_bike = BikeFinder.find_matching(**bike_attrs)
+
+          # bike was not found, create it
+          if found_bike.blank?
+            # prepare params
+            declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
+            b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
+            b_param.clean_params
+            ensure_required_stolen_attrs(b_param.params)
+            b_param.save
+
+            bike = BikeCreator.new(b_param).create_bike
+
+            if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
+              return bike
+            else
+              e = bike.present? ? bike.errors : b_param.errors
+              return error!(e.full_messages.to_sentence, 401)
+            end
+          end
+
+          # bike was found, update instead of creating
+          if found_bike.present?
+            # prepare params
+            declared_p = { "declared_params" => declared(params, include_missing: false) }
+            b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
+            b_param.clean_params
+            ensure_required_stolen_attrs(b_param.params)
+
+            @bike = found_bike
+            authorize_bike_for_user
+
+            if b_param.params.dig("bike", "external_image_urls").present?
+              @bike.load_external_images(b_param.params["bike"]["external_image_urls"])
+            end
+
+            begin
+              BikeUpdator
+                .new(user: current_user, bike: @bike, b_params: b_param.params)
+                .update_available_attributes
+            rescue => e
+              error!("Unable to update bike: #{e}", 401)
+            end
+
+            status :found
+            return @bike.reload
           end
         end
 
@@ -174,7 +212,9 @@ module API
           declared_p = { "declared_params" => declared(params, include_missing: false) }
           find_bike
           authorize_bike_for_user
-          hash = BParam.v2_params(declared_p["declared_params"].as_json)
+          b_param = BParam.new(params: declared_p["declared_params"].as_json, origin: "api_v2")
+          b_param.clean_params
+          hash = b_param.params
           ensure_required_stolen_attrs(hash) if hash["stolen_record"].present? && @bike.stolen != true
           @bike.load_external_images(hash["bike"]["external_image_urls"]) if hash.dig("bike", "external_image_urls").present?
           begin

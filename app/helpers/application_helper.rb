@@ -111,7 +111,7 @@ module ApplicationHelper
     new_object = f.object.send(association).klass.new
     id = new_object.object_id
     fields = f.fields_for(association, new_object, child_index: id) do |builder|
-      render("/bikes/bike_fields/revised_component_fields", f: builder, ctype_id: Ctype.unknown.id)
+      render("/bikes/bike_fields/revised_component_fields", f: builder, ctype_id: Ctype.other.id)
     end
     text = "<span class='context-display-help'>+</span>#{name}"
     link_to(text.html_safe, "#", class: "add_fields", data: { id: id, fields: fields.gsub("\n", "") })
@@ -147,6 +147,20 @@ module ApplicationHelper
 
   def sortable_search_params
     search_param_keys = params.keys.select { |k| k.to_s.match(/\Asearch_/) }
-    params.permit(:direction, :sort, :user_id, :organization_id, *search_param_keys)
+    params.permit(:direction, :sort, :user_id, :organization_id, :period, :render_chart, *search_param_keys)
+  end
+
+  def group_by_method(timeperiod)
+    if timeperiod.last - timeperiod.first < 3601
+      :group_by_minute
+    elsif timeperiod.last - timeperiod.first < 500_000
+      :group_by_hour
+    elsif timeperiod.last - timeperiod.first < 5_000_000 # around 60 days
+      :group_by_day
+    elsif timeperiod.last - timeperiod.first < 32_000_000 # A little over a year
+      :group_by_week
+    else
+      :group_by_month
+    end
   end
 end

@@ -27,6 +27,8 @@ function BinxAdmin() {
       // Enable bootstrap custom file upload boxes
       binxApp.enableFilenameForUploads();
       LoadFancySelects();
+
+      this.enablePeriodSelection();
     },
 
     changeGraphCalendarBox() {
@@ -91,28 +93,21 @@ function BinxAdmin() {
             .replace(regexp, time)
         );
         event.preventDefault();
-        const us_val = parseInt($("#us-country-code").text(), 10);
-        for (let location of Array.from(
-          $(this)
-            .closest("fieldset")
-            .find(".country_select_container select")
-        )) {
-          const l = $(location);
-          if (!(l.val().length > 0)) {
-            l.val(us_val);
-          }
-        }
-        const names = $(this)
-          .closest("fieldset")
-          .find(".location-name-field input");
-        for (let name of Array.from(names)) {
-          const n = $(name);
-          if (!(n.val().length > 0)) {
-            n.val($("#organization_name").val());
-          }
-        }
-
         LoadFancySelects();
+      });
+    },
+
+    enablePeriodSelection() {
+      $("#timeSelectionBtnGroup button").on("click", function(e) {
+        let joiner;
+        const period = $(e.target).attr("data-period");
+        const current_url = location.href.replace(/&?period=[^&]*/, "");
+        if (current_url.match(/\?/)) {
+          joiner = "&";
+        } else {
+          joiner = "?";
+        }
+        return (location.href = `${current_url}${joiner}period=${period}`);
       });
     }
   };
