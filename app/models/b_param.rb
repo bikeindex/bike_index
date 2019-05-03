@@ -20,8 +20,8 @@ class BParam < ActiveRecord::Base
 
   def self.v2_params(hash)
     h = hash["bike"].present? ? hash : { "bike" => hash.with_indifferent_access }
-    h["bike"]["serial_number"] ||= h["bike"].delete "serial"
     # Only assign if the key hasn't been assigned - since it's boolean, can't use conditional assignment
+    h["bike"]["serial_number"] = h["bike"].delete "serial" if h["bike"].key?("serial")
     h["bike"]["send_email"] = !(h["bike"].delete "no_notify") unless h["bike"].key?("send_email")
     org = Organization.friendly_find(h["bike"].delete "organization_slug")
     h["bike"]["creation_organization_id"] = org.id if org.present?
