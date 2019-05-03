@@ -64,7 +64,7 @@ class Admin::ManufacturersController < Admin::BaseController
     %w[name created_at frame_maker]
   end
 
-  def default_direction # So it can be overridden
+  def default_direction
     "asc"
   end
 
