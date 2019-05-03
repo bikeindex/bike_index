@@ -1,10 +1,10 @@
 ![BIKE INDEX][bike-index-logo] [Bike Index][bike-index] 🚲
 ==========================================================
 
+![Cloud66 Deployment Status][cloud66-badge]
 [![CircleCI][circleci-badge]][circleci]
 [![Test Coverage][codeclimate-badge]][codeclimate]
 [![View performance data on Skylight][skylight-badge]][skylight]
-![Cloud66 Deployment Status][cloud66-badge]
 
 [bike-index-logo]: https://github.com/bikeindex/bike_index/blob/master/bike_index.png?raw=true
 [circleci]: https://circleci.com/gh/bikeindex/bike_index/tree/master
