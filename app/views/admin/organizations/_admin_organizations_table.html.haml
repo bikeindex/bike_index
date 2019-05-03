@@ -28,27 +28,28 @@
         Locations
     %tbody
       - @organizations.each do |organization|
-        - next if organization.deleted_at.present?
-        %tr
-          %td
-            = link_to organization.name, admin_organization_url(organization)
-            %small.less-strong
-              = "paid" if organization.is_paid
-          %td.table-cell-check
-            = "&#x2713;".html_safe if organization.approved
-          %td
-            %span.convertTime
-              = l organization.created_at, format: :convert_time
-          %td
-            = organization.bikes.count
-          %td
-            = organization.memberships.count
-          %td
-            = link_to organization.kind.humanize, admin_organizations_path(kind: organization.kind)
-          %td
-            .less-strong-hold
+        - cache(organization) do
+          - next if organization.deleted_at.present?
+          %tr
+            %td
+              = link_to organization.name, admin_organization_url(organization)
+              %small.less-strong
+                = "paid" if organization.is_paid
+            %td.table-cell-check
+              = "&#x2713;".html_safe if organization.approved
+            %td
+              %span.convertTime
+                = l organization.created_at, format: :convert_time
+            %td
+              = organization.bikes.count
+            %td
+              = organization.memberships.count
+            %td
+              = link_to organization.kind.humanize, admin_organizations_path(kind: organization.kind)
+            %td
+              .less-strong-hold
 
-              = organization.locations.count
-              - if organization.show_on_map
-                %span.less-strong-right
-                  Mapped
+                = organization.locations.count
+                - if organization.show_on_map
+                  %span.less-strong-right
+                    Mapped

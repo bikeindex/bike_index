@@ -53,9 +53,9 @@ class Bike < ActiveRecord::Base
   validates_presence_of :primary_frame_color_id
 
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications,
-    :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
-    :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
-    :b_param_id_token, :address, :address_city, :address_state, :address_zipcode
+                :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
+                :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
+                :b_param_id_token, :address, :address_city, :address_state, :address_zipcode
 
   attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
 
@@ -79,6 +79,7 @@ class Bike < ActiveRecord::Base
   # TODO: Rails 5 update - use left_joins method and the text version of enum
   scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 2 }) }
   scope :ascend_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 3 }) }
+  scope :non_example, -> { where(example: false) }
 
   before_save :set_calculated_attributes
 
@@ -90,9 +91,9 @@ class Bike < ActiveRecord::Base
                               }
 
   pg_search_scope :admin_search,
-    against: { owner_email: "A" },
-    associated_against: { ownerships: :owner_email, creator: :email },
-    using: { tsearch: { dictionary: "english", prefix: true } }
+                  against: { owner_email: "A" },
+                  associated_against: { ownerships: :owner_email, creator: :email },
+                  using: { tsearch: { dictionary: "english", prefix: true } }
 
   class << self
     def old_attr_accessible
@@ -138,6 +139,20 @@ class Bike < ActiveRecord::Base
       end
       where(id: bike_id).first
     end
+
+    def bike_code(organization_id = nil) # This method only accepts numerical org ids
+      return includes(:bike_codes).where.not(bike_codes: { bike_id: nil }) if organization_id.blank?
+      includes(:bike_codes).where(bike_codes: { organization_id: organization_id })
+    end
+
+    def no_bike_code # This method doesn't accept org_id because Seth got lazy
+      includes(:bike_codes).where(bike_codes: { bike_id: nil })
+    end
+
+    def organization(org_or_org_id)
+      organization = org_or_org_id.is_a?(Organization) ? org_or_org_id : Organization.friendly_find(org_or_org_id)
+      includes(:bike_organizations).where(bike_organizations: { organization_id: organization.id })
+    end
   end
 
   def cleaned_error_messages # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
@@ -153,7 +168,7 @@ class Bike < ActiveRecord::Base
   def creation_state; creation_states.first end
 
   def creation_description; creation_state&.creation_description end
-  
+
   def bulk_import; creation_state&.bulk_import end
 
   def pos_kind; creation_state&.pos_kind end
@@ -199,7 +214,11 @@ class Bike < ActiveRecord::Base
   def first_ownership; ownerships.reorder(:id).first end
 
   def organized?(org = nil)
-    org.present? ? bike_organization_ids.include?(org.id) : bike_organizations.any?
+    if org.present?
+      bike_organization_ids.include?(org.id)
+    else
+      bike_organizations.any?
+    end
   end
 
   # check if this is the first ownership - or if no owner, which means testing probably
@@ -232,6 +251,10 @@ class Bike < ActiveRecord::Base
     return authorize_for_user(u) unless claimable_by?(u)
     current_ownership.mark_claimed
     true
+  end
+
+  def bike_code?(organization_id = nil) # This method only accepts numerical org ids
+    bike_codes.where(organization_id.present? ? { organization_id: organization_id } : {}).any?
   end
 
   def display_contact_owner?(u = nil)

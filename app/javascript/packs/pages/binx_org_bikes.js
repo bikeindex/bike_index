@@ -1,3 +1,5 @@
+import log from "../utils/log";
+
 function BinxOrgBikes() {
   return {
     init() {
@@ -30,9 +32,19 @@ function BinxOrgBikes() {
         "color_cell",
         "owner_email_cell"
       ];
-      let stored = localStorage.getItem("organizationBikeColumns");
+      let visibleCells = localStorage.getItem("organizationBikeColumns");
       // If we have stored cells, select them. Otherwise,
-      let visibleCells = !stored ? defaultCells : JSON.parse(stored);
+      if (typeof visibleCells === "undefined") {
+        visibleCells = defaultCells;
+      } else {
+        if (typeof visibleCells == "string") {
+          visibleCells = JSON.parse(visibleCells);
+        }
+        if (visibleCells.length < 1) {
+          visibleCells = defaultCells;
+        }
+      }
+
       visibleCells.forEach(cellClass =>
         $(`input#${cellClass}`).prop("checked", true)
       );
