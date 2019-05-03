@@ -9,7 +9,7 @@
         - all_active = !@unknown && (sortable_search_params.keys - all_ignored_params).blank?
         = link_to "All", admin_bikes_path(sortable_search_params.slice(*all_ignored_params)), class: "nav-link #{all_active ? 'active' : ''}"
       %li.nav-item
-        = link_to "Unknown Manufacturers", missing_manufacturer_admin_bikes_path, class: "nav-link #{@unknown ? 'active' : ''}"
+        = link_to "Unknown Mnfgs", missing_manufacturer_admin_bikes_path, class: "nav-link #{@unknown ? 'active' : ''}"
       %li.nav-item
         - stolen_active = params[:search_stolen].present?
         = link_to "stolen", admin_bikes_path(sortable_search_params.merge(search_stolen: stolen_active ? nil : true)), class: "nav-link #{stolen_active ? 'active' : ''}"
