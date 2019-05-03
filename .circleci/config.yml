@@ -124,14 +124,14 @@ jobs:
           command: |
             ./cc-test-reporter sum-coverage --output - codeclimate.*.json | ./cc-test-reporter upload-coverage --debug --input -
 
-  deploy:
+  deploy_production:
     machine:
       enabled: true
     working_directory: ~/bikeindex/bike_index
     steps:
       - checkout
       - run:
-          name: Deploying master to Cloud66
+          name: Deploying to Cloud66 production
           command: |
             curl -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
 
@@ -144,7 +144,7 @@ workflows:
       - upload-coverage:
           requires:
             - build
-      - deploy:
+      - deploy_production:
           requires:
             - build
           filters:
