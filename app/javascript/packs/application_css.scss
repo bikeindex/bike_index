@@ -13,10 +13,6 @@ footer.primary-footer {
   display: none;
 }
 
-#admin-bike-box img {
-  height: 150px;
-  width: 150px;
-}
 .admin-navbar {
   @include media-breakpoint-up(md) {
     position: -webkit-sticky;
@@ -47,4 +43,3 @@ footer.primary-footer {
     @extend .col-12;
   }
 }
-
