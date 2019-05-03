@@ -55,6 +55,42 @@ describe "Bikes API V2" do
       expect(response.code).to eq("403")
     end
 
+    context "special error" do
+      let!(:color) { FactoryBot.create(:color, name: "White") }
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
+      let(:organization) { FactoryBot.create(:organization, name: "Pro's Closet", short_name: "tpc") }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:bike_attrs) do
+        {
+          serial: "WTU171G0193G",
+          manufacturer: "Trek",
+          description: "2012 Trek Superfly 100 AL Elite Mountain Bike 19in 29\" Alloy Shimano XT 10s Fox",
+          year: "2012",
+          frame_material: "aluminum",
+          owner_email: "developers@example.com",
+          color: "white",
+          frame_model: "Superfly 100 AL Elite",
+          access_token: token.token,
+          organization_slug: "TPC",
+          external_image_urls: ["https://s3-us-west-2.amazonaws.com/theproscloset-img/BMT12479_BJ_01.jpg", "https://s3-us-west-2.amazonaws.com/theproscloset-img/BMT12479_BJ_02.jpg"],
+          no_notify: true,
+
+        }
+      end
+      it "creates" do
+        expect do
+          post "/api/v2/bikes?access_token=#{token.token}",
+               bike_attrs.to_json,
+               json_headers
+          pp json_result
+        end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
+        expect(response.code).to eq("201")
+        result = json_result["bike"]
+        expect(result["frame_material"]).to eq "aluminum"
+        expect(result["serial"]).to eq bike_attrs["serial"]
+      end
+    end
+
     it "creates a non example bike, with components" do
       manufacturer = FactoryBot.create(:manufacturer)
       FactoryBot.create(:ctype, name: "wheel")

@@ -12,6 +12,7 @@ class BikeCreator
       year: @b_param.bike["year"],
       frame_model: @b_param.bike["frame_model"],
     })
+
     return true unless bb_data && bb_data["bike"].present?
     @b_param.params["bike"]["cycle_type"] = bb_data["bike"]["cycle_type"] if bb_data["bike"] && bb_data["bike"]["cycle_type"].present?
     if bb_data["bike"]["paint_description"].present?
@@ -87,7 +88,9 @@ class BikeCreator
   end
 
   def create_bike
+    # pp @b_param.bike["serial_number"]
     add_bike_book_data
+    # pp @b_param.bike["serial_number"], "BELOWWWWW"
     @bike = build_bike
     return @bike if @bike.errors.present?
     save_bike(@bike)
