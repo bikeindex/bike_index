@@ -11,11 +11,14 @@
       %li.nav-item
         = link_to "Unknown Manufacturers", missing_manufacturer_admin_bikes_path, class: "nav-link #{@unknown ? 'active' : ''}"
       %li.nav-item
+        - stolen_active = params[:search_stolen].present?
+        = link_to "stolen", admin_bikes_path(sortable_search_params.merge(search_stolen: stolen_active ? nil : true)), class: "nav-link #{stolen_active ? 'active' : ''}"
+      %li.nav-item
         - example_active = params[:search_example].present?
-        = link_to "example", admin_bikes_path(sortable_search_params.merge(search_non_example: nil, search_example: true)), class: "nav-link #{example_active ? 'active' : ''}"
+        = link_to "example", admin_bikes_path(sortable_search_params.merge(search_non_example: nil, search_example: example_active ? nil : true)), class: "nav-link #{example_active ? 'active' : ''}"
       %li.nav-item
         - non_example_active = params[:search_non_example].present?
-        = link_to "non-example", admin_bikes_path(sortable_search_params.merge(search_example: nil, search_non_example: true)), class: "nav-link #{non_example_active ? 'active' : ''}"
+        = link_to "non-example", admin_bikes_path(sortable_search_params.merge(search_example: nil, search_non_example: non_example_active ? nil : true)), class: "nav-link #{non_example_active ? 'active' : ''}"
       %li.nav-item
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (@pos_search_type.present? ? "active" : "") }
           - if @pos_search_type.present?
@@ -23,13 +26,16 @@
           - else
             POS
         .dropdown-menu
-          = link_to "Ascend", admin_bikes_path(sortable_search_params.merge(search_pos: "ascend_pos")), class: "dropdown-item #{@pos_search_type == 'ascend_pos' ? 'active' : ''}"
-          = link_to "Lightspeed", admin_bikes_path(sortable_search_params.merge(search_pos: "lightspeed_pos")), class: "dropdown-item #{@pos_search_type == 'lightspeed_pos' ? 'active' : ''}"
+          - ascend_active = @pos_search_type == "ascend_pos"
+          = link_to "Ascend", admin_bikes_path(sortable_search_params.merge(search_pos: ascend_active ? nil : "ascend_pos")), class: "dropdown-item #{ascend_active ? 'active' : ''}"
+          - lightspeed_active = @pos_search_type == "lightspeed_pos"
+          = link_to "Lightspeed", admin_bikes_path(sortable_search_params.merge(search_pos: lightspeed_active ? nil : "lightspeed_pos")), class: "dropdown-item #{lightspeed_active ? 'active' : ''}"
           .dropdown-divider
-          = link_to "Any POS", admin_bikes_path(sortable_search_params.merge(search_pos: "any_pos")), class: "dropdown-item #{@pos_search_type == 'pos' ? 'active' : ''}"
-          = link_to admin_bikes_path(sortable_search_params.merge(search_pos: "not_pos")), class: "dropdown-item #{@pos_search_type == 'not_pos' ? 'active' : ''}" do
+          - any_pos_active = @pos_search_type == "any_pos"
+          = link_to "Any POS", admin_bikes_path(sortable_search_params.merge(search_pos: any_pos_active ? nil : "any_pos")), class: "dropdown-item #{any_pos_active ? 'active' : ''}"
+          - not_pos_active = @pos_search_type == "not_pos"
+          = link_to admin_bikes_path(sortable_search_params.merge(search_pos: not_pos_active ? nil : "not_pos")), class: "dropdown-item #{not_pos_active ? 'active' : ''}" do
             <strong>Not</strong> POS
-          = link_to "Clear POS search", admin_bikes_path(sortable_search_params.merge(search_pos: nil)), class: "dropdown-item #{@pos_search_type.blank? ? 'active' : ''}"
 
       / <a class="dropdown-item" href="#">Separated link</a>
       /   = link_to "Ascend", admin_bikes_path(sortable_search_params.merge(search_lightspeed: nil, search_ascend: true)), class: "nav-link #{params[:search_ascend].present? ? 'active' : ''}"
