@@ -605,7 +605,7 @@ describe Bike do
       bike = Bike.new(serial_number: " UNKNOWn ")
       expect_any_instance_of(SerialNormalizer).to receive(:normalized).and_return("normal")
       bike.normalize_attributes
-      expect(bike.serial_number).to eq("absent")
+      expect(bike.serial_number).to eq("unknown")
       expect(bike.serial_normalized).to eq("normal")
     end
     it "sets normalized owner email" do
