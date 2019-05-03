@@ -29,7 +29,7 @@
 %hr{ style: "opacity: .3;" }
 
 %p.mt-4
-  - if @search_query_present
+  - if @search_query_present || params[:search_stickers].present?
     %strong
       = number_with_delimiter(@bikes.total_count)
       = "bike".pluralize(@bikes.total_count)
@@ -112,7 +112,7 @@
                   - if @search_stickers == "with"
                     only with
                   - if @search_stickers == "none"
-                    only no sticker
+                    only not
 
 
         / I don't know how to do this in a performant way :/

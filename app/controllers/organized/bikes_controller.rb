@@ -60,7 +60,9 @@ module Organized
       @search_stickers = false
       if params[:search_stickers].present?
         @search_stickers = params[:search_stickers] == "none" ? "none" : "with"
-        # bikes = @search_stickers == "none" ? bikes.bike_codes()
+        bikes = @search_stickers == "none" ? bikes.no_bike_code : bikes.bike_code
+      else
+        @search_stickers = false
       end
       @bikes = bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(@per_page)
       if @interpreted_params[:serial]

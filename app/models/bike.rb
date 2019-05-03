@@ -144,9 +144,8 @@ class Bike < ActiveRecord::Base
       includes(:bike_codes).where(bike_codes: { organization_id: organization_id })
     end
 
-    def no_bike_code(organization_id = nil) # This method only accepts numerical org ids
-      return includes(:bike_codes).where(bike_codes: { bike_id: nil }) if organization_id.blank?
-      includes(:bike_codes).where(bike_codes: { organization_id: organization_id, bike_id: nil })
+    def no_bike_code # This method doesn't accept org_id because Seth got lazy
+      includes(:bike_codes).where(bike_codes: { bike_id: nil })
     end
   end
 
