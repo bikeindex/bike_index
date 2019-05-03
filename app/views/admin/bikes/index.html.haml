@@ -52,7 +52,14 @@
   - if @render_chart
     .col-12.mt-2
       = line_chart available_bikes.send(group_by_method(@time_range), "bikes.created_at").count, curve: false
-      = render partial: "/shared/period_select"
+    .col-12.mb-2.mt-2
+      .row.justify-content-end
+        .col-2
+          %p
+            %em.small.less-strong
+              = number_with_delimiter(available_bikes.count)
+              charted
+        = render partial: "/shared/period_select"
 
 
 - if all_active
