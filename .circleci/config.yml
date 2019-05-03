@@ -127,8 +127,10 @@ jobs:
   deployment:
     production:
       branch: master
-      commands:
-        - curl -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
+      steps:
+        - run:
+            name: Deploying
+            command: curl -X POST -d "" https://hooks.cloud66.com/stacks/redeploy/${CLOUD66_REDEPLOYMENT_PATH}
 
 workflows:
   version: 2
