@@ -1,10 +1,10 @@
 
 %li#admin-bike-partial
   .row.align-items-end
-    .col-md-3.col-sm-4.col-xs-6
+    .col-3
       - if bike.thumb_path.present?
         %img{:alt => bike.title, src: bike.thumb_path}
-    .col-md-9.col-sm-8.col-xs-6
+    .col-9
       %h3.mb-0
         = link_to bike.title_string, bike.list_link_url(target)
       %table.table-list.mb-0
