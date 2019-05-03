@@ -88,9 +88,7 @@ class BikeCreator
   end
 
   def create_bike
-    # pp @b_param.bike["serial_number"]
     add_bike_book_data
-    # pp @b_param.bike["serial_number"], "BELOWWWWW"
     @bike = build_bike
     return @bike if @bike.errors.present?
     save_bike(@bike)

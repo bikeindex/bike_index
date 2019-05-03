@@ -1,0 +1,68 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: http://bikebook.io/?frame_model=superfly_100_al_elite&manufacturer=trek&year=2012
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: 'OK '
+    headers:
+      Connection:
+      - keep-alive
+      Content-Type:
+      - application/json;charset=utf-8
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Headers:
+      - Origin, X-Requested-With, Content-Type, Accept, Authorization
+      Access-Control-Allow-Methods:
+      - GET, OPTIONS
+      Access-Control-Request-Method:
+      - "*"
+      Content-Length:
+      - '2397'
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - WEBrick/1.3.1 (Ruby/2.1.0/2013-12-25)
+      Date:
+      - Fri, 03 May 2019 21:24:50 GMT
+      Via:
+      - 1.1 vegur
+    body:
+      encoding: UTF-8
+      string: '{"bike":{"frame_model":"Superfly 100 AL Elite","manufacturer":"Trek","year":2012,"description":"Alpha
+        Platinum Aluminum main frame & stays w/ABP Convert, magnesium swing link,
+        G2 Geometry, E2 tapered head tube, replaceable derailleur hanger, 110mm travel","paint_description":["Crystal
+        Pearl White"],"manufacturers_url":"http://www.trekbikes.com/us/en/bikes/2012/archive/trek/superfly_100_al_elite/#","rear_wheel_bsd":622,"rear_tire_narrow":"false","stock_photo_url":"https://bikebook.s3.amazonaws.com/uploads/Fr/775/21491","stock_photo_small":"https://bikebook.s3.amazonaws.com/uploads/Fr/775/medium_21491"},"components":[{"component_type":"wheel","description":"Bontrager
+        28-hole FCC alloy front hub, Shimano M525 SL 32-hole alloy rear hub; Bontrager
+        Mustang Disc 29 rims, Tubeless Ready","front_or_rear":"both","cgroup":"Wheels"},{"component_type":"tire","description":"Bontrager
+        29-1 Expert, 29x2.2\"","front_or_rear":"both","cgroup":"Wheels"},{"component_type":"shifter","description":"Shimano
+        SLX M660-10, 10 speed","front_or_rear":"both","cgroup":"Drivetrain and brakes"},{"component_type":"derailleur","description":"Shimano
+        SLX, direct mount","front_or_rear":"front","cgroup":"Drivetrain and brakes"},{"component_type":"derailleur","description":"Shimano
+        Deore XT M780 Shadow","front_or_rear":"rear","cgroup":"Drivetrain and brakes"},{"component_type":"crankset","description":"Shimano
+        M552, 42/32/24","cgroup":"Drivetrain and brakes"},{"component_type":"cog/cassette/freewheel","description":"Shimano
+        HG62-10 11-36, 10 speed","cgroup":"Drivetrain and brakes"},{"component_type":"saddle","description":"Bontrager
+        Evoke 2, chromoly rails","cgroup":"Additional parts"},{"component_type":"seatpost","description":"Bontrager
+        Rhythm Elite, 31.6mm, zero offset","cgroup":"Additional parts"},{"component_type":"handlebar","description":"Bontrager
+        Race Lite Low Riser, 31.8mm, 5mm rise, 9 degree sweep","cgroup":"Additional
+        parts"},{"component_type":"stem","description":"Bontrager Race Lite, 31.8mm","cgroup":"Additional
+        parts"},{"component_type":"headset","description":"FSA NO.57, E2, ACB sealed
+        bearings","cgroup":"Frame and fork"},{"component_type":"brake","description":"Shimano
+        M666 SLX hydraulic disc brakes","front_or_rear":"both","cgroup":"Drivetrain
+        and brakes"},{"component_type":"other","description":"Trek fork & shock sag
+        meter, Bontrager shock pump","cgroup":"Additional parts"}]}'
+    http_version: 
+  recorded_at: Fri, 03 May 2019 21:24:50 GMT
+recorded_with: VCR 4.0.0
