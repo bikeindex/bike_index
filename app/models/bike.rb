@@ -81,7 +81,7 @@ class Bike < ActiveRecord::Base
   scope :ascend_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 3 }) }
   scope :any_pos, -> { includes(:creation_states).where.not(creation_states: { pos_kind: 0 }) }
   scope :not_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 0 }) }
-  scope :example, -> { where(example: false) }
+  scope :example, -> { where(example: true) }
   scope :non_example, -> { where(example: false) }
 
   before_save :set_calculated_attributes
