@@ -1,9 +1,10 @@
 class Admin::ManufacturersController < Admin::BaseController
+  include SortableTable
   before_filter :find_manufacturer, only: [:edit, :update, :destroy, :show]
   layout "new_admin"
 
   def index
-    @manufacturers = Manufacturer.all
+    @manufacturers = Manufacturer.reorder("manufacturers.#{sort_column} #{sort_direction}")
   end
 
   def show
@@ -58,6 +59,14 @@ class Admin::ManufacturersController < Admin::BaseController
   end
 
   protected
+
+  def sortable_columns
+    %w[name created_at frame_maker]
+  end
+
+  def default_direction # So it can be overridden
+    "asc"
+  end
 
   def permitted_parameters
     params.require(:manufacturer).permit(:name, :slug, :website, :frame_maker, :total_years_active, :notes, :open_year, :close_year, :logo, :description, :logo_source)
