@@ -72,7 +72,7 @@
           %td.d-none.d-sm-table-cell
             .less-strong-hold
               - if bike.creation_organization.present?
-                = link_to bike.creation_organization.name, admin_bikes_path(organization_id: bike.creation_organization.to_param)
+                = link_to bike.creation_organization.name, admin_bikes_path(sortable_search_params.merge(organization_id: bike.creation_organization.to_param))
               - if bike.creation_description
                 %span.less-strong-right
                   - if bike.bulk_import.present?

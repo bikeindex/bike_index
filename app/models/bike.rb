@@ -148,6 +148,11 @@ class Bike < ActiveRecord::Base
     def no_bike_code # This method doesn't accept org_id because Seth got lazy
       includes(:bike_codes).where(bike_codes: { bike_id: nil })
     end
+
+    def organization(org_or_org_id)
+      organization = org_or_org_id.is_a?(Organization) ? org_or_org_id : Organization.friendly_find(org_or_org_id)
+      includes(:bike_organizations).where(bike_organizations: { organization_id: organization.id })
+    end
   end
 
   def cleaned_error_messages # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created

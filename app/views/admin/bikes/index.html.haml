@@ -1,31 +1,37 @@
 .admin-subnav
-  .col-md-6
+  .col-md-5
     %h1
       Manage Bikes
-  .col-md-6
+  .col-md-7
     %ul
       %li.nav-item
-        - all_active = !@unknown && sortable_search_params.keys.blank?
-        = link_to "All", admin_bikes_path, class: "nav-link #{all_active ? 'active' : ''}"
+        - all_ignored_params = %w[render_chart period sort direction]
+        - all_active = !@unknown && (sortable_search_params.keys - all_ignored_params).blank?
+        = link_to "All", admin_bikes_path(sortable_search_params.slice(*all_ignored_params)), class: "nav-link #{all_active ? 'active' : ''}"
       %li.nav-item
         = link_to "Unknown Manufacturers", missing_manufacturer_admin_bikes_path, class: "nav-link #{@unknown ? 'active' : ''}"
       %li.nav-item
+        - example_active = params[:search_example].present?
+        = link_to "example", admin_bikes_path(sortable_search_params.merge(search_non_example: nil, search_example: true)), class: "nav-link #{example_active ? 'active' : ''}"
+      %li.nav-item
         - non_example_active = params[:search_non_example].present?
-        = link_to "non-example", admin_bikes_path(sortable_search_params.merge(search_non_example: true)), class: "nav-link #{non_example_active ? 'active' : ''}"
+        = link_to "non-example", admin_bikes_path(sortable_search_params.merge(search_example: nil, search_non_example: true)), class: "nav-link #{non_example_active ? 'active' : ''}"
       %li.nav-item
         = link_to "Ascend", admin_bikes_path(sortable_search_params.merge(search_lightspeed: nil, search_ascend: true)), class: "nav-link #{params[:search_ascend].present? ? 'active' : ''}"
       %li.nav-item
         = link_to "Lightspeed", admin_bikes_path(sortable_search_params.merge(search_ascend: nil, search_lightspeed: true)), class: "nav-link #{params[:search_lightspeed].present? ? 'active' : ''}"
       - unless @render_chart
-        = link_to "chart", admin_bikes_path(sortable_search_params.merge(render_chart: true)), class: "nav-link"
+        %li.nav-item
+          = link_to "chart", admin_bikes_path(sortable_search_params.merge(render_chart: true)), class: "nav-link"
   - if current_organization.present?
     %p.subtitle
       #{link_to current_organization.name, admin_organization_path(current_organization.to_param)} bikes
       %em.small
         = link_to "orgs view", organization_bikes_path(organization_id: current_organization.to_param), class: "less-strong"
   - if @render_chart
-    = line_chart available_bikes.send(group_by_method(@time_range), "bikes.created_at").count, curve: false
-    = render partial: "/shared/period_select"
+    .col-12.mt-2
+      = line_chart available_bikes.send(group_by_method(@time_range), "bikes.created_at").count, curve: false
+      = render partial: "/shared/period_select"
 
 
 - if all_active

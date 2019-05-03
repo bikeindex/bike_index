@@ -144,12 +144,11 @@ class Admin::BikesController < Admin::BaseController
 
   def matching_bikes
     return @matching_bikes if defined?(@matching_bikes)
-    if current_organization.present?
-      bikes = current_organization.bikes
-    else
-      bikes = Bike.unscoped
-    end
+    bikes = Bike.unscoped
+    # do example up here because it unscopes
+    bikes = bikes.example if params[:search_example].present?
     bikes = bikes.non_example if params[:search_non_example].present?
+    bikes = bikes.organization(current_organization) if current_organization.present?
     bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email]
     bikes = bikes.ascend_pos if params[:search_ascend].present?
     bikes = bikes.lightspeed_pos if params[:search_lightspeed].present?
