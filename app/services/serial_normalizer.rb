@@ -1,11 +1,19 @@
 class SerialNormalizer
+  def self.unknown_and_absent_corrected(str = nil)
+    str = str.to_s.strip
+    return "absent" if str.blank? || str.downcase == "absent"
+    return "unknown" if str.gsub(/\s|\?/, "").blank? # Only ?
+    if str[/(no)|(remember)/i].present?
+      return "unknown" if str[/unkno/i].present?
+      return "unknown" if str[/(do.?n.?t)|(not?).?k?no/i].present? # Don't know
+      return "unknown" if str[/(do.?n.?t)|(not?).?remember/i].present? # Don't remember
+    end
+    str
+  end
+
   def initialize(serial: nil, bike_id: nil)
     @serial = serial && serial.strip.upcase
     @bike_id = bike_id
-  end
-
-  def serial_unknown_absent_corrected(str)
-    "??"
   end
 
   def normalized
