@@ -61,7 +61,7 @@
 
 #admin-bike-partial {
   img {
-    height: 100px;
-    width: 100px;
+    height: auto;
+    max-width: 100px;
   }
 }
