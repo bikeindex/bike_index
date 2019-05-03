@@ -51,6 +51,18 @@ describe Bike do
       bike = FactoryBot.create(:bike)
       expect(bike.recovered_records.to_sql).to eq(StolenRecord.unscoped.where(bike_id: bike.id, current: false).order("date_recovered desc").to_sql)
     end
+    context "unknown, absent serials" do
+      let(:bike_with_serial) { FactoryBot.create(:bike, serial_number: "CCcc99FFF") }
+      let(:bike_with_absent_serial) { FactoryBot.create(:bike, serial_number: "aBsent  ") }
+      let(:bike_with_unknown_serial) { FactoryBot.create(:bike, serial_number: "????  \n") }
+      it "corrects poorly entered serial numbers" do
+        [bike_with_serial, bike_with_absent_serial, bike_with_unknown_serial].each { |b| b.reload }
+        expect(bike_with_serial.serial_number).to eq "CCcc99FFF"
+        expect(bike_with_absent_serial.serial_number).to eq "absent"
+        expect(bike_with_unknown_serial.serial_number).to eq "unknown"
+        expect(Bike.with_serial.pluck(:id)).to eq([bike_with_serial.id])
+      end
+    end
     context "actual tests for ascend and lightspeed" do
       let!(:bike_lightspeed_pos) { FactoryBot.create(:bike_lightspeed_pos) }
       let!(:bike_ascend_pos) { FactoryBot.create(:bike_ascend_pos) }
