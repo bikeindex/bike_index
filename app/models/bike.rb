@@ -79,6 +79,7 @@ class Bike < ActiveRecord::Base
   # TODO: Rails 5 update - use left_joins method and the text version of enum
   scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 2 }) }
   scope :ascend_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 3 }) }
+  scope :non_example, -> { where(example: false) }
 
   before_save :set_calculated_attributes
 

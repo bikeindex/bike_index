@@ -140,11 +140,13 @@ class Admin::BikesController < Admin::BaseController
 
   def matching_bikes
     return @matching_bikes if defined?(@matching_bikes)
+    # Do example scoping up here, because it unscopes
     if current_organization.present?
       bikes = current_organization.bikes.includes(:creation_organization, :creation_states, :paint)
     else
       bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint)
     end
+    bikes = bikes.non_example if params[:search_non_example].present?
     bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email]
     bikes = bikes.ascend_pos if params[:search_ascend].present?
     bikes = bikes.lightspeed_pos if params[:search_lightspeed].present?
