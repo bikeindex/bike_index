@@ -142,7 +142,6 @@ class Admin::BikesController < Admin::BaseController
 
   def matching_bikes
     return @matching_bikes if defined?(@matching_bikes)
-    # Do example scoping up here, because it unscopes
     if current_organization.present?
       bikes = current_organization.bikes
     else
