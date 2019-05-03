@@ -17,13 +17,15 @@
         = link_to "Ascend", admin_bikes_path(sortable_search_params.merge(search_lightspeed: nil, search_ascend: true)), class: "nav-link #{params[:search_ascend].present? ? 'active' : ''}"
       %li.nav-item
         = link_to "Lightspeed", admin_bikes_path(sortable_search_params.merge(search_ascend: nil, search_lightspeed: true)), class: "nav-link #{params[:search_lightspeed].present? ? 'active' : ''}"
+      - unless @render_chart
+        = link_to "chart", admin_bikes_path(sortable_search_params.merge(render_chart: true)), class: "nav-link"
   - if current_organization.present?
     %p.subtitle
       #{link_to current_organization.name, admin_organization_path(current_organization.to_param)} bikes
       %em.small
         = link_to "orgs view", organization_bikes_path(organization_id: current_organization.to_param), class: "less-strong"
   - if @render_chart
-    = line_chart available_bikes.send(group_by_method(@time_range), :created_at).count, curve: false
+    = line_chart available_bikes.send(group_by_method(@time_range), "bikes.created_at").count, curve: false
     = render partial: "/shared/period_select"
 
 

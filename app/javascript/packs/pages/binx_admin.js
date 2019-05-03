@@ -101,13 +101,13 @@ function BinxAdmin() {
       $("#timeSelectionBtnGroup button").on("click", function(e) {
         let joiner;
         const period = $(e.target).attr("data-period");
-        const root = location.href.replace(/(\&|\?)period=[^&]*/, "");
-        if (root.match(/\?/)) {
+        const current_url = location.href.replace(/&?period=[^&]*/, "");
+        if (current_url.match(/\?/)) {
           joiner = "&";
         } else {
           joiner = "?";
         }
-        return (location.href = `${root}${joiner}period=${period}`);
+        return (location.href = `${current_url}${joiner}period=${period}`);
       });
     }
   };

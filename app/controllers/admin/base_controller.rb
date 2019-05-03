@@ -11,6 +11,8 @@ class Admin::BaseController < ApplicationController
       @start_time = Time.now - 7.days
     when "month"
       @start_time = Time.now - 30.days
+    when "year"
+      @start_time = Time.now - 1.year
     when "all"
       if current_organization.present?
         @start_time = current_organization.created_at

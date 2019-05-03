@@ -9,5 +9,7 @@
         last 7 days
       %button.btn.btn-outline-secondary.btn-sm{ class: ("active" if @period == "month"), data: { period: "month" } }
         last 30 days
+      %button.btn.btn-outline-secondary.btn-sm{ class: ("active" if @period == "year"), data: { period: "year" } }
+        last year
       %button.btn.btn-outline-secondary.btn-sm{ class: ("active" if @period == "all"), data: { period: "all" } }
         All

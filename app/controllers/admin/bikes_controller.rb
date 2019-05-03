@@ -114,6 +114,8 @@ class Admin::BikesController < Admin::BaseController
     redirect_to admin_bike_path(params[:bike_id])
   end
 
+  helper_method :available_bikes
+
   protected
 
   def sortable_columns
