@@ -11,10 +11,12 @@ module BikeFinder
   #
   # Return a Bike object, or nil
   def self.find_matching(serial:, owner_email:)
+    email = EmailNormalizer.normalize(owner_email)
+
     candidate_user_ids =
       User
         .joins("LEFT JOIN user_emails ON user_emails.user_id = users.id")
-        .where("users.email = ? OR user_emails.email = ?", owner_email, owner_email)
+        .where("users.email = ? OR user_emails.email = ?", email, email)
         .select(:id)
         .uniq
 
