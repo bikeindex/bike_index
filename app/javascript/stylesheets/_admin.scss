@@ -13,6 +13,13 @@
   }
 }
 
+.admin-bike-partial {
+  img {
+    height: auto;
+    max-width: 100px;
+  }
+}
+
 .admin-subnav {
   @extend .mt-4;
   @extend .mb-4;
@@ -56,12 +63,5 @@
 
   li {
     display: inline;
-  }
-}
-
-#admin-bike-partial {
-  img {
-    height: auto;
-    max-width: 100px;
   }
 }
