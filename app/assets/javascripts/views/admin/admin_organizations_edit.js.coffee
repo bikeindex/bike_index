@@ -1,11 +1,11 @@
 class BikeIndex.Views.AdminOrganizationsEdit extends Backbone.View
-    
+
   initialize: ->
     @setElement($('#body'))
     @adminLocations()
     @loadNotifications()
     $('.chosen-select select').select2()
-    
+
   adminLocations: ->
     $('form').on 'click', '.remove_fields', (event) ->
       # We don't need to do anything except slide the input up, because the label is on it.
@@ -24,9 +24,9 @@ class BikeIndex.Views.AdminOrganizationsEdit extends Backbone.View
       for name in names
         n = $(name)
         n.val($('#organization_name').val()) unless n.val().length > 0
-      
+
       $('.chosen-select select').select2()
-      
+
   loadNotifications: ->
     $('#show_notification a').click (e) ->
       e.preventDefault()

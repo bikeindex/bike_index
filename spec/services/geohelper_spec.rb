@@ -54,7 +54,7 @@ describe Geohelper do
           zipcode: "94103",
           country: "USA",
           latitude: 37.7870322,
-          longitude: -122.4039235
+          longitude: -122.4039235,
         }
       end
       it "returns our desires" do

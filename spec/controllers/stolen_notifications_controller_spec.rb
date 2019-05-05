@@ -9,7 +9,7 @@ describe StolenNotificationsController do
     {
       bike_id: bike.id,
       message: "I saw this bike on the street!",
-      reference_url: "https://party.com"
+      reference_url: "https://party.com",
     }
   end
 

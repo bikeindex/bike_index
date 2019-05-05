@@ -3,18 +3,23 @@
   padding-left: 0;
   margin-top: $vertical-height;
   margin-bottom: $vertical-height;
-  @include border-radius();
+
+  @include border-radius;
 }
 
 .page-item {
-  display: inline; // Remove list-style and block-level defaults
+  display: inline;
+
+  // Remove list-style and block-level defaults
 
   &:first-child {
     .page-link {
       margin-left: 0;
+
       @include border-left-radius($border-radius);
     }
   }
+
   &:last-child {
     .page-link {
       @include border-right-radius($border-radius);
@@ -28,8 +33,10 @@
       cursor: default;
       background-color: $blue;
       border-color: $blue;
-      padding: .5rem 0.75rem; // make it a bit taller
-      margin-top: -.1rem;
+      padding: 0.5rem 0.75rem;
+
+      // make it a bit taller
+      margin-top: -0.1rem;
     }
   }
 
@@ -46,8 +53,10 @@
 
 .page-link {
   position: relative;
-  float: left; // Collapse white-space
-  padding: .4rem .5rem;
+  float: left;
+
+  // Collapse white-space
+  padding: 0.4rem 0.5rem;
   margin-left: 3px;
   color: white;
   text-decoration: none;
@@ -60,7 +69,10 @@
     background-color: $gray-dark;
     border-color: $gray-dark;
   }
-  &:active { background: 000; }
+
+  &:active {
+    background: 000;
+  }
 }
 
 //
@@ -68,32 +80,48 @@
 //
 
 .pagination-lg {
-  @include pagination-size($pagination-padding-y-lg, $pagination-padding-x-lg, $font-size-lg, $line-height-lg, $border-radius-lg);
+  @include pagination-size(
+    $pagination-padding-y-lg,
+    $pagination-padding-x-lg,
+    $font-size-lg,
+    $line-height-lg,
+    $border-radius-lg
+  );
 }
 
 .pagination-sm {
-  @include pagination-size($pagination-padding-y-sm, $pagination-padding-x-sm, $font-size-sm, $line-height-sm, $border-radius-sm);
+  @include pagination-size(
+    $pagination-padding-y-sm,
+    $pagination-padding-x-sm,
+    $font-size-sm,
+    $line-height-sm,
+    $border-radius-sm
+  );
 }
 
-
-// 
+//
 // Should be applied to div.pagination when pagination selectors are for prior bootstrap versions
 @mixin legacy-pagination-override {
   @extend .pagination;
+
   li {
     @extend .page-item;
-    a { @extend .page-link; }
+
+    a {
+      @extend .page-link;
+    }
   }
 }
-
 
 // div.paginate-container - our own legacy paginate via kaminari
 .paginate-container {
   display: flex;
   flex: wrap;
   justify-content: center;
-  .pagination { 
+
+  .pagination {
     flex: 0 1 auto;
+
     @include legacy-pagination-override;
   }
 }

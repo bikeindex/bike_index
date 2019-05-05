@@ -4,9 +4,11 @@
       Recovery Stories
 
   #recovery-stories-listing
-    .container
-      #recovery-stories-container{data: {stories_count: @recovery_displays.length}}
-        = render @recovery_displays
+    .container.clearfix
+      .recovery-stories-container{data: {"stories-count" => @slice1.length}}
+        = render @slice1
+      .recovery-stories-container{data: {"stories-count" => @slice2.length}}
+        = render @slice2
 
     .paginate-container.paginate-container-bottom
-      = paginate @recovery_displays
+      = paginate @recovery_displays, window: 0

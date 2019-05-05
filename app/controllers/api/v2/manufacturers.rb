@@ -6,19 +6,19 @@ module API
       resource :manufacturers, desc: "Accepted manufacturers" do
         desc "All the manufacturers with pagination"
         paginate
-        get '/' do
+        get "/" do
           paginate Manufacturer.reorder(:name)
         end
-      
+
         desc "Manufacturer matching ID or name", {
-          notes: <<-NOTE
+          notes: <<-NOTE,
             You can request a manufacturer by either their name or their ID
           NOTE
         }
         params do
-          requires :id, type: String, desc: 'Manufacturer id or slug'
+          requires :id, type: String, desc: "Manufacturer id or slug"
         end
-        get ':id', serializer: ManufacturerV2ShowSerializer do 
+        get ":id", serializer: ManufacturerV2ShowSerializer do
           manufacturer = Manufacturer.friendly_find(params[:id])
           unless manufacturer.present?
             msg = "Unable to find manufacturer with name or id: #{params[:id]}"
@@ -27,7 +27,6 @@ module API
           manufacturer
         end
       end
-
     end
   end
 end

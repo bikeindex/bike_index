@@ -1,1 +1,1 @@
-Rails.application.config.cookie_secret = ENV['VERIFICATION_SECRET']
+Rails.application.config.cookie_secret = ENV["VERIFICATION_SECRET"]

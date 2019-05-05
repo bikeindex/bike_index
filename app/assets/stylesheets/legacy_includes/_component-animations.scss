@@ -2,10 +2,11 @@
 // Component animations
 // --------------------------------------------------
 
-
 .fade {
   opacity: 0;
-  @include transition(opacity .15s linear);
+
+  @include transition(opacity 0.15s linear);
+
   &.in {
     opacity: 1;
   }
@@ -16,7 +17,9 @@
   height: 0;
   overflow: hidden !important;
   overflow: visible \9;
-  @include transition(height .35s ease);
+
+  @include transition(height 0.35s ease);
+
   &.in {
     height: auto;
   }

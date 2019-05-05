@@ -1,10 +1,10 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe BikeSerializer do
-  describe 'standard validations' do
-    let(:bike) { FactoryBot.create(:bike, frame_size: '42') }
+  describe "standard validations" do
+    let(:bike) { FactoryBot.create(:bike, frame_size: "42") }
     let(:component) { FactoryBot.create(:component, bike: bike) }
-    let(:public_image) { FactoryBot.create(:public_image, imageable_type: 'Bike', imageable_id: bike.id) }
+    let(:public_image) { FactoryBot.create(:public_image, imageable_type: "Bike", imageable_id: bike.id) }
     subject { BikeSerializer.new(bike) }
 
     it { expect(subject.manufacturer_name).to eq(bike.mnfg_name) }
@@ -25,7 +25,7 @@ describe BikeSerializer do
     it { expect(subject.front_gear_type).to eq(bike.front_gear_type) }
     it { expect(subject.rear_gear_type).to eq(bike.rear_gear_type) }
     it { expect(subject.stolen_record).to eq(bike.current_stolen_record) }
-    it { expect(subject.frame_size).to eq('42cm') }
+    it { expect(subject.frame_size).to eq("42cm") }
     # it { subject.photo.should == bike.reload.public_images.first.image_url(:large) }
     # it { subject.thumb.should == bike.reload.public_images.first.image_url(:small) }
   end

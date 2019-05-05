@@ -1,29 +1,29 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Bikes::RecoveryController, type: :controller do
   let(:bike) { FactoryBot.create(:stolen_bike) }
   let(:stolen_record) { bike.current_stolen_record }
   let(:recovery_link_token) { stolen_record.find_or_create_recovery_link_token }
 
-  describe 'edit' do
-    context 'nonmatching recovery token' do
-      it 'renders' do
-        get :edit, bike_id: bike.id, token: 'XXXXXXXX'
+  describe "edit" do
+    context "nonmatching recovery token" do
+      it "renders" do
+        get :edit, bike_id: bike.id, token: "XXXXXXXX"
         expect(response).to redirect_to bike_url(bike)
         expect(flash[:error]).to be_present
         expect(session[:recovery_link_token]).to be_blank
       end
     end
-    context 'matching recovery token' do
-      it 'renders' do
+    context "matching recovery token" do
+      it "renders" do
         get :edit, bike_id: bike.id, token: recovery_link_token
         expect(response).to redirect_to bike_path(bike)
         expect(session[:recovery_link_token]).to eq recovery_link_token
       end
     end
-    context 'already recovered bike' do
+    context "already recovered bike" do
       before { stolen_record.add_recovery_information }
-      it 'redirects' do
+      it "redirects" do
         bike.reload
         expect(bike.stolen).to be_falsey
         get :edit, bike_id: bike.id, token: recovery_link_token
@@ -34,18 +34,18 @@ describe Bikes::RecoveryController, type: :controller do
     end
   end
 
-  describe 'update' do
+  describe "update" do
     let(:recovery_info) do
       {
         date_recovered: "2018-07-28T18:57:13.277",
         timezone: "America/Monterrey",
-        recovered_description: 'Some sweet description',
-        index_helped_recovery: '0',
-        can_share_recovery: '1'
+        recovered_description: "Some sweet description",
+        index_helped_recovery: "0",
+        can_share_recovery: "1",
       }
     end
-    context 'matching recovery token' do
-      it 'updates' do
+    context "matching recovery token" do
+      it "updates" do
         expect do
           put :update, bike_id: bike.id, token: recovery_link_token,
                        stolen_record: recovery_info
@@ -63,10 +63,10 @@ describe Bikes::RecoveryController, type: :controller do
         expect(stolen_record.reload.date_recovered.to_i).to be_within(1).of 1532822233
       end
     end
-    context 'non-matching recovery token' do
-      it 'does not update' do
+    context "non-matching recovery token" do
+      it "does not update" do
         expect do
-          put :update, bike_id: bike.id, token: 'XDSFCVVVVVVVVVSD888',
+          put :update, bike_id: bike.id, token: "XDSFCVVVVVVVVVSD888",
                        stolen_record: recovery_info
         end.to change(EmailRecoveredFromLinkWorker.jobs, :size).by(0)
         stolen_record.reload

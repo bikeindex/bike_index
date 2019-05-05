@@ -2,7 +2,7 @@ class UserEmailsController < ApplicationController
   before_filter :ensure_user_email_ownership
 
   def resend_confirmation
-    flash[:success] = 'Email confirmation re-sent'
+    flash[:success] = "Email confirmation re-sent"
     @user_email.send_confirmation_email
     redirect_to my_account_path
   end

@@ -22,7 +22,7 @@ class BikeIndex.BikeBoxes extends BikeIndex
     # Manually replace the image url with src for medium images - brittle...
     # but we don't want to have to query every bikes public images
     data =
-      title: $target.parents('.bike-box-item').find('.title-link').text() 
+      title: $target.parents('.bike-box-item').find('.title-link').text()
       img_src: $target.find('img').prop('src').replace /\/small_/, '/medium_'
     $target.append Mustache.to_html(window.hoverExpandBlockTemplate, data)
 
