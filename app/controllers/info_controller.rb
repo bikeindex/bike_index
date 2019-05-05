@@ -1,5 +1,5 @@
 class InfoController < ApplicationController
-  layout 'application_revised'
+  layout "application_revised"
 
   def about
   end
@@ -35,8 +35,8 @@ class InfoController < ApplicationController
   end
 
   def support_bike_index
-    @page_title = 'Support Bike Index'
-    render layout: 'payments_layout'
+    @page_title = "Support Bike Index"
+    render layout: "payments_layout"
   end
 
   def support_the_index
@@ -51,6 +51,6 @@ class InfoController < ApplicationController
   end
 
   def how_not_to_buy_stolen
-    redirect_to 'https://files.bikeindex.org/stored/dont_buy_stolen.pdf'
+    redirect_to "https://files.bikeindex.org/stored/dont_buy_stolen.pdf"
   end
 end

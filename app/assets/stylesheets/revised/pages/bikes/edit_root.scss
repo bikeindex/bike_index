@@ -1,21 +1,28 @@
 .edit-bike-page-root {
   .frame-sizes {
     .btn {
-      transition: all .1s linear;
+      transition: all 0.1s linear;
       padding-left: 0;
       padding-right: 0;
       width: 3em;
-      &.active, &:active {
+
+      &.active,
+      &:active {
         background: $green;
         color: white;
       }
     }
-    .ordinal-sizes .btn { max-width: 20%; } // Ensure buttons never overflow onto a second line
+
+    .ordinal-sizes .btn {
+      max-width: 20%;
+    }
+
+    // Ensure buttons never overflow onto a second line
     .frame-size-units {
       min-width: 6.5em;
       position: absolute;
       top: 0;
-      transition: top .1s linear;
+      transition: top 0.1s linear;
     }
   }
 }
@@ -23,21 +30,32 @@
 @media (max-width: $grid-breakpoint-sm - 1px) {
   .edit-bike-page-root {
     .frame-sizes {
-      .right-input-help { flex: 0 0 66.6667%; }
+      .right-input-help {
+        flex: 0 0 66.6667%;
+      }
+
       .frame-size-units {
         top: 15px;
         right: 0.9375rem;
       }
-      &.unexpanded-unit-size { padding-bottom: 6*$vertical-height; }
+
+      &.unexpanded-unit-size {
+        padding-bottom: 6 * $vertical-height;
+      }
     }
-    .frame-size-other .form-well-input { @include make-col(5); }
+
+    .frame-size-other .form-well-input {
+      @include make-col(5);
+    }
   }
 }
 
 @media (min-width: $grid-breakpoint-sm) {
   .edit-bike-page-root {
     .frame-sizes {
-      .right-input-help { position: relative; }
+      .right-input-help {
+        position: relative;
+      }
     }
   }
 }

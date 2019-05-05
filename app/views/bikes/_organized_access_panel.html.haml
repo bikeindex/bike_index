@@ -7,37 +7,37 @@
         .col-xs-6
           %h3.header-font-alt
             %span.hidden-sm-down
-              = current_organization.short_name
+              = passive_organization.short_name
             Access Panel
         .col-xs-6
-          - if @bike.organized?(current_organization)
+          - if @bike.organized?(passive_organization)
             %p.text-success.text-right
               %span.hidden-md-down
-                This #{@bike.type} is registered with #{current_organization.short_name}
+                This #{@bike.type} is registered with #{passive_organization.short_name}
               %span.hidden-lg-up
-                reged with #{current_organization.short_name}
+                reged with #{passive_organization.short_name}
           - else
             %p.text-warning.text-right
               %span.hidden-md-down
-                This #{@bike.type} is <em>not</em> registered with #{current_organization.short_name}
+                This #{@bike.type} is <em>not</em> registered with #{passive_organization.short_name}
               %span.hidden-lg-up
-                <em>not</em> reged with #{current_organization.short_name}
+                <em>not</em> reged with #{passive_organization.short_name}
     .card-body
       .row
-        - display_unstolen_notification_form = !@bike.stolen? && current_organization.paid_for?("unstolen_notifications")
-        - if @bike.authorized_by_organization?(org: current_organization)
+        - display_unstolen_notification_form = !@bike.stolen? && passive_organization.paid_for?("unstolen_notifications")
+        - if @bike.authorized_by_organization?(org: passive_organization)
           .col-xs-12.mb-2
             .text-right.less-strong
               %em
                 %span.hidden-md-down
-                  #{current_organization.short_name} registered this #{@bike.type} and it is
+                  #{passive_organization.short_name} registered this #{@bike.type} and it is
               not claimed yet,
               %em
                 so you can
               = link_to "Edit it", edit_bike_path(@bike), class: "btn btn-success btn-sm"
         .mb-2{ class: display_unstolen_notification_form ? "col-md-7" : "col-sm-12" }
           %ul.attr-list{ class: display_unstolen_notification_form ? "" : "split-sm" }
-            - if current_organization.paid_for?("bike_codes") # Always display stickers if org has paid for them
+            - if passive_organization.paid_for?("bike_codes") # Always display stickers if org has paid for them
               %li
                 %span.attr-title
                   Sticker:
@@ -50,7 +50,7 @@
                   - show_sticker_modal = true
                   %a{ href: "#", style: "opacity: 0.8; text-align: right;", data: { toggle: "modal", target: "#assignStickerModal" } }
                     Link Sticker
-            - if @bike.organized?(current_organization) # Only display information about the bike if bike is registered through org
+            - if @bike.organized?(passive_organization) # Only display information about the bike if bike is registered through org
               = @bike.attr_list_item(@bike.user&.name, "Owner name", with_colon: true)
               = @bike.attr_list_item(@bike.owner_email, "Owner email", with_colon: true)
               %li
@@ -58,11 +58,14 @@
                 %span.convertTime
                   = l @bike.created_at, format: :convert_time
               %li
+                %span.attr-title Claimed:
+                = @bike.claimed?
+              %li
                 %span.attr-title Creator:
                 = @bike.creator&.display_name
                 %em.small.less-strong
                   = @bike.creation_description
-              - current_organization.additional_registration_fields.each do |reg_field|
+              - passive_organization.additional_registration_fields.each do |reg_field|
                 - bike_attr = Export.additional_registration_fields[reg_field.to_sym]
                 - if bike_attr == "registration_address"
                   %li
@@ -89,10 +92,10 @@
                     - elsif reg_field == "reg_affiliation"
                       = @bike.organization_affiliation
 
-          - if !@bike.organized?(current_organization) # Apologize, bike isn't organizations
+          - if !@bike.organized?(passive_organization) # Apologize, bike isn't organizations
             %p.less-strong.mt-4
               %em
-                Unable to display additional information because #{@bike.type} is not registered with #{current_organization.name}
+                Unable to display additional information because #{@bike.type} is not registered with #{passive_organization.name}
         - if display_unstolen_notification_form
           .col-md-5.unstolen-notification-box
             %p
@@ -117,11 +120,11 @@
                 .send-message
                   = f.submit "Send message", class: 'btn btn-primary btn-lg'
 
-  - if current_organization.message_kinds.any?
+  - if passive_organization.message_kinds.any?
     .geomessages-wrap
       %span
         Send
-      - current_organization.message_kinds.each do |kind|
+      - passive_organization.message_kinds.each do |kind|
         / %a.btn.btn-secondary.openMessageModal{ target: "#organizationMessageModal", "data-kind" => kind, "data-toggle" => "modal" }
         %a.btn.btn-secondary.openMessageModal{ "data-kind" => kind }
           - if kind == "geolocated_messages"
@@ -129,10 +132,10 @@
           - else
             #{kind.humanize}
 
-- if current_organization.message_kinds.any?
+- if passive_organization.message_kinds.any?
   - modal_body = capture_haml do
     .modal-body
-      = form_for OrganizationMessage.new(bike_id: @bike.id), url: organization_messages_path(organization_id: current_organization) do |f|
+      = form_for OrganizationMessage.new(bike_id: @bike.id), url: organization_messages_path(organization_id: passive_organization) do |f|
         = f.hidden_field :bike_id
         = f.hidden_field :kind_slug
         = f.hidden_field :latitude
@@ -151,7 +154,7 @@
 - if show_sticker_modal
   - sticker_modal_body = capture_haml do
     .modal-body
-      = form_for BikeCode.new, { url: organization_sticker_path(id: "code", organization_id: current_organization.to_param), action: "update", method: "PUT" } do |f|
+      = form_for BikeCode.new, { url: organization_sticker_path(id: "code", organization_id: passive_organization.to_param), action: "update", method: "PUT" } do |f|
         = f.hidden_field :bike_id, value: @bike.id
         .form-group
           = f.label :code, "Sticker Code", class: "org-form-label"

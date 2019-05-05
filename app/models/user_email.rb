@@ -1,12 +1,13 @@
 class UserEmail < ActiveRecord::Base
   belongs_to :user, touch: true
-  belongs_to :old_user, class_name: 'User', touch: true
+  belongs_to :old_user, class_name: "User", touch: true
   validates_presence_of :user_id, :email
 
-  scope :confirmed, -> { where('confirmation_token IS NULL') }
-  scope :unconfirmed, -> { where('confirmation_token IS NOT NULL') }
+  scope :confirmed, -> { where("confirmation_token IS NULL") }
+  scope :unconfirmed, -> { where("confirmation_token IS NOT NULL") }
 
   before_validation :normalize_email
+
   def normalize_email
     self.email = EmailNormalizer.normalize(email)
   end
@@ -17,7 +18,7 @@ class UserEmail < ActiveRecord::Base
   end
 
   def self.add_emails_for_user_id(user_id, email_list)
-    email_list.to_s.split(',').reject(&:blank?).each do |str|
+    email_list.to_s.split(",").reject(&:blank?).each do |str|
       email = EmailNormalizer.normalize(str)
       next if where(user_id: user_id, email: email).present?
       ue = self.new(user_id: user_id, email: email)

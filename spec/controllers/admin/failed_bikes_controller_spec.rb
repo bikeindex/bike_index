@@ -1,7 +1,7 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Admin::FailedBikesController do
-  describe 'index' do
+  describe "index" do
     before do
       user = FactoryBot.create(:admin)
       set_current_user(user)
@@ -11,7 +11,7 @@ describe Admin::FailedBikesController do
     it { is_expected.to render_template(:index) }
   end
 
-  describe 'show' do
+  describe "show" do
     before do
       user = FactoryBot.create(:admin)
       set_current_user(user)

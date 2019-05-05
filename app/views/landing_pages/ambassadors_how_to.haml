@@ -23,7 +23,7 @@
         %p.mb-4
           You bring the ideas, make the connections, and we’ll make sure you have the resources to get stuff done.
 
-        = link_to "Apply to be an ambassador here", "https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform", class: "btn btn-primary"
+        = link_to "Apply to be an ambassador here", new_ambassador_path, class: "btn btn-primary"
 
         = image_tag 'landing_pages/ambassador_1.jpg', alt: 'A Bike Index Ambassador', class: "mt-4"
 
@@ -77,7 +77,7 @@
           =link_to "View current ambassadors", ambassadors_current_path
 
         .mobile-contact-link
-          %a.btn.btn-primary.btn-lg{ href: 'https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform' }
+          %a.btn.btn-primary.btn-lg{ href: new_ambassador_path }
             Apply today
 
       .next-steps-col

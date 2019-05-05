@@ -4,15 +4,15 @@
   %p
     You have added
     %strong
-      #{ pluralize(active_organization.users.count, 'user') }
+      #{ pluralize(current_organization.users.count, 'user') }
   %p
     And can add
     %strong
-      #{active_organization.available_invitation_count} more.
-    = link_to 'Invite another user', new_organization_user_path(organization_id: active_organization.to_param)
+      #{current_organization.available_invitation_count} more.
+    = link_to 'Invite another user', new_organization_user_path(organization_id: current_organization.to_param)
   %p
-    - if active_organization.auto_user.present?
-      Emails are currently sent from <em>#{active_organization.auto_user.email}</em>. #{ link_to 'Update email', organization_manage_index_path(organization_id: active_organization.to_param) }
+    - if current_organization.auto_user.present?
+      Emails are currently sent from <em>#{current_organization.auto_user.email}</em>. #{ link_to 'Update email', organization_manage_index_path(organization_id: current_organization.to_param) }
 
 .organized-table
   %table.table.table-striped.table-bordered
@@ -29,7 +29,7 @@
       - @memberships.each do |membership|
         %tr
           %td
-            = link_to membership.user.name, edit_organization_user_path(membership.id, organization_id: active_organization.to_param)
+            = link_to membership.user.name, edit_organization_user_path(membership.id, organization_id: current_organization.to_param)
           %td
             = membership.user.email
           %td
@@ -37,11 +37,11 @@
               = l membership.created_at, format: :convert_time
             %small.convertTimezone
           %td.hidden-md-down
-            = membership.user.creation_states.where(organization_id: active_organization.id).count
+            = membership.user.creation_states.where(organization_id: current_organization.id).count
       - @organization_invitations.each do |organization_invitation|
         %tr
           %td
-            = link_to organization_invitation.invitee_name, edit_organization_user_path(organization_invitation.id, is_invitation: true, organization_id: active_organization.to_param)
+            = link_to organization_invitation.invitee_name, edit_organization_user_path(organization_invitation.id, is_invitation: true, organization_id: current_organization.to_param)
           %td
             = organization_invitation.invitee_email
           %td

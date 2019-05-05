@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe BikeBookUpdateWorker do
   let(:subject) { BikeBookUpdateWorker }
@@ -7,7 +7,7 @@ describe BikeBookUpdateWorker do
     expect(subject.sidekiq_options["queue"]).to eq "high_priority"
   end
 
-  it 'enqueues listing ordering job' do
+  it "enqueues listing ordering job" do
     BikeBookUpdateWorker.perform_async
     expect(BikeBookUpdateWorker).to have_enqueued_sidekiq_job
   end
@@ -18,31 +18,30 @@ describe BikeBookUpdateWorker do
   end
 
   it "grabs the components and doesn't overwrite components nothing if the bike isn't on bikebook" do
-    manufacturer = FactoryBot.create(:manufacturer, name: 'SE Bikes')
+    manufacturer = FactoryBot.create(:manufacturer, name: "SE Bikes")
     bike = FactoryBot.create(:bike,
-                              manufacturer_id: manufacturer.id,
-                              year: 2014,
-                              frame_model: 'Draft'
-                             )
-    ['fork',
-     'crankset',
-     'pedals',
-     'chain',
-     'wheel',
-     'tire',
-     'headset',
-     'handlebar',
-     'stem',
-     'grips/tape',
-     'saddle',
-     'seatpost'].each { |name| FactoryBot.create(:ctype, name: name) }
+                             manufacturer_id: manufacturer.id,
+                             year: 2014,
+                             frame_model: "Draft")
+    ["fork",
+     "crankset",
+     "pedals",
+     "chain",
+     "wheel",
+     "tire",
+     "headset",
+     "handlebar",
+     "stem",
+     "grips/tape",
+     "saddle",
+     "seatpost"].each { |name| FactoryBot.create(:ctype, name: name) }
     component1 = FactoryBot.create(:component,
-                                    bike: bike, ctype_id: Ctype.friendly_find('fork').id,
-                                    description: 'SE straight Leg Hi-Ten w/ Fender Mounts & Wide Tire Clearance')
+                                   bike: bike, ctype_id: Ctype.friendly_find("fork").id,
+                                   description: "SE straight Leg Hi-Ten w/ Fender Mounts & Wide Tire Clearance")
     expect(component1.is_stock).to be_falsey
     component2 = FactoryBot.create(:component,
-                                    bike: bike, ctype_id: Ctype.friendly_find('crankset').id,
-                                    description: 'Sweet cranks')
+                                   bike: bike, ctype_id: Ctype.friendly_find("crankset").id,
+                                   description: "Sweet cranks")
     BikeBookUpdateWorker.new.perform(bike.id)
     bike.reload
     expect(bike.components.count).to eq(14)

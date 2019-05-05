@@ -1,7 +1,7 @@
 class BikeIndex.Views.BikesChooseRegistration extends Backbone.View
   events:
     'click a.choose-type': 'updateBikeLink'
-   
+
   initialize: ->
     @setElement($('#body'))
     @SetInitialRegistrationType()

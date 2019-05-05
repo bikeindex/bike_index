@@ -1,7 +1,7 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe BikeV2ShowSerializer do
-  describe 'standard validations' do
+  describe "standard validations" do
     let(:bike) { FactoryBot.create(:bike, frame_size: "42", additional_registration: "XXYY") }
     let(:component) { FactoryBot.create(:component, bike: bike) }
     let(:public_image) { FactoryBot.create(:public_image, imageable_type: "Bike", imageable_id: bike.id) }
@@ -45,7 +45,7 @@ describe BikeV2ShowSerializer do
         additional_registration: "XXYY",
         stolen_record: nil,
         public_images: [],
-        components: []
+        components: [],
       }
     end
 

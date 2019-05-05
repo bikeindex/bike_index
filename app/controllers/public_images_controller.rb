@@ -4,7 +4,7 @@ class PublicImagesController < ApplicationController
 
   def show
     @public_image = PublicImage.find(params[:id])
-    if @public_image.present? && @public_image.imageable_type == 'Bike'
+    if @public_image.present? && @public_image.imageable_type == "Bike"
       @owner_viewing = true if @public_image.imageable.current_ownership.present? && @public_image.imageable.owner == current_user
     end
   end
@@ -14,7 +14,7 @@ class PublicImagesController < ApplicationController
     if params[:bike_id].present?
       @public_image.imageable = @bike
       @public_image.save
-      render 'create_revised' and return
+      render "create_revised" and return
     else
       if params[:blog_id].present?
         @blog = Blog.find(params[:blog_id])
@@ -22,10 +22,10 @@ class PublicImagesController < ApplicationController
       elsif params[:mail_snippet_id]
         @public_image.imageable = MailSnippet.find(params[:mail_snippet_id])
       else
-        @public_image.imageable = active_organization
+        @public_image.imageable = current_organization
       end
       @public_image.save
-      render 'create' and return
+      render "create" and return
     end
     flash[:error] = "Whoops! We can't let you create that image."
     redirect_to @public_image.present? ? @public_image.imageable : user_root_url
@@ -41,7 +41,7 @@ class PublicImagesController < ApplicationController
 
   def update
     if @public_image.update_attributes(permitted_parameters)
-      redirect_to edit_bike_url(@public_image.imageable), notice: 'Image was successfully updated.'
+      redirect_to edit_bike_url(@public_image.imageable), notice: "Image was successfully updated."
     else
       render :edit
     end
@@ -52,10 +52,10 @@ class PublicImagesController < ApplicationController
     imageable_id = @public_image.imageable_id
     imageable_type = @public_image.imageable_type
     @public_image.destroy
-    flash[:success] = 'Image was successfully deleted'
+    flash[:success] = "Image was successfully deleted"
     if params[:page].present?
       redirect_to edit_bike_url(imageable_id, page: params[:page]) and return
-    elsif imageable_type == 'Blog'
+    elsif imageable_type == "Blog"
       redirect_to edit_admin_news_url(@imageable.title_slug) and return
     else
       redirect_to edit_bike_url(imageable_id)
@@ -82,13 +82,13 @@ class PublicImagesController < ApplicationController
     # Otherwise, it's a blog image or an organization image (or someone messing about),
     # so ensure the current user is admin authorized
     return true if current_user && current_user.superuser?
-    render json: { error: 'Access denied' }, status: 401 and return
+    render json: { error: "Access denied" }, status: 401 and return
   end
 
   def current_user_image_owner(public_image)
-    if public_image.imageable_type == 'Bike'
+    if public_image.imageable_type == "Bike"
       Bike.unscoped.find(public_image.imageable_id).owner == current_user
-    elsif public_image.imageable_type == 'Blog'
+    elsif public_image.imageable_type == "Blog"
       current_user && current_user.superuser?
     end
   end

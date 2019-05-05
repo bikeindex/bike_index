@@ -11,7 +11,7 @@ describe Admin::Organizations::InvoicesController, type: :controller do
       amount_due: "1220",
       timezone: "EST",
       start_at: "2018-09-05T23:00:00",
-      notes: "some cool note about when something was paid"
+      notes: "some cool note about when something was paid",
     }
   end
   context "super admin" do

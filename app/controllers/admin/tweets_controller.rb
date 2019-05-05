@@ -1,5 +1,6 @@
 class Admin::TweetsController < Admin::BaseController
   before_filter :find_tweet, except: [:new, :create, :index]
+
   def index
     @tweets = Tweet.order(created_at: :desc)
   end
@@ -13,7 +14,7 @@ class Admin::TweetsController < Admin::BaseController
 
   def update
     if @tweet.update_attributes(permitted_parameters)
-      flash[:notice] = 'Tweet saved!'
+      flash[:notice] = "Tweet saved!"
       redirect_to edit_admin_tweet_url
     else
       render action: :edit

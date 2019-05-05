@@ -16,7 +16,7 @@ class AutocompleteLoader
   end
 
   def load_colors
-    Soulheart::Loader.new.load(Color.all.map{ |c| c.autocomplete_hash })
+    Soulheart::Loader.new.load(Color.all.map { |c| c.autocomplete_hash })
   end
 
   def load_manufacturers

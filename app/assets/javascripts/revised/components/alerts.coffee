@@ -52,7 +52,7 @@ class @Alerts
 
   storeAlert: (alert_type, alert_body, callback) ->
     # Store the alert and then run the callback (that we assume reloads the page)
-    stored_alert = 
+    stored_alert =
       alert_type: alert_type
       alert_body: alert_body
     localStorage.setItem('stored_alert', JSON.stringify(stored_alert))

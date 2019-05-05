@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe EmailStolenNotificationWorker do
   let(:subject) { EmailStolenNotificationWorker }
@@ -22,7 +22,7 @@ describe EmailStolenNotificationWorker do
     expect(ActionMailer::Base.deliveries.empty?).to be_falsey
     mail = ActionMailer::Base.deliveries.last
     expect(mail.subject).to eq("Stolen bike contact")
-    expect(mail.to).to eq([override_email || owner_email, 'lily@bikeindex.org', 'bryan@bikeindex.org'])
+    expect(mail.to).to eq([override_email || owner_email, "lily@bikeindex.org", "bryan@bikeindex.org"])
   end
 
   def expect_notification_blocked

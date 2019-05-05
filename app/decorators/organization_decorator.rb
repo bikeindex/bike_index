@@ -1,4 +1,3 @@
-class OrganizationDecorator < ApplicationDecorator 
+class OrganizationDecorator < ApplicationDecorator
   delegate_all
-
 end

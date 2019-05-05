@@ -1,6 +1,6 @@
 = form_for @b_param, { url: registrations_path, action: 'create' } do |f|
   .form-group
-    - email_placeholder = active_organization && active_organization.school? ? "#{active_organization.slug} email" : 'your email'
+    - email_placeholder = current_organization && current_organization.school? ? "#{current_organization.slug} email" : 'your email'
     = f.email_field :owner_email, required: true, value: @owner_email, placeholder: email_placeholder, class: 'form-control'
   .form-group
     - initial_mnfg = @b_param.manufacturer && { id: @b_param.manufacturer.id, text: @b_param.manufacturer.name }.to_json

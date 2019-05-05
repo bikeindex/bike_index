@@ -10,7 +10,7 @@ class BikeCodesController < ApplicationController
       if @bike_code.errors.any?
         flash[:error] = @bike_code.errors.full_messages.to_sentence
       else
-        flash[:success] = "#{@bike_code.kind.titleize} #{@bike_code.code} - #{@bike_code.claimed? ? 'claimed' : 'unclaimed'}"
+        flash[:success] = "#{@bike_code.kind.titleize} #{@bike_code.code} - #{@bike_code.claimed? ? "claimed" : "unclaimed"}"
         if @bike_code.bike.present?
           redirect_to bike_path(@bike_code.bike_id) and return
         end
@@ -31,7 +31,7 @@ class BikeCodesController < ApplicationController
       redirect_to :back
       return
     end
-    bike_code = BikeCode.lookup_with_fallback(bike_code_code, organization_id: current_organization&.id, user: current_user)
+    bike_code = BikeCode.lookup_with_fallback(bike_code_code, organization_id: passive_organization&.id, user: current_user)
     # use the loosest lookup, but only permit it if the user can claim that
     @bike_code = bike_code if bike_code.present? && bike_code.claimable_by?(current_user)
     return @bike_code if @bike_code.present?
