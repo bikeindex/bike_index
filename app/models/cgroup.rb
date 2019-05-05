@@ -5,6 +5,6 @@ class Cgroup < ActiveRecord::Base
   has_many :ctypes
 
   def self.additional_parts
-    where(name: 'Additional parts').first_or_create
+    where(name: "Additional parts").first_or_create
   end
 end

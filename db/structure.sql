@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.3
--- Dumped by pg_dump version 10.3
+-- Dumped from database version 11.2
+-- Dumped by pg_dump version 11.2
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -14,20 +14,6 @@ SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
-
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
 
 --
 -- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
@@ -521,7 +507,8 @@ CREATE TABLE public.creation_states (
     is_pos boolean DEFAULT false NOT NULL,
     is_new boolean DEFAULT false NOT NULL,
     creator_id integer,
-    bulk_import_id integer
+    bulk_import_id integer,
+    pos_kind integer DEFAULT 0
 );
 
 
@@ -1411,7 +1398,6 @@ CREATE TABLE public.organizations (
     is_suspended boolean DEFAULT false NOT NULL,
     auto_user_id integer,
     access_token character varying(255),
-    new_bike_notification text,
     api_access_approved boolean DEFAULT false NOT NULL,
     approved boolean DEFAULT true,
     avatar character varying(255),
@@ -3938,4 +3924,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190329233031');
 INSERT INTO schema_migrations (version) VALUES ('20190401233010');
 
 INSERT INTO schema_migrations (version) VALUES ('20190402230848');
+
+INSERT INTO schema_migrations (version) VALUES ('20190422221408');
 

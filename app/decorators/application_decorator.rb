@@ -1,4 +1,4 @@
-class ApplicationDecorator < Draper::Decorator 
+class ApplicationDecorator < Draper::Decorator
   delegate_all
   include ActionView::Helpers::NumberHelper
 
@@ -6,18 +6,17 @@ class ApplicationDecorator < Draper::Decorator
     PaginatingDecorator
   end
 
-  def ass_name(association, extra = '')
+  def ass_name(association, extra = "")
     ass = object.send(association, name)
-    [ass.name, extra].reject(&:blank?).join(' ') if ass.present?
+    [ass.name, extra].reject(&:blank?).join(" ") if ass.present?
   end
 
   def attr_list_item(desc = nil, title, with_colon: false)
     return nil unless desc.present?
     title = "#{title}:" if with_colon
-    html = h.content_tag(:span, title, class: 'attr-title')
+    html = h.content_tag(:span, title, class: "attr-title")
     h.content_tag(:li, html + desc)
   end
-
 
   def dl_list_item(dd = nil, dt)
     return nil unless dd.present?
@@ -53,13 +52,13 @@ class ApplicationDecorator < Draper::Decorator
 
   def twitterable(user)
     if user.show_twitter and user.twitter
-     h.link_to 'Twitter', "https://twitter.com/#{user.twitter}"
+      h.link_to "Twitter", "https://twitter.com/#{user.twitter}"
     end
   end
 
   def websiteable(user)
     if user.show_website and user.website
-      h.link_to 'Website', user.website
+      h.link_to "Website", user.website
     end
   end
 
@@ -89,9 +88,9 @@ class ApplicationDecorator < Draper::Decorator
     if str.blank?
       nil
     elsif str[/\+/]
-      number_to_phone(str.gsub(/\+\d*/,''), country_code: str[/\A.\d*/].gsub('+',''), delimiter: ' ' )
+      number_to_phone(str.gsub(/\+\d*/, ""), country_code: str[/\A.\d*/].gsub("+", ""), delimiter: " ")
     else
-      number_to_phone(str, delimiter: ' ')
+      number_to_phone(str, delimiter: " ")
     end
   end
 end

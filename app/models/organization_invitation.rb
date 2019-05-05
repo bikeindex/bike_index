@@ -1,6 +1,4 @@
 class OrganizationInvitation < ActiveRecord::Base
-
-
   attr_accessor :admin_org_id
 
   # We are making people fill in names. That way, everyone who is at an
@@ -11,18 +9,21 @@ class OrganizationInvitation < ActiveRecord::Base
   validates_presence_of :inviter, :organization_id, :invitee_email, :membership_role
 
   belongs_to :organization
-  belongs_to :inviter, class_name: 'User', foreign_key: :inviter_id
-  belongs_to :invitee, class_name: 'User', foreign_key: :invitee_id
+  belongs_to :inviter, class_name: "User", foreign_key: :inviter_id
+  belongs_to :invitee, class_name: "User", foreign_key: :invitee_id
 
   default_scope { order(:created_at) }
   scope :unclaimed, -> { where(redeemed: nil) }
 
   after_create :enqueue_notification_job
+  after_create :if_user_exists_assign
+
+  def redeemed?; redeemed end
+
   def enqueue_notification_job
     EmailOrganizationInvitationWorker.perform_async(id)
   end
 
-  after_create :if_user_exists_assign
   def if_user_exists_assign
     user = User.fuzzy_email_find(self.invitee_email)
     if user
@@ -31,11 +32,13 @@ class OrganizationInvitation < ActiveRecord::Base
   end
 
   before_save :normalize_email
+
   def normalize_email
     self.invitee_email = EmailNormalizer.normalize(invitee_email)
   end
 
   after_create :update_organization_invitation_counts
+
   def update_organization_invitation_counts
     org = organization
     if org.available_invitation_count < 1
@@ -56,7 +59,7 @@ class OrganizationInvitation < ActiveRecord::Base
   end
 
   def assign_to(user)
-    return false if redeemed
+    return false if redeemed?
     # This way we don't generate repeat memberships accidentally. There should be some sort of alert.
     return false if user.memberships && user.organizations.include?(organization)
     self.invitee_id = user.id
@@ -67,5 +70,4 @@ class OrganizationInvitation < ActiveRecord::Base
     end
     create_membership
   end
-
 end

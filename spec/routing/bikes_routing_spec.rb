@@ -7,7 +7,7 @@ describe "bikes routing" do
         expect(get: "bikes/scanned/b2100061").to route_to(
           controller: "bikes",
           action: "scanned",
-          scanned_id: "b2100061"
+          scanned_id: "b2100061",
         )
       end
     end
@@ -16,7 +16,7 @@ describe "bikes routing" do
         expect(get: "bikes/12/scanned").to route_to(
           controller: "bikes",
           action: "scanned",
-          id: "12"
+          id: "12",
         )
       end
     end
@@ -25,7 +25,7 @@ describe "bikes routing" do
         expect(get: "bikes/scanned?card_id=xxxxxx").to route_to(
           controller: "bikes",
           action: "scanned",
-          card_id: "xxxxxx"
+          card_id: "xxxxxx",
         )
       end
     end

@@ -2,7 +2,7 @@ class BikeIndex.Views.BikesShow extends Backbone.View
   events:
     'click #thumbnails .clickable-image': 'clickPhoto'
     'keyup': 'logKey'
-    
+
   initialize: ->
     @setElement($('#body'))
     if $('#claim-ownership-modal').length > 0
@@ -22,7 +22,7 @@ class BikeIndex.Views.BikesShow extends Backbone.View
       $(window).scroll ->
         that.prepPhotos()
         $(window).unbind('scroll')
-      
+
 
   initializePhotoSelector: ->
     setTimeout ( ->
@@ -52,7 +52,7 @@ class BikeIndex.Views.BikesShow extends Backbone.View
     targetPhoto = $("#thumbnail-photos div[data-id='#{targetPhotoID}']")
     @photoFadeOut(targetPhotoID, targetPhoto)
 
-      
+
 
   clickPhoto:(event) ->
     event.preventDefault()
@@ -65,7 +65,7 @@ class BikeIndex.Views.BikesShow extends Backbone.View
       if targetPhotoID == "video_embed"
         return false
       else
-        $('#video_embed').remove() 
+        $('#video_embed').remove()
         @photoFadeIn(targetPhotoID, targetPhoto)
     $('#selected-photo .current-photo').addClass('transitioning-photo').removeClass('current-photo')
     if targetPhotoID == "video_embed"
@@ -107,7 +107,7 @@ class BikeIndex.Views.BikesShow extends Backbone.View
       $('#selected-photo .transitioning-photo').hide()
       $('#selected-photo .transitioning-photo').removeClass('transitioning-photo current-photo')
     ), 900
-    
+
     # some portrait images are too tall. Let's make em smaller
     ideal_height = $(window).height() * 0.75
     if $("#selected-photo .current-photo").height() > ideal_height

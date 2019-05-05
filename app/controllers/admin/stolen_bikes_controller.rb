@@ -6,7 +6,7 @@ class Admin::StolenBikesController < Admin::BaseController
     if params[:unapproved]
       bikes = Bike.stolen.order("created_at desc")
     else
-      bikes = Bike.stolen.where('approved_stolen IS NOT TRUE')
+      bikes = Bike.stolen.where("approved_stolen IS NOT TRUE")
       @verified_only = true
     end
     page = params[:page] || 1
@@ -18,7 +18,7 @@ class Admin::StolenBikesController < Admin::BaseController
     @bike.current_stolen_record.update_attribute :approved, true
     @bike.update_attribute :approved_stolen, true
     ApproveStolenListingWorker.perform_async(@bike.id)
-    redirect_to edit_admin_stolen_bike_url(@bike), notice: 'Bike was approved.'
+    redirect_to edit_admin_stolen_bike_url(@bike), notice: "Bike was approved."
   end
 
   def show
@@ -35,8 +35,8 @@ class Admin::StolenBikesController < Admin::BaseController
     BikeUpdator.new(user: current_user, bike: @bike, b_params: { bike: permitted_parameters }).update_ownership
     @bike = @bike.decorate
     if @bike.update_attributes(permitted_parameters)
-      SerialNormalizer.new({serial: @bike.serial_number}).save_segments(@bike.id)
-      redirect_to edit_admin_stolen_bike_url(@bike), notice: 'Bike was successfully updated.'
+      SerialNormalizer.new({ serial: @bike.serial_number }).save_segments(@bike.id)
+      redirect_to edit_admin_stolen_bike_url(@bike), notice: "Bike was successfully updated."
     else
       render action: "edit"
     end

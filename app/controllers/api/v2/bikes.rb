@@ -15,14 +15,14 @@ module API
           optional :primary_frame_color, type: String, values: COLOR_NAMES, desc: "Main color of frame (case sensitive match)"
           optional :secondary_frame_color, type: String, values: COLOR_NAMES, desc: "Secondary color (case sensitive match)"
           optional :tertiary_frame_color, type: String, values: COLOR_NAMES, desc: "Third color (case sensitive match)"
-          optional :rear_gear_type_slug, type: String, desc: 'rear gears (has to be one of the `selections`)'
-          optional :front_gear_type_slug, type: String, desc: 'front gears (has to be one of the `selections`)'
-          optional :handlebar_type_slug, type: String, desc: 'handlebar type (has to be one of the `selections`)'
+          optional :rear_gear_type_slug, type: String, desc: "rear gears (has to be one of the `selections`)"
+          optional :front_gear_type_slug, type: String, desc: "front gears (has to be one of the `selections`)"
+          optional :handlebar_type_slug, type: String, desc: "handlebar type (has to be one of the `selections`)"
           optional :no_notify, type: Boolean, desc: "On create or ownership change, don't notify the new owner."
           optional :is_for_sale, type: Boolean
           optional :frame_material, type: String, values: Bike.frame_materials.keys, desc: "Frame material type"
           optional :external_image_urls, type: Array, desc: "Image urls to include with registration, if images are already on the internet"
-          
+
           optional :stolen_record, type: Hash do
             optional :phone, type: String, desc: "Owner's phone number, **required to create stolen**"
             optional :city, type: String, desc: "City where stolen <br> **required to create stolen**"
@@ -32,24 +32,24 @@ module API
             optional :address, type: String, desc: "Public. Use an intersection if you'd prefer the specific address not be revealed"
             optional :date_stolen, type: Integer, desc: "When was the bike stolen (defaults to current time)"
 
-            optional :police_report_number, type: String, desc: 'Police report number'
-            optional :police_report_department, type: String, desc: 'Police department reported to (include if report number present)'
+            optional :police_report_number, type: String, desc: "Police report number"
+            optional :police_report_department, type: String, desc: "Police department reported to (include if report number present)"
             optional :show_address, type: Boolean, desc: "Display the exact address the theft happened at"
 
-          #   # link to LOCKING options!
-          #   # optional :locking_description_slug, type: String, desc: 'Locking description. description.'
-          #   # optional :lock_defeat_description_slug, type: String, desc: 'Lock defeat description. One of the values from lock defeat desc'
-          #   # optional :theft_description, type: String, desc: 'stuff'
+            #   # link to LOCKING options!
+            #   # optional :locking_description_slug, type: String, desc: 'Locking description. description.'
+            #   # optional :lock_defeat_description_slug, type: String, desc: 'Lock defeat description. One of the values from lock defeat desc'
+            #   # optional :theft_description, type: String, desc: 'stuff'
 
-          #   # optional :phone_for_everyone, type: Boolean, default: false, desc: 'Show phone number to non logged in users'
-          #   # optional :phone_for_users, type: Boolean, default: true, desc: 'Show phone to logged in users'
+            #   # optional :phone_for_everyone, type: Boolean, default: false, desc: 'Show phone number to non logged in users'
+            #   # optional :phone_for_users, type: Boolean, default: true, desc: 'Show phone to logged in users'
           end
         end
 
-        params :components_attrs do 
+        params :components_attrs do
           optional :manufacturer, type: String, desc: "Manufacturer name or ID"
           # [Manufacturer name or ID](api_v2#!/manufacturers/GET_version_manufacturers_format)
-          optional :component_type, type: String, desc: 'Type of component', values: CTYPE_NAMES
+          optional :component_type, type: String, desc: "Type of component", values: CTYPE_NAMES
           optional :model, type: String, desc: "Component model"
           optional :year, type: Integer, desc: "Component year"
           optional :description, type: String, desc: "Component description"
@@ -58,13 +58,13 @@ module API
         end
 
         def creation_user_id
-          if current_user.id == ENV['V2_ACCESSOR_ID'].to_i
+          if current_user.id == ENV["V2_ACCESSOR_ID"].to_i
             org = params[:organization_slug].present? && Organization.friendly_find(params[:organization_slug])
             if org && current_token.application.owner && current_token.application.owner.admin_of?(org)
               return org.auto_user_id
             end
             error!("Permanent tokens can only be used to create bikes for organizations your are an admin of", 403)
-          end  
+          end
           current_user.id
         end
 
@@ -73,23 +73,22 @@ module API
             is_bulk: params[:is_bulk],
             is_pos: params[:is_pos],
             is_new: params[:is_new],
-            no_duplicate: params[:no_duplicate]
-          }
+          }.as_json
         end
 
         def find_bike
           @bike = Bike.unscoped.find(params[:id])
         end
 
-        def authorize_bike_for_user(addendum='')
+        def authorize_bike_for_user(addendum = "")
           return true if @bike.authorize_for_user!(current_user)
           error!("You do not own that #{@bike.type}#{addendum}", 403)
         end
 
         def ensure_required_stolen_attrs(hash)
-          return true unless hash['bike']['stolen']
+          return true unless hash["bike"]["stolen"]
           %w(phone city).each do |k|
-            error!("Could not create stolen record: missing #{k}", 401) unless hash['stolen_record'][k].present?
+            error!("Could not create stolen record: missing #{k}", 401) unless hash["stolen_record"][k].present?
           end
         end
       end
@@ -97,19 +96,18 @@ module API
       resource :bikes do
         desc "View bike with a given ID"
         params do
-          requires :id, type: Integer, desc: 'Bike id'
+          requires :id, type: Integer, desc: "Bike id"
         end
-        get ':id', serializer: BikeV2ShowSerializer, root:  'bike' do 
+        get ":id", serializer: BikeV2ShowSerializer, root: "bike" do
           find_bike
         end
 
-
         desc "Add a bike to the Index!<span class='accstr'>*</span>", {
           authorizations: { oauth2: [{ scope: :write_bikes }] },
-          notes: <<-NOTE
+          notes: <<-NOTE,
             **Requires** `write_bikes` **in the access token** you use to create the bike.
 
-            <hr> 
+            <hr>
 
             **Creating test bikes**: To create test bikes, set `test` to true. These bikes:
 
@@ -133,36 +131,74 @@ module API
           requires :color, type: String, desc: "Main color or paint - does not have to be one of the accepted colors"
           optional :test, type: Boolean, desc: "Is this a test bike?"
           optional :organization_slug, type: String, desc: "Organization bike should be created by. **Only works** if user is a member of the organization"
-          optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: 'bike', desc: "Type of cycle (case sensitive match)"
+          optional :cycle_type_name, type: String, values: CYCLE_TYPE_NAMES, default: "bike", desc: "Type of cycle (case sensitive match)"
           use :bike_attrs
           optional :components, type: Array do
             use :components_attrs
           end
         end
-        post '/', serializer: BikeV2ShowSerializer, root: 'bike' do
-          declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
-          b_param = BParam.create(creator_id: creation_user_id, params: declared_p['declared_params'], origin: 'api_v2')
-          ensure_required_stolen_attrs(b_param.params)
-          bike = BikeCreator.new(b_param).create_bike
-          if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
-            bike
-          else
-            e = bike.present? ? bike.errors : b_param.errors
-            error!(e.full_messages.to_sentence, 401)
+        post "/", serializer: BikeV2ShowSerializer, root: "bike" do
+          # Search for a bike matching the provided serial number / owner email
+          bike_attrs = %w{serial owner_email}.map { |key| [key.to_sym, params[key]] }.to_h
+          found_bike = BikeFinder.find_matching(**bike_attrs)
+
+          # bike was not found, create it
+          if found_bike.blank?
+            # prepare params
+            declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
+            b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
+            b_param.clean_params
+            ensure_required_stolen_attrs(b_param.params)
+            b_param.save
+
+            bike = BikeCreator.new(b_param).create_bike
+
+            if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
+              return bike
+            else
+              e = bike.present? ? bike.errors : b_param.errors
+              return error!(e.full_messages.to_sentence, 401)
+            end
+          end
+
+          # bike was found, update instead of creating
+          if found_bike.present?
+            # prepare params
+            declared_p = { "declared_params" => declared(params, include_missing: false) }
+            b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
+            b_param.clean_params
+            ensure_required_stolen_attrs(b_param.params)
+
+            @bike = found_bike
+            authorize_bike_for_user
+
+            if b_param.params.dig("bike", "external_image_urls").present?
+              @bike.load_external_images(b_param.params["bike"]["external_image_urls"])
+            end
+
+            begin
+              BikeUpdator
+                .new(user: current_user, bike: @bike, b_params: b_param.params)
+                .update_available_attributes
+            rescue => e
+              error!("Unable to update bike: #{e}", 401)
+            end
+
+            status :found
+            return @bike.reload
           end
         end
 
-
         desc "Update a bike owned by the access token<span class='accstr'>*</span>", {
           authorizations: { oauth2: [{ scope: :write_bikes }] },
-          notes: <<-NOTE
+          notes: <<-NOTE,
             **Requires** `read_user` **in the access token** you use to send the notification.
-            
+
             Update a bike owned by the access token you're using.
 
           NOTE
         }
-        params  do 
+        params do
           requires :id, type: Integer, desc: "Bike ID"
           use :bike_attrs
           optional :owner_email, type: String, desc: "Send the bike to a new owner!"
@@ -172,12 +208,14 @@ module API
             optional :destroy, type: Boolean, desc: "Delete this component (requires an ID)"
           end
         end
-        put ':id', serializer: BikeV2ShowSerializer, root: 'bike' do
+        put ":id", serializer: BikeV2ShowSerializer, root: "bike" do
           declared_p = { "declared_params" => declared(params, include_missing: false) }
           find_bike
           authorize_bike_for_user
-          hash = BParam.v2_params(declared_p['declared_params'].as_json)
-          ensure_required_stolen_attrs(hash) if hash['stolen_record'].present? && @bike.stolen != true
+          b_param = BParam.new(params: declared_p["declared_params"].as_json, origin: "api_v2")
+          b_param.clean_params
+          hash = b_param.params
+          ensure_required_stolen_attrs(hash) if hash["stolen_record"].present? && @bike.stolen != true
           @bike.load_external_images(hash["bike"]["external_image_urls"]) if hash.dig("bike", "external_image_urls").present?
           begin
             BikeUpdator.new(user: current_user, bike: @bike, b_params: hash).update_available_attributes
@@ -189,11 +227,11 @@ module API
 
         desc "Add an image to a bike", {
           authorizations: { oauth2: [{ scope: :write_bikes }] },
-          notes: <<-NOTE
+          notes: <<-NOTE,
 
             To post a file to the API with curl:
 
-            `curl -X POST -i -F file=@{test_file.jpg} "#{ENV['BASE_URL']}/api/v2/bikes/{bike_id}/image?access_token={access_token}"`
+            `curl -X POST -i -F file=@{test_file.jpg} "#{ENV["BASE_URL"]}/api/v2/bikes/{bike_id}/image?access_token={access_token}"`
 
             Replace `{text_file.jpg}` with the relative path of the file you're posting.
 
@@ -201,11 +239,11 @@ module API
 
           NOTE
         }
-        params  do
+        params do
           requires :id, type: Integer, desc: "Bike ID"
           requires :file, :type => Rack::Multipart::UploadedFile, :desc => "Attachment."
         end
-        post ':id/image', serializer: PublicImageSerializer, root: 'image' do 
+        post ":id/image", serializer: PublicImageSerializer, root: "image" do
           declared_p = { "declared_params" => declared(params, include_missing: false) }
           find_bike
           authorize_bike_for_user
@@ -217,10 +255,9 @@ module API
           end
         end
 
-
         desc "Send a stolen notification<span class='accstr'>*</span>", {
           authorizations: { oauth2: [{ scope: :read_user }] },
-          notes: <<-NOTE 
+          notes: <<-NOTE,
             **Requires** `read_user` **in the access token** you use to send the notification.
 
             <hr>
@@ -232,23 +269,20 @@ module API
             Before your application is approved you can send notifications to yourself (to a bike that you own that's stolen).
           NOTE
         }
-        params do 
+        params do
           requires :id, type: Integer, desc: "Bike ID. **MUST BE A STOLEN BIKE**"
           requires :message, type: String, desc: "The message you are sending to the owner"
         end
-        post ':id/send_stolen_notification', serializer: StolenNotificationSerializer  do 
+        post ":id/send_stolen_notification", serializer: StolenNotificationSerializer do
           find_bike
           error!("Bike is not stolen", 400) unless @bike.present? && @bike.stolen
           # Unless application is authorized....
-          authorize_bike_for_user(" (this application is not approved to send notifications)") 
+          authorize_bike_for_user(" (this application is not approved to send notifications)")
           StolenNotification.create(bike_id: params[:id],
-            message: params[:message],
-            sender: current_user
-          )
+                                    message: params[:message],
+                                    sender: current_user)
         end
-
       end
-
     end
   end
 end

@@ -5,25 +5,24 @@ class Bike < ActiveRecord::Base
   process_in_background :pdf, CarrierWaveProcessWorker
 
   belongs_to :manufacturer
-  belongs_to :primary_frame_color, class_name: 'Color'
-  belongs_to :secondary_frame_color, class_name: 'Color'
-  belongs_to :tertiary_frame_color, class_name: 'Color'
-  belongs_to :rear_wheel_size, class_name: 'WheelSize'
-  belongs_to :front_wheel_size, class_name: 'WheelSize'
+  belongs_to :primary_frame_color, class_name: "Color"
+  belongs_to :secondary_frame_color, class_name: "Color"
+  belongs_to :tertiary_frame_color, class_name: "Color"
+  belongs_to :rear_wheel_size, class_name: "WheelSize"
+  belongs_to :front_wheel_size, class_name: "WheelSize"
   belongs_to :rear_gear_type
   belongs_to :front_gear_type
   belongs_to :paint, counter_cache: true
-  belongs_to :updator, class_name: 'User'
+  belongs_to :updator, class_name: "User"
   belongs_to :invoice
   belongs_to :location
-  belongs_to :current_stolen_record, class_name: 'StolenRecord'
-  belongs_to :creator, class_name: 'User' # to be deprecated and removed
-  belongs_to :creation_organization, class_name: 'Organization' # to be deprecated and removed
+  belongs_to :current_stolen_record, class_name: "StolenRecord"
+  belongs_to :creator, class_name: "User" # to be deprecated and removed
+  belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed
 
   has_many :bike_organizations, dependent: :destroy
   has_many :organizations, through: :bike_organizations
-  has_one :creation_state, dependent: :destroy
-  delegate :creation_description, :bulk_import, to: :creation_state, allow_nil: true
+  has_many :creation_states, dependent: :destroy
   # delegate :creator, to: :creation_state, source: :creator
   # has_one :creation_organization, through: :creation_state, source: :organization
   has_many :stolen_notifications, dependent: :destroy
@@ -36,7 +35,7 @@ class Bike < ActiveRecord::Base
   has_many :bike_codes
   has_many :b_params, foreign_key: :created_bike_id, dependent: :destroy
   has_many :duplicate_bike_groups, through: :normalized_serial_segments
-  has_many :recovered_records, -> { recovered }, class_name: 'StolenRecord'
+  has_many :recovered_records, -> { recovered }, class_name: "StolenRecord"
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true
@@ -48,16 +47,15 @@ class Bike < ActiveRecord::Base
   validates_presence_of :propulsion_type
   validates_presence_of :cycle_type
   validates_presence_of :creator
-  # validates_presence_of :creation_state_id
   validates_presence_of :manufacturer_id
 
   validates_uniqueness_of :card_id, allow_nil: true
   validates_presence_of :primary_frame_color_id
 
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications,
-    :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
-    :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
-    :b_param_id_token, :address, :address_city, :address_state, :address_zipcode
+                :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
+                :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
+                :b_param_id_token, :address, :address_city, :address_state, :address_zipcode
 
   attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
 
@@ -66,53 +64,60 @@ class Bike < ActiveRecord::Base
   enum cycle_type: CycleType::SLUGS
   enum propulsion_type: PropulsionType::SLUGS
 
-  default_scope { 
+  default_scope {
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
-    .where(example: false, hidden: false)
-    .order('listing_order desc') 
+      .where(example: false, hidden: false)
+      .order("listing_order desc")
   }
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
   scope :organized, -> { where.not(creation_organization_id: nil) }
-  scope :with_serial, -> { where('serial_number != ?', 'absent') }
+  scope :with_serial, -> { where.not(serial_number: ["absent", "unknown"]) }
   # "Recovered" bikes are bikes that were found and are waiting to be claimed. This is confusing and should be fixed
   # so that it no longer is the same word as stolen recoveries
   scope :non_recovered, -> { where(recovered: false) }
+  # TODO: Rails 5 update - use left_joins method and the text version of enum
+  scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 2 }) }
+  scope :ascend_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 3 }) }
+  scope :any_pos, -> { includes(:creation_states).where.not(creation_states: { pos_kind: 0 }) }
+  scope :not_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 0 }) }
+  scope :example, -> { where(example: true) }
+  scope :non_example, -> { where(example: false) }
 
   before_save :set_calculated_attributes
 
   include PgSearch
   pg_search_scope :pg_search, against: {
-      serial_number: 'A',
-      cached_data:   'B',
-      all_description:   'C'
-    }
+                                serial_number: "A",
+                                cached_data: "B",
+                                all_description: "C",
+                              }
 
   pg_search_scope :admin_search,
-    against: { owner_email: 'A' },
-    associated_against: { ownerships: :owner_email, creator: :email },
-    using: { tsearch: { dictionary: 'english', prefix: true } }
+                  against: { owner_email: "A" },
+                  associated_against: { ownerships: :owner_email, creator: :email },
+                  using: { tsearch: { dictionary: "english", prefix: true } }
 
   class << self
     def old_attr_accessible
       # made_without_serial - GUARANTEE there was no serial
-      (%w(manufacturer_id manufacturer_other serial_number 
-        serial_normalized has_no_serial made_without_serial additional_registration
-        creation_organization_id manufacturer year thumb_path name stolen
-        current_stolen_record_id recovered frame_material cycle_type frame_model number_of_seats
-        handlebar_type frame_size frame_size_number frame_size_unit
-        rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow 
-        primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
-        propulsion_type zipcode country_id belt_drive
-        coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
-        timezone date_stolen receive_notifications phone creator creator_id image
-        components_attributes b_param_id embeded embeded_extended example hidden
-        card_id stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
-        marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids
-        ).map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
-            components_attributes: Component.old_attr_accessible]).freeze
+      (%w(manufacturer_id manufacturer_other serial_number
+          serial_normalized has_no_serial made_without_serial additional_registration
+          creation_organization_id manufacturer year thumb_path name stolen
+          current_stolen_record_id recovered frame_material cycle_type frame_model number_of_seats
+          handlebar_type frame_size frame_size_number frame_size_unit
+          rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
+          primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
+          propulsion_type zipcode country_id belt_drive
+          coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
+          timezone date_stolen receive_notifications phone creator creator_id image
+          components_attributes b_param_id embeded embeded_extended example hidden
+          card_id stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
+          marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids
+      ).map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
+                         components_attributes: Component.old_attr_accessible]).freeze
     end
-    
+
     def text_search(query)
       query.present? ? pg_search(query) : all
     end
@@ -137,6 +142,20 @@ class Bike < ActiveRecord::Base
       end
       where(id: bike_id).first
     end
+
+    def bike_code(organization_id = nil) # This method only accepts numerical org ids
+      return includes(:bike_codes).where.not(bike_codes: { bike_id: nil }) if organization_id.blank?
+      includes(:bike_codes).where(bike_codes: { organization_id: organization_id })
+    end
+
+    def no_bike_code # This method doesn't accept org_id because Seth got lazy
+      includes(:bike_codes).where(bike_codes: { bike_id: nil })
+    end
+
+    def organization(org_or_org_id)
+      organization = org_or_org_id.is_a?(Organization) ? org_or_org_id : Organization.friendly_find(org_or_org_id)
+      includes(:bike_organizations).where(bike_organizations: { organization_id: organization.id })
+    end
   end
 
   def cleaned_error_messages # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
@@ -145,9 +164,19 @@ class Bike < ActiveRecord::Base
 
   def get_listing_order
     return current_stolen_record.date_stolen.to_time.to_i.abs if stolen && current_stolen_record.present?
-    t = (updated_at || Time.now).to_i/10000
-    stock_photo_url.present? || public_images.present? ? t : t/100
+    t = (updated_at || Time.now).to_i / 10000
+    stock_photo_url.present? || public_images.present? ? t : t / 100
   end
+
+  def creation_state; creation_states.first end
+
+  def creation_description; creation_state&.creation_description end
+
+  def bulk_import; creation_state&.bulk_import end
+
+  def pos_kind; creation_state&.pos_kind end
+
+  def pos?; pos_kind != "not_pos" end
 
   def current_ownership; ownerships.reorder(:created_at).last end
 
@@ -188,7 +217,11 @@ class Bike < ActiveRecord::Base
   def first_ownership; ownerships.reorder(:id).first end
 
   def organized?(org = nil)
-    org.present? ? bike_organization_ids.include?(org.id) : bike_organizations.any?
+    if org.present?
+      bike_organization_ids.include?(org.id)
+    else
+      bike_organizations.any?
+    end
   end
 
   # check if this is the first ownership - or if no owner, which means testing probably
@@ -223,6 +256,10 @@ class Bike < ActiveRecord::Base
     true
   end
 
+  def bike_code?(organization_id = nil) # This method only accepts numerical org ids
+    bike_codes.where(organization_id.present? ? { organization_id: organization_id } : {}).any?
+  end
+
   def display_contact_owner?(u = nil)
     stolen? && current_stolen_record.present?
   end
@@ -253,7 +290,7 @@ class Bike < ActiveRecord::Base
     @phone
   end
 
-  def visible_by(passed_user=nil)
+  def visible_by(passed_user = nil)
     return true unless hidden
     if passed_user.present?
       return true if passed_user.superuser
@@ -267,24 +304,24 @@ class Bike < ActiveRecord::Base
   end
 
   def title_string
-    t = [year, mnfg_name, frame_model].join(' ')
+    t = [year, mnfg_name, frame_model].join(" ")
     t += " #{type}" if type != "bike"
-    Rails::Html::FullSanitizer.new.sanitize(t.gsub(/\s+/,' ')).strip
+    Rails::Html::FullSanitizer.new.sanitize(t.gsub(/\s+/, " ")).strip
   end
 
   def stolen_string
     return nil unless stolen and current_stolen_record.present?
     [
-      'Stolen ',
+      "Stolen ",
       current_stolen_record.date_stolen && current_stolen_record.date_stolen.strftime("%Y-%m-%d"),
-      current_stolen_record.address && "from #{current_stolen_record.address}. "
-    ].compact.join(' ')
+      current_stolen_record.address && "from #{current_stolen_record.address}. ",
+    ].compact.join(" ")
   end
 
   def video_embed_src
     if video_embed.present?
       code = Nokogiri::HTML(video_embed)
-      src = code.xpath('//iframe/@src')
+      src = code.xpath("//iframe/@src")
       if src[0]
         src[0].value
       end
@@ -296,8 +333,8 @@ class Bike < ActiveRecord::Base
   end
 
   def bike_organization_ids=(val)
-    org_ids = (val.is_a?(Array) ? val : val.split(',').map(&:strip))
-              .map { |id| validated_organization_id(id) }.compact
+    org_ids = (val.is_a?(Array) ? val : val.split(",").map(&:strip))
+      .map { |id| validated_organization_id(id) }.compact
     org_ids.each { |id| bike_organizations.where(organization_id: id).first_or_create }
     bike_organizations.each { |bo| bo.destroy unless org_ids.include?(bo.organization_id) }
     true
@@ -307,7 +344,7 @@ class Bike < ActiveRecord::Base
     return nil unless organization_id.present?
     organization = Organization.friendly_find(organization_id)
     return organization.id if organization && !organization.suspended?
-    msg = organization ? "suspended and can't be used" : 'not found'
+    msg = organization ? "suspended and can't be used" : "not found"
     errors.add(:organization, "#{organization_id} is #{msg}")
     nil
   end
@@ -324,10 +361,10 @@ class Bike < ActiveRecord::Base
   end
 
   def set_user_hidden
-    if marked_user_hidden.present? && marked_user_hidden.to_s != '0'
+    if marked_user_hidden.present? && marked_user_hidden.to_s != "0"
       self.hidden = true
       current_ownership.update_attribute :user_hidden, true unless current_ownership.user_hidden
-    elsif marked_user_unhidden.present? && marked_user_unhidden.to_s != '0'
+    elsif marked_user_unhidden.present? && marked_user_unhidden.to_s != "0"
       self.hidden = false
       current_ownership.update_attribute :user_hidden, false if current_ownership.user_hidden
     end
@@ -335,7 +372,7 @@ class Bike < ActiveRecord::Base
   end
 
   def normalize_attributes
-    self.serial_number = 'absent' if serial_number.blank? || serial_number.strip.downcase == 'unknown'
+    self.serial_number = SerialNormalizer.unknown_and_absent_corrected(serial)
     self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
     if User.fuzzy_email_find(owner_email)
       self.owner_email = User.fuzzy_email_find(owner_email).email
@@ -358,32 +395,32 @@ class Bike < ActiveRecord::Base
     unless frame_size_unit.present?
       if frame_size_number.present?
         if frame_size_number < 30 # Good guessing?
-          self.frame_size_unit = 'in'
+          self.frame_size_unit = "in"
         else
-          self.frame_size_unit = 'cm'
+          self.frame_size_unit = "cm"
         end
       else
-        self.frame_size_unit = 'ordinal'
+        self.frame_size_unit = "ordinal"
       end
     end
 
     if frame_size_number.present?
-      self.frame_size = frame_size_number.to_s.gsub('.0','') + frame_size_unit
+      self.frame_size = frame_size_number.to_s.gsub(".0", "") + frame_size_unit
     else
       self.frame_size = case frame_size.downcase
-      when /x*sma/, 'xs'
-        'xs'
-      when /sma/, 's'
-        's'
-      when /med/, 'm'
-        'm'
-      when /(lg)|(large)/, 'l'
-        'l'
-      when /x*l/, 'xl'
-        'xl'
-      else
-        nil
-      end
+                        when /x*sma/, "xs"
+                          "xs"
+                        when /sma/, "s"
+                          "s"
+                        when /med/, "m"
+                          "m"
+                        when /(lg)|(large)/, "l"
+                          "l"
+                        when /x*l/, "xl"
+                          "xl"
+                        else
+                          nil
+                        end
     end
     true
   end
@@ -425,7 +462,7 @@ class Bike < ActiveRecord::Base
     [
       primary_frame_color && primary_frame_color.name,
       secondary_frame_color && secondary_frame_color.name,
-      tertiary_frame_color && tertiary_frame_color.name
+      tertiary_frame_color && tertiary_frame_color.name,
     ].compact
   end
 
@@ -452,7 +489,7 @@ class Bike < ActiveRecord::Base
       [
         c.year,
         (c.manufacturer && c.manufacturer.name),
-        c.component_type
+        c.component_type,
       ] if c.ctype.present? && c.ctype.name.present?
     end
   end
@@ -461,9 +498,9 @@ class Bike < ActiveRecord::Base
     csr = find_current_stolen_record
     self.attributes = {
       current_stolen_record_id: csr && csr.id,
-      all_description: [description, csr && csr.theft_description].reject(&:blank?).join(' '),
+      all_description: [description, csr && csr.theft_description].reject(&:blank?).join(" "),
       stolen_lat: csr && csr.latitude,
-      stolen_long: csr && csr.longitude
+      stolen_long: csr && csr.longitude,
     }
   end
 
@@ -472,7 +509,7 @@ class Bike < ActiveRecord::Base
     cache_photo
     self.cached_data = [
       mnfg_name,
-      (propulsion_type_name == 'Foot pedal' ? nil : propulsion_type_name),
+      (propulsion_type_name == "Foot pedal" ? nil : propulsion_type_name),
       year,
       (primary_frame_color && primary_frame_color.name),
       (secondary_frame_color && secondary_frame_color.name),
@@ -483,9 +520,9 @@ class Bike < ActiveRecord::Base
       (rear_wheel_size && "#{rear_wheel_size.name} wheel"),
       (front_wheel_size && front_wheel_size != rear_wheel_size ? "#{front_wheel_size.name} wheel" : nil),
       additional_registration,
-      (type == 'bike' ? nil : type),
-      components_cache_string
-    ].flatten.reject(&:blank?).join(' ')
+      (type == "bike" ? nil : type),
+      components_cache_string,
+    ].flatten.reject(&:blank?).join(" ")
   end
 
   def frame_material_name

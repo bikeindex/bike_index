@@ -1,15 +1,20 @@
 @import "legacy_includes/selectize_bootstrap3.scss";
-.control-group .selectize-control { width: 210px; }
+
+.control-group .selectize-control {
+  width: 210px;
+}
+
 @import "legacy_includes/_colors.scss";
 @import "legacy_includes/_variables.scss";
 @import "legacy_includes/_mixins.scss";
 @import "legacy_includes/component-animations.scss";
 @import "legacy_includes/dropdowns.scss";
 @import "legacy_includes/embed_form_styles.scss";
-$newStolenColor: #D25627;
+
+$newStolenColor: #d25627;
 
 #email_check_message {
-  font-size: .8em;
+  font-size: 0.8em;
   color: #f0ad4e;
   cursor: pointer;
   display: none;
@@ -21,7 +26,7 @@ $newStolenColor: #D25627;
   max-width: 800px;
   margin: 0;
   position: relative;
-  
+
   * {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -29,7 +34,9 @@ $newStolenColor: #D25627;
     text-rendering: optimizeLegibility;
   }
 
-  #new_bike { margin: 0; }
+  #new_bike {
+    margin: 0;
+  }
 
   select,
   textarea,
@@ -49,13 +56,16 @@ $newStolenColor: #D25627;
   input[type="color"],
   .uneditable-input {
     @include border-radius(2px);
+
     height: auto;
     font-size: 1em;
-    margin-top: -.25em;
+    margin-top: -0.25em;
     line-height: 1.3em;
   }
+
   .select2-choices {
     @include border-radius(2px);
+
     font-size: 16px;
     min-height: 29px;
   }
@@ -65,27 +75,36 @@ $newStolenColor: #D25627;
   background: darken(white, 10%);
   color: $grayLight;
   cursor: default;
-  &:active, &:focus {
+
+  &:active,
+  &:focus {
     border: 1px solid #ccc;
+
     @include box-shadow(none);
   }
 }
+
 a {
   color: $linkColor;
 }
 
-.button-blue, .button-submit {
+.button-blue,
+.button-submit {
   @include border-radius(4px);
+
   display: block;
-  padding: .5em 1em;
-  margin-bottom: .25em;
+  padding: 0.5em 1em;
+  margin-bottom: 0.25em;
   color: white;
   text-decoration: none;
   text-align: center;
   background: $linkColor;
   border: 1px solid darken($linkColor, 5%);
 
-  &:active { @include box-shadow(inset 0 3px 5px rgba(0,0,0,.125)); }
+  &:active {
+    @include box-shadow(inset 0 3px 5px rgba(0, 0, 0, 0.125));
+  }
+
   &:hover {
     background: darken($linkColor, 5%);
     border: 1px solid darken($linkColor, 12%);
@@ -94,59 +113,76 @@ a {
 
 .button-submit {
   @extend .button-blue;
+
   background: $btnSuccess;
   border: 1px solid $btnSuccessBorder;
 
-  &:active { @include box-shadow(inset 0 3px 5px rgba(0,0,0,.125)); }
+  &:active {
+    @include box-shadow(inset 0 3px 5px rgba(0, 0, 0, 0.125));
+  }
+
   &:hover {
     background: darken($btnSuccess, 5%);
     border: 1px solid darken($btnSuccessBorder, 5%);
   }
 }
 
-
 .input-group {
   @include clearfix;
+
   position: relative;
-  padding: .5em 2em .5em 1em;
+  padding: 0.5em 2em 0.5em 1em;
   border-bottom: 1px solid $grayLightish;
 }
+
 .input-group.add-additional {
   .add-component-fields {
     padding-bottom: 30px;
   }
+
   .hidden-other.unhidden {
-    padding: .5em 0 0;
+    padding: 0.5em 0 0;
   }
+
   padding-left: 0;
   padding-right: 0;
   padding-bottom: 60px;
+
   .button-blue {
     position: absolute;
     bottom: 15px;
     right: 20px;
   }
 }
+
 .control-group {
   float: left;
   max-width: 300px;
   margin-bottom: 0;
-  select { margin-top: .1em; }
+
+  select {
+    margin-top: 0.1em;
+  }
 }
+
 .with-optional-blocks {
   @include clearfix;
+
   .hidden-other.unhidden {
     clear: both;
     padding-bottom: 0;
     width: 100%;
+
     .field {
       float: left;
       display: block;
     }
+
     .optional-form-block {
       margin: 0 0 0 1.25em;
     }
   }
+
   .wheel-diameter {
     clear: both;
   }
@@ -159,38 +195,55 @@ a {
   margin-top: 1em;
   text-align: right;
 }
+
 .has-no-serial {
   margin: 24px 0 0 10px;
   float: left;
   position: relative;
-  input { margin: 0 .5em 0 0;}
+
+  input {
+    margin: 0 0.5em 0 0;
+  }
+
   label {
     cursor: pointer;
     width: 100%;
     margin: 0 15px 0 0;
+
     // width: 105px;
-  } 
+  }
+
   .stolen {
     display: none;
   }
 }
-.select2-container-disabled .select2-choice { color: $grayMed; }
+
+.select2-container-disabled .select2-choice {
+  color: $grayMed;
+}
+
 .unknown-year {
-  
   margin: 24px 0 0 10px;
   float: left;
   position: relative;
-  input { margin: 0 .5em 0 0;}
+
+  input {
+    margin: 0 0.5em 0 0;
+  }
+
   label {
     cursor: pointer;
     width: 100%;
     margin: 0 15px 0 0;
+
     // width: 105px;
-  } 
+  }
 }
+
 .form-save {
   display: block;
   text-align: center;
+
   input {
     text-align: center;
     float: none;
@@ -198,10 +251,14 @@ a {
   }
 }
 
-.hidden-other, .edit-bike-fields .hidden-other,
-.currently-hidden, .edit-bike-fields .currently-hidden,
-.hidden-other, .new-bike-fields .optional-form-block.hidden-other,
-.currently-hidden, .new-bike-fields .optional-form-block.currently-hidden {
+.hidden-other,
+.edit-bike-fields .hidden-other,
+.currently-hidden,
+.edit-bike-fields .currently-hidden,
+.hidden-other,
+.new-bike-fields .optional-form-block.hidden-other,
+.currently-hidden,
+.new-bike-fields .optional-form-block.currently-hidden {
   display: none;
   padding: 1em 0;
 }
@@ -213,69 +270,95 @@ a {
 
 .form-foot {
   border-bottom: 0;
+
   @include clearfix;
 }
-.form-photo-group { padding-bottom: 30px; }
+
+.form-photo-group {
+  padding-bottom: 30px;
+}
+
 .optional-group {
   border-bottom: none;
   border-top: 1px solid $grayLightish;
-  .filefield-button { float: left; }
-  span { float: left; color: $grayMed;}
+
+  .filefield-button {
+    float: left;
+  }
+
+  span {
+    float: left;
+    color: $grayMed;
+  }
 }
 
 .submit-registration {
   clear: both;
   padding-top: 1.25em;
-  select { margin: 0; }
+
+  select {
+    margin: 0;
+  }
+
   input.button-submit {
     float: left;
     font-size: 1.3em;
-    margin: -.6em 0 .5em;
+    margin: -0.6em 0 0.5em;
   }
-  .what-you-register { 
+
+  .what-you-register {
     color: $grayLight;
     display: inline-block;
-    margin: 0 .5em;
+    margin: 0 0.5em;
   }
 }
 
 .select-jsonified .select2-container,
-.chosen-select .controls .select2-container { width: 210px;}
+.chosen-select .controls .select2-container {
+  width: 210px;
+}
 
-.typeahead .dropdown-menu { max-width: 300px; }
+.typeahead .dropdown-menu {
+  max-width: 300px;
+}
 
 .other-value {
   display: none;
 }
 
-
 #alert-block {
   z-index: 100;
   position: fixed;
-  top: 100px; left: 0;
+  top: 100px;
+  left: 0;
+
   // margin: 10px;
   width: 100%;
+
   // @include clearfix;
   margin: 0 auto;
+
   .alert {
-    @include box-shadow(-2px 2px 4px rgba(black,.2));
-    // For IE 8 
+    @include box-shadow((-2px) 2px 4px rgba(black, 0.2));
+
+    // For IE 8
     -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=2, Direction=135, Color='#000000')";
     z-index: 100;
     position: absolute;
     left: 10%;
     width: 80%;
     top: 20px;
-    opacity: .95;
+    opacity: 0.95;
   }
 }
 
-
 .alert {
   @include border-radius(1px);
+
   padding: 15px 35px 20px 14px;
   margin-bottom: $baseLineHeight;
-  text-shadow: 0 1px 0 rgba(255,255,255,.5);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+
   // background-color: $warningBackground;
   // border: 1px solid $warningBorder;
   // color: $warningText;
@@ -284,6 +367,7 @@ a {
     border: 1px solid darken($warningBorder, 7%);
     color: darken($warningText, 20%);
   }
+
   &.alert-success {
     background-color: darken($blue, 2%);
     border: 1px solid darken($blue-lighter, 7%);
@@ -292,7 +376,7 @@ a {
 }
 
 .alert h4 {
-  margin: 0 0 .5em;
+  margin: 0 0 0.5em;
 }
 
 // Adjust close link position
@@ -306,86 +390,122 @@ a {
   cursor: pointer;
   color: $grayLight;
   z-index: 10000;
+
   &:hover {
-    text-shadow: 0 0 2px rgba(black,.2);
+    text-shadow: 0 0 2px rgba(black, 0.2);
     color: $grayMed;
   }
 }
 
 .alert-success {
   @extend .alert;
+
   background-color: $successBackground;
   border-color: $successBorder;
   color: $successText;
 }
+
 .alert-danger,
 .alert-error {
   @extend .alert;
+
   background-color: $errorBackground;
   border-color: $errorBorder;
   color: $errorText;
 }
+
 .alert-info {
   @extend .alert;
+
   background-color: $infoBackground;
   border-color: $infoBorder;
   color: $infoText;
 }
 
-// 
+//
 // STOLEN FIELDS
-// 
-// 
-#stolen_fields_store { display: none; }
+//
+//
+#stolen_fields_store {
+  display: none;
+}
 
 #stolen_fields_container {
   display: none;
-  .input-group { border-left: 3px solid $newStolenColor; }
+
+  .input-group {
+    border-left: 3px solid $newStolenColor;
+  }
 }
 
-.extra-group { clear: both; }
+.extra-group {
+  clear: both;
+}
+
 .large-text {
   max-width: 100%;
   width: 100%;
-  .controls textarea { width: 100% }
+
+  .controls textarea {
+    width: 100%;
+  }
 }
+
 .stolen-phone-groups {
   clear: both;
   width: 100%;
   max-width: 100%;
+
   .phone-group {
     float: left;
+
     label {
       margin: 4px 0 0 15px;
     }
-    input { margin: 0 3px 0 0; }
+
+    input {
+      margin: 0 3px 0 0;
+    }
   }
 }
-#stolen-bike-location .chosen-select { margin-bottom: 5px; }
 
-.stolen-suggestion { margin: 0 0 5px; }
-.stolen-color { color: $newStolenColor; }
+#stolen-bike-location .chosen-select {
+  margin-bottom: 5px;
+}
 
+.stolen-suggestion {
+  margin: 0 0 5px;
+}
 
-.receive-group { max-width: 100%; }
+.stolen-color {
+  color: $newStolenColor;
+}
+
+.receive-group {
+  max-width: 100%;
+}
+
 .receive-notifications {
   // width: 100%;
   padding-left: 25px;
   position: relative;
+
   input {
     position: absolute;
     left: 0;
-    top: .75em;
+    top: 0.75em;
   }
-  label { font-size:  1em; }
+
+  label {
+    font-size: 1em;
+  }
+
   span {
     display: block;
     color: $grayLight;
-    font-size: .9em;
+    font-size: 0.9em;
   }
 }
-
-
 
 #registration-type-tabs {
   // position: absolute;
@@ -395,17 +515,24 @@ a {
 
   .registration-type-tab {
     @include border-radius(4px);
+
     display: none;
-    padding: .5em 1em;
-    margin-bottom: .25em;
+    padding: 0.5em 1em;
+    margin-bottom: 0.25em;
     color: white;
     text-decoration: none;
     text-align: center;
     background: $linkColor;
     border: 1px solid darken($linkColor, 5%);
-    &.current-type { display: block; }
 
-    &:active { @include box-shadow(inset 0 3px 5px rgba(0,0,0,.125)); }
+    &.current-type {
+      display: block;
+    }
+
+    &:active {
+      @include box-shadow(inset 0 3px 5px rgba(0, 0, 0, 0.125));
+    }
+
     &:hover {
       background: darken($linkColor, 5%);
       border: 1px solid darken($linkColor, 12%);
@@ -414,12 +541,14 @@ a {
     &.stolen {
       background: $newStolenColor;
       border: 1px solid darken($newStolenColor, 5%);
+
       &:hover {
         background: darken($newStolenColor, 2%);
         border: 1px solid darken($newStolenColor, 8%);
       }
     }
   }
+
   // .registration-type-tab {
   //   background: #E6E6E6;
   //   padding: 5px 10px 3px 10px;
@@ -447,25 +576,32 @@ a {
 }
 
 @media (max-width: 500px) {
- #registration-type-tabs {
-   position: relative; 
-   padding-bottom: 10px;
-   margin-top: -10px;
- }
+  #registration-type-tabs {
+    position: relative;
+    padding-bottom: 10px;
+    margin-top: -10px;
+  }
 }
 
 .embed-success-block {
   padding: 20px;
-  h1, h3 {
+
+  h1,
+  h3 {
     font-weight: 200;
     font-family: $sansFontFamily;
   }
-  h1 { text-align: center; }
+
+  h1 {
+    text-align: center;
+  }
+
   // h3 { text-align: right; }
   p {
     font-family: $sansFontFamily;
     text-align: center;
   }
+
   img {
     width: 35%;
     display: block;

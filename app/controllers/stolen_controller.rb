@@ -1,14 +1,18 @@
 class StolenController < ApplicationController
   before_filter :set_permitted_format, only: [:index]
   before_filter :remove_subdomain
-  layout 'application_revised'
+  layout "application_revised"
 
   def index
     @feedback = Feedback.new
   end
 
   def current_tsv
-    redirect_to 'https://files.bikeindex.org/uploads/tsvs/current_stolen_bikes.tsv'
+    redirect_to "https://files.bikeindex.org/uploads/tsvs/current_stolen_bikes.tsv"
+  end
+
+  def current_tsv_rapid
+    redirect_to "https://files.bikeindex.org/uploads/tsvs/current_stolen_bikes.tsv"
   end
 
   def show
@@ -16,13 +20,13 @@ class StolenController < ApplicationController
   end
 
   def multi_serial_search
-    render layout: 'multi_serial'
+    render layout: "multi_serial"
   end
 
   private
 
   def set_permitted_format
-    request.format = 'html'
+    request.format = "html"
   end
 
   def remove_subdomain

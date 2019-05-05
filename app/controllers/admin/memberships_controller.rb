@@ -11,7 +11,7 @@ class Admin::MembershipsController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 50
     @memberships = @memberships.order(created_at: :desc)
-                           .page(page).per(per_page)
+      .page(page).per(per_page)
   end
 
   def show
@@ -36,13 +36,13 @@ class Admin::MembershipsController < Admin::BaseController
   def create
     user = User.fuzzy_email_find(params[:membership][:invited_email])
     unless user.present?
-      flash[:error] = 'User not found. Perhaps you should invite them instead?'
+      flash[:error] = "User not found. Perhaps you should invite them instead?"
       @membership = Membership.new
       render action: :new and return
     end
     @membership = Membership.new(user_id: user.id,
-      organization_id: params[:membership][:organization_id],
-      role: params[:membership][:role])
+                                 organization_id: params[:membership][:organization_id],
+                                 role: params[:membership][:role])
     if @membership.save
       flash[:success] = "Membership Created!"
       redirect_to admin_membership_url(@membership)

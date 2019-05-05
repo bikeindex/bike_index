@@ -9,7 +9,7 @@
 # * Author:   chris.dance@papercut.com
 # * Version:  1.5.0
 # * Date:     15th Nov 2013
-# 
+#
 (($) ->
   $.fn.areYouSure = (options) ->
     settings = $.extend(
@@ -48,7 +48,7 @@
 
       isDirty = false
       $form = $(this).parents("form")
-      
+
       # Test on the target first as it's the most likely to be dirty.
       isDirty = true  if isFieldDirty($(evt.target))
       unless isDirty
@@ -63,7 +63,7 @@
     markDirty = ($form, isDirty) ->
       changed = isDirty isnt $form.hasClass(settings.dirtyClass)
       $form.toggleClass settings.dirtyClass, isDirty
-      
+
       # Fire change event if required
       if changed
         settings.change.call $form, $form  if settings.change
@@ -86,7 +86,7 @@
     unless settings.silent
       $(window).bind "beforeunload", ->
         $dirtyForms = $("form").filter("." + settings.dirtyClass)
-        
+
         # $dirtyForms.removeClass(settings.dirtyClass); // Prevent multiple calls?
         settings.message  if $dirtyForms.length > 0
 
@@ -99,7 +99,7 @@
       $form.bind "reset", ->
         markDirty $form, false
 
-      
+
       # Add a custom events
       $form.bind "rescan.areYouSure", rescan
       $form.bind "reinitialize.areYouSure", reinitialize

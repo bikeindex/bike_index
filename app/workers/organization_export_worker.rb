@@ -1,7 +1,7 @@
 class OrganizationExportWorker
   include Sidekiq::Worker
   sidekiq_options queue: "low_priority", backtrace: true, retry: false
-  LINK_BASE = "#{ENV['BASE_URL']}/bikes/".freeze
+  LINK_BASE = "#{ENV["BASE_URL"]}/bikes/".freeze
 
   attr_accessor :export # Only necessary for testing
 
@@ -111,7 +111,7 @@ class OrganizationExportWorker
     when "manufacturer" then bike.mnfg_name
     when "model" then bike.frame_model
     when "year" then bike.year
-    when "color" then bike.frame_colors.join(', ')
+    when "color" then bike.frame_colors.join(", ")
     when "serial" then bike.serial_number
     when "additional_registration_number" then bike.additional_registration
     when "phone" then bike.phone
@@ -133,7 +133,7 @@ class OrganizationExportWorker
     code
   end
 
-  # This is difficult to test in an automated fashion, it's been tested by running it - so be careful about modifying 
+  # This is difficult to test in an automated fashion, it's been tested by running it - so be careful about modifying
   def check_export_ebrake(row)
     return true if @export_ebraked # If it's already braked, don't check again
     # only check every so often, so we can halt processing via an external trip switch

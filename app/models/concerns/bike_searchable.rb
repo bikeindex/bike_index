@@ -1,5 +1,6 @@
 module BikeSearchable
   extend ActiveSupport::Concern
+
   module ClassMethods
     # searchable_interpreted_params returns the args for by all other public methods in this class
     # query_params:
@@ -40,9 +41,9 @@ module BikeSearchable
       items = []
       items += [interpreted_params[:query]] if interpreted_params[:query].present?
       items += [interpreted_params[:manufacturer]].flatten.map { |id| Manufacturer.friendly_find(id) }
-                 .compact.map(&:autocomplete_result_hash) if interpreted_params[:manufacturer]
+        .compact.map(&:autocomplete_result_hash) if interpreted_params[:manufacturer]
       items += interpreted_params[:colors].map { |id| Color.friendly_find(id) }
-                 .compact.map(&:autocomplete_result_hash) if interpreted_params[:colors]
+        .compact.map(&:autocomplete_result_hash) if interpreted_params[:colors]
       items.flatten.compact
     end
 
@@ -60,10 +61,9 @@ module BikeSearchable
         .where(interpreted_params[:manufacturer] ? { manufacturer_id: interpreted_params[:manufacturer] } : {})
     end
 
-
     def searchable_query_items_query(query_params)
       return { query: query_params[:query] } if query_params[:query].present?
-      query = query_params[:query_items] && query_params[:query_items].select { |i| !(/\A[cm]_/ =~ i) }.join(' ')
+      query = query_params[:query_items] && query_params[:query_items].select { |i| !(/\A[cm]_/ =~ i) }.join(" ")
       query.present? ? { query: query } : {}
     end
 
@@ -95,7 +95,7 @@ module BikeSearchable
       if query_params[:stolenness] && %w(all non).include?(query_params[:stolenness])
         { stolenness: query_params[:stolenness] }
       else
-        extracted_searchable_proximity_hash(query_params, ip) || { stolenness: 'stolen' }
+        extracted_searchable_proximity_hash(query_params, ip) || { stolenness: "stolen" }
       end
     end
 
@@ -103,22 +103,22 @@ module BikeSearchable
       return query_params[:manufacturer] if query_params[:manufacturer].present?
       manufacturer_id = query_params[:query_items] && query_params[:query_items].select { |i| /\Am_/ =~ i }
       return nil unless manufacturer_id && manufacturer_id.any?
-      manufacturer_id.map { |i| i.gsub(/m_/, '').to_i }
+      manufacturer_id.map { |i| i.gsub(/m_/, "").to_i }
     end
 
     def extracted_query_items_color_ids(query_params)
       return query_params[:colors] if query_params[:colors].present?
       color_ids = query_params[:query_items] && query_params[:query_items].select { |i| /\Ac_/ =~ i }
       return nil unless color_ids && color_ids.any?
-      color_ids.map { |i| i.gsub(/c_/, '').to_i }
+      color_ids.map { |i| i.gsub(/c_/, "").to_i }
     end
 
     def extracted_searchable_proximity_hash(query_params, ip)
-      return false unless query_params[:stolenness] == 'proximity'
+      return false unless query_params[:stolenness] == "proximity"
       location = query_params[:location]
       return false unless location && !(location =~ /anywhere/i)
       distance = query_params[:distance] && query_params[:distance].to_i
-      if ['', 'ip', 'you'].include?(location.strip.downcase)
+      if ["", "ip", "you"].include?(location.strip.downcase)
         return false unless ip.present?
         location = Geocoder.search(ip)
         if defined?(location.first.data) && location.first.data.is_a?(Array)
@@ -129,9 +129,9 @@ module BikeSearchable
       return false if bounding_box.detect(&:nan?) # If we can't create a bounding box, skip
       {
         bounding_box: bounding_box,
-        stolenness: 'proximity',
-        location:  location,
-        distance: (distance && distance > 0) ? distance : 100
+        stolenness: "proximity",
+        location: location,
+        distance: (distance && distance > 0) ? distance : 100,
       }
     end
 
@@ -140,7 +140,7 @@ module BikeSearchable
 
     def search_matching_color_ids(color_id)
       return all unless color_id # So we can chain this if we don't have any colors
-      where('primary_frame_color_id=? OR secondary_frame_color_id=? OR tertiary_frame_color_id =?', color_id, color_id, color_id)
+      where("primary_frame_color_id=? OR secondary_frame_color_id=? OR tertiary_frame_color_id =?", color_id, color_id, color_id)
     end
 
     def search_matching_query(query)
@@ -150,16 +150,16 @@ module BikeSearchable
     def search_matching_serial(interpreted_params)
       return all unless interpreted_params[:serial]
       # Note: @@ is postgres fulltext search
-      where('serial_normalized @@ ?', interpreted_params[:serial])
+      where("serial_normalized @@ ?", interpreted_params[:serial])
     end
 
     def search_matching_stolenness(interpreted_params)
       case interpreted_params[:stolenness]
-      when 'all'
+      when "all"
         all
-      when 'non'
+      when "non"
         where(stolen: false)
-      when 'proximity'
+      when "proximity"
         where(stolen: true).within_bounding_box(interpreted_params[:bounding_box])
       else
         where(stolen: true)
@@ -167,7 +167,7 @@ module BikeSearchable
     end
 
     def search_matching_close_serials(serial)
-      where('LEVENSHTEIN(serial_normalized, ?) < 3', serial)
+      where("LEVENSHTEIN(serial_normalized, ?) < 3", serial)
     end
   end
 end

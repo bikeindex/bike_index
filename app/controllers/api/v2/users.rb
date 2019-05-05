@@ -4,29 +4,29 @@ module API
       include API::V2::Defaults
 
       resource :users do
-        helpers do 
+        helpers do
           def user_info
             {
               username: current_user.username,
               name: current_user.name,
-              email: current_user.email, 
+              email: current_user.email,
               twitter: (current_user.twitter if current_user.show_twitter),
-              image: (current_user.avatar_url if current_user.show_bikes)
+              image: (current_user.avatar_url if current_user.show_bikes),
             }
           end
-          
+
           def bike_ids
             current_user.bike_ids
           end
 
           def organization_memberships
             return [] unless current_user.memberships.any?
-            current_user.memberships.map{ |membership| 
+            current_user.memberships.map { |membership|
               {
                 organization_name: membership.organization.name,
-                organization_slug: membership.organization.slug, 
+                organization_slug: membership.organization.slug,
                 organization_access_token: membership.organization.access_token,
-                user_is_organization_admin: (true ? membership.role == 'admin' : false)
+                user_is_organization_admin: (true ? membership.role == "admin" : false),
               }
             }
           end
@@ -34,7 +34,7 @@ module API
 
         desc "Current user's information in access token's scope", {
           authorizations: { oauth2: [] },
-          notes: <<-NOTE
+          notes: <<-NOTE,
             Current user is the owner of the `access_token` you use in the request. Depending on your scopes you will get different things back.
             You will always get the user's `id`
             For an array of the user's bike ids, you need `read_bikes` access
@@ -43,29 +43,28 @@ module API
 
           NOTE
         }
-        get '/current', hidden: true do
+        get "/current", hidden: true do
           result = {
-            id: current_user.id.to_s
+            id: current_user.id.to_s,
           }
-          result[:user] = user_info if current_scopes.include?('read_user')
-          result[:bike_ids] = bike_ids if current_scopes.include?('read_bikes')
-          result[:memberships] = organization_memberships if current_scopes.include?('read_organization_membership')
+          result[:user] = user_info if current_scopes.include?("read_user")
+          result[:bike_ids] = bike_ids if current_scopes.include?("read_bikes")
+          result[:memberships] = organization_memberships if current_scopes.include?("read_organization_membership")
           result
         end
 
         desc "Current user's bikes", {
           authorizations: { oauth2: [{ scope: :read_bikes }] },
-          notes: <<-NOTE
+          notes: <<-NOTE,
             This returns the current user's bikes, so long as the access_token has the `read_bikes` scope.
             This uses the bike list bike objects, which only contains the most important information.
             To get all possible information about a bike use `/bikes/{id}`
 
           NOTE
         }
-        get '/current/bikes', hidden: true, each_serializer: BikeV2Serializer, root: 'bikes' do
+        get "/current/bikes", hidden: true, each_serializer: BikeV2Serializer, root: "bikes" do
           current_user.bikes
         end
-      
       end
     end
   end

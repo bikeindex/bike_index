@@ -1,5 +1,5 @@
 class PaymentsController < ApplicationController
-  layout 'payments_layout'
+  layout "payments_layout"
 
   def new
   end
@@ -16,7 +16,7 @@ class PaymentsController < ApplicationController
     elsif user.present?
       customer = Stripe::Customer.create(
         email: email,
-        card: params[:stripe_token]
+        card: params[:stripe_token],
       )
       user.update_attribute :stripe_id, customer.id
     else
@@ -27,7 +27,7 @@ class PaymentsController < ApplicationController
       else
         customer = Stripe::Customer.create(
           email: email,
-          card: params[:stripe_token]
+          card: params[:stripe_token],
         )
       end
     end
@@ -36,10 +36,10 @@ class PaymentsController < ApplicationController
       charge_time = charge.current_period_start
     else
       charge = Stripe::Charge.create(
-        customer:     customer.id,
-        amount:       amount_cents,
-        description:  'Bike Index customer',
-        currency:     'usd'
+        customer: customer.id,
+        amount: amount_cents,
+        description: "Bike Index customer",
+        currency: "usd",
       )
       charge_time = charge.created
     end
@@ -49,7 +49,7 @@ class PaymentsController < ApplicationController
       is_current: true,
       stripe_id: charge.id,
       first_payment_date: Time.at(charge_time).utc.to_datetime,
-      amount_cents: amount_cents
+      amount_cents: amount_cents,
     )
     @payment.is_recurring = true if subscription
     @payment.is_payment = true if params[:is_payment]

@@ -44,7 +44,7 @@ class Admin::NewsController < Admin::BaseController
       user_id: current_user.id,
       body: "No content yet, write some now!",
       published_at: Time.now,
-      is_listicle: false
+      is_listicle: false,
     })
     if @blog.save
       flash[:success] = "Blog created!"
@@ -64,7 +64,7 @@ class Admin::NewsController < Admin::BaseController
 
   def permitted_parameters
     params.require(:blog).permit(*%w(title body user_id published_at post_date post_now tags published old_title_slug
-       timezone description_abbr update_title is_listicle listicles_attributes user_email index_image_id index_image).map(&:to_sym).freeze)
+                                     timezone description_abbr update_title is_listicle listicles_attributes user_email index_image_id index_image).map(&:to_sym).freeze)
   end
 
   def set_dignified_name
