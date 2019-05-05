@@ -7,10 +7,9 @@
     = link_to "Delete example bikes", admin_destroy_example_bikes_url
   - if @bikes.any?
     = render partial: "/admin/bikes/admin_bikes_table"
-    .row
-      .col-lg-8
-      .col-lg-4
-        %p.float-right
+    .row.justify-content-end
+      .col-auto
+        %p
           #{Bike.unscoped.where(example: true).count} example bikes total
 
   - else
