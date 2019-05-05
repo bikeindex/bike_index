@@ -109,7 +109,6 @@ $(document).ready(function() {
   if ($("#admin-content").length > 0) {
     const binxAdmin = BinxAdmin();
     binxAdmin.init();
-    binxEditPhotos.init();
   }
   // Load the page specific things
   const bodyId = document.getElementsByTagName("body")[0].id;

@@ -4,13 +4,12 @@
 = form_for @organization, { as: :organization, url: admin_organization_custom_layout_path(organization_id: @organization.to_param, id: params[:id]), action: 'update' } do |f|
   .form-group.mt-4
     = f.text_area :landing_html, placeholder: 'Landing page (html)', rows: 20, class: "form-control"
-  .row
-    .col-md-11
-    .col-md-1
+  .row.justify-content-end
+    .col-auto
       = f.submit 'Save', class: 'btn btn-success'
 // Because somewhere, there is overflow hidden and it cuts off the bottom of the save button
 .mt-4
-%ul#public_images{ :"data-order-url" => order_public_images_url }
+%ul{ :"data-order-url" => order_public_images_url }
   - if @organization.public_images
     = render partial: '/public_images/public_image', collection: @organization.public_images, as: :public_image, locals: { skip_order: true }
 %section
