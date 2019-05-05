@@ -1,8 +1,8 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Admin::RecoveriesController do
-  describe 'index' do
-    it 'renders' do
+  describe "index" do
+    it "renders" do
       user = FactoryBot.create(:admin)
       set_current_user(user)
       get :index

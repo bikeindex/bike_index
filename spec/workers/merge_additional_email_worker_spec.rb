@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe MergeAdditionalEmailWorker do
   let(:subject) { MergeAdditionalEmailWorker }
@@ -7,14 +7,14 @@ describe MergeAdditionalEmailWorker do
     expect(subject.sidekiq_options["queue"]).to eq "high_priority"
   end
 
-  context 'confirmed' do
-    let(:email) { 'FOO@barexample.com' }
+  context "confirmed" do
+    let(:email) { "FOO@barexample.com" }
     let(:ownership) { FactoryBot.create(:ownership, owner_email: email) }
     let(:user_email) { FactoryBot.create(:user_email, email: email) }
     let(:user) { user_email.user }
     let(:organization_invitation) { FactoryBot.create(:organization_invitation, invitee_email: "#{email.upcase} ") }
 
-    context 'existing user account' do
+    context "existing user account" do
       let(:bike) { FactoryBot.create(:bike, creator_id: old_user.id) }
       let(:old_user) { FactoryBot.create(:user_confirmed, email: email) }
       let(:pre_created_ownership) { FactoryBot.create(:ownership, creator_id: old_user.id) }
@@ -27,12 +27,12 @@ describe MergeAdditionalEmailWorker do
       let(:old_membership) { FactoryBot.create(:membership, user: old_user, organization: third_organization) }
       let(:new_membership) { FactoryBot.create(:membership, user: user, organization: third_organization) }
 
-      let(:integration) { FactoryBot.create(:integration, user: old_user, information: { 'info' => { 'email' => email, name: 'blargh' } }) }
+      let(:integration) { FactoryBot.create(:integration, user: old_user, information: { "info" => { "email" => email, name: "blargh" } }) }
       let(:lock) { FactoryBot.create(:lock, user: old_user) }
       let(:payment) { FactoryBot.create(:payment, user: old_user) }
       let(:customer_contact) { FactoryBot.create(:customer_contact, user: old_user, creator: old_user) }
       let(:stolen_notification) { FactoryBot.create(:stolen_notification, sender: old_user, receiver: old_user) }
-      let(:oauth_application) { Doorkeeper::Application.create(name: 'MyApp', redirect_uri: 'https://app.com') }
+      let(:oauth_application) { Doorkeeper::Application.create(name: "MyApp", redirect_uri: "https://app.com") }
       before do
         old_user.reload
         expect(ownership).to be_present
@@ -55,7 +55,7 @@ describe MergeAdditionalEmailWorker do
         expect(stolen_notification).to be_present
       end
 
-      it 'merges bikes and memberships and deletes user' do
+      it "merges bikes and memberships and deletes user" do
         user.reload
         expect(user.memberships.count).to eq 1
         expect(user.ownerships.count).to eq 0
@@ -99,19 +99,19 @@ describe MergeAdditionalEmailWorker do
       end
     end
 
-    context 'existing multi-user-account' do
-      it 'merges all the accounts. It does not create multiple memberships for one org'
+    context "existing multi-user-account" do
+      it "merges all the accounts. It does not create multiple memberships for one org"
       # It would be nice to test this... future todo
     end
 
-    context 'no existing user account' do
+    context "no existing user account" do
       before do
         expect(ownership).to be_present
         expect(organization_invitation).to be_present
         expect(user_email.confirmed).to be_truthy
       end
 
-      it 'runs the same things as user_create' do
+      it "runs the same things as user_create" do
         user.reload
         expect(user.memberships.count).to eq 0
         expect(user.ownerships.count).to eq 0
@@ -127,10 +127,10 @@ describe MergeAdditionalEmailWorker do
     end
   end
 
-  context 'unconfirmed' do
+  context "unconfirmed" do
     it "doesn't merge" do
       ownership = FactoryBot.create(:ownership)
-      user_email = FactoryBot.create(:user_email, email: ownership.owner_email, confirmation_token: 'token-stuff')
+      user_email = FactoryBot.create(:user_email, email: ownership.owner_email, confirmation_token: "token-stuff")
       expect(user_email.confirmed).to be_falsey
       MergeAdditionalEmailWorker.new.perform(user_email.id)
       user_email.reload

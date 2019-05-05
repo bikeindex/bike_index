@@ -16,7 +16,7 @@ RSpec.describe BulkImport, type: :model do
       end
     end
     context "existing errors - unlikely, but worth just to make sure" do
-      let(:existing_errors) { { line: [2, "Nobody loves you"], file:  "Wrong place wrong time", file_lines: [1] } }
+      let(:existing_errors) { { line: [2, "Nobody loves you"], file: "Wrong place wrong time", file_lines: [1] } }
       let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "ongoing", import_errors: existing_errors) }
       it "adds a new error" do
         expect(bulk_import.starting_line).to eq 2

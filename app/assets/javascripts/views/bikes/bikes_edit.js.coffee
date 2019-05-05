@@ -25,11 +25,11 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     'click #hide_bike_toggle':           'toggleBikeHidden'
     'change #mark_recovered_we_helped':  'toggleCanWeTell'
 
-    
+
   initialize: ->
     @setElement($('#body'))
     window.root_url = $('#root_url').attr('data-url')
-    menu_height = $('#edit-menu').offset().top 
+    menu_height = $('#edit-menu').offset().top
     scroll_height = $(window).height() * .4
     @setDefaultCountryAndState()
     $('#body').attr('data-spy', "scroll").attr('data-target', '#edit-menu')
@@ -56,8 +56,8 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
   scrollToMenuTarget: (event) ->
     event.preventDefault()
     target = $(event.target).attr('href')
-    $('body').animate( 
-      scrollTop: ($(target).offset().top - 20), 'fast' 
+    $('body').animate(
+      scrollTop: ($(target).offset().top - 20), 'fast'
     )
 
   publicImageFileUpload: ->
@@ -102,7 +102,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     sortable_list_items = sortable_container.children('li')
     # This is a list comprehension for the list of all the sortable items, to make an array
     array_of_photo_ids = ($(list_item).attr('id') for list_item in sortable_list_items)
-    new_item_order = 
+    new_item_order =
       list_of_photos: array_of_photo_ids
     # list_of_items is an array containing the ordered list of image_ids
     # Then we post the result of the list comprehension to the url to update
@@ -138,7 +138,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       other = target.parents('.control-group').attr('data-hidden')
       hidden_other = target.parents('article').find(other)
     else
-      expand_value = group.find('.other-value').text()    
+      expand_value = group.find('.other-value').text()
       hidden_other = group.find('.hidden-other')
     @expandIfMatches(hidden_other, current_value, expand_value)
 
@@ -152,7 +152,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       other = selector.parents('.control-group').attr('data-hidden')
       hidden_other = selector.parents('article').find(other)
     else
-      expand_value = group.find('.other-value').text()    
+      expand_value = group.find('.other-value').text()
       hidden_other = group.find('.hidden-other')
     @expandIfMatches(hidden_other, current_value, expand_value)
 
@@ -161,7 +161,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     if parseInt(current_value, 10) == parseInt(expand_value, 10)
       # show the bugger!
       hidden_other.slideDown().addClass('unhidden')
-    else 
+    else
       # if it's visible, clear it and slide up
       if hidden_other.hasClass('unhidden')
         hidden_other.find('input').val('')
@@ -194,7 +194,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         standard.find('select').selectize()[0].selectize.setValue(all.find('select').val())
         standard.fadeIn()
       )
-  
+
   setWheelDiam: (position) ->
     wheelDiam = $("#bike_#{position}_wheel_size_id").val()
     $("##{position}_standard select").selectize()[0].selectize.setValue(wheelDiam)
@@ -204,7 +204,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       $("##{position}_standard").hide()
       $("#show-#{position}-wheel-diams").addClass('currently-hidden').hide()
       $("#hide-#{position}-wheel-diams").removeClass('currently-hidden').show()
-      
+
   updateWheelDiam: (event) ->
     target = $(event.target)
     cv = target.val()
@@ -217,7 +217,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     current_value = $("#cycletype#{$("#bike_cycle_type_id").val()}")
     $('#cycletype-text').removeClass('long-title')
     if current_value.hasClass('long-title')
-      $('#cycletype-text').addClass('long-title')  
+      $('#cycletype-text').addClass('long-title')
     $('#cycletype-text').text(current_value.text())
 
   showColors: ->
@@ -336,19 +336,19 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       hidden_other = target.parents('.mnfg-group').find('.hidden-mnfg')
       if parseInt(target.val(), 10) == parseInt(expand_value, 10)
         hidden_other.slideDown().addClass('unhidden')
-      else 
+      else
         if hidden_other.hasClass('unhidden')
           hidden_other.find('input').selectize()[0].selectize.setValue('')
           hidden_other.removeClass('unhidden').slideUp()
-      
+
 
   toggleExtraModelField: (event) ->
     target = $(event.target)
     hidden_other = target.parents('.input-group').find('.extra-model-fields')
-    if target.val().length > 1    
+    if target.val().length > 1
       # show the bugger!
       hidden_other.slideDown().addClass('unhidden')
-    else 
+    else
       # if it's visible, clear it and slide up
       if hidden_other.hasClass('unhidden')
         hidden_other.find('input').val('')
@@ -377,7 +377,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
       if hidden_other.hasClass('unhidden')
         hidden_other.removeClass('unhidden').slideUp('fast')
         $('#frame-sizer .groupedbtn-group').removeClass('ex-size')
-      
+
   toggleDrivetrainChecks: (event) ->
     target = $(event.target)
     id = target.attr('id')
@@ -394,12 +394,12 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         @setDrivetrainValue('front_gear_select')
       if id == 'rear_gear_select_internal'
         @setDrivetrainValue('rear_gear_select')
-        
+
   setFixed: ->
     ffixed = parseInt($('#front_gear_select_value .fixed_value').text(), 10)
     rfixed = parseInt($('#rear_gear_select_value .fixed_value').text(), 10)
     $('#edit_drivetrain .not-fixed').slideUp 'medium', ->
-      $('#rear_gear_select_internal, #front_gear_select_internal').prop('checked', '')  
+      $('#rear_gear_select_internal, #front_gear_select_internal').prop('checked', '')
       $('#front_gear_select, #rear_gear_select').val('')
       $("#front_gear_select_value #bike_front_gear_type_id_#{ffixed}").prop('checked', true)
       $("#rear_gear_select_value #bike_rear_gear_type_id_#{rfixed}").prop('checked', true)
@@ -418,7 +418,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
   updateDrivetrainValue: (event) ->
     position = $(event.target).attr('id')
     @setDrivetrainValue(position)
-    
+
   setInitialGears: ->
     if $('#fixed_gear_check').prop('checked') == true
       @setFixed()
@@ -434,7 +434,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
         $('#rear_gear_select .placeholder').prop('selected', 'selected')
       else
         $('#rear_gear_select').val(rcount)
-  
+
   toggleUnknownYear: ->
     year_select = $('#bike_year').selectize()[0].selectize
     if $('#bike_unknown_year').prop('checked')
@@ -443,7 +443,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
     else
       year_select.setValue(new Date().getFullYear())
       year_select.enable()
-  
+
   updateYear: ->
     if $('#bike_year').val()
       if $('#bike_year').val().length == 0
@@ -461,8 +461,8 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
   toggleBikeHidden: ->
     $('#hide_bike_toggle_group input').val('true')
     $('form.bikeedit-form-grab').submit()
-      
-  
+
+
   submitSerialUpdate: (e) ->
     e.preventDefault()
     serial = $('#serial_update_serial').val()
@@ -482,8 +482,8 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
           BikeIndex.alertMessage('success', 'Serial correction submitted', "Processing your updated serial now. We review all updates by hand, it could take up to a day before your bike is updated. Thanks!")
         error: (data, textStatus, jqXHR) ->
           BikeIndex.alertMessage('error', 'Request failed', "We're unable to process the update! Try again?")
-      $('#submitSerialCorrection').modal('hide')  
-      
+      $('#submitSerialCorrection').modal('hide')
+
     else
       $('#submit-serial-error').slideDown('fast')
 
@@ -506,8 +506,8 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
           BikeIndex.alertMessage('success', 'Manufacturer correction submitted', "Processing your updated Manufacturer now. We review all updates by hand, it could take up to a day before your bike is updated. Thanks!")
         error: (data, textStatus, jqXHR) ->
           BikeIndex.alertMessage('error', 'Request failed', "We're unable to process the update! Try again?")
-      $('#submitManufacturerCorrection').modal('hide')  
-      
+      $('#submitManufacturerCorrection').modal('hide')
+
     else
       $('#submit-manufacturer-error').slideDown('fast')
 
@@ -535,7 +535,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
             callback()
           success: (res) ->
             callback res.matches.slice(0, per_page)
-        
+
 
   requestBikeDelete: (e) ->
     e.preventDefault()
@@ -554,7 +554,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
           BikeIndex.alertMessage('success', 'Bike delete submitted', "Deleting your bike now. We delete all bikes by hand, it could take up to a day before your bike is gone. Thanks for your patience!")
         error: (data, textStatus, jqXHR) ->
           BikeIndex.alertMessage('error', 'Request failed', "Oh no! Something went wrong and we couldn't send the delete request.")
-      $('#requestBikeDelete').modal('hide')  
+      $('#requestBikeDelete').modal('hide')
     else
       $('#request-delete-error').slideDown('fast')
 
@@ -584,7 +584,7 @@ class BikeIndex.Views.BikesEdit extends Backbone.View
           can_share_recovery: can_share_recovery
         success: (data, textStatus, jqXHR) ->
           # BikeIndex.alertMessage('success', 'Bike marked recovered', "Thanks! We're so glad you got your bike back!")
-          $('#requestBikeDelete').modal('hide')  
+          $('#requestBikeDelete').modal('hide')
           $('#bike_stolen').prop('checked', '')
           $('.bikeedit-form-grab').submit()
         error: (data, textStatus, jqXHR) ->

@@ -1,20 +1,29 @@
 .legal-content {
   max-width: 45em;
   margin: 0 auto;
+
   header {
-    h1 { font-size: 28px;}
+    h1 {
+      font-size: 28px;
+    }
+
     hr {
       margin: 30px 0 40px;
     }
   }
 
-  h1, h2, h3 {
+  h1,
+  h2,
+  h3 {
     font-size: 20px;
     font-weight: normal;
     line-height: 1.25em;
-    margin: 1em 0 .75em;
+    margin: 1em 0 0.75em;
   }
-  h1 { margin: 1.5em 0 .5em; }
+
+  h1 {
+    margin: 1.5em 0 0.5em;
+  }
 }
 
 .accept-vendor-terms {
@@ -23,18 +32,25 @@
   left: 0;
   z-index: 100;
   width: 100%;
-  background-color: #FFF;
+  background-color: #fff;
   border: 1px solid $gray;
-  border: 1px solid rgba(0,0,0,.3);
-  *border: 1px solid $gray; /* IE6-7 */
-  box-shadow: 0 0px 4px rgba(0,0,0,0.2);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  *border: 1px solid $gray;
+
+  /* IE6-7 */
+  box-shadow: 0 0px 4px rgba(0, 0, 0, 0.2);
   background-clip: padding-box;
-  form { margin: 0; }
+
+  form {
+    margin: 0;
+  }
+
   // label { font-size: $standardFontSize;}
   .center-accept-terms-button {
     display: block;
     margin: 0 auto;
   }
+
   .center-accept-terms-text {
     width: 100%;
     text-align: center;
@@ -46,22 +62,29 @@
 @media (min-width: 701px) {
   .accept-vendor-terms {
     .form-horizontal {
-      padding: 10px 20px; }
+      padding: 10px 20px;
+    }
+
     .agree-action {
       width: 100%;
       padding: 15px 20px 20px;
       margin-bottom: 0;
-      text-align: right; // right align buttons
+      text-align: right;
+
+      // right align buttons
       background-color: #f5f5f5;
       border-top: 1px solid #ddd;
       border-radius: 0 0 6px 6px;
-      box-shadow: inset 0 1px 0 #FFF;
+      box-shadow: inset 0 1px 0 #fff;
 
-    // Properly space out buttons
+      // Properly space out buttons
       .btn + .btn {
         margin-left: 5px;
-        margin-bottom: 0; // account for input[type="submit"] which gets the bottom margin like all other inputs
+        margin-bottom: 0;
+
+        // account for input[type="submit"] which gets the bottom margin like all other inputs
       }
+
       // but override that for button groups
       .btn-group .btn + .btn {
         margin-left: -1px;
@@ -75,20 +98,23 @@
     .control-group {
       padding: 0 20px;
       margin-bottom: 5px;
+
       .control-label {
         width: 20px;
         margin-right: 10px;
       }
+
       .controls {
         margin: 0;
       }
     }
+
     .agree-action {
       padding: 10px 0;
+
       .button-blue {
         width: 100%;
       }
     }
   }
 }
-

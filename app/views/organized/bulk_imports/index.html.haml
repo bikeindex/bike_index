@@ -1,8 +1,8 @@
 .organized-page-header.mb-4
   %h1
     %em
-      = active_organization.name
-    - if active_organization.ascend_imports?
+      = current_organization.name
+    - if current_organization.ascend_imports?
       Ascend Imports
     - else
       Bulk Imports
@@ -10,9 +10,9 @@
 .paginate-container
   .paginate{ style: "margin: 12px auto 12px 0;" }
     - if @show_empty
-      = link_to "Exclude Empty imports", organization_bulk_imports_path(organization_id: active_organization.to_param, without_empty: true), class: "btn btn-lg btn-secondary"
+      = link_to "Exclude Empty imports", organization_bulk_imports_path(organization_id: current_organization.to_param, without_empty: true), class: "btn btn-lg btn-secondary"
     - else
-      = link_to "Include Empty imports", organization_bulk_imports_path(organization_id: active_organization.to_param), class: "btn btn-lg btn-secondary"
+      = link_to "Include Empty imports", organization_bulk_imports_path(organization_id: current_organization.to_param), class: "btn btn-lg btn-secondary"
   = paginate @bulk_imports
 
 %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
@@ -31,7 +31,7 @@
     - @bulk_imports.each do |bulk_import|
       %tr
         %td
-          %a.convertTime{ href: organization_bulk_import_path(bulk_import, organization_id: active_organization.to_param) }
+          %a.convertTime{ href: organization_bulk_import_path(bulk_import, organization_id: current_organization.to_param) }
             = l bulk_import.created_at, format: :convert_time
         %td
           - if bulk_import.blocking_error?
@@ -53,4 +53,4 @@
           = bulk_import.creation_states.count # Don't need to do bikes through creation states
 
 %p.text-right
-  = link_to "New import", new_organization_bulk_import_path(organization_id: active_organization.to_param), class: "btn btn-primary"
+  = link_to "New import", new_organization_bulk_import_path(organization_id: current_organization.to_param), class: "btn btn-primary"

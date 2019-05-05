@@ -1,8 +1,8 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Admin::CustomerContactsController do
-  describe 'create' do
-    it 'creates the contact, send the email and redirect to the bike' do
+  describe "create" do
+    it "creates the contact, send the email and redirect to the bike" do
       stolen_record = FactoryBot.create(:stolen_record)
       # pp stolen_record.bike.id
       user = FactoryBot.create(:admin)
@@ -10,9 +10,10 @@ describe Admin::CustomerContactsController do
         user_email: stolen_record.bike.owner_email,
         creator_email: user.email,
         bike_id: stolen_record.bike.id,
-        title: 'some title',
-        body: 'some message',
-        contact_type: 'stolen_contact' }
+        title: "some title",
+        body: "some message",
+        contact_type: "stolen_contact",
+      }
       set_current_user(user)
       expect do
         post :create, customer_contact: customer_contact

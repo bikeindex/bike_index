@@ -45,7 +45,6 @@
 
 %h3
   Feedbacks Graph
-  = javascript_include_tag "//www.google.com/jsapi", "chartkick"
   %pre
   = line_chart graphs_admin_feedbacks_path(params.merge(start_at: params[:start_at]).except(:controller, :action))
 .d-flex

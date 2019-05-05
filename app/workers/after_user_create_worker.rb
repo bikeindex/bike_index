@@ -65,13 +65,13 @@ class AfterUserCreateWorker
       address = user_bikes_for_attrs(user.id).map { |b| b.registration_address }.reject(&:blank?).last
       if address.present?
         user.attributes = { skip_geocode: true,
-                            street: address["address"],
-                            zipcode: address["zipcode"],
-                            city: address["city"],
-                            state: State.fuzzy_find(address["state"]),
-                            country: Country.fuzzy_find(address["country"]),
-                            latitude: address["latitude"],
-                            longitude: address["longitude"] }
+                           street: address["address"],
+                           zipcode: address["zipcode"],
+                           city: address["city"],
+                           state: State.fuzzy_find(address["state"]),
+                           country: Country.fuzzy_find(address["country"]),
+                           latitude: address["latitude"],
+                           longitude: address["longitude"] }
       end
     end
     user.save if user.changed?
@@ -80,6 +80,8 @@ class AfterUserCreateWorker
   private
 
   def user_bikes_for_attrs(user_id)
-    Ownership.where(user_id: user_id).order(:created_at).map(&:bike)
+    # Deal with example bikes
+    Ownership.where(user_id: user_id).where.not(user_id: nil).order(:created_at).pluck(:bike_id)
+      .map { |id| Bike.unscoped.where(id: id).first }.compact
   end
 end

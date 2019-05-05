@@ -5,7 +5,7 @@ StatesAndCountries.countries.each do |c|
 end
 
 # US States and territories
-us_id = Country.find_by_iso('US').id
+us_id = Country.find_by_iso("US").id
 StatesAndCountries.states.each do |s|
   state = State.create(country_id: us_id, name: s[:name], abbreviation: s[:abbr])
   state.save

@@ -3,14 +3,13 @@ class BikeIndex.Views.OrganizationsShow extends Backbone.View
     'click #show-developer-info':           'showDeveloperInfo'
     'click #show-lightspeed-info':          'showLightspeedInfo'
 
-
   initialize: ->
     @setElement($('#body'))
     # Later we can seperate these, for now though here is good enough
     if $('#org-bikes-table').length > 0
       @loadDataTable('#org-bikes-table')
     else if $('#org-users-table').length > 0
-      @loadDataTable('#org-users-table')   
+      @loadDataTable('#org-users-table')
     if $('#edit-organization-page').length > 0
       @initializeLocationEdit()
       $('.chosen-select select').select2()
@@ -33,7 +32,7 @@ class BikeIndex.Views.OrganizationsShow extends Backbone.View
     event.preventDefault()
     $('#lightspeed-info').slideToggle()
     $(event.target).toggleClass('shown')
-      
+
   initializeLocationEdit: ->
     $('form').on 'click', '.remove_fields', (event) ->
       # We don't need to do anything except slide the input up, because the label is on it.
@@ -52,5 +51,5 @@ class BikeIndex.Views.OrganizationsShow extends Backbone.View
       for name in names
         n = $(name)
         n.val($('#organization_name').val()) unless n.val().length > 0
-      
+
       $('.chosen-select select').select2()

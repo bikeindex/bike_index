@@ -34,16 +34,16 @@ class Export < ActiveRecord::Base
     {
       stolen: {
         with_blacklist: false,
-        only_serials_and_police_reports: false
+        only_serials_and_police_reports: false,
       },
       organization: {
         partial_registrations: false,
         start_at: nil,
-        end_at: nil
+        end_at: nil,
       },
       manufacturer: {
-        frame_only: false
-      }
+        frame_only: false,
+      },
     }.as_json.freeze
   end
 
@@ -140,11 +140,11 @@ class Export < ActiveRecord::Base
   end
 
   def tmp_file
-    @tmp_file ||= Tempfile.new(["#{kind == 'organization' ? organization.slug : kind}_#{id}", ".#{file_format}"])
+    @tmp_file ||= Tempfile.new(["#{kind == "organization" ? organization.slug : kind}_#{id}", ".#{file_format}"])
   end
 
   def tmp_file_rows
-    `wc -l "#{tmp_file.path}"`.strip.split(' ')[0].to_i - 1 # Because we don't count header
+    `wc -l "#{tmp_file.path}"`.strip.split(" ")[0].to_i - 1 # Because we don't count header
   end
 
   def description
