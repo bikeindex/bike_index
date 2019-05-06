@@ -252,10 +252,10 @@ describe "Bikes API V3" do
       end
 
       it "updates ownership if a claimed match is found and the update is POSTed by a creation org whose member created it" do
-        creator = FactoryBot.create(:existing_membership).user
-        bike = FactoryBot.create(:ownership_claimed, creator: creator).bike
-        FactoryBot.create(:existing_membership, user: user, organization: creator.organizations.first)
         new_owner = FactoryBot.create(:user, email: "new-owner@example.com")
+        bike = FactoryBot.create(:creation_organization_bike)
+        FactoryBot.create(:ownership_claimed, creator: bike.creator, bike: bike)
+        FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization)
 
         bike_attrs = {
           serial: bike.serial,
