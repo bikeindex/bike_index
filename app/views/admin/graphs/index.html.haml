@@ -54,7 +54,7 @@
       .control-group{ style: "padding-top: 19px" }
     .row
       .col-md-auto
-        = submit_tag "Update chart", class: "btn btn-success"
+        = submit_tag "Update chart", class: "btn btn-success mb-4"
     = line_chart variable_admin_graphs_path(params)
     %em.small.less-strong
       graph is grouped by #{@group_period}
