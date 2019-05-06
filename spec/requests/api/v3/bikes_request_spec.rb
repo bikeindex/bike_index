@@ -251,26 +251,28 @@ describe "Bikes API V3" do
         expect(returned_bike["id"]).to_not eq(bike.id)
       end
 
-      it "creates a new bike if it is POSTed by a creation org whose member initially created the match" do
+      it "updates ownership if a claimed match is found and the update is POSTed by a creation org whose member created it" do
         creator = FactoryBot.create(:existing_membership).user
-        bike = FactoryBot.create(:ownership, creator: creator).bike
+        bike = FactoryBot.create(:ownership_claimed, creator: creator).bike
         FactoryBot.create(:existing_membership, user: user, organization: creator.organizations.first)
+        new_owner = FactoryBot.create(:user, email: "new-owner@example.com")
 
         bike_attrs = {
           serial: bike.serial,
           manufacturer: bike.manufacturer.name,
           color: color.name,
           year: bike.year,
-          owner_email: user.email,
+          owner_email: new_owner.email,
         }
         post "/api/v3/bikes?access_token=#{token.token}",
              bike_attrs.to_json,
              json_headers
 
         returned_bike = json_result["bike"]
-        expect(response.status).to eq(201)
-        expect(response.status_message).to eq("Created")
-        expect(returned_bike["id"]).to_not eq(bike.id)
+        expect(response.status).to eq(302)
+        expect(response.status_message).to eq("Found")
+        expect(returned_bike["id"]).to eq(bike.id)
+        expect(returned_bike["owner_email"]).to eq(new_owner.email)
       end
     end
 
