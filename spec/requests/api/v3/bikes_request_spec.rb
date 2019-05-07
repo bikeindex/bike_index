@@ -72,84 +72,156 @@ describe "Bikes API V3" do
       end
     end
 
-    context "if the bike being created already exists" do
-      it "does not create a new record" do
-        post "/api/v3/bikes?access_token=#{token.token}",
-             bike_attrs.to_json,
-             json_headers
+    context "given a matching pre-existing bike record" do
+      context "if the POSTer is authorized to update" do
+        it "does not create a new record" do
+          post "/api/v3/bikes?access_token=#{token.token}",
+               bike_attrs.to_json,
+               json_headers
 
-        expect(response.status).to eq(201)
-        expect(response.status_message).to eq("Created")
-        bike1 = json_result["bike"]
+          expect(response.status).to eq(201)
+          expect(response.status_message).to eq("Created")
+          bike1 = json_result["bike"]
 
-        post "/api/v3/bikes?access_token=#{token.token}",
-             bike_attrs.to_json,
-             json_headers
+          post "/api/v3/bikes?access_token=#{token.token}",
+               bike_attrs.to_json,
+               json_headers
 
-        bike2 = json_result["bike"]
-        expect(response.status).to eq(302)
-        expect(response.status_message).to eq("Found")
-        expect(bike1["id"]).to eq(bike2["id"])
+          bike2 = json_result["bike"]
+          expect(response.status).to eq(302)
+          expect(response.status_message).to eq("Found")
+          expect(bike1["id"]).to eq(bike2["id"])
+        end
+
+        it "updates the pre-existing record" do
+          old_color = FactoryBot.create(:color, name: "old_color")
+          new_color = FactoryBot.create(:color, name: "new_color")
+          old_manufacturer = FactoryBot.create(:manufacturer, name: "old_manufacturer")
+          new_manufacturer = FactoryBot.create(:manufacturer, name: "new_manufacturer")
+          old_wheel_size = FactoryBot.create(:wheel_size, name: "old_wheel_size", iso_bsd: 10)
+          new_rear_wheel_size = FactoryBot.create(:wheel_size, name: "new_rear_wheel_size", iso_bsd: 11)
+          new_front_wheel_size = FactoryBot.create(:wheel_size, name: "new_front_wheel_size", iso_bsd: 12)
+          old_cycle_type = CycleType.new("unicycle")
+          new_cycle_type = CycleType.new("tricycle")
+          old_year = 1969
+          new_year = 2001
+          bike1 = FactoryBot.create(
+            :bike,
+            creator: user,
+            owner_email: user.email,
+            year: old_year,
+            manufacturer: old_manufacturer,
+            primary_frame_color: old_color,
+            cycle_type: old_cycle_type.id,
+            rear_wheel_size: old_wheel_size,
+            front_wheel_size: old_wheel_size,
+            rear_tire_narrow: false,
+            frame_material: "aluminum",
+          )
+          FactoryBot.create(:ownership, bike: bike1, creator: user, owner_email: user.email)
+
+          bike_attrs = {
+            serial: bike1.serial_number,
+            manufacturer: new_manufacturer.name,
+            rear_tire_narrow: true,
+            front_wheel_bsd: new_front_wheel_size.iso_bsd,
+            rear_wheel_bsd: new_rear_wheel_size.iso_bsd,
+            color: new_color.name,
+            year: new_year,
+            owner_email: user.email,
+            frame_material: "steel",
+            cycle_type_name: new_cycle_type.slug.to_s,
+          }
+          post "/api/v3/bikes?access_token=#{token.token}",
+               bike_attrs.to_json,
+               json_headers
+
+          bike2 = json_result["bike"]
+          expect(bike2["id"]).to eq(bike1.id)
+          expect(bike2["serial"]).to eq(bike1.serial)
+          expect(bike2["year"]).to eq(new_year)
+          expect(bike2["frame_colors"].first).to eq(new_color.name)
+          expect(bike2["type_of_cycle"]).to eq(new_cycle_type.name)
+          expect(bike2["manufacturer_id"]).to eq(old_manufacturer.id)
+          expect(bike2["front_wheel_size_iso_bsd"]).to eq(new_front_wheel_size.iso_bsd)
+          expect(bike2["rear_wheel_size_iso_bsd"]).to eq(new_rear_wheel_size.iso_bsd)
+          expect(bike2["rear_tire_narrow"]).to eq(true)
+          expect(bike2["frame_material"]).to eq("Steel")
+        end
+
+        context "if the matching bike is unclaimed" do
+          it "updates if the submitting org is the creation org" do
+            bike = FactoryBot.create(:creation_organization_bike)
+            FactoryBot.create(:ownership, creator: bike.creator, bike: bike)
+            FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization)
+
+            bike_attrs = {
+              serial: bike.serial,
+              manufacturer: bike.manufacturer.name,
+              color: color.name,
+              year: bike.year,
+              owner_email: bike.owner_email,
+            }
+            post "/api/v3/bikes?access_token=#{token.token}",
+                 bike_attrs.to_json,
+                 json_headers
+
+            returned_bike = json_result["bike"]
+            expect(response.status).to eq(302)
+            expect(response.status_message).to eq("Found")
+            expect(returned_bike["id"]).to eq(bike.id)
+          end
+
+          it "creates a new record if the submitting org isn't the creation org" do
+            bike = FactoryBot.create(:creation_organization_bike)
+            FactoryBot.create(:ownership, creator: bike.creator, bike: bike)
+            FactoryBot.create(:existing_membership, user: user)
+
+            bike_attrs = {
+              serial: bike.serial,
+              manufacturer: bike.manufacturer.name,
+              color: color.name,
+              year: bike.year,
+              owner_email: bike.owner_email,
+            }
+            post "/api/v3/bikes?access_token=#{token.token}",
+                 bike_attrs.to_json,
+                 json_headers
+
+            returned_bike = json_result["bike"]
+            expect(response.status).to eq(201)
+            expect(response.status_message).to eq("Created")
+            expect(returned_bike["id"]).to_not eq(bike.id)
+          end
+        end
       end
 
-      it "updates the pre-existing record if the bike has already been registered" do
-        old_color = FactoryBot.create(:color, name: "old_color")
-        new_color = FactoryBot.create(:color, name: "new_color")
-        old_manufacturer = FactoryBot.create(:manufacturer, name: "old_manufacturer")
-        new_manufacturer = FactoryBot.create(:manufacturer, name: "new_manufacturer")
-        old_wheel_size = FactoryBot.create(:wheel_size, name: "old_wheel_size", iso_bsd: 10)
-        new_rear_wheel_size = FactoryBot.create(:wheel_size, name: "new_rear_wheel_size", iso_bsd: 11)
-        new_front_wheel_size = FactoryBot.create(:wheel_size, name: "new_front_wheel_size", iso_bsd: 12)
-        old_cycle_type = CycleType.new("unicycle")
-        new_cycle_type = CycleType.new("tricycle")
-        old_year = 1969
-        new_year = 2001
-        bike1 = FactoryBot.create(
-          :bike,
-          creator: user,
-          owner_email: user.email,
-          year: old_year,
-          manufacturer: old_manufacturer,
-          primary_frame_color: old_color,
-          cycle_type: old_cycle_type.id,
-          rear_wheel_size: old_wheel_size,
-          front_wheel_size: old_wheel_size,
-          rear_tire_narrow: false,
-          frame_material: "aluminum",
-        )
-        FactoryBot.create(:ownership, bike: bike1, creator: user, owner_email: user.email)
+      context "if the matching bike is claimed" do
+        it "creates a new bike" do
+          bike = FactoryBot.create(:creation_organization_bike)
+          FactoryBot.create(:ownership_claimed, creator: bike.creator, bike: bike)
+          FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization)
 
-        bike_attrs = {
-          serial: bike1.serial_number,
-          manufacturer: new_manufacturer.name,
-          rear_tire_narrow: true,
-          front_wheel_bsd: new_front_wheel_size.iso_bsd,
-          rear_wheel_bsd: new_rear_wheel_size.iso_bsd,
-          color: new_color.name,
-          year: new_year,
-          owner_email: user.email,
-          frame_material: "steel",
-          cycle_type_name: new_cycle_type.slug.to_s,
-        }
-        post "/api/v3/bikes?access_token=#{token.token}",
-             bike_attrs.to_json,
-             json_headers
+          bike_attrs = {
+            serial: bike.serial,
+            manufacturer: bike.manufacturer.name,
+            color: color.name,
+            year: bike.year,
+            owner_email: bike.owner_email,
+          }
+          post "/api/v3/bikes?access_token=#{token.token}",
+               bike_attrs.to_json,
+               json_headers
 
-        bike2 = json_result["bike"]
-        expect(bike2["id"]).to eq(bike1.id)
-        expect(bike2["serial"]).to eq(bike1.serial)
-        expect(bike2["year"]).to eq(new_year)
-        expect(bike2["frame_colors"].first).to eq(new_color.name)
-        expect(bike2["type_of_cycle"]).to eq(new_cycle_type.name)
-        expect(bike2["manufacturer_id"]).to eq(old_manufacturer.id)
-        expect(bike2["front_wheel_size_iso_bsd"]).to eq(new_front_wheel_size.iso_bsd)
-        expect(bike2["rear_wheel_size_iso_bsd"]).to eq(new_rear_wheel_size.iso_bsd)
-        expect(bike2["rear_tire_narrow"]).to eq(true)
-        expect(bike2["frame_material"]).to eq("Steel")
+          returned_bike = json_result["bike"]
+          expect(response.status).to eq(201)
+          expect(response.status_message).to eq("Created")
+          expect(returned_bike["id"]).to_not eq(bike.id)
+        end
       end
     end
 
-    context "given a bike with a match by a normalized serial number" do
+    context "given a bike with a pre-existing match by a normalized serial number" do
       it "responds with the match instead of creating a duplicate" do
         bike_attrs = {
           serial: "serial-Ol",
@@ -178,7 +250,7 @@ describe "Bikes API V3" do
       end
     end
 
-    context "given a bike with a match by a normalized email" do
+    context "given a bike with a pre-existing match by a normalized email" do
       it "responds with the match instead of creating a duplicate" do
         bike_attrs = {
           serial: "serial-01",
@@ -207,7 +279,7 @@ describe "Bikes API V3" do
       end
     end
 
-    context "given a bike with a match by an owning user's secondary email" do
+    context "given a bike with a pre-existing match by an owning user's secondary email" do
       it "responds with the match instead of creating a duplicate" do
         user.user_emails.create(email: "secondary-email@example.com")
         bike = FactoryBot.create(:ownership, creator: user).bike
@@ -230,7 +302,7 @@ describe "Bikes API V3" do
       end
     end
 
-    context "given a bike with a match by serial" do
+    context "given a bike with a pre-existing match by serial" do
       it "creates a new bike if the match has a different owner" do
         bike = FactoryBot.create(:ownership, creator: user).bike
 
@@ -240,74 +312,6 @@ describe "Bikes API V3" do
           color: color.name,
           year: bike.year,
           owner_email: "some-other-owner@example.com",
-        }
-        post "/api/v3/bikes?access_token=#{token.token}",
-             bike_attrs.to_json,
-             json_headers
-
-        returned_bike = json_result["bike"]
-        expect(response.status).to eq(201)
-        expect(response.status_message).to eq("Created")
-        expect(returned_bike["id"]).to_not eq(bike.id)
-      end
-    end
-
-    context "given a match that cannot be updated by the POSTing entity" do
-      it "creates a new bike if the existing match has been claimed" do
-        bike = FactoryBot.create(:creation_organization_bike)
-        FactoryBot.create(:ownership_claimed, creator: bike.creator, bike: bike)
-        FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization)
-
-        bike_attrs = {
-          serial: bike.serial,
-          manufacturer: bike.manufacturer.name,
-          color: color.name,
-          year: bike.year,
-          owner_email: bike.owner_email,
-        }
-        post "/api/v3/bikes?access_token=#{token.token}",
-             bike_attrs.to_json,
-             json_headers
-
-        returned_bike = json_result["bike"]
-        expect(response.status).to eq(201)
-        expect(response.status_message).to eq("Created")
-        expect(returned_bike["id"]).to_not eq(bike.id)
-      end
-
-      it "updates if the match is unclaimed and submitting org is the creation org" do
-        bike = FactoryBot.create(:creation_organization_bike)
-        FactoryBot.create(:ownership, creator: bike.creator, bike: bike)
-        FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization)
-
-        bike_attrs = {
-          serial: bike.serial,
-          manufacturer: bike.manufacturer.name,
-          color: color.name,
-          year: bike.year,
-          owner_email: bike.owner_email,
-        }
-        post "/api/v3/bikes?access_token=#{token.token}",
-             bike_attrs.to_json,
-             json_headers
-
-        returned_bike = json_result["bike"]
-        expect(response.status).to eq(302)
-        expect(response.status_message).to eq("Found")
-        expect(returned_bike["id"]).to eq(bike.id)
-      end
-
-      it "creates a new bike if the submitting org isn't the creation org" do
-        bike = FactoryBot.create(:creation_organization_bike)
-        FactoryBot.create(:ownership, creator: bike.creator, bike: bike)
-        FactoryBot.create(:existing_membership, user: user)
-
-        bike_attrs = {
-          serial: bike.serial,
-          manufacturer: bike.manufacturer.name,
-          color: color.name,
-          year: bike.year,
-          owner_email: bike.owner_email,
         }
         post "/api/v3/bikes?access_token=#{token.token}",
              bike_attrs.to_json,
