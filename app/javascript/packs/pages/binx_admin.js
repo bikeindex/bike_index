@@ -1,6 +1,7 @@
 import log from "../utils/log";
 import moment from "moment-timezone";
 import LoadFancySelects from "../utils/LoadFancySelects";
+import BinxAdminInvoices from "./binx_admin_invoices.js";
 
 function BinxAdmin() {
   return {
@@ -23,6 +24,10 @@ function BinxAdmin() {
       }
       if ($("#admin-locations-fields").length > 0) {
         this.adminLocations();
+      }
+      if ($(".inputTriggerRecalculation")) {
+        const binxAdminInvoices = BinxAdminInvoices()
+        binxAdminInvoices.init();
       }
       // Enable bootstrap custom file upload boxes
       binxApp.enableFilenameForUploads();
