@@ -292,7 +292,7 @@ describe "Bikes API V3" do
              json_headers
 
         returned_bike = json_result["bike"]
-        expect(response.status).to eq(301)
+        expect(response.status).to eq(302)
         expect(response.status_message).to eq("Found")
         expect(returned_bike["id"]).to eq(bike.id)
       end
