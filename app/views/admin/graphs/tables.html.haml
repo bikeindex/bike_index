@@ -1,15 +1,16 @@
-%section
-  %h1
-    Bike Index records tables
-    %small
-      = link_to 'View graphs', admin_graphs_path
-.special-search-field-container
-  .special-search-field
-    = form_tag tables_admin_graphs_path, method: :get do
-      = text_field_tag :location, params[:location], placeholder: 'Location'
-      = text_field_tag :location_radius, params[:location_radius], placeholder: 'Proximity in miles'
-      = hidden_field_tag :tables, true
-      = submit_tag 'Load', name: 'search', class: 'button-blue'
+.admin-subnav
+  .col-md-6
+    %h1
+      Bike Index records tables
+      %small
+        = link_to 'View graphs', admin_graphs_path
+
+= form_tag tables_admin_graphs_path, method: :get do
+  .form-inline
+    = text_field_tag :location, params[:location], placeholder: 'Location', class: "form-control mr-2"
+    = text_field_tag :location_radius, params[:location_radius], placeholder: 'Proximity in miles', class: "form-control mr-2"
+    = hidden_field_tag :tables, true
+    = submit_tag 'Load', name: 'search', class: 'btn btn-primary'
 - years = Array(2013..Time.now.year)
 - dates = years.map { |y| Date.civil(y, 6, 6) }
 - yday = Time.zone.now.yday
@@ -22,71 +23,71 @@
   %span.less-strong
     data in this color
   is (simplified, not accounting for seasonalness) projections for the end of the current year
-
-%table.table.table-striped.table-bordered
-  %thead
-    %th
-    %th Stolen in year
-    %th Total stolen by eoy
-    %th Recovered in year
-    %th Stolen & non, in year
-    %th Total Stolen & non by eoy
-    %th Users in year
-  %tbody
-    - years.each_with_index do |year, index|
-      / - cache("admin_table_count_#{year}", expires_in: 1.hour) do
-      - date = dates[index]
-      %tr
-        %td
-          = year
-        %td
-          / Because of data import from SBR - after, we want created_at,it's more reliable
-          / because we automatically take it, also, people reporting previous thefts, etc
-          - if [2013, 2014].include?(year)
-            = StolenRecord.unscoped.where(date_stolen: date.all_year).count
-          - else
-            = count = StolenRecord.unscoped.where(created_at: date.all_year).count
+.full-screen-table-wrapper
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th
+      %th Stolen in year
+      %th Total stolen by eoy
+      %th Recovered in year
+      %th Stolen & non, in year
+      %th Total Stolen & non by eoy
+      %th Users in year
+    %tbody
+      - years.each_with_index do |year, index|
+        / - cache("admin_table_count_#{year}", expires_in: 1.hour) do
+        - date = dates[index]
+        %tr
+          %td
+            = year
+          %td
+            / Because of data import from SBR - after, we want created_at,it's more reliable
+            / because we automatically take it, also, people reporting previous thefts, etc
+            - if [2013, 2014].include?(year)
+              = StolenRecord.unscoped.where(date_stolen: date.all_year).count
+            - else
+              = count = StolenRecord.unscoped.where(created_at: date.all_year).count
+              - if year == Time.zone.now.year
+                %span.less-strong
+                  = s_project = count + (BigDecimal.new(count) / yday * days_left).to_i
+          %td
+            = count = StolenRecord.unscoped.where('created_at < ?', date.end_of_year).count
             - if year == Time.zone.now.year
               %span.less-strong
-                = s_project = count + (BigDecimal.new(count) / yday * days_left).to_i
-        %td
-          = count = StolenRecord.unscoped.where('created_at < ?', date.end_of_year).count
-          - if year == Time.zone.now.year
-            %span.less-strong
-              = s_project + count
-        %td
-          = count = StolenRecord.unscoped.where(date_recovered: date.all_year).count
-          - if year == Time.zone.now.year
-            %span.less-strong
-              = count + (BigDecimal.new(count) / yday * days_left).to_i
-        %td
-          = count = Bike.unscoped.where(created_at: date.all_year).count
-          - if year == Time.zone.now.year
-            %span.less-strong
-              = a_project = count + (BigDecimal.new(count) / yday * days_left).to_i
-        %td
-          = count = Bike.unscoped.where('created_at < ?', date.all_year.last).count
-          - if year == Time.zone.now.year
-            %span.less-strong
-              = a_project + count
-        %td
-          = count = User.unscoped.where(created_at: date.all_year).count
-          - if year == Time.zone.now.year
-            %span.less-strong
-              = count + (BigDecimal.new(count) / yday * days_left).to_i
-.padded
-.padded
+                = s_project + count
+          %td
+            = count = StolenRecord.unscoped.where(date_recovered: date.all_year).count
+            - if year == Time.zone.now.year
+              %span.less-strong
+                = count + (BigDecimal.new(count) / yday * days_left).to_i
+          %td
+            = count = Bike.unscoped.where(created_at: date.all_year).count
+            - if year == Time.zone.now.year
+              %span.less-strong
+                = a_project = count + (BigDecimal.new(count) / yday * days_left).to_i
+          %td
+            = count = Bike.unscoped.where('created_at < ?', date.all_year.last).count
+            - if year == Time.zone.now.year
+              %span.less-strong
+                = a_project + count
+          %td
+            = count = User.unscoped.where(created_at: date.all_year).count
+            - if year == Time.zone.now.year
+              %span.less-strong
+                = count + (BigDecimal.new(count) / yday * days_left).to_i
+.mt-4
+.mt-4
 - location_radius = params[:location_radius].present? ? params[:location_radius].to_i : 100
 - box = params[:location].present? && Geocoder::Calculations.bounding_box(params[:location], location_radius)
 - if box && !box[0].nan?
-  %h2.padded
+  %h2.mt-4
     Records in
     %strong
       = params[:location]
     %small
       within #{location_radius} miles
-  %table.table.table-striped.table-bordered
-    %thead
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
       %th
       %th Stolen in year
       %th Total stolen by eoy

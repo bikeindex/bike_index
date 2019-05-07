@@ -1,70 +1,57 @@
+.admin-subnav
+  .col-md-4
+    %h1
+      #{@kind.titleize} graphs
+  .col-md-8
+    %ul
+      %li.nav-item
+        = link_to "Location count tables", tables_admin_graphs_path, class: "nav-link"
+      - @graph_kinds.each do |kind|
+        %li.nav-item
+          = link_to "#{kind} graphs", admin_graphs_path(kind: kind), class: @kind == kind ? " nav-link active" : "nav-link"
 
-/ inline scss is wrong and shouldn't be done - but because we're avoiding adding new things to the existing admin stylesheets, putting it here anyway
-/ TODO: put into admin stylesheets when we update admin stylesheets
-:scss
-  .admin-graphs-list a.active {
-    font-weight: bold;
-  }
-  .variable-admin-graphs-form {
-    .control-group {
-      width: 220px;
-      float: left;
-      margin-right: 1rem;
-    }
-  }
-
-%ul.admin-graphs-list
-  %li
-    = link_to "Location count tables", tables_admin_graphs_path
-  - @graph_kinds.each do |kind|
-    %li
-      = link_to "#{kind} graphs", admin_graphs_path(kind: kind), class: @kind == kind ? "active" : ""
-
-%section.padded
-  %h1
-    #{@kind.titleize} graphs
-
-%hr#pageContainerFluid.padded
 
 - if @kind == "general"
-  %section
-    %h2 Users past week
-    = line_chart User.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count
 
-  %section
-    %h2
-      Users since start
-    = line_chart users_admin_graphs_path
+  %h2 Users past week
+  = line_chart User.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count
 
-  %section
-    %h2
-      Bikes past year
-    = line_chart bikes_admin_graphs_path(start_at: 'past_year')
+  %h2
+    Users since start
+  = line_chart users_admin_graphs_path
 
-  %section
-    %h2
-      Bikes since start
 
-    = line_chart bikes_admin_graphs_path
+  %h2
+    Bikes past year
+  = line_chart bikes_admin_graphs_path(start_at: 'past_year')
+
+
+  %h2
+    Bikes since start
+
+  = line_chart bikes_admin_graphs_path
 
 - else
   = form_tag admin_graphs_path, method: :get, class: "variable-admin-graphs-form" do
     = hidden_field_tag :kind, @kind
     = hidden_field_tag :timezone, "", class: "hiddenFieldTimezone"
-
-    %section.graph_time_select
-      = select_tag(:graph_date_option, options_for_select([["Custom","custom"],["Past day", "1,days"],["Past week", "1,weeks"], ["Past month", "1,months"], ["Past six months", "6,months"], ["Past year", "1,years"]], params[:graph_date_option]))
-      = submit_tag "Update chart", class: "button-green"
-    .clearfix
-      .control-group.calendar-box{style: "display: none"}
-        = label_tag :start_at, "Start at", class: "control-label"
-        .controls
+    .row
+      .col-md-4
+        %section.graph_time_select.fancy-select.unfancy
+          = label_tag :selection, "Graph time slice"
+          = select_tag(:graph_date_option, options_for_select([["Custom","custom"],["Past day", "1,days"],["Past week", "1,weeks"], ["Past month", "1,months"], ["Past six months", "6,months"], ["Past year", "1,years"]], params[:graph_date_option]))
+      .col-md-4
+        .form-group.calendar-box{style: "display: none"}
+          = label_tag :start_at, "Start at", class: "control-label"
           = datetime_local_field_tag :start_at, @start_at.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
-      .control-group.calendar-box{style: "display: none"}
-        = label_tag :end_at, "End at", class: "control-label"
-        .controls
-          = datetime_local_field_tag :end_at, @end_at.strftime("%Y-%m-%dT%H:%M"), step: 60
+      .col-md-4
+        .form-group.calendar-box{style: "display: none"}
+          = label_tag :end_at, "End at", class: "control-label"
+          = datetime_local_field_tag :end_at, @end_at.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
       .control-group{ style: "padding-top: 19px" }
+    .row
+      .col-md-auto
+        = submit_tag "Update chart", class: "btn btn-success mb-4"
     = line_chart variable_admin_graphs_path(params)
     %em.small.less-strong
       graph is grouped by #{@group_period}
