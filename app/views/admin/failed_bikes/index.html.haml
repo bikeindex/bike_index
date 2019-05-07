@@ -8,7 +8,7 @@
     = @b_params.where(BParam.arel_table[:created_at].gt(Date.yesterday)).count
     today
 
-.full-screen-table-wrapper
+.full-screen-table
   %table.table.table-striped.table-bordered
     %thead.thead-light
       %th
