@@ -1,61 +1,64 @@
 %h1
   Edit #{@invoice.display_name} for #{link_to @invoice.organization.short_name, admin_organization_invoices_path(@invoice.organization)}
-
-%table.table-list
-  %tr
-    %td
-      Active:
-    %td
-      %strong
-        - if @invoice.active?
-          "Yes"
-        - elsif @invoice.was_active?
-          Expired
-        - else
-          no
-  %tr
-    %td
-      - if @invoice.expired?
-        Expired:
-      - else
-        Expires:
-    %td
-      - if @invoice.subscription_end_at.present?
-        %span.convertTime
-          = l @invoice.subscription_end_at, format: :convert_time
-  %tr
-    %td
-      Associated invoices:
-    %td
-      %ul
-        %li
-          Previous:
-          - if @invoice.previous_invoice.present?
-            #{link_to @invoice.previous_invoice.display_name, edit_admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.previous_invoice.id)}
-        %li
-          Next:
-          - if @invoice.following_invoice.present?
-            #{link_to @invoice.following_invoice.display_name, edit_admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.following_invoice.id)}
-          - else
-            - if @invoice.paid_in_full?
-              %strong
-                = link_to "create following invoice", admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.id, create_following_invoice: true), method: "PUT", action: "update"
+.row
+  .col-sm-6
+    %table.table-list
+      %tr
+        %td
+          Associated invoices:
+        %td
+          %ul
+            %li
+              Previous:
+              - if @invoice.previous_invoice.present?
+                #{link_to @invoice.previous_invoice.display_name, edit_admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.previous_invoice.id)}
+            %li
+              Next:
+              - if @invoice.following_invoice.present?
+                #{link_to @invoice.following_invoice.display_name, edit_admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.following_invoice.id)}
+              - else
+                - if @invoice.paid_in_full?
+                  %strong
+                    = link_to "create following invoice", admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.id, create_following_invoice: true), method: "PUT", action: "update"
+                - else
+                  Invoice must be paid before you can create a following invoice
+      %tr
+        %td
+          Paid in full:
+        %td
+          %strong
+            = @invoice.paid_in_full? ? "Yes" : "No"
+          %span.less-strong
+            = @invoice.money_formatted(@invoice.amount_paid_cents)
+          %ul
+            - @invoice.payments.each do |payment|
+              %li
+                = link_to "#{payment.amount_formatted} on", admin_payment_path(payment)
+                %span.convertTime
+                  = l payment.created_at, format: :convert_time
+  .col-sm-6
+    %table.table-list
+      %tr
+        %td
+          Active:
+        %td
+          %strong
+            - if @invoice.active?
+              "Yes"
+            - elsif @invoice.was_active?
+              Expired
             - else
-              Invoice must be paid before you can create a following invoice
-  %tr
-    %td
-      Paid in full:
-    %td
-      %strong
-        = @invoice.paid_in_full? ? "Yes" : "No"
-      %span.less-strong
-        = @invoice.money_formatted(@invoice.amount_paid_cents)
-      %ul
-        - @invoice.payments.each do |payment|
-          %li
-            = link_to "#{payment.amount_formatted} on", admin_payment_path(payment)
+              no
+      %tr
+        %td
+          - if @invoice.expired?
+            Expired:
+          - else
+            Expires:
+        %td
+          - if @invoice.subscription_end_at.present?
             %span.convertTime
-              = l payment.created_at, format: :convert_time
+              = l @invoice.subscription_end_at, format: :convert_time
 
 
 = render "form"
