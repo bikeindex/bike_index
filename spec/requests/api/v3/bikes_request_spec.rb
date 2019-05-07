@@ -149,7 +149,110 @@ describe "Bikes API V3" do
       end
     end
 
-    it "creates a non example bike, with components and " do
+    context "given a bike with a match by a normalized serial number" do
+      it "responds with the match instead of creating a duplicate" do
+        bike_attrs = {
+          serial: "serial-Ol",
+          manufacturer: manufacturer.name,
+          color: color.name,
+          year: "1969",
+          owner_email: "bike-serial-01@examples.com",
+        }
+        post "/api/v3/bikes?access_token=#{token.token}",
+             bike_attrs.to_json,
+             json_headers
+
+        expect(response.status).to eq(201)
+        expect(response.status_message).to eq("Created")
+        bike1 = json_result["bike"]
+
+        bike_attrs = bike_attrs.merge(serial: "serial-01")
+        post "/api/v3/bikes?access_token=#{token.token}",
+             bike_attrs.to_json,
+             json_headers
+
+        bike2 = json_result["bike"]
+        expect(response.status).to eq(302)
+        expect(response.status_message).to eq("Found")
+        expect(bike1["id"]).to eq(bike2["id"])
+      end
+    end
+
+    context "given a bike with a match by a normalized email" do
+      it "responds with the match instead of creating a duplicate" do
+        bike_attrs = {
+          serial: "serial-01",
+          manufacturer: manufacturer.name,
+          color: color.name,
+          year: "1969",
+          owner_email: "bike-serial-01@example.com",
+        }
+        post "/api/v3/bikes?access_token=#{token.token}",
+             bike_attrs.to_json,
+             json_headers
+
+        expect(response.status).to eq(201)
+        expect(response.status_message).to eq("Created")
+        bike1 = json_result["bike"]
+
+        bike_attrs = bike_attrs.merge(owner_email: "  bike-serial-01@example.com  ")
+        post "/api/v3/bikes?access_token=#{token.token}",
+             bike_attrs.to_json,
+             json_headers
+
+        bike2 = json_result["bike"]
+        expect(response.status).to eq(302)
+        expect(response.status_message).to eq("Found")
+        expect(bike1["id"]).to eq(bike2["id"])
+      end
+    end
+
+    context "given a bike with a match by an owning user's secondary email" do
+      it "responds with the match instead of creating a duplicate" do
+        user.user_emails.create(email: "secondary-email@example.com")
+        bike = FactoryBot.create(:ownership, creator: user).bike
+
+        bike_attrs = {
+          serial: bike.serial,
+          manufacturer: bike.manufacturer.name,
+          color: color.name,
+          year: bike.year,
+          owner_email: user.secondary_emails.first,
+        }
+        post "/api/v3/bikes?access_token=#{token.token}",
+             bike_attrs.to_json,
+             json_headers
+
+        returned_bike = json_result["bike"]
+        expect(response.status).to eq(302)
+        expect(response.status_message).to eq("Found")
+        expect(returned_bike["id"]).to eq(bike.id)
+      end
+    end
+
+    context "given a bike with a match by serial" do
+      it "creates a new bike if the match has a different owner" do
+        bike = FactoryBot.create(:ownership, creator: user).bike
+
+        bike_attrs = {
+          serial: bike.serial,
+          manufacturer: bike.manufacturer.name,
+          color: color.name,
+          year: bike.year,
+          owner_email: "some-other-owner@example.com",
+        }
+        post "/api/v3/bikes?access_token=#{token.token}",
+             bike_attrs.to_json,
+             json_headers
+
+        returned_bike = json_result["bike"]
+        expect(response.status).to eq(201)
+        expect(response.status_message).to eq("Created")
+        expect(returned_bike["id"]).to_not eq(bike.id)
+      end
+    end
+
+    it "creates a non example bike, with components" do
       manufacturer = FactoryBot.create(:manufacturer)
       FactoryBot.create(:ctype, name: "wheel")
       FactoryBot.create(:ctype, name: "Headset")
