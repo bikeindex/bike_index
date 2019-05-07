@@ -3,7 +3,7 @@
 - show_serial ||= params[:show_serial].present?
 - sortable ||= false
 
-.full-screen-table-wrapper
+.full-screen-table
   %table.table.table-striped.table-bordered.table-sm{ class: show_serial ? "show-admin-bike-table-serial-cell" : "" }
     - unless no_show_header
       %thead.thead-light.sortable

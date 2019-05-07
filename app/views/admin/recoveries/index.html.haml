@@ -21,7 +21,7 @@
 
 
 = paginate @recoveries, views_prefix: "admin"
-.full-screen-table-wrapper
+.full-screen-table
   = form_tag approve_admin_recoveries_path, class: '', id: 'multi_check' do
     = hidden_field_tag :multipost, true
     / - unless @posted
