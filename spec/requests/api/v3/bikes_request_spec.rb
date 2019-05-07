@@ -250,28 +250,6 @@ describe "Bikes API V3" do
         expect(response.status_message).to eq("Created")
         expect(returned_bike["id"]).to_not eq(bike.id)
       end
-
-      it "creates a new bike if it is POSTed by a creation org whose member initially created the match" do
-        creator = FactoryBot.create(:existing_membership).user
-        bike = FactoryBot.create(:ownership, creator: creator).bike
-        FactoryBot.create(:existing_membership, user: user, organization: creator.organizations.first)
-
-        bike_attrs = {
-          serial: bike.serial,
-          manufacturer: bike.manufacturer.name,
-          color: color.name,
-          year: bike.year,
-          owner_email: user.email,
-        }
-        post "/api/v3/bikes?access_token=#{token.token}",
-             bike_attrs.to_json,
-             json_headers
-
-        returned_bike = json_result["bike"]
-        expect(response.status).to eq(201)
-        expect(response.status_message).to eq("Created")
-        expect(returned_bike["id"]).to_not eq(bike.id)
-      end
     end
 
     it "creates a non example bike, with components" do
