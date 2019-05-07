@@ -18,7 +18,7 @@
           = f.submit 'Save', class: 'btn btn-success float-right'
   .mt-4
 
-%ul{ :"data-order-url" => order_public_images_url }
+%ul#public_image{ :"data-order-url" => order_public_images_url }
   - if @mail_snippet.public_images
     = render partial: '/public_images/public_image', collection: @mail_snippet.public_images, as: :public_image, locals: { skip_order: true }
 %section

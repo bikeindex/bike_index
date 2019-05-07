@@ -1,10 +1,15 @@
 import log from "../utils/log";
 import moment from "moment-timezone";
 import LoadFancySelects from "../utils/LoadFancySelects";
+import BinxAdminPhotos from "./binx_admin_photos.js"
+import "sortable";
+// global export
+
 
 function BinxAdmin() {
   return {
     init() {
+      window.Sortable = Sortable;
       // If there is an element on the page with id pageContainerFluid, make the page container full width
       if ($("#pageContainerFluid").length) {
         $("#admin-content > .receptacle").css("max-width", "100%");
@@ -23,6 +28,10 @@ function BinxAdmin() {
       }
       if ($("#admin-locations-fields").length > 0) {
         this.adminLocations();
+      }
+      if ($("#public_image").length > 0) {
+        const binxAdminPhotos = BinxAdminPhotos()
+        binxAdminPhotos.init();
       }
       // Enable bootstrap custom file upload boxes
       binxApp.enableFilenameForUploads();

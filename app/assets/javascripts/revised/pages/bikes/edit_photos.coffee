@@ -1,6 +1,3 @@
-import * as Sortable from "sortablejs";
-
-
 class BikeIndex.BikesEditPhotos extends BikeIndex
   constructor: ->
     @initializeEventListeners()

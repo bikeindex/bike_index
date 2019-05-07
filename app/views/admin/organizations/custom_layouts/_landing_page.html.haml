@@ -9,7 +9,7 @@
       = f.submit 'Save', class: 'btn btn-success'
 // Because somewhere, there is overflow hidden and it cuts off the bottom of the save button
 .mt-4
-%ul{ :"data-order-url" => order_public_images_url }
+%ul#public_image{ :"data-order-url" => order_public_images_url }
   - if @organization.public_images
     = render partial: '/public_images/public_image', collection: @organization.public_images, as: :public_image, locals: { skip_order: true }
 %section

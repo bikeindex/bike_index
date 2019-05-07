@@ -6499,6 +6499,18 @@ jest@^24.5.0:
     import-local "^2.0.0"
     jest-cli "^24.7.1"
 
+jquery-sortable@^0.9.13:
+  version "0.9.13"
+  resolved "https://registry.yarnpkg.com/jquery-sortable/-/jquery-sortable-0.9.13.tgz#1cbfb655013a0747370571f06e22f524a00ffba2"
+  integrity sha1-HL+2VQE6B0c3BXHwbiL1JKAP+6I=
+  dependencies:
+    jquery "^2.1.2"
+
+jquery@^2.1.2:
+  version "2.2.4"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-2.2.4.tgz#2c89d6889b5eac522a7eea32c14521559c6cbf02"
+  integrity sha1-LInWiJterFIqfuoywUUhVZxsvwI=
+
 jquery@^3.3.1:
   version "3.3.1"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
