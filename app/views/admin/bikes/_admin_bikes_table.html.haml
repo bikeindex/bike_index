@@ -3,79 +3,80 @@
 - show_serial ||= params[:show_serial].present?
 - sortable ||= false
 
-%table.table.table-striped.table-bordered.table-sm{ class: show_serial ? "show-admin-bike-table-serial-cell" : "" }
-  - unless no_show_header
-    %thead.thead-light.sortable
-      %th
-        - if sortable
-          = sortable "id", "Registered"
-        - else
-          Registered
-      %th.d-none.d-md-table-cell
-        - if sortable
-          = sortable "owner_email", "Sent to"
-        - else
-          Sent to
-      %th
-        - if sortable
-          = sortable "manufacturer_id"
-        - else
-          Manufacturer
-      %th.d-none.d-lg-table-cell
-        Info
-      %th.admin-bike-table-serial-cell
-        Serial
-      %th.d-none.d-sm-table-cell
-        Created by
+.full-screen-table-wrapper
+  %table.table.table-striped.table-bordered.table-sm{ class: show_serial ? "show-admin-bike-table-serial-cell" : "" }
+    - unless no_show_header
+      %thead.thead-light.sortable
+        %th
+          - if sortable
+            = sortable "id", "Registered"
+          - else
+            Registered
+        %th.d-none.d-md-table-cell
+          - if sortable
+            = sortable "owner_email", "Sent to"
+          - else
+            Sent to
+        %th
+          - if sortable
+            = sortable "manufacturer_id"
+          - else
+            Manufacturer
+        %th.d-none.d-lg-table-cell
+          Info
+        %th.admin-bike-table-serial-cell
+          Serial
+        %th.d-none.d-sm-table-cell
+          Created by
 
-  %tbody
-    - bikes.decorate.each do |bike|
-      - cache(bike) do
-        %tr
-          %td
-            .less-strong-hold
-              %a.convertTime{ href: edit_admin_bike_url(bike) }
-                = l bike.created_at, format: :convert_time
-              %span.less-strong-right.d-none.d-md-table-cell
-                - if bike.example
-                  %span.text-danger
-                    = bike.id
-                - else
-                  = bike.id
-          %td.d-none.d-md-table-cell
-            = bike.owner_email
-            - if bike.user?
-              - if bike.owner.donor?
-                <span class="donor-icon">D</span>
-              - elsif bike.owner.paid_org?
-                <span class="paid-org-icon">O</span>
-          %td
-            - if bike.manufacturer_other.present?
-              %span.text-warning
-                = bike.manufacturer_other
-            - else
-              = bike.mnfg_name
-          %td.d-none.d-lg-table-cell
-            .less-strong-hold
-              = [bike.year, bike.frame_model].join(' ')
-              = "(#{bike.type})" unless bike.type == 'bike'
-              - if bike.paint.present? && bike.paint.color_id.blank?
-                %span.less-strong
-                  = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
-                  = bike.frame_colors.to_sentence
-              - if bike.stolen
-                %span.less-strong-right
-                  stolen
-          %td.admin-bike-table-serial-cell
-            %small.less-strong
-              = bike.serial_number
-          %td.d-none.d-sm-table-cell
-            .less-strong-hold
-              - if bike.creation_organization.present?
-                = link_to bike.creation_organization.name, admin_bikes_path(sortable_search_params.merge(organization_id: bike.creation_organization.to_param))
-              - if bike.creation_description
-                %span.less-strong-right
-                  - if bike.bulk_import.present?
-                    = link_to bike.creation_description, admin_bulk_import_path(bike.bulk_import), class: "less-strong"
+    %tbody
+      - bikes.decorate.each do |bike|
+        - cache(bike) do
+          %tr
+            %td
+              .less-strong-hold
+                %a.convertTime{ href: edit_admin_bike_url(bike) }
+                  = l bike.created_at, format: :convert_time
+                %span.less-strong-right.d-none.d-md-table-cell
+                  - if bike.example
+                    %span.text-danger
+                      = bike.id
                   - else
-                    = bike.creation_description
+                    = bike.id
+            %td.d-none.d-md-table-cell
+              = bike.owner_email
+              - if bike.user?
+                - if bike.owner.donor?
+                  <span class="donor-icon">D</span>
+                - elsif bike.owner.paid_org?
+                  <span class="paid-org-icon">O</span>
+            %td
+              - if bike.manufacturer_other.present?
+                %span.text-warning
+                  = bike.manufacturer_other
+              - else
+                = bike.mnfg_name
+            %td.d-none.d-lg-table-cell
+              .less-strong-hold
+                = [bike.year, bike.frame_model].join(' ')
+                = "(#{bike.type})" unless bike.type == 'bike'
+                - if bike.paint.present? && bike.paint.color_id.blank?
+                  %span.less-strong
+                    = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
+                    = bike.frame_colors.to_sentence
+                - if bike.stolen
+                  %span.less-strong-right
+                    stolen
+            %td.admin-bike-table-serial-cell
+              %small.less-strong
+                = bike.serial_number
+            %td.d-none.d-sm-table-cell
+              .less-strong-hold
+                - if bike.creation_organization.present?
+                  = link_to bike.creation_organization.name, admin_bikes_path(sortable_search_params.merge(organization_id: bike.creation_organization.to_param))
+                - if bike.creation_description
+                  %span.less-strong-right
+                    - if bike.bulk_import.present?
+                      = link_to bike.creation_description, admin_bulk_import_path(bike.bulk_import), class: "less-strong"
+                    - else
+                      = bike.creation_description

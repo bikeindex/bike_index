@@ -17,7 +17,9 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
     redirect_to edit_admin_organization_invoice_path
   end
 
-  def edit; end
+  def edit
+    render layout: "new_admin"
+  end
 
   def create
     @invoice = @organization.invoices.build(permitted_parameters.except(:paid_feature_ids))
@@ -43,7 +45,7 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
       flash[:success] = "Invoice updated! #{invoice_is_active_notice(@invoice)}"
       redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
     else
-      render :edit
+      render :edit, layout: "new_admin"
     end
   end
 

@@ -13,10 +13,14 @@
   }
 }
 
-.admin-bike-partial {
-  img {
-    height: auto;
-    max-width: 100px;
+.admin-graphs-list a.active {
+  font-weight: bold;
+}
+.variable-admin-graphs-form {
+  .control-group {
+    width: 220px;
+    float: left;
+    margin-right: 1rem;
   }
 }
 

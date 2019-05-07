@@ -42,10 +42,10 @@ binxApp.preciseTimeSeconds = function(time) {
 };
 
 binxApp.localizeTimes = function() {
-  if (!window.timezone) {
-    window.timezone = moment.tz.guess();
+  if (!window.userTimezone) {
+    window.userTimezone = moment.tz.guess();
   }
-  moment.tz.setDefault(window.timezone);
+  moment.tz.setDefault(window.userTimezone);
   window.yesterday = moment()
     .subtract(1, "day")
     .startOf("day");

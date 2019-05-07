@@ -150,7 +150,10 @@ class Admin::BikesController < Admin::BaseController
     bikes = bikes.example if params[:search_example].present?
     bikes = bikes.non_example if params[:search_non_example].present?
     bikes = bikes.organization(current_organization) if current_organization.present?
-    bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email]
+    bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email].present?
+    bikes = bikes.stolen if params[:search_stolen].present?
+    @pos_search_type = %w[lightspeed_pos ascend_pos any_pos not_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
+    bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
     bikes = bikes.ascend_pos if params[:search_ascend].present?
     bikes = bikes.lightspeed_pos if params[:search_lightspeed].present?
     @matching_bikes = bikes

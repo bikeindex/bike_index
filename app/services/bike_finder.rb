@@ -25,7 +25,7 @@ module BikeFinder
       .where(serial_normalized: SerialNormalizer.new(serial: serial).normalized)
       .where(
         "bikes.owner_email = ? OR ownerships.user_id IN (?) OR ownerships.creator_id IN (?)",
-        owner_email,
+        email,
         candidate_user_ids,
         candidate_user_ids
       )
