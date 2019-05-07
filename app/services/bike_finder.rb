@@ -10,36 +10,25 @@ module BikeFinder
   # - any email associated with any owner (via user.user_emails)
   #
   # Return a Bike object, or nil
-  def self.find_matching(serial:, owner_email:, current_user: nil)
-    owner_email = EmailNormalizer.normalize(owner_email)
-    serial = SerialNormalizer.new(serial: serial).normalized
+  def self.find_matching(serial:, owner_email:)
+    email = EmailNormalizer.normalize(owner_email)
 
     candidate_user_ids =
       User
         .joins("LEFT JOIN user_emails ON user_emails.user_id = users.id")
-        .where("users.email = ? OR user_emails.email = ?", owner_email, owner_email)
+        .where("users.email = ? OR user_emails.email = ?", email, email)
         .select(:id)
         .uniq
 
-    found_bike = Bike
+    Bike
       .joins("LEFT JOIN ownerships ON bikes.id = ownerships.bike_id")
-      .where(serial_normalized: serial)
+      .where(serial_normalized: SerialNormalizer.new(serial: serial).normalized)
       .where(
         "bikes.owner_email = ? OR ownerships.user_id IN (?) OR ownerships.creator_id IN (?)",
-        owner_email,
+        email,
         candidate_user_ids,
         candidate_user_ids
       )
       .first
-
-    return found_bike if found_bike.present?
-
-    if current_user.present?
-      Bike
-        .includes(:ownerships)
-        .where(serial_normalized: serial, ownerships: { claimed: true })
-        .select { |b| b.creation_organization&.in?(current_user.organizations) }
-        .first
-    end
   end
 end

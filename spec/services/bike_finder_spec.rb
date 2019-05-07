@@ -17,20 +17,6 @@ RSpec.describe BikeFinder do
       expect(result).to be_nil
     end
 
-    it "returns a match when the serial matches and the creator and current user are part of the same organization" do
-      bike = FactoryBot.create(:creation_organization_bike)
-      current_user = FactoryBot.create(:existing_membership, organization: bike.creation_organization).user
-      FactoryBot.create(:ownership_claimed, creator: bike.creator, bike: bike)
-
-      result = BikeFinder.find_matching(
-        serial: bike.serial_number,
-        owner_email: "new-owner-email@example.com",
-        current_user: current_user,
-      )
-
-      expect(result).to eq(bike)
-    end
-
     it "returns match when the target email is present on a user record and the serial matches" do
       bike = FactoryBot.create(:ownership).bike
       UserEmail.delete_all

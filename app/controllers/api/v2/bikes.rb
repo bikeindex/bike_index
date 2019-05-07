@@ -139,11 +139,8 @@ module API
         end
         post "/", serializer: BikeV2ShowSerializer, root: "bike" do
           # Search for a bike matching the provided serial number / owner email
-          found_bike = BikeFinder.find_matching(
-            serial: params[:serial],
-            owner_email: params[:owner_email],
-            current_user: current_user,
-          )
+          bike_attrs = %w{serial owner_email}.map { |key| [key.to_sym, params[key]] }.to_h
+          found_bike = BikeFinder.find_matching(**bike_attrs)
 
           # bike was not found, create it
           if found_bike.blank?
