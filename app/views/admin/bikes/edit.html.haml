@@ -135,16 +135,14 @@
           = f.label :primary_frame_color_id
           = collection_select(:bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
       .col-lg-6
-        -# Do you want this here or in the controller?
-        - organizations = Organization.all
         .form-group.fancy-select.unfancy
           = f.label :creation_organization_id
-          = collection_select(:bike, :creation_organization_id, organizations, :id, :name, prompt: "Choose organization")
+          = collection_select(:bike, :creation_organization_id, @organizations, :id, :name, prompt: "Choose organization")
     .row
       .col-lg-6
         .form-group.fancy-select.unfancy
           = f.label :bike_organization_ids, 'Current orgs'
-          = f.collection_select(:bike_organization_ids, organizations, :id, :name, { include_blank: true, prompt: '' }, { multiple: true })
+          = f.collection_select(:bike_organization_ids, @organizations, :id, :name, { include_blank: true, prompt: '' }, { multiple: true })
       .col-lg-6
         .form-group
           = f.label :description

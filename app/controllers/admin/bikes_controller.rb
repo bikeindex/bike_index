@@ -71,6 +71,7 @@ class Admin::BikesController < Admin::BaseController
     @bike = @bike.decorate
     @fast_attr_update = params[:fast_attr_update]
     @recoveries = @bike.recovered_records
+    @organizations = Organization.all
     render layout: "new_admin"
   end
 
