@@ -1,18 +1,21 @@
-%header.with-subtitle.padded
-  %h1
-    Edit #{ link_to @organization.name, admin_organization_path(@organization) } custom layouts
-  %p
-    = link_to 'Custom layouts version history', ENV['CUSTOM_CODE_SOURCE']
-%section
-  .dl-holder.padded
-    %dl.dl-horizontal
-      %dt Paid
-      %dd
-        = @organization.is_paid
-          
-%section.full-screen-table
-  %table.table.table-striped.table-bordered
-    %thead
+%h1
+  Edit #{ link_to @organization.name, admin_organization_path(@organization) } custom layouts
+.row
+  .col-lg-6
+    %p
+      = link_to 'Custom layouts version history', ENV['CUSTOM_CODE_SOURCE']
+  .col-lg-6
+    %table.table-list
+      %tr
+        %td
+          Paid
+        %td
+          %strong
+            = @organization.is_paid
+
+.full-screen-table-wrapper
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
       %th
         Link to edit
       %th
@@ -38,4 +41,3 @@
             = "&#x2713;".html_safe if snippet && snippet.body.present?
           %td.table-cell-check
             = "&#x2713;".html_safe if snippet && snippet.is_enabled
-
