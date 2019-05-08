@@ -206,7 +206,6 @@
                 = f.check_box :stolen
               #admin-recovery-fields{style: "display: none"}
                 .input-group
-                .input-group
                   .form-group.large-text
                     = label :mark_recovered_reason, "How was it recovered"
                     #recovery_descr
@@ -226,14 +225,14 @@
 
 
 
-  .full-screen-table-wrapper
+  .full-screen-table
     %table.table.table-striped.table-bordered.table-sm
       %thead.thead-light
-        %th
+        %th.d-none.d-lg-table-cell
           ID
-        %th
+        %th.d-none.d-md-table-cell
           Created&nbsp;<small class="convertTimezone"></small>
-        %th
+        %th.d-none.d-lg-table-cell
           Creator
         %th
           Owner email
@@ -241,19 +240,17 @@
           Current?
         %th
           Claimed?
-        %th
+        %th.d-none.d-md-table-cell
           User hidden
       %tbody
         - @bike.ownerships.each do |ownership|
           %tr
-            %td
+            %td.d-none.d-lg-table-cell
               = link_to ownership.id, edit_admin_ownership_url(ownership.id)
-            %td
-              %span.hidden
-                = ownership.created_at.strftime("%-m.%-d.%Y %-H.%M")
+            %td.d-none.d-md-table-cell
               %span.convertTime
                 = l ownership.created_at, format: :convert_time
-            %td
+            %td.d-none.d-lg-table-cell
               - u = ownership.creator
               - if u.name.present?
                 = u.name
@@ -265,15 +262,15 @@
               = "&#x2713;".html_safe if ownership.current
             %td.table-cell-check
               = "&#x2713;".html_safe if ownership.claimed
-            %td.table-cell-check
+            %td.table-cell-check.d-none.d-md-table-cell
               = "&#x2713;".html_safe if ownership.user_hidden
   - if @recoveries.any?
     %h3.mt-4
       Recoveries
-    .full-screen-table-wrapper
+    .full-screen-table
       %table.table.table-striped.table-bordered.table-sm
         %thead.thead-light
-          %th
+          %th.d-none.d-md-table-cell
             Date Recovered&nbsp;<small class="convertTimezone"></small>
           %th
             Description
@@ -286,14 +283,14 @@
         %tbody
           - @recoveries.each do |recovery|
             %tr
-              %td
+              %td.d-none.d-md-table-cell
                 %span.convertTime
                   = l recovery.date_recovered, format: :convert_time
               %td
                 = recovery.recovered_description
-              %td.table-cell-check
+              %td.table-cell-check.d-none.d-md-table-cell
                 = "&#x2713;".html_safe if recovery.index_helped_recovery
-              %td.table-cell-check
+              %td.table-cell-check.d-none.d-md-table-cell
                 = "&#x2713;".html_safe if recovery.can_share_recovery
               %td
                 = link_to 'unrecover', unrecover_admin_bikes_path(stolen_record_id: recovery.id, bike_id: @bike.id), method: :put, data: { confirm: "Are you sure you want to mark this #{@bike.type} unrecovered? The #{@bike.type} will be stolen again." }
