@@ -1,7 +1,7 @@
 class Admin::DashboardController < Admin::BaseController
   def index
     @organizations = Organization.unscoped.order("created_at DESC").limit(10)
-    @bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint).order('created_at desc').limit(10)
+    @bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint).order("created_at desc").limit(10)
     @users = User.includes(:memberships => [:organization]).limit(5).order("created_at desc")
     @flavors = FlavorText.all
     @flavor = FlavorText.new
@@ -22,6 +22,7 @@ class Admin::DashboardController < Admin::BaseController
     @component_types = Component.where(ctype_id: Ctype.other.id)
     @handlebar_types = Bike.where(handlebar_type: Bike.handlebar_types[:other])
     @paint = Paint.where("color_id IS NULL")
+    render layout: "new_admin"
   end
 
   def bust_z_cache

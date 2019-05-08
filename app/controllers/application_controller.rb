@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
   end
 
   def handle_unverified_request
-    flash[:error] = "CSRF invalid. If you weren't intentionally doing something dumb, please contact us"
+    flash[:error] = "CSRF invalid. If you don't know why you're receiving this message, please contact us"
     redirect_to user_root_url
   end
 

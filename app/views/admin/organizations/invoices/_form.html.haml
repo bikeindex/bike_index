@@ -4,7 +4,7 @@
     - if @invoice.errors.any?
       = render partial: "/shared/errors", locals: { name: "Invoice", obj: @invoice }
 
-    .full-screen-table-wrapper
+    .full-screen-table
       %table.table.table-striped.table-bordered.table-sm
         %thead.thead-light
           %th

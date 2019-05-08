@@ -52,7 +52,7 @@ RSpec.describe BikeFinder do
 
       result = BikeFinder.find_matching(
         serial: bike.serial_number,
-        owner_email: bike.owner_email,
+        owner_email: "  #{bike.owner_email} ",
       )
 
       expect(result).to eq(bike)
