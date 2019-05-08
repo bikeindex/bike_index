@@ -5,20 +5,20 @@
 
   .form-group
     = f.label :name
-    = f.text_field :name, class: "form-control"
+    = f.text_field :name, class: "form-control w-25"
 
   .form-group
     = f.label :website
-    = f.text_field :website, class: "form-control"
+    = f.text_field :website, class: "form-control w-25"
 
 
   .form-group
     = f.label :open_year
-    = f.text_field :open_year, class: "form-control"
+    = f.text_field :open_year, class: "form-control w-25"
 
   .form-group
     = f.label :close_year
-    = f.text_field :close_year, class: "form-control"
+    = f.text_field :close_year, class: "form-control w-25"
 
     .form-group
     = f.label :frame_maker
@@ -36,6 +36,6 @@
 
   .form-group
     = f.label :description
-    = f.text_area :description, rows: 7, class: "form-control"
+    = f.text_area :description, rows: 7, class: "form-control w-25"
 
   = f.submit "Submit", class: 'btn btn-success mb-4'
