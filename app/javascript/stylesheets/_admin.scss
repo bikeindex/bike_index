@@ -1,3 +1,10 @@
+.admin-bike-partial {
+  img {
+    max-width: 100px;
+    max-height: 100%;
+  }
+}
+
 .admin-navbar {
   @include media-breakpoint-up(md) {
     position: -webkit-sticky;

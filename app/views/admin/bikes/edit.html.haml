@@ -7,67 +7,70 @@
   - if @bike.stolen
     %h4
       = link_to 'Stolen edit page', edit_admin_stolen_bike_url(@bike)
-  %table.table-list
-    %tr
-      %td
-        Owner Email
-      %td
-        = @bike.owner_email
-    - if @bike.owner.present?
-      %tr
-        %td
-          Current Email
-        %td
-          = link_to @bike.owner.email, edit_admin_user_url(@bike.owner)
-      %tr
-        %td
-          Donor
-        %td
-          - if @bike.owner.donor?
-            TRUE!
-          - else
-            No
-      %tr
-        %td
-          Paid Org
-        %td
-          -if @bike.owner.paid_org?
-            - @bike.owner.organizations.paid.each do |organization|
-              <small>#{link_to organization.name, admin_organization_path(organization)}</small>
-          - else
-            %strong
-              Missing owner!
-    - if @bike.current_stolen_record.present?
-      %tr
-        %td
-          Phone
-        %td
-          = @bike.current_stolen_record.phone
-    %tr
-      %td
-        Creation
-      %td
-        - if @bike.creation_organization.present?
-          = link_to @bike.creation_organization.name, admin_organization_path(@bike.creation_organization)
-        - else
-          %small.less-strong
-            self reg
-        - if @bike.creation_description.present?
-          \-
-          %em
-            - if @bike.creation_description == "pos"
-              Point of Sale, auto reg
+  .row
+    .col-md-6
+      %table.table-list
+        %tr
+          %td
+            Paid Org
+          %td
+            -if @bike.owner.paid_org?
+              - @bike.owner.organizations.paid.each do |organization|
+                <small>#{link_to organization.name, admin_organization_path(organization)}</small>
             - else
-              Via #{@bike.creation_description}
-    %tr
-      %td
-        Created
-      %td
-        %span.convertTime
-          = l @bike.created_at, format: :convert_time
-        %small.convertTimezone
-        = @bike.dl_from_attribute('cached_data')
-
+              %strong
+                Missing owner!
+        - if @bike.current_stolen_record.present?
+          %tr
+            %td
+              Phone
+            %td
+              = @bike.current_stolen_record.phone
+        %tr
+          %td
+            Creation
+          %td
+            - if @bike.creation_organization.present?
+              = link_to @bike.creation_organization.name, admin_organization_path(@bike.creation_organization)
+            - else
+              %small.less-strong
+                self reg
+            - if @bike.creation_description.present?
+              \-
+              %em
+                - if @bike.creation_description == "pos"
+                  Point of Sale, auto reg
+                - else
+                  Via #{@bike.creation_description}
+        %tr
+          %td
+            Created
+          %td
+            %span.convertTime
+              = l @bike.created_at, format: :convert_time
+            %small.convertTimezone
+            = @bike.dl_from_attribute('cached_data')
+    .col-md-6
+      %table.table-list
+        %tr
+          %td
+            Owner Email
+          %td
+            = @bike.owner_email
+        - if @bike.owner.present?
+          %tr
+            %td
+              Current Email
+            %td
+              = link_to @bike.owner.email, edit_admin_user_url(@bike.owner)
+          %tr
+            %td
+              Donor
+            %td
+              - if @bike.owner.donor?
+                TRUE!
+              - else
+                No
   %hr
   - if @bike.user_hidden
     %h2.text-danger.mb-4{ style: "margin-bottom: 2rem; text-align: center;" }
