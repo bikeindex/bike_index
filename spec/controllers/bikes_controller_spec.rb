@@ -495,8 +495,7 @@ describe BikesController do
           expect do
             post :create, bike: bike_params
           end.to_not change(Ownership, :count)
-          pp flash[:error]
-          expect(flash[:error]).to be_present
+          expect(flash[:error]).to match(/csrf/i)
         end
       end
       context "non-stolen" do
