@@ -2,6 +2,7 @@ import log from "../utils/log";
 import moment from "moment-timezone";
 import LoadFancySelects from "../utils/LoadFancySelects";
 import BinxAdminInvoices from "./binx_admin_invoices.js";
+import BinxAdminBikesEdit from "./binx_admin_bikes_edit.js"
 
 function BinxAdmin() {
   return {
@@ -28,6 +29,10 @@ function BinxAdmin() {
       if ($(".inputTriggerRecalculation")) {
         const binxAdminInvoices = BinxAdminInvoices()
         binxAdminInvoices.init();
+      }
+      if ($("#frame-sizer").length > 0) {
+        const binxAdminBikesEdit = BinxAdminBikesEdit();
+        binxAdminBikesEdit.init();
       }
       if ($("#admin-recovery-fields")) {
         this.bikesEditRecoverySlide();
