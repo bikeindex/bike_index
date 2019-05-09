@@ -65,9 +65,6 @@
 - if @bulk_import.creation_states.count < 1 || params[:show_reprocess]
   = link_to "Reprocess Import", admin_bulk_import_path(@bulk_import, reprocess: true), method: "PUT", class: "btn btn-secondary float-right"
 
-
-
-
 %h2.mt-4
   Bikes - #{@bulk_import.bikes.count}
   - if @bulk_import.bikes.count > 25
