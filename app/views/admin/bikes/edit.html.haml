@@ -230,9 +230,9 @@
       %thead.thead-light
         %th.d-none.d-lg-table-cell
           ID
-        %th.d-none.d-md-table-cell
+        %th
           Created&nbsp;<small class="convertTimezone"></small>
-        %th.d-none.d-lg-table-cell
+        %th
           Creator
         %th
           Owner email
@@ -246,11 +246,11 @@
         - @bike.ownerships.each do |ownership|
           %tr
             %td.d-none.d-lg-table-cell
-              = link_to ownership.id, edit_admin_ownership_url(ownership.id)
-            %td.d-none.d-md-table-cell
-              %span.convertTime
+              = ownership.id
+            %td
+              %a.convertTime{href: edit_admin_ownership_url(ownership.id)}
                 = l ownership.created_at, format: :convert_time
-            %td.d-none.d-lg-table-cell
+            %td
               - u = ownership.creator
               - if u.name.present?
                 = u.name
@@ -270,20 +270,20 @@
     .full-screen-table
       %table.table.table-striped.table-bordered.table-sm
         %thead.thead-light
-          %th.d-none.d-md-table-cell
+          %th.d-none
             Date Recovered&nbsp;<small class="convertTimezone"></small>
           %th
             Description
-          %th
+          %th.d-none.d-md-table-cell
             Helped?
-          %th
+          %th.d-none.d-md-table-cell
             Share?
-          %th
+          %th.d-none
             unrecover
         %tbody
           - @recoveries.each do |recovery|
             %tr
-              %td.d-none.d-md-table-cell
+              %td.d-none
                 %span.convertTime
                   = l recovery.date_recovered, format: :convert_time
               %td
