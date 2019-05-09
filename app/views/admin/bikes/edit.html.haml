@@ -59,10 +59,17 @@
             - if @bike.creation_description.present?
               \-
               %em
-                - if @bike.creation_description == "pos"
-                  Point of Sale, auto reg
-                - else
-                  Via #{@bike.creation_description}
+                Via #{@bike.creation_description}
+        - if @bike.creation_state&.bulk_import.present?
+          %tr
+            %td
+              Import
+            %td
+              = link_to admin_bulk_import_path(@bike.creation_state.bulk_import.to_param) do
+                \##{@bike.creation_state.bulk_import_id}
+                - if @bike.creation_state.bulk_import.ascend?
+                  %small
+                    Ascend
         %tr
           %td
             Created
@@ -70,7 +77,12 @@
             %span.convertTime
               = l @bike.created_at, format: :convert_time
             %small.convertTimezone
-            = @bike.dl_from_attribute('cached_data')
+        %tr
+          %td
+            Cached Data
+          %td
+            %em.less-strong
+              = @bike.cached_data
 
   %hr
   - if @bike.user_hidden
@@ -85,46 +97,49 @@
     - if @bike.errors.any?
       = render partial: "/shared/errors", locals: { name: "Bike", obj: @bike }
     .row
-      .col-lg-6
+      .col-md-6
         .form-group.fancy-select.unfancy
           = f.label :cycle_type, "Cycle type"
           = select(:bike, :cycle_type, CycleType.select_options, { required: true })
-      .col-lg-6
+      .col-md-3
         .form-group
           = f.label :serial_number
           = f.text_field :serial_number, :required =>true, class: "form-control"
+      .col-md-3
         .form-group
-          = f.label :has_no_serial
+          %label.d-none.d-md-block
+            &nbsp;
           = f.check_box :has_no_serial
+          = f.label :has_no_serial
 
     .row
-      .col-lg-6
-        .form-group
+      .col-md-6
+        .form-group.fancy-select.unfancy
           = f.label :manufacturer_id
-          = f.text_field :manufacturer_id, data: { initial: { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json }, class: "form-control"
-      .col-lg-6
+          = collection_select(:bike, :manufacturer_id, Manufacturer.frames, :id, :name, { }, {required: true, class: "form-control" })
+      .col-md-6
         .form-group
           = f.label :manufacturer_other, "Other frame manufacturer"
           = f.text_field :manufacturer_other, class: "form-control"
     .row
-      .col-lg-6
+      .col-md-6
         .form-group
           = f.label :card_id, "Spokecard id"
           = f.text_field :card_id, class: "form-control"
-      .col-lg-6
-        .form-group
+      .col-md-6
+        .form-check
           = f.label :hidden do
+            = f.check_box :hidden
             - if @bike.user_hidden
               User hidden
             - else
               Hidden (fake delete)
-            = f.check_box :hidden
     .row
-      .col-lg-6
+      .col-md-6
         .form-group
           = f.label :frame_model
           = f.text_field :frame_model, class: "form-control"
-      .col-lg-6
+      .col-md-6
         .form-group
           = f.label :year
           = f.text_field :year, class: "form-control"
@@ -134,25 +149,25 @@
     /   .controls
     /     = collection_select( :bike, :paint_id, Paint.all, :id, :name, required: true, prompt: "Choose paint" )
     .row
-      .col-lg-6
+      .col-md-6
         .form-group.fancy-select.unfancy
           = f.label :primary_frame_color_id
-          = collection_select(:bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
-      .col-lg-6
+          = collection_select(:bike, :primary_frame_color_id, Color.all, :id, :name, { prompt: "Choose color" }, { required: true, class: "form-control" })
+      .col-md-6
         .form-group.fancy-select.unfancy
           = f.label :creation_organization_id
-          = collection_select(:bike, :creation_organization_id, @organizations, :id, :name, prompt: "Choose organization")
+          = collection_select(:bike, :creation_organization_id, @organizations, :id, :name, { prompt: "Choose organization" }, { class: "form-control" })
     .row
-      .col-lg-6
+      .col-md-6
         .form-group.fancy-select.unfancy
           = f.label :bike_organization_ids, 'Current orgs'
-          = f.collection_select(:bike_organization_ids, @organizations, :id, :name, { include_blank: true, prompt: '' }, { multiple: true })
-      .col-lg-6
+          = f.collection_select(:bike_organization_ids, @organizations, :id, :name, { include_blank: true, prompt: '' }, { multiple: true, class: "form-control" })
+      .col-md-6
         .form-group
           = f.label :description
           = f.text_field :description, class: "form-control"
     .row.mb-4
-      .col-lg-6
+      .col-md-6
         .form-group
           = f.label :owner_email
           = f.text_field :owner_email, :required =>true, class: "form-control"

@@ -12,8 +12,8 @@ describe Manufacturer do
     it { is_expected.to have_many :paints }
   end
 
-  describe "default_scope is alphabetized" do
-    it "default scopes to created_at desc" do
+  describe "scopes" do
+    it "default_scope is alphabetized" do
       expect(Manufacturer.all.to_sql).to eq(Manufacturer.unscoped.order(:name).to_sql)
     end
   end

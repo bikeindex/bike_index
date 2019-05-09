@@ -1,0 +1,31 @@
+.primary-alert-block {
+  position: fixed;
+  z-index: $zindex-sticky + 10;
+  padding-right: 0.9375rem;
+  padding-left: 0.9375rem;
+
+  @include media-breakpoint-up(lg) {
+    max-width: 600px;
+    width: 66.66667%;
+    top: 75px;
+    right: 3%;
+  }
+
+  @include media-breakpoint-down(md) {
+    width: 83.33333%;
+    top: 90px;
+    right: 0;
+  }
+}
+
+.alert-error {
+  @extend .alert-danger;
+}
+
+.alert-notice {
+  @extend .alert-info;
+}
+
+.alert p:first-of-type {
+  margin-top: 0.5rem;
+}
