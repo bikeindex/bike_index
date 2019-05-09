@@ -119,7 +119,7 @@
       .col-md-6
         .form-group.fancy-select.unfancy
           = f.label :manufacturer_id
-          = collection_select(:bike, :manufacturer_id, Manufacturer.frames, :id, :name, { required: true }, { class: "form-control" })
+          = collection_select(:bike, :manufacturer_id, Manufacturer.frames, :id, :name, { }, {required: true, class: "form-control" })
       .col-md-6
         .form-group
           = f.label :manufacturer_other, "Other frame manufacturer"
@@ -155,7 +155,7 @@
       .col-md-6
         .form-group.fancy-select.unfancy
           = f.label :primary_frame_color_id
-          = collection_select(:bike, :primary_frame_color_id, Color.all, :id, :name, { required: true, prompt: "Choose color" }, { class: "form-control" })
+          = collection_select(:bike, :primary_frame_color_id, Color.all, :id, :name, { prompt: "Choose color" }, { required: true, class: "form-control" })
       .col-md-6
         .form-group.fancy-select.unfancy
           = f.label :creation_organization_id
