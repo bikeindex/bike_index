@@ -59,10 +59,19 @@
             - if @bike.creation_description.present?
               \-
               %em
-                - if @bike.creation_description == "pos"
-                  Point of Sale, auto reg
-                - else
-                  Via #{@bike.creation_description}
+                Via #{@bike.creation_description}
+        - if @bike.creation_state.bulk_import.present?
+          %tr
+            %td
+              Import
+            %td
+              = link_to admin_bulk_import_path(@bike.creation_state.bulk_import.to_param) do
+                \##{@bike.creation_state.bulk_import_id}
+                - if @bike.creation_state.bulk_import.ascend?
+                  %small
+                    Ascend
+
+
         %tr
           %td
             Created
@@ -70,7 +79,13 @@
             %span.convertTime
               = l @bike.created_at, format: :convert_time
             %small.convertTimezone
-            = @bike.dl_from_attribute('cached_data')
+        %tr
+          %td
+            Cached Data
+          %td
+            %em.less-strong
+              = @bike.cached_data
+
 
   %hr
   - if @bike.user_hidden
