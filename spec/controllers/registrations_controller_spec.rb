@@ -124,7 +124,8 @@ describe RegistrationsController do
         renders_embed_without_xframe
         expect(response).to render_template(:create)
       end
-      context "nothing except email set" do
+      context "nothing except email set - unverified authenticity token" do
+        include_context :test_csrf_token
         it "creates a new bparam and renders" do
           post :create, b_param: { owner_email: "something@stuff.com" }, simple_header: true
           expect_it_to_render_correctly

@@ -487,6 +487,16 @@ describe BikesController do
         }
       end
       let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded, :cycle_type_slug) }
+      context "unverified authenticity token" do
+        include_context :test_csrf_token
+        it "fails" do
+          expect(user).to be_present
+          expect do
+            post :create, bike: bike_params
+          end.to_not change(Ownership, :count)
+          expect(flash[:error]).to match(/csrf/i)
+        end
+      end
       context "non-stolen" do
         it "creates a new ownership and bike from an organization" do
           expect(user).to be_present
