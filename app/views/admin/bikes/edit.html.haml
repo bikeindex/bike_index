@@ -60,7 +60,7 @@
               \-
               %em
                 Via #{@bike.creation_description}
-        - if @bike.creation_state.bulk_import.present?
+        - if @bike.creation_state&.bulk_import.present?
           %tr
             %td
               Import
@@ -70,8 +70,6 @@
                 - if @bike.creation_state.bulk_import.ascend?
                   %small
                     Ascend
-
-
         %tr
           %td
             Created
@@ -85,7 +83,6 @@
           %td
             %em.less-strong
               = @bike.cached_data
-
 
   %hr
   - if @bike.user_hidden
