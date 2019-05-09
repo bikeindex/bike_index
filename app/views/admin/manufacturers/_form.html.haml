@@ -20,19 +20,19 @@
     = f.label :close_year
     = f.text_field :close_year, class: "form-control"
 
-    .form-group
+  .form-group
     = f.label :frame_maker
     = f.check_box :frame_maker
 
-    .form-group
-      = f.label :logo
-      - if @manufacturer.logo?
-        = image_tag(@manufacturer.logo_url(:thumb))
-      - else
-        %p
-          No logo!
-      = f.file_field :logo
-      = f.hidden_field :logo_cache
+  .form-group
+    = f.label :logo
+    - if @manufacturer.logo?
+      = image_tag(@manufacturer.logo_url(:thumb))
+    - else
+      %p
+        No logo!
+    = f.file_field :logo
+    = f.hidden_field :logo_cache
 
   .form-group
     = f.label :description
