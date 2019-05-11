@@ -46,9 +46,9 @@ function BinxAdminBikesEdit() {
     fixieSlide() {
       $("#fixed_fixed").on("change", e => {
         if ($("#fixed_fixed").prop("checked")) {
-          $("#not-fixed").slideUp();
+          $(".not-fixed").slideUp();
         } else {
-          $("#not-fixed").slideDown();
+          $(".not-fixed").slideDown();
         }
       });
     }

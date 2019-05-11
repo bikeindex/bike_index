@@ -1,8 +1,8 @@
 
 %li.admin-bike-partial
   .row.align-items-end
-    .col-lg-2.col-3
-      - if bike.thumb_path.present?
+    - if bike.thumb_path.present?
+      .col-lg-2.col-3
         %img{:alt => bike.title, src: bike.thumb_path}
     .col-lg-4.col-9
       %p.strong.mb-0
