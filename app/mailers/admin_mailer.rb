@@ -8,7 +8,7 @@ class AdminMailer < ActionMailer::Base
     send_to = "contact@bikeindex.org"
     if @feedback.feedback_type.present?
       if @feedback.feedback_type.match?(/organization_created/) || @feedback.lead_type
-        send_to = "craig@bikeindex.org, lily@bikeindex.org"
+        send_to = "lily@bikeindex.org, craig@bikeindex.org"
       elsif @feedback.feedback_type.match?(/bike_recovery/)
         send_to += ", bryan@bikeindex.org, lily@bikeindex.org"
       elsif @feedback.feedback_type.match?(/stolen_information/)

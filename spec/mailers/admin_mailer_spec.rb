@@ -65,7 +65,7 @@ describe AdminMailer do
       let(:feedback) { FactoryBot.create(:feedback, feedback_type: "organization_created", feedback_hash: { organization_id: organization.id }) }
       it "sends a new org email" do
         mail = AdminMailer.feedback_notification_email(feedback)
-        expect(mail.to).to eq(["craig@bikeindex.org", "lily@bikeindex.org"])
+        expect(mail.to).to eq(["lily@bikeindex.org", "craig@bikeindex.org"])
         expect(mail.reply_to).to eq([feedback.email])
       end
     end
