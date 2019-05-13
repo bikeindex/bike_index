@@ -1,56 +1,73 @@
 require "spec_helper"
 
 describe AdminMailer do
+  let(:feedback) { FactoryBot.create(:feedback) }
   describe "feedback_notification_email" do
     before :each do
-      @feedback = FactoryBot.create(:feedback)
-      @mail = AdminMailer.feedback_notification_email(@feedback)
+      @mail = AdminMailer.feedback_notification_email(feedback)
     end
     it "renders email" do
       expect(@mail.subject).to eq("New Feedback Submitted")
       expect(@mail.to).to eq(["contact@bikeindex.org"])
-      expect(@mail.reply_to).to eq([@feedback.email])
+      expect(@mail.reply_to).to eq([feedback.email])
     end
   end
 
   describe "special_feedback_notification_email" do
-    before :each do
-      @bike = FactoryBot.create(:bike)
-      @feedback = FactoryBot.create(:feedback, feedback_hash: { bike_id: @bike.id })
+    let(:feedback) { FactoryBot.create(:feedback, feedback_type: feedback_type, feedback_hash: { bike_id: bike.id }) }
+    let(:bike) { FactoryBot.create(:bike) }
+    context "a delete request email" do
+      let(:feedback_type) { "bike_delete_request" }
+      it "sends a delete request email" do
+        mail = AdminMailer.feedback_notification_email(feedback)
+        expect(mail.subject).to eq("New Feedback Submitted")
+        expect(mail.to).to eq(["contact@bikeindex.org"])
+        expect(mail.reply_to).to eq([feedback.email])
+      end
     end
-    it "sends a delete request email" do
-      @feedback.update_attributes(feedback_type: "bike_delete_request")
-      mail = AdminMailer.feedback_notification_email(@feedback)
-      expect(mail.subject).to eq("New Feedback Submitted")
-      expect(mail.to).to eq(["contact@bikeindex.org"])
-      expect(mail.reply_to).to eq([@feedback.email])
+    context "a recovery email" do
+      let(:feedback_type) { "bike_recovery" }
+      it "sends a recovery email" do
+        mail = AdminMailer.feedback_notification_email(feedback)
+        expect(mail.subject).to eq("New Feedback Submitted")
+        expect(mail.to).to eq(["contact@bikeindex.org", "bryan@bikeindex.org", "lily@bikeindex.org"])
+        expect(mail.reply_to).to eq([feedback.email])
+      end
     end
-    it "sends a recovery email" do
-      @feedback.update_attributes(feedback_type: "bike_recovery")
-      mail = AdminMailer.feedback_notification_email(@feedback)
-      expect(mail.subject).to eq("New Feedback Submitted")
-      expect(mail.to).to eq(["contact@bikeindex.org", "bryan@bikeindex.org", "lily@bikeindex.org"])
-      expect(mail.reply_to).to eq([@feedback.email])
+    context "a stolen_information email" do
+      let(:feedback_type) { "stolen_information" }
+      it "sends a stolen_information email" do
+        mail = AdminMailer.feedback_notification_email(feedback)
+        expect(mail.to).to eq(["bryan@bikeindex.org"])
+      end
     end
-    it "sends a stolen_information email" do
-      @feedback.update_attributes(feedback_type: "stolen_information")
-      mail = AdminMailer.feedback_notification_email(@feedback)
-      expect(mail.to).to eq(["bryan@bikeindex.org"])
+    context "serial_update" do
+      let(:feedback_type) { "serial_update_request" }
+      it "sends a serial update email" do
+        mail = AdminMailer.feedback_notification_email(feedback)
+        expect(mail.subject).to eq("New Feedback Submitted")
+        expect(mail.to).to eq(["contact@bikeindex.org"])
+        expect(mail.reply_to).to eq([feedback.email])
+      end
+      context "with a link" do
+        let(:feedback) { FactoryBot.create(:feedback, body: "something <a href='sddddd'>ffffff</a> WHAT UP", feedback_type: feedback_type, feedback_hash: { bike_id: bike.id }) }
+        it "strips the tag and renders read more" do
+          mail = AdminMailer.feedback_notification_email(feedback)
+          expect(mail.subject).to eq("New Feedback Submitted")
+          expect(mail.body.encoded).to_not match(/<a href=.sddddd/)
+        end
+      end
     end
-    it "sends a serial update email" do
-      @feedback.update_attributes(feedback_type: "serial_update_request")
-      mail = AdminMailer.feedback_notification_email(@feedback)
-      expect(mail.subject).to eq("New Feedback Submitted")
-      expect(mail.to).to eq(["contact@bikeindex.org"])
-      expect(mail.reply_to).to eq([@feedback.email])
-    end
-    it "sends a new org email" do
-      organization = FactoryBot.create(:organization)
-      user = FactoryBot.create(:user)
-      FactoryBot.create(:membership, user: user, organization: organization)
-      @feedback.update_attributes(feedback_hash: { organization_id: organization.id }, feedback_type: "organization_created")
-      mail = AdminMailer.feedback_notification_email(@feedback)
-      expect(mail.reply_to).to eq([@feedback.email])
+    context "org email" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:user) { FactoryBot.create(:user) }
+      let(:membership) { FactoryBot.create(:membership, user: user, organization: organization) }
+      let(:feedback) { FactoryBot.create(:feedback, feedback_type: "organization_created", feedback_hash: { organization_id: organization.id }) }
+      it "sends a new org email" do
+        mail = AdminMailer.feedback_notification_email(feedback)
+        expect(mail.to).to eq(["craig@bikeindex.org", "lily@bikeindex.org"])
+        expect(mail.reply_to).to eq([feedback.email])
+      end
     end
   end
 

@@ -7,8 +7,13 @@ class AdminMailer < ActionMailer::Base
     @feedback = feedback
     send_to = "contact@bikeindex.org"
     if @feedback.feedback_type.present?
-      send_to += ", bryan@bikeindex.org, lily@bikeindex.org" if @feedback.feedback_type =~ /bike_recovery/
-      send_to = "bryan@bikeindex.org" if @feedback.feedback_type =~ /stolen_information/
+      if @feedback.feedback_type.match?(/organization_created/) || @feedback.lead_type
+        send_to = "craig@bikeindex.org, lily@bikeindex.org"
+      elsif @feedback.feedback_type.match?(/bike_recovery/)
+        send_to += ", bryan@bikeindex.org, lily@bikeindex.org"
+      elsif @feedback.feedback_type.match?(/stolen_information/)
+        send_to = "bryan@bikeindex.org"
+      end
     end
     mail("Reply-To" => feedback.email, to: send_to, subject: feedback.title)
   end
