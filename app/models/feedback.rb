@@ -7,13 +7,16 @@ class Feedback < ActiveRecord::Base
 
   after_create :notify_admins
 
-  def notify_admins
-    return true if no_notification_types.include?(feedback_type)
-    EmailFeedbackNotificationWorker.perform_async(id)
+  scope :notification_types, -> { where.not(feedback_type: no_notification_types) }
+  scope :no_notification_types, -> { where(feedback_type: no_notification_types) }
+
+  def self.no_notification_types
+    %w(manufacturer_update_request serial_update_request)
   end
 
-  def no_notification_types
-    %w(manufacturer_update_request serial_update_request)
+  def notify_admins
+    return true if self.class.no_notification_types.include?(feedback_type)
+    EmailFeedbackNotificationWorker.perform_async(id)
   end
 
   def bike

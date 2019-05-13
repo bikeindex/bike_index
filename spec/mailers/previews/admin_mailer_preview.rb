@@ -1,7 +1,7 @@
 # Preview emails at /rails/mailers/admin_mailer
 class AdminMailerPreview < ActionMailer::Preview
   def feedback_notification_email
-    feedback = Feedback.last
+    feedback = Feedback.notification_types.last
     AdminMailer.feedback_notification_email(feedback)
   end
 
