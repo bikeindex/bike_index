@@ -3,6 +3,7 @@ import moment from "moment-timezone";
 import LoadFancySelects from "../utils/LoadFancySelects";
 import BinxAdminInvoices from "./binx_admin_invoices.js";
 import BinxAdminBikesEdit from "./binx_admin_bikes_edit.js"
+import BinxAdminUpdateDrivetrain from "./binx_admin_update_drivetrain.js"
 
 function BinxAdmin() {
   return {
@@ -33,6 +34,10 @@ function BinxAdmin() {
       if ($("#frame-sizer").length > 0) {
         const binxAdminBikesEdit = BinxAdminBikesEdit();
         binxAdminBikesEdit.init();
+      }
+      if ($(".not-fixed").length > 0) {
+        const binxAdminUpdateDrivetrain = BinxAdminUpdateDrivetrain();
+        binxAdminUpdateDrivetrain.init()
       }
       if ($("#admin-recovery-fields")) {
         this.bikesEditRecoverySlide();

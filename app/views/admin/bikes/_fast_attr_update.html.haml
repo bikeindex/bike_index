@@ -6,8 +6,6 @@
 = form_for [:admin, @bike] do |f|
   = hidden_field_tag :fast_attr_update, @fast_attr_update
 
-
-
   - if @bike.errors.any?
     = render partial: "/shared/errors", locals: { name: "Bike", obj: @bike}
   .row
@@ -54,7 +52,7 @@
         - fixed = @bike.rear_gear_type == RearGearType.fixed
         .form-check.mr-2
           = label :fixed, "fixed", class: "form-check-label"
-          = check_box :fixed, "fixed", class: "form-check-input ml-2"
+          = check_box :fixed, "fixed", checked: fixed, class: "form-check-input ml-2"
         .form-check.mr-2
           = label :coaster_brake, "coaster_brake", class: "form-check-label"
           = check_box :coaster_brake, "coaster_brake", class: "form-check-input ml-2"
