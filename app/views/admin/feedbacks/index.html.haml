@@ -1,17 +1,29 @@
+.admin-subnav
+  .col-12
+    %h1
+      #{link_to 'Feedback and messages', admin_feedbacks_path}
+  .col-12.mt-4
+    = line_chart graphs_admin_feedbacks_path(params.merge(start_at: params[:start_at]).except(:controller, :action))
+  .col-12.mt-2
+    .d-flex
+      %ul.list-inline.mx-auto.justify-content-center
+        - %w(all_time past_year past_month past_week).each do |start_at|
+          %li.list-inline-item
+            = link_to start_at.humanize, admin_feedbacks_path(params.merge(start_at: start_at).except(:controller, :action))
 
-%h1
-  #{link_to 'Feedback and messages', admin_feedbacks_path}
 
-%h4
-  = Feedback.count
-  messages
+%p
   - if @matching_count.present?
+    = number_with_delimiter(@matching_count)
     %strong
-      \- #{@matching_count}
-    #{params[:type]}
+      = params[:type]
+    messages
+  - else
+    = number_with_delimiter(@feedbacks.total_count)
+    total messages
 
 
-  = paginate @feedbacks, views_prefix: 'admin'
+= paginate @feedbacks, views_prefix: 'admin'
 
 .full-screen-table
   %table.table.table-bordered.table-striped
@@ -42,13 +54,3 @@
             = feedback.body.truncate(100)
 
 = paginate @feedbacks, views_prefix: 'admin'
-
-%h3
-  Feedbacks Graph
-  %pre
-  = line_chart graphs_admin_feedbacks_path(params.merge(start_at: params[:start_at]).except(:controller, :action))
-.d-flex
-  %ul.list-inline.mx-auto.justify-content-center
-    - %w(all_time past_year past_month past_week).each do |start_at|
-      %li.list-inline-item
-        = link_to start_at.humanize, admin_feedbacks_path(params.merge(start_at: start_at).except(:controller, :action))
