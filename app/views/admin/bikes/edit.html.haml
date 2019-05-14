@@ -2,11 +2,8 @@
   = render 'fast_attr_update'
 - else
   .d-none{data: { url: ENV['BASE_URL'] }}
-  %ul.p-0
+  %ul.p-0.list-unstyled
     = render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show" }
-  - if @bike.stolen
-    %h4
-      = link_to 'Stolen edit page', edit_admin_stolen_bike_url(@bike)
   .row
     .col-md-6
       %table.table-list
@@ -97,77 +94,79 @@
     - if @bike.errors.any?
       = render partial: "/shared/errors", locals: { name: "Bike", obj: @bike }
     .row
-      .col-md-6
+      .col-md-4.col-lg-3
         .form-group.fancy-select.unfancy
           = f.label :cycle_type, "Cycle type"
           = select(:bike, :cycle_type, CycleType.select_options, { required: true })
-      .col-md-3
+      .col-md-3.col-lg-3
         .form-group
           = f.label :serial_number
           = f.text_field :serial_number, :required =>true, class: "form-control"
-      .col-md-3
-        .form-group
+      .col-md-3.col-lg-3
+        .form-check
           %label.d-none.d-md-block
             &nbsp;
           = f.check_box :has_no_serial
           = f.label :has_no_serial
 
-    .row
-      .col-md-6
-        .form-group.fancy-select.unfancy
-          = f.label :manufacturer_id
-          = collection_select(:bike, :manufacturer_id, Manufacturer.frames, :id, :name, { }, {required: true, class: "form-control" })
-      .col-md-6
-        .form-group
-          = f.label :manufacturer_other, "Other frame manufacturer"
-          = f.text_field :manufacturer_other, class: "form-control"
-    .row
-      .col-md-6
-        .form-group
-          = f.label :card_id, "Spokecard id"
-          = f.text_field :card_id, class: "form-control"
-      .col-md-6
+
+      .col-md-4.col-lg-3
         .form-check
+          %label.d-none.d-md-block
+            &nbsp;
           = f.label :hidden do
             = f.check_box :hidden
             - if @bike.user_hidden
               User hidden
             - else
               Hidden (fake delete)
-    .row
-      .col-md-6
+      .col-md-4.col-lg-3
+        .form-group
+          = f.label :manufacturer_other, "Other frame manufacturer"
+          = f.text_field :manufacturer_other, class: "form-control"
+
+      .col-md-4.col-lg-3
+        .form-group
+          = f.label :card_id, "Spokecard id"
+          = f.text_field :card_id, class: "form-control"
+      .col-md-4.col-lg-3
+        .form-group.fancy-select.unfancy
+          = f.label :manufacturer_id
+          = collection_select(:bike, :manufacturer_id, Manufacturer.frames, :id, :name, { }, {required: true, class: "form-control" })
+
+      .col-md-4.col-lg-3
         .form-group
           = f.label :frame_model
           = f.text_field :frame_model, class: "form-control"
-      .col-md-6
+      .col-md-4.col-lg-3
         .form-group
           = f.label :year
           = f.text_field :year, class: "form-control"
-    / Disable for performance reasons.
-    / .control-group.chosen-select
-    /   = f.label :paint_id, "Paint description", class: "control-label"
-    /   .controls
-    /     = collection_select( :bike, :paint_id, Paint.all, :id, :name, required: true, prompt: "Choose paint" )
-    .row
-      .col-md-6
+      / Disable for performance reasons.
+      / .control-group.chosen-select
+      /   = f.label :paint_id, "Paint description", class: "control-label"
+      /   .controls
+      /     = collection_select( :bike, :paint_id, Paint.all, :id, :name, required: true, prompt: "Choose paint" )
+
+      .col-md-4.col-lg-3
         .form-group.fancy-select.unfancy
           = f.label :primary_frame_color_id
           = collection_select(:bike, :primary_frame_color_id, Color.all, :id, :name, { prompt: "Choose color" }, { required: true, class: "form-control" })
-      .col-md-6
+      .col-md-4.col-lg-3
         .form-group.fancy-select.unfancy
           = f.label :creation_organization_id
           = collection_select(:bike, :creation_organization_id, @organizations, :id, :name, { prompt: "Choose organization" }, { class: "form-control" })
-    .row
-      .col-md-6
+
+      .col-md-4.col-lg-3
         .form-group.fancy-select.unfancy
           = f.label :bike_organization_ids, 'Current orgs'
           = f.collection_select(:bike_organization_ids, @organizations, :id, :name, { include_blank: true, prompt: '' }, { multiple: true, class: "form-control" })
-      .col-md-6
+      .col-md-4.col-lg-3
         .form-group
           = f.label :description
           = f.text_field :description, class: "form-control"
-    .row.mb-4
-      .col-md-6
+
+      .col-md-4.col-lg-3
         .form-group
           = f.label :owner_email
           = f.text_field :owner_email, :required =>true, class: "form-control"
@@ -184,38 +183,35 @@
       = f.fields_for :stolen_records do |s|
         - if s.object.current
           .row
-            .col-md-6
+            .col-md-4.col-lg-3
               #stolen-bike-location.form-group.fancy-select.unfancy
                 #country_select_container
                   = label :country, "Country"
                   = s.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country")
                   %p.d-none
                     = Country.united_states.id
-            .col-md-6
+            .col-md-4.col-lg-3
               = label :street, "Intersection or address"
               = s.text_field :street, placeholder: "Intersection or address", class: "form-control"
-          .row
-            .col-md-6
+            .col-md-4.col-lg-3
               = label :city, "City"
               = s.text_field :city, placeholder: "City", class: "form-control"
-            .col-md-6
+            .col-md-4.col-lg-3
               = label :zipcode, "Zipcode"
               = s.text_field :zipcode, placeholder: "Zipcode", class: "form-control"
 
-          .row.mt-4
-            .col-md-6.fancy-select.unfancy
+            .col-md-4.col-lg-3.fancy-select.unfancy
               = label :state, "State"
               = s.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State" )
-            .col-md-6
+            .col-md-4.col-lg-3
               .form-group
                 = label :theft_description, "Theft description"
                 = s.text_area :theft_description, placeholder: "Theft Description", class: "form-control"
-          .row
-            .col-md-6
+            .col-md-4.col-lg-3
               .form-group
                 = f.label :estimated_value, "Estimated value"
                 = s.number_field :estimated_value, class: "form-control"
-            .col-md-6
+            .col-md-4.col-lg-3
               .form-group#stolen-check-box
                 = f.label :stolen, "Bike is stolen"
                 = f.check_box :stolen

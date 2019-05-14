@@ -1,26 +1,24 @@
 #bike_edit_root_url.hidden{data: { url: ENV['BASE_URL'] }}
-%ul.p-0
+%ul.p-0.list-unstyled
   = render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show" }
 
 %hr
 = form_for [:admin, @bike] do |f|
   = hidden_field_tag :fast_attr_update, @fast_attr_update
 
-
-
   - if @bike.errors.any?
     = render partial: "/shared/errors", locals: { name: "Bike", obj: @bike}
   .row
-    .col-md-6
+    .col-md-4.col-lg-3
       .form-group.fancy-select.unfancy
         = f.label :cycle_type, "Cycle type"
         = select(:bike, :cycle_type, CycleType.select_options, { required: true })
-    .col.md-6
+    .col.md-4.col-lg-3
       .form-group.fancy-select.unfancy
         = f.label :frame_material, "Frame material"
         = select(:bike, :frame_material, FrameMaterial.select_options, { include_blank: true, prompt: "Choose material"})
-  .row
-    .col-md-6
+
+    .col-md-4.col-lg-3
       .form-group.fancy-select.unfancy
         = f.label :rear_wheel
         = collection_select(:bike, :rear_wheel_size_id, WheelSize.all, :id, :select_value, include_blank: true, prompt: "Rear wheel size")
@@ -31,7 +29,7 @@
         %label.radio
           = f.radio_button :rear_tire_narrow, "true"
           Narrow
-    .col-md-6
+    .col-md-4.col-lg-3
       .form-group.fancy-select.unfancy
         = f.label :front_wheel
         = collection_select( :bike, :front_wheel_size_id, WheelSize.all, :id, :select_value, include_blank: true, prompt: "Front wheel size")
@@ -42,92 +40,92 @@
         %label.radio
           = f.radio_button :front_tire_narrow, "true"
           Narrow
-  .row
-    .col-md-6
+
+    .col-md-4.col-lg-3
       .form-group.fancy-select.unfancy
         = f.label :handlebar_type
         = select(:bike, :handlebar_type, HandlebarType.select_options, { include_blank: true, required: true, prompt: "Handlebar Style", input_html: { class: "has-hidden-other" }})
-  .row
-    .col-auto
+
+    .col-md-4.col-lg-3
       = label :drivetrain, "Drivetrain"
-  .form-inline
-    - fixed = @bike.rear_gear_type == RearGearType.fixed
-    .form-check.mr-2
-      = label :fixed, "fixed", class: "form-check-label"
-      = check_box :fixed, "fixed", class: "form-check-input ml-2"
-    .form-check.mr-2
-      = label :coaster_brake, "coaster_brake", class: "form-check-label"
-      = check_box :coaster_brake, "coaster_brake", class: "form-check-input ml-2"
-    .form-check.mr-2
-      = label :belt_drive, "belt_drive", class: "form-check-label"
-      = check_box :belt_drive, "belt_drive", class: "form-check-input ml-2"
-  #not-fixed
-    .row.mt-4
-      .col-md-6
-        .form-group.fancy-select.unfancy
-          = label :front_gear_select, "Front gear"
-          = collection_select( :bike, :front_gear_type_id, FrontGearType.all, :id, :name, prompt: "Chainrings?")
-      .col-md-6
-        .form-group.fancy-select.unfancy
-          = label :rear_gears, "Rear gears"
-          = collection_select( :bike, :rear_gear_type_id, RearGearType.all, :id, :name, prompt: "Rear cogs?")
-  .row.mt-4
-    .col-md-6
+      .form-inline
+        - fixed = @bike.rear_gear_type == RearGearType.fixed
+        .form-check.mr-2
+          = label :fixed, "fixed", class: "form-check-label"
+          = check_box :fixed, "fixed", checked: fixed, class: "form-check-input ml-2"
+        .form-check.mr-2
+          = label :coaster_brake, "coaster_brake", class: "form-check-label"
+          = check_box :coaster_brake, "coaster_brake", class: "form-check-input ml-2"
+        .form-check.mr-2
+          = label :belt_drive, "belt_drive", class: "form-check-label"
+          = check_box :belt_drive, "belt_drive", class: "form-check-input ml-2"
+    .col-md-4.col-lg-3.not-fixed
+      .form-group.fancy-select.unfancy
+        = label :front_gear_select, "Front gear"
+        = collection_select( :bike, :front_gear_type_id, FrontGearType.all, :id, :name, prompt: "Chainrings?")
+    .col-md-4.col-lg-3.not-fixed
+      .form-group.fancy-select.unfancy
+        = label :rear_gears, "Rear gears"
+        = collection_select( :bike, :rear_gear_type_id, RearGearType.all, :id, :name, prompt: "Rear cogs?")
+
+    .col-md-4.col-lg-3
       .form-group
         = f.label :manufacturer_id, class: "control-label"
         = f.text_field :manufacturer_id, data: { initial: { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json }, class: "form-control"
-    .col-md-6
+    .col-md-4.col-lg-3
       .form-group
         = f.label :manufacturer_other, "Other manufacturer"
         = f.text_field :manufacturer_other, class: "form-control"
-  .row.mt-4
-    .col-md-6
+
+    .col-md-4.col-lg-3
       .form-group
         = f.label :frame_model
         = f.text_field :frame_model, class: "form-control"
-    .col-md-6
+    .col-md-4.col-lg-3
       .form-group
         = f.label :year
         = f.text_field :year, class: "form-control"
-  - if @bike.creation_organization.present?
-    .form-group
-      = f.label :creation_organization_id, "Creation org"
-      %span.less-strong
-      = @bike.creation_organization.name
-      - if @bike.registered_new
-        %br
-        %strong
-          Registered at POS
-
-  .form-group
-    = f.label :description
-    = f.text_area :description, class: "form-control"
-  #frame-sizer
-    .form-group
-      %label.control-label.unclickable
-        Frame size
-      .groupedbtn-group{ data:  { toggle: "buttons-radio" }}
-        .btn-group
-          %button.btn{ type: "button", :'data-size' => 'xs', class: ( 'active' if @bike.frame_size == 'xs' ) }
-            XS
-          %button.btn{ type: "button", :'data-size' => 's', class: ( 'active' if @bike.frame_size == 's' ) }
-            S
-          %button.btn{ type: "button", :'data-size' => 'm', class: ( 'active' if @bike.frame_size == 'm' ) }
-            M
-          %button.btn{ type: "button", :'data-size' => 'l', class: ( 'active' if @bike.frame_size == 'l' ) }
-            L
-          %button.btn{ type: "button", :'data-size' => 'xl', class: ( 'active' if @bike.frame_size == 'xl' ) }
-            XL
-        .btn-group
-          %button.btn{ type: "button", :'data-size' => 'cm', class: ( 'active' if @bike.frame_size_unit == 'cm' ) }
-            CM
-          %button.btn{ type: "button", :'data-size' => 'in', class: ( 'active' if @bike.frame_size_unit == 'in' ) }
-            IN
-    .hidden-other.mb-4
-      = f.label :frame_size, "Seat tube length", class: "control-label"
-      = f.hidden_field :frame_size_unit
-      = f.hidden_field :frame_size
-      = f.number_field :frame_size_number
+    .col-md-4.col-lg-3
+      .form-group
+        = f.label :description
+        = f.text_area :description, class: "form-control"
+    .col-md-4.col-lg-3
+      #frame-sizer
+        .form-group
+          %label.control-label.unclickable
+            Frame size
+          .groupedbtn-group{ data:  { toggle: "buttons-radio" }}
+            .btn-group
+              %button.btn{ type: "button", 'data-size' => 'xs', class: ( 'active' if @bike.frame_size == 'xs' ) }
+                XS
+              %button.btn{ type: "button", 'data-size' => 's', class: ( 'active' if @bike.frame_size == 's' ) }
+                S
+              %button.btn{ type: "button", 'data-size' => 'm', class: ( 'active' if @bike.frame_size == 'm' ) }
+                M
+              %button.btn{ type: "button", 'data-size' => 'l', class: ( 'active' if @bike.frame_size == 'l' ) }
+                L
+              %button.btn{ type: "button", 'data-size' => 'xl', class: ( 'active' if @bike.frame_size == 'xl' ) }
+                XL
+            .btn-group
+              %button.btn{ type: "button", 'data-size' => 'cm', class: ( 'active' if @bike.frame_size_unit == 'cm' ) }
+                CM
+              %button.btn{ type: "button", 'data-size' => 'in', class: ( 'active' if @bike.frame_size_unit == 'in' ) }
+                IN
+        .hidden-other.mb-4
+          = f.label :frame_size, "Seat tube length", class: "control-label"
+          = f.hidden_field :frame_size_unit
+          = f.hidden_field :frame_size
+          = f.number_field :frame_size_number
+    - if @bike.creation_organization.present?
+      .col-md-4.col-lg-3
+        .form-group
+          = f.label :creation_organization_id, "Creation org:"
+          %span.less-strong
+          = @bike.creation_organization.name
+          - if @bike.registered_new
+            %br
+            %strong
+              Registered at POS
 
   = submit_tag "Update the bike", class: "btn btn-success"
   = link_to "Normal edit", edit_admin_bike_url(@bike)
