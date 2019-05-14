@@ -1,10 +1,7 @@
 
 .d-none{data: { url: ENV['BASE_URL'] }}
-%ul.p-0
+%ul.p-0.list-unstyled
   = render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show" }
-- if @bike.stolen
-  %h4
-    = link_to 'Stolen edit page', edit_admin_stolen_bike_url(@bike)
 .row
   .col-md-6
     %table.table-list
@@ -82,149 +79,141 @@
           %em.less-strong
             = @bike.cached_data
 
-    - if @bike.errors.any?
-      = render partial: "/shared/errors", locals: { name: "Bike", obj: @bike }
-    .row
-      .col-md-4.col-lg-3
-        .form-group.fancy-select.unfancy
-          = f.label :cycle_type, "Cycle type"
-          = select(:bike, :cycle_type, CycleType.select_options, { required: true })
-      .col-md-3.col-lg-3
-        .form-group
-          = f.label :serial_number
-          = f.text_field :serial_number, :required =>true, class: "form-control"
-      .col-md-3.col-lg-3
-        .form-check
-          %label.d-none.d-md-block
-            &nbsp;
-          = f.check_box :has_no_serial
-          = f.label :has_no_serial
-
-
-      .col-md-4.col-lg-3
-        .form-check
-          %label.d-none.d-md-block
-            &nbsp;
-          = f.label :hidden do
-            = f.check_box :hidden
-            - if @bike.user_hidden
-              User hidden
-            - else
-              Hidden (fake delete)
-      .col-md-4.col-lg-3
-        .form-group
-          = f.label :manufacturer_other, "Other frame manufacturer"
-          = f.text_field :manufacturer_other, class: "form-control"
-
-      .col-md-4.col-lg-3
-        .form-group
-          = f.label :card_id, "Spokecard id"
-          = f.text_field :card_id, class: "form-control"
-      .col-md-4.col-lg-3
-        .form-group.fancy-select.unfancy
-          = f.label :manufacturer_id
-          = collection_select(:bike, :manufacturer_id, Manufacturer.frames, :id, :name, { }, {required: true, class: "form-control" })
-
-      .col-md-4.col-lg-3
-        .form-group
-          = f.label :frame_model
-          = f.text_field :frame_model, class: "form-control"
-      .col-md-4.col-lg-3
-        .form-group
-          = f.label :year
-          = f.text_field :year, class: "form-control"
-      / Disable for performance reasons.
-      / .control-group.chosen-select
-      /   = f.label :paint_id, "Paint description", class: "control-label"
-      /   .controls
-      /     = collection_select( :bike, :paint_id, Paint.all, :id, :name, required: true, prompt: "Choose paint" )
-
-      .col-md-4.col-lg-3
-        .form-group.fancy-select.unfancy
-          = f.label :primary_frame_color_id
-          = collection_select(:bike, :primary_frame_color_id, Color.all, :id, :name, { prompt: "Choose color" }, { required: true, class: "form-control" })
-      .col-md-4.col-lg-3
-        .form-group.fancy-select.unfancy
-          = f.label :creation_organization_id
-          = collection_select(:bike, :creation_organization_id, @organizations, :id, :name, { prompt: "Choose organization" }, { class: "form-control" })
-
-      .col-md-4.col-lg-3
-        .form-group.fancy-select.unfancy
-          = f.label :bike_organization_ids, 'Current orgs'
-          = f.collection_select(:bike_organization_ids, @organizations, :id, :name, { include_blank: true, prompt: '' }, { multiple: true, class: "form-control" })
-      .col-md-4.col-lg-3
-        .form-group
-          = f.label :description
-          = f.text_field :description, class: "form-control"
-
-      .col-md-4.col-lg-3
-        .form-group
-          = f.label :owner_email
-          = f.text_field :owner_email, :required =>true, class: "form-control"
-
-
-
+%hr
+- if @bike.user_hidden
+  %h2.text-danger.mb-4{ style: "margin-bottom: 2rem; text-align: center;" }
+    Marked HIDDEN by the user
+    %small
+      no one but the user (and bike index admins) can see it
+= form_for [:admin, @bike], html: { class: 'form form-horizontal admin-bike-edit' } do |f|
+  - if @bike.errors.any?
+    = render partial: "/shared/errors", locals: { name: "Bike", obj: @bike }
+  .row
+    .col-md-4.col-lg-3
+      .form-group.fancy-select.unfancy
+        = f.label :cycle_type, "Cycle type"
+        = select(:bike, :cycle_type, CycleType.select_options, { required: true })
+    .col-md-3.col-lg-3
+      .form-group
+        = f.label :serial_number
+        = f.text_field :serial_number, :required =>true, class: "form-control"
+    .col-md-3.col-lg-3
+      .form-check
+        %label.d-none.d-md-block
+          &nbsp;
+        = f.check_box :has_no_serial
+        = f.label :has_no_serial
+    .col-md-4.col-lg-3
+      .form-check
+        %label.d-none.d-md-block
+          &nbsp;
+        = f.label :hidden do
+          = f.check_box :hidden
+          - if @bike.user_hidden
+            User hidden
+          - else
+            Hidden (fake delete)
+    .col-md-4.col-lg-3
+      .form-group
+        = f.label :manufacturer_other, "Other frame manufacturer"
+        = f.text_field :manufacturer_other, class: "form-control"
+    .col-md-4.col-lg-3
+      .form-group
+        = f.label :card_id, "Spokecard id"
+        = f.text_field :card_id, class: "form-control"
+    .col-md-4.col-lg-3
+      .form-group.fancy-select.unfancy
+        = f.label :manufacturer_id
+        = collection_select(:bike, :manufacturer_id, Manufacturer.frames, :id, :name, { }, {required: true, class: "form-control" })
+    .col-md-4.col-lg-3
+      .form-group
+        = f.label :frame_model
+        = f.text_field :frame_model, class: "form-control"
+    .col-md-4.col-lg-3
+      .form-group
+        = f.label :year
+        = f.text_field :year, class: "form-control"
+    / Disable for performance reasons.
+    / .control-group.chosen-select
+    /   = f.label :paint_id, "Paint description", class: "control-label"
+    /   .controls
+    /     = collection_select( :bike, :paint_id, Paint.all, :id, :name, required: true, prompt: "Choose paint" )
+    .col-md-4.col-lg-3
+      .form-group.fancy-select.unfancy
+        = f.label :primary_frame_color_id
+        = collection_select(:bike, :primary_frame_color_id, Color.all, :id, :name, { prompt: "Choose color" }, { required: true, class: "form-control" })
+    .col-md-4.col-lg-3
+      .form-group.fancy-select.unfancy
+        = f.label :creation_organization_id
+        = collection_select(:bike, :creation_organization_id, @organizations, :id, :name, { prompt: "Choose organization" }, { class: "form-control" })
+    .col-md-4.col-lg-3
+      .form-group.fancy-select.unfancy
+        = f.label :bike_organization_ids, 'Current orgs'
+        = f.collection_select(:bike_organization_ids, @organizations, :id, :name, { include_blank: true, prompt: '' }, { multiple: true, class: "form-control" })
+    .col-md-4.col-lg-3
+      .form-group
+        = f.label :description
+        = f.text_field :description, class: "form-control"
+    .col-md-4.col-lg-3
+      .form-group
+        = f.label :owner_email
+        = f.text_field :owner_email, :required =>true, class: "form-control"
   = submit_tag "Update the bike", class: "btn btn-success mb-4"
   = link_to "Delete bike", admin_bike_url(@bike), method: :delete, confirm: "Are you sure?", class: "btn btn-danger mb-4"
-
-    - if @bike.stolen and @bike.find_current_stolen_record.present?
-      %hr
-      = f.fields_for :stolen_records do |s|
-        - if s.object.current
-          .row
-            .col-md-4.col-lg-3
-              #stolen-bike-location.form-group.fancy-select.unfancy
-                #country_select_container
-                  = label :country, "Country"
-                  = s.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country")
-                  %p.d-none
-                    = Country.united_states.id
-            .col-md-4.col-lg-3
-              = label :street, "Intersection or address"
-              = s.text_field :street, placeholder: "Intersection or address", class: "form-control"
-            .col-md-4.col-lg-3
-              = label :city, "City"
-              = s.text_field :city, placeholder: "City", class: "form-control"
-            .col-md-4.col-lg-3
-              = label :zipcode, "Zipcode"
-              = s.text_field :zipcode, placeholder: "Zipcode", class: "form-control"
-
-            .col-md-4.col-lg-3.fancy-select.unfancy
-              = label :state, "State"
-              = s.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State" )
-            .col-md-4.col-lg-3
-              .form-group
-                = label :theft_description, "Theft description"
-                = s.text_area :theft_description, placeholder: "Theft Description", class: "form-control"
-            .col-md-4.col-lg-3
-              .form-group
-                = f.label :estimated_value, "Estimated value"
-                = s.number_field :estimated_value, class: "form-control"
-            .col-md-4.col-lg-3
-              .form-group#stolen-check-box
-                = f.label :stolen, "Bike is stolen"
-                = f.check_box :stolen
-              #admin-recovery-fields{style: "display: none"}
-                .input-group
-                  .form-group.large-text
-                    = label :mark_recovered_reason, "How was it recovered"
-                    #recovery_descr
-                      = text_area_tag :mark_recovered_reason, nil, rows: 3
-                .input-group
-                  .form-group
-                    = label :mark_recovered_we_helped, "Did the bike index help?"
-                    = check_box_tag :mark_recovered_we_helped, true
-                .input-group
-                  .form-group
-                    = label :can_share_recovery, "Can Share"
-                    = check_box_tag :can_share_recovery, true
-        - else
-          / Don't put anything
-          / Because there might be more stolen records and it breaks without
-          / an else
-
-
-
+  - if @bike.stolen and @bike.find_current_stolen_record.present?
+    %hr
+    = f.fields_for :stolen_records do |s|
+      - if s.object.current
+        .row
+          .col-md-4.col-lg-3
+            #stolen-bike-location.form-group.fancy-select.unfancy
+              #country_select_container
+                = label :country, "Country"
+                = s.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country")
+                %p.d-none
+                  = Country.united_states.id
+          .col-md-4.col-lg-3
+            = label :street, "Intersection or address"
+            = s.text_field :street, placeholder: "Intersection or address", class: "form-control"
+          .col-md-4.col-lg-3
+            = label :city, "City"
+            = s.text_field :city, placeholder: "City", class: "form-control"
+          .col-md-4.col-lg-3
+            = label :zipcode, "Zipcode"
+            = s.text_field :zipcode, placeholder: "Zipcode", class: "form-control"
+          .col-md-4.col-lg-3.fancy-select.unfancy
+            = label :state, "State"
+            = s.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State" )
+          .col-md-4.col-lg-3
+            .form-group
+              = label :theft_description, "Theft description"
+              = s.text_area :theft_description, placeholder: "Theft Description", class: "form-control"
+          .col-md-4.col-lg-3
+            .form-group
+              = f.label :estimated_value, "Estimated value"
+              = s.number_field :estimated_value, class: "form-control"
+          .col-md-4.col-lg-3
+            .form-group#stolen-check-box
+              = f.label :stolen, "Bike is stolen"
+              = f.check_box :stolen
+            #admin-recovery-fields{style: "display: none"}
+              .input-group
+                .form-group.large-text
+                  = label :mark_recovered_reason, "How was it recovered"
+                  #recovery_descr
+                    = text_area_tag :mark_recovered_reason, nil, rows: 3
+              .input-group
+                .form-group
+                  = label :mark_recovered_we_helped, "Did the bike index help?"
+                  = check_box_tag :mark_recovered_we_helped, true
+              .input-group
+                .form-group
+                  = label :can_share_recovery, "Can Share"
+                  = check_box_tag :can_share_recovery, true
+      - else
+        / Don't put anything
+        / Because there might be more stolen records and it breaks without
+        / an else
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
