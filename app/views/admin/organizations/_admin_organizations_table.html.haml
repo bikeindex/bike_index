@@ -45,7 +45,7 @@
             %td
               = organization.memberships.count
             %td
-              = link_to organization.kind.humanize, admin_organizations_path(kind: organization.kind)
+              = link_to organization.kind.humanize, admin_organizations_path(search_kind: organization.kind)
             %td
               .less-strong-hold
 
