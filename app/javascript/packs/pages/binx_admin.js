@@ -2,7 +2,6 @@ import log from "../utils/log";
 import moment from "moment-timezone";
 import LoadFancySelects from "../utils/LoadFancySelects";
 import BinxAdminInvoices from "./binx_admin_invoices.js";
-import BinxAdminUpdateDrivetrain from "./binx_admin_update_drivetrain.js"
 
 function BinxAdmin() {
   return {
