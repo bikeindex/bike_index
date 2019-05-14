@@ -5,12 +5,7 @@ class Admin::OrganizationsController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 25
-    orgs = Organization.all
-    orgs = orgs.paid if params[:search_is_paid].present?
-    orgs = orgs.admin_text_search(params[:search_query]) if params[:search_query].present?
-    orgs = orgs.where(kind: kind_for_organizations) if params[:kind].present?
-    @organizations_count = orgs.count
-    @organizations = orgs.reorder(sort_column + " " + sort_direction).page(page).per(per_page)
+    @organizations = matching_organizations.reorder(sort_column + " " + sort_direction).page(page).per(per_page)
     render layout: "new_admin"
   end
 
@@ -70,6 +65,8 @@ class Admin::OrganizationsController < Admin::BaseController
     redirect_to admin_organizations_url
   end
 
+  helper_method :matching_organizations
+
   protected
 
   def permitted_parameters
@@ -84,13 +81,22 @@ class Admin::OrganizationsController < Admin::BaseController
           .merge(kind: approved_kind)
   end
 
+  def matching_organizations
+    return @matching_organizations if defined?(@matching_organizations)
+    matching_organizations = Organization.all
+    matching_organizations = matching_organizations.paid if params[:search_is_paid].present?
+    matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
+    matching_organizations = matching_organizations.where(kind: kind_for_organizations) if params[:search_kind].present?
+    @matching_organizations = matching_organizations
+  end
+
   def sortable_columns
     %w[created_at name approved]
   end
 
   def kind_for_organizations
     # Legacy enum issue so excited for TODO: Rails 5 update
-    Organization::KIND_ENUM[params[:kind].to_sym] || 0
+    Organization::KIND_ENUM[params[:search_kind].to_sym] || 0
   end
 
   def permitted_locations_params

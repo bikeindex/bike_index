@@ -33,16 +33,13 @@ function BinxOrgBikes() {
         "owner_email_cell"
       ];
       let visibleCells = localStorage.getItem("organizationBikeColumns");
-      // If we have stored cells, select them. Otherwise,
-      if (typeof visibleCells === "undefined") {
+      // If we have stored cells, select them.
+      if (typeof visibleCells === "string") {
+        visibleCells = JSON.parse(visibleCells);
+      }
+      // Unless we have an array with at least one item, make it default
+      if (typeof visibleCells !== "array" || visibleCells.length < 1) {
         visibleCells = defaultCells;
-      } else {
-        if (typeof visibleCells == "string") {
-          visibleCells = JSON.parse(visibleCells);
-        }
-        if (visibleCells.length < 1) {
-          visibleCells = defaultCells;
-        }
       }
 
       visibleCells.forEach(cellClass =>
