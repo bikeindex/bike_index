@@ -1,24 +1,30 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      Manage manufacturers
+  .col-md-7
+    %ul
+      %li.nav-item
+        = link_to 'New Manufacturer', new_admin_manufacturer_url, class: "nav-link"
 
-%h1 Manage Manufacturers
-= link_to 'New Manufacturer', new_admin_manufacturer_url, class: "btn btn-success float-right"
-
-%h4
-  #{@manufacturers.count} total,
-  %span.less-strong
-    #{Manufacturer.with_websites.count} with websites,
-    #{Manufacturer.with_logos.count} with logos.
+  .col-12.mt-4
+    %h4
+      #{number_with_delimiter(@manufacturers.count)} total,
+      %span.less-strong
+        #{number_with_delimiter(Manufacturer.with_websites.count)} with websites,
+        #{number_with_delimiter(Manufacturer.with_logos.count)} with logos.
 
 .full-screen-table.mt-4
-  %table.table.table-striped.table-bordered
-    %thead.thead-light
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light.sortable
       %th
-        Name
+        = sortable "name"
       %th
-        Frames
+        = sortable "frame_maker", "frame"
       %th
         Website
       %th
-        Added
+        = sortable "created_at"
     %tbody
       - @manufacturers.each do |manufacturer|
         %tr

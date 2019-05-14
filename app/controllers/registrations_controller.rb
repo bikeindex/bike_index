@@ -1,5 +1,6 @@
 class RegistrationsController < ApplicationController
   skip_before_filter :set_x_frame_options_header, except: [:new]
+  skip_before_filter :verify_authenticity_token, only: [:create] # Because it was causing issues, and we don't need it here
   before_filter :simple_header
   layout "reg_embed"
 

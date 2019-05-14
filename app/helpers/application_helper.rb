@@ -145,6 +145,10 @@ module ApplicationHelper
     end
   end
 
+  def sortable_search_params?
+    sortable_search_params.values.reject(&:blank?).any?
+  end
+
   def sortable_search_params
     search_param_keys = params.keys.select { |k| k.to_s.match(/\Asearch_/) }
     params.permit(:direction, :sort, :user_id, :organization_id, :period, :render_chart, *search_param_keys)
