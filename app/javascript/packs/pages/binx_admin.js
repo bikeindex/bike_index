@@ -26,7 +26,7 @@ function BinxAdmin() {
         this.adminLocations();
       }
       if ($(".inputTriggerRecalculation")) {
-        const binxAdminInvoices = BinxAdminInvoices()
+        const binxAdminInvoices = BinxAdminInvoices();
         binxAdminInvoices.init();
       }
       if ($("#admin-recovery-fields")) {

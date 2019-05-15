@@ -9,6 +9,7 @@ class Organization < ActiveRecord::Base
     software: 5,
     property_management: 6,
     other: 7,
+    ambassador: 8,
   }.freeze
 
   acts_as_paranoid
@@ -81,6 +82,11 @@ class Organization < ActiveRecord::Base
     matching_slugs = PaidFeature.matching_slugs(slugs)
     return nil unless matching_slugs.present?
     where("paid_feature_slugs ?& array[:keys]", keys: matching_slugs)
+  end
+
+  # Organization kinds creatable by non-superadmins
+  def self.creatable_kinds
+    kinds.reject { |kind| kind == "ambassador" }
   end
 
   def to_param
