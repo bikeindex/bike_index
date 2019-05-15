@@ -2,4 +2,6 @@ From: <%= @feedback.email %>
 
 <%= @feedback.name %> says,
 
-<%= @feedback.body.html_safe %>
+<%= @feedback.body.truncate(10) %>
+
+View more at <%= admin_feedback_url(@feedback) %>

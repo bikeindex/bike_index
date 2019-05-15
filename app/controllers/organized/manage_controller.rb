@@ -1,6 +1,7 @@
 module Organized
   class ManageController < Organized::AdminController
     before_filter :assign_organization, only: [:index, :update, :locations]
+
     def index
       @organization.ensure_auto_user
     end
@@ -20,23 +21,20 @@ module Organized
       end
     end
 
-    def dev
-    end
-
     def destroy
       organization_name = current_organization.name
       if current_organization.is_paid
         flash[:info] = "Please contact support@bikeindex.org to delete #{organization_name}"
         redirect_to current_index_path and return
       end
-      notify_admins('organization_destroyed')
+      notify_admins("organization_destroyed")
       current_organization.destroy
       flash[:info] = "Deleted #{organization_name}"
       redirect_to user_root_url
     end
 
     def landing
-      render '/landing_pages/show'
+      render "/landing_pages/show"
     end
 
     private

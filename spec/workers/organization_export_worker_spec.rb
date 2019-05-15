@@ -16,7 +16,7 @@ describe OrganizationExportWorker do
       nil,
       "Black",
       bike.serial_number,
-      nil
+      nil,
     ]
   end
   let(:csv_string) { csv_lines.map { |r| instance.comma_wrapped_string(r) }.join }
@@ -54,23 +54,31 @@ describe OrganizationExportWorker do
                                       params: { bike: { address: "102 Washington Pl, State College",
                                                         user_name: "Maya Skripal" } })
         end
+        let(:bike_not_avery) { FactoryBot.create(:creation_organization_bike, manufacturer: trek, primary_frame_color: black, organization: organization) }
+        let!(:b_param_partial) do
+          FactoryBot.create(:b_param, created_bike_id: bike_not_avery.id,
+                                      params: { bike: { address: "State College, PA",
+                                                        user_name: "George Washington" } })
+        end
         let(:csv_lines) do
           # We modify the headers during processing to separate the address into multiple fields
           [
             %w[owner_name address city state zipcode sticker],
-            ["Maya Skripal", "102 Washington Pl", "State College", "PA", "16801", "A1111"]
+            ["Maya Skripal", "102 Washington Pl", "State College", "PA", "16801", "A1111"],
           ]
         end
         let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "a1111") }
         include_context :geocoder_real
-        it "exports only bike with name and email" do
+        it "exports only bike with name, email and address" do
           expect(bike_code.claimed?).to be_falsey
           export.update_attributes(file_format: "csv") # Manually switch to csv so that we can parse it more easily :/
-          expect(organization.bikes.pluck(:id)).to match_array([bike.id, bike_for_avery.id])
+          expect(organization.bikes.pluck(:id)).to match_array([bike.id, bike_for_avery.id, bike_not_avery.id])
           expect(export.avery_export?).to be_truthy
           expect(export.headers).to eq Export::AVERY_HEADERS
           VCR.use_cassette("organization_export_worker-avery") do
             instance.perform(export.id)
+            # Check this in here so the vcr geocoder records at the correct place
+            expect(bike_not_avery.registration_address["address"].present?).to be_falsey
           end
           export.reload
           expect(export.progress).to eq "finished"
@@ -139,7 +147,7 @@ describe OrganizationExportWorker do
           nil,
           email,
           "George Smith",
-          "George Smith" # Because of user_name_with_fallback
+          "George Smith", # Because of user_name_with_fallback
         ]
       end
       let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"\",\"\",\"\",\"#{email}\",\"George Smith\",\"George Smith\"" }
@@ -166,7 +174,7 @@ describe OrganizationExportWorker do
           "San Francisco",
           "CA",
           "94103",
-          ""
+          "",
         ]
       end
       let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: { headers: %w[owner_name_or_email link phone additional_registration_number registration_address], bike_code_start: "8z" }) }

@@ -5,10 +5,9 @@ module ControllerHelpers
   extend ActiveSupport::Concern
 
   included do
-    helper_method :current_user, :unconfirmed_current_user, :current_user_or_unconfirmed_user,
-                  :current_organization, :user_root_url, :controller_namespace, :page_id,
-                  :forwarded_ip_address, :ensure_preview_enabled!, :recovered_bike_count,
-                  :sign_in_partner
+    helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
+                  :current_organization, :passive_organization, :controller_namespace, :page_id,
+                  :recovered_bike_count, :default_bike_search_path
     before_filter :enable_rack_profiler
   end
 
@@ -47,13 +46,13 @@ module ControllerHelpers
 
   def user_root_url
     return root_url unless current_user.present?
-    if current_user.superuser
-      admin_root_url
-    elsif current_user.is_content_admin
-      admin_news_index_url
-    else
-      user_home_url(subdomain: false)
-    end
+    return admin_root_url if current_user.superuser
+    return user_home_url(subdomain: false) unless current_user.default_organization.present?
+    organization_bikes_path(organization_id: current_user.default_organization.to_param)
+  end
+
+  def default_bike_search_path
+    bikes_path(location: "ip", stolenness: "proximity")
   end
 
   # Generally this is implicitly set, via the passed parameters - however! it can also be explicitly set
@@ -68,12 +67,12 @@ module ControllerHelpers
       session[:return_to] = nil
       cookies[:return_to] = nil
       case target.downcase
-      when 'password_reset'
+      when "password_reset"
         flash[:success] = "You've been logged in. Please reset your password"
         render action: :update_password and return true
-      when /\A#{ENV['BASE_URL']}/, %r{\A/} # Either starting with our URL or /
+      when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
         redirect_to(target) and return true
-      when 'https://facebook.com/bikeindex'
+      when "https://facebook.com/bikeindex"
         redirect_to(target) and return true
       end
     elsif session[:discourse_redirect]
@@ -86,13 +85,14 @@ module ControllerHelpers
   end
 
   def page_id
-    @page_id ||= [controller_namespace, controller_name, action_name].compact.join('_')
+    @page_id ||= [controller_namespace, controller_name, action_name].compact.join("_")
   end
 
   def recovered_bike_count
     if Rails.env.production?
       Rails.cache.fetch "recovered_bike_count_#{Date.today.to_formatted_s(:number)}" do
-        StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count
+        # StolenBikeRegistry.com had just over 2k recoveries prior to merging. The recoveries weren't imported, so manually calculate
+        StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count + 2_041
       end
     else
       3_021
@@ -105,12 +105,34 @@ module ControllerHelpers
     redirect_to user_root_url and return
   end
 
+  def set_passive_organization(organization)
+    session[:passive_organization_id] = organization&.id || "0"
+    @current_organization = organization
+    @passive_organization = organization
+  end
+
   protected
 
+  # passive_organization is the organization set for the user - which is persisted in session
+  # The user may or may not be interacting with the current_organization in any given request
+  def passive_organization
+    return @passive_organization if defined?(@passive_organization)
+    if session[:passive_organization_id].present?
+      return @passive_organization = nil if session[:passive_organization_id].to_i == 0
+      @passive_organization = Organization.friendly_find(session[:passive_organization_id])
+    end
+    @passive_organization ||= set_passive_organization(current_user&.default_organization)
+  end
+
+  # current_organization is the organization currently being used.
+  # If set, the user *is* interacting with the organization in said request
   def current_organization
     # We call this multiple times - make sure nil stays nil
     return @current_organization if defined?(@current_organization)
     @current_organization = Organization.friendly_find(params[:organization_id])
+    # Sometimes (e.g. embed registration), it's ok if current_user isn't authorized - but only set passive_organization if authorized
+    return @current_organization unless @current_organization.present? && current_user&.authorized?(@current_organization)
+    set_passive_organization(@current_organization)
   end
 
   def current_user
@@ -125,7 +147,7 @@ module ControllerHelpers
   # Because we need to show unconfirmed users logout - and we should show them what they're missing in general
   # Generally, this shouldn't be accessed. Almost always should be accessing current_user
   def current_user_or_unconfirmed_user
-    current_user_or_unconfirmed_user = current_user || unconfirmed_current_user
+    current_user || unconfirmed_current_user
   end
 
   def sign_in_partner
@@ -140,6 +162,7 @@ module ControllerHelpers
   end
 
   def remove_session
+    session.keys.each { |k| session.delete(k) } # Get rid of everything we've been storing
     cookies.delete(:auth)
   end
 
@@ -148,13 +171,13 @@ module ControllerHelpers
   end
 
   def require_member!
-    return true if current_user.is_member_of?(current_organization)
+    return true if current_user.member_of?(current_organization)
     flash[:error] = "You're not a member of that organization!"
     redirect_to user_home_url(subdomain: false) and return
   end
 
   def require_admin!
-    return true if current_user.is_admin_of?(current_organization)
+    return true if current_user.admin_of?(current_organization)
     flash[:error] = "You have to be an organization administrator to do that!"
     redirect_to user_home_url and return
   end
@@ -163,7 +186,7 @@ module ControllerHelpers
     type = "full"
     content_accessible = ["news"]
     type = "content" if content_accessible.include?(controller_name)
-    return true if current_user.present? && current_user.admin_authorized(type)
+    return true if current_user.present? && current_user.superuser?
     flash[:error] = "You don't have permission to do that!"
     redirect_to user_root_url and return
   end

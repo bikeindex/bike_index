@@ -1,12 +1,15 @@
-// 
+//
 // Input helpers
 //
 .hide-selectize-dropdown-arrow {
-  .selectize-control.single .selectize-input:after { display: none; }
+  .selectize-control.single .selectize-input:after {
+    display: none;
+  }
 }
 
-.form-circle-item { // Mixin for help blocks
-  padding: .5em .25em;
+.form-circle-item {
+  // Mixin for help blocks
+  padding: 0.5em 0.25em;
   border-radius: 1em;
   line-height: 0;
   cursor: pointer;
@@ -17,24 +20,30 @@
 
 .below-input-help {
   @extend small;
+
   display: block;
   line-height: 1.5em;
-  padding-bottom: .5em;
+  padding-bottom: 0.5em;
   color: $gray-light;
 }
 
 a.optional-form-block {
   cursor: pointer;
   color: $gray;
-  &:hover { 
+
+  &:hover {
     color: $link-color;
     text-decoration: none;
-    .context-display-help { color: $link-color; }
+
+    .context-display-help {
+      color: $link-color;
+    }
   }
 }
 
 .context-display-help {
   @extend .form-circle-item;
+
   display: inline-block;
   background: #fff;
   border: 1px solid $form-well-border-color;
@@ -43,6 +52,7 @@ a.optional-form-block {
 .hidden-other {
   margin-top: 0;
   display: none;
+
   &.unhidden {
     margin-bottom: 1.5rem;
     display: flex !important;
@@ -52,21 +62,37 @@ a.optional-form-block {
 
 #email_check_message {
   cursor: pointer;
+
   @extend .form-control-feedback;
+
   display: none;
   padding: 0 0.75rem;
+
   // @extend .text-muted;
 }
 
-// 
+//
 // Avatar uploader
-// 
-.avatar-upload-wrapper, .file-upload-wrapper {
-  img { padding-bottom: $vertical-height; }
-  label.file { display: block; }
+//
+.avatar-upload-wrapper,
+.file-upload-wrapper {
+  img {
+    padding-bottom: $vertical-height;
+  }
+
+  label.file {
+    display: block;
+  }
+
   .file-custom {
-    .file-upload-text { color: $gray-light; }
-    &::after { content: ''; }
+    .file-upload-text {
+      color: $gray-light;
+    }
+
+    &::after {
+      content: "";
+    }
+
     &::before {
       content: "Upload Photo";
       font-size: $btn-font-size;
@@ -79,11 +105,12 @@ a.optional-form-block {
       border-color: $green;
     }
   }
+
   // Override the content display for files so it says file not photo
-  &.file-upload-wrapper .file-custom::before { content: "Upload file"; }
+  &.file-upload-wrapper .file-custom::before {
+    content: "Upload file";
+  }
 }
-
-
 
 // Old Bootstrap-4 custom file upload css - https://github.com/twbs/bootstrap-rubygem/blob/0bbd14de56ef118c27a42aa89623cca5edeec94c/assets/stylesheets/bootstrap/_custom-forms.scss
 // Classes changed and broke our useage at 2642b162208bacefa24e6d52a576546392289f46
@@ -94,12 +121,14 @@ a.optional-form-block {
   height: 2.5rem;
   cursor: pointer;
 }
+
 .file input {
   width: 100%;
   margin: 0;
   filter: alpha(opacity = 0);
   opacity: 0;
 }
+
 .file-custom {
   position: absolute;
   top: 0;
@@ -107,36 +136,39 @@ a.optional-form-block {
   left: 0;
   z-index: 5;
   height: 2.5rem;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   line-height: 1.5;
   color: #555;
   user-select: none;
   background-color: #fff;
   border: $input-btn-border-width solid #ddd;
-  border-radius: .25rem;
-  @include box-shadow(inset 0 .2rem .4rem rgba(0,0,0,.05));
+  border-radius: 0.25rem;
+
+  @include box-shadow(inset 0 0.2rem 0.4rem rgba(0, 0, 0, 0.05));
 }
+
 .file-custom::after {
   content: "Choose file...";
 }
+
 .file-custom::before {
   position: absolute;
-  top: -.075rem;
-  right: -.075rem;
-  bottom: -.075rem;
+  top: -0.075rem;
+  right: -0.075rem;
+  bottom: -0.075rem;
   z-index: 6;
   display: block;
   height: 2.5rem;
-  padding: .5rem 1rem;
+  padding: 0.5rem 1rem;
   line-height: 1.5;
   color: #555;
   content: "Browse";
   background-color: #eee;
   border: $input-btn-border-width solid #ddd;
-  border-radius: 0 .25rem .25rem 0;
+  border-radius: 0 0.25rem 0.25rem 0;
 }
 
 // Focus state
 .file input:focus ~ .file-custom {
-  @include box-shadow(0 0 0 .075rem #fff, 0 0 0 .2rem #0074d9);
+  @include box-shadow(0 0 0 0.075rem #fff, 0 0 0 0.2rem #0074d9);
 }

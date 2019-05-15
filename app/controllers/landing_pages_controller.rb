@@ -1,10 +1,10 @@
 class LandingPagesController < ApplicationController
-  layout 'application_revised'
+  layout "application_revised"
   before_action :force_html_response
   before_filter :instantiate_feedback, except: [:show]
 
   def show
-    raise ActionController::RoutingError, 'Not found' unless current_organization.present?
+    raise ActionController::RoutingError, "Not found" unless current_organization.present?
   end
 
   def for_shops; end
@@ -17,9 +17,9 @@ class LandingPagesController < ApplicationController
 
   def ascend; @page_title ||= "Ascend POS on Bike Index" end
 
-  def ambassadors_current; @page_title ||= 'Current Ambassadors' end
+  def ambassadors_current; @page_title ||= "Current Ambassadors" end
 
-  def ambassadors_how_to; @page_title ||= 'Ambassadors' end
+  def ambassadors_how_to; @page_title ||= "Ambassadors" end
 
   protected
 

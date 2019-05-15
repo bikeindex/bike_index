@@ -1,6 +1,6 @@
-%header.with-subtitle
-  %h1
-    Stolen Notifications
+
+%h1
+  Stolen Notifications
 
 %h4
   = StolenNotification.count
@@ -8,34 +8,28 @@
   %em
     (#{StolenNotification.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
 
-.paginate-container
-  = paginate @stolen_notifications
 
-%section.full-screen-table
+= paginate @stolen_notifications, views_prefix: "admin"
+
+.full-screen-table
   %table.table.table-striped.table-bordered
-    %thead
+    %thead.thead-light
       %th
         Date created
-      %th.large-screens
+      %th
         Bike
       %th
         message
-      %th.not-tiny-screens
+      %th
         sent
 
     %tbody
       - @stolen_notifications.each do |stolen_notification|
         %tr
           %td
-            %a{href: admin_stolen_notification_url(stolen_notification) }
-
-              - if stolen_notification.created_at.today?
-                Today at #{stolen_notification.created_at.strftime("%-I %p")}
-              - elsif Date.yesterday().beginning_of_day() <= stolen_notification.created_at
-                Yesterday at #{stolen_notification.created_at.strftime("%-I %p")}
-              - else
-                = stolen_notification.created_at.strftime("%-m.%-d.%Y")
-          %td.large-screens
+            %a.convertTime{ href: admin_stolen_notification_url(stolen_notification) }
+              = l stolen_notification.created_at, format: :convert_time
+          %td
             - if stolen_notification.bike
               .less-strong-hold
                 %span.less-strong-right
@@ -45,11 +39,10 @@
               Bike deleted!
           %td
             = stolen_notification.message.truncate(120)
-          %td.not-tiny-screens.table-cell-check
+          %td.table-cell-check
             - if stolen_notification.send_dates_parsed.count == 1
               = "&#x2713;".html_safe
             - else
               = stolen_notification.send_dates_parsed.count
 
-  .paginate-container
-    = paginate @stolen_notifications
+= paginate @stolen_notifications, views_prefix: "admin"

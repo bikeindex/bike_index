@@ -1,6 +1,4 @@
 class Ownership < ActiveRecord::Base
-
-
   attr_accessor :creator_email, :user_email
 
   validates_presence_of :owner_email
@@ -9,12 +7,13 @@ class Ownership < ActiveRecord::Base
 
   belongs_to :bike, touch: true
   belongs_to :user, touch: true
-  belongs_to :creator, class_name: 'User'
+  belongs_to :creator, class_name: "User"
 
   default_scope { order(:created_at) }
   scope :current, -> { where(current: true) }
 
   before_save :normalize_email
+
   def normalize_email
     self.owner_email = EmailNormalizer.normalize(owner_email)
   end
@@ -40,7 +39,7 @@ class Ownership < ActiveRecord::Base
     save
   end
 
-  def can_be_claimed_by(u)
+  def claimable_by?(u)
     u == User.fuzzy_email_find(owner_email) || u == user
   end
 end

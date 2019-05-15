@@ -2,7 +2,6 @@ class Tweet < ActiveRecord::Base
   validates_presence_of :twitter_id
   has_many :public_images, as: :imageable, dependent: :destroy
   mount_uploader :image, ImageUploader
-  process_in_background :image, CarrierWaveProcessWorker
   before_save :set_body_from_response
   before_validation :ensure_valid_alignment
 
@@ -19,10 +18,10 @@ class Tweet < ActiveRecord::Base
   def self.auto_link_text(text)
     text.gsub /@([^\s])*/ do
       username = Regexp.last_match[0]
-      "<a href=\"https://twitter.com/#{username.delete('@')}\" target=\"_blank\">#{username}</a>"
+      "<a href=\"https://twitter.com/#{username.delete("@")}\" target=\"_blank\">#{username}</a>"
     end.gsub /#([^\s])*/ do
       hashtag = Regexp.last_match[0]
-      "<a href=\"https://twitter.com/hashtag/#{hashtag.delete('#')}\" target=\"_blank\">#{hashtag}</a>"
+      "<a href=\"https://twitter.com/hashtag/#{hashtag.delete("#")}\" target=\"_blank\">#{hashtag}</a>"
     end
   end
 
@@ -38,8 +37,8 @@ class Tweet < ActiveRecord::Base
   end
 
   def set_body_from_response
-    return true unless body_html.blank? && twitter_response && twitter_response['text'].present?
-    self.body_html = self.class.auto_link_text(twitter_response['text'])
+    return true unless body_html.blank? && twitter_response && twitter_response["text"].present?
+    self.body_html = self.class.auto_link_text(twitter_response["text"])
   end
 
   def trh
@@ -47,19 +46,19 @@ class Tweet < ActiveRecord::Base
   end
 
   def tweeted_at
-    Time.parse(trh['created_at'])
+    Time.parse(trh["created_at"])
   end
 
   def tweetor
-    trh['user'] && trh['user']['screen_name']
+    trh["user"] && trh["user"]["screen_name"]
   end
 
   def tweetor_avatar
-    trh['user'] && trh['user']['profile_image_url_https']
+    trh["user"] && trh["user"]["profile_image_url_https"]
   end
 
   def tweetor_name
-    trh['user'] && trh['user']['name']
+    trh["user"] && trh["user"]["name"]
   end
 
   def tweetor_link

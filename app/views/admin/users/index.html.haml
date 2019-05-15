@@ -6,18 +6,8 @@
     #{number_with_delimiter(@user_count)} users
     = params[:user_query].present? ? 'matching query' : 'have signed up'
 
-
-.container.mb-2
-  .row
-    = form_tag admin_users_path, method: :get, class: "form-inline ml-auto" do
-      = text_field_tag :user_query, params[:user_query], placeholder: "Find by name or email", class: "form-control mr-sm-2"
-      = submit_tag "Search", name: "search", class: "btn btn-outline-primary btn-rounded my-0"
-  .row
-    .ml-auto
-      = link_to "Superusers", admin_users_path(superusers: true)
-      |
-      = link_to "Content admins", admin_users_path(content_admins: true)
-
+.pull-right
+  #{link_to "Superusers", admin_users_path(superusers: true)}
 - if @users.present?
   .row
     .paginate-container.ml-auto

@@ -52,6 +52,7 @@ RSpec.describe BikeCode, type: :model do
     let!(:user) { FactoryBot.create(:organization_member, organization: organization2) }
     it "looks up, falling back to the orgs for the user, falling back to any org" do
       expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex")).to eq bikecode
+      expect(BikeCode.lookup_with_fallback("0010", organization_id: "bikeindex")).to eq bikecode
       # It finds the bike_code that exists, even though it doesn't match the organization passed
       expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex", user: nil)).to eq bikecode
       expect(bikecode_duplicate).to be_present
@@ -152,20 +153,32 @@ RSpec.describe BikeCode, type: :model do
   end
 
   describe "claim" do
-    let(:bike) { FactoryBot.create(:bike) }
+    let(:ownership) { FactoryBot.create(:ownership) }
+    let(:bike) { ownership.bike }
     let(:user) { FactoryBot.create(:user) }
     let(:bike_code) { FactoryBot.create(:bike_code) }
     it "claims, doesn't update when unable to parse" do
+      bike_code.reload
       bike_code.claim(user, bike.id)
+      expect(bike_code.previous_bike_id).to be_nil
       expect(bike_code.user).to eq user
       expect(bike_code.bike).to eq bike
       bike_code.claim(user, "https://bikeindex.org/bikes/9#{bike.id}")
+      expect(bike_code.previous_bike_id).to be_nil
       expect(bike_code.errors.full_messages).to be_present
       expect(bike_code.bike).to eq bike
       bike_code.claim(user, "https://bikeindex.org/bikes?per_page=200")
       expect(bike_code.errors.full_messages).to be_present
       expect(bike_code.bike).to eq bike
       expect(bike_code.claimed_at).to be_within(1.second).of Time.now
+      expect(bike_code.previous_bike_id).to be_nil
+      reloaded_code = BikeCode.find bike_code.id # Hard reload, it wasn't resetting errors
+      expect(reloaded_code.unclaimable_by?(user)).to be_falsey
+      expect(ownership.creator.authorized?(bike)).to be_truthy
+      expect(reloaded_code.unclaimable_by?(ownership.creator)).to be_truthy
+      reloaded_code.claim(ownership.creator, "")
+      expect(reloaded_code.bike_id).to be_nil
+      expect(reloaded_code.previous_bike_id).to eq bike.id
     end
     context "with weird strings" do
       it "updates" do
@@ -175,6 +188,7 @@ RSpec.describe BikeCode, type: :model do
         bike_code.claim(user, "\nwww.bikeindex.org/bikes/#{bike.id} ")
         expect(bike_code.errors.full_messages).to_not be_present
         expect(bike_code.bike).to eq bike
+        expect(bike_code.previous_bike_id).to eq bike.id
       end
     end
     context "organized" do
@@ -192,6 +206,15 @@ RSpec.describe BikeCode, type: :model do
         # Since no bike is assigned, it isn't unclaimable again
         bike_code.claim(user, "\n ")
         expect(bike_code.errors.full_messages).to be_present
+        # And it sets previous_bike_id correctly
+        bike_code.reload
+        bike_code.claim(user, "")
+        bike_code.reload
+        expect(bike_code.previous_bike_id).to eq bike.id
+        bike_code.reload
+        bike_code.claim(user, "")
+        bike_code.reload
+        expect(bike_code.previous_bike_id).to eq bike.id
       end
       context "unclaiming with bikeindex.org url" do
         it "adds an error" do

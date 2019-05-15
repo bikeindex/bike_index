@@ -125,7 +125,8 @@ CREATE TABLE public.bike_codes (
     user_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    claimed_at timestamp without time zone
+    claimed_at timestamp without time zone,
+    previous_bike_id integer
 );
 
 
@@ -188,13 +189,11 @@ ALTER SEQUENCE public.bike_organizations_id_seq OWNED BY public.bike_organizatio
 CREATE TABLE public.bikes (
     id integer NOT NULL,
     name character varying(255),
-    cycle_type_id integer,
     serial_number character varying(255) NOT NULL,
     frame_model character varying(255),
     manufacturer_id integer,
     rear_tire_narrow boolean DEFAULT true,
     number_of_seats integer,
-    propulsion_type_id integer,
     creation_organization_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -214,7 +213,6 @@ CREATE TABLE public.bikes (
     primary_frame_color_id integer,
     secondary_frame_color_id integer,
     tertiary_frame_color_id integer,
-    handlebar_type_id integer,
     handlebar_type_other character varying(255),
     front_wheel_size_id integer,
     rear_wheel_size_id integer,
@@ -509,7 +507,8 @@ CREATE TABLE public.creation_states (
     is_pos boolean DEFAULT false NOT NULL,
     is_new boolean DEFAULT false NOT NULL,
     creator_id integer,
-    bulk_import_id integer
+    bulk_import_id integer,
+    pos_kind integer DEFAULT 0
 );
 
 
@@ -605,38 +604,6 @@ CREATE SEQUENCE public.customer_contacts_id_seq
 --
 
 ALTER SEQUENCE public.customer_contacts_id_seq OWNED BY public.customer_contacts.id;
-
-
---
--- Name: cycle_types; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.cycle_types (
-    id integer NOT NULL,
-    name character varying(255),
-    slug character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: cycle_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.cycle_types_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: cycle_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.cycle_types_id_seq OWNED BY public.cycle_types.id;
 
 
 --
@@ -778,38 +745,6 @@ ALTER SEQUENCE public.flavor_texts_id_seq OWNED BY public.flavor_texts.id;
 
 
 --
--- Name: frame_materials; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.frame_materials (
-    id integer NOT NULL,
-    name character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    slug character varying(255)
-);
-
-
---
--- Name: frame_materials_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.frame_materials_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: frame_materials_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.frame_materials_id_seq OWNED BY public.frame_materials.id;
-
-
---
 -- Name: front_gear_types; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -842,38 +777,6 @@ CREATE SEQUENCE public.front_gear_types_id_seq
 --
 
 ALTER SEQUENCE public.front_gear_types_id_seq OWNED BY public.front_gear_types.id;
-
-
---
--- Name: handlebar_types; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.handlebar_types (
-    id integer NOT NULL,
-    name character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    slug character varying(255)
-);
-
-
---
--- Name: handlebar_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.handlebar_types_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: handlebar_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.handlebar_types_id_seq OWNED BY public.handlebar_types.id;
 
 
 --
@@ -1495,7 +1398,6 @@ CREATE TABLE public.organizations (
     is_suspended boolean DEFAULT false NOT NULL,
     auto_user_id integer,
     access_token character varying(255),
-    new_bike_notification text,
     api_access_approved boolean DEFAULT false NOT NULL,
     approved boolean DEFAULT true,
     avatar character varying(255),
@@ -1505,7 +1407,8 @@ CREATE TABLE public.organizations (
     paid_feature_slugs jsonb,
     parent_organization_id integer,
     kind integer,
-    ascend_name character varying
+    ascend_name character varying,
+    registration_field_labels jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -1715,38 +1618,6 @@ ALTER SEQUENCE public.payments_id_seq OWNED BY public.payments.id;
 
 
 --
--- Name: propulsion_types; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.propulsion_types (
-    id integer NOT NULL,
-    name character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    slug character varying(255)
-);
-
-
---
--- Name: propulsion_types_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.propulsion_types_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: propulsion_types_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.propulsion_types_id_seq OWNED BY public.propulsion_types.id;
-
-
---
 -- Name: public_images; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1759,7 +1630,8 @@ CREATE TABLE public.public_images (
     imageable_type character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    is_private boolean DEFAULT false NOT NULL
+    is_private boolean DEFAULT false NOT NULL,
+    external_image_url text
 );
 
 
@@ -1978,7 +1850,8 @@ CREATE TABLE public.stolen_records (
     create_open311 boolean DEFAULT false NOT NULL,
     tsved_at timestamp without time zone,
     estimated_value integer,
-    recovery_link_token text
+    recovery_link_token text,
+    show_address boolean DEFAULT false
 );
 
 
@@ -2106,10 +1979,8 @@ CREATE TABLE public.users (
     can_send_many_stolen_notifications boolean DEFAULT false NOT NULL,
     auth_token character varying(255),
     stripe_id character varying(255),
-    is_content_admin boolean DEFAULT false NOT NULL,
     notification_newsletters boolean DEFAULT false NOT NULL,
     developer boolean DEFAULT false NOT NULL,
-    bike_actions_organization_id integer,
     partner_data json,
     latitude double precision,
     longitude double precision,
@@ -2274,13 +2145,6 @@ ALTER TABLE ONLY public.customer_contacts ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
--- Name: cycle_types id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.cycle_types ALTER COLUMN id SET DEFAULT nextval('public.cycle_types_id_seq'::regclass);
-
-
---
 -- Name: duplicate_bike_groups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2309,24 +2173,10 @@ ALTER TABLE ONLY public.flavor_texts ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- Name: frame_materials id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.frame_materials ALTER COLUMN id SET DEFAULT nextval('public.frame_materials_id_seq'::regclass);
-
-
---
 -- Name: front_gear_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.front_gear_types ALTER COLUMN id SET DEFAULT nextval('public.front_gear_types_id_seq'::regclass);
-
-
---
--- Name: handlebar_types id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.handlebar_types ALTER COLUMN id SET DEFAULT nextval('public.handlebar_types_id_seq'::regclass);
 
 
 --
@@ -2481,13 +2331,6 @@ ALTER TABLE ONLY public.paints ALTER COLUMN id SET DEFAULT nextval('public.paint
 --
 
 ALTER TABLE ONLY public.payments ALTER COLUMN id SET DEFAULT nextval('public.payments_id_seq'::regclass);
-
-
---
--- Name: propulsion_types id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.propulsion_types ALTER COLUMN id SET DEFAULT nextval('public.propulsion_types_id_seq'::regclass);
 
 
 --
@@ -2673,14 +2516,6 @@ ALTER TABLE ONLY public.customer_contacts
 
 
 --
--- Name: cycle_types cycle_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.cycle_types
-    ADD CONSTRAINT cycle_types_pkey PRIMARY KEY (id);
-
-
---
 -- Name: duplicate_bike_groups duplicate_bike_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2713,27 +2548,11 @@ ALTER TABLE ONLY public.flavor_texts
 
 
 --
--- Name: frame_materials frame_materials_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.frame_materials
-    ADD CONSTRAINT frame_materials_pkey PRIMARY KEY (id);
-
-
---
 -- Name: front_gear_types front_gear_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.front_gear_types
     ADD CONSTRAINT front_gear_types_pkey PRIMARY KEY (id);
-
-
---
--- Name: handlebar_types handlebar_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.handlebar_types
-    ADD CONSTRAINT handlebar_types_pkey PRIMARY KEY (id);
 
 
 --
@@ -2913,14 +2732,6 @@ ALTER TABLE ONLY public.payments
 
 
 --
--- Name: propulsion_types propulsion_types_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.propulsion_types
-    ADD CONSTRAINT propulsion_types_pkey PRIMARY KEY (id);
-
-
---
 -- Name: public_images public_images_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3054,13 +2865,6 @@ CREATE INDEX index_bikes_on_creation_state_id ON public.bikes USING btree (creat
 --
 
 CREATE INDEX index_bikes_on_current_stolen_record_id ON public.bikes USING btree (current_stolen_record_id);
-
-
---
--- Name: index_bikes_on_cycle_type_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bikes_on_cycle_type_id ON public.bikes USING btree (cycle_type_id);
 
 
 --
@@ -3411,13 +3215,6 @@ CREATE INDEX index_stolen_records_on_latitude_and_longitude ON public.stolen_rec
 --
 
 CREATE INDEX index_user_emails_on_user_id ON public.user_emails USING btree (user_id);
-
-
---
--- Name: index_users_on_bike_actions_organization_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_users_on_bike_actions_organization_id ON public.users USING btree (bike_actions_organization_id);
 
 
 --
@@ -4113,4 +3910,20 @@ INSERT INTO schema_migrations (version) VALUES ('20190309021455');
 INSERT INTO schema_migrations (version) VALUES ('20190312185621');
 
 INSERT INTO schema_migrations (version) VALUES ('20190314182139');
+
+INSERT INTO schema_migrations (version) VALUES ('20190315183047');
+
+INSERT INTO schema_migrations (version) VALUES ('20190315213846');
+
+INSERT INTO schema_migrations (version) VALUES ('20190317191821');
+
+INSERT INTO schema_migrations (version) VALUES ('20190327164432');
+
+INSERT INTO schema_migrations (version) VALUES ('20190329233031');
+
+INSERT INTO schema_migrations (version) VALUES ('20190401233010');
+
+INSERT INTO schema_migrations (version) VALUES ('20190402230848');
+
+INSERT INTO schema_migrations (version) VALUES ('20190422221408');
 

@@ -43,7 +43,7 @@
       %label.org-form-label
         Organization logo
       .col-sm-4
-        - if @organization.avatar? 
+        - if @organization.avatar?
           = image_tag(@organization.avatar_url(:thumb))
         / - else
         /   %p

@@ -1,8 +1,6 @@
 %h1 New Ad
 
-.form.form-horizontal
-  = form_for [:admin, @ad] do |f|
-    = render partial: 'form', locals: { f: f }
 
-    .control-group.actions
-      = f.submit "Create", class: 'button-green'
+= form_for [:admin, @ad] do |f|
+  = render partial: 'form', locals: { f: f }
+  = f.submit "Create ad", class: 'btn btn-success float-right position-static'

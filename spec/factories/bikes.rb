@@ -12,7 +12,7 @@ FactoryBot.define do
     sequence(:owner_email) { |n| "bike_owner#{n}@example.com" }
     primary_frame_color { Color.black }
     cycle_type { CycleType.slugs.first }
-    propulsion_type "foot-pedal"
+    propulsion_type { "foot-pedal" }
 
     factory :stolen_bike do
       transient do
@@ -30,6 +30,20 @@ FactoryBot.define do
       end
       factory :recovered_bike do
         recovered { true }
+      end
+    end
+
+    factory :bike_lightspeed_pos do
+      after(:create) do |bike, _evaluator|
+        create(:creation_state, creator: bike.creator, bike: bike, is_pos: true, pos_kind: "lightspeed_pos")
+      end
+    end
+    factory :bike_ascend_pos do
+      transient do
+        bulk_import { FactoryBot.create(:bulk_import_ascend) }
+      end
+      after(:create) do |bike, evaluator|
+        create(:creation_state, creator: bike.creator, bike: bike, is_pos: true, pos_kind: "ascend_pos", bulk_import: evaluator.bulk_import)
       end
     end
 

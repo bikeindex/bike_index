@@ -1,5 +1,5 @@
 class BikeIndex.Views.LoginSignup extends Backbone.View
-    
+
   initialize: ->
     @initializeFlipPhotos()
 
@@ -14,13 +14,13 @@ class BikeIndex.Views.LoginSignup extends Backbone.View
       # then run different while statements for each line
       delay = 1000
       photo_numbers = [0..17]
-      
+
       if $('#new_user').length > 0
         Array::push.apply photo_numbers, [18..23]
       for num in photo_numbers
         delay = delay + (200*Math.random())
         @photoFlip(num, delay)
-      
+
 
   photoFlip: (photo_number, delay) ->
     if $("#photo#{photo_number}").length > 0
@@ -29,10 +29,10 @@ class BikeIndex.Views.LoginSignup extends Backbone.View
       $("#photo#{photo_number} .back").html("<img src='#{img_src}'>")
       setTimeout ( ->
         $("#photo#{photo_number}").fadeTo(200, 1)
-        setTimeout ( -> 
+        setTimeout ( ->
           $("#photo#{photo_number}").addClass('uncover')
         ), 300
-        setTimeout ( -> 
+        setTimeout ( ->
           # $("#photo#{photo_number} .front-behind").fadeIn()
           $("#photo#{photo_number} .front-behind").append("<img src='#{img_src}'>").fadeIn()
         ), 900

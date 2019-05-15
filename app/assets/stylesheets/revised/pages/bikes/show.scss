@@ -4,97 +4,159 @@
     bottom: 0;
     width: 100%;
     z-index: $zindex-navbar-fixed - 1;
+
     p {
       text-align: center;
       margin: 0;
       color: white;
     }
+
     .btn {
       margin-left: 20px;
     }
-    .organization-actions-overlay,
+
     .bike-edit-overlay {
       @include box-shadow(0 0 2px rgba(black, 0.2));
+
       padding: $vertical-height;
     }
   }
+
   .bike-edit-overlay {
     background: rgba($blue, 0.92);
-  }
-  .organization-actions-overlay {
-    background: rgba($red, 0.92);
   }
 
   h1 {
     margin-bottom: 0;
+
     .stolen {
       display: block;
       color: $red;
       font-size: 26px;
     }
   }
+
   .social-share-bike {
     @include clearfix;
+
     padding-bottom: $vertical-height;
     border-bottom: 1px solid $gray-light;
+
     h4 {
       margin: 6px 0 0;
       float: left;
     }
   }
+
   .contact-the-owner {
     background: $gray-darker;
     border-radius: $border-radius;
     padding: $vertical-height;
     margin-top: 2 * $vertical-height;
     margin-bottom: 2 * $vertical-height;
+
     p,
     h3 {
       padding: 0 10px;
     }
+
     p {
       color: $gray-light;
       margin-bottom: $vertical-height;
     }
+
     h3 {
       color: white;
       font-size: 21px;
     }
+
     .additional-field {
       margin-top: $vertical-height;
     }
+
     .send-message {
       @include clearfix;
+
       margin-top: $vertical-height;
+
       .btn {
         float: right;
       }
     }
+
     #write_them_a_message .btn {
       display: block;
     }
+
     .phoneable-by {
       em {
         display: block;
       }
+
       strong {
         @extend .header-font;
+
         color: white;
       }
     }
   }
+
   .show-bike-details h3 {
     margin-top: 3 * $vertical-height;
   }
+
   #map_canvas {
     width: 100%;
     height: 400px;
   }
+
   .bike-photos,
   .show-bike-details,
   .ad300x600,
   .component-typess {
     margin-top: $vertical-height;
+  }
+
+  .organized-access-panel {
+    margin: (2 * $vertical-height) 0;
+
+    .card-block {
+      padding: 15px;
+    }
+
+    .card-title {
+      p,
+      h3 {
+        margin: 0;
+      }
+
+      padding-bottom: 0.5 * $vertical-height;
+      border-bottom: 1px solid $gray-lightish;
+    }
+
+    .unstolen-notification-box {
+      @extend .clearfix;
+
+      border-left: 1px solid $gray-lightish;
+      padding-bottom: $vertical-height;
+
+      .form-control {
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+      }
+    }
+
+    .geomessages-wrap {
+      text-align: center;
+      padding: 8px 15px;
+      background: $gray-lighter;
+      border-top: 1px solid $gray-lightish;
+
+      span {
+        display: inline-block;
+        padding-right: 1rem;
+      }
+    }
   }
 }
 
@@ -103,16 +165,28 @@
   #bikes_show {
     .map-holder {
       width: 100%;
-      pointer-events: none; // On small screens, prevent manipulation of map so that it can be scrolled past
+      pointer-events: none;
+
+      // On small screens, prevent manipulation of map so that it can be scrolled past
     }
+
     .nav-tabs.component-types {
       @include binx-nav-tabs;
     }
+
     .tab-content {
       @include binx-nav-tab-content;
     }
+
     .cgroup-name {
       display: none;
+    }
+
+    // contact box is a pull out, rather than full width
+    .organized-access-panel {
+      .unstolen-notification-box {
+        border-left: 0 none;
+      }
     }
   }
 }
@@ -123,31 +197,39 @@
     .nav-tabs.component-types {
       @include binx-nav-tabs-vertical;
     }
+
     .tab-content {
       border: none;
     }
   }
 }
 
-// // On medium screens and bigger, display all the components
+// On medium screens and bigger, display all the components
 @media (min-width: $grid-breakpoint-md) {
   #bikes_show {
     .nav-tabs.component-types {
       display: none;
     }
+
     .tab-content.component-group-wrap {
-      @include make-row();
+      @include make-row;
+
       .component-group {
         display: block;
+
         // width: 100%;
-        @include make-col-ready();
+        @include make-col-ready;
+
         @include make-col(12);
+
         padding-top: $vertical-height;
+
         h3 {
           margin: 24px 0 12px;
         }
       }
     }
+
     // more space for ad
     .ad300x600 {
       margin-top: 4 * $vertical-height;

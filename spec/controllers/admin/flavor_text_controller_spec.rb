@@ -1,9 +1,9 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Admin::FlavorTextsController do
-  describe 'destroy' do
-    it 'destroys' do
-      text = FlavorText.create(message: 'lulz')
+  describe "destroy" do
+    it "destroys" do
+      text = FlavorText.create(message: "lulz")
       user = FactoryBot.create(:admin)
       set_current_user(user)
       expect do
@@ -12,15 +12,15 @@ describe Admin::FlavorTextsController do
     end
   end
 
-  describe 'update' do
-    describe 'success' do
-      it 'updates' do
+  describe "update" do
+    describe "success" do
+      it "updates" do
         user = FactoryBot.create(:admin)
         set_current_user(user)
-        post :create, flavor_text: { message: 'lulz' }
+        post :create, flavor_text: { message: "lulz" }
         expect(response).to redirect_to(:admin_root)
         expect(flash).to be_present
-        expect(FlavorText.last.message).to eq 'lulz'
+        expect(FlavorText.last.message).to eq "lulz"
       end
     end
   end

@@ -14,6 +14,8 @@ class BikeIndex.BikesShow extends BikeIndex
     window.bike_photos_loaded = false
     if $(".bike-overlay-wrapper").length > 0
       @showBikeOverlay()
+    if $(".organized-access-panel").length > 0
+      @showOrganizedAccessPanel()
 
     # Show the "claim bike" modal (or recovery modal) if present
     if document.getElementById('initial-open-modal')
@@ -58,6 +60,7 @@ class BikeIndex.BikesShow extends BikeIndex
     height = 36 + $(".bike-overlay-wrapper").outerHeight() # 36 is base height, add height from overlays too
     $(".primary-footer .terms-and-stuff").css("padding-bottom", "#{height}px")
 
+  showOrganizedAccessPanel: ->
     # If it's an organization message modal, clicking the button opens the modal and fills in the kind
     $(".openMessageModal").on "click", (e) ->
       $("#organizationMessageModal").modal("show")

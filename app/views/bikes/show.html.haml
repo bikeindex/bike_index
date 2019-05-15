@@ -1,10 +1,4 @@
-= render partial: "initial_modal_for_show"
-
-- if current_user.present?
-  - organization_message_overlay = current_user.bike_actions_organization&.present?
-  - edit_overlay = @bike.authorize_bike_for_user(current_user)
-  - if organization_message_overlay || edit_overlay
-    = render partial: "bike_show_overlays", locals: { organization_message_overlay: organization_message_overlay, edit_overlay: edit_overlay}
+= render partial: "bike_show_overlays"
 
 - if current_user&.superuser && @bike.user_hidden
   %h2.text-danger.mb-4.text-center{ style: "text-align: center;" }
@@ -12,9 +6,10 @@
     %small.less-strong
       no one but the user (and Bike Index admins) can see it
 
-/ Caching should go here:
-/ - cache(@bike) do
 .container
+  / Authorize check here, even though we're checking in controller too, because otherwise we're displaying user data
+  - if current_user.present? && passive_organization.present? && current_user.authorized?(passive_organization)
+    = render partial: "organized_access_panel"
   .row
     .col-md-8
       %h1
@@ -84,10 +79,11 @@
           - unless @bike.type == 'bike'
             = @bike.attr_list_item(@bike.type.titleize, 'Cycle type', with_colon: true)
           = @bike.attr_list_item(@bike.mnfg_name, 'Manufacturer', with_colon: true)
+          = @bike.attr_list_item(@bike.name, 'Name', with_colon: true)
           = @bike.attr_list_item(@bike.frame_model, 'Model', with_colon: true)
           = @bike.attr_list_item(@bike.year.to_s, 'Year', with_colon: true)
           = @bike.attr_list_item(@bike.frame_colors.to_sentence, 'Primary colors', with_colon: true)
-          = @bike.attr_list_item(@bike.frame_size, 'Frame size', with_colon: true)
+          = @bike.attr_list_item(@bike.frame_size&.upcase, 'Frame size', with_colon: true)
           - if @bike.front_wheel_size_id.present?
             - front_tire_width = @bike.front_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
             - if @bike.front_wheel_size_id == @bike.rear_wheel_size_id
@@ -123,7 +119,7 @@
             %p
               = @stolen_record.theft_description
 
-    
+
       - cgroups = @bike.cgroup_array.map { |id| { name: Cgroup.find(id).name, id: id } }
       - if cgroups.any?
         %ul.nav.nav-tabs.component-types{ role: 'tablist' }
@@ -169,12 +165,8 @@
       - if @bike.display_contact_owner?(current_user)
         .contact-the-owner
           %p.preface
-            - if @bike.stolen?
-              %em
-                Know something about this #{@bike.type}?
-            - else
-              %em
-                Believe this #{@bike.type} is stolen, even though it hasn't been marked stolen?
+            %em
+              Know something about this #{@bike.type}?
           %h3
             Contact the owner
           - if @bike.recovered

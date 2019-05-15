@@ -5,7 +5,7 @@ module Organized
 
     def index
       @organization_invitations = current_organization.organization_invitations.unclaimed
-      @memberships = current_organization.memberships.order('created_at desc')
+      @memberships = current_organization.memberships.order("created_at desc")
     end
 
     def edit
@@ -34,7 +34,7 @@ module Organized
       else
         @membership.destroy
       end
-      flash[:success] = 'Deleted user from your organization'
+      flash[:success] = "Deleted user from your organization"
       new_invites_count = current_organization.available_invitation_count + 1
       current_organization.update_attribute :available_invitation_count, new_invites_count
       redirect_to current_index_path
@@ -88,14 +88,14 @@ module Organized
         invitee_name: params[:organization_invitation][:invitee_name],
         organization: current_organization,
         inviter: current_user,
-        membership_role: params[:organization_invitation][:membership_role]
+        membership_role: params[:organization_invitation][:membership_role],
       }
     end
 
     def update_organization_invitation_params
       {
         invitee_name: params[:organization_invitation][:name],
-        membership_role: params[:organization_invitation][:membership_role]
+        membership_role: params[:organization_invitation][:membership_role],
       }
     end
 

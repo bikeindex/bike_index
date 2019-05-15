@@ -1,6 +1,6 @@
 - if page.current?
-  %li.active.list-inline-item
+  %li.active.list-inline-item.pt-2
     = content_tag :a, page, remote: remote, rel: (page.next? ? 'next' : (page.prev? ? 'prev' : nil)), class: "btn btn-secondary text-light disabled"
 - else
-  %li.list-inline-item
+  %li.list-inline-item.pt-2
     = link_to page, url, remote: remote, rel: (page.next? ? 'next' : (page.prev? ? 'prev' : nil)), class: "btn btn-secondary", role: "button"

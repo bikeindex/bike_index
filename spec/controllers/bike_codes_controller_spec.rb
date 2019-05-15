@@ -37,10 +37,9 @@ describe BikeCodesController do
         end
       end
       context "code not found" do
-        it "responds with 404" do
-          expect do
-            put :update, id: "asdffdf", organization_id: "cvxcvcv"
-          end.to raise_error(ActiveRecord::RecordNotFound)
+        it "responds with flash error" do
+          put :update, id: "asdffdf", organization_id: "cvxcvcv"
+          expect(flash[:error]).to be_present
         end
       end
       context "already claimed bike" do

@@ -1,8 +1,8 @@
 class BikeIndex.Views.AdminGraphs extends Backbone.View
-    
+
   initialize: ->
     $('#admin-content .receptacle').css('max-width', '100%')
-    
+
     # if $('#graphy').length > 0
     #   @initialize_graph()
     # else
@@ -17,7 +17,7 @@ class BikeIndex.Views.AdminGraphs extends Backbone.View
   #     scaleOverlay : true
   #     # scaleOverride: true
   #     # scaleSteps: 2
-      
+
   #   if $('#graphy').attr('data-values2')
   #     data_values2 = $('#graphy').data('values2')
   #     data =
@@ -47,8 +47,8 @@ class BikeIndex.Views.AdminGraphs extends Backbone.View
   #       ]
   #   ctx = document.getElementById("graphy").getContext("2d")
   #   new Chart(ctx).Line data, options
-    
+
   # initialize_review: ->
   #   data_values1 = $('#review-graph').data('values1')
   #   data_labels = $('#review-graph').data('labels')
-  #   
+  #

@@ -6,6 +6,7 @@ $bikehub-header: #92d149;
   h2 {
     color: $bikehub-header;
   }
+
   p {
     width: 100%;
   }
@@ -13,29 +14,37 @@ $bikehub-header: #92d149;
 
 nav.bikehub-nav {
   background: #fff;
+
   @include clearfix;
+
   margin-bottom: 40px;
   padding-top: 0;
   padding-bottom: 0;
+
   img {
     display: block;
     max-width: 100%;
   }
+
   .bikehub-logo {
     float: left;
     position: relative;
     padding: 16px 0;
+
     img {
       height: 36px;
     }
   }
+
   .primary-logo {
     float: left;
     padding: 6px 0;
+
     img {
       height: 54px;
     }
   }
+
   .poweredby p {
     float: left;
     padding: 18px 6px 0 24px;
@@ -44,10 +53,12 @@ nav.bikehub-nav {
     color: #000;
     line-height: 1;
   }
+
   .primary-logo,
   .poweredby p {
     opacity: 0.7;
   }
+
   .bikehub-nav-item {
     margin: 0;
     float: right;
@@ -57,16 +68,19 @@ nav.bikehub-nav {
     font-size: 16px;
     text-decoration: none;
     color: #212529;
+
     &:active,
     &.active,
     &:hover {
       color: #fff;
       background: #82cb39;
     }
+
     // For some reason, can't select this with :first-of-type, so manually class it
     &.bikehub-nav-item-first {
       margin-left: auto;
     }
+
     &:last-of-type {
       border-right: 1px solid #ededed;
     }
@@ -85,10 +99,12 @@ nav.bikehub-nav {
       position: absolute;
       left: 0;
       top: 48px;
+
       p {
         padding-left: 16px;
       }
     }
+
     margin-bottom: 60px;
   }
 }
@@ -98,9 +114,11 @@ nav.bikehub-nav {
     .bikehub-logo img {
       height: 24px;
     }
+
     .primary-logo img {
       height: 44px;
     }
+
     .bikehub-nav-item {
       font-size: 14px;
       padding: 0.75rem 0.5rem 0;

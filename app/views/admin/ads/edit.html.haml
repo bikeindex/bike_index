@@ -1,32 +1,22 @@
-%h1.padded
+%h1
   Edit Ad
 
-.admin-ad-preview
-  = render 'shared/ad'
+= render 'ad'
 
-.form.form-horizontal
-  = form_for [:admin, @ad] do |f|
-    = render partial: 'form', locals: { f: f }
 
-    .well.span6.ad-form-actions
-      .control-group.avatar-upload
-        %label.control-label
-          Ad image
-        .controls
-          .avatar-img
-            - if @ad.image? 
-              = image_tag(@ad.image_url(:small))
-            - else
-              %p
-                No picture!
-          = f.file_field :image
-          = f.hidden_field :image_cache
-
-      .control-group
-        .control-label
-          = f.label :live
-        .controls
-          = f.check_box :live
-    .span5
-      .control-group.actions.big-action
-        = f.submit "Update", class: 'button-green big-action'
+= form_for [:admin, @ad] do |f|
+  = render partial: 'form', locals: { f: f }
+  %label.w-100 Ad image
+  - if @ad.image?
+    = image_tag(@ad.image_url(:small))
+  - else
+    %p
+      No picture!
+    .form-group
+      = f.label :image
+      = f.file_field :image, class: "btn btn-light"
+      = f.hidden_field :image_cache
+    .form-group
+      = f.label :live, class: "mr-2"
+      = f.check_box :live
+  = f.submit "Update", class: 'btn btn-success float-right'

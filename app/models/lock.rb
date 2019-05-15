@@ -14,5 +14,4 @@ class Lock < ActiveRecord::Base
       self.manufacturer.name
     end
   end
-
 end
