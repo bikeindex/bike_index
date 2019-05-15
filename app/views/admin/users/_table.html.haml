@@ -5,17 +5,17 @@
         Added&nbsp;<small class="convertTimezone"></small>
       %th
         Email
-      %th.d-none.d-md-table-cell
+      %th
         Secondary Emails
-      %th.d-none.d-lg-table-cell
+      %th
         Name
       %th
         Bikes
-      %th.d-none.d-md-table-cell
+      %th
         Memberships
-      %th.d-none.d-lg-table-cell
+      %th
         Admin?
-      %th.d-none.d-lg-table-cell
+      %th
         Confirmed
     %tbody
       - @users.each do |user|
@@ -32,20 +32,20 @@
                 <span class="paid-org-icon">O</span>
               %small.less-strong-right
                 = user.id
-          %td.d-none.d-md-table-cell
+          %td
             %small.less-strong
               = user.secondary_emails.join(', ')
-          %td.d-none.d-lg-table-cell
+          %td
             - if user.name?
               = user.name
           %td
             = user.ownerships.count
-          %td.d-none.d-md-table-cell
+          %td
             - if user.memberships.present?
               - user.memberships.each do |membership|
                 = link_to "#{membership.organization.name} ", admin_membership_url(membership)
-          %td.d-none.d-lg-table-cell
+          %td
             = "super" if user.superuser?
             = "developer" if user.developer?
-          %td.d-none.d-lg-table-cell.table-cell-check
+          %td.table-cell-check
             = "&#x2713;".html_safe if user.confirmed
