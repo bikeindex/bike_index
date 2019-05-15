@@ -1,23 +1,26 @@
-%h1
-  Manage
-  = link_to "users", admin_users_path
+.admin-subnav
+  .col-7
+    %h1
+      Manage
+      = link_to "users", admin_users_path
+  .col-auto
+    = link_to "Superusers", admin_users_path(superusers: true), class: "btn btn-primary"
+.row
+  .col-md-9
+    %h4
+      #{number_with_delimiter(@user_count)} users
+      = params[:user_query].present? ? 'matching query' : 'have signed up'
+  .col-md-3
+    = form_tag admin_users_path, method: :get do
+      .form-inline
+        = text_field_tag :user_query, params[:user_query], placeholder: "Find by name or email", class: "form-control mr-2"
+        = submit_tag "Search", name: "search", class: "btn btn-success"
 
-  %h4
-    #{number_with_delimiter(@user_count)} users
-    = params[:user_query].present? ? 'matching query' : 'have signed up'
-
-.pull-right
-  #{link_to "Superusers", admin_users_path(superusers: true)}
 - if @users.present?
-  .row
-    .paginate-container.ml-auto
-      = paginate @users, views_prefix: "admin"
+  = paginate @users, views_prefix: "admin"
 
   = render partial: "/admin/users/table"
-
-  .row
-    .paginate-container.ml-auto
-      = paginate @users, views_prefix: "admin"
+  = paginate @users, views_prefix: "admin"
 - else
-  %h1.padded
+  %h1.mt-4
     No users found!
