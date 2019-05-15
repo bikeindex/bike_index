@@ -1,8 +1,9 @@
 import log from "../../utils/log";
 import moment from "moment-timezone";
 import LoadFancySelects from "../../utils/LoadFancySelects";
-import BinxAdminInvoices from "./invoices.js";
 import BinxAdminGraphs from "./graphs.js"
+import BinxAdminInvoices from "./invoices.js";
+
 
 function BinxAdmin() {
   return {
