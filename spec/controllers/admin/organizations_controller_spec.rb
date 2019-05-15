@@ -10,6 +10,15 @@ describe Admin::OrganizationsController, type: :controller do
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
     end
+    context "search" do
+      let!(:organization) { FactoryBot.create(:organization, name: "Cool Bikes") }
+      it "renders, finds organization" do
+        get :index, search_query: "cool"
+        expect(response.status).to eq 200
+        expect(response).to render_template(:index)
+        expect(assigns(:organizations)).to eq([organization])
+      end
+    end
   end
 
   describe "edit" do

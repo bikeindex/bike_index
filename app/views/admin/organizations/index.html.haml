@@ -13,7 +13,7 @@
           matching
       organizations
       %em
-        (#{matching_organizations.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+        (#{matching_organizations.where("organizations.created_at >= ?", Time.zone.now.beginning_of_day).count} today)
   .col-md-7
     = form_tag admin_organizations_path, method: :get, class: "form-inline" do
       = hidden_field_tag :sort, sort_column
