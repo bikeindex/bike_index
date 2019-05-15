@@ -5,7 +5,7 @@ class Admin::OrganizationsController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 25
-    @organizations = matching_organizations.reorder(sort_column + " " + sort_direction).page(page).per(per_page)
+    @organizations = matching_organizations.reorder("organizations.#{sort_column} #{sort_direction}").page(page).per(per_page)
     render layout: "new_admin"
   end
 
@@ -83,7 +83,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def matching_organizations
     return @matching_organizations if defined?(@matching_organizations)
-    matching_organizations = Organization.all
+    matching_organizations = Organization.unscoped
     matching_organizations = matching_organizations.paid if params[:search_is_paid].present?
     matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
     matching_organizations = matching_organizations.where(kind: kind_for_organizations) if params[:search_kind].present?
