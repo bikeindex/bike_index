@@ -6,7 +6,7 @@ import moment from "moment-timezone";
 import BinxMapping from "./binx_mapping.js";
 import BinxAppOrgExport from "./binx_org_export.js";
 import BinxAppOrgMessages from "./binx_org_messages.js";
-import BinxAdmin from "./binx_admin.js";
+import BinxAdmin from "./admin/binx_admin.js";
 
 window.binxApp || (window.binxApp = {});
 
