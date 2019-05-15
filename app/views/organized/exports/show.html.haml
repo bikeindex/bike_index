@@ -49,7 +49,7 @@
               bikes in export
             .collapse#show_exported_bikes
               %ul.exported-link-list
-                - @export.exported_bike_ids.each do |id, i|
+                - @export.exported_bike_ids.each_with_index do |id, i|
                   %li
                     #{link_to id, bike_path(id)}#{i == (@export.exported_bike_ids.count - 1) ? "" : ","}
 
@@ -112,7 +112,7 @@
                 %ul.exported-link-list
                   - @export.bike_codes.each_with_index do |code, i|
                     %li
-                      #{link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param)}#{i == (@export.bike_codes.count - 1)? "" : ","}
+                      #{link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param)}#{i == (@export.bike_codes.count - 1) ? "" : ","}
                 - if @export.bike_codes_removed?
                   %em.text-danger
                     Stickers have been unassigned
