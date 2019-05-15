@@ -1,25 +1,25 @@
 %table.table.table-bordered.table-striped.table-sm
   %thead.thead-light
-    %th.hidden-sm-down
+    %th.d-none.d-md-table-cell
       Added&nbsp;<small class="convertTimezone"></small>
     %th
       Email
-    %th.hidden-sm-down
+    %th.d-none.d-md-table-cell
       Secondary Emails
-    %th.hidden-md-down
+    %th.d-none.d-lg-table-cell
       Name
     %th
       Bikes
-    %th.hidden-sm-down
+    %th.d-none.d-md-table-cell
       Memberships
-    %th.hidden-md-down
+    %th.d-none.d-lg-table-cell
       Admin?
-    %th.hidden-md-down
+    %th.d-none.d-lg-table-cell
       Confirmed
   %tbody
     - @users.each do |user|
       %tr
-        %td
+        %td.d-none.d-md-table-cell
           %span.convertTime
             = l user.created_at, format: :convert_time
         %td
@@ -31,20 +31,20 @@
               <span class="paid-org-icon">O</span>
             %small.less-strong-right
               = user.id
-        %td.medium-screens
+        %td.d-none.d-md-table-cell
           %small.less-strong
             = user.secondary_emails.join(', ')
-        %td.large-screens
+        %td.d-none.d-lg-table-cell
           - if user.name?
             = user.name
         %td
           = user.ownerships.count
-        %td.medium-screens
+        %td.d-none.d-md-table-cell
           - if user.memberships.present?
             - user.memberships.each do |membership|
               = link_to "#{membership.organization.name} ", admin_membership_url(membership)
-        %td.large-screens
+        %td.d-none.d-lg-table-cell
           = "super" if user.superuser?
           = "developer" if user.developer?
-        %td.large-screens.table-cell-check
+        %td.d-none.d-lg-table-cell.table-cell-check
           = "&#x2713;".html_safe if user.confirmed
