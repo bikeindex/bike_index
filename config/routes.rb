@@ -125,6 +125,8 @@ Bikeindex::Application.routes.draw do
 
   namespace :admin do
     root to: "dashboard#index"
+    resources :ambassadors, only: [:index, :show]
+    resources :ambassador_tasks
     resources :bikes do
       collection do
         get :duplicates
@@ -280,7 +282,8 @@ Bikeindex::Application.routes.draw do
     resources :bulk_imports, only: %i[index show new create]
     resources :messages, only: %i[index show create]
     resources :stickers, only: %i[index show edit update]
-    resources :ambassadors, only: %i[index]
+    resources :ambassador_dashboard, only: %i[index]
+    resources :ambassador_task_assignments, only: %i[update]
 
     # Organized Admin resources (below here controllers should inherit Organized::AdminController)
     resources :manage, only: %i[index update destroy] do

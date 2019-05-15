@@ -1,0 +1,10 @@
+%h1 New Ambassador Task
+
+= form_for @ambassador_task,
+  url: admin_ambassador_tasks_path,
+  html: { class: "form" } do |f|
+
+  = f.label :description, "Description", class: "form-label"
+  = f.text_field :description, class: 'form-control'
+
+  = submit_tag "Create", class: 'btn btn-success btn-lg'

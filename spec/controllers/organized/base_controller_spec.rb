@@ -6,9 +6,8 @@ describe Organized::BaseController, type: :controller do
       include_context :logged_in_as_organization_member
 
       it "redirects to the bikes page" do
-        organization = user.organizations.first
         get :index, organization_id: organization.to_param
-        expect(response).to redirect_to(organization_bikes_path(organization))
+        expect(response).to redirect_to(organization_bikes_path)
       end
     end
 
@@ -16,9 +15,8 @@ describe Organized::BaseController, type: :controller do
       include_context :logged_in_as_ambassador
 
       it "redirects to the ambassador dashboard" do
-        ambassador_org = user.organizations.first
-        get :index, organization_id: ambassador_org.to_param
-        expect(response).to redirect_to(organization_ambassadors_path(ambassador_org))
+        get :index, organization_id: organization.to_param
+        expect(response).to redirect_to(organization_ambassador_dashboard_index_path)
       end
     end
   end

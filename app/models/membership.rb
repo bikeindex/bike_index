@@ -12,7 +12,7 @@ class Membership < ActiveRecord::Base
 
   after_commit :update_relationships
 
-  scope :ambassador_organizations, -> { where(organization: Organization.ambassador).order(:created_at) }
+  scope :ambassador_organizations, -> { where(organization: Organization.ambassador) }
 
   def self.membership_types
     MEMBERSHIP_TYPES
@@ -25,5 +25,10 @@ class Membership < ActiveRecord::Base
   def update_relationships
     user&.update_attributes(updated_at: Time.now)
     organization&.update_attributes(updated_at: Time.now)
+  end
+
+  def assign_ambassador_tasks!
+    return unless organization.kind == "ambassador"
+    AmbassadorTask.find_each { |task| task.assign_to(user) }
   end
 end

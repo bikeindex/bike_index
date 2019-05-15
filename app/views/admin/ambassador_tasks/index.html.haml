@@ -1,0 +1,19 @@
+%h1 Ambassador Tasks
+
+%p= link_to "New Task", new_admin_ambassador_task_path
+
+%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border.ambassador-tasks-table
+  %thead.small-header
+    %tr
+      %th Description
+      %th
+  %tbody
+    - @ambassador_tasks.each do |task|
+      %tr
+        %td= task.description_html.html_safe
+        %td
+          %span= link_to "Edit", edit_admin_ambassador_task_path(task)
+          &nbsp;
+          %span= link_to "Delete", admin_ambassador_task_path(task), method: :delete
+          &nbsp;
+          %span= link_to "Show Assignments", admin_ambassador_task_path(task)
