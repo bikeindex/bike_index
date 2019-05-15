@@ -1,28 +1,30 @@
-
-%h2
-  TSV Exports!
+.admin-subnav
+  .col-auto
+    %h2
+      TSV Exports!
 
 %p
   TSVs are generated every night.
-.card.bg-light.tsv_export_list
-  .card-body
-    %table.table.table-striped.table-bordered.table-sm
-      %tbody
-        - FileCacheMaintainer.files.each do |tsv_info|
-          %tr
-            %td
-              - if tsv_info[:updated_at].present?
-                = l Time.zone.at(tsv_info[:updated_at].to_i), format: :short_with_hour
-            %td
-              %a{href: tsv_info[:path] }
-                = tsv_info[:filename]
-            %td
-              = tsv_info[:description]
-
 = form_tag admin_update_tsv_blacklist_path, method: :put, multipart: true do
   = label_tag :tsv_blacklist do
     Blacklist Bike Urls, <strong>1 per line</strong>. These can be the id (the number in the url), the bike url, admin url or edit url
     .form-group
       = text_area_tag :blacklist, @blacklist.map{|i| "#{ENV['BASE_URL']}/bikes/#{i}"}.join("\n"), rows: 10, class: 'form-control'
 
-  = submit_tag "Save changes", class: "btn btn-success submit-bike-update"
+= submit_tag "Save changes", class: "btn btn-success submit-bike-update"
+
+- if @tsvs.any?
+  .card.bg-light.tsv_export_list.mt-4
+    .card-body
+      %table.table.table-striped.table-bordered.table-sm
+        %tbody
+          - @tsvs.each do |tsv_info|
+            %tr
+              %td
+                - if tsv_info[:updated_at].present?
+                  = l Time.zone.at(tsv_info[:updated_at].to_i), format: :short_with_hour
+              %td
+                %a{href: tsv_info[:path] }
+                  = tsv_info[:filename]
+              %td
+                = tsv_info[:description]
