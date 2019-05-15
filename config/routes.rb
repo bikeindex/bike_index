@@ -267,7 +267,7 @@ Bikeindex::Application.routes.draw do
   # prepends a :organization_id/ to every nested URL.
   # Down here so that it doesn't override any other routes
   resources :organizations, only: [], path: "o", module: "organized" do
-    get "/", to: "bikes#index", as: :root
+    get "/", to: "base#index", as: :root
     get "landing", to: "manage#landing", as: :landing
     resources :bikes, only: %i[index new show] do
       collection do
@@ -280,6 +280,7 @@ Bikeindex::Application.routes.draw do
     resources :bulk_imports, only: %i[index show new create]
     resources :messages, only: %i[index show create]
     resources :stickers, only: %i[index show edit update]
+    resources :ambassadors, only: %i[index]
 
     # Organized Admin resources (below here controllers should inherit Organized::AdminController)
     resources :manage, only: %i[index update destroy] do

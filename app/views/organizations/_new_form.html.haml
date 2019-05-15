@@ -46,7 +46,7 @@
             %label.org-form-label
               Organization kind
             .col-sm-4
-              - Organization.kinds.each do |kind|
+              - Organization.creatable_kinds.each do |kind|
                 .radio
                   %label
                     = f.radio_button :kind, kind

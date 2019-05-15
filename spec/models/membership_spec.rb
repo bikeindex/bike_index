@@ -7,6 +7,15 @@ describe Membership do
     it { is_expected.to validate_presence_of(:user).with_message(/user/) }
   end
 
+  describe ".ambassador_organizations" do
+    it "returns all and only ambassador organizations" do
+      FactoryBot.create(:existing_membership)
+      ambassador_orgs = FactoryBot.create_list(:membership_ambassador, 3)
+      found_orgs = Membership.ambassador_organizations
+      expect(found_orgs).to eq(ambassador_orgs.sort_by(&:created_at))
+    end
+  end
+
   describe "admin?" do
     context "admin" do
       it "returns true" do
