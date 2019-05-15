@@ -23,7 +23,7 @@ module Api
         feedback_type = params[:request_type]
         if current_user.present? && reason.present? && bike_id.present? && feedback_type.present?
           bike = Bike.find(bike_id)
-          if bike.owner == current_user
+          if bike.authorize_for_user(current_user)
             feedback = Feedback.new(email: current_user.email, body: reason, title: "#{feedback_type.titleize}", feedback_type: feedback_type)
             feedback.name = (current_user.name.present? && current_user.name) || "no name"
             feedback.feedback_hash = { bike_id: bike_id }
@@ -53,7 +53,7 @@ module Api
             render json: success and return
           end
         end
-        message = { errors: { not_allowed: "nuh-uh" } }
+        message = { errors: { not_allowed: "You are not authorized for that bike" } }
         render json: message, status: 403
       end
 
