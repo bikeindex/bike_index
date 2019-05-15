@@ -35,6 +35,16 @@
               %em
                 so you can
               = link_to "Edit it", edit_bike_path(@bike), class: "btn btn-success btn-sm"
+        - elsif current_user.ambassador?
+          .col-xs-12.mb-2
+            .text-right.less-strong
+              %em
+                %span.hidden-md-down
+                  This #{@bike.type} is not claimed yet. As a Bike Index ambassador,
+              %em
+                you can edit it to mark it as returned:
+              = link_to "EDIT", edit_bike_path(@bike), class: "btn btn-success btn-sm"
+
         .mb-2{ class: display_unstolen_notification_form ? "col-md-7" : "col-sm-12" }
           %ul.attr-list{ class: display_unstolen_notification_form ? "" : "split-sm" }
             - if passive_organization.paid_for?("bike_codes") # Always display stickers if org has paid for them

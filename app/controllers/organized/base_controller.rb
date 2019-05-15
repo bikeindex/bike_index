@@ -4,6 +4,14 @@ module Organized
     before_filter :ensure_member!
     layout "application_revised"
 
+    def index
+      if current_organization.ambassador?
+        redirect_to organization_ambassadors_path
+      else
+        redirect_to organization_bikes_path
+      end
+    end
+
     def ensure_member!
       return true if current_user && current_user.member_of?(current_organization)
       set_passive_organization(nil) # remove the active organization, because it failed so don't show it anymore
