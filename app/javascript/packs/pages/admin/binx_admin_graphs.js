@@ -1,4 +1,4 @@
-function BinxGraphs() {
+function BinxAdminGraphs() {
   return {
     init() {
       this.changeGraphCalendarBox()
@@ -32,4 +32,4 @@ function BinxGraphs() {
     },
   }
 }
-export default BinxGraphs;
+export default BinxAdminGraphs;
