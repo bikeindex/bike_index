@@ -303,6 +303,17 @@ class User < ActiveRecord::Base
     ].reject(&:blank?).join(", ")
   end
 
+  def address_hash
+    return nil unless address.present?
+    {
+      address: street,
+      city: city,
+      state: (state&.abbreviation),
+      zipcode: zipcode,
+      country: country&.iso,
+    }.as_json
+  end
+
   def generate_auth_token
     begin
       self.auth_token = SecureRandom.urlsafe_base64 + "t#{Time.now.to_i}"

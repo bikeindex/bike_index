@@ -79,12 +79,8 @@
                 - bike_attr = Export.additional_registration_fields[reg_field.to_sym]
                 - if bike_attr == "registration_address"
                   %li
-                    %span.attr-title
-                      Entered address:
-                    = @bike.b_params.map { |bp| bp.bike["address"] }.reject(&:blank?).first
-                  %li
                     %span.attr-title{ style: "line-height: 1.25;" }
-                      Formatted address:
+                      Address:
                     - address = @bike.registration_address
                     - if address.present?
                       %br

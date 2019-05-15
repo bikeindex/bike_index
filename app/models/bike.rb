@@ -440,7 +440,12 @@ class Bike < ActiveRecord::Base
   end
 
   def registration_address # Goes along with organization additional_registration_fields
-    @registration_address ||= b_params.map(&:fetch_formatted_address).reject(&:blank?).first || {}
+    return @registration_address if defined?(@registration_address)
+    if user&.address_hash&.present?
+      @registration_address = user&.address_hash
+    else
+      @registration_address = b_params.map(&:fetch_formatted_address).reject(&:blank?).first || {}
+    end
   end
 
   def organization_affiliation

@@ -10,6 +10,7 @@
     .col-lg-5.col-md-4.col-9.mt-auto
       %p.strong.mb-0
         = link_to bike.title_string, bike.list_link_url(target)
+        = link_to "admin view", edit_admin_bike_path(bike.to_param), class: "text-muted em"
       %table.table-list.mb-0
         %tbody
           %tr
