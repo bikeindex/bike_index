@@ -63,7 +63,7 @@ describe "Organization API V3" do
           ENV["ALLOWED_WRITE_ORGANIZATIONS"] = "some-other-uid"
           post url, organization_json, json_headers
           expect_status 401
-          expect_json(error: "Unauthorized. Cannot write organiztions")
+          expect_json(error: "Unauthorized. Cannot write organizations")
         end
       end
     end
@@ -82,6 +82,13 @@ describe "Organization API V3" do
 
       it "requires a valid kind" do
         org_json = organization_attrs.merge(kind: "The best kind ever").to_json
+        post url, org_json, json_headers
+        expect_status 400
+        expect_json(error: "kind does not have a valid value")
+      end
+
+      it "forbids creating non-privileged organization kinds" do
+        org_json = organization_attrs.merge(kind: "ambassador").to_json
         post url, org_json, json_headers
         expect_status 400
         expect_json(error: "kind does not have a valid value")

@@ -77,6 +77,16 @@ describe OrganizationsController do
       expect(organization.website).not_to eq("<script>alert(document.cookie)</script>")
       expect(organization.kind).to eq "other"
     end
+
+    it "prevents creating privileged organization kinds" do
+      user = FactoryBot.create(:user_confirmed)
+      set_current_user(user)
+
+      post :create, organization: org_attrs.merge(kind: "ambassador")
+
+      expect(Organization.count).to eq(1)
+      expect(Organization.last.kind).to eq("other")
+    end
   end
 
   describe "legacy embeds" do

@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "organizations routing" do
+describe "organizations routing", type: :routing do
   describe "landing_pages" do
     it "routes root to " do
       expect(LandingPages::ORGANIZATIONS).to include("university")
@@ -13,9 +13,9 @@ describe "organizations routing" do
   end
   context "organized module" do # At least for now...
     describe "root" do
-      it "roots to bikes" do
+      it "routes to base index action" do
         expect(get: "/o/university").to route_to(
-          controller: "organized/bikes",
+          controller: "organized/base",
           action: "index",
           organization_id: "university",
         )
