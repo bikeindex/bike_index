@@ -67,6 +67,9 @@ class Export < ActiveRecord::Base
 
   def custom_bike_ids; options["custom_bike_ids"] end
 
+  # NOTE: Only does the first 100 bikes, in case there is a huge export
+  def exported_bike_ids; options["exported_bike_ids"] end
+
   # 'options' is a weird place to put the assigned bike_codes - but whatever, it's there, just using it
   def bike_codes; options["bike_codes_assigned"] || [] end
 
@@ -84,6 +87,11 @@ class Export < ActiveRecord::Base
 
   def option?(str)
     options[str.to_s].present?
+  end
+
+  def assign_exported_bike_ids
+    # Store the first 100 bike ids that were exported, for diagnostic purposes
+    self.options = options.merge("exported_bike_ids" => bikes_scoped.limit(100).pluck(:id))
   end
 
   def avery_export=(val)

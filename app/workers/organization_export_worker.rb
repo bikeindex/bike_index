@@ -14,6 +14,7 @@ class OrganizationExportWorker
     @export.file = @export.tmp_file
     @export.progress = "finished"
     @export.options = @export.options.merge(bike_codes_assigned: @bike_codes) if @export.assign_bike_codes?
+    @export.assign_exported_bike_ids
     @export.save
     @export.tmp_file.unlink # Remove it and unlink
     @export
