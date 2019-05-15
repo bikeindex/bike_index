@@ -14,19 +14,24 @@
   height: $header-height;
   width: 100%;
   background: $gray-darker;
+
   img {
     display: block;
-    margin: 0.5 * $vertical-height 1.5 * $vertical-height 0 0;
+    margin: (0.5 * $vertical-height) (1.5 * $vertical-height) 0 0;
     float: right;
-    height: $header-height - $vertical-height; // This is also manually set in HTML attrs because of outlook
+    height: $header-height - $vertical-height;
+
+    // This is also manually set in HTML attrs because of outlook
     max-height: $header-height - $vertical-height;
     width: auto;
   }
+
   .partner-logo-wrapper {
     display: block;
     float: left;
     background: #fff;
     height: 84px;
+
     .logo-plus {
       color: $gray-darker;
       font-size: 40px;
@@ -34,11 +39,16 @@
       line-height: 1;
       margin: 17px 12px 0;
     }
+
     .partner-header-logo {
       float: left;
-      margin-top: 21px; // Margin calculated above is 6px
+      margin-top: 21px;
+
+      // Margin calculated above is 6px
       margin-right: 0;
-      height: 45px; // This is also manually set in HTML attrs because of outlook
+      height: 45px;
+
+      // This is also manually set in HTML attrs because of outlook
     }
   }
 }
@@ -49,21 +59,27 @@
     font-weight: 400;
     line-height: 1.2em;
   }
+
   span {
     font-family: Verdana, sans-serif;
     font-size: 30px;
+
     &:nth-of-type(1) {
       color: #f46767;
     }
+
     &:nth-of-type(2) {
       color: #ffed40;
     }
+
     &:nth-of-type(3) {
       color: #c7e775;
     }
+
     &:nth-of-type(4) {
       color: #3498db;
     }
+
     &:nth-of-type(5) {
       color: #cea9f7;
     }
@@ -71,9 +87,11 @@
 }
 
 $foot-padding: 0.5 * ($header-height - $font-size);
+
 .binx-footer {
   background: $gray-darker;
   padding: $foot-padding;
+
   h5 {
     color: $gray-light;
     font-weight: 600;

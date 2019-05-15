@@ -11,18 +11,18 @@ Rails.application.configure do
   config.eager_load = false
 
   # Show full error reports and disable caching.
-  config.consider_all_requests_local       = true
+  config.consider_all_requests_local = true
   config.action_controller.perform_caching = false
   config.cache_store = :dalli_store,
-    { namespace: Bikeindex, expires_in: 0, compress: true }
+  { namespace: Bikeindex, expires_in: 0, compress: true }
 
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.default_url_options = { host: 'localhost', port: 3001 }
+  config.action_mailer.default_url_options = { host: "localhost", port: 3001 }
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.perform_deliveries = true
   config.action_mailer.smtp_settings = {
-    address: 'localhost',
-    port: 1025
+    address: "localhost",
+    port: 1025,
   }
 
   # Print deprecation notices to the Rails logger.
@@ -51,7 +51,7 @@ Rails.application.configure do
   config.lograge.custom_options = lambda do |event|
     {
       remote_ip: event.payload[:ip],
-      params: event.payload[:params].except('controller', 'action', 'format', 'id')
+      params: event.payload[:params].except("controller", "action", "format", "id"),
     }
   end
 
@@ -69,14 +69,14 @@ Rails.application.configure do
   # Make sure we reload the API after every request!
   @last_api_change = Time.now
   api_reloader = ActiveSupport::FileUpdateChecker.new(Dir["#{Rails.root}/app/controllers/api/v2/**/*.rb"]) do |reloader|
-    times = Dir["#{Rails.root}/app/api/**/*.rb"].map{|f| File.mtime(f) }
-    files = Dir["#{Rails.root}/app/api/**/*.rb"].map{|f| f }
+    times = Dir["#{Rails.root}/app/api/**/*.rb"].map { |f| File.mtime(f) }
+    files = Dir["#{Rails.root}/app/api/**/*.rb"].map { |f| f }
 
-    Rails.logger.debug '! Change detected: reloading following files:'
-    files.each_with_index do |s,i|
+    Rails.logger.debug "! Change detected: reloading following files:"
+    files.each_with_index do |s, i|
       if times[i] > @last_api_change
         Rails.logger.debug " - #{s}"
-        load s 
+        load s
       end
     end
 

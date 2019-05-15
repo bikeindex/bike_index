@@ -7,7 +7,7 @@ module Api
       def index
         descriptions = {
           locking_descriptions: StolenRecord.locking_description,
-          locking_defeat_descriptions: StolenRecord.locking_defeat_description
+          locking_defeat_descriptions: StolenRecord.locking_defeat_description,
         }
         respond_with descriptions
       end

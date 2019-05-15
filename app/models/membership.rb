@@ -6,18 +6,20 @@ class Membership < ActiveRecord::Base
   belongs_to :user
   belongs_to :organization
 
-  validates_presence_of :role, message: 'How the hell did you manage to not choose a role? You have to choose one.'
+  validates_presence_of :role, message: "How the hell did you manage to not choose a role? You have to choose one."
   validates_presence_of :organization, message: "Sorry, organization doesn't exist"
   validates_presence_of :user, message: "We're sorry, that user hasn't yet signed up for Bike Index. Please ask them to before adding them to your organization"
 
   after_commit :update_relationships
+
+  scope :ambassador_organizations, -> { where(organization: Organization.ambassador).order(:created_at) }
 
   def self.membership_types
     MEMBERSHIP_TYPES
   end
 
   def admin?
-    role == 'admin'
+    role == "admin"
   end
 
   def update_relationships

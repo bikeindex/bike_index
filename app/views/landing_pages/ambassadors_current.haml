@@ -7,12 +7,13 @@
       .row
         %h1 Current Ambassadors
         %h3 The heroes of bikedom
-        %a.btn.btn-primary.btn-lg{ href: 'mailto:lily@bikeindex.org' }
+        %a.btn.btn-primary.btn-lg{ href: new_ambassador_path }
           Join their ranks
 
     .ribbon
       .container
         .noribbon
+  -# TODO: Un-hardcode this list
   .container.ambassadors-list
     // Right now, this looks better with justify-content: center - but space-around looks better depending on the item count.
     .row
@@ -134,7 +135,7 @@
         %h2
           Your Name Here
         %h3
-          Anytown, USA
+          Anytown, earth
         %h4
           What's your story?
         %p

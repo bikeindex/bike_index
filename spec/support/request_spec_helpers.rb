@@ -24,6 +24,16 @@ shared_context :logged_in_as_organization_member do
   end
 end
 
+shared_context :logged_in_as_ambassador do
+  let(:user) { FactoryBot.create(:user_ambassador) }
+  before { set_current_user(user) }
+end
+
+shared_context :test_csrf_token do
+  before { ActionController::Base.allow_forgery_protection = true }
+  after { ActionController::Base.allow_forgery_protection = false }
+end
+
 shared_context :existing_doorkeeper_app do
   let(:doorkeeper_app) { create_doorkeeper_app }
   let(:application_owner) { FactoryBot.create(:user_confirmed) }

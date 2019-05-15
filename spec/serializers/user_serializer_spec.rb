@@ -1,4 +1,4 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe UserSerializer do
   let(:user) { FactoryBot.create(:user) }

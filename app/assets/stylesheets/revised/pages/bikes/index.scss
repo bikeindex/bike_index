@@ -1,7 +1,11 @@
 #bikes_index {
   .no-exact-results {
     color: $gray;
-    padding: 2*$vertical-height 0;
+    padding: (2 * $vertical-height) 0;
   }
-  .no-exact-results, .secondary-matches { text-align: center; }
+
+  .no-exact-results,
+  .secondary-matches {
+    text-align: center;
+  }
 }

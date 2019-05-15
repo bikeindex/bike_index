@@ -3,62 +3,77 @@
     span.plural {
       display: none;
     }
+
     &.number-is-plural span.plural {
       display: inline-block;
     }
   }
+
   #map {
     width: 100%;
     height: 400px;
     margin-bottom: 4 * $vertical-height;
   }
+
   // messages table rows are rendered when you click on a point on the map too - only show the map link when on the table
   .map-cell {
     display: none;
   }
+
   // We don't want to display extended-col-info except on the main table, when the screen is small
   .extended-col-info {
     display: none;
   }
+
   #messages_table {
     .map-cell {
       display: table-cell;
       padding: 0;
       text-align: center;
+
       a {
         color: $gray-light;
         cursor: pointer;
         display: block;
         padding: 0.3rem;
+
         &:hover,
         &:active {
           color: $link-color;
         }
       }
     }
+
     // For small tables, we want to just have two cells, so that it isn't too wide for the page
     @include media-breakpoint-down(md) {
       line-height: 1.25;
+
       .extended-col-info {
         display: inline-block;
       }
+
       .msgbikelink {
         display: block;
       }
+
       .hidden-sm-cells {
         display: none;
       }
     }
   }
+
   #placeSearch {
     max-width: 60%;
     display: none;
+
     &.searchOnMap {
       display: block;
     }
+
     @include media-breakpoint-down(md) {
       max-width: 50%;
     }
+
     box-shadow: 0 0 4px rgba(black, 0.1);
     margin: 9px 9px 0 0;
     border-radius: 1px;

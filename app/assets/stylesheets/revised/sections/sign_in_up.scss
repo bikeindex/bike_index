@@ -9,14 +9,17 @@ $sign-in-up-form-bg: $gray-lighter;
   span {
     background: $oauth-login-bg;
   }
+
   &:hover,
   &:active,
   &:visited {
     text-decoration: none;
   }
+
   &:hover span {
     background: $oauth-login-bg-hover;
   }
+
   &:active span {
     background: darken($oauth-login-bg-hover, 5%);
   }
@@ -26,41 +29,53 @@ $sign-in-up-form-bg: $gray-lighter;
   .sign-in-up-header h1 {
     margin-bottom: 4 * $vertical-height;
   }
+
   .sign-in-up-main-form-header {
-    padding: 1.5 * $vertical-height 0 $vertical-height;
+    padding: (1.5 * $vertical-height) 0 $vertical-height;
+
     small {
       @extend .body-font;
+
       float: right;
     }
   }
+
   .sign-in-up-or,
   .oauth-providers {
-    @include make-col-ready();
+    @include make-col-ready;
+
     margin-top: auto;
     margin-bottom: auto;
   }
+
   .sign-in-up-or {
     display: none;
+
     h3 {
       margin: 0;
       text-align: center;
     }
   }
+
   .oauth-providers {
     .facebook-login {
       @include oauth-login-bar($facebook-login-color);
     }
+
     .strava-login {
       @include oauth-login-bar($strava-login-color);
+
       img {
         padding-top: 6px;
       }
     }
+
     a {
       display: flex;
       flex-wrap: wrap;
       margin: $vertical-height 0;
     }
+
     span {
       font-family: $header-font-family;
       font-weight: 400;
@@ -69,19 +84,22 @@ $sign-in-up-form-bg: $gray-lighter;
       color: white;
       margin-bottom: 0;
     }
+
     .oauth-logo-block {
       height: 4 * $vertical-height;
       border-radius: $border-radius 0 0 $border-radius;
       flex: 0 0 16.6667%;
-      padding: $vertical-height 0.5 * $vertical-height;
+      padding: $vertical-height (0.5 * $vertical-height);
     }
+
     .oauth-text-block {
       border-radius: 0 $border-radius $border-radius 0;
       flex: 0 0 82.6666%;
       margin-left: 0.66667%;
       line-height: 1;
-      padding: 17px 0 0 3 * $vertical-height;
+      padding: 17px 0 0 (3 * $vertical-height);
     }
+
     img {
       display: block;
       max-height: 100%;
@@ -89,21 +107,26 @@ $sign-in-up-form-bg: $gray-lighter;
       margin: 0 auto;
     }
   }
+
   .main-form {
-    @include make-col-ready();
+    @include make-col-ready;
+
     .checkbox input[type="checkbox"] {
       margin-top: 0.65rem;
     }
+
     a,
     h3.sign-in-up-main-form-header a {
       color: $body-font-color;
       font-weight: $strong-font-weight;
+
       &:hover,
       &:active,
       &.active {
         color: $body-font-color;
       }
     }
+
     .btn {
       padding-top: $vertical-height;
       padding-bottom: $vertical-height;
@@ -111,10 +134,12 @@ $sign-in-up-form-bg: $gray-lighter;
       display: block;
       width: 250px;
     }
+
     p {
-      margin: 2 * $vertical-height 0 0;
+      margin: (2 * $vertical-height) 0 0;
     }
   }
+
   .terms-and-conditions a {
     cursor: pointer;
   }
@@ -125,8 +150,9 @@ $sign-in-up-form-bg: $gray-lighter;
     background: $sign-in-up-form-bg;
     border: 1px solid $gray-lightish;
     border-radius: $border-radius;
-    padding: 2 * $vertical-height 0.9375rem;
+    padding: (2 * $vertical-height) 0.9375rem;
   }
+
   .oauth-providers,
   .main-form {
     @include make-col(12);
@@ -136,19 +162,27 @@ $sign-in-up-form-bg: $gray-lighter;
 @mixin large-screen-sign-up {
   .sign-in-up-or {
     display: block;
-    width: 0; // Or else it overflows and breaks everything
+    width: 0;
+
+    // Or else it overflows and breaks everything
     @include make-col-push(1);
+
     @include make-col(1);
   }
+
   .oauth-providers {
     @include make-col(5);
+
     @include make-col-push(7);
   }
+
   .sign-in-up-main-form-header {
     padding: 0;
   }
+
   .main-form {
     padding-top: 0;
+
     // Main form gets bg
     background: $sign-in-up-form-bg;
     border: 1px solid $gray-lightish;
@@ -162,15 +196,19 @@ $sign-in-up-form-bg: $gray-lighter;
 // Partner sign-in-up is always small screen styled
 .sign-in-up.with-partner {
   @include small-screen-sign-up;
+
   max-width: 660px;
   margin: 0 auto;
+
   // We want to put the omniauth sign up in reverse order
   .sign-in-up-wrap .row {
     flex-direction: column-reverse;
   }
+
   .oauth-providers {
     margin-top: $vertical-height;
   }
+
   .terms-and-conditions label {
     text-indent: -1rem;
     padding-left: 1rem;
@@ -206,6 +244,7 @@ $sign-in-up-form-bg: $gray-lighter;
   .sign-in-up.not-partner {
     .main-form {
       @include make-col(6);
+
       @include make-col-pull(6);
     }
   }
@@ -218,11 +257,14 @@ $sign-in-up-form-bg: $gray-lighter;
     .oauth-providers {
       @include make-col(4);
     }
+
     .sign-in-up-or {
       @include make-col-push(2);
     }
+
     .main-form {
       @include make-col(5);
+
       @include make-col-pull(4);
     }
   }

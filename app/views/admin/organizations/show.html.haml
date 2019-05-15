@@ -12,14 +12,13 @@
 .row
   .col-md-6
     %table.table-list
-      %tbody
-        - if current_user.developer?
-          %tr
-            %td
-              ID
-            %td
-              %spand.less-strong
-                = @organization.id
+      - if current_user.developer?
+        %tr
+          %td
+            ID
+          %td
+            %spand.less-strong
+              = @organization.id
         %tr
           %td
             Map
@@ -93,6 +92,9 @@
           Website
         %td
           = @organization.website
+          - if @organization.website.present?
+            = link_to @organization.website, class: "strong" do
+              &#128279;
       %tr
         %td
           Paid
@@ -244,9 +246,11 @@
 - if @bikes.present?
   %h2.mt-4
     = pluralize(@bikes.total_count, "Bike")
+    %em.small
+      view #{link_to "org bikes view", organization_bikes_path(organization_id: @organization.to_param)}
   = paginate @bikes, views_prefix: "admin"
 
-  = render partial: "/admin/bikes/admin_bikes_table"
+  = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: @bikes }
 
   = paginate @bikes, views_prefix: "admin"
 - else

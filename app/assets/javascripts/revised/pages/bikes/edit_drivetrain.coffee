@@ -12,7 +12,7 @@ class BikeIndex.BikesEditDrivetrain extends BikeIndex
     $('#edit_drivetrain select').change (e) =>
       @updateDrivetrainValue(e)
 
-  # 
+  #
   # Wheels
   updateDiamsFromStandardChange: (e) ->
     current_val = e.target.value
@@ -36,7 +36,7 @@ class BikeIndex.BikesEditDrivetrain extends BikeIndex
         $all_diams_btn.trigger('click', false)
 
 
-  # 
+  #
   # Drivetrain
   toggleDrivetrainChecks: (e) ->
     $target = $(e.target)
@@ -48,7 +48,7 @@ class BikeIndex.BikesEditDrivetrain extends BikeIndex
         @setDrivetrainValue('front_gear_select')
       if id == 'rear_gear_select_internal'
         @setDrivetrainValue('rear_gear_select')
-        
+
   toggleFixed: (is_fixed) ->
     fixed_values = {}
     for side in ['front', 'rear']
@@ -83,7 +83,7 @@ class BikeIndex.BikesEditDrivetrain extends BikeIndex
     else
       position = $(event.target).attr('id')
       @setDrivetrainValue(position)
-    
+
   setInitialGears: ->
     if $('#fixed_gear_check').prop('checked') == true
       @toggleFixed(true)

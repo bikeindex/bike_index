@@ -1,34 +1,53 @@
+.admin-subnav
+  .col
+    %h1
+      #{link_to 'Feedback and messages', admin_feedbacks_path}
 
-%h1
-  #{link_to 'Feedback and messages', admin_feedbacks_path}
+.row
+  .col-sm-6
+    %table.table-list
+      %tbody
+        %tr
+          %td
+            Created
+          %td
+            %span.convertTime.preciseTime
+              = l @feedback.created_at, format: :convert_time
+        %tr
+          %td
+            Type
+          %td
+            = link_to @feedback.feedback_type, admin_feedbacks_path(type: @feedback.feedback_type)
+        %tr
+          %td
+            Title
+          %td
+            = @feedback.title
+        %tr
+          %td
+            User
+          %td
+            = @feedback.name
+            %span.less-strong
+              - if @feedback.user
+                = link_to @feedback.user.display_name, edit_admin_user_path(@feedback.user)
+                user present
+              - else
+                = link_to @feedback.email, admin_users_path(user_query: @feedback.email)
+        - if @feedback.feedback_hash.present?
+          %tr
+            %td
+              data
+            %td
+              %pre
+                %code
+                  = @feedback.feedback_hash.to_yaml.gsub("---\n", "")
 
+  .col-sm-6
+    .card
+      .card-body
+        %h5.card-title
+          Message text
+        %p.card-text
+          = @feedback.body
 
-.card
-  .card-header
-    %h4.card-title
-      #{link_to @feedback.feedback_type, admin_feedbacks_path(type: @feedback.feedback_type)}: #{@feedback.title}
-    %h5.card-subtitle
-      User:
-      = @feedback.name
-  %p.card-body
-    = @feedback.body.truncate(100)
-
-  %table.table.table-striped.table-bordered
-    %tbody
-      %tr
-        %td
-          Created:
-          %a.convertTime.preciseTime{ href: admin_feedback_url(@feedback) }
-            = l @feedback.created_at, format: :convert_time
-        %td
-          By:
-          - if @feedback.user
-            = link_to @feedback.user.display_name, edit_admin_user_path(@feedback.user)
-            user present
-          - else
-            = link_to @feedback.email, admin_users_path(user_query: @feedback.email)
-
-
-- if @feedback.feedback_hash.present?
-  %pre
-    = @feedback.feedback_hash.to_yaml

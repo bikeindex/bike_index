@@ -20,7 +20,7 @@ class Admin::PaymentsController < Admin::BaseController
       invoices = Invoice
     end
     @invoices = invoices.includes(:organization, :payments)
-                       .reorder(sort_column + " " + sort_direction).page(page).per(per_page)
+      .reorder(sort_column + " " + sort_direction).page(page).per(per_page)
   end
 
   def new

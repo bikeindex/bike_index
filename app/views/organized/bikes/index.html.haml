@@ -1,7 +1,7 @@
 - if @bike_code.present?
   - if @bike_code.claimed?
     %h2
-      %a{ href: edit_organization_sticker_path(organization_id: active_organization.id, id: @bike_code.code) }
+      %a{ href: edit_organization_sticker_path(organization_id: current_organization.id, id: @bike_code.code) }
         = @bike_code.kind
         = @bike_code.code
       is currently linked.
@@ -11,24 +11,24 @@
     %h1
       Oh no!
     %h2
-      %a{ href: edit_organization_sticker_path(organization_id: active_organization.id, id: @bike_code.code) }
+      %a{ href: edit_organization_sticker_path(organization_id: current_organization.id, id: @bike_code.code) }
         = @bike_code.kind
         %em
           = @bike_code.code
       isn't linked to a bike.
   %p
     You can enter the URL of the bike you would like to link this #{@bike_code.kind} to:
-  = form_tag bike_code_path(id: @bike_code.code, organization_id: active_organization.id), method: "PUT", class: "row" do
+  = form_tag bike_code_path(id: @bike_code.code, organization_id: current_organization.id), method: "PUT", class: "row" do
     .col-sm-8.col-lg-10
       .form-group
         = text_field_tag :bike_id, "", placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
     .col-sm-4.col-lg-2
       = submit_tag "Update", class: "btn btn-success"
-    
+
   %p.less-strong
-    Or, browse #{active_organization.short_name}'s bikes and click <em>link it</em> to connect it to this #{@bike_code.kind}
+    Or, browse #{current_organization.short_name}'s bikes and click <em>link it</em> to connect it to this #{@bike_code.kind}
   %hr.mt-4.mb-4.less-strong
-- if active_organization.paid_for?("bike_search")
+- if current_organization.paid_for?("bike_search")
   = render "/organized/bikes/search"
 - else
   = render "/organized/bikes/list"

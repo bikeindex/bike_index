@@ -15,7 +15,7 @@
       = f.label :ctype_id, 'Part type', class: 'form-well-label'
       .form-well-input.fancy-select.unfancy
         = f.collection_select(:ctype_id, Ctype.all, :id, :name, { required: true, prompt: 'Component type' }, { class: 'form-control component-ctype-input' })
-    / We really should display Position here, but we aren't right now because of implementation issues 
+    / We really should display Position here, but we aren't right now because of implementation issues
     / .right-input-help
     /   - position_visibility = (f.object.front || f.object.rear) ? '' : 'hidden-other'
     /   .groupedbtn-group{ class: position_visibility, data:  { toggle: 'buttons-radio' } }
@@ -28,7 +28,7 @@
     /         Rear
     /     = f.hidden_field :front_or_rear, class: 'front-or-rear'
     .form-group.row.hidden-other.hidden-ctype{ class: other_ctype_show }
-      = f.label :ctype_other, 'Other part type', class: 'form-well-label'
+      = f.label :ctype_other, 'Unknown part type', class: 'form-well-label'
       .form-well-input
         = f.text_field :ctype_other, class: 'form-control'
 

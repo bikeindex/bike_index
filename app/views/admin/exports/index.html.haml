@@ -4,16 +4,16 @@
 %p
   #{pluralize(@exports.total_count, "Matching Export")}
 
-- if active_organization.present?
+- if current_organization.present?
   %h4.mt-4
-    #{link_to active_organization.name, admin_organization_path(active_organization)} Exports
+    #{link_to current_organization.name, admin_organization_path(current_organization)} Exports
     %small
-      = link_to "view orgs view", organization_exports_path(organization_id: active_organization.to_param), class: "less-strong"
+      = link_to "view orgs view", organization_exports_path(organization_id: current_organization.to_param), class: "less-strong"
 
 
 = paginate @exports, views_prefix: "admin"
 
-.full-screen-table-wrapper
+.full-screen-table
   %table.table.table-striped.table-bordered.mt-4
     %thead.thead-light
       %th
