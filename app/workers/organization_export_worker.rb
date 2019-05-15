@@ -77,8 +77,7 @@ class OrganizationExportWorker
     @avery_export ||= @export.avery_export?
     return true unless @avery_export
     # The address must include a street for it to be valid
-    bike.user_name.present? && bike.registration_address.present? &&
-      bike.registration_address["address"].present?
+    Export.avery_export_bike?(bike)
   end
 
   def bike_to_row(bike)

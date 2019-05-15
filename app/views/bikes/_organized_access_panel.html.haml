@@ -98,6 +98,20 @@
                     - elsif reg_field == "reg_affiliation"
                       = @bike.organization_affiliation
 
+              - if passive_organization.paid_for?("avery_export")
+                %li
+                  %span.attr-title
+                    Avery Exportable:
+                  - if Export.avery_export_bike(@bike)
+                    true
+                  - else
+                    false.
+                    %small.em
+                      - unless @bike.user_name.present?
+                        missing user name
+                      - unless @bike.registration_address.present? && @bike.registration_address["address"].present?
+                        missing Address
+
           - if !@bike.organized?(passive_organization) # Apologize, bike isn't organizations
             %p.less-strong.mt-4
               %em
