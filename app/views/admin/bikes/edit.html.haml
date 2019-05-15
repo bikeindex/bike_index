@@ -259,7 +259,7 @@
   .full-screen-table
     %table.table.table-striped.table-bordered.table-sm
       %thead.thead-light
-        %th.d-none
+        %th
           Date Recovered&nbsp;<small class="convertTimezone"></small>
         %th
           Description
@@ -267,14 +267,15 @@
           Helped?
         %th.d-none.d-md-table-cell
           Share?
-        %th.d-none
+        %th
           unrecover
       %tbody
         - @recoveries.each do |recovery|
           %tr
-            %td.d-none
-              %span.convertTime
-                = l recovery.date_recovered, format: :convert_time
+            %td
+              - if recovery.date_recovered.present?
+                %span.convertTime
+                  = l recovery.date_recovered, format: :convert_time
             %td
               = recovery.recovered_description
             %td.table-cell-check.d-none.d-md-table-cell
