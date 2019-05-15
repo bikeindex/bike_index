@@ -6,15 +6,15 @@
   .col-auto
     = link_to "Superusers", admin_users_path(superusers: true), class: "btn btn-primary"
 .row
-  .col-md-9
+  .col-md-5
     %h4
       #{number_with_delimiter(@user_count)} users
       = params[:user_query].present? ? 'matching query' : 'have signed up'
-  .col-md-3
-    = form_tag admin_users_path, method: :get do
-      .form-inline
-        = text_field_tag :user_query, params[:user_query], placeholder: "Find by name or email", class: "form-control mr-2"
-        = submit_tag "Search", name: "search", class: "btn btn-success"
+  .col-md-7
+    = form_tag admin_users_path, method: :get, class: "form-inline" do
+      .form-group.ml-auto.mr-2.mb-2
+        = text_field_tag :user_query, params[:user_query], placeholder: "Find by name or email", class: "form-control"
+      = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
 - if @users.present?
   = paginate @users, views_prefix: "admin"

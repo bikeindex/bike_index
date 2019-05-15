@@ -1,50 +1,51 @@
-%table.table.table-bordered.table-striped.table-sm
-  %thead.thead-light
-    %th.d-none.d-md-table-cell
-      Added&nbsp;<small class="convertTimezone"></small>
-    %th
-      Email
-    %th.d-none.d-md-table-cell
-      Secondary Emails
-    %th.d-none.d-lg-table-cell
-      Name
-    %th
-      Bikes
-    %th.d-none.d-md-table-cell
-      Memberships
-    %th.d-none.d-lg-table-cell
-      Admin?
-    %th.d-none.d-lg-table-cell
-      Confirmed
-  %tbody
-    - @users.each do |user|
-      %tr
-        %td.d-none.d-md-table-cell
-          %span.convertTime
-            = l user.created_at, format: :convert_time
-        %td
-          .less-strong-hold
-            = link_to user.email, edit_admin_user_url(user)
-            - if user.donor?
-              <span class="donor-icon">D</span>
-            - elsif user.paid_org?
-              <span class="paid-org-icon">O</span>
-            %small.less-strong-right
-              = user.id
-        %td.d-none.d-md-table-cell
-          %small.less-strong
-            = user.secondary_emails.join(', ')
-        %td.d-none.d-lg-table-cell
-          - if user.name?
-            = user.name
-        %td
-          = user.ownerships.count
-        %td.d-none.d-md-table-cell
-          - if user.memberships.present?
-            - user.memberships.each do |membership|
-              = link_to "#{membership.organization.name} ", admin_membership_url(membership)
-        %td.d-none.d-lg-table-cell
-          = "super" if user.superuser?
-          = "developer" if user.developer?
-        %td.d-none.d-lg-table-cell.table-cell-check
-          = "&#x2713;".html_safe if user.confirmed
+.full-screen-table
+  %table.table.table-bordered.table-striped.table-sm
+    %thead.thead-light
+      %th
+        Added&nbsp;<small class="convertTimezone"></small>
+      %th
+        Email
+      %th.d-none.d-md-table-cell
+        Secondary Emails
+      %th.d-none.d-lg-table-cell
+        Name
+      %th
+        Bikes
+      %th.d-none.d-md-table-cell
+        Memberships
+      %th.d-none.d-lg-table-cell
+        Admin?
+      %th.d-none.d-lg-table-cell
+        Confirmed
+    %tbody
+      - @users.each do |user|
+        %tr
+          %td
+            %span.convertTime
+              = l user.created_at, format: :convert_time
+          %td
+            .less-strong-hold
+              = link_to user.email, edit_admin_user_url(user)
+              - if user.donor?
+                <span class="donor-icon">D</span>
+              - elsif user.paid_org?
+                <span class="paid-org-icon">O</span>
+              %small.less-strong-right
+                = user.id
+          %td.d-none.d-md-table-cell
+            %small.less-strong
+              = user.secondary_emails.join(', ')
+          %td.d-none.d-lg-table-cell
+            - if user.name?
+              = user.name
+          %td
+            = user.ownerships.count
+          %td.d-none.d-md-table-cell
+            - if user.memberships.present?
+              - user.memberships.each do |membership|
+                = link_to "#{membership.organization.name} ", admin_membership_url(membership)
+          %td.d-none.d-lg-table-cell
+            = "super" if user.superuser?
+            = "developer" if user.developer?
+          %td.d-none.d-lg-table-cell.table-cell-check
+            = "&#x2713;".html_safe if user.confirmed
