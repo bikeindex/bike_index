@@ -674,6 +674,26 @@ describe Bike do
       allow(bike).to receive(:b_params) { [b_param] }
       expect(bike.registration_address).to eq({})
     end
+    context "with user with address" do
+      include_context :geocoder_default_location
+      let(:country) { Country.united_states }
+      let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
+      let(:user) { FactoryBot.create(:user, country_id: country.id, state_id: state.id, city: "New York", street: "278 Broadway", zipcode: "10007") }
+      let(:bike) { ownership.bike }
+      let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
+      let(:target_address) { default_location_registration_address.merge("country" => "US") } # Annoying discrepancy
+      it "returns the user's address" do
+        expect(user.address_hash).to eq target_address
+        expect(bike.registration_address).to eq target_address
+      end
+      context "ownership creator" do
+        let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user) }
+        it "returns nothing" do
+          expect(user.address_hash).to eq target_address
+          expect(bike.registration_address).to eq({})
+        end
+      end
+    end
     context "with registration_address" do
       let!(:b_param) { FactoryBot.create(:b_param, created_bike_id: bike.id, params: b_param_params) }
       let(:bike) { FactoryBot.create(:bike) }
