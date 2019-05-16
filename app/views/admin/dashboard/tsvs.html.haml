@@ -14,17 +14,16 @@
 = submit_tag "Save changes", class: "btn btn-success submit-bike-update"
 
 - if @tsvs.any?
-  .card.bg-light.tsv_export_list.mt-4
-    .card-body
-      %table.table.table-striped.table-bordered.table-sm
-        %tbody
-          - @tsvs.each do |tsv_info|
-            %tr
-              %td
-                - if tsv_info[:updated_at].present?
-                  = l Time.zone.at(tsv_info[:updated_at].to_i), format: :short_with_hour
-              %td
-                %a{href: tsv_info[:path] }
-                  = tsv_info[:filename]
-              %td
-                = tsv_info[:description]
+  .tsv_table
+    %table.table.table-striped.table-bordered.table-sm
+      %tbody
+        - @tsvs.each do |tsv_info|
+          %tr
+            %td
+              - if tsv_info[:updated_at].present?
+                = l Time.zone.at(tsv_info[:updated_at].to_i), format: :short_with_hour
+            %td
+              %a{href: tsv_info[:path] }
+                = tsv_info[:filename]
+            %td
+                  = tsv_info[:description]
