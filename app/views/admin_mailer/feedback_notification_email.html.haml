@@ -1,3 +1,5 @@
+/ SparkPost blocks emails with URIs it disapproves of. We still want to send these emails, at least for now. So just remove urls and tags, so that sparkpost doesn't block them.
+- feedback_body = strip_tags(@feedback.body).gsub(/http[^\s]*/i, '').truncate(200)
 - if @feedback.feedback_type == 'serial_update_request'
   %h1{ :style => "font-weight: 400px;" }
     Serial update notification
@@ -9,7 +11,7 @@
       = @feedback.email
   %p
     Reason for update:
-    = @feedback.body
+    = feedback_body
   %p
     Old serial:
     = @feedback.feedback_hash[:old_serial]
@@ -29,7 +31,7 @@
       = @feedback.email
   %p
     Reason for update:
-    = @feedback.body
+    = feedback_body
   %p
     Old manufacturer:
     = @feedback.feedback_hash[:old_manufacturer]
@@ -49,7 +51,7 @@
       = @feedback.email
   %p
     Reason for delete:
-    = @feedback.body
+    = feedback_body
   %p
     = link_to edit_admin_bike_url(@feedback.bike), edit_admin_bike_url(@feedback.bike)
 
@@ -58,7 +60,7 @@
     A #{@feedback.bike.type} has been recovered
   %p
     How the bike was recovered
-    = @feedback.body
+    = feedback_body
   %p
     Did we help?
     %strong
@@ -85,12 +87,12 @@
     %strong
       Lead for #{@feedback.lead_type}: #{@feedback.name}
   %p
-    = @feedback.body
-  
+    = feedback_body
+
 - elsif @feedback.feedback_type.present? && @feedback.feedback_type.match(/organization_/i)
   - organization = Organization.find(@feedback.feedback_hash[:organization_id])
   %h1
-    = @feedback.body
+    = feedback_body
   %p
     Created by #{@feedback.email}
   %hr
@@ -111,4 +113,8 @@
       says,
 
   %p
-    = @feedback.body
+    = feedback_body
+
+%p{ style: "margin-top: 30px;" }
+  %strong
+    = link_to "Read full message", admin_feedback_url(@feedback)

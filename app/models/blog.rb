@@ -53,7 +53,7 @@ class Blog < ActiveRecord::Base
     if self.post_date.present?
       self.published_at = TimeParser.parse(post_date, timezone)
     end
-    self.published_at = Time.now if self.post_now == '1'
+    self.published_at = Time.now if self.post_now == "1"
     if self.user_email.present?
       u = User.fuzzy_email_find(user_email)
       self.user_id = u.id if u.present?
@@ -77,7 +77,7 @@ class Blog < ActiveRecord::Base
 
   def update_title_save
     return true unless update_title.present?
-    return true if update_title == false || update_title == '0'
+    return true if update_title == false || update_title == "0"
     self.old_title_slug = self.title_slug
     set_title_slug
   end
@@ -86,7 +86,6 @@ class Blog < ActiveRecord::Base
     # We want to only set this once, and not change it, so that links don't break
     self.title_slug = self.class.slugify_title(title)
   end
-
 
   def create_abbreviation
     if description_abbr.present?
@@ -101,7 +100,7 @@ class Blog < ActiveRecord::Base
       end
       abbr = strip_tags(body_html)
       # strip tags, then remove extra spaces
-      abbr = abbr.gsub(/\n/,' ').gsub(/\s+/, ' ').strip if abbr.present?
+      abbr = abbr.gsub(/\n/, " ").gsub(/\s+/, " ").strip if abbr.present?
       self.body_abbr = truncate(abbr, length: 200)
     end
     true

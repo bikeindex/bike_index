@@ -1,34 +1,38 @@
-%fieldset
-  .control-group
-    = f.label :name, "Name", class: "control-label"
-    .controls.location-name-field
-      = f.text_field :name
+- f.object.country_id ||= @organization.locations.first&.country_id || Country.united_states.id
+- f.object.name ||= @organization.name
+.col-md-6
+  %fieldset.mr-2.ml-2
+    .card.bg-light
+      .card-body
+        .row
+          .col-lg-6
+            .form-group
+              = f.text_field :name, placeholder: "Name", class: "form-control"
+          .col-lg-6
+            .form-group
+              = f.text_field :phone, placeholder: "Phone number", class: "form-control"
+        .row
+          .col-lg-6
+            .form-group
+              = f.text_field :street, placeholder: "Street", class: "form-control mt-1"
+          .col-lg-6
+            .form-group
+              = f.text_field :city, placeholder: "City", class: "form-control mt-1"
+        .row
+          .col-lg-6
+            .form-group.fancy-select.unfancy
+              = f.collection_select(:state_id, State.all, :id, :name, {prompt: "State", include_blank: true}, class: "form-control mt-1" )
+          .col-lg-6
+            .form-group
+              = f.text_field :zipcode, placeholder: "Zipcode", class: "form-control mt-1"
+        .row
+          .col-lg-6
+            .form-group.fancy-select.unfancy
+              = f.collection_select(:country_id, Country.all, :id, :name, class: "form-control mt-1" )
+          .col-lg-6
+            .form-group.text-center
+              = f.check_box :_destroy, class: "d-none"
+              = f.label :_destroy, "Remove", class: "remove_fields btn btn-danger"
 
-  .control-group
-    = f.label :phone, "Phone number", class: "control-label"
-    .controls
-      = f.text_field :phone
 
-  / .control-group
-  /   = f.label :email, "Shop's email (only if you want)", class: "control-label"
-  /   .controls
-  /     = f.text_field :email
-  
-  .control-group.chosen-select
-    = f.label :country_id, "Address", class: "control-label"
-    .controls
-      = f.text_field :street, placeholder: "Street"
-    .controls.extra-field
-      = f.text_field :city, placeholder: "City"
-    .controls.extra-field
-      = f.collection_select(:state_id, State.all, :id, :name, prompt: "State", include_blank: true )
-    .controls.extra-field
-      = f.text_field :zipcode, placeholder: "Zipcode"
-    .controls.extra-field.chosen-select.country_select_container
-      = f.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country" )
-
-  .remove-control
-    = f.check_box :_destroy
-    = f.label :_destroy, "Remove", class: "remove_fields"
-  
   %hr

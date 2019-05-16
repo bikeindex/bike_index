@@ -34,16 +34,16 @@ class Export < ActiveRecord::Base
     {
       stolen: {
         with_blacklist: false,
-        only_serials_and_police_reports: false
+        only_serials_and_police_reports: false,
       },
       organization: {
         partial_registrations: false,
         start_at: nil,
-        end_at: nil
+        end_at: nil,
       },
       manufacturer: {
-        frame_only: false
-      }
+        frame_only: false,
+      },
     }.as_json.freeze
   end
 
@@ -51,6 +51,12 @@ class Export < ActiveRecord::Base
     return PERMITTED_HEADERS unless organization.present?
     additional_headers = organization == "include_paid" ? additional_registration_fields.keys : organization.additional_registration_fields
     PERMITTED_HEADERS + additional_headers.map { |f| additional_registration_fields[f.to_sym] }
+  end
+
+  # class method so that we can test it in other places. Namely - organized_access_panel. If updating logic, update there too
+  def self.avery_export_bike?(bike)
+    bike.user_name.present? && bike.registration_address.present? &&
+      bike.registration_address["address"].present?
   end
 
   def finished_processing?; %w[finished errored].include?(progress) end
@@ -66,6 +72,9 @@ class Export < ActiveRecord::Base
   def bike_codes_removed?; option?("bike_codes_removed") end
 
   def custom_bike_ids; options["custom_bike_ids"] end
+
+  # NOTE: Only does the first 100 bikes, in case there is a huge export
+  def exported_bike_ids; options["exported_bike_ids"] end
 
   # 'options' is a weird place to put the assigned bike_codes - but whatever, it's there, just using it
   def bike_codes; options["bike_codes_assigned"] || [] end
@@ -84,6 +93,11 @@ class Export < ActiveRecord::Base
 
   def option?(str)
     options[str.to_s].present?
+  end
+
+  def assign_exported_bike_ids
+    # Store the first 100 bike ids that were exported, for diagnostic purposes
+    self.options = options.merge("exported_bike_ids" => bikes_scoped.limit(100).pluck(:id))
   end
 
   def avery_export=(val)
@@ -140,11 +154,11 @@ class Export < ActiveRecord::Base
   end
 
   def tmp_file
-    @tmp_file ||= Tempfile.new(["#{kind == 'organization' ? organization.slug : kind}_#{id}", ".#{file_format}"])
+    @tmp_file ||= Tempfile.new(["#{kind == "organization" ? organization.slug : kind}_#{id}", ".#{file_format}"])
   end
 
   def tmp_file_rows
-    `wc -l "#{tmp_file.path}"`.strip.split(' ')[0].to_i - 1 # Because we don't count header
+    `wc -l "#{tmp_file.path}"`.strip.split(" ")[0].to_i - 1 # Because we don't count header
   end
 
   def description

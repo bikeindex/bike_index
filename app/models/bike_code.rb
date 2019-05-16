@@ -16,6 +16,7 @@ class BikeCode < ActiveRecord::Base
   validates_uniqueness_of :code, scope: [:organization_id], allow_nil: false
 
   before_validation :set_calculated_attributes
+  after_commit :update_associations
 
   def self.normalize_code(str = nil)
     return nil unless str.present?
@@ -69,8 +70,8 @@ class BikeCode < ActiveRecord::Base
 
   def url
     [
-      "#{ENV['BASE_URL']}/scanned/bikes/#{code}",
-      organization.present? ? "?organization_id=#{organization.slug}" : nil
+      "#{ENV["BASE_URL"]}/scanned/bikes/#{code}",
+      organization.present? ? "?organization_id=#{organization.slug}" : nil,
     ].compact.join("")
   end
 
@@ -113,6 +114,18 @@ class BikeCode < ActiveRecord::Base
       errors.add(:bike, "\"#{bike_str}\" not found")
     end
     self
+  end
+
+  # Bust cache keys TODO: Rails 5 update test this
+  def update_associations
+    if bike_id.present?
+      found_b = Bike.where(id: bike_id).first
+      found_b&.update_attributes(updated_at: Time.now)
+    end
+    if previous_bike_id.present?
+      found_previous_b = Bike.where(id: previous_bike_id).first
+      found_previous_b&.update_attributes(updated_at: Time.now)
+    end
   end
 
   def set_calculated_attributes

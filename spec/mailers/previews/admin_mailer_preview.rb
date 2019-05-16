@@ -1,7 +1,7 @@
 # Preview emails at /rails/mailers/admin_mailer
 class AdminMailerPreview < ActionMailer::Preview
   def feedback_notification_email
-    feedback = Feedback.last
+    feedback = Feedback.notification_types.last
     AdminMailer.feedback_notification_email(feedback)
   end
 
@@ -17,7 +17,7 @@ class AdminMailerPreview < ActionMailer::Preview
 
   def lightspeed_notification_email
     organization = Organization.last
-    AdminMailer.lightspeed_notification_email(organization, 'asdfasdf')
+    AdminMailer.lightspeed_notification_email(organization, "asdfasdf")
   end
 
   def unknown_organization_for_ascend_import

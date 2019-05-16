@@ -9,7 +9,7 @@ default: &default
 
   # Additional paths webpack should lookup modules
   # ['app/assets', 'engine/foo/app/assets']
-  resolved_paths: ['app/assets']
+  resolved_paths: ["app/assets"]
 
   # Reload manifest.json on all requests so we reload latest compiled packs
   cache_manifest: false
@@ -36,8 +36,8 @@ development:
   dev_server:
     https: false
     host: localhost
-    port: 3035
-    public: localhost:3035
+    port: 3033
+    public: localhost:3033
     hmr: false
     # Inline should be set to true if using HMR
     inline: true

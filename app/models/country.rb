@@ -20,6 +20,6 @@ class Country < ActiveRecord::Base
   end
 
   def self.valid_names
-    StatesAndCountries.countries.map{ |c| c[:name] }
+    StatesAndCountries.countries.map { |c| c[:name] }
   end
 end

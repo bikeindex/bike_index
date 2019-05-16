@@ -3,12 +3,12 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     'change #bike_has_no_serial':     'updateSerial'
     'click a.optional-form-block':    'optionalFormUpdate'
     'change #bike_year':              'updateYear'
-    'change #bike_unknown_year':      'toggleUnknownYear' 
+    'change #bike_unknown_year':      'toggleUnknownYear'
     'click #select-cycletype a':      'changeCycleType'
     'change #bike_manufacturer_id':   'onManufacturerChange'
     'change #country_select_container select': 'updateCountry'
-    
-  
+
+
   initialize: ->
     @setElement($('#body'))
     if $('#bike_has_no_serial').prop('checked') == true
@@ -20,10 +20,10 @@ class BikeIndex.Views.BikesNew extends Backbone.View
         @setDefaultCountry()
     @updateCycleType()
     window.root_url = $('#root_url').attr('data-url')
-    
+
     @initializeFrameMaker("#bike_manufacturer_id")
     @otherManufacturerDisplay($("#bike_manufacturer_id").val())
-  
+
 
   updateSerial: (event) ->
     if $(event.target).prop('checked') == true
@@ -50,7 +50,7 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     current_value = $("#cycletype#{$("#bike_cycle_type_id").val()}")
     $('#cycletype-text').removeClass('long-title')
     if current_value.hasClass('long-title')
-      $('#cycletype-text').addClass('long-title')  
+      $('#cycletype-text').addClass('long-title')
     $('#cycletype-text').text(current_value.text())
 
 
@@ -97,7 +97,7 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     else
       year_select.setValue(new Date().getFullYear())
       year_select.enable()
-  
+
   updateYear: ->
     if $('#bike_year').val()
       if $('#bike_year').val().length == 0
@@ -123,17 +123,17 @@ class BikeIndex.Views.BikesNew extends Backbone.View
     if current_value == expand_value
       # show the bugger!
       hidden_other.slideDown().addClass('unhidden')
-    else 
+    else
       # if it's visible, clear it and slide up
       if hidden_other.hasClass('unhidden')
         hidden_other.find('input').val('')
         hidden_other.removeClass('unhidden').slideUp()
-    
+
   setDefaultCountry: ->
     # we should geocode the country in here if possible...
     default_country_id = parseInt($('#us_country_id').text(), 10)
     $('#country_select_container select').selectize()[0].selectize.setValue(default_country_id)
-    
+
   updateCountry: ->
     c_select = $('#country_select_container select')
     us_val = parseInt($('#country_select_container .other-value').text(), 10)

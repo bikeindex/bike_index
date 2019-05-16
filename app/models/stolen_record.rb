@@ -4,7 +4,7 @@ class StolenRecord < ActiveRecord::Base
 
   attr_accessor :timezone # Just to provide a backup and permit assignment
 
-    def self.old_attr_accessible
+  def self.old_attr_accessible
     # recovery_tweet, recovery_share # We edit this in the admin panel
     %w(police_report_number police_report_department locking_description lock_defeat_description
        timezone date_stolen bike creation_organization_id country_id state_id street zipcode city latitude
@@ -15,22 +15,22 @@ class StolenRecord < ActiveRecord::Base
   end
 
   belongs_to :bike
-  has_one :current_bike, class_name: 'Bike', foreign_key: :current_stolen_record_id
+  has_one :current_bike, class_name: "Bike", foreign_key: :current_stolen_record_id
   has_one :recovery_display
   belongs_to :country
   belongs_to :state
-  belongs_to :creation_organization, class_name: 'Organization'
+  belongs_to :creation_organization, class_name: "Organization"
 
   validates_presence_of :bike
   validates_presence_of :date_stolen
 
   default_scope { where(current: true) }
   scope :approveds, -> { where(approved: true) }
-  scope :approveds_with_reports, -> { approveds.where('police_report_number IS NOT NULL').where('police_report_department IS NOT NULL') }
-  scope :not_tsved, -> { where('tsved_at IS NULL') }
+  scope :approveds_with_reports, -> { approveds.where("police_report_number IS NOT NULL").where("police_report_department IS NOT NULL") }
+  scope :not_tsved, -> { where("tsved_at IS NULL") }
   scope :tsv_today, -> { where("tsved_at IS NULL OR tsved_at >= '#{Time.now.beginning_of_day}'") }
 
-  scope :recovered, -> { unscoped.where(current: false).order('date_recovered desc') }
+  scope :recovered, -> { unscoped.where(current: false).order("date_recovered desc") }
   scope :displayable, -> { recovered.where(can_share_recovery: true) }
   scope :recovery_unposted, -> { unscoped.where(current: false, recovery_posted: false) }
 
@@ -58,19 +58,19 @@ class StolenRecord < ActiveRecord::Base
       city,
       state&.abbreviation,
       zipcode,
-      country_string
-    ].reject(&:blank?).join(', ')
+      country_string,
+    ].reject(&:blank?).join(", ")
   end
 
   def address_short # Doesn't include street
     [city,
      (state && state.abbreviation),
-     zipcode].reject(&:blank?).join(',')
+     zipcode].reject(&:blank?).join(",")
   end
 
   def self.locking_description
-    ['U-lock', 'Two U-locks', 'U-lock and cable', 'Chain with padlock',
-     'Cable lock', 'Heavy duty bicycle security chain', 'Not locked', 'Other'].freeze
+    ["U-lock", "Two U-locks", "U-lock and cable", "Chain with padlock",
+     "Cable lock", "Heavy duty bicycle security chain", "Not locked", "Other"].freeze
   end
 
   def self.locking_description_select
@@ -79,12 +79,12 @@ class StolenRecord < ActiveRecord::Base
 
   def self.locking_defeat_description
     [
-      'Lock was cut, and left at the scene.',
-      'Lock was opened, and left unharmed at the scene.',
-      'Lock is missing, along with the bike.',
-      'Object that bike was locked to was broken, removed, or otherwise compromised.',
-      'Other situation, please describe below.',
-      'Bike was not locked'
+      "Lock was cut, and left at the scene.",
+      "Lock was opened, and left unharmed at the scene.",
+      "Lock is missing, along with the bike.",
+      "Object that bike was locked to was broken, removed, or otherwise compromised.",
+      "Other situation, please describe below.",
+      "Bike was not locked",
     ]
   end
 
@@ -93,6 +93,7 @@ class StolenRecord < ActiveRecord::Base
   end
 
   before_save :set_phone, :fix_date, :titleize_city, :update_tsved_at
+
   def set_phone
     self.phone = Phonifyer.phonify(phone) if phone
     self.secondary_phone = Phonifyer.phonify(secondary_phone) if secondary_phone
@@ -101,7 +102,7 @@ class StolenRecord < ActiveRecord::Base
   def fix_date
     year = date_stolen.year
     if date_stolen.year < (Time.now - 100.years).year
-      decade = year.to_s.chars.last(2).join('')
+      decade = year.to_s.chars.last(2).join("")
       corrected = date_stolen.change(year: "20#{decade}".to_i)
       self.date_stolen = corrected
     end
@@ -113,7 +114,7 @@ class StolenRecord < ActiveRecord::Base
 
   def titleize_city
     if city.present?
-      self.city = city.gsub('USA', '').gsub(/,?(,|\s)[A-Z]+\s?++\z/, '')
+      self.city = city.gsub("USA", "").gsub(/,?(,|\s)[A-Z]+\s?++\z/, "")
       self.city = city.strip.titleize
     end
     true
@@ -125,15 +126,15 @@ class StolenRecord < ActiveRecord::Base
   end
 
   def tsv_col(i)
-    return '' unless i.present?
-    i.gsub(/\\?(\t|\\t)+/i, ' ').gsub(/\\?(\r|\\r)+/i, ' ')
-     .gsub(/\\?(\n|\\n)+/i, ' ').gsub(/\\?\\?('|")+/, ' ')
+    return "" unless i.present?
+    i.gsub(/\\?(\t|\\t)+/i, " ").gsub(/\\?(\r|\\r)+/i, " ")
+     .gsub(/\\?(\n|\\n)+/i, " ").gsub(/\\?\\?('|")+/, " ")
   end
 
   def tsv_row(with_article = true, with_stolen_locations: false)
     b = bike
-    return '' unless b.present?
-    row = ''
+    return "" unless b.present?
+    row = ""
     if with_stolen_locations
       row << "#{tsv_col(city)}\t#{tsv_col(state && state.abbreviation)}\t"
     end
@@ -141,7 +142,7 @@ class StolenRecord < ActiveRecord::Base
     row << "\t"
     row << tsv_col(b.frame_model)
     row << "\t"
-    row << tsv_col(b.serial) unless b.serial == 'absent'
+    row << tsv_col(b.serial) unless b.serial == "absent"
     row << "\t"
     row << tsv_col(b.frame_colors.to_sentence)
     row << tsv_col(b.description)
@@ -149,13 +150,13 @@ class StolenRecord < ActiveRecord::Base
     row << " Stolen from: #{tsv_col(address)}"
     row << "\t"
     row << "Article\t" if with_article
-    row << date_stolen.strftime('%Y-%m-%d')
+    row << date_stolen.strftime("%Y-%m-%d")
     row << "\t"
     row << tsv_col(police_report_number)
     row << "\t"
     row << tsv_col(police_report_department)
     row << "\t\t"
-    row << "#{ENV['BASE_URL']}/bikes/#{b.id}\n"
+    row << "#{ENV["BASE_URL"]}/bikes/#{b.id}\n"
     row
   end
 

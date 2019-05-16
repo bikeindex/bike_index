@@ -1,14 +1,14 @@
 OAUTH_SCOPES = %i[
-  public 
-  read_user 
-  write_user 
-  read_bikes 
-  write_bikes 
-  read_bikewise 
-  write_bikewise 
-  read_organization_membership 
+  public
+  read_user
+  write_user
+  read_bikes
+  write_bikes
+  read_bikewise
+  write_bikewise
+  read_organization_membership
   write_organizations
-  unconfirmed 
+  unconfirmed
 ].freeze
 
 if Rails.env.development? && defined?(User) && defined?(User.first)
@@ -86,7 +86,7 @@ Doorkeeper.configure do
   # by default in non-development environments). OAuth2 delegates security in
   # communication to the HTTPS protocol so it is wise to keep this enabled.
   #
-  force_ssl_in_redirect_uri Rails.env.production?
+  force_ssl_in_redirect_uri false
 
   # Specify what grant flows are enabled in array of Strings. The valid
   # strings and the flows they enable are:

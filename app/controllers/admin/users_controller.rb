@@ -10,12 +10,13 @@ class Admin::UsersController < Admin::BaseController
     else
       if params[:superusers]
         users = User.where(superuser: true)
-      else 
+      else
         users = User.includes(memberships: [:organization]).order("created_at desc")
       end
       @users = users.page(page).per(per_page)
     end
     @user_count = users.count
+    render layout: "new_admin"
   end
 
   def show
@@ -39,7 +40,7 @@ class Admin::UsersController < Admin::BaseController
     @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
     if @user.save
       @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
-      redirect_to admin_users_url, notice: 'User Updated'
+      redirect_to admin_users_url, notice: "User Updated"
     else
       bikes = @user.bikes
       @bikes = BikeDecorator.decorate_collection(bikes)
@@ -49,9 +50,8 @@ class Admin::UsersController < Admin::BaseController
 
   def destroy
     @user.destroy
-    redirect_to admin_users_url, notice: 'User Deleted.'
+    redirect_to admin_users_url, notice: "User Deleted."
   end
-  
 
   protected
 
@@ -61,6 +61,6 @@ class Admin::UsersController < Admin::BaseController
       @user = User.where(id: user_id).first
     end
     @user ||= User.find_by_username(user_id)
-    raise ActionController::RoutingError.new('Not Found') unless @user.present?
+    raise ActionController::RoutingError.new("Not Found") unless @user.present?
   end
 end

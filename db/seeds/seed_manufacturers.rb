@@ -1,10 +1,10 @@
 # A Small sampling of manufacturers to seed!
 # To get the full list download https://github.com/bikeindex/resources/blob/master/manufacturers.csv
 # You can upload the csv in admin section :)
-# 
-# 
+#
+#
 # OG Test Manufacturers are commented out to get the whole list for now
-# 
+#
 # Manufacturer.create(name: "Unknown", frame_maker: true)
 # Manufacturer.create(name: "Other", frame_maker: true)
 # Manufacturer.create(name: "Giant",  frame_maker: true, website: "http://www.giant-bicycles.com/")
@@ -23,7 +23,6 @@
 # Manufacturer.create(name: "Jamis",  frame_maker: true, website: "http://www.jamisbikes.com/usa/index.html")
 # Manufacturer.create(name: "Shimano",  frame_maker: false, website: "http://bike.shimano.com")
 # Manufacturer.create(name: "Campagnolo",  frame_maker: false, website: "http://www.campagnolo.com/")
-
 
 Manufacturer.create!(name: "24seven", frame_maker: true)
 Manufacturer.create!(name: "3M", frame_maker: true)

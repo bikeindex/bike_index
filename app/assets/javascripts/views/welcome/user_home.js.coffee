@@ -3,7 +3,7 @@ class BikeIndex.Views.UserHome extends Backbone.View
     @setElement($('#body'))
     if $('#user-bikes-table').length > 0
       @loadDataTable('#user-bikes-table')
-    
+
 
   loadDataTable:(table_id) ->
     $(table_id).dataTable(

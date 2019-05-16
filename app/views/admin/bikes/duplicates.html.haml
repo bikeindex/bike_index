@@ -1,16 +1,20 @@
 
-%header.with-subtitle
-  %h1
-    Possible duplicate bikes
-.paginate-container
-  = paginate @duplicate_groups
-%section.full-screen-table
-  - @duplicate_groups.each do |duplicate_group|
-    %p
-      %strong
-        #{duplicate_group.segment}
-      = link_to "ignore #{duplicate_group.segment}", ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id), method: 'PUT', class: 'pull-right less-strong'
-    %table.table.table-striped.table-bordered
-      = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: duplicate_group.bikes, no_show_header: true, show_serial: true }
-.paginate-container
-  = paginate @duplicate_groups
+
+%h1
+  Possible duplicate bikes
+
+= paginate @duplicate_groups, views_prefix: "admin"
+
+- @duplicate_groups.each do |duplicate_group|
+  .row
+    .col-lg-6
+      %p
+        %strong
+          #{duplicate_group.segment}
+    .col-lg-6
+      = link_to "ignore #{duplicate_group.segment}", ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id), method: 'PUT', class: 'float-right less-strong'
+
+  = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: duplicate_group.bikes, no_show_header: true, show_serial: true }
+
+
+= paginate @duplicate_groups, views_prefix: "admin"

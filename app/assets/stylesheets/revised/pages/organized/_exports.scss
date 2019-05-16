@@ -7,14 +7,28 @@
     padding: 0.5rem 0.75rem;
     line-height: 1.25;
   }
+
   .collapsed-fields {
     display: none;
   }
+
+  .exported-link-list {
+    list-style-type: none;
+    padding: 1rem;
+    margin: 0;
+    font-size: 90%;
+    li {
+      display: inline-block;
+    }
+  }
+
   .field-collapser {
     @extend small;
+
     display: block;
     text-align: right;
   }
+
   .shownOnAveryExport {
     display: none;
   }

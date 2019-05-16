@@ -46,7 +46,7 @@ describe Organized::BulkImportsController, type: :controller do
           expect(response.status).to eq(200)
           expect(response).to render_template :index
           expect(response).to render_with_layout("application_revised")
-          expect(assigns(:active_organization)).to eq organization
+          expect(assigns(:current_organization)).to eq organization
         end
       end
 
@@ -56,7 +56,7 @@ describe Organized::BulkImportsController, type: :controller do
           expect(response.status).to eq(200)
           expect(response).to render_template :new
           expect(response).to render_with_layout("application_revised")
-          expect(assigns(:active_organization)).to eq organization
+          expect(assigns(:current_organization)).to eq organization
         end
       end
     end
@@ -95,7 +95,7 @@ describe Organized::BulkImportsController, type: :controller do
           expect(response.status).to eq(200)
           expect(response).to render_template :index
           expect(response).to render_with_layout("application_revised")
-          expect(assigns(:active_organization)).to eq organization
+          expect(assigns(:current_organization)).to eq organization
         end
       end
 
@@ -105,7 +105,7 @@ describe Organized::BulkImportsController, type: :controller do
           expect(response.status).to eq(200)
           expect(response).to render_template :new
           expect(response).to render_with_layout("application_revised")
-          expect(assigns(:active_organization)).to eq organization
+          expect(assigns(:current_organization)).to eq organization
         end
       end
 
@@ -152,7 +152,6 @@ describe Organized::BulkImportsController, type: :controller do
               request.headers["Authorization"] = "a9s0dfsdf" # Rspec doesn't support headers key here. TODO: Rails 5 update
               post :create, organization_id: organization.to_param, file: file
               expect(response.status).to eq(401)
-              json_result = JSON.parse(response.body)
               expect(json_result["error"]).to be_present
             end
           end
@@ -162,7 +161,6 @@ describe Organized::BulkImportsController, type: :controller do
               request.headers["Authorization"] = organization.access_token # Rspec doesn't support headers key here. TODO: Rails 5 update
               post :create, organization_id: organization.to_param, file: file
               expect(response.status).to eq(201)
-              json_result = JSON.parse(response.body)
               expect(json_result["success"]).to be_present
 
               bulk_import = BulkImport.last
@@ -183,7 +181,6 @@ describe Organized::BulkImportsController, type: :controller do
                 post :create, organization_id: "ascend", file: file
               end.to change(BulkImport, :count).by 0
               expect(response.status).to eq(401)
-              json_result = JSON.parse(response.body)
               expect(json_result["error"]).to be_present
             end
             context "valid ascend token" do
@@ -193,7 +190,6 @@ describe Organized::BulkImportsController, type: :controller do
                   post :create, organization_id: "ascend", file: file
                 end.to change(BulkImport, :count).by 1
                 expect(response.status).to eq(201)
-                json_result = JSON.parse(response.body)
                 expect(json_result["success"]).to be_present
 
                 bulk_import = BulkImport.last

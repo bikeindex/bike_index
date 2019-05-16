@@ -1,7 +1,7 @@
 class OrganizationExportWorker
   include Sidekiq::Worker
   sidekiq_options queue: "low_priority", backtrace: true, retry: false
-  LINK_BASE = "#{ENV['BASE_URL']}/bikes/".freeze
+  LINK_BASE = "#{ENV["BASE_URL"]}/bikes/".freeze
 
   attr_accessor :export # Only necessary for testing
 
@@ -14,6 +14,7 @@ class OrganizationExportWorker
     @export.file = @export.tmp_file
     @export.progress = "finished"
     @export.options = @export.options.merge(bike_codes_assigned: @bike_codes) if @export.assign_bike_codes?
+    @export.assign_exported_bike_ids
     @export.save
     @export.tmp_file.unlink # Remove it and unlink
     @export
@@ -76,8 +77,7 @@ class OrganizationExportWorker
     @avery_export ||= @export.avery_export?
     return true unless @avery_export
     # The address must include a street for it to be valid
-    bike.user_name.present? && bike.registration_address.present? &&
-      bike.registration_address["address"].present?
+    Export.avery_export_bike?(bike)
   end
 
   def bike_to_row(bike)
@@ -111,7 +111,7 @@ class OrganizationExportWorker
     when "manufacturer" then bike.mnfg_name
     when "model" then bike.frame_model
     when "year" then bike.year
-    when "color" then bike.frame_colors.join(', ')
+    when "color" then bike.frame_colors.join(", ")
     when "serial" then bike.serial_number
     when "additional_registration_number" then bike.additional_registration
     when "phone" then bike.phone
@@ -133,7 +133,7 @@ class OrganizationExportWorker
     code
   end
 
-  # This is difficult to test in an automated fashion, it's been tested by running it - so be careful about modifying 
+  # This is difficult to test in an automated fashion, it's been tested by running it - so be careful about modifying
   def check_export_ebrake(row)
     return true if @export_ebraked # If it's already braked, don't check again
     # only check every so often, so we can halt processing via an external trip switch

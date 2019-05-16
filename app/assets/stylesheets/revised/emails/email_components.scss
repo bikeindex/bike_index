@@ -12,26 +12,35 @@
 }
 
 .donate-message {
-  h5, p { text-align: center; }
-  h5 { font-size: 16px; }
+  h5,
+  p {
+    text-align: center;
+  }
+
+  h5 {
+    font-size: 16px;
+  }
+
   p {
     line-height: 1.5em;
     margin: 8px 0 0;
-    opacity: .8;
+    opacity: 0.8;
     font-size: 15px;
     font-style: italic;
   }
+
   padding: $vertical-height 0;
   border-top: 1px solid $red;
   border-bottom: 1px solid $red;
-  margin: 0 0 2.5*$vertical-height;
+  margin: 0 0 (2.5 * $vertical-height);
 }
 
 .locking-demonstration {
   border: solid $vertical-height $email-light-bg;
   width: 100%;
-  margin: 2*$vertical-height 0 0;
+  margin: (2 * $vertical-height) 0 0;
   position: relative;
+
   img {
     display: block;
     width: 80%;
@@ -45,9 +54,10 @@
   list-style-type: disc;
   margin: 1em 0;
   padding: 0 0 0 40px;
+
   li {
     line-height: 1.5em;
-    margin-top: .5*$vertical-height;
+    margin-top: 0.5 * $vertical-height;
   }
 }
 

@@ -38,9 +38,7 @@
 %hr
 
 - if @bikes.present?
-  .full-screen-table-wrapper
-    %table.table-striped.table-bordered
-      = render partial: "/admin/bikes/admin_bikes_table"
+  = render partial: "/admin/bikes/admin_bikes_table"
 
 - else
   = link_to "Delete!", admin_paint_url(@paint), method: :delete, class: "btn btn-danger"

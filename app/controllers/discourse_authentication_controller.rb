@@ -13,11 +13,11 @@ class DiscourseAuthenticationController < ApplicationController
   private
 
   def discourse_secret
-    ENV['DISCOURSE_SECRET']
+    ENV["DISCOURSE_SECRET"]
   end
 
   def discourse_redirect_url
-    "#{ENV['DISCOURSE_URL']}/session/sso_login"
+    "#{ENV["DISCOURSE_URL"]}/session/sso_login"
   end
 
   def authenticate_and_set_redirect

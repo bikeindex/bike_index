@@ -1,13 +1,14 @@
 class StolenNotification < ActiveRecord::Base
   belongs_to :bike
-  belongs_to :sender, class_name: 'User', foreign_key: :sender_id
-  belongs_to :receiver, class_name: 'User', foreign_key: :receiver_id
+  belongs_to :sender, class_name: "User", foreign_key: :sender_id
+  belongs_to :receiver, class_name: "User", foreign_key: :receiver_id
 
   validates_presence_of :sender, :bike, :message
 
   before_validation :set_calculated_attributes
 
   after_create :notify_receiver
+
   def notify_receiver
     EmailStolenNotificationWorker.perform_async(id)
   end

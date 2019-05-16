@@ -4,19 +4,19 @@ class BikeIndex.Views.AdminBlogsEdit extends Backbone.View
     'click #change_published_date': 'editDate'
     'change .index-image-select input': 'setIndexImage'
 
-    
+
   initialize: ->
     @setElement($('#body'))
     $('#public_image_image').attr('name', "public_image[image]")
     @publicImageFileUpload() if $('#new_public_image').length > 0
     @listicleEdit() if $('#listicle_image').length > 0
     $('.edit_blog').areYouSure()
-    
+
     # Set the current index image
     $(".index_image_#{$('#blog_index_image_id').val()}").prop('checked', true)
-    
 
-    
+
+
   publicImageFileUpload: ->
     # runSortableImages = @sortableImages($('#public_images'))
     $('#new_public_image').fileupload
@@ -56,7 +56,7 @@ class BikeIndex.Views.AdminBlogsEdit extends Backbone.View
       $('#blog-date').slideDown()
 
 
-  listicleEdit: -> 
+  listicleEdit: ->
     for image in $('#listicle_image .list-image')
       block_number = $(image).attr('data-order')
       $(".page_number_#{block_number}").prepend($(image))

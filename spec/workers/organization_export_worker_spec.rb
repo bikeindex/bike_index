@@ -16,7 +16,7 @@ describe OrganizationExportWorker do
       nil,
       "Black",
       bike.serial_number,
-      nil
+      nil,
     ]
   end
   let(:csv_string) { csv_lines.map { |r| instance.comma_wrapped_string(r) }.join }
@@ -43,6 +43,7 @@ describe OrganizationExportWorker do
           expect(export.progress).to eq "finished"
           expect(export.file.read).to be_present
           expect(export.rows).to eq 1
+          expect(export.exported_bike_ids).to eq([bike.id])
         end
       end
       context "avery export" do
@@ -64,7 +65,7 @@ describe OrganizationExportWorker do
           # We modify the headers during processing to separate the address into multiple fields
           [
             %w[owner_name address city state zipcode sticker],
-            ["Maya Skripal", "102 Washington Pl", "State College", "PA", "16801", "A1111"]
+            ["Maya Skripal", "102 Washington Pl", "State College", "PA", "16801", "A1111"],
           ]
         end
         let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "a1111") }
@@ -147,7 +148,7 @@ describe OrganizationExportWorker do
           nil,
           email,
           "George Smith",
-          "George Smith" # Because of user_name_with_fallback
+          "George Smith", # Because of user_name_with_fallback
         ]
       end
       let(:target_csv_line) { "\"http://test.host/bikes/#{bike.id}\",\"#{bike.created_at.utc}\",\"Sweet manufacturer &lt;&gt;&lt;&gt;&gt;\",\"\\\",,,\\\"<script>XSSSSS</script>\",\"Black, #{secondary_color.name}\",\"#{bike.serial_number}\",\"\",\"\",\"\",\"\",\"#{email}\",\"George Smith\",\"George Smith\"" }
@@ -174,7 +175,7 @@ describe OrganizationExportWorker do
           "San Francisco",
           "CA",
           "94103",
-          ""
+          "",
         ]
       end
       let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, options: { headers: %w[owner_name_or_email link phone additional_registration_number registration_address], bike_code_start: "8z" }) }

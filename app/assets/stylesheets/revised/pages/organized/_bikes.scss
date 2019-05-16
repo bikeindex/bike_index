@@ -1,0 +1,36 @@
+#organized_bikes_index {
+  .organized-bikes-settings-toggle {
+    color: $gray-light;
+  }
+  &.javascriptFunctioning .hiddenColumn {
+    display: none;
+  }
+  .settings-list {
+    padding: 2 * $vertical-height $vertical-height;
+    background: $gray-lighter;
+    border: solid 1px rgba($gray-light, 0.7);
+    &.in {
+      margin: $vertical-height 0;
+    }
+    label {
+      cursor: pointer;
+      margin-bottom: 0;
+    }
+    .form-group {
+      margin-bottom: 0;
+    }
+
+    .stickers-sort-btns {
+      margin: 2 * $vertical-height 0 0;
+      padding-top: 2 * $vertical-height;
+      border-top: solid 1px rgba($gray-light, 0.25);
+      .btn {
+        margin-left: 0.5rem;
+      }
+      .btn.active {
+        cursor: default;
+        text-decoration: none;
+      }
+    }
+  }
+}

@@ -4,5 +4,4 @@ class CtypeSerializer < ActiveModel::Serializer
     :has_multiple
 
   self.root = "component_types"
-
 end

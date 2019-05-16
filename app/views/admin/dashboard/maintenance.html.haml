@@ -1,23 +1,25 @@
-%header.with-subtitle
-  %h1 Maintaining things
-  
-%section.full-screen-table
-  %header.with-subtitle
-    %h2
-      Recent example bikes
-    = link_to "Delete example bikes", admin_destroy_example_bikes_url, class: "sharing-links"
-  - if @bikes.any? 
-    %table.table.table-striped.table-bordered
-      = render partial: "/admin/bikes/admin_bikes_table"
-    %p.pull-right
-      #{Bike.unscoped.where(example: true).count} example bikes total
-      
+
+%h1 Maintaining things
+
+.full-screen-table
+  %h2
+    Recent example bikes
+    = link_to "Delete example bikes", admin_destroy_example_bikes_url
+  - if @bikes.any?
+    = render partial: "/admin/bikes/admin_bikes_table"
+    .row.justify-content-end
+      .col-auto
+        %p
+          #{Bike.unscoped.where(example: true).count} example bikes total
+
   - else
     No example bikes right now!
-  
-  %section.full-screen-table
-    %table.table.table-striped.table-bordered
-      %thead
+
+  %h2
+    Component types
+  .full-screen-table
+    %table.table.table-striped.table-bordered.table-sm
+      %thead.thead-light
         %th
           Date
         %th
@@ -31,15 +33,11 @@
         - @component_mnfgs.each do |f|
           %tr
             %td
-              - if f.created_at.today?
-                Today at #{f.created_at.strftime("%-I %p")}
-              - elsif Date.yesterday().beginning_of_day() <= f.created_at               
-                Yesterday at #{f.created_at.strftime("%-I %p")}
-              - else
-                = f.created_at.strftime("%-m/%-d/%Y")
+              %span.convertTime
+                = l f.created_at, format: :convert_time
 
             %td
-              Type: 
+              Type:
               %span.stolen-color
                 #{f.ctype_other},
               - if f.cmodel_name.present?
@@ -63,10 +61,11 @@
             %td
               = link_to f.bike_id, edit_admin_bike_url(f.bike_id)
 
-
-  %section.full-screen-table
-    %table.table.table-striped.table-bordered
-      %thead
+  %h2
+    Handlebar Types
+  .full-screen-table
+    %table.table.table-striped.table-bordered.table-sm
+      %thead.thead-light
         %th
           Date
         %th
@@ -77,12 +76,8 @@
         - @handlebar_types.each do |f|
           %tr
             %td
-              - if f.created_at.today?
-                Today at #{f.created_at.strftime("%-I %p")}
-              - elsif Date.yesterday().beginning_of_day() <= f.created_at               
-                Yesterday at #{f.created_at.strftime("%-I %p")}
-              - else
-                = f.created_at.strftime("%-m/%-d/%Y")
+              %span.convertTime
+                = l f.created_at, format: :convert_time
 
             %td
               = f.handlebar_type_other

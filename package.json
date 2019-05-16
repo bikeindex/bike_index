@@ -11,6 +11,8 @@
     "@honeybadger-io/react": "^0.0.2",
     "@rails/webpacker": "^4.0.2",
     "bootstrap": "^4.1.3",
+    "chart.js": "^2.8.0",
+    "chartkick": "^3.0.2",
     "eslint-plugin-react-hooks": "^1.6.0",
     "honeybadger-js": "^0.5.5",
     "jquery": "^3.3.1",
@@ -25,7 +27,8 @@
     "react": "^16.8.5",
     "react-dom": "^16.8.5",
     "react-spinners": "^0.5.3",
-    "sass": "^1.15.2"
+    "sass": "^1.15.2",
+    "selectize": "^0.12.6"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
