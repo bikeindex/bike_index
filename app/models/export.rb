@@ -53,8 +53,8 @@ class Export < ActiveRecord::Base
     PERMITTED_HEADERS + additional_headers.map { |f| additional_registration_fields[f.to_sym] }
   end
 
-  # class method so that we can test it in other places
-  def self.avery_export_bike(bike)
+  # class method so that we can test it in other places. Namely - organized_access_panel. If updating logic, update there too
+  def self.avery_export_bike?(bike)
     bike.user_name.present? && bike.registration_address.present? &&
       bike.registration_address["address"].present?
   end

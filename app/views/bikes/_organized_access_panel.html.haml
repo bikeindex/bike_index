@@ -110,7 +110,7 @@
                 %li
                   %span.attr-title
                     Avery Exportable:
-                  - if Export.avery_export_bike(@bike)
+                  - if Export.avery_export_bike?(@bike)
                     true
                   - else
                     false.
