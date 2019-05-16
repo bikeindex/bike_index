@@ -12,10 +12,12 @@ describe UpdateOrganizationPosKindWorker, type: :lib do
   end
 
   describe "perform" do
-    let(:ascend_bike) { FactoryBot.create(:bike_ascend_pos) }
-    let(:organization) { ascend_bike.organizations.first }
+    let(:organization) { FactoryBot.create(:organization, kind: "bike_shop") }
+    let!(:ascend_bike) { FactoryBot.create(:bike_ascend_pos, organization: organization) }
     it "schedules all the workers" do
       organization.reload
+      ascend_bike.reload
+      expect(organization.bikes).to eq([ascend_bike])
       expect(organization.pos_kind).to eq "not_pos"
       instance.perform
       organization.reload
