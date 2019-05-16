@@ -159,7 +159,7 @@ describe Organization do
     let(:organization) { FactoryBot.create(:organization) }
     let(:bike) { FactoryBot.create(:stolen_bike, creation_organization_id: organization.id) }
     let(:stolen_record) { bike.find_current_stolen_record }
-    let!(:bike_organization) { FactoryBot.create(:bike_organized, bike: bike, organization: organization) }
+    let!(:bike_organization) { FactoryBot.create(:bike_organization, bike: bike, organization: organization) }
     let!(:bike_unorganized) { FactoryBot.create(:stolen_bike) }
     let(:recovery_information) do
       {
