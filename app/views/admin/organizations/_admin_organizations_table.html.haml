@@ -25,6 +25,11 @@
       %th
         Type
       %th
+        - if sortable
+          = sortable "pos_kind", "POS"
+        - else
+          POS
+      %th
         Locations
     %tbody
       - @organizations.each do |organization|
@@ -46,6 +51,9 @@
               = organization.memberships.count
             %td
               = link_to organization.kind.humanize, admin_organizations_path(search_kind: organization.kind)
+            %td
+              - if organization.bike_shop?
+                = link_to organization.pos_kind.gsub("pos", "").humanize, admin_organizations_path(search_pos_kind: organization.pos_kind), class: "gray-link"
             %td
               .less-strong-hold
 

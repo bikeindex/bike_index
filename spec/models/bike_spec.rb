@@ -483,10 +483,10 @@ describe Bike do
   describe "bike_code and no_bike_code" do
     let(:organization1) { FactoryBot.create(:organization) }
     let(:organization2) { FactoryBot.create(:organization) }
-    let(:bike1) { FactoryBot.create(:organization_bike, organization: organization1) }
-    let(:bike2) { FactoryBot.create(:organization_bike, organization: organization1) }
-    let!(:bike3) { FactoryBot.create(:organization_bike, organization: organization1) }
-    let!(:bike4) { FactoryBot.create(:organization_bike, organization: organization2) }
+    let(:bike1) { FactoryBot.create(:bike_organized, organization: organization1) }
+    let(:bike2) { FactoryBot.create(:bike_organized, organization: organization1) }
+    let!(:bike3) { FactoryBot.create(:bike_organized, organization: organization1) }
+    let!(:bike4) { FactoryBot.create(:bike_organized, organization: organization2) }
     let!(:bike_code1) { FactoryBot.create(:bike_code_claimed, bike: bike1, organization: organization1) }
     let!(:bike_code2) { FactoryBot.create(:bike_code_claimed, bike: bike2, organization: nil) }
     it "returns appropriately" do
@@ -1012,7 +1012,7 @@ describe Bike do
   end
 
   describe "assignment of bike_organization_ids" do
-    let(:bike) { FactoryBot.create(:organization_bike) }
+    let(:bike) { FactoryBot.create(:bike_organized) }
     let(:organization) { bike.organizations.first }
     let(:bike_organization) { bike.bike_organizations.first }
     let(:organization_2) { FactoryBot.create(:organization) }

@@ -236,7 +236,7 @@ describe BikesController do
         end
       end
       context "bike owned by organization" do
-        let(:bike) { FactoryBot.create(:organization_bike, organization: organization) }
+        let(:bike) { FactoryBot.create(:bike_organized, organization: organization) }
         let(:ownership) { FactoryBot.create(:ownership_claimed, bike: bike) }
         it "renders" do
           get :show, id: ownership.bike_id

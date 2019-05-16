@@ -4,12 +4,7 @@ class CreationState < ActiveRecord::Base
   belongs_to :creator, class_name: "User"
   belongs_to :bulk_import
 
-  POS_KIND_ENUM = {
-    not_pos: 0,
-    other_pos: 1,
-    lightspeed_pos: 2,
-    ascend_pos: 3,
-  }.freeze
+  POS_KIND_ENUM = Organization::POS_KIND_ENUM
 
   enum pos_kind: POS_KIND_ENUM
 
