@@ -12,6 +12,16 @@
     display: none;
   }
 
+  .exported-link-list {
+    list-style-type: none;
+    padding: 1rem;
+    margin: 0;
+    font-size: 90%;
+    li {
+      display: inline-block;
+    }
+  }
+
   .field-collapser {
     @extend small;
 

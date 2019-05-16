@@ -24,25 +24,51 @@ describe Api::V1::UsersController do
   end
 
   describe "send_request" do
-    it "actuallies send the mail" do
-      Sidekiq::Testing.inline! do
-        # We don't test that this is being added to Sidekiq
-        # Because we're testing that sidekiq does what it
-        # Needs to do here. Slow tests, but we know it actually works :(
-        o = FactoryBot.create(:ownership)
-        user = o.creator
-        bike = o.bike
-        delete_request = {
-          request_type: "bike_delete_request",
-          user_id: user.id,
-          request_bike_id: bike.id,
-          request_reason: "Some reason",
-        }
-        set_current_user(user)
-        ActionMailer::Base.deliveries = []
-        post :send_request, delete_request
-        expect(response.code).to eq("200")
-        expect(ActionMailer::Base.deliveries).not_to be_empty
+    context "delete request" do
+      let(:ownership) { FactoryBot.create(:ownership) }
+      let(:user) { ownership.creator }
+      let(:bike) { ownership.bike }
+      it "actuallies send the mail" do
+        Sidekiq::Testing.inline! do
+          # We don't test that this is being added to Sidekiq
+          # Because we're testing that sidekiq does what it
+          # Needs to do here. Slow tests, but we know it actually works :(
+          delete_request = {
+            request_type: "bike_delete_request",
+            user_id: user.id,
+            request_bike_id: bike.id,
+            request_reason: "Some reason",
+          }
+          set_current_user(user)
+          ActionMailer::Base.deliveries = []
+          post :send_request, delete_request
+          expect(response.code).to eq("200")
+          expect(ActionMailer::Base.deliveries).not_to be_empty
+        end
+      end
+      context "bike is authorized by user" do
+        let(:organization) { FactoryBot.create(:organization, name: "Pro's Closet", short_name: "tpc") }
+        let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+        let(:bike) { FactoryBot.create(:organization_bike, organization: organization) }
+        let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
+        it "actually sends the email" do
+          Sidekiq::Testing.inline! do
+            # We don't test that this is being added to Sidekiq
+            # Because we're testing that sidekiq does what it
+            # Needs to do here. Slow tests, but we know it actually works :(
+            delete_request = {
+              request_type: "bike_delete_request",
+              user_id: user.id,
+              request_bike_id: bike.id,
+              request_reason: "Some reason",
+            }
+            set_current_user(user)
+            ActionMailer::Base.deliveries = []
+            post :send_request, delete_request
+            expect(response.code).to eq("200")
+            expect(ActionMailer::Base.deliveries).not_to be_empty
+          end
+        end
       end
     end
     context "manufacturer_update_manufacturer present" do

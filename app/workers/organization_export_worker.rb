@@ -14,6 +14,7 @@ class OrganizationExportWorker
     @export.file = @export.tmp_file
     @export.progress = "finished"
     @export.options = @export.options.merge(bike_codes_assigned: @bike_codes) if @export.assign_bike_codes?
+    @export.assign_exported_bike_ids
     @export.save
     @export.tmp_file.unlink # Remove it and unlink
     @export
@@ -76,8 +77,7 @@ class OrganizationExportWorker
     @avery_export ||= @export.avery_export?
     return true unless @avery_export
     # The address must include a street for it to be valid
-    bike.user_name.present? && bike.registration_address.present? &&
-      bike.registration_address["address"].present?
+    Export.avery_export_bike?(bike)
   end
 
   def bike_to_row(bike)
