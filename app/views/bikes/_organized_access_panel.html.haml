@@ -101,6 +101,14 @@
               - if passive_organization.paid_for?("avery_export")
                 %li
                   %span.attr-title
+                    User name:
+                  - if @bike.user_name.present?
+                    = @bike.user_name
+                  - else
+                    %em.text-warning
+                      no name
+                %li
+                  %span.attr-title
                     Avery Exportable:
                   - if Export.avery_export_bike(@bike)
                     true
