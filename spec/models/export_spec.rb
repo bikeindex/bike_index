@@ -87,8 +87,8 @@ RSpec.describe Export, type: :model do
 
   describe "custom_bike_ids=" do
     let(:organization) { FactoryBot.create(:organization) }
-    let!(:bike1) { FactoryBot.create(:organization_bike, organization: organization, created_at: Time.now - 1.day) }
-    let!(:bike2) { FactoryBot.create(:organization_bike, organization: organization) }
+    let!(:bike1) { FactoryBot.create(:bike_organized, organization: organization, created_at: Time.now - 1.day) }
+    let!(:bike2) { FactoryBot.create(:bike_organized, organization: organization) }
     let!(:bike3) { FactoryBot.create(:bike) }
     let(:export) { FactoryBot.build(:export_organization, organization: organization, end_at: Time.now - 1.hour) }
     it "assigns the bike ids" do

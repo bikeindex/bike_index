@@ -86,7 +86,7 @@ describe Organized::BikesController, type: :controller do
           end
         end
         context "with search_stickers" do
-          let!(:bike_with_sticker) { FactoryBot.create(:organization_bike, organization: organization) }
+          let!(:bike_with_sticker) { FactoryBot.create(:bike_organized, organization: organization) }
           let!(:bike_code) { FactoryBot.create(:bike_code_claimed, bike: bike_with_sticker) }
           it "searches for bikes with stickers" do
             expect(bike_with_sticker.bike_code?).to be_truthy

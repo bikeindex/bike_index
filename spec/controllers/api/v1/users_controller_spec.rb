@@ -49,7 +49,7 @@ describe Api::V1::UsersController do
       context "bike is authorized by user" do
         let(:organization) { FactoryBot.create(:organization, name: "Pro's Closet", short_name: "tpc") }
         let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-        let(:bike) { FactoryBot.create(:organization_bike, organization: organization) }
+        let(:bike) { FactoryBot.create(:bike_organized, organization: organization) }
         let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
         it "actually sends the email" do
           Sidekiq::Testing.inline! do

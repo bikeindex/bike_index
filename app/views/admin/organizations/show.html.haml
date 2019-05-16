@@ -137,6 +137,8 @@
           %td
             POS integration:
           %td
+            = @organization.pos_kind.humanize
+            %br
             - if @organization.ascend_imports?
               Ascend
             - else
