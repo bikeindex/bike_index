@@ -21,7 +21,7 @@
       = image_tag('resources/logo.svg', alt: 'Single color logo')
     %p
       Basic logo (#{link_to 'svg', image_path('resources/logo.svg') }, #{link_to 'png', image_path('resources/logo.png') })
-  
+
   %li
     %a.serial-image.blackbg{ href: image_path('resources/logo_white.svg') }
       = image_tag('resources/logo_white.svg', alt: 'Single color logo in white')
@@ -39,3 +39,7 @@
       %br
       %small.less-strong
         Black background shown here for visibility
+
+
+%h5
+  Check out #{link_to "Dev and Design resources", dev_and_design_path} for additional design resources
