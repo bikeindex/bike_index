@@ -1,3 +1,5 @@
+- landing_page_target = "school"
+
 .signup-landing-page.signup-landing-page-campus-packages
   %header.banner-header
     .container
@@ -20,7 +22,7 @@
               <span>$</span>0
             %p
               \/Month
-            %a.btn.btn-primary{ href: "#" }
+            %a.btn.btn-primary{ href: new_organization_path }
               Sign Up Now
 
         %li
@@ -33,7 +35,7 @@
               <span>$</span>25
             %p
               \/Month
-            %a.btn.btn-primary{ href: "#" }
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "supporting" }
               Try For Free
 
         %li
@@ -46,7 +48,7 @@
               <span>$</span>330
             %p
               \/Month
-            %a.btn.btn-primary{ href: "#" }
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "small" }
               Try For Free
 
           %li
@@ -59,7 +61,7 @@
                 <span>$</span>500
               %p
                 \/Month
-              %a.btn.btn-primary{ href: "#" }
+              %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "medium" }
                 Try For Free
 
           %li
@@ -72,7 +74,7 @@
                 <span>$</span>750
               %p
                 \/Month
-              %a.btn.btn-primary{ href: "#" }
+              %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
                 Try For Free
   .container.main-compare-packages-container
     %h2
@@ -88,7 +90,7 @@
               $0
             %p
               (USD/Month billed annually)
-            %a.btn.btn-primary{ href: "#" }
+            %a.btn.btn-primary{ href: new_organization_path }
               Sign Up Now
 
 
@@ -99,7 +101,7 @@
               $25
             %p
               (USD/Month billed annually)
-            %a.btn.btn-primary{ href: "#" }
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "supporting" }
               Try For Free
 
           %th
@@ -109,7 +111,7 @@
               $330
             %p
               (USD/Month billed annually)
-            %a.btn.btn-primary{ href: "#" }
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "small" }
               Try For Free
 
           %th.most-popular-option
@@ -121,7 +123,7 @@
               $500
             %p
               (USD/Month billed annually)
-            %a.btn.btn-primary{ href: "#" }
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "medium" }
               Try For Free
 
           %th
@@ -131,7 +133,7 @@
               $750
             %p
               (USD/Month billed annually)
-            %a.btn.btn-primary{ href: "#" }
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
               Try For Free
       %tbody
         %tr
@@ -198,4 +200,24 @@
     .contact-us-callout
       %p
         Questions? Want to get started?
-        = link_to "Contact us", "#", class: "btn btn-primary"
+        = link_to "Contact us", "#", class: "btn btn-primary tryPaidButton"
+
+- modal_body = capture_haml do
+  = form_for @feedback, html: { class: 'organized-form' } do |f|
+    .modal-body
+      .form-group
+        = f.label :name, "#{landing_page_target.titleize} name", class: "form-label"
+        = f.text_field :name, required: true, class: "form-control"
+      - unless current_user.present?
+        .form-group
+          = f.label :email, class: 'form-label'
+          = f.text_field :email, class: 'form-control'
+      .form-group
+        = f.label :body, "Additional notes", class: 'form-label'
+        = f.text_area :body, class: 'form-control'
+
+      = f.hidden_field :feedback_type, value: "lead_for_#{landing_page_target}"
+
+      = f.submit "Sign up", class: 'btn btn-primary btn-lg'
+
+= render partial: '/shared/modal', locals: { title: "Contact us for a free trial", id: "organizationSignupModal", modal_body: modal_body }

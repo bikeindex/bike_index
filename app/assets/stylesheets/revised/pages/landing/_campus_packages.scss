@@ -44,7 +44,7 @@ $compare-packages-blue: rgb(19, 71, 106);
   }
 
   .campus-packages-price-list,
-  table.compare-packages-table {
+  .compare-packages-table {
     display: none;
   }
 
@@ -119,6 +119,7 @@ $compare-packages-blue: rgb(19, 71, 106);
     }
 
     table.compare-packages-table {
+      display: table;
       th,
       td {
         border-right: 2px solid $compare-packages-table-border;
