@@ -117,7 +117,7 @@ describe OrganizedMailer do
         expect(organization.mail_snippets.count).to eq 3
       end
       context "new non-stolen bike" do
-        let(:bike) { FactoryBot.create(:organization_bike, creation_organization: organization) }
+        let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
         it "renders email and includes the snippets" do
           expect(mail.subject).to eq("Confirm your #{organization.short_name} Bike Index registration")
           expect(mail.body.encoded).to match header_mail_snippet.body

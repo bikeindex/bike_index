@@ -33,38 +33,39 @@ FactoryBot.define do
       end
     end
 
-    factory :bike_lightspeed_pos do
-      after(:create) do |bike, _evaluator|
-        create(:creation_state, creator: bike.creator, bike: bike, is_pos: true, pos_kind: "lightspeed_pos")
-      end
-    end
-    factory :bike_ascend_pos do
-      transient do
-        bulk_import { FactoryBot.create(:bulk_import_ascend) }
-      end
-      after(:create) do |bike, evaluator|
-        create(:creation_state, creator: bike.creator, bike: bike, is_pos: true, pos_kind: "ascend_pos", bulk_import: evaluator.bulk_import)
-      end
-    end
-
     factory :organized_bikes do # don't use this factory exactly, it's used to wrap all the organized bikes
       transient do
         organization { FactoryBot.create(:organization) }
       end
       creation_organization { organization }
 
+      factory :bike_lightspeed_pos do
+        after(:create) do |bike, _evaluator|
+          create(:creation_state, creator: bike.creator, bike: bike, is_pos: true, pos_kind: "lightspeed_pos", organization: bike.creation_organization)
+        end
+      end
+      factory :bike_ascend_pos do
+        transient do
+          bulk_import { FactoryBot.create(:bulk_import_ascend, organization: organization) }
+        end
+        after(:create) do |bike, evaluator|
+          create(:creation_state, creator: bike.creator, bike: bike, is_pos: true, pos_kind: "ascend_pos", bulk_import: evaluator.bulk_import, organization: bike.creation_organization)
+        end
+      end
+
+      factory :bike_organized do
+        after(:create) do |bike, evaluator|
+          create(:bike_organization, organization: bike.creation_organization, bike: bike)
+          bike.reload
+        end
+      end
+
+      # Generally, you should use the organization_bike factory, not this one
       factory :creation_organization_bike do
         after(:create) do |bike, evaluator|
           create(:creation_state, creator: bike.creator, organization: bike.creation_organization, bike: bike)
           # create(:creation_state, creator: bike.creator, organization: evaluator.organization, bike: bike)
           bike.save
-          bike.reload
-        end
-      end
-      factory :organization_bike do
-        after(:create) do |bike, evaluator|
-          # FactoryBot.create(:bike_organization, bike: bike, organization: evaluator.organization)
-          create(:bike_organization, organization: bike.creation_organization, bike: bike)
           bike.reload
         end
       end
