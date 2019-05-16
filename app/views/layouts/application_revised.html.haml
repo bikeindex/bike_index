@@ -92,7 +92,7 @@
                   - memberships.each do |membership|
                     - organization = membership.organization
                     %li
-                      %a.nav-link{ href: organization_bikes_path(organization_id: organization.to_param) }
+                      %a.nav-link{ href: organization_root_path(organization_id: organization.to_param) }
                         View #{organization.name}
             %li.divider-nav-item
             - if current_user_or_unconfirmed_user.superuser?

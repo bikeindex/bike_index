@@ -12,14 +12,13 @@
 .row
   .col-md-6
     %table.table-list
-      %tbody
-        - if current_user.developer?
-          %tr
-            %td
-              ID
-            %td
-              %spand.less-strong
-                = @organization.id
+      - if current_user.developer?
+        %tr
+          %td
+            ID
+          %td
+            %spand.less-strong
+              = @organization.id
         %tr
           %td
             Map

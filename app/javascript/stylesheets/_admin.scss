@@ -1,15 +1,27 @@
-.admin-navbar {
-  @include media-breakpoint-up(md) {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    z-index: $zindex-sticky;
+.admin-bike-partial {
+  img {
+    max-width: 100%;
+    max-height: 110px;
   }
+}
+
+.admin-navbar {
   .navbar-brand img {
     height: 35px;
   }
   .dropdown-toggle {
     cursor: pointer;
+  }
+}
+
+.admin-graphs-list a.active {
+  font-weight: bold;
+}
+.variable-admin-graphs-form {
+  .control-group {
+    width: 220px;
+    float: left;
+    margin-right: 1rem;
   }
 }
 

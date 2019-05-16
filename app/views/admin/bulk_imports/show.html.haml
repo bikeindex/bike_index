@@ -1,59 +1,83 @@
-%p
-  Created:
-  %span.convertTime.preciseTime
-    = l @bulk_import.created_at, format: :convert_time
-%p
-  Progress:
-  = @bulk_import.progress
-
-%p
-  File:
-  %small
-    = link_to @bulk_import.file_url, @bulk_import.file_url
-
-%p
-  User:
-  - if @bulk_import.user.present?
-    = link_to @bulk_import.user.display_name, admin_user_path(@bulk_import.user)
-  - else
-    None
-%p
-  Organization:
-  - if @bulk_import.organization.present?
-    = link_to @bulk_import.organization.name, admin_organization_path(@bulk_import.organization)
-    |
-    %strong
-      = link_to "Organization view of import", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param)
-  - else
-    None
-
-%p
-  Ascend:
-  = @bulk_import.ascend?
-
-- if @bulk_import.ascend_unprocessable?
-  %p.mt-2
-    Bulk Import <span class="text-danger">failed to process</span> because no organization was found with the ascend name of <strong>#{@bulk_import.ascend_name}</strong>
-  %p
-    Fix this by:
-  %ol
-    %li Go to #{link_to "organizations", admin_organizations_path}
-    %li Find the organization this bulk import should have been assigned to
-    %li Edit the organization and add the ascend name <code>#{@bulk_import.ascend_name}</code>
-    %li Return here and click the "reprocess import" button below
+.admin-subnav
+  .col-sm-4
+    %h1
+      Bulk Import
+      %em
+        \##{@bulk_import.id}
+  .col-sm-8
+    %p
+      View #{link_to "all bulk imports", admin_bulk_imports_path}
+      - if @bulk_import.organization_id.present?
+        %em
+          \- View #{link_to "all #{@bulk_import.organization.name} imports", admin_bulk_imports_path(organization_id: @bulk_import.organization.to_param)}
+.row
+  .col-sm-6
+    %table.table-list
+      %tr
+        %td
+          Created
+        %td
+          %span.convertTime.preciseTime
+            = l @bulk_import.created_at, format: :convert_time
+      %tr
+        %td
+          Progress
+        %td
+          = @bulk_import.progress
+      %tr
+        %td
+          File
+        %td
+          %small
+            = link_to @bulk_import.file_url, @bulk_import.file_url
+      %tr
+        %td
+          Errors
+        %td
+          - if @bulk_import.ascend_unprocessable?
+            %p.mt-2
+              Bulk Import <span class="text-danger">failed to process</span> because no organization was found with the ascend name of <strong>#{@bulk_import.ascend_name}</strong>
+            %p
+              Fix this by:
+            %ol
+              %li Go to #{link_to "organizations", admin_organizations_path}
+              %li Find the organization this bulk import should have been assigned to
+              %li Edit the organization and add the ascend name <code>#{@bulk_import.ascend_name}</code>
+              %li Return here and click the "reprocess import" button below
+          - if @bulk_import.import_errors.present?
+            %pre.text-danger
+              = @bulk_import.import_errors
+  .col-sm-6
+    %table.table-list
+      %tr
+        %td
+          User
+        %td
+          - if @bulk_import.user.present?
+            = link_to @bulk_import.user.display_name, admin_user_path(@bulk_import.user)
+          - else
+            None
+      %tr
+        %td
+          Organization
+        %td
+          - if @bulk_import.organization.present?
+            = link_to @bulk_import.organization.name, admin_organization_path(@bulk_import.organization), class: "less-strong"
+            %br
+            %em.strong
+              = link_to "Organization view of import", organization_bulk_import_path(@bulk_import, organization_id: @bulk_import.organization.to_param)
+          - else
+            None
+      %tr
+        %td
+          Ascend
+        %td
+          = "&#x2713;".html_safe if @bulk_import.ascend?
 
 - if @bulk_import.creation_states.count < 1 || params[:show_reprocess]
   = link_to "Reprocess Import", admin_bulk_import_path(@bulk_import, reprocess: true), method: "PUT", class: "btn btn-secondary float-right"
 
-
-- if @bulk_import.import_errors.present?
-  %h2.text-danger
-    Errors
-  %pre.text-danger
-    = @bulk_import.import_errors
-
-
-%h2
+%h2.mt-4
   Bikes - #{@bulk_import.bikes.count}
   - if @bulk_import.bikes.count > 25
     %small

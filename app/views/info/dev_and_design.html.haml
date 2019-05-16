@@ -1,16 +1,22 @@
-%h1
-  Development and design resources
 %h5
-  Bike Index is meant to be useable and expandable by everyone. We're way into the open source.
-%p
-  Here are some other things that might be interesting or useful:
+  Bike Index is meant to be usable and expandable by everyone. We're way into the open source.
+
+%h3.mt-4
+  Design resources
+%ul
+  %li
+    #{link_to "Image assets", image_resources_path} - vector and png Bike Index logos
+  %li
+    #{link_to "Trifold Flyer", "https://files.bikeindex.org/stored/Bike-Index-TriFold.pdf"} - Print color & double-sided (<em>do not</em> rescale, have printer print as close to the edges as it can)
+  %li
+    #{link_to "Bike shop card", "https://files.bikeindex.org/stored/Bike-Index-Shop-Card.pdf"} - design is for notecard size (5.5" x 4.25")
+
+%h3.mt-4 Development resources
 %ul
   %li
     Bike Index itself is open source - check it out #{ link_to "on GitHub", "https://github.com/bikeindex/bike_index" }.
   %li
     = link_to "Our API documentation", documentation_index_path
-  %li
-    = link_to "Image and design assets", image_resources_path
   %li
     #{ link_to "Nearby stolen widget", "https://github.com/bikeindex/stolen_bikes_widget_html" } (on GitHub)
   %li
@@ -20,5 +26,3 @@
     #{link_to "OAuth Applications you've made", oauth_applications_path} (must be logged in)
   %li
     #{link_to "OAuth Applications you've authorized", oauth_authorized_applications_path} (must be logged in)
-  %li
-    #{link_to "Trifold Flyer", "https://files.bikeindex.org/stored/Bike-Index-TriFold.pdf"} - Print color & double-sided (<em>do not</em> rescale, have printer print as close to the edges as it can)

@@ -139,30 +139,14 @@ module API
         end
         post "/", serializer: BikeV2ShowSerializer, root: "bike" do
           # Search for a bike matching the provided serial number / owner email
-          bike_attrs = %w{serial owner_email}.map { |key| [key.to_sym, params[key]] }.to_h
-          found_bike = BikeFinder.find_matching(**bike_attrs)
+          found_bike = BikeFinder.find_matching(
+            serial: params[:serial],
+            owner_email: params[:owner_email],
+          )
 
-          # bike was not found, create it
-          if found_bike.blank?
-            # prepare params
-            declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
-            b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
-            b_param.clean_params
-            ensure_required_stolen_attrs(b_param.params)
-            b_param.save
-
-            bike = BikeCreator.new(b_param).create_bike
-
-            if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
-              return bike
-            else
-              e = bike.present? ? bike.errors : b_param.errors
-              return error!(e.full_messages.to_sentence, 401)
-            end
-          end
-
-          # bike was found, update instead of creating
-          if found_bike.present?
+          # if a matching bike is and can be updated by the submitter, update
+          # existing record instead of creating a new one
+          if found_bike.present? && found_bike.authorize_for_user(current_user)
             # prepare params
             declared_p = { "declared_params" => declared(params, include_missing: false) }
             b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
@@ -186,6 +170,21 @@ module API
 
             status :found
             return @bike.reload
+          end
+
+          declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
+          b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
+          b_param.clean_params
+          ensure_required_stolen_attrs(b_param.params)
+          b_param.save
+
+          bike = BikeCreator.new(b_param).create_bike
+
+          if b_param.errors.blank? && b_param.bike_errors.blank? && bike.present? && bike.errors.blank?
+            bike
+          else
+            e = bike.present? ? bike.errors : b_param.errors
+            error!(e.full_messages.to_sentence, 401)
           end
         end
 

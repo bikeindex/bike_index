@@ -69,12 +69,12 @@ class Admin::BikesController < Admin::BaseController
 
   def edit
     @bike = @bike.decorate
-    @fast_attr_update = params[:fast_attr_update]
     @recoveries = @bike.recovered_records
+    @organizations = Organization.all
+    render layout: "new_admin"
   end
 
   def update
-    @fast_attr_update = params.delete(:fast_attr_update)
     updator = BikeUpdator.new(user: current_user, bike: @bike, b_params: { bike: permitted_parameters }.as_json)
     updator.update_ownership
     updator.update_stolen_record
@@ -90,13 +90,9 @@ class Admin::BikesController < Admin::BaseController
       @bike.create_normalized_serial_segments
       return if return_to_if_present
       flash[:success] = "Bike was successfully updated."
-      if @fast_attr_update.present? && @fast_attr_update
-        redirect_to edit_admin_bike_url(@bike, fast_attr_update: true) and return
-      else
-        redirect_to edit_admin_bike_url(@bike) and return
-      end
+      redirect_to edit_admin_bike_url(@bike) and return
     else
-      render action: "edit"
+      render action: "edit", layout: "new_admin"
     end
   end
 
