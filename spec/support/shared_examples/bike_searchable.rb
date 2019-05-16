@@ -336,7 +336,7 @@ RSpec.shared_examples "bike_searchable" do
         let(:interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: "d") }
 
         let(:bike_1) { FactoryBot.create(:bike) }
-        let(:bike_2) { FactoryBot.create(:organization_bike) }
+        let(:bike_2) { FactoryBot.create(:bike_organized) }
         let(:organization) { bike_2.organizations.first }
         let(:query_params) { { stolenness: "all" } }
         before do
