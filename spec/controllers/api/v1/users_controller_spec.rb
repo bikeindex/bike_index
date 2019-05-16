@@ -53,22 +53,21 @@ describe Api::V1::UsersController do
         let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
         it "actually sends the email" do
           Sidekiq::Testing.inline! do
-          # We don't test that this is being added to Sidekiq
-          # Because we're testing that sidekiq does what it
-          # Needs to do here. Slow tests, but we know it actually works :(
-          delete_request = {
-            request_type: "bike_delete_request",
-            user_id: user.id,
-            request_bike_id: bike.id,
-            request_reason: "Some reason",
-          }
-          set_current_user(user)
-          ActionMailer::Base.deliveries = []
-          post :send_request, delete_request
-          pp response.body
-          expect(response.code).to eq("200")
-          expect(ActionMailer::Base.deliveries).not_to be_empty
-        end
+            # We don't test that this is being added to Sidekiq
+            # Because we're testing that sidekiq does what it
+            # Needs to do here. Slow tests, but we know it actually works :(
+            delete_request = {
+              request_type: "bike_delete_request",
+              user_id: user.id,
+              request_bike_id: bike.id,
+              request_reason: "Some reason",
+            }
+            set_current_user(user)
+            ActionMailer::Base.deliveries = []
+            post :send_request, delete_request
+            expect(response.code).to eq("200")
+            expect(ActionMailer::Base.deliveries).not_to be_empty
+          end
         end
       end
     end
