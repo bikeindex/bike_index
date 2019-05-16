@@ -25,7 +25,10 @@
       %th
         Type
       %th
-        = sortable "pos_kind", "POS"
+        - if sortable
+          = sortable "pos_kind", "POS"
+        - else
+          POS
       %th
         Locations
     %tbody
