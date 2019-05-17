@@ -206,6 +206,9 @@
   = form_for @feedback, html: { class: 'organized-form' } do |f|
     .modal-body
       .form-group
+        - package_opts = %w[supporting small medium large].map { |s| ["#{s.titleize} package", s] }
+        = select(:signup, :package, package_opts, { prompt: "Choose a package size" }, { class: "form-control" })
+      .form-group
         = f.label :name, "#{landing_page_target.titleize} name", class: "form-label"
         = f.text_field :name, required: true, class: "form-control"
       - unless current_user.present?

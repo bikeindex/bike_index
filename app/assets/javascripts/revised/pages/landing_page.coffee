@@ -15,3 +15,4 @@ class BikeIndex.LandingPage extends BikeIndex
   submitOrganizationPaidPlan: (plan) ->
     console.log plan
     $("#organizationSignupModal").modal("show")
+    $("#organizationSignupModal #signup_package").val(plan)
