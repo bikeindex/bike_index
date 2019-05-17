@@ -2,9 +2,6 @@
   .col-md-5
     %h1
       Manage Stickers
-      - if sortable_search_params?
-        %em.small
-          = link_to "view all", admin_bike_codes_path
 
   / We only show this if there aren't any sortable search params, or there is a search_bike_code_batch_id, because performance
   - if !sortable_search_params? || params[:search_bike_code_batch_id].present?
@@ -51,18 +48,22 @@
 
 .row
   .col-md-6
-
-    %p.mt-4
-      = number_with_delimiter(@bike_codes.total_count)
-      Matching stickers,
+    %p
+      - unless params[:search_claimed].present?
+        = number_with_delimiter(@bike_codes.total_count)
+        matching stickers,
       %span.less-strong
         = number_with_delimiter(matching_bike_codes.claimed.count)
-        claimed stickers
+        claimed
+      - if sortable_search_params?
+        \-
+        %em
+          = link_to "view all stickers", admin_bike_codes_path
 
     - if current_organization.present?
       %p
         %strong
-          Viewing #{link_to current_organization.name, admin_organization_path(current_organization)} Bike Codes
+          Viewing #{link_to current_organization.name, admin_organization_path(current_organization)} Stickers
           %small
             = link_to "view orgs view", organization_stickers_path(organization_id: current_organization.to_param), class: "less-strong"
     - if @bike_code_batch.present?
@@ -76,7 +77,11 @@
       = hidden_field_tag :sort, sort_column
       = hidden_field_tag :sort_direction, sort_direction
       = hidden_field_tag :organization_id, params[:organization_id]
-      .form-group.ml-auto
+      = hidden_field_tag :search_bike_code_batch_id, params[:search_bike_code_batch_id]
+      .form-check.ml-auto.ml-2
+        = check_box_tag :search_claimed, true, sortable_search_params[:search_claimed].present?, class: "form-check-input"
+        = label_tag :search_claimed, "Claimed only"
+      .form-group.ml-2
         = text_field_tag :search_query, params[:search_query], placeholder: "search code", class: "form-control"
 
       = submit_tag 'Search', name: 'search', class: 'btn btn-primary ml-2'
@@ -110,10 +115,10 @@
               = l bike_code.created_at, format: :convert_time
           %td
             - if bike_code.organization_id.present?
-              = link_to bike_code.organization.name, admin_bike_codes_path(organization_id: bike_code.organization_id)
+              = link_to bike_code.organization.name, admin_bike_codes_path(sortable_search_params.merge(organization_id: bike_code.organization_id))
           %td
             - if bike_code.bike_code_batch_id.present?
-              = link_to bike_code.bike_code_batch_id, admin_bike_codes_path(search_bike_code_batch_id: bike_code.bike_code_batch_id)
+              = link_to bike_code.bike_code_batch_id, admin_bike_codes_path(sortable_search_params.merge(search_bike_code_batch_id: bike_code.bike_code_batch_id))
           %td
             - if bike_code.claimed? && bike_code.claimed_at.present?
               %span.convertTime

@@ -6,7 +6,7 @@ class BikeCode < ActiveRecord::Base
   belongs_to :bike
   belongs_to :organization
   belongs_to :user # User who assigns the bike
-  belongs_to :bike_code_batch # User who assigns the bike
+  belongs_to :bike_code_batch
 
   scope :claimed, -> { where.not(bike_id: nil) }
   scope :unclaimed, -> { where(bike_id: nil) }

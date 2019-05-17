@@ -6,7 +6,7 @@ class Admin::BikeCodesController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     @bike_codes = matching_bike_codes.reorder("bike_codes.#{sort_column} #{sort_direction}")
-                                     .includes(:bike, :organization).page(page).per(per_page)
+                                     .includes(:organization).page(page).per(per_page)
   end
 
   helper_method :matching_bike_codes
@@ -25,6 +25,9 @@ class Admin::BikeCodesController < Admin::BaseController
     if params[:search_bike_code_batch_id].present?
       @bike_code_batch = BikeCodeBatch.find(params[:search_bike_code_batch_id].to_i)
       bike_codes = bike_codes.where(bike_code_batch_id: @bike_code_batch.id)
+    end
+    if params[:search_claimed].present?
+      bike_codes = bike_codes.claimed
     end
     if params[:search_query].present?
       bike_codes = bike_codes.admin_text_search(params[:search_query])
