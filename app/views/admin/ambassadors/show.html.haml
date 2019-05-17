@@ -5,12 +5,11 @@
     = image_tag @ambassador.avatar.url(:medium), class: 'users-show-avatar'
 
 
-%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+%table.table.table-list
   %tbody
     - @ambassador_attributes.each_pair do |key, value|
       %tr
-        %td
-          %strong= key
+        %td= key
         %td= value
 
 %h2 Ambassador Tasks
@@ -18,7 +17,7 @@
 %p
   %strong= "#{@ambassador.progress_count} complete"
 
-%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border.ambassador-tasks-table
+%table.table.table-striped.table-bordered.ambassador-tasks-table
   %thead.small-header
     %tr
       %th Task

@@ -2,14 +2,16 @@
 
 %p= link_to "New Task", new_admin_ambassador_task_path
 
-%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border.ambassador-tasks-table
+%table.table.table-striped.table-bordered.ambassador-tasks-table
   %thead.small-header
     %tr
+      %th Title
       %th Description
       %th
   %tbody
     - @ambassador_tasks.each do |task|
       %tr
+        %td= task.title
         %td= task.description_html.html_safe
         %td
           %span= link_to "Edit", edit_admin_ambassador_task_path(task)
