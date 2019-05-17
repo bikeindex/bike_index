@@ -212,9 +212,6 @@
         .form-group
           = f.label :email, class: 'form-label'
           = f.text_field :email, class: 'form-control'
-      .form-group
-        = f.label :body, "Additional notes", class: 'form-label'
-        = f.text_area :body, class: 'form-control'
 
       = f.hidden_field :feedback_type, value: "lead_for_#{landing_page_target}"
 
