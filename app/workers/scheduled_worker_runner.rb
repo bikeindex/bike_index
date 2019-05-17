@@ -33,7 +33,7 @@ class ScheduledWorkerRunner < ScheduledWorker
   end
 
   def self.scheduled_workers
-    [UpdateExpiredInvoiceWorker] + [self]
+    [UpdateExpiredInvoiceWorker, UpdateOrganizationPosKindWorker] + [self]
   end
 
   def self.scheduled_non_scheduler_workers
