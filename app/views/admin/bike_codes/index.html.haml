@@ -54,10 +54,10 @@
 
     %p.mt-4
       = number_with_delimiter(@bike_codes.total_count)
-      matching Stickers,
+      Matching stickers,
       %span.less-strong
         = number_with_delimiter(matching_bike_codes.claimed.count)
-        Claimed stickers
+        claimed stickers
 
     - if current_organization.present?
       %p
@@ -87,20 +87,17 @@
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.small-header
       %th
-        Added
+        = sortable "created_at"
       %th
-        Organization
+        = sortable "organization_id"
       %th
-        Batch
+        = sortable "bike_code_batch_id", "Batch"
       %th
         Linked
       %th
         Bike
       %th
-        %small
-          Kind
-      %th
-        Code
+        = sortable "code"
     %tbody
       - @bike_codes.each do |bike_code|
         %tr
@@ -126,10 +123,10 @@
               / For these, use bike_id to avoid loading association
               = organized_bike_text(bike_code.bike)
           %td
-            %small
-              = bike_code.kind
-          %td
             = link_to bike_code.code, "/bikes/scanned/#{bike_code.code}?organization_id=#{bike_code.organization.to_param}"
+            - unless bike_code.sticker?
+              %em.small.text-warning
+                = bike_code.kind
 
 
 = paginate @bike_codes, views_prefix: "admin"
