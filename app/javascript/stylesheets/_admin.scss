@@ -77,3 +77,22 @@
     display: inline;
   }
 }
+
+// Donor icons and references
+.donor-icon,
+.paid-org-icon {
+  display: inline-block;
+  color: white;
+  font-size: 75%;
+  font-weight: 800;
+  padding: 0.15em 0.25em;
+  border: 1px solid #ccc;
+  line-height: 1em;
+  border-radius: 0.5em;
+  &.donor-icon {
+    background: #2ecc71;
+  }
+  &.paid-org-icon {
+    background: #2980b9;
+  }
+}
