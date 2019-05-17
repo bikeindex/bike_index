@@ -15,7 +15,6 @@ describe "Admin::ExportsController" do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
-      expect(assigns(:bike_code_batches)).to eq([bike_code_batches])
       expect(assigns(:bike_codes)).to eq([bike_code])
     end
     context "with search_query" do
@@ -24,7 +23,6 @@ describe "Admin::ExportsController" do
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
         expect(assigns(:bike_codes)).to eq([])
-        expect(assigns(:bike_code_batches)).to be_nil
       end
     end
   end
