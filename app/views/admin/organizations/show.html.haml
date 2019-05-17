@@ -234,7 +234,7 @@
               Stickers
             %td
               - if @organization.paid_for?("bike_codes")
-                = link_to "Has stickers", organization_stickers_path(organization_id: @organization.to_param)
+                = link_to "Has stickers", admin_bike_codes_path(organization_id: @organization.to_param)
               - else
                 %small.less-strong
                   no

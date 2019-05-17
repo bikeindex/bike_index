@@ -23,7 +23,7 @@ class Admin::BikeCodesController < Admin::BaseController
       bike_codes = bike_codes.where(organization_id: current_organization.id)
     end
     if params[:search_bike_code_batch_id].present?
-      @bike_code_batch = BikeCodeBatch.find(params[:search_bike_code_batch_id])
+      @bike_code_batch = BikeCodeBatch.find(params[:search_bike_code_batch_id].to_i)
       bike_codes = bike_codes.where(bike_code_batch_id: @bike_code_batch.id)
     end
     if params[:search_query].present?

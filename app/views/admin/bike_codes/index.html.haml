@@ -6,79 +6,80 @@
         %em.small
           = link_to "view all", admin_bike_codes_path
 
-/ We only show this if there aren't any sortable search params, or there is a search_bike_code_batch_id, because performance
-- if !sortable_search_params? || params[:search_bike_code_batch_id].present?
-  - bike_code_batches = BikeCodeBatch.includes(:user, :organization)
-  %h5
-    = number_with_delimiter(bike_code_batches.count)
-    Sticker Batches
-  .full-screen-table
-    %table.table.table-striped.table-bordered.table-sm
-      %thead
-        %th
-          ID
-        %th
-          Created
-        %th
-          Creator
-        %th
-          Organization
-        %th
-          %small
-            Count/claimed
-        %th
-          Notes
-      %tbody
-        - bike_code_batches.each do |bike_code_batch|
-          %tr
-            %td
-              \##{link_to bike_code_batch.id, admin_bike_codes_path(search_bike_code_batch_id: bike_code_batch.id)}
-            %td
-              %span.convertTime
-                = l bike_code_batch.created_at, format: :convert_time
-            %td
-              = link_to bike_code_batch.user.display_name, admin_user_path(bike_code_batch.user.to_param)
-            %td
-              = link_to bike_code_batch.organization.name, admin_bike_codes_path(organization_id: bike_code_batch.organization_id)
-            %td
-              #{number_with_delimiter(bike_code_batch.bike_codes.count)} / #{number_with_delimiter(bike_code_batch.bike_codes.claimed.count)}
-            %td
-              = bike_code_batch.notes
-
-%hr.mt-4
+  / We only show this if there aren't any sortable search params, or there is a search_bike_code_batch_id, because performance
+  - if !sortable_search_params? || params[:search_bike_code_batch_id].present?
+    - bike_code_batches = BikeCodeBatch.includes(:user, :organization)
+    .col-12.mt-4
+      %h5
+        = number_with_delimiter(bike_code_batches.count)
+        Sticker Batches
+    .col-12
+      .full-screen-table
+        %table.table.table-striped.table-bordered.table-sm
+          %thead
+            %th
+              Batch
+            %th
+              Created
+            %th
+              Creator
+            %th
+              Organization
+            %th
+              %small
+                count/claimed
+            %th
+              Notes
+          %tbody
+            - bike_code_batches.each do |bike_code_batch|
+              %tr
+                %td
+                  #{link_to "##{bike_code_batch.id}", admin_bike_codes_path(search_bike_code_batch_id: bike_code_batch.id)}
+                %td
+                  %span.convertTime
+                    = l bike_code_batch.created_at, format: :convert_time
+                %td
+                  - if bike_code_batch.user.present?
+                    = bike_code_batch.user.display_name
+                %td
+                  - if bike_code_batch.organization.present?
+                    = link_to bike_code_batch.organization.name, admin_bike_codes_path(organization_id: bike_code_batch.organization_id)
+                %td
+                  #{number_with_delimiter(bike_code_batch.bike_codes.count)} / #{number_with_delimiter(bike_code_batch.bike_codes.claimed.count)}
+                %td
+                  = bike_code_batch.notes
 
 .row
-  .col
+  .col-md-6
+
+    %p.mt-4
+      = number_with_delimiter(@bike_codes.total_count)
+      matching Stickers,
+      %span.less-strong
+        = number_with_delimiter(matching_bike_codes.claimed.count)
+        Claimed stickers
+
+    - if current_organization.present?
+      %p
+        %strong
+          Viewing #{link_to current_organization.name, admin_organization_path(current_organization)} Bike Codes
+          %small
+            = link_to "view orgs view", organization_stickers_path(organization_id: current_organization.to_param), class: "less-strong"
+    - if @bike_code_batch.present?
+      %p
+        %strong
+          Viewing Just Batch ##{@bike_code_batch.id}
+        %small
+          = link_to "view all batches", admin_bike_codes_path(sortable_search_params.except(:search_bike_code_batch_id))
+  .col-md-6.mt-2
     = form_tag admin_bike_codes_path, method: :get, class: "form-inline" do
       = hidden_field_tag :sort, sort_column
       = hidden_field_tag :sort_direction, sort_direction
       = hidden_field_tag :organization_id, params[:organization_id]
       .form-group.ml-auto
-        = text_field_tag :search_bike_code_batch_id, params[:search_bike_code_batch_id], placeholder: "Batch ID", class: "form-control mt-4"
-      .form-group.ml-2
-        = text_field_tag :search_query, params[:search_query], placeholder: "search code", class: "form-control mt-4"
+        = text_field_tag :search_query, params[:search_query], placeholder: "search code", class: "form-control"
 
-      = submit_tag 'Search', name: 'search', class: 'btn btn-primary mt-4 ml-2'
-
-%p.mt-4
-  = number_with_delimiter(@bike_codes.total_count)
-  matching Stickers,
-  %span.less-strong
-    = number_with_delimiter(matching_bike_codes.claimed.count)
-    Claimed stickers
-
-- if current_organization.present?
-  %p
-    #{link_to current_organization.name, admin_organization_path(current_organization)} Bike Codes
-    %small
-      = link_to "view orgs view", organization_stickers_path(organization_id: current_organization.to_param), class: "less-strong"
-- if @bike_code_batch.present?
-  %p
-    Viewing Just Batch
-
-    #{link_to current_organization.name, admin_organization_path(current_organization)} Bike Codes
-    %small
-      = link_to "view orgs view", organization_stickers_path(organization_id: current_organization.to_param), class: "less-strong"
+      = submit_tag 'Search', name: 'search', class: 'btn btn-primary ml-2'
 
 = paginate @bike_codes, views_prefix: "admin"
 
@@ -96,15 +97,23 @@
       %th
         Bike
       %th
+        %small
+          Kind
+      %th
         Code
     %tbody
       - @bike_codes.each do |bike_code|
         %tr
           %td
-            %a.convertTime{ href: edit_organization_sticker_path(organization_id: bike_code.organization_id, id: bike_code.code) }
+            - if bike_code.organization_id.present?
+              - bike_code_url = edit_organization_sticker_path(organization_id: bike_code.organization_id, id: bike_code.code)
+            - else
+              - bike_code_url = "/bikes/scanned/#{bike_code.code}"
+            %a.convertTime{ href: bike_code_url }
               = l bike_code.created_at, format: :convert_time
           %td
-            = link_to bike_code.organization.name, admin_bike_codes_path(organization_id: bike_code.organization_id)
+            - if bike_code.organization_id.present?
+              = link_to bike_code.organization.name, admin_bike_codes_path(organization_id: bike_code.organization_id)
           %td
             - if bike_code.bike_code_batch_id.present?
               = link_to bike_code.bike_code_batch_id, admin_bike_codes_path(search_bike_code_batch_id: bike_code.bike_code_batch_id)
@@ -116,6 +125,9 @@
             - if bike_code.claimed?
               / For these, use bike_id to avoid loading association
               = organized_bike_text(bike_code.bike)
+          %td
+            %small
+              = bike_code.kind
           %td
             = link_to bike_code.code, "/bikes/scanned/#{bike_code.code}?organization_id=#{bike_code.organization.to_param}"
 
