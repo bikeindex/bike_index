@@ -127,6 +127,40 @@ ALTER SEQUENCE public.b_params_id_seq OWNED BY public.b_params.id;
 
 
 --
+-- Name: bike_code_batches; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bike_code_batches (
+    id integer NOT NULL,
+    user_id integer,
+    organization_id integer,
+    notes text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: bike_code_batches_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bike_code_batches_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bike_code_batches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bike_code_batches_id_seq OWNED BY public.bike_code_batches.id;
+
+
+--
 -- Name: bike_codes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -140,7 +174,8 @@ CREATE TABLE public.bike_codes (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     claimed_at timestamp without time zone,
-    previous_bike_id integer
+    previous_bike_id integer,
+    bike_code_batch_id integer
 );
 
 
@@ -2076,6 +2111,13 @@ ALTER TABLE ONLY public.b_params ALTER COLUMN id SET DEFAULT nextval('public.b_p
 
 
 --
+-- Name: bike_code_batches id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_code_batches ALTER COLUMN id SET DEFAULT nextval('public.bike_code_batches_id_seq'::regclass);
+
+
+--
 -- Name: bike_codes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2432,6 +2474,14 @@ ALTER TABLE ONLY public.ads
 
 ALTER TABLE ONLY public.b_params
     ADD CONSTRAINT b_params_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bike_code_batches bike_code_batches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_code_batches
+    ADD CONSTRAINT bike_code_batches_pkey PRIMARY KEY (id);
 
 
 --
@@ -2831,6 +2881,27 @@ ALTER TABLE ONLY public.wheel_sizes
 --
 
 CREATE INDEX index_b_params_on_organization_id ON public.b_params USING btree (organization_id);
+
+
+--
+-- Name: index_bike_code_batches_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_code_batches_on_organization_id ON public.bike_code_batches USING btree (organization_id);
+
+
+--
+-- Name: index_bike_code_batches_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_code_batches_on_user_id ON public.bike_code_batches USING btree (user_id);
+
+
+--
+-- Name: index_bike_codes_on_bike_code_batch_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_codes_on_bike_code_batch_id ON public.bike_codes USING btree (bike_code_batch_id);
 
 
 --
@@ -3945,4 +4016,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190422221408');
 INSERT INTO schema_migrations (version) VALUES ('20190424001657');
 
 INSERT INTO schema_migrations (version) VALUES ('20190516222221');
+
+INSERT INTO schema_migrations (version) VALUES ('20190517200357');
 
