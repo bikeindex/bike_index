@@ -22,9 +22,14 @@
   %thead.small-header
     %tr
       %th Task
-      %th Status
+      %th Completed at
   %tbody
-    - @ambassador.ambassador_task_assignments.each do |task|
+    - @ambassador.ambassador_task_assignments.order(created_at: :asc).each do |task|
       %tr
-        %td= task.description_html.html_safe
-        %td= task.status
+        %td
+          %strong= task.title
+          %br
+          = task.description_html.html_safe
+        %td
+          - if task.completed_at
+            %span.convertTime= l task.completed_at, format: :convert_time

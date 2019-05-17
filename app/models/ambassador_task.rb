@@ -2,7 +2,7 @@ class AmbassadorTask < ActiveRecord::Base
   has_many :ambassador_task_assignments
   has_many :users, through: :ambassador_task_assignments
 
-  validates :description, uniqueness: true
+  validates :title, presence: true, uniqueness: true
 
   def description_html
     Kramdown::Document.new(description).to_html

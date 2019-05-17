@@ -8,7 +8,7 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
   validates :ambassador_task, uniqueness: { scope: :user }
   validate :associated_user_is_an_ambassador
 
-  delegate :description, :description_html, to: :ambassador_task
+  delegate :description, :description_html, :title, to: :ambassador_task
 
   scope :completed, -> { where.not(completed_at: nil) }
 

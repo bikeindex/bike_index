@@ -1,13 +1,10 @@
 require "spec_helper"
 
 describe AmbassadorTask, type: :model do
-  it { is_expected.to respond_to(:description) }
-  it { is_expected.to respond_to(:users) }
-
   it { is_expected.to have_many(:users) }
   it { is_expected.to have_many(:ambassador_task_assignments) }
 
-  it { is_expected.to validate_uniqueness_of(:description) }
+  it { is_expected.to validate_uniqueness_of(:title) }
 
   describe "#ensure_assigned_to_all_ambassadors!" do
     it "creates assignments to the given task for all ambassadors" do

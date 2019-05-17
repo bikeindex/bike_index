@@ -2,6 +2,7 @@
 -- PostgreSQL database dump
 --
 
+-- Dumped from database version 11.3
 -- Dumped by pg_dump version 11.3
 
 SET statement_timeout = 0;
@@ -14,20 +15,6 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
 
 --
 -- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
@@ -125,7 +112,8 @@ CREATE TABLE public.ambassador_tasks (
     id integer NOT NULL,
     description character varying DEFAULT ''::character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    title character varying DEFAULT ''::character varying NOT NULL
 );
 
 
@@ -2987,6 +2975,13 @@ CREATE INDEX index_ambassador_task_assignments_on_user_id ON public.ambassador_t
 
 
 --
+-- Name: index_ambassador_tasks_on_title; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_ambassador_tasks_on_title ON public.ambassador_tasks USING btree (title);
+
+
+--
 -- Name: index_b_params_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4144,5 +4139,7 @@ INSERT INTO schema_migrations (version) VALUES ('20190424001657');
 INSERT INTO schema_migrations (version) VALUES ('20190514155447');
 
 INSERT INTO schema_migrations (version) VALUES ('20190516222221');
+
+INSERT INTO schema_migrations (version) VALUES ('20190517161246');
 
 INSERT INTO schema_migrations (version) VALUES ('20190517200357');

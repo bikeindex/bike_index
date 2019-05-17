@@ -10,7 +10,10 @@ module Organized
           .includes(:ambassador_task_assignments)
           .sort_by { |ambassador| -ambassador.percent_complete }
 
-      @ambassador_task_assignments = current_user.ambassador_task_assignments
+      @ambassador_task_assignments =
+        current_user
+          .ambassador_task_assignments
+          .order(created_at: :asc)
     end
   end
 end
