@@ -1,16 +1,23 @@
-%h1 Ambassador Task
-
-%p
-  %strong Description
-  %br
-  = @ambassador_task.description_html.html_safe
-
 %p
   %span= link_to "All tasks", admin_ambassador_tasks_path
   &nbsp;
   %span= link_to "New Task", new_admin_ambassador_task_path
   &nbsp;
   %span= link_to "Edit Task", edit_admin_ambassador_task_path(@ambassador_task)
+
+%h1 Ambassador Task
+
+%p
+  %strong Title
+  %br
+  = @ambassador_task.title
+
+%p
+  %strong Description
+  %br
+  = @ambassador_task.description_html.html_safe
+
+%h2 Assigneees
 
 %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
   %thead.small-header

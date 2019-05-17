@@ -49,7 +49,7 @@ class Admin::AmbassadorTasksController < Admin::BaseController
   private
 
   def ambassador_task_params
-    params.require(:ambassador_task).permit(:description)
+    params.require(:ambassador_task).permit(:title, :description)
   end
 
   def find_ambassador_task

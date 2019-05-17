@@ -7,6 +7,7 @@ describe Admin::AmbassadorTasksController, type: :controller do
     describe "#index" do
       it "renders the index template" do
         get :index
+
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
         expect(flash).to_not be_present
@@ -16,7 +17,9 @@ describe Admin::AmbassadorTasksController, type: :controller do
     describe "#show" do
       it "renders the show template with the found ambassador task" do
         ambassador_task = FactoryBot.create(:ambassador_task)
+
         get :show, id: ambassador_task.id
+
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
@@ -26,6 +29,7 @@ describe Admin::AmbassadorTasksController, type: :controller do
     describe "#new" do
       it "renders the new template" do
         get :new
+
         expect(response.status).to eq(200)
         expect(response).to render_template(:new)
         expect(flash).to_not be_present
@@ -34,8 +38,8 @@ describe Admin::AmbassadorTasksController, type: :controller do
 
     describe "#edit" do
       it "renders the edit template with the found ambassador task" do
-        ambassador_task = FactoryBot.create(:ambassador_task)
-        get :edit, id: ambassador_task.id
+        get :edit, id: FactoryBot.create(:ambassador_task).id
+
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
         expect(flash).to_not be_present
@@ -45,18 +49,27 @@ describe Admin::AmbassadorTasksController, type: :controller do
     describe "#create" do
       it "creates the given ambassador task" do
         ambassador_task = FactoryBot.attributes_for(:ambassador_task)
+        expect(AmbassadorTask.count).to eq(0)
+
         post :create, ambassador_task: ambassador_task
+
         expect(response).to redirect_to(admin_ambassador_tasks_url)
         expect(flash).to_not be_present
+        expect(AmbassadorTask.count).to eq(1)
       end
     end
 
     describe "#update" do
       it "updates the given ambassador task" do
         ambassador_task = FactoryBot.create(:ambassador_task, description: "old text")
-        patch :update, id: ambassador_task.id, ambassador_task: { description: "new text" }
+
+        patch :update,
+              id: ambassador_task.id,
+              ambassador_task: { description: "new text" }
+
         expect(response).to redirect_to(admin_ambassador_tasks_url)
         expect(flash).to_not be_present
+        expect(AmbassadorTask.first.description).to eq("new text")
       end
     end
 
