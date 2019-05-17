@@ -8,8 +8,9 @@ class AmbassadorTask < ActiveRecord::Base
     Kramdown::Document.new(description).to_html
   end
 
+  # Assign the receiver to the given Ambassador
+  # Return the AmbassadorTaskAssignment instance
   def assign_to(user)
-    return unless user.ambassador?
     ambassador_task_assignments.create(user: user)
   end
 
