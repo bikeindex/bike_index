@@ -1,4 +1,5 @@
 require "spec_helper"
+
 describe Membership do
   describe "validations" do
     it { is_expected.to belong_to :organization }

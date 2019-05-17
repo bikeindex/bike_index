@@ -17,7 +17,6 @@ class Admin::AmbassadorTasksController < Admin::BaseController
     @ambassador_task = AmbassadorTask.new(ambassador_task_params)
 
     if @ambassador_task.save
-      @ambassador_task.ensure_assigned_to_all_ambassadors!
       redirect_to admin_ambassador_tasks_url
     else
       flash.now[:error] = @ambassador_task.errors.full_messages.join("\n")

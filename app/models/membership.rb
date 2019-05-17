@@ -11,6 +11,7 @@ class Membership < ActiveRecord::Base
   validates_presence_of :user, message: "We're sorry, that user hasn't yet signed up for Bike Index. Please ask them to before adding them to your organization"
 
   after_commit :update_relationships
+  after_create :assign_ambassador_tasks!
 
   scope :ambassador_organizations, -> { where(organization: Organization.ambassador) }
 

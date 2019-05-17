@@ -4,6 +4,8 @@ class AmbassadorTask < ActiveRecord::Base
 
   validates :title, presence: true, uniqueness: true
 
+  after_create :ensure_assigned_to_all_ambassadors!
+
   def description_html
     Kramdown::Document.new(description).to_html
   end
@@ -16,8 +18,8 @@ class AmbassadorTask < ActiveRecord::Base
 
   # Assigns the task to all ambassadors, if not already assigned
   def ensure_assigned_to_all_ambassadors!
-    User.ambassadors.find_each do |ambassador|
-      next if AmbassadorTaskAssignment.exists?(ambassador_task: self, user: ambassador)
+    Ambassador.find_each do |ambassador|
+      next if ambassador_task_assignments.exists?(user: ambassador)
       assign_to(ambassador)
     end
   end

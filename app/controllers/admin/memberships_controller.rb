@@ -44,7 +44,6 @@ class Admin::MembershipsController < Admin::BaseController
                                  organization_id: params[:membership][:organization_id],
                                  role: params[:membership][:role])
     if @membership.save
-      @membership.assign_ambassador_tasks!
       flash[:success] = "Membership Created!"
       redirect_to admin_membership_url(@membership)
     else
