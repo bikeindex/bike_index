@@ -115,7 +115,7 @@ describe Organized::ManageController, type: :controller do
           expect(flash[:success]).to be_present
           organization.reload
           # Ensure we can update what we think we can
-          (permitted_update_keys - [:website, :embedable_user_email, :auto_user_id]).each do |key|
+          (permitted_update_keys - [:website, :embedable_user_email, :auto_user_id, :kind]).each do |key|
             expect(organization.send(key)).to eq(update_attributes[key])
           end
           # Test that the website and auto_user_id are set correctly
