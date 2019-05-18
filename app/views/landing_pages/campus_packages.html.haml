@@ -21,74 +21,6 @@
     { free: false, supporting: false, small: false, medium: false, large: true, title: "Avery formatted XLS export for mailing stickers" },
   ]
 
-- packages_price_list = capture_haml do
-  %li
-    %h4
-      Free
-    %section
-      %h5
-        &nbsp;
-      %h3
-        Free
-      %p
-        Forever
-      %a.btn.btn-primary{ href: new_organization_path }
-        Sign Up Now
-
-  %li
-    %h4
-      Supporting School
-    %section
-      %h5
-        Keep us peddling
-      %h3
-        <span>$</span>#{number_with_delimiter(plan_costs[:supporting])}
-      %p
-        \/Annually
-      %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "supporting" }
-        Try For Free
-
-  %li
-    %h4
-      Small Campus
-    %section
-      %h5
-        0-10k Members
-      %h3
-        <span>$</span>#{number_with_delimiter(plan_costs[:small])}
-      %p
-        \/Annually
-      %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "small" }
-        Try For Free
-
-  %li
-    %h4
-      Medium Campus
-    %section
-      %h5
-        10k-20k Members
-      %h3
-        <span>$</span>#{number_with_delimiter(plan_costs[:medium])}
-      %p
-        \/Annually
-      %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "medium" }
-        Try For Free
-
-  %li
-    %h4
-      Large Campus
-    %section
-      %h5
-        20k+ Members
-      %h3
-        <span>$</span>#{number_with_delimiter(plan_costs[:large])}
-      %p
-        \/Annually
-      %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
-        Try For Free
-
-
-/ And now, for the actual page ;)
 .signup-landing-page.signup-landing-page-campus-packages
   %header.banner-header
     .container
@@ -100,7 +32,70 @@
           %br
           All plans come with a 30-day free trial
       %ul.campus-packages-price-list
-        = packages_price_list
+        %li
+          %h4
+            Free
+          %section
+            %h5
+              &nbsp;
+            %h3
+              Free
+            %p
+              Forever
+            %a.btn.btn-primary{ href: new_organization_path }
+              Sign Up Now
+
+        %li
+          %h4
+            Supporting School
+          %section
+            %h5
+              Keep us peddling
+            %h3
+              <span>$</span>#{number_with_delimiter(plan_costs[:supporting])}
+            %p
+              \/Annually
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "supporting" }
+              Try For Free
+
+        %li
+          %h4
+            Small Campus
+          %section
+            %h5
+              0-10k Members
+            %h3
+              <span>$</span>#{number_with_delimiter(plan_costs[:small])}
+            %p
+              \/Annually
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "small" }
+              Try For Free
+
+        %li
+          %h4
+            Medium Campus
+          %section
+            %h5
+              10k-20k Members
+            %h3
+              <span>$</span>#{number_with_delimiter(plan_costs[:medium])}
+            %p
+              \/Annually
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "medium" }
+              Try For Free
+
+        %li
+          %h4
+            Large Campus
+          %section
+            %h5
+              20k+ Members
+            %h3
+              <span>$</span>#{number_with_delimiter(plan_costs[:large])}
+            %p
+              \/Annually
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
+              Try For Free
   .container.main-compare-packages-container
     %h2
       Compare Plans and Features
@@ -175,9 +170,79 @@
                         &#8226;
                     - else
                       &mdash;
-    %ul.campus-packages-price-list-small-screens
-      = packages_price_list
 
+
+    %ul.campus-packages-price-list-small-screens
+      %li
+        %h4
+          Free
+        %section
+          %h5
+            &nbsp;
+          %h3
+            Free
+          %p
+            Forever
+          %a.btn.btn-primary{ href: new_organization_path }
+            Sign Up Now
+        = render partial: "package_features", locals: { plan_features: plan_features, plan: :free }
+
+      %li
+        %h4
+          Supporting School
+        %section
+          %h5
+            Keep us peddling
+          %h3
+            <span>$</span>#{number_with_delimiter(plan_costs[:supporting])}
+          %p
+            USD/Annually
+          %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "supporting" }
+            Try For Free
+
+        = render partial: "package_features", locals: { plan_features: plan_features, plan: :supporting }
+
+      %li
+        %h4
+          Small Campus
+        %section
+          %h5
+            0-10k Members
+          %h3
+            <span>$</span>#{number_with_delimiter(plan_costs[:small])}
+          %p
+            USD/Annually
+          %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "small" }
+            Try For Free
+        = render partial: "package_features", locals: { plan_features: plan_features, plan: :small }
+
+      %li
+        %h4
+          Medium Campus
+        %section
+          %h5
+            10k-20k Members
+          %h3
+            <span>$</span>#{number_with_delimiter(plan_costs[:medium])}
+          %p
+            USD/Annually
+          %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "medium" }
+            Try For Free
+        = render partial: "package_features", locals: { plan_features: plan_features, plan: :medium }
+
+      %li
+        %h4
+          Large Campus
+        %section
+          %h5
+            20k+ Members
+          %h3
+            <span>$</span>#{number_with_delimiter(plan_costs[:large])}
+          %p
+            USD/Annually
+          %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
+            Try For Free
+        = render partial: "package_features", locals: { plan_features: plan_features, plan: :large }
 
     %p.mt-4
       %em.less-strong

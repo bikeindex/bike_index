@@ -68,6 +68,74 @@ $compare-packages-blue: rgb(19, 71, 106);
   }
 }
 
+.campus-packages-price-list-small-screens {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+  & > li {
+    display: block;
+    text-align: center;
+    border: 1px solid #979797;
+    margin: $vertical-height 0;
+    padding: $vertical-height;
+    h4,
+    h3,
+    p {
+      margin: 0;
+    }
+  }
+  h5 {
+    color: $gray-light;
+    font-style: italic;
+  }
+  h4 {
+    text-transform: none;
+    margin: 0;
+    font-size: 17px;
+  }
+  .btn-primary,
+  .btn {
+    margin-top: 2 * $vertical-height;
+  }
+  h3 {
+    color: $compare-packages-blue;
+    font-size: 50px;
+    text-align: center;
+    line-height: 1;
+    margin: 0;
+    span {
+      font-size: 75%;
+    }
+  }
+  p {
+    font-style: italic;
+    opacity: 0.9;
+    margin: $vertical-height 0;
+    line-height: 1.5;
+  }
+  .plan-features ul {
+    list-style-type: disc;
+    text-align: left;
+  }
+  .showPlanFeatures {
+    span {
+      margin: 6px 0;
+      width: 100%;
+      text-align: center;
+      display: block;
+    }
+    .uncollapsed {
+      display: none;
+    }
+    &.collapsed .incollapsed {
+      display: none;
+    }
+    &.collapsed .uncollapsed {
+      display: block;
+    }
+  }
+}
+
 // Large screen styles
 @media (min-width: $grid-breakpoint-lg) {
   .signup-landing-page-campus-packages {
@@ -90,9 +158,6 @@ $compare-packages-blue: rgb(19, 71, 106);
       text-align: center;
       flex-align: center;
       justify-content: space-between;
-      .plan-features {
-        display: none;
-      }
       li {
         // Make it a flex column
         width: 100%;
