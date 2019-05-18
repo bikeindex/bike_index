@@ -7,18 +7,18 @@
     { free: true, supporting: true, small: true, medium: true, large: true, title: "Supporting our nonprofit" },
     { free: true, supporting: true, small: true, medium: true, large: true, title: "Create organization account and contact registrants" },
     { free: true, supporting: true, small: true, medium: true, large: true, title: "Embed a basic registration form on your website" },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "Search bikes in organization account" },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "Import CSV file of registrations from former system" },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "Staff accounts" },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "Branded registration landing page" },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "QR sticker scanning and messaging" },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "Ongoing programming, hosting, and support" },
+    { free: false, supporting: true, small: true, medium: true, large: true, title: "Search bikes in organization account" },
+    { free: false, supporting: true, small: true, medium: true, large: true, title: "Import CSV file of registrations from former system" },
+    { free: "10", supporting: "10", small: "10", medium: "unlimited", large: "unlimited", title: "Staff accounts" },
+    { free: false, supporting: false, small: true, medium: true, large: true, title: "Branded registration landing page" },
+    { free: false, supporting: false, small: true, medium: true, large: true, title: "QR sticker scanning and messaging" },
+    { free: false, supporting: false, small: true, medium: true, large: true, title: "Ongoing programming, hosting, and support" },
     { free: false, supporting: false, small: false, medium: true, large: true, title: "Contact registrants who have not finished registration" },
     { free: false, supporting: false, small: false, medium: true, large: true, title: "Add logos and text to Bike Index emails " },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "Export data into CSV/XLSX file" },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "Add specific form fields to your landing page" },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "Automated migration of graduated bikes out of system" },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "Avery formatted XLS export for mailing stickers" },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "Export custom data into CSV/XLSX files" },
+    { free: false, supporting: false, small: false, medium: false, large: true, title: "Add specific form fields to your landing page" },
+    { free: false, supporting: false, small: false, medium: false, large: true, title: "Automated migration of graduated bikes out of system" },
+    { free: false, supporting: false, small: false, medium: false, large: true, title: "Avery formatted XLS export for mailing stickers" },
   ]
 
 .signup-landing-page.signup-landing-page-campus-packages
@@ -162,20 +162,23 @@
             %td
               = feature[:title]
             - plan_sizes.each do |size|
-              - if feature[size].is_a?(String)
-                %td
-                  feature[size]
-              - else
-                %td.table-cell-check
-                  - if feature[size]
-                    %span.included-feature
-                      &#8226;
-                  - else
-                    &mdash;
+              %td
+                - if feature[size].is_a?(String)
+                  = feature[size]
+                - else
+                  %span.feature-boolean
+                    - if feature[size]
+                      %span.included-feature
+                        &#8226;
+                    - else
+                      &mdash;
 
     %p.mt-4
       %em.less-strong
-        A la carte features and custom development available. Get in touch to find out more
+        A la carte features and custom development available.
+        %a.tryPaidButton{ href: "#" }
+          Get in touch
+        to find out more
 
   .contact-us-callout-wrapper
     .contact-us-callout
@@ -186,17 +189,20 @@
   = form_for @feedback, html: { class: 'organized-form' } do |f|
     .modal-body
       .form-group
-        - package_opts = %w[supporting small medium large].map { |s| ["#{s.titleize} package", s] }
-        = select(:signup, :package, package_opts, { prompt: "Choose a package size" }, { class: "form-control" })
+        - package_opts = %w[free supporting small medium large].map { |s| ["#{s.titleize} package", s] }
+        = f.select(:body, package_opts, { prompt: "Choose a package size" }, { class: "form-control", required: true })
       .form-group
-        = f.label :email, class: 'form-label'
-        = f.text_field :email, value: current_user&.email, class: 'form-control'
+        = f.label :email, class: "form-label"
+        = f.text_field :email, value: current_user&.email, class: "form-control"
       .form-group
         = f.label :name, "#{landing_page_target.titleize} name", class: "form-label"
         = f.text_field :name, required: true, class: "form-control"
+      .form-group.noplan
+        = f.label :additional, "Any additional notes", class: "form-label"
+        = f.text_area :additional, placeholder: "Additional notes", class: "form-control", rows: 2
 
       = f.hidden_field :feedback_type, value: "lead_for_#{landing_page_target}"
 
-      = f.submit "Sign up", class: 'btn btn-primary btn-lg'
+      = f.submit "Sign up", class: "btn btn-primary btn-lg"
 
-= render partial: '/shared/modal', locals: { title: "Contact us for a free trial", id: "organizationSignupModal", modal_body: modal_body }
+= render partial: '/shared/modal', locals: { title: "Contact us for a free trial", id: "organizationSignupModal", modal_body: modal_body, start_open: @page_errors }

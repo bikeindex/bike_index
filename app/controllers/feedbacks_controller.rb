@@ -13,7 +13,11 @@ class FeedbacksController < ApplicationController
     @feedback = Feedback.new(permitted_parameters)
     @feedback.user_id = current_user.id if current_user.present?
     if @feedback.save
-      flash[:success] = "Thanks for your message!"
+      if @feedback.lead?
+        flash[:success] = "Thank you! We'll contact you soon."
+      else
+        flash[:success] = "Thanks for your message!"
+      end
       if request.env["HTTP_REFERER"].present? and request.env["HTTP_REFERER"] != request.env["REQUEST_URI"]
         redirect_to :back
       else
@@ -25,6 +29,7 @@ class FeedbacksController < ApplicationController
       template = "#{re_path[:controller]}/#{re_path[:action]}"
       @force_landing_page_render = re_path[:controller] == "landing_pages"
       @recovery_displays = RecoveryDisplay.limit(5) if template == "welcome/index"
+      @page_id = [re_path[:controller], re_path[:action]].join("_")
       render template: template
     end
   end

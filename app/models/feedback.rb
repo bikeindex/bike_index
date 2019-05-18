@@ -34,8 +34,10 @@ class Feedback < ActiveRecord::Base
     self.email ||= user.email
   end
 
+  def lead?; feedback_type && feedback_type =~ /lead_for_/ end
+
   def lead_type
-    return nil unless feedback_type && feedback_type =~ /lead_for_/
+    return nil unless lead?
     feedback_type.gsub(/lead_for_/, "").humanize
   end
 end

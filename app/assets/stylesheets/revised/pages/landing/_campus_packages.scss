@@ -48,13 +48,17 @@ $compare-packages-blue: rgb(19, 71, 106);
     margin-top: 4 * $vertical-height;
   }
   table.compare-packages-table {
-    tbody td {
+    td {
       vertical-align: middle;
-    }
-    .table-cell-check {
-      font-family: Courier;
       text-align: center;
+    }
+    tr td:first-child {
+      text-align: left;
+    }
+    .feature-boolean {
+      font-family: Courier;
       font-weight: bold;
+      text-align: center;
       font-size: 30px;
       color: $gray-light;
       .included-feature {
