@@ -60,6 +60,7 @@ class User < ActiveRecord::Base
   validates_uniqueness_of :email, case_sensitive: false
 
   before_validation :normalize_attributes
+  validate :ensure_unique_email
   before_create :generate_username_confirmation_and_auth
   after_create :perform_create_jobs
   before_save :set_calculated_attributes
@@ -105,8 +106,6 @@ class User < ActiveRecord::Base
   def secondary_emails
     user_emails.where.not(email: email).pluck(:email)
   end
-
-  validate :ensure_unique_email
 
   def ensure_unique_email
     return true unless self.class.fuzzy_confirmed_or_unconfirmed_email_find(email)

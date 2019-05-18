@@ -64,6 +64,7 @@ describe FeedbacksController do
                           feedback_type: "lead_for_school",
                           email: "example@example.com",
                           body: "ffff",
+                          package_size: "small",
                         }
         end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(1)
         expect(response).to redirect_to "http://localhost:3000/partyyyyy"
@@ -72,16 +73,17 @@ describe FeedbacksController do
         expect(feedback.title).to eq "New School lead: Cool School"
         expect(feedback.email).to eq "example@example.com"
         expect(feedback.body).to eq "ffff"
+        expect(feedback.feedback_hash[:package_size]).to eq "small"
       end
     end
 
     context "feedback with additional" do
-      it "creates a feedback message" do
+      it "does not create a feedback message" do
+        request.env["HTTP_REFERER"] = for_schools_url
         expect do
           post :create, feedback: feedback_attrs.merge(additional: "stuff")
-        end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(0)
+        end.to_not change(EmailFeedbackNotificationWorker.jobs, :count)
         expect(flash[:error]).to match(/sign in/i)
-        expect(response).to redirect_to feedbacks_path(anchor: "contact_us_section")
       end
     end
 

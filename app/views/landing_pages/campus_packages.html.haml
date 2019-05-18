@@ -1,0 +1,279 @@
+- landing_page_target = "school"
+
+:ruby
+  plan_sizes = %i[free supporting small medium large]
+  plan_costs = { free: 0, supporting: 299, small: 3999, medium: 5999, large: 8999 }
+  plan_features = [
+    { free: true, supporting: true, small: true, medium: true, large: true, title: "Supporting our nonprofit" },
+    { free: true, supporting: true, small: true, medium: true, large: true, title: "Create organization account and contact registrants" },
+    { free: true, supporting: true, small: true, medium: true, large: true, title: "Embed a basic registration form on your website" },
+    { free: false, supporting: true, small: true, medium: true, large: true, title: "Search bikes in organization account" },
+    { free: false, supporting: true, small: true, medium: true, large: true, title: "Import CSV file of registrations from former system" },
+    { free: "10", supporting: "10", small: "10", medium: "unlimited", large: "unlimited", title: "Staff accounts" },
+    { free: false, supporting: false, small: true, medium: true, large: true, title: "Branded registration landing page" },
+    { free: false, supporting: false, small: true, medium: true, large: true, title: "QR sticker scanning and messaging" },
+    { free: false, supporting: false, small: true, medium: true, large: true, title: "Ongoing programming, hosting, and support" },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "Contact registrants who have not finished registration" },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "Add logos and text to Bike Index emails " },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "Export custom data into CSV/XLSX files" },
+    { free: false, supporting: false, small: false, medium: false, large: true, title: "Add specific form fields to your landing page" },
+    { free: false, supporting: false, small: false, medium: false, large: true, title: "Automated migration of graduated bikes out of system" },
+    { free: false, supporting: false, small: false, medium: false, large: true, title: "Avery formatted XLS export for mailing stickers" },
+  ]
+
+.signup-landing-page.signup-landing-page-campus-packages
+  %header.banner-header
+    .container
+      .campus-packages-main-title
+        %h1
+          Bike Index for Colleges & Universities
+        %h2
+          Clean up your Campus' messy registry.
+          %br
+          All plans come with a 30-day free trial
+      %ul.campus-packages-price-list
+        %li
+          %h4
+            Free
+          %section
+            %h5
+              &nbsp;
+            %h3
+              Free
+            %p
+              Forever
+            %a.btn.btn-primary{ href: new_organization_path }
+              Sign Up Now
+
+        %li
+          %h4
+            Supporting School
+          %section
+            %h5
+              Keep us peddling
+            %h3
+              <span>$</span>#{number_with_delimiter(plan_costs[:supporting])}
+            %p
+              \/Annually
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "supporting" }
+              Try For Free
+
+        %li
+          %h4
+            Small Campus
+          %section
+            %h5
+              0-10k Members
+            %h3
+              <span>$</span>#{number_with_delimiter(plan_costs[:small])}
+            %p
+              \/Annually
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "small" }
+              Try For Free
+
+        %li
+          %h4
+            Medium Campus
+          %section
+            %h5
+              10k-20k Members
+            %h3
+              <span>$</span>#{number_with_delimiter(plan_costs[:medium])}
+            %p
+              \/Annually
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "medium" }
+              Try For Free
+
+        %li
+          %h4
+            Large Campus
+          %section
+            %h5
+              20k+ Members
+            %h3
+              <span>$</span>#{number_with_delimiter(plan_costs[:large])}
+            %p
+              \/Annually
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
+              Try For Free
+  .container.main-compare-packages-container
+    %h2
+      Compare Plans and Features
+    %table.table.compare-packages-table.table-striped
+      %thead
+        %tr
+          %th
+          %th
+            %h4
+              Free
+            %h3
+              $0
+            %p
+              Forever
+            %a.btn.btn-primary{ href: new_organization_path }
+              Sign Up Now
+
+          %th
+            %h4
+              Supporting School
+            %h3
+              $#{number_with_delimiter(plan_costs[:supporting])}
+            %p
+              (USD/annually)
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "supporting" }
+              Try For Free
+
+          %th
+            %h4
+              Small Campus
+            %h3
+              $#{number_with_delimiter(plan_costs[:small])}
+            %p
+              (USD/annually)
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "small" }
+              Try For Free
+
+          %th.most-popular-option
+            .most-popular-note
+              Most Popular
+            %h4
+              Medium Campus
+            %h3
+              $#{number_with_delimiter(plan_costs[:medium])}
+            %p
+              (USD/annually)
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "medium" }
+              Try For Free
+
+          %th
+            %h4
+              Large Campus
+            %h3
+              $#{number_with_delimiter(plan_costs[:large])}
+            %p
+              (USD/annually)
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
+              Try For Free
+      %tbody
+        - plan_features.each do |feature|
+          %tr
+            %td
+              = feature[:title]
+            - plan_sizes.each do |size|
+              %td
+                - if feature[size].is_a?(String)
+                  = feature[size]
+                - else
+                  %span.feature-boolean
+                    - if feature[size]
+                      %span.included-feature
+                        &#8226;
+                    - else
+                      &mdash;
+
+
+    %ul.campus-packages-price-list-small-screens
+      %li
+        %section
+          %h3
+            Free
+          %p
+            Forever
+          %a.btn.btn-primary{ href: new_organization_path }
+            Sign Up Now
+        = render partial: "package_features", locals: { plan_features: plan_features, plan: :free }
+
+      %li
+        %h4
+          Supporting School
+        %section
+          %h5
+            Keep us peddling
+          %h3
+            <span>$</span>#{number_with_delimiter(plan_costs[:supporting])}
+          %p
+            USD/Annually
+          %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "supporting" }
+            Try For Free
+
+        = render partial: "package_features", locals: { plan_features: plan_features, plan: :supporting }
+
+      %li
+        %h4
+          Small Campus
+        %section
+          %h5
+            0-10k Members
+          %h3
+            <span>$</span>#{number_with_delimiter(plan_costs[:small])}
+          %p
+            USD/Annually
+          %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "small" }
+            Try For Free
+        = render partial: "package_features", locals: { plan_features: plan_features, plan: :small }
+
+      %li
+        %h4
+          Medium Campus
+        %section
+          %h5
+            10k-20k Members
+          %h3
+            <span>$</span>#{number_with_delimiter(plan_costs[:medium])}
+          %p
+            USD/Annually
+          %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "medium" }
+            Try For Free
+        = render partial: "package_features", locals: { plan_features: plan_features, plan: :medium }
+
+      %li
+        %h4
+          Large Campus
+        %section
+          %h5
+            20k+ Members
+          %h3
+            <span>$</span>#{number_with_delimiter(plan_costs[:large])}
+          %p
+            USD/Annually
+          %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
+            Try For Free
+        = render partial: "package_features", locals: { plan_features: plan_features, plan: :large }
+
+    %p.mt-4
+      %em.less-strong
+        A la carte features and custom development available.
+        %a.tryPaidButton{ href: "#" }
+          Get in touch
+        to find out more
+
+  .contact-us-callout-wrapper
+    .contact-us-callout
+      Questions? Want to get started?
+      = link_to "Contact us", "#", class: "btn btn-primary tryPaidButton"
+
+- modal_body = capture_haml do
+  = form_for @feedback, html: { class: 'organized-form' } do |f|
+    .modal-body
+      .form-group
+        - package_opts = %w[free supporting small medium large].map { |s| ["#{s.titleize} package", s] }
+        = f.select(:package_size, package_opts, { prompt: "Choose a package size" }, { class: "form-control" })
+      .form-group
+        = f.label :email, class: "form-label"
+        = f.email_field :email, value: current_user&.email, required: true, class: "form-control"
+      .form-group
+        = f.label :name, "#{landing_page_target.titleize} name", class: "form-label"
+        = f.text_field :name, required: true, class: "form-control"
+      .form-group.additional-field
+        = f.label :additional, "Additional", class: "form-label"
+        = f.text_area :additional, class: "form-control"
+      - if @feedback.errors.present?
+        .form-group.additional-field
+          = f.text_area :body,  class: "form-control", rows: 2, required: true
+      - else
+        = f.hidden_field :body
+      = f.hidden_field :feedback_type, value: "lead_for_#{landing_page_target}"
+
+      = f.submit "Sign up", class: "btn btn-primary btn-lg"
+
+= render partial: '/shared/modal', locals: { title: "Contact us for a free trial", id: "organizationSignupModal", modal_body: modal_body, start_open: @page_errors }

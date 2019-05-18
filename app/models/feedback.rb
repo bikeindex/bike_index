@@ -2,8 +2,8 @@ class Feedback < ActiveRecord::Base
   validates_presence_of :body, :email, :title
   serialize :feedback_hash
   belongs_to :user
-  before_validation :generate_title, :set_user_attrs
-  attr_accessor :additional # spam block attribute
+  before_validation :set_calculated_attributes
+  attr_accessor :additional, :package_size
 
   after_create :notify_admins
 
@@ -23,6 +23,22 @@ class Feedback < ActiveRecord::Base
     feedback_hash && feedback_hash[:bike_id] && Bike.unscoped.find(feedback_hash[:bike_id])
   end
 
+  def package_size=(val)
+    self.feedback_hash = (feedback_hash || {}).merge(package_size: val)
+  end
+
+  def set_calculated_attributes
+    generate_title
+    set_user_attrs
+    self.body ||= "lead" if lead?
+  end
+
+  def looks_like_spam?
+    return false if user.present?
+    # We're permitting unsigned in users to send messages for leads, if they try to send additional
+    additional.present?
+  end
+
   def generate_title
     return true if title.present? || lead_type.blank?
     self.title = "New #{lead_type} lead: #{name}"
@@ -34,8 +50,10 @@ class Feedback < ActiveRecord::Base
     self.email ||= user.email
   end
 
+  def lead?; feedback_type && feedback_type =~ /lead_for_/ end
+
   def lead_type
-    return nil unless feedback_type && feedback_type =~ /lead_for_/
+    return nil unless lead?
     feedback_type.gsub(/lead_for_/, "").humanize
   end
 end

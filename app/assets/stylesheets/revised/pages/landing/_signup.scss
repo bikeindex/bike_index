@@ -7,10 +7,14 @@
   .primary-footer {
     margin-top: 0;
   }
+  // This is our minimal spam block thing
+  .form-group.additional-field {
+    display: none !important;
+  }
 }
 
 $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
-  "ambassadors-how-to", "ambassadors-current";
+  "ambassadors-how-to", "ambassadors-current", "campus-packages";
 
 @each $target in $landing-page-targets {
   .signup-landing-page-#{$target} {
@@ -230,10 +234,6 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
       padding: (2.5 * $vertical-height) $contact-us-gutter;
       background: $gray-darker;
       border-radius: $border-radius;
-    }
-
-    .form-group.additional-field {
-      display: none !important;
     }
 
     header {
