@@ -1,5 +1,24 @@
 - landing_page_target = "school"
 
+:ruby
+  plan_features = [
+    { title: "Supporting our nonprofit", free: true, supporting: true, small: true, medium: true, large: true },
+    { title: "Create organization account and contact registrants", free: true, supporting: true, small: true, medium: true, large: true },
+    { title: "Embed a basic registration form on your website", free: true, supporting: true, small: true, medium: true, large: true },
+    { title: "Search bikes in organization account", free: false, supporting: false, small: false, medium: true, large: true },
+    { title: "Import CSV file of registrations from former system", free: false, supporting: false, small: false, medium: true, large: true },
+    { title: "Staff accounts", free: false, supporting: false, small: false, medium: true, large: true },
+    { title: "Branded registration landing page", free: false, supporting: false, small: false, medium: true, large: true },
+    { title: "QR sticker scanning and messaging", free: false, supporting: false, small: false, medium: true, large: true },
+    { title: "Ongoing programming, hosting, and support", free: false, supporting: false, small: false, medium: true, large: true },
+    { title: "Contact registrants who have not finished registration", free: false, supporting: false, small: false, medium: true, large: true },
+    { title: "Add logos and text to Bike Index emails ", free: false, supporting: false, small: false, medium: true, large: true },
+    { title: "Export data into CSV/XLSX file", free: false, supporting: false, small: false, medium: true, large: true },
+    { title: "Add specific form fields to your landing page", free: false, supporting: false, small: false, medium: true, large: true },
+    { title: "Automated migration of graduated bikes out of system", free: false, supporting: false, small: false, medium: true, large: true },
+    { title: "Avery formatted XLS export for mailing stickers", free: false, supporting: false, small: false, medium: true, large: true },
+  ]
+
 .signup-landing-page.signup-landing-page-campus-packages
   %header.banner-header
     .container
@@ -51,31 +70,31 @@
             %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "small" }
               Try For Free
 
-          %li
-            %h4
-              Medium Campus
-            .campus-packages-package
-              %h5
-                10k-20k Members
-              %h3
-                <span>$</span>500
-              %p
-                \/Month
-              %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "medium" }
-                Try For Free
+        %li
+          %h4
+            Medium Campus
+          .campus-packages-package
+            %h5
+              10k-20k Members
+            %h3
+              <span>$</span>500
+            %p
+              \/Month
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "medium" }
+              Try For Free
 
-          %li
-            %h4
-              Large Campus
-            .campus-packages-package
-              %h5
-                20k+ Members
-              %h3
-                <span>$</span>750
-              %p
-                \/Month
-              %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
-                Try For Free
+        %li
+          %h4
+            Large Campus
+          .campus-packages-package
+            %h5
+              20k+ Members
+            %h3
+              <span>$</span>750
+            %p
+              \/Month
+            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
+              Try For Free
   .container.main-compare-packages-container
     %h2
       Compare Plans and Features
@@ -136,61 +155,17 @@
             %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
               Try For Free
       %tbody
-        %tr
-          %td
-            Email&nbsp;Support
-          %td.table-cell-check
-            %span.included-feature
-              &#8226;
-          %td.table-cell-check
-            %span.included-feature
-              &#8226;
-          %td.table-cell-check
-            %span.included-feature
-              &#8226;
-          %td.table-cell-check
-            %span.included-feature
-              &#8226;
-          %td.table-cell-check
-            %span.included-feature
-              &#8226;
-
-        %tr
-          %td
-            Feature description that is extra long
-          %td.table-cell-check
-            %span.included-feature
-              &#8226;
-          %td.table-cell-check
-            %span.included-feature
-              &#8226;
-          %td.table-cell-check
-            %span.included-feature
-              &#8226;
-          %td.table-cell-check
-            %span.included-feature
-              &#8226;
-          %td.table-cell-check
-            %span.included-feature
-              &#8226;
-        %tr
-          %td
-            Email support
-          %td.table-cell-check
-            &mdash;
-          %td.table-cell-check
-            %span.included-feature
-              &#8226;
-          %td.table-cell-check
-            %span.included-feature
-              &#8226;
-          %td.table-cell-check
-            %span.included-feature
-              &#8226;
-          %td.table-cell-check
-            %span.included-feature
-              &#8226;
-
+        - plan_features.each do |feature|
+          %tr
+            %td
+              = feature[:title]
+            - %i[free supporting small medium large].each do |size|
+              %td.table-cell-check
+                - if feature[size]
+                  %span.included-feature
+                    &#8226;
+                - else
+                  &mdash;
 
     %p.mt-4
       %em.less-strong
@@ -198,9 +173,8 @@
 
   .contact-us-callout-wrapper
     .contact-us-callout
-      %p
-        Questions? Want to get started?
-        = link_to "Contact us", "#", class: "btn btn-primary tryPaidButton"
+      Questions? Want to get started?
+      = link_to "Contact us", "#", class: "btn btn-primary tryPaidButton"
 
 - modal_body = capture_haml do
   = form_for @feedback, html: { class: 'organized-form' } do |f|
