@@ -25,7 +25,8 @@ shared_context :logged_in_as_organization_member do
 end
 
 shared_context :logged_in_as_ambassador do
-  let(:user) { FactoryBot.create(:user_ambassador) }
+  let(:user) { FactoryBot.create(:ambassador) }
+  let(:organization) { user.organizations.first }
   before { set_current_user(user) }
 end
 

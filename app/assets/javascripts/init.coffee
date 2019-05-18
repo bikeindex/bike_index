@@ -44,6 +44,7 @@ class BikeIndex.Init extends BikeIndex
       welcome_choose_registration: BikeIndex.ChooseRegistration
       stolen_index: BikeIndex.LegacyStolenIndex
       organized_manage_locations: BikeIndex.OrganizedManageLocations
+      organized_ambassador_dashboard_index: BikeIndex.OrganizedAmbassadorDashboardIndex
       locks_new: BikeIndex.LocksForm
       locks_edit: BikeIndex.LocksForm
       locks_create: BikeIndex.LocksForm

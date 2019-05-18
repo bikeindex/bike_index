@@ -1,4 +1,5 @@
 require "spec_helper"
+
 describe Membership do
   describe "validations" do
     it { is_expected.to belong_to :organization }
@@ -12,7 +13,7 @@ describe Membership do
       FactoryBot.create(:existing_membership)
       ambassador_orgs = FactoryBot.create_list(:membership_ambassador, 3)
       found_orgs = Membership.ambassador_organizations
-      expect(found_orgs).to eq(ambassador_orgs.sort_by(&:created_at))
+      expect(found_orgs.order(:created_at)).to eq(ambassador_orgs.sort_by(&:created_at))
     end
   end
 

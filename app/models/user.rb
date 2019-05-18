@@ -9,6 +9,8 @@ class User < ActiveRecord::Base
 
   mount_uploader :avatar, AvatarUploader
 
+  has_many :ambassador_task_assignments
+  has_many :ambassador_tasks, through: :ambassador_task_assignments
   has_many :payments
   has_many :subscriptions, -> { subscription }, class_name: "Payment"
   has_many :memberships, dependent: :destroy
@@ -37,7 +39,7 @@ class User < ActiveRecord::Base
 
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
-  scope :ambassadors, -> { where(id: Membership.ambassador_organizations.select(:user_id)).order(created_at: :asc) }
+  scope :ambassadors, -> { where(id: Membership.ambassador_organizations.select(:user_id)) }
 
   validates_uniqueness_of :username, case_sensitive: false
 

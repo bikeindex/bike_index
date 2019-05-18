@@ -36,3 +36,9 @@ hr.delete-organization-section {
     // This is effectively min-width for tables
   }
 }
+
+.ambassador-tasks-table {
+  td p {
+    display: inline;
+  }
+}

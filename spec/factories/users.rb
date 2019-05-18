@@ -19,11 +19,6 @@ FactoryBot.define do
       factory :developer do
         developer { true }
       end
-      factory :user_ambassador do
-        after(:create) do |user, _evaluator|
-          FactoryBot.create(:membership_ambassador, user: user)
-        end
-      end
       factory :organized_user do
         # This factory should not be used directly, it's here to wrap organization
         # Use `organization_member` or `organization_admin`
