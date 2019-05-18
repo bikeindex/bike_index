@@ -1,13 +1,10 @@
 %h1= "Ambassador: #{@ambassador.username}"
 
-- if @ambassador.avatar
-  - unless @ambassador.avatar.url(:medium) == 'https://files.bikeindex.org/blank.png'
-    = image_tag @ambassador.avatar.url(:medium), class: 'users-show-avatar'
-
+= @ambassador.avatar
 
 %table.table.table-list
   %tbody
-    - @ambassador_attributes.each_pair do |key, value|
+    - @ambassador.admin_viewable_attribute_listing.each_pair do |key, value|
       %tr
         %td= key
         %td= value
@@ -23,7 +20,7 @@
       %th Task
       %th Completed at
   %tbody
-    - @ambassador.ambassador_task_assignments.order(created_at: :asc).each do |task|
+    - @ambassador.ambassador_task_assignments.each do |task|
       %tr
         %td
           %strong= task.title
