@@ -4,9 +4,6 @@ class BikeIndex.LandingPage extends BikeIndex
       e.preventDefault()
       plan = $(e.target).attr("data-plan")
       this.submitOrganizationPaidPlan(plan)
-    $("#signup_package").on "change", (e) =>
-      console.log $("#signup_package").val()
-      $("#organizationSignupModal #body").val($("#signup_package").val())
 
     if $(window).width() > 767 # bootstrap md breakpoint
       # Instantiate stickyfill with offset of the header-nav
@@ -19,7 +16,5 @@ class BikeIndex.LandingPage extends BikeIndex
     $("#organizationSignupModal").modal("show")
     if plan?
       $("#organizationSignupModal #feedback_body").val(plan)
-      $("#organizationSignupModal .noplan").css("display", "none")
-    else # There is no plan specified
-      $("#organizationSignupModal .noplan").css("display", "block")
+      $("#organizationSignupModal #feedback_package_size").val(plan)
 

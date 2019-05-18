@@ -21,6 +21,74 @@
     { free: false, supporting: false, small: false, medium: false, large: true, title: "Avery formatted XLS export for mailing stickers" },
   ]
 
+- packages_price_list = capture_haml do
+  %li
+    %h4
+      Free
+    %section
+      %h5
+        &nbsp;
+      %h3
+        Free
+      %p
+        Forever
+      %a.btn.btn-primary{ href: new_organization_path }
+        Sign Up Now
+
+  %li
+    %h4
+      Supporting School
+    %section
+      %h5
+        Keep us peddling
+      %h3
+        <span>$</span>#{number_with_delimiter(plan_costs[:supporting])}
+      %p
+        \/Annually
+      %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "supporting" }
+        Try For Free
+
+  %li
+    %h4
+      Small Campus
+    %section
+      %h5
+        0-10k Members
+      %h3
+        <span>$</span>#{number_with_delimiter(plan_costs[:small])}
+      %p
+        \/Annually
+      %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "small" }
+        Try For Free
+
+  %li
+    %h4
+      Medium Campus
+    %section
+      %h5
+        10k-20k Members
+      %h3
+        <span>$</span>#{number_with_delimiter(plan_costs[:medium])}
+      %p
+        \/Annually
+      %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "medium" }
+        Try For Free
+
+  %li
+    %h4
+      Large Campus
+    %section
+      %h5
+        20k+ Members
+      %h3
+        <span>$</span>#{number_with_delimiter(plan_costs[:large])}
+      %p
+        \/Annually
+      %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
+        Try For Free
+
+
+/ And now, for the actual page ;)
 .signup-landing-page.signup-landing-page-campus-packages
   %header.banner-header
     .container
@@ -31,72 +99,8 @@
           Clean up your Campus' messy registry.
           %br
           All plans come with a 30-day free trial
-
       %ul.campus-packages-price-list
-        %li
-          %h4
-            Free Forever
-          .campus-packages-package
-            %h5
-              &nbsp;
-            %h3
-              Free
-            %p
-              Forever
-            %a.btn.btn-primary{ href: new_organization_path }
-              Sign Up Now
-
-        %li
-          %h4
-            Supporting School
-          .campus-packages-package
-            %h5
-              Keep us peddling
-            %h3
-              <span>$</span>#{number_with_delimiter(plan_costs[:supporting])}
-            %p
-              \/Annually
-            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "supporting" }
-              Try For Free
-
-        %li
-          %h4
-            Small Campus
-          .campus-packages-package
-            %h5
-              0-10k Members
-            %h3
-              <span>$</span>#{number_with_delimiter(plan_costs[:small])}
-            %p
-              \/Annually
-            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "small" }
-              Try For Free
-
-        %li
-          %h4
-            Medium Campus
-          .campus-packages-package
-            %h5
-              10k-20k Members
-            %h3
-              <span>$</span>#{number_with_delimiter(plan_costs[:medium])}
-            %p
-              \/Annually
-            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "medium" }
-              Try For Free
-
-        %li
-          %h4
-            Large Campus
-          .campus-packages-package
-            %h5
-              20k+ Members
-            %h3
-              <span>$</span>#{number_with_delimiter(plan_costs[:large])}
-            %p
-              \/Annually
-            %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
-              Try For Free
+        = packages_price_list
   .container.main-compare-packages-container
     %h2
       Compare Plans and Features
@@ -106,14 +110,13 @@
           %th
           %th
             %h4
-              Free Forever
+              Free
             %h3
               $0
             %p
-              (USD/annually)
+              Forever
             %a.btn.btn-primary{ href: new_organization_path }
               Sign Up Now
-
 
           %th
             %h4
@@ -172,6 +175,9 @@
                         &#8226;
                     - else
                       &mdash;
+    %ul.campus-packages-price-list-small-screens
+      = packages_price_list
+
 
     %p.mt-4
       %em.less-strong
@@ -190,17 +196,21 @@
     .modal-body
       .form-group
         - package_opts = %w[free supporting small medium large].map { |s| ["#{s.titleize} package", s] }
-        = f.select(:body, package_opts, { prompt: "Choose a package size" }, { class: "form-control", required: true })
+        = f.select(:package_size, package_opts, { prompt: "Choose a package size" }, { class: "form-control" })
       .form-group
         = f.label :email, class: "form-label"
-        = f.text_field :email, value: current_user&.email, class: "form-control"
+        = f.email_field :email, value: current_user&.email, required: true, class: "form-control"
       .form-group
         = f.label :name, "#{landing_page_target.titleize} name", class: "form-label"
         = f.text_field :name, required: true, class: "form-control"
-      .form-group.noplan
-        = f.label :additional, "Any additional notes", class: "form-label"
-        = f.text_area :additional, placeholder: "Additional notes", class: "form-control", rows: 2
-
+      .form-group.additional-field
+        = f.label :additional, "Additional", class: "form-label"
+        = f.text_area :additional, class: "form-control"
+      - if @feedback.errors.present?
+        .form-group.additional-field
+          = f.text_area :body,  class: "form-control", rows: 2, required: true
+      - else
+        = f.hidden_field :body
       = f.hidden_field :feedback_type, value: "lead_for_#{landing_page_target}"
 
       = f.submit "Sign up", class: "btn btn-primary btn-lg"

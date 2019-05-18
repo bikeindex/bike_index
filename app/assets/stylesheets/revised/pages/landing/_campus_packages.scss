@@ -71,6 +71,9 @@ $compare-packages-blue: rgb(19, 71, 106);
 // Large screen styles
 @media (min-width: $grid-breakpoint-lg) {
   .signup-landing-page-campus-packages {
+    .campus-packages-price-list-small-screens {
+      display: none;
+    }
     .contact-us-callout-wrapper .contact-us-callout {
       float: right;
       margin: 0 0 -4px;
@@ -87,6 +90,9 @@ $compare-packages-blue: rgb(19, 71, 106);
       text-align: center;
       flex-align: center;
       justify-content: space-between;
+      .plan-features {
+        display: none;
+      }
       li {
         // Make it a flex column
         width: 100%;
@@ -128,7 +134,8 @@ $compare-packages-blue: rgb(19, 71, 106);
         margin: $vertical-height 0;
         line-height: 1.5;
       }
-      .campus-packages-package {
+      section {
+        display: block;
         background: #fff;
         border: 2px solid #000;
         padding: $vertical-height $vertical-height 2 * $vertical-height;
