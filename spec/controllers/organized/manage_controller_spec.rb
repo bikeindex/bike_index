@@ -115,7 +115,7 @@ describe Organized::ManageController, type: :controller do
           expect(flash[:success]).to be_present
           organization.reload
           # Ensure we can update what we think we can
-          (permitted_update_keys - [:website, :embedable_user_email, :auto_user_id]).each do |key|
+          (permitted_update_keys - [:website, :embedable_user_email, :auto_user_id, :kind]).each do |key|
             expect(organization.send(key)).to eq(update_attributes[key])
           end
           # Test that the website and auto_user_id are set correctly
@@ -135,7 +135,7 @@ describe Organized::ManageController, type: :controller do
           {
             name: organization.name,
             show_on_map: true,
-            kind: "bike_shop",
+            kind: "ambassador",
             locations_attributes: {
               "0" => {
                 id: location_1.id,
@@ -178,11 +178,13 @@ describe Organized::ManageController, type: :controller do
         end
         context "update" do
           it "updates and adds the locations and shows on map" do
+            expect(organization.kind).to_not eq "ambassador"
             expect do
               put :update, organization_id: organization.to_param, id: organization.to_param, organization: update_attributes
             end.to change(Location, :count).by 1
             organization.reload
             expect(organization.show_on_map).to be_truthy
+            expect(organization.kind).to_not eq "ambassador"
             # Existing location is updated
             location_1.reload
             expect(location_1.organization).to eq organization
@@ -207,12 +209,15 @@ describe Organized::ManageController, type: :controller do
           end
         end
         context "remove" do
-          it "removes the location" do
+          it "removes the location, doesn't change ambassador organization kind" do
+            organization.update_attribute :kind, "ambassador"
             # update_attributes = update_attributes.dup
             update_attributes[:locations_attributes]["0"][:_destroy] = 1
             expect do
-              put :update, organization_id: organization.to_param, id: organization.to_param, organization: update_attributes
+              put :update, organization_id: organization.to_param, id: organization.to_param, organization: update_attributes.merge(kind: "bike_shop")
             end.to change(Location, :count).by 0
+            organization.reload
+            expect(organization.kind).to eq "ambassador"
             expect(Location.where(id: location_1.id).count).to eq 0
           end
         end

@@ -21,13 +21,13 @@
     .col-sm-4
       = f.select :embedable_user_email, @organization.users.pluck(:email), prompt: 'Select email', selected: (@organization.auto_user && @organization.auto_user.email), class: "form-control"
       %span.below-input-help
-        Email address that registrations through #{@organization.name} will be sent from
+        Email address <em>#{@organization.name}</em> bike registrations will be sent from
 
   .form-group.row
     %label.org-form-label
       Organization type
     .col-sm-4
-      - Organization.kinds.each do |kind|
+      - Organization.creatable_kinds.each do |kind|
         .radio
           %label
             = f.radio_button :kind, kind

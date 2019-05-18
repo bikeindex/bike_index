@@ -5,7 +5,7 @@ const environment = process.env.RAILS_ENV;
 
 /* webpacker can't access this exported env */
 const apiKey =
-  environment === "production" ? process.env.HONEYBADGER_API_KEY : "foo";
+  environment === "production" ? process.env.HONEYBADGER_FRONTEND_API_KEY : "foo";
 
 const config = {
   apiKey,
