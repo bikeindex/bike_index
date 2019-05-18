@@ -1,6 +1,7 @@
 - landing_page_target = "school"
 
 :ruby
+  plan_sizes = %i[free supporting small medium large]
   plan_features = [
     { title: "Supporting our nonprofit", free: true, supporting: true, small: true, medium: true, large: true },
     { title: "Create organization account and contact registrants", free: true, supporting: true, small: true, medium: true, large: true },
@@ -159,13 +160,17 @@
           %tr
             %td
               = feature[:title]
-            - %i[free supporting small medium large].each do |size|
-              %td.table-cell-check
-                - if feature[size]
-                  %span.included-feature
-                    &#8226;
-                - else
-                  &mdash;
+            - plan_sizes.each do |size|
+              - if feature[size].is_a?(String)
+                %td
+                  feature[size]
+              - else
+                %td.table-cell-check
+                  - if feature[size]
+                    %span.included-feature
+                      &#8226;
+                  - else
+                    &mdash;
 
     %p.mt-4
       %em.less-strong
