@@ -173,7 +173,7 @@ class Organization < ActiveRecord::Base
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, "")
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
-      orgs = id.present? ? Organization.where("id != ?", id) : Organization.all
+      orgs = id.present? ? Organization.unscoped.where("id != ?", id) : Organization.unscoped.all
       while orgs.where(slug: new_slug).exists?
         i = i.present? ? i + 1 : 2
         new_slug = "#{new_slug}-#{i}"

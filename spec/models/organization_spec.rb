@@ -211,6 +211,22 @@ describe Organization do
       organization.set_calculated_attributes
       expect(organization.slug).to eq("bicycle-shop-2")
     end
+
+    context "deleted things" do
+      it "protects from naming collisions from deleted things, by renaming deleted things" do
+        org1 = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
+        org1.reload
+        org1_id = org1.id
+        expect(org1.short_name).to eq "buckshot"
+        org1.delete
+        org1.reload
+        expect(org1.deleted_at).to be_present
+        expect(org1.slug).to eq "buckshot"
+        org2 = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
+        expect(org1.slug).to eq "buckshot"
+      end
+    end
+
     describe "set_locations_shown" do
       let(:country) { FactoryBot.create(:country) }
       let(:organization) { FactoryBot.create(:organization, show_on_map: true, approved: true) }

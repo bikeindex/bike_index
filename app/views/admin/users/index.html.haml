@@ -3,6 +3,9 @@
     %h1
       Manage
       = link_to "users", admin_users_path
+      - if current_user.developer?
+        %em.less-strong{ style: "font-size: 40%;" }
+          current_user ##{current_user.id}
   .col-auto
     = link_to "Superusers", admin_users_path(superusers: true), class: "btn btn-primary"
 .row

@@ -48,9 +48,15 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:organization).permit(:name, :website, :kind, show_on_map_if_permitted,
+      params.require(:organization).permit(:name, :website, show_on_map_if_permitted, permitted_kind,
                                            :embedable_user_email, paid_attributes,
                                            locations_attributes: permitted_locations_params)
+    end
+
+    def permitted_kind
+      return "ambassador" if @organization.ambassador?
+      new_kind = params.dig(:organization, :kind)
+      Organization.creatable_kinds.include?(new_kind) ? new_kind : @organization.kind
     end
 
     def show_on_map_if_permitted

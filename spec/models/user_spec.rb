@@ -6,11 +6,11 @@ describe User do
       it "returns any and only users who are ambassadors" do
         FactoryBot.create(:user)
         FactoryBot.create(:developer)
-        ambassadors = FactoryBot.create_list(:user_ambassador, 3)
+        ambassadors = FactoryBot.create_list(:ambassador, 3)
 
         found_ambassadors = User.ambassadors
 
-        expect(found_ambassadors).to eq(ambassadors.sort_by(&:created_at))
+        expect(found_ambassadors.pluck(:id).sort).to eq(ambassadors.map(&:id).sort)
       end
     end
 
@@ -47,7 +47,8 @@ describe User do
     it { is_expected.to have_many :sent_stolen_notifications }
     it { is_expected.to have_many :received_stolen_notifications }
     it { is_expected.to validate_presence_of :email }
-    # it { is_expected.to validate_uniqueness_of :email }
+    it { is_expected.to have_many :ambassador_task_assignments }
+    it { is_expected.to have_many(:ambassador_tasks).through(:ambassador_task_assignments) }
   end
 
   describe "create user_email" do
@@ -595,7 +596,7 @@ describe User do
 
   describe "ambassador?" do
     it "returns true if the user has any ambassadorship" do
-      user = FactoryBot.create(:user_ambassador)
+      user = FactoryBot.create(:ambassador)
       user.memberships << FactoryBot.create(:membership, user: user)
       user.save
 

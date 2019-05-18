@@ -1,0 +1,39 @@
+%h1 Ambassadors
+
+%p
+  = link_to "Search for Stolen Bikes", bikes_path, class: "menu-item"
+
+%h2 Tasks
+
+%table.table.table-striped.table-bordered.ambassador-tasks-table
+  %thead.small-header
+    %tr
+      %th Task
+      %th Completed?
+  %tbody#js-task-assignments
+    - @ambassador_task_assignments.each do |task|
+      %tr
+        %td
+          %strong= task.title
+          %br
+          = task.description_html.html_safe
+        %td
+          %input{ "data-update-url"=> organization_ambassador_task_assignment_url(current_organization, task, format: :json),
+                  "data-ambassador-task-assignment-id" => task.id,
+                  type: "checkbox",
+                  checked: (task.completed? ? "checked" : nil) }
+
+%h2 Leaderboard
+
+%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+  %thead.small-header
+    %tr
+      %th Name
+      %th Email
+      %th Progress
+  %tbody
+    - @ambassadors.each do |ambassador|
+      %tr
+        %td= ambassador.name
+        %td= ambassador.email
+        %td= ambassador.progress_count

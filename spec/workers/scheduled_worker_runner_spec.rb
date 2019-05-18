@@ -13,7 +13,7 @@ describe ScheduledWorkerRunner, type: :lib do
   end
 
   it "has correct scheduled workers" do
-    expect(subject.scheduled_workers).to eq scheduled_workers + [subject]
+    expect(subject.scheduled_workers).to eq scheduled_workers + [UpdateOrganizationPosKindWorker, subject]
   end
 
   describe "perform" do
