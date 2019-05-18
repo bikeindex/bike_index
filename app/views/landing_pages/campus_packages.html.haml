@@ -2,22 +2,23 @@
 
 :ruby
   plan_sizes = %i[free supporting small medium large]
+  plan_costs = { free: 0, supporting: 299, small: 3999, medium: 5999, large: 8999 }
   plan_features = [
-    { title: "Supporting our nonprofit", free: true, supporting: true, small: true, medium: true, large: true },
-    { title: "Create organization account and contact registrants", free: true, supporting: true, small: true, medium: true, large: true },
-    { title: "Embed a basic registration form on your website", free: true, supporting: true, small: true, medium: true, large: true },
-    { title: "Search bikes in organization account", free: false, supporting: false, small: false, medium: true, large: true },
-    { title: "Import CSV file of registrations from former system", free: false, supporting: false, small: false, medium: true, large: true },
-    { title: "Staff accounts", free: false, supporting: false, small: false, medium: true, large: true },
-    { title: "Branded registration landing page", free: false, supporting: false, small: false, medium: true, large: true },
-    { title: "QR sticker scanning and messaging", free: false, supporting: false, small: false, medium: true, large: true },
-    { title: "Ongoing programming, hosting, and support", free: false, supporting: false, small: false, medium: true, large: true },
-    { title: "Contact registrants who have not finished registration", free: false, supporting: false, small: false, medium: true, large: true },
-    { title: "Add logos and text to Bike Index emails ", free: false, supporting: false, small: false, medium: true, large: true },
-    { title: "Export data into CSV/XLSX file", free: false, supporting: false, small: false, medium: true, large: true },
-    { title: "Add specific form fields to your landing page", free: false, supporting: false, small: false, medium: true, large: true },
-    { title: "Automated migration of graduated bikes out of system", free: false, supporting: false, small: false, medium: true, large: true },
-    { title: "Avery formatted XLS export for mailing stickers", free: false, supporting: false, small: false, medium: true, large: true },
+    { free: true, supporting: true, small: true, medium: true, large: true, title: "Supporting our nonprofit" },
+    { free: true, supporting: true, small: true, medium: true, large: true, title: "Create organization account and contact registrants" },
+    { free: true, supporting: true, small: true, medium: true, large: true, title: "Embed a basic registration form on your website" },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "Search bikes in organization account" },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "Import CSV file of registrations from former system" },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "Staff accounts" },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "Branded registration landing page" },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "QR sticker scanning and messaging" },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "Ongoing programming, hosting, and support" },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "Contact registrants who have not finished registration" },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "Add logos and text to Bike Index emails " },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "Export data into CSV/XLSX file" },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "Add specific form fields to your landing page" },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "Automated migration of graduated bikes out of system" },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: "Avery formatted XLS export for mailing stickers" },
   ]
 
 .signup-landing-page.signup-landing-page-campus-packages
@@ -39,9 +40,9 @@
             %h5
               &nbsp;
             %h3
-              <span>$</span>0
+              Free
             %p
-              \/Month
+              Forever
             %a.btn.btn-primary{ href: new_organization_path }
               Sign Up Now
 
@@ -52,9 +53,9 @@
             %h5
               Keep us peddling
             %h3
-              <span>$</span>25
+              <span>$</span>#{number_with_delimiter(plan_costs[:supporting])}
             %p
-              \/Month
+              \/Annually
             %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "supporting" }
               Try For Free
 
@@ -65,9 +66,9 @@
             %h5
               0-10k Members
             %h3
-              <span>$</span>330
+              <span>$</span>#{number_with_delimiter(plan_costs[:small])}
             %p
-              \/Month
+              \/Annually
             %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "small" }
               Try For Free
 
@@ -78,9 +79,9 @@
             %h5
               10k-20k Members
             %h3
-              <span>$</span>500
+              <span>$</span>#{number_with_delimiter(plan_costs[:medium])}
             %p
-              \/Month
+              \/Annually
             %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "medium" }
               Try For Free
 
@@ -91,9 +92,9 @@
             %h5
               20k+ Members
             %h3
-              <span>$</span>750
+              <span>$</span>#{number_with_delimiter(plan_costs[:large])}
             %p
-              \/Month
+              \/Annually
             %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
               Try For Free
   .container.main-compare-packages-container
@@ -109,7 +110,7 @@
             %h3
               $0
             %p
-              (USD/Month billed annually)
+              (USD/annually)
             %a.btn.btn-primary{ href: new_organization_path }
               Sign Up Now
 
@@ -118,9 +119,9 @@
             %h4
               Supporting School
             %h3
-              $25
+              $#{number_with_delimiter(plan_costs[:supporting])}
             %p
-              (USD/Month billed annually)
+              (USD/annually)
             %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "supporting" }
               Try For Free
 
@@ -128,9 +129,9 @@
             %h4
               Small Campus
             %h3
-              $330
+              $#{number_with_delimiter(plan_costs[:small])}
             %p
-              (USD/Month billed annually)
+              (USD/annually)
             %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "small" }
               Try For Free
 
@@ -140,9 +141,9 @@
             %h4
               Medium Campus
             %h3
-              $500
+              $#{number_with_delimiter(plan_costs[:medium])}
             %p
-              (USD/Month billed annually)
+              (USD/annually)
             %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "medium" }
               Try For Free
 
@@ -150,9 +151,9 @@
             %h4
               Large Campus
             %h3
-              $750
+              $#{number_with_delimiter(plan_costs[:large])}
             %p
-              (USD/Month billed annually)
+              (USD/annually)
             %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
               Try For Free
       %tbody
@@ -188,12 +189,11 @@
         - package_opts = %w[supporting small medium large].map { |s| ["#{s.titleize} package", s] }
         = select(:signup, :package, package_opts, { prompt: "Choose a package size" }, { class: "form-control" })
       .form-group
+        = f.label :email, class: 'form-label'
+        = f.text_field :email, value: current_user&.email, class: 'form-control'
+      .form-group
         = f.label :name, "#{landing_page_target.titleize} name", class: "form-label"
         = f.text_field :name, required: true, class: "form-control"
-      - unless current_user.present?
-        .form-group
-          = f.label :email, class: 'form-label'
-          = f.text_field :email, class: 'form-control'
 
       = f.hidden_field :feedback_type, value: "lead_for_#{landing_page_target}"
 
