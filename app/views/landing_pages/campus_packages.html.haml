@@ -112,7 +112,7 @@
         = f.label :email, class: "form-label"
         = f.email_field :email, value: current_user&.email, required: true, class: "form-control"
       .form-group
-        = f.label :name, "#{lead_type.titleize} name", class: "form-label"
+        = f.label :name, lead_type.titleize, class: "form-label"
         = f.text_field :name, required: true, class: "form-control"
       .form-group.additional-field
         = f.label :additional, "Additional", class: "form-label"

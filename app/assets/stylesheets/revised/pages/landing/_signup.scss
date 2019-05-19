@@ -14,7 +14,8 @@
 }
 
 $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
-  "ambassadors-how-to", "ambassadors-current", "campus-packages";
+  "ambassadors-how-to", "ambassadors-current", "campus-packages",
+  "cities-packages";
 
 @each $target in $landing-page-targets {
   .signup-landing-page-#{$target} {
