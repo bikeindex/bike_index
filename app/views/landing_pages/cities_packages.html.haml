@@ -26,7 +26,7 @@
     .container
       .campus-packages-main-title
         %h1
-          Bike Index for Colleges & Universities
+          Bike Index for Cities
         %h2
           Clean up your Campus' messy registry.
           %br
@@ -181,7 +181,7 @@
             Forever
           %a.btn.btn-primary{ href: new_organization_path }
             Sign Up Now
-        = render partial: "package_features", locals: { plan_features: plan_features, plan: :free }
+        = render partial: "/landing_pages/package_features", locals: { plan_features: plan_features, plan: :free }
 
       %li
         %h4
@@ -196,7 +196,7 @@
           %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "supporting" }
             Try For Free
 
-        = render partial: "package_features", locals: { plan_features: plan_features, plan: :supporting }
+        = render partial: "/landing_pages/package_features", locals: { plan_features: plan_features, plan: :supporting }
 
       %li
         %h4
@@ -210,7 +210,7 @@
             USD/Annually
           %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "small" }
             Try For Free
-        = render partial: "package_features", locals: { plan_features: plan_features, plan: :small }
+        = render partial: "/landing_pages/package_features", locals: { plan_features: plan_features, plan: :small }
 
       %li
         %h4
@@ -224,7 +224,7 @@
             USD/Annually
           %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "medium" }
             Try For Free
-        = render partial: "package_features", locals: { plan_features: plan_features, plan: :medium }
+        = render partial: "/landing_pages/package_features", locals: { plan_features: plan_features, plan: :medium }
 
       %li
         %h4
@@ -238,7 +238,7 @@
             USD/Annually
           %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => "large" }
             Try For Free
-        = render partial: "package_features", locals: { plan_features: plan_features, plan: :large }
+        = render partial: "/landing_pages/package_features", locals: { plan_features: plan_features, plan: :large }
 
     %p.mt-4
       %em.less-strong
