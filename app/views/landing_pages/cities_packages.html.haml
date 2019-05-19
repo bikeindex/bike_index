@@ -1,40 +1,40 @@
-- lead_type = "school"
+- lead_type = "city"
 
 :ruby
   plans = {
     free: { cost: 0, subhead: nil },
-    supporting: { cost: 299, subhead: "Keep us pedaling" },
-    small: { cost: 3999, subhead: "0-10k Members" },
-    medium: { cost: 5999, subhead: "10k-20k Members", popular: true },
-    large: { cost: 8999, subhead: "20k+ Members" },
+    supporting: { cost: 499, subhead: "Keep us pedaling" },
+    small: { cost: 3999, subhead: "Town" },
+    medium: { cost: 5999, subhead: "Small City", popular: true },
+    large: { cost: 7999, subhead: "Metropolis" },
   }
   plan_sizes = plans.keys
   plan_features = [
-    { free: true, supporting: true, small: true, medium: true, large: true, title: "Supporting our nonprofit" },
     { free: true, supporting: true, small: true, medium: true, large: true, title: "Create organization account and contact registrants" },
-    { free: true, supporting: true, small: true, medium: true, large: true, title: "Embed a basic registration form on your website" },
-    { free: false, supporting: true, small: true, medium: true, large: true, title: "Search bikes in organization account" },
-    { free: false, supporting: true, small: true, medium: true, large: true, title: "Import CSV file of registrations from former system" },
+    { free: true, supporting: true, small: true, medium: true, large: true,  title: "Embed a basic registration form on your website" },
+    { free: false, supporting: true, small: true, medium: true, large: true,  title: "Search bikes in organization account" },
+    { free: false, supporting: true, small: true, medium: true, large: true,  title: "Import CSV file of registrations from former system" },
+    { free: false, supporting: true, small: true, medium: true, large: true,  title: "Social media ad campaign" },
     { free: "10", supporting: "10", small: "10", medium: "unlimited", large: "unlimited", title: "Staff accounts" },
-    { free: false, supporting: false, small: true, medium: true, large: true, title: "Branded registration landing page" },
-    { free: false, supporting: false, small: true, medium: true, large: true, title: "QR sticker scanning and messaging" },
-    { free: false, supporting: false, small: true, medium: true, large: true, title: "Ongoing programming, hosting, and support" },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "Contact registrants who have not finished registration" },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "Add logos and text to Bike Index emails " },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "Export custom data into CSV/XLSX files" },
-    { free: false, supporting: false, small: false, medium: false, large: true, title: "Add specific form fields to your landing page" },
-    { free: false, supporting: false, small: false, medium: false, large: true, title: "Automated migration of graduated bikes out of system" },
-    { free: false, supporting: false, small: false, medium: false, large: true, title: "Avery mailing address formatted XLS export for mailing stickers" },
+    { free: false, supporting: false, small: true, medium: true, large: true,  title: "Branded registration landing page" },
+    { free: false, supporting: false, small: true, medium: true, large: true,  title: "QR sticker scanning and messaging" },
+    { free: false, supporting: false, small: true, medium: true, large: true,  title: "Ongoing programming, hosting, and support" },
+    { free: false, supporting: false, small: false, medium: true, large: true,  title: "Contact registrants who have not finished registration" },
+    { free: false, supporting: false, small: false, medium: true, large: true,  title: "Add logos and text to Bike Index emails " },
+    { free: false, supporting: false, small: false, medium: true, large: true,  title: "Export custom data into CSV/XLSX files" },
+    { free: false, supporting: false, small: false, medium: false, large: true,  title: "Add specific form fields to your landing page" },
+    { free: false, supporting: false, small: false, medium: false, large: true,  title: "Avery mailing address formatted XLS export for mailing stickers" },
+    { free: false, supporting: false, small: false, medium: true, large: true,  title: "Nest multiple organizations in one" },
   ]
 
-.signup-landing-page.signup-landing-page-packages.signup-landing-page-campus-packages
+.signup-landing-page.signup-landing-page-packages.signup-landing-page-cities-packages
   %header.banner-header
     .container
       .packages-main-title
         %h1
-          Bike Index for Colleges & Universities
+          Bike Index for Cities
         %h2
-          Clean up your Campus' messy registry.
+          Give your constituents the bike registry they want
           %br
           All plans come with a 30-day free trial
       %ul.packages-price-list

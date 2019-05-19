@@ -2,7 +2,7 @@ $compare-packages-table-border: rgb(178, 178, 178);
 $compare-packages-blue: rgb(19, 71, 106);
 
 // I think contact-us-callout is going to go on other pages, but scope to just this page for now
-.signup-landing-page-campus-packages {
+.signup-landing-page-packages {
   // Also has styles in the large-screen section
   .contact-us-callout-wrapper {
     position: relative;
@@ -23,14 +23,14 @@ $compare-packages-blue: rgb(19, 71, 106);
 }
 
 // Mike is inconsistent
-.signup-landing-page-campus-packages {
+.signup-landing-page-packages {
   .btn {
     text-transform: none;
     border-radius: 4px;
   }
 }
 
-.signup-landing-page-campus-packages {
+.signup-landing-page-packages {
   .banner-header {
     h1,
     h2 {
@@ -39,8 +39,13 @@ $compare-packages-blue: rgb(19, 71, 106);
       width: 100%;
       text-shadow: 1px 1px 10px rgba(51, 51, 51, 0.7);
     }
+    // We have different breakpoints on this than the other landing pages, so apply this here
+    @include media-breakpoint-down(md) {
+      padding-top: 72px;
+      padding-bottom: 144px;
+    }
   }
-  .campus-packages-price-list,
+  .packages-price-list,
   .compare-packages-table {
     display: none;
   }
@@ -68,7 +73,7 @@ $compare-packages-blue: rgb(19, 71, 106);
   }
 }
 
-.campus-packages-price-list-small-screens {
+.packages-price-list-small-screens {
   list-style-type: none;
   padding: 0;
   margin: 0;
@@ -138,8 +143,8 @@ $compare-packages-blue: rgb(19, 71, 106);
 
 // Large screen styles
 @media (min-width: $grid-breakpoint-lg) {
-  .signup-landing-page-campus-packages {
-    .campus-packages-price-list-small-screens {
+  .signup-landing-page-packages {
+    .packages-price-list-small-screens {
       display: none;
     }
     .contact-us-callout-wrapper .contact-us-callout {
@@ -147,7 +152,7 @@ $compare-packages-blue: rgb(19, 71, 106);
       margin: 0 0 -4px;
       min-width: 30%;
     }
-    .campus-packages-price-list {
+    .packages-price-list {
       list-style-type: none;
       padding: 2 * $vertical-height 0;
       display: -webkit-box;
@@ -282,7 +287,7 @@ $compare-packages-blue: rgb(19, 71, 106);
 
 // Small screens styles
 @media (max-width: $grid-breakpoint-lg - 1px) {
-  .signup-landing-page-campus-packages {
+  .signup-landing-page-packages {
     // On small screens, we need to make sure the image always covers everything
     .banner-header {
       background-size: cover;

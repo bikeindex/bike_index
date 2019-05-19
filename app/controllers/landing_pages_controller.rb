@@ -23,6 +23,8 @@ class LandingPagesController < ApplicationController
 
   def campus_packages; end
 
+  def cities_packages; end
+
   protected
 
   def instantiate_feedback
