@@ -13,28 +13,28 @@
     %li
       Look for local stolen bike groups on Facebook (search "stolen bike {city name} Many of these volunteer groups exist across the globe and can support your recovery efforts.
     %li
-      Tell everyone you know about your stolen bike. Hit all your social networks (Facebook, Instagram, Twitter, etc.) and text/email everyone you know. 
+      Tell everyone you know about your stolen bike. Hit all your social networks (Facebook, Instagram, Twitter, etc.) and text/email everyone you know.
 
   %h2
     What happens next?
 
   %ol
     %li
-      Your local police department will do what it does to help recover your bike. Stay in communication with them. 
+      Your local police department will do what it does to help recover your bike. Stay in communication with them.
     %li
-      Bike Index will broadcast your stolen bike to the local Stolen Bike Twitter handle and spread the word via other social channels. Our stolen bike data is linked to LeadsOnline so if your bike ends up in the 'system' it will get flagged and you will be contacted. Our community will be on the look out on various resale channels. 
+      Bike Index will broadcast your stolen bike to the local Stolen Bike Twitter handle and spread the word via other social channels. Our stolen bike data is linked to LeadsOnline so if your bike ends up in the 'system' it will get flagged and you will be contacted. Our community will be on the look out on various resale channels.
     %li
-      Keep an eye on Craigslist. Set up a specific alert using ifttt.com to flag listing that matches your bike. Track apps such as OfferUp and LetGo as they are frequently used in fencing bikes. 
+      Keep an eye on Craigslist. Set up a specific alert using ifttt.com to flag listing that matches your bike. Track apps such as OfferUp and LetGo as they are frequently used in fencing bikes.
     %li
-      Check out your local flea market for your bike. 
+      Check out your local flea market for your bike.
 
 
   %p
-    We wish you the best of luck in recovering your bicycle. We'd love to add your story to our #{number_with_delimiter recovered_bike_count} recovered bikes. If you wish to support our cause, please consider a #{link_to "donation", support_bike_index_url} or join our #{link_to "ambassador", ambassadors_url} program.
+    We wish you the best of luck in recovering your bicycle. We'd love to add your story to our #{number_with_delimiter Counts.recoveries} recovered bikes. If you wish to support our cause, please consider a #{link_to "donation", support_bike_index_url} or join our #{link_to "ambassador", ambassadors_url} program.
 
   %hr.mt-4.mb-4
 
-  
+
   %section.sbr-get-involved.mt-4.mb-4
     %h2.text-center.mt-4
       Other recovery tools
@@ -51,11 +51,11 @@
                 .alert.alert-error
                   %a.close{"data-dismiss" => "alert"} ×
                   %h4
-                    Please fix the following 
+                    Please fix the following
                     = pluralize(@feedback.errors.count, "error")
                   %ul
                     - @feedback.errors.full_messages.each do |msg|
-                      %li 
+                      %li
                         = msg
             .report-type
               %label
@@ -74,7 +74,7 @@
             .contact-actions.control-group
               = f.email_field :email, placeholder: "Your email address", class: 'form-control'
               = f.submit 'Send alert!', class: 'btn pull-right'
-              
+
       .involve-widget
         %h3.header-font-alt
           List recent stolen bikes on your site with our #{link_to "stolen widget", "https://github.com/bikeindex/stolen_bikes_widget_html"}
