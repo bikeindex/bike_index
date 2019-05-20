@@ -605,7 +605,8 @@ describe BikesController do
           Sidekiq::Testing.inline! do
             test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")))
             expect_any_instance_of(ImageAssociatorWorker).to receive(:perform).and_return(true)
-            post :create, bike: bike_params.merge(image: test_photo)
+            post :create, persist_email: "", bike: bike_params.merge(image: test_photo)
+            expect(assigns[:persist_email]).to be_falsey
             expect(response).to redirect_to(embed_extended_organization_url(organization))
             bike = Bike.last
             expect(bike.owner_email).to eq bike_params[:owner_email].downcase
@@ -624,6 +625,7 @@ describe BikesController do
         it "registers a bike and redirects with persist_email" do
           set_current_user(user2)
           post :create, bike: bike_params.merge(manufacturer_id: "A crazy different thing"), persist_email: true
+          expect(assigns[:persist_email]).to be_truthy
           expect(response).to redirect_to(embed_extended_organization_url(organization, email: "flow@goodtimes.com"))
           bike = Bike.last
           expect(bike.creation_state.origin).to eq "embed_extended"
