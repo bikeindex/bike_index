@@ -5,7 +5,7 @@ class BikeV2Serializer < ActiveModel::Serializer
     :manufacturer_name,
     :frame_model,
     :year,
-    :frame_colors,    
+    :frame_colors,
     :thumb,
     :large_img,
     :is_stock_img,
@@ -13,13 +13,12 @@ class BikeV2Serializer < ActiveModel::Serializer
     :stolen_location,
     :date_stolen,
     :frame_material,
-    :handlebar_type,
-    :cycle_type
+    :handlebar_type
 
   def manufacturer_name
     object.mnfg_name
   end
-  
+
   def title
     object.title_string
   end
@@ -32,9 +31,9 @@ class BikeV2Serializer < ActiveModel::Serializer
     if object.public_images.present?
       object.public_images.first.image_url(:small)
     elsif object.stock_photo_url.present?
-      small = object.stock_photo_url.split('/')
+      small = object.stock_photo_url.split("/")
       ext = "/small_" + small.pop
-      small.join('/') + ext
+      small.join("/") + ext
     end
   end
 
@@ -59,10 +58,6 @@ class BikeV2Serializer < ActiveModel::Serializer
   end
 
   def handlebar_type
-    object.handlebar_type_name
-  end
-  
-  def cycle_type
     object.handlebar_type_name
   end
 end

@@ -1,26 +1,28 @@
-%h1
-  Manage #{link_to "users", admin_users_path}
+.admin-subnav
+  .col-7
+    %h1
+      Manage
+      = link_to "users", admin_users_path
+      - if current_user.developer?
+        %em.less-strong{ style: "font-size: 40%;" }
+          current_user ##{current_user.id}
+  .col-auto
+    = link_to "Superusers", admin_users_path(superusers: true), class: "btn btn-primary"
+.row
+  .col-md-5
+    %h4
+      #{number_with_delimiter(@user_count)} users
+      = params[:user_query].present? ? 'matching query' : 'have signed up'
+  .col-md-7
+    = form_tag admin_users_path, method: :get, class: "form-inline" do
+      .form-group.ml-auto.mr-2.mb-2
+        = text_field_tag :user_query, params[:user_query], placeholder: "Find by name or email", class: "form-control"
+      = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-.special-search-field-container
-  .special-search-field
-    = form_tag admin_users_path, method: :get do
-      = text_field_tag :user_query, params[:user_query], placeholder: "Find by name or email"
-      = submit_tag "Search", name: "search", class: "button-blue"
-
-  %h4
-    #{number_with_delimiter(@user_count)} users
-    = params[:user_query].present? ? 'matching query' : 'have signed up'
-
-.pull-right
-  #{link_to "Superusers", admin_users_path(superusers: true)}|#{link_to "content admins", admin_users_path(content_admins: true)}
 - if @users.present?
-  .paginate-container
-    = paginate @users
-
+  = paginate @users, views_prefix: "admin"
   = render partial: "/admin/users/table"
-
-  .paginate-container
-    = paginate @users
+  = paginate @users, views_prefix: "admin"
 - else
-  %h1.padded
+  %h1.mt-4
     No users found!

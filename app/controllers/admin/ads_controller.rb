@@ -1,6 +1,7 @@
 class Admin::AdsController < Admin::BaseController
   before_filter :find_ad, except: [:index, :new, :create]
   before_filter :find_organizations, only: [:new, :edit]
+  layout "new_admin"
 
   def index
     @ads = Ad.all
@@ -11,7 +12,6 @@ class Admin::AdsController < Admin::BaseController
   end
 
   def edit
-    
   end
 
   def update
@@ -37,7 +37,6 @@ class Admin::AdsController < Admin::BaseController
     end
   end
 
-
   protected
 
   def permitted_parameters
@@ -51,5 +50,4 @@ class Admin::AdsController < Admin::BaseController
   def find_organizations
     @organizations = Organization.all
   end
-
 end

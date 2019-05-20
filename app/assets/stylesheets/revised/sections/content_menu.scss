@@ -1,4 +1,5 @@
 $horizontal-content-menu-padding: $vertical-height;
+
 .primary-content-menu {
   .content-nav-group {
     h3 {
@@ -6,16 +7,28 @@ $horizontal-content-menu-padding: $vertical-height;
       color: white;
       padding: $vertical-height $horizontal-content-menu-padding;
     }
+
     ul {
       @include list-unstyled;
-      li { padding: 0 $horizontal-content-menu-padding; }
+
+      li {
+        padding: 0 $horizontal-content-menu-padding;
+      }
+
       a {
         display: block;
+
         // padding: $horizontal-content-menu-padding;
         color: $gray;
       }
     }
   }
-  @include media-breakpoint-down(md) { width: 100%; }
-  @include media-breakpoint-down(lg) { padding-top: 3*$vertical-height; }
+
+  @include media-breakpoint-down(md) {
+    width: 100%;
+  }
+
+  @include media-breakpoint-down(lg) {
+    padding-top: 3 * $vertical-height;
+  }
 }

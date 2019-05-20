@@ -74,8 +74,9 @@
           = render partial: '/bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
 
           - if @bike.stolen || @organization&.include_field_reg_phone?(current_user)
+            - label_phone = @organization&.registration_field_label("reg_phone") || "Phone"
             .form-group.row.unnested-field
-              = f.label :phone, class: "form-well-label"
+              = f.label :phone, label_phone, class: "form-well-label"
               .form-well-input
                 = f.text_field :phone, required: true, value: current_user&.phone, class: "form-control"
 
@@ -83,25 +84,41 @@
             = fields_for @stolen_record do |srecord|
               = render partial: '/bikes/bike_fields/stolen_location', locals: { srecord: srecord }
 
-          / Commenting out for now, more trouble than it's worth
-          / # - if @b_param.display_email?
           - if @organization&.include_field_reg_address?(current_user)
-            .form-group.row.unnested-field.no-divider-row
-              = f.label :address, "Street address", class: 'form-well-label'
-              .form-well-input
-                = f.text_field :address, required: true, placeholder: 'required', class: 'form-control'
-                %span.below-input-help
-                  Your address is required by #{@organization.short_name}
+            .related-fields
+              .form-group.row
+                - label_address = @organization.registration_field_label("reg_address") || "Mailing address"
+                / Set all the bike address attrs
+                - @bike.attributes = { address: @b_param.address("address"), address_city: @b_param.address("city"), address_zipcode: @b_param.address("zipcode"), address_state: @b_param.address("state") }
+                = f.label :address, label_address, class: 'form-well-label'
+                .form-well-input
+                  = f.text_field :address, required: true, placeholder: "Street address", class: 'form-control'
+                  %span.below-input-help
+                    Your full address is required by #{@organization.short_name}
+              .form-group.row
+                %label.form-well-label
+                .form-well-input
+                  = f.text_field :address_city, required: true, placeholder: "City", class: "form-control"
+              .form-group.row
+                %label.form-well-label
+                .form-well-input
+                  = f.text_field :address_zipcode, required: true, placeholder: "Zipcode", class: "form-control"
+              .form-group.row.fancy-select-placeholder.unfancy
+                %label.form-well-label
+                .form-well-input
+                  = f.collection_select(:address_state, State.all, :abbreviation, :name, { include_blank: true, required: true, prompt: "State" }, { class: "form-control" })
 
           - if @organization&.include_field_reg_secondary_serial?(current_user)
+            - label_secondary_serial = @organization.registration_field_label("reg_secondary_serial") || "Additional serial/sticker number"
             .form-group.row.unnested-field.no-divider-row
-              = f.label :additional_registration, "Additional serial/sticker number", class: "form-well-label"
+              = f.label :additional_registration, label_secondary_serial, class: "form-well-label"
               .form-well-input
                 = f.text_field :additional_registration, autocomplete: "off", autocorrect: "off", autocapitalize: "off", class: "form-control"
 
           - if @organization&.include_field_reg_affiliation?(current_user)
             .form-group.row.unnested-field.no-divider-row.fancy-select.unfancy
-              = f.label :organization_affiliation, "#{@organization.short_name} affiliation", class: "form-well-label"
+              - label_affiliation = @organization.registration_field_label("reg_affiliation") || "#{@organization.short_name} affiliation"
+              = f.label :organization_affiliation, label_affiliation, class: "form-well-label"
               .form-well-input
                 - affiliation_options = @organization.reg_affiliation_options.map { |a| [a.humanize, a] }
                 = f.select :organization_affiliation, affiliation_options, class: "form-control"

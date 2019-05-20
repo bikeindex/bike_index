@@ -1,21 +1,21 @@
-%section.full-screen-table
-  %table.table.table-striped.table-bordered
-    %thead
-      %th.medium-screens
+.full-screen-table
+  %table.table.table-bordered.table-striped.table-sm
+    %thead.thead-light
+      %th
         Added&nbsp;<small class="convertTimezone"></small>
       %th
         Email
-      %th.medium-screens
+      %th
         Secondary Emails
-      %th.large-screens
+      %th
         Name
       %th
         Bikes
-      %th.medium-screens
+      %th
         Memberships
-      %th.large-screens
+      %th
         Admin?
-      %th.large-screens
+      %th
         Confirmed
     %tbody
       - @users.each do |user|
@@ -32,20 +32,20 @@
                 <span class="paid-org-icon">O</span>
               %small.less-strong-right
                 = user.id
-          %td.medium-screens
+          %td
             %small.less-strong
               = user.secondary_emails.join(', ')
-          %td.large-screens
+          %td
             - if user.name?
               = user.name
           %td
             = user.ownerships.count
-          %td.medium-screens
+          %td
             - if user.memberships.present?
               - user.memberships.each do |membership|
                 = link_to "#{membership.organization.name} ", admin_membership_url(membership)
-          %td.large-screens
+          %td
             = "super" if user.superuser?
-            = "content" if user.content?
-          %td.large-screens.table-cell-check
+            = "developer" if user.developer?
+          %td.table-cell-check
             = "&#x2713;".html_safe if user.confirmed

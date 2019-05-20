@@ -3,7 +3,7 @@
   = link_to 'Send an invitation', new_admin_organization_invitation_url(organization_id: current_organization.to_param), class: "button-green sharing-links"
 
 
-  
+
 %h3.invitations-sent
   #{ pluralize(OrganizationInvitation.unclaimed.count, "invitation") } haven't been claimed yet
 

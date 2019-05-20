@@ -11,12 +11,13 @@
       .controls
         = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
       - if @organization&.include_field_reg_secondary_serial?
-        = f.label :additional_registration, "Additional serial/sticker number", class: "control-label"
+        - label_secondary_serial = @organization.registration_field_label("reg_secondary_serial") || "Additional serial/sticker number"
+        = f.label :additional_registration, label_secondary_serial, class: "control-label"
         .controls
-          = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off' 
+          = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
     .has-no-serial.optional-block
       %label
-        = f.check_box :has_no_serial, tabindex: -1 
+        = f.check_box :has_no_serial, tabindex: -1
         Has no serial
 
   .input-group.with-additional-block
@@ -41,7 +42,7 @@
       %label
         %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
         Unknown year
-        
+
   .input-group
     .control-group
       = f.label :frame_model, class: "control-label"
@@ -77,20 +78,31 @@
     .control-group
       %label.control-label{ for: 'bike_owner_email' }
         Owner's email address
-        = f.email_field :owner_email
+        = f.email_field :owner_email, required: true
   - if @organization&.include_field_reg_address?
+    - label_address = @organization.registration_field_label("reg_address") || "Owner's Street address"
+    / Set all the bike address attrs
+    - @bike.attributes = { address: @b_param.address("address"), address_city: @b_param.address("city"), address_zipcode: @b_param.address("zipcode"), address_state: @b_param.address("state") }
     .input-group
-      = f.label :address, "Owner's Street address"
+      = f.label :address, label_address
       .controls
-        = f.text_field :address, required: true
+        = f.text_field :address, required: true, placeholder: "Address"
+      .controls.extra-field
+        = f.text_field :address_city, required: true, placeholder: "City"
+      .controls.extra-field
+        = f.text_field :address_zipcode, required: true, placeholder: "Zipcode"
+      #state-select.controls.extra-field.special-select-single
+        = f.collection_select(:address_state, State.all, :abbreviation, :name, include_blank: true, required: true, prompt: "State" )
   - if @organization&.include_field_reg_phone?
+    - label_phone = @organization.registration_field_label("reg_phone") || "Owner's phone"
     .input-group
-      = f.label :phone, "Owner's phone"
+      = f.label :phone, label_phone
       .controls
         = f.text_field :phone, required: true
   - if @organization&.include_field_reg_affiliation?
+    - label_affiliation = @organization.registration_field_label("reg_affiliation") || "#{@organization.short_name} affiliation"
     .input-group
-      = f.label :organization_affiliation, "#{@organization.short_name} affiliation"
+      = f.label :organization_affiliation, label_affiliation
       .controls
         - affiliation_options = @organization.reg_affiliation_options.map { |a| [a.humanize, a] }
         = f.select :organization_affiliation, affiliation_options, class: "form-control"
@@ -98,14 +110,15 @@
     .submit-registration
       = submit_tag "Register this", class: "button-submit"
       = select(:bike, :cycle_type, CycleType.select_options, { required: true })
+  %h3
+    Optional additions
+  - if @organization.paid_for?("bike_codes")
+    .input-group
+      .control-group
+        = f.label :bike_code, "Sticker id", class: "control-label"
+        .controls
+          = f.text_field :bike_code, value: @b_param.bike_code
   .input-group
-    %h3
-      Optional additions
-    - if @organization.paid_for?("bike_codes")
-      .control-group.special-select-single
-      = f.label :bike_code, "Sticker id", class: "control-label"
-      .controls
-        = f.text_field :bike_code, value: ""
     .control-group.special-select-single
       = f.label :frame_material, "Primary frame material", class: "control-label"
       .controls

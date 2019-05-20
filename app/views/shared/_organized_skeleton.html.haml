@@ -4,62 +4,69 @@
       - if current_organization.display_avatar
         = image_tag current_organization.avatar.url(:medium)
       %h3
-        = current_organization.name
-        %br
         Admin panel
+        %span
+          = current_organization.name
+
     %ul.organized-mainmenu
-      %li
-        %span.menu-item.top-level{ class: ("active" if controller_name == "bikes") }
-          Bikes
-        %ul.organized-submenu
-          %li
-            = active_link (current_organization.paid_for?("bike_search") ? "Search" : "List"), organization_bikes_path(organization_id: current_organization.to_param), class_name: "nav-link"
-          - if current_organization.paid_for?("show_recoveries")
-            %li
-              = active_link "Recoveries", recoveries_organization_bikes_path(current_organization), class_name: "nav-link"
+      - if current_organization.ambassador?
+        %li
+          = active_link "Ambassadors", organization_ambassador_dashboard_index_path, class: "menu-item"
+      - else
+        %li
+          - on_bikes_path = controller_name == "bikes" && action_name == "index" # Because we want to ignore queries and stuff
+          = link_to "Bikes", organization_bikes_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item #{on_bikes_path ? 'active' : ''}"
+        %li
+          = active_link "Add a bike", new_organization_bike_path(current_organization), class: "menu-item"
+        %li
           - if current_organization.paid_for?("show_partial_registrations")
-            %li
-              = active_link "Incompletes", incompletes_organization_bikes_path(current_organization), class_name: "nav-link"
-          - if current_organization.paid_for?("csv_exports")
-            %li
-              = active_link "Exports", organization_exports_path(organization_id: current_organization.to_param), class_name: "nav-link", match_controller: true
+            = active_link "Incomplete registrations", incompletes_organization_bikes_path(current_organization), class: "menu-item"
+          - else
+            %span.disabled-menu-item.menu-item
+              Incomplete registrations
+        - if current_organization.show_multi_serial?
           %li
-            = active_link "Add a bike", new_organization_bike_path(current_organization), class_name: "nav-link"
-      - if current_organization.paid_for?("bike_codes")
-        %li
-          %span.menu-item.top-level{ class: ("active" if controller_name == "stickers") }
-            Stickers
-          %ul.organized-submenu
-            %li
-              = active_link "Search", organization_stickers_path(organization_id: current_organization.to_param), class_name: "nav-link"
-      - if current_organization.message_kinds.any?
-        %li
-          %span.menu-item.top-level{ class: ("active" if controller_name == "messages") }
-            Messages
-          %ul.organized-submenu
-            - current_organization.message_kinds.each do |message_kind|
-              %li
-                = link_to message_kind.titleize, organization_messages_path(organization_id: current_organization.to_param, kind: message_kind), class: "nav-link #{ params[:kind] == message_kind ? "active" : "" }"
-      - if current_user.is_admin_of?(current_organization) || current_user.superuser?
-        %li
-          - manage_active = %w(users manage emails).include?(controller_name)
-          %span.menu-item.top-level{ class: ("active" if manage_active) }
-            Manage
-          %ul.organized-submenu
-            %li
-              = active_link "Users", organization_users_path(organization_id: current_organization.to_param), class_name: "nav-link", match_controller: true
-            %li
-              = active_link "Organization", organization_manage_index_path(organization_id: current_organization.to_param), class_name: "nav-link"
-            %li
-              = active_link "Locations", locations_organization_manage_index_path(organization_id: current_organization.to_param), class_name: "nav-link"
-              %li
-                = active_link "Dev resources", dev_organization_manage_index_path(organization_id: current_organization.to_param), class_name: "nav-link"
-            - if current_organization.show_bulk_import?
-              %ul.organized-submenu
-                %li
-                  - bulk_link_name = current_organization.ascend_imports? ? "Ascend Imports" : "Bulk Imports"
-                  = active_link bulk_link_name, organization_bulk_imports_path(organization_id: current_organization.to_param), class_name: "nav-link", match_controller: true
+            = active_link "Multi serial search", multi_serial_search_organization_bikes_path(current_organization), class: "menu-item"
+        - if current_organization.paid_for?("show_recoveries") # I don't want to show a grayed link for this
+          %li
+            = active_link "Recoveries", recoveries_organization_bikes_path(current_organization), class: "menu-item"
+
+        - if current_organization.show_bulk_import?
+          %li
+            - bulk_link_name = current_organization.ascend_imports? ? "Ascend Imports" : "Bulk Imports"
+            = active_link bulk_link_name, organization_bulk_imports_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
+        %li.divider-above
+          - if current_organization.paid_for?("bike_codes")
+            = active_link "Registration stickers", organization_stickers_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
+          - else
+            %span.disabled-menu-item.menu-item
+              Registration stickers
+        - if current_organization.paid_for?("csv_exports")
+          %li
+            = active_link "Exports", organization_exports_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
+        - if current_organization.message_kinds.any?
+          - current_organization.message_kinds.each_with_index do |message_kind, index|
+            %li{ class: index == 0 ? "divider-above" : "" }
+              / (params[:kind] == message_kind ? "active" : "")
+              - if message_kind == "geolocated_messages"
+                - link_title = "GeoMessaging"
+              - else
+                - link_title = message_kind.gsub("_messages", "").titleize
+              = active_link link_title, organization_messages_path(organization_id: current_organization.to_param, kind: message_kind), class: "menu-item"
+
+        - else
+          %li.divider-above
+            %span.disabled-menu-item.menu-item
+              GeoMessaging
+        - if current_user.admin_of?(current_organization) || current_user.superuser?
+          %li.divider-above
+            = active_link "Users", organization_users_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
+          %li
+            = active_link "#{current_organization.short_name} profile", organization_manage_index_path(organization_id: current_organization.to_param), class: "menu-item"
+          %li
+            = active_link "#{current_organization.short_name} locations", locations_organization_manage_index_path(organization_id: current_organization.to_param), class: "menu-item"
 
 .organized-wrap
-  .container
+  - orgcontainer = "container-fluid" if controller_name == "bikes" && action_name == "index" || controller_name == "messages"
+  %div{ class: orgcontainer || "container" }
     = yield

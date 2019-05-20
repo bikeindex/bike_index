@@ -1,6 +1,7 @@
 module Organized
   class ManageController < Organized::AdminController
     before_filter :assign_organization, only: [:index, :update, :locations]
+
     def index
       @organization.ensure_auto_user
     end
@@ -20,23 +21,20 @@ module Organized
       end
     end
 
-    def dev
-    end
-
     def destroy
       organization_name = current_organization.name
       if current_organization.is_paid
         flash[:info] = "Please contact support@bikeindex.org to delete #{organization_name}"
         redirect_to current_index_path and return
       end
-      notify_admins('organization_destroyed')
+      notify_admins("organization_destroyed")
       current_organization.destroy
       flash[:info] = "Deleted #{organization_name}"
       redirect_to user_root_url
     end
 
     def landing
-      render '/landing_pages/show'
+      render "/landing_pages/show"
     end
 
     private
@@ -50,9 +48,15 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:organization).permit(:name, :website, :kind, show_on_map_if_permitted,
+      params.require(:organization).permit(:name, :website, show_on_map_if_permitted, permitted_kind,
                                            :embedable_user_email, paid_attributes,
                                            locations_attributes: permitted_locations_params)
+    end
+
+    def permitted_kind
+      return "ambassador" if @organization.ambassador?
+      new_kind = params.dig(:organization, :kind)
+      Organization.creatable_kinds.include?(new_kind) ? new_kind : @organization.kind
     end
 
     def show_on_map_if_permitted

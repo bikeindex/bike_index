@@ -7,12 +7,13 @@
       .row
         %h1 Current Ambassadors
         %h3 The heroes of bikedom
-        %a.btn.btn-primary.btn-lg{ href: 'mailto:lily@bikeindex.org' }
+        %a.btn.btn-primary.btn-lg{ href: new_ambassador_path }
           Join their ranks
 
     .ribbon
       .container
         .noribbon
+  -# TODO: Un-hardcode this list: Ambassador.all
   .container.ambassadors-list
     // Right now, this looks better with justify-content: center - but space-around looks better depending on the item count.
     .row
@@ -47,6 +48,16 @@
         %p
           Bike Index allows us to verify details about the bike, theft details, police file number and contact info for the owner. We can also share the registry directly to Law Enforcement to expedite the recovery process.
       .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/Greg-Finnin.jpg', alt: 'Greg Finnin'
+        %h2
+          Greg Finnin
+        %h3
+          Culver City, CA
+        %h4
+          Why Bike Index?
+        %p
+          Bike Index helped me recover my beloved bicycle. I’m now committed to paying forward my good fortune by helping to promote Bike Index in my community.
+      .col-md-3.col-xs-6
         = image_tag 'landing_pages/ambassadors/Michelle-Farris.jpg', alt: 'Michelle Farris'
         %h2
           Michelle Farris
@@ -76,6 +87,7 @@
           Why Bike Index?
         %p
           Bike Index provides ease of use and security of mind. The simplicity of design makes it effective.
+
       .col-md-3.col-xs-6
         = image_tag 'landing_pages/ambassadors/Larry-Hager.jpg', alt: 'Larry Hager'
         %h2
@@ -123,7 +135,7 @@
         %h2
           Your Name Here
         %h3
-          Anytown, USA
+          Anytown, earth
         %h4
           What's your story?
         %p

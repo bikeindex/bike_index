@@ -25,6 +25,7 @@ class Export < ActiveRecord::Base
     { "headers" => default_headers }.merge(default_kind_options[kind.to_s])
   end
 
+  # This is what the methods on bike are named. Why the fuck they need to be transposed, I don't remember
   def self.additional_registration_fields
     { reg_address: "registration_address", reg_secondary_serial: "additional_registration_number", reg_phone: "phone", reg_affiliation: "organization_affiliation" }
   end
@@ -33,16 +34,16 @@ class Export < ActiveRecord::Base
     {
       stolen: {
         with_blacklist: false,
-        only_serials_and_police_reports: false
+        only_serials_and_police_reports: false,
       },
       organization: {
         partial_registrations: false,
         start_at: nil,
-        end_at: nil
+        end_at: nil,
       },
       manufacturer: {
-        frame_only: false
-      }
+        frame_only: false,
+      },
     }.as_json.freeze
   end
 
@@ -50,6 +51,12 @@ class Export < ActiveRecord::Base
     return PERMITTED_HEADERS unless organization.present?
     additional_headers = organization == "include_paid" ? additional_registration_fields.keys : organization.additional_registration_fields
     PERMITTED_HEADERS + additional_headers.map { |f| additional_registration_fields[f.to_sym] }
+  end
+
+  # class method so that we can test it in other places. Namely - organized_access_panel. If updating logic, update there too
+  def self.avery_export_bike?(bike)
+    bike.user_name.present? && bike.registration_address.present? &&
+      bike.registration_address["address"].present?
   end
 
   def finished_processing?; %w[finished errored].include?(progress) end
@@ -63,6 +70,11 @@ class Export < ActiveRecord::Base
   def assign_bike_codes?; bike_code_start.present? end
 
   def bike_codes_removed?; option?("bike_codes_removed") end
+
+  def custom_bike_ids; options["custom_bike_ids"] end
+
+  # NOTE: Only does the first 100 bikes, in case there is a huge export
+  def exported_bike_ids; options["exported_bike_ids"] end
 
   # 'options' is a weird place to put the assigned bike_codes - but whatever, it's there, just using it
   def bike_codes; options["bike_codes_assigned"] || [] end
@@ -83,6 +95,11 @@ class Export < ActiveRecord::Base
     options[str.to_s].present?
   end
 
+  def assign_exported_bike_ids
+    # Store the first 100 bike ids that were exported, for diagnostic purposes
+    self.options = options.merge("exported_bike_ids" => bikes_scoped.limit(100).pluck(:id))
+  end
+
   def avery_export=(val)
     if val
       self.options = options.merge(avery_export: true)
@@ -94,6 +111,15 @@ class Export < ActiveRecord::Base
   def bike_code_start=(val)
     return true unless val.present?
     self.options = options.merge(bike_code_start: BikeCode.normalize_code(val))
+  end
+
+  def custom_bike_ids=(val)
+    custom_ids = val.split(/\s+|,/).map do |cid|
+      id = cid.gsub(/\D*/, "")
+      id.present? ? id.to_i : nil
+    end.compact.uniq
+    custom_ids = nil unless custom_ids.any?
+    self.options = options.merge(custom_bike_ids: custom_ids)
   end
 
   def written_headers
@@ -128,11 +154,11 @@ class Export < ActiveRecord::Base
   end
 
   def tmp_file
-    @tmp_file ||= Tempfile.new(["#{kind == 'organization' ? organization.slug : kind}_#{id}", ".#{file_format}"])
+    @tmp_file ||= Tempfile.new(["#{kind == "organization" ? organization.slug : kind}_#{id}", ".#{file_format}"])
   end
 
   def tmp_file_rows
-    `wc -l "#{tmp_file.path}"`.strip.split(' ')[0].to_i - 1 # Because we don't count header
+    `wc -l "#{tmp_file.path}"`.strip.split(" ")[0].to_i - 1 # Because we don't count header
   end
 
   def description
@@ -150,14 +176,8 @@ class Export < ActiveRecord::Base
 
   def bikes_scoped
     raise "#{kind} scoping not set up" unless kind == "organization"
-    bikes = organization.bikes
-    if option?("start_at")
-      option?("end_at") ? bikes.where(created_at: start_at..end_at) : bikes.where("bikes.created_at > ?", start_at)
-    elsif option?("end_at") # If only end_at is present
-      bikes.where("bikes.created_at < ?", end_at)
-    else
-      bikes
-    end
+    return bikes_within_time(organization.bikes) unless custom_bike_ids.present?
+    bikes_within_time(organization.bikes).or(organization.bikes.where(id: custom_bike_ids))
   end
 
   def set_calculated_attributes
@@ -179,5 +199,17 @@ class Export < ActiveRecord::Base
     # but if we want to manually create an export, we should be able to do so
     opts["headers"] = opts["headers"] & self.class.permitted_headers("include_paid")
     opts
+  end
+
+  private
+
+  def bikes_within_time(bikes)
+    if option?("start_at")
+      option?("end_at") ? bikes.where(created_at: start_at..end_at) : bikes.where("bikes.created_at > ?", start_at)
+    elsif option?("end_at") # If only end_at is present
+      bikes.where("bikes.created_at < ?", end_at)
+    else
+      bikes
+    end
   end
 end

@@ -1,7 +1,7 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Admin::StolenNotificationsController do
-  describe 'index' do
+  describe "index" do
     before do
       user = FactoryBot.create(:admin)
       set_current_user(user)
@@ -12,7 +12,7 @@ describe Admin::StolenNotificationsController do
     it { is_expected.not_to set_flash }
   end
 
-  describe 'show' do
+  describe "show" do
     before do
       stolen_notification = FactoryBot.create(:stolen_notification)
       user = FactoryBot.create(:admin)
@@ -24,8 +24,8 @@ describe Admin::StolenNotificationsController do
     it { is_expected.not_to set_flash }
   end
 
-  describe 'resend' do
-    it 'resends the stolen notification' do
+  describe "resend" do
+    it "resends the stolen notification" do
       Sidekiq::Worker.clear_all
       sender = FactoryBot.create(:user)
       admin = FactoryBot.create(:admin)
@@ -37,7 +37,7 @@ describe Admin::StolenNotificationsController do
       end.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
     end
 
-    it 'redirects if the stolen notification has already been sent' do
+    it "redirects if the stolen notification has already been sent" do
       Sidekiq::Worker.clear_all
       sender = FactoryBot.create(:user)
       admin = FactoryBot.create(:admin)
@@ -50,7 +50,7 @@ describe Admin::StolenNotificationsController do
       expect(response).to redirect_to(:admin_stolen_notification)
     end
 
-    it 'resends if the stolen notification has already been sent if we say pretty please' do
+    it "resends if the stolen notification has already been sent if we say pretty please" do
       Sidekiq::Worker.clear_all
       sender = FactoryBot.create(:user)
       admin = FactoryBot.create(:admin)

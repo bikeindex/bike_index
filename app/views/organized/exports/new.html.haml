@@ -1,58 +1,68 @@
-.organized-page-header
-  %h1
-    %em
-      = current_organization.name
-    new export
+.organized-exports
+  .organized-page-header
+    %h1
+      %em
+        = current_organization.name
+      new export
 
-= form_for @export, { url: organization_exports_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
-  = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
-  - if current_organization.paid_for?("avery_export")
-    .form-group.row
-      = f.label :avery_export, "Avery Label Export", class: "org-form-label"
+  = form_for @export, { url: organization_exports_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
+    = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
+    - if current_organization.paid_for?("avery_export")
+      .form-group.row
+        = f.label :avery_export, "Avery Label Export", class: "org-form-label"
+        .col-sm-4
+          = f.check_box :avery_export
+      .form-group.row.shownOnAveryExport
+        = f.label :bike_code_start, "Initial Sticker #", class: 'org-form-label'
+        .col-sm-6
+          = f.text_field :bike_code_start, value: current_organization.bike_codes.next_unclaimed_code&.code, class: "form-control"
+          %span.below-input-help
+            Starting with given input, stickers will be incrementally assigned to bikes. Leave blank to skip assigning stickers to bikes
+    .row.mt-2.hiddenOnAveryExport
+      .col-lg-4
+        %p.export-included-columns-label
+          Included columns:
+      .col-lg-8
+        .row
+          - Export.permitted_headers(current_organization).each do |header|
+            - next if Export::HIDDEN_HEADERS.include?(header)
+            .form-group.col-xs-6.col-md-4
+              %label.checkbox
+                = f.check_box :headers, { multiple: true, checked: Export.default_headers.include?(header) }, header, 1
+                = header.titleize # This will break when a new reg field is added - which is a plus ;)
+    .form-group.row.mt-4
+      = f.label :custom_bike_ids, "Specific bikes list", class: "org-form-label"
+      .col-sm-8
+        %a.field-expander{ href: "#expandCustomBikeIds" }
+          Add specific bikes to export
+        .collapsed-fields
+          = f.text_area :custom_bike_ids, placeholder: "Put the Bike Index URLs for specific additional bikes to include in this export. Separate with newlines or commas", class: "form-control"
+          %span.below-input-help
+            For example: <code>https://bikeindex.org/bikes/123, https://bikeindex.org/bikes/4567</code>
+    .form-group.row.mt-4
+      = f.label :start_at, "Registered after", class: "org-form-label"
       .col-sm-4
-        = f.check_box :avery_export
-    .form-group.row.shownOnAveryExport
-      = f.label :bike_code_start, "Initial Sticker #", class: 'org-form-label'
-      .col-sm-6
-        = f.text_field :bike_code_start, value: current_organization.bike_codes.next_unclaimed_code&.code, class: "form-control"
-        %span.below-input-help
-          Starting with given input, stickers will be incrementally assigned to bikes. Leave blank to skip assigning stickers to bikes
-  .row.mt-2.hiddenOnAveryExport
-    .col-lg-4
-      %p.export-included-columns-label
-        Included columns:
-    .col-lg-8
-      .row
-        - Export.permitted_headers(current_organization).each do |header|
-          - next if Export::HIDDEN_HEADERS.include?(header)
-          .form-group.col-xs-6.col-md-4
-            %label.checkbox
-              = f.check_box :headers, { multiple: true, checked: Export.default_headers.include?(header) }, header, 1
-              = header.titleize # This will break when a new reg field is added - which is a plus ;)
-  .form-group.row.mt-4
-    = f.label :start_at, "Registered after", class: "org-form-label"
-    .col-sm-4
-      %a.datetimefield-expander{ href: "#expandStartAt" }
-        Set after time
-      .datetimefield-fields
-        = f.datetime_local_field :start_at, step: 60, class: "form-control"
-        %a.datetimefield-collapser{ href: "#expandStartAt" }
-          remove
-  .form-group.row
-    = f.label :end_at, "Registered before", class: "org-form-label"
-    .col-sm-4
-      %a.datetimefield-expander{ href: "#expandEndAt" }
-        Set before time
-      .datetimefield-fields
-        = f.datetime_local_field :end_at, step: 60, class: "form-control"
-        %a.datetimefield-collapser{ href: "#expandStartAt" }
-          remove
-  .form-group.row.mt-2.hiddenOnAveryExport
-    = f.label :format, "Export file format", class: "org-form-label"
-    .col-sm-4
-      = f.select :file_format, Export::VALID_FILE_FORMATS, {}, class: "form-control"
-  .row.mt-4
-    .form-submit-button
-      = f.submit "Create export", class: "btn btn-success btn-lg"
+        %a.field-expander{ href: "#" }
+          Set after time
+        .collapsed-fields
+          = f.datetime_local_field :start_at, step: 60, class: "form-control"
+          %a.field-collapser{ href: "#" }
+            remove
+    .form-group.row
+      = f.label :end_at, "Registered before", class: "org-form-label"
+      .col-sm-4
+        %a.field-expander{ href: "#" }
+          Set before time
+        .collapsed-fields
+          = f.datetime_local_field :end_at, step: 60, class: "form-control"
+          %a.field-collapser{ href: "#" }
+            remove
+    .form-group.row.mt-2.hiddenOnAveryExport
+      = f.label :format, "Export file format", class: "org-form-label"
+      .col-sm-4
+        = f.select :file_format, Export::VALID_FILE_FORMATS, {}, class: "form-control"
+    .row.mt-4
+      .form-submit-button
+        = f.submit "Create export", class: "btn btn-success btn-lg"
 
-= javascript_pack_tag "application"
+  = javascript_pack_tag "application"

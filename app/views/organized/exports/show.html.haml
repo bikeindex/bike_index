@@ -1,108 +1,136 @@
-.organized-page-header
-  %h1
-    Exports
-    %small
-      = link_to "Download Export", @export.file.url, class: "btn btn-secondary pull-right"
+.organized-exports
+  .organized-page-header
+    %h1
+      Exports
+      %small
+        = link_to "Download Export", @export.file.url, class: "btn btn-secondary pull-right"
 
-- if @avery_export_redirect
-  .mb-4
-    = render partial: '/shared/alert', locals: { body: "You'll be automatically redirected to the labels once processing is finished", type: "success" }
+  - if @avery_export_redirect
+    .mb-4
+      = render partial: '/shared/alert', locals: { body: "You'll be automatically redirected to the labels once processing is finished", type: "success" }
 
-%table.organized-list-table
-  %tbody
-    %tr
-      %td
-        Created
-      %td
-        %span.convertTime.preciseTime
-          = l @export.created_at, format: :convert_time
-
-    %tr
-      %td
-        By
-      %td
-        - if @export.user.present?
-          = @export.user.display_name
-    %tr
-      %td
-        Format
-      %td
-        = @export.file_format
-    %tr
-      %td
-        Progress
-      %td#exportProgress{ class: @export.progress, "data-createdat" => @export.created_at.to_i }
-        %span{ class: export_progress_class(@export) }
-          = @export.calculated_progress
-
-    %tr
-      %td
-        Bikes exported
-      %td
-        = @export.rows
-
-    %tr
-      %td
-        Bikes Registered after
-      %td
-        - if @export.start_at.present?
-          %span.convertTime.preciseTime
-            = l @export.start_at, format: :convert_time
-        - else
-          %small.less-strong
-            \-
-    %tr
-      %td
-        Bikes Registered before
-      %td
-        - if @export.end_at.present?
-          %span.convertTime.preciseTime
-            = l @export.end_at, format: :convert_time
-        - else
-          %small.less-strong
-            \-
-
-    - if @export.avery_export?
+  %table.organized-list-table
+    %tbody
       %tr
         %td
-          Avery Export
+          Created
         %td
-          - if @export.finished?
-            %strong
-              = link_to "View Avery Labels", @export.avery_export_url, class: "avery_export_url"
-          - else
-            %em{ class: "text-success" }
-              pending...
+          %span.convertTime.preciseTime
+            = l @export.created_at, format: :convert_time
+
       %tr
         %td
-          Stickers
+          By
         %td
-          - if @export.assign_bike_codes?
-            %em
-              Stickers exported
-            - if @export.bike_codes.any?
-              %ul{ style: "font-size: 80%;" }
-                - @export.bike_codes.each_with_index do |code, index|
+          - if @export.user.present?
+            = @export.user.display_name
+      %tr
+        %td
+          Format
+        %td
+          = @export.file_format
+      %tr
+        %td
+          Progress
+        %td#exportProgress{ class: @export.progress, "data-createdat" => @export.created_at.to_i }
+          %span{ class: export_progress_class(@export) }
+            = @export.calculated_progress
+
+      %tr
+        %td
+          Bikes exported
+        %td
+          = @export.rows
+          - if @export.exported_bike_ids.present?
+            %a.small.less-strong{ href: "#show_exported_bikes", 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse' }
+              Show
+              - if @export.rows > 100
+                first 100
+              bikes in export
+            .collapse#show_exported_bikes
+              %ul.exported-link-list
+                - @export.exported_bike_ids.each_with_index do |id, i|
                   %li
-                    = link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param)
-              - if @export.bike_codes_removed?
-                %em.text-danger
-                  Stickers have been unassigned
-              - else
-                = link_to "Unassign stickers", organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_codes: true), method: :put, class: "btn btn-warning float-right"
-            - else
-              %small.less-strong
-                No stickers assigned
+                    #{link_to id, bike_path(id)}#{i == (@export.exported_bike_ids.count - 1) ? "" : ","}
+
+      %tr
+        %td
+          Bikes Registered after
+        %td
+          - if @export.start_at.present?
+            %span.convertTime.preciseTime
+              = l @export.start_at, format: :convert_time
           - else
-            not assigned
+            %small.less-strong
+              \-
+      %tr
+        %td
+          Bikes Registered before
+        %td
+          - if @export.end_at.present?
+            %span.convertTime.preciseTime
+              = l @export.end_at, format: :convert_time
+          - else
+            %small.less-strong
+              \-
+      - if @export.custom_bike_ids.present?
+        %tr
+          %td
+            Specific bikes
+          %td
+            - included_bike_ids = @export.custom_bike_ids & @export.bikes_scoped.pluck(:id)
+            %ul
+              - @export.custom_bike_ids.each do |custom_id|
+                %li
+                  - if included_bike_ids.include?(custom_id)
+                    = link_to custom_id, bike_path(custom_id)
+                  - else
+                    %small.text-warning
+                      #{link_to custom_id, bike_path(custom_id), class: "less-strong text-warning"}:
+                      %em
+                        Unable to export, not part of your organization
 
-    %tr
-      %td
-        Columns in csv
-      %td
-        %ul
-          - @export.written_headers.each do |header|
-            %li
-              = header.humanize
+      - if @export.avery_export?
+        %tr
+          %td
+            Avery Export
+          %td
+            - if @export.finished?
+              %strong
+                = link_to "View Avery Labels", @export.avery_export_url, class: "avery_export_url"
+            - else
+              %em{ class: "text-success" }
+                pending...
+        %tr
+          %td
+            Stickers
+          %td
+            - if @export.assign_bike_codes?
+              %em
+                #{@export.bike_codes&.count || 0} Stickers exported
+              - if @export.bike_codes.any?
+                %ul.exported-link-list
+                  - @export.bike_codes.each_with_index do |code, i|
+                    %li
+                      #{link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param)}#{i == (@export.bike_codes.count - 1) ? "" : ","}
+                - if @export.bike_codes_removed?
+                  %em.text-danger
+                    Stickers have been unassigned
+                - else
+                  = link_to "Unassign stickers", organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_codes: true), method: :put, class: "btn btn-warning float-right"
+              - else
+                %small.less-strong
+                  No stickers assigned
+            - else
+              not assigned
 
-= javascript_pack_tag "application"
+      %tr
+        %td
+          Columns in csv
+        %td
+          %ul
+            - @export.written_headers.each do |header|
+              %li
+                = header.humanize
+
+  = javascript_pack_tag "application"

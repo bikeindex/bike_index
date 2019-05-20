@@ -2,16 +2,17 @@
 // Dropdown menus
 // --------------------------------------------------
 
-
 // Use the .menu class on any <li> element within the topbar or ul.tabs and you'll get some superfancy dropdowns
 .dropup,
 .dropdown {
   position: relative;
 }
+
 .dropdown-toggle {
   // The caret makes the toggle a bit too tall in IE7
   *margin-bottom: -3px;
 }
+
 .dropdown-toggle:active,
 .open .dropdown-toggle {
   outline: 0;
@@ -24,9 +25,9 @@
   width: 0;
   height: 0;
   vertical-align: top;
-  border-top:   4px solid $white;
+  border-top: 4px solid $white;
   border-right: 4px solid transparent;
-  border-left:  4px solid transparent;
+  border-left: 4px solid transparent;
   content: "";
 }
 
@@ -43,19 +44,28 @@
   top: 100%;
   right: 0;
   z-index: $zindexDropdown;
-  display: none; // none by default, but block on "open" of the menu
+  display: none;
+
+  // none by default, but block on "open" of the menu
   float: left;
   min-width: 160px;
   padding: 5px 0;
-  margin: 2px 0 0; // override default ul
+  margin: 2px 0 0;
+
+  // override default ul
   list-style: none;
   background-color: $dropdownBackground;
-  border: 1px solid #ccc; // Fallback for IE7-8
+  border: 1px solid #ccc;
+
+  // Fallback for IE7-8
   border: 1px solid $dropdownBorder;
   *border-right-width: 2px;
   *border-bottom-width: 2px;
+
   @include border-radius(2px);
-  @include box-shadow(0 5px 10px rgba(0,0,0,.2));
+
+  @include box-shadow(0 5px 10px rgba(0, 0, 0, 0.2));
+
   background-clip: padding-box;
 
   // Aligns the dropdown menu to right
@@ -89,7 +99,11 @@
   text-decoration: none;
   color: $dropdownLinkColorHover;
   background-color: $dropdownLinkBackgroundHover;
-  @include gradient-vertical($dropdownLinkBackgroundHover, darken($dropdownLinkBackgroundHover, 5%));
+
+  @include gradient-vertical(
+    $dropdownLinkBackgroundHover,
+    darken($dropdownLinkBackgroundHover, 5%)
+  );
 }
 
 // Active state
@@ -100,7 +114,11 @@
   text-decoration: none;
   outline: 0;
   background-color: $dropdownLinkBackgroundActive;
-  @include gradient-vertical($dropdownLinkBackgroundActive, darken($dropdownLinkBackgroundActive, 5%));
+
+  @include gradient-vertical(
+    $dropdownLinkBackgroundActive,
+    darken($dropdownLinkBackgroundActive, 5%)
+  );
 }
 
 // Disabled state
@@ -110,6 +128,7 @@
 .dropdown-menu .disabled > a:hover {
   color: $grayLight;
 }
+
 // Nuke hover effects
 .dropdown-menu .disabled > a:hover {
   text-decoration: none;
@@ -148,6 +167,7 @@
     border-bottom: 4px solid $black;
     content: "\2191";
   }
+
   // Different positioning for bottom up menu
   .dropdown-menu {
     top: auto;
@@ -161,15 +181,17 @@
 .dropdown-submenu {
   position: relative;
 }
+
 .dropdown-submenu > .dropdown-menu {
   top: 0;
   left: 100%;
   margin-top: -6px;
   margin-left: -1px;
   -webkit-border-radius: 0 6px 6px 6px;
-     -moz-border-radius: 0 6px 6px 6px;
-          border-radius: 0 6px 6px 6px;
+  -moz-border-radius: 0 6px 6px 6px;
+  border-radius: 0 6px 6px 6px;
 }
+
 .dropdown-submenu:hover .dropdown-menu {
   display: block;
 }
@@ -187,10 +209,10 @@
   margin-top: 5px;
   margin-right: -10px;
 }
+
 .dropdown-submenu:hover > a:after {
   border-left-color: $dropdownLinkColorHover;
 }
-
 
 // Tweak nav headers
 // -----------------
@@ -203,6 +225,8 @@
 // Typeahead
 // ---------
 .typeahead {
-  margin-top: 2px; // give it some space to breathe
+  margin-top: 2px;
+
+  // give it some space to breathe
   @include border-radius(4px);
 }

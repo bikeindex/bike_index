@@ -7,7 +7,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
     production = parseInt($('#documentation_head').attr('data-production'), 10)
     unless production == 1
       @createBikes()
-  
+
   manufacturerCalls: ->
     $.ajax
       type: "GET"
@@ -16,7 +16,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
         $('#manufacturers_frame_makers').text(JSON.stringify(data,undefined,2))
       error: (data, textStatus, jqXHR) ->
         $('#manufacturers_frame_makers').text(JSON.stringify(data,undefined,2))
-      
+
     $.ajax
       type: "GET"
       url: $('#manufacturers_query').attr('data-url')
@@ -24,7 +24,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
         $('#manufacturers_query').text(JSON.stringify(data,undefined,2))
       error: (data, textStatus, jqXHR) ->
         console.log(data)
-  
+
   bikeSearchCall: ->
     $.ajax
       type: "GET"
@@ -61,7 +61,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
         error: (data, textStatus, jqXHR) ->
           $("##{i}_index").text(data)
 
-  createBikes: ->      
+  createBikes: ->
     component_bike =
       serial_number: "XOXO :)"
       manufacturer: "WorkCycles"
@@ -92,7 +92,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
     $.ajax
       url: $('#bike_components').attr('data-url')
       type: "POST"
-      data: 
+      data:
         bike: component_bike
         components: components
         organization_slug: $('#example_organization').attr('data-slug')
@@ -100,20 +100,20 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
       success: (data, textStatus, jqXHR) ->
         $('#bike_components').text(JSON.stringify(data,undefined,2))
       error: (data, textStatus, jqXHR) ->
-        $('#bike_components').text(JSON.stringify(data,undefined,2)) 
-        
-    bike = 
+        $('#bike_components').text(JSON.stringify(data,undefined,2))
+
+    bike =
       serial_number: "XOXO <3"
       manufacturer: "Surly"
       color: "Blue"
       rear_tire_narrow: false
       rear_wheel_bsd: "559"
       owner_email: "new_bike_owner@bikeindex.org"
-    
+
     $.ajax
       url: $('#bike_basic').attr('data-url')
       type: "POST"
-      data: 
+      data:
         bike: bike
         organization_slug: $('#example_organization').attr('data-slug')
         access_token: $('#example_organization').attr('data-token')
@@ -147,7 +147,7 @@ class BikeIndex.Views.DocumentationIndex extends Backbone.View
     $.ajax
       url: $('#bike_stolen').attr('data-url')
       type: "POST"
-      data: 
+      data:
         bike: stolen_bike
         stolen_record: stolen_record
         organization_slug: $('#example_organization').attr('data-slug')

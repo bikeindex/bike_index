@@ -4,7 +4,7 @@ class OwnershipsController < ApplicationController
 
   def show
     bike = Bike.unscoped.find(@ownership.bike_id)
-    if @ownership.can_be_claimed_by(current_user)
+    if @ownership.claimable_by?(current_user)
       if @ownership.current
         @ownership.mark_claimed
         flash[:success] = "Looks like this is your #{bike.type}! Good work, you just claimed it."
@@ -37,5 +37,4 @@ class OwnershipsController < ApplicationController
   def find_ownership
     @ownership = Ownership.find(params[:id])
   end
-
 end

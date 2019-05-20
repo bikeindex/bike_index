@@ -1,6 +1,6 @@
 class BikeBookIntegration
-  require 'net/http'
-  
+  require "net/http"
+
   def make_request(query, method = nil)
     begin
       uri = URI("http://bikebook.io#{method}")
@@ -13,7 +13,7 @@ class BikeBookIntegration
 
     response = JSON.parse(res.body)
     return response if response.kind_of?(Array)
-    response.with_indifferent_access     
+    response.with_indifferent_access
   end
 
   def get_model(options = {})
@@ -21,15 +21,14 @@ class BikeBookIntegration
       options = {
         year: options.year,
         manufacturer: options.manufacturer.name,
-        frame_model: options.frame_model
+        frame_model: options.frame_model,
       }
     end
     return nil unless options[:year].present? && options[:manufacturer].present? && options[:frame_model].present?
     # We're book sluging everything because, url safe (It's the same method bikebook uses)
     query = { manufacturer: Slugifyer.manufacturer(options[:manufacturer]),
-      year: options[:year],
-      frame_model: Slugifyer.book_slug(options[:frame_model])
-    }
+             year: options[:year],
+             frame_model: Slugifyer.book_slug(options[:frame_model]) }
 
     make_request(query)
   end
@@ -38,8 +37,7 @@ class BikeBookIntegration
     return nil unless options[:manufacturer].present?
     query = { manufacturer: Slugifyer.manufacturer(options[:manufacturer]) }
     query[:year] = options[:year] if options[:year].present?
-    
+
     make_request(query, "/model_list/")
   end
-
 end

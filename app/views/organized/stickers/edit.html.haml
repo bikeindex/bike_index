@@ -6,22 +6,32 @@
   - if @bike_code.claimed?
     %p.text-right
       = link_to "Remove Bike link", organization_sticker_path(id: @bike_code.code, organization_id: current_organization.to_param, bike_id: nil), method: :put, class: "btn btn-danger"
-%p
-  Bike:
-  - if @bike_code.claimed?
-    = link_to organized_bike_text(@bike_code.bike), bike_path(@bike_code.bike)
-  - else
-    %strong
-      Unclaimed
-  %br
-  Claimed:
-  - if @bike_code.claimed_at.present?
-    %span.convertTime
-      = l @bike_code.created_at, format: :convert_time
-  %br
-  Claimed by:
-  - if @bike_code.user.present?
-    = @bike_code.user.display_name
+%ul.attr-list
+  %li
+    %span.attr-title
+      Bike:
+    - if @bike_code.claimed?
+      = link_to organized_bike_text(@bike_code.bike), bike_path(@bike_code.bike)
+    - else
+      %strong
+        Unclaimed
+  %li
+    %span.attr-title
+      Claimed:
+    - if @bike_code.claimed_at.present?
+      %span.convertTime
+        = l @bike_code.created_at, format: :convert_time
+  %li
+    %span.attr-title
+      Claimed by:
+    - if @bike_code.user.present?
+      = @bike_code.user.display_name
+  %li
+    %span.attr-title
+      Previous Bike
+    - if @bike_code.previous_bike_id
+      - previous_bike = Bike.where(id: @bike_code.previous_bike_id).first
+      = link_to previous_bike&.title_string || @bike_code.previous_bike_id, bike_path(@bike_code.previous_bike_id)
 
 %hr.mt-4.mb-4
 

@@ -6,6 +6,7 @@ class BikeCode < ActiveRecord::Base
   belongs_to :bike
   belongs_to :organization
   belongs_to :user # User who assigns the bike
+  belongs_to :bike_code_batch
 
   scope :claimed, -> { where.not(bike_id: nil) }
   scope :unclaimed, -> { where(bike_id: nil) }
@@ -16,6 +17,7 @@ class BikeCode < ActiveRecord::Base
   validates_uniqueness_of :code, scope: [:organization_id], allow_nil: false
 
   before_validation :set_calculated_attributes
+  after_commit :update_associations
 
   def self.normalize_code(str = nil)
     return nil unless str.present?
@@ -39,6 +41,7 @@ class BikeCode < ActiveRecord::Base
   end
 
   def self.lookup_with_fallback(str, organization_id: nil, user: nil)
+    return nil unless str.present?
     normalized_code = normalize_code(str)
     user_organization_ids = user&.memberships&.pluck(:organization_id) || []
     if user_organization_ids.any?
@@ -46,6 +49,8 @@ class BikeCode < ActiveRecord::Base
     end
     bike_code ||= lookup(normalized_code, organization_id: organization_id)
     bike_code ||= where(code: normalized_code).first
+    bike_code ||= where(organization_id: organization_id).where("code ILIKE ?", "%#{normalized_code}%").first
+    bike_code ||= where("code ILIKE ?", "%#{normalized_code}%").first
   end
 
   def self.admin_text_search(str)
@@ -66,8 +71,8 @@ class BikeCode < ActiveRecord::Base
 
   def url
     [
-      "#{ENV['BASE_URL']}/scanned/bikes/#{code}",
-      organization.present? ? "?organization_id=#{organization.slug}" : nil
+      "#{ENV["BASE_URL"]}/scanned/bikes/#{code}",
+      organization.present? ? "?organization_id=#{organization.slug}" : nil,
     ].compact.join("")
   end
 
@@ -88,10 +93,12 @@ class BikeCode < ActiveRecord::Base
   end
 
   def unclaimable_by?(user)
-    errors.none? && claimed? && organization.present? && user.is_member_of?(organization)
+    return false unless errors.none? && claimed?
+    organization.present? && user.member_of?(organization) || user.authorized?(bike)
   end
 
   def unclaim!
+    self.previous_bike_id = bike_id if bike_id.present?
     update(bike_id: nil, user_id: nil, claimed_at: nil)
   end
 
@@ -102,11 +109,24 @@ class BikeCode < ActiveRecord::Base
     if bike_str.blank? && claiming_bike.blank? && unclaimable_by?(user)
       unclaim!
     elsif claiming_bike.present?
+      self.previous_bike_id = bike_id || previous_bike_id # Don't erase previous_bike_id if double unclaiming
       update(bike_id: claiming_bike.id, user_id: user.id, claimed_at: Time.now) unless errors.any?
     else
       errors.add(:bike, "\"#{bike_str}\" not found")
     end
     self
+  end
+
+  # Bust cache keys TODO: Rails 5 update test this
+  def update_associations
+    if bike_id.present?
+      found_b = Bike.where(id: bike_id).first
+      found_b&.update_attributes(updated_at: Time.now)
+    end
+    if previous_bike_id.present?
+      found_previous_b = Bike.where(id: previous_bike_id).first
+      found_previous_b&.update_attributes(updated_at: Time.now)
+    end
   end
 
   def set_calculated_attributes

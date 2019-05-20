@@ -1,24 +1,18 @@
-# encoding: utf-8
 class ImageUploader < CarrierWave::Uploader::Base
-  include ::CarrierWave::Backgrounder::Delay
   include CarrierWave::MiniMagick
 
-  # include Sprockets::Helpers::RailsHelper # Deprecated. Should be removed
-  # include Sprockets::Helpers::IsolatedHelper # Deprecated. Should be removed
- 
-  if Rails.env.test?
-    storage :file
-  elsif Rails.env.development?
-    storage :file
-  else
+  if Rails.env.production?
     storage :fog
+  else
+    storage :file
   end
-  
-  after :remove, :delete_empty_upstream_dirs  
+
+  after :remove, :delete_empty_upstream_dirs
+
   def delete_empty_upstream_dirs
     path = ::File.expand_path(store_dir, root)
     Dir.delete(path) # fails if path not empty dir
-    
+
     path = ::File.expand_path(base_store_dir, root)
     Dir.delete(path) # fails if path not empty dir
   rescue SystemCallError
@@ -32,7 +26,7 @@ class ImageUploader < CarrierWave::Uploader::Base
   def store_dir
     "#{base_store_dir}/#{model.id}"
   end
-  
+
   def base_store_dir
     "uploads/#{model.class.to_s[0, 2]}"
   end
@@ -50,10 +44,10 @@ class ImageUploader < CarrierWave::Uploader::Base
   end
 
   version :medium, from_version: :large do
-    process resize_to_fit: [700,525]
+    process resize_to_fit: [700, 525]
   end
 
   version :small, from_version: :medium do
-    process resize_to_fill: [300,300]
+    process resize_to_fill: [300, 300]
   end
 end

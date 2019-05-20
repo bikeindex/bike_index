@@ -3,13 +3,20 @@
 .landing-page-body,
 #welcome_index {
   padding-top: 0;
+
   .primary-footer {
     margin-top: 0;
+  }
+  // This is our minimal spam block thing
+  .form-group.additional-field {
+    display: none !important;
   }
 }
 
 $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
-  "ambassadors-how-to", "ambassadors-current";
+  "ambassadors-how-to", "ambassadors-current", "campus-packages",
+  "cities-packages";
+
 @each $target in $landing-page-targets {
   .signup-landing-page-#{$target} {
     .banner-header {
@@ -26,9 +33,11 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
     .svgicon-border {
       fill: #3498db;
     }
+
     .svgicon-bg {
       fill: #34495e;
     }
+
     .svgicon-body {
       fill: #fff;
     }
@@ -39,20 +48,26 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
   .trusted-by {
     ul {
       @include list-unstyled;
+
       display: flex;
       flex-wrap: wrap;
     }
+
     li {
       flex: 0 0 20%;
+
       &.partner-logo-rectangle {
         flex: 0 0 40%;
       }
-      padding: $vertical-height 0.5 * $vertical-height 2 * $vertical-height;
+
+      padding: $vertical-height (0.5 * $vertical-height) (2 * $vertical-height);
+
       img {
         display: block;
         width: 100%;
         height: auto;
       }
+
       &.offset-partner-logo {
         margin-left: 20%;
       }
@@ -67,14 +82,17 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
     background-size: auto 100%;
     background-position: center top;
     background-repeat: no-repeat;
+
     // For extra wide screens, make sure we cover the whole screen
     @include media-breakpoint-up(lg) {
       background-size: cover;
     }
+
     .icon-wrapper {
       width: 100%;
       margin: 0;
       clear: both;
+
       svg,
       img {
         width: 25%;
@@ -82,20 +100,26 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
         margin: 0 auto;
       }
     }
+
     .banner-text {
-      @include make-col-ready();
+      @include make-col-ready;
+
       @include make-col(12);
+
       margin-top: 2 * $vertical-height;
     }
+
     h1,
     h2,
     h3 {
       color: white;
       text-align: center;
     }
+
     h1 {
       line-height: 1.4em;
     }
+
     h2,
     h3 {
       font-family: $body-font-family;
@@ -105,6 +129,7 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
       font-size: 21px;
       line-height: 1.6em;
     }
+
     .ribbon {
       display: none;
     }
@@ -112,33 +137,40 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
     @include media-breakpoint-up(md) {
       padding-top: 17 * $vertical-height;
       padding-bottom: 0;
+
       .icon-wrapper {
         // There is a 1/6 overhang to the left (8.33333/6 ~ 1.33333)
         flex: 0 0 9.66666%;
         max-width: 9.66666%;
         margin-left: -1.3333%;
+
         svg,
         img {
           width: 100%;
         }
       }
+
       .banner-text {
         @include make-col(7);
+
         margin-top: 0;
       }
+
       h1,
       h2,
       h3 {
         text-align: left;
       }
+
       .ribbon {
         display: block;
         margin-top: 7 * $vertical-height;
         background: $gray-darker;
+
         h2 {
           font-size: 24px;
           margin: 0;
-          padding: 2 * $vertical-height 0;
+          padding: (2 * $vertical-height) 0;
         }
       }
     }
@@ -151,17 +183,23 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
       flex-direction: column-reverse;
     }
   }
+
   .landing-why-col,
   .next-steps-col {
-    @include make-col-ready();
+    @include make-col-ready;
   }
+
   .landing-why-col {
     margin-top: 2 * $vertical-height;
+
     @include make-col(8);
+
     @include media-breakpoint-down(md) {
       @include make-col(12);
+
       min-height: auto;
     }
+
     @include media-breakpoint-up(lg) {
       @include make-col(7);
     }
@@ -172,85 +210,103 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
   }
 
   $contact-us-gutter: 30px;
+
   .next-steps-col {
     margin-top: -9.5 * $vertical-height;
+
     @include make-col(5);
+
     @include media-breakpoint-down(md) {
       @include make-col(12);
+
       min-height: auto;
     }
+
     @include media-breakpoint-up(xl) {
       @include make-col(4);
+
       @include make-col-offset(1);
     }
+
     .next-steps-wrap {
       position: -webkit-sticky;
       position: sticky;
       top: 0;
-      padding: 2.5 * $vertical-height $contact-us-gutter;
+      padding: (2.5 * $vertical-height) $contact-us-gutter;
       background: $gray-darker;
       border-radius: $border-radius;
     }
-    .form-group.additional-field {
-      display: none !important;
-    }
+
     header {
       background: $gray;
-      padding: 2 * $vertical-height 0;
+      padding: (2 * $vertical-height) 0;
       color: white;
       text-align: center;
       font-size: 30px;
       line-height: 1;
       margin-bottom: 2 * $vertical-height;
     }
+
     .btn {
       width: 100%;
       margin-top: 2 * $vertical-height;
     }
   }
+
   .trusted-by-next-steps {
-    margin: 2 * $vertical-height -15px 0;
+    margin: (2 * $vertical-height) -15px 0;
     background: white;
+
     h3 {
-      padding: 2 * $vertical-height 0.5 * $vertical-height 0;
+      padding: (2 * $vertical-height) (0.5 * $vertical-height) 0;
     }
+
     ul {
       @include list-unstyled;
+
       display: flex;
       flex-wrap: wrap;
     }
+
     li {
       flex: 0 0 33%;
+
       &.partner-logo-rectangle {
         flex: 0 0 66%;
       }
-      padding: 0 0.5 * $vertical-height 2 * $vertical-height;
+
+      padding: 0 (0.5 * $vertical-height) (2 * $vertical-height);
+
       img {
         display: block;
         width: 100%;
         height: auto;
       }
     }
+
     .hidden-on-trusted-by-next-steps {
       display: none;
     }
   }
+
   .landing-lightspeed-logo {
     max-width: 280px;
-    margin: 2 * $vertical-height 0 -1 * $vertical-height 0;
+    margin: (2 * $vertical-height) 0 (-1 * $vertical-height) 0;
     display: block;
   }
 }
 
 .signup-landing-page {
   .mobile-contact-link {
-    margin: 2 * $vertical-height 0 4 * $vertical-height;
+    margin: (2 * $vertical-height) 0 (4 * $vertical-height);
+
     a {
       display: block;
       width: 20em;
       max-width: 100%;
       margin: 0 auto;
     }
+
     @include media-breakpoint-up(lg) {
       display: none;
     }

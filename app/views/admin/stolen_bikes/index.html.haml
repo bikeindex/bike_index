@@ -1,11 +1,16 @@
-%header.with-subtitle
-  %h1
-    Stolen Bikes
-  - if @verified_only
-    = link_to 'All stolen (not just unverified)', admin_stolen_bikes_url(unapproved: true), class: "sharing-links"
-  - else
-    = link_to 'Only unverified bikes', admin_stolen_bikes_url, class: "sharing-links"
-%h4
+
+.row
+  .col-sm
+    %h1
+      Stolen bikes
+  .col-sm
+  .col-sm
+  .col-sm
+    - if @verified_only
+      = link_to 'All stolen (not just unverified)', admin_stolen_bikes_url(unapproved: true)
+    - else
+      = link_to 'Only unverified bikes', admin_stolen_bikes_url
+%p
   = link_to "View stolen notifications sent", admin_stolen_notifications_url
 
 %h4
@@ -14,19 +19,24 @@
   %em
     (#{Bike.where(stolen: true).where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
 %h4
-  = StolenRecord.where(approved: false).count
-  are unapproved
+  - if StolenRecord.where(approved: false).count == 0
+    %h4.text-success
+      0 are unapproved
+  - else
+    = StolenRecord.where(approved: false).count
+    are unapproved
 
-.paginate-container
-  = paginate @bikes
-%section.full-screen-table
+
+
+= paginate @bikes, views_prefix: "admin"
+.full-screen-table
   %table.table.table-striped.table-bordered
-    %thead
+    %thead.thead-light
       %th
         Stolen record created&nbsp;<small class="convertTimezone"></small>
-      %th.not-tiny-screens
+      %th
         Bike info
-      %th.large-screens
+      %th
         Theft info
       %th
         Location
@@ -40,9 +50,9 @@
         %tr
           %td
             .less-strong-hold
-              %span.less-strong-right.medium-screens
+              %span.less-strong-right
                 - if bike.example
-                  %span.table-error
+                  %span
                     = bike.id
                 - else
                   = bike.id
@@ -51,16 +61,16 @@
                   - created_date = current_stolen_record ? current_stolen_record.created_at : bike.created_at
                   %span.convertTime
                     = l created_date, format: :convert_time
-          %td.not-tiny-screens
+          %td
             = bike.title_string
 
             - if current_stolen_record && current_stolen_record.estimated_value.present?
               %br
               %small.less-strong
                 $#{current_stolen_record.estimated_value}
-          
+
           - if current_stolen_record.present?
-            %td.large-screens
+            %td
               = current_stolen_record.theft_description
             %td
               - if current_stolen_record.address.present?
@@ -72,7 +82,7 @@
               - elsif bike.owner.paid_org?
                 <span class="paid-org-icon">O</span>
           - else
-            %td.large-screens
+            %td
             %td
             %td
               - if bike.owner.donor?
@@ -80,5 +90,5 @@
               - elsif bike.owner.paid_org?
                 <span class="paid-org-icon">O</span>
 
-  .paginate-container
-    = paginate @bikes
+
+= paginate @bikes, views_prefix: "admin"

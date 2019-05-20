@@ -3,9 +3,9 @@ class IntegrationsController < ApplicationController
   before_filter :skip_if_signed_in
 
   def create
-    @integration = Integration.new(information: request.env['omniauth.auth'],
-                                   access_token: request.env['omniauth.auth']['credentials']['token'],
-                                   provider_name: request.env['omniauth.auth']['provider'])
+    @integration = Integration.new(information: request.env["omniauth.auth"],
+                                   access_token: request.env["omniauth.auth"]["credentials"]["token"],
+                                   provider_name: request.env["omniauth.auth"]["provider"])
     @integration.save
     if @integration.valid? && @integration.user.present?
       @user = @integration.user
@@ -16,7 +16,7 @@ class IntegrationsController < ApplicationController
   end
 
   def integrations_controller_creation_error
-    provider_name = request.env['omniauth.auth'] && request.env['omniauth.auth']['provider']
+    provider_name = request.env["omniauth.auth"] && request.env["omniauth.auth"]["provider"]
     provider_name ||= params[:strategy]
     msg = "There was a problem authenticating you with #{provider_name}. Please sign in a different way or email us at contact@bikeindex.org"
     flash[:error] = msg

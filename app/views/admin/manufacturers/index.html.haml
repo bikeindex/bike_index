@@ -1,25 +1,30 @@
-%header.with-subtitle
-  %h1 Manage Manufacturers
-  = link_to 'New Manufacturer', new_admin_manufacturer_url, class: "button-green sharing-links"
+.admin-subnav
+  .col-md-5
+    %h1
+      Manage manufacturers
+  .col-md-7
+    %ul
+      %li.nav-item
+        = link_to 'New Manufacturer', new_admin_manufacturer_url, class: "nav-link"
 
-%h4
-  #{@manufacturers.count} total, 
-  %span.less-strong
-    #{Manufacturer.with_websites.count} with websites,
-    #{Manufacturer.with_logos.count} with logos.
+  .col-12.mt-4
+    %h4
+      #{number_with_delimiter(@manufacturers.count)} total,
+      %span.less-strong
+        #{number_with_delimiter(Manufacturer.with_websites.count)} with websites,
+        #{number_with_delimiter(Manufacturer.with_logos.count)} with logos.
 
-%ul 
-%section.full-screen-table
-  %table#admin-manufacturers-list.table.table-striped.table-bordered
-    %thead
+.full-screen-table.mt-4
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light.sortable
       %th
-        Name
+        = sortable "name"
       %th
-        Frames
-      %th.large-screens
+        = sortable "frame_maker", "frame"
+      %th
         Website
-      %th.large-screens
-        Added
+      %th
+        = sortable "created_at"
     %tbody
       - @manufacturers.each do |manufacturer|
         %tr
@@ -27,19 +32,16 @@
             = link_to manufacturer.name, admin_manufacturer_url(manufacturer)
           %td.table-cell-check
             = "&#x2713;".html_safe if manufacturer.frame_maker
-          %td.large-screens
+          %td
             - if manufacturer.website
               = link_to "Company website", manufacturer.website
           %td
             %span.convertTime
               = l manufacturer.created_at, format: :convert_time
 
-.form
-  = form_tag import_admin_manufacturers_path, multipart: true do
-    .control-group.padded
-      .control-label
-        %label
-          Upload CSV of Manufacturers list
-      .controls
-        = file_field_tag :file
-    = submit_tag "Import CSV of Manufacturers", class: "button-yellow"
+
+= form_tag import_admin_manufacturers_path, multipart: true do
+  .form-group
+    = label :csv, "Upload CSV of Manufacturers list"
+    = file_field_tag :file
+  = submit_tag "Import CSV of Manufacturers", class: "btn btn-warning float-right mb-4"

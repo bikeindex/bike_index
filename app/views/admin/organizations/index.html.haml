@@ -1,84 +1,37 @@
-%header.with-subtitle
-  %h1
-    Manage Organizations
-  = link_to 'New Organization', new_admin_organization_url, class: "button-green sharing-links"
+.admin-subnav
+  .col-md-9
+    %h1
+      Manage Organization
+  .col-md-3
+    = link_to 'New Organization', new_admin_organization_url, class: "btn btn-success float-right"
+.row.mb-4
+  .col-md-5
+    %p
+      = number_with_delimiter(@organizations.total_count)
+      - if sortable_search_params?
+        %em
+          matching
+      organizations
+      %em
+        (#{matching_organizations.where("organizations.created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+  .col-md-7
+    = form_tag admin_organizations_path, method: :get, class: "form-inline" do
+      = hidden_field_tag :sort, sort_column
+      = hidden_field_tag :sort_direction, sort_direction
+      .form-check.ml-auto.mr-2.ml-2.align-self-end
+        = check_box_tag :search_is_paid, true, checked = sortable_search_params[:search_is_paid] ? true : false, class:"form-check-input"
+        = label_tag :search_is_paid, "Paid only"
+      .form-group
+        = text_field_tag :search_query, params[:search_query], placeholder: "Name/Location#{current_user.developer? ? '/Paid features' : '' }", class: "form-control mt-4"
 
-%h3
-  #{number_with_delimiter(@organizations_count)} organizations
-  = (params[:query].present? || params[:is_paid].present?) ? 'matching' : 'in the system'
+      = submit_tag 'Search', name: 'search', class: 'btn btn-primary mt-4 ml-2'
 
-%div{ style: "width: 100%; text-align: right;" }
-  = form_tag admin_organizations_path, method: :get do
-    = hidden_field_tag :sort, @sort
-    = hidden_field_tag :sort_direction, @sort_direction
-    %label{ style: 'display: inline-block; margin-right: 1em;' }
-      = check_box_tag :is_paid, true, params[:is_paid]
-      paid only
-    = text_field_tag :query, params[:query], placeholder: "Find name, location #{current_user.developer? ? 'or paid features' : '' }", style: "margin: 0; width: 30%; min-width: 200px;"
-    = submit_tag 'Search', name: 'search', class: 'button-blue'
+= paginate @organizations, views_prefix: "admin"
 
-- if @organizations.present?
-  .paginate-container
-    = paginate @organizations
+= render partial: "/admin/organizations/admin_organizations_table", locals: {sortable: true}
 
-%section.full-screen-table
-  %table.table.table-striped.table-bordered
-    %thead
-      - ['name', 'approved', 'created_at'].each do |col|
-        - active_col = @sort == col
-        %th
-          %a.column_sort_update{ href: '#', class: ('active' if active_col), style: 'display: block;', data: { sort: col, direction: (active_col && @sort_direction == 'desc' ? 'asc' : 'desc') } }
-            = col.titleize
-            - if col == "created_at"
-              <small class="convertTimezone"></small>
-            - if active_col
-              .pull-right
-                %small
-                  = (@sort_direction == 'asc' ? '&#x2193;' : '&#x2191;').html_safe
+= paginate @organizations, views_prefix: "admin"
 
-      %th
-        Bikes
-      %th.medium-screens
-        Memberships
-      %th
-        Type
-      %th.large-screens
-        Locations
-    %tbody
-      - @organizations.each do |organization|
-        - next if organization.deleted_at.present?
-        %tr
-          %td
-            = link_to organization.name, admin_organization_url(organization)
-            %small.less-strong.large-screens
-              = "paid" if organization.is_paid
-          %td
-            = "&#x2713;".html_safe if organization.approved
-          %td.medium-screens
-            %span.convertTime
-              = l organization.created_at, format: :convert_time
-          %td
-            = organization.bikes.count
-          %td.medium-screens
-            = organization.memberships.count
-          %td
-            = link_to organization.kind.humanize, admin_organizations_path(kind: organization.kind)
-          %td.large-screens
-            .less-strong-hold
-              
-              = organization.locations.count
-              - if organization.show_on_map
-                %span.less-strong-right
-                  Mapped
-
-
-:coffeescript
-  $('.column_sort_update').click (e) ->
-    e.preventDefault()
-    target = $(e.target)
-    $('.special-search-field #sort').val($(target).attr('data-sort'))
-    $('.special-search-field #sort_direction').val($(target).attr('data-direction'))
-    $('.special-search-field form').submit()
 
 %hr
-  = link_to "View deleted organizations", admin_show_deleted_organizations_url
+  = link_to "View deleted organizations", admin_show_deleted_organizations_url, class: "btn btn-danger"

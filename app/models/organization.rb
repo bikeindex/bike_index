@@ -8,14 +8,23 @@ class Organization < ActiveRecord::Base
     bike_manufacturer: 4,
     software: 5,
     property_management: 6,
-    other: 7
+    other: 7,
+    ambassador: 8,
+  }.freeze
+
+  POS_KIND_ENUM = {
+    not_pos: 0,
+    other_pos: 1,
+    lightspeed_pos: 2,
+    ascend_pos: 3,
+    broken_pos: 4,
   }.freeze
 
   acts_as_paranoid
   mount_uploader :avatar, AvatarUploader
 
   belongs_to :parent_organization, class_name: "Organization"
-  belongs_to :auto_user, class_name: 'User'
+  belongs_to :auto_user, class_name: "User"
 
   has_many :recovered_records, through: :bikes
   has_many :locations, inverse_of: :organization, dependent: :destroy
@@ -38,24 +47,26 @@ class Organization < ActiveRecord::Base
   accepts_nested_attributes_for :locations, allow_destroy: true
 
   enum kind: KIND_ENUM
+  enum pos_kind: POS_KIND_ENUM
 
   validates_presence_of :name
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact admin@bikeindex.org"
 
   default_scope { order(:name) }
-
   scope :shown_on_map, -> { where(show_on_map: true, approved: true) }
   scope :paid, -> { where(is_paid: true) }
+  scope :unpaid, -> { where(is_paid: true) }
   scope :valid, -> { where(is_suspended: false) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
-  scope :with_bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications]) }
+  scope :bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications]) }
 
   before_validation :set_calculated_attributes
-  after_commit :update_user_bike_actions_organizations
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+
+  def self.pos_kinds; POS_KIND_ENUM.keys end
 
   def self.friendly_find(n)
     return nil unless n.present?
@@ -75,13 +86,18 @@ class Organization < ActiveRecord::Base
     match_cols = %w(organizations.name organizations.short_name locations.name locations.city)
     joins("LEFT OUTER JOIN locations AS locations ON organizations.id = locations.organization_id")
       .distinct
-      .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(' OR '), { str: str })
+      .where(match_cols.map { |col| "#{col} ILIKE :str" }.join(" OR "), { str: str })
   end
 
   def self.with_paid_feature_slugs(slugs)
     matching_slugs = PaidFeature.matching_slugs(slugs)
     return nil unless matching_slugs.present?
     where("paid_feature_slugs ?& array[:keys]", keys: matching_slugs)
+  end
+
+  # Organization kinds creatable by non-superadmins
+  def self.creatable_kinds
+    kinds.reject { |kind| kind == "ambassador" }
   end
 
   def to_param
@@ -99,7 +115,7 @@ class Organization < ActiveRecord::Base
   def message_kinds # Matches organization_message kinds
     [
       paid_for?("geolocated_messages") ? "geolocated_messages" : nil,
-      paid_for?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil
+      paid_for?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil,
     ].compact
   end
 
@@ -126,6 +142,10 @@ class Organization < ActiveRecord::Base
     additional_registration_fields.include?("reg_secondary_serial")
   end
 
+  def registration_field_label(field_slug)
+    registration_field_labels && registration_field_labels[field_slug.to_s]
+  end
+
   def bike_actions? # Eventually there will be other actions beside organization_messages, so use this as general reference
     message_kinds.any? || paid_for?("unstolen_notifications")
   end
@@ -150,10 +170,10 @@ class Organization < ActiveRecord::Base
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
     self.paid_feature_slugs = current_invoices.map(&:feature_slugs).flatten
-    new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, '')
+    new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, "")
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
-      orgs = id.present? ? Organization.where('id != ?', id) : Organization.all
+      orgs = id.present? ? Organization.unscoped.where("id != ?", id) : Organization.unscoped.all
       while orgs.where(slug: new_slug).exists?
         i = i.present? ? i + 1 : 2
         new_slug = "#{new_slug}-#{i}"
@@ -162,18 +182,18 @@ class Organization < ActiveRecord::Base
     end
     generate_access_token unless self.access_token.present?
     set_auto_user
-    update_user_bike_actions_organizations
     locations.each { |l| l.save unless l.shown == allowed_show }
     true # TODO: Rails 5 update
   end
 
   def ensure_auto_user
     return true if auto_user.present?
-    self.embedable_user_email = users.first && users.first.email || ENV['AUTO_ORG_MEMBER']
+    self.embedable_user_email = users.first && users.first.email || ENV["AUTO_ORG_MEMBER"]
     save
   end
 
   def child_ids; child_organizations.pluck(:id) end
+
   # Parent invoice serves as invoice
   def current_invoices; parent_organization.present? ? parent_organization.current_invoices : invoices.active end
 
@@ -184,21 +204,23 @@ class Organization < ActiveRecord::Base
   # Enable this if they have paid for showing it, or if they use ascend
   def show_bulk_import?; paid_for?("show_bulk_import") || ascend_imports? end
 
+  def show_multi_serial?; paid_for?("show_multi_serial") || %w[law_enforcement].include?(kind); end
+
   # Can be improved later, for now just always get a location for the map
   def map_focus_coordinates
     location = locations&.first
     {
       latitude: location&.latitude || 37.7870322,
-      longitude: location&.longitude || -122.4061122
+      longitude: location&.longitude || -122.4061122,
     }
   end
 
   def set_auto_user
     if embedable_user_email.present?
       u = User.fuzzy_email_find(embedable_user_email)
-      self.auto_user_id = u.id if u && u.is_member_of?(self)
-      if auto_user_id.blank? && embedable_user_email == ENV['AUTO_ORG_MEMBER']
-        Membership.create(user_id: u.id, organization_id: id, role: 'member')
+      self.auto_user_id = u.id if u && u.member_of?(self)
+      if auto_user_id.blank? && embedable_user_email == ENV["AUTO_ORG_MEMBER"]
+        Membership.create(user_id: u.id, organization_id: id, role: "member")
         self.auto_user_id = u.id
       end
     elsif auto_user_id.blank?
@@ -207,12 +229,12 @@ class Organization < ActiveRecord::Base
     end
   end
 
-  def update_user_bike_actions_organizations
-    if bike_actions?
-      users.where("bike_actions_organization_id IS NULL or bike_actions_organization_id != ?", id)
-    else
-      users.where(bike_actions_organization_id: id)
-    end.each { |u| u.update_attributes(updated_at: Time.now) } # Force updating
+  def calculated_pos_kind
+    recent_bikes = bikes.where(created_at: (Time.now - 1.week)..Time.now)
+    return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
+    return "ascend_pos" if recent_bikes.ascend_pos.count > 0
+    return "other_pos" if recent_bikes.any_pos.count > 0
+    bikes.any_pos.count > 0 ? "broken_pos" : "not_pos"
   end
 
   def allowed_show

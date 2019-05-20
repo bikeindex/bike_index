@@ -1,9 +1,9 @@
-require 'spec_helper'
+require "spec_helper"
 
 describe Oauth::ApplicationsController do
   include_context :existing_doorkeeper_app
   describe "index" do
-    it 'redirects' do
+    it "redirects" do
       get :index
       expect(response).to redirect_to new_session_url
       expect(flash[:error]).to be_present
@@ -26,13 +26,13 @@ describe Oauth::ApplicationsController do
     end
   end
 
-  describe 'create' do
+  describe "create" do
     include_context :logged_in_as_user
     it "creates an application and adds the v2 accessor to it" do
       v2_access_id
       app_attrs = {
         name: "Some app",
-        redirect_uri: "urn:ietf:wg:oauth:2.0:oob"
+        redirect_uri: "urn:ietf:wg:oauth:2.0:oob",
       }
       post :create, doorkeeper_application: app_attrs
       app = user.oauth_applications.first
@@ -59,7 +59,7 @@ describe Oauth::ApplicationsController do
         it "renders if owned by user" do
           expect(doorkeeper_app.owner_id).to eq user.id
           get :edit, id: doorkeeper_app.id
-          expect(response.code).to eq('200')
+          expect(response.code).to eq("200")
           expect(flash).not_to be_present
         end
 
@@ -75,10 +75,10 @@ describe Oauth::ApplicationsController do
 
         context "admin" do
           let(:user) { FactoryBot.create(:admin) }
-          it 'renders if superuser' do
+          it "renders if superuser" do
             expect(doorkeeper_app.owner_id).to_not eq user.id
             get :edit, id: doorkeeper_app.id
-            expect(response.code).to eq('200')
+            expect(response.code).to eq("200")
             expect(flash).not_to be_present
           end
         end
@@ -87,7 +87,7 @@ describe Oauth::ApplicationsController do
 
     describe "update" do
       before { set_current_user(user) } # Do separately from logged_in_as, pulling doorkeeper user
-      it 'renders if owned by user' do
+      it "renders if owned by user" do
         expect(doorkeeper_app.owner_id).to eq user.id
         put :update, id: doorkeeper_app.id, doorkeeper_application: { name: "new thing" }
         doorkeeper_app.reload

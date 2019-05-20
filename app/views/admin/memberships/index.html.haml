@@ -1,34 +1,37 @@
-%header.with-subtitle
-  %h1 Manage Memberships
-  = link_to 'New Membership', new_admin_membership_url, class: "button-green sharing-links"
 
-%section.full-screen-table
-  %h2
-    = @memberships.count
-    Current memberships
-  %table#admin-users-table.table.table-striped.table-bordered
-    %thead
+%h1 Manage Memberships
+= link_to 'New Membership', new_admin_membership_url, class: "btn btn-success float-right"
+
+%h2
+  = @memberships.count
+  Current memberships
+
+= paginate @memberships, views_prefix: 'admin'
+.full-screen-table
+  %table.table.table-striped.table-bordered
+    %thead.thead-light
       %th
         Id&nbsp;
-      %th.medium-screens
+      %th
         Created&nbsp;<small class="convertTimezone"></small>
       %th
         Email
       %th
         Organization
-      %th.large-screens
+      %th
         Management links
     %tbody
       - @memberships.each do |membership|
         %tr
           %td
             = link_to membership.id, admin_membership_url(membership)
-          %td.medium-screens
+          %td
             %span.convertTime
               = l membership.created_at, format: :convert_time
           %td
             = membership.user.email
           %td
             = link_to membership.organization.name, admin_organization_path(membership.organization)
-          %td.large-screens
+          %td
             #{link_to 'Edit', edit_admin_membership_url(membership)}
+= paginate @memberships, views_prefix: 'admin'

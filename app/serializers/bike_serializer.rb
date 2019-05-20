@@ -1,5 +1,4 @@
 class BikeSerializer < ActiveModel::Serializer
-
   attributes :id,
     :serial,
     :registration_created_at,
@@ -23,8 +22,7 @@ class BikeSerializer < ActiveModel::Serializer
     :title,
     :type_of_cycle,
     :frame_material,
-    :handlebar_type,
-    :cycle_type
+    :handlebar_type
 
   has_one :rear_wheel_size,
     :front_wheel_size,
@@ -40,23 +38,23 @@ class BikeSerializer < ActiveModel::Serializer
   def manufacturer_name
     object.mnfg_name
   end
-  
+
   def url
-    "#{ENV['BASE_URL']}/bikes/#{object.id}"
+    "#{ENV["BASE_URL"]}/bikes/#{object.id}"
   end
 
   def api_url
-    "#{ENV['BASE_URL']}/api/v1/bikes/#{object.id}"
+    "#{ENV["BASE_URL"]}/api/v1/bikes/#{object.id}"
   end
 
   def title
     object.title_string + "(#{object.frame_colors.to_sentence.downcase})"
   end
-  
+
   def registration_created_at
     object.created_at
   end
-  
+
   def registration_updated_at
     object.updated_at
   end
@@ -72,19 +70,19 @@ class BikeSerializer < ActiveModel::Serializer
       object.stock_photo_url
     else
       nil
-    end    
+    end
   end
 
   def thumb
     if object.public_images.present?
       object.public_images.first.image_url(:small)
     elsif object.stock_photo_url.present?
-      small = object.stock_photo_url.split('/')
+      small = object.stock_photo_url.split("/")
       ext = "/small_" + small.pop
-      small.join('/') + ext
+      small.join("/") + ext
     else
       nil
-    end    
+    end
   end
 
   def frame_material
@@ -93,9 +91,5 @@ class BikeSerializer < ActiveModel::Serializer
 
   def handlebar_type
     object.handlebar_type_name
-  end
-
-  def cycle_type
-    object.cycle_type_name
   end
 end

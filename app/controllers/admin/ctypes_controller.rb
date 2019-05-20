@@ -1,5 +1,6 @@
 class Admin::CtypesController < Admin::BaseController
-  before_filter :find_ctypes, only: [:edit, :update, :destroy]  
+  before_filter :find_ctypes, only: [:edit, :update, :destroy]
+  layout "new_admin"
 
   def index
     @ctypes = Ctype.all
@@ -14,7 +15,7 @@ class Admin::CtypesController < Admin::BaseController
 
   def update
     if @ctype.update_attributes(permitted_parameters)
-      flash[:success] = 'Component Type Saved!'
+      flash[:success] = "Component Type Saved!"
       redirect_to admin_ctypes_url
     else
       render action: :edit
@@ -24,7 +25,7 @@ class Admin::CtypesController < Admin::BaseController
   def create
     @ctype = Ctype.create(permitted_parameters)
     if @ctype.save
-      flash[:success] = 'Component type created!'
+      flash[:success] = "Component type created!"
       redirect_to admin_ctypes_url
     else
       render action: :new
@@ -36,10 +37,9 @@ class Admin::CtypesController < Admin::BaseController
     redirect_to admin_ctypes_url
   end
 
-
   def import
     Ctype.import(params[:file])
-    flash[:success] = 'Component types imported'
+    flash[:success] = "Component types imported"
     redirect_to admin_ctypes_url
   end
 
@@ -51,6 +51,6 @@ class Admin::CtypesController < Admin::BaseController
 
   def find_ctypes
     @ctype = Ctype.friendly_find(params[:id])
-    raise ActionController::RoutingError.new('Not Found') unless @ctype.present?
+    raise ActionController::RoutingError.new("Not Found") unless @ctype.present?
   end
 end

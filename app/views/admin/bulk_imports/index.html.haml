@@ -1,31 +1,43 @@
-%section.full-screen-table
-  %header.with-subtitle
+.admin-subnav
+  .col-md-6
     %h1
       Bulk Imports
-    = link_to "New bulk import", new_admin_bulk_import_url, class: "button-green sharing-links"
-  %p
-    #{pluralize(@bulk_imports.total_count, "matching bulk import")}
-
+  .col-md-6
+    %ul
+      %li.nav-item
+        - all_active = (params.keys & %w[ascend not_ascend organization_id]).blank?
+        = link_to "All", admin_bulk_imports_path(sortable_search_params), class: "nav-link #{all_active ? 'active' : ''}"
+      %li.nav-item
+        = link_to "Only Ascend", admin_bulk_imports_path(sortable_search_params.merge(ascend: true)), class: "nav-link #{params[:ascend].present? ? 'active' : ''}"
+      %li.nav-item
+        = link_to "Not Ascend", admin_bulk_imports_path(sortable_search_params.merge(not_ascend: true)), class: "nav-link #{params[:not_ascend].present? ? 'active' : ''}"
+      %li.nav-item
+        = link_to "New bulk import", new_admin_bulk_import_url, class: "nav-link"
   - if current_organization.present?
-    %h4.mt-4
+    %p.subtitle
       #{link_to current_organization.name, admin_organization_path(current_organization)} bulk imports
-      %br
       %small
-        = link_to "view orgs view", organization_bulk_imports_path(organization_id: current_organization.to_param), class: "less-strong"
+        = link_to "orgs view", organization_bulk_imports_path(organization_id: current_organization.to_param), class: "less-strong"
 
-  .paginate-container
-    = paginate @bulk_imports
+= line_chart matching_bulk_imports.group_by_day(:created_at, range: 1.month.ago.midnight..Time.now).count
 
-  %table.table.table-striped.table-bordered.padded
-    %thead
+%p
+  = number_with_delimiter(@bulk_imports.total_count)
+  = "matching bulk import".pluralize(@bulk_imports.total_count)
+
+= paginate @bulk_imports, views_prefix: 'admin'
+
+.full-screen-table.pt-2
+  %table.table.table-striped.table-bordered.sortable
+    %thead.thead-light
       %th
-        Date
+        = sortable "created_at"
       %th
-        Progress
+        = sortable "progress"
       %th
         Errors
       %th
-        Creator
+        = sortable "user_id", "Creator"
       %th
         Organization & file
       %th
@@ -63,8 +75,8 @@
                 = link_to bulk_import.organization.name, admin_bulk_imports_url(organization_id: bulk_import.organization.to_param)
               - else
                 = link_to "none", admin_bulk_imports_url(organization_id: "none"), style: "color: #ccc"
-              %br
               %small
                 = bulk_import.file_filename
             %td
               = bulk_import.creation_states.count # Don't need to do bikes through creation states
+= paginate @bulk_imports, views_prefix: 'admin'

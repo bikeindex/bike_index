@@ -1,5 +1,5 @@
 %header.with-subtitle
-  %h1 
+  %h1
     Manage
     %strong
       #{@organization.name}'s
@@ -14,7 +14,7 @@
   %h3.organization-description-list
     #{@organization.name} has sent #{pluralize(@organization.sent_invitation_count, "invitation")},
     %br
-    and has 
+    and has
     = @organization.available_invitation_count
     remaining #{"invitation".pluralize(current_organization.available_invitation_count)}.
   %hr

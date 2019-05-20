@@ -4,7 +4,7 @@ class BikeIndex.Views.StolenMultiSerialSearch extends Backbone.View
     'change #multi_serial_search':    'unlockSearch'
     'click #search_serials':          'searchForSerials'
     'click #multiserial_fuzzy':       'searchSerialsFuzzy'
-    
+
   initialize: ->
     @setElement($('body'))
     @toggleMultiSearch() if window.location.href.match(/multi.?serial.?search/i)
@@ -31,11 +31,11 @@ class BikeIndex.Views.StolenMultiSerialSearch extends Backbone.View
 
   unlockSearch: ->
     $('#multiserial_fuzzy, #search_serials').addClass('ms_unlocked')
-  
+
   searchForSerials: (event) ->
     event.preventDefault()
     return true unless $('#search_serials').hasClass('ms_unlocked')
-    $('#search_serials').removeClass('ms_unlocked')    
+    $('#search_serials').removeClass('ms_unlocked')
     $('#multiserial_fuzzy').fadeIn()
     $('#bikes_returned, #serials_submitted').empty()
     serials = $('#multi_serial_search').val().split(/,|\n/)
@@ -58,12 +58,12 @@ class BikeIndex.Views.StolenMultiSerialSearch extends Backbone.View
           s_i = $("#serials_submitted li[name='#{serial}']").addClass('ms-nomatch')
         else
           that.appendBikes(data.bikes, serial)
-  
+
   bikeList: (bikes) ->
     list = ''
     for bike in bikes
       list += "<li>"
-        
+
       list += '<span class="stolen-color">Stolen</span>' if bike.stolen
       list += """
           <a href='#{bike.url}' target='_blank'>#{bike.title}</a>
@@ -83,9 +83,9 @@ class BikeIndex.Views.StolenMultiSerialSearch extends Backbone.View
     setTimeout (->
       s_i.find('a').removeClass('blink-class')
     ), 500
-    
+
     results = if (bikes.length > 19) then 'First 20 of many' else bikes.length
-    if fuzzy  
+    if fuzzy
       html = "<div class='multiserial-fuzzy-result'><h3>Close to serial "
     else
       html = "<div><h3>"
@@ -100,7 +100,7 @@ class BikeIndex.Views.StolenMultiSerialSearch extends Backbone.View
     for li in $('#serials_submitted li')
       serial = $(li).attr('name')
       @getFuzzySerialResponse(serial)
-    
+
 
   getFuzzySerialResponse: (serial) ->
     base_url = $('#multiserial_fuzzy').attr('data-target')

@@ -34,6 +34,8 @@
             = active_link 'Bike Index news', news_index_path
           %li
             = active_link 'Protect your bike', protect_your_bike_path
+          %li
+            = active_link 'Bicycle Serials', serials_path
           - if %w(news about manufacturers).include?(content_page_type)
             %li
               = active_link 'Donate', support_the_index_path

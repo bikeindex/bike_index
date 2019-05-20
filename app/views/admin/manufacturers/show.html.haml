@@ -1,36 +1,63 @@
+
 %h1
   = @manufacturer.name
-- if @manufacturer.frame_maker
-  %h4
-    #{@manufacturer.name} makes Frames
+
 %hr
+  %table.table-list
+    %tbody
+      %tr
+        %th
+          ID
+        %td
+          = @manufacturer.id
+      %tr
+        %th
+          Slug
+        %td
+          = @manufacturer.slug
+      %tr
+        %th
+          Open Year
+        %td
+          = @manufacturer.open_year
+      %tr
+        %th
+          Close Year
+        %td
+          = @manufacturer.close_year
+      - if @manufacturer.website.present?
+        %tr
+          %th
+            Manufacturer website
+          %td
+            = link_to @manufacturer.website, @manufacturer.website
+      %tr
+        %th
+          Description
+        %td
+          = @manufacturer.description
+      %tr
+        %th
+          Bikes
+        %td
+          = @manufacturer.bikes.count
+      %tr
+        %th
+          Components
+        %td
+          = @manufacturer.components.count
+      - if @manufacturer.logo.present?
+        %th
+          Logo
+        %td
+          = image_tag @manufacturer.logo.url(:thumb)
+      %tr
+        %th
+          Frame Maker?
+        %td.table-cell-check
+          - if @manufacturer.frame_maker
+            &#x2713
 
-.dl-holder
-  %dl.dl-horizontal
-    = @manufacturer.dl_from_attribute('id')
-    = @manufacturer.dl_from_attribute('slug')
-    = @manufacturer.dl_from_attribute("open_year")
-    = @manufacturer.dl_from_attribute("close_year")
-    - if @manufacturer.website.present?
-      = @manufacturer.dl_list_item(link_to(@manufacturer.website, @manufacturer.website), "Website")
-    = @manufacturer.dl_from_attribute('description')
-  %dl.dl-horizontal
-    %dt
-      Bikes
-    %dd
-      = @manufacturer.bikes.count
-    %dt
-      Components
-    %dd
-      = @manufacturer.components.count
 
-    - if @manufacturer.logo.present?
-      %dt
-        Logo
-      %dd
-        = image_tag @manufacturer.logo.url(:thumb)
-
-  
-.actions.padded
-  = link_to "Edit", edit_admin_manufacturer_url(@manufacturer), class: "button-green"
-  = link_to "Delete", admin_manufacturer_url(@manufacturer), method: :delete, confirm: "Are you sure?", class: "button-red"
+= link_to "Edit", edit_admin_manufacturer_url(@manufacturer), class: "btn btn-success"
+= link_to "Delete", admin_manufacturer_url(@manufacturer), method: :delete, confirm: "Are you sure?", class: "btn btn-danger"

@@ -1,10 +1,10 @@
-require 'grape_logging'
+require "grape_logging"
 
 module GrapeLogging
   module Loggers
     class BinxLogger < GrapeLogging::Loggers::Base
       def parameters(request, _)
-        { remote_ip: request.env['HTTP_CF_CONNECTING_IP'], format: 'json' }
+        { remote_ip: request.env["HTTP_CF_CONNECTING_IP"], format: "json" }
       end
     end
   end
@@ -12,7 +12,7 @@ end
 
 module API
   class Base < Grape::API
-    use GrapeLogging::Middleware::RequestLogger, instrumentation_key: 'grape_key',
+    use GrapeLogging::Middleware::RequestLogger, instrumentation_key: "grape_key",
                                                  include: [GrapeLogging::Loggers::BinxLogger.new,
                                                            GrapeLogging::Loggers::FilterParameters.new]
     mount API::V3::RootV3
@@ -25,10 +25,10 @@ module API
       opts = { error: message || e.message }
       opts[:trace] = e.backtrace[0, 10] unless Rails.env.production?
       Rack::Response.new(opts.to_json, status_code_for(e, eclass), {
-                           'Content-Type' => 'application/json',
-                           'Access-Control-Allow-Origin' => '*',
-                           'Access-Control-Request-Method' => '*'
-                         }).finish
+        "Content-Type" => "application/json",
+        "Access-Control-Allow-Origin" => "*",
+        "Access-Control-Request-Method" => "*",
+      }).finish
     end
 
     def self.status_code_for(error, eclass)

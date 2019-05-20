@@ -1,0 +1,19 @@
+%h1 Ambassadors
+
+%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+  %thead.small-header
+    %tr
+      %th Email
+      %th Name
+      %th Ambassador Groups
+      %th Progress
+  %tbody
+    - @ambassadors.each do |ambassador|
+      %tr
+        %td= link_to ambassador.email, admin_ambassador_path(ambassador.id)
+        %td= ambassador.name
+        %td= ambassador.ambassador_organizations.pluck(:name).join(", ")
+        %td= ambassador.progress_count
+
+  .paginate-container
+    = paginate @ambassadors

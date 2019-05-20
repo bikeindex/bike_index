@@ -1,87 +1,130 @@
 $organized-menu-bg: $gray-lighter;
-.organized-left-menu { display: none; }
-@media(min-width: $grid-breakpoint-md) {
+
+.organized-left-menu {
+  display: none;
+
+  .divider-above {
+    border-top: 1px solid #e4e4e4;
+    margin-top: $vertical-height;
+  }
+
+  .divider-below {
+    padding-bottom: $vertical-height;
+    border-bottom: 1px solid #e4e4e4;
+  }
+
+  li:last-of-type {
+    @extend .divider-below;
+  }
+
+  header {
+    margin-top: -2 * $vertical-height;
+    padding: 0 $vertical-height;
+
+    @extend .divider-below;
+
+    overflow-x: hidden;
+
+    h3 {
+      font-size: 18px;
+      line-height: 1.5;
+
+      span {
+        display: block;
+        font-weight: bold;
+        color: #2d2d2d;
+
+        @extend .header-font-alt;
+      }
+    }
+
+    img {
+      width: 70%;
+      max-width: 150px;
+      height: auto;
+      margin: 0 auto $vertical-height;
+      display: block;
+    }
+  }
+}
+
+@media (min-width: $grid-breakpoint-md) {
   .organized-body {
-    // @include clearfix;
     position: relative;
-    .primary-footer { position: relative; } // To make it go over the menu
+
+    .primary-footer {
+      position: relative;
+    }
+
+    // To make it go over the menu
     .organized-left-menu {
       background: $organized-menu-bg;
-      width: 15%; height: 100%;
+      width: 15%;
+      height: 100%;
       position: absolute;
       top: 0;
       display: block;
-      header {
-        margin-top: -2*$vertical-height;
-        padding: $vertical-height;
-        h3 { font-size: 18px; }
-        img {
-          width: 70%;
-          max-width: 150px;
-          height: auto;
-          margin: 0 auto $vertical-height;
-          display: block;
+
+      ul {
+        @include list-unstyled;
+
+        overflow-x: hidden;
+
+        li {
+          padding-top: $vertical-height;
         }
       }
-      ul { @include list-unstyled; }
-      .organized-mainmenu {
-        a, .menu-item {
-          width: 100%;
-          display: block;
-          padding: 0.5*$vertical-height $vertical-height;
-          color: $header-font-nocolor;
-          text-decoration: none;
-          border-bottom: 1px solid #e4e4e4;
-        }
-        a:hover {
+
+      .menu-item {
+        width: 100%;
+        display: block;
+        padding: (0.5 * $vertical-height) $vertical-height;
+        color: $header-font-nocolor;
+        text-decoration: none;
+        font-size: 14px;
+
+        &:hover {
           text-decoration: none;
           font-weight: $strong-font-weight;
+          padding-right: 0;
+
+          // Because otherwise the shift to bold can break line
         }
       }
-      .top-level { border-top: 1px solid #e4e4e4; }
-      // the last item of submenus does not have a border on the bottom, because
-      // the top level item has a full width border
-      .organized-submenu li:last-of-type a { border-bottom: none; }
-      // The last item of the last submenu or the last item of the last menu
-      // Has a bottom border
-      .organized-mainmenu>li:last-of-type {
-        &>a, .organized-submenu li:last-of-type a {
-          border-bottom: 1px solid #e4e4e4; 
-        }
-      }
-      .top-level.active {
-        background: $blue;
-        color: white;
-        position: relative;
+
+      .disabled-menu-item {
+        color: $gray-light;
+        display: block;
+
         &:hover {
-          font-weight: $normal-font-weight;
-          cursor: default;
+          font-weight: normal;
         }
+      }
+
+      .active {
+        color: $blue;
+        position: relative;
+        font-weight: bold;
+
         &:before {
-          content: '';
+          content: "";
           display: block;
-          height:0; width:0;
-          right: 0; top: 50%;
+          height: 0;
+          width: 0;
+          right: 0;
+          top: 50%;
           margin-top: -$vertical-height;
           border-top: $vertical-height solid transparent;
-          border-bottom: $vertical-height solid transparent; 
+          border-bottom: $vertical-height solid transparent;
           border-right: $vertical-height solid white;
           position: absolute;
         }
       }
-      .organized-submenu {
-        li { padding-left: 2*$vertical-height; }
-        .active { font-weight: $strong-font-weight; }
-      }
     }
+
     .organized-wrap {
       width: 100%;
       padding-left: 15%;
     }
-    // .organized-mainmenu {}
-    // .container.organized-main-container {
-    //   float: right;
-    //   width: 85%;
-    // }
   }
 }

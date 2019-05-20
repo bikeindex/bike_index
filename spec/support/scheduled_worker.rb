@@ -9,7 +9,7 @@ shared_context :scheduled_worker do
 
   shared_examples_for :scheduled_worker_tests do
     describe "scheduling" do
-      it 'does not need to run immediately after running' do
+      it "does not need to run immediately after running" do
         clear_scheduled_history
         expect(subject.should_enqueue?).to be_truthy
         instance.perform

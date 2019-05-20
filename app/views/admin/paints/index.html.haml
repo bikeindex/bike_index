@@ -1,6 +1,6 @@
-%header.with-subtitle
-  %h1
-    Manage Paints
+
+%h1
+  Manage Paints
 
 %h4
   = Paint.count
@@ -10,59 +10,54 @@
   = Paint.where('color_id IS NULL').count
   are unlinked
 
-.special-search-field-container
-  .special-search-field
+.row.form-group
+  .col-sm-7
+  .col-sm-4
     = form_tag admin_paints_path, method: :get do
-      = text_field_tag :name, params[:name], placeholder: "Search paints by name"
-      = submit_tag "Search", name: "search", class: "button-blue"
+      = text_field_tag :name, params[:name], placeholder: "Search paints by name", class: "form-control"
+  .col-sm-1
+    = submit_tag "Search", name: "search", class: "btn btn-success"
 
 - if @paints.present?
-  .paginate-container
-    = paginate @paints
-  %section.full-screen-table
+  = paginate @paints, views_prefix: "admin"
+  .full-screen-table
     %table.table.table-striped.table-bordered
-      %thead
+      %thead.thead-light
         %th
           Date created
-        %th.large-screens
+        %th
           manufacturer
         %th
           Bikes
         %th
           Description
-        %th.medium-screens
+        %th
           Color
 
       %tbody
         - @paints.each do |paint|
           %tr
             %td
-              %a{href: edit_admin_paint_url(paint) }
-
-                - if paint.created_at.today?
-                  Today at #{paint.created_at.strftime("%-I %p")}
-                - elsif Date.yesterday().beginning_of_day() <= paint.created_at
-                  Yesterday at #{paint.created_at.strftime("%-I %p")}
-                - else
-                  = paint.created_at.strftime("%-m.%-d.%Y at %-H")
-            %td.large-screens
+              %a.convertTime.preciseTime{ href: admin_paint_url(paint) }
+                = l paint.created_at, format: :convert_time
+            %td
               - if paint.manufacturer_id.present?
                 = paint.manufacturer.name
             %td
               = paint.bikes.count
             %td
               = paint.name
-            %td.medium-screens
+            %td
               - if paint.color_id.present?
                 = paint.color && paint.color.name
               - if paint.secondary_color_id.present?
                 = "- #{paint.secondary_color.name}"
               - if paint.tertiary_color_id.present?
                 = "- #{paint.tertiary_color.name}"
-  .paginate-container
-    = paginate @paints
+
+  = paginate @paints, views_prefix: "admin"
 
 
 - else
-  %h1.padded
+  %h1.mb-4
     No paints found!
