@@ -18,6 +18,7 @@ describe Counts do
       expect(StolenRecord.recovered.count).to eq 1
       expect(Counts.assign_recoveries).to eq 2042
       expect(Counts.assign_recoveries_value).to eq Counts.recovery_average_value * 2042
+      expect(Counts.recoveries_value).to eq Counts.recovery_average_value * 2042
     end
   end
 end
