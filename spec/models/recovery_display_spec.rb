@@ -32,7 +32,7 @@ describe RecoveryDisplay do
     end
     it "sets attrs from stolen record" do
       t = Time.now
-      stolen_record = FactoryBot.create(:stolen_record, date_recovered: t, recovered_description: "stuff", current: false)
+      stolen_record = FactoryBot.create(:stolen_record_recovered, date_recovered: t, recovered_description: "stuff", current: false)
       recovery_display = RecoveryDisplay.new
       recovery_display.from_stolen_record(stolen_record.id)
       expect(recovery_display.quote).to eq("stuff")
