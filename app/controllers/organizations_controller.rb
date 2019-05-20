@@ -54,7 +54,7 @@ class OrganizationsController < ApplicationController
     @bike = BikeCreator.new(@b_param).new_bike
     if params[:email].present?
       @bike.owner_email = params[:email]
-      @persist_email = true
+      @persist_email = true unless defined?(@persist_email)
     end
     render layout: "embed_layout"
   end
