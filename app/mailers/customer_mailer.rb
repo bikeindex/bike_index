@@ -43,7 +43,8 @@ class CustomerMailer < ActionMailer::Base
 
   def admin_contact_stolen_email(customer_contact)
     @customer_contact = customer_contact
-    mail(to: @customer_contact.user_email, "Reply-To" => @customer_contact.creator_email, subject: @customer_contact.title)
+    mail(to: @customer_contact.user_email, sender: @customer_contact.creator_email,
+         reply_to: @customer_contact.creator_email, subject: @customer_contact.title)
   end
 
   def stolen_notification_email(stolen_notification)
