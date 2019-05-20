@@ -605,7 +605,7 @@ describe BikesController do
           Sidekiq::Testing.inline! do
             test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")))
             expect_any_instance_of(ImageAssociatorWorker).to receive(:perform).and_return(true)
-            post :create, bike: bike_params.merge(image: test_photo, persist_email: "")
+            post :create, persist_email: "", bike: bike_params.merge(image: test_photo)
             expect(assigns[:persist_email]).to be_falsey
             expect(response).to redirect_to(embed_extended_organization_url(organization))
             bike = Bike.last
