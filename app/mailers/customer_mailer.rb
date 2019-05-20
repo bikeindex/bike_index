@@ -49,7 +49,9 @@ class CustomerMailer < ActionMailer::Base
 
   def stolen_notification_email(stolen_notification)
     @stolen_notification = stolen_notification
-    mail(to: [@stolen_notification.receiver_email, "lily@bikeindex.org", "bryan@bikeindex.org"],
+    mail(to: @stolen_notification.receiver_email,
+         cc: ["lily@bikeindex.org", "bryan@bikeindex.org"],
+         reply_to: @stolen_notification.sender.email,
          from: "bryan@bikeindex.org", subject: @stolen_notification.display_subject)
     dates = stolen_notification.send_dates_parsed + [Time.now.to_i]
     stolen_notification.update_attribute :send_dates, dates
