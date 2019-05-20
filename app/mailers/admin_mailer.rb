@@ -25,7 +25,9 @@ class AdminMailer < ActionMailer::Base
 
   def blocked_stolen_notification_email(stolen_notification)
     @stolen_notification = stolen_notification
-    mail(to: "bryan@bikeindex.org", bcc: "contact@bikeindex.org", subject: "Stolen notification blocked!")
+    mail(to: "bryan@bikeindex.org",
+         cc: cc: ["stolen-communication@bikeindex.org"],
+         subject: "Stolen notification blocked!")
   end
 
   def unknown_organization_for_ascend_import(bulk_import)

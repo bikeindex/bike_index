@@ -38,19 +38,24 @@ class CustomerMailer < ActionMailer::Base
     @info = customer_contact.info_hash
     @bike = customer_contact.bike
     @biketype = @bike.cycle_type_name&.downcase
-    mail(to: @customer_contact.user_email, subject: @customer_contact.title)
+    mail(to: @customer_contact.user_email,
+         cc: ["stolen-communication@bikeindex.org"],
+         subject: @customer_contact.title)
   end
 
   def admin_contact_stolen_email(customer_contact)
     @customer_contact = customer_contact
-    mail(to: @customer_contact.user_email, sender: @customer_contact.creator_email,
-         reply_to: @customer_contact.creator_email, subject: @customer_contact.title)
+    mail(to: @customer_contact.user_email,
+         sender: @customer_contact.creator_email,
+         cc: ["stolen-communication@bikeindex.org"],
+         reply_to: @customer_contact.creator_email,
+         subject: @customer_contact.title)
   end
 
   def stolen_notification_email(stolen_notification)
     @stolen_notification = stolen_notification
     mail(to: @stolen_notification.receiver_email,
-         cc: ["bryan@bikeindex.org", "lily@bikeindex.org"],
+         cc: ["stolen-communication@bikeindex.org"],
          reply_to: @stolen_notification.sender.email,
          from: "bryan@bikeindex.org", subject: @stolen_notification.display_subject)
     dates = stolen_notification.send_dates_parsed + [Time.now.to_i]
@@ -62,6 +67,7 @@ class CustomerMailer < ActionMailer::Base
     @bike = stolen_record.bike
     @biketype = @bike.cycle_type_name&.downcase
     mail(to: [@bike.owner_email],
+         cc: ["stolen-communication@bikeindex.org"],
          from: "bryan@bikeindex.org",
          subject: "Your #{@biketype} has been marked recovered!")
   end
