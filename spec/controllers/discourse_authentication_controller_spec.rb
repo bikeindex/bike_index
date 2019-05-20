@@ -12,28 +12,99 @@ describe DiscourseAuthenticationController do
         expect(response).to redirect_to(new_session_path)
       end
     end
+
     context "signed in" do
-      before do
-        user = FactoryBot.create(:user_confirmed)
-        set_current_user(user)
-        sso = SingleSignOn.parse(discourse_query_string, ENV["DISCOURSE_SECRET"])
-        sso.email = user.email
-        sso.name = user.name
-        sso.external_id = user.id
-        @target_url = sso.to_url("#{ENV["DISCOURSE_URL"]}/session/sso_login")
+      include_context :logged_in_as_user
+
+      let(:sso) do
+        SingleSignOn.parse(discourse_query_string, ENV["DISCOURSE_SECRET"]).tap do |sso|
+          sso.email = user.email
+          sso.name = user.name
+          sso.external_id = user.id
+        end
       end
 
       it "redirects signed in user from query string" do
+        target_url = sso.to_url("#{ENV["DISCOURSE_URL"]}/session/sso_login")
+
         get :index, Rack::Utils.parse_query(discourse_query_string)
-        expect(response).to redirect_to(@target_url)
+
+        expect(response).to redirect_to(target_url)
         expect(session[:discourse_redirect]).to be_nil
       end
 
       it "redirects user from discourse_redirect in session" do
+        target_url = sso.to_url("#{ENV["DISCOURSE_URL"]}/session/sso_login")
         session[:discourse_redirect] = discourse_query_string
+
         get :index
-        expect(response).to redirect_to(@target_url)
+
+        expect(response).to redirect_to(target_url)
         expect(session[:discourse_redirect]).to be_nil
+      end
+
+      it "does not grant admin permissions if the current_user is not a superuser" do
+        target_url = sso.to_url("#{ENV["DISCOURSE_URL"]}/session/sso_login")
+        session[:discourse_redirect] = discourse_query_string
+
+        get :index
+
+        expect(response).to redirect_to(target_url)
+        expect(sso.admin).to be_nil
+      end
+
+      it "does not grant moderator permissions if the current_user is not an ambassador" do
+        target_url = sso.to_url("#{ENV["DISCOURSE_URL"]}/session/sso_login")
+        session[:discourse_redirect] = discourse_query_string
+
+        get :index
+
+        expect(response).to redirect_to(target_url)
+        expect(sso.moderator).to be_nil
+      end
+    end
+
+    context "signed in as a superuser" do
+      include_context :logged_in_as_super_admin
+
+      let(:sso) do
+        SingleSignOn.parse(discourse_query_string, ENV["DISCOURSE_SECRET"]).tap do |sso|
+          sso.email = user.email
+          sso.name = user.name
+          sso.external_id = user.id
+          sso.admin = true
+        end
+      end
+
+      it "grants admin permissions" do
+        target_url = sso.to_url("#{ENV["DISCOURSE_URL"]}/session/sso_login")
+        session[:discourse_redirect] = discourse_query_string
+
+        get :index
+
+        expect(response).to redirect_to(target_url)
+      end
+    end
+
+    context "signed in as an ambassador" do
+      include_context :logged_in_as_ambassador
+
+      let(:sso) do
+        SingleSignOn.parse(discourse_query_string, ENV["DISCOURSE_SECRET"]).tap do |sso|
+          sso.email = user.email
+          sso.name = user.name
+          sso.external_id = user.id
+          sso.moderator = true
+        end
+      end
+
+      it "grants moderator permissions" do
+        target_url = sso.to_url("#{ENV["DISCOURSE_URL"]}/session/sso_login")
+        session[:discourse_redirect] = discourse_query_string
+
+        get :index
+
+        expect(response).to redirect_to(target_url)
       end
     end
   end

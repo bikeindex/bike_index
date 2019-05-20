@@ -6,6 +6,8 @@ class DiscourseAuthenticationController < ApplicationController
     sso.email = current_user.email
     sso.name = current_user.name
     sso.external_id = current_user.id
+    sso.admin = current_user.superuser? if current_user.superuser?
+    sso.moderator = current_user.ambassador? if current_user.ambassador?
     session[:discourse_redirect] = nil
     redirect_to sso.to_url(discourse_redirect_url) and return
   end
