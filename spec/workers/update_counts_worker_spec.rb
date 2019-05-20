@@ -21,7 +21,7 @@ describe UpdateCountsWorker, type: :lib do
       instance.perform
       expect(Counts.total_bikes).to eq 4
       expect(Counts.stolen_bikes).to eq 1
-      expect(Counts.recoveries).to eq 1
+      expect(Counts.recoveries).to eq 2041
     end
   end
 end
