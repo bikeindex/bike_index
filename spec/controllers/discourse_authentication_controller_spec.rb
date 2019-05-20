@@ -13,7 +13,7 @@ describe DiscourseAuthenticationController do
       end
     end
 
-    context "signed in" do
+    context "signed in as a standard user" do
       include_context :logged_in_as_user
 
       let(:sso) do
@@ -99,6 +99,30 @@ describe DiscourseAuthenticationController do
       end
 
       it "grants moderator permissions" do
+        target_url = sso.to_url("#{ENV["DISCOURSE_URL"]}/session/sso_login")
+        session[:discourse_redirect] = discourse_query_string
+
+        get :index
+
+        expect(response).to redirect_to(target_url)
+      end
+    end
+
+    context "signed in as an ambassador with superuser auth" do
+      include_context :logged_in_as_ambassador
+
+      let(:sso) do
+        SingleSignOn.parse(discourse_query_string, ENV["DISCOURSE_SECRET"]).tap do |sso|
+          sso.email = user.email
+          sso.name = user.name
+          sso.external_id = user.id
+          sso.admin = true
+          sso.moderator = true
+        end
+      end
+
+      it "grants admin and moderator permissions" do
+        user.update(superuser: true)
         target_url = sso.to_url("#{ENV["DISCOURSE_URL"]}/session/sso_login")
         session[:discourse_redirect] = discourse_query_string
 
