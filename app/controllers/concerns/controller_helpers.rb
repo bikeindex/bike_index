@@ -7,7 +7,7 @@ module ControllerHelpers
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
                   :current_organization, :passive_organization, :controller_namespace, :page_id,
-                  :recovered_bike_count, :default_bike_search_path
+                  :default_bike_search_path
     before_filter :enable_rack_profiler
   end
 
@@ -87,17 +87,6 @@ module ControllerHelpers
   # This is overridden in FeedbacksController
   def page_id
     @page_id ||= [controller_namespace, controller_name, action_name].compact.join("_")
-  end
-
-  def recovered_bike_count
-    if Rails.env.production?
-      Rails.cache.fetch "recovered_bike_count_#{Date.today.to_formatted_s(:number)}" do
-        # StolenBikeRegistry.com had just over 2k recoveries prior to merging. The recoveries weren't imported, so manually calculate
-        StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count + 2_041
-      end
-    else
-      3_021
-    end
   end
 
   def ensure_preview_enabled!

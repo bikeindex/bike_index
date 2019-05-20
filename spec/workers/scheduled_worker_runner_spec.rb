@@ -3,7 +3,7 @@ require "spec_helper"
 describe ScheduledWorkerRunner, type: :lib do
   let(:subject) { ScheduledWorkerRunner }
   let(:instance) { subject.new }
-  let(:scheduled_workers) { [UpdateExpiredInvoiceWorker] }
+  let(:scheduled_workers) { [UpdateExpiredInvoiceWorker, UpdateCountsWorker, UpdateOrganizationPosKindWorker] }
   include_context :scheduled_worker
   include_examples :scheduled_worker_tests
 
@@ -13,7 +13,7 @@ describe ScheduledWorkerRunner, type: :lib do
   end
 
   it "has correct scheduled workers" do
-    expect(subject.scheduled_workers).to eq scheduled_workers + [UpdateOrganizationPosKindWorker, subject]
+    expect(subject.scheduled_workers).to match_array(scheduled_workers + [subject])
   end
 
   describe "perform" do
