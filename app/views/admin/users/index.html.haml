@@ -21,7 +21,6 @@
 
 - if @users.present?
   = paginate @users, views_prefix: "admin"
-
   = render partial: "/admin/users/table"
   = paginate @users, views_prefix: "admin"
 - else

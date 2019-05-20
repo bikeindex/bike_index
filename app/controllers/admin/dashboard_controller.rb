@@ -44,6 +44,7 @@ class Admin::DashboardController < Admin::BaseController
   def tsvs
     @blacklist = FileCacheMaintainer.blacklist
     @tsvs = FileCacheMaintainer.files
+    render layout: "new_admin"
   end
 
   def update_tsv_blacklist
