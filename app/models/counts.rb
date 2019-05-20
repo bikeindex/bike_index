@@ -1,43 +1,37 @@
 class Counts
-  COUNTS_KEY = "counts_#{Rails.env}".freeze
+  STOREAGE_KEY = "counts_#{Rails.env}".freeze
 
-  def self.total_bikes=(count)
-    redis { |r| r.hset COUNTS_KEY, "total_bikes", count}
+  class << self
+    def assign_for(count_key, value)
+      redis { |r| r.hset STOREAGE_KEY, count_key, value }
+    end
+
+    def retrieve_for(count_key)
+      redis { |r| r.hget STOREAGE_KEY, count_key }.to_i
+    end
+
+    def assign_total_bikes; assign_for("total_bikes", Bike.count) end
+
+    def total_bikes; retrieve_for("total_bikes") end
+
+    def assign_stolen_bikes; assign_for("stolen_bikes", Bike.stolen.count) end
+
+    def stolen_bikes; retrieve_for("stolen_bikes") end
+
+    def assign_recoveries
+    end
+
+    def recoveries; retrieve_for("recoveries") end
+
+    def assign_recoveries_value
+    end
+
+    def recoveries_value; retrieve_for("recoveries_value") end
   end
-
-  def self.total_bikes
-    redis { |r| r.hget COUNTS_KEY, "total_bikes" }.to_i
-  end
-
-  def self.stolen_bikes=(count)
-    redis { |r| r.hset COUNTS_KEY, "stolen_bikes", count}
-  end
-
-  def self.stolen_bikes
-    redis { |r| r.hget COUNTS_KEY, "stolen_bikes" }.to_i
-  end
-
-  def self.stolen_notes=(count)
-    redis { |r| r.hset COUNTS_KEY, "stolen_notes", count}
-  end
-
-  def self.stolen_notes
-    redis { |r| r.hget COUNTS_KEY, "stolen_notes" }.to_i
-  end
-
-  def self.recoveries=(count)
-    redis { |r| r.hset COUNTS_KEY, "recoveries", count}
-  end
-
-  def self.recoveries
-    redis { |r| r.hget COUNTS_KEY, "recoveries" }.to_i
-  end
-
-
 
   protected
 
-    # Should be the new canonical way of using redis
+  # Should be the new canonical way of using redis
   def self.redis
     # Basically, crib what is done in sidekiq
     raise ArgumentError, "requires a block" unless block_given?
