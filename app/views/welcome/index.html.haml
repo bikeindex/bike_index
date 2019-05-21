@@ -1,44 +1,39 @@
-.root-landing-page
-  %header.root-landing-banner-header
+%main.root-landing-page
+  %header.jumbotron.root-landing-banner-header.bg-image-bike-hero
     .container
-      .row
-        .root-landing-header-text
-          %p
-            %strong
-              = number_with_delimiter Counts.recoveries
-            bikes recovered.
-          %h1
-            <span>Bike</span> <span>Registration</span> <span>that</span> <span>Works</span>
-          %a.btn.btn-lg.btn-success.root-action-btn{ href: new_user_path }
-            Get started, it's free
-        .root-landing-signup
-          - unless current_user.present?
-            = form_for User.new do |f|
-              .form-group
-                = f.label :name, 'full name', class: 'sr-only'
-                = f.text_field :name, placeholder: 'name', class: 'form-control'
-              .row
-                .form-group.col-md-6
-                  = f.label :email, class: 'sr-only'
-                  = f.email_field :email, placeholder: 'email', class: 'form-control'
-                .form-group.col-md-6
-                  = f.label :password, class: 'sr-only'
-                  = f.password_field :password, placeholder: 'password', class: 'form-control'
+      .root-landing-header-text
+        %h2
+          Over
+          = number_with_delimiter(@recovery_count)
+          Bikes Recovered
+        %h1.upcase
+          Bike registration that works
+        %h2
+          Find out how &raquo;
+  .container-fluid.root-landing-banner-subheader
+    .row
+      .subheader-tile.col-md-3
+        .subheader-image.bg-image-bike-shops
+        .subheader-image-caption
+          %em for&nbsp;
+          %span.upcase= link_to "Bike Shops &raquo;".html_safe, for_shops_path
+      .subheader-tile.col-md-3
+        .subheader-image.bg-image-bike-cities
+        .subheader-image-caption
+          %em for&nbsp;
+          %span.upcase= link_to "Cities &raquo;".html_safe, for_law_enforcement_path
+      .subheader-tile.col-md-3
+        .subheader-image.bg-image-bike-schools
+        .subheader-image-caption
+          %em for&nbsp;
+          %span.upcase= link_to "Schools &raquo;".html_safe, for_schools_path
+      .subheader-tile.col-md-3
+        .subheader-image.bg-image-bike-groups
+        .subheader-image-caption
+          %em for&nbsp;
+          %span.upcase= link_to "Community Groups &raquo;".html_safe, for_advocacy_path
 
-              .checkbox
-                %label
-                  = f.check_box :terms_of_service
-                  I agree to Bike Index
-                  %a.no-tab{ data: { target: terms_url } }
-                    terms and conditions
-
-              = f.submit 'Sign up for free', class: 'btn btn-success btn-lg'
-              .or-block
-                or
-              %a.btn.btn-primary.btn-lg.root-landing-facebook{ href: '/auth/facebook' }
-                Sign up for free with Facebook
-
-  - cache 'root_body_wrap', skip_digest: true do # Expired in recovery_displays_controller
+  - cache "root_body_wrap", skip_digest: true do # Expired in recovery_displays_controller
     .root-landing-recovery-stories
       .container
         #recovery-stories-container.extras-hidden

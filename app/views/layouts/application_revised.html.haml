@@ -78,6 +78,9 @@
                 %li.divider-nav-item
                 %li
                   = link_to "Super Admin view #{passive_organization.short_name}", admin_organization_path(passive_organization)
+        - else
+          .center-navbar-signup-link-container
+            = link_to "Sign up", new_user_url, class: "center-navbar-signup-link signup-link upcase"
 
         %a#menu-opened-backdrop
         .hamburgler

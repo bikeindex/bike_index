@@ -12,36 +12,182 @@
 }
 
 .root-landing-banner-header {
-  background-image: image-url("landing_pages/header_bg_root-1080.jpg");
   width: 100%;
-  padding-top: 12 * $vertical-height;
-  padding-bottom: 6 * $vertical-height;
+  margin-bottom: 10px;
+}
+
+.root-landing-banner-subheader {
+  width: 100%;
+  margin-top: 10px;
+  margin-left: 0;
+  margin-right: 0;
+
+  .subheader-tile:first-of-kind {
+    padding-right: 5px;
+  }
+
+  .subheader-tile:last-of-kind {
+    padding-left: 5px;
+  }
+
+  .subheader-tile {
+    margin: 10px auto;
+    min-width: 275px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .subheader-image {
+    height: 275px;
+  }
+
+  .subheader-image-caption {
+    background-color: black;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 15px;
+
+    a {
+      color: #fff;
+    }
+  }
+}
+
+.center-navbar-signup-link-container {
+  display: inline-block;
+  width: 75%;
+  text-align: center;
+  margin: 20px auto 10px auto;
+}
+
+.center-navbar-signup-link {
+	background-color: rgba(0,0,0,0);
+	border-radius: 4px;
+	border: 1px solid #3498DB;
+	width: 85px;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline;
+  font-size: 0.8rem;
+  font-size: 12px;
+  height: 37px;
+  line-height: 18px;
+  padding: 8px 15px;
+  text-align: center;
+}
+
+@media screen and (min-width: 501px) {
+  .center-navbar-signup-link-container {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 1099px) {
+  .root-landing-banner-subheader {
+    .subheader-tile {
+      margin: 10px auto;
+    }
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .root-landing-banner-subheader {
+    .subheader-tile {
+      margin: 0 auto;
+      min-width: 100%;
+    }
+  }
+
+  .subheader-image {
+    display: none;
+  }
+
+  .subheader-image-caption {
+    margin: 5px auto;
+  }
+}
+
+.bg-image-bike-hero {
+  background-image: image-url("landing_pages/hero.jpg");
   background-size: cover;
   background-position: center bottom;
   background-repeat: no-repeat;
 }
 
+.bg-image-bike-shops {
+  background-image: image-url("landing_pages/bike-shop.jpg");
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+
+.bg-image-bike-cities {
+  background-image: image-url("landing_pages/cities.jpg");
+  background-size: cover;
+  background-position: left bottom;
+  background-repeat: no-repeat;
+}
+
+.bg-image-bike-schools {
+  background-image: image-url("landing_pages/schools.jpg");
+  background-size: cover;
+  background-position: right bottom;
+  background-repeat: no-repeat;
+}
+
+.bg-image-bike-groups {
+  background-image: image-url("landing_pages/groups.jpg");
+  background-size: cover;
+  background-position: center bottom;
+  background-repeat: no-repeat;
+}
+
+@media screen and (max-width: 767px) {
+  .bg-image-bike-shops {
+    background-position: center top;
+  }
+
+  .bg-image-bike-cities {
+    background-position: right center;
+  }
+
+  .bg-image-bike-schools {
+    background-position: right top;
+  }
+
+  .bg-image-bike-groups {
+    background-position: center center;
+  }
+}
+
+
+// TODO: Remove styles / optimize images?
 @media screen and (min-device-width: 1000px) {
   .root-landing-banner-header {
-    background-image: image-url("landing_pages/header_bg_root-2000.jpg");
+    background-image: image-url("landing_pages/hero.jpg");
   }
 }
 
 @media screen and (min-device-width: 1000px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi) {
   .root-landing-banner-header {
-    background-image: image-url("landing_pages/header_bg_root-full.jpg");
+    background-image: image-url("landing_pages/hero.jpg");
   }
+}
+
+.upcase {
+  text-transform: uppercase;
 }
 
 .root-landing-banner-header {
   .root-landing-header-text {
-    @include make-col-ready;
-
-    @include make-col(12);
-
     h1,
+    h2,
     p {
       color: white;
+      display: block;
+      margin: 15px auto;
+      text-align: center;
     }
 
     p {
@@ -54,7 +200,20 @@
     }
 
     h1 {
+	    text-shadow: 0 2px 15px #11354E;
       font-size: 60px;
+      font-weight: 300;
+    }
+
+    h2 {
+	    color: #ffffff;
+	    font-size: 24px;
+	    font-weight: 600;
+	    letter-spacing: 0.5px;
+	    line-height: 67px;
+	    text-align: center;
+	    text-shadow: 0 2px 5px rgba(17,46,78,0.72);
+      text-transform: none;
     }
 
     .root-action-btn {
@@ -130,6 +289,8 @@
 
   // so we don't overpower the active border
   @include media-breakpoint-down(sm) {
+    padding-top: 10 * $vertical-height;
+
     .root-landing-header-text {
       p {
         font-size: 20px;
@@ -145,23 +306,11 @@
     }
   }
 
-  @include media-breakpoint-down(md) {
-    .root-landing-header-text {
-      .root-action-btn {
-        display: block;
-      }
-    }
-  }
-
   @include media-breakpoint-up(lg) {
-    padding-top: 20 * $vertical-height;
+    padding-top: 10 * $vertical-height;
     padding-bottom: 12 * $vertical-height;
 
     .root-landing-header-text {
-      margin-top: 55px;
-
-      @include make-col(7);
-
       p {
         line-height: 1.3em;
       }
@@ -173,12 +322,6 @@
       @include make-col-ready;
 
       @include make-col(5);
-    }
-  }
-
-  @include media-breakpoint-up(xl) {
-    .root-landing-header-text {
-      margin-top: 85px;
     }
   }
 }
