@@ -56,6 +56,8 @@ class UsersController < ApplicationController
       @user = User.find_by_password_reset_token(params[:token])
       if @user.present? && !@user.reset_token_expired?
         session[:return_to] = "password_reset"
+        # They got the password reset email, which counts as confirming their email
+        @user.confirm(@user.confirmation_token) if @user.unconfirmed?
         sign_in_and_redirect(@user)
       else
         flash[:error] = "We're sorry, but that link is no longer valid."
