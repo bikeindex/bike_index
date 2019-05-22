@@ -289,9 +289,16 @@ describe UsersController do
 
       context "unconfirmed user" do
         let(:user) { FactoryBot.create(:user) }
-        it "redirects" do
+        it "logs in and redirects" do
+          expect(user.confirmed?).to be_falsey
+          expect(user.password_reset_token).to be_present
           post :password_reset, token: user.password_reset_token
-          expect(response).to redirect_to please_confirm_email_users_path
+          expect(response).to render_template :update_password
+          expect(User.from_auth(cookies.signed[:auth])).to eq(user)
+          # If they are using the correct token, they got the email we sent,
+          # so we can assume they have a confirmed email
+          user.reload
+          expect(user.confirmed?).to be_truthy
         end
       end
 
