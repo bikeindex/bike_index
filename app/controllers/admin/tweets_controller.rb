@@ -47,6 +47,6 @@ class Admin::TweetsController < Admin::BaseController
   end
 
   def fetch_twitter_response(tweet_id)
-    Twitter.status(tweet_id).to_json
+    TwitterClient.status(tweet_id).to_json
   end
 end
