@@ -14,10 +14,10 @@
         - label_secondary_serial = @organization.registration_field_label("reg_secondary_serial") || "Additional serial/sticker number"
         = f.label :additional_registration, label_secondary_serial, class: "control-label"
         .controls
-          = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off' 
+          = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
     .has-no-serial.optional-block
       %label
-        = f.check_box :has_no_serial, tabindex: -1 
+        = f.check_box :has_no_serial, tabindex: -1
         Has no serial
 
   .input-group.with-additional-block
@@ -42,7 +42,7 @@
       %label
         %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
         Unknown year
-        
+
   .input-group
     .control-group
       = f.label :frame_model, class: "control-label"

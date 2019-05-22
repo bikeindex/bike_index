@@ -38,6 +38,7 @@ RSpec.configure do |config|
 
   # Add our request spec helpers
   config.include RequestSpecHelpers, type: :request
+  config.include RequestSpecHelpers, type: :controller
 
   config.before :suite do
     DatabaseCleaner.clean

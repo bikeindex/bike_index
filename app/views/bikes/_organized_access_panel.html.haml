@@ -35,6 +35,16 @@
               %em
                 so you can
               = link_to "Edit it", edit_bike_path(@bike), class: "btn btn-success btn-sm"
+        - elsif current_user.ambassador?
+          .col-xs-12.mb-2
+            .text-right.less-strong
+              %em
+                %span.hidden-md-down
+                  This #{@bike.type} is not claimed yet. As a Bike Index ambassador,
+              %em
+                you can edit it to mark it as returned:
+              = link_to "EDIT", edit_bike_path(@bike), class: "btn btn-success btn-sm"
+
         .mb-2{ class: display_unstolen_notification_form ? "col-md-7" : "col-sm-12" }
           %ul.attr-list{ class: display_unstolen_notification_form ? "" : "split-sm" }
             - if passive_organization.paid_for?("bike_codes") # Always display stickers if org has paid for them
@@ -58,6 +68,9 @@
                 %span.convertTime
                   = l @bike.created_at, format: :convert_time
               %li
+                %span.attr-title Claimed:
+                = @bike.claimed?
+              %li
                 %span.attr-title Creator:
                 = @bike.creator&.display_name
                 %em.small.less-strong
@@ -66,12 +79,8 @@
                 - bike_attr = Export.additional_registration_fields[reg_field.to_sym]
                 - if bike_attr == "registration_address"
                   %li
-                    %span.attr-title
-                      Entered address:
-                    = @bike.b_params.map { |bp| bp.bike["address"] }.reject(&:blank?).first
-                  %li
                     %span.attr-title{ style: "line-height: 1.25;" }
-                      Formatted address:
+                      Address:
                     - address = @bike.registration_address
                     - if address.present?
                       %br
@@ -88,6 +97,28 @@
                       = @bike.phone
                     - elsif reg_field == "reg_affiliation"
                       = @bike.organization_affiliation
+
+              - if passive_organization.paid_for?("avery_export")
+                %li
+                  %span.attr-title
+                    User name:
+                  - if @bike.user_name.present?
+                    = @bike.user_name
+                  - else
+                    %em.text-warning
+                      no name
+                %li
+                  %span.attr-title
+                    Avery Exportable:
+                  - if Export.avery_export_bike?(@bike)
+                    true
+                  - else
+                    false.
+                    %small.em
+                      - unless @bike.user_name.present?
+                        missing user name
+                      - unless @bike.registration_address.present? && @bike.registration_address["address"].present?
+                        missing Address
 
           - if !@bike.organized?(passive_organization) # Apologize, bike isn't organizations
             %p.less-strong.mt-4

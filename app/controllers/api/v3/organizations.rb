@@ -15,7 +15,7 @@ module API
           authorizations: { oauth2: [{ scope: :write_organizations }] },
           notes: <<-NOTES,
           **Requires** `write_organizations` **in the access token** you use to create the organization.
-          <hr> 
+          <hr>
           **Location:** You may optionally include `locations` for the organization.
 
           <hr>
@@ -25,7 +25,7 @@ module API
         params do
           requires :name, type: String, desc: "The organization name"
           requires :website, type: String, desc: "The organization website", regexp: URI::regexp(%w(http https))
-          requires :kind, type: String, desc: "The kind of organization", values: Organization.kinds
+          requires :kind, type: String, desc: "The kind of organization", values: Organization.creatable_kinds
 
           optional :locations, type: Array, desc: "The organization locations" do
             requires :name, type: String, desc: "The location's name"
@@ -40,7 +40,7 @@ module API
 
         # POST /api/v3/organizations
         post serializer: OrganizationSerializer, root: "organization" do
-          error!("Unauthorized. Cannot write organiztions", 401) if !allowed_write_organizations
+          error!("Unauthorized. Cannot write organizations", 401) if !allowed_write_organizations
 
           permitted = declared(params, include_missing: false)
           organization = Organization.new(

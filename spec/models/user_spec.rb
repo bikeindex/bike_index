@@ -1,6 +1,33 @@
 require "spec_helper"
 
 describe User do
+  describe ".ambassadors" do
+    context "given ambassadors and no org filter" do
+      it "returns any and only users who are ambassadors" do
+        FactoryBot.create(:user)
+        FactoryBot.create(:developer)
+        ambassadors = FactoryBot.create_list(:ambassador, 3)
+
+        found_ambassadors = User.ambassadors
+
+        expect(found_ambassadors.pluck(:id).sort).to eq(ambassadors.map(&:id).sort)
+      end
+    end
+
+    context "with no ambassadors" do
+      it "returns an empty array" do
+        expect(User.ambassadors).to eq([])
+      end
+    end
+
+    context "with no matching users" do
+      it "returns an empty array" do
+        FactoryBot.create(:developer)
+        expect(User.ambassadors).to eq([])
+      end
+    end
+  end
+
   describe "validations" do
     it { is_expected.to have_many :user_emails }
     it { is_expected.to have_many :payments }
@@ -20,7 +47,8 @@ describe User do
     it { is_expected.to have_many :sent_stolen_notifications }
     it { is_expected.to have_many :received_stolen_notifications }
     it { is_expected.to validate_presence_of :email }
-    # it { is_expected.to validate_uniqueness_of :email }
+    it { is_expected.to have_many :ambassador_task_assignments }
+    it { is_expected.to have_many(:ambassador_tasks).through(:ambassador_task_assignments) }
   end
 
   describe "create user_email" do
@@ -563,6 +591,21 @@ describe User do
           expect(user.member_of?(nil)).to be_falsey
         end
       end
+    end
+  end
+
+  describe "ambassador?" do
+    it "returns true if the user has any ambassadorship" do
+      user = FactoryBot.create(:ambassador)
+      user.memberships << FactoryBot.create(:membership, user: user)
+      user.save
+
+      expect(user).to be_ambassador
+    end
+
+    it "returns false if the user has no ambassadorships" do
+      user = FactoryBot.create(:organization_member)
+      expect(user).to_not be_ambassador
     end
   end
 

@@ -6,7 +6,7 @@
       = link_to "Back to editing bike", edit_admin_bike_path(@bike)
 
   %ul.bike-boxes
-    = render partial: "/bikes/bike", locals: {bike: @bike, target: "show" }
+    = render partial: "/admin/bikes/bike", locals: {bike: @bike, target: "show" }
   .dl-holder
     %dl.dl-horizontal
       = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
@@ -17,21 +17,21 @@
 
   %h2
     %span.table-error
-      BE CAREFUL. 
+      BE CAREFUL.
     YOU CAN BREAK STUFF HERE
   = form_for [:admin, @ownership], html: { class: "form form-horizontal" } do |f|
     - if @ownership.errors.any?
       #alert-block
         .alert.alert-error
           %h4
-            Please fix the following 
+            Please fix the following
             = pluralize(@ownership.errors.count, "error")
           %ul
             - @ownership.errors.full_messages.each do |msg|
               %li
                 = msg
 
-    
+
     .control-group
       = f.label :current, class: "control-label"
       .controls
@@ -66,4 +66,3 @@
     .actions
       .control-group
         = submit_tag "Update the ownership", class: "button-green"
-        

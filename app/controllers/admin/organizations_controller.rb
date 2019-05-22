@@ -5,18 +5,13 @@ class Admin::OrganizationsController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 25
-    orgs = Organization.all
-    orgs = orgs.paid if params[:search_is_paid].present?
-    orgs = orgs.admin_text_search(params[:search_query]) if params[:search_query].present?
-    orgs = orgs.where(kind: kind_for_organizations) if params[:kind].present?
-    @organizations_count = orgs.count
-    @organizations = orgs.reorder(sort_column + " " + sort_direction).page(page).per(per_page)
+    @organizations = matching_organizations.reorder("organizations.#{sort_column} #{sort_direction}").page(page).per(per_page)
     render layout: "new_admin"
   end
 
   def show
     @locations = @organization.locations.decorate
-    bikes = Bike.where(creation_organization_id: @organization.id).reorder("created_at desc")
+    bikes = @organization.bikes.reorder("created_at desc")
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     @bikes = bikes.page(page).per(per_page)
@@ -70,6 +65,8 @@ class Admin::OrganizationsController < Admin::BaseController
     redirect_to admin_organizations_url
   end
 
+  helper_method :matching_organizations
+
   protected
 
   def permitted_parameters
@@ -78,19 +75,34 @@ class Admin::OrganizationsController < Admin::BaseController
     params.require(:organization)
           .permit(:available_invitation_count, :sent_invitation_count, :name, :short_name, :slug, :website,
                   :ascend_name, :show_on_map, :is_suspended, :embedable_user_email, :auto_user_id, :lock_show_on_map,
-                  :api_access_approved, :access_token, :new_bike_notification, :avatar, :avatar_cache,
+                  :api_access_approved, :access_token, :avatar, :avatar_cache,
                   :parent_organization_id, :lightspeed_cloud_api_key, :approved,
                   [locations_attributes: permitted_locations_params])
           .merge(kind: approved_kind)
   end
 
+  def matching_organizations
+    return @matching_organizations if defined?(@matching_organizations)
+    matching_organizations = Organization.unscoped
+    matching_organizations = matching_organizations.paid if params[:search_is_paid].present?
+    matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
+    matching_organizations = matching_organizations.where(kind: kind_for_organizations) if params[:search_kind].present?
+    matching_organizations = matching_organizations.where(pos_kind: pos_kind_for_organizations) if params[:search_pos_kind].present?
+    @matching_organizations = matching_organizations
+  end
+
   def sortable_columns
-    %w[created_at name approved]
+    %w[created_at name approved pos_kind]
   end
 
   def kind_for_organizations
     # Legacy enum issue so excited for TODO: Rails 5 update
-    Organization::KIND_ENUM[params[:kind].to_sym] || 0
+    Organization::KIND_ENUM[params[:search_kind].to_sym] || 0
+  end
+
+  def pos_kind_for_organizations
+    # Legacy enum issue so excited for TODO: Rails 5 update
+    Organization::POS_KIND_ENUM[params[:search_pos_kind].to_sym] || 0
   end
 
   def permitted_locations_params
@@ -99,9 +111,8 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def find_organization
     @organization = Organization.friendly_find(params[:id])
-    unless @organization
-      flash[:error] = "Sorry! That organization doesn't exist"
-      redirect_to admin_organizations_url and return
-    end
+    return true if @organization.present?
+    flash[:error] = "Sorry! That organization doesn't exist"
+    redirect_to admin_organizations_url and return
   end
 end

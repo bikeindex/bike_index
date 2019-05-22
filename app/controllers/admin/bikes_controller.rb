@@ -1,21 +1,25 @@
 class Admin::BikesController < Admin::BaseController
   include SortableTable
   before_filter :find_bike, only: [:edit, :destroy, :update, :get_destroy]
+  before_action :set_period, only: [:index]
 
   def index
     @page = params[:page] || 1
     per_page = params[:per_page] || 100
-    @bikes = matching_bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(per_page)
+    @render_chart = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:render_chart])
+    @bikes = matching_bikes.includes(:creation_organization, :creation_states, :paint).reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(per_page)
     render layout: "new_admin"
   end
 
   def missing_manufacturer
-    session[:missing_manufacturer_time_order] = params[:time_ordered] if params[:time_ordered].present?
+    session.delete(:missing_manufacturer_time_order) if params[:reset_view].present?
+    session[:missing_manufacturer_time_order] = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:time_ordered]) if params[:time_ordered].present?
     bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id)
     bikes = session[:missing_manufacturer_time_order] ? bikes.order("created_at desc") : bikes.order("manufacturer_other ASC")
     page = params[:page] || 1
     per_page = params[:per_page] || 100
     @bikes = bikes.page(page).per(per_page)
+    render layout: "new_admin"
   end
 
   def update_manufacturers
@@ -65,12 +69,12 @@ class Admin::BikesController < Admin::BaseController
 
   def edit
     @bike = @bike.decorate
-    @fast_attr_update = params[:fast_attr_update]
     @recoveries = @bike.recovered_records
+    @organizations = Organization.all
+    render layout: "new_admin"
   end
 
   def update
-    @fast_attr_update = params.delete(:fast_attr_update)
     updator = BikeUpdator.new(user: current_user, bike: @bike, b_params: { bike: permitted_parameters }.as_json)
     updator.update_ownership
     updator.update_stolen_record
@@ -86,13 +90,9 @@ class Admin::BikesController < Admin::BaseController
       @bike.create_normalized_serial_segments
       return if return_to_if_present
       flash[:success] = "Bike was successfully updated."
-      if @fast_attr_update.present? && @fast_attr_update
-        redirect_to edit_admin_bike_url(@bike, fast_attr_update: true) and return
-      else
-        redirect_to edit_admin_bike_url(@bike) and return
-      end
+      redirect_to edit_admin_bike_url(@bike) and return
     else
-      render action: "edit"
+      render action: "edit", layout: "new_admin"
     end
   end
 
@@ -109,6 +109,8 @@ class Admin::BikesController < Admin::BaseController
     end
     redirect_to admin_bike_path(params[:bike_id])
   end
+
+  helper_method :available_bikes
 
   protected
 
@@ -138,14 +140,21 @@ class Admin::BikesController < Admin::BaseController
 
   def matching_bikes
     return @matching_bikes if defined?(@matching_bikes)
-    if current_organization.present?
-      bikes = current_organization.bikes.includes(:creation_organization, :creation_states, :paint)
-    else
-      bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint)
-    end
-    bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email]
+    bikes = Bike.unscoped
+    # do example up here because it unscopes
+    bikes = bikes.example if params[:search_example].present?
+    bikes = bikes.non_example if params[:search_non_example].present?
+    bikes = bikes.organization(current_organization) if current_organization.present?
+    bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email].present?
+    bikes = bikes.stolen if params[:search_stolen].present?
+    @pos_search_type = %w[lightspeed_pos ascend_pos any_pos not_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
+    bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
     bikes = bikes.ascend_pos if params[:search_ascend].present?
     bikes = bikes.lightspeed_pos if params[:search_lightspeed].present?
     @matching_bikes = bikes
+  end
+
+  def available_bikes
+    matching_bikes.where(created_at: @time_range)
   end
 end

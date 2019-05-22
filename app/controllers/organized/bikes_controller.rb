@@ -57,6 +57,13 @@ module Organized
       else
         bikes = Bike.search(@interpreted_params)
       end
+      @search_stickers = false
+      if params[:search_stickers].present?
+        @search_stickers = params[:search_stickers] == "none" ? "none" : "with"
+        bikes = @search_stickers == "none" ? bikes.no_bike_code : bikes.bike_code
+      else
+        @search_stickers = false
+      end
       @bikes = bikes.reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(@per_page)
       if @interpreted_params[:serial]
         @close_serials = organization_bikes.search_close_serials(@interpreted_params).limit(25)

@@ -30,7 +30,7 @@ describe "Manufacturers API V2" do
     it "responds with missing and cors headers" do
       get "/api/v2/manufacturers/10000"
       expect(response.code).to eq("404")
-      expect(JSON(response.body)["error"].present?).to be_truthy
+      expect(json_result["error"].present?).to be_truthy
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
       expect(response.headers["Content-Type"].match("json")).to be_present
@@ -52,7 +52,7 @@ describe "Manufacturers API V2" do
       get "/api/v2/manufacturersdddd"
       # pp JSON.parse(response.body)
       expect(response.code).to eq("404")
-      expect(JSON(response.body)["error"].present?).to be_truthy
+      expect(json_result["error"].present?).to be_truthy
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
       expect(response.headers["Content-Type"].match("json")).to be_present

@@ -1,6 +1,36 @@
 require "spec_helper"
 
 describe SerialNormalizer do
+  describe "unknown_and_absent_corrected" do
+    it "returns serials that are passed to it" do
+      expect(SerialNormalizer.unknown_and_absent_corrected("   787CCdddWTu ")).to eq "787CCdddWTu"
+      # It also returns correctly if there are some ?s in the string
+      expect(SerialNormalizer.unknown_and_absent_corrected("   787CC???WTu ")).to eq "787CC???WTu"
+      # Also, check that we don't mark things unknown that look sort of like unknown but aren't
+      expect(SerialNormalizer.unknown_and_absent_corrected("Kno1111")).to eq "Kno1111"
+    end
+
+    it "normalizes blank and strips" do
+      expect(SerialNormalizer.unknown_and_absent_corrected("   \n")).to eq "absent"
+      expect(SerialNormalizer.unknown_and_absent_corrected(" absenT   \n")).to eq "absent"
+      expect(SerialNormalizer.unknown_and_absent_corrected("   UNKNOWN \n")).to eq "unknown"
+    end
+
+    context "misentries" do
+      let(:sample_misentries) do
+        [
+          "dont know ", "I don't know it", "i dont fucking know", "sadly I don't know... ", "I do not remember",
+          "???? ??", "Unknown Serial", "IDONTKNOWTHESERIALNUMBER", "I dont remember", "Not known", "dont no",
+        ]
+      end
+      it "normalizes a bunch of misentries" do
+        sample_misentries.each do |serial|
+          expect(SerialNormalizer.unknown_and_absent_corrected(serial)).to eq "unknown"
+        end
+      end
+    end
+  end
+
   describe "normalize" do
     it "normalizes i o 5 2 z and b" do
       serial = "bobs-catzio"

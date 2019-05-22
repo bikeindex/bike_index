@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.3
--- Dumped by pg_dump version 10.3
+-- Dumped from database version 11.3
+-- Dumped by pg_dump version 11.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -12,22 +12,9 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
+SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
 
 --
 -- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
@@ -84,6 +71,73 @@ ALTER SEQUENCE public.ads_id_seq OWNED BY public.ads.id;
 
 
 --
+-- Name: ambassador_task_assignments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ambassador_task_assignments (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    ambassador_task_id integer NOT NULL,
+    completed_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: ambassador_task_assignments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.ambassador_task_assignments_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: ambassador_task_assignments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.ambassador_task_assignments_id_seq OWNED BY public.ambassador_task_assignments.id;
+
+
+--
+-- Name: ambassador_tasks; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ambassador_tasks (
+    id integer NOT NULL,
+    description character varying DEFAULT ''::character varying NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    title character varying DEFAULT ''::character varying NOT NULL
+);
+
+
+--
+-- Name: ambassador_tasks_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.ambassador_tasks_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: ambassador_tasks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.ambassador_tasks_id_seq OWNED BY public.ambassador_tasks.id;
+
+
+--
 -- Name: b_params; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -127,6 +181,40 @@ ALTER SEQUENCE public.b_params_id_seq OWNED BY public.b_params.id;
 
 
 --
+-- Name: bike_code_batches; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bike_code_batches (
+    id integer NOT NULL,
+    user_id integer,
+    organization_id integer,
+    notes text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: bike_code_batches_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bike_code_batches_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bike_code_batches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bike_code_batches_id_seq OWNED BY public.bike_code_batches.id;
+
+
+--
 -- Name: bike_codes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -140,7 +228,8 @@ CREATE TABLE public.bike_codes (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     claimed_at timestamp without time zone,
-    previous_bike_id integer
+    previous_bike_id integer,
+    bike_code_batch_id integer
 );
 
 
@@ -1412,7 +1501,6 @@ CREATE TABLE public.organizations (
     is_suspended boolean DEFAULT false NOT NULL,
     auto_user_id integer,
     access_token character varying(255),
-    new_bike_notification text,
     api_access_approved boolean DEFAULT false NOT NULL,
     approved boolean DEFAULT true,
     avatar character varying(255),
@@ -1423,7 +1511,8 @@ CREATE TABLE public.organizations (
     parent_organization_id integer,
     kind integer,
     ascend_name character varying,
-    registration_field_labels jsonb DEFAULT '{}'::jsonb
+    registration_field_labels jsonb DEFAULT '{}'::jsonb,
+    pos_kind integer DEFAULT 0
 );
 
 
@@ -1745,7 +1834,7 @@ ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays
 --
 
 CREATE TABLE public.schema_migrations (
-    version character varying(255) NOT NULL
+    version character varying NOT NULL
 );
 
 
@@ -2069,10 +2158,31 @@ ALTER TABLE ONLY public.ads ALTER COLUMN id SET DEFAULT nextval('public.ads_id_s
 
 
 --
+-- Name: ambassador_task_assignments id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ambassador_task_assignments ALTER COLUMN id SET DEFAULT nextval('public.ambassador_task_assignments_id_seq'::regclass);
+
+
+--
+-- Name: ambassador_tasks id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ambassador_tasks ALTER COLUMN id SET DEFAULT nextval('public.ambassador_tasks_id_seq'::regclass);
+
+
+--
 -- Name: b_params id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.b_params ALTER COLUMN id SET DEFAULT nextval('public.b_params_id_seq'::regclass);
+
+
+--
+-- Name: bike_code_batches id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_code_batches ALTER COLUMN id SET DEFAULT nextval('public.bike_code_batches_id_seq'::regclass);
 
 
 --
@@ -2427,11 +2537,35 @@ ALTER TABLE ONLY public.ads
 
 
 --
+-- Name: ambassador_task_assignments ambassador_task_assignments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ambassador_task_assignments
+    ADD CONSTRAINT ambassador_task_assignments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: ambassador_tasks ambassador_tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ambassador_tasks
+    ADD CONSTRAINT ambassador_tasks_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: b_params b_params_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.b_params
     ADD CONSTRAINT b_params_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bike_code_batches bike_code_batches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_code_batches
+    ADD CONSTRAINT bike_code_batches_pkey PRIMARY KEY (id);
 
 
 --
@@ -2827,10 +2961,52 @@ ALTER TABLE ONLY public.wheel_sizes
 
 
 --
+-- Name: index_ambassador_task_assignments_on_ambassador_task_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ambassador_task_assignments_on_ambassador_task_id ON public.ambassador_task_assignments USING btree (ambassador_task_id);
+
+
+--
+-- Name: index_ambassador_task_assignments_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ambassador_task_assignments_on_user_id ON public.ambassador_task_assignments USING btree (user_id);
+
+
+--
+-- Name: index_ambassador_tasks_on_title; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_ambassador_tasks_on_title ON public.ambassador_tasks USING btree (title);
+
+
+--
 -- Name: index_b_params_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_b_params_on_organization_id ON public.b_params USING btree (organization_id);
+
+
+--
+-- Name: index_bike_code_batches_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_code_batches_on_organization_id ON public.bike_code_batches USING btree (organization_id);
+
+
+--
+-- Name: index_bike_code_batches_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_code_batches_on_user_id ON public.bike_code_batches USING btree (user_id);
+
+
+--
+-- Name: index_bike_codes_on_bike_code_batch_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_codes_on_bike_code_batch_id ON public.bike_codes USING btree (bike_code_batch_id);
 
 
 --
@@ -3244,6 +3420,22 @@ CREATE INDEX index_users_on_password_reset_token ON public.users USING btree (pa
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING btree (version);
+
+
+--
+-- Name: ambassador_task_assignments fk_rails_6c31316b38; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ambassador_task_assignments
+    ADD CONSTRAINT fk_rails_6c31316b38 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: ambassador_task_assignments fk_rails_d557be2cfa; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ambassador_task_assignments
+    ADD CONSTRAINT fk_rails_d557be2cfa FOREIGN KEY (ambassador_task_id) REFERENCES public.ambassador_tasks(id) ON DELETE CASCADE;
 
 
 --
@@ -3940,5 +4132,14 @@ INSERT INTO schema_migrations (version) VALUES ('20190401233010');
 
 INSERT INTO schema_migrations (version) VALUES ('20190402230848');
 
+INSERT INTO schema_migrations (version) VALUES ('20190422221408');
+
 INSERT INTO schema_migrations (version) VALUES ('20190424001657');
 
+INSERT INTO schema_migrations (version) VALUES ('20190514155447');
+
+INSERT INTO schema_migrations (version) VALUES ('20190516222221');
+
+INSERT INTO schema_migrations (version) VALUES ('20190517161246');
+
+INSERT INTO schema_migrations (version) VALUES ('20190517200357');

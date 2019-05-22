@@ -20,7 +20,7 @@
 
         %p
           You're the first one people call when their bike is stolen. You have the authority to bring bikes back, and it's not an easy job - we know. Let us provide you with tools to make this process smoother.
-        
+
         = render partial: '/landing_pages/tweet', locals: { tweet_id: 839247587521679360 }
 
         %h3 How it works
@@ -28,10 +28,10 @@
           Bike Index users provide serial numbers, proof of ownership and identifying information about their bikes. When a bike is reported lost or stolen, our partners can search Bike Index to identify, locate, and track it from any computer or smartphone. Our extensive archive has helped officers recover bikes involved in criminal situations, from simple theft to chop shops, drug houses - even fencing rings and online black markets.
 
         %p
-          Read about our over #{ number_with_delimiter recovered_bike_count.round(-2) } recoveries on our <a href="/news">blog</a>. For a complete list of Bike Index’s partners, visit <a href="/where">our partners page</a>, and for information on partnering with Bike Index, please contact us.
+          Read about our over #{ number_with_delimiter Counts.recoveries } recoveries on our <a href="/news">blog</a>. For a complete list of Bike Index’s partners, visit <a href="/where">our partners page</a>, and for information on partnering with Bike Index, please contact us.
 
         = render partial: '/landing_pages/tweet', locals: { tweet_id: 890211853942407168 }
-        
+
         .mobile-contact-link
           %a.btn.btn-primary.btn-lg.scroll-to-ref{ href: '#contact-bike-index', data: { offset: -110 } }
             Contact Bike Index
@@ -60,5 +60,5 @@
           %header#contact-bike-index
             Talk to us today
           = render partial: '/landing_pages/next_steps_contact', locals: { landing_page_target: landing_page_target }
-            
+
   = render '/landing_pages/footer'

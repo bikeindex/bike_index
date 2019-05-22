@@ -155,11 +155,12 @@ describe Organization do
     end
   end
 
-  describe "organization recoveries" do
+  describe "organization bikes and recoveries" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:bike) { FactoryBot.create(:stolen_bike, creation_organization_id: organization.id) }
     let(:stolen_record) { bike.find_current_stolen_record }
     let!(:bike_organization) { FactoryBot.create(:bike_organization, bike: bike, organization: organization) }
+    let!(:bike_unorganized) { FactoryBot.create(:stolen_bike) }
     let(:recovery_information) do
       {
         recovered_description: "recovered it on a special corner",
@@ -171,6 +172,10 @@ describe Organization do
       organization.reload
       expect(organization.bikes).to eq([bike])
       expect(organization.bikes.stolen).to eq([bike])
+      # Check the inverse lookup
+      expect((Bike.organization(organization))).to eq([bike])
+      expect((Bike.organization(organization.name))).to eq([bike])
+      # Check recovered
       stolen_record.add_recovery_information(recovery_information)
       bike.reload
       expect(bike.stolen_recovery?).to be_truthy
@@ -206,6 +211,22 @@ describe Organization do
       organization.set_calculated_attributes
       expect(organization.slug).to eq("bicycle-shop-2")
     end
+
+    context "deleted things" do
+      it "protects from naming collisions from deleted things, by renaming deleted things" do
+        org1 = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
+        org1.reload
+        org1_id = org1.id
+        expect(org1.short_name).to eq "buckshot"
+        org1.delete
+        org1.reload
+        expect(org1.deleted_at).to be_present
+        expect(org1.slug).to eq "buckshot"
+        org2 = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
+        expect(org1.slug).to eq "buckshot"
+      end
+    end
+
     describe "set_locations_shown" do
       let(:country) { FactoryBot.create(:country) }
       let(:organization) { FactoryBot.create(:organization, show_on_map: true, approved: true) }
@@ -327,6 +348,22 @@ describe Organization do
       let(:mail_snippet) { FactoryBot.create(:organization_mail_snippet, organization: organization, name: "security") }
       it "returns nil for not-enabled snippet" do
         expect(organization.mail_snippet_body(mail_snippet.name)).to eq mail_snippet.body
+      end
+    end
+  end
+
+  describe "calculated_pos_kind" do
+    context "organization with pos bike and non pos bike" do
+      let(:organization) { FactoryBot.create(:organization_with_auto_user, kind: "bike_shop") }
+      let!(:bike_pos) { FactoryBot.create(:bike_lightspeed_pos, organization: organization) }
+      let!(:bike) { FactoryBot.create(:bike_organization) }
+      it "returns pos type" do
+        organization.reload
+        expect(organization.pos_kind).to eq "not_pos"
+        expect(organization.calculated_pos_kind).to eq "lightspeed_pos"
+        # And if bike is created before cut-of for pos kind, it returns broken
+        bike_pos.update_attribute :created_at, Time.now - 2.weeks
+        expect(organization.calculated_pos_kind).to eq "broken_pos"
       end
     end
   end

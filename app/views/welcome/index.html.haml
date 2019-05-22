@@ -5,7 +5,7 @@
         .root-landing-header-text
           %p
             %strong
-              = number_with_delimiter recovered_bike_count
+              = number_with_delimiter Counts.recoveries
             bikes recovered.
           %h1
             <span>Bike</span> <span>Registration</span> <span>that</span> <span>Works</span>
@@ -28,7 +28,7 @@
               .checkbox
                 %label
                   = f.check_box :terms_of_service
-                  I agree to Bike Index 
+                  I agree to Bike Index
                   %a.no-tab{ data: { target: terms_url } }
                     terms and conditions
 
@@ -88,7 +88,7 @@
 
       %a.btn.btn-lg.btn-success.root-action-btn{ href: new_bike_path }
         Register now!
-              
+
     = render partial: '/landing_pages/footer', locals: { is_root: true }
 
     .root-landing-who

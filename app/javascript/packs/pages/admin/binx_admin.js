@@ -1,6 +1,9 @@
-import log from "../utils/log";
+import log from "../../utils/log";
 import moment from "moment-timezone";
-import LoadFancySelects from "../utils/LoadFancySelects";
+import LoadFancySelects from "../../utils/LoadFancySelects";
+import BinxAdminGraphs from "./graphs.js"
+import BinxAdminInvoices from "./invoices.js";
+
 
 function BinxAdmin() {
   return {
@@ -15,8 +18,8 @@ function BinxAdmin() {
           .css("max-width", "100%");
       }
       if ($(".calendar-box")[0]) {
-        this.setCustomGraphStartAndSlide();
-        this.changeGraphCalendarBox();
+        const binxAdminGraphs = BinxAdminGraphs()
+        binxAdminGraphs.init()
       }
       if ($("#use_image_for_display").length > 0) {
         this.useBikeImageForDisplay();
@@ -24,38 +27,34 @@ function BinxAdmin() {
       if ($("#admin-locations-fields").length > 0) {
         this.adminLocations();
       }
+      if ($(".inputTriggerRecalculation")) {
+        const binxAdminInvoices = BinxAdminInvoices();
+        binxAdminInvoices.init();
+      }
+      if ($("#admin-recovery-fields")) {
+        this.bikesEditRecoverySlide();
+      }
       // Enable bootstrap custom file upload boxes
       binxApp.enableFilenameForUploads();
       LoadFancySelects();
+
+      this.enablePeriodSelection();
     },
 
-    changeGraphCalendarBox() {
-      $("select#graph_date_option").on("change", e => {
+    // Non Fast Attr bikes edit
+    bikesEditRecoverySlide() {
+      const $this = $("#bike_stolen");
+      $this.on("change", e => {
         e.preventDefault();
-        this.setCustomGraphStartAndSlide();
+        if ($this.prop("checked")) {
+          $("#admin-recovery-fields").slideUp();
+        } else {
+          $("#admin-recovery-fields").slideDown();
+        }
       });
     },
 
-    startGraphTimeSet() {
-      const graphSelected = $("select#graph_date_option")[0].value.split(",");
-      const amount = Number(graphSelected[0]);
-      const unit = graphSelected[1];
-      $("#start_at").val(
-        moment()
-          .subtract(amount, unit)
-          .format("YYYY-MM-DDTHH:mm")
-      );
-    },
-
-    setCustomGraphStartAndSlide() {
-      if ($("select#graph_date_option")[0].value === "custom") {
-        $(".calendar-box").slideDown();
-      } else {
-        $(".calendar-box").slideUp();
-        this.startGraphTimeSet();
-      }
-    },
-
+    // Bike Recoveries
     useBikeImageForDisplay() {
       $("#use_image_for_display").on("click", e => {
         e.preventDefault();
@@ -75,6 +74,7 @@ function BinxAdmin() {
       });
     },
 
+    // Orgs location adding method
     adminLocations() {
       $("form").on("click", ".remove_fields", function(event) {
         // We don't need to do anything except slide the input up, because the label is on it.
@@ -92,6 +92,20 @@ function BinxAdmin() {
         );
         event.preventDefault();
         LoadFancySelects();
+      });
+    },
+
+    enablePeriodSelection() {
+      $("#timeSelectionBtnGroup button").on("click", function(e) {
+        let joiner;
+        const period = $(e.target).attr("data-period");
+        const current_url = location.href.replace(/&?period=[^&]*/, "");
+        if (current_url.match(/\?/)) {
+          joiner = "&";
+        } else {
+          joiner = "?";
+        }
+        return (location.href = `${current_url}${joiner}period=${period}`);
       });
     }
   };

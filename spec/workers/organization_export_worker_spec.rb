@@ -43,6 +43,7 @@ describe OrganizationExportWorker do
           expect(export.progress).to eq "finished"
           expect(export.file.read).to be_present
           expect(export.rows).to eq 1
+          expect(export.exported_bike_ids).to eq([bike.id])
         end
       end
       context "avery export" do

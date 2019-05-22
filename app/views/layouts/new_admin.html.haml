@@ -21,33 +21,40 @@
         .collapse.navbar-collapse#collapsible-admin-nav
           %ul.navbar-nav
             %li.nav-item
-              = active_link "Users", admin_users_path, role: "button", class: "nav-link"
+              = active_link "Users", admin_users_path, role: "button", class: "nav-link users", match_controller: true
             %li.nav-item
-              = active_link "Bikes", admin_bikes_path, role: "button", class: "nav-link"
+              = active_link "Bikes", admin_bikes_path, role: "button", class:"nav-link bikes", match_controller: true
             %li.nav-item
-              = active_link "Organizations", admin_organizations_path, role: "button", class: "nav-link"
+              = active_link "Organizations", admin_organizations_path, role: "button", class: "nav-link", match_controller: true
             %li.nav-item
-              = active_link "News", admin_news_index_path, role: "button", class: "nav-link"
+              = active_link "News", admin_news_index_path, role: "button", class: "nav-link", match_controller: true
             %li.dropdown.nav-item
-              - stolen_links = {"Stolen": admin_stolen_bikes_path, "Recoveries": admin_recoveries_path, "Recovery Displays": admin_recovery_displays_path, "Stolen Twitterbot URL": ENV['STOLEN_TWITTERBOT_URL'].gsub(/bikes\z/, '')  }
+              - ambassador_links = {"Ambassadors" => admin_ambassadors_path, "Ambassador Tasks" => admin_ambassador_tasks_path }
+              %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown", class: ambassador_links.has_value?(request.path) ? "active" : ""}
+                Ambassadors
+              .dropdown-menu.admin-nav-dropdown
+                - ambassador_links.each do |link, path|
+                  = active_link link, path, role: "button", class: "btn btn-light dropdown-item"
+            %li.dropdown.nav-item
+              - stolen_links = {"Stolen" => admin_stolen_bikes_path, "Recoveries" => admin_recoveries_path, "Recovery Displays" => admin_recovery_displays_path, "Stolen Twitterbot URL" => ENV['STOLEN_TWITTERBOT_URL'].gsub(/bikes\z/, '')  }
               %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown", class: stolen_links.has_value?(request.path) ? "active" : ""}
                 Stolen
               .dropdown-menu.admin-nav-dropdown
                 - stolen_links.each do |link, path|
                   = active_link link, path, role: "button", class: "btn btn-light dropdown-item"
             %li.dropdown.nav-item
-              - paid_links = {"Payments": admin_payments_path, "Paid Features": admin_paid_features_path, "Invoices": admin_invoices_path}
+              - paid_links = {"Payments" => admin_payments_path, "Paid Features" => admin_paid_features_path, "Invoices" => admin_invoices_path}
               %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown",  class: paid_links.has_value?(request.path) ? "active" : ""}
                 Paid
               .dropdown-menu.admin-nav-dropdown
                 - paid_links.each do |link, path|
                   = active_link link, path, role: "button", class: "btn btn-light dropdown-item"
             %li.dropdown.nav-item
-              - other_links = {"Memberships": admin_memberships_path, "Manufacturers": admin_manufacturers_path, "Invitations": admin_invitations_path, "TSV Exports": admin_tsvs_path, "Maintenance": admin_maintenance_path, "Failed Bikes": admin_failed_bikes_path, "Component Types": admin_ctypes_path, "Graphs": admin_graphs_path, "Edit Paints": admin_paints_path, "Feedbacks": admin_feedbacks_path, "Tweets": admin_tweets_path, "Exports": admin_exports_path, "Bulk Imports": admin_bulk_imports_path, "Duplicates": duplicates_admin_bikes_path}
+              - other_links = {"Memberships" => admin_memberships_path, "Manufacturers" => admin_manufacturers_path, "Invitations" => admin_invitations_path, "TSV Exports" => admin_tsvs_path, "Maintenance" => admin_maintenance_path, "Failed Bikes" => admin_failed_bikes_path, "Component Types" => admin_ctypes_path, "Graphs" => admin_graphs_path, "Edit Paints" => admin_paints_path, "Feedbacks" => admin_feedbacks_path, "Tweets" => admin_tweets_path, "Stickers" => admin_bike_codes_path, "Exports" => admin_exports_path, "Bulk Imports" => admin_bulk_imports_path, "Duplicates" => duplicates_admin_bikes_path}
               %a.dropdown-toggle.nav-link{"data-toggle" => "dropdown",  class: other_links.has_value?(request.path) ? "active" : ""}
                 Other
               .dropdown-menu.admin-nav-dropdown
-                -other_links.each do |link, path|
+                - other_links.each do |link, path|
                   = active_link link, path, role: "button", class: "btn btn-light dropdown-item"
             - if Rails.env.development?
               %li.dropdown.nav-item

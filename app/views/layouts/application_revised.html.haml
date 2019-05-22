@@ -16,15 +16,15 @@
           the non-profit
           %br
           bike registry
-        - if current_user.present? && (current_organization.present? || passive_organization.present?)
-          / Make it possible to manually override the passive organization on any page
-          - set_passive_organization(current_organization) if current_organization.present? && current_organization != passive_organization
-          - if passive_organization.present? # Maybe there isn't a passive organization anymore!
-            %span.current-organization-nav-item
-              %a#passive_organization_submenu{ "aria-haspopup" => "true", "aria-expanded" => "false", data: { toggle: "dropdown" } }
-                = passive_organization.short_name
-                <span class="caret-down">v</span>
-              %ul.current-organization-submenu{ "aria-labelledby" => "#passive_organization_submenu" }
+        - if current_user.present? && passive_organization.present?
+          %span.current-organization-nav-item
+            %a#passive_organization_submenu{ "aria-haspopup" => "true", "aria-expanded" => "false", data: { toggle: "dropdown" } }
+              = passive_organization.short_name
+              <span class="caret-down">v</span>
+            %ul.current-organization-submenu{ "aria-labelledby" => "#passive_organization_submenu" }
+              - if passive_organization.ambassador?
+                = active_link "#{passive_organization.short_name} Dashboard", organization_ambassador_dashboard_index_path(organization_id: passive_organization.to_param), class: "nav-link"
+              - else
                 %li
                   = active_link "#{passive_organization.short_name} Bikes", organization_bikes_path(organization_id: passive_organization.to_param), class: "nav-link"
                 %li
@@ -65,10 +65,10 @@
                     = active_link "#{passive_organization.short_name} profile", organization_manage_index_path(organization_id: passive_organization.to_param), class: "nav-link"
                   %li
                     = active_link "#{passive_organization.short_name} locations", locations_organization_manage_index_path(organization_id: passive_organization.to_param), class: "nav-link"
-                - if current_user&.superuser?
-                  %li.divider-nav-item
-                  %li
-                    = link_to "Super Admin view #{passive_organization.short_name}", admin_organization_path(passive_organization)
+              - if current_user&.superuser?
+                %li.divider-nav-item
+                %li
+                  = link_to "Super Admin view #{passive_organization.short_name}", admin_organization_path(passive_organization)
 
         %a#menu-opened-backdrop
         .hamburgler
@@ -95,7 +95,7 @@
                   - memberships.each do |membership|
                     - organization = membership.organization
                     %li
-                      %a.nav-link{ href: organization_bikes_path(organization_id: organization.to_param) }
+                      %a.nav-link{ href: organization_root_path(organization_id: organization.to_param) }
                         View #{organization.name}
             %li.divider-nav-item
             - if current_user_or_unconfirmed_user.superuser?
@@ -116,7 +116,7 @@
           %li.primary-nav-item
             = active_link 'Blog', news_index_path, class: 'nav-link', match_controller: true
           %li.primary-nav-item
-            = active_link 'Search bikes', bikes_path(location: 'ip', stolenness: 'proximity'), class: 'nav-link', id: 'search_bikes_header_link', match_controller: true
+            = active_link 'Search bikes', default_bike_search_path, class: 'nav-link', id: 'search_bikes_header_link', match_controller: true
     = render 'layouts/revised_messages'
 
     - if current_page_skeleton

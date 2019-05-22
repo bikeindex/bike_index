@@ -5,7 +5,7 @@
 .row
   .form-group.col-md-6
     = f.label :name
-    = f.text_field :name, class: "form-control"
+    = f.text_field :name, required: true, class: "form-control"
 
   .form-group.col-md-6
     = f.label :available_invitation_count, "Available invitations"
@@ -16,7 +16,7 @@
   .col-md-6
     .form-group
       = f.label :short_name, "Short name (15 letters or less)"
-      = f.text_field :short_name, class: "form-control"
+      = f.text_field :short_name, required: true, class: "form-control"
   .col-md-6
     .form-group
       = f.label :ascend_name
@@ -27,17 +27,6 @@
     .form-group.mt-4
       = f.label :website
       = f.text_field :website, class: "form-control"
-    - if @organization.id.present?
-      - emails = @organization.users.pluck(:email)
-      - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
-      .form-group.fancy-select.unfancy
-        = f.label :embedable_user_email
-        = f.select :embedable_user_email, emails, {prompt: "Select email", selected: @embedable_email}, class: "form-control"
-        .less-strong
-          - if @organization.memberships.count == 0
-            You can use #{ENV['AUTO_ORG_MEMBER']} if
-            %br
-            there are no members of the organization
   .col-md-6.mt-4
     %fieldset{:disabled => "disabled"}
       .form-group
@@ -80,6 +69,17 @@
     .form-group.fancy-select.unfancy
       = f.label :parent_organization_id
       = f.collection_select(:parent_organization_id, Organization.all, :id, :name, {prompt: "Choose organization"}, class: "form-control")
+  - if @organization.id.present?
+    .col-md-6
+      - emails = @organization.users.pluck(:email)
+      - emails << ENV['AUTO_ORG_MEMBER'] unless emails.any?
+      .form-group.fancy-select.unfancy
+        = f.label :embedable_user_email
+        = f.select :embedable_user_email, emails, {prompt: "Select email", selected: @embedable_email}, class: "form-control"
+        %small.less-strong
+          - if @organization.memberships.count == 0
+            You can use #{ENV['AUTO_ORG_MEMBER']} if
+            there are no members of the organization
 
   / .control-group.padded
   /   .control-label

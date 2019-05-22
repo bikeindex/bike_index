@@ -41,6 +41,17 @@
           Bikes exported
         %td
           = @export.rows
+          - if @export.exported_bike_ids.present?
+            %a.small.less-strong{ href: "#show_exported_bikes", 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse' }
+              Show
+              - if @export.rows > 100
+                first 100
+              bikes in export
+            .collapse#show_exported_bikes
+              %ul.exported-link-list
+                - @export.exported_bike_ids.each_with_index do |id, i|
+                  %li
+                    #{link_to id, bike_path(id)}#{i == (@export.exported_bike_ids.count - 1) ? "" : ","}
 
       %tr
         %td
@@ -96,12 +107,12 @@
           %td
             - if @export.assign_bike_codes?
               %em
-                Stickers exported
+                #{@export.bike_codes&.count || 0} Stickers exported
               - if @export.bike_codes.any?
-                %ul{ style: "font-size: 80%;" }
-                  - @export.bike_codes.each_with_index do |code, index|
+                %ul.exported-link-list
+                  - @export.bike_codes.each_with_index do |code, i|
                     %li
-                      = link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param)
+                      #{link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param)}#{i == (@export.bike_codes.count - 1) ? "" : ","}
                 - if @export.bike_codes_removed?
                   %em.text-danger
                     Stickers have been unassigned

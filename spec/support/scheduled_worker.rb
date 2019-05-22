@@ -16,5 +16,11 @@ shared_context :scheduled_worker do
         expect(subject.should_enqueue?).to be_falsey
       end
     end
+
+    describe "runnering" do
+      it 'is specified in the runner' do
+        expect(ScheduledWorkerRunner.scheduled_workers).to include(subject)
+      end
+    end
   end
 end

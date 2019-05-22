@@ -1,25 +1,25 @@
-
-%header.with-subtitle
-  %h1
-    Multi manufacturer update
-  .sharing-links
-    %label.checkbox.disabled
-      = check_box_tag :time_ordered, 'time_ordered', session[:missing_manufacturer_time_order]
-      time ordered
+.admin-subnav
+  .col-md-6
+    %h1
+      Multi manufacturer update
+  .col-md-6
+    -if session[:missing_manufacturer_time_order]
+      = link_to "Normal view", missing_manufacturer_admin_bikes_path(reset_view: true), class: "btn btn-primary"
+    -else
+      = link_to "Time ordered view", missing_manufacturer_admin_bikes_path(time_ordered: true), class: "btn btn-primary"
 
 
 = form_tag update_manufacturers_admin_bikes_path, id: 'multi_bike_manufacturer_update' do
-  .row-fluid.multi-bike-manufacturer-form
-    #chosen-container.span4.multi-manufacturer-selector
-      .chosen-select
+  .row
+    .col-md-4
+      .fancy-select.unfancy
         = select_tag :manufacturer_id, options_from_collection_for_select(Manufacturer.frames, :id, :name), prompt: "Choose manufacturer"
-
-      = submit_tag 'Update selected', class: 'button-blue'
-    .span8.paginate-container
-      = paginate @bikes
-  %section.full-screen-table
-    %table.table.table-striped.table-bordered
-      %thead
+    .col-md-2
+      = submit_tag 'Update selected', class: 'btn btn-primary'
+  = paginate @bikes, views_prefix: "admin"
+  .full-screen-table
+    %table.table.table-striped.table-bordered.table-sm
+      %thead.thead-light
         %th.table-cell-check
           &#x2713;
         %th
@@ -38,7 +38,7 @@
               = check_box_tag "bikes_selected[#{bike.id}]", bike.id
             %td
               .less-strong-hold
-                %span.less-strong-right.medium-screens
+                %span.less-strong-right
                   - if bike.example
                     %span.table-error
                       = bike.id
@@ -55,7 +55,7 @@
 
             %td
               - if bike.manufacturer_other.present?
-                %span.table-error
+                %span
                   %span.hidden
                     0 1
                   = bike.manufacturer_other
@@ -69,19 +69,19 @@
                 - desc += "(#{bike.type})" unless bike.type == 'bike'
                 = desc
                 - if bike.paint.present? && bike.paint.color_id.blank?
-                  .large-screens.less-strong
+                  .less-strong
                     = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
                     = bike.frame_colors.to_sentence
                 - if bike.stolen
                   %span.less-strong-right
                     stolen
 
-            %td.not-tiny-screens
+            %td
               .less-strong-hold
                 = bike.creation_organization.name if bike.creation_organization.present?
                 - if bike.registered_new
                   %span.less-strong-right
                     pos
 
-  .paginate-container
-    = paginate @bikes
+
+  = paginate @bikes, views_prefix: "admin"

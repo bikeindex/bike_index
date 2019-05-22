@@ -1,4 +1,4 @@
-.fullscreen-table-wrapper {
+.full-screen-table {
   // Enable scrolling
   overflow-x: scroll;
 
@@ -23,44 +23,46 @@
   }
 }
 
-table .table-cell-check {
-  font-family: Courier;
-  text-align: center;
-  font-weight: bold;
-}
+table {
+  .table-cell-check {
+    font-family: Courier;
+    text-align: center;
+    font-weight: bold;
+  }
 
-.less-strong-hold {
-  position: relative;
-}
+  .less-strong-hold {
+    position: relative;
+  }
 
-.less-strong-right {
-  position: absolute;
-  right: -0.3em;
-  line-height: 1;
-  bottom: -0.2em;
-  font-size: 0.8em;
-  @extend .less-strong;
-}
+  .less-strong-right {
+    position: absolute;
+    right: -0.3em;
+    line-height: 1;
+    bottom: -0.2em;
+    font-size: 0.8em;
+    @extend .less-strong;
+  }
 
-thead.sortable {
-  th {
-    font-weight: normal;
-    a.sortable-link {
-      display: block;
-      position: relative;
-      // To give a spot for the sortable direction
-      &.active {
-        padding-right: 1.5rem;
-      }
-      span.sortable-direction {
+  thead.sortable {
+    th {
+      font-weight: normal;
+      a.sortable-link {
         display: block;
-        position: absolute;
-        right: 0;
-        top: 0;
-      }
-      &.active {
-        font-weight: strong;
-        text-decoration: underline;
+        position: relative;
+        // To give a spot for the sortable direction
+        &.active {
+          padding-right: 1.5rem;
+        }
+        span.sortable-direction {
+          display: block;
+          position: absolute;
+          right: 0;
+          top: 0;
+        }
+        &.active {
+          font-weight: strong;
+          text-decoration: underline;
+        }
       }
     }
   }

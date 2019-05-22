@@ -11,6 +11,9 @@ class Membership < ActiveRecord::Base
   validates_presence_of :user, message: "We're sorry, that user hasn't yet signed up for Bike Index. Please ask them to before adding them to your organization"
 
   after_commit :update_relationships
+  after_create :assign_ambassador_tasks!
+
+  scope :ambassador_organizations, -> { where(organization: Organization.ambassador) }
 
   def self.membership_types
     MEMBERSHIP_TYPES
@@ -23,5 +26,10 @@ class Membership < ActiveRecord::Base
   def update_relationships
     user&.update_attributes(updated_at: Time.now)
     organization&.update_attributes(updated_at: Time.now)
+  end
+
+  def assign_ambassador_tasks!
+    return unless organization.kind == "ambassador"
+    AmbassadorTask.find_each { |task| task.assign_to(user) }
   end
 end

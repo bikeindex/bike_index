@@ -129,6 +129,7 @@ describe BikesController do
     context "illegally set passive_organization" do
       include_context :logged_in_as_user
       it "renders, resets passive_organization_id" do
+        expect(user.default_organization).to be_nil
         session[:passive_organization_id] = organization.id
         get :show, id: bike.id
         expect(response.status).to eq(200)
@@ -136,7 +137,27 @@ describe BikesController do
         expect(response).to render_with_layout("application_revised")
         expect(assigns(:bike)).to be_decorated
         expect(flash).to_not be_present
+        expect(assigns[:current_organization]).to be_nil
+        expect(assigns[:passive_organization]).to be_nil
         expect(session[:passive_organization_id]).to eq "0"
+      end
+    end
+    context "Admin with manually set current_organization" do
+      include_context :logged_in_as_super_admin
+      let(:user) { FactoryBot.create(:organization_member, superuser: true) }
+      it "renders, sets passive_organization_id to be passed organization" do
+        expect(user.default_organization).to be_present
+        expect(user.default_organization).to_not eq organization
+        session[:passive_organization_id] = user.default_organization.id
+        get :show, id: bike.id, organization_id: organization.name
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(response).to render_with_layout("application_revised")
+        expect(assigns(:bike)).to be_decorated
+        expect(flash).to_not be_present
+        expect(assigns(:current_organization)).to eq organization
+        expect(assigns(:passive_organization)).to eq organization
+        expect(session[:passive_organization_id]).to eq organization.id
       end
     end
     context "example bike" do
@@ -215,7 +236,7 @@ describe BikesController do
         end
       end
       context "bike owned by organization" do
-        let(:bike) { FactoryBot.create(:organization_bike, organization: organization) }
+        let(:bike) { FactoryBot.create(:bike_organized, organization: organization) }
         let(:ownership) { FactoryBot.create(:ownership_claimed, bike: bike) }
         it "renders" do
           get :show, id: ownership.bike_id
@@ -466,6 +487,16 @@ describe BikesController do
         }
       end
       let(:testable_bike_params) { bike_params.except(:b_param_id_token, :embeded, :cycle_type_slug) }
+      context "unverified authenticity token" do
+        include_context :test_csrf_token
+        it "fails" do
+          expect(user).to be_present
+          expect do
+            post :create, bike: bike_params
+          end.to_not change(Ownership, :count)
+          expect(flash[:error]).to match(/csrf/i)
+        end
+      end
       context "non-stolen" do
         it "creates a new ownership and bike from an organization" do
           expect(user).to be_present
@@ -574,7 +605,8 @@ describe BikesController do
           Sidekiq::Testing.inline! do
             test_photo = Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")))
             expect_any_instance_of(ImageAssociatorWorker).to receive(:perform).and_return(true)
-            post :create, bike: bike_params.merge(image: test_photo)
+            post :create, persist_email: "", bike: bike_params.merge(image: test_photo)
+            expect(assigns[:persist_email]).to be_falsey
             expect(response).to redirect_to(embed_extended_organization_url(organization))
             bike = Bike.last
             expect(bike.owner_email).to eq bike_params[:owner_email].downcase
@@ -593,6 +625,7 @@ describe BikesController do
         it "registers a bike and redirects with persist_email" do
           set_current_user(user2)
           post :create, bike: bike_params.merge(manufacturer_id: "A crazy different thing"), persist_email: true
+          expect(assigns[:persist_email]).to be_truthy
           expect(response).to redirect_to(embed_extended_organization_url(organization, email: "flow@goodtimes.com"))
           bike = Bike.last
           expect(bike.creation_state.origin).to eq "embed_extended"

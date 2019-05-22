@@ -3,6 +3,20 @@
   opacity: 0.65;
 }
 
+.gray-link {
+  a,
+  & {
+    color: $gray-600 !important;
+    opacity: 0.65;
+    text-decoration: underline;
+  }
+  &:hover,
+  &:active,
+  &.active {
+    opacity: 0.9;
+  }
+}
+
 label {
   cursor: pointer;
 }

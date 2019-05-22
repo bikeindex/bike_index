@@ -9,6 +9,15 @@ class Organization < ActiveRecord::Base
     software: 5,
     property_management: 6,
     other: 7,
+    ambassador: 8,
+  }.freeze
+
+  POS_KIND_ENUM = {
+    not_pos: 0,
+    other_pos: 1,
+    lightspeed_pos: 2,
+    ascend_pos: 3,
+    broken_pos: 4,
   }.freeze
 
   acts_as_paranoid
@@ -38,6 +47,7 @@ class Organization < ActiveRecord::Base
   accepts_nested_attributes_for :locations, allow_destroy: true
 
   enum kind: KIND_ENUM
+  enum pos_kind: POS_KIND_ENUM
 
   validates_presence_of :name
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact admin@bikeindex.org"
@@ -55,6 +65,8 @@ class Organization < ActiveRecord::Base
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+
+  def self.pos_kinds; POS_KIND_ENUM.keys end
 
   def self.friendly_find(n)
     return nil unless n.present?
@@ -81,6 +93,11 @@ class Organization < ActiveRecord::Base
     matching_slugs = PaidFeature.matching_slugs(slugs)
     return nil unless matching_slugs.present?
     where("paid_feature_slugs ?& array[:keys]", keys: matching_slugs)
+  end
+
+  # Organization kinds creatable by non-superadmins
+  def self.creatable_kinds
+    kinds.reject { |kind| kind == "ambassador" }
   end
 
   def to_param
@@ -156,7 +173,7 @@ class Organization < ActiveRecord::Base
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, "")
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
-      orgs = id.present? ? Organization.where("id != ?", id) : Organization.all
+      orgs = id.present? ? Organization.unscoped.where("id != ?", id) : Organization.unscoped.all
       while orgs.where(slug: new_slug).exists?
         i = i.present? ? i + 1 : 2
         new_slug = "#{new_slug}-#{i}"
@@ -210,6 +227,14 @@ class Organization < ActiveRecord::Base
       return nil unless users.any?
       self.auto_user_id = users.first.id
     end
+  end
+
+  def calculated_pos_kind
+    recent_bikes = bikes.where(created_at: (Time.now - 1.week)..Time.now)
+    return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
+    return "ascend_pos" if recent_bikes.ascend_pos.count > 0
+    return "other_pos" if recent_bikes.any_pos.count > 0
+    bikes.any_pos.count > 0 ? "broken_pos" : "not_pos"
   end
 
   def allowed_show

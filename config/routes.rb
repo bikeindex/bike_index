@@ -28,7 +28,8 @@ Bikeindex::Application.routes.draw do
     get slug, to: "landing_pages#show", organization_id: slug
   end
 
-  %w(for_shops for_advocacy for_law_enforcement for_schools ambassadors_how_to ambassadors_current ascend).freeze.each do |page|
+  %w(for_shops for_advocacy for_law_enforcement for_schools ambassadors_how_to ambassadors_current ascend
+     campus_packages cities_packages).freeze.each do |page|
     get page, controller: "landing_pages", action: page
   end
 
@@ -125,6 +126,8 @@ Bikeindex::Application.routes.draw do
 
   namespace :admin do
     root to: "dashboard#index"
+    resources :ambassadors, only: [:index, :show]
+    resources :ambassador_tasks
     resources :bikes do
       collection do
         get :duplicates
@@ -142,7 +145,7 @@ Bikeindex::Application.routes.draw do
     get "bust_z_cache", to: "dashboard#bust_z_cache"
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
     get "invoices", to: "payments#invoices", as: :invoices
-    resources :memberships, :organization_invitations, :bulk_imports, :exports,
+    resources :memberships, :organization_invitations, :bulk_imports, :exports, :bike_codes,
               :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments
     resources :organizations do
       resources :custom_layouts, only: [:index, :edit, :update], controller: "organizations/custom_layouts"
@@ -229,6 +232,7 @@ Bikeindex::Application.routes.draw do
   resources :stolen, only: [:index, :show] do
     collection do
       get "current_tsv"
+      get "current_tsv_rapid"
     end
   end
 
@@ -266,7 +270,7 @@ Bikeindex::Application.routes.draw do
   # prepends a :organization_id/ to every nested URL.
   # Down here so that it doesn't override any other routes
   resources :organizations, only: [], path: "o", module: "organized" do
-    get "/", to: "bikes#index", as: :root
+    get "/", to: "base#index", as: :root
     get "landing", to: "manage#landing", as: :landing
     resources :bikes, only: %i[index new show] do
       collection do
@@ -279,6 +283,8 @@ Bikeindex::Application.routes.draw do
     resources :bulk_imports, only: %i[index show new create]
     resources :messages, only: %i[index show create]
     resources :stickers, only: %i[index show edit update]
+    resources :ambassador_dashboard, only: %i[index]
+    resources :ambassador_task_assignments, only: %i[update]
 
     # Organized Admin resources (below here controllers should inherit Organized::AdminController)
     resources :manage, only: %i[index update destroy] do

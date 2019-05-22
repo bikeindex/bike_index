@@ -16,12 +16,13 @@ class OrganizationInvitation < ActiveRecord::Base
   scope :unclaimed, -> { where(redeemed: nil) }
 
   after_create :enqueue_notification_job
+  after_create :if_user_exists_assign
+
+  def redeemed?; redeemed end
 
   def enqueue_notification_job
     EmailOrganizationInvitationWorker.perform_async(id)
   end
-
-  after_create :if_user_exists_assign
 
   def if_user_exists_assign
     user = User.fuzzy_email_find(self.invitee_email)
@@ -58,7 +59,7 @@ class OrganizationInvitation < ActiveRecord::Base
   end
 
   def assign_to(user)
-    return false if redeemed
+    return false if redeemed?
     # This way we don't generate repeat memberships accidentally. There should be some sort of alert.
     return false if user.memberships && user.organizations.include?(organization)
     self.invitee_id = user.id

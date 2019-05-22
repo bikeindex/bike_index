@@ -87,24 +87,30 @@ RSpec.describe Export, type: :model do
 
   describe "custom_bike_ids=" do
     let(:organization) { FactoryBot.create(:organization) }
-    let!(:bike1) { FactoryBot.create(:organization_bike, organization: organization, created_at: Time.now - 1.day) }
-    let!(:bike2) { FactoryBot.create(:organization_bike, organization: organization) }
+    let!(:bike1) { FactoryBot.create(:bike_organized, organization: organization, created_at: Time.now - 1.day) }
+    let!(:bike2) { FactoryBot.create(:bike_organized, organization: organization) }
     let!(:bike3) { FactoryBot.create(:bike) }
     let(:export) { FactoryBot.build(:export_organization, organization: organization, end_at: Time.now - 1.hour) }
     it "assigns the bike ids" do
       bike1.reload
       expect(bike1.created_at).to be < export.end_at
       export.custom_bike_ids = "https://bikeindex.org/bikes/#{bike1.id}  \n#{bike3.id}, https://bikeindex.org/bikes/#{bike2.id}  "
+      export.assign_exported_bike_ids
       expect(export.custom_bike_ids).to match_array([bike1.id, bike2.id, bike3.id])
       expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(export.exported_bike_ids).to match_array([bike1.id, bike2.id])
       # Bike1 is within the time parameters - so with no custom bikes, it returns that
       export.custom_bike_ids = ""
+      export.assign_exported_bike_ids
       expect(export.custom_bike_ids).to be_nil
       expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id])
+      expect(export.exported_bike_ids).to match_array([bike1.id])
       # And it also returns the bike that is from the time period in addition to any custom bikes that are assigned
       export.custom_bike_ids = "bikeindex.org/bikes/#{bike3.id}  \n /bikes/#{bike2.id}, #{bike2.id}  "
+      export.assign_exported_bike_ids
       expect(export.custom_bike_ids).to match_array([bike2.id, bike3.id])
       expect(export.bikes_scoped.pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(export.exported_bike_ids).to match_array([bike1.id, bike2.id])
     end
   end
 

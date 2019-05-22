@@ -5,13 +5,16 @@
   organizations have been deleted!
 
 
-.full-screen-table-wrapper
+.full-screen-table
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
+      %th
+        %small ID
       %th
         Created
       %th
         Deleted
+        = "\u2193".html_safe
       %th
         Name
       %th
@@ -19,13 +22,16 @@
       %th
         Management links
     %tbody
-      - @organizations.each do |organization|
+      - @organizations.reorder(deleted_at: :desc).each do |organization|
         %tr
+          %td
+            %small.less-strong
+              = organization.id
           %td.convertTime
             = l organization.created_at, format: :convert_time
           %td.convertTime
             = l organization.deleted_at, format: :convert_time
-          %td
+          %td{ style: "width: 30%; word-break: break-all" }
             = organization.name
           %td
             = organization.memberships.count

@@ -9,6 +9,8 @@ class User < ActiveRecord::Base
 
   mount_uploader :avatar, AvatarUploader
 
+  has_many :ambassador_task_assignments
+  has_many :ambassador_tasks, through: :ambassador_task_assignments
   has_many :payments
   has_many :subscriptions, -> { subscription }, class_name: "Payment"
   has_many :memberships, dependent: :destroy
@@ -37,6 +39,7 @@ class User < ActiveRecord::Base
 
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
+  scope :ambassadors, -> { where(id: Membership.ambassador_organizations.select(:user_id)) }
 
   validates_uniqueness_of :username, case_sensitive: false
 
@@ -57,6 +60,7 @@ class User < ActiveRecord::Base
   validates_uniqueness_of :email, case_sensitive: false
 
   before_validation :normalize_attributes
+  validate :ensure_unique_email
   before_create :generate_username_confirmation_and_auth
   after_create :perform_create_jobs
   before_save :set_calculated_attributes
@@ -103,8 +107,6 @@ class User < ActiveRecord::Base
     user_emails.where.not(email: email).pluck(:email)
   end
 
-  validate :ensure_unique_email
-
   def ensure_unique_email
     return true unless self.class.fuzzy_confirmed_or_unconfirmed_email_find(email)
     return true if id.present? # Because existing users shouldn't see this error
@@ -120,6 +122,10 @@ class User < ActiveRecord::Base
   def superuser?; superuser end
 
   def developer?; developer end
+
+  def ambassador?
+    memberships.ambassador_organizations.any?
+  end
 
   def to_param; username end
 
@@ -296,6 +302,17 @@ class User < ActiveRecord::Base
       zipcode,
       country_string,
     ].reject(&:blank?).join(", ")
+  end
+
+  def address_hash
+    return nil unless address.present?
+    {
+      address: street,
+      city: city,
+      state: (state&.abbreviation),
+      zipcode: zipcode,
+      country: country&.iso,
+    }.as_json
   end
 
   def generate_auth_token

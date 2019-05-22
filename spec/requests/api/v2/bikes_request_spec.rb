@@ -9,9 +9,8 @@ describe "Bikes API V2" do
     it "returns one with from an id" do
       bike = FactoryBot.create(:bike)
       get "/api/v2/bikes/#{bike.id}", format: :json
-      result = JSON.parse(response.body)
       expect(response.code).to eq("200")
-      expect(result["bike"]["id"]).to eq(bike.id)
+      expect(json_result["bike"]["id"]).to eq(bike.id)
       expect(response.headers["Content-Type"].match("json")).to be_present
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
@@ -19,9 +18,8 @@ describe "Bikes API V2" do
 
     it "responds with missing" do
       get "/api/v2/bikes/10", format: :json
-      result = JSON(response.body)
       expect(response.code).to eq("404")
-      expect(result["error"].present?).to be_truthy
+      expect(json_result["error"].present?).to be_truthy
       expect(response.headers["Content-Type"].match("json")).to be_present
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
@@ -57,6 +55,48 @@ describe "Bikes API V2" do
       expect(response.code).to eq("403")
     end
 
+    context "special error" do
+      let!(:color) { FactoryBot.create(:color, name: "White") }
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
+      let(:organization) { FactoryBot.create(:organization, name: "Pro's Closet", short_name: "tpc") }
+      let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:bike_attrs) do
+        {
+          serial: "WTU171G0193G",
+          manufacturer: "Trek",
+          description: "2012 Trek Superfly 100 AL Elite Mountain Bike 19in 29\" Alloy Shimano XT 10s Fox",
+          year: "2012",
+          frame_material: "aluminum",
+          owner_email: "developers@example.com",
+          color: "white",
+          frame_model: "Superfly 100 AL Elite",
+          access_token: token.token,
+          organization_slug: "TPC",
+          external_image_urls: ["https://s3-us-west-2.amazonaws.com/theproscloset-img/BMT12479_BJ_01.jpg", "https://s3-us-west-2.amazonaws.com/theproscloset-img/BMT12479_BJ_02.jpg"],
+          no_notify: true,
+        }
+      end
+      it "creates" do
+        VCR.use_cassette("bikes_v2-create-matching-bike-book", match_requests_on: [:path]) do
+          expect do
+            post "/api/v2/bikes?access_token=#{token.token}",
+                 bike_attrs.to_json,
+                 json_headers
+          end.to change(Ownership, :count).by 1
+          expect(response.code).to eq("201")
+          result = json_result["bike"]
+          expect(result["manufacturer_name"]).to eq bike_attrs[:manufacturer]
+          %i[serial year frame_material frame_model].each do |k|
+            pp k unless bike_attrs[k].downcase == result[k]&.to_s&.downcase
+            expect(bike_attrs[k].downcase).to eq result[k].to_s.downcase
+          end
+          expect(result["description"]).to match bike_attrs[:description]
+          expect(result["frame_colors"]).to eq(["White"])
+          expect(result["components"].count).to be > 10
+        end
+      end
+    end
+
     it "creates a non example bike, with components" do
       manufacturer = FactoryBot.create(:manufacturer)
       FactoryBot.create(:ctype, name: "wheel")
@@ -70,7 +110,7 @@ describe "Bikes API V2" do
           component_type: "headset",
           description: "yeah yay!",
           serial_number: "69",
-          model_name: "Richie rich",
+          model: "Richie rich",
         },
         {
           manufacturer: "BLUE TEETH",
@@ -91,7 +131,7 @@ describe "Bikes API V2" do
              json_headers
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
       expect(response.code).to eq("201")
-      result = JSON.parse(response.body)["bike"]
+      result = json_result["bike"]
       expect(result["serial"]).to eq(bike_attrs[:serial])
       expect(result["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       bike = Bike.find(result["id"])
@@ -100,6 +140,7 @@ describe "Bikes API V2" do
       expect(bike.components.count).to eq(3)
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.pluck(:ctype_id).uniq.count).to eq(2)
+      expect(bike.components.map(&:cmodel_name).compact).to eq(["Richie rich"])
       expect(bike.front_gear_type).to eq(front_gear_type)
       expect(bike.handlebar_type).to eq(handlebar_type_slug)
       creation_state = bike.creation_state
@@ -125,7 +166,7 @@ describe "Bikes API V2" do
              json_headers
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
       expect(response.code).to eq("201")
-      result = JSON.parse(response.body)["bike"]
+      result = json_result["bike"]
       expect(result["serial"]).to eq(bike_attrs[:serial])
       expect(result["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
       bike = Bike.unscoped.find(result["id"])
@@ -163,7 +204,7 @@ describe "Bikes API V2" do
              bike_attrs.to_json,
              json_headers
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
-      result = JSON.parse(response.body)
+      result = json_result
       expect(result).to include("bike")
       expect(result["bike"]["serial"]).to eq(bike_attrs[:serial])
       expect(result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
@@ -190,8 +231,7 @@ describe "Bikes API V2" do
              bike_attrs.to_json,
              json_headers
       end.to change(Ownership, :count).by 0
-      result = JSON.parse(response.body)
-      expect(result["error"]).to be_present
+      expect(json_result["error"]).to be_present
     end
   end
 
@@ -223,7 +263,7 @@ describe "Bikes API V2" do
         front_tire_narrow: false,
       }
       post tokenized_url, bike_attrs.merge(additional_attrs).to_json, json_headers
-      result = JSON.parse(response.body)["bike"]
+      result = json_result["bike"]
       expect(response.code).to eq("201")
       bike = Bike.find(result["id"])
       expect(bike.primary_frame_color).to eq color
@@ -238,7 +278,7 @@ describe "Bikes API V2" do
       FactoryBot.create(:membership, user: user, organization: organization, role: "admin")
       organization.save
       post tokenized_url, bike_attrs.to_json, json_headers
-      result = JSON.parse(response.body)["bike"]
+      result = json_result["bike"]
       expect(response.code).to eq("201")
       bike = Bike.find(result["id"])
       expect(bike.creation_organization).to eq(organization)
@@ -258,20 +298,15 @@ describe "Bikes API V2" do
       organization.save
       bike_attrs.delete(:organization_slug)
       post tokenized_url, bike_attrs.to_json, json_headers
-      result = JSON.parse(response.body)
-
       expect(response.code).to eq("403")
-      result = JSON.parse(response.body)
-      expect(result["error"].is_a?(String)).to be_truthy
+      expect(json_result["error"].is_a?(String)).to be_truthy
     end
 
     it "fails to create a bike if the app owner isn't a member of the organization" do
       expect(user.has_membership?).to be_falsey
       post tokenized_url, bike_attrs.to_json, json_headers
-      result = JSON.parse(response.body)
       expect(response.code).to eq("403")
-      result = JSON.parse(response.body)
-      expect(result["error"].is_a?(String)).to be_truthy
+      expect(json_result["error"].is_a?(String)).to be_truthy
     end
   end
 
@@ -300,7 +335,6 @@ describe "Bikes API V2" do
     it "fails to update bike if required stolen attrs aren't present" do
       FactoryBot.create(:country, iso: "US")
       expect(bike.year).to be_nil
-      serial = bike.serial_number
       params[:stolen_record] = {
         phone: "",
         city: "Chicago",
@@ -332,23 +366,21 @@ describe "Bikes API V2" do
     end
 
     it "updates a bike, adds and removes components" do
-      # FactoryBot.create(:manufacturer, name: 'Other')
       wheels = FactoryBot.create(:ctype, name: "wheel")
       headsets = FactoryBot.create(:ctype, name: "Headset")
       comp = FactoryBot.create(:component, bike: bike, ctype: headsets)
       comp2 = FactoryBot.create(:component, bike: bike, ctype: wheels)
       FactoryBot.create(:component)
-      # pp comp2
       bike.reload
       expect(bike.components.count).to eq(2)
       components = [
         {
-          manufacturer: manufacturer.name,
+          manufacturer: manufacturer.slug,
           year: "1999",
           component_type: "headset",
           description: "Second component",
           serial_number: "69",
-          model_name: "Richie rich",
+          model: "Richie rich",
         }, {
           manufacturer: "BLUE TEETH",
           front_or_rear: "Rear",
@@ -362,10 +394,8 @@ describe "Bikes API V2" do
           description: "First component",
         },
       ]
-      params[:is_for_sale] = true
-      params[:components] = components
       expect do
-        put url, params.to_json, json_headers
+        put url, params.merge(is_for_sale: true, components: components).to_json, json_headers
       end.to change(Ownership, :count).by(0)
       expect(response.code).to eq("200")
       bike.reload
@@ -373,12 +403,14 @@ describe "Bikes API V2" do
       expect(bike.is_for_sale).to be_truthy
       expect(bike.year).to eq(params[:year])
       expect(comp2.reload.year).to eq(1999)
+      expect(bike.components.pluck(:cmodel_name)).to match_array([nil, nil, "Richie rich"])
+      expect(bike.components.map(&:manufacturer_name).compact).to match_array(["BLUE TEETH", manufacturer.name])
       expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
       expect(bike.components.count).to eq(3)
     end
 
     it "doesn't remove components that aren't the bikes" do
-      manufacturer = FactoryBot.create(:manufacturer)
+      FactoryBot.create(:manufacturer)
       comp = FactoryBot.create(:component, bike: bike)
       not_urs = FactoryBot.create(:component)
       components = [
@@ -394,8 +426,6 @@ describe "Bikes API V2" do
       put url, params.to_json, json_headers
       expect(response.code).to eq("401")
       expect(response.headers["Content-Type"].match("json")).to be_present
-      # response.headers['Access-Control-Allow-Origin'].should eq('*')
-      # response.headers['Access-Control-Request-Method'].should eq('*')
       expect(bike.reload.components.reload.count).to eq(1)
       expect(bike.components.pluck(:year).first).to eq(1999) # Feature, not a bug?
       expect(not_urs.reload.id).to be_present

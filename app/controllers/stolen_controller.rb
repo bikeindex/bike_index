@@ -11,6 +11,10 @@ class StolenController < ApplicationController
     redirect_to "https://files.bikeindex.org/uploads/tsvs/current_stolen_bikes.tsv"
   end
 
+  def current_tsv_rapid
+    redirect_to "https://files.bikeindex.org/uploads/tsvs/current_stolen_bikes.tsv"
+  end
+
   def show
     redirect_to stolen_index_url
   end

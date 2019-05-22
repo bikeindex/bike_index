@@ -137,7 +137,8 @@ describe CustomerMailer do
   describe "stolen_notification_email" do
     let(:stolen_record) { FactoryBot.create(:stolen_record) }
     let!(:ownership) { FactoryBot.create(:ownership, bike: stolen_record.bike) }
-    let(:stolen_notification) { FactoryBot.create(:stolen_notification, message: "Test Message", reference_url: "something.com", bike: stolen_record.bike) }
+    let(:sender) { FactoryBot.create(:user, email: "party@example.com") }
+    let(:stolen_notification) { FactoryBot.create(:stolen_notification, message: "Test Message", reference_url: "something.com", bike: stolen_record.bike, sender: sender) }
     it "renders email and update sent_dates" do
       mail = CustomerMailer.stolen_notification_email(stolen_notification)
       expect(mail.subject).to eq(stolen_notification.default_subject)
@@ -145,6 +146,8 @@ describe CustomerMailer do
       expect(mail.from.first).to eq("bryan@bikeindex.org")
       expect(mail.body.encoded).to match(stolen_notification.message)
       expect(mail.body.encoded).to match(stolen_notification.reference_url)
+      expect(mail.reply_to).to eq(["party@example.com"])
+      expect(mail.cc).to eq(["bryan@bikeindex.org", "lily@bikeindex.org"])
       stolen_notification.reload
       expect(stolen_notification.send_dates).to be_present
       expect(stolen_notification.send_dates[0]).to eq(stolen_notification.updated_at.to_i)
