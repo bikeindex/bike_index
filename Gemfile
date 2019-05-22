@@ -7,7 +7,7 @@ gem "active_model_serializers", "~> 0.9.3"
 gem "aws-sdk", "~> 1.33"
 gem "bcrypt", "~> 3.1.7"
 gem "jquery-rails"
-gem "pg"
+gem "pg", "~> 0.18.4"
 
 # Speed
 gem "fast_blank", "~> 1.0"
@@ -87,7 +87,7 @@ gem "secure_headers", "~> 2.5.0"
 
 # Frontend
 gem "backbone-on-rails", "~>0.9.10.0" # Legacy js
-gem "bootstrap", "~> 4.0.0.alpha3" # Bootstrap 4 - used for revised stylesheets
+gem "bootstrap"
 gem "chartkick" # Display charts
 gem "coffee-rails"
 gem "groupdate" # Required for charts
