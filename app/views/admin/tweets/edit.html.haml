@@ -1,6 +1,7 @@
-
-%h3
-  = link_to 'View all tweets', admin_tweets_url
+.admin-subnav
+  .col-auto
+    %h3
+      = link_to 'View all tweets', admin_tweets_url
 
 .row.mt-4
   .col-auto
@@ -23,7 +24,6 @@
       .form-group
         = f.label :body_html, 'Tweet display html'
         = f.text_area :body_html, rows: 4, class: "form-control"
-  .row
     .col-md-6
       .form-group.avatar-upload
         = f.label :image, 'Tweet photo', class: 'control-label'
@@ -33,13 +33,16 @@
           - else
             %p
               No picture!
-            = f.file_field :image
+            .input-group
+              .custom-file
+              = f.label :image, "Tweet Image", class: "custom-file-label"
+              = f.file_field :image, class: "custom-file-input"
         - if @tweet.image.present?
           .form-group
             = f.label :remove_image
             = f.check_box :remove_image, class: "form-control"
   .row
-    .col-md-6
+    .col-auto
       .form-group
         %em
           Tweet alignment in image:
@@ -55,28 +58,23 @@
           .form-check-inline.form-check
             = f.radio_button :alignment, 'bottom-right', class: "form-check-input"
             = f.label :alignment, "Bottom-right", {:for => "tweet_alignment_bottom-right", class: "form-check-label pl-0"}
-  .row.justify-content-end
-    .col-auto
+    .col-md-2
       = f.submit 'Save', class: 'btn btn-success'
-
-.mt-4
-%hr
 %h3
   Landing page rendering:
-= stylesheet_link_tag 'revised', media: 'all'
-
-.mt-4
-
-.signup-landing-page
-  .container
-    .row
-      .landing-why-col
-        = render partial: '/landing_pages/tweet', locals: { tweet_id: @tweet.id }
-
 .mt-4
 %hr
 .mt-4
-%label
-  Twitter response data
-%pre
-  = @tweet.twitter_response.to_yaml
+.container
+  .row
+    .landing-why-col
+      = render partial: '/landing_pages/tweet', locals: { tweet_id: @tweet.id }
+
+.mt-4
+%hr
+.row
+  .col-auto
+    %label
+      Twitter response data
+    %pre
+      = @tweet.twitter_response.to_yaml
