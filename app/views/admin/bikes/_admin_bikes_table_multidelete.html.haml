@@ -1,61 +1,62 @@
 - bikes ||= @bikes
-%thead
-  %th
-    Date indexed
-  %th.not-tiny-screens
-    Organization
-  %th.medium-screens
-    Sent to
-  %th.large-screens
-    Info
-  %th
-    Remove
-  
+%table.table.table-bordered.table-striped
+  %thead.thead-light
+    %th
+      Date indexed
+    %th.d-none.d-sm-table-cell
+      Organization
+    %th.d-none.d-lg-table-cell
+      Sent to
+    %th
+      Info
+    %th
+      Remove
 
 
-%tbody
-  - bikes.each do |bike|
-    %tr
-      %td
-        .less-strong-hold
-          %span.less-strong-right.medium-screens
-            - if bike.example
-              %span.table-error
-                = bike.id 
-            - else
-              = bike.id 
-        %a{href: edit_admin_bike_url(bike) }
 
-          - if bike.created_at.today?
-            Today at #{bike.created_at.strftime("%-I %p")}
-          - elsif Date.yesterday().beginning_of_day() <= bike.created_at          
-            Yesterday at #{bike.created_at.strftime("%-I %p")}
-          - else
-            = bike.created_at.strftime("%-m.%-d.%Y")
-      %td.not-tiny-screens
-        .less-strong-hold
-          = bike.creation_organization.name if bike.creation_organization.present?
-          - if bike.registered_new
-            %span.less-strong-right
-              pos
-      %td.medium-screens
-        = bike.owner_email
-      %td.large-screens
-        .less-strong-hold
-          %strong
-            = bike.mnfg_name
-          = [bike.year, bike.frame_model].join(' ')
-          = "(#{bike.type})" unless bike.type == 'bike'
-          - if bike.paint.present? && bike.paint.color_id.blank?
-            .less-strong
-              = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
-              = bike.frame_colors.to_sentence
-          %br
-          %small
-            = bike.description
-          - if bike.stolen
-            %span.less-strong-right
-              stolen
-
+  %tbody
+    - bikes.each do |bike|
+      %tr
         %td
-          = link_to "Delete", get_destroy_admin_bike_url(bike, multi_delete: @page)
+          .less-strong-hold
+            %span.less-strong-right.d-none.d-lg-table-cell
+              - if bike.example
+                %span.table-error
+                  = bike.id
+              - else
+                = bike.id
+          %a{href: edit_admin_bike_url(bike) }
+
+            - if bike.created_at.today?
+              Today at #{bike.created_at.strftime("%-I %p")}
+            - elsif Date.yesterday().beginning_of_day() <= bike.created_at
+              Yesterday at #{bike.created_at.strftime("%-I %p")}
+            - else
+              = bike.created_at.strftime("%-m.%-d.%Y")
+        %td.d-none.d-sm-table-cell
+          .less-strong-hold
+            = bike.creation_organization.name if bike.creation_organization.present?
+            - if bike.registered_new
+              %span.less-strong-right
+                pos
+        %td.d-none.d-lg-table-cell
+          = bike.owner_email
+        %td
+          .less-strong-hold
+            %strong
+              = bike.mnfg_name
+            = [bike.year, bike.frame_model].join(' ')
+            = "(#{bike.type})" unless bike.type == 'bike'
+            - if bike.paint.present? && bike.paint.color_id.blank?
+              .less-strong
+                = link_to bike.paint.name, edit_admin_paint_url(bike.paint)
+                = bike.frame_colors.to_sentence
+            %br
+            %small
+              = bike.description
+            - if bike.stolen
+              %span.less-strong-right
+                stolen
+
+          %td
+            = link_to "Delete", get_destroy_admin_bike_url(bike, multi_delete: @page)
