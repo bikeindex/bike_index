@@ -2,16 +2,15 @@
   .col-7
     %h1
       Manage
+    - if current_user.developer?
+      %em.less-stron
+        current_user ##{current_user.id}
   .col-5
     %ul
-      - if current_user.developer?
-        %li.mr-2
-          %em.less-strong
-            current_user ##{current_user.id}
       %li.nav-item.mr-2
-        = link_to "Superusers", admin_users_path(superusers: true), class: "btn btn-primary"
+        = link_to "Superusers", admin_users_path(superusers: true), class: @superusers ? "nav-link active" : "nav-link"
       %li.nav-item.mr-2
-        = link_to "users", admin_users_path, class: "btn btn-primary"
+        = link_to "users", admin_users_path, class: !@superusers ? "nav-link active" : "nav-link"
 .row
   .col-md-5
     %h4

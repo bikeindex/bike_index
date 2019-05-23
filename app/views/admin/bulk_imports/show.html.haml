@@ -7,10 +7,10 @@
   .col-sm-8
     %ul
       %li.nav-item
-        View #{link_to "all bulk imports", admin_bulk_imports_path}
-        - if @bulk_import.organization_id.present?
-          %em
-            \- View #{link_to "all #{@bulk_import.organization.name} imports", admin_bulk_imports_path(organization_id: @bulk_import.organization.to_param)}
+        = link_to "All bulk imports", admin_bulk_imports_path, class: "nav-link"
+      - if @bulk_import.organization_id.present?
+        %li.nav-item
+          = link_to "All #{@bulk_import.organization.name} imports", admin_bulk_imports_path(organization_id: @bulk_import.organization.to_param), class: "nav-link"
 .row
   .col-sm-6
     %table.table-list

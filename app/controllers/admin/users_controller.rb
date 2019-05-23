@@ -9,6 +9,7 @@ class Admin::UsersController < Admin::BaseController
       @users = Kaminari.paginate_array(users).page(page).per(per_page)
     else
       if params[:superusers]
+        @superusers = true
         users = User.where(superuser: true)
       else
         users = User.includes(memberships: [:organization]).order("created_at desc")
