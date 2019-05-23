@@ -1,29 +1,22 @@
 .admin-subnav
-  .col-auto
+  .col-6
     %h3
       = link_to 'View all tweets', admin_tweets_url
-
-.row.mt-4
   .col-auto
     %small
     = link_to @tweet.tweet_link.gsub(/https?..\//, ''), @tweet.tweet_link, target: '_blank'
-.row.mt-
-  .col-md-2
-    .form-group
-      = label :tweet_by, "Tweet by"
-      = text_field_tag :twitter_id, @tweet.tweetor, disabled: true, class: "form-control"
-  .col-md-2
-    .form-group
-      = label :twitter_id, "Twitter ID"
-      = text_field_tag :twitter_id, @tweet.twitter_id, disabled: true, class: "form-control"
 = form_for [:admin, @tweet], url: { action: 'update', controller: 'tweets' } do |f|
   - if @tweet.errors.any?
     = render partial: "/shared/errors", locals: { name: "Tweet", obj: @tweet}
-  .row
-    .col-md-4
+  .row.mt-4
+    .col-md-3.my-auto
       .form-group
-        = f.label :body_html, 'Tweet display html'
-        = f.text_area :body_html, rows: 4, class: "form-control"
+        = label :tweet_by, "Tweet by"
+        = text_field_tag :twitter_id, @tweet.tweetor, disabled: true, class: "form-control"
+    .col-md-3.my-auto
+      .form-group
+        = label :twitter_id, "Twitter ID"
+        = text_field_tag :twitter_id, @tweet.twitter_id, disabled: true, class: "form-control"
     .col-md-6
       .form-group.avatar-upload
         = f.label :image, 'Tweet photo', class: 'control-label'
@@ -38,11 +31,15 @@
               = f.label :image, "Tweet Image", class: "custom-file-label"
               = f.file_field :image, class: "custom-file-input"
         - if @tweet.image.present?
-          .form-group
-            = f.label :remove_image
-            = f.check_box :remove_image, class: "form-control"
+          .form-check
+            = f.check_box :remove_image, class: "form-check-input"
+            = f.label :remove_image, class: "form-check-label"
   .row
-    .col-auto
+    .col-md-4
+      .form-group
+        = f.label :body_html, 'Tweet display html'
+        = f.text_area :body_html, rows: 4, class: "form-control"
+    .col-md-8.my-auto
       .form-group
         %em
           Tweet alignment in image:
@@ -58,8 +55,9 @@
           .form-check-inline.form-check
             = f.radio_button :alignment, 'bottom-right', class: "form-check-input"
             = f.label :alignment, "Bottom-right", {:for => "tweet_alignment_bottom-right", class: "form-check-label pl-0"}
-    .col-md-2
-      = f.submit 'Save', class: 'btn btn-success'
+  .row.justify-content-end
+    .col-auto
+      = f.submit 'Save', class: 'btn btn-success float-right'
 %h3
   Landing page rendering:
 .mt-4
@@ -67,7 +65,7 @@
 .mt-4
 .container
   .row
-    .landing-why-col
+    .landing-why-col.clearfix
       = render partial: '/landing_pages/tweet', locals: { tweet_id: @tweet.id }
 
 .mt-4
