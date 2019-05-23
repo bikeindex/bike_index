@@ -1,0 +1,16 @@
+- location_count ||= false
+.admin-subnav
+  .col-md-4
+    - if location_count
+      %h1
+        Bike Index records tables
+    - else
+      %h1
+        #{@kind.titleize} graphs
+  .col-md-8
+    %ul
+      %li.nav-item
+        = link_to "Location count tables", tables_admin_graphs_path(location_count: true), class: location_count ? "nav-link active" : "nav-link"
+      - @graph_kinds.each do |kind|
+        %li.nav-item
+          = link_to "#{kind} graphs", admin_graphs_path(kind: kind), class: @kind == kind ? " nav-link active" : "nav-link"

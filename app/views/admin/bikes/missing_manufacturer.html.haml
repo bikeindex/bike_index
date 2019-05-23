@@ -4,12 +4,11 @@
       Multi manufacturer update
   .col-md-6
     %ul
-      -if session[:missing_manufacturer_time_order]
-        %li.nav-item
-          = link_to "Normal view", missing_manufacturer_admin_bikes_path(reset_view: true), class: "btn btn-primary"
-      -else
-        %li.nav-item
-          = link_to "Time ordered view", missing_manufacturer_admin_bikes_path(time_ordered: true), class: "btn btn-primary"
+      %li.nav-item
+        = link_to "Normal view", missing_manufacturer_admin_bikes_path(reset_view: true), class: !session[:missing_manufacturer_time_order] ? "nav-link active" : "nav-link"
+      %li.nav-item
+        = link_to "Time ordered view", missing_manufacturer_admin_bikes_path(time_ordered: true), class: session[:missing_manufacturer_time_order] ? "nav-link active" : "nav-link"
+
 
 
 = form_tag update_manufacturers_admin_bikes_path, id: 'multi_bike_manufacturer_update' do

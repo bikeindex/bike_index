@@ -1,16 +1,4 @@
-.admin-subnav
-  .col-md-4
-    %h1
-      #{@kind.titleize} graphs
-  .col-md-8
-    %ul
-      %li.nav-item
-        = link_to "Location count tables", tables_admin_graphs_path, class: "nav-link"
-      - @graph_kinds.each do |kind|
-        %li.nav-item
-          = link_to "#{kind} graphs", admin_graphs_path(kind: kind), class: @kind == kind ? " nav-link active" : "nav-link"
-
-
+= render partial: "admin/graphs/graphs_subnav"
 - if @kind == "general"
 
   %h2 Users past week
