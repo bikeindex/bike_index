@@ -6,7 +6,7 @@ describe Organized::UsersController, type: :controller do
     describe "index" do
       it "redirects" do
         get :index, organization_id: organization.to_param
-        expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
+        expect(response).to redirect_to(organization_root_path)
         expect(flash[:error]).to be_present
       end
     end
@@ -14,7 +14,7 @@ describe Organized::UsersController, type: :controller do
     describe "new" do
       it "redirects" do
         get :new, organization_id: organization.to_param
-        expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
+        expect(response).to redirect_to(organization_root_path)
         expect(flash[:error]).to be_present
       end
     end
@@ -37,7 +37,7 @@ describe Organized::UsersController, type: :controller do
                          id: organization_invitation.id,
                          is_invitation: true, organization_invitation: organization_invitation_params
           end.to change(OrganizationInvitation, :count).by(0)
-          expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
+          expect(response).to redirect_to(organization_root_path)
           expect(flash[:error]).to be_present
           organization_invitation.reload
           expect(organization_invitation.membership_role).to eq "member"

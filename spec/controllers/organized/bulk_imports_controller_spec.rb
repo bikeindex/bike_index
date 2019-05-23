@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe Organized::BulkImportsController, type: :controller do
-  let(:root_path) { organization_bikes_path(organization_id: organization.to_param) }
   let(:bulk_import) { FactoryBot.create(:bulk_import, organization: organization) }
 
   before { set_current_user(user) if user.present? }
@@ -12,7 +11,7 @@ describe Organized::BulkImportsController, type: :controller do
       let(:user) { nil }
       it "redirects" do
         get :index, organization_id: organization.to_param
-        expect(response).to redirect_to root_path
+        expect(response).to redirect_to(organization_root_path)
       end
     end
 
@@ -21,19 +20,19 @@ describe Organized::BulkImportsController, type: :controller do
       describe "index" do
         it "redirects" do
           get :index, organization_id: organization.to_param
-          expect(response).to redirect_to root_path
+          expect(response).to redirect_to(organization_root_path)
         end
       end
       describe "new" do
         it "redirects" do
           get :new, organization_id: organization.to_param
-          expect(response).to redirect_to root_path
+          expect(response).to redirect_to(organization_root_path)
         end
       end
       describe "show" do
         it "redirects" do
           get :show, id: bulk_import.id, organization_id: organization.to_param
-          expect(response).to redirect_to root_path
+          expect(response).to redirect_to(organization_root_path)
         end
       end
     end
@@ -71,19 +70,19 @@ describe Organized::BulkImportsController, type: :controller do
       describe "index" do
         it "redirects" do
           get :index, organization_id: organization.to_param
-          expect(response).to redirect_to root_path
+          expect(response).to redirect_to(organization_root_path)
         end
       end
       describe "new" do
         it "redirects" do
           get :new, organization_id: organization.to_param
-          expect(response).to redirect_to root_path
+          expect(response).to redirect_to(organization_root_path)
         end
       end
       describe "show" do
         it "redirects" do
           get :show, id: bulk_import.id, organization_id: organization.to_param
-          expect(response).to redirect_to root_path
+          expect(response).to redirect_to(organization_root_path)
         end
       end
     end
