@@ -2,7 +2,9 @@
   .col-md-6
     %h1
       Bike Index records tables
-      %small
+  .col-md-6
+    %ul
+      %li.nav-item
         = link_to 'View graphs', admin_graphs_path
 
 = form_tag tables_admin_graphs_path, method: :get do
