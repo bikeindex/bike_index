@@ -50,6 +50,8 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def tables
+    set_variable_graph_kind
+    @kind = ""
   end
 
   def users
