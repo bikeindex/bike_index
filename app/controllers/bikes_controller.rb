@@ -85,7 +85,7 @@ class BikesController < ApplicationController
   def new
     unless current_user.present?
       store_return_to(new_bike_path(b_param_token: params[:b_param_token], stolen: params[:stolen]))
-      flash[:info] = "You have to sign in to register a bike"
+      flash[:info] = "Please sign in to register a bike"
       redirect_to new_user_path and return
     end
     find_or_new_b_param
