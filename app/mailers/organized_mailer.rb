@@ -10,7 +10,7 @@ class OrganizedMailer < ActionMailer::Base
   def partial_registration(b_param)
     @b_param = b_param
     @organization = @b_param.creation_organization
-    mail("Reply-To" => reply_to, to: @b_param.owner_email, subject: default_i18n_subject(default_subject_vars))
+    mail(reply_to: reply_to, to: @b_param.owner_email, subject: default_i18n_subject(default_subject_vars))
   end
 
   def finished_registration(ownership)
@@ -25,7 +25,7 @@ class OrganizedMailer < ActionMailer::Base
     @organization = @bike.creation_organization if @bike.creation_organization.present? && @vars[:new_bike]
     @vars[:donation_message] = @bike.stolen? && !(@organization && !@organization.is_paid?)
     subject = t("organized_mailer.finished#{finished_registration_type}_registration.subject", default_subject_vars)
-    mail("Reply-To" => reply_to, to: @vars[:email], subject: subject)
+    mail(reply_to: reply_to, to: @vars[:email], subject: subject)
   end
 
   def organization_invitation(organization_invitation)
@@ -34,7 +34,7 @@ class OrganizedMailer < ActionMailer::Base
     @inviter = @organization_invitation.inviter
     @vars = { email: @organization_invitation.invitee_email }
     @new_user = User.fuzzy_email_find(@vars[:email]).present?
-    mail("Reply-To" => reply_to, to: @vars[:email], subject: default_i18n_subject(default_subject_vars))
+    mail(reply_to: reply_to, to: @vars[:email], subject: default_i18n_subject(default_subject_vars))
   end
 
   def custom_message(organization_message)
@@ -43,7 +43,7 @@ class OrganizedMailer < ActionMailer::Base
     @bike = @organization_message.bike
     @sender = @organization_message.sender
 
-    mail("Reply-To" => @organization_message.sender.email, to: @organization_message.email, subject: @organization_message.subject) do |format|
+    mail(reply_to: @organization_message.sender.email, to: @organization_message.email, subject: @organization_message.subject) do |format|
       format.html { render "geolocated_message" }
       format.text { render "geolocated_message_text" }
     end
@@ -64,6 +64,6 @@ class OrganizedMailer < ActionMailer::Base
   end
 
   def reply_to
-    @organization && @organization.auto_user.present? ? @organization.auto_user.email : CONTACT_BIKEINDEX
+    @organization && @organization.auto_user.present? ? @organization.auto_user.email : "contact@bikeindex.org"
   end
 end
