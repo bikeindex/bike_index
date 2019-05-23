@@ -7,7 +7,7 @@
         Search for #{stolenness_desc} bikes
     .col-md-4.ad-col
       .ad-block#top468x60
-        
+
   .row
     .col-md-8
       = form_tag bikes_path, id: 'bikes_search_form', class: 'bikes-search-form', enforce_utf8: false, method: :get do
@@ -57,7 +57,7 @@
     .col-md-8
       - if @bikes.present?
         %ul.bike-boxes
-          = render partial: '/bikes/revised_bike', collection: @bikes, as: :bike
+          = render partial: '/bikes/bike', collection: @bikes, as: :bike
         .paginate-container.paginate-container-bottom
           = paginate @bikes
 
@@ -72,7 +72,7 @@
             #{params[:serial]}
 
         %ul.bike-boxes
-          = render partial: '/bikes/revised_bike', collection: @close_serials, as: :bike
+          = render partial: '/bikes/bike', collection: @close_serials, as: :bike
     .col-md-4.ad-col
       .ad-block#right300x600
 
