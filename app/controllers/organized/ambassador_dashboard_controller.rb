@@ -14,7 +14,7 @@ module Organized
       @ambassador_task_assignments =
         current_user
           .ambassador_task_assignments
-          .order(created_at: :asc)
+          .task_ordered
     end
   end
 end
