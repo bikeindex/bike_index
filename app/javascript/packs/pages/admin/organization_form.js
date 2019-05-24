@@ -14,7 +14,7 @@ class OrganizationForm {
   }
 
   setEventListeners () {
-    this.$form.on("click", "#js-organization-type input.form-check-input", e => {
+    this.$form.on("change", "#js-organization-type input.form-check-input", e => {
       this.toggleAmbassadorFields(e.target);
     });
   }
