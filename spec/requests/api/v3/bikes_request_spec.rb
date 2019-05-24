@@ -717,7 +717,7 @@ describe "Bikes API V3" do
         expect(bike.public_images.count).to eq 0
         expect(bike.owner).to_not eq(user)
         expect(bike.authorized_by_organization?(u: user)).to be_truthy
-        expect(bike.authorize_for_user(user)).to be_truthy
+        expect(bike.authorized_for_user?(user)).to be_truthy
         expect(bike.claimed?).to be_falsey
         expect(bike.current_ownership.claimed?).to be_falsey
         put url, params.to_json, json_headers
