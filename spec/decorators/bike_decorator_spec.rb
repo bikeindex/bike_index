@@ -37,6 +37,25 @@ describe BikeDecorator do
     end
   end
 
+  describe "#creation_organization_name" do
+    context "given an associated creation_organization" do
+      it "returns the organization's name" do
+        org = FactoryBot.create(:organization, name: "Creation Organization")
+        bike = FactoryBot.create(:bike, creation_organization: org).decorate
+        name = bike.creation_organization_name
+        expect(name).to eq(org.name)
+      end
+    end
+
+    context "given no associated creation_organization" do
+      it "returns nil" do
+        bike = FactoryBot.create(:bike, creation_organization: nil).decorate
+        name = bike.creation_organization_name
+        expect(name).to be_nil
+      end
+    end
+  end
+
   describe "phoneable_by?" do
     it "does not return anything if there isn't a stolen record" do
       bike = Bike.new
