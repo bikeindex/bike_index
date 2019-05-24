@@ -3,11 +3,10 @@ FactoryBot.define do
     sequence(:name) { |n| "Organization #{n}" }
     short_name { name }
     available_invitation_count { 5 }
-    show_on_map { true }
-    lock_show_on_map { true }
+    show_on_map { false }
+    lock_show_on_map { false }
     api_access_approved { false }
     sequence(:website) { |n| "http://organization#{n}.com" }
-    sequence(:ascend_name) { |n| "ascend-name-organization-#{n}" }
 
     # before(:create) { |organization| organization.short_name ||= organization.name }
     factory :organization_with_auto_user do

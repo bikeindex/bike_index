@@ -45,9 +45,9 @@ describe Organization do
 
     context "when changing an org from a non-ambassador to ambassador kind" do
       it "sets non-applicable attributes to sensible ambassador org values" do
-        org = FactoryBot.create(:organization_child)
-        expect(org).to be_show_on_map
-        expect(org).to be_lock_show_on_map
+        org = FactoryBot.create(:organization_child, ascend_name: "ascend")
+        expect(org).to_not be_show_on_map
+        expect(org).to_not be_lock_show_on_map
         expect(org).to_not be_api_access_approved
         expect(org).to be_approved
         expect(org.website).to be_present
