@@ -1,10 +1,12 @@
 module Organized
   class BaseController < ApplicationController
+    before_filter :ensure_not_ambassador_organization!, except: :root
     before_filter :ensure_current_organization!
     before_filter :ensure_member!
+
     layout "application_revised"
 
-    def index
+    def root
       if current_organization.ambassador?
         redirect_to organization_ambassador_dashboard_index_path
       else
@@ -22,13 +24,19 @@ module Organized
     def ensure_admin!
       return true if current_user && current_user.admin_of?(current_organization)
       flash[:error] = "You have to be an organization administrator to do that!"
-      redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
+      redirect_to organization_root_path and return
     end
 
     def ensure_ambassador_or_superuser!
       return true if current_user && current_user.superuser? || current_user.ambassador?
       flash[:error] = "You have to be an ambassador to do that!"
       redirect_to user_root_url
+    end
+
+    def ensure_not_ambassador_organization!
+      return true unless current_organization&.ambassador?
+      flash[:error] = "You have to be an admin to do that!"
+      redirect_to organization_root_path
     end
 
     def ensure_current_organization!

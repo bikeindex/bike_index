@@ -16,7 +16,7 @@ describe "organizations routing", type: :routing do
       it "routes to base index action" do
         expect(get: "/o/university").to route_to(
           controller: "organized/base",
-          action: "index",
+          action: "root",
           organization_id: "university",
         )
       end

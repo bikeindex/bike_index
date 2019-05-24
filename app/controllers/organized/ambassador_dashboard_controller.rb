@@ -1,6 +1,7 @@
 module Organized
   class AmbassadorDashboardController < Organized::BaseController
     before_filter :ensure_ambassador_or_superuser!
+    skip_before_filter :ensure_not_ambassador_organization!
 
     def index
       @ambassadors =

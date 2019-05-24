@@ -1,6 +1,7 @@
 module Organized
   class AmbassadorTaskAssignmentsController < Organized::BaseController
     before_filter :ensure_ambassador_or_superuser!
+    skip_before_filter :ensure_not_ambassador_organization!
 
     def update
       ambassador_task_assignment = AmbassadorTaskAssignment.find(params[:id])

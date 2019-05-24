@@ -1,20 +1,31 @@
 require "spec_helper"
 
 describe Organized::ManageController, type: :controller do
+  context "given an authenticated ambassador" do
+    include_context :logged_in_as_ambassador
+
+    it "redirects to the organization root" do
+      expect(get(:index, organization_id: organization)).to redirect_to(organization_root_path)
+      expect(get(:locations, organization_id: organization)).to redirect_to(organization_root_path)
+      expect(get(:update, organization_id: organization, id: 1)).to redirect_to(organization_root_path)
+      expect(get(:destroy, organization_id: organization, id: 1)).to redirect_to(organization_root_path)
+    end
+  end
+
   context "logged_in_as_organization_member" do
     include_context :logged_in_as_organization_member
     describe "index" do
-      it "redirects" do
+      it "redirects to the organization root path" do
         get :index, organization_id: organization.to_param
-        expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
+        expect(response).to redirect_to(organization_root_path)
         expect(flash[:error]).to be_present
       end
     end
 
     describe "locations" do
-      it "redirects" do
+      it "redirects to the organization root path" do
         get :locations, organization_id: organization.to_param
-        expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
+        expect(response).to redirect_to(organization_root_path)
         expect(flash[:error]).to be_present
       end
     end
@@ -24,7 +35,7 @@ describe Organized::ManageController, type: :controller do
         expect do
           delete :destroy, id: organization.id, organization_id: organization.to_param
         end.to change(Organization, :count).by(0)
-        expect(response.location).to match(organization_bikes_path(organization_id: organization.to_param))
+        expect(response).to redirect_to(organization_root_path)
         expect(flash[:error]).to be_present
       end
     end
@@ -77,7 +88,7 @@ describe Organized::ManageController, type: :controller do
             auto_user_id: user.id,
             show_on_map: false,
             api_access_approved: false,
-            access_token: 'stuff7',
+            access_token: "stuff7",
             lock_show_on_map: true,
             is_paid: false,
           }
@@ -93,10 +104,10 @@ describe Organized::ManageController, type: :controller do
             auto_user_id: user.id,
             embedable_user_email: user_2.email,
             api_access_approved: true,
-            access_token: 'things7',
-            website: ' www.drseuss.org',
-            name: 'some new name',
-            kind: 'bike_shop',
+            access_token: "things7",
+            website: " www.drseuss.org",
+            name: "some new name",
+            kind: "bike_shop",
             is_paid: true,
             lock_show_on_map: false,
             show_on_map: true,
@@ -208,16 +219,19 @@ describe Organized::ManageController, type: :controller do
             end
           end
         end
-        context "remove" do
-          it "removes the location, doesn't change ambassador organization kind" do
-            organization.update_attribute :kind, "ambassador"
-            # update_attributes = update_attributes.dup
+
+        context "removing a location" do
+          it "removes the location" do
             update_attributes[:locations_attributes]["0"][:_destroy] = 1
+
             expect do
-              put :update, organization_id: organization.to_param, id: organization.to_param, organization: update_attributes.merge(kind: "bike_shop")
+              put :update,
+                  organization_id: organization.to_param,
+                  id: organization.to_param,
+                  organization: update_attributes.merge(kind: "bike_shop")
             end.to change(Location, :count).by 0
+
             organization.reload
-            expect(organization.kind).to eq "ambassador"
             expect(Location.where(id: location_1.id).count).to eq 0
           end
         end
