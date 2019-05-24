@@ -126,8 +126,8 @@ group :production do
 end
 
 group :development do
-  # gem 'test-unit', '~> 3.0'
   gem "bullet"
+  gem "letter_opener"
   gem "rerun"
 end
 
