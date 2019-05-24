@@ -11,7 +11,9 @@ class OwnershipCreator
   end
 
   def creator_id
-    @creator_id ||= @bike.creator&.id
+    # If this isn't the first ownership, the creator is the current_user, which is passed in
+    # On the first ownership, the creator is the creator of the bike - because organization creation
+    @bike.ownerships.count > 0 ? @creator.id : @bike.creator&.id
   end
 
   def user_id
@@ -21,7 +23,7 @@ class OwnershipCreator
   def send_notification_email(ownership)
     return true if ownership.example
     return true unless ownership.send_email
-    EmailOwnershipInvitationWorker.perform_in(30.seconds, ownership.id)
+    EmailOwnershipInvitationWorker.perform_in(5.seconds, ownership.id)
   end
 
   def self_made?

@@ -1025,9 +1025,7 @@ describe BikesController do
       let(:ownership) { FactoryBot.create(:ownership) }
       let(:user) { ownership.creator }
       let(:bike) { ownership.bike }
-      before do
-        set_current_user(user)
-      end
+      before { set_current_user(user) }
       context "legacy" do
         it "allows you to edit an example bike" do
           # Also test that we don't don't blank bike_organizations
@@ -1061,6 +1059,7 @@ describe BikesController do
           bike_attrs = {
             description: "69",
             handlebar_type: another_handlebar_type,
+            owner_email: "  #{bike.owner_email.upcase}",
             components_attributes: {
               "0" => {
                 "_destroy" => "1",
@@ -1069,7 +1068,9 @@ describe BikesController do
               Time.zone.now.to_i.to_s => component2_attrs,
             },
           }
-          put :update, id: bike.id, bike: bike_attrs
+          expect do
+            put :update, id: bike.id, bike: bike_attrs
+          end.to_not change(Ownership, :count)
           bike.reload
           expect(bike.description).to eq("69")
           expect(response).to redirect_to edit_bike_url(bike)
@@ -1093,10 +1094,68 @@ describe BikesController do
           expect(bike.reload.hidden).to be_falsey
         end
 
-        it "creates a new ownership if the email changes" do
-          expect do
-            put :update, id: bike.id, bike: { owner_email: "new@email.com" }
-          end.to change(Ownership, :count).by(1)
+        context "owner email changes" do
+          let(:email) { "originalemail@example.com" }
+          let(:new_email) { "new@email.com" }
+          let(:ownership) { FactoryBot.create(:ownership, creator: user, owner_email: email) }
+          let(:user) { FactoryBot.create(:user_confirmed, email: email) }
+          before do
+            bike.reload
+            ActionMailer::Base.deliveries = []
+            Sidekiq::Worker.clear_all
+            Sidekiq::Testing.inline!
+          end
+          after { Sidekiq::Testing.fake! }
+
+          def expect_bike_transferred_but_unclaimed(bike, user)
+            bike.reload
+            ownership.reload
+            expect(ownership.current?).to be_falsey
+            expect(bike.owner_email).to eq new_email
+            expect(bike.user).to be_nil # Because the new owner hasn't claimed the ownership yet
+            expect(bike.claimed?).to be_falsey
+            expect(bike.current_ownership.id).to_not eq ownership.id
+            current_ownership = bike.current_ownership
+            expect(current_ownership.creator_id).to eq user.id
+            expect(current_ownership.owner_email).to eq new_email
+            expect(ActionMailer::Base.deliveries.count).to eq 1
+            mail = ActionMailer::Base.deliveries.last
+            expect(mail.subject).to eq("Confirm your Bike Index registration")
+            expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+            expect(mail.from).to eq(["contact@bikeindex.org"])
+            expect(mail.to).to eq([new_email])
+          end
+
+          it "creates a new ownership and emails the new owner" do
+            expect(bike.owner_email).to eq email
+            expect(bike.claimed?).to be_falsey
+            expect(bike.user).to be_nil
+            expect(bike.authorized_for_user?(user)).to be_truthy
+            expect do
+              put :update, id: bike.id, bike: { owner_email: new_email }
+            end.to change(Ownership, :count).by(1)
+            expect_bike_transferred_but_unclaimed(bike, user)
+            expect(bike.owner).to eq user
+            expect(bike.current_ownership.user).to be_nil
+            expect(bike.authorized_for_user?(user)).to be_truthy
+          end
+          context "claimed ownership" do
+            let(:user) { FactoryBot.create(:user_confirmed, email: email) }
+            let(:ownership) { FactoryBot.create(:ownership_claimed, user: user, owner_email: email) }
+            it "creates a new ownership and emails the new owner" do
+              expect(bike.owner_email).to eq email
+              expect(bike.claimed?).to be_truthy
+              expect(bike.user).to eq user
+              expect(bike.authorized_for_user?(user)).to be_truthy
+              expect do
+                put :update, id: bike.id, bike: { owner_email: "#{new_email.upcase} " }
+              end.to change(Ownership, :count).by(1)
+              expect_bike_transferred_but_unclaimed(bike, user)
+              expect(bike.owner).to eq user
+              expect(bike.current_ownership.user).to be_nil
+              expect(bike.authorized_for_user?(user)).to be_truthy
+            end
+          end
         end
 
         it "redirects to return_to if it's a valid url" do

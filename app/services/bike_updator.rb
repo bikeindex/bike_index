@@ -23,21 +23,16 @@ class BikeUpdator
 
   def update_ownership
     @bike.update_attribute :updator_id, @user.id if @user.present? && @bike.updator_id != @user.id
-    if @bike_params["bike"] && @bike_params["bike"]["owner_email"] &&
-       @bike.owner_email != @bike_params["bike"]["owner_email"]
-      if @bike_params["bike"]["owner_email"].blank?
-        @bike_params["bike"].delete("owner_email")
-      else
-        opts = {
-          owner_email: @bike_params["bike"]["owner_email"],
-          bike: @bike,
-          creator: @user,
-          send_email: true,
-        }
-        OwnershipCreator.new(opts).create_ownership
-        @bike_params["bike"]["is_for_sale"] = false
-      end
-    end
+    new_owner_email = EmailNormalizer.normalize(@bike_params["bike"].delete("owner_email"))
+    return false if new_owner_email.blank? || @bike.owner_email == new_owner_email
+    # Since we've deleted the owner_email from the update hash, we have to assign it here
+    # This is required because ownership_creator uses it :/ - not a big fan of this side effect though
+    @bike.owner_email = new_owner_email
+    OwnershipCreator.new(owner_email: new_owner_email,
+                         bike: @bike,
+                         creator: @user,
+                         send_email: true).create_ownership
+    @bike_params["bike"]["is_for_sale"] = false
   end
 
   def ensure_ownership!
