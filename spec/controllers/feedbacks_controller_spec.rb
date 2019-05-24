@@ -75,6 +75,27 @@ describe FeedbacksController do
         expect(feedback.body).to eq "ffff"
         expect(feedback.feedback_hash[:package_size]).to eq "small"
       end
+      context "with a phone number and no package_size" do
+        it "creates a feedback" do
+          request.env["HTTP_REFERER"] = "http://localhost:3000/cities_packages"
+          expect do
+            post :create, feedback: {
+                            name: "Chicago",
+                            feedback_type: "lead_for_city",
+                            email: "example@example.com",
+                            phone_number: "891024123",
+                            package_size: "",
+                          }
+          end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(1)
+          expect(response).to redirect_to "http://localhost:3000/cities_packages"
+          expect(flash[:success]).to be_present
+          feedback = Feedback.last
+          expect(feedback.title).to eq "New City lead: Chicago"
+          expect(feedback.email).to eq "example@example.com"
+          expect(feedback.phone_number).to eq "891024123"
+          expect(feedback.package_size).to eq ""
+        end
+      end
     end
 
     context "feedback with additional" do
