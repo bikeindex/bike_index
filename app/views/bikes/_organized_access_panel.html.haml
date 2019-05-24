@@ -35,7 +35,7 @@
               %em
                 so you can
               = link_to "Edit it", edit_bike_path(@bike), class: "btn btn-success btn-sm"
-        - elsif current_user.ambassador?
+        - elsif current_user.ambassador? && @bike.current_stolen_record.present?
           .col-xs-12.mb-2
             .text-right.less-strong
               %em
@@ -43,7 +43,9 @@
                   This #{@bike.type} is not claimed yet. As a Bike Index ambassador,
               %em
                 you can edit it to mark it as returned:
-              = link_to "EDIT", edit_bike_path(@bike), class: "btn btn-success btn-sm"
+              = link_to "Mark bike recovered",
+                edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token),
+                class: "btn btn-success btn-sm"
 
         .mb-2{ class: display_unstolen_notification_form ? "col-md-7" : "col-sm-12" }
           %ul.attr-list{ class: display_unstolen_notification_form ? "" : "split-sm" }
