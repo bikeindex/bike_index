@@ -42,7 +42,7 @@
                 %span.hidden-md-down
                   This #{@bike.type} is not claimed yet. As a Bike Index ambassador,
               %em
-                you can edit it to mark it as returned:
+                you can mark it as recovered:
               = link_to "Mark bike recovered",
                 edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token),
                 class: "btn btn-success btn-sm"
