@@ -1955,7 +1955,8 @@ CREATE TABLE public.stolen_records (
     tsved_at timestamp without time zone,
     estimated_value integer,
     recovery_link_token text,
-    show_address boolean DEFAULT false
+    show_address boolean DEFAULT false,
+    recovering_user_id integer
 );
 
 
@@ -3402,6 +3403,13 @@ CREATE INDEX index_stolen_records_on_latitude_and_longitude ON public.stolen_rec
 
 
 --
+-- Name: index_stolen_records_on_recovering_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_stolen_records_on_recovering_user_id ON public.stolen_records USING btree (recovering_user_id);
+
+
+--
 -- Name: index_user_emails_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4143,3 +4151,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190516222221');
 INSERT INTO schema_migrations (version) VALUES ('20190517161246');
 
 INSERT INTO schema_migrations (version) VALUES ('20190517200357');
+
+INSERT INTO schema_migrations (version) VALUES ('20190524191139');
+
