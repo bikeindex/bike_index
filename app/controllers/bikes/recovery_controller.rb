@@ -24,8 +24,14 @@ module Bikes
     private
 
     def permitted_params
-      params.require(:stolen_record).permit(:date_recovered, :timezone, :recovered_description,
-                                            :index_helped_recovery, :can_share_recovery)
+      params.require(:stolen_record).permit(
+        :date_recovered,
+        :timezone,
+        :recovering_user_id,
+        :recovered_description,
+        :index_helped_recovery,
+        :can_share_recovery
+      )
     end
 
     def find_bike

@@ -5,10 +5,18 @@
 
 = render partial: '/shared/email_bike_box', locals: { bike_url: bike_url(@bike) }
 
-%p
-  The description of the recovery was:
-  %span.less-strong
-    = @stolen_record.recovered_description
+- if @stolen_record.recovered_description.present?
+  %p
+    The description of the recovery was:
+    %span.less-strong
+      = @stolen_record.recovered_description
+
+- if @recovering_user.present?
+  %p
+    Marked recovered by:
+    %span.less-strong
+      = @recovering_user.email
+      = "(#{@recovering_user.name})" if @recovering_user.name
 
 %hr
 
