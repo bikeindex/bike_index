@@ -61,6 +61,7 @@ class CustomerMailer < ActionMailer::Base
     @stolen_record = stolen_record
     @bike = stolen_record.bike
     @biketype = @bike.cycle_type_name&.downcase
+    @recovering_user = stolen_record.recovering_user
     mail(to: [@bike.owner_email],
          from: "bryan@bikeindex.org",
          subject: "Your #{@biketype} has been marked recovered!")

@@ -8,6 +8,7 @@ describe StolenRecord do
     it { is_expected.to belong_to :country }
     it { is_expected.to belong_to :state }
     it { is_expected.to belong_to :creation_organization }
+    it { is_expected.to belong_to :recovering_user }
   end
 
   it "marks current true by default" do
