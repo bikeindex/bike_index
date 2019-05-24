@@ -11,6 +11,9 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
   delegate :description, :description_html, :title, to: :ambassador_task
 
   scope :completed, -> { where.not(completed_at: nil) }
+  scope :incomplete, -> { where(completed_at: nil) }
+  scope :pending_completion, -> { incomplete.or(where("completed_at > ?", Time.now - 2.hours)) }
+  scope :locked_completed, -> { completed.where("completed_at < ?", Time.now - 2.hours) }
 
   def status
     completed? ? "Completed" : "In progress"

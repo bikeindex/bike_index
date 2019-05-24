@@ -1,39 +1,80 @@
-%h1 Ambassadors
-
 %p
-  = link_to "Search for Stolen Bikes", bikes_path, class: "menu-item"
-
-%h2 Tasks
+  %strong
+    Welcome to your Bike Index Ambassadors homepage.
+  This page contains the resources you need to become a great bike advocate in your community. Here you will find documents, tips, articles, and recommendations for helping cyclists where you live and connecting with Ambassadors around the world doing the same in their communities.
+%p
+  Being a Bike Index Ambassador means helping people, where you live, to register and protect their bikes in case of theft. Share Bike Index with bike shops, advocacy groups, universities, and law enforcement to aid larger numbers and more kinds of cyclists in your area.
+%p
+  On this page, we’ve listed effective activities for registering cyclists in Bike Index. You can track progress and get ideas from other Ambassadors in your area about successful strategies. If you have any questions, post them in our Slack channel or email #{link_to "lily@bikeindex.org", "mailto:lily@bikeindex.org"}.
 
 %table.table.table-striped.table-bordered.ambassador-tasks-table
   %thead.small-header
     %tr
-      %th Task
+      %th Activity
       %th Completed?
   %tbody#js-task-assignments
-    - @ambassador_task_assignments.each do |task|
+    - if current_user.ambassador?
+      - ambassador_task_assignments = @ambassador_task_assignments.pending_completion
+    - else
+      - ambassador_task_assignments = AmbassadorTask.order(id: :desc)
+    - ambassador_task_assignments.each do |task|
       %tr
         %td
           %strong= task.title
           %br
           = task.description_html.html_safe
         %td
-          %input{ "data-update-url"=> organization_ambassador_task_assignment_url(current_organization, task, format: :json),
-                  "data-ambassador-task-assignment-id" => task.id,
-                  type: "checkbox",
-                  checked: (task.completed? ? "checked" : nil) }
+          - if current_user.ambassador?
+            %input{ "data-update-url"=> organization_ambassador_task_assignment_url(current_organization, task, format: :json),
+                    "data-ambassador-task-assignment-id" => task.id,
+                    type: "checkbox",
+                    checked: (task.completed? ? "checked" : nil) }
 
-%h2 Leaderboard
+
+%h2{ style: "margin-top: 40px;" }
+  Leaderboard
 
 %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
   %thead.small-header
     %tr
       %th Name
-      %th Email
-      %th Progress
+      %th Activities
   %tbody
     - @ambassadors.each do |ambassador|
       %tr
         %td= ambassador.name
-        %td= ambassador.email
         %td= ambassador.progress_count
+
+
+%p
+  As an ambassador, you have access to a number of special features on Bike Index. Here are a few of them
+%ul
+  %li
+    You're a moderator on <a href="https://discuss.bikeindex.org">discuss.bikeindex.org</a>
+  %li
+    You can send stolen messages to bikes that haven’t been marked stolen yet (as described in <a href="https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen">recover bikes before they are marked stolen</a>)
+  %li
+    You can mark stolen bikes recovered (this is a feature Ambassadors from New Orleans requested - they just recover bikes so quickly!)
+  %li
+    Access to quick communication with the Bike Index team via Slack and email
+  %li
+    Periodic discount codes from Bike Index partners
+
+- if current_user.ambassador? && @ambassador_task_assignments.locked_completed.any?
+  %h2{ style: "margin-top: 40px;" }
+    Completed activities
+  %table.table.table-striped.table-bordered.ambassador-tasks-table
+    %thead.small-header
+      %tr
+        %th Activity
+        %th Completed&nbsp;at
+    %tbody#js-task-assignments
+      - @ambassador_task_assignments.locked_completed.each do |task|
+        %tr
+          %td
+            %strong= task.title
+            %br
+            = task.description_html.html_safe
+          %td
+            %span.convertTime= l task.completed_at, format: :convert_time
+

@@ -11,6 +11,20 @@ describe AmbassadorTaskAssignment, type: :model do
   let(:ambassador) { FactoryBot.create(:ambassador) }
   let(:ambassador_task) { FactoryBot.create(:ambassador_task) }
 
+  describe "pending_complete" do
+    let!(:ambassador_task_assignment1) { FactoryBot.create(:ambassador_task_assignment, user: ambassador, ambassador_task: ambassador_task) }
+    let!(:ambassador_task_assignment2) { FactoryBot.create(:ambassador_task_assignment, user: ambassador, completed_at: Time.now - 1.day) }
+    it "is complete" do
+      ambassador.reload
+      expect(ambassador.ambassador_task_assignments.completed).to eq([ambassador_task_assignment2])
+      expect(ambassador.ambassador_task_assignments.locked_completed.pluck(:id)).to eq([ambassador_task_assignment2.id])
+      expect(ambassador.ambassador_task_assignments.pending_completion.pluck(:id)).to eq([ambassador_task_assignment1.id])
+      ambassador_task_assignment1.update_attributes(completed_at: Time.now - 1.minute)
+      ambassador.reload
+      expect(ambassador.ambassador_task_assignments.pending_completion.pluck(:id)).to eq([ambassador_task_assignment1.id])
+    end
+  end
+
   context "validates the associated user is an ambassador" do
     it "is invalid if given a non-ambassador" do
       assignment = described_class.new(user: non_ambassador,
