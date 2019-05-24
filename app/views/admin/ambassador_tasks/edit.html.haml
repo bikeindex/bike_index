@@ -1,13 +1,8 @@
-%h1 Edit Ambassador Task
+.container
+  %h1 Edit Ambassador Task
 
-= form_for @ambassador_task,
-  url: admin_ambassador_task_path(@ambassador_task),
-  method: :put,
-  html: { class: "form" } do |f|
-  = f.label :title, "Title", class: "form-label"
-  = f.text_field :title, class: 'form-control'
-
-  = f.label :description, "Description", class: "form-label"
-  = f.text_field :description, class: 'form-control'
-
-  = submit_tag "Save", class: 'btn btn-success btn-lg'
+  = render "form",
+    ambassador_task: @ambassador_task,
+    action: admin_ambassador_task_path(@ambassador_task),
+    method: :put,
+    submit_label: "Save"

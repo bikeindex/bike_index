@@ -1,6 +1,17 @@
 require "spec_helper"
 
 describe Organized::BikesController, type: :controller do
+  context "given an authenticated ambassador" do
+    include_context :logged_in_as_ambassador
+    it "redirects to the organization root path" do
+      expect(get(:index, organization_id: organization)).to redirect_to(organization_root_path)
+      expect(get(:recoveries, organization_id: organization)).to redirect_to(organization_root_path)
+      expect(get(:incompletes, organization_id: organization)).to redirect_to(organization_root_path)
+      expect(get(:new, organization_id: organization)).to redirect_to(organization_root_path)
+      expect(get(:multi_serial_search, organization_id: organization)).to redirect_to(organization_root_path)
+    end
+  end
+
   let(:non_organization_bike) { FactoryBot.create(:bike) }
   before do
     expect(non_organization_bike).to be_present

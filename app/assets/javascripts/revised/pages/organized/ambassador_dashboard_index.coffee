@@ -14,4 +14,4 @@ class BikeIndex.OrganizedAmbassadorDashboardIndex extends BikeIndex
         data: JSON.stringify
           id: $input.data("ambassador-task-assignment-id")
           completed: $input.is(":checked")
-        error: (xhr) -> console.error(JSON.parse(xhr.responseText))
+        error: (xhr) -> console.error(xhr.responseText)
