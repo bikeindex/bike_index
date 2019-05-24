@@ -267,6 +267,5 @@ class Organization < ActiveRecord::Base
     self.website = nil
     self.ascend_name = nil
     self.parent_organization_id = nil
-    self.locations = locations.reload.limit(1) if locations.count > 1
   end
 end

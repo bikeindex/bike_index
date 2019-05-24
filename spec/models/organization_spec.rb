@@ -39,21 +39,19 @@ describe Organization do
         expect(org).to be_approved
         expect(org.website).to be_blank
         expect(org.ascend_name).to be_blank
-        expect(org.locations).to be_empty
         expect(org.parent_organization).to be_blank
       end
     end
 
     context "when changing an org from a non-ambassador to ambassador kind" do
       it "sets non-applicable attributes to sensible ambassador org values" do
-        org = FactoryBot.create(:organization_child, :with_locations)
+        org = FactoryBot.create(:organization_child)
         expect(org).to be_show_on_map
         expect(org).to be_lock_show_on_map
         expect(org).to_not be_api_access_approved
         expect(org).to be_approved
         expect(org.website).to be_present
         expect(org.ascend_name).to be_present
-        expect(org.locations.count).to eq(2)
         expect(org.parent_organization).to be_present
 
         org.update_attributes(kind: :ambassador)
@@ -64,7 +62,6 @@ describe Organization do
         expect(org).to be_approved
         expect(org.website).to be_blank
         expect(org.ascend_name).to be_blank
-        expect(org.locations.count).to eq(1)
         expect(org.parent_organization).to be_blank
       end
     end
