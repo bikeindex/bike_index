@@ -16,7 +16,7 @@
     - if current_user.ambassador?
       - ambassador_task_assignments = @ambassador_task_assignments.pending_completion
     - else
-      - ambassador_task_assignments = AmbassadorTask.order(id: :desc)
+      - ambassador_task_assignments = AmbassadorTask.task_ordered
     - ambassador_task_assignments.each do |task|
       %tr
         %td

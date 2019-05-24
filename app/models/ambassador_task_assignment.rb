@@ -14,6 +14,7 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
   scope :incomplete, -> { where(completed_at: nil) }
   scope :pending_completion, -> { incomplete.or(where("completed_at > ?", Time.now - 2.hours)) }
   scope :locked_completed, -> { completed.where("completed_at < ?", Time.now - 2.hours) }
+  scope :task_ordered, -> { order(ambassador_task_id: :asc) }
 
   def status
     completed? ? "Completed" : "In progress"

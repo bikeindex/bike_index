@@ -4,6 +4,8 @@ class AmbassadorTask < ActiveRecord::Base
 
   validates :title, presence: true, uniqueness: true
 
+  scope :task_ordered, -> { order(id: :asc) }
+
   after_create :ensure_assigned_to_all_ambassadors!
 
   def description_html
