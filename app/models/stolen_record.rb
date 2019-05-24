@@ -166,7 +166,7 @@ class StolenRecord < ActiveRecord::Base
     self.date_recovered = TimeParser.parse(info[:date_recovered], info[:timezone]) || Time.now
     update_attributes(current: false,
                       recovered_description: info[:recovered_description],
-                      recovering_user: User.find_by(id: info[:recovering_user_id]),
+                      recovering_user: info[:recovering_user],
                       index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
                       can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?)
     bike.stolen = false

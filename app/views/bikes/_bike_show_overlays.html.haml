@@ -12,7 +12,6 @@
             It's also how we get better at recovering bikes.
         = form_for @stolen_record, url: bike_recovery_path(bike_id: @bike.id) do |f|
           = hidden_field_tag :token, stolen_record.recovery_link_token
-          = f.hidden_field :recovering_user_id, value: current_user&.id
           .form-group
             = f.label :recovered_description, 'How did you get it back?'
             = f.text_area :recovered_description, class: 'form-control'
