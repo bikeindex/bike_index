@@ -1,6 +1,10 @@
 class BikeDecorator < ApplicationDecorator
   delegate_all
 
+  def creation_organization_name
+    object.creation_organization&.name
+  end
+
   def should_show_other_bikes
     object.user? && object.user.show_bikes
   end
