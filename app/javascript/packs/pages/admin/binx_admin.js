@@ -3,7 +3,7 @@ import moment from "moment-timezone";
 import LoadFancySelects from "../../utils/LoadFancySelects";
 import BinxAdminGraphs from "./graphs.js"
 import BinxAdminInvoices from "./invoices.js";
-
+import OrganizationForm from "./organization_form.js";
 
 function BinxAdmin() {
   return {
@@ -39,6 +39,11 @@ function BinxAdmin() {
       LoadFancySelects();
 
       this.enablePeriodSelection();
+
+      if ($("#admin_organizations_new,#admin_organizations_edit").length > 0) {
+        const $organizationForm = $("form").first();
+        new OrganizationForm($organizationForm);
+      }
     },
 
     // Non Fast Attr bikes edit

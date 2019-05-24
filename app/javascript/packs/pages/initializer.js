@@ -7,7 +7,6 @@ import BinxMapping from "./binx_mapping.js";
 import BinxAppOrgExport from "./binx_org_export.js";
 import BinxAppOrgMessages from "./binx_org_messages.js";
 import BinxAdmin from "./admin/binx_admin.js";
-import OrganizationForm from "./admin/organization_form.js";
 
 window.binxApp || (window.binxApp = {});
 
@@ -125,8 +124,5 @@ $(document).ready(function() {
     case "organized_bikes_index":
       const binxAppOrgBikes = BinxAppOrgBikes();
       binxAppOrgBikes.init();
-    case "admin_organizations_new":
-    case "admin_organizations_edit":
-      window.OrganizationForm = new OrganizationForm($("form").first());
   }
 });
