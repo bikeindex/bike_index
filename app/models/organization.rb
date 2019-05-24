@@ -61,6 +61,7 @@ class Organization < ActiveRecord::Base
   scope :bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications]) }
 
   before_validation :set_calculated_attributes
+  before_save :set_ambassador_organization_defaults
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
 
@@ -253,5 +254,19 @@ class Organization < ActiveRecord::Base
     begin
       self.access_token = SecureRandom.hex
     end while self.class.exists?(access_token: access_token)
+  end
+
+  private
+
+  def set_ambassador_organization_defaults
+    return unless kind == "ambassador"
+    self.show_on_map = false
+    self.lock_show_on_map = false
+    self.api_access_approved = false
+    self.approved = true
+    self.website = nil
+    self.ascend_name = nil
+    self.parent_organization_id = nil
+    self.locations = locations.reload.limit(1) if locations.count > 1
   end
 end
