@@ -13,8 +13,14 @@ class OrganizationForm {
     this.setEventListeners();
   }
 
+  setEventListeners () {
+    this.$form.on("click", "#js-organization-type input.form-check-input", e => {
+      this.toggleAmbassadorFields(e.target);
+    });
+  }
+
   toggleAmbassadorFields(target) {
-    const inputFieldIds = [
+    const inputFields = [
       'organization_ascend_name',
       'organization_website',
       "organization_parent_organization_id",
@@ -22,43 +28,53 @@ class OrganizationForm {
       "organization_lock_show_on_map",
       "organization_api_access_approved",
       "organization_approved"
-    ]
-    const selectizedFieldIds = [
-      "organization_parent_organization_id"
-    ]
+    ].map(fieldId => {
+      return {
+        element: this.$form.find(`#${fieldId}`),
+        label: this.$form.find(`label[for='${fieldId}']`)
+      };
+    });
 
-    const $orgType = $(target)
-    const isAmbassadorOrgSelected = $orgType.val() === "ambassador"
+    const selectizedFields = [
+      "organization_parent_organization_id"
+    ].map(fieldId => {
+      return {
+        element: this.$form.find(`#${fieldId}`),
+        label: this.$form.find(`label[for='${fieldId}-selectized']`)
+      };
+    });
+
+    const $orgType = $(target);
+    const isAmbassadorOrgSelected = $orgType.val() === "ambassador";
 
     if (isAmbassadorOrgSelected) {
-      inputFieldIds
-        .forEach(fieldId => {
-          this.$form.find(`#${fieldId}`).attr("disabled", true)
-          this.$form.find(`label[for='${fieldId}']`).addClass("text-muted")
-        })
-      selectizedFieldIds
-        .forEach(fieldId => {
-          this.$form.find(`#${fieldId}`).selectize()[0].selectize.disable()
-          this.$form.find(`label[for='${fieldId}-selectized']`).addClass("text-muted")
-        })
+      this.disableFields({inputFields, selectizedFields});
     } else {
-      inputFieldIds
-        .forEach(fieldId => {
-          this.$form.find(`#${fieldId}`).attr("disabled", false)
-          this.$form.find(`label[for='${fieldId}']`).removeClass("text-muted")
-        })
-      selectizedFieldIds
-        .forEach(fieldId => {
-          this.$form.find(`#${fieldId}`).selectize()[0].selectize.enable()
-          this.$form.find(`label[for='${fieldId}-selectized']`).removeClass("text-muted")
-        })
+      this.enableFields({inputFields, selectizedFields});
     }
   }
 
-  setEventListeners () {
-    this.$form.on("click", "#js-organization-type input.form-check-input", e => {
-      this.toggleAmbassadorFields(e.target)
-    })
+  disableFields({ inputFields, selectizedFields }) {
+    inputFields.forEach(field => {
+      field.element.attr("disabled", true);
+      field.label.addClass("text-muted");
+    });
+
+    selectizedFields.forEach(field => {
+      field.element.selectize()[0].selectize.disable();
+      field.label.addClass("text-muted");
+    });
+  }
+
+  enableFields({ inputFields, selectizedFields }) {
+    inputFields.forEach(field => {
+      field.element.attr("disabled", false);
+      field.label.removeClass("text-muted");
+    });
+    selectizedFields.forEach(field => {
+      field.element.selectize()[0].selectize.enable();
+      field.label.removeClass("text-muted");
+    });
   }
 }
 
