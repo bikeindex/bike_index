@@ -146,7 +146,7 @@ module API
 
           # if a matching bike is and can be updated by the submitter, update
           # existing record instead of creating a new one
-          if found_bike.present? && found_bike.authorize_for_user(current_user)
+          if found_bike.present? && found_bike.authorized_for_user?(current_user)
             # prepare params
             declared_p = { "declared_params" => declared(params, include_missing: false) }
             b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")

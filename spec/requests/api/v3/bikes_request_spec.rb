@@ -569,7 +569,8 @@ describe "Bikes API V3" do
   describe "update" do
     let(:params) { { year: 1999, serial_number: "XXX69XXX" } }
     let(:url) { "/api/v3/bikes/#{bike.id}?access_token=#{token.token}" }
-    let(:bike) { FactoryBot.create(:ownership, creator_id: user.id).bike }
+    let(:ownership) { FactoryBot.create(:ownership, creator_id: user.id) }
+    let(:bike) { ownership.bike }
     let!(:token) { create_doorkeeper_token(scopes: "read_user read_bikes write_bikes") }
 
     it "doesn't update if user doesn't own the bike" do
@@ -693,16 +694,20 @@ describe "Bikes API V3" do
       expect(not_urs.reload.id).to be_present
     end
 
-    it "claims a bike and updates if it should" do
-      expect(bike.year).to be_nil
-      bike.current_ownership.update_attributes(owner_email: user.email, creator_id: FactoryBot.create(:user).id, claimed: false)
-      expect(bike.reload.owner).not_to eq(user)
-      put url, params.to_json, json_headers
-      expect(response.code).to eq("200")
-      expect(response.headers["Content-Type"].match("json")).to be_present
-      expect(bike.reload.current_ownership.claimed).to be_truthy
-      expect(bike.owner).to eq(user)
-      expect(bike.year).to eq(params[:year])
+    context "unclaimed bike" do
+      let(:ownership) { FactoryBot.create(:ownership, owner_email: user.email, claimed: false) }
+      it "claims a bike and updates if it should" do
+        bike.reload
+        expect(bike.year).to be_nil
+        expect(bike.owner).not_to eq user
+        expect(bike.creator).not_to eq user
+        put url, params.to_json, json_headers
+        expect(response.code).to eq("200")
+        expect(response.headers["Content-Type"].match("json")).to be_present
+        expect(bike.reload.current_ownership.claimed).to be_truthy
+        expect(bike.owner).to eq(user)
+        expect(bike.year).to eq(params[:year])
+      end
     end
 
     context "organization bike" do
@@ -710,14 +715,13 @@ describe "Bikes API V3" do
       let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:params) { { year: 1999, external_image_urls: ["https://files.bikeindex.org/email_assets/logo.png"] } }
-      let(:bike) { ownership.bike }
       let!(:token) { create_doorkeeper_token(scopes: "read_user read_bikes write_bikes") }
       it "permits updating" do
         bike.reload
         expect(bike.public_images.count).to eq 0
         expect(bike.owner).to_not eq(user)
         expect(bike.authorized_by_organization?(u: user)).to be_truthy
-        expect(bike.authorize_for_user(user)).to be_truthy
+        expect(bike.authorized_for_user?(user)).to be_truthy
         expect(bike.claimed?).to be_falsey
         expect(bike.current_ownership.claimed?).to be_falsey
         put url, params.to_json, json_headers
@@ -730,6 +734,47 @@ describe "Bikes API V3" do
         expect(bike.year).to eq params[:year]
         expect(bike.external_image_urls).to eq([]) # Because we haven't created another bparam - this could change though
         expect(bike.public_images.count).to eq 1
+      end
+    end
+
+    context "updating email address to a new owner with an existing account" do
+      let!(:new_user) { FactoryBot.create(:user_confirmed, email: "newuser@example.com") }
+      let(:ownership) { FactoryBot.create(:ownership, owner_email: user.email, user: user, claimed: false) }
+      before do
+        bike.reload # Ensure it's established
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline!
+      end
+      after { Sidekiq::Testing.fake! }
+      it "creates a new ownership, emails owner" do
+        expect(bike.owner_email).to eq user.email
+        expect(bike.claimed?).to be_falsey
+        expect(bike.user).to eq user
+        expect(bike.authorized_for_user?(user)).to be_truthy
+        expect(bike.owner).not_to eq user
+        expect do
+          put url, { owner_email: "newuser@EXAMPLE.com " }.to_json, json_headers
+        end.to change(Ownership, :count).by(1)
+        expect(response.code).to eq("200")
+        expect(response.headers["Content-Type"].match("json")).to be_present
+        bike.reload
+        ownership.reload
+        expect(ownership.claimed?).to be_truthy
+        expect(ownership.current?).to be_falsey
+        expect(bike.owner_email).to eq new_user.email
+        expect(bike.user).to eq new_user # Because the new owner hasn't claimed the ownership yet
+        expect(bike.claimed?).to be_falsey
+        expect(bike.current_ownership.id).to_not eq ownership.id
+        current_ownership = bike.current_ownership
+        expect(current_ownership.creator_id).to eq user.id
+        expect(current_ownership.owner_email).to eq new_user.email
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        mail = ActionMailer::Base.deliveries.last
+        expect(mail.subject).to eq("Confirm your Bike Index registration")
+        expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+        expect(mail.from).to eq(["contact@bikeindex.org"])
+        expect(mail.to).to eq([new_user.email])
       end
     end
   end

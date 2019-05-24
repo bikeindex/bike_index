@@ -23,7 +23,7 @@ module Api
         feedback_type = params[:request_type]
         if current_user.present? && reason.present? && bike_id.present? && feedback_type.present?
           bike = Bike.find(bike_id)
-          if bike.authorize_for_user(current_user)
+          if bike.authorized_for_user?(current_user)
             feedback = Feedback.new(email: current_user.email, body: reason, title: "#{feedback_type.titleize}", feedback_type: feedback_type)
             feedback.name = (current_user.name.present? && current_user.name) || "no name"
             feedback.feedback_hash = { bike_id: bike_id }

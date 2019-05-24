@@ -184,7 +184,7 @@ class Bike < ActiveRecord::Base
   def claimed?; current_ownership.present? && current_ownership.claimed.present? end
 
   # owner resolves to creator if user isn't present, or organization auto user. shouldn't ever be nil
-  def owner; current_ownership && current_ownership.owner end
+  def owner; current_ownership&.owner end
 
   # This can be nil!
   def user; current_ownership&.user end
@@ -244,14 +244,14 @@ class Bike < ActiveRecord::Base
     user == u || current_ownership.claimable_by?(u)
   end
 
-  def authorize_for_user(u)
+  def authorized_for_user?(u)
     return true if u == owner || claimable_by?(u)
     return false if u.blank? || current_ownership&.claimed
     authorized_by_organization?(u: u)
   end
 
   def authorize_for_user!(u)
-    return authorize_for_user(u) unless claimable_by?(u)
+    return authorized_for_user?(u) unless claimable_by?(u)
     current_ownership.mark_claimed
     true
   end
