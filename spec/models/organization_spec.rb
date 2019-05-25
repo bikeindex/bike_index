@@ -17,6 +17,56 @@ describe Organization do
     it { is_expected.to belong_to :auto_user }
   end
 
+  describe "#set_ambassador_organization_defaults before_save hook" do
+    context "when saving a new ambassador org" do
+      it "sets non-applicable attributes to sensible ambassador org values" do
+        org = FactoryBot.build(
+          :organization_ambassador,
+          show_on_map: true,
+          lock_show_on_map: true,
+          api_access_approved: true,
+          approved: false,
+          website: "http://website.com",
+          ascend_name: "ascend-name",
+          parent_organization: FactoryBot.create(:organization),
+        )
+
+        org.save
+
+        expect(org).to_not be_show_on_map
+        expect(org).to_not be_lock_show_on_map
+        expect(org).to_not be_api_access_approved
+        expect(org).to be_approved
+        expect(org.website).to be_blank
+        expect(org.ascend_name).to be_blank
+        expect(org.parent_organization).to be_blank
+      end
+    end
+
+    context "when changing an org from a non-ambassador to ambassador kind" do
+      it "sets non-applicable attributes to sensible ambassador org values" do
+        org = FactoryBot.create(:organization_child, ascend_name: "ascend")
+        expect(org).to_not be_show_on_map
+        expect(org).to_not be_lock_show_on_map
+        expect(org).to_not be_api_access_approved
+        expect(org).to be_approved
+        expect(org.website).to be_present
+        expect(org.ascend_name).to be_present
+        expect(org.parent_organization).to be_present
+
+        org.update_attributes(kind: :ambassador)
+
+        expect(org).to_not be_show_on_map
+        expect(org).to_not be_lock_show_on_map
+        expect(org).to_not be_api_access_approved
+        expect(org).to be_approved
+        expect(org.website).to be_blank
+        expect(org.ascend_name).to be_blank
+        expect(org.parent_organization).to be_blank
+      end
+    end
+  end
+
   describe "scopes" do
     it "Shown on map is shown on map *and* validated" do
       expect(Organization.shown_on_map.to_sql).to eq(Organization.where(show_on_map: true).where(approved: true).order(:name).to_sql)
