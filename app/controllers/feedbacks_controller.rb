@@ -49,7 +49,7 @@ class FeedbacksController < ApplicationController
 
   def permitted_parameters
     params.require(:feedback).permit(:body, :email, :name, :title, :feedback_type, :feedback_hash,
-                                     :package_size, :additional)
+                                     :package_size, :phone_number, :additional)
   end
 
   def set_permitted_format

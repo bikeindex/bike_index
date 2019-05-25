@@ -13,8 +13,8 @@ class BikeIndex.LandingPage extends BikeIndex
       $('.next-steps-wrap').Stickyfill()
 
   submitOrganizationPaidPlan: (plan) ->
-    $("#organizationSignupModal").modal("show")
     if plan?
       $("#organizationSignupModal #feedback_body").val(plan)
       $("#organizationSignupModal #feedback_package_size").val(plan)
+    $("#organizationSignupModal").modal("show")
 

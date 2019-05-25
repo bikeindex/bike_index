@@ -3,7 +3,7 @@ class Feedback < ActiveRecord::Base
   serialize :feedback_hash
   belongs_to :user
   before_validation :set_calculated_attributes
-  attr_accessor :additional, :package_size
+  attr_accessor :additional
 
   after_create :notify_admins
 
@@ -25,6 +25,18 @@ class Feedback < ActiveRecord::Base
 
   def package_size=(val)
     self.feedback_hash = (feedback_hash || {}).merge(package_size: val)
+  end
+
+  def package_size
+    (self.feedback_hash || {})[:package_size]
+  end
+
+  def phone_number=(val)
+    self.feedback_hash = (feedback_hash || {}).merge(phone_number: val)
+  end
+
+  def phone_number
+    (self.feedback_hash || {})[:phone_number]
   end
 
   def set_calculated_attributes

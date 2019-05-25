@@ -15,7 +15,7 @@
           Sign Up Now
     - else
       %h4
-        Supporting #{lead_type.titleize}
+        #{plan.to_s.titleize} #{lead_type.titleize}
       %section
         %h5
           = plan_data[:subhead]
