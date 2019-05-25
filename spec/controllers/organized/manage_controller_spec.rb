@@ -48,7 +48,6 @@ describe Organized::ManageController, type: :controller do
         get :index, organization_id: organization.to_param
         expect(response.status).to eq(200)
         expect(response).to render_template :index
-        expect(response).to render_with_layout("application_revised")
         expect(assigns(:current_organization)).to eq organization
         expect(assigns(:passive_organization)).to eq organization
         expect(session[:passive_organization_id]).to eq organization.id
@@ -60,7 +59,6 @@ describe Organized::ManageController, type: :controller do
         session[:passive_organization_id] = "XXXYYY"
         get :landing, organization_id: organization.to_param
         expect(response.status).to eq(200)
-        expect(response).to render_with_layout("application_revised")
         expect(assigns(:current_organization)).to eq organization
         expect(assigns(:passive_organization)).to eq organization
         expect(session[:passive_organization_id]).to eq organization.id
@@ -72,7 +70,6 @@ describe Organized::ManageController, type: :controller do
         get :locations, organization_id: organization.to_param
         expect(response.status).to eq(200)
         expect(response).to render_template :locations
-        expect(response).to render_with_layout("application_revised")
         expect(assigns(:current_organization)).to eq organization
       end
     end

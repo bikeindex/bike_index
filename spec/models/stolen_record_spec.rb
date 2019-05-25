@@ -1,16 +1,6 @@
 require "spec_helper"
 
 describe StolenRecord do
-  describe "validations" do
-    it { is_expected.to validate_presence_of :bike }
-    it { is_expected.to belong_to :bike }
-    it { is_expected.to have_one :recovery_display }
-    it { is_expected.to belong_to :country }
-    it { is_expected.to belong_to :state }
-    it { is_expected.to belong_to :creation_organization }
-    it { is_expected.to belong_to :recovering_user }
-  end
-
   it "marks current true by default" do
     stolen_record = StolenRecord.new
     expect(stolen_record.current).to be_truthy

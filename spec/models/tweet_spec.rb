@@ -1,11 +1,8 @@
+# coding: utf-8
 require "spec_helper"
 
 RSpec.describe Tweet, type: :model do
   let(:twitter_response) { File.read(Rails.root.join("spec", "fixtures", "integration_data_tweet.json")) }
-
-  describe "validations" do
-    it { should validate_presence_of :twitter_id }
-  end
 
   describe "friendly_find" do
     let!(:tweet) { FactoryBot.create(:tweet) }

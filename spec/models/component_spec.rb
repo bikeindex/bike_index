@@ -1,12 +1,6 @@
 require "spec_helper"
 
 describe Component do
-  describe "validations" do
-    it { is_expected.to belong_to :bike }
-    it { is_expected.to belong_to :manufacturer }
-    it { is_expected.to belong_to :ctype }
-  end
-
   describe "component_type" do
     it "returns the name of the ctype other if it should" do
       ctype = Ctype.new

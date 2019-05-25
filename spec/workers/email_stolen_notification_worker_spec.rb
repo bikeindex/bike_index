@@ -3,8 +3,6 @@ require "spec_helper"
 describe EmailStolenNotificationWorker do
   let(:subject) { EmailStolenNotificationWorker }
   let(:instance) { subject.new }
-  it { is_expected.to be_processed_in :notify }
-
   let(:creator) { FactoryBot.create(:user_confirmed) }
   let(:owner_email) { "targetbike@example.org" }
   let(:user) { FactoryBot.create(:user) }

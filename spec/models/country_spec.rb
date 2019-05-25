@@ -1,14 +1,6 @@
 require "spec_helper"
 
 describe Country do
-  describe "validations" do
-    it { is_expected.to validate_presence_of :name }
-    it { is_expected.to validate_uniqueness_of :iso }
-    it { is_expected.to validate_uniqueness_of :iso }
-    it { is_expected.to have_many :stolen_records }
-    it { is_expected.to have_many :locations }
-  end
-
   describe "fuzzy_iso_find" do
     it "finds the country by ISO address when the case doesn't match" do
       country = Country.create(name: "EEEEEEEh", iso: "LULZ")

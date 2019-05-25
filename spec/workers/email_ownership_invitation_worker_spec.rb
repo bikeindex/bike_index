@@ -1,8 +1,6 @@
 require "spec_helper"
 
 describe EmailOwnershipInvitationWorker do
-  it { is_expected.to be_processed_in :notify }
-
   it "sends an email" do
     ownership = FactoryBot.create(:ownership)
     ActionMailer::Base.deliveries = []

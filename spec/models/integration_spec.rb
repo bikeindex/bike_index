@@ -1,11 +1,6 @@
 require "spec_helper"
 
 describe Integration do
-  describe "validations" do
-    it { is_expected.to validate_presence_of :information }
-    it { is_expected.to validate_presence_of :access_token }
-  end
-
   let(:facebook_file) { File.read(Rails.root.join("spec", "fixtures", "integration_data_facebook.json")) }
   let(:strava_file) { File.read(Rails.root.join("spec", "fixtures", "integration_data_strava.json")) }
 

@@ -1,12 +1,6 @@
 require "spec_helper"
 
 describe AmbassadorTaskAssignment, type: :model do
-  it { is_expected.to belong_to(:user) }
-  it { is_expected.to belong_to(:ambassador_task) }
-  it { is_expected.to validate_presence_of(:user) }
-  it { is_expected.to validate_presence_of(:ambassador_task) }
-  it { is_expected.to delegate_method(:description).to(:ambassador_task) }
-
   let(:non_ambassador) { FactoryBot.create(:user) }
   let(:ambassador) { FactoryBot.create(:ambassador) }
   let(:ambassador_task) { FactoryBot.create(:ambassador_task) }

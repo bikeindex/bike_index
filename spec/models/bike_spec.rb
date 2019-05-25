@@ -2,38 +2,6 @@ require "spec_helper"
 
 describe Bike do
   it_behaves_like "bike_searchable"
-  describe "validations" do
-    it { is_expected.to belong_to :manufacturer }
-    it { is_expected.to belong_to :primary_frame_color }
-    it { is_expected.to belong_to :secondary_frame_color }
-    it { is_expected.to belong_to :tertiary_frame_color }
-    it { is_expected.to belong_to :rear_wheel_size }
-    it { is_expected.to belong_to :front_wheel_size }
-    it { is_expected.to belong_to :rear_gear_type }
-    it { is_expected.to belong_to :front_gear_type }
-    it { is_expected.to belong_to :paint }
-    it { is_expected.to belong_to :updator }
-    it { is_expected.to have_many :bike_organizations }
-    it { is_expected.to have_many(:organizations).through(:bike_organizations) }
-    it { is_expected.to belong_to :creation_organization }
-    it { is_expected.to belong_to :current_stolen_record }
-    it { is_expected.to have_many :duplicate_bike_groups }
-    it { is_expected.to have_many :b_params }
-    it { is_expected.to have_many :stolen_notifications }
-    it { is_expected.to have_many :stolen_records }
-    it { is_expected.to have_many :ownerships }
-    it { is_expected.to have_many :public_images }
-    it { is_expected.to have_many :components }
-    it { is_expected.to have_many :other_listings }
-    it { is_expected.to accept_nested_attributes_for :stolen_records }
-    it { is_expected.to accept_nested_attributes_for :components }
-    it { is_expected.to validate_presence_of :creator }
-    it { is_expected.to validate_presence_of :propulsion_type }
-    it { is_expected.to validate_presence_of :serial_number }
-    it { is_expected.to validate_presence_of :manufacturer_id }
-    it { is_expected.to validate_presence_of :primary_frame_color_id }
-  end
-
   describe "scopes" do
     it "default scopes to created_at desc" do
       expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false).order("listing_order desc").to_sql)

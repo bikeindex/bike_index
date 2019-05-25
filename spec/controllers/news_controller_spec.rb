@@ -44,7 +44,6 @@ describe NewsController do
           get :index
           expect(response.status).to eq(200)
           expect(response).to render_template("index")
-          expect(response).to render_with_layout("application_revised")
         end
       end
       context "xml" do
@@ -68,7 +67,6 @@ describe NewsController do
         get :show, id: blog.title_slug
         expect(response.status).to eq(200)
         expect(response).to render_template("show")
-        expect(response).to render_with_layout("application_revised")
       end
     end
   end

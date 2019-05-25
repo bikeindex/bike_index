@@ -146,7 +146,6 @@ group :development, :test do
   gem "rubocop-daemon", "~> 0.3.1", require: false
   gem "rubocop-performance", "~> 1.1.0", require: false
   gem "rufo", "~> 0.6.0", require: false
-  gem "shoulda-matchers", "~> 2.8.0"
 end
 
 group :test do

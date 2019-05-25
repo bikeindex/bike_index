@@ -3,12 +3,6 @@ require "spec_helper"
 describe Color do
   it_behaves_like "friendly_name_findable"
   it_behaves_like "autocomplete_hashable"
-  describe "validations" do
-    it { is_expected.to validate_presence_of :name }
-    it { is_expected.to validate_presence_of :priority }
-    it { is_expected.to validate_uniqueness_of :name }
-    it { is_expected.to have_many :paints }
-  end
 
   describe "friendly_find" do
     it "finds users by email address when the case doesn't match" do

@@ -7,9 +7,6 @@ describe Admin::StolenNotificationsController do
       set_current_user(user)
       get :index
     end
-    it { is_expected.to respond_with(:success) }
-    it { is_expected.to render_template(:index) }
-    it { is_expected.not_to set_flash }
   end
 
   describe "show" do
@@ -19,9 +16,6 @@ describe Admin::StolenNotificationsController do
       set_current_user(user)
       get :show, id: stolen_notification.id
     end
-    it { is_expected.to respond_with(:success) }
-    it { is_expected.to render_template(:show) }
-    it { is_expected.not_to set_flash }
   end
 
   describe "resend" do
@@ -30,7 +24,6 @@ describe Admin::StolenNotificationsController do
       sender = FactoryBot.create(:user)
       admin = FactoryBot.create(:admin)
       stolen_notification = FactoryBot.create(:stolen_notification, sender: sender)
-      # pp expect(EmailStolenNotificationWorker).to have_enqueued_sidekiq_job
       set_current_user(admin)
       expect do
         get :resend, id: stolen_notification.id

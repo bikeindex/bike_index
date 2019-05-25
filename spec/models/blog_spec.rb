@@ -1,14 +1,6 @@
 require "spec_helper"
 
 describe Blog do
-  # describe 'validations' do
-  #   it { should validate_presence_of :title }
-  #   it { should validate_presence_of :body }
-  #   it { should validate_presence_of :user_id }
-  #   it { should validate_uniqueness_of :title }
-  #   it { should validate_uniqueness_of :title_slug }
-  # end
-
   describe "friendly_find" do
     let(:user) { FactoryBot.create(:user) }
     let!(:blog) { Blog.create(title: "foo title", body: "ummmmm good", user_id: user.id, old_title_slug: "an-elder-statesman-title") }

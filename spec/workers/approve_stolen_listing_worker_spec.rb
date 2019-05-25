@@ -1,8 +1,6 @@
 require "spec_helper"
 
 describe ApproveStolenListingWorker do
-  it { is_expected.to be_processed_in :notify }
-
   it "enqueues another awesome job" do
     bike = FactoryBot.create(:bike)
     ApproveStolenListingWorker.perform_async(bike.id)

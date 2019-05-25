@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe UnknownOrganizationForAscendImportWorker do
-  it { is_expected.to be_processed_in :notify }
   let(:bulk_import) { FactoryBot.create(:bulk_import_ascend) }
 
   it "sends an email" do

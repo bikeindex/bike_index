@@ -1,13 +1,6 @@
 require "spec_helper"
 
 describe Membership do
-  describe "validations" do
-    it { is_expected.to belong_to :organization }
-    it { is_expected.to validate_presence_of(:role).with_message(/a role/i) }
-    it { is_expected.to validate_presence_of(:organization).with_message(/organization/i) }
-    it { is_expected.to validate_presence_of(:user).with_message(/user/) }
-  end
-
   describe ".ambassador_organizations" do
     it "returns all and only ambassador organizations" do
       FactoryBot.create(:existing_membership)
