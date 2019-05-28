@@ -391,7 +391,7 @@ describe UsersController do
             expect(response).to be_success
             expect(assigns(:edit_template)).to eq(template)
             expect(response).to render_template(partial: "_edit_#{template}")
-            expect(response).to render_template("layouts/application_revised_bikehub")
+            expect(response).to render_template("layouts/application_revised")
           end
         end
       end
