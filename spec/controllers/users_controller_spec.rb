@@ -31,6 +31,7 @@ describe UsersController do
         expect(response.code).to eq("200")
         expect(response).to render_template("new")
         expect(flash).to_not be_present
+        expect(response).to render_template("layouts/application_revised")
       end
       context "with partner param" do
         it "actually sets it" do
@@ -38,6 +39,7 @@ describe UsersController do
           expect(assigns(:user).email).to eq "seth@bikes.com"
           expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
           expect(session[:partner]).to be_nil
+          expect(response).to render_template("layouts/application_revised_bikehub")
         end
         context "with partner session" do
           it "actually sets it" do
@@ -45,6 +47,7 @@ describe UsersController do
             get :new, return_to: "/bikes/12?contact_owner=true"
             expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
             session[:partner] = "bikehub"
+            expect(response).to render_template("layouts/application_revised_bikehub")
           end
         end
       end
@@ -169,6 +172,7 @@ describe UsersController do
             post :create, partner: "bikehub", user: user_attributes
             expect(response).to render_template("new")
             expect(assigns(:page_errors)).to be_present
+            expect(response).to render_template("layouts/application_revised_bikehub")
           end
         end
       end
@@ -356,6 +360,7 @@ describe UsersController do
       get :accept_vendor_terms
       expect(response.status).to eq(200)
       expect(response).to render_template(:accept_vendor_terms)
+      expect(response).to render_template("layouts/application_revised")
     end
   end
 
@@ -375,6 +380,7 @@ describe UsersController do
         expect(response).to be_success
         expect(assigns(:edit_template)).to eq("root")
         expect(response).to render_template("edit")
+        expect(response).to render_template("layouts/application_revised")
       end
     end
     context "application_revised layout" do
@@ -385,6 +391,7 @@ describe UsersController do
             expect(response).to be_success
             expect(assigns(:edit_template)).to eq(template)
             expect(response).to render_template(partial: "_edit_#{template}")
+            expect(response).to render_template("layouts/application_revised_bikehub")
           end
         end
       end

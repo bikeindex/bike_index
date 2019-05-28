@@ -8,6 +8,7 @@ describe SessionsController do
       expect(response.code).to eq("200")
       expect(response).to render_template("new")
       expect(flash).to_not be_present
+      expect(response).to render_template("layouts/application_revised")
     end
     context "signed in user" do
       include_context :logged_in_as_user
@@ -30,17 +31,20 @@ describe SessionsController do
       it "actually sets it" do
         get :new, return_to: "/bikes/12?contact_owner=true"
         expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
+        expect(response).to render_template("layouts/application_revised")
       end
       context "with partner" do
         it "actually sets it, renders bikehub layout" do
           get :new, return_to: "/bikes/12?contact_owner=true", partner: "bikehub"
           expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
+          expect(response).to render_template("layouts/application_revised_bikehub")
         end
         context "partner in session" do
           it "actually sets it, renders bikehub layout" do
             session[:partner] = "bikehub"
             get :new, return_to: "/bikes/12?contact_owner=true"
             expect(session[:partner]).to be_nil
+            expect(response).to render_template("layouts/application_revised_bikehub")
           end
         end
       end
@@ -154,6 +158,7 @@ describe SessionsController do
         post :create, session: { password: "something incorrect" }
         expect(session[:user_id]).to be_nil
         expect(response).to render_template("new")
+        expect(response).to render_template("layouts/application_revised")
       end
       context "user is organization admin" do
         let(:organization) { FactoryBot.create(:organization, kind: organization_kind) }
@@ -204,6 +209,7 @@ describe SessionsController do
       post :create, session: { email: "notThere@example.com" }
       expect(cookies.signed[:auth]).to be_nil
       expect(response).to render_template(:new)
+      expect(response).to render_template("layouts/application_revised")
     end
   end
 end
