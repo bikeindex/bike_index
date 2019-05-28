@@ -1,8 +1,6 @@
 require "spec_helper"
 
 describe EmailStolenBikeAlertWorker do
-  it { is_expected.to be_processed_in :notify }
-
   describe "perform" do
     it "sends an email" do
       stolen_record = FactoryBot.create(:stolen_record)

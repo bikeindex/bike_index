@@ -34,7 +34,6 @@ describe Organized::ExportsController, type: :controller do
         it "renders" do
           get :index, organization_id: organization.to_param
           expect(response).to render_template(:index)
-          expect(response).to render_with_layout("application_revised")
           expect(assigns(:current_organization)).to eq organization
         end
       end
@@ -53,7 +52,6 @@ describe Organized::ExportsController, type: :controller do
         expect(organization.paid_for?("csv_exports")).to be_truthy
         get :index, organization_id: organization.to_param
         expect(response.code).to eq("200")
-        expect(response).to render_with_layout("application_revised")
         expect(response).to render_template(:index)
         expect(assigns(:current_organization)).to eq organization
         expect(assigns(:exports).pluck(:id)).to eq([export.id])

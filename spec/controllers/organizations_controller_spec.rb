@@ -7,7 +7,6 @@ describe OrganizationsController do
         get :new
         expect(response.status).to eq(200)
         expect(response).to render_template(:new)
-        expect(response).to render_with_layout("application_revised")
       end
     end
     context "with user" do
@@ -16,7 +15,6 @@ describe OrganizationsController do
         get :new
         expect(response.status).to eq(200)
         expect(response).to render_template(:new)
-        expect(response).to render_with_layout("application_revised")
       end
     end
   end

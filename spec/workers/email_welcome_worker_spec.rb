@@ -1,8 +1,6 @@
 require "spec_helper"
 
 describe EmailWelcomeWorker do
-  it { is_expected.to be_processed_in :notify }
-
   it "enqueues listing ordering job" do
     user = FactoryBot.create(:user)
     EmailWelcomeWorker.new.perform(user.id)

@@ -40,7 +40,6 @@ describe Organized::BikesController, type: :controller do
         get :index, organization_id: organization.to_param
         expect(response.status).to eq(200)
         expect(response).to render_template :index
-        expect(response).to render_with_layout("application_revised")
         expect(assigns(:current_organization)).to eq organization
         expect(assigns(:page_id)).to eq "organized_bikes_index"
         expect(assigns(:passive_organization)).to eq organization
@@ -56,7 +55,6 @@ describe Organized::BikesController, type: :controller do
         get :index, organization_id: organization.to_param
         expect(response.status).to eq(200)
         expect(response).to render_template :index
-        expect(response).to render_with_layout("application_revised")
         expect(assigns(:current_organization)).to eq organization
         expect(assigns(:page_id)).to eq "organized_bikes_index"
       end
@@ -67,7 +65,6 @@ describe Organized::BikesController, type: :controller do
         get :new, organization_id: organization.to_param
         expect(response.status).to eq(200)
         expect(response).to render_template :new
-        expect(response).to render_with_layout("application_revised")
         expect(assigns(:current_organization)).to eq organization
       end
     end
@@ -201,7 +198,6 @@ describe Organized::BikesController, type: :controller do
           get :index, organization_id: organization.to_param
           expect(response.status).to eq(200)
           expect(response).to render_template :index
-          expect(response).to render_with_layout("application_revised")
           expect(assigns(:current_organization)).to eq organization
           expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
         end
@@ -225,7 +221,6 @@ describe Organized::BikesController, type: :controller do
         get :new, organization_id: organization.to_param
         expect(response.status).to eq(200)
         expect(response).to render_template :new
-        expect(response).to render_with_layout("application_revised")
         expect(assigns(:current_organization)).to eq organization
       end
     end

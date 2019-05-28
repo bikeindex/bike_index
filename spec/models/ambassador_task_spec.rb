@@ -1,11 +1,6 @@
 require "spec_helper"
 
 describe AmbassadorTask, type: :model do
-  it { is_expected.to have_many(:users) }
-  it { is_expected.to have_many(:ambassador_task_assignments) }
-
-  it { is_expected.to validate_uniqueness_of(:title) }
-
   describe "#ensure_assigned_to_all_ambassadors!" do
     it "idempotently creates assignments to the given task for all ambassadors" do
       user = FactoryBot.create(:user_confirmed)

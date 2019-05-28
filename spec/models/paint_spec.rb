@@ -2,16 +2,6 @@ require "spec_helper"
 
 describe Paint do
   it_behaves_like "friendly_name_findable"
-  describe "validations" do
-    it { is_expected.to validate_presence_of :name }
-    it { is_expected.to validate_uniqueness_of :name }
-    it { is_expected.to belong_to :color }
-    it { is_expected.to belong_to :secondary_color }
-    it { is_expected.to belong_to :tertiary_color }
-    it { is_expected.to belong_to :manufacturer }
-    it { is_expected.to have_many :bikes }
-  end
-
   describe "lowercase name" do
     it "makes the name lowercase on save" do
       pd = Paint.create(name: "Hazel or Something")

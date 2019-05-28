@@ -44,7 +44,6 @@ describe Organized::BulkImportsController, type: :controller do
           get :index, organization_id: organization.to_param
           expect(response.status).to eq(200)
           expect(response).to render_template :index
-          expect(response).to render_with_layout("application_revised")
           expect(assigns(:current_organization)).to eq organization
         end
       end
@@ -54,7 +53,6 @@ describe Organized::BulkImportsController, type: :controller do
           get :new, organization_id: organization.to_param
           expect(response.status).to eq(200)
           expect(response).to render_template :new
-          expect(response).to render_with_layout("application_revised")
           expect(assigns(:current_organization)).to eq organization
         end
       end
@@ -93,7 +91,6 @@ describe Organized::BulkImportsController, type: :controller do
           get :index, organization_id: organization.to_param
           expect(response.status).to eq(200)
           expect(response).to render_template :index
-          expect(response).to render_with_layout("application_revised")
           expect(assigns(:current_organization)).to eq organization
         end
       end
@@ -103,7 +100,6 @@ describe Organized::BulkImportsController, type: :controller do
           get :new, organization_id: organization.to_param
           expect(response.status).to eq(200)
           expect(response).to render_template :new
-          expect(response).to render_with_layout("application_revised")
           expect(assigns(:current_organization)).to eq organization
         end
       end
@@ -113,7 +109,6 @@ describe Organized::BulkImportsController, type: :controller do
           get :show, id: bulk_import.id, organization_id: organization.to_param
           expect(response.status).to eq(200)
           expect(response).to render_template :show
-          expect(response).to render_with_layout("application_revised")
         end
         context "not organizations bulk_import" do
           let(:bulk_import) { FactoryBot.create(:bulk_import) }

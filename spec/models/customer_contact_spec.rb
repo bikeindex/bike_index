@@ -1,20 +1,6 @@
 require "spec_helper"
 
 describe CustomerContact do
-  describe "validations" do
-    it { is_expected.to validate_presence_of :user_email }
-    it { is_expected.to validate_presence_of :creator_email }
-    # it { should validate_presence_of :creator_id }
-    it { is_expected.to validate_presence_of :contact_type }
-    it { is_expected.to validate_presence_of :bike_id }
-    it { is_expected.to validate_presence_of :title }
-    it { is_expected.to validate_presence_of :body }
-    it { is_expected.to belong_to :user }
-    it { is_expected.to belong_to :creator }
-    it { is_expected.to belong_to :bike }
-    it { is_expected.to serialize :info_hash }
-  end
-
   describe "normalize_email_and_find_user" do
     it "finds email and associate" do
       user = FactoryBot.create(:user)

@@ -1,13 +1,6 @@
 require "spec_helper"
 
 describe RecoveryDisplay do
-  describe "validations" do
-    it { is_expected.to validate_presence_of :quote }
-    it { is_expected.to belong_to :stolen_record }
-    # Before validation sets it, so test fails
-    # it { should validate_presence_of :recovered_at }
-  end
-
   describe "set_time" do
     it "sets time from input" do
       recovery_display = RecoveryDisplay.new(date_input: "04-27-1999")

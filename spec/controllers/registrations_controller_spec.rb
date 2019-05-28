@@ -6,7 +6,6 @@ describe RegistrationsController do
   let(:organization) { auto_user.organizations.first }
   let(:renders_embed_without_xframe) do
     expect(response.status).to eq(200)
-    expect(response).to render_with_layout("reg_embed")
     expect(response.headers["X-Frame-Options"]).not_to be_present
     expect(flash).to_not be_present
   end
@@ -16,7 +15,6 @@ describe RegistrationsController do
       get :new, organization_id: organization.id, stolen: true
       expect(response).to render_template(:new)
       expect(response.status).to eq(200)
-      expect(response).to render_with_layout("application_revised")
       expect(response.headers["X-Frame-Options"]).to be_present
       expect(flash).to_not be_present
     end

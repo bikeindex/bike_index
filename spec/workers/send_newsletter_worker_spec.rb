@@ -1,7 +1,6 @@
 require "spec_helper"
 
 describe SendNewsletterWorker do
-  it { is_expected.to be_processed_in :notify }
   let(:subject) { SendNewsletterWorker }
   let(:instance) { subject.new }
 

@@ -1,13 +1,6 @@
 require "spec_helper"
 
 describe UserEmail do
-  describe "validations" do
-    it { is_expected.to belong_to(:user).touch(true) }
-    it { is_expected.to belong_to :old_user }
-    it { is_expected.to validate_presence_of :user_id }
-    it { is_expected.to validate_presence_of :email }
-  end
-
   describe "scopes" do
     it "confirmed only user_emails without tokens" do
       expect(UserEmail.confirmed.to_sql).to eq(UserEmail.where("confirmation_token IS NULL").to_sql)

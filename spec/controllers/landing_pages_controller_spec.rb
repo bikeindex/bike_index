@@ -8,7 +8,6 @@ describe LandingPagesController do
       get :show, organization_id: "university"
       expect(response.status).to eq(200)
       expect(response).to render_template("show")
-      expect(response).to render_with_layout("application_revised")
       expect(title).to eq "University Bike Registration"
     end
     context "xml request format" do
@@ -16,7 +15,6 @@ describe LandingPagesController do
         get :show, organization_id: organization.slug, format: :xml
         expect(response.status).to eq(200)
         expect(response).to render_template("show")
-        expect(response).to render_with_layout("application_revised")
         expect(title).to eq "University Bike Registration"
       end
     end
@@ -28,7 +26,6 @@ describe LandingPagesController do
         get landing_type.to_sym, preview: true
         expect(response.status).to eq(200)
         expect(response).to render_template(landing_type)
-        expect(response).to render_with_layout("application_revised")
         if landing_type == "for_advocacy"
           expect(title).to eq "Bike Index for Advocacy Organizations"
         elsif landing_type == "ascend"

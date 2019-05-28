@@ -3,7 +3,6 @@ require "spec_helper"
 describe EmailOrganizationMessageWorker do
   let(:subject) { EmailOrganizationMessageWorker }
   let(:instance) { subject.new }
-  it { is_expected.to be_processed_in :notify }
 
   context "delivery failed" do
     let(:organization_message) { FactoryBot.create(:organization_message, delivery_status: "failure") }

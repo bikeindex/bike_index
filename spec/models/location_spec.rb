@@ -1,16 +1,6 @@
 require "spec_helper"
 
 describe Location do
-  describe "validations" do
-    it { is_expected.to belong_to :organization }
-    it { is_expected.to belong_to :country }
-    it { is_expected.to belong_to :state }
-    it { is_expected.to validate_presence_of :name }
-    it { is_expected.to validate_presence_of :organization }
-    it { is_expected.to validate_presence_of :city }
-    it { is_expected.to validate_presence_of :country }
-  end
-
   describe "set_phone" do
     it "strips the non-digit numbers from the phone input" do
       location = FactoryBot.create(:location, phone: "773.83ddp+83(887)")

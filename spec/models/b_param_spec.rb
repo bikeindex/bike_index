@@ -1,12 +1,6 @@
 require "spec_helper"
 
 describe BParam do
-  describe "validations" do
-    it { is_expected.to belong_to :created_bike }
-    it { is_expected.to belong_to :creator }
-    # it { should validate_presence_of :creator }
-  end
-
   describe "bike" do
     it "returns the bike attribs" do
       b_param = BParam.new(params: { bike: { serial_number: "XXX" } })

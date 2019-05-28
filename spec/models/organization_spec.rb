@@ -1,22 +1,6 @@
 require "spec_helper"
 
 describe Organization do
-  describe "validations" do
-    # it { should validate_uniqueness_of :slug }
-    it { is_expected.to validate_presence_of :name }
-    it { is_expected.to have_many :memberships }
-    it { is_expected.to have_many :mail_snippets }
-    it { is_expected.to have_many :users }
-    it { is_expected.to have_many :organization_invitations }
-    it { is_expected.to have_many(:bike_organizations) }
-    # it { is_expected.to have_many(:bikes).through(:bike_organizations) }
-    it { is_expected.to have_many :creation_states }
-    it { is_expected.to have_many(:created_bikes).through(:creation_states) }
-
-    it { is_expected.to have_many :locations }
-    it { is_expected.to belong_to :auto_user }
-  end
-
   describe "#set_ambassador_organization_defaults before_save hook" do
     context "when saving a new ambassador org" do
       it "sets non-applicable attributes to sensible ambassador org values" do

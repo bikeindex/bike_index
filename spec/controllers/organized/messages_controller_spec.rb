@@ -103,7 +103,6 @@ describe Organized::MessagesController, type: :controller do
       get :index, organization_id: organization.to_param, kind: "geolocated_messages"
       expect(response.status).to eq(200)
       expect(response).to render_template :index
-      expect(response).to render_with_layout("application_revised")
       expect(assigns(:current_organization)).to eq organization
     end
   end

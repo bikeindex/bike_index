@@ -2,16 +2,6 @@ require "spec_helper"
 
 describe Manufacturer do
   it_behaves_like "autocomplete_hashable"
-  describe "validations" do
-    it { is_expected.to validate_presence_of :name }
-    it { is_expected.to validate_uniqueness_of :name }
-    it { is_expected.to validate_uniqueness_of :slug }
-    it { is_expected.to have_many :bikes }
-    it { is_expected.to have_many :locks }
-    it { is_expected.to have_many :components }
-    it { is_expected.to have_many :paints }
-  end
-
   describe "scopes" do
     it "default_scope is alphabetized" do
       expect(Manufacturer.all.to_sql).to eq(Manufacturer.unscoped.order(:name).to_sql)

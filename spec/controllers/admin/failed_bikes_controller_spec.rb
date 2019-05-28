@@ -2,23 +2,29 @@ require "spec_helper"
 
 describe Admin::FailedBikesController do
   describe "index" do
-    before do
+    it "responds with OK and renders the index template" do
       user = FactoryBot.create(:admin)
       set_current_user(user)
+
       get :index
+
+      expect(response).to be_ok
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:index)
     end
-    it { is_expected.to respond_with(:success) }
-    it { is_expected.to render_template(:index) }
   end
 
   describe "show" do
-    before do
+    it "responds with OK and renders the show template" do
       user = FactoryBot.create(:admin)
       set_current_user(user)
       b_param = BParam.create(creator_id: user.id)
+
       get :show, id: b_param.id
+
+      expect(response).to be_ok
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
     end
-    it { is_expected.to respond_with(:success) }
-    it { is_expected.to render_template(:show) }
   end
 end

@@ -23,7 +23,6 @@ describe BikesController do
           get :index
           expect(response.status).to eq 200
           expect(response).to render_template(:index)
-          expect(response).to render_with_layout("application_revised")
           expect(flash).to_not be_present
           expect(assigns(:interpreted_params)).to eq(stolenness: "stolen")
           expect(assigns(:selected_query_items_options)).to eq([])
@@ -122,7 +121,6 @@ describe BikesController do
       get :show, id: bike.id
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
-      expect(response).to render_with_layout("application_revised")
       expect(assigns(:bike)).to be_decorated
       expect(flash).to_not be_present
     end
@@ -134,7 +132,6 @@ describe BikesController do
         get :show, id: bike.id
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
-        expect(response).to render_with_layout("application_revised")
         expect(assigns(:bike)).to be_decorated
         expect(flash).to_not be_present
         expect(assigns[:current_organization]).to be_nil
@@ -152,7 +149,6 @@ describe BikesController do
         get :show, id: bike.id, organization_id: organization.name
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
-        expect(response).to render_with_layout("application_revised")
         expect(assigns(:bike)).to be_decorated
         expect(flash).to_not be_present
         expect(assigns(:current_organization)).to eq organization
@@ -165,7 +161,6 @@ describe BikesController do
         ownership.bike.update_attributes(example: true)
         get :show, id: bike.id
         expect(response).to render_template(:show)
-        expect(response).to render_with_layout("application_revised")
         expect(assigns(:bike)).to be_decorated
       end
     end
@@ -188,7 +183,6 @@ describe BikesController do
             get :show, id: bike.id
             expect(response.status).to eq(200)
             expect(response).to render_template(:show)
-            expect(response).to render_with_layout("application_revised")
             expect(assigns(:bike)).to be_decorated
             expect(flash).to_not be_present
           end
@@ -199,7 +193,6 @@ describe BikesController do
             get :show, id: bike.id
             expect(response.status).to eq(200)
             expect(response).to render_template(:show)
-            expect(response).to render_with_layout("application_revised")
             expect(assigns(:bike)).to be_decorated
             expect(flash).to_not be_present
           end
@@ -383,7 +376,6 @@ describe BikesController do
           b_param = assigns(:b_param)
           expect(b_param.revised_new?).to be_truthy
           expect(response).to render_template(:new)
-          expect(response).to render_with_layout("application_revised")
         end
       end
       context "bike through b_param" do
@@ -403,7 +395,6 @@ describe BikesController do
             expect(assigns(:b_param)).to eq b_param
             expect(bike.is_a?(Bike)).to be_truthy
             bike_attrs.each { |k, v| expect(bike.send(k)).to eq(v) }
-            expect(response).to render_with_layout("application_revised")
           end
         end
         context "partial registration by organization" do
@@ -420,7 +411,6 @@ describe BikesController do
               pp k unless bike.send(k) == v
               expect(bike.send(k)).to eq(v)
             end
-            expect(response).to render_with_layout("application_revised")
             expect(assigns(:organization)).to eq organization
           end
         end
@@ -432,7 +422,6 @@ describe BikesController do
             bike = assigns(:bike)
             expect(bike.is_a?(Bike)).to be_truthy
             expect(assigns(:b_param)).to_not eq b_param
-            expect(response).to render_with_layout("application_revised")
             expect(flash[:info]).to match(/couldn.t find/i)
           end
         end
@@ -955,7 +944,6 @@ describe BikesController do
           context "non-stolen bike" do
             it "renders the bike_details template" do
               get :edit, id: bike.id
-              expect(response).to render_with_layout "application_revised"
               expect(response).to be_success
               expect(assigns(:edit_template)).to eq "root"
               expect(assigns(:edit_templates)).to eq non_stolen_edit_templates.as_json
@@ -968,7 +956,6 @@ describe BikesController do
               bike.reload
               expect(bike.stolen).to be_truthy
               get :edit, id: bike.id
-              expect(response).to render_with_layout "application_revised"
               expect(response).to be_success
               expect(assigns(:edit_template)).to eq "stolen"
               expect(assigns(:edit_templates)).to eq stolen_edit_templates.as_json
@@ -981,7 +968,6 @@ describe BikesController do
               bike.reload
               expect(bike.recovered).to be_truthy
               get :edit, id: bike.id
-              expect(response).to render_with_layout "application_revised"
               expect(response).to be_success
               expect(assigns(:edit_template)).to eq "stolen"
               expect(assigns(:edit_templates)).to eq recovery_edit_templates.as_json
@@ -997,7 +983,6 @@ describe BikesController do
           context template do
             it "renders the template" do
               get :edit, id: bike.id, page: template
-              expect(response).to render_with_layout("application_revised")
               expect(response).to be_success
               expect(response).to render_template("edit_#{template}")
               expect(assigns(:edit_template)).to eq(template)

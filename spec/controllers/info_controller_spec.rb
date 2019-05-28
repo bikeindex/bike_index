@@ -12,9 +12,9 @@ describe InfoController do
             expect(response.status).to eq(200)
             expect(response).to render_template(page.to_sym)
             if page == "support_bike_index"
-              expect(response).to render_with_layout("payments_layout")
+              expect(response).to render_template("layouts/payments_layout")
             else
-              expect(response).to render_with_layout("application_revised")
+              expect(response).to render_template("layouts/application_revised")
             end
           end
         end
@@ -34,9 +34,9 @@ describe InfoController do
             expect(response.status).to eq(200)
             expect(response).to render_template(page.to_sym)
             if page == "support_bike_index"
-              expect(response).to render_with_layout("payments_layout")
+              expect(response).to render_template("layouts/payments_layout")
             else
-              expect(response).to render_with_layout("application_revised")
+              expect(response).to render_template("layouts/application_revised")
             end
           end
         end

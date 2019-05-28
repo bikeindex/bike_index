@@ -6,7 +6,6 @@ describe WelcomeController do
       get :index
       expect(response.status).to eq(200)
       expect(response).to render_template("index")
-      expect(response).to render_with_layout("application_revised")
       expect(flash).to_not be_present
     end
     context "json request format" do
@@ -14,7 +13,6 @@ describe WelcomeController do
         get :index, format: :json
         expect(response.status).to eq(200)
         expect(response).to render_template("index")
-        expect(response).to render_with_layout("application_revised")
         expect(flash).to_not be_present
       end
     end
@@ -33,7 +31,6 @@ describe WelcomeController do
       get :goodbye
       expect(response.status).to eq(200)
       expect(response).to render_template("goodbye")
-      expect(response).to render_with_layout("application_revised")
       expect(flash).to_not be_present
     end
     context "logged_in" do
@@ -66,7 +63,6 @@ describe WelcomeController do
         get :choose_registration
         expect(response.status).to eq(200)
         expect(response).to render_template("choose_registration")
-        expect(response).to render_with_layout("application_revised")
       end
     end
   end
@@ -98,7 +94,6 @@ describe WelcomeController do
             get :user_home
             expect(response.status).to eq(200)
             expect(response).to render_template("user_home")
-            expect(response).to render_with_layout("application_revised")
             expect(session[:passive_organization_id]).to eq "0"
             expect(assigns[:passive_organization]).to be_nil
           end
@@ -110,7 +105,6 @@ describe WelcomeController do
             get :user_home
             expect(response.status).to eq(200)
             expect(response).to render_template("user_home")
-            expect(response).to render_with_layout("application_revised")
             expect(session[:passive_organization_id]).to eq organization.id
             expect(assigns[:passive_organization]).to eq organization
           end
@@ -130,7 +124,6 @@ describe WelcomeController do
             get :user_home, per_page: 1
             expect(response.status).to eq(200)
             expect(response).to render_template("user_home")
-            expect(response).to render_with_layout("application_revised")
             expect(assigns(:bikes).count).to eq 1
             expect(assigns(:per_page).to_s).to eq "1"
             expect(assigns(:bikes).first).to eq(bike)
@@ -149,7 +142,6 @@ describe WelcomeController do
         expect(assigns(:recovery_displays).count).to eq 2
         expect(response.status).to eq(200)
         expect(response).to render_template("recovery_stories")
-        expect(response).to render_with_layout("application_revised")
         expect(flash).to_not be_present
       end
 
@@ -159,7 +151,6 @@ describe WelcomeController do
         expect(assigns(:recovery_displays)).to be_empty
         expect(response.status).to eq(200)
         expect(response).to render_template("recovery_stories")
-        expect(response).to render_with_layout("application_revised")
         expect(flash).to be_present
       end
     end

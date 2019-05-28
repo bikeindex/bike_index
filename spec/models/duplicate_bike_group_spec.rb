@@ -1,9 +1,6 @@
 require "spec_helper"
 
 describe DuplicateBikeGroup do
-  it { is_expected.to have_many :normalized_serial_segments }
-  it { is_expected.to have_many :bikes }
-
   describe "segment" do
     it "returns the first segment" do
       duplicate_bike_group = DuplicateBikeGroup.new

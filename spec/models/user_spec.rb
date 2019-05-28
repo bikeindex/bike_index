@@ -28,29 +28,6 @@ describe User do
     end
   end
 
-  describe "validations" do
-    it { is_expected.to have_many :user_emails }
-    it { is_expected.to have_many :payments }
-    it { is_expected.to have_many :subscriptions }
-    it { is_expected.to have_many :memberships }
-    it { is_expected.to have_many :organization_embeds }
-    it { is_expected.to have_many :organizations }
-    it { is_expected.to have_many :ownerships }
-    it { is_expected.to have_many :current_ownerships }
-    it { is_expected.to have_many :owned_bikes }
-    it { is_expected.to have_many :currently_owned_bikes }
-    it { is_expected.to have_many :integrations }
-    it { is_expected.to have_many :created_ownerships }
-    it { is_expected.to have_many :locks }
-    it { is_expected.to have_many :organization_invitations }
-    it { is_expected.to have_many :oauth_applications }
-    it { is_expected.to have_many :sent_stolen_notifications }
-    it { is_expected.to have_many :received_stolen_notifications }
-    it { is_expected.to validate_presence_of :email }
-    it { is_expected.to have_many :ambassador_task_assignments }
-    it { is_expected.to have_many(:ambassador_tasks).through(:ambassador_task_assignments) }
-  end
-
   describe "create user_email" do
     it "creates a user_email on create" do
       user = FactoryBot.create(:user_confirmed)

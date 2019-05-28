@@ -52,7 +52,6 @@ describe Organized::UsersController, type: :controller do
         get :index, organization_id: organization.to_param
         expect(response.status).to eq(200)
         expect(response).to render_template :index
-        expect(response).to render_with_layout("application_revised")
         expect(assigns(:current_organization)).to eq organization
       end
     end
@@ -62,7 +61,6 @@ describe Organized::UsersController, type: :controller do
         get :new, organization_id: organization.to_param
         expect(response.code).to eq("200")
         expect(response).to render_template :new
-        expect(response).to render_with_layout "application_revised"
       end
     end
 
@@ -74,7 +72,6 @@ describe Organized::UsersController, type: :controller do
           expect(assigns(:membership)).to eq membership
           expect(response.code).to eq("200")
           expect(response).to render_template :edit
-          expect(response).to render_with_layout "application_revised"
         end
       end
       context "organization_invitation" do
@@ -84,7 +81,6 @@ describe Organized::UsersController, type: :controller do
           expect(assigns(:organization_invitation)).to eq invitation
           expect(response.code).to eq("200")
           expect(response).to render_template :edit
-          expect(response).to render_with_layout "application_revised"
         end
       end
     end
