@@ -126,7 +126,12 @@ Bikeindex::Application.routes.draw do
 
   namespace :admin do
     root to: "dashboard#index"
-    resources :ambassadors, only: [:index, :show]
+    resources :ambassadors, only: [:index, :show] do
+      collection do
+        get :resources
+        get :getting_started
+      end
+    end
     resources :ambassador_tasks
     resources :bikes do
       collection do

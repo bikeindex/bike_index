@@ -23,7 +23,14 @@
               <span class="caret-down">v</span>
             %ul.current-organization-submenu{ "aria-labelledby" => "#passive_organization_submenu" }
               - if passive_organization.ambassador?
-                = active_link "#{passive_organization.short_name} Dashboard", organization_ambassador_dashboard_index_path(organization_id: passive_organization.to_param), class: "nav-link"
+                %li
+                  = active_link "#{passive_organization.short_name} Dashboard", organization_ambassador_dashboard_index_path(organization_id: passive_organization.to_param), class: "nav-link"
+                %li
+                  = active_link "#{passive_organization.short_name} Resources", resources_organization_ambassador_dashboard_path(organization_id: passive_organization.to_param), class: "nav-link"
+                %li
+                  = active_link "#{passive_organization.short_name} Getting started", getting_started_organization_ambassador_dashboard_path(organization_id: passive_organization.to_param), class: "nav-link"
+                %li
+                  = active_link "Multi serial search", multi_serial_search_organization_bikes_path(current_organization), class: "nav-link"
               - else
                 %li
                   = active_link "#{passive_organization.short_name} Bikes", organization_bikes_path(organization_id: passive_organization.to_param), class: "nav-link"

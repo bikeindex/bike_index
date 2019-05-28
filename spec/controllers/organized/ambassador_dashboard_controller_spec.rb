@@ -13,12 +13,30 @@ describe Organized::AmbassadorDashboardController, type: :controller do
     context "given an authenticated ambassador" do
       include_context :logged_in_as_ambassador
 
-      it "renders the ambassador dashboard" do
-        get :index, organization_id: organization.id
+      describe "index" do
+        it "renders the ambassador dashboard" do
+          get :index, organization_id: organization.id
 
-        expect(response).to be_ok
-        expect(assigns(:ambassadors).count).to eq(1)
-        expect(response).to render_template(:index)
+          expect(response).to be_ok
+          expect(assigns(:ambassadors).count).to eq(1)
+          expect(response).to render_template(:index)
+        end
+      end
+
+      describe "resources" do
+        it "renders the ambassador resources" do
+          get :resources, organization_id: organization.id
+          expect(response).to be_ok
+          expect(response).to render_template(:resources)
+        end
+      end
+
+      describe "getting_started" do
+        it "renders the ambassador resources" do
+          get :resources, organization_id: organization.id
+          expect(response).to be_ok
+          expect(response).to render_template(:getting_started)
+        end
       end
     end
 
