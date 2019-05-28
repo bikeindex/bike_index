@@ -8,7 +8,7 @@ module Organized
 
     def root
       if current_organization.ambassador?
-        redirect_to organization_ambassador_dashboard_index_path
+        redirect_to organization_ambassador_dashboard_path
       else
         redirect_to organization_bikes_path
       end
