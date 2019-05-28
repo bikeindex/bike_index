@@ -11,7 +11,15 @@
     %ul.organized-mainmenu
       - if current_organization.ambassador?
         %li
-          = active_link "Ambassadors", organization_ambassador_dashboard_index_path, class: "menu-item"
+          = active_link "#{passive_organization.short_name}", organization_ambassador_dashboard_path, class: "menu-item"
+        %li
+          = active_link "Resources", resources_organization_ambassador_dashboard_path(organization_id: current_organization.to_param), class: "menu-item"
+        %li
+          = active_link "Getting started", getting_started_organization_ambassador_dashboard_path(organization_id: current_organization.to_param), class: "menu-item"
+        %li
+          = active_link "Multi serial search", multi_serial_search_organization_bikes_path(organization_id: current_organization.to_param), class: "menu-item"
+        %li
+          = active_link "Discuss", "https://discuss.bikeindex.org", class: "menu-item"
       - else
         %li
           - on_bikes_path = controller_name == "bikes" && action_name == "index" # Because we want to ignore queries and stuff

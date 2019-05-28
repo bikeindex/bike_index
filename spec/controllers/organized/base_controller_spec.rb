@@ -16,7 +16,7 @@ describe Organized::BaseController, type: :controller do
 
       it "redirects to the ambassador dashboard" do
         get :root, organization_id: organization.to_param
-        expect(response).to redirect_to(organization_ambassador_dashboard_index_path)
+        expect(response).to redirect_to(organization_ambassador_dashboard_path)
       end
     end
   end

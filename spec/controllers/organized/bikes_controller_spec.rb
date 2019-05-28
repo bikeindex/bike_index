@@ -8,7 +8,13 @@ describe Organized::BikesController, type: :controller do
       expect(get(:recoveries, organization_id: organization)).to redirect_to(organization_root_path)
       expect(get(:incompletes, organization_id: organization)).to redirect_to(organization_root_path)
       expect(get(:new, organization_id: organization)).to redirect_to(organization_root_path)
-      expect(get(:multi_serial_search, organization_id: organization)).to redirect_to(organization_root_path)
+    end
+    describe "multi_serial_search" do
+      it "renders" do
+        get :multi_serial_search, organization_id: organization.to_param
+        expect(response.status).to eq(200)
+        expect(response).to render_template :multi_serial_search
+      end
     end
   end
 

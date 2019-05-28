@@ -1,6 +1,7 @@
 module Organized
   class BikesController < Organized::BaseController
     include SortableTable
+    skip_before_filter :ensure_not_ambassador_organization!, only: [:multi_serial_search]
 
     def index
       @page = params[:page] || 1

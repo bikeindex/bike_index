@@ -1,9 +1,9 @@
 module Organized
-  class AmbassadorDashboardController < Organized::BaseController
+  class AmbassadorDashboardsController < Organized::BaseController
     before_filter :ensure_ambassador_or_superuser!
     skip_before_filter :ensure_not_ambassador_organization!
 
-    def index
+    def show
       @ambassadors =
         Ambassador
           .includes(:memberships)
@@ -16,5 +16,9 @@ module Organized
           .ambassador_task_assignments
           .task_ordered
     end
+
+    def resources; end
+
+    def getting_started; end
   end
 end
