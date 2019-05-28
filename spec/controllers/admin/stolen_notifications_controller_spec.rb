@@ -25,6 +25,7 @@ describe Admin::StolenNotificationsController do
       expect(response).to be_ok
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
+      expect(flash).to be_blank
     end
   end
 
