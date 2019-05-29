@@ -109,9 +109,6 @@ workflows:
   commit:
     jobs:
       - build
-      - upload-coverage:
-          requires:
-            - build
       - deploy_production:
           requires:
             - build
