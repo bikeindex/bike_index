@@ -146,7 +146,8 @@ Bikeindex::Application.routes.draw do
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
     get "invoices", to: "payments#invoices", as: :invoices
     resources :memberships, :organization_invitations, :bulk_imports, :exports, :bike_codes,
-              :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments
+              :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments,
+              :partial_bikes
     resources :organizations do
       resources :custom_layouts, only: [:index, :edit, :update], controller: "organizations/custom_layouts"
       resources :invoices, controller: "organizations/invoices"
