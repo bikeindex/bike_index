@@ -48,10 +48,14 @@
     .col-md-6
       .form-group
         = f.label :username
-        = f.text_field :username
+        = f.text_field :username, class: "form-control"
       .form-check.form-check-inline
         = f.check_box :confirmed, disabled: @user.confirmed, class: "form-check-input"
         = f.label :confirmed, class: "form-check-label"
+      .form-check.form-check-inline
+        = f.check_box :banned, class: "form-check-input"
+        = f.label :banned, class: "form-check-label"
+      %hr
       .form-check.form-check-inline
         = f.check_box :superuser, class: "form-check-input"
         = f.label :superuser, class: "form-check-label"
@@ -59,9 +63,7 @@
         .form-check.form-check-inline
           = f.check_box :developer, class: "form-check-input"
           = f.label :developer, class: "form-check-label"
-      .form-check.form-check-inline
-        = f.check_box :banned, class: "form-check-input"
-        = f.label :banned, class: "form-check-label"
+      %hr
       .form-check.form-check-inline
         = f.check_box :can_send_many_stolen_notifications, class: "form-check-input"
         = f.label :can_send_many_stolen_notifications, class: "form-check-label"
