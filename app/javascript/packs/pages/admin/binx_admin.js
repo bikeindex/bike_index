@@ -1,7 +1,7 @@
 import log from "../../utils/log";
 import moment from "moment-timezone";
 import LoadFancySelects from "../../utils/LoadFancySelects";
-import BinxAdminGraphs from "./graphs.js"
+import BinxAdminGraphs from "./graphs.js";
 import BinxAdminInvoices from "./invoices.js";
 import OrganizationForm from "./organization_form.js";
 
@@ -18,8 +18,8 @@ function BinxAdmin() {
           .css("max-width", "100%");
       }
       if ($(".calendar-box")[0]) {
-        const binxAdminGraphs = BinxAdminGraphs()
-        binxAdminGraphs.init()
+        const binxAdminGraphs = BinxAdminGraphs();
+        binxAdminGraphs.init();
       }
       if ($("#use_image_for_display").length > 0) {
         this.useBikeImageForDisplay();
@@ -33,6 +33,9 @@ function BinxAdmin() {
       }
       if ($("#admin-recovery-fields")) {
         this.bikesEditRecoverySlide();
+      }
+      if ($("#admin-users-table").length > 0) {
+        this.loadDataTable('#admin-users-table')
       }
       // Enable bootstrap custom file upload boxes
       binxApp.enableFilenameForUploads();
@@ -111,6 +114,13 @@ function BinxAdmin() {
           joiner = "?";
         }
         return (location.href = `${current_url}${joiner}period=${period}`);
+      });
+    },
+    loadDataTable(table_id) {
+      return $(table_id).dataTable({
+        aaSorting: [],
+        aLengthMenu: [[25, 50, 100, 200, -1], [25, 50, 100, 200, "All"]],
+        iDisplayLength: -1
       });
     }
   };

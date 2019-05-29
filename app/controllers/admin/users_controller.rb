@@ -28,6 +28,7 @@ class Admin::UsersController < Admin::BaseController
     per_page = params[:per_page] || 50
     @bikes = @user.bikes.reorder(created_at: :desc).page(page).per(per_page)
     @ownerships = @user.ownerships.reorder(created_at: :desc).page(page).per(per_page)
+    render layout: "new_admin"
   end
 
   def update
