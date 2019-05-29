@@ -1,5 +1,6 @@
 class Admin::UsersController < Admin::BaseController
   before_filter :find_user, only: [:edit, :update, :destroy]
+  layout "new_admin"
 
   def index
     page = params[:page] || 1
@@ -16,7 +17,6 @@ class Admin::UsersController < Admin::BaseController
       @users = users.page(page).per(per_page)
     end
     @user_count = users.count
-    render layout: "new_admin"
   end
 
   def show
@@ -28,7 +28,6 @@ class Admin::UsersController < Admin::BaseController
     per_page = params[:per_page] || 50
     @bikes = @user.bikes.reorder(created_at: :desc).page(page).per(per_page)
     @ownerships = @user.ownerships.reorder(created_at: :desc).page(page).per(per_page)
-    render layout: "new_admin"
   end
 
   def update

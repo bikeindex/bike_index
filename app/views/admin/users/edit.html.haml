@@ -32,24 +32,6 @@
             Updated
           %td.convertTime
             = l @user.updated_at, format: :convert_time
-  .col-md-6.mt-auto
-    .card
-      .card-body.bg-light{style: "overflow-y: scroll; height: 200px;"}
-        - if @bikes.present?
-          .row
-            .col-auto
-              %h3.mt-4
-                %span
-                  #{@user.email}
-                Bikes (#{pluralize(@bikes.total_count, "Bike")})
-          %ul.list-unstyled
-            - @bikes.decorate.each do |bike|
-              - display = bike.title
-              - display = "#{display} (hidden)" if bike.hidden
-              - display = "#{display} (example)" if bike.example
-
-              %li
-                = link_to display, edit_admin_bike_url(bike)
 = form_for [:admin, @user] do |f|
   - if @user.errors.any?
     = render partial: "/shared/errors", locals: { name: "User", obj: @user }
@@ -68,21 +50,21 @@
         = f.label :username
         = f.text_field :username
       .form-check.form-check-inline
-        = f.label :confirmed, class: "form-check-label"
         = f.check_box :confirmed, disabled: @user.confirmed, class: "form-check-input"
+        = f.label :confirmed, class: "form-check-label"
       .form-check.form-check-inline
-        = f.label :superuser, class: "form-check-label"
         = f.check_box :superuser, class: "form-check-input"
+        = f.label :superuser, class: "form-check-label"
       - if current_user.developer?
         .form-check.form-check-inline
-          = f.label :developer, class: "form-check-label"
           = f.check_box :developer, class: "form-check-input"
+          = f.label :developer, class: "form-check-label"
       .form-check.form-check-inline
-        = f.label :banned, class: "form-check-label"
         = f.check_box :banned, class: "form-check-input"
+        = f.label :banned, class: "form-check-label"
       .form-check.form-check-inline
-        = f.label :can_send_many_stolen_notifications, class: "form-check-label"
         = f.check_box :can_send_many_stolen_notifications, class: "form-check-input"
+        = f.label :can_send_many_stolen_notifications, class: "form-check-label"
     .col-md-6
       .form-group
         = f.label :secondary_emails
@@ -93,8 +75,10 @@
   .row.justify-content-end.mt-4
     .col-auto
       = f.submit 'Save', class: 'btn btn-success'
-
-
+.mt-4
+%h3
+  Bikes
+= render partial: "admin/bikes/admin_bikes_table", locals: {bikes: @bikes}
 
 %h3
   Donations
