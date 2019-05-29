@@ -155,7 +155,6 @@ group :test do
   gem "guard-rspec"
   gem "guard-rubocop", require: false
   gem "rspec-sidekiq"
-  gem "simplecov", require: false
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
 end
