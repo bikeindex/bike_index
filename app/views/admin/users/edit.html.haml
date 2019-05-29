@@ -32,6 +32,10 @@
             Updated
           %td.convertTime
             = l @user.updated_at, format: :convert_time
+  - if @ambassador
+    .col-md-6
+      = render partial: "/admin/ambassadors/ambassador"
+
 = form_for [:admin, @user] do |f|
   - if @user.errors.any?
     = render partial: "/shared/errors", locals: { name: "User", obj: @user }

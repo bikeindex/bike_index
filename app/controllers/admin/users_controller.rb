@@ -59,6 +59,9 @@ class Admin::UsersController < Admin::BaseController
     user_id = params[:id]
     if user_id.is_a?(Integer) || user_id.match(/\A\d*\z/).present?
       @user = User.where(id: user_id).first
+      if Ambassador.find(user_id)
+        @ambassador = Ambassador.find(user_id).decorate
+      end
     end
     @user ||= User.find_by_username(user_id)
     raise ActionController::RoutingError.new("Not Found") unless @user.present?
