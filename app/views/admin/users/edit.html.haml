@@ -162,10 +162,10 @@
 
 - if @user.memberships.count > 0
   .full-screen-table
-    %h2
+    %h2.mt-4
       = @user.memberships.count
       Current memberships
-    %table#admin-users-table.table.table-striped.table-bordered
+    %table.table.table-striped.table-bordered
       %thead.thead-light
         %th
           Id&nbsp;

@@ -34,9 +34,6 @@ function BinxAdmin() {
       if ($("#admin-recovery-fields")) {
         this.bikesEditRecoverySlide();
       }
-      if ($("#admin-users-table").length > 0) {
-        this.loadDataTable('#admin-users-table')
-      }
       // Enable bootstrap custom file upload boxes
       binxApp.enableFilenameForUploads();
       LoadFancySelects();
@@ -114,13 +111,6 @@ function BinxAdmin() {
           joiner = "?";
         }
         return (location.href = `${current_url}${joiner}period=${period}`);
-      });
-    },
-    loadDataTable(table_id) {
-      return $(table_id).dataTable({
-        aaSorting: [],
-        aLengthMenu: [[25, 50, 100, 200, -1], [25, 50, 100, 200, "All"]],
-        iDisplayLength: -1
       });
     }
   };
