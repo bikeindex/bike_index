@@ -1,11 +1,11 @@
-- landing_page_target = "campus-packages"
+- landing_page_target = "school"
 
 .signup-landing-page{ class: "signup-landing-page-#{landing_page_target}" }
   %header.banner-header
     .container
       .row
         .icon-wrapper
-          = render "/landing_pages/icons/header_school_svg"
+          = render "/landing_pages/icons/header_#{landing_page_target}_svg"
         .banner-text
           %h1 Bike Index for Universities
           %h3 Protecting bikes on campus can be a full-time job. Let us help.
