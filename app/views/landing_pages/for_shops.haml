@@ -1,4 +1,5 @@
 - landing_page_target = 'shop'
+
 .signup-landing-page{ class: "signup-landing-page-#{landing_page_target}" }
   %header.banner-header
     .container
@@ -6,34 +7,47 @@
         .icon-wrapper
           = render "/landing_pages/icons/header_#{landing_page_target}_svg"
         .banner-text
-          %h1 Bike Index for <br> Bike Shops
-          %h3 Unite against bike theft and protect your customers' bikes before they're even out there.
+          %h1
+            Bike Index for Bike Shops
+          %h3
+            Unite against bike theft and protect your customers' bikes before
+            they're even out there.
 
-    .ribbon
-      .container
-        %h2 Do right by your customers in just 5 clicks.
   .container
     .row.main-body-row
       .landing-why-col
-        %h3 Register bikes for your customers
-        %p
-          For completely free we provide you with the tools needed to automatically register each bike you sell in Bike Index through your POS. All it takes is a few minutes of setup, either with your Ascend or Lightspeed Retail account.
+        %h3
+          Register bikes for your customers
 
         %p
-          Build goodwill with your customers with a service you can offer at no cost. Recover a stolen bike, and you’ll have a customer for life.
+          For completely free we provide you with the tools needed to
+          automatically register each bike you sell in Bike Index through your
+          POS. All it takes is a few minutes of setup, either with your Ascend
+          or Lightspeed Retail account.
+
+        %p
+          Build goodwill with your customers with a service you can offer at no
+          cost. Recover a stolen bike, and you’ll have a customer for life.
 
         %p
           Join our
           = link_to "network of shop partners.", "http://bikeindex.org/where"
+
           Sign up for a free Bike Index account for your shop
           = link_to "here.", "https://bikeindex.org/organizations/new"
+
           Once you do this, link your account to your Lightspeed or register bikes in Bike Index through Ascend.
 
         = image_tag 'ascend-logo.png', class: 'landing-lightspeed-logo', alt: "Ascend logo"
         = image_tag 'lightspeed_logo.png', class: 'landing-lightspeed-logo', alt: 'Lightspeed logo'
-        %h3 Use Lightspeed Retail?
+
+        %h3
+          Use Lightspeed Retail?
+
         %p
-          Our official Lightspeed integration provides entirely automated registration for every bike you sell. All you have to do is make sure you input the serial number and take the customer's email.
+          Our official Lightspeed integration provides entirely automated
+          registration for every bike you sell. All you have to do is make sure
+          you input the serial number and take the customer's email.
 
         %p
           = link_to "Learn more", "https://bikeindex.org/lightspeed"
@@ -44,7 +58,11 @@
           Ascend Retail
 
         %p
-          Connect your Ascend account and your Bike Index shop account. Each night, Ascend will export the bikes you’ve sold, and we’ll import them into Bike Index for your customers. Other than setup, you’re done! Learn more about the Ascend integration
+          Connect your Ascend account and your Bike Index shop account. Each
+          night, Ascend will export the bikes you’ve sold, and we’ll import them
+          into Bike Index for your customers. Other than setup, you’re done!
+          Learn more about the Ascend integration
+
           = link_to "here.", "https://bikeindex.org/ascend"
 
         = render partial: '/landing_pages/tweet', locals: { tweet_id: 840324239425073152 }
@@ -57,9 +75,11 @@
           Relevant posts:
 
         %p
-          = link_to "Driving service revenues with bicycle registration", "https://bikeindex.org/news/driving-service-revenues-with-bicycle-registration"
+          = link_to "Driving service revenues with bicycle registration",
+          "https://bikeindex.org/news/driving-service-revenues-with-bicycle-registration"
         %p
-          = link_to "5 ways to grow community for your bike shop", "https://bikeindex.org/news/5-ways-to-grow-community-for-your-bike-shop"
+          = link_to "5 ways to grow community for your bike shop",
+          "https://bikeindex.org/news/5-ways-to-grow-community-for-your-bike-shop"
 
 
         .mobile-contact-link
@@ -68,35 +88,17 @@
 
         .trusted-by.hidden-lg-up
           %h3
-            Used by bike shops everywhere
-          - shop_partners = capture_haml do
-            %ul
-              %li.hidden-on-trusted-by-next-steps
-                = image_tag 'landing_pages/partners/Joe-Bike.png', alt: 'Joe Bike'
-              %li.partner-logo-rectangle
-                = image_tag 'landing_pages/partners/Gray-Goat.png', alt: 'Gray Goat'
-              %li
-                = image_tag 'landing_pages/partners/Bike-Lane-Chicago.png', alt: 'Bike Lane Chicago'
-              %li
-                = image_tag 'landing_pages/partners/All-Star-Bikes.png', alt: 'All Star Bikes'
-              %li.partner-logo-rectangle
-                = image_tag 'landing_pages/partners/Mission-Bicycle-Company.png', alt: 'Mission Bicycle Company'
-              %li.partner-logo-rectangle
-                = image_tag 'landing_pages/partners/City-Bikes-DC.png', alt: 'City Bikes DC'
-              %li
-                = image_tag 'landing_pages/partners/Ferris-Wheels.png', alt: 'Ferris Wheels'
-
-          = shop_partners
+            Trusted by bike shops everywhere
+          = image_tag "landing_pages/logos/shops.png", alt: "bike shop partners"
 
       .next-steps-col
         .next-steps-wrap
-          %header#contact-bike-index
-            Sign up for free
-          %a.btn.btn-primary.btn-lg{ href: new_organization_path }
-            Get started
-          .trusted-by-next-steps.hidden-md-down
-            %h3
-              Used everywhere
-            = shop_partners
-
-  = render '/landing_pages/footer'
+          %header
+            Used at bike shops everywhere
+            = link_to bike_shop_packages_path, class: "btn btn-primary btn-lg" do
+              Features &amp; Pricing
+              %span.chevron &raquo;
+          .trusted-by
+            .header
+              Trusted by bike shops everywhere
+            = image_tag "landing_pages/logos/shops.png", alt: "bike shop partners"

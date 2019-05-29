@@ -77,6 +77,8 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
     background-size: auto 100%;
     background-position: right center;
     background-repeat: no-repeat;
+    border-bottom: 3px solid black;
+    background-size: cover;
 
     // For extra wide screens, make sure we cover the whole screen
     @include media-breakpoint-up(lg) {

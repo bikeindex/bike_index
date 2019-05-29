@@ -9,6 +9,7 @@
         .banner-text
           %h1 Bike Index for Universities
           %h3 Protecting bikes on campus can be a full-time job. Let us help.
+
   .container
     .row.main-body-row
       .landing-why-col
@@ -25,9 +26,11 @@
           smartphone or laptop. You have access to the data behind it all to
           understand how best to protect bikes on your campus.
 
-        = render partial: '/landing_pages/tweet', locals: { tweet_id: 863853852658761729 }
+        = render partial: "/landing_pages/tweet", locals: { tweet_id: 863853852658761729 }
 
-        %h3 How it works
+        %h3
+          How it works
+
         %p
           Bike Index users provide serial numbers, proof of ownership and
           identifying information about their bikes. When a bike is reported
