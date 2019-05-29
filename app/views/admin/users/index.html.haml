@@ -8,16 +8,16 @@
   .col-7
     %ul
       %li.nav-item
-        = link_to "Ambassadors", admin_users_path(sortable_search_params.merge(search_ambassadors: true)), class: params[:search_superusers].present? ? "nav-link active" : "nav-link"
+        - ambassadors_search_params = sortable_search_params.merge(search_ambassadors: !@search_ambassadors)
+        = link_to "Ambassadors", admin_users_path(ambassadors_search_params), class: @search_ambassadors ? "nav-link active" : "nav-link"
       %li.nav-item
-        = link_to "Superusers", admin_users_path(sortable_search_params.merge(search_superusers: true)), class: params[:search_superusers].present? ? "nav-link active" : "nav-link"
-      %li.nav-item
-        = link_to "Users", admin_users_path, class: sortable_search_params? ? "nav-link" : "nav-link active"
+        - superusers_search_params = sortable_search_params.merge(search_superusers: !@search_superusers)
+        = link_to "Superusers", admin_users_path(superusers_search_params), class: @search_superusers ? "nav-link active" : "nav-link"
   - if current_organization.present?
     %p.subtitle
       #{link_to current_organization.name, admin_organization_path(current_organization.to_param)} Users
       %em.small
-        = link_to "without organization", admin_users_path(sortable_search_params.except(:organization_id)), class: "less-strong"
+        = link_to "without organization", admin_users_path(sortable_search_params.except(:organization_id)), class: "gray-link"
 .row
   .col-md-5
     %h4
@@ -33,7 +33,7 @@
 
 .mt-4
 = paginate @users, views_prefix: "admin"
-= render partial: "/admin/users/table"
+= render partial: "/admin/users/table", locals: { render_sortable: true }
 = paginate @users, views_prefix: "admin"
 - unless @users.present?
   %h1.mt-4

@@ -98,6 +98,6 @@
 - if params[:multi_delete]
   = render partial: "/admin/bikes/admin_bikes_table_multidelete"
 - else
-  = render partial: "/admin/bikes/admin_bikes_table", locals: { sortable: true }
+  = render partial: "/admin/bikes/admin_bikes_table", locals: { render_sortable: true }
 
 = paginate @bikes, views_prefix: "admin"

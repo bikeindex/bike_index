@@ -5,33 +5,33 @@
   %table.table.table-striped.table-bordered.sortable
     %thead.thead-light
       %th
-        - if sortable
+        - if render_sortable
           = sortable "id", "#"
         - else
           \#
       - if display_organization
         %th
-          - if sortable
+          - if render_sortable
             = sortable "organization_id"
           - else
             Organization
       %th
-        - if sortable
+        - if render_sortable
           = sortable "subscription_start_at", "Start"
         - else
           Start
       %th
-        - if sortable
+        - if render_sortable
           = sortable "subscription_end_at", "End"
         - else
           End
       %th
-        - if sortable
+        - if render_sortable
           = sortable "amount_due_cents", "$ Due"
         - else
           $ Due
       %th
-        - if sortable
+        - if render_sortable
           = sortable "amount_paid_cents", "$ Paid"
         - else
           $ paid

@@ -16,12 +16,18 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
   scope :locked_completed, -> { completed.where("completed_at < ?", Time.now - 2.hours) }
   scope :task_ordered, -> { order(ambassador_task_id: :asc) }
 
+  after_commit :update_associated_user
+
   def status
     completed? ? "Completed" : "In progress"
   end
 
   def completed?
     completed_at.present?
+  end
+
+  def update_associated_user
+    user&.update_attributes(updated_at: Time.now)
   end
 
   private

@@ -30,7 +30,7 @@
 
 = paginate @organizations, views_prefix: "admin"
 
-= render partial: "/admin/organizations/admin_organizations_table", locals: {sortable: true}
+= render partial: "/admin/organizations/admin_organizations_table", locals: { render_sortable: true }
 
 = paginate @organizations, views_prefix: "admin"
 

@@ -39,7 +39,7 @@ class User < ActiveRecord::Base
 
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
-  scope :superusers, -> { where(useruser: true) }
+  scope :superusers, -> { where(superuser: true) }
   scope :ambassadors, -> { where(id: Membership.ambassador_organizations.select(:user_id)) }
 
   validates_uniqueness_of :username, case_sensitive: false
@@ -69,11 +69,7 @@ class User < ActiveRecord::Base
   attr_accessor :skip_geocode
 
   geocoded_by :address
-  after_validation :geocode, if: ->(obj) do
-                               !skip_geocode &&
-                                 (obj.city.present? || obj.zipcode.present? || obj.street.present?) &&
-                                 (obj.city_changed? || obj.zipcode_changed? || obj.street_changed?)
-                             end
+  after_validation :geocode, if: lambda { !self.skip_geocode && self.geocodeable_attributes_changed? }
 
   class << self
     def fuzzy_email_find(email)
@@ -94,9 +90,14 @@ class User < ActiveRecord::Base
     end
 
     def admin_text_search(n)
-      search_str = "%#{n.strip}%"
+      str = "%#{n.to_s.strip}%"
       joins(:user_emails)
-        .where("users.name ILIKE ? OR users.email ILIKE ? OR user_emails.email ILIKE ?", search_str, search_str, search_str)
+        .where("users.name ILIKE ? OR users.email ILIKE ? OR user_emails.email ILIKE ?", str, str, str)
+    end
+
+    def from_auth(auth)
+      return nil unless auth && auth.kind_of?(Array)
+      self.where(id: auth[0], auth_token: auth[1]).first
     end
   end
 
@@ -328,11 +329,6 @@ class User < ActiveRecord::Base
 
   protected
 
-  def self.from_auth(auth)
-    return nil unless auth && auth.kind_of?(Array)
-    self.where(id: auth[0], auth_token: auth[1]).first
-  end
-
   def generate_username_confirmation_and_auth
     usrname = username || SecureRandom.urlsafe_base64
     while User.where(username: usrname).where.not(id: id).exists?
@@ -344,5 +340,10 @@ class User < ActiveRecord::Base
     end
     generate_auth_token
     true
+  end
+
+  def geocodeable_attributes_changed?
+    return false unless city.present? || zipcode.present? || street.present?
+    city_changed? || zipcode_changed? || street_changed?
   end
 end
