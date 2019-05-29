@@ -64,9 +64,8 @@
                   = link_to membership.organization.name.gsub(" ", "\u00a0"), admin_users_path(organization_id: membership.organization_id), class: "small"
             %td
               - if user.ambassador?
-                %small
-                  - ambassador = Ambassador.find(user.id)
-                  = ambassador.progress_count
+                - ambassador = Ambassador.find(user.id)
+                = ambassador.progress_count
             %td
               %small
                 = "super" if user.superuser?
