@@ -109,7 +109,7 @@
 }
 
 .bg-image-bike-hero {
-  background-image: image-url("landing_pages/hero.jpg");
+  background-image: image-url("landing_pages/header-bg-root-full.jpg");
   background-size: cover;
   background-position: center bottom;
   background-repeat: no-repeat;
@@ -162,16 +162,16 @@
 }
 
 
-// TODO: Remove styles / optimize images?
+// TODO: Optimize images
 @media screen and (min-device-width: 1000px) {
   .root-landing-banner-header {
-    background-image: image-url("landing_pages/hero.jpg");
+    background-image: image-url("landing_pages/header_bg_root-full.jpg");
   }
 }
 
 @media screen and (min-device-width: 1000px) and (-webkit-min-device-pixel-ratio: 2) and (min-resolution: 192dpi) {
   .root-landing-banner-header {
-    background-image: image-url("landing_pages/hero.jpg");
+    background-image: image-url("landing_pages/header_bg_root-full.jpg");
   }
 }
 
