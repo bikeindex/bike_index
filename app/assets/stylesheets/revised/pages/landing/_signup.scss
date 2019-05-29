@@ -41,46 +41,39 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
     .svgicon-body {
       fill: #fff;
     }
+
   }
 }
 
 .signup-landing-page {
   .trusted-by {
-    ul {
-      @include list-unstyled;
+    padding: 10px;
 
-      display: flex;
-      flex-wrap: wrap;
+    .header {
+      background-color: transparent;
+      text-align: center;
+      font-weight: 600;
+      font-size: 14px;
+      margin: 0;
+      padding: 0;
     }
 
-    li {
-      flex: 0 0 20%;
-
-      &.partner-logo-rectangle {
-        flex: 0 0 40%;
-      }
-
-      padding: $vertical-height (0.5 * $vertical-height) (2 * $vertical-height);
-
-      img {
-        display: block;
-        width: 100%;
-        height: auto;
-      }
-
-      &.offset-partner-logo {
-        margin-left: 20%;
-      }
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+      padding-right: 15px;
     }
   }
 }
 
 .signup-landing-page {
   .banner-header {
-    padding-top: 6 * $vertical-height;
-    padding-bottom: 12 * $vertical-height;
+    padding-top: 100px !important;
+    padding-bottom: 100px !important;
+    margin-top: 100px;
     background-size: auto 100%;
-    background-position: center top;
+    background-position: right center;
     background-repeat: no-repeat;
 
     // For extra wide screens, make sure we cover the whole screen
@@ -114,10 +107,13 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
     h3 {
       color: white;
       text-align: center;
+      margin: 0;
     }
 
     h1 {
+      font-size: 36px;
       line-height: 1.4em;
+      text-shadow: 2px 1px 20px $gray-darker;
     }
 
     h2,
@@ -126,8 +122,9 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
       font-weight: $normal-font-weight;
       text-transform: none;
       font-style: normal;
-      font-size: 21px;
-      line-height: 1.6em;
+      font-size: 15px;
+      font-weight: 600;
+      line-height: 24px;
     }
 
     .ribbon {
@@ -205,7 +202,17 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
     }
 
     h3 {
-      margin-top: 3 * $vertical-height;
+      margin-top: 20px;
+      text-transform: none;
+	    font-size: 24px;
+      font-weight: 500;
+	    letter-spacing: -1px;
+	    line-height: 29px;
+    }
+
+    h4 {
+      font-size: 18px;
+      font-weight: 500;
     }
   }
 
@@ -217,6 +224,7 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
     @include make-col(5);
 
     @include media-breakpoint-down(md) {
+      display: none;
       @include make-col(12);
 
       min-height: auto;
@@ -232,24 +240,30 @@ $landing-page-targets: "shop", "school", "advocacy", "law_enforcement",
       position: -webkit-sticky;
       position: sticky;
       top: 0;
-      padding: (2.5 * $vertical-height) $contact-us-gutter;
+      padding: 0;
       background: $gray-darker;
+      border: 3px solid black;
       border-radius: $border-radius;
+      background-color: white;
+      max-width: 270px;
+
+      main {
+        padding: (1.5 * $vertical-height) $contact-us-gutter;
+      }
     }
 
     header {
-      background: $gray;
-      padding: (2 * $vertical-height) 0;
+      background-color: $gray-darkest;
       color: white;
       text-align: center;
-      font-size: 30px;
       line-height: 1;
-      margin-bottom: 2 * $vertical-height;
+      padding: 20px 15px 25px 15px;
     }
 
     .btn {
       width: 100%;
       margin-top: 2 * $vertical-height;
+      font-size: 12px;
     }
   }
 

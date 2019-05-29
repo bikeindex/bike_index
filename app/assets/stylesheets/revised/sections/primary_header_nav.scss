@@ -391,6 +391,7 @@ $mainmenu-open-zindex: 10;
       .signup-link {
         border-radius: 4px;
         border: 1px solid $link-color;
+        color: white;
         transition: background 0.05s linear;
 
         &:hover {
