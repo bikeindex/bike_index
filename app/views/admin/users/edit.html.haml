@@ -32,9 +32,62 @@
             Updated
           %td.convertTime
             = l @user.updated_at, format: :convert_time
-  - if @ambassador
+  - if @user.ambassador?
     .col-md-6
-      = render partial: "/admin/ambassadors/ambassador"
+      - ambassador = Ambassador.find(@user.id)
+
+      %h1= "Ambassador: #{ambassador.username}"
+
+      = ambassador.avatar
+
+      %table.table-list
+        %tr
+          %td
+            Name
+          %td
+            = ambassador.name
+        %tr
+          %td
+            Email
+          %td
+            = ambassador.email
+        %tr
+          %td
+            Phone
+          %td
+            = ambassador.phone
+        %tr
+          %td
+            Website
+          %td
+            = ambassador.website
+        %tr
+          %td
+            City
+          %td
+            = ambassador.city
+
+
+      %h2 Ambassador Tasks
+
+      %p
+        %strong= "#{ambassador.progress_count} complete"
+
+      %table.table.table-striped.table-bordered.ambassador-tasks-table
+        %thead.small-header.thead-light
+          %tr
+            %th Task
+            %th Completed at
+        %tbody
+          - ambassador.ambassador_task_assignments.each do |task|
+            %tr
+              %td
+                %strong= task.title
+                %br
+                = task.description_html.html_safe
+              %td
+                - if task.completed_at
+                  %span.convertTime= l task.completed_at, format: :convert_time
 
 = form_for [:admin, @user] do |f|
   - if @user.errors.any?
