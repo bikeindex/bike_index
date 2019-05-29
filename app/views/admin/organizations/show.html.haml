@@ -74,7 +74,7 @@
         %td
           Users
         %td
-          = @organization.users.count
+          = link_to @organization.users.count, admin_users_path(organization_id: @organization.to_param)
       %tr
         %td
           Sent Invites

@@ -39,6 +39,7 @@ class User < ActiveRecord::Base
 
   scope :confirmed, -> { where(confirmed: true) }
   scope :unconfirmed, -> { where(confirmed: false) }
+  scope :superusers, -> { where(useruser: true) }
   scope :ambassadors, -> { where(id: Membership.ambassador_organizations.select(:user_id)) }
 
   validates_uniqueness_of :username, case_sensitive: false
@@ -94,8 +95,8 @@ class User < ActiveRecord::Base
 
     def admin_text_search(n)
       search_str = "%#{n.strip}%"
-      (where("name ILIKE ? OR email ILIKE ?", search_str, search_str) +
-       joins(:user_emails).where("user_emails.email ILIKE ?", search_str)).uniq
+      joins(:user_emails)
+        .where("users.name ILIKE ? OR users.email ILIKE ? OR user_emails.email ILIKE ?", search_str, search_str, search_str)
     end
   end
 
