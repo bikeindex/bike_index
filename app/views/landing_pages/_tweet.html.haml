@@ -1,8 +1,10 @@
 - tweet_id ||= nil # ensure we don't explode when not passed key thing
+- asset_host = Rails.env.development? ? "https://files.bikeindex.org" : ""
 - tweet = Tweet.friendly_find(tweet_id)
+
 - if tweet.present?
   .embeded-tweet
-    = image_tag tweet.image
+    = image_tag "#{asset_host}#{tweet.image}"
     .tweet-display{ class: "tweet-align-#{tweet.alignment}" }
       %a.tweetor-header{ href: tweet.tweetor_link, target: '_blank' }
         = image_tag tweet.tweetor_avatar
