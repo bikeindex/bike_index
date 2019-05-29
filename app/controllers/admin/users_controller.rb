@@ -66,7 +66,7 @@ class Admin::UsersController < Admin::BaseController
     else
       users = User
     end
-    users = users.ambassadors if @search_ambassadors
+    users = Ambassador.all if @search_ambassadors
     users = users.superusers if @search_superusers
     users = users.admin_text_search(params[:query]) if params[:query].present?
     users
