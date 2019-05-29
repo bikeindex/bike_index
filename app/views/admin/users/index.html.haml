@@ -1,31 +1,40 @@
 .admin-subnav
-  .col-7
+  .col-5
     %h1
       Manage
     - if current_user.developer?
       %em.less-strong
         current_user ##{current_user.id}
-  .col-5
+  .col-7
     %ul
-      %li.nav-item.mr-2
-        = link_to "Superusers", admin_users_path(superusers: true), class: params[:superusers].present? ? "nav-link active" : "nav-link"
-      %li.nav-item.mr-2
-        = link_to "users", admin_users_path, class: !params[:superusers].present? ? "nav-link active" : "nav-link"
+      %li.nav-item
+        - ambassadors_search_params = sortable_search_params.merge(search_ambassadors: !@search_ambassadors)
+        = link_to "Ambassadors", admin_users_path(ambassadors_search_params), class: @search_ambassadors ? "nav-link active" : "nav-link"
+      %li.nav-item
+        - superusers_search_params = sortable_search_params.merge(search_superusers: !@search_superusers)
+        = link_to "Superusers", admin_users_path(superusers_search_params), class: @search_superusers ? "nav-link active" : "nav-link"
+  - if current_organization.present?
+    %p.subtitle
+      #{link_to current_organization.name, admin_organization_path(current_organization.to_param)} Users
+      %em.small
+        = link_to "without organization", admin_users_path(sortable_search_params.except(:organization_id)), class: "gray-link"
 .row
   .col-md-5
     %h4
-      #{number_with_delimiter(@user_count)} users
-      = params[:user_query].present? ? 'matching query' : 'have signed up'
+      #{number_with_delimiter(@users.total_count)} matching users
   .col-md-7
     = form_tag admin_users_path, method: :get, class: "form-inline" do
+      = hidden_field_tag :search_ambassadors, params[:search_ambassadors]
+      = hidden_field_tag :search_superusers, params[:search_superusers]
+      = hidden_field_tag :organization_id, params[:organization_id]
       .form-group.ml-auto.mr-2.mb-2
-        = text_field_tag :user_query, params[:user_query], placeholder: "Find by name or email", class: "form-control"
+        = text_field_tag :query, params[:query], placeholder: "Find by name or email", class: "form-control"
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
-- if @users.present?
-  = paginate @users, views_prefix: "admin"
-  = render partial: "/admin/users/table"
-  = paginate @users, views_prefix: "admin"
-- else
+.mt-4
+= paginate @users, views_prefix: "admin"
+= render partial: "/admin/users/table", locals: { render_sortable: true }
+= paginate @users, views_prefix: "admin"
+- unless @users.present?
   %h1.mt-4
     No users found!

@@ -1,20 +1,20 @@
-- sortable ||= false
+- render_sortable ||= false
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light.sortable
       %th
-        - if sortable
+        - if render_sortable
           = sortable "name"
         - else
           Name
       %th
-        - if sortable
+        - if render_sortable
           = sortable "approved"
         - else
           Approved
       %th
-        - if sortable
+        - if render_sortable
           = sortable "created_at"
         - else
           Created at
@@ -25,7 +25,7 @@
       %th
         Type
       %th
-        - if sortable
+        - if render_sortable
           = sortable "pos_kind", "POS"
         - else
           POS
