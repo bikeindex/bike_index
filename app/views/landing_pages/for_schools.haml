@@ -66,7 +66,9 @@
         .next-steps-wrap
           %header
             Keep campus bikes in order
-            .btn.btn-primary.btn-lg Features &amp; Pricing &raquo;
+            = link_to campus_packages_path, class: "btn btn-primary btn-lg" do
+              Features &amp; Pricing
+              %span.chevron &raquo;
           .trusted-by
             .header Trusted by top universities
             = image_tag "landing_pages/logos/universities.png", alt: "university partners"
