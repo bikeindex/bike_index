@@ -16,22 +16,34 @@
         .subheader-image.bg-image-bike-shops
         .subheader-image-caption
           %em for&nbsp;
-          %span.upcase= link_to "Bike Shops &raquo;".html_safe, for_shops_path
+          %span.upcase
+            = link_to for_shops_path do
+              Bike Shops
+              %span.chevron &raquo;
       .subheader-tile.col-md-3
         .subheader-image.bg-image-bike-cities
         .subheader-image-caption
           %em for&nbsp;
-          %span.upcase= link_to "Cities &raquo;".html_safe, for_law_enforcement_path
+          %span.upcase
+            = link_to for_law_enforcement_path do
+              Cities
+              %span.chevron &raquo;
       .subheader-tile.col-md-3
         .subheader-image.bg-image-bike-schools
         .subheader-image-caption
           %em for&nbsp;
-          %span.upcase= link_to "Schools &raquo;".html_safe, for_schools_path
+          %span.upcase
+            = link_to for_schools_path do
+              Schools
+              %span.chevron &raquo;
       .subheader-tile.col-md-3
         .subheader-image.bg-image-bike-groups
         .subheader-image-caption
           %em for&nbsp;
-          %span.upcase= link_to "Community Groups &raquo;".html_safe, for_advocacy_path
+          %span.upcase
+            = link_to for_advocacy_path do
+              Community Groups
+              %span.chevron &raquo;
 
   - cache "root_body_wrap", skip_digest: true do # Expired in recovery_displays_controller
     .root-landing-recovery-stories
