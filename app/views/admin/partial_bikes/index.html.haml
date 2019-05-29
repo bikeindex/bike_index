@@ -1,0 +1,87 @@
+.admin-subnav
+  .col-5
+    %h1
+      Manage Partial Bikes
+  .col-7
+    %ul
+      %li.nav-item
+        - search_with_bike = sortable_search_params.merge(search_with_bike: !@search_with_bike)
+        = link_to "Completed", admin_partial_bikes_path(search_with_bike), class: @search_with_bike ? "nav-link active" : "nav-link"
+      %li.nav-item
+        - search_without_bike = sortable_search_params.merge(search_without_bike: !@search_without_bike)
+        = link_to "Partial", admin_partial_bikes_path(search_without_bike), class: @search_without_bike ? "nav-link active" : "nav-link"
+.row
+  .col-md-5
+    %h4
+      #{number_with_delimiter(@b_params.total_count)} matching partial bikes
+  .col-md-7
+    = form_tag admin_partial_bikes_path, method: :get, class: "form-inline" do
+      = hidden_field_tag :search_with_bike, params[:search_with_bike]
+      = hidden_field_tag :search_without_bike, params[:search_without_bike]
+      .form-group.ml-auto.mr-2.mb-2
+        = text_field_tag :query, params[:query], placeholder: "Find by email", class: "form-control"
+      = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
+
+.mt-4
+= paginate @b_params, views_prefix: "admin"
+
+.full-screen-table
+  %table.table.table-bordered.table-striped.table-sm
+    %thead.thead-light.sortable
+      %th
+        = sortable "created_at"
+      %th
+        %small
+          = sortable "updated_at"
+      %th
+        = sortable "email"
+      %th
+        = sortable "creator_id"
+      %th
+        = sortable "created_bike_id", "Bike"
+      %th
+        %small
+          = sortable "origin"
+      %th
+        Creation organization
+      %th
+        Data
+    %tbody
+      - @b_params.each do |b_param|
+        %tr
+          %td
+            %span.convertTime
+              = l b_param.created_at, format: :convert_time
+          %td
+            - if b_param.updated_at != b_param.created_at
+              %small.convertTime
+                = l b_param.updated_at, format: :convert_time
+          %td
+            .less-strong-hold
+              = b_param.email
+          %td
+            %small.less-strong
+              - if b_param.creator.present?
+                = link_to b_param.creator.display_name, admin_user_path(b_param.creator_id)
+          %td
+            - if b_param.created_bike_id.present?
+              = link_to b_param.created_bike_id, admin_bike_path(b_param.created_bike_id)
+          %td
+            %small
+              = b_param.origin&.humanize
+          %td
+            - if b_param.creation_organization.present?
+              = b_param.creation_organization.name
+          %td{ style: "width: 30%; overflow-x: scroll" }
+            .codewrapper
+              %pre
+                %code
+                  = b_param.params.to_json.gsub('",', '", ') # Add a space so it gets line broken
+
+
+
+
+= paginate @b_params, views_prefix: "admin"
+- unless @b_params.present?
+  %h1.mt-4
+    No Partial registrations found!
