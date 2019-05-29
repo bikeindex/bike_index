@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.3
--- Dumped by pg_dump version 11.3
+-- Dumped from database version 10.3
+-- Dumped by pg_dump version 10.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -12,9 +12,22 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
-SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
 
 --
 -- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
@@ -1834,7 +1847,7 @@ ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays
 --
 
 CREATE TABLE public.schema_migrations (
-    version character varying NOT NULL
+    version character varying(255) NOT NULL
 );
 
 
@@ -2086,7 +2099,7 @@ CREATE TABLE public.users (
     stripe_id character varying(255),
     notification_newsletters boolean DEFAULT false NOT NULL,
     developer boolean DEFAULT false NOT NULL,
-    partner_data json,
+    partner_data jsonb,
     latitude double precision,
     longitude double precision,
     street character varying,
@@ -2094,7 +2107,7 @@ CREATE TABLE public.users (
     country_id integer,
     state_id integer,
     notification_unstolen boolean DEFAULT true,
-    my_bikes_hash json
+    my_bikes_hash jsonb
 );
 
 
@@ -4153,4 +4166,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190517161246');
 INSERT INTO schema_migrations (version) VALUES ('20190517200357');
 
 INSERT INTO schema_migrations (version) VALUES ('20190524191139');
+
+INSERT INTO schema_migrations (version) VALUES ('20190529024835');
 

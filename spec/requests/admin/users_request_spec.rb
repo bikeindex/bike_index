@@ -11,7 +11,8 @@ describe "Admin::UsersController" do
 
   describe "index" do
     it "renders" do
-      get base_url
+      expect(user_subject).to be_present
+      get "{base_url}?query=something" # Test to make sure we're dealing with admin_text_search correctly
       expect(response).to render_template :index
     end
   end

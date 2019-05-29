@@ -93,6 +93,7 @@ class User < ActiveRecord::Base
       str = "%#{n.to_s.strip}%"
       joins(:user_emails)
         .where("users.name ILIKE ? OR users.email ILIKE ? OR user_emails.email ILIKE ?", str, str, str)
+        .distinct
     end
 
     def from_auth(auth)
