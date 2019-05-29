@@ -1,10 +1,8 @@
-# <p align="center">![BIKE INDEX][bike-index-logo]</p> [Bike Index][bike-index] 🚲 ![Cloud66 Deployment Status][cloud66-badge] [![CircleCI][circleci-badge]][circleci] [![Test Coverage][codeclimate-badge]][codeclimate] [![View performance data on Skylight][skylight-badge]][skylight]
+# <p align="center">![BIKE INDEX][bike-index-logo]</p> [Bike Index][bike-index] 🚲 ![Cloud66 Deployment Status][cloud66-badge] [![CircleCI][circleci-badge]][circleci] [![View performance data on Skylight][skylight-badge]][skylight]
 
 [bike-index-logo]: https://github.com/bikeindex/bike_index/blob/master/bike_index.png?raw=true
 [circleci]: https://circleci.com/gh/bikeindex/bike_index/tree/master
 [circleci-badge]: https://circleci.com/gh/bikeindex/bike_index/tree/master.svg?style=svg
-[codeclimate]: https://codeclimate.com/github/bikeindex/bike_index
-[codeclimate-badge]: https://codeclimate.com/github/bikeindex/bike_index/badges/coverage.svg
 [skylight]: https://oss.skylight.io/app/applications/j93iQ4K2pxCP
 [skylight-badge]: https://badges.skylight.io/status/j93iQ4K2pxCP.svg
 [bike-index]: https://www.bikeindex.org
