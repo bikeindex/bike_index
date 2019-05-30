@@ -51,10 +51,9 @@ class Location < ActiveRecord::Base
   end
 
   def display_name
-    if name == organization.name
-      name
-    else
-      "#{organization.name} - #{name}"
-    end
+    return "" if organization.blank?
+    return name if name == organization.name
+
+    "#{organization.name} - #{name}"
   end
 end

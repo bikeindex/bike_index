@@ -47,7 +47,7 @@
                 %p
                   %a{ href: "tel:#{ location.phone }" }
                     = location.display_phone
-              - if location.organization.website.present?
+              - if location&.organization&.website.present?
                 %p
                   = link_to "#{location.organization.name} website", location.organization.website, target: "_blank", class: "shop-site"
               .map-window
@@ -91,7 +91,7 @@
                 %p
                   %a{ href: "tel:#{ location.phone }" }
                     = location.display_phone
-              - if location.organization.website.present?
+              - if location&.organization&.website.present?
                 %p
                   = link_to "#{location.organization.name} website", location.organization.website, target: "_blank", class: "shop-site"
               .map-window
