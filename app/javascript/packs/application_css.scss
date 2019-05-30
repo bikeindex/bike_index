@@ -1,5 +1,9 @@
 @import "~bootstrap/scss/bootstrap";
 @import "~selectize/dist/css/selectize.bootstrap3";
+// For some reason, selectize is making the cursor a text selector - which is annoying
+.selectize-dropdown .option {
+  cursor: pointer;
+}
 
 // General styles
 @import "../stylesheets/utils";
