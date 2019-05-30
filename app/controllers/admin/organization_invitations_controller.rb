@@ -9,6 +9,7 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
   def new
     @organization_invitation = OrganizationInvitation.new
     @organizations = Organization.all
+    render layout: "new_admin"
   end
 
   def show
@@ -19,6 +20,7 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
 
   def edit
     @organizations = Organization.all
+    render layout: "new_admin"
   end
 
   def update
