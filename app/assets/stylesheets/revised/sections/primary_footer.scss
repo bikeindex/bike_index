@@ -87,12 +87,15 @@ $primary-footer-top-margin: 6 * $vertical-height;
   .terms-and-stuff {
     background: $black-off;
     color: $gray-light;
-    text-align: center;
+    text-align: right;
 
     p {
-      margin: 0;
+      color: $gray-light;
       font-size: 12px;
+      line-height: 1.5;
+      margin: 0;
       padding: 0;
+
     }
   }
 }
