@@ -1,16 +1,17 @@
 
 %li.admin-bike-partial
   .row
-    .col-lg-1.col-md-2.col-3.mt-auto
+    .col-lg-1.col-md-2.col-3.mt-auto.mb-2
       - if bike.thumb_path.present?
         %img{:alt => bike.title, src: bike.thumb_path}
       - else
         %h3.text-center
           No Image
-    .col-lg-5.col-md-4.col-9.mt-auto
+    .col-lg-5.col-md-4.col-9.mt-auto.mb-2
       %p.strong.mb-0
         = link_to bike.title_string, bike.list_link_url(target)
-        = link_to "admin view", edit_admin_bike_path(bike.to_param), class: "text-muted em"
+        - unless controller_name == "bikes" && action_name == "edit"
+          = link_to "admin view", edit_admin_bike_path(bike.to_param), class: "text-muted em"
       %table.table-list.mb-0
         %tbody
           %tr
@@ -24,9 +25,9 @@
             %td
               = bike.frame_colors.to_sentence
     - if bike.stolen and bike.current_stolen_record.present?
-      .col-lg-6.border.border-danger.mt-auto
+      .col-lg-6.border.border-danger
         %h4
-          = link_to 'Stolen edit page', edit_admin_stolen_bike_url(@bike)
+          = link_to 'Admin Stolen edit page', edit_admin_stolen_bike_url(@bike)
         %table.table-list
           %tr
             %td

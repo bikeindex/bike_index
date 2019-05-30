@@ -35,12 +35,12 @@
               %em
                 so you can
               = link_to "Edit it", edit_bike_path(@bike), class: "btn btn-success btn-sm"
-        - elsif current_user.ambassador? && @bike.current_stolen_record.present?
+        - elsif passive_organization.ambassador? && @bike.current_stolen_record.present?
           .col-xs-12.mb-2
             .text-right.less-strong
               %em
                 %span.hidden-md-down
-                  This #{@bike.type} is not claimed yet. As a Bike Index ambassador,
+                  As a Bike Index ambassador,
               %em
                 you can mark it as recovered:
               = link_to "Mark bike recovered",
@@ -155,7 +155,6 @@
       %span
         Send
       - passive_organization.message_kinds.each do |kind|
-        / %a.btn.btn-secondary.openMessageModal{ target: "#organizationMessageModal", "data-kind" => kind, "data-toggle" => "modal" }
         %a.btn.btn-secondary.openMessageModal{ "data-kind" => kind }
           - if kind == "geolocated_messages"
             GeoMessage
