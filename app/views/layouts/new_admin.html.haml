@@ -52,9 +52,10 @@
                                 { title: "Stolen Twitterbot", path: ENV["STOLEN_TWITTERBOT_URL"].gsub(/bikes\z/, ""), match_controller: false },
                                 { title: "Memberships", path: admin_memberships_path, match_controller: true },
                                 { title: "Manufacturers", path: admin_manufacturers_path, match_controller: true },
-                                { title: "Invitations", path: admin_invitations_path, match_controller: true },
-                                { title: "TSV Exports", path: admin_tsvs_path, match_controller: true },
-                                { title: "Maintenance", path: admin_maintenance_path, match_controller: true },
+                                { title: "Organization Invitations", path: admin_organization_invitations_path, match_controller: false },
+                                { title: "New Organization Invitation", path: new_admin_organization_invitation_path, match_controller: false },
+                                { title: "TSV Exports", path: admin_tsvs_path, match_controller: false },
+                                { title: "Maintenance", path: admin_maintenance_path, match_controller: false },
                                 { title: "Failed Bikes", path: admin_failed_bikes_path, match_controller: true },
                                 { title: "Component Types", path: admin_ctypes_path, match_controller: true },
                                 { title: "Graphs", path: admin_graphs_path, match_controller: true },
@@ -68,9 +69,11 @@
                                 { title: "Duplicates", path: duplicates_admin_bikes_path, match_controller: false }
                               ]
                 other_link_active = other_links.detect { |l| current_page_active?(l[:path], l[:match_controller]) }
-                other_select_opts = options_for_select(other_links.map { |l| [l[:title], l[:path]] }, other_link_active && other_link_active[:path])
+                # previously other_select_opts had `other_link_active && other_link_active[:path]` - but that meant that it was difficult to navigate away from pages, so just putting it in prompt now
+                other_select_opts = options_for_select(other_links.map { |l| [l[:title], l[:path]] })
+                other_prompt = other_link_active.present? ? "Viewing #{other_link_active[:title]}" : "Other pages"
               .fancy-select.unfancy.no-restore-on-backspace
-                = select(:admin, :other_navigation, other_select_opts, { prompt: "Other pages" }, { class: "form-control" })
+                = select(:admin, :other_navigation, other_select_opts, { prompt: other_prompt }, { class: "form-control" })
 
           %ul.navbar-nav.ml-auto
             %li.nav-item

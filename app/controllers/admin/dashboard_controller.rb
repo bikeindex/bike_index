@@ -8,11 +8,6 @@ class Admin::DashboardController < Admin::BaseController
     render layout: "new_admin"
   end
 
-  def invitations
-    @organizations = Organization.all
-    @organization_invitation = OrganizationInvitation.new
-  end
-
   def maintenance
     # @bikes here because this is the only one we're using the standard admin bikes table
     @bikes = Bike.unscoped.order("created_at desc").where(example: true).limit(10)
