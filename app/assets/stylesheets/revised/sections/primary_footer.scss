@@ -38,13 +38,16 @@ $primary-footer-top-margin: 6 * $vertical-height;
     }
 
     h4 {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
       margin-bottom: 0.5 * $vertical-height;
-      font-size: 15px;
     }
 
     ul {
       @include list-unstyled;
 
+      font-size: 12px;
       margin: 0;
     }
 

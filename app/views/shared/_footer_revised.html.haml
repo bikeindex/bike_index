@@ -2,31 +2,44 @@
   .primary-footer-nav
     .container
       .row
-        %nav.col-md-3.pull-right
-          %h4
-            = active_link "Donate to Bike Index", support_the_index_path
+        %nav.col-md-2.pull-right
+          %h4 Bike Index
           %ul
-            %li
-              = active_link "Store", shop_path
-            %li
-              = active_link "Ambassadors", ambassadors_how_to_path
-        %nav.col-md-3.pull-right
-          %h4
-            = active_link "Help", help_path
+            %li= active_link "FAQ", ""
+            %li= active_link "Blog", ""
+            %li= active_link "Help", help_path
+            %li= active_link "About", about_path
+            %li= active_link "Where We Are", ""
+            %li= active_link "Stolen Bike Recoveries", ""
+
+        %nav.col-md-2.pull-right
+          %h4 Support Us
           %ul
-            %li
-              = active_link "Sign up a shop or organization", new_organization_path
-            %li
-              = active_link "BikeHub", "https://bikehub.com"
-        %nav.col-md-3.pull-right
-          %h4
-            = active_link "Dev and Design Resources", dev_and_design_path
+            %li= active_link "Donate", ""
+            %li= active_link "Store", ""
+            %li= active_link "Ambassadors", ""
+
+        %nav.col-md-2.pull-right
+          %h4 Resources
           %ul
-            %li
-              = active_link "API documentation", documentation_index_path
-            %li
-              = active_link "List of manufacturers", manufacturers_path
-        %nav.col-md-3.social-nav
+            %li= active_link "API documentation", documentation_index_path
+            %li= active_link "Dev Resources", ""
+            %li= active_link "Design & Logos", ""
+            %li= active_link "Bike Manufacturer List", ""
+            %li= active_link "Stolen Bike Map", ""
+
+        %nav.col-md-2.pull-right
+          %h4 Who we serve
+          %ul
+            %li= active_link "Bike Shops", ""
+            %li= active_link "Schools and Universities", ""
+            %li= active_link "Cities", ""
+            %li= active_link "Law Enforcement", ""
+            %li= active_link "Community Groups", ""
+
+        %nav.col-md-2.pull-right
+
+        %nav.col-md-2.social-nav
           %ul
             %li
               %a.footer-facebook{ href: "https://facebook.com/bikeindex", alt: "Bike Index Facebook" }
@@ -56,7 +69,6 @@
                       <path class="svgpath" d="M2860.58,2618.42a20,20,0,1,1,20-20A20.07,20.07,0,0,1,2860.58,2618.42Zm0-38.57a18.52,18.52,0,1,0,18.52,18.52A18.54,18.54,0,0,0,2860.58,2579.85Z" transform="translate(-2840.54 -2578.33)"/>
                     </g>
                   </svg>
-
 
 
   %nav.terms-and-stuff
