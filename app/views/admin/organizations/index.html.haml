@@ -4,6 +4,12 @@
       Manage Organization
   .col-md-3
     %ul
+      - if params[:search_kind].present?
+        %li.nav-item
+          = link_to params[:search_kind], admin_users_path(sortable_search_params.except(:search_kind)), class: "nav-link active"
+      %li.nav-item
+        - paid_search_params = sortable_search_params.merge(search_paid: !@search_paid)
+        = link_to "Paid", admin_users_path(paid_search_params), class: @search_paid ? "nav-link active" : "nav-link"
       %li.nav-item
         = link_to 'New Organization', new_admin_organization_url, class: "nav-link"
 .row.mb-4
@@ -20,9 +26,9 @@
     = form_tag admin_organizations_path, method: :get, class: "form-inline" do
       = hidden_field_tag :sort, sort_column
       = hidden_field_tag :sort_direction, sort_direction
+      = hidden_field_tag :search_paid, @search_paid
       .form-check.ml-auto.mr-2.ml-2.align-self-end
         = check_box_tag :search_is_paid, true, checked = sortable_search_params[:search_is_paid] ? true : false, class:"form-check-input"
-        = label_tag :search_is_paid, "Paid only"
       .form-group
         = text_field_tag :search_query, params[:search_query], placeholder: "Name/Location#{current_user.developer? ? '/Paid features' : '' }", class: "form-control mt-4"
 

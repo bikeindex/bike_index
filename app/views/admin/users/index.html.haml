@@ -24,6 +24,8 @@
       #{number_with_delimiter(@users.total_count)} matching users
   .col-md-7
     = form_tag admin_users_path, method: :get, class: "form-inline" do
+      = hidden_field_tag :sort, sort_column
+      = hidden_field_tag :sort_direction, sort_direction
       = hidden_field_tag :search_ambassadors, params[:search_ambassadors]
       = hidden_field_tag :search_superusers, params[:search_superusers]
       = hidden_field_tag :organization_id, params[:organization_id]

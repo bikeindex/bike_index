@@ -83,8 +83,9 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def matching_organizations
     return @matching_organizations if defined?(@matching_organizations)
+    @search_paid = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:search_is_paid])
     matching_organizations = Organization.unscoped
-    matching_organizations = matching_organizations.paid if params[:search_is_paid].present?
+    matching_organizations = matching_organizations.paid if @search_paid
     matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
     matching_organizations = matching_organizations.where(kind: kind_for_organizations) if params[:search_kind].present?
     matching_organizations = matching_organizations.where(pos_kind: pos_kind_for_organizations) if params[:search_pos_kind].present?
