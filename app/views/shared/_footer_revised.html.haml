@@ -2,31 +2,44 @@
   .primary-footer-nav
     .container
       .row
-        %nav.col-md-3.pull-right
-          %h4
-            = active_link "Donate to Bike Index", support_the_index_path
+        %nav.col-md-2.pull-right
+          %h4 Bike Index
           %ul
-            %li
-              = active_link "Store", shop_path
-            %li
-              = active_link "Ambassadors", ambassadors_how_to_path
-        %nav.col-md-3.pull-right
-          %h4
-            = active_link "Help", help_path
+            %li= active_link "FAQ", support_path
+            %li= active_link "Blog", news_index_path
+            %li= active_link "Help", help_path
+            %li= active_link "About", about_path
+            %li= active_link "Where We Are", where_path
+            %li= active_link "Stolen Bike Recoveries", recovery_stories_path
+
+        %nav.col-md-2.pull-right
+          %h4 Support Us
           %ul
-            %li
-              = active_link "Sign up a shop or organization", new_organization_path
-            %li
-              = active_link "BikeHub", "https://bikehub.com"
-        %nav.col-md-3.pull-right
-          %h4
-            = active_link "Dev and Design Resources", dev_and_design_path
+            %li= active_link "Donate", support_bike_index_path
+            %li= active_link "Store", store_path
+            %li= active_link "Ambassadors", ambassadors_how_to_path
+
+        %nav.col-md-2.pull-right
+          %h4 Resources
           %ul
-            %li
-              = active_link "API documentation", documentation_index_path
-            %li
-              = active_link "List of manufacturers", manufacturers_path
-        %nav.col-md-3.social-nav
+            %li= active_link "API documentation", documentation_index_path
+            %li= active_link "Dev Resources", dev_and_design_path
+            %li= active_link "Design & Logos", image_resources_path
+            %li= active_link "Bike Manufacturer List", manufacturers_path
+            %li= active_link "Stolen Bike Map", "https://map.bikewise.org/"
+
+        %nav.col-md-2.pull-right
+          %h4 Who we serve
+          %ul
+            %li= active_link "Bike Shops", for_bike_shops_path
+            %li= active_link "Schools and Universities", for_schools_path
+            %li= active_link "Cities", for_cities_path
+            %li= active_link "Law Enforcement", for_law_enforcement_path
+            %li= active_link "Community Groups", for_community_groups_path
+
+        %nav.col-md-2.pull-right
+
+        %nav.col-md-2.social-nav
           %ul
             %li
               %a.footer-facebook{ href: "https://facebook.com/bikeindex", alt: "Bike Index Facebook" }
@@ -58,7 +71,6 @@
                   </svg>
 
 
-
   %nav.terms-and-stuff
     .container
       %p
@@ -67,7 +79,7 @@
         - else
           #{link_to "Privacy policy", privacy_path}
         and #{link_to "terms and conditions", terms_path}.
-        %br
+      %p
         %span{data: {license: "https://github.com/bikeindex/bike_index/blob/master/LICENSE"}}
           #{Time.zone.now.year} &copy; Bike Index, a 501(c)(3) nonprofit - EIN 81-4296194
 - cache 'facebook_pixel' do

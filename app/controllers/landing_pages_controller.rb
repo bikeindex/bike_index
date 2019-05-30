@@ -7,24 +7,6 @@ class LandingPagesController < ApplicationController
     raise ActionController::RoutingError, "Not found" unless current_organization.present?
   end
 
-  def for_shops; end
-
-  def for_advocacy; end
-
-  def for_law_enforcement; end
-
-  def for_schools; end
-
-  def ascend; @page_title ||= "Ascend POS on Bike Index" end
-
-  def ambassadors_current; @page_title ||= "Current Ambassadors" end
-
-  def ambassadors_how_to; @page_title ||= "Ambassadors" end
-
-  def campus_packages; end
-
-  def cities_packages; end
-
   protected
 
   def instantiate_feedback

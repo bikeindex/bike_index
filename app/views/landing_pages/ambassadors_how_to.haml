@@ -1,16 +1,19 @@
-.signup-landing-page.signup-landing-page-ambassadors.signup-landing-page-ambassadors-how-to
+- landing_page_target = "ambassadors-how-to"
+
+.signup-landing-page.landing-page{ class: "signup-landing-page-#{landing_page_target}" }
   %header.banner-header
     .container
       .row
         .icon-wrapper
           = render "/landing_pages/icons/header_ambassadors_svg"
         .banner-text
-          %h1 Become a Bike Index<br>Ambassador
-          %h3 Want to help fight bike theft in your community?<br>Start here!
+          %h1 Become a Bike Index Ambassador
+          %h2 Want to help fight bike theft in your community?<br>Start here!
 
     .ribbon
       .container
         .noribbon
+
   .container
     .row.main-body-row
       .landing-why-col
@@ -82,7 +85,7 @@
 
       .next-steps-col
         .next-steps-wrap
-          .trusted-by-next-steps.hidden-md-down
+          .trusted-by
             %h3
               Become an ambassador
             %ul
@@ -100,5 +103,3 @@
                   Current ambassadors
           %a.btn.btn-primary.btn-lg{ href: 'https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform' }
             Apply Today
-
-  %footer.ambassadors-blank-footer

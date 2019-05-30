@@ -12,18 +12,176 @@
 }
 
 .root-landing-banner-header {
-  background-image: image-url("landing_pages/header_bg_root-1080.jpg");
   width: 100%;
-  padding-top: 12 * $vertical-height;
-  padding-bottom: 6 * $vertical-height;
+  margin-bottom: 0;
+}
+
+.root-landing-banner-subheader {
+  width: 100%;
+  margin: 0;
+
+  .subheader-tile-link {
+    color: #fff;
+    text-decoration: none;
+  }
+
+  .subheader-tile:first-of-kind {
+    padding-right: 5px;
+  }
+
+  .subheader-tile:last-of-kind {
+    padding-left: 5px;
+  }
+
+  .subheader-tile {
+    margin: 10px auto;
+    min-width: 275px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .subheader-image {
+    height: 275px;
+  }
+
+  .subheader-image-caption {
+    background-color: black;
+    color: #fff;
+    font-weight: bold;
+    padding: 10px 15px;
+    text-decoration: none;
+  }
+}
+
+.center-navbar-signup-link-container {
+  display: inline-block;
+  margin: 20px auto 10px auto;
+  position: absolute;
+  text-align: center;
+  width: 75%;
+}
+
+.center-navbar-signup-link {
+	background-color: black;
+	border-radius: 4px;
+	border: 1px solid #3498DB;
+	width: 85px;
+  color: #fff;
+  cursor: pointer;
+  display: inline;
+  font-size: 12px;
+  height: 37px;
+  line-height: 18px;
+  padding: 8px 15px;
+  text-align: center;
+  text-decoration: none;
+
+  &:hover {
+    background: rgba(white, 0.1);
+    text-decoration: none;
+    color: #fff;
+  }
+
+  &.active,
+  &:active {
+    background: rgba(white, 0.1);
+    text-decoration: none;
+    color: #fff;
+  }
+}
+
+@media screen and (min-width: 991px) {
+  .center-navbar-signup-link-container {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 1099px) {
+  .root-landing-banner-subheader {
+    .subheader-tile {
+      margin: 10px auto;
+    }
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .root-landing-banner-subheader {
+    .subheader-tile {
+      margin: 0 auto;
+      min-width: 100%;
+    }
+  }
+
+  .subheader-image {
+    display: none;
+  }
+
+  .subheader-image-caption {
+    margin: 5px auto;
+  }
+}
+
+.bg-image-bike-hero {
+  background-image: image-url("landing_pages/header_bg_root-full.jpg");
   background-size: cover;
-  background-position: center bottom;
+  background-position: center;
   background-repeat: no-repeat;
 }
 
+.bg-image-bike-shops {
+  background-image: image-url("landing_pages/bike-shop.jpg");
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+}
+
+.bg-image-bike-cities {
+  background-image: image-url("landing_pages/cities.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.bg-image-bike-schools {
+  background-image: image-url("landing_pages/schools.jpg");
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
+}
+
+.bg-image-bike-groups {
+  background-image: image-url("landing_pages/groups.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+@include media-breakpoint-up(lg) {
+  .bg-image-bike-hero {
+    background-position: bottom;
+  }
+
+  .bg-image-bike-shops {
+    background-position: center top;
+  }
+
+  .bg-image-bike-cities {
+    background-position: right center;
+  }
+
+  .bg-image-bike-schools {
+    background-position: right top;
+  }
+
+  .bg-image-bike-groups {
+    background-position: center center;
+  }
+}
+
+// TODO: Optimize images
 @media screen and (min-device-width: 1000px) {
   .root-landing-banner-header {
-    background-image: image-url("landing_pages/header_bg_root-2000.jpg");
+    background-image: image-url("landing_pages/header_bg_root-full.jpg");
   }
 }
 
@@ -33,15 +191,19 @@
   }
 }
 
+.upcase {
+  text-transform: uppercase;
+}
+
 .root-landing-banner-header {
   .root-landing-header-text {
-    @include make-col-ready;
-
-    @include make-col(12);
-
     h1,
+    h2,
     p {
       color: white;
+      display: block;
+      margin: 15px auto;
+      text-align: center;
     }
 
     p {
@@ -54,7 +216,25 @@
     }
 
     h1 {
+	    text-shadow: 0 2px 5px rgba(17,46,78,0.72);
       font-size: 60px;
+      font-weight: 300;
+    }
+
+    h2 {
+	    color: #ffffff;
+	    font-size: 24px;
+	    font-weight: 600;
+	    letter-spacing: 0.5px;
+	    line-height: 67px;
+	    text-align: center;
+	    text-shadow: 0 2px 5px rgba(17,46,78,0.72);
+      text-transform: none;
+
+      a {
+        color: #ffffff;
+        text-decoration: none;
+      }
     }
 
     .root-action-btn {
@@ -130,6 +310,8 @@
 
   // so we don't overpower the active border
   @include media-breakpoint-down(sm) {
+    padding-top: 10 * $vertical-height;
+
     .root-landing-header-text {
       p {
         font-size: 20px;
@@ -145,23 +327,11 @@
     }
   }
 
-  @include media-breakpoint-down(md) {
-    .root-landing-header-text {
-      .root-action-btn {
-        display: block;
-      }
-    }
-  }
-
   @include media-breakpoint-up(lg) {
-    padding-top: 20 * $vertical-height;
+    padding-top: 10 * $vertical-height;
     padding-bottom: 12 * $vertical-height;
 
     .root-landing-header-text {
-      margin-top: 55px;
-
-      @include make-col(7);
-
       p {
         line-height: 1.3em;
       }
@@ -175,16 +345,11 @@
       @include make-col(5);
     }
   }
-
-  @include media-breakpoint-up(xl) {
-    .root-landing-header-text {
-      margin-top: 85px;
-    }
-  }
 }
 
 .root-landing-how-it-works {
-  padding-top: 4 * $vertical-height;
+  background-color: #f9f9f9;
+  padding: 4 * $vertical-height 0;
 
   h3.landing-container-label,
   h4 {

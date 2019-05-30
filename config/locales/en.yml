@@ -35,10 +35,17 @@ en:
     stolen_howworks: "How it works"
     stolen_merging: "Stolen bike registry"
     landing_pages_show: "%{organization} Bike Registration"
-    landing_pages_for_shops: Bike Index for Shops
-    landing_pages_for_advocacy: Bike Index for Advocacy Organizations
+    landing_pages_ambassadors_current: Bike Index Ambassadors
+    landing_pages_ambassadors_how_to: Become a Bike Index Ambassador
+    landing_pages_ascend: Ascend POS on Bike Index
+    landing_pages_bike_shop_packages: Bike Index for Bike Shops - Features and Pricing
+    landing_pages_campus_packages: Bike Index for Schools - Features and Pricing
+    landing_pages_cities_packages: Bike Index for Cities - Features and Pricing
+    landing_pages_for_cities: Bike Index for Cities
+    landing_pages_for_community_groups: Bike Index for Community Groups
     landing_pages_for_law_enforcement: Bike Index for Law Enforcement
     landing_pages_for_schools: Bike Index for Schools
+    landing_pages_for_bike_shops: Bike Index for Bike Shops
   meta_descriptions:
     welcome_index: "The best bike registry: Simple, secure and free."
     welcome_user_home: "Your bikes on Bike Index"

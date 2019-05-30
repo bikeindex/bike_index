@@ -1,62 +1,81 @@
-- landing_page_target = 'school'
-.signup-landing-page{ class: "signup-landing-page-#{landing_page_target}" }
+- landing_page_target = "school"
+
+.signup-landing-page.landing-page{ class: "signup-landing-page-#{landing_page_target}" }
   %header.banner-header
     .container
       .row
         .icon-wrapper
           = render "/landing_pages/icons/header_#{landing_page_target}_svg"
         .banner-text
-          %h1 Bike Index for <br> Universities
-          %h3 So many campus members ride bicycles. Protecting these bikes can be a full-time job. Let us help.
-    .ribbon
+          %h1 Bike Index for Universities
+          %h3 Protecting bikes on campus can be a full-time job. Let us help.
+
+    .ribbon.mobile-contact-link
       .container
-        %h2 Guard your school against bike theft
+        %h2
+          = link_to campus_packages_path, class: "btn btn-primary btn-lg" do
+            Features &amp; Pricing
+            %span.chevron &raquo;
+
   .container
     .row.main-body-row
       .landing-why-col
-        %h3 Why Bike Index?
+        %h3 Make bike registration better
         %p
-          We’ve designed a platform to solve a fundamental barrier in safeguarding bicycles: the lack of a universal bike registry. With our consolidated university registration sites, it's easier for police and transportation departments to search and recover campus bicycles.
-        %p
-          Your students can register their bikes, verify ownership, and alert the community to missing bikes from anywhere. All they need is any smartphone or laptop. You have access to the data behind it all to understand how best to protect bikes on your campus.
-
-        = render partial: '/landing_pages/tweet', locals: { tweet_id: 863853852658761729 }
-
-        %h3 Join Our Growing Network
-        %p
-          As an official Bike Index partner, you and your students will have access to our national network of almost 130,000 registered bikes — the most widely-used registry in the U.S. - as well as a network of over 370+ partners in local law enforcement, bike organizations, pawnshops and retail businesses.
-        %p
-          Bike Index is committed to a community-driven effort in recovering lost and stolen bikes. No matter the type of bike or cyclist, we want to keep all bikes rolling with their rightful owners.
+          We've designed a platform to solve a fundamental barrier in
+          safeguarding bicycles: the lack of a universal bike registry. With our
+          consolidated university registration sites, it's easier for police and
+          transportation departments to search and recover campus bicycles.
 
         %p
-          With over #{ number_with_delimiter Counts.recoveries } successful recoveries, Bike Index has experience to offer to your campus staff and security. You will have the support you need to increase bike protection on your campus.
+          Your students can register their bikes, verify ownership, and alert
+          the community to missing bikes from anywhere. All they need is any
+          smartphone or laptop. You have access to the data behind it all to
+          understand how best to protect bikes on your campus.
 
+        %p
+          = render partial: "/landing_pages/tweet", locals: { tweet_id: 863853852658761729 }
 
-        .mobile-contact-link
-          %a.btn.btn-primary.btn-lg.scroll-to-ref{ href: '#contact-bike-index', data: { offset: -110 } }
-            Contact Bike Index
+        %h3
+          How it works
 
-        .trusted-by
+        %p
+          Bike Index users provide serial numbers, proof of ownership and
+          identifying information about their bikes. When a bike is reported
+          lost or stolen, our partners can search Bike Index to identify,
+          locate, and track it from any computer or smartphone. Our extensive
+          archive has helped officers recover bikes involved in criminal
+          situations, from simple theft to chop shops, drug houses - even
+          fencing rings and online black markets.
+
+        %p
+          Read about our over #{ number_with_delimiter Counts.recoveries }
+          recoveries on our blog. For a complete list of Bike Index's partners,
+          visit our partners page, and for information on partnering with Bike
+          Index, please contact us.
+
+        %h4 Related articles:
+        %ul
+          %li
+            = link_to "Universities should use Bike Index as their registration system of choice",
+            "https://bikeindex.org/news/universities-should-use-bike-index-as-their-registration-system-of-cho"
+          %li
+            = link_to "University of Pittsburgh partners with Bike Index to protect campus bicycles",
+            "https://bikeindex.org/news/university-of-pittsburgh-partners-with-bike-index-to-protect-campus-bi"
+
+        .trusted-by.hidden-lg-up
           %h3
-            Trusted by top universities and police departments
-          %ul
-            %li
-              = image_tag 'landing_pages/partners/UMD.png', alt: 'University of Maryland'
-            %li.partner-logo-rectangle
-              = image_tag 'landing_pages/partners/Bike-Theft-Task-Force-Portland.png', alt: 'Portland Bike Theft Task Force'
-            %li
-              = image_tag 'landing_pages/partners/University-of-Washington.png', alt: 'University of Washington'
-            %li
-              = image_tag 'landing_pages/partners/City-of-Bend.png', alt: 'City of Bend'
-            %li.offset-partner-logo
-              = image_tag 'landing_pages/partners/BYU.png', alt: 'Brigham Young University'
-            %li
-              = image_tag 'landing_pages/partners/Sunnyvale.png', alt: 'Sunnyvale'
+            Trusted by top universities
+          = image_tag "landing_pages/logos/universities.png", alt: "university partners"
 
       .next-steps-col
         .next-steps-wrap
-          %header#contact-bike-index
-            Talk to us today
-          = render partial: '/landing_pages/next_steps_contact', locals: { landing_page_target: landing_page_target }
-
-  = render '/landing_pages/footer'
+          %header
+            Keep campus bikes in order
+            = link_to campus_packages_path, class: "btn btn-primary btn-lg" do
+              Features &amp; Pricing
+              %span.chevron &raquo;
+          .trusted-by
+            .header
+              Trusted by top universities
+            = image_tag "landing_pages/logos/universities.png", alt: "university partners"
