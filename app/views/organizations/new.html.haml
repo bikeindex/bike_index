@@ -1,71 +1,74 @@
-%h1
-  Bike Index for organizations
+.container
+  %h1
+    Bike Index for organizations
+  = render partial: "/landing_pages/for_organizations_photo_list"
 
-- if current_user.present?
-  %p
-    %em
-      Your current account (<strong>#{current_user.email}</strong>) will be a member of the organization you create.
-  %p
-    %em
-      If you don't want that to be the case, #{link_to 'log out', session_path(redirect_location: 'new_user'), method: :delete} and sign up with the email you would like to use instead.
+  .mt-4
 
-  = form_for @organization, html: { class: 'organized-form mt-4' } do |f|
+  - if current_user.present?
+    %p
+      %em
+        Your current account (<strong>#{current_user.email}</strong>) will be a member of the organization you create.
+    %p
+      %em
+        If you don't want that to be the case, #{link_to 'log out', session_path(redirect_location: 'new_user'), method: :delete} and sign up with the email you would like to use instead.
 
-    - if @organization.errors.any?
-      #alert-block
-        .alert.alert-error
-          %a.close{"data-dismiss" => "alert"} ×
-          %h4
-            Please fix the following
-            = pluralize(@organization.errors.count, "error")
-          %ul
-            - @organization.errors.full_messages.each do |msg|
-              %li
-                = msg
-    .card
-      .card-block
-        %h3.card-title
-          New organization
-        - if current_user.memberships.count > 0
-          .alert.alert-info.mt-4.mb-4
-            - org = current_user.organizations.first
-            %h3.padded.header-font-alt.text-center
-              You are already a member of #{link_to org.name, organization_root_path(org.slug)}.
-            %p.text-center
-              Filling out this form will create a new, different organization
-        .form-group.row.mt-4
-          = f.label :name, 'Organization name', class: 'org-form-label'
-          .col-sm-4
-            = f.text_field :name, required: true, class: 'form-control'
+    = form_for @organization, html: { class: 'organized-form mt-4' } do |f|
 
-        .form-group.row
-          = f.label :website, class: 'org-form-label'
-          .col-sm-4
-            = f.text_field :website, class: 'form-control'
+      - if @organization.errors.any?
+        #alert-block
+          .alert.alert-error
+            %a.close{"data-dismiss" => "alert"} ×
+            %h4
+              Please fix the following
+              = pluralize(@organization.errors.count, "error")
+            %ul
+              - @organization.errors.full_messages.each do |msg|
+                %li
+                  = msg
+      .card
+        .card-block
+          %h3.card-title
+            New organization
+          - if current_user.memberships.count > 0
+            .alert.alert-info.mt-4.mb-4
+              - org = current_user.organizations.first
+              %h3.padded.header-font-alt.text-center
+                You are already a member of #{link_to org.name, organization_root_path(org.slug)}.
+              %p.text-center
+                Filling out this form will create a new, different organization
+          .form-group.row.mt-4
+            = f.label :name, 'Organization name', class: 'org-form-label'
+            .col-sm-4
+              = f.text_field :name, required: true, class: 'form-control'
 
-        .form-group.row
-          %label.org-form-label
-            Organization kind
-          .col-sm-4
-            - Organization.creatable_kinds.each do |kind|
-              .radio
-                %label
-                  = f.radio_button :kind, kind
-                  = kind.humanize
-        .form-group.row
-          .col-sm-4.col-sm-push-4
-            = f.submit 'add organization', class: 'btn btn-success'
-- else
-  .alert.alert-info.padded
-    %h3
-      Add your organization to Bike Index for free, in three easy steps:
+          .form-group.row
+            = f.label :website, class: 'org-form-label'
+            .col-sm-4
+              = f.text_field :website, class: 'form-control'
+
+          .form-group.row
+            %label.org-form-label
+              Organization kind
+            .col-sm-4
+              - Organization.creatable_kinds.each do |kind|
+                .radio
+                  %label
+                    = f.radio_button :kind, kind
+                    = kind.humanize
+          .form-group.row
+            .col-sm-4.col-sm-push-4
+              = f.submit 'add organization', class: 'btn btn-success'
+  - else
+    %h3.header-font-alt
+      Add your organization to Bike Index, for free, in three easy steps:
     %ol
       %li
         Sign up for a #{link_to "Bike Index account", new_user_url(return_to: "/organizations/new")}
       %li
         Confirm your email
       %li
-        Return to this page and fill in the form!
+        Fill out the form that will appear on this page once you're signed in.
 
 
 

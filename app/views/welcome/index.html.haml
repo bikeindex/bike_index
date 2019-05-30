@@ -12,40 +12,8 @@
           = link_to new_bike_path do
             Register Now
             %span.chevron &raquo;
-  .container-fluid.root-landing-banner-subheader
-    .row
-      .subheader-tile.col-md-3
-        = link_to for_bike_shops_path, class: "subheader-tile-link" do
-          .subheader-image.bg-image-bike-shops
-          .subheader-image-caption
-            %em for&nbsp;
-            %span.upcase
-              Bike Shops
-              %span.chevron &raquo;
-      .subheader-tile.col-md-3
-        = link_to for_cities_path, class: "subheader-tile-link" do
-          .subheader-image.bg-image-bike-cities
-          .subheader-image-caption
-            %em for&nbsp;
-            %span.upcase
-              Cities
-              %span.chevron &raquo;
-      .subheader-tile.col-md-3
-        = link_to for_schools_path, class: "subheader-tile-link" do
-          .subheader-image.bg-image-bike-schools
-          .subheader-image-caption
-            %em for&nbsp;
-            %span.upcase
-              Schools
-              %span.chevron &raquo;
-      .subheader-tile.col-md-3
-        = link_to for_community_groups_path, class: "subheader-tile-link" do
-          .subheader-image.bg-image-bike-groups
-          .subheader-image-caption
-            %em for&nbsp;
-            %span.upcase
-              Community Groups
-              %span.chevron &raquo;
+
+  = render partial: "/landing_pages/for_organizations_photo_list"
 
   - cache "root_body_wrap", skip_digest: true do # Expired in recovery_displays_controller
     .root-landing-recovery-stories
