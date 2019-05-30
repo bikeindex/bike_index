@@ -62,7 +62,7 @@
 }
 
 .center-navbar-signup-link {
-	background-color: rgba(0,0,0,0);
+	background-color: black;
 	border-radius: 4px;
 	border: 1px solid #3498DB;
 	width: 85px;
@@ -75,6 +75,20 @@
   line-height: 18px;
   padding: 8px 15px;
   text-align: center;
+  text-decoration: none;
+
+  &:hover {
+    background: rgba(white, 0.1);
+    text-decoration: none;
+    color: #fff;
+  }
+
+  &.active,
+  &:active {
+    background: rgba(white, 0.1);
+    text-decoration: none;
+    color: #fff;
+  }
 }
 
 @media screen and (min-width: 501px) {
