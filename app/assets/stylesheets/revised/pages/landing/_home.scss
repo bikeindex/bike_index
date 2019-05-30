@@ -203,7 +203,7 @@
     }
 
     h1 {
-	    text-shadow: 0 2px 15px #11354E;
+	    text-shadow: 0 2px 5px rgba(17,46,78,0.72);
       font-size: 60px;
       font-weight: 300;
     }
@@ -217,6 +217,11 @@
 	    text-align: center;
 	    text-shadow: 0 2px 5px rgba(17,46,78,0.72);
       text-transform: none;
+
+      a {
+        color: #ffffff;
+        text-decoration: none;
+      }
     }
 
     .root-action-btn {
