@@ -1,72 +1,71 @@
-.vendor-signup
-  %h2.padded
-    Want to sign up?
-  %article.vendor-signup-form
-    %p
-      It's free.
-    %p
-      There are no commitments.
-    %p
-      We just want to stop bike theft.
-    
-    = render "new_form"
+%h1
+  Bike Index for organizations
 
-  %hr.padded
+- if current_user.present?
+  %p
+    %em
+      Your current account (<strong>#{current_user.email}</strong>) will be a member of the organization you create.
+  %p
+    %em
+      If you don't want that to be the case, #{link_to 'log out', session_path(redirect_location: 'new_user'), method: :delete} and sign up with the email you would like to use instead.
 
-  %header.padded
-    .header-text
-      %h1
-        Are you a bike shop? 
-      %h1
-        A biking organization?
-  %article
-    %p
-      The Bike Index gives you the ability to quickly and easily register bikes for your customers or members.
-    %p
-      How it works: 
+  = form_for @organization, html: { class: 'organized-form mt-4' } do |f|
 
-    %ul.fancy-bullets
+    - if @organization.errors.any?
+      #alert-block
+        .alert.alert-error
+          %a.close{"data-dismiss" => "alert"} ×
+          %h4
+            Please fix the following
+            = pluralize(@organization.errors.count, "error")
+          %ul
+            - @organization.errors.full_messages.each do |msg|
+              %li
+                = msg
+    .card
+      .card-block
+        %h3.card-title
+          New organization
+        - if current_user.memberships.count > 0
+          .alert.alert-info.mt-4.mb-4
+            - org = current_user.organizations.first
+            %h3.padded.header-font-alt.text-center
+              You are already a member of #{link_to org.name, organization_root_path(org.slug)}.
+            %p.text-center
+              Filling out this form will create a new, different organization
+        .form-group.row.mt-4
+          = f.label :name, 'Organization name', class: 'org-form-label'
+          .col-sm-4
+            = f.text_field :name, required: true, class: 'form-control'
+
+        .form-group.row
+          = f.label :website, class: 'org-form-label'
+          .col-sm-4
+            = f.text_field :website, class: 'form-control'
+
+        .form-group.row
+          %label.org-form-label
+            Organization kind
+          .col-sm-4
+            - Organization.creatable_kinds.each do |kind|
+              .radio
+                %label
+                  = f.radio_button :kind, kind
+                  = kind.humanize
+        .form-group.row
+          .col-sm-4.col-sm-push-4
+            = f.submit 'add organization', class: 'btn btn-success'
+- else
+  .alert.alert-info.padded
+    %h3
+      Add your organization to Bike Index for free, in three easy steps:
+    %ol
       %li
-        %span.green-bullet
-        %p
-          Fill in basic information about a bike and the customer's email.
+        Sign up for a #{link_to "Bike Index account", new_user_url(return_to: "/organizations/new")}
       %li
-        %span.green-bullet
-        %p
-          We send them an email with the information about their bike.
-      
-    %p
-      That's it!
-    %p
-      The customer doesn't need to do anything else either. If they want to, they can sign in and upload photos or add details to their bike &mdash; but even if they don't, they have a permanent record of their bike.
-    %p
-      If their bike is ever stolen they have all the information they need to file a police report, make an insurance claim and, most importantly, they can mark their bike stolen on Bike Index &mdash; where it has the best chance of being found.
-
-  / %hr.padded
-  / %h2.padded.lightspeed-logod
-  /   %a{ href: lightspeed_integration_url }
-  /     = image_tag 'lightspeed_logo.png', class: 'lightspeed-logo'
-  /     integration
-  / %article
-  /   %p
-  /     We have an official
-  /     %strong
-  /       Lightspeed Retail Integration
-  /     that automates the entire process - #{link_to "learn how here", lightspeed_integration_url}.
-  
-  %hr.padded
-
-  %h2.padded
-    Lightspeed Integration
-  %article
-    %p
-      Are you a bike shop that uses Lightspeed? We have an integration that will register every bike you sell, automatically, for free - #{ link_to 'Lightspeed Integration information', lightspeed_integration_path }.
-
-  %h2.padded
-    Batch registration
-  %article
-    %p
-      If you have a spreadsheets of serial numbers or want to set up batch uploading in some other way, #{link_to "contact us", "mailto:seth@bikeindex.org"}.
+        Confirm your email
+      %li
+        Return to this page and fill in the form!
 
 
-= render '/shared/content_footer_ad'
+
