@@ -1,25 +1,18 @@
 import log from "../../utils/log";
 import moment from "moment-timezone";
 import LoadFancySelects from "../../utils/LoadFancySelects";
-import BinxAdminGraphs from "./graphs.js"
+import BinxAdminGraphs from "./graphs.js";
 import BinxAdminInvoices from "./invoices.js";
 import OrganizationForm from "./organization_form.js";
 
 function BinxAdmin() {
   return {
     init() {
-      // If there is an element on the page with id pageContainerFluid, make the page container full width
-      if ($("#pageContainerFluid").length) {
-        $("#admin-content > .receptacle").css("max-width", "100%");
-      } else {
-        // Also, make full-screen-table receptacle max-width
-        $(".full-screen-table")
-          .parents(".receptacle")
-          .css("max-width", "100%");
-      }
+      this.initAdminSearchSelect();
+
       if ($(".calendar-box")[0]) {
-        const binxAdminGraphs = BinxAdminGraphs()
-        binxAdminGraphs.init()
+        const binxAdminGraphs = BinxAdminGraphs();
+        binxAdminGraphs.init();
       }
       if ($("#use_image_for_display").length > 0) {
         this.useBikeImageForDisplay();
@@ -44,6 +37,17 @@ function BinxAdmin() {
         const $organizationForm = $("form").first();
         new OrganizationForm($organizationForm);
       }
+    },
+
+    initAdminSearchSelect() {
+      window.initialValue = $("#admin_other_navigation").val();
+      // On change, if the change is for something new and is an actual value, redirect to that page
+      $("#admin_other_navigation").on("change", e => {
+        let newValue = $("#admin_other_navigation").val();
+        if (newValue != window.initialValue && newValue.length > 0) {
+          location.href = newValue;
+        }
+      });
     },
 
     // Non Fast Attr bikes edit

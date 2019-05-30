@@ -17,6 +17,10 @@
   .dropdown-toggle {
     cursor: pointer;
   }
+  .fancy-select {
+    min-width: 300px;
+    margin-top: 4px;
+  }
 }
 
 .admin-graphs-list a.active {

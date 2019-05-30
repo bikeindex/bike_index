@@ -54,4 +54,23 @@ describe WebhookRunner do
       expect(runner.hook_urls("after_bike_update")).to eq(redis.lrange(rid, 0, 0))
     end
   end
+  other_links = {
+                  "POS Integration" => "https://posintegration.bikeindex.org",
+                  "Memberships" => admin_memberships_path,
+                  "Manufacturers" => admin_manufacturers_path,
+                  "Invitations" => admin_invitations_path,
+                  "TSV Exports" => admin_tsvs_path,
+                  "Maintenance" => admin_maintenance_path,
+                  "Failed Bikes" => admin_failed_bikes_path,
+                  "Component Types" => admin_ctypes_path,
+                  "Graphs" => admin_graphs_path,
+                  "Edit Paints" => admin_paints_path,
+                  "Feedbacks" => admin_feedbacks_path,
+                  "Tweets" => admin_tweets_path,
+                  "Stickers" => admin_bike_codes_path,
+                  "Exports" => admin_exports_path,
+                  "Bulk Imports" => admin_bulk_imports_path,
+                  "Partial Bikes" => admin_partial_bikes_path,
+                  "Duplicates" => duplicates_admin_bikes_path,
+                }
 end

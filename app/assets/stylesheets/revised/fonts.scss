@@ -106,9 +106,13 @@ h5 {
   }
 }
 
+.uncap {
+  text-transform: none !important;
+}
+
 .header-font-uncap {
   @extend .header-font;
-  text-transform: none !important;
+  @extend .uncap;
 }
 
 .header-font-alt {

@@ -1,12 +1,14 @@
 = render partial: "bike_show_overlays"
 
-- if current_user&.superuser && @bike.user_hidden
-  %h2.text-danger.mb-4.text-center{ style: "text-align: center;" }
-    HIDDEN by owner
-    %small.less-strong
-      no one but the user (and Bike Index admins) can see it
-
 .container
+  - if current_user&.superuser
+    %p.mb-4.text-right
+      = link_to "#{@bike.type.titleize} in Admin", admin_bike_path(@bike.to_param), class: "btn btn-primary uncap"
+    - if @bike.user_hidden
+      %h2.text-danger.mb-4.text-center
+        HIDDEN by owner
+        %small.less-strong
+          no one but the user (and Bike Index admins) can see it
   / Authorize check here, even though we're checking in controller too, because otherwise we're displaying user data
   - if current_user.present? && passive_organization.present? && current_user.authorized?(passive_organization)
     = render partial: "organized_access_panel"
