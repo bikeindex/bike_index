@@ -14,6 +14,13 @@
           %h3
             Plug your city in nationally.
 
+    .container.mobile-contact-link
+      .ribbon
+        %h2
+          = link_to cities_packages_path, class: "btn btn-primary btn-lg" do
+            Features &amp; Pricing
+            %span.chevron &raquo;
+
   .container
     .row.main-body-row
       .landing-why-col
@@ -54,10 +61,6 @@
           %li
             = link_to "Bike Index unveils partnership with the City of Palo Alto",
             "https://bikeindex.org/news/bike-index-unveils-new-qr-stickers-and-partnership-with-the-city-of-pa"
-
-        .mobile-contact-link
-          %a.btn.btn-primary.btn-lg{ href: new_organization_path }
-            Sign up for Bike Index
 
         .trusted-by.hidden-lg-up
           %h3

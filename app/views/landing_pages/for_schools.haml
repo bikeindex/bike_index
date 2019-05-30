@@ -10,6 +10,13 @@
           %h1 Bike Index for Universities
           %h3 Protecting bikes on campus can be a full-time job. Let us help.
 
+    .container.mobile-contact-link
+      .ribbon
+        %h2
+          = link_to campus_packages_path, class: "btn btn-primary btn-lg" do
+            Features &amp; Pricing
+            %span.chevron &raquo;
+
   .container
     .row.main-body-row
       .landing-why-col
@@ -55,11 +62,6 @@
           %li
             = link_to "University of Pittsburgh partners with Bike Index to protect campus bicycles",
             "https://bikeindex.org/news/university-of-pittsburgh-partners-with-bike-index-to-protect-campus-bi"
-
-
-        .mobile-contact-link
-          %a.btn.btn-primary.btn-lg.scroll-to-ref{ href: "#contact-bike-index", data: { offset: -110 } }
-            Contact Bike Index
 
         .trusted-by.hidden-lg-up
           %h3

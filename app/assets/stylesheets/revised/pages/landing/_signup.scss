@@ -131,10 +131,6 @@ $landing-page-targets: "shop", "school", "community_groups", "law_enforcement",
       line-height: 24px;
     }
 
-    .ribbon {
-      display: none;
-    }
-
     @include media-breakpoint-up(md) {
       padding-top: 17 * $vertical-height;
       padding-bottom: 0;

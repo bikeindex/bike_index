@@ -13,6 +13,11 @@
             The most wide-reaching and effective tools against bike theft
             &mdash; period.
 
+    .container.mobile-contact-link
+      .ribbon
+        %h2
+          = link_to "Sign up for free", new_organization_path, class: "btn btn-primary btn-lg"
+
   .container
     .row.main-body-row
       .landing-why-col
@@ -57,10 +62,6 @@
             = link_to "Bike Index welcomes Stolen Bikes NOLA",
             "https://bikeindex.org/news/bike-index-welcomes-our-newest-partner---stolen-bikes-nola"
 
-
-        .mobile-contact-link
-          %a.btn.btn-primary.btn-lg{ href: new_organization_path }
-            Sign up for Bike Index
 
         .trusted-by.hidden-lg-up
           %h3
