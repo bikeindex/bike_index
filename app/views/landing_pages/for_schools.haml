@@ -26,7 +26,8 @@
           smartphone or laptop. You have access to the data behind it all to
           understand how best to protect bikes on your campus.
 
-        = render partial: "/landing_pages/tweet", locals: { tweet_id: 863853852658761729 }
+        %p
+          = render partial: "/landing_pages/tweet", locals: { tweet_id: 863853852658761729 }
 
         %h3
           How it works
@@ -57,7 +58,7 @@
 
 
         .mobile-contact-link
-          %a.btn.btn-primary.btn-lg.scroll-to-ref{ href: '#contact-bike-index', data: { offset: -110 } }
+          %a.btn.btn-primary.btn-lg.scroll-to-ref{ href: "#contact-bike-index", data: { offset: -110 } }
             Contact Bike Index
 
         .trusted-by.hidden-lg-up

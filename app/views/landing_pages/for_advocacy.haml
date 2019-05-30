@@ -1,4 +1,4 @@
-- landing_page_target = 'advocacy'
+- landing_page_target = "advocacy"
 
 .signup-landing-page{ class: "signup-landing-page-#{landing_page_target}" }
   %header.banner-header
@@ -26,7 +26,8 @@
           Spread the Bike Index word to your constituents to get them riding
           protected. Create a free organization account #{link_to "here", new_organization_path}.
 
-        = render partial: '/landing_pages/tweet', locals: { tweet_id: 875377223322259457 }
+        %p
+          = render partial: "/landing_pages/tweet", locals: { tweet_id: 875377223322259457 }
 
         %h3 Partners made in heaven
         %p
