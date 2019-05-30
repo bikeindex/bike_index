@@ -13,7 +13,7 @@
   }
 }
 
-$landing-page-targets: "shop", "school", "community_groups", "law_enforcement",
+$landing-page-targets: "bike_shops", "school", "community_groups", "law_enforcement",
   "cities", "ambassadors-how-to", "ambassadors-current", "campus-packages",
   "shop-packages", "cities-packages";
 
@@ -24,6 +24,29 @@ $landing-page-targets: "shop", "school", "community_groups", "law_enforcement",
     }
   }
 }
+
+@include media-breakpoint-up(lg) {
+  .signup-landing-page-community_groups {
+    .banner-header {
+      background-position: center center !important;
+    }
+  }
+}
+
+@include media-breakpoint-down(lg) {
+  .signup-landing-page-community_groups {
+    .banner-header {
+      background-position: center center !important;
+    }
+  }
+
+  .signup-landing-page-shops {
+    .banner-header {
+      background-position: center center !important;
+    }
+  }
+}
+
 
 // Including root-landing-page because required for footer, also ambassadors
 .signup-landing-page,
