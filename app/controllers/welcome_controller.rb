@@ -7,7 +7,6 @@ class WelcomeController < ApplicationController
 
   def index
     @recovery_displays = RecoveryDisplay.limit(5)
-    @recovery_count = recovery_count
   end
 
   def bike_creation_graph
@@ -65,11 +64,5 @@ class WelcomeController < ApplicationController
     slice_size = (list.length / 2.0).ceil
     slice1, slice2 = list.each_slice(slice_size).entries
     [slice1, slice2 || []]
-  end
-
-  def recovery_count
-    Rails.cache.fetch("recovery-count", expires_in: 24.hours) do
-      Counts.recoveries
-    end
   end
 end

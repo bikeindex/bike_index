@@ -4,7 +4,7 @@
       .root-landing-header-text
         %h2
           Over
-          = number_with_delimiter(@recovery_count)
+          = number_with_delimiter(Counts.recoveries_value)
           Bikes Recovered
         %h1.upcase
           Bike registration that works
