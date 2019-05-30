@@ -1,6 +1,5 @@
 .root-landing-recovery-stories {
-  background: #f9f9f9;
-  padding: (4 * $vertical-height) 0;
+  padding-top: (4 * $vertical-height);
 }
 
 #recovery-stories-listing {
@@ -11,7 +10,7 @@
 
 #recovery-stories-container {
   width: 90%;
-  margin: 0 auto;
+  margin: 35px auto 0 auto;
   position: relative;
 
   .slick-prev {
