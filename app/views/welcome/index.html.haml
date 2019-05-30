@@ -9,7 +9,7 @@
         %h1.upcase
           Bike registration that works
         %h2
-          = link_to "#how-it-works", class: "scroll-to-ref", data: { offset: -80 } do
+          = link_to new_organization_path do
             Find out how &raquo;
   .container-fluid.root-landing-banner-subheader
     .row
@@ -57,7 +57,7 @@
 
     .root-landing-how-it-works
       .container
-        %h3.landing-container-label#how-it-works But how does it work?
+        %h3.landing-container-label But How Does it work?
         .row
           .col-md-2.root-landing-how-icon
             = render '/landing_pages/icons/how_icon_register_svg'
