@@ -1,0 +1,83 @@
+- landing_page_target = "cities"
+
+.signup-landing-page{ class: "signup-landing-page-#{landing_page_target}" }
+  %header.banner-header
+    .container
+      .row
+        .icon-wrapper
+          = render "/landing_pages/icons/header_#{landing_page_target}_svg"
+        .banner-text
+          %h1
+            Bike Index for Cities
+          %h3
+            TBD
+
+  .container
+    .row.main-body-row
+      .landing-why-col
+        %h3
+          Recover your citizen's bikes
+
+        %p
+          You're the first one your citizens look to when their bikes are
+          stolen. Access and search our international database to return your
+          community's bikes to their rightful owners.
+
+        %p
+          You have the authority to bring bikes back - that’s no small
+          responsibility. That’s why we have tools - such as our integration
+          with LeadsOnline and #{link_to "automated tweets", "https://twitter.com/stolenbikessfo"}
+          of stolen bikes - to keep your community safe. Connect with
+          #{link_to "local ambassadors", "http://bikeindex.org/ambassadors_how_to"}
+          and spotters to quickly confiscate and block sales of stolen bikes.
+
+        %p
+          With over 215,000 registries and almost 5,500 stolen bicycle
+          recoveries, we know how to help.
+
+
+        %p
+          = render partial: "/landing_pages/tweet", locals: { tweet_id: 839247587521679360 }
+
+        %h3 Put a lock on bike theft
+
+        %p
+          Our extensive archive has helped officers recover bikes involved in
+          criminal situations, from simple theft to chop shops, drug houses -
+          even fencing rings and online black markets.
+
+        %p
+          With over 600 partnerships, Bike Index is the industry leader in
+          bicycle registration. Join our network for free
+          #{link_to "here", "https://bikeindex.org/organizations/new"},
+          or ask us to put you in touch with an existing partner in law
+          enforcement.
+
+        %p
+          If you want to collaborate with other departments in your city to
+          manage a registry, learn more about Bike Index for municipalities
+          #{link_to "here", for_cities_path}.
+
+        %p
+          = render partial: "/landing_pages/tweet", locals: { tweet_id: 890211853942407168 }
+
+        .mobile-contact-link
+          %a.btn.btn-primary.btn-lg{ href: new_organization_path }
+            Sign up for Bike Index
+
+        .trusted-by.hidden-lg-up
+          %h3
+            Trusted by Law Enforcement everywhere
+          = image_tag "landing_pages/logos/law-enforcement.png", alt: "law enforcement partners"
+
+      .next-steps-col
+        .next-steps-wrap
+          %header
+            Trusted by municipalities everywhere
+            = link_to cities_packages_path, class: "btn btn-primary btn-lg" do
+              Features &amp; Pricing
+              %span.chevron &raquo;
+          .trusted-by
+            .header
+              Trusted by municipalities everywhere
+            = image_tag "landing_pages/logos/cities.png", alt: "municipal partners"
