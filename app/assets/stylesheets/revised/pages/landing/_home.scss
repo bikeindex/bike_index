@@ -424,11 +424,13 @@
 }
 
 .root-landing-who {
+  background-color: #f9f9f9;
   padding-bottom: 6 * $vertical-height;
 
   h3.landing-container-label {
     color: $gray-darker;
     margin: (2 * $vertical-height) 0;
+    padding-top: 2rem;
 
     @include media-breakpoint-up(lg) {
       margin: (4 * $vertical-height) 0;
