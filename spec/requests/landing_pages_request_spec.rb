@@ -1,15 +1,20 @@
 require "spec_helper"
 
 RSpec.describe LandingPagesController, type: :request do
+  describe "#for_shops" do
+    it "redirects to for_bike_shops_path" do
+      expect(get("/for_shops")).to redirect_to(for_bike_shops_path)
+    end
+  end
+
   describe "#for_advocacy" do
     it "redirects to for_community_groups_path" do
-      get("/for_advocacy")
-      expect(response).to redirect_to(for_community_groups_path)
+      expect(get("/for_advocacy")).to redirect_to(for_community_groups_path)
     end
   end
 
   {
-    for_shops: "Bike Index for Bike Shops",
+    for_bike_shops: "Bike Index for Bike Shops",
     for_cities: "Bike Index for Cities",
     for_community_groups: "Bike Index for Community Groups",
     for_law_enforcement: "Bike Index for Law Enforcement",

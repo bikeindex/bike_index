@@ -35,16 +35,17 @@ Bikeindex::Application.routes.draw do
     bike_shop_packages
     campus_packages
     cities_packages
+    for_bike_shops
     for_community_groups
     for_cities
     for_law_enforcement
     for_schools
-    for_shops
   ).freeze.each do |page|
     get page, controller: "landing_pages", action: page
   end
 
   get "for_advocacy", to: redirect("/for_community_groups")
+  get "for_shops", to: redirect("/for_bike_shops")
   get "ambassadors", to: redirect("/ambassadors_how_to") # Because convenience
   get "ambassadors/new", to: redirect("https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform"), as: :new_ambassador
 
