@@ -6,7 +6,20 @@
     %ul
       - if params[:search_kind].present?
         %li.nav-item
-          = link_to params[:search_kind], admin_organizations_path(sortable_search_params.except(:search_kind)), class: "nav-link active"
+          = link_to params[:search_kind].humanize, admin_organizations_path(sortable_search_params.except(:search_kind)), class: "nav-link active"
+      %li.nav-item
+        - active_pos_kind = params[:search_pos]
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (active_pos_kind.present? ? "active" : "") }
+          - if active_pos_kind.present?
+            = active_pos_kind.humanize
+          - else
+            POS
+        .dropdown-menu
+          - Organization.pos_kinds.each do |pos_kind|
+            - pos_kind
+            - kind_active = active_pos_kind == pos_kind
+            = link_to pos_kind.humanize, admin_organizations_path(sortable_search_params.merge(search_pos: kind_active ? nil : pos_kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
+
       %li.nav-item
         - paid_search_params = sortable_search_params.merge(search_paid: !@search_paid)
         = link_to "Paid", admin_organizations_path(paid_search_params), class: @search_paid ? "nav-link active" : "nav-link"
@@ -27,6 +40,8 @@
       = hidden_field_tag :sort, sort_column
       = hidden_field_tag :sort_direction, sort_direction
       = hidden_field_tag :search_paid, @search_paid
+      = hidden_field_tag :search_kind, params[:search_kind]
+      = hidden_field_tag :search_pos, params[:search_pos]
       .form-group.ml-auto.align-self-end
         = text_field_tag :search_query, params[:search_query], placeholder: "Name/Location#{current_user.developer? ? '/Paid features' : '' }", class: "form-control mt-4"
 
