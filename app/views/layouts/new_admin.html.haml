@@ -69,11 +69,9 @@
                                 { title: "Duplicates", path: duplicates_admin_bikes_path, match_controller: false }
                               ]
                 other_link_active = other_links.detect { |l| current_page_active?(l[:path], l[:match_controller]) }
-                # previously other_select_opts had `other_link_active && other_link_active[:path]` - but that meant that it was difficult to navigate away from pages, so just putting it in prompt now
-                other_select_opts = options_for_select(other_links.map { |l| [l[:title], l[:path]] })
                 other_prompt = other_link_active.present? ? "Viewing #{other_link_active[:title]}" : "Other pages"
               .fancy-select.unfancy.no-restore-on-backspace
-                = select(:admin, :other_navigation, other_select_opts, { prompt: other_prompt }, { class: "form-control" })
+                = select(:admin, :other_navigation, options_for_select(other_links.map { |l| [l[:title], l[:path]] }), { prompt: other_prompt }, { class: "form-control" })
 
           %ul.navbar-nav.ml-auto
             %li.nav-item
