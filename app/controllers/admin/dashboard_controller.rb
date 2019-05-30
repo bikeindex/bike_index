@@ -11,7 +11,6 @@ class Admin::DashboardController < Admin::BaseController
   def invitations
     @organizations = Organization.all
     @organization_invitation = OrganizationInvitation.new
-    render layout: "new_admin"
   end
 
   def maintenance

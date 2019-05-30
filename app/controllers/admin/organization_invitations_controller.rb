@@ -9,19 +9,16 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
   def new
     @organization_invitation = OrganizationInvitation.new
     @organizations = Organization.all
-    render layout: "new_admin"
   end
 
   def show
     @organizations = Organization.all
     @organization_invitations = OrganizationInvitation.where(organization_id: @organization.id)
     @organization_invitation = OrganizationInvitation.new(organization_id: @organization.id)
-    render layout: "new_admin"
   end
 
   def edit
     @organizations = Organization.all
-    render layout: "new_admin"
   end
 
   def update
@@ -48,7 +45,7 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
       end
     else
       flash[:error] = "Oh no! This organization has no more invitations. Email contact@bikeindex.org for help"
-      redirect_to new_admin_organization_invitation_url(@organization_invitation.id, organization_id: @organization_invitation.organization.to_param)
+      redirect_to root_url
     end
   end
 
