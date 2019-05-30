@@ -42,7 +42,7 @@ class WelcomeController < ApplicationController
 
   def recovery_stories
     page = params[:page] || 1
-    @per_page = params[:per_page] || 50
+    @per_page = params[:per_page] || 10
 
     @recovery_displays = RecoveryDisplay.page(page).per(@per_page)
     @slice1, @slice2 = list_halves(@recovery_displays)
