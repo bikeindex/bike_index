@@ -92,18 +92,18 @@ $landing-page-targets: "bike_shops", "school", "community_groups", "law_enforcem
   }
 }
 
-.landing-page {
+.signup-landing-page.landing-page {
   @include media-breakpoint-down(lg) {
     .banner-header {
-      padding-top: 100px !important;
-      padding-bottom: 0 !important;
+      padding-top: 100px;
+      padding-bottom: 0;
     }
   }
 
   @include media-breakpoint-up(lg) {
     .banner-header {
-      padding-top: 100px !important;
-      padding-bottom: 100px !important;
+      padding-top: 100px;
+      padding-bottom: 100px;
     }
   }
 }
