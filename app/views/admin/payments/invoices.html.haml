@@ -2,7 +2,7 @@
   %h1
     - if params[:query].present?
       %em
-        = params[:query] 
+        = params[:query]
     Invoices
 %p
   Go to organizations to create new invoices
@@ -23,4 +23,4 @@
 
   = paginate @invoices
 
-= render partial: "/admin/organizations/invoices/table", locals: { invoices: @invoices, sortable: true, display_organization: true }
+= render partial: "/admin/organizations/invoices/table", locals: { invoices: @invoices, render_sortable: true, display_organization: true }

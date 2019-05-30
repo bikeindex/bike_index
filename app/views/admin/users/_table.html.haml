@@ -1,10 +1,18 @@
+- render_sortable ||= false
+
 .full-screen-table
   %table.table.table-bordered.table-striped.table-sm
-    %thead.thead-light
+    %thead.thead-light.sortable
       %th
-        Added&nbsp;<small class="convertTimezone"></small>
+        - if render_sortable
+          = sortable "created_at"
+        - else
+          Added&nbsp;<small class="convertTimezone"></small>
       %th
-        Email
+        - if render_sortable
+          = sortable "email"
+        - else
+          Email
       %th
         Secondary Emails
       %th
@@ -14,38 +22,55 @@
       %th
         Memberships
       %th
+        %small
+          Ambassador tasks
+
+      %th
         Admin?
       %th
-        Confirmed
+        %small
+          Confirmed
     %tbody
       - @users.each do |user|
-        %tr
-          %td
-            %span.convertTime
-              = l user.created_at, format: :convert_time
-          %td
-            .less-strong-hold
-              = link_to user.email, edit_admin_user_url(user)
-              - if user.donor?
-                <span class="donor-icon">D</span>
-              - elsif user.paid_org?
-                <span class="paid-org-icon">O</span>
-              %small.less-strong-right
-                = user.id
-          %td
-            %small.less-strong
-              = user.secondary_emails.join(', ')
-          %td
-            - if user.name?
-              = user.name
-          %td
-            = user.ownerships.count
-          %td
-            - if user.memberships.present?
-              - user.memberships.each do |membership|
-                = link_to "#{membership.organization.name} ", admin_membership_url(membership)
-          %td
-            = "super" if user.superuser?
-            = "developer" if user.developer?
-          %td.table-cell-check
-            = "&#x2713;".html_safe if user.confirmed
+        - cache(user) do
+          %tr
+            %td
+              %span.convertTime
+                = l user.created_at, format: :convert_time
+            %td
+              .less-strong-hold
+                = link_to user.email, edit_admin_user_url(user)
+                - if user.donor?
+                  <span class="donor-icon">D</span>
+                - elsif user.paid_org?
+                  <span class="paid-org-icon">O</span>
+                %small.less-strong-right
+                  = user.id
+            %td
+              %small.less-strong
+                = user.secondary_emails.join(', ')
+            %td
+              - if user.name?
+                = user.name
+            %td
+              = user.ownerships.count
+            %td
+              - if user.memberships.present?
+                - first_org_rendered = false # can't use each_with_index because sometimes org is ambassador org
+                - user.memberships.each do |membership|
+                  - next if membership.organization.ambassador?
+                  - if first_org_rendered
+                    <small class="less-strong">|</small>
+                  - else
+                    - first_org_rendered = true
+                  = link_to membership.organization.name.gsub(" ", "\u00a0"), admin_users_path(organization_id: membership.organization_id), class: "small"
+            %td
+              - if user.ambassador?
+                - ambassador = Ambassador.find(user.id)
+                = ambassador.progress_count
+            %td
+              %small
+                = "super" if user.superuser?
+                = "developer" if user.developer?
+            %td.table-cell-check
+              = "&#x2713;".html_safe if user.confirmed

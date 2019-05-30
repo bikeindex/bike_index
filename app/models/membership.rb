@@ -23,6 +23,10 @@ class Membership < ActiveRecord::Base
     role == "admin"
   end
 
+  def ambassador?
+    organization.ambassador?
+  end
+
   def update_relationships
     user&.update_attributes(updated_at: Time.now)
     organization&.update_attributes(updated_at: Time.now)

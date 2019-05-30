@@ -1,24 +1,24 @@
 - bikes ||= @bikes
 - no_show_header ||= false
 - show_serial ||= params[:show_serial].present?
-- sortable ||= false
+- render_sortable ||= false
 
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm{ class: show_serial ? "show-admin-bike-table-serial-cell" : "" }
     - unless no_show_header
       %thead.thead-light.sortable
         %th
-          - if sortable
+          - if render_sortable
             = sortable "id", "Registered"
           - else
             Registered
         %th.d-none.d-md-table-cell
-          - if sortable
+          - if render_sortable
             = sortable "owner_email", "Sent to"
           - else
             Sent to
         %th
-          - if sortable
+          - if render_sortable
             = sortable "manufacturer_id"
           - else
             Manufacturer
