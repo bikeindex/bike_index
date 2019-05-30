@@ -24,14 +24,9 @@ function BinxOrgBikes() {
     },
 
     selectStoredVisibleColumns() {
-      const defaultCells = [
-        "created_at_cell",
-        "stolen_cell",
-        "manufacturer_cell",
-        "model_cell",
-        "color_cell",
-        "owner_email_cell"
-      ];
+      const defaultCells = JSON.parse(
+        $("#organizedSearchSettings").attr("data-defaultcols")
+      );
       let visibleCells = localStorage.getItem("organizationBikeColumns");
       // If we have stored cells, select them.
       if (typeof visibleCells === "string") {
