@@ -1,12 +1,10 @@
-// Trying to avoid merge conflicts, this should get put up above with the other imports
-import BinxAppOrgBikes from "./binx_org_bikes.js";
-
 // This is stuff that needs to happen on page load.
 import moment from "moment-timezone";
 import BinxMapping from "./binx_mapping.js";
+import BinxAdmin from "./admin/binx_admin.js";
 import BinxAppOrgExport from "./binx_org_export.js";
 import BinxAppOrgMessages from "./binx_org_messages.js";
-import BinxAdmin from "./admin/binx_admin.js";
+import BinxAppOrgBikes from "./binx_org_bikes.js";
 
 window.binxApp || (window.binxApp = {});
 
