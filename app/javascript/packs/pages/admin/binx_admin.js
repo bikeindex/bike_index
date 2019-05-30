@@ -1,7 +1,7 @@
 import log from "../../utils/log";
 import moment from "moment-timezone";
 import LoadFancySelects from "../../utils/LoadFancySelects";
-import BinxAdminGraphs from "./graphs.js"
+import BinxAdminGraphs from "./graphs.js";
 import BinxAdminInvoices from "./invoices.js";
 import OrganizationForm from "./organization_form.js";
 
@@ -18,8 +18,8 @@ function BinxAdmin() {
           .css("max-width", "100%");
       }
       if ($(".calendar-box")[0]) {
-        const binxAdminGraphs = BinxAdminGraphs()
-        binxAdminGraphs.init()
+        const binxAdminGraphs = BinxAdminGraphs();
+        binxAdminGraphs.init();
       }
       if ($("#use_image_for_display").length > 0) {
         this.useBikeImageForDisplay();
