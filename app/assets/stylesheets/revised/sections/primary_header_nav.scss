@@ -203,6 +203,7 @@ $mainmenu-open-zindex: 10;
       transition: padding $mainmenu-transform-speed linear;
       padding: (1.5 * $vertical-height) 0;
       z-index: $mainmenu-open-zindex + 3;
+      background-color: $black-off;
 
       a {
         font-size: 36px;

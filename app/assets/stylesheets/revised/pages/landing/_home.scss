@@ -55,9 +55,10 @@
 
 .center-navbar-signup-link-container {
   display: inline-block;
-  width: 75%;
-  text-align: center;
   margin: 20px auto 10px auto;
+  position: absolute;
+  text-align: center;
+  width: 75%;
 }
 
 .center-navbar-signup-link {
@@ -69,7 +70,6 @@
   color: #fff;
   cursor: pointer;
   display: inline;
-  font-size: 0.8rem;
   font-size: 12px;
   height: 37px;
   line-height: 18px;
