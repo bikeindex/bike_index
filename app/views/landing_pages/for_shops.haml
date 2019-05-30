@@ -1,4 +1,4 @@
-- landing_page_target = 'shop'
+- landing_page_target = "shop"
 
 .signup-landing-page{ class: "signup-landing-page-#{landing_page_target}" }
   %header.banner-header
@@ -12,6 +12,8 @@
           %h3
             Unite against bike theft and protect your customers' bikes before
             they're even out there.
+          %h3
+            Do right by your customers in just 5 clicks.
 
   .container
     .row.main-body-row
@@ -27,19 +29,19 @@
 
         %p
           Build goodwill with your customers with a service you can offer at no
-          cost. Recover a stolen bike, and you’ll have a customer for life.
+          cost. Recover a stolen bike, and you'll have a customer for life.
 
         %p
-          Join our
-          = link_to "network of shop partners.", "http://bikeindex.org/where"
+          Join our #{link_to "network of shop partners", "http://bikeindex.org/where"}.
 
           Sign up for a free Bike Index account for your shop
-          = link_to "here.", "https://bikeindex.org/organizations/new"
+          #{link_to "here", "https://bikeindex.org/organizations/new"}.
 
-          Once you do this, link your account to your Lightspeed or register bikes in Bike Index through Ascend.
+          Once you do this, link your account to your Lightspeed or register
+          bikes in Bike Index through Ascend.
 
-        = image_tag 'ascend-logo.png', class: 'landing-lightspeed-logo', alt: "Ascend logo"
-        = image_tag 'lightspeed_logo.png', class: 'landing-lightspeed-logo', alt: 'Lightspeed logo'
+          = image_tag "ascend-logo.png", class: "landing-lightspeed-logo", alt: "Ascend logo"
+          = image_tag "lightspeed_logo.png", class: "landing-lightspeed-logo", alt: "Lightspeed logo"
 
         %h3
           Use Lightspeed Retail?
@@ -59,28 +61,26 @@
 
         %p
           Connect your Ascend account and your Bike Index shop account. Each
-          night, Ascend will export the bikes you’ve sold, and we’ll import them
-          into Bike Index for your customers. Other than setup, you’re done!
+          night, Ascend will export the bikes you've sold, and we'll import them
+          into Bike Index for your customers. Other than setup, you're done!
           Learn more about the Ascend integration
+          #{link_to "here", "https://bikeindex.org/ascend"}.
 
-          = link_to "here.", "https://bikeindex.org/ascend"
-
-        = render partial: '/landing_pages/tweet', locals: { tweet_id: 840324239425073152 }
+        %p
+          = render partial: "/landing_pages/tweet", locals: { tweet_id: 840324239425073152 }
 
         %p
           Don't use Ascend or Lightspeed POS? Ask us about
-          = link_to "printed materials", "https://bikeindex.myshopify.com/"
+          #{link_to "printed materials", "https://bikeindex.myshopify.com/"}.
 
-        %p
-          Relevant posts:
-
-        %p
-          = link_to "Driving service revenues with bicycle registration",
-          "https://bikeindex.org/news/driving-service-revenues-with-bicycle-registration"
-        %p
-          = link_to "5 ways to grow community for your bike shop",
-          "https://bikeindex.org/news/5-ways-to-grow-community-for-your-bike-shop"
-
+        %h4 Related articles:
+        %ul
+          %li
+            = link_to "Driving service revenues with bicycle registration",
+            "https://bikeindex.org/news/driving-service-revenues-with-bicycle-registration"
+          %li
+            = link_to "5 ways to grow community for your bike shop",
+            "https://bikeindex.org/news/5-ways-to-grow-community-for-your-bike-shop"
 
         .mobile-contact-link
           %a.btn.btn-primary.btn-lg{ href: new_organization_path }
