@@ -47,6 +47,7 @@
   }
   .nav-item {
     @extend .small;
+    margin-left: 0.25rem;
     a {
       padding: 0.25rem 0.5rem;
     }

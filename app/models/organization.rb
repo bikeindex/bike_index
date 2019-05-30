@@ -67,7 +67,7 @@ class Organization < ActiveRecord::Base
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
-  def self.pos_kinds; POS_KIND_ENUM.keys end
+  def self.pos_kinds; POS_KIND_ENUM.keys.map(&:to_s) end
 
   def self.friendly_find(n)
     return nil unless n.present?
