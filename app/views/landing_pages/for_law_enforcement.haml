@@ -1,4 +1,5 @@
-- landing_page_target = 'law_enforcement'
+- landing_page_target = "law_enforcement"
+
 .signup-landing-page{ class: "signup-landing-page-#{landing_page_target}" }
   %header.banner-header
     .container
@@ -6,59 +7,85 @@
         .icon-wrapper
           = render "/landing_pages/icons/header_#{landing_page_target}_svg"
         .banner-text
-          %h1 Bike Index for <br> Law Enforcement
-          %h3 Is your agency equipped to fight bike theft? Bike Index can help officers get bikes back into the right hands.
-    .ribbon
-      .container
-        %h2 Don’t let bike theft handcuff your department
+          %h1
+            Bike Index for Law Enforcement
+          %h3
+            Is your department equipped to fight bike theft? Bike Index can help
+            you get bikes back into the right hands.
+
   .container
     .row.main-body-row
       .landing-why-col
-        %h3 Why Bike Index?
-        %p
-          Bike Index is the nation’s most widely used bicycle registration and recovery service. By partnering with Bike Index, your department will have access to our database of approximately 120,000 catalogued bikes, as well as a network of over 80,000 registered riders. We have 370+ additional partners across law enforcement agencies, bike organizations, pawn shops and retail businesses, all dedicated to recovering lost or stolen bikes, at no cost to the owners.
+        %h3
+          Recover your citizen's bikes
 
         %p
-          You're the first one people call when their bike is stolen. You have the authority to bring bikes back, and it's not an easy job - we know. Let us provide you with tools to make this process smoother.
-
-        = render partial: '/landing_pages/tweet', locals: { tweet_id: 839247587521679360 }
-
-        %h3 How it works
-        %p
-          Bike Index users provide serial numbers, proof of ownership and identifying information about their bikes. When a bike is reported lost or stolen, our partners can search Bike Index to identify, locate, and track it from any computer or smartphone. Our extensive archive has helped officers recover bikes involved in criminal situations, from simple theft to chop shops, drug houses - even fencing rings and online black markets.
+          You're the first one your citizens look to when their bikes are
+          stolen. Access and search our international database to return your
+          community's bikes to their rightful owners.
 
         %p
-          Read about our over #{ number_with_delimiter Counts.recoveries } recoveries on our <a href="/news">blog</a>. For a complete list of Bike Index’s partners, visit <a href="/where">our partners page</a>, and for information on partnering with Bike Index, please contact us.
+          You have the authority to bring bikes back - that’s no small
+          responsibility. That’s why we have tools - such as our integration
+          with LeadsOnline and #{link_to "automated tweets", "https://twitter.com/stolenbikessfo"}
+          of stolen bikes - to keep your community safe. Connect with
+          #{link_to "local ambassadors", "http://bikeindex.org/ambassadors_how_to"}
+          and spotters to quickly confiscate and block sales of stolen bikes.
 
-        = render partial: '/landing_pages/tweet', locals: { tweet_id: 890211853942407168 }
+        %p
+          With over 215,000 registries and almost 5,500 stolen bicycle
+          recoveries, we know how to help.
+
+
+        %p
+          = render partial: "/landing_pages/tweet", locals: { tweet_id: 839247587521679360 }
+
+        %h3 Put a lock on bike theft
+
+        %p
+          Our extensive archive has helped officers recover bikes involved in
+          criminal situations, from simple theft to chop shops, drug houses -
+          even fencing rings and online black markets.
+
+        %p
+          With over 600 partnerships, Bike Index is the industry leader in
+          bicycle registration. Join our network for free
+          #{link_to "here", "https://bikeindex.org/organizations/new"},
+          or ask us to put you in touch with an existing partner in law
+          enforcement.
+
+        %p
+          If you want to collaborate with other departments in your city to
+          manage a registry, learn more about Bike Index for municipalities
+          #{link_to "here", for_cities_path}.
+
+        %p
+          = render partial: "/landing_pages/tweet", locals: { tweet_id: 890211853942407168 }
+
+        %h4 Related articles:
+        %ul
+          %li
+            = link_to "Bend reduces bike theft by 60 percent",
+            "https://bikeindex.org/news/bend-reduces-bike-theft-by-60-percent-with-help-from-pine-mountain-spo"
+          %li
+            = link_to "Bike Index's newest municipal partner: New Orleans",
+            "https://bikeindex.org/news/bike-indexs-newest-municipal-partner-new-orleans"
 
         .mobile-contact-link
-          %a.btn.btn-primary.btn-lg.scroll-to-ref{ href: '#contact-bike-index', data: { offset: -110 } }
-            Contact Bike Index
+          %a.btn.btn-primary.btn-lg{ href: new_organization_path }
+            Sign up for Bike Index
 
-        .trusted-by
+        .trusted-by.hidden-lg-up
           %h3
-            Trusted by Law Enforcement Everywhere
-          %ul
-            %li
-              = image_tag 'landing_pages/partners/St-Louis-PD.png', alt: 'St. Louis PD'
-            %li.partner-logo-rectangle
-              = image_tag 'landing_pages/partners/Bike-Theft-Task-Force-Portland.png', alt: 'Portland Bike Theft Task Force'
-            %li
-              = image_tag 'landing_pages/partners/Santa-Monica-PD.png', alt: 'Santa Monica PD'
-            %li
-              = image_tag 'landing_pages/partners/City-of-Bend.png', alt: 'City of Bend'
-            %li.offset-partner-logo
-              = image_tag 'landing_pages/partners/Sunnyvale.png', alt: 'Sunnyvale'
-            %li
-              = image_tag 'landing_pages/partners/University-of-Washington.png', alt: 'University of Washington'
-            %li
-              = image_tag 'landing_pages/partners/SFPD.png', alt: 'SFPD'
+            Trusted by Law Enforcement everywhere
+          = image_tag "landing_pages/logos/law-enforcement.png", alt: "law enforcement partners"
 
       .next-steps-col
         .next-steps-wrap
-          %header#contact-bike-index
-            Talk to us today
-          = render partial: '/landing_pages/next_steps_contact', locals: { landing_page_target: landing_page_target }
-
-  = render '/landing_pages/footer'
+          %header
+            Trusted by law enforcement everywhere
+            = link_to "Sign up for free", new_organization_path, class: "btn btn-primary btn-lg"
+          .trusted-by
+            .header
+              Trusted by law enforcement everywhere
+            = image_tag "landing_pages/logos/law-enforcement.png", alt: "law enforcement partners"
