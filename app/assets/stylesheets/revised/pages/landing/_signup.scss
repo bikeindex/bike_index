@@ -92,7 +92,7 @@ $landing-page-targets: "bike_shops", "school", "community_groups", "law_enforcem
   }
 }
 
-.signup-landing-page {
+.landing-page {
   @include media-breakpoint-down(lg) {
     .banner-header {
       padding-top: 100px !important;
@@ -106,7 +106,9 @@ $landing-page-targets: "bike_shops", "school", "community_groups", "law_enforcem
       padding-bottom: 100px !important;
     }
   }
+}
 
+.signup-landing-page {
   .banner-header {
     margin-top: 100px;
     background-size: auto 100%;
