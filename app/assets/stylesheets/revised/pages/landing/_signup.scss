@@ -70,9 +70,21 @@ $landing-page-targets: "shop", "school", "community_groups", "law_enforcement",
 }
 
 .signup-landing-page {
+  @include media-breakpoint-down(lg) {
+    .banner-header {
+      padding-top: 100px !important;
+      padding-bottom: 0 !important;
+    }
+  }
+
+  @include media-breakpoint-up(lg) {
+    .banner-header {
+      padding-top: 100px !important;
+      padding-bottom: 100px !important;
+    }
+  }
+
   .banner-header {
-    padding-top: 100px !important;
-    padding-bottom: 100px !important;
     margin-top: 100px;
     background-size: auto 100%;
     background-position: right center;
@@ -158,7 +170,15 @@ $landing-page-targets: "shop", "school", "community_groups", "law_enforcement",
       h3 {
         text-align: left;
       }
+    }
 
+    @include media-breakpoint-up(md) {
+      .ribbon {
+        display: none;
+      }
+    }
+
+    @include media-breakpoint-down(md) {
       .ribbon {
         display: block;
         margin-top: 7 * $vertical-height;
@@ -312,17 +332,11 @@ $landing-page-targets: "shop", "school", "community_groups", "law_enforcement",
 
 .signup-landing-page {
   .mobile-contact-link {
-    margin: (2 * $vertical-height) 0 (4 * $vertical-height);
-
     a {
       display: block;
       width: 20em;
       max-width: 100%;
       margin: 0 auto;
-    }
-
-    @include media-breakpoint-up(lg) {
-      display: none;
     }
   }
 }
