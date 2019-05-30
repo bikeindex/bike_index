@@ -32,62 +32,36 @@
             Updated
           %td.convertTime
             = l @user.updated_at, format: :convert_time
-  - if @user.ambassador?
-    .col-md-6
-      - ambassador = Ambassador.find(@user.id)
-
-      %h1= "Ambassador: #{ambassador.username}"
-
-      = ambassador.avatar
-
-      %table.table-list
-        %tr
-          %td
-            Name
-          %td
-            = ambassador.name
-        %tr
-          %td
-            Email
-          %td
-            = ambassador.email
-        %tr
-          %td
-            Phone
-          %td
-            = ambassador.phone
-        %tr
-          %td
-            Website
-          %td
-            = ambassador.website
-        %tr
-          %td
-            City
-          %td
-            = ambassador.city
-
-
-      %h2 Ambassador Tasks
-
-      %p
-        %strong= "#{ambassador.progress_count} complete"
-
-      %table.table.table-striped.table-bordered.ambassador-tasks-table
-        %thead.small-header.thead-light
-          %tr
-            %th Task
-            %th Completed at
-        %tbody
-          - ambassador.ambassador_task_assignments.each do |task|
-            %tr
-              %td
-                %strong= task.title
-                %br
-                = task.description_html.html_safe
-              %td
-                - if task.completed_at
-                  %span.convertTime= l task.completed_at, format: :convert_time
+  .col-md-6.mt-auto
+    - if @user.avatar?
+      = @user.avatar
+    %table.table-list
+      %tr
+        %td
+          Ambassador?
+        %td
+          %strong
+            = @user.ambassador?
+      %tr
+        %td
+          Name
+        %td
+          = @user.name
+      %tr
+        %td
+          Phone
+        %td
+          = @user.phone
+      %tr
+        %td
+          Website
+        %td
+          = @user.website
+      %tr
+        %td
+          City
+        %td
+          = @user.city
 
 = form_for [:admin, @user] do |f|
   - if @user.errors.any?
@@ -135,6 +109,25 @@
   .row.justify-content-end.mt-4
     .col-auto
       = f.submit 'Save', class: 'btn btn-success'
+- if @user.ambassador?
+  %h2 Ambassador Tasks
+  - ambassador = Ambassador.find(@user.id)
+  %p
+    %strong= "#{ambassador.progress_count} complete"
+
+  %table.table.table-striped.table-bordered.ambassador-tasks-table
+    %thead.small-header.thead-light
+      %tr
+        %th Task
+        %th Completed at
+    %tbody
+      - ambassador.ambassador_task_assignments.each do |task|
+        %tr
+          %td
+            %strong= task.title
+          %td
+            - if task.completed_at
+              %span.convertTime= l task.completed_at, format: :convert_time
 .mt-4
 %h3
   Bikes
@@ -161,48 +154,6 @@
           = payment.amount
         %td
           = "&#x2713;".html_safe if payment.is_payment
-- if @ownerships.present?
-  .row
-    .col-auto
-      %h3.mt-4
-        %span
-          #{@user.email}
-        ownerships(#{pluralize(@ownerships.total_count, "Ownership")})
-  .full-screen-table
-    %table.table.table-striped.table-bordered.table-sm
-      %thead.thead-light
-        %th
-          ID
-        %th
-          Created&nbsp;<small class="convertTimezone"></small>
-        %th
-          Creator
-        %th
-          Owner email
-        %th
-          Current?
-      %tbody
-        - @ownerships.each do |ownership|
-          %tr
-            %td
-              = link_to ownership.id, edit_admin_ownership_url(ownership.id)
-            %td
-              %span.convertTime
-                = l ownership.created_at, format: :convert_time
-            %td
-              - u = ownership.creator
-              - if u && u.name.present?
-                = u.name
-              - else
-                = u && u.email
-            %td
-              = ownership.owner_email
-            %td.table-cell-check
-              = "&#x2713;".html_safe if ownership.current
-  = paginate @ownerships
-- else
-  %p
-    #{@user.email} has no Bikes
 
 - if @user.memberships.count > 0
   .full-screen-table
@@ -264,6 +215,7 @@
               = "&#x2713;".html_safe if user_email.primary
             %td
               = user_email.old_user_id
+
 
 .mt-4.mb-4.row.justify-content-end
   .col-auto
