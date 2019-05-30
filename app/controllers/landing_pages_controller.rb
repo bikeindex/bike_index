@@ -9,7 +9,9 @@ class LandingPagesController < ApplicationController
 
   def for_shops; end
 
-  def for_advocacy; end
+  def for_advocacy; redirect_to(for_community_groups_path); end
+
+  def for_community_groups; end
 
   def for_law_enforcement; end
 
@@ -21,9 +23,11 @@ class LandingPagesController < ApplicationController
 
   def ambassadors_how_to; @page_title ||= "Ambassadors" end
 
-  def campus_packages; end
+  def bike_shop_packages; @page_title ||= "Features & Pricing: Bike Shops"; end
 
-  def cities_packages; end
+  def campus_packages; @page_title ||= "Features & Pricing: Schools"; end
+
+  def cities_packages; @page_title ||= "Features & Pricing: Cities"; end
 
   protected
 
