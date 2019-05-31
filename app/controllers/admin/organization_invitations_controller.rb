@@ -9,16 +9,19 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
   def new
     @organization_invitation = OrganizationInvitation.new
     @organizations = Organization.all
+    render layout: "new_admin"
   end
 
   def show
     @organizations = Organization.all
     @organization_invitations = OrganizationInvitation.where(organization_id: @organization.id)
     @organization_invitation = OrganizationInvitation.new(organization_id: @organization.id)
+    render layout: "new_admin"
   end
 
   def edit
     @organizations = Organization.all
+    render layout: "new_admin"
   end
 
   def update
@@ -26,14 +29,13 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
       flash[:success] = "Invitation Saved!"
       redirect_to admin_organization_invitations_url
     else
-      render action: :edit
+      render action: :edit, layout: "new_admin"
     end
   end
 
   def create
     @organization_invitation = OrganizationInvitation.new(permitted_parameters)
     @organization_invitation.inviter = current_user
-
     @organization = @organization_invitation.organization
     if @organization.available_invitation_count > 0
       if @organization_invitation.save
@@ -45,7 +47,7 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
       end
     else
       flash[:error] = "Oh no! This organization has no more invitations. Email contact@bikeindex.org for help"
-      redirect_to root_url
+      redirect_to admin_organization_path(@organization)
     end
   end
 
