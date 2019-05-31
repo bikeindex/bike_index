@@ -25,6 +25,8 @@ class StolenRecord < ActiveRecord::Base
   validates_presence_of :bike
   validates_presence_of :date_stolen
 
+  enum recovery_display_status: [:not_eligible, :waiting_on_decision, :displayed, :not_displayed]
+
   default_scope { where(current: true) }
   scope :approveds, -> { where(approved: true) }
   scope :approveds_with_reports, -> { approveds.where("police_report_number IS NOT NULL").where("police_report_department IS NOT NULL") }

@@ -12,8 +12,16 @@ module Bikes
     end
 
     def update
+      p "!!!!"
+      p permitted_params
       update_params = permitted_params.merge(recovering_user: current_user)
       if @stolen_record.add_recovery_information(update_params)
+        if permitted_params[:can_share_recovery == true && :index_helped_recovery == true]
+          p "HIT HIT HIT"
+          @stolen_record.waiting_on_decision!
+        else
+          @stolen_record.not_eligible!
+        end
         EmailRecoveredFromLinkWorker.perform_async(@stolen_record.id)
         flash[:success] = "Bike marked recovered! Thank you!"
         redirect_to bike_path(@bike)
