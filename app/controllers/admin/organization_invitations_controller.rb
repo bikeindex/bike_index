@@ -36,7 +36,6 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
   def create
     @organization_invitation = OrganizationInvitation.new(permitted_parameters)
     @organization_invitation.inviter = current_user
-
     @organization = @organization_invitation.organization
     if @organization.available_invitation_count > 0
       if @organization_invitation.save
@@ -48,7 +47,7 @@ class Admin::OrganizationInvitationsController < Admin::BaseController
       end
     else
       flash[:error] = "Oh no! This organization has no more invitations. Email contact@bikeindex.org for help"
-      redirect_to new_admin_organization_invitation_url(@organization_invitation.id, organization_id: @organization_invitation.organization.to_param)
+      redirect_to admin_organization_path(@organization)
     end
   end
 
