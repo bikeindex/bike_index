@@ -34,7 +34,7 @@ module ApplicationHelper
     when "welcome"
       "content_skeleton" if %w(goodbye).include?(action_name)
     when "organizations"
-      "content_skeleton" if %w(new lightspeed_integration).include?(action_name)
+      "content_skeleton" if %w(lightspeed_integration).include?(action_name)
     when "users"
       "content_skeleton" if %w(request_password_reset).include?(action_name)
     when *%w(news feedbacks manufacturers errors registrations)

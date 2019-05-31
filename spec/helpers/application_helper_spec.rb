@@ -167,12 +167,16 @@ describe ApplicationHelper do
     end
     describe "organizations controller" do
       before { allow(view).to receive(:controller_name) { "organizations" } }
-      %w(new lightspeed_integration).each do |action|
-        context action do
-          it "returns content_skeleton" do
-            allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to eq "content_skeleton"
-          end
+      context "lightspeed_integration" do
+        it "returns content_skeleton" do
+          allow(view).to receive(:action_name) { "lightspeed_integration" }
+          expect(helper.current_page_skeleton).to eq "content_skeleton"
+        end
+      end
+      context "new" do
+        it "returns no skeleton" do
+          allow(view).to receive(:action_name) { "new" }
+          expect(helper.current_page_skeleton).to be_nil
         end
       end
     end
