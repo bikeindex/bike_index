@@ -1,72 +1,8 @@
-.vendor-signup
-  %h2.padded
-    Want to sign up?
-  %article.vendor-signup-form
-    %p
-      It's free.
-    %p
-      There are no commitments.
-    %p
-      We just want to stop bike theft.
-    
-    = render "new_form"
+.container
+  %h1
+    Bike Index for organizations
+  = render partial: "/landing_pages/for_organizations_photo_list"
 
-  %hr.padded
+  .mt-4
 
-  %header.padded
-    .header-text
-      %h1
-        Are you a bike shop? 
-      %h1
-        A biking organization?
-  %article
-    %p
-      The Bike Index gives you the ability to quickly and easily register bikes for your customers or members.
-    %p
-      How it works: 
-
-    %ul.fancy-bullets
-      %li
-        %span.green-bullet
-        %p
-          Fill in basic information about a bike and the customer's email.
-      %li
-        %span.green-bullet
-        %p
-          We send them an email with the information about their bike.
-      
-    %p
-      That's it!
-    %p
-      The customer doesn't need to do anything else either. If they want to, they can sign in and upload photos or add details to their bike &mdash; but even if they don't, they have a permanent record of their bike.
-    %p
-      If their bike is ever stolen they have all the information they need to file a police report, make an insurance claim and, most importantly, they can mark their bike stolen on Bike Index &mdash; where it has the best chance of being found.
-
-  / %hr.padded
-  / %h2.padded.lightspeed-logod
-  /   %a{ href: lightspeed_integration_url }
-  /     = image_tag 'lightspeed_logo.png', class: 'lightspeed-logo'
-  /     integration
-  / %article
-  /   %p
-  /     We have an official
-  /     %strong
-  /       Lightspeed Retail Integration
-  /     that automates the entire process - #{link_to "learn how here", lightspeed_integration_url}.
-  
-  %hr.padded
-
-  %h2.padded
-    Lightspeed Integration
-  %article
-    %p
-      Are you a bike shop that uses Lightspeed? We have an integration that will register every bike you sell, automatically, for free - #{ link_to 'Lightspeed Integration information', lightspeed_integration_path }.
-
-  %h2.padded
-    Batch registration
-  %article
-    %p
-      If you have a spreadsheets of serial numbers or want to set up batch uploading in some other way, #{link_to "contact us", "mailto:seth@bikeindex.org"}.
-
-
-= render '/shared/content_footer_ad'
+  = render "new_form"

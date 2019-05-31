@@ -33,17 +33,6 @@ describe Admin::DashboardController do
       end
     end
 
-    describe "invitations" do
-      it "renders" do
-        user = FactoryBot.create(:admin)
-        set_current_user(user)
-        BParam.create(creator_id: user.id)
-        get :invitations
-        expect(response.code).to eq "200"
-        expect(response).to render_template(:invitations)
-      end
-    end
-
     describe "maintenance" do
       it "renders" do
         FactoryBot.create(:manufacturer, name: "other")
