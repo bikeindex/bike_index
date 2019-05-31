@@ -1,4 +1,4 @@
-class BikeIndex.OrganizedAmbassadorDashboardIndex extends BikeIndex
+class BikeIndex.OrganizedAmbassadorDashboardsShow extends BikeIndex
   constructor: ->
     super()
     @initializeEventListeners()
