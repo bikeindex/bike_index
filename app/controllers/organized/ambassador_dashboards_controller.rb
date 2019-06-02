@@ -13,11 +13,11 @@ module Organized
 
       if current_user.ambassador?
         current_ambassador = Ambassador.find(current_user.id).decorate
-        @suggested_activities = current_ambassador.suggested_activities
-        @completed_activities = current_ambassador.completed_activites
+        @suggested_activities = current_ambassador.suggested_activities.decorate
+        @completed_activities = current_ambassador.completed_activities.decorate
       else
-        @suggested_activities = AmbassadorTask.task_ordered
-        @completed_activities = current_ambassador.completed_activites
+        @suggested_activities = AmbassadorTask.task_ordered.decorate
+        @completed_activities = []
       end
     end
 

@@ -9,7 +9,7 @@ class AmbassadorDecorator < ApplicationDecorator
       .task_ordered
   end
 
-  def completed_activites
+  def completed_activities
     ambassador_task_assignments.locked_completed
   end
 
