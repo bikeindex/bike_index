@@ -5,17 +5,15 @@ module Organized
 
     def update
       ambassador_task_assignment = AmbassadorTaskAssignment.find(params[:id])
-      completed_at = params[:completed] ? Time.current : nil
+      completed_at = params[:completed] == "true" ? Time.current : nil
 
       if ambassador_task_assignment.update(completed_at: completed_at)
-        render json: ambassador_task_assignment
+        flash[:info] = "Activity status updated."
       else
-        render json: {
-                 ambassador_task_assignment: ambassador_task_assignment,
-                 errors: ambassador_task_assignment.errors.full_messages,
-               },
-               status: :unprocessable_entity
+        flash[:error] = "Could not update activity status. Please try again later."
       end
+
+      redirect_to organization_ambassador_dashboard_url(current_organization)
     end
   end
 end
