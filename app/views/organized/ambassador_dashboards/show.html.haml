@@ -1,25 +1,35 @@
 %h2.header-font-uncap
   Welcome to your Ambassador homepage
+
 %p
-  This page contains the resources you need to become a great bike advocate in your community. Here you will find documents, tips, articles, and recommendations for helping cyclists where you live and connecting with Ambassadors around the world doing the same in their communities.
+  This page contains the resources you need to become a great bike advocate in
+  your community. Here you will find documents, tips, articles, and
+  recommendations for helping cyclists where you live and connecting with
+  Ambassadors around the world doing the same in their communities.
+
 %p
-  Being a Bike Index Ambassador means helping people, where you live, to register and protect their bikes in case of theft. Share Bike Index with bike shops, advocacy groups, universities, and law enforcement to aid larger numbers and more kinds of cyclists in your area.
+  Being a Bike Index Ambassador means helping people, where you live, to
+  register and protect their bikes in case of theft. Share Bike Index with bike
+  shops, advocacy groups, universities, and law enforcement to aid larger
+  numbers and more kinds of cyclists in your area.
+
 %p
-  On this page, we’ve listed effective activities for registering cyclists in Bike Index. You can track progress and get ideas from other Ambassadors in your area about successful strategies. If you have any questions, post them in our Slack channel or email #{link_to "lily@bikeindex.org", "mailto:lily@bikeindex.org"}.
+  On this page, we've listed effective activities for registering cyclists in
+  Bike Index. You can track progress and get ideas from other Ambassadors in
+  your area about successful strategies. If you have any questions, post them in
+  our Slack channel or email
+  #{link_to "lily@bikeindex.org", "mailto:lily@bikeindex.org"}.
 
 %h2{ style: "margin-top: 40px;" }
   Suggested Activities
+
 %table.table.table-striped.table-bordered.ambassador-tasks-table{ style: "margin-top: 40px;" }
   %thead.small-header
     %tr
       %th Activity
       %th Completed?
-  %tbody#js-task-assignments
-    - if current_user.ambassador?
-      - ambassador_task_assignments = @ambassador_task_assignments.pending_completion
-    - else
-      - ambassador_task_assignments = AmbassadorTask.task_ordered
-    - ambassador_task_assignments.each do |task|
+  %tbody
+    - @suggested_activities.each do |task|
       %tr
         %td
           %strong= task.title
@@ -33,16 +43,17 @@
                     checked: (task.completed? ? "checked" : nil) }
 
 
-- if current_user.ambassador? && @ambassador_task_assignments.locked_completed.any?
+- if @completed_activities.present?
   %h2{ style: "margin-top: 40px;" }
     Completed activities
+
   %table.table.table-striped.table-bordered.ambassador-tasks-table
     %thead.small-header
       %tr
         %th Activity
         %th Completed
-    %tbody#js-task-assignments
-      - @ambassador_task_assignments.locked_completed.each do |task|
+    %tbody
+      - @completed_activities.each do |task|
         %tr
           %td
             %strong= task.title

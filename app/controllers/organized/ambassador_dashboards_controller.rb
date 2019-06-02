@@ -11,10 +11,21 @@ module Organized
           .includes(:ambassador_task_assignments)
           .sort_by { |ambassador| -ambassador.percent_complete }
 
-      @ambassador_task_assignments =
-        current_user
-          .ambassador_task_assignments
-          .task_ordered
+      if current_user.ambassador?
+        @suggested_activities =
+          current_user
+            .ambassador_task_assignments
+            .pending_completion
+            .task_ordered
+
+        @completed_activities =
+          current_user
+            .ambassador_task_assignments
+            .locked_completed
+            .task_ordered
+      else
+        @suggested_activities = AmbassadorTask.task_ordered
+      end
     end
 
     def resources; end
