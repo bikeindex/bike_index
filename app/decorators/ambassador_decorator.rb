@@ -5,7 +5,16 @@ class AmbassadorDecorator < ApplicationDecorator
   def ambassador_task_assignments
     ambassador
       .ambassador_task_assignments
-      .order(created_at: :asc)
+      .includes(:ambassador_task)
+      .task_ordered
+  end
+
+  def completed_activites
+    ambassador_task_assignments.locked_completed
+  end
+
+  def suggested_activities
+    ambassador_task_assignments.pending_completion
   end
 
   def avatar

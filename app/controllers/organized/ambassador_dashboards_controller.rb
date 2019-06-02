@@ -12,19 +12,12 @@ module Organized
           .sort_by { |ambassador| -ambassador.percent_complete }
 
       if current_user.ambassador?
-        @suggested_activities =
-          current_user
-            .ambassador_task_assignments
-            .pending_completion
-            .task_ordered
-
-        @completed_activities =
-          current_user
-            .ambassador_task_assignments
-            .locked_completed
-            .task_ordered
+        current_ambassador = Ambassador.find(current_user.id).decorate
+        @suggested_activities = current_ambassador.suggested_activities
+        @completed_activities = current_ambassador.completed_activites
       else
         @suggested_activities = AmbassadorTask.task_ordered
+        @completed_activities = current_ambassador.completed_activites
       end
     end
 
