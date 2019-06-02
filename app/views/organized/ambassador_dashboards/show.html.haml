@@ -20,33 +20,33 @@
   our Slack channel or email
   #{link_to "lily@bikeindex.org", "mailto:lily@bikeindex.org"}.
 
-%h2{ style: "margin-top: 40px;" }
-  Suggested Activities
-
-%table.table.table-striped.table-bordered.ambassador-tasks-table{ style: "margin-top: 40px;" }
-  %thead.small-header
-    %tr
-      %th Activity
-      %th Completed?
-  %tbody
-    - @suggested_activities.each do |task|
+- if @suggested_activities.present?
+  %h2{ style: "margin-top: 40px;" }
+    Suggested Activities
+  %table.table.table-striped.table-bordered.ambassador-tasks-table{ style: "margin-top: 40px;" }
+    %thead.small-header
       %tr
-        %td
-          %strong= task.title
-          %br
-          = task.description_html.html_safe
-        %td
+        %th Activity
+        - if current_user.ambassador?
+          %th Actions
+    %tbody
+      - @suggested_activities.each do |task|
+        %tr
+          %td
+            %strong= task.title
+            %br
+            = task.description_html.html_safe
           - if current_user.ambassador?
-            %input{ "data-update-url"=> organization_ambassador_task_assignment_url(current_organization, task, format: :json),
-                    "data-ambassador-task-assignment-id" => task.id,
-                    type: "checkbox",
-                    checked: (task.completed? ? "checked" : nil) }
-
+            %td
+              - label = task.completed? ? "Pending" : "Complete"
+              = button_to "Mark #{label}",
+              organization_ambassador_task_assignment_url(current_organization, task),
+              method: :put,
+              params: {completed: !task.completed?}
 
 - if @completed_activities.present?
   %h2{ style: "margin-top: 40px;" }
     Completed activities
-
   %table.table.table-striped.table-bordered.ambassador-tasks-table
     %thead.small-header
       %tr
