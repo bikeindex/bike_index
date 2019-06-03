@@ -1,11 +1,11 @@
 
 %li.admin-bike-partial
   .row
-    .col-lg-1.col-md-2.col-3.mt-auto.mb-2
+    .col-lg-1.col-md-2.col-3.mt-auto.mb-2.admin-image-thumb
       - if bike.thumb_path.present?
-        %img{:alt => bike.title, src: bike.thumb_path}
+        %img{alt: bike.title, src: bike.thumb_path}
       - else
-        %h3.text-center
+        %h3
           No Image
     .col-lg-5.col-md-4.col-9.mt-auto.mb-2
       %p.strong.mb-0

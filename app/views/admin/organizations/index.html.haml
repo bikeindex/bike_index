@@ -1,12 +1,22 @@
 .admin-subnav
-  .col-md-9
+  .col-md-4
     %h1
-      Manage Organization
-  .col-md-3
+      Organizations
+  .col-md-8
     %ul
-      - if params[:search_kind].present?
-        %li.nav-item
-          = link_to params[:search_kind].humanize, admin_organizations_path(sortable_search_params.except(:search_kind)), class: "nav-link active"
+      %li.nav-item
+        - active_kind = params[:search_kind]
+        %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (active_kind.present? ? "active" : "") }
+          - if active_kind.present?
+            = active_kind.humanize
+          - else
+            Kind
+        .dropdown-menu
+          - Organization.kinds.each do |kind|
+            - kind
+            - kind_active = active_kind == kind
+            = link_to kind.humanize, admin_organizations_path(sortable_search_params.merge(search_kind: kind_active ? nil : kind)), class: "dropdown-item #{kind_active ? 'active' : ''}"
+
       %li.nav-item
         - active_pos_kind = params[:search_pos]
         %a.nav-link.dropdown-toggle{ href: "#", role: "button", "data-toggle" => "dropdown", "aria-haspopup" => "true", "aria-expanded" => "false", class: (active_pos_kind.present? ? "active" : "") }
@@ -23,6 +33,8 @@
       %li.nav-item
         - paid_search_params = sortable_search_params.merge(search_paid: !@search_paid)
         = link_to "Paid", admin_organizations_path(paid_search_params), class: @search_paid ? "nav-link active" : "nav-link"
+      %li.nav-item
+        = link_to "Deleted", admin_show_deleted_organizations_url, class: "nav-link"
       %li.nav-item
         = link_to 'New Organization', new_admin_organization_url, class: "nav-link"
 .row.mb-4
@@ -53,6 +65,3 @@
 
 = paginate @organizations, views_prefix: "admin"
 
-
-%hr
-  = link_to "View deleted organizations", admin_show_deleted_organizations_url, class: "btn btn-danger"
