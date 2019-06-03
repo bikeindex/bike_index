@@ -14,18 +14,6 @@ describe Admin::AmbassadorTasksController, type: :controller do
       end
     end
 
-    describe "#show" do
-      it "renders the show template with the found ambassador task" do
-        ambassador_task = FactoryBot.create(:ambassador_task)
-
-        get :show, id: ambassador_task.id
-
-        expect(response.status).to eq(200)
-        expect(response).to render_template(:show)
-        expect(flash).to_not be_present
-      end
-    end
-
     describe "#new" do
       it "renders the new template" do
         get :new
@@ -89,7 +77,6 @@ describe Admin::AmbassadorTasksController, type: :controller do
   context "given an authenticated non-superadmin" do
     include_context :logged_in_as_user
     it { expect(get(:index)).to redirect_to(user_home_url) }
-    it { expect(get(:show, id: 1)).to redirect_to(user_home_url) }
     it { expect(get(:new)).to redirect_to(user_home_url) }
     it { expect(get(:edit, id: 1)).to redirect_to(user_home_url) }
     it { expect(post(:create)).to redirect_to(user_home_url) }
