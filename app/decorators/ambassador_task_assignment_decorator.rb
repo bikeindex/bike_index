@@ -13,6 +13,7 @@ class AmbassadorTaskAssignmentDecorator < ApplicationDecorator
       h.organization_ambassador_task_assignment_url(current_organization, ambassador_task_assignment),
       method: :put,
       params: { completed: !is_complete },
+      class: "btn btn-primary",
     )
   end
 end
