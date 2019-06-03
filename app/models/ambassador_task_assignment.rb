@@ -24,10 +24,6 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
     ambassador.current_ambassador_organization&.name
   end
 
-  def status
-    completed? ? "Completed" : "In progress"
-  end
-
   def completed?
     completed_at.present?
   end
