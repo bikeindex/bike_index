@@ -1,5 +1,5 @@
 class Tweet < ActiveRecord::Base
-  validates_presence_of :twitter_id
+  validates :twitter_id, presence: true, uniqueness: true
   has_many :public_images, as: :imageable, dependent: :destroy
   mount_uploader :image, ImageUploader
   before_save :set_body_from_response
