@@ -32,8 +32,8 @@ describe Ambassador, type: :model do
     context "given two completed of three tasks" do
       it "returns 2/3 as a Float rounded to 2" do
         ambassador = FactoryBot.create(:ambassador)
-        FactoryBot.create_list(:ambassador_task_assignment, 2, :completed, user: ambassador)
-        FactoryBot.create(:ambassador_task_assignment, user: ambassador)
+        FactoryBot.create_list(:ambassador_task_assignment, 2, :completed, ambassador: ambassador)
+        FactoryBot.create(:ambassador_task_assignment, ambassador: ambassador)
         expect(ambassador.percent_complete).to eq(0.67)
       end
     end
@@ -41,7 +41,7 @@ describe Ambassador, type: :model do
     context "given three completed of three tasks" do
       it "returns 1" do
         ambassador = FactoryBot.create(:ambassador)
-        FactoryBot.create_list(:ambassador_task_assignment, 2, :completed, user: ambassador)
+        FactoryBot.create_list(:ambassador_task_assignment, 2, :completed, ambassador: ambassador)
         expect(ambassador.percent_complete).to eq(1)
       end
     end
