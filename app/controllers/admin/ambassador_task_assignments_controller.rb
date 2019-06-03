@@ -5,7 +5,7 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
   def index
     @ambassador_task_assignments =
       Kaminari
-        .paginate_array(sorted_assignments.decorate)
+        .paginate_array(sorted_assignments)
         .page(params.fetch(:page, 1))
         .per(params.fetch(:per_page, 25))
   end
@@ -27,7 +27,7 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
 
     case sort_criterion
     when :completed_at
-      assignments.reorder(completed_at: direction)
+      assignments.reorder(completed_at: direction).decorate
     when :organization_name
       assignments
         .to_a
@@ -36,9 +36,9 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
     when :task_title
       assignments.reorder("ambassador_tasks.title #{direction}")
     when :ambassador_name
-      assignments.reorder("users.name #{direction}")
+      assignments.reorder("users.name #{direction}").decorate
     else
-      assignments.task_ordered
+      assignments.task_ordered.decorate
     end
   end
 end
