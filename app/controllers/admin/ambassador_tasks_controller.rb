@@ -1,13 +1,11 @@
 class Admin::AmbassadorTasksController < Admin::BaseController
   layout "new_admin"
 
-  before_action :find_ambassador_task, only: %w[show edit update]
+  before_action :find_ambassador_task, only: %w[edit update]
 
   def index
     @ambassador_tasks = AmbassadorTask.all.order(created_at: :asc)
   end
-
-  def show; end
 
   def new
     @ambassador_task = AmbassadorTask.new
