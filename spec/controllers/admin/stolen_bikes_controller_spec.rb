@@ -8,7 +8,10 @@ describe Admin::StolenBikesController do
 
   describe "index" do
     it "renders" do
+      bike = FactoryBot.create(:stolen_bike)
+
       get :index
+
       expect(response.code).to eq("200")
       expect(response).to render_template("index")
       expect(flash).to_not be_present
