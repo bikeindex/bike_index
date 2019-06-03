@@ -19,54 +19,54 @@
           %td
             %spand.less-strong
               = @organization.id
-        %tr
-          %td
-            Map
-          %td
-            - unless @organization.approved
-              %strong
-                Not approved
-              %small
-                therefor hidden
-              %em
-                Would be
-            - if @organization.show_on_map
-              Shown on map
-            - else
-              %strong
-                Not Shown
-        %tr
-          %td
-            Kind
-          %td
-            = @organization.kind.humanize
-        %tr
-          %td
-            Slug
-          %td
-            = @organization.slug
-            ,
-            = link_to "embed", embed_registrations_url(organization_id: @organization.to_param)
-            ,
-            = link_to "org's manage", organization_manage_index_path(organization_id: @organization.to_param)
-        %tr
-          %td
-            Auto user email
-          %td
-            = @organization.auto_user.email if @organization.auto_user.present?
-        %tr
-          %td
-            Created
-          %td
-            %span.convertTime.preciseTime
-              = l @organization.created_at, format: :convert_time
-            %small.convertTimezone
-        %tr
-          %td
-            Updated
-          %td
-            %span.convertTime.preciseTime
-              = l @organization.updated_at, format: :convert_time
+      %tr
+        %td
+          Map
+        %td
+          - unless @organization.approved
+            %strong
+              Not approved
+            %small
+              therefor hidden
+            %em
+              Would be
+          - if @organization.show_on_map
+            Shown on map
+          - else
+            %strong
+              Not Shown
+      %tr
+        %td
+          Kind
+        %td
+          = @organization.kind.humanize
+      %tr
+        %td
+          Slug
+        %td
+          = @organization.slug
+          ,
+          = link_to "embed", embed_registrations_url(organization_id: @organization.to_param)
+          ,
+          = link_to "org's manage", organization_manage_index_path(organization_id: @organization.to_param)
+      %tr
+        %td
+          Auto user email
+        %td
+          = @organization.auto_user.email if @organization.auto_user.present?
+      %tr
+        %td
+          Created
+        %td
+          %span.convertTime.preciseTime
+            = l @organization.created_at, format: :convert_time
+          %small.convertTimezone
+      %tr
+        %td
+          Updated
+        %td
+          %span.convertTime.preciseTime
+            = l @organization.updated_at, format: :convert_time
 
   .col-md-6
     %table.table-list
