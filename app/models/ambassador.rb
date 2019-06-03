@@ -39,4 +39,8 @@ class Ambassador < User
   def ambassador_organizations
     organizations.ambassador
   end
+
+  def current_ambassador_organization
+    ambassador_organizations.order(created_at: :desc).last
+  end
 end
