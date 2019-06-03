@@ -7,14 +7,16 @@ describe Admin::StolenBikesController do
   end
 
   describe "index" do
-    it "renders" do
-      bike = FactoryBot.create(:stolen_bike)
+    it "renders the index template with stolen bikes" do
+      _bike = FactoryBot.create(:bike)
+      stolen_bike = FactoryBot.create(:stolen_bike)
 
       get :index
 
       expect(response.code).to eq("200")
       expect(response).to render_template("index")
       expect(flash).to_not be_present
+      expect(assigns(:bikes)).to match_array([stolen_bike])
     end
   end
 
