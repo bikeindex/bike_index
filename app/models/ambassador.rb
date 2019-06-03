@@ -41,6 +41,6 @@ class Ambassador < User
   end
 
   def current_ambassador_organization
-    ambassador_organizations.order(created_at: :desc).last
+    ambassador_organizations.order(id: :desc).last
   end
 end

@@ -1,0 +1,30 @@
+.admin-subnav
+  .col-md-5
+    %h1 Completed Ambassador Task Assignments
+
+.row
+  .col-md-6
+    %p= pluralize |
+        number_with_delimiter(@ambassador_task_assignments.total_count), |
+        "completed assignment"
+
+
+= paginate @ambassador_task_assignments, views_prefix: "admin"
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
+      %th= sortable "completed_at"
+      %th= sortable "organization_name"
+      %th= sortable "task_title"
+      %th= sortable "ambassador_name"
+    %tbody
+      - @ambassador_task_assignments.each do |assignment|
+        %tr
+          %td.convertTime= l(assignment.completed_at, format: :convert_time)
+          %td= assignment.organization_name
+          %td= assignment.title
+          %td= assignment.ambassador_name
+
+
+= paginate @ambassador_task_assignments, views_prefix: "admin"
