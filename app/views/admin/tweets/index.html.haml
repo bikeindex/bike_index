@@ -23,7 +23,7 @@
       - @tweets.each do |tweet|
         %tr
           %td
-            %a.convertTime{ href: admin_tweet_path(tweet.twitter_id) }
+            %a.convertTime{ href: admin_tweet_path(tweet.id) }
               = l tweet.created_at, format: :convert_time
           %td
             %small.less-strong

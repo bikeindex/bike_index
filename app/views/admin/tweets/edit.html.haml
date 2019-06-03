@@ -57,7 +57,13 @@
             = f.label :alignment, "Bottom-right", {:for => "tweet_alignment_bottom-right", class: "form-check-label pl-0"}
   .row.justify-content-end
     .col-auto
-      = f.submit 'Save', class: 'btn btn-success float-right'
+      = f.submit "Save", class: "btn btn-success"
+      = link_to "Delete",
+      { controller: "admin/tweets", id: @tweet.id, action: :destroy},
+      confirm: "Are you sure you want to delete this tweet?",
+      method: :delete,
+      class: "btn btn-danger"
+
 %h3
   Landing page rendering:
 .mt-4
