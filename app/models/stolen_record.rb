@@ -43,10 +43,14 @@ class StolenRecord < ActiveRecord::Base
     unscoped.where(bike_id: bike_id, recovery_link_token: recovery_link_token).first
   end
 
+  def self.recovering_user_recording_start; Time.at(1558821440) end # Rough time that PR#790 was merged
+
   def recovered?; !current? end
 
   # TODO: check based on the ownership of the bike at the time of recovery
   def recovering_user_owner?; recovering_user.present? && bike.owner == recovering_user end
+
+  def pre_recovering_user?; date_recovered.present? && date_recovered < self.class.recovering_user_recording_start end
 
   def address_override_show_address; address(override_show_address: true) end
 

@@ -251,7 +251,9 @@ describe StolenRecord do
       let(:user_id) { ownership.user_id }
       it "updates recovered bike and assigns recovering_user" do
         expect(stolen_record.recovering_user).to eq ownership.user
+        expect(stolen_record.date_recovered).to be_within(1.second).of Time.now
         expect(stolen_record.recovering_user_owner?).to be_truthy
+        expect(stolen_record.pre_recovering_user?).to be_falsey
       end
     end
     context "date_recovered" do
@@ -262,6 +264,7 @@ describe StolenRecord do
       it "updates recovered bike and assigns date" do
         expect(stolen_record.date_recovered.to_i).to be_within(1).of target_timestamp
         expect(stolen_record.recovering_user_owner?).to be_falsey
+        expect(stolen_record.pre_recovering_user?).to be_truthy
       end
     end
   end
