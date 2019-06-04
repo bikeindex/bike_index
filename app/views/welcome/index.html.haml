@@ -27,7 +27,13 @@
         .row
           .col-md-2.root-landing-how-icon
             = render '/landing_pages/icons/how_icon_register_svg'
-            = image_tag 'landing_pages/dashed_line.svg', class: 'root-icon-connector'
+            =# image_tag 'landing_pages/dashed_line.svg', class: 'root-icon-connector'
+            -# Error: argument `$color` of `darken($color, $amount)` must be a color
+            -#         on line 174 of ../../.asdf/installs/ruby/2.5.1/lib/ruby/gems/2.5.0/gems/bootstrap-4.3.1/assets/stylesheets/bootstrap/_variables.scss, in function `darken`
+            -#         from line 174 of ../../.asdf/installs/ruby/2.5.1/lib/ruby/gems/2.5.0/gems/bootstrap-4.3.1/assets/stylesheets/bootstrap/_variables.scss
+            -#         from line 16 of app/assets/stylesheets/revised.scss
+            -# >> $link-hover-color:                        darken($link-color, 15%) !default;
+            -#    ------------------------------------------^
           .col-md-7.root-landing-explanation
             .root-landing-explanation-wrap
               %h4 Register Your Bike

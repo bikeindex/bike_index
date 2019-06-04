@@ -33,7 +33,7 @@ $border-radius-sm: 1px;
 @import "bootstrap/mixins";
 
 // Reset and dependencies
-@import "bootstrap/normalize";
+// @import "bootstrap/normalize"; // Error: File to import not found or unreadable: bootstrap/normalize.
 @import "bootstrap/print";
 
 // Core CSS
@@ -76,7 +76,7 @@ $border-radius-sm: 1px;
 // @import "bootstrap/buttons"; // Override buttons with our own buttons
 
 // Components
-@import "bootstrap/animation";
+// @import "bootstrap/animation";  // Error: File to import not found or unreadable: bootstrap/animation.
 @import "bootstrap/dropdown";
 @import "bootstrap/button-group";
 @import "bootstrap/input-group";
@@ -94,7 +94,7 @@ $border-radius-sm: 1px;
 @import "bootstrap/progress";
 @import "bootstrap/media";
 @import "bootstrap/list-group";
-@import "bootstrap/responsive-embed";
+// @import "bootstrap/responsive-embed";  // Error: File to import not found or unreadable: bootstrap/responsive-embed.
 @import "bootstrap/close";
 
 // Components w/ JavaScript
