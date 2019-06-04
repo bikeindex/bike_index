@@ -3,6 +3,8 @@ module Organized
     before_filter :ensure_ambassador_or_superuser!
     skip_before_filter :ensure_not_ambassador_organization!
 
+    decorates_assigned :ambassadors, :completed_activities, :suggested_activities
+
     def show
       @ambassadors =
         Ambassador
@@ -13,10 +15,10 @@ module Organized
 
       if current_user.ambassador?
         current_ambassador = Ambassador.find(current_user.id).decorate
-        @suggested_activities = current_ambassador.suggested_activities.decorate
-        @completed_activities = current_ambassador.completed_activities.decorate
+        @suggested_activities = current_ambassador.activities_pending
+        @completed_activities = current_ambassador.activities_completed
       else
-        @suggested_activities = AmbassadorTask.task_ordered.decorate
+        @suggested_activities = AmbassadorTask.task_ordered
         @completed_activities = []
       end
     end
