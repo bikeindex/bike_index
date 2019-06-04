@@ -27,7 +27,7 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
 
     case sort_criterion
     when :completed_at
-      assignments.reorder(completed_at: direction).decorate
+      assignments.reorder(completed_at: direction)
     when :organization_name
       assignments
         .to_a
@@ -36,9 +36,9 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
     when :task_title
       assignments.reorder("ambassador_tasks.title #{direction}")
     when :ambassador_name
-      assignments.reorder("users.name #{direction}").decorate
+      assignments.reorder("users.name #{direction}")
     else
-      assignments.task_ordered.decorate
+      assignments.task_ordered
     end
   end
 end

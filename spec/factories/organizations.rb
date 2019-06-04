@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :organization do
-    sequence(:name) { |n| "Organization #{n}" }
+    sequence(:name) { |n| "Organization #{n.to_s.rjust(3, "0")}" }
     short_name { name }
     available_invitation_count { 5 }
     show_on_map { false }
@@ -21,7 +21,7 @@ FactoryBot.define do
 
     factory :organization_ambassador do
       kind { "ambassador" }
-      sequence(:name) { |n| "Ambassador Group #{n}" }
+      sequence(:name) { |n| "Ambassador Group #{n.to_s.rjust(3, "0")}" }
     end
 
     trait :with_locations do

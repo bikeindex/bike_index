@@ -19,40 +19,43 @@ RSpec.describe Admin::AmbassadorTaskAssignmentsController, type: :request do
 
       context "sorting by completion time" do
         it "sorts in ascending order of completion by default" do
-          a1 = FactoryBot.create(:ambassador_task_assignment, :completed)
-          a2 = FactoryBot.create(:ambassador_task_assignment, :completed)
-          a3 = FactoryBot.create(:ambassador_task_assignment, :completed)
+          ordered_assignments =
+            FactoryBot
+              .create_list(:ambassador_task_assignment, 3, :completed)
+              .map(&:id)
 
           get admin_ambassador_task_assignments_path
 
           assignments = assigns(:ambassador_task_assignments).map(&:id)
-          expect(assignments).to eq([a1, a2, a3].map(&:id))
+          expect(assignments).to eq(ordered_assignments)
         end
 
         it "sorts in descending order of completion if passed :asc" do
-          a1 = FactoryBot.create(:ambassador_task_assignment, :completed)
-          a2 = FactoryBot.create(:ambassador_task_assignment, :completed)
-          a3 = FactoryBot.create(:ambassador_task_assignment, :completed)
+          ordered_assignments =
+            FactoryBot
+              .create_list(:ambassador_task_assignment, 3, :completed)
+              .map(&:id)
 
           get admin_ambassador_task_assignments_path,
               sort: :completed_at,
               direction: :asc
 
           assignments = assigns(:ambassador_task_assignments).map(&:id)
-          expect(assignments).to eq([a1, a2, a3].map(&:id))
+          expect(assignments).to eq(ordered_assignments)
         end
 
         it "sorts in descending order of completion if passed :desc" do
-          a1 = FactoryBot.create(:ambassador_task_assignment, :completed)
-          a2 = FactoryBot.create(:ambassador_task_assignment, :completed)
-          a3 = FactoryBot.create(:ambassador_task_assignment, :completed)
+          ordered_assignments =
+            FactoryBot
+              .create_list(:ambassador_task_assignment, 3, :completed)
+              .map(&:id)
 
           get admin_ambassador_task_assignments_path,
               sort: :completed_at,
               direction: :desc
 
           assignments = assigns(:ambassador_task_assignments).map(&:id)
-          expect(assignments).to eq([a3, a2, a1].map(&:id))
+          expect(assignments).to eq(ordered_assignments.reverse)
         end
       end
 

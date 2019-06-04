@@ -24,14 +24,14 @@ describe Ambassador, type: :model do
   describe "#current_ambassador_organization" do
     it "returns the most recently associated ambassador organization" do
       ambassador = FactoryBot.create(:ambassador)
-      FactoryBot.create_list(:membership_ambassador, 2, user: ambassador)
-      membership = FactoryBot.create(:membership_ambassador, user: ambassador)
+      FactoryBot.create(:membership_ambassador, user: ambassador)
+      new_ambassadorship = FactoryBot.create(:membership_ambassador, user: ambassador)
       FactoryBot.create(:membership, user: ambassador)
 
       current_org = ambassador.current_ambassador_organization
 
-      expect(current_org).to eq(membership.organization)
-      expect(ambassador.organizations.count).to eq(5)
+      expect(current_org).to eq(new_ambassadorship.organization)
+      expect(ambassador.organizations.count).to eq(4)
     end
   end
 
