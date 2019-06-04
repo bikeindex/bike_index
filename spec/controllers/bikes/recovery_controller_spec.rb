@@ -7,7 +7,7 @@ describe Bikes::RecoveryController, type: :controller do
 
   describe "edit" do
     context "nonmatching recovery token" do
-      it "renders" do
+      it "redirects" do
         get :edit, bike_id: bike.id, token: "XXXXXXXX"
         expect(response).to redirect_to bike_url(bike)
         expect(flash[:error]).to be_present
@@ -61,6 +61,29 @@ describe Bikes::RecoveryController, type: :controller do
         expect(stolen_record.can_share_recovery).to be_truthy
         expect(stolen_record.recovered_description).to eq recovery_info[:recovered_description]
         expect(stolen_record.reload.date_recovered.to_i).to be_within(1).of 1532822233
+        expect(stolen_record.recovering_user).to be_nil
+      end
+      context "with user present" do
+        include_context :logged_in_as_user
+        it "updates and assigns recovering_user" do
+          expect do
+            put :update, bike_id: bike.id, token: recovery_link_token,
+                         stolen_record: recovery_info
+          end.to change(EmailRecoveredFromLinkWorker.jobs, :size).by(1)
+          stolen_record.reload
+          bike.reload
+
+          expect(bike.stolen).to be_falsey
+          expect(stolen_record.recovered?).to be_truthy
+          expect(stolen_record.current).to be_falsey
+          expect(bike.current_stolen_record).not_to be_present
+          expect(stolen_record.index_helped_recovery).to be_falsey
+          expect(stolen_record.can_share_recovery).to be_truthy
+          expect(stolen_record.recovered_description).to eq recovery_info[:recovered_description]
+          expect(stolen_record.reload.date_recovered.to_i).to be_within(1).of 1532822233
+          expect(stolen_record.recovering_user).to be_present
+          expect(stolen_record.recovering_user).to eq user
+        end
       end
     end
     context "non-matching recovery token" do
