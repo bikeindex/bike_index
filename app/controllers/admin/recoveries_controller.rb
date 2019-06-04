@@ -8,7 +8,7 @@ class Admin::RecoveriesController < Admin::BaseController
     elsif params[:all_recoveries]
       recoveries = StolenRecord.recovered.includes(:bike).order("date_recovered desc")
     else
-      recoveries = StolenRecord.displayable.includes(:bike).order("date_recovered desc").where(recovery_display_status: :waiting_on_decision)
+      recoveries = StolenRecord.displayable.includes(:bike).order("date_recovered desc").where(recovery_display_status: "waiting_on_decision")
     end
     page = params[:page] || 1
     per_page = params[:per_page] || 50
@@ -26,7 +26,10 @@ class Admin::RecoveriesController < Admin::BaseController
 
   def update
     @stolen_record = StolenRecord.unscoped.find(params[:id])
-    if @stolen_record.update_attributes(permitted_parameters)
+    if params[:undisplayable]
+      @stolen_record.update_attributs(recovery_display_status: 4)
+      redirect_to admin_recoveries_url
+    elsif @stolen_record.update_attributes(permitted_parameters)
       flash[:success] = "Recovery Saved!"
       redirect_to admin_recoveries_url
     else
@@ -63,6 +66,6 @@ class Admin::RecoveriesController < Admin::BaseController
   private
 
   def permitted_parameters
-    params.require(:stolen_record).permit(StolenRecord.old_attr_accessible)
+    params.require(:stolen_record).permit(StolenRecord.old_attr_accessible, :undisplayable)
   end
 end

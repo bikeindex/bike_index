@@ -25,7 +25,7 @@ class StolenRecord < ActiveRecord::Base
   validates_presence_of :bike
   validates_presence_of :date_stolen
 
-  enum recovery_display_status: [:not_eligible, :waiting_on_decision, :displayed, :not_displayed]
+  enum recovery_display_status: [:waiting_on_decision, :displayable_no_photo, :not_elibible, :displayed, :not_displayed]
 
   default_scope { where(current: true) }
   scope :approveds, -> { where(approved: true) }
@@ -163,6 +163,19 @@ class StolenRecord < ActiveRecord::Base
     row
   end
 
+  def recovery_display_check(info = {})
+    if info[:can_share_recovery] == true
+      if self.bike.image.thumb_path.present?
+        display_status = 0
+      else
+        display_status = 1
+      end
+    else
+      display_status = 2
+    end
+    return display_status
+  end
+
   def add_recovery_information(info = {})
     info = ActiveSupport::HashWithIndifferentAccess.new(info)
     self.date_recovered = TimeParser.parse(info[:date_recovered], info[:timezone]) || Time.now
@@ -170,7 +183,8 @@ class StolenRecord < ActiveRecord::Base
                       recovered_description: info[:recovered_description],
                       recovering_user: info[:recovering_user],
                       index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
-                      can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?)
+                      can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?,
+                      recovery_display_status: recovery_display_check(info))
     bike.stolen = false
     bike.save
   end
