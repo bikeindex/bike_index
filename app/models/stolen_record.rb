@@ -45,6 +45,9 @@ class StolenRecord < ActiveRecord::Base
 
   def recovered?; !current? end
 
+  # TODO: check based on the ownership of the bike at the time of recovery
+  def recovering_user_owner?; recovering_user.present? && bike.owner == recovering_user end
+
   def address_override_show_address; address(override_show_address: true) end
 
   def address(skip_default_country: false, override_show_address: false)
@@ -166,7 +169,7 @@ class StolenRecord < ActiveRecord::Base
     self.date_recovered = TimeParser.parse(info[:date_recovered], info[:timezone]) || Time.now
     update_attributes(current: false,
                       recovered_description: info[:recovered_description],
-                      recovering_user: info[:recovering_user],
+                      recovering_user_id: info[:recovering_user_id],
                       index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
                       can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?)
     bike.stolen = false

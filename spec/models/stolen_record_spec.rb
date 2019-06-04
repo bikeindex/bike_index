@@ -210,6 +210,7 @@ describe StolenRecord do
   describe "add_recovery_information" do
     let(:bike) { FactoryBot.create(:stolen_bike) }
     let(:stolen_record) { bike.current_stolen_record }
+    let(:user_id) { nil }
     let(:recovery_info) do
       {
         request_type: "bike_recovery",
@@ -218,6 +219,7 @@ describe StolenRecord do
         recovered_description: "Some reason",
         index_helped_recovery: "true",
         can_share_recovery: "false",
+        recovering_user_id: user_id,
       }
     end
     before do
@@ -232,19 +234,34 @@ describe StolenRecord do
       expect(bike.current_stolen_record).not_to be_present
       expect(stolen_record.index_helped_recovery).to be_truthy
       expect(stolen_record.can_share_recovery).to be_falsey
+      expect(stolen_record.recovering_user_id).to eq user_id
+      stolen_record.reload
     end
-    context "no date_recovered" do
+    context "no date_recovered, no user" do
       let(:recovery_request) { recovery_info.except(:can_share_recovery) }
       it "updates recovered bike" do
-        expect(stolen_record.reload.date_recovered).to be_within(1.second).of Time.now
+        expect(stolen_record.date_recovered).to be_within(1.second).of Time.now
+        expect(stolen_record.recovering_user).to be_blank
+        expect(stolen_record.recovering_user_owner?).to be_falsey
+      end
+    end
+    context "owner is bike owner" do
+      let(:recovery_request) { recovery_info }
+      let(:ownership) { FactoryBot.create(:ownership_claimed, bike: bike) }
+      let(:user_id) { ownership.user_id }
+      it "updates recovered bike and assigns recovering_user" do
+        expect(stolen_record.recovering_user).to eq ownership.user
+        expect(stolen_record.recovering_user_owner?).to be_truthy
       end
     end
     context "date_recovered" do
+      let(:user_id) { FactoryBot.create(:user).id }
       let(:time_str) { "2017-01-31T23:57:56" }
       let(:target_timestamp) { 1485907076 }
       let(:recovery_request) { recovery_info.merge(date_recovered: time_str, timezone: "Atlantic/Reykjavik") }
       it "updates recovered bike and assigns date" do
         expect(stolen_record.date_recovered.to_i).to be_within(1).of target_timestamp
+        expect(stolen_record.recovering_user_owner?).to be_falsey
       end
     end
   end
