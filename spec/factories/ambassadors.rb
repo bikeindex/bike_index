@@ -3,6 +3,7 @@ FactoryBot.define do
     transient do
       organization { FactoryBot.create(:organization_ambassador) }
     end
+
     after(:create) do |ambassador, evaluator|
       FactoryBot.create(:membership_ambassador,
                         user: ambassador,

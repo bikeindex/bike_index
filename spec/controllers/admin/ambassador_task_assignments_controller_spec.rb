@@ -61,10 +61,16 @@ RSpec.describe Admin::AmbassadorTaskAssignmentsController, type: :request do
 
       context "sorting by organization name" do
         it "sorts in ascending order if passed :asc" do
-          org_names =
-            FactoryBot
-              .create_list(:ambassador_task_assignment, 3, :completed)
-              .map { |a| a.ambassador.current_ambassador_organization.name }
+          org1 = FactoryBot.create(:organization_ambassador, name: "A")
+          FactoryBot.create(:ambassador_task_assignment, :completed, organization: org1)
+          org2 = FactoryBot.create(:organization_ambassador, name: "B")
+          FactoryBot.create(:ambassador_task_assignment, :completed, organization: org2)
+          org3 = FactoryBot.create(:organization_ambassador, name: "C")
+          FactoryBot.create(:ambassador_task_assignment, :completed, organization: org3)
+
+          # ambassador for group "B" joins group "X"
+          org4 = FactoryBot.create(:organization_ambassador, name: "X")
+          FactoryBot.create(:membership_ambassador, user: Ambassador.second, organization: org4)
 
           get admin_ambassador_task_assignments_path,
               sort: :organization_name,
@@ -74,14 +80,21 @@ RSpec.describe Admin::AmbassadorTaskAssignmentsController, type: :request do
             assigns(:ambassador_task_assignments)
               .map { |a| a.ambassador.current_ambassador_organization.name }
 
-          expect(assignments).to eq(org_names)
+          # Tasks should be sorted by name of the ambassador's *current* ambassador org
+          expect(assignments).to eq(["A", "C", "X"])
         end
 
         it "sorts in descending order if passed :desc" do
-          org_names =
-            FactoryBot
-              .create_list(:ambassador_task_assignment, 3, :completed)
-              .map { |a| a.ambassador.current_ambassador_organization.name }
+          org1 = FactoryBot.create(:organization_ambassador, name: "X")
+          FactoryBot.create(:ambassador_task_assignment, :completed, organization: org1)
+          org2 = FactoryBot.create(:organization_ambassador, name: "Y")
+          FactoryBot.create(:ambassador_task_assignment, :completed, organization: org2)
+          org3 = FactoryBot.create(:organization_ambassador, name: "Z")
+          FactoryBot.create(:ambassador_task_assignment, :completed, organization: org3)
+
+          # ambassador for group "Y" joins group "B"
+          org4 = FactoryBot.create(:organization_ambassador, name: "B")
+          FactoryBot.create(:membership_ambassador, user: Ambassador.second, organization: org4)
 
           get admin_ambassador_task_assignments_path,
               sort: :organization_name,
@@ -91,7 +104,8 @@ RSpec.describe Admin::AmbassadorTaskAssignmentsController, type: :request do
             assigns(:ambassador_task_assignments)
               .map { |a| a.ambassador.current_ambassador_organization.name }
 
-          expect(assignments).to eq(org_names.reverse)
+          # Tasks should be sorted by name of the ambassador's *current* ambassador org
+          expect(assignments).to eq(["Z", "X", "B"])
         end
       end
 
