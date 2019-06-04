@@ -20,6 +20,30 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
   delegate :description, :description_html, :title, to: :ambassador_task
   delegate :name, to: :ambassador, prefix: true
 
+  def self.sort_by_association(criterion:, direction:)
+    assignments =
+      AmbassadorTaskAssignment
+        .includes(:ambassador_task, ambassador: { memberships: :organization })
+        .completed
+
+    case criterion
+    when :completed_at
+      assignments.reorder(completed_at: direction)
+    when :organization_name
+      # assignments.reorder("organizations.name #{direction}")
+      assignments
+        .to_a
+        .sort_by!(&:organization_name)
+        .tap { |arr| arr.reverse! if direction == :desc }
+    when :task_title
+      assignments.reorder("ambassador_tasks.title #{direction}")
+    when :ambassador_name
+      assignments.reorder("users.name #{direction}")
+    else
+      assignments.task_ordered
+    end
+  end
+
   def organization_name
     ambassador.current_ambassador_organization&.name
   end
