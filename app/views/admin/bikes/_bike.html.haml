@@ -3,7 +3,7 @@
   .row
     .col-lg-1.col-md-2.col-3.mt-auto.mb-2.admin-image-thumb
       - if bike.thumb_path.present?
-        %img{alt: bike.title, src: bike.thumb_path}
+        = image_tag bike.thumb_path, alt: bike.title_string
       - else
         %h3
           No Image
