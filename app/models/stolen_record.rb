@@ -170,15 +170,15 @@ class StolenRecord < ActiveRecord::Base
     row
   end
 
-  def recovery_display_check(info = {})
+  def recovery_display_check(info)
     if info[:can_share_recovery] == "true"
       if self.bike.thumb_path.present?
-        display_status = 0
+        self.update_attributes(recovery_display_status: "waiting_on_decision")
       else
-        display_status = 1
+        self.update_attributes(recovery_display_status: "displayable_no_photo")
       end
     else
-      display_status = 2
+      self.update_attributes(recovery_display_status: "not_elibible")
     end
   end
 
@@ -189,8 +189,7 @@ class StolenRecord < ActiveRecord::Base
                       recovered_description: info[:recovered_description],
                       recovering_user_id: info[:recovering_user_id],
                       index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
-                      can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?,
-                      recovery_display_status: recovery_display_check(info))
+                      can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?)
     bike.stolen = false
     bike.save
   end

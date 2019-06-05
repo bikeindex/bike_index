@@ -84,7 +84,7 @@ class Admin::BikesController < Admin::BaseController
         recovered_description: params[:mark_recovered_reason],
         index_helped_recovery: params[:mark_recovered_we_helped],
         can_share_recovery: params[:can_share_recovery],
-        recovery_display_status: params,
+        recovery_display_status: 1,
       )
     end
     if @bike.update_attributes(permitted_parameters.except(:stolen_records_attributes))
