@@ -4,9 +4,29 @@
 
 .row
   .col-md-6
-    %p= pluralize |
-        number_with_delimiter(@ambassador_task_assignments.total_count), |
-        "completed assignment"
+    - if !@results_filtered
+      %p= pluralize |
+          number_with_delimiter(@ambassador_task_assignments.total_count), |
+          "completed activities"
+    - else
+      %p
+        = pluralize |
+          number_with_delimiter(@ambassador_task_assignments.total_count), |
+          "matching completed activities"
+        %em= link_to "view all", admin_ambassador_task_assignments_path
+  .col-md-6
+    = form_tag admin_ambassador_task_assignments_path, method: :get,
+      class: "form-inline admin-filter-menu" do
+      = hidden_field_tag :sort, sort_column
+      = hidden_field_tag :sort_direction, sort_direction
+
+      .form-group.ml-2
+        = select_tag :organization_id, |
+          options_from_collection_for_select(Organization.ambassador, "id", "name"), |
+          prompt: "Filter by organization", |
+          class: "form-control"
+
+      = submit_tag "Filter", name: "search", class: "btn btn-primary ml-2"
 
 
 = paginate @ambassador_task_assignments, views_prefix: "admin"
