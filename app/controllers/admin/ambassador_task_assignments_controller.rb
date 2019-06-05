@@ -3,8 +3,14 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
   layout "new_admin"
 
   def index
+    matching_assignments =
+      AmbassadorTaskAssignment
+        .includes(:ambassador_task, ambassador: { memberships: :organization })
+        .completed_assignments(filter_params, sort_column => sort_direction)
+
     @ambassador_task_assignments =
-      sorted_task_assignments(sort_column, sort_direction)
+      Kaminari
+        .paginate_array(matching_assignments)
         .page(params.fetch(:page, 1))
         .per(params.fetch(:per_page, 25))
   end
@@ -12,24 +18,22 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[completed_at task_title ambassador_name]
+    %w[completed_at organization_name task_title ambassador_name]
   end
 
-  def sorted_task_assignments(column, direction)
-    assignments =
-      AmbassadorTaskAssignment
-        .includes(:ambassador_task, :ambassador)
-        .completed
-
-    case column.to_sym
-    when :completed_at
-      assignments.reorder(completed_at: direction)
-    when :task_title
-      assignments.reorder("ambassador_tasks.title #{direction}")
-    when :ambassador_name
-      assignments.reorder("users.name #{direction}")
+  def filter_params
+    case
+    when params[:organization_id].present?
+      @results_filtered = true
+      { organization_id: params[:organization_id] }
+    when params[:ambassador_task_id]
+      @results_filtered = true
+      { ambassador_task_id: params[:ambassador_task_id] }
+    when params[:ambassador_id]
+      @results_filtered = true
+      { ambassador_id: params[:ambassador_id] }
     else
-      assignments.task_ordered
+      {}
     end
   end
 end
