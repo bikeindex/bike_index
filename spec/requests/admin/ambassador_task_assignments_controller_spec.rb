@@ -17,6 +17,17 @@ RSpec.describe Admin::AmbassadorTaskAssignmentsController, type: :request do
         expect(assigns(:ambassador_task_assignments)).to eq([completed])
       end
 
+      context "filtering by organization" do
+        it "filters by the given organization id" do
+          a1 = FactoryBot.create(:ambassador_task_assignment, :completed)
+          FactoryBot.create(:ambassador_task_assignment, :completed)
+
+          get admin_ambassador_task_assignments_path, organization_id: a1.id
+
+          expect(assigns(:ambassador_task_assignments)).to match_array([a1])
+        end
+      end
+
       context "sorting by completion time" do
         it "sorts in descending order of completion by default" do
           ordered_assignments =
