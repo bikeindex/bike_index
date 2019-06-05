@@ -162,14 +162,23 @@ $mainmenu-open-zindex: 10;
   }
 
   .current-organization-submenu a,
-  .primary-submenu a {
+  .primary-submenu a,
+  .primary-submenu .text-nav-item {
     font-family: $body-font-family;
     color: $primary-nav-text-color;
     font-weight: 400;
     font-style: normal;
     font-size: 15px;
-    text-transform: none;
+  }
 
+  .text-nav-item {
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .current-organization-submenu a,
+  .primary-submenu a {
+    text-transform: none;
     &:hover,
     &:active,
     &.active {
@@ -265,7 +274,8 @@ $mainmenu-open-zindex: 10;
         }
       }
 
-      a {
+      a,
+      .text-nav-item {
         padding: $vertical-height (2 * $vertical-height);
 
         &:active,
@@ -367,9 +377,12 @@ $mainmenu-open-zindex: 10;
       position: relative;
       transition: padding $mainmenu-transform-speed linear;
 
-      a {
+      a,
+      .text-nav-item {
         padding: 8px (0.5 * $grid-gutter-width);
+      }
 
+      a {
         &.active,
         &:active {
           text-decoration: none;
