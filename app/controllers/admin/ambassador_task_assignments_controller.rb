@@ -23,9 +23,15 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
 
   def filter_params
     {}.tap do |h|
-      h[:organization_id] = params[:search_organization_id] if params[:search_organization_id].present?
+      h[:organization_id] = organization_filter if organization_filter.present?
       h[:ambassador_task_id] = params[:search_ambassador_task_id] if params[:search_ambassador_task_id].present?
       h[:ambassador_id] = params[:search_ambassador_id] if params[:search_ambassador_id].present?
     end
   end
+
+  def organization_filter
+    params[:search_organization_id]
+  end
+
+  helper_method :organization_filter
 end

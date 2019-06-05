@@ -22,7 +22,7 @@
 
       .form-group.ml-2
         = select_tag :organization_id, |
-          options_from_collection_for_select(Organization.ambassador, "id", "name", params[:organization_id]), |
+          options_from_collection_for_select(Organization.ambassador, "id", "name", organization_filter), |
           prompt: "Filter by organization", |
           class: "form-control"
 
