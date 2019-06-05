@@ -22,8 +22,7 @@ class BikeIndex.NavHeader extends BikeIndex
         $(".primary-header-nav .primary-logo").outerWidth() -
         $(".primary-header-nav .hamburgler").outerWidth()
       # There is also a 16px margin and a bunch of padding on either side on current-organization-submenu, so subtract that as well
-      console.log(available_width - 80)
-      $(".primary-header-nav .current-organization-nav-item a").css("max-width", "#{available_width - 100}px")
+      $(".primary-header-nav .current-organization-nav-item a").css("max-width", "#{available_width - 102}px")
 
   initializeHamburgler: ->
     # toggleMenu = @toggleMenu
