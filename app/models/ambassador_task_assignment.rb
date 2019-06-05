@@ -21,6 +21,23 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
   delegate :name, to: :ambassador, prefix: true
   delegate :name, to: :organization, prefix: true
 
+  # Find completed assignments, filtering and sorting by columns on associated
+  # models. The inner join is necessary because our data model permits multiple
+  # ambassador organization memberships for the same user (the most recent being
+  # the active ambassadorship). The intent is to eventually refactor to
+  # enforcing single membership.
+  #
+  # filters: :organization_id, :ambassador_task_id, :ambassador_id (multiple permitted)
+  # sort: :organization_name, :task_title, :ambassador_name
+  #
+  # Example:
+  #
+  #    AmbassadorTaskAssignment.completed_assignments(
+  #      filters: { organization_id: 3, ambassador_task_id: 1 },
+  #      sort: { task_title: :desc }
+  #    )
+  #
+  # Return [AmbassadorTaskAssignment]
   def self.completed_assignments(filters: {}, sort: {})
     filters = filters.each_pair.map { |col, val| [col.to_s.to_sym, sanitize(val)] }
     sort_col, sort_dir = sort.to_a.first
