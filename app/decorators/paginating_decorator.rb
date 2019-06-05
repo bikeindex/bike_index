@@ -1,3 +1,3 @@
 class PaginatingDecorator < Draper::CollectionDecorator
-  delegate :current_page, :limit_value, :page, :per, :total_count, :total_pages, :reorder
+  delegate :current_page, :total_pages, :limit_value
 end
