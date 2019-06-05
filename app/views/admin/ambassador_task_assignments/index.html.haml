@@ -4,7 +4,7 @@
 
 .row
   .col-md-6
-    - if !@results_filtered
+    - if !sortable_search_params?
       %p= pluralize |
           number_with_delimiter(@ambassador_task_assignments.total_count), |
           "completed activities"
@@ -43,11 +43,11 @@
         %tr
           %td.convertTime= l(assignment.completed_at, format: :convert_time)
           %td= link_to assignment.organization_name, |
-          admin_ambassador_task_assignments_path(sortable_search_params.merge(organization_id: assignment.organization.id))
+          admin_ambassador_task_assignments_path(sortable_search_params.merge(search_organization_id: assignment.organization.id))
           %td= link_to assignment.title, |
-          admin_ambassador_task_assignments_path(sortable_search_params.merge(ambassador_task_id: assignment.ambassador_task_id))
+          admin_ambassador_task_assignments_path(sortable_search_params.merge(search_ambassador_task_id: assignment.ambassador_task_id))
           %td= link_to assignment.ambassador_name, |
-          admin_ambassador_task_assignments_path(sortable_search_params.merge(ambassador_id: assignment.user_id))
+          admin_ambassador_task_assignments_path(sortable_search_params.merge(search_ambassador_id: assignment.user_id))
 
 
 = paginate @ambassador_task_assignments, views_prefix: "admin"

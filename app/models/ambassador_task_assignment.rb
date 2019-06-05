@@ -21,16 +21,14 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
   delegate :name, to: :ambassador, prefix: true
   delegate :name, to: :organization, prefix: true
 
-  def self.completed_assignments(filter: {}, sort: {})
-    filter_col, filter_val = filter.to_a.first
+  def self.completed_assignments(filters: {}, sort: {})
+    filters = filters.each_pair.map { |col, val| [col.to_s.to_sym, sanitize(val)] }
     sort_col, sort_dir = sort.to_a.first
-
-    filter_col, sort_col = (filter_col || "").to_sym, (sort_col || "").to_sym
-    filter_val = sanitize(filter_val)
+    sort_col = (sort_col || "").to_sym
 
     query = "".tap do |sql|
       sql << <<~SQL
-        SELECT *
+        SELECT *, ambassador_task_assignments.id as id
         FROM ambassador_task_assignments
         JOIN ambassador_tasks
         ON ambassador_tasks.id = ambassador_task_assignments.ambassador_task_id
@@ -53,16 +51,14 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
         WHERE ambassador_task_assignments.completed_at IS NOT NULL
       SQL
 
-      if filter_val.present?
-        case filter_col
-        when :organization_id
-          sql << "AND organizations.id = #{filter_val}\n"
-        when :ambassador_task_id
-          sql << "AND ambassador_tasks.id = #{filter_val}\n"
-        when :ambassador_id
-          sql << "AND users.id = #{filter_val}\n"
-        end
-      end
+      filter_to_sql_clause = {
+        organization_id: ->(filter_val) { "AND organizations.id = #{filter_val}" },
+        ambassador_task_id: ->(filter_val) { "AND ambassador_tasks.id = #{filter_val}" },
+        ambassador_id: ->(filter_val) { "AND users.id = #{filter_val}" },
+      }
+      sql << filters
+        .map { |col, val| filter_to_sql_clause[col]&.call(val) }
+        .join("\n")
 
       case sort_col
       when :organization_name

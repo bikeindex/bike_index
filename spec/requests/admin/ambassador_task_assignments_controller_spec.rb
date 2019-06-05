@@ -17,15 +17,52 @@ RSpec.describe Admin::AmbassadorTaskAssignmentsController, type: :request do
         expect(assigns(:ambassador_task_assignments)).to eq([completed])
       end
 
-      context "filtering by organization" do
+      context "filtering" do
         it "filters by the given organization_id" do
           a1 = FactoryBot.create(:ambassador_task_assignment, :completed)
           FactoryBot.create(:ambassador_task_assignment, :completed)
 
           get admin_ambassador_task_assignments_path,
-              organization_id: a1.organization.id
+              search_organization_id: a1.organization.id
 
           expect(assigns(:ambassador_task_assignments)).to match_array([a1])
+        end
+
+        it "filters by the given task" do
+          a1 = FactoryBot.create(:ambassador_task_assignment, :completed)
+          FactoryBot.create(:ambassador_task_assignment, :completed)
+
+          get admin_ambassador_task_assignments_path,
+              search_ambassador_task_id: a1.ambassador_task.id
+
+          expect(assigns(:ambassador_task_assignments)).to match_array([a1])
+        end
+
+        it "filters by the given ambassador" do
+          a1 = FactoryBot.create(:ambassador_task_assignment, :completed)
+          FactoryBot.create(:ambassador_task_assignment, :completed)
+
+          get admin_ambassador_task_assignments_path,
+              search_ambassador_id: a1.ambassador.id
+
+          expect(assigns(:ambassador_task_assignments)).to match_array([a1])
+        end
+
+        it "filters by combinations of filter columns" do
+          a1 = FactoryBot.create(:ambassador_task_assignment, :completed)
+          a2 = FactoryBot.create(:ambassador_task_assignment, :completed,
+                                 organization: a1.organization,
+                                 ambassador_task: a1.ambassador_task)
+          a3 = FactoryBot.create(:ambassador_task_assignment, :completed,
+                                 organization: a1.organization,
+                                 ambassador_task: a1.ambassador_task)
+          FactoryBot.create(:ambassador_task_assignment, :completed)
+
+          get admin_ambassador_task_assignments_path,
+              search_organization_id: a1.organization.id,
+              search_ambassador_task_id: a3.ambassador_task.id
+
+          expect(assigns(:ambassador_task_assignments)).to match_array([a1, a2, a3])
         end
       end
 

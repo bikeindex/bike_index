@@ -6,7 +6,7 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
     matching_assignments =
       AmbassadorTaskAssignment
         .includes(:ambassador_task, ambassador: { memberships: :organization })
-        .completed_assignments(filter: filter_params, sort: { sort_column => sort_direction })
+        .completed_assignments(filters: filter_params, sort: { sort_column => sort_direction })
 
     @ambassador_task_assignments =
       Kaminari
@@ -22,18 +22,10 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
   end
 
   def filter_params
-    case
-    when params[:organization_id].present?
-      @results_filtered = true
-      { organization_id: params[:organization_id] }
-    when params[:ambassador_task_id]
-      @results_filtered = true
-      { ambassador_task_id: params[:ambassador_task_id] }
-    when params[:ambassador_id]
-      @results_filtered = true
-      { ambassador_id: params[:ambassador_id] }
-    else
-      {}
+    {}.tap do |h|
+      h[:organization_id] = params[:search_organization_id] if params[:search_organization_id].present?
+      h[:ambassador_task_id] = params[:search_ambassador_task_id] if params[:search_ambassador_task_id].present?
+      h[:ambassador_id] = params[:search_ambassador_id] if params[:search_ambassador_id].present?
     end
   end
 end
