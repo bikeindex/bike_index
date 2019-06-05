@@ -26,8 +26,8 @@ class Admin::RecoveriesController < Admin::BaseController
 
   def update
     @stolen_record = StolenRecord.unscoped.find(params[:id])
-    if params[:undisplayable]
-      @stolen_record.update_attributs(recovery_display_status: 4)
+    if params[:stolen_record][:recovery_display_status]
+      @stolen_record.update_attributes(recovery_display_status: 4)
       redirect_to admin_recoveries_url
     elsif @stolen_record.update_attributes(permitted_parameters)
       flash[:success] = "Recovery Saved!"

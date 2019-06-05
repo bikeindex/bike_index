@@ -164,8 +164,8 @@ class StolenRecord < ActiveRecord::Base
   end
 
   def recovery_display_check(info = {})
-    if info[:can_share_recovery] == true
-      if self.bike.image.thumb_path.present?
+    if info[:can_share_recovery] == "true"
+      if self.bike.thumb_path.present?
         display_status = 0
       else
         display_status = 1
@@ -173,7 +173,6 @@ class StolenRecord < ActiveRecord::Base
     else
       display_status = 2
     end
-    return display_status
   end
 
   def add_recovery_information(info = {})
