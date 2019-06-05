@@ -26,15 +26,9 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
         .includes(:ambassador_task, ambassador: { memberships: :organization })
         .completed
 
-    case criterion
+    case criterion.to_sym
     when :completed_at
       assignments.reorder(completed_at: direction)
-    when :organization_name
-      # assignments.reorder("organizations.name #{direction}")
-      assignments
-        .to_a
-        .sort_by!(&:organization_name)
-        .tap { |arr| arr.reverse! if direction == :desc }
     when :task_title
       assignments.reorder("ambassador_tasks.title #{direction}")
     when :ambassador_name
