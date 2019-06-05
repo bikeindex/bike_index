@@ -2,7 +2,7 @@ require "spec_helper"
 
 base_url = "/admin/exports"
 
-describe "Admin::ExportsController" do
+describe Admin::ExportsController, type: :request do
   # Request specs don't have cookies so we need to stub stuff if we're in request specs
   # This is suboptimal, but hey, it gets us to request specs for now
   before { allow(User).to receive(:from_auth) { user } }

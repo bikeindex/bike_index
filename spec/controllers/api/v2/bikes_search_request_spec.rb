@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "Bikes API V2" do
+describe "Bikes API V2", type: :request do
   describe "bike search" do
     before :each do
       @bike = FactoryBot.create(:bike)

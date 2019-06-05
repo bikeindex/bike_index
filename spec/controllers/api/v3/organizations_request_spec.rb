@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "Organization API V3" do
+describe "Organization API V3", type: :request do
   include_context :existing_doorkeeper_app
 
   describe "create" do

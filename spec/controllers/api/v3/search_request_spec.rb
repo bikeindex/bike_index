@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe "Search API V3" do
+describe "Search API V3", type: :request do
   let(:manufacturer) { FactoryBot.create(:manufacturer) }
   let(:color) { FactoryBot.create(:color) }
   describe "/" do
