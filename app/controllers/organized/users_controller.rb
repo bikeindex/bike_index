@@ -84,23 +84,23 @@ module Organized
 
     def create_organization_invitation_params
       {
-        invitee_email: params[:organization_invitation][:invitee_email],
-        invitee_name: params[:organization_invitation][:invitee_name],
+        invitee_email: params.dig(:organization_invitation, :invitee_email),
+        invitee_name: params.dig(:organization_invitation, :invitee_name),
         organization: current_organization,
         inviter: current_user,
-        membership_role: params[:organization_invitation][:membership_role],
+        membership_role: params.dig(:organization_invitation, :membership_role),
       }
     end
 
     def update_organization_invitation_params
       {
-        invitee_name: params[:organization_invitation][:name],
-        membership_role: params[:organization_invitation][:membership_role],
+        invitee_name: params.dig(:organization_invitation, :name),
+        membership_role: params.dig(:organization_invitation, :membership_role),
       }
     end
 
     def update_membership_params
-      { role: params[:membership][:role] }
+      { role: params.dig(:membership, :role) }
     end
   end
 end
