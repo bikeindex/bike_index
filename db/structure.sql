@@ -1954,7 +1954,6 @@ CREATE TABLE public.stolen_records (
     recovery_link_token text,
     show_address boolean DEFAULT false,
     recovering_user_id integer,
-    recover_display_status integer,
     recovery_display_status integer
 );
 
@@ -4158,4 +4157,10 @@ INSERT INTO schema_migrations (version) VALUES ('20190529024835');
 INSERT INTO schema_migrations (version) VALUES ('20190531220014');
 
 INSERT INTO schema_migrations (version) VALUES ('20190531221656');
+
+INSERT INTO schema_migrations (version) VALUES ('20190605210905');
+
+INSERT INTO schema_migrations (version) VALUES ('20190605211020');
+
+INSERT INTO schema_migrations (version) VALUES ('20190605211143');
 
