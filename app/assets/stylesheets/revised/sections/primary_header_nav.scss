@@ -162,23 +162,14 @@ $mainmenu-open-zindex: 10;
   }
 
   .current-organization-submenu a,
-  .primary-submenu a,
-  .primary-submenu .text-nav-item {
+  .primary-submenu a {
     font-family: $body-font-family;
     color: $primary-nav-text-color;
     font-weight: 400;
     font-style: normal;
     font-size: 15px;
-  }
-
-  .text-nav-item {
-    text-transform: uppercase;
-    opacity: 0.7;
-  }
-
-  .current-organization-submenu a,
-  .primary-submenu a {
     text-transform: none;
+
     &:hover,
     &:active,
     &.active {
@@ -274,8 +265,7 @@ $mainmenu-open-zindex: 10;
         }
       }
 
-      a,
-      .text-nav-item {
+      a {
         padding: $vertical-height (2 * $vertical-height);
 
         &:active,
@@ -377,12 +367,9 @@ $mainmenu-open-zindex: 10;
       position: relative;
       transition: padding $mainmenu-transform-speed linear;
 
-      a,
-      .text-nav-item {
-        padding: 8px (0.5 * $grid-gutter-width);
-      }
-
       a {
+        padding: 8px (0.5 * $grid-gutter-width);
+
         &.active,
         &:active {
           text-decoration: none;
