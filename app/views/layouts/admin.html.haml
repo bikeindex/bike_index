@@ -1,23 +1,23 @@
 !!!
 %html
-  = render 'shared/header'
-  
+  = render "shared/header"
+
   - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   - body_class = "news-page" if controller_name == "news"
 
   = stylesheet_link_tag "admin", media: "all"
-    
+
   %body#body{ class: body_class }
-    = render 'layouts/messages'
+    = render "layouts/messages"
 
     %header.global-header.collapsible-head.invisibled#header
-      = render 'shared/header_nav'
-      
+      = render "shared/header_nav"
+
     %header.replace-header
       .inner-recep
         - if current_user.superuser?
-          %h2.new-title 
+          %h2.new-title
             = admin_nav_link "Go hard", admin_root_path
           %ul
             %li
@@ -64,7 +64,7 @@
         .inner-recep
 
           = yield
-      
+
     = render 'shared/footer'
 
   :javascript

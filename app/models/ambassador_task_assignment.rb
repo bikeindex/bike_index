@@ -1,12 +1,13 @@
 class AmbassadorTaskAssignment < ActiveRecord::Base
-  belongs_to :user
   belongs_to :ambassador_task
+  belongs_to :ambassador,
+             class_name: "Ambassador",
+             foreign_key: :user_id
 
-  validates :user, presence: true
+  validates :ambassador, presence: true
   validates :ambassador_task, presence: true
 
-  validates :ambassador_task, uniqueness: { scope: :user }
-  validate :associated_user_is_an_ambassador
+  validates :ambassador_task, uniqueness: { scope: :ambassador }
 
   delegate :description, :description_html, :title, to: :ambassador_task
 
@@ -27,13 +28,6 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
   end
 
   def update_associated_user
-    user&.update_attributes(updated_at: Time.now)
-  end
-
-  private
-
-  def associated_user_is_an_ambassador
-    return if user&.ambassador?
-    errors.add(:user, "must be an ambassador")
+    ambassador.update_attributes(updated_at: Time.now)
   end
 end

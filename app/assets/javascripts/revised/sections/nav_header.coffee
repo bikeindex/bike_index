@@ -7,13 +7,22 @@ class BikeIndex.NavHeader extends BikeIndex
     # Instantiate headroom - scroll to hide header
     $('nav.primary-header-nav').headroom(@headroomOptions)
 
-    # TODO: fix when new bootstrap applied - right now, on iphone, clicking doesn't always work,
-    # we're trying to catch it here
+    # Some small screen specific things
     if $(window).width() < 768
+      # TODO: fix when new bootstrap applied - right now, on iphone, clicking doesn't always work,
+      # we're trying to catch it here
       $(".current-organization-submenu").click (e) =>
         $target = $(event.target)
         if $target.attr("href")
           window.location = $target.attr("href")
+
+      # If the passive_organization name is too wide, it overflows and makes the topbar hide things
+      # So truncate it
+      available_width = $(".primary-header-nav .container").innerWidth() -
+        $(".primary-header-nav .primary-logo").outerWidth() -
+        $(".primary-header-nav .hamburgler").outerWidth()
+      # There is also a 16px margin and a bunch of padding on either side on current-organization-submenu, so subtract that as well
+      $(".primary-header-nav .current-organization-nav-item a").css("max-width", "#{available_width - 102}px")
 
   initializeHamburgler: ->
     # toggleMenu = @toggleMenu

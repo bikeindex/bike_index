@@ -4,9 +4,15 @@
 }
 
 .admin-bike-partial {
-  img {
-    max-width: 100%;
-    max-height: 110px;
+  .admin-image-thumb {
+    img {
+      max-width: 100%;
+      max-height: 110px;
+    }
+    h3 {
+      text-align: center;
+      color: #ccc;
+    }
   }
 }
 

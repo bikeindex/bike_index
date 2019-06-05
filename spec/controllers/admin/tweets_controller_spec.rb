@@ -39,4 +39,32 @@ describe Admin::TweetsController do
       tweet = assigns(:tweet)
     end
   end
+
+  describe "#destroy" do
+    context "given a successful deletion" do
+      it "deletes the tweet, redirects to tweet index url with an appropriate flash" do
+        tweet = FactoryBot.create(:tweet)
+
+        delete :destroy, id: tweet.id
+
+        expect(response).to redirect_to(admin_tweets_url)
+        expect(flash[:error]).to be_blank
+        expect(flash[:info]).to match("deleted")
+      end
+    end
+
+    context "given a failed deletion" do
+      it "redirects to tweet edit url with an appropriate flash" do
+        tweet = FactoryBot.create(:tweet)
+        allow(tweet).to receive(:destroy).and_return(false)
+        allow(Tweet).to receive(:friendly_find).with(tweet.id.to_s).and_return(tweet)
+
+        delete :destroy, id: tweet.id
+
+        expect(response).to redirect_to(edit_admin_tweet_url)
+        expect(flash[:info]).to be_blank
+        expect(flash[:error]).to match("Could not delete")
+      end
+    end
+  end
 end

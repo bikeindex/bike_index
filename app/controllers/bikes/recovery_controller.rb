@@ -32,7 +32,7 @@ module Bikes
         :recovered_description,
         :index_helped_recovery,
         :can_share_recovery
-      )
+      ).merge(recovering_user_id: current_user&.id)
     end
 
     def find_bike

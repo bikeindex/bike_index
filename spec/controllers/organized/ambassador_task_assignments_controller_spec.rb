@@ -11,26 +11,47 @@ describe Organized::AmbassadorTaskAssignmentsController, type: :controller do
         patch :update,
               organization_id: organization,
               id: assignment,
-              completed: false,
-              format: :json
+              completed: "false"
 
-        expect(response.status).to eq(200)
+        expect(response).to redirect_to(organization_ambassador_dashboard_url)
         expect(assignment.reload.completed_at).to be_nil
+        expect(flash[:info]).to match("status updated")
+        expect(flash[:error]).to be_blank
       end
     end
 
     context "given completed: true" do
       it "sets the task's completed_at value" do
         assignment = FactoryBot.create(:ambassador_task_assignment)
+        expect(assignment.reload.completed_at).to be_nil
 
         patch :update,
               organization_id: organization,
               id: assignment,
-              completed: true,
-              format: :json
+              completed: "true"
 
-        expect(response.status).to eq(200)
+        expect(response).to redirect_to(organization_ambassador_dashboard_url)
         expect(assignment.reload.completed_at).to_not be_nil
+        expect(flash[:info]).to match("status updated")
+        expect(flash[:error]).to be_blank
+      end
+    end
+
+    context "given a failed update" do
+      it "sets the flash error message" do
+        assignment = FactoryBot.create(:ambassador_task_assignment)
+        allow(assignment).to receive(:update_attributes).and_return(false)
+        allow(AmbassadorTaskAssignment).to receive(:find).and_return(assignment)
+
+        patch :update,
+              organization_id: organization,
+              id: assignment,
+              completed: "true"
+
+        expect(response).to redirect_to(organization_ambassador_dashboard_url)
+        expect(assignment.reload.completed_at).to_not be_present
+        expect(flash[:info]).to be_blank
+        expect(flash[:error]).to match("Could not update")
       end
     end
   end

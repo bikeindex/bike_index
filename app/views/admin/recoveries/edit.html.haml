@@ -24,6 +24,22 @@
               = l @bike.created_at, format: :convert_time
         %tr
           %td
+            Recovered by
+          %td
+            - if @recovery.recovering_user.present?
+              = link_to @recovery.recovering_user.display_name, admin_user_path(@recovery.recovering_user.to_param)
+              - unless @recovery.recovering_user_owner?
+                %em.text-warning.less-strong
+                  not owner!
+            - elsif @recovery.pre_recovering_user?
+              %small.less-strong
+                pre-recording of recovering user
+            - else
+              %small.less-strong
+                No user present
+
+        %tr
+          %td
             Owner Email
           %td
             = @bike.owner_email

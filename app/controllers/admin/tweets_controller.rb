@@ -36,6 +36,16 @@ class Admin::TweetsController < Admin::BaseController
     end
   end
 
+  def destroy
+    if @tweet.present? && @tweet.destroy
+      flash[:info] = "Tweet deleted."
+      redirect_to admin_tweets_url
+    else
+      flash[:error] = "Could not delete tweet."
+      redirect_to edit_admin_tweet_url(@tweet.id)
+    end
+  end
+
   private
 
   def permitted_parameters

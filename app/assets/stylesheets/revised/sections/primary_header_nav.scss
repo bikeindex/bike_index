@@ -93,7 +93,7 @@ $mainmenu-open-zindex: 10;
   .current-organization-nav-item {
     float: left;
     display: block;
-    margin: 0 0 0 2rem;
+    margin: 0 0 0 16px;
     padding: $vertical-height 24px 0;
     transition: padding $mainmenu-transform-speed linear;
 
@@ -159,6 +159,13 @@ $mainmenu-open-zindex: 10;
     li {
       font-size: 80%;
     }
+  }
+
+  // If it overflows, hide the extra text. Explicit width is set in coffeescript
+  #passive_organization_submenu {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
 
   .current-organization-submenu a,
@@ -315,9 +322,8 @@ $mainmenu-open-zindex: 10;
   }
 
   .current-organization-nav-item {
-    padding-top: (2px + $vertical-height) !important;
-
     // Somehow, makes things lineup more
+    padding-top: (2px + $vertical-height) !important;
   }
 
   .primary-header-nav.menu-in {
