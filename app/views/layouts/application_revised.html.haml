@@ -20,7 +20,6 @@
           %span.current-organization-nav-item
             %a#passive_organization_submenu{ "aria-haspopup" => "true", "aria-expanded" => "false", data: { toggle: "dropdown" } }
               = passive_organization.short_name
-              = passive_organization.short_name
               <span class="caret-down">v</span>
             %ul.current-organization-submenu{ "aria-labelledby" => "#passive_organization_submenu" }
               - if passive_organization.ambassador?
