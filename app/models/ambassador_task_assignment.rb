@@ -21,8 +21,10 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
   delegate :name, to: :ambassador, prefix: true
   delegate :name, to: :organization, prefix: true
 
-  def self.completed_assignments(args = {})
-    (filter_col, filter_val), (sort_col, sort_dir) = args.to_a
+  def self.completed_assignments(filter: {}, sort: {})
+    filter_col, filter_val = filter.to_a.first
+    sort_col, sort_dir = sort.to_a.first
+
     filter_col, sort_col = (filter_col || "").to_sym, (sort_col || "").to_sym
     filter_val = sanitize(filter_val)
 
@@ -72,7 +74,7 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
       when :ambassador_name
         sql << "ORDER BY users.name #{sort_dir}\n"
       else
-        sql << "ORDER BY ambassador_task_assignments.ambassador_task_id ASC\n"
+        sql << "ORDER BY ambassador_task_assignments.completed_at DESC\n"
       end
     end
 

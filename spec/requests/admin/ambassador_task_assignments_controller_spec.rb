@@ -18,7 +18,7 @@ RSpec.describe Admin::AmbassadorTaskAssignmentsController, type: :request do
       end
 
       context "filtering by organization" do
-        it "filters by the given organization id" do
+        it "filters by the given organization_id" do
           a1 = FactoryBot.create(:ambassador_task_assignment, :completed)
           FactoryBot.create(:ambassador_task_assignment, :completed)
 
