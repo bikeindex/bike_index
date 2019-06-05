@@ -21,10 +21,10 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
   delegate :name, to: :ambassador, prefix: true
   delegate :name, to: :organization, prefix: true
 
-  def self.completed_assignments(filter = {}, sort = {})
-    filter_col, filter_val = filter.to_a.first
-    sort_col, sort_dir = sort.to_a.first
-    filter_col, sort_col = filter_col.to_s.to_sym, sort_col.to_s.to_sym
+  def self.completed_assignments(args = {})
+    (filter_col, filter_val), (sort_col, sort_dir) = args.to_a
+    filter_col, sort_col = (filter_col || "").to_sym, (sort_col || "").to_sym
+    filter_val = sanitize(filter_val)
 
     query = "".tap do |sql|
       sql << <<~SQL
@@ -54,25 +54,25 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
       if filter_val.present?
         case filter_col
         when :organization_id
-          sql << "\n AND organizations.id = #{filter_val}"
+          sql << "AND organizations.id = #{filter_val}\n"
         when :ambassador_task_id
-          sql << "\n AND ambassador_tasks.id = #{filter_val}"
+          sql << "AND ambassador_tasks.id = #{filter_val}\n"
         when :ambassador_id
-          sql << "\n AND users.id = #{filter_val}"
+          sql << "AND users.id = #{filter_val}\n"
         end
       end
 
       case sort_col
       when :organization_name
-        sql << "\n ORDER BY organizations.name #{sort_dir}"
+        sql << "ORDER BY organizations.name #{sort_dir}\n"
       when :completed_at
-        sql << "\n ORDER BY ambassador_task_assignments.completed_at #{sort_dir}"
+        sql << "ORDER BY ambassador_task_assignments.completed_at #{sort_dir}\n"
       when :task_title
-        sql << "\n ORDER BY ambassador_tasks.title #{sort_dir}"
+        sql << "ORDER BY ambassador_tasks.title #{sort_dir}\n"
       when :ambassador_name
-        sql << "\n ORDER BY users.name #{sort_dir}"
+        sql << "ORDER BY users.name #{sort_dir}\n"
       else
-        sql << "\n ORDER BY ambassador_task_assignments.ambassador_task_id ASC"
+        sql << "ORDER BY ambassador_task_assignments.ambassador_task_id ASC\n"
       end
     end
 

@@ -6,7 +6,7 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
     matching_assignments =
       AmbassadorTaskAssignment
         .includes(:ambassador_task, ambassador: { memberships: :organization })
-        .completed_assignments(filter_params, sort_column => sort_direction)
+        .completed_assignments(filter_params.merge(sort_column => sort_direction))
 
     @ambassador_task_assignments =
       Kaminari
