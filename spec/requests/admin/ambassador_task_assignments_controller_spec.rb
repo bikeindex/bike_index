@@ -22,7 +22,8 @@ RSpec.describe Admin::AmbassadorTaskAssignmentsController, type: :request do
           a1 = FactoryBot.create(:ambassador_task_assignment, :completed)
           FactoryBot.create(:ambassador_task_assignment, :completed)
 
-          get admin_ambassador_task_assignments_path, organization_id: a1.id
+          get admin_ambassador_task_assignments_path,
+              organization_id: a1.organization.id
 
           expect(assigns(:ambassador_task_assignments)).to match_array([a1])
         end
@@ -70,7 +71,7 @@ RSpec.describe Admin::AmbassadorTaskAssignmentsController, type: :request do
         end
       end
 
-      context "sorting by organization name", skip: "pending implementation" do
+      context "sorting by organization name" do
         it "sorts in ascending order if passed asc" do
           org1 = FactoryBot.create(:organization_ambassador, name: "A")
           FactoryBot.create(:ambassador_task_assignment, :completed, organization: org1)
