@@ -1,9 +1,9 @@
 %nav.primary-edit-form-well-menu
   %ul
     - @edit_templates.each do |template, description|
-      %li
-        - classname = @edit_template == template ? 'active' : ''
-        %a{ href: edit_bike_path(page: template), class: classname }
+      %li{ class: "edit-menu-#{template}" }
+        - link_classname = @edit_template == template ? 'active' : ''
+        %a{ href: edit_bike_path(page: template), class: link_classname }
           %h4
             = description
   .form-well-edit-page-select
@@ -13,7 +13,7 @@
     %select.dirtyignore
       - @edit_templates.each do |template, description|
         %option{ selected: (@edit_template == template), value: edit_bike_path(page: template) }
-          = description 
+          = description
   .edit-form-well-submit-wrapper
     = hidden_field_tag :edit_template, @edit_template
     = submit_tag 'Save changes', class: 'btn btn-lg btn-primary'

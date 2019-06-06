@@ -14,8 +14,20 @@ $menu-select-overlay-line-height: 12px;
     li {
       display: block;
 
-      &:nth-of-type(n + 5) {
+      &.edit-menu-ownership {
         border-top: 1px solid $gray-light;
+      }
+      &.edit-menu-stolen {
+        a h4 {
+          color: $red;
+        }
+        a:hover,
+        a:active,
+        a.active {
+          h4 {
+            color: darken($red, 15%);
+          }
+        }
       }
     }
 

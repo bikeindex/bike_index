@@ -183,7 +183,8 @@ class BikesController < ApplicationController
       photos: "Photos",
       drivetrain: "Wheels + Drivetrain",
       accessories: "Accessories + Components",
-      ownership: "Groups + Ownership",
+      ownership: "Transfer Ownership",
+      groups: "Groups + Organizations",
       remove: "Hide or Delete",
       stolen: (@bike.stolen ? "#{stolen_type} details" : "Report Stolen or Missing"),
     }
