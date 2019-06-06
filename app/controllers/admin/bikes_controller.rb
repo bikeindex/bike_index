@@ -142,15 +142,11 @@ class Admin::BikesController < Admin::BaseController
     return @matching_bikes if defined?(@matching_bikes)
     bikes = Bike.unscoped
     if params[:search_user_id].present?
-      if params[:search_example]
-        params[:search_example] = nil
-        flash[:danger] = "Sorry! That won't work"
-      end
       @user = User.find(params[:search_user_id])
       if @user.rough_approx_bikes.count
-        bikes = @user.rough_approx_bikes.limit(10)
+        bikes = @user.rough_approx_bikes
       else
-        bikes = @user.bikes.limit(10)
+        bikes = @user.bikes
       end
     else
       # do example here because it doesn't work w/ @user and also unscopes
