@@ -39,4 +39,17 @@ class Ambassador < User
   def ambassador_organizations
     organizations.ambassador
   end
+
+  def current_ambassador_organization
+    most_recent_ambassador_membership =
+      memberships
+        .ambassador_organizations
+        .reorder(created_at: :desc)
+        .limit(1)
+
+    organizations
+      .ambassador
+      .where(id: most_recent_ambassador_membership.select(:organization_id))
+      .first
+  end
 end

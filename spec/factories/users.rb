@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :user do
-    name
+    sequence(:name) { |n| "User #{n.to_s.rjust(3, "0")}" }
     email { generate(:unique_email) }
     password { "testthisthing7$" }
     password_confirmation { "testthisthing7$" }

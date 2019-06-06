@@ -140,6 +140,7 @@ Bikeindex::Application.routes.draw do
   namespace :admin do
     root to: "dashboard#index"
     resources :ambassador_tasks, except: :show
+    resources :ambassador_task_assignments, only: [:index]
     resources :bikes do
       collection do
         get :duplicates

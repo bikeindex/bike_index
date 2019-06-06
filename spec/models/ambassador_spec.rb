@@ -21,6 +21,22 @@ describe Ambassador, type: :model do
     end
   end
 
+  describe "#current_ambassador_organization" do
+    it "returns the most recently associated ambassador organization" do
+      ambassador = FactoryBot.create(:ambassador)
+      org1 = FactoryBot.create(:organization_ambassador)
+      org2 = FactoryBot.create(:organization_ambassador)
+      FactoryBot.create(:membership_ambassador, user: ambassador, organization: org2)
+      new_ambassadorship = FactoryBot.create(:membership_ambassador, user: ambassador, organization: org1)
+      FactoryBot.create(:membership, user: ambassador)
+
+      current_org = ambassador.current_ambassador_organization
+
+      expect(current_org).to eq(new_ambassadorship.organization)
+      expect(ambassador.organizations.count).to eq(4)
+    end
+  end
+
   describe "#percent_complete" do
     context "given no associated tasks" do
       it "returns 0 as a Float" do
