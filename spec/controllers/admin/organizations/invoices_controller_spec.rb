@@ -25,6 +25,23 @@ describe Admin::Organizations::InvoicesController, type: :controller do
       end
     end
 
+    describe "new" do
+      it "renders" do
+        get :new, organization_id: organization.to_param
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:new)
+      end
+      context "passed end_at" do
+        let(:end_at) { Time.now + 10.years }
+        it "renders, includes end_at" do
+          get :new, organization_id: organization.to_param, end_at: end_at.to_i
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:new)
+          expect(assigns(:invoice).end_at).to be_within(2.seconds).of end_at
+        end
+      end
+    end
+
     describe "edit" do
       it "renders" do
         get :edit, organization_id: organization.to_param, id: invoice.to_param
