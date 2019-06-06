@@ -148,8 +148,8 @@ class Admin::BikesController < Admin::BaseController
         bikes = @user.bikes
       end
     else
-      # do example here because it doesn't work w/ @user and also unscopes
       bikes = Bike.unscoped
+      # do example here because it doesn't work w/ @user and also unscopes
       bikes = bikes.example if params[:search_example].present?
     end
     bikes = bikes.non_example if params[:search_non_example].present?
