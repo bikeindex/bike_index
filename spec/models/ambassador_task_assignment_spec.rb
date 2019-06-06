@@ -195,7 +195,9 @@ describe AmbassadorTaskAssignment, type: :model do
             .create_list(:ambassador_task_assignment, 3, :completed)
             .map(&:ambassador_name)
 
-        result = described_class.completed_assignments(sort: { ambassador_name: :asc })
+        result =
+          described_class
+            .completed_assignments(sort: { ambassador_name: :asc })
 
         expect(result.map(&:ambassador_name)).to eq(ambassador_names)
       end
@@ -206,7 +208,9 @@ describe AmbassadorTaskAssignment, type: :model do
             .create_list(:ambassador_task_assignment, 3, :completed)
             .map(&:ambassador_name)
 
-        result = described_class.completed_assignments(sort: { ambassador_name: :desc })
+        result =
+          described_class
+            .completed_assignments(sort: { ambassador_name: :desc })
 
         expect(result.map(&:ambassador_name)).to eq(ambassador_names.reverse)
       end
@@ -219,7 +223,9 @@ describe AmbassadorTaskAssignment, type: :model do
             .create_list(:ambassador_task_assignment, 3, :completed)
             .map(&:title)
 
-        result = described_class.completed_assignments(sort: { task_title: :asc })
+        result =
+          described_class
+            .completed_assignments(sort: { ambassador_task_title: :asc })
 
         expect(result.map(&:title)).to eq(task_titles)
       end
@@ -230,7 +236,9 @@ describe AmbassadorTaskAssignment, type: :model do
             .create_list(:ambassador_task_assignment, 3, :completed)
             .map(&:title)
 
-        result = described_class.completed_assignments(sort: { task_title: :desc })
+        result =
+          described_class
+            .completed_assignments(sort: { ambassador_task_title: :desc })
 
         expect(result.map(&:title)).to eq(task_titles.reverse)
       end
