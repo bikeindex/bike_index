@@ -141,12 +141,21 @@ class Admin::BikesController < Admin::BaseController
   def matching_bikes
     return @matching_bikes if defined?(@matching_bikes)
     bikes = Bike.unscoped
-    # do example up here because it unscopes
-    if params[:search_user_id]
+    if params[:search_user_id].present?
+      if params[:search_example]
+        params[:search_example] = nil
+        flash[:danger] = "Sorry! That won't work"
+      end
       @user = User.find(params[:search_user_id])
-      bikes = bikes.where(owner_email: @user.email)
+      if @user.rough_approx_bikes.count
+        bikes = @user.rough_approx_bikes.limit(10)
+      else
+        bikes = @user.bikes.limit(10)
+      end
+    else
+      # do example here because it doesn't work w/ @user and also unscopes
+      bikes = bikes.example if params[:search_example].present?
     end
-    bikes = bikes.example if params[:search_example].present?
     bikes = bikes.non_example if params[:search_non_example].present?
     bikes = bikes.organization(current_organization) if current_organization.present?
     bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email].present?

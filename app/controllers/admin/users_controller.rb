@@ -15,11 +15,14 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def edit
-    page = params[:page] || 1
-    per_page = params[:per_page] || 25
-    bikes = @user.bikes.limit(10)
+    # If the user has a bunch of bikes, it can cause timeouts. In those cases, use rough approximation
+    if @user.rough_approx_bikes.count
+      bikes = @user.rough_approx_bikes.limit(10)
+    else
+      bikes = @user.bikes.limit(10)
+    end
     @bikescount = @user.bikes.count
-    @bikes = bikes.reorder(created_at: :desc).page(page).per(per_page)
+    @bikes = bikes.reorder(created_at: :desc)
   end
 
   def update
