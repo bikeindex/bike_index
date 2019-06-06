@@ -9,7 +9,6 @@ class Admin::ManufacturersController < Admin::BaseController
 
   def show
     raise ActionController::RoutingError.new("Not Found") unless @manufacturer.present?
-    @manufacturer = @manufacturer.decorate
   end
 
   def new

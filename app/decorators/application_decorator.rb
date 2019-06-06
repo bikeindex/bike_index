@@ -1,3 +1,6 @@
+# NB: Decorators are deprecated in this project.
+#     Use Helper methods for view logic, consider incrementally refactoring
+#     existing view logic from decorators to view helpers.
 class ApplicationDecorator < Draper::Decorator
   delegate_all
   include ActionView::Helpers::NumberHelper
@@ -50,47 +53,11 @@ class ApplicationDecorator < Draper::Decorator
     end
   end
 
-  def twitterable(user)
-    if user.show_twitter and user.twitter
-      h.link_to "Twitter", "https://twitter.com/#{user.twitter}"
-    end
-  end
-
-  def websiteable(user)
-    if user.show_website and user.website
-      h.link_to "Website", user.website
-    end
-  end
-
-  def show_twitter_and_website(user)
-    if twitterable(user) or websiteable(user)
-      html = ""
-      if twitterable(user)
-        html << twitterable(user)
-        html << " and #{websiteable(user)}" if websiteable(user)
-      else
-        html << websiteable(user)
-      end
-      html.html_safe
-    end
-  end
-
   def short_address(item)
     return nil unless item.country
     html = "#{item.city}"
     html << ", #{item.state.abbreviation}" if item.state.present?
     html << " - #{item.country.iso}"
     html
-  end
-
-  def display_phone(str = nil)
-    str ||= object&.phone
-    if str.blank?
-      nil
-    elsif str[/\+/]
-      number_to_phone(str.gsub(/\+\d*/, ""), country_code: str[/\A.\d*/].gsub("+", ""), delimiter: " ")
-    else
-      number_to_phone(str, delimiter: " ")
-    end
   end
 end

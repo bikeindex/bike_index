@@ -33,62 +33,11 @@ describe ApplicationDecorator do
     end
   end
 
-  describe "websiteable" do
-    it "creates a link if bike owner wants one shown" do
-      user = User.new
-      allow(user).to receive(:show_website).and_return(true)
-      allow(user).to receive(:website).and_return("website")
-      decorator = ApplicationDecorator.new(user).websiteable(user)
-      expect(decorator).to eq('<a href="website">Website</a>')
-    end
-  end
-
-  describe "twitterable" do
-    it "creates a link if bike owner wants one shown" do
-      user = User.new
-      allow(user).to receive(:show_twitter).and_return(true)
-      allow(user).to receive(:twitter).and_return("twitter")
-      decorator = ApplicationDecorator.new(user).twitterable(user)
-      expect(decorator).to eq('<a href="https://twitter.com/twitter">Twitter</a>')
-    end
-  end
-
-  describe "show_twitter_and_website" do
-    it "combines twitter and website" do
-      user = User.new
-      decorator = ApplicationDecorator.new(user)
-      allow(decorator).to receive(:twitterable).and_return("twitter")
-      allow(decorator).to receive(:websiteable).and_return("website")
-      expect(decorator.show_twitter_and_website(user)).to eq("twitter and website")
-    end
-    it "justs return website if no twitter" do
-      user = User.new
-      decorator = ApplicationDecorator.new(user)
-      allow(decorator).to receive(:user?).and_return(true)
-      allow(decorator).to receive(:twitterable).and_return(nil)
-      allow(decorator).to receive(:websiteable).and_return("website")
-      expect(decorator.show_twitter_and_website(user)).to eq("website")
-    end
-  end
-
   describe "ass_name" do
     it "grabs the association name" do
       wheel_size = FactoryBot.create(:wheel_size, name: "foobar", iso_bsd: 559)
       bike = Bike.new(front_wheel_size: wheel_size)
       expect(ApplicationDecorator.new(bike).ass_name("front_wheel_size")).to eq("foobar")
-    end
-  end
-
-  describe "display_phone" do
-    it "displays the phone with an area code" do
-      location = Location.new
-      allow(location).to receive(:phone).and_return("999 999 9999")
-      expect(ApplicationDecorator.new(location).display_phone).to eq("999 999 9999")
-    end
-    it "displays the phone with a country code" do
-      location = Location.new
-      allow(location).to receive(:phone).and_return("+91 8041505583")
-      expect(ApplicationDecorator.new(location).display_phone).to eq("+91 804 150 5583")
     end
   end
 end
