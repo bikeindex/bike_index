@@ -30,6 +30,10 @@ class Invoice < ActiveRecord::Base
     where(id: str).first
   end
 
+  def self.feature_slugs
+    all.map(&:feature_slugs).flatten.uniq
+  end
+
   def subscription_duration; 1.year end # Static, at least for now
   def renewal_invoice?; first_invoice_id.present? end
   def active?; is_active end # Alias - don't directly access the db attribute, because it might change

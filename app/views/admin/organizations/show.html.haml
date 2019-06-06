@@ -9,6 +9,9 @@
   %h2.text-danger
     Organization is suspended
 
+- if @organization.law_enforcement_missing_verified_features?
+  .alert.alert-info
+    This is a law enforcement organization without unstolen notifications. To enable unstolen notifications, #{link_to "add an invoice for this organization", new_admin_organization_invoice_path(organization_id: @organization.to_param)} and enable "unstolen notifications" in it
 .row
   .col-md-6
     %table.table-list
@@ -322,5 +325,6 @@
     = link_to "Manage organization invitations", admin_organization_invitation_url(organization_id: @organization.to_param), class: "btn btn-warning"
   %li.list-inline-item.mt-4
     = link_to "Edit", edit_admin_organization_url(@organization), class: "btn btn-success"
-  %li.list-inline-item.mt-4
-    = link_to "Delete #{@organization.name}!", admin_organization_url(@organization), method: :delete, confirm: "Are you sure?", class: "btn btn-danger"
+  - unless @organization.deleted?
+    %li.list-inline-item.mt-4
+      = link_to "Delete #{@organization.name}!", admin_organization_url(@organization), method: :delete, confirm: "Are you sure?", class: "btn btn-danger"
