@@ -65,7 +65,7 @@
                   Owner phone
                 %td
                   %a.phone-number-link{ href: "tell:#{@stolen_record.phone}" }
-                    = @stolen_record.display_phone
+                    = display_phone(@stolen_record.phone)
             - if @stolen_record.police_report_number.present?
               %tr
                 %td.td-title
@@ -96,7 +96,7 @@
               Registered
             %td
               = @bike.created_at.strftime("%Y-%m-%d")
-              to 
+              to
               - if @bike.owner.present? && @bike.owner.name.present?
                 = @bike.owner.name
               - else

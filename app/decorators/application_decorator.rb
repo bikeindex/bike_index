@@ -82,15 +82,4 @@ class ApplicationDecorator < Draper::Decorator
     html << " - #{item.country.iso}"
     html
   end
-
-  def display_phone(str = nil)
-    str ||= object&.phone
-    if str.blank?
-      nil
-    elsif str[/\+/]
-      number_to_phone(str.gsub(/\+\d*/, ""), country_code: str[/\A.\d*/].gsub("+", ""), delimiter: " ")
-    else
-      number_to_phone(str, delimiter: " ")
-    end
-  end
 end

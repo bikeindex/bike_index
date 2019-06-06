@@ -1,6 +1,15 @@
 require "spec_helper"
 
 describe ApplicationHelper do
+  describe "#display_phone" do
+    it "displays the phone with an area code" do
+      expect(display_phone("999 999 9999")).to eq("999 999 9999")
+    end
+    it "displays the phone with a country code" do
+      expect(display_phone("+91 8041505583")).to eq("+91 804 150 5583")
+    end
+  end
+
   describe "active_link" do
     context "without a class" do
       it "returns the link active if it ought to be" do

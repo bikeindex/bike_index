@@ -78,17 +78,4 @@ describe ApplicationDecorator do
       expect(ApplicationDecorator.new(bike).ass_name("front_wheel_size")).to eq("foobar")
     end
   end
-
-  describe "display_phone" do
-    it "displays the phone with an area code" do
-      location = Location.new
-      allow(location).to receive(:phone).and_return("999 999 9999")
-      expect(ApplicationDecorator.new(location).display_phone).to eq("999 999 9999")
-    end
-    it "displays the phone with a country code" do
-      location = Location.new
-      allow(location).to receive(:phone).and_return("+91 8041505583")
-      expect(ApplicationDecorator.new(location).display_phone).to eq("+91 804 150 5583")
-    end
-  end
 end
