@@ -16,7 +16,7 @@ class Admin::UsersController < Admin::BaseController
 
   def edit
     # If the user has a bunch of bikes, it can cause timeouts. In those cases, use rough approximation
-    if @user.rough_approx_bikes.count
+    if @user.rough_approx_bikes.count > 25
       bikes = @user.rough_approx_bikes
     else
       bikes = @user.bikes

@@ -140,16 +140,16 @@ class Admin::BikesController < Admin::BaseController
 
   def matching_bikes
     return @matching_bikes if defined?(@matching_bikes)
-    bikes = Bike.unscoped
     if params[:search_user_id].present?
       @user = User.find(params[:search_user_id])
-      if @user.rough_approx_bikes.count
+      if @user.rough_approx_bikes.count > 25
         bikes = @user.rough_approx_bikes
       else
         bikes = @user.bikes
       end
     else
       # do example here because it doesn't work w/ @user and also unscopes
+      bikes = Bike.unscoped
       bikes = bikes.example if params[:search_example].present?
     end
     bikes = bikes.non_example if params[:search_non_example].present?
