@@ -22,7 +22,6 @@ class Admin::StolenNotificationsController < Admin::BaseController
 
   def show
     @bike = @stolen_notification.bike
-    @stolen_notification = @stolen_notification.decorate
   end
 
   def find_notification

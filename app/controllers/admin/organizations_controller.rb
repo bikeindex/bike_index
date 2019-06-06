@@ -10,12 +10,11 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def show
-    @locations = @organization.locations.decorate
+    @locations = @organization.locations
     bikes = @organization.bikes.reorder("created_at desc")
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     @bikes = bikes.page(page).per(per_page)
-    @organization = @organization.decorate
     render layout: "new_admin"
   end
 
