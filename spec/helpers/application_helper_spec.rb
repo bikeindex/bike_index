@@ -10,6 +10,42 @@ describe ApplicationHelper do
     end
   end
 
+  describe "#show_twitter_and_website" do
+    it "combines twitter and website" do
+      user = User.new(show_website: true,
+                      website: "website",
+                      show_twitter: true,
+                      twitter: "twitter")
+      html = show_twitter_and_website(user)
+      expect(html).to eq("<a href=\"https://twitter.com/twitter\">Twitter</a> and <a href=\"website\">Website</a>")
+    end
+    it "justs return website if no twitter" do
+      user = User.new(show_website: true, website: "website")
+      html = show_twitter_and_website(user)
+      expect(html).to eq("<a href=\"website\">Website</a>")
+    end
+  end
+
+  describe "#websiteable" do
+    it "creates a link if bike owner wants one shown" do
+      user = User.new
+      allow(user).to receive(:show_website).and_return(true)
+      allow(user).to receive(:website).and_return("website")
+      html = websiteable(user)
+      expect(html).to eq('<a href="website">Website</a>')
+    end
+  end
+
+  describe "#twitterable" do
+    it "creates a link if bike owner wants one shown" do
+      user = User.new
+      allow(user).to receive(:show_twitter).and_return(true)
+      allow(user).to receive(:twitter).and_return("twitter")
+      html = twitterable(user)
+      expect(html).to eq('<a href="https://twitter.com/twitter">Twitter</a>')
+    end
+  end
+
   describe "active_link" do
     context "without a class" do
       it "returns the link active if it ought to be" do

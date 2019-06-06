@@ -14,18 +14,6 @@ describe BikeDecorator do
     end
   end
 
-  describe "bike_show_twitter_and_website" do
-    it "calls the method from application decorator" do
-      user = User.new
-      bike = Bike.new
-      allow(bike).to receive(:user).and_return(user)
-      decorator = BikeDecorator.new(bike)
-      allow(bike).to receive(:user?).and_return(true)
-      expect(decorator).to receive(:show_twitter_and_website).with(user)
-      decorator.bike_show_twitter_and_website
-    end
-  end
-
   describe "title" do
     it "returns the major bike attribs formatted" do
       bike = Bike.new

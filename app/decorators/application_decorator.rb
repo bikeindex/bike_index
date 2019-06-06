@@ -53,31 +53,6 @@ class ApplicationDecorator < Draper::Decorator
     end
   end
 
-  def twitterable(user)
-    if user.show_twitter and user.twitter
-      h.link_to "Twitter", "https://twitter.com/#{user.twitter}"
-    end
-  end
-
-  def websiteable(user)
-    if user.show_website and user.website
-      h.link_to "Website", user.website
-    end
-  end
-
-  def show_twitter_and_website(user)
-    if twitterable(user) or websiteable(user)
-      html = ""
-      if twitterable(user)
-        html << twitterable(user)
-        html << " and #{websiteable(user)}" if websiteable(user)
-      else
-        html << websiteable(user)
-      end
-      html.html_safe
-    end
-  end
-
   def short_address(item)
     return nil unless item.country
     html = "#{item.city}"

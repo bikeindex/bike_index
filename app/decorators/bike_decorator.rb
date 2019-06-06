@@ -18,12 +18,6 @@ class BikeDecorator < ApplicationDecorator
     html.html_safe
   end
 
-  def bike_show_twitter_and_website
-    return nil unless object.user?
-    user = object.user
-    show_twitter_and_website(user)
-  end
-
   def title
     t = ""
     t += "#{object.year} " if object.year.present?

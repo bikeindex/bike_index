@@ -177,4 +177,29 @@ module ApplicationHelper
       number_to_phone(str, delimiter: " ")
     end
   end
+
+  def twitterable(user)
+    if user.show_twitter and user.twitter
+      link_to "Twitter", "https://twitter.com/#{user.twitter}"
+    end
+  end
+
+  def websiteable(user)
+    if user.show_website and user.website
+      link_to "Website", user.website
+    end
+  end
+
+  def show_twitter_and_website(user)
+    if twitterable(user) or websiteable(user)
+      html = ""
+      if twitterable(user)
+        html << twitterable(user)
+        html << " and #{websiteable(user)}" if websiteable(user)
+      else
+        html << websiteable(user)
+      end
+      html.html_safe
+    end
+  end
 end
