@@ -66,16 +66,3 @@
               %span.context-display-help
                 +
               Add an organization
-
-        .form-wrap.secondary-form-wrap
-          .form-well-form-header
-            %h3
-              Ownership
-          .col-xs-12
-            %p
-              Sell, trade or give away this #{@bike.type}?
-              Enter the new owner's email to transfer the registration.
-          .form-group.row.unnested-field.no-divider-row
-            = f.label :owner_email, class: 'form-well-label'
-            .form-well-input
-              = f.email_field :owner_email, required: true, class: 'form-control'
