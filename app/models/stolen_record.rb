@@ -1,6 +1,13 @@
 class StolenRecord < ActiveRecord::Base
   include ActiveModel::Dirty
   include Phonifyerable
+  RECOVERY_DISPLAY_STATUS_ENUM = {
+    not_elibible: 0,
+    waiting_on_decision: 1,
+    displayable_no_photo: 2,
+    displayed: 3,
+    not_displayed: 4,
+  }.freeze
 
   attr_accessor :timezone # Just to provide a backup and permit assignment
 
@@ -25,7 +32,7 @@ class StolenRecord < ActiveRecord::Base
   validates_presence_of :bike
   validates_presence_of :date_stolen
 
-  enum recovery_display_status: [:waiting_on_decision, :displayable_no_photo, :not_elibible, :displayed, :not_displayed]
+  enum recovery_display_status: RECOVERY_DISPLAY_STATUS_ENUM
 
   default_scope { where(current: true) }
   scope :approveds, -> { where(approved: true) }

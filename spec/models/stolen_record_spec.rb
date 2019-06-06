@@ -115,6 +115,12 @@ describe StolenRecord do
     end
   end
 
+  describe "recovery display status" do
+    it "is not elibible" do
+      expect(StolenRecord.new.recovery_display_status).to eq "not_elibible"
+    end
+  end
+
   describe "set_phone" do
     it "it should set_phone" do
       stolen_record = FactoryBot.create(:stolen_record)
