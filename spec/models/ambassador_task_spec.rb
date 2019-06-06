@@ -2,24 +2,11 @@ require "spec_helper"
 
 describe AmbassadorTask, type: :model do
   describe "#ensure_assigned_to_all_ambassadors!" do
-    it "idempotently creates assignments to the given task for all ambassadors" do
-      user = FactoryBot.create(:user_confirmed)
-      a1, a2, a3 = FactoryBot.create_list(:ambassador, 3)
+    it "enqueues a job to assign the new task to all ambassadors" do
       task = FactoryBot.create(:ambassador_task)
 
-      task.ensure_assigned_to_all_ambassadors!
-
-      expect(user.ambassador_task_assignments.count).to eq(0)
-      expect(a1.ambassador_task_assignments.count).to eq(1)
-      expect(a2.ambassador_task_assignments.count).to eq(1)
-      expect(a3.ambassador_task_assignments.count).to eq(1)
-
-      task.ensure_assigned_to_all_ambassadors!
-
-      expect(user.ambassador_task_assignments.count).to eq(0)
-      expect(a1.ambassador_task_assignments.count).to eq(1)
-      expect(a2.ambassador_task_assignments.count).to eq(1)
-      expect(a3.ambassador_task_assignments.count).to eq(1)
+      expect { task.ensure_assigned_to_all_ambassadors! }
+        .to(change { AmbassadorTaskAfterCreateWorker.jobs.size }.by(1))
     end
   end
 

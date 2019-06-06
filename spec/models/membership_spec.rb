@@ -1,6 +1,24 @@
 require "spec_helper"
 
 describe Membership do
+  describe "#ensure_ambassador_tasks_assigned!" do
+    context "given an ambassador organization" do
+      it "enqueues a job to assign ambassador tasks to the given user" do
+        membership = FactoryBot.create(:membership_ambassador)
+        expect { membership.ensure_ambassador_tasks_assigned! }
+          .to(change { AmbassadorMembershipAfterCreateWorker.jobs.size }.by(1))
+      end
+    end
+
+    context "given a non-ambassador organization" do
+      it "does not enqueue a job to assign ambassador tasks to the given user" do
+        membership = FactoryBot.create(:existing_membership)
+        expect { membership.ensure_ambassador_tasks_assigned! }
+          .to_not(change { AmbassadorMembershipAfterCreateWorker.jobs.size })
+      end
+    end
+  end
+
   describe ".ambassador_organizations" do
     it "returns all and only ambassador organizations" do
       FactoryBot.create(:existing_membership)
