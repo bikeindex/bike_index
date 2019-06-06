@@ -18,15 +18,14 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[completed_at organization_name task_title ambassador_name]
+    %w[completed_at organization_name ambassador_task_title ambassador_name]
   end
 
   def filter_params
-    {}.tap do |h|
-      h[:organization_id] = organization_filter if organization_filter.present?
-      h[:ambassador_task_id] = params[:search_ambassador_task_id] if params[:search_ambassador_task_id].present?
-      h[:ambassador_id] = params[:search_ambassador_id] if params[:search_ambassador_id].present?
-    end
+    params
+      .slice(:search_organization_id, :search_ambassador_task_id, :search_ambassador_id)
+      .map { |k, v| [k[/(?<=search_).+/].to_sym, v] }
+      .to_h
   end
 
   def organization_filter

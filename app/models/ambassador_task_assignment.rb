@@ -28,13 +28,13 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
   # enforcing single membership.
   #
   # filters: :organization_id, :ambassador_task_id, :ambassador_id (multiple permitted)
-  # sort: :organization_name, :task_title, :ambassador_name
+  # sort: :organization_name, :ambassador_task_title, :ambassador_name
   #
   # Example:
   #
   #    AmbassadorTaskAssignment.completed_assignments(
   #      filters: { organization_id: 3, ambassador_task_id: 1 },
-  #      sort: { task_title: :desc }
+  #      sort: { ambassador_task_title: :desc }
   #    )
   #
   # Return [AmbassadorTaskAssignment]
@@ -82,7 +82,7 @@ class AmbassadorTaskAssignment < ActiveRecord::Base
         sql << "ORDER BY organizations.name #{sort_dir}\n"
       when :completed_at
         sql << "ORDER BY ambassador_task_assignments.completed_at #{sort_dir}\n"
-      when :task_title
+      when :ambassador_task_title
         sql << "ORDER BY ambassador_tasks.title #{sort_dir}\n"
       when :ambassador_name
         sql << "ORDER BY users.name #{sort_dir}\n"

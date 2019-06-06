@@ -36,7 +36,7 @@
     %thead.small-header
       %th= sortable "completed_at"
       %th= sortable "organization_name"
-      %th= sortable "task_title"
+      %th= sortable "ambassador_task_title", "Task Title"
       %th= sortable "ambassador_name"
     %tbody
       - @ambassador_task_assignments.each do |assignment|
