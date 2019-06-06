@@ -18,11 +18,13 @@ class Admin::UsersController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     # If the user has a bunch of bikes, it can cause timeouts. In those cases, use rough approximation
-    if @user.rough_approx_bikes.count > per_page
-      bikes = @user.rough_approx_bikes
-    else
-      bikes = @user.bikes
-    end
+    # if @user.rough_approx_bikes.count > per_page
+    #   bikes = @user.rough_approx_bikes
+    # else
+    #   bikes = @user.bikes
+    # end
+    bikes = @user.bikes.limit(10)
+    @bikescount = @user.bikes.count
     @bikes = bikes.reorder(created_at: :desc).page(page).per(per_page)
   end
 

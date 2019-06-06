@@ -81,6 +81,10 @@
       %strong
         = number_with_delimiter(@bikes.total_count)
       = "Matching Bike".pluralize(@bikes.total_count)
+      - if @user
+        %strong
+          Owned by
+          = link_to "#{@user.email}", admin_user_path(@user)
   .col-md-7
     = form_tag admin_bikes_path, method: :get, class: "form-inline" do
       = hidden_field_tag :sort
