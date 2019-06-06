@@ -1,6 +1,8 @@
+# NB: Decorators are deprecated in this project.
+#     Use Helper methods for view logic, consider incrementally refactoring
+#     existing view logic from decorators to view helpers.
 class AmbassadorTaskAssignmentDecorator < ApplicationDecorator
   delegate_all
-  alias ambassador_task_assignment object
 
   def button_to_toggle_completion_status(current_user, current_organization)
     return unless current_user.ambassador?
