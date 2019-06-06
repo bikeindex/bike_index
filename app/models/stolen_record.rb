@@ -109,7 +109,7 @@ class StolenRecord < ActiveRecord::Base
     locking_defeat_description.map { |l| [l, l] }
   end
 
-  before_save :set_phone, :fix_date, :titleize_city, :update_tsved_at
+  before_save :set_phone, :fix_date, :titleize_city, :update_tsved_at, :set_recovery_display
 
   def set_phone
     self.phone = Phonifyer.phonify(phone) if phone
@@ -177,15 +177,15 @@ class StolenRecord < ActiveRecord::Base
     row
   end
 
-  def recovery_display_check(info)
-    if info[:can_share_recovery] == "true"
-      if self.bike.thumb_path.present?
-        self.update_attributes(recovery_display_status: "waiting_on_decision")
+  def set_recovery_display
+    if can_share_recovery
+      if bike.thumb_path.present?
+        self.recovery_display_status = "waiting_on_decision"
       else
-        self.update_attributes(recovery_display_status: "displayable_no_photo")
+        self.recovery_display_status = "displayable_no_photo"
       end
     else
-      self.update_attributes(recovery_display_status: "not_elibible")
+      self.recovery_display_status = "not_elibible"
     end
   end
 

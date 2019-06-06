@@ -119,6 +119,32 @@ describe StolenRecord do
     it "is not elibible" do
       expect(StolenRecord.new.recovery_display_status).to eq "not_elibible"
     end
+    context "stolen record is recovered, unable to share" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: false) }
+      it "is not displayed" do
+        expect(stolen_record.recovery_display_status).to eq "not_elibible"
+      end
+    end
+    context "stolen record is recovered, able to share" do
+      let!(:bike) { FactoryBot.create(:bike, thumb_path: "https://via.placeholder.com/150") }
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, bike: bike, can_share_recovery: true) }
+      it "is waiting on decision when user marks that we can share" do
+        expect(stolen_record.recovery_display_status).to eq "waiting_on_decision"
+      end
+    end
+    # context "stolen record is recovered, sharable but no photo" do
+    #   let(:bike) { FactoryBot.create(:bike) }
+    #   let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, bike: bike) }
+    #   it "is not displayed" do
+    #     expect(stolen_record.recovery_display_status).to eq "not_elibible"
+    #   end
+    # end
+    # context "stolen record is recovered, admin marked as undisplayable" do
+    #   let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: false) }
+    #   it "is not displayed" do
+    #     expect(stolen_record.recovery_display_status).to eq "not_elibible"
+    #   end
+    # end
   end
 
   describe "set_phone" do
