@@ -15,12 +15,21 @@ class TimeParser
     end
   rescue ArgumentError => e
     # Try to parse some other, unexpected formats - for now, just one
-    raise e unless time_str[%r{\d+/\d+/\d}] # IE 11 sends this format
+    ie11_formatted = %r{(?<month>\d+)/(?<day>\d+)/(?<year>\d+)}.match(time_str)
+    raise e unless ie11_formatted
+
     # Time zones are hell
     Time.zone = parse_timezone(timezone_str)
-    time = Time.strptime(time_str, "%m/%d/%Y")
+
+    time_str =
+      %i(year month day)
+        .map { |component| ie11_formatted[component] }
+        .join("-")
+
+    time = Time.zone.parse(time_str)
                .in_time_zone(parse_timezone(timezone_str))
                .beginning_of_day
+
     Time.zone = DEFAULT_TIMEZONE
     time
   end
