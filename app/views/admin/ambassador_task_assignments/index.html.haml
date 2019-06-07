@@ -1,6 +1,6 @@
 .admin-subnav
   .col-md-5
-    %h1 Completed Ambassador Task Assignments
+    %h1 Completed Ambassador Activities
 
 .row
   .col-md-6
@@ -36,7 +36,7 @@
     %thead.small-header
       %th= sortable "completed_at"
       %th= sortable "organization_name"
-      %th= sortable "ambassador_task_title", "Task Title"
+      %th= sortable "ambassador_task_title", "Activity Title"
       %th= sortable "ambassador_name"
     %tbody
       - @ambassador_task_assignments.each do |assignment|

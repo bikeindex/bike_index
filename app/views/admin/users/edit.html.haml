@@ -2,6 +2,9 @@
   .col-md-6
     %h1
       Editing #{@user.email}
+      - if current_user.developer?
+        %em.small.less-strong
+          id: #{@user.id}
     %table.table-list
       %tbody
         %tr
