@@ -19,8 +19,12 @@ class Admin::PaymentsController < Admin::BaseController
     else
       invoices = Invoice
     end
-    @invoices = invoices.includes(:organization, :payments)
-      .reorder(sort_column + " " + sort_direction).page(page).per(per_page)
+    @invoices =
+      invoices
+        .includes(:organization, :payments, :paid_features, :first_invoice)
+        .reorder(sort_column + " " + sort_direction)
+        .page(page)
+        .per(per_page)
   end
 
   def new
