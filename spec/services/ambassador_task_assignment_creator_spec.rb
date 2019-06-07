@@ -10,6 +10,7 @@ RSpec.describe AmbassadorTaskAssignmentCreator do
 
         AmbassadorTaskAssignmentCreator.assign_task_to_all_ambassadors(task)
 
+        expect(AmbassadorTaskAssignment.count).to eq(3)
         expect(user.ambassador_task_assignments.count).to eq(0)
         expect(a1.ambassador_task_assignments.count).to eq(1)
         expect(a2.ambassador_task_assignments.count).to eq(1)
@@ -17,6 +18,7 @@ RSpec.describe AmbassadorTaskAssignmentCreator do
 
         AmbassadorTaskAssignmentCreator.assign_task_to_all_ambassadors(task.id)
 
+        expect(AmbassadorTaskAssignment.count).to eq(3)
         expect(user.ambassador_task_assignments.count).to eq(0)
         expect(a1.ambassador_task_assignments.count).to eq(1)
         expect(a2.ambassador_task_assignments.count).to eq(1)

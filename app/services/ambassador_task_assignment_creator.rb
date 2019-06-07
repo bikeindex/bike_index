@@ -14,17 +14,15 @@ module AmbassadorTaskAssignmentCreator
         .where(ambassador_task_assignments: { ambassador_task_id: ambassador_task.id })
         .select(:id)
 
-    not_assigned_ambassador_ids =
+    new_assignments =
       Ambassador
         .includes(:ambassador_task_assignments)
-        .where.not(id: already_assigned_ambassador_ids)
+        .where
+        .not(id: already_assigned_ambassador_ids)
         .pluck(:id)
+        .map { |ambassador_id| { user_id: ambassador_id, ambassador_task_id: ambassador_task.id } }
 
-    new_assignments =
-      not_assigned_ambassador_ids
-        .map { |ambassador_id| { user_id: ambassador_id, ambassador_task: ambassador_task } }
-
-    AmbassadorTaskAssignment.create(new_assignments)
+    AmbassadorTaskAssignment.import(new_assignments, validate: true)
   end
 
   def self.assign_all_ambassador_tasks_to(ambassador_or_id)
@@ -37,6 +35,20 @@ module AmbassadorTaskAssignmentCreator
                  "Not an Ambassador or Ambassador id: #{ambassador_or_id}"
       end
 
-    AmbassadorTask.find_each { |task| task.assign_to(ambassador) }
+    already_assigned_task_ids =
+      AmbassadorTask
+        .includes(ambassador_task_assignments: :ambassadors)
+        .where(ambassador_task_assignments: { ambassador: ambassador })
+        .select(:id)
+
+    new_assignments =
+      AmbassadorTask
+        .includes(:ambassador_task_assignments)
+        .where
+        .not(id: already_assigned_task_ids)
+        .pluck(:id)
+        .map { |t_id| { ambassador_task_id: t_id, user_id: ambassador.id } }
+
+    AmbassadorTaskAssignment.import(new_assignments, validate: true)
   end
 end
