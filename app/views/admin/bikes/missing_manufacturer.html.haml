@@ -31,11 +31,12 @@
     .col-md-2
       = submit_tag 'Update selected', class: 'btn btn-primary'
   = paginate @bikes, views_prefix: "admin"
-  .full-screen-table
+  .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
       %thead.thead-light
         %th.table-cell-check
-          &#x2713;
+          %a#multi-mnfg-selector{ href: "#" }
+            &#x2713;
         %th
           Date indexed
         %th
@@ -48,7 +49,7 @@
       %tbody
         - @bikes.each do |bike|
           %tr
-            %td
+            %td.table-cell-check.update-mnfg-select
               = check_box_tag "bikes_selected[#{bike.id}]", bike.id
             %td
               .less-strong-hold
