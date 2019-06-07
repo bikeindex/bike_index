@@ -33,6 +33,8 @@ GEM
       activemodel (= 4.2.11)
       activesupport (= 4.2.11)
       arel (~> 6.0)
+    activerecord-import (1.0.2)
+      activerecord (>= 3.2)
     activesupport (4.2.11)
       i18n (~> 0.7)
       minitest (~> 5.1)
@@ -610,6 +612,7 @@ PLATFORMS
 
 DEPENDENCIES
   active_model_serializers (~> 0.9.3)
+  activerecord-import
   airborne
   api-pagination
   aws-sdk (~> 1.33)
