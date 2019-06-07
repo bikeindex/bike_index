@@ -106,6 +106,21 @@ describe Organization do
     end
   end
 
+  describe "friendly find" do
+    let!(:organization) { FactoryBot.create(:organization, short_name: "something cool") }
+    let!(:organization2) { FactoryBot.create(:organization, short_name: "Bike Shop", name: "Trek Store of Santa Cruz") }
+    let!(:organization3) { FactoryBot.create(:organization, short_name: "BikeEastBay", previous_slug: "ebbc") }
+    it "finds by slug, previous_slug and name" do
+      expect(organization2.slug).to eq "bike-shop"
+      expect(Organization.friendly_find(" ")).to be_nil
+      expect(Organization.friendly_find("something-cool")).to eq organization
+      expect(Organization.friendly_find("bike shop")).to eq organization2
+      expect(Organization.where("LOWER(name) = LOWER(?)", "trek store of SANTA CRUZ".downcase).first).to eq organization2
+      expect(Organization.friendly_find("trek store of SANTA CRUZ")).to eq organization2
+      expect(Organization.friendly_find("bikeeastbay")).to eq organization3
+    end
+  end
+
   describe "map_coordinates" do
     # There is definitely a better way to do this!
     # But for now, just stubbing it because whatever, they haven't put anything in

@@ -102,7 +102,6 @@ CREATE TABLE public.ambassador_task_assignments (
 --
 
 CREATE SEQUENCE public.ambassador_task_assignments_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -135,7 +134,6 @@ CREATE TABLE public.ambassador_tasks (
 --
 
 CREATE SEQUENCE public.ambassador_tasks_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -212,7 +210,6 @@ CREATE TABLE public.bike_code_batches (
 --
 
 CREATE SEQUENCE public.bike_code_batches_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1525,7 +1522,8 @@ CREATE TABLE public.organizations (
     kind integer,
     ascend_name character varying,
     registration_field_labels jsonb DEFAULT '{}'::jsonb,
-    pos_kind integer DEFAULT 0
+    pos_kind integer DEFAULT 0,
+    previous_slug character varying
 );
 
 
@@ -4168,4 +4166,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190517200357');
 INSERT INTO schema_migrations (version) VALUES ('20190524191139');
 
 INSERT INTO schema_migrations (version) VALUES ('20190529024835');
+
+INSERT INTO schema_migrations (version) VALUES ('20190607174104');
 

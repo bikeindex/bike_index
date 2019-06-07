@@ -24,6 +24,11 @@
               = @organization.id
       %tr
         %td
+          Short Name
+        %td
+          = @organization.short_name
+      %tr
+        %td
           Map
         %td
           - unless @organization.approved
@@ -34,7 +39,8 @@
             %em
               Would be
           - if @organization.show_on_map
-            Shown on map
+            %span.less-strong
+              Shown on map
           - else
             %strong
               Not Shown
@@ -54,11 +60,6 @@
           = link_to "org's manage", organization_manage_index_path(organization_id: @organization.to_param)
       %tr
         %td
-          Auto user email
-        %td
-          = @organization.auto_user.email if @organization.auto_user.present?
-      %tr
-        %td
           Created
         %td
           %span.convertTime.preciseTime
@@ -73,6 +74,11 @@
 
   .col-md-6
     %table.table-list
+      %tr
+        %td
+          Auto user email
+        %td
+          = @organization.auto_user.email if @organization.auto_user.present?
       %tr
         %td
           Users
