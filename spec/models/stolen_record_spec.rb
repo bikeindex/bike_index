@@ -121,30 +121,32 @@ describe StolenRecord do
     end
     context "stolen record is recovered, unable to share" do
       let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: false) }
+      before do
+        stolen_record.set_recovery_display
+      end
       it "is not displayed" do
         expect(stolen_record.recovery_display_status).to eq "not_elibible"
       end
     end
     context "stolen record is recovered, able to share" do
-      let!(:bike) { FactoryBot.create(:bike, thumb_path: "https://via.placeholder.com/150") }
-      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, bike: bike, can_share_recovery: true) }
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
+      before do
+        stolen_record.bike.thumb_path = "http://via.placeholder.com/300"
+        stolen_record.set_recovery_display
+      end
       it "is waiting on decision when user marks that we can share" do
         expect(stolen_record.recovery_display_status).to eq "waiting_on_decision"
       end
     end
-    # context "stolen record is recovered, sharable but no photo" do
-    #   let(:bike) { FactoryBot.create(:bike) }
-    #   let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, bike: bike) }
-    #   it "is not displayed" do
-    #     expect(stolen_record.recovery_display_status).to eq "not_elibible"
-    #   end
-    # end
-    # context "stolen record is recovered, admin marked as undisplayable" do
-    #   let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: false) }
-    #   it "is not displayed" do
-    #     expect(stolen_record.recovery_display_status).to eq "not_elibible"
-    #   end
-    # end
+    context "stolen record is recovered, sharable but no photo" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
+      before do
+        stolen_record.set_recovery_display
+      end
+      it "is not displayed" do
+        expect(stolen_record.recovery_display_status).to eq "displayable_no_photo"
+      end
+    end
   end
 
   describe "set_phone" do
@@ -155,9 +157,6 @@ describe StolenRecord do
       stolen_record.set_phone
       expect(stolen_record.phone).to eq("0000000000")
       expect(stolen_record.secondary_phone).to eq("0000000000")
-    end
-    it "has before_save_callback_method defined as a before_save callback" do
-      expect(StolenRecord._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_phone)).to eq(true)
     end
   end
 
@@ -182,8 +181,12 @@ describe StolenRecord do
       stolen_record.titleize_city
       expect(stolen_record.city).to eq("Georgian La")
     end
-    it "has before_save_callback_method defined as a before_save callback" do
-      expect(StolenRecord._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:titleize_city)).to eq(true)
+  end
+
+  describe "set_calculated_attributes" do
+    let(:stolen_record) { FactoryBot.create(:stolen_record) }
+    it "has before_save_callback_method defined as before_save callback" do
+      expect(stolen_record._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_calculated_attributes)).to eq(true)
     end
   end
 
@@ -208,10 +211,6 @@ describe StolenRecord do
       stolen_record.date_stolen = next_year
       stolen_record.fix_date
       expect(stolen_record.date_stolen.year).to eq(Time.now.year - 1)
-    end
-
-    it "has before_save_callback_method defined as a before_save callback" do
-      expect(StolenRecord._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:fix_date)).to eq(true)
     end
   end
 

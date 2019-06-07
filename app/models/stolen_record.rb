@@ -1,13 +1,7 @@
 class StolenRecord < ActiveRecord::Base
   include ActiveModel::Dirty
   include Phonifyerable
-  RECOVERY_DISPLAY_STATUS_ENUM = {
-    not_elibible: 0,
-    waiting_on_decision: 1,
-    displayable_no_photo: 2,
-    displayed: 3,
-    not_displayed: 4,
-  }.freeze
+  RECOVERY_DISPLAY_STATUS_ENUM = %w[ not_eligible waiting_on_decision displayable_no_photo displayed not_displayed ].freeze
 
   attr_accessor :timezone # Just to provide a backup and permit assignment
 
@@ -109,7 +103,15 @@ class StolenRecord < ActiveRecord::Base
     locking_defeat_description.map { |l| [l, l] }
   end
 
-  before_save :set_phone, :fix_date, :titleize_city, :update_tsved_at, :set_recovery_display
+  before_save :set_calculated_attributes
+
+  def set_calculated_attributes
+    set_phone
+    fix_date
+    titleize_city
+    update_tsved_at
+    set_recovery_display
+  end
 
   def set_phone
     self.phone = Phonifyer.phonify(phone) if phone
@@ -185,7 +187,7 @@ class StolenRecord < ActiveRecord::Base
         self.recovery_display_status = "displayable_no_photo"
       end
     else
-      self.recovery_display_status = "not_elibible"
+      self.recovery_display_status = "not_eligible"
     end
   end
 
