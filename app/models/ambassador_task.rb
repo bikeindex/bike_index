@@ -20,9 +20,6 @@ class AmbassadorTask < ActiveRecord::Base
 
   # Assigns the task to all ambassadors, if not already assigned
   def ensure_assigned_to_all_ambassadors!
-    Ambassador.find_each do |ambassador|
-      next if ambassador_task_assignments.exists?(ambassador: ambassador)
-      assign_to(ambassador)
-    end
+    AmbassadorTaskAfterCreateWorker.perform_async(id)
   end
 end
