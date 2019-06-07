@@ -115,7 +115,6 @@ describe Organization do
       expect(Organization.friendly_find(" ")).to be_nil
       expect(Organization.friendly_find("something-cool")).to eq organization
       expect(Organization.friendly_find("bike shop")).to eq organization2
-      expect(Organization.where("LOWER(name) = LOWER(?)", "trek store of SANTA CRUZ".downcase).first).to eq organization2
       expect(Organization.friendly_find("trek store of SANTA CRUZ")).to eq organization2
       expect(Organization.friendly_find("bikeeastbay")).to eq organization3
     end
