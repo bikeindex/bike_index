@@ -72,7 +72,9 @@ class Organization < ActiveRecord::Base
   def self.friendly_find(n)
     return nil unless n.present?
     return find(n) if integer_slug?(n)
-    find_by_slug(Slugifyer.slugify(n)) || find_by_name(n) # Fallback, search by name just in case
+    slug = Slugifyer.slugify(n)
+    # First try slug, then previous slug, and finally, just give finding by name a shot
+    find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first
   end
 
   def self.integer_slug?(n)
