@@ -151,6 +151,10 @@ class Organization < ActiveRecord::Base
     message_kinds.any? || paid_for?("unstolen_notifications")
   end
 
+  def law_enforcement_missing_verified_features?
+    law_enforcement? && !paid_for?("unstolen_notifications")
+  end
+
   def paid_for?(feature_name)
     return false unless feature_name.present? && paid_feature_slugs.is_a?(Array)
     # If kinds is an array, make sure they all are permitted kinds
@@ -170,7 +174,7 @@ class Organization < ActiveRecord::Base
     self.is_paid = current_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
-    self.paid_feature_slugs = current_invoices.map(&:feature_slugs).flatten
+    self.paid_feature_slugs = current_invoices.feature_slugs
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, "")
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug

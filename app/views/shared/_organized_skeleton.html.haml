@@ -77,4 +77,8 @@
 .organized-wrap
   - orgcontainer = "container-fluid" if controller_name == "bikes" && action_name == "index" || controller_name == "messages"
   %div{ class: orgcontainer || "container" }
+    - if current_organization.law_enforcement_missing_verified_features?
+      .alert.alert-info.mb-4
+        %p
+          Bike Index provides additional features for verified Law Enforcement organizations. Please contact #{link_to "lily@bikeindex.org", "mailto:lily@bikeindex.org"} to get them enabled.
     = yield

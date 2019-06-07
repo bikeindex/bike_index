@@ -82,7 +82,7 @@ class UsersController < ApplicationController
       raise ActionController::RoutingError.new("Not Found")
     end
     @owner = user
-    @user = user.decorate
+    @user = user
     unless user == current_user || @user.show_bikes
       redirect_to user_home_url, notice: "Sorry, that user isn't sharing their bikes" and return
     end

@@ -886,7 +886,8 @@ describe BikesController do
         photos: "Photos",
         drivetrain: "Wheels + Drivetrain",
         accessories: "Accessories + Components",
-        ownership: "Groups + Ownership",
+        ownership: "Transfer Ownership",
+        groups: "Groups + Organizations",
         remove: "Hide or Delete",
       }
     end

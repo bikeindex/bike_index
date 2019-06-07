@@ -10,12 +10,11 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def show
-    @locations = @organization.locations.decorate
+    @locations = @organization.locations
     bikes = @organization.bikes.reorder("created_at desc")
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     @bikes = bikes.page(page).per(per_page)
-    @organization = @organization.decorate
     render layout: "new_admin"
   end
 
@@ -113,7 +112,14 @@ class Admin::OrganizationsController < Admin::BaseController
   def find_organization
     @organization = Organization.friendly_find(params[:id])
     return true if @organization.present?
-    flash[:error] = "Sorry! That organization doesn't exist"
-    redirect_to admin_organizations_url and return
+  rescue ActiveRecord::RecordNotFound
+    @organization = Organization.unscoped.friendly_find(params[:id])
+    if @organization.present?
+      flash[:error] = "This organization is deleted! Things might not work correctly in here"
+      return true
+    else
+      flash[:error] = "Sorry! That organization doesn't exist"
+      redirect_to admin_organizations_url and return
+    end
   end
 end

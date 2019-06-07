@@ -23,7 +23,7 @@
             %span.convertTime
               = l blog.published_at, format: :convert_time
           %td.medium-screens
-            = blog.user.name || blog.user.email
+            = blog.user&.name || blog.user&.email
           %td
             %p.blog-index
               = link_to blog.title, edit_admin_news_url(blog)

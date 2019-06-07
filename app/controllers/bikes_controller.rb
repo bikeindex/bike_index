@@ -26,11 +26,11 @@ class BikesController < ApplicationController
   end
 
   def show
-    @components = @bike.components.decorate
+    @components = @bike.components
     if @bike.stolen and @bike.current_stolen_record.present?
       # Show contact owner box on load - happens if user has clicked on it and then logged in
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
-      @stolen_record = @bike.current_stolen_record.decorate
+      @stolen_record = @bike.current_stolen_record
     end
     @bike = @bike.decorate
     respond_to do |format|
@@ -41,7 +41,7 @@ class BikesController < ApplicationController
 
   def pdf
     if @bike.stolen and @bike.current_stolen_record.present?
-      @stolen_record = @bike.current_stolen_record.decorate
+      @stolen_record = @bike.current_stolen_record
     end
     @bike = @bike.decorate
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..-1]
@@ -183,7 +183,8 @@ class BikesController < ApplicationController
       photos: "Photos",
       drivetrain: "Wheels + Drivetrain",
       accessories: "Accessories + Components",
-      ownership: "Groups + Ownership",
+      ownership: "Transfer Ownership",
+      groups: "Groups + Organizations",
       remove: "Hide or Delete",
       stolen: (@bike.stolen ? "#{stolen_type} details" : "Report Stolen or Missing"),
     }

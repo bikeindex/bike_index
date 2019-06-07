@@ -1,0 +1,53 @@
+.admin-subnav
+  .col-md-5
+    %h1 Completed Ambassador Activities
+
+.row
+  .col-md-6
+    - if !sortable_search_params?
+      %p= pluralize |
+          number_with_delimiter(@ambassador_task_assignments.total_count), |
+          "completed activities"
+    - else
+      %p
+        = pluralize |
+          number_with_delimiter(@ambassador_task_assignments.total_count), |
+          "matching completed activities"
+        %em= link_to "view all", admin_ambassador_task_assignments_path
+  .col-md-6
+    = form_tag admin_ambassador_task_assignments_path, method: :get,
+      class: "form-inline admin-filter-menu" do
+      = hidden_field_tag :sort, sort_column
+      = hidden_field_tag :sort_direction, sort_direction
+
+      .form-group.ml-2
+        = select_tag :search_organization_id, |
+          options_from_collection_for_select(Organization.ambassador, "id", "name", organization_filter), |
+          prompt: "Filter by organization", |
+          class: "form-control"
+
+      = submit_tag "Filter", name: "search", class: "btn btn-primary ml-2"
+
+
+= paginate @ambassador_task_assignments, views_prefix: "admin"
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
+      %th= sortable "completed_at"
+      %th= sortable "organization_name"
+      %th= sortable "ambassador_task_title", "Activity Title"
+      %th= sortable "ambassador_name"
+    %tbody
+      - @ambassador_task_assignments.each do |assignment|
+        %tr
+          %td.convertTime= l(assignment.completed_at, format: :convert_time)
+          %td= link_to assignment.organization_name, |
+          admin_ambassador_task_assignments_path(sortable_search_params.merge(search_organization_id: assignment.organization.id))
+          %td= link_to assignment.title, |
+          admin_ambassador_task_assignments_path(sortable_search_params.merge(search_ambassador_task_id: assignment.ambassador_task_id))
+          %td= link_to assignment.ambassador_name, |
+          admin_ambassador_task_assignments_path(sortable_search_params.merge(search_ambassador_id: assignment.user_id))
+
+
+= paginate @ambassador_task_assignments, views_prefix: "admin"

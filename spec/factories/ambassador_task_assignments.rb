@@ -1,6 +1,10 @@
 FactoryBot.define do
   factory :ambassador_task_assignment do
-    ambassador { FactoryBot.create(:ambassador) }
+    transient do
+      organization { FactoryBot.create(:organization_ambassador) }
+    end
+
+    ambassador { FactoryBot.create(:ambassador, organization: organization) }
     ambassador_task { FactoryBot.create(:ambassador_task) }
 
     trait :completed do

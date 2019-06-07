@@ -8,7 +8,10 @@ FactoryBot.define do
 
     factory :membership_ambassador do
       before(:create) do
-        Membership.skip_callback(:create, :before, :assign_ambassador_tasks!)
+        Membership.skip_callback(:create, :after, :ensure_ambassador_tasks_assigned!)
+      end
+      after(:create) do
+        Membership.set_callback(:create, :after, :ensure_ambassador_tasks_assigned!)
       end
       role { "member" }
       organization { FactoryBot.create(:organization_ambassador) }

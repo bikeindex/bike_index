@@ -38,10 +38,10 @@
                 no user
 
           %td
-            - if payment.organization_id.present?
+            - if payment.organization.present?
               = link_to payment.organization.short_name, admin_organization_path(payment.organization)
           %td
-            - if payment.invoice_id.present?
+            - if payment.invoice.present? && payment.organization.present?
               #{link_to payment.invoice.display_name, edit_admin_organization_invoice_path(organization_id: payment.organization.to_param, id: payment.invoice.id)}
               - if payment.invoice.subscription_start_at
                 %small.convertTime

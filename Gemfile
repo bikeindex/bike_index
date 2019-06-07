@@ -4,6 +4,7 @@ ruby "2.5.1"
 gem "rails", "4.2.11"
 
 gem "active_model_serializers", "~> 0.9.3"
+gem "activerecord-import"
 gem "aws-sdk", "~> 1.33"
 gem "bcrypt", "~> 3.1.7"
 gem "jquery-rails"
@@ -23,7 +24,7 @@ gem "soulheart", "~> 0.3.0"
 gem "carrierwave", "~> 0.11.2"
 gem "carrierwave_backgrounder"
 gem "dalli"
-gem "draper", require: false
+gem "draper", require: false # NB: Draper is deprecated in this project
 gem "eventmachine"
 gem "fog-aws"
 gem "geocoder"

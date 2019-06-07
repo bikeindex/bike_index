@@ -41,18 +41,23 @@
         Features
     %tbody
       - invoices.each do |invoice|
+        - organization = invoice.organization
         %tr
           %td
-            = link_to invoice.display_name, edit_admin_organization_invoice_path(organization_id: invoice.organization.to_param, id: invoice.to_param)
+            - if organization.present?
+              = link_to invoice.display_name, edit_admin_organization_invoice_path(organization_id: organization.to_param, id: invoice.to_param)
             - if invoice.active?
               %small.text-success{ style: "display: block;" }
                 Active
             - if invoice.previous_invoice.present?
               %small.less-strong{ style: "display: block; margin-top: 1rem;" }
                 Follows ##{invoice.previous_invoice.id}
-          - if display_organization
+          - if display_organization && organization.present?
             %td
-              = link_to invoice.organization.short_name, admin_organization_path(invoice.organization)
+              = link_to organization.short_name, admin_organization_path(organization.to_param)
+              - unless invoice.organization.present?
+                %small.text-danger
+                  organization is deleted!
           %td
             - if invoice.subscription_start_at.present?
               %span.convertTime

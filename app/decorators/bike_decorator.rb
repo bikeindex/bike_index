@@ -1,3 +1,6 @@
+# NB: Decorators are deprecated in this project.
+#     Use Helper methods for view logic, consider incrementally refactoring
+#     existing view logic from decorators to view helpers.
 class BikeDecorator < ApplicationDecorator
   delegate_all
 
@@ -13,12 +16,6 @@ class BikeDecorator < ApplicationDecorator
     return nil unless should_show_other_bikes
     html = "<a href='/users/#{object.user.username}'>View user's other bikes</a>"
     html.html_safe
-  end
-
-  def bike_show_twitter_and_website
-    return nil unless object.user?
-    user = object.user
-    show_twitter_and_website(user)
   end
 
   def title

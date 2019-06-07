@@ -1,6 +1,8 @@
+# NB: Decorators are deprecated in this project.
+#     Use Helper methods for view logic, consider incrementally refactoring
+#     existing view logic from decorators to view helpers.
 class AmbassadorDecorator < ApplicationDecorator
   delegate_all
-  alias ambassador object
 
   def avatar
     avatar_url = ambassador.avatar&.url(:medium)

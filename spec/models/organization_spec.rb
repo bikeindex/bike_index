@@ -343,6 +343,17 @@ describe Organization do
     end
   end
 
+  describe "law_enforcement_missing_verified_features?" do
+    let(:law_enforcement_organization) { Organization.new(kind: "law_enforcement") }
+    let(:law_enforcement_organization_with_unstolen) { Organization.new(kind: "law_enforcement", paid_feature_slugs: ["unstolen_notifications"]) }
+    let(:bike_shop_organization) { Organization.new(kind: "bike_shop") }
+    it "is true for law_enforcement, false for shop, false for law_enforcement with unstolen_notifications" do
+      expect(law_enforcement_organization.law_enforcement_missing_verified_features?).to be_truthy
+      expect(bike_shop_organization.law_enforcement_missing_verified_features?).to be_falsey
+      expect(law_enforcement_organization_with_unstolen.law_enforcement_missing_verified_features?).to be_falsey
+    end
+  end
+
   describe "display_avatar" do
     context "unpaid" do
       it "does not display" do
