@@ -41,6 +41,7 @@ describe Admin::OrganizationsController, type: :controller do
         kind: "shop",
         parent_organization_id: parent_organization.id,
         ascend_name: "party on",
+        previous_slug: "partied-on",
         locations_attributes: {
           "0" => {
             id: location_1.id,
@@ -85,6 +86,7 @@ describe Admin::OrganizationsController, type: :controller do
       expect(organization.parent_organization).to eq parent_organization
       expect(organization.name).to eq update_attributes[:name]
       expect(organization.ascend_name).to eq "party on"
+      expect(organization.previous_slug).to eq "partied-on"
       # Existing location is updated
       location_1.reload
       expect(location_1.organization).to eq organization
