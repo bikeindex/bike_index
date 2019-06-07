@@ -4,17 +4,29 @@ describe Membership do
   describe "#ensure_ambassador_tasks_assigned!" do
     context "given an ambassador organization" do
       it "enqueues a job to assign ambassador tasks to the given user" do
-        membership = FactoryBot.create(:membership_ambassador)
-        expect { membership.ensure_ambassador_tasks_assigned! }
-          .to(change { AmbassadorMembershipAfterCreateWorker.jobs.size }.by(1))
+        user = FactoryBot.create(:user_confirmed)
+        org = FactoryBot.create(:organization_ambassador)
+        tasks = FactoryBot.create_list(:ambassador_task, 2)
+        expect(AmbassadorTaskAssignment.count).to eq(0)
+
+        Membership.create(organization: org, user: user)
+        Sidekiq::Worker.drain_all
+
+        expect(AmbassadorTaskAssignment.count).to eq(2)
+        expect(Ambassador.find(user.id).ambassador_tasks).to match_array(tasks)
       end
     end
 
     context "given a non-ambassador organization" do
       it "does not enqueue a job to assign ambassador tasks to the given user" do
-        membership = FactoryBot.create(:existing_membership)
-        expect { membership.ensure_ambassador_tasks_assigned! }
-          .to_not(change { AmbassadorMembershipAfterCreateWorker.jobs.size })
+        user = FactoryBot.create(:user_confirmed)
+        org = FactoryBot.create(:organization)
+        expect(AmbassadorTaskAssignment.count).to eq(0)
+
+        Membership.create(organization: org, user: user)
+        Sidekiq::Worker.drain_all
+
+        expect(AmbassadorTaskAssignment.count).to eq(0)
       end
     end
   end

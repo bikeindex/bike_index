@@ -1,17 +1,12 @@
 module AmbassadorTaskAssignmentCreator
-  def self.assign_task_to_all_ambassadors(ambassador_task_or_id)
-    ambassador_task =
-      case ambassador_task_or_id
-      when AmbassadorTask then ambassador_task_or_id
-      when Integer then AmbassadorTask.find(ambassador_task_or_id)
-      else raise ArgumentError,
-                 "Not an AmbassadorTask or AmbassadorTask id: #{ambassador_task_or_id}"
-      end
+  def self.assign_task_to_all_ambassadors(ambassador_task_id)
+    return unless ambassador_task_id.present?
+    return unless AmbassadorTask.exists?(ambassador_task_id)
 
     already_assigned_ambassador_ids =
       Ambassador
-        .includes(:ambassador_task_assignments)
-        .where(ambassador_task_assignments: { ambassador_task_id: ambassador_task.id })
+        .includes(ambassador_task_assignments: :ambassador_task)
+        .where(ambassador_task_assignments: { ambassador_task_id: ambassador_task_id })
         .select(:id)
 
     new_assignments =
@@ -20,25 +15,19 @@ module AmbassadorTaskAssignmentCreator
         .where
         .not(id: already_assigned_ambassador_ids)
         .pluck(:id)
-        .map { |ambassador_id| { user_id: ambassador_id, ambassador_task_id: ambassador_task.id } }
+        .map { |ambassador_id| { user_id: ambassador_id, ambassador_task_id: ambassador_task_id } }
 
     AmbassadorTaskAssignment.import(new_assignments, validate: true)
   end
 
-  def self.assign_all_ambassador_tasks_to(ambassador_or_id)
-    ambassador =
-      case ambassador_or_id
-      when Ambassador then ambassador_or_id
-      when User then Ambassador.find(ambassador_or_id.id)
-      when Integer then Ambassador.find(ambassador_or_id)
-      else raise ArgumentError,
-                 "Not an Ambassador or Ambassador id: #{ambassador_or_id}"
-      end
+  def self.assign_all_ambassador_tasks_to(ambassador_id)
+    return unless ambassador_id.present?
+    return unless Ambassador.exists?(ambassador_id)
 
     already_assigned_task_ids =
       AmbassadorTask
-        .includes(ambassador_task_assignments: :ambassadors)
-        .where(ambassador_task_assignments: { ambassador: ambassador })
+        .includes(ambassador_task_assignments: :ambassador)
+        .where(ambassador_task_assignments: { user_id: ambassador_id })
         .select(:id)
 
     new_assignments =
@@ -47,7 +36,7 @@ module AmbassadorTaskAssignmentCreator
         .where
         .not(id: already_assigned_task_ids)
         .pluck(:id)
-        .map { |t_id| { ambassador_task_id: t_id, user_id: ambassador.id } }
+        .map { |t_id| { ambassador_task_id: t_id, user_id: ambassador_id } }
 
     AmbassadorTaskAssignment.import(new_assignments, validate: true)
   end

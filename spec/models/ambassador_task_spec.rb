@@ -2,11 +2,15 @@ require "spec_helper"
 
 describe AmbassadorTask, type: :model do
   describe "#ensure_assigned_to_all_ambassadors!" do
-    it "enqueues a job to assign the new task to all ambassadors" do
-      task = FactoryBot.create(:ambassador_task)
+    it "propogates assignments to the new task on creation" do
+      ambassador = FactoryBot.create(:ambassador)
+      expect(AmbassadorTaskAssignment.count).to eq(0)
 
-      expect { task.ensure_assigned_to_all_ambassadors! }
-        .to(change { AmbassadorTaskAfterCreateWorker.jobs.size }.by(1))
+      task = AmbassadorTask.create(title: "New Task")
+      Sidekiq::Worker.drain_all
+
+      expect(AmbassadorTaskAssignment.count).to eq(1)
+      expect(ambassador.ambassador_tasks.pluck(:id)).to match_array([task.id])
     end
   end
 
