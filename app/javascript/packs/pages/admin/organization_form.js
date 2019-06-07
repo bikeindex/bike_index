@@ -1,28 +1,31 @@
-class OrganizationForm {
+class BinxAdminOrganizationForm {
   constructor($form) {
     this.$form = $form;
 
-    const $selectedType =
-          $form
-          .find("#js-organization-type")
-          .find("input:checked")
-          .first()
+    const $selectedType = $form
+      .find("#js-organization-type")
+      .find("input:checked")
+      .first();
 
     this.toggleAmbassadorFields($selectedType);
 
     this.setEventListeners();
   }
 
-  setEventListeners () {
-    this.$form.on("change", "#js-organization-type input.form-check-input", e => {
-      this.toggleAmbassadorFields(e.target);
-    });
+  setEventListeners() {
+    this.$form.on(
+      "change",
+      "#js-organization-type input.form-check-input",
+      e => {
+        this.toggleAmbassadorFields(e.target);
+      }
+    );
   }
 
   toggleAmbassadorFields(target) {
     const inputFields = [
-      'organization_ascend_name',
-      'organization_website',
+      "organization_ascend_name",
+      "organization_website",
       "organization_parent_organization_id",
       "organization_show_on_map",
       "organization_lock_show_on_map",
@@ -35,22 +38,22 @@ class OrganizationForm {
       };
     });
 
-    const selectizedFields = [
-      "organization_parent_organization_id"
-    ].map(fieldId => {
-      return {
-        element: this.$form.find(`#${fieldId}`),
-        label: this.$form.find(`label[for='${fieldId}-selectized']`)
-      };
-    });
+    const selectizedFields = ["organization_parent_organization_id"].map(
+      fieldId => {
+        return {
+          element: this.$form.find(`#${fieldId}`),
+          label: this.$form.find(`label[for='${fieldId}-selectized']`)
+        };
+      }
+    );
 
     const $orgType = $(target);
     const isAmbassadorOrgSelected = $orgType.val() === "ambassador";
 
     if (isAmbassadorOrgSelected) {
-      this.disableFields({inputFields, selectizedFields});
+      this.disableFields({ inputFields, selectizedFields });
     } else {
-      this.enableFields({inputFields, selectizedFields});
+      this.enableFields({ inputFields, selectizedFields });
     }
   }
 
@@ -78,4 +81,4 @@ class OrganizationForm {
   }
 }
 
-export default OrganizationForm;
+export default BinxAdminOrganizationForm;

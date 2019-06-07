@@ -5,12 +5,24 @@
   .col-md-6
     %ul
       %li.nav-item
-        = link_to "Normal view", missing_manufacturer_admin_bikes_path(reset_view: true), class: !session[:missing_manufacturer_time_order] ? "nav-link active" : "nav-link"
+        = link_to "all bikes", admin_bikes_path, class: "nav-link"
+      %li.nav-item
+        = link_to "Alphabeticall view", missing_manufacturer_admin_bikes_path(reset_view: true), class: !session[:missing_manufacturer_time_order] ? "nav-link active" : "nav-link"
       %li.nav-item
         = link_to "Time ordered view", missing_manufacturer_admin_bikes_path(time_ordered: true), class: session[:missing_manufacturer_time_order] ? "nav-link active" : "nav-link"
 
-
-
+.row.mb-4
+  .col-md-8
+    %p
+      %strong
+        = number_with_delimiter(@bikes.total_count)
+      matching
+      = "bike".pluralize(@bikes)
+  .col-md-4
+    = form_tag missing_manufacturer_admin_bikes_path, method: :get, class: "form-inline" do
+      .form-group.ml-auto.mr-2
+        = text_field_tag :search_other_name, params[:search_other_name], placeholder: "Search Other mnfg", class: "form-control"
+        = submit_tag "Search", name: "search", class: "btn btn-primary ml-2"
 = form_tag update_manufacturers_admin_bikes_path, id: 'multi_bike_manufacturer_update' do
   .row
     .col-md-4
@@ -19,11 +31,12 @@
     .col-md-2
       = submit_tag 'Update selected', class: 'btn btn-primary'
   = paginate @bikes, views_prefix: "admin"
-  .full-screen-table
+  .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
       %thead.thead-light
         %th.table-cell-check
-          &#x2713;
+          %a#multi-mnfg-selector{ href: "#" }
+            &#x2713;
         %th
           Date indexed
         %th
@@ -36,33 +49,25 @@
       %tbody
         - @bikes.each do |bike|
           %tr
-            %td
+            %td.table-cell-check.update-mnfg-select
               = check_box_tag "bikes_selected[#{bike.id}]", bike.id
             %td
               .less-strong-hold
+                %a.convertTime{ href: edit_admin_bike_url(bike) }
+                  = l bike.created_at, format: :convert_time
                 %span.less-strong-right
                   - if bike.example
                     %span.table-error
                       = bike.id
                   - else
                     = bike.id
-              %a{href: edit_admin_bike_url(bike) }
-
-                - if bike.created_at.today?
-                  Today at #{bike.created_at.strftime("%-I %p")}
-                - elsif Date.yesterday().beginning_of_day() <= bike.created_at
-                  Yesterday at #{bike.created_at.strftime("%-I %p")}
-                - else
-                  = bike.created_at.strftime("%-m.%-d.%Y")
 
             %td
               - if bike.manufacturer_other.present?
-                %span
-                  %span.hidden
-                    0 1
-                  = bike.manufacturer_other
+                = bike.manufacturer_other
               - else
-                = bike.mnfg_name
+                %em.less-strong
+                  = bike.mnfg_name
             %td
               .less-strong-hold
                 - desc = ''
