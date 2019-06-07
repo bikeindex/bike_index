@@ -8,7 +8,7 @@ RSpec.describe AmbassadorTaskAssignmentCreator do
         a1, a2, a3 = FactoryBot.create_list(:ambassador, 3)
         task = FactoryBot.create(:ambassador_task)
 
-        AmbassadorTaskAssignmentCreator.assign_task_to_all_ambassadors(task.id)
+        AmbassadorTaskAssignmentCreator.assign_task_to_all_ambassadors(task)
 
         expect(AmbassadorTaskAssignment.count).to eq(3)
         expect(user.ambassador_task_assignments.count).to eq(0)
@@ -16,20 +16,13 @@ RSpec.describe AmbassadorTaskAssignmentCreator do
         expect(a2.ambassador_task_assignments.count).to eq(1)
         expect(a3.ambassador_task_assignments.count).to eq(1)
 
-        AmbassadorTaskAssignmentCreator.assign_task_to_all_ambassadors(task.id)
+        AmbassadorTaskAssignmentCreator.assign_task_to_all_ambassadors(task)
 
         expect(AmbassadorTaskAssignment.count).to eq(3)
         expect(user.ambassador_task_assignments.count).to eq(0)
         expect(a1.ambassador_task_assignments.count).to eq(1)
         expect(a2.ambassador_task_assignments.count).to eq(1)
         expect(a3.ambassador_task_assignments.count).to eq(1)
-      end
-    end
-
-    context "given a not-found Ambassador id" do
-      it "no-ops" do
-        expect { AmbassadorTaskAssignmentCreator.assign_task_to_all_ambassadors(99) }
-          .to_not(change { AmbassadorTaskAssignment.count })
       end
     end
   end
@@ -40,22 +33,15 @@ RSpec.describe AmbassadorTaskAssignmentCreator do
         task_ids = FactoryBot.create_list(:ambassador_task, 3).map(&:id)
         ambassador = FactoryBot.create(:ambassador)
 
-        AmbassadorTaskAssignmentCreator.assign_all_ambassador_tasks_to(ambassador.id)
+        AmbassadorTaskAssignmentCreator.assign_all_ambassador_tasks_to(ambassador)
 
         found_task_ids = ambassador.ambassador_task_assignments.pluck(:ambassador_task_id)
         expect(found_task_ids).to match_array(task_ids)
 
-        AmbassadorTaskAssignmentCreator.assign_all_ambassador_tasks_to(ambassador.id)
+        AmbassadorTaskAssignmentCreator.assign_all_ambassador_tasks_to(ambassador)
 
         found_task_ids = ambassador.ambassador_task_assignments.pluck(:ambassador_task_id)
         expect(found_task_ids).to match_array(task_ids)
-      end
-    end
-
-    context "given an Ambassador that can't be found" do
-      it "no-ops" do
-        expect { AmbassadorTaskAssignmentCreator.assign_all_ambassador_tasks_to(99) }
-          .to_not(change { AmbassadorTaskAssignment.count })
       end
     end
   end
