@@ -140,6 +140,7 @@ group :development, :test do
   gem "dotenv-rails"
   gem "foreman"
   gem "jazz_fingers"
+  gem "parallel_tests"
   gem "pry-byebug"
   gem "pry-rails"
   gem "rb-fsevent", "~> 0.9.1"
