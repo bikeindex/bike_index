@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe PaymentsController do
+RSpec.describe PaymentsController do
   let(:user) { FactoryBot.create(:user_confirmed) }
 
   describe "new" do

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe EmailInvoiceWorker do
+RSpec.describe EmailInvoiceWorker do
   it "sends an email" do
     payment = FactoryBot.create(:payment)
     ActionMailer::Base.deliveries = []

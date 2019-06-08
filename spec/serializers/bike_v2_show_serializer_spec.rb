@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe BikeV2ShowSerializer do
+RSpec.describe BikeV2ShowSerializer do
   describe "standard validations" do
     let(:bike) { FactoryBot.create(:bike, frame_size: "42", additional_registration: "XXYY") }
     let(:component) { FactoryBot.create(:component, bike: bike) }

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe "Oauth::AuthorizationsController" do
+RSpec.describe "Oauth::AuthorizationsController" do
   include_context :existing_doorkeeper_app
   before { expect(doorkeeper_app).to be_present }
   let(:scope) { "read_bikes+read_user" }

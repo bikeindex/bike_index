@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe EmailLightspeedNotificationWorker do
+RSpec.describe EmailLightspeedNotificationWorker do
   it "sends an email" do
     organization = FactoryBot.create(:organization)
     api_key = "some key or something"

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe "Manufacturers API V2" do
+RSpec.describe "Manufacturers API V2" do
   describe "root" do
     it "responds on index with pagination" do
       manufacturer = FactoryBot.create(:manufacturer, name: "AAAAAzz") # make sure it's the first manufacturer

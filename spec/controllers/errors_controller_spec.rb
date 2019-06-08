@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe ErrorsController do
+RSpec.describe ErrorsController do
   describe "bad_request" do
     it "renders" do
       get :bad_request

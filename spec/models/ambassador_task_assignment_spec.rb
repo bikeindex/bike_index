@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe AmbassadorTaskAssignment, type: :model do
+RSpec.describe AmbassadorTaskAssignment, type: :model do
   let(:non_ambassador) { FactoryBot.create(:user) }
   let(:ambassador) { FactoryBot.create(:ambassador) }
   let(:ambassador_task) { FactoryBot.create(:ambassador_task) }

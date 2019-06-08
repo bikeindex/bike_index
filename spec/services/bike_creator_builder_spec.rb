@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe BikeCreatorBuilder do
+RSpec.describe BikeCreatorBuilder do
   describe "new_bike" do
     it "returns a new bike object from the params with the b_param_id" do
       bike = Bike.new

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe StolenRecord do
+RSpec.describe StolenRecord do
   it "marks current true by default" do
     stolen_record = StolenRecord.new
     expect(stolen_record.current).to be_truthy

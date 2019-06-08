@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
-describe OtherListing do
+RSpec.describe OtherListing do
 end

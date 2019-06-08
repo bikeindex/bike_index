@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe EmailConfirmationWorker do
+RSpec.describe EmailConfirmationWorker do
   it "sends a welcome email" do
     user = FactoryBot.create(:user)
     EmailConfirmationWorker.new.perform(user.id)

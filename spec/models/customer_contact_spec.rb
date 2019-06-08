@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe CustomerContact do
+RSpec.describe CustomerContact do
   describe "normalize_email_and_find_user" do
     it "finds email and associate" do
       user = FactoryBot.create(:user)

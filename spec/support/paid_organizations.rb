@@ -1,4 +1,4 @@
-shared_context :organization_with_geolocated_messages do
+RSpec.shared_context :organization_with_geolocated_messages do
   let(:paid_feature) { FactoryBot.create(:paid_feature, feature_slugs: %w[messages geolocated_messages]) }
   let!(:invoice) do
     inv = FactoryBot.create(:invoice_paid, organization: organization)

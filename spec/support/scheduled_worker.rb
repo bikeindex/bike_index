@@ -1,4 +1,4 @@
-shared_context :scheduled_worker do
+RSpec.shared_context :scheduled_worker do
   let(:redis) { ScheduledWorker.redis }
 
   def clear_scheduled_history
@@ -18,7 +18,7 @@ shared_context :scheduled_worker do
     end
 
     describe "runnering" do
-      it 'is specified in the runner' do
+      it "is specified in the runner" do
         expect(ScheduledWorkerRunner.scheduled_workers).to include(subject)
       end
     end

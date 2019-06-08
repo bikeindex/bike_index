@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Api::V1::FrameMaterialsController do
+RSpec.describe Api::V1::FrameMaterialsController do
   describe "index" do
     it "loads the page" do
       get :index, format: :json

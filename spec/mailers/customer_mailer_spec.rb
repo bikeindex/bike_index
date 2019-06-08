@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe CustomerMailer do
+RSpec.describe CustomerMailer do
   let(:user) { FactoryBot.create(:user) }
 
   describe "welcome_email" do

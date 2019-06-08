@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe RemoveExpiredFileCacheWorker do
+RSpec.describe RemoveExpiredFileCacheWorker do
   describe "perform" do
     it "removes expired files" do
       t = (Time.now - 3.days).to_i

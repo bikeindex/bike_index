@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe CycleType do
+RSpec.describe CycleType do
   describe "normalized name" do
     let(:slug) { :trailer }
 

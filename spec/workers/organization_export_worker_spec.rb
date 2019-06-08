@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe OrganizationExportWorker do
+RSpec.describe OrganizationExportWorker do
   let(:subject) { OrganizationExportWorker }
   let(:instance) { subject.new }
   let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil) }

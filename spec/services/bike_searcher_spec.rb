@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe BikeSearcher do
+RSpec.describe BikeSearcher do
   describe "initialize" do
     context "basic serial array" do
       it "deletes the serial gsub expression if it is present" do

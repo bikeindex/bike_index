@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe UpdateAuthTokenWorker do
+RSpec.describe UpdateAuthTokenWorker do
   let(:subject) { UpdateAuthTokenWorker }
 
   it "is the correct queue" do

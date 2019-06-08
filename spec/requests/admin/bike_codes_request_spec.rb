@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
 base_url = "/admin/bike_codes"
 

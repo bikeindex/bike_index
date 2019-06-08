@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe HeaderTagHelper do
+RSpec.describe HeaderTagHelper do
   before do
     allow(view).to receive(:controller_name) { controller_name }
     allow(view).to receive(:action_name) { action_name }

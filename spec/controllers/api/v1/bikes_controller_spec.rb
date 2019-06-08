@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Api::V1::BikesController do
+RSpec.describe Api::V1::BikesController do
   describe "index" do
     it "loads the page and have the correct headers" do
       FactoryBot.create(:bike)

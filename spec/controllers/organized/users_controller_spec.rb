@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Organized::UsersController, type: :controller do
+RSpec.describe Organized::UsersController, type: :controller do
   context "logged_in_as_organization_member" do
     include_context :logged_in_as_organization_member
     describe "index" do

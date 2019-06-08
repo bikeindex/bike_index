@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::MailSnippetsController do
+RSpec.describe Admin::MailSnippetsController do
   include_context :logged_in_as_super_admin
 
   describe "index" do

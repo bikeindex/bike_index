@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe "organizations routing", type: :routing do
+RSpec.describe "organizations routing", type: :routing do
   describe "landing_pages" do
     it "routes root to " do
       expect(LandingPages::ORGANIZATIONS).to include("university")

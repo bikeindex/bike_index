@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe PublicImagesController do
+RSpec.describe PublicImagesController do
   describe "create" do
     context "bike" do
       let(:ownership) { FactoryBot.create(:ownership) }

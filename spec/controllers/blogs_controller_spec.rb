@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe BlogsController do
+RSpec.describe BlogsController do
   describe "index" do
     it "redirects" do
       get :index

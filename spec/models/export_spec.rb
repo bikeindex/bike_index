@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe Export, type: :model do
   let(:organization) { export.organization }

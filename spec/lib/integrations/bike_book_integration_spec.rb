@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe BikeBookIntegration do
+RSpec.describe BikeBookIntegration do
   describe "get_model" do
     it "returns a hash with the model for Co-motion" do
       manufacturer = FactoryBot.create(:manufacturer, name: "Co-Motion")

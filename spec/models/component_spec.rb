@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Component do
+RSpec.describe Component do
   describe "component_type" do
     it "returns the name of the ctype other if it should" do
       ctype = Ctype.new

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe AdminMailer do
+RSpec.describe AdminMailer do
   let(:feedback) { FactoryBot.create(:feedback) }
   describe "feedback_notification_email" do
     before :each do

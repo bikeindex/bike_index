@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe BikeCreatorAssociator do
+RSpec.describe BikeCreatorAssociator do
   let(:subject) { BikeCreatorAssociator }
   let(:instance) { subject.new }
   describe "create_ownership" do

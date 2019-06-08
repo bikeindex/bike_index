@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Api::V1::NotificationsController do
+RSpec.describe Api::V1::NotificationsController do
   describe "send_notification_email" do
     it "returns correct code if authentication fails" do
       bike = FactoryBot.create(:bike)

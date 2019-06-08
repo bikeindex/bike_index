@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe EmailOrganizationMessageWorker do
+RSpec.describe EmailOrganizationMessageWorker do
   let(:subject) { EmailOrganizationMessageWorker }
   let(:instance) { subject.new }
 

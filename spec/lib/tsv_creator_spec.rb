@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe TsvCreator do
+RSpec.describe TsvCreator do
   describe "create_manufacturer" do
     it "makes mnfgs"
   end

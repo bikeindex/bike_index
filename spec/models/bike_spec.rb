@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Bike do
+RSpec.describe Bike do
   it_behaves_like "bike_searchable"
   describe "scopes" do
     it "default scopes to created_at desc" do

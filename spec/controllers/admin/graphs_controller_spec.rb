@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::GraphsController, type: :controller do
+RSpec.describe Admin::GraphsController, type: :controller do
   include_context :logged_in_as_super_admin
   describe "index" do
     context "graphs" do

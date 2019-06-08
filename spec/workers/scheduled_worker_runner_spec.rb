@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe ScheduledWorkerRunner, type: :lib do
+RSpec.describe ScheduledWorkerRunner, type: :lib do
   let(:subject) { ScheduledWorkerRunner }
   let(:instance) { subject.new }
   let(:scheduled_workers) { [UpdateExpiredInvoiceWorker, UpdateCountsWorker, UpdateOrganizationPosKindWorker] }

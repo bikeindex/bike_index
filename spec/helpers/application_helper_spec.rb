@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe ApplicationHelper do
+RSpec.describe ApplicationHelper do
   describe "#display_phone" do
     it "displays the phone with an area code" do
       expect(display_phone("999 999 9999")).to eq("999 999 9999")

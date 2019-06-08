@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe DuplicateBikeFinderWorker do
+RSpec.describe DuplicateBikeFinderWorker do
   it "takes a bike id and search for groups" do
     bike1 = FactoryBot.create(:bike, serial_number: "applejacks cereal")
     bike1.create_normalized_serial_segments

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::OrganizationsController, type: :controller do
+RSpec.describe Admin::OrganizationsController, type: :controller do
   let(:organization) { FactoryBot.create(:organization, approved: false) }
   include_context :logged_in_as_super_admin
 

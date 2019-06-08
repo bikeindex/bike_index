@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Api::V1::CycleTypesController do
+RSpec.describe Api::V1::CycleTypesController do
   describe "index" do
     it "loads the request" do
       get :index, format: :json

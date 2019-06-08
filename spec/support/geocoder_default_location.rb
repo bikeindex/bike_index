@@ -1,4 +1,4 @@
-shared_context :geocoder_default_location do
+RSpec.shared_context :geocoder_default_location do
   let(:default_location) do
     {
       latitude: 40.7143528,

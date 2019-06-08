@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe AmbassadorTask, type: :model do
+RSpec.describe AmbassadorTask, type: :model do
   describe "#ensure_assigned_to_all_ambassadors!" do
     it "propogates assignments to the new task on creation" do
       ambassador = FactoryBot.create(:ambassador)

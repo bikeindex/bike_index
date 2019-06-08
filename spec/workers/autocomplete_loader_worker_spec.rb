@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe AutocompleteLoaderWorker do
+RSpec.describe AutocompleteLoaderWorker do
   let(:subject) { AutocompleteLoaderWorker }
 
   it "is the correct queue" do
@@ -8,7 +8,7 @@ describe AutocompleteLoaderWorker do
   end
 
   it "calls passed arguments on autocomplete loader" do
-    expect_any_instance_of(AutocompleteLoader).to receive(:party)
-    AutocompleteLoaderWorker.new.perform("party")
+    expect_any_instance_of(AutocompleteLoader).to receive(:clear)
+    AutocompleteLoaderWorker.new.perform("clear")
   end
 end

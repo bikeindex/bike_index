@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe BikeCodesController do
+RSpec.describe BikeCodesController do
   describe "update" do
     let(:bike_code) { FactoryBot.create(:bike_code) }
     let(:bike) { FactoryBot.create(:bike) }

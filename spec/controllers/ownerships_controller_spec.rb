@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe OwnershipsController do
+RSpec.describe OwnershipsController do
   describe "show" do
     it "sets the flash with absent user for create account" do
       ownership = FactoryBot.create(:ownership)

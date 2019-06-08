@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe EmailStolenBikeAlertWorker do
+RSpec.describe EmailStolenBikeAlertWorker do
   describe "perform" do
     it "sends an email" do
       stolen_record = FactoryBot.create(:stolen_record)

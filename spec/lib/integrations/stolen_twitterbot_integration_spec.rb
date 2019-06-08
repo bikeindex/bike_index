@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe StolenTwitterbotIntegration do
+RSpec.describe StolenTwitterbotIntegration do
   describe "send_tweet" do
     it "sends a post request" do
       ENV["STOLEN_TWITTERBOT_URL"] = "http://example.com"

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::StolenBikesController do
+RSpec.describe Admin::StolenBikesController do
   let(:user) { FactoryBot.create(:admin) }
   before do
     set_current_user(user)

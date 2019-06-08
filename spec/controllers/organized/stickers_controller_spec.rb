@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Organized::StickersController, type: :controller do
+RSpec.describe Organized::StickersController, type: :controller do
   let(:root_path) { organization_bikes_path(organization_id: organization.to_param) }
   let(:stickers_root_path) { organization_stickers_path(organization_id: organization.to_param) }
   let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "partee") }

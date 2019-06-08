@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::TweetsController do
+RSpec.describe Admin::TweetsController do
   let(:subject) { FactoryBot.create(:tweet) }
   let(:user) { FactoryBot.create(:admin) }
   before { set_current_user(user) }

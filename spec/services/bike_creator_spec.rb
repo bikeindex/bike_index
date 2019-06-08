@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe BikeCreator do
+RSpec.describe BikeCreator do
   describe "include_bike_book" do
     it "returns the bike if stuff isn't present" do
       creator = BikeCreator.new

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe AdditionalEmailConfirmationWorker do
+RSpec.describe AdditionalEmailConfirmationWorker do
   it "sends a confirm your additional email, email" do
     user_email = FactoryBot.create(:user_email)
     AdditionalEmailConfirmationWorker.new.perform(user_email.id)

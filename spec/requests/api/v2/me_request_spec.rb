@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe "Me API V2" do
+RSpec.describe "Me API V2" do
   include_context :existing_doorkeeper_app
   describe "unauthorized current" do
     it "Sends correct error code when no user present" do

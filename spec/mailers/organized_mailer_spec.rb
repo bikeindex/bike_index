@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe OrganizedMailer do
+RSpec.describe OrganizedMailer do
   let(:organization) { FactoryBot.create(:organization_with_auto_user) }
   let(:header_mail_snippet) do
     FactoryBot.create(:organization_mail_snippet,

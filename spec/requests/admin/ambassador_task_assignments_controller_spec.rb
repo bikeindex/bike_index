@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe Admin::AmbassadorTaskAssignmentsController, type: :request do
   before { allow(User).to receive(:from_auth) { user } }

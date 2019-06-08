@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe FileCacheMaintainer do
+RSpec.describe FileCacheMaintainer do
   describe "cached_all_stolen" do
     it "returns the most recent all_stolen" do
       FileCacheMaintainer.update_file_info("1456863086_all_stolen_cache.json", 1456863086)

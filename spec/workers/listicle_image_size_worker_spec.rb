@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe ListicleImageSizeWorker do
+RSpec.describe ListicleImageSizeWorker do
   it "enqueues another awesome job" do
     ListicleImageSizeWorker.perform_async
     expect(ListicleImageSizeWorker).to have_enqueued_sidekiq_job

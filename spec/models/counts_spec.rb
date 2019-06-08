@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Counts do
+RSpec.describe Counts do
   let(:redis) { Redis.new }
   before { redis.expire(Counts::STOREAGE_KEY, 0) }
 
