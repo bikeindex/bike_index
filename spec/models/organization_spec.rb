@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Organization do
+RSpec.describe Organization, type: :model do
   describe "#set_ambassador_organization_defaults before_save hook" do
     context "when saving a new ambassador org" do
       it "sets non-applicable attributes to sensible ambassador org values" do

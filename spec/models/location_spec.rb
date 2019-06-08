@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Location do
+RSpec.describe Location, type: :model do
   describe "set_phone" do
     it "strips the non-digit numbers from the phone input" do
       location = FactoryBot.create(:location, phone: "773.83ddp+83(887)")

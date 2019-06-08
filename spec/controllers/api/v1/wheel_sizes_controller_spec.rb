@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Api::V1::WheelSizesController do
+RSpec.describe Api::V1::WheelSizesController, type: :controller do
   describe "index" do
     it "loads the request" do
       FactoryBot.create(:wheel_size)

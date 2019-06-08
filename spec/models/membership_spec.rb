@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Membership do
+RSpec.describe Membership, type: :model do
   describe "#ensure_ambassador_tasks_assigned!" do
     context "given an ambassador organization" do
       it "enqueues a job to assign ambassador tasks to the given user" do

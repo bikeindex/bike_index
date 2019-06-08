@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe DiscourseAuthenticationController do
+RSpec.describe DiscourseAuthenticationController, type: :controller do
   describe "index" do
     let(:discourse_query_string) { "sso=bm9uY2U9MGViZDBjMWU2YmZjMDk2MmIxODQ2YzBiYWY4NjNmNDcmcmV0dXJu%0AX3Nzb191cmw9aHR0cCUzQSUyRiUyRmxvY2FsaG9zdCUzQTMwMDAlMkZzZXNz%0AaW9uJTJGc3NvX2xvZ2lu%0A&sig=b1cffd09e878825b0bcdbf2eedf7e7e6133e3ca5acac6854f096bee71786f125" }
     let(:discourse_params) { { "sso" => "bm9uY2U9MGViZDBjMWU2YmZjMDk2MmIxODQ2YzBiYWY4NjNmNDcmcmV0dXJu%0AX3Nzb191cmw9aHR0cCUzQSUyRiUyRmxvY2FsaG9zdCUzQTMwMDAlMkZzZXNz%0AaW9uJTJGc3NvX2xvZ2lu%0A", "sig" => "5b49e8c57feef6f8ca0ae0720388dcf6d46c183be8017413344c388580daaca3" } }

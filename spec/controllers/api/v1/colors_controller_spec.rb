@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Api::V1::ColorsController do
+RSpec.describe Api::V1::ColorsController, type: :controller do
   describe "index" do
     it "loads the page" do
       FactoryBot.create(:color)

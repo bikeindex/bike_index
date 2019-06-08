@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Admin::RecoveryDisplaysController do
+RSpec.describe Admin::RecoveryDisplaysController, type: :controller do
   before do
     user = FactoryBot.create(:admin)
     set_current_user(user)

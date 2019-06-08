@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe OrganizationsController do
+RSpec.describe OrganizationsController, type: :controller do
   describe "new" do
     context "with out user" do
       it "renders" do

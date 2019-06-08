@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe InfoController do
+RSpec.describe InfoController, type: :controller do
   describe "revised views" do
     pages = %w(about protect_your_bike where serials image_resources resources
                dev_and_design support_bike_index terms vendor_terms privacy lightspeed)

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe PublicImage do
+RSpec.describe PublicImage, type: :model do
   describe "default_name" do
     it "sets a default name from filename if not bike" do
       public_image = PublicImage.new

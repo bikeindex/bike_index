@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe StolenController do
+RSpec.describe StolenController, type: :controller do
   describe "index" do
     context "with subdomain" do
       it "redirects to no subdomain" do

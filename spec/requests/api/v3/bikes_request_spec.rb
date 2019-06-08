@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Bikes API V3" do
+RSpec.describe "Bikes API V3", type: :request do
   let(:manufacturer) { FactoryBot.create(:manufacturer) }
   let(:color) { FactoryBot.create(:color) }
   include_context :existing_doorkeeper_app

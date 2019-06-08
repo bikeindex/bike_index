@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe EmailFeedbackNotificationWorker do
+RSpec.describe EmailFeedbackNotificationWorker, type: :job do
   it "sends an email" do
     feedback = FactoryBot.create(:feedback)
     ActionMailer::Base.deliveries = []

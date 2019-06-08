@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Admin::FlavorTextsController do
+RSpec.describe Admin::FlavorTextsController, type: :controller do
   describe "destroy" do
     it "destroys" do
       text = FlavorText.create(message: "lulz")

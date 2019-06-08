@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe AmbassadorMembershipAfterCreateWorker do
+RSpec.describe AmbassadorMembershipAfterCreateWorker, type: :job do
   describe "#perform" do
     context "given a non-ambassador" do
       it "no-ops" do

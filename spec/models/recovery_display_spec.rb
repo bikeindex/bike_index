@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe RecoveryDisplay do
+RSpec.describe RecoveryDisplay, type: :model do
   describe "set_time" do
     it "sets time from input" do
       recovery_display = RecoveryDisplay.new(date_input: "04-27-1999")

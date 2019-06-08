@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe EmailOrganizationInvitationWorker do
+RSpec.describe EmailOrganizationInvitationWorker, type: :job do
   it "sends an email" do
     organization_invitation = FactoryBot.create(:organization_invitation)
     ActionMailer::Base.deliveries = []

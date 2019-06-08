@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UnusedOwnershipRemovalWorker do
+RSpec.describe UnusedOwnershipRemovalWorker, type: :job do
   it "enqueues listing ordering job" do
     UnusedOwnershipRemovalWorker.perform_async
     expect(UnusedOwnershipRemovalWorker).to have_enqueued_sidekiq_job

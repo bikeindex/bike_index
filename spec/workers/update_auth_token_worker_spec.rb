@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UpdateAuthTokenWorker do
+RSpec.describe UpdateAuthTokenWorker, type: :job do
   let(:subject) { UpdateAuthTokenWorker }
 
   it "is the correct queue" do

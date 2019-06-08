@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Admin::RecoveriesController do
+RSpec.describe Admin::RecoveriesController, type: :controller do
   describe "index" do
     it "renders" do
       user = FactoryBot.create(:admin)

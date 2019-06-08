@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe OrganizedHelper do
+RSpec.describe OrganizedHelper, type: :helper do
   describe "organized bike display" do
     let(:bike) { FactoryBot.create(:creation_organization_bike) }
     let(:target_text) do

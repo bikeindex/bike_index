@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe EmailAdminContactStolenWorker do
+RSpec.describe EmailAdminContactStolenWorker, type: :job do
   describe "perform" do
     it "sends an email" do
       stolen_record = FactoryBot.create(:stolen_record)

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UserEmail do
+RSpec.describe UserEmail, type: :model do
   describe "scopes" do
     it "confirmed only user_emails without tokens" do
       expect(UserEmail.confirmed.to_sql).to eq(UserEmail.where("confirmation_token IS NULL").to_sql)

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe AfterBikeSaveWorker do
+RSpec.describe AfterBikeSaveWorker, type: :job do
   let(:subject) { AfterBikeSaveWorker }
   let(:instance) { subject.new }
   before { Sidekiq::Worker.clear_all }

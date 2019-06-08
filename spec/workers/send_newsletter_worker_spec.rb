@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe SendNewsletterWorker do
+RSpec.describe SendNewsletterWorker, type: :job do
   let(:subject) { SendNewsletterWorker }
   let(:instance) { subject.new }
 

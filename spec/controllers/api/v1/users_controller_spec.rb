@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Api::V1::UsersController do
+RSpec.describe Api::V1::UsersController, type: :controller do
   describe "current" do
     it "returns user_present = false if there is no user present" do
       get :current, format: :json

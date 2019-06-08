@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Ownership do
+RSpec.describe Ownership, type: :model do
   describe "normalize_email" do
     it "removes leading and trailing whitespace and downcase email" do
       ownership = Ownership.new

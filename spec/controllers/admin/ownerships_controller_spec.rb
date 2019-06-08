@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Admin::OwnershipsController do
+RSpec.describe Admin::OwnershipsController, type: :controller do
   describe "edit" do
     it "renders" do
       ownership = FactoryBot.create(:ownership)

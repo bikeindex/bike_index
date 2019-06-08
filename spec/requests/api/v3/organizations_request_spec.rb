@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Organization API V3" do
+RSpec.describe "Organization API V3", type: :request do
   include_context :existing_doorkeeper_app
 
   describe "create" do

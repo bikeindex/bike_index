@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe GetManufacturerLogoWorker do
+RSpec.describe GetManufacturerLogoWorker, type: :job do
   it "enqueues listing ordering job" do
     GetManufacturerLogoWorker.perform_async
     expect(GetManufacturerLogoWorker).to have_enqueued_sidekiq_job

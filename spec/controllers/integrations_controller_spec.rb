@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe IntegrationsController do
+RSpec.describe IntegrationsController, type: :controller do
   let!(:omniauth_facebook_mock) do
     OmniAuth.config.mock_auth[:facebook] = OmniAuth::AuthHash.new("provider" => "facebook",
                                                                   "uid" => "64901670",

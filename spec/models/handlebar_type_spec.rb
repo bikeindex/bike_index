@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe HandlebarType do
+RSpec.describe HandlebarType, type: :model do
   describe "normalized name" do
     let(:slug) { :bmx }
 

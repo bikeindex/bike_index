@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UserEmbedsController do
+RSpec.describe UserEmbedsController, type: :controller do
   describe "show" do
     it "renders the page if username is found" do
       user = FactoryBot.create(:user, show_bikes: true)

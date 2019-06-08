@@ -1,4 +1,4 @@
 require "rails_helper"
 
-RSpec.describe OtherListing do
+RSpec.describe OtherListing, type: :model do
 end

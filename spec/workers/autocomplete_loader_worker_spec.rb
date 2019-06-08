@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe AutocompleteLoaderWorker do
+RSpec.describe AutocompleteLoaderWorker, type: :job do
   let(:subject) { AutocompleteLoaderWorker }
 
   it "is the correct queue" do

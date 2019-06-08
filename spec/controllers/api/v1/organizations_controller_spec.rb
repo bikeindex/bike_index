@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Api::V1::OrganizationsController do
+RSpec.describe Api::V1::OrganizationsController, type: :controller do
   describe "show" do
     it "returns unauthorized unless organizations api token present" do
       organization = FactoryBot.create(:organization)

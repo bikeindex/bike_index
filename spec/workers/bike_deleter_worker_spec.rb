@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe BikeDeleterWorker do
+RSpec.describe BikeDeleterWorker, type: :job do
   let(:subject) { BikeDeleterWorker }
   let(:instance) { subject.new }
 

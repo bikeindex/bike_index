@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe MergeAdditionalEmailWorker do
+RSpec.describe MergeAdditionalEmailWorker, type: :job do
   let(:subject) { MergeAdditionalEmailWorker }
 
   it "is the correct queue" do

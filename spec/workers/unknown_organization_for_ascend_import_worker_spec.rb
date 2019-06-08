@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UnknownOrganizationForAscendImportWorker do
+RSpec.describe UnknownOrganizationForAscendImportWorker, type: :job do
   let(:bulk_import) { FactoryBot.create(:bulk_import_ascend) }
 
   it "sends an email" do

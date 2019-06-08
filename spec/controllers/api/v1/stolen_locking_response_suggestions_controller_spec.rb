@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Api::V1::StolenLockingResponseSuggestionsController do
+RSpec.describe Api::V1::StolenLockingResponseSuggestionsController, type: :controller do
   describe "index" do
     it "loads the page" do
       get :index, format: :json

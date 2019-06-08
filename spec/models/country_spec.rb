@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Country do
+RSpec.describe Country, type: :model do
   describe "fuzzy_iso_find" do
     it "finds the country by ISO address when the case doesn't match" do
       country = Country.create(name: "EEEEEEEh", iso: "LULZ")

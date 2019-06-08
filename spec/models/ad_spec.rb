@@ -1,4 +1,4 @@
 require "rails_helper"
 
-RSpec.describe Ad do
+RSpec.describe Ad, type: :model do
 end

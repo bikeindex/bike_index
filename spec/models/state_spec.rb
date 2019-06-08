@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe State do
+RSpec.describe State, type: :model do
   describe "fuzzy_abbr_find" do
     it "finds users by email address when the case doesn't match" do
       state = FactoryBot.create(:state, abbreviation: "LULZ")

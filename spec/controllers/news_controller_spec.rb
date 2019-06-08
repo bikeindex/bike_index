@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe NewsController do
+RSpec.describe NewsController, type: :controller do
   context "legacy" do
     describe "index" do
       it "renders" do

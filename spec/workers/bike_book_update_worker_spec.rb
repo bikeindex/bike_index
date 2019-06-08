@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe BikeBookUpdateWorker do
+RSpec.describe BikeBookUpdateWorker, type: :job do
   let(:subject) { BikeBookUpdateWorker }
 
   it "is the correct queue" do

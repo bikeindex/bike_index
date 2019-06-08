@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe CacheAllStolenWorker do
+RSpec.describe CacheAllStolenWorker, type: :job do
   describe "output_stolen" do
     it "creates a stolen cache" do
       FactoryBot.create(:stolen_bike)

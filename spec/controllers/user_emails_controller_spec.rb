@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe UserEmailsController do
+RSpec.describe UserEmailsController, type: :controller do
   let(:user_email) { FactoryBot.create(:user_email, confirmation_token: "sometoken-or-something") }
   let(:user) { user_email.user }
   before do

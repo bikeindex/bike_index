@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Admin::FailedBikesController do
+RSpec.describe Admin::FailedBikesController, type: :controller do
   describe "index" do
     it "responds with OK and renders the index template" do
       user = FactoryBot.create(:admin)

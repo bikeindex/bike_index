@@ -15,13 +15,7 @@ ActiveRecord::Migration.maintain_test_schema!
 Dir[Rails.root.join("spec", "support", "**", "*.rb")].each { |f| require f }
 
 RSpec.configure do |config|
-  # Use color in STDOUT
-  config.color = true
-  # Use color not only in STDOUT but also in pagers and files
-  config.tty = true
   config.use_transactional_fixtures = true
-  config.render_views
-  config.infer_spec_type_from_file_location!
 
   # Add our request spec helpers
   config.include RequestSpecHelpers, type: :request
@@ -29,5 +23,6 @@ RSpec.configure do |config|
 end
 
 def set_current_user(user)
-  cookies.signed[:auth] = { secure: true, httponly: true, value: [user.id, user.auth_token] }
+  cookies.signed[:auth] =
+    { secure: true, httponly: true, value: [user.id, user.auth_token] }
 end

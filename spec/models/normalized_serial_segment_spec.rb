@@ -1,4 +1,4 @@
 require "rails_helper"
 
-RSpec.describe NormalizedSerialSegment do
+RSpec.describe NormalizedSerialSegment, type: :model do
 end

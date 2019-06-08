@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe EmailWelcomeWorker do
+RSpec.describe EmailWelcomeWorker, type: :job do
   it "enqueues listing ordering job" do
     user = FactoryBot.create(:user)
     EmailWelcomeWorker.new.perform(user.id)

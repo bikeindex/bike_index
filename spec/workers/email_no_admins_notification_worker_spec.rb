@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe EmailNoAdminsNotificationWorker do
+RSpec.describe EmailNoAdminsNotificationWorker, type: :job do
   it "sends an email" do
     organization = FactoryBot.create(:organization)
     ActionMailer::Base.deliveries = []

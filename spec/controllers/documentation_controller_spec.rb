@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe DocumentationController do
+RSpec.describe DocumentationController, type: :controller do
   describe "index" do
     it "redirects to current api documentation" do
       get :index

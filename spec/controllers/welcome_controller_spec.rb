@@ -1,6 +1,8 @@
 require "rails_helper"
 
-RSpec.describe WelcomeController do
+RSpec.describe WelcomeController, type: :controller do
+  render_views
+
   describe "index" do
     it "renders" do
       get :index

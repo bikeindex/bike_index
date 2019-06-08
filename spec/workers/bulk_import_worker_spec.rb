@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe BulkImportWorker do
+RSpec.describe BulkImportWorker, type: :job do
   let(:subject) { BulkImportWorker }
   let(:instance) { subject.new }
   let(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending") }

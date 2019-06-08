@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Manufacturers API V3" do
+RSpec.describe "Manufacturers API V3", type: :request do
   describe "root" do
     it "responds on index with pagination" do
       FactoryBot.create(:manufacturer)

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe TwitterClient do
+RSpec.describe TwitterClient, type: :model do
   it "initializes a singleton" do
     expect(TwitterClient).to respond_to(:instance)
     expect(TwitterClient).to_not respond_to(:new)

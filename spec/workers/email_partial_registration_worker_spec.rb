@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe EmailPartialRegistrationWorker do
+RSpec.describe EmailPartialRegistrationWorker, type: :job do
   it "sends a partial registration email" do
     b_param = FactoryBot.create(:b_param)
     EmailPartialRegistrationWorker.new.perform(b_param.id)

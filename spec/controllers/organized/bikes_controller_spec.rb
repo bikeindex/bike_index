@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe Organized::BikesController, type: :controller do
+  render_views
+
   context "given an authenticated ambassador" do
     include_context :logged_in_as_ambassador
     it "redirects to the organization root path" do

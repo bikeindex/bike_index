@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe WheelSize do
+RSpec.describe WheelSize, type: :model do
   describe "popularity" do
     it "returns the popularities word of the wheel size" do
       wheel_size = WheelSize.new(priority: 1)

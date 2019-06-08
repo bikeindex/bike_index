@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe PropulsionType do
+RSpec.describe PropulsionType, type: :model do
   describe "normalized name" do
     let(:slug) { :insufflation }
 

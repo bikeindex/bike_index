@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe "Users API V2" do
+RSpec.describe "Users API V2", type: :request do
   include_context :existing_doorkeeper_app
   describe "unauthorized current" do
     it "Sends correct error code when no user present" do

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Color do
+RSpec.describe Color, type: :model do
   it_behaves_like "friendly_name_findable"
   it_behaves_like "autocomplete_hashable"
 

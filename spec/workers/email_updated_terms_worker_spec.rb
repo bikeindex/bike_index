@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe EmailUpdatedTermsWorker do
+RSpec.describe EmailUpdatedTermsWorker, type: :job do
   let(:user) { FactoryBot.create(:organization_member) }
   let(:subject) { EmailUpdatedTermsWorker.new }
   before do

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Paint do
+RSpec.describe Paint, type: :model do
   it_behaves_like "friendly_name_findable"
   describe "lowercase name" do
     it "makes the name lowercase on save" do

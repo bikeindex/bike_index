@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Feedback do
+RSpec.describe Feedback, type: :model do
   describe "create" do
     it "enqueues an email job" do
       expect do
