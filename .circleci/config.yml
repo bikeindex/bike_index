@@ -2,13 +2,14 @@ version: 2
 jobs:
   build:
     working_directory: ~/bikeindex/bike_index
-    parallelism: 5
+    parallelism: 2
     shell: /bin/bash --login
     environment:
       RAILS_ENV: test
       RACK_ENV: test
       COVERAGE: true
       TZ: /usr/share/zoneinfo/America/Chicago
+
     docker:
       - image: circleci/ruby:2.5.1-stretch-node
         environment:
@@ -19,55 +20,77 @@ jobs:
           POSTGRES_USER: root
           POSTGRES_DB: bikeindex_test
       - image: redis:4.0.9
+
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            # This branch if available
-            - v2-dep-{{ .Branch }}-
-            # Default branch if not
-            - v2-dep-master-
-            # Any branch if there are none on the default branch - this should be unnecessary if you have your default branch configured correctly
-            - v2-dep-
+
       - run:
           name: install dockerize
           command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
           environment:
             DOCKERIZE_VERSION: v0.6.1
+
       - run:
           name: install system libraries
           command: sudo apt-get update && sudo apt-get -y install imagemagick postgresql-client
+
       - run:
           name: install bundler
           command: gem install bundler
+
+      # Ruby dependencies
+      - restore_cache:
+          key: v2-bundler-{{ checksum "Gemfile.lock" }}
       - run:
           name: bundle gems
           command: bundle install --path=vendor/bundle --jobs=4 --retry=3
-      # So that we can compile assets, since we use node & yarn
+      - save_cache:
+          key: v2-bundler-{{ checksum "Gemfile.lock" }}
+          paths:
+            - vendor/bundle
+            - ~/.bundle
+
+      # Node dependencies
+      - restore_cache:
+          key: v2-yarn-{{ checksum "yarn.lock" }}
       - run:
           name: Yarn Install
           command: yarn install --cache-folder ~/.cache/yarn
+      - save_cache:
+          key: v2-yarn-{{ checksum "yarn.lock" }}
+          paths:
+            - ~/.cache/yarn
+
+      # Asset compilation
+      - restore_cache:
+          keys:
+            # This branch if available
+            - v2-assets-{{ .Branch }}
+            # Default branch if not
+            - v2-assets-master-
+            - v2-assets-
       - run: bundle exec rake assets:precompile
+      - save_cache:
+          key: v2-assets-{{ .Branch }}
+          paths:
+            - public/assets
+            - tmp/cache/assets/sprockets
+
       - run:
           name: Install Code Climate Test Reporter
           command: |
             curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
             chmod +x ./cc-test-reporter
+
       - run:
           name: Wait for PostgreSQL to start
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
-      - save_cache:
-          key: v2-dep-{{ .Branch }}-{{ epoch }}
-          paths:
-            - ./vendor/bundle
-            - ~/.bundle
-            - public/assets
-            - tmp/cache/assets/sprockets
-            - ~/.cache/yarn
+
       - run:
           name: Setup Database
           command: |
             bundle exec rake db:create db:structure:load
+
       - run:
           name: RSpec
           command: |
@@ -84,24 +107,30 @@ jobs:
       - run:
           name: "eslint"
           command: "yarn lint"
+
       - run:
           name: "Jest: Install junit coverage"
           command: yarn add --dev jest-junit
+
       - run:
           name: "Jest: Tests"
           command: yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
           environment:
             JEST_JUNIT_OUTPUT: "reports/junit/js-test-results.xml"
+
       - run:
           name: Code Climate Test Coverage
           command: |
             ./cc-test-reporter format-coverage -t simplecov -o "coverage/codeclimate.$CIRCLE_NODE_INDEX.json"
+
       - persist_to_workspace:
           root: coverage
           paths:
             - codeclimate.*.json
+
       - store_test_results:
           path: test-results
+
       - store_artifacts:
           path: test-artifacts
 
