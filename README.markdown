@@ -85,21 +85,19 @@ We use [RSpec](https://github.com/rspec/rspec) and
 ### Running tests in parallel
 
 The project's test suite can be run in parallel using [`parallel_tests`][]. By
-default, the library spawns two processes per core on your machine.
-
-You can optionally set the `PARALLEL_TEST_PROCESSORS` env variable somewhere in
-your shell initialization scripts to tweak this number, or set it from the
-command line as follows:
+default, the library spawns one process per CPU. You can optionally set the
+`PARALLEL_TEST_PROCESSORS` env variable to tweak this number, or set it from the
+command line by issuing
 
 ```shell-script
 bin/rake parallel:test[1] # --> force 1 CPU
 ```
 
-This number will vary by machine, but 1-2 processes per core generally yields
-the best results thumb. You may need to experiment to find the optimal number,
-but the library provides a sensible default.
+You may need to experiment to find the optimal number, but the library provides
+a sensible default of 1 per CPU (2 per dual-core processor, e.g.).
 
-The first time you run you'll need to set up your test databases with
+The first time you run tests in parallel you'll need to set up your test
+databases with
 
 ```shell-script
 bin/rake parallel:setup
@@ -117,7 +115,7 @@ To manually propagate migrations across all test databases, issue
 bin/rake parallel:prepare
 ```
 
-See the [`parallel_tests`][] for more.
+See the [`parallel_tests`][] docs for more.
 
 [`parallel_tests`]: https://github.com/grosser/parallel_tests/
 
