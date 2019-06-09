@@ -3,7 +3,7 @@ group :red_green_refactor, halt_on_fail: true do
     cmd: "bin/rspec -f progress",
     cmd_additional_args: "--require rails_helper --no-profile --order defined",
     run_all: {
-      cmd: "bundle exec parallel_rspec --quiet --test-options='-f documentation -o /dev/null -f progress",
+      cmd: "bin/parallel_rspec --quiet --test-options='-f documentation -o /dev/null -f progress",
       cmd_additional_args: "'",
     },
     failed_mode: :focus,
