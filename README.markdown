@@ -63,7 +63,7 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 We use [RSpec](https://github.com/rspec/rspec) and
 [Guard](https://github.com/guard/guard) for testing.
 
-- Run the test suite continuously in the background with `bundle exec guard`.
+- Run the test suite continuously in the background with `bin/guard`.
 
 - Run the entire test suite in parallel (see "Running tests in parallel" below)
   with `bin/rake parallel:spec`.
