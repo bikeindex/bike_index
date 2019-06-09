@@ -60,15 +60,66 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
 ## Testing
 
-We use [RSpec](https://github.com/rspec/rspec) and [Guard](https://github.com/guard/guard) for testing.
+We use [RSpec](https://github.com/rspec/rspec) and
+[Guard](https://github.com/guard/guard) for testing.
 
 - Run the test suite continuously in the background with `bundle exec guard`.
 
-- You may have to manually add the fuzzystrmatch extension, which we use for near serial searches, to your databases. The migration should take care of this but sometimes doesn't. Open the databases in postgres (`psql bikeindex_development` and `psql bikeindex_test`) and add the extension.
+- Run the entire test suite in parallel (see "Running tests in parallel" below)
+  with `bin/rake parallel:spec`.
 
+- Run a list of test files or test directories in parallel with
+  `bin/parallel_rspec <FILES_OR_FOLDERS>`.
+
+- Run tests sequentially with `bin/rspec`.
+
+- You may have to manually add the `fuzzystrmatch` extension, which we use for
+  near serial searches, to your databases. The migration should take care of
+  this but sometimes doesn't. Open the databases in postgres
+  (`psql bikeindex_development` and `psql bikeindex_test`) and add the extension.
+
+  ```sql
+  CREATE EXTENSION fuzzystrmatch;
+  ```
+
+### Running tests in parallel
+
+The project's test suite can be run in parallel using [`parallel_tests`][]. By
+default, the library spawns two processes per core on your machine.
+
+You can optionally set the `PARALLEL_TEST_PROCESSORS` env variable somewhere in
+your shell initialization scripts to tweak this number, or set it from the
+command line as follows:
+
+```shell-script
+bin/rake parallel:test[1] # --> force 1 CPU
 ```
-CREATE EXTENSION fuzzystrmatch;
+
+This number will vary by machine, but 1-2 processes per core generally yields
+the best results thumb. You may need to experiment to find the optimal number,
+but the library provides a sensible default.
+
+The first time you run you'll need to set up your test databases with
+
+```shell-script
+bin/rake parallel:setup
 ```
+
+You'll then be able to run the test suite in parallel with
+
+```shell-script
+bin/rake parallel:spec
+```
+
+To manually propagate migrations across all test databases, issue
+
+```shell-script
+bin/rake parallel:prepare
+```
+
+See the [`parallel_tests`][] for more.
+
+[`parallel_tests`]: https://github.com/grosser/parallel_tests/
 
 ## Code Hygiene
 
