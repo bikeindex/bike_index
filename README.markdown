@@ -43,9 +43,9 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
 - `yarn install` install js packages
 
-- `rake db:setup` create and seed your database
+- `bin/rake db:setup` create and seed your database
 
-- `rake seed_test_users_and_bikes` to:
+- `bin/rake seed_test_users_and_bikes` to:
   - Add the three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `please12`)
   - Give user@example.com 50 bikes
 
@@ -62,7 +62,7 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
 We use [RSpec](https://github.com/rspec/rspec) and [Guard](https://github.com/guard/guard) for testing.
 
-- Run the test suit in the background with `bundle exec guard`
+- Run the test suite continuously in the background with `bundle exec guard`.
 
 - You may have to manually add the fuzzystrmatch extension, which we use for near serial searches, to your databases. The migration should take care of this but sometimes doesn't. Open the databases in postgres (`psql bikeindex_development` and `psql bikeindex_test`) and add the extension.
 
@@ -100,7 +100,7 @@ project README to find a suitable editor plugin.
 RuboCop is configured to ignore Ruby style and layout (deferring to Rufo) and focus
 on code complexity, performance, and suggested best practices.
 
-To run it from the command line, issue `bundle exec rubocop`, optionally passing
+To run it from the command line, issue `bin/rubocop`, optionally passing
 a specific file(s). For a performance boost, you can also start a rubocop daemon
 with `bundle exec rubocop-daemon start`, in which case you'd lint with
 `bundle exec rubocop-daemon exec`.
