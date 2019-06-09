@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe Invoice, type: :model do
   let(:organization) { invoice.organization }

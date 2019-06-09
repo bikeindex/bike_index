@@ -1,6 +1,7 @@
-require "spec_helper"
+require "rails_helper"
 
-describe LandingPagesController, type: :controller do
+RSpec.describe LandingPagesController, type: :controller do
+  render_views
   include_context :page_content_values
 
   describe "show" do

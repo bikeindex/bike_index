@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::NewsController, type: :controller do
+RSpec.describe Admin::NewsController, type: :controller do
   let(:subject) { FactoryBot.create(:blog) }
   include_context :logged_in_as_super_admin
 

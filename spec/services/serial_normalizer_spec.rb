@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe SerialNormalizer do
+RSpec.describe SerialNormalizer do
   describe "unknown_and_absent_corrected" do
     it "returns serials that are passed to it" do
       expect(SerialNormalizer.unknown_and_absent_corrected("   787CCdddWTu ")).to eq "787CCdddWTu"

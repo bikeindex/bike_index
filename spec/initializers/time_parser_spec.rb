@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe TimeParser do
+RSpec.describe TimeParser do
   let(:subject) { TimeParser }
   before { Time.zone = subject::DEFAULT_TIMEZONE }
 

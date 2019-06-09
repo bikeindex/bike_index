@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Integration do
+RSpec.describe Integration, type: :model do
   let(:facebook_file) { File.read(Rails.root.join("spec", "fixtures", "integration_data_facebook.json")) }
   let(:strava_file) { File.read(Rails.root.join("spec", "fixtures", "integration_data_strava.json")) }
 

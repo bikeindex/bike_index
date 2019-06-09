@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe OrganizedMessageSerializer, type: :lib do
+RSpec.describe OrganizedMessageSerializer, type: :lib do
   let(:subject) { OrganizedMessageSerializer }
   let(:obj) { FactoryBot.create(:organization_message) }
   let(:serializer) { subject.new(obj, root: false) }

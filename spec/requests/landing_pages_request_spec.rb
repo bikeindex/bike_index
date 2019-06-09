@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe LandingPagesController, type: :request do
   describe "#for_shops" do

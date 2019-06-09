@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
-describe FrontGearType do
+RSpec.describe FrontGearType, type: :model do
 end

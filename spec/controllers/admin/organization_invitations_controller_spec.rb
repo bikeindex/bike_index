@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe Admin::OrganizationInvitationsController, type: :controller do
   let(:user) { FactoryBot.create(:admin) }

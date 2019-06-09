@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Ambassador, type: :model do
+RSpec.describe Ambassador, type: :model do
   describe ".all" do
     it "returns all ambassadors" do
       FactoryBot.create(:user)

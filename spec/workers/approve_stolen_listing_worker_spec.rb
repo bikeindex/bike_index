@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe ApproveStolenListingWorker do
+RSpec.describe ApproveStolenListingWorker, type: :job do
   it "enqueues another awesome job" do
     bike = FactoryBot.create(:bike)
     ApproveStolenListingWorker.perform_async(bike.id)

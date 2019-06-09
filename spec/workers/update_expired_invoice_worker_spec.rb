@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe UpdateOrganizationPosKindWorker, type: :lib do
+RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
   let(:subject) { UpdateOrganizationPosKindWorker }
   let(:instance) { subject.new }
   include_context :scheduled_worker

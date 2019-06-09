@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe ApplicationDecorator do
+RSpec.describe ApplicationDecorator do
   describe "dl_list_item" do
     it "returns a dt and dd from what's passed attribute" do
       bike = Bike.new

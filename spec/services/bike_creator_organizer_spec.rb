@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
-describe BikeCreatorOrganizer do
+RSpec.describe BikeCreatorOrganizer do
 end

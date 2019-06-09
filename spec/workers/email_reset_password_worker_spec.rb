@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe EmailResetPasswordWorker do
+RSpec.describe EmailResetPasswordWorker, type: :job do
   it "sends a password_reset email" do
     user = FactoryBot.create(:user)
     EmailResetPasswordWorker.new.perform(user.id)

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe BikeUpdator do
+RSpec.describe BikeUpdator do
   describe "find_bike" do
     it "raises an error if it can't find the bike" do
       expect { BikeUpdator.new(b_params: { id: 696969 }).find_bike }.to raise_error(BikeUpdatorError)

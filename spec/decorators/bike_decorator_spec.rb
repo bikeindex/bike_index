@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe BikeDecorator do
+RSpec.describe BikeDecorator do
   describe "show_other_bikes" do
     it "links to bikes if the user is the current owner and wants to share" do
       bike = Bike.new

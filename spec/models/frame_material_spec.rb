@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe FrameMaterial do
+RSpec.describe FrameMaterial, type: :model do
   describe "name" do
     let(:enum) { :organic }
     subject { FrameMaterial.new(enum) }

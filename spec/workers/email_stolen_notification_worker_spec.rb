@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe EmailStolenNotificationWorker do
+RSpec.describe EmailStolenNotificationWorker, type: :job do
   let(:subject) { EmailStolenNotificationWorker }
   let(:instance) { subject.new }
   let(:creator) { FactoryBot.create(:user_confirmed) }

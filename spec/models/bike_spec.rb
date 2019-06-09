@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Bike do
+RSpec.describe Bike, type: :model do
   it_behaves_like "bike_searchable"
   describe "scopes" do
     it "default scopes to created_at desc" do
@@ -684,7 +684,6 @@ describe Bike do
         it "gets the one that has an address, doesn't lookup if formatted_address stored" do
           expect(bike.b_params.pluck(:id)).to match_array([b_param2.id, b_param.id])
           bike.reload
-          expect_any_instance_of(Geohelper).to_not receive(:formatted_address_hash)
           expect(bike.registration_address).to eq target.as_json
         end
       end

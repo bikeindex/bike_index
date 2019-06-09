@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
 RSpec.shared_examples "bike_searchable" do
   let(:manufacturer) { FactoryBot.create(:manufacturer) }

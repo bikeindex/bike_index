@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Organized::ManageController, type: :controller do
+RSpec.describe Organized::ManageController, type: :controller do
   context "given an authenticated ambassador" do
     include_context :logged_in_as_ambassador
 

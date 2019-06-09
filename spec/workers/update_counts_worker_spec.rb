@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe UpdateCountsWorker, type: :lib do
+RSpec.describe UpdateCountsWorker, type: :lib do
   let(:subject) { UpdateCountsWorker }
   let(:instance) { subject.new }
   include_context :scheduled_worker

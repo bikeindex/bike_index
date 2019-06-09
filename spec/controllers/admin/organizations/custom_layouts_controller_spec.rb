@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::Organizations::CustomLayoutsController, type: :controller do
+RSpec.describe Admin::Organizations::CustomLayoutsController, type: :controller do
   let(:organization) { FactoryBot.create(:organization) }
   context "super admin" do
     include_context :logged_in_as_super_admin

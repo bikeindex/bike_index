@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Organized::AmbassadorTaskAssignmentsController, type: :controller do
+RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :controller do
   describe "#update" do
     include_context :logged_in_as_ambassador
 

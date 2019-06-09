@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe FeedbacksController do
+RSpec.describe FeedbacksController, type: :controller do
   describe "index" do
     it "renders with revised_layout" do
       get :index

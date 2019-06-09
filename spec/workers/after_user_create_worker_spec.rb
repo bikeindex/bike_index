@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe AfterUserCreateWorker do
+RSpec.describe AfterUserCreateWorker, type: :job do
   let(:subject) { AfterUserCreateWorker }
   let(:instance) { subject.new }
 

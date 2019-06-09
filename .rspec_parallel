@@ -1,0 +1,12 @@
+--require rails_helper
+
+--no-profile
+--order random
+
+--format progress
+
+--format ParallelTests::RSpec::SummaryLogger
+--out tmp/parallel_spec_summary.log
+
+--format ParallelTests::RSpec::RuntimeLogger
+--out tmp/parallel_runtime_rspec.log

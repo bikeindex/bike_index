@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe StolenNotificationsController do
+RSpec.describe StolenNotificationsController, type: :controller do
   let(:user) { FactoryBot.create(:user_confirmed) }
   let(:bike) { FactoryBot.create(:bike) }
   let(:user2) { FactoryBot.create(:user) }

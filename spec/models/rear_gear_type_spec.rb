@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
-describe RearGearType do
+RSpec.describe RearGearType, type: :model do
 end

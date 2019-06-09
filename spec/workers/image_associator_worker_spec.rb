@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe ImageAssociatorWorker do
+RSpec.describe ImageAssociatorWorker, type: :job do
   let(:subject) { ImageAssociatorWorker }
 
   it "is the correct queue" do

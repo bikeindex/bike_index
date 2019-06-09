@@ -47,3 +47,7 @@ yarn-error.log
 
 # Ignore jest coverage files
 coverage
+
+# Ignore test results
+test-results/
+spec/examples.txt

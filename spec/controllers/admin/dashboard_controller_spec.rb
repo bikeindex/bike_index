@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::DashboardController do
+RSpec.describe Admin::DashboardController, type: :controller do
   describe "index" do
     context "not logged in" do
       it "redirects" do

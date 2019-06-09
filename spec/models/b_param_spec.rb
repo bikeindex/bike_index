@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe BParam do
+RSpec.describe BParam, type: :model do
   describe "bike" do
     it "returns the bike attribs" do
       b_param = BParam.new(params: { bike: { serial_number: "XXX" } })

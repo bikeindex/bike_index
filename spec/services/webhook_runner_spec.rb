@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe WebhookRunner do
+RSpec.describe WebhookRunner do
   describe "make_request" do
     it "doesn't error if webhook doesn't return" do
       runner = WebhookRunner.new

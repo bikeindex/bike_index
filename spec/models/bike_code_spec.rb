@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe BikeCode, type: :model do
   describe "normalize_code" do

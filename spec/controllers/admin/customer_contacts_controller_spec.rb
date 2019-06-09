@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::CustomerContactsController do
+RSpec.describe Admin::CustomerContactsController, type: :controller do
   describe "create" do
     it "creates the contact, send the email and redirect to the bike" do
       stolen_record = FactoryBot.create(:stolen_record)

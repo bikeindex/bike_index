@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::PaymentsController, type: :controller do
+RSpec.describe Admin::PaymentsController, type: :controller do
   include_context :logged_in_as_super_admin
   let(:subject) { FactoryBot.create(:payment, user: user) }
   let(:organization) { FactoryBot.create(:organization) }

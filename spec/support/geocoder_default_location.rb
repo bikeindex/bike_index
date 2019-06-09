@@ -1,4 +1,4 @@
-shared_context :geocoder_default_location do
+RSpec.shared_context :geocoder_default_location do
   let(:default_location) do
     {
       latitude: 40.7143528,
@@ -42,7 +42,7 @@ shared_context :geocoder_default_location do
   end
 end
 
-shared_context :geocoder_real do
+RSpec.shared_context :geocoder_real do
   before { Geocoder.configure(lookup: :google, use_https: true) }
   after { Geocoder.configure(lookup: :test) }
 end

@@ -1,8 +1,8 @@
-require "spec_helper"
+require "rails_helper"
 
-base_url = "/admin/partial_bikes/"
+RSpec.describe Admin::PartialBikesController, type: :request do
+  base_url = "/admin/partial_bikes/"
 
-describe "Admin::PartialBikesController" do
   # Request specs don't have cookies so we need to stub stuff if we're in request specs
   # This is suboptimal, but hey, it gets us to request specs for now
   before { allow(User).to receive(:from_auth) { user } }

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::BulkImportsController, type: :controller do
+RSpec.describe Admin::BulkImportsController, type: :controller do
   let(:user) { FactoryBot.create(:admin) }
   before do
     set_current_user(user)

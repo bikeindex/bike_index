@@ -1,10 +1,10 @@
-require "spec_helper"
+require "rails_helper"
 
-describe HeaderTagHelper do
+RSpec.describe HeaderTagHelper, type: :helper do
   before do
+    helper.extend(ControllerHelpers)
     allow(view).to receive(:controller_name) { controller_name }
     allow(view).to receive(:action_name) { action_name }
-    allow(view).to receive(:request_url) { "" }
     # These two methods are defined in application controller
     allow(view).to receive(:controller_namespace) { controller_namespace }
     allow(view).to receive(:page_id) { [controller_namespace, controller_name, action_name].compact.join("_") }
@@ -39,6 +39,7 @@ describe HeaderTagHelper do
 
   describe "page_description=" do
     it "sets page_description with strip_tags" do
+      helper.extend(ControllerHelpers)
       helper.page_description = "<script>alert();</script> description <em>stuff</em>"
       expect(helper.page_description).to eq "description stuff"
     end

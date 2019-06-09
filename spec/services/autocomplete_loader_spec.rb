@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe AutocompleteLoader do
+RSpec.describe AutocompleteLoader do
   describe "reload" do
     it "calls all the things" do
       autocomplete_loader = AutocompleteLoader.new

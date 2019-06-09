@@ -1,5 +1,5 @@
 # coding: utf-8
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe Tweet, type: :model do
   let(:twitter_response) { File.read(Rails.root.join("spec", "fixtures", "integration_data_tweet.json")) }

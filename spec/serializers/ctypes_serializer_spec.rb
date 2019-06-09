@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe CtypeSerializer do
+RSpec.describe CtypeSerializer do
   let(:ctype) { FactoryBot.create(:ctype, has_multiple: true) }
   subject { CtypeSerializer.new(ctype) }
 

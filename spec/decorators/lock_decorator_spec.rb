@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe LockDecorator do
+RSpec.describe LockDecorator do
   describe "lock_type_name" do
     it "returns the lock type name other name if present" do
       lock = Lock.new

@@ -1,6 +1,8 @@
-require "spec_helper"
+require "rails_helper"
 
-describe BikesController do
+RSpec.describe BikesController, type: :controller do
+  render_views
+
   describe "index" do
     include_context :geocoder_default_location
     let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "1234567890") }

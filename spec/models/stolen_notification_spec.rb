@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe StolenNotification do
+RSpec.describe StolenNotification, type: :model do
   describe "create" do
     it "enqueues an email job" do
       expect do

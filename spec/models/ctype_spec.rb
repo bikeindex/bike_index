@@ -1,5 +1,5 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Ctype do
+RSpec.describe Ctype, type: :model do
   it_behaves_like "friendly_slug_findable"
 end

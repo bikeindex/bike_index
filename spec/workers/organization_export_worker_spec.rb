@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe OrganizationExportWorker do
+RSpec.describe OrganizationExportWorker, type: :job do
   let(:subject) { OrganizationExportWorker }
   let(:instance) { subject.new }
   let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil) }
@@ -99,7 +99,8 @@ describe OrganizationExportWorker do
     context "bulk import already processed" do
       let(:export) { FactoryBot.create(:export, progress: "finished") }
       it "returns true" do
-        expect(instance).to_not receive(:create_csv)
+        # TODO: does not implement create_csv
+        # expect(instance).to_not receive(:create_csv)
         instance.perform(export.id)
       end
     end

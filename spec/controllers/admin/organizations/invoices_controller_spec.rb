@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::Organizations::InvoicesController, type: :controller do
+RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
   let(:organization) { FactoryBot.create(:organization) }
   let(:invoice) { FactoryBot.create(:invoice, organization: organization) }
   let(:paid_feature1) { FactoryBot.create(:paid_feature, feature_slugs: ["abandoned_bike_messages"]) }

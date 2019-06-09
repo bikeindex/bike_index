@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Oauth::ApplicationsController do
+RSpec.describe Oauth::ApplicationsController, type: :controller do
   include_context :existing_doorkeeper_app
   describe "index" do
     it "redirects" do
