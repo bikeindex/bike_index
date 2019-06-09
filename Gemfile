@@ -130,6 +130,9 @@ group :development do
   gem "bullet"
   gem "letter_opener"
   gem "rerun"
+  gem "spring"
+  gem "spring-commands-rspec"
+  gem "spring-commands-rubocop"
 end
 
 group :development, :test do
