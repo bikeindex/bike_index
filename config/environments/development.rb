@@ -13,7 +13,7 @@ Rails.application.configure do
   # Show full error reports
   config.consider_all_requests_local = true
 
-  # Enable/disable caching
+  # Run rake dev:cache to toggle caching in development
   if Rails.root.join("tmp", "caching-dev.txt").exist?
     config.action_controller.perform_caching = true
     config.cache_store = :dalli_store,
