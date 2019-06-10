@@ -117,33 +117,36 @@ describe StolenRecord do
 
   describe "recovery display status" do
     it "is not elibible" do
-      expect(StolenRecord.new.recovery_display_status).to eq "not_elibible"
+      expect(StolenRecord.new.recovery_display_status).to eq "not_eligible"
     end
     context "stolen record is recovered, unable to share" do
       let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: false) }
-      before do
-        stolen_record.set_recovery_display
-      end
       it "is not displayed" do
-        expect(stolen_record.recovery_display_status).to eq "not_elibible"
+        stolen_record.reload
+        expect(stolen_record.recovery_display_status).to eq "not_eligible"
       end
     end
     context "stolen record is recovered, able to share" do
+      let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
       let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
-      before do
-        stolen_record.bike.thumb_path = "http://via.placeholder.com/300"
-        stolen_record.set_recovery_display
-      end
+      let(:bike) { stolen_record.bike }
       it "is waiting on decision when user marks that we can share" do
+        bike.reload
+        bike.cache_photo
+        stolen_record.reload
+        p "record"
+        pp stolen_record
+        p "bike"
+        pp bike
+        expect(stolen_record.bike.thumb_path).to be_present
+        expect(stolen_record.can_share_recovery).to be_truthy
         expect(stolen_record.recovery_display_status).to eq "waiting_on_decision"
       end
     end
     context "stolen record is recovered, sharable but no photo" do
       let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
-      before do
-        stolen_record.set_recovery_display
-      end
       it "is not displayed" do
+        stolen_record.reload
         expect(stolen_record.recovery_display_status).to eq "displayable_no_photo"
       end
     end
@@ -235,6 +238,43 @@ describe StolenRecord do
       stolen_record.update_attributes(police_report_department: "CPD")
       stolen_record.reload
       expect(stolen_record.tsved_at).to be_nil
+    end
+  end
+
+  describe "calculated_recovery_display_status" do
+    context "recovery is not eligible for display" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: false) }
+      it "returns not_eligible" do
+        expect(stolen_record.calculated_recovery_display_status).to eq "not_eligible"
+      end
+    end
+    context "recovery is eligible for display but has no photo" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
+      it "returns displayable_no_photo" do
+        expect(stolen_record.calculated_recovery_display_status).to eq "displayable_no_photo"
+      end
+    end
+    context "recovery is eligible for display" do
+      let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
+      let(:bike) { stolen_record.bike }
+      it "returns waiting_on_decision" do
+        bike.reload
+        bike.cache_photo
+        expect(stolen_record.calculated_recovery_display_status).to eq "waiting_on_decision"
+      end
+    end
+    context "recovery is displayed" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true, recovery_display_status: "displayed") }
+      it "returns displayed" do
+        expect(stolen_record.calculated_recovery_display_status).to eq "displayed"
+      end
+    end
+    context "recovery has been marked as not eligible for display" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true, recovery_display_status: "not_displayed") }
+      it "returns not_displayed" do
+        expect(stolen_record.calculated_recovery_display_status).to eq "not_displayed"
+      end
     end
   end
 

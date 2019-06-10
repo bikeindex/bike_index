@@ -1,7 +1,13 @@
 class StolenRecord < ActiveRecord::Base
   include ActiveModel::Dirty
   include Phonifyerable
-  RECOVERY_DISPLAY_STATUS_ENUM = %w[ not_eligible waiting_on_decision displayable_no_photo displayed not_displayed ].freeze
+  RECOVERY_DISPLAY_STATUS_ENUM = {
+    not_eligible: 0,
+    waiting_on_decision: 1,
+    displayable_no_photo: 2,
+    displayed: 3,
+    not_displayed: 4,
+  }.freeze
 
   attr_accessor :timezone # Just to provide a backup and permit assignment
 
@@ -110,7 +116,7 @@ class StolenRecord < ActiveRecord::Base
     fix_date
     titleize_city
     update_tsved_at
-    set_recovery_display
+    self.recovery_display_status = calculated_recovery_display_status
   end
 
   def set_phone
@@ -179,15 +185,14 @@ class StolenRecord < ActiveRecord::Base
     row
   end
 
-  def set_recovery_display
-    if can_share_recovery
-      if bike.thumb_path.present?
-        self.recovery_display_status = "waiting_on_decision"
-      else
-        self.recovery_display_status = "displayable_no_photo"
-      end
+  def calculated_recovery_display_status
+    return "not_eligible" unless can_share_recovery
+    return "not_displayed" if not_displayed?
+    return "displayed" if displayed?
+    if bike.thumb_path.present?
+      "waiting_on_decision"
     else
-      self.recovery_display_status = "not_eligible"
+      "displayable_no_photo"
     end
   end
 
