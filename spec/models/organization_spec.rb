@@ -146,6 +146,12 @@ RSpec.describe Organization, type: :model do
 
         enabled = ambassador_org.paid_for?(["unstolen_notifications"])
         expect(enabled).to eq(true)
+
+        enabled = ambassador_org.paid_for?("unstolen notifications")
+        expect(enabled).to eq(true)
+
+        enabled = ambassador_org.paid_for?("invalid feature name")
+        expect(enabled).to eq(false)
       end
     end
   end
