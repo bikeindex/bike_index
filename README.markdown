@@ -58,6 +58,11 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
   - if you want to use [Pow](http://pow.cx/) (or some other setup that isn't through localhost:3001), change the appropriate values in [session_store.rb](config/initializers/session_store.rb) and [.env](.env).
 
 
+Toggle Spring with `rake dev:spring` (defaults to enabled)
+
+Toggle Caching in development with `rake dev:cache` (defaults to disabled)
+
+
 ## Testing
 
 We use [RSpec](https://github.com/rspec/rspec) and

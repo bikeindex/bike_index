@@ -3,7 +3,8 @@
 # This file loads spring without using Bundler, in order to be fast.
 # It gets overwritten when you run the `spring binstub` command.
 
-ENV["DISABLE_SPRING"] = "1" if File.exists?(File.join(__dir__, "../.offspring"))
+# Run rake dev:spring to toggle spring
+ENV["DISABLE_SPRING"] = "1" if File.exists?(File.join(__dir__, "..", "tmp", "spring-off.txt"))
 
 unless defined?(Spring)
   require "rubygems"

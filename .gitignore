@@ -51,6 +51,3 @@ coverage
 # Ignore test results
 test-results/
 spec/examples.txt
-
-# Make it possible to skip spring
-.offspring
