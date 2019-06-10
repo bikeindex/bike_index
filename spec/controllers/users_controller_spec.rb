@@ -1,8 +1,6 @@
 require "rails_helper"
 
 RSpec.describe UsersController, type: :controller do
-  render_views
-
   let(:user) { FactoryBot.create(:user_confirmed) }
   describe "new" do
     context "already signed in" do
