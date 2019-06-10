@@ -18,7 +18,7 @@ class CreationState < ActiveRecord::Base
 
   def creation_description
     if is_pos
-      pos_kind.gsub("_pos", "").humanize
+      pos_kind.to_s.gsub("_pos", "").humanize
     elsif is_bulk
       "bulk reg"
     elsif origin.present?
