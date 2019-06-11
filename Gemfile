@@ -70,7 +70,7 @@ gem "api-pagination"
 gem "doorkeeper", "~> 3.1.0"
 gem "grape", "~> 0.19.1"
 gem "grape-active_model_serializers", "~> 1.4.0"
-gem "grape-swagger", "~> 0.10.4"
+gem "grape-swagger", "0.11"
 gem "swagger-ui_rails"
 gem "wine_bouncer"
 
