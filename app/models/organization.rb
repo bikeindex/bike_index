@@ -50,7 +50,8 @@ class Organization < ActiveRecord::Base
   enum pos_kind: POS_KIND_ENUM
 
   validates_presence_of :name
-  validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact admin@bikeindex.org"
+  validates_uniqueness_of :short_name, message: "Another organization already has this short name - if you don't think that should be the case, contact support@bikeindex.org"
+  validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
 
   default_scope { order(:name) }
   scope :shown_on_map, -> { where(show_on_map: true, approved: true) }
