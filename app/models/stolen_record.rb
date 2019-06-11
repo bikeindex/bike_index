@@ -1,6 +1,13 @@
 class StolenRecord < ActiveRecord::Base
   include ActiveModel::Dirty
   include Phonifyerable
+  RECOVERY_DISPLAY_STATUS_ENUM = {
+    not_eligible: 0,
+    waiting_on_decision: 1,
+    displayable_no_photo: 2,
+    displayed: 3,
+    not_displayed: 4,
+  }.freeze
 
   attr_accessor :timezone # Just to provide a backup and permit assignment
 
@@ -25,6 +32,8 @@ class StolenRecord < ActiveRecord::Base
   validates_presence_of :bike
   validates_presence_of :date_stolen
 
+  enum recovery_display_status: RECOVERY_DISPLAY_STATUS_ENUM
+
   default_scope { where(current: true) }
   scope :approveds, -> { where(approved: true) }
   scope :approveds_with_reports, -> { approveds.where("police_report_number IS NOT NULL").where("police_report_department IS NOT NULL") }
@@ -34,6 +43,8 @@ class StolenRecord < ActiveRecord::Base
   scope :recovered, -> { unscoped.where(current: false).order("date_recovered desc") }
   scope :displayable, -> { recovered.where(can_share_recovery: true) }
   scope :recovery_unposted, -> { unscoped.where(current: false, recovery_posted: false) }
+
+  before_save :set_calculated_attributes
 
   geocoded_by :address_override_show_address
   after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
@@ -100,7 +111,13 @@ class StolenRecord < ActiveRecord::Base
     locking_defeat_description.map { |l| [l, l] }
   end
 
-  before_save :set_phone, :fix_date, :titleize_city, :update_tsved_at
+  def set_calculated_attributes
+    set_phone
+    fix_date
+    titleize_city
+    update_tsved_at
+    self.recovery_display_status = calculated_recovery_display_status
+  end
 
   def set_phone
     self.phone = Phonifyer.phonify(phone) if phone
@@ -166,6 +183,17 @@ class StolenRecord < ActiveRecord::Base
     row << "\t\t"
     row << "#{ENV["BASE_URL"]}/bikes/#{b.id}\n"
     row
+  end
+
+  def calculated_recovery_display_status
+    return "not_eligible" unless can_share_recovery
+    return "not_displayed" if not_displayed?
+    return "displayed" if displayed?
+    if bike.thumb_path.present?
+      "waiting_on_decision"
+    else
+      "displayable_no_photo"
+    end
   end
 
   def add_recovery_information(info = {})

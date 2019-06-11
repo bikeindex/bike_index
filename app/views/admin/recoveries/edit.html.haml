@@ -1,10 +1,12 @@
-
-%h1
-  Edit recovery for #{@bike.type}
-%p
-  = link_to "Back to recoveries", admin_recoveries_url
-%p
-  = link_to "Edit bike", edit_admin_bike_path(@bike), class: "btn btn-success float-right mb-4"
+.row
+  .col-md-10
+    %p
+      = link_to "Back to recoveries", admin_recoveries_url
+    %h1
+      Edit recovery for #{@bike.type}
+  .col-md-2
+    %p
+      = link_to "Edit bike", edit_admin_bike_path(@bike), class: "btn btn-success mb-4 float-right"
 
 
 
@@ -66,7 +68,6 @@
   - if @recovery.recovery_display.present?
     = link_to "Recovery displayed", edit_admin_recovery_display_url(@recovery.recovery_display)
   - else
-    = link_to 'Display recovery', new_admin_recovery_display_url(stolen_record_id: @recovery.id), class: 'btn btn-primary mb-4'
     - if @recovery.recovery_posted
       Recovery posted
 
@@ -78,16 +79,28 @@
 
 %hr
 - url = {action: "update", controller: "recoveries"}
-= form_for([:admin, @recovery], :url => url , html: { class: "form form-horizontal" }) do |f|
-  - if @recovery.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Recovery", obj: @recovery}
-  .form-group
-    = f.label :index_helped_recovery
-    = f.check_box :index_helped_recovery
+.row
+  .col-md-6
+    = form_for([:admin, @recovery], :url => url , html: { class: "form form-horizontal" }) do |f|
 
-  .form-group
-    = f.label :can_share_recovery
-    = f.check_box :can_share_recovery
+      - if @recovery.errors.any?
+        = render partial: "/shared/errors", locals: { name: "Recovery", obj: @recovery}
+      .form-group
+        = f.label :index_helped_recovery
+        = f.check_box :index_helped_recovery
+
+      .form-group
+        = f.label :can_share_recovery
+        = f.check_box :can_share_recovery
+      - if @recovery.not_displayed?
+        .form-group
+          = label :mark_as_eligible, "eligible"
+          = check_box "mark_as_eligible", "eligible"
+      - else
+        .form-group
+          = label :is_not_displayable, "undisplayable"
+          = check_box "is_not_displayable", "undisplayable"
+      = submit_tag "Update the recovery", class: "btn btn-success"
 
 
   / .control-group.recovery-input-field

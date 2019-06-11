@@ -8,7 +8,7 @@ class Admin::RecoveriesController < Admin::BaseController
     elsif params[:all_recoveries]
       recoveries = StolenRecord.recovered.includes(:bike).order("date_recovered desc")
     else
-      recoveries = StolenRecord.displayable.includes(:bike).order("date_recovered desc")
+      recoveries = StolenRecord.waiting_on_decision.includes(:bike).order("date_recovered desc")
     end
     page = params[:page] || 1
     per_page = params[:per_page] || 50
@@ -26,6 +26,11 @@ class Admin::RecoveriesController < Admin::BaseController
 
   def update
     @stolen_record = StolenRecord.unscoped.find(params[:id])
+    if params[:is_not_displayable].present?
+      @stolen_record.recovery_display_status = "not_displayed"
+    elsif params[:mark_as_eligible].present?
+      @stolen_record.recovery_display_status = "waiting_on_decision"
+    end
     if @stolen_record.update_attributes(permitted_parameters)
       flash[:success] = "Recovery Saved!"
       redirect_to admin_recoveries_url

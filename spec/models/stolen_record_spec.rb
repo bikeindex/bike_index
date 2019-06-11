@@ -115,6 +115,52 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
+  describe "recovery display status" do
+    it "is not elibible" do
+      expect(StolenRecord.new.recovery_display_status).to eq "not_eligible"
+    end
+    context "stolen record is recovered, unable to share" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: false) }
+      it "is not displayed" do
+        stolen_record.reload
+        expect(stolen_record.recovery_display_status).to eq "not_eligible"
+      end
+    end
+    context "stolen record is recovered, able to share" do
+      let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
+      let(:bike) { stolen_record.bike }
+      it "is waiting on decision when user marks that we can share" do
+        bike.reload.update_attributes(updated_at: Time.now)
+        stolen_record.reload.update_attributes(updated_at: Time.now)
+        expect(stolen_record.bike.thumb_path).to be_present
+        expect(stolen_record.can_share_recovery).to be_truthy
+        expect(stolen_record.recovery_display_status).to eq "waiting_on_decision"
+      end
+    end
+    context "stolen record is recovered, sharable but no photo" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
+      it "is not displayed" do
+        stolen_record.reload
+        expect(stolen_record.recovery_display_status).to eq "displayable_no_photo"
+      end
+    end
+    context "stolen_record is displayed" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, recovery_display_status: "displayed", can_share_recovery: true) }
+      it "is displayed" do
+        stolen_record.reload.update_attributes(updated_at: Time.now)
+        expect(stolen_record.recovery_display_status).to eq "displayed"
+      end
+    end
+    context "stolen_record is not_displayed" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, recovery_display_status: "not_displayed", can_share_recovery: true) }
+      it "is not_displayed" do
+        stolen_record.reload.update_attributes(updated_at: Time.now)
+        expect(stolen_record.recovery_display_status).to eq "not_displayed"
+      end
+    end
+  end
+
   describe "set_phone" do
     it "it should set_phone" do
       stolen_record = FactoryBot.create(:stolen_record)
@@ -123,9 +169,6 @@ RSpec.describe StolenRecord, type: :model do
       stolen_record.set_phone
       expect(stolen_record.phone).to eq("0000000000")
       expect(stolen_record.secondary_phone).to eq("0000000000")
-    end
-    it "has before_save_callback_method defined as a before_save callback" do
-      expect(StolenRecord._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_phone)).to eq(true)
     end
   end
 
@@ -150,8 +193,12 @@ RSpec.describe StolenRecord, type: :model do
       stolen_record.titleize_city
       expect(stolen_record.city).to eq("Georgian La")
     end
-    it "has before_save_callback_method defined as a before_save callback" do
-      expect(StolenRecord._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:titleize_city)).to eq(true)
+  end
+
+  describe "set_calculated_attributes" do
+    let(:stolen_record) { FactoryBot.create(:stolen_record) }
+    it "has before_save_callback_method defined as before_save callback" do
+      expect(stolen_record._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_calculated_attributes)).to eq(true)
     end
   end
 
@@ -177,10 +224,6 @@ RSpec.describe StolenRecord, type: :model do
       stolen_record.fix_date
       expect(stolen_record.date_stolen.year).to eq(Time.now.year - 1)
     end
-
-    it "has before_save_callback_method defined as a before_save callback" do
-      expect(StolenRecord._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:fix_date)).to eq(true)
-    end
   end
 
   describe "update_tsved_at" do
@@ -204,6 +247,43 @@ RSpec.describe StolenRecord, type: :model do
       stolen_record.update_attributes(police_report_department: "CPD")
       stolen_record.reload
       expect(stolen_record.tsved_at).to be_nil
+    end
+  end
+
+  describe "calculated_recovery_display_status" do
+    context "recovery is not eligible for display" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: false) }
+      it "returns not_eligible" do
+        expect(stolen_record.calculated_recovery_display_status).to eq "not_eligible"
+      end
+    end
+    context "recovery is eligible for display but has no photo" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
+      it "returns displayable_no_photo" do
+        expect(stolen_record.calculated_recovery_display_status).to eq "displayable_no_photo"
+      end
+    end
+    context "recovery is eligible for display" do
+      let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
+      let(:bike) { stolen_record.bike }
+      it "returns waiting_on_decision" do
+        bike.reload
+        bike.update_attributes(updated_at: Time.now)
+        expect(stolen_record.calculated_recovery_display_status).to eq "waiting_on_decision"
+      end
+    end
+    context "recovery is displayed" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true, recovery_display_status: "displayed") }
+      it "returns displayed" do
+        expect(stolen_record.calculated_recovery_display_status).to eq "displayed"
+      end
+    end
+    context "recovery has been marked as not eligible for display" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true, recovery_display_status: "not_displayed") }
+      it "returns not_displayed" do
+        expect(stolen_record.calculated_recovery_display_status).to eq "not_displayed"
+      end
     end
   end
 
