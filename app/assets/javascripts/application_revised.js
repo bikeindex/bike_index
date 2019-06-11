@@ -21,9 +21,11 @@
 //= require external_scripts/zoom.js
 //= require dataTables/jquery.dataTables
 //= require dataTables/bootstrap/3/jquery.dataTables.bootstrap
+//= require chartkick
+//= require Chart.bundle
 
-// Legacy carousel. Used on homepage. 
-// Can use if we need a carousel, though would be nice to use rails-assets version instead 
+// Legacy carousel. Used on homepage.
+// Can use if we need a carousel, though would be nice to use rails-assets version instead
 //= require external_scripts/slick.js
 
 // Things that are required for File Upload:
