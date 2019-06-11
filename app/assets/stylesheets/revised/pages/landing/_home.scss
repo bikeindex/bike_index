@@ -529,11 +529,14 @@
   }
 
   .count-block {
-    text-align: right;
     margin-top: 2rem;
 
-    &:first-of-type {
-      margin-top: 0;
+    @include media-breakpoint-up(lg) {
+      text-align: right;
+      &:first-of-type {
+        // on big screens, ensure it doesn't break from the chart
+        margin-top: 0;
+      }
     }
 
     h4 {

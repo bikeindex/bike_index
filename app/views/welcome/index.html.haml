@@ -123,7 +123,7 @@
               }
             }
 
-          = column_chart Bike.unscoped.where(created_at: (Time.now - 7.days)..Time.now).group_by_day(:created_at).count, thousands: ",", defer: true, library: chartkick_library_props
+          = column_chart Counts.week_creation_chart, thousands: ",", defer: true, library: chartkick_library_props
           %h4.chart-label
             Bikes registered this week
         .col-md-2
@@ -146,10 +146,10 @@
             %h4
               Total Recovery value
               %span.count-display
-                = number_with_delimiter(Counts.recoveries_value)
+                $#{number_with_delimiter(Counts.recoveries_value)}
           .count-block
             %h4
               Partner Organizations
               %span.count-display
-                = number_with_delimiter(Organization.count)
+                = number_with_delimiter(Counts.organizations)
 
