@@ -190,7 +190,8 @@ RSpec.describe Api::V1::UsersController, type: :controller do
         expect(bike.stolen).to be_falsey
         expect(feedback.body).to eq recovery_request[:request_reason]
         expect(feedback.feedback_hash).to eq recovery_request
-                                               .slice(:index_helped_recovery, :can_share_recovery).merge(bike_id: bike.id.to_s)
+                                               .slice(:index_helped_recovery, :can_share_recovery)
+                                               .merge(bike_id: bike.id.to_s).as_json
         expect(stolen_record.current).to be_falsey
         expect(stolen_record.bike).to eq(bike)
         expect(stolen_record.recovered?).to be_truthy

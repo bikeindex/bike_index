@@ -1,6 +1,6 @@
 class Feedback < ActiveRecord::Base
   validates_presence_of :body, :email, :title
-  serialize :feedback_hash
+  serialize :feedback_hash_text
   belongs_to :user
   before_validation :set_calculated_attributes
   attr_accessor :additional
@@ -14,29 +14,34 @@ class Feedback < ActiveRecord::Base
     %w(manufacturer_update_request serial_update_request)
   end
 
-  def notify_admins
-    return true if self.class.no_notification_types.include?(feedback_type)
-    EmailFeedbackNotificationWorker.perform_async(id)
-  end
-
-  def bike
-    feedback_hash && feedback_hash[:bike_id] && Bike.unscoped.find(feedback_hash[:bike_id])
+  def self.for_bike(bike = nil)
+    return where("(feedback_hash->'bike_id') IS NOT NULL") if bike.blank?
+    where("(feedback_hash->'bike_id') IS NOT NULL")
   end
 
   def package_size=(val)
     self.feedback_hash = (feedback_hash || {}).merge(package_size: val)
   end
 
-  def package_size
-    (self.feedback_hash || {})[:package_size]
+  def phone_number=(val)
+    feedback_hash = (feedback_hash || {}).merge(phone_number: val)
   end
 
-  def phone_number=(val)
-    self.feedback_hash = (feedback_hash || {}).merge(phone_number: val)
+  def notify_admins
+    return true if self.class.no_notification_types.include?(feedback_type)
+    EmailFeedbackNotificationWorker.perform_async(id)
+  end
+
+  def bike
+    feedback_hash && feedback_hash["bike_id"] && Bike.unscoped.find(feedback_hash["bike_id"])
+  end
+
+  def package_size
+    (feedback_hash || {})["package_size"]
   end
 
   def phone_number
-    (self.feedback_hash || {})[:phone_number]
+    (feedback_hash || {})["phone_number"]
   end
 
   def set_calculated_attributes
