@@ -2,11 +2,13 @@ require "rails_helper"
 
 RSpec.describe Feedback, type: :model do
   describe "bike" do
+    let(:_bike) { FactoryBot.create(:bike) }
     let(:bike) { FactoryBot.create(:bike) }
     let!(:feedback) { FactoryBot.create(:feedback_serial_update_request, bike: bike) }
     it "finds it, returns bike" do
-      expect(Feedback.for_bike.pluck(:id)).to eq([feedback.id])
-      expect(Feedback.for_bike(bike).pluck(:id)).to eq([feedback.id])
+      expect(Feedback.bike.pluck(:id)).to eq([feedback.id])
+      expect(Feedback.bike(bike).pluck(:id)).to eq([feedback.id])
+      expect(Feedback.bike(bike.id).pluck(:id)).to eq([feedback.id])
       expect(feedback.bike).to eq bike
     end
   end

@@ -164,8 +164,14 @@
       .form-group
         = f.label :owner_email
         = f.text_field :owner_email, :required =>true, class: "form-control"
-  = submit_tag "Update the bike", class: "btn btn-success mb-4"
-  = link_to "Delete bike", admin_bike_url(@bike), method: :delete, confirm: "Are you sure?", class: "btn btn-danger mb-4"
+
+  .row.mb-4
+    .col-4
+      = submit_tag "Update the bike", class: "btn btn-success"
+    .col-8.text-right
+      = link_to "Bike messages", admin_feedbacks_path(search_bike_id: @bike.to_param), class: "btn btn-outline-primary"
+      = link_to "Delete bike", admin_bike_url(@bike), method: :delete, confirm: "Are you sure?", class: "btn btn-danger ml-4"
+
   - if @bike.stolen and @bike.find_current_stolen_record.present?
     %hr
     = f.fields_for :stolen_records do |s|

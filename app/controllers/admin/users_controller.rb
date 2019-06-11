@@ -55,11 +55,7 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def find_user
-    user_id = params[:id]
-    if user_id.is_a?(Integer) || user_id.match(/\A\d*\z/).present?
-      @user = User.where(id: user_id).first
-    end
-    @user ||= User.find_by_username(user_id)
+    @user = User.friendly_username_find(params[:id])
     raise ActiveRecord::RecordNotFound unless @user.present?
   end
 

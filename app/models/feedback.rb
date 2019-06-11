@@ -14,9 +14,10 @@ class Feedback < ActiveRecord::Base
     %w(manufacturer_update_request serial_update_request)
   end
 
-  def self.for_bike(bike = nil)
-    return where("(feedback_hash->'bike_id') IS NOT NULL") if bike.blank?
-    where("(feedback_hash->'bike_id') IS NOT NULL")
+  def self.bike(bike_or_bike_id = nil)
+    return where("(feedback_hash->>'bike_id') IS NOT NULL") if bike_or_bike_id.blank?
+    bike_id = bike_or_bike_id.is_a?(Bike) ? bike_or_bike_id.id : bike_or_bike_id
+    where("(feedback_hash->>'bike_id') = ?", bike_id.to_s)
   end
 
   def package_size=(val)
@@ -32,8 +33,14 @@ class Feedback < ActiveRecord::Base
     EmailFeedbackNotificationWorker.perform_async(id)
   end
 
+  def delete_request?; feedback_type == "bike_delete_request" end
+
+  def bike_id
+    (feedback_hash || {})["bike_id"]
+  end
+
   def bike
-    feedback_hash && feedback_hash["bike_id"] && Bike.unscoped.find(feedback_hash["bike_id"])
+    Bike.unscoped.where(id: bike_id).first
   end
 
   def package_size

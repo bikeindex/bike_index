@@ -48,6 +48,7 @@ module Api
             elsif feedback_type.match("bike_recovery")
               recover_bike(bike, feedback)
             end
+            feedback.user_id = current_user&.id
             feedback.save
             success = { success: "submitted request" }
             render json: success and return

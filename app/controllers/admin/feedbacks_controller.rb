@@ -1,42 +1,43 @@
 class Admin::FeedbacksController < Admin::BaseController
-  before_filter :find_feedback_for_params, except: [:show]
+  include SortableTable
   layout "new_admin"
+  before_action :set_period, only: [:index]
 
   def index
-    @matching_count = @feedbacks.count if params[:type].present?
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @feedbacks = @feedbacks.order(created_at: :desc)
-                           .page(page).per(per_page)
+    @feedbacks = matching_feedbacks.reorder("feedbacks.#{sort_column} #{sort_direction}")
+                                   .page(page).per(per_page)
   end
 
   def show
     @feedback = Feedback.find(params[:id])
   end
 
-  def graphs
-    render json: case params[:start_at]
-      when "past_year"
-        @feedbacks.where("created_at >= ?", Time.now - 1.year)
-          .group_by_week(:created_at).count
-      when "all_time"
-        @feedbacks.group_by_month(:created_at).count
-      when "past_week"
-        @feedbacks.where("created_at >= ?", Time.now - 1.week)
-          .group_by_hour(:created_at).count
-      else
-        @feedbacks.where("created_at >= ?", Time.now - 1.month)
-          .group_by_day(:created_at).count
-      end
-  end
+  helper_method :available_feedbacks
 
   private
 
-  def find_feedback_for_params
-    if params[:type].present?
-      @feedbacks = Feedback.where(feedback_type: (params[:type] == "msg" ? nil : params[:type]))
-    else
-      @feedbacks = Feedback
+  def sortable_columns
+    %w[created_at feedback_type]
+  end
+
+  def matching_feedbacks
+    feedbacks = Feedback
+    if params[:search_type].present?
+      feedbacks = feedbacks.where(feedback_type: params[:search_type] == "msg" ? nil : params[:search_type])
     end
+    if params[:search_user_id].present?
+      @user = User.friendly_username_find(params[:search_user_id])
+      feedbacks = feedbacks.where(user_id: @user.id) if @user.present?
+    end
+    if params[:search_bike_id].present?
+      feedbacks = feedbacks.bike(params[:search_bike_id])
+    end
+    feedbacks
+  end
+
+  def available_feedbacks
+    matching_feedbacks.where(created_at: @time_range)
   end
 end
