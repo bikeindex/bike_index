@@ -1,6 +1,17 @@
 require "rails_helper"
 
 RSpec.describe Feedback, type: :model do
+  describe "bike" do
+    let(:_bike) { FactoryBot.create(:bike) }
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:feedback) { FactoryBot.create(:feedback_serial_update_request, bike: bike) }
+    it "finds it, returns bike" do
+      expect(Feedback.bike.pluck(:id)).to eq([feedback.id])
+      expect(Feedback.bike(bike).pluck(:id)).to eq([feedback.id])
+      expect(Feedback.bike(bike.id).pluck(:id)).to eq([feedback.id])
+      expect(feedback.bike).to eq bike
+    end
+  end
   describe "create" do
     it "enqueues an email job" do
       expect do
@@ -32,7 +43,7 @@ RSpec.describe Feedback, type: :model do
       expect(feedback.errors.full_messages).to_not be_present
       expect(feedback.errors.count).to eq 0
       expect(feedback.id).to be_present
-      expect(feedback.feedback_hash).to eq(package_size: "small")
+      expect(feedback.feedback_hash).to eq("package_size" => "small")
     end
   end
 

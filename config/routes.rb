@@ -189,9 +189,7 @@ Bikeindex::Application.routes.draw do
       end
     end
     resources :failed_bikes, only: [:index, :show]
-    resources :feedbacks, only: [:index, :show] do
-      collection { get :graphs }
-    end
+    resources :feedbacks, only: [:index, :show]
     resources :ownerships, only: [:edit, :update]
     resources :tweets
     get "blog", to: redirect("/news")

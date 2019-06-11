@@ -72,7 +72,7 @@ RSpec.describe FeedbacksController, type: :controller do
         expect(feedback.title).to eq "New School lead: Cool School"
         expect(feedback.email).to eq "example@example.com"
         expect(feedback.body).to eq "ffff"
-        expect(feedback.feedback_hash[:package_size]).to eq "small"
+        expect(feedback.feedback_hash["package_size"]).to eq "small"
       end
       context "with a phone number and no package_size" do
         it "creates a feedback" do

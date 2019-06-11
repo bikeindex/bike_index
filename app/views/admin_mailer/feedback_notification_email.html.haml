@@ -14,10 +14,10 @@
     = feedback_body
   %p
     Old serial:
-    = @feedback.feedback_hash[:old_serial]
+    = @feedback.feedback_hash["old_serial"]
   %p
     New serial:
-    = @feedback.feedback_hash[:new_serial]
+    = @feedback.feedback_hash["new_serial"]
   %p
     = link_to edit_admin_bike_url(@feedback.bike), edit_admin_bike_url(@feedback.bike)
 - if @feedback.feedback_type == 'manufacturer_update_request'
@@ -34,10 +34,10 @@
     = feedback_body
   %p
     Old manufacturer:
-    = @feedback.feedback_hash[:old_manufacturer]
+    = @feedback.feedback_hash["old_manufacturer"]
   %p
     New manufacturer:
-    = @feedback.feedback_hash[:new_manufacturer]
+    = @feedback.feedback_hash["new_manufacturer"]
   %p
     = link_to edit_admin_bike_url(@feedback.bike), edit_admin_bike_url(@feedback.bike)
 - elsif @feedback.feedback_type == 'bike_delete_request'
@@ -64,13 +64,13 @@
   %p
     Did we help?
     %strong
-      = @feedback.feedback_hash[:index_helped_recovery]
-  - if @feedback.feedback_hash[:index_helped_recovery]
+      = @feedback.feedback_hash["index_helped_recovery"]
+  - if @feedback.feedback_hash["index_helped_recovery"]
     %p
       Can we share?
       %strong
-        = @feedback.feedback_hash[:can_share_recovery]
-    - if @feedback.feedback_hash[:can_share_recovery]
+        = @feedback.feedback_hash["can_share_recovery"]
+    - if @feedback.feedback_hash["can_share_recovery"]
       %h3{ :style => "font-weight: 400px;" }
         = link_to "Approve sharing this recovery!", admin_recoveries_url
   %p
@@ -90,7 +90,7 @@
     = feedback_body
 
 - elsif @feedback.feedback_type.present? && @feedback.feedback_type.match(/organization_/i)
-  - organization = Organization.find(@feedback.feedback_hash[:organization_id])
+  - organization = Organization.find(@feedback.feedback_hash["organization_id"])
   %h1
     = feedback_body
   %p

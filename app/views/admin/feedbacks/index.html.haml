@@ -3,25 +3,30 @@
     %h1
       #{link_to 'Feedback and messages', admin_feedbacks_path}
   .col-12.mt-4
-    = line_chart graphs_admin_feedbacks_path(params.merge(start_at: params[:start_at]).except(:controller, :action))
-  .col-12.mt-2
-    .d-flex
-      %ul.list-inline.mx-auto.justify-content-center
-        - %w(all_time past_year past_month past_week).each do |start_at|
-          %li.list-inline-item
-            = link_to start_at.humanize, admin_feedbacks_path(params.merge(start_at: start_at).except(:controller, :action))
+    = line_chart available_feedbacks.send(group_by_method(@time_range), "feedbacks.created_at").count, curve: false, thousands: ",", defer: true
+  .col-12.mb-2.mt-2
+    .row.justify-content-end
+      .col-2
+        %p
+          %em.small.less-strong
+            = number_with_delimiter(available_feedbacks.count)
+            charted
+      = render partial: "/shared/period_select"
 
 
 %p
-  - if @matching_count.present?
-    = number_with_delimiter(@matching_count)
+  = number_with_delimiter(@feedbacks.total_count)
+  - if params[:search_type].present?
     %strong
-      = params[:type]
-    messages
-  - else
-    = number_with_delimiter(@feedbacks.total_count)
-    total messages
+      = params[:search_type]
 
+  - if params[:search_bike_id].present?
+    for #{link_to "bike##{params[:search_bike_id]}", admin_bike_path(params[:search_bike_id])}
+
+  - if @user.present?
+    From #{link_to @user.display_name, admin_user_path(@user)}
+
+  = "message".pluralize(@feedbacks.count)
 
 = paginate @feedbacks, views_prefix: 'admin'
 
@@ -29,11 +34,18 @@
   %table.table.table-bordered.table-striped
     %thead.thead-light
       %tr
-        %th.w-25{:scope => "col"} Created
-        %th{:scope => "col"} User
-        %th{:scope => "col"} Type
-        %th{:scope => "col"} Name
-        %th.w-25{:scope => "col"} Body
+        %th
+          = sortable "created_at"
+        %th
+          User
+        %th
+          Bike
+        %th
+          = sortable "feedback_type", "Type"
+        %th
+          Name
+        %th.w-25
+          Body
     %tbody
       - @feedbacks.each do |feedback|
         %tr
@@ -41,13 +53,22 @@
             %a.convertTime{ href: admin_feedback_url(feedback) }
               = l feedback.created_at, format: :convert_time
           %td
-            - if feedback.user
-              = link_to feedback.user.display_name, edit_admin_user_path(feedback.user)
+            - if feedback.user_id.present?
+              = link_to feedback.user.display_name, admin_user_path(feedback.user)
+              - unless params[:search_user_id].present?
+                %small
+                  = link_to "matching messages", admin_feedbacks_path(sortable_search_params.merge(search_user_id: feedback.user_id)), class: "gray-link"
             - else
               = link_to feedback.email, admin_users_path(user_query: feedback.email)
           %td
-            - feedback_type = feedback.feedback_type || 'msg'
+            - feedback_type = (feedback.feedback_type || 'msg').humanize
             = link_to feedback_type, admin_feedbacks_path(type: feedback_type)
+          %td
+            - if feedback.bike_id.present?
+              = link_to "#{feedback.bike_id}", admin_bike_path(feedback.bike_id), class: "less-strong"
+              - unless params[:search_bike_id].present?
+                %small
+                  = link_to "matching messages", admin_feedbacks_path(sortable_search_params.merge(search_bike_id: feedback.bike_id)), class: "gray-link"
           %td
             = feedback.name
           %td

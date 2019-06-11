@@ -104,13 +104,6 @@ FactoryBot.define do
     sequence(:title) { |n| "Blog title #{n}" }
   end
 
-  factory :feedback do
-    email { "foo@boy.com" }
-    body { "This is a test email." }
-    title { "New Feedback Submitted" }
-    name { "Bobby Joe" }
-  end
-
   factory :stolen_notification do
     sender { FactoryBot.create(:user) }
     receiver { FactoryBot.create(:user) }
