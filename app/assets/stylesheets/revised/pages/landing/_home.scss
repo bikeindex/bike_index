@@ -521,7 +521,21 @@
     }
   }
 
+  .chart-label {
+    @extend .header-font-uncap;
+    font-style: italic;
+    color: rgba(172, 172, 172, 0.7);
+    font-size: 20px;
+  }
+
   .count-block {
+    text-align: right;
+    margin-top: 2rem;
+
+    &:first-of-type {
+      margin-top: 0;
+    }
+
     h4 {
       @extend .header-font-uncap;
       font-size: 20px;
