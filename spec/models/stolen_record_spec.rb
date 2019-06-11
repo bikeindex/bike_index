@@ -131,13 +131,8 @@ describe StolenRecord do
       let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
       let(:bike) { stolen_record.bike }
       it "is waiting on decision when user marks that we can share" do
-        bike.reload
-        bike.cache_photo
-        stolen_record.reload
-        p "record"
-        pp stolen_record
-        p "bike"
-        pp bike
+        bike.reload.update_attributes(updated_at: Time.now)
+        stolen_record.reload.update_attributes(updated_at: Time.now)
         expect(stolen_record.bike.thumb_path).to be_present
         expect(stolen_record.can_share_recovery).to be_truthy
         expect(stolen_record.recovery_display_status).to eq "waiting_on_decision"
@@ -148,6 +143,20 @@ describe StolenRecord do
       it "is not displayed" do
         stolen_record.reload
         expect(stolen_record.recovery_display_status).to eq "displayable_no_photo"
+      end
+    end
+    context "stolen_record is displayed" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, recovery_display_status: "displayed", can_share_recovery: true) }
+      it "is displayed" do
+        stolen_record.reload.update_attributes(updated_at: Time.now)
+        expect(stolen_record.recovery_display_status).to eq "displayed"
+      end
+    end
+    context "stolen_record is not_displayed" do
+      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, recovery_display_status: "not_displayed", can_share_recovery: true) }
+      it "is not_displayed" do
+        stolen_record.reload.update_attributes(updated_at: Time.now)
+        expect(stolen_record.recovery_display_status).to eq "not_displayed"
       end
     end
   end
@@ -260,7 +269,7 @@ describe StolenRecord do
       let(:bike) { stolen_record.bike }
       it "returns waiting_on_decision" do
         bike.reload
-        bike.cache_photo
+        bike.update_attributes(updated_at: Time.now)
         expect(stolen_record.calculated_recovery_display_status).to eq "waiting_on_decision"
       end
     end

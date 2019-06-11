@@ -66,6 +66,6 @@ class Admin::RecoveriesController < Admin::BaseController
   private
 
   def permitted_parameters
-    params.require(:stolen_record).permit(StolenRecord.old_attr_accessible, :undisplayable)
+    params.require(:stolen_record).permit(StolenRecord.old_attr_accessible)
   end
 end
