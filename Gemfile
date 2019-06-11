@@ -128,6 +128,9 @@ end
 
 group :development do
   gem "bullet"
+  gem "guard"
+  gem "guard-rspec", require: false
+  gem "guard-rubocop", require: false
   gem "letter_opener"
   gem "rerun"
   gem "spring"
@@ -143,22 +146,19 @@ group :development, :test do
   gem "parallel_tests"
   gem "pry-byebug"
   gem "pry-rails"
-  gem "rb-fsevent", "~> 0.9.1"
+  gem "rb-fsevent", "~> 0.10.3"
   gem "rspec", "~> 3.3.0"
   gem "rspec-rails", "~> 3.3.0"
   gem "rspec_junit_formatter" # For circle ci
   gem "rubocop", "~> 0.67", require: false
   gem "rubocop-daemon", "~> 0.3.1", require: false
   gem "rubocop-performance", "~> 1.1.0", require: false
-  gem "rufo", "~> 0.6.0", require: false
+  gem "rufo", "~> 0.7.0", require: false
 end
 
 group :test do
   gem "airborne"
   gem "factory_bot_rails"
-  gem "guard"
-  gem "guard-rspec"
-  gem "guard-rubocop", require: false
   gem "rspec-sidekiq"
   gem "simplecov", require: false
   gem "vcr" # Stub external HTTP requests
