@@ -203,7 +203,8 @@ class StolenRecord < ActiveRecord::Base
                       recovered_description: info[:recovered_description],
                       recovering_user_id: info[:recovering_user_id],
                       index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
-                      can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?)
+                      can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?,
+                      recovery_display_status: calculated_recovery_display_status)
     bike.stolen = false
     bike.save
   end

@@ -92,12 +92,15 @@
       .form-group
         = f.label :can_share_recovery
         = f.check_box :can_share_recovery
-      .form-group
-        = f.label :recovery_display_status, "Undisplayable"
-        = f.check_box :recovery_display_status
+      - if @recovery.not_displayed?
+        .form-group
+          = label :mark_as_eligible, "eligible"
+          = check_box "mark_as_eligible", "eligible"
+      - else
+        .form-group
+          = label :is_not_displayable, "undisplayable"
+          = check_box "is_not_displayable", "undisplayable"
       = submit_tag "Update the recovery", class: "btn btn-success"
-  .col-md-6
-    = link_to "Don't Display", new_admin_recovery_display_url(stolen_record_id: @recovery.id), class: "btn btn-warning"
 
 
   / .control-group.recovery-input-field
