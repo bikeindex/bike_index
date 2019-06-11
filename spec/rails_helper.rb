@@ -1,3 +1,21 @@
+# simplecov must be required before anything else
+if ENV["COVERAGE"]
+  require "simplecov"
+  SimpleCov.start("rails") do
+    add_filter "/spec/"
+    add_filter "/config/"
+    add_filter "/vendor/"
+
+    add_group "Decorators", "app/decorators"
+    add_group "Serializers", "app/serializers"
+    add_group "Services", "app/services"
+    add_group "Uploaders", "app/uploaders"
+    add_group "Libraries", "lib"
+  end
+
+  Rails.application.eager_load! if defined?(Rails)
+end
+
 require "spec_helper"
 
 # Assign here because only one .env file
@@ -25,13 +43,6 @@ RSpec.configure do |config|
   # Add our request spec helpers
   config.include RequestSpecHelpers, type: :request
   config.include RequestSpecHelpers, type: :controller
-end
-
-# For codeclimate test coverage.
-# Only enable if the environmental variable is set - i.e. on CI
-if ENV["COVERAGE"]
-  require "simplecov"
-  SimpleCov.start "rails"
 end
 
 VCR.configure do |config|

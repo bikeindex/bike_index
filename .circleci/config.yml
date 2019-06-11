@@ -8,6 +8,7 @@ jobs:
       RAILS_ENV: test
       RACK_ENV: test
       COVERAGE: true
+      DISABLE_SPRING: true
       TZ: /usr/share/zoneinfo/America/Chicago
 
     docker:
