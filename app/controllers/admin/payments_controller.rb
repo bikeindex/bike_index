@@ -3,7 +3,6 @@ class Admin::PaymentsController < Admin::BaseController
   before_filter :find_payment, only: %i[edit update]
 
   def index
-    p "!!!!!!!!!"
     page = params[:page] || 1
     per_page = params[:per_page] || 50
     @payments = Payment.includes(:user, :organization, :invoice)
