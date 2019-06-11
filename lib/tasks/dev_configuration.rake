@@ -22,15 +22,16 @@ class RakeDevConfiguration
     end
 
     def toggle_spring
-      file = "tmp/spring-off.txt"
+      file = "tmp/spring-on.txt"
       FileUtils.mkdir_p("tmp")
 
       if File.exist?(file)
         delete_cache_file(file)
-        puts "Spring is now enabled."
+        puts "Spring is no longer enabled (you will need to manually kill the spring processes)"
       else
         create_cache_file(file)
-        puts "Spring is no longer enabled (you may need to manually kill the spring processes)"
+        puts "Spring is now enabled."
+
       end
 
       FileUtils.touch "tmp/restart.txt" # Probably doesn't do anything right now, but whatever
