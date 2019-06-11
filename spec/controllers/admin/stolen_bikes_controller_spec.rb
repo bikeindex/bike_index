@@ -1,8 +1,6 @@
 require "rails_helper"
 
 RSpec.describe Admin::StolenBikesController, type: :controller do
-  render_views
-
   let(:user) { FactoryBot.create(:admin) }
   before do
     set_current_user(user)

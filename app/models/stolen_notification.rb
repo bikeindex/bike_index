@@ -41,4 +41,11 @@ class StolenNotification < ActiveRecord::Base
     self.receiver ||= bike.owner
     self.send_dates ||= [].to_json
   end
+
+  def default_message
+    self.message ||= <<~STR
+      Hi, this is #{sender&.name} with Bike Index.
+      Is this your missing #{bike.type}?
+    STR
+  end
 end

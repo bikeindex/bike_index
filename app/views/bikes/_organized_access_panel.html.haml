@@ -129,26 +129,26 @@
         - if display_unstolen_notification_form
           .col-md-5.unstolen-notification-box
             %p
-              %em
-                #{@bike.type.titleize} is not marked stolen.
-              %strong
-                Believe it is anyway?
-            %h3
-              Contact the owner
-            - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
-            #write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }
-              %a.btn.btn-primary.btn-lg{ href: '#new_stolen_message', 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse' }
-                Write them a message
+              %em #{@bike.type.titleize} is not marked stolen.
+              %strong Believe it is anyway?
+              %h3 Contact the owner
+              - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
+              #write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }
+                %a.btn.btn-primary.btn-lg{ href: '#new_stolen_message', 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse' }
+                  Write them a message
 
-            .collapse#new_stolen_message{ class: ("in" if @contact_owner_open) }
-              - @stolen_notification ||= StolenNotification.new(bike: @bike)
-              = form_for @stolen_notification do |f|
-                = f.hidden_field :bike_id, value: @bike.id
-                = f.text_area :message, required: true, placeholder: "Where did you see this #{@bike.type}? If you're contacting about an ad you found online, include a link in the field below", rows: 6, class: "form-control"
-                = f.text_field :reference_url, placeholder: 'Link url', class: "form-control additional-field"
+              .collapse#new_stolen_message{ class: ("in" if @contact_owner_open) }
+                - @stolen_notification ||= StolenNotification.new(bike: @bike, sender: current_user)
+                = form_for @stolen_notification do |f|
+                  = f.hidden_field :bike_id, value: @bike.id
+                  = f.text_field :reference_url, placeholder: 'Link url', class: "form-control additional-field"
+                  - if current_user.ambassador?
+                    = f.text_area :message, required: true, value: @stolen_notification.default_message, rows: 6, class: "form-control"
+                  - else
+                    = f.text_area :message, required: true, placeholder: "Where did you see this #{@bike.type}? If you're contacting about an ad you found online, include a link in the field below", rows: 6, class: "form-control"
 
-                .send-message
-                  = f.submit "Send message", class: 'btn btn-primary btn-lg'
+                  .send-message
+                    = f.submit "Send message", class: 'btn btn-primary btn-lg'
 
   - if passive_organization.message_kinds.any?
     .geomessages-wrap

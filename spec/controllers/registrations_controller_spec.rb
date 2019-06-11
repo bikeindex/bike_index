@@ -1,8 +1,6 @@
 require "rails_helper"
 
 RSpec.describe RegistrationsController, type: :controller do
-  render_views
-
   let(:user) { FactoryBot.create(:user_confirmed) }
   let(:auto_user) { FactoryBot.create(:organization_auto_user) }
   let(:organization) { auto_user.organizations.first }
