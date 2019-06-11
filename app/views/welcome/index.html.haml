@@ -105,19 +105,22 @@
 
   .root-by-the-numbers
     .container-fluid
-      %h3.landing-container-label Bike Index numbers
+      %h3.landing-container-label Bike Index statistics
       .row
         .col-md-10.charted
           :ruby
             scale_color = "rgb(172, 172, 172)"
             chartkick_library_props = {
+              animation: { duration: 5000, easing: "easeOutQuart" },
               scales: {
                 yAxes: [{
-                  gridLines: { color: "rgba(172, 172, 172, 0.25)" },
+                  gridLines: { color: "rgba(172, 172, 172, 0)" },
                   ticks: { fontColor: scale_color }
                 }],
                 xAxes: [{
-                  gridLines: { color: "rgba(172, 172, 172, 0.25)" },
+                  weight: 5,
+                  borderColor: "rgba(0,0,0,0)",
+                  gridLines: { color: "rgba(172, 172, 172, 0)" },
                   ticks: { fontColor: scale_color }
                 }]
               }
