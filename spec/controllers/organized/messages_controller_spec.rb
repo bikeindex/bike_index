@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Organized::MessagesController, type: :controller do
+RSpec.describe Organized::MessagesController, type: :controller do
   include_context :geocoder_default_location
   include_context :organization_with_geolocated_messages
   let(:root_path) { organization_messages_path(organization_id: organization.to_param, kind: kind_slug) }
@@ -67,7 +67,7 @@ describe Organized::MessagesController, type: :controller do
           expect(organization.paid_for?(kind_slug)).to be_truthy
           expect do
             post :create, organization_id: organization.to_param, organization_message: message_params
-            expect(response).to redirect_to root_path
+            expect(response).to redirect_to organization_messages_path(organization_id: organization.to_param, kind: [kind_slug])
             expect(flash[:success]).to be_present
           end.to change(EmailOrganizationMessageWorker.jobs, :count).by(1)
           organization_message = OrganizationMessage.last

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Organized::ManageController, type: :controller do
+RSpec.describe Organized::ManageController, type: :controller do
   context "given an authenticated ambassador" do
     include_context :logged_in_as_ambassador
 
@@ -143,6 +143,7 @@ describe Organized::ManageController, type: :controller do
           {
             name: organization.name,
             show_on_map: true,
+            short_name: "Something cool",
             kind: "ambassador",
             locations_attributes: {
               "0" => {
@@ -217,6 +218,21 @@ describe Organized::ManageController, type: :controller do
           end
         end
 
+        context "matching short_name" do
+          let!(:organization2) { FactoryBot.create(:organization, short_name: "cool short name") }
+          it "doesn't update" do
+            put :update,
+                organization_id: organization.to_param,
+                id: organization.to_param,
+                organization: { kind: "property_management", short_name: "cool short name" }
+
+            expect(assigns[:page_errors]).to be_present
+            organization.reload
+            expect(organization.short_name).to_not eq "cool short name"
+            expect(organization.kind).to_not eq "property_management"
+          end
+        end
+
         context "removing a location" do
           it "removes the location" do
             update_attributes[:locations_attributes]["0"][:_destroy] = 1
@@ -225,11 +241,12 @@ describe Organized::ManageController, type: :controller do
               put :update,
                   organization_id: organization.to_param,
                   id: organization.to_param,
-                  organization: update_attributes.merge(kind: "bike_shop")
+                  organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name")
             end.to change(Location, :count).by 0
 
             organization.reload
             expect(Location.where(id: location_1.id).count).to eq 0
+            expect(organization.short_name).to eq "cool other name"
           end
         end
       end

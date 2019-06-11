@@ -1,7 +1,7 @@
 # encoding: utf-8
-require "spec_helper"
+require "rails_helper"
 
-describe Phonifyer do
+RSpec.describe Phonifyer do
   describe "phonify" do
     context "blank" do
       it "returns nil" do

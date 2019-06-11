@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe "Organized::MessagesController" do
+RSpec.describe Organized::MessagesController, type: :request do
   include_context :geocoder_default_location
   include_context :organization_with_geolocated_messages
   let(:base_url) { "/o/#{organization.to_param}/messages" }

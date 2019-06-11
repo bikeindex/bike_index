@@ -50,7 +50,8 @@ class Organization < ActiveRecord::Base
   enum pos_kind: POS_KIND_ENUM
 
   validates_presence_of :name
-  validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact admin@bikeindex.org"
+  validates_uniqueness_of :short_name, case_sensitive: false, message: "another organization has this abbreviation - if you don't think that should be the case, contact support@bikeindex.org"
+  validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
 
   default_scope { order(:name) }
   scope :shown_on_map, -> { where(show_on_map: true, approved: true) }
@@ -72,7 +73,9 @@ class Organization < ActiveRecord::Base
   def self.friendly_find(n)
     return nil unless n.present?
     return find(n) if integer_slug?(n)
-    find_by_slug(Slugifyer.slugify(n)) || find_by_name(n) # Fallback, search by name just in case
+    slug = Slugifyer.slugify(n)
+    # First try slug, then previous slug, and finally, just give finding by name a shot
+    find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first
   end
 
   def self.integer_slug?(n)
@@ -156,13 +159,16 @@ class Organization < ActiveRecord::Base
   end
 
   def paid_for?(feature_name)
-    return false unless feature_name.present? && paid_feature_slugs.is_a?(Array)
-    # If kinds is an array, make sure they all are permitted kinds
-    if feature_name.is_a?(Array)
-      return false unless feature_name.any? # If they passed an empty array, it's false
-      return feature_name.none? { |k| !paid_for?(k) }
+    features =
+      Array(feature_name)
+        .map { |name| name.strip.downcase.gsub(/\s/, "_") }
+
+    return false unless features.present? && paid_feature_slugs.is_a?(Array)
+
+    features.all? do |feature|
+      paid_feature_slugs.include?(feature) ||
+      (ambassador? && feature == "unstolen_notifications")
     end
-    paid_feature_slugs.include?(feature_name.strip.downcase.gsub(/\s/, "_")) # gnarly custom slug function because fml
   end
 
   def set_calculated_attributes

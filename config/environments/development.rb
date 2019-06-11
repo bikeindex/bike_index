@@ -10,11 +10,19 @@ Rails.application.configure do
   # Do not eager load code on boot.
   config.eager_load = false
 
-  # Show full error reports and disable caching.
+  # Show full error reports
   config.consider_all_requests_local = true
-  config.action_controller.perform_caching = false
-  config.cache_store = :dalli_store,
-  { namespace: Bikeindex, expires_in: 0, compress: true }
+
+  # Run rake dev:cache to toggle caching in development
+  if Rails.root.join("tmp", "caching-dev.txt").exist?
+    config.action_controller.perform_caching = true
+    config.cache_store = :dalli_store,
+    { namespace: Bikeindex, expires_in: 0, compress: true }
+  else
+    config.action_controller.perform_caching = false
+
+    config.cache_store = :null_store
+  end
 
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.default_url_options = { host: "localhost", port: 3001 }

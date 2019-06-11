@@ -31,7 +31,7 @@ class Invoice < ActiveRecord::Base
   end
 
   def self.feature_slugs
-    all.map(&:feature_slugs).flatten.uniq
+    includes(:paid_features).pluck(:feature_slugs).flatten.uniq
   end
 
   def subscription_duration; 1.year end # Static, at least for now

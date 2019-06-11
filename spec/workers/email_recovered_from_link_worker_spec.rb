@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe EmailRecoveredFromLinkWorker do
+RSpec.describe EmailRecoveredFromLinkWorker, type: :job do
   let(:bike) { FactoryBot.create(:stolen_bike) }
   let(:stolen_record) { bike.current_stolen_record }
   before { stolen_record.add_recovery_information }

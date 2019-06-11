@@ -1,7 +1,7 @@
 # encoding: utf-8
-require "spec_helper"
+require "rails_helper"
 
-describe Slugifyer do
+RSpec.describe Slugifyer do
   describe "book_slug" do
     it "removes special characters and downcase" do
       slug = Slugifyer.book_slug("Surly's Cross-check bike (small wheel)")

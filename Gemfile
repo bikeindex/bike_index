@@ -68,9 +68,9 @@ gem "twitter" # Twitter. For rendering tweets
 # OAuth provider, Grape, associated parts of API V2
 gem "api-pagination"
 gem "doorkeeper", "~> 3.1.0"
-gem "grape", "~> 0.14.0"
+gem "grape", "~> 0.19.1"
 gem "grape-active_model_serializers", "~> 1.4.0"
-gem "grape-swagger", "~> 0.10.4"
+gem "grape-swagger", "0.11"
 gem "swagger-ui_rails"
 gem "wine_bouncer"
 
@@ -130,6 +130,9 @@ group :development do
   gem "bullet"
   gem "letter_opener"
   gem "rerun"
+  gem "spring"
+  gem "spring-commands-rspec"
+  gem "spring-commands-rubocop"
 end
 
 group :development, :test do
@@ -137,6 +140,7 @@ group :development, :test do
   gem "dotenv-rails"
   gem "foreman"
   gem "jazz_fingers"
+  gem "parallel_tests"
   gem "pry-byebug"
   gem "pry-rails"
   gem "rb-fsevent", "~> 0.9.1"

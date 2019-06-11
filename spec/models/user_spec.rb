@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe User do
+RSpec.describe User, type: :model do
   describe ".ambassadors" do
     context "given ambassadors and no org filter" do
       it "returns any and only users who are ambassadors" do
@@ -364,6 +364,12 @@ describe User do
       user.superuser = true
       expect(user.send_unstolen_notifications?).to be_truthy
     end
+
+    it "returns true for an ambassador" do
+      ambassador = FactoryBot.create(:ambassador)
+      expect(ambassador.send_unstolen_notifications?).to eq(true)
+    end
+
     context "organization" do
       let(:user) { FactoryBot.create(:organization_member) }
       let(:organization) { user.organizations.first }

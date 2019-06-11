@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe OrganizationInvitation do
+RSpec.describe OrganizationInvitation, type: :model do
   describe "create" do
     before :each do
       @o = FactoryBot.create(:organization_invitation)

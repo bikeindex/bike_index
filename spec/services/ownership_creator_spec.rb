@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe OwnershipCreator do
+RSpec.describe OwnershipCreator do
   describe "user_id" do
     let(:subject) { OwnershipCreator.new(bike: Bike.new(owner_email: "foo@email.com")) }
     it "returns nil if the user doesn't exist" do

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe ManufacturersController do
+RSpec.describe ManufacturersController, type: :controller do
   describe "index" do
     it "renders the index template with revised_layout" do
       get :index

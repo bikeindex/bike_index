@@ -18,17 +18,18 @@ class @AdDisplayer
     $("##{unit}").html([@geolocatedAd()].join("")).addClass("rendered-ad photo-ad")
 
   geolocatedAd: ->
-    location = localStorage.getItem('location')
-    if location?
-      # Wrap the string in blank space so it's possible to check for non word chars
-      location = " #{location.toLowerCase()} "
-      for match in lemonade_location_matches
-        # Check if the matching strings are separate words in the location string
-        expression = ///[^\w]#{match}[^\w]///
-        return lemonade_ad if location.match(///[^\w]#{match}[^\w]///)
-    else
-      # Display it anyway, our location tracking is sort of BS
-      return lemonade_ad
+    # Disabling lemonade, for now
+    # location = localStorage.getItem('location')
+    # if location?
+    #   # Wrap the string in blank space so it's possible to check for non word chars
+    #   location = " #{location.toLowerCase()} "
+    #   for match in lemonade_location_matches
+    #     # Check if the matching strings are separate words in the location string
+    #     expression = ///[^\w]#{match}[^\w]///
+    #     return lemonade_ad if location.match(///[^\w]#{match}[^\w]///)
+    # else
+    #   # Display it anyway, our location tracking is sort of BS
+    #   return lemonade_ad
     # return an empty string if there aren't any matches
     ''
 

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe MembershipSerializer do
+RSpec.describe MembershipSerializer do
   let(:organization) { FactoryBot.create(:organization) }
   let(:user) { FactoryBot.create(:user) }
   let(:membership) { FactoryBot.create(:membership, organization_id: organization.id, user_id: user.id, role: "member") }

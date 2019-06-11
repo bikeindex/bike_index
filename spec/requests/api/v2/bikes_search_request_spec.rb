@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe "Bikes API V2" do
+RSpec.describe "Bikes API V2", type: :request do
   describe "bike search" do
     before :each do
       @bike = FactoryBot.create(:bike)

@@ -38,9 +38,9 @@ module Organized
     end
 
     def ensure_permitted_message_kind!
-      @kind = params[:organization_message].present? ? params[:organization_message][:kind_slug] : params[:kind]
-      @kind ||= current_organization.message_kinds
-      return true if current_organization.paid_for?(@kind)
+      @kinds = Array(params.dig(:organization_message, :kind_slug) || params[:kind])
+      @kinds = current_organization.message_kinds unless @kinds.any?
+      return true if current_organization.paid_for?(@kinds)
       flash[:error] = "Your organization doesn't have access to that, please contact Bike Index support"
       if current_organization.message_kinds.any?
         redirect_to organization_messages_path(organization_id: current_organization.to_param, kind: current_organization.message_kinds.first)
@@ -56,7 +56,7 @@ module Organized
     end
 
     def redirect_back
-      redirect_kind = @kind || current_organization.message_kinds.first
+      redirect_kind = @kinds || current_organization.message_kinds.first
       redirect_to organization_messages_path(organization_id: current_organization.to_param, kind: redirect_kind)
       return
     end

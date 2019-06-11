@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe ComponentCreator do
+RSpec.describe ComponentCreator do
   describe "set_manufacturer_key" do
     context "manufacturer in db" do
       let(:manufacturer) { FactoryBot.create(:manufacturer, name: "SRAM") }

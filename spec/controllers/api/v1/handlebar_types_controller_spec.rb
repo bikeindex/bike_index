@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Api::V1::HandlebarTypesController do
+RSpec.describe Api::V1::HandlebarTypesController, type: :controller do
   describe "index" do
     it "loads the page" do
       get :index, format: :json

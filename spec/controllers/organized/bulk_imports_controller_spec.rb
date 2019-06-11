@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Organized::BulkImportsController, type: :controller do
+RSpec.describe Organized::BulkImportsController, type: :controller do
   let(:bulk_import) { FactoryBot.create(:bulk_import, organization: organization) }
 
   before { set_current_user(user) if user.present? }

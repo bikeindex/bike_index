@@ -1,7 +1,7 @@
 # encoding: utf-8
-require "spec_helper"
+require "rails_helper"
 
-describe Urlifyer do
+RSpec.describe Urlifyer do
   describe "urlify" do
     it "does nothing if no website is present" do
       website = Urlifyer.urlify(nil)

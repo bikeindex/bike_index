@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe CreationState, type: :model do
   describe "set_calculated_attributes" do

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Payment do
+RSpec.describe Payment, type: :model do
   it_behaves_like "amountable"
   describe "create" do
     context "stripe" do

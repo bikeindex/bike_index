@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe EmailNormalizer do
+RSpec.describe EmailNormalizer do
   describe "normalize" do
     context "spaces and capitals" do
       it "normalizes them" do

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::PaintsController do
+RSpec.describe Admin::PaintsController, type: :controller do
   include_context :logged_in_as_super_admin
   describe "index" do
     it "renders" do

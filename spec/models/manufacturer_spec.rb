@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Manufacturer do
+RSpec.describe Manufacturer, type: :model do
   it_behaves_like "autocomplete_hashable"
   describe "scopes" do
     it "default_scope is alphabetized" do

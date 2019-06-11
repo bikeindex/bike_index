@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Cgroup do
+RSpec.describe Cgroup, type: :model do
   it_behaves_like "friendly_slug_findable"
 
   describe "additional_parts" do

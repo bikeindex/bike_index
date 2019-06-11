@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe SessionsController do
+RSpec.describe SessionsController, type: :controller do
   describe "new" do
     it "renders and calls store_return_to" do
       expect(controller).to receive(:store_return_to)

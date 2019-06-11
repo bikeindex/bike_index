@@ -3,7 +3,7 @@ import moment from "moment-timezone";
 import LoadFancySelects from "../../utils/LoadFancySelects";
 import BinxAdminGraphs from "./graphs.js";
 import BinxAdminInvoices from "./invoices.js";
-import OrganizationForm from "./organization_form.js";
+import BinxAdminOrganizationForm from "./organization_form.js";
 
 function BinxAdmin() {
   return {
@@ -35,7 +35,10 @@ function BinxAdmin() {
 
       if ($("#admin_organizations_new,#admin_organizations_edit").length > 0) {
         const $organizationForm = $("form").first();
-        new OrganizationForm($organizationForm);
+        new BinxAdminOrganizationForm($organizationForm);
+      }
+      if ($("#multi-mnfg-selector").length > 0) {
+        this.bikesMultiManufacturerUpdate();
       }
     },
 
@@ -115,6 +118,15 @@ function BinxAdmin() {
           joiner = "?";
         }
         return (location.href = `${current_url}${joiner}period=${period}`);
+      });
+    },
+
+    bikesMultiManufacturerUpdate() {
+      window.toggleAllChecked = false;
+      $("#multi-mnfg-selector").on("click", function(event) {
+        event.preventDefault();
+        window.toggleAllChecked = !window.toggleAllChecked;
+        $(".update-mnfg-select input").prop("checked", window.toggleAllChecked);
       });
     }
   };

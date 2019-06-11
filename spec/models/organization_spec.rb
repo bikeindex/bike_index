@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Organization do
+RSpec.describe Organization, type: :model do
   describe "#set_ambassador_organization_defaults before_save hook" do
     context "when saving a new ambassador org" do
       it "sets non-applicable attributes to sensible ambassador org values" do
@@ -106,6 +106,20 @@ describe Organization do
     end
   end
 
+  describe "friendly find" do
+    let!(:organization) { FactoryBot.create(:organization, short_name: "something cool") }
+    let!(:organization2) { FactoryBot.create(:organization, short_name: "Bike Shop", name: "Trek Store of Santa Cruz") }
+    let!(:organization3) { FactoryBot.create(:organization, short_name: "BikeEastBay", previous_slug: "ebbc") }
+    it "finds by slug, previous_slug and name" do
+      expect(organization2.slug).to eq "bike-shop"
+      expect(Organization.friendly_find(" ")).to be_nil
+      expect(Organization.friendly_find("something-cool")).to eq organization
+      expect(Organization.friendly_find("bike shop")).to eq organization2
+      expect(Organization.friendly_find("trek store of SANTA CRUZ")).to eq organization2
+      expect(Organization.friendly_find("bikeeastbay")).to eq organization3
+    end
+  end
+
   describe "map_coordinates" do
     # There is definitely a better way to do this!
     # But for now, just stubbing it because whatever, they haven't put anything in
@@ -118,6 +132,26 @@ describe Organization do
       it "is the locations coordinates" do
         organization.reload # Somehow doesn't pick this up - TODO: Rails 5 update
         expect(organization.map_focus_coordinates).to eq(latitude: 41.9282162, longitude: -87.6327552)
+      end
+    end
+  end
+
+  describe "#paid_for?" do
+    context "given an ambassador organization and 'unstolen_notifications'" do
+      it "returns true" do
+        ambassador_org = FactoryBot.create(:organization_ambassador)
+
+        enabled = ambassador_org.paid_for?("unstolen_notifications")
+        expect(enabled).to eq(true)
+
+        enabled = ambassador_org.paid_for?(["unstolen_notifications"])
+        expect(enabled).to eq(true)
+
+        enabled = ambassador_org.paid_for?("unstolen notifications")
+        expect(enabled).to eq(true)
+
+        enabled = ambassador_org.paid_for?("invalid feature name")
+        expect(enabled).to eq(false)
       end
     end
   end

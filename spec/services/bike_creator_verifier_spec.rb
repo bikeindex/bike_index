@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
-describe BikeCreatorVerifier do
+RSpec.describe BikeCreatorVerifier do
 end

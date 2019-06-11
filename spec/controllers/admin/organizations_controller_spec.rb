@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::OrganizationsController, type: :controller do
+RSpec.describe Admin::OrganizationsController, type: :controller do
   let(:organization) { FactoryBot.create(:organization, approved: false) }
   include_context :logged_in_as_super_admin
 
@@ -17,6 +17,21 @@ describe Admin::OrganizationsController, type: :controller do
         expect(response.status).to eq 200
         expect(response).to render_template(:index)
         expect(assigns(:organizations)).to eq([organization])
+      end
+    end
+  end
+
+  describe "show" do
+    it "renders" do
+      get :show, id: organization.to_param
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
+    end
+    context "unknown organization" do
+      it "redirects" do
+        get :show, id: "d89safdf"
+        expect(flash[:error]).to be_present
+        expect(response).to redirect_to(:admin_organizations)
       end
     end
   end
@@ -41,6 +56,7 @@ describe Admin::OrganizationsController, type: :controller do
         kind: "shop",
         parent_organization_id: parent_organization.id,
         ascend_name: "party on",
+        previous_slug: "partied-on",
         locations_attributes: {
           "0" => {
             id: location_1.id,
@@ -85,6 +101,7 @@ describe Admin::OrganizationsController, type: :controller do
       expect(organization.parent_organization).to eq parent_organization
       expect(organization.name).to eq update_attributes[:name]
       expect(organization.ascend_name).to eq "party on"
+      expect(organization.previous_slug).to eq "partied-on"
       # Existing location is updated
       location_1.reload
       expect(location_1.organization).to eq organization

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe TsvCreatorWorker do
+RSpec.describe TsvCreatorWorker, type: :job do
   it "enqueues another awesome job" do
     TsvCreatorWorker.perform_async
     expect(TsvCreatorWorker).to have_enqueued_sidekiq_job

@@ -1,14 +1,19 @@
-shared_context :logged_in_as_user do
+def set_current_user(user)
+  cookies.signed[:auth] =
+    { secure: true, httponly: true, value: [user.id, user.auth_token] }
+end
+
+RSpec.shared_context :logged_in_as_user do
   let(:user) { FactoryBot.create(:user_confirmed) }
   before { set_current_user(user) }
 end
 
-shared_context :logged_in_as_super_admin do
+RSpec.shared_context :logged_in_as_super_admin do
   let(:user) { FactoryBot.create(:admin) }
   before { set_current_user(user) }
 end
 
-shared_context :logged_in_as_organization_admin do
+RSpec.shared_context :logged_in_as_organization_admin do
   let(:user) { FactoryBot.create(:organization_admin) }
   let(:organization) { user.organizations.first }
   before :each do
@@ -16,7 +21,7 @@ shared_context :logged_in_as_organization_admin do
   end
 end
 
-shared_context :logged_in_as_organization_member do
+RSpec.shared_context :logged_in_as_organization_member do
   let(:user) { FactoryBot.create(:organization_member) }
   let(:organization) { user.organizations.first }
   before :each do
@@ -24,18 +29,18 @@ shared_context :logged_in_as_organization_member do
   end
 end
 
-shared_context :logged_in_as_ambassador do
+RSpec.shared_context :logged_in_as_ambassador do
   let(:user) { FactoryBot.create(:ambassador) }
   let(:organization) { user.organizations.first }
   before { set_current_user(user) }
 end
 
-shared_context :test_csrf_token do
+RSpec.shared_context :test_csrf_token do
   before { ActionController::Base.allow_forgery_protection = true }
   after { ActionController::Base.allow_forgery_protection = false }
 end
 
-shared_context :existing_doorkeeper_app do
+RSpec.shared_context :existing_doorkeeper_app do
   let(:doorkeeper_app) { create_doorkeeper_app }
   let(:application_owner) { FactoryBot.create(:user_confirmed) }
   let(:user) { application_owner } # So we don't waste time creating extra users

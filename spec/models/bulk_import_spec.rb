@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe BulkImport, type: :model do
   describe "add_file_errors" do

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe LockType do
+RSpec.describe LockType, type: :model do
   it_behaves_like "friendly_slug_findable"
 
   describe "manufacturer_name" do

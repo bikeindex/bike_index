@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe UpdateCountsWorker, type: :lib do
+RSpec.describe UpdateCountsWorker, type: :lib do
   let(:subject) { UpdateCountsWorker }
   let(:instance) { subject.new }
   include_context :scheduled_worker
@@ -22,6 +22,7 @@ describe UpdateCountsWorker, type: :lib do
       expect(Counts.total_bikes).to eq 4
       expect(Counts.stolen_bikes).to eq 1
       expect(Counts.recoveries).to eq 2041
+      expect(Counts.week_creation_chart.kind_of?(Hash)).to be_truthy
     end
   end
 end

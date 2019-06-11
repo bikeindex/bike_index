@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::AmbassadorTasksController, type: :controller do
+RSpec.describe Admin::AmbassadorTasksController, type: :controller do
   context "given an authenticated super admin" do
     include_context :logged_in_as_super_admin
 

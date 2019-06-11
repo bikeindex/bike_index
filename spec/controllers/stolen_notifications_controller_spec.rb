@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe StolenNotificationsController do
+RSpec.describe StolenNotificationsController, type: :controller do
   let(:user) { FactoryBot.create(:user_confirmed) }
   let(:bike) { FactoryBot.create(:bike) }
   let(:user2) { FactoryBot.create(:user) }
@@ -23,6 +23,7 @@ describe StolenNotificationsController do
     describe "user logged in" do
       let(:bike) { FactoryBot.create(:stolen_bike) }
       before { set_current_user(user) }
+
       it "creates a Stolen Notification record" do
         bike.reload
         expect(bike.owner.id).to eq user2.id

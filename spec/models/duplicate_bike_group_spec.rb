@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe DuplicateBikeGroup do
+RSpec.describe DuplicateBikeGroup, type: :model do
   describe "segment" do
     it "returns the first segment" do
       duplicate_bike_group = DuplicateBikeGroup.new

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe ExternalImageUrlStoreWorker do
+RSpec.describe ExternalImageUrlStoreWorker, type: :job do
   let(:subject) { ExternalImageUrlStoreWorker }
   let(:instance) { subject.new }
 

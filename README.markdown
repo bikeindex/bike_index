@@ -43,9 +43,9 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
 - `yarn install` install js packages
 
-- `rake db:setup` create and seed your database
+- `bin/rake db:setup` create and seed your database
 
-- `rake seed_test_users_and_bikes` to:
+- `bin/rake seed_test_users_and_bikes` to:
   - Add the three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `please12`)
   - Give user@example.com 50 bikes
 
@@ -58,17 +58,71 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
   - if you want to use [Pow](http://pow.cx/) (or some other setup that isn't through localhost:3001), change the appropriate values in [session_store.rb](config/initializers/session_store.rb) and [.env](.env).
 
 
+Toggle Spring with `rake dev:spring` (defaults to disabled)
+
+Toggle Caching in development with `rake dev:cache` (defaults to disabled)
+
+
 ## Testing
 
-We use [RSpec](https://github.com/rspec/rspec) and [Guard](https://github.com/guard/guard) for testing.
+We use [RSpec](https://github.com/rspec/rspec) and
+[Guard](https://github.com/guard/guard) for testing.
 
-- Run the test suit in the background with `bundle exec guard`
+- Run the test suite continuously in the background with `bin/guard`.
 
-- You may have to manually add the fuzzystrmatch extension, which we use for near serial searches, to your databases. The migration should take care of this but sometimes doesn't. Open the databases in postgres (`psql bikeindex_development` and `psql bikeindex_test`) and add the extension.
+- Run the entire test suite in parallel (see "Running tests in parallel" below)
+  with `bin/rake parallel:spec`.
 
+- Run a list of test files or test directories in parallel with
+  `bin/parallel_rspec <FILES_OR_FOLDERS>`.
+
+- Run tests sequentially with `bin/rspec`.
+
+- You may have to manually add the `fuzzystrmatch` extension, which we use for
+  near serial searches, to your databases. The migration should take care of
+  this but sometimes doesn't. Open the databases in postgres
+  (`psql bikeindex_development` and `psql bikeindex_test`) and add the extension.
+
+  ```sql
+  CREATE EXTENSION fuzzystrmatch;
+  ```
+
+### Running tests in parallel
+
+The project's test suite can be run in parallel using [`parallel_tests`][]. By
+default, the library spawns one process per CPU. You can optionally set the
+`PARALLEL_TEST_PROCESSORS` env variable to tweak this number, or set it from the
+command line by issuing
+
+```shell-script
+bin/rake parallel:test[1] # --> force 1 CPU
 ```
-CREATE EXTENSION fuzzystrmatch;
+
+You may need to experiment to find the optimal number, but the library provides
+a sensible default of 1 per CPU (2 per dual-core processor, e.g.).
+
+The first time you run tests in parallel you'll need to set up your test
+databases with
+
+```shell-script
+bin/rake parallel:setup
 ```
+
+You'll then be able to run the test suite in parallel with
+
+```shell-script
+bin/rake parallel:spec
+```
+
+To manually propagate migrations across all test databases, issue
+
+```shell-script
+bin/rake parallel:prepare
+```
+
+See the [`parallel_tests`][] docs for more.
+
+[`parallel_tests`]: https://github.com/grosser/parallel_tests/
 
 ## Code Hygiene
 
@@ -100,7 +154,7 @@ project README to find a suitable editor plugin.
 RuboCop is configured to ignore Ruby style and layout (deferring to Rufo) and focus
 on code complexity, performance, and suggested best practices.
 
-To run it from the command line, issue `bundle exec rubocop`, optionally passing
+To run it from the command line, issue `bin/rubocop`, optionally passing
 a specific file(s). For a performance boost, you can also start a rubocop daemon
 with `bundle exec rubocop-daemon start`, in which case you'd lint with
 `bundle exec rubocop-daemon exec`.

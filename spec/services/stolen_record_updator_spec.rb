@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe StolenRecordUpdator do
+RSpec.describe StolenRecordUpdator do
   describe "create_new_record" do
     it "creates a new stolen record" do
       bike = FactoryBot.create(:bike)

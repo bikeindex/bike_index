@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Admin::AdsController, type: :controller do
+RSpec.describe Admin::AdsController, type: :controller do
   describe "index" do
     it "responds with OK and renders the index template" do
       user = FactoryBot.create(:admin)

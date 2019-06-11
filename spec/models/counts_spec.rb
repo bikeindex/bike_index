@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Counts do
+RSpec.describe Counts, type: :model do
   let(:redis) { Redis.new }
   before { redis.expire(Counts::STOREAGE_KEY, 0) }
 
@@ -9,6 +9,16 @@ describe Counts do
       Counts.assign_total_bikes
       expect(redis.hget Counts::STOREAGE_KEY, "total_bikes").to eq "0"
       expect(Counts.total_bikes).to eq 0
+    end
+  end
+
+  context "week_creation_chart" do
+    let!(:bike) { FactoryBot.create(:bike) }
+    let(:target) { { "#{Date.today}" => 1 } }
+    it "saves the thing" do
+      expect(Counts.week_creation_chart).to be_nil # Ensure we aren't throwing errors
+      Counts.assign_week_creation_chart
+      expect(Counts.week_creation_chart).to eq target
     end
   end
 

@@ -1,11 +1,22 @@
-require "spec_helper"
+require "rails_helper"
 
-describe StolenNotification do
+RSpec.describe StolenNotification, type: :model do
   describe "create" do
     it "enqueues an email job" do
       expect do
         FactoryBot.create(:stolen_notification)
       end.to change(EmailStolenNotificationWorker.jobs, :size).by(1)
+    end
+  end
+
+  describe "#default_message" do
+    it "sets the message value to the ambassador template" do
+      user = FactoryBot.create(:user, name: "Index Bikeman")
+      notification = FactoryBot.build(:stolen_notification, message: nil, sender: user)
+
+      notification.default_message
+      expect(notification.message).to match(/this is #{user.name} with Bike Index/)
+      expect(notification.message).to match(/Is this your missing bike?/)
     end
   end
 

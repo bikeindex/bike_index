@@ -24,15 +24,24 @@
 
 .row
   .col-md-6
-    .form-group.mt-4
+    .form-group
       = f.label :website
       = f.text_field :website, class: "form-control"
-  .col-md-6.mt-4
+  .col-6.col-lg-3
     %fieldset{:disabled => "disabled"}
       .form-group
         = f.label :slug, "Slug:"
         %p
           = @organization.slug
+  - if current_user.developer?
+    .col-6.col-lg-3
+      .form-group
+        = f.label :previous_slug do
+          Previous Slug
+          %em.small.text-warning
+            Rarely unnecessary
+        = f.text_field :previous_slug, class: "form-control"
+
 .row
   .col-md-6.pl-4
     .form-group#js-organization-type

@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe ApplicationHelper do
+RSpec.describe ApplicationHelper, type: :helper do
   describe "#display_phone" do
     it "displays the phone with an area code" do
       expect(display_phone("999 999 9999")).to eq("999 999 9999")
@@ -81,8 +81,13 @@ describe ApplicationHelper do
   end
 
   describe "current_page_skeleton" do
-    before { allow(view).to receive(:controller_namespace) { controller_namespace } }
     let(:controller_namespace) { nil }
+
+    before do
+      helper.extend(ControllerHelpers)
+      allow(view).to receive(:controller_namespace) { controller_namespace }
+    end
+
     describe "landing_pages controller" do
       before { allow(view).to receive(:controller_name) { "landing_pages" } }
       context "show (organization landing page)" do
@@ -298,8 +303,11 @@ describe ApplicationHelper do
       end
     end
     context "bikes controller" do
-      before { allow(view).to receive(:controller_name) { "bikes" } }
-      before { allow(view).to receive(:controller_namespace) { nil } }
+      before do
+        helper.extend(ControllerHelpers)
+        allow(view).to receive(:controller_name) { "bikes" }
+        allow(view).to receive(:controller_namespace) { nil }
+      end
       it "returns nil" do
         expect(helper.body_class).to be_nil
       end

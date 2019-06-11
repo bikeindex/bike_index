@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Organized::BaseController, type: :controller do
+RSpec.describe Organized::BaseController, type: :controller do
   describe "#root" do
     context "if not viewing an ambassador organization" do
       include_context :logged_in_as_organization_member

@@ -1509,7 +1509,8 @@ CREATE TABLE public.organizations (
     kind integer,
     ascend_name character varying,
     registration_field_labels jsonb DEFAULT '{}'::jsonb,
-    pos_kind integer DEFAULT 0
+    pos_kind integer DEFAULT 0,
+    previous_slug character varying
 );
 
 
@@ -4155,4 +4156,5 @@ INSERT INTO schema_migrations (version) VALUES ('20190524191139');
 INSERT INTO schema_migrations (version) VALUES ('20190529024835');
 
 INSERT INTO schema_migrations (version) VALUES ('20190606214539');
+INSERT INTO schema_migrations (version) VALUES ('20190607174104');
 

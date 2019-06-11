@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Geohelper do
+RSpec.describe Geohelper do
   include_context :geocoder_real
 
   describe "reverse_geocode" do

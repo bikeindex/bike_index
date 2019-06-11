@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
-describe Listicle do
+RSpec.describe Listicle, type: :model do
 end

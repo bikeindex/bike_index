@@ -1,4 +1,4 @@
-require "spec_helper"
+require "rails_helper"
 
 RSpec.describe AmbassadorTaskAssignmentCreator do
   describe ".assign_task_to_all_ambassadors" do

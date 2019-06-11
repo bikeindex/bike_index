@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe "Selections API V2" do
+RSpec.describe "Selections API V2", type: :request do
   describe "colors" do
     it "responds on index" do
       selection = FactoryBot.create(:color)

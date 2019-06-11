@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-describe UsersController do
+RSpec.describe UsersController, type: :controller do
   let(:user) { FactoryBot.create(:user_confirmed) }
   describe "new" do
     context "already signed in" do
