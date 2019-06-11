@@ -21,6 +21,21 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
     end
   end
 
+  describe "show" do
+    it "renders" do
+      get :show, id: organization.to_param
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
+    end
+    context "unknown organization" do
+      it "redirects" do
+        get :show, id: "d89safdf"
+        expect(flash[:error]).to be_present
+        expect(response).to redirect_to(:admin_organizations)
+      end
+    end
+  end
+
   describe "edit" do
     it "renders" do
       get :edit, id: organization.to_param
