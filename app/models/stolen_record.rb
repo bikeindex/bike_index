@@ -44,6 +44,8 @@ class StolenRecord < ActiveRecord::Base
   scope :displayable, -> { recovered.where(can_share_recovery: true) }
   scope :recovery_unposted, -> { unscoped.where(current: false, recovery_posted: false) }
 
+  before_save :set_calculated_attributes
+
   geocoded_by :address_override_show_address
   after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
 
@@ -108,8 +110,6 @@ class StolenRecord < ActiveRecord::Base
   def self.locking_defeat_description_select
     locking_defeat_description.map { |l| [l, l] }
   end
-
-  before_save :set_calculated_attributes
 
   def set_calculated_attributes
     set_phone
@@ -203,8 +203,7 @@ class StolenRecord < ActiveRecord::Base
                       recovered_description: info[:recovered_description],
                       recovering_user_id: info[:recovering_user_id],
                       index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
-                      can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?,
-                      recovery_display_status: calculated_recovery_display_status)
+                      can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?)
     bike.stolen = false
     bike.save
   end
