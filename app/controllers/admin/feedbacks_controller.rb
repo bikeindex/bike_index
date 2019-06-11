@@ -28,7 +28,7 @@ class Admin::FeedbacksController < Admin::BaseController
       feedbacks = feedbacks.where(feedback_type: params[:search_type] == "msg" ? nil : params[:search_type])
     end
     if params[:search_user_id].present?
-      @user = User.friendly_username_find(params[:search_user_id])
+      @user = User.username_friendly_find(params[:search_user_id])
       feedbacks = feedbacks.where(user_id: @user.id) if @user.present?
     end
     if params[:search_bike_id].present?

@@ -84,7 +84,7 @@ class User < ActiveRecord::Base
       fuzzy_email_find(email) || fuzzy_unconfirmed_primary_email_find(email)
     end
 
-    def friendly_username_find(n)
+    def username_friendly_find(n)
       if n.is_a?(Integer) || n.match(/\A\d*\z/).present?
         where(id: n).first
       else
