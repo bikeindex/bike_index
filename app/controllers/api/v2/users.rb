@@ -3,7 +3,7 @@ module API
     class Users < API::Base
       include API::V2::Defaults
 
-      resource :users do
+      resource :users, desc: "Deprecated" do
         helpers do
           def user_info
             {
