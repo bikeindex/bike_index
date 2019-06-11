@@ -189,7 +189,7 @@ class StolenRecord < ActiveRecord::Base
     return "not_eligible" unless can_share_recovery
     return "not_displayed" if not_displayed?
     return "displayed" if displayed?
-    if bike.thumb_path.present?
+    if bike&.thumb_path&.present?
       "waiting_on_decision"
     else
       "displayable_no_photo"
