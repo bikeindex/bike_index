@@ -158,13 +158,16 @@ class Organization < ActiveRecord::Base
   end
 
   def paid_for?(feature_name)
-    return false unless feature_name.present? && paid_feature_slugs.is_a?(Array)
-    # If kinds is an array, make sure they all are permitted kinds
-    if feature_name.is_a?(Array)
-      return false unless feature_name.any? # If they passed an empty array, it's false
-      return feature_name.none? { |k| !paid_for?(k) }
+    features =
+      Array(feature_name)
+        .map { |name| name.strip.downcase.gsub(/\s/, "_") }
+
+    return false unless features.present? && paid_feature_slugs.is_a?(Array)
+
+    features.all? do |feature|
+      paid_feature_slugs.include?(feature) ||
+      (ambassador? && feature == "unstolen_notifications")
     end
-    paid_feature_slugs.include?(feature_name.strip.downcase.gsub(/\s/, "_")) # gnarly custom slug function because fml
   end
 
   def set_calculated_attributes

@@ -364,6 +364,12 @@ RSpec.describe User, type: :model do
       user.superuser = true
       expect(user.send_unstolen_notifications?).to be_truthy
     end
+
+    it "returns true for an ambassador" do
+      ambassador = FactoryBot.create(:ambassador)
+      expect(ambassador.send_unstolen_notifications?).to eq(true)
+    end
+
     context "organization" do
       let(:user) { FactoryBot.create(:organization_member) }
       let(:organization) { user.organizations.first }

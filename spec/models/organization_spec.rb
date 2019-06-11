@@ -136,6 +136,26 @@ RSpec.describe Organization, type: :model do
     end
   end
 
+  describe "#paid_for?" do
+    context "given an ambassador organization and 'unstolen_notifications'" do
+      it "returns true" do
+        ambassador_org = FactoryBot.create(:organization_ambassador)
+
+        enabled = ambassador_org.paid_for?("unstolen_notifications")
+        expect(enabled).to eq(true)
+
+        enabled = ambassador_org.paid_for?(["unstolen_notifications"])
+        expect(enabled).to eq(true)
+
+        enabled = ambassador_org.paid_for?("unstolen notifications")
+        expect(enabled).to eq(true)
+
+        enabled = ambassador_org.paid_for?("invalid feature name")
+        expect(enabled).to eq(false)
+      end
+    end
+  end
+
   describe "is_paid and paid_for? calculations" do
     let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: ["csv_exports"]) }
     let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0) }
