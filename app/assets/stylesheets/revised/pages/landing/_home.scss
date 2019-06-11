@@ -62,10 +62,10 @@
 }
 
 .center-navbar-signup-link {
-	background-color: black;
-	border-radius: 4px;
-	border: 1px solid #3498DB;
-	width: 85px;
+  background-color: black;
+  border-radius: 4px;
+  border: 1px solid #3498db;
+  width: 85px;
   color: #fff;
   cursor: pointer;
   display: inline;
@@ -216,19 +216,19 @@
     }
 
     h1 {
-	    text-shadow: 0 2px 5px rgba(17,46,78,0.72);
+      text-shadow: 0 2px 5px rgba(17, 46, 78, 0.72);
       font-size: 60px;
       font-weight: 300;
     }
 
     h2 {
-	    color: #ffffff;
-	    font-size: 24px;
-	    font-weight: 600;
-	    letter-spacing: 0.5px;
-	    line-height: 67px;
-	    text-align: center;
-	    text-shadow: 0 2px 5px rgba(17,46,78,0.72);
+      color: #ffffff;
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      line-height: 67px;
+      text-align: center;
+      text-shadow: 0 2px 5px rgba(17, 46, 78, 0.72);
       text-transform: none;
 
       a {
@@ -497,6 +497,41 @@
 
     .root-landing-who-rectangle {
       flex: 0 0 40%;
+    }
+  }
+}
+
+.root-by-the-numbers {
+  background-image: image-url("landing_pages/bike_pattern_bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  color: rgb(172, 172, 172);
+  text-align: center;
+
+  h3.landing-container-label {
+    color: #fff;
+    padding-top: (2 * $vertical-height);
+    margin: 0 0 (2 * $vertical-height);
+
+    @include media-breakpoint-up(lg) {
+      margin: 0 0 (4 * $vertical-height);
+      padding-top: (4 * $vertical-height);
+    }
+  }
+
+  .count-block {
+    h4 {
+      @extend .header-font-uncap;
+      font-size: 20px;
+      color: rgb(172, 172, 172);
+    }
+    .count-display {
+      display: block;
+      font-weight: $strong-font-weight;
+      margin-top: 0.5rem;
+      font-size: 22px;
     }
   }
 }

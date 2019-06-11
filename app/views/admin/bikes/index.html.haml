@@ -51,7 +51,7 @@
         = link_to "orgs view", organization_bikes_path(organization_id: current_organization.to_param), class: "less-strong"
   - if @render_chart
     .col-12.mt-2
-      = line_chart available_bikes.send(group_by_method(@time_range), "bikes.created_at").count, curve: false
+      = line_chart available_bikes.send(group_by_method(@time_range), "bikes.created_at").count, curve: false, thousands: ",", defer: true
     .col-12.mb-2.mt-2
       .row.justify-content-end
         .col-2

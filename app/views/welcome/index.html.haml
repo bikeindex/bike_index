@@ -64,41 +64,93 @@
       %a.btn.btn-lg.btn-success.root-action-btn{ href: new_bike_path }
         Register now!
 
-    .root-landing-who
-      .container
-        %h3.landing-container-label Used By
+  .root-landing-who
+    .container
+      %h3.landing-container-label Used By
 
-        .root-landing-who-wrap
-          .root-landing-who-square
-            = image_tag "landing_pages/partners/UMD.png", alt: "University of Maryland"
-          .root-landing-who-rectangle
-            = image_tag "landing_pages/partners/Bike-East-Bay.png", alt: "Bike East Bay"
-          .root-landing-who-square
-            = image_tag "landing_pages/partners/University-of-Washington.png", alt: "University of Washington"
-          .root-landing-who-square
-            = image_tag "landing_pages/partners/Bike-Pittsburgh.png", alt: "Bike Pittsburgh"
-          .root-landing-who-square
-            = image_tag "landing_pages/partners/SFPD.png", alt: "San Francisco Police Department"
-          .root-landing-who-square
-            = image_tag "landing_pages/partners/Wisconsin-Bike-Fed.png", alt: "Wisconsin Bike Federation"
-          .root-landing-who-rectangle
-            = image_tag "landing_pages/partners/Bike-Theft-Task-Force-Portland.png", alt: "Portland Bike Theft taskforce"
-          .root-landing-who-square
-            = link_to image_tag("landing_pages/partners/Pinhead.png", alt: "Pinhead locks"), "https://pinheadlocks.com/"
+      .root-landing-who-wrap
+        .root-landing-who-square
+          = image_tag "landing_pages/partners/UMD.png", alt: "University of Maryland"
+        .root-landing-who-rectangle
+          = image_tag "landing_pages/partners/Bike-East-Bay.png", alt: "Bike East Bay"
+        .root-landing-who-square
+          = image_tag "landing_pages/partners/University-of-Washington.png", alt: "University of Washington"
+        .root-landing-who-square
+          = image_tag "landing_pages/partners/Bike-Pittsburgh.png", alt: "Bike Pittsburgh"
+        .root-landing-who-square
+          = image_tag "landing_pages/partners/SFPD.png", alt: "San Francisco Police Department"
+        .root-landing-who-square
+          = image_tag "landing_pages/partners/Wisconsin-Bike-Fed.png", alt: "Wisconsin Bike Federation"
+        .root-landing-who-rectangle
+          = image_tag "landing_pages/partners/Bike-Theft-Task-Force-Portland.png", alt: "Portland Bike Theft taskforce"
+        .root-landing-who-square
+          = link_to image_tag("landing_pages/partners/Pinhead.png", alt: "Pinhead locks"), "https://pinheadlocks.com/"
 
-          .root-landing-who-square
-            = image_tag "landing_pages/partners/St-Louis-PD.png", alt: "St. Louis PD"
-          .root-landing-who-rectangle
-            = image_tag "landing_pages/partners/Seattle-Bike-Blog.png", alt: "Seattle Bike Blog"
-          .root-landing-who-square
-            = image_tag "landing_pages/partners/Sunnyvale.png", alt: "Sunnyvale"
-          .root-landing-who-square
-            = image_tag "landing_pages/partners/Stolen-Bikes-NOLA.png", alt: "Stolen Bikes NOLA"
-          .root-landing-who-square
-            = image_tag "landing_pages/partners/City-of-Bend.png", alt: "City of Bend"
-          .root-landing-who-rectangle
-            = image_tag "landing_pages/partners/Mission-Bicycle-Company.png", alt: "Mission Bicycle Company"
-          .root-landing-who-square
-            = image_tag "landing_pages/partners/Santa-Monica-PD.png", alt: "Santa Monica Police Department"
-          .root-landing-who-square
-            = link_to image_tag("landing_pages/partners/Bike-Portland.png", alt: "Bike Portland"), "https://bikeeastbay.org/Register"
+        .root-landing-who-square
+          = image_tag "landing_pages/partners/St-Louis-PD.png", alt: "St. Louis PD"
+        .root-landing-who-rectangle
+          = image_tag "landing_pages/partners/Seattle-Bike-Blog.png", alt: "Seattle Bike Blog"
+        .root-landing-who-square
+          = image_tag "landing_pages/partners/Sunnyvale.png", alt: "Sunnyvale"
+        .root-landing-who-square
+          = image_tag "landing_pages/partners/Stolen-Bikes-NOLA.png", alt: "Stolen Bikes NOLA"
+        .root-landing-who-square
+          = image_tag "landing_pages/partners/City-of-Bend.png", alt: "City of Bend"
+        .root-landing-who-rectangle
+          = image_tag "landing_pages/partners/Mission-Bicycle-Company.png", alt: "Mission Bicycle Company"
+        .root-landing-who-square
+          = image_tag "landing_pages/partners/Santa-Monica-PD.png", alt: "Santa Monica Police Department"
+        .root-landing-who-square
+          = link_to image_tag("landing_pages/partners/Bike-Portland.png", alt: "Bike Portland"), "https://bikeeastbay.org/Register"
+
+  .root-by-the-numbers
+    .container-fluid
+      %h3.landing-container-label Bike Index numbers
+      .row
+        .col-md-10.charted
+          :ruby
+            scale_color = "rgb(172, 172, 172)"
+            chartkick_library_props = {
+              title: {
+                display: true,
+                fontColor: scale_color,
+                text: "Bikes registered this past week"
+              },
+              scales: {
+                yAxes: [{
+                  gridLines: { color: "rgba(172, 172, 172, 0.25)" },
+                  ticks: { fontColor: scale_color }
+                }],
+                xAxes: [{
+                  gridLines: { color: "rgba(172, 172, 172, 0.25)" },
+                  ticks: { fontColor: scale_color }
+                }]
+              }
+            }
+
+          = column_chart Bike.unscoped.where(created_at: (Time.now - 7.days)..Time.now).group_by_day(:created_at).count, thousands: ",", defer: true, library: chartkick_library_props
+          %h4
+            Bikes registered this past week
+        .col-md-2
+          .count-block
+            %h4
+              Total Bikes Registered
+              %span.count-display
+                = number_with_delimiter(Counts.total_bikes)
+          .count-block
+            %h4
+              Stolen Bikes Registered
+              %span.count-display
+                = number_with_delimiter(Counts.stolen_bikes)
+          .count-block
+            %h4
+              Stolen Bikes Recovered
+              %span.count-display
+                = number_with_delimiter(Counts.recoveries)
+          .count-block
+            %h4
+              Total Recovery value
+              %span.count-display
+                = number_with_delimiter(Counts.recoveries_value)
+
+
