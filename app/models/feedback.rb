@@ -1,6 +1,5 @@
 class Feedback < ActiveRecord::Base
   validates_presence_of :body, :email, :title
-  serialize :feedback_hash_text
   belongs_to :user
   before_validation :set_calculated_attributes
   attr_accessor :additional

@@ -802,7 +802,6 @@ CREATE TABLE public.feedbacks (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     feedback_type character varying(255),
-    feedback_hash_text text,
     user_id integer,
     feedback_hash jsonb
 );
@@ -4171,4 +4170,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190529024835');
 INSERT INTO schema_migrations (version) VALUES ('20190607174104');
 
 INSERT INTO schema_migrations (version) VALUES ('20190611203612');
+
+INSERT INTO schema_migrations (version) VALUES ('20190611223723');
 
