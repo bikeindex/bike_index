@@ -25,7 +25,7 @@ class Feedback < ActiveRecord::Base
   end
 
   def phone_number=(val)
-    feedback_hash = (feedback_hash || {}).merge(phone_number: val)
+    self.feedback_hash = (feedback_hash || {}).merge(phone_number: val)
   end
 
   def notify_admins
