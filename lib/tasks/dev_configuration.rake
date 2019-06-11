@@ -27,7 +27,7 @@ class RakeDevConfiguration
 
       if File.exist?(file)
         delete_cache_file(file)
-        puts "Spring is no longer enabled (you may need to manually kill the spring processes)"
+        puts "Spring is no longer enabled (you will need to manually kill the spring processes)"
       else
         create_cache_file(file)
         puts "Spring is now enabled."
