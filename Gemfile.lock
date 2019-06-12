@@ -451,7 +451,6 @@ GEM
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
     rmagick (2.15.4)
-    rollout (2.3.0)
     rqrcode (0.10.1)
       chunky_png (~> 1.0)
     rqrcode-rails3 (0.1.7)
@@ -706,7 +705,6 @@ DEPENDENCIES
   rerun
   responders (~> 2.0)
   rmagick
-  rollout
   rqrcode-rails3
   rspec (~> 3.3.0)
   rspec-rails (~> 3.3.0)
