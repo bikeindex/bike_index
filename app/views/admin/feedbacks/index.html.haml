@@ -1,7 +1,9 @@
 .admin-subnav
   .col-12
     %h1
-      #{link_to 'Feedback and messages', admin_feedbacks_path}
+      Feedback & Messages
+      %small
+        = link_to "view all", admin_feedbacks_path
   .col-12.mt-4
     = line_chart available_feedbacks.send(group_by_method(@time_range), "feedbacks.created_at").count, curve: false, thousands: ",", defer: true
   .col-12.mb-2.mt-2
