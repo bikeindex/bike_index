@@ -226,6 +226,8 @@
         / Don't put anything
         / Because there might be more stolen records and it breaks without
         / an else
+%h3.mt-4
+  Ownerships
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
@@ -265,6 +267,7 @@
             = "&#x2713;".html_safe if ownership.claimed
           %td.table-cell-check.d-none.d-md-table-cell
             = "&#x2713;".html_safe if ownership.user_hidden
+
 - if @recoveries.any?
   %h3.mt-4
     Recoveries
@@ -285,9 +288,12 @@
         - @recoveries.each do |recovery|
           %tr
             %td
-              - if recovery.date_recovered.present?
-                %span.convertTime
-                  = l recovery.date_recovered, format: :convert_time
+              %a{ href: edit_admin_recovery_path(recovery.to_param) }
+                - if recovery.date_recovered.present?
+                  %span.convertTime
+                    = l recovery.date_recovered, format: :convert_time
+                - else # Still need text for link
+                  View recovery
             %td
               = recovery.recovered_description
             %td.table-cell-check.d-none.d-md-table-cell
