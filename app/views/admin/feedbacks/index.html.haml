@@ -1,7 +1,9 @@
 .admin-subnav
   .col-12
     %h1
-      #{link_to 'Feedback and messages', admin_feedbacks_path}
+      Feedback & Messages
+      %small
+        = link_to "view all", admin_feedbacks_path
   .col-12.mt-4
     = line_chart available_feedbacks.send(group_by_method(@time_range), "feedbacks.created_at").count, curve: false, thousands: ",", defer: true
   .col-12.mb-2.mt-2
@@ -18,7 +20,7 @@
   = number_with_delimiter(@feedbacks.total_count)
   - if params[:search_type].present?
     %strong
-      = params[:search_type]
+      = params[:search_type].gsub("_request", "").humanize
 
   - if params[:search_bike_id].present?
     for #{link_to "bike##{params[:search_bike_id]}", admin_bike_path(params[:search_bike_id])}
@@ -61,8 +63,7 @@
             - else
               = link_to feedback.email, admin_users_path(user_query: feedback.email)
           %td
-            - feedback_type = (feedback.feedback_type || 'msg').humanize
-            = link_to feedback_type, admin_feedbacks_path(type: feedback_type)
+            = link_to feedback.humanized_type, admin_feedbacks_path(sortable_search_params.merge(search_type: feedback.feedback_type))
           %td
             - if feedback.bike_id.present?
               = link_to "#{feedback.bike_id}", admin_bike_path(feedback.bike_id), class: "less-strong"
