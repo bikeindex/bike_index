@@ -13,6 +13,11 @@ gem "pg"
 # Speed
 gem "fast_blank", "~> 1.0"
 
+# Feature flagging
+gem "flipper"
+gem "flipper-active_record"
+gem "flipper-ui"
+
 # Redis and redis dependents
 gem "hiredis"
 gem "redis", ">= 3.2.0", require: ["redis", "redis/connection/hiredis"]
