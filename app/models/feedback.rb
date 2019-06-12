@@ -50,6 +50,11 @@ class Feedback < ActiveRecord::Base
     (feedback_hash || {})["phone_number"]
   end
 
+  def humanized_type
+    return "msg" unless feedback_type.present?
+    lead_type || feedback_type.gsub("_request", "").humanize
+  end
+
   def set_calculated_attributes
     generate_title
     set_user_attrs
