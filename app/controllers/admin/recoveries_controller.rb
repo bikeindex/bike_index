@@ -2,14 +2,23 @@ class Admin::RecoveriesController < Admin::BaseController
   layout "new_admin"
 
   def index
-    if params[:posted]
-      @posted = true
-      recoveries = StolenRecord.recovery_unposted.includes(:bike).order("date_recovered desc")
-    elsif params[:all_recoveries]
-      recoveries = StolenRecord.recovered.includes(:bike).order("date_recovered desc")
-    else
-      recoveries = StolenRecord.waiting_on_decision.includes(:bike).order("date_recovered desc")
+    unless params[:search_recovery_dispay_status]
+      if params[:all_recoveries]
+        recoveries = StolenRecord.recovered.includes(:bike).order("date_recovered desc")
+      elsif params[:displayed]
+        recoveries = StolenRecord.recovered.displayed.includes(:bike).order("date_recovered desc")
+      elsif params[:not_displayed]
+        recoveries = StolenRecord.recovered.not_displayed.includes(:bike).order("date_recovered desc")
+      elsif params[:eligible_no_photo]
+        recoveries = StolenRecord.recovered.displayable_no_photo.includes(:bike).order("date_recovered desc")
+      elsif params[:not_eligible]
+        recoveries = StolenRecord.recovered.not_eligible.includes(:bike).order("date_recovered desc")
+      else
+        recoveries = StolenRecord.recovered.waiting_on_decision.includes(:bike).order("date_recovered desc")
+      end
     end
+    @recoveries_count = recoveries.count
+    @waiting = StolenRecord.recovered.waiting_on_decision.count + StolenRecord.recovered.displayable_no_photo.count
     page = params[:page] || 1
     per_page = params[:per_page] || 50
     @recoveries = recoveries.page(page).per(per_page)

@@ -188,7 +188,7 @@ class StolenRecord < ActiveRecord::Base
   def calculated_recovery_display_status
     return "not_eligible" unless can_share_recovery
     return "not_displayed" if not_displayed?
-    return "displayed" if displayed?
+    return "displayed" if RecoveryDisplay.exists?(stolen_record_id: self.id)
     if bike&.thumb_path&.present?
       "waiting_on_decision"
     else
