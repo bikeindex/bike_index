@@ -146,9 +146,10 @@ RSpec.describe StolenRecord, type: :model do
       end
     end
     context "stolen_record is displayed" do
-      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, recovery_display_status: "displayed", can_share_recovery: true) }
+      let!(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true, recovery_display: recovery_display) }
+      let(:recovery_display) { stolen_record.recovery_display }
       it "is displayed" do
-        stolen_record.reload.update_attributes(updated_at: Time.now)
+        stolen_record.reload
         expect(stolen_record.recovery_display_status).to eq "displayed"
       end
     end
@@ -274,7 +275,8 @@ RSpec.describe StolenRecord, type: :model do
       end
     end
     context "recovery is displayed" do
-      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true, recovery_display_status: "displayed") }
+      let!(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true, recovery_display: recovery_display) }
+      let(:recovery_display) { stolen_record.recovery_display }
       it "returns displayed" do
         expect(stolen_record.calculated_recovery_display_status).to eq "displayed"
       end
