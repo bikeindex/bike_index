@@ -48,7 +48,7 @@ module ControllerHelpers
     return root_url unless current_user.present?
     return admin_root_url if current_user.superuser
     return user_home_url(subdomain: false) unless current_user.default_organization.present?
-    organization_bikes_path(organization_id: current_user.default_organization.to_param)
+    organization_root_url(organization_id: current_user.default_organization.to_param)
   end
 
   def default_bike_search_path
