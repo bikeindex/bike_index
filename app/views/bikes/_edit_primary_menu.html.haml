@@ -1,11 +1,21 @@
 %nav.primary-edit-form-well-menu
+  - if @bike.stolen?
+    %h3.nav-group-header Theft Details
+    %ul
+      - @theft_templates.each do |template, description|
+        %li{ class: "edit-menu-#{template}" }
+          - link_classname = @edit_template == template ? 'active' : ''
+          %a{ href: edit_bike_path(page: template), class: link_classname }
+            %h4= description
+
+  %h3.nav-group-header Bike Details
   %ul
-    - @edit_templates.each do |template, description|
+    - @bike_templates.each do |template, description|
       %li{ class: "edit-menu-#{template}" }
         - link_classname = @edit_template == template ? 'active' : ''
         %a{ href: edit_bike_path(page: template), class: link_classname }
-          %h4
-            = description
+          %h4= description
+
   .form-well-edit-page-select
     %span.menu-select-overlay
       You are editing

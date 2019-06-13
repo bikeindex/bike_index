@@ -4,9 +4,10 @@ class BikeIndex.BikesEdit extends BikeIndex
     new FormWellMenu
     # Get the template name, call page specific Scripts if we have them
     switch $('.form-well-header.container').attr('data-template')
-      when 'root' then new BikeIndex.BikesEditRoot
+      when 'bike_details' then new BikeIndex.BikesEditBikeDetails
       when 'drivetrain' then new BikeIndex.BikesEditDrivetrain
-      when 'stolen' then new BikeIndex.BikesEditStolen
+      when 'report_recovered' then new BikeIndex.BikesEditStolen
+      when 'report_stolen' then new BikeIndex.BikesEditStolen
       when 'photos' then new BikeIndex.BikesEditPhotos
       when 'accessories' then new BikeIndex.BikesEditAccessories
       when 'remove' then new BikeIndex.BikesEditRemove
@@ -17,6 +18,3 @@ class BikeIndex.BikesEdit extends BikeIndex
 
   submitBikeEditForm: ->
     $('form.primary-edit-bike-form').submit()
-    setTimeout (-> # Sometimes the page reload isn't triggered. Do it manually
-      location.reload(true)
-    ), 300

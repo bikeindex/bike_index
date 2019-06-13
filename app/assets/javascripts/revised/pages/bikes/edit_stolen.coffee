@@ -1,3 +1,7 @@
+# Runs on the following templates:
+# bikes/edit_report_recovered
+# bikes/edit_report_stolen
+
 class BikeIndex.BikesEditStolen extends BikeIndex
   constructor: ->
     @initializeEventListeners()
@@ -7,13 +11,13 @@ class BikeIndex.BikesEditStolen extends BikeIndex
 
   initializeEventListeners: ->
     $('#mark-stolen-btn').click (e) =>
+      e.preventDefault()
       @markStolen(e)
     $('#toggle-stolen form').submit (e) =>
       e.preventDefault()
       @markRecovered()
 
   markStolen: (e) ->
-    e.preventDefault()
     $('#bike_stolen').val('true')
     window.pageScript.submitBikeEditForm()
 
@@ -21,7 +25,8 @@ class BikeIndex.BikesEditStolen extends BikeIndex
     if success
       msg = "Thanks for telling us! We're so glad you got your bike back!"
       $('#bike_stolen').prop('checked', '0')
-      window.BikeIndexAlerts.add('success', msg, window.location.reload())
+      redirect_url = window.location.href.replace(window.location.search, "?page=report_stolen")
+      window.BikeIndexAlerts.add('success', msg, () -> window.location.href = redirect_url)
     else
       msg = "Oh no! Something went wrong and we couldn't mark your bike recovered."
       window.BikeIndexAlerts.add('error', msg)

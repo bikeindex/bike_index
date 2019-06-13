@@ -1,4 +1,4 @@
-class BikeIndex.BikesEditRoot extends BikeIndex
+class BikeIndex.BikesEditBikeDetails extends BikeIndex
   constructor: ->
     @initializeEventListeners()
     new window.ManufacturersSelect('#manufacturer_update_manufacturer')

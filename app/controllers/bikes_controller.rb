@@ -153,50 +153,106 @@ class BikesController < ApplicationController
 
   def edit
     @page_errors = @bike.errors
-    @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
-    if @edit_template == "photos"
-      @private_images = PublicImage.unscoped.where(imageable_type: "Bike").where(imageable_id: @bike.id).where(is_private: true)
+    @edit_templates = edit_templates
+
+    is_valid, @edit_template = target_edit_template(params[:page], edit_templates.keys)
+
+    if !is_valid
+      redirect_to edit_bike_url(@bike, page: @edit_template) and return
     end
+
+    if @edit_template == "photos"
+      @private_images =
+        PublicImage
+          .unscoped
+          .where(imageable_type: "Bike")
+          .where(imageable_id: @bike.id)
+          .where(is_private: true)
+    end
+
     render "edit_#{@edit_template}".to_sym
   end
 
   def update
     begin
-      @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params.as_json, current_ownership: @current_ownership).update_available_attributes
+      @bike = BikeUpdator.new(
+        user: current_user,
+        bike: @bike,
+        b_params: permitted_bike_params.as_json,
+        current_ownership: @current_ownership,
+      ).update_available_attributes
     rescue => e
       flash[:error] = e.message
     end
+
     @bike = @bike.decorate
+
     if @bike.errors.any? || flash[:error].present?
       edit and return
     else
       flash[:success] = "Bike successfully updated!"
       return if return_to_if_present
-      redirect_to edit_bike_url(@bike, page: params[:edit_template]) and return
+
+      # When reporting a bike as stolen, redirect to the recovery form.
+      # The recovery form redirects to the stolen form and is handled by
+      # CoffeeScript in pages/bikes/edit_stolen.coffee
+      target_template = (params[:edit_template] == "report_stolen") ?
+        "report_recovered" : params[:edit_template]
+      redirect_to edit_bike_url(@bike, page: target_template) and return
     end
   end
 
-  def edit_templates_hash
-    stolen_type = @bike.recovered ? "Recovery" : "Theft"
-    hash = {
-      root: "Bike Details",
-      photos: "Photos",
-      drivetrain: "Wheels + Drivetrain",
-      accessories: "Accessories + Components",
-      ownership: "Transfer Ownership",
-      groups: "Groups + Organizations",
-      remove: "Hide or Delete",
-      stolen: (@bike.stolen ? "#{stolen_type} details" : "Report Stolen or Missing"),
-    }
-    # To make stolen the first key if bike is stolen. using as_json for string keys instead of sym
-    (@bike.stolen ? hash.to_a.rotate(-1).to_h : hash).as_json
-  end
-
   def edit_templates
-    @edit_templates ||= edit_templates_hash
+    return @edit_templates if defined?(@edit_templates)
+    @theft_templates = theft_templates
+    @bike_templates = bike_templates
+    @edit_templates = @theft_templates.merge(@bike_templates)
   end
 
   protected
+
+  # Determine the appropriate edit template to use.
+  def target_edit_template(requested_page, valid_pages)
+    default_page = (@bike.stolen? ? :theft_details : :bike_details)
+    return [true, default_page] if requested_page.blank?
+
+    if requested_page.in?(valid_pages)
+      [true, requested_page]
+    else
+      [false, default_page]
+    end
+  end
+
+  # NB: Hash insertion order here determines how nav links are displayed in the
+  # UI. Keys also correspond to template names and query parameters, and values
+  # are used as haml header tag text in the corresponding templates.
+  def theft_templates
+    return {} unless @bike.stolen?
+
+    {}.with_indifferent_access.tap do |h|
+      h[:theft_details] = "Recovery details" if @bike.recovered?
+      h[:theft_details] = "Theft details" unless @bike.recovered?
+      h[:publicize] = "Publicize Theft" if Flipper.enabled?(:premium_listings)
+      h[:alert] = "Activate Bike Index Alert" if Flipper.enabled?(:premium_listings)
+      h[:report_recovered] = "Mark this Bike Recovered" unless @bike.recovered?
+    end
+  end
+
+  # NB: Hash insertion order here determines how nav links are displayed in the
+  # UI. Keys also correspond to template names and query parameters, and values
+  # are used as haml header tag text in the corresponding templates.
+  def bike_templates
+    {}.with_indifferent_access.tap do |h|
+      h[:bike_details] = "Bike Details"
+      h[:photos] = "Photos"
+      h[:drivetrain] = "Wheels and Drivetrain"
+      h[:accessories] = "Accessories and Components"
+      h[:ownership] = "Transfer Ownership"
+      h[:groups] = "Groups and Organizations"
+      h[:remove] = "Hide or Delete"
+      h[:report_stolen] = "Report Stolen or Missing" unless @bike.stolen?
+    end
+  end
 
   # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers
   # Also provides testable protection against seeing organization info on bikes
