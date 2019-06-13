@@ -3,40 +3,30 @@
   .col-md-5
     %h1
       Recoveries
-      - unless @all_recoveries
-        that can be displayed
   .col-md-7
     %ul
       %li.nav-item
-        - eligible = params[:waiting_on_decision].present?
-        = link_to "Eligible", admin_recoveries_path(waiting_on_decision: true), class: "nav-link #{eligible ? 'active' : ''}"
+        - eligible = params[:search_recovery_display_status] == "1" || params[:search_recovery_display_status].nil?
+        = link_to "Eligible", admin_recoveries_path(search_recovery_display_status: 1), class: "nav-link #{eligible ? "active" : ""}"
       %li.nav-item
-        - eligible_no_photo = params[:eligible_no_photo].present?
-        = link_to "Eligible no photo", admin_recoveries_path(eligible_no_photo: true), class: "nav-link #{eligible_no_photo ? 'active' : ''}"
+        - eligible_no_photo = params[:search_recovery_display_status] == "2"
+        = link_to "Eligible no photo", admin_recoveries_path(search_recovery_display_status: 2), class: "nav-link #{eligible_no_photo ? "active" : ""}"
       %li.nav-item
-        - not_eligible = params[:not_eligible].present?
-        = link_to "Not Eligible", admin_recoveries_path(not_eligible: true), class: "nav-link #{not_eligible ? 'active' : ''}"
+        - not_eligible = params[:search_recovery_display_status] == "0"
+        = link_to "Not Eligible", admin_recoveries_path(search_recovery_display_status: 0), class: "nav-link #{not_eligible ? "active" : ""}"
       %li.nav-item
-        - displayed = params[:displayed].present?
-        = link_to "Displayed", admin_recoveries_path(displayed: true), class: "nav-link #{displayed ? 'active' : ''}"
+        - displayed = params[:search_recovery_display_status] == "3"
+        = link_to "Displayed", admin_recoveries_path(search_recovery_display_status: 3), class: "nav-link #{displayed ? "active" : ""}"
       %li.nav-item
-        - not_displayed = params[:not_displayed].present?
-        = link_to "Not displayed", admin_recoveries_path(not_displayed: true), class: "nav-link #{not_displayed ? 'active' : ''}"
+        - not_displayed = params[:search_recovery_display_status] == "4"
+        = link_to "Not displayed", admin_recoveries_path(search_recovery_display_status: 4), class: "nav-link #{not_displayed ? "active" : ""}"
       %li.nav-item
-        - all_recoveries = params[:all_recoveries].present?
-        = link_to "All Recoveries", admin_recoveries_path(all_recoveries: true), class: "nav-link #{all_recoveries ? 'active' : ''}"
-    -# - if @all_recoveries
-    -#   = link_to 'Only displayable', admin_recoveries_url, class: "btn btn-success float-right"
-    -# - else
-    -#   = link_to 'All recoveries', admin_recoveries_url(all_recoveries: true), class: "btn btn-success float-right"
+        - all = params[:all_recoveries].present?
+        = link_to "All Recoveries", admin_recoveries_path(all_recoveries: true), class: "nav-link #{all ? "active" : ""}"
 
 %h4
-  = @recoveries_count
+  = @recoveries.total_count
   recoveries
-%h4
-  = @waiting
-  are waiting to be posted
-
 
 = paginate @recoveries, views_prefix: "admin"
 .full-screen-table

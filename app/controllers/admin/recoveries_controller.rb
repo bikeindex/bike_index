@@ -2,23 +2,7 @@ class Admin::RecoveriesController < Admin::BaseController
   layout "new_admin"
 
   def index
-    unless params[:search_recovery_dispay_status]
-      if params[:all_recoveries]
-        recoveries = StolenRecord.recovered.includes(:bike).order("date_recovered desc")
-      elsif params[:displayed]
-        recoveries = StolenRecord.recovered.displayed.includes(:bike).order("date_recovered desc")
-      elsif params[:not_displayed]
-        recoveries = StolenRecord.recovered.not_displayed.includes(:bike).order("date_recovered desc")
-      elsif params[:eligible_no_photo]
-        recoveries = StolenRecord.recovered.displayable_no_photo.includes(:bike).order("date_recovered desc")
-      elsif params[:not_eligible]
-        recoveries = StolenRecord.recovered.not_eligible.includes(:bike).order("date_recovered desc")
-      else
-        recoveries = StolenRecord.recovered.waiting_on_decision.includes(:bike).order("date_recovered desc")
-      end
-    end
-    @recoveries_count = recoveries.count
-    @waiting = StolenRecord.recovered.waiting_on_decision.count + StolenRecord.recovered.displayable_no_photo.count
+    recoveries = matching_recoveries
     page = params[:page] || 1
     per_page = params[:per_page] || 50
     @recoveries = recoveries.page(page).per(per_page)
@@ -75,6 +59,18 @@ class Admin::RecoveriesController < Admin::BaseController
   end
 
   private
+
+  def matching_recoveries
+    recoveries = StolenRecord
+    if params[:search_recovery_display_status].present?
+      recoveries = recoveries.recovered.where(recovery_display_status: params[:search_recovery_display_status]).includes(:bike).order("date_recovered desc")
+    elsif params[:all_recoveries]
+      recoveries = recoveries.recovered.includes(:bike).order("date_recovered desc")
+    else
+      recoveries = recoveries.recovered.waiting_on_decision.includes(:bike).order("date_recovered desc")
+    end
+    recoveries
+  end
 
   def permitted_parameters
     params.require(:stolen_record).permit(StolenRecord.old_attr_accessible)
