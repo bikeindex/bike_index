@@ -20,7 +20,7 @@ class Counts
     end
 
     def beginning_of_week
-      (Time.now - 7.days).end_of_day + 1.minute
+      (Time.current - 7.days).end_of_day + 1.minute
     end
 
     def total_bikes; retrieve_for("total_bikes") end
@@ -45,11 +45,10 @@ class Counts
 
     def assign_recoveries
       # StolenBikeRegistry.com had just over 2k recoveries prior to merging. The recoveries weren't imported, so manually calculate
-      assign_for("recoveries", StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count + 2_041)
+      assign_for("recoveries", StolenRecord.recovered.where("date_recovered < ?", Time.current.beginning_of_day).count + 2_041)
     end
 
     def assign_week_creation_chart
-      Time.zone = TimeParser::DEFAULT_TIMEZONE # Just to make sure
       assign_for("week_creation_chart", Bike.unscoped.where(created_at: beginning_of_week..Time.now).group_by_day(:created_at).count.to_json)
     end
 
