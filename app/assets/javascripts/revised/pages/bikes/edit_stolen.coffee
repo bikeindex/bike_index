@@ -25,7 +25,7 @@ class BikeIndex.BikesEditStolen extends BikeIndex
     if success
       msg = "Thanks for telling us! We're so glad you got your bike back!"
       $('#bike_stolen').prop('checked', '0')
-      redirect_url = window.location.href.replace(window.location.search, "?page=report_stolen")
+      redirect_url = window.location.href.replace(window.location.search, "")
       window.BikeIndexAlerts.add('success', msg, () -> window.location.href = redirect_url)
     else
       msg = "Oh no! Something went wrong and we couldn't mark your bike recovered."

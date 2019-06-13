@@ -186,13 +186,7 @@ class BikesController < ApplicationController
     else
       flash[:success] = "Bike successfully updated!"
       return if return_to_if_present
-
-      # When reporting a bike as stolen, redirect to the recovery form.
-      # The recovery form redirects to the stolen form and is handled by
-      # CoffeeScript in pages/bikes/edit_stolen.coffee
-      target_template = (params[:edit_template] == "report_stolen") ?
-        "report_recovered" : params[:edit_template]
-      redirect_to edit_bike_url(@bike, page: target_template) and return
+      redirect_to edit_bike_url(@bike, page: params[:edit_template]) and return
     end
   end
 
