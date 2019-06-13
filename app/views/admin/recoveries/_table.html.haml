@@ -1,0 +1,84 @@
+- render_sortable ||= false
+
+.full-screen-table
+  %table.table.table-striped.table-bordered
+    %thead.thead-light.sortable
+      %th
+        - if render_sortable
+          = sortable "date_recovered"
+        - else
+          Date recovered
+      %th
+        - if render_sortable
+          = sortable "recovery_display_status", "Status"
+        - else
+          Status
+      %th
+        Bike
+      %th
+        Recovery info
+      %th
+        Location
+      %th
+        %small
+          Helped
+      %th
+        %small
+          Shareable
+      %th
+        %small
+          Display
+    %tbody
+      - recoveries.each do |recovery|
+        %tr
+          %td
+            %a{href: edit_admin_recovery_url(recovery.id) }
+              - if recovery.date_recovered.present?
+                - date = recovery.date_recovered
+              - else
+                %small
+                - date = recovery.created_at
+                %span.text-danger
+                  no recovery date
+              %span.convertTime
+                = l date, format: :convert_time
+          %td
+            %small
+              = recovery.recovery_display_status.gsub("_", "&nbsp;").html_safe
+
+          %td
+            - if recovery.bike.present?
+              .less-strong-hold
+                %span.less-strong-right
+                  = link_to recovery.bike_id, edit_admin_bike_url(recovery.bike)
+                = recovery.bike.title_string
+                - if recovery.estimated_value.present?
+                  %small.less-strong
+                    $#{recovery.estimated_value}
+          %td
+            - if recovery.recovered_description.present?
+              %small
+                = recovery.recovered_description
+            %small.less-strong
+              = recovery.theft_description.truncate(200) if recovery.theft_description.present?
+            - if recovery.recovering_user.present?
+              %br
+              %small.less-strong
+                Recovered by
+                = link_to recovery.recovering_user.display_name, admin_user_path(recovery.recovering_user.to_param)
+                - unless recovery.recovering_user_owner?
+                  %span.text-warning
+                    not owner!
+          %td
+            - if recovery.address.present?
+              = recovery.city
+          %td.table-cell-check
+            / Posted
+            / = "&#x2713;".html_safe if recovery.recovery_posted
+            = "&#x2713;".html_safe if recovery.index_helped_recovery
+          %td.table-cell-check
+            = "&#x2713;".html_safe if recovery.can_share_recovery
+          %td.table-cell-check
+            - if recovery.recovery_display.present?
+              = link_to "&#x2713;".html_safe, edit_admin_recovery_display_url(recovery.recovery_display)
+
