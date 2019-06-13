@@ -13,10 +13,14 @@ gem "pg"
 # Speed
 gem "fast_blank", "~> 1.0"
 
+# Feature flagging
+gem "flipper"
+gem "flipper-active_record"
+gem "flipper-ui"
+
 # Redis and redis dependents
 gem "hiredis"
 gem "redis", ">= 3.2.0", require: ["redis", "redis/connection/hiredis"]
-gem "rollout" # Feature flags
 gem "sidekiq", "~> 5.1.0" # Background processing
 gem "sidekiq-failures"
 gem "soulheart", "~> 0.3.0"
