@@ -45,7 +45,8 @@ class Counts
     end
 
     def assign_week_creation_chart
-      assign_for("week_creation_chart", Bike.unscoped.where(created_at: (Time.now - 7.days)..Time.now).group_by_day(:created_at).count.to_json)
+      matching_bikes = Bike.unscoped.where(created_at: ((Time.now - 7.days).beginning_of_day)..Time.now)
+      assign_for("week_creation_chart", matching_bikes.group_by_day(:created_at).count.to_json)
     end
 
     def recoveries; retrieve_for("recoveries") end
