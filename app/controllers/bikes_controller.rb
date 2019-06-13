@@ -155,9 +155,10 @@ class BikesController < ApplicationController
     @page_errors = @bike.errors
     @edit_templates = edit_templates
 
-    is_valid, @edit_template = target_edit_template(params[:page], edit_templates.keys)
+    result = target_edit_template(params[:page], edit_templates.keys)
+    @edit_template = result[:template]
 
-    if !is_valid
+    if !result[:is_valid]
       redirect_to edit_bike_url(@bike, page: @edit_template) and return
     end
 
@@ -213,14 +214,22 @@ class BikesController < ApplicationController
 
   # Determine the appropriate edit template to use.
   def target_edit_template(requested_page, valid_pages)
-    default_page = (@bike.stolen? ? :theft_details : :bike_details)
-    return [true, default_page] if requested_page.blank?
+    result = {}
+    default_page = @bike.stolen? ? :theft_details : :bike_details
 
-    if requested_page.in?(valid_pages)
-      [true, requested_page]
+    case
+    when requested_page.blank?
+      result[:is_valid] = true
+      result[:template] = default_page
+    when requested_page.in?(valid_pages)
+      result[:is_valid] = true
+      result[:template] = requested_page
     else
-      [false, default_page]
+      result[:is_valid] = false
+      result[:template] = default_page
     end
+
+    result
   end
 
   # NB: Hash insertion order here determines how nav links are displayed in the
