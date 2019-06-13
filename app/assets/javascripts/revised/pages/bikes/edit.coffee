@@ -18,3 +18,6 @@ class BikeIndex.BikesEdit extends BikeIndex
 
   submitBikeEditForm: ->
     $('form.primary-edit-bike-form').submit()
+    setTimeout (-> # Sometimes the page reload isn't triggered. Do it manually
+      location.reload(true)
+    ), 300
