@@ -14,7 +14,7 @@ RSpec.describe Admin::DashboardController, type: :controller do
       it "redirects" do
         get :index
         expect(response.code).to eq("302")
-        expect(response).to redirect_to organization_bikes_path(organization_id: user.default_organization.to_param)
+        expect(response).to redirect_to organization_root_path(organization_id: user.default_organization.to_param)
       end
     end
   end

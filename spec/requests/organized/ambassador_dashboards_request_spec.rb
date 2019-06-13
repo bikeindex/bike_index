@@ -21,9 +21,9 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
     let(:organization) { FactoryBot.create(:organization) }
     let(:user) { FactoryBot.create(:organization_member, organization: organization) }
     describe "index" do
-      it "redirects the user's homepage" do
+      it "redirects to organization root path" do
         get organization_ambassador_dashboard_path(organization)
-        expect(response).to redirect_to organization_bikes_path(organization_id: organization)
+        expect(response).to redirect_to organization_root_path(organization_id: organization)
       end
     end
   end

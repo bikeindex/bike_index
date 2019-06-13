@@ -48,7 +48,7 @@ module ControllerHelpers
     return root_url unless current_user.present?
     return admin_root_url if current_user.superuser
     return user_home_url(subdomain: false) unless current_user.default_organization.present?
-    organization_bikes_path(organization_id: current_user.default_organization.to_param)
+    organization_root_url(organization_id: current_user.default_organization.to_param)
   end
 
   def default_bike_search_path
@@ -87,12 +87,6 @@ module ControllerHelpers
   # This is overridden in FeedbacksController
   def page_id
     @page_id ||= [controller_namespace, controller_name, action_name].compact.join("_")
-  end
-
-  def ensure_preview_enabled!
-    return true if preview_enabled?
-    flash[:notice] = "Sorry, you don't have permission to view that page"
-    redirect_to user_root_url and return
   end
 
   def set_passive_organization(organization)
@@ -154,10 +148,6 @@ module ControllerHelpers
   def remove_session
     session.keys.each { |k| session.delete(k) } # Get rid of everything we've been storing
     cookies.delete(:auth)
-  end
-
-  def preview_enabled?
-    (current_user && $rollout.active?(:preview, current_user)) || (params && params[:preview])
   end
 
   def require_member!

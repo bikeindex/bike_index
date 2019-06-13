@@ -845,6 +845,72 @@ ALTER SEQUENCE public.flavor_texts_id_seq OWNED BY public.flavor_texts.id;
 
 
 --
+-- Name: flipper_features; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.flipper_features (
+    id integer NOT NULL,
+    key character varying NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: flipper_features_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.flipper_features_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: flipper_features_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.flipper_features_id_seq OWNED BY public.flipper_features.id;
+
+
+--
+-- Name: flipper_gates; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.flipper_gates (
+    id integer NOT NULL,
+    feature_key character varying NOT NULL,
+    key character varying NOT NULL,
+    value character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: flipper_gates_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.flipper_gates_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: flipper_gates_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.flipper_gates_id_seq OWNED BY public.flipper_gates.id;
+
+
+--
 -- Name: front_gear_types; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2298,6 +2364,20 @@ ALTER TABLE ONLY public.flavor_texts ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
+-- Name: flipper_features id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.flipper_features ALTER COLUMN id SET DEFAULT nextval('public.flipper_features_id_seq'::regclass);
+
+
+--
+-- Name: flipper_gates id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.flipper_gates ALTER COLUMN id SET DEFAULT nextval('public.flipper_gates_id_seq'::regclass);
+
+
+--
 -- Name: front_gear_types id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2694,6 +2774,22 @@ ALTER TABLE ONLY public.feedbacks
 
 ALTER TABLE ONLY public.flavor_texts
     ADD CONSTRAINT flavor_texts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: flipper_features flipper_features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.flipper_features
+    ADD CONSTRAINT flipper_features_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: flipper_gates flipper_gates_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.flipper_gates
+    ADD CONSTRAINT flipper_gates_pkey PRIMARY KEY (id);
 
 
 --
@@ -3168,6 +3264,20 @@ CREATE INDEX index_exports_on_user_id ON public.exports USING btree (user_id);
 --
 
 CREATE INDEX index_feedbacks_on_user_id ON public.feedbacks USING btree (user_id);
+
+
+--
+-- Name: index_flipper_features_on_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_flipper_features_on_key ON public.flipper_features USING btree (key);
+
+
+--
+-- Name: index_flipper_gates_on_feature_key_and_key_and_value; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_flipper_gates_on_feature_key_and_key_and_value ON public.flipper_gates USING btree (feature_key, key, value);
 
 
 --
@@ -4163,3 +4273,4 @@ INSERT INTO schema_migrations (version) VALUES ('20190611203612');
 
 INSERT INTO schema_migrations (version) VALUES ('20190611223723');
 
+INSERT INTO schema_migrations (version) VALUES ('20190612183532');
