@@ -937,7 +937,7 @@ RSpec.describe BikesController, type: :controller do
           bike.reload
           expect(bike.owner).to eq user
           expect(response).to be_success
-          expect(assigns(:edit_template)).to eq :bike_details
+          expect(assigns(:edit_template)).to eq "bike_details"
         end
       end
       context "not-creator but member of creation_organization" do
@@ -949,7 +949,7 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.creation_organization).to eq user.organizations.first
           get :edit, id: bike.id
           expect(response).to be_success
-          expect(assigns(:edit_template)).to eq :bike_details
+          expect(assigns(:edit_template)).to eq "bike_details"
         end
       end
     end
@@ -962,7 +962,7 @@ RSpec.describe BikesController, type: :controller do
             it "renders the bike_details template" do
               get :edit, id: bike.id
               expect(response.status).to eq(200)
-              expect(assigns(:edit_template)).to eq :bike_details
+              expect(assigns(:edit_template)).to eq "bike_details"
               expect(assigns(:edit_templates)).to eq non_stolen_edit_templates.as_json
               expect(response).to render_template "edit_bike_details"
             end
@@ -974,7 +974,7 @@ RSpec.describe BikesController, type: :controller do
               expect(bike.stolen).to be_truthy
               get :edit, id: bike.id
               expect(response).to be_success
-              expect(assigns(:edit_template)).to eq :theft_details
+              expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq stolen_edit_templates.as_json
               expect(response).to render_template "edit_theft_details"
             end
@@ -986,7 +986,7 @@ RSpec.describe BikesController, type: :controller do
               expect(bike.recovered).to be_truthy
               get :edit, id: bike.id
               expect(response).to be_success
-              expect(assigns(:edit_template)).to eq :theft_details
+              expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq recovery_edit_templates.as_json
               expect(response).to render_template "edit_theft_details"
             end

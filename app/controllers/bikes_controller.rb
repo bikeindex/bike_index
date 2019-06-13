@@ -155,7 +155,7 @@ class BikesController < ApplicationController
     @page_errors = @bike.errors
     @edit_templates = edit_templates
 
-    result = target_edit_template(params[:page], edit_templates.keys)
+    result = target_edit_template(requested_page: params[:page])
     @edit_template = result[:template]
 
     if !result[:is_valid]
@@ -176,18 +176,11 @@ class BikesController < ApplicationController
 
   def update
     begin
-      @bike = BikeUpdator.new(
-        user: current_user,
-        bike: @bike,
-        b_params: permitted_bike_params.as_json,
-        current_ownership: @current_ownership,
-      ).update_available_attributes
+      @bike = BikeUpdator.new(user: current_user, bike: @bike, b_params: permitted_bike_params.as_json, current_ownership: @current_ownership).update_available_attributes
     rescue => e
       flash[:error] = e.message
     end
-
     @bike = @bike.decorate
-
     if @bike.errors.any? || flash[:error].present?
       edit and return
     else
@@ -205,28 +198,33 @@ class BikesController < ApplicationController
 
   def edit_templates
     return @edit_templates if defined?(@edit_templates)
-    @theft_templates = theft_templates
+    @theft_templates = @bike.stolen? ? theft_templates : {}
     @bike_templates = bike_templates
     @edit_templates = @theft_templates.merge(@bike_templates)
   end
 
   protected
 
-  # Determine the appropriate edit template to use.
-  def target_edit_template(requested_page, valid_pages)
+  # Determine the appropriate edit template to use in the edit view.
+  #
+  # If provided an invalid template name, return the default page for a stolen /
+  # unstolen bike and `:is_valid` mapped to false.
+  #
+  # Return a Hash with keys :is_valid (boolean), :template (string)
+  def target_edit_template(requested_page:)
     result = {}
     default_page = @bike.stolen? ? :theft_details : :bike_details
 
     case
     when requested_page.blank?
       result[:is_valid] = true
-      result[:template] = default_page
-    when requested_page.in?(valid_pages)
+      result[:template] = default_page.to_s
+    when edit_templates.has_key?(requested_page)
       result[:is_valid] = true
-      result[:template] = requested_page
+      result[:template] = requested_page.to_s
     else
       result[:is_valid] = false
-      result[:template] = default_page
+      result[:template] = default_page.to_s
     end
 
     result
@@ -236,8 +234,6 @@ class BikesController < ApplicationController
   # UI. Keys also correspond to template names and query parameters, and values
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
-    return {} unless @bike.stolen?
-
     {}.with_indifferent_access.tap do |h|
       h[:theft_details] = "Recovery details" if @bike.recovered?
       h[:theft_details] = "Theft details" unless @bike.recovered?
