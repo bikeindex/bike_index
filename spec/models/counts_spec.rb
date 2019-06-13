@@ -14,11 +14,10 @@ RSpec.describe Counts, type: :model do
 
   context "week_creation_chart" do
     let!(:bike) { FactoryBot.create(:bike) }
-    let!(:bike_first) { FactoryBot.create(:bike, created_at: (Time.now - 7.days).beginning_of_day + 1.minute) }
+    let!(:bike_first) { FactoryBot.create(:bike, created_at: (Time.now - 6.days).beginning_of_day + 1.minute) }
     let(:target) do
       {
-        (Date.today - 7.days).to_s => 1,
-        (Date.today - 6.days).to_s => 0,
+        (Date.today - 6.days).to_s => 1,
         (Date.today - 5.days).to_s => 0,
         (Date.today - 4.days).to_s => 0,
         (Date.today - 3.days).to_s => 0,
@@ -30,6 +29,7 @@ RSpec.describe Counts, type: :model do
     it "saves the thing" do
       expect(Counts.week_creation_chart).to be_nil # Ensure we aren't throwing errors with nil
       Counts.assign_week_creation_chart
+      expect(Counts.week_creation_chart.keys.count).to eq 7
       expect(Counts.week_creation_chart).to eq target
     end
   end
