@@ -1,5 +1,6 @@
-# Ignore bundler config
+# Ignore local config files
 /.bundle
+Guardfile
 
 # Ignore all logfiles and tempfiles.
 /log/*.log

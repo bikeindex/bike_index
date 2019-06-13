@@ -1,0 +1,62 @@
+version: "2"
+
+# default values in comments
+checks:
+  argument-count:
+    config:
+      threshold: 4 # 4
+  complex-logic:
+    config:
+      threshold: 4 # 4
+  file-lines:
+    config:
+      threshold: 500 # 250
+  method-complexity:
+    config:
+      threshold: 10 # 5
+  method-count:
+    config:
+      threshold: 40 # 20
+  method-lines:
+    config:
+      threshold: 50 # 25
+  nested-control-flow:
+    config:
+      threshold: 4 # 4
+  return-statements:
+    config:
+      threshold: 4 # 4
+
+plugins:
+  rubocop:
+    enabled: false
+    channel: rubocop-0-67
+    config: ./.rubocop.yml
+  eslint:
+    enabled: true
+    config: ./.eslintrc
+  csslint:
+    enabled: false
+
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - ruby:
+          mass_threshold: 50
+      - javascript:
+          mass_threshold: 110
+
+exclude_patterns:
+- "**/node_modules/"
+- "**/spec/"
+- "**/test/"
+- "**/tests/"
+- "**/vendor/"
+- "app/assets/javascripts/external_scripts/"
+- "config/"
+- "db/"
+- "dist/"
+- "features/"
+- "node_modules/"
+- "script/"

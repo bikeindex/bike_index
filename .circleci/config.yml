@@ -106,9 +106,6 @@ jobs:
                               --out test-results/rspec/rspec.xml \
                               --format progress \
                               -- ${TESTFILES}
-      - run:
-          name: "eslint"
-          command: "yarn lint"
 
       - run:
           name: "Jest: Install junit coverage"
