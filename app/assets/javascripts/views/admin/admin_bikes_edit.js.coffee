@@ -1,3 +1,4 @@
+# TODO: Is this dead code?
 class BikeIndex.Views.AdminBikesEdit extends Backbone.View
   events:
     'click #frame-sizer button': 'updateFrameSize'

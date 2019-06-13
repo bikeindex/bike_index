@@ -106,6 +106,7 @@ $(document).ready ->
   else if document.getElementById('admin-content')
     new BikeIndex.Views.DataTables
     if document.getElementById('bike_edit_root_url')
+      # TODO: Is this dead code?
       new BikeIndex.Views.AdminBikesEdit
     else if document.getElementById('admin-locations-fields')
       new BikeIndex.Views.AdminOrganizationsEdit
@@ -123,4 +124,3 @@ $(document).ready ->
 
   if document.getElementById('multi_serial_search')
     new BikeIndex.Views.StolenMultiSerialSearch
-
