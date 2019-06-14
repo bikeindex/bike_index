@@ -37,7 +37,7 @@ class RakeDevConfiguration
     end
 
     def toggle_letter_opener
-      file = "tmp/noletter_opener.txt"
+      file = "tmp/skip-letter_opener.txt"
       FileUtils.mkdir_p("tmp")
 
       if File.exist?(file)
