@@ -6,13 +6,13 @@ class Admin::BaseController < ApplicationController
     @period = params[:period]
     case @period
     when "hour"
-      @start_time = Time.now - 1.hour
+      @start_time = Time.current - 1.hour
     when "day"
-      @start_time = Time.now - 1.day
+      @start_time = Time.current - 1.day
     when "month"
-      @start_time = Time.now - 30.days
+      @start_time = Time.current - 30.days
     when "year"
-      @start_time = Time.now - 1.year
+      @start_time = Time.current - 1.year
     when "all"
       if current_organization.present?
         @start_time = current_organization.created_at
@@ -21,8 +21,8 @@ class Admin::BaseController < ApplicationController
       end
     else
       @period = "week"
-      @start_time = Time.now - 7.days
+      @start_time = Time.current - 7.days
     end
-    @time_range = @start_time..Time.now
+    @time_range = @start_time..Time.current
   end
 end

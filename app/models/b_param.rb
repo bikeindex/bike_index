@@ -55,7 +55,7 @@ class BParam < ActiveRecord::Base
   end
 
   def self.with_organization_or_no_creator(toke) # Because organization embed bikes might not match the creator
-    without_bike.where("created_at >= ?", Time.now - 1.month).where(id_token: toke)
+    without_bike.where("created_at >= ?", Time.current - 1.month).where(id_token: toke)
       .detect { |b| b.creator_id.blank? || b.creation_organization_id.present? || b.params["creation_organization_id"].present? }
   end
 

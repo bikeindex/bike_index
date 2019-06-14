@@ -338,7 +338,7 @@ RSpec.describe HeaderTagHelper, type: :helper do
     end
     describe "show" do
       let(:action_name) { "show" }
-      let(:target_time) { (Time.now - 1.hour).utc }
+      let(:target_time) { (Time.current - 1.hour).utc }
       # Have to create user so it creates a path for the user
       let(:user) { FactoryBot.create(:user, name: "John", twitter: "stolenbikereg") }
       let(:blog) do

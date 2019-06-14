@@ -48,7 +48,7 @@ class StolenRecordUpdator
 
     stolen_record.attributes = permitted_attributes(sr)
 
-    stolen_record.date_stolen = TimeParser.parse(sr["date_stolen"], sr["timezone"]) || Time.now unless @date_stolen.present?
+    stolen_record.date_stolen = TimeParser.parse(sr["date_stolen"], sr["timezone"]) || Time.current unless @date_stolen.present?
 
     if sr["country"].present?
       country = Country.fuzzy_iso_find(sr["country"])
@@ -68,7 +68,7 @@ class StolenRecordUpdator
 
   def create_new_record
     mark_records_not_current
-    new_stolen_record = StolenRecord.new(bike: @bike, current: true, date_stolen: @date_stolen || Time.now)
+    new_stolen_record = StolenRecord.new(bike: @bike, current: true, date_stolen: @date_stolen || Time.current)
     new_stolen_record.phone = @bike.phone
     new_stolen_record.country_id = Country.united_states&.id
     stolen_record = update_with_params(new_stolen_record)

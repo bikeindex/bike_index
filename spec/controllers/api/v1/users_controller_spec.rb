@@ -135,7 +135,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
     end
 
     it "it untsvs a bike" do
-      t = Time.now - 1.minute
+      t = Time.current - 1.minute
       stolen_record = FactoryBot.create(:stolen_record, tsved_at: t)
       o = FactoryBot.create(:ownership, bike: stolen_record.bike)
       user = o.creator

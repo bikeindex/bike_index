@@ -57,7 +57,7 @@ class TsvCreator
   end
 
   def create_org_count(organization, start_date = nil)
-    start_date ||= Time.now.beginning_of_year
+    start_date ||= Time.current.beginning_of_year
     obikes = organization.bikes.where("bikes.created_at >= ?", start_date)
     out_file = File.join(Rails.root, "#{@file_prefix}org_count_bikes.tsv")
     output = File.open(out_file, "w")
@@ -69,7 +69,7 @@ class TsvCreator
   # Not tested. Needs to be tested and made useful before use
   # def create_org_total_count(organization, start_date=nil)
   #   return "organization has no location" unless organization.locations.present?
-  #   start_date ||= Time.now.beginning_of_year
+  #   start_date ||= Time.current.beginning_of_year
   #   obikes = organization.bikes.where("created_at >= ?", start_date)
   #   organization_bikes = obikes.count
   #   box = Geocoder::Calculations.bounding_box(organization.locations.first, 50)
@@ -125,10 +125,10 @@ class TsvCreator
   end
 
   def create_daily_tsvs
-    @file_prefix = "#{@file_prefix}#{Time.now.strftime("%Y_%-m_%-d")}_"
+    @file_prefix = "#{@file_prefix}#{Time.current.strftime("%Y_%-m_%-d")}_"
     create_stolen(true, stolen_records: StolenRecord.approveds.tsv_today)
     create_stolen_with_reports(true, stolen_records: StolenRecord.approveds_with_reports.tsv_today)
-    t = Time.now
+    t = Time.current
     StolenRecord.tsv_today.map { |sr| sr.update_attribute :tsved_at, t }
   end
 end

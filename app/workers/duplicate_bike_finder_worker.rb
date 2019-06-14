@@ -10,7 +10,7 @@ class DuplicateBikeFinderWorker
         where(normalized_serial_segments: { segment: serial_segment.segment }).first
       if existing_duplicate.present?
         serial_segment.update_attribute :duplicate_bike_group_id, existing_duplicate.id
-        existing_duplicate.update_attribute :added_bike_at, Time.now
+        existing_duplicate.update_attribute :added_bike_at, Time.current
       else
         duplicate_segments = NormalizedSerialSegment.where(segment: serial_segment.segment)
         if duplicate_segments.count > 1

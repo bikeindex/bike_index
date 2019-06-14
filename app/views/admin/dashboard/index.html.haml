@@ -17,7 +17,7 @@
         - today = Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count
         - yesterday = (Bike.where("created_at >= ?", Time.zone.now.beginning_of_day - 1.day).count) - today
         (#{number_with_delimiter(today)} today, #{number_with_delimiter(yesterday)} yesterday)
-    - bikes = [ { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count }, { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count }]
+    - bikes = [ { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.current).count }, { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.current).count }]
 
 = line_chart bikes
 

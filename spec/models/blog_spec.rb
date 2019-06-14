@@ -21,7 +21,7 @@ RSpec.describe Blog, type: :model do
   describe "set_title_slug" do
     it "makes the title 70 char long and character safe for params" do
       @user = FactoryBot.create(:user)
-      blog = Blog.new(title: "A really really really really loooooooooooooooooooooooooooooooooooong title that absolutely rocks so hard", body: "some things", user_id: @user.id, published_at: Time.now)
+      blog = Blog.new(title: "A really really really really loooooooooooooooooooooooooooooooooooong title that absolutely rocks so hard", body: "some things", user_id: @user.id, published_at: Time.current)
       blog.save
       expect(blog.title_slug).to eq("a-really-really-really-really-loooooooooooooooooooooooooooooooooooong")
     end
@@ -30,7 +30,7 @@ RSpec.describe Blog, type: :model do
   describe "update_title_save" do
     it "makes the title 70 char long and character safe for params" do
       @user = FactoryBot.create(:user)
-      blog = Blog.new(title: "A really really really really loooooooooooooooooooooooooooooooooooong title that absolutely rocks so hard", body: "some things", user_id: @user.id, published_at: Time.now)
+      blog = Blog.new(title: "A really really really really loooooooooooooooooooooooooooooooooooong title that absolutely rocks so hard", body: "some things", user_id: @user.id, published_at: Time.current)
       blog.save
       blog.title = "New Title"
       blog.update_title = "1"
@@ -43,7 +43,7 @@ RSpec.describe Blog, type: :model do
   describe "create_abbreviation" do
     it "makes the text 200 char long or less and remove any new lines" do
       @user = FactoryBot.create(:user)
-      blog = Blog.new(title: "Blog title", user_id: @user.id, published_at: Time.now)
+      blog = Blog.new(title: "Blog title", user_id: @user.id, published_at: Time.current)
       blog.body = "" "
       Lorem ipsum dolor sit amet! Consectetur adipisicing elit, sed do eiusmod
 
@@ -64,7 +64,7 @@ RSpec.describe Blog, type: :model do
 
     it "creates the body abbr from a listicle" do
       @user = FactoryBot.create(:user)
-      blog = Blog.create(title: "Blog title", user_id: @user.id, published_at: Time.now, body: "stuff", is_listicle: true)
+      blog = Blog.create(title: "Blog title", user_id: @user.id, published_at: Time.current, body: "stuff", is_listicle: true)
       Listicle.create(blog_id: blog.id, body: "View the link\n[here](http://something)\n\n<img class='post-image' src='https://files.bikeindex.org/uploads/Pu/1003/large_photo__6_.JPG' alt='Bike Index shirt and stickers'>\n![PBR, a bike bag and drawings](http://imgur.com/e4zzEjP.jpg) and also this")
       blog.reload.save
       expect(blog.reload.body_abbr).to eq("View the link here and also this")
@@ -74,7 +74,7 @@ RSpec.describe Blog, type: :model do
       # TODO: remove markdown images
       # Also, it would be cool if we could end on a word instead of in the middle of one...
       @user = FactoryBot.create(:user)
-      blog = Blog.new(title: "Blog title", user_id: @user.id, published_at: Time.now)
+      blog = Blog.new(title: "Blog title", user_id: @user.id, published_at: Time.current)
       blog.body = "View the link\n[here](http://something)\n\n<img class='post-image' src='https://files.bikeindex.org/uploads/Pu/1003/large_photo__6_.JPG' alt='Bike Index shirt and stickers'>\n![PBR, a bike bag and drawings](http://imgur.com/e4zzEjP.jpg) and also this"
       blog.save
       expect(blog.body_abbr).to eq("View the link here and also this")

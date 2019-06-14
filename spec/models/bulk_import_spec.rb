@@ -34,7 +34,7 @@ RSpec.describe BulkImport, type: :model do
   end
 
   describe "blocking_error?" do
-    let(:bulk_import) { BulkImport.new(import_errors: { line: [2, "dddd"] }.as_json, progress: "finished", created_at: Time.now - 1.month) }
+    let(:bulk_import) { BulkImport.new(import_errors: { line: [2, "dddd"] }.as_json, progress: "finished", created_at: Time.current - 1.month) }
     it "is be_falsey" do
       expect(bulk_import.blocking_error?).to be_falsey
     end
@@ -45,7 +45,7 @@ RSpec.describe BulkImport, type: :model do
       end
     end
     context "pending and more than a minute old" do
-      let(:bulk_import) { BulkImport.new(created_at: Time.now - 10.minutes, progress: "pending") }
+      let(:bulk_import) { BulkImport.new(created_at: Time.current - 10.minutes, progress: "pending") }
       it "is truthy" do
         # Fallback because we failed to parse it
         expect(bulk_import.blocking_error?).to be_truthy

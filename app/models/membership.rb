@@ -28,8 +28,8 @@ class Membership < ActiveRecord::Base
   end
 
   def update_relationships
-    user&.update_attributes(updated_at: Time.now)
-    organization&.update_attributes(updated_at: Time.now)
+    user&.update_attributes(updated_at: Time.current)
+    organization&.update_attributes(updated_at: Time.current)
   end
 
   def ensure_ambassador_tasks_assigned!

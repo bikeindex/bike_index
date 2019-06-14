@@ -19,9 +19,9 @@ class Invoice < ActiveRecord::Base
   scope :renewal_invoice, -> { where.not(first_invoice_id: nil) }
   scope :active, -> { where(is_active: true) }
   scope :inactive, -> { where(is_active: false) }
-  scope :current, -> { active.where("subscription_end_at > ?", Time.now) }
-  scope :expired, -> { where.not(subscription_start_at: nil).where("subscription_end_at < ?", Time.now) }
-  scope :should_expire, -> { where(is_active: true).where("subscription_end_at < ?", Time.now) }
+  scope :current, -> { active.where("subscription_end_at > ?", Time.current) }
+  scope :expired, -> { where.not(subscription_start_at: nil).where("subscription_end_at < ?", Time.current) }
+  scope :should_expire, -> { where(is_active: true).where("subscription_end_at < ?", Time.current) }
 
   attr_accessor :timezone
 
@@ -38,8 +38,8 @@ class Invoice < ActiveRecord::Base
   def renewal_invoice?; first_invoice_id.present? end
   def active?; is_active end # Alias - don't directly access the db attribute, because it might change
   def was_active?; expired? && force_active || subscription_start_at.present? && paid_in_full? end
-  def current?; active? && subscription_end_at > Time.now end
-  def expired?; subscription_end_at && subscription_end_at < Time.now end
+  def current?; active? && subscription_end_at > Time.current end
+  def expired?; subscription_end_at && subscription_end_at < Time.current end
   def should_expire?; is_active && expired? end # Use db attribute here, because that's what matters
   def discount_cents; feature_cost_cents - (amount_due_cents || 0) end
   def paid_in_full?; amount_paid_cents.present? && amount_due_cents.present? && amount_paid_cents >= amount_due_cents end
@@ -146,7 +146,7 @@ class Invoice < ActiveRecord::Base
   end
 
   def update_organization
-    organization.update_attributes(updated_at: Time.now)
-    organization.child_organizations.each { |o| o.update_attributes(updated_at: Time.now) }
+    organization.update_attributes(updated_at: Time.current)
+    organization.child_organizations.each { |o| o.update_attributes(updated_at: Time.current) }
   end
 end

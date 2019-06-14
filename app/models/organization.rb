@@ -241,7 +241,7 @@ class Organization < ActiveRecord::Base
   end
 
   def calculated_pos_kind
-    recent_bikes = bikes.where(created_at: (Time.now - 1.week)..Time.now)
+    recent_bikes = bikes.where(created_at: (Time.current - 1.week)..Time.current)
     return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
     return "ascend_pos" if recent_bikes.ascend_pos.count > 0
     return "other_pos" if recent_bikes.any_pos.count > 0

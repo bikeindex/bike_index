@@ -79,7 +79,7 @@ RSpec.describe "Bikes API V2", type: :request do
   describe "all_stolen" do
     it "returns the cached file" do
       FactoryBot.create(:stolen_bike)
-      t = Time.now.to_i
+      t = Time.current.to_i
       CacheAllStolenWorker.new.perform
       cached_all_stolen = FileCacheMaintainer.cached_all_stolen
       expect(cached_all_stolen["updated_at"].to_i).to be >= t

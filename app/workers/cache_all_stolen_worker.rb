@@ -22,7 +22,7 @@ class CacheAllStolenWorker
   end
 
   def filename
-    @filename ||= "#{file_prefix}#{Time.now.to_i}_all_stolen_cache.json"
+    @filename ||= "#{file_prefix}#{Time.current.to_i}_all_stolen_cache.json"
   end
 
   def tmp_path

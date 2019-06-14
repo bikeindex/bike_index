@@ -361,7 +361,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.reload.year).to eq(params[:year])
       expect(bike.serial_number).to eq(serial)
       expect(bike.stolen).to be_truthy
-      expect(bike.current_stolen_record.date_stolen.to_i).to be > Time.now.to_i - 10
+      expect(bike.current_stolen_record.date_stolen.to_i).to be > Time.current.to_i - 10
       expect(bike.current_stolen_record.police_report_number).to eq("999999")
     end
 

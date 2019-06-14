@@ -14,7 +14,7 @@ class RecoveryDisplay < ActiveRecord::Base
     if date_input.present?
       self.date_recovered = DateTime.strptime("#{date_input} 06", "%m-%d-%Y %H")
     end
-    self.date_recovered = Time.now unless date_recovered.present?
+    self.date_recovered = Time.current unless date_recovered.present?
   end
 
   validate :quote_not_too_long

@@ -47,7 +47,7 @@ RSpec.describe StolenRecord, type: :model do
       expect(StolenRecord.recovery_unposted.to_sql).to eq(StolenRecord.unscoped.where(current: false, recovery_posted: false).to_sql)
     end
     it "scopes tsv_today" do
-      stolen1 = FactoryBot.create(:stolen_record, current: true, tsved_at: Time.now)
+      stolen1 = FactoryBot.create(:stolen_record, current: true, tsved_at: Time.current)
       stolen2 = FactoryBot.create(:stolen_record, current: true, tsved_at: nil)
 
       expect(StolenRecord.tsv_today.pluck(:id)).to eq([stolen1.id, stolen2.id])
@@ -131,8 +131,8 @@ RSpec.describe StolenRecord, type: :model do
       let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
       let(:bike) { stolen_record.bike }
       it "is waiting on decision when user marks that we can share" do
-        bike.reload.update_attributes(updated_at: Time.now)
-        stolen_record.reload.update_attributes(updated_at: Time.now)
+        bike.reload.update_attributes(updated_at: Time.current)
+        stolen_record.reload.update_attributes(updated_at: Time.current)
         expect(stolen_record.bike.thumb_path).to be_present
         expect(stolen_record.can_share_recovery).to be_truthy
         expect(stolen_record.recovery_display_status).to eq "waiting_on_decision"
@@ -149,14 +149,14 @@ RSpec.describe StolenRecord, type: :model do
       let(:recovery_display) { FactoryBot.create(:recovery_display) }
       let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true, recovery_display: recovery_display) }
       it "is displayed" do
-        stolen_record.reload.update_attributes(updated_at: Time.now)
+        stolen_record.reload.update_attributes(updated_at: Time.current)
         expect(stolen_record.recovery_display_status).to eq "displayed"
       end
     end
     context "stolen_record is not_displayed" do
       let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, recovery_display_status: "not_displayed", can_share_recovery: true) }
       it "is not_displayed" do
-        stolen_record.reload.update_attributes(updated_at: Time.now)
+        stolen_record.reload.update_attributes(updated_at: Time.current)
         expect(stolen_record.recovery_display_status).to eq "not_displayed"
       end
     end
@@ -220,30 +220,30 @@ RSpec.describe StolenRecord, type: :model do
     end
     it "it should set the year to the past year if the date hasn't happened yet" do
       stolen_record = FactoryBot.create(:stolen_record)
-      next_year = (Time.now + 2.months)
+      next_year = (Time.current + 2.months)
       stolen_record.date_stolen = next_year
       stolen_record.fix_date
-      expect(stolen_record.date_stolen.year).to eq(Time.now.year - 1)
+      expect(stolen_record.date_stolen.year).to eq(Time.current.year - 1)
     end
   end
 
   describe "update_tsved_at" do
     it "does not reset on save" do
-      t = Time.now - 1.minute
+      t = Time.current - 1.minute
       stolen_record = FactoryBot.create(:stolen_record, tsved_at: t)
       stolen_record.update_attributes(theft_description: "Something new description wise")
       stolen_record.reload
       expect(stolen_record.tsved_at.to_i).to eq(t.to_i)
     end
     it "resets from an update to police report" do
-      t = Time.now - 1.minute
+      t = Time.current - 1.minute
       stolen_record = FactoryBot.create(:stolen_record, tsved_at: t)
       stolen_record.update_attributes(police_report_number: "89dasf89dasf")
       stolen_record.reload
       expect(stolen_record.tsved_at).to be_nil
     end
     it "resets from an update to police report department" do
-      t = Time.now - 1.minute
+      t = Time.current - 1.minute
       stolen_record = FactoryBot.create(:stolen_record, tsved_at: t)
       stolen_record.update_attributes(police_report_department: "CPD")
       stolen_record.reload
@@ -270,7 +270,7 @@ RSpec.describe StolenRecord, type: :model do
       let(:bike) { stolen_record.bike }
       it "returns waiting_on_decision" do
         bike.reload
-        bike.update_attributes(updated_at: Time.now)
+        bike.update_attributes(updated_at: Time.current)
         expect(stolen_record.calculated_recovery_display_status).to eq "waiting_on_decision"
       end
     end
@@ -322,7 +322,7 @@ RSpec.describe StolenRecord, type: :model do
     context "no date_recovered, no user" do
       let(:recovery_request) { recovery_info.except(:can_share_recovery) }
       it "updates recovered bike" do
-        expect(stolen_record.date_recovered).to be_within(1.second).of Time.now
+        expect(stolen_record.date_recovered).to be_within(1.second).of Time.current
         expect(stolen_record.recovering_user).to be_blank
         expect(stolen_record.recovering_user_owner?).to be_falsey
       end
@@ -333,7 +333,7 @@ RSpec.describe StolenRecord, type: :model do
       let(:user_id) { ownership.user_id }
       it "updates recovered bike and assigns recovering_user" do
         expect(stolen_record.recovering_user).to eq ownership.user
-        expect(stolen_record.date_recovered).to be_within(1.second).of Time.now
+        expect(stolen_record.date_recovered).to be_within(1.second).of Time.current
         expect(stolen_record.recovering_user_owner?).to be_truthy
         expect(stolen_record.pre_recovering_user?).to be_falsey
       end

@@ -71,7 +71,7 @@ Rails.application.configure do
   # config.action_view.raise_on_missing_translations = true
 
   # Make sure we reload the API after every request!
-  @last_api_change = Time.now
+  @last_api_change = Time.current
   api_reloader = ActiveSupport::FileUpdateChecker.new(Dir["#{Rails.root}/app/controllers/api/v2/**/*.rb"]) do |reloader|
     times = Dir["#{Rails.root}/app/api/**/*.rb"].map { |f| File.mtime(f) }
     files = Dir["#{Rails.root}/app/api/**/*.rb"].map { |f| f }

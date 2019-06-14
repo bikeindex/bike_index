@@ -7,7 +7,7 @@ class RemoveExpiredFileCacheWorker
   end
 
   def expired_file_hashes
-    expiration = (Time.now - 2.days).to_i
+    expiration = (Time.current - 2.days).to_i
     FileCacheMaintainer.files.select do |file|
       file["updated_at"].to_i < expiration
     end

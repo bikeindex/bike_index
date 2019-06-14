@@ -28,7 +28,7 @@ class ScheduledWorkerRunner < ScheduledWorker
     redis { |r| r.hget HISTORY_KEY, record_key(worker_string, record) }
   end
 
-  def self.write_worker_history(worker_string, record, value = Time.now)
+  def self.write_worker_history(worker_string, record, value = Time.current)
     redis { |r| r.hset HISTORY_KEY, record_key(worker_string, record), value }
   end
 

@@ -48,6 +48,6 @@ class MailSnippet < ActiveRecord::Base
   def update_organization
     # Because we need to update the organization and make sure mail snippet calculations are included
     # Manually update to ensure that it runs the before save stuff
-    organization && organization.update_attributes(updated_at: Time.now)
+    organization && organization.update_attributes(updated_at: Time.current)
   end
 end

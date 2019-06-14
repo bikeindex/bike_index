@@ -138,7 +138,7 @@ RSpec.describe OrganizedMailer, type: :mailer do
       end
       context "non-new (pre-existing ownership)" do
         let(:bike) { FactoryBot.create(:bike, creation_organization: organization) }
-        let(:pre_existing_ownership) { FactoryBot.create(:ownership, bike: bike, created_at: Time.now - 1.minute) }
+        let(:pre_existing_ownership) { FactoryBot.create(:ownership, bike: bike, created_at: Time.current - 1.minute) }
         before do
           expect(pre_existing_ownership).to be_present
         end

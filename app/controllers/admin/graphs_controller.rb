@@ -62,9 +62,9 @@ class Admin::GraphsController < Admin::BaseController
     bikes = Bike.unscoped
     case params[:start_at]
     when "past_year"
-      range = 1.year.ago.midnight..Time.now
+      range = 1.year.ago.midnight..Time.current
     else
-      range ||= bike_index_start..Time.now
+      range ||= bike_index_start..Time.current
     end
     bgraph = [
       { name: "Registrations", data: bikes.group_by_month(:created_at, range: range).count },
@@ -113,7 +113,7 @@ class Admin::GraphsController < Admin::BaseController
   def set_variable_graphing_timing
     @timezone = TimeParser.parse_timezone(params[:timezone] || "America/Los_Angeles")
     @start_at = params[:start_at].present? ? TimeParser.parse(params[:start_at], @timezone) : bike_index_start
-    @end_at = params[:end_at].present? ? TimeParser.parse(params[:end_at], @timezone) : Time.now
+    @end_at = params[:end_at].present? ? TimeParser.parse(params[:end_at], @timezone) : Time.current
     @group_period = calculated_group_period(@start_at, @end_at)
   end
 

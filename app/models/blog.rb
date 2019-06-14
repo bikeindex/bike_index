@@ -42,7 +42,7 @@ class Blog < ActiveRecord::Base
   end
 
   def set_calculated_attributes
-    self.published_at ||= Time.now # We need to have a published time...
+    self.published_at ||= Time.current # We need to have a published time...
     set_published_at_and_published
     update_title_save
     create_abbreviation
@@ -53,7 +53,7 @@ class Blog < ActiveRecord::Base
     if self.post_date.present?
       self.published_at = TimeParser.parse(post_date, timezone)
     end
-    self.published_at = Time.now if self.post_now == "1"
+    self.published_at = Time.current if self.post_now == "1"
     if self.user_email.present?
       u = User.fuzzy_email_find(user_email)
       self.user_id = u.id if u.present?

@@ -32,7 +32,7 @@ class FileCacheMaintainer
     end
 
     def update_file_info(filename, updated_at = nil)
-      updated_at ||= Time.now
+      updated_at ||= Time.current
       begin
         redis.hset info_id, filename, updated_at.to_i
       rescue

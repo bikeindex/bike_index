@@ -4,7 +4,7 @@ RSpec.describe FileCacheMaintainer do
   describe "cached_all_stolen" do
     it "returns the most recent all_stolen" do
       FileCacheMaintainer.update_file_info("1456863086_all_stolen_cache.json", 1456863086)
-      t = Time.now.to_i
+      t = Time.current.to_i
       FileCacheMaintainer.update_file_info("#{t}_all_stolen_cache.json", t)
       target = {
         "path" => "#{t}_all_stolen_cache.json",
@@ -38,7 +38,7 @@ RSpec.describe FileCacheMaintainer do
 
   describe "tsv info" do
     it "updates tsv info and returns with indifferent access" do
-      t = Time.now
+      t = Time.current
       FileCacheMaintainer.reset_file_info("current_stolen_bikes.tsv", t)
       tsv = FileCacheMaintainer.files[0]
       expect(tsv[:updated_at]).to eq(t.to_i.to_s)
@@ -48,16 +48,16 @@ RSpec.describe FileCacheMaintainer do
     end
 
     it "returns the way we want - dailys after non daily" do
-      t = Time.now
+      t = Time.current
       FileCacheMaintainer.reset_file_info("https://files.bikeindex.org/uploads/tsvs/approved_current_stolen_bikes.tsv", t)
       FileCacheMaintainer.update_file_info("https://files.bikeindex.org/uploads/tsvs/current_stolen_bikes.tsv")
-      FileCacheMaintainer.update_file_info("https://files.bikeindex.org/uploads/tsvs/#{Time.now.strftime("%Y_%-m_%-d")}_approved_current_stolen_bikes.tsv")
-      FileCacheMaintainer.update_file_info("https://files.bikeindex.org/uploads/tsvs/#{Time.now.strftime("%Y_%-m_%-d")}_current_stolen_bikes.tsv")
+      FileCacheMaintainer.update_file_info("https://files.bikeindex.org/uploads/tsvs/#{Time.current.strftime("%Y_%-m_%-d")}_approved_current_stolen_bikes.tsv")
+      FileCacheMaintainer.update_file_info("https://files.bikeindex.org/uploads/tsvs/#{Time.current.strftime("%Y_%-m_%-d")}_current_stolen_bikes.tsv")
       FileCacheMaintainer.files.each_with_index do |file, index|
         if index < 2
           expect(["approved_current_stolen_bikes.tsv", "current_stolen_bikes.tsv"].include?(file[:filename])).to be_truthy
         else
-          expect(["#{Time.now.strftime("%Y_%-m_%-d")}_approved_current_stolen_bikes.tsv", "#{Time.now.strftime("%Y_%-m_%-d")}_current_stolen_bikes.tsv"].include?(file[:filename])).to be_truthy
+          expect(["#{Time.current.strftime("%Y_%-m_%-d")}_approved_current_stolen_bikes.tsv", "#{Time.current.strftime("%Y_%-m_%-d")}_current_stolen_bikes.tsv"].include?(file[:filename])).to be_truthy
         end
       end
     end

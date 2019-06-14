@@ -282,7 +282,7 @@ RSpec.describe User, type: :model do
       expect(user.username).to be_present
       expect(user.confirmation_token).to be_present
       time = Time.at(user.auth_token.match(/\d*\z/)[0].to_i)
-      expect(time).to be > Time.now - 1.minutes
+      expect(time).to be > Time.current - 1.minutes
     end
     it "haves before create callback" do
       expect(User._create_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:generate_username_confirmation_and_auth)).to eq(true)
@@ -320,12 +320,12 @@ RSpec.describe User, type: :model do
     it "gets the time" do
       user = User.new
       user.set_password_reset_token
-      expect(user.reset_token_time).to be > Time.now - 2.seconds
+      expect(user.reset_token_time).to be > Time.current - 2.seconds
     end
     it "uses input time" do
       user = FactoryBot.create(:user)
-      user.set_password_reset_token((Time.now - 61.minutes).to_i)
-      expect(user.reload.reset_token_time).to be < (Time.now - 1.hours)
+      user.set_password_reset_token((Time.current - 61.minutes).to_i)
+      expect(user.reload.reset_token_time).to be < (Time.current - 1.hours)
     end
   end
 
@@ -380,11 +380,11 @@ RSpec.describe User, type: :model do
         expect(user.render_donation_request).to be_nil
         expect(user.send_unstolen_notifications?).to be_falsey
         invoice.update_attributes(paid_feature_ids: [paid_feature.id])
-        organization.update_attributes(updated_at: Time.now) # TODO: Rails 5 update, after_commit
+        organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update, after_commit
         expect(organization.bike_actions?).to be_truthy
         expect(Organization.bike_actions.pluck(:id)).to eq([organization.id])
         # Also, it bubbles up. BUT TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
-        user.update_attributes(updated_at: Time.now)
+        user.update_attributes(updated_at: Time.current)
         user.reload
         expect(user.send_unstolen_notifications?).to be_truthy
       end

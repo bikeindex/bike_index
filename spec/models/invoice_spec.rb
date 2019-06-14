@@ -14,7 +14,7 @@ RSpec.describe Invoice, type: :model do
 
   describe "set_calculated_attributes" do
     context "expired paid_in_full" do
-      let(:invoice) { Invoice.new(subscription_start_at: Time.now.yesterday - 1.year, amount_due: 0) }
+      let(:invoice) { Invoice.new(subscription_start_at: Time.current.yesterday - 1.year, amount_due: 0) }
       it "is not active" do
         invoice.set_calculated_attributes
         expect(invoice.expired?).to be_truthy
@@ -25,7 +25,7 @@ RSpec.describe Invoice, type: :model do
   end
 
   describe "previous_invoice" do
-    let(:invoice) { FactoryBot.create(:invoice, start_at: Time.now - 4.years, force_active: true) }
+    let(:invoice) { FactoryBot.create(:invoice, start_at: Time.current - 4.years, force_active: true) }
     let(:invoice2) { invoice.create_following_invoice }
     let(:invoice3) { invoice2.create_following_invoice }
     it "returns correct invoices" do
@@ -36,10 +36,10 @@ RSpec.describe Invoice, type: :model do
       expect(invoice2.active?).to be_falsey
       expect(invoice2.was_active?).to be_truthy
       expect(invoice3.subscription_first_invoice).to eq invoice
-      expect(invoice2.subscription_start_at).to be_within(1.minute).of Time.now - 3.years
+      expect(invoice2.subscription_start_at).to be_within(1.minute).of Time.current - 3.years
       expect(invoice2.renewal_invoice?).to be_truthy
       expect(invoice2.previous_invoice).to eq invoice
-      expect(invoice3.subscription_start_at).to be_within(1.minute).of Time.now - 2.years
+      expect(invoice3.subscription_start_at).to be_within(1.minute).of Time.current - 2.years
       expect(invoice3.previous_invoice).to eq invoice2
     end
   end
@@ -54,7 +54,7 @@ RSpec.describe Invoice, type: :model do
       end
     end
     context "with active invoice" do
-      let(:invoice) { FactoryBot.create(:invoice, subscription_start_at: Time.now - 4.years, force_active: true) }
+      let(:invoice) { FactoryBot.create(:invoice, subscription_start_at: Time.current - 4.years, force_active: true) }
       let(:paid_feature) { FactoryBot.create(:paid_feature, kind: "standard") }
       let(:paid_feature_one_time) { FactoryBot.create(:paid_feature_one_time) }
       it "returns invoice" do
@@ -75,7 +75,7 @@ RSpec.describe Invoice, type: :model do
   end
 
   describe "paid_feature_ids" do
-    let(:invoice) { FactoryBot.create(:invoice, amount_due_cents: nil, subscription_start_at: Time.now - 1.week) }
+    let(:invoice) { FactoryBot.create(:invoice, amount_due_cents: nil, subscription_start_at: Time.current - 1.week) }
     let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 100_000) }
     let(:paid_feature2) { FactoryBot.create(:paid_feature) }
     let(:paid_feature_one_time) { FactoryBot.create(:paid_feature_one_time, name: "one Time Feature") }
@@ -94,7 +94,7 @@ RSpec.describe Invoice, type: :model do
       invoice.reload
       expect(invoice.paid_features.pluck(:id)).to match_array([paid_feature2.id, paid_feature_one_time.id])
       # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
-      organization.update_attributes(updated_at: Time.now)
+      organization.update_attributes(updated_at: Time.current)
       organization.reload
       expect(organization.paid_feature_slugs).to eq([])
     end
@@ -103,17 +103,17 @@ RSpec.describe Invoice, type: :model do
   describe "two invoices" do
     let(:paid_feature1) { FactoryBot.create(:paid_feature, feature_slugs: ["bike_search"]) }
     let(:paid_feature2) { FactoryBot.create(:paid_feature, feature_slugs: ["reg_secondary_serial"]) }
-    let(:invoice1) { FactoryBot.create(:invoice, amount_due_cents: 0, subscription_start_at: Time.now - 1.week) }
+    let(:invoice1) { FactoryBot.create(:invoice, amount_due_cents: 0, subscription_start_at: Time.current - 1.week) }
     let(:organization) { invoice1.organization }
-    let(:invoice2) { FactoryBot.build(:invoice, amount_due_cents: 0, subscription_start_at: Time.now - 1.day, organization: organization) }
+    let(:invoice2) { FactoryBot.build(:invoice, amount_due_cents: 0, subscription_start_at: Time.current - 1.day, organization: organization) }
     it "adds the paid features" do
       invoice1.update_attributes(paid_feature_ids: [paid_feature1.id])
       # TODO: Rails 5 update
-      organization.update_attributes(updated_at: Time.now)
+      organization.update_attributes(updated_at: Time.current)
       expect(organization.paid_feature_slugs).to eq(["bike_search"])
       invoice2.save
       invoice2.update_attributes(paid_feature_ids: [paid_feature2.id])
-      organization.update_attributes(updated_at: Time.now)
+      organization.update_attributes(updated_at: Time.current)
       expect(organization.paid_feature_slugs).to match_array %w[bike_search reg_secondary_serial]
     end
   end

@@ -38,7 +38,7 @@ class StolenRecord < ActiveRecord::Base
   scope :approveds, -> { where(approved: true) }
   scope :approveds_with_reports, -> { approveds.where("police_report_number IS NOT NULL").where("police_report_department IS NOT NULL") }
   scope :not_tsved, -> { where("tsved_at IS NULL") }
-  scope :tsv_today, -> { where("tsved_at IS NULL OR tsved_at >= '#{Time.now.beginning_of_day}'") }
+  scope :tsv_today, -> { where("tsved_at IS NULL OR tsved_at >= '#{Time.current.beginning_of_day}'") }
 
   scope :recovered, -> { unscoped.where(current: false).order("date_recovered desc") }
   scope :displayable, -> { recovered.where(can_share_recovery: true) }
@@ -126,13 +126,13 @@ class StolenRecord < ActiveRecord::Base
 
   def fix_date
     year = date_stolen.year
-    if date_stolen.year < (Time.now - 100.years).year
+    if date_stolen.year < (Time.current - 100.years).year
       decade = year.to_s.chars.last(2).join("")
       corrected = date_stolen.change(year: "20#{decade}".to_i)
       self.date_stolen = corrected
     end
-    if date_stolen > Time.now + 2.days
-      corrected = date_stolen.change(year: Time.now.year - 1)
+    if date_stolen > Time.current + 2.days
+      corrected = date_stolen.change(year: Time.current.year - 1)
       self.date_stolen = corrected
     end
   end
@@ -198,7 +198,7 @@ class StolenRecord < ActiveRecord::Base
 
   def add_recovery_information(info = {})
     info = ActiveSupport::HashWithIndifferentAccess.new(info)
-    self.date_recovered = TimeParser.parse(info[:date_recovered], info[:timezone]) || Time.now
+    self.date_recovered = TimeParser.parse(info[:date_recovered], info[:timezone]) || Time.current
     update_attributes(current: false,
                       recovered_description: info[:recovered_description],
                       recovering_user_id: info[:recovering_user_id],

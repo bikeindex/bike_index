@@ -110,7 +110,7 @@ class BikeCode < ActiveRecord::Base
       unclaim!
     elsif claiming_bike.present?
       self.previous_bike_id = bike_id || previous_bike_id # Don't erase previous_bike_id if double unclaiming
-      update(bike_id: claiming_bike.id, user_id: user.id, claimed_at: Time.now) unless errors.any?
+      update(bike_id: claiming_bike.id, user_id: user.id, claimed_at: Time.current) unless errors.any?
     else
       errors.add(:bike, "\"#{bike_str}\" not found")
     end
@@ -121,11 +121,11 @@ class BikeCode < ActiveRecord::Base
   def update_associations
     if bike_id.present?
       found_b = Bike.where(id: bike_id).first
-      found_b&.update_attributes(updated_at: Time.now)
+      found_b&.update_attributes(updated_at: Time.current)
     end
     if previous_bike_id.present?
       found_previous_b = Bike.where(id: previous_bike_id).first
-      found_previous_b&.update_attributes(updated_at: Time.now)
+      found_previous_b&.update_attributes(updated_at: Time.current)
     end
   end
 

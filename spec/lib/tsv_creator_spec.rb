@@ -43,7 +43,7 @@ RSpec.describe TsvCreator do
       expect(tsv_creator).to receive(:create_stolen).with(true, stolen_records: StolenRecord.approveds.tsv_today)
 
       tsv_creator.create_daily_tsvs
-      expect(tsv_creator.file_prefix).to eq("/spec/fixtures/tsv_creation/#{Time.now.year}_#{Time.now.month}_#{Time.now.day}_")
+      expect(tsv_creator.file_prefix).to eq("/spec/fixtures/tsv_creation/#{Time.current.year}_#{Time.current.month}_#{Time.current.day}_")
       stolen_record.reload
       expect(stolen_record.tsved_at).to be_present
     end

@@ -36,7 +36,7 @@ RSpec.describe "Me API V3", type: :request do
     end
 
     context "unconfirmed user" do
-      let(:time) { Time.now - 1.month }
+      let(:time) { Time.current - 1.month }
       let(:user) { FactoryBot.create(:user, created_at: time) }
       it "responds with unauthorized" do
         user.reload

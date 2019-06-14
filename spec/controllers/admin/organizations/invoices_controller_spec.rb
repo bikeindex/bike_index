@@ -32,7 +32,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
         expect(response).to render_template(:new)
       end
       context "passed end_at" do
-        let(:end_at) { Time.now + 10.years }
+        let(:end_at) { Time.current + 10.years }
         it "renders, includes end_at" do
           get :new, organization_id: organization.to_param, end_at: end_at.to_i
           expect(response.status).to eq(200)
@@ -56,7 +56,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
           post :create, organization_id: organization.to_param, invoice: params
         end.to change(Invoice, :count).by 1
         # TODO: Rails 5 update
-        organization.update_attributes(updated_at: Time.now)
+        organization.update_attributes(updated_at: Time.current)
         invoice = organization.invoices.last
         expect(invoice.active?).to be_falsey
         expect(organization.is_paid).to be_falsey
@@ -73,7 +73,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
             post :create, organization_id: organization.to_param, invoice: params.merge(amount_due: "0", end_at: "2020-09-05T23:00:00")
           end.to change(Invoice, :count).by 1
           # TODO: Rails 5 update
-          organization.update_attributes(updated_at: Time.now)
+          organization.update_attributes(updated_at: Time.current)
           invoice = organization.invoices.last
           expect(invoice.active?).to be_truthy
           expect(organization.is_paid).to be_truthy
@@ -105,7 +105,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
         expect(invoice.notes).to eq params[:notes]
       end
       context "create_following_invoice" do
-        let!(:invoice) { FactoryBot.create(:invoice, organization: organization, subscription_start_at: Time.now - 2.years, force_active: true) }
+        let!(:invoice) { FactoryBot.create(:invoice, organization: organization, subscription_start_at: Time.current - 2.years, force_active: true) }
         it "creates following invoice" do
           expect do
             put :update, organization_id: organization.to_param, id: invoice.to_param, create_following_invoice: true
