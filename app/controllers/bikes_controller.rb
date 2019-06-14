@@ -231,8 +231,8 @@ class BikesController < ApplicationController
     {}.with_indifferent_access.tap do |h|
       h[:theft_details] = "Recovery details" if @bike.recovered?
       h[:theft_details] = "Theft details" unless @bike.recovered?
-      h[:publicize] = "Publicize Theft" if Flipper.enabled?(:premium_listings)
-      h[:alert] = "Activate Bike Index Alert" if Flipper.enabled?(:premium_listings)
+      h[:publicize] = "Publicize Theft" if Flipper.enabled?(:premium_listings, current_user)
+      h[:alert] = "Activate Bike Index Alert" if Flipper.enabled?(:premium_listings, current_user)
       h[:report_recovered] = "Mark this Bike Recovered" unless @bike.recovered?
     end
   end
