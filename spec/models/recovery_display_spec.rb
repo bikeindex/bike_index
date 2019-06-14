@@ -1,6 +1,13 @@
 require "rails_helper"
 
 RSpec.describe RecoveryDisplay, type: :model do
+  describe "stolen_record" do
+    let!(:recovery_display) { FactoryBot.create(:recovery_display_with_stolen_record) }
+    it "finds the stolen_record" do
+      recovery_display.reload
+      expect(recovery_display.stolen_record).to be_present
+    end
+  end
   describe "set_time" do
     it "sets time from input" do
       recovery_display = RecoveryDisplay.new(date_input: "04-27-1999")
