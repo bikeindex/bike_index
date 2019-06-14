@@ -253,6 +253,10 @@ class User < ActiveRecord::Base
     ows.reject(&:blank?)
   end
 
+  def flipper_id
+    "#{self.class.name}:#{id}"
+  end
+
   def current_subscription
     subscriptions.current.first
   end
