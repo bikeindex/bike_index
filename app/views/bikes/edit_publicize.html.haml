@@ -1,1 +1,17 @@
-%h3 Publicize Theft
+/ Integrates with app/assets/javascripts/revised/pages/bikes/edit_stolen.coffee
+= form_for @bike, multipart: true, html: { class: "primary-edit-bike-form stolenEditPage" } do |f|
+  = f.hidden_field :stolen
+
+  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+    .row
+      = render partial: "/bikes/edit_primary_menu"
+
+      .col-md-8.form-well#form_well_wrap
+        .form-wrap
+          .form-well-form-header
+            / Publicize Theft
+            %h3= @edit_templates[@edit_template]
+          .no-divider-row.full-width-button
+            = link_to "Press this button!", "",   |
+              class: "btn btn-success btn-lg",    |
+              data: {toggle: "modal", target: "#open-modal"}
