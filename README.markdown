@@ -76,10 +76,13 @@ We use [RSpec](https://github.com/rspec/rspec) and
 
 ### Running tests in parallel
 
-We use [`parallel_tests`][] to run the test suite in parallel.
+We use [`parallel_tests`][] to run the test suite in parallel - run with `bin/rake parallel:spec`
+
 
 - Run `bin/rake parallel:prepare` to synchronize the test db schema after migrations (rather than `db:test:prepare`).
+
 - Run specific files or test directories with `bin/parallel_rspec <FILES_OR_FOLDERS>`
+
 - Run Guard with parallelism `bin/guard -G Guardfile_parallel`
 
 By default, `parallel_tests` spawns one process per CPU in your computer (which is a sensible default). You can optionally set the
