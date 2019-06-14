@@ -39,24 +39,17 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 This explanation assumes you're familiar with developing Ruby on Rails applications.
 
-- `bundle install` install ruby gems
-
-- `yarn install` install js packages
-
-- `bin/rake db:setup` create and seed your database
-
-- `bin/rake seed_test_users_and_bikes` to:
-  - Add the three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `please12`)
-  - Give user@example.com 50 bikes
+- `bin/setup` sets up the application and seeds:
+  - Three test user accounts: admin@example.com, member@example.com, user@example.com (all have password `please12`)
+  - Gives user@example.com 50 bikes
 
 - `./start` start the server.
 
-  - [start](start) is a bash script. It starts redis in the background and runs foreman with the [dev procfile](Procfile_development). If you need/prefer something else, do that
+  - [start](start) is a bash script. It starts redis in the background and runs foreman with the [dev procfile](Procfile_development). If you need/prefer something else, do that. If you want to use [Pow](http://pow.cx/) (or some other setup that isn't through localhost:3001), change the appropriate values in [session_store.rb](config/initializers/session_store.rb) and [.env](.env)
 
 - Go to [localhost:3001](http://localhost:3001)
 
-  - if you want to use [Pow](http://pow.cx/) (or some other setup that isn't through localhost:3001), change the appropriate values in [session_store.rb](config/initializers/session_store.rb) and [.env](.env).
-
+**Additional options:**
 
 Toggle Spring with `rake dev:spring` (defaults to disabled)
 
