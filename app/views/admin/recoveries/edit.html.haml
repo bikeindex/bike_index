@@ -64,19 +64,31 @@
         Recovery Description
       .card-body
         = @recovery.recovered_description
-%h2
-  - if @recovery.recovery_display.present?
-    = link_to "Recovery displayed", edit_admin_recovery_display_url(@recovery.recovery_display)
-  - else
-    - if @recovery.recovery_posted
-      Recovery posted
+/ %h2
+/   - if @recovery.recovery_display.present?
+/     = link_to "Recovery displayed", edit_admin_recovery_display_url(@recovery.recovery_display)
+/   - else
+/     - if @recovery.recovery_posted
+/       Recovery posted
 
+/   - if @recovery.can_share_recovery == true
+/     = link_to 'Share recovery', approve_admin_recoveries_url(id: @recovery.id), method: :post, confirm: "Approval will\n\n- Send out a tweet\n- And post to facebook.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
+/   - else
+/     = link_to 'Post recovery (no share)', approve_admin_recoveries_url(id: @recovery.id), method: :post, class: 'button-blue padded'
 
-  / - elsif @recovery.can_share_recovery == true
-  /   = link_to 'Share recovery', approve_admin_recoveries_url(id: @recovery.id), method: :post, confirm: "Approval will\n\n- Send out a tweet\n- And post to facebook.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
-  / - else
-  /   = link_to 'Post recovery (no share)', approve_admin_recoveries_url(id: @recovery.id), method: :post, class: 'button-blue padded'
-
+.row
+  .col-md-6
+    - if @recovery.displayed?
+      %h2
+        = link_to "Recovery displayed", edit_admin_recovery_display_url(@recovery.recovery_display)
+  .col-md-3
+    - if !@recovery.displayed?
+      = link_to 'Share recovery', new_admin_recovery_display_path(@recovery), class: 'btn btn-primary'
+  .col-md-3
+    - if !@recovery.not_displayed?
+      = button_to "Not Displayable", admin_recovery_path(id: @recovery.id, stolen_record: {is_not_displayable: true}), method: :put, class: "btn btn-warning"
+    - else
+      = button_to "Mark Eligible for display", admin_recovery_path(id: @recovery.id, stolen_record: {mark_as_eligible: true}), method: :put, class: "btn btn-success"
 %hr
 - url = {action: "update", controller: "recoveries"}
 .row
@@ -92,14 +104,6 @@
       .form-group
         = f.label :can_share_recovery
         = f.check_box :can_share_recovery
-      - if @recovery.not_displayed?
-        .form-group
-          = label :mark_as_eligible, "eligible"
-          = check_box "mark_as_eligible", "eligible"
-      - else
-        .form-group
-          = label :is_not_displayable, "undisplayable"
-          = check_box "is_not_displayable", "undisplayable"
       = submit_tag "Update the recovery", class: "btn btn-success"
 
 

@@ -20,9 +20,9 @@ class Admin::RecoveriesController < Admin::BaseController
 
   def update
     @stolen_record = StolenRecord.unscoped.find(params[:id])
-    if params[:is_not_displayable].present?
+    if params[:stolen_record][:is_not_displayable].present?
       @stolen_record.recovery_display_status = "not_displayed"
-    elsif params[:mark_as_eligible].present?
+    elsif params[:stolen_record][:mark_as_eligible].present?
       @stolen_record.recovery_display_status = "waiting_on_decision"
     end
     if @stolen_record.update_attributes(permitted_parameters)
