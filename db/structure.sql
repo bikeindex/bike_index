@@ -814,37 +814,6 @@ ALTER SEQUENCE public.feedbacks_id_seq OWNED BY public.feedbacks.id;
 
 
 --
--- Name: flavor_texts; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.flavor_texts (
-    id integer NOT NULL,
-    message character varying(255),
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: flavor_texts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.flavor_texts_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: flavor_texts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.flavor_texts_id_seq OWNED BY public.flavor_texts.id;
-
-
---
 -- Name: flipper_features; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2357,13 +2326,6 @@ ALTER TABLE ONLY public.feedbacks ALTER COLUMN id SET DEFAULT nextval('public.fe
 
 
 --
--- Name: flavor_texts id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.flavor_texts ALTER COLUMN id SET DEFAULT nextval('public.flavor_texts_id_seq'::regclass);
-
-
---
 -- Name: flipper_features id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2766,14 +2728,6 @@ ALTER TABLE ONLY public.exports
 
 ALTER TABLE ONLY public.feedbacks
     ADD CONSTRAINT feedbacks_pkey PRIMARY KEY (id);
-
-
---
--- Name: flavor_texts flavor_texts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.flavor_texts
-    ADD CONSTRAINT flavor_texts_pkey PRIMARY KEY (id);
 
 
 --
