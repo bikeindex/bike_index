@@ -11,10 +11,10 @@ class RakeDevConfiguration
       FileUtils.mkdir_p("tmp")
 
       if File.exist?(file)
-        delete_cache_file(file)
+        delete_toggle_file(file)
         puts "Development mode is no longer being cached."
       else
-        create_cache_file(file)
+        create_toggle_file(file)
         puts "Development mode is now being cached."
       end
 
@@ -26,48 +26,38 @@ class RakeDevConfiguration
       FileUtils.mkdir_p("tmp")
 
       if File.exist?(file)
-        delete_cache_file(file)
+        delete_toggle_file(file)
         puts "Spring is no longer enabled (you will need to manually kill the spring processes)"
       else
-        create_cache_file(file)
+        create_toggle_file(file)
         puts "Spring is now enabled."
       end
 
       FileUtils.touch "tmp/restart.txt" # Probably doesn't do anything right now, but whatever
     end
 
-    def toggle_letteropener
-      file = "tmp/skip-letteropener.txt"
+    def toggle_letter_opener
+      file = "tmp/noletter_opener.txt"
       FileUtils.mkdir_p("tmp")
 
       if File.exist?(file)
-        delete_cache_file(file)
-        puts "letter-opener is now disabled"
+        delete_toggle_file(file)
+        puts "letter_opener is now enabled"
       else
-        create_cache_file(file)
-        puts "letter-opener is disabled."
+        create_toggle_file(file)
+        puts "letter_opener is disabled."
       end
 
       FileUtils.touch "tmp/restart.txt" # Probably doesn't do anything right now, but whatever
     end
 
-    def enable_by_argument(caching, file)
-      FileUtils.mkdir_p("tmp")
-
-      if caching
-        create_cache_file(file)
-      elsif caching == false && File.exist?(file)
-        delete_cache_file(file)
-      end
-    end
-
     private
 
-    def create_cache_file(file)
+    def create_toggle_file(file)
       FileUtils.touch(file)
     end
 
-    def delete_cache_file(file)
+    def delete_toggle_file(file)
       File.delete(file)
     end
   end
@@ -82,7 +72,7 @@ namespace :dev do
     RakeDevConfiguration.toggle_spring
   end
 
-  task letteropener: :environment do
-    RakeDevConfiguration.toggle_letteropener
+  task letter_opener: :environment do
+    RakeDevConfiguration.toggle_letter_opener
   end
 end
