@@ -26,6 +26,7 @@ class Admin::PaymentsController < Admin::BaseController
         .reorder(sort_column + " " + sort_direction)
         .page(page)
         .per(per_page)
+    render layout: "new_admin"
   end
 
   def new

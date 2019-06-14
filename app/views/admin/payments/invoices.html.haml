@@ -1,26 +1,25 @@
-%header.with-subtitle
-  %h1
-    - if params[:query].present?
-      %em
-        = params[:query]
-    Invoices
-%p
-  Go to organizations to create new invoices
-
-.paginate-container{ style: "margin-top: 30px;" }
-  %h4
-    = pluralize(@invoices.total_count, "matching invoice")
-    .pull-right
+.admin-subnav
+  .col-md-6
+    %h1
       - if params[:query].present?
-        %small
-          = link_to "view all", admin_invoices_path(query: "active")
-        \|
-      %small
-        = link_to "active", admin_invoices_path(query: "active"), class: (params[:query] == "active" ? "active" : "")
-      \|
-      %small
-        = link_to "inactive", admin_invoices_path(query: "inactive"), class: (params[:query] == "inactive" ? "active" : "")
+        %em
+          = params[:query]
+          Invoices
+    %h4
+      = pluralize(@invoices.total_count, "matching invoice")
+    %p
+      Go to organizations to create new invoices
 
-  = paginate @invoices
+  .col-md-6
+    %ul
+      - if params[:query].present?
+        %li
+          = link_to "view all", admin_invoices_path, class: "nav-link"
+      %li
+        = link_to "active", admin_invoices_path(query: "active"), class: "nav-link #{params[:query] == "active" ? "active" : ""}"
+      %li
+        = link_to "inactive", admin_invoices_path(query: "inactive"), class: "nav-link #{params[:query] == "inactive" ? "active" : ""}"
+
+= paginate @invoices, views_prefix: "admin"
 
 = render partial: "/admin/organizations/invoices/table", locals: { invoices: @invoices, render_sortable: true, display_organization: true }
