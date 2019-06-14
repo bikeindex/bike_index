@@ -105,9 +105,7 @@ $(document).ready ->
 
   else if document.getElementById('admin-content')
     new BikeIndex.Views.DataTables
-    if document.getElementById('bike_edit_root_url')
-      new BikeIndex.Views.AdminBikesEdit
-    else if document.getElementById('admin-locations-fields')
+    if document.getElementById('admin-locations-fields')
       new BikeIndex.Views.AdminOrganizationsEdit
     else if document.getElementById('admin-recoveries')
       new BikeIndex.Views.AdminRecoveries
@@ -123,4 +121,3 @@ $(document).ready ->
 
   if document.getElementById('multi_serial_search')
     new BikeIndex.Views.StolenMultiSerialSearch
-

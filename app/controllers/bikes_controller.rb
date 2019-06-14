@@ -153,10 +153,24 @@ class BikesController < ApplicationController
 
   def edit
     @page_errors = @bike.errors
-    @edit_template = edit_templates[params[:page]].present? ? params[:page] : edit_templates.keys.first
-    if @edit_template == "photos"
-      @private_images = PublicImage.unscoped.where(imageable_type: "Bike").where(imageable_id: @bike.id).where(is_private: true)
+    @edit_templates = edit_templates
+
+    result = target_edit_template(requested_page: params[:page])
+    @edit_template = result[:template]
+
+    if !result[:is_valid]
+      redirect_to edit_bike_url(@bike, page: @edit_template) and return
     end
+
+    if @edit_template == "photos"
+      @private_images =
+        PublicImage
+          .unscoped
+          .where(imageable_type: "Bike")
+          .where(imageable_id: @bike.id)
+          .where(is_private: true)
+    end
+
     render "edit_#{@edit_template}".to_sym
   end
 
@@ -176,27 +190,68 @@ class BikesController < ApplicationController
     end
   end
 
-  def edit_templates_hash
-    stolen_type = @bike.recovered ? "Recovery" : "Theft"
-    hash = {
-      root: "Bike Details",
-      photos: "Photos",
-      drivetrain: "Wheels + Drivetrain",
-      accessories: "Accessories + Components",
-      ownership: "Transfer Ownership",
-      groups: "Groups + Organizations",
-      remove: "Hide or Delete",
-      stolen: (@bike.stolen ? "#{stolen_type} details" : "Report Stolen or Missing"),
-    }
-    # To make stolen the first key if bike is stolen. using as_json for string keys instead of sym
-    (@bike.stolen ? hash.to_a.rotate(-1).to_h : hash).as_json
-  end
-
   def edit_templates
-    @edit_templates ||= edit_templates_hash
+    return @edit_templates if defined?(@edit_templates)
+    @theft_templates = @bike.stolen? ? theft_templates : {}
+    @bike_templates = bike_templates
+    @edit_templates = @theft_templates.merge(@bike_templates)
   end
 
   protected
+
+  # Determine the appropriate edit template to use in the edit view.
+  #
+  # If provided an invalid template name, return the default page for a stolen /
+  # unstolen bike and `:is_valid` mapped to false.
+  #
+  # Return a Hash with keys :is_valid (boolean), :template (string)
+  def target_edit_template(requested_page:)
+    result = {}
+    default_page = @bike.stolen? ? :theft_details : :bike_details
+
+    case
+    when requested_page.blank?
+      result[:is_valid] = true
+      result[:template] = default_page.to_s
+    when edit_templates.has_key?(requested_page)
+      result[:is_valid] = true
+      result[:template] = requested_page.to_s
+    else
+      result[:is_valid] = false
+      result[:template] = default_page.to_s
+    end
+
+    result
+  end
+
+  # NB: Hash insertion order here determines how nav links are displayed in the
+  # UI. Keys also correspond to template names and query parameters, and values
+  # are used as haml header tag text in the corresponding templates.
+  def theft_templates
+    {}.with_indifferent_access.tap do |h|
+      h[:theft_details] = "Recovery details" if @bike.recovered?
+      h[:theft_details] = "Theft details" unless @bike.recovered?
+      h[:publicize] = "Publicize Theft" if Flipper.enabled?(:premium_listings)
+      h[:alert] = "Activate Bike Index Alert" if Flipper.enabled?(:premium_listings)
+      h[:report_recovered] = "Mark this Bike Recovered" unless @bike.recovered?
+    end
+  end
+
+  # NB: Hash insertion order here determines how nav links are displayed in the
+  # UI. Keys also correspond to template names and query parameters, and values
+  # are used as haml header tag text in the corresponding templates.
+  def bike_templates
+    {}.with_indifferent_access.tap do |h|
+      h[:bike_details] = "Bike Details"
+      h[:photos] = "Photos"
+      h[:drivetrain] = "Wheels and Drivetrain"
+      h[:accessories] = "Accessories and Components"
+      h[:ownership] = "Transfer Ownership"
+      h[:groups] = "Groups and Organizations"
+      h[:remove] = "Hide or Delete"
+      h[:report_stolen] = "Report Stolen or Missing" unless @bike.stolen?
+    end
+  end
 
   # Make it possible to assign organization for a view by passing the organization_id parameter - mainly useful for superusers
   # Also provides testable protection against seeing organization info on bikes

@@ -880,20 +880,36 @@ RSpec.describe BikesController, type: :controller do
   describe "edit" do
     let(:ownership) { FactoryBot.create(:ownership) }
     let(:bike) { ownership.bike }
-    let(:edit_templates) do
+    let(:bike_templates) do
       {
-        root: "Bike Details",
+        bike_details: "Bike Details",
         photos: "Photos",
-        drivetrain: "Wheels + Drivetrain",
-        accessories: "Accessories + Components",
+        drivetrain: "Wheels and Drivetrain",
+        accessories: "Accessories and Components",
         ownership: "Transfer Ownership",
-        groups: "Groups + Organizations",
+        groups: "Groups and Organizations",
         remove: "Hide or Delete",
+        report_stolen: "Report Stolen or Missing",
       }
     end
-    let(:non_stolen_edit_templates) { edit_templates.merge(stolen: "Report Stolen or Missing") }
-    let(:stolen_edit_templates) { { stolen: "Theft details" }.merge(edit_templates) }
-    let(:recovery_edit_templates) { { stolen: "Recovery details" }.merge(edit_templates) }
+    let(:theft_templates) do
+      {
+        theft_details: "Theft details",
+        # publicize: "Publicize Theft",
+        # alert: "Activate Bike Index Alert",
+        report_recovered: "Mark this Bike Recovered",
+      }
+    end
+    let(:edit_templates) do
+      theft_templates.merge(bike_templates)
+    end
+    let(:non_stolen_edit_templates) { bike_templates }
+    let(:stolen_edit_templates) { edit_templates.except(:report_stolen) }
+    let(:recovery_edit_templates) {
+      edit_templates
+        .merge(theft_details: "Recovery details")
+        .except(:report_stolen, :report_recovered)
+    }
 
     context "no user" do
       it "redirects and sets the flash" do
@@ -921,7 +937,7 @@ RSpec.describe BikesController, type: :controller do
           bike.reload
           expect(bike.owner).to eq user
           expect(response).to be_success
-          expect(assigns(:edit_template)).to eq "root"
+          expect(assigns(:edit_template)).to eq "bike_details"
         end
       end
       context "not-creator but member of creation_organization" do
@@ -933,7 +949,7 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.creation_organization).to eq user.organizations.first
           get :edit, id: bike.id
           expect(response).to be_success
-          expect(assigns(:edit_template)).to eq "root"
+          expect(assigns(:edit_template)).to eq "bike_details"
         end
       end
     end
@@ -945,22 +961,22 @@ RSpec.describe BikesController, type: :controller do
           context "non-stolen bike" do
             it "renders the bike_details template" do
               get :edit, id: bike.id
-              expect(response).to be_success
-              expect(assigns(:edit_template)).to eq "root"
+              expect(response.status).to eq(200)
+              expect(assigns(:edit_template)).to eq "bike_details"
               expect(assigns(:edit_templates)).to eq non_stolen_edit_templates.as_json
-              expect(response).to render_template "edit_root"
+              expect(response).to render_template "edit_bike_details"
             end
           end
           context "stolen bike" do
             it "renders with stolen as first template, different description" do
-              bike.update_attribute :stolen, true
+              bike.update_attribute(:stolen, true)
               bike.reload
               expect(bike.stolen).to be_truthy
               get :edit, id: bike.id
               expect(response).to be_success
-              expect(assigns(:edit_template)).to eq "stolen"
+              expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq stolen_edit_templates.as_json
-              expect(response).to render_template "edit_stolen"
+              expect(response).to render_template "edit_theft_details"
             end
           end
           context "recovered bike" do
@@ -970,19 +986,20 @@ RSpec.describe BikesController, type: :controller do
               expect(bike.recovered).to be_truthy
               get :edit, id: bike.id
               expect(response).to be_success
-              expect(assigns(:edit_template)).to eq "stolen"
+              expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq recovery_edit_templates.as_json
-              expect(response).to render_template "edit_stolen"
+              expect(response).to render_template "edit_theft_details"
             end
           end
         end
-        # Grab all the template keys from the controller so we can test that we render all of them
-        # Both to ensure we get all of them and because we can't use the let block
+        # Grab all the template keys from the controller so we can test that we
+        # render all of them Both to ensure we get all of them and because we
+        # can't use the let block
         bc = BikesController.new
         bc.instance_variable_set(:@bike, Bike.new)
-        bc.edit_templates_hash.keys.map(&:to_s).each do |template|
-          context template do
-            it "renders the template" do
+        bc.edit_templates.each_pair do |template, _label|
+          context "with query param ?page=#{template}" do
+            it "renders the #{template} template" do
               get :edit, id: bike.id, page: template
               expect(response).to be_success
               expect(response).to render_template("edit_#{template}")

@@ -1,4 +1,14 @@
-.edit-bike-page-root {
+#bikes_edit {
+  .nav-group-header {
+    margin-top: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+  .nav-group-header:first-of-type {
+    margin-top: 0;
+  }
+}
+
+.edit-bike-page-bike_details {
   .frame-sizes {
     .btn {
       transition: all 0.1s linear;
@@ -28,7 +38,13 @@
 }
 
 @media (max-width: $grid-breakpoint-sm - 1px) {
-  .edit-bike-page-root {
+  #bikes_edit {
+    .nav-group-header {
+      display: none;
+    }
+  }
+
+  .edit-bike-page-bike_details {
     .frame-sizes {
       .right-input-help {
         flex: 0 0 66.6667%;
@@ -51,7 +67,7 @@
 }
 
 @media (min-width: $grid-breakpoint-sm) {
-  .edit-bike-page-root {
+  .edit-bike-page-bike_details {
     .frame-sizes {
       .right-input-help {
         position: relative;
