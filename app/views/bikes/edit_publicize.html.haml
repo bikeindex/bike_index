@@ -15,6 +15,7 @@
             Share your listing - so everyone knows to watch out for your
             #{@bike.type}!
 
+          / TODO: Consolidate social urls in helpers
           .no-divider-row.full-width-button.btn-share
             %a.bth.btn-lg.link-share{href: "http://www.facebook.com/share.php?u=#{bike_url(@bike)}", target: "_blank"}
               %img{ src: "https://files.bikeindex.org/facebook.png" }

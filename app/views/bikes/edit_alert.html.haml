@@ -1,1 +1,97 @@
-%h3 Activate Bike Index Alert
+= form_for @bike, multipart: true, html: { class: "primary-edit-bike-form" } do |f|
+  = f.hidden_field :stolen
+
+  .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
+    .row
+      = render partial: "/bikes/edit_primary_menu"
+
+      .col-md-8.form-well#form_well_wrap
+        .form-wrap
+          .form-well-form-header
+            / Publicize Theft
+            %h3= @edit_templates[@edit_template]
+
+          .row
+            .col-md-12.col-lg-4
+              .detail-card-container
+                .detail-card-title Maximum
+                .detail-card
+                  .detail-card-subtitle
+                    %strong 50,000
+                    Views
+                  .detail-card-subtitle
+                    %strong 7
+                    Days
+                  .detail-card-subtitle.detail-card-price $69.95
+                .detail-card-subtitle
+                  .detail-card-button.btn-primary Choose Maximum
+                .detail-card-content-main
+                  %ul
+                    %li
+                      %strong 5,000 Ad Campaign Views
+                      from people within 10 miles
+                    %li
+                      %strong +10,000 Bonus Views
+                      from people within 10 miles
+                    %li
+                      Ad campaign runs for
+                      %strong 7 Days
+                    %li
+                      %strong Priority Support
+                      from the Bike Index Team
+
+            .col-md-12.col-lg-4
+              .detail-card-container
+                .detail-card-title Standard
+                .detail-card
+                  .detail-card-subtitle
+                    %strong 25,000
+                    Views
+                  .detail-card-subtitle
+                    %strong 7
+                    Days
+                  .detail-card-subtitle.detail-card-price $39.95
+                .detail-card-subtitle
+                  .detail-card-button.btn-primary Choose Standard
+                .detail-card-content-main
+                  %ul
+                    %li
+                      %strong 5,000 Ad Campaign Views
+                      from people within 10 miles
+                    %li
+                      %strong +10,000 Bonus Views
+                      from people within 10 miles
+                    %li
+                      Ad campaign runs for
+                      %strong 7 Days
+                    %li
+                      %strong Priority Support
+                      from the Bike Index Team
+
+            .col-md-12.col-lg-4
+              .detail-card-container
+                .detail-card-title Starter
+                .detail-card
+                  .detail-card-subtitle
+                    %strong 10,000
+                    Views
+                  .detail-card-subtitle
+                    %strong 7
+                    Days
+                  .detail-card-subtitle.detail-card-price $19.95
+                .detail-card-subtitle
+                  .detail-card-button.btn-primary Choose Starter
+                .detail-card-content-main
+                  %ul
+                    %li
+                      %strong 5,000 Ad Campaign Views
+                      from people within 10 miles
+                    %li
+                      %strong +10,000 Bonus Views
+                      from people within 10 miles
+                    %li
+                      Ad campaign runs for
+                      %strong 7 Days
+                    %li
+                      %strong Priority Support
+                      from the Bike Index Team
