@@ -11,7 +11,25 @@
           .form-well-form-header
             / Publicize Theft
             %h3= @edit_templates[@edit_template]
-          .no-divider-row.full-width-button
-            = link_to "Press this button!", "",   |
-              class: "btn btn-success btn-lg",    |
-              data: {toggle: "modal", target: "#open-modal"}
+
+          %h5.description
+            Share your listing - so everyone knows to watch out for your
+            #{@bike.type}!
+
+          .no-divider-row.full-width-button.btn-share
+            %a.bth.btn-lg.link-share{href: "http://www.facebook.com/share.php?u=#{bike_url(@bike)}", target: "_blank"}
+              %img{ src: "https://files.bikeindex.org/facebook.png" }
+              .share-social.share-facebook Share on Facebook
+
+          .no-divider-row.full-width-button.btn-share
+            %a.twitter-share-button{href: "https://twitter.com/share?ref_src=twsrc%5Etfw",
+                                    "data-text" => "Help me find my stolen bike!",
+                                    "data-hashtags" => "bikeindex",
+                                    "data-related" => "BikeIndex",
+                                    "data-show-count" => false,
+                                    "data-size" => "large",
+                                    "data-url" => bike_url(@bike)}
+            %script{async: true, src: "https://platform.twitter.com/widgets.js", charset: "utf-8" }
+            %a{href: "https://twitter.com/share?url=#{bike_url(@bike)}&text=Help me find my stolen bike!",
+               target: "_blank"}
+              .share-social.share-twitter Share on Twitter
