@@ -31,7 +31,21 @@ class RakeDevConfiguration
       else
         create_cache_file(file)
         puts "Spring is now enabled."
+      end
 
+      FileUtils.touch "tmp/restart.txt" # Probably doesn't do anything right now, but whatever
+    end
+
+    def toggle_letteropener
+      file = "tmp/skip-letteropener.txt"
+      FileUtils.mkdir_p("tmp")
+
+      if File.exist?(file)
+        delete_cache_file(file)
+        puts "letter-opener is now disabled"
+      else
+        create_cache_file(file)
+        puts "letter-opener is disabled."
       end
 
       FileUtils.touch "tmp/restart.txt" # Probably doesn't do anything right now, but whatever
@@ -48,13 +62,14 @@ class RakeDevConfiguration
     end
 
     private
-      def create_cache_file(file)
-        FileUtils.touch(file)
-      end
 
-      def delete_cache_file(file)
-        File.delete(file)
-      end
+    def create_cache_file(file)
+      FileUtils.touch(file)
+    end
+
+    def delete_cache_file(file)
+      File.delete(file)
+    end
   end
 end
 
@@ -65,5 +80,9 @@ namespace :dev do
 
   task spring: :environment do
     RakeDevConfiguration.toggle_spring
+  end
+
+  task letteropener: :environment do
+    RakeDevConfiguration.toggle_letteropener
   end
 end

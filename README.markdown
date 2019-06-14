@@ -54,6 +54,8 @@ Toggle Spring with `rake dev:spring` (defaults to disabled)
 
 Toggle Caching in development with `rake dev:cache` (defaults to disabled)
 
+Toggle letter-opener in development with `rake dev:letteropener` (defaults to enabled)
+
 
 ## Testing
 
