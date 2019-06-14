@@ -1,5 +1,6 @@
 class User < ActiveRecord::Base
   include ActionView::Helpers::SanitizeHelper
+  include FeatureFlaggable
   cattr_accessor :current_user
 
   has_secure_password
@@ -251,10 +252,6 @@ class User < ActiveRecord::Base
       ows = ows.map { |o| o.bike_id if o.bike }
     end
     ows.reject(&:blank?)
-  end
-
-  def flipper_id
-    "#{self.class.name}:#{id}"
   end
 
   def current_subscription
