@@ -15,18 +15,12 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
       let(:stolen_record) { FactoryBot.create(:stolen_record, can_share_recovery: true, recovery_display_status: "waiting_on_decision") }
       let(:params) { { id: stolen_record.id, stolen_record: { is_not_displayable: true } } }
       it "updates waiting_on_decision to not_displayed" do
-        put :update, params
-        stolen_record.reload
-        expect(stolen_record.recovery_display_status).to eq "not_displayed"
-      end
-      it "doesn't create a new recovery_display" do
         expect do
           put :update, params
-          stolen_record.reload
         end.to change(RecoveryDisplay, :count).by 0
-      end
-      it "correctly redirects the user" do
-        expect(put :update, params).to redirect_to(admin_recoveries_path)
+        stolen_record.reload
+        expect(stolen_record.recovery_display_status).to eq "not_displayed"
+        expect(response).to redirect_to(admin_recoveries_path)
         expect(flash).to be_present
       end
     end
@@ -34,30 +28,26 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
       let(:stolen_record) { FactoryBot.create(:stolen_record, can_share_recovery: true, recovery_display_status: "not_eligible") }
       let(:params) { { id: stolen_record.id, stolen_record: { can_share_recovery: true } } }
       it "updates can_share_recovery" do
-        put :update, params
-        stolen_record.reload
-        expect(stolen_record.can_share_recovery).to be_truthy
-      end
-      it "doesn't create a new recovery_display" do
         expect do
           put :update, params
-          stolen_record.reload
         end.to change(RecoveryDisplay, :count).by 0
+        stolen_record.reload
+        expect(stolen_record.can_share_recovery).to be_truthy
+        expect(response).to redirect_to(admin_recoveries_path)
+        expect(flash).to be_present
       end
     end
     context "admin marks recovery as index_helped_recover" do
       let(:stolen_record) { FactoryBot.create(:stolen_record, can_share_recovery: true, recovery_display_status: "not_eligible") }
       let(:params) { { id: stolen_record.id, stolen_record: { index_helped_recovery: true } } }
       it "updates index_helped_recover" do
-        put :update, params
-        stolen_record.reload
-        expect(stolen_record.index_helped_recovery).to be_truthy
-      end
-      it "doesn't create a new recovery_display" do
         expect do
           put :update, params
-          stolen_record.reload
         end.to change(RecoveryDisplay, :count).by 0
+        stolen_record.reload
+        expect(stolen_record.index_helped_recovery).to be_truthy
+        expect(response).to redirect_to(admin_recoveries_path)
+        expect(flash).to be_present
       end
     end
     context "admin marks undisplayable bike as displayable" do
@@ -68,12 +58,13 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
       it "updates not_displayed to waiting_on_decision" do
         bike.reload.update_attributes(updated_at: Time.current)
         stolen_record.reload.update_attributes(updated_at: Time.current)
-        put :update, params
+        expect do
+          put :update, params
+        end.to change(RecoveryDisplay, :count).by 0
         stolen_record.reload
         expect(stolen_record.recovery_display_status).to eq "waiting_on_decision"
-      end
-      it "redirects the user to new recovery display page" do
-        expect(put :update, params).to redirect_to(new_admin_recovery_display_path(stolen_record))
+        expect(response).to redirect_to(new_admin_recovery_display_path(stolen_record))
+        expect(flash).to be_present
       end
     end
   end
