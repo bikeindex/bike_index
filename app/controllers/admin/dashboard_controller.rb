@@ -3,8 +3,6 @@ class Admin::DashboardController < Admin::BaseController
     @organizations = Organization.unscoped.order("created_at DESC").limit(10)
     @bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint).order("created_at desc").limit(10)
     @users = User.includes(:memberships => [:organization]).limit(5).order("created_at desc")
-    @flavors = FlavorText.all
-    @flavor = FlavorText.new
     render layout: "new_admin"
   end
 
