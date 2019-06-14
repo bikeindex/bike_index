@@ -168,7 +168,6 @@ Bikeindex::Application.routes.draw do
     get "recover_organization", to: "organizations#recover"
     get "show_deleted_organizations", to: "organizations#show_deleted"
 
-    resources :flavor_texts, only: [:destroy, :create]
     resources :stolen_bikes do
       member { post :approve }
     end
