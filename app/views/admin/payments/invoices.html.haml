@@ -11,15 +11,14 @@
       Go to organizations to create new invoices
 
   .col-md-6
-    - if params[:query].present?
-      %small
-        = link_to "view all", admin_invoices_path(query: "active")
-      \|
-    %small
-      = link_to "active", admin_invoices_path(query: "active"), class: (params[:query] == "active" ? "active" : "")
-    \|
-    %small
-      = link_to "inactive", admin_invoices_path(query: "inactive"), class: (params[:query] == "inactive" ? "active" : "")
+    %ul
+      - if params[:query].present?
+        %li
+          = link_to "view all", admin_invoices_path, class: "nav-link"
+      %li
+        = link_to "active", admin_invoices_path(query: "active"), class: "nav-link #{params[:query] == "active" ? "active" : ""}"
+      %li
+        = link_to "inactive", admin_invoices_path(query: "inactive"), class: "nav-link #{params[:query] == "inactive" ? "active" : ""}"
 
 = paginate @invoices, views_prefix: "admin"
 
