@@ -1,3 +1,5 @@
+directories %w(app spec lib config)
+
 group :red_green_refactor, halt_on_fail: true do
   rspec_options = {
     cmd: "bin/rspec -f progress",
