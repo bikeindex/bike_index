@@ -12,11 +12,6 @@ Dir.chdir APP_ROOT do
   system "gem install bundler --conservative"
   system "bundle check || bundle install"
 
-  puts "\n== Copying sample files =="
-  unless File.exist?("Guardfile")
-    system "cp Guardfile.sample Guardfile"
-  end
-
   puts "\n== Preparing database =="
   system "bin/rake db:setup"
 
