@@ -15,7 +15,7 @@ module Sessionable
   end
 
   def sign_in_and_redirect(user)
-    session[:last_seen] = Time.now
+    session[:last_seen] = Time.current
     session[:render_donation_request] = user.render_donation_request if user&.render_donation_request
     set_passive_organization(user.default_organization) # Set that organization!
     if ActiveRecord::Type::Boolean.new.type_cast_from_database(params.dig(:session, :remember_me))

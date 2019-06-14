@@ -11,7 +11,7 @@
 
 - if @organization.law_enforcement_missing_verified_features?
   .alert.alert-info
-    This is a law enforcement organization without unstolen notifications. To enable unstolen notifications, #{link_to "add an invoice for this organization", new_admin_organization_invoice_path(organization_id: @organization.to_param, end_at: (Time.now + 10.years).to_i)} and enable "unstolen notifications" in it
+    This is a law enforcement organization without unstolen notifications. To enable unstolen notifications, #{link_to "add an invoice for this organization", new_admin_organization_invoice_path(organization_id: @organization.to_param, end_at: (Time.current + 10.years).to_i)} and enable "unstolen notifications" in it
 .row
   .col-md-6
     %table.table-list

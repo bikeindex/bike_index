@@ -31,12 +31,12 @@ class AfterBikeSaveWorker
     {
       auth_token: AUTH_TOKEN,
       bike: BikeV2ShowSerializer.new(bike, root: false).as_json,
-      update: bike.created_at > Time.now - 30.seconds,
+      update: bike.created_at > Time.current - 30.seconds,
     }
   end
 
   def update_matching_partial_registrations(bike)
-    return true unless bike.created_at > Time.now - 5.minutes # skip unless new bike
+    return true unless bike.created_at > Time.current - 5.minutes # skip unless new bike
     matches = BParam.partial_registrations.without_bike.where("email ilike ?", "%#{bike.owner_email}%")
     if matches.count > 1
       # Try to make it a little more accurate lookup

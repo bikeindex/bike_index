@@ -10,7 +10,7 @@ RSpec.describe RecoveryDisplay, type: :model do
     it "sets time if no time" do
       recovery_display = RecoveryDisplay.new
       recovery_display.set_time
-      expect(recovery_display.date_recovered).to be > Time.now - 5.seconds
+      expect(recovery_display.date_recovered).to be > Time.current - 5.seconds
     end
     it "has before_validation_callback_method defined" do
       expect(RecoveryDisplay._validation_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_time)).to eq(true)
@@ -24,12 +24,12 @@ RSpec.describe RecoveryDisplay, type: :model do
       expect(recovery_display.errors).not_to be_present
     end
     it "sets attrs from stolen record" do
-      t = Time.now
+      t = Time.current
       stolen_record = FactoryBot.create(:stolen_record_recovered, date_recovered: t, recovered_description: "stuff", current: false)
       recovery_display = RecoveryDisplay.new
       recovery_display.from_stolen_record(stolen_record.id)
       expect(recovery_display.quote).to eq("stuff")
-      expect(recovery_display.date_recovered).to be > Time.now - 5.seconds
+      expect(recovery_display.date_recovered).to be > Time.current - 5.seconds
       expect(recovery_display.stolen_record_id).to eq(stolen_record.id)
     end
     it "sets name from stolen record" do

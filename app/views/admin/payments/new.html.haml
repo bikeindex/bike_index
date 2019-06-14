@@ -13,11 +13,11 @@
         = f.select :kind, Payment.admin_creatable_kinds.map { |k| [k.humanize, k] }
 
     .control-group.padded
-      - f.object.created_at = TimeParser.round(f.object.created_at || Time.now)
+      - f.object.created_at = TimeParser.round(f.object.created_at || Time.current)
       .control-label
         = f.label :created_at, "Time of payment"
       .controls
-        = f.datetime_local_field :created_at, max: Time.now + 1.week, step: 60, required: true, class: 'form-control'
+        = f.datetime_local_field :created_at, max: Time.current + 1.week, step: 60, required: true, class: 'form-control'
 
     .control-group.padded
       .control-label

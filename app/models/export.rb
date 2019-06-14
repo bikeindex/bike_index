@@ -190,7 +190,7 @@ class Export < ActiveRecord::Base
   # Generally, use calculated_progress rather than progress directly for display
   def calculated_progress
     return progress unless pending? || ongoing?
-    (created_at || Time.now) < Time.now - 10.minutes ? "errored" : progress
+    (created_at || Time.current) < Time.current - 10.minutes ? "errored" : progress
   end
 
   def validated_options(opts)

@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe RemoveExpiredFileCacheWorker, type: :job do
   describe "perform" do
     it "removes expired files" do
-      t = (Time.now - 3.days).to_i
+      t = (Time.current - 3.days).to_i
       FileCacheMaintainer.reset_file_info("#{t}_all_stolen_cache.json", t)
       FileCacheMaintainer.update_file_info("current_stolen_bikes.tsv")
       expect(FileCacheMaintainer.files.count).to eq 2

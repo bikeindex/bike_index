@@ -312,7 +312,7 @@ RSpec.describe UsersController, type: :controller do
 
       context "token expired" do
         it "redirects to request password reset" do
-          user.set_password_reset_token((Time.now - 61.minutes).to_i)
+          user.set_password_reset_token((Time.current - 61.minutes).to_i)
           post :password_reset, token: user.password_reset_token
           expect(flash[:error]).to be_present
           expect(cookies.signed[:auth]).to_not be_present
@@ -436,7 +436,7 @@ RSpec.describe UsersController, type: :controller do
     end
 
     it "Updates user if there is a reset_pass token" do
-      user.set_password_reset_token((Time.now - 30.minutes).to_i)
+      user.set_password_reset_token((Time.current - 30.minutes).to_i)
       user.reload
       auth = user.auth_token
       email = user.email
@@ -476,7 +476,7 @@ RSpec.describe UsersController, type: :controller do
     end
 
     it "Doesn't update user if reset_pass token is more than an hour old" do
-      user.set_password_reset_token((Time.now - 61.minutes).to_i)
+      user.set_password_reset_token((Time.current - 61.minutes).to_i)
       auth = user.auth_token
       user.email
       set_current_user(user)

@@ -166,22 +166,22 @@ class User < ActiveRecord::Base
   end
 
   def reset_token_expired?
-    reset_token_time < (Time.now - 1.hours)
+    reset_token_time < (Time.current - 1.hours)
   end
 
-  def set_password_reset_token(t = Time.now.to_i)
-    self.password_reset_token = "#{t}-" + Digest::MD5.hexdigest("#{SecureRandom.hex(10)}-#{DateTime.now}")
+  def set_password_reset_token(t = Time.current.to_i)
+    self.password_reset_token = "#{t}-" + Digest::MD5.hexdigest("#{SecureRandom.hex(10)}-#{DateTime.current}")
     self.save
   end
 
   def accept_vendor_terms_of_service
     self.vendor_terms_of_service = true
-    self.when_vendor_terms_of_service = DateTime.now
+    self.when_vendor_terms_of_service = DateTime.current
     save
   end
 
   def send_password_reset_email
-    unless reset_token_time > Time.now - 2.minutes
+    unless reset_token_time > Time.current - 2.minutes
       set_password_reset_token
       EmailResetPasswordWorker.perform_async(id)
     end
@@ -328,7 +328,7 @@ class User < ActiveRecord::Base
 
   def generate_auth_token
     begin
-      self.auth_token = SecureRandom.urlsafe_base64 + "t#{Time.now.to_i}"
+      self.auth_token = SecureRandom.urlsafe_base64 + "t#{Time.current.to_i}"
     end while User.where(auth_token: auth_token).exists?
   end
 
@@ -345,7 +345,7 @@ class User < ActiveRecord::Base
     end
     self.username = usrname
     if !confirmed
-      self.confirmation_token = (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.now.to_s}")
+      self.confirmation_token = (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.current.to_s}")
     end
     generate_auth_token
     true

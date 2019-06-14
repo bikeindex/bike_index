@@ -45,6 +45,6 @@ class Payment < ActiveRecord::Base
 
   def update_invoice
     return true unless invoice.present?
-    invoice.update_attributes(updated_at: Time.now) # Manually trigger invoice update
+    invoice.update_attributes(updated_at: Time.current) # Manually trigger invoice update
   end
 end

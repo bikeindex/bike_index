@@ -47,7 +47,7 @@ class Location < ActiveRecord::Base
   def update_organization
     # Because we need to update the organization and make sure it is shown on the map correctly
     # Manually update to ensure that it runs the before save stuff
-    organization && organization.update_attributes(updated_at: Time.now)
+    organization && organization.update_attributes(updated_at: Time.current)
   end
 
   def display_name

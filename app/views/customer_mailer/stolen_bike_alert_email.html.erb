@@ -18,7 +18,7 @@
       <%= @info[:tweet_string].split('https://bikeindex.org')[0] %>
       <a href="https://bikeindex.org/bikes/<%= @bike.id %>" style="border:none;color:#0084b4;text-decoration:none">Bike Index link</a>
     </p>
-    <a href="https://twitter.com/<%= @info[:tweet_account_screen_name] %>/status/<%= @info[:tweet_id] %>" style="display:block;border:none;color:#0084b4;text-decoration:none;color:#999999;font-size: 12px; margin-top: 5px;" target="_blank"><%= Time.now.strftime("%I:%M %P - %d %b %y") %></a>
+    <a href="https://twitter.com/<%= @info[:tweet_account_screen_name] %>/status/<%= @info[:tweet_id] %>" style="display:block;border:none;color:#0084b4;text-decoration:none;color:#999999;font-size: 12px; margin-top: 5px;" target="_blank"><%= Time.current.strftime("%I:%M %P - %d %b %y") %></a>
   </div>
 </div>
 <% if @info[:retweet_screen_names].present? %>

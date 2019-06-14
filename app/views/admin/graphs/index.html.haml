@@ -2,7 +2,7 @@
 - if @kind == "general"
 
   %h2 Users past week
-  = line_chart User.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.now).count
+  = line_chart User.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.current).count
 
   %h2
     Users since start

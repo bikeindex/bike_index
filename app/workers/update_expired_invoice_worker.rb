@@ -5,7 +5,7 @@ class UpdateExpiredInvoiceWorker < ScheduledWorker
 
   def perform
     record_scheduler_started
-    Invoice.should_expire.each { |invoice| invoice.update_attributes(updated_at: Time.now) }
+    Invoice.should_expire.each { |invoice| invoice.update_attributes(updated_at: Time.current) }
     record_scheduler_finished
   end
 end

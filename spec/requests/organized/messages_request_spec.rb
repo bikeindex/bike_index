@@ -24,7 +24,7 @@ RSpec.describe Organized::MessagesController, type: :request do
         expect(response.headers["Access-Control-Request-Method"]).not_to be_present
       end
       context "with a message" do
-        let!(:organization_message_1) { FactoryBot.create(:organization_message, organization: organization, kind: "geolocated", created_at: Time.now - 1.hour) }
+        let!(:organization_message_1) { FactoryBot.create(:organization_message, organization: organization, kind: "geolocated", created_at: Time.current - 1.hour) }
         let(:bike) { organization_message_1.bike }
         let(:target) do
           {

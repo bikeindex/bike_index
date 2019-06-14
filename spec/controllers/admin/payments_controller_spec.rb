@@ -6,7 +6,7 @@ RSpec.describe Admin::PaymentsController, type: :controller do
   let(:organization) { FactoryBot.create(:organization) }
   let(:invoice) { FactoryBot.create(:invoice, organization: organization) }
   let(:user2) { FactoryBot.create(:user) }
-  let(:create_time) { Time.now - 2.weeks }
+  let(:create_time) { Time.current - 2.weeks }
   let(:params) { { organization_id: organization.id, invoice_id: invoice.id, email: user2.email, amount: 222.22, kind: "stripe", created_at: create_time.strftime("%FT%T%:z") } }
 
   describe "index" do
@@ -43,7 +43,7 @@ RSpec.describe Admin::PaymentsController, type: :controller do
 
   describe "update" do
     context "stripe payment" do
-      let(:og_time) { Time.now - 3.hours }
+      let(:og_time) { Time.current - 3.hours }
       let(:invoice) { FactoryBot.create(:invoice, organization: organization, updated_at: og_time) }
       it "updates available attributes" do
         expect(subject.invoice).to be_nil
@@ -53,12 +53,12 @@ RSpec.describe Admin::PaymentsController, type: :controller do
         expect(subject.invoice).to eq invoice
         # Not changed attrs:
         expect(subject.kind).to eq "stripe"
-        expect(subject.created_at).to be_within(1.minute).of Time.now
+        expect(subject.created_at).to be_within(1.minute).of Time.current
         expect(subject.user).to eq user
         expect(subject.amount_cents).to_not eq 22_222
         expect(subject.is_payment).to be_truthy
         # invoice.reload
-        # expect(invoice.updated_at).to be_within(1.second).of Time.now # TODO: Rails 5 update - enable this, rspec doesn't correctly manage after_commit right now
+        # expect(invoice.updated_at).to be_within(1.second).of Time.current # TODO: Rails 5 update - enable this, rspec doesn't correctly manage after_commit right now
       end
     end
     context "check payment" do
@@ -70,7 +70,7 @@ RSpec.describe Admin::PaymentsController, type: :controller do
         expect(subject.invoice).to eq invoice
         # Not changed attrs:
         expect(subject.kind).to eq "check"
-        expect(subject.created_at).to be_within(1.minute).of Time.now
+        expect(subject.created_at).to be_within(1.minute).of Time.current
         expect(subject.user).to eq user
         expect(subject.email).to eq user.email
         expect(subject.amount_cents).to eq 55555
@@ -83,7 +83,7 @@ RSpec.describe Admin::PaymentsController, type: :controller do
           expect(subject.invoice).to be_nil
           # Not changed attrs:
           expect(subject.kind).to eq "check"
-          expect(subject.created_at).to be_within(1.minute).of Time.now
+          expect(subject.created_at).to be_within(1.minute).of Time.current
           expect(subject.user).to eq user
           expect(subject.email).to eq user.email
           expect(subject.amount_cents).to eq 55555

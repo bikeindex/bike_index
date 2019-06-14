@@ -165,11 +165,11 @@ RSpec.describe Organization, type: :model do
       expect(organization.paid_for?("csv_exports")).to be_falsey
       invoice.update_attributes(paid_feature_ids: [paid_feature.id])
       expect(invoice.feature_slugs).to eq(["csv_exports"])
-      organization.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - after_commit
+      organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
       expect(organization.is_paid).to be_truthy
       expect(organization.paid_feature_slugs).to eq(["csv_exports"])
       expect(organization.paid_for?("csv_exports")).to be_truthy
-      organization_child.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - after_commit
+      organization_child.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
       expect(organization_child.is_paid).to be_falsey
       organization_child.update_attributes(parent_organization: organization)
       organization_child.reload
@@ -189,7 +189,7 @@ RSpec.describe Organization, type: :model do
         expect(organization.paid_for?("geolocated_messages")).to be_falsey
         expect(user.send_unstolen_notifications?).to be_falsey
         invoice.update_attributes(paid_feature_ids: [paid_feature.id, paid_feature2.id])
-        organization.update_attributes(updated_at: Time.now) # TODO: Rails 5 update - after_commit
+        organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
         expect(organization.paid_for?("messages")).to be_truthy
         expect(organization.paid_for?("geolocated_messages")).to be_falsey
         expect(organization.paid_for?("abandoned_bike_messages")).to be_truthy
@@ -441,7 +441,7 @@ RSpec.describe Organization, type: :model do
         expect(organization.pos_kind).to eq "not_pos"
         expect(organization.calculated_pos_kind).to eq "lightspeed_pos"
         # And if bike is created before cut-of for pos kind, it returns broken
-        bike_pos.update_attribute :created_at, Time.now - 2.weeks
+        bike_pos.update_attribute :created_at, Time.current - 2.weeks
         expect(organization.calculated_pos_kind).to eq "broken_pos"
       end
     end

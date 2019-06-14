@@ -7,7 +7,7 @@ class Admin::NewsController < Admin::BaseController
   end
 
   def new
-    @blog = Blog.new(published_at: Time.now, user_id: current_user.id)
+    @blog = Blog.new(published_at: Time.current, user_id: current_user.id)
   end
 
   def image_edit
@@ -43,7 +43,7 @@ class Admin::NewsController < Admin::BaseController
       title: params[:blog][:title],
       user_id: current_user.id,
       body: "No content yet, write some now!",
-      published_at: Time.now,
+      published_at: Time.current,
       is_listicle: false,
     })
     if @blog.save

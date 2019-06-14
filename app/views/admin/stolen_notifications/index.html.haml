@@ -6,7 +6,7 @@
   = StolenNotification.count
   Stolen Notifications created,
   %em
-    (#{StolenNotification.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+    (#{StolenNotification.where("created_at >= ?", Time.current.beginning_of_day).count} today)
 
 
 = paginate @stolen_notifications, views_prefix: "admin"

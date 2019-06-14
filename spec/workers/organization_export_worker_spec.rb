@@ -92,7 +92,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
           expect(bike_code.claimed?).to be_truthy
           expect(bike_code.bike).to eq bike_for_avery
           expect(bike_code.user).to eq export.user
-          expect(bike_code.claimed_at).to be_within(1.second).of Time.now
+          expect(bike_code.claimed_at).to be_within(1.second).of Time.current
         end
       end
     end
@@ -106,7 +106,7 @@ RSpec.describe OrganizationExportWorker, type: :job do
     end
     context "no bikes" do
       let(:csv_lines) { [export.headers] }
-      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, end_at: Time.now - 1.week) }
+      let(:export) { FactoryBot.create(:export_organization, progress: "pending", file: nil, end_at: Time.current - 1.week) }
       it "finishes export" do
         expect(bike.organizations.pluck(:id)).to eq([organization.id])
         instance.perform(export.id)

@@ -54,6 +54,6 @@ class PaidFeature < ActiveRecord::Base
 
   # Trigger an update to invoices which will, in turn, update the associated organizations
   def update_invoices
-    invoices.each { |i| i.update_attributes(updated_at: Time.now) }
+    invoices.each { |i| i.update_attributes(updated_at: Time.current) }
   end
 end

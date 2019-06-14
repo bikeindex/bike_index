@@ -31,8 +31,8 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
       it "updates not_displayed to waiting_on_decision" do
         user = FactoryBot.create(:admin)
         set_current_user(user)
-        bike.reload.update_attributes(updated_at: Time.now)
-        stolen_record.reload.update_attributes(updated_at: Time.now)
+        bike.reload.update_attributes(updated_at: Time.current)
+        stolen_record.reload.update_attributes(updated_at: Time.current)
         put :update, params
         stolen_record.reload
         expect(stolen_record.recovery_display_status).to eq "waiting_on_decision"

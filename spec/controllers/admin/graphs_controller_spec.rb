@@ -44,7 +44,7 @@ RSpec.describe Admin::GraphsController, type: :controller do
         expect(response.status).to eq(200)
         expect(json_result.is_a?(Array)).to be_truthy
         expect(assigns(:start_at)).to be_within(1.day).of Time.parse("2007-01-01 1:00")
-        expect(assigns(:end_at)).to be_within(1.minute).of Time.now
+        expect(assigns(:end_at)).to be_within(1.minute).of Time.current
         expect(assigns(:group_period)).to eq "month"
       end
       context "passed date and time" do
@@ -73,7 +73,7 @@ RSpec.describe Admin::GraphsController, type: :controller do
             expect(data_group["error"]).to_not be_present
           end
           expect(assigns(:start_at)).to be_within(1.day).of Time.parse("2007-01-01 1:00")
-          expect(assigns(:end_at)).to be_within(1.minute).of Time.now
+          expect(assigns(:end_at)).to be_within(1.minute).of Time.current
           expect(assigns(:group_period)).to eq "month"
         end
         context "passed date and time" do

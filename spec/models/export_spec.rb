@@ -35,7 +35,7 @@ RSpec.describe Export, type: :model do
   end
 
   describe "calculated_progress" do
-    let(:export) { Export.new(created_at: Time.now, progress: "pending") }
+    let(:export) { Export.new(created_at: Time.current, progress: "pending") }
     it "returns the progress it is given" do
       expect(export.pending?).to be_truthy
       expect(export.calculated_progress).to eq "pending"
@@ -45,7 +45,7 @@ RSpec.describe Export, type: :model do
       expect(export.calculated_progress).to eq "errored"
     end
     context "export created a lil bit ago" do
-      let(:export) { Export.new(created_at: Time.now - 10.minutes, progress: "pending") }
+      let(:export) { Export.new(created_at: Time.current - 10.minutes, progress: "pending") }
       it "returns what it's given, unless incomplete" do
         expect(export.pending?).to be_truthy
         expect(export.calculated_progress).to eq "errored"
@@ -87,10 +87,10 @@ RSpec.describe Export, type: :model do
 
   describe "custom_bike_ids=" do
     let(:organization) { FactoryBot.create(:organization) }
-    let!(:bike1) { FactoryBot.create(:bike_organized, organization: organization, created_at: Time.now - 1.day) }
+    let!(:bike1) { FactoryBot.create(:bike_organized, organization: organization, created_at: Time.current - 1.day) }
     let!(:bike2) { FactoryBot.create(:bike_organized, organization: organization) }
     let!(:bike3) { FactoryBot.create(:bike) }
-    let(:export) { FactoryBot.build(:export_organization, organization: organization, end_at: Time.now - 1.hour) }
+    let(:export) { FactoryBot.build(:export_organization, organization: organization, end_at: Time.current - 1.hour) }
     it "assigns the bike ids" do
       bike1.reload
       expect(bike1.created_at).to be < export.end_at
@@ -145,8 +145,8 @@ RSpec.describe Export, type: :model do
     # end
     context "organization" do
       let(:export) { FactoryBot.create(:export_organization, file: nil) }
-      let(:start_time) { Time.now - 20.hours }
-      let(:end_time) { Time.now - 5.minutes }
+      let(:start_time) { Time.current - 20.hours }
+      let(:end_time) { Time.current - 5.minutes }
       it "has the scopes we expect" do
         expect(export.bikes_scoped.to_sql).to eq organization.bikes.to_sql
         export.options = export.options.merge("start_at" => start_time)

@@ -900,20 +900,20 @@ RSpec.describe Bike, type: :model do
   describe "get_listing_order" do
     let(:bike) { Bike.new }
     it "is 1/1000 of the current timestamp" do
-      expect(bike.get_listing_order).to eq(Time.now.to_i / 1000000)
+      expect(bike.get_listing_order).to eq(Time.current.to_i / 1000000)
     end
 
     it "is the current stolen record date stolen * 1000" do
       allow(bike).to receive(:stolen).and_return(true)
       stolen_record = StolenRecord.new
-      yesterday = Time.now - 1.days
+      yesterday = Time.current - 1.days
       allow(stolen_record).to receive(:date_stolen).and_return(yesterday)
       allow(bike).to receive(:current_stolen_record).and_return(stolen_record)
       expect(bike.get_listing_order).to eq(yesterday.to_time.to_i)
     end
 
     it "is the updated_at" do
-      last_week = Time.now - 7.days
+      last_week = Time.current - 7.days
       bike.updated_at = last_week
       allow(bike).to receive(:stock_photo_url).and_return("https://some_photo.cum")
       expect(bike.get_listing_order).to eq(last_week.to_time.to_i / 10000)
@@ -921,8 +921,8 @@ RSpec.describe Bike, type: :model do
 
     context "problem date" do
       let(:problem_date) do
-        digits = (Time.now.year - 1).to_s[2, 3] # last two digits of last year
-        problem_date = Date.strptime("#{Time.now.month}-22-00#{digits}", "%m-%d-%Y")
+        digits = (Time.current.year - 1).to_s[2, 3] # last two digits of last year
+        problem_date = Date.strptime("#{Time.current.month}-22-00#{digits}", "%m-%d-%Y")
       end
       let(:bike) { FactoryBot.create(:stolen_bike) }
       it "does not get out of integer errors" do
@@ -932,8 +932,8 @@ RSpec.describe Bike, type: :model do
         # TODO: Rails 5 update - enable this, rspec doesn't correctly manage after_commit right now -
         # but stolen records don't actually have an after_commit hook to update bikes (they probably should though)
         # This is just checking this is called correctly on save
-        bike.update_attributes(updated_at: Time.now)
-        expect(bike.listing_order).to be > (Time.now - 13.months).to_i
+        bike.update_attributes(updated_at: Time.current)
+        expect(bike.listing_order).to be > (Time.current - 13.months).to_i
       end
     end
   end
@@ -990,7 +990,7 @@ RSpec.describe Bike, type: :model do
         bike.bike_organization_ids = ""
         # Acts as paranoid
         bike_organization.reload
-        expect(bike_organization.deleted_at).to be_within(1.second).of Time.now
+        expect(bike_organization.deleted_at).to be_within(1.second).of Time.current
         expect(bike.bike_organization_ids).to eq([])
         bike.bike_organization_ids = [organization.id]
         bike.reload

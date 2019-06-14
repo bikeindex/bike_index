@@ -504,8 +504,8 @@ RSpec.describe BikesController, type: :controller do
         end
       end
       context "stolen" do
-        let(:target_time) { Time.now.to_i }
-        let(:stolen_params) { chicago_stolen_params.merge(date_stolen: (Time.now - 1.day).utc, timezone: "UTC") }
+        let(:target_time) { Time.current.to_i }
+        let(:stolen_params) { chicago_stolen_params.merge(date_stolen: (Time.current - 1.day).utc, timezone: "UTC") }
         context "valid" do
           include_context :geocoder_real
           context "with old style date input" do
@@ -523,7 +523,7 @@ RSpec.describe BikesController, type: :controller do
                 testable_bike_params.each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
                 stolen_record = bike.current_stolen_record
                 stolen_params.except(:date_stolen, :timezone).each { |k, v| expect(stolen_record.send(k).to_s).to eq v.to_s }
-                expect(stolen_record.date_stolen.to_i).to be_within(1).of(Time.now.yesterday.to_i)
+                expect(stolen_record.date_stolen.to_i).to be_within(1).of(Time.current.yesterday.to_i)
                 expect(stolen_record.show_address).to be_falsey
               end
             end
@@ -1068,7 +1068,7 @@ RSpec.describe BikesController, type: :controller do
                 "_destroy" => "1",
                 id: component1.id.to_s,
               },
-              Time.zone.now.to_i.to_s => component2_attrs,
+              Time.current.to_i.to_s => component2_attrs,
             },
           }
           expect do

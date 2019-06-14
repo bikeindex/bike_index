@@ -50,7 +50,7 @@ RSpec.describe Admin::DashboardController, type: :controller do
       it "renders and assigns tsvs" do
         user = FactoryBot.create(:admin)
         set_current_user(user)
-        t = Time.now
+        t = Time.current
         FileCacheMaintainer.reset_file_info("current_stolen_bikes.tsv", t)
         # tsvs = [{ filename: 'current_stolen_bikes.tsv', updated_at: t.to_i.to_s, description: 'Approved Stolen bikes' }]
         blacklist = %w(1010101 2 4 6)

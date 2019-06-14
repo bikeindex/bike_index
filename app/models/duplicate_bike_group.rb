@@ -7,7 +7,7 @@ class DuplicateBikeGroup < ActiveRecord::Base
   before_save :update_added_bike_at
 
   def update_added_bike_at
-    self.added_bike_at ||= Time.now
+    self.added_bike_at ||= Time.current
   end
 
   def segment

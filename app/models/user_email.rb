@@ -56,7 +56,7 @@ class UserEmail < ActiveRecord::Base
   end
 
   def expired
-    created_at > Time.zone.now - 2.hours
+    created_at > Time.current - 2.hours
   end
 
   def make_primary
@@ -81,6 +81,6 @@ class UserEmail < ActiveRecord::Base
   end
 
   def generate_confirmation
-    self.update_attribute :confirmation_token, (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.now.to_s}")
+    self.update_attribute :confirmation_token, (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.current.to_s}")
   end
 end

@@ -49,13 +49,13 @@ class Counts
     end
 
     def assign_week_creation_chart
-      assign_for("week_creation_chart", Bike.unscoped.where(created_at: beginning_of_week..Time.now).group_by_day(:created_at).count.to_json)
+      assign_for("week_creation_chart", Bike.unscoped.where(created_at: beginning_of_week..Time.current).group_by_day(:created_at).count.to_json)
     end
 
     def recoveries; retrieve_for("recoveries") end
 
     def assign_recoveries_value
-      valued = StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).pluck(:estimated_value).reject(&:blank?)
+      valued = StolenRecord.recovered.where("date_recovered < ?", Time.current.beginning_of_day).pluck(:estimated_value).reject(&:blank?)
       # Sum of the recovered bikes with estimated_values + recovery_average_value * the number of bikes without an estimated_value
       assign_for("recoveries_value", valued.sum + (recoveries - valued.count) * recovery_average_value)
     end

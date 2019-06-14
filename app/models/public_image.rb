@@ -26,7 +26,7 @@ class PublicImage < ActiveRecord::Base
     if external_image_url.present? && image.blank?
       return ExternalImageUrlStoreWorker.perform_async(id)
     end
-    imageable&.update_attributes(updated_at: Time.now)
+    imageable&.update_attributes(updated_at: Time.current)
     return true unless imageable_type == "Bike"
     AfterBikeSaveWorker.perform_async(imageable_id)
   end

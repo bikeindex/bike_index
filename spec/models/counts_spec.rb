@@ -14,7 +14,7 @@ RSpec.describe Counts, type: :model do
 
   context "week_creation_chart" do
     let!(:bike) { FactoryBot.create(:bike) }
-    let!(:bike_first) { FactoryBot.create(:bike, created_at: (Time.now - 6.days).beginning_of_day + 1.minute) }
+    let!(:bike_first) { FactoryBot.create(:bike, created_at: (Time.current - 6.days).beginning_of_day + 1.minute) }
     let(:target) do
       {
         (Date.today - 6.days).to_s => 1,
@@ -35,7 +35,7 @@ RSpec.describe Counts, type: :model do
   end
 
   context "recoveries" do
-    let!(:recovered_bike) { FactoryBot.create(:stolen_record_recovered, date_recovered: Time.now - 1.day) }
+    let!(:recovered_bike) { FactoryBot.create(:stolen_record_recovered, date_recovered: Time.current - 1.day) }
     it "returns constant" do
       expect(StolenRecord.recovered.count).to eq 1
       expect(Counts.assign_recoveries).to eq 2042

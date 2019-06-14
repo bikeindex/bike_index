@@ -74,8 +74,8 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
             shown: false,
             _destroy: 0,
           },
-          Time.zone.now.to_i.to_s => {
-            created_at: Time.zone.now.to_f.to_s,
+          Time.current.to_i.to_s => {
+            created_at: Time.current.to_f.to_s,
             name: "Second shop",
             zipcode: "12243444",
             city: "cool city",
