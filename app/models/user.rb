@@ -1,5 +1,6 @@
 class User < ActiveRecord::Base
   include ActionView::Helpers::SanitizeHelper
+  include FeatureFlaggable
   cattr_accessor :current_user
 
   has_secure_password
