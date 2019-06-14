@@ -1,16 +1,21 @@
-%header.with-subtitle
-  %h1 Payments
-  = link_to "New payment", new_admin_payment_url, class: "button-green sharing-links"
+.admin-subnav
+  .col-md-6
+    %h1
+      Payments
+  .col-md-6
+    = link_to "New payment", new_admin_payment_url, class: "btn btn-success float-right"
 
-.paginate-container{ style: "margin-top: 30px;" }
-  %h4.pull-left
-    = pluralize(@payments.total_count, "matching payment")
-  = paginate @payments
+.row.mb-4
+  .col-md-6
+    %h4
+      = pluralize(@payments.total_count, "matching payment")
+  .col-md-6
+    = paginate @payments, views_prefix: "admin"
 
 
-%section.full-screen-table
-  %table.table.table-striped.table-bordered.sortable
-    %thead
+.full-screen-table
+  %table.table.table-striped.table-bordered.sortable.table-sm
+    %thead.thead-light
       %th
         = sortable "created_at", "Paid"
       %th
@@ -54,3 +59,4 @@
                 = payment.kind.humanize
           %td
             = payment.amount_formatted
+= paginate @payments, views_prefix: "admin"

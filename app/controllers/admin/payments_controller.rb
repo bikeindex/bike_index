@@ -7,6 +7,7 @@ class Admin::PaymentsController < Admin::BaseController
     per_page = params[:per_page] || 50
     @payments = Payment.includes(:user, :organization, :invoice)
                        .order(sort_column + " " + sort_direction).page(page).per(per_page)
+    render layout: "new_admin"
   end
 
   def invoices
