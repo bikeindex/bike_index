@@ -66,13 +66,13 @@
   %p
     There are currently #{number_with_delimiter(PublicImage.count)} bike images
     %em
-      (#{PublicImage.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+      (#{PublicImage.where("created_at >= ?", Time.current.beginning_of_day).count} today)
 
   %p
     = number_with_delimiter(Bike.count)
     publicly registered,
     %em
-      (#{Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+      (#{Bike.where("created_at >= ?", Time.current.beginning_of_day).count} today)
     = number_with_delimiter(Ownership.where(current: true).where(claimed: true).count)
     are claimed
 

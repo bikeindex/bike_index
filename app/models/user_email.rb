@@ -56,7 +56,7 @@ class UserEmail < ActiveRecord::Base
   end
 
   def expired
-    created_at > Time.zone.now - 2.hours
+    created_at > Time.current - 2.hours
   end
 
   def make_primary

@@ -1068,7 +1068,7 @@ RSpec.describe BikesController, type: :controller do
                 "_destroy" => "1",
                 id: component1.id.to_s,
               },
-              Time.zone.now.to_i.to_s => component2_attrs,
+              Time.current.to_i.to_s => component2_attrs,
             },
           }
           expect do

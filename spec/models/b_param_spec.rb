@@ -363,7 +363,7 @@ RSpec.describe BParam, type: :model do
     #
     # Because for now we aren't updating the factory, use this let for b_params factory
     let(:b_param) { BParam.create }
-    let(:expire_b_param) { b_param.update_attribute :created_at, Time.zone.now - 5.weeks }
+    let(:expire_b_param) { b_param.update_attribute :created_at, Time.current - 5.weeks }
     context "with user_id passed" do
       context "without token" do
         it "returns a new b_param, with creator of user_id" do

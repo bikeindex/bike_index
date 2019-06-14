@@ -89,7 +89,7 @@ class OrganizationsController < ApplicationController
     if @b_param.params && @b_param.params["stolen_record"].present?
       stolen_attrs = @b_param.params["stolen_record"].except("phone_no_show")
     else
-      stolen_attrs = { country_id: Country.united_states.id, date_stolen: Time.zone.now }
+      stolen_attrs = { country_id: Country.united_states.id, date_stolen: Time.current }
     end
     @bike.stolen_records.build(stolen_attrs)
   end
@@ -97,7 +97,7 @@ class OrganizationsController < ApplicationController
   def built_stolen_record_date(str)
     DateTime.strptime("#{str} 06", "%m-%d-%Y %H") if str.present?
   rescue ArgumentError
-    Time.zone.now
+    Time.current
   end
 
   def permitted_create_params

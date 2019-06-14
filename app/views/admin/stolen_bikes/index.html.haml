@@ -16,7 +16,7 @@
   = Bike.where(stolen: true).count
   Stolen Bikes indexed,
   %em
-    (#{Bike.where(stolen: true).where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+    (#{Bike.where(stolen: true).where("created_at >= ?", Time.current.beginning_of_day).count} today)
 %h4
   - if StolenRecord.where(approved: false).count == 0
     %h4.text-success

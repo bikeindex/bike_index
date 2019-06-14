@@ -14,8 +14,8 @@
       = number_with_delimiter(Bike.count)
       bikes total
       %em
-        - today = Bike.where("created_at >= ?", Time.zone.now.beginning_of_day).count
-        - yesterday = (Bike.where("created_at >= ?", Time.zone.now.beginning_of_day - 1.day).count) - today
+        - today = Bike.where("created_at >= ?", Time.current.beginning_of_day).count
+        - yesterday = (Bike.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today
         (#{number_with_delimiter(today)} today, #{number_with_delimiter(yesterday)} yesterday)
     - bikes = [ { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.current).count }, { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.current).count }]
 
@@ -32,8 +32,8 @@
     %p
       = number_with_delimiter(User.count)
       users total
-      - today = User.where("created_at >= ?", Time.zone.now.beginning_of_day).count
-      - yesterday = (User.where("created_at >= ?", Time.zone.now.beginning_of_day - 1.day).count) - today
+      - today = User.where("created_at >= ?", Time.current.beginning_of_day).count
+      - yesterday = (User.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today
       %em
         (#{number_with_delimiter(today)} today, #{number_with_delimiter(yesterday)} yesterday)
 
@@ -48,7 +48,7 @@
     %p
       = number_with_delimiter(Organization.count)
       Organizations total
-      - today = Organization.where("created_at >= ?", Time.zone.now.beginning_of_day).count
-      - yesterday = (Organization.where("created_at >= ?", Time.zone.now.beginning_of_day - 1.day).count) - today
+      - today = Organization.where("created_at >= ?", Time.current.beginning_of_day).count
+      - yesterday = (Organization.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today
       %em
         (#{number_with_delimiter(today)} today, #{number_with_delimiter(yesterday)} yesterday)

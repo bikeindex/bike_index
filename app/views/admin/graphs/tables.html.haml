@@ -7,8 +7,8 @@
     = submit_tag 'Load', name: 'search', class: 'btn btn-primary'
 - years = Array(2013..Time.current.year)
 - dates = years.map { |y| Date.civil(y, 6, 6) }
-- yday = Time.zone.now.yday
-- days_left = Time.zone.now.end_of_year.yday - yday
+- yday = Time.current.yday
+- days_left = Time.current.end_of_year.yday - yday
 
 %h2
   Records everywhere
@@ -41,32 +41,32 @@
               = StolenRecord.unscoped.where(date_stolen: date.all_year).count
             - else
               = count = StolenRecord.unscoped.where(created_at: date.all_year).count
-              - if year == Time.zone.now.year
+              - if year == Time.current.year
                 %span.less-strong
                   = s_project = count + (BigDecimal.new(count) / yday * days_left).to_i
           %td
             = count = StolenRecord.unscoped.where('created_at < ?', date.end_of_year).count
-            - if year == Time.zone.now.year
+            - if year == Time.current.year
               %span.less-strong
                 = s_project + count
           %td
             = count = StolenRecord.unscoped.where(date_recovered: date.all_year).count
-            - if year == Time.zone.now.year
+            - if year == Time.current.year
               %span.less-strong
                 = count + (BigDecimal.new(count) / yday * days_left).to_i
           %td
             = count = Bike.unscoped.where(created_at: date.all_year).count
-            - if year == Time.zone.now.year
+            - if year == Time.current.year
               %span.less-strong
                 = a_project = count + (BigDecimal.new(count) / yday * days_left).to_i
           %td
             = count = Bike.unscoped.where('created_at < ?', date.all_year.last).count
-            - if year == Time.zone.now.year
+            - if year == Time.current.year
               %span.less-strong
                 = a_project + count
           %td
             = count = User.unscoped.where(created_at: date.all_year).count
-            - if year == Time.zone.now.year
+            - if year == Time.current.year
               %span.less-strong
                 = count + (BigDecimal.new(count) / yday * days_left).to_i
 .mt-4
@@ -102,19 +102,19 @@
               = StolenRecord.unscoped.where(date_stolen: date.all_year).within_bounding_box(box).count
             - else
               = count = StolenRecord.unscoped.where(created_at: date.all_year).within_bounding_box(box).count
-              - if year == Time.zone.now.year
+              - if year == Time.current.year
                 %span.less-strong
                   = s_project = count + (BigDecimal.new(count) / yday * days_left).to_i
           %td
             / To calculate for a specific time period:
             / StolenRecord.unscoped.where(created_at: Time.current.beginning_of_month..Time.current).within_bounding_box(Geocoder::Calculations.bounding_box('Seattle', 25)).count
             = count = StolenRecord.unscoped.where('created_at < ?', date.end_of_year).within_bounding_box(box).count
-            - if year == Time.zone.now.year
+            - if year == Time.current.year
               %span.less-strong
                 = s_project + count
           %td
             = count = StolenRecord.unscoped.where(date_recovered: date.all_year).within_bounding_box(box).count
-            - if year == Time.zone.now.year
+            - if year == Time.current.year
               %span.less-strong
                 = count + (BigDecimal.new(count) / yday * days_left).to_i
           %td

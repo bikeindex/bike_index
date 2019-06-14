@@ -55,7 +55,7 @@ class Counts
     def recoveries; retrieve_for("recoveries") end
 
     def assign_recoveries_value
-      valued = StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).pluck(:estimated_value).reject(&:blank?)
+      valued = StolenRecord.recovered.where("date_recovered < ?", Time.current.beginning_of_day).pluck(:estimated_value).reject(&:blank?)
       # Sum of the recovered bikes with estimated_values + recovery_average_value * the number of bikes without an estimated_value
       assign_for("recoveries_value", valued.sum + (recoveries - valued.count) * recovery_average_value)
     end

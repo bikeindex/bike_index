@@ -6,7 +6,7 @@
   = Paint.count
   indexed,
   %em
-    (#{Paint.where("created_at >= ?", Time.zone.now.beginning_of_day).count} today)
+    (#{Paint.where("created_at >= ?", Time.current.beginning_of_day).count} today)
   = Paint.where('color_id IS NULL').count
   are unlinked
 

@@ -31,6 +31,6 @@
 
       .binx-footer
         %h5
-          #{Time.zone.now.year} &copy; Bike Index.
+          #{Time.current.year} &copy; Bike Index.
           - unless @organization.present? && controller_path == 'organized_mailer' && @organization.is_paid
             Help prevent bike theft, #{ link_to 'make a donation.', support_the_index_url }
