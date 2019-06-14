@@ -1,18 +1,12 @@
 class Admin::RecoveriesController < Admin::BaseController
+  include SortableTable
   layout "new_admin"
 
   def index
-    if params[:posted]
-      @posted = true
-      recoveries = StolenRecord.recovery_unposted.includes(:bike).order("date_recovered desc")
-    elsif params[:all_recoveries]
-      recoveries = StolenRecord.recovered.includes(:bike).order("date_recovered desc")
-    else
-      recoveries = StolenRecord.waiting_on_decision.includes(:bike).order("date_recovered desc")
-    end
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @recoveries = recoveries.page(page).per(per_page)
+    @recoveries = matching_recoveries.reorder("stolen_records.#{sort_column} #{sort_direction}")
+                                     .page(page).per(per_page)
   end
 
   def show
@@ -65,7 +59,25 @@ class Admin::RecoveriesController < Admin::BaseController
     end
   end
 
+  helper_method :recovery_display_status_searched
+
   private
+
+  def sortable_columns
+    %w[date_recovered recovery_display_status]
+  end
+
+  def recovery_display_status_searched
+    return StolenRecord::RECOVERY_DISPLAY_STATUS_ENUM.values if params[:search_recovery_display_status] == "all"
+    # Legacy enum issue so excited for TODO: Rails 5 update
+    recovery_display_status_parameter = (params[:search_recovery_display_status] || "waiting_on_decision").to_sym
+    StolenRecord::RECOVERY_DISPLAY_STATUS_ENUM[recovery_display_status_parameter.to_sym] || 1
+  end
+
+  def matching_recoveries
+    recoveries = StolenRecord.recovered.where(recovery_display_status: recovery_display_status_searched)
+    recoveries.includes(:bike)
+  end
 
   def permitted_parameters
     params.require(:stolen_record).permit(StolenRecord.old_attr_accessible)

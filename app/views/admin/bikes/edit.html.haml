@@ -271,34 +271,4 @@
 - if @recoveries.any?
   %h3.mt-4
     Recoveries
-  .full-screen-table
-    %table.table.table-striped.table-bordered.table-sm
-      %thead.thead-light
-        %th
-          Date Recovered&nbsp;<small class="convertTimezone"></small>
-        %th
-          Description
-        %th.d-none.d-md-table-cell
-          Helped?
-        %th.d-none.d-md-table-cell
-          Share?
-        %th
-          unrecover
-      %tbody
-        - @recoveries.each do |recovery|
-          %tr
-            %td
-              %a{ href: edit_admin_recovery_path(recovery.to_param) }
-                - if recovery.date_recovered.present?
-                  %span.convertTime
-                    = l recovery.date_recovered, format: :convert_time
-                - else # Still need text for link
-                  View recovery
-            %td
-              = recovery.recovered_description
-            %td.table-cell-check.d-none.d-md-table-cell
-              = "&#x2713;".html_safe if recovery.index_helped_recovery
-            %td.table-cell-check.d-none.d-md-table-cell
-              = "&#x2713;".html_safe if recovery.can_share_recovery
-            %td
-              = link_to 'unrecover', unrecover_admin_bikes_path(stolen_record_id: recovery.id, bike_id: @bike.id), method: :put, data: { confirm: "Are you sure you want to mark this #{@bike.type} unrecovered? The #{@bike.type} will be stolen again." }
+  = render partial: "/admin/recoveries/table", locals: { recoveries: @recoveries }
