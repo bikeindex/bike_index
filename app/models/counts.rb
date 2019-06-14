@@ -19,6 +19,10 @@ class Counts
       1428 # 2019/5/20 - calculated by averaging the value of the recoveries that had listed values
     end
 
+    def beginning_of_week
+      (Time.current - 7.days).end_of_day + 1.minute
+    end
+
     def total_bikes; retrieve_for("total_bikes") end
 
     def stolen_bikes; retrieve_for("stolen_bikes") end
@@ -41,11 +45,11 @@ class Counts
 
     def assign_recoveries
       # StolenBikeRegistry.com had just over 2k recoveries prior to merging. The recoveries weren't imported, so manually calculate
-      assign_for("recoveries", StolenRecord.recovered.where("date_recovered < ?", Time.zone.now.beginning_of_day).count + 2_041)
+      assign_for("recoveries", StolenRecord.recovered.where("date_recovered < ?", Time.current.beginning_of_day).count + 2_041)
     end
 
     def assign_week_creation_chart
-      assign_for("week_creation_chart", Bike.unscoped.where(created_at: (Time.now - 7.days)..Time.now).group_by_day(:created_at).count.to_json)
+      assign_for("week_creation_chart", Bike.unscoped.where(created_at: beginning_of_week..Time.now).group_by_day(:created_at).count.to_json)
     end
 
     def recoveries; retrieve_for("recoveries") end
