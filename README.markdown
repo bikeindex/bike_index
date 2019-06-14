@@ -60,15 +60,7 @@ Toggle Caching in development with `rake dev:cache` (defaults to disabled)
 We use [RSpec](https://github.com/rspec/rspec) and
 [Guard](https://github.com/guard/guard) for testing.
 
-- Run the test suite continuously in the background with `bin/guard`.
-
-- Run the entire test suite in parallel (see "Running tests in parallel" below)
-  with `bin/rake parallel:spec`.
-
-- Run a list of test files or test directories in parallel with
-  `bin/parallel_rspec <FILES_OR_FOLDERS>`.
-
-- Run tests sequentially with `bin/rspec`.
+- Run the test suite continuously in the background with `bin/guard` (watches for file changes/saves and runs those specs)
 
 - You may have to manually add the `fuzzystrmatch` extension, which we use for
   near serial searches, to your databases. The migration should take care of
@@ -79,42 +71,15 @@ We use [RSpec](https://github.com/rspec/rspec) and
   CREATE EXTENSION fuzzystrmatch;
   ```
 
-### Running tests in parallel
+We use [`parallel_tests`](https://github.com/grosser/parallel_tests/) to run the test suite in parallel. By default, this will spawn one process per CPU in your computer.
 
-The project's test suite can be run in parallel using [`parallel_tests`][]. By
-default, the library spawns one process per CPU. You can optionally set the
-`PARALLEL_TEST_PROCESSORS` env variable to tweak this number, or set it from the
-command line by issuing
+- Run all the tests in parallel with `bin/rake parallel:spec`
 
-```shell-script
-bin/rake parallel:test[1] # --> force 1 CPU
-```
+- Run `bin/rake parallel:prepare` to synchronize the test db schema after migrations (rather than `db:test:prepare`).
 
-You may need to experiment to find the optimal number, but the library provides
-a sensible default of 1 per CPU (2 per dual-core processor, e.g.).
+- Run specific files or test directories with `bin/parallel_rspec <FILES_OR_FOLDERS>`
 
-The first time you run tests in parallel you'll need to set up your test
-databases with
-
-```shell-script
-bin/rake parallel:setup
-```
-
-You'll then be able to run the test suite in parallel with
-
-```shell-script
-bin/rake parallel:spec
-```
-
-To manually propagate migrations across all test databases, issue
-
-```shell-script
-bin/rake parallel:prepare
-```
-
-See the [`parallel_tests`][] docs for more.
-
-[`parallel_tests`]: https://github.com/grosser/parallel_tests/
+- Run Guard with parallelism `bin/guard -G Guardfile_parallel`
 
 ## Code Hygiene
 
