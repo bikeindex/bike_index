@@ -14,7 +14,7 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
   describe "update" do
     context "admin marks recovery that as undisplayable" do
       let(:stolen_record) { FactoryBot.create(:stolen_record, can_share_recovery: true, recovery_display_status: "waiting_on_decision") }
-      let(:params) { { id: stolen_record.id, stolen_record: { index_helped_recovery: 1, can_share_recovery: 1 }, is_not_displayable: { undisplayable: 1 } } }
+      let(:params) { { id: stolen_record.id, stolen_record: { is_not_displayable: true } } }
       it "updates waiting_on_decision to not_displayed" do
         user = FactoryBot.create(:admin)
         set_current_user(user)
@@ -25,9 +25,9 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
     end
     context "admin marks undisplayable bike as displayable" do
       let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
-      let(:stolen_record) { FactoryBot.create(:stolen_record, can_share_recovery: true, recovery_display_status: "waiting_on_decision") }
+      let(:stolen_record) { FactoryBot.create(:stolen_record, can_share_recovery: true, recovery_display_status: "not_displayed") }
       let(:bike) { stolen_record.bike }
-      let(:params) { { id: stolen_record.id, stolen_record: { index_helped_recovery: 1, can_share_recovery: 1 }, mark_as_eligible: { eligible: 1 } } }
+      let(:params) { { id: stolen_record.id, stolen_record: {mark_as_eligible: true  } } }
       it "updates not_displayed to waiting_on_decision" do
         user = FactoryBot.create(:admin)
         set_current_user(user)
