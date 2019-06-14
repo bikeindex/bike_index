@@ -34,7 +34,6 @@ We're an open source project. Take a gander through our code, report bugs, or do
 
 - Requires 1gb of ram (or at least more than 512mb)
 
-
 ## Running Bike Index locally
 
 This explanation assumes you're familiar with developing Ruby on Rails applications.
@@ -45,7 +44,7 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
 - `./start` start the server.
 
-  - [start](start) is a bash script. It starts redis in the background and runs foreman with the [dev procfile](Procfile_development). If you need/prefer something else, do that. If you want to use [Pow](http://pow.cx/) (or some other setup that isn't through localhost:3001), change the appropriate values in [session_store.rb](config/initializers/session_store.rb) and [.env](.env)
+  - [start](start) is a bash script. It starts redis in the background and runs foreman with the [dev procfile](Procfile_development). If you need/prefer something else, do that. If your "something else" isn't running at localhost:3001, change the appropriate values in [Procfile_development](Procfile_development) and [.env](.env)
 
 - Go to [localhost:3001](http://localhost:3001)
 
