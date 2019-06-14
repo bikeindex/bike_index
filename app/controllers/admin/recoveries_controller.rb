@@ -20,14 +20,15 @@ class Admin::RecoveriesController < Admin::BaseController
 
   def update
     @stolen_record = StolenRecord.unscoped.find(params[:id])
-    if params[:stolen_record][:is_not_displayable].present?
-      @stolen_record.recovery_display_status = "not_displayed"
-    elsif params[:stolen_record][:mark_as_eligible].present?
+    if params[:stolen_record][:mark_as_eligible].present?
       @stolen_record.recovery_display_status = "waiting_on_decision"
+      redirect = new_admin_recovery_display_path(@stolen_record)
+    elsif params[:stolen_record][:is_not_displayable].present?
+      @stolen_record.recovery_display_status = "not_displayed"
     end
     if @stolen_record.update_attributes(permitted_parameters)
       flash[:success] = "Recovery Saved!"
-      redirect_to admin_recoveries_url
+      redirect_to redirect ||= admin_recoveries_url
     else
       raise StandardError
       render action: :edit
