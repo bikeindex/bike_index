@@ -11,10 +11,10 @@ class RakeDevConfiguration
       FileUtils.mkdir_p("tmp")
 
       if File.exist?(file)
-        delete_cache_file(file)
+        delete_toggle_file(file)
         puts "Development mode is no longer being cached."
       else
-        create_cache_file(file)
+        create_toggle_file(file)
         puts "Development mode is now being cached."
       end
 
@@ -26,35 +26,40 @@ class RakeDevConfiguration
       FileUtils.mkdir_p("tmp")
 
       if File.exist?(file)
-        delete_cache_file(file)
+        delete_toggle_file(file)
         puts "Spring is no longer enabled (you will need to manually kill the spring processes)"
       else
-        create_cache_file(file)
+        create_toggle_file(file)
         puts "Spring is now enabled."
-
       end
 
       FileUtils.touch "tmp/restart.txt" # Probably doesn't do anything right now, but whatever
     end
 
-    def enable_by_argument(caching, file)
+    def toggle_letter_opener
+      file = "tmp/skip-letter_opener.txt"
       FileUtils.mkdir_p("tmp")
 
-      if caching
-        create_cache_file(file)
-      elsif caching == false && File.exist?(file)
-        delete_cache_file(file)
+      if File.exist?(file)
+        delete_toggle_file(file)
+        puts "letter_opener is now enabled"
+      else
+        create_toggle_file(file)
+        puts "letter_opener is disabled."
       end
+
+      FileUtils.touch "tmp/restart.txt" # Probably doesn't do anything right now, but whatever
     end
 
     private
-      def create_cache_file(file)
-        FileUtils.touch(file)
-      end
 
-      def delete_cache_file(file)
-        File.delete(file)
-      end
+    def create_toggle_file(file)
+      FileUtils.touch(file)
+    end
+
+    def delete_toggle_file(file)
+      File.delete(file)
+    end
   end
 end
 
@@ -65,5 +70,9 @@ namespace :dev do
 
   task spring: :environment do
     RakeDevConfiguration.toggle_spring
+  end
+
+  task letter_opener: :environment do
+    RakeDevConfiguration.toggle_letter_opener
   end
 end

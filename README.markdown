@@ -48,12 +48,11 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
 - Go to [localhost:3001](http://localhost:3001)
 
-**Additional options:**
-
-Toggle Spring with `rake dev:spring` (defaults to disabled)
-
-Toggle Caching in development with `rake dev:cache` (defaults to disabled)
-
+| Toggle in development | command | default |
+| --------- | ------- | ------- |
+| Spring    | `bin/rake dev:spring` | disabled |
+| Caching   | `bin/rake dev:cache` | disabled |
+| [letter_opener](https://github.com/ryanb/letter_opener) | `bin/rake dev:letter_opener` | enabled |
 
 ## Testing
 
