@@ -15,9 +15,12 @@ Dir.chdir APP_ROOT do
   puts "== Starting redis so database can be migrated =="
   system "redis-server &"
 
-  puts "\n== Preparing database =="
-  system "bin/rake db:setup db:test:prepare"
+  puts "\n== Preparing and seeding database =="
+  system "bin/rake db:setup"
   system "bin/rake seed_test_users_and_bikes"
+
+  puts "\n== Preparing test database (including parallelism) =="
+  system "bin/rake parallel:prepare"
 
   puts "\n== Removing old logs and tempfiles =="
   system "rm -f log/*"
