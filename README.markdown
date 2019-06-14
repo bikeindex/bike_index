@@ -62,9 +62,6 @@ We use [RSpec](https://github.com/rspec/rspec) and
 
 - Run the test suite continuously in the background with `bin/guard` (watches for file changes/saves and runs those specs)
 
-- Run the test suite in parallel
-  with `bin/rake parallel:spec` (see [Running tests in parallel](#running-tests-in-parallel) below)
-
 - You may have to manually add the `fuzzystrmatch` extension, which we use for
   near serial searches, to your databases. The migration should take care of
   this but sometimes doesn't. Open the databases in postgres
@@ -74,21 +71,15 @@ We use [RSpec](https://github.com/rspec/rspec) and
   CREATE EXTENSION fuzzystrmatch;
   ```
 
-### Running tests in parallel
+We use [`parallel_tests`](https://github.com/grosser/parallel_tests/) to run the test suite in parallel. By default, this will spawn one process per CPU in your computer.
 
-We use [`parallel_tests`][] to run the test suite in parallel - run with `bin/rake parallel:spec`
-
+- Run all the tests in parallel with `bin/rake parallel:spec`
 
 - Run `bin/rake parallel:prepare` to synchronize the test db schema after migrations (rather than `db:test:prepare`).
 
 - Run specific files or test directories with `bin/parallel_rspec <FILES_OR_FOLDERS>`
 
 - Run Guard with parallelism `bin/guard -G Guardfile_parallel`
-
-By default, `parallel_tests` spawns one process per CPU in your computer (which is a sensible default). You can optionally set the
-`PARALLEL_TEST_PROCESSORS` env variable to tweak this number. See the [`parallel_tests`][] docs for more configuration options.
-
-[`parallel_tests`]: https://github.com/grosser/parallel_tests/
 
 ## Code Hygiene
 
