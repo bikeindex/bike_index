@@ -1,9 +1,14 @@
-.clearfix.mb-4
-  %h1.float-left
-    = @organization.name
-  = link_to "Edit organization", edit_admin_organization_url(@organization), class: "btn btn-primary float-right"
-  - if current_user.developer?
-    = link_to 'edit custom layouts', admin_organization_custom_layouts_path(organization_id: @organization.to_param), class: "btn btn-link float-right less-strong"
+.admin-subnav
+  .col-md-4
+    %h1
+      = @organization.name
+  .col-md-8
+    %ul
+      %li.nav-item
+        = link_to "Edit organization", edit_admin_organization_url(@organization), class: "btn btn-primary float-right"
+      - if current_user.developer?
+        %li.nav-item
+          = link_to "edit custom layouts", admin_organization_custom_layouts_path(organization_id: @organization.to_param), class: "btn btn-link btn-sm less-strong"
 
 - if @organization.is_suspended
   %h2.text-danger
@@ -54,10 +59,13 @@
           Slug
         %td
           = @organization.slug
-          ,
+          \|
           = link_to "embed", embed_registrations_url(organization_id: @organization.to_param)
-          ,
-          = link_to "org's manage", organization_manage_index_path(organization_id: @organization.to_param)
+          \|
+          - if @organization.ambassador?
+            = link_to "dashboard", organization_ambassador_dashboard_path(organization_id: passive_organization.to_param)
+          - else
+            = link_to "org's manage", organization_manage_index_path(organization_id: @organization.to_param)
       %tr
         %td
           Created
@@ -272,27 +280,28 @@
 %h2.mt-4
   = pluralize(@organization.users.count, "User")
 
-%table.table.table-striped.table-bordered.table-sm
-  %thead.thead-light
-    %th
-      Edit&nbsp;
-    %th
-      Name
-    %th
-      Email
-    %th
-      Total indexed
-  %tbody
-    - @organization.users.each do |user|
-      %tr
-        %td
-          = link_to "&rarr;".html_safe, edit_admin_user_url(user)
-        %td
-          = user.name
-        %td
-          = user.email
-        %td
-          = user.creation_states.where(organization_id: @organization.id).count
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th
+        Edit&nbsp;
+      %th
+        Name
+      %th
+        Email
+      %th
+        Total indexed
+    %tbody
+      - @organization.users.each do |user|
+        %tr
+          %td
+            = link_to "&rarr;".html_safe, edit_admin_user_url(user)
+          %td
+            = user.name
+          %td
+            = user.email
+          %td
+            = user.creation_states.where(organization_id: @organization.id).count
 
 
 %ul.list-unstyled
@@ -326,11 +335,12 @@
               = location.address
 
 
-%ul.list-inline
-  %li.list-inline-item.mt-4
+%ul.list-inline.mt-4
+  %li.list-inline-item
     = link_to "Manage organization invitations", admin_organization_invitation_url(organization_id: @organization.to_param), class: "btn btn-warning"
-  %li.list-inline-item.mt-4
+
+  %li.list-inline-item
     = link_to "Edit", edit_admin_organization_url(@organization), class: "btn btn-success"
   - unless @organization.deleted?
-    %li.list-inline-item.mt-4
-      = link_to "Delete #{@organization.name}!", admin_organization_url(@organization), method: :delete, confirm: "Are you sure?", class: "btn btn-danger"
+    %li.list-inline-item.ml-auto
+      = link_to "Delete", admin_organization_url(@organization), method: :delete, confirm: "Are you sure?", class: "btn btn-danger"

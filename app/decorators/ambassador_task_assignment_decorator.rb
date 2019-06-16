@@ -8,7 +8,7 @@ class AmbassadorTaskAssignmentDecorator < ApplicationDecorator
     return unless current_user.ambassador?
 
     is_complete = ambassador_task_assignment.completed?
-    button_label = is_complete ? "Mark Pending" : "Mark Complete"
+    button_label = is_complete ? "Pending" : "Complete"
 
     h.button_to(
       button_label,
