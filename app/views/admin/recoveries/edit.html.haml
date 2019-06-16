@@ -71,7 +71,7 @@
         = link_to "Recovery displayed", edit_admin_recovery_display_url(@recovery.recovery_display)
   .col-md-3
     - if !@recovery.displayed?
-      = link_to 'Share recovery', new_admin_recovery_display_path(@recovery), class: 'btn btn-primary'
+      = link_to 'Share recovery', new_admin_recovery_display_path(stolen_record_id: @recovery.id), class: 'btn btn-primary'
   .col-md-3
     - if !@recovery.not_displayed?
       = button_to "Not Displayable", admin_recovery_path(id: @recovery.id, stolen_record: {is_not_displayable: true}), method: :put, class: "btn btn-warning"
