@@ -22,47 +22,50 @@
 
 - if suggested_activities.present?
   %h2 Suggested Activities
-  %table.table.table-striped.table-bordered.ambassador-tasks-table
-    %thead.small-header
-      %tr
-        %th Activity
-        %th Actions
-    %tbody
-      - suggested_activities.each do |task|
+  .full-screen-table
+    %table.table.table-striped.table-bordered.ambassador-tasks-table
+      %thead.small-header
         %tr
-          %td
-            %strong= task.title
-            %br
-            = task.description_html.html_safe
-          %td
-            = task.button_to_toggle_completion_status(current_user, current_organization)
+          %th Activity
+          %th Actions
+      %tbody
+        - suggested_activities.each do |task|
+          %tr
+            %td
+              %strong= task.title
+              %br
+              = task.description_html.html_safe
+            %td
+              = task.button_to_toggle_completion_status(current_user, current_organization)
 
 - if completed_activities.present?
   %h2 Completed activities
-  %table.table.table-striped.table-bordered.ambassador-tasks-table
-    %thead.small-header
-      %tr
-        %th Activity
-        %th Completed
-    %tbody
-      - completed_activities.each do |task|
+  .full-screen-table
+    %table.table.table-striped.table-bordered.ambassador-tasks-table
+      %thead.small-header
         %tr
-          %td
-            %strong= task.title
-            %br
-            = task.description_html.html_safe
-          %td
-            %span.convertTime= l task.completed_at, format: :convert_time
+          %th Activity
+          %th Completed
+      %tbody
+        - completed_activities.each do |task|
+          %tr
+            %td
+              %strong= task.title
+              %br
+              = task.description_html.html_safe
+            %td
+              %span.convertTime= l task.completed_at, format: :convert_time
 
 
 %h2 Leaderboard
-%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
-  %thead.small-header
-    %tr
-      %th Name
-      %th Activities
-  %tbody
-    - ambassadors.each do |ambassador|
+.full-screen-table
+  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
+    %thead.small-header
       %tr
-        %td= ambassador.name
-        %td= ambassador.progress_count
+        %th Name
+        %th Activities
+    %tbody
+      - ambassadors.each do |ambassador|
+        %tr
+          %td= ambassador.name
+          %td= ambassador.progress_count
