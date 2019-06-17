@@ -9,10 +9,12 @@
 %ul.list-unstyled
   = render partial: "/admin/bikes/bike", locals: {bike: @bike, target: "show" }
 .row
-  .col-md-6
+  .col-auto
     %h2
-      %span.table-error
+      %span
         BE CAREFUL. YOU CAN BREAK STUFF HERE
+.row
+  .col-md-6
     = form_for [:admin, @ownership], html: { class: "form form-horizontal" } do |f|
       - if @ownership.errors.any?
         = render partial: "/shared/errors", locals: { name: "Ownership", obj: @ownership }
