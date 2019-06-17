@@ -4,6 +4,7 @@ class Admin::NewsController < Admin::BaseController
 
   def index
     @blogs = Blog.order("created_at asc")
+    render layout: "new_admin"
   end
 
   def new
