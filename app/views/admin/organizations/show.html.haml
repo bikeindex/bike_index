@@ -291,7 +291,7 @@
         Email
       - if @organization.ambassador?
         %th
-          Activities completed
+          Activities
       %th
         Total indexed
     %tbody
@@ -301,13 +301,13 @@
             = link_to "&rarr;".html_safe, edit_admin_user_url(user)
           %td
             = user.name
+          %td
+            = user.email
           - if @organization.ambassador?
             %td
               - if user.ambassador?
                 - ambassador = Ambassador.find(user.id)
-                = ambassador.progress_count
-          %td
-            = user.email
+                = link_to ambassador.progress_count, admin_ambassador_task_assignments_path(search_ambassador_id: ambassador.id)
           %td
             = user.creation_states.where(organization_id: @organization.id).count
 

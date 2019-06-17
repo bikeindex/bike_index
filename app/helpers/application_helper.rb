@@ -169,8 +169,6 @@ module ApplicationHelper
   end
 
   def button_to_toggle_task_completion_status(ambassador_task_assignment, current_user, current_organization)
-    return unless current_user.ambassador?
-
     is_complete = ambassador_task_assignment.completed?
     button_label = is_complete ? "Mark Pending" : "Mark Complete"
 
