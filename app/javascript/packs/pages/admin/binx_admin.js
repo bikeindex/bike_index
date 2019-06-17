@@ -27,6 +27,10 @@ function BinxAdmin() {
       if ($("#admin-recovery-fields")) {
         this.bikesEditRecoverySlide();
       }
+      if ($("#characterCounter").length > 0) {
+        this.setCharacterCount();
+        this.characterCounter();
+      }
       // Enable bootstrap custom file upload boxes
       binxApp.enableFilenameForUploads();
       LoadFancySelects();
@@ -128,6 +132,17 @@ function BinxAdmin() {
         window.toggleAllChecked = !window.toggleAllChecked;
         $(".update-mnfg-select input").prop("checked", window.toggleAllChecked);
       });
+    },
+    setCharacterCount() {
+      $("p#characterTotal").text($("#characterCounter").val().length)
+    },
+
+    characterCounter() {
+      let self = this
+      $("#characterCounter").on("keyup", function(e){
+        e.preventDefault
+        self.setCharacterCount();
+      })
     }
   };
 }
