@@ -3487,6 +3487,13 @@ CREATE INDEX index_users_on_password_reset_token ON public.users USING btree (pa
 
 
 --
+-- Name: unique_assignment_to_ambassador; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX unique_assignment_to_ambassador ON public.ambassador_task_assignments USING btree (user_id, ambassador_task_id);
+
+
+--
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4230,4 +4237,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190611223723');
 INSERT INTO schema_migrations (version) VALUES ('20190612183532');
 
 INSERT INTO schema_migrations (version) VALUES ('20190614223136');
+
+INSERT INTO schema_migrations (version) VALUES ('20190617174200');
 
