@@ -154,6 +154,7 @@ class BikesController < ApplicationController
   def edit
     @page_errors = @bike.errors
     @edit_templates = edit_templates
+    @pricing_plans = PRICING_PLANS
 
     result = target_edit_template(requested_page: params[:page])
     @edit_template = result[:template]
@@ -325,4 +326,26 @@ class BikesController < ApplicationController
   def permitted_bparams # still manually managing permission of params, skip for now
     params.as_json
   end
+
+  # TEMP: Replacing with AR models
+  PRICING_PLANS = [
+    {
+      views: 50_000,
+      duration: 7,
+      price: 6995,
+      name: "Maximum",
+    },
+    {
+      views: 25_000,
+      duration: 7,
+      price: 3995,
+      name: "Standard",
+    },
+    {
+      views: 10_000,
+      duration: 7,
+      price: 1995,
+      name: "Starter",
+    },
+  ].map { |attr| OpenStruct.new(attr) }
 end

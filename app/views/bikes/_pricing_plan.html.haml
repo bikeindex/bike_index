@@ -1,0 +1,30 @@
+.col-md-12.col-lg-4
+  .detail-card-container
+    .detail-card-title= pricing_plan.name
+    .detail-card
+      .detail-card-subtitle
+        %strong= number_with_delimiter(pricing_plan.views)
+        Views
+      .detail-card-subtitle
+        %strong= pricing_plan.duration
+        Days
+      .detail-card-subtitle.detail-card-price
+        = number_to_currency(pricing_plan.price / 100.0, unit: "$")
+    .detail-card-subtitle
+      .detail-card-button.btn-primary
+        Choose
+        = pricing_plan.name
+    .detail-card-content-main
+      %ul
+        %li
+          %strong 5,000 Ad Campaign Views
+          from people within 10 miles
+        %li
+          %strong +10,000 Bonus Views
+          from people within 10 miles
+        %li
+          Ad campaign runs for
+          %strong 7 Days
+        %li
+          %strong Priority Support
+          from the Bike Index Team
