@@ -1,8 +1,8 @@
 class Admin::OwnershipsController < Admin::BaseController
   before_filter :find_ownership
+  layout "new_admin"
 
   def edit
-    render layout: "new_admin"
   end
 
   def update
