@@ -1,0 +1,76 @@
+.edit-bike-page-alert {
+  .detail-card-container {
+    background-color: $white;
+    border: 1px solid $black;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 15px auto;
+  }
+
+  .detail-card-title {
+    background-color: $black;
+    border-bottom: 0;
+    color: $white;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 1.25px;
+    padding: 25px;
+    text-align: center;
+  }
+
+  .detail-card {
+    background: $white;
+    padding: 10px;
+  }
+
+  .detail-card-subtitle {
+    background-color: $white;
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .detail-card-price {
+    color: $header-font-color;
+    font-size: 45px;
+    letter-spacing: 1.5px;
+    margin: 25px auto;
+  }
+
+  .detail-card-button {
+    border-radius: 4px;
+    font-size: 18px;
+    margin: auto;
+    padding-bottom: 18px;
+    padding-top: 18px;
+    width: 90%;
+  }
+
+  .detail-card-content-main {
+    background-color: $white;
+    border-radius: 4px;
+    font-size: 12px;
+    margin: 0 auto;
+    padding: 10px;
+
+    ul {
+      list-style-type: none;
+      margin: auto;
+      padding: 0;
+    }
+
+    li:first-of-type {
+      margin-top: 0;
+    }
+
+    li {
+      border-bottom: 1px solid $gray-light;
+      margin: 5px auto;
+    }
+
+    li:last-of-type {
+      border: 0;
+      margin-bottom: 0;
+    }
+  }
+
+}

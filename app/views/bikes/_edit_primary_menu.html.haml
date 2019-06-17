@@ -1,3 +1,5 @@
+- is_disabled ||= false
+
 %nav.primary-edit-form-well-menu
   - if @bike.stolen?
     %h3.nav-group-header Theft Details
@@ -26,4 +28,4 @@
           = description
   .edit-form-well-submit-wrapper
     = hidden_field_tag :edit_template, @edit_template
-    = submit_tag 'Save changes', class: 'btn btn-lg btn-primary'
+    = submit_tag 'Save changes', class: 'btn btn-lg btn-primary', disabled: is_disabled
