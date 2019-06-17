@@ -7,3 +7,7 @@ Flipper.configure do |config|
     Flipper.new(adapter)
   end
 end
+
+Flipper.register(:superusers) do |actor|
+  actor.respond_to?(:superuser?) && actor.superuser?
+end
