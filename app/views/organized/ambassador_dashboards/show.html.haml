@@ -20,7 +20,7 @@
   our Slack channel or email
   #{link_to "lily@bikeindex.org", "mailto:lily@bikeindex.org"}.
 
-- if suggested_activities.present?
+- if @suggested_activities.present?
   %h2 Suggested Activities
   .full-screen-table
     %table.table.table-striped.table-bordered.ambassador-tasks-table
@@ -29,16 +29,17 @@
           %th Activity
           %th Actions
       %tbody
-        - suggested_activities.each do |task|
+        - @suggested_activities.each do |task|
           %tr
             %td
               %strong= task.title
               %br
               = task.description_html.html_safe
-            %td
-              = task.button_to_toggle_completion_status(current_user, current_organization)
+            %td.ambassador-toggle
+              - if task.is_a?(AmbassadorTaskAssignment)
+                = button_to_toggle_task_completion_status(task, current_user, current_organization)
 
-- if completed_activities.present?
+- if @completed_activities.present?
   %h2 Completed activities
   .full-screen-table
     %table.table.table-striped.table-bordered.ambassador-tasks-table
@@ -47,7 +48,7 @@
           %th Activity
           %th Completed
       %tbody
-        - completed_activities.each do |task|
+        - @completed_activities.each do |task|
           %tr
             %td
               %strong= task.title
@@ -65,7 +66,7 @@
         %th Name
         %th Activities
     %tbody
-      - ambassadors.each do |ambassador|
+      - @ambassadors.each do |ambassador|
         %tr
           %td= ambassador.name
           %td= ambassador.progress_count

@@ -1,0 +1,17 @@
+#organized_ambassador_dashboards_show {
+  .ambassador-toggle {
+    padding: 0;
+    text-align: center;
+    @include media-breakpoint-down(md) {
+      font-size: 90%;
+      width: 7rem;
+      .btn {
+        padding: 0.5rem 0;
+        white-space: normal;
+        display: block;
+        width: 90%;
+        margin: 1rem auto;
+      }
+    }
+  }
+}
