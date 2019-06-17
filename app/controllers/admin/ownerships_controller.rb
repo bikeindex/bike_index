@@ -2,6 +2,7 @@ class Admin::OwnershipsController < Admin::BaseController
   before_filter :find_ownership
 
   def edit
+    render layout: "new_admin"
   end
 
   def update
