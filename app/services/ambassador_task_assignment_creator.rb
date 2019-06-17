@@ -6,18 +6,21 @@ module AmbassadorTaskAssignmentCreator
         .where(ambassador_task_assignments: { ambassador_task: ambassador_task })
         .select(:id)
 
-    new_assignments =
+    unassigned_ambassadors =
       Ambassador
         .includes(:ambassador_task_assignments)
         .where
         .not(id: already_assigned_ambassador_ids)
-        .pluck(:id)
-        .map { |ambassador_id| { user_id: ambassador_id, ambassador_task_id: ambassador_task.id } }
+        .references(:ambassador_task_assignments)
 
-    AmbassadorTaskAssignment.import(new_assignments, validate: true)
+    unassigned_ambassadors.find_each do |ambassador|
+      ambassador_task.assign_to(ambassador)
+    end
   end
 
   def self.assign_all_ambassador_tasks_to(ambassador)
+    ambassador = ambassador.becomes(Ambassador)
+
     already_assigned_task_ids =
       AmbassadorTask
         .includes(ambassador_task_assignments: :ambassador)
@@ -29,9 +32,10 @@ module AmbassadorTaskAssignmentCreator
         .includes(:ambassador_task_assignments)
         .where
         .not(id: already_assigned_task_ids)
-        .pluck(:id)
-        .map { |t_id| { ambassador_task_id: t_id, user_id: ambassador.id } }
+        .references(:ambassador_task_assignments)
 
-    AmbassadorTaskAssignment.import(new_assignments, validate: true)
+    new_assignments.find_each do |ambassador_task|
+      ambassador_task.assign_to(ambassador)
+    end
   end
 end
