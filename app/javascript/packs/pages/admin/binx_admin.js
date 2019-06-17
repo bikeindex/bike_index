@@ -134,7 +134,7 @@ function BinxAdmin() {
       });
     },
     setCharacterCount() {
-      $("p#characterTotal").text($("#characterCounter").val().length)
+      $("p#characterTotal").text($("#characterCounter").val().length + "/300")
     },
 
     characterCounter() {
