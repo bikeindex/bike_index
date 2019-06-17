@@ -1,6 +1,7 @@
 .col-md-12.col-lg-4
   .detail-card-container
-    .detail-card-title= pricing_plan.name
+    .detail-card-title
+      = pricing_plan.name
     .detail-card
       .detail-card-subtitle
         %strong= number_with_delimiter(pricing_plan.views)
@@ -12,8 +13,8 @@
         = number_to_currency(pricing_plan.price / 100.0, unit: "$")
     .detail-card-subtitle
       .detail-card-button.btn-primary
-        Choose
-        = pricing_plan.name
+        %a.js-pricing-plan-select{ data: { amount: pricing_plan.price } }
+          Choose #{pricing_plan.name}
     .detail-card-content-main
       %ul
         %li

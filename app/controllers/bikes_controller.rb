@@ -233,7 +233,7 @@ class BikesController < ApplicationController
       h[:theft_details] = "Recovery details" if @bike.recovered?
       h[:theft_details] = "Theft details" unless @bike.recovered?
       h[:publicize] = "Publicize Theft"
-      h[:alert] = "Activate Bike Index Alert" if Flipper.enabled?(:premium_listings, current_user)
+      h[:alert] = "Activate Theft Alert" if Flipper.enabled?(:premium_listings, current_user)
       h[:report_recovered] = "Mark this Bike Recovered" unless @bike.recovered?
     end
   end

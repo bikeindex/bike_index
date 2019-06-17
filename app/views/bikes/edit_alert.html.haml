@@ -1,7 +1,7 @@
 .primary-edit-bike-form
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: "/bikes/edit_primary_menu", locals: { is_disabled: true}
+      = render partial: "/bikes/edit_primary_menu", locals: { is_disabled: true }
 
       .col-md-8.form-well#form_well_wrap
         .form-wrap
@@ -9,5 +9,15 @@
             / Publicize Theft
             %h3= @edit_templates[@edit_template]
 
-          .row
-            = render partial: "pricing_plan", collection: @pricing_plans
+          %form#bikeindex-stripe-bike-alert-form
+            .row
+              = render partial: "pricing_plan", collection: @pricing_plans
+
+%script{ src: "https://checkout.stripe.com/checkout.js" }
+- stripe_data = { key: ENV["STRIPE_PUBLISHABLE_KEY"], email: current_user&.email, type:  "Pay" }
+- theft_alerts_path = ""
+= form_tag theft_alerts_path, id: "stripe_form", data: stripe_data do
+  = hidden_field_tag :stripe_token
+  = hidden_field_tag :stripe_amount
+  = hidden_field_tag :stripe_email
+  = hidden_field_tag :is_payment, true
