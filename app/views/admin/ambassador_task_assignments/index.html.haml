@@ -4,6 +4,14 @@
 
 .row
   .col-md-6
+    - if params[:search_ambassador_id].present?
+      - ambassador = Ambassador.username_friendly_find(params[:search_ambassador_id])
+      %p
+        Viewing #{link_to ambassador.display_name, admin_user_path(ambassador.to_param)}'s completed activities
+    - if params[:search_organization_id].present?
+      - organization = Organization.friendly_find(params[:search_organization_id])
+      %p
+        For #{link_to organization.name, admin_organization_path(organization.to_param)}
     - if !sortable_search_params?
       %p= pluralize |
           number_with_delimiter(@ambassador_task_assignments.total_count), |

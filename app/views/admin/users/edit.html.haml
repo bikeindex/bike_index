@@ -144,7 +144,7 @@
 %h3
   Donations
 .full-screen-table
-  %table.table.table-striped.table-bordered
+  %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
       %th
         Date
@@ -168,7 +168,7 @@
     %h2.mt-4
       = @user.memberships.count
       Current memberships
-    %table.table.table-striped.table-bordered
+    %table.table.table-striped.table-bordered.table-sm
       %thead.thead-light
         %th
           Id&nbsp;
@@ -198,7 +198,7 @@
 - if @user.user_emails.count > 1
   %h2 User emails
   .full-screen-table
-    %table.table.table-striped.table-bordered
+    %table.table.table-striped.table-bordered.table-sm
       %thead
         %th
           Created&nbsp;<small class="convertTimezone"></small>
