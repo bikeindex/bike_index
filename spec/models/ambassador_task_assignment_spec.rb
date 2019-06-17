@@ -55,6 +55,16 @@ RSpec.describe AmbassadorTaskAssignment, type: :model do
       expect(assignment2).to be_invalid
       expect(assignment2.errors[:ambassador_task]).to eq(["has already been taken"])
     end
+
+    it "raises if the task assignment is non-unique per-user" do
+      assignment1 = FactoryBot.create(:ambassador_task_assignment)
+      ambassador = assignment1.ambassador
+      task = assignment1.ambassador_task
+
+      assignment2 = described_class.new(ambassador: ambassador, ambassador_task: task)
+
+      expect { assignment2.save(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
   end
 
   describe ".completed_assignments" do
