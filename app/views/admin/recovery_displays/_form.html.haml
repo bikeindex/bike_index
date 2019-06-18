@@ -30,7 +30,9 @@
         .col-lg-6
           .form-group
             = f.label :body
-            = f.text_area :quote, placeholder: 'Quote about recovery', rows: 4, class: "form-control"
+            = f.text_area :quote, placeholder: 'Quote about recovery', rows: 4, class: "form-control", id: "characterCounter"
+          %p#characterTotal
+
         .col-lg-6
           #recovery-photo-upload-input
             .form-group.mt-4

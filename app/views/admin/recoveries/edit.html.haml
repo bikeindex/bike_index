@@ -24,6 +24,20 @@
               = l @bike.created_at, format: :convert_time
         %tr
           %td
+            Stolen at
+          %td
+            - if @recovery.date_stolen.present?
+              %span.convertTime
+                = l @recovery.date_stolen, format: :convert_time
+        %tr
+          %td
+            Recovered at
+          %td
+            - if @recovery.date_recovered.present?
+              %span.convertTime{ href: admin_bike_url(@bike) }
+                = l @recovery.date_recovered, format: :convert_time
+        %tr
+          %td
             Recovered by
           %td
             - if @recovery.recovering_user.present?

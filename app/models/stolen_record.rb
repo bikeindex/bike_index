@@ -59,7 +59,7 @@ class StolenRecord < ActiveRecord::Base
   def recovered?; !current? end
 
   # TODO: check based on the ownership of the bike at the time of recovery
-  def recovering_user_owner?; recovering_user.present? && bike.owner == recovering_user end
+  def recovering_user_owner?; recovering_user.present? && bike&.owner == recovering_user end
 
   def pre_recovering_user?; date_recovered.present? && date_recovered < self.class.recovering_user_recording_start end
 
