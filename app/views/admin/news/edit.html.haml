@@ -2,9 +2,11 @@
   .col-md-6
     %h1
       Editing that #{@dignified_name}!
-  .col-md-6
+  .col-md-4
     %p
       = link_to "Back to all", admin_news_index_url, class: "float-right btn btn-primary"
+  .col-md-2
+    = link_to "Delete post", admin_news_url(@blog), method: :delete, confirm: "Are you sure?", class: "btn btn-danger float-right"
 - if params[:show_photos]
   %p
     - if @blog.is_listicle
@@ -107,7 +109,3 @@
     .alert.alert-info
       %p
         The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank"} if you're curious.
-
-.mt-4.clearfix
-  = link_to "Delete post", admin_news_url(@blog), method: :delete, confirm: "Are you sure?", class: "btn btn-danger"
-
