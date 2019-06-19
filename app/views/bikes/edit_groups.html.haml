@@ -19,6 +19,10 @@
                     Creation organization
                   %p.form-well-input-static.bike_organization_static_input{ data: { orgid: @bike.creation_organization_id } }
                     = @bike.creation_organization.name
+                    %small
+                      %label.checkbox-inline.not-fixed
+                        = check_box_tag "coaster_brake_organization_#{@bike.creation_organization_id}"
+                        Can edit
                   .right-input-help
                     %a.optional-form-block.remove-organization{ href: '#' }
                       %span.context-display-help
@@ -37,7 +41,7 @@
                       Remove
 
           :javascript
-            window.organizations = #{Organization.valid.map { |organization| { name: organization.name, id: organization.id } }.to_json };
+            window.organizations = #{Organization.approved.map { |organization| { name: organization.name, id: organization.id } }.to_json };
           .related-fields#additional_organization_fields
             .form-group.row.unnested-field.no-divider-row
               = f.hidden_field :bike_organization_ids, value: @bike.bike_organization_ids.join(',')
