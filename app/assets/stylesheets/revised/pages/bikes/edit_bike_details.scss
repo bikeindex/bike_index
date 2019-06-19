@@ -37,7 +37,7 @@
   }
 }
 
-@media (max-width: $grid-breakpoint-md) {
+@media (max-width: $grid-breakpoint-md - 1px) {
   #bikes_edit {
     .nav-group-header {
       display: none;
@@ -66,7 +66,7 @@
   }
 }
 
-@media (min-width: $grid-breakpoint-sm) {
+@media (min-width: $grid-breakpoint-md) {
   .edit-bike-page-bike_details {
     .frame-sizes {
       .right-input-help {
