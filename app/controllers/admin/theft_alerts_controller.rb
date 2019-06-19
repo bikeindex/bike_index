@@ -19,7 +19,13 @@ class Admin::TheftAlertsController < Admin::BaseController
 
   def update
     @theft_alert = TheftAlert.find(params[:id])
-    @theft_alert.public_send("#{state_transition}!", theft_alert_params)
+
+    case state_transition
+    when "begin"
+      @theft_alert.begin!(facebook_post_url: theft_alert_params[:facebook_post_url])
+    when "end", "reset"
+      @theft_alert.public_send("#{state_transition}!")
+    end
 
     if @theft_alert.errors.present?
       flash[:error] = @theft_alert.errors.to_a

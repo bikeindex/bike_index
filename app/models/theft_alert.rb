@@ -18,39 +18,36 @@ class TheftAlert < ActiveRecord::Base
 
   delegate :bike, to: :stolen_record
 
-  def begin!(kwargs)
+  def begin!(facebook_post_url:)
     start_time = Time.current
     end_time = start_time + theft_alert_plan&.duration_days&.days
 
     attrs = {
       status: "active",
-      facebook_post_url: kwargs.fetch(:facebook_post_url, ""),
+      facebook_post_url: facebook_post_url,
       begin_at: start_time,
       end_at: end_time.end_of_day,
     }
-
     update(attrs) if valid_state?(attrs)
   end
 
-  def end!(*)
+  def end!
     attrs = {
       status: "inactive",
       facebook_post_url: facebook_post_url,
       begin_at: begin_at,
       end_at: end_at,
     }
-
     update(attrs) if valid_state?(attrs)
   end
 
-  def reset!(*)
+  def reset!
     attrs = {
       status: "pending",
       facebook_post_url: "",
       begin_at: nil,
       end_at: nil,
     }
-
     update(attrs) if valid_state?(attrs)
   end
 
