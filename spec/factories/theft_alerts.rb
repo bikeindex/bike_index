@@ -6,9 +6,11 @@ FactoryBot.define do
     status { "pending" }
 
     trait :paid do
-      after(:create) do |theft_alert, _evaluator|
-        payment = create(:payment, user: theft_alert.creator)
-        theft_alert.update_attributes(payment: payment)
+      transient do
+        payment { create(:payment, user: creator) }
+      end
+      after(:create) do |theft_alert, evaluator|
+        theft_alert.update_attributes(payment: evaluator.payment)
       end
     end
 
@@ -18,32 +20,29 @@ FactoryBot.define do
       sequence(:facebook_post_url) do |n|
         "https://facebook.com/user.#{creator.id}/posts/#{n}"
       end
-      before(:create) do |theft_alert, _evaluator|
-        plan = create(:theft_alert_plan)
-
-        duration = plan.duration_days
-        end_at = theft_alert.begin_at + duration.days
-
+      transient do
+        theft_alert_plan { create(:theft_alert_plan) }
+      end
+      before(:create) do |theft_alert, evaluator|
+        plan = evaluator.theft_alert_plan
         theft_alert.theft_alert_plan = plan
-        theft_alert.end_at = end_at.end_of_day
-
+        theft_alert.end_at = theft_alert.begin_at + plan.duration_days.days
         theft_alert.save
       end
     end
 
     trait :ended do
       status { "inactive" }
-      end_at { Time.current.end_of_day }
+      end_at { Time.current }
 
-      before(:create) do |theft_alert, _evaluator|
-        plan = create(:theft_alert_plan)
+      transient do
+        theft_alert_plan { create(:theft_alert_plan) }
+      end
 
-        duration = plan.duration_days
-        begin_at = theft_alert.end_at - duration.days
-
+      before(:create) do |theft_alert, evaluator|
+        plan = evaluator.theft_alert_plan
         theft_alert.theft_alert_plan = plan
-        theft_alert.begin_at = begin_at.beginning_of_day
-
+        theft_alert.begin_at = theft_alert.end_at - plan.duration_days.days
         theft_alert.save
       end
     end
