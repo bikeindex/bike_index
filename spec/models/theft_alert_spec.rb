@@ -19,12 +19,9 @@ RSpec.describe TheftAlert, type: :model do
       it "sets begin and end times, flips the status" do
         theft_alert = FactoryBot.create(:theft_alert_paid)
         duration = theft_alert.theft_alert_plan.duration_days
-        now = nil
+        now = Time.current
 
-        Timecop.freeze do
-          now = Time.current
-          theft_alert.begin!(facebook_post_url: "https://facebook.com")
-        end
+        theft_alert.begin!(facebook_post_url: "https://facebook.com")
 
         expect(theft_alert.begin_at).to eq(now.beginning_of_day)
         expect(theft_alert.end_at).to eq(now.end_of_day + duration.days)
