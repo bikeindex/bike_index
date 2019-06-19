@@ -161,6 +161,10 @@ Bikeindex::Application.routes.draw do
     resources :memberships, :organization_invitations, :bulk_imports, :exports, :bike_codes,
               :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments,
               :partial_bikes
+
+    resources :theft_alerts, only: [:index, :edit, :update]
+    resources :theft_alert_plans, only: [:index, :edit, :update, :new, :create]
+
     resources :organizations do
       resources :custom_layouts, only: [:index, :edit, :update], controller: "organizations/custom_layouts"
       resources :invoices, controller: "organizations/invoices"

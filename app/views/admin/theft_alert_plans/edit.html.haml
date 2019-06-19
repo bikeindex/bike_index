@@ -1,0 +1,8 @@
+.container
+  %h1 Edit Theft Alert Plan
+
+  = render "form",
+    record: @theft_alert_plan,
+    action: admin_theft_alert_plan_path(@theft_alert_plan),
+    method: :patch,
+    submit_label: "Save"
