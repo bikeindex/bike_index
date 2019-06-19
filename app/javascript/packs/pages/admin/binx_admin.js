@@ -1,6 +1,6 @@
 import log from "../../utils/log";
 import moment from "moment-timezone";
-import LoadFancySelects from "../../utils/load_fancy_selects.js";
+import LoadFancySelects from "../../utils/LoadFancySelects";
 import BinxAdminGraphs from "./graphs.js";
 import BinxAdminInvoices from "./invoices.js";
 import BinxAdminOrganizationForm from "./organization_form.js";
@@ -139,15 +139,15 @@ function BinxAdmin() {
       });
     },
     setCharacterCount() {
-      $("p#characterTotal").text($("#characterCounter").val().length + "/300");
+      $("p#characterTotal").text($("#characterCounter").val().length + "/300")
     },
 
     characterCounter() {
-      let self = this;
-      $("#characterCounter").on("keyup", function(e) {
-        e.preventDefault;
+      let self = this
+      $("#characterCounter").on("keyup", function(e){
+        e.preventDefault
         self.setCharacterCount();
-      });
+      })
     }
   };
 }

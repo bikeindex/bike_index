@@ -86,13 +86,12 @@ RSpec.describe "Bikes API V2", type: :request do
           expect(response.code).to eq("201")
           result = json_result["bike"]
           expect(result["manufacturer_name"]).to eq bike_attrs[:manufacturer]
-          %i[serial year frame_model].each do |k|
+          %i[serial year frame_material frame_model].each do |k|
             pp k unless bike_attrs[k].downcase == result[k]&.to_s&.downcase
             expect(bike_attrs[k].downcase).to eq result[k].to_s.downcase
           end
           expect(result["description"]).to match bike_attrs[:description]
           expect(result["frame_colors"]).to eq(["White"])
-          expect(result["frame_material_slug"]).to eq("aluminum")
           expect(result["components"].count).to be > 10
         end
       end

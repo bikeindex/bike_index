@@ -135,6 +135,7 @@ RSpec.describe "Bikes API V3", type: :request do
           post "/api/v3/bikes?access_token=#{token.token}",
                bike_attrs.to_json,
                json_headers
+
           bike2 = json_result["bike"]
           expect(bike2["id"]).to eq(bike1.id)
           expect(bike2["serial"]).to eq(bike1.serial)
@@ -145,7 +146,7 @@ RSpec.describe "Bikes API V3", type: :request do
           expect(bike2["front_wheel_size_iso_bsd"]).to eq(new_front_wheel_size.iso_bsd)
           expect(bike2["rear_wheel_size_iso_bsd"]).to eq(new_rear_wheel_size.iso_bsd)
           expect(bike2["rear_tire_narrow"]).to eq(true)
-          expect(bike2["frame_material_slug"]).to eq("steel")
+          expect(bike2["frame_material"]).to eq("Steel")
         end
       end
 

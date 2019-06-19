@@ -15,7 +15,7 @@ class BikeV2ShowSerializer < BikeV2Serializer
     :rear_wheel_size_iso_bsd,
     :front_wheel_size_iso_bsd,
     :handlebar_type_slug,
-    :frame_material_slug,
+    :frame_material,
     :front_gear_type_slug,
     :rear_gear_type_slug,
     :additional_registration
@@ -75,8 +75,7 @@ class BikeV2ShowSerializer < BikeV2Serializer
     object.rear_gear_type && object.rear_gear_type.slug
   end
 
-  def frame_material_slug
-    return nil unless object.frame_material.present?
-    FrameMaterial.new(object.frame_material).slug
+  def frame_material
+    object.frame_material_name
   end
 end
