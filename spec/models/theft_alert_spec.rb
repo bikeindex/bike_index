@@ -23,7 +23,7 @@ RSpec.describe TheftAlert, type: :model do
 
         theft_alert.begin!(facebook_post_url: "https://facebook.com")
 
-        expect(theft_alert.begin_at).to eq(now.beginning_of_day)
+        expect(theft_alert.begin_at).to be_within(5.seconds).of(now)
         expect(theft_alert.end_at).to eq(now.end_of_day + duration.days)
         expect(theft_alert.status).to eq("active")
       end

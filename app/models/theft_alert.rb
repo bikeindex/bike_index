@@ -19,7 +19,7 @@ class TheftAlert < ActiveRecord::Base
   delegate :bike, to: :stolen_record
 
   def begin!(kwargs)
-    start_time = Time.current.beginning_of_day
+    start_time = Time.current
     end_time = start_time + theft_alert_plan&.duration_days&.days
 
     attrs = {
