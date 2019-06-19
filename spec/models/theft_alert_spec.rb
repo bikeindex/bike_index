@@ -1,6 +1,25 @@
 require "rails_helper"
 
 RSpec.describe TheftAlert, type: :model do
+  describe "factory" do
+    let(:theft_alert) { FactoryBot.build(:theft_alert) }
+    it "is valid" do
+      expect(theft_alert.save).to be_truthy
+    end
+    context "begun" do
+      let(:theft_alert) { FactoryBot.build(:theft_alert_begun) }
+      it "is valid" do
+        expect(theft_alert.save).to be_truthy
+      end
+    end
+    context "paid" do
+      let(:theft_alert) { FactoryBot.build(:theft_alert_paid) }
+      it "is valid" do
+        expect(theft_alert.save).to be_truthy
+        expect(theft_alert.payment).to be_present
+      end
+    end
+  end
   describe "#begin!" do
     context "given no facebook post url" do
       it "rejects the update, sets an error" do
