@@ -92,6 +92,7 @@ RSpec.describe "Bikes API V2", type: :request do
           end
           expect(result["description"]).to match bike_attrs[:description]
           expect(result["frame_colors"]).to eq(["White"])
+          expect(result["frame_material_slug"]).to eq("aluminum")
           expect(result["components"].count).to be > 10
         end
       end
