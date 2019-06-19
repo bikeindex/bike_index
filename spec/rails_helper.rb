@@ -40,9 +40,11 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.render_views
 
-  # Add our request spec helpers
+  # Add our request/controller spec helpers
   config.include RequestSpecHelpers, type: :request
-  config.include RequestSpecHelpers, type: :controller
+  config.include ControllerSpecHelpers, type: :controller
+  config.include JsonHelpers, type: :controller
+  config.include JsonHelpers, type: :request
 end
 
 VCR.configure do |config|

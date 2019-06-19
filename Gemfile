@@ -164,6 +164,7 @@ group :test do
   gem "factory_bot_rails"
   gem "rspec-sidekiq"
   gem "simplecov", require: false
+  gem "timecop"
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
 end
