@@ -15,7 +15,7 @@ class BikeV2ShowSerializer < BikeV2Serializer
     :rear_wheel_size_iso_bsd,
     :front_wheel_size_iso_bsd,
     :handlebar_type_slug,
-    :frame_material,
+    :frame_material_slug,
     :front_gear_type_slug,
     :rear_gear_type_slug,
     :additional_registration
