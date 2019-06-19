@@ -74,7 +74,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
               theft_alert: { facebook_post_url: "" }
 
         expect(flash[:success]).to be_blank
-        expect(flash[:error]).to match(/must be a valid url/)
+        expect(flash[:error]).to include("Facebook post url must be a valid url")
         expect(response).to redirect_to(edit_admin_theft_alert_path(alert, params: { state_transition: :begin }))
         expect(alert.reload.status).to eq("pending")
       end

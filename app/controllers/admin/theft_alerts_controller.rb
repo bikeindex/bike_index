@@ -22,7 +22,7 @@ class Admin::TheftAlertsController < Admin::BaseController
     @theft_alert.public_send("#{state_transition}!", theft_alert_params)
 
     if @theft_alert.errors.present?
-      flash[:error] = @theft_alert.errors.full_messages.first
+      flash[:error] = @theft_alert.errors.to_a
       redirect_to edit_admin_theft_alert_path(@theft_alert, params: { state_transition: state_transition })
     else
       flash[:success] = "Success!"
