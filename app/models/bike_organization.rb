@@ -4,4 +4,8 @@ class BikeOrganization < ActiveRecord::Base
   validates_presence_of :bike_id, :organization_id
   validates_uniqueness_of :organization_id, scope: [:bike_id], allow_nil: false
   acts_as_paranoid
+
+  scope :able_to_edit_claimed, -> { where(unable_to_edit_claimed: false) }
 end
+
+

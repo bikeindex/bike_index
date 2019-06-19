@@ -22,6 +22,8 @@ class Bike < ActiveRecord::Base
 
   has_many :bike_organizations, dependent: :destroy
   has_many :organizations, through: :bike_organizations
+  has_many :able_to_edit_claimed_bike_organizations, -> { able_to_edit_claimed }, class_name: "BikeOrganization"
+  has_many :able_to_edit_claimed_organizations, through: :able_to_edit_claimed_bike_organizations, source: :organization
   has_many :creation_states, dependent: :destroy
   # delegate :creator, to: :creation_state, source: :creator
   # has_one :creation_organization, through: :creation_state, source: :organization
@@ -227,13 +229,18 @@ class Bike < ActiveRecord::Base
   # check if this is the first ownership - or if no owner, which means testing probably
   def first_ownership?; current_ownership&.blank? || current_ownership == first_ownership end
 
+  def editable_organizations
+    return organizations if first_ownership? && organized? && !claimed?
+    able_to_edit_claimed_organizations
+  end
+
   def authorized_by_organization?(u: nil, org: nil)
-    return false unless first_ownership? && organized? && !claimed?
+    return false unless editable_organizations.any?
     return true unless u.present? || org.present?
     return creation_organization == org if org.present? && u.blank?
     # so, we know a user was passed
     return false if claimable_by?(u) # this is authorized by owner, not organization
-    return organizations.any? { |o| u.member_of?(o) } unless org.present?
+    return editable_organizations.any? { |o| u.member_of?(o) } unless org.present?
     creation_organization == org && u.member_of?(org)
   end
 
@@ -246,7 +253,7 @@ class Bike < ActiveRecord::Base
 
   def authorized_for_user?(u)
     return true if u == owner || claimable_by?(u)
-    return false if u.blank? || current_ownership&.claimed
+    return false if u.blank?
     authorized_by_organization?(u: u)
   end
 
