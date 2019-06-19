@@ -16,7 +16,7 @@ FactoryBot.define do
 
     trait :begun do
       status { "active" }
-      begin_at { Time.current.beginning_of_day }
+      begin_at { Time.current }
       sequence(:facebook_post_url) do |n|
         "https://facebook.com/user.#{creator.id}/posts/#{n}"
       end
