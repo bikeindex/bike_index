@@ -569,6 +569,7 @@ GEM
     thor (0.19.1)
     thread_safe (0.3.6)
     tilt (2.0.8)
+    timecop (0.9.1)
     twitter (6.2.0)
       addressable (~> 2.3)
       buftok (~> 0.2.0)
@@ -738,6 +739,7 @@ DEPENDENCIES
   swagger-ui_rails
   therubyracer
   thor (= 0.19.1)
+  timecop
   twitter
   uglifier
   unicorn
