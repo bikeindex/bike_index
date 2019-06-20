@@ -97,7 +97,7 @@ class BikeCode < ActiveRecord::Base
   end
 
   def pretty_code
-    [code_prefix, code_integer.to_s.scan(/.{1,3}/)]
+    [code_prefix, code_number_string.scan(/.{1,3}/)]
       .flatten.compact.join(" ")
   end
 
@@ -154,5 +154,13 @@ class BikeCode < ActiveRecord::Base
     self.code = self.class.normalize_code(code)
     self.code_integer = self.class.calculated_code_integer(code)
     self.code_prefix = self.class.calculated_code_prefix(code)
+  end
+
+  private
+
+  def code_number_string
+    str = code_integer.to_s
+    return str unless bike_code_batch&.code_number_length.present?
+    str.rjust(bike_code_batch.code_number_length, "0")
   end
 end

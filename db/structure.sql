@@ -201,7 +201,8 @@ CREATE TABLE public.bike_code_batches (
     organization_id integer,
     notes text,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    code_number_length integer
 );
 
 

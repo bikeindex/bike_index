@@ -60,6 +60,15 @@ RSpec.describe BikeCode, type: :model do
         expect(bike_code.pretty_code).to eq("A 0")
       end
     end
+    context "bike_code_batch has a set length" do
+      let(:bike_code) { BikeCode.new(code: "A001", bike_code_batch_id: bike_code_batch.id) }
+      let(:bike_code2) { FactoryBot.create(:bike_code, code: "A102", bike_code_batch_id: bike_code_batch.id) }
+      let(:bike_code_batch) { FactoryBot.create(:bike_code_batch, code_number_length: 5) }
+      it "renders the pretty print from the batch length" do
+        expect(bike_code.pretty_code).to eq "A 000 01"
+        expect(bike_code2.pretty_code).to eq "A 001 02"
+      end
+    end
   end
 
   describe "lookup_with_fallback" do
