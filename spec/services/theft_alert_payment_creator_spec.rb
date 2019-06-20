@@ -33,8 +33,8 @@ RSpec.describe TheftAlertPaymentCreator, type: :service, vcr: true do
           )
         end
 
-        expect(Payment.count).to eq(0)
         expect { service.call }.to raise_error(Stripe::InvalidRequestError)
+        expect(Payment.count).to eq(0)
       end
     end
 
@@ -51,8 +51,8 @@ RSpec.describe TheftAlertPaymentCreator, type: :service, vcr: true do
           )
         end
 
-        expect(Payment.count).to eq(0)
         expect { service.call }.to raise_error(Stripe::CardError)
+        expect(Payment.count).to eq(0)
       end
     end
   end
