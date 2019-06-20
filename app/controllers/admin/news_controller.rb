@@ -4,10 +4,12 @@ class Admin::NewsController < Admin::BaseController
 
   def index
     @blogs = Blog.order("created_at asc")
+    render layout: "new_admin"
   end
 
   def new
     @blog = Blog.new(published_at: Time.current, user_id: current_user.id)
+    render layout: "new_admin"
   end
 
   def image_edit
@@ -20,6 +22,7 @@ class Admin::NewsController < Admin::BaseController
   end
 
   def edit
+    render layout: "new_admin"
   end
 
   def update
