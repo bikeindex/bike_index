@@ -33,7 +33,6 @@ function BinxAdmin() {
         this.characterCounter();
       }
       if ($("#change_published_date").length > 0) {
-        console.log("hi")
         const binxAdminBlogs = BinxAdminBlogs();
         binxAdminBlogs.init();
       }
