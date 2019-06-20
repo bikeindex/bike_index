@@ -1,44 +1,21 @@
 <% skip_order ||= false %>
-<div class="card">
-  <div class="card-body bg-light">
-    <li class="public_image mt-4" id="<%= public_image.id %>">
-      <label>
-        <%= public_image.name.truncate(18) %>
-      </label>
-      <%= image_tag(public_image.image_url(:small)) if public_image.image? %>
-      <em class="less-strong">processing ...</em>
-      <div class="row">
-        <div class="col-md-8">
-          <% if public_image.imageable_type != 'Blog' %>
-            <div class="form-group">
-              <textarea class="form-control">
-                \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
-              </textarea>
-            </div>
-          <% else %>
-            <div class="form-group">
-              <textarea class="form-control">
-                \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
-              </textarea>
-            </div>
-          <% end %>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-8">
-          <p>
-            <span>Copy the above text and paste it where you'd like it to appear in the post</span>
-          </p>
-        </div>
-        <div class="col-md-4">
-          <%= link_to "Delete image", public_image_url(public_image, return_url: edit_admin_news_url(@blog)), method: :delete, class: "btn btn-danger float-right" %>
-        </div>
-      </div>
-    </li>
+<li class="public_image" id="<%= public_image.id %>">
+  <div class='processing'>... processing</div>
+  <%= image_tag(public_image.image_url(:small)) if public_image.image? %>
+  <div class="name"><%= public_image.name.truncate(18) %></div>
+  <div class="actions">
+    <% if public_image.imageable_type != 'Blog' %>
+      <textarea class="code-to-enter">&lt;img class="post-image" src="<%= public_image.image_url %>" alt="ENTER YOUR TEXT HERE"&gt;</textarea>
+      <p><span>Copy the above text and paste it where you'd like it to appear</span></p>
+    <% else %>
+      <textarea class="code-to-enter">&lt;img class="post-image" src="<%= public_image.image_url %>" alt="ENTER YOUR TEXT HERE"&gt;</textarea>
+      <p>
+        <span>Copy the above text and paste it where you'd like it to appear in the post</span>
+        <%= link_to "Delete image", public_image_url(public_image, return_url: edit_admin_news_url(@blog)), method: :delete, class: "photo-remove" %>
+      </p>
+    <% end %>
   </div>
-  <%unless skip_order%>
-    <div class= "index-image-select">
-      <input class = "index_image_#{public_image.id}", name = "index_image_id", type = "radio", value = "#{public_image.id}"}/>
-    </div>
+  <% unless skip_order %>
+    <div class="index-image-select"><input type="radio" name="index_image_id" value="<%= public_image.id %>" class="index_image_<%= public_image.id %>"></div>
   <% end %>
-</div>
+</li>
