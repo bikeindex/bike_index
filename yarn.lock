@@ -4763,6 +4763,11 @@ filename-regex@^2.0.0:
   resolved "https://registry.yarnpkg.com/filename-regex/-/filename-regex-2.0.1.tgz#c1c4b9bee3e09725ddb106b75c1e301fe2f18b26"
   integrity sha1-wcS5vuPglyXdsQa3XB4wH+LxiyY=
 
+filepond@^4.4.9:
+  version "4.4.9"
+  resolved "https://registry.yarnpkg.com/filepond/-/filepond-4.4.9.tgz#fd7c479b48ce06a072afc7fd834dbe2dc4a6827f"
+  integrity sha512-8TIxbnON85qo3q61z0xjHkNGSe52O/ISBaJaAwX9ybNXDmPlQfj5dl2otSoRFJW3dpW3BqjB8/aZNHXsEQI9mg==
+
 fileset@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/fileset/-/fileset-2.0.3.tgz#8e7548a96d3cc2327ee5e674168723a333bba2a0"
