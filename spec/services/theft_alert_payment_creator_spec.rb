@@ -40,13 +40,11 @@ RSpec.describe TheftAlertPaymentCreator, type: :service, vcr: true do
 
     context "given a Stripe credit card decline error" do
       it "raises RecordInvalid" do
-        declined_card_token = stripe_token(:declined).id
-
         service = -> do
           described_class.create!(
             user: user,
             stripe_email: user.email,
-            stripe_token: declined_card_token,
+            stripe_token: stripe_token_declined.id,
             stripe_amount: 100,
           )
         end

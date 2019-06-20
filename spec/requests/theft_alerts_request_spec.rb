@@ -48,12 +48,10 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
     end
 
     it "redirects to the bike edit page with flash if the payment request fails" do
-      card_declined_token = stripe_token(:declined).id
-
       post "/theft_alerts",
            theft_alert_plan_id: theft_alert_plan.id,
            bike_id: bike.id,
-           stripe_token: card_declined_token,
+           stripe_token: stripe_token_declined.id,
            stripe_amount: 100,
            stripe_email: current_user.email
 
