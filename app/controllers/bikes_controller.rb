@@ -173,7 +173,11 @@ class BikesController < ApplicationController
           .where(is_private: true)
     when "alert"
       @theft_alerts =
-        @bike.current_stolen_record.theft_alerts.where(creator: current_user)
+        @bike
+          .current_stolen_record
+          .theft_alerts
+          .creation_ordered_desc
+          .where(creator: current_user)
     end
 
     render "edit_#{@edit_template}".to_sym
