@@ -17,13 +17,13 @@ RSpec.describe Counts, type: :model do
     let!(:bike_first) { FactoryBot.create(:bike, created_at: (Time.current - 6.days).beginning_of_day + 1.minute) }
     let(:target) do
       {
-        (Date.today - 6.days).to_s => 1,
-        (Date.today - 5.days).to_s => 0,
-        (Date.today - 4.days).to_s => 0,
-        (Date.today - 3.days).to_s => 0,
-        (Date.today - 2.days).to_s => 0,
-        (Date.today - 1.days).to_s => 0,
-        Date.today.to_s => 1,
+        (Date.current - 6.days).to_s => 1,
+        (Date.current - 5.days).to_s => 0,
+        (Date.current - 4.days).to_s => 0,
+        (Date.current - 3.days).to_s => 0,
+        (Date.current - 2.days).to_s => 0,
+        (Date.current - 1.days).to_s => 0,
+        Date.current.to_s => 1,
       }
     end
     it "saves the thing" do
