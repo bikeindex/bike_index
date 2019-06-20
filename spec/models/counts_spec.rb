@@ -13,6 +13,7 @@ RSpec.describe Counts, type: :model do
   end
 
   context "week_creation_chart" do
+    # TODO: This is failing locally
     let!(:bike) { FactoryBot.create(:bike) }
     let!(:bike_first) { FactoryBot.create(:bike, created_at: (Time.current - 6.days).beginning_of_day + 1.minute) }
     let(:target) do
