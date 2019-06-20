@@ -4,6 +4,7 @@ import LoadFancySelects from "../../utils/load_fancy_selects.js";
 import BinxAdminGraphs from "./graphs.js";
 import BinxAdminInvoices from "./invoices.js";
 import BinxAdminOrganizationForm from "./organization_form.js";
+import BinxAdminBlogs from "./blogs.js"
 
 function BinxAdmin() {
   return {
@@ -32,6 +33,7 @@ function BinxAdmin() {
         this.characterCounter();
       }
       if ($("#change_published_date").length > 0) {
+        console.log("hi")
         const binxAdminBlogs = BinxAdminBlogs();
         binxAdminBlogs.init();
       }
