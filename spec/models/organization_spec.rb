@@ -117,6 +117,7 @@ RSpec.describe Organization, type: :model do
       expect(Organization.friendly_find("bike shop")).to eq organization2
       expect(Organization.friendly_find("trek store of SANTA CRUZ")).to eq organization2
       expect(Organization.friendly_find("bikeeastbay")).to eq organization3
+      expect(Organization.friendly_find(organization)).to eq organization
     end
   end
 

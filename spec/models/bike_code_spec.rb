@@ -63,24 +63,29 @@ RSpec.describe BikeCode, type: :model do
   end
 
   describe "lookup_with_fallback" do
-    let(:organization1) { FactoryBot.create(:organization, short_name: "BikeIndex") }
-    let(:organization2) { FactoryBot.create(:organization) }
-    let!(:bike_code) { FactoryBot.create(:bike_code, code: "a0010", organization: organization2) }
-    let(:bike_code_duplicate) { FactoryBot.create(:bike_code, code: "a0010", organization: organization1) }
-    let!(:user) { FactoryBot.create(:organization_member, organization: organization2) }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:organization_duplicate) { FactoryBot.create(:organization, short_name: "DuplicateOrg") }
+    let(:organization_no_match) { FactoryBot.create(:organization) }
+    let!(:bike_code_initial) { FactoryBot.create(:bike_code, code: "a0010", organization: organization) }
+    let(:bike_code_duplicate) { FactoryBot.create(:bike_code, code: "a0010", organization: organization_duplicate) }
+    let!(:user) { FactoryBot.create(:organization_member, organization: organization_duplicate) }
     it "looks up, falling back to the orgs for the user, falling back to any org" do
-      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex")).to eq bike_code
-      expect(BikeCode.lookup_with_fallback("0010", organization_id: "bikeindex")).to eq bike_code
-      # It finds the bike_code that exists, even though it doesn't match the organization passed
-      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex", user: nil)).to eq bike_code
-      expect(bike_code_duplicate).to be_present
-      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex", user: nil)).to eq bike_code_duplicate
-      # It finds bike_code that matches the users organizations
-      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex", user: user)).to eq bike_code
-      # It also finds using the split ups
-      expect(BikeCode.lookup_with_fallback("A10", organization_id: "bikeindex")).to eq bike_code
-      expect(BikeCode.lookup_with_fallback("A 00 10", organization_id: "bikeindex")).to eq bike_code
-      expect(BikeCode.lookup_with_fallback("A 000 10", user: user)).to eq bike_code2
+      expect(bike_code_duplicate).to be_present # Ensure it's created after initial
+      # It finds the first record in the database
+      expect(BikeCode.lookup_with_fallback("a0010")).to eq bike_code_initial
+      expect(BikeCode.lookup_with_fallback("0010")).to eq bike_code_initial
+      # If there is an organization passed, it finds matching that organization
+      expect(BikeCode.lookup_with_fallback("0010", organization_id: organization_duplicate.name)).to eq bike_code_duplicate
+      expect(BikeCode.lookup_with_fallback("A10", organization_id: "duplicateorg")).to eq bike_code_duplicate
+      # It finds the bike_code that exists, even if it doesn't match the organization passed
+      expect(BikeCode.lookup_with_fallback("a0010", organization_id: organization_no_match.short_name)).to eq bike_code_initial
+      # It finds the bike_code from the user's organization
+      expect(BikeCode.lookup_with_fallback("a0010", user: user)).to eq bike_code_duplicate
+      # It finds bike_code that matches the passed organization - overriding the user organization
+      expect(BikeCode.lookup_with_fallback("a0010", organization_id: organization, user: user)).to eq bike_code_initial
+      # It falls back to the user's organization bike codes if passed an organization that doesn't match any codes, or an org that doesn't exist
+      expect(BikeCode.lookup_with_fallback("A 00 10", organization_id: organization_no_match.id, user: user)).to eq bike_code_duplicate
+      expect(BikeCode.lookup_with_fallback("A 000 10", organization_id: "dfddfdfs", user: user)).to eq bike_code_duplicate
     end
   end
 

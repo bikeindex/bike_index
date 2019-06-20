@@ -21,7 +21,7 @@ class BikeCode < ActiveRecord::Base
 
   def self.normalize_code(str = nil)
     return nil unless str.present?
-    code = str.to_s.upcase.strip
+    code = str.to_s.upcase.strip.gsub(/\s*/, "")
     if code.match?(/BIKEINDEX.ORG/)
       code = code.gsub(%r{\A.*BIKEINDEX.ORG/BIKES}, "").gsub(/\?.*/, "") # Remove the start and query string
       code = code.gsub(%r{/SCANNED/?}, "").gsub(%r{(\A/)|(/\z)}, "") # Remove scanned, wherever it is, and a trailing / if it exists
@@ -37,27 +37,35 @@ class BikeCode < ActiveRecord::Base
     where(code_integer: calculated_code_integer(str), code_prefix: calculated_code_prefix(str))
   end
 
+  def self.organization_search(organization_id)
+    if organization_id.present?
+      org = Organization.friendly_find(organization_id)
+      return where(organization_id: org.id) if org.present?
+    end
+    # Sorta ugly, but this needs to return an empty active record collection
+    where(organization_id: 0)
+  end
+
   # organization_id can be any organization identifier (name, slug, id)
   # generally don't pass in normalized_code
   def self.lookup(str, organization_id: nil)
     normalized_code = normalize_code(str)
-    if organization_id.present?
-      org = Organization.friendly_find(organization_id)
-      return where(organization_id: org.id).code_integer_and_prefix_search(normalized_code).first if org.present?
-    end
-    code_integer_and_prefix_search(normalized_code).first
+    matching_codes = code_integer_and_prefix_search(normalized_code)
+    matching_codes.organization_search(organization_id).first || matching_codes.first
   end
 
   def self.lookup_with_fallback(str, organization_id: nil, user: nil)
     return nil unless str.present?
     normalized_code = normalize_code(str)
+    matching_codes = code_integer_and_prefix_search(normalized_code)
+    bike_code ||= matching_codes.organization_search(organization_id).first
+    return bike_code if bike_code.present?
     user_organization_ids = user&.memberships&.pluck(:organization_id) || []
     if user_organization_ids.any?
-      bike_code = where(organization_id: user_organization_ids).code_integer_and_prefix_search(normalized_code).first
+      bike_code ||= matching_codes.where(organization_id: user_organization_ids).first
     end
-    bike_code ||= lookup(normalized_code, organization_id: organization_id)
-    bike_code ||= code_integer_and_prefix_search(normalized_code).first
-    bike_code ||= where(organization_id: organization_id).where("code ILIKE ?", "%#{normalized_code}%").first
+    bike_code ||= matching_codes.first
+    bike_code ||= organization_search(organization_id).where("code ILIKE ?", "%#{normalized_code}%").first
     bike_code ||= where("code ILIKE ?", "%#{normalized_code}%").first
   end
 
