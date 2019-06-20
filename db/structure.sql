@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.3
--- Dumped by pg_dump version 11.3
+-- Dumped from database version 10.3
+-- Dumped by pg_dump version 10.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -12,9 +12,22 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
-SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
 
 --
 -- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
@@ -226,7 +239,9 @@ CREATE TABLE public.bike_codes (
     updated_at timestamp without time zone NOT NULL,
     claimed_at timestamp without time zone,
     previous_bike_id integer,
-    bike_code_batch_id integer
+    bike_code_batch_id integer,
+    code_integer integer,
+    code_prefix character varying
 );
 
 
@@ -259,7 +274,8 @@ CREATE TABLE public.bike_organizations (
     organization_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    deleted_at timestamp without time zone
+    deleted_at timestamp without time zone,
+    unable_to_edit_claimed boolean DEFAULT false NOT NULL
 );
 
 
@@ -830,7 +846,6 @@ CREATE TABLE public.flipper_features (
 --
 
 CREATE SEQUENCE public.flipper_features_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -864,7 +879,6 @@ CREATE TABLE public.flipper_gates (
 --
 
 CREATE SEQUENCE public.flipper_gates_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1867,7 +1881,7 @@ ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays
 --
 
 CREATE TABLE public.schema_migrations (
-    version character varying NOT NULL
+    version character varying(255) NOT NULL
 );
 
 
@@ -4409,4 +4423,8 @@ INSERT INTO schema_migrations (version) VALUES ('20190617174200');
 INSERT INTO schema_migrations (version) VALUES ('20190617193251');
 
 INSERT INTO schema_migrations (version) VALUES ('20190617193255');
+
+INSERT INTO schema_migrations (version) VALUES ('20190619202656');
+
+INSERT INTO schema_migrations (version) VALUES ('20190620203854');
 

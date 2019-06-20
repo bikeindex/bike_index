@@ -29,6 +29,10 @@ class BikeCode < ActiveRecord::Base
     code.gsub(/\A0*/, "") # Strip leading 0s, because we don't care about them
   end
 
+  def self.calculated_code_integer(str); str.present? ? str.gsub(/\A\D+/, "").to_i : nil end
+
+  def self.calculated_code_prefix(str); str.present? ? str.gsub(/\d+\z/, "") : nil end
+
   # organization_id can be any organization identifier (name, slug, id)
   # generally don't pass in normalized_code
   def self.lookup(str, organization_id: nil)
@@ -78,6 +82,11 @@ class BikeCode < ActiveRecord::Base
 
   def next_unclaimed_code
     BikeCode.where(organization_id: organization_id).next_unclaimed_code(id)
+  end
+
+  def pretty_code
+    [code_prefix, code_integer.to_s.scan(/.{1,3}/)]
+      .flatten.compact.join(" ")
   end
 
   def claimable_by?(user)
@@ -131,5 +140,7 @@ class BikeCode < ActiveRecord::Base
 
   def set_calculated_attributes
     self.code = self.class.normalize_code(code)
+    self.code_integer = self.class.calculated_code_integer(code)
+    self.code_prefix = self.class.calculated_code_prefix(code)
   end
 end
