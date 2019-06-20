@@ -33,6 +33,7 @@ gem "fog-aws"
 gem "geocoder"
 gem "hamlit"
 gem "high_voltage"
+gem "honeybadger"
 gem "httparty"
 gem "i18n"
 gem "journey", "~> 1.0.3"
@@ -125,7 +126,6 @@ gem "lograge" # Structure log data, put it in single lines to improve the functi
 gem "logstash-event" # Use logstash format for logging data
 
 group :production do
-  gem "honeybadger", "~> 2.0" # Error monitoring
   gem "skylight" # Performance monitoring
 end
 

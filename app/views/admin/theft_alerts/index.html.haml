@@ -59,3 +59,5 @@
                 = hidden_field_tag :state_transition, "reset"
                 = f.hidden_field :status
                 = submit_tag "Reset Alert", class: "btn btn-warning p-1", data: { confirm: "Are you sure?" }
+
+= paginate @theft_alerts, views_prefix: "admin"

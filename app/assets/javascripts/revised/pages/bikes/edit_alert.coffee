@@ -6,16 +6,20 @@ class BikeIndex.BikesEditAlert extends BikeIndex
   initializeEventListeners: =>
     $("#bikeindex-stripe-bike-alert-form").on "click", ".js-pricing-plan-select", (e) =>
       e.preventDefault()
-      amount = $(e.target).data("amount")
-      return true unless amount
+      $selectedPlan = $(e.target)
+      amount_cents = $selectedPlan.data("amountCents")
+      plan_id = $selectedPlan.data("theftAlertPlanId")
+      if not amount_cents or not plan_id
+        console.error("Missing amount: '#{amount_cents}' or plan_id: '#{plan_id}'")
+        return true
       @clearAlerts()
-      @openStripeForm(amount)
+      @openStripeForm(amount_cents, plan_id)
       return false
 
   clearAlerts: () =>
      $('.primary-alert-block .alert').remove()
 
-  openStripeForm: (amount_cents) =>
+  openStripeForm: (amount_cents, selected_plan_id) =>
     $stripe_form = $('#stripe_form')
     # Checkout integration custom:
     # https://stripe.com/docs/checkout#integration-custom
@@ -25,11 +29,12 @@ class BikeIndex.BikesEditAlert extends BikeIndex
       key: $stripe_form.attr("data-key")
       image: "/apple_touch_icon.png"
       token: (token) ->
-        $("#stripe_token").val(token.id)
-        $("#stripe_email").val(token.email)
-        $("#stripe_form").submit()
+        $stripe_form.find("#stripe_token").val(token.id)
+        $stripe_form.find("#stripe_email").val(token.email)
+        $stripe_form.find("#theft_alert_plan_id").val(selected_plan_id)
+        $stripe_form.submit()
 
-    $("#stripe_amount").val(amount_cents)
+    $stripe_form.find("#stripe_amount").val(amount_cents)
     handler.open
       name: "Bike Index"
       description: "Bike Index Theft Alert"

@@ -1,8 +1,14 @@
 class Admin::TheftAlertsController < Admin::BaseController
   layout "new_admin"
 
+  # TODO: Add sorting and filtering
   def index
-    @theft_alerts = TheftAlert.includes(:theft_alert_plan).all
+    @theft_alerts =
+      TheftAlert
+        .includes(:theft_alert_plan)
+        .creation_ordered_desc
+        .page(params.fetch(:page, 1))
+        .per(params.fetch(:per_page, 25))
   end
 
   def edit

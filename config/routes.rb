@@ -64,6 +64,7 @@ Bikeindex::Application.routes.draw do
   get "logout", to: "sessions#destroy"
 
   resources :payments
+  resources :theft_alerts, only: [:create]
   resources :documentation, only: [:index] do
     collection do
       get :api_v1

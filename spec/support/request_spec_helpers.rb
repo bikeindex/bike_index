@@ -5,7 +5,7 @@ module RequestSpecHelpers
 
   def log_in(user = nil)
     user ||= FactoryBot.create(:user_confirmed)
-    @current_user ||= user
+    @current_user = user
     allow(User).to receive(:from_auth) { user }
   end
 
