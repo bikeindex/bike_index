@@ -154,22 +154,26 @@ class BikesController < ApplicationController
   def edit
     @page_errors = @bike.errors
     @edit_templates = edit_templates
-    @pricing_plans = PRICING_PLANS
+    @theft_alert_plans = TheftAlertPlan.active.price_ordered_desc
 
-    result = target_edit_template(requested_page: params[:page])
-    @edit_template = result[:template]
+    requested_page = target_edit_template(requested_page: params[:page])
+    @edit_template = requested_page[:template]
 
-    if !result[:is_valid]
+    if !requested_page[:is_valid]
       redirect_to edit_bike_url(@bike, page: @edit_template) and return
     end
 
-    if @edit_template == "photos"
+    case @edit_template
+    when "photos"
       @private_images =
         PublicImage
           .unscoped
           .where(imageable_type: "Bike")
           .where(imageable_id: @bike.id)
           .where(is_private: true)
+    when "alert"
+      @theft_alerts =
+        @bike.current_stolen_record.theft_alerts.where(creator: current_user)
     end
 
     render "edit_#{@edit_template}".to_sym
@@ -233,7 +237,7 @@ class BikesController < ApplicationController
       h[:theft_details] = "Recovery details" if @bike.recovered?
       h[:theft_details] = "Theft details" unless @bike.recovered?
       h[:publicize] = "Publicize Theft"
-      h[:alert] = "Activate Theft Alert" if Flipper.enabled?(:premium_listings, current_user)
+      h[:alert] = "Activate Bike Index Alert" if Flipper.enabled?(:premium_listings, current_user)
       h[:report_recovered] = "Mark this Bike Recovered" unless @bike.recovered?
     end
   end
@@ -326,26 +330,4 @@ class BikesController < ApplicationController
   def permitted_bparams # still manually managing permission of params, skip for now
     params.as_json
   end
-
-  # TEMP: Replacing with AR models
-  PRICING_PLANS = [
-    {
-      views: 50_000,
-      duration: 7,
-      price: 6995,
-      name: "Maximum",
-    },
-    {
-      views: 25_000,
-      duration: 7,
-      price: 3995,
-      name: "Standard",
-    },
-    {
-      views: 10_000,
-      duration: 7,
-      price: 1995,
-      name: "Starter",
-    },
-  ].map { |attr| OpenStruct.new(attr) }
 end

@@ -1,0 +1,19 @@
+.col-md-12.col-lg-4
+  .detail-card-container
+    .detail-card-title
+      = theft_alert_plan.name
+    .detail-card
+      .detail-card-subtitle
+        %strong= number_with_delimiter(theft_alert_plan.views)
+        Views
+      .detail-card-subtitle
+        %strong= theft_alert_plan.duration_days
+        Days
+      .detail-card-subtitle.detail-card-price
+        = number_to_currency(theft_alert_plan.amount_cents / 100.0, unit: "$")
+    .detail-card-subtitle
+      .detail-card-button.btn-primary
+        %a.js-pricing-plan-select{ data: { amount_cents: theft_alert_plan.amount_cents, theft_alert_plan_id: theft_alert_plan.id } }
+          Choose #{theft_alert_plan.name}
+    .detail-card-content-main
+      = theft_alert_plan.description_html.html_safe
