@@ -896,7 +896,7 @@ RSpec.describe BikesController, type: :controller do
       {
         theft_details: "Theft details",
         publicize: "Publicize Theft",
-        # alert: "Activate Bike Index Alert",
+        alert: "Activate Bike Index Alert",
         report_recovered: "Mark this Bike Recovered",
       }
     end
@@ -972,7 +972,10 @@ RSpec.describe BikesController, type: :controller do
               bike.update_attribute(:stolen, true)
               bike.reload
               expect(bike.stolen).to be_truthy
+              allow(Flipper).to receive(:enabled?).and_return(true)
+
               get :edit, id: bike.id
+
               expect(response).to be_success
               expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq stolen_edit_templates.as_json
@@ -984,7 +987,10 @@ RSpec.describe BikesController, type: :controller do
               bike.update_attributes(stolen: true, recovered: true)
               bike.reload
               expect(bike.recovered).to be_truthy
+              allow(Flipper).to receive(:enabled?).and_return(true)
+
               get :edit, id: bike.id
+
               expect(response).to be_success
               expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq recovery_edit_templates.as_json
@@ -1005,6 +1011,7 @@ RSpec.describe BikesController, type: :controller do
               expect(response).to render_template("edit_#{template}")
               expect(assigns(:edit_template)).to eq(template)
               expect(assigns(:private_images)).to eq([]) if template == "photos"
+              expect(assigns(:theft_alerts)).to eq([]) if template == "alert"
             end
           end
         end

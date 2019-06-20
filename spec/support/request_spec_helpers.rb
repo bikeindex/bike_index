@@ -13,11 +13,10 @@ RSpec.shared_context :logged_in_as_super_admin do
   before { set_current_user(user) }
 end
 
-RSpec.shared_context :logged_in_as_organization_admin do
-  let(:user) { FactoryBot.create(:organization_admin) }
-  let(:organization) { user.organizations.first }
-  before :each do
-    set_current_user(user)
+  def log_in(user = nil)
+    user ||= FactoryBot.create(:user_confirmed)
+    @current_user = user
+    allow(User).to receive(:from_auth) { user }
   end
 end
 

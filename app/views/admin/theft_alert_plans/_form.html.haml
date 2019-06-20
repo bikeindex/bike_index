@@ -1,0 +1,30 @@
+= form_for record, url: action, method: method, html: { class: "form" } do |f|
+  = f.label :name, "Name", class: "form-label font-weight-bold mt-2 mb-0"
+  = f.text_field :name, class: "form-control"
+
+  = f.label :amount_cents, "Price (cents)", class: "form-label font-weight-bold mt-2 mb-0"
+  = f.number_field :amount_cents, class: "form-control"
+
+  = f.label :views, "Views Provided", class: "form-label font-weight-bold mt-2 mb-0"
+  = f.number_field :views, class: "form-control"
+
+  = f.label :duration_days, "Duration (days)", class: "form-label font-weight-bold mt-2 mb-0"
+  = f.number_field :duration_days, class: "form-control"
+
+  = f.label :active, "Active?", class: "form-label font-weight-bold mt-2 mb-0"
+  = f.check_box :active, class: "form-control"
+
+  = f.label :description, "Description", class: "form-label font-weight-bold mt-2 mb-0"
+  = f.text_area :description, class: "form-control", rows: "10"
+
+  .float-right
+    [
+    = link_to "Markdown",
+      "https://www.markdownguide.org/getting-started",
+      target: "_blank",
+      tabindex: -1
+    permitted
+    ]
+
+  %br
+  = submit_tag submit_label, class: "btn btn-success btn-lg"

@@ -14,5 +14,8 @@ FactoryBot.define do
       end
       bike { FactoryBot.create(:creation_organization_bike, organization: organization) }
     end
+    factory :ownership_stolen do
+      bike { FactoryBot.create(:stolen_bike, owner_email: owner_email, creator: creator) }
+    end
   end
 end
