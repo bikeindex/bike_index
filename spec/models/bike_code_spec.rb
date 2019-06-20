@@ -62,6 +62,18 @@ RSpec.describe BikeCode, type: :model do
     end
   end
 
+  describe "lookup with split ups" do
+    let!(:bike_code1) { FactoryBot.create(:bike_code, code: "A0010") }
+    let!(:bike_code2) { FactoryBot.create(:bike_code, code: "A00100") }
+    it "finds the expected bike_codes" do
+      expect(BikeCode.lookup_with_fallback("A10")).to eq bike_code1
+      expect(BikeCode.lookup_with_fallback("A 00 10")).to eq bike_code1
+      expect(BikeCode.lookup_with_fallback("A 000 10")).to eq bike_code1
+      expect(BikeCode.lookup_with_fallback("A0 00 100")).to eq bike_code2
+      expect(BikeCode.lookup_with_fallback("A 100")).to eq bike_code2
+    end
+  end
+
   describe "duplication and integers" do
     let(:organization) { FactoryBot.create(:organization) }
     let!(:sticker) { FactoryBot.create(:bike_code, kind: "sticker", code: 12, organization_id: organization.id) }
