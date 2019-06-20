@@ -1,28 +1,30 @@
-%header.with-subtitle
-  %h1
-    Our #{@dignified_name}
-  = link_to 'New Blog', new_admin_news_url, class: "button-green sharing-links"
+.admin-subnav
+  .col-md-6
+    %h1
+      Our #{@dignified_name}
+  .col-md-6
+    = link_to 'New Blog', new_admin_news_url, class: "btn btn-success float-right"
 
-%section.full-screen-table
-  %table.table.table-striped.table-bordered
-    %thead
-      %th.medium-screens
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th.d-none.d-lg-table-cell
         Date&nbsp;<small class="convertTimezone"></small>
-      %th.medium-screens
+      %th.d-none.d-lg-table-cell
         Creator
       %th
         Content
-      %th.medium-screens
+      %th.d-none.d-lg-table-cell
         Vignettes
       %th
         Published
     %tbody
       - @blogs.each do |blog|
         %tr
-          %td.medium-screens
+          %td.d-none.d-lg-table-cell
             %span.convertTime
               = l blog.published_at, format: :convert_time
-          %td.medium-screens
+          %td.d-none.d-lg-table-cell
             = blog.user&.name || blog.user&.email
           %td
             %p.blog-index
