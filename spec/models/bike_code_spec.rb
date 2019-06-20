@@ -68,7 +68,7 @@ RSpec.describe BikeCode, type: :model do
     let!(:bike_code) { FactoryBot.create(:bike_code, code: "a0010", organization: organization2) }
     let(:bike_code_duplicate) { FactoryBot.create(:bike_code, code: "a0010", organization: organization1) }
     let!(:user) { FactoryBot.create(:organization_member, organization: organization2) }
-    xit "looks up, falling back to the orgs for the user, falling back to any org" do
+    it "looks up, falling back to the orgs for the user, falling back to any org" do
       expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex")).to eq bike_code
       expect(BikeCode.lookup_with_fallback("0010", organization_id: "bikeindex")).to eq bike_code
       # It finds the bike_code that exists, even though it doesn't match the organization passed

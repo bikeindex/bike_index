@@ -31,7 +31,11 @@ class BikeCode < ActiveRecord::Base
 
   def self.calculated_code_integer(str); str.present? ? str.gsub(/\A\D+/, "").to_i : nil end
 
-  def self.calculated_code_prefix(str); str.present? ? str.gsub(/\d+\z/, "") : nil end
+  def self.calculated_code_prefix(str); str.present? ? str.gsub(/\d+\z/, "").upcase : nil end
+
+  def self.code_integer_and_prefix_search(str)
+    where(code_integer: calculated_code_integer(str), code_prefix: calculated_code_prefix(str))
+  end
 
   # organization_id can be any organization identifier (name, slug, id)
   # generally don't pass in normalized_code
@@ -39,9 +43,9 @@ class BikeCode < ActiveRecord::Base
     normalized_code = normalize_code(str)
     if organization_id.present?
       org = Organization.friendly_find(organization_id)
-      return where(code: normalized_code, organization_id: org.id).first if org.present?
+      return where(organization_id: org.id).code_integer_and_prefix_search(normalized_code).first if org.present?
     end
-    where(code: normalized_code).first
+    code_integer_and_prefix_search(normalized_code).first
   end
 
   def self.lookup_with_fallback(str, organization_id: nil, user: nil)
@@ -49,10 +53,10 @@ class BikeCode < ActiveRecord::Base
     normalized_code = normalize_code(str)
     user_organization_ids = user&.memberships&.pluck(:organization_id) || []
     if user_organization_ids.any?
-      bike_code = where(code: normalized_code, organization_id: user_organization_ids).first
+      bike_code = where(organization_id: user_organization_ids).code_integer_and_prefix_search(normalized_code).first
     end
     bike_code ||= lookup(normalized_code, organization_id: organization_id)
-    bike_code ||= where(code: normalized_code).first
+    bike_code ||= code_integer_and_prefix_search(normalized_code).first
     bike_code ||= where(organization_id: organization_id).where("code ILIKE ?", "%#{normalized_code}%").first
     bike_code ||= where("code ILIKE ?", "%#{normalized_code}%").first
   end
