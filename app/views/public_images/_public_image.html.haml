@@ -6,18 +6,21 @@
         = public_image.name.truncate(18)
       = image_tag(public_image.image_url(:small)) if public_image.image?
       %em.less-strong processing ...
-      - if public_image.imageable_type != 'Blog'
-        .form-group
-          %textarea.form-control
-            \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
-        %p
-          %span Copy the above text and paste it where you'd like it to appear
-      - else
-        .form-group
-          %textarea.form-control
-            \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
-        %p
-          %span Copy the above text and paste it where you'd like it to appear in the post
+      .row
+        .col-md-8
+          - if public_image.imageable_type != 'Blog'
+            .form-group
+              %textarea.form-control
+                \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
+          - else
+            .form-group
+              %textarea.form-control
+                \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
+      .row
+        .col-md-8
+          %p
+            %span Copy the above text and paste it where you'd like it to appear in the post
+        .col-md-4
           = link_to "Delete image", public_image_url(public_image, return_url: edit_admin_news_url(@blog)), method: :delete, class: "btn btn-danger float-right"
   / - unless skip_order
   /   .index-image-select
