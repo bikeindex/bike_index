@@ -47,6 +47,7 @@ RSpec.configure do |config|
   config.include JsonHelpers, type: :request
   config.include StripeHelpers, type: :request
   config.include StripeHelpers, type: :controller
+  config.include StripeHelpers, type: :service
 end
 
 VCR.configure do |config|
