@@ -94,7 +94,7 @@ Bikeindex::Application.routes.draw do
       post "password_reset"
       get "password_reset"
       get "update_password"
-      get "localid"
+      get "globalid"
     end
     member { get "unsubscribe" }
   end
