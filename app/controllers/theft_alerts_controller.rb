@@ -18,10 +18,10 @@ class TheftAlertsController < ApplicationController
 
     theft_alert.update(payment: payment)
   rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
-    Honeybadger.notify(e) if defined?(Honeybadger)
+    Honeybadger.notify(e)
     flash[:error] = "We were unable to process your order. Please contact support."
   rescue Stripe::StripeError => e
-    Honeybadger.notify(e) if defined?(Honeybadger)
+    Honeybadger.notify(e)
     flash[:error] = "Your order is pending, but we were unable to complete payment. Please contact support."
   else
     flash[:success] = "Success! Your order is pending."
