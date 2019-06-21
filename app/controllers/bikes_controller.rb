@@ -154,11 +154,9 @@ class BikesController < ApplicationController
   def edit
     @page_errors = @bike.errors
     @edit_templates = edit_templates
-    @theft_alert_plans = TheftAlertPlan.active.price_ordered_desc
 
     requested_page = target_edit_template(requested_page: params[:page])
     @edit_template = requested_page[:template]
-
     if !requested_page[:is_valid]
       redirect_to edit_bike_url(@bike, page: @edit_template) and return
     end
@@ -171,13 +169,19 @@ class BikesController < ApplicationController
           .where(imageable_type: "Bike")
           .where(imageable_id: @bike.id)
           .where(is_private: true)
-    when "alert"
+    when /alert/
+      @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc
+      @selected_theft_alert_plan =
+        @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
+        @theft_alert_plans.max_by(&:amount_cents)
       @theft_alerts =
         @bike
           .current_stolen_record
           .theft_alerts
+          .includes(:theft_alert_plan)
           .creation_ordered_desc
           .where(creator: current_user)
+          .references(:theft_alert_plan)
     end
 
     render "edit_#{@edit_template}".to_sym
@@ -222,7 +226,7 @@ class BikesController < ApplicationController
     when requested_page.blank?
       result[:is_valid] = true
       result[:template] = default_page.to_s
-    when edit_templates.has_key?(requested_page)
+    when edit_templates.has_key?(requested_page), :alert_purchase
       result[:is_valid] = true
       result[:template] = requested_page.to_s
     else

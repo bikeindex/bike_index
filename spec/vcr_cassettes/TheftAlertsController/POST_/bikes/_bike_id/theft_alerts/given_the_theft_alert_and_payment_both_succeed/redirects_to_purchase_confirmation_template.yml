@@ -23,7 +23,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Thu, 20 Jun 2019 14:32:54 GMT
+      - Sat, 22 Jun 2019 00:38:37 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -43,7 +43,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_9zryU1suG9BVGg
+      - req_5rkvU3iAtv9Ta0
       Stripe-Version:
       - '2014-12-08'
       Strict-Transport-Security:
@@ -52,10 +52,10 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "tok_FI1MS3L7qpGL6h",
+          "id": "tok_FIYMH8iawaaMqt",
           "object": "token",
           "card": {
-            "id": "card_FI1MSE4IEDqCkn",
+            "id": "card_FIYMDnLzWObMiT",
             "object": "card",
             "address_city": null,
             "address_country": null,
@@ -81,19 +81,19 @@ http_interactions:
             "tokenization_method": null
           },
           "client_ip": "100.37.244.206",
-          "created": 1561041174,
+          "created": 1561163917,
           "livemode": false,
           "type": "card",
           "used": false
         }
     http_version: 
-  recorded_at: Thu, 20 Jun 2019 14:32:54 GMT
+  recorded_at: Sat, 22 Jun 2019 00:38:37 GMT
 - request:
     method: post
     uri: https://api.stripe.com/v1/customers
     body:
       encoding: UTF-8
-      string: email=user25s%40bikeiasdndex.org&card=tok_FI1MS3L7qpGL6h
+      string: email=user2s%40bikeiasdndex.org&card=tok_FIYMH8iawaaMqt
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/3.3.2
@@ -111,11 +111,11 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Thu, 20 Jun 2019 14:32:54 GMT
+      - Sat, 22 Jun 2019 00:38:38 GMT
       Content-Type:
       - application/json
       Content-Length:
-      - '2808'
+      - '2807'
       Connection:
       - keep-alive
       Access-Control-Allow-Credentials:
@@ -131,7 +131,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_xHeSdbpokh7Zd8
+      - req_zlj1KuZtA3Uspt
       Stripe-Version:
       - '2014-12-08'
       Strict-Transport-Security:
@@ -140,7 +140,7 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "cus_FI1MPIgW5DFRFa",
+          "id": "cus_FIYMMOnOFMmosQ",
           "object": "customer",
           "account_balance": 0,
           "address": null,
@@ -149,7 +149,7 @@ http_interactions:
             "object": "list",
             "data": [
               {
-                "id": "card_FI1MSE4IEDqCkn",
+                "id": "card_FIYMDnLzWObMiT",
                 "object": "card",
                 "address_city": null,
                 "address_country": null,
@@ -161,7 +161,7 @@ http_interactions:
                 "address_zip_check": null,
                 "brand": "Visa",
                 "country": "US",
-                "customer": "cus_FI1MPIgW5DFRFa",
+                "customer": "cus_FIYMMOnOFMmosQ",
                 "cvc_check": "pass",
                 "dynamic_last4": null,
                 "exp_month": 12,
@@ -177,17 +177,17 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 1,
-            "url": "/v1/customers/cus_FI1MPIgW5DFRFa/cards"
+            "url": "/v1/customers/cus_FIYMMOnOFMmosQ/cards"
           },
-          "created": 1561041174,
+          "created": 1561163918,
           "currency": null,
-          "default_card": "card_FI1MSE4IEDqCkn",
-          "default_source": "card_FI1MSE4IEDqCkn",
+          "default_card": "card_FIYMDnLzWObMiT",
+          "default_source": "card_FIYMDnLzWObMiT",
           "delinquent": false,
           "description": null,
           "discount": null,
-          "email": "user25s@bikeiasdndex.org",
-          "invoice_prefix": "6980E984",
+          "email": "user2s@bikeiasdndex.org",
+          "invoice_prefix": "AD92CF6D",
           "invoice_settings": {
             "custom_fields": null,
             "default_payment_method": null,
@@ -206,7 +206,7 @@ http_interactions:
             "object": "list",
             "data": [
               {
-                "id": "card_FI1MSE4IEDqCkn",
+                "id": "card_FIYMDnLzWObMiT",
                 "object": "card",
                 "address_city": null,
                 "address_country": null,
@@ -218,7 +218,7 @@ http_interactions:
                 "address_zip_check": null,
                 "brand": "Visa",
                 "country": "US",
-                "customer": "cus_FI1MPIgW5DFRFa",
+                "customer": "cus_FIYMMOnOFMmosQ",
                 "cvc_check": "pass",
                 "dynamic_last4": null,
                 "exp_month": 12,
@@ -234,7 +234,7 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 1,
-            "url": "/v1/customers/cus_FI1MPIgW5DFRFa/sources"
+            "url": "/v1/customers/cus_FIYMMOnOFMmosQ/sources"
           },
           "subscriptions": {
             "object": "list",
@@ -243,7 +243,7 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 0,
-            "url": "/v1/customers/cus_FI1MPIgW5DFRFa/subscriptions"
+            "url": "/v1/customers/cus_FIYMMOnOFMmosQ/subscriptions"
           },
           "tax_exempt": "none",
           "tax_ids": {
@@ -253,19 +253,19 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 0,
-            "url": "/v1/customers/cus_FI1MPIgW5DFRFa/tax_ids"
+            "url": "/v1/customers/cus_FIYMMOnOFMmosQ/tax_ids"
           },
           "tax_info": null,
           "tax_info_verification": null
         }
     http_version: 
-  recorded_at: Thu, 20 Jun 2019 14:32:54 GMT
+  recorded_at: Sat, 22 Jun 2019 00:38:38 GMT
 - request:
     method: post
     uri: https://api.stripe.com/v1/charges
     body:
       encoding: UTF-8
-      string: customer=cus_FI1MPIgW5DFRFa&amount=100&description=Bike+Index+Alert&currency=usd
+      string: customer=cus_FIYMMOnOFMmosQ&amount=100&description=Bike+Index+Alert&currency=usd
     headers:
       User-Agent:
       - Stripe/v1 RubyBindings/3.3.2
@@ -283,7 +283,7 @@ http_interactions:
       Server:
       - nginx
       Date:
-      - Thu, 20 Jun 2019 14:32:55 GMT
+      - Sat, 22 Jun 2019 00:38:39 GMT
       Content-Type:
       - application/json
       Content-Length:
@@ -303,7 +303,7 @@ http_interactions:
       Cache-Control:
       - no-cache, no-store
       Request-Id:
-      - req_KN9q2er1sqhTQl
+      - req_UNbQ6oaCiCXaFO
       Stripe-Version:
       - '2014-12-08'
       Strict-Transport-Security:
@@ -312,14 +312,14 @@ http_interactions:
       encoding: UTF-8
       string: |
         {
-          "id": "ch_FI1MtJ8oejKTPu",
+          "id": "ch_FIYM8UdekbVfmi",
           "object": "charge",
           "amount": 100,
           "amount_refunded": 0,
           "application": null,
           "application_fee": null,
           "application_fee_amount": null,
-          "balance_transaction": "txn_FI1M0becOl3RMN",
+          "balance_transaction": "txn_FIYMPTKoLwc0t5",
           "billing_details": {
             "address": {
               "city": null,
@@ -335,7 +335,7 @@ http_interactions:
           },
           "captured": true,
           "card": {
-            "id": "card_FI1MSE4IEDqCkn",
+            "id": "card_FIYMDnLzWObMiT",
             "object": "card",
             "address_city": null,
             "address_country": null,
@@ -347,7 +347,7 @@ http_interactions:
             "address_zip_check": null,
             "brand": "Visa",
             "country": "US",
-            "customer": "cus_FI1MPIgW5DFRFa",
+            "customer": "cus_FIYMMOnOFMmosQ",
             "cvc_check": "pass",
             "dynamic_last4": null,
             "exp_month": 12,
@@ -360,9 +360,9 @@ http_interactions:
             "name": null,
             "tokenization_method": null
           },
-          "created": 1561041175,
+          "created": 1561163919,
           "currency": "usd",
-          "customer": "cus_FI1MPIgW5DFRFa",
+          "customer": "cus_FIYMMOnOFMmosQ",
           "description": "Bike Index Alert",
           "destination": null,
           "dispute": null,
@@ -380,13 +380,13 @@ http_interactions:
             "network_status": "approved_by_network",
             "reason": null,
             "risk_level": "normal",
-            "risk_score": 62,
+            "risk_score": 17,
             "seller_message": "Payment complete.",
             "type": "authorized"
           },
           "paid": true,
           "payment_intent": null,
-          "payment_method": "card_FI1MSE4IEDqCkn",
+          "payment_method": "card_FIYMDnLzWObMiT",
           "payment_method_details": {
             "card": {
               "brand": "visa",
@@ -408,7 +408,7 @@ http_interactions:
           },
           "receipt_email": null,
           "receipt_number": null,
-          "receipt_url": "https://pay.stripe.com/receipts/acct_2Ksnm0T0GBfX0vyPUIxE/ch_FI1MtJ8oejKTPu/rcpt_FI1Mkd9VqLKPqXSgarPijAgp9dlDiuN",
+          "receipt_url": "https://pay.stripe.com/receipts/acct_2Ksnm0T0GBfX0vyPUIxE/ch_FIYM8UdekbVfmi/rcpt_FIYMAFV2PaL55R2MwFq0vQZf2Ybc8ap",
           "refunded": false,
           "refunds": {
             "object": "list",
@@ -417,12 +417,12 @@ http_interactions:
             ],
             "has_more": false,
             "total_count": 0,
-            "url": "/v1/charges/ch_FI1MtJ8oejKTPu/refunds"
+            "url": "/v1/charges/ch_FIYM8UdekbVfmi/refunds"
           },
           "review": null,
           "shipping": null,
           "source": {
-            "id": "card_FI1MSE4IEDqCkn",
+            "id": "card_FIYMDnLzWObMiT",
             "object": "card",
             "address_city": null,
             "address_country": null,
@@ -434,7 +434,7 @@ http_interactions:
             "address_zip_check": null,
             "brand": "Visa",
             "country": "US",
-            "customer": "cus_FI1MPIgW5DFRFa",
+            "customer": "cus_FIYMMOnOFMmosQ",
             "cvc_check": "pass",
             "dynamic_last4": null,
             "exp_month": 12,
@@ -455,5 +455,5 @@ http_interactions:
           "transfer_group": null
         }
     http_version: 
-  recorded_at: Thu, 20 Jun 2019 14:32:55 GMT
+  recorded_at: Sat, 22 Jun 2019 00:38:39 GMT
 recorded_with: VCR 4.0.0
