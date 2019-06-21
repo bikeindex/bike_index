@@ -49,8 +49,7 @@ class Admin::PaymentsController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[id created_at user_id organization_id kind invoice_id amount_cents
-       subscription_start_at subscription_end_at amount_due_cents amount_paid_cents]
+    %w[id created_at user_id organization_id kind invoice_id amount_cents]
   end
 
   def valid_invoice_parameters?
