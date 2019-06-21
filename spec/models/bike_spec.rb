@@ -261,6 +261,7 @@ RSpec.describe Bike, type: :model do
       it "returns correctly for all sorts of convoluted things" do
         bike.reload
         expect(bike.creation_organization).to eq organization
+        expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
         expect(bike.claimed?).to be_falsey
         expect(bike.authorize_for_user!(member)).to be_truthy
         expect(bike.authorize_for_user!(member)).to be_truthy
@@ -353,17 +354,24 @@ RSpec.describe Bike, type: :model do
     let(:user) { FactoryBot.create(:user) }
     let(:organization) { FactoryBot.create(:organization) }
     let!(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
-    let(:organization2) { FactoryBot.create(:organization) }
-    let!(:organization_membership2) { FactoryBot.create(:membership, user: organization_member, organization: organization2) }
-    let(:ownership) { FactoryBot.create(:ownership_organization_bike, user: user, claimed: true, organization: organization, can_edit_claimed: true) }
+    let(:organization_membership2) { FactoryBot.create(:membership, user: organization_member) }
+    let!(:organization2) { organization_membership2.organization }
+    let(:ownership) { FactoryBot.create(:ownership_organization_bike, user: user, claimed: true, organization: organization, can_edit_claimed: false) }
     let(:bike) { ownership.bike }
-    let!(:other_organization) { FactoryBot.create(:bike_organization, bike: bike, can_edit_claimed: false, organization: organization2) }
+    let!(:other_organization) { FactoryBot.create(:bike_organization, bike: bike, can_edit_claimed: true, organization: organization2) }
     it "checks the passed organization" do
+      bike.reload
+      expect(bike.claimed?).to be_truthy
       expect(bike.editable_organizations.pluck(:id)).to eq([organization2.id])
       expect(bike.authorized_by_organization?(u: user)).to be_falsey # Because the user is the owner
+      expect(bike.authorized_by_organization?).to be_truthy
       expect(bike.authorized_by_organization?(u: organization_member)).to be_truthy
+      expect(bike.authorized_by_organization?(org: organization)).to be_falsey
       expect(bike.authorized_by_organization?(u: organization_member, org: organization)).to be_falsey
+      expect(bike.authorized_by_organization?(org: organization2)).to be_truthy
       expect(bike.authorized_by_organization?(u: organization_member, org: organization2)).to be_truthy
+      # Also, if passed a user, the user must be a member of the organization that was passed
+      expect(bike.authorized_by_organization?(u: FactoryBot.create(:user), org: organization2)).to be_falsey
     end
   end
 

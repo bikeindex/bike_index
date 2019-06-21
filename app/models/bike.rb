@@ -235,13 +235,15 @@ class Bike < ActiveRecord::Base
   end
 
   def authorized_by_organization?(u: nil, org: nil)
-    return false unless editable_organizations.any?
+    editable_organization_ids = editable_organizations.pluck(:id)
+    return false unless editable_organization_ids.any?
     return true unless u.present? || org.present?
-    return creation_organization == org if org.present? && u.blank?
-    # so, we know a user was passed
-    return false if claimable_by?(u) # this is authorized by owner, not organization
-    return editable_organizations.any? { |o| u.member_of?(o) } unless org.present?
-    creation_organization == org && u.member_of?(org)
+    # We have either a org or a user - if no user, we only need to check org
+    return editable_organization_ids.include?(org.id) if u.blank?
+    return false if claimable_by?(u) # authorized by owner, not organization
+    # Ensure the user is part of the organization and the organization can edit if passed both
+    return u.member_of?(org) && editable_organization_ids.include?(org.id) if org.present?
+    editable_organizations.any? { |o| u.member_of?(o) }
   end
 
   def first_owner_email; first_ownership.owner_email end
