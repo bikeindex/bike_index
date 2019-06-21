@@ -16,9 +16,6 @@
       %span.navbar-brand
         = link_to (image_tag("logo.svg")), admin_root_path
       - if current_user.superuser?
-        / %button.navbar-toggler{"aria-controls" => "navbarSupportedContent", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-target" => "#collapsible-admin-nav", "data-toggle" => "collapse", type: "button"}
-        /   %span.navbar-toggler-icon
-        / .collapse.navbar-collapse#collapsible-admin-nav
         %ul.navbar-nav.d-none.d-md-flex
           %li.nav-item
             = active_link "Users", admin_users_path, role: "button", class: "nav-link users", match_controller: true
