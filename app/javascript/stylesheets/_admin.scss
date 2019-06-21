@@ -46,7 +46,12 @@
   @extend .row;
   border-bottom: 1px solid $gray-400;
   padding-bottom: 20px;
-  h1, h2, h3 {
+  h1 {
+    font-size: 2rem;
+  }
+  h1,
+  h2,
+  h3 {
     @include media-breakpoint-down(sm) {
       font-size: 1.5rem;
     }
