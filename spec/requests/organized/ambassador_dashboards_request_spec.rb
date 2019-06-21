@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
-  let(:organization) { FactoryBot.create(:organization_ambassador) }
+  let(:current_organization) { FactoryBot.create(:organization_ambassador) }
 
   context "given an unauthenticated user" do
     describe "index" do
@@ -15,13 +15,13 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
   context "given an authenticated non-ambassador" do
     include_context :request_spec_logged_in_as_user
     let(:organization) { FactoryBot.create(:organization) }
-    let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
     describe "index" do
       it "redirects to organization root path" do
-        user.reload
-        expect(user.default_organization).to be_present
-        get organization_ambassador_dashboard_path(organization)
-        expect(response).to redirect_to organization_root_path(organization_id: organization)
+        current_user.reload
+        expect(current_user.default_organization).to be_present
+        get organization_ambassador_dashboard_path(current_organization)
+        expect(response).to redirect_to organization_root_path(organization_id: current_organization)
       end
     end
   end
@@ -31,7 +31,7 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
     describe "show" do
       it "renders the ambassador dashboard" do
         FactoryBot.create_list(:ambassador_task, 2)
-        FactoryBot.create_list(:ambassador, 2, organization: organization)
+        FactoryBot.create_list(:ambassador, 2, organization: current_organization)
 
         get organization_ambassador_dashboard_path(organization)
 
@@ -40,9 +40,9 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
         expect(response).to render_template(:show)
       end
       context "has not accepted vendor terms" do
-        let(:user) { FactoryBot.create(:ambassador, vendor_terms_of_service: false, organization: organization) }
+        let(:current_user) { FactoryBot.create(:ambassador, vendor_terms_of_service: false, organization: current_organization) }
         it "redirects to accept the terms" do
-          get "/o/#{organization.slug}/ambassador_dashboard"
+          get "/o/#{current_organization.slug}/ambassador_dashboard"
           expect(response).to redirect_to accept_vendor_terms_path
         end
       end
@@ -50,7 +50,7 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
 
     describe "resources" do
       it "renders the ambassador resources" do
-        get resources_organization_ambassador_dashboard_path(organization)
+        get resources_organization_ambassador_dashboard_path(current_organization)
         expect(response.status).to eq(200)
         expect(response).to render_template(:resources)
       end
@@ -58,7 +58,7 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
 
     describe "getting_started" do
       it "renders the ambassador resources" do
-        get getting_started_organization_ambassador_dashboard_path(organization)
+        get getting_started_organization_ambassador_dashboard_path(current_organization)
         expect(response.status).to eq(200)
         expect(response).to render_template(:getting_started)
       end
@@ -71,9 +71,9 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
     describe "show" do
       it "renders the ambassador dashboard with ambassadors list" do
         FactoryBot.create_list(:ambassador_task, 2)
-        FactoryBot.create_list(:ambassador, 2, organization: organization)
+        FactoryBot.create_list(:ambassador, 2, organization: current_organization)
 
-        get organization_ambassador_dashboard_path(organization)
+        get organization_ambassador_dashboard_path(current_organization)
 
         expect(response.status).to eq(200)
         expect(assigns(:ambassadors).count).to eq(2)
@@ -85,7 +85,7 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
 
     describe "resources" do
       it "renders the ambassador resources template" do
-        get resources_organization_ambassador_dashboard_path(organization)
+        get resources_organization_ambassador_dashboard_path(current_organization)
         expect(response.status).to eq(200)
         expect(response).to render_template(:resources)
       end
@@ -93,7 +93,7 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
 
     describe "getting_started" do
       it "renders the ambassador getting started template" do
-        get getting_started_organization_ambassador_dashboard_path(organization)
+        get getting_started_organization_ambassador_dashboard_path(current_organization)
         expect(response.status).to eq(200)
         expect(response).to render_template(:getting_started)
       end
