@@ -19,7 +19,7 @@
                     Creation organization
                   %p.form-well-input-static.bike_organization_static_input{ data: { orgid: @bike.creation_organization_id } }
                     = @bike.creation_organization.name
-                    %small
+                    %small.can-edit-checkbox
                       %label.checkbox-inline.not-fixed
                         = check_box_tag :organization_can_edit_claimed, @bike.creation_organization_id, @bike.editable_organizations.pluck(:id).include?(@bike.creation_organization_id)
                         Can edit this #{@bike.type}
@@ -28,13 +28,14 @@
                       %span.context-display-help
                         &ndash;
                       Remove
-              - @bike.bike_organizations.each do |bike_organization|
+              - @bike.bike_organizations.each_with_index do |bike_organization, index|
                 - next if bike_organization.organization == @bike.creation_organization
                 .form-group.row
-                  %label.form-well-label
+                  %label.form-well-label.less-strong
+                    Other organizations
                   %p.form-well-input-static.bike_organization_static_input{ data: { orgid: bike_organization.organization_id } }
                     = bike_organization.organization.name
-                    %small
+                    %small.can-edit-checkbox
                       %label.checkbox-inline.not-fixed
                         = check_box_tag :organization_can_edit_claimed, bike_organization.organization_id, bike_organization.can_edit_claimed
                         Can edit this #{@bike.type}
