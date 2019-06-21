@@ -26,6 +26,9 @@
   .fancy-select {
     min-width: 300px;
     margin-top: 4px;
+    @include media-breakpoint-down(xs) {
+      min-width: 240px;
+    }
   }
 }
 

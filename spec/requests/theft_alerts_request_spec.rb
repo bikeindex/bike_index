@@ -4,9 +4,10 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
   describe "POST /bikes/:bike_id/theft_alerts" do
     let(:theft_alert_plan) { FactoryBot.create(:theft_alert_plan) }
     let(:bike) { FactoryBot.create(:ownership_stolen).bike }
+    let(:current_user) { bike.owner }
 
     before do
-      log_in bike.owner
+      log_in current_user
       expect(Payment.count).to eq(0)
       expect(TheftAlert.count).to eq(0)
     end
