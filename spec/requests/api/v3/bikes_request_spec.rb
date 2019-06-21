@@ -198,7 +198,7 @@ RSpec.describe "Bikes API V3", type: :request do
       context "if the matching bike is claimed" do
         let(:can_edit_claimed) { true }
         let(:bike) { FactoryBot.create(:creation_organization_bike, can_edit_claimed: can_edit_claimed) }
-        let!(:ownership) { FactoryBot.create(:ownership, creator: bike.creator, bike: bike) }
+        let!(:ownership) { FactoryBot.create(:ownership_claimed, creator: bike.creator, bike: bike) }
         let!(:membership) { FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization) }
         let(:bike_attrs) do
           {
