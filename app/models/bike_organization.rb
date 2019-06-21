@@ -5,12 +5,12 @@ class BikeOrganization < ActiveRecord::Base
   validates_uniqueness_of :organization_id, scope: [:bike_id], allow_nil: false
   acts_as_paranoid
 
-  scope :can_edit_claimed, -> { where(unable_to_edit_claimed: false) }
+  scope :can_edit_claimed, -> { where(can_not_edit_claimed: false) }
 
-  # Because seth wants to have default=false attributes in the database, but can_edit_claimed makes more sense
-  def can_edit_claimed; !unable_to_edit_claimed end
+  # Because seth wants to have default=false attributes in the database, but can_edit_claimed is easier to think about
+  def can_edit_claimed; !can_not_edit_claimed end
 
   def can_edit_claimed=(val)
-    self.unable_to_edit_claimed = !val
+    self.can_not_edit_claimed = !val
   end
 end

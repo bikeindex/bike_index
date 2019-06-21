@@ -11,9 +11,9 @@ FactoryBot.define do
     factory :ownership_organization_bike do
       transient do
         organization { FactoryBot.create(:organization) }
-        unable_to_edit_claimed { false }
+        can_edit_claimed { true }
       end
-      bike { FactoryBot.create(:creation_organization_bike, organization: organization, unable_to_edit_claimed: unable_to_edit_claimed) }
+      bike { FactoryBot.create(:creation_organization_bike, organization: organization, can_edit_claimed: can_edit_claimed) }
     end
     factory :ownership_stolen do
       bike { FactoryBot.create(:stolen_bike, owner_email: owner_email, creator: creator) }

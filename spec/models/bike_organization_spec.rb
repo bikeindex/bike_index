@@ -7,7 +7,7 @@ RSpec.describe BikeOrganization, type: :model do
       expect(bike_organization.can_edit_claimed).to be_truthy
       bike_organization.can_edit_claimed = false
       expect(bike_organization.can_edit_claimed).to be_falsey
-      expect(bike_organization.unable_to_edit_claimed).to be_truthy
+      expect(bike_organization.can_not_edit_claimed).to be_truthy
     end
   end
 end

@@ -12,6 +12,8 @@ class CreationState < ActiveRecord::Base
   after_create :create_bike_organization
   after_save :set_reflexive_association
 
+  attr_accessor :can_edit_claimed
+
   def self.origins
     %w[embed embed_extended embed_partial api_v1 api_v2 bulk_import_worker].freeze
   end
@@ -33,9 +35,11 @@ class CreationState < ActiveRecord::Base
 
   def create_bike_organization
     return true unless organization.present?
-    BikeOrganization.where(bike_id: bike_id, organization_id: organization_id).first_or_create
-    if organization.parent_organization.present?
-      BikeOrganization.where(bike_id: bike_id, organization_id: organization.parent_organization_id).first_or_create
+    unless BikeOrganization.where(bike_id: bike_id, organization_id: organization_id).present?
+      BikeOrganization.create(bike_id: bike_id, organization_id: organization_id, can_edit_claimed: can_edit_claimed)
+    end
+    if organization.parent_organization.present? && BikeOrganization.where(bike_id: bike_id, organization_id: organization.parent_organization_id).blank?
+      BikeOrganization.create(bike_id: bike_id, organization_id: organization.parent_organization_id, can_edit_claimed: can_edit_claimed)
     end
     true # Legacy concerns, so excited for TODO: Rails 5 update
   end
