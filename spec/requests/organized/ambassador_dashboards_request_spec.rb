@@ -7,7 +7,7 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
     describe "index" do
       it "redirects to the user homepage" do
         get organization_ambassador_dashboard_path(organization)
-        expect(response).to redirect_to(/user_home/)
+        expect(response).to redirect_to root_url
       end
     end
   end

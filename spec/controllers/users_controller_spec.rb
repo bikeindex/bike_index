@@ -600,13 +600,14 @@ RSpec.describe UsersController, type: :controller do
         expect(user.reload.terms_of_service).to be_falsey
       end
       context "vendor_terms" do
-        let(:user) { FactoryBot.create(:user) }
+        let(:user) { FactoryBot.create(:user_confirmed) }
         it "redirects to accept the terms" do
           expect(user.terms_of_service).to be_truthy
-          expect(user.vendor_terms_of_service).to be_truthy
+          expect(user.accepted_vendor_terms_of_service?).to be_falsey
           set_current_user(user)
           post :update, id: user.username, user: { vendor_terms_of_service: "0" }
           expect(response).to redirect_to accept_vendor_terms_path
+          expect(user.reload.vendor_terms_of_service).to be_falsey
         end
       end
     end
