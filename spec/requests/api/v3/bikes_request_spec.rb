@@ -655,7 +655,7 @@ RSpec.describe "Bikes API V3", type: :request do
       headsets = FactoryBot.create(:ctype, name: "Headset")
       comp = FactoryBot.create(:component, bike: bike, ctype: headsets)
       comp2 = FactoryBot.create(:component, bike: bike, ctype: wheels)
-      not_urs = FactoryBot.create(:component)
+      FactoryBot.create(:component)
       bike.reload
       expect(bike.components.count).to eq(2)
       components = [
@@ -696,7 +696,7 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "doesn't remove components that aren't the bikes" do
-      manufacturer = FactoryBot.create(:manufacturer)
+      FactoryBot.create(:manufacturer)
       comp = FactoryBot.create(:component, bike: bike)
       not_urs = FactoryBot.create(:component)
       components = [
