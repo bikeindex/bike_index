@@ -1,5 +1,7 @@
-%h1
-  Edit #{@invoice.display_name} for #{link_to @invoice.organization.short_name, admin_organization_invoices_path(@invoice.organization)}
+.admin-subnav
+  .col-12
+    %h1
+      Edit #{@invoice.display_name} for #{link_to @invoice.organization.short_name, admin_organization_path(@invoice.organization)}
 .row
   .col-sm-6
     %table.table-list
@@ -22,6 +24,9 @@
                     = link_to "create following invoice", admin_organization_invoice_path(organization_id: @invoice.organization.to_param, id: @invoice.id, create_following_invoice: true), method: "PUT", action: "update"
                 - else
                   Invoice must be paid before you can create a following invoice
+            %li
+              %small.less-strong
+                = link_to "all organization invoices", admin_organization_invoices_path(@invoice.organization)
       %tr
         %td
           Paid in full:

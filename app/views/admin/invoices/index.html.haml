@@ -1,0 +1,27 @@
+.admin-subnav
+  .col-md-6
+    %h1
+      %em.strong
+        - if params[:query].present?
+          = params[:query].titleize
+        - else
+          All
+      Invoices
+  .col-md-6
+    %ul
+      - if sortable_search_params?
+        %li
+          = link_to "view all", admin_invoices_path, class: "nav-link"
+      %li
+        = link_to "active", admin_invoices_path(sortable_search_params.merge(query: "active")), class: "nav-link #{params[:query] == "active" ? "active" : ""}"
+      %li
+        = link_to "inactive", admin_invoices_path(sortable_search_params.merge(query: "inactive")), class: "nav-link #{params[:query] == "inactive" ? "active" : ""}"
+  %p.subtitle
+    = @invoices.total_count
+    = "matching invoice".pluralize(@invoices.total_count)
+%p.less-strong
+  Go to individual organizations to create new invoices
+
+= paginate @invoices, views_prefix: "admin"
+
+= render partial: "/admin/organizations/invoices/table", locals: { invoices: @invoices, render_sortable: true, display_organization: true }

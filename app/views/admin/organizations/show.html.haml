@@ -184,6 +184,8 @@
           and
           %strong
             #{@organization.invoices.active.count} active
+    = render partial: "/admin/organizations/invoices/table", locals: { invoices: @organization.invoices.order(id: :desc).limit(3) }
+
   .col-md-6
 
     - if @organization.is_paid
