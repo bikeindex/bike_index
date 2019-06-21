@@ -1,5 +1,7 @@
 .container
   %h1 Edit Ambassador Activity
+  .text-right
+    = link_to "Delete activity", admin_ambassador_task_path(@ambassador_task), method: :delete, confirm: "Are you sure you want to delete this? This can't be undone", class: "text-warning"
 
   = render "form",
     ambassador_task: @ambassador_task,
