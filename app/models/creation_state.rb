@@ -56,7 +56,7 @@ class CreationState < ActiveRecord::Base
     elsif is_pos
       "lightspeed_pos"
     else
-      "not_pos"
+      "no_pos"
     end
   end
 end

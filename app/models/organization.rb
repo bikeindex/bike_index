@@ -13,11 +13,12 @@ class Organization < ActiveRecord::Base
   }.freeze
 
   POS_KIND_ENUM = {
-    not_pos: 0,
+    no_pos: 0,
     other_pos: 1,
     lightspeed_pos: 2,
     ascend_pos: 3,
     broken_pos: 4,
+    does_not_need_pos: 5,
   }.freeze
 
   acts_as_paranoid
@@ -159,7 +160,7 @@ class Organization < ActiveRecord::Base
   end
 
   def bike_shop_display_integration_alert?
-    bike_shop? && not_pos? # TODO: if the shop has registered a bike within past week, don't show
+    bike_shop? && %w[no_pos broken_pos].include?(pos_kind)
   end
 
   def paid_for?(feature_name)
@@ -249,7 +250,10 @@ class Organization < ActiveRecord::Base
     return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
     return "ascend_pos" if recent_bikes.ascend_pos.count > 0
     return "other_pos" if recent_bikes.any_pos.count > 0
-    bikes.any_pos.count > 0 ? "broken_pos" : "not_pos"
+    if created_at < Time.current - 1.week
+      return "does_not_need_pos" if recent_bikes.count > 4
+    end
+    bikes.any_pos.count > 0 ? "broken_pos" : "no_pos"
   end
 
   def allowed_show
