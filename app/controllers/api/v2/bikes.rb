@@ -143,7 +143,6 @@ module API
             serial: params[:serial],
             owner_email: params[:owner_email],
           )
-          pp found_bike.present?
 
           # if a matching bike is and can be updated by the submitter, update
           # existing record instead of creating a new one

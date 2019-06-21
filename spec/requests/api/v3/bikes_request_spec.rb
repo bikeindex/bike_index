@@ -198,8 +198,8 @@ RSpec.describe "Bikes API V3", type: :request do
       context "if the matching bike is claimed" do
         let(:can_edit_claimed) { true }
         let(:bike) { FactoryBot.create(:creation_organization_bike, can_edit_claimed: can_edit_claimed) }
-        let(:ownership) { FactoryBot.create(:ownership, creator: bike.creator, bike: bike) }
-        let(:membership) { FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization) }
+        let!(:ownership) { FactoryBot.create(:ownership, creator: bike.creator, bike: bike) }
+        let!(:membership) { FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization) }
         let(:bike_attrs) do
           {
             serial: bike.serial,
@@ -218,10 +218,10 @@ RSpec.describe "Bikes API V3", type: :request do
           end.to_not change(Bike, :count)
 
           returned_bike = json_result["bike"]
-          expect(response.status).to eq(201)
-          expect(response.status_message).to eq("Found")
-          expect(returned_bike["id"]).to eq(bike.id)
-          expect(returned_bike["year"]).to eq(2012)
+          expect(response.status).to eq(302)
+          expect(response.status_message).to eq "Found"
+          expect(returned_bike["id"]).to eq bike.id
+          expect(returned_bike["year"]).to eq 2012
           bike.reload
           expect(bike.year).to eq 2012
         end
@@ -237,8 +237,8 @@ RSpec.describe "Bikes API V3", type: :request do
 
             returned_bike = json_result["bike"]
             expect(response.status).to eq(201)
-            expect(response.status_message).to eq("Created")
-            expect(returned_bike["id"]).to_not eq(bike.id)
+            expect(response.status_message).to eq "Created"
+            expect(returned_bike["id"]).to_not eq bike.id
             bike.reload
             expect(bike.year).to_not eq 2012
           end
