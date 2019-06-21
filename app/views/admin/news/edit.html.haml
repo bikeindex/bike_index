@@ -102,7 +102,7 @@
     .card-body.bg-light
       %ul.list-unstyled#public_images{ :"data-order-url" => order_public_images_url }
         - if @blog.public_images
-          = render partial: "news_public_image", collection: @blog.public_images, as: :public_image
+          = render partial: "/public_images/public_image", collection: @blog.public_images, as: :public_image
       %section
         = render partial: "public_images/admin_new_form", locals: { imageable_type: 'Blog' }
     .alert.alert-info
