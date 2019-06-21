@@ -1,5 +1,6 @@
 class Admin::InvoicesController < Admin::BaseController
   include SortableTable
+  layout "new_admin"
   before_filter :find_payment, only: %i[edit update]
 
   def index
@@ -11,7 +12,6 @@ class Admin::InvoicesController < Admin::BaseController
         .reorder(sort_column + " " + sort_direction)
         .page(page)
         .per(per_page)
-    render layout: "new_admin"
   end
 
   protected
