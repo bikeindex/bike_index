@@ -22,8 +22,8 @@ class Bike < ActiveRecord::Base
 
   has_many :bike_organizations, dependent: :destroy
   has_many :organizations, through: :bike_organizations
-  has_many :able_to_edit_claimed_bike_organizations, -> { able_to_edit_claimed }, class_name: "BikeOrganization"
-  has_many :able_to_edit_claimed_organizations, through: :able_to_edit_claimed_bike_organizations, source: :organization
+  has_many :can_edit_claimed_bike_organizations, -> { can_edit_claimed }, class_name: "BikeOrganization"
+  has_many :can_edit_claimed_organizations, through: :can_edit_claimed_bike_organizations, source: :organization
   has_many :creation_states, dependent: :destroy
   # delegate :creator, to: :creation_state, source: :creator
   # has_one :creation_organization, through: :creation_state, source: :organization
@@ -231,7 +231,7 @@ class Bike < ActiveRecord::Base
 
   def editable_organizations
     return organizations if first_ownership? && organized? && !claimed?
-    able_to_edit_claimed_organizations
+    can_edit_claimed_organizations
   end
 
   def authorized_by_organization?(u: nil, org: nil)

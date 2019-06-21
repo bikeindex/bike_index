@@ -341,7 +341,7 @@ RSpec.describe Bike, type: :model do
     let!(:organization_membership2) { FactoryBot.create(:membership, user: organization_member, organization: organization2) }
     let(:ownership) { FactoryBot.create(:ownership_organization_bike, user: user, claimed: true, organization: organization, unable_to_edit_claimed: true) }
     let(:bike) { ownership.bike }
-    let!(:other_organization) { FactoryBot.create(:bike_organizations, bike: bike, unable_to_edit_claimed: false, organization: organization2) }
+    let!(:other_organization) { FactoryBot.create(:bike_organization, bike: bike, unable_to_edit_claimed: false, organization: organization2) }
     it "checks the passed organization" do
       expect(bike.editable_organizations.pluck(:id)).to eq([organization2.id])
       expect(bike.authorized_by_organization?(u: user)).to be_falsey # Because the user is the owner

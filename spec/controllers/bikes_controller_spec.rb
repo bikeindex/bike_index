@@ -1317,9 +1317,9 @@ RSpec.describe BikesController, type: :controller do
     end
     context "organized bike, member present" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:unable_to_edit_claimed) { true }
+      let(:can_edit_claimed) { false }
       let(:claimed) { false }
-      let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization, unable_to_edit_claimed: unable_to_edit_claimed, claimed: claimed) }
+      let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization, can_edit_claimed: can_edit_claimed, claimed: claimed) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:bike) { ownership.bike }
       before { set_current_user(user) }
@@ -1349,8 +1349,8 @@ RSpec.describe BikesController, type: :controller do
           expect(assigns(:bike)).to be_decorated
           expect(bike.description).to_not eq "new description"
         end
-        context "unable_to_edit_claimed false" do
-          let(:unable_to_edit_claimed) { true }
+        context "can_edit_claimed true" do
+          let(:can_edit_claimed) { true }
           it "updates the bike" do
             bike.reload
             expect(bike.owner).to_not eq(user)

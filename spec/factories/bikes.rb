@@ -36,13 +36,13 @@ FactoryBot.define do
     factory :organized_bikes do # don't use this factory exactly, it's used to wrap all the organized bikes
       transient do
         organization { FactoryBot.create(:organization) }
-        unable_to_edit_claimed { false }
+        can_edit_claimed { true }
       end
       creation_organization { organization }
 
       factory :bike_organized do
         after(:create) do |bike, evaluator|
-          create(:bike_organization, organization: bike.creation_organization, bike: bike, unable_to_edit_claimed: evaluator.unable_to_edit_claimed)
+          create(:bike_organization, organization: bike.creation_organization, bike: bike, can_edit_claimed: evaluator.can_edit_claimed)
           bike.reload
         end
 
