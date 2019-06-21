@@ -196,26 +196,28 @@ RSpec.describe "Bikes API V3", type: :request do
       end
 
       context "if the matching bike is claimed" do
-        it "creates a new bike" do
-          bike = FactoryBot.create(:creation_organization_bike)
-          FactoryBot.create(:ownership_claimed, creator: bike.creator, bike: bike)
-          FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization)
+        context "organization" do
+          it "creates a new bike" do
+            bike = FactoryBot.create(:creation_organization_bike)
+            FactoryBot.create(:ownership_claimed, creator: bike.creator, bike: bike)
+            FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization)
 
-          bike_attrs = {
-            serial: bike.serial,
-            manufacturer: bike.manufacturer.name,
-            color: color.name,
-            year: bike.year,
-            owner_email: bike.owner_email,
-          }
-          post "/api/v3/bikes?access_token=#{token.token}",
-               bike_attrs.to_json,
-               json_headers
+            bike_attrs = {
+              serial: bike.serial,
+              manufacturer: bike.manufacturer.name,
+              color: color.name,
+              year: bike.year,
+              owner_email: bike.owner_email,
+            }
+            post "/api/v3/bikes?access_token=#{token.token}",
+                 bike_attrs.to_json,
+                 json_headers
 
-          returned_bike = json_result["bike"]
-          expect(response.status).to eq(201)
-          expect(response.status_message).to eq("Created")
-          expect(returned_bike["id"]).to_not eq(bike.id)
+            returned_bike = json_result["bike"]
+            expect(response.status).to eq(201)
+            expect(response.status_message).to eq("Created")
+            expect(returned_bike["id"]).to_not eq(bike.id)
+          end
         end
       end
     end
