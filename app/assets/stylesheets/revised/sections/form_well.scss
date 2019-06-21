@@ -116,6 +116,9 @@
   .form-group {
     clear: both;
 
+    label.checkbox-inline {
+      cursor: pointer;
+    }
     .checkbox-inline {
       padding-top: 0.5em;
     }
