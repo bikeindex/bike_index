@@ -1346,7 +1346,7 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.authorized_by_organization?(u: user)).to be_falsey
           put :update, id: bike.id, bike: { description: "new description", handlebar_type: "forward" }
           expect(flash[:error]).to be_present
-          expect(assigns(:bike)).to be_decorated
+          expect(assigns(:bike)).to be_present
           expect(bike.description).to_not eq "new description"
         end
         context "can_edit_claimed true" do
@@ -1358,7 +1358,7 @@ RSpec.describe BikesController, type: :controller do
             expect(bike.authorized_by_organization?(u: user)).to be_truthy
             put :update, id: bike.id, bike: { description: "new description", handlebar_type: "forward" }
             expect(response).to redirect_to edit_bike_url(bike)
-            expect(assigns(:bike)).to be_decorated
+            expect(assigns(:bike)).to be_present
             bike.reload
             expect(bike.hidden).to be_falsey
             expect(bike.description).to eq "new description"
