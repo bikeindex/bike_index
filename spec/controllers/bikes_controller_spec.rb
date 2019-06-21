@@ -265,10 +265,10 @@ RSpec.describe BikesController, type: :controller do
 
   describe "scanned" do
     let(:bike) { FactoryBot.create(:bike) }
-    let!(:bike_code) { FactoryBot.create(:bike_code, bike: bike, code: 900) }
+    let!(:bike_code) { FactoryBot.create(:bike_code, bike: bike, code: "D900") }
     let(:organization) { FactoryBot.create(:organization) }
     context "organized no bike" do
-      let!(:bike_code2) { FactoryBot.create(:bike_code, organization: organization, code: "0900") }
+      let!(:bike_code2) { FactoryBot.create(:bike_code, organization: organization, code: "D0900") }
       let!(:user) { FactoryBot.create(:user_confirmed) }
       before { set_current_user(user) }
       it "renders the scanned page" do
@@ -282,7 +282,7 @@ RSpec.describe BikesController, type: :controller do
       context "user part of organization" do
         let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
         it "makes current_organization the organization" do
-          get :scanned, id: "000#{bike_code2.code}", organization_id: organization.to_param
+          get :scanned, id: "D0900", organization_id: organization.to_param
           expect(assigns(:bike_code)).to eq bike_code2
           expect(session[:passive_organization_id]).to eq organization.id
           expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_code: bike_code2.code)
@@ -292,7 +292,7 @@ RSpec.describe BikesController, type: :controller do
           it "makes current_organization the organization" do
             expect(user.memberships&.pluck(:organization_id)).to eq([organization.id])
             expect(bike_code2.organization).to eq organization
-            get :scanned, id: "000#{bike_code2.code}", organization_id: "BikeIndex"
+            get :scanned, id: "D900", organization_id: "BikeIndex"
             expect(assigns(:bike_code)).to eq bike_code2
             expect(session[:passive_organization_id]).to eq organization.id
             expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_code: bike_code2.code)
@@ -896,7 +896,7 @@ RSpec.describe BikesController, type: :controller do
       {
         theft_details: "Theft details",
         publicize: "Publicize Theft",
-        # alert: "Activate Bike Index Alert",
+        alert: "Activate Bike Index Alert",
         report_recovered: "Mark this Bike Recovered",
       }
     end
@@ -972,7 +972,10 @@ RSpec.describe BikesController, type: :controller do
               bike.update_attribute(:stolen, true)
               bike.reload
               expect(bike.stolen).to be_truthy
+              allow(Flipper).to receive(:enabled?).and_return(true)
+
               get :edit, id: bike.id
+
               expect(response).to be_success
               expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq stolen_edit_templates.as_json
@@ -984,7 +987,10 @@ RSpec.describe BikesController, type: :controller do
               bike.update_attributes(stolen: true, recovered: true)
               bike.reload
               expect(bike.recovered).to be_truthy
+              allow(Flipper).to receive(:enabled?).and_return(true)
+
               get :edit, id: bike.id
+
               expect(response).to be_success
               expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq recovery_edit_templates.as_json
@@ -1005,6 +1011,7 @@ RSpec.describe BikesController, type: :controller do
               expect(response).to render_template("edit_#{template}")
               expect(assigns(:edit_template)).to eq(template)
               expect(assigns(:private_images)).to eq([]) if template == "photos"
+              expect(assigns(:theft_alerts)).to eq([]) if template == "alert"
             end
           end
         end

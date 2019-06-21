@@ -13,11 +13,12 @@ class Organization < ActiveRecord::Base
   }.freeze
 
   POS_KIND_ENUM = {
-    not_pos: 0,
+    no_pos: 0,
     other_pos: 1,
     lightspeed_pos: 2,
     ascend_pos: 3,
     broken_pos: 4,
+    does_not_need_pos: 5,
   }.freeze
 
   acts_as_paranoid
@@ -72,6 +73,7 @@ class Organization < ActiveRecord::Base
 
   def self.friendly_find(n)
     return nil unless n.present?
+    return n if n.is_a?(Organization)
     return find(n) if integer_slug?(n)
     slug = Slugifyer.slugify(n)
     # First try slug, then previous slug, and finally, just give finding by name a shot
@@ -156,6 +158,10 @@ class Organization < ActiveRecord::Base
 
   def law_enforcement_missing_verified_features?
     law_enforcement? && !paid_for?("unstolen_notifications")
+  end
+
+  def bike_shop_display_integration_alert?
+    bike_shop? && %w[no_pos broken_pos].include?(pos_kind)
   end
 
   def paid_for?(feature_name)
@@ -245,7 +251,10 @@ class Organization < ActiveRecord::Base
     return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
     return "ascend_pos" if recent_bikes.ascend_pos.count > 0
     return "other_pos" if recent_bikes.any_pos.count > 0
-    bikes.any_pos.count > 0 ? "broken_pos" : "not_pos"
+    if bike_shop? && created_at < Time.current - 1.week
+      return "does_not_need_pos" if recent_bikes.count > 2
+    end
+    bikes.any_pos.count > 0 ? "broken_pos" : "no_pos"
   end
 
   def allowed_show

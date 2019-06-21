@@ -37,12 +37,6 @@ class Admin::CtypesController < Admin::BaseController
     redirect_to admin_ctypes_url
   end
 
-  def import
-    Ctype.import(params[:file])
-    flash[:success] = "Component types imported"
-    redirect_to admin_ctypes_url
-  end
-
   protected
 
   def permitted_parameters
