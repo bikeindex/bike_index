@@ -21,8 +21,8 @@
                     = @bike.creation_organization.name
                     %small
                       %label.checkbox-inline.not-fixed
-                        = check_box_tag "coaster_brake_organization_#{@bike.creation_organization_id}"
-                        Can edit
+                        = check_box_tag :organization_can_edit_claimed, @bike.creation_organization_id, @bike.editable_organizations.pluck(:id).include?(@bike.creation_organization_id)
+                        Can edit this #{@bike.type}
                   .right-input-help
                     %a.optional-form-block.remove-organization{ href: '#' }
                       %span.context-display-help
@@ -34,6 +34,10 @@
                   %label.form-well-label
                   %p.form-well-input-static.bike_organization_static_input{ data: { orgid: bike_organization.organization_id } }
                     = bike_organization.organization.name
+                    %small
+                      %label.checkbox-inline.not-fixed
+                        = check_box_tag :organization_can_edit_claimed, bike_organization.organization_id, bike_organization.can_edit_claimed
+                        Can edit this #{@bike.type}
                   .right-input-help
                     %a.optional-form-block.remove-organization{ href: '#' }
                       %span.context-display-help
