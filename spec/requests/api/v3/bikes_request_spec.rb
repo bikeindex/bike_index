@@ -215,7 +215,7 @@ RSpec.describe "Bikes API V3", type: :request do
             post "/api/v3/bikes?access_token=#{token.token}",
                  bike_attrs.to_json,
                  json_headers
-           end.to_not change(Bike, :count)
+          end.to_not change(Bike, :count)
 
           returned_bike = json_result["bike"]
           expect(response.status).to eq(201)
@@ -233,7 +233,7 @@ RSpec.describe "Bikes API V3", type: :request do
               post "/api/v3/bikes?access_token=#{token.token}",
                    bike_attrs.to_json,
                    json_headers
-             end.to change(Bike, :count).by 1
+            end.to change(Bike, :count).by 1
 
             returned_bike = json_result["bike"]
             expect(response.status).to eq(201)
