@@ -21,7 +21,7 @@
                     = @bike.creation_organization.name
                     %span.can-edit-checkbox
                       %label.checkbox-inline.not-fixed
-                        = check_box_tag :organization_can_edit_claimed, @bike.creation_organization_id, @bike.editable_organizations.pluck(:id).include?(@bike.creation_organization_id)
+                        = check_box_tag "organization_ids_can_edit_claimed[]", @bike.creation_organization_id, @bike.editable_organizations.pluck(:id).include?(@bike.creation_organization_id), multiple: true
                         Can edit this #{@bike.type}
                   .right-input-help
                     %a.optional-form-block.remove-organization{ href: '#' }
@@ -37,7 +37,7 @@
                     = bike_organization.organization.name
                     %span.can-edit-checkbox
                       %label.checkbox-inline.not-fixed
-                        = check_box_tag :organization_can_edit_claimed, bike_organization.organization_id, bike_organization.can_edit_claimed
+                        = check_box_tag "organization_ids_can_edit_claimed[]", bike_organization.organization_id, bike_organization.can_edit_claimed, multiple: true
                         Can edit this #{@bike.type}
                   .right-input-help
                     %a.optional-form-block.remove-organization{ href: '#' }
@@ -75,3 +75,6 @@
               %span.context-display-help
                 +
               Add an organization
+
+          = render "/shared/form_well_footer_save"
+

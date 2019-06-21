@@ -1303,7 +1303,10 @@ RSpec.describe BikesController, type: :controller do
         expect(ownership.owner).to eq user
       end
       it "updates the bike with the allowed_attributes" do
-        put :update, id: bike.id, bike: allowed_attributes
+        put :update,
+            id: bike.id,
+            bike: allowed_attributes,
+            organization_ids_can_edit_claimed: [organization_2.id]
         expect(response).to redirect_to edit_bike_url(bike)
         expect(assigns(:bike)).to be_decorated
         bike.reload
@@ -1313,6 +1316,25 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.send(key)).to eq value
         end
         expect(bike.bike_organization_ids).to eq([organization.id, organization_2.id])
+        expect(bike.editable_organizations.pluck(:id)).to eq([organization_2.id])
+      end
+      context "empty organization_ids_can_edit_claimed" do
+        it "updates the bike with the allowed_attributes" do
+          put :update,
+              id: bike.id,
+              bike: allowed_attributes,
+              organization_ids_can_edit_claimed: []
+          expect(response).to redirect_to edit_bike_url(bike)
+          expect(assigns(:bike)).to be_decorated
+          bike.reload
+          expect(bike.hidden).to be_falsey
+          allowed_attributes.except(*skipped_attrs).each do |key, value|
+            pp value, key unless bike.send(key) == value
+            expect(bike.send(key)).to eq value
+          end
+          expect(bike.bike_organization_ids).to eq([organization.id, organization_2.id])
+          expect(bike.editable_organizations.pluck(:id)).to eq([])
+        end
       end
     end
     context "organized bike, member present" do
@@ -1335,6 +1357,7 @@ RSpec.describe BikesController, type: :controller do
         expect(bike.hidden).to be_falsey
         expect(bike.description).to eq "new description"
         expect(bike.handlebar_type).to eq "forward"
+        expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
       end
       context "bike is claimed" do
         let(:claimed) { true }
