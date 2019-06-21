@@ -29,7 +29,7 @@
         %li
           - if current_organization.paid_for?("show_partial_registrations")
             = active_link "Incomplete registrations", incompletes_organization_bikes_path(current_organization), class: "menu-item"
-          - else
+          - elsif !current_organization.bike_shop?
             %span.disabled-menu-item.menu-item
               Incomplete registrations
         - if current_organization.show_multi_serial?
@@ -90,8 +90,8 @@
           %ul
             %li
               %strong
-                = link_to "Integrate with Lightspeed Retail", lightspeed_interface_path, class: ""
-              for automatic registration of the bikes you sell.
+                = link_to "Integrate Bike Index with Lightspeed", lightspeed_interface_path, class: ""
+              to automatically register the bikes you sell to your customers.
             %li
               Read an full explanation of #{link_to "how the integration works", lightspeed_path}.
     = yield

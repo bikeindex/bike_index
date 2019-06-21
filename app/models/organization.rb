@@ -250,8 +250,8 @@ class Organization < ActiveRecord::Base
     return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
     return "ascend_pos" if recent_bikes.ascend_pos.count > 0
     return "other_pos" if recent_bikes.any_pos.count > 0
-    if created_at < Time.current - 1.week
-      return "does_not_need_pos" if recent_bikes.count > 4
+    if bike_shop? && created_at < Time.current - 1.week
+      return "does_not_need_pos" if recent_bikes.count > 2
     end
     bikes.any_pos.count > 0 ? "broken_pos" : "no_pos"
   end
