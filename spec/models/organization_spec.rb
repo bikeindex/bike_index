@@ -492,8 +492,7 @@ RSpec.describe Organization, type: :model do
       context "does_not_need_pos" do
         let(:pos_kind) { "does_not_need_pos" }
         it "is falsey" do
-          expect(organization.pos_kind).to eq "does_not_need_pos"
-          expect(organization.bike_shop_display_integration_alert?).to be_truthy
+          expect(organization.bike_shop_display_integration_alert?).to be_falsey
         end
       end
     end
