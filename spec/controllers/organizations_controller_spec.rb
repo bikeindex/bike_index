@@ -152,28 +152,28 @@ RSpec.describe OrganizationsController, type: :controller do
     end
   end
 
-  describe "connect_lightspeed" do
+  describe "lightspeed_interface" do
     context "with user with organization" do
       include_context :logged_in_as_organization_admin
       it "redirects to posintegration" do
-        get :connect_lightspeed
+        get :lightspeed_interface
         expect(response).to redirect_to "https://posintegration.bikeindex.org"
       end
     end
     context "with user without organization" do
       include_context :logged_in_as_user
       it "redirects to posintegration" do
-        get :connect_lightspeed
+        get :lightspeed_interface
         expect(flash[:info]).to match(/organization/)
         expect(response).to redirect_to new_organization_path
       end
     end
     context "without user" do
       it "redirects to posintegration" do
-        get :connect_lightspeed
+        get :lightspeed_interface
         expect(response).to redirect_to new_user_path
         expect(flash[:info]).to match(/sign up/)
-        expect(session[:return_to]).to eq connect_lightspeed_path
+        expect(session[:return_to]).to eq lightspeed_interface_path
       end
     end
   end

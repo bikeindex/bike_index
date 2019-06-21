@@ -322,11 +322,11 @@
 %hr.mt-4
 - if @locations.any?
   - if @locations.count > 1
-    %h3.mt-4
+    %h4.mt-4
       = pluralize(@locations.count, "Location")
   .row
     - @locations.each do |location|
-      .col-md-6
+      .col-lg-4.col-sm-6.mb-4
         .card
           .card-body
             - if !location.shown && @organization.allowed_show

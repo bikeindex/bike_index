@@ -158,6 +158,10 @@ class Organization < ActiveRecord::Base
     law_enforcement? && !paid_for?("unstolen_notifications")
   end
 
+  def bike_shop_display_integration_alert?
+    bike_shop? && not_pos? # TODO: if the shop has registered a bike within past week, don't show
+  end
+
   def paid_for?(feature_name)
     features =
       Array(feature_name)

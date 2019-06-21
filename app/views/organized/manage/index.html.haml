@@ -1,8 +1,7 @@
-.mb-4
-  %h1
-    %em
-      = @organization.name
-    settings
+%h1.mb-4
+  %em
+    = @organization.name
+  settings
 = form_for @organization, { url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
 
   .form-group.row
