@@ -1,9 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
-  # Request specs don't have cookies so we need to stub stuff if we're in request specs
-  # This is suboptimal, but hey, it gets us to request specs for now
-  before { allow(User).to receive(:from_auth) { user } }
+  include_context :logged_in_as_ambassador
   let(:organization) { FactoryBot.create(:organization_ambassador) }
 
   context "given an unauthenticated user" do
@@ -41,6 +39,13 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
         expect(response.status).to eq(200)
         expect(assigns(:ambassadors).count).to eq(3)
         expect(response).to render_template(:show)
+      end
+      context "has not accepted vendor terms" do
+        let(:user) { FactoryBot.create(:ambassador, accept_vendor_terms_of_service: false) }
+        it "redirects to accept the terms" do
+          get "/o/#{organization.slug}/ambassador_dashboard"
+          expect(response).to redirect_to accept_vendor_terms_path
+        end
       end
     end
 

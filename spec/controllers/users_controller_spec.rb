@@ -571,11 +571,14 @@ RSpec.describe UsersController, type: :controller do
     it "updates the vendor terms of service and emailable" do
       user = FactoryBot.create(:user_confirmed, terms_of_service: false, notification_newsletters: false)
       expect(user.notification_newsletters).to be_falsey
-      org = FactoryBot.create(:organization)
-      FactoryBot.create(:membership, organization: org, user: user)
+      organization = FactoryBot.create(:organization)
+      FactoryBot.create(:membership, organization: organization, user: user)
+      user.reload
+      expect(user.default_organization).to eq organization
       set_current_user(user)
       post :update, id: user.username, user: { vendor_terms_of_service: "1", notification_newsletters: true }
       expect(response.code).to eq("302")
+      expect(response).to redirect_to organization_root_url(organization_id: organization.to_param)
       expect(user.reload.vendor_terms_of_service).to be_truthy
       expect(user.notification_newsletters).to be_truthy
     end
@@ -587,7 +590,27 @@ RSpec.describe UsersController, type: :controller do
       end.to change(AfterUserChangeWorker.jobs, :size).by(1)
       expect(user.reload.name).to eq("Cool stuff")
     end
+
+    describe "submit without updating terms" do
+      it "redirects to accept the terms" do
+        set_current_user(user)
+        post :update, id: user.username, user: { terms_of_service: "0" }
+        expect(response).to redirect_to accept_terms_path
+        expect(user.reload.terms_of_service).to be_falsey
+      end
+      context "vendor_terms" do
+        let(:user) { FactoryBot.create(:user) }
+        it "redirects to accept the terms" do
+          expect(user.terms_of_service).to be_truthy
+          expect(user.vendor_terms_of_service).to be_truthy
+          set_current_user(user)
+          post :update, id: user.username, user: { vendor_terms_of_service: "0" }
+          expect(response).to redirect_to accept_vendor_terms_path
+        end
+      end
+    end
   end
+
   describe "unsubscribe" do
     context "subscribed unconfirmed user" do
       let(:user) { FactoryBot.create(:user, notification_newsletters: true) }
