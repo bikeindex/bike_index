@@ -80,7 +80,7 @@ class Bike < ActiveRecord::Base
   scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 2 }) }
   scope :ascend_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 3 }) }
   scope :any_pos, -> { includes(:creation_states).where.not(creation_states: { pos_kind: 0 }) }
-  scope :not_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 0 }) }
+  scope :no_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 0 }) }
   scope :example, -> { where(example: true) }
   scope :non_example, -> { where(example: false) }
 
@@ -176,7 +176,7 @@ class Bike < ActiveRecord::Base
 
   def pos_kind; creation_state&.pos_kind end
 
-  def pos?; pos_kind != "not_pos" end
+  def pos?; pos_kind != "no_pos" end
 
   def current_ownership; ownerships.reorder(:created_at).last end
 

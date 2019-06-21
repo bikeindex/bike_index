@@ -48,3 +48,14 @@ hr.delete-organization-section {
     margin-top: 40px;
   }
 }
+
+.organization-wide-alert {
+  @extend .alert;
+  @extend .alert-info;
+  margin: 0 auto 40px;
+  p,
+  ul {
+    color: $body-font-color;
+    margin-bottom: 0;
+  }
+}

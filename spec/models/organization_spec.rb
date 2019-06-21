@@ -284,13 +284,13 @@ RSpec.describe Organization, type: :model do
       it "protects from naming collisions from deleted things, by renaming deleted things" do
         org1 = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
         org1.reload
-        org1_id = org1.id
+        org1.id = org1.id
         expect(org1.short_name).to eq "buckshot"
         org1.delete
         org1.reload
         expect(org1.deleted_at).to be_present
         expect(org1.slug).to eq "buckshot"
-        org2 = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
+        FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
         expect(org1.slug).to eq "buckshot"
       end
     end
@@ -435,14 +435,65 @@ RSpec.describe Organization, type: :model do
     context "organization with pos bike and non pos bike" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user, kind: "bike_shop") }
       let!(:bike_pos) { FactoryBot.create(:bike_lightspeed_pos, organization: organization) }
-      let!(:bike) { FactoryBot.create(:bike_organization) }
+      let!(:bike) { FactoryBot.create(:bike_organized, organization: organization) }
       it "returns pos type" do
         organization.reload
-        expect(organization.pos_kind).to eq "not_pos"
+        expect(organization.pos_kind).to eq "no_pos"
         expect(organization.calculated_pos_kind).to eq "lightspeed_pos"
         # And if bike is created before cut-of for pos kind, it returns broken
         bike_pos.update_attribute :created_at, Time.current - 2.weeks
         expect(organization.calculated_pos_kind).to eq "broken_pos"
+      end
+    end
+    context "recent bikes" do
+      let(:organization) { FactoryBot.create(:organization_with_auto_user, kind: "bike_shop") }
+      it "no_pos, does_not_need_pos if older organization" do
+        organization.reload
+        expect(organization.calculated_pos_kind).to eq "no_pos"
+        3.times { FactoryBot.create(:bike_organized, organization: organization) }
+        organization.reload
+        expect(organization.calculated_pos_kind).to eq "no_pos"
+        organization.update_attribute :created_at, Time.current - 2.weeks
+        organization.reload
+        expect(organization.calculated_pos_kind).to eq "does_not_need_pos"
+      end
+    end
+  end
+
+  describe "bike_shop_display_integration_alert?" do
+    let(:organization) { Organization.new(kind: "law_enforcement", pos_kind: "no_pos") }
+    it "is falsey for non-shops" do
+      expect(organization.bike_shop_display_integration_alert?).to be_falsey
+    end
+    context "shop" do
+      let(:organization) { Organization.new(kind: "bike_shop", pos_kind: pos_kind) }
+      let(:pos_kind) { "no_pos" }
+      it "is true" do
+        expect(organization.bike_shop_display_integration_alert?).to be_truthy
+      end
+      context "lightspeed_pos" do
+        let(:pos_kind) { "lightspeed_pos" }
+        it "is false" do
+          expect(organization.bike_shop_display_integration_alert?).to be_falsey
+        end
+      end
+      context "ascend_pos" do
+        let(:pos_kind) { "ascend_pos" }
+        it "is false" do
+          expect(organization.bike_shop_display_integration_alert?).to be_falsey
+        end
+      end
+      context "broken_pos" do
+        let(:pos_kind) { "broken_pos" }
+        it "is true" do
+          expect(organization.bike_shop_display_integration_alert?).to be_truthy
+        end
+      end
+      context "does_not_need_pos" do
+        let(:pos_kind) { "does_not_need_pos" }
+        it "is falsey" do
+          expect(organization.bike_shop_display_integration_alert?).to be_falsey
+        end
       end
     end
   end

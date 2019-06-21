@@ -82,7 +82,7 @@ Bikeindex::Application.routes.draw do
 
   resources :feedbacks, only: [:index, :create]
   get "vendor_signup", to: redirect("/organizations/new")
-  get "connect_lightspeed", to: "organizations#connect_lightspeed"
+  get "lightspeed_interface", to: "organizations#lightspeed_interface"
   get "help", to: "feedbacks#index"
   get "feedbacks/new", to: redirect("/help")
   %w(support contact contact_us).each { |p| get p, to: redirect("/help") }
