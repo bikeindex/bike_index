@@ -10,7 +10,7 @@ module Sessionable
     if current_user.present?
       return if return_to_if_present # If this returns true, we're returning already
       flash[:success] = "You're already signed in!"
-      redirect_to user_home_url and return
+      redirect_to user_root_url and return
     end
   end
 

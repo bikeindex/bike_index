@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Admin::TheftAlertsController, type: :request do
   context "given a logged-in superuser" do
-    before { log_in_as_superuser }
+    include_context :request_spec_logged_in_as_superuser
 
     describe "GET /admin/theft_alerts" do
       it "responds with 200 OK and renders the index template" do
