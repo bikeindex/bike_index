@@ -36,4 +36,23 @@ RSpec.describe LandingPagesController, type: :request do
       end
     end
   end
+
+  describe "welcome#index" do
+    include_context :request_spec_logged_in_as_organization_member
+    it "renders" do
+      get "/"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:index)
+    end
+    context "organization deleted" do
+      it "renders" do
+        current_user.reload
+        current_organization.delete
+        current_user.reload
+        get "/"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:index)
+      end
+    end
+  end
 end

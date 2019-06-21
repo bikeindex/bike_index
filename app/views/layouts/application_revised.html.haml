@@ -101,6 +101,7 @@
                 - if memberships.any?
                   - memberships.each do |membership|
                     - organization = membership.organization
+                    - next unless organization.present?
                     %li
                       %a.nav-link{ href: organization_root_path(organization_id: organization.to_param) }
                         View <em>#{organization.name}</em>
