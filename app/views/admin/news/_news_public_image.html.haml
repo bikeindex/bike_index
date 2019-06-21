@@ -1,20 +1,31 @@
 - skip_order ||= false
 %li.public_image{:id => "#{public_image.id}"}
-  .processing ... processing
   = image_tag(public_image.image_url(:small)) if public_image.image?
-  .name= public_image.name.truncate(18)
-  .actions
-    - if public_image.imageable_type != 'Blog'
-      %textarea.code-to-enter
-        \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
+  .row
+    .col-md-2
       %p
-        %span Copy the above text and paste it where you'd like it to appear
-    - else
-      %textarea.code-to-enter
-        \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
+        = public_image.name.truncate(18)
+      %em.less-strong
+        processing...
+    .col-md-7
+      .form-group
+        - if public_image.imageable_type != 'Blog'
+          %textarea.form-control
+            \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
+          %p
+            %span Copy the above text and paste it where you'd like it to appear
+        - else
+          %textarea.form-control
+            \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
+    .col-md-3
+      %img{src: "#{public_image.image_url}"}
+  .row
+    .col-md-6
       %p
         %span Copy the above text and paste it where you'd like it to appear in the post
-        = link_to "Delete image", public_image_url(public_image, return_url: edit_admin_news_url(@blog)), method: :delete, class: "photo-remove"
+    .col-md-6
+      = link_to "Delete image", public_image_url(public_image, return_url: edit_admin_news_url(@blog)), method: :delete, class: "btn btn-danger float-right"
+  / I'm not sure what this is doing?!?!?!
   - unless skip_order
     .index-image-select
       %input{:class => "index_image_#{public_image.id}", :name => "index_image_id", :type => "radio", :value => "#{public_image.id}"}/
