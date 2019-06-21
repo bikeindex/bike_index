@@ -579,7 +579,8 @@ RSpec.describe UsersController, type: :controller do
       post :update, id: user.username, user: { vendor_terms_of_service: "1", notification_newsletters: true }
       expect(response.code).to eq("302")
       expect(response).to redirect_to organization_root_url(organization_id: organization.to_param)
-      expect(user.reload.vendor_terms_of_service).to be_truthy
+      expect(user.reload.accepted_vendor_terms_of_service?).to be_truthy
+      expect(user.when_vendor_terms_of_service).to be_within(1.second).of Time.current
       expect(user.notification_newsletters).to be_truthy
     end
 

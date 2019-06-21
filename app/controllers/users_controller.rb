@@ -128,7 +128,7 @@ class UsersController < ApplicationController
         end
       elsif params[:user][:vendor_terms_of_service].present?
         if params[:user][:vendor_terms_of_service] == "1"
-          @user.accept_vendor_terms_of_service
+          @user.update_attributes(accepted_vendor_terms_of_service: true)
           if @user.memberships.any?
             flash[:success] = "Thanks! Now you can use Bike Index as #{@user.memberships.first.organization.name}"
           else
@@ -136,7 +136,7 @@ class UsersController < ApplicationController
           end
           redirect_to user_root_url and return
         else
-          redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index through an organization" and return
+          redirect_to accept_vendor_terms_path, notice: "You have to accept the Terms of Service if you would like to use Bike Index through an organization" and return
         end
       end
       if params[:user][:password].present?

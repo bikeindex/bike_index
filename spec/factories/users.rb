@@ -11,6 +11,7 @@ FactoryBot.define do
         partner_data { { sign_up: "bikehub" } }
       end
       factory :admin do
+        accepted_vendor_terms_of_service { true }
         superuser { true }
         factory :admin_developer do
           developer { true }
@@ -25,6 +26,9 @@ FactoryBot.define do
         transient do
           organization { FactoryBot.create(:organization) }
         end
+
+        accepted_vendor_terms_of_service { true } # Necessary so everyone doesn't redirect back accept_vendor_terms
+
         factory :organization_member do
           after(:create) do |user, evaluator|
             FactoryBot.create(:membership, user: user, organization: evaluator.organization)

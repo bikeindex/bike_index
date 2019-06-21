@@ -1,13 +1,10 @@
 require "rails_helper"
 
 RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
-  include_context :logged_in_as_ambassador
   let(:organization) { FactoryBot.create(:organization_ambassador) }
 
   context "given an unauthenticated user" do
-    let(:user) { FactoryBot.create(:user) }
     describe "index" do
-      let(:organization) { FactoryBot.create(:organization) }
       it "redirects to the user homepage" do
         get organization_ambassador_dashboard_path(organization)
         expect(response).to redirect_to(/user_home/)
@@ -16,10 +13,13 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
   end
 
   context "given an authenticated non-ambassador" do
+    include_context :request_spec_logged_in_as_user
     let(:organization) { FactoryBot.create(:organization) }
     let(:user) { FactoryBot.create(:organization_member, organization: organization) }
     describe "index" do
       it "redirects to organization root path" do
+        user.reload
+        expect(user.default_organization).to be_present
         get organization_ambassador_dashboard_path(organization)
         expect(response).to redirect_to organization_root_path(organization_id: organization)
       end
@@ -27,8 +27,7 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
   end
 
   context "given an authenticated ambassador" do
-    let(:user) { FactoryBot.create(:ambassador, organization: organization) }
-
+    include_context :request_spec_logged_in_as_ambassador
     describe "show" do
       it "renders the ambassador dashboard" do
         FactoryBot.create_list(:ambassador_task, 2)
@@ -41,7 +40,7 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
         expect(response).to render_template(:show)
       end
       context "has not accepted vendor terms" do
-        let(:user) { FactoryBot.create(:ambassador, accept_vendor_terms_of_service: false) }
+        let(:user) { FactoryBot.create(:ambassador, vendor_terms_of_service: false, organization: organization) }
         it "redirects to accept the terms" do
           get "/o/#{organization.slug}/ambassador_dashboard"
           expect(response).to redirect_to accept_vendor_terms_path
@@ -67,7 +66,7 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
   end
 
   context "given a non-ambassador super admin" do
-    let(:user) { FactoryBot.create(:admin) }
+    include_context :request_spec_logged_in_as_superuser
 
     describe "show" do
       it "renders the ambassador dashboard with ambassadors list" do

@@ -9,26 +9,31 @@ module RequestSpecHelpers
     allow(User).to receive(:from_auth) { user }
   end
 
+  RSpec.shared_context :request_spec_logged_in_as_user do
+    let(:user) { FactoryBot.create(:user) }
+    before { log_in(user) }
+  end
+
   RSpec.shared_context :request_spec_logged_in_as_superuser do
     let(:user) { FactoryBot.create(:admin) }
     before { log_in(user) }
   end
 
   RSpec.shared_context :request_spec_logged_in_as_organization_admin do
-    let(:user) { FactoryBot.create(:organization_admin) }
-    let(:organization) { user.organizations.first }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
     before { log_in(user) }
   end
 
   RSpec.shared_context :request_spec_logged_in_as_organization_member do
-    let(:user) { FactoryBot.create(:organization_member) }
-    let(:organization) { user.organizations.first }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:user) { FactoryBot.create(:organization_member, organization: organization) }
     before { log_in(user) }
   end
 
   RSpec.shared_context :request_spec_logged_in_as_ambassador do
-    let(:user) { FactoryBot.create(:ambassador) }
-    let(:organization) { user.organizations.first }
+    let(:organization) { FactoryBot.create(:organization_ambassador) }
+    let(:user) { FactoryBot.create(:ambassador, organization: organization) }
     before { log_in(user) }
   end
 end
