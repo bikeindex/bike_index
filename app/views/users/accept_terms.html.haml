@@ -10,7 +10,7 @@
     = form_for @user, html: { class: 'form' } do |f|
 
       .form-group
-        %label{ for: 'user_terms_of_service', class: 'center-accept-terms-text' }
+        = f.label :terms_of_service, class: "center-accept-terms-text" do
           = f.check_box :terms_of_service
           I agree to Bike Index
           %strong

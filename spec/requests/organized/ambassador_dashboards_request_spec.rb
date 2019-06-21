@@ -6,7 +6,7 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
   context "given an unauthenticated user" do
     describe "index" do
       it "redirects to the user homepage" do
-        get organization_ambassador_dashboard_path(organization)
+        get organization_ambassador_dashboard_path(current_organization)
         expect(response).to redirect_to root_url
       end
     end
@@ -14,7 +14,7 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
 
   context "given an authenticated non-ambassador" do
     include_context :request_spec_logged_in_as_user
-    let(:organization) { FactoryBot.create(:organization) }
+    let(:current_organization) { FactoryBot.create(:organization) }
     let(:current_user) { FactoryBot.create(:organization_member, organization: current_organization) }
     describe "index" do
       it "redirects to organization root path" do
@@ -33,7 +33,7 @@ RSpec.describe Organized::AmbassadorDashboardsController, type: :request do
         FactoryBot.create_list(:ambassador_task, 2)
         FactoryBot.create_list(:ambassador, 2, organization: current_organization)
 
-        get organization_ambassador_dashboard_path(organization)
+        get organization_ambassador_dashboard_path(current_organization)
 
         expect(response.status).to eq(200)
         expect(assigns(:ambassadors).count).to eq(3)
