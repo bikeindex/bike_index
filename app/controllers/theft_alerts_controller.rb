@@ -23,8 +23,10 @@ class TheftAlertsController < ApplicationController
   rescue Stripe::StripeError => e
     Honeybadger.notify(e)
     flash[:error] = "Your order is pending, but we were unable to complete payment. Please contact support."
+    TheftAlertPurchaseNotificationWorker.perform_async(theft_alert.id)
   else
     flash[:success] = "Success! Your order is pending."
+    TheftAlertPurchaseNotificationWorker.perform_async(theft_alert.id)
   ensure
     redirect_to edit_bike_url(@bike, params: { page: :alert })
   end
