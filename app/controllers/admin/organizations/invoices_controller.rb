@@ -5,13 +5,11 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
 
   def index
     @invoices = @organization.invoices.reorder(id: :desc)
-    render layout: "new_admin"
   end
 
   def new
     @invoice ||= @organization.invoices.new
     @invoice.end_at = TimeParser.parse(params[:end_at]) if params[:end_at].present?
-    render layout: "new_admin"
   end
 
   def show
@@ -19,7 +17,6 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
   end
 
   def edit
-    render layout: "new_admin"
   end
 
   def create
@@ -30,7 +27,7 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
       flash[:success] = "Invoice created! #{invoice_is_active_notice(@invoice)}"
       redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
     else
-      render :new, layout: "new_admin"
+      render :new
     end
   end
 
@@ -46,7 +43,7 @@ class Admin::Organizations::InvoicesController < Admin::BaseController
       flash[:success] = "Invoice updated! #{invoice_is_active_notice(@invoice)}"
       redirect_to admin_organization_invoices_path(organization_id: @organization.to_param)
     else
-      render :edit, layout: "new_admin"
+      render :edit
     end
   end
 
