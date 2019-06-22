@@ -117,6 +117,7 @@ RSpec.describe UsersController, type: :controller do
             end.to change(EmailWelcomeWorker.jobs, :count)
             expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
             user = User.order(:created_at).last
+            expect(user.terms_of_service).to be_truthy
             expect(user.email).to eq email
             expect(User.from_auth(cookies.signed[:auth])).to eq user
             expect(session[:passive_organization_id]).to eq organization.id
