@@ -23,11 +23,12 @@
               %h5.light-italic
                 Drag and drop files here or use the
                 %strong
-                  Upload Photos 
+                  Upload Photos
                 button
               %label.file
                 = f.file_field :image, multiple: true, name: "public_image[image]"
                 %span.file-custom
+        = render "/shared/form_well_footer_save"
 / Mustache template for rendering post upload
 :plain
   <script id="image-upload-finished-template" type="x-tmpl-mustache">
