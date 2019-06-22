@@ -1,0 +1,36 @@
+%p A new Bike Index Alert was just created.
+
+
+%h4{style: "margin-top: 1em;"}
+  = link_to "Theft Alert",
+    edit_admin_theft_alert_url(@theft_alert, params: {state_transition: :begin}),
+    target: "_blank"
+
+%h4{style: "margin-top: 1em;"}
+  = link_to "Plan: #{@theft_alert_plan.name} (#{@theft_alert_plan.duration_days} days)",
+    edit_admin_theft_alert_plan_url(@theft_alert_plan),
+    target: "_blank"
+
+%h4{style: "margin-top: 1em;"}
+  - if @theft_alert.payment.nil?
+    Payment Failed
+  - else
+    = link_to "Payment", edit_admin_payment_url(@theft_alert.payment), target: "_blank"
+
+%h4{style: "margin-top: 1em;"}
+  = link_to "User", edit_admin_user_url(@creator), target: "_blank"
+
+%span{style: "display: block; line-height: 1.5em;"}
+  = @creator.name
+
+%span{style: "display: block; line-height: 1.5em;"}
+  = @creator.email
+
+%h4{style: "margin-top: 1em;"}
+  = link_to "Bike", edit_admin_bike_url(@bike), target: "_blank"
+
+%span{style: "display: block; line-height: 1.5em;"}
+  = @bike.title_string
+
+%span{style: "display: block; line-height: 1.5em;"}
+  = "owner email: #{@bike.owner_email}"

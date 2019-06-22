@@ -1,0 +1,38 @@
+:ruby
+  text =<<~TXT
+  A new Bike Index Alert was just created.\n
+
+  Theft Alert
+  -----------
+
+  #{edit_admin_theft_alert_url(@theft_alert)}
+
+
+  Theft Alert Plan
+  ----------------
+
+  #{@theft_alert_plan.name} (#{@theft_alert_plan.duration_days} days)
+
+
+  User
+  ----
+
+  #{@creator.name}
+  #{@creator.email}
+  #{edit_admin_user_url(@creator)}
+
+
+  Bike
+  ----
+
+  #{@bike.title_string}
+  Owner email: #{@bike.owner_email}
+  #{edit_admin_bike_url(@bike)}
+
+  Payment
+  -------
+
+  #{@theft_alert.payment.nil? ? 'Failed' : edit_admin_payment_url(@theft_alert.payment)}
+  TXT
+
+= text

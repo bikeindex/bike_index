@@ -28,7 +28,7 @@ class StolenRecord < ActiveRecord::Base
   belongs_to :state
   belongs_to :creation_organization, class_name: "Organization"
   belongs_to :recovering_user, class_name: "User"
-  has_many :theft_alerts, dependent: :destroy
+  has_many :theft_alerts
 
   validates_presence_of :bike
   validates_presence_of :date_stolen

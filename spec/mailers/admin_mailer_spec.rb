@@ -119,4 +119,38 @@ RSpec.describe AdminMailer, type: :mailer do
       expect(mail.subject).to match("Unknown organization for ascend import")
     end
   end
+
+  describe "#theft_alert_purchased" do
+    it "renders email" do
+      theft_alert = FactoryBot.create(:theft_alert_paid)
+
+      mail = described_class.theft_alert_purchased(theft_alert)
+
+      expect(mail.to).to eq(["admin@bikeindex.org"])
+      expect(mail.subject).to match("Bike Index Alert purchased")
+      body = mail.body.encoded
+      expect(body).to include(theft_alert.creator.name)
+      expect(body).to include(theft_alert.creator.email)
+      expect(body).to include(theft_alert.theft_alert_plan.name)
+      expect(body).to include(theft_alert.bike.title_string)
+      expect(body).to include("payments/#{theft_alert.payment.id}/edit")
+    end
+
+    context "given a purchase with a payment failure" do
+      it "notes the failure in the email" do
+        theft_alert = FactoryBot.create(:theft_alert_unpaid)
+
+        mail = described_class.theft_alert_purchased(theft_alert)
+
+        expect(mail.to).to eq(["admin@bikeindex.org"])
+        expect(mail.subject).to match("Bike Index Alert purchased")
+        body = mail.body.encoded
+        expect(body).to include(theft_alert.creator.name)
+        expect(body).to include(theft_alert.creator.email)
+        expect(body).to include(theft_alert.theft_alert_plan.name)
+        expect(body).to include(theft_alert.bike.title_string)
+        expect(body).to include("Payment Failed")
+      end
+    end
+  end
 end

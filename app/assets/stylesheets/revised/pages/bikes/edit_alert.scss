@@ -1,10 +1,55 @@
 .edit-bike-page-alert {
+  form {
+    button {
+      border-radius: 5px;
+      height: 45px;
+      vertical-align: middle;
+    }
+
+    .times {
+      font-size: 150%;
+      line-height: 0.8em;
+      vertical-align: middle;
+    }
+  }
+
+  .confirm-form {
+    .copy {
+      margin: 20px auto;
+      width: 85%;
+    }
+
+    .description {
+      background-color: $blue-faint;
+      border-radius: 10px;
+      margin: 0 auto;
+      padding: 50px;
+      width: 60%;
+
+      ul {
+        margin: 0;
+        padding: 0;
+      }
+
+      li {
+        list-style-type: none;
+
+        &::before {
+          content: '\2713  ';
+        }
+      }
+    }
+  }
+
   .detail-card-container {
     background-color: $white;
-    border: 1px solid $black;
+    border: 1px solid #999;
     border-radius: 4px;
-    cursor: pointer;
     margin: 15px auto;
+
+    &.selected {
+      border: 1px solid #3498db;
+    }
   }
 
   .detail-card-title {
@@ -16,15 +61,31 @@
     letter-spacing: 1.25px;
     padding: 25px;
     text-align: center;
+    position: relative;
+  }
+
+  .preferred-tag {
+    background-color: #3598da;
+    bottom: -7px;
+    color: #fff;
+    font-size: 12px;
+    line-height: 1;
+    margin: 0;
+    padding: 5px 10px;
+    position: absolute;
+    right: 0px;
+    text-align: right;
+    width: 93px;
   }
 
   .detail-card {
     background: $white;
-    padding: 10px;
+    margin: 10px;
   }
 
   .detail-card-subtitle {
     background-color: $white;
+    border-radius: 5px;
     font-size: 20px;
     text-align: center;
   }
@@ -49,8 +110,8 @@
     background-color: $white;
     border-radius: 4px;
     font-size: 12px;
-    margin: 0 auto;
-    padding: 10px;
+    margin: 10px;
+    padding: 0;
 
     ul {
       list-style-type: none;
@@ -63,8 +124,8 @@
     }
 
     li {
-      border-bottom: 1px solid $gray-light;
-      margin: 5px auto;
+      line-height: 1.75em;
+      margin: 10px auto;
     }
 
     li:last-of-type {
@@ -73,4 +134,51 @@
     }
   }
 
+  .detail-card-footer {
+    background-color: #f4f4f3;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    bottom: 0;
+    font-size: 18px;
+    font-weight: 500;
+    left: 0;
+    line-height: 27px;
+    padding: .618em;
+    right: 0;
+    transition: all 125ms ease-in-out;
+
+    &::before {
+      background-color: #ffffff;
+      border: 2px solid #919197;
+      border-radius: 50%;
+      content: '';
+      cursor: pointer;
+      display: inline-block;
+      height: 2em;
+      vertical-align: middle;
+      width: 2em;
+    }
+
+    &.selected {
+      background-color: #3498db;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+
+    &.selected::before {
+      background-color: #3498db;
+      border-color: #ffffff;
+      color: #ffffff;
+      content: '\2713';
+      font-family: 'zp-icons';
+      font-style: normal;
+      font-variant: normal;
+      font-weight: normal;
+      line-height: 1.8;
+      text-rendering: optimizeLegibility;
+      text-transform: none;
+    }
+  }
 }

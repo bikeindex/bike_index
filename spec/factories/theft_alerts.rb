@@ -24,7 +24,7 @@ FactoryBot.define do
       begin_at { end_at - theft_alert_plan.duration_days.days }
     end
 
-    factory :theft_alert_pending
+    factory :theft_alert_unpaid
     factory :theft_alert_paid, traits: [:paid]
     factory :theft_alert_begun, traits: [:paid, :begun]
     factory :theft_alert_ended, traits: [:paid, :begun, :ended]
