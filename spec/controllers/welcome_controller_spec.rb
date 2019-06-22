@@ -16,6 +16,21 @@ RSpec.describe WelcomeController, type: :controller do
         expect(flash).to_not be_present
       end
     end
+    context "organization deleted" do
+      include_context :logged_in_as_organization_admin
+      it "renders" do
+        org_id = organization.id
+        session[:passive_organization_id] = org_id
+        expect(user.default_organization).to be_present
+        organization.destroy
+        user.reload
+        expect(Organization.unscoped.find(org_id)).to be_present
+        expect(user.organizations.count).to eq 0
+        get :index
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:index)
+      end
+    end
   end
 
   describe "bike_creation_graph" do

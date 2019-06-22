@@ -193,6 +193,7 @@ class BikesController < ApplicationController
     rescue => e
       flash[:error] = e.message
     end
+    update_organizations_can_edit_claimed(@bike, params[:organization_ids_can_edit_claimed]) if params.key?(:organization_ids_can_edit_claimed)
     @bike = @bike.decorate
     if @bike.errors.any? || flash[:error].present?
       edit and return
@@ -317,6 +318,13 @@ class BikesController < ApplicationController
       redirect_to bike_path(@bike) and return
     end
     authenticate_user("Please create an account", flash_type: :info)
+  end
+
+  def update_organizations_can_edit_claimed(bike, organization_ids)
+    organization_ids = organization_ids.map(&:to_i)
+    bike.bike_organizations.each do |bike_organization|
+      bike_organization.update_attribute :can_not_edit_claimed, !organization_ids.include?(bike_organization.organization_id)
+    end
   end
 
   def render_ad

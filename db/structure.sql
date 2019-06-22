@@ -276,7 +276,7 @@ CREATE TABLE public.bike_organizations (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     deleted_at timestamp without time zone,
-    unable_to_edit_claimed boolean DEFAULT false NOT NULL
+    can_not_edit_claimed boolean DEFAULT false NOT NULL
 );
 
 
@@ -2050,7 +2050,6 @@ CREATE TABLE public.theft_alert_plans (
 --
 
 CREATE SEQUENCE public.theft_alert_plans_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2089,7 +2088,6 @@ CREATE TABLE public.theft_alerts (
 --
 
 CREATE SEQUENCE public.theft_alerts_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4425,7 +4423,7 @@ INSERT INTO schema_migrations (version) VALUES ('20190617193251');
 
 INSERT INTO schema_migrations (version) VALUES ('20190617193255');
 
-INSERT INTO schema_migrations (version) VALUES ('20190619202656');
-
 INSERT INTO schema_migrations (version) VALUES ('20190620203854');
+
+INSERT INTO schema_migrations (version) VALUES ('20190621183811');
 
