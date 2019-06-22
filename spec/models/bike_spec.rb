@@ -249,12 +249,19 @@ RSpec.describe Bike, type: :model do
     context "creation organization" do
       let(:owner) { FactoryBot.create(:organization_member) }
       let(:organization) { owner.organizations.first }
-      let(:ownership) { FactoryBot.create(:ownership_organization_bike, user: owner, organization: organization) }
+      let(:can_edit_claimed) { false }
+      let(:ownership) do
+        FactoryBot.create(:ownership_organization_bike,
+                          user: owner,
+                          organization: organization,
+                          can_edit_claimed: can_edit_claimed)
+      end
       let(:member) { FactoryBot.create(:organization_member, organization: organization) }
       before { expect(bike.creation_organization).to eq member.organizations.first }
       it "returns correctly for all sorts of convoluted things" do
         bike.reload
         expect(bike.creation_organization).to eq organization
+        expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
         expect(bike.claimed?).to be_falsey
         expect(bike.authorize_for_user!(member)).to be_truthy
         expect(bike.authorize_for_user!(member)).to be_truthy
@@ -283,21 +290,38 @@ RSpec.describe Bike, type: :model do
         expect(bike.authorize_for_user!(user)).to be_falsey
       end
       context "claimed" do
-        let(:ownership) { FactoryBot.create(:ownership_organization_bike, user: user, claimed: true, organization: organization) }
-        it "returns false" do
+        before do
+          ownership.mark_claimed
+          bike.reload
           expect(bike.claimed?).to be_truthy
-          expect(bike.owner).to eq user
+        end
+        it "returns false" do
+          expect(bike.organizations.pluck(:id)).to eq([organization.id])
+          expect(bike.editable_organizations).to eq([])
           expect(bike.authorized_for_user?(member)).to be_falsey
           expect(member.authorized?(bike)).to be_falsey
           expect(bike.authorized_by_organization?).to be_falsey
-          expect(bike.claimed?).to be_truthy
           expect(bike.organized?).to be_truthy
           expect(bike.organized?(organization)).to be_truthy
           expect(bike.organized?(Organization.new)).to be_falsey
         end
+        context "can_edit_claimed true" do
+          let(:can_edit_claimed) { true }
+          it "returns true" do
+            expect(bike.owner).to eq owner
+            expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+            expect(bike.authorized_for_user?(member)).to be_truthy
+            expect(member.authorized?(bike)).to be_truthy
+            expect(bike.authorized_by_organization?).to be_truthy
+            expect(bike.claimed?).to be_truthy
+            expect(bike.organized?).to be_truthy
+            expect(bike.organized?(organization)).to be_truthy
+            expect(bike.organized?(Organization.new)).to be_falsey
+          end
+        end
       end
       context "multiple ownerships" do
-        let!(:ownership_2) { FactoryBot.create(:ownership_organization_bike, bike: bike, creator: user) }
+        let!(:ownership2) { FactoryBot.create(:ownership, bike: bike, creator: user) }
         it "returns false" do
           bike.reload
           expect(bike.claimed?).to be_falsey
@@ -308,7 +332,46 @@ RSpec.describe Bike, type: :model do
           expect(bike.authorize_for_user!(member)).to be_falsey
           expect(bike.claimed?).to be_falsey
         end
+        context "can_edit_claimed true" do
+          let(:can_edit_claimed) { true }
+          it "returns truthy" do
+            bike.reload
+            expect(bike.claimed?).to be_falsey
+            expect(bike.owner).to eq user
+            expect(bike.ownerships.count).to eq 2
+            expect(bike.authorized_by_organization?).to be_truthy
+            expect(bike.authorized_by_organization?(org: organization)).to be_truthy
+            expect(bike.authorized_for_user?(member)).to be_truthy
+            expect(bike.authorize_for_user!(member)).to be_truthy
+            expect(bike.claimed?).to be_falsey
+          end
+        end
       end
+    end
+  end
+
+  describe "authorized_by_organization" do
+    let(:user) { FactoryBot.create(:user) }
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:organization_membership2) { FactoryBot.create(:membership, user: organization_member) }
+    let!(:organization2) { organization_membership2.organization }
+    let(:ownership) { FactoryBot.create(:ownership_organization_bike, user: user, claimed: true, organization: organization, can_edit_claimed: false) }
+    let(:bike) { ownership.bike }
+    let!(:other_organization) { FactoryBot.create(:bike_organization, bike: bike, can_edit_claimed: true, organization: organization2) }
+    it "checks the passed organization" do
+      bike.reload
+      expect(bike.claimed?).to be_truthy
+      expect(bike.editable_organizations.pluck(:id)).to eq([organization2.id])
+      expect(bike.authorized_by_organization?(u: user)).to be_falsey # Because the user is the owner
+      expect(bike.authorized_by_organization?).to be_truthy
+      expect(bike.authorized_by_organization?(u: organization_member)).to be_truthy
+      expect(bike.authorized_by_organization?(org: organization)).to be_falsey
+      expect(bike.authorized_by_organization?(u: organization_member, org: organization)).to be_falsey
+      expect(bike.authorized_by_organization?(org: organization2)).to be_truthy
+      expect(bike.authorized_by_organization?(u: organization_member, org: organization2)).to be_truthy
+      # Also, if passed a user, the user must be a member of the organization that was passed
+      expect(bike.authorized_by_organization?(u: FactoryBot.create(:user), org: organization2)).to be_falsey
     end
   end
 

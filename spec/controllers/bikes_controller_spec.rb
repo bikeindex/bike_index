@@ -1303,7 +1303,10 @@ RSpec.describe BikesController, type: :controller do
         expect(ownership.owner).to eq user
       end
       it "updates the bike with the allowed_attributes" do
-        put :update, id: bike.id, bike: allowed_attributes
+        put :update,
+            id: bike.id,
+            bike: allowed_attributes,
+            organization_ids_can_edit_claimed: [organization_2.id]
         expect(response).to redirect_to edit_bike_url(bike)
         expect(assigns(:bike)).to be_decorated
         bike.reload
@@ -1313,17 +1316,39 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.send(key)).to eq value
         end
         expect(bike.bike_organization_ids).to eq([organization.id, organization_2.id])
+        expect(bike.editable_organizations.pluck(:id)).to eq([organization_2.id])
+      end
+      context "empty organization_ids_can_edit_claimed" do
+        it "updates the bike with the allowed_attributes" do
+          put :update,
+              id: bike.id,
+              bike: allowed_attributes,
+              organization_ids_can_edit_claimed: []
+          expect(response).to redirect_to edit_bike_url(bike)
+          expect(assigns(:bike)).to be_decorated
+          bike.reload
+          expect(bike.hidden).to be_falsey
+          allowed_attributes.except(*skipped_attrs).each do |key, value|
+            pp value, key unless bike.send(key) == value
+            expect(bike.send(key)).to eq value
+          end
+          expect(bike.bike_organization_ids).to eq([organization.id, organization_2.id])
+          expect(bike.editable_organizations.pluck(:id)).to eq([])
+        end
       end
     end
     context "organized bike, member present" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
+      let(:can_edit_claimed) { false }
+      let(:claimed) { false }
+      let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization, can_edit_claimed: can_edit_claimed, claimed: claimed) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:bike) { ownership.bike }
       before { set_current_user(user) }
       it "updates the bike" do
         bike.reload
         expect(bike.owner).to_not eq(user)
+        expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
         expect(bike.authorized_by_organization?(u: user)).to be_truthy
         put :update, id: bike.id, bike: { description: "new description", handlebar_type: "forward" }
         expect(response).to redirect_to edit_bike_url(bike)
@@ -1332,6 +1357,37 @@ RSpec.describe BikesController, type: :controller do
         expect(bike.hidden).to be_falsey
         expect(bike.description).to eq "new description"
         expect(bike.handlebar_type).to eq "forward"
+        expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+      end
+      context "bike is claimed" do
+        let(:claimed) { true }
+        it "fails to update" do
+          ownership.reload
+          bike.reload
+          expect(bike.owner).to_not eq(user)
+          expect(bike.editable_organizations.pluck(:id)).to eq([])
+          expect(bike.authorized_by_organization?(u: user)).to be_falsey
+          put :update, id: bike.id, bike: { description: "new description", handlebar_type: "forward" }
+          expect(flash[:error]).to be_present
+          expect(assigns(:bike)).to be_present
+          expect(bike.description).to_not eq "new description"
+        end
+        context "can_edit_claimed true" do
+          let(:can_edit_claimed) { true }
+          it "updates the bike" do
+            bike.reload
+            expect(bike.owner).to_not eq(user)
+            expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+            expect(bike.authorized_by_organization?(u: user)).to be_truthy
+            put :update, id: bike.id, bike: { description: "new description", handlebar_type: "forward" }
+            expect(response).to redirect_to edit_bike_url(bike)
+            expect(assigns(:bike)).to be_present
+            bike.reload
+            expect(bike.hidden).to be_falsey
+            expect(bike.description).to eq "new description"
+            expect(bike.handlebar_type).to eq "forward"
+          end
+        end
       end
     end
   end

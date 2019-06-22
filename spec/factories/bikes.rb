@@ -36,18 +36,25 @@ FactoryBot.define do
     factory :organized_bikes do # don't use this factory exactly, it's used to wrap all the organized bikes
       transient do
         organization { FactoryBot.create(:organization) }
+        can_edit_claimed { true }
       end
       creation_organization { organization }
 
       factory :bike_organized do
         after(:create) do |bike, evaluator|
-          create(:bike_organization, organization: bike.creation_organization, bike: bike)
+          create(:bike_organization, organization: bike.creation_organization,
+                                     bike: bike,
+                                     can_edit_claimed: evaluator.can_edit_claimed)
           bike.reload
         end
 
         factory :bike_lightspeed_pos do
           after(:create) do |bike, _evaluator|
-            create(:creation_state, creator: bike.creator, bike: bike, is_pos: true, pos_kind: "lightspeed_pos", organization: bike.creation_organization)
+            create(:creation_state, creator: bike.creator,
+                                    bike: bike,
+                                    is_pos: true,
+                                    pos_kind: "lightspeed_pos",
+                                    organization: bike.creation_organization)
           end
         end
 
@@ -56,7 +63,12 @@ FactoryBot.define do
             bulk_import { FactoryBot.create(:bulk_import_ascend, organization: organization) }
           end
           after(:create) do |bike, evaluator|
-            create(:creation_state, creator: bike.creator, bike: bike, is_pos: true, pos_kind: "ascend_pos", bulk_import: evaluator.bulk_import, organization: bike.creation_organization)
+            create(:creation_state, creator: bike.creator,
+                                    bike: bike,
+                                    is_pos: true,
+                                    pos_kind: "ascend_pos",
+                                    bulk_import: evaluator.bulk_import,
+                                    organization: bike.creation_organization)
           end
         end
       end
@@ -64,7 +76,10 @@ FactoryBot.define do
       # Generally, you should use the organization_bike factory, not this one
       factory :creation_organization_bike do
         after(:create) do |bike, evaluator|
-          create(:creation_state, creator: bike.creator, organization: bike.creation_organization, bike: bike)
+          create(:creation_state, creator: bike.creator,
+                                  organization: bike.creation_organization,
+                                  bike: bike,
+                                  can_edit_claimed: evaluator.can_edit_claimed)
           bike.save
           bike.reload
         end

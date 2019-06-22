@@ -1,0 +1,10 @@
+#bikes_edit {
+  .bike_organization_static_input {
+    line-height: 1.25;
+    .can-edit-checkbox {
+      display: block;
+      font-size: 80%;
+      font-weight: $normal-font-weight;
+    }
+  }
+}
