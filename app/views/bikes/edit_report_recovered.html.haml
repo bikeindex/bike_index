@@ -4,7 +4,7 @@
 
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: "/bikes/edit_primary_menu"
+      = render partial: "/bikes/edit_primary_menu", locals: { is_disabled: true }
 
       - if @bike.stolen? && @bike.find_current_stolen_record.present? && !@bike.recovered?
         .col-md-8.form-well#form_well_wrap
