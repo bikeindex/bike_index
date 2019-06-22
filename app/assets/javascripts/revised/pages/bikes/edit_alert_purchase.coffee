@@ -23,17 +23,15 @@ class BikeIndex.BikesEditAlertPurchase extends BikeIndex
       key: $planConfirmationForm.attr("data-key")
       image: "/apple_touch_icon.png"
       token: (token) ->
-        console.log "token"
-        console.log token
         $planConfirmationForm.find("#stripe_token").val(token.id)
         $planConfirmationForm.find("#stripe_email").val(token.email)
         $planConfirmationForm.submit()
 
-    amount_cents = +$planConfirmationForm.find("#stripe_amount").val()
+    price = $planConfirmationForm.find("#stripe_amount").val()
     handler.open
       name: "Bike Index"
       description: "Bike Index Theft Alert"
-      amount: amount_cents
+      amount: parseInt(price, 10)
       email: $planConfirmationForm.data("email")
       allowRememberMe: false
       panelLabel: $planConfirmationForm.data("type")
