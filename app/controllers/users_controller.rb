@@ -117,7 +117,7 @@ class UsersController < ApplicationController
     if !@user.errors.any? && @user.update_attributes(permitted_update_parameters)
       AfterUserChangeWorker.perform_async(@user.id)
       if params[:user][:terms_of_service].present?
-        if params[:user][:terms_of_service] == "1"
+        if ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:user][:terms_of_service])
           @user.terms_of_service = true
           @user.save
           flash[:success] = "Thanks! Now you can use Bike Index"
@@ -127,7 +127,7 @@ class UsersController < ApplicationController
           redirect_to accept_terms_url and return
         end
       elsif params[:user][:vendor_terms_of_service].present?
-        if params[:user][:vendor_terms_of_service] == "1"
+        if ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:user][:vendor_terms_of_service])
           @user.update_attributes(accepted_vendor_terms_of_service: true)
           if @user.memberships.any?
             flash[:success] = "Thanks! Now you can use Bike Index as #{@user.memberships.first.organization.name}"
@@ -179,7 +179,7 @@ class UsersController < ApplicationController
 
   def permitted_parameters
     params.require(:user)
-          .permit(:name, :username, :email, :notification_newsletters, :notification_unstolen,
+          .permit(:name, :username, :email, :notification_newsletters, :notification_unstolen, :terms_of_service,
                   :additional_emails, :title, :description, :phone, :street, :city, :zipcode, :country_id,
                   :state_id, :avatar, :avatar_cache, :twitter, :show_twitter, :website, :show_website,
                   :show_bikes, :show_phone, :my_bikes_link_target, :my_bikes_link_title, :password, :password_confirmation)

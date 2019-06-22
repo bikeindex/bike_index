@@ -14,7 +14,7 @@ class TheftAlert < ActiveRecord::Base
              class_name: "User",
              foreign_key: :user_id
 
-  scope :due_for_expiration, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
+  scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
 
   delegate :bike, to: :stolen_record

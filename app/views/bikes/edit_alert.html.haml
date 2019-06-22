@@ -3,47 +3,28 @@
     .row
       = render partial: "/bikes/edit_primary_menu", locals: { is_disabled: true }
 
-      .col-md-8.form-well#form_well_wrap
-        .form-wrap
+      .col-md-8.form-well
+        .form-wrap{style: "padding-bottom: 20px;"}
           .form-well-form-header
-            / Publicize Theft
-            %h3= @edit_templates[@edit_template]
+            / Activate Bike Index Alert
+            %h3.text-center.w-100
+              = @edit_templates[@edit_template]
 
-          %form#bikeindex-stripe-bike-alert-form
+          = form_tag edit_bike_url(@bike), method: :get, id: "js-select-plan-form" do
+            = hidden_field_tag :page, :alert_purchase
+            = hidden_field_tag :selected_plan_id
             .row
-              = render @theft_alert_plans
+              %h3.text-center.w-100 Select Plan
+            .row
+              = render @theft_alert_plans,
+                selected_plan: @selected_theft_alert_plan,
+                preferred_plan: @theft_alert_plans.max_by(&:amount_cents)
+            .row
+              .text-center.w-100.mt-2
+                %button.btn.btn-lg.btn-primary Select Plan
 
         - if @theft_alerts.present?
           .row &nbsp;
           .row
             .col-md-12
-              %h3 Past Bike Index Alerts
-              %table.table.table-bordered
-                %thead.small-header
-                  %tr
-                    %th Created at
-                    %th Plan
-                    %th Status
-                    %th Begins at
-                    %th Ends at
-                    %th Facebook post
-                %tbody
-                  - @theft_alerts.each do |alert|
-                    - plan = alert.theft_alert_plan
-                    %tr
-                      %td.convertTime= l(alert.created_at, format: :convert_time)
-                      %td #{plan.name} (#{plan.duration_days} days)
-                      %td= alert.status
-                      %td.convertTime= l(alert.begin_at, format: :convert_time) if alert.begin_at.present?
-                      %td.convertTime= l(alert.end_at, format: :convert_time) if alert.end_at.present?
-                      %td= link_to "link", alert.facebook_post_url, target: "_blank" if alert.facebook_post_url.present?
-
-
-%script{ src: "https://checkout.stripe.com/checkout.js" }
-- stripe_data = { key: ENV["STRIPE_PUBLISHABLE_KEY"], email: current_user&.email, type:  "Pay" }
-= form_tag theft_alerts_path, id: "stripe_form", data: stripe_data do
-  = hidden_field_tag :bike_id, @bike.id
-  = hidden_field_tag :theft_alert_plan_id
-  = hidden_field_tag :stripe_token
-  = hidden_field_tag :stripe_amount
-  = hidden_field_tag :stripe_email
+              = render partial: "theft_alerts_table", locals: { theft_alerts: @theft_alerts }
