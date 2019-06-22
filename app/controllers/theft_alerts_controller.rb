@@ -17,12 +17,10 @@ class TheftAlertsController < ApplicationController
     )
 
     theft_alert.update(payment: payment)
-  rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound => e
-    Honeybadger.notify(e)
+  rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound
     flash[:error] = "We were unable to process your order. Please contact support."
     redirect_to edit_bike_url(@bike, params: { page: :alert_purchase })
-  rescue Stripe::StripeError => e
-    Honeybadger.notify(e)
+  rescue Stripe::CardError
     TheftAlertPurchaseNotificationWorker.perform_async(theft_alert.id)
     flash[:error] = "Your order is pending, but we were unable to complete payment. Please contact support to complete your purchase."
     redirect_to edit_bike_url(@bike, params: { page: :alert_purchase })
