@@ -1,0 +1,12 @@
+.container
+  %h1 Activate Theft Alert
+
+  = form_for @theft_alert,
+    url: admin_theft_alert_path(@theft_alert),
+    method: :patch,
+    html: { class: "m-0" } do |f|
+    = hidden_field_tag :state_transition, "begin"
+    = f.label :facebook_post_url, class: "form-label font-weight-bold mt-2 mb-0"
+    = f.text_field :facebook_post_url, class: "form-control"
+    %br
+    = submit_tag "Begin", class: "btn btn-info"

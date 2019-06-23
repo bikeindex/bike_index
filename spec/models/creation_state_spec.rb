@@ -55,8 +55,8 @@ RSpec.describe CreationState, type: :model do
 
   describe "calculated_pos_kind" do
     let(:creation_state) { CreationState.new }
-    it "returns not_pos" do
-      expect(creation_state.send("calculated_pos_kind")).to eq "not_pos"
+    it "returns no_pos" do
+      expect(creation_state.send("calculated_pos_kind")).to eq "no_pos"
     end
     context "is_pos" do
       # We're defaulting to Lightspeed right now, because it's what exists in the database

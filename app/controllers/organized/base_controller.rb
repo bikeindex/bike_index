@@ -15,10 +15,14 @@ module Organized
     end
 
     def ensure_member!
-      return true if current_user && current_user.member_of?(current_organization)
+      if current_user && current_user.member_of?(current_organization)
+        return true if current_user.accepted_vendor_terms_of_service?
+        flash[:success] = "Please accept the terms of service for organizations"
+        redirect_to accept_vendor_terms_path and return
+      end
       set_passive_organization(nil) # remove the active organization, because it failed so don't show it anymore
       flash[:error] = "You're not a member of that organization!"
-      redirect_to user_home_url(subdomain: false) and return
+      redirect_to user_root_url and return
     end
 
     def ensure_admin!

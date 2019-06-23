@@ -229,7 +229,7 @@ GEM
     hashie (3.6.0)
     high_voltage (3.0.0)
     hiredis (0.6.3)
-    honeybadger (2.6.0)
+    honeybadger (4.3.1)
     htmlentities (4.3.4)
     http (3.3.0)
       addressable (~> 2.3)
@@ -576,7 +576,6 @@ GEM
     thor (0.19.1)
     thread_safe (0.3.6)
     tilt (2.0.8)
-    timecop (0.9.1)
     twitter (6.2.0)
       addressable (~> 2.3)
       buftok (~> 0.2.0)
@@ -672,7 +671,7 @@ DEPENDENCIES
   hamlit
   high_voltage
   hiredis
-  honeybadger (~> 2.0)
+  honeybadger
   httparty
   i18n
   jazz_fingers
@@ -747,7 +746,6 @@ DEPENDENCIES
   swagger-ui_rails
   therubyracer
   thor (= 0.19.1)
-  timecop
   twitter
   uglifier
   unicorn

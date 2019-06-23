@@ -1,8 +1,8 @@
 .form-wrap
-  .form-well-form-header
+  .form-well-form-header-always-visible
     %h3
       Sharing and Personal page settings
-  
+
   .related-fields
     .form-group.row.sharing-collapser{ data: { target: '#twitter-field' } }
       %label.form-well-label
@@ -70,7 +70,7 @@
         %label.form-well-label
           Profile avatar
         .form-well-input
-          - if @user.avatar? 
+          - if @user.avatar?
             = image_tag(@user.avatar_url(:thumb))
           %img.replaced-img
           %label.file
@@ -87,3 +87,4 @@
         = f.label :description, 'Page text', class:  'form-well-label'
         .form-well-input-large
           = f.text_area :description, rows: 6, class: 'form-control'
+  = render "/shared/form_well_footer_save"

@@ -3,7 +3,7 @@
 
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: "/bikes/edit_primary_menu"
+      = render partial: "/bikes/edit_primary_menu", locals: { is_disabled: true }
 
       .col-md-8.form-well#form_well_wrap
         .form-wrap
@@ -29,7 +29,7 @@
                                     "data-show-count" => false,
                                     "data-size" => "large",
                                     "data-url" => bike_url(@bike)}
-            %script{async: true, src: "https://platform.twitter.com/widgets.js", charset: "utf-8" }
+            %script{src: "https://platform.twitter.com/widgets.js", charset: "utf-8"}
             %a{href: "https://twitter.com/share?url=#{bike_url(@bike)}&text=Help me find my stolen bike!",
                target: "_blank"}
               .share-social.share-twitter Share on Twitter

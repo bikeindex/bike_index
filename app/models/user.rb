@@ -175,10 +175,16 @@ class User < ActiveRecord::Base
     self.save
   end
 
-  def accept_vendor_terms_of_service
-    self.vendor_terms_of_service = true
-    self.when_vendor_terms_of_service = DateTime.current
-    save
+  def accepted_vendor_terms_of_service?
+    vendor_terms_of_service
+  end
+
+  def accepted_vendor_terms_of_service=(val)
+    if ActiveRecord::Type::Boolean.new.type_cast_from_database(val)
+      self.vendor_terms_of_service = true
+      self.when_vendor_terms_of_service = Time.current
+    end
+    true
   end
 
   def send_password_reset_email

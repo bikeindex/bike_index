@@ -22,6 +22,8 @@ class Bike < ActiveRecord::Base
 
   has_many :bike_organizations, dependent: :destroy
   has_many :organizations, through: :bike_organizations
+  has_many :can_edit_claimed_bike_organizations, -> { can_edit_claimed }, class_name: "BikeOrganization"
+  has_many :can_edit_claimed_organizations, through: :can_edit_claimed_bike_organizations, source: :organization
   has_many :creation_states, dependent: :destroy
   # delegate :creator, to: :creation_state, source: :creator
   # has_one :creation_organization, through: :creation_state, source: :organization
@@ -80,7 +82,7 @@ class Bike < ActiveRecord::Base
   scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 2 }) }
   scope :ascend_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 3 }) }
   scope :any_pos, -> { includes(:creation_states).where.not(creation_states: { pos_kind: 0 }) }
-  scope :not_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 0 }) }
+  scope :no_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 0 }) }
   scope :example, -> { where(example: true) }
   scope :non_example, -> { where(example: false) }
 
@@ -176,7 +178,7 @@ class Bike < ActiveRecord::Base
 
   def pos_kind; creation_state&.pos_kind end
 
-  def pos?; pos_kind != "not_pos" end
+  def pos?; pos_kind != "no_pos" end
 
   def current_ownership; ownerships.reorder(:created_at).last end
 
@@ -227,14 +229,21 @@ class Bike < ActiveRecord::Base
   # check if this is the first ownership - or if no owner, which means testing probably
   def first_ownership?; current_ownership&.blank? || current_ownership == first_ownership end
 
+  def editable_organizations
+    return organizations if first_ownership? && organized? && !claimed?
+    can_edit_claimed_organizations
+  end
+
   def authorized_by_organization?(u: nil, org: nil)
-    return false unless first_ownership? && organized? && !claimed?
+    editable_organization_ids = editable_organizations.pluck(:id)
+    return false unless editable_organization_ids.any?
     return true unless u.present? || org.present?
-    return creation_organization == org if org.present? && u.blank?
-    # so, we know a user was passed
-    return false if claimable_by?(u) # this is authorized by owner, not organization
-    return organizations.any? { |o| u.member_of?(o) } unless org.present?
-    creation_organization == org && u.member_of?(org)
+    # We have either a org or a user - if no user, we only need to check org
+    return editable_organization_ids.include?(org.id) if u.blank?
+    return false if claimable_by?(u) # authorized by owner, not organization
+    # Ensure the user is part of the organization and the organization can edit if passed both
+    return u.member_of?(org) && editable_organization_ids.include?(org.id) if org.present?
+    editable_organizations.any? { |o| u.member_of?(o) }
   end
 
   def first_owner_email; first_ownership.owner_email end
@@ -246,7 +255,7 @@ class Bike < ActiveRecord::Base
 
   def authorized_for_user?(u)
     return true if u == owner || claimable_by?(u)
-    return false if u.blank? || current_ownership&.claimed
+    return false if u.blank?
     authorized_by_organization?(u: u)
   end
 

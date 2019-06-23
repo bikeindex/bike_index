@@ -265,10 +265,10 @@ RSpec.describe BikesController, type: :controller do
 
   describe "scanned" do
     let(:bike) { FactoryBot.create(:bike) }
-    let!(:bike_code) { FactoryBot.create(:bike_code, bike: bike, code: 900) }
+    let!(:bike_code) { FactoryBot.create(:bike_code, bike: bike, code: "D900") }
     let(:organization) { FactoryBot.create(:organization) }
     context "organized no bike" do
-      let!(:bike_code2) { FactoryBot.create(:bike_code, organization: organization, code: "0900") }
+      let!(:bike_code2) { FactoryBot.create(:bike_code, organization: organization, code: "D0900") }
       let!(:user) { FactoryBot.create(:user_confirmed) }
       before { set_current_user(user) }
       it "renders the scanned page" do
@@ -282,7 +282,7 @@ RSpec.describe BikesController, type: :controller do
       context "user part of organization" do
         let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
         it "makes current_organization the organization" do
-          get :scanned, id: "000#{bike_code2.code}", organization_id: organization.to_param
+          get :scanned, id: "D0900", organization_id: organization.to_param
           expect(assigns(:bike_code)).to eq bike_code2
           expect(session[:passive_organization_id]).to eq organization.id
           expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_code: bike_code2.code)
@@ -292,7 +292,7 @@ RSpec.describe BikesController, type: :controller do
           it "makes current_organization the organization" do
             expect(user.memberships&.pluck(:organization_id)).to eq([organization.id])
             expect(bike_code2.organization).to eq organization
-            get :scanned, id: "000#{bike_code2.code}", organization_id: "BikeIndex"
+            get :scanned, id: "D900", organization_id: "BikeIndex"
             expect(assigns(:bike_code)).to eq bike_code2
             expect(session[:passive_organization_id]).to eq organization.id
             expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_code: bike_code2.code)
@@ -896,7 +896,7 @@ RSpec.describe BikesController, type: :controller do
       {
         theft_details: "Theft details",
         publicize: "Publicize Theft",
-        # alert: "Activate Bike Index Alert",
+        alert: "Activate Bike Index Alert",
         report_recovered: "Mark this Bike Recovered",
       }
     end
@@ -972,7 +972,10 @@ RSpec.describe BikesController, type: :controller do
               bike.update_attribute(:stolen, true)
               bike.reload
               expect(bike.stolen).to be_truthy
+              allow(Flipper).to receive(:enabled?).and_return(true)
+
               get :edit, id: bike.id
+
               expect(response).to be_success
               expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq stolen_edit_templates.as_json
@@ -984,7 +987,10 @@ RSpec.describe BikesController, type: :controller do
               bike.update_attributes(stolen: true, recovered: true)
               bike.reload
               expect(bike.recovered).to be_truthy
+              allow(Flipper).to receive(:enabled?).and_return(true)
+
               get :edit, id: bike.id
+
               expect(response).to be_success
               expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq recovery_edit_templates.as_json
@@ -1005,6 +1011,7 @@ RSpec.describe BikesController, type: :controller do
               expect(response).to render_template("edit_#{template}")
               expect(assigns(:edit_template)).to eq(template)
               expect(assigns(:private_images)).to eq([]) if template == "photos"
+              expect(assigns(:theft_alerts)).to eq([]) if template == "alert"
             end
           end
         end
@@ -1296,7 +1303,10 @@ RSpec.describe BikesController, type: :controller do
         expect(ownership.owner).to eq user
       end
       it "updates the bike with the allowed_attributes" do
-        put :update, id: bike.id, bike: allowed_attributes
+        put :update,
+            id: bike.id,
+            bike: allowed_attributes,
+            organization_ids_can_edit_claimed: [organization_2.id]
         expect(response).to redirect_to edit_bike_url(bike)
         expect(assigns(:bike)).to be_decorated
         bike.reload
@@ -1306,17 +1316,39 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.send(key)).to eq value
         end
         expect(bike.bike_organization_ids).to eq([organization.id, organization_2.id])
+        expect(bike.editable_organizations.pluck(:id)).to eq([organization_2.id])
+      end
+      context "empty organization_ids_can_edit_claimed" do
+        it "updates the bike with the allowed_attributes" do
+          put :update,
+              id: bike.id,
+              bike: allowed_attributes,
+              organization_ids_can_edit_claimed: []
+          expect(response).to redirect_to edit_bike_url(bike)
+          expect(assigns(:bike)).to be_decorated
+          bike.reload
+          expect(bike.hidden).to be_falsey
+          allowed_attributes.except(*skipped_attrs).each do |key, value|
+            pp value, key unless bike.send(key) == value
+            expect(bike.send(key)).to eq value
+          end
+          expect(bike.bike_organization_ids).to eq([organization.id, organization_2.id])
+          expect(bike.editable_organizations.pluck(:id)).to eq([])
+        end
       end
     end
     context "organized bike, member present" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
+      let(:can_edit_claimed) { false }
+      let(:claimed) { false }
+      let(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization, can_edit_claimed: can_edit_claimed, claimed: claimed) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:bike) { ownership.bike }
       before { set_current_user(user) }
       it "updates the bike" do
         bike.reload
         expect(bike.owner).to_not eq(user)
+        expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
         expect(bike.authorized_by_organization?(u: user)).to be_truthy
         put :update, id: bike.id, bike: { description: "new description", handlebar_type: "forward" }
         expect(response).to redirect_to edit_bike_url(bike)
@@ -1325,6 +1357,37 @@ RSpec.describe BikesController, type: :controller do
         expect(bike.hidden).to be_falsey
         expect(bike.description).to eq "new description"
         expect(bike.handlebar_type).to eq "forward"
+        expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+      end
+      context "bike is claimed" do
+        let(:claimed) { true }
+        it "fails to update" do
+          ownership.reload
+          bike.reload
+          expect(bike.owner).to_not eq(user)
+          expect(bike.editable_organizations.pluck(:id)).to eq([])
+          expect(bike.authorized_by_organization?(u: user)).to be_falsey
+          put :update, id: bike.id, bike: { description: "new description", handlebar_type: "forward" }
+          expect(flash[:error]).to be_present
+          expect(assigns(:bike)).to be_present
+          expect(bike.description).to_not eq "new description"
+        end
+        context "can_edit_claimed true" do
+          let(:can_edit_claimed) { true }
+          it "updates the bike" do
+            bike.reload
+            expect(bike.owner).to_not eq(user)
+            expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
+            expect(bike.authorized_by_organization?(u: user)).to be_truthy
+            put :update, id: bike.id, bike: { description: "new description", handlebar_type: "forward" }
+            expect(response).to redirect_to edit_bike_url(bike)
+            expect(assigns(:bike)).to be_present
+            bike.reload
+            expect(bike.hidden).to be_falsey
+            expect(bike.description).to eq "new description"
+            expect(bike.handlebar_type).to eq "forward"
+          end
+        end
       end
     end
   end

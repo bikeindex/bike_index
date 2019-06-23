@@ -1,7 +1,7 @@
 .form-wrap
-  .form-well-form-header
+  .form-well-form-header-always-visible
     %h3
-      Personal Information for 
+      Personal Information for
       = @user.display_name
   .col-xs-12
     %p
@@ -113,3 +113,5 @@
       %span.context-display-help
         +
       Add additional email
+
+  = render "/shared/form_well_footer_save"

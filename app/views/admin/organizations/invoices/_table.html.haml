@@ -2,7 +2,7 @@
 - display_organization ||= false
 
 .full-screen-table
-  %table.table.table-striped.table-bordered.sortable
+  %table.table.table-striped.table-bordered.sortable{ class: render_sortable ? "" : "table-sm" }
     %thead.thead-light
       %th
         - if render_sortable
@@ -72,7 +72,7 @@
             %span{ class: invoice.paid_in_full? ? "text-success" : "" }
               = invoice.amount_paid_formatted
             - if invoice.payments.any?
-              %ul{ style: "padding-top: 10px;" }
+              %ul
                 - invoice.payments.each do |payment|
                   %li{ style: "font-size: 80%;" }
                     #{link_to "#{payment.amount_formatted} #{payment.kind}", admin_payment_path(payment)},

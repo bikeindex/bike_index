@@ -196,26 +196,52 @@ RSpec.describe "Bikes API V3", type: :request do
       end
 
       context "if the matching bike is claimed" do
-        it "creates a new bike" do
-          bike = FactoryBot.create(:creation_organization_bike)
-          FactoryBot.create(:ownership_claimed, creator: bike.creator, bike: bike)
-          FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization)
-
-          bike_attrs = {
+        let(:can_edit_claimed) { true }
+        let(:bike) { FactoryBot.create(:creation_organization_bike, can_edit_claimed: can_edit_claimed) }
+        let!(:ownership) { FactoryBot.create(:ownership_claimed, creator: bike.creator, bike: bike) }
+        let!(:membership) { FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization) }
+        let(:bike_attrs) do
+          {
             serial: bike.serial,
             manufacturer: bike.manufacturer.name,
             color: color.name,
-            year: bike.year,
+            year: "2012",
             owner_email: bike.owner_email,
           }
-          post "/api/v3/bikes?access_token=#{token.token}",
-               bike_attrs.to_json,
-               json_headers
+        end
+        it "updates" do
+          expect(bike.year).to_not eq 2012
+          expect do
+            post "/api/v3/bikes?access_token=#{token.token}",
+                 bike_attrs.to_json,
+                 json_headers
+          end.to_not change(Bike, :count)
 
           returned_bike = json_result["bike"]
-          expect(response.status).to eq(201)
-          expect(response.status_message).to eq("Created")
-          expect(returned_bike["id"]).to_not eq(bike.id)
+          expect(response.status).to eq(302)
+          expect(response.status_message).to eq "Found"
+          expect(returned_bike["id"]).to eq bike.id
+          expect(returned_bike["year"]).to eq 2012
+          bike.reload
+          expect(bike.year).to eq 2012
+        end
+        context "can_edit_claimed false" do
+          let(:can_edit_claimed) { false }
+          it "creates a new bike" do
+            expect(bike.year).to_not eq 2012
+            expect do
+              post "/api/v3/bikes?access_token=#{token.token}",
+                   bike_attrs.to_json,
+                   json_headers
+            end.to change(Bike, :count).by 1
+
+            returned_bike = json_result["bike"]
+            expect(response.status).to eq(201)
+            expect(response.status_message).to eq "Created"
+            expect(returned_bike["id"]).to_not eq bike.id
+            bike.reload
+            expect(bike.year).to_not eq 2012
+          end
         end
       end
     end
@@ -629,7 +655,7 @@ RSpec.describe "Bikes API V3", type: :request do
       headsets = FactoryBot.create(:ctype, name: "Headset")
       comp = FactoryBot.create(:component, bike: bike, ctype: headsets)
       comp2 = FactoryBot.create(:component, bike: bike, ctype: wheels)
-      not_urs = FactoryBot.create(:component)
+      FactoryBot.create(:component)
       bike.reload
       expect(bike.components.count).to eq(2)
       components = [
@@ -670,7 +696,7 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "doesn't remove components that aren't the bikes" do
-      manufacturer = FactoryBot.create(:manufacturer)
+      FactoryBot.create(:manufacturer)
       comp = FactoryBot.create(:component, bike: bike)
       not_urs = FactoryBot.create(:component)
       components = [

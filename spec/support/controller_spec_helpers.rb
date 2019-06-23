@@ -17,24 +17,24 @@ module ControllerSpecHelpers
   end
 
   RSpec.shared_context :logged_in_as_organization_admin do
-    let(:user) { FactoryBot.create(:organization_admin) }
-    let(:organization) { user.organizations.first }
+    let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
+    let(:organization) { FactoryBot.create(:organization) }
     before :each do
       set_current_user(user)
     end
   end
 
   RSpec.shared_context :logged_in_as_organization_member do
-    let(:user) { FactoryBot.create(:organization_member) }
-    let(:organization) { user.organizations.first }
+    let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:organization) { FactoryBot.create(:organization) }
     before :each do
       set_current_user(user)
     end
   end
 
   RSpec.shared_context :logged_in_as_ambassador do
-    let(:user) { FactoryBot.create(:ambassador) }
-    let(:organization) { user.organizations.first }
+    let(:user) { FactoryBot.create(:ambassador, organization: organization) }
+    let(:organization) { FactoryBot.create(:organization_ambassador) }
     before { set_current_user(user) }
   end
 

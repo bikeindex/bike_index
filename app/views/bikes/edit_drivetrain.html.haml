@@ -4,7 +4,7 @@
       = render partial: '/bikes/edit_primary_menu'
       .col-md-8.form-well
         .form-wrap
-          .form-well-form-header
+          .form-well-form-header-always-visible
             %h3
               Wheels
 
@@ -53,9 +53,8 @@
                   = f.radio_button "#{side}_tire_narrow".to_sym, 'false'
                   Wide
 
-
         .form-wrap.secondary-form-wrap#edit_drivetrain
-          .form-well-form-header
+          .form-well-form-header-always-visible
             %h3
               Drivetrain
           - rear_fixed = RearGearType.fixed.id
@@ -124,3 +123,4 @@
                     = f.radio_button 'rear_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", data: {count: gt.count }
 
 
+        = render "/shared/form_well_footer_save"

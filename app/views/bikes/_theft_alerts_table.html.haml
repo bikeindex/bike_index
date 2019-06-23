@@ -1,0 +1,28 @@
+- first_form_well ||= false
+
+- if theft_alerts.present?
+  .form-wrap{ class: first_form_well ? "" : "secondary-form-wrap" }
+    .form-well-form-header-always-visible
+      %h3
+        Existing Theft Alerts
+    .row
+      .col-md-12
+        %table.table.table-bordered{ style: "background: #fff;" }
+          %thead.small-header
+            %tr
+              %th Created
+              %th Plan
+              %th Status
+              %th Start
+              %th End
+              %th Post
+
+          %tbody
+            - theft_alerts.each do |alert|
+              %tr
+                %td= alert.created_at.to_date.to_s(:long)
+                %td= alert.theft_alert_plan.name
+                %td= alert.status
+                %td.convertTime= l(alert.begin_at, format: :convert_time) if alert.begin_at.present?
+                %td.convertTime= l(alert.end_at, format: :convert_time) if alert.end_at.present?
+                %td= link_to "link", alert.facebook_post_url, target: "_blank" if alert.facebook_post_url.present?

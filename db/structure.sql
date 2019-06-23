@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.3
--- Dumped by pg_dump version 11.3
+-- Dumped from database version 10.3
+-- Dumped by pg_dump version 10.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -12,9 +12,22 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
-SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
+
+--
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
+
 
 --
 -- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
@@ -188,7 +201,8 @@ CREATE TABLE public.bike_code_batches (
     organization_id integer,
     notes text,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    code_number_length integer
 );
 
 
@@ -226,7 +240,9 @@ CREATE TABLE public.bike_codes (
     updated_at timestamp without time zone NOT NULL,
     claimed_at timestamp without time zone,
     previous_bike_id integer,
-    bike_code_batch_id integer
+    bike_code_batch_id integer,
+    code_integer integer,
+    code_prefix character varying
 );
 
 
@@ -259,7 +275,8 @@ CREATE TABLE public.bike_organizations (
     organization_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    deleted_at timestamp without time zone
+    deleted_at timestamp without time zone,
+    can_not_edit_claimed boolean DEFAULT false NOT NULL
 );
 
 
@@ -830,7 +847,6 @@ CREATE TABLE public.flipper_features (
 --
 
 CREATE SEQUENCE public.flipper_features_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -864,7 +880,6 @@ CREATE TABLE public.flipper_gates (
 --
 
 CREATE SEQUENCE public.flipper_gates_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2014,6 +2029,80 @@ ALTER SEQUENCE public.stolen_records_id_seq OWNED BY public.stolen_records.id;
 
 
 --
+-- Name: theft_alert_plans; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.theft_alert_plans (
+    id integer NOT NULL,
+    name character varying DEFAULT ''::character varying NOT NULL,
+    amount_cents integer NOT NULL,
+    views integer NOT NULL,
+    duration_days integer NOT NULL,
+    description character varying DEFAULT ''::character varying NOT NULL,
+    active boolean DEFAULT true NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: theft_alert_plans_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.theft_alert_plans_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: theft_alert_plans_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.theft_alert_plans_id_seq OWNED BY public.theft_alert_plans.id;
+
+
+--
+-- Name: theft_alerts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.theft_alerts (
+    id integer NOT NULL,
+    stolen_record_id integer,
+    theft_alert_plan_id integer,
+    payment_id integer,
+    user_id integer,
+    status integer DEFAULT 0 NOT NULL,
+    facebook_post_url character varying DEFAULT ''::character varying NOT NULL,
+    begin_at timestamp without time zone,
+    end_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: theft_alerts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.theft_alerts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: theft_alerts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.theft_alerts_id_seq OWNED BY public.theft_alerts.id;
+
+
+--
 -- Name: tweets; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2543,6 +2632,20 @@ ALTER TABLE ONLY public.stolen_records ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
+-- Name: theft_alert_plans id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.theft_alert_plans ALTER COLUMN id SET DEFAULT nextval('public.theft_alert_plans_id_seq'::regclass);
+
+
+--
+-- Name: theft_alerts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.theft_alerts ALTER COLUMN id SET DEFAULT nextval('public.theft_alerts_id_seq'::regclass);
+
+
+--
 -- Name: tweets id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2976,6 +3079,22 @@ ALTER TABLE ONLY public.stolen_records
 
 ALTER TABLE ONLY public.stolen_notifications
     ADD CONSTRAINT stolen_notifications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: theft_alert_plans theft_alert_plans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.theft_alert_plans
+    ADD CONSTRAINT theft_alert_plans_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: theft_alerts theft_alerts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.theft_alerts
+    ADD CONSTRAINT theft_alerts_pkey PRIMARY KEY (id);
 
 
 --
@@ -3473,6 +3592,34 @@ CREATE INDEX index_stolen_records_on_recovering_user_id ON public.stolen_records
 
 
 --
+-- Name: index_theft_alerts_on_payment_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_theft_alerts_on_payment_id ON public.theft_alerts USING btree (payment_id);
+
+
+--
+-- Name: index_theft_alerts_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_theft_alerts_on_stolen_record_id ON public.theft_alerts USING btree (stolen_record_id);
+
+
+--
+-- Name: index_theft_alerts_on_theft_alert_plan_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_theft_alerts_on_theft_alert_plan_id ON public.theft_alerts USING btree (theft_alert_plan_id);
+
+
+--
+-- Name: index_theft_alerts_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_theft_alerts_on_user_id ON public.theft_alerts USING btree (user_id);
+
+
+--
 -- Name: index_user_emails_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3501,11 +3648,43 @@ CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING b
 
 
 --
+-- Name: theft_alerts fk_rails_3c23dcdc45; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.theft_alerts
+    ADD CONSTRAINT fk_rails_3c23dcdc45 FOREIGN KEY (stolen_record_id) REFERENCES public.stolen_records(id) ON DELETE CASCADE;
+
+
+--
+-- Name: theft_alerts fk_rails_4d1dc73022; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.theft_alerts
+    ADD CONSTRAINT fk_rails_4d1dc73022 FOREIGN KEY (theft_alert_plan_id) REFERENCES public.theft_alert_plans(id) ON DELETE CASCADE;
+
+
+--
+-- Name: theft_alerts fk_rails_58c070cc66; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.theft_alerts
+    ADD CONSTRAINT fk_rails_58c070cc66 FOREIGN KEY (user_id) REFERENCES public.users(id);
+
+
+--
 -- Name: ambassador_task_assignments fk_rails_6c31316b38; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.ambassador_task_assignments
     ADD CONSTRAINT fk_rails_6c31316b38 FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: theft_alerts fk_rails_6dac5d87d9; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.theft_alerts
+    ADD CONSTRAINT fk_rails_6dac5d87d9 FOREIGN KEY (payment_id) REFERENCES public.payments(id);
 
 
 --
@@ -4239,4 +4418,12 @@ INSERT INTO schema_migrations (version) VALUES ('20190612183532');
 INSERT INTO schema_migrations (version) VALUES ('20190614223136');
 
 INSERT INTO schema_migrations (version) VALUES ('20190617174200');
+
+INSERT INTO schema_migrations (version) VALUES ('20190617193251');
+
+INSERT INTO schema_migrations (version) VALUES ('20190617193255');
+
+INSERT INTO schema_migrations (version) VALUES ('20190620203854');
+
+INSERT INTO schema_migrations (version) VALUES ('20190621183811');
 

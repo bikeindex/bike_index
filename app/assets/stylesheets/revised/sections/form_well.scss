@@ -116,6 +116,9 @@
   .form-group {
     clear: both;
 
+    label.checkbox-inline {
+      cursor: pointer;
+    }
     .checkbox-inline {
       padding-top: 0.5em;
     }
@@ -145,6 +148,10 @@
       margin: 0 auto;
       max-width: 450px;
     }
+  }
+
+  .extra-footer-save {
+    display: none;
   }
 
   hr {
@@ -278,6 +285,15 @@
   .form-well .full-width-section {
     padding-left: 2 * $row-side-padding;
     padding-right: 2 * $row-side-padding;
+  }
+
+  .form-well .extra-footer-save {
+    display: block;
+    padding-top: 60px;
+    .btn {
+      display: block;
+      margin: 0 auto 0;
+    }
   }
 
   // because we have to use floats instead of flex with sticky (affixing edit menu)

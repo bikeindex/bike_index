@@ -60,10 +60,11 @@ Bikeindex::Application.routes.draw do
   get "bike_creation_graph", to: "welcome#bike_creation_graph"
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
 
-  resource :session, only: [:new, :create, :destroy]
+  resource :session, only: %i[new create destroy]
   get "logout", to: "sessions#destroy"
 
   resources :payments
+  resources :theft_alerts, only: [:create]
   resources :documentation, only: [:index] do
     collection do
       get :api_v1
@@ -75,13 +76,13 @@ Bikeindex::Application.routes.draw do
   end
 
   resources :ownerships, only: [:show]
-  resources :memberships, only: [:update, :destroy]
+  resources :memberships, only: %i[update destroy]
 
-  resources :stolen_notifications, only: [:create, :new]
+  resources :stolen_notifications, only: %i[create new]
 
-  resources :feedbacks, only: [:index, :create]
+  resources :feedbacks, only: %i[index create]
   get "vendor_signup", to: redirect("/organizations/new")
-  get "connect_lightspeed", to: "organizations#connect_lightspeed"
+  get "lightspeed_interface", to: "organizations#lightspeed_interface"
   get "help", to: "feedbacks#index"
   get "feedbacks/new", to: redirect("/help")
   %w(support contact contact_us).each { |p| get p, to: redirect("/help") }
@@ -109,11 +110,11 @@ Bikeindex::Application.routes.draw do
       post "make_primary"
     end
   end
-  resources :news, only: [:show, :index]
-  resources :blogs, only: [:show, :index]
+  resources :news, only: %i[show index]
+  resources :blogs, only: %i[show index]
   get "blog", to: redirect("/news")
 
-  resources :public_images, only: [:create, :show, :edit, :update, :destroy] do
+  resources :public_images, only: %i[create show edit update destroy] do
     collection do
       post :order
     end
@@ -131,12 +132,12 @@ Bikeindex::Application.routes.draw do
       get :scanned
       get :pdf
     end
-    resource :recovery, only: [:edit, :update], controller: "bikes/recovery"
+    resource :recovery, only: %i[edit update], controller: "bikes/recovery"
   end
   get "bikes/scanned/:scanned_id", to: "bikes#scanned"
 
   resources :bike_codes, only: [:update]
-  resources :locks, except: [:show, :index]
+  resources :locks, except: %[show index]
 
   namespace :admin do
     root to: "dashboard#index"
@@ -152,18 +153,23 @@ Bikeindex::Application.routes.draw do
       end
       member { get :get_destroy }
     end
+    resources :partial_bikes, only: [:index]
     get "invitations", to: "dashboard#invitations"
     get "maintenance", to: "dashboard#maintenance"
     put "update_tsv_blacklist", to: "dashboard#update_tsv_blacklist"
     get "tsvs", to: "dashboard#tsvs"
     get "bust_z_cache", to: "dashboard#bust_z_cache"
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
-    get "invoices", to: "payments#invoices", as: :invoices
     resources :memberships, :organization_invitations, :bulk_imports, :exports, :bike_codes,
               :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments,
-              :partial_bikes
+              :ctypes
+
+    resources :invoices, only: [:index]
+    resources :theft_alerts, only: %i[index edit update]
+    resources :theft_alert_plans, only: %i[index edit update new create]
+
     resources :organizations do
-      resources :custom_layouts, only: [:index, :edit, :update], controller: "organizations/custom_layouts"
+      resources :custom_layouts, only: %i[index edit update], controller: "organizations/custom_layouts"
       resources :invoices, controller: "organizations/invoices"
     end
     get "recover_organization", to: "organizations#recover"
@@ -188,18 +194,15 @@ Bikeindex::Application.routes.draw do
         get :variable
       end
     end
-    resources :failed_bikes, only: [:index, :show]
-    resources :feedbacks, only: [:index, :show]
-    resources :ownerships, only: [:edit, :update]
+    resources :failed_bikes, only: %i[index show]
+    resources :feedbacks, only: %i[index show]
+    resources :ownerships, only: %i[edit update]
     resources :tweets
     get "blog", to: redirect("/news")
     resources :news do
       collection do
         get :listicle_image_edit
       end
-    end
-    resources :ctypes, only: [:new, :create, :index, :edit, :update, :destroy] do
-      collection { post :import }
     end
     resources :manufacturers do
       collection { post :import }
@@ -226,7 +229,7 @@ Bikeindex::Application.routes.draw do
       resources :colors, only: [:index]
       resources :handlebar_types, only: [:index]
       resources :frame_materials, only: [:index]
-      resources :manufacturers, only: [:index, :show]
+      resources :manufacturers, only: %i[index show]
       resources :notifications, only: [:create]
       resources :organizations, only: [:show]
       resources :users do

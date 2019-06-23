@@ -126,8 +126,8 @@ gem "lograge" # Structure log data, put it in single lines to improve the functi
 gem "logstash-event" # Use logstash format for logging data
 
 group :production do
-  gem "honeybadger", "~> 2.0" # Error monitoring
   gem "skylight" # Performance monitoring
+  gem "honeybadger"
 end
 
 group :development do
@@ -165,7 +165,6 @@ group :test do
   gem "factory_bot_rails"
   gem "rspec-sidekiq"
   gem "simplecov", require: false
-  gem "timecop"
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
 end
