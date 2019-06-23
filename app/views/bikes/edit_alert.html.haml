@@ -2,10 +2,12 @@
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
       = render partial: "/bikes/edit_primary_menu", locals: { is_disabled: true }
-
       .col-md-8.form-well
-        .form-wrap{style: "padding-bottom: 20px;"}
-          .form-well-form-header
+
+        = render partial: "theft_alerts_table", locals: { theft_alerts: @theft_alerts, first_form_well: true }
+
+        .form-wrap{ class: @theft_alerts.present? ? "secondary-form-wrap" : "" }
+          .form-well-form-header-always-visible
             / Activate Bike Index Alert
             %h3.text-center.w-100
               = @edit_templates[@edit_template]
@@ -22,9 +24,3 @@
             .row
               .text-center.w-100.mt-2
                 %button.btn.btn-lg.btn-primary Select Plan
-
-        - if @theft_alerts.present?
-          .row &nbsp;
-          .row
-            .col-md-12
-              = render partial: "theft_alerts_table", locals: { theft_alerts: @theft_alerts }

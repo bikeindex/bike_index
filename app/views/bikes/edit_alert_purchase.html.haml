@@ -4,7 +4,7 @@
       = render partial: "/bikes/edit_primary_menu", locals: { is_disabled: true }
 
       .col-md-8.form-well
-        .form-wrap{style: "padding-bottom: 15px;"}
+        .form-wrap
           .form-well-form-header
             %h3.text-center.w-100
               / 'alert'-prefixed templates should all have the same header and
@@ -50,10 +50,6 @@
                     %span.times &times;
                     Cancel
 
-        - if @theft_alerts.present?
-          .row &nbsp;
-          .row
-            .col-md-12
-              = render partial: "theft_alerts_table", locals: { theft_alerts: @theft_alerts }
+        = render partial: "theft_alerts_table", locals: { theft_alerts: @theft_alerts }
 
 %script{ src: "https://checkout.stripe.com/checkout.js", async: true }

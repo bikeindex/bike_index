@@ -20,27 +20,29 @@
 }
 
 // Per page header on bikes and users
-.form-well-form-header {
+.form-well-form-header,
+.form-well-form-header-always-visible {
   h3,
   h5 {
     padding: 0 $vertical-height;
     margin-bottom: 2 * $vertical-height;
+
+    @include media-breakpoint-down(md) {
+      padding: 0;
+    }
+  }
+
+  @include media-breakpoint-up(lg) {
+    margin-top: -2 * $vertical-height;
   }
 }
 
-.primary-edit-bike-form {
-  // On bike pages, per page header is hidden except on large screens
-  // It's  always visible on user edit
-  .form-well-form-header {
-    display: none;
-
-    // Hidden on sm screens, shown via mediaquery
-    @include media-breakpoint-up(lg) {
-      margin-top: -2 * $vertical-height;
-    }
-
-    @include media-breakpoint-up(md) {
-      display: block;
-    }
+// On bike pages, per page header is generally hidden except on large screens
+// It's  always visible on user edit
+.form-well-form-header {
+  display: none;
+  // Hidden on sm screens, shown via mediaquery
+  @include media-breakpoint-up(md) {
+    display: block;
   }
 }

@@ -4,7 +4,7 @@
       = render partial: '/bikes/edit_primary_menu'
       .col-md-8.form-well
         .form-wrap
-          .form-well-form-header
+          .form-well-form-header-always-visible
             %h3
               Wheels
 
@@ -54,7 +54,7 @@
                   Wide
 
         .form-wrap.secondary-form-wrap#edit_drivetrain
-          .form-well-form-header
+          .form-well-form-header-always-visible
             %h3
               Drivetrain
           - rear_fixed = RearGearType.fixed.id
