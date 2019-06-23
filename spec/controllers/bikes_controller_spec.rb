@@ -997,6 +997,15 @@ RSpec.describe BikesController, type: :controller do
               expect(response).to render_template "edit_theft_details"
             end
           end
+          context "unknown template" do
+            it "renders the bike_details template" do
+              get :edit, id: bike.id, page: "root_party"
+              expect(response.status).to eq(200)
+              expect(assigns(:edit_template)).to eq "bike_details"
+              expect(assigns(:edit_templates)).to eq non_stolen_edit_templates.as_json
+              expect(response).to render_template "edit_bike_details"
+            end
+          end
         end
         # Grab all the template keys from the controller so we can test that we
         # render all of them Both to ensure we get all of them and because we
