@@ -32,7 +32,7 @@ function BinxAdmin() {
         this.setCharacterCount();
         this.characterCounter();
       }
-      if ($("#change_published_date").length > 0) {
+      if ($("#new_public_image").length > 0) {
         const binxAdminBlogs = BinxAdminBlogs();
         binxAdminBlogs.init();
       }
