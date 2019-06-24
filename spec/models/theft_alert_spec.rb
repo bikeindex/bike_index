@@ -21,6 +21,16 @@ RSpec.describe TheftAlert, type: :model do
     end
   end
 
+  describe "recovered bike" do
+    let(:stolen_record) { FactoryBot.create(:stolen_record_recovered) }
+    let(:bike) { stolen_record.bike }
+    let!(:theft_alert) { FactoryBot.create(:theft_alert, stolen_record: stolen_record) }
+    it "returns the bike" do
+      expect(theft_alert.stolen_record).to eq stolen_record
+      expect(theft_alert.recovered?).to be_truthy
+    end
+  end
+
   describe "#begin!" do
     context "given no facebook post url" do
       it "rejects the update, sets an error" do
