@@ -1,8 +1,7 @@
 class TheftAlert < ActiveRecord::Base
   enum status: { pending: 0, active: 1, inactive: 2 }.freeze
 
-  validates :stolen_record,
-            :theft_alert_plan,
+  validates :theft_alert_plan,
             :status,
             :creator,
             presence: true
@@ -17,7 +16,15 @@ class TheftAlert < ActiveRecord::Base
   scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
 
-  delegate :bike, to: :stolen_record, allow_nil: true
+  # Override because of recovered bikes not being in default scope
+  def stolen_record
+    return nil unless stolen_record_id.present?
+    StolenRecord.unscoped.find_by_id(stolen_record_id)
+  end
+
+  def bike; stolen_record&.bike end
+
+  def recovered?; stolen_record&.recovered? end
 
   def begin!(facebook_post_url:, notes:)
     start_time = Time.current
