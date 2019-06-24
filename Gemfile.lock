@@ -334,7 +334,6 @@ GEM
     notiffany (0.1.1)
       nenv (~> 0.1)
       shellany (~> 0.0)
-    oauth (0.5.4)
     oauth2 (1.4.1)
       faraday (>= 0.8, < 0.16.0)
       jwt (>= 1.0, < 3.0)
@@ -346,12 +345,10 @@ GEM
       rack (>= 1.6.2, < 3)
     omniauth-facebook (4.0.0)
       omniauth-oauth2 (~> 1.2)
-    omniauth-globalid (0.0.2)
-      omniauth-oauth (~> 1.1)
+    omniauth-globalid (0.0.4)
+      omniauth (~> 1.2)
+      omniauth-oauth2 (~> 1.1)
       rack
-    omniauth-oauth (1.1.0)
-      oauth
-      omniauth (~> 1.0)
     omniauth-oauth2 (1.4.0)
       oauth2 (~> 1.0)
       omniauth (~> 1.2)
