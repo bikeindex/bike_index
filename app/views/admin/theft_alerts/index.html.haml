@@ -24,6 +24,8 @@
           %td
             - if alert.bike.present?
               = link_to alert.bike.id, edit_admin_bike_path(alert.bike)
+            - if alert.bike_recovered?
+              #{alert.bike.type} recovered
           %td
             = link_to alert.creator.email, edit_admin_user_path(alert.creator.email)
           %td
