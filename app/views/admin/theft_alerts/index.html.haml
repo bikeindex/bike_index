@@ -22,7 +22,8 @@
             = link_to edit_admin_theft_alert_path(alert) do
               .convertTime= l(alert.created_at, format: :convert_time)
           %td
-            = link_to alert.bike.id, edit_admin_bike_path(alert.bike)
+            - if alert.bike.present?
+              = link_to alert.bike.id, edit_admin_bike_path(alert.bike)
           %td
             = link_to alert.creator.email, edit_admin_user_path(alert.creator.email)
           %td
