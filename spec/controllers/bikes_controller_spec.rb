@@ -895,8 +895,8 @@ RSpec.describe BikesController, type: :controller do
     let(:theft_templates) do
       {
         theft_details: "Theft details",
-        publicize: "Publicize Theft",
-        alert: "Activate Bike Index Alert",
+        publicize: "Share on Social Media",
+        alert: "Create Premium Stolen Bike Alert",
         report_recovered: "Mark this Bike Recovered",
       }
     end
