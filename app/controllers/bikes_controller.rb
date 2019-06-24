@@ -227,7 +227,7 @@ class BikesController < ApplicationController
     when requested_page.blank?
       result[:is_valid] = true
       result[:template] = default_page.to_s
-    when edit_templates.has_key?(requested_page), :alert_purchase
+    when edit_templates.has_key?(requested_page), requested_page == :alert_purchase
       result[:is_valid] = true
       result[:template] = requested_page.to_s
     else
