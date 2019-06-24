@@ -19,4 +19,4 @@
           %td= task.title
           %td= task.description_html.html_safe
           %td
-            %span = link_to "Edit", edit_admin_ambassador_task_path(task)
+            = link_to "Edit", edit_admin_ambassador_task_path(task)
