@@ -42,25 +42,4 @@
           %td
             = link_to "link", alert.facebook_post_url, target: "_blank" if alert.facebook_post_url.present?
 
-          %td
-            - case alert.status
-            - when "pending"
-              = form_tag edit_admin_theft_alert_path(alert), method: :get do |f|
-                = hidden_field_tag :state_transition, "begin"
-                = submit_tag "Begin Alert", class: "btn btn-success p-1"
-            - when "active"
-              = form_for alert,
-                url: admin_theft_alert_path(alert),
-                method: :patch do |f|
-                = hidden_field_tag :state_transition, "end"
-                = f.hidden_field :status
-                = submit_tag "End Alert", class: "btn btn-danger p-1", data: { confirm: "Are you sure?" }
-            - when "inactive"
-              = form_for alert,
-                url: admin_theft_alert_path(alert),
-                method: :patch do |f|
-                = hidden_field_tag :state_transition, "reset"
-                = f.hidden_field :status
-                = submit_tag "Reset Alert", class: "btn btn-warning p-1", data: { confirm: "Are you sure?" }
-
 = paginate @theft_alerts, views_prefix: "admin"
