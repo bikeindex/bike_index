@@ -2079,7 +2079,8 @@ CREATE TABLE public.theft_alerts (
     begin_at timestamp without time zone,
     end_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    notes text
 );
 
 
@@ -4426,4 +4427,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190617193255');
 INSERT INTO schema_migrations (version) VALUES ('20190620203854');
 
 INSERT INTO schema_migrations (version) VALUES ('20190621183811');
+
+INSERT INTO schema_migrations (version) VALUES ('20190624171627');
 

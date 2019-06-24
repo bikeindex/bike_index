@@ -13,14 +13,6 @@ class Admin::TheftAlertsController < Admin::BaseController
 
   def edit
     @theft_alert = TheftAlert.find(params[:id])
-
-    case state_transition
-    when "begin"
-      render :edit
-    else
-      flash[:error] = "Invalid state transition."
-      redirect_to admin_theft_alerts_path
-    end
   end
 
   def update
@@ -45,7 +37,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   private
 
   def theft_alert_params
-    params.require(:theft_alert).permit(:facebook_post_url)
+    params.require(:theft_alert).permit(:facebook_post_url, :notes)
   end
 
   def state_transition
