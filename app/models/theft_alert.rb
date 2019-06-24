@@ -19,7 +19,7 @@ class TheftAlert < ActiveRecord::Base
 
   delegate :bike, to: :stolen_record, allow_nil: true
 
-  def begin!(facebook_post_url:)
+  def begin!(facebook_post_url:, notes:)
     start_time = Time.current
     end_time = start_time + theft_alert_plan&.duration_days&.days
 
@@ -28,6 +28,16 @@ class TheftAlert < ActiveRecord::Base
       facebook_post_url: facebook_post_url,
       begin_at: start_time,
       end_at: end_time.end_of_day,
+      notes: notes,
+    }
+    update(attrs) if valid_state?(attrs)
+  end
+
+  def update_details!(facebook_post_url:, notes:)
+    attrs = {
+      status: self.status,
+      facebook_post_url: facebook_post_url,
+      notes: notes,
     }
     update(attrs) if valid_state?(attrs)
   end
@@ -56,10 +66,10 @@ class TheftAlert < ActiveRecord::Base
 
   # Ensure fields have expected values for the target state's status
   def valid_state?(target_state)
-    status = target_state[:status]
-    begin_at = target_state[:begin_at]
-    end_at = target_state[:end_at]
-    facebook_post_url = target_state[:facebook_post_url]
+    status = target_state.fetch(:status, self.status)
+    begin_at = target_state.fetch(:begin_at, self.begin_at)
+    end_at = target_state.fetch(:end_at, self.end_at)
+    facebook_post_url = target_state.fetch(:facebook_post_url, self.facebook_post_url)
 
     case status
     when "pending"
