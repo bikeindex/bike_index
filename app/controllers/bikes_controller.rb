@@ -221,13 +221,14 @@ class BikesController < ApplicationController
   # Return a Hash with keys :is_valid (boolean), :template (string)
   def target_edit_template(requested_page:)
     result = {}
+    valid_pages = [*edit_templates.keys, "alert_purchase"]
     default_page = @bike.stolen? ? :theft_details : :bike_details
 
     case
     when requested_page.blank?
       result[:is_valid] = true
       result[:template] = default_page.to_s
-    when edit_templates.has_key?(requested_page), :alert_purchase
+    when requested_page.in?(valid_pages)
       result[:is_valid] = true
       result[:template] = requested_page.to_s
     else
