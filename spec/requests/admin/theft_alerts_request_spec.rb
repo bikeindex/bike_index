@@ -25,13 +25,14 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
       end
 
       context "given no state transition param" do
-        it "redirects to the theft alert index page" do
+        it "defaults to the update_details transition" do
           alert = FactoryBot.create(:theft_alert)
 
           get "/admin/theft_alerts/#{alert.id}/edit"
 
-          expect(response).to redirect_to(admin_theft_alerts_path)
-          expect(flash[:error]).to match(/invalid state/i)
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:edit)
+          expect(response.body).to include("update_detail")
         end
       end
     end
@@ -43,11 +44,16 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
 
         patch "/admin/theft_alerts/#{alert.id}",
               state_transition: "begin",
-              theft_alert: { facebook_post_url: "https://facebook.com/example/post/1" }
+              theft_alert: {
+                facebook_post_url: "https://facebook.com/example/post/1",
+                notes: "Some notes",
+              }
 
         expect(response).to redirect_to(admin_theft_alerts_path)
         expect(flash[:errors]).to be_blank
         expect(alert.reload.status).to eq("active")
+        expect(alert.facebook_post_url).to eq("https://facebook.com/example/post/1")
+        expect(alert.notes).to eq("Some notes")
 
         patch "/admin/theft_alerts/#{alert.id}",
               state_transition: "end",

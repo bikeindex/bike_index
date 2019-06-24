@@ -4,6 +4,7 @@ FactoryBot.define do
     theft_alert_plan { FactoryBot.create(:theft_alert_plan) }
     creator { FactoryBot.create(:user_confirmed) }
     status { "pending" }
+    notes { nil }
 
     trait :paid do
       payment { FactoryBot.create(:payment, user: creator) }

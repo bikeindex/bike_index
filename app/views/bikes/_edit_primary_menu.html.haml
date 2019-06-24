@@ -10,7 +10,7 @@
           %a{ href: edit_bike_path(page: template), class: is_active }
             %h4= description
 
-  %h3.nav-group-header Bike Details
+  %h3.nav-group-header #{@bike.type} Details
   %ul
     - @bike_templates.each do |template, description|
       %li{ class: "edit-menu-#{template}" }
