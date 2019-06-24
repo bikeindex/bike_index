@@ -6,7 +6,7 @@
     url: admin_theft_alert_path(@theft_alert),
     method: :patch,
     html: { class: "m-0" } do |f|
-    = hidden_field_tag :state_transition, "begin"
+    = hidden_field_tag :state_transition, params.fetch(:state_transition, "update_details")
     .form-group
       = f.label :facebook_post_url, class: "form-label"
       = f.text_field :facebook_post_url, class: "form-control"

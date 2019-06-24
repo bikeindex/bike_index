@@ -43,11 +43,16 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
 
         patch "/admin/theft_alerts/#{alert.id}",
               state_transition: "begin",
-              theft_alert: { facebook_post_url: "https://facebook.com/example/post/1" }
+              theft_alert: {
+                facebook_post_url: "https://facebook.com/example/post/1",
+                notes: "Some notes",
+              }
 
         expect(response).to redirect_to(admin_theft_alerts_path)
         expect(flash[:errors]).to be_blank
         expect(alert.reload.status).to eq("active")
+        expect(alert.facebook_post_url).to eq("https://facebook.com/example/post/1")
+        expect(alert.notes).to eq("Some notes")
 
         patch "/admin/theft_alerts/#{alert.id}",
               state_transition: "end",

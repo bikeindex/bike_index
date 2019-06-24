@@ -20,12 +20,13 @@ RSpec.describe TheftAlert, type: :model do
       end
     end
   end
+
   describe "#begin!" do
     context "given no facebook post url" do
       it "rejects the update, sets an error" do
         theft_alert = FactoryBot.create(:theft_alert)
 
-        theft_alert.begin!(facebook_post_url: "")
+        theft_alert.begin!(facebook_post_url: "", notes: "")
 
         expect(theft_alert.reload.status).to eq("pending")
         expect(theft_alert.begin_at).to eq(nil)
@@ -40,12 +41,25 @@ RSpec.describe TheftAlert, type: :model do
         duration = theft_alert.theft_alert_plan.duration_days
         now = Time.current
 
-        theft_alert.begin!(facebook_post_url: "https://facebook.com")
+        theft_alert.begin!(facebook_post_url: "https://facebook.com", notes: "")
 
         expect(theft_alert.begin_at).to be_within(5.seconds).of(now)
         expect(theft_alert.end_at).to eq(now.end_of_day + duration.days)
         expect(theft_alert.status).to eq("active")
       end
+    end
+  end
+
+  describe "#update_details!" do
+    it "updates permitted fields, leaving status, alert timestamps unchanged" do
+      theft_alert = FactoryBot.create(:theft_alert_begun)
+
+      theft_alert.update_details!(facebook_post_url: "a url", notes: "a note")
+
+      expect(theft_alert.errors.to_a).to be_empty
+      expect(theft_alert.facebook_post_url).to eq("a url")
+      expect(theft_alert.notes).to eq("a note")
+      expect(theft_alert.status).to eq("active")
     end
   end
 
