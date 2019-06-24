@@ -1015,7 +1015,7 @@ RSpec.describe BikesController, type: :controller do
           context "with query param ?page=#{template}" do
             it "renders the #{template} template" do
               get :edit, id: bike.id, page: template
-              expect(response).to be_success
+              expect(response.status).to eq(200)
               expect(response).to render_template("edit_#{template}")
               expect(assigns(:edit_template)).to eq(template)
               expect(assigns(:private_images)).to eq([]) if template == "photos"
