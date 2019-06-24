@@ -7,7 +7,7 @@
     target: "_blank"
 
 %h4{style: "margin-top: 1em;"}
-  = link_to "Plan: #{@theft_alert_plan.name} (#{@theft_alert_plan.duration_days} days)",
+  = link_to "Plan: #{@theft_alert_plan.title_string}",
     edit_admin_theft_alert_plan_url(@theft_alert_plan),
     target: "_blank"
 

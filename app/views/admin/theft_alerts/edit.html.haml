@@ -11,7 +11,7 @@
       = f.select :status, options_for_select(TheftAlert.statuses.keys), class: "form-control"
     .form-group
       = f.label :theft_alert_plan_id, class: "form-label"
-      = f.select :theft_alert_plan_id, options_for_select(TheftAlertPlan.active.pluck(:name, :id)), class: "form-control"
+      = f.select :theft_alert_plan_id, options_for_select(TheftAlertPlan.active.map{|e| [e.title_string, e.id]}), class: "form-control"
     .form-group
       = f.label :begin_at, class: "form-label"
       = f.datetime_select :begin_at, include_blank: true, class: "form-control"

@@ -14,6 +14,7 @@
         %th Start
         %th End
         %th Facebook post
+        %th
     %tbody
       - @theft_alerts.each do |alert|
         %tr
@@ -29,7 +30,7 @@
             = link_to alert.creator.email, edit_admin_user_path(alert.creator.email)
           %td
             - plan = alert.theft_alert_plan
-            = link_to "#{plan.name} (#{plan.duration_days} days)", edit_admin_theft_alert_plan_path(plan)
+            = link_to plan.title_string, edit_admin_theft_alert_plan_path(plan)
           %td
             = link_to alert.status, edit_admin_theft_alert_path(alert)
           %td
@@ -40,5 +41,7 @@
               .convertTime= l(alert.end_at, format: :convert_time) if alert.end_at.present?
           %td
             = link_to "link", alert.facebook_post_url, target: "_blank" if alert.facebook_post_url.present?
+          %td
+            = link_to "Update", edit_admin_theft_alert_path(alert), class: "btn btn-info p-1"
 
 = paginate @theft_alerts, views_prefix: "admin"
