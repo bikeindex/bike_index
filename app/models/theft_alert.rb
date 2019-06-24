@@ -16,7 +16,7 @@ class TheftAlert < ActiveRecord::Base
   scope :should_expire, -> { active.where('"theft_alerts"."end_at" <= ?', Time.current) }
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
 
-  # Override because of recovered bikes being hidden
+  # Override because of recovered bikes not being in default scope
   def stolen_record
     return nil unless stolen_record_id.present?
     StolenRecord.unscoped.find_by_id(stolen_record_id)
