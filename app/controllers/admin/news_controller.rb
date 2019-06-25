@@ -9,7 +9,6 @@ class Admin::NewsController < Admin::BaseController
 
   def new
     @blog = Blog.new(published_at: Time.current, user_id: current_user.id)
-    render layout: "new_admin"
   end
 
   def image_edit
