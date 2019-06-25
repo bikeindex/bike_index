@@ -1,13 +1,13 @@
 class Admin::PaymentsController < Admin::BaseController
   include SortableTable
   before_filter :find_payment, only: %i[edit update]
+  layout "new_admin"
 
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
     @payments = Payment.includes(:user, :organization, :invoice)
                        .order(sort_column + " " + sort_direction).page(page).per(per_page)
-    render layout: "new_admin"
   end
 
   def new
@@ -18,7 +18,8 @@ class Admin::PaymentsController < Admin::BaseController
     redirect_to edit_admin_payment_url
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if valid_invoice_parameters?
