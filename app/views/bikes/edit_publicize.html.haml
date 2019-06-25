@@ -6,13 +6,14 @@
       = render partial: "/bikes/edit_primary_menu", locals: { is_disabled: true }
 
       .col-md-8.form-well#form_well_wrap
-        .form-wrap.stolen-checklist-wrap
-          .form-well-form-header-always-visible
-            %h3.header-font-alt
-              Do these things for the best chance of recovery!
-          = render partial: "/bikes/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record }
+        - if @bike.current_stolen_record&.display_checklist?
+          .form-wrap.stolen-checklist-wrap
+            .form-well-form-header-always-visible
+              %h3.header-font-alt
+                Do these things for the best chance of recovery!
+            = render partial: "/bikes/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record }
 
-        .form-wrap{ class: @bike.current_stolen_record.display_checklist? ? "secondary-form-wrap" : "" }
+        .form-wrap{ class: @bike.current_stolen_record&.display_checklist? ? "secondary-form-wrap" : "" }
           .form-well-form-header
             / Publicize Theft
             %h3= @edit_templates[@edit_template]

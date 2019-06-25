@@ -11,6 +11,12 @@
             / Activate Bike Index Alert
             %h3.text-center.w-100
               = @edit_templates[@edit_template]
+          .row
+            .col-sm-12
+              %p
+                We've found targeted sharing on social media to have a <em>huge</em> effect on recovering stolen bikes.
+              %p
+                Bike Index can help by purchasing targeted ads on Facebook to spread the word about your stolen #{@bike.type}.
 
           = form_tag edit_bike_url(@bike), method: :get, id: "js-select-plan-form" do
             = hidden_field_tag :page, :alert_purchase
