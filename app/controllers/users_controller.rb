@@ -2,13 +2,15 @@ class UsersController < ApplicationController
   layout "application_revised"
   include Sessionable
   before_action :authenticate_user, only: [:edit]
-  before_action :skip_if_signed_in, only: [:new]
+  before_action :skip_if_signed_in, only: [:new, :globalid]
   before_action :assign_edit_template, only: [:edit, :update]
 
   def new
     @user ||= User.new(email: params[:email])
     render_partner_or_default_signin_layout
   end
+
+  def globalid; end
 
   def create
     @user = User.new(permitted_parameters)
