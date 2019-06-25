@@ -22,7 +22,6 @@ class Admin::NewsController < Admin::BaseController
   end
 
   def edit
-    render layout: "new_admin"
   end
 
   def update
