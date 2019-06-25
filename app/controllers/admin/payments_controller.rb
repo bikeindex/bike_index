@@ -1,7 +1,7 @@
 class Admin::PaymentsController < Admin::BaseController
   include SortableTable
   before_filter :find_payment, only: %i[edit update]
-  layout: "new_admin"
+  layout "new_admin"
 
   def index
     page = params[:page] || 1
