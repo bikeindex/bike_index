@@ -16,8 +16,11 @@
         = f.label :created_at, "Time of payment"
         = f.datetime_local_field :created_at, max: Time.current + 1.week, step: 60, required: true, class: 'form-control'
     .col-md-6
-      .form-group
-        = f.label :amount
+      = f.label :amount
+      .input-group
+        .input-group-prepend
+          %span.input-group-text
+            $
         = f.number_field :amount, step: 1, min: 0, class: "form-control"
     .col-md-6
       .form-group
