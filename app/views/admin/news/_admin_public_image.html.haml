@@ -4,7 +4,7 @@
     .card-body
       .row
         .col-md-1
-          %img{:src => "\#{public_image.image_url}"}/
+          %img{src: "#{public_image.image_url}"}
         .col-md-1
           = image_tag(public_image.image_url(:small)) if public_image.image?
           %p= public_image.name.truncate(18)
@@ -21,7 +21,7 @@
             %p.mt-4
               %span Copy the above text and paste it where you'd like it to appear in the post
               = link_to "Delete image", public_image_url(public_image, return_url: edit_admin_news_url(@blog)), method: :delete, class: "btn btn-danger float-right"
-        .col-md-1
-          - unless skip_order
+        - unless skip_order
+          .col-md-1
             .index-image-select
               %input{:class => "index_image_#{public_image.id}", :name => "index_image_id", :type => "radio", :value => "#{public_image.id}"}/
