@@ -28,14 +28,10 @@
   </p>
 <% end %>
 
-<h2 style="font-weight: 400; text-align: center; padding-top: .5em; margin: 1em 0;font-size: 30px;">Next Steps</h2>
-<div class="wrap" style="border: 1px solid #dfe3ee;border-radius: 4px;padding: 10px 5px;background: #f7f7f7; margin-bottom: 10px;">
-  <h2 style="font-family: helvetica;font-size: 28px;text-align: center;margin: .5em 0 .7em; font-weight: 400;">Spread the word!</h2>
-  <a href="http://www.facebook.com/share.php?u=<%= bike_url(@bike) %>" style="display: block;background: #dfe3ee;position: relative;border-radius: 4px;font-family: helvetica;height: 50px;">
-    <img src="https://files.bikeindex.org/facebook.png" style="height: 50px;width: 50px;display: block;float: left;">
-    <span class="text" style="display: block;text-align: center;margin-top: .5em;line-height: 1.2em;padding: 1em 1em 0;">Share on Facebook - so everyone knows to watch out for your <%= @bike.type %>!</span>
-  </a>
-</div>
+<h3 style="margin: 2rem 0 1rem">Improve your chances of recovery by doing all these things!</h3>
+<%= render partial: "/bikes/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record } %>
+<hr>
+
 <p style="margin: 50px 0 0; padding: 20px 0 0; font-weight: 400; color: #95A5A5; text-align: center;">This email is about the <%= stolen_word %> <%= @biketype %> registered on Bike Index on <%= @bike.created_at.strftime("%m.%d.%y") %></p>
 
 <%= render partial: '/shared/email_bike_box', locals: { bike_url: bike_url(@bike) } %>

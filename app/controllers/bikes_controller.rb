@@ -173,7 +173,7 @@ class BikesController < ApplicationController
       @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc
       @selected_theft_alert_plan =
         @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
-        @theft_alert_plans.max_by(&:amount_cents)
+        @theft_alert_plans.min_by(&:amount_cents)
       @theft_alerts =
         @bike
           .current_stolen_record
@@ -247,7 +247,7 @@ class BikesController < ApplicationController
       h[:theft_details] = "Recovery details" if @bike.recovered?
       h[:theft_details] = "Theft details" unless @bike.recovered?
       h[:publicize] = "Share on Social Media"
-      h[:alert] = "Create Premium Stolen Bike Alert" if Flipper.enabled?(:premium_listings, current_user)
+      h[:alert] = "Activate Premium Alert" if Flipper.enabled?(:premium_listings, current_user)
       h[:report_recovered] = "Mark this Bike Recovered" unless @bike.recovered?
     end
   end

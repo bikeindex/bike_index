@@ -1,0 +1,43 @@
+.stolen-checklist-wrap {
+  padding-bottom: 0;
+  ul {
+    margin: 0;
+    padding: 0;
+    display: block;
+    list-style-type: none;
+  }
+  li {
+    display: block;
+    padding: 0 0 0 2rem;
+    margin: 0 0 0.25rem;
+    position: relative;
+
+    .checklist-checkbox {
+      display: block;
+      position: absolute;
+      background: #fff;
+      left: 0.25em;
+      top: 0.25em;
+      border: 2px solid #919197;
+      border-radius: 50%;
+      min-width: 1.5em;
+      min-height: 1.5em;
+      vertical-align: middle;
+      line-height: 1;
+      padding: 0.1em;
+    }
+    &.completed-item {
+      text-decoration: line-through;
+      opacity: 0.75;
+      .checklist-checkbox {
+        color: #919197;
+        font-family: "zp-icons";
+        font-style: normal;
+        font-variant: normal;
+        font-weight: normal;
+        text-rendering: optimizeLegibility;
+        text-transform: none;
+      }
+    }
+  }
+}
