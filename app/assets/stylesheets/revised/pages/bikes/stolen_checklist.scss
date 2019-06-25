@@ -1,45 +1,43 @@
-.edit-bike-page-publicize {
-  .description {
-    padding: 0 12px;
+.stolen-checklist-wrap {
+  ul {
+    margin: 0;
+    padding: 0;
+    display: block;
+    list-style-type: none;
+  }
+  li {
+    display: block;
+    padding: 0 0 0 2rem;
+    margin: 0;
+    position: relative;
+
+    &:before {
+      display: block;
+      position: absolute;
+      background: #fff;
+      left: 0.5rem;
+      top: 0.5rem;
+      border: 2px solid #919197;
+      border-radius: 50%;
+      content: "";
+      min-width: 1.2em;
+      min-height: 1.2em;
+      vertical-align: middle;
+      line-height: 1;
+      padding: 0.1em;
+    }
   }
 
-  .btn-share {
-    display: block;
-    margin: 10px;
-    text-align: center;
-
-    a {
-      padding: 0;
-      text-decoration: none;
-    }
-
-    .link-social {
-      display: block;
-      height: 75px;
-    }
-
-    img {
-      height: 50px;
-      width: 50px;
-    }
-
-    .share-social {
-      display: block;
-      font-family: helvetica;
-      text-align: center;
-      text-transform: none;
-    }
-
-    .share-facebook {
-      margin-left: 10px;
-    }
-
-    .twitter-share-button {
-      display: block;
-      float: none;
-      margin: auto;
-      position: relative;
-      text-align: center;
-    }
+  li.completed-item:before {
+    // background-color: #3498db;
+    // border-color: #ffffff;
+    color: #919197;
+    content: "\2713";
+    font-family: "zp-icons";
+    font-style: normal;
+    font-variant: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+    text-transform: none;
   }
 }
