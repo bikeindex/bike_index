@@ -5,29 +5,57 @@
         Do these things for the best chance of recovery!
     %ul
       %li.completed-item
+        %span.checklist-checkbox
+          &check;
         List #{@bike.type} on Bike Index
-      %li{ class: stolen_record.street.present? ? "completed-item" : "" }
+
+      - street_present = stolen_record.street.present?
+      %li{ class: street_present ? "completed-item" : "" }
+        %span.checklist-checkbox
+          = street_present ? "&check;".html_safe : ""
         Report theft on Bike Index, including
         = link_to "location where the theft occurred", edit_bike_path(id: @bike.to_param, page: "theft_details")
-      %li{ class: @bike.public_images.any? ? "completed-item" : "" }
+
+      - images_present = @bike.public_images.any?
+      %li{ class:  images_present ? "completed-item" : "" }
+        %span.checklist-checkbox
+          = images_present ? "&check;".html_safe : ""
         Add
         = link_to "a photo of your #{@bike.type}", edit_bike_path(id: @bike.to_param, page: "photos")
-      %li{ class: stolen_record.police_report_number.present? ? "completed-item" : "" }
+
+      - police_report_present = stolen_record.police_report_number.present?
+      %li{ class: police_report_present ? "completed-item" : "" }
+        %span.checklist-checkbox
+          = police_report_present ? "&check;".html_safe : ""
         Add
         = link_to "a Police Report Number", edit_bike_path(id: @bike.to_param, page: "theft_details")
         to your theft report
         %ul
-          %li{ class: stolen_record.police_report_number.present? ? "completed-item" : "" }
+          %li{ class: police_report_present ? "completed-item" : "" }
+            %span.checklist-checkbox
+              = police_report_present ? "&check;".html_safe : ""
             Push bike info to
             = link_to "LEADSonline", "https://bikeindex.org/news/bike-index-partners-with-leads-online"
             (Bike Index does this when you enter your police report number)
-          %li{ class: stolen_record.police_report_number.present? ? "completed-item" : "" }
+          %li{ class: police_report_present ? "completed-item" : "" }
+            %span.checklist-checkbox
+              = police_report_present ? "&check;".html_safe : ""
             Push bike info to law enforcement databases (Bike Index does this when you enter your police report number)
-      %li{ class: stolen_record.approved ? "completed-item" : "" }
+
+      - approved = stolen_record.approved
+      %li{ class: approved ? "completed-item" : "" }
+        %span.checklist-checkbox
+          = approved ? "&check;".html_safe : ""
         Share on Twitter (Bike Index will do this once we review your listing)
+
       %li
+        %span.checklist-checkbox
         = link_to "Share widely on your personal social media", edit_bike_path(id: @bike.to_param, page: "publicize")
         (Facebook, Instagram, etc)
-      %li{ class: stolen_record.theft_alerts.any? ? "completed-item" : "" }
+
+      - theft_alert_purchased = stolen_record.theft_alerts.any?
+      %li{ class: theft_alert_purchased ? "completed-item" : "" }
+        %span.checklist-checkbox
+          = theft_alert_purchased ? "&check;".html_safe : ""
         Supercharge sharing on Facebook with Bike Index
         = link_to "Premium Stolen Bike Alerts", edit_bike_path(id: @bike.to_param, page: "alert")
