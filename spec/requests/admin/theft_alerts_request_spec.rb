@@ -5,6 +5,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
     include_context :request_spec_logged_in_as_superuser
 
     describe "GET /admin/theft_alerts" do
+      let!(:theft_alert) { FactoryBot.create(:theft_alert) }
       it "responds with 200 OK and renders the index template" do
         get "/admin/theft_alerts"
         expect(response).to be_ok
