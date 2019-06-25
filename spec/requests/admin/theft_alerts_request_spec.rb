@@ -64,6 +64,28 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         expect(alert.end_at).to be_within(2.seconds).of(Time.current + 7.days)
       end
 
+      it "does not set alert timestamps when updating a pending alert" do
+        alert = FactoryBot.create(:theft_alert)
+        expect(alert.status).to eq("pending")
+        expect(alert.notes).to be_nil
+        expect(alert.begin_at).to be_nil
+        expect(alert.end_at).to be_nil
+
+        patch "/admin/theft_alerts/#{alert.id}",
+              theft_alert: {
+                status: "pending",
+                facebook_post_url: "https://facebook.com/example/post/1",
+                theft_alert_plan_id: alert.theft_alert_plan.id,
+                notes: "updated note",
+              }
+
+        expect(response).to redirect_to(admin_theft_alerts_path)
+        expect(alert.reload.status).to eq("pending")
+        expect(alert.notes).to eq("updated note")
+        expect(alert.begin_at).to be_nil
+        expect(alert.end_at).to be_nil
+      end
+
       it "does not overwrite submitted timestamps when updating a non-pending alert" do
         alert = FactoryBot.create(:theft_alert_begun)
         now = Time.current
