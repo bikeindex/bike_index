@@ -12,13 +12,16 @@ class Admin::PaymentsController < Admin::BaseController
 
   def new
     @payment = Payment.new
+    render layout: "new_admin"
   end
 
   def show
     redirect_to edit_admin_payment_url
   end
 
-  def edit; end
+  def edit
+    render layout: "new_admin"
+  end
 
   def update
     if valid_invoice_parameters?
