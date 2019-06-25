@@ -1,18 +1,17 @@
 class Admin::PaymentsController < Admin::BaseController
   include SortableTable
   before_filter :find_payment, only: %i[edit update]
+  layout: "new_admin"
 
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
     @payments = Payment.includes(:user, :organization, :invoice)
                        .order(sort_column + " " + sort_direction).page(page).per(per_page)
-    render layout: "new_admin"
   end
 
   def new
     @payment = Payment.new
-    render layout: "new_admin"
   end
 
   def show
@@ -20,7 +19,6 @@ class Admin::PaymentsController < Admin::BaseController
   end
 
   def edit
-    render layout: "new_admin"
   end
 
   def update
