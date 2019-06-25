@@ -16,23 +16,12 @@ class Admin::TheftAlertsController < Admin::BaseController
   def edit; end
 
   def update
-    case state_transition
-    when "begin", "update_details"
-      @theft_alert.public_send(
-        "#{state_transition}!",
-        facebook_post_url: theft_alert_params[:facebook_post_url],
-        notes: theft_alert_params[:notes],
-      )
-    when "end", "reset"
-      @theft_alert.public_send("#{state_transition}!")
-    end
-
-    if @theft_alert.errors.present?
-      flash[:error] = @theft_alert.errors.to_a
-      redirect_to edit_admin_theft_alert_path(@theft_alert, params: { state_transition: state_transition })
-    else
+    if @theft_alert.update(set_alert_timestamps(theft_alert_params))
       flash[:success] = "Success!"
       redirect_to admin_theft_alerts_path
+    else
+      flash[:error] = @theft_alert.errors.to_a
+      render :edit
     end
   end
 
@@ -43,16 +32,35 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def theft_alert_params
-    params.require(:theft_alert).permit(:facebook_post_url, :notes)
+    params.require(:theft_alert).permit(
+      :begin_at,
+      :end_at,
+      :facebook_post_url,
+      :notes,
+      :status,
+      :theft_alert_plan_id
+    )
   end
 
-  def state_transition
-    return @state_transition if defined?(@state_transition)
+  def set_alert_timestamps(theft_alert_attrs)
+    currently_pending = @theft_alert.status == "pending"
+    transitioning_to_active = theft_alert_attrs[:status] == "active"
+    transitioning_to_pending = theft_alert_attrs[:status] == "pending"
 
-    valid_state_transitions = %w[begin end reset update_details]
-    state_transition = params[:state_transition]
-    return unless state_transition.in?(valid_state_transitions)
+    if currently_pending && transitioning_to_active
+      theft_alert_plan = TheftAlertPlan.find(theft_alert_attrs[:theft_alert_plan_id])
+      now = Time.current
+      theft_alert_attrs[:begin_at] = now
+      theft_alert_attrs[:end_at] = now + theft_alert_plan.duration_days.days
+    elsif transitioning_to_pending
+      theft_alert_attrs[:begin_at] = nil
+      theft_alert_attrs[:end_at] = nil
+    else
+      timezone = TimeParser.parse_timezone(params[:timezone])
+      theft_alert_attrs[:begin_at] = TimeParser.parse(theft_alert_attrs[:begin_at], timezone)
+      theft_alert_attrs[:end_at] = TimeParser.parse(theft_alert_attrs[:end_at], timezone)
+    end
 
-    @state_transition = state_transition
+    theft_alert_attrs
   end
 end

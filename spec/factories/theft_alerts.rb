@@ -12,17 +12,17 @@ FactoryBot.define do
 
     trait :begun do
       status { "active" }
-      begin_at { Time.current }
       sequence(:facebook_post_url) do |n|
         "https://facebook.com/user.#{creator.id}/posts/#{n}"
       end
+      begin_at { Time.current }
       end_at { begin_at + theft_alert_plan.duration_days.days }
     end
 
     trait :ended do
       status { "inactive" }
-      end_at { Time.current }
       begin_at { end_at - theft_alert_plan.duration_days.days }
+      end_at { Time.current }
     end
 
     factory :theft_alert_unpaid
