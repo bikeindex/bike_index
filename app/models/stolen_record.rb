@@ -64,7 +64,10 @@ class StolenRecord < ActiveRecord::Base
 
   def pre_recovering_user?; date_recovered.present? && date_recovered < self.class.recovering_user_recording_start end
 
-  def address_override_show_address; address(override_show_address: true) end
+  # Only display if they have put in an address - so that we don't show on initial creation
+  def display_checklist?; address.present? end
+
+  def address_override_show_address; address(skip_default_country: true) end
 
   def address(skip_default_country: false, override_show_address: false)
     country_string = country && country.iso

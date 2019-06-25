@@ -1,9 +1,10 @@
 require "rails_helper"
 
 RSpec.describe StolenRecord, type: :model do
-  it "marks current true by default" do
+  it "marks current true by default, display_checklist? false" do
     stolen_record = StolenRecord.new
     expect(stolen_record.current).to be_truthy
+    expect(stolen_record.display_checklist?).to be_falsey
   end
 
   describe "find_or_create_recovery_link_token" do
@@ -69,6 +70,7 @@ RSpec.describe StolenRecord, type: :model do
       expect(stolen_record.address(override_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
       stolen_record.show_address = true
       expect(stolen_record.address).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
+      expect(stolen_record.display_checklist?).to be_truthy
     end
     it "is ok with missing information" do
       stolen_record = StolenRecord.new(street: "2200 N Milwaukee Ave",

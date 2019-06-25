@@ -1,0 +1,33 @@
+- if stolen_record&.display_checklist?
+  .form-wrap.stolen-checklist-wrap
+    .form-well-form-header-always-visible
+      %h3.header-font-alt
+        Do these things for the best chance of recovery!
+    %ul
+      %li.completed-item
+        List #{@bike.type} on Bike Index
+      %li{ class: stolen_record.street.present? ? "completed-item" : "" }
+        Report theft on Bike Index, including
+        = link_to "location where the theft occurred", edit_bike_path(id: @bike.to_param, page: "theft_details")
+      %li{ class: @bike.public_images.any? ? "completed-item" : "" }
+        Add
+        = link_to "a photo of your #{@bike.type}", edit_bike_path(id: @bike.to_param, page: "photos")
+      %li{ class: stolen_record.police_report_number.present? ? "completed-item" : "" }
+        Add
+        = link_to "a Police Report Number", edit_bike_path(id: @bike.to_param, page: "theft_details")
+        to your theft report
+        %ul
+          %li{ class: stolen_record.police_report_number.present? ? "completed-item" : "" }
+            Push bike info to
+            = link_to "LEADSonline", "https://bikeindex.org/news/bike-index-partners-with-leads-online"
+            (Bike Index does this when you enter your police report number)
+          %li{ class: stolen_record.police_report_number.present? ? "completed-item" : "" }
+            Push bike info to law enforcement databases (Bike Index does this when you enter your police report number)
+      %li{ class: stolen_record.approved ? "completed-item" : "" }
+        Share on Twitter (Bike Index will do this once we review your listing)
+      %li
+        = link_to "Share widely on your personal social media", edit_bike_path(id: @bike.to_param, page: "publicize")
+        (Facebook, Instagram, etc)
+      %li{ class: stolen_record.theft_alerts.any? ? "completed-item" : "" }
+        Supercharge sharing on Facebook with our
+        = link_to "Premium Stolen Bike Alerts", edit_bike_path(id: @bike.to_param, page: "alert")

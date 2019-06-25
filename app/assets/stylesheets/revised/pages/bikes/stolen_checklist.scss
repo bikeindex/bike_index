@@ -1,0 +1,45 @@
+.edit-bike-page-publicize {
+  .description {
+    padding: 0 12px;
+  }
+
+  .btn-share {
+    display: block;
+    margin: 10px;
+    text-align: center;
+
+    a {
+      padding: 0;
+      text-decoration: none;
+    }
+
+    .link-social {
+      display: block;
+      height: 75px;
+    }
+
+    img {
+      height: 50px;
+      width: 50px;
+    }
+
+    .share-social {
+      display: block;
+      font-family: helvetica;
+      text-align: center;
+      text-transform: none;
+    }
+
+    .share-facebook {
+      margin-left: 10px;
+    }
+
+    .twitter-share-button {
+      display: block;
+      float: none;
+      margin: auto;
+      position: relative;
+      text-align: center;
+    }
+  }
+}
