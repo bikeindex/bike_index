@@ -20,12 +20,13 @@
         class: "form-control"
 
     - unless @theft_alert.pending?
+      = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
       .form-group
         = f.label :begin_at, class: "form-label"
-        = f.datetime_select :begin_at, include_blank: true, class: "form-control"
+        = f.datetime_local_field :begin_at, include_blank: true, class: "form-control"
       .form-group
         = f.label :end_at, class: "form-label"
-        = f.datetime_select :end_at, include_blank: true, class: "form-control"
+        = f.datetime_local_field :end_at, include_blank: true, class: "form-control"
 
     .form-group
       = f.label :facebook_post_url, class: "form-label"

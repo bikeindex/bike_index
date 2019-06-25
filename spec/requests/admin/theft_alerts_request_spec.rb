@@ -33,6 +33,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
               theft_alert: {
                 status: "active",
                 facebook_post_url: "https://facebook.com/example/post/1",
+                theft_alert_plan_id: alert.theft_alert_plan.id,
                 notes: "Some notes",
               }
 
@@ -44,11 +45,53 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         expect(alert.notes).to eq("Some notes")
       end
 
+      it "sets alert timestamps when beginning an alert" do
+        alert = FactoryBot.create(:theft_alert)
+        expect(alert.status).to eq("pending")
+        expect(alert.begin_at).to eq(nil)
+        expect(alert.end_at).to eq(nil)
+
+        patch "/admin/theft_alerts/#{alert.id}",
+              theft_alert: {
+                status: "active",
+                facebook_post_url: "https://facebook.com/example/post/1",
+                theft_alert_plan_id: alert.theft_alert_plan.id,
+              }
+
+        expect(response).to redirect_to(admin_theft_alerts_path)
+        expect(alert.reload.status).to eq("active")
+        expect(alert.begin_at).to be_within(2.seconds).of(Time.current)
+        expect(alert.end_at).to be_within(2.seconds).of(Time.current + 7.days)
+      end
+
+      it "does not overwrite submitted timestamps when updating a non-pending alert" do
+        alert = FactoryBot.create(:theft_alert_begun)
+        now = Time.current
+        expect(alert.status).to eq("active")
+
+        patch "/admin/theft_alerts/#{alert.id}",
+              theft_alert: {
+                status: "active",
+                facebook_post_url: "https://facebook.com/example/post/1",
+                theft_alert_plan_id: alert.theft_alert_plan.id,
+                begin_at: now,
+                end_at: now + 1.day,
+              }
+
+        expect(response).to redirect_to(admin_theft_alerts_path)
+        expect(alert.reload.status).to eq("active")
+        expect(alert.begin_at).to be_within(5.seconds).of(now)
+        expect(alert.end_at).to be_within(5.seconds).of(now + 1.day)
+      end
+
       it "renders the edit template on update failure" do
         alert = FactoryBot.create(:theft_alert, status: "pending")
 
         patch "/admin/theft_alerts/#{alert.id}",
-              theft_alert: { status: nil }
+              theft_alert: {
+                status: nil,
+                theft_alert_plan_id: alert.theft_alert_plan.id,
+              }
 
         expect(response.status).to eq(200)
         expect(flash[:success]).to be_blank
