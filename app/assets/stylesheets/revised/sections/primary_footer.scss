@@ -30,6 +30,13 @@ $primary-footer-top-margin: 6 * $vertical-height;
     }
   }
 
+  .locale-form {
+    font-size: 12px;
+    label {
+      margin-right: 5px;
+    }
+  }
+
   .primary-footer-nav {
     background: $gray-dark;
 
