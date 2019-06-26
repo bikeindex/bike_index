@@ -559,6 +559,24 @@ RSpec.describe UsersController, type: :controller do
       expect(user.reload.terms_of_service).to be_truthy
     end
 
+    it "updates the preferred_language if valid" do
+      expect(user.preferred_language).to eq(nil)
+      set_current_user(user)
+      patch :update, id: user.username, user: { preferred_language: "en" }
+      expect(flash[:success]).to match(/successfully updated/i)
+      expect(response).to redirect_to(my_account_url)
+      expect(user.reload.preferred_language).to eq("en")
+    end
+
+    it "does not update the preferred_language if invalid" do
+      expect(user.preferred_language).to eq(nil)
+      set_current_user(user)
+      patch :update, id: user.username, user: { preferred_language: "klingon" }
+      expect(flash[:success]).to be_blank
+      expect(response).to render_template(:edit)
+      expect(user.reload.preferred_language).to eq(nil)
+    end
+
     it "updates notification" do
       set_current_user(user)
       expect(user.notification_unstolen).to be_truthy # Because it's set to true by default

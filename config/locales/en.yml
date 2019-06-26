@@ -1,4 +1,6 @@
+---
 en:
+  language: English
   meta_titles:
     welcome_index: "Bike Index - Bike registration that works"
     welcome_goodbye: "Logged out"

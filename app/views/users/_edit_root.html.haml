@@ -50,6 +50,17 @@
     %label.form-well-label
     .form-well-input
       = f.text_field :zipcode, placeholder: "zipcode", class: "form-control"
+
+  - if Flipper.enabled?(:localization, current_user)
+    .form-group.row.fancy-select.unfancy
+      = f.label :country_id, class: "form-well-label" do
+        Preferred language
+      .form-well-input
+        = f.select(:preferred_language,
+        options_for_select(language_choices, selected: current_user.preferred_language),
+        { prompt: "Choose language", include_blank: true },
+        { class: "language-select-input form-control" } )
+
   .col-xs-12
     %p
       Have multiple emails? Consolidate them into one account here
