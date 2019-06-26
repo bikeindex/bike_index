@@ -151,8 +151,8 @@ group :development, :test do
   gem "pry-byebug"
   gem "pry-rails"
   gem "rb-fsevent", "~> 0.10.3"
-  gem "rspec", "~> 3.3.0"
-  gem "rspec-rails", "~> 3.3.0"
+  gem "rspec", "~> 3.4"
+  gem "rspec-rails", "~> 3.8"
   gem "rspec_junit_formatter" # For circle ci
   gem "rubocop", "~> 0.67", require: false
   gem "rubocop-daemon", "~> 0.3.1", require: false
