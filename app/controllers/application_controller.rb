@@ -67,6 +67,9 @@ class ApplicationController < ActionController::Base
   end
 
   def set_locale
+    # Prevent leaking of I18n.locale between requests
+    I18n.locale = I18n.default_locale
+
     return unless Flipper.enabled?(:localization, current_user)
     # TODO: Remove debug logging when feature flag is removed
 
