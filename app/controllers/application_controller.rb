@@ -68,6 +68,7 @@ class ApplicationController < ActionController::Base
 
   def set_locale
     return unless Flipper.enabled?(:localization, current_user)
+    # TODO: Remove debug logging when feature flag is removed
 
     logger.debug("* Params: '#{locale_from_request_params}'")
     logger.debug("* User profile:: '#{current_user&.preferred_language}'")
