@@ -4,8 +4,7 @@
       .root-landing-header-text
         %h2
           Over $#{number_with_delimiter(Counts.recoveries_value)} Worth of Bikes Recovered
-        %h1.upcase
-          Bike registration that works
+        %h1.upcase= t(".hero")
         %h2
           = link_to new_bike_path do
             Register Now
@@ -155,4 +154,3 @@
               Partner Organizations
               %span.count-display
                 = number_with_delimiter(Counts.organizations)
-
