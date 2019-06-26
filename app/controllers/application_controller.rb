@@ -58,6 +58,11 @@ class ApplicationController < ActionController::Base
     params.permit(*Bike.permitted_search_params).merge(stolenness: @stolenness)
   end
 
+  def default_url_options
+    # forward locale param when provided
+    params.slice(:locale)
+  end
+
   def locale_from_request_header
     request.env.fetch("HTTP_ACCEPT_LANGUAGE", "").scan(/^[a-z]{2}/).first
   end
