@@ -968,11 +968,14 @@ RSpec.describe BikesController, type: :controller do
             end
           end
           context "stolen bike" do
+            before do
+              allow(Flipper).to receive(:enabled?).with(:premium_listings, user).and_return(true)
+            end
+
             it "renders with stolen as first template, different description" do
               bike.update_attribute(:stolen, true)
               bike.reload
               expect(bike.stolen).to be_truthy
-              allow(Flipper).to receive(:enabled?).and_return(true)
 
               get :edit, id: bike.id
 
@@ -983,11 +986,13 @@ RSpec.describe BikesController, type: :controller do
             end
           end
           context "recovered bike" do
+            before do
+              allow(Flipper).to receive(:enabled?).with(:premium_listings, user).and_return(true)
+            end
             it "renders with recovered as first template, different description" do
               bike.update_attributes(stolen: true, recovered: true)
               bike.reload
               expect(bike.recovered).to be_truthy
-              allow(Flipper).to receive(:enabled?).and_return(true)
 
               get :edit, id: bike.id
 

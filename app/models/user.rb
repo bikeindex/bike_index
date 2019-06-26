@@ -58,6 +58,8 @@ class User < ActiveRecord::Base
     on: :update
   validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :update, allow_blank: true
 
+  validate :preferred_language_is_an_available_locale
+
   validates_presence_of :email
   validates_uniqueness_of :email, case_sensitive: false
 
@@ -361,5 +363,13 @@ class User < ActiveRecord::Base
   def geocodeable_attributes_changed?
     return false unless city.present? || zipcode.present? || street.present?
     city_changed? || zipcode_changed? || street_changed?
+  end
+
+  private
+
+  def preferred_language_is_an_available_locale
+    return if preferred_language.blank?
+    return if I18n.available_locales.include?(preferred_language.to_sym)
+    errors.add(:preferred_language, "not an available language")
   end
 end

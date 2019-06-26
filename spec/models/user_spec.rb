@@ -38,48 +38,57 @@ RSpec.describe User, type: :model do
 
   describe "validate" do
     describe "create" do
+      subject { User.new(FactoryBot.attributes_for(:user)) }
       before :each do
-        @user = User.new(FactoryBot.attributes_for(:user))
-        expect(@user.valid?).to be_truthy
+        expect(subject.valid?).to be_truthy
       end
 
       it "requires password on create" do
-        @user.password = nil
-        @user.password_confirmation = nil
-        expect(@user.valid?).to be_falsey
-        expect(@user.errors.messages[:password].include?("can't be blank")).to be_truthy
+        subject.password = nil
+        subject.password_confirmation = nil
+        expect(subject.valid?).to be_falsey
+        expect(subject.errors.messages[:password].include?("can't be blank")).to be_truthy
       end
 
       it "requires password and confirmation to match" do
-        @user.password_confirmation = "wtf"
-        expect(@user.valid?).to be_falsey
-        expect(@user.errors.messages[:password_confirmation].include?("doesn't match confirmation")).to be_truthy
+        subject.password_confirmation = "wtf"
+        expect(subject.valid?).to be_falsey
+        expect(subject.errors.messages[:password_confirmation].include?("doesn't match confirmation")).to be_truthy
       end
 
       it "requires at least 8 characters for the password" do
-        @user.password = "hi"
-        @user.password_confirmation = "hi"
-        expect(@user.valid?).to be_falsey
-        expect(@user.errors.messages[:password].include?("is too short (minimum is 6 characters)")).to be_truthy
+        subject.password = "hi"
+        subject.password_confirmation = "hi"
+        expect(subject.valid?).to be_falsey
+        expect(subject.errors.messages[:password].include?("is too short (minimum is 6 characters)")).to be_truthy
       end
 
       it "makes sure there is at least one letter" do
-        @user.password = "1234567890"
-        @user.password_confirmation = "1234567890"
-        expect(@user.valid?).to be_falsey
-        expect(@user.errors.messages[:password].include?("must contain at least one letter")).to be_truthy
+        subject.password = "1234567890"
+        subject.password_confirmation = "1234567890"
+        expect(subject.valid?).to be_falsey
+        expect(subject.errors.messages[:password].include?("must contain at least one letter")).to be_truthy
       end
 
       it "doesn't let unconfirmed users have the same password" do
-        FactoryBot.create(:user, email: @user.email)
-        expect(@user.valid?).to be_falsey
-        expect(@user.errors.messages[:email]).to be_present
+        FactoryBot.create(:user, email: subject.email)
+        expect(subject.valid?).to be_falsey
+        expect(subject.errors.messages[:email]).to be_present
       end
 
       it "doesn't let confirmed users have the same password" do
-        FactoryBot.create(:user_confirmed, email: @user.email)
-        expect(@user.valid?).to be_falsey
-        expect(@user.errors.messages[:email]).to be_present
+        FactoryBot.create(:user_confirmed, email: subject.email)
+        expect(subject.valid?).to be_falsey
+        expect(subject.errors.messages[:email]).to be_present
+      end
+
+      it "validates preferred_language" do
+        subject.preferred_language = nil
+        expect(subject.valid?).to eq(true)
+        subject.preferred_language = "en"
+        expect(subject.valid?).to eq(true)
+        subject.preferred_language = "klingon"
+        expect(subject.valid?).to eq(false)
       end
     end
 

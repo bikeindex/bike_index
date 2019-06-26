@@ -1,6 +1,7 @@
 class ApplicationController < ActionController::Base
   include ControllerHelpers
   protect_from_forgery
+  before_action :set_locale
 
   ensure_security_headers(csp: false,
                           hsts: "max-age=#{20.years.to_i}",
@@ -54,5 +55,32 @@ class ApplicationController < ActionController::Base
   def permitted_org_bike_search_params
     @stolenness ||= params["stolenness"].present? ? params["stolenness"] : "all"
     params.permit(*Bike.permitted_search_params).merge(stolenness: @stolenness)
+  end
+
+  def locale_from_request_header
+    request.env.fetch("HTTP_ACCEPT_LANGUAGE", "").scan(/^[a-z]{2}/).first
+  end
+
+  def locale_from_request_params
+    requested_locale = params.fetch(:locale, "").strip.to_sym
+    requested_locale if I18n.available_locales.include?(requested_locale)
+  end
+
+  def set_locale
+    return unless Flipper.enabled?(:localization, current_user)
+    # TODO: Remove debug logging when feature flag is removed
+
+    logger.debug("* Params: '#{locale_from_request_params}'")
+    logger.debug("* User profile:: '#{current_user&.preferred_language}'")
+    logger.debug("* Request Headers: '#{locale_from_request_header}'")
+    logger.debug("* Default: '#{I18n.default_locale}'")
+
+    I18n.locale =
+      locale_from_request_params ||
+      current_user&.preferred_language.presence ||
+      locale_from_request_header ||
+      I18n.default_locale
+
+    logger.debug("* Locale set to '#{I18n.locale}'")
   end
 end

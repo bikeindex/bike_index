@@ -215,4 +215,11 @@ module ApplicationHelper
       html.html_safe
     end
   end
+
+  def language_choices
+    @language_choices ||=
+      I18n
+        .available_locales
+        .map { |locale| [t("language", locale: locale), locale.to_s] }
+  end
 end

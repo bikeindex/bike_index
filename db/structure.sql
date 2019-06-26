@@ -2218,7 +2218,8 @@ CREATE TABLE public.users (
     country_id integer,
     state_id integer,
     notification_unstolen boolean DEFAULT true,
-    my_bikes_hash jsonb
+    my_bikes_hash jsonb,
+    preferred_language character varying
 );
 
 
@@ -4429,4 +4430,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190620203854');
 INSERT INTO schema_migrations (version) VALUES ('20190621183811');
 
 INSERT INTO schema_migrations (version) VALUES ('20190624171627');
+
+INSERT INTO schema_migrations (version) VALUES ('20190625151428');
 

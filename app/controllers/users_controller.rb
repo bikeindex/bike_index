@@ -184,7 +184,8 @@ class UsersController < ApplicationController
           .permit(:name, :username, :email, :notification_newsletters, :notification_unstolen, :terms_of_service,
                   :additional_emails, :title, :description, :phone, :street, :city, :zipcode, :country_id,
                   :state_id, :avatar, :avatar_cache, :twitter, :show_twitter, :website, :show_website,
-                  :show_bikes, :show_phone, :my_bikes_link_target, :my_bikes_link_title, :password, :password_confirmation)
+                  :show_bikes, :show_phone, :my_bikes_link_target, :my_bikes_link_title, :password,
+                  :password_confirmation, :preferred_language)
           .merge(sign_in_partner.present? ? { partner_data: { sign_up: sign_in_partner } } : {})
   end
 
