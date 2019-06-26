@@ -72,6 +72,18 @@ RSpec::Sidekiq.configure do |config|
   config.warn_when_jobs_not_processed_by_sidekiq = false
 end
 
+RSpec.configure do |config|
+  config.before(:each) do
+    # Reset feature-flipping between examples
+    # (Un-stub before each example as needed, overriding with specific args)
+    allow(Flipper).to receive(:enabled?).with(any_args).and_call_original
+
+    # Reset locale settings to defaults
+    I18n.default_locale = :en
+    I18n.locale = I18n.default_locale
+  end
+end
+
 # DB Cleaner metadata tags
 # ========================
 #

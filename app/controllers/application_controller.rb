@@ -67,6 +67,8 @@ class ApplicationController < ActionController::Base
   end
 
   def set_locale
+    return unless Flipper.enabled?(:localization, current_user)
+
     logger.debug("* Params: '#{locale_from_request_params}'")
     logger.debug("* User profile:: '#{current_user&.preferred_language}'")
     logger.debug("* Request Headers: '#{locale_from_request_header}'")
