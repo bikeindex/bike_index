@@ -70,6 +70,7 @@
                           { title: "Bulk Imports", path: admin_bulk_imports_path, match_controller: true },
                           { title: "Partial Bikes", path: admin_partial_bikes_path, match_controller: true },
                           { title: "Duplicate Bikes", path: duplicates_admin_bikes_path, match_controller: false },
+                          { title: "Feature Flags", path: admin_feature_flags_path, match_controller: false },
                           { title: "Exit Admin", path: root_path, match_controller: false },
                         ]
           other_link_active = other_links.detect { |l| current_page_active?(l[:path], l[:match_controller]) }
