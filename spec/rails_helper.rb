@@ -78,9 +78,8 @@ RSpec.configure do |config|
     # (Un-stub before each example as needed, overriding with specific args)
     allow(Flipper).to receive(:enabled?).with(any_args).and_call_original
 
-    # Reset locale settings to defaults
+    # Reset default locale between examples
     I18n.default_locale = :en
-    I18n.locale = I18n.default_locale
   end
 end
 
