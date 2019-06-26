@@ -50,9 +50,12 @@
                         = bike.attr_list_item(bike.short_address(bike.current_stolen_record), 'Location')
                     %ul.attr-list
                       %li
-                        = link_to 'Edit Bike', edit_bike_url(bike)
+                        = link_to 'Edit Bike', edit_bike_path(bike)
                       %li
-                        = link_to 'Printable (pdf)', pdf_bike_url(bike)
+                        - if bike.stolen
+                          = link_to 'Printable (pdf)', pdf_bike_path(bike)
+                        - else
+                          = link_to "Mark bike stolen", edit_bike_path(bike, page: "report_stolen"), class: "text-danger less-strong"
 
             .paginate-container.paginate-container-bottom
               = paginate @bikes
@@ -76,7 +79,7 @@
                   %tr
                     %td
                       = lock.lock_type_name
-                      = link_to('Edit', edit_lock_url(lock))
+                      = link_to('Edit', edit_lock_path(lock))
                     %td
                       = lock.manufacturer_name
                     %td
