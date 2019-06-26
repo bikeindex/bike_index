@@ -17,6 +17,10 @@ gem "flipper"
 gem "flipper-active_record"
 gem "flipper-ui"
 
+# I18n
+gem "i18n_generators"
+gem "rails-i18n"
+
 # Redis and redis dependents
 gem "hiredis"
 gem "redis", ">= 3.2.0", require: ["redis", "redis/connection/hiredis"]
@@ -34,7 +38,6 @@ gem "geocoder"
 gem "hamlit"
 gem "high_voltage"
 gem "httparty"
-gem "i18n"
 gem "journey", "~> 1.0.3"
 gem "kaminari" # pagination
 gem "kramdown" # Markdown
@@ -44,8 +47,8 @@ gem "money-rails"
 gem "nokogiri", "~> 1.8.1"
 gem "omniauth", "~> 1.6"
 gem "omniauth-facebook"
-gem "omniauth-strava"
 gem "omniauth-globalid"
+gem "omniauth-strava"
 gem "paranoia"
 gem "pg_search"
 gem "rack-contrib"
