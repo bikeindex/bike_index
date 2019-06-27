@@ -40,6 +40,9 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.render_views
 
+  # include translation / localization methods
+  config.include AbstractController::Translation
+
   # Add our request/controller spec helpers
   config.include RequestSpecHelpers, type: :request
   config.include ControllerSpecHelpers, type: :controller
