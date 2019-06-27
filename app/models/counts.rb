@@ -27,11 +27,9 @@ class Counts
 
     def stolen_bikes; retrieve_for("stolen_bikes") end
 
-    def week_creation_chart; retrieve_for("week_creation_chart") end
-
     def organizations; retrieve_for("organizations") end
 
-    def week_creation_chart;
+    def week_creation_chart
       chart_data = redis { |r| r.hget STOREAGE_KEY, "week_creation_chart" }
       chart_data.present? ? JSON.parse(chart_data) : chart_data
     end
@@ -61,20 +59,20 @@ class Counts
     end
 
     def recoveries_value; retrieve_for("recoveries_value") end
-  end
 
-  protected
+    protected
 
-  # Should be the new canonical way of using redis
-  def self.redis
-    # Basically, crib what is done in sidekiq
-    raise ArgumentError, "requires a block" unless block_given?
-    redis_pool.with { |conn| yield conn }
-  end
+    # Should be the new canonical way of using redis
+    def redis
+      # Basically, crib what is done in sidekiq
+      raise ArgumentError, "requires a block" unless block_given?
+      redis_pool.with { |conn| yield conn }
+    end
 
-  def self.redis_pool
-    @redis ||= ConnectionPool.new(timeout: 1, size: 2) do
-      Redis.new
+    def redis_pool
+      @redis ||= ConnectionPool.new(timeout: 1, size: 2) do
+        Redis.new
+      end
     end
   end
 end
