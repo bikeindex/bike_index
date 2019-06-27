@@ -147,6 +147,7 @@ es:
       update: Actualizar %{model}
   number:
     currency:
+      alphabetic_code: EUR
       format:
         delimiter: "."
         format: "%n %u"
@@ -1054,4 +1055,6 @@ es:
 
   welcome:
     index:
+      value_of_bikes_recovered: Más de %{value} por valor de bicicletas recuperadas
       hero: Registro de bicicleta que funciona
+      register_now: Registrase ahora!
