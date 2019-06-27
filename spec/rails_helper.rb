@@ -80,9 +80,6 @@ RSpec.configure do |config|
     # Reset feature-flipping between examples
     # (Un-stub before each example as needed, overriding with specific args)
     allow(Flipper).to receive(:enabled?).with(any_args).and_call_original
-
-    # Reset default locale between examples
-    I18n.default_locale = :en
   end
 end
 

@@ -30,10 +30,8 @@ RSpec.describe "Locale detection", type: :request do
       it "renders the homepage in the requested language" do
         get "/", locale: :en
         expect(response.body).to match(/bike registration/i)
-
         get "/", locale: :es
         expect(response.body).to match(/registro de bicicleta/i)
-
         get "/", locale: :nl
         expect(response.body).to match(/fietsregistratie/i)
       end
@@ -74,12 +72,8 @@ RSpec.describe "Locale detection", type: :request do
 
       it "gives highest precedence to query param" do
         current_user.update(preferred_language: :es)
-
-        get "/",
-            { locale: :nl },
-            { "HTTP_ACCEPT_LANGUAGE" => "en-US,en;q=0.9" }
-
-        expect(response.body).to match(/fietsregistratie/i), nil
+        get "/", { locale: :nl }, { "HTTP_ACCEPT_LANGUAGE" => "en-US,en;q=0.9" }
+        expect(response.body).to match(/fietsregistratie/i)
       end
 
       it "gives secondary precedence to user preference" do
@@ -95,10 +89,13 @@ RSpec.describe "Locale detection", type: :request do
       end
 
       it "falls back to the app default if no other locales are provided or recognized" do
-        I18n.default_locale = :es
+        allow(I18n).to receive(:default_locale).and_return(:es)
         current_user.update(preferred_language: nil)
+
         get "/", { locale: :klingon }, { "HTTP_ACCEPT_LANGUAGE" => "k3" }
+
         expect(response.body).to match(/registro de bicicleta/i)
+        allow(I18n).to receive(:default_locale).and_call_original
       end
     end
   end
