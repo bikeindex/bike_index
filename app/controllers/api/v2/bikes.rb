@@ -254,6 +254,30 @@ module API
           end
         end
 
+        desc "Remove an image from a bike", {
+          authorizations: { oauth2: [{ scope: :write_bikes }] },
+          notes: <<-NOTE,
+
+            Remove an image from the bike, specifying both the bike_id and the image id (which can be found in the public_images resopnse)
+
+            **Requires** `write_bikes` **in the access token** you use.
+
+          NOTE
+
+        }
+        params do
+          requires :id, type: Integer, desc: "Bike ID"
+          requires :image_id, type: Integer, desc: "Image ID"
+        end
+        delete ":id/images/:image_id", serializer: BikeV2ShowSerializer, root: "bike" do
+          find_bike
+          authorize_bike_for_user
+          public_image = @bike.public_images.find_by_id(params[:image_id])
+          error!("Unable to find that image", 404) unless public_image.present?
+          public_image.destroy
+          @bike
+        end
+
         desc "Send a stolen notification<span class='accstr'>*</span>", {
           authorizations: { oauth2: [{ scope: :read_user }] },
           notes: <<-NOTE,

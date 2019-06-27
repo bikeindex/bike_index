@@ -4,7 +4,8 @@ class PublicImageSerializer < ActiveModel::Serializer
     :full,
     :large,
     :medium,
-    :thumb
+    :thumb,
+    :id
 
   def full
     object.image_url

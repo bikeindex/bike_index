@@ -804,7 +804,7 @@ RSpec.describe "Bikes API V3", type: :request do
     end
   end
 
-  describe "image" do
+  describe "post id/image" do
     let!(:token) { create_doorkeeper_token(scopes: "read_user write_bikes") }
     it "doesn't post an image to a bike if the bike isn't owned by the user" do
       bike = FactoryBot.create(:ownership).bike
@@ -837,6 +837,31 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(response.code).to eq("201")
       expect(response.headers["Content-Type"].match("json")).to be_present
       expect(bike.reload.public_images.count).to eq(1)
+    end
+  end
+
+  describe "delete id/image" do
+    let!(:token) { create_doorkeeper_token(scopes: "read_user write_bikes") }
+    let(:ownership) { FactoryBot.create(:ownership, creator_id: user.id) }
+    let(:bike) { ownership.bike }
+    let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
+    it "deletes an image" do
+      bike.reload
+      expect(bike.public_images.count).to eq(1)
+      delete "/api/v3/bikes/#{bike.id}/images/#{public_image.id}?access_token=#{token.token}"
+      expect(response.code).to eq("200")
+      expect(json_result["bike"]["public_images"].count).to eq 0
+      expect(bike.reload.public_images.count).to eq(0)
+    end
+    context "not users image" do
+      let(:public_image) { FactoryBot.create(:public_image) }
+      it "doesn't delete an image to a bike if the bike isn't owned by the user" do
+        bike.reload
+        delete "/api/v3/bikes/#{bike.id}/images/#{public_image.id}?access_token=#{token.token}"
+        expect(response.code).to eq("404")
+        public_image.reload
+        expect(public_image).to be_present
+      end
     end
   end
 
