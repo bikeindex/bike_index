@@ -27,11 +27,12 @@ class Counts
 
     def stolen_bikes; retrieve_for("stolen_bikes") end
 
-    def week_creation_chart; retrieve_for("week_creation_chart") end
-
     def organizations; retrieve_for("organizations") end
 
-    def week_creation_chart;
+    # TODO: Dupe method definition
+    def week_creation_chart; retrieve_for("week_creation_chart") end
+
+    def week_creation_chart
       chart_data = redis { |r| r.hget STOREAGE_KEY, "week_creation_chart" }
       chart_data.present? ? JSON.parse(chart_data) : chart_data
     end
@@ -63,6 +64,8 @@ class Counts
     def recoveries_value; retrieve_for("recoveries_value") end
   end
 
+  # TODO: This `protected` has no effect. Do we want to move the methods below
+  # into the class << self?
   protected
 
   # Should be the new canonical way of using redis
