@@ -854,14 +854,14 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.reload.public_images.count).to eq(0)
     end
     context "not users image" do
-      let(:ownership) { FactoryBot.create(:ownership) }
+      let(:public_image) { FactoryBot.create(:public_image) }
       it "doesn't delete an image to a bike if the bike isn't owned by the user" do
         bike.reload
         expect(bike.public_images.count).to eq(1)
         delete "/api/v3/bikes/#{bike.id}/images/#{public_image.id}?access_token=#{token.token}"
-        expect(public_image).to be_present
         expect(response.code).to eq("404")
-        expect(bike.reload.public_images.count).to eq(1)
+        public_image.reload
+        expect(public_image).to be_present
       end
     end
   end
