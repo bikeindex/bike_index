@@ -1,5 +1,8 @@
 nl:
   language: Dutch
+  number:
+    currency:
+      alphabetic_code: EUR
   activerecord:
     models:
       ad: Advertentie  #g
@@ -836,4 +839,6 @@ nl:
 
   welcome:
     index:
+      value_of_bikes_recovered: Meer dan %{value} aan fietsen teruggevonden
       hero: Fietsregistratie die werkt
+      register_now: Registreer nu!

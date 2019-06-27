@@ -147,6 +147,7 @@ en:
       update: Update %{model}
   number:
     currency:
+      alphabetic_code: USD
       format:
         delimiter: ","
         format: "%u%n"
