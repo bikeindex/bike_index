@@ -68,4 +68,16 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
       end
     end
   end
+  describe "edit" do
+    let(:bike) { ownership.bike }
+    let(:stolen_record) { bike.current_stolen_record }
+    let(:ownership) { FactoryBot.create(:ownership_stolen) }
+    it "doesn't break if recovery's bike is deleted" do
+      expect(stolen_record).to be_present
+      bike.destroy
+      get :edit, id: stolen_record.id
+      expect(response).to be_success
+      expect(flash).to_not be_present
+    end
+  end
 end
