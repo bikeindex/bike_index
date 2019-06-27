@@ -160,9 +160,22 @@ window.updateSearchBikesHeaderLink = ->
       distance = null
     else
       localStorage.setItem('distance', distance)
+
   distance ||= 100
-  url = "/bikes?stolenness=proximity&location=#{location}&distance=#{distance}"
-  $('#search_bikes_header_link').attr('href', url)
+
+  # update search params, retaining any other query params
+  $bike_search_link = $("#search_bikes_header_link")
+
+  bike_search_query = $bike_search_link[0].search
+  params = Object.fromEntries(bike_search_query.replace("?", "").split("&").map((e) => e.split("=")))
+  params["stolenness"] = "proximity"
+  params["location"] = location
+  params["distance"] = distance
+
+  bike_search_path = $bike_search_link[0].pathname
+  query_string = Object.entries(params).map((e) => e.join("=")).join("&")
+  $bike_search_link.attr("href", "#{bike_search_path}?#{query_string}")
+
 
 $(document).ready ->
   window.updateSearchBikesHeaderLink()

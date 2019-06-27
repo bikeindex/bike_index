@@ -209,7 +209,9 @@ Bikeindex::Application.routes.draw do
     end
     resources :users, only: [:index, :show, :edit, :update, :destroy]
 
-    mount Flipper::UI.app(Flipper) => "/feature_flags", constraints: AdminRestriction
+    mount Flipper::UI.app(Flipper) => "/feature_flags",
+          constraints: AdminRestriction,
+          as: :feature_flags
   end
 
   namespace :api, defaults: { format: "json" } do

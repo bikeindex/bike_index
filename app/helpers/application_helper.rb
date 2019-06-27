@@ -217,9 +217,8 @@ module ApplicationHelper
   end
 
   def language_choices
-    @language_choices ||=
-      I18n
-        .available_locales
-        .map { |locale| [t("language", locale: locale), locale.to_s] }
+    @language_choices ||= I18n.available_locales.map do |locale|
+      [t("language", locale: locale), locale.to_s]
+    end
   end
 end

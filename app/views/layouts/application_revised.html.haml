@@ -12,7 +12,7 @@
       .container
         %a.primary-logo{ href: user_root_url }
           = image_tag "revised/logo.svg", class: "primary-nav", alt: "Bike Index home"
-        %a.nonprofit-subtitle{ href: "https://bikeindex.org/news/bike-index--now-a-nonprofit" }
+        = link_to news_path("bike-index--now-a-nonprofit"), class: "nonprofit-subtitle" do
           the non-profit
           %br
           bike registry

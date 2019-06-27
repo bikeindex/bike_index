@@ -1,7 +1,8 @@
 class ApplicationController < ActionController::Base
   include ControllerHelpers
   protect_from_forgery
-  before_action :set_locale
+
+  around_action :set_locale
 
   ensure_security_headers(csp: false,
                           hsts: "max-age=#{20.years.to_i}",
@@ -57,6 +58,11 @@ class ApplicationController < ActionController::Base
     params.permit(*Bike.permitted_search_params).merge(stolenness: @stolenness)
   end
 
+  def default_url_options
+    # forward locale param when provided
+    params.slice(:locale)
+  end
+
   def locale_from_request_header
     request.env.fetch("HTTP_ACCEPT_LANGUAGE", "").scan(/^[a-z]{2}/).first
   end
@@ -66,24 +72,30 @@ class ApplicationController < ActionController::Base
     requested_locale if I18n.available_locales.include?(requested_locale)
   end
 
-  def set_locale
-    # Prevent leaking of I18n.locale between requests
-    I18n.locale = I18n.default_locale
+  def requested_locale
+    logger.info("* Current: '#{I18n.locale}'")
+    logger.info("* Params: '#{locale_from_request_params}'")
+    logger.info("* User profile:: '#{current_user&.preferred_language}'")
+    logger.info("* Request Headers: '#{locale_from_request_header}'")
+    logger.info("* Default: '#{I18n.default_locale}'")
 
-    return unless Flipper.enabled?(:localization, current_user)
-    # TODO: Remove debug logging when feature flag is removed
-
-    logger.debug("* Params: '#{locale_from_request_params}'")
-    logger.debug("* User profile:: '#{current_user&.preferred_language}'")
-    logger.debug("* Request Headers: '#{locale_from_request_header}'")
-    logger.debug("* Default: '#{I18n.default_locale}'")
-
-    I18n.locale =
+    requested_locale =
       locale_from_request_params ||
       current_user&.preferred_language.presence ||
       locale_from_request_header ||
       I18n.default_locale
 
-    logger.debug("* Locale set to '#{I18n.locale}'")
+    logger.info("* Locale set to '#{requested_locale}'")
+
+    requested_locale
+  end
+
+  # TODO: Remove logging in #requested_locale when feature flag is removed
+  def set_locale
+    if Flipper.enabled?(:localization, current_user)
+      I18n.with_locale(requested_locale) { yield }
+    else
+      I18n.with_locale(I18n.default_locale) { yield }
+    end
   end
 end
