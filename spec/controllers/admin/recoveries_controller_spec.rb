@@ -10,6 +10,18 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
       expect(flash).to_not be_present
     end
   end
+  describe "edit" do
+    let(:stolen_record) { bike.current_stolen_record }
+    let(:bike) { ownership.bike }
+    let(:ownership) { FactoryBot.create(:ownership_stolen) }
+    it "doesn't break if recovery's bike is deleted" do
+      expect(stolen_record).to be_present
+      bike.destroy
+      edit_admin_recovery_path(stolen_record.id)
+      expect(response).to be_success
+      expect(flash).to_not be_present
+    end
+  end
   describe "update" do
     context "admin marks recovery as undisplayable" do
       let(:stolen_record) { FactoryBot.create(:stolen_record, can_share_recovery: true, recovery_display_status: "waiting_on_decision") }
@@ -66,18 +78,6 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
         expect(response).to redirect_to(new_admin_recovery_display_path(stolen_record))
         expect(flash).to be_present
       end
-    end
-  end
-  describe "edit" do
-    let(:bike) { ownership.bike }
-    let(:stolen_record) { bike.current_stolen_record }
-    let(:ownership) { FactoryBot.create(:ownership_stolen) }
-    it "doesn't break if recovery's bike is deleted" do
-      expect(stolen_record).to be_present
-      bike.destroy
-      get :edit, id: stolen_record.id
-      expect(response).to be_success
-      expect(flash).to_not be_present
     end
   end
 end

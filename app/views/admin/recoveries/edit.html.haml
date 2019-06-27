@@ -2,8 +2,12 @@
   .col-md-10
     %p
       = link_to "Back to recoveries", admin_recoveries_url
-    %h1
-      Edit recovery for #{@bike.type}
+    - if @bike.present?
+      %h1
+        Edit recovery for #{@bike.type}
+    - else
+      %h1
+        Edit Recovery for deleted bike
   .col-md-2
     %p
       = link_to "Edit bike", edit_admin_bike_path(@bike), class: "btn btn-success mb-4 float-right"
