@@ -13,22 +13,5 @@
               / Report Stolen or Missing
               %h3= @edit_templates[@edit_template]
             .no-divider-row.full-width-button
-              %a.btn.btn-danger.btn-lg{data: { toggle: "modal", target: "#toggle-stolen" } }
+              %a.btn.btn-danger.btn-lg#mark-stolen-btn
                 This #{@bike.type} is stolen or missing!
-
-- modal_title = "Oh no!"
-- modal_body = capture_haml do
-  .modal-body
-    %p Is your #{@bike.type} actually missing or stolen?
-  .modal-btn-footer
-    .row
-      .col-xs-6
-        %button.btn.btn-secondary{ "data-dismiss" => "modal", type: "button" }
-          Nevermind
-      .col-xs-6
-        %button.btn.btn-danger#mark-stolen-btn{ type: "button" }
-          Yes, it is!
-
-/ Only one modal if stolen, only one (different) modal if not stolen
-= render partial: "/shared/modal", |
-  locals: { title: modal_title, id: "toggle-stolen", modal_body: modal_body }
