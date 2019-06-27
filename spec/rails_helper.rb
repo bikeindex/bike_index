@@ -78,7 +78,7 @@ end
 RSpec.configure do |config|
   config.before(:each) do
     # Reset feature-flipping between examples
-    # (Un-stub before each example as needed, overriding with specific args)
+    # (In test examples, stub Flipper as needed, passing specific args to #with)
     allow(Flipper).to receive(:enabled?).with(any_args).and_call_original
   end
 end
