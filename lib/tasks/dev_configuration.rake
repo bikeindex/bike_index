@@ -64,14 +64,17 @@ class RakeDevConfiguration
 end
 
 namespace :dev do
+  desc "Toggle caching"
   task cache: :environment do
     RakeDevConfiguration.toggle_dev_caching
   end
 
+  desc "Toggle Spring (application pre-loader)"
   task spring: :environment do
     RakeDevConfiguration.toggle_spring
   end
 
+  desc "Toggle letter_opener gem, which automatically opens sent emails in a browser window"
   task letter_opener: :environment do
     RakeDevConfiguration.toggle_letter_opener
   end
