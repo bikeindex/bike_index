@@ -1,6 +1,7 @@
 module MoneyHelper
   include MoneyRails::ActionViewExtension
 
+  # TODO: Add a bank implementation that fetches conversion rate values
   Money.default_bank.add_rate(:USD, :EUR, 0.88)
 
   def default_currency
