@@ -12,9 +12,11 @@
             Donor
           %td
             - if @user.donor?
-              <span class="donor-icon">D</span>
+              <span class="donor-icon">D</span><span class="less-strong">onor</span>
+              - if @user.paid_org?
+                %br
             - if @user.paid_org?
-              <span class="paid-org-icon">O</span>
+              <span class="less-strong">Paid</span> <span class="paid-org-icon">O</span><span class="less-strong">rganization member</span>
         %tr
           %td
             Email: Newsletters
@@ -43,9 +45,24 @@
           %td.convertTime
             = l @user.updated_at, format: :convert_time
   .col-md-6.mt-auto
-    - if @user.avatar?
-      = @user.avatar
     %table.table-list
+      %tr
+        %td
+          Photo
+        %td
+          - if @user.avatar?
+            = @user.avatar
+      %tr
+        %td
+          Social
+        %td
+          %small
+            - if @user.show_bikes?
+              = link_to "Bike Index profile page", "/users/#{@user.username}"
+              - if @user.twitter.present?
+                %br
+            - if @user.twitter.present?
+              Twitter: #{link_to @user.twitter, "https://twitter.com/#{@user.twitter}"}
       %tr
         %td
           Ambassador?
