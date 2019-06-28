@@ -678,30 +678,37 @@ RSpec.describe "Bikes API V3", type: :request do
     it "updates a bike, adds and removes components" do
       wheels = FactoryBot.create(:ctype, name: "wheel")
       headsets = FactoryBot.create(:ctype, name: "Headset")
-      comp = FactoryBot.create(:component, bike: bike, ctype: headsets)
-      comp2 = FactoryBot.create(:component, bike: bike, ctype: wheels)
+      mfg1 = FactoryBot.create(:manufacturer, name: "old manufacturer")
+      mfg2 = FactoryBot.create(:manufacturer, name: "new manufacturer")
+      comp = FactoryBot.create(:component, manufacturer: mfg1, bike: bike, ctype: headsets)
+      comp2 = FactoryBot.create(:component, manufacturer: mfg1, bike: bike, ctype: wheels)
       FactoryBot.create(:component)
       bike.reload
       expect(bike.components.count).to eq(2)
+
       components = [
         {
-          manufacturer: manufacturer.name,
+          manufacturer: mfg2.name,
           year: "1999",
           component_type: "headset",
-          description: "Second component",
+          description: "C-2",
           serial_number: "69",
           model: "Sram GXP Eagle",
-        }, {
+        },
+        {
           manufacturer: "BLUE TEETH",
           front_or_rear: "Rear",
-          description: "third component",
-        }, {
+          description: "C-3",
+        },
+        {
           id: comp.id,
           destroy: true,
-        }, {
+        },
+        {
           id: comp2.id,
+          manufacturer: mfg2.id,
           year: "1999",
-          description: "First component",
+          description: "C-1",
         },
       ]
       params[:is_for_sale] = true
@@ -711,15 +718,21 @@ RSpec.describe "Bikes API V3", type: :request do
         put url, params.to_json, json_headers
       end.to change(Ownership, :count).by(0)
 
-      expect(response.code).to eq("200")
+      expect(response.status).to eq(200)
+
       bike.reload
-      bike.components.reload
       expect(bike.is_for_sale).to be_truthy
       expect(bike.year).to eq(params[:year])
+
+      components = bike.components.reload
+      expect(components.count).to eq(3)
       expect(comp2.reload.year).to eq(1999)
-      expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
-      expect(bike.components.map(&:cmodel_name).compact).to eq(["Sram GXP Eagle"])
-      expect(bike.components.count).to eq(3)
+      expect(components.map(&:cmodel_name).compact).to eq(["Sram GXP Eagle"])
+
+      manufacturers = components.map { |c| [c.description, c.manufacturer&.name] }.compact
+      expect(manufacturers).to(match_array([["C-1", "new manufacturer"],
+                                            ["C-2", "new manufacturer"],
+                                            ["C-3", "Other"]]))
     end
 
     it "doesn't remove components that aren't the bikes" do
