@@ -246,7 +246,11 @@ class BParam < ActiveRecord::Base
   end
 
   def set_color_keys
-    %w[primary_frame_color secondary_frame_color tertiary_frame_color].each { |key| set_color_key(key) }
+    %w[
+      primary_frame_color
+      secondary_frame_color
+      tertiary_frame_color
+    ].each { |key| set_color_key(key) }
   end
 
   def set_color_key(key = nil)
