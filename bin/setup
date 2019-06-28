@@ -18,6 +18,7 @@ Dir.chdir APP_ROOT do
   puts "\n== Preparing and seeding database =="
   system "bin/rake db:setup"
   system "bin/rake seed_test_users_and_bikes"
+  system "bin/rake dev:seed_counts"
 
   puts "\n== Preparing test database (including parallelism) =="
   system "bin/rake parallel:prepare"
