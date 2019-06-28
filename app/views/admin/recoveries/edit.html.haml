@@ -2,82 +2,89 @@
   .col-md-10
     %p
       = link_to "Back to recoveries", admin_recoveries_url
-    %h1
-      Edit recovery for #{@bike.type}
+    - if @bike.present?
+      %h1
+        Edit recovery for #{@bike.type}
+    - else
+      %h1
+        Edit Recovery for deleted bike
   .col-md-2
     %p
       = link_to "Edit bike", edit_admin_bike_path(@bike), class: "btn btn-success mb-4 float-right"
 
 
+- if @bike.present?
+  %ul.list-unstyled
+    = render partial: "/admin/bikes/bike", locals: {bike: @bike, target: "show" }
+  .row
+    .col-sm-12.col-lg-6
+      %table.table-list
+        %tbody
+          %tr
+            %td
+              Created at
+            %td
+              %a.convertTime{ href: admin_bike_url(@bike) }
+                = l @bike.created_at, format: :convert_time
+          %tr
+            %td
+              Stolen at
+            %td
+              - if @recovery.date_stolen.present?
+                %span.convertTime
+                  = l @recovery.date_stolen, format: :convert_time
+          %tr
+            %td
+              Recovered at
+            %td
+              - if @recovery.date_recovered.present?
+                %span.convertTime{ href: admin_bike_url(@bike) }
+                  = l @recovery.date_recovered, format: :convert_time
+          %tr
+            %td
+              Recovered by
+            %td
+              - if @recovery.recovering_user.present?
+                = link_to @recovery.recovering_user.display_name, admin_user_path(@recovery.recovering_user.to_param)
+                - unless @recovery.recovering_user_owner?
+                  %em.text-warning.less-strong
+                    not owner!
+              - elsif @recovery.pre_recovering_user?
+                %small.less-strong
+                  pre-recording of recovering user
+              - else
+                %small.less-strong
+                  No user present
 
-%ul.list-unstyled
-  = render partial: "/admin/bikes/bike", locals: {bike: @bike, target: "show" }
-.row
-  .col-sm-12.col-lg-6
-    %table.table-list
-      %tbody
-        %tr
-          %td
-            Created at
-          %td
-            %a.convertTime{ href: admin_bike_url(@bike) }
-              = l @bike.created_at, format: :convert_time
-        %tr
-          %td
-            Stolen at
-          %td
-            - if @recovery.date_stolen.present?
-              %span.convertTime
-                = l @recovery.date_stolen, format: :convert_time
-        %tr
-          %td
-            Recovered at
-          %td
-            - if @recovery.date_recovered.present?
-              %span.convertTime{ href: admin_bike_url(@bike) }
-                = l @recovery.date_recovered, format: :convert_time
-        %tr
-          %td
-            Recovered by
-          %td
-            - if @recovery.recovering_user.present?
-              = link_to @recovery.recovering_user.display_name, admin_user_path(@recovery.recovering_user.to_param)
-              - unless @recovery.recovering_user_owner?
-                %em.text-warning.less-strong
-                  not owner!
-            - elsif @recovery.pre_recovering_user?
-              %small.less-strong
-                pre-recording of recovering user
-            - else
-              %small.less-strong
-                No user present
-
-        %tr
-          %td
-            Owner Email
-          %td
-            = @bike.owner_email
-        %tr
-          %td
-            Current Owner
-          %td
-            = @bike.owner.email
-        %tr
-          %td
-            Cached Data
-          %td
-            = @bike.cached_data
-        %tr
-          %td
-            Location
-          %td
-            = @recovery.address
-  .col-sm-12.col-lg-6
-    .card
-      .card-header
-        Recovery Description
-      .card-body
-        = @recovery.recovered_description
+          %tr
+            %td
+              Owner Email
+            %td
+              = @bike.owner_email
+          %tr
+            %td
+              Current Owner
+            %td
+              = @bike.owner.email
+          %tr
+            %td
+              Cached Data
+            %td
+              = @bike.cached_data
+          %tr
+            %td
+              Location
+            %td
+              = @recovery.address
+    .col-sm-12.col-lg-6
+      .card
+        .card-header
+          Recovery Description
+        .card-body
+          = @recovery.recovered_description
+- else
+  %h1
+    Recovery has no bike!
 .row.justify-content-end
   - if @recovery.waiting_on_decision?
     .col-md-2
