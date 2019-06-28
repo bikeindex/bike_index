@@ -592,43 +592,62 @@ RSpec.describe "Bikes API V3", type: :request do
   end
 
   describe "update" do
-    let(:params) { { year: 1999, serial_number: "XXX69XXX" } }
+    before do
+      FactoryBot.create(:color, name: "Orange")
+      FactoryBot.create(:country, iso: "US")
+    end
+
+    let(:params) do
+      {
+        year: 1975,
+        serial_number: "XXX69XXX",
+        description: "updated description",
+        primary_frame_color: "orange",
+        secondary_frame_color: "black",
+        tertiary_frame_color: "orange",
+        front_gear_type_slug: "2",
+        rear_gear_type_slug: "3",
+        handlebar_type_slug: "front",
+      }
+    end
+
     let(:url) { "/api/v3/bikes/#{bike.id}?access_token=#{token.token}" }
     let(:ownership) { FactoryBot.create(:ownership, creator_id: user.id) }
     let(:bike) { ownership.bike }
     let!(:token) { create_doorkeeper_token(scopes: "read_user read_bikes write_bikes") }
 
     it "doesn't update if user doesn't own the bike" do
-      bike.current_ownership.update_attributes(user_id: FactoryBot.create(:user).id, claimed: true)
+      other_user = FactoryBot.create(:user)
+      bike.current_ownership.update_attributes(user_id: other_user.id, claimed: true)
       allow_any_instance_of(Bike).to receive(:type).and_return("unicorn")
+
       put url, params.to_json, json_headers
+
       expect(response.body.match("do not own that unicorn")).to be_present
       expect(response.code).to eq("403")
     end
 
     it "doesn't update if not in scope" do
       token.update_attribute :scopes, "public"
+
       put url, params.to_json, json_headers
+
       expect(response.code).to eq("403")
       expect(response.body).to match(/oauth/i)
       expect(response.body).to match(/permission/i)
     end
 
     it "fails to update bike if required stolen attrs aren't present" do
-      FactoryBot.create(:country, iso: "US")
       expect(bike.year).to be_nil
-      params[:stolen_record] = {
-        phone: "",
-        city: "Chicago",
-      }
+      params[:stolen_record] = { phone: "", city: "Chicago" }
+
       put url, params.to_json, json_headers
+
       expect(response.code).to eq("401")
       expect(response.body.match("missing phone")).to be_present
     end
 
     it "updates a bike, adds a stolen record, doesn't update locked attrs" do
-      FactoryBot.create(:color, name: "Orange")
-      FactoryBot.create(:country, iso: "US")
       expect(bike.year).to be_nil
       expect(bike.primary_frame_color.name).to eq("Black")
 
@@ -657,7 +676,6 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "updates a bike, adds and removes components" do
-      # FactoryBot.create(:manufacturer, name: 'Other')
       wheels = FactoryBot.create(:ctype, name: "wheel")
       headsets = FactoryBot.create(:ctype, name: "Headset")
       comp = FactoryBot.create(:component, bike: bike, ctype: headsets)
@@ -688,9 +706,11 @@ RSpec.describe "Bikes API V3", type: :request do
       ]
       params[:is_for_sale] = true
       params[:components] = components
+
       expect do
         put url, params.to_json, json_headers
       end.to change(Ownership, :count).by(0)
+
       expect(response.code).to eq("200")
       bike.reload
       bike.components.reload
@@ -716,7 +736,9 @@ RSpec.describe "Bikes API V3", type: :request do
         },
       ]
       params[:components] = components
+
       put url, params.to_json, json_headers
+
       expect(response.code).to eq("401")
       expect(response.headers["Content-Type"].match("json")).to be_present
       # response.headers['Access-Control-Allow-Origin'].should eq('*')
