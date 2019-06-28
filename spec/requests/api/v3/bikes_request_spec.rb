@@ -681,7 +681,7 @@ RSpec.describe "Bikes API V3", type: :request do
       mfg1 = FactoryBot.create(:manufacturer, name: "old manufacturer")
       mfg2 = FactoryBot.create(:manufacturer, name: "new manufacturer")
       comp = FactoryBot.create(:component, manufacturer: mfg1, bike: bike, ctype: headsets)
-      comp2 = FactoryBot.create(:component, manufacturer: mfg1, bike: bike, ctype: wheels)
+      comp2 = FactoryBot.create(:component, manufacturer: mfg1, bike: bike, ctype: wheels, serial_number: "old-serial")
       FactoryBot.create(:component)
       bike.reload
       expect(bike.components.count).to eq(2)
@@ -692,7 +692,6 @@ RSpec.describe "Bikes API V3", type: :request do
           year: "1999",
           component_type: "headset",
           description: "C-2",
-          serial_number: "69",
           model: "Sram GXP Eagle",
         },
         {
@@ -708,6 +707,7 @@ RSpec.describe "Bikes API V3", type: :request do
           id: comp2.id,
           manufacturer: mfg2.id,
           year: "1999",
+          serial: "updated-serial",
           description: "C-1",
         },
       ]
@@ -733,6 +733,11 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(manufacturers).to(match_array([["C-1", "new manufacturer"],
                                             ["C-2", "new manufacturer"],
                                             ["C-3", "Other"]]))
+
+      serials = components.map { |c| [c.description, c.serial_number] }.compact
+      expect(serials).to(match_array([["C-1", "updated-serial"],
+                                      ["C-2", nil],
+                                      ["C-3", nil]]))
     end
 
     it "doesn't remove components that aren't the bikes" do
