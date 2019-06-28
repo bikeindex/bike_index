@@ -246,10 +246,12 @@ class BParam < ActiveRecord::Base
   end
 
   def set_color_key
-    paint = params["bike"]["color"]
+    paint = params.dig("bike", "color") || params.dig("bike", "primary_frame_color")
     color = Color.friendly_find(paint.strip) if paint.present?
     if color.present?
       params["bike"]["primary_frame_color_id"] = color.id
+      params["bike"].delete("primary_frame_color")
+      params["bike"].delete("color")
     else
       set_paint_key(paint)
     end

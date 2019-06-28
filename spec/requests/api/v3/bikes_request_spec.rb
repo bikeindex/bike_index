@@ -627,8 +627,11 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "updates a bike, adds a stolen record, doesn't update locked attrs" do
+      FactoryBot.create(:color, name: "Orange")
       FactoryBot.create(:country, iso: "US")
       expect(bike.year).to be_nil
+      expect(bike.primary_frame_color.name).to eq("Black")
+
       serial = bike.serial_number
       params[:stolen_record] = {
         city: "Chicago",
@@ -637,11 +640,15 @@ RSpec.describe "Bikes API V3", type: :request do
         police_report_number: "999999",
       }
       params[:owner_email] = "foo@new_owner.com"
+      params[:primary_frame_color] = "orange"
+
       expect do
         put url, params.to_json, json_headers
       end.to change(Ownership, :count).by(1)
-      expect(response.code).to eq("200")
+
+      expect(response.status).to eq(200)
       expect(bike.reload.year).to eq(params[:year])
+      expect(bike.primary_frame_color&.name).to eq("Orange")
       expect(bike.serial_number).to eq(serial)
       expect(bike.stolen).to be_truthy
       expect(bike.current_stolen_record.date_stolen.to_i).to be > Time.current.to_i - 10
