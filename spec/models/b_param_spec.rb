@@ -126,7 +126,7 @@ RSpec.describe BParam, type: :model do
       }.as_json
       b_param = BParam.new(params: { bike: bike })
       expect(b_param).to receive(:set_manufacturer_key).and_return(true)
-      expect(b_param).to receive(:set_color_key).and_return(true)
+      expect(b_param).to receive(:set_color_keys).and_return(true)
       expect(b_param).to receive(:set_wheel_size_key).and_return(true)
       expect(b_param).to receive(:set_cycle_type_key).and_return(true)
       expect(b_param).to receive(:set_rear_gear_type_slug).and_return(true)
@@ -301,7 +301,7 @@ RSpec.describe BParam, type: :model do
       color = FactoryBot.create(:color)
       bike = { color: color.name }
       b_param = BParam.new(params: { bike: bike })
-      b_param.set_color_key
+      b_param.set_color_key("primary_frame_color")
       expect(b_param.params["bike"]["color"]).not_to be_present
       expect(b_param.params["bike"]["primary_frame_color_id"]).to eq(color.id)
     end
