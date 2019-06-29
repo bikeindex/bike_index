@@ -2,7 +2,7 @@ CYCLE_TYPE_NAMES = CycleType::NAMES.values.map(&:downcase) rescue ["bike"]
 
 if Rails.env.test?
   CTYPE_NAMES = ["wheel", "headset"]
-  COLOR_NAMES = ["black"]
+  COLOR_NAMES = ["black", "orange"]
   COUNTRY_ISOS = ["US"]
 else
   CTYPE_NAMES = !!Ctype && Ctype.pluck(:name).map(&:downcase) rescue []

@@ -552,14 +552,20 @@ RSpec.describe BikesController, type: :controller do
         context "invalid" do
           it "renders the stolen form with all the attributes" do
             target_path = embed_organization_path(id: organization.slug, b_param_id_token: b_param.id_token)
+
             expect do
-              post :create, bike: bike_params.merge(stolen: "1", primary_frame_color: nil),
-                            stolen_record: stolen_params
+              post :create,
+                   bike: bike_params.merge(stolen: "1", serial_number: nil),
+                   stolen_record: stolen_params
+
               expect(assigns(:bike).errors&.full_messages).to be_present
-            end.to change(Ownership, :count).by 0
+            end.to change(Ownership, :count).by(0)
+
             expect(response).to redirect_to target_path
             bike = assigns(:bike)
-            testable_bike_params.except(:primary_frame_color_id).each { |k, v| expect(bike.send(k).to_s).to eq v.to_s }
+            testable_bike_params
+              .except(:serial_number)
+              .each { |k, v| expect(bike.send(k).to_s).to eq(v.to_s) }
             expect(bike.stolen).to be_truthy
             # we retain the stolen record attrs, it would be great to test that they are
             # assigned correctly, but I don't know how - it needs to completely

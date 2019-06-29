@@ -592,43 +592,65 @@ RSpec.describe "Bikes API V3", type: :request do
   end
 
   describe "update" do
-    let(:params) { { year: 1999, serial_number: "XXX69XXX" } }
+    before do
+      FactoryBot.create(:color, name: "Orange")
+      FactoryBot.create(:country, iso: "US")
+    end
+
+    let(:params) do
+      {
+        year: 1975,
+        serial_number: "XXX69XXX",
+        description: "updated description",
+        primary_frame_color: "orange",
+        secondary_frame_color: "black",
+        tertiary_frame_color: "orange",
+        front_gear_type_slug: "2",
+        rear_gear_type_slug: "3",
+        handlebar_type_slug: "front",
+      }
+    end
+
     let(:url) { "/api/v3/bikes/#{bike.id}?access_token=#{token.token}" }
     let(:ownership) { FactoryBot.create(:ownership, creator_id: user.id) }
     let(:bike) { ownership.bike }
     let!(:token) { create_doorkeeper_token(scopes: "read_user read_bikes write_bikes") }
 
     it "doesn't update if user doesn't own the bike" do
-      bike.current_ownership.update_attributes(user_id: FactoryBot.create(:user).id, claimed: true)
+      other_user = FactoryBot.create(:user)
+      bike.current_ownership.update_attributes(user_id: other_user.id, claimed: true)
       allow_any_instance_of(Bike).to receive(:type).and_return("unicorn")
+
       put url, params.to_json, json_headers
+
       expect(response.body.match("do not own that unicorn")).to be_present
       expect(response.code).to eq("403")
     end
 
     it "doesn't update if not in scope" do
       token.update_attribute :scopes, "public"
+
       put url, params.to_json, json_headers
+
       expect(response.code).to eq("403")
       expect(response.body).to match(/oauth/i)
       expect(response.body).to match(/permission/i)
     end
 
     it "fails to update bike if required stolen attrs aren't present" do
-      FactoryBot.create(:country, iso: "US")
       expect(bike.year).to be_nil
-      params[:stolen_record] = {
-        phone: "",
-        city: "Chicago",
-      }
+      params[:stolen_record] = { phone: "", city: "Chicago" }
+
       put url, params.to_json, json_headers
+
       expect(response.code).to eq("401")
       expect(response.body.match("missing phone")).to be_present
     end
 
     it "updates a bike, adds a stolen record, doesn't update locked attrs" do
-      FactoryBot.create(:country, iso: "US")
       expect(bike.year).to be_nil
+      expect(bike.primary_frame_color.name).to eq("Black")
+
       serial = bike.serial_number
       params[:stolen_record] = {
         city: "Chicago",
@@ -637,11 +659,15 @@ RSpec.describe "Bikes API V3", type: :request do
         police_report_number: "999999",
       }
       params[:owner_email] = "foo@new_owner.com"
+      params[:primary_frame_color] = "orange"
+
       expect do
         put url, params.to_json, json_headers
       end.to change(Ownership, :count).by(1)
-      expect(response.code).to eq("200")
+
+      expect(response.status).to eq(200)
       expect(bike.reload.year).to eq(params[:year])
+      expect(bike.primary_frame_color&.name).to eq("Orange")
       expect(bike.serial_number).to eq(serial)
       expect(bike.stolen).to be_truthy
       expect(bike.current_stolen_record.date_stolen.to_i).to be > Time.current.to_i - 10
@@ -650,49 +676,68 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "updates a bike, adds and removes components" do
-      # FactoryBot.create(:manufacturer, name: 'Other')
       wheels = FactoryBot.create(:ctype, name: "wheel")
       headsets = FactoryBot.create(:ctype, name: "Headset")
-      comp = FactoryBot.create(:component, bike: bike, ctype: headsets)
-      comp2 = FactoryBot.create(:component, bike: bike, ctype: wheels)
+      mfg1 = FactoryBot.create(:manufacturer, name: "old manufacturer")
+      mfg2 = FactoryBot.create(:manufacturer, name: "new manufacturer")
+      comp = FactoryBot.create(:component, manufacturer: mfg1, bike: bike, ctype: headsets)
+      comp2 = FactoryBot.create(:component, manufacturer: mfg1, bike: bike, ctype: wheels, serial_number: "old-serial")
       FactoryBot.create(:component)
       bike.reload
       expect(bike.components.count).to eq(2)
+
       components = [
         {
-          manufacturer: manufacturer.name,
+          manufacturer: mfg2.name,
           year: "1999",
           component_type: "headset",
-          description: "Second component",
-          serial_number: "69",
+          description: "C-2",
           model: "Sram GXP Eagle",
-        }, {
+        },
+        {
           manufacturer: "BLUE TEETH",
           front_or_rear: "Rear",
-          description: "third component",
-        }, {
+          description: "C-3",
+        },
+        {
           id: comp.id,
           destroy: true,
-        }, {
+        },
+        {
           id: comp2.id,
+          manufacturer: mfg2.id,
           year: "1999",
-          description: "First component",
+          serial: "updated-serial",
+          description: "C-1",
         },
       ]
       params[:is_for_sale] = true
       params[:components] = components
+
       expect do
         put url, params.to_json, json_headers
       end.to change(Ownership, :count).by(0)
-      expect(response.code).to eq("200")
+
+      expect(response.status).to eq(200)
+
       bike.reload
-      bike.components.reload
       expect(bike.is_for_sale).to be_truthy
       expect(bike.year).to eq(params[:year])
+
+      components = bike.components.reload
+      expect(components.count).to eq(3)
       expect(comp2.reload.year).to eq(1999)
-      expect(bike.components.pluck(:manufacturer_id).include?(manufacturer.id)).to be_truthy
-      expect(bike.components.map(&:cmodel_name).compact).to eq(["Sram GXP Eagle"])
-      expect(bike.components.count).to eq(3)
+      expect(components.map(&:cmodel_name).compact).to eq(["Sram GXP Eagle"])
+
+      manufacturers = components.map { |c| [c.description, c.manufacturer&.name] }.compact
+      expect(manufacturers).to(match_array([["C-1", "new manufacturer"],
+                                            ["C-2", "new manufacturer"],
+                                            ["C-3", "Other"]]))
+
+      serials = components.map { |c| [c.description, c.serial_number] }.compact
+      expect(serials).to(match_array([["C-1", "updated-serial"],
+                                      ["C-2", nil],
+                                      ["C-3", nil]]))
     end
 
     it "doesn't remove components that aren't the bikes" do
@@ -709,7 +754,9 @@ RSpec.describe "Bikes API V3", type: :request do
         },
       ]
       params[:components] = components
+
       put url, params.to_json, json_headers
+
       expect(response.code).to eq("401")
       expect(response.headers["Content-Type"].match("json")).to be_present
       # response.headers['Access-Control-Allow-Origin'].should eq('*')
