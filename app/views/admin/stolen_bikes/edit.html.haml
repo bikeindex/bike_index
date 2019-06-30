@@ -11,9 +11,25 @@
     .pull-left
       = image_tag img.image_url(:small)
 
-= link_to 'Approve listing', approve_admin_stolen_bike_url(@bike), method: :post, class: 'button-blue padded', data: { confirm: "Approving will:\n\n- Send out a tweet\n- The #{@bike.type} will be posted to any pertinent blogs.\n- It can NOT be effectively reversed\n" }
+- unless @stolen_record&.approved
+  .row.mt-4.mb-4
+    .col-sm-6
+      %p.mb-0
+        %span.text-warning
+          %strong
+            Warning!
+          Approving will:
+      %ul.mt-0
+        %li
+          Send out a tweet
+        %li
+          The #{@bike.type} will be posted to any pertinent blogs.
+        %li
+          It can NOT be effectively reversed\n
+    .col-sm-6.text-center
+      = link_to "Approve listing", approve_admin_stolen_bike_url(@bike), method: :post, class: "btn btn-lg btn-success"
+  %hr
 
-%hr{ style: "margin-top: 40px;" }
 - if @customer_contact.present?
   = form_for [:admin, @customer_contact] do |f|
     %h4
