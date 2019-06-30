@@ -136,8 +136,7 @@
     - @user.payments.reorder(created_at: :desc).each do |payment|
       %tr
         %td
-          %span.convertTime
-            = l payment.created_at, format: :convert_time
+          = link_to l(payment.created_at, format: :convert_time), admin_payment_path(payment), class: "convertTime"
           %small.convertTimezone
         %td
           = payment.amount

@@ -21,6 +21,13 @@
             Stripe ID
           %td
             = link_to @payment.stripe_id, "https://dashboard.stripe.com/payments/#{@payment.stripe_id}"
+      %tr
+        %td
+          For
+        %td
+          - if @payment.theft_alert.present?
+            = link_to "Theft alert", edit_admin_theft_alert_path(@payment.theft_alert)
+
 
 = form_for [:admin, @payment] do |f|
   - if @payment.errors.any?

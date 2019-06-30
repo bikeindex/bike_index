@@ -5,9 +5,11 @@
 
 .admin-bike-partial {
   .admin-image-thumb {
+    max-width: 220px;
     img {
       max-width: 100%;
-      max-height: 110px;
+      width: 180px;
+      height: auto;
     }
     h3 {
       text-align: center;
@@ -74,6 +76,11 @@
   .subtitle {
     @extend .mt-4;
     @extend .col-12;
+  }
+  &.midpage-subnav {
+    border-bottom: none;
+    border-top: 1px solid $gray-400;
+    padding-top: 20px;
   }
 }
 

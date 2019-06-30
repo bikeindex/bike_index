@@ -1,0 +1,42 @@
+- render_sortable ||= false
+- skip_bike ||= false
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.small-header
+      %tr
+        %th Created
+        - unless skip_bike
+          %th Bike
+        %th Creator
+        %th Plan
+        %th Status
+        %th Start
+        %th End
+        %th Facebook post
+    %tbody
+      - theft_alerts.each do |theft_alert|
+        %tr
+          %td
+            = link_to l(theft_alert.created_at, format: :convert_time), edit_admin_theft_alert_path(theft_alert), class: "convertTime"
+          - unless skip_bike
+            %td
+              - if theft_alert.bike.present?
+                = link_to theft_alert.bike.title_string, edit_admin_bike_path(theft_alert.bike)
+              - if theft_alert.recovered?
+                %span.text-success
+                  #{theft_alert.bike.type} recovered
+          %td
+            = link_to theft_alert.creator.display_name, edit_admin_user_path(theft_alert.creator.to_param)
+          %td
+            - plan = theft_alert.theft_alert_plan
+            = link_to plan.title_string, edit_admin_theft_alert_plan_path(plan)
+          %td
+            = theft_alert.status
+          %td
+            %span.convertTime= l(theft_alert.begin_at, format: :convert_time) if theft_alert.begin_at.present?
+          %td
+            %span.convertTime= l(theft_alert.end_at, format: :convert_time) if theft_alert.end_at.present?
+          %td
+            = link_to "fbook link", theft_alert.facebook_post_url, target: "_blank" if theft_alert.facebook_post_url.present?
+

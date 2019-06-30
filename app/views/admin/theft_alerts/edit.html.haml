@@ -4,6 +4,11 @@
 
 = render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show", stolen_record: @stolen_record }
 
+.admin-subnav.midpage-subnav
+  .col-12
+    %h1
+      Edit Theft Alert
+
 = form_for @theft_alert,
   url: admin_theft_alert_path(@theft_alert),
   method: :patch,
