@@ -21,7 +21,8 @@
         %tr
           %td= link_to plan.name , edit_admin_theft_alert_plan_path(plan)
           %td= number_to_currency(plan.amount_cents / 100.0, unit: "$")
-          %td= plan.views
+          %td= number_with_delimiter(plan.views)
           %td= plan.duration_days
           %td= plan.description_html.html_safe
-          %td= plan.active?
+          %td
+            = "&#x2713;".html_safe if plan.active?
