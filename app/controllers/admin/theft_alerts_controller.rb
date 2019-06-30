@@ -28,7 +28,9 @@ class Admin::TheftAlertsController < Admin::BaseController
   private
 
   def find_theft_alert
-    @theft_alert = TheftAlert.find(params[:id])
+    @theft_alert ||= TheftAlert.find(params[:id])
+    @stolen_record ||= @theft_alert.stolen_record
+    @bike ||= @stolen_record.bike.decorate
   end
 
   def theft_alert_params

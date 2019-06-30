@@ -1,131 +1,64 @@
-- if @customer_contact.present?
-  %ul.list-unstyled
-    = render partial: "admin/bikes/bike", locals: {bike: @bike, target: "show" }
-  = form_for [:admin, @customer_contact] do |f|
-    - if @customer_contact.errors.any?
-      = render partial: "/shared/errors", locals: { name: "Customer contact", obj: @customer_contact}
+= render partial: "admin/bikes/bike", locals: { bike: @bike, target: "show", stolen_record: @stolen_record }
+- unless @stolen_record.present?
+  %h1.mt-4
+    Stolen record not created yet.
+  %p
+    Wait a minute or two and it will be here!
 
+  %hr.mt-4
+  = link_to "Standard edit page", edit_admin_bike_url(@bike)
+  - @bike.public_images.each do |img|
+    .pull-left
+      = image_tag img.image_url(:small)
+
+- unless @stolen_record&.approved
+  .row.mt-4.mb-4
+    .col-sm-6
+      %p.mb-0
+        %span.text-warning
+          %strong
+            Warning!
+          Approving will:
+      %ul.mt-0
+        %li
+          Send out a tweet
+        %li
+          The #{@bike.type} will be posted to any pertinent blogs.
+        %li
+          It can NOT be effectively reversed\n
+    .col-sm-6.text-center
+      = link_to "Approve listing", approve_admin_stolen_bike_url(@bike), method: :post, class: "btn btn-lg btn-success"
+  %hr
+
+- if @customer_contact.present?
+  = form_for [:admin, @customer_contact] do |f|
     %h4
       Send bike owner an email
-    .row
-      .form-group.col-md-6.col-lg-4
-        = f.label :current_user
-        = f.email_field :creator_email, value: current_user.email, class: "form-control"
-      .form-group.col-md-6.col-lg-4
-        = f.label :user_email
-        = f.email_field :user_email, value: @bike.owner_email, class: "form-control"
-      .form-group.col-md-6.col-lg-4
-        = f.label :bike, "Your stolen bike"
-        = f.text_field :title, value: "Your stolen #{@bike.title_string}", class: "form-control"
-        = f.hidden_field :contact_type, value: 'stolen_contact'
-        = f.hidden_field :creator_id, value: current_user.id
-        = f.hidden_field :bike_id, value: @bike.id
-      .form-group.col-md-6.col-lg-4
-        = f.label :notification_body
-        = f.text_area :body, placeholder: "You can write HTML in here. There will be a link to the #{@bike.type} included automatically.", rows: 7, class: "form-control"
-      - if @stolen_record.present?
-        .col-lg-4.col-md-6
-          %table.table-list
-            %tbody
-              %tr
-                %td
-                  Theft description
-                %td
-                  = @stolen_record.theft_description
-              %tr
-                %td
-                  Created
-                %td.convertTime
-                  = l @bike.created_at, format: :convert_time
-              %tr
-                %td
-                  Owner email
-                %td
-                  = @bike.owner_email
-              %tr
-                %td
-                  Current owner
-                %td
-                  = @bike.owner_email
-              -if @bike.creation_organization_id.present?
-                %tr
-                  %td
-                    Organization name
-                  %td
-                    = @bike.creation_organization_name
-              %tr
-                %td
-                  Callable by
-                %td
-                  - if @stolen_record.phone_for_everyone
-                    %strong
-                      Everyone
-                  -else
-                    = "Users" if @stolen_record.phone_for_users
-                    = "Shops" if @stolen_record.phone_for_shops
-                    = "Police" if @stolen_record.phone_for_police
-              %tr
-                %td
-                  Link to recover
-                %td
-                  %input.form-control{ disabled: true, type: 'text', value: edit_bike_recovery_url(bike_id: @bike.id, token: @stolen_record.find_or_create_recovery_link_token).to_s }
-        .col-lg-4.col-md-6
-          %table.table-list
-            %tbody
-              %tr
-                %td
-                  Approved?
-                %td
-                  - if @stolen_record.approved
-                    Check
-                  - else
-                    = link_to 'Approve listing', approve_admin_stolen_bike_url(@bike), method: :post, confirm: "Approving will:\n\n- Send out a tweet\n- The #{@bike.type} will be posted to any pertinent blogs.\n- It can NOT be effectively reversed\n", class: 'button-blue padded'
-              %tr
-                %td
-                  Stolen on
-                %td.convertTime
-                  = l @stolen_record.date_stolen, format: :convert_time
-              %tr
-                %td
-                  Address
-                %td
-                  = @stolen_record.address
-              %tr
-                %td
-                  Phone
-                %td
-                  = @stolen_record.phone
-                  = @stolen_record.secondary_phone
-              %tr
-                %td
-                  Police Department
-                %td
-                  = @stolen_record.police_report_department
-              %tr
-                %td
-                  Police Report
-                %td
-                  = @stolen_record.police_report_number
-              %tr
-                %td
-                  Estimated $
-                %td
-                  = @stolen_record.estimated_value
-      - else
-        %h1.mt-4
-          Stolen record not created yet.
-        %p
-          Wait a minute or two and it will be here!
 
-        %hr.mt-4
-        = link_to "Standard edit page", edit_admin_bike_url(@bike)
-        - @bike.public_images.each do |img|
-          .pull-left
-            = image_tag img.image_url(:small)
+    - if @customer_contact.errors.any?
+      = render partial: "/shared/errors", locals: { name: "Customer contact", obj: @customer_contact}
+    .row
+      .col-lg-4
+        .row
+          .form-group.col-sm-6
+            = f.label :current_user
+            = f.email_field :creator_email, value: current_user.email, class: "form-control"
+          .form-group.col-md-6
+            = f.label :user_email
+            = f.email_field :user_email, value: @bike.owner_email, class: "form-control"
+          .form-group.col-12
+            = f.label :bike, "Your stolen bike"
+            = f.text_field :title, value: "Your stolen #{@bike.title_string}", class: "form-control"
+            = f.hidden_field :contact_type, value: 'stolen_contact'
+            = f.hidden_field :creator_id, value: current_user.id
+            = f.hidden_field :bike_id, value: @bike.id
+      .col-lg-8
+        .form-group
+          = f.label :notification_body
+          = f.text_area :body, placeholder: "You can write HTML in here. There will be a link to the #{@bike.type} included automatically.", rows: 7, class: "form-control"
       .col-auto.mt-auto
         = f.submit 'Send it!', class: 'btn btn-success mb-4'
-        = link_to "Edit Bike", edit_admin_bike_url(@bike), class:"btn btn-primary mb-4"
-        = link_to "Delete", admin_bike_url(@bike), method: :delete, confirm: "Are you sure?", class: "btn btn-danger mb-4"
+        = link_to "Delete", admin_bike_url(@bike), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger mb-4"
 
 - else
   %h1

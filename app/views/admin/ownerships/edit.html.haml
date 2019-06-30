@@ -1,13 +1,9 @@
-.row
-  .col-md-4
-    %h1
-      Edit ownership
-  .col-md-8
-    %p
-      = link_to "Back to editing bike", edit_admin_bike_path(@bike), class: "float-right btn btn-primary"
+.admin-subnav
+  .col-12
+    %h1 Edit ownership
 
-%ul.list-unstyled
-  = render partial: "/admin/bikes/bike", locals: {bike: @bike, target: "show" }
+= render partial: "/admin/bikes/bike", locals: {bike: @bike, target: "show" }
+
 .row
   .col-auto
     %h2

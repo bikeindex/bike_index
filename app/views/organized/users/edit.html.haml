@@ -6,7 +6,7 @@
 %p
   .clearfix
     - id = (@organization_invitation || @membership).id
-    = link_to 'remove from organization', organization_user_path(id: id, organization_id: current_organization.to_param, is_invitation: @is_invitation), method: :delete, confirm: "Are you sure you want to remove #{@name} from #{current_organization.name}? (They will still be to use their personal account)", class: 'btn btn-danger pull-right'
+    = link_to 'remove from organization', organization_user_path(id: id, organization_id: current_organization.to_param, is_invitation: @is_invitation), method: :delete, data: { confirm: "Are you sure you want to remove #{@name} from #{current_organization.name}? (They will still be to use their personal account)" }, class: 'btn btn-danger pull-right'
   - if @is_invitation
     %p
       Invited

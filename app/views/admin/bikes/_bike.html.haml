@@ -1,48 +1,200 @@
+- stolen_record ||= stolen_record || bike.find_current_stolen_record
+.admin-bike-partial
+  - if bike.present?
+    .row
+      .col-lg-2.col-3.mt-auto.mb-2.admin-image-thumb
+        - if bike.thumb_path.present?
+          = image_tag bike.thumb_path, alt: bike.title_string
+        - else
+          %h3.less-strong
+            No Image
+      .col-lg-5.col-9.mt-auto.mb-2
+        %p.strong.mb-0
+          = link_to bike.list_link_url(target) do
+            - if bike.stolen
+              %span.text-danger
+                Stolen
+            = bike.title_string
+          - unless controller_name == "bikes" && action_name == "edit"
+            = link_to "admin view", edit_admin_bike_path(bike.to_param), class: "text-muted float-right"
+        %table.table-list.mb-0
+          %tbody
+            %tr
+              %td
+                Serial number
+              %td
+                = bike.serial_number
+            %tr
+              %td
+                Colors
+              %td
+                = bike.frame_colors.to_sentence
+            %tr
+              %td
+                Created
+              %td
+                %span.convertTime
+                  = l bike.created_at, format: :convert_time
+                %small.convertTimezone
+            %tr
+              %td
+                Updated
+              %td
+                %span.convertTime
+                  = l bike.updated_at, format: :convert_time
 
-%li.admin-bike-partial
-  .row
-    .col-lg-1.col-md-2.col-3.mt-auto.mb-2.admin-image-thumb
-      - if bike.thumb_path.present?
-        = image_tag bike.thumb_path, alt: bike.title_string
-      - else
-        %h3
-          No Image
-    .col-lg-5.col-md-4.col-9.mt-auto.mb-2
-      %p.strong.mb-0
-        = link_to bike.title_string, bike.list_link_url(target)
-        - unless controller_name == "bikes" && action_name == "edit"
-          = link_to "admin view", edit_admin_bike_path(bike.to_param), class: "text-muted em"
-      %table.table-list.mb-0
-        %tbody
-          %tr
-            %td
-              Serial number
-            %td
-              = bike.serial_number
-          %tr
-            %td
-              Colors
-            %td
-              = bike.frame_colors.to_sentence
-    - if bike.stolen and bike.current_stolen_record.present?
-      .col-lg-6.border.border-danger
-        %h4
-          = link_to 'Admin Stolen edit page', edit_admin_stolen_bike_url(@bike)
+            - pdf ||= false
+            - if pdf
+              %tr
+                %td
+                  PDF
+                %td
+                  = link_to "Printable registration", pdf_bike_url(bike)
+      .col-lg-5
         %table.table-list
           %tr
             %td
-              Stolen at
+              Owner Email
             %td
-              %span.convertTime.preciseTime
-                = l bike.current_stolen_record.date_stolen, format: :convert_time
+              = bike.owner_email
+          - if bike.user.present?
+            %tr
+              %td
+                Current Email
+              %td
+                = link_to bike.user.email, edit_admin_user_url(bike.user.id)
+            %tr
+              %td
+                Donor
+              %td
+                - if bike.user.donor?
+                  <span class="donor-icon">D</span><span class="less-strong">onor</span>
+                - if bike.user.paid_org?
+                  %br
+                - if bike.user.paid_org?
+                  <span class="less-strong">Paid</span> <span class="paid-org-icon">O</span><span class="less-strong">rganization member</span>
+          - else
+            %tr
+              %td
+                Owner
+              %td
+                Unclaimed
           %tr
             %td
-              From
+              Cached Data
             %td
-              = bike.short_address(bike.current_stolen_record)
+              %em.less-strong
+                = bike.cached_data
+          %tr
+            %td
+              Creation
+            %td
+              - if bike.creation_organization.present?
+                = link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization)
+              - else
+                %small.less-strong
+                  self reg
+              - if bike.creation_description.present?
+                \-
+                %em
+                  Via #{bike.creation_description}
+              - if bike.creation_state&.bulk_import.present?
+                %br
+                Import
+                = link_to admin_bulk_import_path(bike.creation_state.bulk_import.to_param) do
+                  \##{bike.creation_state.bulk_import_id}
+                  - if bike.creation_state.bulk_import.ascend?
+                    %small
+                      Ascend
+  - else
+    %h1
+      No Bike present
+  - if stolen_record.present?
+    %h4.mt-2
+      %span.text-danger
+        Theft information
+      - unless controller_name == "stolen_bikes"
+        %span.float-right
+          = link_to "Stolen approval/message", edit_admin_stolen_bike_url(bike)
+    .row
+      .col-md-6
+        %table.table-list
+          %tbody
+            %tr
+              %td
+                Theft description
+              %td
+                = stolen_record.theft_description
+            %tr
+              %td
+                Marked stolen
+              %td.convertTime
+                = l stolen_record.created_at, format: :convert_time
+            %tr
+              %td
+                Stolen at
+              %td.convertTime
+                = l stolen_record.date_stolen, format: :convert_time
 
-
-
-      - pdf ||= false
-      -if pdf
-        = link_to "Printable registration", pdf_bike_url(bike)
+            -if bike.creation_organization_id.present?
+              %tr
+                %td
+                  Organization name
+                %td
+                  = bike.creation_organization_name
+            %tr
+              %td
+                Callable by
+              %td
+                - if stolen_record.phone_for_everyone
+                  %strong
+                    Everyone
+                -else
+                  = "Users" if stolen_record.phone_for_users
+                  = "Shops" if stolen_record.phone_for_shops
+                  = "Police" if stolen_record.phone_for_police
+            - unless stolen_record.recovered?
+              %tr
+                %td
+                  Link to recover
+                %td
+                  %input.form-control{ disabled: true, type: 'text', value: edit_bike_recovery_url(bike_id: bike.id, token: stolen_record.find_or_create_recovery_link_token).to_s }
+      .col-md-6
+        %table.table-list
+          %tbody
+            %tr
+              %td
+                Approved?
+              %td
+                = "&#x2713;".html_safe if stolen_record.approved
+            %tr
+              %td
+                Estimated $
+              %td
+                = stolen_record.estimated_value
+            %tr
+              %td
+                Address
+              %td
+                = stolen_record.address
+            %tr
+              %td
+                Phone
+              %td
+                = stolen_record.phone
+                - if stolen_record.secondary_phone.present?
+                  %br
+                  %small
+                    %span.less-strong secondary:
+                    = stolen_record.secondary_phone
+            %tr
+              %td
+                Police Department
+              %td
+                = stolen_record.police_report_department
+            %tr
+              %td
+                Police Report
+              %td
+                = stolen_record.police_report_number
+  %hr.mt-2.mb-4

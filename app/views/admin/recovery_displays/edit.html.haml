@@ -6,4 +6,4 @@
 
 = render partial: "form"
 
-= link_to "Delete recovery display", admin_recovery_display_url(@recovery_display), method: :delete, confirm: "Are you sure?", class: "btn btn-danger"
+= link_to "Delete recovery display", admin_recovery_display_url(@recovery_display), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger"

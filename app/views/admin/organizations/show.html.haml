@@ -353,4 +353,4 @@
     = link_to "Edit", edit_admin_organization_url(@organization), class: "btn btn-success"
   - unless @organization.deleted?
     %li.list-inline-item.ml-auto
-      = link_to "Delete", admin_organization_url(@organization), method: :delete, confirm: "Are you sure?", class: "btn btn-danger"
+      = link_to "Delete", admin_organization_url(@organization), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger"

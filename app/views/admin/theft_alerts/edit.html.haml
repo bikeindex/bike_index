@@ -1,39 +1,53 @@
 .admin-subnav
   .col-12
     %h1 Edit Theft Alert
-.container
-  = form_for @theft_alert,
-    url: admin_theft_alert_path(@theft_alert),
-    method: :patch,
-    html: { class: "m-0" } do |f|
 
-    .form-group
-      = f.label :status, class: "form-label"
-      = f.select :status,
-        options_for_select(TheftAlert.statuses.keys, @theft_alert.status),
-        class: "form-control"
-    .form-group
-      - plan_options = TheftAlertPlan.active.map { |e| [e.title_string, e.id] }
-      = f.label :theft_alert_plan_id, class: "form-label"
-      = f.select :theft_alert_plan_id,
-        options_for_select(plan_options, @theft_alert.theft_alert_plan.id),
-        class: "form-control"
+= render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show", stolen_record: @stolen_record }
 
-    - unless @theft_alert.pending?
+.admin-subnav.midpage-subnav
+  .col-12
+    %h1
+      Edit Theft Alert
+
+= form_for @theft_alert,
+  url: admin_theft_alert_path(@theft_alert),
+  method: :patch,
+  html: { class: "m-0" } do |f|
+  .row
+    .col-sm-6
+      .form-group
+        = f.label :status
+        = f.select :status,
+          options_for_select(TheftAlert.statuses.keys, @theft_alert.status),
+          {},
+          class: "form-control"
+    .col-sm-6
+      .form-group
+        - plan_options = TheftAlertPlan.active.map { |e| [e.title_string, e.id] }
+        = f.label :theft_alert_plan_id
+        = f.select :theft_alert_plan_id,
+          options_for_select(plan_options, @theft_alert.theft_alert_plan.id),
+          {},
+          class: "form-control"
+
+  - unless @theft_alert.pending?
+    .row
       = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
-      .form-group
-        = f.label :begin_at, class: "form-label"
-        = f.datetime_local_field :begin_at, include_blank: true, class: "form-control"
-      .form-group
-        = f.label :end_at, class: "form-label"
-        = f.datetime_local_field :end_at, include_blank: true, class: "form-control"
+      .col-sm-6
+        .form-group
+          = f.label :begin_at
+          = f.datetime_local_field :begin_at, include_blank: true, class: "form-control"
+      .col-sm-6
+        .form-group
+          = f.label :end_at
+          = f.datetime_local_field :end_at, include_blank: true, class: "form-control"
 
-    .form-group
-      = f.label :facebook_post_url, class: "form-label"
-      = f.text_field :facebook_post_url, class: "form-control"
-    .form-group
-      = f.label :notes, class: "form-label"
-      = f.text_area :notes, class: "form-control"
+  .form-group
+    = f.label :facebook_post_url
+    = f.text_field :facebook_post_url, class: "form-control"
+  .form-group
+    = f.label :notes
+    = f.text_area :notes, rows: 3, class: "form-control"
 
-    .form-group
-      = submit_tag "Save", class: "btn btn-info"
+  .form-group
+    = submit_tag "Save", class: "btn btn-info"
