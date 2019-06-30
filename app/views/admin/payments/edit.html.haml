@@ -15,6 +15,12 @@
           Amount
         %td
           = @payment.amount_formatted
+      - if @payment.stripe_id.present?
+        %tr
+          %td
+            Stripe ID
+          %td
+            = link_to @payment.stripe_id, "https://dashboard.stripe.com/payments/#{@payment.stripe_id}"
 
 = form_for [:admin, @payment] do |f|
   - if @payment.errors.any?
