@@ -20,4 +20,4 @@
         Organization Name
       %td
         = link_to @organization.name, admin_organization_path(@organization)
-= link_to 'Delete Membership!', admin_membership_path(@membership), method: :delete, confirm: 'Are you sure you want to delete this membership?', class: 'btn btn-danger'
+= link_to 'Delete Membership!', admin_membership_path(@membership), method: :delete, data: { confirm: 'Are you sure you want to delete this membership?' }, class: 'btn btn-danger'

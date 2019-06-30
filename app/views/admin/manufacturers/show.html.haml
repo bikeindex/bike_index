@@ -60,4 +60,4 @@
 
 
 = link_to "Edit", edit_admin_manufacturer_url(@manufacturer), class: "btn btn-success"
-= link_to "Delete", admin_manufacturer_url(@manufacturer), method: :delete, confirm: "Are you sure?", class: "btn btn-danger"
+= link_to "Delete", admin_manufacturer_url(@manufacturer), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger"

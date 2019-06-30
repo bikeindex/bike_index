@@ -121,4 +121,4 @@
     %p
       The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank"} if you're curious.
   .padded.clearfix
-    = link_to "Delete post", admin_news_url(@blog), method: :delete, confirm: "Are you sure?", class: "button-red"
+    = link_to "Delete post", admin_news_url(@blog), method: :delete, data: { confirm: "Are you sure?" }, class: "button-red"

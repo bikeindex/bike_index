@@ -1,7 +1,9 @@
 .row
   .col-md-6
     %h1
-      Editing #{@user.email}
+      %small
+        Editing
+      = @user.display_name
       - if current_user.developer?
         %em.small.less-strong
           id: #{@user.id}
@@ -90,52 +92,6 @@
         %td
           = @user.city
 
-= form_for [:admin, @user] do |f|
-  - if @user.errors.any?
-    = render partial: "/shared/errors", locals: { name: "User", obj: @user }
-  .row.mt-4
-    .col-md-6
-      .form-group
-        = f.label :name
-        = f.text_field :name, class: "form-control"
-    .col-md-6
-      .form-group
-        = f.label :email
-        = f.email_field :email, class: "form-control"
-  .row
-    .col-md-6
-      .form-group
-        = f.label :username
-        = f.text_field :username, class: "form-control"
-      .form-group
-        .form-check.form-check-inline
-          = f.check_box :confirmed, disabled: @user.confirmed, class: "form-check-input"
-          = f.label :confirmed, class: "form-check-label"
-        .form-check.form-check-inline
-          = f.check_box :banned, class: "form-check-input"
-          = f.label :banned, class: "form-check-label"
-      .form-group
-        .form-check.form-check-inline
-          = f.check_box :superuser, class: "form-check-input"
-          = f.label :superuser, class: "form-check-label"
-        - if current_user.developer?
-          .form-check.form-check-inline
-            = f.check_box :developer, class: "form-check-input"
-            = f.label :developer, class: "form-check-label"
-      .form-group
-        .form-check.form-check-inline
-          = f.check_box :can_send_many_stolen_notifications, class: "form-check-input"
-          = f.label :can_send_many_stolen_notifications, class: "form-check-label"
-    .col-md-6
-      .form-group
-        = f.label :secondary_emails
-        = text_area_tag :secondary_emails, @user.secondary_emails.join(", "), disabled: true, rows: 2, class: "form-control"
-
-
-
-  .row.justify-content-end.mt-4
-    .col-auto
-      = f.submit 'Save', class: 'btn btn-success'
 - if @user.ambassador?
   %h2 Ambassador Tasks
   - ambassador = Ambassador.find(@user.id)
@@ -158,18 +114,19 @@
 .mt-4
 .row.mt-4
   .col-md-6
-    %h3
+    %h4
       User has #{ pluralize(@bikescount, "bike") }
   - if @bikescount > 10
     .col-md-6.mt-auto
       = link_to "Show all bikes", admin_bikes_path(search_user_id: @user.id), class: "float-right"
-= render partial: "admin/bikes/admin_bikes_table", locals: {bikes: @bikes}
 
-%h3
-  Donations
+= render partial: "admin/bikes/admin_bikes_table", locals: { bikes: @bikes }
+
+%h4.mt-4
+  Donations/payments
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
-    %thead.thead-light
+    %thead
       %th
         Date
       %th
@@ -188,10 +145,10 @@
           = "&#x2713;".html_safe if payment.is_payment
 
 - if @user.memberships.count > 0
+  %h4.mt-4
+    = @user.memberships.count
+    Current memberships
   .full-screen-table
-    %h2.mt-4
-      = @user.memberships.count
-      Current memberships
     %table.table.table-striped.table-bordered.table-sm
       %thead.thead-light
         %th
@@ -248,7 +205,57 @@
             %td
               = user_email.old_user_id
 
+%hr
+%h4 Edit
+= form_for [:admin, @user] do |f|
+  - if @user.errors.any?
+    = render partial: "/shared/errors", locals: { name: "User", obj: @user }
+  .row.mt-4
+    .col-md-6
+      .form-group
+        = f.label :name
+        = f.text_field :name, class: "form-control"
+    .col-md-6
+      .form-group
+        = f.label :email
+        = f.email_field :email, class: "form-control"
+  .row
+    .col-md-6
+      .form-group
+        = f.label :username
+        = f.text_field :username, class: "form-control"
+    .col-md-6
+      .form-group
+        = f.label :secondary_emails
+        = text_area_tag :secondary_emails, @user.secondary_emails.join(", "), disabled: true, rows: 1, class: "form-control"
+  .row
+    .col-md-5
+      .form-group
+        .form-check
+          = f.check_box :confirmed, disabled: @user.confirmed, class: "form-check-input"
+          = f.label :confirmed, class: "form-check-label"
+      .form-group
+        .form-check
+          = f.check_box :banned, class: "form-check-input"
+          = f.label :banned, class: "form-check-label"
+      .form-group
+        .form-check.form-check-inline
+          = f.check_box :can_send_many_stolen_notifications, class: "form-check-input"
+          = f.label :can_send_many_stolen_notifications, class: "form-check-label"
+    .col-md-5
+      .form-group
+        .form-check.form-check-inline
+          = f.check_box :superuser, class: "form-check-input"
+          = f.label :superuser, class: "form-check-label"
+      .form-group
+        - if current_user.developer?
+          .form-check.form-check-inline
+            = f.check_box :developer, class: "form-check-input"
+            = f.label :developer, class: "form-check-label"
+    .col-md-2
+      = f.submit 'Save', class: 'btn btn-success'
 
-.mt-4.mb-4.row.justify-content-end
+%hr{ style: "margin-top: 60px;" }
+.mt-4.mb-4.row
   .col-auto
-    = link_to "Delete #{@user.email}!", admin_user_url(@user), method: :delete, confirm: "Are you sure?", class: "btn btn-danger"
+    = link_to "Delete #{@user.email}!", admin_user_url(@user.to_param), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger less-strong"

@@ -1,7 +1,5 @@
-
-.d-none{data: { url: ENV['BASE_URL'] }}
-%ul.p-0.list-unstyled
-  = render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show" }
+.d-none{ data: { url: ENV['BASE_URL'] } }
+= render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show" }
 .row
   .col-md-6
     %table.table-list
@@ -170,7 +168,7 @@
       = submit_tag "Update the bike", class: "btn btn-success"
     .col-8.text-right
       = link_to "Bike messages", admin_feedbacks_path(search_bike_id: @bike.to_param), class: "btn btn-outline-primary"
-      = link_to "Delete bike", admin_bike_url(@bike), method: :delete, confirm: "Are you sure?", class: "btn btn-danger ml-4"
+      = link_to "Delete bike", admin_bike_url(@bike), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger ml-4"
 
   - if @bike.stolen and @bike.find_current_stolen_record.present?
     %hr

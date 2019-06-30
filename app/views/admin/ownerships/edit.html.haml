@@ -6,8 +6,8 @@
     %p
       = link_to "Back to editing bike", edit_admin_bike_path(@bike), class: "float-right btn btn-primary"
 
-%ul.list-unstyled
-  = render partial: "/admin/bikes/bike", locals: {bike: @bike, target: "show" }
+= render partial: "/admin/bikes/bike", locals: {bike: @bike, target: "show" }
+
 .row
   .col-auto
     %h2

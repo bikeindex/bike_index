@@ -14,8 +14,9 @@
 
 
 - if @bike.present?
-  %ul.list-unstyled
-    = render partial: "/admin/bikes/bike", locals: {bike: @bike, target: "show" }
+
+  = render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show" }
+
   .row
     .col-sm-12.col-lg-6
       %table.table-list
@@ -95,7 +96,7 @@
     .col-md-2
       = link_to "Edit Recovery", edit_admin_recovery_display_url(@recovery.recovery_display), class: "btn btn-primary"
     .col-md-2
-      = link_to "Delete recovery display", admin_recovery_display_url(@recovery.recovery_display), method: :delete, confirm: "Are you sure?", class: "btn btn-danger"
+      = link_to "Delete recovery display", admin_recovery_display_url(@recovery.recovery_display), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger"
   - elsif @recovery.not_displayed?
     .col-md-2
       = button_to "Mark Eligible for display", admin_recovery_path(id: @recovery.id, stolen_record: {mark_as_eligible: true}), method: :put, class: "btn btn-success"
