@@ -333,6 +333,8 @@ en:
       add_a_stolen_bike: Add a stolen bike
       add_a_stolenfound_bike: Add a stolen/found bike you've recovered
       register_bike: Register bike
+    recovery_stories:
+      recovery_stories: Recovery Stories
   landing_pages:
     for_organizations_photo_list:
       for: for
