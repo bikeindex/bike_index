@@ -327,3 +327,9 @@ en:
     goodbye:
       youve_been_logged_out: You've been logged out
       come_back_soon: Come back soon!
+    choose_registration:
+      add_a_bike_through: Add a bike through
+      add_your_own_bike: Add your own bike
+      add_a_stolen_bike: Add a stolen bike
+      add_a_stolenfound_bike: Add a stolen/found bike you've recovered
+      register_bike: Register bike
