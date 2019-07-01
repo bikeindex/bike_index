@@ -43,5 +43,6 @@
           %td
             = link_to "fbook link", theft_alert.facebook_post_url, target: "_blank" if theft_alert.facebook_post_url.present?
           %td
-            = theft_alert.notes
+            %small
+              = theft_alert.notes
 
