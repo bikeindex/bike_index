@@ -13,7 +13,8 @@
         %th Status
         %th Start
         %th End
-        %th Facebook post
+        %th Facebook
+        %th Notes
     %tbody
       - theft_alerts.each do |theft_alert|
         %tr
@@ -29,14 +30,18 @@
           %td
             = link_to theft_alert.creator.display_name, edit_admin_user_path(theft_alert.creator.to_param)
           %td
-            - plan = theft_alert.theft_alert_plan
-            = link_to plan.title_string, edit_admin_theft_alert_plan_path(plan)
+            - theft_alert_plan = theft_alert.theft_alert_plan
+            = link_to theft_alert_plan.title_string, edit_admin_theft_alert_plan_path(theft_alert_plan)
+            %small
+              = number_to_currency(theft_alert_plan.amount_cents / 100.0, unit: "$")
           %td
             = theft_alert.status
           %td
-            %span.convertTime= l(theft_alert.begin_at, format: :convert_time) if theft_alert.begin_at.present?
+            %small.convertTime= l(theft_alert.begin_at, format: :convert_time) if theft_alert.begin_at.present?
           %td
-            %span.convertTime= l(theft_alert.end_at, format: :convert_time) if theft_alert.end_at.present?
+            %small.convertTime= l(theft_alert.end_at, format: :convert_time) if theft_alert.end_at.present?
           %td
             = link_to "fbook link", theft_alert.facebook_post_url, target: "_blank" if theft_alert.facebook_post_url.present?
+          %td
+            = theft_alert.notes
 
