@@ -11,7 +11,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -37,7 +37,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -335,6 +335,10 @@ en:
       register_bike: Register bike
     recovery_stories:
       recovery_stories: Recovery Stories
+    update_browser:
+      oh_no: Oh No!
+      unsupported_browser: We're sorry, Bike Index does not support your browser.
+      go_here_to_learn_more: Go here to learn more
   landing_pages:
     for_organizations_photo_list:
       for: for
