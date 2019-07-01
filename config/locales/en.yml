@@ -339,6 +339,39 @@ en:
       oh_no: Oh No!
       unsupported_browser: We're sorry, Bike Index does not support your browser.
       go_here_to_learn_more: Go here to learn more
+    user_home:
+      user_bikes: "%{current_user_name} bikes"
+      bikes: bikes
+      locks: locks
+      add_a_photo: Add a photo
+      recovered: RECOVERED
+      stolen: STOLEN
+      serial: Serial
+      primary_colors: Primary colors
+      date_recovered: Date recovered
+      date_stolen: Date stolen
+      location: Location
+      edit_bike: Edit Bike
+      printable_pdf: Printable (pdf)
+      mark_bike_stolen: Mark bike stolen
+      report_stolen: report_stolen
+      you_have_no_registered_bikes: You have no registered bikes
+      lock_type: Lock Type
+      manufacturer: Manufacturer
+      key_serial: Key Serial
+      combination: Combination
+      edit: Edit
+      you_have_no_registered_locks: You have no registered locks
+      register_new_items: Register new items
+      add_a_bike: Add a bike
+      add_a_lock: Add a lock
+      add_some_info: Add some info
+      sorry_your_bike_was_stolen: We're sorry your %{bikes_last_type} was stolen, but hopefully, with everyone able to search for it, you'll get it back!
+      thanks_for_adding_your_bike: Awesome! We're pumped you added a %{bikes_last_type} to the Index.
+      welcome: Welcome
+      to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
+      tell_us_more_about_yourself: Tell us more about yourself.
+      update_your_profile: Update your profile
   landing_pages:
     for_organizations_photo_list:
       for: for
