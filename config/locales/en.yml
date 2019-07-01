@@ -257,7 +257,7 @@ en:
     landing_pages_for_schools: Bike Index for Schools
     landing_pages_for_bike_shops: Bike Index for Bike Shops
   meta_descriptions:
-    welcome_index: "The best bike registry: Simple, secure and free."
+    welcome_index: 'The best bike registry: Simple, secure and free.'
     welcome_user_home: Your bikes on Bike Index
     info_about: Why we made Bike Index and who we are
     info_resources: Bike Index resources and useful tools
@@ -324,3 +324,6 @@ en:
       stolen_bikes_recovered: Stolen Bikes Recovered
       total_recovery_value: Total Recovery value
       partner_organizations: Partner Organizations
+    goodbye:
+      youve_been_logged_out: You've been logged out
+      come_back_soon: Come back soon!
