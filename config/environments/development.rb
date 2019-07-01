@@ -73,7 +73,7 @@ Rails.application.configure do
   end
 
   # Raises error for missing translations
-  # config.action_view.raise_on_missing_translations = true
+  config.action_view.raise_on_missing_translations = true
 
   # Make sure we reload the API after every request!
   @last_api_change = Time.current
