@@ -5,10 +5,11 @@
     %meta{'http-equiv' => 'X-UA-Compatible', content: 'IE=edge,chrome=1'}
     %meta{name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1'}
     %meta{name: 'description', content: 'Embedable Bike Index registration form. Register your bike for free, right now' }
-    %title Protect your bike today
+    %title= t(".protect_your_bike_today")
     = csrf_meta_tags
     = stylesheet_link_tag 'registrations', media: 'all'
     = javascript_include_tag 'registrations'
+
   %body{ style: 'background: none; width: 100%; max-width: 500px; margin: 0 auto;' }
     .registration-widget#binx_registration_widget{ class: params[:organization_id] }
       - if action_name == 'create'
@@ -16,19 +17,17 @@
           = image_tag 'revised/logo.svg', class: 'reg-header-logo'
       - elsif @simple_header
         %header
-          %h3
-            Register your bike
+          %h3= t(".register_your_bike")
       - else
         %header.reg-header
           = image_tag 'revised/logo.svg', class: 'reg-header-logo'
-          %h2
-            Protect your bike today
+          %h2= t(".protect_your_bike_today")
           %p
-            Register on Bike Index.
-            %em
-              It's free.
+            = t(".register_on_bike_index")
+            %em= t(".its_free")
       .registration-widget-body
         = yield
+
   :javascript
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
