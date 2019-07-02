@@ -3,39 +3,39 @@
     .container
       .row
         %nav.col-md-2.pull-right
-          %h4 Bike Index
+          %h4= t(".bike_index")
           %ul
-            %li= active_link "FAQ", support_path
-            %li= active_link "Blog", news_index_path
-            %li= active_link "Help", help_path
-            %li= active_link "About", about_path
-            %li= active_link "Where We Are", where_path
-            %li= active_link "Stolen Bike Recoveries", recovery_stories_path
+            %li= active_link t(".faq"), support_path
+            %li= active_link t(".blog"), news_index_path
+            %li= active_link t(".help"), help_path
+            %li= active_link t(".about"), about_path
+            %li= active_link t(".where_we_are"), where_path
+            %li= active_link t(".stolen_bike_recoveries"), recovery_stories_path
 
         %nav.col-md-2.pull-right
-          %h4 Support Us
+          %h4= t(".support_us")
           %ul
-            %li= active_link "Donate", support_bike_index_path
-            %li= active_link "Store", store_path
-            %li= active_link "Ambassadors", ambassadors_how_to_path
+            %li= active_link t(".donate"), support_bike_index_path
+            %li= active_link t(".store"), store_path
+            %li= active_link t(".ambassadors"), ambassadors_how_to_path
 
         %nav.col-md-2.pull-right
-          %h4 Resources
+          %h4= t(".resources")
           %ul
-            %li= active_link "API documentation", documentation_index_path
-            %li= active_link "Dev Resources", dev_and_design_path
-            %li= active_link "Design & Logos", image_resources_path
-            %li= active_link "Bike Manufacturer List", manufacturers_path
-            %li= active_link "Stolen Bike Map", "https://map.bikewise.org/"
+            %li= active_link t(".api_documentation"), documentation_index_path
+            %li= active_link t(".dev_resources"), dev_and_design_path
+            %li= active_link t(".design_logos"), image_resources_path
+            %li= active_link t(".bike_manufacturer_list"), manufacturers_path
+            %li= active_link t(".stolen_bike_map"), "https://map.bikewise.org/"
 
         %nav.col-md-2.pull-right
-          %h4 Who we serve
+          %h4= t(".who_we_serve")
           %ul
-            %li= active_link "Bike Shops", for_bike_shops_path
-            %li= active_link "Schools and Universities", for_schools_path
-            %li= active_link "Cities", for_cities_path
-            %li= active_link "Law Enforcement", for_law_enforcement_path
-            %li= active_link "Community Groups", for_community_groups_path
+            %li= active_link t(".bike_shops"), for_bike_shops_path
+            %li= active_link t(".schools_and_universities"), for_schools_path
+            %li= active_link t(".cities"), for_cities_path
+            %li= active_link t(".law_enforcement"), for_law_enforcement_path
+            %li= active_link t(".community_groups"), for_community_groups_path
 
         %nav.col-md-2.pull-right
 
@@ -78,7 +78,7 @@
             = form_tag nil, method: :get, class: "locale-form" do
               .row
                 .form-group
-                  = label_tag(:locale, "Language")
+                  = label_tag(:locale, t(".language"))
                   = select_tag(:locale,
                   options_for_select(language_choices, selected: I18n.locale),
                   class: "form-control-sm",
@@ -87,14 +87,13 @@
             &nbsp;
         .col-md-6.text-right
           %p
-            - if current_user.present? && current_user.has_membership?
-              #{link_to "Privacy policy", privacy_path}, #{link_to "vendor terms", vendor_terms_path}
-            - else
-              #{link_to "Privacy policy", privacy_path}
-            and #{link_to "terms and conditions", terms_path}.
+            = [link_to(t(".privacy_policy"), privacy_url),
+            (current_user&.has_membership? ? link_to(t(".vendor_terms"), vendor_terms_url) : nil),
+            link_to(t(".terms_and_conditions"), terms_url)].compact.to_sentence.html_safe
+
           %p
             %span{data: {license: "https://github.com/bikeindex/bike_index/blob/master/LICENSE"}}
-              #{Time.current.year} &copy; Bike Index, a 501(c)(3) nonprofit - EIN 81-4296194
+              = t(".copyright_html", current_year: Time.current.year)
 
 - cache 'facebook_pixel' do
   = render '/shared/facebook_pixel'

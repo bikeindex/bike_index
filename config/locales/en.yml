@@ -534,3 +534,32 @@ en:
       privacy_policy: Privacy policy
       vendor_terms: vendor terms
       terms_and_conditions: terms and conditions
+    footer_revised:
+      privacy_policy: Privacy policy
+      vendor_terms: vendor terms
+      terms_and_conditions: terms and conditions
+      bike_index: Bike Index
+      faq: FAQ
+      blog: Blog
+      help: Help
+      about: About
+      where_we_are: Where We Are
+      stolen_bike_recoveries: Stolen Bike Recoveries
+      support_us: Support Us
+      donate: Donate
+      store: Store
+      ambassadors: Ambassadors
+      resources: Resources
+      api_documentation: API documentation
+      dev_resources: Dev Resources
+      design_logos: Design & Logos
+      bike_manufacturer_list: Bike Manufacturer List
+      stolen_bike_map: Stolen Bike Map
+      who_we_serve: Who we serve
+      bike_shops: Bike Shops
+      schools_and_universities: Schools and Universities
+      cities: Cities
+      law_enforcement: Law Enforcement
+      community_groups: Community Groups
+      language: Language
+      copyright_html: "%{current_year} &copy; Bike Index, a 501(c)(3) nonprofit - EIN 81-4296194"
