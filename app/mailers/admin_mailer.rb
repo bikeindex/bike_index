@@ -44,6 +44,6 @@ class AdminMailer < ActionMailer::Base
     @theft_alert_plan = theft_alert.theft_alert_plan
     @creator = theft_alert.creator
     @bike = theft_alert.bike
-    mail(to: "stolenbikealerts@bikeindex.org", subject: "Bike Index Alert purchased")
+    mail(to: "stolenbikealerts@bikeindex.org", subject: "Theft Alert purchased: #{@theft_alert.id}")
   end
 end
