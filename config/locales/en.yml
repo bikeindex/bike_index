@@ -520,3 +520,17 @@ en:
       other_registries_html: Other registries generally hide serials because of their technical limitations. They keep information away from those most likely to use it for good, even though %{wikipedia_link} doesn't work.
       while_serial_numbers: While serial numbers and bike information is public, there is nothing to connect users to the bikes they own. We never make user information available unless the user explicitly chooses to do so.
       we_care_about_your_privacy: We care about your privacy more than anyone — you can hide your registration so nobody but you can see it. We just don't think it's a good idea.
+    footer:
+      register_a_bike: Register a bike
+      bike_index_partner_organizations: Bike Index partner organizations
+      bike_index_resources: Bike Index resources
+      about_bike_index: About Bike Index
+      bike_index_news: Bike Index news
+      list_of_manufacturers: List of manufacturers
+      help: Help
+      contact_us: Contact us
+      contact_us_section: contact_us_section
+      sign_up_a_shop_or_organization: Sign up a shop or organization
+      privacy_policy: Privacy policy
+      vendor_terms: vendor terms
+      terms_and_conditions: terms and conditions
