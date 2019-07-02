@@ -456,3 +456,11 @@ en:
       bikeindex_is_a_nonprofit: Bike Index is a 501(c)(3) nonprofit. We depend on donations to provide these services. We recommend law enforcement agencies like %{org_name} donate at least $20 a year to help support our efforts.
       contact_bike_owners: Contact bike owners before their bikes are marked stolen
       email_for_access_html: Email %{email_link} for access.
+    email_bike_box:
+      make: 'Make:'
+      serial: 'Serial:'
+      color: color
+      found: 'Found:'
+      stolen_from: 'Stolen from:'
+      date: 'Date:'
+      color_may_be_incorrect: Color may be incorrect. Please update it if necessary!
