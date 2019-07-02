@@ -6,14 +6,24 @@
     .col-3.mb-2.col-lg-2
       = image_tag img.image_url(:small), class: "ml-auto mr-auto", style: "display: block; max-width: 150px; height: auto;"
 
-- unless @stolen_record.present?
+%hr
+- if @stolen_record.blank?
   %h1.mt-4
     Stolen record not created yet.
   %p
-    Wait a minute or two and it will be here!
+    If this bike has just been marked stolen, wait a minute or two and it will be here!
 
-%hr.mt-4
-- if @stolen_record.present? && !@stolen_record.approved
+- elsif @bike.present? && !@current_stolen_record
+  %h2.text-warning
+    This Stolen record is not the current stolen record for the Bike!
+  %p
+    Either you're viewing a recovered bike or there is a new stolen record.
+  %h4
+    = link_to "View the current stolen record", edit_admin_stolen_bike_url(@bike.id)
+  %p.text-danger.mt-4
+    You Probably don't want to do anything on this page
+
+- elsif @stolen_record.present? && !@stolen_record.approved
   .row.mt-4.mb-4
     .col-sm-6
       %p.mb-0
@@ -30,7 +40,8 @@
           It can NOT be effectively reversed\n
     .col-sm-6.text-center
       = link_to "Approve listing", approve_admin_stolen_bike_url(@bike), method: :post, class: "btn btn-lg btn-success"
-  %hr
+
+%hr.mt-4.mb-4
 
 - if @customer_contact.present?
   = form_for [:admin, @customer_contact] do |f|

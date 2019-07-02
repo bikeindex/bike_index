@@ -114,9 +114,9 @@
     %h4.mt-2
       %span.text-danger
         Theft information
-      - unless %w[stolen_bikes recoveries recovery_display].include?(controller_name)
+      - unless controller_name == "stolen_bikes"
         %span.float-right
-          = link_to edit_admin_stolen_bike_url(bike) do
+          = link_to edit_admin_stolen_bike_url(stolen_record.id, stolen_record_id: true) do
             - if stolen_record.approved?
               Stolen message
             - else
@@ -205,8 +205,9 @@
   - if display_recovery && stolen_record.present? && stolen_record.recovered?
     %h4.mt-2
       Recovery Information
-      %small{ style: "font-size: 80%;" }
-        = link_to "admin recovery view", admin_recovery_path(stolen_record.to_param), class: "text-muted"
+      - unless controller_name == "recoveries"
+        %small{ style: "font-size: 80%;" }
+          = link_to "admin recovery view", admin_recovery_path(stolen_record.to_param), class: "text-muted"
     .row
       .col-sm-12.col-lg-6
         %table.table-list

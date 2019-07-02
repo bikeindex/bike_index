@@ -55,7 +55,7 @@ class Admin::StolenBikesController < Admin::BaseController
       @bike = Bike.unscoped.find_by_id(params[:id])
       @stolen_record = @bike.current_stolen_record
     end
-    @current_stolen_record = @stolen_record.present? && @stolen_record.id == @bike.current_stolen_record.id
+    @current_stolen_record = @stolen_record.present? && @stolen_record.id == @bike.current_stolen_record&.id
     @bike
   end
 end
