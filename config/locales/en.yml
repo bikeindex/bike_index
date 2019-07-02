@@ -1,5 +1,6 @@
 ---
 en:
+  bike_serial_number: Serial number
   language: English
   date:
     abbr_day_names:
@@ -464,3 +465,58 @@ en:
       stolen_from: 'Stolen from:'
       date: 'Date:'
       color_may_be_incorrect: Color may be incorrect. Please update it if necessary!
+    faq:
+      faqs: Common issues & frequently asked questions
+      who_can_register_bikes: Who can register bikes?
+      everyone_can_register_bikes_for_free: Everyone can register bikes, for free.
+      how_bikes_are_verified: How do you verify the bikes that people register?
+      partner_link: one of our partner shops
+      registration_html: Registering your bike at %{partner_link} verifies the registration (shops may choose to only register bikes that they sell).
+      verification_questions: Any question of verification is dealt with by reviewing your registration information. This hasn't been an issue.
+      can_you_tell_me_what_bike_by_serial: Can you tell me what bike I have based on its serial number?
+      not_yet: No. This is a feature we're working on, but we aren't there yet.
+      we_recommend_searching: For now, we recommend searching for your bike's serial number. We will show you any registered bikes that have similar serial numbers.
+      bike_serial_number: Bike serial number
+      similar_serials: If there are any bikes with similar serial numbers, particularly if just the last few numbers are different — your bike is most likely that make and model.
+      what_if_i_sell_my_bike: What if I sell my bike?
+      free_to_transfer: Bike registration is permanent, it's free to transfer bikes.
+      go_to_edit_page: Go to the edit page for the bike and click on the link at the bottom
+      reveal_owner_email_html: This will reveal the owner's email. Enter in the new owners email and click <em>Send Bike</em>.
+      can_partner_with_bikeindex: Can my local bike shop partner with Bike Index?
+      absolutely: Absolutely!
+      organization_signup_link: organization signup page
+      organization_signup_html: Have them visit the %{signup_link}, we'll set them up with a organization account so they can register bikes for free.
+      how_can_i_advertise: How can I advertise on Bike Index
+      in_the_process_of_setting_up_advertising: We're in the process of setting up advertising opportunities throughout the site, particularly for local bike shops.
+      email_us_html: Email %{email_link} to find out more!
+      bike_was_already_stolen: My bike was already stolen. What should I do?
+      add_details: Add the bike and details about the theft to the Index now!
+      comprehensive_public_database: Bike Index is a comprehensive public database - if your bike was stolen, we think everyone should know about it.
+      stolen_bikes_link: stolen bikes page
+      add_a_stolen_bike_link: add a stolen bike here
+      visit_or_add_html: Visit the %{visit_link} for more information, or %{add_link}.
+      how_does_this_prevent_bike_theft: How does this prevent bike theft?
+      people_with_good_intentions: Right now people with good intentions buy stolen bikes because there isn't a single searchable, simple resource to check before buying a bike.
+      bike_index_is_that_resource: Bike Index is that resource. The next time you buy a used bike, check the Index first.
+      we_offer_bike_shops: We offer bike shops and law enforcement an easy to use interface to look up any suspicious bikes they encounter, and a way to quickly contact the proper owner.
+      we_successfully_recover: We successfully recover stolen bikes every week through this process.
+      how_can_i_stay_up_to_date: How can I stay up to date on what Bike Index is doing?
+      blog_link: blog
+      read_our_blog_html: Read our %{blog_link}! We post most cool things we do there.
+      follow_us_html: You can also follow us on %{twitter_link} and %{facebook_link}.
+      can_thieves_search: Is it possible for bike thieves to search Index to check if a bike is listed as stolen before they sell it?
+      possible_but_uncommon: It is possible, but not common. We track and flag suspect activities to prevent abuse of Bike Index.
+      what_about_my_privacy: What about my privacy?
+      your_personal_information_is_never_viewed: Your personal information is never viewed, shared or sold without your permission.
+      bikes_are_public_and_searchable: Bikes are public and searchable, but no information about the owner is visible. You can choose to share information (such as your twitter or personal website) but this is turned off by default.
+      article_link: our article
+      to_learn_more_html: To learn more check out %{article_link} about privacy.
+      why_public: Why are serial numbers and non-stolen bikes public?
+      serial_numbers_public: We make serial numbers public because it's the best way to recover stolen bikes and deter theft.
+      the_faster_and_easier_it_is: The faster and easier it is to access serials, the more stolen bikes we recover. Restricting access to serial numbers only helps thieves.
+      this_isnt_optimistic_speculation: 'This isn''t optimistic speculation: we''ve proved this and continue to do so with every stolen bike we recover.'
+      weve_recovered_bikes: We've recovered bikes before they could even be marked stolen because they could be found on the Index.
+      security_by_obscurity_link: security by obscurity
+      other_registries_html: Other registries generally hide serials because of their technical limitations. They keep information away from those most likely to use it for good, even though %{wikipedia_link} doesn't work.
+      while_serial_numbers: While serial numbers and bike information is public, there is nothing to connect users to the bikes they own. We never make user information available unless the user explicitly chooses to do so.
+      we_care_about_your_privacy: We care about your privacy more than anyone — you can hide your registration so nobody but you can see it. We just don't think it's a good idea.
