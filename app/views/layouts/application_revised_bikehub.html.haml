@@ -31,8 +31,10 @@
       .row
         .col-sm-12
           %h1
-            = t(".bikehub")
-            = signup_page ? t(".sign_up") : t(".log_in")
+            - if signup_page
+              = t(".bikehub_signup")
+            - else
+              = t(".bikehub_login")
       .row
         .col-sm-12
           - if signup_page
