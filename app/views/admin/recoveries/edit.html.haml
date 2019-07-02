@@ -1,14 +1,8 @@
 = render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show", stolen_record: @recovery, display_recovery: true }
 
-/ .admin-subnav.midpage-subnav
-/   .col-md-12
-/     %h1
-/       - if @bike.present?
-/         Update recovery for #{@bike.type}
-/       - else
-/         Update Recovery for deleted bike
-
-%h2.mt-4 Recovery display
+.admin-subnav.midpage-subnav
+  .col-12
+    %h2 Manage Recovery Display
 .row.text-center
   - if @recovery.waiting_on_decision?
     .col-6

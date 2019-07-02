@@ -1,8 +1,8 @@
-%h1
-  Edit recovery
-- if @bike.present?
-  %p
-    for #{link_to @bike.title_string.strip, edit_admin_bike_url(@bike)}, #{link_to "recovery", edit_admin_recovery_url(@recovery_display.stolen_record_id)}
+= render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show", stolen_record: @stolen_record, display_recovery: true }
+
+.admin-subnav.midpage-subnav
+  .col-12
+    %h1 Edit Recovery Display
 
 = render partial: "form"
 

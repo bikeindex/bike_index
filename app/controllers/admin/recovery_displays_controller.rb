@@ -12,7 +12,8 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
     @recovery_display = RecoveryDisplay.new
     if params[:stolen_record_id].present?
       @recovery_display.from_stolen_record(params[:stolen_record_id])
-      @bike = @recovery_display.bike
+      @stolen_record = @recovery_display.stolen_record
+      @bike = @recovery_display.bike && @recovery_display.bike.decorate
     end
   end
 
@@ -27,7 +28,8 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   end
 
   def edit
-    @bike = @recovery_display.bike
+    @stolen_record = @recovery_display.stolen_record
+    @bike = @recovery_display.bike && @recovery_display.bike.decorate
   end
 
   def update

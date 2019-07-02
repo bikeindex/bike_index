@@ -1,4 +1,4 @@
-- stolen_record ||= stolen_record || bike.find_current_stolen_record
+- stolen_record ||= stolen_record || bike.present? && bike.find_current_stolen_record
 - display_recovery ||= stolen_record.present? && stolen_record.recovered?
 .admin-bike-partial
   - if bike.blank?
@@ -202,9 +202,11 @@
                 Police Report
               %td
                 = stolen_record.police_report_number
-  - if display_recovery && stolen_record.recovered?
+  - if display_recovery && stolen_record.present? && stolen_record.recovered?
     %h4.mt-2
       Recovery Information
+      %small{ style: "font-size: 80%;" }
+        = link_to "admin recovery view", admin_recovery_path(stolen_record.to_param), class: "text-muted"
     .row
       .col-sm-12.col-lg-6
         %table.table-list
