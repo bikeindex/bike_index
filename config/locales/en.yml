@@ -432,3 +432,7 @@ en:
       the_bike_index_team: The Bike Index Team
       help_prevent_theft: Help prevent bike theft,
       make_a_donation: make a donation.
+    embed_layout:
+      register_through_org: Register a bike through %{org_name}
+      please_fix_the_following: Please fix the following
+      error: error
