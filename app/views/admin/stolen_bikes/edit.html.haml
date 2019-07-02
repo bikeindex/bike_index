@@ -1,17 +1,19 @@
 = render partial: "admin/bikes/bike", locals: { bike: @bike, target: "show", stolen_record: @stolen_record }
+
+.row.mt-2.mb-4
+  - @bike.public_images.each_with_index do |img, index|
+    - next if index == 1
+    .col-3.mb-2.col-lg-2
+      = image_tag img.image_url(:small), class: "ml-auto mr-auto", style: "display: block; max-width: 150px; height: auto;"
+
 - unless @stolen_record.present?
   %h1.mt-4
     Stolen record not created yet.
   %p
     Wait a minute or two and it will be here!
 
-  %hr.mt-4
-  = link_to "Standard edit page", edit_admin_bike_url(@bike)
-  - @bike.public_images.each do |img|
-    .pull-left
-      = image_tag img.image_url(:small)
-
-- unless @stolen_record&.approved
+%hr.mt-4
+- if @stolen_record.present? && !@stolen_record.approved
   .row.mt-4.mb-4
     .col-sm-6
       %p.mb-0
