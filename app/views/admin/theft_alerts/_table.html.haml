@@ -24,18 +24,22 @@
             %td
               - if theft_alert.bike.present?
                 = link_to theft_alert.bike.title_string, edit_admin_bike_path(theft_alert.bike)
-              - if theft_alert.recovered?
-                %span.text-success
-                  #{theft_alert.bike.type} recovered
           %td
             = link_to theft_alert.creator.display_name, edit_admin_user_path(theft_alert.creator.to_param)
           %td
             - theft_alert_plan = theft_alert.theft_alert_plan
-            = link_to theft_alert_plan.title_string, edit_admin_theft_alert_plan_path(theft_alert_plan)
             %small
-              = number_to_currency(theft_alert_plan.amount_cents / 100.0, unit: "$")
+              = link_to theft_alert_plan.title_string, edit_admin_theft_alert_plan_path(theft_alert_plan)
+              %span.less-strong
+                = number_to_currency(theft_alert_plan.amount_cents / 100.0, unit: "$")
           %td
-            = theft_alert.status
+            - if theft_alert.recovered?
+              = link_to "recovered!", admin_recovery_path(theft_alert.bike), class: "text-success"
+            - else
+              - text_class = "text-info" if theft_alert.active?
+              - text_class ||= "text-danger" if theft_alert.pending?
+              %span{ class: text_class || "" }
+                = theft_alert.status
           %td
             %small.convertTime= l(theft_alert.begin_at, format: :convert_time) if theft_alert.begin_at.present?
           %td
