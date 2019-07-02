@@ -182,7 +182,7 @@ class User < ActiveRecord::Base
   end
 
   def accepted_vendor_terms_of_service=(val)
-    if ActiveRecord::Type::Boolean.new.type_cast_from_database(val)
+    if ParamsNormalizer.boolean(val)
       self.vendor_terms_of_service = true
       self.when_vendor_terms_of_service = Time.current
     end

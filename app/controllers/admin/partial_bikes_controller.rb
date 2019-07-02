@@ -15,8 +15,8 @@ class Admin::PartialBikesController < Admin::BaseController
   end
 
   def matching_b_params
-    @search_with_bike = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:search_with_bike])
-    @search_without_bike = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:search_without_bike])
+    @search_with_bike = ParamsNormalizer.boolean(params[:search_with_bike])
+    @search_without_bike = ParamsNormalizer.boolean(params[:search_without_bike])
     b_params = BParam
     b_params = b_params.with_bike if @search_with_bike
     b_params = b_params.without_bike if @search_without_bike
