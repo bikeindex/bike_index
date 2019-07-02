@@ -20,12 +20,13 @@
             = f.label :date_recovered
             - f.object.date_recovered ||= Time.current
             = f.datetime_local_field :date_recovered, max: Time.current + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(f.object.date_recovered, format: :convert_time)
-        .col-lg-6
-          - if @bike.present?
+
+        - if @bike.present?
+          .col-lg-6
             .form-group
               %label
                 Bike url
-              %input.less-strong.w-100{ type: 'text', value: bike_url(@recovery_display.bike) }
+              %input.form-control.less-strong.w-100{ type: "text", value: bike_url(@recovery_display.bike), disabled: true }
       .row
         .col-lg-6
           .form-group

@@ -1,6 +1,10 @@
 - stolen_record ||= stolen_record || bike.find_current_stolen_record
+- display_recovery ||= stolen_record.recovered?
 .admin-bike-partial
-  - if bike.present?
+  - if bike.blank?
+    %h1.text-danger
+      No Bike present
+  - else
     .row
       .col-lg-2.col-3.mt-auto.mb-2.admin-image-thumb
         - if bike.thumb_path.present?
@@ -106,14 +110,11 @@
                   - if bike.creation_state.bulk_import.ascend?
                     %small
                       Ascend
-  - else
-    %h1
-      No Bike present
   - if stolen_record.present?
     %h4.mt-2
       %span.text-danger
         Theft information
-      - unless controller_name == "stolen_bikes"
+      - unless %w[stolen_bikes recoveries recovery_display].include?(controller_name)
         %span.float-right
           = link_to "Stolen approval/message", edit_admin_stolen_bike_url(bike)
     .row
@@ -197,4 +198,55 @@
                 Police Report
               %td
                 = stolen_record.police_report_number
+  - if display_recovery
+    %h4.mt-2
+      Recovery Information
+    .row
+      .col-sm-12.col-lg-6
+        %table.table-list
+          %tbody
+            %tr
+              %td
+                Recovered at
+              %td
+                - if @recovery.date_recovered.present?
+                  %span.convertTime{ href: admin_bike_url(@bike) }
+                    = l @recovery.date_recovered, format: :convert_time
+            %tr
+              %td
+                Recovered by
+              %td
+                - if @recovery.recovering_user.present?
+                  = link_to @recovery.recovering_user.display_name, admin_user_path(@recovery.recovering_user.to_param)
+                  - unless @recovery.recovering_user_owner?
+                    %em.text-warning.less-strong
+                      not owner!
+                - elsif @recovery.pre_recovering_user?
+                  %small.less-strong
+                    pre-recording of recovering user
+                - else
+                  %small
+                    No user present
+                    %span.less-strong
+                      most likely recovered by owner
+            %tr
+              %td
+                We Helped
+              %td
+                = "&#x2713;".html_safe if @recovery.index_helped_recovery
+            %tr
+              %td
+                Can Share
+              %td
+                = "&#x2713;".html_safe if @recovery.can_share_recovery
+      .col-sm-12.col-lg-6
+        %table.table-list
+          %tbody
+            %tr
+              %td{ colspan: 2 }
+                Description
+            %tr
+              %td.full-width-data{ colspan: 2 }
+                = @recovery.recovered_description
+
   %hr.mt-2.mb-4
