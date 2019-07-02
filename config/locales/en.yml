@@ -12,7 +12,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -38,7 +38,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -563,3 +563,5 @@ en:
       community_groups: Community Groups
       language: Language
       copyright_html: "%{current_year} &copy; Bike Index, a 501(c)(3) nonprofit - EIN 81-4296194"
+    form_well_footer_save:
+      save_changes: Save changes
