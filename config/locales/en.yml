@@ -384,34 +384,46 @@ en:
       error: error
       please_fix_the_following: Please fix the following %{errors}
     application_revised:
-      the_nonprofit_bike_registry: the non-profit bike registry
-      org_dashboard: "%{org_name} Dashboard"
-      resources: Resources
-      getting_started: Getting started
-      multi_serial_search: Multi serial search
-      discuss: Discuss
-      org_bikes: "%{org_name} Bikes"
-      add_a_bike: Add a bike
-      incomplete_registrations: Incomplete registrations
-      recoveries: Recoveries
-      lightspeed_integration_panel: Lightspeed Integration Panel
-      registration_stickers: Registration stickers
-      exports: Exports
-      users: Users
-      org_profile: "%{org_name} profile"
-      org_locations: "%{org_name} locations"
-      super_admin_view: Super Admin view %{org_name}
-      sign_up: Sign up
-      settings: Settings
-      view_org: View %{org_name}
-      register_a_new_bike: Register a new bike
-      your_bikes: Your bikes
-      settings: "%{user_email} settings"
-      logout: Logout
-      admin: Admin
-      log_in: log in
-      help: Help
       about: About
-      donate: Donate
+      add_a_bike: Add a bike
+      admin: Admin
       blog: Blog
+      discuss: Discuss
+      donate: Donate
+      exports: Exports
+      getting_started: Getting started
+      help: Help
+      incomplete_registrations: Incomplete registrations
+      lightspeed_integration_panel: Lightspeed Integration Panel
+      log_in: log in
+      logout: Logout
+      multi_serial_search: Multi serial search
+      org_bikes: "%{org_name} Bikes"
+      org_dashboard: "%{org_name} Dashboard"
+      org_locations: "%{org_name} locations"
+      org_profile: "%{org_name} profile"
+      recoveries: Recoveries
+      register_a_new_bike: Register a new bike
+      registration_stickers: Registration stickers
+      resources: Resources
       search_bikes: Search bikes
+      settings: "%{user_email} settings"
+      sign_up: Sign up
+      super_admin_view: Super Admin view %{org_name}
+      the_nonprofit_bike_registry: the non-profit bike registry
+      users: Users
+      view_org: View %{org_name}
+      your_bikes: Your bikes
+    application_revised_bikehub:
+      bike_security: At BikeHub, we believe bike security is more than just a strong U-lock.
+      bikehub: BikeHub
+      bikeindex_a_nonprofit: Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration service in the world.
+      bikeindex_bikehub_partnership: Through this partnership, BikeHub patrons enjoy access to the most secure public bike parking – and registration with nation’s largest network, used by law enforcement agencies, universities, and advocates to connect recovered bikes with their owners.
+      contact: Contact
+      log_in: Log In
+      login_message: Logging in here will log you in to BikeHub.
+      powered_by: powered by
+      powered_by_bike_index: BikeHub accounts are powered by Bike Index – the premier bike registry.
+      sign_up: Sign up
+      signup_message: Creating an account here will sign you up for BikeHub
+      why_bikeindex: WHY BIKEINDEX?
