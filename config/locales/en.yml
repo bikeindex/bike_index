@@ -446,3 +446,13 @@ en:
       register_your_bike: Register your bike
       register_on_bike_index: Register on Bike Index.
       its_free: It's free.
+  shared:
+    donate_modal:
+      greeting: Hello %{user_name},
+      thank_you: Thank you so much for using Bike Index!
+      law_enforcement_features: 'We have a number of features specifically designed for law enforcement officers:'
+      thanks_for_using_bike_index: Thanks for using Bike Index!
+      multiple_serial_search_pane: Multiple serial search pane
+      bikeindex_is_a_nonprofit: Bike Index is a 501(c)(3) nonprofit. We depend on donations to provide these services. We recommend law enforcement agencies like %{org_name} donate at least $20 a year to help support our efforts.
+      contact_bike_owners: Contact bike owners before their bikes are marked stolen
+      email_for_access_html: Email %{email_link} for access.
