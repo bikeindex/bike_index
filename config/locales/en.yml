@@ -11,7 +11,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -37,7 +37,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -436,3 +436,7 @@ en:
       register_through_org: Register a bike through %{org_name}
       please_fix_the_following: Please fix the following
       error: error
+    payments_layout:
+      until_every_bike_is_safe: Until Every bike is safe
+      be_a_bike_saver: Be a bike saver.
+      support_bike_index_today: Support Bike Index today.
