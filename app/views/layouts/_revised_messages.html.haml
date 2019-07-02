@@ -7,16 +7,15 @@
 
 .primary-alert-block
   - flash.each do |name, msg|
-    = render partial: '/shared/alert', locals: { body: msg, type: name }
+    = render partial: "/shared/alert", locals: { body: msg, type: name }
 
   - if @page_errors.present? # Primarily used for form object errors
-    - title = "Please fix the following #{pluralize(@page_errors.count, 'error')}"
+    - title = t(".please_fix_the_following", errors: pluralize(@page_errors.count, t(".error")))
     - error_body = capture_haml do
       %ul
         - @page_errors = @page_errors.full_messages if @page_errors.is_a?(ActiveModel::Errors)
         - @page_errors.each do |msg|
-          %li
-            = msg
+          %li= msg
     = render partial: '/shared/alert', locals: { body: error_body, title: title }
 
 :plain

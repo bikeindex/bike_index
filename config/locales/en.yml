@@ -11,7 +11,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -37,7 +37,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -379,3 +379,7 @@ en:
       cities: Cities
       schools: Schools
       community_groups: Community Groups
+  layouts:
+    revised_messages:
+      error: error
+      please_fix_the_following: Please fix the following %{errors}
