@@ -1,5 +1,5 @@
 - stolen_record ||= stolen_record || bike.find_current_stolen_record
-- display_recovery ||= stolen_record.recovered?
+- display_recovery ||= stolen_record.present? && stolen_record.recovered?
 .admin-bike-partial
   - if bike.blank?
     %h1.text-danger
@@ -116,7 +116,11 @@
         Theft information
       - unless %w[stolen_bikes recoveries recovery_display].include?(controller_name)
         %span.float-right
-          = link_to "Stolen approval/message", edit_admin_stolen_bike_url(bike)
+          = link_to edit_admin_stolen_bike_url(bike) do
+            - if stolen_record.approved?
+              Stolen message
+            - else
+              Stolen message/approval
     .row
       .col-md-6
         %table.table-list
@@ -128,7 +132,7 @@
                 = stolen_record.theft_description
             %tr
               %td
-                Marked stolen
+                Stolen record created
               %td.convertTime
                 = l stolen_record.created_at, format: :convert_time
             %tr
@@ -198,7 +202,7 @@
                 Police Report
               %td
                 = stolen_record.police_report_number
-  - if display_recovery
+  - if display_recovery && stolen_record.recovered?
     %h4.mt-2
       Recovery Information
     .row
@@ -209,19 +213,19 @@
               %td
                 Recovered at
               %td
-                - if @recovery.date_recovered.present?
-                  %span.convertTime{ href: admin_bike_url(@bike) }
-                    = l @recovery.date_recovered, format: :convert_time
+                - if stolen_record.date_recovered.present?
+                  %span.convertTime{ href: admin_bike_url(bike) }
+                    = l stolen_record.date_recovered, format: :convert_time
             %tr
               %td
                 Recovered by
               %td
-                - if @recovery.recovering_user.present?
-                  = link_to @recovery.recovering_user.display_name, admin_user_path(@recovery.recovering_user.to_param)
-                  - unless @recovery.recovering_user_owner?
+                - if stolen_record.recovering_user.present?
+                  = link_to stolen_record.recovering_user.display_name, admin_user_path(stolen_record.recovering_user.to_param)
+                  - unless stolen_record.recovering_user_owner?
                     %em.text-warning.less-strong
                       not owner!
-                - elsif @recovery.pre_recovering_user?
+                - elsif stolen_record.pre_recovering_user?
                   %small.less-strong
                     pre-recording of recovering user
                 - else
@@ -233,12 +237,12 @@
               %td
                 We Helped
               %td
-                = "&#x2713;".html_safe if @recovery.index_helped_recovery
+                = "&#x2713;".html_safe if stolen_record.index_helped_recovery
             %tr
               %td
                 Can Share
               %td
-                = "&#x2713;".html_safe if @recovery.can_share_recovery
+                = "&#x2713;".html_safe if stolen_record.can_share_recovery
       .col-sm-12.col-lg-6
         %table.table-list
           %tbody
@@ -247,6 +251,4 @@
                 Description
             %tr
               %td.full-width-data{ colspan: 2 }
-                = @recovery.recovered_description
-
-  %hr.mt-2.mb-4
+                = stolen_record.recovered_description

@@ -1,5 +1,6 @@
-.d-none{ data: { url: ENV['BASE_URL'] } }
 = render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show" }
+
+.d-none{ data: { url: ENV['BASE_URL'] } }
 
 - if @bike.current_stolen_record.present? && @bike.current_stolen_record.theft_alerts.any?
   %h4.mt-2
@@ -9,7 +10,7 @@
 - if @recoveries.any?
   %h3.mt-4
     Recoveries
-  = render partial: "/admin/recoveries/table", locals: { recoveries: @recoveries }
+  = render partial: "/admin/recoveries/table", locals: { recoveries: @recoveries, skip_bike: true }
 
 %h3.mt-4
   Ownerships

@@ -4,6 +4,22 @@
 }
 
 .admin-bike-partial {
+  margin: -1.5rem -15px 0;
+  padding: 1.5rem 15px;
+  overflow-x: hidden;
+  background: $gray-900;
+  position: relative;
+  border-bottom: 1px solid #ccc;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    color: #fff;
+  }
+  table {
+    background: #fff;
+  }
   .admin-image-thumb {
     max-width: 220px;
     img {
@@ -37,6 +53,7 @@
 .admin-graphs-list a.active {
   font-weight: bold;
 }
+
 .variable-admin-graphs-form {
   .control-group {
     width: 220px;
@@ -77,9 +94,10 @@
     @extend .mt-4;
     @extend .col-12;
   }
+
   &.midpage-subnav {
     border-bottom: none;
-    border-top: 1px solid $gray-400;
+    margin-top: 40px;
     padding-top: 20px;
   }
 }
