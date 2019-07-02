@@ -492,6 +492,7 @@ $mainmenu-open-zindex: 10;
       text-decoration: none;
       margin: 11px $vertical-height 0 $vertical-height;
       transition: margin $mainmenu-transform-speed linear;
+      width: 90px;
     }
 
     &.headroom--pinned .nonprofit-subtitle,
