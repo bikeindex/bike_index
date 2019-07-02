@@ -19,3 +19,6 @@ Chartkick.addAdapter(Chart);
 // Add jQuery to the window so it's accessible in the console, and just in general
 window.$ = window.jQuery = jQuery;
 
+
+import * as FilePond from 'filepond';
+window.FilePond = FilePond

@@ -108,8 +108,8 @@ function BinxAdmin() {
         const regexp = new RegExp($(this).data("id"), "g");
         $(this).before(
           $(this)
-            .data("fields")
-            .replace(regexp, time)
+          .data("fields")
+          .replace(regexp, time)
         );
         event.preventDefault();
         LoadFancySelects();
