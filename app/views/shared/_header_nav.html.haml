@@ -9,8 +9,7 @@
         %span.transparent-logo-bg
 
         %span.logo-background
-        %h2
-          Bike Index
+        %h2 Bike Index
       %nav#header-tabs.collapse.in
         %ul.global-tabs
           %span#global-tabs-cover
@@ -20,25 +19,27 @@
               - if current_user.present?
                 = current_user.email
               - else
-                You
+                = t(".you")
+
           %li.super_user.hidden
-            = link_to 'Superuser home', admin_root_path, class: "follow-link"
-        
+            = link_to t(".superuser_home"), admin_root_path, class: "follow-link"
+
           %li.expand_t.no_user.hidden
             %a.expand-sign-in{href: "#signup"}
-              Log in
+              = t(".log_in")
           %li.no_user.hidden
-            = link_to "Sign up", new_user_url, class: "follow-link"
+            = link_to t(".sign_up"), new_user_url, class: "follow-link"
 
         .tab-content
           #you.tab-pane.yes_user.hidden
             %ul
               %li
-                = link_to 'Your bikes', user_home_url, class: "follow-link"
+                = link_to t(".your_bikes"), user_home_url, class: "follow-link"
               %li
-                %a{ title: "Your preferences", href: "/my_account"}
-                  Preferences
+                %a{ title: t(".your_preferences"), href: "/my_account"}
+                  = t(".preferences")
               %li
-                = link_to 'Log out', session_path, method: :delete
+                = link_to t(".log_out"), session_path, method: :delete
+
       #head-search-bikes
         .search-fields
