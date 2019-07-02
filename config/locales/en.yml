@@ -11,7 +11,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -37,7 +37,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -383,3 +383,35 @@ en:
     revised_messages:
       error: error
       please_fix_the_following: Please fix the following %{errors}
+    application_revised:
+      the_nonprofit_bike_registry: the non-profit bike registry
+      org_dashboard: "%{org_name} Dashboard"
+      resources: Resources
+      getting_started: Getting started
+      multi_serial_search: Multi serial search
+      discuss: Discuss
+      org_bikes: "%{org_name} Bikes"
+      add_a_bike: Add a bike
+      incomplete_registrations: Incomplete registrations
+      recoveries: Recoveries
+      lightspeed_integration_panel: Lightspeed Integration Panel
+      registration_stickers: Registration stickers
+      exports: Exports
+      users: Users
+      org_profile: "%{org_name} profile"
+      org_locations: "%{org_name} locations"
+      super_admin_view: Super Admin view %{org_name}
+      sign_up: Sign up
+      settings: Settings
+      view_org: View %{org_name}
+      register_a_new_bike: Register a new bike
+      your_bikes: Your bikes
+      settings: "%{user_email} settings"
+      logout: Logout
+      admin: Admin
+      log_in: log in
+      help: Help
+      about: About
+      donate: Donate
+      blog: Blog
+      search_bikes: Search bikes
