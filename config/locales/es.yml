@@ -147,6 +147,7 @@ es:
       update: Actualizar %{model}
   number:
     currency:
+      alphabetic_code: EUR
       format:
         delimiter: "."
         format: "%n %u"
@@ -1054,4 +1055,24 @@ es:
 
   welcome:
     index:
+      value_of_bikes_recovered: Más de %{value} por valor de bicicletas recuperadas
       hero: Registro de bicicleta que funciona
+      register_now: Registrase ahora!
+      read_more_recovery_stories: Más historias de recuperación
+      but_how_does_it_work: ¿Pero como funciona?
+      register_your_bike: Registre su bicicleta
+      how_it_works: Es sencillo. Envíe su nombre, el fabricante de la bicicleta, el número de serie y la información de los componentes para ingresar su bicicleta en el registro de bicicletas más utilizado del planeta.
+      alert_the_community: Alertar a la comunidad
+      if_your_bike_goes_missing: Si su bicicleta desaparece, márquela como perdida o robada para notificar a toda la comunidad de Bike Index y sus socios.
+      the_community_responds: La comunidad responde.
+      identifying_your_bike: Un usuario o socio se encuentra con su bicicleta, utiliza el Índice de bicicletas para identificarlo y se comunica con usted.
+      you_get_your_bike_back: Recibes tu bicicleta de vuelta
+      recover_your_bike_for_free: Con la ayuda de la comunidad de Bike Index y sus socios, tiene la información necesaria para recuperar su bicicleta perdida o robada sin costo alguno para usted. Es lo que hacemos.
+      used_by: Usado por
+      bike_index_statistics: Estadísticas del índice de bicicletas
+      bikes_registered_this_week: Bicicletas registradas esta semana
+      total_bikes_registered: Total de bicicletas registradas
+      stolen_bikes_registered: Bicicletas robadas registradas
+      stolen_bikes_recovered: Bicicletas robadas recuperadas
+      total_recovery_value: Valor de recuperación total
+      partner_organizations: Organizaciones socias

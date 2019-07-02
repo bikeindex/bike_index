@@ -165,7 +165,7 @@ window.updateSearchBikesHeaderLink = ->
 
   # update search params, retaining any other query params
   $bike_search_link = $("#search_bikes_header_link")
-
+  return true unless $bike_search_link.length
   bike_search_query = $bike_search_link[0].search
   params = Object.fromEntries(bike_search_query.replace("?", "").split("&").map((e) => e.split("=")))
   params["stolenness"] = "proximity"

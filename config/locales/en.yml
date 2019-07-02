@@ -105,7 +105,7 @@ en:
     messages:
       accepted: must be accepted
       blank: can't be blank
-      confirmation: doesn't match %{attribute}
+      confirmation: doesn't match confirmation
       empty: can't be empty
       equal_to: must be equal to %{count}
       even: must be even
@@ -116,13 +116,10 @@ en:
       invalid: is invalid
       less_than: must be less than %{count}
       less_than_or_equal_to: must be less than or equal to %{count}
-      model_invalid: 'Validation failed: %{errors}'
       not_a_number: is not a number
       not_an_integer: must be an integer
       odd: must be odd
-      other_than: must be other than %{count}
-      present: must be blank
-      required: must exist
+      record_invalid: 'Validation failed: %{errors}'
       taken: has already been taken
       too_long:
         one: is too long (maximum is 1 character)
@@ -139,12 +136,14 @@ en:
         one: 1 error prohibited this %{model} from being saved
         other: "%{count} errors prohibited this %{model} from being saved"
   helpers:
-    select:
-      prompt: Please select
-    submit:
-      create: Create %{model}
-      submit: Save %{model}
-      update: Update %{model}
+    page_entries_info:
+      one_page:
+        display_entries:
+          zero: No %{entry_name} found
+          one: Displaying <b>1</b> %{entry_name}
+          other: Displaying <b>all %{count}</b> %{entry_name}
+      more_pages:
+        display_entries: Displaying %{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> of <b>%{total}</b> in total
   number:
     currency:
       alphabetic_code: USD
@@ -202,48 +201,49 @@ en:
       two_words_connector: " and "
       words_connector: ", "
   time:
-    am: am
     formats:
-      default: "%a, %d %b %Y %H:%M:%S %z"
-      long: "%B %d, %Y %H:%M"
-      short: "%d %b %H:%M"
-    pm: pm
-
+      standard_display: "%A, %B %d"
+      short_with_year: "%a, %B %d %Y"
+      no_day_with_year: "%B %d %Y"
+      blog: "%m_%d_%Y"
+      dotted: "%Y.%-m.%-d"
+      short_with_hour: "%m.%d.%y - %l%P"
+      convert_time: "%FT%T%z"
   meta_titles:
-    welcome_index: "Bike Index - Bike registration that works"
-    welcome_goodbye: "Logged out"
-    bikes_index: "Search results"
-    bikes_new: "Register a bike!"
-    bikes_new_stolen: "Register a stolen bike"
-    feedbacks_vendor_signup: "Shop sign up - Bike Index"
-    feedbacks_new: "Contact Bike Index"
-    feedbacks_index: "Help with Bike Index"
-    news_index: "Bike Index news"
-    info_about: "Bike Index - Bike registration that works"
-    info_spokecard: "Spoke cards - Bike Index"
-    info_stolen_bikes: "Responding to theft"
-    info_serials: "Bike serial numbers"
-    manufacturers_index: "Bike Manufacturers"
-    users_new: "Sign up - Bike Index"
-    users_edit: "Edit your account"
-    users_confirm: "Confirm your email - Bike Index"
-    users_request_password_reset: "Reset password - Bike Index"
-    users_password_reset: "Password reset - Bike Index"
-    users_accept_terms: "Terms of use - Bike Index"
-    users_accept_vendor_terms: "Organization terms - Bike Index"
-    documentation_api_v1: "Bike Index API documentation"
-    organization_invitations_new: "New invitation"
-    payments_new: "Support the Index!"
-    payments_create: "Thanks for your support!"
-    sessions_new: "Log in"
-    sessions_create: "Log in"
-    stolen_index: "Bike registry"
-    info_where: "Bike Index partners"
-    links: "links"
-    about: "FAQ"
-    tech: "Technology for fighting bike theft"
-    stolen_howworks: "How it works"
-    stolen_merging: "Stolen bike registry"
+    welcome_index: Bike Index - Bike registration that works
+    welcome_goodbye: Logged out
+    bikes_index: Search results
+    bikes_new: Register a bike!
+    bikes_new_stolen: Register a stolen bike
+    feedbacks_vendor_signup: Shop sign up - Bike Index
+    feedbacks_new: Contact Bike Index
+    feedbacks_index: Help with Bike Index
+    news_index: Bike Index news
+    info_about: Bike Index - Bike registration that works
+    info_spokecard: Spoke cards - Bike Index
+    info_stolen_bikes: Responding to theft
+    info_serials: Bike serial numbers
+    manufacturers_index: Bike Manufacturers
+    users_new: Sign up - Bike Index
+    users_edit: Edit your account
+    users_confirm: Confirm your email - Bike Index
+    users_request_password_reset: Reset password - Bike Index
+    users_password_reset: Password reset - Bike Index
+    users_accept_terms: Terms of use - Bike Index
+    users_accept_vendor_terms: Organization terms - Bike Index
+    documentation_api_v1: Bike Index API documentation
+    organization_invitations_new: New invitation
+    payments_new: Support the Index!
+    payments_create: Thanks for your support!
+    sessions_new: Log in
+    sessions_create: Log in
+    stolen_index: Bike registry
+    info_where: Bike Index partners
+    links: links
+    about: FAQ
+    tech: Technology for fighting bike theft
+    stolen_howworks: How it works
+    stolen_merging: Stolen bike registry
     landing_pages_show: "%{organization} Bike Registration"
     landing_pages_ambassadors_current: Bike Index Ambassadors
     landing_pages_ambassadors_how_to: Become a Bike Index Ambassador
@@ -257,98 +257,43 @@ en:
     landing_pages_for_schools: Bike Index for Schools
     landing_pages_for_bike_shops: Bike Index for Bike Shops
   meta_descriptions:
-    welcome_index: "The best bike registry: Simple, secure and free."
-    welcome_user_home: "Your bikes on Bike Index"
-    info_about: "Why we made Bike Index and who we are"
-    info_resources: "Bike Index resources and useful tools"
-    info_stolen_bikes: "What to do if your bike is stolen - next steps Bike Index recommends taking."
-    info_serials: "What bike serial numbers are - and where to find them."
-    info_spokecard: "The Bike Index offers spoke cards that link to each bike on the Index with a QR code. Learn about how they work and how to create your own."
-    info_where: "Organizations that use Bike Index to search for and register bikes."
-    info_protect_your_bike: "Prevent bike theft. Recommendations and best practices for protecting your bike from thieves."
-    manufacturers_index: "Bicycle related manufacturers listed on Bike Index - all the brands you know and then some."
-    bikes_index: "Search for bikes that have been registered on Bike Index"
-    bikes_new_stolen: "Register a stolen bike on Bike Index quickly, easily and for free."
-    bikes_new: "Register a bike on Bike Index quickly, easily and for free. Create a permanent verified record of your bike to protect it."
-    feedbacks_vendor_signup: "Sign up with Bike Index to register your customers' bikes quickly, easily and for free."
-    feedbacks_new: "Contact Bike Index. Your words are our muse, whisper them in our ear."
-    feedbacks_index: "Help using Bike Index. Frequently asked questions and other things."
-    news_index: "Read Bike Index news. Also, periodically, learn magic spells."
-    users_new: "Sign up for Bike Index"
-    documentation_api_v1: "API Version 1 documentation and love"
-    documentation_api_v2: "Bike Index API v2 documentation. Authentication with OAuth2, uses JSON, is RESTful and is generally pretty awesome"
-    sessions_new: "Log in to Bike Index"
-    sessions_create: "Log in to Bike Index"
-    stolen_index: "Bike Index helps recover your stolen bike"
-    stolen_merging: "StolenBicycleRegistry.com merged with Bike Index in 2014 to become the largest open bike registration service in the world"
-    landing_pages_show: "Register your bicycle with %{organization} - powered by Bike Index"
+    welcome_index: 'The best bike registry: Simple, secure and free.'
+    welcome_user_home: Your bikes on Bike Index
+    info_about: Why we made Bike Index and who we are
+    info_resources: Bike Index resources and useful tools
+    info_stolen_bikes: What to do if your bike is stolen - next steps Bike Index recommends taking.
+    info_serials: What bike serial numbers are - and where to find them.
+    info_spokecard: The Bike Index offers spoke cards that link to each bike on the Index with a QR code. Learn about how they work and how to create your own.
+    info_where: Organizations that use Bike Index to search for and register bikes.
+    info_protect_your_bike: Prevent bike theft. Recommendations and best practices for protecting your bike from thieves.
+    manufacturers_index: Bicycle related manufacturers listed on Bike Index - all the brands you know and then some.
+    bikes_index: Search for bikes that have been registered on Bike Index
+    bikes_new_stolen: Register a stolen bike on Bike Index quickly, easily and for free.
+    bikes_new: Register a bike on Bike Index quickly, easily and for free. Create a permanent verified record of your bike to protect it.
+    feedbacks_vendor_signup: Sign up with Bike Index to register your customers' bikes quickly, easily and for free.
+    feedbacks_new: Contact Bike Index. Your words are our muse, whisper them in our ear.
+    feedbacks_index: Help using Bike Index. Frequently asked questions and other things.
+    news_index: Read Bike Index news. Also, periodically, learn magic spells.
+    users_new: Sign up for Bike Index
+    documentation_api_v1: API Version 1 documentation and love
+    documentation_api_v2: Bike Index API v2 documentation. Authentication with OAuth2, uses JSON, is RESTful and is generally pretty awesome
+    sessions_new: Log in to Bike Index
+    sessions_create: Log in to Bike Index
+    stolen_index: Bike Index helps recover your stolen bike
+    stolen_merging: StolenBicycleRegistry.com merged with Bike Index in 2014 to become the largest open bike registration service in the world
+    landing_pages_show: Register your bicycle with %{organization} - powered by Bike Index
     landing_pages_for_law_enforcement: Is your agency equipped to fight bike theft? Bike Index can help officers get bikes back into the right hands.
     landing_pages_for_schools: With bicycle theft a growing problem across campuses everywhere, students’ bikes can be difficult to protect without help.
-
   doorkeeper:
     scopes:
-      public: "Authenticate with you, view public information"
-  time:
-    formats:
-      standard_display: "%A, %B %d"
-      short_with_year: "%a, %B %d %Y"
-      no_day_with_year: "%B %d %Y"
-      blog: "%m_%d_%Y"
-      dotted: "%Y.%-m.%-d"
-      short_with_hour: "%m.%d.%y - %l%P"
-      convert_time: "%FT%T%z"
-  errors: &errors
-    format: ! "%{attribute} %{message}"
-    messages:
-      accepted: must be accepted
-      blank: can't be blank
-      confirmation: doesn't match confirmation
-      empty: can't be empty
-      equal_to: must be equal to %{count}
-      even: must be even
-      exclusion: is reserved
-      greater_than: must be greater than %{count}
-      greater_than_or_equal_to: must be greater than or equal to %{count}
-      inclusion: is not included in the list
-      invalid: is invalid
-      less_than: must be less than %{count}
-      less_than_or_equal_to: must be less than or equal to %{count}
-      not_a_number: is not a number
-      not_an_integer: must be an integer
-      odd: must be odd
-      record_invalid: ! "Validation failed: %{errors}"
-      taken: has already been taken
-      too_long:
-        one: is too long (maximum is 1 character)
-        other: is too long (maximum is %{count} characters)
-      too_short:
-        one: is too short (minimum is 1 character)
-        other: is too short (minimum is %{count} characters)
-      wrong_length:
-        one: is the wrong length (should be 1 character)
-        other: is the wrong length (should be %{count} characters)
-    template:
-      body: ! "There were problems with the following fields:"
-      header:
-        one: 1 error prohibited this %{model} from being saved
-        other: ! "%{count} errors prohibited this %{model} from being saved"
+      public: Authenticate with you, view public information
   views:
     pagination:
       first: "&laquo;"
       last: "&raquo;"
-      previous: "Prev"
-      next: "Next"
+      previous: Prev
+      next: Next
       truncate: "&hellip;"
-  helpers:
-    page_entries_info:
-      one_page:
-        display_entries:
-          zero: "No %{entry_name} found"
-          one: "Displaying <b>1</b> %{entry_name}"
-          other: "Displaying <b>all %{count}</b> %{entry_name}"
-      more_pages:
-        display_entries: "Displaying %{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> of <b>%{total}</b> in total"
-
   activerecord:
     errors:
       messages:
@@ -356,7 +301,81 @@ en:
         restrict_dependent_destroy:
           has_one: Cannot delete record because a dependent %{record} exists
           has_many: Cannot delete record because dependent %{record} exist
-
   welcome:
     index:
+      value_of_bikes_recovered: Over %{value} Worth of Bikes Recovered
       hero: Bike registration that works
+      register_now: Register now!
+      read_more_recovery_stories: Read more recovery stories
+      but_how_does_it_work: But How Does it work?
+      register_your_bike: Register Your Bike
+      how_it_works: It's simple. Submit your name, bike manufacturer, serial number, and component information to enter your bike into the most widely used bike registry on the planet.
+      alert_the_community: Alert the Community
+      if_your_bike_goes_missing: If your bike goes missing, mark it as lost or stolen to notify the entire Bike Index community and its partners.
+      the_community_responds: The community responds
+      identifying_your_bike: A user or partner encounters your bike, uses Bike Index to identify it, and contacts you.
+      you_get_your_bike_back: You Get your Bike Back
+      recover_your_bike_for_free: With the help of the Bike Index community and its partners, you have the information necessary to recover your lost or stolen bike at no cost to you. It's what we do.
+      used_by: Used By
+      bike_index_statistics: Bike Index statistics
+      bikes_registered_this_week: Bikes registered this week
+      total_bikes_registered: Total Bikes Registered
+      stolen_bikes_registered: Stolen Bikes Registered
+      stolen_bikes_recovered: Stolen Bikes Recovered
+      total_recovery_value: Total Recovery value
+      partner_organizations: Partner Organizations
+    goodbye:
+      youve_been_logged_out: You've been logged out
+      come_back_soon: Come back soon!
+    choose_registration:
+      add_a_bike_through: Add a bike through
+      add_your_own_bike: Add your own bike
+      add_a_stolen_bike: Add a stolen bike
+      add_a_stolenfound_bike: Add a stolen/found bike you've recovered
+      register_bike: Register bike
+    recovery_stories:
+      recovery_stories: Recovery Stories
+    update_browser:
+      oh_no: Oh No!
+      unsupported_browser: We're sorry, Bike Index does not support your browser.
+      go_here_to_learn_more: Go here to learn more
+    user_home:
+      user_bikes: "%{current_user_name} bikes"
+      bikes: bikes
+      locks: locks
+      add_a_photo: Add a photo
+      recovered: RECOVERED
+      stolen: STOLEN
+      serial: Serial
+      primary_colors: Primary colors
+      date_recovered: Date recovered
+      date_stolen: Date stolen
+      location: Location
+      edit_bike: Edit Bike
+      printable_pdf: Printable (pdf)
+      mark_bike_stolen: Mark bike stolen
+      report_stolen: report_stolen
+      you_have_no_registered_bikes: You have no registered bikes
+      lock_type: Lock Type
+      manufacturer: Manufacturer
+      key_serial: Key Serial
+      combination: Combination
+      edit: Edit
+      you_have_no_registered_locks: You have no registered locks
+      register_new_items: Register new items
+      add_a_bike: Add a bike
+      add_a_lock: Add a lock
+      add_some_info: Add some info
+      sorry_your_bike_was_stolen: We're sorry your %{bikes_last_type} was stolen, but hopefully, with everyone able to search for it, you'll get it back!
+      thanks_for_adding_your_bike: Awesome! We're pumped you added a %{bikes_last_type} to the Index.
+      welcome: Welcome
+      to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
+      tell_us_more_about_yourself: Tell us more about yourself.
+      update_your_profile: Update your profile
+  landing_pages:
+    for_organizations_photo_list:
+      for: for
+      bike_shops: Bike Shops
+      cities: Cities
+      schools: Schools
+      community_groups: Community Groups
