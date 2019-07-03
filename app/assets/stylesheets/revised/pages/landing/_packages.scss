@@ -228,8 +228,9 @@ $compare-packages-blue: rgb(19, 71, 106);
           margin: 0 0 0.5 * $vertical-height;
         }
         th {
-          border-top: 2px solid $compare-packages-table-border;
           border-bottom: 2px solid $compare-packages-table-border;
+          border-top: 2px solid $compare-packages-table-border;
+          text-align: center;
           &:first-of-type {
             border-top-color: transparent;
             border-left-color: transparent;
