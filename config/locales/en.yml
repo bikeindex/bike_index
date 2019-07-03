@@ -384,6 +384,10 @@ en:
       organization_name: Organization name
       message: Message
       get_in_touch: Get in touch
+    find_out_more:
+      custom_development_available: A la carte features and custom development available.
+      get_in_touch_link: Get in touch
+      find_out_more_html: "%{get_in_touch_link} to find out more."
   layouts:
     revised_messages:
       error: error
