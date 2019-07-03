@@ -226,7 +226,6 @@ module API
 
         desc "Add an image to a bike", {
           authorizations: { oauth2: [{ scope: :write_bikes }] },
-          extra_data: { version: CONST_VERSION },
           notes: <<-NOTE,
 
             To post a file to the API with curl:
