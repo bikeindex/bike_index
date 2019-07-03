@@ -414,44 +414,47 @@ en:
       package_title: "%{name} package"
       year: year
     cities_packages:
-      year: year
-      keep_us_pedaling: Keep us pedaling
-      town: Town
-      small_city: Small City
-      metropolis: Metropolis
-      package_title: "%{name} package"
-      bike_index_for_cities: Bike Index for Cities
-      give_your_constituents_the_bike_registry_: Give your constituents the bike registry they want
-      all_plans_come_with_a_30day_free_trial: All plans come with a 30-day free trial
-      compare_plans_and_features: Compare Plans and Features
-      new_organization_path_class: "), new_organization_path , class: "
-      try_for_free: Try For Free
-      questions_want_to_get_started: Questions? Want to get started?
-      contact_us: Contact us
-      link_to_tcontact_us_class_btn_btnprimary_: "#"
-      choose_a_package_size: Choose a package size
       additional: Additional
+      all_plans_come_with_a_30day_free_trial: All plans come with a 30-day free trial
+      bike_index_for_cities: Bike Index for Cities
+      choose_a_package_size: Choose a package size
+      compare_plans_and_features: Compare Plans and Features
+      contact_us: Contact us
       contact_us_for_trial: Contact us for a free trial
+      forever: Forever
+      free: Free
+      give_your_constituents_the_bike_registry_: Give your constituents the bike registry they want
+      keep_us_pedaling: Keep us pedaling
+      link_to_tcontact_us_class_btn_btnprimary_: "#"
+      metropolis: Metropolis
+      new_organization_path_class: "), new_organization_path , class: "
+      package_title: "%{name} package"
+      questions_want_to_get_started: Questions? Want to get started?
       sign_up: Sign up
-    campus_packages:
+      sign_up_now: Sign Up Now
+      small_city: Small City
+      town: Town
+      try_for_free: Try For Free
       year: year
+    campus_packages:
+      additional: Additional
+      all_plans_come_with_a_30day_free_trial: All plans come with a 30-day free trial
+      bike_index_for_colleges_universities: Bike Index for Colleges & Universities
+      choose_a_package_size: Choose a package size
+      clean_up_your_campus_messy_registry: Clean up your Campus's messy registry.
+      compare_plans_and_features: Compare Plans and Features
+      contact_us: Contact us
+      contact_us_for_trial: Contact us for a free trial
+      forever: Forever
+      free: Free
       keep_us_pedaling: Keep us pedaling
       number_of_members: "%{range} Members"
       package_title: "%{name} package"
-      bike_index_for_colleges_universities: Bike Index for Colleges & Universities
-      clean_up_your_campus_messy_registry: Clean up your Campus's messy registry.
-      all_plans_come_with_a_30day_free_trial: All plans come with a 30-day free trial
-      compare_plans_and_features: Compare Plans and Features
-      free: Free
-      forever: Forever
+      questions_want_to_get_started: Questions? Want to get started?
+      sign_up: Sign up
       sign_up_now: Sign Up Now
       try_for_free: Try For Free
-      questions_want_to_get_started: Questions? Want to get started?
-      contact_us: Contact us
-      contact_us_for_trial: Contact us for a free trial
-      choose_a_package_size: Choose a package size
-      additional: Additional
-      sign_up: Sign up
+      year: year
   plan_features:
     supporting_our_nonprofit: Supporting our nonprofit
     create_organization_account: Create organization account and contact registrants
