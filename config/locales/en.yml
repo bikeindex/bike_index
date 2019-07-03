@@ -415,6 +415,24 @@ en:
       year: year
     cities_packages:
       year: year
+      keep_us_pedaling: Keep us pedaling
+      town: Town
+      small_city: Small City
+      metropolis: Metropolis
+      package_title: "%{name} package"
+      bike_index_for_cities: Bike Index for Cities
+      give_your_constituents_the_bike_registry_: Give your constituents the bike registry they want
+      all_plans_come_with_a_30day_free_trial: All plans come with a 30-day free trial
+      compare_plans_and_features: Compare Plans and Features
+      new_organization_path_class: "), new_organization_path , class: "
+      try_for_free: Try For Free
+      questions_want_to_get_started: Questions? Want to get started?
+      contact_us: Contact us
+      link_to_tcontact_us_class_btn_btnprimary_: "#"
+      choose_a_package_size: Choose a package size
+      additional: Additional
+      contact_us_for_trial: Contact us for a free trial
+      sign_up: Sign up
     campus_packages:
       year: year
       keep_us_pedaling: Keep us pedaling
