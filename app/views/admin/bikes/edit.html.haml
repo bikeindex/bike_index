@@ -136,12 +136,6 @@
       .form-group.fancy-select.unfancy
         = f.label :bike_organization_ids, 'Current orgs'
         = f.collection_select(:bike_organization_ids, @organizations, :id, :name, { include_blank: true, prompt: '' }, { multiple: true, class: "form-control" })
-    -# I don't think this is relevant anymore - probably should remove this attribute
-    -# .col-md-4.col-lg-3
-    -#   .form-group
-    -#     = f.label :card_id, "Spokecard id"
-    -#     = f.text_field :card_id, class: "form-control"
-
 
   .row.mt-4
     .col-12.text-center

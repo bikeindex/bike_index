@@ -211,11 +211,6 @@ class Bike < ActiveRecord::Base
 
   def no_serial?; made_without_serial? || serial_unknown? end
 
-  # attr_readers for serial
-  def has_no_serial; defined?(@has_no_serial) ? @has_no_serial : serial_unknown? end
-
-  def made_without_serial; defined?(@made_without_serial) ? @made_without_serial : made_without_serial? end
-
   # This is for organizations - might be useful for admin as well. We want it to be nil if it isn't present
   # User - not ownership, because we don't want registrar
   def user_name
