@@ -1,36 +1,43 @@
 %header.with-subtitle
   %h1 Your applications
   %p
-    = link_to 'New Application', new_oauth_application_path, class: 'btn binxbtn binxbtn-lg'
+    = link_to 'New Application', new_oauth_application_path, class: 'btn btn-primary btn-lg'
 
-%table.table.table-striped.margined
-  %thead
-    %tr
-      %th Created
-      %th Name
-      %th Callback URL
-      %th
-      %th
-  %tbody
-    - @applications.each do |application|
-      %tr{:id => "application_#{application.id}"}
-        %td
-          %span.convertTime
-            = l application.created_at, format: :convert_time
-        %td
-          = application.name
-        %td
-          %small
-            = application.redirect_uri
-        %td
-          = link_to "View", oauth_application_url(application), class: 'btn binxbtn-default'
-        %td
-          = link_to 'Edit', edit_oauth_application_url(application), class: 'btn binxbtn-primary'
-        %td
-          = render 'delete_form', application: application
+.full-screen-table
+  %table.table.table-striped.margined
+    %thead
+      %tr
+        %th Created
+        %th Name
+        %th Callback URL
+        %th
+        %th
+        %th
+    %tbody
+      - @applications.each do |application|
+        %tr{id: "application_#{application.id}"}
+          %td
+            %span.convertTime
+              = l application.created_at, format: :convert_time
+          %td
+            = application.name
+          %td
+            %pre.small
+              = application.redirect_uri.gsub(/\s+/, "\n")
+          %td
+            = link_to "View", oauth_application_url(application), class: 'btn btn-default'
+          %td
+            = link_to 'Edit', edit_oauth_application_url(application), class: 'btn btn-primary'
+          %td
+            = render 'delete_form', application: application
 .container
-  %h3.padded
-    Documentation on the API is available at #{link_to "documentation", documentation_index_url}
+  %h3.mt-4.mb-4.header-font-alt.text-center
+    Documentation on the API is available at #{link_to "/documentation", documentation_index_url}
 
 - if current_user.superuser?
   = render 'admin_applications'
+
+:javascript
+  $(document).ready(function() {
+    $(".doorkeeper-container").addClass("container-fluid").removeClass("doorkeeper-container");
+  });
