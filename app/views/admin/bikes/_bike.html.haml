@@ -1,5 +1,6 @@
 - stolen_record ||= stolen_record || bike.present? && bike.find_current_stolen_record
 - display_recovery ||= stolen_record.present? && stolen_record.recovered?
+
 .admin-bike-partial
   - if bike.blank?
     %h1.text-danger
@@ -140,13 +141,6 @@
                 Stolen at
               %td.convertTime
                 = l stolen_record.date_stolen, format: :convert_time
-
-            -if bike.creation_organization_id.present?
-              %tr
-                %td
-                  Organization name
-                %td
-                  = bike.creation_organization_name
             %tr
               %td
                 Callable by
@@ -154,7 +148,7 @@
                 - if stolen_record.phone_for_everyone
                   %strong
                     Everyone
-                -else
+                - else
                   = "Users" if stolen_record.phone_for_users
                   = "Shops" if stolen_record.phone_for_shops
                   = "Police" if stolen_record.phone_for_police
@@ -217,7 +211,7 @@
                 Recovered at
               %td
                 - if stolen_record.date_recovered.present?
-                  %span.convertTime{ href: admin_bike_url(bike) }
+                  %span.convertTime{ href: bike.present? ? admin_bike_url(bike) : "#" }
                     = l stolen_record.date_recovered, format: :convert_time
             %tr
               %td
