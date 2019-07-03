@@ -115,4 +115,5 @@
 
       = f.submit t(".sign_up"), class: "btn btn-primary btn-lg"
 
-= render partial: '/shared/modal', locals: { title: t(".contact_us_for_trial"), id: "organizationSignupModal", modal_body: modal_body, start_open: @page_errors }
+= render partial: '/shared/modal',
+locals: { title: t(".contact_us_for_trial"), id: "organizationSignupModal", modal_body: modal_body, start_open: @page_errors }
