@@ -19,7 +19,7 @@ module Organized
     end
 
     def create
-      if ActiveRecord::Type::Boolean.new.type_cast_from_database(params.dig(:export, :avery_export))
+      if ParamsNormalizer.boolean(params.dig(:export, :avery_export))
         create_avery_export
       else
         @export = Export.new(permitted_parameters)
