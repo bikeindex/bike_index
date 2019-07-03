@@ -51,7 +51,6 @@ class Bike < ActiveRecord::Base
   validates_presence_of :creator
   validates_presence_of :manufacturer_id
 
-  validates_uniqueness_of :card_id, allow_nil: true
   validates_presence_of :primary_frame_color_id
 
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications,
@@ -114,7 +113,7 @@ class Bike < ActiveRecord::Base
           coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
           timezone date_stolen receive_notifications phone creator creator_id image
           components_attributes b_param_id embeded embeded_extended example hidden
-          card_id stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
+          stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
           marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids
       ).map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
                          components_attributes: Component.old_attr_accessible]).freeze
