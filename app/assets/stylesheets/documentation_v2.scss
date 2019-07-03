@@ -1,7 +1,24 @@
 // = require swagger-ui
 
 // Add table styles
-@import "revised/sections/tables";
+.full-screen-table {
+  // Enable scrolling
+  overflow-x: scroll;
+
+  td ul {
+    padding: 0 0 0 1.5rem;
+    margin: 0.5rem 0 0.5rem;
+  }
+}
+// Make it edge to edge on xs screens
+@media (max-width: 600px) {
+  .full-screen-table {
+    margin-left: -15px;
+    margin-right: -15px;
+  }
+}
+
+// Standard styles
 
 #grid-overlay {
   position: fixed;
