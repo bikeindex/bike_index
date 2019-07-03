@@ -1072,7 +1072,7 @@ RSpec.describe BikesController, type: :controller do
 
         it "updates the bike and components" do
           component1 = FactoryBot.create(:component, bike: bike)
-          another_handlebar_type = "drop"
+          other_handlebar_type = "other"
           ctype_id = component1.ctype_id
           bike.reload
           component2_attrs = {
@@ -1087,7 +1087,8 @@ RSpec.describe BikesController, type: :controller do
           }
           bike_attrs = {
             description: "69",
-            handlebar_type: another_handlebar_type,
+            handlebar_type: other_handlebar_type,
+            handlebar_type_other: "Joysticks",
             owner_email: "  #{bike.owner_email.upcase}",
             components_attributes: {
               "0" => {
@@ -1103,7 +1104,8 @@ RSpec.describe BikesController, type: :controller do
           bike.reload
           expect(bike.description).to eq("69")
           expect(response).to redirect_to edit_bike_url(bike)
-          expect(bike.handlebar_type).to eq another_handlebar_type
+          expect(bike.handlebar_type).to eq other_handlebar_type
+          expect(bike.handlebar_type_other).to eq "Joysticks"
           expect(assigns(:bike)).to be_decorated
           expect(bike.hidden).to be_falsey
 

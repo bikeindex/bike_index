@@ -31,6 +31,7 @@ RSpec.describe Bike, type: :model do
         expect(bike_with_absent_serial.serial_unknown?).to be_falsey
         expect(bike_with_unknown_serial.made_without_serial?).to be_falsey
         expect(bike_with_unknown_serial.serial_unknown?).to be_truthy
+        expect(bike_with_unknown_serial.has_no_serial).to be_falsey
         expect(bike_with_serial.serial_number).to eq "CCcc99FFF"
         expect(bike_with_absent_serial.serial_number).to eq "absent"
         expect(bike_with_unknown_serial.serial_number).to eq "unknown"
