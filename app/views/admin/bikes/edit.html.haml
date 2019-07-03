@@ -1,5 +1,6 @@
-.d-none{ data: { url: ENV['BASE_URL'] } }
 = render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show" }
+
+.d-none{ data: { url: ENV['BASE_URL'] } }
 
 - if @bike.current_stolen_record.present? && @bike.current_stolen_record.theft_alerts.any?
   %h4.mt-2
@@ -9,7 +10,7 @@
 - if @recoveries.any?
   %h3.mt-4
     Recoveries
-  = render partial: "/admin/recoveries/table", locals: { recoveries: @recoveries }
+  = render partial: "/admin/recoveries/table", locals: { recoveries: @recoveries, skip_bike: true }
 
 %h3.mt-4
   Ownerships
@@ -146,7 +147,7 @@
       = link_to "Delete bike", admin_bike_url(@bike), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger ml-4"
 
   - if @bike.stolen and @bike.current_stolen_record.present?
-    %h4.mt-4
+    %h4.mt-4#edit-stolen-record
       Edit Stolen Record
     = f.fields_for :stolen_records do |s|
       - next unless s.object.current

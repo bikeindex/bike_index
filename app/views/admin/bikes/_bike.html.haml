@@ -1,6 +1,11 @@
-- stolen_record ||= stolen_record || bike.find_current_stolen_record
+- stolen_record ||= stolen_record || bike.present? && bike.find_current_stolen_record
+- display_recovery ||= stolen_record.present? && stolen_record.recovered?
+
 .admin-bike-partial
-  - if bike.present?
+  - if bike.blank?
+    %h1.text-danger
+      No Bike present
+  - else
     .row
       .col-lg-2.col-3.mt-auto.mb-2.admin-image-thumb
         - if bike.thumb_path.present?
@@ -106,16 +111,17 @@
                   - if bike.creation_state.bulk_import.ascend?
                     %small
                       Ascend
-  - else
-    %h1
-      No Bike present
   - if stolen_record.present?
     %h4.mt-2
       %span.text-danger
         Theft information
       - unless controller_name == "stolen_bikes"
         %span.float-right
-          = link_to "Stolen approval/message", edit_admin_stolen_bike_url(bike)
+          = link_to edit_admin_stolen_bike_url(stolen_record.id, stolen_record_id: true) do
+            - if stolen_record.approved?
+              Stolen message
+            - else
+              Stolen message/approval
     .row
       .col-md-6
         %table.table-list
@@ -127,7 +133,7 @@
                 = stolen_record.theft_description
             %tr
               %td
-                Marked stolen
+                Stolen record created
               %td.convertTime
                 = l stolen_record.created_at, format: :convert_time
             %tr
@@ -135,13 +141,6 @@
                 Stolen at
               %td.convertTime
                 = l stolen_record.date_stolen, format: :convert_time
-
-            -if bike.creation_organization_id.present?
-              %tr
-                %td
-                  Organization name
-                %td
-                  = bike.creation_organization_name
             %tr
               %td
                 Callable by
@@ -149,7 +148,7 @@
                 - if stolen_record.phone_for_everyone
                   %strong
                     Everyone
-                -else
+                - else
                   = "Users" if stolen_record.phone_for_users
                   = "Shops" if stolen_record.phone_for_shops
                   = "Police" if stolen_record.phone_for_police
@@ -197,4 +196,56 @@
                 Police Report
               %td
                 = stolen_record.police_report_number
-  %hr.mt-2.mb-4
+  - if display_recovery && stolen_record.present? && stolen_record.recovered?
+    %h4.mt-2
+      Recovery Information
+      - unless controller_name == "recoveries"
+        %small{ style: "font-size: 80%;" }
+          = link_to "admin recovery view", admin_recovery_path(stolen_record.to_param), class: "text-muted"
+    .row
+      .col-sm-12.col-lg-6
+        %table.table-list
+          %tbody
+            %tr
+              %td
+                Recovered at
+              %td
+                - if stolen_record.date_recovered.present?
+                  %span.convertTime{ href: bike.present? ? admin_bike_url(bike) : "#" }
+                    = l stolen_record.date_recovered, format: :convert_time
+            %tr
+              %td
+                Recovered by
+              %td
+                - if stolen_record.recovering_user.present?
+                  = link_to stolen_record.recovering_user.display_name, admin_user_path(stolen_record.recovering_user.to_param)
+                  - unless stolen_record.recovering_user_owner?
+                    %em.text-warning.less-strong
+                      not owner!
+                - elsif stolen_record.pre_recovering_user?
+                  %small.less-strong
+                    pre-recording of recovering user
+                - else
+                  %small
+                    No user present
+                    %span.less-strong
+                      most likely recovered by owner
+            %tr
+              %td
+                We Helped
+              %td
+                = "&#x2713;".html_safe if stolen_record.index_helped_recovery
+            %tr
+              %td
+                Can Share
+              %td
+                = "&#x2713;".html_safe if stolen_record.can_share_recovery
+      .col-sm-12.col-lg-6
+        %table.table-list
+          %tbody
+            %tr
+              %td{ colspan: 2 }
+                Description
+            %tr
+              %td.full-width-data{ colspan: 2 }
+                = stolen_record.recovered_description
