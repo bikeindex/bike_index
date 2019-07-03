@@ -25,6 +25,12 @@ RSpec.describe Bike, type: :model do
       let(:bike_with_unknown_serial) { FactoryBot.create(:bike, serial_number: "????  \n") }
       it "corrects poorly entered serial numbers" do
         [bike_with_serial, bike_with_absent_serial, bike_with_unknown_serial].each { |b| b.reload }
+        expect(bike_with_serial.made_without_serial?).to be_falsey
+        expect(bike_with_serial.serial_unknown?).to be_falsey
+        expect(bike_with_absent_serial.made_without_serial?).to be_truthy
+        expect(bike_with_absent_serial.serial_unknown?).to be_falsey
+        expect(bike_with_unknown_serial.made_without_serial?).to be_falsey
+        expect(bike_with_unknown_serial.serial_unknown?).to be_truthy
         expect(bike_with_serial.serial_number).to eq "CCcc99FFF"
         expect(bike_with_absent_serial.serial_number).to eq "absent"
         expect(bike_with_unknown_serial.serial_number).to eq "unknown"

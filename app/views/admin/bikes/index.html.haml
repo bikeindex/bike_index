@@ -100,8 +100,8 @@
     = paginate @bikes, views_prefix: "admin"
 
 - if params[:multi_delete]
-  = render partial: "/admin/bikes/admin_bikes_table_multidelete"
+  = render partial: "/admin/bikes/table_multidelete"
 - else
-  = render partial: "/admin/bikes/admin_bikes_table", locals: { render_sortable: true }
+  = render partial: "/admin/bikes/table", locals: { render_sortable: true }
 
 = paginate @bikes, views_prefix: "admin"

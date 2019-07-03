@@ -198,12 +198,18 @@ class Bike < ActiveRecord::Base
   # Small helper because we call this a lot
   def type; cycle_type && cycle_type_name.downcase end
 
-  # this should be put somewhere else sometime
-  def serial; serial_number unless recovered end
-
   def user_hidden; hidden && current_ownership&.user_hidden end
 
   def fake_deleted; hidden && !user_hidden end
+
+  # this should be put somewhere else sometime
+  def serial; serial_number unless recovered end
+
+  def made_without_serial?; serial_number == "absent" end
+
+  def serial_unknown?; serial_number == "unknown" end
+
+  def no_serial?; made_without_serial? || serial_unknown? end
 
   # This is for organizations - might be useful for admin as well. We want it to be nil if it isn't present
   # User - not ownership, because we don't want registrar

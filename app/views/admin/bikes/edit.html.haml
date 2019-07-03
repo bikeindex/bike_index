@@ -73,55 +73,61 @@
       .form-group.fancy-select.unfancy
         = f.label :cycle_type, "Cycle type"
         = select(:bike, :cycle_type, CycleType.select_options, { required: true })
-    .col-md-3.col-lg-3
+    .col-6.col-md-4.col-lg-5
       .form-group
         = f.label :serial_number
-        = f.text_field :serial_number, :required =>true, class: "form-control"
-    .col-md-3.col-lg-3
-      .form-check
-        %label.d-none.d-md-block
-          &nbsp;
-        = f.check_box :has_no_serial
-        = f.label :has_no_serial
-    .col-md-4.col-lg-3
-      .form-check
-        %label.d-none.d-md-block
-          &nbsp;
-        = f.label :hidden do
-          = f.check_box :hidden
-          - if @bike.user_hidden
-            User hidden
-          - else
-            Hidden (fake delete)
-    .col-md-4.col-lg-3
-      .form-group
-        = f.label :manufacturer_other, "Other frame manufacturer"
-        = f.text_field :manufacturer_other, class: "form-control"
-    .col-md-4.col-lg-3
-      .form-group
-        = f.label :card_id, "Spokecard id"
-        = f.text_field :card_id, class: "form-control"
-    .col-md-4.col-lg-3
+        = f.text_field :serial_number, required: true, class: "form-control #{@bike.no_serial? ? 'fake-disabled' : ''}"
+    .col-6.col-md-4.col-lg-3
+      .serial-check.serial-check-unknown.ml-2.collapse{ class: @bike.made_without_serial? ? "" : "show" }
+        = check_box_tag :has_no_serial, true, @bike.serial_unknown?, class: "form-check-input"
+        = label_tag :has_no_serial, "Unknown serial"
+      .serial-check.serial-check-made-without.ml-2.collapse{ class: @bike.serial_unknown? ? "" : "show" }
+        = check_box_tag :made_without_serial, true, @bike.made_without_serial?, class: "form-check-input"
+        = label_tag :made_without_serial
+  .row
+    .col-6.col-md-4.col-lg-3
       .form-group.fancy-select.unfancy
         = f.label :manufacturer_id
-        = collection_select(:bike, :manufacturer_id, Manufacturer.frames, :id, :name, { }, {required: true, class: "form-control" })
+        = collection_select(:bike, :manufacturer_id, Manufacturer.frames, :id, :name, {}, { required: true, class: "form-control" })
+    .col-6.col-md-4.col-lg-3
+      .form-group
+        = f.label :manufacturer_other do
+          Other mnfg
+          %small.less-strong
+            %span.d-none.d-xl-inline
+              Only necessary
+            if Manufacturer <em>Other</em>
+        = f.text_field :manufacturer_other, class: "form-control"
+    .col-6.col-md-4.col-lg-3
+      .form-group
+        = f.label :year
+        = f.text_field :year, class: "form-control"
+    .col-6.col-md-4.col-lg-3
+      .form-group.fancy-select.unfancy
+        = f.label :primary_frame_color_id
+        = collection_select(:bike, :primary_frame_color_id, Color.all, :id, :name, { prompt: "Choose color" }, { required: true, class: "form-control" })
     .col-md-4.col-lg-3
       .form-group
         = f.label :frame_model
         = f.text_field :frame_model, class: "form-control"
     .col-md-4.col-lg-3
       .form-group
-        = f.label :year
-        = f.text_field :year, class: "form-control"
-    / Disable for performance reasons.
-    / .control-group.chosen-select
-    /   = f.label :paint_id, "Paint description", class: "control-label"
-    /   .controls
-    /     = collection_select( :bike, :paint_id, Paint.all, :id, :name, required: true, prompt: "Choose paint" )
+        = f.label :owner_email
+        = f.text_field :owner_email, required: true, class: "form-control"
     .col-md-4.col-lg-3
-      .form-group.fancy-select.unfancy
-        = f.label :primary_frame_color_id
-        = collection_select(:bike, :primary_frame_color_id, Color.all, :id, :name, { prompt: "Choose color" }, { required: true, class: "form-control" })
+      %label.d-none.d-md-block
+        &nbsp;
+      = f.label :hidden do
+        = f.check_box :hidden
+        - if @bike.user_hidden
+          User hidden
+        - else
+          Hidden (fake delete)
+  .row.mt-2
+    .col-md-4.col-lg-6
+      .form-group
+        = f.label :description
+        = f.text_area :description, class: "form-control"
     .col-md-4.col-lg-3
       .form-group.fancy-select.unfancy
         = f.label :creation_organization_id
@@ -130,20 +136,14 @@
       .form-group.fancy-select.unfancy
         = f.label :bike_organization_ids, 'Current orgs'
         = f.collection_select(:bike_organization_ids, @organizations, :id, :name, { include_blank: true, prompt: '' }, { multiple: true, class: "form-control" })
-    .col-md-4.col-lg-3
-      .form-group
-        = f.label :description
-        = f.text_field :description, class: "form-control"
-    .col-md-4.col-lg-3
-      .form-group
-        = f.label :owner_email
-        = f.text_field :owner_email, :required =>true, class: "form-control"
 
-  .row.mb-4
-    .col-4
-      = submit_tag "Update the bike", class: "btn btn-success"
-    .col-8.text-right
+  .row.mt-4
+    .col-12.text-center
+      = submit_tag "Update the bike", class: "btn btn-success btn-lg"
+  .row.mt-4.mb-4
+    .col-6
       = link_to "Bike messages", admin_feedbacks_path(search_bike_id: @bike.to_param), class: "btn btn-outline-primary"
+    .col-6.text-right
       = link_to "Delete bike", admin_bike_url(@bike), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger ml-4"
 
   - if @bike.stolen and @bike.current_stolen_record.present?

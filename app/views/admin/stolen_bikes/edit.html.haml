@@ -34,12 +34,12 @@
         %li
           #{link_to "Edit Bike", admin_bike_path(@bike)} if there is a 40 word descriptions in the "Bike Model" field and move it to the description field
         %li
-          #{link_to "Edit Bike", admin_bike_path(@bike)} & check "Serial missing" if:
+          #{link_to "Edit Bike", admin_bike_path(@bike)} & check "Unknown Serial" if:
           %ul
             %li
               The serial is "idk" or other similar stupid shit (rather than <span class="less-strong">absent</span>)
             %li
-              the serials is only a frame numbers like EN14761 or EN14****
+              The serial is <em>only</em> a frame numbers like <code>EN14761</code> or <code>EN14****</code>
         %li
           #{link_to "Edit Bike", admin_bike_path(@bike, anchor: "edit-stolen-record")} and fix the stolen city name if:
           %ul

@@ -186,12 +186,12 @@ RSpec.describe BikeDecorator do
           bike = Bike.new(serial_number: "absent")
           allow(bike).to receive(:stolen).and_return(true)
           decorator = BikeDecorator.new(bike)
-          expect(decorator.serial_display).to eq("Unknown")
+          expect(decorator.serial_display).to eq("Made without serial")
         end
       end
       context "not stolen" do
         it "unknown" do
-          bike = Bike.new(serial_number: "absent")
+          bike = Bike.new(serial_number: "unknown")
           allow(bike).to receive(:stolen).and_return(false)
           decorator = BikeDecorator.new(bike)
           expect(decorator.serial_display).to eq("Unknown")
@@ -202,7 +202,7 @@ RSpec.describe BikeDecorator do
           bike = Bike.new(serial_number: "absent", made_without_serial: true)
           allow(bike).to receive(:stolen).and_return(false)
           decorator = BikeDecorator.new(bike)
-          expect(decorator.serial_display).to eq("Has no serial")
+          expect(decorator.serial_display).to eq("Made without serial")
         end
       end
     end

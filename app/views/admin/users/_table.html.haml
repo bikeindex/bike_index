@@ -5,9 +5,9 @@
     %thead.thead-light.sortable
       %th
         - if render_sortable
-          = sortable "created_at"
+          = sortable "created_at", "Added"
         - else
-          Added&nbsp;<small class="convertTimezone"></small>
+          Added&nbsp;<small class="convertTimezone d-none d-sm-inline"></small>
       %th
         - if render_sortable
           = sortable "email"

@@ -21,7 +21,9 @@
     background: #fff;
   }
   .admin-image-thumb {
-    max-width: 220px;
+    @include media-breakpoint-up(md) {
+      max-width: 220px;
+    }
     img {
       max-width: 100%;
       width: 180px;
