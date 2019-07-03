@@ -271,7 +271,7 @@
       view #{link_to "org bikes view", organization_bikes_path(organization_id: @organization.to_param)}
   = paginate @bikes, views_prefix: "admin"
 
-  = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: @bikes }
+  = render partial: "/admin/bikes/table", locals: { bikes: @bikes }
 
   = paginate @bikes, views_prefix: "admin"
 - else

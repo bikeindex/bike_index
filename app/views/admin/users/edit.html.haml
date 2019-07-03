@@ -120,7 +120,7 @@
     .col-md-6.mt-auto
       = link_to "Show all bikes", admin_bikes_path(search_user_id: @user.id), class: "float-right"
 
-= render partial: "admin/bikes/admin_bikes_table", locals: { bikes: @bikes }
+= render partial: "admin/bikes/table", locals: { bikes: @bikes }
 
 %h4.mt-4
   Donations/payments
