@@ -396,6 +396,32 @@ en:
       custom_development_available: A la carte features and custom development available.
       get_in_touch_link: Get in touch
       find_out_more_html: "%{get_in_touch_link} to find out more."
+    bike_shop_packages:
+      supporting_shop: Supporting Shop
+      additional: Additional
+      bike_index_for_bike_shops: Bike Index for bike shops
+      choose_a_package_size: Choose a package size
+      compare_plans_and_features: Compare Plans and Features
+      contact_us: Contact us
+      contact_us_for_trial: Contact us for a free trial
+      forever: Forever
+      free: Free
+      questions_want_to_get_started: Questions? Want to get started?
+      sign_up: Sign up
+      sign_up_now: Sign Up Now
+      simply_the_best_bike_registry: Simply the best bike registry
+      try_for_free: Try For Free
+      package_title: "%{name} package"
+      year: year
+  plan_features:
+      supporting_our_nonprofit: Supporting our nonprofit
+      create_organization_account: Create organization account and contact registrants
+      embed_a_registration_form: Embed a registration form on your website so people can register in your organization account
+      automatic_registration_through_pos: Automatic registration through your POS
+      social_media_and_email_marketing: Social Media and Email marketing campaign assets
+      search_bikes_in_organization: Search bikes in organization account
+      import_csv_file: Import CSV file of registrations from former system
+      welcome_campaign: Welcome campaign on Facebook, Twitter, and Instagram
   layouts:
     revised_messages:
       error: error
