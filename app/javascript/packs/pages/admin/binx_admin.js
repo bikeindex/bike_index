@@ -37,7 +37,7 @@ function BinxAdmin() {
 
       if ($("#admin_bikes_edit").length) {
         const binxAdminBikesEdit = BinxAdminBikesEdit();
-        binxAdminBikesEdit.init()
+        binxAdminBikesEdit.init();
       }
 
       if ($("#admin_organizations_new, #admin_organizations_edit").length) {
