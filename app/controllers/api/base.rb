@@ -23,8 +23,13 @@ module API
       eclass = e.class.to_s
       message = "OAuth error: #{e}" if eclass =~ /WineBouncer::Errors/
       opts = { error: message || e.message }
-      opts[:trace] = e.backtrace[0, 10] unless Rails.env.production?
-      Rack::Response.new(opts.to_json, status_code_for(e, eclass), {
+      status_code = status_code_for(e, eclass)
+      if Rails.env.production?
+        Honeybadger.notify(e) if status_code > 450 # Only notify in production for 500s
+      else
+        opts[:trace] = e.backtrace[0, 10]
+      end
+      Rack::Response.new(opts.to_json, status_code, {
         "Content-Type" => "application/json",
         "Access-Control-Allow-Origin" => "*",
         "Access-Control-Request-Method" => "*",
