@@ -380,6 +380,10 @@ en:
       cities: Cities
       schools: Schools
       community_groups: Community Groups
+    next_steps_contact:
+      organization_name: Organization name
+      message: Message
+      get_in_touch: Get in touch
   layouts:
     revised_messages:
       error: error
