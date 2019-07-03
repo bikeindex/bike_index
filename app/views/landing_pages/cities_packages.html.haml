@@ -10,21 +10,21 @@
   }
   plan_sizes = plans.keys
   plan_features = [
-    { free: true, supporting: true, small: true, medium: true, large: true, title: "Create organization account and contact registrants" },
-    { free: true, supporting: true, small: true, medium: true, large: true,  title: "Embed a basic registration form on your website" },
-    { free: false, supporting: true, small: true, medium: true, large: true,  title: "Search bikes in organization account" },
-    { free: false, supporting: true, small: true, medium: true, large: true,  title: "Import CSV file of registrations from former system" },
-    { free: false, supporting: true, small: true, medium: true, large: true,  title: "Social media ad campaign" },
-    { free: "10", supporting: "10", small: "10", medium: "unlimited", large: "unlimited", title: "Staff accounts" },
-    { free: false, supporting: false, small: true, medium: true, large: true,  title: "Branded registration landing page" },
-    { free: false, supporting: false, small: true, medium: true, large: true,  title: "QR sticker scanning and messaging" },
-    { free: false, supporting: false, small: true, medium: true, large: true,  title: "Ongoing programming, hosting, and support" },
-    { free: false, supporting: false, small: false, medium: true, large: true,  title: "Contact registrants who have not finished registration" },
-    { free: false, supporting: false, small: false, medium: true, large: true,  title: "Add logos and text to Bike Index emails " },
-    { free: false, supporting: false, small: false, medium: true, large: true,  title: "Export custom data into CSV/XLSX files" },
-    { free: false, supporting: false, small: false, medium: false, large: true,  title: "Add specific form fields to your landing page" },
-    { free: false, supporting: false, small: false, medium: false, large: true,  title: "Avery mailing address formatted XLS export for mailing stickers" },
-    { free: false, supporting: false, small: false, medium: true, large: true,  title: "Nest multiple organizations in one" },
+    { free: true, supporting: true, small: true, medium: true, large: true, title: t("plan_features.create_organization_account") },
+    { free: true, supporting: true, small: true, medium: true, large: true,  title: t("plan_features.embed_a_registration_form") },
+    { free: false, supporting: true, small: true, medium: true, large: true,  title: t("plan_features.search_bikes_in_organization") },
+    { free: false, supporting: true, small: true, medium: true, large: true,  title: t("plan_features.import_csv_file") },
+    { free: false, supporting: true, small: true, medium: true, large: true,  title: t("plan_features.welcome_campaign") },
+    { free: "10", supporting: "10", small: "10", medium: "unlimited", large: "unlimited", title: t("plan_features.staff_accounts") },
+    { free: false, supporting: false, small: true, medium: true, large: true,  title: t("plan_features.landing_page") },
+    { free: false, supporting: false, small: true, medium: true, large: true,  title: t("plan_features.qr_sticker") },
+    { free: false, supporting: false, small: true, medium: true, large: true,  title: t("plan_features.ongoing_programming") },
+    { free: false, supporting: false, small: false, medium: true, large: true,  title: t("plan_features.contact_registrants") },
+    { free: false, supporting: false, small: false, medium: true, large: true,  title: t("plan_features.add_logos") },
+    { free: false, supporting: false, small: false, medium: true, large: true,  title: t("plan_features.export_custom_data") },
+    { free: false, supporting: false, small: false, medium: false, large: true,  title: t("plan_features.add_form_fields") },
+    { free: false, supporting: false, small: false, medium: false, large: true,  title: t("plan_features.mailing_stickers") },
+    { free: false, supporting: false, small: false, medium: true, large: true,  title: t("plan_features.nest_organizations") },
   ]
 
 .signup-landing-page.signup-landing-page-packages.signup-landing-page-cities-packages
@@ -60,12 +60,12 @@
                   Sign Up Now
               - else
                 %th
-                  %h4
-                    #{plan.to_s.titleize} #{lead_type}
-                  %h3
-                    $#{number_with_delimiter(plan_data[:cost])}
+                  %h4 #{plan.to_s.titleize} #{lead_type}
+                  %h3= number_to_currency(plan_data[:cost], precision: 0)
                   %p
-                    (USD/annually)
+                    = t("number.currency.alphabetic_code")
+                    = "/"
+                    = t(".year")
                   %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => plan.to_s }
                     Try For Free
 

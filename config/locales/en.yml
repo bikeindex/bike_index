@@ -413,6 +413,10 @@ en:
       try_for_free: Try For Free
       package_title: "%{name} package"
       year: year
+    cities_packages:
+      year: year
+    campus_packages:
+      year: year
   plan_features:
       supporting_our_nonprofit: Supporting our nonprofit
       create_organization_account: Create organization account and contact registrants
@@ -422,6 +426,17 @@ en:
       search_bikes_in_organization: Search bikes in organization account
       import_csv_file: Import CSV file of registrations from former system
       welcome_campaign: Welcome campaign on Facebook, Twitter, and Instagram
+      staff_accounts: Staff accounts
+      landing_page: Branded registration landing page
+      qr_sticker: QR sticker scanning and messaging
+      ongoing_programming: Ongoing programming, hosting, and support
+      contact_registrants: Contact registrants who have not finished registration
+      add_logos: Add logos and text to Bike Index emails
+      export_custom_data: Export custom data into CSV/XLSX files
+      add_form_fields: Add specific form fields to your landing page
+      automated_migration: Automated migration of graduated bikes out of system
+      mailing_stickers: Avery mailing address formatted XLS export for mailing stickers
+      nest_organizations: Nest multiple organizations in one
   layouts:
     revised_messages:
       error: error
