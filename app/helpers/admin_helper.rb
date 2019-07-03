@@ -40,7 +40,13 @@ module AdminHelper
   end
 
   def admin_nav_select_link_active
-    admin_nav_select_links.detect { |link| current_page_active?(link[:path], link[:match_controller]) }
+    return @admin_nav_select_link_active if defined?(@admin_nav_select_link_active)
+    @admin_nav_select_link_active = admin_nav_select_links.detect { |link| current_page_active?(link[:path], link[:match_controller]) }
+    unless @admin_nav_select_link_active.present?
+      # Because organization invoices edit doesn't match controller
+      @admin_nav_select_link_active = admin_nav_select_links.detect { |link| link[:title].match(/invoices/i) } if controller_name == "invoices" && action_name == "edit"
+    end
+    @admin_nav_select_link_active
   end
 
   def admin_nav_select_prompt

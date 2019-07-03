@@ -5,10 +5,14 @@
     %h2 Manage Recovery Display
 .row.text-center
   - if @recovery.waiting_on_decision?
-    .col-6
-      = button_to "Not Displayable", admin_recovery_path(id: @recovery.id, stolen_record: {is_not_displayable: true}), method: :put, class: "btn btn-lg btn-warning"
-    .col-6
-      = link_to "Share recovery", new_admin_recovery_display_path(stolen_record_id: @recovery.id), class: "btn btn-lg btn-primary"
+    .col-md-4
+      %h4
+        Choose what to do with this recovery:
+    .col-6.col-md-4
+      = link_to "Display recovery", new_admin_recovery_display_path(stolen_record_id: @recovery.id), class: "btn btn-lg btn-primary d-block"
+    .col-6.col-md-4
+      = button_to "Mark Not Displayable", admin_recovery_path(id: @recovery.id, stolen_record: { is_not_displayable: true }), method: :put, class: "btn btn-lg btn-warning d-block", style: "width: 100%;"
+
   - elsif @recovery.displayed?
     .col-6
       %p
@@ -20,6 +24,15 @@
       %p
         This recovery is not displayed.
       = button_to "Mark Eligible for display", admin_recovery_path(id: @recovery.id, stolen_record: { mark_as_eligible: true }), method: :put, class: "btn btn-lg btn-success"
+  - else
+    .col-12
+      %h4
+        Display Status:
+        %em
+          = @recovery.recovery_display_status.humanize
+      %p.mt-4
+        Really want to display this recovery?
+        = link_to "Display recovery here", new_admin_recovery_display_path(stolen_record_id: @recovery.id)
 
 %hr{ style: "margin: 60px 0 30px;" }
 %h2 Edit recovery information

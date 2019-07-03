@@ -1,3 +1,23 @@
+.row.mt-4.mb-4
+  .col-md-10.col-lg-8.ml-auto.mr-auto
+    %h4
+      Recovery display approval process
+    %ol
+      %li
+        Remove last name from "Quote by" field
+      %li
+        Make sure there is a picture! Either click "Use first image" (if there is a bike that has an image), or find an image for the bike elsewhere and upload it
+      %li
+        Edit the "Body" field and
+        %ul
+          %li
+            Make sure the text is under the character count (there's a counter below that updates as you type)
+          %li
+            Remove any references to race
+          %li
+            Fix typos and grammar
+%hr.mb-4
+
 = form_for [:admin, @recovery_display] do |f|
   - if @recovery_display.errors.any?
     = render partial: "/shared/errors", locals: { name: "Recovery Display", obj: @recovery_display }
@@ -30,7 +50,8 @@
       .form-group
         = f.label :body
         = f.text_area :quote, placeholder: 'Quote about recovery', rows: 4, class: "form-control", id: "characterCounter"
-      %p#characterTotal
+      %p.text-info.text-right{ style: "margin-top: -10px; font-size: 150%;" }
+        %span#characterTotal
 
     .col-lg-6
       #recovery-photo-upload-input
@@ -38,8 +59,8 @@
         = f.label :image, "Recovery photo"
         - if @recovery_display.image?
           = image_tag(@recovery_display.image_url(:thumb))
-        - else
-          %p
+        - elsif @recovery_display.id.present?
+          %p.text-danger
             No picture!
         .input-group.mb-3
           .custom-file
@@ -57,7 +78,7 @@
                 - url = @bike.stock_photo_url
               %label
                 #{link_to "Bike", bike_url(@bike), target: "_blank"} #{text}
-              %a.btn.btn-success#use_image_for_display{ href: '#', data: {url: url}}
+              %a.btn.btn-outline-success#use_image_for_display{ href: '#', data: {url: url}}
                 Use first image
             - else
               Bike has no image
@@ -67,6 +88,6 @@
         .form-check
           = f.check_box :remove_image, class: "form-check-input"
           = f.label :remove_image, class: "form-check-label"
-
-  = f.hidden_field :remote_image_url
-  = f.submit 'Save', class: 'btn btn-success float-right mt-4'
+          = f.hidden_field :remote_image_url
+  .mt-4.mb-4.text-right
+    = f.submit "Save", class: 'btn btn-success'

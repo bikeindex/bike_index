@@ -38,7 +38,7 @@
 
         - if admin_nav_display_view_all
           = link_to admin_nav_select_link_active[:path], class: "nav-link text-muted em" do
-            all
+            All
             .d-none.d-sm-inline-block.d-md-none.d-xl-inline-block
               = admin_nav_select_link_active[:title]
         .fancy-select.unfancy.no-restore-on-backspace
@@ -48,7 +48,7 @@
     = render 'layouts/revised_messages'
 
     %section#admin-content
-      .container-fluid.mt-4
+      .container-fluid.mt-4.mb-4
         = yield
 
     = render 'shared/footer_revised'

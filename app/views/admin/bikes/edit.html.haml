@@ -147,7 +147,7 @@
       = link_to "Delete bike", admin_bike_url(@bike), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger ml-4"
 
   - if @bike.stolen and @bike.current_stolen_record.present?
-    %h4.mt-4
+    %h4.mt-4#edit-stolen-record
       Edit Stolen Record
     = f.fields_for :stolen_records do |s|
       - next unless s.object.current
