@@ -2,7 +2,7 @@ module API
   module V2
     class Bikes < API::Base
       include API::V2::Defaults
-      CONST_VERSION = "xx11"
+
       helpers do
         params :bike_attrs do
           optional :rear_wheel_bsd, type: Integer, desc: "Rear wheel iso bsd (has to be one of the `selections`)"
