@@ -2,44 +2,38 @@
   %li
     - if plan == :free
       - unless render_features # Bottom section doesn't render this duplicate "free"
-        %h4
-          Free
+        %h4= t(".free")
       %section
-        %h5
-          &nbsp;
-        %h3
-          Free
-        %p
-          Forever
+        %h5 &nbsp;
+        %h3= t(".free")
+        %p= t(".forever")
         %a.btn.btn-primary{ href: new_organization_path }
-          Sign Up Now
+          = t(".sign_up_now")
     - else
-      %h4
-        #{plan.to_s.titleize} #{lead_type.titleize}
+      %h4 #{plan.to_s.titleize} #{lead_type.titleize}
       %section
-        %h5
-          = plan_data[:subhead]
-        %h3
-          <span>$</span>#{number_with_delimiter(plan_data[:cost])}
+        %h5= plan_data[:subhead]
+        =# TODO: localized price points
+        %h3= number_to_currency(plan_data[:cost], precision: 0)
         %p
-          USD/Annually
+          = t("number.currency.alphabetic_code")
+          = "/"
+          = t(".year")
+
         %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => plan.to_s }
-          Try For Free
+          = t(".try_for_free")
 
     - if render_features
       .plan-features
         %a.showPlanFeatures.collapsed{ href: "##{plan}_features", "aria-controls" => "#{plan}_features", "data-toggle" => "collapse" }
           %span.uncollapsed
-            See Features >
+            = t(".see_features")
             %i.fas.fa-chevron-down
           %span.incollapsed
-            Hide Features ^
+            = t(".hide_features")
             %i.fas.fa-chevron-up
         %ul.collapse{ id: "#{plan}_features" }
-          - plan_features.each do |feature|
-            - next unless feature[plan].present?
+          - plan_features.select { |f| f[plan].present? }.each do |feature|
             %li
-              - if feature[plan].is_a?(String)
-                = feature[plan]
+              = feature[plan] if feature[plan].is_a?(String)
               = feature[:title]
-

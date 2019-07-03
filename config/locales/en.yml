@@ -12,7 +12,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -38,7 +38,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -384,6 +384,14 @@ en:
       organization_name: Organization name
       message: Message
       get_in_touch: Get in touch
+    packages_list:
+      free: Free
+      forever: Forever
+      sign_up_now: Sign Up Now
+      year: year
+      try_for_free: Try For Free
+      see_features: See Features
+      hide_features: Hide Features
     find_out_more:
       custom_development_available: A la carte features and custom development available.
       get_in_touch_link: Get in touch
