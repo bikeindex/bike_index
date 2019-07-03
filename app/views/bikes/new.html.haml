@@ -10,7 +10,7 @@
   - if @bike.stolen?
     = f.hidden_field :stolen, value: true
     = hidden_field_tag :stolen, value: true
-  
+
   - if @bike.recovered
     = f.hidden_field :recovered, value: true
   .form-well-container.container
@@ -69,7 +69,7 @@
             = f.label :frame_model, class: 'form-well-label'
             .form-well-input
               = f.text_field :frame_model, class: 'form-control'
-          
+
           - classname = (@b_param.display_email? ? '' : 'no-divider-row')
           = render partial: '/bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
 
@@ -147,7 +147,7 @@
         Is a handmade frame
     %p
       It probably has a serial number.
-    %p 
+    %p
       Read about #{link_to 'how to find your serial number', serials_url, target: '_blank' }
       %small
         (opens in a separate window)
