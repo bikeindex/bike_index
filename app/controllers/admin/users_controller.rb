@@ -60,8 +60,8 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def matching_users
-    @search_ambassadors = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:search_ambassadors])
-    @search_superusers = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:search_superusers])
+    @search_ambassadors = ParamsNormalizer.boolean(params[:search_ambassadors])
+    @search_superusers = ParamsNormalizer.boolean(params[:search_superusers])
     if current_organization.present?
       users = current_organization.users
     else

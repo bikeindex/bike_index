@@ -18,7 +18,7 @@ module Sessionable
     session[:last_seen] = Time.current
     session[:render_donation_request] = user.render_donation_request if user&.render_donation_request
     set_passive_organization(user.default_organization) # Set that organization!
-    if ActiveRecord::Type::Boolean.new.type_cast_from_database(params.dig(:session, :remember_me))
+    if ParamsNormalizer.boolean(params.dig(:session, :remember_me))
       cookies.permanent.signed[:auth] = cookie_options(user)
     else
       default_session_set(user)

@@ -6,14 +6,14 @@ class Admin::BikesController < Admin::BaseController
   def index
     @page = params[:page] || 1
     per_page = params[:per_page] || 100
-    @render_chart = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:render_chart])
+    @render_chart = ParamsNormalizer.boolean(params[:render_chart])
     @bikes = matching_bikes.includes(:creation_organization, :creation_states, :paint).reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(per_page)
     render layout: "new_admin"
   end
 
   def missing_manufacturer
     session.delete(:missing_manufacturer_time_order) if params[:reset_view].present?
-    session[:missing_manufacturer_time_order] = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:time_ordered]) if params[:time_ordered].present?
+    session[:missing_manufacturer_time_order] = ParamsNormalizer.boolean(params[:time_ordered]) if params[:time_ordered].present?
     bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id)
     bikes = bikes.where("manufacturer_other ILIKE ?", "%#{params[:search_other_name]}%") if params[:search_other_name].present?
     bikes = session[:missing_manufacturer_time_order] ? bikes.order("created_at desc") : bikes.order("manufacturer_other ASC")
