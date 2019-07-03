@@ -12,7 +12,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -38,7 +38,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -581,3 +581,17 @@ en:
       last_30_days: last 30 days
       last_year: last year
       all: All
+  sessions:
+    new:
+      get_on_bike_index: Get on Bike Index
+      sign_in_using_facebook: Sign in using Facebook
+      sign_in_using_strava: Sign in using Strava
+      or: Or
+      log_in: Log in
+      no_bike_index_account: no Bike Index account?
+      dont_have_an_account: don't have an account?
+      sign_up: sign up
+      email: email
+      password: password
+      keep_me_logged_in: Keep me logged in
+      forgot_your_password: Forgot your password?
