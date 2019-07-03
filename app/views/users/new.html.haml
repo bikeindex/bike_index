@@ -2,36 +2,30 @@
   - unless sign_in_partner.present?
     .sign-in-up-header.container
       .row
-        %h1
-          = t("sign_in_up.#{controller_name}_h1")
+        %h1 Get on Bike Index
   .container
     .sign-in-up-wrap
       .row
         .oauth-providers
           %a.facebook-login{ href: '/auth/facebook' }
-            %span.oauth-logo-block
-              = image_tag 'revised/facebook_login.svg'
-            %span.oauth-text-block
-              #{t("sign_in_up.#{controller_name}_oauth_text_block")} Facebook
-            
+            %span.oauth-logo-block= image_tag 'revised/facebook_login.svg'
+            %span.oauth-text-block Sign up using Facebook
+
           %a.strava-login{ href: '/auth/strava' }
-            %span.oauth-logo-block
-              = image_tag 'revised/strava_login.svg'
-            %span.oauth-text-block
-              #{t("sign_in_up.#{controller_name}_oauth_text_block")} Strava
+            %span.oauth-logo-block= image_tag 'revised/strava_login.svg'
+            %span.oauth-text-block Sign up using Strava
         .sign-in-up-or
-          %h3
-            Or
+          %h3 Or
         .main-form
           %h3.sign-in-up-main-form-header
-            = t("sign_in_up.#{controller_name}_main_form_action")
+            Sign up
             %small
-              already have
               - if sign_in_partner.present?
-                a Bike Index
+                already have a Bike Index account?
               - else
-                an
-              account? #{link_to 'log in', new_session_path(partner: sign_in_partner, email: params[:email])}
+                already have an account?
+              = link_to 'log in', new_session_path(partner: sign_in_partner, email: params[:email])
+
           = form_for @user do |f|
             - if sign_in_partner
               = hidden_field_tag :partner, sign_in_partner
@@ -49,22 +43,22 @@
             .checkbox.terms-and-conditions
               %label
                 = f.check_box :terms_of_service
-                I agree to
+
                 - if sign_in_partner == "bikehub"
-                  BikeHub's
-                  %a.no-tab{ data: { target: "https://basic.bikehub.com/terms.html" } }
-                    terms and conditions
-                  and
-                Bike Index
-                %a.no-tab{ data: { target: terms_url } }
-                  terms and conditions
+                  I agree to BikeHub's
+                  = link_to "terms and conditions", nil, data: { target: "https://basic.bikehub.com/terms.html" }, class: "no-tab"
+                  and Bike Index's
+                  = link_to "terms and conditions", nil, data: { target: terms_path }, class: "no-tab"
+                - else
+                  I agree to Bike Index's
+                  = link_to "terms and conditions", nil, data: { target: terms_path }, class: "no-tab"
+
             - unless sign_in_partner.present?
               .checkbox
                 %label
                   = f.check_box :notification_newsletters
                   Get Bike Index's Newsletter
 
-            = f.submit t("sign_in_up.#{controller_name}_main_form_action"), class: 'btn btn-primary btn-lg'
+            = f.submit "Sign up", class: 'btn btn-primary btn-lg'
 
-          %p
-            = link_to t('sign_in_up.forgot_password'), '/users/request_password_reset'
+          %p= link_to "Forgot your password?", request_password_reset_users_path

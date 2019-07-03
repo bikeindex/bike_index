@@ -2,35 +2,31 @@
   - unless sign_in_partner.present?
     .sign-in-up-header.container
       .row
-        %h1
-          = t("sign_in_up.#{controller_name}_h1")
+        %h1 Get on Bike Index
   .container
     .sign-in-up-wrap
       .row
         .oauth-providers
           %a.facebook-login{ href: '/auth/facebook' }
-            %span.oauth-logo-block
-              = image_tag 'revised/facebook_login.svg'
-            %span.oauth-text-block
-              #{t("sign_in_up.#{controller_name}_oauth_text_block")} Facebook
-            
+            %span.oauth-logo-block= image_tag 'revised/facebook_login.svg'
+            %span.oauth-text-block Sign in using Facebook
+
           %a.strava-login{ href: '/auth/strava' }
-            %span.oauth-logo-block
-              = image_tag 'revised/strava_login.svg'
-            %span.oauth-text-block
-              #{t("sign_in_up.#{controller_name}_oauth_text_block")} Strava
+            %span.oauth-logo-block= image_tag 'revised/strava_login.svg'
+            %span.oauth-text-block Sign in using Strava
         .sign-in-up-or
           %h3
             Or
         .main-form
           %h3.sign-in-up-main-form-header
-            = t("sign_in_up.#{controller_name}_main_form_action")
+            Log in
             %small
               - if sign_in_partner.present?
-                no Bike Index
+                no Bike Index account?
               - else
-                don't have an
-              account? #{link_to 'sign up', new_user_path(partner: sign_in_partner, email: params[:email])}
+                don't have an account?
+              = link_to 'sign up', new_user_path(partner: sign_in_partner, email: params[:email])
+
           = form_for :session, url: session_url do |f|
             - if sign_in_partner
               = hidden_field_tag :partner, sign_in_partner
@@ -44,7 +40,7 @@
               %label
                 = f.check_box :remember_me, value: '1', checked: true
                 Keep me logged in
-            = f.submit t("sign_in_up.#{controller_name}_main_form_action"), class: 'btn btn-primary btn-lg'
 
-          %p
-            = link_to t('sign_in_up.forgot_password'), '/users/request_password_reset'
+            = f.submit "Log in", class: 'btn btn-primary btn-lg'
+
+          %p= link_to "Forgot your password?", request_password_reset_users_path
