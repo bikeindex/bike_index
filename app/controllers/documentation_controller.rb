@@ -28,7 +28,8 @@ class DocumentationController < ApplicationController
     @access_code = params[:code]
     @access_grant = Doorkeeper::AccessGrant.where(resource_owner_id: current_user_or_unconfirmed_user&.id, token: @access_code).last
     @application = @access_grant.application if @access_grant.present?
-    render layout: "application"
+    render layout: "application_revised"
+    # render layout: "application"
   end
 
   private
