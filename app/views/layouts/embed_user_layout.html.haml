@@ -7,11 +7,12 @@
     %meta{name: "description", content: "Bikes on the Index" }
     = stylesheet_link_tag "embed_user_styles", media: "all"
     = csrf_meta_tags
-    
+
   %body#bi_user_embed
     = yield
 
     = javascript_include_tag "embed_user"
+
   :javascript
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

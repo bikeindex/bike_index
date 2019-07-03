@@ -379,3 +379,70 @@ en:
       cities: Cities
       schools: Schools
       community_groups: Community Groups
+  layouts:
+    revised_messages:
+      error: error
+      please_fix_the_following: Please fix the following %{errors}
+    application_revised:
+      about: About
+      add_a_bike: Add a bike
+      admin: Admin
+      blog: Blog
+      discuss: Discuss
+      donate: Donate
+      exports: Exports
+      getting_started: Getting started
+      help: Help
+      incomplete_registrations: Incomplete registrations
+      lightspeed_integration_panel: Lightspeed Integration Panel
+      log_in: log in
+      logout: Logout
+      multi_serial_search: Multi serial search
+      org_bikes: "%{org_name} Bikes"
+      org_dashboard: "%{org_name} Dashboard"
+      org_locations: "%{org_name} locations"
+      org_profile: "%{org_name} profile"
+      recoveries: Recoveries
+      register_a_new_bike: Register a new bike
+      registration_stickers: Registration stickers
+      resources: Resources
+      search_bikes: Search bikes
+      settings: "%{user_email} settings"
+      sign_up: Sign up
+      super_admin_view: Super Admin view %{org_name}
+      the_nonprofit_bike_registry: the non-profit bike registry
+      users: Users
+      view_org: View %{org_name}
+      your_bikes: Your bikes
+    application_revised_bikehub:
+      bike_security: At BikeHub, we believe bike security is more than just a strong U-lock.
+      bikehub_signup: BikeHub Sign-Up
+      bikehub_login: BikeHub Login
+      bikeindex_a_nonprofit: Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration service in the world.
+      bikeindex_bikehub_partnership: Through this partnership, BikeHub patrons enjoy access to the most secure public bike parking – and registration with nation’s largest network, used by law enforcement agencies, universities, and advocates to connect recovered bikes with their owners.
+      contact: Contact
+      log_in: Log in
+      login_message: Logging in here will log you in to BikeHub.
+      powered_by: powered by
+      powered_by_bike_index: BikeHub accounts are powered by Bike Index – the premier bike registry.
+      sign_up: Sign up
+      signup_message: Creating an account here will sign you up for BikeHub
+      why_bikeindex: WHY BIKEINDEX?
+    email:
+      bike_index: Bike Index
+      the_bike_index_team: The Bike Index Team
+      help_prevent_theft: Help prevent bike theft,
+      make_a_donation: make a donation.
+    embed_layout:
+      register_through_org: Register a bike through %{org_name}
+      please_fix_the_following: Please fix the following
+      error: error
+    payments_layout:
+      until_every_bike_is_safe: Until Every bike is safe
+      be_a_bike_saver: Be a bike saver.
+      support_bike_index_today: Support Bike Index today.
+    reg_embed:
+      protect_your_bike_today: Protect your bike today
+      register_your_bike: Register your bike
+      register_on_bike_index: Register on Bike Index.
+      its_free: It's free.
