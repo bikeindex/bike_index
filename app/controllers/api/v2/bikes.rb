@@ -2,7 +2,7 @@ module API
   module V2
     class Bikes < API::Base
       include API::V2::Defaults
-
+      CONST_VERSION = "xx11"
       helpers do
         params :bike_attrs do
           optional :rear_wheel_bsd, type: Integer, desc: "Rear wheel iso bsd (has to be one of the `selections`)"
@@ -114,7 +114,7 @@ module API
             - Do not show turn up in searches
             - Do not send an email to the owner on creation
             - Are automatically deleted after a few days
-            - Can be viewed in the API /v2/bikes/{id} (same as non-test bikes)
+            - Can be viewed in the API /v3/bikes/{id} (same as non-test bikes)
             - Can be viewed on the HTML site /bikes/{id} (same as non-test bikes)
 
             *`test` is automatically marked true on this documentation page. Set it to false it if you want to create actual bikes*
@@ -226,11 +226,12 @@ module API
 
         desc "Add an image to a bike", {
           authorizations: { oauth2: [{ scope: :write_bikes }] },
+          extra_data: { version: CONST_VERSION },
           notes: <<-NOTE,
 
             To post a file to the API with curl:
 
-            `curl -X POST -i -F file=@{test_file.jpg} "#{ENV["BASE_URL"]}/api/v2/bikes/{bike_id}/image?access_token={access_token}"`
+            `curl -X POST -i -F file=@{test_file.jpg} "#{ENV["BASE_URL"]}/api/v3/bikes/{bike_id}/image?access_token={access_token}"`
 
             Replace `{text_file.jpg}` with the relative path of the file you're posting.
 
