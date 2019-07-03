@@ -42,7 +42,7 @@
                 %h4= t(".free")
                 %h3= number_to_currency(0, precision: 0)
                 %p= t(".forever")
-                = link_to t(".sign_up_now"), new_organization_path , class: "btn btn-primary"
+                = link_to t(".sign_up_now"), new_organization_path, class: "btn btn-primary"
               - else
                 %th
                   %h4 #{plan.to_s.titleize} #{lead_type}
