@@ -92,10 +92,14 @@ class ApplicationController < ActionController::Base
 
   # TODO: Remove logging in #requested_locale when feature flag is removed
   def set_locale
-    if Flipper.enabled?(:localization, current_user)
-      I18n.with_locale(requested_locale) { yield }
-    else
+    unless Flipper.enabled?(:localization, current_user)
+      return I18n.with_locale(I18n.default_locale) { yield }
+    end
+
+    if controller_namespace == "admin"
       I18n.with_locale(I18n.default_locale) { yield }
+    else
+      I18n.with_locale(requested_locale) { yield }
     end
   end
 end

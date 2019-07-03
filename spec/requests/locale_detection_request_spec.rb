@@ -99,4 +99,39 @@ RSpec.describe "Locale detection", type: :request do
       end
     end
   end
+
+  describe "requesting an admin path" do
+    include_context :request_spec_logged_in_as_superuser
+    before do
+      allow(Flipper).to receive(:enabled?).with(:localization, current_user).and_return(true)
+    end
+
+    context "given a user preference" do
+      it "renders the admin dashboard in English" do
+        current_user.update(preferred_language: :nl)
+        get "/admin"
+        expect(response.body).to match(/The best bike registry/i)
+        get "/admin/bikes"
+        expect(response.body).to match(/The best bike registry/i)
+      end
+    end
+
+    context "given a valid locale query param" do
+      it "renders the admin dashboard in English" do
+        get "/admin", locale: :nl
+        expect(response.body).to match(/The best bike registry/i)
+        get "/admin/bikes", locale: :nl
+        expect(response.body).to match(/The best bike registry/i)
+      end
+    end
+
+    context "given a valid ACCEPT_LANGUAGE header" do
+      it "renders the homepage in English" do
+        get "/admin", {}, { "HTTP_ACCEPT_LANGUAGE" => "nl,en;q=0.9" }
+        expect(response.body).to match(/The best bike registry/i)
+        get "/admin/users", {}, { "HTTP_ACCEPT_LANGUAGE" => "nl,en;q=0.9" }
+        expect(response.body).to match(/The best bike registry/i)
+      end
+    end
+  end
 end
