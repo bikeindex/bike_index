@@ -9,7 +9,6 @@ function BinxAdminBlogs() {
   return {
     init() {
       this.editDate()
-      this.filePondUpload()
     },
 
     editDate() {
@@ -17,10 +16,6 @@ function BinxAdminBlogs() {
         e.preventDefault();
         $("#blog-date").slideDown()
       })
-    },
-    filePondUpload() {
-      FilePond.create(
-        $("input"))
     }
   };
 }

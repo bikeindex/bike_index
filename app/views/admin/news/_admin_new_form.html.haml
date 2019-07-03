@@ -1,4 +1,4 @@
-.card.bg-light
+.card.bg-light.filepond-container
   .card-body
     = form_for PublicImage.new do |f|
       .photo-upload-fields
@@ -8,10 +8,11 @@
           = hidden_field_tag :organization_id, @organization.id
         - elsif imageable_type == 'MailSnippet'
           = hidden_field_tag :mail_snippet_id, @mail_snippet.id
-        .upload-buttons
-          Upload photos
-          = f.file_field :image, multiple: "multiple", name: "filepond", class: "filepond"
-        %p.extra-info
-          Drag and drop files here to or use the
-          %em Upload Photos
-          button.
+        .row.justify-content-center
+          .col-auto
+            = f.file_field :image, multiple: "multiple", name: "filepond", class: "filepond", id: "pond"
+
+:javascript
+  FilePond.create(
+          document.querySelector('#pond')
+        );
