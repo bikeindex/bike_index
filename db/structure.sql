@@ -341,7 +341,6 @@ CREATE TABLE public.bikes (
     frame_size character varying(255),
     frame_size_unit character varying(255),
     pdf character varying(255),
-    card_id integer,
     recovered boolean DEFAULT false NOT NULL,
     paint_id integer,
     registered_new boolean,
@@ -3209,13 +3208,6 @@ CREATE INDEX index_bike_organizations_on_organization_id ON public.bike_organiza
 
 
 --
--- Name: index_bikes_on_card_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bikes_on_card_id ON public.bikes USING btree (card_id);
-
-
---
 -- Name: index_bikes_on_creation_state_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4432,4 +4424,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190621183811');
 INSERT INTO schema_migrations (version) VALUES ('20190624171627');
 
 INSERT INTO schema_migrations (version) VALUES ('20190625151428');
+
+INSERT INTO schema_migrations (version) VALUES ('20190703194554');
 

@@ -27,8 +27,10 @@
       padding: 0.1em;
     }
     &.completed-item {
-      text-decoration: line-through;
       opacity: 0.75;
+      & > .checklist-text {
+        text-decoration: line-through;
+      }
       .checklist-checkbox {
         color: #919197;
         font-family: "zp-icons";

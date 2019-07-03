@@ -51,7 +51,6 @@ class Bike < ActiveRecord::Base
   validates_presence_of :creator
   validates_presence_of :manufacturer_id
 
-  validates_uniqueness_of :card_id, allow_nil: true
   validates_presence_of :primary_frame_color_id
 
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications,
@@ -107,14 +106,14 @@ class Bike < ActiveRecord::Base
           serial_normalized has_no_serial made_without_serial additional_registration
           creation_organization_id manufacturer year thumb_path name stolen
           current_stolen_record_id recovered frame_material cycle_type frame_model number_of_seats
-          handlebar_type frame_size frame_size_number frame_size_unit
+          handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
           rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
           primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
           propulsion_type zipcode country_id belt_drive
           coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
           timezone date_stolen receive_notifications phone creator creator_id image
           components_attributes b_param_id embeded embeded_extended example hidden
-          card_id stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
+          stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
           marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids
       ).map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
                          components_attributes: Component.old_attr_accessible]).freeze
