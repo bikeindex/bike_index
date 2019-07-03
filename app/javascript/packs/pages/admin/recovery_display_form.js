@@ -37,7 +37,7 @@ function BinxAdminRecoveryDisplayForm() {
         this.setCharacterCount();
       });
     }
-  }
+  };
 }
 
 export default BinxAdminRecoveryDisplayForm;

@@ -3,7 +3,7 @@ import log from "../../utils/log";
 function BinxAdminBikesEdit() {
   return {
     init() {
-      window.originalSerialNumber = $("#bike_serial_number").val()
+      window.originalSerialNumber = $("#bike_serial_number").val();
       $(".serial-check input").on("change", e => {
         this.updateSerialDisplay();
       });
@@ -22,7 +22,7 @@ function BinxAdminBikesEdit() {
         $("#bike_serial_number").addClass("fake-disabled");
       } else {
         $(".serial-check").collapse("show");
-        $("#bike_serial_number").val(window.originalSerialNumber)
+        $("#bike_serial_number").val(window.originalSerialNumber);
         $("#bike_serial_number").removeClass("fake-disabled");
       }
     },
@@ -38,6 +38,6 @@ function BinxAdminBikesEdit() {
         }
       });
     }
-  }
+  };
 }
 export default BinxAdminBikesEdit;

@@ -1,49 +1,50 @@
 - applications = Doorkeeper::Application.order(created_at: :desc)
-%hr.margined
 
-%h1.margined.padded
-  All applications 
-  %span.less-strong
+%hr.mt-4
+
+%h1.mt-4
+  All applications
+  %small.less-strong
     (admin list)
 
-%h3
-  #{pluralize(applications.count, "application")} created
+%h3.header-font-uncap
+  = number_with_delimiter(applications.count)
+  = "application".pluralize(applications.count)
+  created
 
-%table.table.table-striped.margined
-  %thead
-    %tr
-      %th
-        Created
-      %th
-        Name
-      %th
-        User
-      %th 
-        Callback URLs
-      %th
-        Tokens
-  %tbody
-    - applications.each do |application|
-      %tr{:id => "application_#{application.id}"}
-        %td
-          %span.convertTime
-            = l application.created_at, format: :convert_time
-        %td
-          .less-strong-hold
-            = application.name
-            %span.less-strong-right
-              = application.id
-        %td
-          - if application.owner.present?
-            = application.owner.display_name
-          - else
-            no owner
-        %td
-          %small.less-strong-hold
-            = application.redirect_uri
-            %br
-          
-          %span.less-strong-right
-            #{link_to "view", oauth_application_url(application)} | #{link_to 'edit', edit_oauth_application_url(application)}
-        %td
-          = application.access_tokens.count
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm.mt-4
+    %thead
+      %tr
+        %th
+          Created
+        %th
+          Name
+        %th
+          User
+        %th
+          Callback URLs
+        %th
+          %small
+            Tokens
+    %tbody
+      - applications.each do |application|
+        %tr{id: "application_#{application.id}" }
+          %td
+            %a.convertTime{ href: oauth_application_url(application) }
+              = l application.created_at, format: :convert_time
+          %td
+            .less-strong-hold
+              = application.name
+              %span.less-strong-right
+                = application.id
+          %td
+            - if application.owner.present?
+              = link_to application.owner.display_name, admin_user_path(application.owner.to_param)
+            - else
+              no owner
+          %td
+            %pre.small
+              = application.redirect_uri.gsub(/\s+/, "\n")
+          %td
+            = application.access_tokens.count

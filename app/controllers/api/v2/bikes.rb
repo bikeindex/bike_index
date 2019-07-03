@@ -114,7 +114,7 @@ module API
             - Do not show turn up in searches
             - Do not send an email to the owner on creation
             - Are automatically deleted after a few days
-            - Can be viewed in the API /v2/bikes/{id} (same as non-test bikes)
+            - Can be viewed in the API /v3/bikes/{id} (same as non-test bikes)
             - Can be viewed on the HTML site /bikes/{id} (same as non-test bikes)
 
             *`test` is automatically marked true on this documentation page. Set it to false it if you want to create actual bikes*
@@ -230,7 +230,7 @@ module API
 
             To post a file to the API with curl:
 
-            `curl -X POST -i -F file=@{test_file.jpg} "#{ENV["BASE_URL"]}/api/v2/bikes/{bike_id}/image?access_token={access_token}"`
+            `curl -X POST -i -F file=@{test_file.jpg} "#{ENV["BASE_URL"]}/api/v3/bikes/{bike_id}/image?access_token={access_token}"`
 
             Replace `{text_file.jpg}` with the relative path of the file you're posting.
 

@@ -43,7 +43,7 @@ function BinxOrgBikes() {
     },
 
     updateVisibleColumns() {
-      $(".fullscreen-table-wrapper th, .fullscreen-table-wrapper td").addClass(
+      $(".full-screen-table th, .full-screen-table td").addClass(
         "hiddenColumn"
       );
       let enabledCells = $("#organizedSearchSettings input:checked")
