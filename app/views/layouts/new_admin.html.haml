@@ -39,7 +39,7 @@
         - if admin_nav_display_view_all
           = link_to admin_nav_select_link_active[:path], class: "nav-link text-muted em" do
             all
-            .d-none.d-md-inline-block
+            .d-none.d-sm-inline-block.d-md-none.d-xl-inline-block
               = admin_nav_select_link_active[:title]
         .fancy-select.unfancy.no-restore-on-backspace
           = select(:admin, :other_navigation, options_for_select(admin_nav_select_links.map { |l| [l[:title], l[:path]] }), { prompt: admin_nav_select_prompt }, { class: "form-control" })

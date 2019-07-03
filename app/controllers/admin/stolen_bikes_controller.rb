@@ -48,7 +48,7 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def find_bike
-    if ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:stolen_record_id])
+    if ParamsNormalizer.boolean(params[:stolen_record_id])
       @stolen_record = StolenRecord.unscoped.find(params[:id])
       @bike = Bike.unscoped.find_by_id(@stolen_record.bike_id)
     else

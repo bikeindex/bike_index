@@ -25,21 +25,62 @@
 
 - elsif @stolen_record.present? && !@stolen_record.approved
   .row.mt-4.mb-4
-    .col-sm-6
-      %p.mb-0
-        %span.text-warning
-          %strong
-            Warning!
+    .col-md-6
+      %h4
+        Stolen Record approval process
+      %ol
+        %li
+          Delete anything that's egregiously wrong (like Motorcycles), or spam
+        %li
+          #{link_to "Edit Bike", admin_bike_path(@bike)} if there is a 40 word descriptions in the "Bike Model" field and move it to the description field
+        %li
+          #{link_to "Edit Bike", admin_bike_path(@bike)} & check "Serial missing" if:
+          %ul
+            %li
+              The serial is "idk" or other similar stupid shit (rather than <span class="less-strong">absent</span>)
+            %li
+              the serials is only a frame numbers like EN14761 or EN14****
+        %li
+          #{link_to "Edit Bike", admin_bike_path(@bike, anchor: "edit-stolen-record")} and fix the stolen city name if:
+          %ul
+            %li
+              City is abbreviated: e.g. "SLC" and not "Salt Lake City"
+            %li
+              The recurring new-bikes bug where city names like "San Francisco" need fixed because they just say "San"
+
+        %li
+          Determine if bike is <em>Special</em> - here are some reasons/actions taken
+          %ul
+            %li
+              Super distinct, in a city we are strong in? We tweet highlight it, even though its getting auto tweeted
+            %li
+              A real distinct cargo bike in PDX? I can post to "PDX Cargo Bike Gang"
+            %li
+              Is it a bike dressed up as a unicorn in New Orleans? post to "Stolen bikes nola"
+            %li
+              Is the person using a photo from instagram? Connect with them on IG
+            %li
+              Is the person well-known/VIP? we email them / tweet them etc
+            %li
+              Did the person say "I have security video" but didn't include it? Email them for it.
+            %li
+              Did the person say "I have photos of the thief"  - same
+          %em.less-strong
+            If you believe the bike is <em>Special</em>, and don't know what to do, ping Bryan with it
+
+    .col-md-6
+      .alert.alert-info
+        %h4
           Approving will:
-      %ul.mt-0
-        %li
-          Send out a tweet
-        %li
-          The #{@bike.type} will be posted to any pertinent blogs.
-        %li
-          It can NOT be effectively reversed
-    .col-sm-6.text-center
-      = link_to "Approve listing", approve_admin_stolen_bike_url(@bike), method: :post, class: "btn btn-lg btn-success"
+        %ul.mt-0
+          %li
+            Send out a tweet
+          %li
+            The #{@bike.type} will be posted to any pertinent blogs.
+          %li
+            It <strong class="em">can NOT</strong> be effectively reversed
+        .mt-4.text-center
+          = link_to "Approve listing", approve_admin_stolen_bike_url(@bike), method: :post, class: "btn btn-lg btn-success"
 
 %hr.mt-4.mb-4
 
