@@ -79,8 +79,10 @@ class BikeDecorator < ApplicationDecorator
 
   def serial_display
     return "Hidden" if object.recovered
-    if object.serial.match("absent")
-      object.made_without_serial ? "Has no serial" : "Unknown"
+    if object.serial_unknown?
+      "Unknown"
+    elsif object.made_without_serial?
+      "Made without serial"
     else
       object.serial
     end
