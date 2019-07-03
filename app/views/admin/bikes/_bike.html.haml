@@ -8,20 +8,20 @@
   - else
     .row
       .col-lg-2.col-3.mt-auto.mb-2.admin-image-thumb
-        - if bike.thumb_path.present?
-          = image_tag bike.thumb_path, alt: bike.title_string
-        - else
-          %h3.less-strong
-            No Image
+        %a{ href: edit_admin_bike_path(bike.to_param) }
+          - if bike.thumb_path.present?
+            = image_tag bike.thumb_path, alt: bike.title_string
+          - else
+            %h3.less-strong
+              No Image
       .col-lg-5.col-9.mt-auto.mb-2
         %p.strong.mb-0
-          = link_to bike.list_link_url(target) do
+          = link_to edit_admin_bike_path(bike.to_param) do
             - if bike.stolen
               %span.text-danger
                 Stolen
             = bike.title_string
-          - unless controller_name == "bikes" && action_name == "edit"
-            = link_to "admin view", edit_admin_bike_path(bike.to_param), class: "text-muted float-right"
+          = link_to "non-admin view", bike_path(bike.to_param), class: "text-muted float-right"
         %table.table-list.mb-0
           %tbody
             %tr
