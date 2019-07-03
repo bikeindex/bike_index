@@ -23,19 +23,18 @@ function BinxAdminRecoveryDisplayForm() {
           );
           $image_btn.text("nvrmind");
         }
-        return $image_btn.toggleClass("using_bikes");
+        $image_btn.toggleClass("using_bikes");
       });
     },
 
     setCharacterCount() {
-      $("#characterTotal").text($("#characterCounter").val().length + "/300");
+      $("#characterTotal").text(`${$("#characterCounter").val().length}/300`);
     },
 
     characterCounter() {
-      let self = this;
-      $("#characterCounter").on("keyup", function(e) {
+      $("#characterCounter").on("keyup", e => {
         e.preventDefault();
-        self.setCharacterCount();
+        this.setCharacterCount();
       });
     }
   }

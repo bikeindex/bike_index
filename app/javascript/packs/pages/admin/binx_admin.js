@@ -21,8 +21,8 @@ function BinxAdmin() {
         binxAdminGraphs.init();
       }
 
-      if ($("#use_image_for_display").length) {
-        const binxAdminRecoveryDisplayForm = BinxAdminRecoveryDisplayForm;
+      if ($("#recovery-display-form").length) {
+        const binxAdminRecoveryDisplayForm = BinxAdminRecoveryDisplayForm();
         binxAdminRecoveryDisplayForm.init();
       }
 
