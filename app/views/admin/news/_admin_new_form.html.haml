@@ -8,9 +8,7 @@
           = hidden_field_tag :organization_id, @organization.id
         - elsif imageable_type == 'MailSnippet'
           = hidden_field_tag :mail_snippet_id, @mail_snippet.id
-        .row.justify-content-center
-          .col-auto
-            = f.file_field :image, multiple: "multiple", name: "filepond", class: "filepond", id: "pond"
+        = f.file_field :image, multiple: "multiple", name: "filepond", class: "filepond", id: "pond"
 
 :javascript
   FilePond.create(
