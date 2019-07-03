@@ -35,7 +35,7 @@
 
   .subheader-tile {
     margin: 10px auto;
-    min-width: 275px;
+    // min-width: 275px;
     padding-left: 5px;
     padding-right: 5px;
   }
@@ -347,6 +347,13 @@
   }
 }
 
+// Prevent overflow on tiny screens
+@media (max-width: 350px) {
+  .root-landing-banner-header .root-landing-header-text h1 {
+    font-size: 35px;
+  }
+}
+
 .root-landing-how-it-works {
   background-color: #f9f9f9;
   padding: 4 * $vertical-height 0;
@@ -509,6 +516,7 @@
 
   color: rgb(172, 172, 172);
   text-align: center;
+  overflow: scroll; // Fix overflow issue
 
   h3.landing-container-label {
     color: #fff;
