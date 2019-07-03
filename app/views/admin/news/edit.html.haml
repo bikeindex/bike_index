@@ -104,7 +104,7 @@
         - if @blog.public_images
           = render partial: "/public_images/public_image", collection: @blog.public_images, as: :public_image
       %section
-        = render partial: "admin_new_form", locals: { imageable_type: 'Blog', admin: true }
+        = render partial: "/public_images/admin_new_form", locals: { imageable_type: 'Blog', admin: true }
     .alert.alert-info
       %p
         The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank"} if you're curious.
