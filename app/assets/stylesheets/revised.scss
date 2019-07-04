@@ -346,3 +346,17 @@ body {
 .less-strong {
   opacity: 0.65;
 }
+
+.gray-link {
+  a,
+  & {
+    color: #6c757d !important; // new bootstrap: $gray-600
+    opacity: 0.65;
+    text-decoration: underline;
+  }
+  &:hover,
+  &:active,
+  &.active {
+    opacity: 0.9;
+  }
+}

@@ -239,6 +239,7 @@ RSpec.describe BikeCode, type: :model do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       let(:bike_code) { FactoryBot.create(:bike_code, bike: bike, organization: organization) }
       it "permits unclaiming of organized bikes if already claimed" do
+        expect(bike.organizations).to eq([])
         bike_code.reload
         expect(bike_code.errors.full_messages).to_not be_present
         bike_code.claim(user, "\n ")
@@ -258,6 +259,12 @@ RSpec.describe BikeCode, type: :model do
         bike_code.claim(user, "")
         bike_code.reload
         expect(bike_code.previous_bike_id).to eq bike.id
+        bike.reload
+        expect(bike.organizations.pluck(:id)).to eq([organization.id])
+        expect(bike.organizations.can_edit_claimed_organizations).to eq([])
+      end
+      context "assigns to organization" do
+
       end
       context "unclaiming with bikeindex.org url" do
         it "adds an error" do

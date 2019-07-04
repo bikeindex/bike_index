@@ -306,6 +306,13 @@ RSpec.describe BikesController, type: :controller do
         expect(response).to redirect_to bike_url(bike)
       end
     end
+    context "unknown code" do
+      it "redirects to user root, flash error present" do
+        get :scanned, card_id: " 1393242"
+        expect(response).to redirect_to user_home_path
+        expect(flash[:error]).to be_present
+      end
+    end
     context "code_id" do
       let!(:bike_code) { FactoryBot.create(:bike_code, code: "sss", bike: bike) }
       it "redirects to the proper page" do

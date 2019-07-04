@@ -135,6 +135,7 @@ Bikeindex::Application.routes.draw do
     resource :recovery, only: %i[edit update], controller: "bikes/recovery"
   end
   get "bikes/scanned/:scanned_id", to: "bikes#scanned"
+  get "stickers/:scanned_id", to: "bikes#scanned"
 
   resources :bike_codes, only: [:update]
   resources :locks, except: %[show index]
