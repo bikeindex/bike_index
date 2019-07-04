@@ -44,6 +44,12 @@ RSpec.describe BikeCode, type: :model do
     end
   end
 
+  describe "claimed" do
+    it "is not claimed if bike doesn't exist" do
+      expect(BikeCode.new(bike_id: 12123123).claimed?).to be_falsey
+    end
+  end
+
   describe "code_integer code_prefix and pretty_display" do
     let(:bike_code) { BikeCode.new(code: "b02012012") }
     before { bike_code.set_calculated_attributes }
