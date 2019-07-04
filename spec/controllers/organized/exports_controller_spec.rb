@@ -240,7 +240,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
             expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
           end
           context "avery export with already assigned bike_code" do
-            let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "a221C", bike_id: 111) }
+            let!(:bike_code) { FactoryBot.create(:bike_code_claimed, organization: organization, code: "a221C") }
             it "makes the avery export" do
               expect(bike_code.claimed?).to be_truthy
               expect do

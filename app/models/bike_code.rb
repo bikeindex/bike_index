@@ -81,7 +81,7 @@ class BikeCode < ActiveRecord::Base
     unclaimed.reorder(:id).where("id > ?", after_id || 1).first
   end
 
-  def claimed?; bike_id.present? end
+  def claimed?; bike_id.present? && bike.present? end
 
   def unclaimed?; !claimed? end
 
