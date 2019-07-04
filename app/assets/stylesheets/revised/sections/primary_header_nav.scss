@@ -119,11 +119,11 @@ $mainmenu-open-zindex: 10;
     }
 
     .caret-down {
-      font-size: 75%;
       color: darken($primary-nav-text-color, 10%);
-      font-weight: 800;
       display: inline-block;
-      margin-left: 0.2rem;
+      font-size: 90%;
+      font-weight: 800;
+      margin-left: .2rem;
     }
   }
 

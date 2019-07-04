@@ -380,6 +380,99 @@ en:
       cities: Cities
       schools: Schools
       community_groups: Community Groups
+    next_steps_contact:
+      organization_name: Organization name
+      message: Message
+      get_in_touch: Get in touch
+    packages_list:
+      free: Free
+      forever: Forever
+      sign_up_now: Sign Up Now
+      year: year
+      try_for_free: Try For Free
+      see_features: See Features
+      hide_features: Hide Features
+    find_out_more:
+      custom_development_available: A la carte features and custom development available.
+      get_in_touch_link: Get in touch
+      find_out_more_html: "%{get_in_touch_link} to find out more."
+    bike_shop_packages:
+      supporting_shop: Supporting Shop
+      additional: Additional
+      bike_index_for_bike_shops: Bike Index for bike shops
+      choose_a_package_size: Choose a package size
+      compare_plans_and_features: Compare Plans and Features
+      contact_us: Contact us
+      contact_us_for_trial: Contact us for a free trial
+      forever: Forever
+      free: Free
+      questions_want_to_get_started: Questions? Want to get started?
+      sign_up: Sign up
+      sign_up_now: Sign Up Now
+      simply_the_best_bike_registry: Simply the best bike registry
+      try_for_free: Try For Free
+      package_title: "%{name} package"
+      year: year
+    cities_packages:
+      additional: Additional
+      all_plans_come_with_a_30day_free_trial: All plans come with a 30-day free trial
+      bike_index_for_cities: Bike Index for Cities
+      choose_a_package_size: Choose a package size
+      compare_plans_and_features: Compare Plans and Features
+      contact_us: Contact us
+      contact_us_for_trial: Contact us for a free trial
+      forever: Forever
+      free: Free
+      give_your_constituents_the_bike_registry_: Give your constituents the bike registry they want
+      keep_us_pedaling: Keep us pedaling
+      metropolis: Metropolis
+      package_title: "%{name} package"
+      questions_want_to_get_started: Questions? Want to get started?
+      sign_up: Sign up
+      sign_up_now: Sign Up Now
+      small_city: Small City
+      town: Town
+      try_for_free: Try For Free
+      year: year
+    campus_packages:
+      additional: Additional
+      all_plans_come_with_a_30day_free_trial: All plans come with a 30-day free trial
+      bike_index_for_colleges_universities: Bike Index for Colleges & Universities
+      choose_a_package_size: Choose a package size
+      clean_up_your_campus_messy_registry: Clean up your Campus's messy registry.
+      compare_plans_and_features: Compare Plans and Features
+      contact_us: Contact us
+      contact_us_for_trial: Contact us for a free trial
+      forever: Forever
+      free: Free
+      keep_us_pedaling: Keep us pedaling
+      number_of_members: "%{range} Members"
+      package_title: "%{name} package"
+      questions_want_to_get_started: Questions? Want to get started?
+      sign_up: Sign up
+      sign_up_now: Sign Up Now
+      try_for_free: Try For Free
+      year: year
+  plan_features:
+    supporting_our_nonprofit: Supporting our nonprofit
+    create_organization_account: Create organization account and contact registrants
+    embed_a_registration_form: Embed a registration form on your website so people can register in your organization account
+    automatic_registration_through_pos: Automatic registration through your POS
+    social_media_and_email_marketing: Social Media and Email marketing campaign assets
+    search_bikes_in_organization: Search bikes in organization account
+    import_csv_file: Import CSV file of registrations from former system
+    welcome_campaign: Welcome campaign on Facebook, Twitter, and Instagram
+    staff_accounts: Staff accounts
+    landing_page: Branded registration landing page
+    qr_sticker: QR sticker scanning and messaging
+    ongoing_programming: Ongoing programming, hosting, and support
+    contact_registrants: Contact registrants who have not finished registration
+    add_logos: Add logos and text to Bike Index emails
+    export_custom_data: Export custom data into CSV/XLSX files
+    add_form_fields: Add specific form fields to your landing page
+    automated_migration: Automated migration of graduated bikes out of system
+    mailing_stickers: Avery mailing address formatted XLS export for mailing stickers
+    nest_organizations: Nest multiple organizations in one
   layouts:
     revised_messages:
       error: error
@@ -581,3 +674,17 @@ en:
       last_30_days: last 30 days
       last_year: last year
       all: All
+  sessions:
+    new:
+      get_on_bike_index: Get on Bike Index
+      sign_in_using_facebook: Sign in using Facebook
+      sign_in_using_strava: Sign in using Strava
+      or: Or
+      log_in: Log in
+      no_bike_index_account: no Bike Index account?
+      dont_have_an_account: don't have an account?
+      sign_up: sign up
+      email: email
+      password: password
+      keep_me_logged_in: Keep me logged in
+      forgot_your_password: Forgot your password?

@@ -5,6 +5,8 @@
     = stylesheet_link_tag 'revised', media: 'all'
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <!-- TODO: Use yarn -->
+    <script src="https://kit.fontawesome.com/82eb17360c.js"></script>
     = javascript_include_tag 'application_revised'
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
   %body{ id: page_id, class:  body_class }
@@ -19,7 +21,7 @@
           %span.current-organization-nav-item
             %a#passive_organization_submenu{ "aria-haspopup" => "true", "aria-expanded" => "false", data: { toggle: "dropdown" } }
               = passive_organization.short_name
-              <span class="caret-down">v</span>
+              %i.fas.fa-chevron-down.caret-down
             %ul.current-organization-submenu{ "aria-labelledby" => "#passive_organization_submenu" }
               - if passive_organization.ambassador?
                 %li
