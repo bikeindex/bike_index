@@ -33,17 +33,6 @@ class BikeDecorator < ApplicationDecorator
     t.html_safe
   end
 
-  def phoneable_by?(user = nil)
-    return nil unless object.current_stolen_record.present?
-    return true if object.current_stolen_record.phone_for_everyone
-    if user.present?
-      return true if user.superuser
-      return true if object.current_stolen_record.phone_for_shops && user.has_shop_membership?
-      return true if object.current_stolen_record.phone_for_police && user.has_police_membership?
-      true if object.current_stolen_record.phone_for_users
-    end
-  end
-
   def tire_width(position)
     return "narrow" if object.send("#{position}_tire_narrow")
     "wide"

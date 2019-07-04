@@ -44,69 +44,6 @@ RSpec.describe BikeDecorator do
     end
   end
 
-  describe "phoneable_by?" do
-    it "does not return anything if there isn't a stolen record" do
-      bike = Bike.new
-      expect(BikeDecorator.new(bike).phoneable_by?).to be_nil
-    end
-    it "returns true if users can see it" do
-      bike = Bike.new
-      stolen_record = StolenRecord.new
-      allow(bike).to receive(:stolen).and_return(true)
-      allow(bike).to receive(:current_stolen_record).and_return(stolen_record)
-      allow(stolen_record).to receive(:phone_for_everyone).and_return(true)
-      expect(BikeDecorator.new(bike).phoneable_by?).to be_truthy
-    end
-
-    it "returns true if users can see it and user is there" do
-      user = User.new
-      bike = Bike.new
-      stolen_record = StolenRecord.new
-      allow(bike).to receive(:stolen).and_return(true)
-      allow(bike).to receive(:current_stolen_record).and_return(stolen_record)
-      allow(stolen_record).to receive(:phone_for_users).and_return(true)
-      expect(BikeDecorator.new(bike).phoneable_by?(user)).to be_truthy
-    end
-
-    it "returns true if shops can see it and user has shop membership" do
-      user = User.new
-      bike = Bike.new
-      stolen_record = StolenRecord.new
-      allow(user).to receive(:has_shop_membership?).and_return(true)
-      allow(bike).to receive(:stolen).and_return(true)
-      allow(bike).to receive(:current_stolen_record).and_return(stolen_record)
-      allow(stolen_record).to receive(:phone_for_users).and_return(false)
-      allow(stolen_record).to receive(:phone_for_shops).and_return(true)
-      expect(BikeDecorator.new(bike).phoneable_by?(user)).to be_truthy
-    end
-
-    it "returns true if police can see it and user is police" do
-      user = User.new
-      bike = Bike.new
-      stolen_record = StolenRecord.new
-      allow(user).to receive(:has_police_membership?).and_return(true)
-      allow(bike).to receive(:stolen).and_return(true)
-      allow(bike).to receive(:current_stolen_record).and_return(stolen_record)
-      allow(stolen_record).to receive(:phone_for_users).and_return(false)
-      allow(stolen_record).to receive(:phone_for_shops).and_return(false)
-      allow(stolen_record).to receive(:phone_for_police).and_return(true)
-      expect(BikeDecorator.new(bike).phoneable_by?(user)).to be_truthy
-    end
-
-    it "returns true for superusers" do
-      user = User.new
-      bike = Bike.new
-      stolen_record = StolenRecord.new
-      allow(user).to receive(:superuser).and_return(true)
-      allow(bike).to receive(:stolen).and_return(true)
-      allow(bike).to receive(:current_stolen_record).and_return(stolen_record)
-      allow(stolen_record).to receive(:phone_for_users).and_return(false)
-      allow(stolen_record).to receive(:phone_for_shops).and_return(false)
-      allow(stolen_record).to receive(:phone_for_police).and_return(false)
-      expect(BikeDecorator.new(bike).phoneable_by?(user)).to be_truthy
-    end
-  end
-
   describe "tire_width" do
     it "returns wide if false" do
       bike = Bike.new

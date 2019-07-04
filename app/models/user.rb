@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  include Phonifyerable
   include ActionView::Helpers::SanitizeHelper
   include FeatureFlaggable
   cattr_accessor :current_user

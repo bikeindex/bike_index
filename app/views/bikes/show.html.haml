@@ -3,7 +3,7 @@
 .container
   - if current_user&.superuser
     %p.mb-4.text-center
-      = link_to "#{@bike.type.titleize} in Admin", admin_bike_path(@bike.to_param), class: "btn btn-secondary uncap", style: "display: block;"
+      = link_to "#{@bike.type.titleize} in Admin", admin_bike_path(@bike.to_param), class: "btn btn-outline-info uncap", style: "display: block;"
     - if @bike.user_hidden
       %h2.text-danger.mb-4.text-center
         HIDDEN by owner
