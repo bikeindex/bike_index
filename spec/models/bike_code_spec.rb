@@ -133,14 +133,15 @@ RSpec.describe BikeCode, type: :model do
     let(:user) { FactoryBot.create(:user) }
     let(:organization) { FactoryBot.create(:organization) }
     let(:membership) { FactoryBot.create(:membership, user: user, organization: organization) }
+    let(:bike) { FactoryBot.create(:bike) }
     before { stub_const("BikeCode::MAX_UNORGANIZED", 1) }
     it "is truthy" do
       expect(BikeCode.new.claimable_by?(user)).to be_truthy
       # Already claimed bikes can't be linked
-      expect(BikeCode.new(bike_id: 1243).claimable_by?(user)).to be_falsey
+      expect(BikeCode.new(bike_id: bike.id).claimable_by?(user)).to be_falsey
     end
     context "user has too many bike_codes" do
-      let!(:bike_code) { FactoryBot.create(:bike_code_claimed, user_id: user.id) }
+      let!(:bike_code) { FactoryBot.create(:bike_code_claimed, user_id: user.id, bike: bike) }
       it "has expected values" do
         expect(BikeCode.new.claimable_by?(user)).to be_falsey
         expect(membership).to be_present
