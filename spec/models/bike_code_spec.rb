@@ -44,7 +44,7 @@ RSpec.describe BikeCode, type: :model do
     end
   end
 
-  describe "claimed" do
+  describe "claimed?" do
     it "is not claimed if bike doesn't exist" do
       expect(BikeCode.new(bike_id: 12123123).claimed?).to be_falsey
     end
@@ -140,7 +140,7 @@ RSpec.describe BikeCode, type: :model do
       expect(BikeCode.new(bike_id: 1243).claimable_by?(user)).to be_falsey
     end
     context "user has too many bike_codes" do
-      let!(:bike_code) { FactoryBot.create(:bike_code, user_id: user.id) }
+      let!(:bike_code) { FactoryBot.create(:bike_code_claimed, user_id: user.id) }
       it "has expected values" do
         expect(BikeCode.new.claimable_by?(user)).to be_falsey
         expect(membership).to be_present
