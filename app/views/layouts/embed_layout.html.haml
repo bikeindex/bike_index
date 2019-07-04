@@ -24,7 +24,7 @@
             %a.close{"data-dismiss" => "alert"} ×
             %h4
               = t(".please_fix_the_following")
-              = pluralize(@b_param.bike.errors.count, t(".error"))
+              = pluralize(@b_param.bike_errors.count, t(".error"))
             %ul
               - @b_param.bike_errors.each do |msg|
                 %li= msg
