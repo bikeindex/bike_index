@@ -1,4 +1,5 @@
 class Bike < ActiveRecord::Base
+  include Phonifyerable
   include ActiveModel::Dirty
   include BikeSearchable
   mount_uploader :pdf, PdfUploader
@@ -296,12 +297,25 @@ class Bike < ActiveRecord::Base
 
   def phone
     # use @phone because attr_accessor
+    @phone ||= current_stolen_record&.phone
     @phone ||= user&.phone
     # Only grab the phone number from b_params if this is the first_ownership
-    if first_ownership?
-      @phone ||= b_params.map(&:phone).reject(&:blank?).first
-    end
+    @phone ||= b_params.map(&:phone).reject(&:blank?).first if first_ownership?
     @phone
+  end
+
+  def phoneable_by?(passed_user = nil)
+    return false unless phone.present?
+    return true if passed_user&.superuser
+    if current_stolen_record.blank?
+      return false unless contact_owner?(passed_user) # This return false if user isn't present
+      return !passed_user.ambassador? # we aren't giving ambassadors access to phones rn
+    end
+    return true if current_stolen_record.phone_for_everyone
+    return false if passed_user.blank?
+    return true if current_stolen_record.phone_for_shops && passed_user.has_shop_membership?
+    return true if current_stolen_record.phone_for_police && passed_user.has_police_membership?
+    current_stolen_record.phone_for_users
   end
 
   def visible_by(passed_user = nil)
