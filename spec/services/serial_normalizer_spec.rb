@@ -22,7 +22,7 @@ RSpec.describe SerialNormalizer do
         [
           "dont know ", "I don't know it", "i dont fucking know", "sadly I don't know... ", "I do not remember",
           "???? ??", "Unknown Serial", "IDONTKNOWTHESERIALNUMBER", "I dont remember", "Not known", "dont no", "missing",
-          "n/a", "do not have", "no serial", "idk",
+          "n/a", "do not have", "no serial", "idk", "unkown",
         ]
       end
       it "normalizes a bunch of misentries" do

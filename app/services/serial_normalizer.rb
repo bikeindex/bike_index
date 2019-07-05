@@ -9,7 +9,7 @@ class SerialNormalizer
   end
 
   def self.looks_like_unknown?(str_downcase)
-    return true if ["na", "idk", "no", "no serial"].include?(str_downcase) # specific things
+    return true if ["na", "idk", "no", "unkown", "no serial", "none"].include?(str_downcase) # specific things
     if str_downcase[/(no)|(remember)/].present?
       return true if str_downcase[/unkno/].present?
       return true if str_downcase[/(do.?n.?t)|(not?).?k?no/].present? # Don't know
