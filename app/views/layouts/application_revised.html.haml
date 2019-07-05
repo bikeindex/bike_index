@@ -112,7 +112,7 @@
                 %li
                   = active_link t(".your_bikes"), user_home_path, class: 'nav-link'
                 %li
-                  = active_link t(".settings", user_email: current_user_or_unconfirmed_user.email), my_account_path, class: 'nav-link'
+                  = active_link t(".user_settings", user_email: current_user_or_unconfirmed_user.email), my_account_path, class: 'nav-link'
                 %li
                   = link_to t(".logout"), goodbye_path, class: 'nav-link'
             %li.divider-nav-item
