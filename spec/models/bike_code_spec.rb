@@ -240,7 +240,7 @@ RSpec.describe BikeCode, type: :model do
       let(:bike_code) { FactoryBot.create(:bike_code, organization: organization) }
       it "permits unclaiming of organized bikes if already claimed" do
         expect(bike.organizations).to eq([])
-        bike_code.claim(user, claiming_bike: bike)
+        bike_code.claim(user, bike)
         bike.reload
         bike_code.reload
         expect(bike.organizations.pluck(:id)).to eq([organization.id])

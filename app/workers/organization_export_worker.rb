@@ -127,7 +127,7 @@ class OrganizationExportWorker
   def assign_bike_code_and_increment(bike)
     return "" unless @bike_code.present?
     code = @bike_code.code
-    @bike_code.claim(@export.user, bike.id, claiming_bike: bike)
+    @bike_code.claim(@export.user, bike)
     @bike_codes << code
     @bike_code = @bike_code.next_unclaimed_code
     code

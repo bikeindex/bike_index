@@ -123,9 +123,9 @@ class BikeCode < ActiveRecord::Base
     update(bike_id: nil, user_id: nil, claimed_at: nil)
   end
 
-  def claim(user, bike_str = nil, claiming_bike: nil)
+  def claim(user, bike_str)
     errors.add(:user, "not found") unless user.present?
-    claiming_bike ||= Bike.friendly_find(bike_str)
+    claiming_bike = bike_str.is_a?(Bike) ? bike_str : Bike.friendly_find(bike_str)
     # Check bike_str, not bike_id, because we don't want to allow people adding bikes
     if bike_str.blank? && claiming_bike.blank? && unclaimable_by?(user)
       unclaim!

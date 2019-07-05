@@ -259,7 +259,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
       let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "z") }
       it "removes the bike codes" do
         export.options = export.options.merge(bike_codes_assigned: ["Z"])
-        bike_code.claim(user, bike.id, claiming_bike: bike)
+        bike_code.claim(user, bike)
         export.save
         export.reload
         bike_code.reload
