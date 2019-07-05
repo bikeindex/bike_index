@@ -367,3 +367,36 @@ body {
     opacity: 0.9;
   }
 }
+
+// Taken from bootstrap 4.3.1
+
+//
+// Utilities for common `display` values
+//
+
+$displays: none, inline, inline-block, block, table, table-row, table-cell, flex,
+  inline-flex !default;
+
+$grid-breakpoints-431: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px
+) !default;
+
+@function breakpoint-infix($name, $breakpoints: $grid-breakpoints) {
+  @return if(breakpoint-min($name, $breakpoints) == null, "", "-#{$name}");
+}
+
+@each $breakpoint in map-keys($grid-breakpoints-431) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints-431);
+
+    @each $value in $displays {
+      .d#{$infix}-#{$value} {
+        display: $value !important;
+      }
+    }
+  }
+}
