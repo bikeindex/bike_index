@@ -1,6 +1,4 @@
 .container
-  %h1
-    Oh no!
   %h2
     = @bike_code.kind
     %em
@@ -23,7 +21,7 @@
             = text_field_tag :bike_id, "", placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
         .col-sm-4.col-lg-2
           = submit_tag "Update", class: "btn btn-success"
-        
+
       %p{ style: "margin-top: 24px;" }
         Or, click <em>link it</em> on of your bikes to connect it to this #{@bike_code.kind}:
 

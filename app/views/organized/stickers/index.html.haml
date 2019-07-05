@@ -42,7 +42,6 @@
         Bike
       %th
         Code
-      %th
     %tbody
       - @bike_codes.each do |bike_code|
         %tr
@@ -56,15 +55,13 @@
           %td
             - if bike_code.claimed?
               / For these, use bike_id to avoid loading association
-              = link_to  organized_bike_text(bike_code.bike)
+              = link_to organized_bike_text(bike_code.bike), bike_path(bike_code.bike)
           %td
             = bike_code.code
-          %td
-            .text-center
-              = link_to "/stickers/#{bike_code.code}?organization_id=#{current_organization.to_param}", class: "gray-link small" do
-                %span.hidden-md-down
-                  user sticker
-                view
+            / = link_to "/stickers/#{bike_code.code}?organization_id=#{current_organization.to_param}", class: "gray-link small" do
+            /   %span.hidden-md-down
+            /     user sticker
+            /   view
 
 .paginate-container.paginate-container-bottom
   = paginate @bike_codes

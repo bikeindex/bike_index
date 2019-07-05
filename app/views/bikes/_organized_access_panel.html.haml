@@ -30,10 +30,7 @@
             .text-right.less-strong
               %em
                 %span.hidden-md-down
-                  #{passive_organization.short_name} registered this #{@bike.type} and it is
-              not claimed yet,
-              %em
-                so you can
+                  #{passive_organization.short_name} has permission to edit this #{@bike.type}
               = link_to "Edit it", edit_bike_path(@bike), class: "btn btn-success btn-sm"
         - elsif passive_organization.ambassador? && @bike.current_stolen_record.present?
           .col-xs-12.mb-2

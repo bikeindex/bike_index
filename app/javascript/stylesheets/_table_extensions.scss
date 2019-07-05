@@ -18,20 +18,23 @@
   @extend .table-striped;
   @extend .table-bordered;
   @extend .table-sm;
-  tr td:first-child {
-    font-size: 75%;
-    font-style: italic;
-    text-align: right;
-    padding: 9px 4px 4px;
-    line-height: 1.25;
-  }
-  tr td:first-child.full-width-data {
-    font-size: 100%;
-    font-style: normal;
-  }
-  // use last, rather than first, to enable full width single rows
-  tr td:last-child {
-    width: 85%; // This is effectively min-width for tables
+  tr td {
+    line-height: 1.5;
+    &:first-child {
+      font-size: 75%;
+      font-style: italic;
+      text-align: right;
+      padding: 9px 4px 4px;
+      line-height: 1.25;
+    }
+    &:first-child.full-width-data {
+      font-size: 100%;
+      font-style: normal;
+    }
+    // use last, rather than first, to enable full width single rows
+    &:last-child {
+      width: 85%; // This is effectively min-width for tables
+    }
   }
 }
 
