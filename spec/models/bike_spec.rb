@@ -378,6 +378,10 @@ RSpec.describe Bike, type: :model do
         expect(bike.authorized_by_organization?(org: Organization.new)).to be_falsey
         expect(bike.authorized_for_user?(user)).to be_falsey
         expect(bike.authorize_for_user!(user)).to be_falsey
+        # Also test the post-claim authorization
+        bike.authorize_for_user!(owner)
+        expect(bike.authorized_for_user?(owner)).to be_truthy
+        expect(bike.authorized_by_organization?(u: owner)).to be_falsey # Also doesn't work for user if bike is claimed
       end
       context "claimed" do
         before do

@@ -37,7 +37,7 @@
                   Nevermind
 
 
-- elsif current_user.present?
+- if current_user.present?
   - if @bike.claimable_by?(current_user)
     - modal_title = "Your #{@bike.type}"
     - modal_body = capture_haml do

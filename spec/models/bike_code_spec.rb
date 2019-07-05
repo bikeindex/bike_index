@@ -237,9 +237,15 @@ RSpec.describe BikeCode, type: :model do
     context "organized" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-      let(:bike_code) { FactoryBot.create(:bike_code, bike: bike, organization: organization) }
+      let(:bike_code) { FactoryBot.create(:bike_code, organization: organization) }
       it "permits unclaiming of organized bikes if already claimed" do
+        expect(bike.organizations).to eq([])
+        bike_code.claim(user, bike)
+        bike.reload
         bike_code.reload
+        expect(bike.organizations.pluck(:id)).to eq([organization.id])
+        expect(bike.can_edit_claimed_organizations.pluck(:id)).to eq([])
+        expect(bike_code.claimed?).to be_truthy
         expect(bike_code.errors.full_messages).to_not be_present
         bike_code.claim(user, "\n ")
         expect(bike_code.errors.full_messages).to_not be_present
@@ -260,7 +266,9 @@ RSpec.describe BikeCode, type: :model do
         expect(bike_code.previous_bike_id).to eq bike.id
       end
       context "unclaiming with bikeindex.org url" do
+        let(:bike_code) { FactoryBot.create(:bike_code_claimed, bike: bike, organization: organization) }
         it "adds an error" do
+          expect(bike_code.bike).to eq bike
           # Doesn't permit unclaiming by a bikeindex.org/ url, because that's probably a mistake
           bike_code.claim(user, "www.bikeindex.org/bikes/ ")
           expect(bike_code.errors.full_messages).to be_present
@@ -269,7 +277,7 @@ RSpec.describe BikeCode, type: :model do
       end
 
       context "unorganized" do
-        let(:bike_code) { FactoryBot.create(:bike_code, bike: bike, organization: FactoryBot.create(:organization)) }
+        let(:bike_code) { FactoryBot.create(:bike_code_claimed, bike: bike, organization: FactoryBot.create(:organization)) }
         it "can't unclaim other orgs bikes" do
           bike_code.claim(user, nil)
           expect(bike_code.errors.full_messages).to be_present

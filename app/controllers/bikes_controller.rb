@@ -62,7 +62,8 @@ class BikesController < ApplicationController
   def scanned
     @bike_code = BikeCode.lookup_with_fallback(scanned_id, organization_id: params[:organization_id], user: current_user)
     if @bike_code.blank?
-      raise ActiveRecord::RecordNotFound
+      flash[:error] = "Unable to find sticker: '#{params[:scanned_id]}'"
+      redirect_to user_root_url
     elsif @bike_code.bike.present?
       redirect_to bike_url(@bike_code.bike_id) and return
     elsif current_user.present?

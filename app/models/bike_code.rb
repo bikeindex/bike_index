@@ -123,15 +123,18 @@ class BikeCode < ActiveRecord::Base
     update(bike_id: nil, user_id: nil, claimed_at: nil)
   end
 
-  def claim(user, bike_str, claiming_bike: nil)
+  def claim(user, bike_str)
     errors.add(:user, "not found") unless user.present?
-    claiming_bike ||= Bike.friendly_find(bike_str)
+    claiming_bike = bike_str.is_a?(Bike) ? bike_str : Bike.friendly_find(bike_str)
     # Check bike_str, not bike_id, because we don't want to allow people adding bikes
     if bike_str.blank? && claiming_bike.blank? && unclaimable_by?(user)
       unclaim!
     elsif claiming_bike.present?
       self.previous_bike_id = bike_id || previous_bike_id # Don't erase previous_bike_id if double unclaiming
-      update(bike_id: claiming_bike.id, user_id: user.id, claimed_at: Time.current) unless errors.any?
+      unless errors.any?
+        update(bike_id: claiming_bike.id, user_id: user.id, claimed_at: Time.current)
+        bike.bike_organizations.create(organization_id: organization_id, can_not_edit_claimed: true) if organization.present?
+      end
     else
       errors.add(:bike, "\"#{bike_str}\" not found")
     end

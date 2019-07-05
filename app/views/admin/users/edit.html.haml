@@ -60,7 +60,7 @@
         %td
           %small
             - if @user.show_bikes?
-              = link_to "Bike Index profile page", "/users/#{@user.username}"
+              = link_to "Bike Index profile page", "/users/#{@user.username}", class: "gray-link"
               - if @user.twitter.present?
                 %br
             - if @user.twitter.present?

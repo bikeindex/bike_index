@@ -8,8 +8,6 @@
     %p
       It is connected to this #{link_to @bike_code.bike&.title_string, bike_path(@bike_code.bike_id)}.
   - else
-    %h1
-      Oh no!
     %h2
       %a{ href: edit_organization_sticker_path(organization_id: current_organization.id, id: @bike_code.code) }
         = @bike_code.kind
@@ -26,7 +24,7 @@
       = submit_tag "Update", class: "btn btn-success"
 
   %p.less-strong
-    Or, browse #{current_organization.short_name}'s bikes and click <em>link it</em> to connect it to this #{@bike_code.kind}
+    Or, search #{current_organization.short_name}'s bikes, view the bike and click <em>link it</em> to connect it to this #{@bike_code.kind}
   %hr.mt-4.mb-4.less-strong
 - if current_organization.paid_for?("bike_search")
   = render "/organized/bikes/search"

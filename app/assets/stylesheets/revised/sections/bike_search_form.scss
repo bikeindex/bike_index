@@ -79,7 +79,8 @@
 
   // Search button
   .search-button-wrap {
-    flex: 0 0 16.6%;
+    // Slightly smaller, don't break line on non-retina screens
+    flex: 0 0 16.4%;
     padding-right: 0.9375rem;
   }
 

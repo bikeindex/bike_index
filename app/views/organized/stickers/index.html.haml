@@ -13,7 +13,7 @@
     .col-sm-2.text-right
       = submit_tag "Search", class: "btn btn-primary"
     .col-md-12
-      .btn-group{ role: "group", "aria-label" => "Size", data: { toggle: "buttons" }, style: "margin-top: 0.3rem;" }
+      .btn-group#organized-bike-code-claimedness{ role: "group", "aria-label" => "Claimedness", data: { toggle: "buttons" }, style: "margin-top: 0.3rem;" }
         - claimedness = "claimed" if params[:claimedness] == "claimed"
         - claimedness ||= "unclaimed" if params[:claimedness] == "unclaimed"
         - claimedness ||= "all"
@@ -55,9 +55,9 @@
           %td
             - if bike_code.claimed?
               / For these, use bike_id to avoid loading association
-              = organized_bike_text(bike_code.bike)
+              = link_to organized_bike_text(bike_code.bike), bike_path(bike_code.bike)
           %td
-            = link_to bike_code.code, "/bikes/scanned/#{bike_code.code}?organization_id=#{current_organization.to_param}"
+            = bike_code.code
 
 .paginate-container.paginate-container-bottom
   = paginate @bike_codes

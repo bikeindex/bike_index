@@ -3,35 +3,50 @@
     Edit Sticker
     %em
       = @bike_code.code
-  - if @bike_code.claimed?
+  - if @bike_code.bike_id.present?
     %p.text-right
       = link_to "Remove Bike link", organization_sticker_path(id: @bike_code.code, organization_id: current_organization.to_param, bike_id: nil), method: :put, class: "btn btn-danger"
-%ul.attr-list
-  %li
-    %span.attr-title
-      Bike:
-    - if @bike_code.claimed?
-      = link_to organized_bike_text(@bike_code.bike), bike_path(@bike_code.bike)
-    - else
-      %strong
-        Unclaimed
-  %li
-    %span.attr-title
-      Claimed:
-    - if @bike_code.claimed_at.present?
-      %span.convertTime
-        = l @bike_code.created_at, format: :convert_time
-  %li
-    %span.attr-title
-      Claimed by:
-    - if @bike_code.user.present?
-      = @bike_code.user.display_name
-  %li
-    %span.attr-title
-      Previous Bike
+
+%table.table-list
+  %tbody
+    %tr
+      %td
+        Sticker
+      %td
+        = @bike_code.code
+    %tr
+      %td
+        Claimed
+      %td
+        - if @bike_code.claimed_at.present?
+          %span.convertTime
+            = l @bike_code.created_at, format: :convert_time
+    %tr
+      %td
+        Bike
+      %td
+        - if @bike_code.claimed?
+          = link_to organized_bike_text(@bike_code.bike), bike_path(@bike_code.bike)
+        - elsif @bike_code.bike_id.present?
+          %span.text-danger
+            Bike is unavailable - it was probably deleted
+        - else
+          %strong
+            Unclaimed
+    %tr
+      %td
+        Claimed by
+      %td
+        - if @bike_code.user.present?
+          = @bike_code.user.display_name
+
     - if @bike_code.previous_bike_id
-      - previous_bike = Bike.where(id: @bike_code.previous_bike_id).first
-      = link_to previous_bike&.title_string || @bike_code.previous_bike_id, bike_path(@bike_code.previous_bike_id)
+      %tr
+        %td
+          Previous Bike
+        %td
+          - previous_bike = Bike.find_by_id(@bike_code.previous_bike_id)
+          = link_to previous_bike&.title_string || @bike_code.previous_bike_id, bike_path(@bike_code.previous_bike_id)
 
 %hr.mt-4.mb-4
 
