@@ -692,7 +692,7 @@ RSpec.describe BikesController, type: :controller do
           it "creates, is made_without_serial" do
             expect(user.bikes.count).to eq 0
             expect do
-              post :create, bike: bike_params
+              post :create, bike: bike_params.merge(made_without_serial: "1")
             end.to change(Ownership, :count).by(1)
             expect(user.bikes.count).to eq 1
             bike = user.bikes.first

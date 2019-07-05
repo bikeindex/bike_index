@@ -1093,7 +1093,7 @@ RSpec.describe Bike, type: :model do
     context "problem date" do
       let(:problem_date) do
         digits = (Time.current.year - 1).to_s[2, 3] # last two digits of last year
-        problem_date = Date.strptime("#{Time.current.month}-22-00#{digits}", "%m-%d-%Y")
+        Date.strptime("#{Time.current.month}-22-00#{digits}", "%m-%d-%Y")
       end
       let(:bike) { FactoryBot.create(:stolen_bike) }
       it "does not get out of integer errors" do

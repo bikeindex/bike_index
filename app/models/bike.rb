@@ -209,7 +209,8 @@ class Bike < ActiveRecord::Base
     serial_number
   end
 
-  def made_without_serial?; made_without_serial || serial_number == "made_without_serial" end
+  # We may eventually remove the boolean. For now, we're just going with it.
+  def made_without_serial?; made_without_serial end
 
   def serial_unknown?; serial_number == "unknown" end
 
@@ -404,9 +405,9 @@ class Bike < ActiveRecord::Base
   end
 
   def normalize_attributes
+    self.serial_number = "made_without_serial" if made_without_serial?
     self.serial_number = SerialNormalizer.unknown_and_absent_corrected(serial_number)
     self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
-    self.made_without_serial = serial_number == ""
     if User.fuzzy_email_find(owner_email)
       self.owner_email = User.fuzzy_email_find(owner_email).email
     else
