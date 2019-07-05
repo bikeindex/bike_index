@@ -14,13 +14,15 @@ RSpec.describe SerialNormalizer do
       expect(SerialNormalizer.unknown_and_absent_corrected("   \n")).to eq "unknown"
       expect(SerialNormalizer.unknown_and_absent_corrected(" absenT   \n")).to eq "unknown"
       expect(SerialNormalizer.unknown_and_absent_corrected("   UNKNOWN \n")).to eq "unknown"
+      expect(SerialNormalizer.unknown_and_absent_corrected("   missing \n")).to eq "unknown"
     end
 
     context "misentries" do
       let(:sample_misentries) do
         [
           "dont know ", "I don't know it", "i dont fucking know", "sadly I don't know... ", "I do not remember",
-          "???? ??", "Unknown Serial", "IDONTKNOWTHESERIALNUMBER", "I dont remember", "Not known", "dont no",
+          "???? ??", "Unknown Serial", "IDONTKNOWTHESERIALNUMBER", "I dont remember", "Not known", "dont no", "missing",
+          "n/a", "do not have", "no serial", "idk",
         ]
       end
       it "normalizes a bunch of misentries" do

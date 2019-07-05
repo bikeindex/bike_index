@@ -21,12 +21,13 @@ RSpec.describe Bike, type: :model do
     end
     context "unknown, absent serials" do
       let(:bike_with_serial) { FactoryBot.create(:bike, serial_number: "CCcc99FFF") }
-      let(:bike_made_without_serial) { FactoryBot.create(:bike, serial_number: "made_without_serial") }
+      let(:bike_made_without_serial) { FactoryBot.create(:bike, made_without_serial: true) }
       let(:bike_with_unknown_serial) { FactoryBot.create(:bike, serial_number: "????  \n") }
       it "corrects poorly entered serial numbers" do
         [bike_with_serial, bike_made_without_serial, bike_with_unknown_serial].each { |b| b.reload }
         expect(bike_with_serial.made_without_serial?).to be_falsey
         expect(bike_with_serial.serial_unknown?).to be_falsey
+        expect(bike_made_without_serial.serial_number).to eq "made_without_serial"
         expect(bike_made_without_serial.made_without_serial?).to be_truthy
         expect(bike_made_without_serial.serial_unknown?).to be_falsey
         expect(bike_with_unknown_serial.made_without_serial?).to be_falsey
@@ -784,7 +785,8 @@ RSpec.describe Bike, type: :model do
     end
     context "Made without" do
       it "returns made_without_serial" do
-        bike = Bike.new(serial_number: "made_without_serial")
+        bike = Bike.new(made_without_serial: true)
+        bike.normalize_attributes
         expect(bike.serial_display).to eq("Made without serial")
       end
     end

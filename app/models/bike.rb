@@ -202,7 +202,6 @@ class Bike < ActiveRecord::Base
 
   def fake_deleted; hidden && !user_hidden end
 
-  # this should be put somewhere else sometime
   def serial_display
     return "Hidden" if recovered
     return serial_number.humanize if no_serial?

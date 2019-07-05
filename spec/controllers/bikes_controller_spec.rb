@@ -1397,7 +1397,7 @@ RSpec.describe BikesController, type: :controller do
             pp value, key unless bike.send(key) == value
             expect(bike.send(key)).to eq value
           end
-          expect(bike.bike_organization_ids).to eq([organization.id, organization_2.id])
+          expect(bike.bike_organization_ids).to match_array([organization.id, organization_2.id])
           expect(bike.editable_organizations.pluck(:id)).to eq([])
         end
       end

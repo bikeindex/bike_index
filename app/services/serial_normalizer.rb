@@ -3,13 +3,21 @@ class SerialNormalizer
     str = str.to_s.strip
     # Return unknown if blank, '?' or 'absent' (legacy concern - 'unknown' used to be stored as 'absent')
     return "unknown" if str.blank? || str.gsub(/\s|\?/, "").blank? || str.downcase == "absent"
-    return "made_without_serial" if str.downcase == "made_without_serial"
-    if str[/(no)|(remember)/i].present?
-      return "unknown" if str[/unkno/i].present?
-      return "unknown" if str[/(do.?n.?t)|(not?).?k?no/i].present? # Don't know
-      return "unknown" if str[/(do.?n.?t)|(not?).?remember/i].present? # Don't remember
-    end
+    return "made_without_serial" if str == "made_without_serial"
+    return "unknown" if looks_like_unknown?(str.downcase)
     str
+  end
+
+  def self.looks_like_unknown?(str_downcase)
+    return true if ["na", "idk", "no", "no serial"].include?(str_downcase) # specific things
+    if str_downcase[/(no)|(remember)/].present?
+      return true if str_downcase[/unkno/].present?
+      return true if str_downcase[/(do.?n.?t)|(not?).?k?no/].present? # Don't know
+      return true if str_downcase[/(do.?n.?t)|(not?).?remember/].present? # Don't remember
+    end
+    return true if str_downcase[/n\/a/].present?
+    return true if str_downcase[/missing/].present? # Don't remember
+    false
   end
 
   def initialize(serial: nil, bike_id: nil)
