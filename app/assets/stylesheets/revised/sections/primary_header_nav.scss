@@ -27,6 +27,9 @@ $mainmenu-open-zindex: 10;
   left: 0;
   width: 100%;
   z-index: $zindex-navbar-fixed;
+  ul {
+    list-style-type: none;
+  }
 
   .primary-logo {
     position: relative;
@@ -149,7 +152,6 @@ $mainmenu-open-zindex: 10;
     margin: 0;
     font-size: 1rem;
     text-align: left;
-    list-style: none;
     background-color: #222222;
     background-clip: padding-box;
     border: 1px solid rgba($gray, 0.3);
@@ -291,7 +293,7 @@ $mainmenu-open-zindex: 10;
     }
 
     .primary-submenu {
-      padding-left: 12px;
+      padding-left: 0;
     }
 
     #menu-opened-backdrop {
@@ -339,6 +341,12 @@ $mainmenu-open-zindex: 10;
     .primary-main-menu {
       transform: translate(0%, 0);
     }
+  }
+}
+
+@media (max-width: $grid-breakpoint-sm) {
+  .primary-header-nav.menu-in .hamburgler {
+    padding-left: 1%; // Don't break line on small screens
   }
 }
 
@@ -441,7 +449,6 @@ $mainmenu-open-zindex: 10;
     margin: 2px 0 0;
     font-size: 1rem;
     text-align: left;
-    list-style: none;
     background-color: $primary-nav-background;
     background-clip: padding-box;
     border: 1px solid rgba($gray, 0.3);
