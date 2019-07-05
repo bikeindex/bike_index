@@ -309,7 +309,7 @@ RSpec.describe BikesController, type: :controller do
     context "unknown code" do
       it "redirects to user root, flash error present" do
         get :scanned, card_id: " 1393242"
-        expect(response).to redirect_to user_home_path
+        expect(response).to redirect_to root_path
         expect(flash[:error]).to be_present
       end
     end
