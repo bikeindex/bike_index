@@ -333,6 +333,7 @@ $mainmenu-open-zindex: 10;
 
     .hamburgler {
       padding-right: $mainmenu-width - 5%;
+      padding-left: 10%; // Ensure we cover the links when scrolling
     }
 
     .primary-main-menu {
