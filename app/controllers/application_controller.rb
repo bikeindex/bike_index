@@ -73,11 +73,12 @@ class ApplicationController < ActionController::Base
   end
 
   def requested_locale
-    logger.info({ locale_current: "#{I18n.locale}",
-                  locale_params: locale_from_request_params,
-                  locale_user_profile: current_user&.preferred_language,
-                  locale_headers: locale_from_request_header,
-                  locale_default: I18n.default_locale }.to_json)
+
+    # logger.info({ locale_current: "#{I18n.locale}",
+    #               locale_params: locale_from_request_params,
+    #               locale_user_profile: current_user&.preferred_language,
+    #               locale_headers: locale_from_request_header,
+    #               locale_default: I18n.default_locale }.to_json)
 
     requested_locale =
       locale_from_request_params ||
@@ -85,7 +86,7 @@ class ApplicationController < ActionController::Base
       locale_from_request_header ||
       I18n.default_locale
 
-    logger.info("* Locale set to '#{requested_locale}'")
+    # logger.info("* Locale set to '#{requested_locale}'")
 
     requested_locale
   end
