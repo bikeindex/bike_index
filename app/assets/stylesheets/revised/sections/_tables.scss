@@ -3,7 +3,7 @@
   overflow-x: scroll;
 
   // Make it edge to edge on xs screens
-  @include media-breakpoint-down(xs) {
+  @include media-breakpoint-down(sm) {
     margin-left: -15px;
     margin-right: -15px;
   }

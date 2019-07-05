@@ -114,13 +114,10 @@
                   = active_link t(".your_bikes"), user_home_path, class: 'nav-link'
                 %li
                   = active_link t(".user_settings", user_email: current_user_or_unconfirmed_user.email), my_account_path, class: 'nav-link'
+                %li.divider-nav-item
                 %li
                   = link_to t(".logout"), goodbye_path, class: 'nav-link'
             %li.divider-nav-item
-            - if current_user_or_unconfirmed_user.superuser?
-              %li.primary-nav-item
-                = active_link t(".admin"), user_root_url, class: 'nav-link'
-              %li.divider-nav-item
           - else
             %li.primary-nav-item
               = active_link t(".sign_up"), new_user_url, class: 'nav-link signup-link'
