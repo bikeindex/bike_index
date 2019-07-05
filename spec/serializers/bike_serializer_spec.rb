@@ -18,7 +18,7 @@ RSpec.describe BikeSerializer do
     it { expect(subject.rear_tire_narrow).to eq(bike.rear_tire_narrow) }
     it { expect(subject.front_tire_narrow).to eq(bike.front_tire_narrow) }
     it { expect(subject.rear_wheel_size).to eq(bike.rear_wheel_size) }
-    it { expect(subject.serial).to eq(bike.serial_number) }
+    it { expect(subject.serial_display).to eq(bike.serial_number) }
     it { expect(subject.front_wheel_size).to eq(bike.front_wheel_size) }
     it { expect(subject.handlebar_type).to eq(bike.handlebar_type) }
     it { expect(subject.frame_material).to eq(bike.frame_material_name) }

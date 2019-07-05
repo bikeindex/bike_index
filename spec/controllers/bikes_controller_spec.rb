@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe BikesController, type: :controller do
+  let(:manufacturer) { FactoryBot.create(:manufacturer) }
+  let(:color) { FactoryBot.create(:color) }
   describe "index" do
     include_context :geocoder_default_location
     let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "1234567890") }
@@ -341,8 +343,6 @@ RSpec.describe BikesController, type: :controller do
 
     context "signed in" do
       include_context :logged_in_as_user
-      let(:manufacturer) { FactoryBot.create(:manufacturer) }
-      let(:color) { FactoryBot.create(:color) }
       let(:organization) { FactoryBot.create(:organization) }
       context "passed stolen param" do
         it "renders a new stolen bike" do
@@ -447,8 +447,6 @@ RSpec.describe BikesController, type: :controller do
 
   describe "create" do
     # This is the create action for bikes controller
-    let(:manufacturer) { FactoryBot.create(:manufacturer) }
-    let(:color) { FactoryBot.create(:color) }
     let(:cycle_type) { "tandem" }
     let(:handlebar_type) { "bmx" }
     let(:state) { FactoryBot.create(:state) }
@@ -666,6 +664,46 @@ RSpec.describe BikesController, type: :controller do
 
     context "standard web form submission" do
       include_context :logged_in_as_user
+      describe "blank serials" do
+        let(:bike_params) do
+          {
+            serial_number: "absent",
+            manufacturer_id: manufacturer.name,
+            primary_frame_color_id: color.id,
+            owner_email: user.email,
+            has_no_serial: "1",
+            made_without_serial: "0",
+          }
+        end
+        it "creates" do
+          expect(user.bikes.count).to eq 0
+          expect do
+            post :create, bike: bike_params
+          end.to change(Ownership, :count).by(1)
+          expect(user.bikes.count).to eq 1
+          bike = user.bikes.first
+          expect(bike.claimed?).to be_truthy
+          expect(bike.no_serial?).to be_truthy
+          expect(bike.made_without_serial?).to be_falsey
+          expect(bike.serial_unknown?).to be_truthy
+          expect(bike.serial_number).to eq "unknown"
+        end
+        context "made_without_serial" do
+          it "creates, is made_without_serial" do
+            expect(user.bikes.count).to eq 0
+            expect do
+              post :create, bike: bike_params
+            end.to change(Ownership, :count).by(1)
+            expect(user.bikes.count).to eq 1
+            bike = user.bikes.first
+            expect(bike.claimed?).to be_truthy
+            expect(bike.no_serial?).to be_truthy
+            expect(bike.made_without_serial?).to be_truthy
+            expect(bike.serial_unknown?).to be_falsey
+            expect(bike.serial_number).to eq "made_without_serial"
+          end
+        end
+      end
 
       context "legacy b_param" do
         let(:bike_params) do
@@ -1297,7 +1335,6 @@ RSpec.describe BikesController, type: :controller do
       end
     end
     context "owner present (who is allowed to edit)" do
-      let(:color) { FactoryBot.create(:color) }
       let(:user) { FactoryBot.create(:user_confirmed) }
       let(:ownership) { FactoryBot.create(:ownership_organization_bike, owner_email: user.email) }
       let(:bike) { ownership.bike }

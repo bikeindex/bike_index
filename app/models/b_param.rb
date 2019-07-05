@@ -61,7 +61,7 @@ class BParam < ActiveRecord::Base
 
   def self.assignable_attrs
     %w(manufacturer_id manufacturer_other frame_model year owner_email creation_organization_id
-       stolen recovered serial_number has_no_serial made_without_serial
+       stolen recovered serial_number made_without_serial
        primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id)
   end
 

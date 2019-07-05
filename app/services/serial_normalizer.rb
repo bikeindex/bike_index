@@ -1,8 +1,9 @@
 class SerialNormalizer
   def self.unknown_and_absent_corrected(str = nil)
     str = str.to_s.strip
-    return "absent" if str.blank? || str.downcase == "absent"
-    return "unknown" if str.gsub(/\s|\?/, "").blank? # Only ?
+    # Return unknown if blank, '?' or 'absent' (legacy concern - 'unknown' used to be stored as 'absent')
+    return "unknown" if str.blank? || str.gsub(/\s|\?/, "").blank? || str.downcase == "absent"
+    return "made_without_serial" if str.downcase == "made_without_serial"
     if str[/(no)|(remember)/i].present?
       return "unknown" if str[/unkno/i].present?
       return "unknown" if str[/(do.?n.?t)|(not?).?k?no/i].present? # Don't know
@@ -17,7 +18,7 @@ class SerialNormalizer
   end
 
   def normalized
-    return "absent" if @serial.blank? || @serial == "ABSENT"
+    return nil if @serial.blank? || %w[UNKNOWN MADE_WITHOUT_SERIAL].include?(@serial)
     normed = @serial.dup
     serial_substitutions.each do |key, value|
       normed.gsub!(/[#{key}]/, value)
@@ -27,7 +28,7 @@ class SerialNormalizer
   end
 
   def normalized_segments
-    return [] if normalized == "absent"
+    return [] if normalized.blank?
     normalized.split(" ").reject(&:empty?).uniq
   end
 
