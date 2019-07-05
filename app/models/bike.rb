@@ -102,7 +102,6 @@ class Bike < ActiveRecord::Base
 
   class << self
     def old_attr_accessible
-      # made_without_serial - GUARANTEE there was no serial
       (%w(manufacturer_id manufacturer_other serial_number
           serial_normalized made_without_serial additional_registration
           creation_organization_id manufacturer year thumb_path name stolen

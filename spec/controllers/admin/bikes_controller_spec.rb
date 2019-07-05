@@ -74,6 +74,7 @@ RSpec.describe Admin::BikesController, type: :controller do
         bike_attributes = {
           serial_number: "new thing and stuff",
           bike_organization_ids: ["", organization.id.to_s],
+          made_without_serial: "0",
           stolen_records_attributes: {
             "0" => {
               street: "Cortland and Ashland",
@@ -107,6 +108,22 @@ RSpec.describe Admin::BikesController, type: :controller do
         expect(bike.serial_number).to eq("ssssssssss")
         expect(response).to redirect_to "/about"
         expect(session[:return_to]).to be_nil
+      end
+    end
+
+    context "made without serial" do
+      it "makes it made without serial" do
+        bike = FactoryBot.create(:bike, serial_number: "og serial")
+        FactoryBot.create(:ownership, bike: bike)
+        opts = {
+          id: bike.id,
+          bike: { made_without_serial: "1", serial_number: "d" },
+        }
+        put :update, opts
+        bike.reload
+        expect(bike.made_without_serial?).to be_truthy
+        expect(bike.serial_number).to eq("made_without_serial")
+        expect(bike.normalized_serial_segments).to eq([])
       end
     end
   end

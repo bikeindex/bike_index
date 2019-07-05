@@ -667,11 +667,10 @@ RSpec.describe BikesController, type: :controller do
       describe "blank serials" do
         let(:bike_params) do
           {
-            serial_number: "absent",
+            serial_number: "unknown",
             manufacturer_id: manufacturer.name,
             primary_frame_color_id: color.id,
             owner_email: user.email,
-            has_no_serial: "1",
             made_without_serial: "0",
           }
         end
@@ -687,6 +686,7 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.made_without_serial?).to be_falsey
           expect(bike.serial_unknown?).to be_truthy
           expect(bike.serial_number).to eq "unknown"
+          expect(bike.normalized_serial_segments).to eq([])
         end
         context "made_without_serial" do
           it "creates, is made_without_serial" do
@@ -701,6 +701,7 @@ RSpec.describe BikesController, type: :controller do
             expect(bike.made_without_serial?).to be_truthy
             expect(bike.serial_unknown?).to be_falsey
             expect(bike.serial_number).to eq "made_without_serial"
+            expect(bike.normalized_serial_segments).to eq([])
           end
         end
       end
