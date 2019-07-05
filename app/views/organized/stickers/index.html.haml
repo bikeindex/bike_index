@@ -58,10 +58,6 @@
               = link_to organized_bike_text(bike_code.bike), bike_path(bike_code.bike)
           %td
             = bike_code.code
-            / = link_to "/stickers/#{bike_code.code}?organization_id=#{current_organization.to_param}", class: "gray-link small" do
-            /   %span.hidden-md-down
-            /     user sticker
-            /   view
 
 .paginate-container.paginate-container-bottom
   = paginate @bike_codes
