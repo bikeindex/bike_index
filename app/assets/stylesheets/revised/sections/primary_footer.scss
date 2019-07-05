@@ -105,6 +105,16 @@ $primary-footer-top-margin: 6 * $vertical-height;
 }
 
 //
+// Large Screen Styles
+@media (max-width: $grid-breakpoint-lg - 1px) and (min-width: $grid-breakpoint-md) {
+  .social-nav {
+    li {
+      margin: auto 10px;
+    }
+  }
+}
+
+//
 // Small Screen Styles
 @media (max-width: $grid-breakpoint-lg - 1px) {
   .primary-footer-nav nav {
