@@ -15,6 +15,8 @@ class BikeIndex.Views.Home extends Backbone.View
     $('.testimonial-container').slick
       infinite: false
       lazyLoad: 'ondemand'
+      prevArrow: '<i class="fas fa-chevron-left slick-prev"></i>'
+      nextArrow: '<i class="fas fa-chevron-right slick-next"></i>'
 
   spaceWheelHolder: (only_if_overlap=false) ->
     active_quote = $('.testimonial-block.active .testimonial-quote')
@@ -31,4 +33,3 @@ class BikeIndex.Views.Home extends Backbone.View
       # console.log(wheel_margin)
       # console.log(target)
       $('.wheeled').css('margin-top', "#{target + wheel_margin}px")
-

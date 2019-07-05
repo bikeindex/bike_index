@@ -4,5 +4,7 @@ class BikeIndex.WelcomeIndex extends BikeIndex
     $('#recovery-stories-container').slick
       infinite: false
       lazyLoad: 'ondemand'
+      prevArrow: '<i class="fas fa-chevron-left slick-prev"></i>'
+      nextArrow: '<i class="fas fa-chevron-right slick-next"></i>'
     $(window).scroll ->
       $('.root-landing-who').addClass('scrolled')
