@@ -246,7 +246,7 @@ class Bike < ActiveRecord::Base
     return true unless u.present? || org.present?
     # We have either a org or a user - if no user, we only need to check org
     return editable_organization_ids.include?(org.id) if u.blank?
-    return false if claimable_by?(u) # authorized by owner, not organization
+    return false if claimable_by?(u) || u == owner # authorized by owner, not organization
     # Ensure the user is part of the organization and the organization can edit if passed both
     return u.member_of?(org) && editable_organization_ids.include?(org.id) if org.present?
     editable_organizations.any? { |o| u.member_of?(o) }
