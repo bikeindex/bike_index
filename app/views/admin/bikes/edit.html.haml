@@ -7,7 +7,7 @@
     Theft Alerts
   = render partial: "/admin/theft_alerts/table", locals: { theft_alerts: @bike.current_stolen_record.theft_alerts, skip_bike: true }
 
-- if @recoveries.any?
+- if @recoveries.present?
   %h3.mt-4
     Recoveries
   = render partial: "/admin/recoveries/table", locals: { recoveries: @recoveries, skip_bike: true }
@@ -78,12 +78,12 @@
         = f.label :serial_number
         = f.text_field :serial_number, required: true, class: "form-control #{@bike.no_serial? ? 'fake-disabled' : ''}"
     .col-6.col-md-4.col-lg-3
-      .serial-check.serial-check-unknown.ml-2.collapse{ class: @bike.made_without_serial? ? "" : "show" }
+      .serial-check.serial-check-unknown.ml-2
         = check_box_tag :has_no_serial, true, @bike.serial_unknown?, class: "form-check-input"
         = label_tag :has_no_serial, "Unknown serial"
-      .serial-check.serial-check-made-without.ml-2.collapse{ class: @bike.serial_unknown? ? "" : "show" }
-        = check_box_tag :made_without_serial, true, @bike.made_without_serial?, class: "form-check-input"
-        = label_tag :made_without_serial
+      .serial-check.serial-check-made-without.ml-2
+        = f.check_box :made_without_serial, class: "form-check-input"
+        = f.label :made_without_serial
   .row
     .col-6.col-md-4.col-lg-3
       .form-group.fancy-select.unfancy
@@ -129,14 +129,15 @@
       .form-group
         = f.label :description
         = f.text_area :description, class: "form-control"
-    .col-md-4.col-lg-3
-      .form-group.fancy-select.unfancy
-        = f.label :creation_organization_id
-        = collection_select(:bike, :creation_organization_id, @organizations, :id, :name, { prompt: "Choose organization" }, { class: "form-control" })
-    .col-md-4.col-lg-3
-      .form-group.fancy-select.unfancy
-        = f.label :bike_organization_ids, 'Current orgs'
-        = f.collection_select(:bike_organization_ids, @organizations, :id, :name, { include_blank: true, prompt: '' }, { multiple: true, class: "form-control" })
+    - if @organizations.present?
+      .col-md-4.col-lg-3
+        .form-group.fancy-select.unfancy
+          = f.label :creation_organization_id
+          = f.collection_select(:creation_organization_id, @organizations, :id, :name, { prompt: "Choose organization" }, { class: "form-control" })
+      .col-md-4.col-lg-3
+        .form-group.fancy-select.unfancy
+          = f.label :bike_organization_ids, 'Current orgs'
+          = f.collection_select(:bike_organization_ids, @organizations, :id, :name, { include_blank: true, prompt: '' }, { multiple: true, class: "form-control" })
 
   .row.mt-4
     .col-12.text-center

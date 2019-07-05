@@ -70,7 +70,7 @@ toggleRegistrationType = ->
 
 updateSerial = (e) ->
   if $(e.target).prop('checked') == true
-    $('#bike_serial_number').val('absent').addClass('absent-serial')
+    $('#bike_serial_number').val('unknown').addClass('absent-serial')
   else
     $('#bike_serial_number').val('').removeClass('absent-serial')
 
@@ -129,7 +129,7 @@ $(document).ready ->
   otherManufacturerDisplay($("#bike_manufacturer_id").val())
   $('#stolen_record_phone').attr('required', false)
 
-  $('#bike_has_no_serial').change (e) ->
+  $('#has_no_serial').change (e) ->
     updateSerial(e)
 
   $('#alert-block .close').click ->

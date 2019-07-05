@@ -32,14 +32,14 @@
               #made-without-serial-input
                 %label
                   = f.check_box :made_without_serial
-                  Made without serial
+                  This #{@bike.type} was made without a serial
               .below-input-help#made-without-serial-help
                 .hidden-other
                   %a{ data: { toggle: 'modal', target: '#made-without-serial-modal' } }
                     This #{@bike.type} was made without a serial number
             .right-input-help
-              %label
-                = f.check_box :has_no_serial, tabindex: -1
+              %label.made-without-serial-checkbox
+                = check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1
                 Missing serial
 
           .related-fields

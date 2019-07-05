@@ -137,7 +137,7 @@ RSpec.describe "Bikes API V3", type: :request do
                json_headers
           bike2 = json_result["bike"]
           expect(bike2["id"]).to eq(bike1.id)
-          expect(bike2["serial"]).to eq(bike1.serial)
+          expect(bike2["serial"]).to eq(bike1.serial_display)
           expect(bike2["year"]).to eq(new_year)
           expect(bike2["frame_colors"].first).to eq(new_color.name)
           expect(bike2["type_of_cycle"]).to eq(new_cycle_type.name)
@@ -156,7 +156,7 @@ RSpec.describe "Bikes API V3", type: :request do
           FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization)
 
           bike_attrs = {
-            serial: bike.serial,
+            serial: bike.serial_display,
             manufacturer: bike.manufacturer.name,
             color: color.name,
             year: bike.year,
@@ -178,7 +178,7 @@ RSpec.describe "Bikes API V3", type: :request do
           FactoryBot.create(:existing_membership, user: user)
 
           bike_attrs = {
-            serial: bike.serial,
+            serial: bike.serial_display,
             manufacturer: bike.manufacturer.name,
             color: color.name,
             year: bike.year,
@@ -202,7 +202,7 @@ RSpec.describe "Bikes API V3", type: :request do
         let!(:membership) { FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization) }
         let(:bike_attrs) do
           {
-            serial: bike.serial,
+            serial: bike.serial_display,
             manufacturer: bike.manufacturer.name,
             color: color.name,
             year: "2012",
@@ -310,7 +310,7 @@ RSpec.describe "Bikes API V3", type: :request do
         bike = FactoryBot.create(:ownership, creator: user).bike
 
         bike_attrs = {
-          serial: bike.serial,
+          serial: bike.serial_display,
           manufacturer: bike.manufacturer.name,
           color: color.name,
           year: bike.year,
@@ -332,7 +332,7 @@ RSpec.describe "Bikes API V3", type: :request do
         bike = FactoryBot.create(:ownership, creator: user).bike
 
         bike_attrs = {
-          serial: bike.serial,
+          serial: bike.serial_display,
           manufacturer: bike.manufacturer.name,
           color: color.name,
           year: bike.year,

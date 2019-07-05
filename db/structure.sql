@@ -324,7 +324,6 @@ CREATE TABLE public.bikes (
     thumb_path text,
     video_embed text,
     year integer,
-    has_no_serial boolean DEFAULT false NOT NULL,
     creator_id integer,
     front_tire_narrow boolean,
     primary_frame_color_id integer,
@@ -4426,4 +4425,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190624171627');
 INSERT INTO schema_migrations (version) VALUES ('20190625151428');
 
 INSERT INTO schema_migrations (version) VALUES ('20190703194554');
+
+INSERT INTO schema_migrations (version) VALUES ('20190705230020');
 

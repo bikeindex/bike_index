@@ -4,7 +4,7 @@ class BikeIndex.BikesNew extends BikeIndex
     new BikeIndex.FormWell
     new window.CheckEmail('#bike_owner_email')
     @initializeEventListeners()
-    @updateSerial($('#bike_has_no_serial').prop('checked'))
+    @updateSerial($('#has_no_serial').prop('checked'))
     @otherManufacturerDisplay($('#bike_manufacturer_id').val())
     if $('#stolen_record_us_id').length > 0
       united_stated_id = $('#stolen_record_us_id').data('usid')
@@ -19,8 +19,8 @@ class BikeIndex.BikesNew extends BikeIndex
       @toggleUnknownYear()
     $('#bike_year').change (e) =>
       @updateYear()
-    $('#bike_has_no_serial').change (e) =>
-      @updateSerial($('#bike_has_no_serial').prop('checked'))
+    $('#has_no_serial').change (e) =>
+      @updateSerial($('#has_no_serial').prop('checked'))
     $('#made-without-serial-button').click (e) =>
       @madeWithoutSerial(true)
     $('#bike_made_without_serial').change (e) => # Only ever called when visible, so it's time to close
@@ -29,24 +29,26 @@ class BikeIndex.BikesNew extends BikeIndex
   updateSerial: (serial_absent) ->
     @madeWithoutSerial()
     if serial_absent
-      serialVal = $('#bike_serial_number').val()
-      window.existingSerialNumber = serialVal unless serialVal == "absent"
-      $('#bike_serial_number').val('absent').addClass('absent-serial')
-      $('#made-without-serial-help .hidden-other').slideDown()
+      serialVal = $("#bike_serial_number").val()
+      unless serialVal == "made_without_serial" || serialVal == "unknown"
+        window.existingSerialNumber = serialVal
+      $('#bike_serial_number').val("unknown").addClass("absent-serial")
+      $("#made-without-serial-help .hidden-other").slideDown()
     else
-      if $('#bike_serial_number').val() == "absent"
-        $('#bike_serial_number').val(window.existingSerialNumber || "").removeClass('absent-serial')
-      $('#made-without-serial-help .hidden-other').slideUp()
+      if $("#bike_serial_number").val() == "unknown"
+        $("#bike_serial_number").val(window.existingSerialNumber || "").removeClass("absent-serial")
+      $("#made-without-serial-help .hidden-other").slideUp()
 
   madeWithoutSerial: (no_serial = false) ->
     # Show the made_without_serial checkbox, hide other serial inputs
     $('#made-without-serial-modal').modal('hide')
     if no_serial
-      $("#serial-input, #made-without-serial-help").slideUp()
+      $("#serial-input, #made-without-serial-help, .made-without-serial-checkbox").slideUp()
       $('#made-without-serial-input').slideDown()
       $('#bike_made_without_serial').prop('checked', true)
+      $('#bike_serial_number').val("made_without_serial")
     else
-      $("#serial-input, #made-without-serial-help").slideDown()
+      $("#serial-input, #made-without-serial-help, .made-without-serial-checkbox").slideDown()
       $('#made-without-serial-input').slideUp()
       $('#bike_made_without_serial').prop('checked', false)
 

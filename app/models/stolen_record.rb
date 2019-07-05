@@ -171,7 +171,7 @@ class StolenRecord < ActiveRecord::Base
     row << "\t"
     row << tsv_col(b.frame_model)
     row << "\t"
-    row << tsv_col(b.serial) unless b.serial == "absent"
+    row << tsv_col(b.serial_display)
     row << "\t"
     row << tsv_col(b.frame_colors.to_sentence)
     row << tsv_col(b.description)

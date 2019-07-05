@@ -12,12 +12,12 @@ function BinxAdminBikesEdit() {
 
     updateSerialDisplay() {
       if ($(".serial-check input:checked").length) {
-        if ($(".serial-check-unknown input:checked").length) {
-          $(".serial-check-made-without").collapse("hide");
-          $("#bike_serial_number").val("unknown");
+        if ($(".serial-check-made-without input:checked").length) {
+          log.debug("in made without");
+          $(".serial-check-unknown input").prop("checked", false);
+          $("#bike_serial_number").val("made_without_serial");
         } else {
-          $(".serial-check-unknown").collapse("hide");
-          $("#bike_serial_number").val("absent");
+          $("#bike_serial_number").val("unknown");
         }
         $("#bike_serial_number").addClass("fake-disabled");
       } else {

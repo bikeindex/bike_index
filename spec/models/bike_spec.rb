@@ -21,21 +21,21 @@ RSpec.describe Bike, type: :model do
     end
     context "unknown, absent serials" do
       let(:bike_with_serial) { FactoryBot.create(:bike, serial_number: "CCcc99FFF") }
-      let(:bike_with_absent_serial) { FactoryBot.create(:bike, serial_number: "aBsent  ") }
+      let(:bike_made_without_serial) { FactoryBot.create(:bike, made_without_serial: true) }
       let(:bike_with_unknown_serial) { FactoryBot.create(:bike, serial_number: "????  \n") }
       it "corrects poorly entered serial numbers" do
-        [bike_with_serial, bike_with_absent_serial, bike_with_unknown_serial].each { |b| b.reload }
+        [bike_with_serial, bike_made_without_serial, bike_with_unknown_serial].each { |b| b.reload }
         expect(bike_with_serial.made_without_serial?).to be_falsey
         expect(bike_with_serial.serial_unknown?).to be_falsey
-        expect(bike_with_absent_serial.made_without_serial?).to be_truthy
-        expect(bike_with_absent_serial.serial_unknown?).to be_falsey
+        expect(bike_made_without_serial.serial_number).to eq "made_without_serial"
+        expect(bike_made_without_serial.made_without_serial?).to be_truthy
+        expect(bike_made_without_serial.serial_unknown?).to be_falsey
         expect(bike_with_unknown_serial.made_without_serial?).to be_falsey
         expect(bike_with_unknown_serial.serial_unknown?).to be_truthy
-        expect(bike_with_unknown_serial.has_no_serial).to be_falsey
         expect(bike_with_serial.serial_number).to eq "CCcc99FFF"
-        expect(bike_with_absent_serial.serial_number).to eq "absent"
+        expect(bike_made_without_serial.serial_number).to eq "made_without_serial"
         expect(bike_with_unknown_serial.serial_number).to eq "unknown"
-        expect(Bike.with_serial.pluck(:id)).to eq([bike_with_serial.id])
+        expect(Bike.with_known_serial.pluck(:id)).to match_array([bike_with_serial.id, bike_made_without_serial.id])
       end
     end
     context "actual tests for ascend and lightspeed" do
@@ -765,14 +765,29 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "serial" do
-    it "only returns the serial if we should show people the serial" do
-      # We're hiding serial numbers for bikes that are recovered to provide a method of verifying
-      # ownership
-      bike = Bike.new
-      allow(bike).to receive(:serial_number).and_return("something")
-      allow(bike).to receive(:recovered).and_return(true)
-      expect(bike.serial).to be_nil
+  describe "serial_display" do
+    it "returns the serial" do
+      expect(Bike.new(serial_number: "AAbbCC").serial_display).to eq "AAbbCC"
+    end
+    context "recovered" do
+      it "only returns the serial if we should show people the serial" do
+        # We're hiding serial numbers for recovered bikes to provide a method of verifying ownership
+        bike = Bike.new(serial_number: "something", recovered: true)
+        expect(bike.serial_display).to eq "Hidden"
+      end
+    end
+    context "unknown" do
+      it "returns unknown" do
+        bike = Bike.new(serial_number: "unknown")
+        expect(bike.serial_display).to eq("Unknown")
+      end
+    end
+    context "Made without" do
+      it "returns made_without_serial" do
+        bike = Bike.new(made_without_serial: true)
+        bike.normalize_attributes
+        expect(bike.serial_display).to eq("Made without serial")
+      end
     end
   end
 
@@ -1079,7 +1094,7 @@ RSpec.describe Bike, type: :model do
     context "problem date" do
       let(:problem_date) do
         digits = (Time.current.year - 1).to_s[2, 3] # last two digits of last year
-        problem_date = Date.strptime("#{Time.current.month}-22-00#{digits}", "%m-%d-%Y")
+        Date.strptime("#{Time.current.month}-22-00#{digits}", "%m-%d-%Y")
       end
       let(:bike) { FactoryBot.create(:stolen_bike) }
       it "does not get out of integer errors" do

@@ -74,7 +74,7 @@ class Bike < ActiveRecord::Base
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
   scope :organized, -> { where.not(creation_organization_id: nil) }
-  scope :with_serial, -> { where.not(serial_number: ["absent", "unknown"]) }
+  scope :with_known_serial, -> { where.not(serial_number: "unknown") }
   # "Recovered" bikes are bikes that were found and are waiting to be claimed. This is confusing and should be fixed
   # so that it no longer is the same word as stolen recoveries
   scope :non_recovered, -> { where(recovered: false) }
@@ -102,9 +102,8 @@ class Bike < ActiveRecord::Base
 
   class << self
     def old_attr_accessible
-      # made_without_serial - GUARANTEE there was no serial
       (%w(manufacturer_id manufacturer_other serial_number
-          serial_normalized has_no_serial made_without_serial additional_registration
+          serial_normalized made_without_serial additional_registration
           creation_organization_id manufacturer year thumb_path name stolen
           current_stolen_record_id recovered frame_material cycle_type frame_model number_of_seats
           handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
@@ -202,10 +201,14 @@ class Bike < ActiveRecord::Base
 
   def fake_deleted; hidden && !user_hidden end
 
-  # this should be put somewhere else sometime
-  def serial; serial_number unless recovered end
+  def serial_display
+    return "Hidden" if recovered
+    return serial_number.humanize if no_serial?
+    serial_number
+  end
 
-  def made_without_serial?; serial_number == "absent" end
+  # We may eventually remove the boolean. For now, we're just going with it.
+  def made_without_serial?; made_without_serial end
 
   def serial_unknown?; serial_number == "unknown" end
 
@@ -400,7 +403,8 @@ class Bike < ActiveRecord::Base
   end
 
   def normalize_attributes
-    self.serial_number = SerialNormalizer.unknown_and_absent_corrected(serial)
+    self.serial_number = "made_without_serial" if made_without_serial?
+    self.serial_number = SerialNormalizer.unknown_and_absent_corrected(serial_number)
     self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
     if User.fuzzy_email_find(owner_email)
       self.owner_email = User.fuzzy_email_find(owner_email).email

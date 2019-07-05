@@ -317,7 +317,7 @@ RSpec.describe BulkImportWorker, type: :job do
 
           expect(bike.owner_email).to eq row[:owner_email]
           expect(bike.manufacturer).to eq manufacturer
-          expect(bike.serial_number).to eq "absent"
+          expect(bike.serial_number).to eq "unknown"
           expect(bike.frame_model).to eq "Midnight Special"
           expect(bike.primary_frame_color).to eq black
 
@@ -347,10 +347,10 @@ RSpec.describe BulkImportWorker, type: :job do
       let(:non_blank_examples) { %w[somethingna none8xc9x] }
       it "rescues blank serials, doesn't rescue non blank serials" do
         blank_examples.each do |e|
-          expect(instance.rescue_blank_serial(e)).to eq "absent"
+          expect(instance.rescue_blank_serial(e)).to eq "unknown"
         end
         non_blank_examples.each do |e|
-          expect(instance.rescue_blank_serial(e)).to_not eq "absent"
+          expect(instance.rescue_blank_serial(e)).to_not eq "unknown"
         end
       end
     end
