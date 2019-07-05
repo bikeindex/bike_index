@@ -73,13 +73,11 @@ class ApplicationController < ActionController::Base
   end
 
   def requested_locale
-    unless rails.production?
-      logger.info("* Current: '#{I18n.locale}'")
-      logger.info("* Params: '#{locale_from_request_params}'")
-      logger.info("* User profile:: '#{current_user&.preferred_language}'")
-      logger.info("* Request Headers: '#{locale_from_request_header}'")
-      logger.info("* Default: '#{I18n.default_locale}'")
-    end
+    logger.info({ locale_current: "#{I18n.locale}",
+                  locale_params: locale_from_request_params,
+                  locale_user_profile: current_user&.preferred_language,
+                  locale_headers: locale_from_request_header,
+                  locale_default: I18n.default_locale }.to_json)
 
     requested_locale =
       locale_from_request_params ||
