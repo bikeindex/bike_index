@@ -266,7 +266,9 @@ RSpec.describe BikeCode, type: :model do
         expect(bike_code.previous_bike_id).to eq bike.id
       end
       context "unclaiming with bikeindex.org url" do
+        let(:bike_code) { FactoryBot.create(:bike_code_claimed, bike: bike, organization: organization) }
         it "adds an error" do
+          expect(bike_code.bike).to eq bike
           # Doesn't permit unclaiming by a bikeindex.org/ url, because that's probably a mistake
           bike_code.claim(user, "www.bikeindex.org/bikes/ ")
           expect(bike_code.errors.full_messages).to be_present
@@ -275,7 +277,7 @@ RSpec.describe BikeCode, type: :model do
       end
 
       context "unorganized" do
-        let(:bike_code) { FactoryBot.create(:bike_code, bike: bike, organization: FactoryBot.create(:organization)) }
+        let(:bike_code) { FactoryBot.create(:bike_code_claimed, bike: bike, organization: FactoryBot.create(:organization)) }
         it "can't unclaim other orgs bikes" do
           bike_code.claim(user, nil)
           expect(bike_code.errors.full_messages).to be_present
