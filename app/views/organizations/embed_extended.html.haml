@@ -17,8 +17,8 @@
           = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
     .has-no-serial.optional-block
       %label
-        = f.check_box :has_no_serial, tabindex: -1
-        Has no serial
+        = check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1
+        Unknown serial
 
   .input-group.with-additional-block
     .control-group.select-jsonified

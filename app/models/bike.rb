@@ -104,7 +104,7 @@ class Bike < ActiveRecord::Base
     def old_attr_accessible
       # made_without_serial - GUARANTEE there was no serial
       (%w(manufacturer_id manufacturer_other serial_number
-          serial_normalized has_no_serial made_without_serial additional_registration
+          serial_normalized made_without_serial additional_registration
           creation_organization_id manufacturer year thumb_path name stolen
           current_stolen_record_id recovered frame_material cycle_type frame_model number_of_seats
           handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit

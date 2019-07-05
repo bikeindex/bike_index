@@ -24,11 +24,8 @@
           = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
     .has-no-serial.optional-block
       %label
-        = f.check_box :has_no_serial, tabindex: -1 
-        %span.stolen          
-          Unknown
-        %span.not-stolen          
-          Has no serial
+        = check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1
+        Unknown serial
 
   .input-group.with-additional-block
     .control-group.select-jsonified
@@ -52,7 +49,7 @@
       %label
         %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
         Unknown year
-        
+
   .input-group
     .control-group
       = f.label :frame_model, class: "control-label"
@@ -84,7 +81,7 @@
           Third color
         .controls.special-select-single
           = collection_select( :bike, :tertiary_frame_color_id, Color.all, :id, :name, prompt: "Choose color" )
-  
+
   #stolen_fields_container
     #stolen_fields
       = f.hidden_field :stolen, value: true
@@ -123,10 +120,10 @@
               = builder.text_area :theft_description, rows: 3
         .input-group
           %p.stolen-suggestion
-            Filing a 
+            Filing a
             %strong
               police report
-            is 
+            is
             %span.stolen-color
               extremely important
             for stolen bike recovery.
@@ -178,7 +175,7 @@
       %span.what-you-register
         this
       = select(:bike, :cycle_type, CycleType.select_options, { required: true })
-      
+
   .input-group.optional-group.form-photo-group
     - if @b_param.image.present? or @b_param.image_tmp.present?
       %strong

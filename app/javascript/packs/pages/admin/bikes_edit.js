@@ -17,7 +17,7 @@ function BinxAdminBikesEdit() {
           $("#bike_serial_number").val("unknown");
         } else {
           $(".serial-check-unknown").collapse("hide");
-          $("#bike_serial_number").val("absent");
+          $("#bike_serial_number").val("made_without_serial");
         }
         $("#bike_serial_number").addClass("fake-disabled");
       } else {
