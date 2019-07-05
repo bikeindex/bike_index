@@ -5,17 +5,12 @@
   h1 {
     margin-bottom: 0;
   }
-
-  .edit-bike-title-submenu {
-    margin: 0;
-
-    a {
-      color: $body-font-color;
-
-      &:hover {
-        color: $link-color;
-      }
-    }
+}
+// There is a margin issue on bike edit, fixing it by clobbering here
+@media (min-width: 768px) {
+  #bikes_edit .form-well-header.container {
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 

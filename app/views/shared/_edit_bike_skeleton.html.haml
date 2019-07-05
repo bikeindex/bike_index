@@ -11,11 +11,14 @@
       = @bike.frame_model
       = @bike.type unless @bike.type == 'bike'
     - unless @bike.user?
-      %p.edit-bike-title-submenu
-        Sent to 
+      %p.mb-0
+        Owned by
         %em
           = @bike.owner_email
-        but it hasn't been claimed yet
-    %p.edit-bike-title-submenu
-      = link_to "View #{@bike.type.titleize}", bike_path(@bike)
+        - if @bike.authorized_by_organization?(org: passive_organization)
+          but #{passive_organization.short_name} has permission to edit
+        - else # it's almost certainly because the user hasn't claimed it
+          but it hasn't been claimed yet
+    %p.mb-4
+      = link_to "View #{@bike.type.titleize}", bike_path(@bike), class: "gray-link"
 = yield

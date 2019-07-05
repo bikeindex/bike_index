@@ -371,6 +371,9 @@ RSpec.describe Bike, type: :model do
         # It should be authorized for the owner, but not be authorized_by_organization
         expect(bike.authorized_for_user?(owner)).to be_truthy
         expect(bike.authorized_by_organization?(u: owner)).to be_falsey # Because this bike is authorized by owning it, not organization
+        bike.authorize_for_user!(owner)
+        expect(bike.authorized_for_user?(owner)).to be_truthy
+        expect(bike.authorized_by_organization?(u: owner)).to be_falsey # Also doesn't work for user if bike is claimed
         expect(bike.authorized_by_organization?(u: member)).to be_truthy # Sanity check - we haven't broken this
         # And it isn't authorized for a random user or a random org
         expect(bike.authorized_by_organization?(u: user)).to be_falsey
