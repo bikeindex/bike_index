@@ -10,6 +10,8 @@ class PublicImagesController < ApplicationController
   end
 
   def create
+    p "!!!!!!!"
+    p "hello2!!!!!!!!!!"
     @public_image = PublicImage.new(permitted_parameters)
     if params[:bike_id].present?
       @public_image.imageable = @bike
@@ -94,6 +96,8 @@ class PublicImagesController < ApplicationController
   end
 
   def permitted_parameters
+    p "!!!!!!!"
+    p "hello1!!!!!!!!!!"
     params.require(:public_image).permit(:image, :name, :imageable, :listing_order, :remote_image_url, :is_private)
   end
 

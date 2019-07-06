@@ -9,7 +9,7 @@ function BinxAdminBlogs() {
   return {
     init() {
       this.editDate()
-      this.filePondUpload
+      this.filePondUpload();
     },
 
     editDate() {
@@ -23,21 +23,28 @@ function BinxAdminBlogs() {
       FilePond.create(
         document.querySelector('#pond')
       );
-
-
       FilePond.setOptions({
         server: {
-          url: "/public_images/create",
+          url: './',
+          timeout: 7000,
           process: {
-            url: './process',
+            url: './public_images',
             method: 'POST',
+            headers: {
+              'x-customheader': 'Hello World'
+            },
             withCredentials: false,
-            headers: {},
-            timeout: 7000,
-            onload: null,
-            onerror: null,
-            ondata: null
-          }
+            onload: this.onLoadFile,
+            onerror: (response) => response.data,
+            ondata: (formData) => {
+              formData.append('Hello', 'World');
+              return formData;
+            }
+          },
+          revert: './revert',
+          restore: './restore/',
+          load: './load/',
+          fetch: './fetch/'
         }
       });
     }
