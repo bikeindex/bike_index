@@ -3,7 +3,6 @@ class ProcessMembershipWorker
   sidekiq_options queue: "high_priority", backtrace: true
 
   def perform(membership_id, user_id = nil)
-    pp "m: #{membership_id}, user: #{user_id}"
     membership = Membership.find(membership_id)
 
     assign_membership_user(membership, user_id) if membership.user.blank?
