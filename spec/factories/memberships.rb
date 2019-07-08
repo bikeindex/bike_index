@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :membership do
     role { "member" }
     organization { FactoryBot.create(:organization) }
+    sender { FactoryBot.create(:user_confirmed) }
     sequence(:invited_email) { |n| user&.email || "someone-#{n}@test.com" }
 
     factory :membership_claimed do
