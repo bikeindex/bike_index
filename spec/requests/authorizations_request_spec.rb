@@ -24,10 +24,8 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
   end
 
   context "current user present" do
-    let!(:user_subject) { FactoryBot.create(:user_confirmed) }
-    # Stubbing finding user via cookies because I'm not sure how to set cookies in request spec right now :/
-    # TODO: Rails 5 update maybe...
-    before { allow(User).to receive(:from_auth) { user_subject } } # Stubbing user lookup
+    include_context :request_spec_logged_in_as_user
+
     it "renders" do
       get authorization_url
       expect(response.code).to eq("200")
@@ -47,7 +45,7 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
     end
 
     context "unconfirmed user" do
-      let!(:user_subject) { FactoryBot.create(:user) }
+      let!(:current_user) { FactoryBot.create(:user) }
       it "redirects" do
         get authorization_url
         # This will redirect to please_confirm_email_users_path after new_session realizes an unconfirmed user is present
@@ -56,7 +54,7 @@ RSpec.describe Oauth::AuthorizationsController, type: :request do
       context "with unconfirmed scope" do
         let(:scope) { "read_bikes+read_user+unconfirmed" }
         it "renders" do
-          expect(user_subject.confirmed?).to be_falsey
+          expect(current_user.confirmed?).to be_falsey
           get authorization_url
           expect(response.code).to eq("200")
           expect(response).to render_template(:new)

@@ -111,14 +111,12 @@
           %td
             - if task.completed_at
               %span.convertTime= l task.completed_at, format: :convert_time
-.mt-4
 .row.mt-4
   .col-md-6
     %h4
       User has #{ pluralize(@bikescount, "bike") }
-  - if @bikescount > 10
-    .col-md-6.mt-auto
-      = link_to "Show all bikes", admin_bikes_path(search_user_id: @user.id), class: "float-right"
+  .col-md-6.text-right
+    = link_to "Show all user bikes", admin_bikes_path(search_user_id: @user.id)
 
 = render partial: "admin/bikes/table", locals: { bikes: @bikes }
 

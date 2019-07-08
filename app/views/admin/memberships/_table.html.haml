@@ -1,11 +1,6 @@
-.admin-subnav
-  .col-md-5
-    %h1
-      Manage Memberships
-  .col-md-7
-    %ul
-      %li.nav-item
-        = link_to "New Membership", new_admin_membership_url, class: "nav-link"
+
+%h1 Manage Memberships
+= link_to 'New Membership', new_admin_membership_url, class: "btn btn-success float-right"
 
 %h2
   = @memberships.count

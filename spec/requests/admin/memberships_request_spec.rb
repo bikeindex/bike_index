@@ -2,7 +2,11 @@ require "rails_helper"
 
 RSpec.describe Admin::UsersController, type: :request do
   base_url = "/admin/users/"
-  include_context :request_spec_logged_in_as_superuser
+
+  # Request specs don't have cookies so we need to stub stuff if we're in request specs
+  # This is suboptimal, but hey, it gets us to request specs for now
+  before { allow(User).to receive(:from_auth) { user } }
+  let(:user) { FactoryBot.create(:admin) }
   let(:user_subject) { FactoryBot.create(:user) }
 
   describe "index" do
@@ -51,7 +55,7 @@ RSpec.describe Admin::UsersController, type: :request do
       end
     end
     context "developer" do
-      let(:current_user) { FactoryBot.create(:admin_developer) }
+      let(:user) { FactoryBot.create(:admin_developer) }
       it "updates developer" do
         put "#{base_url}/#{user_subject.id}", user: {
                                                 developer: true,
