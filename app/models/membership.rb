@@ -6,13 +6,13 @@ class Membership < ActiveRecord::Base
   belongs_to :user
   belongs_to :organization
 
-  validates_presence_of :role, message: "How the hell did you manage to not choose a role? You have to choose one."
-  validates_presence_of :organization, message: "Sorry, organization doesn't exist"
-  validates_presence_of :user, message: "We're sorry, that user hasn't yet signed up for Bike Index. Please ask them to before adding them to your organization"
+  validates_presence_of :role, :organization, :sender_id
 
+  before_validation :set_calculated_attributes
+  after_create :enqueue_processing_worker
   after_commit :update_relationships
-  after_create :ensure_ambassador_tasks_assigned!
 
+  scope :claimed, -> { where.not(claimed_at: nil) }
   scope :ambassador_organizations, -> { where(organization: Organization.ambassador) }
 
   def self.membership_types
@@ -32,8 +32,12 @@ class Membership < ActiveRecord::Base
     organization&.update_attributes(updated_at: Time.current)
   end
 
-  def ensure_ambassador_tasks_assigned!
-    return unless organization.kind == "ambassador"
-    AmbassadorMembershipAfterCreateWorker.perform_async(id)
+  def enqueue_processing_worker
+    ProcessMembershipWorker.perform_async(id)
+  end
+
+  def set_calculated_attributes
+    self.invited_email = EmailNormalizer.normalize(invited_email)
+    self.claimed_at ||= Time.now if user_id.present?
   end
 end

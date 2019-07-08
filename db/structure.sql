@@ -1283,7 +1283,8 @@ CREATE TABLE public.memberships (
     updated_at timestamp without time zone NOT NULL,
     deleted_at timestamp without time zone,
     sender_id integer,
-    claimed_at timestamp without time zone
+    claimed_at timestamp without time zone,
+    email_invitation_sent_at timestamp without time zone
 );
 
 

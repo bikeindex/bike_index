@@ -66,7 +66,7 @@ RSpec.describe Organized::UsersController, type: :controller do
 
     describe "edit" do
       context "membership" do
-        let(:membership) { FactoryBot.create(:existing_membership, organization: organization) }
+        let(:membership) { FactoryBot.create(:membership_claimed, organization: organization) }
         it "renders the page" do
           get :edit, organization_id: organization.to_param, id: membership.id
           expect(assigns(:membership)).to eq membership
@@ -114,7 +114,7 @@ RSpec.describe Organized::UsersController, type: :controller do
       end
       context "membership" do
         context "other valid membership" do
-          let(:membership) { FactoryBot.create(:existing_membership, organization: organization, role: "member") }
+          let(:membership) { FactoryBot.create(:membership_claimed, organization: organization, role: "member") }
           let(:membership_params) { { role: "admin", user_id: 333 } }
           it "updates the role" do
             og_user = membership.user
@@ -160,7 +160,7 @@ RSpec.describe Organized::UsersController, type: :controller do
       end
       context "membership" do
         context "other valid membership" do
-          let(:membership) { FactoryBot.create(:existing_membership, organization: organization, role: "member") }
+          let(:membership) { FactoryBot.create(:membership_claimed, organization: organization, role: "member") }
           it "destroys the membership" do
             expect(membership).to be_present
             count = organization.available_invitation_count

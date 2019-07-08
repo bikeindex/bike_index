@@ -31,18 +31,18 @@ FactoryBot.define do
 
         factory :organization_member do
           after(:create) do |user, evaluator|
-            FactoryBot.create(:membership, user: user, organization: evaluator.organization)
+            FactoryBot.create(:membership_claimed, user: user, organization: evaluator.organization)
           end
         end
         factory :organization_auto_user do
           after(:create) do |user, evaluator|
-            FactoryBot.create(:membership, user: user, organization: evaluator.organization)
+            FactoryBot.create(:membership_claimed, user: user, organization: evaluator.organization)
             evaluator.organization.update_attribute :auto_user_id, user.id
           end
         end
         factory :organization_admin do
           after(:create) do |user, evaluator|
-            FactoryBot.create(:membership, user: user, organization: evaluator.organization, role: "admin")
+            FactoryBot.create(:membership_claimed, user: user, organization: evaluator.organization, role: "admin")
           end
         end
       end

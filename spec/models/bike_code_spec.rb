@@ -132,7 +132,7 @@ RSpec.describe BikeCode, type: :model do
   describe "claimable_by?" do
     let(:user) { FactoryBot.create(:user) }
     let(:organization) { FactoryBot.create(:organization) }
-    let(:membership) { FactoryBot.create(:membership, user: user, organization: organization) }
+    let(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: organization) }
     let(:bike) { FactoryBot.create(:bike) }
     before { stub_const("BikeCode::MAX_UNORGANIZED", 1) }
     it "is truthy" do

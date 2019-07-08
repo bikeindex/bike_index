@@ -153,7 +153,7 @@ RSpec.describe "Bikes API V3", type: :request do
         it "updates if the submitting org is the creation org" do
           bike = FactoryBot.create(:creation_organization_bike)
           FactoryBot.create(:ownership, creator: bike.creator, bike: bike)
-          FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization)
+          FactoryBot.create(:membership_claimed, user: user, organization: bike.creation_organization)
 
           bike_attrs = {
             serial: bike.serial_display,
@@ -175,7 +175,7 @@ RSpec.describe "Bikes API V3", type: :request do
         it "creates a new record if the submitting org isn't the creation org" do
           bike = FactoryBot.create(:creation_organization_bike)
           FactoryBot.create(:ownership, creator: bike.creator, bike: bike)
-          FactoryBot.create(:existing_membership, user: user)
+          FactoryBot.create(:membership_claimed, user: user)
 
           bike_attrs = {
             serial: bike.serial_display,
@@ -199,7 +199,7 @@ RSpec.describe "Bikes API V3", type: :request do
         let(:can_edit_claimed) { true }
         let(:bike) { FactoryBot.create(:creation_organization_bike, can_edit_claimed: can_edit_claimed) }
         let!(:ownership) { FactoryBot.create(:ownership_claimed, creator: bike.creator, bike: bike) }
-        let!(:membership) { FactoryBot.create(:existing_membership, user: user, organization: bike.creation_organization) }
+        let!(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: bike.creation_organization) }
         let(:bike_attrs) do
           {
             serial: bike.serial_display,

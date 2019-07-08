@@ -141,11 +141,13 @@
         %td
           = "&#x2713;".html_safe if payment.is_payment
 
+.row
+  .col-md-6
+    %h4.mt-4
+      = @user.memberships.count
+      Memberships
 - if @user.memberships.count > 0
-  %h4.mt-4
-    = @user.memberships.count
-    Memberships
-  = render partial: "/admin/memberships/table", locals: { organization_invitations: @user.memberships }
+  = render partial: "/admin/memberships/table", locals: { memberships: @user.memberships }
 
 
 - if @user.user_emails.count > 1

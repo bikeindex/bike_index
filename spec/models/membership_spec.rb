@@ -33,7 +33,7 @@ RSpec.describe Membership, type: :model do
 
   describe ".ambassador_organizations" do
     it "returns all and only ambassador organizations" do
-      FactoryBot.create(:existing_membership)
+      FactoryBot.create(:membership_claimed)
       ambassador_orgs = FactoryBot.create_list(:membership_ambassador, 3)
       found_orgs = Membership.ambassador_organizations
       expect(found_orgs.order(:created_at)).to eq(ambassador_orgs.sort_by(&:created_at))

@@ -97,7 +97,7 @@ RSpec.describe UsersController, type: :controller do
         end
         context "with organization_invitation and an example bike" do
           let(:email) { "test@stuff.com" }
-          let(:organization_invitation) { FactoryBot.create(:organization_invitation, invitee_email: " #{email.upcase}", membership_role: "member") }
+          let(:organization_invitation) { FactoryBot.create(:membership, invited_email: " #{email.upcase}", membership_role: "member") }
           let!(:organization) { organization_invitation.organization }
           let(:bike) { FactoryBot.create(:bike, example: true, owner_email: email) }
           let!(:ownership) { FactoryBot.create(:ownership, bike: bike, owner_email: email) }
@@ -591,7 +591,7 @@ RSpec.describe UsersController, type: :controller do
       user = FactoryBot.create(:user_confirmed, terms_of_service: false, notification_newsletters: false)
       expect(user.notification_newsletters).to be_falsey
       organization = FactoryBot.create(:organization)
-      FactoryBot.create(:membership, organization: organization, user: user)
+      FactoryBot.create(:membership_claimed, organization: organization, user: user)
       user.reload
       expect(user.default_organization).to eq organization
       set_current_user(user)
