@@ -65,7 +65,7 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def show
-    redirect_to edit_admin_bike_url
+    redirect_to edit_admin_bike_path
   end
 
   def edit

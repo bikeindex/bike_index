@@ -16,6 +16,7 @@ class User < ActiveRecord::Base
   has_many :payments
   has_many :subscriptions, -> { subscription }, class_name: "Payment"
   has_many :memberships, dependent: :destroy
+  has_many :sent_memberships, class_name: "Membership", foreign_key: :sender_id
   has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
   has_many :organizations, through: :memberships
   has_many :ownerships, dependent: :destroy
@@ -34,8 +35,6 @@ class User < ActiveRecord::Base
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
 
-  has_many :organization_invitations, class_name: "OrganizationInvitation", inverse_of: :inviter
-  has_many :organization_invitations, class_name: "OrganizationInvitation", inverse_of: :invitee
   belongs_to :state
   belongs_to :country
 
