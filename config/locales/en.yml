@@ -696,7 +696,27 @@ en:
       new_password: New Password
       new_password_confirmation: New Password confirmation
     edit_root:
-      # TODO
+      personal_information_for_user: "Personal Information for %{user_name}"
+      any_use_of_your_personal_information_html: "Any use of your personal information is governed by the terms of our %{privacy_policy}. We do not sell, trade, or rent your personal information to third parties."
+      receive_the_bike_index_newsletter: Receive the Bike Index newsletter
+      give_us_permission_html: "Give us permission to contact you if we believe your bike has been stolen, <em>even if it isn't marked stolen -</em> <strong>%{why_you_should_link}</strong>"
+      address: Address
+      choose_country: Choose country
+      city: City
+      state: State
+      zipcode: ZIP code
+      choose_language: Choose language
+      preferred_language: Preferred language
+      have_multiple_emails: Have multiple emails? Consolidate them into one account here
+      primary_email: Primary email
+      notifications_email: This is the email we send notifications to
+      confirmed_emails: Confirmed emails
+      make_primary_email: Make primary email
+      unconfirmed_emails: Unconfirmed emails
+      resend_confirmation: Resend confirmation
+      remove_email: Remove email
+      additional_email: Additional email
+      add_additional_email: Add additional email
     edit_sharing:
       sharing_and_personal_page_settings: Sharing and Personal page settings
       show_twitter: Show Twitter
@@ -756,7 +776,6 @@ en:
       get_bike_indexs_newsletter: Get Bike Index's Newsletter
       forgot_your_password: Forgot your password?
     organization_show:
-      # TODO
     password_reset:
       password_reset: Password Reset
       weve_sent_an_email: We've sent an email to the address you have on file with us.
@@ -765,7 +784,7 @@ en:
       thanks_for_signing_up_for_bike_index: Thanks for signing up for Bike Index!
       please_verify_your_email: Please verify your email
       we_sent_an_email: We sent an email with a confirmation link in it. Follow the link in the email to finish signing up!
-      we_sent_an_email_to_user_email_html: 'We sent an email to <strong class="stolen-color">%{user_email}</strong> with a confirmation link in it. Follow the link in the email to finish signing up!'
+      we_sent_an_email_to_user_email_html: We sent an email to <strong class="stolen-color">%{user_email}</strong> with a confirmation link in it. Follow the link in the email to finish signing up!
     request_password_reset:
       reset_your_password: Reset your Password
       your_email_address: your email address
