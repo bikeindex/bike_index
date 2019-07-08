@@ -770,9 +770,9 @@ en:
       log_in: log in
       bikehub_terms_url: https://basic.bikehub.com/terms.html
       terms_and_conditions: terms and conditions
-      agree_bikeindex_bikehub_toc_html: "I agree to BikeHub''s %{bikehub_toc_link} and Bike Index''s %{bikeindex_toc_link}."
-      agree_bikeindex_toc_html: "I agree to Bike Index''s %{bikeindex_toc_link}."
-      get_bike_indexs_newsletter: Get Bike Index''s Newsletter
+      agree_bikeindex_bikehub_toc_html: "I agree to BikeHub's %{bikehub_toc_link} and Bike Index's %{bikeindex_toc_link}."
+      agree_bikeindex_toc_html: "I agree to Bike Index's %{bikeindex_toc_link}."
+      get_bike_indexs_newsletter: "Get Bike Index's Newsletter"
       forgot_your_password: Forgot your password?
     organization_show:
       joined_the_bike_index: "Joined the bike index %{timestamp}"
