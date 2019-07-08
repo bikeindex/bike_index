@@ -7,7 +7,7 @@ class Membership < ActiveRecord::Base
   belongs_to :organization
   belongs_to :sender, class_name: "User"
 
-  validates_presence_of :role, :organization_id
+  validates_presence_of :role, :organization_id # TODO: should include :invited_email
 
   before_validation :set_calculated_attributes
   after_commit :enqueue_processing_worker

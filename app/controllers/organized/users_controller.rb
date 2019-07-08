@@ -27,8 +27,8 @@ module Organized
     end
 
     def new
-      @organization_invitation = OrganizationInvitation.new(organization_id: current_organization.id)
-      @page_errors = @organization_invitation.errors
+      @membership ||= Membership.new(organization_id: current_organization.id)
+      @page_errors = @membership.errors
     end
 
     def create

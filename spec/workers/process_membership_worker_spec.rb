@@ -51,13 +51,14 @@ RSpec.describe ProcessMembershipWorker, type: :job do
         expect(ActionMailer::Base.deliveries.empty?).to be_falsey
       end
       context "user with email exists" do
-        let!(:user) { FactoryBot.create(:user_confirmed, email: membership.invited_email) }
-        it "sends the email, claims, etc" do
-          user.reload
+        let!(:user) { FactoryBot.build(:user_confirmed, email: membership.invited_email) }
+        it "sends the email, claims, etc - happens automatically on save" do
           expect(user.memberships.count).to eq 0
           expect(membership.claimed?).to be_falsey
           expect(membership.email_invitation_sent_at).to be_blank
-          described_class.new.perform(membership.id)
+          user.save
+          user.perform_create_jobs # TODO: Rails 5 update - this is an after_commit issue
+          user.reload
           membership.reload
           expect(membership.send_invitation_email?).to be_falsey
           expect(membership.user).to eq user
