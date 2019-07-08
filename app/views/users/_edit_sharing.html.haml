@@ -31,7 +31,7 @@
     #personal-field.form-group.row.collapse
       = f.label :website, t(".personal_site_url"), class: 'form-well-label'
       .form-well-input
-        = f.text_field :website, placeholder: t(".examplecom"), class: 'form-control'
+        = f.text_field :website, placeholder: t(".example_url"), class: 'form-control'
 
   .related-fields
     .form-group.row
@@ -39,7 +39,7 @@
       .form-well-input
         = f.text_field :my_bikes_link_target,
         value: @user.mb_link_target,
-        placeholder: t(".httpexamplecom"),
+        placeholder: t(".example_url"),
         class: 'form-control'
 
     .form-group.row
@@ -59,7 +59,7 @@
   %hr
   .col-xs-12
     %p
-      = t(".the_bike_index_can_create_a_page_listing_")
+      = t(".the_bike_index_can_create_a_page")
       - preview_page = t(".preview_page")
       = link_to "(#{preview_page})", user_url(@user), target: '_blank'
     .form-group.unnested-field.row.sharing-collapser{ data: { target: '#personal-page' } }

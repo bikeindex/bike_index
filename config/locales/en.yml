@@ -697,9 +697,9 @@ en:
       new_password_confirmation: New Password confirmation
     edit_root:
       personal_information_for_user: "Personal Information for %{user_name}"
-      any_use_of_your_personal_information_html: "Any use of your personal information is governed by the terms of our %{privacy_policy}. We do not sell, trade, or rent your personal information to third parties."
+      any_use_of_your_personal_information_html: Any use of your personal information is governed by the terms of our %{privacy_policy}. We do not sell, trade, or rent your personal information to third parties.
       receive_the_bike_index_newsletter: Receive the Bike Index newsletter
-      give_us_permission_html: "Give us permission to contact you if we believe your bike has been stolen, <em>even if it isn't marked stolen -</em> <strong>%{why_you_should_link}</strong>"
+      give_us_permission_html: Give us permission to contact you if we believe your bike has been stolen, <em>even if it isn't marked stolen -</em> <strong>%{why_you_should_link}</strong>
       address: Address
       choose_country: Choose country
       city: City
@@ -728,26 +728,25 @@ en:
       personal_site_url: Personal Site URL
       examplecom: example.com
       additional_link: Additional Link
-      httpexamplecom: http://example.com
+      example_url: http://example.com
       title_for_link: Title for link
       my_awesome_link: My awesome link
       your_username_is_the_url_for_your_sharing: Your username is the URL for your sharing page and the bike embed form. Update it if you care about those things.
-      the_bike_index_can_create_a_page_listing_: The Bike Index can create a page listing all your bikes that includes all the information you want to share. It's your personal page.
+      the_bike_index_can_create_a_page: The Bike Index can create a page listing all your bikes that includes all the information you want to share. It's your personal page.
       preview_page: preview page
       create_public_page: Create public page
       create_page: Create page
-      no_please_dont_create_me_a_page: No, please don't create me a page
+      no_please_dont_create_me_a_page: "No, please don't create me a page"
       profile_avatar: Profile avatar
       choose_file: Choose file...
       page_title: Page title
-      formwelllabel: form-well-label
       this_users_bikes: This user's bikes
       page_text: Page text
     accept_terms:
-      i_agree_to_tos_html: I agree to Bike Index's <strong>Terms of Service</strong>.
+      i_agree_to_tos_html: "I agree to Bike Index's <strong>Terms of Service</strong>."
       submit: Submit
     accept_vendor_terms:
-      i_agree_to_tos_html: I agree to Bike Index's <strong>Terms of Service for Organizations</strong>.
+      i_agree_to_tos_html: "I agree to Bike Index's <strong>Terms of Service for Organizations</strong>."
       submit: Submit
     confirm_error_404:
       woops: Woops
@@ -771,9 +770,9 @@ en:
       log_in: log in
       bikehub_terms_url: https://basic.bikehub.com/terms.html
       terms_and_conditions: terms and conditions
-      agree_bikeindex_bikehub_toc_html: I agree to BikeHub's %{bikehub_toc_link} and Bike Index's %{bikeindex_toc_link}.
-      agree_bikeindex_toc_html: I agree to Bike Index's %{bikeindex_toc_link}.
-      get_bike_indexs_newsletter: Get Bike Index's Newsletter
+      agree_bikeindex_bikehub_toc_html: "I agree to BikeHub''s %{bikehub_toc_link} and Bike Index''s %{bikeindex_toc_link}."
+      agree_bikeindex_toc_html: "I agree to Bike Index''s %{bikeindex_toc_link}."
+      get_bike_indexs_newsletter: Get Bike Index''s Newsletter
       forgot_your_password: Forgot your password?
     organization_show:
     password_reset:
@@ -784,7 +783,7 @@ en:
       thanks_for_signing_up_for_bike_index: Thanks for signing up for Bike Index!
       please_verify_your_email: Please verify your email
       we_sent_an_email: We sent an email with a confirmation link in it. Follow the link in the email to finish signing up!
-      we_sent_an_email_to_user_email_html: We sent an email to <strong class="stolen-color">%{user_email}</strong> with a confirmation link in it. Follow the link in the email to finish signing up!
+      we_sent_an_email_to_user_email_html: 'We sent an email to <strong class="stolen-color">%{user_email}</strong> with a confirmation link in it. Follow the link in the email to finish signing up!'
     request_password_reset:
       reset_your_password: Reset your Password
       your_email_address: your email address
@@ -797,7 +796,7 @@ en:
       this_user_has_no_bikes_yet: This user has no bikes yet!
     update_password:
       choose_a_new_password: Choose a new password!
-      and_try_not_to_forget_it: "(and try not to forget it...)"
+      and_try_not_to_forget_it: and try not to forget it...
       update_your_password: Update your password
       password: Password
       password_confirmation: Password confirmation
