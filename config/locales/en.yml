@@ -774,22 +774,6 @@ en:
       agree_bikeindex_toc_html: "I agree to Bike Index's %{bikeindex_toc_link}."
       get_bike_indexs_newsletter: "Get Bike Index's Newsletter"
       forgot_your_password: Forgot your password?
-    organization_show:
-      joined_the_bike_index: "Joined the bike index %{timestamp}"
-      bikes_indexed_for_org_html: "Bikes indexed for <strong>%{org_name}</strong> by %{user}"
-      date_indexed: Date indexed
-      sent_to: Sent to
-      manufacturer: Manufacturer
-      color: Color
-      rear_wheel_size: Rear Wheel size
-      today_at: "Today at %{timestamp}"
-      yesterday_at: "Yesterday at %{timestamp}"
-      edit_user_email: "Edit %{user_email}"
-      admin_of_organization: Admin of organization
-      member_of_organization: Member of organization
-      update_role: Update role
-      delete_member: Delete member
-      confirmation: "Are you sure you want to remove %{user_email} from your organization?"
     password_reset:
       password_reset: Password Reset
       weve_sent_an_email: We've sent an email to the address you have on file with us.
