@@ -32,7 +32,7 @@ class OrganizedMailer < ActionMailer::Base
     @membership = membership
     @organization = @membership.organization
     @sender = @membership.sender
-    @vars = { email: @membership.invitee_email }
+    @vars = { email: @membership.invited_email }
     @new_user = User.fuzzy_email_find(@vars[:email]).present?
     mail(reply_to: reply_to, to: @vars[:email], subject: default_i18n_subject(default_subject_vars))
   end

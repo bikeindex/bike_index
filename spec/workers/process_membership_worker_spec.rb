@@ -7,9 +7,11 @@ RSpec.describe ProcessMembershipWorker, type: :job do
         it "does not create ambassador_task_assignments" do
           membership = FactoryBot.create(:membership_claimed)
           FactoryBot.create(:ambassador_task)
+          ActionMailer::Base.deliveries = []
           expect do
             described_class.new.perform(membership.id)
           end.to_not change(AmbassadorTaskAssignment, :count)
+          expect(ActionMailer::Base.deliveries.empty?).to be_truthy
         end
       end
 
@@ -40,7 +42,13 @@ RSpec.describe ProcessMembershipWorker, type: :job do
     context "no user no email" do
       let(:membership) { FactoryBot.create(:membership) }
       it "sends the email" do
-
+        expect(membership.claimed?).to be_falsey
+        expect(membership.email_invitation_sent_at).to be_blank
+        ActionMailer::Base.deliveries = []
+        described_class.new.perform(membership.id)
+        membership.reload
+        expect(membership.email_invitation_sent_at).to be_present
+        expect(ActionMailer::Base.deliveries.empty?).to be_falsey
       end
     end
   end

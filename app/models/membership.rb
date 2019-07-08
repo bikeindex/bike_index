@@ -20,20 +20,16 @@ class Membership < ActiveRecord::Base
     MEMBERSHIP_TYPES
   end
 
+  def send_invitation_email?; email_invitation_sent_at.blank? end
+
+  def admin?; role == "admin" end
+
+  def claimed?; claimed_at.present? end
+
+  def ambassador?; organization.ambassador? end
+
   def invited_display_name
     invited_email
-  end
-
-  def send_invitation_email?
-    email_invitation_sent_at.present?
-  end
-
-  def admin?
-    role == "admin"
-  end
-
-  def ambassador?
-    organization.ambassador?
   end
 
   def enqueue_processing_worker
