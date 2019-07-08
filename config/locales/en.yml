@@ -689,3 +689,114 @@ en:
       password: password
       keep_me_logged_in: Keep me logged in
       forgot_your_password: Forgot your password?
+  users:
+    edit_password:
+      reset_password: Reset password
+      for_password_update: For password update
+      new_password: New Password
+      new_password_confirmation: New Password confirmation
+    edit_root:
+      personal_information_for_user: "Personal Information for %{user_name}"
+      any_use_of_your_personal_information_html: Any use of your personal information is governed by the terms of our %{privacy_policy}. We do not sell, trade, or rent your personal information to third parties.
+      receive_the_bike_index_newsletter: Receive the Bike Index newsletter
+      give_us_permission_html: Give us permission to contact you if we believe your bike has been stolen, <em>even if it isn't marked stolen -</em> <strong>%{why_you_should_link}</strong>
+      address: Address
+      choose_country: Choose country
+      city: City
+      state: State
+      zipcode: ZIP code
+      choose_language: Choose language
+      preferred_language: Preferred language
+      have_multiple_emails: Have multiple emails? Consolidate them into one account here
+      primary_email: Primary email
+      notifications_email: This is the email we send notifications to
+      confirmed_emails: Confirmed emails
+      make_primary_email: Make primary email
+      unconfirmed_emails: Unconfirmed emails
+      resend_confirmation: Resend confirmation
+      remove_email: Remove email
+      additional_email: Additional email
+      add_additional_email: Add additional email
+    edit_sharing:
+      sharing_and_personal_page_settings: Sharing and Personal page settings
+      show_twitter: Show Twitter
+      no_twitter: No Twitter
+      twitter_handle: Twitter handle
+      show_personal_site: Show Personal Site
+      show_personal_website: Show personal website
+      no_personal_site: No personal site
+      personal_site_url: Personal Site URL
+      examplecom: example.com
+      additional_link: Additional Link
+      example_url: http://example.com
+      title_for_link: Title for link
+      my_awesome_link: My awesome link
+      your_username_is_the_url_for_your_sharing: Your username is the URL for your sharing page and the bike embed form. Update it if you care about those things.
+      the_bike_index_can_create_a_page: The Bike Index can create a page listing all your bikes that includes all the information you want to share. It's your personal page.
+      preview_page: preview page
+      create_public_page: Create public page
+      create_page: Create page
+      no_please_dont_create_me_a_page: "No, please don't create me a page"
+      profile_avatar: Profile avatar
+      choose_file: Choose file...
+      page_title: Page title
+      this_users_bikes: This user's bikes
+      page_text: Page text
+    accept_terms:
+      i_agree_to_tos_html: "I agree to Bike Index's <strong>Terms of Service</strong>."
+      submit: Submit
+    accept_vendor_terms:
+      i_agree_to_tos_html: "I agree to Bike Index's <strong>Terms of Service for Organizations</strong>."
+      submit: Submit
+    confirm_error_404:
+      woops: Woops
+      we_couldnt_find_a_user_with_that_id: We couldn't find a user with that ID. Something strange is going on.
+    confirm_error_bad_token:
+      woops: Woops
+      could_not_find_matching_ticket: That ticket doesn't match anything in our records. Sorry.
+    edit:
+      you_are_editing: You are editing
+      save_changes: Save changes
+    globalid:
+      sign_in_with_globalid: Sign in with GlobaliD
+    new:
+      get_on_bike_index: Get on Bike Index
+      sign_up_using_facebook: Sign up using Facebook
+      sign_up_using_strava: Sign up using Strava
+      or: Or
+      sign_up: Sign up
+      already_have_a_bike_index_account: already have a Bike Index account?
+      already_have_an_account: already have an account?
+      log_in: log in
+      bikehub_terms_url: https://basic.bikehub.com/terms.html
+      terms_and_conditions: terms and conditions
+      agree_bikeindex_bikehub_toc_html: "I agree to BikeHub's %{bikehub_toc_link} and Bike Index's %{bikeindex_toc_link}."
+      agree_bikeindex_toc_html: "I agree to Bike Index's %{bikeindex_toc_link}."
+      get_bike_indexs_newsletter: "Get Bike Index's Newsletter"
+      forgot_your_password: Forgot your password?
+    password_reset:
+      password_reset: Password Reset
+      weve_sent_an_email: We've sent an email to the address you have on file with us.
+      follow_the_link_back: Follow the link back to the site to reset your password!
+    please_confirm_email:
+      thanks_for_signing_up_for_bike_index: Thanks for signing up for Bike Index!
+      please_verify_your_email: Please verify your email
+      we_sent_an_email: We sent an email with a confirmation link in it. Follow the link in the email to finish signing up!
+      we_sent_an_email_to_user_email_html: 'We sent an email to <strong class="stolen-color">%{user_email}</strong> with a confirmation link in it. Follow the link in the email to finish signing up!'
+    request_password_reset:
+      reset_your_password: Reset your Password
+      your_email_address: your email address
+      enter_the_email_address: Enter the email address you used to sign up. We'll send you an email with a link to reset your password.
+    show:
+      this_users_bikes: This user's bikes
+      bikes: Bikes
+      recovered: Recovered
+      stolen: Stolen!
+      this_user_has_no_bikes_yet: This user has no bikes yet!
+    update_password:
+      choose_a_new_password: Choose a new password!
+      and_try_not_to_forget_it: and try not to forget it...
+      update_your_password: Update your password
+      password: Password
+      password_confirmation: Password confirmation
+      update_password: Update password

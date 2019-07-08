@@ -11,8 +11,6 @@
       .control-group
         = f.label :vendor_terms_of_service, class: "center-accept-terms-text" do
           = f.check_box :vendor_terms_of_service
-          I agree to Bike Index
-          %strong
-            Terms of Service for Organizations.
+          = t(".i_agree_to_tos_html")
     .agree-action
-      = f.submit "Submit", class: "btn btn-primary btn-lg center-accept-terms-button"
+      = f.submit t(".submit"), class: "btn btn-primary btn-lg center-accept-terms-button"
