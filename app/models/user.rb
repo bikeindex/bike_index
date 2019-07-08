@@ -213,12 +213,12 @@ class User < ActiveRecord::Base
 
   def member_of?(organization)
     return false unless organization.present?
-    Membership.where(user_id: id, organization_id: organization.id).present? || superuser?
+    Membership.claimed.where(user_id: id, organization_id: organization.id).present? || superuser?
   end
 
   def admin_of?(organization)
     return false unless organization.present?
-    Membership.where(user_id: id, organization_id: organization.id, role: "admin").present? || superuser?
+    Membership.claimed.where(user_id: id, organization_id: organization.id, role: "admin").present? || superuser?
   end
 
   def has_membership?

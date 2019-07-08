@@ -19,6 +19,8 @@ class Membership < ActiveRecord::Base
     MEMBERSHIP_TYPES
   end
 
+  def invited_display_name; user.present? ? user.display_name : invited_email end
+
   def send_invitation_email?; email_invitation_sent_at.blank? && invited_email.present? end
 
   def admin?; role == "admin" end
@@ -27,8 +29,18 @@ class Membership < ActiveRecord::Base
 
   def ambassador?; organization.ambassador? end
 
-  def invited_display_name
-    invited_email
+  # TODO: remove after removing organization_invitations
+  def calculated_org_invite
+    return nil unless user_id.present?
+    OrganizationInvitation.where(organization_id: organization_id, invitee_id: user_id).first
+  end
+
+  def calculated_org_invite_email
+    calculated_org_invite&.invitee_email || user&.email
+  end
+
+  def calculated_org_invite_sender_id
+    calculated_org_invite&.inviter_id
   end
 
   def enqueue_processing_worker

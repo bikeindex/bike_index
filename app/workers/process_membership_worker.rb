@@ -12,7 +12,7 @@ class ProcessMembershipWorker
     end
     # Bust cache keys on user and organization
     membership.user&.update_attributes(updated_at: Time.current)
-    membership.organization&.update_attributes(updated_at: Time.current)
+    membership.organization.update_attributes(updated_at: Time.current) if membership.organization.present?
 
     assign_all_ambassador_tasks_to(membership)
   end

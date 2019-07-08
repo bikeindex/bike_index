@@ -1544,7 +1544,6 @@ CREATE TABLE public.organizations (
     website character varying(255),
     short_name character varying(255),
     show_on_map boolean,
-    sent_invitation_count integer DEFAULT 0,
     deleted_at timestamp without time zone,
     is_suspended boolean DEFAULT false NOT NULL,
     auto_user_id integer,

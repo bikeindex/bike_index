@@ -106,9 +106,11 @@ class Organization < ActiveRecord::Base
     kinds.reject { |kind| kind == "ambassador" }
   end
 
-  def to_param
-    slug
-  end
+  def to_param; slug end
+
+  def sent_invitation_count; memberships.count end
+
+  def remaining_invitation_count; available_invitation_count - sent_invitation_count end
 
   def ascend_imports?; ascend_name.present? end
 

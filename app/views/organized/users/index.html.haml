@@ -2,56 +2,58 @@
   %h1
     Manage Users
   %p
-    You have added
+    You have invited:
     %strong
-      #{ pluralize(current_organization.users.count, 'user') }
+      = number_with_delimiter(current_organization.sent_invitation_count)
+      = "user".pluralize(current_organization.sent_invitation_count)
   %p
-    And can add
+    You can add
     %strong
-      #{current_organization.available_invitation_count} more.
-    = link_to 'Invite another user', new_organization_user_path(organization_id: current_organization.to_param)
+      = number_with_delimiter current_organization.remaining_invitation_count
+      more
+    - if current_organization.remaining_invitation_count > 0
+      = link_to "Invite another user", new_organization_user_path(organization_id: current_organization.to_param)
   %p
     - if current_organization.auto_user.present?
       Emails are currently sent from <em>#{current_organization.auto_user.email}</em>. #{ link_to 'Update email', organization_manage_index_path(organization_id: current_organization.to_param) }
 
+.paginate-container
+  = paginate @memberships
+
 .organized-table
-  %table.table.table-striped.table-bordered
+  %table.table.table-striped.table-bordered.table-sm
     %thead
       %th
-        Name
+        = sortable "created_at"
       %th
-        Email
+        = sortable "invited_email", "To"
       %th
-        Date added
-      %th.hidden-md-down
-        Total indexed
+        = sortable "claimed_at"
+      %th
+        = sortable "role", "Admin?"
+      %th
+        %small
+          = sortable "sender_id"
     %tbody
       - @memberships.each do |membership|
         %tr
           %td
-            = link_to membership.user.name, edit_organization_user_path(membership.id, organization_id: current_organization.to_param)
-          %td
-            = membership.user.email
-          %td
             %span.convertTime
               = l membership.created_at, format: :convert_time
-            %small.convertTimezone
-          %td.hidden-md-down
-            = membership.user.creation_states.where(organization_id: current_organization.id).count
-      - @organization_invitations.each do |organization_invitation|
-        %tr
+            %small.less-strong
+              = membership.id
           %td
-            = link_to organization_invitation.invitee_name, edit_organization_user_path(organization_invitation.id, is_invitation: true, organization_id: current_organization.to_param)
-          %td
-            = organization_invitation.invitee_email
-          %td
-            %strong
-              Has not signed up
-            %br
-            %small
-              invited
-              %span.convertTime
-                = l organization_invitation.created_at, format: :convert_time
-              %small.convertTimezone
+            = membership.invited_display_name
+            %small.less-strong.d-none.d-lg-inline-block
+              = membership.invited_email
 
           %td
+            - if membership.claimed_at.present?
+              %span.convertTime
+                = l membership.created_at, format: :convert_time
+          %td
+            = "&#x2713;".html_safe if membership.admin?
+          %td
+            - if membership.sender.present?
+              %small
+                = membership.sender.display_name

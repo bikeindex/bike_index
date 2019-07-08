@@ -1,30 +1,22 @@
 module Organized
   class UsersController < Organized::AdminController
-    before_filter :find_invitation_or_membership, only: [:edit, :update, :destroy]
+    include SortableTable
+    before_filter :find_membership, only: [:edit, :update, :destroy]
     before_filter :reject_self_updates, only: [:update, :destroy]
 
     def index
-      @organization_invitations = current_organization.organization_invitations.unclaimed
-      @memberships = current_organization.memberships.order("created_at desc")
+      page = params[:page] || 1
+      per_page = params[:per_page] || 25
+      @memberships = matching_memberships.reorder("memberships.#{sort_column} #{sort_direction}")
+                                         .page(page).per(per_page)
     end
 
     def edit
-      if @is_invitation
-        @organization_invitation = current_organization.organization_invitations.unclaimed.find(params[:id])
-      else
-        @membership = current_organization.memberships.find(params[:id])
-      end
-      @name = @organization_invitation && @organization_invitation.invitee_name || @membership && @membership.user.name
     end
 
     def update
-      if @is_invitation
-        @organization_invitation.update_attributes(update_organization_invitation_params)
-        flash[:success] = "Updated invitation for #{@organization_invitation.invitee_email}"
-      else
-        @membership.update_attributes(update_membership_params)
-        flash[:success] = "Updated membership for #{@membership.user.email}"
-      end
+      @membership.update_attributes(permitted_update_params)
+      flash[:success] = "Updated membership for #{@membership.user.email}"
       redirect_to current_index_path
     end
 
@@ -46,13 +38,13 @@ module Organized
     end
 
     def create
-      unless current_organization.available_invitation_count > 0
+      unless current_organization.remaining_invitation_count > 0
         flash[:error] = "#{current_organization.name} is out of user invitations. Contact support@bikeindex.org"
         redirect_to current_index_path and return
       end
-      @organization_invitation = OrganizationInvitation.new(create_organization_invitation_params)
-      if @organization_invitation.save
-        flash[:success] = "#{@organization_invitation.invitee_email} was invited to #{current_organization.name}!"
+      @membership = Membership.new(permitted_create_params)
+      if @membership.save
+        flash[:success] = "#{@membership.invited_email} was invited to #{current_organization.name}!"
         redirect_to current_index_path
       else
         flash[:error] = "Whoops! Looks like we're missing some information"
@@ -62,17 +54,20 @@ module Organized
 
     private
 
+    def sortable_columns
+      %w[created_at invited_email sender_id claimed_at]
+    end
+
+    def matching_memberships
+      memberships = current_organization.memberships
+    end
+
     def current_index_path
       organization_users_path(organization_id: current_organization.to_param)
     end
 
-    def find_invitation_or_membership
-      @is_invitation = params[:is_invitation]
-      if @is_invitation
-        @organization_invitation = current_organization.organization_invitations.unclaimed.find(params[:id])
-      else
-        @membership = current_organization.memberships.find(params[:id])
-      end
+    def find_membership
+      @membership = current_organization.memberships.find(params[:id])
     end
 
     def reject_self_updates
@@ -82,21 +77,13 @@ module Organized
       end
     end
 
-    def create_organization_invitation_params
-      {
-        invitee_email: params.dig(:organization_invitation, :invitee_email),
-        invitee_name: params.dig(:organization_invitation, :invitee_name),
-        organization: current_organization,
-        inviter: current_user,
-        membership_role: params.dig(:organization_invitation, :membership_role),
-      }
+    def permitted_update_params
+      params.require(:membership).permit(:role).merge(organization_id: current_organization.id)
     end
 
-    def update_organization_invitation_params
-      {
-        invitee_name: params.dig(:organization_invitation, :name),
-        membership_role: params.dig(:organization_invitation, :membership_role),
-      }
+    def permitted_create_params
+      params.require(:membership).permit(:role, :invited_email)
+            .merge(organization: current_organization, sender: current_user)
     end
 
     def update_membership_params

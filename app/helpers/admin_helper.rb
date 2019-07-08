@@ -19,8 +19,6 @@ module AdminHelper
       { title: "Stolen Twitterbot", path: ENV["STOLEN_TWITTERBOT_URL"].gsub(/bikes\z/, ""), match_controller: false },
       { title: "Memberships", path: admin_memberships_path, match_controller: true },
       { title: "Manufacturers", path: admin_manufacturers_path, match_controller: true },
-      { title: "Organization Invitations", path: admin_organization_invitations_path, match_controller: false },
-      { title: "New Organization Invitation", path: new_admin_organization_invitation_path, match_controller: false },
       { title: "TSV Exports", path: admin_tsvs_path, match_controller: false },
       { title: "Maintenance", path: admin_maintenance_path, match_controller: false },
       { title: "Failed Bikes", path: admin_failed_bikes_path, match_controller: true },
