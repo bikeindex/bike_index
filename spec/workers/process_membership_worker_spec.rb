@@ -8,7 +8,6 @@ RSpec.describe ProcessMembershipWorker, type: :job do
         it "does not create ambassador_task_assignments" do
           membership = FactoryBot.create(:membership_claimed)
           FactoryBot.create(:ambassador_task)
-          # ActionMailer::Base.deliveries = []
           expect do
             described_class.new.perform(membership.id)
           end.to_not change(AmbassadorTaskAssignment, :count)

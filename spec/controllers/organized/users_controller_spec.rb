@@ -160,20 +160,24 @@ RSpec.describe Organized::UsersController, type: :controller do
       end
       context "available invitations" do
         it "creates membership, reduces invitation tokens by 1" do
-          expect(organization.remaining_invitation_count).to eq 4
-          expect do
-            put :create, organization_id: organization.to_param,
-                         membership: membership_params
-          end.to change(Membership, :count).by(1)
-          expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
-          expect(flash[:success]).to be_present
-          organization.reload
-          expect(organization.remaining_invitation_count).to eq 3
-          membership = Membership.last
-          expect(membership.role).to eq "member"
-          expect(membership.sender).to eq user
-          expect(membership.invited_email).to eq "bike_email@bike_shop.com"
-          expect(organization.sent_invitation_count).to eq 2
+          Sidekiq::Testing.inline! do
+            ActionMailer::Base.deliveries = []
+            expect(organization.remaining_invitation_count).to eq 4
+            expect do
+              put :create, organization_id: organization.to_param,
+                           membership: membership_params
+            end.to change(Membership, :count).by(1)
+            expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
+            expect(flash[:success]).to be_present
+            organization.reload
+            expect(organization.remaining_invitation_count).to eq 3
+            membership = Membership.last
+            expect(membership.role).to eq "member"
+            expect(membership.sender).to eq user
+            expect(membership.invited_email).to eq "bike_email@bike_shop.com"
+            expect(organization.sent_invitation_count).to eq 2
+            expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+          end
         end
       end
       context "no available invitations" do
