@@ -2,10 +2,11 @@ class ProcessMembershipWorker
   include Sidekiq::Worker
   sidekiq_options queue: "high_priority", backtrace: true
 
-  def perform(membership_id)
+  def perform(membership_id, user_id = nil)
+    pp "m: #{membership_id}, user: #{user_id}"
     membership = Membership.find(membership_id)
 
-    assign_membership_user(membership) if membership.user.blank?
+    assign_membership_user(membership, user_id) if membership.user.blank?
     if membership.send_invitation_email?
       OrganizedMailer.organization_invitation(membership).deliver_now
       membership.update_attribute :email_invitation_sent_at, Time.current
@@ -17,10 +18,10 @@ class ProcessMembershipWorker
     assign_all_ambassador_tasks_to(membership)
   end
 
-  def assign_membership_user(membership)
-    user = User.fuzzy_email_find(membership.invited_email)
-    return false unless user.present?
-    membership.update_attributes(user: user)
+  def assign_membership_user(membership, user_id)
+    user_id ||= User.fuzzy_email_find(membership.invited_email)&.id
+    return false unless user_id.present?
+    membership.update_attributes(user_id: user_id)
     membership.reload
   end
 

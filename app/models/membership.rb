@@ -12,6 +12,7 @@ class Membership < ActiveRecord::Base
   before_validation :set_calculated_attributes
   after_commit :enqueue_processing_worker
 
+  scope :unclaimed, -> { where(claimed_at: nil) }
   scope :claimed, -> { where.not(claimed_at: nil) }
   scope :ambassador_organizations, -> { where(organization: Organization.ambassador) }
 

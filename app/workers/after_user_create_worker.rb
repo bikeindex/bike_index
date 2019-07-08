@@ -50,9 +50,9 @@ class AfterUserCreateWorker
   end
 
   def associate_membership_invites(user, email, without_confirm: false)
-    organization_invitations = OrganizationInvitation.where(invitee_email: email)
-    return false unless organization_invitations.any?
-    organization_invitations.each { |i| i.assign_to(user) }
+    memberships = Membership.unclaimed.where(invited_email: email)
+    return false unless memberships.any?
+    memberships.pluck(:id).each { |m_id| ProcessMembershipWorker.perform_async(m_id, user.id) }
     user.confirm(user.confirmation_token) unless without_confirm
   end
 

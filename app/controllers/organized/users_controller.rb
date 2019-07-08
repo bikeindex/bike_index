@@ -21,14 +21,8 @@ module Organized
     end
 
     def destroy
-      if @is_invitation
-        @organization_invitation.destroy
-      else
-        @membership.destroy
-      end
+      @membership.destroy
       flash[:success] = "Deleted user from your organization"
-      new_invites_count = current_organization.available_invitation_count + 1
-      current_organization.update_attribute :available_invitation_count, new_invites_count
       redirect_to current_index_path
     end
 
