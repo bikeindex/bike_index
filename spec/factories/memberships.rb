@@ -7,15 +7,10 @@ FactoryBot.define do
 
     factory :membership_claimed do
       user { FactoryBot.create(:user_confirmed) }
-      claimed_at { Time.now }
+      email_invitation_sent_at { Time.current }
+      claimed_at { Time.current }
 
       factory :membership_ambassador do
-        # before(:create) do
-        #   Membership.skip_callback(:create, :after, :ensure_ambassador_tasks_assigned!)
-        # end
-        # after(:create) do
-        #   Membership.set_callback(:create, :after, :ensure_ambassador_tasks_assigned!)
-        # end
         organization { FactoryBot.create(:organization_ambassador) }
       end
     end

@@ -4,12 +4,16 @@ RSpec.describe Membership, type: :model do
   describe "#ensure_ambassador_tasks_assigned!" do
     context "given an ambassador organization" do
       it "enqueues a job to assign ambassador tasks to the given user" do
+        Sidekiq::Worker.clear_all
         user = FactoryBot.create(:user_confirmed)
         org = FactoryBot.create(:organization_ambassador)
         tasks = FactoryBot.create_list(:ambassador_task, 2)
         expect(AmbassadorTaskAssignment.count).to eq(0)
 
-        Membership.create(organization: org, user: user)
+        Sidekiq::Worker.clear_all
+        expect do
+          membership = FactoryBot.create(:membership_claimed, organization: org, user: user)
+        end.to change(ProcessMembershipWorker.jobs, :count).by 1
         Sidekiq::Worker.drain_all
 
         expect(AmbassadorTaskAssignment.count).to eq(2)

@@ -157,8 +157,8 @@ RSpec.describe OrganizedMailer, type: :mailer do
   end
 
   describe "organization_invitation" do
-    let(:organization_invitation) { FactoryBot.create(:organization_invitation, organization: organization) }
-    let(:mail) { OrganizedMailer.organization_invitation(organization_invitation) }
+    let(:membership) { FactoryBot.create(:membership, organization: organization) }
+    let(:mail) { OrganizedMailer.organization_invitation(membership) }
     before do
       expect(header_mail_snippet).to be_present
     end

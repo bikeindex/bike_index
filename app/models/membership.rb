@@ -5,11 +5,12 @@ class Membership < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :organization
+  belongs_to :sender, class_name: "User"
 
-  validates_presence_of :role, :organization, :sender_id
+  validates_presence_of :role, :organization_id
 
   before_validation :set_calculated_attributes
-  after_create :enqueue_processing_worker
+  after_save :enqueue_processing_worker
   after_commit :update_relationships
 
   scope :claimed, -> { where.not(claimed_at: nil) }
@@ -17,6 +18,14 @@ class Membership < ActiveRecord::Base
 
   def self.membership_types
     MEMBERSHIP_TYPES
+  end
+
+  def invited_display_name
+    invited_email
+  end
+
+  def send_invitation_email?
+    email_invitation_sent_at.present?
   end
 
   def admin?
@@ -27,17 +36,12 @@ class Membership < ActiveRecord::Base
     organization.ambassador?
   end
 
-  def update_relationships
-    user&.update_attributes(updated_at: Time.current)
-    organization&.update_attributes(updated_at: Time.current)
-  end
-
   def enqueue_processing_worker
     ProcessMembershipWorker.perform_async(id)
   end
 
   def set_calculated_attributes
     self.invited_email = EmailNormalizer.normalize(invited_email)
-    self.claimed_at ||= Time.now if user_id.present?
+    self.claimed_at ||= Time.current if user_id.present?
   end
 end

@@ -1281,10 +1281,7 @@ CREATE TABLE public.memberships (
     invited_email character varying(255),
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    deleted_at timestamp without time zone,
-    sender_id integer,
-    claimed_at timestamp without time zone,
-    email_invitation_sent_at timestamp without time zone
+    deleted_at timestamp without time zone
 );
 
 
@@ -3406,13 +3403,6 @@ CREATE INDEX index_memberships_on_organization_id ON public.memberships USING bt
 
 
 --
--- Name: index_memberships_on_sender_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_memberships_on_sender_id ON public.memberships USING btree (sender_id);
-
-
---
 -- Name: index_memberships_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4437,6 +4427,4 @@ INSERT INTO schema_migrations (version) VALUES ('20190625151428');
 INSERT INTO schema_migrations (version) VALUES ('20190703194554');
 
 INSERT INTO schema_migrations (version) VALUES ('20190705230020');
-
-INSERT INTO schema_migrations (version) VALUES ('20190708181605');
 
