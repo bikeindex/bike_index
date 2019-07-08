@@ -10,8 +10,7 @@ class Membership < ActiveRecord::Base
   validates_presence_of :role, :organization_id
 
   before_validation :set_calculated_attributes
-  after_save :enqueue_processing_worker
-  after_commit :update_relationships
+  after_commit :enqueue_processing_worker
 
   scope :claimed, -> { where.not(claimed_at: nil) }
   scope :ambassador_organizations, -> { where(organization: Organization.ambassador) }
@@ -20,7 +19,7 @@ class Membership < ActiveRecord::Base
     MEMBERSHIP_TYPES
   end
 
-  def send_invitation_email?; email_invitation_sent_at.blank? end
+  def send_invitation_email?; email_invitation_sent_at.blank? && invited_email.present? end
 
   def admin?; role == "admin" end
 

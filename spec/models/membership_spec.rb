@@ -13,6 +13,7 @@ RSpec.describe Membership, type: :model do
         Sidekiq::Worker.clear_all
         expect do
           membership = FactoryBot.create(:membership_claimed, organization: org, user: user)
+          membership.enqueue_processing_worker # TODO: Rails 5 update
         end.to change(ProcessMembershipWorker.jobs, :count).by 1
         Sidekiq::Worker.drain_all
 
@@ -27,7 +28,8 @@ RSpec.describe Membership, type: :model do
         org = FactoryBot.create(:organization)
         expect(AmbassadorTaskAssignment.count).to eq(0)
 
-        Membership.create(organization: org, user: user)
+        membership = FactoryBot.create(:membership_claimed, organization: org, user: user)
+        membership.enqueue_processing_worker # TODO: Rails 5 update
         Sidekiq::Worker.drain_all
 
         expect(AmbassadorTaskAssignment.count).to eq(0)

@@ -4,6 +4,8 @@ class ProcessMembershipWorker
 
   def perform(membership_id)
     membership = Membership.find(membership_id)
+
+    assign_membership_user(membership) if membership.user.blank?
     if membership.send_invitation_email?
       OrganizedMailer.organization_invitation(membership).deliver_now
       membership.update_attribute :email_invitation_sent_at, Time.current
@@ -13,6 +15,13 @@ class ProcessMembershipWorker
     membership.organization&.update_attributes(updated_at: Time.current)
 
     assign_all_ambassador_tasks_to(membership)
+  end
+
+  def assign_membership_user(membership)
+    user = User.fuzzy_email_find(membership.invited_email)
+    return false unless user.present?
+    membership.update_attributes(user: user)
+    membership.reload
   end
 
   def assign_all_ambassador_tasks_to(membership)

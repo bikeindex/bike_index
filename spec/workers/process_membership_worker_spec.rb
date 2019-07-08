@@ -1,13 +1,14 @@
 require "rails_helper"
 
 RSpec.describe ProcessMembershipWorker, type: :job do
+  before { ActionMailer::Base.deliveries = [] }
   describe "#perform" do
     context "ambassador" do
       context "given a non-ambassador" do
         it "does not create ambassador_task_assignments" do
           membership = FactoryBot.create(:membership_claimed)
           FactoryBot.create(:ambassador_task)
-          ActionMailer::Base.deliveries = []
+          # ActionMailer::Base.deliveries = []
           expect do
             described_class.new.perform(membership.id)
           end.to_not change(AmbassadorTaskAssignment, :count)
@@ -39,16 +40,33 @@ RSpec.describe ProcessMembershipWorker, type: :job do
     end
 
 
-    context "no user no email" do
+    context "email not sent" do
       let(:membership) { FactoryBot.create(:membership) }
       it "sends the email" do
         expect(membership.claimed?).to be_falsey
         expect(membership.email_invitation_sent_at).to be_blank
-        ActionMailer::Base.deliveries = []
         described_class.new.perform(membership.id)
         membership.reload
+        expect(membership.claimed?).to be_falsey
         expect(membership.email_invitation_sent_at).to be_present
         expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+      end
+      context "user with email exists" do
+        let!(:user) { FactoryBot.create(:user_confirmed, email: membership.invited_email) }
+        it "sends the email, claims, etc" do
+          user.reload
+          expect(user.memberships.count).to eq 0
+          expect(membership.claimed?).to be_falsey
+          expect(membership.email_invitation_sent_at).to be_blank
+          described_class.new.perform(membership.id)
+          membership.reload
+          expect(membership.send_invitation_email?).to be_falsey
+          expect(membership.user).to eq user
+          expect(membership.claimed?).to be_truthy
+          expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+          user.reload
+          expect(user.memberships.count).to eq 1
+        end
       end
     end
   end
