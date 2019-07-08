@@ -109,7 +109,7 @@ RSpec.describe Organized::UsersController, type: :controller do
         let(:membership) { FactoryBot.create(:membership, organization: organization, sender: user) }
         it "destroys" do
           expect(membership.claimed?).to be_falsey
-          count = organization.available_invitation_count
+          count = organization.remaining_invitation_count
           expect do
             delete :destroy, organization_id: organization.to_param,
                              id: membership.id
@@ -117,7 +117,7 @@ RSpec.describe Organized::UsersController, type: :controller do
           expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
           expect(flash[:success]).to be_present
           organization.reload
-          expect(organization.available_invitation_count).to eq(count + 1)
+          expect(organization.remaining_invitation_count).to eq(count + 1)
         end
       end
       context "membership" do
@@ -125,27 +125,27 @@ RSpec.describe Organized::UsersController, type: :controller do
           let(:membership) { FactoryBot.create(:membership_claimed, organization: organization, role: "member") }
           it "destroys the membership" do
             expect(membership.claimed?).to be_truthy
-            count = organization.available_invitation_count
+            count = organization.remaining_invitation_count
             expect do
               delete :destroy, organization_id: organization.to_param, id: membership.id
             end.to change(Membership, :count).by(-1)
             expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
             expect(flash[:success]).to be_present
             organization.reload
-            expect(organization.available_invitation_count).to eq(count + 1)
+            expect(organization.remaining_invitation_count).to eq(count + 1)
           end
         end
         context "marking self member" do
           let(:membership) { user.memberships.first }
           it "does not destroy" do
-            count = organization.available_invitation_count
+            count = organization.remaining_invitation_count
             expect do
               delete :destroy, organization_id: organization.to_param, id: membership.id
             end.to change(Membership, :count).by(0)
             expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
             expect(flash[:error]).to be_present
             organization.reload
-            expect(organization.available_invitation_count).to eq count
+            expect(organization.remaining_invitation_count).to eq count
           end
         end
       end
@@ -172,9 +172,13 @@ RSpec.describe Organized::UsersController, type: :controller do
             organization.reload
             expect(organization.remaining_invitation_count).to eq 3
             membership = Membership.last
+            membership.enqueue_processing_worker # TODO: Rails 5 update - this is an after_commit issue
+            membership.reload
             expect(membership.role).to eq "member"
             expect(membership.sender).to eq user
             expect(membership.invited_email).to eq "bike_email@bike_shop.com"
+            expect(membership.claimed?).to be_falsey
+            expect(membership.email_invitation_sent_at).to be_present
             expect(organization.sent_invitation_count).to eq 2
             expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           end
