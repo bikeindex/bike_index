@@ -12,7 +12,7 @@
 
         .form-well-edit-page-select
           %span.menu-select-overlay
-            You are editing
+            = t(".you_are_editing")
           // ignore this select in dirty forms
           %select.dirtyignore
             - @edit_templates.each do |template, description|
@@ -20,7 +20,7 @@
                 = description
         .edit-form-well-submit-wrapper
           = hidden_field_tag :page, @edit_template
-          = submit_tag 'Save changes', class: 'btn btn-lg btn-primary'
+          = submit_tag t(".save_changes"), class: 'btn btn-lg btn-primary'
 
       .col-md-8.form-well
         = render partial: "edit_#{@edit_template}", locals: { f: f }

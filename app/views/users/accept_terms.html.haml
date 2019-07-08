@@ -3,7 +3,7 @@
     .receptacle
       .inner-recep.legal-content
         :markdown
-          #{render partial: '/info/terms_text'}
+          #{render partial: "info/terms_text"}
 
   .accept-vendor-terms
 
@@ -12,8 +12,7 @@
       .form-group
         = f.label :terms_of_service, class: "center-accept-terms-text" do
           = f.check_box :terms_of_service
-          I agree to Bike Index
+          = t(".i_agree_to_tos_html")
           %strong
-            Terms of Service
       .agree-action
-        = f.submit "Submit", class: 'btn btn-primary btn-lg center-accept-terms-button'
+        = f.submit t(".submit"), class: 'btn btn-primary btn-lg center-accept-terms-button'

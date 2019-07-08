@@ -1,18 +1,16 @@
 .container
   %h1
-    Thanks for signing up for Bike Index!
+    = t(".thanks_for_signing_up_for_bike_index")
   %h3
-    Please verify your email
-  %p
-    We sent an email
-    - if @user.present?
-      to 
-      %strong.stolen-color
-        = @user.email
-    with a confirmation link in it. Follow the link in the email to finish signing up!
+    = t(".please_verify_your_email")
+
+  - if @user.present?
+    %p= t(".we_sent_an_email_to_user_email_html", user_email: @user.email)
+  - else
+    %p= t(".we_sent_an_email")
 
 :plain
-  
+
   <!-- Google Code for Bike Index (Sign Up) Conversion Page -->
   <script type="text/javascript">
   /* <![CDATA[ */
