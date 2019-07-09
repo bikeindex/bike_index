@@ -29,7 +29,8 @@
             .form-group.col-xs-6.col-md-4
               %label.checkbox
                 = f.check_box :headers, { multiple: true, checked: Export.default_headers.include?(header) }, header, 1
-                = header.titleize # This will break when a new reg field is added - which is a plus
+                -# This will break when a new reg field is added - which is a plus ☺️
+                = header.titleize
     .form-group.row.mt-4
       = f.label :custom_bike_ids, "Specific bikes list", class: "org-form-label"
       .col-sm-8
