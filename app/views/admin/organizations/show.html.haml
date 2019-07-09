@@ -102,8 +102,6 @@
           Remaining invites
         %td
           = link_to @organization.available_invitation_count, admin_invitations_url(organization_id: @organization.to_param)
-          ,
-          = link_to "Remaining invites", admin_organization_invitation_url(organization_id: @organization.to_param)
       %tr
         %td
           Website
