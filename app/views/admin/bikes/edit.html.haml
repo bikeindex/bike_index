@@ -189,11 +189,12 @@
               = s.text_field :police_report_number, class: "form-control"
           .row
             .col-6.form-group
-              = f.label :estimated_value, "Estimated value"
+              = s.label :estimated_value, "Estimated value"
               = s.number_field :estimated_value, class: "form-control"
-            .col-6.form-group#stolen-check-box
-              = f.label :stolen, "Bike is stolen"
-              = f.check_box :stolen
+            .col-6.form-group#stolenCheckBox
+              = f.label :stolen do
+                = f.check_box :stolen
+                Bike is stolen
       #adminRecoveryFields.collapse
         %hr
         .row
@@ -203,8 +204,10 @@
               = text_area_tag :mark_recovered_reason, nil, rows: 3, class: "form-control"
           .col-md-6
             .form-group
-              = label :mark_recovered_we_helped, "Did Bike Index help?"
-              = check_box_tag :mark_recovered_we_helped, true
+              = label_tag :mark_recovered_we_helped do
+                = check_box_tag :mark_recovered_we_helped, true
+                Did Bike Index help?
             .form-group
-              = label :can_share_recovery, "Can Share"
-              = check_box_tag :can_share_recovery, true
+              = label_tag :can_share_recovery do
+                = check_box_tag :can_share_recovery, true
+                Can Share

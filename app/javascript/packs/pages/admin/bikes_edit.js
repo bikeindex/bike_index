@@ -28,7 +28,7 @@ function BinxAdminBikesEdit() {
     },
 
     bikesEditRecoverySlide() {
-      const $this = $("#bike_stolen");
+      const $this = $("#stolenCheckBox input");
       $this.on("change", e => {
         e.preventDefault();
         if ($this.prop("checked")) {
