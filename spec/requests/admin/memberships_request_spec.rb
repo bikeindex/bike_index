@@ -8,7 +8,7 @@ RSpec.describe Admin::MembershipsController, type: :request do
 
   describe "index" do
     it "renders" do
-      expect(organization_invitation).to be_present
+      expect(membership).to be_present
       get base_url
       expect(response).to render_template :index
     end
