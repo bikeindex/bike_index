@@ -30,20 +30,6 @@ class Membership < ActiveRecord::Base
 
   def ambassador?; organization.ambassador? end
 
-  # TODO: remove after removing organization_invitations
-  def calculated_org_invite
-    return nil unless user_id.present?
-    OrganizationInvitation.where(organization_id: organization_id, invitee_id: user_id).first
-  end
-
-  def calculated_org_invite_email
-    calculated_org_invite&.invitee_email || user&.email
-  end
-
-  def calculated_org_invite_sender_id
-    calculated_org_invite&.inviter_id
-  end
-
   def enqueue_processing_worker
     ProcessMembershipWorker.perform_async(id)
   end

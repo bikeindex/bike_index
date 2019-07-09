@@ -113,7 +113,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
     let!(:membership) { FactoryBot.create(:membership, invited_email: " #{user.email.upcase}") }
     let!(:membership2) { FactoryBot.create(:membership, invited_email: " #{user.email.upcase}") }
     let(:user) { FactoryBot.build(:user, email: "owner1@A.COM") }
-    it "assigns any organization invitations that match the user email, and mark user confirmed if invited" do
+    it "assigns any memberships that match the user email, and mark user confirmed if invited" do
       membership.reload
       expect(membership.claimed?).to be_falsey
       Sidekiq::Testing.inline! do

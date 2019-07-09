@@ -1,85 +1,54 @@
 .mb-4
   %h1
-    Edit membership for
-    %em
-      = @name
-%p
-  .clearfix
-    - id = (@organization_invitation || @membership).id
-    = link_to 'remove from organization', organization_user_path(id: id, organization_id: current_organization.to_param, is_invitation: @is_invitation), method: :delete, data: { confirm: "Are you sure you want to remove #{@name} from #{current_organization.name}? (They will still be to use their personal account)" }, class: 'btn btn-danger pull-right'
-  - if @is_invitation
-    %p
-      Invited
-      %strong
-        #{l @organization_invitation.created_at, format: :short_with_year},
-    %p
-      but #{@organization_invitation.invitee_email}
-      %strong
-        has still not signed up
-  - else
-    %p
-      Joined
-      %strong
-        = l @membership.created_at, format: :short_with_year
+    Edit membership
+    %em.small
+      for
+      = @membership.invited_email
+%p.text-right
+  = link_to 'remove from organization', organization_user_path(id: @membership.id, organization_id: current_organization.to_param), method: :delete, data: { confirm: "Are you sure you want to remove #{@name} from #{current_organization.name}? (They will still be to use their personal account)" }, class: 'btn btn-danger'
 
-- if @is_invitation
-  = form_for @organization_invitation, { as: :organization_invitation, url: organization_user_path(id: @organization_invitation.id, organization_id: current_organization.to_param, is_invitation: @is_invitation), action: 'update', html: { class: 'organized-form' } } do |f|
+%table.table-list
+  %tbody
+    %tr
+      %td
+        Invited
+      %td
+        %span.converTime.preciseTime
+          = l @membership.created_at, format: :short_with_year
+    %tr
+      %td
+        Signed up
+      %td
+        - if @membership.claimed?
+          %span.converTime.preciseTime
+            = l @membership.claimed_at, format: :short_with_year
+        - else
+          #{@membership.invited_display_name}
+          %strong
+            has still not signed up
 
-    .form-group.row
-      = f.label :invitee_email, 'Email', class: 'org-form-label'
-      .col-sm-4
-        %p.static-form-control
-          = @organization_invitation.invitee_email
-          %br
-          %em
-            %small.text-muted
-              Incorrect email? Delete this membership and resend.
+= form_for @membership, { as: :membership, url: organization_user_path(id: @membership.id, organization_id: current_organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
 
-    .form-group.row
-      = f.label :invitee_name, 'Name', class: 'org-form-label'
-      .col-sm-4
-        = f.text_field :invitee_name, required: true, class: 'form-control'
+  .form-group.row
+    %label.org-form-label
+      Email
+    .col-sm-4
+      %p.static-form-control
+        = @membership.user.email
 
-    .form-group.row
-      %label.org-form-label
-        Membership type
-      .col-sm-4
-        .radio
-          %label
-            = f.radio_button :membership_role, Membership.membership_types.first
-            Admin of organization
-        .radio
-          %label
-            = f.radio_button :membership_role, Membership.membership_types.second
-            Member of organization
+  .form-group.row
+    %label.org-form-label
+      Membership type
+    .col-sm-4
+      .radio
+        %label
+          = f.radio_button :role, Membership.membership_types.first
+          Admin of organization
+      .radio
+        %label
+          = f.radio_button :role, Membership.membership_types.second
+          Member of organization
 
-    .form-group.row.mt-4
-      .form-submit-button
-        = f.submit 'Update', class: 'btn btn-success btn-lg'
-
-- else
-  = form_for @membership, { as: :organization_invitation, url: organization_user_path(id: @membership.id, organization_id: current_organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
-
-    .form-group.row
-      %label.org-form-label
-        Email
-      .col-sm-4
-        %p.static-form-control
-          = @membership.user.email
-
-    .form-group.row
-      %label.org-form-label
-        Membership type
-      .col-sm-4
-        .radio
-          %label
-            = f.radio_button :role, Membership.membership_types.first
-            Admin of organization
-        .radio
-          %label
-            = f.radio_button :role, Membership.membership_types.second
-            Member of organization
-
-    .row.mt-4.form-group
-      .form-submit-button
-        = f.submit 'Update', class: 'btn btn-success btn-lg'
+  .row.mt-4.form-group
+    .form-submit-button
+      = f.submit 'Update', class: 'btn btn-success btn-lg'

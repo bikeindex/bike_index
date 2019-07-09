@@ -4,57 +4,57 @@ en:
   language: English
   date:
     abbr_day_names:
-    - Sun
-    - Mon
-    - Tue
-    - Wed
-    - Thu
-    - Fri
-    - Sat
+      - Sun
+      - Mon
+      - Tue
+      - Wed
+      - Thu
+      - Fri
+      - Sat
     abbr_month_names:
-    -
-    - Jan
-    - Feb
-    - Mar
-    - Apr
-    - May
-    - Jun
-    - Jul
-    - Aug
-    - Sep
-    - Oct
-    - Nov
-    - Dec
+      -
+      - Jan
+      - Feb
+      - Mar
+      - Apr
+      - May
+      - Jun
+      - Jul
+      - Aug
+      - Sep
+      - Oct
+      - Nov
+      - Dec
     day_names:
-    - Sunday
-    - Monday
-    - Tuesday
-    - Wednesday
-    - Thursday
-    - Friday
-    - Saturday
+      - Sunday
+      - Monday
+      - Tuesday
+      - Wednesday
+      - Thursday
+      - Friday
+      - Saturday
     formats:
       default: "%Y-%m-%d"
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
-    - January
-    - February
-    - March
-    - April
-    - May
-    - June
-    - July
-    - August
-    - September
-    - October
-    - November
-    - December
+      -
+      - January
+      - February
+      - March
+      - April
+      - May
+      - June
+      - July
+      - August
+      - September
+      - October
+      - November
+      - December
     order:
-    - :year
-    - :month
-    - :day
+      - :year
+      - :month
+      - :day
   datetime:
     distance_in_words:
       about_x_hours:
@@ -120,7 +120,7 @@ en:
       not_a_number: is not a number
       not_an_integer: must be an integer
       odd: must be odd
-      record_invalid: 'Validation failed: %{errors}'
+      record_invalid: "Validation failed: %{errors}"
       taken: has already been taken
       too_long:
         one: is too long (maximum is 1 character)
@@ -132,7 +132,7 @@ en:
         one: is the wrong length (should be 1 character)
         other: is the wrong length (should be %{count} characters)
     template:
-      body: 'There were problems with the following fields:'
+      body: "There were problems with the following fields:"
       header:
         one: 1 error prohibited this %{model} from being saved
         other: "%{count} errors prohibited this %{model} from being saved"
@@ -171,9 +171,9 @@ en:
           quadrillion: Quadrillion
           thousand: Thousand
           trillion: Trillion
-          unit: ''
+          unit: ""
       format:
-        delimiter: ''
+        delimiter: ""
         precision: 3
         significant: true
         strip_insignificant_zeros: true
@@ -191,11 +191,11 @@ en:
           tb: TB
     percentage:
       format:
-        delimiter: ''
+        delimiter: ""
         format: "%n%"
     precision:
       format:
-        delimiter: ''
+        delimiter: ""
   support:
     array:
       last_word_connector: ", and "
@@ -233,7 +233,6 @@ en:
     users_accept_terms: Terms of use - Bike Index
     users_accept_vendor_terms: Organization terms - Bike Index
     documentation_api_v1: Bike Index API documentation
-    organization_invitations_new: New invitation
     payments_new: Support the Index!
     payments_create: Thanks for your support!
     sessions_new: Log in
@@ -258,7 +257,7 @@ en:
     landing_pages_for_schools: Bike Index for Schools
     landing_pages_for_bike_shops: Bike Index for Bike Shops
   meta_descriptions:
-    welcome_index: 'The best bike registry: Simple, secure and free.'
+    welcome_index: "The best bike registry: Simple, secure and free."
     welcome_user_home: Your bikes on Bike Index
     info_about: Why we made Bike Index and who we are
     info_resources: Bike Index resources and useful tools
@@ -298,7 +297,7 @@ en:
   activerecord:
     errors:
       messages:
-        record_invalid: 'Validation failed: %{errors}'
+        record_invalid: "Validation failed: %{errors}"
         restrict_dependent_destroy:
           has_one: Cannot delete record because a dependent %{record} exists
           has_many: Cannot delete record because dependent %{record} exist
@@ -545,19 +544,19 @@ en:
     donate_modal:
       greeting: Hello %{user_name},
       thank_you: Thank you so much for using Bike Index!
-      law_enforcement_features: 'We have a number of features specifically designed for law enforcement officers:'
+      law_enforcement_features: "We have a number of features specifically designed for law enforcement officers:"
       thanks_for_using_bike_index: Thanks for using Bike Index!
       multiple_serial_search_pane: Multiple serial search pane
       bikeindex_is_a_nonprofit: Bike Index is a 501(c)(3) nonprofit. We depend on donations to provide these services. We recommend law enforcement agencies like %{org_name} donate at least $20 a year to help support our efforts.
       contact_bike_owners: Contact bike owners before their bikes are marked stolen
       email_for_access_html: Email %{email_link} for access.
     email_bike_box:
-      make: 'Make:'
-      serial: 'Serial:'
+      make: "Make:"
+      serial: "Serial:"
       color: color
-      found: 'Found:'
-      stolen_from: 'Stolen from:'
-      date: 'Date:'
+      found: "Found:"
+      stolen_from: "Stolen from:"
+      date: "Date:"
       color_may_be_incorrect: Color may be incorrect. Please update it if necessary!
     faq:
       faqs: Common issues & frequently asked questions
@@ -608,7 +607,7 @@ en:
       why_public: Why are serial numbers and non-stolen bikes public?
       serial_numbers_public: We make serial numbers public because it's the best way to recover stolen bikes and deter theft.
       the_faster_and_easier_it_is: The faster and easier it is to access serials, the more stolen bikes we recover. Restricting access to serial numbers only helps thieves.
-      this_isnt_optimistic_speculation: 'This isn''t optimistic speculation: we''ve proved this and continue to do so with every stolen bike we recover.'
+      this_isnt_optimistic_speculation: "This isn't optimistic speculation: we've proved this and continue to do so with every stolen bike we recover."
       weve_recovered_bikes: We've recovered bikes before they could even be marked stolen because they could be found on the Index.
       security_by_obscurity_link: security by obscurity
       other_registries_html: Other registries generally hide serials because of their technical limitations. They keep information away from those most likely to use it for good, even though %{wikipedia_link} doesn't work.

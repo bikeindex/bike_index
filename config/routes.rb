@@ -155,13 +155,12 @@ Bikeindex::Application.routes.draw do
       member { get :get_destroy }
     end
     resources :partial_bikes, only: [:index]
-    get "invitations", to: "dashboard#invitations"
     get "maintenance", to: "dashboard#maintenance"
     put "update_tsv_blacklist", to: "dashboard#update_tsv_blacklist"
     get "tsvs", to: "dashboard#tsvs"
     get "bust_z_cache", to: "dashboard#bust_z_cache"
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
-    resources :memberships, :organization_invitations, :bulk_imports, :exports, :bike_codes,
+    resources :memberships, :bulk_imports, :exports, :bike_codes,
               :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments,
               :ctypes
 

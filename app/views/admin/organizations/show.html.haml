@@ -314,9 +314,6 @@
 
 %ul.list-inline.mt-4
   %li.list-inline-item
-    = link_to "Manage organization invitations", admin_organization_invitation_url(organization_id: @organization.to_param), class: "btn btn-warning"
-
-  %li.list-inline-item
     = link_to "Edit", edit_admin_organization_url(@organization), class: "btn btn-success"
   - unless @organization.deleted?
     %li.list-inline-item.ml-auto
