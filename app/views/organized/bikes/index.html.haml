@@ -5,8 +5,10 @@
         = @bike_code.kind
         = @bike_code.code
       is currently linked.
+
+    - bike_link = link_to(@bike_code.bike&.title_string, bike_path(@bike_code.bike_id))
     %p
-      It is connected to this #{link_to @bike_code.bike&.title_string, bike_path(@bike_code.bike_id)}.
+      It is connected to this %{bike_link}.
   - else
     %h2
       %a{ href: edit_organization_sticker_path(organization_id: current_organization.id, id: @bike_code.code) }
@@ -23,10 +25,13 @@
     .col-sm-4.col-lg-2
       = submit_tag "Update", class: "btn btn-success"
 
+  - org_name = current_organization.short_name
+  - bike_code_kind = @bike_code.kind
   %p.less-strong
-    Or, search #{current_organization.short_name}'s bikes, view the bike and click <em>link it</em> to connect it to this #{@bike_code.kind}
+    Or, search %{org_name}'s bikes, view the bike and click <em>link it</em> to connect it to this %{bike_code_kind}
+
   %hr.mt-4.mb-4.less-strong
 - if current_organization.paid_for?("bike_search")
-  = render "/organized/bikes/search"
+  = render "organized/bikes/search"
 - else
-  = render "/organized/bikes/list"
+  = render "organized/bikes/list"

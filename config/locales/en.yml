@@ -4,57 +4,57 @@ en:
   language: English
   date:
     abbr_day_names:
-      - Sun
-      - Mon
-      - Tue
-      - Wed
-      - Thu
-      - Fri
-      - Sat
+    - Sun
+    - Mon
+    - Tue
+    - Wed
+    - Thu
+    - Fri
+    - Sat
     abbr_month_names:
-      -
-      - Jan
-      - Feb
-      - Mar
-      - Apr
-      - May
-      - Jun
-      - Jul
-      - Aug
-      - Sep
-      - Oct
-      - Nov
-      - Dec
+    -
+    - Jan
+    - Feb
+    - Mar
+    - Apr
+    - May
+    - Jun
+    - Jul
+    - Aug
+    - Sep
+    - Oct
+    - Nov
+    - Dec
     day_names:
-      - Sunday
-      - Monday
-      - Tuesday
-      - Wednesday
-      - Thursday
-      - Friday
-      - Saturday
+    - Sunday
+    - Monday
+    - Tuesday
+    - Wednesday
+    - Thursday
+    - Friday
+    - Saturday
     formats:
       default: "%Y-%m-%d"
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-      -
-      - January
-      - February
-      - March
-      - April
-      - May
-      - June
-      - July
-      - August
-      - September
-      - October
-      - November
-      - December
+    -
+    - January
+    - February
+    - March
+    - April
+    - May
+    - June
+    - July
+    - August
+    - September
+    - October
+    - November
+    - December
     order:
-      - :year
-      - :month
-      - :day
+    - :year
+    - :month
+    - :day
   datetime:
     distance_in_words:
       about_x_hours:
@@ -120,7 +120,7 @@ en:
       not_a_number: is not a number
       not_an_integer: must be an integer
       odd: must be odd
-      record_invalid: "Validation failed: %{errors}"
+      record_invalid: 'Validation failed: %{errors}'
       taken: has already been taken
       too_long:
         one: is too long (maximum is 1 character)
@@ -132,7 +132,7 @@ en:
         one: is the wrong length (should be 1 character)
         other: is the wrong length (should be %{count} characters)
     template:
-      body: "There were problems with the following fields:"
+      body: 'There were problems with the following fields:'
       header:
         one: 1 error prohibited this %{model} from being saved
         other: "%{count} errors prohibited this %{model} from being saved"
@@ -171,9 +171,9 @@ en:
           quadrillion: Quadrillion
           thousand: Thousand
           trillion: Trillion
-          unit: ""
+          unit: ''
       format:
-        delimiter: ""
+        delimiter: ''
         precision: 3
         significant: true
         strip_insignificant_zeros: true
@@ -191,11 +191,11 @@ en:
           tb: TB
     percentage:
       format:
-        delimiter: ""
+        delimiter: ''
         format: "%n%"
     precision:
       format:
-        delimiter: ""
+        delimiter: ''
   support:
     array:
       last_word_connector: ", and "
@@ -257,7 +257,7 @@ en:
     landing_pages_for_schools: Bike Index for Schools
     landing_pages_for_bike_shops: Bike Index for Bike Shops
   meta_descriptions:
-    welcome_index: "The best bike registry: Simple, secure and free."
+    welcome_index: 'The best bike registry: Simple, secure and free.'
     welcome_user_home: Your bikes on Bike Index
     info_about: Why we made Bike Index and who we are
     info_resources: Bike Index resources and useful tools
@@ -297,7 +297,7 @@ en:
   activerecord:
     errors:
       messages:
-        record_invalid: "Validation failed: %{errors}"
+        record_invalid: 'Validation failed: %{errors}'
         restrict_dependent_destroy:
           has_one: Cannot delete record because a dependent %{record} exists
           has_many: Cannot delete record because dependent %{record} exist
@@ -544,19 +544,19 @@ en:
     donate_modal:
       greeting: Hello %{user_name},
       thank_you: Thank you so much for using Bike Index!
-      law_enforcement_features: "We have a number of features specifically designed for law enforcement officers:"
+      law_enforcement_features: 'We have a number of features specifically designed for law enforcement officers:'
       thanks_for_using_bike_index: Thanks for using Bike Index!
       multiple_serial_search_pane: Multiple serial search pane
       bikeindex_is_a_nonprofit: Bike Index is a 501(c)(3) nonprofit. We depend on donations to provide these services. We recommend law enforcement agencies like %{org_name} donate at least $20 a year to help support our efforts.
       contact_bike_owners: Contact bike owners before their bikes are marked stolen
       email_for_access_html: Email %{email_link} for access.
     email_bike_box:
-      make: "Make:"
-      serial: "Serial:"
+      make: 'Make:'
+      serial: 'Serial:'
       color: color
-      found: "Found:"
-      stolen_from: "Stolen from:"
-      date: "Date:"
+      found: 'Found:'
+      stolen_from: 'Stolen from:'
+      date: 'Date:'
       color_may_be_incorrect: Color may be incorrect. Please update it if necessary!
     faq:
       faqs: Common issues & frequently asked questions
@@ -607,7 +607,7 @@ en:
       why_public: Why are serial numbers and non-stolen bikes public?
       serial_numbers_public: We make serial numbers public because it's the best way to recover stolen bikes and deter theft.
       the_faster_and_easier_it_is: The faster and easier it is to access serials, the more stolen bikes we recover. Restricting access to serial numbers only helps thieves.
-      this_isnt_optimistic_speculation: "This isn't optimistic speculation: we've proved this and continue to do so with every stolen bike we recover."
+      this_isnt_optimistic_speculation: 'This isn''t optimistic speculation: we''ve proved this and continue to do so with every stolen bike we recover.'
       weve_recovered_bikes: We've recovered bikes before they could even be marked stolen because they could be found on the Index.
       security_by_obscurity_link: security by obscurity
       other_registries_html: Other registries generally hide serials because of their technical limitations. They keep information away from those most likely to use it for good, even though %{wikipedia_link} doesn't work.
@@ -695,7 +695,7 @@ en:
       new_password: New Password
       new_password_confirmation: New Password confirmation
     edit_root:
-      personal_information_for_user: "Personal Information for %{user_name}"
+      personal_information_for_user: Personal Information for %{user_name}
       any_use_of_your_personal_information_html: Any use of your personal information is governed by the terms of our %{privacy_policy}. We do not sell, trade, or rent your personal information to third parties.
       receive_the_bike_index_newsletter: Receive the Bike Index newsletter
       give_us_permission_html: Give us permission to contact you if we believe your bike has been stolen, <em>even if it isn't marked stolen -</em> <strong>%{why_you_should_link}</strong>
@@ -735,17 +735,17 @@ en:
       preview_page: preview page
       create_public_page: Create public page
       create_page: Create page
-      no_please_dont_create_me_a_page: "No, please don't create me a page"
+      no_please_dont_create_me_a_page: No, please don't create me a page
       profile_avatar: Profile avatar
       choose_file: Choose file...
       page_title: Page title
       this_users_bikes: This user's bikes
       page_text: Page text
     accept_terms:
-      i_agree_to_tos_html: "I agree to Bike Index's <strong>Terms of Service</strong>."
+      i_agree_to_tos_html: I agree to Bike Index's <strong>Terms of Service</strong>.
       submit: Submit
     accept_vendor_terms:
-      i_agree_to_tos_html: "I agree to Bike Index's <strong>Terms of Service for Organizations</strong>."
+      i_agree_to_tos_html: I agree to Bike Index's <strong>Terms of Service for Organizations</strong>.
       submit: Submit
     confirm_error_404:
       woops: Woops
@@ -769,9 +769,9 @@ en:
       log_in: log in
       bikehub_terms_url: https://basic.bikehub.com/terms.html
       terms_and_conditions: terms and conditions
-      agree_bikeindex_bikehub_toc_html: "I agree to BikeHub's %{bikehub_toc_link} and Bike Index's %{bikeindex_toc_link}."
-      agree_bikeindex_toc_html: "I agree to Bike Index's %{bikeindex_toc_link}."
-      get_bike_indexs_newsletter: "Get Bike Index's Newsletter"
+      agree_bikeindex_bikehub_toc_html: I agree to BikeHub's %{bikehub_toc_link} and Bike Index's %{bikeindex_toc_link}.
+      agree_bikeindex_toc_html: I agree to Bike Index's %{bikeindex_toc_link}.
+      get_bike_indexs_newsletter: Get Bike Index's Newsletter
       forgot_your_password: Forgot your password?
     password_reset:
       password_reset: Password Reset
@@ -781,7 +781,7 @@ en:
       thanks_for_signing_up_for_bike_index: Thanks for signing up for Bike Index!
       please_verify_your_email: Please verify your email
       we_sent_an_email: We sent an email with a confirmation link in it. Follow the link in the email to finish signing up!
-      we_sent_an_email_to_user_email_html: 'We sent an email to <strong class="stolen-color">%{user_email}</strong> with a confirmation link in it. Follow the link in the email to finish signing up!'
+      we_sent_an_email_to_user_email_html: We sent an email to <strong class="stolen-color">%{user_email}</strong> with a confirmation link in it. Follow the link in the email to finish signing up!
     request_password_reset:
       reset_your_password: Reset your Password
       your_email_address: your email address
@@ -799,3 +799,47 @@ en:
       password: Password
       password_confirmation: Password confirmation
       update_password: Update password
+  organized:
+    ambassador_dashboards:
+      show:
+        welcome_to_your_ambassador_homepage: Welcome to your Ambassador homepage
+        this_page_contains_the_resources_you_need: This page contains the resources you need to become a great bike advocate in your community. Here you will find documents, tips, articles, and recommendations for helping cyclists where you live and connecting with Ambassadors around the world doing the same in their communities.
+        being_a_bike_index_ambassador: Being a Bike Index Ambassador means helping people, where you live, to register and protect their bikes in case of theft. Share Bike Index with bike shops, advocacy groups, universities, and law enforcement to aid larger numbers and more kinds of cyclists in your area.
+        activities_for_registering_cyclists_html: On this page, we've listed effective activities for registering cyclists in Bike Index. You can track progress and get ideas from other Ambassadors in your area about successful strategies. If you have any questions, post them in our Slack channel or email %{help_link}.
+        suggested_activities: Suggested Activities
+        activity: Activity
+        actions: Actions
+        completed_activities: Completed activities
+        completed: Completed
+        leaderboard: Leaderboard
+        name: Name
+        activities: Activities
+      getting_started:
+        10_tips_for_getting_started_in_your_town: 10 tips for getting started in your town
+        be_a_part_of_your_local_cycling_culture: Be a part of your local cycling culture. This comes in many forms, Whether you’re a racer or commuter, gravel grinder, mechanic, or enthusiast, there are ways to get involved. Get to know others who are active in the cycling community. Even in a big city, cyclists know cyclists and are very welcoming.
+        have_twitter_connect: Have twitter. Connect with all your local cyclists on twitter. Promote Bike Index on twitter and don’t be afraid to tag and name drop us.
+        post_and_rt_stolen_bikes: Post and RT stolen bikes in your area. Connect people looking to match stolen bikes in your community. People will follow you, and you can follow them too! You don’t have to be an official to keep an eye out for stolen bikes.
+        find_and_talk_to_local_bloggers: Find and talk to local bloggers and enlist them. They will have followings in your area. Interview some folks and get some articles written and published.
+        engage_your_local_city_and_cops: Engage your local city and cops. Find the people who deal with whatever local bike registry system your city uses. Sometimes a simple “_____ bike registry” search will lead you to the person you need to talk to.
+        seek_out_local_facebook_groups: Seek out local facebook groups that find stolen bikes. They exist, and there might be more than one.
+        promote_bike_index: Promote the hell out of Bike Index to cops, bike shops, and biking orgs all the time, in person and via twitter. It helps to approach with materials in hand, whether that’s a flyer, some stickers, or a business card.
+        encourage_people_to_watch: Encourage people to watch craigslist and offerup for your area, and match sketchy bikes for sale in the Bike Index. BIKE HUNT ALL DAY.
+        grow_your_network_via_bike: Grow your network via bike theft victims in that area. Engage them to help out and do the above. There is a good chance they will be interested if they're pissed off about bike thefts.
+        ride_your_bike_express_your: Ride your bike! Express your love for bikes in whatever form you want. The people you’re going to talk to do their work because they love bikes too. Sharing that with them will create the first steps in a great partnership.
+      resources:
+        ambassador_resources: Ambassador resources
+        as_an_ambassador_you_have_access_to_a_num: 'As an ambassador, you have access to a number of special features on Bike Index. Here are a few of them:'
+        youre_a_moderator_on_discuss_html: You're a moderator on <a href="https://discuss.bikeindex.org">discuss.bikeindex.org</a>
+        you_can_send_stolen_messages_html: You can send stolen messages to bikes that haven’t been marked stolen yet (as described in <a href="https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen">recover bikes before they are marked stolen</a>)
+        you_can_mark_stolen_bikes: You can mark stolen bikes recovered (ambassadors from New Orleans requested this feature - they just recover bikes so quickly!)
+        access_to_quick_communication: Access to quick communication with the Bike Index team via Slack and email
+        periodic_discount_codes: Periodic discount codes from Bike Index partners
+        some_additional_resources: 'Some additional resources:'
+        qr_sticker_org_instructions: QR sticker instructions for organizations
+        qr_sticker_org_instructions_url: https://drive.google.com/file/d/1VXoF1NB7CcSLu8BaBQeuLhNmmB89qp81/view?usp=sharing
+        qr_sticker_instructions: QR sticker instructions for individuals
+        qr_sticker_instructions_url: https://drive.google.com/file/d/1_EMLLgvJGdyQI7catFmuhs2zHoNoaXBE/view?usp=sharing
+        organizations_sign_up: Organizations sign up
+        page_on_bike_index_html: '%{signup_link} page on Bike Index'
+        tips_for_talking_to_bike_shops: Tips for talking to bike shops
+        tips_for_talking_to_bike_shops_url: https://bikeindex.org/news/how-to-get-a-bike-shop-signed-up-in-bike-index

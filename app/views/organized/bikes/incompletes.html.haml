@@ -44,7 +44,8 @@
           = b_param.owner_email
           - if include_child_org && b_param.organization != current_organization
             %small.less-strong{ style: "display: block; line-height: 1;" }
-              through #{b_param.organization.short_name}
+              through
+              = b_param.organization.short_name
 
 .paginate-container.paginate-container-bottom
   = paginate @b_params
