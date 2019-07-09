@@ -1009,3 +1009,35 @@ en:
         no_stickers_assigned: No stickers assigned
         not_assigned: not assigned
         columns_in_csv: Columns in csv
+    manage:
+      location_fields:
+        location_name: Location name
+        name: Name
+        phone_number: Phone number
+        address: Address
+        street: Street
+        city: City
+        state: State
+        choose_country: Choose country
+        zipcode: Zipcode
+        remove: Remove
+      index:
+        org_settings: "<em>%{org_name}</em> settings"
+        name: Name
+        abbreviation: Abbreviation
+        registration_email: Registration email
+        select_email: Select email
+        org_email_address: Email address <em>%{org_name}</em> bike registrations will be sent from
+        organization_type: Organization type
+        organization_logo: Organization logo
+        choose_file: Choose file...
+        update: Update
+        i_would_like_to_terminate_my_account: I would like to terminate my account with Bike Index
+        delete_organization: Delete organization
+        removal_confirmation: Are you positive you want to remove %{org_name} from Bike Index?
+      locations:
+        location_settings_html: <em>%{org_name}</em> location settings
+        bike_index_partner_map: Bike Index partner map
+        display_org_on_map_html: Display <em>%{org_name}</em> on %{map_link}
+        add_location: Add location
+        save: Save

@@ -1,28 +1,28 @@
 .mb-4
-  %h1
-    %em
-      = @organization.name
-    location settings
+  %h1= t(".location_settings_html", org_name: @organization.name)
+
 = form_for @organization, { url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
   = hidden_field_tag :locations_page, true
+
   .form-group.row.locations-where-and-add
     .col-sm-4
       .checkbox
         %label
           = f.check_box :show_on_map
-          Display
-          %em
-            = @organization.name
-          on #{ link_to "Bike Index partner map", where_path, target: "_blank" }
+          - map_link = link_to(t(".bike_index_partner_map"), where_path, target: "_blank" )
+          = t(".display_org_on_map_html", org_name: @organization.name, map_link: map_link).html_safe
+
     .col-sm-4
-      = revised_link_to_add_fields 'Add location', f, :locations, class_name: 'btn btn-secondary btn-lg'
+      = revised_link_to_add_fields t(".add_location"), f, :locations, class_name: 'btn btn-secondary btn-lg'
 
   - default_country = @organization.locations.first && @organization.locations.first.country && @organization.locations.first.country.id || Country.united_states.id
   - default_name = @organization.name
+
   .locations-fieldset-wrapper#locations_fieldsets{ data: { country: default_country, name: default_name } }
     = f.fields_for :locations do |builder|
-      = render 'location_fields', f: builder
+      = render "location_fields", f: builder
     %span#fieldsetend
+
   .form-group.row
     .col-sm-4.col-sm-push-4
-      = f.submit 'Save', class: 'btn btn-success btn-lg'
+      = f.submit t(".save"), class: "btn btn-success btn-lg"

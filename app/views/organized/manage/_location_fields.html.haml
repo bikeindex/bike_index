@@ -4,26 +4,25 @@
       .row
         .col-sm-6
           .form-group
-            = f.label :name, 'Location name'
-            = f.text_field :name, placeholder: 'Name', required: true, class: 'form-control location-name-field'
+            = f.label :name, t(".location_name")
+            = f.text_field :name, placeholder: t(".name"), required: true, class: 'form-control location-name-field'
         .col-sm-6
           .form-group
-            = f.label :phone, 'Phone number'
+            = f.label :phone, t(".phone_number")
             = f.text_field :phone, class: 'form-control'
 
       .form-group.address-group
-        = f.label :street, 'Address'
-        = f.text_field :street, placeholder: 'Street', class: 'form-control'
-        = f.text_field :city, required: true, placeholder: 'City', class: 'form-control'
+        = f.label :street, t(".address")
+        = f.text_field :street, placeholder: t(".street"), class: 'form-control'
+        = f.text_field :city, required: true, placeholder: t(".city"), class: 'form-control'
         .row.countrystatezip
           .col-sm-4.location-country-select.fancy-select.unfancy
-            = f.collection_select(:country_id, Country.all, :id, :name, prompt: 'Choose country')
+            = f.collection_select(:country_id, Country.all, :id, :name, prompt: t(".choose_country"))
           .col-sm-4.fancy-select.unfancy
-            = f.collection_select(:state_id, State.all, :id, :name, prompt: 'State', include_blank: true )
+            = f.collection_select(:state_id, State.all, :id, :name, prompt: t(".state"), include_blank: true )
           .col-sm-4
-            = f.text_field :zipcode, placeholder: 'Zipcode', class: 'form-control'
+            = f.text_field :zipcode, placeholder: t(".zipcode"), class: 'form-control'
 
       .remove-control
         = f.check_box :_destroy
-        = f.label :_destroy, 'Remove', class: 'remove_fields'
-
+        = f.label :_destroy, t(".remove"), class: 'remove_fields'
