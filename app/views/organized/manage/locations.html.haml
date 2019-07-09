@@ -10,7 +10,7 @@
         %label
           = f.check_box :show_on_map
           - map_link = link_to(t(".bike_index_partner_map"), where_path, target: "_blank" )
-          = t(".display_org_on_map_html", org_name: @organization.name, map_link: map_link).html_safe
+          = t(".display_org_on_map_html", org_name: @organization.name, map_link: map_link)
 
     .col-sm-4
       = revised_link_to_add_fields t(".add_location"), f, :locations, class_name: 'btn btn-secondary btn-lg'
