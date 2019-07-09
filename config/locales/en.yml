@@ -870,7 +870,6 @@ en:
         visible_columns: Visible columns
         stickers: 'Stickers:'
         all: All
-        active: active
         only_with_stickers_html: Only <strong>with</strong> stickers
         only_no_sticker_html: Only <strong>no</strong> sticker
         registered: Registered

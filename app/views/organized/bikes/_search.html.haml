@@ -89,7 +89,7 @@
   - if current_organization.paid_for?("bike_codes")
     %p.stickers-sort-btns
       = t(".stickers")
-      = link_to t(".all"), organization_bikes_path(search_params.merge(search_stickers: nil)), class: "btn btn-secondary #{@search_stickers.blank? ? t(".active", ) : ''}"
+      = link_to t(".all"), organization_bikes_path(search_params.merge(search_stickers: nil)), class: "btn btn-secondary #{@search_stickers.blank? ? 'active' : ''}"
       = link_to organization_bikes_path(search_params.merge(search_stickers: "with")), class: "btn btn-secondary #{@search_stickers == 'with' ? 'active' : ''}" do
         = t(".only_with_stickers_html")
       = link_to organization_bikes_path(search_params.merge(search_stickers: "none")), class: "btn btn-secondary #{@search_stickers == 'none' ? 'active' : ''}" do
