@@ -49,7 +49,11 @@ class Membership < ActiveRecord::Base
   end
 
   def set_calculated_attributes
-    self.invited_email = EmailNormalizer.normalize(invited_email)
+    if invited_email.present?
+      self.invited_email = EmailNormalizer.normalize(invited_email)
+    else
+      self.invited_email = user&.email # Basically, just for auto_user in orgs
+    end
     self.claimed_at ||= Time.current if user_id.present?
   end
 end
