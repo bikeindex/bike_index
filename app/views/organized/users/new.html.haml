@@ -13,14 +13,24 @@
       more
 
 = form_for @membership, { as: :membership, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
+  - if @membership.errors.any?
+    = render partial: "/shared/errors", locals: { name: "Membership", obj: @membership }
 
-  .form-group.row
-    = f.label :invited_email, "Email you're inviting", class: 'org-form-label'
+  .form-group.row#singleEmailInvite
+    = f.label :invited_email, "Email you're inviting", class: "org-form-label"
     .col-sm-4
-      = f.email_field :invited_email, required: true, class: 'form-control'
+      = f.email_field :invited_email, class: "form-control"
       .below-input-help
-        %a{ href: "#" }
+        %a#multipleUserSelect{ href: "#" }
           Invite multiple emails
+  .form-group.row.currently-hidden#multipleEmailInvite
+    = label_tag :multiple_emails_invited, class: "org-form-label" do
+      Multiple emails
+      %br
+      %em.small
+        1 email per line
+    .col-sm-4.currently-hidden#multipleEmailInviteField
+      = text_area_tag :multiple_emails_invited, "", placeholder: "example@example.com\nexample2@example.com\nexample3@example.com", rows: 4, class: "form-control"
 
   .form-group.row
     %label.org-form-label
@@ -39,3 +49,4 @@
     .form-submit-button
       = f.submit 'Send invitation', class: 'btn btn-success btn-lg'
 
+= javascript_pack_tag "application"

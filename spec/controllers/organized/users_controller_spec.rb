@@ -158,6 +158,15 @@ RSpec.describe Organized::UsersController, type: :controller do
           invited_email: "bike_email@bike_shop.com",
         }
       end
+      context "no email" do
+        it "fails" do
+          expect do
+            put :create, organization_id: organization.to_param,
+                         membership: membership_params.merge(invited_email: " ")
+          end.to change(Membership, :count).by(0)
+          expect(assigns(:membership).errors.full_messages).to be_present
+        end
+      end
       context "available invitations" do
         it "creates membership, reduces invitation tokens by 1" do
           Sidekiq::Testing.inline! do
