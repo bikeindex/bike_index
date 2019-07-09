@@ -175,6 +175,7 @@ window.updateSearchBikesHeaderLink = ->
   bike_search_path = $bike_search_link[0].pathname
   query_string = Object.entries(params).map((e) => e.join("=")).join("&")
   $bike_search_link.attr("href", "#{bike_search_path}?#{query_string}")
+  $(".defaultBikeSearchLink").attr("href", "#{bike_search_path}?#{query_string}")
 
 
 $(document).ready ->

@@ -6,7 +6,7 @@ module ControllerHelpers
 
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
-                  :current_organization, :passive_organization, :controller_namespace, :page_id,
+                  :user_root_bike_search?, :current_organization, :passive_organization, :controller_namespace, :page_id,
                   :default_bike_search_path
     before_filter :enable_rack_profiler
   end
@@ -44,11 +44,20 @@ module ControllerHelpers
     end
   end
 
+  def user_root_bike_search?
+    current_user.present? && current_user.default_organization.present? &&
+      current_user.default_organization.law_enforcement?
+  end
+
   def user_root_url
     return root_url unless current_user.present?
     return admin_root_url if current_user.superuser
     return user_home_url(subdomain: false) unless current_user.default_organization.present?
-    organization_root_url(organization_id: current_user.default_organization.to_param)
+    if user_root_bike_search?
+      default_bike_search_path
+    else
+      organization_root_url(organization_id: current_user.default_organization.to_param)
+    end
   end
 
   def default_bike_search_path

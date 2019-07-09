@@ -50,6 +50,9 @@ class WelcomeController < ApplicationController
     flash[:notice] = "No recovery stories to display" if @recovery_displays.empty?
   end
 
+  # Adding for testing purposes - so we can test where the root url for a user goes - sethherr, 2019-7-9
+  def user_root_url_redirect; redirect_to user_root_url and return end
+
   private
 
   def authenticate_user_for_welcome_controller

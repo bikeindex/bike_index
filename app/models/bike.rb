@@ -54,7 +54,7 @@ class Bike < ActiveRecord::Base
 
   validates_presence_of :primary_frame_color_id
 
-  attr_accessor :other_listing_urls, :date_stolen, :receive_notifications,
+  attr_accessor :other_listing_urls, :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
                 :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
                 :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
                 :b_param_id_token, :address, :address_city, :address_state, :address_zipcode
