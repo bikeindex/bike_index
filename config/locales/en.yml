@@ -895,7 +895,7 @@ en:
         sent: Sent
         bike: Bike
         email: email
-        through: through
+        through_org: through %{org_name}
       index:
         is_currently_linked: is currently linked.
         connected_to_bike_html: It is connected to this %{bike_link}.
