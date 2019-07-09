@@ -12,7 +12,7 @@
   %body{ id: page_id, class:  body_class }
     %nav.primary-header-nav
       .container
-        %a.primary-logo{ href: user_root_url }
+        %a.primary-logo{ href: user_root_url, class: user_root_bike_search? ? "defaultBikeSearchLink" : "" }
           = image_tag "revised/logo.svg", class: "primary-nav", alt: "Bike Index home"
         = link_to news_path("bike-index--now-a-nonprofit"), class: "nonprofit-subtitle" do
           = t(".the_nonprofit_bike_registry")
