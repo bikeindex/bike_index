@@ -44,11 +44,11 @@
     = t(".if_you_are_including_photo_url_html")
     %ul
       %li
-        %span.text-success= t(".correct")
-        = t(".actual_image_url")
+        = t(".correct_actual_image_url_html")
         = link_to t(".spokecard_image_url"), style: "word-wrap: break-word;", class: "small"
       %li
-        %span.text-danger= t(".incorrect")
-        = t(".image_on_webpage")
+        = t(".incorrect_image_on_webpage_html")
         = link_to t(".spokecard_image_url"), style: "word-wrap: break-word;", class: "small"
-        %em.text-danger= t(".this_will_not_work")
+        %em.text-danger
+          \-
+          = t(".this_will_not_work")

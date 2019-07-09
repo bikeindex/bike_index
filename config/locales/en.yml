@@ -951,13 +951,11 @@ en:
         view_an_example_csv_html: View an %{link_to_example_csv}.
         if_only_some_of_your_bikes_html: If only some of your bikes have values in optional columns, leave the cell blank for the ones that don't have it (rather than putting <em>unknown</em> or <em>n/a</em>).
         if_you_are_including_photo_url_html: 'If you are including "photo_url" make sure the url is of the image itself. If it''s of a webpage with the photo on it, <em>the photo import will not work</em>. Examples:'
-        correct: 'Correct:'
-        actual_image_url: actual image url
+        correct_actual_image_url_html: '<span class="text-success">Correct</span>: actual image url'
         spokecard_image_url: https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg
-        incorrect: 'INCORRECT:'
-        image_on_webpage: image on webpage
+        incorrect_image_on_webpage_html: '<span class="text-danger"">INCORRECT</span>: image on webpage'
         spokecard_page_url: https://en.wikipedia.org/wiki/Bike_Index#/media/File:Bike_Index_registration_spokecard.jpg
-        this_will_not_work: "- this will not work!"
+        this_will_not_work: this will not work!
       show:
         ascend_import: Ascend import
         bulk_import: Bulk import
