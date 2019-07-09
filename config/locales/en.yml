@@ -840,6 +840,74 @@ en:
         qr_sticker_instructions: QR sticker instructions for individuals
         qr_sticker_instructions_url: https://drive.google.com/file/d/1_EMLLgvJGdyQI7catFmuhs2zHoNoaXBE/view?usp=sharing
         organizations_sign_up: Organizations sign up
-        page_on_bike_index_html: '%{signup_link} page on Bike Index'
+        page_on_bike_index_html: "%{signup_link} page on Bike Index"
         tips_for_talking_to_bike_shops: Tips for talking to bike shops
         tips_for_talking_to_bike_shops_url: https://bikeindex.org/news/how-to-get-a-bike-shop-signed-up-in-bike-index
+    bikes:
+      list:
+        org_bikes_html: "<em>%{org_name}</em> bikes"
+        bike: bike
+        registered: registered
+        added: Added
+        manufacturer: Manufacturer
+        model: Model
+        color: Color
+        sent_to: Sent to
+        link: Link
+        sticker: Sticker
+        sent_to_a_new_owner: sent to a new owner
+      search:
+        search_bike_descriptions: Search bike descriptions
+        search_owner_email: Search owner email
+        search_for_serial_number: Search for serial number
+        bike: bike
+        matching_bikes_html: <strong>%{bikes}</strong> matching
+        registered_bikes_html: <strong>%{bikes}</strong> registered with %{org_name}
+        view_just_stolen_bikes: view just stolen bikes
+        stolen_bikes_html: "<em>stolen</em> bikes"
+        view_all_bikes: view all bikes
+        settings: settings
+        visible_columns: Visible columns
+        stickers: 'Stickers:'
+        all: All
+        active: active
+        only_with_stickers_html: Only <strong>with</strong> stickers
+        only_no_sticker_html: Only <strong>no</strong> sticker
+        registered: Registered
+        stolen: Stolen
+        color: Color
+        manufacturer: Manufacturer
+        model: Model
+        updated: Updated
+        mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
+        owner_name: Owner name
+        sent_to: Sent to
+        sticker: Sticker
+        only_with: only with
+        only_not: only not
+        link: Link
+      incompletes:
+        org_incomplete_registrations_html: "<em>%{org_name}</em> Incomplete Registrations"
+        matching: matching
+        incomplete: incomplete
+        registration: registration
+        search_emails: Search emails
+        search: Search
+        sent: Sent
+        bike: Bike
+        email: email
+        through: through
+      index:
+        is_currently_linked: is currently linked.
+        connected_to_bike_html: It is connected to this %{bike_link}.
+        isnt_linked_to_a_bike: isn't linked to a bike.
+        enter_url_of_the_bike_html: 'You can enter the URL of the bike you would like to link this %{bike_code_kind} to:'
+        update: Update
+        search_org_bikes_html: Or, search %{org_name}'s bikes, view the bike and click <em>link it</em> to connect it to this %{bike_code_kind}
+      recoveries:
+        org_recoveries_html: "<em>%{org_name}</em> Recoveries"
+        recovery: recovery
+        date_recovered: Date Recovered
+        description: Description
+        mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
+        owner: Owner

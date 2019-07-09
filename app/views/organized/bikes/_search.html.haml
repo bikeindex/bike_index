@@ -1,4 +1,5 @@
-/ If no url_for_search passed in, default to organization bike search
+-# If no url_for_search passed in, default to organization bike search
+
 - path_for_search ||= organization_bikes_path(organization_id: current_organization.to_param)
 - skip_view_just_stolen ||= @bike_code.present?
 
@@ -8,14 +9,14 @@
       - opt_vals = @selected_query_items_options.map { |i| i.is_a?(String) ? [i, i] : [i['text'], i['search_id']]  }
       = select_tag :query_items,                                      |
         options_for_select(opt_vals, selected: opt_vals.map(&:last)), |
-        placeholder: 'Search bike descriptions',                      |
+        placeholder: t(".search_bike_descriptions"),                  |
         class: 'form-control query-field',                            |
         multiple: true
 
-      = text_field_tag :query, params[:query], placeholder: 'Search bike descriptions', class: 'form-control query-field'
+      = text_field_tag :query, params[:query], placeholder: t(".search_bike_descriptions"), class: 'form-control query-field'
       .sidebyside-queries
-        = text_field_tag :email, params[:email], placeholder: 'Search owner email', class: 'form-control query-field email-field-too'
-        = text_field_tag :serial, params[:serial], placeholder: 'Search for serial number', class: 'form-control query-field email-field-too'
+        = text_field_tag :email, params[:email], placeholder: t(".search_owner_email"), class: 'form-control query-field email-field-too'
+        = text_field_tag :serial, params[:serial], placeholder: t(".search_for_serial_number"), class: 'form-control query-field email-field-too'
 
     .search-button-wrap
       = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
@@ -30,28 +31,24 @@
 
 %p.mt-4
   - if @search_query_present || params[:search_stickers].present?
-    %strong
-      = number_with_delimiter(@bikes.total_count)
-      = "bike".pluralize(@bikes.total_count)
-    matching
+    = t(".matching_bikes_html", bikes: pluralize(number_with_delimiter(@bikes.total_count), t(".bike")))
   - else
-    = number_with_delimiter(@bikes.total_count)
-    = "bike".pluralize(@bikes.total_count)
-    registered with #{current_organization.short_name}
+    = t(".registered_bikes_html",
+    bikes: pluralize(number_with_delimiter(@bikes.total_count), t(".bike")),
+    org_name: current_organization.short_name)
 
   - search_params = @interpreted_params.merge(organization_id: current_organization.to_param)
   - unless skip_view_just_stolen
     - if @stolenness == 'all'
       %a.float-right.organized-bikes-stolenness-toggle{ href: organization_bikes_path(search_params.merge(stolenness: 'stolen')), data: { stolenness: 'stolen' } }
-        view just stolen bikes
+        = t(".view_just_stolen_bikes")
     - else
-      %em
-        stolen
-      bikes
+      = t(".stolen_bikes_html")
       %a.organized-bikes-stolenness-toggle{ href: organization_bikes_path(search_params.merge(stolenness: 'all')), data: { stolenness: 'all' } }
-        view all bikes
+        = t(".view_all_bikes")
   %a.float-right.less-strong.hidden-xs-down{ href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse", style: "margin: 0 .5rem; color: #bbb" }
-    settings
+    = t(".settings")
+
 :ruby
   column_renames = {
     "created_at_cell" => "Registered",
@@ -81,7 +78,7 @@
   enabled_columns = (default_columns + optional_columns)
 .collapse#organizedSearchSettings.settings-list{ "data-defaultcols" => enabled_columns.to_json }
   %h3.header-font-alt
-    Visible columns
+    = t(".visible_columns")
   .row
     - enabled_columns.each do |cell_name|
       .col-xs-6.col-md-4
@@ -91,53 +88,51 @@
             = column_renames[cell_name]
   - if current_organization.paid_for?("bike_codes")
     %p.stickers-sort-btns
-      Stickers:
-      = link_to "All", organization_bikes_path(search_params.merge(search_stickers: nil)), class: "btn btn-secondary #{@search_stickers.blank? ? 'active' : ''}"
+      = t(".stickers")
+      = link_to t(".all"), organization_bikes_path(search_params.merge(search_stickers: nil)), class: "btn btn-secondary #{@search_stickers.blank? ? t(".active", ) : ''}"
       = link_to organization_bikes_path(search_params.merge(search_stickers: "with")), class: "btn btn-secondary #{@search_stickers == 'with' ? 'active' : ''}" do
-        Only <strong>with</strong> stickers
+        = t(".only_with_stickers_html")
       = link_to organization_bikes_path(search_params.merge(search_stickers: "none")), class: "btn btn-secondary #{@search_stickers == 'none' ? 'active' : ''}" do
-        Only <strong>no</strong> sticker
+        = t(".only_no_sticker_html")
 
 .full-screen-table
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
     %thead.small-header.sortable
       %tr
         %th.hiddenColumn.created_at_cell
-          = sortable "id", "Registered"
+          = sortable "id", t(".registered")
         %th.hiddenColumn.updated_at_cell.hidden-xs-down
-          = sortable "updated_at"
+          = sortable "updated_at", t(".updated")
         %th.hiddenColumn.hidden-xs-down.stolen_cell
           %small
-            = sortable "stolen"
+            = sortable "stolen", t(".stolen")
         %th.hiddenColumn.hidden-xs-down.manufacturer_cell
-          = sortable "manufacturer_id"
+          = sortable "manufacturer_id", t(".manufacturer")
         %th.hiddenColumn.hidden-xs-down.model_cell
-          = sortable "frame_model", "Model"
+          = sortable "frame_model", t(".model")
         %th.hiddenColumn.hidden-xs-down.color_cell
-          Color
+          = t(".color")
         %th.hiddenColumn.owner_email_cell
           %small.hidden-sm-up
-            mnfg, model,
-            %span.less-strong
-              color
+            = t(".mfg_model_color_html")
             %br
-          = sortable "owner_email", "Sent to"
+          = sortable "owner_email", t(".sent_to")
         %th.hiddenColumn.owner_name_cell.hidden-xs-down
           %small
-            Owner name
+            = t(".owner_name")
         - current_organization.additional_registration_fields.each do |field_name|
           %th.hiddenColumn.hidden-xs-down{ class: "#{field_name}_cell" }
             = column_renames["#{field_name}_cell"]
         - if current_organization.paid_for?("bike_codes")
           %th.hiddenColumn.hidden-xs-down{ class: "sticker_cell" }
-            Sticker
+            = t(".sticker")
             - if params[:search_stickers].present?
               %em.small
                 %a.less-strong{ href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse" }
                   - if @search_stickers == "with"
-                    only with
+                    = t(".only_with")
                   - if @search_stickers == "none"
-                    only not
+                    = t(".only_not")
 
 
         / I don't know how to do this in a performant way :/
@@ -146,9 +141,9 @@
         /     Export
         - if @bike_code.present?
           %th
-            Link
+            = t(".link")
             %br
-            Sticker
+            = t(".sticker")
     %tbody
       - @bikes.each do |bike|
         %tr
@@ -206,7 +201,7 @@
           - if @bike_code.present?
             %td
               %small
-                = link_to "Link", bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id, bike_id: bike.id), method: "PUT"
+                = link_to t(".link"), bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id, bike_id: bike.id), method: "PUT"
 
 .paginate-container.paginate-container-bottom
   = paginate @bikes
