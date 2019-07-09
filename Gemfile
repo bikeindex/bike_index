@@ -18,8 +18,11 @@ gem "flipper-active_record"
 gem "flipper-ui"
 
 # I18n
-gem "i18n_generators"
 gem "rails-i18n"
+group :development, :test do
+  gem "i18n-tasks"
+  gem "i18n_generators"
+end
 
 # Redis and redis dependents
 gem "hiredis"
