@@ -1,6 +1,6 @@
 .card.bg-light.filepond-container
   .card-body
-    = form_for PublicImage.new do |f|
+    = form_for PublicImage.new, html: {class: "UppyDragDrop-One"} do |f|
       .photo-upload-fields
         - if imageable_type == 'Blog'
           = hidden_field_tag :blog_id, @blog.id
@@ -8,4 +8,4 @@
           = hidden_field_tag :organization_id, @organization.id
         - elsif imageable_type == 'MailSnippet'
           = hidden_field_tag :mail_snippet_id, @mail_snippet.id
-        = f.file_field :image, multiple: "multiple", class: "filepond", id: "pond"
+        = f.file_field :image

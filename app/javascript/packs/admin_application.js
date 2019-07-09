@@ -20,19 +20,9 @@ Chartkick.addAdapter(Chart);
 window.$ = window.jQuery = jQuery;
 
 
-import * as FilePond from 'filepond';
-import FilePondPluginFileEncode from 'filepond-plugin-file-encode';
-import FilePondPluginImageExifOrientation from 'filepond-plugin-image-exif-orientation';
-import FilePondPluginImagePreview from 'filepond-plugin-image-preview';
-import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
-window.FilePond = FilePond
-FilePond.registerPlugin(
-  // encodes the file as base64 data
-  FilePondPluginFileEncode,
-  // validates the size of the file
-  FilePondPluginFileValidateSize,
-  // corrects mobile image orientation
-  FilePondPluginImageExifOrientation,
-  // previews dropped images
-  FilePondPluginImagePreview
-);
+window.Uppy = require('@uppy/core')
+window.XHRUpload = require('@uppy/xhr-upload')
+window.Dashboard = require('@uppy/dashboard')
+window.DragDrop = require('@uppy/drag-drop')
+window.Tus = require("@uppy/tus")
+window.ProgressBar = require("@uppy/progress-bar")
