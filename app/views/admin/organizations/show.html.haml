@@ -96,12 +96,12 @@
         %td
           Sent Invites
         %td
-          = @organization.sent_invitation_count
+          = number_with_delimiter @organization.sent_invitation_count
       %tr
         %td
           Remaining invites
         %td
-          = link_to @organization.available_invitation_count, admin_invitations_url(organization_id: @organization.to_param)
+          = number_with_delimiter @organization.remaining_invitation_count
       %tr
         %td
           Website
@@ -172,7 +172,7 @@
           %td
             More to come soon
 .row.mt-4
-  .col-12
+  .col-6
     %p
       %strong
         = link_to "Edit/Create Invoices", admin_organization_invoices_path(organization_id: @organization.to_param)
@@ -274,9 +274,9 @@
   %h2.mt-4
     No bikes
 
-.row
+.row.mt-4
   .col-6
-    %h4.mt-4
+    %h4
       = number_with_delimiter(@organization.memberships.count)
       = "Membership".pluralize(@organization.memberships.count)
       %small
@@ -285,10 +285,12 @@
   .col-6.text-right
     = link_to "View all memberships", admin_memberships_path(organization_id: @organization.to_param)
 - if @organization.memberships.count > 0
-  = render partial: "/admin/memberships/table", locals: { memberships: @organization.memberships.reorder(created_at: :asc).limit(25) }
+  = render partial: "/admin/memberships/table", locals: { memberships: @organization.memberships.reorder(created_at: :asc).limit(25), skip_organization: true }
 
 
 %hr.mt-4
+%h4
+  Locations
 - if @locations.any?
   - if @locations.count > 1
     %h4.mt-4
@@ -312,9 +314,9 @@
               = location.address
 
 
-%ul.list-inline.mt-4
-  %li.list-inline-item
+.row
+  .col-6
     = link_to "Edit", edit_admin_organization_url(@organization), class: "btn btn-success"
   - unless @organization.deleted?
-    %li.list-inline-item.ml-auto
+    .col-6.text-right
       = link_to "Delete", admin_organization_url(@organization), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger"

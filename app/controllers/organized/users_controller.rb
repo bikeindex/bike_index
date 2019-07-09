@@ -63,7 +63,7 @@ module Organized
     end
 
     def matching_memberships
-      memberships = current_organization.memberships
+      current_organization.memberships
     end
 
     def current_index_path
