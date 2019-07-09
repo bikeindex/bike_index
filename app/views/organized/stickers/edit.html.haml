@@ -2,7 +2,7 @@
   %h1
     Edit Sticker
     %em
-      = @bike_code.code
+      = @bike_code.pretty_code
   - if @bike_code.bike_id.present?
     %p.text-right
       = link_to "Remove Bike link", organization_sticker_path(id: @bike_code.code, organization_id: current_organization.to_param, bike_id: nil), method: :put, class: "btn btn-danger"
@@ -13,7 +13,7 @@
       %td
         Sticker
       %td
-        = @bike_code.code
+        = @bike_code.pretty_code
     %tr
       %td
         Claimed

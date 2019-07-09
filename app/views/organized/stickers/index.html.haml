@@ -4,6 +4,9 @@
       = current_organization.name
     Stickers
 
+- claimedness = "claimed" if params[:claimedness] == "claimed"
+- claimedness ||= "unclaimed" if params[:claimedness] == "unclaimed"
+- claimedness ||= "all"
 = form_tag organization_stickers_path(organization_id: current_organization.to_param), method: :get, class: "stickers-form" do
   .row
     .col-md-4
@@ -14,9 +17,6 @@
       = submit_tag "Search", class: "btn btn-primary"
     .col-md-12
       .btn-group#organized-bike-code-claimedness{ role: "group", "aria-label" => "Claimedness", data: { toggle: "buttons" }, style: "margin-top: 0.3rem;" }
-        - claimedness = "claimed" if params[:claimedness] == "claimed"
-        - claimedness ||= "unclaimed" if params[:claimedness] == "unclaimed"
-        - claimedness ||= "all"
         %label.btn.btn-sm.btn-secondary{ class: ("active" if claimedness == "all") }
           %input{ type: "radio", name: "claimedness", autocomplete: "off", checked: claimedness == "all", value: "all" }
           All
@@ -33,15 +33,18 @@
       = number_with_delimiter(@bike_codes.total_count)
     = "Sticker".pluralize(@bike_codes.total_count)
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
-    %thead.small-header
+    %thead.sortable
       %th
-        Added&nbsp;<small class="convertTimezone"></small>
+        = sortable "created_at", "Added&nbsp;<small class='convertTimezone'></small>".html_safe
       %th
-        Linked&nbsp;<small class="convertTimezone"></small>
+        - if claimedness == "claimed"
+          = sortable "claimed_at"
+        - else
+          Claimed
       %th
         Bike
       %th
-        Code
+        = sortable "code_integer", "Code"
     %tbody
       - @bike_codes.each do |bike_code|
         %tr
@@ -57,7 +60,8 @@
               / For these, use bike_id to avoid loading association
               = link_to organized_bike_text(bike_code.bike), bike_path(bike_code.bike)
           %td
-            = bike_code.code
+            %strong
+              = bike_code.pretty_code
 
 .paginate-container.paginate-container-bottom
   = paginate @bike_codes
