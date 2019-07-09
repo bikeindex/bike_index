@@ -1,55 +1,47 @@
 .organized-exports
   .organized-page-header
-    %h1
-      %em
-        = current_organization.name
-      Exports
+    %h1= t(".org_exports_html", org_name: current_organization.name)
 
   .text-right
-    = link_to "New Export", new_organization_export_path(organization_id: current_organization.to_param), class: "btn btn-secondary pull-right"
+    = link_to t(".new_export"),
+    new_organization_export_path(organization_id: current_organization.to_param),
+    class: "btn btn-secondary pull-right"
 
   .table-responsive.mt-4
     %p{ style: "margin-bottom: 0;" }
       %strong
-        = number_with_delimiter(@exports.total_count)
-      = "Export".pluralize(@exports.total_count)
+        = pluralize(number_with_delimiter(@exports.total_count), t(".export"))
 
     %table.table.table-striped.table-bordered.table-sm.without-exterior-border
       %thead.small-header
         %th
-          Created&nbsp;<small class="convertTimezone"></small>
-        %th
-          Creator
-        %th
-          Progress
-        %th
-          Bikes in export
-        %td
-          Download
+          = t(".created")
+          %small.convertTimezone
+        %th= t(".creator")
+        %th= t(".progress")
+        %th= t(".bikes_in_export")
+        %td= t(".download")
         %td
       %tbody
         - @exports.each do |export|
           %tr
             %td
               %a.convertTime{ href: organization_export_path(export, organization_id: current_organization.to_param) }
-                = l export.created_at, format: :convert_time
+                = l(export.created_at, format: :convert_time)
             %td
-              - if export.user.present?
-                = export.user.display_name
+              = export&.user&.display_name
             %td
               %span{ class: export_progress_class(export) }
                 = export.calculated_progress
             %td
-              - if export.finished?
-                = number_with_delimiter(export.rows)
+              = number_with_delimiter(export.rows) if export.finished?
             %td
-              - if export.file.url.present?
-                = link_to "Download", export.file.url
+              = link_to(t(".download"), export.file.url) if export.file.url.present?
             %td
               %small
-                = link_to "Delete", organization_export_path(export, organization_id: current_organization.to_param), method: :delete
-
-
+                = link_to t(".delete"),
+                organization_export_path(export, organization_id: current_organization.to_param),
+                method: :delete
 
   .paginate-container.paginate-container-bottom
     = paginate @exports

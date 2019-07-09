@@ -911,3 +911,101 @@ en:
         description: Description
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
         owner: Owner
+    bulk_imports:
+      index:
+        org_ascend_imports_html: "<em>%{org_name}</em> Ascend Imports"
+        org_bulk_imports_html: "<em>%{org_name}</em> Bulk Imports"
+        org_exports_html: "<em>%{org_name}</em> Exports"
+        new_export: New Export
+        export: Export
+        exclude_empty_imports: Exclude Empty imports
+        include_empty_imports: Include Empty imports
+        added: Added
+        progress: Progress
+        download: Download
+        delete: Delete
+        errors: Errors
+        creator: Creator
+        bikes: Bikes
+        line: Line
+        file: File!
+        unable_to_process: Unable to process
+        new_import: New import
+      new:
+        register_bikes_from_a_csv: Register bikes from a CSV
+        must_have_required_headers_html: Your CSV <em>must</em> have our required headers.
+        required_headers_are_html: The required headers are <code>manufacturer</code>, <code>model</code> <code>color</code> <code>email</code> and <code>serial</code>.
+        our_example_csv_here: our example CSV here
+        example_csv_url: https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_only_required.csv
+        look_at_example_csv_html: Look at %{link_to_example_csv}.
+        notes_on_successfully_importing: 'Notes on successfully importing:'
+        you_must_upload_a_dot_csv_html: You must upload a <code>.CSV</code>
+        for_best_results: For best results, put quotes around all the cells.
+        your_headers_must_match_html: 'Your headers must match our headers <em>exactly</em> - for example if you have ''serial #'' as a header, the import will not work.'
+        doing_an_import: Doing an import for the first time? Try importing a sample of your CSV with just 1 or 2 rows, and replace the email with your own email - so if the bikes don't import correctly, you can make adjustments and delete the bikes, without having to delete a large number of bikes.
+        csv_file_with_bikes: CSV File with bikes
+        choose_file: Choose file...
+        upload_and_begin_import: Upload and begin import
+        optional_additions: 'Optional additions:'
+        we_support_a_few_additional: We support a few additional, optional columns. You do not have to include them unless you want to.
+        example_csv_link: example CSV with all optional columns here
+        view_an_example_csv_html: View an %{link_to_example_csv}.
+        if_only_some_of_your_bikes_html: If only some of your bikes have values in optional columns, leave the cell blank for the ones that don't have it (rather than putting <em>unknown</em> or <em>n/a</em>).
+        if_you_are_including_photo_url_html: 'If you are including "photo_url" make sure the url is of the image itself. If it''s of a webpage with the photo on it, <em>the photo import will not work</em>. Examples:'
+        correct: 'Correct:'
+        actual_image_url: actual image url
+        spokecard_image_url: https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg
+        incorrect: 'INCORRECT:'
+        image_on_webpage: image on webpage
+        spokecard_page_url: https://en.wikipedia.org/wiki/Bike_Index#/media/File:Bike_Index_registration_spokecard.jpg
+        this_will_not_work: "- this will not work!"
+      show:
+        ascend_import: Ascend import
+        bulk_import: Bulk import
+        created: Created
+        progress: Progress
+        file: File
+        creator: Creator
+        errors: Errors
+        bikes: Bikes
+        manufacturer: Manufacturer
+        model: Model
+        color: Color
+        sent_to: Sent to
+        sent_to_a_new_owner: "(sent to a new owner)"
+    exports:
+      index:
+        org_exports_html: "%{org_name} Exports"
+        new_export: New Export
+        export: Export
+        created: Created
+        creator: Creator
+        progress: Progress
+        bikes_in_export: Bikes in export
+        download: Download
+        delete: Delete
+      show:
+        exports: Exports
+        download_export: Download Export
+        shared_alert_body: You'll be automatically redirected to the labels once processing is finished
+        created: Created
+        by: By
+        format: Format
+        progress: Progress
+        bikes_exported: Bikes exported
+        show_first_100_bikes_in_export: Show first 100 bikes in export
+        show_bikes_in_export: Show bikes in export
+        bikes_registered_after: Bikes Registered after
+        bikes_registered_before: Bikes Registered before
+        specific_bikes: Specific bikes
+        unable_to_export: Unable to export, not part of your organization
+        avery_export: Avery Export
+        view_avery_labels: View Avery Labels
+        pending: pending...
+        stickers: Stickers
+        stickers_exported: "%{bike_codes_count} Stickers exported"
+        stickers_have_been_unassigned: Stickers have been unassigned
+        unassign_stickers: Unassign stickers
+        no_stickers_assigned: No stickers assigned
+        not_assigned: not assigned
+        columns_in_csv: Columns in csv
