@@ -24,6 +24,8 @@ Bikeindex::Application.routes.draw do
   get "/", to: redirect(:root_url, subdomain: false), constraints: { subdomain: "stolen" }
   root to: "welcome#index"
 
+  get "/user_root_url_redirect", to: "welcome#user_root_url_redirect", as: :user_root_url_redirect
+
   LandingPages::ORGANIZATIONS.each do |slug|
     get slug, to: "landing_pages#show", organization_id: slug
   end
