@@ -5,837 +5,823 @@ nl:
       alphabetic_code: EUR
   activerecord:
     models:
-      ad: Advertentie  #g
-      ambassador: Ambassadeur  #g
-      ambassador_task: Ambassador-taak  #g
-      ambassador_task_assignment: Taaktoewijzing ambassadeur  #g
-      b_param: B param  #g
-      bike: Fiets  #g
-      bike_code: Fiets code  #g
-      bike_code_batch: Fietscodebatch  #g
-      bike_organization: Fiets organisatie  #g
-      blog: blog  #g
-      bulk_import: Bulkimport  #g
-      cgroup: CGroup  #g
-      color: Kleur  #g
-      component: bestanddeel  #g
-      country: land  #g
-      creation_state: Creatie staat  #g
-      ctype: Ctype  #g
-      customer_contact: Klantencontact  #g
-      doorkeeper/access_grant: Doorkeeper / toegangssubsidie  #g
-      doorkeeper/access_token: Doorkeeper / toegangstoken  #g
-      doorkeeper/application: Portier / applicatie  #g
-      duplicate_bike_group: Dubbele fietsgroep  #g
-      export: Exporteren  #g
-      feedback: terugkoppeling  #g
-      flipper/adapters/active_record/feature: Flipper / adapters / actief record / functie  #g
-      flipper/adapters/active_record/gate: Flipper / adapters / actief record / poort  #g
-      front_gear_type: Voorste versnelling type  #g
-      integration: integratie  #g
-      invoice: Factuur  #g
-      invoice_paid_feature: Factuur betaald functie  #g
-      listicle: Listicle  #g
-      location: Plaats  #g
-      lock: Slot  #g
-      lock_type: Type vergrendelen  #g
-      mail_snippet: E-mailfragment  #g
-      manufacturer: Fabrikant  #g
-      membership: Lidmaatschap  #g
-      normalized_serial_segment: Genormaliseerd serieel segment  #g
-      organization: Organisatie  #g
-      organization_invitation: Organisatie uitnodiging  #g
-      organization_message: Organisatie bericht  #g
-      other_listing: Andere aanbieding  #g
-      ownership: Eigendom  #g
-      paid_feature: Betaalde functie  #g
-      paint: Verf  #g
-      payment: Betaling  #g
-      public_image: Publiek imago  #g
-      rear_gear_type: Achter versnelling type  #g
-      recovery_display: Herstelscherm  #g
-      state: Staat  #g
-      stolen_notification: Gestolen melding  #g
-      stolen_record: Gestolen record  #g
-      theft_alert: Diefstalwaarschuwing  #g
-      theft_alert_plan: Diefstal-alarmplan  #g
-      tweet: gekwetter  #g
-      user: Gebruiker  #g
-      user_email: E-mailadres gebruiker  #g
-      wheel_size: Wielgrootte  #g
+      ad: Advertentie #g
+      ambassador: Ambassadeur #g
+      ambassador_task: Ambassador-taak #g
+      ambassador_task_assignment: Taaktoewijzing ambassadeur #g
+      b_param: B param #g
+      bike: Fiets #g
+      bike_code: Fiets code #g
+      bike_code_batch: Fietscodebatch #g
+      bike_organization: Fiets organisatie #g
+      blog: blog #g
+      bulk_import: Bulkimport #g
+      cgroup: CGroup #g
+      color: Kleur #g
+      component: bestanddeel #g
+      country: land #g
+      creation_state: Creatie staat #g
+      ctype: Ctype #g
+      customer_contact: Klantencontact #g
+      doorkeeper/access_grant: Doorkeeper / toegangssubsidie #g
+      doorkeeper/access_token: Doorkeeper / toegangstoken #g
+      doorkeeper/application: Portier / applicatie #g
+      duplicate_bike_group: Dubbele fietsgroep #g
+      export: Exporteren #g
+      feedback: terugkoppeling #g
+      flipper/adapters/active_record/feature: Flipper / adapters / actief record / functie #g
+      flipper/adapters/active_record/gate: Flipper / adapters / actief record / poort #g
+      front_gear_type: Voorste versnelling type #g
+      integration: integratie #g
+      invoice: Factuur #g
+      invoice_paid_feature: Factuur betaald functie #g
+      listicle: Listicle #g
+      location: Plaats #g
+      lock: Slot #g
+      lock_type: Type vergrendelen #g
+      mail_snippet: E-mailfragment #g
+      manufacturer: Fabrikant #g
+      membership: Lidmaatschap #g
+      normalized_serial_segment: Genormaliseerd serieel segment #g
+      organization: Organisatie #g
+      organization_message: Organisatie bericht #g
+      other_listing: Andere aanbieding #g
+      ownership: Eigendom #g
+      paid_feature: Betaalde functie #g
+      paint: Verf #g
+      payment: Betaling #g
+      public_image: Publiek imago #g
+      rear_gear_type: Achter versnelling type #g
+      recovery_display: Herstelscherm #g
+      state: Staat #g
+      stolen_notification: Gestolen melding #g
+      stolen_record: Gestolen record #g
+      theft_alert: Diefstalwaarschuwing #g
+      theft_alert_plan: Diefstal-alarmplan #g
+      tweet: gekwetter #g
+      user: Gebruiker #g
+      user_email: E-mailadres gebruiker #g
+      wheel_size: Wielgrootte #g
 
     attributes:
       ad:
-        body: Lichaam  #g
-        image: Beeld  #g
-        live: Leven  #g
-        organization: :activerecord.models.organization  #g
-        target_url: Doel-URL  #g
-        title: Titel  #g
+        body: Lichaam #g
+        image: Beeld #g
+        live: Leven #g
+        organization: :activerecord.models.organization #g
+        target_url: Doel-URL #g
+        title: Titel #g
 
       ambassador:
-        ambassador_task_assignments: Ambassador taakopdrachten  #g
-        ambassador_tasks: Ambassador-taken  #g
-        auth_token: auth_token  #g
-        avatar: avatar  #g
-        banned: banned  #g
-        can_send_many_stolen_notifications: can_send_many_stolen_notifications  #g
-        city: city  #g
-        confirmation_token: confirmation_token  #g
-        confirmed: confirmed  #g
-        country: :activerecord.models.country  #g
-        created_bikes: Gemaakt fietsen  #g
-        created_ownerships: Gemaakte eigendommen  #g
-        creation_states: Creatie staten  #g
-        current_ownerships: Huidige eigendommen  #g
-        currently_owned_bikes: Momenteel fietsen in eigendom  #g
-        description: description  #g
-        developer: developer  #g
-        email: email  #g
-        integrations: integraties  #g
-        last_login: last_login  #g
-        latitude: latitude  #g
-        locks: sloten  #g
-        longitude: longitude  #g
-        memberships: lidmaatschappen  #g
-        my_bikes_hash: my_bikes_hash  #g
-        name: name  #g
-        notification_newsletters: notification_newsletters  #g
-        notification_unstolen: notification_unstolen  #g
-        oauth_applications: OAuth-applicaties  #g
-        organization_embeds: Organisatie instort  #g
-        organization_invitations: Organisatie-uitnodigingen  #g
-        organizations: organisaties  #g
-        owned_bikes: Eigen fietsen  #g
-        ownerships: eigendommen  #g
-        partner_data: partner_data  #g
-        password: password  #g
-        password_digest: password_digest  #g
-        password_reset_token: password_reset_token  #g
-        payments: betalingen  #g
-        phone: phone  #g
-        preferred_language: preferred_language  #g
-        received_stolen_notifications: Gestolen meldingen ontvangen  #g
-        sent_stolen_notifications: Verzonden gestolen meldingen  #g
-        show_bikes: show_bikes  #g
-        show_phone: show_phone  #g
-        show_twitter: show_twitter  #g
-        show_website: show_website  #g
-        state: :activerecord.models.state  #g
-        street: street  #g
-        subscriptions: abonnementen  #g
-        superuser: superuser  #g
-        terms_of_service: terms_of_service  #g
-        title: title  #g
-        twitter: twitter  #g
-        user_emails: Gebruikersmails  #g
-        username: username  #g
-        vendor_terms_of_service: vendor_terms_of_service  #g
-        website: website  #g
-        when_vendor_terms_of_service: when_vendor_terms_of_service  #g
-        zipcode: zipcode  #g
+        ambassador_task_assignments: Ambassador taakopdrachten #g
+        ambassador_tasks: Ambassador-taken #g
+        auth_token: auth_token #g
+        avatar: avatar #g
+        banned: banned #g
+        can_send_many_stolen_notifications: can_send_many_stolen_notifications #g
+        city: city #g
+        confirmation_token: confirmation_token #g
+        confirmed: confirmed #g
+        country: :activerecord.models.country #g
+        created_bikes: Gemaakt fietsen #g
+        created_ownerships: Gemaakte eigendommen #g
+        creation_states: Creatie staten #g
+        current_ownerships: Huidige eigendommen #g
+        currently_owned_bikes: Momenteel fietsen in eigendom #g
+        description: description #g
+        developer: developer #g
+        email: email #g
+        integrations: integraties #g
+        last_login: last_login #g
+        latitude: latitude #g
+        locks: sloten #g
+        longitude: longitude #g
+        memberships: lidmaatschappen #g
+        my_bikes_hash: my_bikes_hash #g
+        name: name #g
+        notification_newsletters: notification_newsletters #g
+        notification_unstolen: notification_unstolen #g
+        oauth_applications: OAuth-applicaties #g
+        organization_embeds: Organisatie instort #g
+        organizations: organisaties #g
+        owned_bikes: Eigen fietsen #g
+        ownerships: eigendommen #g
+        partner_data: partner_data #g
+        password: password #g
+        password_digest: password_digest #g
+        password_reset_token: password_reset_token #g
+        payments: betalingen #g
+        phone: phone #g
+        preferred_language: preferred_language #g
+        received_stolen_notifications: Gestolen meldingen ontvangen #g
+        sent_stolen_notifications: Verzonden gestolen meldingen #g
+        show_bikes: show_bikes #g
+        show_phone: show_phone #g
+        show_twitter: show_twitter #g
+        show_website: show_website #g
+        state: :activerecord.models.state #g
+        street: street #g
+        subscriptions: abonnementen #g
+        superuser: superuser #g
+        terms_of_service: terms_of_service #g
+        title: title #g
+        twitter: twitter #g
+        user_emails: Gebruikersmails #g
+        username: username #g
+        vendor_terms_of_service: vendor_terms_of_service #g
+        website: website #g
+        when_vendor_terms_of_service: when_vendor_terms_of_service #g
+        zipcode: zipcode #g
 
       ambassador_task:
-        ambassador_task_assignments: Ambassador taakopdrachten  #g
-        ambassadors: Ambassadors  #g
-        description: Omschrijving  #g
-        title: Titel  #g
+        ambassador_task_assignments: Ambassador taakopdrachten #g
+        ambassadors: Ambassadors #g
+        description: Omschrijving #g
+        title: Titel #g
 
       ambassador_task_assignment:
-        ambassador: :activerecord.models.ambassador  #g
-        ambassador_task: :activerecord.models.ambassador_task  #g
-        completed_at: Voltooid op  #g
+        ambassador: :activerecord.models.ambassador #g
+        ambassador_task: :activerecord.models.ambassador_task #g
+        completed_at: Voltooid op #g
 
       b_param:
-        bike_errors: Fietsfouten  #g
-        bike_title: Titel van de fiets  #g
-        created_bike: :activerecord.models.created_bike  #g
-        creator: :activerecord.models.creator  #g
-        email: E-mail  #g
-        id_token: Id-token  #g
-        image: Beeld  #g
-        image_processed: Afbeelding verwerkt  #g
-        image_tmp: Afbeelding tmp  #g
-        old_params: Oude params  #g
-        organization: :activerecord.models.organization  #g
-        origin: Oorsprong  #g
-        params: params  #g
+        bike_errors: Fietsfouten #g
+        bike_title: Titel van de fiets #g
+        created_bike: :activerecord.models.created_bike #g
+        creator: :activerecord.models.creator #g
+        email: E-mail #g
+        id_token: Id-token #g
+        image: Beeld #g
+        image_processed: Afbeelding verwerkt #g
+        image_tmp: Afbeelding tmp #g
+        old_params: Oude params #g
+        organization: :activerecord.models.organization #g
+        origin: Oorsprong #g
+        params: params #g
 
       bike:
-        additional_registration: Aanvullende registratie  #g
-        all_description: Alle beschrijving  #g
-        approved_stolen: Goedgekeurd gestolen  #g
-        b_params: B params  #g
-        belt_drive: Riemaandrijving  #g
-        bike_codes: Fietscodes  #g
-        bike_organizations: Fietsorganisaties  #g
-        cached_data: Gegevens in cache  #g
-        can_edit_claimed_bike_organizations: Kan geclaimde fietsorganisaties bewerken  #g
-        can_edit_claimed_organizations: Kan geclaimde organisaties bewerken  #g
-        coaster_brake: Terugtraprem  #g
-        components: Components  #g
-        creation_organization: :activerecord.models.creation_organization  #g
-        creation_states: Creatie staten  #g
-        creator: :activerecord.models.creator  #g
-        current_stolen_record: :activerecord.models.current_stolen_record  #g
-        cycle_type: Cyclustype  #g
-        description: Omschrijving  #g
-        duplicate_bike_groups: Dubbele fietsgroepen  #g
-        example: Voorbeeld  #g
-        frame_material: Frame materiaal  #g
-        frame_model: Frame model  #g
-        frame_size: Kadergrootte  #g
-        frame_size_number: Framegrootte nummer  #g
-        frame_size_unit: Framegrootte-eenheid  #g
-        front_gear_type: :activerecord.models.front_gear_type  #g
-        front_tire_narrow: Voorband smal  #g
-        front_wheel_size: :activerecord.models.front_wheel_size  #g
-        handlebar_type: Stuur type  #g
-        handlebar_type_other: Stuur type anders  #g
-        has_no_serial: Heeft geen serie  #g
-        hidden: Verborgen  #g
-        invoice: :activerecord.models.invoice  #g
-        is_for_sale: Is te koop  #g
-        listing_order: Listing order  #g
-        location: :activerecord.models.location  #g
-        made_without_serial: Gemaakt zonder serienummer  #g
-        manufacturer: :activerecord.models.manufacturer  #g
-        manufacturer_other: Fabrikant anders  #g
-        mnfg_name: Mnfg-naam  #g
-        name: Naam  #g
-        normalized_serial_segments: Genormaliseerde seriële segmenten  #g
-        number_of_seats: aantal zitplaatsen  #g
-        organizations: organisaties  #g
-        other_listings: Andere aanbiedingen  #g
-        owner_email: Eigenaar e-mail  #g
-        ownerships: eigendommen  #g
-        paint: :activerecord.models.paint  #g
-        pdf: pdf  #g
-        primary_frame_color: :activerecord.models.primary_frame_color  #g
-        propulsion_type: Voortstuwingstype  #g
-        propulsion_type_other: Voortstuwingstype overig  #g
-        public_images: Openbare afbeeldingen  #g
-        rear_gear_type: :activerecord.models.rear_gear_type  #g
-        rear_tire_narrow: Achterband smal  #g
-        rear_wheel_size: :activerecord.models.rear_wheel_size  #g
-        recovered: hersteld  #g
-        recovered_records: Herstelde records  #g
-        registered_new: Geregistreerd nieuw  #g
-        secondary_frame_color: :activerecord.models.secondary_frame_color  #g
-        serial_normalized: Serieel genormaliseerd  #g
-        serial_number: Serienummer  #g
-        stock_photo_url: URL voor stockfoto  #g
-        stolen: Gestolen  #g
-        stolen_lat: Gestolen lat  #g
-        stolen_long: Lang gestolen  #g
-        stolen_notifications: Gestolen meldingen  #g
-        stolen_records: Gestolen records  #g
-        tertiary_frame_color: :activerecord.models.tertiary_frame_color  #g
-        thumb_path: Duim pad  #g
-        updator: :activerecord.models.updator  #g
-        video_embed: Video insluiten  #g
-        year: Jaar  #g
-        zipcode: Postcode  #g
+        additional_registration: Aanvullende registratie #g
+        all_description: Alle beschrijving #g
+        approved_stolen: Goedgekeurd gestolen #g
+        b_params: B params #g
+        belt_drive: Riemaandrijving #g
+        bike_codes: Fietscodes #g
+        bike_organizations: Fietsorganisaties #g
+        cached_data: Gegevens in cache #g
+        can_edit_claimed_bike_organizations: Kan geclaimde fietsorganisaties bewerken #g
+        can_edit_claimed_organizations: Kan geclaimde organisaties bewerken #g
+        coaster_brake: Terugtraprem #g
+        components: Components #g
+        creation_organization: :activerecord.models.creation_organization #g
+        creation_states: Creatie staten #g
+        creator: :activerecord.models.creator #g
+        current_stolen_record: :activerecord.models.current_stolen_record #g
+        cycle_type: Cyclustype #g
+        description: Omschrijving #g
+        duplicate_bike_groups: Dubbele fietsgroepen #g
+        example: Voorbeeld #g
+        frame_material: Frame materiaal #g
+        frame_model: Frame model #g
+        frame_size: Kadergrootte #g
+        frame_size_number: Framegrootte nummer #g
+        frame_size_unit: Framegrootte-eenheid #g
+        front_gear_type: :activerecord.models.front_gear_type #g
+        front_tire_narrow: Voorband smal #g
+        front_wheel_size: :activerecord.models.front_wheel_size #g
+        handlebar_type: Stuur type #g
+        handlebar_type_other: Stuur type anders #g
+        has_no_serial: Heeft geen serie #g
+        hidden: Verborgen #g
+        invoice: :activerecord.models.invoice #g
+        is_for_sale: Is te koop #g
+        listing_order: Listing order #g
+        location: :activerecord.models.location #g
+        made_without_serial: Gemaakt zonder serienummer #g
+        manufacturer: :activerecord.models.manufacturer #g
+        manufacturer_other: Fabrikant anders #g
+        mnfg_name: Mnfg-naam #g
+        name: Naam #g
+        normalized_serial_segments: Genormaliseerde seriële segmenten #g
+        number_of_seats: aantal zitplaatsen #g
+        organizations: organisaties #g
+        other_listings: Andere aanbiedingen #g
+        owner_email: Eigenaar e-mail #g
+        ownerships: eigendommen #g
+        paint: :activerecord.models.paint #g
+        pdf: pdf #g
+        primary_frame_color: :activerecord.models.primary_frame_color #g
+        propulsion_type: Voortstuwingstype #g
+        propulsion_type_other: Voortstuwingstype overig #g
+        public_images: Openbare afbeeldingen #g
+        rear_gear_type: :activerecord.models.rear_gear_type #g
+        rear_tire_narrow: Achterband smal #g
+        rear_wheel_size: :activerecord.models.rear_wheel_size #g
+        recovered: hersteld #g
+        recovered_records: Herstelde records #g
+        registered_new: Geregistreerd nieuw #g
+        secondary_frame_color: :activerecord.models.secondary_frame_color #g
+        serial_normalized: Serieel genormaliseerd #g
+        serial_number: Serienummer #g
+        stock_photo_url: URL voor stockfoto #g
+        stolen: Gestolen #g
+        stolen_lat: Gestolen lat #g
+        stolen_long: Lang gestolen #g
+        stolen_notifications: Gestolen meldingen #g
+        stolen_records: Gestolen records #g
+        tertiary_frame_color: :activerecord.models.tertiary_frame_color #g
+        thumb_path: Duim pad #g
+        updator: :activerecord.models.updator #g
+        video_embed: Video insluiten #g
+        year: Jaar #g
+        zipcode: Postcode #g
 
       bike_code:
-        bike: :activerecord.models.bike  #g
-        bike_code_batch: :activerecord.models.bike_code_batch  #g
-        claimed_at: claimed_at  #g
-        code: Code  #g
-        code_integer: code_integer  #g
-        code_prefix: Codevoorvoegsel  #g
-        kind: kind  #g
-        organization: :activerecord.models.organization  #g
-        user: :activerecord.models.user  #g
+        bike: :activerecord.models.bike #g
+        bike_code_batch: :activerecord.models.bike_code_batch #g
+        claimed_at: claimed_at #g
+        code: Code #g
+        code_integer: code_integer #g
+        code_prefix: Codevoorvoegsel #g
+        kind: kind #g
+        organization: :activerecord.models.organization #g
+        user: :activerecord.models.user #g
 
       bike_code_batch:
-        bike_codes: Fietscodes  #g
-        code_number_length: Codenummer lengte  #g
-        notes: Notes  #g
-        organization: :activerecord.models.organization  #g
-        user: :activerecord.models.user  #g
+        bike_codes: Fietscodes #g
+        code_number_length: Codenummer lengte #g
+        notes: Notes #g
+        organization: :activerecord.models.organization #g
+        user: :activerecord.models.user #g
 
       bike_organization:
-        bike: :activerecord.models.bike  #g
-        can_not_edit_claimed: Kan geclaimd niet bewerken  #g
-        deleted_at: Verwijderd om  #g
-        organization: :activerecord.models.organization  #g
+        bike: :activerecord.models.bike #g
+        can_not_edit_claimed: Kan geclaimd niet bewerken #g
+        deleted_at: Verwijderd om #g
+        organization: :activerecord.models.organization #g
 
       blog:
-        body: Lichaam  #g
-        body_abbr: Lichaam abbr  #g
-        description_abbr: Beschrijving abbr  #g
-        index_image: Index afbeelding  #g
-        index_image_lg: Index afbeelding lg  #g
-        is_listicle: Is listicle  #g
-        listicles: Listicles  #g
-        old_title_slug: Oude titelslak  #g
-        public_images: Openbare afbeeldingen  #g
-        published: Gepubliceerd  #g
-        published_at: Gepubliceerd op  #g
-        tags: Tags  #g
-        title: Titel  #g
-        title_slug: Titel naaktslak  #g
-        user: :activerecord.models.user  #g
+        body: Lichaam #g
+        body_abbr: Lichaam abbr #g
+        description_abbr: Beschrijving abbr #g
+        index_image: Index afbeelding #g
+        index_image_lg: Index afbeelding lg #g
+        is_listicle: Is listicle #g
+        listicles: Listicles #g
+        old_title_slug: Oude titelslak #g
+        public_images: Openbare afbeeldingen #g
+        published: Gepubliceerd #g
+        published_at: Gepubliceerd op #g
+        tags: Tags #g
+        title: Titel #g
+        title_slug: Titel naaktslak #g
+        user: :activerecord.models.user #g
 
       bulk_import:
-        bikes: Bikes  #g
-        creation_states: Creatie staten  #g
-        file: het dossier  #g
-        import_errors: Fouten importeren  #g
-        is_ascend: Is ascend  #g
-        no_notify: Geen melding  #g
-        organization: :activerecord.models.organization  #g
-        progress: Vooruitgang  #g
-        user: :activerecord.models.user  #g
+        bikes: Bikes #g
+        creation_states: Creatie staten #g
+        file: het dossier #g
+        import_errors: Fouten importeren #g
+        is_ascend: Is ascend #g
+        no_notify: Geen melding #g
+        organization: :activerecord.models.organization #g
+        progress: Vooruitgang #g
+        user: :activerecord.models.user #g
 
       cgroup:
-        ctypes: ctypes  #g
-        description: Omschrijving  #g
-        name: Naam  #g
-        slug: Naaktslak  #g
+        ctypes: ctypes #g
+        description: Omschrijving #g
+        name: Naam #g
+        slug: Naaktslak #g
 
       color:
-        bikes: Bikes  #g
-        display: tonen  #g
-        name: Naam  #g
-        paints: verven  #g
-        priority: Prioriteit  #g
+        bikes: Bikes #g
+        display: tonen #g
+        name: Naam #g
+        paints: verven #g
+        priority: Prioriteit #g
 
       component:
-        bike: :activerecord.models.bike  #g
-        cmodel_name: Cmodel naam  #g
-        ctype: :activerecord.models.ctype  #g
-        ctype_other: Ctype anders  #g
-        description: Omschrijving  #g
-        front: Voorkant  #g
-        is_stock: Is voorraad  #g
-        manufacturer: :activerecord.models.manufacturer  #g
-        manufacturer_other: Fabrikant anders  #g
-        rear: achterkant  #g
-        serial_number: Serienummer  #g
-        year: Jaar  #g
+        bike: :activerecord.models.bike #g
+        cmodel_name: Cmodel naam #g
+        ctype: :activerecord.models.ctype #g
+        ctype_other: Ctype anders #g
+        description: Omschrijving #g
+        front: Voorkant #g
+        is_stock: Is voorraad #g
+        manufacturer: :activerecord.models.manufacturer #g
+        manufacturer_other: Fabrikant anders #g
+        rear: achterkant #g
+        serial_number: Serienummer #g
+        year: Jaar #g
 
       country:
-        iso: Iso  #g
-        locations: locaties  #g
-        name: Naam  #g
-        stolen_records: Gestolen records  #g
+        iso: Iso #g
+        locations: locaties #g
+        name: Naam #g
+        stolen_records: Gestolen records #g
 
       creation_state:
-        bike: :activerecord.models.bike  #g
-        bulk_import: :activerecord.models.bulk_import  #g
-        creator: :activerecord.models.creator  #g
-        is_bulk: Is bulk  #g
-        is_new: Is nieuw  #g
-        is_pos: Is pos  #g
-        organization: :activerecord.models.organization  #g
-        origin: Oorsprong  #g
-        pos_kind: Pos soort  #g
+        bike: :activerecord.models.bike #g
+        bulk_import: :activerecord.models.bulk_import #g
+        creator: :activerecord.models.creator #g
+        is_bulk: Is bulk #g
+        is_new: Is nieuw #g
+        is_pos: Is pos #g
+        organization: :activerecord.models.organization #g
+        origin: Oorsprong #g
+        pos_kind: Pos soort #g
 
       ctype:
-        cgroup: :activerecord.models.cgroup  #g
-        components: Components  #g
-        has_multiple: Heeft meerdere  #g
-        image: Beeld  #g
-        name: Naam  #g
-        secondary_name: Secundaire naam  #g
-        slug: Naaktslak  #g
+        cgroup: :activerecord.models.cgroup #g
+        components: Components #g
+        has_multiple: Heeft meerdere #g
+        image: Beeld #g
+        name: Naam #g
+        secondary_name: Secundaire naam #g
+        slug: Naaktslak #g
 
       customer_contact:
-        bike: :activerecord.models.bike  #g
-        body: Lichaam  #g
-        contact_type: Contact type  #g
-        creator: :activerecord.models.creator  #g
-        creator_email: E-mail van maker  #g
-        info_hash: Info Hash  #g
-        title: Titel  #g
-        user: :activerecord.models.user  #g
-        user_email: E-mailadres gebruiker  #g
+        bike: :activerecord.models.bike #g
+        body: Lichaam #g
+        contact_type: Contact type #g
+        creator: :activerecord.models.creator #g
+        creator_email: E-mail van maker #g
+        info_hash: Info Hash #g
+        title: Titel #g
+        user: :activerecord.models.user #g
+        user_email: E-mailadres gebruiker #g
 
       doorkeeper/access_grant:
-        application: :activerecord.models.application  #g
-        expires_in: expires_in  #g
-        redirect_uri: Stuur uri door  #g
-        revoked_at: Ingetrokken om  #g
-        scopes: scopes  #g
-        token: blijk  #g
+        application: :activerecord.models.application #g
+        expires_in: expires_in #g
+        redirect_uri: Stuur uri door #g
+        revoked_at: Ingetrokken om #g
+        scopes: scopes #g
+        token: blijk #g
 
       doorkeeper/access_token:
-        application: :activerecord.models.application  #g
-        expires_in: Verloopt in  #g
-        refresh_token: Token vernieuwen  #g
-        revoked_at: Ingetrokken om  #g
-        scopes: scopes  #g
-        token: blijk  #g
+        application: :activerecord.models.application #g
+        expires_in: Verloopt in #g
+        refresh_token: Token vernieuwen #g
+        revoked_at: Ingetrokken om #g
+        scopes: scopes #g
+        token: blijk #g
 
       doorkeeper/application:
-        access_grants: Toegangssubsidies  #g
-        access_tokens: Toegangstokens  #g
-        authorized_applications: Geautoriseerde applicaties  #g
-        authorized_tokens: Geautoriseerde tokens  #g
-        can_send_stolen_notifications: Kan gestolen meldingen verzenden  #g
-        is_internal: Is intern  #g
-        name: Naam  #g
-        owner: :activerecord.models.owner  #g
-        owner_type: Eigenaar type  #g
-        redirect_uri: Stuur uri door  #g
-        scopes: scopes  #g
-        secret: Geheim  #g
-        uid: uid  #g
+        access_grants: Toegangssubsidies #g
+        access_tokens: Toegangstokens #g
+        authorized_applications: Geautoriseerde applicaties #g
+        authorized_tokens: Geautoriseerde tokens #g
+        can_send_stolen_notifications: Kan gestolen meldingen verzenden #g
+        is_internal: Is intern #g
+        name: Naam #g
+        owner: :activerecord.models.owner #g
+        owner_type: Eigenaar type #g
+        redirect_uri: Stuur uri door #g
+        scopes: scopes #g
+        secret: Geheim #g
+        uid: uid #g
 
       duplicate_bike_group:
-        added_bike_at: Fiets toegevoegd bij  #g
-        bikes: Bikes  #g
-        ignore: Negeren  #g
-        normalized_serial_segments: Genormaliseerde seriële segmenten  #g
+        added_bike_at: Fiets toegevoegd bij #g
+        bikes: Bikes #g
+        ignore: Negeren #g
+        normalized_serial_segments: Genormaliseerde seriële segmenten #g
 
       export:
-        file: het dossier  #g
-        file_format: Bestandsformaat  #g
-        kind: Soort  #g
-        options: opties  #g
-        organization: :activerecord.models.organization  #g
-        progress: Vooruitgang  #g
-        rows: rijen  #g
-        user: :activerecord.models.user  #g
+        file: het dossier #g
+        file_format: Bestandsformaat #g
+        kind: Soort #g
+        options: opties #g
+        organization: :activerecord.models.organization #g
+        progress: Vooruitgang #g
+        rows: rijen #g
+        user: :activerecord.models.user #g
 
       feedback:
-        body: Lichaam  #g
-        email: E-mail  #g
-        feedback_hash: Feedbackhash  #g
-        feedback_type: Soort feedback  #g
-        name: Naam  #g
-        title: Titel  #g
-        user: :activerecord.models.user  #g
+        body: Lichaam #g
+        email: E-mail #g
+        feedback_hash: Feedbackhash #g
+        feedback_type: Soort feedback #g
+        name: Naam #g
+        title: Titel #g
+        user: :activerecord.models.user #g
 
       flipper/adapters/active_record/feature:
-        key: Sleutel  #g
+        key: Sleutel #g
 
       flipper/adapters/active_record/gate:
-        feature_key: feature_key  #g
-        key: Sleutel  #g
-        value: Waarde  #g
+        feature_key: feature_key #g
+        key: Sleutel #g
+        value: Waarde #g
 
       front_gear_type:
-        bikes: Bikes  #g
-        count: tellen  #g
-        internal: intern  #g
-        name: Naam  #g
-        slug: Naaktslak  #g
-        standard: Standaard  #g
+        bikes: Bikes #g
+        count: tellen #g
+        internal: intern #g
+        name: Naam #g
+        slug: Naaktslak #g
+        standard: Standaard #g
 
       integration:
-        access_token: Toegangstoken  #g
-        information: Informatie  #g
-        provider_name: Provider naam  #g
-        user: :activerecord.models.user  #g
+        access_token: Toegangstoken #g
+        information: Informatie #g
+        provider_name: Provider naam #g
+        user: :activerecord.models.user #g
 
       invoice:
-        amount_due_cents: amount_due_cents  #g
-        amount_paid_cents: amount_paid_cents  #g
-        first_invoice: :activerecord.models.first_invoice  #g
-        force_active: Forceer actief  #g
-        invoice_paid_features: Factuur betaalde functies  #g
-        is_active: Is actief  #g
-        notes: notes  #g
-        organization: :activerecord.models.organization  #g
-        paid_features: Betaalde functies  #g
-        payments: betalingen  #g
-        subscription_end_at: subscription_end_at  #g
-        subscription_start_at: subscription_start_at  #g
+        amount_due_cents: amount_due_cents #g
+        amount_paid_cents: amount_paid_cents #g
+        first_invoice: :activerecord.models.first_invoice #g
+        force_active: Forceer actief #g
+        invoice_paid_features: Factuur betaalde functies #g
+        is_active: Is actief #g
+        notes: notes #g
+        organization: :activerecord.models.organization #g
+        paid_features: Betaalde functies #g
+        payments: betalingen #g
+        subscription_end_at: subscription_end_at #g
+        subscription_start_at: subscription_start_at #g
 
       invoice_paid_feature:
-        invoice: :activerecord.models.invoice  #g
-        paid_feature: :activerecord.models.paid_feature  #g
+        invoice: :activerecord.models.invoice #g
+        paid_feature: :activerecord.models.paid_feature #g
 
       listicle:
-        blog: :activerecord.models.blog  #g
-        body: body  #g
-        body_html: body_html  #g
-        crop_top_offset: crop_top_offset  #g
-        image: image  #g
-        image_credits: image_credits  #g
-        image_credits_html: image_credits_html  #g
-        image_height: image_height  #g
-        image_width: image_width  #g
-        list_order: list_order  #g
-        title: title  #g
+        blog: :activerecord.models.blog #g
+        body: body #g
+        body_html: body_html #g
+        crop_top_offset: crop_top_offset #g
+        image: image #g
+        image_credits: image_credits #g
+        image_credits_html: image_credits_html #g
+        image_height: image_height #g
+        image_width: image_width #g
+        list_order: list_order #g
+        title: title #g
 
       location:
-        bikes: Bikes  #g
-        city: stad  #g
-        country: :activerecord.models.country  #g
-        deleted_at: deleted_at  #g
-        email: email  #g
-        latitude: latitude  #g
-        longitude: longitude  #g
-        name: name  #g
-        organization: :activerecord.models.organization  #g
-        phone: phone  #g
-        shown: shown  #g
-        state: :activerecord.models.state  #g
-        street: street  #g
-        zipcode: Postcode  #g
+        bikes: Bikes #g
+        city: stad #g
+        country: :activerecord.models.country #g
+        deleted_at: deleted_at #g
+        email: email #g
+        latitude: latitude #g
+        longitude: longitude #g
+        name: name #g
+        organization: :activerecord.models.organization #g
+        phone: phone #g
+        shown: shown #g
+        state: :activerecord.models.state #g
+        street: street #g
+        zipcode: Postcode #g
 
       lock:
-        combination: Combinatie  #g
-        has_combination: Heeft combinatie  #g
-        has_key: Heeft sleutel  #g
-        key_serial: Key serial  #g
-        lock_model: Lock-model  #g
-        lock_type: :activerecord.models.lock_type  #g
-        manufacturer: :activerecord.models.manufacturer  #g
-        manufacturer_other: Fabrikant anders  #g
-        notes: Notes  #g
-        user: :activerecord.models.user  #g
+        combination: Combinatie #g
+        has_combination: Heeft combinatie #g
+        has_key: Heeft sleutel #g
+        key_serial: Key serial #g
+        lock_model: Lock-model #g
+        lock_type: :activerecord.models.lock_type #g
+        manufacturer: :activerecord.models.manufacturer #g
+        manufacturer_other: Fabrikant anders #g
+        notes: Notes #g
+        user: :activerecord.models.user #g
 
       lock_type:
-        name: name  #g
-        slug: slug  #g
+        name: name #g
+        slug: slug #g
 
       mail_snippet:
-        address: address  #g
-        body: body  #g
-        is_enabled: is_enabled  #g
-        is_location_triggered: is_location_triggered  #g
-        kind: kind  #g
-        latitude: latitude  #g
-        longitude: longitude  #g
-        name: name  #g
-        organization: :activerecord.models.organization  #g
-        proximity_radius: proximity_radius  #g
-        public_images: Openbare afbeeldingen  #g
+        address: address #g
+        body: body #g
+        is_enabled: is_enabled #g
+        is_location_triggered: is_location_triggered #g
+        kind: kind #g
+        latitude: latitude #g
+        longitude: longitude #g
+        name: name #g
+        organization: :activerecord.models.organization #g
+        proximity_radius: proximity_radius #g
+        public_images: Openbare afbeeldingen #g
 
       manufacturer:
-        bikes: Bikes  #g
-        close_year: close_year  #g
-        components: Components  #g
-        description: description  #g
-        frame_maker: frame_maker  #g
-        locks: sloten  #g
-        logo: logo  #g
-        logo_source: logo_source  #g
-        name: name  #g
-        notes: notes  #g
-        open_year: open_year  #g
-        paints: verven  #g
-        slug: slug  #g
-        total_years_active: total_years_active  #g
-        website: website  #g
+        bikes: Bikes #g
+        close_year: close_year #g
+        components: Components #g
+        description: description #g
+        frame_maker: frame_maker #g
+        locks: sloten #g
+        logo: logo #g
+        logo_source: logo_source #g
+        name: name #g
+        notes: notes #g
+        open_year: open_year #g
+        paints: verven #g
+        slug: slug #g
+        total_years_active: total_years_active #g
+        website: website #g
 
       membership:
-        deleted_at: deleted_at  #g
-        invited_email: invited_email  #g
-        organization: :activerecord.models.organization  #g
-        role: role  #g
-        user: :activerecord.models.user  #g
+        deleted_at: deleted_at #g
+        invited_email: invited_email #g
+        organization: :activerecord.models.organization #g
+        role: role #g
+        user: :activerecord.models.user #g
 
       normalized_serial_segment:
-        bike: :activerecord.models.bike  #g
-        duplicate_bike_group: :activerecord.models.duplicate_bike_group  #g
-        segment: segment  #g
+        bike: :activerecord.models.bike #g
+        duplicate_bike_group: :activerecord.models.duplicate_bike_group #g
+        segment: segment #g
 
       organization:
-        access_token: Toegangstoken  #g
-        api_access_approved: Api-toegang goedgekeurd  #g
-        approved: aangenomen  #g
-        ascend_name: Ga naar de naam  #g
-        auto_user: :activerecord.models.auto_user  #g
-        avatar: avatar  #g
-        b_params: B params  #g
-        bike_codes: Fietscodes  #g
-        bike_organizations: Fietsorganisaties  #g
-        bikes: Bikes  #g
-        child_organizations: Kinderorganisaties  #g
-        created_bikes: Gemaakt fietsen  #g
-        creation_states: Creatie staten  #g
-        deleted_at: Verwijderd om  #g
-        invoices: facturen  #g
-        is_paid: Is betaald  #g
-        is_suspended: Is geschorst  #g
-        kind: Soort  #g
-        landing_html: Bestemmings-html  #g
-        locations: locaties  #g
-        lock_show_on_map: Lock show op kaart  #g
-        mail_snippets: E-mailfragmenten  #g
-        memberships: lidmaatschappen  #g
-        name: Naam  #g
-        organization_invitations: Organisatie-uitnodigingen  #g
-        organization_messages: Organisatie berichten  #g
-        paid_feature_slugs: Betaalde kenmerkslakken  #g
-        parent_organization: :activerecord.models.parent_organization  #g
-        payments: betalingen  #g
-        pos_kind: Pos soort  #g
-        previous_slug: Vorige slak  #g
-        public_images: Openbare afbeeldingen  #g
-        recovered_records: Herstelde records  #g
-        registration_field_labels: Registratie veldlabels  #g
-        short_name: Korte naam  #g
-        show_on_map: Toon op kaart  #g
-        slug: Naaktslak  #g
-        users: gebruikers  #g
-        website: Website  #g
-
-      organization_invitation:
-        deleted_at: deleted_at  #g
-        invitee: :activerecord.models.invitee  #g
-        invitee_email: invitee_email  #g
-        invitee_name: invitee_name  #g
-        inviter: :activerecord.models.inviter  #g
-        membership_role: membership_role  #g
-        organization: :activerecord.models.organization  #g
-        redeemed: redeemed  #g
+        access_token: Toegangstoken #g
+        api_access_approved: Api-toegang goedgekeurd #g
+        approved: aangenomen #g
+        ascend_name: Ga naar de naam #g
+        auto_user: :activerecord.models.auto_user #g
+        avatar: avatar #g
+        b_params: B params #g
+        bike_codes: Fietscodes #g
+        bike_organizations: Fietsorganisaties #g
+        bikes: Bikes #g
+        child_organizations: Kinderorganisaties #g
+        created_bikes: Gemaakt fietsen #g
+        creation_states: Creatie staten #g
+        deleted_at: Verwijderd om #g
+        invoices: facturen #g
+        is_paid: Is betaald #g
+        is_suspended: Is geschorst #g
+        kind: Soort #g
+        landing_html: Bestemmings-html #g
+        locations: locaties #g
+        lock_show_on_map: Lock show op kaart #g
+        mail_snippets: E-mailfragmenten #g
+        memberships: lidmaatschappen #g
+        name: Naam #g
+        organization_messages: Organisatie berichten #g
+        paid_feature_slugs: Betaalde kenmerkslakken #g
+        parent_organization: :activerecord.models.parent_organization #g
+        payments: betalingen #g
+        pos_kind: Pos soort #g
+        previous_slug: Vorige slak #g
+        public_images: Openbare afbeeldingen #g
+        recovered_records: Herstelde records #g
+        registration_field_labels: Registratie veldlabels #g
+        short_name: Korte naam #g
+        show_on_map: Toon op kaart #g
+        slug: Naaktslak #g
+        users: gebruikers #g
+        website: Website #g
 
       organization_message:
-        accuracy: accuracy  #g
-        address: address  #g
-        bike: :activerecord.models.bike  #g
-        body: body  #g
-        delivery_status: delivery_status  #g
-        email: email  #g
-        kind: kind  #g
-        latitude: latitude  #g
-        longitude: longitude  #g
-        organization: :activerecord.models.organization  #g
-        sender: :activerecord.models.sender  #g
+        accuracy: accuracy #g
+        address: address #g
+        bike: :activerecord.models.bike #g
+        body: body #g
+        delivery_status: delivery_status #g
+        email: email #g
+        kind: kind #g
+        latitude: latitude #g
+        longitude: longitude #g
+        organization: :activerecord.models.organization #g
+        sender: :activerecord.models.sender #g
 
       other_listing:
-        bike: :activerecord.models.bike  #g
-        listing_type: listing_type  #g
-        url: url  #g
+        bike: :activerecord.models.bike #g
+        listing_type: listing_type #g
+        url: url #g
 
       ownership:
-        bike: :activerecord.models.bike  #g
-        claimed: claimed  #g
-        creator: :activerecord.models.creator  #g
-        current: current  #g
-        example: example  #g
-        owner_email: owner_email  #g
-        send_email: send_email  #g
-        user: :activerecord.models.user  #g
-        user_hidden: user_hidden  #g
+        bike: :activerecord.models.bike #g
+        claimed: claimed #g
+        creator: :activerecord.models.creator #g
+        current: current #g
+        example: example #g
+        owner_email: owner_email #g
+        send_email: send_email #g
+        user: :activerecord.models.user #g
+        user_hidden: user_hidden #g
 
       paid_feature:
-        amount_cents: amount_cents  #g
-        description: description  #g
-        details_link: details_link  #g
-        feature_slugs: feature_slugs  #g
-        invoice_paid_features: Factuur betaalde functies  #g
-        invoices: facturen  #g
-        kind: kind  #g
-        name: name  #g
+        amount_cents: amount_cents #g
+        description: description #g
+        details_link: details_link #g
+        feature_slugs: feature_slugs #g
+        invoice_paid_features: Factuur betaalde functies #g
+        invoices: facturen #g
+        kind: kind #g
+        name: name #g
 
       paint:
-        bikes: Bikes  #g
-        color: :activerecord.models.color  #g
-        manufacturer: :activerecord.models.manufacturer  #g
-        name: Naam  #g
-        secondary_color: :activerecord.models.secondary_color  #g
-        tertiary_color: :activerecord.models.tertiary_color  #g
+        bikes: Bikes #g
+        color: :activerecord.models.color #g
+        manufacturer: :activerecord.models.manufacturer #g
+        name: Naam #g
+        secondary_color: :activerecord.models.secondary_color #g
+        tertiary_color: :activerecord.models.tertiary_color #g
 
       payment:
-        amount_cents: amount_cents  #g
-        email: email  #g
-        first_payment_date: first_payment_date  #g
-        invoice: :activerecord.models.invoice  #g
-        is_current: is_current  #g
-        is_payment: is_payment  #g
-        is_recurring: is_recurring  #g
-        kind: kind  #g
-        last_payment_date: last_payment_date  #g
-        organization: :activerecord.models.organization  #g
-        user: :activerecord.models.user  #g
+        amount_cents: amount_cents #g
+        email: email #g
+        first_payment_date: first_payment_date #g
+        invoice: :activerecord.models.invoice #g
+        is_current: is_current #g
+        is_payment: is_payment #g
+        is_recurring: is_recurring #g
+        kind: kind #g
+        last_payment_date: last_payment_date #g
+        organization: :activerecord.models.organization #g
+        user: :activerecord.models.user #g
 
       public_image:
-        external_image_url: external_image_url  #g
-        image: image  #g
-        imageable: :activerecord.models.imageable  #g
-        imageable_type: imageable_type  #g
-        is_private: is_private  #g
-        listing_order: listing_order  #g
-        name: name  #g
+        external_image_url: external_image_url #g
+        image: image #g
+        imageable: :activerecord.models.imageable #g
+        imageable_type: imageable_type #g
+        is_private: is_private #g
+        listing_order: listing_order #g
+        name: name #g
 
       rear_gear_type:
-        bikes: Bikes  #g
-        count: count  #g
-        internal: internal  #g
-        name: name  #g
-        slug: slug  #g
-        standard: standard  #g
+        bikes: Bikes #g
+        count: count #g
+        internal: internal #g
+        name: name #g
+        slug: slug #g
+        standard: standard #g
 
       recovery_display:
-        date_recovered: date_recovered  #g
-        image: image  #g
-        link: link  #g
-        quote: quote  #g
-        quote_by: quote_by  #g
-        stolen_record: :activerecord.models.stolen_record  #g
+        date_recovered: date_recovered #g
+        image: image #g
+        link: link #g
+        quote: quote #g
+        quote_by: quote_by #g
+        stolen_record: :activerecord.models.stolen_record #g
 
       state:
-        abbreviation: Afkorting  #g
-        country: :activerecord.models.country  #g
-        locations: locaties  #g
-        name: Naam  #g
-        stolen_records: Gestolen records  #g
+        abbreviation: Afkorting #g
+        country: :activerecord.models.country #g
+        locations: locaties #g
+        name: Naam #g
+        stolen_records: Gestolen records #g
 
       stolen_notification:
-        bike: :activerecord.models.bike  #g
-        message: message  #g
-        receiver: :activerecord.models.receiver  #g
-        receiver_email: receiver_email  #g
-        reference_url: reference_url  #g
-        send_dates: send_dates  #g
-        sender: :activerecord.models.sender  #g
-        subject: subject  #g
+        bike: :activerecord.models.bike #g
+        message: message #g
+        receiver: :activerecord.models.receiver #g
+        receiver_email: receiver_email #g
+        reference_url: reference_url #g
+        send_dates: send_dates #g
+        sender: :activerecord.models.sender #g
+        subject: subject #g
 
       stolen_record:
-        approved: approved  #g
-        bike: :activerecord.models.bike  #g
-        can_share_recovery: can_share_recovery  #g
-        city: city  #g
-        country: :activerecord.models.country  #g
-        create_open311: create_open311  #g
-        creation_organization: :activerecord.models.creation_organization  #g
-        current: current  #g
-        current_bike: :activerecord.models.current_bike  #g
-        date_recovered: date_recovered  #g
-        date_stolen: date_stolen  #g
-        estimated_value: estimated_value  #g
-        index_helped_recovery: index_helped_recovery  #g
-        latitude: latitude  #g
-        lock_defeat_description: lock_defeat_description  #g
-        locking_description: locking_description  #g
-        longitude: longitude  #g
-        phone: phone  #g
-        phone_for_everyone: phone_for_everyone  #g
-        phone_for_police: phone_for_police  #g
-        phone_for_shops: phone_for_shops  #g
-        phone_for_users: phone_for_users  #g
-        police_report_department: police_report_department  #g
-        police_report_number: police_report_number  #g
-        proof_of_ownership: proof_of_ownership  #g
-        receive_notifications: receive_notifications  #g
-        recovered_description: recovered_description  #g
-        recovering_user: :activerecord.models.recovering_user  #g
-        recovery_display: :activerecord.models.recovery_display  #g
-        recovery_display_status: recovery_display_status  #g
-        recovery_link_token: recovery_link_token  #g
-        recovery_posted: recovery_posted  #g
-        recovery_share: recovery_share  #g
-        recovery_tweet: recovery_tweet  #g
-        secondary_phone: secondary_phone  #g
-        show_address: show_address  #g
-        state: :activerecord.models.state  #g
-        street: street  #g
-        theft_alerts: Diefstalwaarschuwingen  #g
-        theft_description: theft_description  #g
-        time: time  #g
-        tsved_at: tsved_at  #g
-        zipcode: zipcode  #g
+        approved: approved #g
+        bike: :activerecord.models.bike #g
+        can_share_recovery: can_share_recovery #g
+        city: city #g
+        country: :activerecord.models.country #g
+        create_open311: create_open311 #g
+        creation_organization: :activerecord.models.creation_organization #g
+        current: current #g
+        current_bike: :activerecord.models.current_bike #g
+        date_recovered: date_recovered #g
+        date_stolen: date_stolen #g
+        estimated_value: estimated_value #g
+        index_helped_recovery: index_helped_recovery #g
+        latitude: latitude #g
+        lock_defeat_description: lock_defeat_description #g
+        locking_description: locking_description #g
+        longitude: longitude #g
+        phone: phone #g
+        phone_for_everyone: phone_for_everyone #g
+        phone_for_police: phone_for_police #g
+        phone_for_shops: phone_for_shops #g
+        phone_for_users: phone_for_users #g
+        police_report_department: police_report_department #g
+        police_report_number: police_report_number #g
+        proof_of_ownership: proof_of_ownership #g
+        receive_notifications: receive_notifications #g
+        recovered_description: recovered_description #g
+        recovering_user: :activerecord.models.recovering_user #g
+        recovery_display: :activerecord.models.recovery_display #g
+        recovery_display_status: recovery_display_status #g
+        recovery_link_token: recovery_link_token #g
+        recovery_posted: recovery_posted #g
+        recovery_share: recovery_share #g
+        recovery_tweet: recovery_tweet #g
+        secondary_phone: secondary_phone #g
+        show_address: show_address #g
+        state: :activerecord.models.state #g
+        street: street #g
+        theft_alerts: Diefstalwaarschuwingen #g
+        theft_description: theft_description #g
+        time: time #g
+        tsved_at: tsved_at #g
+        zipcode: zipcode #g
 
       theft_alert:
-        begin_at: begin_at  #g
-        creator: :activerecord.models.creator  #g
-        end_at: end_at  #g
-        facebook_post_url: facebook_post_url  #g
-        notes: notes  #g
-        payment: :activerecord.models.payment  #g
-        status: status  #g
-        stolen_record: :activerecord.models.stolen_record  #g
-        theft_alert_plan: :activerecord.models.theft_alert_plan  #g
+        begin_at: begin_at #g
+        creator: :activerecord.models.creator #g
+        end_at: end_at #g
+        facebook_post_url: facebook_post_url #g
+        notes: notes #g
+        payment: :activerecord.models.payment #g
+        status: status #g
+        stolen_record: :activerecord.models.stolen_record #g
+        theft_alert_plan: :activerecord.models.theft_alert_plan #g
 
       theft_alert_plan:
-        active: active  #g
-        amount_cents: amount_cents  #g
-        description: description  #g
-        duration_days: duration_days  #g
-        name: name  #g
-        stolen_records: Gestolen records  #g
-        theft_alerts: Diefstalwaarschuwingen  #g
-        views: views  #g
+        active: active #g
+        amount_cents: amount_cents #g
+        description: description #g
+        duration_days: duration_days #g
+        name: name #g
+        stolen_records: Gestolen records #g
+        theft_alerts: Diefstalwaarschuwingen #g
+        views: views #g
 
       tweet:
-        alignment: alignment  #g
-        body_html: body_html  #g
-        image: image  #g
-        public_images: Openbare afbeeldingen  #g
-        twitter_response: twitter_response  #g
+        alignment: alignment #g
+        body_html: body_html #g
+        image: image #g
+        public_images: Openbare afbeeldingen #g
+        twitter_response: twitter_response #g
 
       user:
-        ambassador_task_assignments: Ambassador taakopdrachten  #g
-        ambassador_tasks: Ambassador-taken  #g
-        auth_token: Auth token  #g
-        avatar: avatar  #g
-        banned: verboden  #g
-        can_send_many_stolen_notifications: Kan veel gestolen meldingen verzenden  #g
-        city: stad  #g
-        confirmation_token: Bevestigingstoken  #g
-        confirmed: bevestigd  #g
-        country: :activerecord.models.country  #g
-        created_bikes: Gemaakt fietsen  #g
-        created_ownerships: Gemaakte eigendommen  #g
-        creation_states: Creatie staten  #g
-        current_ownerships: Huidige eigendommen  #g
-        currently_owned_bikes: Momenteel fietsen in eigendom  #g
-        description: Omschrijving  #g
-        developer: Ontwikkelaar  #g
-        email: E-mail  #g
-        integrations: integraties  #g
-        last_login: Laatste aanmelding  #g
-        latitude: Breedtegraad  #g
-        locks: sloten  #g
-        longitude: Lengtegraad  #g
-        memberships: lidmaatschappen  #g
-        my_bikes_hash: Mijn fietsen hasj  #g
-        name: Naam  #g
-        notification_newsletters: Meldingsnieuwsbrieven  #g
-        notification_unstolen: Melding ongedaan gemaakt  #g
-        oauth_applications: OAuth-applicaties  #g
-        organization_embeds: Organisatie instort  #g
-        organization_invitations: Organisatie-uitnodigingen  #g
-        organizations: organisaties  #g
-        owned_bikes: Eigen fietsen  #g
-        ownerships: eigendommen  #g
-        partner_data: Partner gegevens  #g
-        password: Wachtwoord  #g
-        password_digest: Wachtwoordoverzicht  #g
-        password_reset_token: Wachtwoordherstel-token  #g
-        payments: betalingen  #g
-        phone: Telefoon  #g
-        preferred_language: Voorkeurstaal  #g
-        received_stolen_notifications: Gestolen meldingen ontvangen  #g
-        sent_stolen_notifications: Verzonden gestolen meldingen  #g
-        show_bikes: Toon fietsen  #g
-        show_phone: Toon telefoon  #g
-        show_twitter: Laat twitter zien  #g
-        show_website: Toon website  #g
-        state: :activerecord.models.state  #g
-        street: Straat  #g
-        subscriptions: abonnementen  #g
-        superuser: Super gebruiker  #g
-        terms_of_service: Servicevoorwaarden  #g
-        title: Titel  #g
-        twitter: tjilpen  #g
-        user_emails: Gebruikersmails  #g
-        username: Gebruikersnaam  #g
-        vendor_terms_of_service: Servicevoorwaarden van de leverancier  #g
-        website: Website  #g
-        when_vendor_terms_of_service: Wanneer de servicevoorwaarden van de leverancier  #g
-        zipcode: Postcode  #g
+        ambassador_task_assignments: Ambassador taakopdrachten #g
+        ambassador_tasks: Ambassador-taken #g
+        auth_token: Auth token #g
+        avatar: avatar #g
+        banned: verboden #g
+        can_send_many_stolen_notifications: Kan veel gestolen meldingen verzenden #g
+        city: stad #g
+        confirmation_token: Bevestigingstoken #g
+        confirmed: bevestigd #g
+        country: :activerecord.models.country #g
+        created_bikes: Gemaakt fietsen #g
+        created_ownerships: Gemaakte eigendommen #g
+        creation_states: Creatie staten #g
+        current_ownerships: Huidige eigendommen #g
+        currently_owned_bikes: Momenteel fietsen in eigendom #g
+        description: Omschrijving #g
+        developer: Ontwikkelaar #g
+        email: E-mail #g
+        integrations: integraties #g
+        last_login: Laatste aanmelding #g
+        latitude: Breedtegraad #g
+        locks: sloten #g
+        longitude: Lengtegraad #g
+        memberships: lidmaatschappen #g
+        my_bikes_hash: Mijn fietsen hasj #g
+        name: Naam #g
+        notification_newsletters: Meldingsnieuwsbrieven #g
+        notification_unstolen: Melding ongedaan gemaakt #g
+        oauth_applications: OAuth-applicaties #g
+        organization_embeds: Organisatie instort #g
+        organizations: organisaties #g
+        owned_bikes: Eigen fietsen #g
+        ownerships: eigendommen #g
+        partner_data: Partner gegevens #g
+        password: Wachtwoord #g
+        password_digest: Wachtwoordoverzicht #g
+        password_reset_token: Wachtwoordherstel-token #g
+        payments: betalingen #g
+        phone: Telefoon #g
+        preferred_language: Voorkeurstaal #g
+        received_stolen_notifications: Gestolen meldingen ontvangen #g
+        sent_stolen_notifications: Verzonden gestolen meldingen #g
+        show_bikes: Toon fietsen #g
+        show_phone: Toon telefoon #g
+        show_twitter: Laat twitter zien #g
+        show_website: Toon website #g
+        state: :activerecord.models.state #g
+        street: Straat #g
+        subscriptions: abonnementen #g
+        superuser: Super gebruiker #g
+        terms_of_service: Servicevoorwaarden #g
+        title: Titel #g
+        twitter: tjilpen #g
+        user_emails: Gebruikersmails #g
+        username: Gebruikersnaam #g
+        vendor_terms_of_service: Servicevoorwaarden van de leverancier #g
+        website: Website #g
+        when_vendor_terms_of_service: Wanneer de servicevoorwaarden van de leverancier #g
+        zipcode: Postcode #g
 
       user_email:
-        confirmation_token: confirmation_token  #g
-        email: email  #g
-        old_user: :activerecord.models.old_user  #g
-        user: :activerecord.models.user  #g
+        confirmation_token: confirmation_token #g
+        email: email #g
+        old_user: :activerecord.models.old_user #g
+        user: :activerecord.models.user #g
 
       wheel_size:
-        bikes: Bikes  #g
-        description: Omschrijving  #g
-        iso_bsd: Iso bsd  #g
-        name: Naam  #g
-        priority: Prioriteit  #g
+        bikes: Bikes #g
+        description: Omschrijving #g
+        iso_bsd: Iso bsd #g
+        name: Naam #g
+        priority: Prioriteit #g
 
   welcome:
     index:

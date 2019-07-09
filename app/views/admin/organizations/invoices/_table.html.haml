@@ -26,15 +26,16 @@
         - else
           End
       %th
-        - if render_sortable
-          = sortable "amount_due_cents", "$ Due"
-        - else
-          $ Due
+        %small
+          - if render_sortable
+            = sortable "amount_due_cents", "$ Due"
+          - else
+            $&nbsp;Due
       %th
         - if render_sortable
           = sortable "amount_paid_cents", "$ Paid"
         - else
-          $ paid
+          $&nbsp;paid
       %th
         Discount
       %th

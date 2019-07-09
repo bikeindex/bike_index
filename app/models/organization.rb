@@ -32,7 +32,6 @@ class Organization < ActiveRecord::Base
   has_many :memberships, dependent: :destroy
   has_many :mail_snippets
   has_many :users, through: :memberships
-  has_many :organization_invitations, dependent: :destroy
   has_many :organization_messages
   has_many :bike_organizations
   has_many :bikes, through: :bike_organizations

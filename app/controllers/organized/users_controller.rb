@@ -7,7 +7,7 @@ module Organized
     def index
       page = params[:page] || 1
       per_page = params[:per_page] || 25
-      @memberships = matching_memberships.reorder("memberships.#{sort_column} #{sort_direction}")
+      @memberships = matching_memberships.includes(:user, :sender).reorder("memberships.#{sort_column} #{sort_direction}")
                                          .page(page).per(per_page)
     end
 
@@ -63,7 +63,7 @@ module Organized
     end
 
     def matching_memberships
-      memberships = current_organization.memberships
+      current_organization.memberships
     end
 
     def current_index_path

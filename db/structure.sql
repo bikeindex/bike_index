@@ -1452,44 +1452,6 @@ ALTER SEQUENCE public.oauth_applications_id_seq OWNED BY public.oauth_applicatio
 
 
 --
--- Name: organization_invitations; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.organization_invitations (
-    id integer NOT NULL,
-    invitee_email character varying(255),
-    invitee_name character varying(255),
-    invitee_id integer,
-    organization_id integer,
-    inviter_id integer,
-    redeemed boolean,
-    membership_role character varying(255) DEFAULT 'member'::character varying,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    deleted_at timestamp without time zone
-);
-
-
---
--- Name: organization_invitations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.organization_invitations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: organization_invitations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.organization_invitations_id_seq OWNED BY public.organization_invitations.id;
-
-
---
 -- Name: organization_messages; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2536,13 +2498,6 @@ ALTER TABLE ONLY public.oauth_applications ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
--- Name: organization_invitations id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.organization_invitations ALTER COLUMN id SET DEFAULT nextval('public.organization_invitations_id_seq'::regclass);
-
-
---
 -- Name: organization_messages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2969,14 +2924,6 @@ ALTER TABLE ONLY public.oauth_access_tokens
 
 ALTER TABLE ONLY public.oauth_applications
     ADD CONSTRAINT oauth_applications_pkey PRIMARY KEY (id);
-
-
---
--- Name: organization_invitations organization_invitations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.organization_invitations
-    ADD CONSTRAINT organization_invitations_pkey PRIMARY KEY (id);
 
 
 --
@@ -3472,13 +3419,6 @@ CREATE INDEX index_oauth_applications_on_owner_id_and_owner_type ON public.oauth
 --
 
 CREATE UNIQUE INDEX index_oauth_applications_on_uid ON public.oauth_applications USING btree (uid);
-
-
---
--- Name: index_organization_invitations_on_organization_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_organization_invitations_on_organization_id ON public.organization_invitations USING btree (organization_id);
 
 
 --
@@ -4438,4 +4378,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190703194554');
 INSERT INTO schema_migrations (version) VALUES ('20190705230020');
 
 INSERT INTO schema_migrations (version) VALUES ('20190708181605');
+
+INSERT INTO schema_migrations (version) VALUES ('20190709011902');
 

@@ -12,7 +12,7 @@
       = number_with_delimiter current_organization.remaining_invitation_count
       more
     - if current_organization.remaining_invitation_count > 0
-      = link_to "Invite another user", new_organization_user_path(organization_id: current_organization.to_param)
+      = link_to "Invite more users", new_organization_user_path(organization_id: current_organization.to_param)
   %p
     - if current_organization.auto_user.present?
       Emails are currently sent from <em>#{current_organization.auto_user.email}</em>. #{ link_to 'Update email', organization_manage_index_path(organization_id: current_organization.to_param) }
@@ -38,10 +38,8 @@
       - @memberships.each do |membership|
         %tr
           %td
-            %span.convertTime
+            %a.convertTime{ href: edit_organization_user_path(membership.id, organization_id: current_organization.to_param) }
               = l membership.created_at, format: :convert_time
-            %small.less-strong
-              = membership.id
           %td
             = membership.invited_display_name
             %small.less-strong.d-none.d-lg-inline-block
