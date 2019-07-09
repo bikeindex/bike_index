@@ -44,7 +44,6 @@ nl:
       membership: Lidmaatschap #g
       normalized_serial_segment: Genormaliseerd serieel segment #g
       organization: Organisatie #g
-      organization_invitation: Organisatie uitnodiging #g
       organization_message: Organisatie bericht #g
       other_listing: Andere aanbieding #g
       ownership: Eigendom #g
@@ -574,16 +573,6 @@ nl:
         slug: Naaktslak #g
         users: gebruikers #g
         website: Website #g
-
-      organization_invitation:
-        deleted_at: deleted_at #g
-        invitee: :activerecord.models.invitee #g
-        invitee_email: invitee_email #g
-        invitee_name: invitee_name #g
-        inviter: :activerecord.models.inviter #g
-        membership_role: membership_role #g
-        organization: :activerecord.models.organization #g
-        redeemed: redeemed #g
 
       organization_message:
         accuracy: accuracy #g

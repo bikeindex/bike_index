@@ -260,7 +260,6 @@ es:
       membership: Afiliación #g
       normalized_serial_segment: Segmento serial normalizado #g
       organization: Organización #g
-      organization_invitation: Invitación a la organización #g
       organization_message: Mensaje de organizacion #g
       other_listing: Otro listado #g
       ownership: Propiedad #g
@@ -790,16 +789,6 @@ es:
         slug: Babosa #g
         users: Usuarios #g
         website: Sitio web #g
-
-      organization_invitation:
-        deleted_at: Eliminado en #g
-        invitee: :activerecord.models.invitee #g
-        invitee_email: Email del invitado #g
-        invitee_name: Nombre del invitado #g
-        inviter: :activerecord.models.inviter #g
-        membership_role: Rol de membresía #g
-        organization: :activerecord.models.organization #g
-        redeemed: Redimidos #g
 
       organization_message:
         accuracy: Exactitud #g
