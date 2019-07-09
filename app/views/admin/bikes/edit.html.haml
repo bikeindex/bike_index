@@ -153,49 +153,61 @@
       Edit Stolen Record
     = f.fields_for :stolen_records do |s|
       - next unless s.object.current
-      .row
-        .col-md-4.col-lg-3
-          #stolen-bike-location.form-group.fancy-select.unfancy
-            #country_select_container
-              = label :country, "Country"
-              = s.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country")
-              %p.d-none
-                = Country.united_states.id
-        .col-md-4.col-lg-3
-          = label :street, "Intersection or address"
-          = s.text_field :street, placeholder: "Intersection or address", class: "form-control"
-        .col-md-4.col-lg-3
-          = label :city, "City"
-          = s.text_field :city, placeholder: "City", class: "form-control"
-        .col-md-4.col-lg-3
-          = label :zipcode, "Zipcode"
-          = s.text_field :zipcode, placeholder: "Zipcode", class: "form-control"
-        .col-md-4.col-lg-3.fancy-select.unfancy
-          = label :state, "State"
-          = s.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State" )
-        .col-md-4.col-lg-3
+      .row.mt-4
+        .col-md-4
+          .row
+            #stolen-bike-location.form-group.fancy-select.unfancy.col-6
+              #country_select_container
+                = label :country, "Country"
+                = s.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country")
+                %p.d-none
+                  = Country.united_states.id
+            .form-group.fancy-select.unfancy.col-6
+              = s.label :state, "State"
+              = s.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State")
           .form-group
-            = label :theft_description, "Theft description"
+            = label :street, "Intersection or address"
+            = s.text_field :street, placeholder: "Intersection or address", class: "form-control"
+          .row
+            .col-6.form-group
+              = label :city, "City"
+              = s.text_field :city, placeholder: "City", class: "form-control"
+            .col-6.form-group
+              = label :zipcode, "Zipcode"
+              = s.text_field :zipcode, placeholder: "Zipcode", class: "form-control"
+
+        .col-md-8
+          .form-group
+            = s.label :theft_description, "Theft description"
             = s.text_area :theft_description, placeholder: "Theft Description", class: "form-control"
-        .col-md-4.col-lg-3
-          .form-group
-            = f.label :estimated_value, "Estimated value"
-            = s.number_field :estimated_value, class: "form-control"
-        .col-md-4.col-lg-3
-          .form-group#stolen-check-box
-            = f.label :stolen, "Bike is stolen"
-            = f.check_box :stolen
-          #admin-recovery-fields{style: "display: none"}
-            .input-group
-              .form-group.large-text
-                = label :mark_recovered_reason, "How was it recovered"
-                #recovery_descr
-                  = text_area_tag :mark_recovered_reason, nil, rows: 3
-            .input-group
-              .form-group
-                = label :mark_recovered_we_helped, "Did the bike index help?"
+          .row
+            .col-6.form-group
+              = s.label :police_report_department
+              = s.text_field :police_report_department, class: "form-control"
+            .col-6.form-group
+              = s.label :police_report_number
+              = s.text_field :police_report_number, class: "form-control"
+          .row
+            .col-6.form-group
+              = s.label :estimated_value, "Estimated value"
+              = s.number_field :estimated_value, class: "form-control"
+            .col-6.form-group#stolenCheckBox
+              = f.label :stolen do
+                = f.check_box :stolen
+                Bike is stolen
+      #adminRecoveryFields.collapse
+        %hr
+        .row
+          .col-md-6
+            .form-group
+              = label :mark_recovered_reason, "How was it recovered"
+              = text_area_tag :mark_recovered_reason, nil, rows: 3, class: "form-control"
+          .col-md-6
+            .form-group
+              = label_tag :mark_recovered_we_helped do
                 = check_box_tag :mark_recovered_we_helped, true
-            .input-group
-              .form-group
-                = label :can_share_recovery, "Can Share"
+                Did Bike Index help?
+            .form-group
+              = label_tag :can_share_recovery do
                 = check_box_tag :can_share_recovery, true
+                Can Share
