@@ -37,12 +37,22 @@ module Organized
         redirect_to current_index_path and return
       end
       @membership = Membership.new(permitted_create_params)
-      if @membership.save
-        flash[:success] = "#{@membership.invited_email} was invited to #{current_organization.name}!"
-        redirect_to current_index_path
+      if params[:multiple_emails_invited].present?
+        if multiple_emails_invited.count > current_organization.remaining_invitation_count
+          flash[:error] = "You tried to invite #{multiple_emails_invited.count} users, but #{current_organization.name} only can invite *#{current_organization.remaining_invitation_count} more*. Invite fewer or contact support"
+          render :new
+        else
+          flash[:success] = "#{multiple_emails_invited.count} users invited to #{current_organization.name}"
+          multiple_emails_invited.each { |email| Membership.create(permitted_create_params.merge(invited_email: email)) }
+          redirect_to current_index_path and return
+        end
       else
-        flash[:error] = "Whoops! Looks like we're missing some information"
-        render :new
+        if @membership.save
+          flash[:success] = "#{@membership.invited_email} was invited to #{current_organization.name}!"
+          redirect_to current_index_path
+        else
+          render :new
+        end
       end
     end
 
@@ -69,6 +79,10 @@ module Organized
         flash[:error] = "Sorry, you can't remove yourself from the organization. Contact us at support@bikeindex.org if this is problematic."
         redirect_to organization_users_path(organization_id: current_organization) and return
       end
+    end
+
+    def multiple_emails_invited
+      params[:multiple_emails_invited].split(/\s+/).flatten.reject(&:blank?).uniq
     end
 
     def permitted_update_params

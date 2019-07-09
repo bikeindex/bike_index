@@ -203,6 +203,37 @@ RSpec.describe Organized::UsersController, type: :controller do
           expect(flash[:error]).to be_present
         end
       end
+      context "multiple invitations, more than available" do
+        let(:multiple_emails_invited) { %w[stuff@stuff.com stuff@stuff2.com stuff@stuff.com stuff3@stuff.com stuff4@stuff.com stuff5@stuff.com stuff6@stuff.com] }
+        it "renders error, doesn't create any" do
+          Sidekiq::Testing.inline! do
+            ActionMailer::Base.deliveries = []
+            expect(organization.remaining_invitation_count).to eq 4
+            expect do
+              put :create, organization_id: organization.to_param,
+                           membership: membership_params,
+                           multiple_emails_invited: multiple_emails_invited.join("\n")
+            end.to_not change(Membership, :count)
+          end
+        end
+      end
+      context "multiple invitations" do
+        let(:multiple_emails_invited) { %w[stuff@stuff.com  stuff@stuff2.com stuff@stuff.com stuff3@stuff.com stuff4@stuff.com stuff4@stuff.com stuff4@stuff.com] }
+        let(:target_invited_emails) { %w[stuff@stuff.com  stuff@stuff2.com stuff3@stuff.com stuff4@stuff.com] + [user.email] }
+        it "invites, dedupes" do
+          ActionMailer::Base.deliveries = []
+          expect(organization.remaining_invitation_count).to eq 4
+          expect do
+            put :create, organization_id: organization.to_param,
+                         membership: membership_params,
+                         multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
+          end.to change(Membership, :count).by 4
+          organization.reload
+          expect(organization.remaining_invitation_count).to eq 0
+          expect(organization.sent_invitation_count).to eq 5
+          expect(organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
+        end
+      end
     end
   end
 end
