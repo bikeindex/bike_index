@@ -15,6 +15,7 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def show
+    redirect_to edit_admin_membership_path
   end
 
   def new

@@ -2,25 +2,35 @@
   %h1
     Invite user
   %p
-    You have invited
+    You have invited:
     %strong
-      #{ pluralize(current_organization.sent_invitation_count, 'user') },
-    %br
-    And can add
+      = number_with_delimiter(current_organization.sent_invitation_count)
+      = "user".pluralize(current_organization.sent_invitation_count)
+  %p
+    You can add
     %strong
-      #{current_organization.available_invitation_count} more.
+      = number_with_delimiter current_organization.remaining_invitation_count
+      more
 
-= form_for @organization_invitation, { as: :organization_invitation, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
-
-  .form-group.row
-    = f.label :invitee_email, "Email you're inviting", class: 'org-form-label'
+= form_for @membership, { as: :membership, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
+  - if @membership.errors.any?
+    = render partial: "/shared/errors", locals: { name: "Membership", obj: @membership }
+  - display_multi_invite = params[:multiple_emails_invited].present?
+  .form-group.row#singleEmailInvite{ class: display_multi_invite ? "currently-hidden" : "" }
+    = f.label :invited_email, "Email you're inviting", class: "org-form-label"
     .col-sm-4
-      = f.email_field :invitee_email, required: true, class: 'form-control'
-
-  .form-group.row
-    = f.label :invitee_name, 'Name', class: 'org-form-label'
-    .col-sm-4
-      = f.text_field :invitee_name, required: true, class: 'form-control'
+      = f.email_field :invited_email, class: "form-control"
+      .below-input-help
+        %a#multipleUserSelect{ href: "#" }
+          Invite multiple emails
+  .form-group.row#multipleEmailInvite{ class: display_multi_invite ? "" : "currently-hidden" }
+    = label_tag :multiple_emails_invited, class: "org-form-label" do
+      Multiple emails
+      %br
+      %em.small
+        1 email per line
+    .col-sm-4#multipleEmailInviteField{ class: display_multi_invite ? "" : "currently-hidden" }
+      = text_area_tag :multiple_emails_invited, params[:multiple_emails_invited], placeholder: "example@example.com\nexample2@example.com\nexample3@example.com", rows: 4, class: "form-control"
 
   .form-group.row
     %label.org-form-label
@@ -28,14 +38,15 @@
     .col-sm-4
       .radio
         %label
-          = f.radio_button :membership_role, Membership.membership_types.first
+          = f.radio_button :role, Membership.membership_types.first
           Admin of organization
       .radio
         %label
-          = f.radio_button :membership_role, Membership.membership_types.second
+          = f.radio_button :role, Membership.membership_types.second
           Member of organization
 
   .form-group.row
     .form-submit-button
       = f.submit 'Send invitation', class: 'btn btn-success btn-lg'
 
+= javascript_pack_tag "application"

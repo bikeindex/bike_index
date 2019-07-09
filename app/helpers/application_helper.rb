@@ -66,8 +66,6 @@ module ApplicationHelper
       elsif action_name == "show" && link_text == "Go hard"
         class_name = "active"
       end
-    elsif controller_name == "organization_invitations" && link_text == "Invitations"
-      class_name = "active"
     elsif controller_name == "payments"
       if action_name == "invoices"
         class_name = "active" if link_text == "Invoices"

@@ -15,14 +15,9 @@ class OrganizationInvitation < ActiveRecord::Base
   default_scope { order(:created_at) }
   scope :unclaimed, -> { where(redeemed: nil) }
 
-  after_create :enqueue_notification_job
-  after_create :if_user_exists_assign
+  before_validation :set_calculated_attributes
 
   def redeemed?; redeemed end
-
-  def enqueue_notification_job
-    EmailOrganizationInvitationWorker.perform_async(id)
-  end
 
   def if_user_exists_assign
     user = User.fuzzy_email_find(self.invitee_email)
@@ -31,13 +26,9 @@ class OrganizationInvitation < ActiveRecord::Base
     end
   end
 
-  before_save :normalize_email
-
-  def normalize_email
+  def set_calculated_attributes
     self.invitee_email = EmailNormalizer.normalize(invitee_email)
   end
-
-  after_create :update_organization_invitation_counts
 
   def update_organization_invitation_counts
     org = organization

@@ -4,12 +4,11 @@ RSpec.describe Organized::MessagesController, type: :request do
   include_context :geocoder_default_location
   include_context :organization_with_geolocated_messages
   let(:base_url) { "/o/#{organization.to_param}/messages" }
-  # Request specs don't have cookies so we need to stub stuff if we're in request specs
-  # This is suboptimal, but hey, it gets us to request specs for now
-  before { allow(User).to receive(:from_auth) { user } }
+
+  include_context :request_spec_logged_in_as_user
 
   describe "messages root" do
-    let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
     it "renders" do
       get base_url, json_headers
       expect(response.status).to eq(200)

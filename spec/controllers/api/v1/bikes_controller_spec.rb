@@ -22,7 +22,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
       stole2 = FactoryBot.create(:stolen_record, approved: true)
       organization = FactoryBot.create(:organization)
       user = FactoryBot.create(:user)
-      FactoryBot.create(:membership, user: user, organization: organization)
+      FactoryBot.create(:membership_claimed, user: user, organization: organization)
       options = { stolen: true, organization_slug: organization.slug, access_token: organization.access_token }
       get :stolen_ids, options.as_json
       expect(response.code).to eq("200")
@@ -108,7 +108,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
       before :each do
         @organization = FactoryBot.create(:organization)
         user = FactoryBot.create(:user)
-        FactoryBot.create(:membership, user: user, organization: @organization)
+        FactoryBot.create(:membership_claimed, user: user, organization: @organization)
         @organization.save
       end
 
@@ -296,7 +296,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         FactoryBot.create(:color, name: "Black")
         org = FactoryBot.create(:organization, name: "Example organization")
         user = FactoryBot.create(:user)
-        FactoryBot.create(:membership, user: user, organization: org)
+        FactoryBot.create(:membership_claimed, user: user, organization: org)
         manufacturer = FactoryBot.create(:manufacturer)
         org.save
         bike_attrs = {

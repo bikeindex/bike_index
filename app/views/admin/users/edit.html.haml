@@ -111,14 +111,12 @@
           %td
             - if task.completed_at
               %span.convertTime= l task.completed_at, format: :convert_time
-.mt-4
 .row.mt-4
   .col-md-6
     %h4
       User has #{ pluralize(@bikescount, "bike") }
-  - if @bikescount > 10
-    .col-md-6.mt-auto
-      = link_to "Show all bikes", admin_bikes_path(search_user_id: @user.id), class: "float-right"
+  .col-md-6.text-right
+    = link_to "Show all user bikes", admin_bikes_path(search_user_id: @user.id)
 
 = render partial: "admin/bikes/table", locals: { bikes: @bikes }
 
@@ -143,37 +141,14 @@
         %td
           = "&#x2713;".html_safe if payment.is_payment
 
+.row
+  .col-md-6
+    %h4.mt-4
+      = @user.memberships.count
+      Memberships
 - if @user.memberships.count > 0
-  %h4.mt-4
-    = @user.memberships.count
-    Current memberships
-  .full-screen-table
-    %table.table.table-striped.table-bordered.table-sm
-      %thead.thead-light
-        %th
-          Id&nbsp;
-        %th.d-none.d-lg-table-cell
-          Created&nbsp;<small class="convertTimezone"></small>
-        %th
-          Email
-        %th
-          Organization
-        %th.d-none.d-xl-table-cell
-          Management links
-      %tbody
-        - @user.memberships.each do |membership|
-          %tr
-            %td
-              = link_to membership.id, admin_membership_url(membership)
-            %td.d-none.d-lg-table-cell
-              %span.convertTime
-                = l membership.created_at, format: :convert_time
-            %td
-              = membership.user.email
-            %td
-              = link_to membership.organization.name, admin_organization_path(membership.organization)
-            %td.d-none.d-xl-table-cell
-              #{link_to 'Edit', edit_admin_membership_url(membership)}
+  = render partial: "/admin/memberships/table", locals: { memberships: @user.memberships }
+
 
 - if @user.user_emails.count > 1
   %h2 User emails

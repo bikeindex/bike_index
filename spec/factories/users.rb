@@ -5,6 +5,8 @@ FactoryBot.define do
     password { "testthisthing7$" }
     password_confirmation { "testthisthing7$" }
     terms_of_service { true }
+    after(:create) { |u| u.perform_create_jobs } # TODO: Rails 5 update - this is an after_commit issue
+
     factory :user_confirmed do
       after(:create) { |u| u.confirm(u.confirmation_token) }
       factory :user_bikehub_signup do
@@ -31,18 +33,18 @@ FactoryBot.define do
 
         factory :organization_member do
           after(:create) do |user, evaluator|
-            FactoryBot.create(:membership, user: user, organization: evaluator.organization)
+            FactoryBot.create(:membership_claimed, user: user, organization: evaluator.organization)
           end
         end
         factory :organization_auto_user do
           after(:create) do |user, evaluator|
-            FactoryBot.create(:membership, user: user, organization: evaluator.organization)
+            FactoryBot.create(:membership_claimed, user: user, organization: evaluator.organization)
             evaluator.organization.update_attribute :auto_user_id, user.id
           end
         end
         factory :organization_admin do
           after(:create) do |user, evaluator|
-            FactoryBot.create(:membership, user: user, organization: evaluator.organization, role: "admin")
+            FactoryBot.create(:membership_claimed, user: user, organization: evaluator.organization, role: "admin")
           end
         end
       end

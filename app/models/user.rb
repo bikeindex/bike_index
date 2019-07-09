@@ -16,6 +16,7 @@ class User < ActiveRecord::Base
   has_many :payments
   has_many :subscriptions, -> { subscription }, class_name: "Payment"
   has_many :memberships, dependent: :destroy
+  has_many :sent_memberships, class_name: "Membership", foreign_key: :sender_id
   has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
   has_many :organizations, through: :memberships
   has_many :ownerships, dependent: :destroy
@@ -34,8 +35,6 @@ class User < ActiveRecord::Base
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
 
-  has_many :organization_invitations, class_name: "OrganizationInvitation", inverse_of: :inviter
-  has_many :organization_invitations, class_name: "OrganizationInvitation", inverse_of: :invitee
   belongs_to :state
   belongs_to :country
 
@@ -67,7 +66,7 @@ class User < ActiveRecord::Base
   before_validation :normalize_attributes
   validate :ensure_unique_email
   before_create :generate_username_confirmation_and_auth
-  after_create :perform_create_jobs
+  after_commit :perform_create_jobs, on: :create
   before_save :set_calculated_attributes
 
   attr_accessor :skip_geocode
@@ -214,12 +213,12 @@ class User < ActiveRecord::Base
 
   def member_of?(organization)
     return false unless organization.present?
-    Membership.where(user_id: id, organization_id: organization.id).present? || superuser?
+    Membership.claimed.where(user_id: id, organization_id: organization.id).present? || superuser?
   end
 
   def admin_of?(organization)
     return false unless organization.present?
-    Membership.where(user_id: id, organization_id: organization.id, role: "admin").present? || superuser?
+    Membership.claimed.where(user_id: id, organization_id: organization.id, role: "admin").present? || superuser?
   end
 
   def has_membership?

@@ -7,7 +7,7 @@ module RequestSpecHelpers
   end
 
   RSpec.shared_context :request_spec_logged_in_as_user do
-    let(:current_user) { FactoryBot.create(:user) }
+    let(:current_user) { FactoryBot.create(:user_confirmed) }
     before { log_in(current_user) }
   end
 

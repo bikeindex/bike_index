@@ -180,7 +180,7 @@ RSpec.describe "Bikes API V2", type: :request do
     it "creates a stolen bike through an organization and uses the passed phone" do
       organization = FactoryBot.create(:organization)
       user.update_attribute :phone, "0987654321"
-      FactoryBot.create(:membership, user: user, organization: organization)
+      FactoryBot.create(:membership_claimed, user: user, organization: organization)
       FactoryBot.create(:country, iso: "US")
       FactoryBot.create(:state, abbreviation: "NY")
       organization.save
@@ -256,7 +256,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "also sets front wheel bsd" do
-      FactoryBot.create(:membership, user: user, organization: organization, role: "admin")
+      FactoryBot.create(:membership_claimed, user: user, organization: organization, role: "admin")
       organization.save
       wheel_size_2 = FactoryBot.create(:wheel_size, iso_bsd: 622)
       additional_attrs = {
@@ -276,7 +276,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "creates a bike for organization with v2_accessor" do
-      FactoryBot.create(:membership, user: user, organization: organization, role: "admin")
+      FactoryBot.create(:membership_claimed, user: user, organization: organization, role: "admin")
       organization.save
       post tokenized_url, bike_attrs.to_json, json_headers
       result = json_result["bike"]
@@ -295,7 +295,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "doesn't create a bike without an organization with v2_accessor" do
-      FactoryBot.create(:membership, user: user, organization: organization, role: "admin")
+      FactoryBot.create(:membership_claimed, user: user, organization: organization, role: "admin")
       organization.save
       bike_attrs.delete(:organization_slug)
       post tokenized_url, bike_attrs.to_json, json_headers

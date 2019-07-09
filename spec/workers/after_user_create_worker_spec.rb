@@ -110,16 +110,46 @@ RSpec.describe AfterUserCreateWorker, type: :job do
   end
 
   describe "associate_membership_invites" do
-    let!(:organization_invitation) { FactoryBot.create(:organization_invitation, invitee_email: " #{user.email.upcase}") }
+    let!(:membership) { FactoryBot.create(:membership, invited_email: " #{user.email.upcase}") }
+    let!(:membership2) { FactoryBot.create(:membership, invited_email: " #{user.email.upcase}") }
     let(:user) { FactoryBot.build(:user, email: "owner1@A.COM") }
     it "assigns any organization invitations that match the user email, and mark user confirmed if invited" do
-      user.save
-      expect(organization_invitation.created_at < user.created_at).to be_truthy
-      # This is called on create, so we just test that things happen correctly here
-      # Rather than stubbing stuff out - and to ensure that this actually happens inline
+      membership.reload
+      expect(membership.claimed?).to be_falsey
+      Sidekiq::Testing.inline! do
+        user.save
+        user.perform_create_jobs
+      end
       user.reload
-      expect(user.memberships.count).to eq 1
+      expect(membership.created_at < user.created_at).to be_truthy
+      # This is called on create, so we just test that things happen correctly here
+      membership.reload
+      membership2.reload
       expect(user.confirmed?).to be_truthy
+      expect(membership.claimed?).to be_truthy
+      expect(membership2.claimed?).to be_truthy
+      expect(membership.user).to eq user
+      expect(user.memberships.count).to eq 2
+      expect(user.organizations.count).to eq 2
+    end
+
+    # We are processing the first organization inline so we can redirect users to the organization they belong to
+    it "non-async processes the first" do
+      membership.reload
+      expect(membership.claimed?).to be_falsey
+      user.save
+      user.perform_create_jobs
+      user.reload
+      expect(membership.created_at < user.created_at).to be_truthy
+      # This is called on create, so we just test that things happen correctly here
+      membership.reload
+      membership2.reload
+      expect(user.confirmed?).to be_truthy
+      expect(membership.claimed?).to be_truthy
+      expect(membership2.claimed?).to be_falsey
+      expect(membership.user).to eq user
+      expect(user.memberships.count).to eq 1
+      expect(user.organizations.count).to eq 1
     end
   end
 

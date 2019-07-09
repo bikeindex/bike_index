@@ -79,7 +79,6 @@ RSpec.describe Organized::ManageController, type: :controller do
         let(:org_attributes) do
           {
             available_invitation_count: 10,
-            sent_invitation_count: 1,
             is_suspended: false,
             embedable_user_email: user.email,
             auto_user_id: user.id,
@@ -96,7 +95,6 @@ RSpec.describe Organized::ManageController, type: :controller do
             # slug: 'short_name',
             slug: "cool name and stuffffff",
             available_invitation_count: "20",
-            sent_invitation_count: "0",
             is_suspended: true,
             auto_user_id: user.id,
             embedable_user_email: user_2.email,

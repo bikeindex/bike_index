@@ -174,7 +174,7 @@
           %td
             More to come soon
 .row.mt-4
-  .col-md-6
+  .col-12
     %p
       %strong
         = link_to "Edit/Create Invoices", admin_organization_invoices_path(organization_id: @organization.to_param)
@@ -266,61 +266,30 @@
                   = slug
 - if @bikes.present?
   %h2.mt-4
-    = pluralize(@bikes.total_count, "Bike")
+    = number_with_delimiter(@bikes.total_count)
+    = "Bike".pluralize(@bikes.total_count)
     %em.small
       view #{link_to "org bikes view", organization_bikes_path(organization_id: @organization.to_param)}
   = paginate @bikes, views_prefix: "admin"
-
   = render partial: "/admin/bikes/table", locals: { bikes: @bikes }
-
-  = paginate @bikes, views_prefix: "admin"
 - else
   %h2.mt-4
     No bikes
 
-
-%h2.mt-4
-  = pluralize(@organization.users.count, "User")
-
-.full-screen-table
-  %table.table.table-striped.table-bordered.table-sm
-    %thead.thead-light
-      %th
-        Edit&nbsp;
-      %th
-        Name
-      %th
-        Email
-      - if @organization.ambassador?
-        %th
-          Activities
-      %th
-        Total indexed
-    %tbody
-      - @organization.users.each do |user|
-        %tr
-          %td
-            = link_to "&rarr;".html_safe, edit_admin_user_url(user)
-          %td
-            = user.name
-          %td
-            = user.email
-          - if @organization.ambassador?
-            %td
-              - if user.ambassador?
-                - ambassador = Ambassador.find(user.id)
-                = link_to ambassador.progress_count, admin_ambassador_task_assignments_path(search_ambassador_id: ambassador.id)
-          %td
-            = user.creation_states.where(organization_id: @organization.id).count
+.row
+  .col-6
+    %h4.mt-4
+      = number_with_delimiter(@organization.memberships.count)
+      = "Membership".pluralize(@organization.memberships.count)
+      %small
+        = number_with_delimiter(@organization.memberships.claimed.count)
+        claimed
+  .col-6.text-right
+    = link_to "View all memberships", admin_memberships_path(organization_id: @organization.to_param)
+- if @organization.memberships.count > 0
+  = render partial: "/admin/memberships/table", locals: { memberships: @organization.memberships.reorder(created_at: :asc).limit(25) }
 
 
-%ul.list-unstyled
-  - @organization.users.each do |user|
-    %li
-      %p
-        = user.name
-        |
-        = user.email
 %hr.mt-4
 - if @locations.any?
   - if @locations.count > 1

@@ -1,8 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Admin::AmbassadorTaskAssignmentsController, type: :request do
-  before { allow(User).to receive(:from_auth) { user } }
-  let(:user) { FactoryBot.create(:admin) }
+  include_context :request_spec_logged_in_as_superuser
 
   describe "#index" do
     context "when logged in as a super admin" do

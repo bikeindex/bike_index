@@ -1,10 +1,11 @@
-// This is stuff that needs to happen on page load.
+import log from "../utils/log";
 import moment from "moment-timezone";
 import BinxMapping from "./binx_mapping.js";
 import BinxAdmin from "./admin/binx_admin.js";
 import BinxAppOrgExport from "./binx_org_export.js";
 import BinxAppOrgMessages from "./binx_org_messages.js";
 import BinxAppOrgBikes from "./binx_org_bikes.js";
+import BinxAppOrgUserForm from "./binx_org_user_form";
 
 window.binxApp || (window.binxApp = {});
 
@@ -122,5 +123,10 @@ $(document).ready(function() {
     case "organized_bikes_index":
       const binxAppOrgBikes = BinxAppOrgBikes();
       binxAppOrgBikes.init();
+  }
+  // This can be new, edit, create or update, so just checking for the element
+  if ($("#multipleUserSelect").length) {
+    const binxAppOrgUserForm = BinxAppOrgUserForm();
+    binxAppOrgUserForm.init();
   }
 });
