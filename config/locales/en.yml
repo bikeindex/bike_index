@@ -845,9 +845,9 @@ en:
         tips_for_talking_to_bike_shops_url: https://bikeindex.org/news/how-to-get-a-bike-shop-signed-up-in-bike-index
     bikes:
       list:
-        org_bikes_html: "<em>%{org_name}</em> bikes"
+        org_bikes_html: '<em>%{org_name}</em> bikes'
         bike: bike
-        registered: registered
+        num_bikes_registered_html: '<strong>%{num_bikes}</strong> registered'
         added: Added
         manufacturer: Manufacturer
         model: Model

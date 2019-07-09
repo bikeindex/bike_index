@@ -2,10 +2,9 @@
   %h1= t(".org_bikes_html", org_name: current_organization.name)
 
   %p
-    %strong
-      - count = defined?(@bikes.total_count) ? @bikes.total_count : @bikes.count
-      = pluralize(number_with_delimiter(count), t(".bike"))
-    = t(".registered")
+    - count = defined?(@bikes.total_count) ? @bikes.total_count : @bikes.count
+    - num_bikes = pluralize(number_with_delimiter(count), t(".bike"))
+    = t(".num_bikes_registered_html", num_bikes: num_bikes)
 .full-screen-table
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
     %thead.small-header
