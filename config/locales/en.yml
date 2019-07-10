@@ -1055,3 +1055,16 @@ en:
         subject: Subject
         additional_text: Additional text
         none: none
+    stickers:
+      index:
+        stickers: Stickers
+        search_sticker_id: Search Sticker ID
+        search_bike_url_or_id: Search Bike URL or ID
+        search: Search
+        all: All
+        sticker: Sticker
+        claimed: Claimed
+        unclaimed: Unclaimed
+        bike: Bike
+        added_html: Added <small class="convertTimezone"></small>
+        coded: Code
