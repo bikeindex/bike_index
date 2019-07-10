@@ -585,9 +585,8 @@ en:
       bike_was_already_stolen: My bike was already stolen. What should I do?
       add_details: Add the bike and details about the theft to the Index now!
       comprehensive_public_database: Bike Index is a comprehensive public database - if your bike was stolen, we think everyone should know about it.
-      stolen_bikes_link: stolen bikes page
-      add_a_stolen_bike_link: add a stolen bike here
-      visit_or_add_html: Visit the %{visit_link} for more information, or %{add_link}.
+      add_a_stolen_bike_link: add your your stolen bike to Bike Index!
+      visit_or_add_html: First, %{add_link}. Once you've done that, we'll show you a checklist of what to do to improve your chances of recovery.
       how_does_this_prevent_bike_theft: How does this prevent bike theft?
       people_with_good_intentions: Right now people with good intentions buy stolen bikes because there isn't a single searchable, simple resource to check before buying a bike.
       bike_index_is_that_resource: Bike Index is that resource. The next time you buy a used bike, check the Index first.

@@ -90,7 +90,7 @@
           %p
             %strong= t(".add_details")
           %p= t(".comprehensive_public_database")
-          %p= t(".visit_or_add_html", visit_link: link_to(t(".stolen_bikes_link"), stolen_bikes_url), add_link: link_to(t(".add_a_stolen_bike_link"), new_bike_url(stolen: true)))
+          %p= t(".visit_or_add_html", add_link: link_to(t(".add_a_stolen_bike_link"), new_bike_url(stolen: true)))
 
       %dt.collapse-faq
         %a.collapsed{ href: "#does-this-prevent-theft", data: { toggle: "collapse"} }
