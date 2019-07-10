@@ -36,13 +36,13 @@ module API
             optional :police_report_department, type: String, desc: "Police department reported to (include if report number present)"
             optional :show_address, type: Boolean, desc: "Display the exact address the theft happened at"
 
-            #   # link to LOCKING options!
-            #   # optional :locking_description_slug, type: String, desc: 'Locking description. description.'
-            #   # optional :lock_defeat_description_slug, type: String, desc: 'Lock defeat description. One of the values from lock defeat desc'
-            #   # optional :theft_description, type: String, desc: 'stuff'
+            optional :theft_description, type: String, desc: "stuff"
 
-            #   # optional :phone_for_everyone, type: Boolean, default: false, desc: 'Show phone number to non logged in users'
-            #   # optional :phone_for_users, type: Boolean, default: true, desc: 'Show phone to logged in users'
+            # link to LOCKING options!
+            # optional :locking_description_slug, type: String, desc: "Locking description. description."
+            # optional :lock_defeat_description_slug, type: String, desc: "Lock defeat description. One of the values from lock defeat desc"
+            # optional :phone_for_everyone, type: Boolean, default: false, desc: 'Show phone number to non logged in users'
+            # optional :phone_for_users, type: Boolean, default: true, desc: 'Show phone to logged in users'
           end
         end
 
@@ -144,8 +144,7 @@ module API
             declared_p = { "declared_params" => declared(params, include_missing: false) }
             b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
             b_param.clean_params
-            ensure_required_stolen_attrs(b_param.params)
-
+            o
             @bike = found_bike
             authorize_bike_for_user
 
@@ -168,7 +167,6 @@ module API
           declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
           b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
           b_param.clean_params
-          ensure_required_stolen_attrs(b_param.params)
           b_param.save
 
           bike = BikeCreator.new(b_param).create_bike
@@ -207,7 +205,6 @@ module API
           b_param = BParam.new(params: declared_p["declared_params"].as_json, origin: "api_v2")
           b_param.clean_params
           hash = b_param.params
-          ensure_required_stolen_attrs(hash) if hash["stolen_record"].present? && @bike.stolen != true
           @bike.load_external_images(hash["bike"]["external_image_urls"]) if hash.dig("bike", "external_image_urls").present?
           begin
             BikeUpdator.new(user: current_user, bike: @bike, b_params: hash).update_available_attributes
