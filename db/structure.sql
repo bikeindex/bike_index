@@ -2143,7 +2143,7 @@ CREATE TABLE public.users (
     name character varying(255),
     email character varying(255),
     password text,
-    last_login timestamp without time zone,
+    last_login_at timestamp without time zone,
     superuser boolean DEFAULT false NOT NULL,
     password_reset_token text,
     created_at timestamp without time zone NOT NULL,
