@@ -423,6 +423,27 @@ RSpec.describe User, type: :model do
     end
   end
 
+  describe "update_last_sign_in" do
+    let(:user) { FactoryBot.create(:user) }
+    let(:update_time) { Time.current - 3.hours }
+    it "updates the last sign in for the user, regardless of whether there are errors" do
+      user.update_column :updated_at, update_time
+      user.reload
+      expect(user.updated_at).to be_within(1.second).of update_time
+      expect(user.last_login_at).to be_blank
+      expect(user.last_login_ip).to be_blank
+      user.password = nil
+      user.save
+      expect(user.errors).to be_present
+      user.update_last_login("127.0.0.1")
+      expect(user.errors).to be_present
+      user.reload
+      expect(user.last_login_at).to be_present
+      expect(user.last_login_ip).to be_present
+      expect(user.updated_at).to be_within(1.second).of update_time
+    end
+  end
+
   describe "friendly_id_find" do
     it "fails with nil" do
       result = User.friendly_id_find("some stuff")
