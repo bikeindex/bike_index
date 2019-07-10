@@ -1019,12 +1019,12 @@ en:
         zipcode: Zipcode
         remove: Remove
       index:
-        org_settings: "<em>%{org_name}</em> settings"
+        org_settings_html: "<em>%{org_name}</em> settings"
         name: Name
         abbreviation: Abbreviation
         registration_email: Registration email
         select_email: Select email
-        org_email_address: Email address <em>%{org_name}</em> bike registrations will be sent from
+        org_email_address_html: Email address <em>%{org_name}</em> bike registrations will be sent from
         organization_type: Organization type
         organization_logo: Organization logo
         choose_file: Choose file...

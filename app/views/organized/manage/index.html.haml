@@ -1,5 +1,5 @@
 %h1.mb-4
-  = t(".org_settings", org_name: @organization.name)
+  = t(".org_settings_html", org_name: @organization.name)
 
 = form_for @organization, { url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
 
@@ -23,7 +23,7 @@
       selected: (@organization.auto_user && @organization.auto_user.email),
       class: "form-control"
       %span.below-input-help
-        = t(".org_email_address", org_name: @organization.name)
+        = t(".org_email_address_html", org_name: @organization.name)
 
   .form-group.row
     %label.org-form-label
