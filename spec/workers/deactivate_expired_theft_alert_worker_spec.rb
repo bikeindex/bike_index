@@ -1,7 +1,6 @@
 require "rails_helper"
 
 RSpec.describe DeactivateExpiredTheftAlertWorker, type: :job do
-  let(:instance) { described_class.new }
   include_context :scheduled_worker
   include_examples :scheduled_worker_tests
 
