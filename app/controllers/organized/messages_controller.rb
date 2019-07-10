@@ -4,6 +4,21 @@ module Organized
     before_action :ensure_permitted_message_kind!, only: %i[index create]
 
     def index
+      members =
+        current_organization
+          .users
+          .map { |u| u && [u.id.to_s, { name: u.display_name }] }
+          .compact
+          .to_h
+
+      @page_data = {
+        google_maps_key: ENV["GOOGLE_MAPS"],
+        map_center_lat: current_organization.map_focus_coordinates[:latitude],
+        map_center_lng: current_organization.map_focus_coordinates[:longitude],
+        members: members,
+        message_root_path: organization_messages_path(organization_id: current_organization.to_param),
+      }
+
       respond_to do |format|
         format.html
         format.json do

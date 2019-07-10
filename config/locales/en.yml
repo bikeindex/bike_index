@@ -1038,3 +1038,9 @@ en:
         display_org_on_map_html: Display <em>%{org_name}</em> on %{map_link}
         add_location: Add location
         save: Save
+    messages:
+      index:
+        bike: Bike
+        matches: matches
+        sender: Sender
+        sent: Sent
