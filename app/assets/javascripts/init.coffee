@@ -167,7 +167,11 @@ window.updateSearchBikesHeaderLink = ->
   $bike_search_link = $("#search_bikes_header_link")
   return true unless $bike_search_link.length
   bike_search_query = $bike_search_link[0].search
-  params = Object.fromEntries(bike_search_query.replace("?", "").split("&").map((e) => e.split("=")))
+
+  tuples_to_object = (tuples_list) =>
+     tuples_list.reduce ((obj, tuple) -> (obj[tuple[0]] = tuple[1]) && obj), {}
+  params = tuples_to_object(bike_search_query.replace("?", "").split("&").map((e) => e.split("=")))
+
   params["stolenness"] = "proximity"
   params["location"] = location
   params["distance"] = distance
