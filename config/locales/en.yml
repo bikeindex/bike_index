@@ -845,9 +845,9 @@ en:
         tips_for_talking_to_bike_shops_url: https://bikeindex.org/news/how-to-get-a-bike-shop-signed-up-in-bike-index
     bikes:
       list:
-        org_bikes_html: '<em>%{org_name}</em> bikes'
+        org_bikes_html: "<em>%{org_name}</em> bikes"
         bike: bike
-        num_bikes_registered_html: '<strong>%{num_bikes}</strong> registered'
+        num_bikes_registered_html: "<strong>%{num_bikes}</strong> registered"
         added: Added
         manufacturer: Manufacturer
         model: Model
@@ -861,8 +861,8 @@ en:
         search_owner_email: Search owner email
         search_for_serial_number: Search for serial number
         bike: bike
-        matching_bikes_html: <strong>%{bikes}</strong> matching
-        registered_bikes_html: <strong>%{bikes}</strong> registered with %{org_name}
+        matching_bikes_html: "<strong>%{bikes}</strong> matching"
+        registered_bikes_html: "<strong>%{bikes}</strong> registered with %{org_name}"
         view_just_stolen_bikes: view just stolen bikes
         stolen_bikes_html: "<em>stolen</em> bikes"
         view_all_bikes: view all bikes
@@ -1033,7 +1033,7 @@ en:
         delete_organization: Delete organization
         removal_confirmation: Are you positive you want to remove %{org_name} from Bike Index?
       locations:
-        location_settings_html: <em>%{org_name}</em> location settings
+        location_settings_html: "<em>%{org_name}</em> location settings"
         bike_index_partner_map: Bike Index partner map
         display_org_on_map_html: Display <em>%{org_name}</em> on %{map_link}
         add_location: Add location
