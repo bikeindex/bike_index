@@ -2,8 +2,6 @@
   .col-12
     %h1
       Feedback & Messages
-      %small
-        = link_to "view all", admin_feedbacks_path
   .col-12.mt-4
     = line_chart available_feedbacks.send(group_by_method(@time_range), "feedbacks.created_at").count, curve: false, thousands: ",", defer: true
   .col-12.mb-2.mt-2
@@ -29,6 +27,17 @@
     From #{link_to @user.display_name, admin_user_path(@user)}
 
   = "message".pluralize(@feedbacks.count)
+
+.row
+  .col-12
+    = form_tag admin_feedbacks_path, method: :get, class: "form-inline" do
+      = hidden_field_tag :sort, sort_column
+      = hidden_field_tag :sort_direction, sort_direction
+      .form-group.mr-2.mb-2
+        = text_field_tag :search_bike_id, params[:search_bike_id], placeholder: "Search for Bike ID", class: "form-control"
+      .form-group.mr-2.mb-2
+        = select_tag :search_type, options_for_select(Feedback.feedback_types.map { |t| [t.humanize, t] }, selected: params[:search_type]), { prompt: "Message type", class: "form-control" }
+      = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
 = paginate @feedbacks, views_prefix: 'admin'
 
@@ -56,8 +65,7 @@
               = l feedback.created_at, format: :convert_time
           %td
             - if feedback.user_id.present?
-              - display_name = feedback.user&.display_name || feedback.user_id
-              = link_to display_name, admin_user_path(feedback.user_id)
+              = link_to feedback.user.display_name, admin_user_path(feedback.user)
               - unless params[:search_user_id].present?
                 %small
                   = link_to "matching messages", admin_feedbacks_path(sortable_search_params.merge(search_user_id: feedback.user_id)), class: "gray-link"
