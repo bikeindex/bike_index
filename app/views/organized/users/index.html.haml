@@ -1,21 +1,19 @@
 .mb-4
-  %h1
-    Manage Users
+  %h1= t(".manage_users")
   %p
-    You have invited:
-    %strong
-      = number_with_delimiter(current_organization.sent_invitation_count)
-      = "user".pluralize(current_organization.sent_invitation_count)
+    - count = number_with_delimiter(current_organization.sent_invitation_count)
+    = t(".you_have_invited_html", users_count: pluralize(count, 'user'))
   %p
-    You can add
-    %strong
-      = number_with_delimiter current_organization.remaining_invitation_count
-      more
+    - count = number_with_delimiter(current_organization.remaining_invitation_count)
+    = t(".remaining_invites", invitations_count: count)
+
     - if current_organization.remaining_invitation_count > 0
-      = link_to "Invite more users", new_organization_user_path(organization_id: current_organization.to_param)
+      = link_to t(".invite_more_users"), new_organization_user_path(organization_id: current_organization.to_param)
+
   %p
     - if current_organization.auto_user.present?
-      Emails are currently sent from <em>#{current_organization.auto_user.email}</em>. #{ link_to 'Update email', organization_manage_index_path(organization_id: current_organization.to_param) }
+      = t(".emails_are_currently_sent_from", email: current_organization.auto_user.email)
+      =  link_to t(".update_email"), organization_manage_index_path(organization_id: current_organization.to_param)
 
 .paginate-container
   = paginate @memberships
@@ -23,34 +21,28 @@
 .organized-table
   %table.table.table-striped.table-bordered.table-sm
     %thead.sortable
-      %th
-        = sortable "created_at"
-      %th
-        = sortable "invited_email", "To"
-      %th
-        = sortable "claimed_at"
-      %th
-        = sortable "role", "Admin?"
+      %th= sortable "created_at", t(".created")
+      %th= sortable "invited_email", t(".to")
+      %th= sortable "claimed_at", t(".claimed")
+      %th= sortable "role", t(".is_admin")
       %th
         %small
-          = sortable "sender_id"
+          = sortable "sender_id", t(".sender")
     %tbody
       - @memberships.each do |membership|
         %tr
           %td
             %a.convertTime{ href: edit_organization_user_path(membership.id, organization_id: current_organization.to_param) }
-              = l membership.created_at, format: :convert_time
+              = l(membership.created_at, format: :convert_time)
           %td
             = membership.invited_display_name
             %small.less-strong.d-none.d-lg-inline-block
               = membership.invited_email
-
           %td
             - if membership.claimed_at.present?
               %span.convertTime
-                = l membership.created_at, format: :convert_time
-          %td
-            = "&#x2713;".html_safe if membership.admin?
+                = l(membership.created_at, format: :convert_time)
+          %td= "&#x2713;".html_safe if membership.admin?
           %td
             - if membership.sender.present?
               %small

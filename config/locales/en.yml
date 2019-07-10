@@ -1093,3 +1093,15 @@ en:
         member_of_organization: Member of organization
         confirmation: Are you sure you want to remove %{user_name} from %{org_name}? (They will still be to use their personal account)
         update: Update
+      index:
+        manage_users: Manage Users
+        you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
+        remaining_invites: You can add <strong>%{invitations_count}</strong> more
+        invite_more_users: Invite more users
+        emails_are_currently_sent_from: Emails are currently sent from <em>%{email}</em>.
+        update_email: Update email
+        created: Created
+        to: To
+        claimed: Claimed
+        is_admin: Admin?
+        sender: Sender
