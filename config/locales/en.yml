@@ -1080,3 +1080,16 @@ en:
         previous_bike: Previous Bike
         bike_id_or_url: Bike ID / URL
         update: Update
+    users:
+      edit:
+        edit_membership_html: 'Edit membership <em class="small">for %{email}</em>'
+        remove_from_organization: remove from organization
+        invited: Invited
+        signed_up: Signed up
+        has_not_signed_up_html: '%{name} <strong>has still not signed up</strong>'
+        email: Email
+        membership_type: Membership type
+        admin_of_organization: Admin of organization
+        member_of_organization: Member of organization
+        confirmation: Are you sure you want to remove %{user_name} from %{org_name}? (They will still be to use their personal account)
+        update: Update
