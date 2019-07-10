@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe ScheduledWorkerRunner, type: :lib do
   let(:subject) { ScheduledWorkerRunner }
   let(:instance) { subject.new }
-  let(:scheduled_workers) { [UpdateExpiredInvoiceWorker, UpdateCountsWorker, UpdateOrganizationPosKindWorker] }
+  let(:scheduled_workers) { [UpdateExpiredInvoiceWorker, UpdateCountsWorker, UpdateOrganizationPosKindWorker, DeactivateExpiredTheftAlertWorker] }
   include_context :scheduled_worker
   include_examples :scheduled_worker_tests
 
