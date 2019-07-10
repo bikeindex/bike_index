@@ -45,8 +45,9 @@
 
             .collapse#show_exported_bikes
               %ul.exported-link-list
-                - bike_ids.each do |id|
-                  %li= link_to(id, bike_path(id))
+                - bike_ids.each_with_index do |id, i|
+                  %li
+                    #{link_to id, bike_path(id)}#{i == (@export.exported_bike_ids.count - 1) ? "" : ","}
 
       %tr
         %td
@@ -99,8 +100,9 @@
               %em= t(".stickers_exported", bike_codes_count: @export.bike_codes&.count.to_i)
               - if @export.bike_codes.any?
                 %ul.exported-link-list
-                  - bike_code_links = @export.bike_codes.each do |code|
-                    %li= link_to(code, edit_organization_sticker_path(code, organization_id: current_organization.to_param))
+                  - bike_code_links = @export.bike_codes.each do |code, i|
+                    %li
+                       #{link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param)}#{i == (@export.bike_codes.count - 1) ? "" : ","}
 
                 - if @export.bike_codes_removed?
                   %em.text-danger= t(".stickers_have_been_unassigned")
