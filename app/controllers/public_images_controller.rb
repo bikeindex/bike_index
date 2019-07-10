@@ -10,8 +10,6 @@ class PublicImagesController < ApplicationController
   end
 
   def create
-    p "!!!!!"
-    p "fuck"
     @public_image = PublicImage.new(permitted_parameters)
     if params[:bike_id].present?
       @public_image.imageable = @bike
@@ -27,7 +25,7 @@ class PublicImagesController < ApplicationController
         @public_image.imageable = current_organization
       end
       @public_image.save
-      render "create" and return
+      render json: { success: true } and return
     end
     flash[:error] = "Whoops! We can't let you create that image."
     redirect_to @public_image.present? ? @public_image.imageable : user_root_url

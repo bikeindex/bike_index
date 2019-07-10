@@ -1,6 +1,6 @@
 .card.bg-light
   .card-body
-    .UppyForm
+    .UppyDragDrop-One.UppyForm
       = form_for PublicImage.new do |f|
         - if imageable_type == 'Blog'
           = hidden_field_tag :blog_id, @blog.id
@@ -8,4 +8,6 @@
           = hidden_field_tag :organization_id, @organization.id
         - elsif imageable_type == 'MailSnippet'
           = hidden_field_tag :mail_snippet_id, @mail_snippet.id
-        = f.file_field :image, html: {multiple: "multiple", name: "public_image[image]"}
+        / = f.file_field :image
+        / = f.submit "Submit", class: "btn btn-light"
+    .UppyDragDrop-One-Progress

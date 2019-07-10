@@ -19,20 +19,27 @@ function BinxAdminBlogs() {
     },
 
     uppyFileUpload() {
-      const uppy = new Uppy({
+      const uppyOne = new Uppy({
         debug: true,
         autoProceed: true
       })
-      uppy.use(FileInput, {
-        target: '.UppyForm',
-        replaceTargetContent: true
-      })
-      uppy.use(XHRUpload, {
-        endpoint: '/public_images',
-        method: "POST",
-        formData: true,
-        fieldName: 'files[]'
-      })
+      uppyOne
+        .use(FileInput, {
+          target: ".UppyForm",
+          inputName: 'public_image[image]'
+        })
+        .use(XHRUpload, {
+          endpoint: "/public_images",
+          method: "post"
+        })
+        .use(Dashboard, {
+          target: '.UppyDragDrop-One',
+          inline: true
+        })
+        .use(ProgressBar, {
+          target: '.UppyDragDrop-One-Progress',
+          hideAfterFinish: false
+        })
     }
   };
 }

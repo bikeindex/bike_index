@@ -32,8 +32,19 @@ RSpec.describe PublicImagesController, type: :controller do
           user = FactoryBot.create(:admin)
           set_current_user(user)
           post :create, blog_id: blog.id, public_image: { name: "cool name" }, format: :js
+          expect(JSON.parse(response.body)).to be_present
           blog.reload
           expect(blog.public_images.first.name).to eq "cool name"
+        end
+        context "blog_id not given" do
+          it "creates an image" do
+            user = FactoryBot.create(:admin)
+            set_current_user(user)
+            expect do
+              post :create, blog_id: "", public_image: { name: "cool name" }, format: :js
+            end.to change(PublicImage, :count).by 1
+            expect(JSON.parse(response.body)).to be_present
+          end
         end
       end
       context "not admin" do
