@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe UpdateExpiredInvoiceWorker, type: :lib do
+RSpec.describe UpdateExpiredInvoiceWorker, type: :lib do
   include_context :scheduled_worker
   include_examples :scheduled_worker_tests
 
