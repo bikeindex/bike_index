@@ -33,9 +33,10 @@
     = form_tag admin_feedbacks_path, method: :get, class: "form-inline" do
       = hidden_field_tag :sort, sort_column
       = hidden_field_tag :sort_direction, sort_direction
-      = hidden_field_tag :search_type, sort_direction
-      .form-group.ml-auto.mr-2.mb-2
+      .form-group.mr-2.mb-2
         = text_field_tag :search_bike_id, params[:search_bike_id], placeholder: "Search for Bike ID", class: "form-control"
+      .form-group.mr-2.mb-2
+        = select_tag :search_type, options_for_select(Feedback.feedback_types.map { |t| [t.humanize, t] }, selected: params[:search_type]), { prompt: "Message type", class: "form-control" }
       = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
 
 = paginate @feedbacks, views_prefix: 'admin'
