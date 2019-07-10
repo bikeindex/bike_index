@@ -1,15 +1,18 @@
 - if @bike.stolen && session[:recovery_link_token].present?
-  - stolen_record = StolenRecord.find_matching_token(bike_id: @bike.id, recovery_link_token: session.delete(:recovery_link_token)) # Delete token so modal doesn't keep rendering
+  -# Delete token so modal doesn't keep rendering
+  - stolen_record = StolenRecord.find_matching_token(bike_id: @bike.id, recovery_link_token: session.delete(:recovery_link_token))
+
   - if stolen_record.present?
-    / Similar form exists in edit_report_stolen / edit_report_recovered
+    -# Similar form exists in edit_report_stolen / edit_report_recovered
     - modal_title = "Mark your #{@bike.type} recovered!"
     - modal_body = capture_haml do
       .modal-body
         %p
-          Please tell us how you got your #{@bike.type} back, we really care!
+          = "Please tell us how you got your #{@bike.type} back, we really care!"
           %br
           %strong
             It's also how we get better at recovering bikes.
+
         = form_for @stolen_record, url: bike_recovery_path(bike_id: @bike.id) do |f|
           = hidden_field_tag :token, stolen_record.recovery_link_token
           .form-group
@@ -42,33 +45,30 @@
     - modal_title = "Your #{@bike.type}"
     - modal_body = capture_haml do
       .modal-body
-        %p
-          We're honored to have your #{@bike.type} on the Index.
-        %p
-          Claim it so you can update your listing.
+        %p= "We're honored to have your #{@bike.type} on the Index."
+        %p Claim it so you can update your listing.
       .modal-btn-footer
         .row
           .col-xs-6.col-xs-push-3
-            %a.btn.btn-success{ href: "/ownerships/#{@bike.current_ownership.id}" }
-              Claim #{@bike.type}
+            = link_to "Claim #{@bike.type}", ownership_path(@bike.current_ownership), class: "btn btn-success"
 
   - elsif @bike.authorized_for_user?(current_user) && !@bike.authorized_by_organization?(u: current_user)
     .bike-overlay-wrapper
       .bike-edit-overlay
         %p
-          / If the bike user is actually the current bike owner, do this
+          -# If the bike user is actually the current bike owner, do this
           - if @bike.user == current_user
             - if @bike.user_hidden
-              %strong
-                This #{@bike.type} is hidden.
+              %strong= "This #{@bike.type} is hidden."
               No one can see it but you
+
             - if @bike.user?
               - if @bike.recovered
-                Thank you for recovering this #{@bike.type}!
+                = "Thank you for recovering this #{@bike.type}!"
               - elsif @bike.stolen
-                We're really bummed your #{@bike.type} was stolen.
+                = "We're really bummed your #{@bike.type} was stolen."
               - else
-                Whoah, this awesome #{@bike.type} is yours!
+                = "Whoa, this awesome #{@bike.type} is yours!"
 
               - if @bike.public_images.any?
                 Add some more information about it.
@@ -78,13 +78,9 @@
                 - else
                   Add a picture of it, so everyone can admire its beauty!
           - else # The bike has been sent to someone other than the current_user
-            You sent this #{@bike.type} to
-            %em
-              = @bike.current_ownership.owner_email
-            and it hasn't been claimed yet. You can update it
+            = "You sent this #{@bike.type} to <em>#{@bike.current_ownership.owner_email}</em> and it hasn't been claimed yet. You can update it.".html_safe
           = link_to  "Edit", edit_bike_path, class: "btn btn-secondary"
 
-
-
-- if modal_title.present? # This is for stolen modal or claim modal
-  = render partial: '/shared/modal', locals: { title: modal_title, id: 'initial-open-modal', modal_body: modal_body }
+- if modal_title.present?
+  -# This is for stolen modal or claim modal
+  = render partial: 'shared/modal', locals: { title: modal_title, id: 'initial-open-modal', modal_body: modal_body }

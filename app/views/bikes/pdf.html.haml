@@ -64,7 +64,7 @@
                 %td.td-title
                   Owner phone
                 %td
-                  %a.phone-number-link{ href: "tell:#{@stolen_record.phone}" }
+                  %a.phone-number-link{ href: "tel:#{@stolen_record.phone}" }
                     = display_phone(@stolen_record.phone)
             - if @stolen_record.police_report_number.present?
               %tr
@@ -155,7 +155,7 @@
                     - if hubs.where(rear: true)
                       - r_hub = hubs.where(rear: true).first
                       - if r_hub.present?
-                        (#{r_hub.cmodel_name} by #{r_hub.manufacturer_name})
+                        = "(#{r_hub.cmodel_name} by #{r_hub.manufacturer_name})"
 
 
     .bike-details
@@ -206,5 +206,4 @@
             printout
           %p
             online @
-            %a{href: bike_url(@bike) }
-              bikeindex.org#{bike_path(@bike)}
+            = link_to "bikeindex.org#{bike_path(@bike)}", bike_url(@bike)

@@ -4,7 +4,7 @@
   .row.first-row
     .col-md-8
       %h1
-        Search for #{stolenness_desc} bikes
+        = "Search for #{stolenness_desc} bikes"
     .col-md-4.ad-col
       .ad-block#top468x60
 
@@ -13,12 +13,7 @@
       = form_tag bikes_path, id: 'bikes_search_form', class: 'bikes-search-form', enforce_utf8: false, method: :get do
         .query-field-wrap.nojs
           - opt_vals = @selected_query_items_options.map { |i| i.is_a?(String) ? [i, i] : [i['text'], i['search_id']]  }
-          = select_tag :query_items,                                      |
-            options_for_select(opt_vals, selected: opt_vals.map(&:last)), |
-            placeholder: 'Search bike descriptions',                      |
-            class: 'form-control query-field',                            |
-            multiple: true
-
+          = select_tag :query_items, options_for_select(opt_vals, selected: opt_vals.map(&:last)), placeholder: 'Search bike descriptions', class: 'form-control query-field', multiple: true
           = text_field_tag :query, params[:query], placeholder: 'Search bike descriptions', class: 'form-control query-field'
           = text_field_tag :serial, params[:serial], placeholder: 'Search for serial number', class: 'form-control query-field'
         .search-button-wrap
@@ -57,26 +52,25 @@
     .col-md-8
       - if @bikes.present?
         %ul.bike-boxes
-          = render partial: '/bikes/bike', collection: @bikes, as: :bike
+          = render partial: 'bikes/bike', collection: @bikes, as: :bike
         .paginate-container.paginate-container-bottom
           = paginate @bikes
 
       - else
         %h3.no-exact-results
-          No #{stolenness_desc} bikes matched your search
+          = "No #{stolenness_desc} bikes matched your search"
 
       - if @close_serials.present?
         %h3.secondary-matches
-          #{stolenness_desc} with serial numbers close to
-          %em
-            #{params[:serial]}
+          = "#{stolenness_desc} with serial numbers close to <em>#{params[:serial]}</em>".html_safe
 
         %ul.bike-boxes
-          = render partial: '/bikes/bike', collection: @close_serials, as: :bike
+          = render partial: 'bikes/bike', collection: @close_serials, as: :bike
+
     .col-md-4.ad-col
       .ad-block#right300x600
 
 :javascript
-  window.interpreted_params = #{@interpreted_params.to_json};
+  = "window.interpreted_params = #{@interpreted_params.to_json};"
 
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>

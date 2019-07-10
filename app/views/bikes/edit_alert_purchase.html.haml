@@ -1,7 +1,7 @@
 .primary-edit-bike-form
   .form-well-container.container{ class: "edit-bike-page-alert" }
     .row
-      = render partial: "/bikes/edit_primary_menu", locals: { is_disabled: true }
+      = render partial: "bikes/edit_primary_menu", locals: { is_disabled: true }
 
       .col-md-8.form-well
         .form-wrap
@@ -30,8 +30,7 @@
             .row
               .copy.text-center
                 %strong
-                  Here is what you'll get with the
-                  #{@selected_theft_alert_plan.name} plan:
+                  = "Here is what you'll get with the #{@selected_theft_alert_plan.name} plan:"
             .row
               .description
                 = @selected_theft_alert_plan.description_html.html_safe
@@ -39,7 +38,7 @@
               .copy.text-center
                 %strong
                   - price = @selected_theft_alert_plan.amount_cents
-                  Charge: #{number_to_currency(price / 100.0, unit: "$")}
+                  = "Charge: #{number_to_currency(price / 100.0, unit: '$')}"
             .row
               .text-center.w-100.mt-2
                 %button.btn.btn-lg.btn-primary#js-confirm-plan-button

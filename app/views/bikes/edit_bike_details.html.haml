@@ -1,7 +1,8 @@
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: '/bikes/edit_primary_menu'
+      = render partial: 'bikes/edit_primary_menu'
+
       .col-md-8.form-well
         .form-wrap
           .form-well-form-header
@@ -40,7 +41,7 @@
             .form-well-input
               = f.text_field :frame_model, class: 'form-control'
 
-          = render partial: '/bikes/bike_fields/revised_colors', locals: { f: f }
+          = render partial: 'bikes/bike_fields/revised_colors', locals: { f: f }
 
           .form-group.row.unnested-field
             = f.label :frame_material, 'Main frame material', class: 'form-well-label'
@@ -71,11 +72,6 @@
                 = f.hidden_field :frame_size
                 = f.number_field :frame_size_number, class: 'form-control'
 
-          / .form-group.row.unnested-field
-          /   = f.label :paint_name, 'Paint description', class: 'form-well-label'
-          /   .form-well-input
-          /     = f.text_field :paint_name, class: 'form-control'
-
           .form-group.row.unnested-field
             = f.label :name, 'Bike Name', class: 'form-well-label'
             .form-well-input
@@ -96,7 +92,7 @@
             .form-well-input
               = f.text_field :zipcode, class: 'form-control', placeholder: 'zip code'
 
-          = render "/shared/form_well_footer_save"
+          = render "shared/form_well_footer_save"
 
           - if @bike.show_sticker_edit?
             %hr
@@ -120,7 +116,7 @@
 - serial_correction_body = capture_haml do
   = form_tag do |t|
     .modal-body
-      = render partial: '/shared/alert', locals: { body: 'Please fill in both fields', class_names: 'currently-hidden' }
+      = render partial: 'shared/alert', locals: { body: 'Please fill in both fields', class_names: 'currently-hidden' }
       = hidden_field_tag :serial_update_bike_id, @bike.id
       .form-group
         %label{ for: :serial_update_serial }
@@ -137,12 +133,13 @@
         .col-xs-6.col-xs-pull-6
           %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
             Nevermind
-= render partial: '/shared/modal', locals: { title: 'Update serial number', id: 'serial-correction', modal_body: serial_correction_body }
+
+= render partial: 'shared/modal', locals: { title: 'Update serial number', id: 'serial-correction', modal_body: serial_correction_body }
 
 - manufacturer_correction_body = capture_haml do
   = form_tag do |t|
     .modal-body
-      = render partial: '/shared/alert', locals: { body: 'Please fill in both fields', class_names: 'currently-hidden' }
+      = render partial: 'shared/alert', locals: { body: 'Please fill in both fields', class_names: 'currently-hidden' }
       = hidden_field_tag :manufacturer_update_bike_id, @bike.id
       .form-group
         %label{ for: :manufacturer_update_manufacturer }
@@ -159,4 +156,5 @@
         .col-xs-6.col-xs-pull-6
           %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
             Nevermind
-= render partial: '/shared/modal', locals: { title: 'Update manufacturer', id: 'manufacturer-correction', modal_body: manufacturer_correction_body }
+
+= render partial: 'shared/modal', locals: { title: 'Update manufacturer', id: 'manufacturer-correction', modal_body: manufacturer_correction_body }

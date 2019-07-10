@@ -1,9 +1,9 @@
 .primary-edit-bike-form
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: "/bikes/edit_primary_menu", locals: { is_disabled: true }
-      .col-md-8.form-well
+      = render partial: "bikes/edit_primary_menu", locals: { is_disabled: true }
 
+      .col-md-8.form-well
         = render partial: "theft_alerts_table", locals: { theft_alerts: @theft_alerts, first_form_well: true }
 
         .form-wrap{ class: @theft_alerts.present? ? "secondary-form-wrap" : "" }
@@ -16,7 +16,7 @@
               %p
                 We've found targeted sharing on social media to have a <em>huge</em> effect on recovering stolen bikes.
               %p
-                Bike Index can help by purchasing targeted ads on Facebook to spread the word about your stolen #{@bike.type}.
+                = "Bike Index can help by purchasing targeted ads on Facebook to spread the word about your stolen #{@bike.type}."
 
           = form_tag edit_bike_url(@bike), method: :get, id: "js-select-plan-form" do
             = hidden_field_tag :page, :alert_purchase
@@ -24,9 +24,7 @@
             .row
               %h3.text-center.w-100 Select Plan
             .row
-              = render @theft_alert_plans,
-                selected_plan: @selected_theft_alert_plan,
-                preferred_plan: @theft_alert_plans.max_by(&:amount_cents)
+              = render @theft_alert_plans, selected_plan: @selected_theft_alert_plan, preferred_plan: @theft_alert_plans.max_by(&:amount_cents)
             .row
               .text-center.w-100.mt-2
                 %button.btn.btn-lg.btn-primary Select Plan

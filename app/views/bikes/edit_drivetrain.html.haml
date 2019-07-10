@@ -1,7 +1,7 @@
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: '/bikes/edit_primary_menu'
+      = render partial: 'bikes/edit_primary_menu'
       .col-md-8.form-well
         .form-wrap
           .form-well-form-header-always-visible
@@ -12,10 +12,10 @@
             .related-fields
               .form-group.row
                 %label.form-well-label{ for: "#{side}_standard" }
-                  #{side.titleize} wheel
+                  = "#{side.titleize} wheel"
                 .form-well-input.fancy-select-placeholder.unfancy
                   .standard-diams{ id: "#{side}_standard"}
-                    // ignore this select in dirty forms
+                    -# ignore this select in dirty forms
                     %select.form-control.dirtyignore
                       %option{ value: '' }
                         Choose diameter
@@ -44,7 +44,7 @@
                     Hide extra sizes
             .form-group.row.unnested-field
               %label.form-well-label
-                #{side.titleize} tire
+                = "#{side.titleize} tire"
               .form-well-input
                 %label.radio-inline
                   = f.radio_button "#{side}_tire_narrow".to_sym, 'true'

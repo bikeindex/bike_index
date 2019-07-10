@@ -4,7 +4,7 @@
       %span.checklist-checkbox
         &#10003;
       %span.checklist-text
-        List #{@bike.type} on Bike Index
+        = "List #{@bike.type} on Bike Index"
 
     - serial_unknown = @bike.serial_unknown?
     - if serial_unknown
@@ -37,9 +37,8 @@
       %span.checklist-checkbox
         = "&#10003;".html_safe if police_report_present
       %span.checklist-text
-        Add
-        = link_to "a Police Report Number", edit_bike_path(id: @bike.to_param, page: "theft_details")
-        to your theft report
+        - bike_link = link_to "a Police Report Number", edit_bike_path(id: @bike.to_param, page: "theft_details")
+        = "Add #{bike_link} to your theft report".html_safe
       %ul
         %li{ class: submitted_to_police_services ? "completed-item" : "" }
           %span.checklist-checkbox

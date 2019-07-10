@@ -13,29 +13,24 @@
           - if @bike.organized?(passive_organization)
             %p.text-success.text-right
               %span.hidden-md-down
-                This #{@bike.type} is registered with #{passive_organization.short_name}
+                = "This #{@bike.type} is registered with #{passive_organization.short_name}"
               %span.hidden-lg-up
-                reged with #{passive_organization.short_name}
+                = "reged with #{passive_organization.short_name}"
           - else
             %p.text-warning.text-right
               %span.hidden-md-down
-                This #{@bike.type} is <em>not</em> registered with #{passive_organization.short_name}
+                = "This #{@bike.type} is <em>not</em> registered with #{passive_organization.short_name}".html_safe
               %span.hidden-lg-up
-                <em>not</em> reged with #{passive_organization.short_name}
+                = "<em>not</em> reged with #{passive_organization.short_name}".html_safe
     .card-body
       .row
         - display_unstolen_notification_form = !@bike.stolen? && passive_organization.paid_for?("unstolen_notifications")
         - if passive_organization.ambassador? && @bike.current_stolen_record.present?
           .col-xs-12.mb-2
             .text-right.less-strong
-              %em
-                %span.hidden-md-down
-                  As a Bike Index ambassador,
-              %em
-                you can mark it as recovered:
-              = link_to "Mark bike recovered",
-                edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token),
-                class: "btn btn-success btn-sm"
+              <em><span class="hidden-md-down">As a Bike Index ambassador,</span> you can mark it as recovered:</em>
+
+              = link_to "Mark bike recovered", edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token), class: "btn btn-success btn-sm"
 
         .mb-2{ class: display_unstolen_notification_form ? "col-md-7" : "col-sm-12" }
           %table.table-list
@@ -44,11 +39,11 @@
                 %td Permission
                 %td
                   - if @bike.authorized_by_organization?(org: passive_organization)
-                    #{passive_organization.short_name} can edit this #{@bike.type}
+                    = "#{passive_organization.short_name} can edit this #{@bike.type}"
                     = link_to "Edit", edit_bike_path(@bike), class: "btn btn-success btn-sm float-right"
                   - else
                     %em.small.less-strong
-                      #{passive_organization.short_name} can not edit
+                      = "#{passive_organization.short_name} can not edit"
               - if passive_organization.paid_for?("bike_codes") # Always display stickers if org has paid for them
                 %tr
                   %td
@@ -99,9 +94,11 @@
                         - address = @bike.registration_address
                         - if address.present?
                           %br
-                          &nbsp;&nbsp;&nbsp;#{address["address"]}
+                          &nbsp;&nbsp;&nbsp;
+                          = address["address"]
                           %br
-                          &nbsp;&nbsp;&nbsp;#{address["city"]}, #{address["state"]} #{address["zipcode"]}
+                          &nbsp;&nbsp;&nbsp;
+                          = "#{address["city"]}, #{address["state"]} #{address["zipcode"]}"
                   - else
                     %tr
                       %td
@@ -145,11 +142,11 @@
         - if display_unstolen_notification_form
           .col-md-5.unstolen-notification-box
             %p
-              %em #{@bike.type.titleize} is not marked stolen.
+              %em= "#{@bike.type.titleize} is not marked stolen."
               %strong Believe it is anyway?
             - if @bike.contact_owner?(current_user)
               %h3 Contact the owner
-              - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
+              - redirect = new_session_url(return_to: bike_path(@bike, params: {contact_owner: true})) unless current_user.present?
               #write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }
                 %a.btn.btn-primary.btn-lg{ href: '#new_stolen_message', 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse' }
                   Write them a message
@@ -169,17 +166,14 @@
 
               - if @bike.phoneable_by?(current_user)
                 %p.phoneable-by.mt-4
-                  %em
-                    Or call
-                  %strong
-                    Owner's phone number:
-                  %a{ href: "tell:#{@bike.phone}" }
-                    = @bike.phone_display
+                  <em>Or call</em> <strong>Owner's phone number:</strong>
+                  = link_to @bike.phone_display, "tel:#{@bike.phone}"
             - else
               %p
                 This user <strong>revoked</strong> permission to contact them prior to their bike being marked stolen.
               %p
-                Email #{link_to "support@bikeindex.org", "mailto:support@bikeindex.org"} to deal with this.
+                = support_link = link_to("support@bikeindex.org", "mailto:support@bikeindex.org")
+                = "Email #{support_link} to deal with this."
 
   - if passive_organization.message_kinds.any?
     .geomessages-wrap
@@ -190,7 +184,7 @@
           - if kind == "geolocated_messages"
             GeoMessage
           - else
-            #{kind.humanize}
+            = kind.humanize
 
 - if passive_organization.message_kinds.any?
   - modal_body = capture_haml do
@@ -223,4 +217,4 @@
           .form-submit-button
             = f.submit "Assign sticker", class: "btn btn-success btn-lg"
 
-  = render partial: "/shared/modal", locals: { title: "Assign sticker", modal_body: sticker_modal_body, id: "assignStickerModal" }
+  = render partial: "shared/modal", locals: { title: "Assign sticker", modal_body: sticker_modal_body, id: "assignStickerModal" }

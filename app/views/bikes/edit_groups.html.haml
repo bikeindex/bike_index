@@ -1,7 +1,8 @@
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: '/bikes/edit_primary_menu'
+      = render partial: 'bikes/edit_primary_menu'
+
       .col-md-8.form-well
         .form-wrap#edit_bike_organizations
           .form-well-form-header
@@ -22,7 +23,7 @@
                     %span.can-edit-checkbox
                       %label.checkbox-inline.not-fixed
                         = check_box_tag "organization_ids_can_edit_claimed[]", @bike.creation_organization_id, @bike.editable_organizations.pluck(:id).include?(@bike.creation_organization_id), multiple: true
-                        Can edit this #{@bike.type}
+                        = "Can edit this #{@bike.type}"
                   .right-input-help
                     %a.optional-form-block.remove-organization{ href: '#' }
                       %span.context-display-help
@@ -38,7 +39,7 @@
                     %span.can-edit-checkbox
                       %label.checkbox-inline.not-fixed
                         = check_box_tag "organization_ids_can_edit_claimed[]", bike_organization.organization_id, bike_organization.can_edit_claimed, multiple: true
-                        Can edit this #{@bike.type}
+                        = "Can edit this #{@bike.type}"
                   .right-input-help
                     %a.optional-form-block.remove-organization{ href: '#' }
                       %span.context-display-help
@@ -46,10 +47,12 @@
                       Remove
 
           :javascript
-            window.organizations = #{Organization.approved.map { |organization| { name: organization.name, id: organization.id } }.to_json };
+            = "window.organizations = #{Organization.approved.map { |organization| { name: organization.name, id: organization.id } }.to_json };"
+
           .related-fields#additional_organization_fields
             .form-group.row.unnested-field.no-divider-row
               = f.hidden_field :bike_organization_ids, value: @bike.bike_organization_ids.join(',')
+
             :plain
               <script id="additional-organization-template" type="x-tmpl-mustache">
                 <div class='form-group row collapse'>
@@ -75,4 +78,5 @@
               %span.context-display-help
                 +
               Add an organization
-          = render "/shared/form_well_footer_save"
+
+          = render "shared/form_well_footer_save"

@@ -8,7 +8,7 @@
       %th.medium-screens
         Model
       %th.large-screens
-        Color&nbsp;&nbsp;
+        Color
       %th.large-screens
         Created by
 
@@ -21,18 +21,18 @@
               - if bike.created_at.today?
                 %span.hidden
                   = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-                Today at #{bike.created_at.strftime("%-I %p")}
+                = "Today at #{bike.created_at.strftime('%-I %p')}"
               - elsif Date.yesterday().beginning_of_day() <= bike.created_at
                 %span.hidden
                   = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-                Yesterday at #{bike.created_at.strftime("%-I %p")}
+                = "Yesterday at #{bike.created_at.strftime('%-I %p')}"
               - else
                 %span.hidden
                   = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
                 = bike.created_at.strftime("%-m/%-d/%Y")
               - if pdf
                 = link_to "pdf", pdf_bike_url(bike), class: 'less-strong-right'
-              
+
           %td
             = link_to bike.mnfg_name, bike.list_link_url(target)
           %td.large-screens

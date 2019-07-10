@@ -8,7 +8,7 @@
       %th.medium-screens
         Model
       %th.large-screens
-        Color&nbsp;&nbsp;
+        Color
       %th.medium-screens
         Sent to
       %th.large-screens
@@ -21,11 +21,11 @@
             - if bike.created_at.today?
               %span.hidden
                 = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Today at #{bike.created_at.strftime("%-I %p")}
+              = "Today at #{bike.created_at.strftime('%-I %p')}"
             - elsif Date.yesterday().beginning_of_day() <= bike.created_at
               %span.hidden
                 = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              Yesterday at #{bike.created_at.strftime("%-I %p")}
+              = "Yesterday at #{bike.created_at.strftime('%-I %p')}"
             - else
               %span.hidden
                 = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
