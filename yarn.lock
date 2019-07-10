@@ -1213,6 +1213,14 @@
     "@uppy/utils" "1.1.0"
     preact "8.2.9"
 
+"@uppy/file-input@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@uppy/file-input/-/file-input-1.1.0.tgz#350203f69cb7fee436950e3f48e9b136d32d00fe"
+  integrity sha512-y7RyU0v9JuiUbuKYqB6oPkVi9Qs56q5npc2Du+l1xhE40Te3RYRca8bnVzIhv7pVqQfTanJ0/ypxZM8DhX7UnQ==
+  dependencies:
+    "@uppy/utils" "1.1.0"
+    preact "8.2.9"
+
 "@uppy/informer@1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@uppy/informer/-/informer-1.1.0.tgz#9896edefd7dfbf67d834c66534aa4a86650ca9db"
@@ -4340,6 +4348,11 @@ es-to-primitive@^1.2.0:
     is-callable "^1.1.4"
     is-date-object "^1.0.1"
     is-symbol "^1.0.2"
+
+es6-promise@^4.2.8:
+  version "4.2.8"
+  resolved "https://registry.yarnpkg.com/es6-promise/-/es6-promise-4.2.8.tgz#4eb21594c972bc40553d276e510539143db53e0a"
+  integrity sha512-HJDGx5daxeIvxdBxvG2cb9g4tEvwIk3i8+nhX0yGrYmZUzbkdg8QbDevheDB8gd0//uPj4c1EQua8Q+MViT0/w==
 
 escape-html@~1.0.3:
   version "1.0.3"
@@ -11480,7 +11493,7 @@ whatwg-encoding@^1.0.1, whatwg-encoding@^1.0.3:
   dependencies:
     iconv-lite "0.4.24"
 
-whatwg-fetch@>=0.10.0:
+whatwg-fetch@>=0.10.0, whatwg-fetch@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/whatwg-fetch/-/whatwg-fetch-3.0.0.tgz#fc804e458cc460009b1a2b966bc8817d2578aefb"
 

@@ -1,4 +1,8 @@
 import log from "../../utils/log";
+import 'es6-promise/auto'
+import 'whatwg-fetch'
+require('@uppy/core/dist/style.css')
+require('@uppy/dashboard/dist/style.css')
 
 function BinxAdminBlogs() {
   return {
@@ -15,42 +19,20 @@ function BinxAdminBlogs() {
     },
 
     uppyFileUpload() {
-      const uppyOne = new Uppy({
+      const uppy = new Uppy({
         debug: true,
         autoProceed: true
       })
-      uppyOne
-        .use(DragDrop, {
-          target: '.UppyDragDrop-One'
-        })
-        .use(Tus, {
-          endpoint: 'https://master.tus.io/files/'
-        })
-        // .use(ProgressBar, {
-        //   target: '.UppyDragDrop-One-Progress',
-        //   hideAfterFinish: false
-        // })
-
-      // const uppyTwo = new Uppy({
-      //   debug: true,
-      //   autoProceed: false
-      // })
-      // uppyTwo
-      //   .use(DragDrop, {
-      //     target: '#UppyDragDrop-Two'
-      //   })
-      //   .use(Tus, {
-      //     endpoint: 'https://master.tus.io/files/'
-      //   })
-      //   .use(ProgressBar, {
-      //     target: '.UppyDragDrop-Two-Progress',
-      //     hideAfterFinish: false
-      //   })
-
-      // let uploadBtn = document.querySelector('.UppyDragDrop-Two-Upload')
-      // uploadBtn.addEventListener('click', function() {
-      //   uppyTwo.upload()
-      // })
+      uppy.use(FileInput, {
+        target: '.UppyForm',
+        replaceTargetContent: true
+      })
+      uppy.use(XHRUpload, {
+        endpoint: '/public_images',
+        method: "POST",
+        formData: true,
+        fieldName: 'files[]'
+      })
     }
   };
 }
