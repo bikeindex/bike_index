@@ -164,6 +164,11 @@ export default class BinxAppOrgMessages {
     binxApp.localizeTimes();
 
     $("#messagesCount .number").text(messages.length);
+    if (messages.length == 1) {
+      $("#messagesCount").removeClass("number-is-plural");
+    } else {
+      $("#messagesCount").addClass("number-is-plural");
+    }
   }
 
   addMarkerPointsForMessages(messages) {
