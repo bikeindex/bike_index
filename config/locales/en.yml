@@ -845,9 +845,9 @@ en:
         tips_for_talking_to_bike_shops_url: https://bikeindex.org/news/how-to-get-a-bike-shop-signed-up-in-bike-index
     bikes:
       list:
-        org_bikes_html: '<em>%{org_name}</em> bikes'
+        org_bikes_html: "<em>%{org_name}</em> bikes"
         bike: bike
-        num_bikes_registered_html: '<strong>%{num_bikes}</strong> registered'
+        num_bikes_registered_html: "<strong>%{num_bikes}</strong> registered"
         added: Added
         manufacturer: Manufacturer
         model: Model
@@ -861,8 +861,8 @@ en:
         search_owner_email: Search owner email
         search_for_serial_number: Search for serial number
         bike: bike
-        matching_bikes_html: <strong>%{bikes}</strong> matching
-        registered_bikes_html: <strong>%{bikes}</strong> registered with %{org_name}
+        matching_bikes_html: "<strong>%{bikes}</strong> matching"
+        registered_bikes_html: "<strong>%{bikes}</strong> registered with %{org_name}"
         view_just_stolen_bikes: view just stolen bikes
         stolen_bikes_html: "<em>stolen</em> bikes"
         view_all_bikes: view all bikes
@@ -1033,8 +1033,91 @@ en:
         delete_organization: Delete organization
         removal_confirmation: Are you positive you want to remove %{org_name} from Bike Index?
       locations:
-        location_settings_html: <em>%{org_name}</em> location settings
+        location_settings_html: "<em>%{org_name}</em> location settings"
         bike_index_partner_map: Bike Index partner map
         display_org_on_map_html: Display <em>%{org_name}</em> on %{map_link}
         add_location: Add location
         save: Save
+    messages:
+      index:
+        bike: Bike
+        matches: matches
+        sender: Sender
+        sent: Sent
+      show:
+        organization_message: "%{org_kind} Message"
+        created: Created
+        delivered: Delivered
+        success: Success
+        pending_delivery: Pending delivery
+        sender: Sender
+        bike: Bike
+        subject: Subject
+        additional_text: Additional text
+        none: none
+    stickers:
+      index:
+        stickers: Stickers
+        search_sticker_id: Search Sticker ID
+        search_bike_url_or_id: Search Bike URL or ID
+        search: Search
+        all: All
+        sticker: Sticker
+        claimed: Claimed
+        unclaimed: Unclaimed
+        bike: Bike
+        added_html: Added <small class="convertTimezone"></small>
+        coded: Code
+      edit:
+        edit_sticker: Edit Sticker
+        remove_bike_link: Remove Bike link
+        sticker: Sticker
+        claimed: Claimed
+        bike: Bike
+        bike_is_unavailable: Bike is unavailable - it was probably deleted
+        unclaimed: Unclaimed
+        claimed_by: Claimed by
+        previous_bike: Previous Bike
+        bike_id_or_url: Bike ID / URL
+        update: Update
+    users:
+      edit:
+        edit_membership_html: Edit membership for <em class="small">%{email}</em>
+        remove_from_organization: remove from organization
+        invited: Invited
+        signed_up: Signed up
+        has_not_signed_up_html: "%{name} <strong>has still not signed up</strong>"
+        email: Email
+        membership_type: Membership type
+        admin_of_organization: Admin of organization
+        member_of_organization: Member of organization
+        confirmation: Are you sure you want to remove %{user_name} from %{org_name}? (They will still be to use their personal account)
+        update: Update
+      index:
+        manage_users: Manage Users
+        you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
+        remaining_invites_html: You can add <strong>%{invitations_count}</strong> more
+        invite_more_users: Invite more users
+        emails_are_currently_sent_from_html: Emails are currently sent from <em>%{email}</em>.
+        update_email: Update email
+        created: Created
+        user: user
+        to: To
+        claimed: Claimed
+        is_admin: Admin?
+        sender: Sender
+      new:
+        invite_user: Invite user
+        you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
+        remaining_invites_html: You can add <strong>%{invitations_count}</strong> more
+        email_youre_inviting: Email you're inviting
+        invite_multiple_emails: Invite multiple emails
+        multiple_emails: Multiple emails
+        1_email_per_line: 1 email per line
+        membership: Membership
+        user: user
+        example_emails: example@example.com\nexample2@example.com\nexample3@example.com
+        membership_type: Membership type
+        admin_of_organization: Admin of organization
+        member_of_organization: Member of organization
+        send_invitation: Send invitation
