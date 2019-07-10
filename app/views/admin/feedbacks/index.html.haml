@@ -57,7 +57,7 @@
           %td
             - if feedback.user_id.present?
               - display_name = feedback.user&.display_name || feedback.user_id
-              = link_to display_name, admin_user_path(feedback.user)
+              = link_to display_name, admin_user_path(feedback.user_id)
               - unless params[:search_user_id].present?
                 %small
                   = link_to "matching messages", admin_feedbacks_path(sortable_search_params.merge(search_user_id: feedback.user_id)), class: "gray-link"
