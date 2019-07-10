@@ -144,7 +144,6 @@ module API
             declared_p = { "declared_params" => declared(params, include_missing: false) }
             b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
             b_param.clean_params
-            o
             @bike = found_bike
             authorize_bike_for_user
 
