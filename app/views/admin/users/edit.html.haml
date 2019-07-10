@@ -46,6 +46,16 @@
             Updated
           %td.convertTime
             = l @user.updated_at, format: :convert_time
+        %tr
+          %td
+            Last&nbsp;login
+          %td
+            - if @user.last_login_at.present?
+              %span.convertTime
+                = l @user.last_login_at, format: :convert_time
+            - if @user.last_login_ip.present?
+              %small.less-strong
+                @user.last_login_ip
   .col-md-6.mt-auto
     %table.table-list
       %tr
