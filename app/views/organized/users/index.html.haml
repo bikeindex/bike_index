@@ -2,17 +2,17 @@
   %h1= t(".manage_users")
   %p
     - count = number_with_delimiter(current_organization.sent_invitation_count)
-    = t(".you_have_invited_html", users_count: pluralize(count, 'user'))
+    = t(".you_have_invited_html", users_count: pluralize(count, t(".user")))
   %p
     - count = number_with_delimiter(current_organization.remaining_invitation_count)
-    = t(".remaining_invites", invitations_count: count)
+    = t(".remaining_invites_html", invitations_count: count)
 
     - if current_organization.remaining_invitation_count > 0
       = link_to t(".invite_more_users"), new_organization_user_path(organization_id: current_organization.to_param)
 
   %p
     - if current_organization.auto_user.present?
-      = t(".emails_are_currently_sent_from", email: current_organization.auto_user.email)
+      = t(".emails_are_currently_sent_from_html", email: current_organization.auto_user.email)
       =  link_to t(".update_email"), organization_manage_index_path(organization_id: current_organization.to_param)
 
 .paginate-container
