@@ -1,30 +1,21 @@
 %h2.header-font-uncap
-  Ambassador resources
+  = t(".ambassador_resources")
 
 %p.mt-4
-  As an ambassador, you have access to a number of special features on Bike Index. Here are a few of them:
+  = t(".as_an_ambassador_you_have_access_to_a_num")
 %ul
-  %li
-    You're a moderator on <a href="https://discuss.bikeindex.org">discuss.bikeindex.org</a>
-  %li
-    You can send stolen messages to bikes that haven’t been marked stolen yet (as described in <a href="https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen">recover bikes before they are marked stolen</a>)
-  %li
-    You can mark stolen bikes recovered (ambassadors from New Orleans requested this feature - they just recover bikes so quickly!)
-  %li
-    Access to quick communication with the Bike Index team via Slack and email
-  %li
-    Periodic discount codes from Bike Index partners
+  %li= t(".youre_a_moderator_on_discuss_html")
+  %li= t(".you_can_send_stolen_messages_html")
+  %li= t(".you_can_mark_stolen_bikes")
+  %li= t(".access_to_quick_communication")
+  %li= t(".periodic_discount_codes")
 
 
 %p.mt-4
-  Some additional resources:
+  = t(".some_additional_resources")
 
 %ol
-  %li
-    = link_to "QR sticker instructions for organizations", "https://drive.google.com/file/d/1VXoF1NB7CcSLu8BaBQeuLhNmmB89qp81/view?usp=sharing"
-  %li
-    = link_to "QR sticker instructions for individuals", "https://drive.google.com/file/d/1_EMLLgvJGdyQI7catFmuhs2zHoNoaXBE/view?usp=sharing"
-  %li
-    #{link_to "Organizations sign up", new_organization_path} page on Bike Index
-  %li
-    = link_to "Tips for talking to bike shops", "https://bikeindex.org/news/how-to-get-a-bike-shop-signed-up-in-bike-index"
+  %li= link_to(t(".qr_sticker_org_instructions"), t(".qr_sticker_org_instructions_url"))
+  %li= link_to(t(".qr_sticker_instructions"), t(".qr_sticker_instructions_url"))
+  %li= t(".page_on_bike_index_html", signup_link: link_to(t(".organizations_sign_up"), new_organization_path))
+  %li= link_to t(".tips_for_talking_to_bike_shops"), t(".tips_for_talking_to_bike_shops_url")

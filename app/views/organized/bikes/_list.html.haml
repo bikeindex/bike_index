@@ -1,36 +1,32 @@
 .organized-page-header
-  %h1
-    %em
-      = current_organization.name
-    bikes
+  %h1= t(".org_bikes_html", org_name: current_organization.name)
+
   %p
-    %strong
-      - count = defined?(@bikes.total_count) ? @bikes.total_count : @bikes.count
-      = number_with_delimiter(count)
-      = "bike".pluralize(count)
-    registered
+    - count = defined?(@bikes.total_count) ? @bikes.total_count : @bikes.count
+    - num_bikes = pluralize(number_with_delimiter(count), t(".bike"))
+    = t(".num_bikes_registered_html", num_bikes: num_bikes)
 .full-screen-table
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
     %thead.small-header
       %tr
         %th.date-added
-          Added&nbsp;<small class="convertTimezone"></small>
-        %th Manufacturer
-        %th Model
-        %th Color
-        %th Sent to
-        / %th Claimed
+          = t(".added")
+          %small.convertTimezone
+        %th= t(".manufacturer")
+        %th= t(".model")
+        %th= t(".color")
+        %th= t(".sent_to")
+        -# %th Claimed
         - if @bike_code.present?
           %th
-            Link
+            = t(".link")
             %br
-            Sticker
+            = t(".sticker")
     %tbody
       - @bikes.each do |bike|
         %tr
           %td
-            %a.convertTime{ href: bike_path(bike) }
-              = l bike.created_at, format: :convert_time
+            = link_to l(bike.created_at, format: :convert_time), bike_path(bike), class: "convertTime"
           %td
             = bike.mnfg_name
           %td
@@ -43,13 +39,14 @@
               - if bike.creation_description
                 = bike.creation_description
               - unless bike.owner_email == bike.first_owner_email
-                (sent to a new owner)
-          / %td
-          /   = "&#x2713;".html_safe if bike.user?
+                = "(#{t('.sent_to_a_new_owner')})"
           - if @bike_code.present?
             %td
               %small
-                = link_to "Link", bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id, bike_id: bike.id), method: "PUT"
+                = link_to t(".link"),
+                bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id, bike_id: bike.id),
+                method: "PUT"
+
 - if defined?(@bikes.total_count)
   .paginate-container.paginate-container-bottom
     = paginate @bikes
