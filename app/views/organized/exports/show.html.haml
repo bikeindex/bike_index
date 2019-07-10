@@ -102,7 +102,7 @@
                 %ul.exported-link-list
                   - bike_code_links = @export.bike_codes.each do |code, i|
                     %li
-                       #{link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param)}#{i == (@export.bike_codes.count - 1) ? "" : ","}
+                      #{link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param)}#{i == (@export.bike_codes.count - 1) ? "" : ","}
 
                 - if @export.bike_codes_removed?
                   %em.text-danger= t(".stickers_have_been_unassigned")
