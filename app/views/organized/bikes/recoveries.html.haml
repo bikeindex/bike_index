@@ -36,10 +36,7 @@
 
           %td
             %small
-              - if bike.frame_model.present?
-                = [bike.mnfg_name, bike.frame_model].join(", ")
-              - else
-                = bike.mnfg_name
+              = [bike.mnfg_name, bike.frame_model].select(&:present?).join(", ")
               %span.less-strong
                 = bike.frame_colors.to_sentence
           %td
