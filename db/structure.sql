@@ -2182,7 +2182,6 @@ CREATE TABLE public.users (
     notification_unstolen boolean DEFAULT true,
     my_bikes_hash jsonb,
     preferred_language character varying,
-    magic_link_token text,
     last_login_ip character varying
 );
 
@@ -4382,6 +4381,4 @@ INSERT INTO schema_migrations (version) VALUES ('20190705230020');
 INSERT INTO schema_migrations (version) VALUES ('20190708181605');
 
 INSERT INTO schema_migrations (version) VALUES ('20190709011902');
-
-INSERT INTO schema_migrations (version) VALUES ('20190710203715');
 
