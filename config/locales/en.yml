@@ -1044,3 +1044,14 @@ en:
         matches: matches
         sender: Sender
         sent: Sent
+      show:
+        organization_message: "%{org_kind} Message"
+        created: Created
+        delivered: Delivered
+        success: Success
+        pending_delivery: Pending delivery
+        sender: Sender
+        bike: Bike
+        subject: Subject
+        additional_text: Additional text
+        none: none
