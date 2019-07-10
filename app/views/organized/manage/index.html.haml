@@ -66,7 +66,7 @@
   #delete-organization.collapse
     .text-md-center
       = link_to t(".delete_organization"),
-      organization_manage_path(id: current_organization.id, organization_id: current_organization.to_param),
-      method: :delete,
-      data: { confirm: t(".removal_confirmation", org_name: current_organization.name) },
-      class: 'btn btn-danger'
+        organization_manage_path(id: current_organization.id, organization_id: current_organization.to_param),
+        method: :delete,
+        data: { confirm: t(".removal_confirmation", org_name: current_organization.name) },
+        class: 'btn btn-danger'
