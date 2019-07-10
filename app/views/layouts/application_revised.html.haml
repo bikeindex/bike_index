@@ -132,7 +132,7 @@
           %li.primary-nav-item
             = active_link t(".blog"), news_index_path, class: 'nav-link', match_controller: true
           %li.primary-nav-item.d-none.d-lg-block
-            = active_link t(".search_bikes"), default_bike_search_path, class: 'nav-link defaultBikeSearchLink', id: 'search_bikes_header_link', match_controller: true
+            = active_link t(".search_bikes"), default_bike_search_path, class: 'nav-link defaultBikeSearchLink', match_controller: true
     = render 'layouts/revised_messages'
 
     - if current_page_skeleton
