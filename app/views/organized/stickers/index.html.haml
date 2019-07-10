@@ -1,67 +1,78 @@
 .organized-page-header.mb-4
   %h1
-    %em
-      = current_organization.name
-    Stickers
+    %em= current_organization.name
+    = t(".stickers")
 
 - claimedness = "claimed" if params[:claimedness] == "claimed"
 - claimedness ||= "unclaimed" if params[:claimedness] == "unclaimed"
 - claimedness ||= "all"
-= form_tag organization_stickers_path(organization_id: current_organization.to_param), method: :get, class: "stickers-form" do
+
+= form_tag organization_stickers_path(organization_id: current_organization.to_param),
+  method: :get,
+  class: "stickers-form" do
+
   .row
     .col-md-4
-      = text_field_tag :query, params[:query], placeholder: "Search Sticker ID", class: "form-control"
+      = text_field_tag :query, params[:query],
+        placeholder: t(".search_sticker_id"),
+        class: "form-control"
+
     .col-md-4
-      = text_field_tag :bike_query, params[:bike_query], placeholder: "Search Bike URL or ID", class: "form-control"
+      = text_field_tag :bike_query,
+        params[:bike_query],
+        placeholder: t(".search_bike_url_or_id"),
+        class: "form-control"
+
     .col-sm-2.text-right
-      = submit_tag "Search", class: "btn btn-primary"
+      = submit_tag t(".search"), class: "btn btn-primary"
+
     .col-md-12
       .btn-group#organized-bike-code-claimedness{ role: "group", "aria-label" => "Claimedness", data: { toggle: "buttons" }, style: "margin-top: 0.3rem;" }
         %label.btn.btn-sm.btn-secondary{ class: ("active" if claimedness == "all") }
           %input{ type: "radio", name: "claimedness", autocomplete: "off", checked: claimedness == "all", value: "all" }
-          All
+          = t(".all")
+
         %label.btn.btn-sm.btn-secondary{ class: ("active" if claimedness == "claimed") }
           %input{ type: "radio", name: "claimedness", autocomplete: "off", checked: claimedness == "claimed", value: "claimed" }
-          Claimed
+          = t(".claimed")
+
         %label.btn.btn-sm.btn-secondary{ class: ("active" if claimedness == "unclaimed") }
           %input{ type: "radio", name: "claimedness", autocomplete: "off", checked: claimedness == "unclaimed", value: "unclaimed" }
-          Unclaimed
+          = t(".unclaimed")
 
 .table-responsive.mt-4
   %p{ style: "margin-bottom: 0;" }
-    %strong
-      = number_with_delimiter(@bike_codes.total_count)
-    = "Sticker".pluralize(@bike_codes.total_count)
+    %strong= pluralize(number_with_delimiter(@bike_codes.total_count), t(".sticker"))
+
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.sortable
       %th
-        = sortable "created_at", "Added&nbsp;<small class='convertTimezone'></small>".html_safe
+        = sortable "created_at", t(".added_html")
       %th
         - if claimedness == "claimed"
-          = sortable "claimed_at"
+          = sortable "claimed_at", t(".claimed")
         - else
-          Claimed
+          = t(".claimed")
+      %th= t(".bike")
       %th
-        Bike
-      %th
-        = sortable "code_integer", "Code"
+        = sortable "code_integer", t(".coded")
+
     %tbody
       - @bike_codes.each do |bike_code|
         %tr
           %td
             %a.convertTime{ href: edit_organization_sticker_path(organization_id: current_organization.id, id: bike_code.code) }
-              = l bike_code.created_at, format: :convert_time
+              = l(bike_code.created_at, format: :convert_time)
           %td
             - if bike_code.claimed? && bike_code.claimed_at.present?
               %span.convertTime
-                = l bike_code.claimed_at, format: :convert_time
+                = l(bike_code.claimed_at, format: :convert_time)
           %td
             - if bike_code.claimed?
-              / For these, use bike_id to avoid loading association
-              = link_to organized_bike_text(bike_code.bike), bike_path(bike_code.bike)
+              -# For these, use bike_id to avoid loading association
+              = link_to(organized_bike_text(bike_code.bike), bike_path(bike_code.bike))
           %td
-            %strong
-              = bike_code.pretty_code
+            %strong= bike_code.pretty_code
 
 .paginate-container.paginate-container-bottom
   = paginate @bike_codes

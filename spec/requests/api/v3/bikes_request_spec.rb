@@ -454,8 +454,6 @@ RSpec.describe "Bikes API V3", type: :request do
         state: "NY",
         police_report_number: "99999999",
         police_report_department: "New York",
-      # locking_description: "some locking description",
-      # lock_defeat_description: "broken in some crazy way"
       }
       expect do
         post "/api/v3/bikes?access_token=#{token.token}",
@@ -482,13 +480,26 @@ RSpec.describe "Bikes API V3", type: :request do
         phone: "",
         theft_description: "This bike was stolen and that's no fair.",
         city: "Chicago",
+        theft_description: "I was away for a little bit and suddenly the bike was gone",
       }
       expect do
         post "/api/v3/bikes?access_token=#{token.token}",
              bike_attrs.to_json,
              json_headers
-      end.to change(Ownership, :count).by 0
-      expect(json_result["error"]).to be_present
+      end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
+      expect(json_result).to include("bike")
+      expect(json_result["bike"]["serial"]).to eq(bike_attrs[:serial])
+      expect(json_result["bike"]["manufacturer_name"]).to eq(bike_attrs[:manufacturer])
+      expect(json_result["bike"]["stolen_record"]["date_stolen"]).to be_within(1).of Time.current.to_i
+      bike = Bike.find(json_result["bike"]["id"])
+      expect(bike.creation_organization).to be_blank
+      expect(bike.creation_state.origin).to eq "api_v2" # Because it just inherits v2 :/
+      expect(bike.stolen).to be_truthy
+      expect(bike.current_stolen_record_id).to be_present
+      expect(bike.current_stolen_record.police_report_number).to be_nil
+      expect(bike.current_stolen_record.phone).to be_nil
+      expect(bike.current_stolen_record.show_address).to be_falsey
+      expect(bike.current_stolen_record.theft_description).to eq "I was away for a little bit and suddenly the bike was gone"
     end
   end
 
@@ -635,16 +646,6 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(response.code).to eq("403")
       expect(response.body).to match(/oauth/i)
       expect(response.body).to match(/permission/i)
-    end
-
-    it "fails to update bike if required stolen attrs aren't present" do
-      expect(bike.year).to be_nil
-      params[:stolen_record] = { phone: "", city: "Chicago" }
-
-      put url, params.to_json, json_headers
-
-      expect(response.code).to eq("401")
-      expect(response.body.match("missing phone")).to be_present
     end
 
     it "updates a bike, adds a stolen record, doesn't update locked attrs" do

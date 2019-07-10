@@ -1,54 +1,50 @@
 .mb-4
   %h1
-    Edit membership
-    %em.small
-      for
-      = @membership.invited_email
+    = t(".edit_membership_html", email: @membership.invited_email)
+
 %p.text-right
-  = link_to 'remove from organization', organization_user_path(id: @membership.id, organization_id: current_organization.to_param), method: :delete, data: { confirm: "Are you sure you want to remove #{@name} from #{current_organization.name}? (They will still be to use their personal account)" }, class: 'btn btn-danger'
+  = link_to t(".remove_from_organization"),
+    organization_user_path(id: @membership.id, organization_id: current_organization.to_param),
+    method: :delete,
+    data: { confirm: t(".confirmation", user_name: @name, org_name: current_organization.name) },
+    class: "btn btn-danger"
 
 %table.table-list
   %tbody
     %tr
       %td
-        Invited
+        = t(".invited")
       %td
         %span.converTime.preciseTime
-          = l @membership.created_at, format: :short_with_year
+          = l(@membership.created_at, format: :short_with_year)
     %tr
       %td
-        Signed up
+        = t(".signed_up")
       %td
         - if @membership.claimed?
-          %span.converTime.preciseTime
-            = l @membership.claimed_at, format: :short_with_year
+          %span.converTime.preciseTime= l(@membership.claimed_at, format: :short_with_year)
         - else
-          #{@membership.invited_display_name}
-          %strong
-            has still not signed up
+          = t(".has_not_signed_up_html", name: @membership.invited_display_name)
 
 = form_for @membership, { as: :membership, url: organization_user_path(id: @membership.id, organization_id: current_organization.to_param), action: 'update', html: { class: 'organized-form' } } do |f|
-
   .form-group.row
-    %label.org-form-label
-      Email
+    %label.org-form-label= t(".email")
     .col-sm-4
-      %p.static-form-control
-        = @membership.user.email
+      %p.static-form-control= @membership.user.email
 
   .form-group.row
     %label.org-form-label
-      Membership type
+      = t(".membership_type")
     .col-sm-4
       .radio
         %label
           = f.radio_button :role, Membership.membership_types.first
-          Admin of organization
+          = t(".admin_of_organization")
       .radio
         %label
           = f.radio_button :role, Membership.membership_types.second
-          Member of organization
+          = t(".member_of_organization")
 
   .row.mt-4.form-group
     .form-submit-button
-      = f.submit 'Update', class: 'btn btn-success btn-lg'
+      = f.submit t(".update"), class: "btn btn-success btn-lg"

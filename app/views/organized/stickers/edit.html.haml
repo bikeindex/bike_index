@@ -1,61 +1,60 @@
 .mb-4
   %h1
-    Edit Sticker
-    %em
-      = @bike_code.pretty_code
+    = t(".edit_sticker")
+    %em= @bike_code.pretty_code
   - if @bike_code.bike_id.present?
     %p.text-right
-      = link_to "Remove Bike link", organization_sticker_path(id: @bike_code.code, organization_id: current_organization.to_param, bike_id: nil), method: :put, class: "btn btn-danger"
+      = link_to t(".remove_bike_link"),
+        organization_sticker_path(id: @bike_code.code, organization_id: current_organization.to_param, bike_id: nil),
+        method: :put,
+        class: "btn btn-danger"
 
 %table.table-list
   %tbody
     %tr
-      %td
-        Sticker
-      %td
-        = @bike_code.pretty_code
+      %td= t(".sticker")
+      %td= @bike_code.pretty_code
     %tr
-      %td
-        Claimed
+      %td= t(".claimed")
       %td
         - if @bike_code.claimed_at.present?
           %span.convertTime
-            = l @bike_code.created_at, format: :convert_time
+            = l(@bike_code.created_at, format: :convert_time)
     %tr
-      %td
-        Bike
+      %td= t(".bike")
       %td
         - if @bike_code.claimed?
-          = link_to organized_bike_text(@bike_code.bike), bike_path(@bike_code.bike)
+          = link_to(organized_bike_text(@bike_code.bike), bike_path(@bike_code.bike))
         - elsif @bike_code.bike_id.present?
-          %span.text-danger
-            Bike is unavailable - it was probably deleted
+          %span.text-danger= t(".bike_is_unavailable")
         - else
-          %strong
-            Unclaimed
+          %strong= t(".unclaimed")
     %tr
-      %td
-        Claimed by
-      %td
-        - if @bike_code.user.present?
-          = @bike_code.user.display_name
+      %td= t(".claimed_by")
+      %td= @bike_code.user&.display_name
 
     - if @bike_code.previous_bike_id
       %tr
-        %td
-          Previous Bike
+        %td= t(".previous_bike")
         %td
           - previous_bike = Bike.find_by_id(@bike_code.previous_bike_id)
-          = link_to previous_bike&.title_string || @bike_code.previous_bike_id, bike_path(@bike_code.previous_bike_id)
+          - label = previous_bike&.title_string || @bike_code.previous_bike_id
+          = link_to(label, bike_path(@bike_code.previous_bike_id))
 
 %hr.mt-4.mb-4
 
-= form_for @bike_code, { url: organization_sticker_path(id: @bike_code.code, organization_id: current_organization.to_param), action: "update", html: { class: "organized-form" } } do |f|
+= form_for @bike_code,
+  { url: organization_sticker_path(id: @bike_code.code,
+    organization_id: current_organization.to_param),
+    action: "update",
+    html: { class: "organized-form" } } do |f|
 
   .form-group.row
-    = f.label :bike_id, "Bike ID/URL", class: "org-form-label"
+    = f.label :bike_id, t(".bike_id_or_url"), class: "org-form-label"
+
     .col-sm-4
       = f.text_field :bike_id, required: true, class: "form-control"
+
   .row.mt-4
     .form-submit-button
-      = f.submit "Update", class: "btn btn-success btn-lg"
+      = f.submit t(".update"), class: "btn btn-success btn-lg"
