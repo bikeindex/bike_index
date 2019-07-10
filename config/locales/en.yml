@@ -1068,3 +1068,15 @@ en:
         bike: Bike
         added_html: Added <small class="convertTimezone"></small>
         coded: Code
+      edit:
+        edit_sticker: Edit Sticker
+        remove_bike_link: Remove Bike link
+        sticker: Sticker
+        claimed: Claimed
+        bike: Bike
+        bike_is_unavailable: Bike is unavailable - it was probably deleted
+        unclaimed: Unclaimed
+        claimed_by: Claimed by
+        previous_bike: Previous Bike
+        bike_id_or_url: Bike ID / URL
+        update: Update
