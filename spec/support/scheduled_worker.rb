@@ -11,15 +11,15 @@ RSpec.shared_context :scheduled_worker do
     describe "scheduling" do
       it "does not need to run immediately after running" do
         clear_scheduled_history
-        expect(subject.should_enqueue?).to be_truthy
+        expect(described_class.should_enqueue?).to be_truthy
         instance.perform
-        expect(subject.should_enqueue?).to be_falsey
+        expect(described_class.should_enqueue?).to be_falsey
       end
     end
 
     describe "runnering" do
       it "is specified in the runner" do
-        expect(ScheduledWorkerRunner.scheduled_workers).to include(subject)
+        expect(ScheduledWorkerRunner.scheduled_workers).to include(described_class)
       end
     end
   end

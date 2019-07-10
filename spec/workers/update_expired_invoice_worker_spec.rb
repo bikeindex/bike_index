@@ -1,14 +1,13 @@
 require "rails_helper"
 
 RSpec.describe UpdateOrganizationPosKindWorker, type: :lib do
-  let(:subject) { UpdateOrganizationPosKindWorker }
-  let(:instance) { subject.new }
+  let(:instance) { described_class.new }
   include_context :scheduled_worker
   include_examples :scheduled_worker_tests
 
   it "is the correct queue and frequency" do
-    expect(subject.sidekiq_options["queue"]).to eq "low_priority" # overrides default
-    expect(subject.frequency).to be > 6.hours
+    expect(described_class.sidekiq_options["queue"]).to eq "low_priority" # overrides default
+    expect(described_class.frequency).to be > 6.hours
   end
 
   describe "perform" do

@@ -1,6 +1,10 @@
 require "rails_helper"
 
 RSpec.describe DeactivateExpiredTheftAlertWorker, type: :job do
+  let(:instance) { described_class.new }
+  include_context :scheduled_worker
+  include_examples :scheduled_worker_tests
+
   describe "#perform" do
     it "deactivates expired theft alerts" do
       active = FactoryBot.create_list(:theft_alert_begun, 2)
