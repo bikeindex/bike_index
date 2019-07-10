@@ -45,7 +45,8 @@
 
             .collapse#show_exported_bikes
               %ul.exported-link-list
-                %li= bike_ids.map { |id| link_to(id, bike_path(id)) }.join(", ").html_safe
+                - bike_ids.each do |id|
+                  %li= link_to(id, bike_path(id))
 
       %tr
         %td
@@ -98,17 +99,16 @@
               %em= t(".stickers_exported", bike_codes_count: @export.bike_codes&.count.to_i)
               - if @export.bike_codes.any?
                 %ul.exported-link-list
-                  - bike_code_links = @export.bike_codes.map do |code|
-                    link_to(code, edit_organization_sticker_path(code, organization_id: current_organization.to_param))
-                  %li= bike_code_links.join(", ").html_safe
+                  - bike_code_links = @export.bike_codes.each do |code|
+                    %li= link_to(code, edit_organization_sticker_path(code, organization_id: current_organization.to_param))
 
                 - if @export.bike_codes_removed?
                   %em.text-danger= t(".stickers_have_been_unassigned")
                 - else
                   = link_to(t(".unassign_stickers"),
-                  organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_codes: true),
-                  method: :put,
-                  class: "btn btn-warning float-right")
+                    organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_codes: true),
+                    method: :put,
+                    class: "btn btn-warning float-right")
               - else
                 %small.less-strong= t(".no_stickers_assigned")
             - else
