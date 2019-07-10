@@ -1,7 +1,6 @@
 require "rails_helper"
 
 RSpec.describe ScheduledWorkerRunner, type: :lib do
-  let(:instance) { described_class.new }
   let(:scheduled_workers) { [UpdateExpiredInvoiceWorker, UpdateCountsWorker, UpdateOrganizationPosKindWorker, DeactivateExpiredTheftAlertWorker] }
   include_context :scheduled_worker
   include_examples :scheduled_worker_tests
@@ -19,7 +18,7 @@ RSpec.describe ScheduledWorkerRunner, type: :lib do
     it "schedules all the workers" do
       clear_scheduled_history
       expect(described_class.scheduled_workers.count).to be > 0
-      instance.perform
+      described_class.new.perform
       described_class.scheduled_non_scheduler_workers.each do |worker|
         expect(worker.jobs.count).to eq 1
       end
