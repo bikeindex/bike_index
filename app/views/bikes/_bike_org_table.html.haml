@@ -2,17 +2,17 @@
   %table.table.table-striped.table-bordered
     %thead
       %th
-        Date indexed
+        = t(".date_indexed")
       %th
-        Manufacturer
+        = t(".manufacturer")
       %th.medium-screens
-        Model
+        = t(".model")
       %th.large-screens
-        Color
+        = t(".color")
       %th.medium-screens
-        Sent to
+        = t(".sent_to")
       %th.large-screens
-        view PDF
+        = t(".view_pdf")
 
     %tbody
       - @bikes.each do |bike|
@@ -21,11 +21,11 @@
             - if bike.created_at.today?
               %span.hidden
                 = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              = "Today at #{bike.created_at.strftime('%-I %p')}"
+              = t(".today_at_bikecreated_atstrftimei_p", bikecreated_atstrftimei_p: bike.created_at.strftime('%-I %p'))
             - elsif Date.yesterday().beginning_of_day() <= bike.created_at
               %span.hidden
                 = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              = "Yesterday at #{bike.created_at.strftime('%-I %p')}"
+              = t(".yesterday_at_bikecreated_atstrftimei_p", bikecreated_atstrftimei_p: bike.created_at.strftime('%-I %p'))
             - else
               %span.hidden
                 = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
@@ -39,4 +39,4 @@
           %td.medium-screens
             = bike.owner_email
           %td.large-screens
-            = link_to "PDF", pdf_bike_url(bike)
+            = link_to t(".pdf"), pdf_bike_url(bike)

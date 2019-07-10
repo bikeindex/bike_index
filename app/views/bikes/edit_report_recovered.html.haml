@@ -14,14 +14,14 @@
               %h3= @edit_templates[@edit_template]
             .no-divider-row.full-width-button
               %a.btn.btn-success.btn-lg{data: { toggle: "modal", target: "#toggle-stolen" } }
-                = "This #{@bike.type} has been returned!"
+                = t(".this_biketype_has_been_returned", biketype: @bike.type)
 
 
 - modal_title = "We're so glad you got your #{@bike.type} back!"
 
 - alert_body = capture_haml do
-  %p= "Please tell us how you got your #{@bike.type} back, we really care!"
-  %p It"s how we get better at recovering bikes.
+  %p= t(".please_tell_us_how_you_got_your_biketype_", biketype: @bike.type)
+  %p= t(".its_how_we_get_better_at_recovering_bikes")
 
 - modal_body = capture_haml do
   .modal-body
@@ -31,23 +31,23 @@
       = hidden_field_tag :mark_recovered_stolen_record_id, (@bike.current_stolen_record_id if @bike.current_stolen_record_id.present?)
       .form-group
         %label{ for: :mark_recovered_reason }
-          How did you get it back?
+          = t(".how_did_you_get_it_back")
         = text_area_tag :mark_recovered_reason, '', class: 'form-control'
       .checkbox
         %label
           %input#mark_recovered_we_helped{ type: 'checkbox' }
-          Did we help?
+          = t(".did_we_help")
       .checkbox
         %label
           %input#mark_recovered_can_share_recovery{ type: 'checkbox' }
-          Can we share your story?
+          = t(".can_we_share_your_story")
       .modal-btn-footer
         .row
           .col-xs-6.col-xs-push-6
-            = submit_tag 'Mark recovered', class: 'btn btn-success'
+            = submit_tag t(".mark_recovered"), class: 'btn btn-success'
           .col-xs-6.col-xs-pull-6
             %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
-              Nevermind
+              = t(".nevermind")
 
 / Only one modal if stolen, only one (different) modal if not stolen
 = render partial: "shared/modal", locals: { title: modal_title, id: "toggle-stolen", modal_body: modal_body }

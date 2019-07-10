@@ -12,13 +12,13 @@
               = @edit_templates.select { |k, v| @edit_template.match(/#{k}/) }.values.first
 
             .row
-              %h3.text-center.w-100 Thanks!
+              %h3.text-center.w-100= t(".thanks")
               .col-md-12
                 .copy.text-center
-                  Your order is pending.
+                  = t(".your_order_is_pending")
             .row
               .col-md-12
                 .copy.text-center
-                  Stay tuned for an update once we've processed your alert.
+                  = t(".stay_tuned_for_an_update_once_weve_proces")
 
         = render partial: "theft_alerts_table", locals: { theft_alerts: @theft_alerts }

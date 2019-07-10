@@ -2,15 +2,15 @@
   %table#user-bikes-table.table.table-striped.table-bordered
     %thead
       %th
-        Date indexed
+        = t(".date_indexed")
       %th
-        Manufacturer
+        = t(".manufacturer")
       %th.medium-screens
-        Model
+        = t(".model")
       %th.large-screens
-        Color
+        = t(".color")
       %th.large-screens
-        Created by
+        = t(".created_by")
 
     %tbody
       - pdf ||= false
@@ -21,17 +21,17 @@
               - if bike.created_at.today?
                 %span.hidden
                   = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-                = "Today at #{bike.created_at.strftime('%-I %p')}"
+                = t(".today_at_bikecreated_atstrftimei_p", bikecreated_atstrftimei_p: bike.created_at.strftime('%-I %p'))
               - elsif Date.yesterday().beginning_of_day() <= bike.created_at
                 %span.hidden
                   = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-                = "Yesterday at #{bike.created_at.strftime('%-I %p')}"
+                = t(".yesterday_at_bikecreated_atstrftimei_p", bikecreated_atstrftimei_p: bike.created_at.strftime('%-I %p'))
               - else
                 %span.hidden
                   = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
                 = bike.created_at.strftime("%-m/%-d/%Y")
               - if pdf
-                = link_to "pdf", pdf_bike_url(bike), class: 'less-strong-right'
+                = link_to t(".pdf"), pdf_bike_url(bike), class: 'less-strong-right'
 
           %td
             = link_to bike.mnfg_name, bike.list_link_url(target)
@@ -47,4 +47,4 @@
               - else
                 = u.email
             - else
-              Sorry, we're not sure who created this
+              = t(".sorry_were_not_sure_who_created_this")

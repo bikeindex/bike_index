@@ -4,7 +4,7 @@
   .row.first-row
     .col-md-8
       %h1
-        = "Search for #{stolenness_desc} bikes"
+        = t(".search_for_stolenness_desc_bikes", stolenness_desc: stolenness_desc)
     .col-md-4.ad-col
       .ad-block#top468x60
 
@@ -13,40 +13,40 @@
       = form_tag bikes_path, id: 'bikes_search_form', class: 'bikes-search-form', enforce_utf8: false, method: :get do
         .query-field-wrap.nojs
           - opt_vals = @selected_query_items_options.map { |i| i.is_a?(String) ? [i, i] : [i['text'], i['search_id']]  }
-          = select_tag :query_items, options_for_select(opt_vals, selected: opt_vals.map(&:last)), placeholder: 'Search bike descriptions', class: 'form-control query-field', multiple: true
-          = text_field_tag :query, params[:query], placeholder: 'Search bike descriptions', class: 'form-control query-field'
-          = text_field_tag :serial, params[:serial], placeholder: 'Search for serial number', class: 'form-control query-field'
+          = select_tag :query_items, options_for_select(opt_vals, selected: opt_vals.map(&:last)), placeholder: t(".search_bike_descriptions"), class: 'form-control query-field', multiple: true
+          = text_field_tag :query, params[:query], placeholder: t(".search_bike_descriptions"), class: 'form-control query-field'
+          = text_field_tag :serial, params[:serial], placeholder: t(".search_for_serial_number"), class: 'form-control query-field'
         .search-button-wrap
-          = button_tag(type: 'submit', class: 'searchit btn btn-primary') do
+          = button_tag(type: t(".submit"), class: 'searchit btn btn-primary') do
             :plain
               <svg id="search-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 29 29"><defs><style>.cls-1,.cls-2{fill:none;stroke:#fff;stroke-miterlimit:10;stroke-width:2px;}.cls-2{stroke-linecap:round;}</style></defs><title>searcher</title><circle class="cls-1" cx="10.39" cy="10.39" r="9.39"/><line class="cls-2" x1="17.03" y1="17.03" x2="28" y2="28"/></svg>
         .stolen-search-fields{ class: ('currently-hidden' unless params[:stolenness] == 'proximity') }
-          = text_field_tag :location, params[:location], placeholder: 'Anywhere', class: 'form-control stolen-proximity'
+          = text_field_tag :location, params[:location], placeholder: t(".anywhere"), class: 'form-control stolen-proximity'
           %span
-            miles of
+            = t(".miles_of")
           = number_field_tag :distance, @interpreted_params[:distance] || 100, placeholder: '100', min: 1, class: 'form-control stolen-radius'
           %span
-            within
+            = t(".within")
           = hidden_field_tag :stolenness, params[:stolenness]
       - unless params[:stolenness] == 'all'
         .search-type-tabs
           %ul#stolenness_tabs.nav.nav-tabs{ role: 'tablist' }
             %li#stolenness_tab_proximity.nav-item{ data: { stolenness: 'proximity' } }
               %a.nav-link{ href: '#', class: ('active' if @interpreted_params[:stolenness] == 'proximity'), role: 'tab' }
-                Stolen within
+                = t(".stolen_within")
                 %span#search_distance
                   X
-                miles of
+                = t(".miles_of")
                 %span#search_location
-                  you
+                  = t(".you")
                 %span.count
             %li#stolenness_tab_stolen.nav-item{ data: { stolenness: 'stolen' } }
               %a.nav-link{ href: '#', class: ('active' if @interpreted_params[:stolenness] == 'stolen'), role: 'tab' }
-                Stolen anywhere
+                = t(".stolen_anywhere")
                 %span.count
             %li#stolenness_tab_non.nav-item{ data: { stolenness: 'non' } }
               %a.nav-link{ href: '#', class: ('active' if @interpreted_params[:stolenness] == 'non'), role: 'tab' }
-                Not marked stolen
+                = t(".not_marked_stolen")
                 %span.count
   .row
     .col-md-8
@@ -58,11 +58,11 @@
 
       - else
         %h3.no-exact-results
-          = "No #{stolenness_desc} bikes matched your search"
+          = t(".no_stolenness_desc_bikes_matched_your_sea", stolenness_desc: stolenness_desc)
 
       - if @close_serials.present?
         %h3.secondary-matches
-          = "#{stolenness_desc} with serial numbers close to <em>#{params[:serial]}</em>".html_safe
+          = t(".stolenness_desc_with_serial_numbers_close", stolenness_desc: stolenness_desc, paramsserial: params[:serial]).html_safe
 
         %ul.bike-boxes
           = render partial: 'bikes/bike', collection: @close_serials, as: :bike

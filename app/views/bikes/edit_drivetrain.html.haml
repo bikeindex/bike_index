@@ -6,83 +6,83 @@
         .form-wrap
           .form-well-form-header-always-visible
             %h3
-              Wheels
+              = t(".wheels")
 
           - %w(front rear).each do |side|
             .related-fields
               .form-group.row
                 %label.form-well-label{ for: "#{side}_standard" }
-                  = "#{side.titleize} wheel"
+                  = t(".sidetitleize_wheel", sidetitleize: side.titleize)
                 .form-well-input.fancy-select-placeholder.unfancy
                   .standard-diams{ id: "#{side}_standard"}
                     -# ignore this select in dirty forms
                     %select.form-control.dirtyignore
                       %option{ value: '' }
-                        Choose diameter
+                        = t(".choose_diameter")
                       %option{ value: WheelSize.id_for_bsd(622) }
-                        700c (includes 29ers)
+                        = t(".700c_includes_29ers")
                       %option{ value: WheelSize.id_for_bsd(584) }
-                        650b
+                        = t(".650b")
                       %option{ value: WheelSize.id_for_bsd(630) }
-                        27in
+                        = t(".27in")
                       %option{ value: WheelSize.id_for_bsd(559) }
-                        26in
+                        = t(".26in")
                       %option{ value: WheelSize.id_for_bsd(406) }
-                        20in
+                        = t(".20in")
                       %option{ value: WheelSize.id_for_bsd(355) }
-                        18in
+                        = t(".18in")
                       %option{ value: WheelSize.id_for_bsd(305) }
-                        16in
+                        = t(".16in")
                       %option{ value: WheelSize.id_for_bsd(203) }
-                        12in
+                        = t(".12in")
                   .all-diams.currently-hidden{ id: "#{side}_all" }
-                    = f.collection_select("#{side}_wheel_size_id".to_sym, WheelSize.all , :id, :select_value, prompt: 'All diameters')
+                    = f.collection_select("#{side}_wheel_size_id".to_sym, WheelSize.all , :id, :select_value, prompt: t(".all_diameters", ))
                 .right-input-help
                   %a.wh_sw.show-all-diams.optional-form-block{ id: "show_#{side}_wheel_diams", data: { target: "##{side}_all", toggle: "#hide_#{side}_wheel_diams", action: 'swap', swap: "##{side}_standard" } }
-                    Show more sizes
+                    = t(".show_more_sizes")
                   %a.wh_sw.optional-form-block.currently-hidden{ id: "hide_#{side}_wheel_diams", data: { target: "##{side}_standard", toggle: "#show_#{side}_wheel_diams", action: 'swap', swap: "##{side}_all" } }
-                    Hide extra sizes
+                    = t(".hide_extra_sizes")
             .form-group.row.unnested-field
               %label.form-well-label
-                = "#{side.titleize} tire"
+                = t(".sidetitleize_tire", sidetitleize: side.titleize)
               .form-well-input
                 %label.radio-inline
                   = f.radio_button "#{side}_tire_narrow".to_sym, 'true'
-                  Narrow
+                  = t(".narrow")
                 %label.radio-inline
                   = f.radio_button "#{side}_tire_narrow".to_sym, 'false'
-                  Wide
+                  = t(".wide")
 
         .form-wrap.secondary-form-wrap#edit_drivetrain
           .form-well-form-header-always-visible
             %h3
-              Drivetrain
+              = t(".drivetrain")
           - rear_fixed = RearGearType.fixed.id
           - front_fixed = FrontGearType.fixed.id
           - fixed = @bike.rear_gear_type_id == rear_fixed
           .form-group.row.unnested-field
             %label.form-well-label
-              Drivetrain type
+              = t(".drivetrain_type")
             .form-well-input
               %label.checkbox-inline
                 %input#fixed_gear_check.checkbox.drive-check{ type: "checkbox", checked: fixed }
-                Fixed
+                = t(".fixed")
               %label.checkbox-inline.not-fixed
                 = f.check_box :coaster_brake
-                Coaster Brake
+                = t(".coaster_brake")
               %label.checkbox-inline.not-fixed
                 = f.check_box :belt_drive
-                Belt Drive
+                = t(".belt_drive")
 
           .related-fields.fancy-select.unfancy.not-fixed.no-divider-row
             .form-group.row
               %label.form-well-label{ for: 'front_gear_select'}
-                Front gears
+                = t(".front_gears")
               .form-well-input
                 // ignore this select in dirty forms
                 %select#front_gear_select.form-control.dirtyignore
                   %option.placeholder{ value: ''}
-                    Select chainring count
+                    = t(".select_chainring_count")
                   - FrontGearType.standard.each do |gt|
                     %option{ value: gt.count }
                       = gt.name
@@ -90,7 +90,7 @@
                 - f_internal = (@bike.front_gear_type ? @bike.front_gear_type.internal : false)
                 %label
                   %input#front_gear_select_internal.drive-check{ type: 'checkbox', checked: f_internal }
-                  Internal front gears
+                  = t(".internal_front_gears")
               .row.currently-hidden#front_gear_select_value{ data: { initialcount: (@bike.front_gear_type.count if @bike.front_gear_type), fixed: front_fixed } }
                 = f.radio_button 'front_gear_type_id', nil, class: 'no-gear-selected'
                 - FrontGearType.all.each do |gt|
@@ -99,12 +99,12 @@
           .related-fields.fancy-select.unfancy.not-fixed.no-divider-row
             .form-group.row
               %label.form-well-label{ for: 'rear_gear_select' }
-                Rear gears
+                = t(".rear_gears")
               .form-well-input
                 // ignore this select in dirty forms
                 %select#rear_gear_select.form-control.dirtyignore
                   %option.placeholder{ value: '' }
-                    Select cog count
+                    = t(".select_cog_count")
                   - RearGearType.standard.each do |gt|
                     %option{ value: gt.count }
                       = gt.name
@@ -112,7 +112,7 @@
                 - r_internal = (@bike.rear_gear_type ? @bike.rear_gear_type.internal : false)
                 %label
                   %input#rear_gear_select_internal.drive-check{ type: 'checkbox', checked: r_internal }
-                  Internal rear gears
+                  = t(".internal_rear_gears")
 
               .row.currently-hidden#rear_gear_select_value{ data: { initialcount: (@bike.rear_gear_type.count if @bike.rear_gear_type), fixed: rear_fixed } }
                 = f.radio_button 'rear_gear_type_id', nil, class: 'no-gear-selected'

@@ -2,42 +2,42 @@
   %h2
     = @bike_code.kind
     %em= @bike_code.code
-    isn't linked to a bike.
+    = t(".isnt_linked_to_a_bike")
   %hr.mb-4.mb-4
 
   - if current_user.present?
     - if !@bike_code.claimable_by?(current_user)
-      %h3 You have claimed the maximum permitted number of Bike Codes.
+      %h3= t(".you_have_claimed_the_maximum_permitted_nu")
       %p
-        support_email = link_to "support@bikeindex.org", "mailto:support@bikeindex.org"
-        = "Please email #{support_email} if you don't understand why you're seeing this message or if you need an exception made."
+        = t(".support_email_link_to_supportbikeindexorg")
+        = t(".please_email_support_email_if_you_dont_un", support_email: support_email)
     - else
       %p
-        = "You can enter the URL of the bike you would like to link this #{@bike_code.kind} to:"
-      = form_tag bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id), method: "PUT", class: "row" do
+        = t(".you_can_enter_the_url_of_the_bike_you_wou", bike_codekind: @bike_code.kind)
+      = form_tag bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id), method: :put, class: "row" do
         .col-sm-8.col-lg-10
           .form-group
-            = text_field_tag :bike_id, "", placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
+            = text_field_tag :bike_id, placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
         .col-sm-4.col-lg-2
-          = submit_tag "Update", class: "btn btn-success"
+          = submit_tag t(".update"), class: "btn btn-success"
 
       %p{ style: "margin-top: 24px;" }
-        = "Or, click <em>link it</em> on of your bikes to connect it to this #{@bike_code.kind}:"
+        = t(".or_click_emlink_item_on_of_your_bikes_to_", bike_codekind: @bike_code.kind)
 
       %table.table.table-striped.table-bordered.table-sm.without-exterior-border
         %thead.small-header
           %tr
             %th.date-added
-              Added
+              = t(".added")
               %small.convertTimezone
-            %th.hidden-xs-down Manufacturer
-            %th.hidden-xs-down Model
-            %th.hidden-xs-down Color
+            %th.hidden-xs-down= t(".manufacturer")
+            %th.hidden-xs-down= t(".model")
+            %th.hidden-xs-down= t(".color")
             %th.hidden-sm-up.hidden-sm-up
               %small
-                mnfg, model, <span class="less-strong">color</span>
+                = t(".mnfg_model_span_classlessstrongcolorspan")
             %th
-              Link IT!
+              = t(".link_it")
         %tbody
           - @bikes.each do |bike|
             %tr
@@ -53,14 +53,14 @@
                 = bike.frame_colors.to_sentence
               %td.hidden-sm-up
                 %small
-                  = [bike.mnfg_name, bike.frame_model].select(&:present?)..join(", ")
+                  = [t(".bikemnfg_name"), bike.frame_model].select(&:present?)..join(", ")
                   %span.less-strong
                     = bike.frame_colors.to_sentence
                   %br
               %td
                 %small
-                  = link_to "Link #{@bike_code.kind}", bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id, bike_id: bike.id), method: "PUT"
+                  = link_to t(".link_bike_codekind", bike_codekind: @bike_code.kind), bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id, bike_id: bike.id), method: :put
   - else
     %p{ style: "margin-top: 24px;" }
-      To link that card with a bike,
-      = link_to "please sign in", new_session_url(return_to: "bikes/#{@bike_code.code}/scanned?organization_id=#{@bike_code.organization_id}")
+      = t(".to_link_that_card_with_a_bike")
+      = link_to t(".please_sign_in", ), new_session_url(return_to: "bikes/#{@bike_code.code}/scanned?organization_id=#{@bike_code.organization_id}")

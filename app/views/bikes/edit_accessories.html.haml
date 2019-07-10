@@ -18,7 +18,7 @@
               .form-well-input.fancy-select-placeholder.unfancy
                 = select(:bike, :handlebar_type, HandlebarType.select_options , { prompt: " " }, { class: "form-control handlebar-type-input" })
             .form-group.row.hidden-other{ class: @bike.handlebar_type == "other" ? "unhidden" : "" }
-              = f.label :handlebar_type_other, "Other handlebar type", class: "form-well-label"
+              = f.label :handlebar_type_other, t(".other_handlebar_type"), class: "form-well-label"
               .form-well-input
                 = f.text_field :handlebar_type_other, class: "form-control"
 
@@ -28,6 +28,6 @@
               = render 'bikes/bike_fields/revised_component_fields', f: builder
             %hr
             .add-additional-fields-block.no-divider-row
-              = revised_link_to_add_components 'Add a component', f, :components
+              = revised_link_to_add_components t(".add_a_component"), f, :components
 
           = render "shared/form_well_footer_save"

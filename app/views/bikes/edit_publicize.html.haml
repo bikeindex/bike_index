@@ -10,7 +10,7 @@
           .form-wrap.stolen-checklist-wrap
             .form-well-form-header-always-visible
               %h3.header-font-alt
-                Do these things for the best chance of recovery!
+                = t(".do_these_things_for_the_best_chance_of_re")
 
             = render partial: "bikes/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record }
 
@@ -20,7 +20,7 @@
             %h3= @edit_templates[@edit_template]
 
           %h5.description
-            = "Share your listing - so everyone knows to watch out for your #{@bike.type}!"
+            = t(".share_your_listing_so_everyone_knows_to_w", biketype: @bike.type)
 
           -# TODO: Consolidate social urls in helpers
           .no-divider-row.full-width-button.btn-share
@@ -29,7 +29,7 @@
 
             = link_to facebook_share_url, target: "_blank", class: "bth btn-lg link-share" do
               = image_tag facebook_image_url
-              .share-social.share-facebook Share on Facebook
+              .share-social.share-facebook= t(".share_on_facebook")
 
           .no-divider-row.full-width-button.btn-share
             - tweet_text = "Help me find my stolen bike!"
@@ -43,4 +43,4 @@
             %script{src: "https://platform.twitter.com/widgets.js", charset: "utf-8"}
             %a{href: "https://twitter.com/share?url=#{bike_url(@bike)}&text=#{tweet_text}",
                target: "_blank"}
-              .share-social.share-twitter Share on Twitter
+              .share-social.share-twitter= t(".share_on_twitter")

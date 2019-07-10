@@ -4,17 +4,17 @@
   .form-wrap{ class: first_form_well ? "" : "secondary-form-wrap" }
     .form-well-form-header-always-visible
       %h3
-        Existing Theft Alerts
+        = t(".existing_theft_alerts")
     .row
       .col-sm-12
         %table.table.table-bordered{ style: "background: #fff;" }
           %thead.small-header
             %tr
-              %th Created
-              %th Plan
-              %th Status
-              %th Start
-              %th End
+              %th= t(".created")
+              %th= t(".plan")
+              %th= t(".status")
+              %th= t(".start")
+              %th= t(".end")
 
           %tbody
             - theft_alerts.each do |alert|

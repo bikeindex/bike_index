@@ -1120,3 +1120,367 @@ en:
         admin_of_organization: Admin of organization
         member_of_organization: Member of organization
         send_invitation: Send invitation
+  bikes:
+    bike:
+      serial: Serial
+      primary_colors: Primary colors
+      recovered: Recovered
+      stolen: Stolen
+      location: Location
+    bike_org_table:
+      date_indexed: Date indexed
+      manufacturer: Manufacturer
+      model: Model
+      color: Color
+      sent_to: Sent to
+      view_pdf: view PDF
+      today_at_bikecreated_atstrftimei_p: Today at %{bikecreated_atstrftimei_p}
+      yesterday_at_bikecreated_atstrftimei_p: Yesterday at %{bikecreated_atstrftimei_p}
+      pdf: PDF
+    bike_show_overlays:
+      please_tell_us_how_you_got_your_biketype_: Please tell us how you got your %{biketype} back, we really care!
+      its_also_how_we_get_better_at_recovering_: It's also how we get better at recovering bikes.
+      how_did_you_get_it_back: How did you get it back?
+      when_did_you_recover_it: When did you recover it?
+      did_we_help: Did we help?
+      can_we_share_your_story: Can we share your story?
+      mark_recovered: Mark recovered
+      nevermind: Nevermind
+      were_honored_to_have_your_biketype_on_the: We're honored to have your %{biketype} on the Index.
+      claim_it_so_you_can_update_your_listing: Claim it so you can update your listing.
+      claim_biketype: Claim %{biketype}
+      this_biketype_is_hidden: This %{biketype} is hidden.
+      no_one_can_see_it_but_you: No one can see it but you
+      thank_you_for_recovering_this_biketype: Thank you for recovering this %{biketype}!
+      were_really_bummed_your_biketype_was_stol: We're really bummed your %{biketype} was stolen.
+      whoa_this_awesome_biketype_is_yours: Whoa, this awesome %{biketype} is yours!
+      add_some_more_information_about_it: Add some more information about it.
+      add_a_picture_so_people_know_what_to_look: Add a picture so people know what to look for!
+      add_a_picture_of_it_so_everyone_can_admir: Add a picture of it, so everyone can admire its beauty!
+      you_sent_this_biketype_to_embikecurrent_o: You sent this %{biketype} to <em>%{bikecurrent_ownershipowner_email}</em> and it hasn't been claimed yet. You can update it.
+      edit: Edit
+    bike_table:
+      date_indexed: Date indexed
+      manufacturer: Manufacturer
+      model: Model
+      color: Color
+      created_by: Created by
+      today_at_bikecreated_atstrftimei_p: Today at %{bikecreated_atstrftimei_p}
+      yesterday_at_bikecreated_atstrftimei_p: Yesterday at %{bikecreated_atstrftimei_p}
+      pdf: pdf
+      sorry_were_not_sure_who_created_this: Sorry, we're not sure who created this
+    bike_u:
+      serial: Serial
+      colors: Colors
+      status: 'Status:'
+      recoveredfound: Recovered/Found
+      stolen: STOLEN
+      from: From
+      stolen_on: Stolen on
+    edit_primary_menu:
+      theft_details: Theft Details
+      biketype_details: "%{biketype} Details"
+      you_are_editing: You are editing
+      save_changes: Save changes
+    stolen_checklist:
+      list_biketype_on_bike_index: List %{biketype} on Bike Index
+      add_serial_number: Add serial number
+      critical_contact_who_you_bought_the_bike_: CRITICAL - contact who you bought the bike from and find out if they have it
+      report_theft_on_bike_index_including: Report theft on Bike Index, including
+      location_where_the_theft_occurred: location where the theft occurred
+      theft_details: theft_details
+      add: Add
+      a_photo_of_your_biketype: a photo of your %{biketype}
+      photos: photos
+      add_bike_link_to_your_theft_report: Add %{bike_link} to your theft report
+      push_bike_info_to: Push bike info to
+      leadsonline: LEADSonline
+      httpsbikeindexorgnewsbikeindexpartnerswit: https://bikeindex.org/news/bike-index-partners-with-leads-online
+      bike_index_does_this_when_you_enter_your_: "(Bike Index does this when you enter your police report number)"
+      requires_a_serial_number: requires a serial number
+      push_bike_info_to_law_enforcement_databas: Push bike info to law enforcement databases (Bike Index does this when you enter your police report number)
+      share_on_twitter_bike_index_will_do_this_: Share on Twitter (Bike Index will do this once we review your listing)
+      share_widely_on_your_personal_social_medi: Share widely on your personal social media
+      publicize: publicize
+      facebook_instagram_etc: "(Facebook, Instagram, etc)"
+      supercharge_sharing_on_facebook_with_bike: Supercharge sharing on Facebook with Bike Index
+      premium_stolen_bike_alerts: Premium Stolen Bike Alerts
+      alert: alert
+    theft_alerts_table:
+      existing_theft_alerts: Existing Theft Alerts
+      created: Created
+      plan: Plan
+      status: Status
+      start: Start
+      end: End
+    bike_fields:
+      revised_colors:
+        choose_color: Choose color
+        color_help: Color help
+        add_a_color: Add a color
+        remove_color: Remove color
+      revised_component_fields:
+        remove_part: Remove part
+        part_type: Part type
+        component_type: Component type
+        unknown_part_type: Unknown part type
+        part_description: Part Description
+        other_manufacturer: Other manufacturer
+        model: Model
+        model_year: Model Year
+        part_serial: Part Serial
+      stolen_location:
+        where_was_it_stolen_type: Where was it %{stolen_type}?
+        choose_country: Choose country
+        address_or_intersection: Address or intersection
+        city: City
+        zipcode: Zipcode
+        publicly_display_exact_address_theft_occu: Publicly display exact address theft occurred
+    edit_accessories:
+      other_handlebar_type: Other handlebar type
+      add_a_component: Add a component
+    edit_alert:
+      weve_found_targeted_sharing_on_social_med: We've found targeted sharing on social media to have a <em>huge</em> effect on recovering stolen bikes.
+      bike_index_can_help_by_purchasing_targete: Bike Index can help by purchasing targeted ads on Facebook to spread the word about your stolen %{biketype}.
+      select_plan: Select Plan
+    edit_alert_purchase:
+      confirm_your_plan: Confirm your plan
+      youve_made_an_excellent_choice_please_con: You've made an excellent choice! Please confirm it below.
+      here_is_what_youll_get_with_the_selected_: 'Here is what you''ll get with the %{selected_theft_alert_planname} plan:'
+      charge_number_to_currencyprice_1000_unit: 'Charge: %{number_to_currencyprice_1000_unit}'
+      check_confirm: "&check; Confirm"
+      cancel: Cancel
+    edit_alert_purchase_confirmation:
+      thanks: Thanks!
+      your_order_is_pending: Your order is pending.
+      stay_tuned_for_an_update_once_weve_proces: Stay tuned for an update once we've processed your alert.
+    edit_bike_details:
+      submit_serial_correction: Submit serial correction
+      submit_manufacturer_correction: Submit Manufacturer Correction
+      model_year: Model year
+      unsure_or_unknown: Unsure or unknown
+      unknown_year: Unknown year
+      main_frame_material: Main frame material
+      choose_material: Choose material
+      frame_size: Frame size
+      seat_tube_length: Seat tube length
+      bike_name: Bike Name
+      general_description: General description
+      other_serial_or_registration_number: Other serial or registration number
+      updated_serial: Updated serial
+      reason_for_update: Reason for update
+      submit_update: Submit update
+      nevermind: Nevermind
+      manufacturer: Manufacturer
+    edit_drivetrain:
+      wheels: Wheels
+      sidetitleize_wheel: "%{sidetitleize} wheel"
+      choose_diameter: Choose diameter
+      700c_includes_29ers: 700c (includes 29ers)
+      650b: 650b
+      27in: 27in
+      26in: 26in
+      20in: 20in
+      18in: 18in
+      16in: 16in
+      12in: 12in
+      all_diameters: All diameters
+      show_more_sizes: Show more sizes
+      hide_extra_sizes: Hide extra sizes
+      sidetitleize_tire: "%{sidetitleize} tire"
+      narrow: Narrow
+      wide: Wide
+      drivetrain: Drivetrain
+      drivetrain_type: Drivetrain type
+      fixed: Fixed
+      coaster_brake: Coaster Brake
+      belt_drive: Belt Drive
+      front_gears: Front gears
+      select_chainring_count: Select chainring count
+      internal_front_gears: Internal front gears
+      rear_gears: Rear gears
+      select_cog_count: Select cog count
+      internal_rear_gears: Internal rear gears
+    edit_groups:
+      groups_and_organizations: Groups and Organizations
+      are_you_part_of_a_school_want_to_bolster_: Are you part of a school? Want to bolster a local advocacy organization? Add the organization here.
+      creation_organization: Creation organization
+      can_edit_this_biketype: Can edit this %{biketype}
+      remove: Remove
+      other_organizations: Other organizations
+      add_an_organization: Add an organization
+    edit_ownership:
+      transfer_ownership: Transfer Ownership
+      sell_trade_or_give_away_this_biketype_ent: Sell, trade or give away this %{biketype}? Enter the new owner's email to transfer the registration.
+    edit_photos:
+      drag_the_uploaded_photos_to_rearrange_the: Drag the uploaded photos to rearrange the order in which they appear
+      drag_and_drop_files_here_or_use_the_stron: Drag and drop files here or use the <strong>Upload Photos</strong> button
+    edit_publicize:
+      do_these_things_for_the_best_chance_of_re: Do these things for the best chance of recovery!
+      share_your_listing_so_everyone_knows_to_w: Share your listing - so everyone knows to watch out for your %{biketype}!
+      share_on_facebook: Share on Facebook
+      share_on_twitter: Share on Twitter
+    edit_report_recovered:
+      this_biketype_has_been_returned: This %{biketype} has been returned!
+      please_tell_us_how_you_got_your_biketype_: Please tell us how you got your %{biketype} back, we really care!
+      its_how_we_get_better_at_recovering_bikes: It"s how we get better at recovering bikes.
+      how_did_you_get_it_back: How did you get it back?
+      did_we_help: Did we help?
+      can_we_share_your_story: Can we share your story?
+      mark_recovered: Mark recovered
+      nevermind: Nevermind
+    edit_report_stolen:
+      this_biketype_is_stolen_or_missing: This %{biketype} is stolen or missing!
+    edit_theft_details:
+      do_these_things_for_the_best_chance_of_re: Do these things for the best chance of recovery!
+      when_was_it_stolen_type: When was it %{stolen_type}
+      police_report: 'Police report #'
+      without_a_valid_report_number_your_bike_w: Without a valid report number, your bike won't be included in partner searches by <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
+      department_city: Department & city
+      do_you_have_proof_of_ownership_of_this_bi: Do you have proof of ownership of this %{biketype}?
+      if_this_biketype_was_added_to_the_index_b: If this %{biketype} was added to the Index by a bike shop, that counts as proof of ownership
+      receive_notifications_from_bike_index_abo: Receive notifications from Bike Index about this stolen %{biketype}
+      eg_if_we_tweet_about_it_or_see_someone_se: e.g. if we tweet about it or see someone searching for its serial number
+    index:
+      search_for_stolenness_desc_bikes: Search for %{stolenness_desc} bikes
+      search_bike_descriptions: Search bike descriptions
+      search_for_serial_number: Search for serial number
+      submit: submit
+      anywhere: Anywhere
+      miles_of: miles of
+      within: within
+      stolen_within: Stolen within
+      you: you
+      stolen_anywhere: Stolen anywhere
+      not_marked_stolen: Not marked stolen
+      no_stolenness_desc_bikes_matched_your_sea: No %{stolenness_desc} bikes matched your search
+      stolenness_desc_with_serial_numbers_close: "%{stolenness_desc} with serial numbers close to <em>%{paramsserial}</em>"
+    new:
+      enter_biketype_details: Enter %{biketype} details
+      this_is_a: This is a
+      serial_help: Serial help
+      this_biketype_was_made_without_a_serial: This %{biketype} was made without a serial
+      this_biketype_was_made_without_a_serial_n: This %{biketype} was made without a serial number
+      missing_serial: Missing serial
+      select_other_if_manufacturer_doesnt_show_: Select 'Other' if manufacturer doesn't show up when entered
+      other_manufacturer: Other manufacturer
+      model_year: Model year
+      unsure_or_unknown: Unsure or unknown
+      unknown_year: Unknown year
+      street_address: Street address
+      your_full_address_is_required_by_organiza: Your full address is required by %{organizationshort_name}
+      city: City
+      zipcode: Zipcode
+      register: Register
+      very_emveryem_few_bikes_are_made_without_: 'Very <em>very</em> few bikes are made without serials. Unless this %{biketype}:'
+      was_made_before_1970: Was made before 1970
+      is_a_handmade_frame: Is a handmade frame
+      it_probably_has_a_serial_number: It probably has a serial number.
+      read_about_how_to_find_link_smallopens_in: Read about %{how_to_find_link} <small>(opens in a separate window)</small>
+      nevermind: Nevermind
+      i_just_dont_know_the_serial: I just don't know the serial
+      im_100_sure: I'm 100% sure
+    pdf:
+      stolen: Stolen
+      description_of_theft: Description of theft
+      date_stolen: Date Stolen
+      location: Location
+      owner_phone: Owner phone
+      police_report: Police report
+      department: Department
+      bike_description: 'Bike description:'
+      registered: Registered
+      ymd: "%Y-%m-%d"
+      to: to
+      bike_serial: Bike Serial
+      manufacturer: Manufacturer
+      model: Model
+      frame_size: Frame size
+      paint: Paint
+      color: Color
+      front_gears: Front gears
+      rear_gears: Rear gears
+      with_coaster_brake: with coaster brake
+      r_hubcmodel_name_by_r_hubmanufacturer_nam: "(%{r_hubcmodel_name} by %{r_hubmanufacturer_name})"
+      front_wheel: Front wheel
+      with: with
+      narrow_tires: narrow tires
+      wide_tires: wide tires
+      rear_wheel: Rear wheel
+      saddle: Saddle
+      by: by
+      registration: Registration
+      printout: printout
+      online: online @
+      bikeindexorgbike_pathbike: bikeindex.org%{bike_pathbike}
+    scanned:
+      isnt_linked_to_a_bike: isn't linked to a bike.
+      you_have_claimed_the_maximum_permitted_nu: You have claimed the maximum permitted number of Bike Codes.
+      support_email_link_to_supportbikeindexorg: support_email = link_to "support@bikeindex.org", "mailto:support@bikeindex.org"
+      please_email_support_email_if_you_dont_un: Please email %{support_email} if you don't understand why you're seeing this message or if you need an exception made.
+      you_can_enter_the_url_of_the_bike_you_wou: 'You can enter the URL of the bike you would like to link this %{bike_codekind} to:'
+      update: Update
+      or_click_emlink_item_on_of_your_bikes_to_: 'Or, click <em>link it</em> on of your bikes to connect it to this %{bike_codekind}:'
+      added: Added
+      manufacturer: Manufacturer
+      model: Model
+      color: Color
+      mnfg_model_span_classlessstrongcolorspan: mnfg, model, <span class="less-strong">color</span>
+      link_it: Link IT!
+      bikemnfg_name: bike.mnfg_name
+      bikeframe_model: bike.frame_model
+      link_bike_codekind: Link %{bike_codekind}
+      to_link_that_card_with_a_bike: To link that card with a bike,
+      please_sign_in: please sign in
+      bikesbike_codecodescannedorganization_idb: bikes/%{bike_codecode}/scanned?organization_id=%{bike_codeorganization_id}
+    show:
+      biketypetitleize_in_admin: "%{biketypetitleize} in Admin"
+      hidden_by_owner: HIDDEN by owner
+      no_one_but_the_user_and_bike_index_admins: no one but the user (and Bike Index admins) can see it
+      recovered: Recovered
+      stolen: Stolen
+      at: at
+      view_users_other_registrations: View user's other registrations
+      biketypetitleize_photo: "%{biketypetitleize} photo"
+      ibikepublic_imagesfirstlisting_order: i|%{bikepublic_imagesfirstlisting_order}
+      zoom: zoom
+      stock_photo_of_a_bikeyear_bikeframe_model: Stock photo of a %{bikeyear} %{bikeframe_model}
+      color_may_not_match: Color may not match!
+      i0: i|0
+      serial: Serial
+      other_serialregistrationsticker: Other serial/registration/sticker
+      cycle_type: Cycle type
+      manufacturer: Manufacturer
+      name: Name
+      model: Model
+      year: Year
+      primary_colors: Primary colors
+      frame_size: Frame size
+      frame_material: Frame Material
+      handlebar_type: Handlebar type
+      distinguishing_features: Distinguishing features
+      bikerecovered_recovery_theft_details: "%{bikerecovered_recovery_theft} Details"
+      location: Location
+      locking_description: Locking description
+      locking_circumvented: Locking circumvented
+      date_stolen_type: Date %{stolen_type}
+      police_report: 'Police report #'
+      department_city: Department & city
+      description_of_incident: Description of incident
+      front_rear: Front & rear
+      front: Front
+      rear: Rear
+      other: Other
+      componentcmodel_name: "%{componentcmodel_name}"
+      componentyear: "%{componentyear}"
+      spread_the_word: Spread the word!
+      share_it: Share it!
+      know_something_about_this_biketype: Know something about this %{biketype}?
+      contact_the_owner: Contact the owner
+      is_this_your_bike_send_proof_of_ownership: Is this your bike? Send proof of ownership (such as the bike's serial number or a link to a photo of you with the bike)
+      write_them_a_message: Write them a message
+      where_did_you_see_this_biketype_if_youre_: Where did you see this %{biketype}? If you're contacting about an ad you found online, include a link in the field below
+      link_url: Link url
+      send_message: Send message
+      or_call: Or call
+      owners_phone_number: 'Owner''s phone number:'

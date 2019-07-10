@@ -1,7 +1,7 @@
 - serial_help_content = "Every bike has a unique serial number, it's how they are identified. To learn more or see some examples, go to #{link_to 'our serial page', serials_url, target: '_blank' } <small>(opens in a separate window)</small>."
 
 .form-well-header.container
-  %h1= "Enter #{@bike.type} details"
+  %h1= t(".enter_biketype_details", biketype: @bike.type)
 
 = form_for @bike, multipart: true do |f|
   = f.hidden_field :b_param_id_token, value: @b_param&.id_token
@@ -19,7 +19,7 @@
       .col-lg-8.offset-lg-2.form-well
         .form-wrap
           .form-group.row.unnested-field
-            = f.label :cycle_type, 'This is a', class: 'form-well-label'
+            = f.label :cycle_type, t(".this_is_a"), class: 'form-well-label'
             .form-well-input.fancy-select.unfancy
               = select(:bike, :cycle_type, CycleType.select_options, { required: true, class: 'form-control'})
 
@@ -28,20 +28,20 @@
             .form-well-input
               #serial-input
                 = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: 'highly recommended', class: 'form-control'
-                %a.inline-input-help{ title: 'Serial help', data: { toggle: 'popover', content: serial_help_content } }
+                %a.inline-input-help{ title: t(".serial_help"), data: { toggle: 'popover', content: serial_help_content } }
                   ?
               #made-without-serial-input
                 %label
                   = f.check_box :made_without_serial
-                  = "This #{@bike.type} was made without a serial"
+                  = t(".this_biketype_was_made_without_a_serial", biketype: @bike.type)
               .below-input-help#made-without-serial-help
                 .hidden-other
                   %a{ data: { toggle: 'modal', target: '#made-without-serial-modal' } }
-                    = "This #{@bike.type} was made without a serial number"
+                    = t(".this_biketype_was_made_without_a_serial_n", biketype: @bike.type)
             .right-input-help
               %label.made-without-serial-checkbox
                 = check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1
-                Missing serial
+                = t(".missing_serial")
 
           .related-fields
             .form-group.row
@@ -51,22 +51,22 @@
                 - initial = @bike.manufacturer && { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json
                 = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy', data: { initial: initial }
                 %span.below-input-help
-                  Select 'Other' if manufacturer doesn't show up when entered
+                  = t(".select_other_if_manufacturer_doesnt_show_")
 
             .form-group.hidden-other.row
-              = f.label :manufacturer_other, 'Other manufacturer', class: 'form-well-label'
+              = f.label :manufacturer_other, t(".other_manufacturer"), class: 'form-well-label'
               .form-well-input
                 = f.text_field :manufacturer_other, class: 'form-control'
 
           .form-group.row.fancy-select.unfancy.unnested-field
-            = f.label :year, 'Model year', class: 'form-well-label'
+            = f.label :year, t(".model_year"), class: 'form-well-label'
             .form-well-input
               - years = (1900..Time.current.year+1).to_a.reverse.map { |i| [i,i] }
-              = f.select :year, years, prompt: "Unsure or unknown", selected: @bike.year || Time.current.year
+              = f.select :year, years, prompt: t(".unsure_or_unknown"), selected: @bike.year || Time.current.year
             .right-input-help
               %label
                 %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
-                Unknown year
+                = t(".unknown_year")
 
           .form-group.row.unnested-field
             = f.label :frame_model, class: 'form-well-label'
@@ -95,17 +95,17 @@
                 - @bike.attributes = { address: @b_param.address("address"), address_city: @b_param.address("city"), address_zipcode: @b_param.address("zipcode"), address_state: @b_param.address("state") }
                 = f.label :address, label_address, class: 'form-well-label'
                 .form-well-input
-                  = f.text_field :address, required: true, placeholder: "Street address", class: 'form-control'
+                  = f.text_field :address, required: true, placeholder: t(".street_address"), class: 'form-control'
                   %span.below-input-help
-                    Your full address is required by #{@organization.short_name}
+                    = t(".your_full_address_is_required_by_organiza", organizationshort_name: @organization.short_name)
               .form-group.row
                 %label.form-well-label
                 .form-well-input
-                  = f.text_field :address_city, required: true, placeholder: "City", class: "form-control"
+                  = f.text_field :address_city, required: true, placeholder: t(".city"), class: "form-control"
               .form-group.row
                 %label.form-well-label
                 .form-well-input
-                  = f.text_field :address_zipcode, required: true, placeholder: "Zipcode", class: "form-control"
+                  = f.text_field :address_zipcode, required: true, placeholder: t(".zipcode"), class: "form-control"
               .form-group.row.fancy-select-placeholder.unfancy
                 %label.form-well-label
                 .form-well-input
@@ -132,34 +132,34 @@
               - email = @bike.owner_email || current_user && current_user.email
               = f.email_field :owner_email, value: email, required: true, placeholder: 'required', class: 'form-control'
       .new-bike-submit-wrapper
-        = submit_tag 'Register', class: 'btn btn-lg btn-primary'
+        = submit_tag t(".register"), class: 'btn btn-lg btn-primary'
 
 - modal_body = capture_haml do
   .modal-body
     %p
-      = "Very <em>very</em> few bikes are made without serials. Unless this #{@bike.type}:"
+      = t(".very_emveryem_few_bikes_are_made_without_", biketype: @bike.type)
     %ul
       %li
-        Was made before 1970
+        = t(".was_made_before_1970")
       %li.li-or
         \- or -
       %li
-        Is a handmade frame
+        = t(".is_a_handmade_frame")
     %p
-      It probably has a serial number.
+      = t(".it_probably_has_a_serial_number")
     %p
       - how_to_find_link = link_to 'how to find your serial number', serials_url, target: "_blank"
-      = "Read about #{how_to_find_link} <small>(opens in a separate window)</small>".html_safe
+      = t(".read_about_how_to_find_link_smallopens_in", how_to_find_link: how_to_find_link).html_safe
 
   .modal-btn-footer
     .row
       .col-xs-6
         %button.btn.btn-secondary{'data-dismiss' => 'modal', type: 'button'}
-          Nevermind
-        I just don't know the serial
+          = t(".nevermind")
+        = t(".i_just_dont_know_the_serial")
       .col-xs-6
         %button.btn.btn-danger#made-without-serial-button{type: 'button'}
-          I'm 100% sure
-        = "This #{@bike.type} was made without a serial"
+          = t(".im_100_sure")
+        = t(".this_biketype_was_made_without_a_serial", biketype: @bike.type)
 
 = render partial: 'shared/modal', locals: { title: 'Are you certain?', id: 'made-without-serial-modal', modal_body: modal_body }
