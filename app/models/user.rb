@@ -196,6 +196,10 @@ class User < ActiveRecord::Base
     end
   end
 
+  def update_last_login(ip_address)
+    update_columns(last_login_at: Time.current, last_login_ip: ip_address)
+  end
+
   def confirm(token)
     if token == confirmation_token
       self.confirmation_token = nil

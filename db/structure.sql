@@ -2143,7 +2143,7 @@ CREATE TABLE public.users (
     name character varying(255),
     email character varying(255),
     password text,
-    last_login timestamp without time zone,
+    last_login_at timestamp without time zone,
     superuser boolean DEFAULT false NOT NULL,
     password_reset_token text,
     created_at timestamp without time zone NOT NULL,
@@ -2181,7 +2181,8 @@ CREATE TABLE public.users (
     state_id integer,
     notification_unstolen boolean DEFAULT true,
     my_bikes_hash jsonb,
-    preferred_language character varying
+    preferred_language character varying,
+    last_login_ip character varying
 );
 
 
@@ -4380,4 +4381,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190705230020');
 INSERT INTO schema_migrations (version) VALUES ('20190708181605');
 
 INSERT INTO schema_migrations (version) VALUES ('20190709011902');
+
+INSERT INTO schema_migrations (version) VALUES ('20190710230727');
 
