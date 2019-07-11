@@ -147,10 +147,15 @@ RSpec.describe Export, type: :model do
                                     params: { bike: { address: "102 Washington Pl, State College" } })
       end
       let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil, bike: bike) }
+      include_context :geocoder_real
       it "is exportable" do
-        ownership.reload
-        expect(ownership.claimed?).to be_falsey
-        expect(Export.avery_export_bike?(bike)).to be_truthy
+        # Referencing the same address and the same cassette from a different spec, b/c I'm terrible ;)
+        VCR.use_cassette("organization_export_worker-avery") do
+          ownership.reload
+          expect(bike.owner_name).to eq "some name"
+          expect(bike.registration_address["address"]).to eq "102 Washington Pl"
+          expect(Export.avery_export_bike?(bike)).to be_truthy
+        end
       end
     end
   end
