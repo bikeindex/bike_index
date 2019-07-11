@@ -63,6 +63,10 @@ class ApplicationController < ActionController::Base
     requested_locale if I18n.available_locales.include?(requested_locale)
   end
 
+  def t(key)
+    I18n.t(key, scope: [:controllers, controller_namespace, controller_name].compact)
+  end
+
   def requested_locale
 
     # logger.info({ locale_current: "#{I18n.locale}",

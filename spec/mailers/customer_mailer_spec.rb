@@ -150,7 +150,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.cc).to eq(["bryan@bikeindex.org", "lily@bikeindex.org"])
       stolen_notification.reload
       expect(stolen_notification.send_dates).to be_present
-      expect(stolen_notification.send_dates[0]).to eq(stolen_notification.updated_at.to_i)
+      expect(stolen_notification.send_dates[0]).to be_within(1).of(stolen_notification.updated_at.to_i)
       stolen_note = StolenNotification.where(id: stolen_notification.id).first
       mail2 = CustomerMailer.stolen_notification_email(stolen_note)
       expect(mail2.subject).to eq(stolen_notification.default_subject)
