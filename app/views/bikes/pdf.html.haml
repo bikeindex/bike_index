@@ -15,8 +15,6 @@
       - tit += "#{@bike.frame_model} by " if @bike.frame_model.present?
       = tit + @bike.mnfg_name
 
-
-
 %body
   %header
     - if @bike.manufacturer.logo && @bike.manufacturer.logo.url != "https://files.bikeindex.org/blank.png"
@@ -48,8 +46,8 @@
             %tr
               %td.td-title
                 = t(".date_stolen")
-              %td
-                = @stolen_record.date_stolen.strftime("%Y-%m-%d")
+              %td.convertTime
+                = @stolen_record.date_stolen.strftime("time.format.convert_time")
             %tr
               %td.td-title
                 = t(".location")
@@ -94,8 +92,8 @@
           %tr
             %td.td-title
               = t(".registered")
-            %td
-              = @bike.created_at.strftime("%Y-%m-%d")
+            %td.convertTime
+              = @bike.created_at.strftime("time.format.convert_time")
               = t(".to")
               - if @bike.owner.present? && @bike.owner.name.present?
                 = @bike.owner.name

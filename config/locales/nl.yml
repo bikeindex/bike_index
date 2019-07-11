@@ -11,6 +11,9 @@ nl:
         significant: false
         strip_insignificant_zeros: false
         unit: "€"
+  time:
+    formats:
+      convert_time: "%FT%T%z" # TODO: Localize
   activerecord:
     models:
       ad: Advertentie #g
