@@ -78,9 +78,10 @@
           = render partial: 'bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
 
           - if @bike.stolen || @organization&.include_field_reg_phone?(current_user)
-            - label_phone = @organization&.registration_field_label("reg_phone") || t(".phone")
             .form-group.row.unnested-field
-              = f.label :phone, label_phone, class: "form-well-label"
+              = f.label :phone,
+                @organization&.registration_field_label("reg_phone") || t(".phone"),
+                class: "form-well-label"
               .form-well-input
                 = f.text_field :phone, required: true, value: current_user&.phone, class: "form-control"
 
@@ -91,47 +92,79 @@
           - if @organization&.include_field_reg_address?(current_user)
             .related-fields
               .form-group.row
-                - label_address = @organization.registration_field_label("reg_address") || t(".mailing_address")
-                / Set all the bike address attrs
-                - @bike.attributes = { address: @b_param.address("address"), address_city: @b_param.address("city"), address_zipcode: @b_param.address("zipcode"), address_state: @b_param.address("state") }
-                = f.label :address, label_address, class: 'form-well-label'
+                -# Set all the bike address attrs
+                - @bike.attributes = { address: @b_param.address("address"),
+                  address_city: @b_param.address("city"),
+                  address_zipcode: @b_param.address("zipcode"),
+                  address_state: @b_param.address("state") }
+
+                = f.label :address,
+                  @organization.registration_field_label("reg_address") || t(".mailing_address"),
+                  class: 'form-well-label'
+
                 .form-well-input
-                  = f.text_field :address, required: true, placeholder: t(".street_address"), class: 'form-control'
+                  = f.text_field :address,
+                    required: true,
+                    placeholder: t(".street_address"),
+                    class: 'form-control'
+
                   %span.below-input-help
                     = t(".your_full_address_is_required", org_name: @organization.short_name)
+
               .form-group.row
                 %label.form-well-label
                 .form-well-input
-                  = f.text_field :address_city, required: true, placeholder: t(".city"), class: "form-control"
+                  = f.text_field :address_city,
+                    required: true,
+                    placeholder: t(".city"),
+                    class: "form-control"
+
               .form-group.row
                 %label.form-well-label
                 .form-well-input
-                  = f.text_field :address_zipcode, required: true, placeholder: t(".zipcode"), class: "form-control"
+                  = f.text_field :address_zipcode,
+                    required: true,
+                    placeholder: t(".zipcode"),
+                    class: "form-control"
+
               .form-group.row.fancy-select-placeholder.unfancy
                 %label.form-well-label
                 .form-well-input
-                  = f.collection_select(:address_state, State.all, :abbreviation, :name, { include_blank: true, required: true, prompt: t(".state") }, { class: "form-control" })
+                  = f.collection_select(:address_state, State.all, :abbreviation, :name,
+                    { include_blank: true, required: true, prompt: t(".state") },
+                    { class: "form-control" })
 
           - if @organization&.include_field_reg_secondary_serial?(current_user)
-            - label_secondary_serial = @organization.registration_field_label("reg_secondary_serial") || t(".additional_serial_sticker_number")
             .form-group.row.unnested-field.no-divider-row
-              = f.label :additional_registration, label_secondary_serial, class: "form-well-label"
+              = f.label :additional_registration,
+                @organization.registration_field_label("reg_secondary_serial") || t(".additional_serial_sticker_number"),
+                class: "form-well-label"
               .form-well-input
-                = f.text_field :additional_registration, autocomplete: "off", autocorrect: "off", autocapitalize: "off", class: "form-control"
+                = f.text_field :additional_registration,
+                  autocomplete: "off",
+                  autocorrect: "off",
+                  autocapitalize: "off",
+                  class: "form-control"
 
           - if @organization&.include_field_reg_affiliation?(current_user)
             .form-group.row.unnested-field.no-divider-row.fancy-select.unfancy
-              - label_affiliation = @organization.registration_field_label("reg_affiliation") || t(".affiliation", org_name: @organization.short_name)
-              = f.label :organization_affiliation, label_affiliation, class: "form-well-label"
+              = f.label :organization_affiliation,
+                @organization.registration_field_label("reg_affiliation") || t(".affiliation", org_name: @organization.short_name),
+                class: "form-well-label"
               .form-well-input
-                - affiliation_options = @organization.reg_affiliation_options.map { |a| [a.humanize, a] }
-                = f.select :organization_affiliation, affiliation_options, class: "form-control"
+                = f.select :organization_affiliation,
+                  @organization.reg_affiliation_options.map { |a| [a.humanize, a] },
+                  class: "form-control"
 
           .form-group.row.unnested-field.no-divider-row
             = f.label :owner_email, class: 'form-well-label'
             .form-well-input
-              - email = @bike.owner_email || current_user && current_user.email
-              = f.email_field :owner_email, value: email, required: true, placeholder: 'required', class: 'form-control'
+              = f.email_field :owner_email,
+                value: @bike.owner_email || current_user&.email,
+                required: true,
+                placeholder: 'required',
+                class: 'form-control'
+
       .new-bike-submit-wrapper
         = submit_tag t(".register"), class: 'btn btn-lg btn-primary'
 
