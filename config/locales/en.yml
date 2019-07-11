@@ -1342,6 +1342,7 @@ en:
       share_your_listing_so_everyone_knows_to_w: Share your listing - so everyone knows to watch out for your %{bike_type}!
       share_on_facebook: Share on Facebook
       share_on_twitter: Share on Twitter
+      help_me_find_bike: Help me find my stolen bike!
     edit_report_recovered:
       this_bike_has_been_returned: This %{bike_type} has been returned!
       please_tell_us_how_you_got_your_bike: Please tell us how you got your %{bike_type} back, we really care!
