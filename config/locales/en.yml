@@ -1452,7 +1452,6 @@ en:
       at: at
       view_users_other_registrations: View user's other registrations
       bike_photo: "%{bike_type} photo"
-      zoom: zoom
       stock_photo: Stock photo of a %{year} %{model}
       color_may_not_match: Color may not match!
       serial: Serial
