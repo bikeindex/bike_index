@@ -16,7 +16,7 @@
         %ul.attr-list
           %li
             %span.attr-title
-              = bike.recovered ? t(".recovered") : "Stolen"
+              = bike.recovered ? t(".recovered") : t(".stolen")
             %span.convertTime
               = l bike.current_stolen_record.date_stolen, format: :convert_time
           = bike.attr_list_item(bike.short_address(bike.current_stolen_record), t(".location"))
