@@ -29,8 +29,8 @@ binxApp.enableFilenameForUploads = function() {
 // and make the instance of class (which I'm storing on window) the same name without the first letter capitalized
 // I'm absolutely sure there is a best practice that I'm ignoring, but just doing it for now.
 $(document).ready(function() {
-  const timeUtils = TimeParser();
-  timeParser.localize();
+  window.timeParser = TimeParser();
+  window.timeParser.localize();
   // Load admin, whatever
   if ($("#admin-content").length > 0) {
     const binxAdmin = BinxAdmin();
@@ -38,18 +38,18 @@ $(document).ready(function() {
   }
   // Load the page specific things
   const bodyId = document.getElementsByTagName("body")[0].id;
-  switch (bodyId) {
-    case "organized_messages_index":
-      window.binxMapping = new BinxMapping("geolocated_messages");
-      window.binxAppOrgMessages = new BinxAppOrgMessages();
-      binxAppOrgMessages.init();
-    case "organized_exports_show":
-    case "organized_exports_new":
-      window.binxAppOrgExport = new BinxAppOrgExport();
-      binxAppOrgExport.init();
-    case "organized_bikes_index":
-      const binxAppOrgBikes = BinxAppOrgBikes();
-      binxAppOrgBikes.init();
+  if (bodyId === "organized_messages_index") {
+    window.binxMapping = new BinxMapping("geolocated_messages");
+    window.binxAppOrgMessages = new BinxAppOrgMessages();
+    binxAppOrgMessages.init();
+  } else if (
+    ["organized_exports_show", "organized_exports_new"].includes(bodyId)
+  ) {
+    window.binxAppOrgExport = new BinxAppOrgExport();
+    binxAppOrgExport.init();
+  } else if (bodyId === "organized_bikes_index") {
+    const binxAppOrgBikes = BinxAppOrgBikes();
+    binxAppOrgBikes.init();
   }
   // This can be new, edit, create or update, so just checking for the element
   if ($("#multipleUserSelect").length) {

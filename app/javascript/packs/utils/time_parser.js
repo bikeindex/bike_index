@@ -1,3 +1,4 @@
+import log from "../utils/log";
 import moment from "moment-timezone";
 
 const TimeParser = () => {
@@ -50,13 +51,15 @@ const TimeParser = () => {
       $(".convertTime").each(function() {
         let $this = $(this);
         $this.removeClass("convertTime");
-        $this.addClass("convertedTime"); // Because we style it sometimes
+        $this.addClass("convertedTime"); // So we can style it
         let text = $this.text().trim();
         if (!(text.length > 0)) {
           return;
         }
         let time = moment(text, moment.ISO_8601);
+        log.debug(time, time.format("YYYY-MM-DD h:mma"));
         if (!time.isValid) {
+          log.debug("ffffff");
           return;
         }
         $this
