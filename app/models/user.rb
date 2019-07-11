@@ -162,14 +162,14 @@ class User < ActiveRecord::Base
     superuser || organizations.any? { |o| o.paid_for?("unstolen_notifications") }
   end
 
-  def user_token_time(user_token_type)
-    t = self[user_token_type].to_s.split("-")[0]
+  def auth_token_time(auth_token_type)
+    t = self[auth_token_type].to_s.split("-")[0]
     t = (t.present? && t.to_i > 1427848192) ? t.to_i : 1364777722
     Time.at(t)
   end
 
-  def user_token_expired?(user_token_type)
-    user_token_time(user_token_type) < (Time.current - 1.hours)
+  def auth_token_expired?(auth_token_type)
+    auth_token_time(auth_token_type) < (Time.current - 1.hours)
   end
 
   def accepted_vendor_terms_of_service?
@@ -185,9 +185,16 @@ class User < ActiveRecord::Base
   end
 
   def send_password_reset_email
-    unless user_token_time("password_reset_token") > Time.current - 2.minutes
+    unless auth_token_time("password_reset_token") > Time.current - 2.minutes
       update_auth_token("password_reset_token")
       EmailResetPasswordWorker.perform_async(id)
+    end
+  end
+
+  def send_magic_link_email
+    unless auth_token_time("magic_link_token") > Time.current - 2.minutes
+      update_auth_token("magic_link_token")
+      EmailMagicLoginLinkWorker.perform_async(id)
     end
   end
 
