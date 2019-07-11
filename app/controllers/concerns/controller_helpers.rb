@@ -17,10 +17,7 @@ module ControllerHelpers
   end
 
   def forwarded_ip_address
-    return @forwarded_ip_address if defined?(@forwarded_ip_address)
-    @forwarded_ip_address = request.env["HTTP_CF_CONNECTING_IP"]
-    @forwarded_ip_address ||= request.headers["HTTP_X_FORWARDED_FOR"].split(",").last if request.headers["HTTP_X_FORWARDED_FOR"].present?
-    @forwarded_ip_address ||= request.headers["REMOTE_ADDR"] || request.headers["ip"]
+    @forwarded_ip_address ||= ForwardedIpAddress.parse(request)
   end
 
   def enable_rack_profiler
