@@ -225,11 +225,11 @@ class Bike < ActiveRecord::Base
     oname = b_params.map(&:user_name).reject(&:blank?).first
     return oname if oname.present?
     # If this bike is unclaimed and was created by an organization member, then we don't have an owner_name
-    return nil if creation_organization.present? && owner.member_of?(creation_organization)
+    return nil if creation_organization.present? && owner&.member_of?(creation_organization)
     owner&.name
   end
 
-  def owner_name_or_email; user_name || owner_email end
+  def owner_name_or_email; owner_name || owner_email end
 
   def first_ownership; ownerships.reorder(:id).first end
 
