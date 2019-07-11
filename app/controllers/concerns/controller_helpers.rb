@@ -11,6 +11,19 @@ module ControllerHelpers
     before_filter :enable_rack_profiler
   end
 
+  def append_info_to_payload(payload)
+    super
+    payload[:ip] = forwarded_ip_address
+  end
+
+  def forwarded_ip_address
+    return @forwarded_ip_address if defined?(@forwarded_ip_address)
+    @forwarded_ip_address = request.headers["CF-Connecting-IP"] if request.headers["CF-Connecting-IP"]
+    @forwarded_ip_address ||= request.headers["HTTP_X_FORWARDED_FOR"].split(",").last if request.headers["HTTP_X_FORWARDED_FOR"].present?
+    @forwarded_ip_address ||= request.headers["REMOTE_ADDR"] || request.headers["ip"]
+    @forwarded_ip_address
+  end
+
   def enable_rack_profiler
     return false unless current_user&.developer?
     Rack::MiniProfiler.authorize_request unless Rails.env.test?
