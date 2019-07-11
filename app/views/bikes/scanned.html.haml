@@ -7,13 +7,13 @@
 
   - if current_user.present?
     - if !@bike_code.claimable_by?(current_user)
-      %h3= t(".you_have_claimed_the_maximum_permitted_nu")
+      %h3= t(".you_have_claimed_the_maximum_permitted")
       %p
-        = t(".support_email_link_to_supportbikeindexorg")
-        = t(".please_email_support_email_if_you_dont_un", support_email: support_email)
+        - support_email = link_to "support@bikeindex.org", "mailto:support@bikeindex.org"
+        = t(".please_email_support_html", support_email_link: support_email)
     - else
       %p
-        = t(".you_can_enter_the_url_of_the_bike_you_wou", bike_codekind: @bike_code.kind)
+        = t(".you_can_enter_the_url", bike_code_kind: @bike_code.kind)
       = form_tag bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id), method: :put, class: "row" do
         .col-sm-8.col-lg-10
           .form-group
@@ -22,7 +22,7 @@
           = submit_tag t(".update"), class: "btn btn-success"
 
       %p{ style: "margin-top: 24px;" }
-        = t(".or_click_emlink_item_on_of_your_bikes_to_", bike_codekind: @bike_code.kind)
+        = t(".or_click_html", bike_code_kind: @bike_code.kind)
 
       %table.table.table-striped.table-bordered.table-sm.without-exterior-border
         %thead.small-header
@@ -35,7 +35,7 @@
             %th.hidden-xs-down= t(".color")
             %th.hidden-sm-up.hidden-sm-up
               %small
-                = t(".mnfg_model_span_classlessstrongcolorspan")
+                = t(".mnfg_model_color_html")
             %th
               = t(".link_it")
         %tbody
@@ -63,4 +63,4 @@
   - else
     %p{ style: "margin-top: 24px;" }
       = t(".to_link_that_card_with_a_bike")
-      = link_to t(".please_sign_in", ), new_session_url(return_to: "bikes/#{@bike_code.code}/scanned?organization_id=#{@bike_code.organization_id}")
+      = link_to t(".please_sign_in"), new_session_url(return_to: scanned_bike(@bike_code.code, params: { organization_id: @bike_code.organization_id }))

@@ -1,7 +1,7 @@
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: 'bikes/edit_primary_menu', locals: { is_disabled: true }
+      = render partial: "bikes/edit_primary_menu", locals: { is_disabled: true }
 
       .col-md-8.form-well
         .form-wrap
@@ -10,10 +10,12 @@
 
           .related-fields.hide-this-bike.no-divider-row
             .form-group.row
-              - hide_toggle = @bike.user_hidden ? 'Un-hide' : 'Hide'
               .hide-this-bike-link
                 %a.collapsed{ href: '#hide_bike_toggle_group', data: { toggle: 'collapse' } }
-                  = "#{hide_toggle} this #{@bike.type}"
+                  - if @bike.user_hidden
+                    = t(".unhide_this_bike", bike_type: @bike.type)
+                  - else
+                    = t(".hide_this_bike", bike_type: @bike.type)
 
               .collapse#hide_bike_toggle_group
                 - if @bike.user_hidden
@@ -22,41 +24,44 @@
                   = f.hidden_field :marked_user_hidden
                 .hide-explanation
                   %p
-                    %strong
-                      Keeping your bike public is the best way to help recover stolen bikes and deter theft.
+                    %strong= t(".keeping_your_bike_public")
                   %p
-                    = "You can read more about why this is important to us in our #{link_to "FAQs", support_path(anchor: 'public-serials')}."
+                    - faq_link = link_to t(".faqs"), support_path(anchor: 'public-serials')
+                    = t(".you_can_read_more_html", faq_link: faq_link)
                   %p
-                    = "We strongly recommend keeping your #{@bike.type} visible, but you can hide this #{@bike.type} if you prefer. Even though we don't think it's a good idea. You can always toggle this setting to show and hide a bike."
+                    = t(".we_strongly_recommend", bike_type: @bike.type, bike_type: @bike.type)
                   %p.text-xs-center
                     - btn_type = @bike.user_hidden ? 'btn-success' : 'btn-danger'
                     %a.btn.btn-lg#hide_bike_toggle{role: 'button', class: btn_type }
-                      = "#{hide_toggle} #{@bike.type}"
-
+                      - if @bike.user_hidden
+                        = t(".unhide_this_bike", bike_type: @bike.type)
+                      - else
+                        = t(".hide_this_bike", bike_type: @bike.type)
           %hr
 
           .delete-from-index.no-divider-row
             %a{data: { toggle: 'modal', target: '#request-delete' } }
               = render 'shared/trash_icon'
-              = "Delete this #{@bike.type} from Bike Index"
+              = t(".delete_this_bike", bike_type: @bike.type)
 
 
+- modal_title = t(".modal_title", bike_type: @bike.type)
 - modal_body = capture_haml do
   = form_tag do |t|
     .modal-body
-      = render partial: 'shared/alert', locals: { body: "Please fill in the reason for the #{@bike.type} deletion", title: 'We want to know why!', class_names: 'currently-hidden' }
+      = render partial: 'shared/alert', locals: { body: t(".reason_modal_body", bike_type: @bike.type), title: t(".reason_modal_title"), class_names: 'currently-hidden' }
       = hidden_field_tag :bike_delete_bike_id, @bike.id
 
       .form-group
         %label{ for: :bike_delete_reason }
-          Reason for deletion
+          = t(".reason_for_deletion")
         = text_area_tag :bike_delete_reason, '', class: 'form-control'
     .modal-btn-footer
       .row
         .col-xs-6.col-xs-push-6
-          = submit_tag 'Delete bike', class: 'btn btn-danger'
+          = submit_tag t(".delete_bike"), class: 'btn btn-danger'
         .col-xs-6.col-xs-pull-6
           %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
-            Nevermind
+            = t(".nevermind")
 
-= render partial: 'shared/modal', locals: { title: "Are you sure you want to delete this #{@bike.type}?", id: 'request-delete', modal_body: modal_body }
+= render partial: 'shared/modal', locals: { title: modal_title, id: 'request-delete', modal_body: modal_body }

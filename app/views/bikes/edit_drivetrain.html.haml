@@ -44,7 +44,7 @@
                     = t(".hide_extra_sizes")
             .form-group.row.unnested-field
               %label.form-well-label
-                = t(".sidetitleize_tire", sidetitleize: side.titleize)
+                = t(".side", side: side.titleize)
               .form-well-input
                 %label.radio-inline
                   = f.radio_button "#{side}_tire_narrow".to_sym, 'true'
@@ -123,4 +123,4 @@
                     = f.radio_button 'rear_gear_type_id', gt.id, class: "count_#{gt.count} internal_#{gt.internal}", data: {count: gt.count }
 
 
-        = render "/shared/form_well_footer_save"
+        = render "shared/form_well_footer_save"

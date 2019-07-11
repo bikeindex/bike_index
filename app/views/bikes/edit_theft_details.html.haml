@@ -10,7 +10,7 @@
           .form-wrap.stolen-checklist-wrap
             .form-well-form-header-always-visible
               %h3.header-font-alt
-                = t(".do_these_things_for_the_best_chance_of_re")
+                = t(".do_these_things_for_the_best_chance")
             = render partial: "bikes/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record }
 
         .form-wrap{ class: @bike.current_stolen_record&.display_checklist? ? "secondary-form-wrap" : "" }
@@ -19,14 +19,14 @@
             %h3= @edit_templates[@edit_template]
 
           -# Helper text display
-          - stolen_type = @bike.recovered ? 'recovered' : 'stolen'
+          - stolen_type = @bike.recovered ? t(".recovered") : t(".stolen")
           = f.fields_for :stolen_records do |srecord|
             - next unless srecord.object.current # Because they may have multiple stolen records
 
             %h3
             .form-group.row.unnested-field
               = srecord.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
-              = srecord.label :date_stolen, t(".when_was_it_stolen_type", stolen_type: stolen_type), class: 'form-well-label'
+              = srecord.label :date_stolen, t(".when_was_it_stolen", stolen_type: stolen_type), class: 'form-well-label'
               .form-well-input
                 - srecord.object.date_stolen = TimeParser.round(srecord.object.date_stolen || Time.current)
                 = srecord.datetime_local_field :date_stolen, max: Time.current + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(srecord.object.date_stolen, format: :convert_time)
@@ -47,7 +47,7 @@
               = srecord.label :estimated_value, class: 'form-well-label'
               .form-well-input.input-group{ style: 'max-height: 2.5rem;'}
                 .input-group-addon
-                  $
+                  = t("number.currency.format.unit")
                 = srecord.number_field :estimated_value, min: '1', class: 'form-control'
 
             - unless @bike.recovered?
@@ -61,7 +61,8 @@
                   = srecord.select(:lock_defeat_description, StolenRecord.locking_defeat_description_select, prompt: '')
 
             .form-group.row.unnested-field
-              - description_label = @bike.recovered ? "How did you recovered the #{@bike.type}" : 'Description of the incident'
+              - description_label = @bike.recovered ? t(".how_did_you_recover", bike_type: @bike.type) : t(".description_of_the_incident")
+
               = srecord.label :theft_description, description_label, class:  'form-well-label'
               .form-well-input-large
                 = srecord.text_area :theft_description, rows: 3, class: 'form-control'
@@ -71,7 +72,7 @@
               .form-well-input
                 = srecord.text_field :police_report_number, class: 'form-control'
                 %span.below-input-help
-                  = t(".without_a_valid_report_number_your_bike_w")
+                  = t(".without_a_valid_report_number_html")
             .form-group.row.unnested-field.no-divider-row
               = srecord.label :police_report_department, t(".department_city"), class: 'form-well-label'
               .form-well-input
@@ -81,15 +82,15 @@
             .form-group.row.unnested-field.full-width-section.no-divider-row
               %label
                 = srecord.check_box :proof_of_ownership
-                = t(".do_you_have_proof_of_ownership_of_this_bi", biketype: @bike.type)
+                = t(".do_you_have_proof_of_ownership", bike_type: @bike.type)
               .full-width-checkbox-help
-                = t(".if_this_biketype_was_added_to_the_index_b", biketype: @bike.type)
+                = t(".if_this_bike_type_was_added", bike_type: @bike.type)
             %hr
             .form-group.row.unnested-field.full-width-section.no-divider-row
               %label
                 = srecord.check_box :receive_notifications
-                = t(".receive_notifications_from_bike_index_abo", biketype: @bike.type)
+                = t(".receive_notifications", bike_type: @bike.type)
               .full-width-checkbox-help
-                = t(".eg_if_we_tweet_about_it_or_see_someone_se")
+                = t(".eg_if_we_tweet_about_it")
 
             = render "shared/form_well_footer_save"

@@ -6,11 +6,9 @@
       .col-md-8.form-well
         .form-wrap#edit_bike_organizations
           .form-well-form-header
-            %h3
-              = t(".groups_and_organizations")
+            %h3= t(".groups_and_organizations")
           .col-xs-12
-            %p
-              = t(".are_you_part_of_a_school_want_to_bolster_")
+            %p= t(".are_you_part_of_a_school_want_to_bolster_")
 
           - if @bike.bike_organizations.any?
             .related-fields.no-divider-row
@@ -23,7 +21,7 @@
                     %span.can-edit-checkbox
                       %label.checkbox-inline.not-fixed
                         = check_box_tag "organization_ids_can_edit_claimed[]", @bike.creation_organization_id, @bike.editable_organizations.pluck(:id).include?(@bike.creation_organization_id), multiple: true
-                        = t(".can_edit_this_biketype", biketype: @bike.type)
+                        = t(".can_edit_this_bike", bike_type: @bike.type)
                   .right-input-help
                     %a.optional-form-block.remove-organization{ href: '#' }
                       %span.context-display-help
@@ -39,7 +37,7 @@
                     %span.can-edit-checkbox
                       %label.checkbox-inline.not-fixed
                         = check_box_tag "organization_ids_can_edit_claimed[]", bike_organization.organization_id, bike_organization.can_edit_claimed, multiple: true
-                        = t(".can_edit_this_biketype", biketype: @bike.type)
+                        = t(".can_edit_this_bike", bike_type: @bike.type)
                   .right-input-help
                     %a.optional-form-block.remove-organization{ href: '#' }
                       %span.context-display-help
@@ -47,7 +45,7 @@
                       = t(".remove")
 
           :javascript
-            = "window.organizations = #{Organization.approved.map { |organization| { name: organization.name, id: organization.id } }.to_json };"
+            window.organizations = #{Organization.approved.map { |organization| { name: organization.name, id: organization.id } }.to_json };
 
           .related-fields#additional_organization_fields
             .form-group.row.unnested-field.no-divider-row
@@ -59,7 +57,9 @@
                   <label class='form-well-label'></label>
                   <div class='form-well-input fancy-select-placeholder unfancy'>
                     <select class="form-control bike_organization_input" autocomplete="off" autocorrect="off" autocapitalize="off">
-                      <option value="" disabled selected>Choose organization</option>
+                      <option value="" disabled selected>
+                        #{t(".choose_organization")}
+                      </option>
                       {{ #organizations }}
                         <option value="{{ id }}">{{ name }}</option>
                       {{ /organizations }}
@@ -68,7 +68,7 @@
                   <div class="right-input-help">
                     <a class="optional-form-block remove-organization">
                       <span class="context-display-help">&ndash;</span>
-                      Remove
+                      #{t(".remove")}
                     </a>
                   </div>
                 </div>

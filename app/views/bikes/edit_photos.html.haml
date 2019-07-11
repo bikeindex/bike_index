@@ -11,7 +11,7 @@
           %h3= @edit_templates[@edit_template]
 
           %h5.light-italic
-            = t(".drag_the_uploaded_photos_to_rearrange_the")
+            = t(".drag_the_uploaded_photos")
 
         %ul#public_images.row.edit-photo-display-list{ data: { orderurl: order_public_images_url, imagesurl: public_images_url } }
           = render partial: 'public_images/revised_public_image', collection: @bike.public_images, as: :image
@@ -24,7 +24,7 @@
             = hidden_field_tag :bike_id, @bike.id
             .col-xs-12
               %h5.light-italic
-                = t(".drag_and_drop_files_here_or_use_the_stron")
+                = t(".drag_and_drop_files_here_html")
               %label.file
                 = f.file_field :image, multiple: true, name: "public_image[image]"
                 %span.file-custom
@@ -35,5 +35,7 @@
 :plain
   <script id="image-upload-finished-template" type="x-tmpl-mustache">
     <p><em>{{file.name}}</em></p>
-    <h5 class="text-info text-xs-right">Finished uploading</h5>
+    <h5 class="text-info text-xs-right">
+      #{t(".finished_uploading")}
+    </h5>
   </script>

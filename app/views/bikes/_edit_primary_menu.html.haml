@@ -11,7 +11,7 @@
             %h4= description
 
   %h3.nav-group-header
-    = t(".biketype_details", biketype: @bike.type)
+    = t(".bike_type_details", bike_type: @bike.type)
   %ul
     - @bike_templates.each do |template, description|
       %li{ class: "edit-menu-#{template}" }

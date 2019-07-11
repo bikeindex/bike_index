@@ -58,11 +58,11 @@
 
       - else
         %h3.no-exact-results
-          = t(".no_stolenness_desc_bikes_matched_your_sea", stolenness_desc: stolenness_desc)
+          = t(".no_bikes_matched", stolenness: stolenness_desc)
 
       - if @close_serials.present?
         %h3.secondary-matches
-          = t(".stolenness_desc_with_serial_numbers_close", stolenness_desc: stolenness_desc, paramsserial: params[:serial]).html_safe
+          = t(".with_serial_numbers_html", stolenness: stolenness_desc, serial: params[:serial])
 
         %ul.bike-boxes
           = render partial: 'bikes/bike', collection: @close_serials, as: :bike
@@ -71,6 +71,6 @@
       .ad-block#right300x600
 
 :javascript
-  = "window.interpreted_params = #{@interpreted_params.to_json};"
+  window.interpreted_params = #{@interpreted_params.to_json};
 
 <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>

@@ -1,7 +1,8 @@
-- serial_help_content = "Every bike has a unique serial number, it's how they are identified. To learn more or see some examples, go to #{link_to 'our serial page', serials_url, target: '_blank' } <small>(opens in a separate window)</small>."
+- serial_page_link = link_to(t(".our_serial_page"), serials_url, target: '_blank')
+- serial_help_content = t(".serial_help_content_html", serial_page_link: serial_page_link)
 
 .form-well-header.container
-  %h1= t(".enter_biketype_details", biketype: @bike.type)
+  %h1= t(".enter_bike_type_details", bike_type: @bike.type)
 
 = form_for @bike, multipart: true do |f|
   = f.hidden_field :b_param_id_token, value: @b_param&.id_token
@@ -27,17 +28,17 @@
             = f.label :serial_number, class: 'form-well-label'
             .form-well-input
               #serial-input
-                = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: 'highly recommended', class: 'form-control'
+                = f.text_field :serial_number, required: true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off', placeholder: t('.highly_recommended'), class: 'form-control'
                 %a.inline-input-help{ title: t(".serial_help"), data: { toggle: 'popover', content: serial_help_content } }
                   ?
               #made-without-serial-input
                 %label
                   = f.check_box :made_without_serial
-                  = t(".this_biketype_was_made_without_a_serial", biketype: @bike.type)
+                  = t(".without_serial", bike_type: @bike.type)
               .below-input-help#made-without-serial-help
                 .hidden-other
                   %a{ data: { toggle: 'modal', target: '#made-without-serial-modal' } }
-                    = t(".this_biketype_was_made_without_a_serial_n", biketype: @bike.type)
+                    = t(".without_serial_number", bike_type: @bike.type)
             .right-input-help
               %label.made-without-serial-checkbox
                 = check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1
@@ -51,7 +52,7 @@
                 - initial = @bike.manufacturer && { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json
                 = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name, class: 'form-control unfancy', data: { initial: initial }
                 %span.below-input-help
-                  = t(".select_other_if_manufacturer_doesnt_show_")
+                  = t(".select_other")
 
             .form-group.hidden-other.row
               = f.label :manufacturer_other, t(".other_manufacturer"), class: 'form-well-label'
@@ -77,7 +78,7 @@
           = render partial: 'bikes/bike_fields/revised_colors', locals: { f: f, classname: classname }
 
           - if @bike.stolen || @organization&.include_field_reg_phone?(current_user)
-            - label_phone = @organization&.registration_field_label("reg_phone") || "Phone"
+            - label_phone = @organization&.registration_field_label("reg_phone") || t(".phone")
             .form-group.row.unnested-field
               = f.label :phone, label_phone, class: "form-well-label"
               .form-well-input
@@ -90,14 +91,14 @@
           - if @organization&.include_field_reg_address?(current_user)
             .related-fields
               .form-group.row
-                - label_address = @organization.registration_field_label("reg_address") || "Mailing address"
+                - label_address = @organization.registration_field_label("reg_address") || t(".mailing_address")
                 / Set all the bike address attrs
                 - @bike.attributes = { address: @b_param.address("address"), address_city: @b_param.address("city"), address_zipcode: @b_param.address("zipcode"), address_state: @b_param.address("state") }
                 = f.label :address, label_address, class: 'form-well-label'
                 .form-well-input
                   = f.text_field :address, required: true, placeholder: t(".street_address"), class: 'form-control'
                   %span.below-input-help
-                    = t(".your_full_address_is_required_by_organiza", organizationshort_name: @organization.short_name)
+                    = t(".your_full_address_is_required", org_name: @organization.short_name)
               .form-group.row
                 %label.form-well-label
                 .form-well-input
@@ -112,7 +113,7 @@
                   = f.collection_select(:address_state, State.all, :abbreviation, :name, { include_blank: true, required: true, prompt: "State" }, { class: "form-control" })
 
           - if @organization&.include_field_reg_secondary_serial?(current_user)
-            - label_secondary_serial = @organization.registration_field_label("reg_secondary_serial") || "Additional serial/sticker number"
+            - label_secondary_serial = @organization.registration_field_label("reg_secondary_serial") || t(".additional_serial_sticker_number")
             .form-group.row.unnested-field.no-divider-row
               = f.label :additional_registration, label_secondary_serial, class: "form-well-label"
               .form-well-input
@@ -120,7 +121,7 @@
 
           - if @organization&.include_field_reg_affiliation?(current_user)
             .form-group.row.unnested-field.no-divider-row.fancy-select.unfancy
-              - label_affiliation = @organization.registration_field_label("reg_affiliation") || "#{@organization.short_name} affiliation"
+              - label_affiliation = @organization.registration_field_label("reg_affiliation") || t(".affiliation", org_name: @organization.short_name)
               = f.label :organization_affiliation, label_affiliation, class: "form-well-label"
               .form-well-input
                 - affiliation_options = @organization.reg_affiliation_options.map { |a| [a.humanize, a] }
@@ -137,19 +138,21 @@
 - modal_body = capture_haml do
   .modal-body
     %p
-      = t(".very_emveryem_few_bikes_are_made_without_", biketype: @bike.type)
+      = t(".very_few_bikes_html", bike_type: @bike.type)
     %ul
       %li
         = t(".was_made_before_1970")
       %li.li-or
-        \- or -
+        \-
+        = t(".or")
+        \-
       %li
         = t(".is_a_handmade_frame")
     %p
       = t(".it_probably_has_a_serial_number")
     %p
-      - how_to_find_link = link_to 'how to find your serial number', serials_url, target: "_blank"
-      = t(".read_about_how_to_find_link_smallopens_in", how_to_find_link: how_to_find_link).html_safe
+      - how_to_find_link = link_to t('.how_to_find_serial'), serials_url, target: "_blank"
+      = t(".read_how_to_find_html", how_to_find_link: how_to_find_link)
 
   .modal-btn-footer
     .row
@@ -160,6 +163,6 @@
       .col-xs-6
         %button.btn.btn-danger#made-without-serial-button{type: 'button'}
           = t(".im_100_sure")
-        = t(".this_biketype_was_made_without_a_serial", biketype: @bike.type)
+        = t(".without_serial", bike_type: @bike.type)
 
-= render partial: 'shared/modal', locals: { title: 'Are you certain?', id: 'made-without-serial-modal', modal_body: modal_body }
+= render partial: 'shared/modal', locals: { title: t('.are_you_certain'), id: 'made-without-serial-modal', modal_body: modal_body }

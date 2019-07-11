@@ -8,46 +8,46 @@
           %h3.header-font-alt
             %span.hidden-sm-down
               = passive_organization.short_name
-            Access Panel
+            = t(".access_panel")
         .col-xs-6
           - if @bike.organized?(passive_organization)
             %p.text-success.text-right
               %span.hidden-md-down
-                = "This #{@bike.type} is registered with #{passive_organization.short_name}"
+                = t(".bike_is_registered", bike_type: @bike.type, org_name: passive_organization.short_name)
               %span.hidden-lg-up
-                = "reged with #{passive_organization.short_name}"
+                = t(".is_registered", org_name: passive_organization.short_name)
           - else
             %p.text-warning.text-right
               %span.hidden-md-down
-                = "This #{@bike.type} is <em>not</em> registered with #{passive_organization.short_name}".html_safe
+                = t(".bike_is_not_registered_html", bike_type: @bike.type, org_name: passive_organization.short_name)
               %span.hidden-lg-up
-                = "<em>not</em> reged with #{passive_organization.short_name}".html_safe
+                = t(".is_not_registered_html", org_name: passive_organization.short_name)
     .card-body
       .row
         - display_unstolen_notification_form = !@bike.stolen? && passive_organization.paid_for?("unstolen_notifications")
         - if passive_organization.ambassador? && @bike.current_stolen_record.present?
           .col-xs-12.mb-2
             .text-right.less-strong
-              <em><span class="hidden-md-down">As a Bike Index ambassador,</span> you can mark it as recovered:</em>
+              = t(".as_a_bikeindex_ambassador_html")
 
-              = link_to "Mark bike recovered", edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token), class: "btn btn-success btn-sm"
+              = link_to t(".mark_bike_recovered"), edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token), class: "btn btn-success btn-sm"
 
         .mb-2{ class: display_unstolen_notification_form ? "col-md-7" : "col-sm-12" }
           %table.table-list
             %tbody
               %tr
-                %td Permission
+                %td= t(".permission")
                 %td
                   - if @bike.authorized_by_organization?(org: passive_organization)
-                    = "#{passive_organization.short_name} can edit this #{@bike.type}"
-                    = link_to "Edit", edit_bike_path(@bike), class: "btn btn-success btn-sm float-right"
+                    = t(".org_can_edit_bike", org_name: passive_organization.short_name, bike_type: @bike.type)
+                    = link_to t(".edit"), edit_bike_path(@bike), class: "btn btn-success btn-sm float-right"
                   - else
                     %em.small.less-strong
-                      = "#{passive_organization.short_name} can not edit"
+                      = t(".org_cannot_edit", org_name: passive_organization.short_name)
               - if passive_organization.paid_for?("bike_codes") # Always display stickers if org has paid for them
                 %tr
                   %td
-                    Sticker
+                    = t(".sticker")
                   %td
                     - @bike.bike_codes.each do |bike_code|
                       - if bike_code.organization.present?
@@ -57,29 +57,24 @@
                     - if @bike.bike_codes.none?
                       - show_sticker_modal = true
                       %a{ href: "#", style: "opacity: 0.8; text-align: right;", data: { toggle: "modal", target: "#assignStickerModal" } }
-                        Link Sticker
+                        = t(".link_sticker")
               - if @bike.organized?(passive_organization) # Only display information about the bike if bike is registered through org
                 %tr
-                  %td
-                    Owner name
-                  %td
-                    = @bike.user&.name
+                  %td= t(".owner_name")
+                  %td= @bike.user&.name
                 %tr
-                  %td
-                    Owner email
-                  %td
-                    = @bike.owner_email
+                  %td= t(".owner_email")
+                  %td= @bike.owner_email
                 %tr
-                  %td Registered:
+                  %td= t(".registered")
                   %td
                     %span.convertTime
                       = l @bike.created_at, format: :convert_time
                 %tr
-                  %td Claimed
-                  %td
-                    = @bike.claimed?
+                  %td= t(".claimed")
+                  %td= @bike.claimed?
                 %tr
-                  %td Creator
+                  %td= t(".creator")
                   %td
                     = @bike.creator&.display_name
                     %em.small.less-strong
@@ -88,8 +83,7 @@
                   - bike_attr = Export.additional_registration_fields[reg_field.to_sym]
                   - if bike_attr == "registration_address"
                     %tr
-                      %td
-                        Address:
+                      %td= t(".address")
                       %td
                         - address = @bike.registration_address
                         - if address.present?
@@ -98,11 +92,11 @@
                           = address["address"]
                           %br
                           &nbsp;&nbsp;&nbsp;
-                          = "#{address["city"]}, #{address["state"]} #{address["zipcode"]}"
+                          = "#{address['city']}, #{address['state']} #{address['zipcode']}"
                   - else
                     %tr
                       %td
-                        #{(bike_attr || reg_field).humanize}:
+                        = "#{(bike_attr || reg_field).humanize}:"
                       %td
                         - if reg_field == "reg_secondary_serial"
                           = @bike.additional_registration
@@ -113,76 +107,74 @@
 
                 - if passive_organization.paid_for?("avery_export")
                   %tr
-                    %td
-                      User name
+                    %td= t(".user_name")
                     %td
                       - if @bike.user_name.present?
                         = @bike.user_name
                       - else
                         %em.text-warning
-                          no name
+                          = t(".no_name")
                   %tr
-                    %td
-                      Avery Exportable
+                    %td= t(".avery_exportable")
                     %td
                       - if Export.avery_export_bike?(@bike)
-                        true
+                        = t(".is_true")
                       - else
-                        false.
+                        = t(".is_false")
                         %small.em
                           - unless @bike.user_name.present?
-                            missing user name
+                            = t(".missing_user_name")
                           - unless @bike.registration_address.present? && @bike.registration_address["address"].present?
-                            missing Address
+                            = t(".missing_address")
 
           - if !@bike.organized?(passive_organization) # Apologize, bike isn't organizations
             %p.less-strong.mt-4
               %em
-                Unable to display additional information because #{@bike.type} is not registered with #{passive_organization.name}
+                = t(".unable_to_display_additional_information", bike_type: @bike.type, org_name: passive_organization.name)
         - if display_unstolen_notification_form
           .col-md-5.unstolen-notification-box
             %p
-              %em= "#{@bike.type.titleize} is not marked stolen."
-              %strong Believe it is anyway?
+              %em= t(".bike_not_marked_stolen", bike_type: @bike.type.titleize)
+              %strong= t(".believe_it_is_anyway")
             - if @bike.contact_owner?(current_user)
-              %h3 Contact the owner
+              %h3= t(".contact_the_owner")
               - redirect = new_session_url(return_to: bike_path(@bike, params: {contact_owner: true})) unless current_user.present?
               #write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }
                 %a.btn.btn-primary.btn-lg{ href: '#new_stolen_message', 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse' }
-                  Write them a message
+                  = t(".write_them_a_message")
 
               .collapse#new_stolen_message{ class: ("in" if @contact_owner_open) }
                 - @stolen_notification ||= StolenNotification.new(bike: @bike, sender: current_user)
                 = form_for @stolen_notification do |f|
                   = f.hidden_field :bike_id, value: @bike.id
-                  = f.text_field :reference_url, placeholder: "Link url for online sighting", class: "form-control additional-field"
+                  = f.text_field :reference_url, placeholder: t(".link_url_for_online_sighting"), class: "form-control additional-field"
                   - if current_user.ambassador?
                     = f.text_area :message, required: true, value: @stolen_notification.default_message, rows: 6, class: "form-control"
                   - else
-                    = f.text_area :message, required: true, placeholder: "Where did you see this #{@bike.type}? If you're contacting about an ad you found online, include a link in the field below", rows: 6, class: "form-control"
+                    = f.text_area :message, required: true, placeholder: t(".where_did_you_see_this_bike", bike_type: @bike.type), rows: 6, class: "form-control"
 
                   .send-message
-                    = f.submit "Send message", class: 'btn btn-primary btn-lg'
+                    = f.submit t(".send_message"), class: 'btn btn-primary btn-lg'
 
               - if @bike.phoneable_by?(current_user)
                 %p.phoneable-by.mt-4
-                  <em>Or call</em> <strong>Owner's phone number:</strong>
+                  = t(".or_call_owner_html")
                   = link_to @bike.phone_display, "tel:#{@bike.phone}"
             - else
               %p
-                This user <strong>revoked</strong> permission to contact them prior to their bike being marked stolen.
+                = t(".user_revoked_permission_html")
               %p
-                = support_link = link_to("support@bikeindex.org", "mailto:support@bikeindex.org")
-                = "Email #{support_link} to deal with this."
+                = support_link = link_to(t(".support_email"), "mailto:#{t('.support_email')}")
+                = t(".email_to_deal_with_this_html", support_link: support_link)
 
   - if passive_organization.message_kinds.any?
     .geomessages-wrap
       %span
-        Send
+        = t(".send")
       - passive_organization.message_kinds.each do |kind|
         %a.btn.btn-secondary.openMessageModal{ "data-kind" => kind }
           - if kind == "geolocated_messages"
-            GeoMessage
+            = t(".geomessage")
           - else
             = kind.humanize
 
@@ -196,14 +188,14 @@
         = f.hidden_field :longitude
         = f.hidden_field :accuracy
         .form-group
-          = f.label :body, "Additional message"
+          = f.label :body, t(".additional_message")
           = f.text_area :body, class: 'form-control'
         .modal-btn-footer
-          = submit_tag "Send message", class: "btn btn-success", id: "submitMessageBtn", disabled: true
+          = submit_tag t(".send_message"), class: "btn btn-success", id: "submitMessageBtn", disabled: true
           %span.less-strong#waitingOnLocationText
-            Waiting on device location
+            = t(".waiting_on_device_location")
 
-  = render partial: "/shared/modal", locals: { title: "Message #{@bike.type} owner", modal_body: modal_body, id: "organizationMessageModal" }
+  = render partial: "shared/modal", locals: { title: t(".message_owner", bike_type: @bike.type), modal_body: modal_body, id: "organizationMessageModal" }
 
 - if show_sticker_modal
   - sticker_modal_body = capture_haml do
@@ -211,10 +203,10 @@
       = form_for BikeCode.new, { url: organization_sticker_path(id: "code", organization_id: passive_organization.to_param), action: "update", method: "PUT" } do |f|
         = f.hidden_field :bike_id, value: @bike.id
         .form-group
-          = f.label :code, "Sticker Code", class: "org-form-label"
+          = f.label :code, t(".sticker_code"), class: "org-form-label"
           = f.text_field :code, required: true, class: "form-control"
         .modal-btn-footer
           .form-submit-button
-            = f.submit "Assign sticker", class: "btn btn-success btn-lg"
+            = f.submit t(".assign_sticker"), class: "btn btn-success btn-lg"
 
-  = render partial: "shared/modal", locals: { title: "Assign sticker", modal_body: sticker_modal_body, id: "assignStickerModal" }
+  = render partial: "shared/modal", locals: { title: t(".assign_sticker"), modal_body: sticker_modal_body, id: "assignStickerModal" }

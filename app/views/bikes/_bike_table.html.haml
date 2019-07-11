@@ -1,16 +1,11 @@
 %section.full-screen-table
   %table#user-bikes-table.table.table-striped.table-bordered
     %thead
-      %th
-        = t(".date_indexed")
-      %th
-        = t(".manufacturer")
-      %th.medium-screens
-        = t(".model")
-      %th.large-screens
-        = t(".color")
-      %th.large-screens
-        = t(".created_by")
+      %th= t(".date_indexed")
+      %th= t(".manufacturer")
+      %th.medium-screens= t(".model")
+      %th.large-screens= t(".color")
+      %th.large-screens= t(".created_by")
 
     %tbody
       - pdf ||= false
@@ -21,11 +16,11 @@
               - if bike.created_at.today?
                 %span.hidden
                   = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-                = t(".today_at_bikecreated_atstrftimei_p", bikecreated_atstrftimei_p: bike.created_at.strftime('%-I %p'))
+                = t(".today_at", timestamp: bike.created_at.strftime('%-I %p'))
               - elsif Date.yesterday().beginning_of_day() <= bike.created_at
                 %span.hidden
                   = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-                = t(".yesterday_at_bikecreated_atstrftimei_p", bikecreated_atstrftimei_p: bike.created_at.strftime('%-I %p'))
+                = t(".yesterday_at", timestamp: bike.created_at.strftime('%-I %p'))
               - else
                 %span.hidden
                   = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")

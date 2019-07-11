@@ -3,7 +3,7 @@
 .container
   - if current_user&.superuser
     %p.mb-4.text-center
-      = link_to t(".biketypetitleize_in_admin", biketypetitleize: @bike.type.titleize), admin_bike_path(@bike.to_param), class: "btn btn-outline-info uncap", style: "display: block;"
+      = link_to t(".bike_in_admin", bike_type: @bike.type.titleize), admin_bike_path(@bike.to_param), class: "btn btn-outline-info uncap", style: "display: block;"
     - if @bike.user_hidden
       %h2.text-danger.mb-4.text-center
         = t(".hidden_by_owner")
@@ -18,7 +18,6 @@
     .col-md-8
       %h1
         - if @bike.stolen
-          - stolen_type = @bike.recovered ? 'recovered' : 'stolen'
           %strong.stolen
             = t(".recovered") if @bike.recovered
             = t(".stolen")
@@ -49,7 +48,7 @@
         - if @bike.public_images.any?
           #selected-photo{ class: "image-holder #{"just1photo" if @bike.public_images.count == 1}" }
             .current-photo{ id: "image#{@bike.public_images.first.id}"}
-              = image_tag(@bike.public_images.first.image_url(:large), alt: t(".biketypetitleize_photo", biketypetitleize: @bike.type.titleize), id: t(".ibikepublic_imagesfirstlisting_order", bikepublic_imagesfirstlisting_order: @bike.public_images.first.listing_order), data: { action: t(".zoom"), original: @bike.public_images.first.image_url })
+              = image_tag(@bike.public_images.first.image_url(:large), alt: t(".bike_photo", bike_type: @bike.type.titleize), id: t(".ibikepublic_imagesfirstlisting_order", bikepublic_imagesfirstlisting_order: @bike.public_images.first.listing_order), data: { action: t(".zoom"), original: @bike.public_images.first.image_url })
           - if @bike.public_images.count > 1
             %span.thumbnail-shadow
             %span.thumbnail-shadow-r
@@ -69,17 +68,16 @@
         - elsif @bike.stock_photo_url.present?
           #selected-photo.image-holder.just1photo
             %h3.stock-photo
-              = t(".stock_photo_of_a_bikeyear_bikeframe_model", bikeyear: @bike.year, bikeframe_model: @bike.frame_model)
-              %em
-                = t(".color_may_not_match")
+              = t(".stock_photo", year: @bike.year, model: @bike.frame_model)
+              %em= t(".color_may_not_match")
             .current-photo#stock_photo_img
-              = image_tag(@bike.stock_photo_url, alt: t(".biketypetitleize_photo", biketypetitleize: @bike.type.titleize), id: t(".i0"), data: {action: 'zoom', original: @bike.stock_photo_url})
+              = image_tag(@bike.stock_photo_url, alt: t(".bike_photo", bike_type: @bike.type.titleize), id: "i|0", data: {action: 'zoom', original: @bike.stock_photo_url})
 
       .show-bike-details
         %ul.attr-list.split-sm
           = @bike.attr_list_item(@bike.serial_display, t(".serial"), with_colon: true)
           - unless @bike.recovered
-            = @bike.attr_list_item(@bike.additional_registration, t(".other_serialregistrationsticker"), with_colon: true)
+            = @bike.attr_list_item(@bike.additional_registration, t(".other_serial"), with_colon: true)
           - unless @bike.type == 'bike'
             = @bike.attr_list_item(@bike.type.titleize, t(".cycle_type"), with_colon: true)
           = @bike.attr_list_item(@bike.mnfg_name, t(".manufacturer"), with_colon: true)
@@ -105,7 +103,7 @@
             = @bike.description
         - if @bike.stolen && @stolen_record.present?
           %h3
-            = t(".bikerecovered_recovery_theft_details", bikerecovered_recovery_theft: @bike.recovered ? 'Recovery' : 'Theft')
+            = t(".theft_details", bike_recovered: @bike.recovered ? 'Recovery' : 'Theft')
           .row
             - if @bike.current_stolen_record.latitude.present?
               = render 'stolen_map'
@@ -114,7 +112,8 @@
                 = @bike.attr_list_item(@stolen_record.address(skip_default_country: true), t(".location"))
                 = @bike.attr_list_item(@stolen_record.locking_description, t(".locking_description"))
                 = @bike.attr_list_item(@stolen_record.lock_defeat_description, t(".locking_circumvented"))
-                = @bike.attr_list_item((l @stolen_record.date_stolen, format: :dotted), t(".date_stolen_type", stolen_type: stolen_type)) # stolen_type defined at start of document
+                - stolen_type = @bike.recovered ? 'recovered' : 'stolen'
+                = @bike.attr_list_item((l @stolen_record.date_stolen, format: :dotted), t(".date_stolen_type", stolen_type: stolen_type))
                 = @bike.attr_list_item(@stolen_record.police_report_number, t(".police_report"))
                 = @bike.attr_list_item(@stolen_record.police_report_department, t(".department_city"))
           - if @stolen_record.theft_description.present?
@@ -170,7 +169,7 @@
         .contact-the-owner
           %p.preface
             %em
-              = t(".know_something_about_this_biketype", biketype: @bike.type)
+              = t(".know_something_about_this_bike_type", bike_type: @bike.type)
           %h3
             = t(".contact_the_owner")
           - if @bike.recovered
@@ -185,7 +184,7 @@
             - @stolen_notification ||= StolenNotification.new(bike: @bike)
             = form_for @stolen_notification do |f|
               = f.hidden_field :bike_id, value: @bike.id
-              = f.text_area :message, required: true, placeholder: t(".where_did_you_see_this_biketype_if_youre_", biketype: @bike.type), rows: 6, class: "form-control"
+              = f.text_area :message, required: true, placeholder: t(".where_did_you_see_this_bike", bike_type: @bike.type), rows: 6, class: "form-control"
               = f.text_field :reference_url, placeholder: t(".link_url"), class: "form-control additional-field"
 
               .send-message

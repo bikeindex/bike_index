@@ -95,7 +95,7 @@
             %td.td-title
               = t(".registered")
             %td
-              = @bike.created_at.strftime(t(".ymd"))
+              = @bike.created_at.strftime("%Y-%m-%d")
               = t(".to")
               - if @bike.owner.present? && @bike.owner.name.present?
                 = @bike.owner.name
@@ -155,7 +155,9 @@
                     - if hubs.where(rear: true)
                       - r_hub = hubs.where(rear: true).first
                       - if r_hub.present?
-                        = t(".r_hubcmodel_name_by_r_hubmanufacturer_nam", r_hubcmodel_name: r_hub.cmodel_name, r_hubmanufacturer_name: r_hub.manufacturer_name)
+                        - model_name = r_hub.cmodel_name
+                        - mfg_name = r_hub.manufacturer_name
+                        = "(#{model_name} #{t('.by')} #{mfg_name})"
 
 
     .bike-details
@@ -206,4 +208,5 @@
             = t(".printout")
           %p
             = t(".online")
-            = link_to t(".bikeindexorgbike_pathbike", bike_pathbike: bike_path(@bike)), bike_url(@bike)
+            @
+            = link_to t(".bikeindex_org", bike_path: bike_path(@bike)), bike_url(@bike)

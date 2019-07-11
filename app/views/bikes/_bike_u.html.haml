@@ -19,7 +19,7 @@
             %h3
               = t(".status")
               - if bike_u.recovered
-                = t(".recoveredfound")
+                = t(".recovered_found")
               - else
                 = t(".stolen")
             - if bike_u.current_stolen_record.present?

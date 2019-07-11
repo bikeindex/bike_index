@@ -4,7 +4,7 @@
       %span.checklist-checkbox
         &#10003;
       %span.checklist-text
-        = t(".list_biketype_on_bike_index", biketype: @bike.type)
+        = t(".list_bike_type_on_bike_index", bike_type: @bike.type)
 
     - serial_unknown = @bike.serial_unknown?
     - if serial_unknown
@@ -12,16 +12,15 @@
         %span.checklist-checkbox
         %span.checklist-text
           = t(".add_serial_number")
-          %em
-            = t(".critical_contact_who_you_bought_the_bike_")
+          %em= t(".contact_seller")
 
     - street_present = stolen_record.street.present?
     %li{ class: street_present ? "completed-item" : "" }
       %span.checklist-checkbox
         = "&#10003;".html_safe if street_present
       %span.checklist-text
-        = t(".report_theft_on_bike_index_including")
-        = link_to t(".location_where_the_theft_occurred"), edit_bike_path(id: @bike.to_param, page: "theft_details")
+        - edit_bike_link = link_to(t(".location_where_the_theft_occurred"), edit_bike_path(id: @bike.to_param, page: "theft_details"))
+        = t(".report_theft_html", edit_bike_link: edit_bike_link)
 
     - images_present = @bike.public_images.any?
     %li{ class:  images_present ? "completed-item" : "" }
@@ -29,7 +28,8 @@
         = "&#10003;".html_safe if images_present
       %span.checklist-text
         = t(".add")
-        = link_to t(".a_photo_of_your_biketype", biketype: @bike.type), edit_bike_path(id: @bike.to_param, page: "photos")
+        = link_to t(".a_photo_of_your_bike_type", bike_type: @bike.type),
+          edit_bike_path(id: @bike.to_param, page: "photos")
 
     - police_report_present = stolen_record.police_report_number.present?
     - submitted_to_police_services = police_report_present && !serial_unknown
@@ -37,23 +37,23 @@
       %span.checklist-checkbox
         = "&#10003;".html_safe if police_report_present
       %span.checklist-text
-        - bike_link = link_to "a Police Report Number", edit_bike_path(id: @bike.to_param, page: "theft_details")
-        = t(".add_bike_link_to_your_theft_report", bike_link: bike_link).html_safe
+        - bike_link = link_to(t(".a_police_report"), edit_bike_path(id: @bike.to_param, page: "theft_details"))
+        = t(".add_bike_link_to_your_theft_report_html", bike_link: bike_link)
       %ul
         %li{ class: submitted_to_police_services ? "completed-item" : "" }
           %span.checklist-checkbox
             = "&#10003;".html_safe if submitted_to_police_services
           %span.checklist-text
             = t(".push_bike_info_to")
-            = link_to t(".leadsonline"), "https://bikeindex.org/news/bike-index-partners-with-leads-online"
-            = t(".bike_index_does_this_when_you_enter_your_")
+            = link_to t(".leads_online"), t(".leads_online_url")
+            = t(".bike_index_does_this")
           - if serial_unknown
             %span.text-danger= t(".requires_a_serial_number")
         %li{ class: submitted_to_police_services ? "completed-item" : "" }
           %span.checklist-checkbox
             = "&#10003;".html_safe if submitted_to_police_services
           %span.checklist-text
-            = t(".push_bike_info_to_law_enforcement_databas")
+            = t(".push_bike_info_to_law_enforcement")
             - if serial_unknown
               %span.text-danger= t(".requires_a_serial_number")
 
@@ -62,12 +62,12 @@
       %span.checklist-checkbox
         = "&#10003;".html_safe if approved
       %span.checklist-text
-        = t(".share_on_twitter_bike_index_will_do_this_")
+        = t(".share_on_twitter")
 
     %li
       %span.checklist-checkbox
       %span.checklist-text
-        = link_to t(".share_widely_on_your_personal_social_medi"), edit_bike_path(id: @bike.to_param, page: "publicize")
+        = link_to t(".share_widely_on_your_personal_social"), edit_bike_path(id: @bike.to_param, page: "publicize")
         = t(".facebook_instagram_etc")
 
     - theft_alert_purchased = stolen_record.theft_alerts.any?
@@ -75,5 +75,5 @@
       %span.checklist-checkbox
         = "&#10003;".html_safe if theft_alert_purchased
       %span.checklist-text
-        = t(".supercharge_sharing_on_facebook_with_bike")
+        = t(".supercharge_sharing_on_facebook")
         = link_to t(".premium_stolen_bike_alerts"), edit_bike_path(id: @bike.to_param, page: "alert")

@@ -13,18 +13,19 @@
               = @edit_templates[@edit_template]
           .row
             .col-sm-12
-              %p
-                = t(".weve_found_targeted_sharing_on_social_med")
-              %p
-                = t(".bike_index_can_help_by_purchasing_targete", biketype: @bike.type)
+              %p= t(".targeted_sharing_html")
+              %p= t(".bike_index_can_help", bike_type: @bike.type)
 
           = form_tag edit_bike_url(@bike), method: :get, id: "js-select-plan-form" do
             = hidden_field_tag :page, :alert_purchase
             = hidden_field_tag :selected_plan_id
             .row
-              %h3.text-center.w-100= t(".select_plan")
+              %h3.text-center.w-100
+                = t(".select_plan")
             .row
               = render @theft_alert_plans, selected_plan: @selected_theft_alert_plan, preferred_plan: @theft_alert_plans.max_by(&:amount_cents)
+
             .row
               .text-center.w-100.mt-2
-                %button.btn.btn-lg.btn-primary= t(".select_plan")
+                %button.btn.btn-lg.btn-primary
+                  = t(".select_plan")

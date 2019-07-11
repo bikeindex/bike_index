@@ -8,8 +8,7 @@
           .form-well-form-header
             %h3= t(".transfer_ownership")
           .col-xs-12
-            %p
-              = t(".sell_trade_or_give_away_this_biketype_ent", biketype: @bike.type)
+            %p= t(".sell_trade_or_give_away_this_bike", bike_type: @bike.type)
           .form-group.row.unnested-field.no-divider-row
             = f.label :owner_email, class: 'form-well-label'
             .form-well-input
