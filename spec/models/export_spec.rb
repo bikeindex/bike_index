@@ -146,7 +146,7 @@ RSpec.describe Export, type: :model do
         FactoryBot.create(:b_param, created_bike_id: bike.id,
                                     params: { bike: { address: "102 Washington Pl, State College" } })
       end
-      let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil) }
+      let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil, bike: bike) }
       it "is exportable" do
         ownership.reload
         expect(ownership.claimed?).to be_falsey
