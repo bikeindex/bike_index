@@ -76,24 +76,28 @@
       .show-bike-details
         %ul.attr-list.split-sm
           = @bike.attr_list_item(@bike.serial_display, t(".serial"), with_colon: true)
+
           - unless @bike.recovered
             = @bike.attr_list_item(@bike.additional_registration, t(".other_serial"), with_colon: true)
           - unless @bike.type == 'bike'
             = @bike.attr_list_item(@bike.type.titleize, t(".cycle_type"), with_colon: true)
+
           = @bike.attr_list_item(@bike.mnfg_name, t(".manufacturer"), with_colon: true)
           = @bike.attr_list_item(@bike.name, t(".name"), with_colon: true)
           = @bike.attr_list_item(@bike.frame_model, t(".model"), with_colon: true)
           = @bike.attr_list_item(@bike.year.to_s, t(".year"), with_colon: true)
           = @bike.attr_list_item(@bike.frame_colors.to_sentence, t(".primary_colors"), with_colon: true)
           = @bike.attr_list_item(@bike.frame_size&.upcase, t(".frame_size"), with_colon: true)
+
           - if @bike.front_wheel_size_id.present?
             - front_tire_width = @bike.front_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
             - if @bike.front_wheel_size_id == @bike.rear_wheel_size_id
-              = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), 'Wheel diameter', with_colon: true)
+              = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), t('.wheel_diameter'), with_colon: true)
             - else
-              = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), 'Front wheel diameter', with_colon: true)
+              = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), t(".front_wheel_diameter"), with_colon: true)
               - rear_tire_width = @bike.rear_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
-              = @bike.attr_list_item(@bike.ass_name('rear_wheel_size', rear_tire_width), 'Rear wheel diameter', with_colon: true)
+              = @bike.attr_list_item(@bike.ass_name('rear_wheel_size', rear_tire_width), t(".rear_wheel_diameter"), with_colon: true)
+
           = @bike.attr_list_item(@bike.frame_material_name, t(".frame_material"), with_colon: true)
           = @bike.attr_list_item(@bike.handlebar_type_name, t(".handlebar_type"), with_colon: true)
         - if @bike.description.present?

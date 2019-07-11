@@ -1498,6 +1498,9 @@ en:
       front_rear: Front & rear
       front: Front
       rear: Rear
+      wheel_diameter: Wheel diameter
+      front_wheel_diameter: Front wheel diameter
+      rear_wheel_diameter: Rear wheel diameter
       other: Other
       componentcmodel_name: "%{componentcmodel_name}"
       componentyear: "%{componentyear}"
