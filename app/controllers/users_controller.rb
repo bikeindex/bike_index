@@ -142,8 +142,8 @@ class UsersController < ApplicationController
         end
       end
       if params[:user][:password].present?
-        @user.generate_auth_token
-        @user.set_user_token("password_reset_token")
+        @user.generate_auth_token("auth_token")
+        @user.update_auth_token("password_reset_token")
         @user.reload
         default_session_set(@user)
       end

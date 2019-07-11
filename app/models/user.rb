@@ -172,10 +172,6 @@ class User < ActiveRecord::Base
     user_token_time(user_token_type) < (Time.current - 1.hours)
   end
 
-  def set_user_token(user_token_type, t = Time.current.to_i)
-    self.update_attributes(user_token_type => "#{t}-" + Digest::MD5.hexdigest("#{SecureRandom.hex(10)}-#{DateTime.current}"))
-  end
-
   def accepted_vendor_terms_of_service?
     vendor_terms_of_service
   end
@@ -190,7 +186,7 @@ class User < ActiveRecord::Base
 
   def send_password_reset_email
     unless user_token_time("password_reset_token") > Time.current - 2.minutes
-      set_user_token("password_reset_token")
+      update_auth_token("password_reset_token")
       EmailResetPasswordWorker.perform_async(id)
     end
   end
@@ -338,10 +334,16 @@ class User < ActiveRecord::Base
     }.as_json
   end
 
-  def generate_auth_token
+  def set_auth_token(auth_token_type, t = nil)
+    generate_auth_token(auth_token_type, t)
+    save
+  end
+
+  def generate_auth_token(auth_token_type, t = nil)
+    t ||= Time.current.to_i
     begin
-      self.auth_token = SecureRandom.urlsafe_base64 + "t#{Time.current.to_i}"
-    end while User.where(auth_token: auth_token).exists?
+      self.attributes = { auth_token_type => "#{t}-" + Digest::MD5.hexdigest("#{SecureRandom.hex(24)}-#{t}") }
+    end while User.where(auth_token_type => auth_token).exists?
   end
 
   def access_tokens_for_application(i)
@@ -356,10 +358,8 @@ class User < ActiveRecord::Base
       usrname = SecureRandom.urlsafe_base64
     end
     self.username = usrname
-    if !confirmed
-      self.confirmation_token = (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.current.to_s}")
-    end
-    generate_auth_token
+    self.generate_auth_token("confirmation_token") if !confirmed
+    generate_auth_token("auth_token")
     true
   end
 

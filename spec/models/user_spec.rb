@@ -329,14 +329,14 @@ RSpec.describe User, type: :model do
       it "gets the time" do
         user = FactoryBot.create(:user)
         expect(user.password_reset_token).to be_blank
-        user.set_user_token("password_reset_token")
+        user.update_auth_token("password_reset_token")
         user.reload
         expect(user.password_reset_token).to be_present
         expect(user.user_token_time("password_reset_token")).to be > Time.current - 2.seconds
       end
       it "uses input time" do
         user = FactoryBot.create(:user)
-        user.set_user_token("password_reset_token", (Time.current - 61.minutes).to_i)
+        user.update_auth_token("password_reset_token", (Time.current - 61.minutes).to_i)
         expect(user.reload.user_token_time("password_reset_token")).to be < (Time.current - 1.hours)
       end
     end
@@ -348,12 +348,12 @@ RSpec.describe User, type: :model do
       end
       it "gets the time" do
         user = User.new
-        user.set_user_token("magic_link_token")
+        user.update_auth_token("magic_link_token")
         expect(user.user_token_time("magic_link_token")).to be > Time.current - 2.seconds
       end
       it "uses input time" do
         user = FactoryBot.create(:user)
-        user.set_user_token("magic_link_token", (Time.current - 61.minutes).to_i)
+        user.update_auth_token("magic_link_token", (Time.current - 61.minutes).to_i)
         expect(user.reload.user_token_time("magic_link_token")).to be < (Time.current - 1.hours)
       end
     end

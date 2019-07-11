@@ -33,7 +33,7 @@ RSpec.describe CustomerMailer, type: :mailer do
 
   describe "password_reset_email" do
     it "renders email" do
-      user.set_user_token("password_reset_token")
+      user.update_auth_token("password_reset_token")
       mail = CustomerMailer.password_reset_email(user)
       expect(mail.subject).to eq("Instructions to reset your password")
       expect(mail.from).to eq(["contact@bikeindex.org"])
