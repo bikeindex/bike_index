@@ -1290,6 +1290,8 @@ en:
       submit_update: Submit update
       nevermind: Nevermind
       manufacturer: Manufacturer
+      zipcode: zip code
+      tell_us_about_your_bike: Tell us about your bike!
     edit_drivetrain:
       wheels: Wheels
       sidetitleize_wheel: "%{sidetitleize} wheel"

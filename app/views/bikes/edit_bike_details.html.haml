@@ -80,7 +80,7 @@
           .form-group.row.unnested-field
             = f.label :description, t(".general_description"), class: 'form-well-label form-well-label-large-input'
             .form-well-input-large
-              = f.text_area :description, rows: 3, class: 'form-control', placeholder: 'Tell us about your bike!'
+              = f.text_area :description, rows: 3, class: 'form-control', placeholder: t('.tell_us_about_your_bike')
 
           .form-group.row.unnested-field
             = f.label :additional_registration, t(".other_serial_or_registration_number"), class: 'form-well-label'
@@ -90,7 +90,7 @@
           .form-group.row.unnested-field.no-divider-row
             = f.label :zipcode, class: 'form-well-label'
             .form-well-input
-              = f.text_field :zipcode, class: 'form-control', placeholder: 'zip code'
+              = f.text_field :zipcode, class: 'form-control', placeholder: t(".zipcode")
 
           = render "shared/form_well_footer_save"
 
