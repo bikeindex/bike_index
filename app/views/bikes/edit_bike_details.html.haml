@@ -98,6 +98,25 @@
 
           = render "/shared/form_well_footer_save"
 
+          - if @bike.show_sticker_edit?
+            %hr
+            .related-fields.mt-4
+              .form-group.row
+                %label.form-well-label
+                  Existing stickers
+                %p.form-well-input-static
+
+                  - @bike.bike_codes.each do |bike_code|
+                    = bike_code.pretty_code
+                    %br
+              .form-group.row.no-divider-row.mb-0
+                = label_tag :bike_code, class: "form-well-label" do
+                  Assign a new sticker
+                .form-well-input
+                  - bike_code_from_org = @bike.organizations.with_paid_feature_slugs("bike_codes").last&.bike_codes&.claimed&.reorder(:code_integer)&.second&.pretty_code
+                  = text_field_tag :bike_code, nil, class: 'form-control', placeholder: bike_code_from_org || "A0 100"
+            = render "/shared/form_well_footer_save"
+
 - serial_correction_body = capture_haml do
   = form_tag do |t|
     .modal-body

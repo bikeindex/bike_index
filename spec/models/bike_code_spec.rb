@@ -50,7 +50,7 @@ RSpec.describe BikeCode, type: :model do
     end
   end
 
-  describe "code_integer code_prefix and pretty_display" do
+  describe "code_integer code_prefix and pretty_lookup" do
     let(:bike_code) { BikeCode.new(code: "b02012012") }
     before { bike_code.set_calculated_attributes }
     it "separates" do
@@ -67,12 +67,14 @@ RSpec.describe BikeCode, type: :model do
       end
     end
     context "bike_code_batch has a set length" do
-      let(:bike_code) { BikeCode.new(code: "A001", bike_code_batch_id: bike_code_batch.id) }
+      let(:bike_code) { FactoryBot.create(:bike_code, code: "A0001", bike_code_batch_id: bike_code_batch.id) }
       let(:bike_code2) { FactoryBot.create(:bike_code, code: "A102", bike_code_batch_id: bike_code_batch.id) }
       let(:bike_code_batch) { FactoryBot.create(:bike_code_batch, code_number_length: 5) }
       it "renders the pretty print from the batch length" do
         expect(bike_code.pretty_code).to eq "A 000 01"
         expect(bike_code2.pretty_code).to eq "A 001 02"
+        expect(BikeCode.lookup("A 01")).to eq(bike_code)
+        expect(BikeCode.lookup("A 001 02")).to eq(bike_code2)
       end
     end
   end

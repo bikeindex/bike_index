@@ -108,7 +108,7 @@ class BikeCode < ActiveRecord::Base
     return true if user_organization_ids.include?(organization_id)
     return false if claimed?
     # Because the way activerecord where.not works in rails 4, we need this nil explicitly
-    total_codes = BikeCode.where(user_id: user.id).where(organization_id: nil).count
+    total_codes = BikeCode.where(user_id: user.id, organization_id: nil).count
     total_codes += BikeCode.where(user_id: user.id).where.not(organization_id: user_organization_ids).count
     total_codes < MAX_UNORGANIZED
   end
@@ -123,11 +123,17 @@ class BikeCode < ActiveRecord::Base
     update(bike_id: nil, user_id: nil, claimed_at: nil)
   end
 
-  def claim(user, bike_str)
+  def claim_if_permitted(user, bike_or_string)
+    return claim(user, bike_or_string) if claimable_by?(user)
+    errors.add(:user, "do not have permission to claim this")
+    false
+  end
+
+  def claim(user, bike_or_string)
     errors.add(:user, "not found") unless user.present?
-    claiming_bike = bike_str.is_a?(Bike) ? bike_str : Bike.friendly_find(bike_str)
-    # Check bike_str, not bike_id, because we don't want to allow people adding bikes
-    if bike_str.blank? && claiming_bike.blank? && unclaimable_by?(user)
+    claiming_bike = bike_or_string.is_a?(Bike) ? bike_or_string : Bike.friendly_find(bike_or_string)
+    # Check bike_or_string, not bike_id, because we don't want to allow people adding bikes
+    if bike_or_string.blank? && claiming_bike.blank? && unclaimable_by?(user)
       unclaim!
     elsif claiming_bike.present?
       self.previous_bike_id = bike_id || previous_bike_id # Don't erase previous_bike_id if double unclaiming
@@ -136,7 +142,7 @@ class BikeCode < ActiveRecord::Base
         bike.bike_organizations.create(organization_id: organization_id, can_not_edit_claimed: true) if organization.present?
       end
     else
-      errors.add(:bike, "\"#{bike_str}\" not found")
+      errors.add(:bike, "\"#{bike_or_string}\" not found")
     end
     self
   end
