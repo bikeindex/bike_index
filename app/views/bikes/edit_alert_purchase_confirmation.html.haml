@@ -7,8 +7,8 @@
         .form-wrap
           .form-well-form-header
             %h3.text-center.w-100
-              / 'alert'-prefixed templates should all have the same header and
-              / highlight the same nav menu item
+              -# 'alert'-prefixed templates should all have the same header and
+              -# highlight the same nav menu item
               = @edit_templates.select { |k, v| @edit_template.match(/#{k}/) }.values.first
 
             .row
