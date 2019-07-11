@@ -47,7 +47,7 @@
               %ul.exported-link-list
                 - bike_ids.each_with_index do |id, i|
                   %li
-                    #{link_to id, bike_path(id)}#{i == (@export.exported_bike_ids.count - 1) ? "" : ","}
+                    #{link_to id, bike_path(id, organization_id: current_organization.to_param)}#{i == (@export.exported_bike_ids.count - 1) ? "" : ","}
 
       %tr
         %td
@@ -78,10 +78,10 @@
               - @export.custom_bike_ids.each do |custom_id|
                 %li
                   - if included_bike_ids.include?(custom_id)
-                    = link_to custom_id, bike_path(custom_id)
+                    = link_to custom_id, bike_path(custom_id, organization_id: current_organization.to_param)
                   - else
                     %small.text-warning
-                      = link_to(custom_id, bike_path(custom_id), class: "less-strong text-warning")
+                      = link_to(custom_id, bike_path(custom_id, organization_id: current_organization.to_param), class: "less-strong text-warning")
                       \:
                       %em= t(".unable_to_export")
 
