@@ -1175,24 +1175,6 @@ en:
       add_a_picture_of_it: Add a picture of it, so everyone can admire its beauty!
       you_sent_this_bike_html: You sent this %{bike_type} to <em>%{owner_email}</em> and it hasn't been claimed yet. You can update it.
       edit: Edit
-    bike_table:
-      date_indexed: Date indexed
-      manufacturer: Manufacturer
-      model: Model
-      color: Color
-      created_by: Created by
-      today_at: Today at %{timestamp}
-      yesterday_at: Yesterday at %{timestamp}
-      pdf: pdf
-      sorry_were_not_sure_who_created_this: Sorry, we're not sure who created this
-    bike_u:
-      serial: Serial
-      colors: Colors
-      status: 'Status:'
-      recovered_found: Recovered/Found
-      stolen: STOLEN
-      from: From
-      stolen_on: Stolen on
     edit_primary_menu:
       theft_details: Theft Details
       bike_type_details: "%{bike_type} Details"
