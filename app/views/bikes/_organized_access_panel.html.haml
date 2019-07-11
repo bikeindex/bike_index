@@ -61,7 +61,7 @@
               - if @bike.organized?(passive_organization) # Only display information about the bike if bike is registered through org
                 %tr
                   %td= t(".owner_name")
-                  %td= @bike.user&.name
+                  %td= @bike.owner_name
                 %tr
                   %td= t(".owner_email")
                   %td= @bike.owner_email
@@ -107,14 +107,6 @@
 
                 - if passive_organization.paid_for?("avery_export")
                   %tr
-                    %td= t(".user_name")
-                    %td
-                      - if @bike.user_name.present?
-                        = @bike.user_name
-                      - else
-                        %em.text-warning
-                          = t(".no_name")
-                  %tr
                     %td= t(".avery_exportable")
                     %td
                       - if Export.avery_export_bike?(@bike)
@@ -122,8 +114,8 @@
                       - else
                         = t(".is_false")
                         %small.em
-                          - unless @bike.user_name.present?
-                            = t(".missing_user_name")
+                          - unless @bike.owner_name.present?
+                            = t(".missing_owner_name")
                           - unless @bike.registration_address.present? && @bike.registration_address["address"].present?
                             = t(".missing_address")
 

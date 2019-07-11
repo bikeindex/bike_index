@@ -1109,7 +1109,7 @@ en:
         update: Update
       index:
         manage_users: Manage Users
-        you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
+        you_have_invited_html: "You have invited: <strong>%{users_count}</strong>"
         remaining_invites_html: You can add <strong>%{invitations_count}</strong> more
         invite_more_users: Invite more users
         emails_are_currently_sent_from_html: Emails are currently sent from <em>%{email}</em>.
@@ -1122,7 +1122,7 @@ en:
         sender: Sender
       new:
         invite_user: Invite user
-        you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
+        you_have_invited_html: "You have invited: <strong>%{users_count}</strong>"
         remaining_invites_html: You can add <strong>%{invitations_count}</strong> more
         email_youre_inviting: Email you're inviting
         invite_multiple_emails: Invite multiple emails
@@ -1244,8 +1244,8 @@ en:
     edit_alert_purchase:
       confirm_your_plan: Confirm your plan
       youve_made_an_excellent_choice: You've made an excellent choice! Please confirm it below.
-      here_is_what_youll_get: 'Here is what you''ll get with the %{plan_name} plan:'
-      charge: 'Charge: %{price}'
+      here_is_what_youll_get: "Here is what you'll get with the %{plan_name} plan:"
+      charge: "Charge: %{price}"
       confirm: Confirm
       cancel: Cancel
     edit_alert_purchase_confirmation:
@@ -1335,7 +1335,7 @@ en:
       stolen: Stolen
       do_these_things_for_the_best_chance: Do these things for the best chance of recovery!
       when_was_it_stolen: When was it %{stolen_type}
-      police_report: 'Police report #'
+      police_report: "Police report #"
       without_a_valid_report_number_html: Without a valid report number, your bike won't be included in partner searches by <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
       department_city: Department & city
       do_you_have_proof_of_ownership: Do you have proof of ownership of this %{bike_type}?
@@ -1379,7 +1379,7 @@ en:
       zipcode: Zipcode
       register: Register
       or: or
-      very_few_bikes_html: 'Very <em>very</em> few bikes are made without serials. Unless this %{bike_type}:'
+      very_few_bikes_html: "Very <em>very</em> few bikes are made without serials. Unless this %{bike_type}:"
       was_made_before_1970: Was made before 1970
       is_a_handmade_frame: Is a handmade frame
       it_probably_has_a_serial_number: It probably has a serial number.
@@ -1402,7 +1402,7 @@ en:
       owner_phone: Owner phone
       police_report: Police report
       department: Department
-      bike_description: 'Bike description:'
+      bike_description: "Bike description:"
       registered: Registered
       to: to
       bike_serial: Bike Serial
@@ -1421,7 +1421,6 @@ en:
       wide_tires: wide tires
       rear_wheel: Rear wheel
       saddle: Saddle
-      by: by
       registration: Registration
       printout: printout
       online: online
@@ -1430,9 +1429,9 @@ en:
       isnt_linked_to_a_bike: isn't linked to a bike.
       you_have_claimed_the_maximum_permitted: You have claimed the maximum permitted number of Bike Codes.
       please_email_support_html: Please email %{support_email} if you don't understand why you're seeing this message or if you need an exception made.
-      you_can_enter_the_url: 'You can enter the URL of the bike you would like to link this %{bike_code_kind} to:'
+      you_can_enter_the_url: "You can enter the URL of the bike you would like to link this %{bike_code_kind} to:"
       update: Update
-      or_click_html: 'Or, click <em>link it</em> on of your bikes to connect it to this %{bike_code_kind}:'
+      or_click_html: "Or, click <em>link it</em> on of your bikes to connect it to this %{bike_code_kind}:"
       added: Added
       manufacturer: Manufacturer
       model: Model
@@ -1473,7 +1472,7 @@ en:
       locking_description: Locking description
       locking_circumvented: Locking circumvented
       date_stolen_type: Date %{stolen_type}
-      police_report: 'Police report #'
+      police_report: "Police report #"
       department_city: Department & city
       description_of_incident: Description of incident
       front_rear: Front & rear
@@ -1495,7 +1494,7 @@ en:
       link_url: Link url
       send_message: Send message
       or_call: Or call
-      owners_phone_number: 'Owner''s phone number:'
+      owners_phone_number: "Owner's phone number:"
     organized_access_panel:
       access_panel: Access Panel
       bike_is_registered: This %{bike_type} is registered with %{org_name}
@@ -1512,16 +1511,15 @@ en:
       link_sticker: Link Sticker
       owner_name: Owner name
       owner_email: Owner email
-      registered: 'Registered:'
+      registered: "Registered:"
       claimed: Claimed
       creator: Creator
-      address: 'Address:'
-      user_name: User name
+      address: "Address:"
       no_name: no name
       avery_exportable: Avery Exportable
       is_true: true.
       is_false: false.
-      missing_user_name: missing user name
+      missing_owner_name: missing user name
       missing_address: missing Address
       unable_to_display_additional_information: Unable to display additional information because %{bike_type} is not registered with %{org_name}
       bike_not_marked_stolen: "%{bike_type} is not marked stolen."

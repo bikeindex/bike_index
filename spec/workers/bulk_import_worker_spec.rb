@@ -190,7 +190,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike1.phone).to eq("(888) 777-6666")
           expect(bike1.registration_address).to eq default_location_registration_address
           expect(bike1.additional_registration).to be_nil
-          expect(bike1.user_name).to be_nil
+          expect(bike1.owner_name).to be_nil
 
           bike2 = bulk_import.bikes.reorder(:created_at).last
           expect(bike2.primary_frame_color).to eq white
@@ -207,7 +207,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike2.registration_address).to_not be_present
           expect(bike2.phone).to be_nil
           expect(bike2.additional_registration).to eq "extra serial number"
-          expect(bike2.user_name).to eq "Sally"
+          expect(bike2.owner_name).to eq "Sally"
         end
       end
     end

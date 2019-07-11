@@ -218,14 +218,18 @@ class Bike < ActiveRecord::Base
 
   # This is for organizations - might be useful for admin as well. We want it to be nil if it isn't present
   # User - not ownership, because we don't want registrar
-  def user_name
+  def owner_name
     return user.name if user&.name.present?
-    # Only grab the name from b_params if it's the first owner - or if no owner, which means testing probably
+    # Only look deeper for the name if it's the first owner - or if no owner, which means testing probably
     return nil unless current_ownership.blank? || current_ownership&.first?
-    b_params.map(&:user_name).reject(&:blank?).first
+    oname = b_params.map(&:user_name).reject(&:blank?).first
+    return oname if oname.present?
+    # If this bike is unclaimed and was created by an organization member, then we don't have an owner_name
+    return nil if creation_organization.present? && owner.member_of?(creation_organization)
+    owner&.name
   end
 
-  def user_name_or_email; user_name || owner_email end
+  def owner_name_or_email; user_name || owner_email end
 
   def first_ownership; ownerships.reorder(:id).first end
 
