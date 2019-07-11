@@ -46,8 +46,8 @@
             %tr
               %td.td-title
                 = t(".date_stolen")
-              %td.convertTime
-                = @stolen_record.date_stolen.strftime("time.format.convert_time")
+              %td
+                = @stolen_record.date_stolen.strftime("time.format.short_with_hour")
             %tr
               %td.td-title
                 = t(".location")

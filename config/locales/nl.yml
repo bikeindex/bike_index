@@ -14,6 +14,7 @@ nl:
   time:
     formats:
       convert_time: "%FT%T%z" # TODO: Localize
+      short_with_hour: "%m.%d.%y - %l%P" # TODO: Localize
   activerecord:
     models:
       ad: Advertentie #g
