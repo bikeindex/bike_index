@@ -26,7 +26,7 @@
   .form-group.row.fancy-select-placeholder.unfancy.hidden-other{ class: state_class }
     %label.form-well-label
     .form-well-input
-      = srecord.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: 'State' }, { class: 'form-control' })
+      = srecord.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: t(".state") }, { class: 'form-control' })
 
   .form-group.row
     %label.form-well-label

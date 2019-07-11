@@ -1249,6 +1249,7 @@ en:
         choose_country: Choose country
         address_or_intersection: Address or intersection
         city: City
+        state: State
         zipcode: Zipcode
         publicly_display_exact_address: Publicly display exact address theft occurred
     edit_accessories:
