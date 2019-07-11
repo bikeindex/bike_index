@@ -12,7 +12,7 @@ jobs:
       TZ: /usr/share/zoneinfo/America/Chicago
 
     docker:
-      - image: circleci/ruby:2.5.1-stretch-node
+      - image: circleci/ruby:2.5.5-stretch-node
         environment:
           PGHOST: 127.0.0.1
           PGUSER: root

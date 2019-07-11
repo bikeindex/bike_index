@@ -1,5 +1,5 @@
 <div class="map-holder col-md-8">
-  <div id="map_canvas" ></div>
+  <div id="map_canvas"></div>
 </div>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -14,8 +14,7 @@
       center: center,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     };
-    map = new google.maps.Map(document.getElementById('map_canvas'),
-        myOptions);
+    map = new google.maps.Map(document.getElementById('map_canvas'), myOptions);
     var circleOptions = {
       strokeColor: "#bf2f2f",
       strokeOpacity: 0.8,

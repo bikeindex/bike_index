@@ -4,36 +4,41 @@
   - ctype_id = f.object.ctype_id
   - other_ctype_show = ctype_id == @ctype_other_id ? 'unhidden' : ''
   - other_model_show = (f.object.cmodel_name.present?) ? 'unhidden' : ''
+
   .right-input-help.remove-part
     = f.label :_destroy do
       %span.context-display-help
         &ndash;
       = f.check_box :_destroy
-      Remove part
+      = t(".remove_part")
+
   .related-fields
     .form-group.row
-      = f.label :ctype_id, 'Part type', class: 'form-well-label'
+      = f.label :ctype_id, t(".part_type"), class: 'form-well-label'
+
       .form-well-input.fancy-select.unfancy
-        = f.collection_select(:ctype_id, Ctype.all, :id, :name, { required: true, prompt: 'Component type' }, { class: 'form-control component-ctype-input' })
-    / We really should display Position here, but we aren't right now because of implementation issues
-    / .right-input-help
-    /   - position_visibility = (f.object.front || f.object.rear) ? '' : 'hidden-other'
-    /   .groupedbtn-group{ class: position_visibility, data:  { toggle: 'buttons-radio' } }
-    /     .btn-group{ role: 'group' }
-    /       %button.btn.btn-default.ctype-position-both{ class: ('active' if f.object.both) data: { position: 'both' } }
-    /         Both
-    /       %button.btn.btn-default{ class: ('active' if f.object.front ), data: { position: 'front' } }
-    /         Front
-    /       %button.btn.btn-default{ class: ('active' if f.object.rear ), data: { position: 'rear' } }
-    /         Rear
-    /     = f.hidden_field :front_or_rear, class: 'front-or-rear'
+        = f.collection_select(:ctype_id, Ctype.all, :id, :name, { required: true, prompt: t(".component_type") }, { class: 'form-control component-ctype-input' })
+
+    -# We really should display Position here, but we aren't right now because of implementation issues
+    -# .right-input-help
+    -#   - position_visibility = (f.object.front || f.object.rear) ? '' : 'hidden-other'
+    -#   .groupedbtn-group{ class: position_visibility, data:  { toggle: 'buttons-radio' } }
+    -#     .btn-group{ role: 'group' }
+    -#       %button.btn.btn-default.ctype-position-both{ class: ('active' if f.object.both) data: { position: 'both' } }
+    -#         Both
+    -#       %button.btn.btn-default{ class: ('active' if f.object.front ), data: { position: 'front' } }
+    -#         Front
+    -#       %button.btn.btn-default{ class: ('active' if f.object.rear ), data: { position: 'rear' } }
+    -#         Rear
+    -#     = f.hidden_field :front_or_rear, class: 'front-or-rear'
+
     .form-group.row.hidden-other.hidden-ctype{ class: other_ctype_show }
-      = f.label :ctype_other, 'Unknown part type', class: 'form-well-label'
+      = f.label :ctype_other, t(".unknown_part_type"), class: 'form-well-label'
       .form-well-input
         = f.text_field :ctype_other, class: 'form-control'
 
   .form-group.row.unnested-field
-    = f.label :description, 'Part Description', class: 'form-well-label form-well-label-large-input'
+    = f.label :description, t(".part_description"), class: 'form-well-label form-well-label-large-input'
     .form-well-input-large
       = f.text_area :description, rows: 2, class: 'form-control'
 
@@ -43,20 +48,20 @@
       .form-well-input
         = f.text_field :manufacturer_id, class: 'form-control component-manufacturer-input unfancy', data: { initial: initial_manufacturer }
     .hidden-other.form-group.row{ class: other_mnfg_show }
-      = f.label :manufacturer_other, 'Other manufacturer', class: 'form-well-label'
+      = f.label :manufacturer_other, t(".other_manufacturer"), class: 'form-well-label'
       .form-well-input
         = f.text_field :manufacturer_other, class: 'form-control'
 
   .related-fields
     .form-group.row
-      = f.label :cmodel_name, 'Model', class: 'form-well-label'
+      = f.label :cmodel_name, t(".model"), class: 'form-well-label'
       .form-well-input.form-well-input.component_model
         = f.text_field :cmodel_name, class: 'form-control'
     .form-group.row.hidden-other{ class: other_model_show }
-      = f.label :year, 'Model Year', class: 'form-well-label'
+      = f.label :year, t(".model_year"), class: 'form-well-label'
       .form-well-input
         = f.text_field :year, class: 'form-control'
     .form-group.row.hidden-other{ class: other_model_show }
-      = f.label :serial_number, 'Part Serial', class: 'form-well-label'
+      = f.label :serial_number, t(".part_serial"), class: 'form-well-label'
       .form-well-input
         = f.text_field :serial_number, class: 'form-control', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
