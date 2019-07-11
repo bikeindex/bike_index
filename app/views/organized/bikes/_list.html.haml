@@ -26,7 +26,7 @@
       - @bikes.each do |bike|
         %tr
           %td
-            = link_to l(bike.created_at, format: :convert_time), bike_path(bike), class: "convertTime"
+            = link_to l(bike.created_at, format: :convert_time), bike_path(bike, organization_id: current_organization.to_param), class: "convertTime"
           %td
             = bike.mnfg_name
           %td

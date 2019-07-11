@@ -113,6 +113,7 @@ RSpec.describe UsersController, type: :controller do
             bike.reload
             expect(bike.user).to be_blank
             expect do
+              request.env["HTTP_CF_CONNECTING_IP"] = "99.99.99.9"
               post :create, user: user_attributes
               # TODO: Rails 5 update - this is an after_commit issue
               user = User.order(:created_at).last
@@ -126,6 +127,9 @@ RSpec.describe UsersController, type: :controller do
               expect(User.from_auth(cookies.signed[:auth])).to eq user
               bike.reload
               expect(bike.user).to eq user
+              expect(user.confirmed?).to be_truthy
+              expect(user.last_login_at).to be_within(3.seconds).of Time.current
+              expect(user.last_login_ip).to eq "99.99.99.9"
             end.to change(EmailWelcomeWorker.jobs, :count)
           end
         end

@@ -195,11 +195,13 @@ class BikesController < ApplicationController
       flash[:error] = e.message
     end
     update_organizations_can_edit_claimed(@bike, params[:organization_ids_can_edit_claimed]) if params.key?(:organization_ids_can_edit_claimed)
+    assign_bike_codes(params[:bike_code]) if params[:bike_code].present?
     @bike = @bike.decorate
+
     if @bike.errors.any? || flash[:error].present?
       edit and return
     else
-      flash[:success] = "Bike successfully updated!"
+      flash[:success] ||= "Bike successfully updated!"
       return if return_to_if_present
       redirect_to edit_bike_url(@bike, page: params[:edit_template]) and return
     end
@@ -245,11 +247,11 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = "Recovery details" if @bike.recovered?
-      h[:theft_details] = "Theft details" unless @bike.recovered?
-      h[:publicize] = "Share on Social Media"
-      h[:alert] = "Activate Premium Alert" if Flipper.enabled?(:premium_listings, current_user)
-      h[:report_recovered] = "Mark this Bike Recovered" unless @bike.recovered?
+      h[:theft_details] = t(:recovery_details) if @bike.recovered?
+      h[:theft_details] = t(:theft_details) unless @bike.recovered?
+      h[:publicize] = t(:publicize)
+      h[:alert] = t(:alert) if Flipper.enabled?(:premium_listings, current_user)
+      h[:report_recovered] = t(:report_recovered) unless @bike.recovered?
     end
   end
 
@@ -258,14 +260,14 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def bike_templates
     {}.with_indifferent_access.tap do |h|
-      h[:bike_details] = "Bike Details"
-      h[:photos] = "Photos"
-      h[:drivetrain] = "Wheels and Drivetrain"
-      h[:accessories] = "Accessories and Components"
-      h[:ownership] = "Transfer Ownership"
-      h[:groups] = "Groups and Organizations"
-      h[:remove] = "Hide or Delete"
-      h[:report_stolen] = "Report Stolen or Missing" unless @bike.stolen?
+      h[:bike_details] = t(:bike_details)
+      h[:photos] = t(:photos)
+      h[:drivetrain] = t(:drivetrain)
+      h[:accessories] = t(:accessories)
+      h[:ownership] = t(:ownership)
+      h[:groups] = t(:groups)
+      h[:remove] = t(:remove)
+      h[:report_stolen] = t(:report_stolen) unless @bike.stolen?
     end
   end
 
@@ -326,6 +328,16 @@ class BikesController < ApplicationController
     organization_ids = organization_ids.map(&:to_i)
     bike.bike_organizations.each do |bike_organization|
       bike_organization.update_attribute :can_not_edit_claimed, !organization_ids.include?(bike_organization.organization_id)
+    end
+  end
+
+  def assign_bike_codes(bike_code)
+    bike_code = BikeCode.lookup_with_fallback(bike_code)
+    return flash[:error] = "Unable to find a sticker matching #{bike_code}" unless bike_code.present?
+    if bike_code.claim_if_permitted(current_user, @bike)
+      flash[:success] = "Success! Sticker '#{bike_code.pretty_code}' has been assigned to your #{@bike.type}"
+    else
+      flash[:error] = bike_code.errors.full_messages
     end
   end
 

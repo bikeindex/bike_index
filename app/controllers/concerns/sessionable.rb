@@ -18,7 +18,7 @@ module Sessionable
     session[:last_seen] = Time.current
     session[:render_donation_request] = user.render_donation_request if user&.render_donation_request
     set_passive_organization(user.default_organization) # Set that organization!
-    user.update_last_login(params[:remote_ip])
+    user.update_last_login(forwarded_ip_address)
     if ParamsNormalizer.boolean(params.dig(:session, :remember_me))
       cookies.permanent.signed[:auth] = cookie_options(user)
     else

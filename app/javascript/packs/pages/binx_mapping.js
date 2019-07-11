@@ -145,7 +145,7 @@ export default class BinxMapping {
     }
     window.infoWindow.setContent(popupContent);
     // Ensure things are rendered before setting times, pause for a hot sec
-    window.setTimeout(() => binxApp.localizeTimes(), 50);
+    window.setTimeout(() => window.timeParser.localize(), 50);
   }
 
   openInfoWindow(marker, markerId, point) {

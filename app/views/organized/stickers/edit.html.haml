@@ -24,7 +24,7 @@
       %td= t(".bike")
       %td
         - if @bike_code.claimed?
-          = link_to(organized_bike_text(@bike_code.bike), bike_path(@bike_code.bike))
+          = link_to(organized_bike_text(@bike_code.bike), bike_path(@bike_code.bike, organization_id: current_organization.to_param))
         - elsif @bike_code.bike_id.present?
           %span.text-danger= t(".bike_is_unavailable")
         - else
@@ -39,7 +39,7 @@
         %td
           - previous_bike = Bike.find_by_id(@bike_code.previous_bike_id)
           - label = previous_bike&.title_string || @bike_code.previous_bike_id
-          = link_to(label, bike_path(@bike_code.previous_bike_id))
+          = link_to(label, bike_path(@bike_code.previous_bike_id, organization_id: current_organization.to_param))
 
 %hr.mt-4.mb-4
 

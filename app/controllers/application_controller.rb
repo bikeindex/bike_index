@@ -12,15 +12,6 @@ class ApplicationController < ActionController::Base
                           x_download_options: false,
                           x_permitted_cross_domain_policies: false)
 
-  def forwarded_ip_address
-    @forwarded_ip_address ||= request.env["HTTP_X_FORWARDED_FOR"].split(",")[0] if request.env["HTTP_X_FORWARDED_FOR"]
-  end
-
-  def append_info_to_payload(payload)
-    super
-    payload[:ip] = request.headers["CF-Connecting-IP"]
-  end
-
   def handle_unverified_request
     flash[:error] = "CSRF invalid. If you don't know why you're receiving this message, please contact us"
     redirect_to user_root_url
@@ -70,6 +61,10 @@ class ApplicationController < ActionController::Base
   def locale_from_request_params
     requested_locale = params.fetch(:locale, "").strip.to_sym
     requested_locale if I18n.available_locales.include?(requested_locale)
+  end
+
+  def t(key)
+    I18n.t(key, scope: [:controllers, controller_namespace, controller_name].compact)
   end
 
   def requested_locale
