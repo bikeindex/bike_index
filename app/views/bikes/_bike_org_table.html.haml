@@ -21,11 +21,11 @@
             - if bike.created_at.today?
               %span.hidden
                 = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              = t(".today_at_bikecreated_atstrftimei_p", bikecreated_atstrftimei_p: bike.created_at.strftime('%-I %p'))
+              = t(".today_at", created_at: bike.created_at.strftime('%-I %p'))
             - elsif Date.yesterday().beginning_of_day() <= bike.created_at
               %span.hidden
                 = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")
-              = t(".yesterday_at_bikecreated_atstrftimei_p", bikecreated_atstrftimei_p: bike.created_at.strftime('%-I %p'))
+              = t(".yesterday_at", created_at: bike.created_at.strftime('%-I %p'))
             - else
               %span.hidden
                 = bike.created_at.strftime("%-m.%-d.%Y %-H.%M")

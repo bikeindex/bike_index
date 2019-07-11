@@ -1149,8 +1149,8 @@ en:
       color: Color
       sent_to: Sent to
       view_pdf: view PDF
-      today_at_bikecreated_atstrftimei_p: Today at %{bikecreated_atstrftimei_p}
-      yesterday_at_bikecreated_atstrftimei_p: Yesterday at %{bikecreated_atstrftimei_p}
+      today_at: Today at %{created_at}
+      yesterday_at: Yesterday at %{created_at}
       pdf: PDF
     bike_show_overlays:
       please_tell_us_how_you_got_your_biketype_: Please tell us how you got your %{biketype} back, we really care!
