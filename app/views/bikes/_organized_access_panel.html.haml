@@ -72,7 +72,7 @@
                       = l @bike.created_at, format: :convert_time
                 %tr
                   %td= t(".claimed")
-                  %td= @bike.claimed?
+                  %td= "&#x2713;".html_safe if @bike.claimed?
                 %tr
                   %td= t(".creator")
                   %td
