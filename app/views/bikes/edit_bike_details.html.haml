@@ -111,12 +111,13 @@
                 .form-well-input
                   - bike_code_from_org = @bike.organizations.with_paid_feature_slugs("bike_codes").last&.bike_codes&.claimed&.reorder(:code_integer)&.second&.pretty_code
                   = text_field_tag :bike_code, nil, class: 'form-control', placeholder: bike_code_from_org || "A0 100"
-            = render "/shared/form_well_footer_save"
+
+            = render "shared/form_well_footer_save"
 
 - serial_correction_body = capture_haml do
   = form_tag do |t|
     .modal-body
-      = render partial: 'shared/alert', locals: { body: 'Please fill in both fields', class_names: 'currently-hidden' }
+      = render partial: 'shared/alert', locals: { body: t(".please_fill_in_both_fields"), class_names: 'currently-hidden' }
       = hidden_field_tag :serial_update_bike_id, @bike.id
       .form-group
         %label{ for: :serial_update_serial }
@@ -134,12 +135,12 @@
           %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
             = t(".nevermind")
 
-= render partial: 'shared/modal', locals: { title: 'Update serial number', id: 'serial-correction', modal_body: serial_correction_body }
+= render partial: 'shared/modal', locals: { title: t(".update_serial_number"), id: 'serial-correction', modal_body: serial_correction_body }
 
 - manufacturer_correction_body = capture_haml do
   = form_tag do |t|
     .modal-body
-      = render partial: 'shared/alert', locals: { body: 'Please fill in both fields', class_names: 'currently-hidden' }
+      = render partial: 'shared/alert', locals: { body: t(".please_fill_in_both_fields"), class_names: 'currently-hidden' }
       = hidden_field_tag :manufacturer_update_bike_id, @bike.id
       .form-group
         %label{ for: :manufacturer_update_manufacturer }

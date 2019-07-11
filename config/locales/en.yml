@@ -1271,6 +1271,8 @@ en:
       your_order_is_pending: Your order is pending.
       stay_tuned_for_an_update_once_weve_proces: Stay tuned for an update once we've processed your alert.
     edit_bike_details:
+      please_fill_in_both_fields: Please fill in both fields
+      update_serial_number: Update serial number
       submit_serial_correction: Submit serial correction
       submit_manufacturer_correction: Submit Manufacturer Correction
       model_year: Model year
