@@ -55,7 +55,7 @@
                 = l @user.last_login_at, format: :convert_time
             - if @user.last_login_ip.present?
               %small.less-strong
-                @user.last_login_ip
+                = @user.last_login_ip
   .col-md-6.mt-auto
     %table.table-list
       %tr

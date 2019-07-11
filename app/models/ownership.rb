@@ -35,7 +35,7 @@ class Ownership < ActiveRecord::Base
   def mark_claimed
     self.claimed = true
     u = User.fuzzy_email_find(owner_email)
-    self.user_id = u.id if u.present? && user_id.blank?
+    self.user_id ||= u.id if u.present?
     save
   end
 

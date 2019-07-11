@@ -885,7 +885,7 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "user_name" do
+  describe "owner_name" do
     let(:bike) { Bike.new }
     let(:user) { User.new(name: "Fun McGee") }
     context "user" do
@@ -893,7 +893,47 @@ RSpec.describe Bike, type: :model do
       it "returns users name" do
         allow(bike).to receive(:current_ownership) { ownership }
         expect(ownership.first?).to be_truthy
-        expect(bike.user_name).to eq "Fun McGee"
+        expect(bike.owner_name).to eq "Fun McGee"
+      end
+    end
+    context "creator" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:user) { FactoryBot.create(:user_confirmed, name: "Stephanie Example") }
+      let(:new_owner) { FactoryBot.create(:user, name: "Sally Stuff", email: "sally@example.com") }
+      let(:ownership) { FactoryBot.create(:ownership_organization_bike, claimed: false, user: nil, creator: user, organization: organization, owner_email: "sally@example.com") }
+      let(:bike) { ownership.bike }
+      it "falls back to creator" do
+        ownership.reload
+        expect(ownership.claimed?).to be_falsey
+        expect(bike.user).to be_blank
+        expect(bike.owner_name).to eq "Stephanie Example"
+        ownership.user = new_owner
+        # Creator name is a fallback, if the bike is claimed we want to use the person who has claimed it
+        ownership.mark_claimed
+        bike.reload
+        ownership.reload
+        expect(ownership.claimed?).to be_truthy
+        expect(ownership.user).to eq new_owner
+        expect(bike.owner_name).to eq "Sally Stuff"
+      end
+      context "creator is member of creation organization" do
+        # PSU students keep creating accounts that use a different email from their school email, and then sending bikes to their school email
+        # which means the bike isn't claimed, because it's been sent to their school account rather than their correct email account.
+        # Basically, they're behaving in a way that breaks our existing email flow
+        # For other bikes, e.g. POS integration bikes, we don't want to display the creator
+        # If the creator is a member of the organization, we assume it was not the actual user who created the bike
+        let(:user) { FactoryBot.create(:organization_member, organization: organization, name: "Stephanie Example") }
+        it "is nil" do
+          ownership.reload
+          expect(ownership.claimed?).to be_falsey
+          expect(bike.owner_name).to be_blank
+          expect(bike.user).to be_blank
+          ownership.user = new_owner
+          ownership.mark_claimed
+          bike.reload
+          expect(bike.user).to eq new_owner
+          expect(bike.owner_name).to eq "Sally Stuff"
+        end
       end
     end
     context "b_param" do
@@ -904,13 +944,13 @@ RSpec.describe Bike, type: :model do
         allow(bike).to receive(:b_params) { [b_param] }
       end
       it "returns the phone" do
-        expect(bike.user_name).to eq "Jane Yung"
+        expect(bike.owner_name).to eq "Jane Yung"
       end
       context "not first ownerships" do
         it "is the users " do
           allow(ownership).to receive(:first?) { false }
           allow(bike).to receive(:current_ownership) { ownership }
-          expect(bike.user_name).to be_nil
+          expect(bike.owner_name).to be_nil
         end
       end
     end
