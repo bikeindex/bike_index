@@ -64,7 +64,7 @@ class ApplicationController < ActionController::Base
   end
 
   def t(key)
-    I18n.t(key, scope: [:controllers, controller_name])
+    I18n.t(key, scope: [:controllers, controller_namespace, controller_name].compact)
   end
 
   def requested_locale
