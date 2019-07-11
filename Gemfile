@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 # If you bump the Ruby version, make sure to update the Vagrantfile appropriately
-ruby "2.5.1"
+ruby "2.5.5"
 gem "rails", "4.2.11"
 
 gem "active_model_serializers", "~> 0.9.3"
