@@ -1,17 +1,17 @@
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: '/bikes/edit_primary_menu'
+      = render partial: 'bikes/edit_primary_menu'
+
       .col-md-8.form-well
         .form-wrap
           .form-well-form-header
-            %h3 Transfer Ownership
+            %h3= t(".transfer_ownership")
           .col-xs-12
-            %p
-              Sell, trade or give away this #{@bike.type}?
-              Enter the new owner's email to transfer the registration.
+            %p= t(".sell_trade_or_give_away_this_bike", bike_type: @bike.type)
           .form-group.row.unnested-field.no-divider-row
             = f.label :owner_email, class: 'form-well-label'
             .form-well-input
               = f.email_field :owner_email, required: true, class: 'form-control'
-          = render "/shared/form_well_footer_save"
+
+          = render "shared/form_well_footer_save"

@@ -3,28 +3,30 @@
 
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: '/bikes/edit_primary_menu'
+      = render partial: 'bikes/edit_primary_menu'
 
       .col-md-8.form-well#form_well_wrap
         - if @bike.current_stolen_record&.display_checklist?
           .form-wrap.stolen-checklist-wrap
             .form-well-form-header-always-visible
               %h3.header-font-alt
-                Do these things for the best chance of recovery!
-            = render partial: "/bikes/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record }
+                = t(".do_these_things_for_the_best_chance")
+            = render partial: "bikes/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record }
+
         .form-wrap{ class: @bike.current_stolen_record&.display_checklist? ? "secondary-form-wrap" : "" }
           .form-well-form-header
-            / Theft Details
+            -# Theft Details
             %h3= @edit_templates[@edit_template]
 
-          / Helper text display
-          - stolen_type = @bike.recovered ? 'recovered' : 'stolen'
+          -# Helper text display
+          - stolen_type = @bike.recovered ? t(".recovered") : t(".stolen")
           = f.fields_for :stolen_records do |srecord|
             - next unless srecord.object.current # Because they may have multiple stolen records
+
             %h3
             .form-group.row.unnested-field
               = srecord.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
-              = srecord.label :date_stolen, "When was it #{stolen_type}", class: 'form-well-label'
+              = srecord.label :date_stolen, t(".when_was_it_stolen", stolen_type: stolen_type), class: 'form-well-label'
               .form-well-input
                 - srecord.object.date_stolen = TimeParser.round(srecord.object.date_stolen || Time.current)
                 = srecord.datetime_local_field :date_stolen, max: Time.current + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(srecord.object.date_stolen, format: :convert_time)
@@ -39,7 +41,7 @@
               .form-well-input
                 = srecord.text_field :secondary_phone, class: 'form-control'
 
-            = render partial: '/bikes/bike_fields/stolen_location', locals: { srecord: srecord, stolen_type: stolen_type }
+            = render partial: 'bikes/bike_fields/stolen_location', locals: { srecord: srecord, stolen_type: stolen_type }
 
             .form-group.row.unnested-field
               = srecord.label :estimated_value, class: 'form-well-label'
@@ -57,22 +59,22 @@
                 = srecord.label :lock_defeat_description, class:  'form-well-label'
                 .form-well-input
                   = srecord.select(:lock_defeat_description, StolenRecord.locking_defeat_description_select, prompt: '')
-            / -- unless @bike.recovered?
 
             .form-group.row.unnested-field
-              - description_label = @bike.recovered ? "How did you recovered the #{@bike.type}" : 'Description of the incident'
+              - description_label = @bike.recovered ? t(".how_did_you_recover", bike_type: @bike.type) : t(".description_of_the_incident")
+
               = srecord.label :theft_description, description_label, class:  'form-well-label'
               .form-well-input-large
                 = srecord.text_area :theft_description, rows: 3, class: 'form-control'
 
             .form-group.row.unnested-field
-              = srecord.label :police_report_number, 'Police report #', class: 'form-well-label'
+              = srecord.label :police_report_number, t(".police_report"), class: 'form-well-label'
               .form-well-input
                 = srecord.text_field :police_report_number, class: 'form-control'
                 %span.below-input-help
-                  Without a valid report number, your bike won't be included in partner searches by <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
+                  = t(".without_a_valid_report_number_html")
             .form-group.row.unnested-field.no-divider-row
-              = srecord.label :police_report_department, 'Department & city', class: 'form-well-label'
+              = srecord.label :police_report_department, t(".department_city"), class: 'form-well-label'
               .form-well-input
                 = srecord.text_field :police_report_department, class: 'form-control'
 
@@ -80,14 +82,15 @@
             .form-group.row.unnested-field.full-width-section.no-divider-row
               %label
                 = srecord.check_box :proof_of_ownership
-                Do you have proof of ownership of this #{@bike.type}?
+                = t(".do_you_have_proof_of_ownership", bike_type: @bike.type)
               .full-width-checkbox-help
-                If this #{@bike.type} was added to the Index by a bike shop, that counts as proof of ownership
+                = t(".if_this_bike_type_was_added", bike_type: @bike.type)
             %hr
             .form-group.row.unnested-field.full-width-section.no-divider-row
               %label
                 = srecord.check_box :receive_notifications
-                Receive notifications from Bike Index about this stolen #{@bike.type}
+                = t(".receive_notifications", bike_type: @bike.type)
               .full-width-checkbox-help
-                e.g. if we tweet about it or see someone searching for its serial number
-            = render "/shared/form_well_footer_save"
+                = t(".eg_if_we_tweet_about_it")
+
+            = render "shared/form_well_footer_save"
