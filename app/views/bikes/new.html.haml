@@ -110,7 +110,7 @@
               .form-group.row.fancy-select-placeholder.unfancy
                 %label.form-well-label
                 .form-well-input
-                  = f.collection_select(:address_state, State.all, :abbreviation, :name, { include_blank: true, required: true, prompt: "State" }, { class: "form-control" })
+                  = f.collection_select(:address_state, State.all, :abbreviation, :name, { include_blank: true, required: true, prompt: t(".state") }, { class: "form-control" })
 
           - if @organization&.include_field_reg_secondary_serial?(current_user)
             - label_secondary_serial = @organization.registration_field_label("reg_secondary_serial") || t(".additional_serial_sticker_number")

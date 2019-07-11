@@ -1401,6 +1401,7 @@ en:
       street_address: Street address
       your_full_address_is_required: Your full address is required by %{org_name}
       city: City
+      state: State
       zipcode: Zipcode
       register: Register
       or: or
