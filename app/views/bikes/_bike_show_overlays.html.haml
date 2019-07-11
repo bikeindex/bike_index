@@ -8,10 +8,10 @@
     - modal_body = capture_haml do
       .modal-body
         %p
-          = t(".please_tell_us_how_you_got_your_biketype_", biketype: @bike.type)
+          = t(".please_tell_us_how_you_got_your_bike", bike_type: @bike.type)
           %br
           %strong
-            = t(".its_also_how_we_get_better_at_recovering_")
+            = t(".its_also_how_we_get_better_at_recovering")
 
         = form_for @stolen_record, url: bike_recovery_path(bike_id: @bike.id) do |f|
           = hidden_field_tag :token, stolen_record.recovery_link_token
@@ -45,12 +45,12 @@
     - modal_title = t(".your_bike", bike_type: @bike.type)
     - modal_body = capture_haml do
       .modal-body
-        %p= t(".were_honored_to_have_your_biketype_on_the", biketype: @bike.type)
+        %p= t(".were_honored_to_have_your_bike", bike_type: @bike.type)
         %p= t(".claim_it_so_you_can_update_your_listing")
       .modal-btn-footer
         .row
           .col-xs-6.col-xs-push-3
-            = link_to t(".claim_biketype", biketype: @bike.type), ownership_path(@bike.current_ownership), class: "btn btn-success"
+            = link_to t(".claim_bike_type", bike_type: @bike.type), ownership_path(@bike.current_ownership), class: "btn btn-success"
 
   - elsif @bike.authorized_for_user?(current_user) && !@bike.authorized_by_organization?(u: current_user)
     .bike-overlay-wrapper
@@ -59,16 +59,16 @@
           -# If the bike user is actually the current bike owner, do this
           - if @bike.user == current_user
             - if @bike.user_hidden
-              %strong= t(".this_biketype_is_hidden", biketype: @bike.type)
+              %strong= t(".this_bike_type_is_hidden", bike_type: @bike.type)
               = t(".no_one_can_see_it_but_you")
 
             - if @bike.user?
               - if @bike.recovered
-                = t(".thank_you_for_recovering_this_biketype", biketype: @bike.type)
+                = t(".thank_you_for_recovering_this_bike_type", bike_type: @bike.type)
               - elsif @bike.stolen
-                = t(".were_really_bummed_your_biketype_was_stol", biketype: @bike.type)
+                = t(".were_really_bummed_your_bike_type_was_stol", bike_type: @bike.type)
               - else
-                = t(".whoa_this_awesome_biketype_is_yours", biketype: @bike.type)
+                = t(".whoa_this_awesome_bike_type_is_yours", bike_type: @bike.type)
 
               - if @bike.public_images.any?
                 = t(".add_some_more_information_about_it")
