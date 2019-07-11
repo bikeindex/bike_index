@@ -323,7 +323,7 @@ RSpec.describe User, type: :model do
   describe "auth_token_time" do
     context "password_reset_token" do
       it "gets long time ago if not there" do
-        user = User.new(password_reset_token: "c7c3b99a319ac09e2b00-2015-03-31 19:29:52 -0500")
+        user = User.new(password_reset_token: "c7c3b99a319ac09e2b0080a8s89asd89afsd6734n")
         expect(user.auth_token_time("password_reset_token")).to eq(Time.at(1364777722))
       end
       it "gets the time" do
@@ -343,7 +343,7 @@ RSpec.describe User, type: :model do
 
     context "magic_link_token" do
       it "gets long time ago if not there" do
-        user = User.new(magic_link_token: "c7c3b99a319ac09e2b00-2015-03-31 19:29:52 -0500")
+        user = User.new(magic_link_token: "c7c3b99a319ac09e2b00-89121981231231331212")
         expect(user.auth_token_time("magic_link_token")).to eq(Time.at(1364777722))
       end
       it "gets the time" do
