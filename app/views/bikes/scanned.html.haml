@@ -63,4 +63,4 @@
   - else
     %p{ style: "margin-top: 24px;" }
       = t(".to_link_that_card_with_a_bike")
-      = link_to t(".please_sign_in"), new_session_url(return_to: scanned_bike(@bike_code.code, params: { organization_id: @bike_code.organization_id }))
+      = link_to t(".please_sign_in"), new_session_url(return_to: scanned_bike_path(@bike_code.code, params: { organization_id: @bike_code.organization_id }))
