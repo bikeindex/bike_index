@@ -1168,11 +1168,11 @@ en:
       this_bike_type_is_hidden: This %{bike_type} is hidden.
       no_one_can_see_it_but_you: No one can see it but you
       thank_you_for_recovering_this_bike_type: Thank you for recovering this %{bike_type}!
-      were_really_bummed_your_bike_type_was_stol: We're really bummed your %{bike_type} was stolen.
+      were_really_bummed_your_bike_type_was_stolen: We're really bummed your %{bike_type} was stolen.
       whoa_this_awesome_bike_type_is_yours: Whoa, this awesome %{bike_type} is yours!
       add_some_more_information_about_it: Add some more information about it.
       add_a_picture_so_people_know_what_to_look: Add a picture so people know what to look for!
-      add_a_picture_of_it_so_everyone_can_admir: Add a picture of it, so everyone can admire its beauty!
+      add_a_picture_of_it: Add a picture of it, so everyone can admire its beauty!
       you_sent_this_bike_html: You sent this %{bike_type} to <em>%{owner_email}</em> and it hasn't been claimed yet. You can update it.
       edit: Edit
     bike_table:

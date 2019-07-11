@@ -66,7 +66,7 @@
               - if @bike.recovered
                 = t(".thank_you_for_recovering_this_bike_type", bike_type: @bike.type)
               - elsif @bike.stolen
-                = t(".were_really_bummed_your_bike_type_was_stol", bike_type: @bike.type)
+                = t(".were_really_bummed_your_bike_type_was_stolen", bike_type: @bike.type)
               - else
                 = t(".whoa_this_awesome_bike_type_is_yours", bike_type: @bike.type)
 
@@ -76,8 +76,9 @@
                 - if @bike.stolen
                   = t(".add_a_picture_so_people_know_what_to_look")
                 - else
-                  = t(".add_a_picture_of_it_so_everyone_can_admir")
-          - else # The bike has been sent to someone other than the current_user
+                  = t(".add_a_picture_of_it")
+          - else
+            -# The bike has been sent to someone other than the current_user
             = t(".you_sent_this_bike_html", bike_type: @bike.type, owner_email: @bike.current_ownership.owner_email)
           = link_to  t(".edit"), edit_bike_path, class: "btn btn-secondary"
 
