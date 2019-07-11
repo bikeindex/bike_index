@@ -82,7 +82,7 @@
                 %tr
                   %td Claimed
                   %td
-                    = @bike.claimed?
+                    = "&#x2713;".html_safe if @bike.claimed?
                 %tr
                   %td Creator
                   %td
