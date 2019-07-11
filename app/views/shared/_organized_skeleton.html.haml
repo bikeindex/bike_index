@@ -94,4 +94,19 @@
               to automatically register the bikes you sell to your customers.
             %li
               Read an full explanation of #{link_to "how the integration works", lightspeed_path}.
+        %p.mt-2
+          Use Ascend?
+          %ul
+            %li
+              %strong
+                = link_to "Integrate Bike Index with Ascend", ascend_path, class: ""
+              to automatically register the bikes you sell to your customers.
+        %p.mt-2
+          Other Point of Sale system?
+          %ul
+            %li
+              Register bikes with our
+              %strong
+                = link_to "streamlined Bike Shop registration page", new_organization_bike_path(organization_id: current_organization.to_param)
+
     = yield
