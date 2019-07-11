@@ -212,7 +212,7 @@ RSpec.describe User, type: :model do
         expect(User.admin_text_search("econd")).to eq([user])
       end
     end
-    # These specs fail and i don't know why, since they aren't protecting something luser facing I'm commenting them out
+    # These specs fail and i don't know why, since they aren't protecting something user facing I'm commenting them out
     #
     # context "unconfirmed user partial match" do
     #   let!(:user) { FactoryBot.create(:user, email: "sample-stuff@e.us") }

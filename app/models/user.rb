@@ -163,9 +163,7 @@ class User < ActiveRecord::Base
   end
 
   def auth_token_time(auth_token_type)
-    t = self[auth_token_type].to_s.split("-")[0]
-    t = (t.present? && t.to_i > 1427848192) ? t.to_i : 1364777722
-    Time.at(t)
+    AuthTokenizer.token_time(self[auth_token_type])
   end
 
   def auth_token_expired?(auth_token_type)
@@ -341,16 +339,8 @@ class User < ActiveRecord::Base
     }.as_json
   end
 
-  def set_auth_token(auth_token_type, t = nil)
-    generate_auth_token(auth_token_type, t)
-    save
-  end
-
-  def generate_auth_token(auth_token_type, t = nil)
-    t ||= Time.current.to_i
-    begin
-      self.attributes = { auth_token_type => "#{t}-" + Digest::MD5.hexdigest("#{SecureRandom.hex(24)}-#{t}") }
-    end while User.where(auth_token_type => auth_token).exists?
+  def generate_auth_token(auth_token_type)
+    self.attributes = { auth_token_type => AuthTokenizer.new_token(t) }
   end
 
   def access_tokens_for_application(i)
