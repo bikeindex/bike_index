@@ -19,6 +19,7 @@
           = form_tag edit_bike_url(@bike), method: :get, id: "js-select-plan-form" do
             = hidden_field_tag :page, :alert_purchase
             = hidden_field_tag :selected_plan_id
+            = hidden_field_tag :locale, params[:locale] if params[:locale].presence
             .row
               %h3.text-center.w-100
                 = t(".select_plan")
