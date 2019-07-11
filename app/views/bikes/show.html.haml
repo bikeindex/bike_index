@@ -48,7 +48,7 @@
         - if @bike.public_images.any?
           #selected-photo{ class: "image-holder #{"just1photo" if @bike.public_images.count == 1}" }
             .current-photo{ id: "image#{@bike.public_images.first.id}"}
-              = image_tag(@bike.public_images.first.image_url(:large), alt: t(".bike_photo", bike_type: @bike.type.titleize), id: t(".ibikepublic_imagesfirstlisting_order", bikepublic_imagesfirstlisting_order: @bike.public_images.first.listing_order), data: { action: t(".zoom"), original: @bike.public_images.first.image_url })
+              = image_tag(@bike.public_images.first.image_url(:large), alt: t(".bike_photo", bike_type: @bike.type.titleize), id: "i|#{@bike.public_images.first.listing_order}", data: { action: t(".zoom"), original: @bike.public_images.first.image_url })
           - if @bike.public_images.count > 1
             %span.thumbnail-shadow
             %span.thumbnail-shadow-r

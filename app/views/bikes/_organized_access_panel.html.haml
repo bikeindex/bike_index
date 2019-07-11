@@ -40,6 +40,9 @@
                 %td
                   - if @bike.authorized_by_organization?(org: passive_organization)
                     = t(".org_can_edit_bike", org_name: passive_organization.short_name, bike_type: @bike.type)
+                    - if @bike.can_edit_claimed_organizations.pluck(:id).include?(passive_organization.id)
+                      %em.small
+                        = t(".organization_can_edit_after_claimed", bike_type: @bike.type)
                     = link_to t(".edit"), edit_bike_path(@bike), class: "btn btn-success btn-sm float-right"
                   - else
                     %em.small.less-strong
@@ -110,9 +113,11 @@
                     %td= t(".avery_exportable")
                     %td
                       - if Export.avery_export_bike?(@bike)
-                        = t(".is_true")
+                        %span.text-success
+                          = t(".is_true")
                       - else
-                        = t(".is_false")
+                        %span.text-danger
+                          = t(".is_false")
                         %small.em
                           - unless @bike.owner_name.present?
                             = t(".missing_owner_name")
