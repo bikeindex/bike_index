@@ -1278,14 +1278,6 @@ en:
       wheels: Wheels
       sidetitleize_wheel: "%{sidetitleize} wheel"
       choose_diameter: Choose diameter
-      700c_includes_29ers: 700c (includes 29ers)
-      650b: 650b
-      27in: 27in
-      26in: 26in
-      20in: 20in
-      18in: 18in
-      16in: 16in
-      12in: 12in
       all_diameters: All diameters
       show_more_sizes: Show more sizes
       hide_extra_sizes: Hide extra sizes

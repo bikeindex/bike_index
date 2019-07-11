@@ -20,21 +20,21 @@
                       %option{ value: '' }
                         = t(".choose_diameter")
                       %option{ value: WheelSize.id_for_bsd(622) }
-                        = t(".700c_includes_29ers")
+                        700c (includes 29ers)
                       %option{ value: WheelSize.id_for_bsd(584) }
-                        = t(".650b")
+                        650b
                       %option{ value: WheelSize.id_for_bsd(630) }
-                        = t(".27in")
+                        27in
                       %option{ value: WheelSize.id_for_bsd(559) }
-                        = t(".26in")
+                        26in
                       %option{ value: WheelSize.id_for_bsd(406) }
-                        = t(".20in")
+                        20in
                       %option{ value: WheelSize.id_for_bsd(355) }
-                        = t(".18in")
+                        18in
                       %option{ value: WheelSize.id_for_bsd(305) }
-                        = t(".16in")
+                        16in
                       %option{ value: WheelSize.id_for_bsd(203) }
-                        = t(".12in")
+                        12in
                   .all-diams.currently-hidden{ id: "#{side}_all" }
                     = f.collection_select("#{side}_wheel_size_id".to_sym, WheelSize.all , :id, :select_value, prompt: t(".all_diameters", ))
                 .right-input-help
