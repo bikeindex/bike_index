@@ -59,7 +59,6 @@ const TimeParser = () => {
         let time = moment(text, moment.ISO_8601);
         log.debug(time, time.format("YYYY-MM-DD h:mma"));
         if (!time.isValid) {
-          log.debug("ffffff");
           return;
         }
         $this
