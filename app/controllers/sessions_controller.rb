@@ -7,6 +7,9 @@ class SessionsController < ApplicationController
     render_partner_or_default_signin_layout
   end
 
+  def magic_link
+  end
+
   def create
     @user = User.fuzzy_confirmed_or_unconfirmed_email_find(permitted_parameters[:email])
     if @user.present?
