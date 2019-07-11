@@ -10,10 +10,6 @@ class Urlifyer
     end
   end
 
-  def self.is_url(string)
-    true if uri?("http://" + string)
-  end
-
   def self.uri?(string)
     uri = URI.parse(string)
     %w(http https).include?(uri.scheme)
