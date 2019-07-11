@@ -1171,6 +1171,64 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.reload.hidden).to be_falsey
         end
 
+        context "bike_code" do
+          let(:bike_attrs) { { description: "42", handlebar_type: "drop" } }
+          let!(:bike_code) { FactoryBot.create(:bike_code, code: "a00100") }
+          it "updates and applies the bike code" do
+            expect(bike.bike_codes.count).to eq 0
+            put :update, id: bike.id, bike: bike_attrs, bike_code: "https://bikeindex.org/bikes/scanned/A100?organization_id=europe"
+            expect(flash[:success]).to match(bike_code.pretty_code)
+            bike.reload
+            expect(bike.description).to eq "42"
+            expect(bike.handlebar_type).to eq "drop"
+            expect(bike.bike_codes.count).to eq 1
+            bike_code.reload
+            expect(bike_code.claimed?).to be_truthy
+            expect(bike_code.bike).to eq bike
+            expect(bike_code.user).to eq user
+          end
+          context "bike already has a bike code" do
+            let!(:bike_code_claimed) { FactoryBot.create(:bike_code_claimed, bike: bike, user: user) }
+            it "assigns another bike code, doesn't remove existing" do
+              expect(bike.bike_codes.count).to eq 1
+              put :update, id: bike.id, bike: bike_attrs, bike_code: "A 100"
+              expect(flash[:success]).to match(bike_code.pretty_code)
+              bike.reload
+              expect(bike.description).to eq "42"
+              expect(bike.handlebar_type).to eq "drop"
+              expect(bike.bike_codes.count).to eq 2
+              bike_code.reload
+              expect(bike_code.claimed?).to be_truthy
+              expect(bike_code.bike).to eq bike
+              expect(bike_code.user).to eq bike.creator
+              bike_code_claimed.reload
+            end
+            context "not allowed to assign another code" do
+              before { stub_const("BikeCode::MAX_UNORGANIZED", 1) }
+              it "renders errors" do
+                expect(bike.bike_codes.count).to eq 1
+                put :update, id: bike.id, bike: bike_attrs, bike_code: "A 100"
+                expect(flash[:error]).to be_present
+                bike.reload
+                expect(bike.description).to eq "42"
+                expect(bike.handlebar_type).to eq "drop"
+                expect(bike.bike_codes.count).to eq 1
+              end
+            end
+          end
+          context "bike code not found" do
+            it "renders errors" do
+              expect(bike.bike_codes.count).to eq 0
+              put :update, id: bike.id, bike: bike_attrs, bike_code: "A 10"
+              expect(flash[:error]).to be_present
+              bike.reload
+              expect(bike.description).to eq "42"
+              expect(bike.handlebar_type).to eq "drop"
+              expect(bike.bike_codes.count).to eq 0
+            end
+          end
+        end
+
         context "owner email changes" do
           let(:email) { "originalemail@example.com" }
           let(:new_email) { "new@email.com" }
