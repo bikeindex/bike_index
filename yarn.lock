@@ -1221,6 +1221,14 @@
     "@uppy/utils" "1.1.0"
     preact "8.2.9"
 
+"@uppy/form@^1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@uppy/form/-/form-1.1.0.tgz#de780a4508c449949e52dcbcdf600131b102f260"
+  integrity sha512-Y9Yi7HxcDJj3ryp6+YehJKb6YSGeOLiZk87WHET01gHbqL3vT8/fm5xgmveh0m8jLjrdcxx2IWxPGU8yLjR5MQ==
+  dependencies:
+    "@uppy/utils" "1.1.0"
+    get-form-data "^2.0.0"
+
 "@uppy/informer@1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@uppy/informer/-/informer-1.1.0.tgz#9896edefd7dfbf67d834c66534aa4a86650ca9db"
@@ -5193,6 +5201,11 @@ get-caller-file@^1.0.1:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/get-caller-file/-/get-caller-file-1.0.3.tgz#f978fa4c90d1dfe7ff2d6beda2a515e713bdcf4a"
   integrity sha512-3t6rVToeoZfYSGd8YoLFR2DJkiQrIiUrGcjvFX2mDw3bn6k2OtwHN0TNCLbBO+w8qTvimhDkv+LSscbJY1vE6w==
+
+get-form-data@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/get-form-data/-/get-form-data-2.0.0.tgz#f211018ea617cc54678522235f0e2a9025d89411"
+  integrity sha512-YUpw0aTWeGliifqMYrTohe/YdqVmKLmaNwuscd2WlRNGfba57JHGuuvvv2c6LiZdFys285POVWANTh6SqcwFag==
 
 get-stdin@^4.0.1:
   version "4.0.1"

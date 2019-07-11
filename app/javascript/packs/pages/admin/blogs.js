@@ -26,10 +26,11 @@ function BinxAdminBlogs() {
       uppyOne
         .use(FileInput, {
           target: ".UppyForm",
-          inputName: 'public_image[image]'
+          inputName: "public_image[image]"
         })
         .use(XHRUpload, {
           endpoint: "/public_images",
+          formData: true,
           method: "post"
         })
         .use(Dashboard, {
@@ -40,6 +41,14 @@ function BinxAdminBlogs() {
           target: '.UppyDragDrop-One-Progress',
           hideAfterFinish: false
         })
+      uppyOne.use(Form, {
+        target: "#new_public_image",
+        getMetaFromForm: true,
+        addResultToForm: true,
+        multipleResults: false,
+        submitOnSuccess: false,
+        triggerUploadOnSubmit: false
+      })
     }
   };
 }
