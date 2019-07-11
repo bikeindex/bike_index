@@ -127,9 +127,10 @@ RSpec.describe UsersController, type: :controller do
               expect(User.from_auth(cookies.signed[:auth])).to eq user
               bike.reload
               expect(bike.user).to eq user
+              expect(user.confirmed?).to be_truthy
+              expect(user.last_login_at).to be_within(3.seconds).of Time.current
+              expect(user.last_login_ip).to eq "99.99.99.9"
             end.to change(EmailWelcomeWorker.jobs, :count)
-            expect(user.last_login_at).to be_within(1.second).of Time.now
-            expect(user.last_login_ip).to eq "99.99.99.9"
           end
         end
         context "with membership, partner param" do
