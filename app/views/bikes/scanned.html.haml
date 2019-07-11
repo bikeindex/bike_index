@@ -53,7 +53,7 @@
                 = bike.frame_colors.to_sentence
               %td.hidden-sm-up
                 %small
-                  = [t(".bikemnfg_name"), bike.frame_model].select(&:present?)..join(", ")
+                  = [t(".bikemnfg_name"), bike.frame_model].select(&:present?).join(", ")
                   %span.less-strong
                     = bike.frame_colors.to_sentence
                   %br
