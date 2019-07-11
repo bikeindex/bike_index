@@ -42,7 +42,7 @@
 
 - if current_user.present?
   - if @bike.claimable_by?(current_user)
-    - modal_title = "Your #{@bike.type}"
+    - modal_title = t(".your_bike", bike_type: @bike.type)
     - modal_body = capture_haml do
       .modal-body
         %p= t(".were_honored_to_have_your_biketype_on_the", biketype: @bike.type)
@@ -78,7 +78,7 @@
                 - else
                   = t(".add_a_picture_of_it_so_everyone_can_admir")
           - else # The bike has been sent to someone other than the current_user
-            = t(".you_sent_this_biketype_to_embikecurrent_o", biketype: @bike.type, bikecurrent_ownershipowner_email: @bike.current_ownership.owner_email).html_safe
+            = t(".you_sent_this_bike_html", bike_type: @bike.type, owner_email: @bike.current_ownership.owner_email)
           = link_to  t(".edit"), edit_bike_path, class: "btn btn-secondary"
 
 - if modal_title.present?

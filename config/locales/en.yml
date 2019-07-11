@@ -1161,6 +1161,7 @@ en:
       can_we_share_your_story: Can we share your story?
       mark_recovered: Mark recovered
       nevermind: Nevermind
+      your_bike: Your %{bike_type}
       were_honored_to_have_your_biketype_on_the: We're honored to have your %{biketype} on the Index.
       claim_it_so_you_can_update_your_listing: Claim it so you can update your listing.
       claim_biketype: Claim %{biketype}
@@ -1172,7 +1173,7 @@ en:
       add_some_more_information_about_it: Add some more information about it.
       add_a_picture_so_people_know_what_to_look: Add a picture so people know what to look for!
       add_a_picture_of_it_so_everyone_can_admir: Add a picture of it, so everyone can admire its beauty!
-      you_sent_this_biketype_to_embikecurrent_o: You sent this %{biketype} to <em>%{bikecurrent_ownershipowner_email}</em> and it hasn't been claimed yet. You can update it.
+      you_sent_this_bike_html: You sent this %{bike_type} to <em>%{owner_email}</em> and it hasn't been claimed yet. You can update it.
       edit: Edit
     bike_table:
       date_indexed: Date indexed
