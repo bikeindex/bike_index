@@ -172,9 +172,9 @@
                 %small.less-strong
                   = bike.creation_description
             %td.hiddenColumn.owner_name_cell.hidden-xs-down
-              - if bike.user_name.present?
+              - if bike.owner_name.present?
                 %em
-                  = bike.user_name
+                  = bike.owner_name
             - current_organization.additional_registration_fields.each do |field_name|
               %td.hiddenColumn.hidden-xs-down{ class: "#{field_name}_cell" }
                 - if field_name == "reg_address"

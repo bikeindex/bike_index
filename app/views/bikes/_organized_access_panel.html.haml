@@ -40,6 +40,9 @@
                 %td
                   - if @bike.authorized_by_organization?(org: passive_organization)
                     = t(".org_can_edit_bike", org_name: passive_organization.short_name, bike_type: @bike.type)
+                    - if @bike.can_edit_claimed_organizations.pluck(:id).include?(passive_organization.id)
+                      %em.small
+                        = t(".organization_can_edit_after_claimed", bike_type: @bike.type)
                     = link_to t(".edit"), edit_bike_path(@bike), class: "btn btn-success btn-sm float-right"
                   - else
                     %em.small.less-strong
@@ -61,7 +64,7 @@
               - if @bike.organized?(passive_organization) # Only display information about the bike if bike is registered through org
                 %tr
                   %td= t(".owner_name")
-                  %td= @bike.user&.name
+                  %td= @bike.owner_name
                 %tr
                   %td= t(".owner_email")
                   %td= @bike.owner_email
@@ -72,7 +75,7 @@
                       = l @bike.created_at, format: :convert_time
                 %tr
                   %td= t(".claimed")
-                  %td= @bike.claimed?
+                  %td= "&#x2713;".html_safe if @bike.claimed?
                 %tr
                   %td= t(".creator")
                   %td
@@ -107,23 +110,17 @@
 
                 - if passive_organization.paid_for?("avery_export")
                   %tr
-                    %td= t(".user_name")
-                    %td
-                      - if @bike.user_name.present?
-                        = @bike.user_name
-                      - else
-                        %em.text-warning
-                          = t(".no_name")
-                  %tr
                     %td= t(".avery_exportable")
                     %td
                       - if Export.avery_export_bike?(@bike)
-                        = t(".is_true")
+                        %span.text-success
+                          = t(".is_true")
                       - else
-                        = t(".is_false")
+                        %span.text-danger
+                          = t(".is_false")
                         %small.em
-                          - unless @bike.user_name.present?
-                            = t(".missing_user_name")
+                          - unless @bike.owner_name.present?
+                            = t(".missing_owner_name")
                           - unless @bike.registration_address.present? && @bike.registration_address["address"].present?
                             = t(".missing_address")
 
