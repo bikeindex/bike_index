@@ -70,7 +70,7 @@
           %td
             - if bike_code.claimed?
               -# For these, use bike_id to avoid loading association
-              = link_to(organized_bike_text(bike_code.bike), bike_path(bike_code.bike))
+              = link_to(organized_bike_text(bike_code.bike), bike_path(bike_code.bike, organization_id: current_organization.to_param))
           %td
             %strong= bike_code.pretty_code
 

@@ -149,7 +149,7 @@
         %tr
           - cache("#{current_organization.id}-#{bike.id}-#{bike.updated_at}") do
             %td.hiddenColumn.created_at_cell
-              %a.convertTime{ href: bike_path(bike) }
+              %a.convertTime{ href: bike_path(bike, organization_id: current_organization.to_param) }
                 = l bike.created_at, format: :convert_time
             %td.hiddenColumn.updated_at_cell.hidden-xs-down
               %small.convertTime
