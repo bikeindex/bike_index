@@ -89,14 +89,18 @@ RSpec.describe SessionsController, type: :controller do
       describe "when authentication works" do
         it "authenticates and removes partner session" do
           expect(user.last_login_at).to be_blank
+          expect(user.last_login_ip).to be_blank
           session[:partner] = "bikehub"
           expect(user).to receive(:authenticate).and_return(true)
           request.env["HTTP_REFERER"] = user_home_url
+          request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
           post :create, session: { password: "would be correct" }
           expect(cookies.signed[:auth][1]).to eq(user.auth_token)
           expect(response).to redirect_to "https://new.bikehub.com/account"
           expect(session[:partner]).to be_nil
+          user.reload
           expect(user.last_login_at).to be_within(1.second).of Time.now
+          expect(user.last_login_ip).to eq "66.66.66.66"
         end
 
         context "admin" do
