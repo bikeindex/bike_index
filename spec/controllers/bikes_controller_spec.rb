@@ -48,9 +48,9 @@ RSpec.describe BikesController, type: :controller do
       end
       context "ip proximity" do
         let(:query_params) { { location: "yoU", distance: 1, stolenness: "proximity" } }
+        before { request.env["HTTP_CF_CONNECTING_IP"] = ip_address }
         context "found location" do
           it "assigns passed parameters and close_serials" do
-            expect_any_instance_of(BikesController).to receive(:forwarded_ip_address) { ip_address }
             allow(Geocoder).to receive(:search) { legacy_production_ip_search_result }
             get :index, query_params
             expect(response.status).to eq 200
@@ -61,7 +61,6 @@ RSpec.describe BikesController, type: :controller do
         context "ip passed as parameter" do
           let(:ip_query_params) { query_params.merge(location: "IP") }
           it "assigns passed parameters and close_serials" do
-            expect_any_instance_of(BikesController).to receive(:forwarded_ip_address) { ip_address }
             allow(Geocoder).to receive(:search) { production_ip_search_result }
             get :index, ip_query_params
             expect(response.status).to eq 200
@@ -72,7 +71,6 @@ RSpec.describe BikesController, type: :controller do
         context "no location" do
           let(:ip_query_params) { query_params.merge(location: "   ") }
           it "assigns passed parameters and close_serials" do
-            expect_any_instance_of(BikesController).to receive(:forwarded_ip_address) { ip_address }
             allow(Geocoder).to receive(:search) { production_ip_search_result }
             get :index, ip_query_params
             expect(response.status).to eq 200
@@ -105,7 +103,7 @@ RSpec.describe BikesController, type: :controller do
           }.as_json
         end
         it "sends all the params we want to searchable_interpreted_params" do
-          expect_any_instance_of(BikesController).to receive(:forwarded_ip_address) { "special" }
+          request.env["HTTP_CF_CONNECTING_IP"] = "special"
           expect(Bike).to receive(:searchable_interpreted_params).with(query_params, ip: "special") { {} }
           get :index, query_params
           expect(response.status).to eq 200
