@@ -320,11 +320,11 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe "user_token_time" do
+  describe "auth_token_time" do
     context "password_reset_token" do
       it "gets long time ago if not there" do
         user = User.new(password_reset_token: "c7c3b99a319ac09e2b00-2015-03-31 19:29:52 -0500")
-        expect(user.user_token_time("password_reset_token")).to eq(Time.at(1364777722))
+        expect(user.auth_token_time("password_reset_token")).to eq(Time.at(1364777722))
       end
       it "gets the time" do
         user = FactoryBot.create(:user)
@@ -332,29 +332,29 @@ RSpec.describe User, type: :model do
         user.update_auth_token("password_reset_token")
         user.reload
         expect(user.password_reset_token).to be_present
-        expect(user.user_token_time("password_reset_token")).to be > Time.current - 2.seconds
+        expect(user.auth_token_time("password_reset_token")).to be > Time.current - 2.seconds
       end
       it "uses input time" do
         user = FactoryBot.create(:user)
         user.update_auth_token("password_reset_token", (Time.current - 61.minutes).to_i)
-        expect(user.reload.user_token_time("password_reset_token")).to be < (Time.current - 1.hours)
+        expect(user.reload.auth_token_time("password_reset_token")).to be < (Time.current - 1.hours)
       end
     end
 
     context "magic_link_token" do
       it "gets long time ago if not there" do
         user = User.new(magic_link_token: "c7c3b99a319ac09e2b00-2015-03-31 19:29:52 -0500")
-        expect(user.user_token_time("magic_link_token")).to eq(Time.at(1364777722))
+        expect(user.auth_token_time("magic_link_token")).to eq(Time.at(1364777722))
       end
       it "gets the time" do
         user = User.new
         user.update_auth_token("magic_link_token")
-        expect(user.user_token_time("magic_link_token")).to be > Time.current - 2.seconds
+        expect(user.auth_token_time("magic_link_token")).to be > Time.current - 2.seconds
       end
       it "uses input time" do
         user = FactoryBot.create(:user)
         user.update_auth_token("magic_link_token", (Time.current - 61.minutes).to_i)
-        expect(user.reload.user_token_time("magic_link_token")).to be < (Time.current - 1.hours)
+        expect(user.reload.auth_token_time("magic_link_token")).to be < (Time.current - 1.hours)
       end
     end
   end

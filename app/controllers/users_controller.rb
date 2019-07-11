@@ -56,7 +56,7 @@ class UsersController < ApplicationController
   def password_reset
     if params[:token].present?
       @user = User.find_by_password_reset_token(params[:token])
-      if @user.present? && !@user.user_token_expired?("password_reset_token")
+      if @user.present? && !@user.auth_token_expired?("password_reset_token")
         session[:return_to] = "password_reset"
         # They got the password reset email, which counts as confirming their email
         @user.confirm(@user.confirmation_token) if @user.unconfirmed?
@@ -106,7 +106,7 @@ class UsersController < ApplicationController
         remove_session
         flash[:error] = "Doesn't match user's password reset token"
         redirect_to user_home_url and return
-      elsif @user.user_token_expired?("password_reset_token")
+      elsif @user.auth_token_expired?("password_reset_token")
         remove_session
         flash[:error] = "Password reset token expired, try resetting password again"
         redirect_to user_home_url and return
