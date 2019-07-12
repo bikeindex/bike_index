@@ -2,6 +2,7 @@
   .card-body
     .UppyDragDrop-One
       = form_for PublicImage.new, html: {class: "UppyForm"} do |f|
+        = hidden_field_tag :upload_plugin, "uppy"
         - if imageable_type == 'Blog'
           = hidden_field_tag :blog_id, @blog.id
         - elsif imageable_type == 'Organization'

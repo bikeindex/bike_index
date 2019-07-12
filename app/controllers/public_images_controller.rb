@@ -94,7 +94,12 @@ class PublicImagesController < ApplicationController
   end
 
   def permitted_parameters
-    params.require(:public_image).permit(:image, :name, :imageable, :listing_order, :remote_image_url, :is_private)
+    pp params[:file]
+    if params[:upload_plugin] == "uppy"
+      pp "I'm hit!"
+    else
+      params.require(:public_image).permit(:image, :name, :imageable, :listing_order, :remote_image_url, :is_private)
+    end
   end
 
   def find_image_if_owned

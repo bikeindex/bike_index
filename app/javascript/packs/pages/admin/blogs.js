@@ -31,6 +31,7 @@ function BinxAdminBlogs() {
         .use(XHRUpload, {
           endpoint: "/public_images",
           formData: true,
+          fieldName: "file",
           method: "post"
         })
         .use(Dashboard, {
