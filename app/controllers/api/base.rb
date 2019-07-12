@@ -8,15 +8,13 @@ module GrapeLogging
       end
     end
   end
-  # Need to add file parameters to this so it doesn't try (and fail) to make images json
-  FILTERED_PARAMS = Rails.application.config.filter_parameters + [:file]
 end
 
 module API
   class Base < Grape::API
     use GrapeLogging::Middleware::RequestLogger, instrumentation_key: "grape_key",
                                                  include: [GrapeLogging::Loggers::BinxLogger.new,
-                                                           GrapeLogging::Loggers::FilterParameters.new(GrapeLogging::FILTERED_PARAMS)]
+                                                           GrapeLogging::Loggers::FilterParameters.new]
     mount API::V3::RootV3
     mount API::V2::RootV2
 
