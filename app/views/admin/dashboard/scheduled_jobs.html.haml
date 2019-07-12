@@ -1,0 +1,51 @@
+.admin-subnav
+  .col-12
+    %h1
+      Schedule jobs
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th
+        Job
+      %th
+        Frequency
+      %th
+        Last started
+      %th
+        Last finished
+      %th
+        Duration
+
+    %tbody
+      - ScheduledWorkerRunner.scheduled_workers.each do |klass|
+        / - klass
+        %tr
+          %td
+            = klass
+          %td
+            - if klass.frequency < 1.minute
+              = klass.frequency
+              seconds
+            - elsif klass.frequency >= 1.minute && klass.frequency < 1.hour
+              = klass.frequency/60.00
+              minutes
+            - elsif klass.frequency >= 1.hour && klass.frequency < 24.hours
+              = klass.frequency/3600.00
+              hours
+            - elsif klass.frequency >= 24.hours
+              = klass.frequency/86400.00
+              days
+          %td
+            - if klass.last_finished.present?
+              %span.convertTime
+                = l Time.parse(klass.last_finished), format: :convert_time
+          %td
+            - if klass.last_started.present?
+              %span.convertTime
+                = l Time.parse(klass.last_started), format: :convert_time
+          %td
+            - if klass.last_finished.present? && klass.last_started.present?
+              = Time.parse(klass.last_finished) - Time.parse(klass.last_started)
+
+

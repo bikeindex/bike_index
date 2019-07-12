@@ -160,6 +160,7 @@ Bikeindex::Application.routes.draw do
     end
     resources :partial_bikes, only: [:index]
     get "maintenance", to: "dashboard#maintenance"
+    get "scheduled_jobs", to: "dashboard#scheduled_jobs"
     put "update_tsv_blacklist", to: "dashboard#update_tsv_blacklist"
     get "tsvs", to: "dashboard#tsvs"
     get "bust_z_cache", to: "dashboard#bust_z_cache"

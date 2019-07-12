@@ -8,7 +8,6 @@ class Admin::BikesController < Admin::BaseController
     per_page = params[:per_page] || 100
     @render_chart = ParamsNormalizer.boolean(params[:render_chart])
     @bikes = matching_bikes.includes(:creation_organization, :creation_states, :paint).reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(per_page)
-    render layout: "new_admin"
   end
 
   def missing_manufacturer
@@ -20,7 +19,6 @@ class Admin::BikesController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 100
     @bikes = bikes.page(page).per(per_page)
-    render layout: "new_admin"
   end
 
   def update_manufacturers
@@ -45,7 +43,6 @@ class Admin::BikesController < Admin::BaseController
     @page = params[:page] || 1
     per_page = params[:per_page] || 25
     @duplicate_groups = duplicate_groups.page(@page).per(per_page)
-    render layout: "new_admin"
   end
 
   def ignore_duplicate_toggle
@@ -72,7 +69,6 @@ class Admin::BikesController < Admin::BaseController
     @bike = @bike.decorate
     @recoveries = @bike.recovered_records
     @organizations = Organization.all
-    render layout: "new_admin"
   end
 
   def update
@@ -93,7 +89,7 @@ class Admin::BikesController < Admin::BaseController
       flash[:success] = "Bike was successfully updated."
       redirect_to edit_admin_bike_url(@bike) and return
     else
-      render action: "edit", layout: "new_admin"
+      render action: "edit"
     end
   end
 
