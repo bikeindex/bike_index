@@ -38,11 +38,11 @@
               days
           %td
             - if klass.last_finished.present?
-              %span.convertTime
+              %span.convertTime.preciseTime
                 = l Time.parse(klass.last_finished), format: :convert_time
           %td
             - if klass.last_started.present?
-              %span.convertTime
+              %span.convertTime.preciseTime
                 = l Time.parse(klass.last_started), format: :convert_time
           %td
             - if klass.last_finished.present? && klass.last_started.present?
