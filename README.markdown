@@ -146,7 +146,7 @@ If the initial provisioning fails for any reason, try running `vagrant provision
 
 ## Bug tracker
 
-Have a bug or a feature request? [Open a new issue](https://github.com/bikeindex/bike_index/issues/new).
+Have a bug or a feature request? [Open an issue](https://github.com/bikeindex/bike_index/issues/new).
 
 
 ## Community
@@ -164,7 +164,7 @@ Don't wait until you have a finished feature before before opening the PR, unfin
 
 Once the PR is ready for review, request review from the relevant person.
 
-If your pull request contains Ruby patches or features, you must include relevant rspec tests.
+If your pull request contains Ruby patches or features, you must include relevant Rspec tests.
 
 
 ... and go hard
