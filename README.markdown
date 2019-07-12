@@ -1,4 +1,4 @@
-# <p align="center">![BIKE INDEX][bike-index-logo]</p> [Bike Index][bike-index] 🚲 ![Cloud66 Deployment Status][cloud66-badge] [![CircleCI][circleci-badge]][circleci] [![Test Coverage][codeclimate-badge]][codeclimate] [![View performance data on Skylight][skylight-badge]][skylight]
+# [![BIKE INDEX][bike-index-logo]][bike-index] ![Cloud66 Deployment Status][cloud66-badge] [![CircleCI][circleci-badge]][circleci] [![Test Coverage][codeclimate-badge]][codeclimate] [![View performance data on Skylight][skylight-badge]][skylight]</p>
 
 [bike-index-logo]: https://github.com/bikeindex/bike_index/blob/master/bike_index.png?raw=true
 [circleci]: https://circleci.com/gh/bikeindex/bike_index/tree/master
@@ -12,7 +12,7 @@
 
 Bike registration that works: online, powerful, free.
 
-Registering a bike only takes a few minutes and gives cyclists a permanent record linked to their identity that proves ownership in the case of a theft.
+Registering a 🚲 only takes a few minutes and gives 🚴‍♀️ a permanent record linked to their identity that proves ownership in the case of a theft.
 
 We're an open source project. Take a gander through our code, report bugs, or download it and run it locally.
 
