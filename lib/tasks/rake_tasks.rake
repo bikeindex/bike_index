@@ -17,16 +17,3 @@ desc "Create frame_makers and push to redis"
 task :sm_import_manufacturers => :environment do
   AutocompleteLoaderWorker.perform_async("load_manufacturers")
 end
-
-desc "Daily maintenance tasks to be run"
-task :daily_maintenance_tasks => :environment do
-  RemoveExpiredFileCacheWorker.perform_async
-  Ownership.pluck(:id).each { |id| UnusedOwnershipRemovalWorker.perform_async(id) }
-end
-
-desc "download manufacturer logos"
-task :download_manufacturer_logos => :environment do
-  Manufacturer.with_websites.pluck(:id).each_with_index do |id, index|
-    GetManufacturerLogoWorker.perform_in((5 * index).seconds, id)
-  end
-end

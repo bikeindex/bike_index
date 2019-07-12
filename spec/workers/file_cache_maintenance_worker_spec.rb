@@ -32,15 +32,16 @@ RSpec.describe FileCacheMaintenanceWorker, type: :job do
     end
   end
 
-  describe "removing" do
+  describe "removing expired files" do
     it "removes expired files" do
       t = (Time.current - 3.days).to_i
-      FileCacheMaintainer.reset_file_info("#{t}_all_stolen_cache.json", t)
+      expired_filename = "#{t}_all_stolen_cache.json"
+      FileCacheMaintainer.reset_file_info(expired_filename, t)
       FileCacheMaintainer.update_file_info("current_stolen_bikes.tsv")
       expect(FileCacheMaintainer.files.count).to eq 2
-      RemoveExpiredFileCacheWorker.new.perform
-      expect(FileCacheMaintainer.files.count).to eq 1
-      expect(FileCacheMaintainer.files.first["filename"]).to eq "current_stolen_bikes.tsv"
+      expect(FileCacheMaintainer.files.map { |f| f["filename"] }.include?(expired_filename)).to be_truthy
+      described_class.new.perform
+      expect(FileCacheMaintainer.files.map { |f| f["filename"] }.include?(expired_filename)).to be_falsey
     end
   end
 end
