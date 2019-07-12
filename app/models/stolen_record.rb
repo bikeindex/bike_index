@@ -214,10 +214,7 @@ class StolenRecord < ActiveRecord::Base
 
   def find_or_create_recovery_link_token
     return recovery_link_token if recovery_link_token.present?
-    begin
-      self.recovery_link_token = SecureRandom.urlsafe_base64
-    end while self.class.where(recovery_link_token: recovery_link_token).exists?
-    save
+    update_attributes(recovery_link_token: AuthTokenizer.new_token)
     recovery_link_token
   end
 end
