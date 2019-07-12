@@ -60,14 +60,6 @@ $hover-about-social-color: lighten($gray-light, 15%);
     }
   }
 
-  .the-alumni {
-    display: none;
-  }
-
-  .about-alumni-list {
-    display: none;
-  }
-
   .about-list {
     @include clearfix;
 
@@ -86,10 +78,6 @@ $hover-about-social-color: lighten($gray-light, 15%);
       margin: 0 0 0 2%;
       position: relative;
 
-      &:first-of-type {
-        margin-left: 0;
-      }
-
       img {
         display: block;
         width: 100%;
@@ -101,5 +89,15 @@ $hover-about-social-color: lighten($gray-light, 15%);
         margin-left: 16%;
       }
     }
+  }
+
+  .about-alumni-list {
+    list-style-position: outside;
+
+    li {
+      margin: 0;
+      margin-right: 5px;
+    }
+
   }
 }

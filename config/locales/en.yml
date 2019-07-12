@@ -2309,3 +2309,41 @@ en:
         assistance, at your expense.
       your_use_of_the_service: Your use of the Service is at your sole risk. The service
         is provided on an "as is" and "as available" basis.
+    about:
+      about_bike_index: About Bike Index
+      nonprofit_status: 501(c)(3) nonprofit
+      cofounded_by_html: Cofounded by Seth Herr and Bryan Hance in 2013, Bike Index is a %{description_link}.
+      widely_used: It is the most widely used and successful bicycle registration service in the world with over %{bikes_count} cataloged bikes, %{partners_count} community partners and tens of thousands of daily searches.
+      seth_built: Seth built Bike Index when he was a bike mechanic because he wanted to be able to register bikes for his customers. Bryan developed and ran a community driven bicycle recovery service (StolenBikeRegistry.com) that recovered bikes from the first week it was created in 2004.
+      merging_the_services: Merging the two services Seth and Bryan created the universal bike registration service they both dreamed of — a database used and searched by individuals, bike shops, police departments and other apps. A bike registry that gives everyone the ability to register and recover bicycles.
+      simple_efficient_effective: Simple. Efficient. Effective.
+      bike_registration_that_works: Bike registration that works.
+      the_team: The team
+      seth_herr_image_title: Those are not official Bike Index arm warmers, we don't have Bike Index arm warmers
+      seth_herr_bio_html: |
+        <strong>Seth Herr</strong> learned to program so that he could build
+        Bike Index, because he was a bike mechanic and was frustrated that
+        something like it didn't exist.
+      bryan_hance_bio_html: |
+        <strong>Bryan Hance</strong> created StolenBicycleRegistry.com in 2004
+        because 5 of his bikes were stolen in 9 years&mdash;and realized
+        recovering bikes was really fun. He lives in Portland and recovers lots
+        of bikes.
+      craig_dalton_bio_html: |
+        <strong>Craig Dalton</strong> thought he had the bike industry out of
+        his system until Bike Index came knocking. Craig is bringing his
+        entrepreneurial experience to the business side of Bike Index.
+      lily_williams_bio_html: |
+        <strong>Lily Williams</strong> has a master's degree from Medill School
+        of Journalism but realized along the way that bikes are the most
+        deserving recipients of words. She writes and communicates for Bike
+        Index.
+      jan_pecnik_bio_html: |
+        <strong>Jan Pecnik</strong> fell in love with bikes while studying his masters in the
+        Netherlands, focusing on social entrepreneurship. After a couple of
+        years of solo riding, he now helps Bike Index expand across Europe and
+        beyond.
+      mike_oleon_bio_html: |
+        <strong>Mike Oleon</strong> does the graphic design and illustration for the Index. If
+        anything looks good, it's probably his fault.
+      alumni: Alumni
