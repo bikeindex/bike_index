@@ -1,4 +1,3 @@
-# NEWLY ADDED SCHEDULER TASK! All tasks should be moved into scheduled workers
 task run_scheduler: :environment do
   ScheduledWorkerRunner.perform_async if ScheduledWorkerRunner.should_enqueue?
 end
@@ -19,20 +18,10 @@ task :sm_import_manufacturers => :environment do
   AutocompleteLoaderWorker.perform_async("load_manufacturers")
 end
 
-desc "cache all stolen response"
-task :cache_all_stolen => :environment do
-  CacheAllStolenWorker.perform_async
-end
-
 desc "Daily maintenance tasks to be run"
 task :daily_maintenance_tasks => :environment do
   RemoveExpiredFileCacheWorker.perform_async
   Ownership.pluck(:id).each { |id| UnusedOwnershipRemovalWorker.perform_async(id) }
-end
-
-desc "Create stolen tsv"
-task :create_tsvs => :environment do
-  TsvCreator.enqueue_creation
 end
 
 desc "download manufacturer logos"
