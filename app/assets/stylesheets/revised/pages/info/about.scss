@@ -20,35 +20,23 @@ $hover-about-social-color: lighten($gray-light, 15%);
       width: 8 * $vertical-height;
     }
 
-    svg {
-      display: inline-block;
-      max-height: 6 * $vertical-height;
-    }
-
-    span.social-link-text {
-      display: block;
-      margin-top: -0.5em;
+    .social-link-text {
       color: $initial-about-social-color;
-    }
-
-    .svgpath,
-    span.social-link-text {
+      display: block;
       fill: $initial-about-social-color;
+      margin-top: -0.5em;
       transition: all 0.05s linear;
     }
 
     a {
       display: block;
       position: relative;
+      color: inherit;
 
       &:hover,
       &:active {
         text-decoration: none;
         color: $hover-about-social-color;
-
-        .svgpath {
-          fill: $hover-about-social-color;
-        }
       }
     }
   }
@@ -72,14 +60,6 @@ $hover-about-social-color: lighten($gray-light, 15%);
     }
   }
 
-  .the-alumni {
-    display: none;
-  }
-
-  .about-alumni-list {
-    display: none;
-  }
-
   .about-list {
     @include clearfix;
 
@@ -98,10 +78,6 @@ $hover-about-social-color: lighten($gray-light, 15%);
       margin: 0 0 0 2%;
       position: relative;
 
-      &:first-of-type {
-        margin-left: 0;
-      }
-
       img {
         display: block;
         width: 100%;
@@ -113,5 +89,15 @@ $hover-about-social-color: lighten($gray-light, 15%);
         margin-left: 16%;
       }
     }
+  }
+
+  .about-alumni-list {
+    list-style-position: outside;
+
+    li {
+      margin: 0;
+      margin-right: 5px;
+    }
+
   }
 }
