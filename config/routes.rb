@@ -62,7 +62,9 @@ Bikeindex::Application.routes.draw do
   get "bike_creation_graph", to: "welcome#bike_creation_graph"
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
 
-  resource :session, only: %i[new create destroy]
+  resource :session, only: %i[new create destroy] do
+    collection { get :magic_link }
+  end
   get "logout", to: "sessions#destroy"
 
   resources :payments
@@ -274,10 +276,6 @@ Bikeindex::Application.routes.draw do
   get "lightspeed_integration", to: redirect("/lightspeed")
 
   %w(stolen_bikes roadmap security spokecard how_it_works).freeze.each { |p| get p, to: redirect("/resources") }
-
-  # get 'sitemap.xml.gz' => redirect('https://files.bikeindex.org/sitemaps/sitemap_index.xml.gz')
-  # Somehow the redirect drops the .gz extension, which ruins it so this redirect is handled by Cloudflare
-  # get 'sitemaps/(*all)' => redirect('https://files.bikeindex.org/sitemaps/%{all}')
 
   get "/400", to: "errors#bad_request", via: :all
   get "/401", to: "errors#unauthorized", via: :all
