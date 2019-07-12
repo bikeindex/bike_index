@@ -38,6 +38,7 @@
             - else
               - text_class = "text-info" if theft_alert.active?
               - text_class ||= "text-danger" if theft_alert.pending?
+              - text_class ||= "less-strong small" if theft_alert.inactive?
               %span{ class: text_class || "" }
                 = theft_alert.status
           %td
