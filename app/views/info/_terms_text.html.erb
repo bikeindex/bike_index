@@ -1,5 +1,8 @@
 <% file_path = @view_renderer.lookup_context.find_template(@virtual_path).identifier.gsub(/\A.*\/app\//i, 'app/') %>
 <%- change_history_url = "https://github.com/bikeindex/bike_index/tree/master/#{file_path}" %>
+<%- terms_link = link_to("bikeindex.org/terms", terms_path) %>
+<%- contact_email_link = link_to("contact@bikeindex.org", "mailto:contact@bikeindex.org") %>
+<%- contact_link = link_to("contact us", contact_us_path) %>
 
 <header>
   <h1>
@@ -23,7 +26,7 @@
 
 <p><%= t('.welcome_to_bike_index_html') %></p>
 
-<p><%= t('.by_giving_bike_shops_html', contact_link: link_to("contact us", contact_us_path)) %></p>
+<p><%= t('.by_giving_bike_shops_html', contact_link: contact_link) %></p>
 
 <h1 id="section_a">
   <a name="section-a-acceptance-of-terms" class="anchor" href="#section-a-acceptance-of-terms"><span class="mini-icon mini-icon-link"></span></a>
@@ -36,7 +39,6 @@
   </li>
   <li>
     <p>
-    <%- terms_link = link_to("bikeindex.org/terms", terms_path) %>
     <%= t('.if_bike_index_html', terms_link: terms_link) %>
     </p>
   </li>
@@ -190,7 +192,6 @@
   </li>
   <li>
     <p>
-    <%- contact_email_link = link_to("contact@bikeindex.org", "mailto:contact@bikeindex.org") %>
     <%= t('.questions_html', contact_email_link: contact_email_link) %>
     </p>
   </li>
