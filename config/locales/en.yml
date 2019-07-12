@@ -2347,3 +2347,23 @@ en:
         <strong>Mike Oleon</strong> does the graphic design and illustration for the Index. If
         anything looks good, it's probably his fault.
       alumni: Alumni
+    dev_and_design:
+      meant_to_be_usable: Bike Index is meant to be usable and expandable by everyone. We're way into the open source.
+      design_resources: Design resources
+      image_assets: Image assets
+      bike_index_logos_html: "%{link} - vector and png Bike Index logos"
+      trifold_flyer: Trifold Flyer
+      trifold_flyer_pdf_url: 'https://files.bikeindex.org/stored/Bike-Index-TriFold.pdf'
+      flyers_html: "%{link} - Print color & double-sided (<em>do not</em> rescale, have printer print as close to the edges as it can)"
+      bike_shop_card: Bike shop card
+      bike_shop_card_pdf_url: 'https://files.bikeindex.org/stored/Bike-Index-Shop-Card.pdf'
+      bike_shop_cards_html: '%{link} - design is for notecard size (5.5" x 4.25")'
+      development_resources: Development resources
+      on_github: on GitHub
+      open_source_html: Bike Index itself is open source - check it out %{link}.
+      our_api_documentation: Our API documentation
+      nearby_stolen_widget: Nearby stolen widget
+      nearby_stolen_widget_html: "%{link} (on GitHub)"
+      display_widget_html: "%{link} (must be logged in - also, has no usage instructions...)"
+      oauth_apps_html: "%{link} (must be logged in)"
+      oauth_authorized_apps_html: "%{link} (must be logged in)"
