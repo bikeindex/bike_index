@@ -10,6 +10,7 @@ class SessionsController < ApplicationController
   def magic_link
     user = User.find_by_magic_link_token(params[:token])
     if user.present? && !user.auth_token_expired?("magic_link_token")
+      user.confirm(user.confirmation_token) unless user.confirmed?
       @user = user
       user.update_attributes(magic_link_token: nil)
       sign_in_and_redirect(@user)

@@ -81,6 +81,21 @@ RSpec.describe SessionsController, type: :controller do
         expect(user.last_login_ip).to eq "66.66.66.66"
         expect(user.magic_link_token).to be_blank
       end
+      context "unconfirmed user" do
+        let(:user) { FactoryBot.create(:user) }
+        it "confirms user" do
+          user.update_auth_token("magic_link_token")
+          user.reload
+          expect(user.confirmed?).to be_falsey
+          get :magic_link, token: user.magic_link_token
+          expect(cookies.signed[:auth][1]).to eq(user.auth_token)
+          expect(response).to redirect_to user_home_url
+          user.reload
+          expect(user.last_login_at).to be_within(1.second).of Time.now
+          expect(user.magic_link_token).to be_blank
+          expect(user.confirmed?).to be_truthy
+        end
+      end
       context "magic_link expired" do
         it "renders" do
           user.update_auth_token("magic_link_token", Time.current - 61.minutes)
@@ -115,11 +130,12 @@ RSpec.describe SessionsController, type: :controller do
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
-        post :create_magic_link, email: "something@stuff.bike"
-        expect(flash[:error]).to be_present
-        expect(response).to redirect_to new_user_path
-        expect(ActionMailer::Base.deliveries.count).to eq 0
-        expect(user.reload.magic_link_token).to be_nil
+          post :create_magic_link, email: "something@stuff.bike"
+          expect(flash[:error]).to be_present
+          expect(response).to redirect_to new_user_path
+          expect(ActionMailer::Base.deliveries.count).to eq 0
+          expect(user.reload.magic_link_token).to be_nil
+        end
       end
     end
   end
