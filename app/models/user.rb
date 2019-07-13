@@ -340,7 +340,7 @@ class User < ActiveRecord::Base
   end
 
   def generate_auth_token(auth_token_type)
-    self.attributes = { auth_token_type => SecurityTokenizer.new_token(t) }
+    self.attributes = { auth_token_type => SecurityTokenizer.new_token }
   end
 
   def access_tokens_for_application(i)
