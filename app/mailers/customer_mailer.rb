@@ -24,7 +24,8 @@ class CustomerMailer < ActionMailer::Base
 
   def magic_login_link_email(user)
     @user = user
-    @url = "#{ENV["BASE_URL"]}/sessions/magic_link?token=#{@user.magic_link_token}"
+    @url = "#{ENV["BASE_URL"]}/session/magic_link?token=#{@user.magic_link_token}"
+    mail(to: @user.email, subject: "Sign in to Bike Index")
   end
 
   def additional_email_confirmation(user_email)

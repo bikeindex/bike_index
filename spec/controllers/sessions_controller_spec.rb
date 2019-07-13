@@ -51,6 +51,79 @@ RSpec.describe SessionsController, type: :controller do
     end
   end
 
+  describe "magic_link" do
+    it "renders" do
+      get :magic_link
+      expect(assigns(:incorrect_token)).to be_falsey
+      expect(cookies.signed[:auth]).to be_nil
+      expect(response.code).to eq "200"
+      expect(response).to render_template("magic_link")
+    end
+    context "unmatched magic_link" do
+      it "renders" do
+        get :magic_link, token: SecurityTokenizer.new_token
+        expect(assigns(:incorrect_token)).to be_truthy
+        expect(cookies.signed[:auth]).to be_nil
+        expect(response.code).to eq "200"
+        expect(response).to render_template("magic_link")
+      end
+    end
+    context "matching magic_link" do
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      it "signs in and redirects" do
+        user.update_auth_token("magic_link_token")
+        request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
+        get :magic_link, token: user.magic_link_token
+        expect(cookies.signed[:auth][1]).to eq(user.auth_token)
+        expect(response).to redirect_to user_home_url
+        user.reload
+        expect(user.last_login_at).to be_within(1.second).of Time.now
+        expect(user.last_login_ip).to eq "66.66.66.66"
+        expect(user.magic_link_token).to be_blank
+      end
+      context "magic_link expired" do
+        it "renders" do
+          user.update_auth_token("magic_link_token", Time.current - 61.minutes)
+          request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
+          get :magic_link, token: user.magic_link_token
+          expect(assigns(:incorrect_token)).to be_truthy
+          expect(cookies.signed[:auth]).to be_nil
+          expect(response.code).to eq "200"
+          expect(response).to render_template("magic_link")
+        end
+      end
+    end
+  end
+
+  describe "create_magic_link" do
+    it "sends the magic link" do
+      user = FactoryBot.create(:user_confirmed)
+      expect(user.magic_link_token).to be_nil
+      ActionMailer::Base.deliveries = []
+      Sidekiq::Worker.clear_all
+      Sidekiq::Testing.inline! do
+        post :create_magic_link, email: user.email
+        expect(ActionMailer::Base.deliveries.count).to eq 1
+        mail = ActionMailer::Base.deliveries.last
+        expect(mail.subject).to eq("Sign in to Bike Index")
+        expect(mail.to).to eq([user.email])
+        expect(user.reload.magic_link_token).not_to be_nil
+      end
+    end
+    context "unknown email" do
+      it "redirects to login" do
+        ActionMailer::Base.deliveries = []
+        Sidekiq::Worker.clear_all
+        Sidekiq::Testing.inline! do
+        post :create_magic_link, email: "something@stuff.bike"
+        expect(flash[:error]).to be_present
+        expect(response).to redirect_to new_user_path
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+        expect(user.reload.magic_link_token).to be_nil
+      end
+    end
+  end
+
   describe "destroy" do
     include_context :logged_in_as_user
     it "logs out the current user" do
@@ -87,20 +160,35 @@ RSpec.describe SessionsController, type: :controller do
       end
 
       describe "when authentication works" do
-        it "authenticates and removes partner session" do
-          expect(user.last_login_at).to be_blank
-          expect(user.last_login_ip).to be_blank
-          session[:partner] = "bikehub"
-          expect(user).to receive(:authenticate).and_return(true)
-          request.env["HTTP_REFERER"] = user_home_url
-          request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
-          post :create, session: { password: "would be correct" }
-          expect(cookies.signed[:auth][1]).to eq(user.auth_token)
-          expect(response).to redirect_to "https://new.bikehub.com/account"
-          expect(session[:partner]).to be_nil
-          user.reload
-          expect(user.last_login_at).to be_within(1.second).of Time.now
-          expect(user.last_login_ip).to eq "66.66.66.66"
+
+      it "signs in" do
+        expect(user).to receive(:authenticate).and_return(true)
+        request.env["HTTP_REFERER"] = user_home_url
+        request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
+        post :create, session: { password: "would be correct" }
+        expect(cookies.signed[:auth][1]).to eq(user.auth_token)
+        expect(response).to redirect_to user_home_url
+        expect(session[:partner]).to be_nil
+        user.reload
+        expect(user.last_login_at).to be_within(1.second).of Time.now
+        expect(user.last_login_ip).to eq "66.66.66.66"
+      end
+        context "partner" do
+          it "authenticates and removes partner session" do
+            expect(user.last_login_at).to be_blank
+            expect(user.last_login_ip).to be_blank
+            session[:partner] = "bikehub"
+            expect(user).to receive(:authenticate).and_return(true)
+            request.env["HTTP_REFERER"] = user_home_url
+            request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
+            post :create, session: { password: "would be correct" }
+            expect(cookies.signed[:auth][1]).to eq(user.auth_token)
+            expect(response).to redirect_to "https://new.bikehub.com/account"
+            expect(session[:partner]).to be_nil
+            user.reload
+            expect(user.last_login_at).to be_within(1.second).of Time.now
+            expect(user.last_login_ip).to eq "66.66.66.66"
+          end
         end
 
         context "admin" do
@@ -166,6 +254,7 @@ RSpec.describe SessionsController, type: :controller do
         expect(response).to render_template("new")
         expect(response).to render_template("layouts/application_revised")
       end
+
       context "user is organization admin" do
         let(:organization) { FactoryBot.create(:organization, kind: organization_kind) }
         let(:user) { FactoryBot.create(:organization_member, organization: organization) }

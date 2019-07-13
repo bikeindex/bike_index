@@ -8,6 +8,26 @@ class SessionsController < ApplicationController
   end
 
   def magic_link
+    user = User.find_by_magic_link_token(params[:token])
+    if user.present? && !user.auth_token_expired?("magic_link_token")
+      @user = user
+      user.update_attributes(magic_link_token: nil)
+      sign_in_and_redirect(@user)
+    else
+      @incorrect_token = params[:token].present?
+    end
+  end
+
+  def create_magic_link
+    user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
+    if user.present?
+      user.send_magic_link_email
+      flash[:success] = "Sign in link sent! Just click the link in your email to sign in"
+      redirect_to root_path
+    else
+      flash[:error] = "Unable to find that user"
+      redirect_to new_user_path
+    end
   end
 
   def create

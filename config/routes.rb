@@ -63,7 +63,10 @@ Bikeindex::Application.routes.draw do
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
 
   resource :session, only: %i[new create destroy] do
-    collection { get :magic_link }
+    collection do
+      get :magic_link
+      post :create_magic_link
+    end
   end
   get "logout", to: "sessions#destroy"
 
