@@ -290,7 +290,7 @@ RSpec.describe User, type: :model do
       expect(user.auth_token).to be_present
       expect(user.username).to be_present
       expect(user.confirmation_token).to be_present
-      time = Time.at(user.auth_token.match(/\d*\z/)[0].to_i)
+      time = Time.at(SecurityTokenizer.token_time(user.auth_token))
       expect(time).to be > Time.current - 1.minutes
     end
     it "haves before create callback" do
@@ -382,25 +382,28 @@ RSpec.describe User, type: :model do
     end
   end
 
-  # describe "send_magic_link_email" do
-  #   it "enqueues sending the password reset" do
-  #     user = FactoryBot.create(:user)
-  #     expect(user.password_reset_token).to be_nil
-  #     expect do
-  #       user.send_password_reset_email
-  #     end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
-  #     expect(user.reload.password_reset_token).not_to be_nil
-  #   end
+  describe "send_magic_link_email" do
+    it "enqueues sending the password reset" do
+      user = FactoryBot.create(:user)
+      expect(user.magic_link_token).to be_nil
+      expect do
+        user.send_magic_link_email
+      end.to change(EmailMagicLoginLinkWorker.jobs, :size).by(1)
+      expect(user.reload.magic_link_token).not_to be_nil
+    end
 
-  #   it "doesn't send another one immediately" do
-  #     user = FactoryBot.create(:user)
-  #     user.send_password_reset_email
-  #     user.send_password_reset_email
-  #     expect do
-  #       user.send_password_reset_email
-  #     end.to change(EmailResetPasswordWorker.jobs, :size).by(0)
-  #   end
-  # end
+    it "doesn't send another one immediately (or alter the token)" do
+      user = FactoryBot.create(:user)
+      user.send_magic_link_email
+      token = user.magic_link_token
+      user.send_magic_link_email
+      expect do
+        user.send_magic_link_email
+      end.to change(EmailResetPasswordWorker.jobs, :size).by(0)
+      user.reload
+      expect(user.magic_link_token).to eq token
+    end
+  end
 
   describe "update_last_sign_in" do
     let(:user) { FactoryBot.create(:user) }

@@ -190,7 +190,7 @@ class User < ActiveRecord::Base
   end
 
   def send_magic_link_email
-    unless auth_token_time("magic_link_token") > Time.current - 2.minutes
+    unless auth_token_time("magic_link_token") > Time.current - 1.minutes
       update_auth_token("magic_link_token")
       EmailMagicLoginLinkWorker.perform_async(id)
     end
@@ -339,8 +339,13 @@ class User < ActiveRecord::Base
     }.as_json
   end
 
-  def generate_auth_token(auth_token_type)
-    self.attributes = { auth_token_type => SecurityTokenizer.new_token }
+  def update_auth_token(auth_token_type, time = nil)
+    generate_auth_token(auth_token_type, time)
+    save
+  end
+
+  def generate_auth_token(auth_token_type, time = nil)
+    self.attributes = { auth_token_type => SecurityTokenizer.new_token(time) }
   end
 
   def access_tokens_for_application(i)

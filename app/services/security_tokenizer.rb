@@ -1,6 +1,6 @@
 class SecurityTokenizer
-  def self.new_token
-    t = Time.current.to_i
+  def self.new_token(time = nil)
+    t = (time || Time.current).to_i
     "#{t}-" + SecureRandom.hex + Digest::MD5.hexdigest("#{SecureRandom.hex}-#{t}")
   end
 
