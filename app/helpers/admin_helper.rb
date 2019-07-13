@@ -33,7 +33,8 @@ module AdminHelper
       { title: "Partial Bikes", path: admin_partial_bikes_path, match_controller: true },
       { title: "Duplicate Bikes", path: duplicates_admin_bikes_path, match_controller: false },
       { title: "Feature Flags", path: admin_feature_flags_path, match_controller: false },
-      { title: "Exit Admin", path: root_path, match_controller: false }
+      { title: "Scheduled Jobs", path: admin_scheduled_jobs_path, match_controller: false },
+      { title: "Exit Admin", path: root_path, match_controller: false },
     ]
   end
 

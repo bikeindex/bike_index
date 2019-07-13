@@ -1,15 +1,20 @@
-class CacheAllStolenWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "carrierwave", backtrace: true, retry: false
+class FileCacheMaintenanceWorker < ScheduledWorker
   attr_reader :filename
 
+  def self.frequency
+    6.hours
+  end
+
   def perform
+    record_scheduler_started
     write_stolen
     uploader = JsonUploader.new
     file = File.open(tmp_path)
     uploader.store!(file)
     file.close
     FileCacheMaintainer.update_file_info(output_url(uploader))
+    expired_file_hashes.each { |fh| FileCacheMaintainer.remove_file(fh) }
+    record_scheduler_finished
   end
 
   def output_url(uploader)
@@ -37,5 +42,12 @@ class CacheAllStolenWorker
     end
     File.truncate(tmp_path, File.size(tmp_path) - 1) # remove final comma
     File.open(tmp_path, "a+") { |file| file << "]}" }
+  end
+
+  def expired_file_hashes
+    expiration = (Time.current - 2.days).to_i
+    FileCacheMaintainer.files.select do |file|
+      file["updated_at"].to_i < expiration
+    end
   end
 end
