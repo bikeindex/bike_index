@@ -163,7 +163,7 @@ class User < ActiveRecord::Base
   end
 
   def auth_token_time(auth_token_type)
-    AuthTokenizer.token_time(self[auth_token_type])
+    SecurityTokenizer.token_time(self[auth_token_type])
   end
 
   def auth_token_expired?(auth_token_type)
@@ -340,7 +340,7 @@ class User < ActiveRecord::Base
   end
 
   def generate_auth_token(auth_token_type)
-    self.attributes = { auth_token_type => AuthTokenizer.new_token(t) }
+    self.attributes = { auth_token_type => SecurityTokenizer.new_token(t) }
   end
 
   def access_tokens_for_application(i)

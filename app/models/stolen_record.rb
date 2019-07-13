@@ -214,7 +214,7 @@ class StolenRecord < ActiveRecord::Base
 
   def find_or_create_recovery_link_token
     return recovery_link_token if recovery_link_token.present?
-    update_attributes(recovery_link_token: AuthTokenizer.new_token)
+    update_attributes(recovery_link_token: SecurityTokenizer.new_token)
     recovery_link_token
   end
 end
