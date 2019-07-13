@@ -134,7 +134,6 @@ RSpec.describe SessionsController, type: :controller do
           expect(flash[:error]).to be_present
           expect(response).to redirect_to new_user_path
           expect(ActionMailer::Base.deliveries.count).to eq 0
-          expect(user.reload.magic_link_token).to be_nil
         end
       end
     end

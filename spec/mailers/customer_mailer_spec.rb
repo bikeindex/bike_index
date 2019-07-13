@@ -41,6 +41,16 @@ RSpec.describe CustomerMailer, type: :mailer do
     end
   end
 
+  describe "magic_login_link_email" do
+    it "renders email" do
+      user.update_auth_token("password_reset_token")
+      mail = CustomerMailer.password_reset_email(user)
+      expect(mail.subject).to eq("Instructions to reset your password")
+      expect(mail.from).to eq(["contact@bikeindex.org"])
+      expect(mail.body.encoded).to match(user.password_reset_token)
+    end
+  end
+
   describe "additional_email_confirmation" do
     let(:user_email) { FactoryBot.create(:user_email) }
     it "renders email" do

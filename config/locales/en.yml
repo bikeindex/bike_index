@@ -693,6 +693,7 @@ en:
       get_on_bike_index: Get on Bike Index
       sign_in_using_facebook: Sign in using Facebook
       sign_in_using_strava: Sign in using Strava
+      sign_in_using_magic_link: Emailed sign in link
       or: Or
       log_in: Log in
       no_bike_index_account: no Bike Index account?
