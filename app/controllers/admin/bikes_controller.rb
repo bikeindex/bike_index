@@ -2,6 +2,7 @@ class Admin::BikesController < Admin::BaseController
   include SortableTable
   before_filter :find_bike, only: [:edit, :destroy, :update, :get_destroy]
   before_action :set_period, only: [:index]
+  layout "new_admin"
 
   def index
     @page = params[:page] || 1
