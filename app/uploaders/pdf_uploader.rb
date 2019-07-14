@@ -1,6 +1,7 @@
 # encoding: utf-8
 
 class PdfUploader < CarrierWave::Uploader::Base
+  include ::CarrierWave::Backgrounder::Delay
   include CarrierWave::MimeTypes
 
   process :set_content_type
