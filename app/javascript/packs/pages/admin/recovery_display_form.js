@@ -17,8 +17,9 @@ function BinxAdminRecoveryDisplayForm() {
           $("#recovery-bike-image-text").removeClass("bike-image-added");
         } else {
           $("#recovery-photo-upload-input").collapse("hide");
-          const dataUrl = $("#use_image_for_display").attr("data-url");
-          $("#recovery_display_remote_image_url").val(dataUrl);
+          $("#recovery_display_remote_image_url").val(
+            $("#use_image_for_display").attr("data-url")
+          );
           $("#recovery-bike-image-text").addClass("bike-image-added");
         }
       });
