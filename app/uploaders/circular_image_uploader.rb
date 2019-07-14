@@ -2,7 +2,6 @@
 
 class CircularImageUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
-  include ::CarrierWave::Backgrounder::Delay
 
   if Rails.env.production?
     storage :fog

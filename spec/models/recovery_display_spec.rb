@@ -8,6 +8,13 @@ RSpec.describe RecoveryDisplay, type: :model do
       expect(recovery_display.stolen_record).to be_present
     end
   end
+
+  describe "image_exists?" do
+    it "is false by default" do
+      expect(RecoveryDisplay.new.image_exists?).to be_falsey
+    end
+  end
+
   describe "set_time" do
     it "sets time from input" do
       recovery_display = RecoveryDisplay.new(date_input: "04-27-1999")

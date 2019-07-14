@@ -3,7 +3,6 @@ class Bike < ActiveRecord::Base
   include ActiveModel::Dirty
   include BikeSearchable
   mount_uploader :pdf, PdfUploader
-  process_in_background :pdf, CarrierWaveProcessWorker
 
   belongs_to :manufacturer
   belongs_to :primary_frame_color, class_name: "Color"
