@@ -11,19 +11,16 @@ function BinxAdminRecoveryDisplayForm() {
     useBikeImageForDisplay() {
       $("#use_image_for_display").on("click", e => {
         e.preventDefault();
-        const $image_btn = $("#use_image_for_display");
-        if ($image_btn.hasClass("using_bikes")) {
-          $("#recovery-photo-upload-input").slideDown();
+        if ($("#recovery-bike-image-text").hasClass("bike-image-added")) {
+          $("#recovery-photo-upload-input").collapse("show");
           $("#recovery_display_remote_image_url").val("");
-          $image_btn.text("Use first image");
+          $("#recovery-bike-image-text").removeClass("bike-image-added");
         } else {
-          $("#recovery-photo-upload-input").slideUp();
-          $("#recovery_display_remote_image_url").val(
-            $image_btn.attr("data-url")
-          );
-          $image_btn.text("nvrmind");
+          $("#recovery-photo-upload-input").collapse("hide");
+          const dataUrl = $("#use_image_for_display").attr("data-url");
+          $("#recovery_display_remote_image_url").val(dataUrl);
+          $("#recovery-bike-image-text").addClass("bike-image-added");
         }
-        $image_btn.toggleClass("using_bikes");
       });
     },
 

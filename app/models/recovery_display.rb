@@ -33,6 +33,10 @@ class RecoveryDisplay < ActiveRecord::Base
     self.quote_by = sr.bike.current_ownership && sr.bike.owner && sr.bike.owner.name
   end
 
+  def image_exists?
+    image.present? && image.file.exists?
+  end
+
   def bike
     return nil unless stolen_record_id.present?
     StolenRecord.unscoped.find(stolen_record_id).bike
