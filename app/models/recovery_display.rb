@@ -1,7 +1,6 @@
 class RecoveryDisplay < ActiveRecord::Base
   validates_presence_of :quote, :date_recovered
   mount_uploader :image, CircularImageUploader
-  process_in_background :image, CarrierWaveProcessWorker
   belongs_to :stolen_record
 
   default_scope { order("date_recovered desc") }
@@ -32,6 +31,10 @@ class RecoveryDisplay < ActiveRecord::Base
     self.date_recovered = sr.date_recovered
     self.quote = sr.recovered_description
     self.quote_by = sr.bike.current_ownership && sr.bike.owner && sr.bike.owner.name
+  end
+
+  def image_exists?
+    image.present? && image.file.exists?
   end
 
   def bike

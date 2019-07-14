@@ -54,8 +54,7 @@
         %span#characterTotal
 
     .col-lg-6
-      #recovery-photo-upload-input
-        .form-group.mt-4
+      #recovery-photo-upload-input.form-group.mt-4.collapse.show
         = f.label :image, "Recovery photo"
         - if @recovery_display.image?
           = image_tag(@recovery_display.image_url(:thumb))
@@ -66,28 +65,33 @@
           .custom-file
             = f.label :image, "Choose file", class: "custom-file-label"
             = f.file_field :image, class: "custom-file-input"
-      .form-group.avatar-upload
-        .avatar-img
-          - if @bike.present? && @recovery_display.image.blank?
-            - if @bike.public_images.present? || @bike.stock_photo_url.present?
-              - if @bike.public_images.present?
-                - text = "has image"
-                - url = @bike.public_images.first.image_url
-              - else
-                - text = "has stock image"
-                - url = @bike.stock_photo_url
-              %label
-                #{link_to "Bike", bike_url(@bike), target: "_blank"} #{text}
-              %a.btn.btn-outline-success#use_image_for_display{ href: '#', data: {url: url}}
-                Use first image
-            - else
-              Bike has no image
+      - if @bike.present? && !@recovery_display.image_exists?
+        .form-group.mt-3
+          - if @bike.public_images.present? || @bike.stock_photo_url.present?
+            - bike_image_url = @bike.public_images.present? ? @bike.public_images.first.image_url : @bike.stock_photo_url
+            = f.hidden_field :remote_image_url
+            %p#recovery-bike-image-text
+              %span.using-bike-image
+                Using #{@bike.type} image
+              %span.not-using-bike-image
+                = @bike.type.titleize
+                - if @bike.public_images.present?
+                  has image
+                - else
+                  has stock image
+              %a.btn.btn-outline-success#use_image_for_display{ href: '#', data: { url: bike_image_url } }
+                %span.not-using-bike-image
+                  Use first image
+                %span.using-bike-image
+                  nvrmind, upload an image
+          - else
+            Bike has no image
+
   - if @recovery_display.image.present?
     .row.mb-4.mt-4
       .col-lg-6
         .form-check
           = f.check_box :remove_image, class: "form-check-input"
           = f.label :remove_image, class: "form-check-label"
-          = f.hidden_field :remote_image_url
   .mt-4.mb-4.text-right
     = f.submit "Save", class: 'btn btn-success'

@@ -162,3 +162,17 @@
 .admin-filter-menu {
   float: right;
 }
+
+#recovery-bike-image-text {
+  .using-bike-image {
+    display: none;
+  }
+  &.bike-image-added {
+    .using-bike-image {
+      display: inline-block;
+    }
+    .not-using-bike-image {
+      display: none;
+    }
+  }
+}
