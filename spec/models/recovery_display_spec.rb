@@ -9,9 +9,21 @@ RSpec.describe RecoveryDisplay, type: :model do
     end
   end
 
-  describe "image_exists?" do
+  describe "image_exists? and image_processing" do
+    let(:recovery_display) { RecoveryDisplay.new }
     it "is false by default" do
-      expect(RecoveryDisplay.new.image_exists?).to be_falsey
+      expect(recovery_display.image_exists?).to be_falsey
+      expect(recovery_display.image_processing?).to be_falsey
+    end
+    context "with image present" do
+      let(:image) { File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")) }
+      let(:recovery_display) { RecoveryDisplay.new(updated_at: Time.current, image: image) }
+      it "processing is true if recently updated" do
+        expect(recovery_display.image_exists?).to be_falsey
+        expect(recovery_display.image_processing?).to be_truthy
+        recovery_display.updated_at = Time.now - 2.minutes
+        expect(recorery_display.image_processing?).to be_falsey
+      end
     end
   end
 
