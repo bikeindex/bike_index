@@ -100,7 +100,7 @@ Bikeindex::Application.routes.draw do
       get "confirm" # Get because needs to be called from a link in an email
       get "request_password_reset"
       post "password_reset"
-      get "password_reset"
+      get "password_reset", as: :password_reset_form
       get "update_password"
       get "globalid"
     end
