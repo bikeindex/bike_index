@@ -484,6 +484,68 @@ en:
       sign_up_now: Sign Up Now
       try_for_free: Try For Free
       year: year
+    ambassadors_current:
+      current_ambassadors: Current Ambassadors
+      the_heroes_of_bikedom: The heroes of bikedom
+      join_their_ranks: Join their ranks
+      steve_piercy: Steve Piercy
+      why_bike_index: Why Bike Index?
+      bike_index_helps_people_recover_their_sto: Bike Index helps people recover their stolen bikes, educates on the prevention of theft, and builds a community through its website.  And it's a non-profit organization that released its software as open source.
+      steve_piercys_ambassadorship_is_sponsored_html: <em>Steve Piercy's</em> ambassadorship is sponsored by <strong>%{sponsor_link}</strong>.
+      gears: GEARs
+      bike_index_allows_us_to_verify_details_ab: Bike Index allows us to verify details about the bike, theft details, police file number and contact info for the owner. We can also share the registry directly to Law Enforcement to expedite the recovery process.
+      bike_index_helped_me_recover_my_beloved_b: Bike Index helped me recover my beloved bicycle. I’m now committed to paying forward my good fortune by helping to promote Bike Index in my community.
+      educating_kids_about_how_to_lock_their_bi: Educating kids about how to lock their bikes and register them is an important part of growing bike commuters!
+      i_believe_community_involvement_makes_a_d: I believe community involvement makes a difference in crime and Bike Index is the easiest way to get involved and actually make a difference
+      bike_index_provides_ease_of_use_and_secur: Bike Index provides ease of use and security of mind. The simplicity of design makes it effective.
+      if_a_person_loses_their_bike_there_is_suc: If a person loses their bike there is such a feeling of loss but when its recovered there is such a feeling of renewal and restoration. That is the reason I promote Bike Index
+      as_the_founder_of_bicycle_security_adviso: As the founder of Bicycle Security Advisors — who’s mission is to provide communities with the best information on how to keep bikes safely parked and protected from theft — Bike Index is unequivocally the most effective registry you can use.
+      bike_index_isnt_the_only_internet_bike_re: Bike Index isn't the only internet bike registry, but it's the only one that works and I firmly believe it's a direct result of how it was designed.
+      after_a_couple_of_recoveries_i_got_hooked: After a couple of recoveries, I got hooked. It was so nice to be able to return some of these bikes to people who really love them.
+      your_name_here: Your Name Here
+      anytown_earth: Anytown, earth
+      whats_your_story: What's your story?
+      become_a_bike_index_ambassador_and_help_s: Become a Bike Index Ambassador and help stolen bikes find their way home
+    ambassadors_how_to:
+      become_a_bike_index_ambassador: Become a Bike Index Ambassador
+      want_to_help_fight_bike_theft_in_your_com: Want to help fight bike theft in your community?
+      start_here: Start here!
+      why_work_with_bike_index: Why Work with Bike Index
+      bike_index_is_a_nonprofit_with_a_big_miss: 'Bike Index is a nonprofit with a big mission: register every bicycle out there, and recover every bike that gets stolen. That’s why we need your help. We’re a national registry but you know your cycling communities best.'
+      anyone_can_help_bike_index_we_are_always_: |
+        Anyone can help Bike Index. We are always in need of donations,
+        connections to local bike shops and other organizations, and shares on
+        social media. But maybe you know of a great shop or a budding advocacy
+        group in your town that would love to register bikes for their users and
+        constituents. Or maybe your local police department is looking to
+        upgrade their registry. (Or maybe they don’t even have one yet).
+      you_bring_the_ideas_make_the_connections_: You bring the ideas, make the connections, and we’ll make sure you have the resources to get stuff done.
+      apply_to_be_an_ambassador_here: Apply to be an ambassador here
+      how_it_works: How it works
+      we_provide_you_with_the_resources_to_make: 'We provide you with the resources to make Bike Index a reality in your community. Each level of ambassadorship receives:'
+      access_to_ambassadors_slack_channel_for_s: Access to ambassadors slack channel for sharing ideas, tips, and success stories among the Bike Index team and other ambassadors around the country and world
+      a_basic_package_of_materials_including_a_: A basic package of materials including a Bike Index cycling cap and stickers
+      give_you_shoutouts_on_social_media: Give you shoutouts on social media
+      to_become_a_bike_index_ambassador_fill_ou: To become a Bike Index Ambassador, fill out the application above. If we approve your application - and why wouldn’t we?! - Then, all you need to do is connect us with your local cycling organizations. No organization is off the table, so be creative.
+      typical_ambassador_activities_include: 'Typical ambassador activities include:'
+      monitoring_online_sales_platforms_like_cr: Monitoring online sales platforms like Craigslist and Offerup for suspicious bikes, and checking to see if those bikes are listed as stolen on Bike Index.
+      share_bike_index_on_social_channels_inclu: Share Bike Index on social channels - including Facebook cycling groups in your area.
+      follow_bike_index_on_twitter_facebook_and: Follow Bike Index on twitter, facebook, and instagram so we can follow you back!
+      get_bike_shops_signed_up_for_bike_index_u: Get bike shops signed up for Bike Index using one of our
+      pos_integrations: POS integrations
+      connect_us_with_city_officials_law_enforc: Connect us with city officials, law enforcement and local universities interested in using Bike Index as the area’s official registration system
+      join_our_list_of_ambassadors_and_advocate: Join our list of ambassadors and advocates. It’s easy. We’re a growing nonprofit with a mission to register and recovery bikes. Join us today.
+      check_out_our_media_resources: Check out our media resources
+      here: here.
+      relevant_articles: 'Relevant articles:'
+      9_steps_for_getting_your_stolen_bike_back: 9 steps for getting your stolen bike back
+      bike_index_launches_new_ambassador_progra: Bike Index launches new ambassador program
+      be_a_bike_saver: Be a bike saver
+      view_current_ambassadors: View current ambassadors
+      apply_today: Apply Today
+      become_an_ambassador: Become an ambassador
+      typical_ambassador_activities: Typical ambassador activities
+      current_ambassadors: Current ambassadors
   plan_features:
     supporting_our_nonprofit: Supporting our nonprofit
     create_organization_account: Create organization account and contact registrants
