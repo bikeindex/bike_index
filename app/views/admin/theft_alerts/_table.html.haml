@@ -65,7 +65,15 @@
             %small.convertTime= l(theft_alert.begin_at, format: :convert_time) if theft_alert.begin_at.present?
           %td
             %small.convertTime= l(theft_alert.end_at, format: :convert_time) if theft_alert.end_at.present?
-          %td= theft_alert.city
+          %td
+            = theft_alert.city
+            - if theft_alert.state.present?
+              %small.less-strong
+                = theft_alert.state.abbreviation
+            - elsif theft_alert.country != Country.united_states
+              %small.less-strong
+                = theft_alert.country.name
+
           %td
             %small
               = theft_alert.notes
