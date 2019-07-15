@@ -5,103 +5,74 @@
     .container
       .row
         .icon-wrapper
-          = render "/landing_pages/icons/header_#{landing_page_target}_svg"
+          = render "landing_pages/icons/header_#{landing_page_target}_svg"
         .banner-text
-          %h1
-            Bike Index for Bike Shops
-          %h3
-            Unite against bike theft and protect your customers' bikes before
-            they're even out there.
-          %h3
-            Do right by your customers in just 5 clicks.
+          %h1= t(".bike_index_for_bike_shops")
+          %h3= t(".bikes_before_they")
+          %h3= t(".do_right_by_your_customers")
 
     .ribbon.mobile-contact-link
       .container
         %h2
           = link_to bike_shop_packages_path, class: "btn btn-primary btn-lg" do
-            Features &amp; Pricing
+            = t(".features_and_pricing")
             %span.chevron &raquo;
 
   .container
     .row.main-body-row
       .landing-why-col
-        %h3
-          Register bikes for your customers
+        %h3= t(".register_bikes_for_your_customers")
+        %p= t(".for_completely_free_we_provide_you_with_t")
+        %p= t(".build_goodwill_with_your_customers_with_a")
 
         %p
-          For completely free we provide you with the tools needed to
-          automatically register each bike you sell in Bike Index through your
-          POS. All it takes is a few minutes of setup, either with your Ascend
-          or Lightspeed Retail account.
-
-        %p
-          Build goodwill with your customers with a service you can offer at no
-          cost. Recover a stolen bike, and you'll have a customer for life.
-
-        %p
-          Join our #{link_to "network of shop partners", "http://bikeindex.org/where"}.
-
-          Sign up for a free Bike Index account for your shop
-          #{link_to "here", "https://bikeindex.org/organizations/new"}.
-
-          Once you do this, link your account to your Lightspeed or register
-          bikes in Bike Index through Ascend.
+          - network_link = link_to t(".network_of_shop_partners"), where_path
+          = t(".join_our_network_link_html", network_link: network_link)
+          - new_org_link = link_to t(".here"), new_organization_path
+          = t(".sign_up_for_a_free_bike_index_account_html", new_org_link: new_org_link)
+          = t(".once_you_do_this_link_your_account_to_you")
 
           = image_tag "ascend-logo.png", class: "landing-lightspeed-logo", alt: "Ascend logo"
           = image_tag "lightspeed_logo.png", class: "landing-lightspeed-logo", alt: "Lightspeed logo"
 
-        %h3
-          Use Lightspeed Retail?
+        %h3= t(".use_lightspeed_retail")
+        %p= t(".our_official_lightspeed_integration_provi")
 
         %p
-          Our official Lightspeed integration provides entirely automated
-          registration for every bike you sell. All you have to do is make sure
-          you input the serial number and take the customer's email.
+          = link_to t(".learn_more"), lightspeed_path
+          = t(".or")
+          = link_to t(".connect_your_lightspeed_account"), lightspeed_interface_path
+
+        %h3= t(".ascend_retail")
 
         %p
-          = link_to "Learn more", "https://bikeindex.org/lightspeed"
-          or
-          = link_to "connect your Lightspeed account", "https://bikeindex.org/lightspeed_interface"
+          - ascend_link = link_to t(".here"), ascend_path
+          = t(".connect_your_ascend_account_html", ascend_link: ascend_link)
 
-        %h3
-          Ascend Retail
+        %p= render partial: "landing_pages/tweet", locals: { tweet_id: 840324239425073152 }
 
         %p
-          Connect your Ascend account and your Bike Index shop account. Each
-          night, Ascend will export the bikes you've sold, and we'll import them
-          into Bike Index for your customers. Other than setup, you're done!
-          Learn more about the Ascend integration
-          #{link_to "here", "https://bikeindex.org/ascend"}.
+          - printed_materials_link = link_to t(".printed_materials"), "https://bikeindex.myshopify.com/"
+          = t(".dont_use_ascend_or_lightspeed_html", printed_materials: printed_materials_link)
 
-        %p
-          = render partial: "/landing_pages/tweet", locals: { tweet_id: 840324239425073152 }
-
-        %p
-          Don't use Ascend or Lightspeed POS? Ask us about
-          #{link_to "printed materials", "https://bikeindex.myshopify.com/"}.
-
-        %h4 Related articles:
+        %h4= t(".related_articles")
         %ul
           %li
-            = link_to "Driving service revenues with bicycle registration",
-            "https://bikeindex.org/news/driving-service-revenues-with-bicycle-registration"
+            = link_to t(".driving_service_revenues_with_bicycle_reg"), news_path("driving-service-revenues-with-bicycle-registration")
           %li
-            = link_to "5 ways to grow community for your bike shop",
-            "https://bikeindex.org/news/5-ways-to-grow-community-for-your-bike-shop"
+            = link_to t(".5_ways_to_grow_community_for_your_bike_sh"), news_path("5-ways-to-grow-community-for-your-bike-shop")
 
         .trusted-by.hidden-lg-up
-          %h3
-            Trusted by bike shops everywhere
+          %h3= t(".trusted_by_bike_shops_everywhere")
           = image_tag "landing_pages/logos/bike_shops.png", alt: "bike shop partners"
 
       .next-steps-col
         .next-steps-wrap
           %header
-            Used at bike shops everywhere
+            = t(".used_at_bike_shops_everywhere")
             = link_to bike_shop_packages_path, class: "btn btn-primary btn-lg" do
-              Features &amp; Pricing
+              = t(".features_and_pricing")
               %span.chevron &raquo;
           .trusted-by
-            .header
-              Trusted by bike shops everywhere
+            .header= t(".trusted_by_bike_shops_everywhere")
             = image_tag "landing_pages/logos/bike_shops.png", alt: "bike shop partners"
