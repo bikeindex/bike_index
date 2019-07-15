@@ -16,13 +16,14 @@ RSpec.describe RecoveryDisplay, type: :model do
       expect(recovery_display.image_processing?).to be_falsey
     end
     context "with image present" do
-      let(:image) { File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg")) }
-      let(:recovery_display) { RecoveryDisplay.new(updated_at: Time.current, image: image) }
+      let(:recovery_display) { RecoveryDisplay.new(updated_at: Time.current) }
       it "processing is true if recently updated" do
+        # Sort of hacky, but gets us something
+        allow(recovery_display).to receive(:image) { OpenStruct.new(file: OpenStruct.new("exists?" => false)) }
         expect(recovery_display.image_exists?).to be_falsey
         expect(recovery_display.image_processing?).to be_truthy
         recovery_display.updated_at = Time.now - 2.minutes
-        expect(recorery_display.image_processing?).to be_falsey
+        expect(recovery_display.image_processing?).to be_falsey
       end
     end
   end
