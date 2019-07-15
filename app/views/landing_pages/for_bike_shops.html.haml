@@ -1,0 +1,78 @@
+- landing_page_target = "bike_shops"
+
+.signup-landing-page.landing-page{ class: "signup-landing-page-#{landing_page_target}" }
+  %header.banner-header
+    .container
+      .row
+        .icon-wrapper
+          = render "landing_pages/icons/header_#{landing_page_target}_svg"
+        .banner-text
+          %h1= t(".bike_index_for_bike_shops")
+          %h3= t(".bikes_before_they")
+          %h3= t(".do_right_by_your_customers")
+
+    .ribbon.mobile-contact-link
+      .container
+        %h2
+          = link_to bike_shop_packages_path, class: "btn btn-primary btn-lg" do
+            = t(".features_and_pricing")
+            %span.chevron &raquo;
+
+  .container
+    .row.main-body-row
+      .landing-why-col
+        %h3= t(".register_bikes_for_your_customers")
+        %p= t(".for_completely_free_we_provide_you_with_t")
+        %p= t(".build_goodwill_with_your_customers_with_a")
+
+        %p
+          - network_link = link_to t(".network_of_shop_partners"), where_path
+          = t(".join_our_network_link_html", network_link: network_link)
+          - new_org_link = link_to t(".here"), new_organization_path
+          = t(".sign_up_for_a_free_bike_index_account_html", new_org_link: new_org_link)
+          = t(".once_you_do_this_link_your_account_to_you")
+
+          = image_tag "ascend-logo.png", class: "landing-lightspeed-logo", alt: "Ascend logo"
+          = image_tag "lightspeed_logo.png", class: "landing-lightspeed-logo", alt: "Lightspeed logo"
+
+        %h3= t(".use_lightspeed_retail")
+        %p= t(".our_official_lightspeed_integration_provi")
+
+        %p
+          = link_to t(".learn_more"), lightspeed_path
+          = t(".or")
+          = link_to t(".connect_your_lightspeed_account"), lightspeed_interface_path
+
+        %h3= t(".ascend_retail")
+
+        %p
+          - ascend_link = link_to t(".here"), ascend_path
+          = t(".connect_your_ascend_account_html", ascend_link: ascend_link)
+
+        %p= render partial: "landing_pages/tweet", locals: { tweet_id: 840324239425073152 }
+
+        %p
+          - printed_materials_link = link_to t(".printed_materials"), "https://bikeindex.myshopify.com/"
+          = t(".dont_use_ascend_or_lightspeed_html", printed_materials: printed_materials_link)
+
+        %h4= t(".related_articles")
+        %ul
+          %li
+            = link_to t(".driving_service_revenues_with_bicycle_reg"), news_path("driving-service-revenues-with-bicycle-registration")
+          %li
+            = link_to t(".5_ways_to_grow_community_for_your_bike_sh"), news_path("5-ways-to-grow-community-for-your-bike-shop")
+
+        .trusted-by.hidden-lg-up
+          %h3= t(".trusted_by_bike_shops_everywhere")
+          = image_tag "landing_pages/logos/bike_shops.png", alt: "bike shop partners"
+
+      .next-steps-col
+        .next-steps-wrap
+          %header
+            = t(".used_at_bike_shops_everywhere")
+            = link_to bike_shop_packages_path, class: "btn btn-primary btn-lg" do
+              = t(".features_and_pricing")
+              %span.chevron &raquo;
+          .trusted-by
+            .header= t(".trusted_by_bike_shops_everywhere")
+            = image_tag "landing_pages/logos/bike_shops.png", alt: "bike shop partners"

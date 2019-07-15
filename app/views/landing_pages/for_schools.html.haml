@@ -1,0 +1,55 @@
+- landing_page_target = "school"
+
+.signup-landing-page.landing-page{ class: "signup-landing-page-#{landing_page_target}" }
+  %header.banner-header
+    .container
+      .row
+        .icon-wrapper
+          = render "landing_pages/icons/header_#{landing_page_target}_svg"
+
+        .banner-text
+          %h1= t(".bike_index_for_universities")
+          %h3= t(".protecting_bikes_on_campus_can_be")
+
+    .ribbon.mobile-contact-link
+      .container
+        %h2
+          = link_to campus_packages_path, class: "btn btn-primary btn-lg" do
+            = t(".features_amp_pricing")
+            %span.chevron &raquo;
+
+  .container
+    .row.main-body-row
+      .landing-why-col
+        %h3= t(".make_bike_registration_better")
+        %p= t(".weve_designed_a_platform")
+        %p= t(".your_students_can_register_their_bikes")
+        %p= render partial: "landing_pages/tweet", locals: { tweet_id: 863853852658761729 }
+
+        %h3= t(".how_it_works")
+        %p= t(".bike_index_users_provide")
+        %p= t(".read_about_our_html", count: number_with_delimiter(Counts.recoveries))
+
+        %h4= t(".related_articles")
+        %ul
+          %li
+            = link_to t(".universities_should_use_bike_index_as_the"), news_path("universities-should-use-bike-index-as-their-registration-system-of-cho")
+          %li
+            = link_to t(".university_of_pittsburgh_partners_with_bi"), news_path("university-of-pittsburgh-partners-with-bike-index-to-protect-campus-bi")
+
+        .trusted-by.hidden-lg-up
+          %h3
+            = t(".trusted_by_top_universities")
+          = image_tag "landing_pages/logos/universities.png", alt: "university partners"
+
+      .next-steps-col
+        .next-steps-wrap
+          %header
+            = t(".keep_campus_bikes_in_order")
+            = link_to campus_packages_path, class: "btn btn-primary btn-lg" do
+              = t(".features_amp_pricing")
+              %span.chevron &raquo;
+          .trusted-by
+            .header
+              = t(".trusted_by_top_universities")
+            = image_tag "landing_pages/logos/universities.png", alt: "university partners"

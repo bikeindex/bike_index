@@ -1,0 +1,113 @@
+- landing_page_target = "ambassadors-how-to"
+
+.signup-landing-page.landing-page{ class: "signup-landing-page-#{landing_page_target}" }
+  %header.banner-header
+    .container
+      .row
+        .icon-wrapper
+          = render "landing_pages/icons/header_ambassadors_svg"
+
+        .banner-text
+          %h1= t(".become_a_bike_index_ambassador")
+          %h2
+            = t(".want_to_help_fight_bike_theft_in_your_com")
+            %br
+            = t(".start_here")
+
+    .ribbon
+      .container
+        .noribbon
+
+  .container
+    .row.main-body-row
+      .landing-why-col
+        %h3#ambassadors_why= t(".why_work_with_bike_index")
+        %p
+          = t(".bike_index_is_a_nonprofit_with_a_big_miss")
+
+        %p
+          = t(".anyone_can_help_bike_index_we_are_always_")
+
+        %p.mb-4
+          = t(".you_bring_the_ideas_make_the_connections_")
+
+        = link_to t(".apply_to_be_an_ambassador_here"), new_ambassador_path, class: "btn btn-primary"
+
+        = image_tag 'landing_pages/ambassador_1.jpg', alt: 'A Bike Index Ambassador', class: "mt-4"
+
+        %h3#ambassadors_how= t(".how_it_works")
+
+        %p
+          = t(".we_provide_you_with_the_resources_to_make")
+        %ul
+          %li
+            = t(".access_to_ambassadors_slack_channel_for_s")
+          %li
+            = t(".a_basic_package_of_materials_including_a_")
+          %li
+            = t(".give_you_shoutouts_on_social_media")
+
+        %p
+          = t(".to_become_a_bike_index_ambassador_fill_ou")
+
+        %h3#ambassador_activities
+          = t(".typical_ambassador_activities_include")
+
+        %ul
+          %li
+            = t(".monitoring_online_sales_platforms_like_cr")
+          %li
+            = t(".share_bike_index_on_social_channels_inclu")
+          %li
+            = t(".follow_bike_index_on_twitter_facebook_and")
+          %li
+            = t(".get_bike_shops_signed_up_for_bike_index_u")
+            = link_to t(".pos_integrations"), for_shops_path
+          %li
+            = t(".connect_us_with_city_officials_law_enforc")
+
+        %p
+          = t(".join_our_list_of_ambassadors_and_advocate")
+
+        %p
+          = t(".check_out_our_media_resources")
+          = link_to t(".here"), resources_path
+        %p
+          = t(".relevant_articles")
+        %p
+          = link_to t(".9_steps_for_getting_your_stolen_bike_back"),
+            news_path("9-steps-for-getting-your-stolen-bike-back")
+        %p
+          = link_to t(".bike_index_launches_new_ambassador_progra"),
+            news_path("bike-index-launches-ambassadors-program")
+        %p
+          = link_to t(".be_a_bike_saver"),
+            news_path("be-a-bike-saver---donate-to-bike-index-on-giving-tuesday")
+
+        %h3#current_ambassadors
+          =link_to t(".view_current_ambassadors"), ambassadors_current_path
+
+        .mobile-contact-link
+          %a.btn.btn-primary.btn-lg{ href: new_ambassador_path }
+            = t(".apply_today")
+
+      .next-steps-col
+        .next-steps-wrap
+          .trusted-by
+            %h3
+              = t(".become_an_ambassador")
+            %ul
+              %li
+                %a{ href: '#ambassadors_why', class: 'scroll-to-ref', data: { offset: -80 } }
+                  = t(".why_work_with_bike_index")
+              %li
+                %a{ href: '#ambassadors_how', class: 'scroll-to-ref', data: { offset: -80 } }
+                  = t(".how_it_works")
+              %li
+                %a{ href: '#ambassador_activities', class: 'scroll-to-ref', data: { offset: -80 } }
+                  = t(".typical_ambassador_activities")
+              %li
+                %a{ href: ambassadors_current_path }
+                  = t(".current_ambassadors")
+          %a.btn.btn-primary.btn-lg{ href: 'https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform' }
+            = t(".apply_today")

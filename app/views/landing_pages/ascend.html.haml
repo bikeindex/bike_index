@@ -1,0 +1,32 @@
+- landing_page_target = 'ascend'
+.signup-landing-page{ class: "signup-landing-page-#{landing_page_target}" }
+
+  .container
+    .row.main-body-row
+      .landing-why-col.ascend-how
+        .ascend-image
+          = render "landing_pages/icons/header_#{landing_page_target}_svg"
+
+        %h1= t(".automatic_bicycle_registration")
+        %h3= t(".link_your_ascend_retail_and_bike_index")
+
+        %p= t(".we_have_a_new_free_bicycle_registration")
+        %p= t(".if_your_shop_uses_lightspeed_html", lightspeed_path: lightspeed_path)
+        %p= t(".once_youve_set_up_the_trek_ascenwd")
+        %p= t(".then_if_a_customers_bike_goes_missing_html", privacy_path: privacy_path)
+        %p
+          %strong
+
+        %ol
+          %li
+            - new_org_link = link_to t(".new_bike_shop_org"), new_organization_path
+            = t(".sign_up_as_a_new_org_html", new_org_link: new_org_link)
+          %li
+            - ascend_link = link_to t(".ascend_knowledge_base_article"), "https://ascendrms.uservoice.com/knowledgebase/articles/1904050"
+            = t(".follow_the_setup_instructions_html", ascend_link: ascend_link)
+
+          %li
+            = t(".email_us_the_password_to_finish_setting_u")
+        %p
+          - shops_email_link = link_to "bikeshops@bikeindex.org", "mailto:bikeshops@bikeindex.org"
+          = t(".email_shops_html", shops_email_link: shops_email_link)
