@@ -31,13 +31,13 @@
 
       POST #{ENV['BASE_URL']}/oauth/token?grant_type=refresh_token&client_id=<app_id>&refresh_token=<refresh_token>
 
-  in ruby, using the OAuth2 library: 
+  in ruby, using the OAuth2 library:
 
       client = OAuth2::Client.new('app_id', 'app_secret', site: "#{ENV['BASE_URL']}")
       puts client.auth_code.authorize_url(:redirect_uri => 'urn:ietf:wg:oauth:2.0:oob')
       # Vist the URL that is printed out and authenticate.
       # You will be sent to a page that shows you the access code, (because the redirect_uri is the one used for testing).
-      
+
       token = client.auth_code.get_token(code, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob')
       # Where "code" is the code from the page after authentication
       # Bike Index tokens expire in 1 hour - (but that is subject to change without notice)
@@ -49,8 +49,8 @@
       token.expired?
       # => true
 
-      # And you can refresh your token with 
+      # And you can refresh your token with
       new_token = token.refresh!
 
-  
+
   You will get a refresh token back when you create a token. As long as you have that token, you can create a new token when your existing token has expired.
