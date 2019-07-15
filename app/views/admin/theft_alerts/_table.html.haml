@@ -70,7 +70,7 @@
             - if theft_alert.state.present?
               %small.less-strong
                 = theft_alert.state.abbreviation
-            - elsif theft_alert.country != Country.united_states
+            - elsif theft_alert.country.present? && theft_alert.country != Country.united_states
               %small.less-strong
                 = theft_alert.country.name
 
