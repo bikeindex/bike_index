@@ -324,7 +324,7 @@ RSpec.describe User, type: :model do
     context "password_reset_token" do
       it "gets long time ago if not there" do
         user = User.new(password_reset_token: "c7c3b99a319ac09e2b0080a8s89asd89afsd6734n")
-        expect(user.auth_token_time("password_reset_token")).to eq(Time.at(1364777722))
+        expect(user.auth_token_time("password_reset_token")).to eq(Time.at(SecurityTokenizer::EARLIEST_TOKEN_TIME))
       end
       it "gets the time" do
         user = FactoryBot.create(:user)
@@ -344,7 +344,7 @@ RSpec.describe User, type: :model do
     context "magic_link_token" do
       it "gets long time ago if not there" do
         user = User.new(magic_link_token: "c7c3b99a319ac09e2b00-89121981231231331212")
-        expect(user.auth_token_time("magic_link_token")).to eq(Time.at(1364777722))
+        expect(user.auth_token_time("magic_link_token")).to eq(Time.at(SecurityTokenizer::EARLIEST_TOKEN_TIME))
       end
       it "gets the time" do
         user = User.new
