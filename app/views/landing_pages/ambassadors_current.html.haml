@@ -5,10 +5,10 @@
         .icon-wrapper
           = render "/landing_pages/icons/header_ambassadors_svg"
       .row
-        %h1 Current Ambassadors
-        %h3 The heroes of bikedom
+        %h1= t(".current_ambassadors")
+        %h3= t(".the_heroes_of_bikedom")
         %a.btn.btn-primary.btn-lg{ href: new_ambassador_path }
-          Join their ranks
+          = t(".join_their_ranks")
 
     .ribbon
       .container
@@ -20,21 +20,21 @@
       .col-md-3.col-xs-6
         = image_tag 'landing_pages/ambassadors/Steve-Piercy.jpg', alt: 'Steve Piercy'
         %h2
-          Steve Piercy
+          = t(".steve_piercy")
         %h3
           Eugene, OR
         %h4
-          Why Bike Index?
+          = t(".why_bike_index")
         %p
-          Bike Index helps people recover their stolen bikes, educates on the prevention of theft, and builds a community through its website.  And it's a non-profit organization that released its software as open source.
+          = t(".bike_index_helps_people_recover_their_sto")
       .col-md-3.col-xs-6
         .sponsored-by-block
           %p
             %em
-              Steve Piercy's
-            ambassadorship is sponsored by
+              = t(".steve_piercys")
+            = t(".ambassadorship_is_sponsored_by")
             %strong
-              = link_to "GEARs", "https://eugenegears.org/"
+              = link_to t(".gears"), "https://eugenegears.org/"
           = link_to image_tag('landing_pages/ambassadors/sponsor-GEARs.png', alt: 'Greater Eugene Area Riders', class: "no-clip"), "https://eugenegears.org/"
 
       .col-md-3.col-xs-6
@@ -44,9 +44,9 @@
         %h3
           Edmonton, Alberta
         %h4
-          Why Bike Index?
+          = t(".why_bike_index")
         %p
-          Bike Index allows us to verify details about the bike, theft details, police file number and contact info for the owner. We can also share the registry directly to Law Enforcement to expedite the recovery process.
+          = t(".bike_index_allows_us_to_verify_details_ab")
       .col-md-3.col-xs-6
         = image_tag 'landing_pages/ambassadors/Greg-Finnin.jpg', alt: 'Greg Finnin'
         %h2
@@ -54,9 +54,9 @@
         %h3
           Culver City, CA
         %h4
-          Why Bike Index?
+          = t(".why_bike_index")
         %p
-          Bike Index helped me recover my beloved bicycle. I’m now committed to paying forward my good fortune by helping to promote Bike Index in my community.
+          = t(".bike_index_helped_me_recover_my_beloved_b")
       .col-md-3.col-xs-6
         = image_tag 'landing_pages/ambassadors/Michelle-Farris.jpg', alt: 'Michelle Farris'
         %h2
@@ -64,9 +64,9 @@
         %h3
           Seattle, WA
         %h4
-          Why Bike Index?
+          = t(".why_bike_index")
         %p
-          Educating kids about how to lock their bikes and register them is an important part of growing bike commuters!
+          = t(".educating_kids_about_how_to_lock_their_bi")
       .col-md-3.col-xs-6
         = image_tag 'landing_pages/ambassadors/Jason-Cawood.jpg', alt: 'Jason Cawood'
         %h2
@@ -74,19 +74,19 @@
         %h3
           Troutdale, OR
         %h4
-          Why Bike Index?
+          = t(".why_bike_index")
         %p
-          I believe community involvement makes a difference in crime and Bike Index is the easiest way to get involved and actually make a difference
+          = t(".i_believe_community_involvement_makes_a_d")
       .col-md-3.col-xs-6
         = image_tag 'landing_pages/ambassadors/David-Saunders.jpg', alt: 'David Saunders'
         %h2
-          David Saunders
+          = t(".david_saunders")
         %h3
           Buffalo-Niagara, NY
         %h4
-          Why Bike Index?
+          = t(".why_bike_index")
         %p
-          Bike Index provides ease of use and security of mind. The simplicity of design makes it effective.
+          = t(".bike_index_provides_ease_of_use_and_secur")
 
       .col-md-3.col-xs-6
         = image_tag 'landing_pages/ambassadors/Larry-Hager.jpg', alt: 'Larry Hager'
@@ -95,9 +95,9 @@
         %h3
           Leduc, AB, Canada
         %h4
-          Why Bike Index?
+          = t(".why_bike_index")
         %p
-          If a person loses their bike there is such a feeling of loss but when its recovered there is such a feeling of renewal and restoration. That is the reason I promote Bike Index
+          = t(".if_a_person_loses_their_bike_there_is_suc")
     .row
       .col-md-3.col-xs-6
         = image_tag 'landing_pages/ambassadors/Brock-Howell.jpg', alt: 'Brock Howell'
@@ -106,9 +106,9 @@
         %h3
           Seattle, WA
         %h4
-          Why Bike Index?
+          = t(".why_bike_index")
         %p
-          As the founder of Bicycle Security Advisors&mdash;who’s mission is to provide communities with the best information on how to keep bikes safely parked and protected from theft&mdash;Bike Index is unequivocally the most effective registry you can use.
+          = t(".as_the_founder_of_bicycle_security_adviso")
       .col-md-3.col-xs-6
         = image_tag 'landing_pages/ambassadors/Chris-Olin.jpg', alt: 'Chris Olin'
         %h2
@@ -116,9 +116,9 @@
         %h3
           Rochester, NY
         %h4
-          Why Bike Index?
+          = t(".why_bike_index")
         %p
-          Bike Index isn't the only internet bike registry, but it's the only one that works and I firmly believe it's a direct result of how it was designed.
+          = t(".bike_index_isnt_the_only_internet_bike_re")
       .col-md-3.col-xs-6
         = image_tag 'landing_pages/ambassadors/Dirk-Degroot.jpg', alt: 'Dirk Degroot'
         %h2
@@ -126,17 +126,17 @@
         %h3
           Seattle, WA
         %h4
-          Why Bike Index?
+          = t(".why_bike_index")
         %p
-          After a couple of recoveries, I got hooked. It was so nice to be able to return some of these bikes to people who really love them.
+          = t(".after_a_couple_of_recoveries_i_got_hooked")
 
       .col-md-3.col-xs-6
         = image_tag 'landing_pages/ambassadors/placeholder.png', alt: 'This could be you!'
         %h2
-          Your Name Here
+          = t(".your_name_here")
         %h3
-          Anytown, earth
+          = t(".anytown_earth")
         %h4
-          What's your story?
+          = t(".whats_your_story")
         %p
-          Become a Bike Index Ambassador and help stolen bikes find their way home
+          = t(".become_a_bike_index_ambassador_and_help_s")
