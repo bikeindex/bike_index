@@ -31,7 +31,7 @@
     .col-sm-4#multipleEmailInviteField{ class: display_multi_invite ? "" : "currently-hidden" }
       = text_area_tag :multiple_emails_invited,
         params[:multiple_emails_invited],
-        placeholder: t(".example_emails"),
+        placeholder: "email1@gmail.com\nemail2@gmail.com\nemail3@gmail.com",
         rows: 4,
         class: "form-control"
 

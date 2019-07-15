@@ -1155,7 +1155,6 @@ en:
         1_email_per_line: 1 email per line
         membership: Membership
         user: user
-        example_emails: example@example.com\nexample2@example.com\nexample3@example.com
         membership_type: Membership type
         admin_of_organization: Admin of organization
         member_of_organization: Member of organization
