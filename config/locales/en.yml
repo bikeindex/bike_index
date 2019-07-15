@@ -333,6 +333,833 @@ en:
         restrict_dependent_destroy:
           has_one: Cannot delete record because a dependent %{record} exists
           has_many: Cannot delete record because dependent %{record} exist
+    models:
+      ad: Ad  #g
+      ambassador: Ambassador  #g
+      ambassador_task: Ambassador task  #g
+      ambassador_task_assignment: Ambassador task assignment  #g
+      b_param: B param  #g
+      bike: Bike  #g
+      bike_code: Bike code  #g
+      bike_code_batch: Bike code batch  #g
+      bike_organization: Bike organization  #g
+      blog: Blog  #g
+      bulk_import: Bulk import  #g
+      cgroup: Cgroup  #g
+      color: Color  #g
+      component: Component  #g
+      country: Country  #g
+      creation_state: Creation state  #g
+      ctype: Ctype  #g
+      customer_contact: Customer contact  #g
+      doorkeeper/access_grant: Doorkeeper/access grant  #g
+      doorkeeper/access_token: Doorkeeper/access token  #g
+      doorkeeper/application: Doorkeeper/application  #g
+      duplicate_bike_group: Duplicate bike group  #g
+      export: Export  #g
+      feedback: Feedback  #g
+      flipper/adapters/active_record/feature: Flipper/adapters/active record/feature  #g
+      flipper/adapters/active_record/gate: Flipper/adapters/active record/gate  #g
+      front_gear_type: Front gear type  #g
+      integration: Integration  #g
+      invoice: Invoice  #g
+      invoice_paid_feature: Invoice paid feature  #g
+      listicle: Listicle  #g
+      location: Location  #g
+      lock: Lock  #g
+      lock_type: Lock type  #g
+      mail_snippet: Mail snippet  #g
+      manufacturer: Manufacturer  #g
+      membership: Membership  #g
+      normalized_serial_segment: Normalized serial segment  #g
+      organization: Organization  #g
+      organization_message: Organization message  #g
+      other_listing: Other listing  #g
+      ownership: Ownership  #g
+      paid_feature: Paid feature  #g
+      paint: Paint  #g
+      payment: Payment  #g
+      public_image: Public image  #g
+      rear_gear_type: Rear gear type  #g
+      recovery_display: Recovery display  #g
+      state: State  #g
+      stolen_notification: Stolen notification  #g
+      stolen_record: Stolen record  #g
+      theft_alert: Theft alert  #g
+      theft_alert_plan: Theft alert plan  #g
+      tweet: Tweet  #g
+      user: User  #g
+      user_email: User email  #g
+      wheel_size: Wheel size  #g
+
+    attributes:
+      ad:
+        body: Body  #g
+        image: Image  #g
+        live: Live  #g
+        organization: :activerecord.models.organization  #g
+        target_url: Target url  #g
+        title: Title  #g
+
+      ambassador:
+        ambassador_task_assignments: Ambassador task assignments  #g
+        ambassador_tasks: Ambassador tasks  #g
+        auth_token: Auth token  #g
+        avatar: Avatar  #g
+        banned: Banned  #g
+        can_send_many_stolen_notifications: Can send many stolen notifications  #g
+        city: City  #g
+        confirmation_token: Confirmation token  #g
+        confirmed: Confirmed  #g
+        country: :activerecord.models.country  #g
+        created_bikes: Created bikes  #g
+        created_ownerships: Created ownerships  #g
+        creation_states: Creation states  #g
+        current_ownerships: Current ownerships  #g
+        currently_owned_bikes: Currently owned bikes  #g
+        description: Description  #g
+        developer: Developer  #g
+        email: Email  #g
+        integrations: Integrations  #g
+        last_login_at: Last login at  #g
+        last_login_ip: Last login ip  #g
+        latitude: Latitude  #g
+        locks: Locks  #g
+        longitude: Longitude  #g
+        magic_link_token: Magic link token  #g
+        memberships: Memberships  #g
+        my_bikes_hash: My bikes hash  #g
+        name: Name  #g
+        notification_newsletters: Notification newsletters  #g
+        notification_unstolen: Notification unstolen  #g
+        oauth_applications: Oauth applications  #g
+        organization_embeds: Organization embeds  #g
+        organizations: Organizations  #g
+        owned_bikes: Owned bikes  #g
+        ownerships: Ownerships  #g
+        partner_data: Partner data  #g
+        password: Password  #g
+        password_digest: Password digest  #g
+        password_reset_token: Password reset token  #g
+        payments: Payments  #g
+        phone: Phone  #g
+        preferred_language: Preferred language  #g
+        received_stolen_notifications: Received stolen notifications  #g
+        sent_memberships: Sent memberships  #g
+        sent_stolen_notifications: Sent stolen notifications  #g
+        show_bikes: Show bikes  #g
+        show_phone: Show phone  #g
+        show_twitter: Show twitter  #g
+        show_website: Show website  #g
+        state: :activerecord.models.state  #g
+        street: Street  #g
+        subscriptions: Subscriptions  #g
+        superuser: Superuser  #g
+        terms_of_service: Terms of service  #g
+        title: Title  #g
+        twitter: Twitter  #g
+        user_emails: User emails  #g
+        username: Username  #g
+        vendor_terms_of_service: Vendor terms of service  #g
+        website: Website  #g
+        when_vendor_terms_of_service: When vendor terms of service  #g
+        zipcode: Zipcode  #g
+
+      ambassador_task:
+        ambassador_task_assignments: Ambassador task assignments  #g
+        ambassadors: Ambassadors  #g
+        description: Description  #g
+        title: Title  #g
+
+      ambassador_task_assignment:
+        ambassador: :activerecord.models.ambassador  #g
+        ambassador_task: :activerecord.models.ambassador_task  #g
+        completed_at: Completed at  #g
+
+      b_param:
+        bike_errors: Bike errors  #g
+        bike_title: Bike title  #g
+        created_bike: :activerecord.models.created_bike  #g
+        creator: :activerecord.models.creator  #g
+        email: Email  #g
+        id_token: Id token  #g
+        image: Image  #g
+        image_processed: Image processed  #g
+        image_tmp: Image tmp  #g
+        old_params: Old params  #g
+        organization: :activerecord.models.organization  #g
+        origin: Origin  #g
+        params: Params  #g
+
+      bike:
+        additional_registration: Additional registration  #g
+        all_description: All description  #g
+        approved_stolen: Approved stolen  #g
+        b_params: B params  #g
+        belt_drive: Belt drive  #g
+        bike_codes: Bike codes  #g
+        bike_organizations: Bike organizations  #g
+        cached_data: Cached data  #g
+        can_edit_claimed_bike_organizations: Can edit claimed bike organizations  #g
+        can_edit_claimed_organizations: Can edit claimed organizations  #g
+        coaster_brake: Coaster brake  #g
+        components: Components  #g
+        creation_organization: :activerecord.models.creation_organization  #g
+        creation_states: Creation states  #g
+        creator: :activerecord.models.creator  #g
+        current_stolen_record: :activerecord.models.current_stolen_record  #g
+        cycle_type: Cycle type  #g
+        description: Description  #g
+        duplicate_bike_groups: Duplicate bike groups  #g
+        example: Example  #g
+        frame_material: Frame material  #g
+        frame_model: Frame model  #g
+        frame_size: Frame size  #g
+        frame_size_number: Frame size number  #g
+        frame_size_unit: Frame size unit  #g
+        front_gear_type: :activerecord.models.front_gear_type  #g
+        front_tire_narrow: Front tire narrow  #g
+        front_wheel_size: :activerecord.models.front_wheel_size  #g
+        handlebar_type: Handlebar type  #g
+        handlebar_type_other: Handlebar type other  #g
+        hidden: Hidden  #g
+        invoice: :activerecord.models.invoice  #g
+        is_for_sale: Is for sale  #g
+        listing_order: Listing order  #g
+        location: :activerecord.models.location  #g
+        made_without_serial: Made without serial  #g
+        manufacturer: :activerecord.models.manufacturer  #g
+        manufacturer_other: Manufacturer other  #g
+        mnfg_name: Mnfg name  #g
+        name: Name  #g
+        normalized_serial_segments: Normalized serial segments  #g
+        number_of_seats: Number of seats  #g
+        organizations: Organizations  #g
+        other_listings: Other listings  #g
+        owner_email: Owner email  #g
+        ownerships: Ownerships  #g
+        paint: :activerecord.models.paint  #g
+        pdf: Pdf  #g
+        primary_frame_color: :activerecord.models.primary_frame_color  #g
+        propulsion_type: Propulsion type  #g
+        propulsion_type_other: Propulsion type other  #g
+        public_images: Public images  #g
+        rear_gear_type: :activerecord.models.rear_gear_type  #g
+        rear_tire_narrow: Rear tire narrow  #g
+        rear_wheel_size: :activerecord.models.rear_wheel_size  #g
+        recovered: Recovered  #g
+        recovered_records: Recovered records  #g
+        registered_new: Registered new  #g
+        secondary_frame_color: :activerecord.models.secondary_frame_color  #g
+        serial_normalized: Serial normalized  #g
+        serial_number: Serial number  #g
+        stock_photo_url: Stock photo url  #g
+        stolen: Stolen  #g
+        stolen_lat: Stolen lat  #g
+        stolen_long: Stolen long  #g
+        stolen_notifications: Stolen notifications  #g
+        stolen_records: Stolen records  #g
+        tertiary_frame_color: :activerecord.models.tertiary_frame_color  #g
+        thumb_path: Thumb path  #g
+        updator: :activerecord.models.updator  #g
+        video_embed: Video embed  #g
+        year: Year  #g
+        zipcode: Zipcode  #g
+
+      bike_code:
+        bike: :activerecord.models.bike  #g
+        bike_code_batch: :activerecord.models.bike_code_batch  #g
+        claimed_at: Claimed at  #g
+        code: Code  #g
+        code_integer: Code integer  #g
+        code_prefix: Code prefix  #g
+        kind: Kind  #g
+        organization: :activerecord.models.organization  #g
+        user: :activerecord.models.user  #g
+
+      bike_code_batch:
+        bike_codes: Bike codes  #g
+        code_number_length: Code number length  #g
+        notes: Notes  #g
+        organization: :activerecord.models.organization  #g
+        user: :activerecord.models.user  #g
+
+      bike_organization:
+        bike: :activerecord.models.bike  #g
+        can_not_edit_claimed: Can not edit claimed  #g
+        deleted_at: Deleted at  #g
+        organization: :activerecord.models.organization  #g
+
+      blog:
+        body: Body  #g
+        body_abbr: Body abbr  #g
+        description_abbr: Description abbr  #g
+        index_image: Index image  #g
+        index_image_lg: Index image lg  #g
+        is_listicle: Is listicle  #g
+        listicles: Listicles  #g
+        old_title_slug: Old title slug  #g
+        public_images: Public images  #g
+        published: Published  #g
+        published_at: Published at  #g
+        tags: Tags  #g
+        title: Title  #g
+        title_slug: Title slug  #g
+        user: :activerecord.models.user  #g
+
+      bulk_import:
+        bikes: Bikes  #g
+        creation_states: Creation states  #g
+        file: File  #g
+        import_errors: Import errors  #g
+        is_ascend: Is ascend  #g
+        no_notify: No notify  #g
+        organization: :activerecord.models.organization  #g
+        progress: Progress  #g
+        user: :activerecord.models.user  #g
+
+      cgroup:
+        ctypes: Ctypes  #g
+        description: Description  #g
+        name: Name  #g
+        slug: Slug  #g
+
+      color:
+        bikes: Bikes  #g
+        display: Display  #g
+        name: Name  #g
+        paints: Paints  #g
+        priority: Priority  #g
+
+      component:
+        bike: :activerecord.models.bike  #g
+        cmodel_name: Cmodel name  #g
+        ctype: :activerecord.models.ctype  #g
+        ctype_other: Ctype other  #g
+        description: Description  #g
+        front: Front  #g
+        is_stock: Is stock  #g
+        manufacturer: :activerecord.models.manufacturer  #g
+        manufacturer_other: Manufacturer other  #g
+        rear: Rear  #g
+        serial_number: Serial number  #g
+        year: Year  #g
+
+      country:
+        iso: Iso  #g
+        locations: Locations  #g
+        name: Name  #g
+        stolen_records: Stolen records  #g
+
+      creation_state:
+        bike: :activerecord.models.bike  #g
+        bulk_import: :activerecord.models.bulk_import  #g
+        creator: :activerecord.models.creator  #g
+        is_bulk: Is bulk  #g
+        is_new: Is new  #g
+        is_pos: Is pos  #g
+        organization: :activerecord.models.organization  #g
+        origin: Origin  #g
+        pos_kind: Pos kind  #g
+
+      ctype:
+        cgroup: :activerecord.models.cgroup  #g
+        components: Components  #g
+        has_multiple: Has multiple  #g
+        image: Image  #g
+        name: Name  #g
+        secondary_name: Secondary name  #g
+        slug: Slug  #g
+
+      customer_contact:
+        bike: :activerecord.models.bike  #g
+        body: Body  #g
+        contact_type: Contact type  #g
+        creator: :activerecord.models.creator  #g
+        creator_email: Creator email  #g
+        info_hash: Info hash  #g
+        title: Title  #g
+        user: :activerecord.models.user  #g
+        user_email: User email  #g
+
+      doorkeeper/access_grant:
+        application: :activerecord.models.application  #g
+        expires_in: Expires in  #g
+        redirect_uri: Redirect uri  #g
+        revoked_at: Revoked at  #g
+        scopes: Scopes  #g
+        token: Token  #g
+
+      doorkeeper/access_token:
+        application: :activerecord.models.application  #g
+        expires_in: Expires in  #g
+        refresh_token: Refresh token  #g
+        revoked_at: Revoked at  #g
+        scopes: Scopes  #g
+        token: Token  #g
+
+      doorkeeper/application:
+        access_grants: Access grants  #g
+        access_tokens: Access tokens  #g
+        authorized_applications: Authorized applications  #g
+        authorized_tokens: Authorized tokens  #g
+        can_send_stolen_notifications: Can send stolen notifications  #g
+        is_internal: Is internal  #g
+        name: Name  #g
+        owner: :activerecord.models.owner  #g
+        owner_type: Owner type  #g
+        redirect_uri: Redirect URI  #g
+        scopes: Scopes  #g
+        secret: Secret  #g
+        uid: Uid  #g
+
+      duplicate_bike_group:
+        added_bike_at: Added bike at  #g
+        bikes: Bikes  #g
+        ignore: Ignore  #g
+        normalized_serial_segments: Normalized serial segments  #g
+
+      export:
+        file: File  #g
+        file_format: File format  #g
+        kind: Kind  #g
+        options: Options  #g
+        organization: :activerecord.models.organization  #g
+        progress: Progress  #g
+        rows: Rows  #g
+        user: :activerecord.models.user  #g
+
+      feedback:
+        body: Body  #g
+        email: Email  #g
+        feedback_hash: Feedback hash  #g
+        feedback_type: Feedback type  #g
+        name: Name  #g
+        title: Title  #g
+        user: :activerecord.models.user  #g
+
+      flipper/adapters/active_record/feature:
+        key: Key  #g
+
+      flipper/adapters/active_record/gate:
+        feature_key: Feature key  #g
+        key: Key  #g
+        value: Value  #g
+
+      front_gear_type:
+        bikes: Bikes  #g
+        count: Count  #g
+        internal: Internal  #g
+        name: Name  #g
+        slug: Slug  #g
+        standard: Standard  #g
+
+      integration:
+        access_token: Access token  #g
+        information: Information  #g
+        provider_name: Provider name  #g
+        user: :activerecord.models.user  #g
+
+      invoice:
+        amount_due_cents: Amount due cents  #g
+        amount_paid_cents: Amount paid cents  #g
+        first_invoice: :activerecord.models.first_invoice  #g
+        force_active: Force active  #g
+        invoice_paid_features: Invoice paid features  #g
+        is_active: Is active  #g
+        notes: Notes  #g
+        organization: :activerecord.models.organization  #g
+        paid_features: Paid features  #g
+        payments: Payments  #g
+        subscription_end_at: Subscription end at  #g
+        subscription_start_at: Subscription start at  #g
+
+      invoice_paid_feature:
+        invoice: :activerecord.models.invoice  #g
+        paid_feature: :activerecord.models.paid_feature  #g
+
+      listicle:
+        blog: :activerecord.models.blog  #g
+        body: Body  #g
+        body_html: Body html  #g
+        crop_top_offset: Crop top offset  #g
+        image: Image  #g
+        image_credits: Image credits  #g
+        image_credits_html: Image credits html  #g
+        image_height: Image height  #g
+        image_width: Image width  #g
+        list_order: List order  #g
+        title: Title  #g
+
+      location:
+        bikes: Bikes  #g
+        city: City  #g
+        country: :activerecord.models.country  #g
+        deleted_at: Deleted at  #g
+        email: Email  #g
+        latitude: Latitude  #g
+        longitude: Longitude  #g
+        name: Name  #g
+        organization: :activerecord.models.organization  #g
+        phone: Phone  #g
+        shown: Shown  #g
+        state: :activerecord.models.state  #g
+        street: Street  #g
+        zipcode: Zipcode  #g
+
+      lock:
+        combination: Combination  #g
+        has_combination: Has combination  #g
+        has_key: Has key  #g
+        key_serial: Key serial  #g
+        lock_model: Lock model  #g
+        lock_type: :activerecord.models.lock_type  #g
+        manufacturer: :activerecord.models.manufacturer  #g
+        manufacturer_other: Manufacturer other  #g
+        notes: Notes  #g
+        user: :activerecord.models.user  #g
+
+      lock_type:
+        name: Name  #g
+        slug: Slug  #g
+
+      mail_snippet:
+        address: Address  #g
+        body: Body  #g
+        is_enabled: Is enabled  #g
+        is_location_triggered: Is location triggered  #g
+        kind: Kind  #g
+        latitude: Latitude  #g
+        longitude: Longitude  #g
+        name: Name  #g
+        organization: :activerecord.models.organization  #g
+        proximity_radius: Proximity radius  #g
+        public_images: Public images  #g
+
+      manufacturer:
+        bikes: Bikes  #g
+        close_year: Close year  #g
+        components: Components  #g
+        description: Description  #g
+        frame_maker: Frame maker  #g
+        locks: Locks  #g
+        logo: Logo  #g
+        logo_source: Logo source  #g
+        name: Name  #g
+        notes: Notes  #g
+        open_year: Open year  #g
+        paints: Paints  #g
+        slug: Slug  #g
+        total_years_active: Total years active  #g
+        website: Website  #g
+
+      membership:
+        claimed_at: Claimed at  #g
+        deleted_at: Deleted at  #g
+        email_invitation_sent_at: Email invitation sent at  #g
+        invited_email: Invited email  #g
+        organization: :activerecord.models.organization  #g
+        role: Role  #g
+        sender: :activerecord.models.sender  #g
+        user: :activerecord.models.user  #g
+
+      normalized_serial_segment:
+        bike: :activerecord.models.bike  #g
+        duplicate_bike_group: :activerecord.models.duplicate_bike_group  #g
+        segment: Segment  #g
+
+      organization:
+        access_token: Access token  #g
+        api_access_approved: Api access approved  #g
+        approved: Approved  #g
+        ascend_name: Ascend name  #g
+        auto_user: :activerecord.models.auto_user  #g
+        avatar: Avatar  #g
+        b_params: B params  #g
+        bike_codes: Bike codes  #g
+        bike_organizations: Bike organizations  #g
+        bikes: Bikes  #g
+        child_organizations: Child organizations  #g
+        created_bikes: Created bikes  #g
+        creation_states: Creation states  #g
+        deleted_at: Deleted at  #g
+        invoices: Invoices  #g
+        is_paid: Is paid  #g
+        is_suspended: Is suspended  #g
+        kind: Kind  #g
+        landing_html: Landing html  #g
+        locations: Locations  #g
+        lock_show_on_map: Lock show on map  #g
+        mail_snippets: Mail snippets  #g
+        memberships: Memberships  #g
+        name: Name  #g
+        organization_messages: Organization messages  #g
+        paid_feature_slugs: Paid feature slugs  #g
+        parent_organization: :activerecord.models.parent_organization  #g
+        payments: Payments  #g
+        pos_kind: Pos kind  #g
+        previous_slug: Previous slug  #g
+        public_images: Public images  #g
+        recovered_records: Recovered records  #g
+        registration_field_labels: Registration field labels  #g
+        short_name: Short name  #g
+        show_on_map: Show on map  #g
+        slug: Slug  #g
+        users: Users  #g
+        website: Website  #g
+
+      organization_message:
+        accuracy: Accuracy  #g
+        address: Address  #g
+        bike: :activerecord.models.bike  #g
+        body: Body  #g
+        delivery_status: Delivery status  #g
+        email: Email  #g
+        kind: Kind  #g
+        latitude: Latitude  #g
+        longitude: Longitude  #g
+        organization: :activerecord.models.organization  #g
+        sender: :activerecord.models.sender  #g
+
+      other_listing:
+        bike: :activerecord.models.bike  #g
+        listing_type: Listing type  #g
+        url: Url  #g
+
+      ownership:
+        bike: :activerecord.models.bike  #g
+        claimed: Claimed  #g
+        creator: :activerecord.models.creator  #g
+        current: Current  #g
+        example: Example  #g
+        owner_email: Owner email  #g
+        send_email: Send email  #g
+        user: :activerecord.models.user  #g
+        user_hidden: User hidden  #g
+
+      paid_feature:
+        amount_cents: Amount cents  #g
+        description: Description  #g
+        details_link: Details link  #g
+        feature_slugs: Feature slugs  #g
+        invoice_paid_features: Invoice paid features  #g
+        invoices: Invoices  #g
+        kind: Kind  #g
+        name: Name  #g
+
+      paint:
+        bikes: Bikes  #g
+        color: :activerecord.models.color  #g
+        manufacturer: :activerecord.models.manufacturer  #g
+        name: Name  #g
+        secondary_color: :activerecord.models.secondary_color  #g
+        tertiary_color: :activerecord.models.tertiary_color  #g
+
+      payment:
+        amount_cents: Amount cents  #g
+        email: Email  #g
+        first_payment_date: First payment date  #g
+        invoice: :activerecord.models.invoice  #g
+        is_current: Is current  #g
+        is_payment: Is payment  #g
+        is_recurring: Is recurring  #g
+        kind: Kind  #g
+        last_payment_date: Last payment date  #g
+        organization: :activerecord.models.organization  #g
+        theft_alert: :activerecord.models.theft_alert  #g
+        user: :activerecord.models.user  #g
+
+      public_image:
+        external_image_url: External image url  #g
+        image: Image  #g
+        imageable: :activerecord.models.imageable  #g
+        imageable_type: Imageable type  #g
+        is_private: Is private  #g
+        listing_order: Listing order  #g
+        name: Name  #g
+
+      rear_gear_type:
+        bikes: Bikes  #g
+        count: Count  #g
+        internal: Internal  #g
+        name: Name  #g
+        slug: Slug  #g
+        standard: Standard  #g
+
+      recovery_display:
+        date_recovered: Date recovered  #g
+        image: Image  #g
+        link: Link  #g
+        quote: Quote  #g
+        quote_by: Quote by  #g
+        stolen_record: :activerecord.models.stolen_record  #g
+
+      state:
+        abbreviation: Abbreviation  #g
+        country: :activerecord.models.country  #g
+        locations: Locations  #g
+        name: Name  #g
+        stolen_records: Stolen records  #g
+
+      stolen_notification:
+        bike: :activerecord.models.bike  #g
+        message: Message  #g
+        receiver: :activerecord.models.receiver  #g
+        receiver_email: Receiver email  #g
+        reference_url: Reference url  #g
+        send_dates: Send dates  #g
+        sender: :activerecord.models.sender  #g
+        subject: Subject  #g
+
+      stolen_record:
+        approved: Approved  #g
+        bike: :activerecord.models.bike  #g
+        can_share_recovery: Can share recovery  #g
+        city: City  #g
+        country: :activerecord.models.country  #g
+        create_open311: Create open311  #g
+        creation_organization: :activerecord.models.creation_organization  #g
+        current: Current  #g
+        current_bike: :activerecord.models.current_bike  #g
+        date_recovered: Date recovered  #g
+        date_stolen: Date stolen  #g
+        estimated_value: Estimated value  #g
+        index_helped_recovery: Index helped recovery  #g
+        latitude: Latitude  #g
+        lock_defeat_description: Lock defeat description  #g
+        locking_description: Locking description  #g
+        longitude: Longitude  #g
+        phone: Phone  #g
+        phone_for_everyone: Phone for everyone  #g
+        phone_for_police: Phone for police  #g
+        phone_for_shops: Phone for shops  #g
+        phone_for_users: Phone for users  #g
+        police_report_department: Police report department  #g
+        police_report_number: Police report number  #g
+        proof_of_ownership: Proof of ownership  #g
+        receive_notifications: Receive notifications  #g
+        recovered_description: Recovered description  #g
+        recovering_user: :activerecord.models.recovering_user  #g
+        recovery_display: :activerecord.models.recovery_display  #g
+        recovery_display_status: Recovery display status  #g
+        recovery_link_token: Recovery link token  #g
+        recovery_posted: Recovery posted  #g
+        recovery_share: Recovery share  #g
+        recovery_tweet: Recovery tweet  #g
+        secondary_phone: Secondary phone  #g
+        show_address: Show address  #g
+        state: :activerecord.models.state  #g
+        street: Street  #g
+        theft_alerts: Theft alerts  #g
+        theft_description: Theft description  #g
+        time: Time  #g
+        tsved_at: Tsved at  #g
+        zipcode: Zipcode  #g
+
+      theft_alert:
+        begin_at: Begin at  #g
+        creator: :activerecord.models.creator  #g
+        end_at: End at  #g
+        facebook_post_url: Facebook post url  #g
+        notes: Notes  #g
+        payment: :activerecord.models.payment  #g
+        status: Status  #g
+        stolen_record: :activerecord.models.stolen_record  #g
+        theft_alert_plan: :activerecord.models.theft_alert_plan  #g
+
+      theft_alert_plan:
+        active: Active  #g
+        amount_cents: Amount cents  #g
+        description: Description  #g
+        duration_days: Duration days  #g
+        name: Name  #g
+        stolen_records: Stolen records  #g
+        theft_alerts: Theft alerts  #g
+        views: Views  #g
+
+      tweet:
+        alignment: Alignment  #g
+        body_html: Body html  #g
+        image: Image  #g
+        public_images: Public images  #g
+        twitter_response: Twitter response  #g
+
+      user:
+        ambassador_task_assignments: Ambassador task assignments  #g
+        ambassador_tasks: Ambassador tasks  #g
+        auth_token: Auth token  #g
+        avatar: Avatar  #g
+        banned: Banned  #g
+        can_send_many_stolen_notifications: Can send many stolen notifications  #g
+        city: City  #g
+        confirmation_token: Confirmation token  #g
+        confirmed: Confirmed  #g
+        country: :activerecord.models.country  #g
+        created_bikes: Created bikes  #g
+        created_ownerships: Created ownerships  #g
+        creation_states: Creation states  #g
+        current_ownerships: Current ownerships  #g
+        currently_owned_bikes: Currently owned bikes  #g
+        description: Description  #g
+        developer: Developer  #g
+        email: Email  #g
+        integrations: Integrations  #g
+        last_login_at: Last login at  #g
+        last_login_ip: Last login ip  #g
+        latitude: Latitude  #g
+        locks: Locks  #g
+        longitude: Longitude  #g
+        magic_link_token: Magic link token  #g
+        memberships: Memberships  #g
+        my_bikes_hash: My bikes hash  #g
+        name: Name  #g
+        notification_newsletters: Notification newsletters  #g
+        notification_unstolen: Notification unstolen  #g
+        oauth_applications: Oauth applications  #g
+        organization_embeds: Organization embeds  #g
+        organizations: Organizations  #g
+        owned_bikes: Owned bikes  #g
+        ownerships: Ownerships  #g
+        partner_data: Partner data  #g
+        password: Password  #g
+        password_digest: Password digest  #g
+        password_reset_token: Password reset token  #g
+        payments: Payments  #g
+        phone: Phone  #g
+        preferred_language: Preferred language  #g
+        received_stolen_notifications: Received stolen notifications  #g
+        sent_memberships: Sent memberships  #g
+        sent_stolen_notifications: Sent stolen notifications  #g
+        show_bikes: Show bikes  #g
+        show_phone: Show phone  #g
+        show_twitter: Show twitter  #g
+        show_website: Show website  #g
+        state: :activerecord.models.state  #g
+        street: Street  #g
+        subscriptions: Subscriptions  #g
+        superuser: Superuser  #g
+        terms_of_service: Terms of service  #g
+        title: Title  #g
+        twitter: Twitter  #g
+        user_emails: User emails  #g
+        username: Username  #g
+        vendor_terms_of_service: Vendor terms of service  #g
+        website: Website  #g
+        when_vendor_terms_of_service: When vendor terms of service  #g
+        zipcode: Zipcode  #g
+
+      user_email:
+        confirmation_token: Confirmation token  #g
+        email: Email  #g
+        old_user: :activerecord.models.old_user  #g
+        user: :activerecord.models.user  #g
+
+      wheel_size:
+        bikes: Bikes  #g
+        description: Description  #g
+        iso_bsd: Iso bsd  #g
+        name: Name  #g
+        priority: Priority  #g
   welcome:
     index:
       value_of_bikes_recovered: Over %{value} Worth of Bikes Recovered
