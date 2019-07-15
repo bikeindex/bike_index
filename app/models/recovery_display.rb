@@ -34,6 +34,11 @@ class RecoveryDisplay < ActiveRecord::Base
     self.quote_by = sr.bike.current_ownership && sr.bike.owner && sr.bike.owner.name
   end
 
+  def image_processing?
+    return false unless image.present? && updated_at > Time.current - 1.minute
+    !image_exists?
+  end
+
   def image_exists?
     image.present? && image.file.exists?
   end

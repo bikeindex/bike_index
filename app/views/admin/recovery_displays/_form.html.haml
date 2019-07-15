@@ -65,9 +65,15 @@
           .custom-file
             = f.label :image, "Choose file", class: "custom-file-label"
             = f.file_field :image, class: "custom-file-input"
+        .form-check
+          = f.check_box :remove_image, class: "form-check-input"
+          = f.label :remove_image, class: "form-check-label"
       - if @bike.present? && !@recovery_display.image_exists?
         .form-group.mt-3
           - if @bike.public_images.present? || @bike.stock_photo_url.present?
+            - if @recovery_display.image_processing?
+              %span.text-warning
+                Image is still processing - please check back in a few minutes before reuploading an image
             - bike_image_url = @bike.public_images.present? ? @bike.public_images.first.image_url : @bike.stock_photo_url
             = f.hidden_field :remote_image_url
             %p#recovery-bike-image-text
@@ -87,11 +93,5 @@
           - else
             Bike has no image
 
-  - if @recovery_display.image.present?
-    .row.mb-4.mt-4
-      .col-lg-6
-        .form-check
-          = f.check_box :remove_image, class: "form-check-input"
-          = f.label :remove_image, class: "form-check-label"
   .mt-4.mb-4.text-right
     = f.submit "Save", class: 'btn btn-success'
