@@ -710,6 +710,7 @@ en:
       get_on_bike_index: Get on Bike Index
       sign_in_using_facebook: Sign in using Facebook
       sign_in_using_strava: Sign in using Strava
+      sign_in_using_magic_link: Emailed sign in link
       or: Or
       log_in: Log in
       no_bike_index_account: no Bike Index account?
@@ -719,6 +720,13 @@ en:
       password: password
       keep_me_logged_in: Keep me logged in
       forgot_your_password: Forgot your password?
+    magic_link:
+      sign_in_with_magic_link: Passwordless sign in
+      enter_email_address: Enter your email address, we'll send you an email with a link to log in.
+      your_email_address: your email address
+      get_sign_in_link: Get sign in link
+      unable_to_auth: Unable to authenticate that token
+      reenter_email: Please re-enter your email address to receive a new token
   users:
     edit_password:
       reset_password: Reset password

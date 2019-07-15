@@ -162,19 +162,12 @@ class User < ActiveRecord::Base
     superuser || organizations.any? { |o| o.paid_for?("unstolen_notifications") }
   end
 
-  def reset_token_time
-    t = password_reset_token && password_reset_token.split("-")[0]
-    t = (t.present? && t.to_i > 1427848192) ? t.to_i : 1364777722
-    Time.at(t)
+  def auth_token_time(auth_token_type)
+    SecurityTokenizer.token_time(self[auth_token_type])
   end
 
-  def reset_token_expired?
-    reset_token_time < (Time.current - 1.hours)
-  end
-
-  def set_password_reset_token(t = Time.current.to_i)
-    self.password_reset_token = "#{t}-" + Digest::MD5.hexdigest("#{SecureRandom.hex(10)}-#{DateTime.current}")
-    self.save
+  def auth_token_expired?(auth_token_type)
+    auth_token_time(auth_token_type) < (Time.current - 1.hours)
   end
 
   def accepted_vendor_terms_of_service?
@@ -190,9 +183,16 @@ class User < ActiveRecord::Base
   end
 
   def send_password_reset_email
-    unless reset_token_time > Time.current - 2.minutes
-      set_password_reset_token
+    unless auth_token_time("password_reset_token") > Time.current - 2.minutes
+      update_auth_token("password_reset_token")
       EmailResetPasswordWorker.perform_async(id)
+    end
+  end
+
+  def send_magic_link_email
+    unless auth_token_time("magic_link_token") > Time.current - 1.minutes
+      update_auth_token("magic_link_token")
+      EmailMagicLoginLinkWorker.perform_async(id)
     end
   end
 
@@ -339,10 +339,13 @@ class User < ActiveRecord::Base
     }.as_json
   end
 
-  def generate_auth_token
-    begin
-      self.auth_token = SecureRandom.urlsafe_base64 + "t#{Time.current.to_i}"
-    end while User.where(auth_token: auth_token).exists?
+  def update_auth_token(auth_token_type, time = nil)
+    generate_auth_token(auth_token_type, time)
+    save
+  end
+
+  def generate_auth_token(auth_token_type, time = nil)
+    self.attributes = { auth_token_type => SecurityTokenizer.new_token(time) }
   end
 
   def access_tokens_for_application(i)
@@ -357,10 +360,8 @@ class User < ActiveRecord::Base
       usrname = SecureRandom.urlsafe_base64
     end
     self.username = usrname
-    if !confirmed
-      self.confirmation_token = (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.current.to_s}")
-    end
-    generate_auth_token
+    self.generate_auth_token("confirmation_token") if !confirmed
+    generate_auth_token("auth_token")
     true
   end
 

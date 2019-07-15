@@ -258,17 +258,6 @@ RSpec.describe ApplicationHelper, type: :helper do
         end
       end
     end
-    describe "users controller" do
-      before { allow(view).to receive(:controller_name) { "users" } }
-      %w(request_password_reset).each do |action|
-        context action do
-          it "returns content_skeleton" do
-            allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to eq "content_skeleton"
-          end
-        end
-      end
-    end
     describe "errors controller" do
       before { allow(view).to receive(:controller_name) { "errors" } }
       %w(bad_request not_found unprocessable_entity server_error unauthorized).each do |action|

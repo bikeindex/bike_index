@@ -70,6 +70,17 @@ $sign-in-up-form-bg: $gray-lighter;
       }
     }
 
+    .magic_link-login {
+      @include oauth-login-bar($gray);
+      i {
+        font-size: 1.5em;
+        padding-top: 12px;
+        display: block;
+        line-height: 0;
+        text-align: center;
+      }
+    }
+
     a {
       display: flex;
       flex-wrap: wrap;

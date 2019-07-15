@@ -212,7 +212,7 @@ RSpec.describe User, type: :model do
         expect(User.admin_text_search("econd")).to eq([user])
       end
     end
-    # These specs fail and i don't know why, since they aren't protecting something luser facing I'm commenting them out
+    # These specs fail and i don't know why, since they aren't protecting something user facing I'm commenting them out
     #
     # context "unconfirmed user partial match" do
     #   let!(:user) { FactoryBot.create(:user, email: "sample-stuff@e.us") }
@@ -290,7 +290,7 @@ RSpec.describe User, type: :model do
       expect(user.auth_token).to be_present
       expect(user.username).to be_present
       expect(user.confirmation_token).to be_present
-      time = Time.at(user.auth_token.match(/\d*\z/)[0].to_i)
+      time = Time.at(SecurityTokenizer.token_time(user.auth_token))
       expect(time).to be > Time.current - 1.minutes
     end
     it "haves before create callback" do
@@ -320,21 +320,42 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe "reset_token_time" do
-    it "gets long time ago if not there" do
-      user = User.new
-      allow(user).to receive(:password_reset_token).and_return("c7c3b99a319ac09e2b00-2015-03-31 19:29:52 -0500")
-      expect(user.reset_token_time).to eq(Time.at(1364777722))
+  describe "auth_token_time" do
+    context "password_reset_token" do
+      it "gets long time ago if not there" do
+        user = User.new(password_reset_token: "c7c3b99a319ac09e2b0080a8s89asd89afsd6734n")
+        expect(user.auth_token_time("password_reset_token")).to eq(Time.at(SecurityTokenizer::EARLIEST_TOKEN_TIME))
+      end
+      it "gets the time" do
+        user = FactoryBot.create(:user)
+        expect(user.password_reset_token).to be_blank
+        user.update_auth_token("password_reset_token")
+        user.reload
+        expect(user.password_reset_token).to be_present
+        expect(user.auth_token_time("password_reset_token")).to be > Time.current - 2.seconds
+      end
+      it "uses input time" do
+        user = FactoryBot.create(:user)
+        user.update_auth_token("password_reset_token", (Time.current - 61.minutes).to_i)
+        expect(user.reload.auth_token_time("password_reset_token")).to be < (Time.current - 1.hours)
+      end
     end
-    it "gets the time" do
-      user = User.new
-      user.set_password_reset_token
-      expect(user.reset_token_time).to be > Time.current - 2.seconds
-    end
-    it "uses input time" do
-      user = FactoryBot.create(:user)
-      user.set_password_reset_token((Time.current - 61.minutes).to_i)
-      expect(user.reload.reset_token_time).to be < (Time.current - 1.hours)
+
+    context "magic_link_token" do
+      it "gets long time ago if not there" do
+        user = User.new(magic_link_token: "c7c3b99a319ac09e2b00-89121981231231331212")
+        expect(user.auth_token_time("magic_link_token")).to eq(Time.at(SecurityTokenizer::EARLIEST_TOKEN_TIME))
+      end
+      it "gets the time" do
+        user = User.new
+        user.update_auth_token("magic_link_token")
+        expect(user.auth_token_time("magic_link_token")).to be > Time.current - 2.seconds
+      end
+      it "uses input time" do
+        user = FactoryBot.create(:user)
+        user.update_auth_token("magic_link_token", (Time.current - 61.minutes).to_i)
+        expect(user.reload.auth_token_time("magic_link_token")).to be < (Time.current - 1.hours)
+      end
     end
   end
 
@@ -351,11 +372,57 @@ RSpec.describe User, type: :model do
     it "doesn't send another one immediately" do
       user = FactoryBot.create(:user)
       user.send_password_reset_email
-      expect(user).not_to receive(:set_password_reset_token)
-      user.send_password_reset_email
+      current_token = user.password_reset_token
       expect do
         user.send_password_reset_email
+        user.send_password_reset_email
       end.to change(EmailResetPasswordWorker.jobs, :size).by(0)
+      user.reload
+      expect(user.password_reset_token).to eq current_token
+    end
+  end
+
+  describe "send_magic_link_email" do
+    it "enqueues sending the password reset" do
+      user = FactoryBot.create(:user)
+      expect(user.magic_link_token).to be_nil
+      expect do
+        user.send_magic_link_email
+      end.to change(EmailMagicLoginLinkWorker.jobs, :size).by(1)
+      expect(user.reload.magic_link_token).not_to be_nil
+    end
+
+    it "doesn't send another one immediately (or alter the token)" do
+      user = FactoryBot.create(:user)
+      user.send_magic_link_email
+      token = user.magic_link_token
+      user.send_magic_link_email
+      expect do
+        user.send_magic_link_email
+      end.to change(EmailResetPasswordWorker.jobs, :size).by(0)
+      user.reload
+      expect(user.magic_link_token).to eq token
+    end
+  end
+
+  describe "update_last_sign_in" do
+    let(:user) { FactoryBot.create(:user) }
+    let(:update_time) { Time.current - 3.hours }
+    it "updates the last sign in for the user, regardless of whether there are errors" do
+      user.update_column :updated_at, update_time
+      user.reload
+      expect(user.updated_at).to be_within(1.second).of update_time
+      expect(user.last_login_at).to be_blank
+      expect(user.last_login_ip).to be_blank
+      user.password = nil
+      user.save
+      expect(user.errors).to be_present
+      user.update_last_login("127.0.0.1")
+      expect(user.errors).to be_present
+      user.reload
+      expect(user.last_login_at).to be_present
+      expect(user.last_login_ip).to be_present
+      expect(user.updated_at).to be_within(1.second).of update_time
     end
   end
 
