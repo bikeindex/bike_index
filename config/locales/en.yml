@@ -405,6 +405,48 @@ en:
       tell_us_more_about_yourself: Tell us more about yourself.
       update_your_profile: Update your profile
   landing_pages:
+    for_bike_shops:
+      bike_index_for_bike_shops: Bike Index for Bike Shops
+      bikes_before_they: Unite against bike theft and protect your customers bikes before they're even out there.
+      do_right_by_your_customers: Do right by your customers in just 5 clicks.
+      features_and_pricing: Features & Pricing
+      register_bikes_for_your_customers: Register bikes for your customers
+      for_completely_free_we_provide_you_with_t: For completely free we provide you with the tools needed to automatically register each bike you sell in Bike Index through your POS. All it takes is a few minutes of setup, either with your Ascend or Lightspeed Retail account.
+      build_goodwill_with_your_customers_with_a: Build goodwill with your customers with a service you can offer at no cost. Recover a stolen bike, and you'll have a customer for life.
+      network_of_shop_partners: network of shop partners
+      here: here
+      join_our_network_link_html: Join our %{network_link}.
+      sign_up_for_a_free_bike_index_account_html: Sign up for a free Bike Index account for your shop %{new_org_link}.
+      once_you_do_this_link_your_account_to_you: Once you do this, link your account to your Lightspeed or register bikes in Bike Index through Ascend.
+      use_lightspeed_retail: Use Lightspeed Retail?
+      our_official_lightspeed_integration_provi: Our official Lightspeed integration provides entirely automated registration for every bike you sell. All you have to do is make sure you input the serial number and take the customer's email.
+      learn_more: Learn more
+      printed_materials: printed materials
+      or: or
+      connect_your_lightspeed_account: connect your Lightspeed account
+      ascend_retail: Ascend Retail
+      connect_your_ascend_account_html: Connect your Ascend account and your Bike Index shop account. Each night, Ascend will export the bikes you've sold, and we'll import them into Bike Index for your customers. Other than setup, you're done! Learn more about the Ascend integration %{ascend_link}.
+      dont_use_ascend_or_lightspeed_html: Don't use Ascend or Lightspeed POS? Ask us about %{printed_materials}.
+      related_articles: 'Related articles:'
+      driving_service_revenues_with_bicycle_reg: Driving service revenues with bicycle registration
+      5_ways_to_grow_community_for_your_bike_sh: 5 ways to grow community for your bike shop
+      trusted_by_bike_shops_everywhere: Trusted by bike shops everywhere
+      used_at_bike_shops_everywhere: Used at bike shops everywhere
+    for_cities:
+      bike_index_for_cities: Bike Index for Cities
+      actually_get_people_registered_and_do_it_: Actually get people registered. And do it for cheap.
+      plug_your_city_in_nationally: Plug your city in nationally.
+      features_amp_pricing: Features & Pricing
+      mitigate_the_registration_mess: Mitigate the registration mess
+      no_more_index_cards_or_excel_sheets_give_: No more index cards or excel sheets. Give your citizens the tools to register from a smartphone, in less than two minutes, and use these registrations to recover and return stolen bikes.
+      bring_together_bike_shops_schools_municip: Bring together bike shops, schools, municipal departments, and law enforcement to register bikes in one system. Gone are the days of waiting for people to not come in to register their bikes, or wondering if that other department took care of it. Bike Index consolidates everything in one manageable place.
+      our_community_is_your_community: Our community is your community
+      bike_index_is_the_community_registration_: Bike Index is the community registration system of choice. We are the bike registration system of over 600 organizations - communities in every corner of the country. Join the most widely used bike registration network in the nation.
+      engage_your_residents_and_recover_their_b: Engage your residents and recover their bikes, and they will love you forever.
+      related_articles: 'Related articles:'
+      bike_index_unveils_partnership_with_the_c: Bike Index unveils partnership with the City of Palo Alto
+      trusted_by_law_enforcement_everywhere: Trusted by Law Enforcement everywhere
+      trusted_by_municipalities_everywhere: Trusted by municipalities everywhere
     for_organizations_photo_list:
       for: for
       bike_shops: Bike Shops
@@ -2449,30 +2491,3 @@ en:
       follow_the_setup_instructions_html: Follow the setup instructions on <strong>%{ascend_link}</strong> on Bike Index
       email_us_the_password_to_finish_setting_u: Email us the password to finish setting up!
       email_shops_html: Email %{shops_email_link} if you have any questions. Thank you for registering bikes in Bike Index!
-    for_bike_shops:
-      bike_index_for_bike_shops: Bike Index for Bike Shops
-      bikes_before_they: Unite against bike theft and protect your customers bikes before they're even out there.
-      do_right_by_your_customers: Do right by your customers in just 5 clicks.
-      features_and_pricing: Features & Pricing
-      register_bikes_for_your_customers: Register bikes for your customers
-      for_completely_free_we_provide_you_with_t: For completely free we provide you with the tools needed to automatically register each bike you sell in Bike Index through your POS. All it takes is a few minutes of setup, either with your Ascend or Lightspeed Retail account.
-      build_goodwill_with_your_customers_with_a: Build goodwill with your customers with a service you can offer at no cost. Recover a stolen bike, and you'll have a customer for life.
-      network_of_shop_partners: network of shop partners
-      here: here
-      join_our_network_link_html: Join our %{network_link}.
-      sign_up_for_a_free_bike_index_account_html: Sign up for a free Bike Index account for your shop %{new_org_link}.
-      once_you_do_this_link_your_account_to_you: Once you do this, link your account to your Lightspeed or register bikes in Bike Index through Ascend.
-      use_lightspeed_retail: Use Lightspeed Retail?
-      our_official_lightspeed_integration_provi: Our official Lightspeed integration provides entirely automated registration for every bike you sell. All you have to do is make sure you input the serial number and take the customer's email.
-      learn_more: Learn more
-      printed_materials: printed materials
-      or: or
-      connect_your_lightspeed_account: connect your Lightspeed account
-      ascend_retail: Ascend Retail
-      connect_your_ascend_account_html: Connect your Ascend account and your Bike Index shop account. Each night, Ascend will export the bikes you've sold, and we'll import them into Bike Index for your customers. Other than setup, you're done! Learn more about the Ascend integration %{ascend_link}.
-      dont_use_ascend_or_lightspeed_html: Don't use Ascend or Lightspeed POS? Ask us about %{printed_materials}.
-      related_articles: 'Related articles:'
-      driving_service_revenues_with_bicycle_reg: Driving service revenues with bicycle registration
-      5_ways_to_grow_community_for_your_bike_sh: 5 ways to grow community for your bike shop
-      trusted_by_bike_shops_everywhere: Trusted by bike shops everywhere
-      used_at_bike_shops_everywhere: Used at bike shops everywhere
