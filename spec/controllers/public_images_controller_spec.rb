@@ -27,21 +27,32 @@ RSpec.describe PublicImagesController, type: :controller do
     end
     context "blog" do
       let(:blog) { FactoryBot.create(:blog) }
+      let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/app/assets/images/who/seth-herr.jpg"))) }
       context "admin authorized" do
         it "creates an image" do
           user = FactoryBot.create(:admin)
           set_current_user(user)
-          post :create, blog_id: blog.id, public_image: { name: "cool name" }, format: :js
+          post :create, blog_id: blog.id, public_image: { name: "cool name", image: file }, format: :js
           expect(JSON.parse(response.body)).to be_present
           blog.reload
           expect(blog.public_images.first.name).to eq "cool name"
+        end
+        context "sent from uppy" do
+          it "creates an image" do
+            user = FactoryBot.create(:admin)
+            set_current_user(user)
+            post :create, blog_id: blog.id, upload_plugin: "uppy", name: "cool name", image: file, format: :js
+            expect(JSON.parse(response.body)).to be_present
+            blog.reload
+            expect(blog.public_images.first.name).to eq "cool name"
+          end
         end
         context "blog_id not given" do
           it "creates an image" do
             user = FactoryBot.create(:admin)
             set_current_user(user)
             expect do
-              post :create, blog_id: "", public_image: { name: "cool name" }, format: :js
+              post :create, blog_id: "", public_image: { name: "cool name", image: file }, format: :js
             end.to change(PublicImage, :count).by 1
             expect(JSON.parse(response.body)).to be_present
           end
@@ -51,7 +62,7 @@ RSpec.describe PublicImagesController, type: :controller do
         it "does not create an image" do
           set_current_user(FactoryBot.create(:user_confirmed))
           expect do
-            post :create, blog_id: blog.id, public_image: { name: "cool name" }, format: :js
+            post :create, blog_id: blog.id, public_image: { name: "cool name", image: file }, format: :js
             expect(response.code).to eq("401")
           end.to change(PublicImage, :count).by 0
         end

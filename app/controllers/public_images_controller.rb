@@ -94,9 +94,8 @@ class PublicImagesController < ApplicationController
   end
 
   def permitted_parameters
-    pp params[:file]
     if params[:upload_plugin] == "uppy"
-      pp "I'm hit!"
+      { image: params[:file], name: params[:name] }
     else
       params.require(:public_image).permit(:image, :name, :imageable, :listing_order, :remote_image_url, :is_private)
     end
