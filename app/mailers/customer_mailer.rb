@@ -18,13 +18,13 @@ class CustomerMailer < ActionMailer::Base
 
   def password_reset_email(user)
     @user = user
-    @url = "#{ENV["BASE_URL"]}/users/password_reset?token=#{@user.password_reset_token}"
+    @url = password_reset_url(token: @user.password_reset_token)
     mail(to: @user.email)
   end
 
   def magic_login_link_email(user)
     @user = user
-    @url = "#{ENV["BASE_URL"]}/session/magic_link?token=#{@user.magic_link_token}"
+    @url = magic_link_session_url(token: @user.password_reset_token)
     mail(to: @user.email, subject: "Sign in to Bike Index")
   end
 
