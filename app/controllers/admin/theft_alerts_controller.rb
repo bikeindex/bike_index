@@ -1,4 +1,5 @@
 class Admin::TheftAlertsController < Admin::BaseController
+  include SortableTable
   layout "new_admin"
 
   before_action :find_theft_alert, only: [:edit, :update]
@@ -6,9 +7,8 @@ class Admin::TheftAlertsController < Admin::BaseController
   # TODO: Add sorting and filtering
   def index
     @theft_alerts =
-      TheftAlert
+        matching_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
         .includes(:theft_alert_plan)
-        .creation_ordered_desc
         .page(params.fetch(:page, 1))
         .per(params.fetch(:per_page, 25))
   end
@@ -42,6 +42,14 @@ class Admin::TheftAlertsController < Admin::BaseController
       :status,
       :theft_alert_plan_id
     )
+  end
+
+  def sortable_columns
+    %w[created_at theft_alert_plan_id status begin_at end_at]
+  end
+
+  def matching_theft_alerts
+    TheftAlert
   end
 
   def set_alert_timestamps(theft_alert_attrs)

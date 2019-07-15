@@ -19,6 +19,7 @@ class TheftAlert < ActiveRecord::Base
   scope :creation_ordered_desc, -> { order(created_at: :desc) }
 
   delegate :duration_days, to: :theft_alert_plan
+  delegate :country, :city, :state, :zipcode, :street, to: :stolen_record, allow_nil: true
 
   # Override because of recovered bikes not being in default scope
   def stolen_record

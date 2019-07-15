@@ -5,15 +5,35 @@
   %table.table.table-striped.table-bordered.table-sm
     %thead.small-header
       %tr
-        %th Created
+        %th
+          - if render_sortable
+            = sortable "created_at"
+          - else
+            Created
         - unless skip_bike
           %th Bike
         %th Creator
-        %th Plan
-        %th Status
-        %th Start
-        %th End
-        %th Facebook
+        %th
+          - if render_sortable
+            = sortable "theft_alert_plan_id", "Plan"
+          - else
+            Plan
+        %th
+          - if render_sortable
+            = sortable "status"
+          - else
+            Status
+        %th
+          - if render_sortable
+            = sortable "begin_at", "Start"
+          - else
+            Start
+        %th
+          - if render_sortable
+            = sortable "end_at"
+          - else
+            End
+        %th City
         %th Notes
     %tbody
       - theft_alerts.each do |theft_alert|
@@ -45,8 +65,7 @@
             %small.convertTime= l(theft_alert.begin_at, format: :convert_time) if theft_alert.begin_at.present?
           %td
             %small.convertTime= l(theft_alert.end_at, format: :convert_time) if theft_alert.end_at.present?
-          %td
-            = link_to "fbook link", theft_alert.facebook_post_url, target: "_blank" if theft_alert.facebook_post_url.present?
+          %td= theft_alert.city
           %td
             %small
               = theft_alert.notes
