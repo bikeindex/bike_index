@@ -405,6 +405,19 @@ en:
       tell_us_more_about_yourself: Tell us more about yourself.
       update_your_profile: Update your profile
   landing_pages:
+    ascend:
+      automatic_bicycle_registration: Automatic Bicycle Registration for Bike Shops using Ascend POS
+      link_your_ascend_retail_and_bike_index: Link your Ascend Retail and Bike Index Accounts for free
+      we_have_a_new_free_bicycle_registration: We have a new, free bicycle registration for bike shops. If you’re a shop that uses Ascend as your POS, our new Ascend point of sale integration will allow you to register each bike you sell automatically. Setup takes about 10 minutes.
+      if_your_shop_uses_lightspeed_html: If your shop uses Lightspeed, check out our Lightspeed POS integration <a target="none" href="%{lightspeed_path}">here</a>.
+      once_youve_set_up_the_trek_ascenwd: Once you’ve set up the Trek Ascend POS bicycle registration, you’re done! Each day, Bike Index will pull newly-sold bike information from Ascend to create Bike Index accounts for your customers. Their new bikes will be waiting for them upon login. They just have to check their email, and their new bike will be waiting for them.
+      then_if_a_customers_bike_goes_missing_html: 'Then, if a customer’s bike goes missing, their bike’s information and serial number will be stored for them to access. But don’t worry: <a target="none" href="%{privacy_path}">we will never give out any of your customer data</a>.'
+      new_bike_shop_org: new bike shop organization
+      sign_up_as_a_new_org_html: Sign up as a %{new_org_link} on Bike Index
+      ascend_knowledge_base_article: "Acend's Knowledge base article"
+      follow_the_setup_instructions_html: Follow the setup instructions on <strong>%{ascend_link}</strong> on Bike Index
+      email_us_the_password_to_finish_setting_u: Email us the password to finish setting up!
+      email_shops_html: Email %{shops_email_link} if you have any questions. Thank you for registering bikes in Bike Index!
     for_schools:
       bike_index_for_universities: Bike Index for Universities
       protecting_bikes_on_campus_can_be: Protecting bikes on campus can be a full-time job. Let us help.
@@ -2529,16 +2542,3 @@ en:
       display_widget_html: "%{link} (must be logged in - also, has no usage instructions...)"
       oauth_apps_html: "%{link} (must be logged in)"
       oauth_authorized_apps_html: "%{link} (must be logged in)"
-    ascend:
-      automatic_bicycle_registration: Automatic Bicycle Registration for Bike Shops using Ascend POS
-      link_your_ascend_retail_and_bike_index: Link your Ascend Retail and Bike Index Accounts for free
-      we_have_a_new_free_bicycle_registration: We have a new, free bicycle registration for bike shops. If you’re a shop that uses Ascend as your POS, our new Ascend point of sale integration will allow you to register each bike you sell automatically. Setup takes about 10 minutes.
-      if_your_shop_uses_lightspeed_html: If your shop uses Lightspeed, check out our Lightspeed POS integration <a target="none" href="%{lightspeed_path}">here</a>.
-      once_youve_set_up_the_trek_ascenwd: Once you’ve set up the Trek Ascend POS bicycle registration, you’re done! Each day, Bike Index will pull newly-sold bike information from Ascend to create Bike Index accounts for your customers. Their new bikes will be waiting for them upon login. They just have to check their email, and their new bike will be waiting for them.
-      then_if_a_customers_bike_goes_missing_html: 'Then, if a customer’s bike goes missing, their bike’s information and serial number will be stored for them to access. But don’t worry: <a target="none" href="%{privacy_path}">we will never give out any of your customer data</a>.'
-      new_bike_shop_org: new bike shop organization
-      sign_up_as_a_new_org_html: Sign up as a %{new_org_link} on Bike Index
-      ascend_knowledge_base_article: "Acend's Knowledge base article"
-      follow_the_setup_instructions_html: Follow the setup instructions on <strong>%{ascend_link}</strong> on Bike Index
-      email_us_the_password_to_finish_setting_u: Email us the password to finish setting up!
-      email_shops_html: Email %{shops_email_link} if you have any questions. Thank you for registering bikes in Bike Index!
