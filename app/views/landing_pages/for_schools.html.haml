@@ -5,77 +5,51 @@
     .container
       .row
         .icon-wrapper
-          = render "/landing_pages/icons/header_#{landing_page_target}_svg"
+          = render "landing_pages/icons/header_#{landing_page_target}_svg"
+
         .banner-text
-          %h1 Bike Index for Universities
-          %h3 Protecting bikes on campus can be a full-time job. Let us help.
+          %h1= t(".bike_index_for_universities")
+          %h3= t(".protecting_bikes_on_campus_can_be")
 
     .ribbon.mobile-contact-link
       .container
         %h2
           = link_to campus_packages_path, class: "btn btn-primary btn-lg" do
-            Features &amp; Pricing
+            = t(".features_amp_pricing")
             %span.chevron &raquo;
 
   .container
     .row.main-body-row
       .landing-why-col
-        %h3 Make bike registration better
-        %p
-          We've designed a platform to solve a fundamental barrier in
-          safeguarding bicycles: the lack of a universal bike registry. With our
-          consolidated university registration sites, it's easier for police and
-          transportation departments to search and recover campus bicycles.
+        %h3= t(".make_bike_registration_better")
+        %p= t(".weve_designed_a_platform")
+        %p= t(".your_students_can_register_their_bikes")
+        %p= render partial: "landing_pages/tweet", locals: { tweet_id: 863853852658761729 }
 
-        %p
-          Your students can register their bikes, verify ownership, and alert
-          the community to missing bikes from anywhere. All they need is any
-          smartphone or laptop. You have access to the data behind it all to
-          understand how best to protect bikes on your campus.
+        %h3= t(".how_it_works")
+        %p= t(".bike_index_users_provide")
+        %p= t(".read_about_our_html", count: number_with_delimiter(Counts.recoveries))
 
-        %p
-          = render partial: "/landing_pages/tweet", locals: { tweet_id: 863853852658761729 }
-
-        %h3
-          How it works
-
-        %p
-          Bike Index users provide serial numbers, proof of ownership and
-          identifying information about their bikes. When a bike is reported
-          lost or stolen, our partners can search Bike Index to identify,
-          locate, and track it from any computer or smartphone. Our extensive
-          archive has helped officers recover bikes involved in criminal
-          situations, from simple theft to chop shops, drug houses - even
-          fencing rings and online black markets.
-
-        %p
-          Read about our over #{ number_with_delimiter Counts.recoveries }
-          recoveries on our blog. For a complete list of Bike Index's partners,
-          visit our partners page, and for information on partnering with Bike
-          Index, please contact us.
-
-        %h4 Related articles:
+        %h4= t(".related_articles")
         %ul
           %li
-            = link_to "Universities should use Bike Index as their registration system of choice",
-            "https://bikeindex.org/news/universities-should-use-bike-index-as-their-registration-system-of-cho"
+            = link_to t(".universities_should_use_bike_index_as_the"), news_path("universities-should-use-bike-index-as-their-registration-system-of-cho")
           %li
-            = link_to "University of Pittsburgh partners with Bike Index to protect campus bicycles",
-            "https://bikeindex.org/news/university-of-pittsburgh-partners-with-bike-index-to-protect-campus-bi"
+            = link_to t(".university_of_pittsburgh_partners_with_bi"), news_path("university-of-pittsburgh-partners-with-bike-index-to-protect-campus-bi")
 
         .trusted-by.hidden-lg-up
           %h3
-            Trusted by top universities
+            = t(".trusted_by_top_universities")
           = image_tag "landing_pages/logos/universities.png", alt: "university partners"
 
       .next-steps-col
         .next-steps-wrap
           %header
-            Keep campus bikes in order
+            = t(".keep_campus_bikes_in_order")
             = link_to campus_packages_path, class: "btn btn-primary btn-lg" do
-              Features &amp; Pricing
+              = t(".features_amp_pricing")
               %span.chevron &raquo;
           .trusted-by
             .header
-              Trusted by top universities
+              = t(".trusted_by_top_universities")
             = image_tag "landing_pages/logos/universities.png", alt: "university partners"

@@ -405,6 +405,21 @@ en:
       tell_us_more_about_yourself: Tell us more about yourself.
       update_your_profile: Update your profile
   landing_pages:
+    for_schools:
+      bike_index_for_universities: Bike Index for Universities
+      protecting_bikes_on_campus_can_be: Protecting bikes on campus can be a full-time job. Let us help.
+      features_amp_pricing: Features & Pricing
+      make_bike_registration_better: Make bike registration better
+      weve_designed_a_platform: "We've designed a platform to solve a fundamental barrier in safeguarding bicycles: the lack of a universal bike registry. With our consolidated university registration sites, it's easier for police and transportation departments to search and recover campus bicycles."
+      your_students_can_register_their_bikes: Your students can register their bikes, verify ownership, and alert the community to missing bikes from anywhere. All they need is any smartphone or laptop. You have access to the data behind it all to understand how best to protect bikes on your campus.
+      how_it_works: How it works
+      bike_index_users_provide: Bike Index users provide serial numbers, proof of ownership and identifying information about their bikes. When a bike is reported lost or stolen, our partners can search Bike Index to identify, locate, and track it from any computer or smartphone. Our extensive archive has helped officers recover bikes involved in criminal situations, from simple theft to chop shops, drug houses - even fencing rings and online black markets.
+      read_about_our_html: Read about our over %{count} recoveries on our blog. For a complete list of Bike Index's partners, visit our partners page, and for information on partnering with Bike Index, please contact us.
+      related_articles: 'Related articles:'
+      universities_should_use_bike_index_as_the: Universities should use Bike Index as their registration system of choice
+      university_of_pittsburgh_partners_with_bi: University of Pittsburgh partners with Bike Index to protect campus bicycles
+      trusted_by_top_universities: Trusted by top universities
+      keep_campus_bikes_in_order: Keep campus bikes in order
     for_law_enforcement:
       bike_index_for_law_enforcement: Bike Index for Law Enforcement
       is_your_department_equipped_to_fight_bike: Is your department equipped to fight bike theft? Bike Index can help you get bikes back into the right hands.
