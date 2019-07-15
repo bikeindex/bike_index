@@ -405,6 +405,25 @@ en:
       tell_us_more_about_yourself: Tell us more about yourself.
       update_your_profile: Update your profile
   landing_pages:
+    for_law_enforcement:
+      bike_index_for_law_enforcement: Bike Index for Law Enforcement
+      is_your_department_equipped_to_fight_bike: Is your department equipped to fight bike theft? Bike Index can help you get bikes back into the right hands.
+      sign_up_for_free: Sign up for free
+      recover_your_citizens_bikes: Recover your citizen's bikes
+      here: here
+      youre_the_first_one: You're the first one your citizens look to when their bikes are stolen. Access and search our international database to return your community's bikes to their rightful owners.
+      automated_tweets: automated tweets
+      local_ambassadors: local ambassadors
+      you_have_the_authority_to_bring_html: You have the authority to bring bikes back - that’s no small responsibility. That’s why we have tools - such as our integration with LeadsOnline and %{link} of stolen bikes - to keep your community safe. Connect with %{link} and spotters to quickly confiscate and block sales of stolen bikes.
+      with_over_215000_registries_and_almost_55: With over 215,000 registries and almost 5,500 stolen bicycle recoveries, we know how to help.
+      put_a_lock_on_bike_theft: Put a lock on bike theft
+      our_extensive_archive_has_helped_officers: Our extensive archive has helped officers recover bikes involved in criminal situations, from simple theft to chop shops, drug houses - even fencing rings and online black markets.
+      with_over_600_partnerships_html: With over 600 partnerships, Bike Index is the industry leader in bicycle registration. Join our network for free %{link}, or ask us to put you in touch with an existing partner in law enforcement.
+      if_you_want_to_collaborate_html: If you want to collaborate with other departments in your city to manage a registry, learn more about Bike Index for municipalities %{link}.
+      related_articles: 'Related articles:'
+      bend_reduces_bike_theft_by_60_percent: Bend reduces bike theft by 60 percent
+      bike_indexs_newest_municipal_partner: 'Bike Index''s newest municipal partner: New Orleans'
+      trusted_by_law_enforcement_everywhere: Trusted by law enforcement everywhere
     for_community_groups:
       bike_index_for_community_groups: Bike Index for Community Groups
       the_most_widereaching_and_effective_tools: The most wide-reaching and effective tools against bike theft — period.
