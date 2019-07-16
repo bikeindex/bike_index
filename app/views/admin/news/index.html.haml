@@ -21,12 +21,13 @@
     %tbody
       - @blogs.each do |blog|
         %tr
-          .less-strong-hold
-            %span.convertTime
-              = l blog.published_at, format: :convert_time
-            - if current_user.developer?
-              %small.less-strong-right
-                = blog.id
+          %td
+            .less-strong-hold
+              %span.convertTime
+                = l blog.published_at, format: :convert_time
+              - if current_user.developer?
+                %small.less-strong-right
+                  = blog.id
           %td.d-none.d-lg-table-cell
             = blog.user&.name || blog.user&.email
           %td
