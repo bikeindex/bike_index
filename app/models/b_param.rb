@@ -14,6 +14,7 @@ class BParam < ActiveRecord::Base
   scope :without_bike, -> { where(created_bike_id: nil) }
   scope :without_creator, -> { where(creator_id: nil) }
   scope :partial_registrations, -> { where(origin: "embed_partial") }
+  scope :bike_params, -> { where("(params -> 'bike') is not null") }
 
   before_create :generate_id_token
   before_save :clean_params
