@@ -1,0 +1,9 @@
+---
+es:
+  language: Espanol
+  number:
+    currency:
+      alphabetic_code: EUR
+  welcome:
+    index:
+      hero: Registro de bicicleta que funciona

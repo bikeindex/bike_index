@@ -306,19 +306,20 @@ en:
       send_me_back: Send me back from whence I came!
   controllers:
     bikes:
-      bike_details: Bike Details
-      photos: Photos
-      drivetrain: Wheels and Drivetrain
-      accessories: Accessories and Components
-      ownership: Transfer Ownership
-      groups: Groups and Organizations
-      remove: Hide or Delete
-      report_stolen: Report Stolen or Missing
-      recovery_details: Recovery details
-      theft_details: Theft details
-      publicize: Share on Social Media
-      alert: Activate Premium Alert
-      report_recovered: Mark this Bike Recovered
+      edit:
+        bike_details: Bike Details
+        photos: Photos
+        drivetrain: Wheels and Drivetrain
+        accessories: Accessories and Components
+        ownership: Transfer Ownership
+        groups: Groups and Organizations
+        remove: Hide or Delete
+        report_stolen: Report Stolen or Missing
+        recovery_details: Recovery details
+        theft_details: Theft details
+        publicize: Share on Social Media
+        alert: Activate Premium Alert
+        report_recovered: Mark this Bike Recovered
   views:
     pagination:
       first: "&laquo;"

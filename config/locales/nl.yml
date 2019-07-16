@@ -1,0 +1,9 @@
+---
+nl:
+  language: Dutch
+  number:
+    currency:
+      alphabetic_code: EUR
+  welcome:
+    index:
+      hero: fietsregistratie
