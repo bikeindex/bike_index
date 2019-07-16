@@ -27,7 +27,7 @@ RSpec.describe PublicImagesController, type: :controller do
     end
     context "blog" do
       let(:blog) { FactoryBot.create(:blog) }
-      let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/app/assets/images/who/seth-herr.jpg"))) }
+      let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
       context "admin authorized" do
         it "creates an image" do
           user = FactoryBot.create(:admin)
@@ -42,9 +42,12 @@ RSpec.describe PublicImagesController, type: :controller do
             user = FactoryBot.create(:admin)
             set_current_user(user)
             post :create, blog_id: blog.id, upload_plugin: "uppy", name: "cool name", image: file, format: :js
+            public_image = PublicImage.last
             expect(JSON.parse(response.body)).to be_present
             blog.reload
+            expect(blog.public_images).not_to be_empty
             expect(blog.public_images.first.name).to eq "cool name"
+            expect(public_image.imageable).to eq(blog)
           end
         end
         context "blog_id not given" do
