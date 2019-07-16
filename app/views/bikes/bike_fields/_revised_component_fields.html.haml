@@ -17,7 +17,9 @@
       = f.label :ctype_id, t(".part_type"), class: 'form-well-label'
 
       .form-well-input.fancy-select.unfancy
-        = f.collection_select(:ctype_id, Ctype.all, :id, :name, { required: true, prompt: t(".component_type") }, { class: 'form-control component-ctype-input' })
+        = f.collection_select(:ctype_id, Ctype.all, :id, :name,
+          { required: true, prompt: t(".component_type") },
+          { class: 'form-control component-ctype-input' })
 
     -# We really should display Position here, but we aren't right now because of implementation issues
     -# .right-input-help
