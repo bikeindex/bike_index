@@ -105,6 +105,7 @@ ignore_missing:
 ## Consider these keys used:
 ignore_unused:
 - 'activerecord.attributes.*'
+- 'activerecord.enums.*'
 - '{devise,kaminari,will_paginate}.*'
 - 'simple_form.{yes,no}'
 - 'simple_form.{placeholders,hints,labels}.*'

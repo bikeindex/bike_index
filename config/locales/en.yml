@@ -1,6 +1,46 @@
 ---
 en:
   activerecord:
+    enums:
+      handlebar_type:
+        drop: Drop
+        forward: Forward facing
+        rearward: Rear facing
+        other: Not handlebars
+        bmx: BMX style
+        flat: Flat or riser
+      frame_material:
+        aluminum: Aluminum
+        composite: Carbon or composite
+        organic: Wood or organic material
+        steel: Steel
+        titanium: Titanium
+      propulsion_type:
+        foot_pedal: Foot pedal
+        hand_pedal: Hand pedal
+        sail: Sail
+        insufflation: Insufflation
+        electric_assist: Electric Assist
+        electric_throttle: Electric throttle
+        gas: Gas
+        other_style: Other style
+      cycle_type:
+        bike: Bike
+        tandem: Tandem
+        unicycle: Unicycle
+        tricycle: Tricycle
+        stroller: Stroller
+        recumbent: Recumbent
+        trailer: Bike Trailer
+        wheelchair: Wheelchair
+        cargo: Cargo Bike (front storage)
+        tall_bike: Tall Bike
+        penny_farthing: Penny Farthing
+        cargo_rear: Cargo Bike (rear storage)
+        cargo_trike: Cargo Tricycle (front storage)
+        cargo_trike_rear: Cargo Tricycle (rear storage)
+        trail_behind: Trail behind (half bike)
+        pedi_cab: Pedi Cab (rickshaw)
     attributes:
       ad:
         body: Body
@@ -1279,7 +1319,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1305,7 +1345,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -1521,7 +1561,7 @@ en:
       changes_p1: >-
         Bike Index may periodically update this policy. We will notify you about significant
         changes by sending a notice to the primary email address specified in your
-        Bike Index Service Account or by placing a prominent notice on our site. 
+        Bike Index Service Account or by placing a prominent notice on our site.
         Such notices shall be considered to be received by you within 24 hours of
         the time it is posted to our website or emailed to you unless we receive notice
         that the email was not delivered.
