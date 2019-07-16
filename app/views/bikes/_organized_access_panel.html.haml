@@ -98,10 +98,14 @@
                           = [address['city'], address['state']].reject(&:blank?).join(", ")
                           = address['zipcode']
                         - else
-                          = address.values.join(", ")
-                          %br
+                          - address.except("latitude", "longitude").each do |k, v|
+                            %span.less-strong
+                              #{k == "address" ? "street" : k}:
+                            = v
+                            %br
                           %span.text-warning
                             %small invalid address
+
 
                   - else
                     %tr
