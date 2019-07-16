@@ -1,6 +1,5 @@
 ---
 en:
-  bike_serial_number: Serial number
   language: English
   date:
     abbr_day_names:
@@ -1214,7 +1213,6 @@ en:
       edit_bike: Edit Bike
       printable_pdf: Printable (pdf)
       mark_bike_stolen: Mark bike stolen
-      report_stolen: report_stolen
       you_have_no_registered_bikes: You have no registered bikes
       lock_type: Lock Type
       manufacturer: Manufacturer
@@ -1345,10 +1343,6 @@ en:
       cities: Cities
       schools: Schools
       community_groups: Community Groups
-    next_steps_contact:
-      organization_name: Organization name
-      message: Message
-      get_in_touch: Get in touch
     packages_list:
       free: Free
       forever: Forever
@@ -1422,7 +1416,6 @@ en:
       current_ambassadors: Current Ambassadors
       the_heroes_of_bikedom: The heroes of bikedom
       join_their_ranks: Join their ranks
-      steve_piercy: Steve Piercy
       why_bike_index: Why Bike Index?
       bike_index_helps_people_recover_their_sto: Bike Index helps people recover their stolen bikes, educates on the prevention of theft, and builds a community through its website.  And it's a non-profit organization that released its software as open source.
       steve_piercys_ambassadorship_is_sponsored_html: <em>Steve Piercy's</em> ambassadorship is sponsored by <strong>%{sponsor_link}</strong>.
@@ -1507,7 +1500,6 @@ en:
     application_revised:
       about: About
       add_a_bike: Add a bike
-      admin: Admin
       blog: Blog
       discuss: Discuss
       donate: Donate
@@ -1528,7 +1520,6 @@ en:
       registration_stickers: Registration stickers
       resources: Resources
       search_bikes: Search bikes
-      settings: Settings
       user_settings: "%{user_email} settings"
       sign_up: Sign up
       super_admin_view: Super Admin view %{org_name}
@@ -1587,6 +1578,7 @@ en:
       date: "Date:"
       color_may_be_incorrect: Color may be incorrect. Please update it if necessary!
     faq:
+      bike_serial_number: Serial number
       faqs: Common issues & frequently asked questions
       who_can_register_bikes: Who can register bikes?
       everyone_can_register_bikes_for_free: Everyone can register bikes, for free.
@@ -1649,7 +1641,6 @@ en:
       list_of_manufacturers: List of manufacturers
       help: Help
       contact_us: Contact us
-      contact_us_section: contact_us_section
       sign_up_a_shop_or_organization: Sign up a shop or organization
       privacy_policy: Privacy policy
       vendor_terms: vendor terms
@@ -1760,7 +1751,6 @@ en:
       show_personal_website: Show personal website
       no_personal_site: No personal site
       personal_site_url: Personal Site URL
-      examplecom: example.com
       additional_link: Additional Link
       example_url: http://example.com
       title_for_link: Title for link
@@ -1949,15 +1939,10 @@ en:
       index:
         org_ascend_imports_html: "<em>%{org_name}</em> Ascend Imports"
         org_bulk_imports_html: "<em>%{org_name}</em> Bulk Imports"
-        org_exports_html: "<em>%{org_name}</em> Exports"
-        new_export: New Export
-        export: Export
         exclude_empty_imports: Exclude Empty imports
         include_empty_imports: Include Empty imports
         added: Added
         progress: Progress
-        download: Download
-        delete: Delete
         errors: Errors
         creator: Creator
         bikes: Bikes
@@ -2162,16 +2147,6 @@ en:
       recovered: Recovered
       stolen: Stolen
       location: Location
-    bike_org_table:
-      date_indexed: Date indexed
-      manufacturer: Manufacturer
-      model: Model
-      color: Color
-      sent_to: Sent to
-      view_pdf: view PDF
-      today_at: Today at %{created_at}
-      yesterday_at: Yesterday at %{created_at}
-      pdf: PDF
     bike_show_overlays:
       please_tell_us_how_you_got_your_bike: Please tell us how you got your %{bike_type} back, we really care!
       its_also_how_we_get_better_at_recovering: It's also how we get better at recovering bikes.
@@ -2206,7 +2181,6 @@ en:
       contact_seller: CRITICAL - contact who you bought the bike from and find out if they have it
       location_where_the_theft_occurred: location where the theft occurred
       report_theft_html: Report theft on Bike Index, including %{edit_bike_link}
-      theft_details: theft_details
       add: Add
       a_photo_of_your_bike_type: a photo of your %{bike_type}
       a_police_report: a Police Report Number
@@ -2459,7 +2433,6 @@ en:
       mnfg_model_color_html: mnfg, model, <span class="less-strong">color</span>
       link_it: Link IT!
       bikemnfg_name: bike.mnfg_name
-      bikeframe_model: bike.frame_model
       link_bike_codekind: Link %{bike_codekind}
       to_link_that_card_with_a_bike: To link that card with a bike,
       please_sign_in: please sign in
@@ -2535,7 +2508,6 @@ en:
       claimed: Claimed
       creator: Creator
       address: "Address:"
-      no_name: no name
       avery_exportable: Avery Exportable
       is_true: "true"
       is_false: "false"
@@ -2837,13 +2809,7 @@ en:
         about your Customers. If Bike Index is acquired by another organization, we
         will notify all users via the primary e-mail address on file that their information
         is being transferred and may be subject to a different privacy policy.
-      privacy_of_others_p4_html:
-        We will never sell, trade, or give out information
-        about your Customers. If Bike Index is acquired by another organization, we
-        will notify all users via the primary e-mail address on file that their information
-        is being transferred and may be subject to a different privacy policy.
-      privacy_of_others_p5_html:
-        Customer data you have collected prior to this partnership
+      privacy_of_others_p4_html: Customer data you have collected prior to this partnership
         but that you want Bike Index to incorporate into the Service will be protected
         by all of the terms listed in this Agreement.
       prohibited_businesses: Prohibited Businesses
