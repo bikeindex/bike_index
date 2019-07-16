@@ -817,6 +817,21 @@ nl:
       user: TRME User
       user_email: TRME User email
       wheel_size: TRME Wheel size
+    options_for_select:
+      color:
+        black: TRME Black
+        blue: TRME Blue
+        brown: TRME Brown
+        green: TRME Green
+        orange: TRME Orange
+        pink: TRME Pink
+        purple: TRME Purple
+        red: TRME Red
+        silver_gray_or_bare_metal: TRME Silver, Gray or Bare Metal
+        stickers_tape_or_other_cover_up: TRME Stickers tape or other cover-up
+        teal: TRME Teal
+        white: TRME White
+        yellow_or_gold: TRME Yellow or Gold
   bikes:
     bike:
       location: TRME Location

@@ -9,7 +9,7 @@
     = f.label :primary_frame_color, class: 'form-well-label'
 
     .form-well-input.fancy-select.unfancy
-      = f.collection_select(:primary_frame_color_id, Color.all, :id, :name, required: true, prompt: t(".choose_color") )
+      = f.select(:primary_frame_color_id, options_for_select(Color.select_options), required: true, prompt: t(".choose_color") )
       %a.inline-input-help{ title: t(".color_help"), data: { toggle: 'popover', content: t(".primary_color_help_content_html") } }
         ?
     .right-input-help
@@ -25,7 +25,7 @@
   #secondary-color.form-group.row.hidden-other{ class: ('unhidden' if display_secondary_color) }
     = f.label :secondary_frame_color, class: 'form-well-label'
     .form-well-input.fancy-select.unfancy
-      = f.collection_select(:secondary_frame_color_id, Color.all, :id, :name, prompt: t(".choose_color") )
+      = f.select(:secondary_frame_color_id, options_for_select(Color.select_options),  prompt: t(".choose_color") )
     .right-input-help
       %a#add-tertiary.optional-form-block{ class: ('currently-hidden' if display_tertiary_color), data: { target: '#tertiary-color', toggle: '#rm-tertiary' } }
         %span.context-display-help
@@ -39,4 +39,4 @@
   #tertiary-color.form-group.row.hidden-other{ class: ('unhidden' if display_tertiary_color) }
     = f.label :tertiary_frame_color, class: 'form-well-label'
     .form-well-input.fancy-select.unfancy
-      = f.collection_select(:tertiary_frame_color_id, Color.all, :id, :name, prompt: t(".choose_color") )
+      = f.select(:tertiary_frame_color_id, options_for_select(Color.select_options),  prompt: t(".choose_color") )
