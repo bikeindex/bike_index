@@ -34,7 +34,8 @@ class Blog < ActiveRecord::Base
     return nil unless str.present?
     return find(str) if integer_slug?(str)
     slug = slugify_title(str)
-    find_by_title_slug(slug) || find_by_old_title_slug(slug)
+    find_by_title_slug(slug) || find_by_old_title_slug(slug) ||
+      find_by_title_slug(str) || find_by_title(str)
   end
 
   def to_param

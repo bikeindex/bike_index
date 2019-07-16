@@ -9,6 +9,11 @@
   line-height: 1.5;
 }
 
+// Hide overflowing file names
+.custom-file-label {
+  overflow: hidden;
+}
+
 // General styles
 @import "../stylesheets/utils";
 @import "../stylesheets/table_extensions";
