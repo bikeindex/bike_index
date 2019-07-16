@@ -49,6 +49,11 @@ function BinxAdmin() {
       if ($("#multi-mnfg-selector").length) {
         this.bikesMultiManufacturerUpdate();
       }
+
+      if ($("#blog-image-form").length > 0) {
+        const binxAdminBlogs = BinxAdminBlogs();
+        binxAdminBlogs.init();
+      }
     },
 
     initAdminSearchSelect() {
