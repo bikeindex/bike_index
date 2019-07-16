@@ -1,3 +1,5 @@
+# Useful because of looking at PSU errors. Checkout https://github.com/bikeindex/bike_index/pull/1042
+
 class AveryableBikeWorker
   include Sidekiq::Worker
   sidekiq_options queue: "low_priority"
