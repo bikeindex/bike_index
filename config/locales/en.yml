@@ -817,7 +817,7 @@ en:
       user: User
       user_email: User email
       wheel_size: Wheel size
-    options_for_select:
+    select_options:
       color:
         black: Black
         blue: Blue

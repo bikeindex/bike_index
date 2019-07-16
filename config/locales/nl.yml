@@ -817,7 +817,7 @@ nl:
       user: TRME User
       user_email: TRME User email
       wheel_size: TRME Wheel size
-    options_for_select:
+    select_options:
       color:
         black: TRME Black
         blue: TRME Blue

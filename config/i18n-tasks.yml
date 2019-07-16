@@ -106,7 +106,7 @@ ignore_missing:
 ignore_unused:
 - 'activerecord.attributes.*'
 - 'activerecord.enums.*'
-- 'activerecord.options_for_select.*'
+- 'activerecord.select_options.*'
 - '{devise,kaminari,will_paginate}.*'
 - 'simple_form.{yes,no}'
 - 'simple_form.{placeholders,hints,labels}.*'
