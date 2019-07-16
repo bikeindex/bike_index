@@ -11,7 +11,8 @@
 
   = render partial: "/landing_pages/for_organizations_photo_list"
 
-  - cache "root_body_wrap", skip_digest: true do # Expired in recovery_displays_controller
+  -# Expired in admin/recovery_displays_controller
+  - cache("root_recovery_stories", skip_digest: true) do
     .root-landing-recovery-stories
       .container
         #recovery-stories-container.extras-hidden
@@ -21,6 +22,7 @@
               recovery_stories_path,
               class: "see-more-link"
 
+  - cache("root_body") do
     .root-landing-how-it-works
       .container
         %h3.landing-container-label= t(".but_how_does_it_work")
