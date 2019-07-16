@@ -16,7 +16,7 @@ class Color < ActiveRecord::Base
   def self.name_translation(name)
     I18n.t(
       name.to_s.downcase.gsub(/[^[:alnum:]]+/, "_"),
-      scope: [:activerecord, :options_for_select, self.name.underscore],
+      scope: [:activerecord, :select_options, self.name.underscore],
     )
   end
 
