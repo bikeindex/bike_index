@@ -14,7 +14,7 @@ class BParam < ActiveRecord::Base
   scope :without_bike, -> { where(created_bike_id: nil) }
   scope :without_creator, -> { where(creator_id: nil) }
   scope :partial_registrations, -> { where(origin: "embed_partial") }
-  scope :bike_params, -> { where("(params -> 'bike') is not null") }
+  scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
 
   before_create :generate_id_token
   before_save :clean_params
@@ -342,7 +342,7 @@ class BParam < ActiveRecord::Base
     else
       formatted_address = Geohelper.formatted_address_hash(bike["address"])
       # return at least something from legacy entries that don't have enough info to guess address
-      return { address: bike["address"] } if formatted_address.blank? && bike["address"].present?
+      formatted_address = { address: bike["address"] } if formatted_address.blank? && bike["address"].present?
     end
     return {} unless formatted_address.present?
     update_attribute :params, params.merge(formatted_address: formatted_address)

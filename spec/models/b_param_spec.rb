@@ -285,14 +285,20 @@ RSpec.describe BParam, type: :model do
           bike: {
             serial_number: "zzz",
             organization_affiliation: "employee",
+            handlebar_type: nil,
             address: "0229 HAMMOND BLDG",
           }
         }.as_json
       end
       include_context :geocoder_real
-      it "returns the address string" do
+      let(:b_param) { FactoryBot.create(:b_param, params: params_hash) }
+      it "stores the address string" do
+        b_param.reload
+        expect(b_param.params).to eq params_hash
         VCR.use_cassette "b_param-fetch_formatted_address-fail" do
           expect(b_param.fetch_formatted_address).to eq(address: "0229 HAMMOND BLDG")
+          b_param.reload
+          expect(b_param.params["formatted_address"]).to be_present
           expect(bike.registration_address).to be_present
           expect(bike.valid_registration_address_present?).to be_falsey
         end
