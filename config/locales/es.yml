@@ -713,6 +713,46 @@ es:
         iso_bsd: TRME Iso bsd
         name: TRME Name
         priority: TRME Priority
+    enums:
+      cycle_type:
+        bike: TRME Bike
+        cargo: TRME Cargo Bike (front storage)
+        cargo_rear: TRME Cargo Bike (rear storage)
+        cargo_trike: TRME Cargo Tricycle (front storage)
+        cargo_trike_rear: TRME Cargo Tricycle (rear storage)
+        pedi_cab: TRME Pedi Cab (rickshaw)
+        penny_farthing: TRME Penny Farthing
+        recumbent: TRME Recumbent
+        stroller: TRME Stroller
+        tall_bike: TRME Tall Bike
+        tandem: TRME Tandem
+        trail_behind: TRME Trail behind (half bike)
+        trailer: TRME Bike Trailer
+        tricycle: TRME Tricycle
+        unicycle: TRME Unicycle
+        wheelchair: TRME Wheelchair
+      frame_material:
+        aluminum: TRME Aluminum
+        composite: TRME Carbon or composite
+        organic: TRME Wood or organic material
+        steel: TRME Steel
+        titanium: TRME Titanium
+      handlebar_type:
+        bmx: TRME BMX style
+        drop: TRME Drop
+        flat: TRME Flat or riser
+        forward: TRME Forward facing
+        other: TRME Not handlebars
+        rearward: TRME Rear facing
+      propulsion_type:
+        electric_assist: TRME Electric Assist
+        electric_throttle: TRME Electric throttle
+        foot_pedal: TRME Foot pedal
+        gas: TRME Gas
+        hand_pedal: TRME Hand pedal
+        insufflation: TRME Insufflation
+        other_style: TRME Other style
+        sail: TRME Sail
     errors:
       messages:
         record_invalid: 'TRME Validation failed: %{errors}'
