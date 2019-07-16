@@ -4924,11 +4924,6 @@ filename-regex@^2.0.0:
   resolved "https://registry.yarnpkg.com/filename-regex/-/filename-regex-2.0.1.tgz#c1c4b9bee3e09725ddb106b75c1e301fe2f18b26"
   integrity sha1-wcS5vuPglyXdsQa3XB4wH+LxiyY=
 
-filepond-plugin-file-validate-type@^1.2.4:
-  version "1.2.4"
-  resolved "https://registry.yarnpkg.com/filepond-plugin-file-validate-type/-/filepond-plugin-file-validate-type-1.2.4.tgz#ce7f5f469dbc7ce0da12fdef7b0f24e4c263c410"
-  integrity sha512-K1qD8mfahJoz2zRlWWvYoHuy4k/8tHggsoGbm/blpTp63OyahOdJBzMN3VK7USYn5OZ58uOFdMTMyi8ibFpW/Q==
-
 fileset@^2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/fileset/-/fileset-2.0.3.tgz#8e7548a96d3cc2327ee5e674168723a333bba2a0"

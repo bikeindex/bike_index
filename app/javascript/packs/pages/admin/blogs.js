@@ -1,7 +1,10 @@
 import log from "../../utils/log";
+
+// required for uppy file upload
 import 'es6-promise/auto'
 import 'whatwg-fetch'
-// required for uppy file upload
+import 'es6-promise/auto'
+import 'whatwg-fetch'
 require('@uppy/core/dist/style.css')
 require('@uppy/dashboard/dist/style.css')
 window.Uppy = require('@uppy/core')
