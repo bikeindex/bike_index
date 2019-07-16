@@ -25,6 +25,20 @@ RSpec.describe Blog, type: :model do
       blog.save
       expect(blog.title_slug).to eq("a-really-really-really-really-loooooooooooooooooooooooooooooooooooong")
     end
+    context "long title" do
+      let(:title) { "We made it all the way to Oregon and back without one dysentery scare" }
+      let(:target) { "we-made-it-all-the-way-to-oregon-and-back-without-one-dysentery-scare" }
+      let(:legacy_slug) { "we-made-it-all-the-way-to-oregon-and-back-without-" }
+      let(:blog) { FactoryBot.create(:blog, title: title, body: "text about making it to Oregon") }
+      it "doesn't break things" do
+        blog.reload
+        expect(blog.title_slug).to eq target
+        expect(Blog.friendly_find(target)).to eq blog
+        # legacy issue where we chopped stuff down
+        blog.update_attribute :title_slug, legacy_slug
+        expect(Blog.friendly_find(legacy_slug)).to eq blog
+      end
+    end
   end
 
   describe "update_title_save" do
