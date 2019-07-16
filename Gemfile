@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 # If you bump the Ruby version, make sure to update the Vagrantfile appropriately
-ruby "2.5.1"
+ruby "2.5.5"
 gem "rails", "4.2.11"
 
 gem "active_model_serializers", "~> 0.9.3"
@@ -16,6 +16,13 @@ gem "fast_blank", "~> 1.0"
 gem "flipper"
 gem "flipper-active_record"
 gem "flipper-ui"
+
+# I18n
+gem "rails-i18n"
+group :development, :test do
+  gem "i18n-tasks"
+  gem "i18n_generators"
+end
 
 # Redis and redis dependents
 gem "hiredis"
@@ -33,9 +40,7 @@ gem "fog-aws"
 gem "geocoder"
 gem "hamlit"
 gem "high_voltage"
-gem "honeybadger"
 gem "httparty"
-gem "i18n"
 gem "journey", "~> 1.0.3"
 gem "kaminari" # pagination
 gem "kramdown" # Markdown
@@ -45,6 +50,7 @@ gem "money-rails"
 gem "nokogiri", "~> 1.8.1"
 gem "omniauth", "~> 1.6"
 gem "omniauth-facebook"
+gem "omniauth-globalid"
 gem "omniauth-strava"
 gem "paranoia"
 gem "pg_search"
@@ -127,6 +133,7 @@ gem "logstash-event" # Use logstash format for logging data
 
 group :production do
   gem "skylight" # Performance monitoring
+  gem "honeybadger"
 end
 
 group :development do
@@ -150,8 +157,8 @@ group :development, :test do
   gem "pry-byebug"
   gem "pry-rails"
   gem "rb-fsevent", "~> 0.10.3"
-  gem "rspec", "~> 3.3.0"
-  gem "rspec-rails", "~> 3.3.0"
+  gem "rspec", "~> 3.4"
+  gem "rspec-rails", "~> 3.8"
   gem "rspec_junit_formatter" # For circle ci
   gem "rubocop", "~> 0.67", require: false
   gem "rubocop-daemon", "~> 0.3.1", require: false

@@ -5,12 +5,12 @@
     %meta{'http-equiv' => 'X-UA-Compatible', content: 'IE=edge,chrome=1'}
     %meta{name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1'}
     %meta{name: 'description', content: "Embedable form, add a bike through #{@organization.name}." }
-    %title
-      Register a bike through #{@organization.name}
+    %title= t(".register_through_org", org_name: @organization.name)
     = stylesheet_link_tag "embed_styles", media: "all"
     = javascript_include_tag "embed"
     = csrf_meta_tags
-    
+
+
   %body#bi_embed
     #alert-block
       - flash.each do |name, msg|
@@ -23,14 +23,14 @@
           .alert.alert-error
             %a.close{"data-dismiss" => "alert"} ×
             %h4
-              Please fix the following 
-              = pluralize(@b_param.bike_errors.count, "error")
+              = t(".please_fix_the_following")
+              = pluralize(@b_param.bike_errors.count, t(".error"))
             %ul
               - @b_param.bike_errors.each do |msg|
-                %li
-                  = msg
-          
+                %li= msg
+
     = yield
+
   :javascript
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

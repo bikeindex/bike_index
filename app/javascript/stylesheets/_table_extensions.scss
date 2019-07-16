@@ -7,6 +7,10 @@
     margin-left: -15px;
     margin-right: -15px;
   }
+  td ul {
+    padding: 0 0 0 1.5rem;
+    margin: 0.5rem 0 0.5rem;
+  }
 }
 
 .table-list {
@@ -14,12 +18,23 @@
   @extend .table-striped;
   @extend .table-bordered;
   @extend .table-sm;
-  tr td:first-child {
-    font-size: 80%;
-    font-style: italic;
-  }
-  tr td:last-child {
-    width: 85%; // This is effectively min-width for tables
+  tr td {
+    line-height: 1.5;
+    &:first-child {
+      font-size: 75%;
+      font-style: italic;
+      text-align: right;
+      padding: 9px 4px 4px;
+      line-height: 1.25;
+    }
+    &:first-child.full-width-data {
+      font-size: 100%;
+      font-style: normal;
+    }
+    // use last, rather than first, to enable full width single rows
+    &:last-child {
+      width: 85%; // This is effectively min-width for tables
+    }
   }
 }
 
@@ -32,6 +47,7 @@ table {
 
   .less-strong-hold {
     position: relative;
+    min-height: 1.25em;
   }
 
   .less-strong-right {

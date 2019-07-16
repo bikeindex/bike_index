@@ -1,9 +1,10 @@
 class Admin::DashboardController < Admin::BaseController
+  layout "new_admin"
+
   def index
     @organizations = Organization.unscoped.order("created_at DESC").limit(10)
     @bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint).order("created_at desc").limit(10)
     @users = User.includes(:memberships => [:organization]).limit(5).order("created_at desc")
-    render layout: "new_admin"
   end
 
   def maintenance
@@ -15,8 +16,9 @@ class Admin::DashboardController < Admin::BaseController
     @component_types = Component.where(ctype_id: Ctype.other.id)
     @handlebar_types = Bike.where(handlebar_type: Bike.handlebar_types[:other])
     @paint = Paint.where("color_id IS NULL")
-    render layout: "new_admin"
   end
+
+  def scheduled_jobs; end
 
   def bust_z_cache
     Rails.cache.clear
@@ -37,7 +39,6 @@ class Admin::DashboardController < Admin::BaseController
   def tsvs
     @blacklist = FileCacheMaintainer.blacklist
     @tsvs = FileCacheMaintainer.files
-    render layout: "new_admin"
   end
 
   def update_tsv_blacklist

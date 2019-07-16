@@ -72,7 +72,7 @@ class Admin::OrganizationsController < Admin::BaseController
     approved_kind = params.dig(:organization, :kind)
     approved_kind = "other" unless Organization.kinds.include?(approved_kind)
     params.require(:organization)
-          .permit(:available_invitation_count, :sent_invitation_count, :name, :short_name, :slug, :website,
+          .permit(:available_invitation_count, :name, :short_name, :slug, :website,
                   :ascend_name, :show_on_map, :is_suspended, :embedable_user_email, :auto_user_id, :lock_show_on_map,
                   :api_access_approved, :access_token, :avatar, :avatar_cache, :previous_slug,
                   :parent_organization_id, :lightspeed_cloud_api_key, :approved,
@@ -82,7 +82,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def matching_organizations
     return @matching_organizations if defined?(@matching_organizations)
-    @search_paid = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:search_paid])
+    @search_paid = ParamsNormalizer.boolean(params[:search_paid])
     matching_organizations = Organization.unscoped
     matching_organizations = matching_organizations.paid if @search_paid
     matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
@@ -101,6 +101,10 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def pos_kind_for_organizations
+    if params[:search_pos] == "no_pos"
+      # We want to return both no_pos and does_not_need_pos
+      return [Organization::POS_KIND_ENUM[:no_pos], Organization::POS_KIND_ENUM[:does_not_need_pos]]
+    end
     # Legacy enum issue so excited for TODO: Rails 5 update
     Organization::POS_KIND_ENUM[params[:search_pos].to_sym] || 0
   end

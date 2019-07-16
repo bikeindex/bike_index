@@ -14,8 +14,9 @@ class Admin::RecoveriesController < Admin::BaseController
   end
 
   def edit
-    @recovery = StolenRecord.unscoped.find(params[:id])
-    @bike = @recovery.bike.decorate
+    @recovery ||= StolenRecord.unscoped.find(params[:id])
+    bike = Bike.unscoped.find_by_id(@recovery.bike_id)
+    @bike = bike && bike.decorate
   end
 
   def update
@@ -26,11 +27,12 @@ class Admin::RecoveriesController < Admin::BaseController
     elsif params[:stolen_record][:is_not_displayable].present?
       @stolen_record.recovery_display_status = "not_displayed"
     end
+
     if @stolen_record.update_attributes(permitted_parameters)
       flash[:success] = "Recovery Saved!"
       redirect_to redirect ||= admin_recoveries_url
     else
-      raise StandardError
+      @recovery = @stolen_record
       render action: :edit
     end
   end

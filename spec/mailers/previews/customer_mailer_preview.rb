@@ -12,6 +12,15 @@ class CustomerMailerPreview < ActionMailer::Preview
     CustomerMailer.password_reset_email(preview_user)
   end
 
+  def magic_login_link_email
+    user = User.where.not(magic_link_token: nil).reorder(:updated_at).last
+    if user.blank?
+      user = preview_user
+      preview_user.update_auth_token("magic_link_token")
+    end
+    CustomerMailer.magic_login_link_email(user)
+  end
+
   def additional_email_confirmation
     user_email = UserEmail.unconfirmed.last
     CustomerMailer.additional_email_confirmation(user_email)

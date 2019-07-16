@@ -1,5 +1,6 @@
-Hello #{'Welcome to Bike Index' if @new_user == true}
+Hello#{", Welcome to Bike Index" if @new_user == true}
 
-#{@inviter.display_name} has indicated that you are a member of #{@organization.name}.
+- if @sender.present?
+  #{@sender.display_name} has indicated that you are a member of #{@organization.name}.
 
 Sign up or sign in to BikeIndex.org to join #{@organization.name}!

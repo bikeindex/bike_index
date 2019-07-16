@@ -1,22 +1,33 @@
 - @ctype_other_id = Ctype.other.id
 - @manufacturer_other_id = Manufacturer.other.id
+
+- handlebar_type_other = "other" # Because we're assigning as an enum
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: '/bikes/edit_primary_menu'
-      .col-md-8.form-well#form_well_wrap{ data: { ctypeother: @ctype_other_id, manufacturerother: @manufacturer_other_id } }
+      = render partial: 'bikes/edit_primary_menu'
+
+      .col-md-8.form-well#form_well_wrap{ data: { ctypeother: @ctype_other_id, manufacturerother: @manufacturer_other_id, handlebartypeother: handlebar_type_other } }
         .form-wrap
           .form-well-form-header
-            %h3
-              = @edit_templates[@edit_template]
-          .form-group.row.unnested-field.no-divider-row
-            = f.label :handlebar_type_id, class: 'form-well-label'
-            .form-well-input.fancy-select-placeholder.unfancy
-              = select(:bike, :handlebar_type, HandlebarType.select_options , { prompt: ' '})
+            %h3= @edit_templates[@edit_template]
+
+          .related-fields
+            .form-group.row.unnested-field.no-divider-row
+              = f.label :handlebar_type_id, class: 'form-well-label'
+              .form-well-input.fancy-select-placeholder.unfancy
+                = select(:bike, :handlebar_type, HandlebarType.select_options , { prompt: " " }, { class: "form-control handlebar-type-input" })
+            .form-group.row.hidden-other{ class: @bike.handlebar_type == "other" ? "unhidden" : "" }
+              = f.label :handlebar_type_other, t(".other_handlebar_type"), class: "form-well-label"
+              .form-well-input
+                = f.text_field :handlebar_type_other, class: "form-control"
+
           %fieldset.add-additional
             #has_multiples_parts{ data: { ids: Ctype.where(has_multiple: true).map(&:id).to_json } }
             = f.fields_for :components do |builder|
-              = render '/bikes/bike_fields/revised_component_fields', f: builder
+              = render 'bikes/bike_fields/revised_component_fields', f: builder
             %hr
             .add-additional-fields-block.no-divider-row
-              = revised_link_to_add_components 'Add a component', f, :components
+              = revised_link_to_add_components t(".add_a_component"), f, :components
+
+          = render "shared/form_well_footer_save"

@@ -137,6 +137,29 @@ RSpec.describe Export, type: :model do
     end
   end
 
+  describe "avery_export_bike?" do
+    context "unclaimed bike, with owner email" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:user) { FactoryBot.create(:user_confirmed, name: "some name") }
+      let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization) }
+      let!(:b_param) do
+        FactoryBot.create(:b_param, created_bike_id: bike.id,
+                                    params: { bike: { address: "102 Washington Pl, State College" } })
+      end
+      let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil, bike: bike) }
+      include_context :geocoder_real
+      it "is exportable" do
+        # Referencing the same address and the same cassette from a different spec, b/c I'm terrible ;)
+        VCR.use_cassette("organization_export_worker-avery") do
+          ownership.reload
+          expect(bike.owner_name).to eq "some name"
+          expect(bike.registration_address["address"]).to eq "102 Washington Pl"
+          expect(Export.avery_export_bike?(bike)).to be_truthy
+        end
+      end
+    end
+  end
+
   describe "bikes_scoped" do
     # Pending - we're getting the organization scopes up and running before migrating existing TsvCreator tasks
     # But we eventually want to add stolen tsv's into here

@@ -12,7 +12,7 @@ FactoryBot.define do
     factory :organization_with_auto_user do
       auto_user { FactoryBot.create(:user) }
       after(:create) do |organization|
-        FactoryBot.create(:membership, user: organization.auto_user, organization: organization)
+        FactoryBot.create(:membership_claimed, user: organization.auto_user, organization: organization)
       end
     end
     factory :organization_child do

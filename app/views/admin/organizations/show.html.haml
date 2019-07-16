@@ -96,14 +96,12 @@
         %td
           Sent Invites
         %td
-          = @organization.sent_invitation_count
+          = number_with_delimiter @organization.sent_invitation_count
       %tr
         %td
           Remaining invites
         %td
-          = link_to @organization.available_invitation_count, admin_invitations_url(organization_id: @organization.to_param)
-          ,
-          = link_to "Remaining invites", admin_organization_invitation_url(organization_id: @organization.to_param)
+          = number_with_delimiter @organization.remaining_invitation_count
       %tr
         %td
           Website
@@ -174,7 +172,7 @@
           %td
             More to come soon
 .row.mt-4
-  .col-md-6
+  .col-6
     %p
       %strong
         = link_to "Edit/Create Invoices", admin_organization_invoices_path(organization_id: @organization.to_param)
@@ -184,6 +182,8 @@
           and
           %strong
             #{@organization.invoices.active.count} active
+    = render partial: "/admin/organizations/invoices/table", locals: { invoices: @organization.invoices.order(id: :desc).limit(3) }
+
   .col-md-6
 
     - if @organization.is_paid
@@ -264,69 +264,40 @@
                   = slug
 - if @bikes.present?
   %h2.mt-4
-    = pluralize(@bikes.total_count, "Bike")
+    = number_with_delimiter(@bikes.total_count)
+    = "Bike".pluralize(@bikes.total_count)
     %em.small
       view #{link_to "org bikes view", organization_bikes_path(organization_id: @organization.to_param)}
   = paginate @bikes, views_prefix: "admin"
-
-  = render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: @bikes }
-
-  = paginate @bikes, views_prefix: "admin"
+  = render partial: "/admin/bikes/table", locals: { bikes: @bikes }
 - else
   %h2.mt-4
     No bikes
 
-
-%h2.mt-4
-  = pluralize(@organization.users.count, "User")
-
-.full-screen-table
-  %table.table.table-striped.table-bordered.table-sm
-    %thead.thead-light
-      %th
-        Edit&nbsp;
-      %th
-        Name
-      %th
-        Email
-      - if @organization.ambassador?
-        %th
-          Activities
-      %th
-        Total indexed
-    %tbody
-      - @organization.users.each do |user|
-        %tr
-          %td
-            = link_to "&rarr;".html_safe, edit_admin_user_url(user)
-          %td
-            = user.name
-          %td
-            = user.email
-          - if @organization.ambassador?
-            %td
-              - if user.ambassador?
-                - ambassador = Ambassador.find(user.id)
-                = link_to ambassador.progress_count, admin_ambassador_task_assignments_path(search_ambassador_id: ambassador.id)
-          %td
-            = user.creation_states.where(organization_id: @organization.id).count
+.row.mt-4
+  .col-6
+    %h4
+      = number_with_delimiter(@organization.memberships.count)
+      = "Membership".pluralize(@organization.memberships.count)
+      %small
+        = number_with_delimiter(@organization.memberships.claimed.count)
+        claimed
+  .col-6.text-right
+    = link_to "View all memberships", admin_memberships_path(organization_id: @organization.to_param)
+- if @organization.memberships.count > 0
+  = render partial: "/admin/memberships/table", locals: { memberships: @organization.memberships.reorder(created_at: :asc).limit(25), skip_organization: true }
 
 
-%ul.list-unstyled
-  - @organization.users.each do |user|
-    %li
-      %p
-        = user.name
-        |
-        = user.email
 %hr.mt-4
+%h4
+  Locations
 - if @locations.any?
   - if @locations.count > 1
-    %h3.mt-4
+    %h4.mt-4
       = pluralize(@locations.count, "Location")
   .row
     - @locations.each do |location|
-      .col-md-6
+      .col-lg-4.col-sm-6.mb-4
         .card
           .card-body
             - if !location.shown && @organization.allowed_show
@@ -343,12 +314,9 @@
               = location.address
 
 
-%ul.list-inline.mt-4
-  %li.list-inline-item
-    = link_to "Manage organization invitations", admin_organization_invitation_url(organization_id: @organization.to_param), class: "btn btn-warning"
-
-  %li.list-inline-item
+.row
+  .col-6
     = link_to "Edit", edit_admin_organization_url(@organization), class: "btn btn-success"
   - unless @organization.deleted?
-    %li.list-inline-item.ml-auto
-      = link_to "Delete", admin_organization_url(@organization), method: :delete, confirm: "Are you sure?", class: "btn btn-danger"
+    .col-6.text-right
+      = link_to "Delete", admin_organization_url(@organization), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger"

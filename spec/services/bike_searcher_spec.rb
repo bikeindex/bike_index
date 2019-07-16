@@ -71,11 +71,6 @@ RSpec.describe BikeSearcher do
       search = BikeSearcher.new(serial: "STood")
       expect(search.matching_serial.first).to eq(bike)
     end
-    it "finds bikes with absent serials" do
-      bike = FactoryBot.create(:bike, serial_number: "absent")
-      search = BikeSearcher.new(serial: "absent")
-      expect(search.matching_serial.first).to eq(bike)
-    end
     it "fulls text search" do
       bike = FactoryBot.create(:bike, serial_number: "K10DY00047-bkd")
       search = BikeSearcher.new(serial: "bkd-K1oDYooo47")

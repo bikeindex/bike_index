@@ -34,6 +34,15 @@ class RecoveryDisplay < ActiveRecord::Base
     self.quote_by = sr.bike.current_ownership && sr.bike.owner && sr.bike.owner.name
   end
 
+  def image_processing?
+    return false unless image.present? && updated_at > Time.current - 1.minute
+    !image_exists?
+  end
+
+  def image_exists?
+    image.present? && image.file.exists?
+  end
+
   def bike
     return nil unless stolen_record_id.present?
     StolenRecord.unscoped.find(stolen_record_id).bike
@@ -44,6 +53,6 @@ class RecoveryDisplay < ActiveRecord::Base
   end
 
   def update_associations
-    stolen_record&.update_attributes(updated_at: Time.now)
+    stolen_record&.update_attributes(updated_at: Time.current)
   end
 end

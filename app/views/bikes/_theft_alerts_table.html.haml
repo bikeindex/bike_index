@@ -1,0 +1,26 @@
+- first_form_well ||= false
+
+- if theft_alerts.present?
+  .form-wrap{ class: first_form_well ? "" : "secondary-form-wrap" }
+    .form-well-form-header-always-visible
+      %h3
+        = t(".existing_theft_alerts")
+    .row
+      .col-sm-12
+        %table.table.table-bordered{ style: "background: #fff;" }
+          %thead.small-header
+            %tr
+              %th= t(".created")
+              %th= t(".plan")
+              %th= t(".status")
+              %th= t(".start")
+              %th= t(".end")
+
+          %tbody
+            - theft_alerts.each do |alert|
+              %tr
+                %td= alert.created_at.to_date.to_s(:long)
+                %td= alert.theft_alert_plan.name
+                %td= alert.status
+                %td.convertTime= l(alert.begin_at, format: :convert_time) if alert.begin_at.present?
+                %td.convertTime= l(alert.end_at, format: :convert_time) if alert.end_at.present?

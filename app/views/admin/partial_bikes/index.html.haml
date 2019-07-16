@@ -26,7 +26,7 @@
 = paginate @b_params, views_prefix: "admin"
 
 .full-screen-table
-  %table.table.table-bordered.table-striped.table-sm{ style: "table-layout: fixed;" }
+  %table.table.table-bordered.table-striped.table-sm
     %thead.thead-light.sortable
       %th
         = sortable "created_at"
@@ -72,10 +72,11 @@
           %td
             - if b_param.creation_organization.present?
               = b_param.creation_organization.name
-          %td{ style: "width: 30%; overflow: scroll; white-space: nowrape;" }
-            %pre
-              %code
-                = b_param.params.to_json
+          %td{ style: "width: 30%;" }
+            %div{ style: "overflow: scroll; white-space: nowrap;" }
+              %pre
+                %code
+                  = b_param.params.to_json.gsub('":{', "\":{\n ").gsub('":', '": ').gsub(",", ",\n ")
 
 
 

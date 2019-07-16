@@ -89,14 +89,7 @@ class BulkImportWorker
   end
 
   def rescue_blank_serial(serial)
-    return "absent" unless serial.present?
-
-    serial.strip!
-    if ["n.?a", "none", "unkn?own"].any? { |m| serial.match(/\A#{m}\z/i).present? }
-      "absent"
-    else
-      serial
-    end
+    SerialNormalizer.unknown_and_absent_corrected(serial)
   end
 
   def creator_id

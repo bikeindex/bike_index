@@ -1,132 +1,58 @@
-.row
-  .col-md-10
-    %p
-      = link_to "Back to recoveries", admin_recoveries_url
-    %h1
-      Edit recovery for #{@bike.type}
-  .col-md-2
-    %p
-      = link_to "Edit bike", edit_admin_bike_path(@bike), class: "btn btn-success mb-4 float-right"
+= render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show", stolen_record: @recovery, display_recovery: true }
 
-
-
-%ul.list-unstyled
-  = render partial: "/admin/bikes/bike", locals: {bike: @bike, target: "show" }
-.row
-  .col-sm-12.col-lg-6
-    %table.table-list
-      %tbody
-        %tr
-          %td
-            Created at
-          %td
-            %a.convertTime{ href: admin_bike_url(@bike) }
-              = l @bike.created_at, format: :convert_time
-        %tr
-          %td
-            Stolen at
-          %td
-            - if @recovery.date_stolen.present?
-              %span.convertTime
-                = l @recovery.date_stolen, format: :convert_time
-        %tr
-          %td
-            Recovered at
-          %td
-            - if @recovery.date_recovered.present?
-              %span.convertTime{ href: admin_bike_url(@bike) }
-                = l @recovery.date_recovered, format: :convert_time
-        %tr
-          %td
-            Recovered by
-          %td
-            - if @recovery.recovering_user.present?
-              = link_to @recovery.recovering_user.display_name, admin_user_path(@recovery.recovering_user.to_param)
-              - unless @recovery.recovering_user_owner?
-                %em.text-warning.less-strong
-                  not owner!
-            - elsif @recovery.pre_recovering_user?
-              %small.less-strong
-                pre-recording of recovering user
-            - else
-              %small.less-strong
-                No user present
-
-        %tr
-          %td
-            Owner Email
-          %td
-            = @bike.owner_email
-        %tr
-          %td
-            Current Owner
-          %td
-            = @bike.owner.email
-        %tr
-          %td
-            Cached Data
-          %td
-            = @bike.cached_data
-        %tr
-          %td
-            Location
-          %td
-            = @recovery.address
-  .col-sm-12.col-lg-6
-    .card
-      .card-header
-        Recovery Description
-      .card-body
-        = @recovery.recovered_description
-.row.justify-content-end
+.admin-subnav.midpage-subnav
+  .col-12
+    %h2 Manage Recovery Display
+.row.text-center
   - if @recovery.waiting_on_decision?
-    .col-md-2
-      = button_to "Not Displayable", admin_recovery_path(id: @recovery.id, stolen_record: {is_not_displayable: true}), method: :put, class: "btn btn-warning"
-    .col-md-2
-      = link_to 'Share recovery', new_admin_recovery_display_path(stolen_record_id: @recovery.id), class: 'btn btn-primary'
+    .col-md-4
+      %h4
+        Choose what to do with this recovery:
+    .col-6.col-md-4
+      = link_to "Display recovery", new_admin_recovery_display_path(stolen_record_id: @recovery.id), class: "btn btn-lg btn-primary d-block"
+    .col-6.col-md-4
+      = button_to "Mark Not Displayable", admin_recovery_path(id: @recovery.id, stolen_record: { is_not_displayable: true }), method: :put, class: "btn btn-lg btn-warning d-block", style: "width: 100%;"
+
   - elsif @recovery.displayed?
-    .col-md-2
-      = link_to "Edit Recovery", edit_admin_recovery_display_url(@recovery.recovery_display), class: "btn btn-primary"
-    .col-md-2
-      = link_to "Delete recovery display", admin_recovery_display_url(@recovery.recovery_display), method: :delete, confirm: "Are you sure?", class: "btn btn-danger"
+    .col-6
+      %p
+        This recovery is displayed.
+    .col-6
+      = link_to "Edit Recovery Display", edit_admin_recovery_display_url(@recovery.recovery_display), class: "btn btn-lg btn-primary"
   - elsif @recovery.not_displayed?
-    .col-md-2
-      = button_to "Mark Eligible for display", admin_recovery_path(id: @recovery.id, stolen_record: {mark_as_eligible: true}), method: :put, class: "btn btn-success"
-%hr
-- url = {action: "update", controller: "recoveries"}
-.row
-  .col-md-6
-    = form_for([:admin, @recovery], :url => url , html: { class: "form form-horizontal" }) do |f|
+    .col-12
+      %p
+        This recovery is not displayed.
+      = button_to "Mark Eligible for display", admin_recovery_path(id: @recovery.id, stolen_record: { mark_as_eligible: true }), method: :put, class: "btn btn-lg btn-success"
+  - else
+    .col-12
+      %h4
+        Display Status:
+        %em
+          = @recovery.recovery_display_status.humanize
+      %p.mt-4
+        Really want to display this recovery?
+        = link_to "Display recovery here", new_admin_recovery_display_path(stolen_record_id: @recovery.id)
 
-      - if @recovery.errors.any?
-        = render partial: "/shared/errors", locals: { name: "Recovery", obj: @recovery}
+%hr{ style: "margin: 60px 0 30px;" }
+%h2 Edit recovery information
+
+= form_for([:admin, @recovery], url: { action: "update", controller: "recoveries" } , html: { class: "form form-horizontal" }) do |f|
+  - if @recovery.errors.any?
+    = render partial: "/shared/errors", locals: { name: "Recovery", obj: @recovery}
+  .row.mt-4
+    .col-md-6
       .form-group
-        = f.check_box :index_helped_recovery
-        = f.label :index_helped_recovery
+        = f.label :recovered_description, "Recovery description"
+        = f.text_area :recovered_description, rows: 4, class: "form-control"
 
-      .form-group
-        = f.check_box :can_share_recovery
-        = f.label :can_share_recovery
-      = submit_tag "Update the recovery", class: "btn btn-success"
+    .col-md-6
+      .form-group.form-check
+        = f.check_box :index_helped_recovery, class: "form-check-input"
+        = f.label :index_helped_recovery, class: "form-check-label"
 
-  / .control-group.recovery-input-field
-  /   = f.label :recovery_share, "Story to share",   class: "control-label"
-  /   .controls
-  /     = f.text_area :recovery_share
-  / / tweets - 140 chars, - 23 for URL
-  / - tweet_length = 140 - 23
-  / - if @bike.thumb_image.present?
-  /   / Minus 23 if bike has an image
-  /   - tweet_length = tweet_length - 23
-  / .control-group#tweet-entry.recovery-input-field{ data: {length: tweet_length } }
-  /   = f.label :recovery_tweet, class: "control-label"
-  /   .controls
-  /     = f.text_area :recovery_tweet
-  /   %span#tweet-length
-  /     = tweet_length
-
-
-  / .actions
-  /   .control-group
-  /     = submit_tag "Update the recovery", class: "button-green"
-  /
+      .form-group.form-check
+        = f.check_box :can_share_recovery, class: "form-check-input"
+        = f.label :can_share_recovery, class: "form-check-label"
+      .form-group.mt-4
+        = submit_tag "Update the recovery", class: "btn btn-success"

@@ -28,10 +28,26 @@ RSpec.describe Admin::StolenBikesController, type: :controller do
       get :edit, id: bike.id
       stolen_record.reload
 
+      expect(assigns(:current_stolen_record)).to be_truthy
+      expect(assigns(:stolen_record)).to eq stolen_record
       expect(stolen_record.recovery_link_token).to be_present
       expect(response.code).to eq("200")
       expect(response).to render_template("edit")
       expect(flash).to_not be_present
+    end
+    context "passed stolen_record id" do
+      let!(:recovered_record) { FactoryBot.create(:stolen_record_recovered, bike: bike) }
+      it "finds stolen_record" do
+        bike.reload
+        expect(stolen_record.recovery_link_token).to_not be_present
+        expect(bike.current_stolen_record).to eq stolen_record
+        get :edit, id: recovered_record.id, stolen_record_id: true
+        expect(assigns(:stolen_record)).to eq recovered_record
+        expect(assigns(:current_stolen_record)).to be_falsey
+        expect(response.code).to eq("200")
+        expect(response).to render_template("edit")
+        expect(flash).to_not be_present
+      end
     end
   end
 

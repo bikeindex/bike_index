@@ -1,32 +1,13 @@
 class Admin::PaymentsController < Admin::BaseController
   include SortableTable
   before_filter :find_payment, only: %i[edit update]
+  layout "new_admin"
 
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
     @payments = Payment.includes(:user, :organization, :invoice)
                        .order(sort_column + " " + sort_direction).page(page).per(per_page)
-    render layout: "new_admin"
-  end
-
-  def invoices
-    page = params[:page] || 1
-    per_page = params[:per_page] || 50
-    if params[:query] == "active"
-      invoices = Invoice.active
-    elsif params[:query] == "inactive"
-      invoices = Invoice.inactive
-    else
-      invoices = Invoice
-    end
-    @invoices =
-      invoices
-        .includes(:organization, :payments, :paid_features, :first_invoice)
-        .reorder(sort_column + " " + sort_direction)
-        .page(page)
-        .per(per_page)
-    render layout: "new_admin"
   end
 
   def new
@@ -37,7 +18,8 @@ class Admin::PaymentsController < Admin::BaseController
     redirect_to edit_admin_payment_url
   end
 
-  def edit; end
+  def edit
+  end
 
   def update
     if valid_invoice_parameters?
@@ -67,9 +49,8 @@ class Admin::PaymentsController < Admin::BaseController
 
   protected
 
-  def sortable_columns # sortable columns for both payments and invoices ;)
-    %w[id created_at user_id organization_id kind invoice_id amount_cents
-       subscription_start_at subscription_end_at amount_due_cents amount_paid_cents id]
+  def sortable_columns
+    %w[id created_at user_id organization_id kind invoice_id amount_cents]
   end
 
   def valid_invoice_parameters?

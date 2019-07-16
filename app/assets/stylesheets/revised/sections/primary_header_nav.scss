@@ -27,6 +27,9 @@ $mainmenu-open-zindex: 10;
   left: 0;
   width: 100%;
   z-index: $zindex-navbar-fixed;
+  ul {
+    list-style-type: none;
+  }
 
   .primary-logo {
     position: relative;
@@ -85,7 +88,7 @@ $mainmenu-open-zindex: 10;
     font-family: courier;
   }
 
-  .settings-link svg {
+  .primary-nav-item .settings-link {
     display: none;
   }
 
@@ -119,10 +122,10 @@ $mainmenu-open-zindex: 10;
     }
 
     .caret-down {
-      font-size: 75%;
       color: darken($primary-nav-text-color, 10%);
-      font-weight: 800;
       display: inline-block;
+      font-size: 90%;
+      font-weight: 800;
       margin-left: 0.2rem;
     }
   }
@@ -149,7 +152,6 @@ $mainmenu-open-zindex: 10;
     margin: 0;
     font-size: 1rem;
     text-align: left;
-    list-style: none;
     background-color: #222222;
     background-clip: padding-box;
     border: 1px solid rgba($gray, 0.3);
@@ -291,7 +293,7 @@ $mainmenu-open-zindex: 10;
     }
 
     .primary-submenu {
-      padding-left: 12px;
+      padding-left: 0;
     }
 
     #menu-opened-backdrop {
@@ -333,11 +335,18 @@ $mainmenu-open-zindex: 10;
 
     .hamburgler {
       padding-right: $mainmenu-width - 5%;
+      padding-left: 10%; // Ensure we cover the links when scrolling
     }
 
     .primary-main-menu {
       transform: translate(0%, 0);
     }
+  }
+}
+
+@media (max-width: $grid-breakpoint-sm) {
+  .primary-header-nav.menu-in .hamburgler {
+    padding-right: 50%; // Don't break line on small screens
   }
 }
 
@@ -412,12 +421,9 @@ $mainmenu-open-zindex: 10;
       }
 
       .settings-link {
+        display: block;
         padding-top: 0.5 * $vertical-height;
         padding-bottom: 0.5 * $vertical-height;
-
-        .settings-text {
-          display: none;
-        }
 
         svg {
           display: block;
@@ -443,7 +449,6 @@ $mainmenu-open-zindex: 10;
     margin: 2px 0 0;
     font-size: 1rem;
     text-align: left;
-    list-style: none;
     background-color: $primary-nav-background;
     background-clip: padding-box;
     border: 1px solid rgba($gray, 0.3);
@@ -492,6 +497,7 @@ $mainmenu-open-zindex: 10;
       text-decoration: none;
       margin: 11px $vertical-height 0 $vertical-height;
       transition: margin $mainmenu-transform-speed linear;
+      width: 90px;
     }
 
     &.headroom--pinned .nonprofit-subtitle,

@@ -39,3 +39,15 @@ label {
 .convertedTime {
   white-space: nowrap;
 }
+
+// When we need an input to look disabled, but still submit to the server
+.fake-disabled {
+  &,
+  &:active,
+  &:focus,
+  &.active {
+    background-color: #e9ecef;
+    opacity: 1;
+    cursor: not-allowed;
+  }
+}

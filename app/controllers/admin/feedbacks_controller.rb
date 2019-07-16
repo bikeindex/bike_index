@@ -24,7 +24,7 @@ class Admin::FeedbacksController < Admin::BaseController
 
   def matching_feedbacks
     feedbacks = Feedback
-    if params[:search_type].present?
+    if params[:search_type].present? && Feedback.feedback_types.include?(params[:search_type])
       feedbacks = feedbacks.where(feedback_type: params[:search_type] == "msg" ? nil : params[:search_type])
     end
     if params[:search_user_id].present?

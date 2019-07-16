@@ -31,8 +31,7 @@ class MergeAdditionalEmailWorker
 
   def merge_user_memberships(user_email, old_user)
     Organization.where(auto_user_id: old_user.id).each { |i| i.update_attribute :auto_user_id, user_email.user_id }
-    OrganizationInvitation.where(inviter_id: old_user.id).each { |i| i.update_attribute :inviter_id, user_email.user_id }
-    OrganizationInvitation.where(invitee_id: old_user.id).each { |i| i.update_attribute :invitee_id, user_email.user_id }
+    Membership.where(sender_id: old_user.id).each { |i| i.update_attribute :sender_id, user_email.user_id }
     old_user.memberships.each do |membership|
       if user_email.user.organizations.include?(membership.organization)
         membership.delete

@@ -6,6 +6,7 @@ RSpec.describe EmailRecoveredFromLinkWorker, type: :job do
   before { stolen_record.add_recovery_information }
 
   it "sends a recovered from link email" do
+    ActionMailer::Base.deliveries = []
     EmailRecoveredFromLinkWorker.new.perform(stolen_record.id)
     expect(ActionMailer::Base.deliveries.empty?).to be_falsey
   end

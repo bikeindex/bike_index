@@ -17,14 +17,6 @@ RSpec.describe Admin::PaymentsController, type: :controller do
     end
   end
 
-  describe "invoices" do
-    it "renders" do
-      get :invoices
-      expect(response.status).to eq(200)
-      expect(response).to render_template(:invoices)
-    end
-  end
-
   describe "edit" do
     it "renders" do
       get :edit, id: subject.to_param

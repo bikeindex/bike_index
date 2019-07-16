@@ -92,19 +92,19 @@
           .col-2
             %a.btn.btn-primary{target: "_blank", href: blog_url(@blog)}
               preview post
-          .col-2
-            = f.submit 'Save', class: 'btn btn-success'
+            = f.submit 'Save', class: 'button-green pull-right'
 
 
-
-- unless @blog.is_listicle
-  .card.mt-4
-    .card-body.bg-light
-      %ul.list-unstyled#public_images{ :"data-order-url" => order_public_images_url }
-        - if @blog.public_images
-          = render partial: "/public_images/public_image", collection: @blog.public_images, as: :public_image
-      %section
-        = render partial: "/public_images/admin_new_form", locals: { imageable_type: 'Blog', admin: true }
-    .alert.alert-info
-      %p
-        The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank"} if you're curious.
+  - unless @blog.is_listicle
+    .well
+      .add-blog-photos
+        %ul#public_images{ :"data-order-url" => order_public_images_url }
+          - if @blog.public_images
+            = render partial: "/public_images/public_image", collection: @blog.public_images, as: :public_image
+        %section
+          = render partial: "public_images/admin_new_form", locals: { imageable_type: 'Blog' }
+  .alert.alert-info
+    %p
+      The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank"} if you're curious.
+  .padded.clearfix
+    = link_to "Delete post", admin_news_url(@blog), method: :delete, data: { confirm: "Are you sure?" }, class: "button-red"

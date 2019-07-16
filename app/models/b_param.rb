@@ -61,7 +61,7 @@ class BParam < ActiveRecord::Base
 
   def self.assignable_attrs
     %w(manufacturer_id manufacturer_other frame_model year owner_email creation_organization_id
-       stolen recovered serial_number has_no_serial made_without_serial
+       stolen recovered serial_number made_without_serial
        primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id)
   end
 
@@ -89,7 +89,7 @@ class BParam < ActiveRecord::Base
   end
 
   def stolen=(val)
-    params["bike"]["stolen"] = ActiveRecord::Type::Boolean.new.type_cast_from_database(val)
+    params["bike"]["stolen"] = ParamsNormalizer.boolean(val)
   end
 
   def primary_frame_color_id=(val)
@@ -178,7 +178,7 @@ class BParam < ActiveRecord::Base
     bike["stolen"] = true if params["stolen_record"].present?
     set_wheel_size_key
     set_manufacturer_key
-    set_color_key unless bike["primary_frame_color_id"].present?
+    set_color_keys
     set_cycle_type_key
     set_rear_gear_type_slug if bike["rear_gear_type_slug"].present?
     set_front_gear_type_slug if bike["front_gear_type_slug"].present?
@@ -245,20 +245,38 @@ class BParam < ActiveRecord::Base
     params["bike"]["front_gear_type_id"] = gear && gear.id
   end
 
-  def set_color_key
-    paint = params["bike"]["color"]
+  def set_color_keys
+    %w[
+      primary_frame_color
+      secondary_frame_color
+      tertiary_frame_color
+    ].each { |key| set_color_key(key) }
+  end
+
+  def set_color_key(key = nil)
+    if bike["#{key}_id"].present?
+      params["bike"].delete(key)
+      return
+    end
+
+    paint = params.dig("bike", "color") || params.dig("bike", key)
     color = Color.friendly_find(paint.strip) if paint.present?
+
     if color.present?
-      params["bike"]["primary_frame_color_id"] = color.id
+      params["bike"]["#{key}_id"] = color.id
     else
       set_paint_key(paint)
     end
+
+    params["bike"].delete(key)
     params["bike"].delete("color")
   end
 
   def set_paint_key(paint_entry)
     return nil unless paint_entry.present?
+
     paint = Paint.friendly_find(paint_entry)
+
     if paint.present?
       params["bike"]["paint_id"] = paint.id
     else
@@ -268,6 +286,7 @@ class BParam < ActiveRecord::Base
       params["bike"]["paint_id"] = paint.id
       params["bike"]["paint_name"] = paint.name
     end
+
     unless bike["primary_frame_color_id"].present?
       if paint.color_id.present?
         params["bike"]["primary_frame_color_id"] = paint.color.id

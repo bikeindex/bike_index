@@ -12,7 +12,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
     let(:ownership) { FactoryBot.create(:ownership, owner_email: email) }
     let(:user_email) { FactoryBot.create(:user_email, email: email) }
     let(:user) { user_email.user }
-    let(:organization_invitation) { FactoryBot.create(:organization_invitation, invitee_email: "#{email.upcase} ") }
+    let(:membership) { FactoryBot.create(:membership, invited_email: "#{email.upcase} ") }
 
     context "existing user account" do
       let(:bike) { FactoryBot.create(:bike, creator_id: old_user.id) }
@@ -20,12 +20,13 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
       let(:pre_created_ownership) { FactoryBot.create(:ownership, creator_id: old_user.id) }
       let(:old_user_ownership) { FactoryBot.create(:ownership, owner_email: email) }
 
-      let(:organization) { organization_invitation.organization }
+      let(:organization) { membership.organization }
+      let(:membership) { FactoryBot.create(:membership_claimed, user: old_user) }
       let(:second_organization) { FactoryBot.create(:organization, auto_user_id: old_user.id) }
-      let(:membership) { FactoryBot.create(:membership, user: old_user, organization: second_organization) }
+      let(:second_membership) { FactoryBot.create(:membership_claimed, user: old_user, organization: second_organization) }
       let(:third_organization) { FactoryBot.create(:organization, auto_user_id: old_user.id) }
-      let(:old_membership) { FactoryBot.create(:membership, user: old_user, organization: third_organization) }
-      let(:new_membership) { FactoryBot.create(:membership, user: user, organization: third_organization) }
+      let(:old_membership) { FactoryBot.create(:membership_claimed, user: old_user, organization: third_organization) }
+      let(:new_membership) { FactoryBot.create(:membership_claimed, user: user, organization: third_organization) }
 
       let(:integration) { FactoryBot.create(:integration, user: old_user, information: { "info" => { "email" => email, name: "blargh" } }) }
       let(:lock) { FactoryBot.create(:lock, user: old_user) }
@@ -36,7 +37,8 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
       before do
         old_user.reload
         expect(ownership).to be_present
-        expect(organization_invitation).to be_present
+        expect(membership).to be_present
+        expect(second_membership).to be_present
         expect(user_email.confirmed).to be_truthy
         old_user_ownership.mark_claimed
         expect(old_user.ownerships.first).to eq old_user_ownership
@@ -81,6 +83,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
         expect(user_email.user).to eq user
         expect(user.ownerships.count).to eq 2
         expect(user.memberships.count).to eq 3
+        expect(user.organizations.pluck(:id)).to match_array([organization.id, second_organization.id, third_organization.id])
         expect(membership.user).to eq user
         expect(new_membership.user).to eq user
         expect(second_organization.auto_user).to eq user
@@ -107,7 +110,7 @@ RSpec.describe MergeAdditionalEmailWorker, type: :job do
     context "no existing user account" do
       before do
         expect(ownership).to be_present
-        expect(organization_invitation).to be_present
+        expect(membership).to be_present
         expect(user_email.confirmed).to be_truthy
       end
 

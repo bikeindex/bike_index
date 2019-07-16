@@ -11,7 +11,11 @@ class BikeV2Serializer < ActiveModel::Serializer
     :is_stock_img,
     :stolen,
     :stolen_location,
-    :date_stolen,
+    :date_stolen
+
+  def serial
+    object.serial_display
+  end
 
   def manufacturer_name
     object.mnfg_name

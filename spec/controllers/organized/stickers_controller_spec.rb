@@ -86,9 +86,11 @@ RSpec.describe Organized::StickersController, type: :controller do
 
       describe "update" do
         let(:bike) { FactoryBot.create(:bike) }
-        let(:bike_code) { FactoryBot.create(:bike_code, bike_id: bike.id, organization_id: organization.id) }
+        let(:bike_code) { FactoryBot.create(:bike_code_claimed, bike_id: bike.id, organization_id: organization.id) }
         let(:bike2) { FactoryBot.create(:bike) }
         it "updates" do
+          bike2.reload
+          expect(bike2.organizations.pluck(:id)).to eq([])
           put :update, id: bike_code.code, organization_id: organization.id, bike_code: { bike_id: "https://bikeindex.org/bikes/#{bike2.id} " }
           expect(assigns(:current_organization)).to eq organization
           expect(flash[:success]).to be_present
@@ -96,6 +98,8 @@ RSpec.describe Organized::StickersController, type: :controller do
           bike_code.reload
           expect(bike_code.bike_id).to eq bike2.id
           expect(bike_code.previous_bike_id).to eq bike.id
+          bike2.reload
+          expect(bike2.organizations.pluck(:id)).to eq([organization.id])
         end
         context "passed code rather than id" do
           it "updates" do

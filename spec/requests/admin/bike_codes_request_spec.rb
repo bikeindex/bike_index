@@ -1,12 +1,9 @@
 require "rails_helper"
 
-RSpec.describe Admin::ExportsController, type: :request do
+RSpec.describe Admin::BikeCodesController, type: :request do
   base_url = "/admin/bike_codes"
 
-  # Request specs don't have cookies so we need to stub stuff if we're in request specs
-  # This is suboptimal, but hey, it gets us to request specs for now
-  before { allow(User).to receive(:from_auth) { user } }
-  let(:user) { FactoryBot.create(:admin) }
+  include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
     let(:bike_code_batch) { FactoryBot.create(:bike_code_batch) }

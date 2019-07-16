@@ -6,16 +6,11 @@
 .accept-vendor-terms
 
   = form_for @user do |f|
-    
-    .form-horizontal
+
+    .form-group
       .control-group
-        %label
-          .control-label
-            = f.check_box :vendor_terms_of_service
-          .controls
-            I agree to Bike Index 
-            %strong
-              Terms of Service for Vendors.
+        = f.label :vendor_terms_of_service, class: "center-accept-terms-text" do
+          = f.check_box :vendor_terms_of_service
+          = t(".i_agree_to_tos_html")
     .agree-action
-      .control-group
-        = f.submit "Submit", class: 'button-blue'
+      = f.submit t(".submit"), class: "btn btn-primary btn-lg center-accept-terms-button"

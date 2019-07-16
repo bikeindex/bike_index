@@ -5,7 +5,7 @@ class UpdateAuthTokenWorker
 
   def perform(id)
     user = User.find(id)
-    user.generate_auth_token
+    user.generate_auth_token("auth_token")
     user.save
   end
 end

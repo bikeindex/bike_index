@@ -1,7 +1,12 @@
 <div id="error-page-wrap">
   <h1 class="error-text">422</h1>
-  <p class="error-explanation">We're sorry, We can't do what you just asked. Think you ought to be able to? Email us <a href="mailto:contact@bikeindex.org">Contact</a>.</p>
+  <p class="error-explanation">
+    <%- email_link = link_to t(".contact"), "mailto:#{t('.contact_email')}"  %>
+    <%= t(".explanation_html", email_link: email_link) %>
+  </p>
   <h4 class="go-back">
-    <a class="back-link" onClick="history.go(-1);return true;">Send me back from whence I came!</a>
+    <a class="back-link" onClick="history.go(-1);return true;">
+      <%= t(".send_me_back") %>
+    </a>
   </h4>
 </div>

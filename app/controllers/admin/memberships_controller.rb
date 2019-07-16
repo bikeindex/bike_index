@@ -1,4 +1,5 @@
 class Admin::MembershipsController < Admin::BaseController
+  include SortableTable
   before_filter :find_membership, only: [:show, :edit, :update, :destroy]
   before_filter :find_users, only: [:new, :create, :edit]
   before_filter :find_user, only: [:show]
@@ -7,14 +8,14 @@ class Admin::MembershipsController < Admin::BaseController
   layout "new_admin"
 
   def index
-    @memberships = Membership.includes(:organization, :user).reorder(created_at: :desc)
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @memberships = @memberships.order(created_at: :desc)
-      .page(page).per(per_page)
+    @memberships = matching_memberships.includes(:user, :sender, :organization).reorder("memberships.#{sort_column} #{sort_direction}")
+                                         .page(page).per(per_page)
   end
 
   def show
+    redirect_to edit_admin_membership_path
   end
 
   def new
@@ -58,6 +59,10 @@ class Admin::MembershipsController < Admin::BaseController
 
   protected
 
+  def sortable_columns
+    %w[created_at invited_email sender_id claimed_at organization_id]
+  end
+
   def permitted_parameters
     params.require(:membership).permit(:organization_id, :user_id, :role, :invited_email)
   end
@@ -80,5 +85,13 @@ class Admin::MembershipsController < Admin::BaseController
 
   def find_organization
     @organization = Organization.find(@membership[:organization_id])
+  end
+
+  def matching_memberships
+    if current_organization.present?
+      current_organization.memberships
+    else
+      Membership.all
+    end
   end
 end

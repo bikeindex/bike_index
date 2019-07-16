@@ -13,6 +13,7 @@ class BikeIndex.BikesEdit extends BikeIndex
       when 'remove' then new BikeIndex.BikesEditRemove
       when 'groups' then new BikeIndex.BikesEditGroups
       when 'alert' then new BikeIndex.BikesEditAlert
+      when 'alert_purchase' then new BikeIndex.BikesEditAlertPurchase
 
   updatePageLocation: (url) ->
     window.location.href = url

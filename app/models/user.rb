@@ -1,4 +1,5 @@
 class User < ActiveRecord::Base
+  include Phonifyerable
   include ActionView::Helpers::SanitizeHelper
   include FeatureFlaggable
   cattr_accessor :current_user
@@ -15,6 +16,7 @@ class User < ActiveRecord::Base
   has_many :payments
   has_many :subscriptions, -> { subscription }, class_name: "Payment"
   has_many :memberships, dependent: :destroy
+  has_many :sent_memberships, class_name: "Membership", foreign_key: :sender_id
   has_many :organization_embeds, class_name: "Organization", foreign_key: :auto_user_id
   has_many :organizations, through: :memberships
   has_many :ownerships, dependent: :destroy
@@ -33,8 +35,6 @@ class User < ActiveRecord::Base
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
 
-  has_many :organization_invitations, class_name: "OrganizationInvitation", inverse_of: :inviter
-  has_many :organization_invitations, class_name: "OrganizationInvitation", inverse_of: :invitee
   belongs_to :state
   belongs_to :country
 
@@ -58,13 +58,15 @@ class User < ActiveRecord::Base
     on: :update
   validates_format_of :password, with: /\A.*(?=.*[a-z]).*\Z/i, message: "must contain at least one letter", on: :update, allow_blank: true
 
+  validate :preferred_language_is_an_available_locale
+
   validates_presence_of :email
   validates_uniqueness_of :email, case_sensitive: false
 
   before_validation :normalize_attributes
   validate :ensure_unique_email
   before_create :generate_username_confirmation_and_auth
-  after_create :perform_create_jobs
+  after_commit :perform_create_jobs, on: :create
   before_save :set_calculated_attributes
 
   attr_accessor :skip_geocode
@@ -160,32 +162,42 @@ class User < ActiveRecord::Base
     superuser || organizations.any? { |o| o.paid_for?("unstolen_notifications") }
   end
 
-  def reset_token_time
-    t = password_reset_token && password_reset_token.split("-")[0]
-    t = (t.present? && t.to_i > 1427848192) ? t.to_i : 1364777722
-    Time.at(t)
+  def auth_token_time(auth_token_type)
+    SecurityTokenizer.token_time(self[auth_token_type])
   end
 
-  def reset_token_expired?
-    reset_token_time < (Time.current - 1.hours)
+  def auth_token_expired?(auth_token_type)
+    auth_token_time(auth_token_type) < (Time.current - 1.hours)
   end
 
-  def set_password_reset_token(t = Time.current.to_i)
-    self.password_reset_token = "#{t}-" + Digest::MD5.hexdigest("#{SecureRandom.hex(10)}-#{DateTime.current}")
-    self.save
+  def accepted_vendor_terms_of_service?
+    vendor_terms_of_service
   end
 
-  def accept_vendor_terms_of_service
-    self.vendor_terms_of_service = true
-    self.when_vendor_terms_of_service = DateTime.current
-    save
+  def accepted_vendor_terms_of_service=(val)
+    if ParamsNormalizer.boolean(val)
+      self.vendor_terms_of_service = true
+      self.when_vendor_terms_of_service = Time.current
+    end
+    true
   end
 
   def send_password_reset_email
-    unless reset_token_time > Time.current - 2.minutes
-      set_password_reset_token
+    unless auth_token_time("password_reset_token") > Time.current - 2.minutes
+      update_auth_token("password_reset_token")
       EmailResetPasswordWorker.perform_async(id)
     end
+  end
+
+  def send_magic_link_email
+    unless auth_token_time("magic_link_token") > Time.current - 1.minutes
+      update_auth_token("magic_link_token")
+      EmailMagicLoginLinkWorker.perform_async(id)
+    end
+  end
+
+  def update_last_login(ip_address)
+    update_columns(last_login_at: Time.current, last_login_ip: ip_address)
   end
 
   def confirm(token)
@@ -205,12 +217,12 @@ class User < ActiveRecord::Base
 
   def member_of?(organization)
     return false unless organization.present?
-    Membership.where(user_id: id, organization_id: organization.id).present? || superuser?
+    Membership.claimed.where(user_id: id, organization_id: organization.id).present? || superuser?
   end
 
   def admin_of?(organization)
     return false unless organization.present?
-    Membership.where(user_id: id, organization_id: organization.id, role: "admin").present? || superuser?
+    Membership.claimed.where(user_id: id, organization_id: organization.id, role: "admin").present? || superuser?
   end
 
   def has_membership?
@@ -327,10 +339,13 @@ class User < ActiveRecord::Base
     }.as_json
   end
 
-  def generate_auth_token
-    begin
-      self.auth_token = SecureRandom.urlsafe_base64 + "t#{Time.current.to_i}"
-    end while User.where(auth_token: auth_token).exists?
+  def update_auth_token(auth_token_type, time = nil)
+    generate_auth_token(auth_token_type, time)
+    save
+  end
+
+  def generate_auth_token(auth_token_type, time = nil)
+    self.attributes = { auth_token_type => SecurityTokenizer.new_token(time) }
   end
 
   def access_tokens_for_application(i)
@@ -345,15 +360,21 @@ class User < ActiveRecord::Base
       usrname = SecureRandom.urlsafe_base64
     end
     self.username = usrname
-    if !confirmed
-      self.confirmation_token = (Digest::MD5.hexdigest "#{SecureRandom.hex(10)}-#{DateTime.current.to_s}")
-    end
-    generate_auth_token
+    self.generate_auth_token("confirmation_token") if !confirmed
+    generate_auth_token("auth_token")
     true
   end
 
   def geocodeable_attributes_changed?
     return false unless city.present? || zipcode.present? || street.present?
     city_changed? || zipcode_changed? || street_changed?
+  end
+
+  private
+
+  def preferred_language_is_an_available_locale
+    return if preferred_language.blank?
+    return if I18n.available_locales.include?(preferred_language.to_sym)
+    errors.add(:preferred_language, "not an available language")
   end
 end

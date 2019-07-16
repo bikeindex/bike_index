@@ -40,6 +40,9 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.render_views
 
+  # include translation / localization methods
+  config.include AbstractController::Translation
+
   # Add our request/controller spec helpers
   config.include RequestSpecHelpers, type: :request
   config.include ControllerSpecHelpers, type: :controller
@@ -70,6 +73,14 @@ end
 
 RSpec::Sidekiq.configure do |config|
   config.warn_when_jobs_not_processed_by_sidekiq = false
+end
+
+RSpec.configure do |config|
+  config.before(:each) do
+    # Reset feature-flipping between examples
+    # (In test examples, stub Flipper as needed, passing specific args to #with)
+    allow(Flipper).to receive(:enabled?).with(any_args).and_call_original
+  end
 end
 
 # DB Cleaner metadata tags

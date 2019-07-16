@@ -38,4 +38,12 @@ class AdminMailer < ActionMailer::Base
     @api_key = api_key
     mail(to: "admin@bikeindex.org", subject: "Api Notification sent!")
   end
+
+  def theft_alert_purchased(theft_alert)
+    @theft_alert = theft_alert
+    @theft_alert_plan = theft_alert.theft_alert_plan
+    @creator = theft_alert.creator
+    @bike = theft_alert.bike
+    mail(to: "stolenbikealerts@bikeindex.org", subject: "Theft Alert purchased: #{@theft_alert.id}")
+  end
 end

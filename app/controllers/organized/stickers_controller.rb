@@ -1,13 +1,16 @@
 module Organized
   class StickersController < Organized::BaseController
+    include SortableTable
     before_action :ensure_access_to_bike_codes!, except: [:create] # Because this checks ensure_admin
     before_action :find_bike_code, only: [:edit, :update]
     rescue_from ActionController::RedirectBackError, with: :redirect_back # Gross. TODO: Rails 5 update
 
     def index
-      @page = params[:page] || 1
-      @per_page = params[:per_page] || 25
-      @bike_codes = searched.includes(:bike).order(created_at: :desc).page(@page).per(@per_page)
+      page = params[:page] || 1
+      per_page = params[:per_page] || 25
+      @bike_codes = searched.includes(:bike)
+                            .reorder("bike_codes.#{sort_column} #{sort_direction}")
+                            .page(page).per(per_page)
     end
 
     def edit
@@ -33,6 +36,10 @@ module Organized
     end
 
     private
+
+    def sortable_columns
+      %w[created_at claimed_at code_integer]
+    end
 
     def bike_code_code
       params.dig(:bike_code, :code) || params[:id]

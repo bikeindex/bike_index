@@ -33,7 +33,17 @@ RSpec.describe CustomerMailer, type: :mailer do
 
   describe "password_reset_email" do
     it "renders email" do
-      user.set_password_reset_token
+      user.update_auth_token("password_reset_token")
+      mail = CustomerMailer.password_reset_email(user)
+      expect(mail.subject).to eq("Instructions to reset your password")
+      expect(mail.from).to eq(["contact@bikeindex.org"])
+      expect(mail.body.encoded).to match(user.password_reset_token)
+    end
+  end
+
+  describe "magic_login_link_email" do
+    it "renders email" do
+      user.update_auth_token("password_reset_token")
       mail = CustomerMailer.password_reset_email(user)
       expect(mail.subject).to eq("Instructions to reset your password")
       expect(mail.from).to eq(["contact@bikeindex.org"])
@@ -150,7 +160,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.cc).to eq(["bryan@bikeindex.org", "lily@bikeindex.org"])
       stolen_notification.reload
       expect(stolen_notification.send_dates).to be_present
-      expect(stolen_notification.send_dates[0]).to eq(stolen_notification.updated_at.to_i)
+      expect(stolen_notification.send_dates[0]).to be_within(1).of(stolen_notification.updated_at.to_i)
       stolen_note = StolenNotification.where(id: stolen_notification.id).first
       mail2 = CustomerMailer.stolen_notification_email(stolen_note)
       expect(mail2.subject).to eq(stolen_notification.default_subject)

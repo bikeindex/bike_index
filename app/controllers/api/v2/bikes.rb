@@ -36,13 +36,13 @@ module API
             optional :police_report_department, type: String, desc: "Police department reported to (include if report number present)"
             optional :show_address, type: Boolean, desc: "Display the exact address the theft happened at"
 
-            #   # link to LOCKING options!
-            #   # optional :locking_description_slug, type: String, desc: 'Locking description. description.'
-            #   # optional :lock_defeat_description_slug, type: String, desc: 'Lock defeat description. One of the values from lock defeat desc'
-            #   # optional :theft_description, type: String, desc: 'stuff'
+            optional :theft_description, type: String, desc: "stuff"
 
-            #   # optional :phone_for_everyone, type: Boolean, default: false, desc: 'Show phone number to non logged in users'
-            #   # optional :phone_for_users, type: Boolean, default: true, desc: 'Show phone to logged in users'
+            # link to LOCKING options!
+            # optional :locking_description_slug, type: String, desc: "Locking description. description."
+            # optional :lock_defeat_description_slug, type: String, desc: "Lock defeat description. One of the values from lock defeat desc"
+            # optional :phone_for_everyone, type: Boolean, default: false, desc: 'Show phone number to non logged in users'
+            # optional :phone_for_users, type: Boolean, default: true, desc: 'Show phone to logged in users'
           end
         end
 
@@ -84,13 +84,6 @@ module API
           return true if @bike.authorize_for_user!(current_user)
           error!("You do not own that #{@bike.type}#{addendum}", 403)
         end
-
-        def ensure_required_stolen_attrs(hash)
-          return true unless hash["bike"]["stolen"]
-          %w(phone city).each do |k|
-            error!("Could not create stolen record: missing #{k}", 401) unless hash["stolen_record"][k].present?
-          end
-        end
       end
 
       resource :bikes do
@@ -114,7 +107,7 @@ module API
             - Do not show turn up in searches
             - Do not send an email to the owner on creation
             - Are automatically deleted after a few days
-            - Can be viewed in the API /v2/bikes/{id} (same as non-test bikes)
+            - Can be viewed in the API /v3/bikes/{id} (same as non-test bikes)
             - Can be viewed on the HTML site /bikes/{id} (same as non-test bikes)
 
             *`test` is automatically marked true on this documentation page. Set it to false it if you want to create actual bikes*
@@ -151,8 +144,6 @@ module API
             declared_p = { "declared_params" => declared(params, include_missing: false) }
             b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
             b_param.clean_params
-            ensure_required_stolen_attrs(b_param.params)
-
             @bike = found_bike
             authorize_bike_for_user
 
@@ -175,7 +166,6 @@ module API
           declared_p = { "declared_params" => declared(params, include_missing: false).merge(creation_state_params) }
           b_param = BParam.new(creator_id: creation_user_id, params: declared_p["declared_params"].as_json, origin: "api_v2")
           b_param.clean_params
-          ensure_required_stolen_attrs(b_param.params)
           b_param.save
 
           bike = BikeCreator.new(b_param).create_bike
@@ -214,7 +204,6 @@ module API
           b_param = BParam.new(params: declared_p["declared_params"].as_json, origin: "api_v2")
           b_param.clean_params
           hash = b_param.params
-          ensure_required_stolen_attrs(hash) if hash["stolen_record"].present? && @bike.stolen != true
           @bike.load_external_images(hash["bike"]["external_image_urls"]) if hash.dig("bike", "external_image_urls").present?
           begin
             BikeUpdator.new(user: current_user, bike: @bike, b_params: hash).update_available_attributes
@@ -230,7 +219,7 @@ module API
 
             To post a file to the API with curl:
 
-            `curl -X POST -i -F file=@{test_file.jpg} "#{ENV["BASE_URL"]}/api/v2/bikes/{bike_id}/image?access_token={access_token}"`
+            `curl -X POST -i -F file=@{test_file.jpg} "#{ENV["BASE_URL"]}/api/v3/bikes/{bike_id}/image?access_token={access_token}"`
 
             Replace `{text_file.jpg}` with the relative path of the file you're posting.
 
@@ -252,6 +241,30 @@ module API
           else
             error!(public_image.errors.full_messages.to_sentence, 401)
           end
+        end
+
+        desc "Remove an image from a bike", {
+          authorizations: { oauth2: [{ scope: :write_bikes }] },
+          notes: <<-NOTE,
+
+            Remove an image from the bike, specifying both the bike_id and the image id (which can be found in the public_images resopnse)
+
+            **Requires** `write_bikes` **in the access token** you use.
+
+          NOTE
+
+        }
+        params do
+          requires :id, type: Integer, desc: "Bike ID"
+          requires :image_id, type: Integer, desc: "Image ID"
+        end
+        delete ":id/images/:image_id", serializer: BikeV2ShowSerializer, root: "bike" do
+          find_bike
+          authorize_bike_for_user
+          public_image = @bike.public_images.find_by_id(params[:image_id])
+          error!("Unable to find that image", 404) unless public_image.present?
+          public_image.destroy
+          @bike
         end
 
         desc "Send a stolen notification<span class='accstr'>*</span>", {

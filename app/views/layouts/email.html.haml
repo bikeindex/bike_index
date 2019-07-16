@@ -2,24 +2,33 @@
 %html
   %head
     %meta{ content: 'text/html; charset=UTF-8', 'http-equiv' => 'Content-Type' }
-    %title
-      = content_for?(:title) ? yield(:title) : 'Bike Index'
+    %title= content_for?(:title) ? yield(:title) : t(".bike_index")
     = stylesheet_link_tag 'email'
+
   %body
     .binx-wrapper
       .binx-header
         %img{ src: "https://files.bikeindex.org/email_assets/logo.png", height: "70", alt: "Bike Index logo" }
+
         - if @partner
           %span.partner-logo-wrapper
-            = image_tag "https://files.bikeindex.org/email_assets/bikehub_logo.png", height: "50", alt: "BikeHub Logo", class: "partner-header-logo"
+            = image_tag "https://files.bikeindex.org/email_assets/bikehub_logo.png",
+              height: "50",
+              alt: "BikeHub Logo",
+              class: "partner-header-logo"
+
             %span.logo-plus
               +
+
       .binx-body
         - if @organization.present? && controller_path == 'organized_mailer' && @organization.mail_snippet_body('header').present?
           = @organization.mail_snippet_body('header').html_safe
+
         = yield
+
         - if @organization.present? && controller_path == 'organized_mailer' && @organization.mail_snippet_body('footer').present?
           = @organization.mail_snippet_body('footer').html_safe
+
       .binx-pstscpt
         .hearts
           %span &#9829;
@@ -27,10 +36,12 @@
           %span &#9829;
           %span &#9829;
           %span &#9829;
-        %h4 The Bike Index Team
+        %h4= t(".the_bike_index_team")
 
       .binx-footer
         %h5
-          #{Time.current.year} &copy; Bike Index.
+          #{Time.current.year} &copy; #{t(".bike_index")}.
+
           - unless @organization.present? && controller_path == 'organized_mailer' && @organization.is_paid
-            Help prevent bike theft, #{ link_to 'make a donation.', support_the_index_url }
+            = t(".help_prevent_theft")
+            = link_to(t(".make_a_donation"), support_the_index_url)

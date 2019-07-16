@@ -2,30 +2,32 @@
 
 %nav.primary-edit-form-well-menu
   - if @bike.stolen?
-    %h3.nav-group-header Theft Details
+    %h3.nav-group-header= t(".theft_details")
     %ul
       - @theft_templates.each do |template, description|
         %li{ class: "edit-menu-#{template}" }
-          - link_classname = @edit_template == template ? 'active' : ''
-          %a{ href: edit_bike_path(page: template), class: link_classname }
+          - is_active = 'active' if @edit_template.match(/#{template}/)
+          %a{ href: edit_bike_path(page: template), class: is_active }
             %h4= description
 
-  %h3.nav-group-header Bike Details
+  %h3.nav-group-header
+    = t(".bike_type_details", bike_type: @bike.type)
   %ul
     - @bike_templates.each do |template, description|
       %li{ class: "edit-menu-#{template}" }
-        - link_classname = @edit_template == template ? 'active' : ''
-        %a{ href: edit_bike_path(page: template), class: link_classname }
+        - is_active = 'active' if @edit_template.match(/#{template}/)
+        %a{ href: edit_bike_path(id: @bike.to_param, page: template), class: is_active }
           %h4= description
 
   .form-well-edit-page-select
     %span.menu-select-overlay
-      You are editing
-    // ignore this select in dirty forms
+      = t(".you_are_editing")
+    -# ignore this select in dirty forms
     %select.dirtyignore
       - @edit_templates.each do |template, description|
         %option{ selected: (@edit_template == template), value: edit_bike_path(page: template) }
           = description
+
   .edit-form-well-submit-wrapper
     = hidden_field_tag :edit_template, @edit_template
-    = submit_tag 'Save changes', class: 'btn btn-lg btn-primary', disabled: is_disabled
+    = submit_tag t(".save_changes"), class: 'btn btn-lg btn-primary', disabled: is_disabled

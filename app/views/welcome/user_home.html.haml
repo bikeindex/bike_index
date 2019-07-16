@@ -2,7 +2,7 @@
   .row.first-row
     .col-md-8
       %h1
-        #{current_user.display_name} bikes
+        = t(".user_bikes", current_user_name: current_user.display_name)
 
     .col-md-4.ad-col
       .ad-block#top468x60
@@ -11,10 +11,10 @@
       %ul.user-items-nav.nav.nav-tabs{ role: 'tablist' }
         %li.nav-item
           %a.nav-link{ class: ('active' unless @locks_active_tab), href: '#bikes_tab_content', data: { toggle: 'tab', role: 'tab' } }
-            bikes
+            = t(".bikes")
         %li.nav-item
           %a.nav-link{ class: ('active' if @locks_active_tab), href: '#locks_tab_content', data: { toggle: 'tab', role: 'tab' } }
-            locks
+            = t(".locks")
       .user-items-content.tab-content
         .tab-pane#bikes_tab_content{ class: ('active' unless @locks_active_tab) }
           - if @bikes.present?
@@ -26,75 +26,68 @@
                     - unless bike.thumb_path
                       .thumb-overlay
                         = image_tag 'revised/photo_icon.svg'
-                        %h4
-                          Add a photo
+                        %h4= t(".add_a_photo")
                     = bike.thumb_image
                   .bike-information.multi-attr-lists
                     %h5.title-link
                       - if bike.stolen
                         %strong.stolen-color
                           - if bike.recovered
-                            RECOVERED
+                            = t(".recovered")
                           - else
-                            STOLEN
+                            = t(".stolen")
                       %strong
                         - unless bike.type == 'bike'
                           = bike.type
                         = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
                       #{bike.frame_model}
                     %ul.attr-list
-                      = bike.attr_list_item(bike.serial_display, 'Serial')
-                      = bike.attr_list_item(bike.frame_colors.to_sentence, 'Primary colors')
+                      = bike.attr_list_item(bike.serial_display, t(".serial"))
+                      = bike.attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
                       - if bike.current_stolen_record.present?
-                        = bike.attr_list_item((l bike.current_stolen_record.date_stolen, format: :dotted), "Date #{bike.recovered ? 'recovered' : 'stolen'}")
-                        = bike.attr_list_item(bike.short_address(bike.current_stolen_record), 'Location')
+                        - recovered_or_stolen =  bike.recovered? ? t(".date_recovered") : t('.date_stolen')
+                        = bike.attr_list_item(l(bike.current_stolen_record.date_stolen, format: :dotted), recovered_or_stolen)
+                        = bike.attr_list_item(bike.short_address(bike.current_stolen_record), t(".location"))
                     %ul.attr-list
+                      %li= link_to t(".edit_bike"), edit_bike_path(bike)
                       %li
-                        = link_to 'Edit Bike', edit_bike_url(bike)
-                      %li
-                        = link_to 'Printable (pdf)', pdf_bike_url(bike)
+                        - if bike.stolen
+                          = link_to t(".printable_pdf"), pdf_bike_path(bike)
+                        - else
+                          = link_to t(".mark_bike_stolen"), edit_bike_path(bike, page: "report_stolen"), class: "text-danger less-strong"
 
             .paginate-container.paginate-container-bottom
               = paginate @bikes
           - else
-            %h2
-              You have no registered bikes
+            %h2= t(".you_have_no_registered_bikes")
         .tab-pane#locks_tab_content{ class: ('active' if @locks_active_tab) }
           - if @locks.present?
             %table.table.table-striped.table-bordered
               %thead
-                %th
-                  Lock Type
-                %th
-                  Manufacturer
-                %th
-                  Key Serial
-                %th
-                  Combination
+                %th= t(".lock_type")
+                %th= t(".manufacturer")
+                %th= t(".key_serial")
+                %th= t(".combination")
               %tbody
                 - @locks.each do |lock|
                   %tr
                     %td
                       = lock.lock_type_name
-                      = link_to('Edit', edit_lock_url(lock))
-                    %td
-                      = lock.manufacturer_name
-                    %td
-                      = lock.key_serial
-                    %td
-                      = lock.combination
+                      = link_to(t(".edit"), edit_lock_path(lock))
+                    %td= lock.manufacturer_name
+                    %td= lock.key_serial
+                    %td= lock.combination
           - else
-            %h2
-              You have no registered locks
+            %h2= t(".you_have_no_registered_locks")
     .col-md-4
       .side-box
         %h3.first-item
-          Register new items
+          = t(".register_new_items")
         .inner
-          = link_to "Add a bike", choose_registration_path, class: "btn btn-primary btn-lg"
-          = link_to "Add a lock", new_lock_url, class: "btn btn-primary-offset btn-lg"
+          = link_to t(".add_a_bike"), choose_registration_path, class: "btn btn-primary btn-lg"
+          = link_to t(".add_a_lock"), new_lock_url, class: "btn btn-primary-offset btn-lg"
         %h3
-          Add some info
+          = t(".add_some_info")
         .inner.last-item
           - if @bikes.present?
             .lock-group
@@ -107,13 +100,12 @@
                 %p
                   - if @bikes.count > 0
                     - if @bikes.last.stolen
-                      We're sorry your #{@bikes.last.type} was stolen, but hopefully, with everyone able to search for it, you'll get it back!
+                      = t(".sorry_your_bike_was_stolen", bikes_last_type: @bikes.last.type)
                     - else
-                      Awesome! We're pumped you added a #{@bikes.last.type} to the Index.
+                      = t(".thanks_for_adding_your_bike", bikes_last_type: @bikes.last.type)
                   - else
-                    %strong
-                      Welcome
-                    to Bike Index. Thanks for signing up!
+                    %strong= t(".welcome")
+                    = t(".to_bike_index_thanks_for_signing_up")
 
           .lock-group
             .image-column
@@ -121,6 +113,6 @@
             .col-xs-10
               %p
                 %strong
-                  Tell us more about yourself.
-                = link_to "Update your profile", my_account_url
+                  = t(".tell_us_more_about_yourself")
+                = link_to t(".update_your_profile"), my_account_url
       .ad-block#right300x600

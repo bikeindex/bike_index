@@ -1,14 +1,4 @@
 .organized-messages {
-  #messagesCount {
-    span.plural {
-      display: none;
-    }
-
-    &.number-is-plural span.plural {
-      display: inline-block;
-    }
-  }
-
   #map {
     width: 100%;
     height: 400px;

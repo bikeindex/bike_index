@@ -84,4 +84,4 @@
     %small
       Last 25 shown <em>use organization view for paginated list</em>
 
-= render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: @bulk_import.bikes.reorder(created_at: :desc).limit(25) }
+= render partial: "/admin/bikes/table", locals: { bikes: @bulk_import.bikes.reorder(created_at: :desc).limit(25) }

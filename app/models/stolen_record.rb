@@ -28,7 +28,7 @@ class StolenRecord < ActiveRecord::Base
   belongs_to :state
   belongs_to :creation_organization, class_name: "Organization"
   belongs_to :recovering_user, class_name: "User"
-  has_many :theft_alerts, dependent: :destroy
+  has_many :theft_alerts
 
   validates_presence_of :bike
   validates_presence_of :date_stolen
@@ -64,7 +64,10 @@ class StolenRecord < ActiveRecord::Base
 
   def pre_recovering_user?; date_recovered.present? && date_recovered < self.class.recovering_user_recording_start end
 
-  def address_override_show_address; address(override_show_address: true) end
+  # Only display if they have put in an address - so that we don't show on initial creation
+  def display_checklist?; address.present? end
+
+  def address_override_show_address; address(skip_default_country: true) end
 
   def address(skip_default_country: false, override_show_address: false)
     country_string = country && country.iso
@@ -168,7 +171,7 @@ class StolenRecord < ActiveRecord::Base
     row << "\t"
     row << tsv_col(b.frame_model)
     row << "\t"
-    row << tsv_col(b.serial) unless b.serial == "absent"
+    row << tsv_col(b.serial_display)
     row << "\t"
     row << tsv_col(b.frame_colors.to_sentence)
     row << tsv_col(b.description)
@@ -211,10 +214,7 @@ class StolenRecord < ActiveRecord::Base
 
   def find_or_create_recovery_link_token
     return recovery_link_token if recovery_link_token.present?
-    begin
-      self.recovery_link_token = SecureRandom.urlsafe_base64
-    end while self.class.where(recovery_link_token: recovery_link_token).exists?
-    save
+    update_attributes(recovery_link_token: SecurityTokenizer.new_token)
     recovery_link_token
   end
 end

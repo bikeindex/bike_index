@@ -31,6 +31,10 @@ class BikeSerializer < ActiveModel::Serializer
     :rear_gear_type,
     :stolen_record
 
+  def serial
+    object.serial_display
+  end
+
   def type_of_cycle
     object.cycle_type_name
   end

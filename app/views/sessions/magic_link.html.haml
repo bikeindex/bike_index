@@ -1,0 +1,13 @@
+.container
+  %h3= t(".sign_in_with_magic_link")
+  - if @incorrect_token
+    .alert.alert-warning.mt-2.mb-4
+      %h3.header-font-alt.mb-2=t(".unable_to_auth")
+      %p=t(".reenter_email")
+
+  %p= t(".enter_email_address")
+
+  = form_tag '/session/create_magic_link', method: 'post' do
+    .form-group
+      %input{ name: 'email', id: 'email', type: 'text', placeholder: t(".your_email_address"), class: 'form-control' }
+  %input{ type: 'submit', value: t(".get_sign_in_link"), class: 'btn btn-primary btn-lg' }

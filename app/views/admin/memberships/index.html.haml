@@ -1,37 +1,25 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      Manage Memberships
+  .col-md-7
+    %ul
+      %li.nav-item
+        = link_to "New Membership", new_admin_membership_url, class: "nav-link"
 
-%h1 Manage Memberships
-= link_to 'New Membership', new_admin_membership_url, class: "btn btn-success float-right"
+%h4
+  = number_with_delimiter @memberships.total_count
+  matching
+  = "membership".pluralize(@memberships.total_count)
+- if current_organization.present?
+  %p.mt-2
+    Viewing #{link_to current_organization.name, admin_organization_path(current_organization)} Memberships
+    %small
+      = link_to "view orgs view", organization_users_path(organization_id: current_organization.to_param), class: "less-strong"
 
-%h2
-  = @memberships.count
-  Current memberships
+.mt-4
+  = paginate @memberships, views_prefix: 'admin'
 
-= paginate @memberships, views_prefix: 'admin'
-.full-screen-table
-  %table.table.table-striped.table-bordered
-    %thead.thead-light
-      %th
-        Id&nbsp;
-      %th
-        Created&nbsp;<small class="convertTimezone"></small>
-      %th
-        Email
-      %th
-        Organization
-      %th
-        Management links
-    %tbody
-      - @memberships.each do |membership|
-        %tr
-          %td
-            = link_to membership.id, admin_membership_url(membership)
-          %td
-            %span.convertTime
-              = l membership.created_at, format: :convert_time
-          %td
-            = membership.user.email
-          %td
-            = link_to membership.organization.name, admin_organization_path(membership.organization)
-          %td
-            #{link_to 'Edit', edit_admin_membership_url(membership)}
+= render partial: "/admin/memberships/table", locals: { memberships: @memberships, render_sortable: true }
+
 = paginate @memberships, views_prefix: 'admin'

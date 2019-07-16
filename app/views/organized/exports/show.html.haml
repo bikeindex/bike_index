@@ -1,136 +1,126 @@
 .organized-exports
   .organized-page-header
     %h1
-      Exports
+      = t(".exports")
       %small
-        = link_to "Download Export", @export.file.url, class: "btn btn-secondary pull-right"
+        = link_to t(".download_export"), @export.file.url, class: "btn btn-secondary pull-right"
 
   - if @avery_export_redirect
     .mb-4
-      = render partial: '/shared/alert', locals: { body: "You'll be automatically redirected to the labels once processing is finished", type: "success" }
+      = render partial: "shared/alert", locals: { body: t(".shared_alert_body"), type: "success" }
 
-  %table.organized-list-table
+  %table.table-list
     %tbody
       %tr
-        %td
-          Created
+        %td= t(".created")
         %td
           %span.convertTime.preciseTime
-            = l @export.created_at, format: :convert_time
-
+            = l(@export.created_at, format: :convert_time)
       %tr
-        %td
-          By
-        %td
-          - if @export.user.present?
-            = @export.user.display_name
+        %td= t(".by")
+        %td= @export.user.display_name if @export.user.present?
       %tr
-        %td
-          Format
-        %td
-          = @export.file_format
+        %td= t(".format")
+        %td= @export.file_format
       %tr
-        %td
-          Progress
+        %td= t(".progress")
         %td#exportProgress{ class: @export.progress, "data-createdat" => @export.created_at.to_i }
           %span{ class: export_progress_class(@export) }
             = @export.calculated_progress
 
       %tr
-        %td
-          Bikes exported
+        %td= t(".bikes_exported")
         %td
           = @export.rows
-          - if @export.exported_bike_ids.present?
-            %a.small.less-strong{ href: "#show_exported_bikes", 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse' }
-              Show
-              - if @export.rows > 100
-                first 100
-              bikes in export
+          - bike_ids = @export.exported_bike_ids
+
+          - if bike_ids.present?
+            %a.small.less-strong{ href: "#show_exported_bikes",
+                                 'aria-controls' => 'new_stolen_message',
+                                 'data-toggle' => 'collapse' }
+              - if @export&.rows.to_i > 100
+                = t(".show_first_100_bikes_in_export")
+              - else
+                = t(".show_bikes_in_export")
+
             .collapse#show_exported_bikes
               %ul.exported-link-list
-                - @export.exported_bike_ids.each_with_index do |id, i|
+                - bike_ids.each_with_index do |id, i|
                   %li
-                    #{link_to id, bike_path(id)}#{i == (@export.exported_bike_ids.count - 1) ? "" : ","}
+                    #{link_to id, bike_path(id, organization_id: current_organization.to_param)}#{i == (@export.exported_bike_ids.count - 1) ? "" : ","}
 
       %tr
         %td
-          Bikes Registered after
+          = t(".bikes_registered_after")
         %td
           - if @export.start_at.present?
             %span.convertTime.preciseTime
-              = l @export.start_at, format: :convert_time
+              = l(@export.start_at, format: :convert_time)
           - else
             %small.less-strong
               \-
       %tr
         %td
-          Bikes Registered before
+          = t(".bikes_registered_before")
         %td
           - if @export.end_at.present?
             %span.convertTime.preciseTime
-              = l @export.end_at, format: :convert_time
+              = l(@export.end_at, format: :convert_time)
           - else
             %small.less-strong
               \-
       - if @export.custom_bike_ids.present?
         %tr
+          %td= t(".specific_bikes")
           %td
-            Specific bikes
-          %td
-            - included_bike_ids = @export.custom_bike_ids & @export.bikes_scoped.pluck(:id)
+            - included_bike_ids = (@export.custom_bike_ids & @export.bikes_scoped.pluck(:id))
             %ul
               - @export.custom_bike_ids.each do |custom_id|
                 %li
                   - if included_bike_ids.include?(custom_id)
-                    = link_to custom_id, bike_path(custom_id)
+                    = link_to custom_id, bike_path(custom_id, organization_id: current_organization.to_param)
                   - else
                     %small.text-warning
-                      #{link_to custom_id, bike_path(custom_id), class: "less-strong text-warning"}:
-                      %em
-                        Unable to export, not part of your organization
+                      = link_to(custom_id, bike_path(custom_id, organization_id: current_organization.to_param), class: "less-strong text-warning")
+                      \:
+                      %em= t(".unable_to_export")
 
       - if @export.avery_export?
         %tr
-          %td
-            Avery Export
+          %td= t(".avery_export")
           %td
             - if @export.finished?
-              %strong
-                = link_to "View Avery Labels", @export.avery_export_url, class: "avery_export_url"
+              %strong= link_to(t(".view_avery_labels"), @export.avery_export_url, class: "avery_export_url")
             - else
-              %em{ class: "text-success" }
-                pending...
+              %em.text-success= t(".pending")
         %tr
-          %td
-            Stickers
+          %td= t(".stickers")
           %td
             - if @export.assign_bike_codes?
-              %em
-                #{@export.bike_codes&.count || 0} Stickers exported
+              %em= t(".stickers_exported", bike_codes_count: @export.bike_codes&.count.to_i)
               - if @export.bike_codes.any?
                 %ul.exported-link-list
-                  - @export.bike_codes.each_with_index do |code, i|
+                  - bike_code_links = @export.bike_codes.each do |code, i|
                     %li
                       #{link_to code, edit_organization_sticker_path(code, organization_id: current_organization.to_param)}#{i == (@export.bike_codes.count - 1) ? "" : ","}
+
                 - if @export.bike_codes_removed?
-                  %em.text-danger
-                    Stickers have been unassigned
+                  %em.text-danger= t(".stickers_have_been_unassigned")
                 - else
-                  = link_to "Unassign stickers", organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_codes: true), method: :put, class: "btn btn-warning float-right"
+                  = link_to(t(".unassign_stickers"),
+                    organization_export_path(@export.id, organization_id: current_organization.to_param, remove_bike_codes: true),
+                    method: :put,
+                    class: "btn btn-warning float-right")
               - else
-                %small.less-strong
-                  No stickers assigned
+                %small.less-strong= t(".no_stickers_assigned")
             - else
-              not assigned
+              = t(".not_assigned")
 
       %tr
-        %td
-          Columns in csv
+        %td= t(".columns_in_csv")
         %td
           %ul
             - @export.written_headers.each do |header|
-              %li
-                = header.humanize
+              %li= header.humanize
 
   = javascript_pack_tag "application"

@@ -33,6 +33,13 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :controller do
       expect(response).to render_template(:edit)
       expect(flash).to_not be_present
     end
+    it "doesn't break if the recovery_display's bike is deleted" do
+      recovery_display.reload
+      get :edit, id: recovery_display.id
+      expect(response).to be_success
+      expect(response).to render_template(:edit)
+      expect(flash).to_not be_present
+    end
   end
 
   describe "create" do

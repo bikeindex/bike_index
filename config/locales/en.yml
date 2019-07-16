@@ -1,39 +1,214 @@
+---
 en:
+  bike_serial_number: Serial number
+  language: English
+  date:
+    abbr_day_names:
+      - Sun
+      - Mon
+      - Tue
+      - Wed
+      - Thu
+      - Fri
+      - Sat
+    abbr_month_names:
+      -
+      - Jan
+      - Feb
+      - Mar
+      - Apr
+      - May
+      - Jun
+      - Jul
+      - Aug
+      - Sep
+      - Oct
+      - Nov
+      - Dec
+    day_names:
+      - Sunday
+      - Monday
+      - Tuesday
+      - Wednesday
+      - Thursday
+      - Friday
+      - Saturday
+    formats:
+      default: "%Y-%m-%d"
+      long: "%B %d, %Y"
+      short: "%b %d"
+    month_names:
+      -
+      - January
+      - February
+      - March
+      - April
+      - May
+      - June
+      - July
+      - August
+      - September
+      - October
+      - November
+      - December
+    order:
+      - :year
+      - :month
+      - :day
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: about 1 hour
+        other: about %{count} hours
+      about_x_months:
+        one: about 1 month
+        other: about %{count} months
+      about_x_years:
+        one: about 1 year
+        other: about %{count} years
+      almost_x_years:
+        one: almost 1 year
+        other: almost %{count} years
+      half_a_minute: half a minute
+      less_than_x_seconds:
+        one: less than 1 second
+        other: less than %{count} seconds
+      less_than_x_minutes:
+        one: less than a minute
+        other: less than %{count} minutes
+      over_x_years:
+        one: over 1 year
+        other: over %{count} years
+      x_seconds:
+        one: 1 second
+        other: "%{count} seconds"
+      x_minutes:
+        one: 1 minute
+        other: "%{count} minutes"
+      x_days:
+        one: 1 day
+        other: "%{count} days"
+      x_months:
+        one: 1 month
+        other: "%{count} months"
+      x_years:
+        one: 1 year
+        other: "%{count} years"
+    prompts:
+      second: Seconds
+      minute: Minute
+      hour: Hour
+      day: Day
+      month: Month
+      year: Year
+  helpers:
+    page_entries_info:
+      one_page:
+        display_entries:
+          zero: No %{entry_name} found
+          one: Displaying <b>1</b> %{entry_name}
+          other: Displaying <b>all %{count}</b> %{entry_name}
+      more_pages:
+        display_entries: Displaying %{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> of <b>%{total}</b> in total
+  number:
+    currency:
+      alphabetic_code: USD
+      format:
+        delimiter: ","
+        format: "%u%n"
+        precision: 2
+        separator: "."
+        significant: false
+        strip_insignificant_zeros: false
+        unit: "$"
+    format:
+      delimiter: ","
+      precision: 3
+      separator: "."
+      significant: false
+      strip_insignificant_zeros: false
+    human:
+      decimal_units:
+        format: "%n %u"
+        units:
+          billion: Billion
+          million: Million
+          quadrillion: Quadrillion
+          thousand: Thousand
+          trillion: Trillion
+          unit: ""
+      format:
+        delimiter: ""
+        precision: 3
+        significant: true
+        strip_insignificant_zeros: true
+      storage_units:
+        format: "%n %u"
+        units:
+          byte:
+            one: Byte
+            other: Bytes
+          eb: EB
+          gb: GB
+          kb: KB
+          mb: MB
+          pb: PB
+          tb: TB
+    percentage:
+      format:
+        delimiter: ""
+        format: "%n%"
+    precision:
+      format:
+        delimiter: ""
+  support:
+    array:
+      last_word_connector: ", and "
+      two_words_connector: " and "
+      words_connector: ", "
+  time:
+    formats:
+      standard_display: "%A, %B %d"
+      short_with_year: "%a, %B %d %Y"
+      no_day_with_year: "%B %d %Y"
+      blog: "%m_%d_%Y"
+      dotted: "%Y.%-m.%-d"
+      short_with_hour: "%m.%d.%y - %l%P"
+      convert_time: "%FT%T%z"
   meta_titles:
-    welcome_index: "Bike Index - Bike registration that works"
-    welcome_goodbye: "Logged out"
-    bikes_index: "Search results"
-    bikes_new: "Register a bike!"
-    bikes_new_stolen: "Register a stolen bike"
-    feedbacks_vendor_signup: "Shop sign up - Bike Index"
-    feedbacks_new: "Contact Bike Index"
-    feedbacks_index: "Help with Bike Index"
-    news_index: "Bike Index news"
-    info_about: "Bike Index - Bike registration that works"
-    info_spokecard: "Spoke cards - Bike Index"
-    info_stolen_bikes: "Responding to theft"
-    info_serials: "Bike serial numbers"
-    manufacturers_index: "Bike Manufacturers"
-    users_new: "Sign up - Bike Index"
-    users_edit: "Edit your account"
-    users_confirm: "Confirm your email - Bike Index"
-    users_request_password_reset: "Reset password - Bike Index"
-    users_password_reset: "Password reset - Bike Index"
-    users_accept_terms: "Terms of use - Bike Index"
-    users_accept_vendor_terms: "Organization terms - Bike Index"
-    documentation_api_v1: "Bike Index API documentation"
-    organization_invitations_new: "New invitation"
-    payments_new: "Support the Index!"
-    payments_create: "Thanks for your support!"
-    sessions_new: "Log in"
-    sessions_create: "Log in"
-    stolen_index: "Bike registry"
-    info_where: "Bike Index partners"
-    links: "links"
-    about: "FAQ"
-    tech: "Technology for fighting bike theft"
-    stolen_howworks: "How it works"
-    stolen_merging: "Stolen bike registry"
+    welcome_index: Bike Index - Bike registration that works
+    welcome_goodbye: Logged out
+    bikes_index: Search results
+    bikes_new: Register a bike!
+    bikes_new_stolen: Register a stolen bike
+    feedbacks_vendor_signup: Shop sign up - Bike Index
+    feedbacks_new: Contact Bike Index
+    feedbacks_index: Help with Bike Index
+    news_index: Bike Index news
+    info_about: Bike Index - Bike registration that works
+    info_spokecard: Spoke cards - Bike Index
+    info_stolen_bikes: Responding to theft
+    info_serials: Bike serial numbers
+    manufacturers_index: Bike Manufacturers
+    users_new: Sign up - Bike Index
+    users_edit: Edit your account
+    users_confirm: Confirm your email - Bike Index
+    users_request_password_reset: Reset password - Bike Index
+    users_password_reset: Password reset - Bike Index
+    users_accept_terms: Terms of use - Bike Index
+    users_accept_vendor_terms: Organization terms - Bike Index
+    documentation_api_v1: Bike Index API documentation
+    payments_new: Support the Index!
+    payments_create: Thanks for your support!
+    sessions_new: Log in
+    sessions_create: Log in
+    stolen_index: Bike registry
+    info_where: Bike Index partners
+    links: links
+    about: FAQ
+    tech: Technology for fighting bike theft
+    stolen_howworks: How it works
+    stolen_merging: Stolen bike registry
     landing_pages_show: "%{organization} Bike Registration"
     landing_pages_ambassadors_current: Bike Index Ambassadors
     landing_pages_ambassadors_how_to: Become a Bike Index Ambassador
@@ -48,47 +223,37 @@ en:
     landing_pages_for_bike_shops: Bike Index for Bike Shops
   meta_descriptions:
     welcome_index: "The best bike registry: Simple, secure and free."
-    welcome_user_home: "Your bikes on Bike Index"
-    info_about: "Why we made Bike Index and who we are"
-    info_resources: "Bike Index resources and useful tools"
-    info_stolen_bikes: "What to do if your bike is stolen - next steps Bike Index recommends taking."
-    info_serials: "What bike serial numbers are - and where to find them."
-    info_spokecard: "The Bike Index offers spoke cards that link to each bike on the Index with a QR code. Learn about how they work and how to create your own."
-    info_where: "Organizations that use Bike Index to search for and register bikes."
-    info_protect_your_bike: "Prevent bike theft. Recommendations and best practices for protecting your bike from thieves."
-    manufacturers_index: "Bicycle related manufacturers listed on Bike Index - all the brands you know and then some."
-    bikes_index: "Search for bikes that have been registered on Bike Index"
-    bikes_new_stolen: "Register a stolen bike on Bike Index quickly, easily and for free."
-    bikes_new: "Register a bike on Bike Index quickly, easily and for free. Create a permanent verified record of your bike to protect it."
-    feedbacks_vendor_signup: "Sign up with Bike Index to register your customers' bikes quickly, easily and for free."
-    feedbacks_new: "Contact Bike Index. Your words are our muse, whisper them in our ear."
-    feedbacks_index: "Help using Bike Index. Frequently asked questions and other things."
-    news_index: "Read Bike Index news. Also, periodically, learn magic spells."
-    users_new: "Sign up for Bike Index"
-    documentation_api_v1: "API Version 1 documentation and love"
-    documentation_api_v2: "Bike Index API v2 documentation. Authentication with OAuth2, uses JSON, is RESTful and is generally pretty awesome"
-    sessions_new: "Log in to Bike Index"
-    sessions_create: "Log in to Bike Index"
-    stolen_index: "Bike Index helps recover your stolen bike"
-    stolen_merging: "StolenBicycleRegistry.com merged with Bike Index in 2014 to become the largest open bike registration service in the world"
-    landing_pages_show: "Register your bicycle with %{organization} - powered by Bike Index"
+    welcome_user_home: Your bikes on Bike Index
+    info_about: Why we made Bike Index and who we are
+    info_resources: Bike Index resources and useful tools
+    info_stolen_bikes: What to do if your bike is stolen - next steps Bike Index recommends taking.
+    info_serials: What bike serial numbers are - and where to find them.
+    info_spokecard: The Bike Index offers spoke cards that link to each bike on the Index with a QR code. Learn about how they work and how to create your own.
+    info_where: Organizations that use Bike Index to search for and register bikes.
+    info_protect_your_bike: Prevent bike theft. Recommendations and best practices for protecting your bike from thieves.
+    manufacturers_index: Bicycle related manufacturers listed on Bike Index - all the brands you know and then some.
+    bikes_index: Search for bikes that have been registered on Bike Index
+    bikes_new_stolen: Register a stolen bike on Bike Index quickly, easily and for free.
+    bikes_new: Register a bike on Bike Index quickly, easily and for free. Create a permanent verified record of your bike to protect it.
+    feedbacks_vendor_signup: Sign up with Bike Index to register your customers' bikes quickly, easily and for free.
+    feedbacks_new: Contact Bike Index. Your words are our muse, whisper them in our ear.
+    feedbacks_index: Help using Bike Index. Frequently asked questions and other things.
+    news_index: Read Bike Index news. Also, periodically, learn magic spells.
+    users_new: Sign up for Bike Index
+    documentation_api_v1: API Version 1 documentation and love
+    documentation_api_v2: Bike Index API v2 documentation. Authentication with OAuth2, uses JSON, is RESTful and is generally pretty awesome
+    sessions_new: Log in to Bike Index
+    sessions_create: Log in to Bike Index
+    stolen_index: Bike Index helps recover your stolen bike
+    stolen_merging: StolenBicycleRegistry.com merged with Bike Index in 2014 to become the largest open bike registration service in the world
+    landing_pages_show: Register your bicycle with %{organization} - powered by Bike Index
     landing_pages_for_law_enforcement: Is your agency equipped to fight bike theft? Bike Index can help officers get bikes back into the right hands.
     landing_pages_for_schools: With bicycle theft a growing problem across campuses everywhere, students’ bikes can be difficult to protect without help.
-
   doorkeeper:
     scopes:
-      public: "Authenticate with you, view public information"
-  time:
-    formats:
-      standard_display: "%A, %B %d"
-      short_with_year: "%a, %B %d %Y"
-      no_day_with_year: "%B %d %Y"
-      blog: "%m_%d_%Y"
-      dotted: "%Y.%-m.%-d"
-      short_with_hour: "%m.%d.%y - %l%P"
-      convert_time: "%FT%T%z"
-  errors: &errors
-    format: ! "%{attribute} %{message}"
+      public: Authenticate with you, view public information
+  errors:
+    format: "%{attribute} %{message}"
     messages:
       accepted: must be accepted
       blank: can't be blank
@@ -106,7 +271,7 @@ en:
       not_a_number: is not a number
       not_an_integer: must be an integer
       odd: must be odd
-      record_invalid: ! "Validation failed: %{errors}"
+      record_invalid: "Validation failed: %{errors}"
       taken: has already been taken
       too_long:
         one: is too long (maximum is 1 character)
@@ -118,23 +283,2132 @@ en:
         one: is the wrong length (should be 1 character)
         other: is the wrong length (should be %{count} characters)
     template:
-      body: ! "There were problems with the following fields:"
+      body: "There were problems with the following fields:"
       header:
         one: 1 error prohibited this %{model} from being saved
-        other: ! "%{count} errors prohibited this %{model} from being saved"
+        other: "%{count} errors prohibited this %{model} from being saved"
+    bad_request:
+      explanation: We're sorry, we didn't understand what you just asked. Why don't you try again?
+      send_me_back: Send me back from whence I came!
+    not_found:
+      explanation: We're sorry, the page you were looking for wasn't there.
+      send_me_back: Send me back from whence I came!
+    server_error:
+      explanation: We're sorry, there was a server error and we can't show you that page.
+      send_me_back: Send me back from whence I came!
+    unauthorized:
+      explanation: We're sorry, you aren't allowed to do that.
+      send_me_back: Send me back from whence I came!
+    unprocessable_entity:
+      contact: Contact
+      contact_email: contact@bikeindex.org
+      explanation_html: "We're sorry, We can't do what you just asked. Think you ought to be able to? Email us: %{email_link}."
+      send_me_back: Send me back from whence I came!
+  controllers:
+    bikes:
+      bike_details: Bike Details
+      photos: Photos
+      drivetrain: Wheels and Drivetrain
+      accessories: Accessories and Components
+      ownership: Transfer Ownership
+      groups: Groups and Organizations
+      remove: Hide or Delete
+      report_stolen: Report Stolen or Missing
+      recovery_details: Recovery details
+      theft_details: Theft details
+      publicize: Share on Social Media
+      alert: Activate Premium Alert
+      report_recovered: Mark this Bike Recovered
   views:
     pagination:
       first: "&laquo;"
       last: "&raquo;"
-      previous: "Prev"
-      next: "Next"
+      previous: Prev
+      next: Next
       truncate: "&hellip;"
-  helpers:
-    page_entries_info:
-      one_page:
-        display_entries:
-          zero: "No %{entry_name} found"
-          one: "Displaying <b>1</b> %{entry_name}"
-          other: "Displaying <b>all %{count}</b> %{entry_name}"
-      more_pages:
-        display_entries: "Displaying %{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> of <b>%{total}</b> in total"
+  activerecord:
+    errors:
+      messages:
+        record_invalid: "Validation failed: %{errors}"
+        restrict_dependent_destroy:
+          has_one: Cannot delete record because a dependent %{record} exists
+          has_many: Cannot delete record because dependent %{record} exist
+  welcome:
+    index:
+      value_of_bikes_recovered: Over %{value} Worth of Bikes Recovered
+      hero: Bike registration that works
+      register_now: Register now!
+      read_more_recovery_stories: Read more recovery stories
+      but_how_does_it_work: But How Does it work?
+      register_your_bike: Register Your Bike
+      how_it_works: It's simple. Submit your name, bike manufacturer, serial number, and component information to enter your bike into the most widely used bike registry on the planet.
+      alert_the_community: Alert the Community
+      if_your_bike_goes_missing: If your bike goes missing, mark it as lost or stolen to notify the entire Bike Index community and its partners.
+      the_community_responds: The community responds
+      identifying_your_bike: A user or partner encounters your bike, uses Bike Index to identify it, and contacts you.
+      you_get_your_bike_back: You Get your Bike Back
+      recover_your_bike_for_free: With the help of the Bike Index community and its partners, you have the information necessary to recover your lost or stolen bike at no cost to you. It's what we do.
+      used_by: Used By
+      bike_index_statistics: Bike Index statistics
+      bikes_registered_this_week: Bikes registered this week
+      total_bikes_registered: Total Bikes Registered
+      stolen_bikes_registered: Stolen Bikes Registered
+      stolen_bikes_recovered: Stolen Bikes Recovered
+      total_recovery_value: Total Recovery value
+      partner_organizations: Partner Organizations
+    goodbye:
+      youve_been_logged_out: You've been logged out
+      come_back_soon: Come back soon!
+    choose_registration:
+      add_a_bike_through: Add a bike through
+      add_your_own_bike: Add your own bike
+      add_a_stolen_bike: Add a stolen bike
+      add_a_stolenfound_bike: Add a stolen/found bike you've recovered
+      register_bike: Register bike
+    recovery_stories:
+      recovery_stories: Recovery Stories
+    update_browser:
+      oh_no: Oh No!
+      unsupported_browser: We're sorry, Bike Index does not support your browser.
+      go_here_to_learn_more: Go here to learn more
+    user_home:
+      user_bikes: "%{current_user_name} bikes"
+      bikes: bikes
+      locks: locks
+      add_a_photo: Add a photo
+      recovered: RECOVERED
+      stolen: STOLEN
+      serial: Serial
+      primary_colors: Primary colors
+      date_recovered: Date recovered
+      date_stolen: Date stolen
+      location: Location
+      edit_bike: Edit Bike
+      printable_pdf: Printable (pdf)
+      mark_bike_stolen: Mark bike stolen
+      report_stolen: report_stolen
+      you_have_no_registered_bikes: You have no registered bikes
+      lock_type: Lock Type
+      manufacturer: Manufacturer
+      key_serial: Key Serial
+      combination: Combination
+      edit: Edit
+      you_have_no_registered_locks: You have no registered locks
+      register_new_items: Register new items
+      add_a_bike: Add a bike
+      add_a_lock: Add a lock
+      add_some_info: Add some info
+      sorry_your_bike_was_stolen: We're sorry your %{bikes_last_type} was stolen, but hopefully, with everyone able to search for it, you'll get it back!
+      thanks_for_adding_your_bike: Awesome! We're pumped you added a %{bikes_last_type} to the Index.
+      welcome: Welcome
+      to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
+      tell_us_more_about_yourself: Tell us more about yourself.
+      update_your_profile: Update your profile
+  landing_pages:
+    ascend:
+      automatic_bicycle_registration: Automatic Bicycle Registration for Bike Shops using Ascend POS
+      link_your_ascend_retail_and_bike_index: Link your Ascend Retail and Bike Index Accounts for free
+      we_have_a_new_free_bicycle_registration: We have a new, free bicycle registration for bike shops. If you’re a shop that uses Ascend as your POS, our new Ascend point of sale integration will allow you to register each bike you sell automatically. Setup takes about 10 minutes.
+      if_your_shop_uses_lightspeed_html: If your shop uses Lightspeed, check out our Lightspeed POS integration <a target="none" href="%{lightspeed_path}">here</a>.
+      once_youve_set_up_the_trek_ascenwd: Once you’ve set up the Trek Ascend POS bicycle registration, you’re done! Each day, Bike Index will pull newly-sold bike information from Ascend to create Bike Index accounts for your customers. Their new bikes will be waiting for them upon login. They just have to check their email, and their new bike will be waiting for them.
+      then_if_a_customers_bike_goes_missing_html: 'Then, if a customer’s bike goes missing, their bike’s information and serial number will be stored for them to access. But don’t worry: <a target="none" href="%{privacy_path}">we will never give out any of your customer data</a>.'
+      new_bike_shop_org: new bike shop organization
+      sign_up_as_a_new_org_html: Sign up as a %{new_org_link} on Bike Index
+      ascend_knowledge_base_article: "Acend's Knowledge base article"
+      follow_the_setup_instructions_html: Follow the setup instructions on <strong>%{ascend_link}</strong> on Bike Index
+      email_us_the_password_to_finish_setting_u: Email us the password to finish setting up!
+      email_shops_html: Email %{shops_email_link} if you have any questions. Thank you for registering bikes in Bike Index!
+    for_schools:
+      bike_index_for_universities: Bike Index for Universities
+      protecting_bikes_on_campus_can_be: Protecting bikes on campus can be a full-time job. Let us help.
+      features_amp_pricing: Features & Pricing
+      make_bike_registration_better: Make bike registration better
+      weve_designed_a_platform: "We've designed a platform to solve a fundamental barrier in safeguarding bicycles: the lack of a universal bike registry. With our consolidated university registration sites, it's easier for police and transportation departments to search and recover campus bicycles."
+      your_students_can_register_their_bikes: Your students can register their bikes, verify ownership, and alert the community to missing bikes from anywhere. All they need is any smartphone or laptop. You have access to the data behind it all to understand how best to protect bikes on your campus.
+      how_it_works: How it works
+      bike_index_users_provide: Bike Index users provide serial numbers, proof of ownership and identifying information about their bikes. When a bike is reported lost or stolen, our partners can search Bike Index to identify, locate, and track it from any computer or smartphone. Our extensive archive has helped officers recover bikes involved in criminal situations, from simple theft to chop shops, drug houses - even fencing rings and online black markets.
+      read_about_our_html: Read about our over %{count} recoveries on our blog. For a complete list of Bike Index's partners, visit our partners page, and for information on partnering with Bike Index, please contact us.
+      related_articles: 'Related articles:'
+      universities_should_use_bike_index_as_the: Universities should use Bike Index as their registration system of choice
+      university_of_pittsburgh_partners_with_bi: University of Pittsburgh partners with Bike Index to protect campus bicycles
+      trusted_by_top_universities: Trusted by top universities
+      keep_campus_bikes_in_order: Keep campus bikes in order
+    for_law_enforcement:
+      bike_index_for_law_enforcement: Bike Index for Law Enforcement
+      is_your_department_equipped_to_fight_bike: Is your department equipped to fight bike theft? Bike Index can help you get bikes back into the right hands.
+      sign_up_for_free: Sign up for free
+      recover_your_citizens_bikes: Recover your citizen's bikes
+      here: here
+      youre_the_first_one: You're the first one your citizens look to when their bikes are stolen. Access and search our international database to return your community's bikes to their rightful owners.
+      automated_tweets: automated tweets
+      local_ambassadors: local ambassadors
+      you_have_the_authority_to_bring_html: You have the authority to bring bikes back - that’s no small responsibility. That’s why we have tools - such as our integration with LeadsOnline and %{link} of stolen bikes - to keep your community safe. Connect with %{link} and spotters to quickly confiscate and block sales of stolen bikes.
+      with_over_215000_registries_and_almost_55: With over 215,000 registries and almost 5,500 stolen bicycle recoveries, we know how to help.
+      put_a_lock_on_bike_theft: Put a lock on bike theft
+      our_extensive_archive_has_helped_officers: Our extensive archive has helped officers recover bikes involved in criminal situations, from simple theft to chop shops, drug houses - even fencing rings and online black markets.
+      with_over_600_partnerships_html: With over 600 partnerships, Bike Index is the industry leader in bicycle registration. Join our network for free %{link}, or ask us to put you in touch with an existing partner in law enforcement.
+      if_you_want_to_collaborate_html: If you want to collaborate with other departments in your city to manage a registry, learn more about Bike Index for municipalities %{link}.
+      related_articles: 'Related articles:'
+      bend_reduces_bike_theft_by_60_percent: Bend reduces bike theft by 60 percent
+      bike_indexs_newest_municipal_partner: 'Bike Index''s newest municipal partner: New Orleans'
+      trusted_by_law_enforcement_everywhere: Trusted by law enforcement everywhere
+    for_community_groups:
+      bike_index_for_community_groups: Bike Index for Community Groups
+      the_most_widereaching_and_effective_tools: The most wide-reaching and effective tools against bike theft — period.
+      sign_up_for_free: Sign up for free
+      help_us_help_you: Help us help you
+      we_provide_free_and_easy_access_to_our_re: We provide free and easy access to our registry for anyone and everyone who rides a bicycle, in any capacity. Bike Index is a community-driven effort in recovering lost and stolen bikes. No matter the type of bike or cyclist, we want to keep all bikes rolling with the owners that need them.
+      spread_the_bike_index_word_html: Spread the Bike Index word to your constituents to get them riding protected. Create a free organization account %{link}.
+      partners_made_in_heaven: Partners made in heaven
+      gone_are_the_days_where_you_had_to_regist: Gone are the days where you had to register your bike in your neighborhood, county, city, state and country. Just register all bikes in Bike Index and a cyclists registration will be valid anywhere. Run registration drives? Host community cycling events? Let us know and we will send you Bike Index materials.
+      registrations_are_free_forever_join_bike_: Registrations are free. Forever. Join Bike Index and start registering today.
+      here: here
+      purchase_a_pack_of_advocacy_html: Purchase a pack of advocacy materials %{link}.
+      related_articles: 'Related articles:'
+      bike_index_launches_new_ambassadors_progr: Bike Index launches new Ambassadors program
+      bike_index_welcomes_stolen_bikes_nola: Bike Index welcomes Stolen Bikes NOLA
+      trusted_by_community_groups_everywhere: Trusted by community groups everywhere
+      used_by_community_groups_everywhere: Used by community groups everywhere
+    for_bike_shops:
+      bike_index_for_bike_shops: Bike Index for Bike Shops
+      bikes_before_they: Unite against bike theft and protect your customers bikes before they're even out there.
+      do_right_by_your_customers: Do right by your customers in just 5 clicks.
+      features_and_pricing: Features & Pricing
+      register_bikes_for_your_customers: Register bikes for your customers
+      for_completely_free_we_provide_you_with_t: For completely free we provide you with the tools needed to automatically register each bike you sell in Bike Index through your POS. All it takes is a few minutes of setup, either with your Ascend or Lightspeed Retail account.
+      build_goodwill_with_your_customers_with_a: Build goodwill with your customers with a service you can offer at no cost. Recover a stolen bike, and you'll have a customer for life.
+      network_of_shop_partners: network of shop partners
+      here: here
+      join_our_network_link_html: Join our %{network_link}.
+      sign_up_for_a_free_bike_index_account_html: Sign up for a free Bike Index account for your shop %{new_org_link}.
+      once_you_do_this_link_your_account_to_you: Once you do this, link your account to your Lightspeed or register bikes in Bike Index through Ascend.
+      use_lightspeed_retail: Use Lightspeed Retail?
+      our_official_lightspeed_integration_provi: Our official Lightspeed integration provides entirely automated registration for every bike you sell. All you have to do is make sure you input the serial number and take the customer's email.
+      learn_more: Learn more
+      printed_materials: printed materials
+      or: or
+      connect_your_lightspeed_account: connect your Lightspeed account
+      ascend_retail: Ascend Retail
+      connect_your_ascend_account_html: Connect your Ascend account and your Bike Index shop account. Each night, Ascend will export the bikes you've sold, and we'll import them into Bike Index for your customers. Other than setup, you're done! Learn more about the Ascend integration %{ascend_link}.
+      dont_use_ascend_or_lightspeed_html: Don't use Ascend or Lightspeed POS? Ask us about %{printed_materials}.
+      related_articles: 'Related articles:'
+      driving_service_revenues_with_bicycle_reg: Driving service revenues with bicycle registration
+      5_ways_to_grow_community_for_your_bike_sh: 5 ways to grow community for your bike shop
+      trusted_by_bike_shops_everywhere: Trusted by bike shops everywhere
+      used_at_bike_shops_everywhere: Used at bike shops everywhere
+    for_cities:
+      bike_index_for_cities: Bike Index for Cities
+      actually_get_people_registered_and_do_it_: Actually get people registered. And do it for cheap.
+      plug_your_city_in_nationally: Plug your city in nationally.
+      features_amp_pricing: Features & Pricing
+      mitigate_the_registration_mess: Mitigate the registration mess
+      no_more_index_cards_or_excel_sheets_give_: No more index cards or excel sheets. Give your citizens the tools to register from a smartphone, in less than two minutes, and use these registrations to recover and return stolen bikes.
+      bring_together_bike_shops_schools_municip: Bring together bike shops, schools, municipal departments, and law enforcement to register bikes in one system. Gone are the days of waiting for people to not come in to register their bikes, or wondering if that other department took care of it. Bike Index consolidates everything in one manageable place.
+      our_community_is_your_community: Our community is your community
+      bike_index_is_the_community_registration_: Bike Index is the community registration system of choice. We are the bike registration system of over 600 organizations - communities in every corner of the country. Join the most widely used bike registration network in the nation.
+      engage_your_residents_and_recover_their_b: Engage your residents and recover their bikes, and they will love you forever.
+      related_articles: 'Related articles:'
+      bike_index_unveils_partnership_with_the_c: Bike Index unveils partnership with the City of Palo Alto
+      trusted_by_law_enforcement_everywhere: Trusted by Law Enforcement everywhere
+      trusted_by_municipalities_everywhere: Trusted by municipalities everywhere
+    for_organizations_photo_list:
+      for: for
+      bike_shops: Bike Shops
+      cities: Cities
+      schools: Schools
+      community_groups: Community Groups
+    next_steps_contact:
+      organization_name: Organization name
+      message: Message
+      get_in_touch: Get in touch
+    packages_list:
+      free: Free
+      forever: Forever
+      sign_up_now: Sign Up Now
+      year: year
+      try_for_free: Try For Free
+      see_features: See Features
+      hide_features: Hide Features
+    find_out_more:
+      custom_development_available: A la carte features and custom development available.
+      get_in_touch_link: Get in touch
+      find_out_more_html: "%{get_in_touch_link} to find out more."
+    bike_shop_packages:
+      supporting_shop: Supporting Shop
+      additional: Additional
+      bike_index_for_bike_shops: Bike Index for bike shops
+      choose_a_package_size: Choose a package size
+      compare_plans_and_features: Compare Plans and Features
+      contact_us: Contact us
+      contact_us_for_trial: Contact us for a free trial
+      forever: Forever
+      free: Free
+      questions_want_to_get_started: Questions? Want to get started?
+      sign_up: Sign up
+      sign_up_now: Sign Up Now
+      simply_the_best_bike_registry: Simply the best bike registry
+      try_for_free: Try For Free
+      package_title: "%{name} package"
+      year: year
+    cities_packages:
+      additional: Additional
+      all_plans_come_with_a_30day_free_trial: All plans come with a 30-day free trial
+      bike_index_for_cities: Bike Index for Cities
+      choose_a_package_size: Choose a package size
+      compare_plans_and_features: Compare Plans and Features
+      contact_us: Contact us
+      contact_us_for_trial: Contact us for a free trial
+      forever: Forever
+      free: Free
+      give_your_constituents_the_bike_registry_: Give your constituents the bike registry they want
+      keep_us_pedaling: Keep us pedaling
+      metropolis: Metropolis
+      package_title: "%{name} package"
+      questions_want_to_get_started: Questions? Want to get started?
+      sign_up: Sign up
+      sign_up_now: Sign Up Now
+      small_city: Small City
+      town: Town
+      try_for_free: Try For Free
+      year: year
+    campus_packages:
+      additional: Additional
+      all_plans_come_with_a_30day_free_trial: All plans come with a 30-day free trial
+      bike_index_for_colleges_universities: Bike Index for Colleges & Universities
+      choose_a_package_size: Choose a package size
+      clean_up_your_campus_messy_registry: Clean up your Campus's messy registry.
+      compare_plans_and_features: Compare Plans and Features
+      contact_us: Contact us
+      contact_us_for_trial: Contact us for a free trial
+      forever: Forever
+      free: Free
+      keep_us_pedaling: Keep us pedaling
+      number_of_members: "%{range} Members"
+      package_title: "%{name} package"
+      questions_want_to_get_started: Questions? Want to get started?
+      sign_up: Sign up
+      sign_up_now: Sign Up Now
+      try_for_free: Try For Free
+      year: year
+    ambassadors_current:
+      current_ambassadors: Current Ambassadors
+      the_heroes_of_bikedom: The heroes of bikedom
+      join_their_ranks: Join their ranks
+      steve_piercy: Steve Piercy
+      why_bike_index: Why Bike Index?
+      bike_index_helps_people_recover_their_sto: Bike Index helps people recover their stolen bikes, educates on the prevention of theft, and builds a community through its website.  And it's a non-profit organization that released its software as open source.
+      steve_piercys_ambassadorship_is_sponsored_html: <em>Steve Piercy's</em> ambassadorship is sponsored by <strong>%{sponsor_link}</strong>.
+      gears: GEARs
+      bike_index_allows_us_to_verify_details_ab: Bike Index allows us to verify details about the bike, theft details, police file number and contact info for the owner. We can also share the registry directly to Law Enforcement to expedite the recovery process.
+      bike_index_helped_me_recover_my_beloved_b: Bike Index helped me recover my beloved bicycle. I’m now committed to paying forward my good fortune by helping to promote Bike Index in my community.
+      educating_kids_about_how_to_lock_their_bi: Educating kids about how to lock their bikes and register them is an important part of growing bike commuters!
+      i_believe_community_involvement_makes_a_d: I believe community involvement makes a difference in crime and Bike Index is the easiest way to get involved and actually make a difference
+      bike_index_provides_ease_of_use_and_secur: Bike Index provides ease of use and security of mind. The simplicity of design makes it effective.
+      if_a_person_loses_their_bike_there_is_suc: If a person loses their bike there is such a feeling of loss but when its recovered there is such a feeling of renewal and restoration. That is the reason I promote Bike Index
+      as_the_founder_of_bicycle_security_adviso: As the founder of Bicycle Security Advisors — who’s mission is to provide communities with the best information on how to keep bikes safely parked and protected from theft — Bike Index is unequivocally the most effective registry you can use.
+      bike_index_isnt_the_only_internet_bike_re: Bike Index isn't the only internet bike registry, but it's the only one that works and I firmly believe it's a direct result of how it was designed.
+      after_a_couple_of_recoveries_i_got_hooked: After a couple of recoveries, I got hooked. It was so nice to be able to return some of these bikes to people who really love them.
+      your_name_here: Your Name Here
+      anytown_earth: Anytown, earth
+      whats_your_story: What's your story?
+      become_a_bike_index_ambassador_and_help_s: Become a Bike Index Ambassador and help stolen bikes find their way home
+    ambassadors_how_to:
+      become_a_bike_index_ambassador: Become a Bike Index Ambassador
+      want_to_help_fight_bike_theft_in_your_com: Want to help fight bike theft in your community?
+      start_here: Start here!
+      why_work_with_bike_index: Why Work with Bike Index
+      bike_index_is_a_nonprofit_with_a_big_miss: 'Bike Index is a nonprofit with a big mission: register every bicycle out there, and recover every bike that gets stolen. That’s why we need your help. We’re a national registry but you know your cycling communities best.'
+      anyone_can_help_bike_index_we_are_always_: |
+        Anyone can help Bike Index. We are always in need of donations,
+        connections to local bike shops and other organizations, and shares on
+        social media. But maybe you know of a great shop or a budding advocacy
+        group in your town that would love to register bikes for their users and
+        constituents. Or maybe your local police department is looking to
+        upgrade their registry. (Or maybe they don’t even have one yet).
+      you_bring_the_ideas_make_the_connections_: You bring the ideas, make the connections, and we’ll make sure you have the resources to get stuff done.
+      apply_to_be_an_ambassador_here: Apply to be an ambassador here
+      how_it_works: How it works
+      we_provide_you_with_the_resources_to_make: 'We provide you with the resources to make Bike Index a reality in your community. Each level of ambassadorship receives:'
+      access_to_ambassadors_slack_channel_for_s: Access to ambassadors slack channel for sharing ideas, tips, and success stories among the Bike Index team and other ambassadors around the country and world
+      a_basic_package_of_materials_including_a_: A basic package of materials including a Bike Index cycling cap and stickers
+      give_you_shoutouts_on_social_media: Give you shoutouts on social media
+      to_become_a_bike_index_ambassador_fill_ou: To become a Bike Index Ambassador, fill out the application above. If we approve your application - and why wouldn’t we?! - Then, all you need to do is connect us with your local cycling organizations. No organization is off the table, so be creative.
+      typical_ambassador_activities_include: 'Typical ambassador activities include:'
+      monitoring_online_sales_platforms_like_cr: Monitoring online sales platforms like Craigslist and Offerup for suspicious bikes, and checking to see if those bikes are listed as stolen on Bike Index.
+      share_bike_index_on_social_channels_inclu: Share Bike Index on social channels - including Facebook cycling groups in your area.
+      follow_bike_index_on_twitter_facebook_and: Follow Bike Index on twitter, facebook, and instagram so we can follow you back!
+      get_bike_shops_signed_up_for_bike_index_u: Get bike shops signed up for Bike Index using one of our
+      pos_integrations: POS integrations
+      connect_us_with_city_officials_law_enforc: Connect us with city officials, law enforcement and local universities interested in using Bike Index as the area’s official registration system
+      join_our_list_of_ambassadors_and_advocate: Join our list of ambassadors and advocates. It’s easy. We’re a growing nonprofit with a mission to register and recovery bikes. Join us today.
+      check_out_our_media_resources: Check out our media resources
+      here: here.
+      relevant_articles: 'Relevant articles:'
+      9_steps_for_getting_your_stolen_bike_back: 9 steps for getting your stolen bike back
+      bike_index_launches_new_ambassador_progra: Bike Index launches new ambassador program
+      be_a_bike_saver: Be a bike saver
+      view_current_ambassadors: View current ambassadors
+      apply_today: Apply Today
+      become_an_ambassador: Become an ambassador
+      typical_ambassador_activities: Typical ambassador activities
+      current_ambassadors: Current ambassadors
+  plan_features:
+    supporting_our_nonprofit: Supporting our nonprofit
+    create_organization_account: Create organization account and contact registrants
+    embed_a_registration_form: Embed a registration form on your website so people can register in your organization account
+    automatic_registration_through_pos: Automatic registration through your POS
+    social_media_and_email_marketing: Social Media and Email marketing campaign assets
+    search_bikes_in_organization: Search bikes in organization account
+    import_csv_file: Import CSV file of registrations from former system
+    welcome_campaign: Welcome campaign on Facebook, Twitter, and Instagram
+    staff_accounts: Staff accounts
+    landing_page: Branded registration landing page
+    qr_sticker: QR sticker scanning and messaging
+    ongoing_programming: Ongoing programming, hosting, and support
+    contact_registrants: Contact registrants who have not finished registration
+    add_logos: Add logos and text to Bike Index emails
+    export_custom_data: Export custom data into CSV/XLSX files
+    add_form_fields: Add specific form fields to your landing page
+    automated_migration: Automated migration of graduated bikes out of system
+    mailing_stickers: Avery mailing address formatted XLS export for mailing stickers
+    nest_organizations: Nest multiple organizations in one
+  layouts:
+    revised_messages:
+      error: error
+      please_fix_the_following: Please fix the following %{errors}
+    application_revised:
+      about: About
+      add_a_bike: Add a bike
+      admin: Admin
+      blog: Blog
+      discuss: Discuss
+      donate: Donate
+      exports: Exports
+      getting_started: Getting started
+      help: Help
+      incomplete_registrations: Incomplete registrations
+      lightspeed_integration_panel: Lightspeed Integration Panel
+      log_in: log in
+      logout: Logout
+      multi_serial_search: Multi serial search
+      org_bikes: "%{org_name} Bikes"
+      org_dashboard: "%{org_name} Dashboard"
+      org_locations: "%{org_name} locations"
+      org_profile: "%{org_name} profile"
+      recoveries: Recoveries
+      register_a_new_bike: Register a new bike
+      registration_stickers: Registration stickers
+      resources: Resources
+      search_bikes: Search bikes
+      settings: Settings
+      user_settings: "%{user_email} settings"
+      sign_up: Sign up
+      super_admin_view: Super Admin view %{org_name}
+      the_nonprofit_bike_registry: the non-profit bike registry
+      users: Users
+      view_org: View %{org_name}
+      your_bikes: Your bikes
+    application_revised_bikehub:
+      bike_security: At BikeHub, we believe bike security is more than just a strong U-lock.
+      bikehub_signup: BikeHub Sign-Up
+      bikehub_login: BikeHub Login
+      bikeindex_a_nonprofit: Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration service in the world.
+      bikeindex_bikehub_partnership: Through this partnership, BikeHub patrons enjoy access to the most secure public bike parking – and registration with nation’s largest network, used by law enforcement agencies, universities, and advocates to connect recovered bikes with their owners.
+      contact: Contact
+      log_in: Log in
+      login_message: Logging in here will log you in to BikeHub.
+      powered_by: powered by
+      powered_by_bike_index: BikeHub accounts are powered by Bike Index – the premier bike registry.
+      sign_up: Sign up
+      signup_message: Creating an account here will sign you up for BikeHub
+      why_bikeindex: WHY BIKEINDEX?
+    email:
+      bike_index: Bike Index
+      the_bike_index_team: The Bike Index Team
+      help_prevent_theft: Help prevent bike theft,
+      make_a_donation: make a donation.
+    embed_layout:
+      register_through_org: Register a bike through %{org_name}
+      please_fix_the_following: Please fix the following
+      error: error
+    payments_layout:
+      until_every_bike_is_safe: Until Every bike is safe
+      be_a_bike_saver: Be a bike saver.
+      support_bike_index_today: Support Bike Index today.
+    reg_embed:
+      protect_your_bike_today: Protect your bike today
+      register_your_bike: Register your bike
+      register_on_bike_index: Register on Bike Index.
+      its_free: It's free.
+  shared:
+    donate_modal:
+      greeting: Hello %{user_name},
+      thank_you: Thank you so much for using Bike Index!
+      law_enforcement_features: "We have a number of features specifically designed for law enforcement officers:"
+      thanks_for_using_bike_index: Thanks for using Bike Index!
+      multiple_serial_search_pane: Multiple serial search pane
+      bikeindex_is_a_nonprofit: Bike Index is a 501(c)(3) nonprofit. We depend on donations to provide these services. We recommend law enforcement agencies like %{org_name} donate at least $20 a year to help support our efforts.
+      contact_bike_owners: Contact bike owners before their bikes are marked stolen
+      email_for_access_html: Email %{email_link} for access.
+    email_bike_box:
+      make: "Make:"
+      serial: "Serial:"
+      color: color
+      found: "Found:"
+      stolen_from: "Stolen from:"
+      date: "Date:"
+      color_may_be_incorrect: Color may be incorrect. Please update it if necessary!
+    faq:
+      faqs: Common issues & frequently asked questions
+      who_can_register_bikes: Who can register bikes?
+      everyone_can_register_bikes_for_free: Everyone can register bikes, for free.
+      how_bikes_are_verified: How do you verify the bikes that people register?
+      partner_link: one of our partner shops
+      registration_html: Registering your bike at %{partner_link} verifies the registration (shops may choose to only register bikes that they sell).
+      verification_questions: Any question of verification is dealt with by reviewing your registration information. This hasn't been an issue.
+      can_you_tell_me_what_bike_by_serial: Can you tell me what bike I have based on its serial number?
+      not_yet: No. This is a feature we're working on, but we aren't there yet.
+      we_recommend_searching: For now, we recommend searching for your bike's serial number. We will show you any registered bikes that have similar serial numbers.
+      bike_serial_number: Bike serial number
+      similar_serials: If there are any bikes with similar serial numbers, particularly if just the last few numbers are different — your bike is most likely that make and model.
+      what_if_i_sell_my_bike: What if I sell my bike?
+      free_to_transfer: Bike registration is permanent, it's free to transfer bikes.
+      go_to_edit_page: Go to the edit page for the bike and select the "Transfer Ownership page"
+      reveal_owner_email_html: Enter the new owner's email address and save the changes! You will still be able to edit the bike until the new owner claims it.
+      can_partner_with_bikeindex: Can my local bike shop partner with Bike Index?
+      absolutely: Absolutely!
+      organization_signup_link: organization signup page
+      organization_signup_html: Have them visit the %{signup_link}, we'll set them up with a organization account so they can register bikes for free.
+      how_can_i_advertise: How can I advertise on Bike Index
+      in_the_process_of_setting_up_advertising: We're in the process of setting up advertising opportunities throughout the site, particularly for local bike shops.
+      email_us_html: Email %{email_link} to find out more!
+      bike_was_already_stolen: My bike was already stolen. What should I do?
+      add_details: Add the bike and details about the theft to the Index now!
+      comprehensive_public_database: Bike Index is a comprehensive public database - if your bike was stolen, we think everyone should know about it.
+      add_a_stolen_bike_link: add your your stolen bike to Bike Index!
+      visit_or_add_html: First, %{add_link}. Once you've done that, we'll show you a checklist of what to do to improve your chances of recovery.
+      how_does_this_prevent_bike_theft: How does this prevent bike theft?
+      people_with_good_intentions: Right now people with good intentions buy stolen bikes because there isn't a single searchable, simple resource to check before buying a bike.
+      bike_index_is_that_resource: Bike Index is that resource. The next time you buy a used bike, check the Index first.
+      we_offer_bike_shops: We offer bike shops and law enforcement an easy to use interface to look up any suspicious bikes they encounter, and a way to quickly contact the proper owner.
+      we_successfully_recover: We successfully recover stolen bikes every week through this process.
+      how_can_i_stay_up_to_date: How can I stay up to date on what Bike Index is doing?
+      blog_link: blog
+      read_our_blog_html: Read our %{blog_link}! We post most cool things we do there.
+      follow_us_html: You can also follow us on %{twitter_link} and %{facebook_link}.
+      can_thieves_search: Is it possible for bike thieves to search Index to check if a bike is listed as stolen before they sell it?
+      possible_but_uncommon: It is possible, but not common. We track and flag suspect activities to prevent abuse of Bike Index.
+      what_about_my_privacy: What about my privacy?
+      your_personal_information_is_never_viewed: Your personal information is never viewed, shared or sold without your permission.
+      bikes_are_public_and_searchable: Bikes are public and searchable, but no information about the owner is visible. You can choose to share information (such as your twitter or personal website) but this is turned off by default.
+      article_link: our article
+      to_learn_more_html: To learn more check out %{article_link} about privacy.
+      why_public: Why are serial numbers and non-stolen bikes public?
+      serial_numbers_public: We make serial numbers public because it's the best way to recover stolen bikes and deter theft.
+      the_faster_and_easier_it_is: The faster and easier it is to access serials, the more stolen bikes we recover. Restricting access to serial numbers only helps thieves.
+      this_isnt_optimistic_speculation: "This isn't optimistic speculation: we've proved this and continue to do so with every stolen bike we recover."
+      weve_recovered_bikes: We've recovered bikes before they could even be marked stolen because they could be found on the Index.
+      security_by_obscurity_link: security by obscurity
+      other_registries_html: Other registries generally hide serials because of their technical limitations. They keep information away from those most likely to use it for good, even though %{wikipedia_link} doesn't work.
+      while_serial_numbers: While serial numbers and bike information is public, there is nothing to connect users to the bikes they own. We never make user information available unless the user explicitly chooses to do so.
+      we_care_about_your_privacy: We care about your privacy more than anyone — you can hide your registration so nobody but you can see it. We just don't think it's a good idea.
+    footer:
+      register_a_bike: Register a bike
+      bike_index_partner_organizations: Bike Index partner organizations
+      bike_index_resources: Bike Index resources
+      about_bike_index: About Bike Index
+      bike_index_news: Bike Index news
+      list_of_manufacturers: List of manufacturers
+      help: Help
+      contact_us: Contact us
+      contact_us_section: contact_us_section
+      sign_up_a_shop_or_organization: Sign up a shop or organization
+      privacy_policy: Privacy policy
+      vendor_terms: vendor terms
+      terms_and_conditions: terms and conditions
+    footer_revised:
+      privacy_policy: Privacy policy
+      vendor_terms: vendor terms
+      terms_and_conditions: terms and conditions
+      bike_index: Bike Index
+      faq: FAQ
+      blog: Blog
+      help: Help
+      about: About
+      where_we_are: Where We Are
+      stolen_bike_recoveries: Stolen Bike Recoveries
+      support_us: Support Us
+      donate: Donate
+      store: Store
+      ambassadors: Ambassadors
+      resources: Resources
+      api_documentation: API documentation
+      dev_resources: Dev Resources
+      design_logos: Design & Logos
+      bike_manufacturer_list: Bike Manufacturer List
+      stolen_bike_map: Stolen Bike Map
+      who_we_serve: Who we serve
+      bike_shops: Bike Shops
+      schools_and_universities: Schools and Universities
+      cities: Cities
+      law_enforcement: Law Enforcement
+      community_groups: Community Groups
+      language: Language
+      copyright_html: "%{current_year} &copy; Bike Index, a 501(c)(3) nonprofit - EIN 81-4296194"
+    form_well_footer_save:
+      save_changes: Save changes
+    header_nav:
+      you: You
+      superuser_home: Superuser home
+      log_in: Log in
+      sign_up: Sign up
+      your_bikes: Your bikes
+      your_preferences: Your preferences
+      preferences: Preferences
+      log_out: Log out
+    period_select:
+      last_hour: last hour
+      last_day: last day
+      last_7_days: last 7 days
+      last_30_days: last 30 days
+      last_year: last year
+      all: All
+  sessions:
+    new:
+      get_on_bike_index: Get on Bike Index
+      sign_in_using_facebook: Sign in using Facebook
+      sign_in_using_strava: Sign in using Strava
+      sign_in_using_magic_link: Emailed sign in link
+      or: Or
+      log_in: Log in
+      no_bike_index_account: no Bike Index account?
+      dont_have_an_account: don't have an account?
+      sign_up: sign up
+      email: email
+      password: password
+      keep_me_logged_in: Keep me logged in
+      forgot_your_password: Forgot your password?
+    magic_link:
+      sign_in_with_magic_link: Passwordless sign in
+      enter_email_address: Enter your email address, we'll send you an email with a link to log in.
+      your_email_address: your email address
+      get_sign_in_link: Get sign in link
+      unable_to_auth: Unable to authenticate that token
+      reenter_email: Please re-enter your email address to receive a new token
+  users:
+    edit_password:
+      reset_password: Reset password
+      for_password_update: For password update
+      new_password: New Password
+      new_password_confirmation: New Password confirmation
+    edit_root:
+      personal_information_for_user: Personal Information for %{user_name}
+      any_use_of_your_personal_information_html: Any use of your personal information is governed by the terms of our %{privacy_policy}. We do not sell, trade, or rent your personal information to third parties.
+      receive_the_bike_index_newsletter: Receive the Bike Index newsletter
+      give_us_permission_html: Give us permission to contact you if we believe your bike has been stolen, <em>even if it isn't marked stolen -</em> <strong>%{why_you_should_link}</strong>
+      address: Address
+      choose_country: Choose country
+      city: City
+      state: State
+      zipcode: ZIP code
+      choose_language: Choose language
+      preferred_language: Preferred language
+      have_multiple_emails: Have multiple emails? Consolidate them into one account here
+      primary_email: Primary email
+      notifications_email: This is the email we send notifications to
+      confirmed_emails: Confirmed emails
+      make_primary_email: Make primary email
+      unconfirmed_emails: Unconfirmed emails
+      resend_confirmation: Resend confirmation
+      remove_email: Remove email
+      additional_email: Additional email
+      add_additional_email: Add additional email
+    edit_sharing:
+      sharing_and_personal_page_settings: Sharing and Personal page settings
+      show_twitter: Show Twitter
+      no_twitter: No Twitter
+      twitter_handle: Twitter handle
+      show_personal_site: Show Personal Site
+      show_personal_website: Show personal website
+      no_personal_site: No personal site
+      personal_site_url: Personal Site URL
+      examplecom: example.com
+      additional_link: Additional Link
+      example_url: http://example.com
+      title_for_link: Title for link
+      my_awesome_link: My awesome link
+      your_username_is_the_url_for_your_sharing: Your username is the URL for your sharing page and the bike embed form. Update it if you care about those things.
+      the_bike_index_can_create_a_page: The Bike Index can create a page listing all your bikes that includes all the information you want to share. It's your personal page.
+      preview_page: preview page
+      create_public_page: Create public page
+      create_page: Create page
+      no_please_dont_create_me_a_page: No, please don't create me a page
+      profile_avatar: Profile avatar
+      choose_file: Choose file...
+      page_title: Page title
+      this_users_bikes: This user's bikes
+      page_text: Page text
+    accept_terms:
+      i_agree_to_tos_html: I agree to Bike Index's <strong>Terms of Service</strong>.
+      submit: Submit
+    accept_vendor_terms:
+      i_agree_to_tos_html: I agree to Bike Index's <strong>Terms of Service for Organizations</strong>.
+      submit: Submit
+    confirm_error_404:
+      woops: Woops
+      we_couldnt_find_a_user_with_that_id: We couldn't find a user with that ID. Something strange is going on.
+    confirm_error_bad_token:
+      woops: Woops
+      could_not_find_matching_ticket: That ticket doesn't match anything in our records. Sorry.
+    edit:
+      you_are_editing: You are editing
+      save_changes: Save changes
+    globalid:
+      sign_in_with_globalid: Sign in with GlobaliD
+    new:
+      get_on_bike_index: Get on Bike Index
+      sign_up_using_facebook: Sign up using Facebook
+      sign_up_using_strava: Sign up using Strava
+      or: Or
+      sign_up: Sign up
+      already_have_a_bike_index_account: already have a Bike Index account?
+      already_have_an_account: already have an account?
+      log_in: log in
+      bikehub_terms_url: https://basic.bikehub.com/terms.html
+      terms_and_conditions: terms and conditions
+      agree_bikeindex_bikehub_toc_html: I agree to BikeHub's %{bikehub_toc_link} and Bike Index's %{bikeindex_toc_link}.
+      agree_bikeindex_toc_html: I agree to Bike Index's %{bikeindex_toc_link}.
+      get_bike_indexs_newsletter: Get Bike Index's Newsletter
+      forgot_your_password: Forgot your password?
+    password_reset:
+      password_reset: Password Reset
+      weve_sent_an_email: We've sent an email to the address you have on file with us.
+      follow_the_link_back: Follow the link back to the site to reset your password!
+    please_confirm_email:
+      thanks_for_signing_up_for_bike_index: Thanks for signing up for Bike Index!
+      please_verify_your_email: Please verify your email
+      we_sent_an_email: We sent an email with a confirmation link in it. Follow the link in the email to finish signing up!
+      we_sent_an_email_to_user_email_html: We sent an email to <strong class="stolen-color">%{user_email}</strong> with a confirmation link in it. Follow the link in the email to finish signing up!
+    request_password_reset:
+      reset_your_password: Reset your Password
+      your_email_address: your email address
+      enter_the_email_address: Enter the email address you used to sign up. We'll send you an email with a link to reset your password.
+    show:
+      this_users_bikes: This user's bikes
+      bikes: Bikes
+      recovered: Recovered
+      stolen: Stolen!
+      this_user_has_no_bikes_yet: This user has no bikes yet!
+    update_password:
+      choose_a_new_password: Choose a new password!
+      and_try_not_to_forget_it: and try not to forget it...
+      update_your_password: Update your password
+      password: Password
+      password_confirmation: Password confirmation
+      update_password: Update password
+  organized:
+    ambassador_dashboards:
+      show:
+        welcome_to_your_ambassador_homepage: Welcome to your Ambassador homepage
+        this_page_contains_the_resources_you_need: This page contains the resources you need to become a great bike advocate in your community. Here you will find documents, tips, articles, and recommendations for helping cyclists where you live and connecting with Ambassadors around the world doing the same in their communities.
+        being_a_bike_index_ambassador: Being a Bike Index Ambassador means helping people, where you live, to register and protect their bikes in case of theft. Share Bike Index with bike shops, advocacy groups, universities, and law enforcement to aid larger numbers and more kinds of cyclists in your area.
+        activities_for_registering_cyclists_html: On this page, we've listed effective activities for registering cyclists in Bike Index. You can track progress and get ideas from other Ambassadors in your area about successful strategies. If you have any questions, post them in our Slack channel or email %{help_link}.
+        suggested_activities: Suggested Activities
+        activity: Activity
+        actions: Actions
+        completed_activities: Completed activities
+        completed: Completed
+        leaderboard: Leaderboard
+        name: Name
+        activities: Activities
+      getting_started:
+        10_tips_for_getting_started_in_your_town: 10 tips for getting started in your town
+        be_a_part_of_your_local_cycling_culture: Be a part of your local cycling culture. This comes in many forms, Whether you’re a racer or commuter, gravel grinder, mechanic, or enthusiast, there are ways to get involved. Get to know others who are active in the cycling community. Even in a big city, cyclists know cyclists and are very welcoming.
+        have_twitter_connect: Have twitter. Connect with all your local cyclists on twitter. Promote Bike Index on twitter and don’t be afraid to tag and name drop us.
+        post_and_rt_stolen_bikes: Post and RT stolen bikes in your area. Connect people looking to match stolen bikes in your community. People will follow you, and you can follow them too! You don’t have to be an official to keep an eye out for stolen bikes.
+        find_and_talk_to_local_bloggers: Find and talk to local bloggers and enlist them. They will have followings in your area. Interview some folks and get some articles written and published.
+        engage_your_local_city_and_cops: Engage your local city and cops. Find the people who deal with whatever local bike registry system your city uses. Sometimes a simple “_____ bike registry” search will lead you to the person you need to talk to.
+        seek_out_local_facebook_groups: Seek out local facebook groups that find stolen bikes. They exist, and there might be more than one.
+        promote_bike_index: Promote the hell out of Bike Index to cops, bike shops, and biking orgs all the time, in person and via twitter. It helps to approach with materials in hand, whether that’s a flyer, some stickers, or a business card.
+        encourage_people_to_watch: Encourage people to watch craigslist and offerup for your area, and match sketchy bikes for sale in the Bike Index. BIKE HUNT ALL DAY.
+        grow_your_network_via_bike: Grow your network via bike theft victims in that area. Engage them to help out and do the above. There is a good chance they will be interested if they're pissed off about bike thefts.
+        ride_your_bike_express_your: Ride your bike! Express your love for bikes in whatever form you want. The people you’re going to talk to do their work because they love bikes too. Sharing that with them will create the first steps in a great partnership.
+      resources:
+        ambassador_resources: Ambassador resources
+        as_an_ambassador_you_have_access_to_a_num: "As an ambassador, you have access to a number of special features on Bike Index. Here are a few of them:"
+        youre_a_moderator_on_discuss_html: You're a moderator on <a href="https://discuss.bikeindex.org">discuss.bikeindex.org</a>
+        you_can_send_stolen_messages_html: You can send stolen messages to bikes that haven’t been marked stolen yet (as described in <a href="https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen">recover bikes before they are marked stolen</a>)
+        you_can_mark_stolen_bikes: You can mark stolen bikes recovered (ambassadors from New Orleans requested this feature - they just recover bikes so quickly!)
+        access_to_quick_communication: Access to quick communication with the Bike Index team via Slack and email
+        periodic_discount_codes: Periodic discount codes from Bike Index partners
+        some_additional_resources: "Some additional resources:"
+        qr_sticker_org_instructions: QR sticker instructions for organizations
+        qr_sticker_org_instructions_url: https://drive.google.com/file/d/1VXoF1NB7CcSLu8BaBQeuLhNmmB89qp81/view?usp=sharing
+        qr_sticker_instructions: QR sticker instructions for individuals
+        qr_sticker_instructions_url: https://drive.google.com/file/d/1_EMLLgvJGdyQI7catFmuhs2zHoNoaXBE/view?usp=sharing
+        organizations_sign_up: Organizations sign up
+        page_on_bike_index_html: "%{signup_link} page on Bike Index"
+        tips_for_talking_to_bike_shops: Tips for talking to bike shops
+        tips_for_talking_to_bike_shops_url: https://bikeindex.org/news/how-to-get-a-bike-shop-signed-up-in-bike-index
+    bikes:
+      list:
+        org_bikes_html: "<em>%{org_name}</em> bikes"
+        bike: bike
+        num_bikes_registered_html: "<strong>%{num_bikes}</strong> registered"
+        added: Added
+        manufacturer: Manufacturer
+        model: Model
+        color: Color
+        sent_to: Sent to
+        link: Link
+        sticker: Sticker
+        sent_to_a_new_owner: sent to a new owner
+      search:
+        search_bike_descriptions: Search bike descriptions
+        search_owner_email: Search owner email
+        search_for_serial_number: Search for serial number
+        bike: bike
+        matching_bikes_html: "<strong>%{bikes}</strong> matching"
+        registered_bikes_html: "<strong>%{bikes}</strong> registered with %{org_name}"
+        view_just_stolen_bikes: view just stolen bikes
+        stolen_bikes_html: "<em>stolen</em> bikes"
+        view_all_bikes: view all bikes
+        settings: settings
+        visible_columns: Visible columns
+        stickers: "Stickers:"
+        all: All
+        only_with_stickers_html: Only <strong>with</strong> stickers
+        only_no_sticker_html: Only <strong>no</strong> sticker
+        registered: Registered
+        stolen: Stolen
+        color: Color
+        manufacturer: Manufacturer
+        model: Model
+        updated: Updated
+        mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
+        owner_name: Owner name
+        sent_to: Sent to
+        sticker: Sticker
+        only_with: only with
+        only_not: only not
+        link: Link
+      incompletes:
+        org_incomplete_registrations_html: "<em>%{org_name}</em> Incomplete Registrations"
+        matching: matching
+        incomplete: incomplete
+        registration: registration
+        search_emails: Search emails
+        search: Search
+        sent: Sent
+        bike: Bike
+        email: email
+        through_org: through %{org_name}
+      index:
+        is_currently_linked: is currently linked.
+        connected_to_bike_html: It is connected to this %{bike_link}.
+        isnt_linked_to_a_bike: isn't linked to a bike.
+        enter_url_of_the_bike_html: "You can enter the URL of the bike you would like to link this %{bike_code_kind} to:"
+        update: Update
+        search_org_bikes_html: Or, search %{org_name}'s bikes, view the bike and click <em>link it</em> to connect it to this %{bike_code_kind}
+      recoveries:
+        org_recoveries_html: "<em>%{org_name}</em> Recoveries"
+        recovery: recovery
+        date_recovered: Date Recovered
+        description: Description
+        mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
+        owner: Owner
+    bulk_imports:
+      index:
+        org_ascend_imports_html: "<em>%{org_name}</em> Ascend Imports"
+        org_bulk_imports_html: "<em>%{org_name}</em> Bulk Imports"
+        org_exports_html: "<em>%{org_name}</em> Exports"
+        new_export: New Export
+        export: Export
+        exclude_empty_imports: Exclude Empty imports
+        include_empty_imports: Include Empty imports
+        added: Added
+        progress: Progress
+        download: Download
+        delete: Delete
+        errors: Errors
+        creator: Creator
+        bikes: Bikes
+        line: Line
+        file: File!
+        unable_to_process: Unable to process
+        new_import: New import
+      new:
+        register_bikes_from_a_csv: Register bikes from a CSV
+        must_have_required_headers_html: Your CSV <em>must</em> have our required headers.
+        required_headers_are_html: The required headers are <code>manufacturer</code>, <code>model</code> <code>color</code> <code>email</code> and <code>serial</code>.
+        our_example_csv_here: our example CSV here
+        example_csv_url: https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_only_required.csv
+        look_at_example_csv_html: Look at %{link_to_example_csv}.
+        notes_on_successfully_importing: "Notes on successfully importing:"
+        you_must_upload_a_dot_csv_html: You must upload a <code>.CSV</code>
+        for_best_results: For best results, put quotes around all the cells.
+        your_headers_must_match_html: "Your headers must match our headers <em>exactly</em> - for example if you have 'serial #' as a header, the import will not work."
+        doing_an_import: Doing an import for the first time? Try importing a sample of your CSV with just 1 or 2 rows, and replace the email with your own email - so if the bikes don't import correctly, you can make adjustments and delete the bikes, without having to delete a large number of bikes.
+        csv_file_with_bikes: CSV File with bikes
+        choose_file: Choose file...
+        upload_and_begin_import: Upload and begin import
+        optional_additions: "Optional additions:"
+        we_support_a_few_additional: We support a few additional, optional columns. You do not have to include them unless you want to.
+        example_csv_link: example CSV with all optional columns here
+        view_an_example_csv_html: View an %{link_to_example_csv}.
+        if_only_some_of_your_bikes_html: If only some of your bikes have values in optional columns, leave the cell blank for the ones that don't have it (rather than putting <em>unknown</em> or <em>n/a</em>).
+        if_you_are_including_photo_url_html: 'If you are including "photo_url" make sure the url is of the image itself. If it''s of a webpage with the photo on it, <em>the photo import will not work</em>. Examples:'
+        correct_actual_image_url_html: '<span class="text-success">Correct</span>: actual image url'
+        spokecard_image_url: https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg
+        incorrect_image_on_webpage_html: '<span class="text-danger"">INCORRECT</span>: image on webpage'
+        spokecard_page_url: https://en.wikipedia.org/wiki/Bike_Index#/media/File:Bike_Index_registration_spokecard.jpg
+        this_will_not_work: this will not work!
+      show:
+        ascend_import: Ascend import
+        bulk_import: Bulk import
+        created: Created
+        progress: Progress
+        file: File
+        creator: Creator
+        errors: Errors
+        bikes: Bikes
+        manufacturer: Manufacturer
+        model: Model
+        color: Color
+        sent_to: Sent to
+        sent_to_a_new_owner: "(sent to a new owner)"
+    exports:
+      index:
+        org_exports_html: "%{org_name} Exports"
+        new_export: New Export
+        export: Export
+        created: Created
+        creator: Creator
+        progress: Progress
+        bikes_in_export: Bikes in export
+        download: Download
+        delete: Delete
+      show:
+        exports: Exports
+        download_export: Download Export
+        shared_alert_body: You'll be automatically redirected to the labels once processing is finished
+        created: Created
+        by: By
+        format: Format
+        progress: Progress
+        bikes_exported: Bikes exported
+        show_first_100_bikes_in_export: Show first 100 bikes in export
+        show_bikes_in_export: Show bikes in export
+        bikes_registered_after: Bikes Registered after
+        bikes_registered_before: Bikes Registered before
+        specific_bikes: Specific bikes
+        unable_to_export: Unable to export, not part of your organization
+        avery_export: Avery Export
+        view_avery_labels: View Avery Labels
+        pending: pending...
+        stickers: Stickers
+        stickers_exported: "%{bike_codes_count} Stickers exported"
+        stickers_have_been_unassigned: Stickers have been unassigned
+        unassign_stickers: Unassign stickers
+        no_stickers_assigned: No stickers assigned
+        not_assigned: not assigned
+        columns_in_csv: Columns in csv
+    manage:
+      location_fields:
+        location_name: Location name
+        name: Name
+        phone_number: Phone number
+        address: Address
+        street: Street
+        city: City
+        state: State
+        choose_country: Choose country
+        zipcode: Zipcode
+        remove: Remove
+      index:
+        org_settings_html: "<em>%{org_name}</em> settings"
+        name: Name
+        abbreviation: Abbreviation
+        registration_email: Registration email
+        select_email: Select email
+        org_email_address_html: Email address <em>%{org_name}</em> bike registrations will be sent from
+        organization_type: Organization type
+        organization_logo: Organization logo
+        choose_file: Choose file...
+        update: Update
+        i_would_like_to_terminate_my_account: I would like to terminate my account with Bike Index
+        delete_organization: Delete organization
+        removal_confirmation: Are you positive you want to remove %{org_name} from Bike Index?
+      locations:
+        location_settings_html: "<em>%{org_name}</em> location settings"
+        bike_index_partner_map: Bike Index partner map
+        display_org_on_map_html: Display <em>%{org_name}</em> on %{map_link}
+        add_location: Add location
+        save: Save
+    messages:
+      index:
+        bike: Bike
+        matches: matches
+        sender: Sender
+        sent: Sent
+      show:
+        organization_message: "%{org_kind} Message"
+        created: Created
+        delivered: Delivered
+        success: Success
+        pending_delivery: Pending delivery
+        sender: Sender
+        bike: Bike
+        subject: Subject
+        additional_text: Additional text
+        none: none
+    stickers:
+      index:
+        stickers: Stickers
+        search_sticker_id: Search Sticker ID
+        search_bike_url_or_id: Search Bike URL or ID
+        search: Search
+        all: All
+        sticker: Sticker
+        claimed: Claimed
+        unclaimed: Unclaimed
+        bike: Bike
+        added_html: Added <small class="convertTimezone"></small>
+        coded: Code
+      edit:
+        edit_sticker: Edit Sticker
+        remove_bike_link: Remove Bike link
+        sticker: Sticker
+        claimed: Claimed
+        bike: Bike
+        bike_is_unavailable: Bike is unavailable - it was probably deleted
+        unclaimed: Unclaimed
+        claimed_by: Claimed by
+        previous_bike: Previous Bike
+        bike_id_or_url: Bike ID / URL
+        update: Update
+    users:
+      edit:
+        edit_membership_html: Edit membership for <em class="small">%{email}</em>
+        remove_from_organization: remove from organization
+        invited: Invited
+        signed_up: Signed up
+        has_not_signed_up_html: "%{name} <strong>has still not signed up</strong>"
+        email: Email
+        membership_type: Membership type
+        admin_of_organization: Admin of organization
+        member_of_organization: Member of organization
+        confirmation: Are you sure you want to remove %{user_name} from %{org_name}? (They will still be to use their personal account)
+        update: Update
+      index:
+        manage_users: Manage Users
+        you_have_invited_html: "You have invited: <strong>%{users_count}</strong>"
+        remaining_invites_html: You can add <strong>%{invitations_count}</strong> more
+        invite_more_users: Invite more users
+        emails_are_currently_sent_from_html: Emails are currently sent from <em>%{email}</em>.
+        update_email: Update email
+        created: Created
+        user: user
+        to: To
+        claimed: Claimed
+        is_admin: Admin?
+        sender: Sender
+      new:
+        invite_user: Invite user
+        you_have_invited_html: "You have invited: <strong>%{users_count}</strong>"
+        remaining_invites_html: You can add <strong>%{invitations_count}</strong> more
+        email_youre_inviting: Email you're inviting
+        invite_multiple_emails: Invite multiple emails
+        multiple_emails: Multiple emails
+        1_email_per_line: 1 email per line
+        membership: Membership
+        user: user
+        membership_type: Membership type
+        admin_of_organization: Admin of organization
+        member_of_organization: Member of organization
+        send_invitation: Send invitation
+  bikes:
+    bike:
+      serial: Serial
+      primary_colors: Primary colors
+      recovered: Recovered
+      stolen: Stolen
+      location: Location
+    bike_org_table:
+      date_indexed: Date indexed
+      manufacturer: Manufacturer
+      model: Model
+      color: Color
+      sent_to: Sent to
+      view_pdf: view PDF
+      today_at: Today at %{created_at}
+      yesterday_at: Yesterday at %{created_at}
+      pdf: PDF
+    bike_show_overlays:
+      please_tell_us_how_you_got_your_bike: Please tell us how you got your %{bike_type} back, we really care!
+      its_also_how_we_get_better_at_recovering: It's also how we get better at recovering bikes.
+      how_did_you_get_it_back: How did you get it back?
+      when_did_you_recover_it: When did you recover it?
+      did_we_help: Did we help?
+      can_we_share_your_story: Can we share your story?
+      mark_recovered: Mark recovered
+      nevermind: Nevermind
+      your_bike: Your %{bike_type}
+      were_honored_to_have_your_bike: We're honored to have your %{bike_type} on the Index.
+      claim_it_so_you_can_update_your_listing: Claim it so you can update your listing.
+      claim_bike_type: Claim %{bike_type}
+      this_bike_type_is_hidden: This %{bike_type} is hidden.
+      no_one_can_see_it_but_you: No one can see it but you
+      thank_you_for_recovering_this_bike_type: Thank you for recovering this %{bike_type}!
+      were_really_bummed_your_bike_type_was_stolen: We're really bummed your %{bike_type} was stolen.
+      whoa_this_awesome_bike_type_is_yours: Whoa, this awesome %{bike_type} is yours!
+      add_some_more_information_about_it: Add some more information about it.
+      add_a_picture_so_people_know_what_to_look: Add a picture so people know what to look for!
+      add_a_picture_of_it: Add a picture of it, so everyone can admire its beauty!
+      you_sent_this_bike_html: You sent this %{bike_type} to <em>%{owner_email}</em> and it hasn't been claimed yet. You can update it.
+      edit: Edit
+    edit_primary_menu:
+      theft_details: Theft Details
+      bike_type_details: "%{bike_type} Details"
+      you_are_editing: You are editing
+      save_changes: Save changes
+    stolen_checklist:
+      list_bike_type_on_bike_index: List %{bike_type} on Bike Index
+      add_serial_number: Add serial number
+      contact_seller: CRITICAL - contact who you bought the bike from and find out if they have it
+      location_where_the_theft_occurred: location where the theft occurred
+      report_theft_html: Report theft on Bike Index, including %{edit_bike_link}
+      theft_details: theft_details
+      add: Add
+      a_photo_of_your_bike_type: a photo of your %{bike_type}
+      a_police_report: a Police Report Number
+      add_bike_link_to_your_theft_report_html: Add %{bike_link} to your theft report
+      push_bike_info_to: Push bike info to
+      leads_online: LEADSonline
+      leads_online_url: https://bikeindex.org/news/bike-index-partners-with-leads-online
+      bike_index_does_this: "(Bike Index does this when you enter your police report number)"
+      requires_a_serial_number: requires a serial number
+      push_bike_info_to_law_enforcement: Push bike info to law enforcement databases (Bike Index does this when you enter your police report number)
+      share_on_twitter: Share on Twitter (Bike Index will do this once we review your listing)
+      share_widely_on_your_personal_social: Share widely on your personal social media
+      facebook_instagram_etc: "(Facebook, Instagram, etc)"
+      supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
+      premium_stolen_bike_alerts: Premium Stolen Bike Alerts
+    theft_alerts_table:
+      existing_theft_alerts: Existing Theft Alerts
+      created: Created
+      plan: Plan
+      status: Status
+      start: Start
+      end: End
+    bike_fields:
+      revised_colors:
+        choose_color: Choose color
+        color_help: Color help
+        add_a_color: Add a color
+        remove_color: Remove color
+        primary_color_help_content_html: The color of the frame and fork&mdash;not the wheels, cranks, or anything else. You can put a more detailed description in paint description (once you've registered), <em>this</em> is to get a general color to make searching easier
+      revised_component_fields:
+        remove_part: Remove part
+        part_type: Part type
+        component_type: Component type
+        unknown_part_type: Unknown part type
+        part_description: Part Description
+        other_manufacturer: Other manufacturer
+        model: Model
+        model_year: Model Year
+        part_serial: Part Serial
+      stolen_location:
+        where_was_it_stolen_type: Where was it %{stolen_type}?
+        choose_country: Choose country
+        address_or_intersection: Address or intersection
+        city: City
+        state: State
+        zipcode: Zipcode
+        publicly_display_exact_address: Publicly display exact address theft occurred
+    edit_accessories:
+      other_handlebar_type: Other handlebar type
+      add_a_component: Add a component
+    edit_alert:
+      targeted_sharing_html: We've found targeted sharing on social media to have a <em>huge</em> effect on recovering stolen bikes.
+      bike_index_can_help: Bike Index can help by purchasing targeted ads on Facebook to spread the word about your stolen %{bike_type}.
+      select_plan: Select Plan
+    edit_alert_purchase:
+      confirm_your_plan: Confirm your plan
+      youve_made_an_excellent_choice: You've made an excellent choice! Please confirm it below.
+      here_is_what_youll_get: "Here is what you'll get with the %{plan_name} plan:"
+      charge: "Charge: %{price}"
+      confirm: Confirm
+      cancel: Cancel
+    edit_alert_purchase_confirmation:
+      thanks: Thanks!
+      your_order_is_pending: Your order is pending.
+      stay_tuned_for_an_update_once_weve_proces: Stay tuned for an update once we've processed your alert.
+    edit_bike_details:
+      please_fill_in_both_fields: Please fill in both fields
+      update_serial_number: Update serial number
+      submit_serial_correction: Submit serial correction
+      submit_manufacturer_correction: Submit Manufacturer Correction
+      model_year: Model year
+      unsure_or_unknown: Unsure or unknown
+      unknown_year: Unknown year
+      main_frame_material: Main frame material
+      choose_material: Choose material
+      frame_size: Frame size
+      seat_tube_length: Seat tube length
+      bike_name: Bike Name
+      general_description: General description
+      other_serial_or_registration_number: Other serial or registration number
+      updated_serial: Updated serial
+      reason_for_update: Reason for update
+      submit_update: Submit update
+      nevermind: Nevermind
+      manufacturer: Manufacturer
+      zipcode: zip code
+      tell_us_about_your_bike: Tell us about your bike!
+    edit_drivetrain:
+      wheels: Wheels
+      sidetitleize_wheel: "%{sidetitleize} wheel"
+      choose_diameter: Choose diameter
+      all_diameters: All diameters
+      show_more_sizes: Show more sizes
+      hide_extra_sizes: Hide extra sizes
+      side: "%{side} tire"
+      narrow: Narrow
+      wide: Wide
+      drivetrain: Drivetrain
+      drivetrain_type: Drivetrain type
+      fixed: Fixed
+      coaster_brake: Coaster Brake
+      belt_drive: Belt Drive
+      front_gears: Front gears
+      select_chainring_count: Select chainring count
+      internal_front_gears: Internal front gears
+      rear_gears: Rear gears
+      select_cog_count: Select cog count
+      internal_rear_gears: Internal rear gears
+    edit_groups:
+      groups_and_organizations: Groups and Organizations
+      are_you_part_of_a_school_want_to_bolster_: Are you part of a school? Want to bolster a local advocacy organization? Add the organization here.
+      creation_organization: Creation organization
+      can_edit_this_bike: Can edit this %{bike_type}
+      choose_organization: Choose organization
+      remove: Remove
+      other_organizations: Other organizations
+      add_an_organization: Add an organization
+    edit_ownership:
+      transfer_ownership: Transfer Ownership
+      sell_trade_or_give_away_this_bike: Sell, trade or give away this %{bike_type}? Enter the new owner's email to transfer the registration.
+    edit_photos:
+      drag_the_uploaded_photos: Drag the uploaded photos to rearrange the order in which they appear
+      drag_and_drop_files_here_html: Drag and drop files here or use the <strong>Upload Photos</strong> button
+      finished_uploading: Finished uploading
+    edit_publicize:
+      do_these_things_for_the_best_chance_of_re: Do these things for the best chance of recovery!
+      share_your_listing_so_everyone_knows_to_w: Share your listing - so everyone knows to watch out for your %{bike_type}!
+      share_on_facebook: Share on Facebook
+      share_on_twitter: Share on Twitter
+      help_me_find_bike: Help me find my stolen bike!
+    edit_report_recovered:
+      this_bike_has_been_returned: This %{bike_type} has been returned!
+      please_tell_us_how_you_got_your_bike: Please tell us how you got your %{bike_type} back, we really care!
+      its_how_we_get_better_at_recovering_bikes: It"s how we get better at recovering bikes.
+      how_did_you_get_it_back: How did you get it back?
+      did_we_help: Did we help?
+      can_we_share_your_story: Can we share your story?
+      mark_recovered: Mark recovered
+      nevermind: Nevermind
+      were_so_glad: We're so glad you got your %{bike_type} back!
+      not_enough_info: Not enough information!
+    edit_report_stolen:
+      this_bike_type_is_stolen_or_missing: This %{bike_type} is stolen or missing!
+    edit_theft_details:
+      recovered: Recovered
+      stolen: Stolen
+      do_these_things_for_the_best_chance: Do these things for the best chance of recovery!
+      when_was_it_stolen: When was it %{stolen_type}
+      police_report: "Police report #"
+      without_a_valid_report_number_html: Without a valid report number, your bike won't be included in partner searches by <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
+      department_city: Department & city
+      do_you_have_proof_of_ownership: Do you have proof of ownership of this %{bike_type}?
+      if_this_bike_type_was_added: If this %{bike_type} was added to the Index by a bike shop, that counts as proof of ownership
+      receive_notifications: Receive notifications from Bike Index about this stolen %{bike_type}
+      eg_if_we_tweet_about_it: e.g. if we tweet about it or see someone searching for its serial number
+      how_did_you_recover: How did you recovered the %{bike_type}
+      description_of_the_incident: Description of the incident
+    index:
+      search_for_stolenness_desc_bikes: Search for %{stolenness_desc} bikes
+      search_bike_descriptions: Search bike descriptions
+      search_for_serial_number: Search for serial number
+      submit: submit
+      anywhere: Anywhere
+      miles_of: miles of
+      within: within
+      stolen_within: Stolen within
+      you: you
+      stolen_anywhere: Stolen anywhere
+      not_marked_stolen: Not marked stolen
+      no_bikes_matched: No %{stolenness} bikes matched your search
+      with_serial_numbers_html: "%{stolenness} with serial numbers close to <em>%{serial}</em>"
+    new:
+      our_serial_page: our serial page
+      serial_help_content_html: Every bike has a unique serial number, it's how they are identified. To learn more or see some examples, go to %{serial_page_link} <small>(opens in a separate window)</small>.
+      enter_bike_type_details: Enter %{bike_type} details
+      this_is_a: This is a
+      serial_help: Serial help
+      without_serial: This %{bike_type} was made without a serial
+      without_serial_number: This %{bike_type} was made without a serial number
+      missing_serial: Missing serial
+      select_other: Select 'Other' if manufacturer doesn't show up when entered
+      other_manufacturer: Other manufacturer
+      model_year: Model year
+      unsure_or_unknown: Unsure or unknown
+      unknown_year: Unknown year
+      street_address: Street address
+      your_full_address_is_required: Your full address is required by %{org_name}
+      city: City
+      state: State
+      zipcode: Zipcode
+      register: Register
+      or: or
+      very_few_bikes_html: "Very <em>very</em> few bikes are made without serials. Unless this %{bike_type}:"
+      was_made_before_1970: Was made before 1970
+      is_a_handmade_frame: Is a handmade frame
+      it_probably_has_a_serial_number: It probably has a serial number.
+      how_to_find_serial: how to find your serial number
+      read_how_to_find_html: Read about %{how_to_find_link} <small>(opens in a separate window)</small>
+      nevermind: Nevermind
+      i_just_dont_know_the_serial: I just don't know the serial
+      im_100_sure: I'm 100% sure
+      are_you_certain: Are you certain?
+      highly_recommended: highly recommended
+      mailing_address: Mailing address
+      additional_serial_sticker_number: Additional serial/sticker number
+      affiliation: "%{org_name} affiliation"
+      phone: Phone
+    pdf:
+      stolen: Stolen
+      description_of_theft: Description of theft
+      date_stolen: Date Stolen
+      location: Location
+      owner_phone: Owner phone
+      police_report: Police report
+      department: Department
+      bike_description: "Bike description:"
+      registered: Registered
+      to: to
+      bike_serial: Bike Serial
+      manufacturer: Manufacturer
+      model: Model
+      frame_size: Frame size
+      paint: Paint
+      by: by
+      color: Color
+      front_gears: Front gears
+      rear_gears: Rear gears
+      with_coaster_brake: with coaster brake
+      front_wheel: Front wheel
+      with: with
+      narrow_tires: narrow tires
+      wide_tires: wide tires
+      rear_wheel: Rear wheel
+      saddle: Saddle
+      registration: Registration
+      printout: printout
+      online: online
+      bikeindex_org: bikeindex.org%{bike_path}
+    scanned:
+      isnt_linked_to_a_bike: isn't linked to a bike.
+      you_have_claimed_the_maximum_permitted: You have claimed the maximum permitted number of Bike Codes.
+      please_email_support_html: Please email %{support_email} if you don't understand why you're seeing this message or if you need an exception made.
+      you_can_enter_the_url: "You can enter the URL of the bike you would like to link this %{bike_code_kind} to:"
+      update: Update
+      or_click_html: "Or, click <em>link it</em> on of your bikes to connect it to this %{bike_code_kind}:"
+      added: Added
+      manufacturer: Manufacturer
+      model: Model
+      color: Color
+      mnfg_model_color_html: mnfg, model, <span class="less-strong">color</span>
+      link_it: Link IT!
+      bikemnfg_name: bike.mnfg_name
+      bikeframe_model: bike.frame_model
+      link_bike_codekind: Link %{bike_codekind}
+      to_link_that_card_with_a_bike: To link that card with a bike,
+      please_sign_in: please sign in
+    show:
+      bike_in_admin: "%{bike_type} in Admin"
+      hidden_by_owner: HIDDEN by owner
+      no_one_but_the_user_and_bike_index_admins: no one but the user (and Bike Index admins) can see it
+      recovered: Recovered
+      stolen: Stolen
+      at: at
+      view_users_other_registrations: View user's other registrations
+      bike_photo: "%{bike_type} photo"
+      stock_photo: Stock photo of a %{year} %{model}
+      color_may_not_match: Color may not match!
+      serial: Serial
+      other_serial: Other serial/registration/sticker
+      cycle_type: Cycle type
+      manufacturer: Manufacturer
+      name: Name
+      model: Model
+      year: Year
+      primary_colors: Primary colors
+      frame_size: Frame size
+      frame_material: Frame Material
+      handlebar_type: Handlebar type
+      distinguishing_features: Distinguishing features
+      theft_details: "%{bike_recovered} Details"
+      location: Location
+      locking_description: Locking description
+      locking_circumvented: Locking circumvented
+      date_stolen_type: Date %{stolen_type}
+      police_report: "Police report #"
+      department_city: Department & city
+      description_of_incident: Description of incident
+      front_rear: Front & rear
+      front: Front
+      rear: Rear
+      wheel_diameter: Wheel diameter
+      front_wheel_diameter: Front wheel diameter
+      rear_wheel_diameter: Rear wheel diameter
+      other: Other
+      componentcmodel_name: "%{componentcmodel_name}"
+      componentyear: "%{componentyear}"
+      spread_the_word: Spread the word!
+      share_it: Share it!
+      know_something_about_this_bike_type: Know something about this %{bike_type}?
+      contact_the_owner: Contact the owner
+      is_this_your_bike_send_proof_of_ownership: Is this your bike? Send proof of ownership (such as the bike's serial number or a link to a photo of you with the bike)
+      write_them_a_message: Write them a message
+      where_did_you_see_this_bike: Where did you see this %{bike_type}? If you're contacting about an ad you found online, include a link in the field below
+      link_url: Link url
+      send_message: Send message
+      or_call: Or call
+      owners_phone_number: "Owner's phone number:"
+    organized_access_panel:
+      access_panel: Access Panel
+      bike_is_registered: This %{bike_type} is registered with %{org_name}
+      is_registered: reged with %{org_name}
+      bike_is_not_registered_html: This %{bike_type} is <em>not</em> registered with %{org_name}
+      is_not_registered_html: "<em>not</em> reged with %{org_name}"
+      as_a_bikeindex_ambassador_html: <em><span class="hidden-md-down">As a Bike Index ambassador,</span> you can mark it as recovered:</em>
+      mark_bike_recovered: Mark bike recovered
+      permission: Permission
+      org_can_edit_bike: "%{org_name} can edit this %{bike_type}"
+      organization_can_edit_after_claimed: "and can edit after %{bike_type} claimed"
+      edit: Edit
+      org_cannot_edit: "%{org_name} can not edit"
+      sticker: Sticker
+      link_sticker: Link Sticker
+      owner_name: Owner name
+      owner_email: Owner email
+      registered: "Registered:"
+      claimed: Claimed
+      creator: Creator
+      address: "Address:"
+      no_name: no name
+      avery_exportable: Avery Exportable
+      is_true: "true"
+      is_false: "false"
+      missing_owner_name: missing user name
+      missing_address: missing Address
+      unable_to_display_additional_information: Unable to display additional information because %{bike_type} is not registered with %{org_name}
+      bike_not_marked_stolen: "%{bike_type} is not marked stolen."
+      believe_it_is_anyway: Believe it is anyway?
+      contact_the_owner: Contact the owner
+      write_them_a_message: Write them a message
+      link_url_for_online_sighting: Link url for online sighting
+      where_did_you_see_this_bike: Where did you see this %{bike_type}? If you're contacting about an ad you found online, include a link in the field below
+      send_message: Send message
+      or_call_owner_html: "<em>Or call</em> <strong>Owner's phone number:</strong>"
+      user_revoked_permission_html: This user <strong>revoked</strong> permission to contact them prior to their bike being marked stolen.
+      support_email: support@bikeindex.org
+      email_to_deal_with_this_html: Email %{support_link} to deal with this.
+      send: Send
+      message_owner: Message %{bike_type} owner
+      geomessage: GeoMessage
+      additional_message: Additional message
+      waiting_on_device_location: Waiting on device location
+      sticker_code: Sticker Code
+      assign_sticker: Assign sticker
+    edit_remove:
+      unhide_this_bike: Un-hide this %{bike_type}
+      hide_this_bike: Hide this %{bike_type}
+      keeping_your_bike_public: Keeping your bike public is the best way to help recover stolen bikes and deter theft.
+      you_can_read_more_html: You can read more about why this is important to us in our %{faq_link}.
+      faqs: FAQs
+      we_strongly_recommend: We strongly recommend keeping your %{bike_type} visible, but you can hide this %{bike_type} if you prefer. Even though we don't think it's a good idea. You can always toggle this setting to show and hide a bike.
+      delete_this_bike: Delete this %{bike_type} from Bike Index
+      reason_for_deletion: Reason for deletion
+      delete_bike: Delete bike
+      nevermind: Nevermind
+      reason_modal_body: Please fill in the reason for the %{bike_type} deletion
+      reason_modal_title: We want to know why!
+      modal_title: Are you sure you want to delete this %{bike_type}?
+  info:
+    vendor_terms_text:
+      about_terms_of_service_for_vendors: About our terms of service for vendors
+      available_here: available here
+      because_bike_index_html: |
+        Because Bike Index relies on partnering with bike organizations, we may need to
+        verify your status as a bike organization. You provide us with basic information
+        about your organization and we will seek to verify your information (we may work
+        with third parties to do so) and approve your Vendor Account unless deemed risky
+        (by us or our friends). You give us permission to do all this, and to
+        periodically update the information or we otherwise must decline to offer you
+        the Service. <a href="#section_c">Complete details</a>
+      becoming_a_vendor: Becoming a Vendor on Bike Index
+      bike_index_vendor_service: Bike Index Vendor Service
+      bike_index_vendor_tos: Bike Index Vendor Terms of Service
+      binding_arbitration: Binding Arbitration
+      binding_arbitration_p1: Any controversy or claim arising out of or relating
+        to these Terms of Service, or any breach thereof, shall be settled by arbitration
+        administered by the American Arbitration Association in accordance with its
+        Commercial Arbitration Rules and judgment on the award rendered by the arbitrator(s)
+        may be entered in any court having jurisdiction thereof.
+      by_giving_bike_shop_employees_html: |
+        By giving bike shop employees and bike advocacy organizations - Vendors - the
+        ability to add bikes to the Service for free, we aim to encourage registration
+        and to fight procrastination of bike registrations. We have additionally
+        developed a Lightspeed integration that allows shops that use Lightspeed as your
+        point of sale to register bikes immediately upon sale. We discuss this in detail
+        later in this document. If you have any questions or concerns, or simply want to
+        better understand how we do things at Bike Index, please do not hesitate to
+        %{contact_link}.
+      customer_service: Customer Service
+      customer_service_body: We will provide you with customer service to resolve
+        any issues relating to your Bike Index Account, the registration of bikes
+        through our service, and use of our software.
+      disclosures_and_notices: Disclosures and Notices
+      disclosures_and_notices_p1: You agree that Bike Index can provide disclosures
+        and notices regarding the Service to you by posting such disclosures and notices
+        on our website, emailing them to the email address listed in your Bike Index
+        account, or mailing them to the address listed in your Bike Index Vendor Account.
+        You also agree that electronic disclosures and notices have the same meaning
+        and effect as if we had provided you with a paper copy. Such disclosures and
+        notices shall be considered to be received by you within 24 hours of the time
+        it is posted to our website or emailed to you unless we receive notice that
+        the email was not delivered.
+      effects_of_deactivation: Effects of Deactivation
+      effects_of_deactivation_p1: Upon deactivation of your Bike Index Vendor Account,
+        we will immediately discontinue your ability to add bikes through the Service.
+        You will still be able to access the rest of the service.
+      effects_of_termination: Effects of Termination
+      effects_of_termination_p1: Upon termination and closing of your Bike Index Account,
+        we will immediately discontinue your access to the Vendor Service. You agree
+        to stop accepting new registrations through the Service. You will not be refunded
+        the remainder of any fees that you have paid for the Service if your access
+        to or use of the Service is terminated or suspended. Any funds in our custody
+        will be retained by Bike Index.
+      effects_of_termination_p2: 'Upon termination you agree: (i) to immediately cease
+        your use of the Service (ii) to discontinue use of any Bike Index trademarks
+        and to immediately remove any Bike Index references and logos from your business
+        (iii) to continue to be bound by this Agreement (iv) that the license granted
+        under this Agreement shall end, (v) that we reserve the right (but have no
+        obligation) to delete all of your information and account data stored on our
+        servers, and (e) we will not be liable to you for compensation, reimbursement,
+        or damages in connection with your use of the Service, or any termination
+        or suspension of the Service or deletion of your information or account data.'
+      governing_law: Governing Law
+      governing_law_p1: The terms of these Terms of Service for Vendors shall be interpreted
+        and enforced according to the laws of the State of Illinois. All parties consent
+        to the personal jurisdiction and venue of any court located in Cook County,
+        Illinois, and each waives any objections based on improper jurisdiction, on
+        venue, on the inconvenience of the judicial forum, or on any other grounds.
+      illegal_use: Suspicion of Unauthorized or Illegal Use
+      illegal_use_p1: We reserve the right to not authorize or settle any transaction
+        you submit which we believe is in violation of this Agreement, any other Bike
+        Index agreement, or exposes you, other Bike Index users, our processors or
+        Bike Index to harm, including but not limited to fraud and other criminal
+        acts. You are hereby granting us authorization to share information with law
+        enforcement about you, your transactions, or your Bike Index Service Account
+        if we reasonably suspect that your use of Bike Index has been for an unauthorized,
+        illegal, or criminal purpose.
+      last_updated_html: Last updated July 29th, 2017. Previous versions and the change
+        history is %{link}.
+      license_trademarks: Your License; Our Trademarks
+      license_trademarks_p1: Bike Index grants you a personal, limited, non-exclusive,
+        revocable, non-transferable license, without the right to sublicense, to electronically
+        access and use the Service solely to register, to manage the bicycles records
+        you so create, and to contact stolen bike owners if you encounter their bike.
+        The Service includes our website, any software, programs, documentation, tools,
+        internet-based services, components, and any updates (including software maintenance,
+        service information, help content, bug fixes or maintenance releases) thereto
+        provided to you by Bike Index. You will be entitled to download updates to
+        the Service, subject to any additional terms made known to you at that time,
+        when Bike Index makes these updates available.
+      license_trademarks_p2: We may also periodically make available certain Bike
+        Index logos, trademarks or other identifiers for your use. You are not required
+        to use them and may use them in the way you desire.
+      lightspeed_integration: Lightspeed Integration
+      lightspeed_integration_p1: To register a customer’s bicycle directly from your
+        shop, you must collect the customer’s bike serial number and the customer’s
+        e-mail address. If your shop uses Lightspeed Retail and you use the Bike Index
+        Lightspeed integration, Lightspeed will collect and send to us all information
+        in Lightspeed at the time of the sale. This information could include, but
+        is not limited to, customer phone number, customer address, bike color and
+        bike size. We only collect the information necessary to effectively register
+        the bicycle for your Customer.
+      lightspeed_integration_p2: We are committed to keeping customer information
+        private. We do not store any of the information transmitted from Lightspeed
+        other than the information needed to create the Bike Index registration. All
+        communication between Lightspeed and our Service is encrypted and covered
+        under our Terms and the applicable terms and agreements set by Lightspeed.
+      limitation_of_liability: Limitation of Liability and Damages
+      limitation_of_liability_p1: IN NO EVENT SHALL A DISCLAIMING ENTITY (AS DEFINED
+        IN SECTION 7 ABOVE) BE LIABLE FOR ANY LOST PROFITS, LOSS OF DATA, OR ANY INDIRECT,
+        PUNITIVE, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR EXEMPLARY DAMAGES ARISING
+        OUT OF, IN CONNECTION WITH OR RELATING TO THIS AGREEMENT OR THE SERVICES,
+        INCLUDING WITHOUT LIMITATION THE USE OF, INABILITY TO USE, OR UNAVAILABILITY
+        OF THE SERVICE. UNDER NO CIRCUMSTANCES WILL ANY OF THE DISCLAIMING ENTITIES
+        (AS DEFINED IN SECTION 12 ABOVE) BE RESPONSIBLE FOR ANY DAMAGE, LOSS OR INJURY
+        RESULTING FROM HACKING, TAMPERING OR OTHER UNAUTHORIZED ACCESS OR USE OF THE
+        SERVICE OR YOUR BIKE INDEX ACCOUNT OR THE INFORMATION CONTAINED THEREIN.
+      limitation_of_liability_p2: THE DISCLAIMING ENTITIES ASSUME NO LIABILITY OR
+        RESPONSIBILITY FOR (A) ANY PERSONAL INJURY OR PROPERTY DAMAGE, OF ANY NATURE
+        WHATSOEVER, RESULTING FROM YOUR ACCESS TO OR USE OF THE SERVICE; (B) ANY UNAUTHORIZED
+        ACCESS TO OR USE OF SERVERS USED IN CONNECTION WITH THE SERVICES AND/OR ANY
+        AND ALL PERSONAL INFORMATION STORED THEREIN; (C) ANY INTERRUPTION OR CESSATION
+        OF TRANSMISSION TO OR FROM THE SERVICE; (D) ANY SOFTWARE BUGS, VIRUSES, TROJAN
+        HORSES, OR OTHER HARMFUL CODE THAT MAY BE TRANSMITTED TO OR THROUGH THE SERVICE;
+        (E) ANY ERRORS, INACCURACIES OR OMISSIONS IN ANY CONTENT OR INFORMATION, FOR
+        ANY LOSS OR DAMAGE INCURRED AS A RESULT OF THE USE OF ANY CONTENT OR INFORMATION,
+        IN EACH CASE POSTED, EMAILED, STORED, TRANSMITTED, OR OTHERWISE MADE AVAILABLE
+        THROUGH THE SERVICE; AND/OR (F) USER CONTENT OR THE DEFAMATORY, OFFENSIVE,
+        OR ILLEGAL CONDUCT OF ANY THIRD PARTY.
+      limitation_of_liability_p3: WITHOUT LIMITING THE FOREGOING PROVISIONS OF THIS
+        SECTION 10, THE DISCLAIMING ENTITIES’ CUMULATIVE LIABILITY TO YOU SHALL BE
+        LIMITED TO DIRECT DAMAGES AND IN ALL EVENTS SHALL NOT EXCEED IN THE AGGREGATE
+        THE AMOUNT OF FEES PAID BY YOU TO BIKE INDEX DURING THE TWELVE (12) MONTH
+        PERIOD IMMEDIATELY PRECEDING THE EVENT GIVING RISE TO THE CLAIM FOR LIABILITY.
+      limitation_of_liability_p4: THIS LIMITATION OF LIABILITY SECTION APPLIES REGARDLESS
+        OF THE LEGAL THEORY ON WHICH THE CLAIM IS BASED, INCLUDING WITHOUT LIMITATION
+        CONTRACT, TORT (INCLUDING NEGLIGENCE), STRICT LIABILITY, OR ANY OTHER BASIS.
+        THE LIMITATIONS APPLY EVEN IF BIKE INDEX HAS BEEN ADVISED OF THE POSSIBILITY
+        OF SUCH DAMAGE.
+      limitation_of_liability_p5: THE PROVISIONS OF THIS SECTION 10 SHALL APPLY TO
+        THE FULLEST EXTENT PERMITTED BY LAW IN THE APPLICABLE JURISDICTION.
+      limitation_of_liability_p6: The Service is controlled and operated from its
+        facilities in the United States. Bike Index makes no representations that
+        the Service is appropriate or available for use in other locations. Those
+        who access or use the Service from other jurisdictions do so at their own
+        volition and are entirely responsible for compliance with all applicable United
+        States, foreign and local laws and regulations, including but not limited
+        to export and import regulations. Unless otherwise explicitly stated, all
+        materials found on the Service are solely directed to individuals, companies,
+        or other entities located in the United States.
+      no_warranties: No Warranties
+      no_warranties_p1: THE SERVICE AND ALL ACCOMPANYING DOCUMENTATION ARE PROVIDED
+        ON AN "AS IS" AND "AS AVAILABLE" BASIS, WITHOUT ANY WARRANTIES, EITHER EXPRESS,
+        IMPLIED, OR STATUTORY, INCLUDING WITHOUT LIMITATION ANY IMPLIED WARRANTIES
+        OF TITLE, MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+        USE OF THE SERVICE IS AT YOUR OWN RISK.
+      no_warranties_p2: NO ADVICE OR INFORMATION, WHETHER ORAL OR WRITTEN, OBTAINED
+        BY YOU FROM OR THROUGH THE SERVICE OR FROM (I) BIKE INDEX; OR (II) ANY OF
+        THE RESPECTIVE AFFILIATES, AGENTS, DIRECTORS AND EMPLOYEES OF ANY OF THE ENTITIES
+        LISTED IN (I) ABOVE (COLLECTIVELY, THE "DISCLAIMING ENTITIES" AND INDIVIDUALLY
+        A "DISCLAIMING ENTITY"), WILL CREATE ANY WARRANTY. YOU SPECIFICALLY ACKNOWLEDGE
+        THAT BIKE INDEX CAN NOT ENSURE THAT YOUR CUSTOMERS WILL COMPLETE A REGISTRATION
+        OR ARE AUTHORIZED TO DO SO.
+      no_warranties_p3: WITHOUT LIMITING THE FOREGOING, THE DISCLAIMING ENTITIES DO
+        NOT WARRANT THAT THE INFORMATION THEY PROVIDE OR THAT IS PROVIDED THROUGH
+        THE SERVICE IS ACCURATE, RELIABLE OR CORRECT; THAT THE SERVICE WILL MEET YOUR
+        REQUIREMENTS; THAT THE SERVICE WILL BE AVAILABLE AT ANY PARTICULAR TIME OR
+        LOCATION, THAT THE SERVICE WILL FUNCTION IN AN UNINTERRUPTED MANNER OR BE
+        SECURE; THAT ANY DEFECTS OR ERRORS WILL BE CORRECTED; OR THAT THE SERVICE
+        IS FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS. ANY SUBJECT MATTER DOWNLOADED
+        OR OTHERWISE OBTAINED THROUGH THE USE OF THE SERVICE IS DOWNLOADED AT YOUR
+        OWN RISK AND YOU WILL BE SOLELY RESPONSIBLE FOR ANY DAMAGE TO YOUR PROPERTY
+        OR LOSS OF DATA THAT RESULTS FROM SUCH DOWNLOAD. THE DISCLAIMING ENTITIES
+        MAKE NO REPRESENTATIONS OR WARRANTIES ABOUT HOW LONG WILL BE NEEDED TO COMPLETE
+        THE PROCESSING OF A TRANSACTION.
+      no_warranties_p4: THE DISCLAIMING ENTITIES DO NOT WARRANT, ENDORSE, GUARANTEE,
+        OR ASSUME RESPONSIBILITY FOR ANY PRODUCT OR SERVICE ADVERTISED OR OFFERED
+        BY A THIRD PARTY THROUGH THE SERVICE OR ANY HYPERLINKED WEBSITE OR SERVICE,
+        OR FEATURED IN ANY BANNER OR OTHER ADVERTISING, AND BIKE INDEX WILL NOT BE
+        A PARTY TO OR IN ANY WAY MONITOR ANY TRANSACTION BETWEEN YOU AND THIRD-PARTY
+        PROVIDERS OF PRODUCTS OR SERVICES.
+      our_role: Our Role
+      our_role_body: Our Service helps you quickly and easily register bikes for your
+        Customers, and gives Customers the ability to modify most aspects of their
+        registrations. You will be required to register with Bike Index to use Bike
+        Index Vendor Service (see Becoming a Bike Index Vendor). In addition, we do
+        not assume any liability for bicycles, tricycles or other types of crafts
+        (collectively "Bikes") registered through our Service.
+      ownership: Ownership
+      ownership_p1: The Service is licensed and not sold. We reserve all rights not
+        expressly granted to you in this Agreement. The Service is protected by copyright,
+        trade secret and other intellectual property laws. We own the title, copyright
+        and other worldwide Intellectual Property Rights (as defined below) in the
+        Service and all copies of the Service. This Agreement does not grant you any
+        rights to our trademarks or service marks.
+      ownership_p2: For the purposes of this Agreement, "Intellectual Property Rights"
+        means all patent rights, copyright rights, mask work rights, moral rights,
+        rights of publicity, trademark, trade dress and service mark rights, goodwill,
+        trade secret rights and other intellectual property rights as may now exist
+        or hereafter come into existence, and all applications therefore and registrations,
+        renewals and extensions thereof, under the laws of any state, country, territory
+        or other jurisdiction.
+      ownership_p3: You may choose to or we may invite you to submit comments or ideas
+        about the Service, including without limitation about how to improve the Service
+        or our products ("Ideas"). By submitting any Idea, you agree that your disclosure
+        is gratuitous, unsolicited and without restriction and will not place Bike
+        Index under any fiduciary or other obligation, and that we are free to use
+        the Idea without any additional compensation to you, and/or to disclose the
+        Idea on a non-confidential basis or otherwise to anyone. You further acknowledge
+        that, by acceptance of your submission, Bike Index does not waive any rights
+        to use similar or related ideas previously known to Bike Index, or developed
+        by its employees, or obtained from sources other than you.
+      privacy_of_others: Privacy of Others
+      privacy_of_others_p1_html: You represent to Bike Index that you are in compliance
+        with all applicable privacy laws, you have obtained all necessary rights and
+        consents under applicable law to disclose to Bike Index, or allow Bike Index
+        to collect, use, retain and disclose any Customer data that you provide to
+        us or authorize us to collect. You are solely responsible for disclosing to
+        your Customers that accessing our service will require their acceptance of
+        our <a href="https://bikeindex.org/terms">Terms of Service</a> and <a href="https://bikeindex.org/privacy">Privacy
+        Policy</a>
+      privacy_of_others_p2_html: If you receive information about others, including
+        Bike Index Users, through the use of the Service, you must keep such information
+        confidential and only use it in connection with the Service. You may not disclose
+        or distribute any such information to a third party or use any such information
+        for marketing purposes unless you receive the express consent of the user
+        to do so.
+      privacy_of_others_p3_html: We will never sell, trade, or give out information
+        about your Customers. If Bike Index is acquired by another organization, we
+        will notify all users via the primary e-mail address on file that their information
+        is being transferred and may be subject to a different privacy policy.
+      privacy_of_others_p4_html: We will never sell, trade, or give out information
+        about your Customers. If Bike Index is acquired by another organization, we
+        will notify all users via the primary e-mail address on file that their information
+        is being transferred and may be subject to a different privacy policy.
+      privacy_of_others_p5_html: Customer data you have collected prior to this partnership
+        but that you want Bike Index to incorporate into the Service will be protected
+        by all of the terms listed in this Agreement.
+      prohibited_businesses: Prohibited Businesses
+      prohibited_businesses_p1: 'By registering for Bike Index Vendor Service, you
+        are confirming that you will not use the Service to register bikes in connection
+        with the following businesses, business activities or business practices:
+        (1) knowingly selling stolen bikes, (2) stealing bikes.'
+      prohibited_businesses_p2: By accepting this Agreement you confirm that you will
+        satisfy these requirements.
+      references_to_relationship: References to Our Relationship
+      references_to_relationship_p1: You agree, from the time that you accept this
+        Agreement with Bike Index until you terminate your account with us, that we
+        may identify you as a Vendor of Bike Index. Neither you nor we will imply
+        any untrue sponsorship, endorsement or affiliation between you and Bike Index.
+        You give us permission to post information on our website regarding your business
+        including but not limited to it's name, location, and phone number.
+      representation_and_warranties: Representation and Warranties
+      representation_and_warranties_p1: 'You represent and warrant to us that: (a)
+        you are a natural person at least eighteen (18) years of age or, if you are
+        under eighteen (18) years of age have obtained the consent of your parent
+        or legal guardian to your execution of this Agreement and use of Bike Index
+        Vendor Services in the manner prescribed by Bike Index; (b) you are eligible
+        to register and use the Service and have the right, power, and ability to
+        enter into and perform under this Agreement; (c) the name identified by you
+        when you registered is the business name under which you sell goods and services;
+        (d) any registration submitted by you will represent a bona fide sale by you;
+        (e) you will fulfill all of your obligations to each customer for which you
+        submit a registration and will resolve any Customer dispute or complaint directly
+        with the Customer; (f) you and all registrations initiated by you will comply
+        with all federal, state, and local laws, rules, and regulations applicable
+        to your business, including any applicable tax laws and regulations; (g) you
+        will not use the Service, directly or indirectly, for any fraudulent undertaking
+        or in any manner so as to interfere with the use of the Service.'
+      restricted_use: Restricted Use
+      restricted_use_p1: 'You are required to obey all laws, rules, and regulations
+        applicable to your use of the Service (for example, those governing stolen
+        property, consumer protections, unfair competition, anti-discrimination or
+        false advertising). In addition to any other requirements or restrictions
+        set forth in this Agreement, you agree not to, nor to permit any third party
+        to, do any of the following: (i) access or attempt to access Bike Index systems,
+        programs or data that are not made available for public use; (ii) permit any
+        third party to use and benefit from the Service via a rental, lease, timesharing,
+        service bureau or other arrangement; (iii) transfer any rights granted to
+        you under this Agreement; (iv) work around any of the technical limitations
+        of the Service, use any tool to enable features or functionalities that are
+        otherwise disabled in the Service, or decompile, disassemble or otherwise
+        reverse engineer the Service, except to the extent that such restriction is
+        expressly prohibited by law; (v) perform or attempt to perform any actions
+        that would interfere with the proper working of the Service, prevent access
+        to or use of the Service by our other users, or impose an unreasonable or
+        disproportionately large load on our infrastructure; or (vi) otherwise use
+        the Service except as expressly allowed under this section.'
+      section_a: 'Section A: The Bike Index Service'
+      section_c: 'Section C: Registering for Bike Index Vendor Status'
+      section_d: 'Section D: Termination and Other Legal Matters'
+      security: Security
+      security_body_html: Bike Index is responsible for protecting the security of
+        Customer data in our possession from unauthorized access and accidental loss
+        or modification. We will maintain commercially reasonable administrative,
+        technical and physical procedures to protect all the personal information
+        regarding you and your Customers that is stored in our servers. However, we
+        cannot guarantee that unauthorized third parties will never be able to defeat
+        those measures or use such personal information for improper purposes. You
+        acknowledge that you provide this personal information regarding you and your
+        Customers at your own risk. We recommend you review our <a href="https://bikeindex.org/privacy">Privacy
+        Policy</a>, which will help you understand how we collect, use and safeguard
+        the information you provide to us.
+      term: Term
+      term_p1: The Agreement is effective upon the date you agree to it (by electronically
+        indicating acceptance) and continues so long as you use the Service or until
+        terminated by Bike Index.
+      termination: Termination
+      termination_and_other_legal_terms: Termination and Other Legal Terms
+      termination_p1: You may terminate this Agreement by closing your Bike Index
+        account at any time by following the instructions on our website in your organization’s
+        Vendor Account profile. We may terminate this Agreement and close your Bike
+        Index Vendor Account at any time for any reason effective upon providing you
+        notice in accordance with Section A10(references to our relationships) above.
+        We may suspend your Bike Index account and your access to the Service, or
+        terminate this Agreement, if (i) we determine in our sole discretion that
+        you are ineligible for the Service for reasons, including without limitation
+        customer complaints about your use of the service, or for any other reason;
+        or (ii) you do not comply with any of the provisions of this Agreement.
+      terms_of_service_for_vendors: Terms of Service for Vendors
+      tos_agreement: The Terms and Conditions described here constitute a legal "Agreement"
+        between the sole proprietor or business organization listed as the "Vendor"
+        on the Service registration page (sometimes referred to as "you," "your",
+        "merchant"), and Bike Index, NFP. ("Bike Index").
+      vendor_registration: Vendor Registration
+      vendor_registration_p1: The Bike Index Vendor Service is only made available
+        under this Agreement to persons that operate a business selling goods or services,
+        or operate cycling related organizations. To use Bike Index to register bikes,
+        you will first have to register for a "Vendor Account." When you register
+        for a Bike Index Vendor Account, we will collect basic information including
+        your name, company name, location, email address, and phone number. If you
+        have not already done so, you will also be required to provide an email address
+        and password for your Bike Index account.
+      vendor_registration_p2: When you register as a Vendor, you must also provide
+        information about an owner or principal of the business or organization and
+        you must be authorized to act on behalf of the business and have the authority
+        to bind the business to this Agreement. To sign up a business to use the Service,
+        you must agree to this Agreement on behalf of the business. If you have so
+        agreed, the term "you" will mean you, the natural person, as well as the business
+        organization that you represent.
+      verification: Verification
+      verification_p1: We may ask for information to help verify your identity including
+        a driver’s license or other government issued identification, or a business
+        license. We may request your permission to do a physical inspection at your
+        place of business and to examine bicycles that pertain to your compliance
+        with this Agreement. Your failure to comply with any of these requests within
+        five (5) days may result in deactivation or termination of your Bike Index
+        account. You authorize us to retrieve additional information about you from
+        third parties and other identification services.
+      verification_p2: After we have collected and verified all your information,
+        Bike Index will review your Account and determine if you are eligible to use
+        the Service. Bike Index will notify you once your account has been either
+        approved or deemed ineligible for use of the Service.
+      verification_p3: By accepting the terms of this Agreement, you are providing
+        us with authorization to retrieve information about you by using third parties,
+        including bike industry wholesalers, distributors, and other information providers.
+        You acknowledge that such information retrieved may include your name, address
+        history, business history, and other data about you. Bike Index may periodically
+        update this information to determine whether you continue to meet our eligibility
+        requirements.
+      verification_p4: You agree that Bike Index is permitted to contact and share
+        information about you and your application (including whether you are approved
+        or declined), as well as your use of Bike Index with our friends.
+      we_can_deactivate_html: |
+        We can deactivate your ability to register new bikes or terminate this
+        "Agreement" at any time (especially if you do something bad). You can also
+        terminate anytime. Termination is effective immediately. Termination does not
+        alter your previously registered bikes. This section also includes all the extra
+        legal stuff they make us add (e.g. indemnification, warranties, assignment).
+        <a href="#section_d">Complete details</a>
+      we_provide_you_with_html: |
+        We provide you with a service to register the bikes you interact with; we will
+        respect and protect your and your Customers' privacy, data and personal
+        information. You run your business, service your Customers, and observe all
+        laws, rules, and regulations. <a href="#section_a">Complete details</a>
+      welcome_to_bike_index_html: |
+        <strong>Welcome to Bike Index</strong>, a 501(c)(3) nonprofit. We developed a
+        publicly-accessible bike registration service (the "Service") that gives
+        organizations registered on Bike Index ("Vendors", "you") the ability to quickly
+        and easily register bikes for their "Customers" - patrons of their services -
+        using Vendor "Accounts." We believe that such a service that the Service deters
+        bike theft and helps Customers recover stolen bikes.
+      with_the_following_brief_descriptions: With the following brief descriptions
+        of the parts of this "Agreement", we attempt to explain the important parts
+        of our Service. But there are significant details in the whole document that
+        make it worth reading.
+      your_liability: Your Liability
+      your_liability_p1: You are responsible for all claims, fines, fees, penalties
+        and other liability arising out of or relating to your breach of this Agreement,
+        and/or your use of the Service. Bike Index will have the final decision-making
+        authority with respect to claims. You will be required to reimburse Bike Index
+        for your liability. You will not receive a refund of any fees paid to Bike
+        Index.
+      your_liability_p2: Without limiting the foregoing, you agree to defend, indemnify,
+        and hold harmless Bike Index and its respective employees and agents (collectively
+        "Disclaiming Entities") from and against any claim, suit, demand, loss, liability,
+        damage, action or proceeding arising out of or relating to (i) your breach
+        of any provision of this Agreement, and/or (ii) your use of the Service, including
+        without limitation any reversals, claims, fines, fees, penalties and attorneys’
+        fees; (iii) your, or your employee’s or agent’s, negligence or willful misconduct;
+        or (iv) third party indemnity obligations we incur as a direct or indirect
+        result of your acts or omissions.
+      your_privacy: Your Privacy
+      your_privacy_body_html: Your privacy and the protection of your data are very
+        important to us. You acknowledge that you have received, read in full and
+        agree with the terms of our <a href="https://bikeindex.org/privacy">Privacy
+        Policy</a> linked to and incorporated into this Agreement by reference, which
+        contains your consent to our collection, use, retention and disclosure of
+        personal information as well as other matters set forth therein and which
+        explains how and for what purposes we collect, use, retain, disclose and safeguard
+        the information you provide to us.
+    privacy:
+      available_here: available here
+      changes: Changes
+      changes_p1: Bike Index may periodically update this policy. We will notify you
+        about significant changes by sending a notice to the primary email address
+        specified in your Bike Index Service Account or by placing a prominent notice
+        on our site.  Such notices shall be considered to be received by you within
+        24 hours of the time it is posted to our website or emailed to you unless
+        we receive notice that the email was not delivered.
+      changes_p2_html: You retain the right to access, amend, correct or delete your
+        personal information where it is inaccurate at any time. To do so, please
+        contact <a href="mailto:contact@bikeindex.org">contact@bikeindex.org</a>.
+      cookies: Cookies
+      cookies_p1: A cookie is a small amount of data, which often includes an anonymous
+        unique identifier, that is sent to your browser from a web site's computers
+        and is stored on your computer's hard drive. The stored information helps
+        you connect more quickly to sites you’ve previously visited.
+      cookies_p2: Cookies are required to use Bike Index Service.
+      cookies_p3: We use cookies to record current session information, but do not
+        use permanent cookies. For example, you are required to re-login to your Bike
+        Index account after a certain period of time has elapsed to protect you against
+        others accidentally or intentionally accessing your Account contents.
+      data_storage: Data Storage
+      data_storage_p1: 'Bike Index uses third party vendors and hosting partners to
+        provide the necessary hardware, software, networking, storage, and related
+        technology required to run Bike Index. Although Bike Index does own the code,
+        databases, and all rights to Bike Index application, you retain all rights
+        to your data.  '
+      disclosure: Disclosure
+      disclosure_p1_html: Bike Index may disclose personally identifiable information
+        under special circumstances, such as to comply with subpoenas or when your
+        actions violate the <a href="https://bikeindex.org/terms">Terms of Service</a>.
+      general_information: General Information
+      general_information_p1: 'We collect the e-mail addresses and other shared personal
+        information of those who communicate with us, aggregate information on the
+        pages Users access or visit and the functions Users perform on pages, and
+        information volunteered by Users (such as survey information and/or site registrations).
+        The information we collect is used to improve the content of our Web pages
+        and the quality of our Service, and is not shared with or sold to other organizations
+        for commercial purposes, except to provide products or services you''ve requested,
+        when we have your permission, or under the following circumstances:'
+      general_information_p2: It is necessary to share information in order to investigate,
+        prevent, or take action regarding illegal activities, suspected fraud, situations
+        involving potential threats to the physical safety of any person, violations
+        of Terms of Service of the specific application, or as otherwise required
+        by law.
+      general_information_p3: We transfer information about you if Bike Index is acquired
+        by or merged with another company. In this unlikely event, Bike Index will
+        notify you via e-mail before information about you is transferred and becomes
+        subject to a different privacy policy.
+      information_gathering: Information Gathering and Usage
+      information_gathering_p1: When you register for Bike Index we may ask for information
+        such as your name, email address, billing address, or phone number. The only
+        required field is e-mail. Whatever you choose to share, You can either show
+        or hide from the public on your Bike Index Account.
+      information_gathering_p2: 'Bike Index uses collected information for the following
+        general purposes: provision of products and services, identification and authentication,
+        services improvement, contact, and research.'
+      last_updated_html: Last updated July 29th, 2017. Previous versions and the change
+        history is %{link}.
+      questions: Questions
+      questions_p1_html: Any questions about this Privacy Policy should be addressed
+        to <a href="mailto:contact@bikeindex.org">contact@bikeindex.org</a>
+      see_terms_link_html: Please see the %{terms_link} for definitions of terms.
+      terms_of_service: Terms of Service
+    terms_text:
+      about_our_terms_of_service: About our Terms of Service
+      available_here: available here
+      best_effort: Bike Index does not warrant that (i) the service will meet your
+        specific requirements, (ii) the service will be uninterrupted, timely, secure,
+        or error-free, (iii) the results that may be obtained from the use of the
+        service will be accurate or reliable, (iv) the quality of any products, services,
+        information, or other material purchased or obtained by you through the service
+        will meet your expectations, and (v) any errors in the Service will be corrected.
+      bike_index_reserves: Bike Index reserves the right at any time and from time
+        to time to modify or discontinue, temporarily or permanently, the Service
+        (or any part thereof) with or without notice.
+      bike_index_shall_not_be_liable: Bike Index shall not be liable to you or to
+        any third party for any modification, suspension or discontinuance of the
+        Service.
+      by_creating_account: By creating an "Account" and using the BikeIndex.org web
+        site ("Service"), or any services of Bike Index, NFP ("Bike Index"), you are
+        agreeing to be bound by the following terms and conditions ("Terms of Service").
+        IF YOU ARE ENTERING INTO THIS AGREEMENT ON BEHALF OF A COMPANY OR OTHER LEGAL
+        ENTITY, YOU REPRESENT THAT YOU HAVE THE AUTHORITY TO BIND SUCH ENTITY, ITS
+        AFFILIATES AND ALL USERS WHO ACCESS OUR SERVICES THROUGH YOUR ACCOUNT TO THESE
+        TERMS AND CONDITIONS, IN WHICH CASE THE TERMS "YOU" OR "YOUR" SHALL REFER
+        TO SUCH ENTITY, ITS AFFILIATES AND USERS ASSOCIATED WITH IT. IF YOU DO NOT
+        HAVE SUCH AUTHORITY, OR IF YOU DO NOT AGREE WITH THESE TERMS AND CONDITIONS,
+        YOU MUST NOT ACCEPT THIS AGREEMENT AND MAY NOT USE THE SERVICES.
+      by_giving_bike_shops_html: By giving bike shops, biking organizations and police
+        departments the ability to register bikes directly for their constituents
+        we aim to incentivize bike registration, support local cycling culture and
+        ensure accurate registrations. We have tried to draft this Terms of Service
+        to be as simple and comprehensible as possible. Unfortunately, the realities
+        of the legal world make that a very difficult task. So, should you have any
+        questions or concerns, or simply want to better understand how we do things
+        at Bike Index, please do not hesitate to %{contact_link}.
+      content_on_the_service: Content" on the Service is defined by any information
+        Users input into the service. Users are defined as those who utilize the Bike
+        Index Service and agree to the Terms of Service. While Bike Index prohibits
+        some conduct and Content on the Service, you understand and agree that Bike
+        Index cannot be responsible for the Content posted on the Service and you
+        nonetheless may be exposed to such materials. you agree to use the Service
+        at your own risk. Violation of any of the terms below will result in the termination
+        of your Account.
+      if_bike_index_html: 'If Bike Index makes material changes to these Terms, we
+        will notify you by email or by posting a notice on our site before the changes
+        are effective. Any new features that augment or enhance the current Service,
+        including the release of new tools and resources, shall be subject to the
+        Terms of Service. Continued use of the Service after any such changes shall
+        constitute your consent to such changes. You can review the most current version
+        of the Terms of Service at any time at: %{terms_link}.'
+      last_updated_html: Last updated July 29th, 2017. Previous versions and the change
+        history is %{link}.
+      may_be_terminated: You understand that the technical processing and transmission
+        of the Service, including your Content, may be transfered unencrypted and
+        involve (a) transmissions over various networks; and (b) changes to conform
+        and adapt to technical requirements of connecting networks or devices.
+      no_abuse: Verbal, physical, written or other abuse (including threats of abuse
+        or retribution) of any Bike Index customer, employee, member, or officer will
+        result in immediate account termination.
+      no_spam: You must not upload, post, host, or transmit unsolicited email, SMSs,
+        or "spam" messages.
+      no_waiver: The failure of Bike Index to exercise or enforce any right or provision
+        of the Terms of Service shall not constitute a waiver of such right or provision.
+        The Terms of Service constitutes the entire agreement between you and Bike
+        Index and govern your use of the Service, superseding any prior agreements
+        between you and Bike Index (including, but not limited to, any prior versions
+        of the Terms of Service). You agree that these Terms of Service and your use
+        of the Service are governed under Illinois law.
+      questions_html: Questions about the Terms of Service should be sent to %{contact_email_link}.
+      section_a_header: 'Section A: User''s Acknowledgment and Acceptance of Terms'
+      section_b_header: 'Section B: Account Terms'
+      section_c_header: 'Section C: Modifications to the service'
+      section_d_header: 'Section D: Copyright and content ownership'
+      section_e_header: 'Section E: General Conditions'
+      support_for_bike_index_services: Support for Bike Index services is currently
+        only available in English, via email.
+      terms_of_service: Terms of Service
+      third_party_vendors: You understand that Bike Index uses third party vendors
+        and hosting partners to provide the necessary hardware, software, networking,
+        storage, and related technology required to run the Service.
+      we_claim_no_ip: We claim no intellectual property rights over the material you
+        provide to the Service. Your profile and materials uploaded remain yours.
+        However, Content that you upload about your bikes can be viewed publicly,
+        and setting your profile to be public will allow information you add to it
+        to be viewed publicly. You agree to allow others to view this Content.
+      we_dont_prescreen_content: Bike Index does not pre-screen Content, but Bike
+        Index and its designee have the right (but not the obligation) in their sole
+        discretion to refuse or remove any Content that is available via the Service.
+      we_may_remove_content: We may, but have no obligation to, remove Content and
+        Accounts containing Content that we determine in our sole discretion are unlawful,
+        offensive, threatening, libelous, defamatory, pornographic, obscene or otherwise
+        objectionable or violates any party's intellectual property or these Terms
+        of Service.
+      welcome_to_bike_index_html: <strong>Welcome to Bike Index</strong>, a 501(c)(3)
+        nonprofit. We've developed a publicly-accessible bike registration service
+        (the "Service") that gives you the ability to save and share your bikes on
+        the internet.
+      you_agree_not_to_resell: You agree not to sell, resell or exploit any portion
+        of the Service, use of the Service, or access to the Service without the express
+        written permission by Bike Index.
+      you_are_responsible_for_content: You are responsible for all Content posted
+        and activity that occurs under your account (even when Content is posted by
+        others who have accounts under your account or access to your account).
+      you_are_responsible_for_security: You are responsible for maintaining the security
+        of your account and password. Bike Index cannot and will not be liable for
+        any loss or damage from your failure to comply with this security obligation.
+      you_may_not_use_for_illegal: You may not use the Service for any illegal or
+        unauthorized purpose. You must not, in the use of the Service, violate any
+        laws in your jurisdiction (including but not limited to copyright or trademark
+        laws).
+      you_must_be_human: You must be a human. Accounts registered by "bots" or other
+        automated methods are not permitted.
+      you_must_notify: You must not modify, adapt or hack the Service or modify another
+        website so as to falsely imply that it is associated with the Service, Bike
+        Index, or any other Bike Index service.
+      you_must_provide_email: You must provide a valid email address in order to complete
+        the signup process.
+      you_shall_defend_bike_index: You shall defend Bike Index against any claim,
+        demand, suit or proceeding made or brought against Bike Index by a third party
+        alleging that your Content, or your use of the Service in violation of this
+        Agreement, infringes or misappropriates the intellectual property rights of
+        a third party or violates applicable law, and shall indemnify Bike Index for
+        any damages finally awarded against, and for reasonable attorney’s fees incurred
+        by, Bike Index in connection with any such claim, demand, suit or proceeding;
+        provided, that Bike Index (a) promptly gives you written notice of the claim,
+        demand, suit or proceeding; (b) gives you sole control of the defense and
+        settlement of the claim, demand, suit or proceeding (provided that tou may
+        not settle any claim, demand, suit or proceeding unless the settlement unconditionally
+        releases Bike Index of all liability); and (c) provides to you all reasonable
+        assistance, at your expense.
+      your_use_of_the_service: Your use of the Service is at your sole risk. The service
+        is provided on an "as is" and "as available" basis.
+    about:
+      about_bike_index: About Bike Index
+      nonprofit_status: 501(c)(3) nonprofit
+      cofounded_by_html: Cofounded by Seth Herr and Bryan Hance in 2013, Bike Index is a %{description_link}.
+      widely_used: It is the most widely used and successful bicycle registration service in the world with over %{bikes_count} cataloged bikes, %{partners_count} community partners and tens of thousands of daily searches.
+      seth_built: Seth built Bike Index when he was a bike mechanic because he wanted to be able to register bikes for his customers. Bryan developed and ran a community driven bicycle recovery service (StolenBikeRegistry.com) that recovered bikes from the first week it was created in 2004.
+      merging_the_services: Merging the two services Seth and Bryan created the universal bike registration service they both dreamed of — a database used and searched by individuals, bike shops, police departments and other apps. A bike registry that gives everyone the ability to register and recover bicycles.
+      simple_efficient_effective: Simple. Efficient. Effective.
+      bike_registration_that_works: Bike registration that works.
+      the_team: The team
+      seth_herr_image_title: Those are not official Bike Index arm warmers, we don't have Bike Index arm warmers
+      seth_herr_bio_html: |
+        <strong>Seth Herr</strong> learned to program so that he could build
+        Bike Index, because he was a bike mechanic and was frustrated that
+        something like it didn't exist.
+      bryan_hance_bio_html: |
+        <strong>Bryan Hance</strong> created StolenBicycleRegistry.com in 2004
+        because 5 of his bikes were stolen in 9 years&mdash;and realized
+        recovering bikes was really fun. He lives in Portland and recovers lots
+        of bikes.
+      craig_dalton_bio_html: |
+        <strong>Craig Dalton</strong> thought he had the bike industry out of
+        his system until Bike Index came knocking. Craig is bringing his
+        entrepreneurial experience to the business side of Bike Index.
+      lily_williams_bio_html: |
+        <strong>Lily Williams</strong> has a master's degree from Medill School
+        of Journalism but realized along the way that bikes are the most
+        deserving recipients of words. She writes and communicates for Bike
+        Index.
+      jan_pecnik_bio_html: |
+        <strong>Jan Pecnik</strong> fell in love with bikes while studying his masters in the
+        Netherlands, focusing on social entrepreneurship. After a couple of
+        years of solo riding, he now helps Bike Index expand across Europe and
+        beyond.
+      mike_oleon_bio_html: |
+        <strong>Mike Oleon</strong> does the graphic design and illustration for the Index. If
+        anything looks good, it's probably his fault.
+      alumni: Alumni
+    dev_and_design:
+      meant_to_be_usable: Bike Index is meant to be usable and expandable by everyone. We're way into the open source.
+      design_resources: Design resources
+      image_assets: Image assets
+      bike_index_logos_html: "%{link} - vector and png Bike Index logos"
+      trifold_flyer: Trifold Flyer
+      trifold_flyer_pdf_url: 'https://files.bikeindex.org/stored/Bike-Index-TriFold.pdf'
+      flyers_html: "%{link} - Print color & double-sided (<em>do not</em> rescale, have printer print as close to the edges as it can)"
+      bike_shop_card: Bike shop card
+      bike_shop_card_pdf_url: 'https://files.bikeindex.org/stored/Bike-Index-Shop-Card.pdf'
+      bike_shop_cards_html: '%{link} - design is for notecard size (5.5" x 4.25")'
+      development_resources: Development resources
+      on_github: on GitHub
+      open_source_html: Bike Index itself is open source - check it out %{link}.
+      our_api_documentation: Our API documentation
+      nearby_stolen_widget: Nearby stolen widget
+      nearby_stolen_widget_html: "%{link} (on GitHub)"
+      display_widget_html: "%{link} (must be logged in - also, has no usage instructions...)"
+      oauth_apps_html: "%{link} (must be logged in)"
+      oauth_authorized_apps_html: "%{link} (must be logged in)"

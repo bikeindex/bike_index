@@ -35,8 +35,6 @@ module ApplicationHelper
       "content_skeleton" if %w(goodbye).include?(action_name)
     when "organizations"
       "content_skeleton" if %w(lightspeed_integration).include?(action_name)
-    when "users"
-      "content_skeleton" if %w(request_password_reset).include?(action_name)
     when *%w(news feedbacks manufacturers errors registrations)
       "content_skeleton"
     end
@@ -66,8 +64,6 @@ module ApplicationHelper
       elsif action_name == "show" && link_text == "Go hard"
         class_name = "active"
       end
-    elsif controller_name == "organization_invitations" && link_text == "Invitations"
-      class_name = "active"
     elsif controller_name == "payments"
       if action_name == "invoices"
         class_name = "active" if link_text == "Invoices"
@@ -213,6 +209,12 @@ module ApplicationHelper
         html << websiteable(user)
       end
       html.html_safe
+    end
+  end
+
+  def language_choices
+    @language_choices ||= I18n.available_locales.map do |locale|
+      [t("language", locale: locale), locale.to_s]
     end
   end
 end

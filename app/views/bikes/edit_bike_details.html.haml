@@ -1,7 +1,8 @@
 = form_for @bike, multipart: true, html: { class: 'primary-edit-bike-form' } do |f|
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: '/bikes/edit_primary_menu'
+      = render partial: 'bikes/edit_primary_menu'
+
       .col-md-8.form-well
         .form-wrap
           .form-well-form-header
@@ -16,40 +17,40 @@
                 = @bike.serial_number
               .right-input-help.right-text-help
                 %a{ data: { toggle: 'modal', target: '#serial-correction' } }
-                  Submit serial correction
+                  = t(".submit_serial_correction")
             .form-group.row
               = f.label :manufacturer, class: 'form-well-label'
               %p.form-well-input-static
                 = @bike.mnfg_name
               .right-input-help.right-text-help
                 %a{ data: { toggle: 'modal', target: '#manufacturer-correction' } }
-                  Submit Manufacturer Correction
+                  = t(".submit_manufacturer_correction")
 
           .form-group.row.fancy-select-placeholder.unfancy.unnested-field
-            = f.label :year, 'Model year', class: 'form-well-label'
+            = f.label :year, t(".model_year"), class: 'form-well-label'
             .form-well-input
               - years = (1900..Time.current.year+1).to_a.reverse.map { |i| [i,i] }
-              = f.select :year, years, prompt: 'Unsure or unknown', allow_blank: true
+              = f.select :year, years, prompt: t(".unsure_or_unknown"), allow_blank: true
             .right-input-help
               %label
                 %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
-                Unknown year
+                = t(".unknown_year")
 
           .form-group.row.unnested-field
             = f.label :frame_model, class: 'form-well-label'
             .form-well-input
               = f.text_field :frame_model, class: 'form-control'
 
-          = render partial: '/bikes/bike_fields/revised_colors', locals: { f: f }
+          = render partial: 'bikes/bike_fields/revised_colors', locals: { f: f }
 
           .form-group.row.unnested-field
-            = f.label :frame_material, 'Main frame material', class: 'form-well-label'
+            = f.label :frame_material, t(".main_frame_material"), class: 'form-well-label'
             .form-well-input.fancy-select-placeholder.unfancy
-              = select(:bike, :frame_material, FrameMaterial.select_options , { include_blank: true, prompt: "Choose material"})
+              = select(:bike, :frame_material, FrameMaterial.select_options , { include_blank: true, prompt: t(".choose_material")})
           .related-fields
             .form-group.row.frame-sizes{ class: ('unexpanded-unit-size' unless %w(cm in).include?(@bike.frame_size_unit)) }
               %label.form-well-label
-                Frame size
+                = t(".frame_size")
               .form-well-input
                 .ordinal-sizes.btn-group{ role: 'group', 'aria-label' => 'Size', data: { toggle: 'buttons' } }
                   - %w(xs s m l xl).each do |size|
@@ -65,77 +66,96 @@
                       %input{ type: 'radio', name: 'frame_size', autocomplete: 'off', checked: active }
                       = unit.upcase
             .form-group.row.hidden-other.frame-size-other
-              = f.label :frame_size, 'Seat tube length', class: 'form-well-label'
+              = f.label :frame_size, t(".seat_tube_length"), class: 'form-well-label'
               .form-well-input
                 = f.hidden_field :frame_size_unit
                 = f.hidden_field :frame_size
                 = f.number_field :frame_size_number, class: 'form-control'
 
-          / .form-group.row.unnested-field
-          /   = f.label :paint_name, 'Paint description', class: 'form-well-label'
-          /   .form-well-input
-          /     = f.text_field :paint_name, class: 'form-control'
-
           .form-group.row.unnested-field
-            = f.label :name, 'Bike Name', class: 'form-well-label'
+            = f.label :name, t(".bike_name"), class: 'form-well-label'
             .form-well-input
               = f.text_field :name, class: 'form-control'
 
           .form-group.row.unnested-field
-            = f.label :description, 'General description', class: 'form-well-label form-well-label-large-input'
+            = f.label :description, t(".general_description"), class: 'form-well-label form-well-label-large-input'
             .form-well-input-large
-              = f.text_area :description, rows: 3, class: 'form-control', placeholder: 'Tell us about your bike!'
+              = f.text_area :description, rows: 3, class: 'form-control', placeholder: t('.tell_us_about_your_bike')
 
           .form-group.row.unnested-field
-            = f.label :additional_registration, 'Other serial or registration number', class: 'form-well-label'
+            = f.label :additional_registration, t(".other_serial_or_registration_number"), class: 'form-well-label'
             .form-well-input
               = f.text_field :additional_registration, class: 'form-control'
 
           .form-group.row.unnested-field.no-divider-row
             = f.label :zipcode, class: 'form-well-label'
             .form-well-input
-              = f.text_field :zipcode, class: 'form-control', placeholder: 'zip code'
+              = f.text_field :zipcode, class: 'form-control', placeholder: t(".zipcode")
+
+          = render "shared/form_well_footer_save"
+
+          - if @bike.show_sticker_edit?
+            %hr
+            .related-fields.mt-4
+              .form-group.row
+                %label.form-well-label
+                  Existing stickers
+                %p.form-well-input-static
+
+                  - @bike.bike_codes.each do |bike_code|
+                    = bike_code.pretty_code
+                    %br
+              .form-group.row.no-divider-row.mb-0
+                = label_tag :bike_code, class: "form-well-label" do
+                  Assign a new sticker
+                .form-well-input
+                  - bike_code_from_org = @bike.organizations.with_paid_feature_slugs("bike_codes").last&.bike_codes&.claimed&.reorder(:code_integer)&.second&.pretty_code
+                  = text_field_tag :bike_code, nil, class: 'form-control', placeholder: bike_code_from_org || "A0 100"
+
+            = render "shared/form_well_footer_save"
 
 - serial_correction_body = capture_haml do
   = form_tag do |t|
     .modal-body
-      = render partial: '/shared/alert', locals: { body: 'Please fill in both fields', class_names: 'currently-hidden' }
+      = render partial: 'shared/alert', locals: { body: t(".please_fill_in_both_fields"), class_names: 'currently-hidden' }
       = hidden_field_tag :serial_update_bike_id, @bike.id
       .form-group
         %label{ for: :serial_update_serial }
-          Updated serial
+          = t(".updated_serial")
         = text_field_tag :serial_update_serial, '', class: 'form-control'
       .form-group
         %label{ for: :serial_update_reason }
-          Reason for update
+          = t(".reason_for_update")
         = text_area_tag :serial_update_reason, '', class: 'form-control'
     .modal-btn-footer
       .row
         .col-xs-6.col-xs-push-6
-          = submit_tag 'Submit update', class: 'btn btn-primary'
+          = submit_tag t(".submit_update"), class: 'btn btn-primary'
         .col-xs-6.col-xs-pull-6
           %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
-            Nevermind
-= render partial: '/shared/modal', locals: { title: 'Update serial number', id: 'serial-correction', modal_body: serial_correction_body }
+            = t(".nevermind")
+
+= render partial: 'shared/modal', locals: { title: t(".update_serial_number"), id: 'serial-correction', modal_body: serial_correction_body }
 
 - manufacturer_correction_body = capture_haml do
   = form_tag do |t|
     .modal-body
-      = render partial: '/shared/alert', locals: { body: 'Please fill in both fields', class_names: 'currently-hidden' }
+      = render partial: 'shared/alert', locals: { body: t(".please_fill_in_both_fields"), class_names: 'currently-hidden' }
       = hidden_field_tag :manufacturer_update_bike_id, @bike.id
       .form-group
         %label{ for: :manufacturer_update_manufacturer }
-          Manufacturer
+          = t(".manufacturer")
         = text_field_tag :manufacturer_update_manufacturer, '', class: 'form-control unfancy'
       .form-group
         %label{ for: :manufacturer_update_reason }
-          Reason for update
+          = t(".reason_for_update")
         = text_area_tag :manufacturer_update_reason, '', class: 'form-control'
     .modal-btn-footer
       .row
         .col-xs-6.col-xs-push-6
-          = submit_tag 'Submit update', class: 'btn btn-primary'
+          = submit_tag t(".submit_update"), class: 'btn btn-primary'
         .col-xs-6.col-xs-pull-6
           %button.btn.btn-secondary{ 'data-dismiss' => 'modal', type: 'button' }
-            Nevermind
-= render partial: '/shared/modal', locals: { title: 'Update manufacturer', id: 'manufacturer-correction', modal_body: manufacturer_correction_body }
+            = t(".nevermind")
+
+= render partial: 'shared/modal', locals: { title: 'Update manufacturer', id: 'manufacturer-correction', modal_body: manufacturer_correction_body }

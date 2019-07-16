@@ -3,33 +3,44 @@
 
   .form-well-container.container{ class: "edit-bike-page-#{@edit_template}" }
     .row
-      = render partial: "/bikes/edit_primary_menu"
+      = render partial: "bikes/edit_primary_menu", locals: { is_disabled: true }
 
       .col-md-8.form-well#form_well_wrap
-        .form-wrap
+        - if @bike.current_stolen_record&.display_checklist?
+          .form-wrap.stolen-checklist-wrap
+            .form-well-form-header-always-visible
+              %h3.header-font-alt
+                = t(".do_these_things_for_the_best_chance_of_re")
+
+            = render partial: "bikes/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record }
+
+        .form-wrap{ class: @bike.current_stolen_record&.display_checklist? ? "secondary-form-wrap" : "" }
           .form-well-form-header
-            / Publicize Theft
+            -# Publicize Theft
             %h3= @edit_templates[@edit_template]
 
           %h5.description
-            Share your listing - so everyone knows to watch out for your
-            #{@bike.type}!
+            = t(".share_your_listing_so_everyone_knows_to_w", bike_type: @bike.type)
 
-          / TODO: Consolidate social urls in helpers
+          -# TODO: Consolidate social urls in helpers
           .no-divider-row.full-width-button.btn-share
-            %a.bth.btn-lg.link-share{href: "http://www.facebook.com/share.php?u=#{bike_url(@bike)}", target: "_blank"}
-              %img{ src: "https://files.bikeindex.org/facebook.png" }
-              .share-social.share-facebook Share on Facebook
+            - facebook_image_url = "https://files.bikeindex.org/facebook.png"
+            - facebook_share_url =  "http://www.facebook.com/share.php?u=#{bike_url(@bike)}"
+
+            = link_to facebook_share_url, target: "_blank", class: "bth btn-lg link-share" do
+              = image_tag facebook_image_url
+              .share-social.share-facebook= t(".share_on_facebook")
 
           .no-divider-row.full-width-button.btn-share
+            - tweet_text = t(".help_me_find_bike")
             %a.twitter-share-button{href: "https://twitter.com/share?ref_src=twsrc%5Etfw",
-                                    "data-text" => "Help me find my stolen bike!",
+                                    "data-text" => tweet_text,
                                     "data-hashtags" => "bikeindex",
                                     "data-related" => "BikeIndex",
                                     "data-show-count" => false,
                                     "data-size" => "large",
                                     "data-url" => bike_url(@bike)}
-            %script{async: true, src: "https://platform.twitter.com/widgets.js", charset: "utf-8" }
-            %a{href: "https://twitter.com/share?url=#{bike_url(@bike)}&text=Help me find my stolen bike!",
+            %script{src: "https://platform.twitter.com/widgets.js", charset: "utf-8"}
+            %a{href: "https://twitter.com/share?url=#{bike_url(@bike)}&text=#{tweet_text}",
                target: "_blank"}
-              .share-social.share-twitter Share on Twitter
+              .share-social.share-twitter= t(".share_on_twitter")

@@ -184,9 +184,11 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 // Bike form pages
 @import "revised/pages/bikes/new";
 @import "revised/pages/bikes/edit_bike_details";
+@import "revised/pages/bikes/edit_bike_groups";
 @import "revised/pages/bikes/edit_remove";
 @import "revised/pages/bikes/edit_accessories";
 @import "revised/pages/bikes/edit_photos";
+@import "revised/pages/bikes/stolen_checklist";
 @import "revised/pages/bikes/edit_publicize";
 @import "revised/pages/bikes/edit_alert";
 
@@ -314,6 +316,13 @@ body {
   margin-bottom: $vertical-height;
 }
 
+.mt-0 {
+  margin-top: 0;
+}
+.mb-0 {
+  margin-bottom: 0;
+}
+
 .small {
   @extend small;
 }
@@ -343,4 +352,42 @@ body {
 
 .less-strong {
   opacity: 0.65;
+}
+
+.gray-link {
+  a,
+  & {
+    color: #6c757d !important; // new bootstrap: $gray-600
+    opacity: 0.65;
+    text-decoration: underline;
+  }
+  &:hover,
+  &:active,
+  &.active {
+    opacity: 0.9;
+  }
+}
+
+// Taken from bootstrap 4.3.1
+//
+// Utilities for common `display` values
+//
+
+$displays: none, inline, inline-block, block, table, table-row, table-cell, flex,
+  inline-flex !default;
+
+@function breakpoint-infix($name, $breakpoints: $grid-breakpoints) {
+  @return if(breakpoint-min($name, $breakpoints) == null, "", "-#{$name}");
+}
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    @each $value in $displays {
+      .d#{$infix}-#{$value} {
+        display: $value !important;
+      }
+    }
+  }
 }
