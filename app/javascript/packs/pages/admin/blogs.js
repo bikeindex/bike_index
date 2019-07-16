@@ -1,8 +1,19 @@
 import log from "../../utils/log";
 import 'es6-promise/auto'
 import 'whatwg-fetch'
+// required for uppy file upload
 require('@uppy/core/dist/style.css')
 require('@uppy/dashboard/dist/style.css')
+window.Uppy = require('@uppy/core')
+window.XHRUpload = require('@uppy/xhr-upload')
+window.Dashboard = require('@uppy/dashboard')
+window.DragDrop = require('@uppy/drag-drop')
+window.Tus = require("@uppy/tus")
+window.ProgressBar = require("@uppy/progress-bar")
+window.FileInput = require('@uppy/file-input')
+window.Form = require("@uppy/form")
+
+
 
 function BinxAdminBlogs() {
   return {

@@ -24,7 +24,6 @@
     "core-js": "2",
     "es6-promise": "^4.2.8",
     "eslint-plugin-react-hooks": "^1.6.0",
-    "filepond": "^4.4.10",
     "filepond-plugin-file-validate-type": "^1.2.4",
     "honeybadger-js": "^0.5.5",
     "jquery": "^3.4.0",
