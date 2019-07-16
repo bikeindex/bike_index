@@ -55,8 +55,7 @@ class Export < ActiveRecord::Base
 
   # class method so that we can test it in other places. Namely - organized_access_panel. If updating logic, update there too
   def self.avery_export_bike?(bike)
-    bike.owner_name.present? && bike.registration_address.present? &&
-      bike.registration_address["address"].present?
+    bike.owner_name.present? && bike.valid_registration_address_present?
   end
 
   def finished_processing?; %w[finished errored].include?(progress) end

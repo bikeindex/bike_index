@@ -1,0 +1,103 @@
+---
+http_interactions:
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=0229%20HAMMOND%20BLDG&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Tue, 16 Jul 2019 22:20:06 GMT
+        Expires:
+          - Tue, 16 Jul 2019 22:30:06 GMT
+        Cache-Control:
+          - public, max-age=600
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        Content-Length:
+          - "65"
+        X-Xss-Protection:
+          - "0"
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=414
+        Alt-Svc:
+          - quic=":443"; ma=2592000; v="46,43,39"
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [],
+             "status" : "ZERO_RESULTS"
+          }
+      http_version:
+    recorded_at: Tue, 16 Jul 2019 22:20:06 GMT
+  - request:
+      method: get
+      uri: https://maps.googleapis.com/maps/api/geocode/json?address=0229%20HAMMOND%20BLDG&language=en&sensor=false
+      body:
+        encoding: US-ASCII
+        string: ""
+      headers:
+        Accept-Encoding:
+          - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+        Accept:
+          - "*/*"
+        User-Agent:
+          - Ruby
+    response:
+      status:
+        code: 200
+        message: OK
+      headers:
+        Content-Type:
+          - application/json; charset=UTF-8
+        Date:
+          - Tue, 16 Jul 2019 22:20:06 GMT
+        Expires:
+          - Tue, 16 Jul 2019 22:30:06 GMT
+        Access-Control-Allow-Origin:
+          - "*"
+        Server:
+          - mafe
+        Content-Length:
+          - "65"
+        X-Xss-Protection:
+          - "0"
+        X-Frame-Options:
+          - SAMEORIGIN
+        Server-Timing:
+          - gfet4t7; dur=414
+        Cache-Control:
+          - public, max-age=600
+        Age:
+          - "0"
+        Alt-Svc:
+          - quic=":443"; ma=2592000; v="46,43,39"
+      body:
+        encoding: ASCII-8BIT
+        string: |
+          {
+             "results" : [],
+             "status" : "ZERO_RESULTS"
+          }
+      http_version:
+    recorded_at: Tue, 16 Jul 2019 22:20:06 GMT
+recorded_with: VCR 4.0.0
