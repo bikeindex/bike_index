@@ -24,8 +24,8 @@ class CustomerMailer < ActionMailer::Base
 
   def magic_login_link_email(user)
     @user = user
-    @url = magic_link_session_url(token: @user.password_reset_token)
-    mail(to: @user.email, subject: "Sign in to Bike Index")
+    @url = magic_link_session_url(token: @user.magic_link_token)
+    mail(to: @user.email)
   end
 
   def additional_email_confirmation(user_email)
