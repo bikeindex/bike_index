@@ -3262,7 +3262,7 @@ en:
         admin_of_organization: Admin of organization
         email_youre_inviting: Email you're inviting
         automatic_passwordless: >-
-          TRME Your organization is set up with automatic passwordless log in. The Emails you
+          Your organization is set up with automatic passwordless log in. The Emails you
           add will receive a message with a link to sign in.
         invite_multiple_emails: Invite multiple emails
         invite_user: Invite user
