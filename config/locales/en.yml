@@ -832,6 +832,58 @@ en:
         teal: Teal
         white: White
         yellow_or_gold: Yellow or Gold
+      ctype:
+        aero_bars_extensions_bar_ends: aero bars/extensions/bar ends
+        axle_nuts: axle nuts
+        bashguard_chain_guide: bashguard/chain guide
+        basket: basket
+        bell_noisemaker: bell/noisemaker
+        bottom_bracket: bottom bracket
+        brake: brake
+        brake_cable: brake cable
+        brake_lever: brake lever
+        brake_pad: brake pad
+        brake_rotor: brake rotor
+        chain: chain
+        chain_tensioners: chain tensioners
+        chainrings: chainrings
+        cog_cassette_freewheel: cog/cassette/freewheel
+        computer: computer
+        crankset: crankset
+        derailleur: derailleur
+        detangler: detangler
+        fairing: fairing
+        fender: fender
+        fork: fork
+        generator_dynamo: generator/dynamo
+        grips_tape: grips/tape
+        handlebar: handlebar
+        headset: headset
+        hub: hub
+        hub_guard: hub guard
+        kickstand: kickstand
+        lights: lights
+        other: other
+        pedals: pedals
+        pegs: pegs
+        rack: rack
+        rear_suspension: rear suspension
+        rim: rim
+        saddle: saddle
+        seatpost: seatpost
+        seatpost_clamp: seatpost clamp
+        shift_and_brake_lever: shift and brake lever
+        shift_cable: shift cable
+        shifter: shifter
+        spokes: spokes
+        stem: stem
+        tire: tire
+        toe_clips: toe clips
+        training_wheels: training wheels
+        tube: tube
+        unknown: unknown
+        water_bottle_cage: water bottle cage
+        wheel: wheel
   bikes:
     bike:
       location: Location
