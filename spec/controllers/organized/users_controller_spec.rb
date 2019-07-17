@@ -224,6 +224,7 @@ RSpec.describe Organized::UsersController, type: :controller do
         it "invites, dedupes" do
           Sidekiq::Testing.inline! do
             ActionMailer::Base.deliveries = []
+            og_membership_ids = organization.memberships.pluck(:id)
             expect(organization.remaining_invitation_count).to eq 4
             expect do
               put :create, organization_id: organization.to_param,
@@ -234,6 +235,10 @@ RSpec.describe Organized::UsersController, type: :controller do
             expect(organization.remaining_invitation_count).to eq 0
             expect(organization.sent_invitation_count).to eq 5
             expect(organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
+            # TODO: Rails 5 update - this is an after_commit issue
+            organization.memberships.where.not(id: og_membership_ids).each { |m| m.enqueue_processing_worker }
+            organization.reload
+            expect(organization.users.count).to eq 1
             expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           end
         end
@@ -245,6 +250,7 @@ RSpec.describe Organized::UsersController, type: :controller do
               expect(organization.remaining_invitation_count).to eq 4
               expect(organization.users.count).to eq 1
               expect(organization.users.confirmed.count).to eq 1
+              og_membership_ids = organization.memberships.pluck(:id)
               expect do
                 put :create, organization_id: organization.to_param,
                              membership: membership_params,
@@ -254,7 +260,10 @@ RSpec.describe Organized::UsersController, type: :controller do
               expect(organization.remaining_invitation_count).to eq 0
               expect(organization.sent_invitation_count).to eq 5
               expect(organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
-              expect(organization.users.pluck(:invited_email)).to match_array(target_invited_emails)
+              # TODO: Rails 5 update - this is an after_commit issue
+              organization.memberships.where.not(id: og_membership_ids).each { |m| m.enqueue_processing_worker }
+              organization.reload
+              expect(organization.users.pluck(:email)).to match_array(target_invited_emails)
               expect(organization.users.count).to eq 5
               expect(organization.users.confirmed.count).to eq 5
               expect(ActionMailer::Base.deliveries.empty?).to be_truthy

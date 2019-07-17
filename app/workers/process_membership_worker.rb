@@ -8,7 +8,6 @@ class ProcessMembershipWorker
     assign_membership_user(membership, user_id) if membership.user.blank?
     return false if remove_duplicated_membership!(membership)
     auto_generate_user_for_organization(membership)
-
     if membership.send_invitation_email?
       OrganizedMailer.organization_invitation(membership).deliver_now
       membership.update_attribute :email_invitation_sent_at, Time.current

@@ -94,7 +94,7 @@ RSpec.describe ProcessMembershipWorker, type: :job do
         expect(user.confirmed?).to be_truthy
         expect(EmailWelcomeWorker.jobs.count).to eq 0
         expect(EmailConfirmationWorker.jobs.count).to eq 0
-        # Temporary. We're going to send emails in the future, but for the first org we're doing it without emails
+        # We don't want to send users emails for organizations with passworless users
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
       end
       context "user already exists" do
