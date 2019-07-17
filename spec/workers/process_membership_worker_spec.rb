@@ -1,7 +1,9 @@
 require "rails_helper"
 
 RSpec.describe ProcessMembershipWorker, type: :job do
+  let(:instance) { described_class.new }
   before { ActionMailer::Base.deliveries = [] }
+
   describe "#perform" do
     context "ambassador" do
       context "given a non-ambassador" do
@@ -9,7 +11,7 @@ RSpec.describe ProcessMembershipWorker, type: :job do
           membership = FactoryBot.create(:membership_claimed)
           FactoryBot.create(:ambassador_task)
           expect do
-            described_class.new.perform(membership.id)
+            instance.perform(membership.id)
           end.to_not change(AmbassadorTaskAssignment, :count)
           expect(ActionMailer::Base.deliveries.empty?).to be_truthy
         end
@@ -22,19 +24,76 @@ RSpec.describe ProcessMembershipWorker, type: :job do
           membership = FactoryBot.create(:membership_ambassador, user_id: user.id)
 
           expect do
-            described_class.new.perform(membership.id)
+            instance.perform(membership.id)
           end.to change(AmbassadorTaskAssignment, :count).by 3
 
           found_task_ids = user.ambassador_task_assignments.pluck(:ambassador_task_id)
           expect(found_task_ids).to match_array(task_ids)
 
           expect do
-            described_class.new.perform(membership.id)
+            instance.perform(membership.id)
           end.to_not change(AmbassadorTaskAssignment, :count)
 
           found_task_ids = user.ambassador_task_assignments.pluck(:ambassador_task_id)
           expect(found_task_ids).to match_array(task_ids)
         end
+      end
+    end
+
+    context "duplication" do
+      let(:user) { FactoryBot.create(:user, email: "party@monster.com") }
+      let!(:existing_membership) { FactoryBot.create(:membership, user: user) }
+      let!(:membership) { FactoryBot.create(:membership, user: nil, invited_email: invitation_email, organization: existing_membership.organization) }
+      let(:invitation_email) { "party@monster.com" }
+      it "deletes itself" do
+        expect(membership.valid?).to be_truthy
+        expect(user.confirmed?).to be_falsey
+        expect do
+          instance.perform(membership.id)
+        end.to change(Membership, :count).by(-1)
+        existing_membership.reload
+        expect(existing_membership).to be_present
+      end
+      context "confirmed user" do
+        let(:user) { FactoryBot.create(:user_confirmed, email: "party@monster.com") }
+        it "deletes itself" do
+          expect(user.confirmed?).to be_truthy
+          expect do
+            instance.perform(membership.id)
+          end.to change(Membership, :count).by(-1)
+          existing_membership.reload
+          expect(existing_membership).to be_present
+        end
+      end
+      context "secondary email" do
+        let(:invitation_email) { "not@party.com" }
+        let!(:user_email) { FactoryBot.create(:user_email, user: user, email: invitation_email) }
+        it "deletes itself" do
+          expect do
+            instance.perform(membership.id)
+          end.to change(Membership, :count).by(-1)
+          existing_membership.reload
+          expect(existing_membership).to be_present
+        end
+      end
+    end
+
+    context "organization auto_passwordless_users" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let!(:membership) { FactoryBot.create(:membership, organization: organization, invited_email: "rock@hardplace.com") }
+      before { organization.update_attribute :paid_feature_slugs, ["auto_passwordless_users"] }
+      it "creates a user" do
+        expect do
+          instance.perform(membership.id)
+        end.to change(User, :count).by 1
+        user = User.reorder(:created_at).last
+        expect(user.memberships).to eq([membership])
+        expect(user.password).to be_present
+        expect(user.email).to eq "rock@hardplace.com"
+        expect(user.confirmed?).to be_truthy
+      end
+      context "user already exists" do
+
       end
     end
 
@@ -44,7 +103,9 @@ RSpec.describe ProcessMembershipWorker, type: :job do
       it "sends the email" do
         expect(membership.claimed?).to be_falsey
         expect(membership.email_invitation_sent_at).to be_blank
-        described_class.new.perform(membership.id)
+        expect do
+          instance.perform(membership.id)
+        end.to_not change(User, :count)
         membership.reload
         expect(membership.claimed?).to be_falsey
         expect(membership.email_invitation_sent_at).to be_present
@@ -52,7 +113,7 @@ RSpec.describe ProcessMembershipWorker, type: :job do
       end
       context "user with email exists" do
         let!(:user) { FactoryBot.build(:user_confirmed, email: membership.invited_email) }
-        it "sends the email, claims, etc - happens automatically on save" do
+        it "does not send the email, claims, etc - happens automatically on save" do
           expect(user.memberships.count).to eq 0
           expect(membership.claimed?).to be_falsey
           expect(membership.email_invitation_sent_at).to be_blank
