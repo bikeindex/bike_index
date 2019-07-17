@@ -152,6 +152,7 @@ RSpec.describe Organized::UsersController, type: :controller do
     end
 
     describe "create" do
+      before { Sidekiq::Worker.clear_all }
       let(:membership_params) do
         {
           role: "member",
@@ -233,12 +234,32 @@ RSpec.describe Organized::UsersController, type: :controller do
             expect(organization.remaining_invitation_count).to eq 0
             expect(organization.sent_invitation_count).to eq 5
             expect(organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
+            expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           end
         end
-      end
-      context "auto_passwordless_users" do
-        it "invites whatever" do
-          fail
+        context "auto_passwordless_users" do
+          before { organization.update_attribute :paid_feature_slugs, ["passwordless_users"] }
+          it "invites whatever" do
+            Sidekiq::Testing.inline! do
+              ActionMailer::Base.deliveries = []
+              expect(organization.remaining_invitation_count).to eq 4
+              expect(organization.users.count).to eq 1
+              expect(organization.users.confirmed.count).to eq 1
+              expect do
+                put :create, organization_id: organization.to_param,
+                             membership: membership_params,
+                             multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
+              end.to change(Membership, :count).by 4
+              organization.reload
+              expect(organization.remaining_invitation_count).to eq 0
+              expect(organization.sent_invitation_count).to eq 5
+              expect(organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
+              expect(organization.users.pluck(:invited_email)).to match_array(target_invited_emails)
+              expect(organization.users.count).to eq 5
+              expect(organization.users.confirmed.count).to eq 5
+              expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+            end
+          end
         end
       end
     end

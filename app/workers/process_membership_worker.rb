@@ -46,7 +46,8 @@ class ProcessMembershipWorker
                     password_confirmation: password)
     user.save!
     user.confirm(user.confirmation_token)
-    membership.update_attributes(user_id: user.id)
+    # We don't want to send users emails in this situation.
+    membership.update_attributes(user_id: user.id, email_invitation_sent_at: Time.current)
     membership.reload
   end
 

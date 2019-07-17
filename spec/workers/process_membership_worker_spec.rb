@@ -83,7 +83,7 @@ RSpec.describe ProcessMembershipWorker, type: :job do
       let(:organization) { FactoryBot.create(:organization) }
       let!(:membership) { FactoryBot.create(:membership, organization: organization, invited_email: email) }
       before { organization.update_attribute :paid_feature_slugs, ["passwordless_users"] }
-      it "creates a user" do
+      it "creates a user, does not send an email" do
         Sidekiq::Worker.clear_all
         expect do
           instance.perform(membership.id)
@@ -94,13 +94,16 @@ RSpec.describe ProcessMembershipWorker, type: :job do
         expect(user.confirmed?).to be_truthy
         expect(EmailWelcomeWorker.jobs.count).to eq 0
         expect(EmailConfirmationWorker.jobs.count).to eq 0
+        # Temporary. We're going to send emails in the future, but for the first org we're doing it without emails
+        expect(ActionMailer::Base.deliveries.empty?).to be_truthy
       end
       context "user already exists" do
         let!(:user) { FactoryBot.create(:user, email: email) }
-        it "does not create a user" do
+        it "does not create a user, send and email" do
           expect do
             instance.perform(membership.id)
           end.to_not change(User, :count)
+          expect(ActionMailer::Base.deliveries.empty?).to be_falsey
         end
       end
     end
