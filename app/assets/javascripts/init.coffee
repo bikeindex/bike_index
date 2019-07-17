@@ -186,6 +186,5 @@ $(document).ready ->
   window.BikeIndex.Init = new BikeIndex.Init
   if document.getElementById('binx_registration_widget')
     new window.ManufacturersSelect('#binx_registration_widget #b_param_manufacturer_id')
-  new window.AdDisplayer
   warnIfUnsupportedBrowser()
   enableEscapeForModals()
