@@ -34,6 +34,7 @@ class User < ActiveRecord::Base
 
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
+  has_many :theft_alerts
 
   belongs_to :state
   belongs_to :country
