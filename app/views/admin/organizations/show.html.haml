@@ -5,7 +5,7 @@
   .col-md-8
     %ul
       %li.nav-item
-        = link_to "Organization view", organization_root_path(organization_id: @organization.to_param), class: "btn btn-outline-success btn-sm"
+        = link_to "organization's view", organization_root_path(organization_id: @organization.to_param), class: "btn btn-outline-success btn-sm"
       %li.nav-item
         = link_to "Edit organization", edit_admin_organization_url(@organization), class: "nav-link"
       - if current_user.developer?
