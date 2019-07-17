@@ -94,7 +94,7 @@ RSpec.describe ProcessMembershipWorker, type: :job do
         expect(user.confirmed?).to be_truthy
         expect(EmailWelcomeWorker.jobs.count).to eq 0
         expect(EmailConfirmationWorker.jobs.count).to eq 0
-        # We don't want to send users emails for organizations with passworless users
+        # We don't want to send users emails for organizations with passwordless users
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
       end
       context "user already exists" do

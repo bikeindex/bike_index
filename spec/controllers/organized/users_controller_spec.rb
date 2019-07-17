@@ -243,8 +243,17 @@ RSpec.describe Organized::UsersController, type: :controller do
           end
         end
         context "auto_passwordless_users" do
-          before { organization.update_attribute :paid_feature_slugs, ["passwordless_users"] }
+          let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 0, feature_slugs: ["passwordless_users"]) }
+          let!(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization) }
           it "invites whatever" do
+            # We have to actually assign the invoice here because membership creation bumps the organization -
+            # so the organization still has the paid feature after the first membership is created
+            invoice.update_attributes(paid_feature_ids: [paid_feature.id])
+            # invoice.reload
+            # TODO: Rails 5 update - this is an after_commit issue
+            organization.update_attributes(updated_at: Time.current)
+            organization.reload
+            expect(organization.paid_feature_slugs).to eq(["passwordless_users"])
             Sidekiq::Testing.inline! do
               ActionMailer::Base.deliveries = []
               expect(organization.remaining_invitation_count).to eq 4
@@ -263,9 +272,9 @@ RSpec.describe Organized::UsersController, type: :controller do
               # TODO: Rails 5 update - this is an after_commit issue
               organization.memberships.where.not(id: og_membership_ids).each { |m| m.enqueue_processing_worker }
               organization.reload
-              expect(organization.users.pluck(:email)).to match_array(target_invited_emails)
               expect(organization.users.count).to eq 5
               expect(organization.users.confirmed.count).to eq 5
+              expect(organization.users.pluck(:email)).to match_array(target_invited_emails)
               expect(ActionMailer::Base.deliveries.empty?).to be_truthy
             end
           end
