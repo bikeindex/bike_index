@@ -923,8 +923,11 @@ en:
       thanks: Thanks!
       your_order_is_pending: Your order is pending.
     edit_bike_details:
+      a_qr_sticker: a QR Sticker
+      add_a_sticker_label_html: Add %{sticker_information_link}
       bike_name: Bike Name
       choose_material: Choose material
+      existing_stickers: Existing stickers
       frame_size: Frame size
       general_description: General description
       main_frame_material: Main frame material
@@ -944,9 +947,6 @@ en:
       update_serial_number: Update serial number
       updated_serial: Updated serial
       zipcode: zip code
-      existing_stickers: Existing stickers
-      a_qr_sticker: A QR Sticker
-      add_a_sticker_label: Add a %{sticker_information_link} to your bike
     edit_drivetrain:
       all_diameters: All diameters
       belt_drive: Belt Drive
@@ -971,8 +971,9 @@ en:
     edit_groups:
       add_an_organization: Add another organization
       are_you_part_of_a_school_want_to_bolster_: >-
-        Are you a student of one of our school or university partners? Want to let a local advocacy organization know that you love them?
-        Add the organization here.
+        Are you a student of one of our school or university partners? Want to let
+        a local advocacy organization know that you love them? Add the organization
+        here.
       can_edit_this_bike: Can edit this %{bike_type}
       choose_organization: Choose organization
       creation_organization: Creation organization
@@ -1337,7 +1338,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -1363,7 +1364,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
