@@ -26,7 +26,7 @@ class BikeIndex.BikesEditGroups extends BikeIndex
 
   addAdditionalOrganizationSelector: ->
     $('#additional_organization_fields').append(Mustache.render(window.addOrganizationTemplate, { organizations: window.organizations }))
-    window.BikeIndex.Init.loadFancySelects()
+    @loadFancySelects()
     $('#additional_organization_fields .collapse').collapse('show')
 
   bikeOrganizationIds: ->
