@@ -8,5 +8,7 @@ en:
       subject: Thank you for supporting Bike Index!
     password_reset_email:
       subject: Instructions to reset your password
+    magic_login_link_email:
+      subject: Sign in to Bike Index
     additional_email_confirmation:
       subject: Confirm your additional email

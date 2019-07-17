@@ -96,6 +96,9 @@ RSpec.describe ProcessMembershipWorker, type: :job do
         expect(EmailConfirmationWorker.jobs.count).to eq 0
         # We don't want to send users emails for organizations with passwordless users
         expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+        # There was a bug where users weren't getting the magic link token when it was sent to them. So verify that we create the token
+        user.send_magic_link_email
+        expect(user.magic_link_token).to be_present
       end
       context "user already exists" do
         let!(:user) { FactoryBot.create(:user, email: email) }
