@@ -7,6 +7,7 @@ import BinxAdminRecoveryDisplayForm from "./recovery_display_form.js";
 import BinxAdminInvoices from "./invoices.js";
 import BinxAdminOrganizationForm from "./organization_form.js";
 import BinxAdminBlogs from "./blogs.js"
+import BinxAdminListicles from "./listicles"
 
 function BinxAdmin() {
   return {
@@ -54,6 +55,10 @@ function BinxAdmin() {
         const binxAdminBlogs = BinxAdminBlogs();
         binxAdminBlogs.init();
       }
+      if ($(".listicle-block").length > 0) {
+        const binxAdminListicles = BinxAdminListicles();
+        binxAdminListicles.init();
+      }
     },
 
     initAdminSearchSelect() {
@@ -80,8 +85,8 @@ function BinxAdmin() {
         const regexp = new RegExp($(this).data("id"), "g");
         $(this).before(
           $(this)
-            .data("fields")
-            .replace(regexp, time)
+          .data("fields")
+          .replace(regexp, time)
         );
         event.preventDefault();
         LoadFancySelects();

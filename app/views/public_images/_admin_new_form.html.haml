@@ -1,4 +1,4 @@
-.card.bg-light
+.card.bg-light.uppy
   .card-body
     .UppyDragDrop-One
       = form_for PublicImage.new, html: {class: "UppyForm"} do |f|
@@ -9,5 +9,5 @@
           = hidden_field_tag :organization_id, @organization.id
         - elsif imageable_type == 'MailSnippet'
           = hidden_field_tag :mail_snippet_id, @mail_snippet.id
-        = f.file_field :image, html: {name: "public_image[image]"}
+        = f.file_field :image, html: {name: "public_image[image]"}, class: "d-none"
     .UppyDragDrop-One-Progress
