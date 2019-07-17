@@ -2,6 +2,7 @@ class Ctype < ActiveRecord::Base
   # Note: Ctype is short for component_type.
   # The name had to be shortened because of join table key length
   include FriendlySlugFindable
+  include Selectable
 
   attr_accessor :cgroup_name
 
