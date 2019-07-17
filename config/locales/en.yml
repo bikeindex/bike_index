@@ -1074,6 +1074,7 @@ en:
       with_serial_numbers_html: "%{stolenness} with serial numbers close to <em>%{serial}</em>"
       within: within
       you: you
+      all: all
     new:
       additional_serial_sticker_number: Additional serial/sticker number
       affiliation: "%{org_name} affiliation"
@@ -1338,7 +1339,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1364,7 +1365,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
