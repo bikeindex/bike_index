@@ -18,8 +18,9 @@ task sm_import_manufacturers: :environment do
   AutocompleteLoaderWorker.perform_async("load_manufacturers")
 end
 
-desc "Prepare translations"
+desc "Prepare translations for committing to master"
 task prepare_translations: :environment do
   `i18n-tasks add-missing -v 'TRME %{value}' nl`
   `i18n-tasks normalize`
+  `i18n-tasks health`
 end
