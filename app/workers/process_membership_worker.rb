@@ -6,15 +6,19 @@ class ProcessMembershipWorker
     membership = Membership.find(membership_id)
 
     assign_membership_user(membership, user_id) if membership.user.blank?
-    return false if remove_duplicate_membership!(membership)
+    return false if remove_duplicated_membership!(membership)
+    auto_generate_user_for_organization(membership)
+
     if membership.send_invitation_email?
       OrganizedMailer.organization_invitation(membership).deliver_now
       membership.update_attribute :email_invitation_sent_at, Time.current
     end
+
     # Bust cache keys on user and organization
     membership.user&.update_attributes(updated_at: Time.current)
     membership.organization.update_attributes(updated_at: Time.current) if membership.organization.present?
 
+    # Assign ambassador tasks too
     assign_all_ambassador_tasks_to(membership)
   end
 
@@ -25,11 +29,25 @@ class ProcessMembershipWorker
     membership.reload
   end
 
-  def remove_duplicate_membership!(membership)
+  def remove_duplicated_membership!(membership)
     return false unless membership.user.present? &&
-      membership.user.memberships.where.not(id: membership.id)
-                .where(organization_id: membership.organization_id).any?
+                        membership.user.memberships.where.not(id: membership.id)
+                                  .where(organization_id: membership.organization_id).any?
     membership.destroy
+  end
+
+  def auto_generate_user_for_organization(membership)
+    return false unless membership.organization.paid_for?("auto_passwordless_users") &&
+                        membership.user.blank?
+    password = SecurityTokenizer.new_token.slice(12, 50)
+    user = User.new(skip_create_jobs: true,
+                    email: membership.invited_email,
+                    password: password,
+                    password_confirmation: password)
+    user.save!
+    user.confirm(user.confirmation_token)
+    membership.update_attributes(user_id: user.id)
+    membership.reload
   end
 
   def assign_all_ambassador_tasks_to(membership)

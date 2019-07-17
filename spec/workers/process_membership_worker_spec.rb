@@ -79,24 +79,31 @@ RSpec.describe ProcessMembershipWorker, type: :job do
     end
 
     context "organization auto_passwordless_users" do
+      let(:email) { "rock@hardplace.com" }
       let(:organization) { FactoryBot.create(:organization) }
-      let!(:membership) { FactoryBot.create(:membership, organization: organization, invited_email: "rock@hardplace.com") }
+      let!(:membership) { FactoryBot.create(:membership, organization: organization, invited_email: email) }
       before { organization.update_attribute :paid_feature_slugs, ["auto_passwordless_users"] }
       it "creates a user" do
+        Sidekiq::Worker.clear_all
         expect do
           instance.perform(membership.id)
         end.to change(User, :count).by 1
         user = User.reorder(:created_at).last
         expect(user.memberships).to eq([membership])
-        expect(user.password).to be_present
-        expect(user.email).to eq "rock@hardplace.com"
+        expect(user.email).to eq email
         expect(user.confirmed?).to be_truthy
+        expect(EmailWelcomeWorker.jobs.count).to eq 0
+        expect(EmailConfirmationWorker.jobs.count).to eq 0
       end
       context "user already exists" do
-
+        let!(:user) { FactoryBot.create(:user, email: email) }
+        it "does not create a user" do
+          expect do
+            instance.perform(membership.id)
+          end.to_not change(User, :count)
+        end
       end
     end
-
 
     context "email not sent" do
       let(:membership) { FactoryBot.create(:membership) }

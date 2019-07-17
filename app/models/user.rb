@@ -66,10 +66,10 @@ class User < ActiveRecord::Base
   before_validation :normalize_attributes
   validate :ensure_unique_email
   before_create :generate_username_confirmation_and_auth
-  after_commit :perform_create_jobs, on: :create
+  after_commit :perform_create_jobs, on: :create, if: lambda { !self.skip_create_jobs }
   before_save :set_calculated_attributes
 
-  attr_accessor :skip_geocode
+  attr_accessor :skip_geocode, :skip_create_jobs
 
   geocoded_by :address
   after_validation :geocode, if: lambda { !self.skip_geocode && self.geocodeable_attributes_changed? }
