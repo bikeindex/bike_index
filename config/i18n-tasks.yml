@@ -1,13 +1,16 @@
-# i18n-tasks finds and manages missing and unused translations: https://github.com/glebm/i18n-tasks
+# i18n-tasks finds and manages missing and unused translations:
+# https://github.com/glebm/i18n-tasks
 
 # The "main" locale.
 base_locale: en
-## All available locales are inferred from the data by default. Alternatively, specify them explicitly:
-# locales: [es, fr]
-## Reporting locale, default: en. Available: en, ru.
-# internal_locale: en
 
-# Read and write translations.
+# All available locales are inferred from the data by default. Alternatively,
+# specify them explicitly:
+# locales: [nl]
+
+# Reporting locale, default: en. Available: en, ru.
+internal_locale: en
+
 data:
   ## Translations are read from the file system. Supported format: YAML, JSON.
   ## Provide a custom adapter:
@@ -20,11 +23,12 @@ data:
     ## More files:
     # - config/locales/**/*.%{locale}.yml
 
-  # Locale files to write new keys to, based on a list of key pattern => file rules. Matched from top to bottom:
+  # Locale files to write new keys to, based on a list of key pattern => file
+  # rules. Matched from top to bottom:
   # `i18n-tasks normalize -p` will force move the keys according to these rules
   write:
     ## For example, write devise and simple form keys to their respective files:
-    # - ['{devise, simple_form}.*', 'config/locales/\1.%{locale}.yml']
+    - ['{doorkeeper}.*', 'config/locales/\1.%{locale}.yml']
     ## Catch-all default:
     # - config/locales/%{locale}.yml
 
@@ -40,7 +44,7 @@ data:
   yaml:
     write:
       # do not wrap lines at 80 characters
-      line_width: -1
+      line_width: 80
 
   ## Pretty-print JSON:
   # json:
@@ -57,12 +61,12 @@ search:
   #  - app/
 
   ## Root directories for relative keys resolution.
-  # relative_roots:
-  #   - app/controllers
-  #   - app/helpers
-  #   - app/mailers
-  #   - app/presenters
-  #   - app/views
+  relative_roots:
+    - app/controllers
+    - app/helpers
+    - app/mailers
+    - app/presenters
+    - app/views
 
   ## Files or `File.fnmatch` patterns to exclude from search. Some files are always excluded regardless of this setting:
   ##   %w(*.jpg *.png *.gif *.svg *.ico *.eot *.otf *.ttf *.woff *.woff2 *.pdf *.css *.sass *.scss *.less *.yml *.json)
@@ -83,26 +87,43 @@ search:
   ## See this example of a custom scanner: https://github.com/glebm/i18n-tasks/wiki/A-custom-scanner-example
 
 ## Translation Services
-# translation:
-#   # Google Translate
-#   # Get an API key and set billing info at https://code.google.com/apis/console to use Google Translate
-#   google_translate_api_key: "AbC-dEf5"
-#   # DeepL Pro Translate
-#   # Get an API key and subscription at https://www.deepl.com/pro to use DeepL Pro
-#   deepl_api_key: "48E92789-57A3-466A-9959-1A1A1A1A1A1A"
+translation:
+  # Google Translate
+  # Get an API key and set billing info at https://code.google.com/apis/console
+  # to use Google Translate
+  # google_translate_api_key: "AbC-dEf5"
+
+  # DeepL Pro Translate
+  # Get an API key and subscription at https://www.deepl.com/pro to use DeepL Pro
+  # deepl_api_key: "48E92789-57A3-466A-9959-1A1A1A1A1A1A"
 
 ## Do not consider these keys missing:
-# ignore_missing:
-# - 'errors.messages.{accepted,blank,invalid,too_short,too_long}'
-# - '{devise,simple_form}.*'
+ignore_missing:
+- 'errors.messages.{accepted,blank,invalid,too_short,too_long}'
+- '{devise,simple_form}.*'
 
 ## Consider these keys used:
-# ignore_unused:
-# - 'activerecord.attributes.*'
-# - '{devise,kaminari,will_paginate}.*'
-# - 'simple_form.{yes,no}'
-# - 'simple_form.{placeholders,hints,labels}.*'
-# - 'simple_form.{error_notification,required}.:'
+ignore_unused:
+- 'activerecord.attributes.*'
+- 'activerecord.enums.*'
+- 'activerecord.select_options.*'
+- '{devise,kaminari,will_paginate}.*'
+- 'simple_form.{yes,no}'
+- 'simple_form.{placeholders,hints,labels}.*'
+- 'simple_form.{error_notification,required}.:'
+- 'activerecord.errors.*'
+- 'activerecord.models.*'
+- 'controllers.*'
+- '*_mailer.*'
+- 'date.*'
+- 'datetime.*'
+- 'errors.*'
+- 'support.*'
+- 'time.*'
+- 'number.*'
+- 'meta_titles.*'
+- 'meta_descriptions.*'
+- 'helpers.page_entries_info.*'
 
 ## Exclude these keys from the `i18n-tasks eq-base' report:
 # ignore_eq_base:

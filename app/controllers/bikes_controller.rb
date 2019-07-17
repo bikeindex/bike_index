@@ -247,11 +247,11 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = t(:recovery_details) if @bike.recovered?
-      h[:theft_details] = t(:theft_details) unless @bike.recovered?
-      h[:publicize] = t(:publicize)
-      h[:alert] = t(:alert) if Flipper.enabled?(:premium_listings, current_user)
-      h[:report_recovered] = t(:report_recovered) unless @bike.recovered?
+      h[:theft_details] = translation(:recovery_details) if @bike.recovered?
+      h[:theft_details] = translation(:theft_details) unless @bike.recovered?
+      h[:publicize] = translation(:publicize)
+      h[:alert] = translation(:alert) if Flipper.enabled?(:premium_listings, current_user)
+      h[:report_recovered] = translation(:report_recovered) unless @bike.recovered?
     end
   end
 
@@ -260,14 +260,14 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def bike_templates
     {}.with_indifferent_access.tap do |h|
-      h[:bike_details] = t(:bike_details)
-      h[:photos] = t(:photos)
-      h[:drivetrain] = t(:drivetrain)
-      h[:accessories] = t(:accessories)
-      h[:ownership] = t(:ownership)
-      h[:groups] = t(:groups)
-      h[:remove] = t(:remove)
-      h[:report_stolen] = t(:report_stolen) unless @bike.stolen?
+      h[:bike_details] = translation(:bike_details)
+      h[:photos] = translation(:photos)
+      h[:drivetrain] = translation(:drivetrain)
+      h[:accessories] = translation(:accessories)
+      h[:ownership] = translation(:ownership)
+      h[:groups] = translation(:groups)
+      h[:remove] = translation(:remove)
+      h[:report_stolen] = translation(:report_stolen) unless @bike.stolen?
     end
   end
 

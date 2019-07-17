@@ -98,6 +98,11 @@ module ControllerHelpers
     end
   end
 
+  def translation(key, scope = nil)
+    scope ||= [:controllers, controller_namespace, controller_name, action_name]
+    I18n.t(key, scope: scope.compact)
+  end
+
   def controller_namespace
     @controller_namespace ||= self.class.parent.name != "Object" ? self.class.parent.name.downcase : nil
   end
