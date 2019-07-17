@@ -7,9 +7,8 @@
   %p
     - count = number_with_delimiter(current_organization.remaining_invitation_count)
     = t(".remaining_invites_html", invitations_count: count)
-  - if current_organization.paid_for?("auto_passwordless_users")
-    %p
-      = t(".automatic_passwordless")
+  - if current_organization.paid_for?("passwordless_users")
+    %p= t(".automatic_passwordless")
 
 = form_for @membership, { as: :membership, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form' } } do |f|
 

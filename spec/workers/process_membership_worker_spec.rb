@@ -78,11 +78,11 @@ RSpec.describe ProcessMembershipWorker, type: :job do
       end
     end
 
-    context "organization auto_passwordless_users" do
+    context "organization passwordless_users" do
       let(:email) { "rock@hardplace.com" }
       let(:organization) { FactoryBot.create(:organization) }
       let!(:membership) { FactoryBot.create(:membership, organization: organization, invited_email: email) }
-      before { organization.update_attribute :paid_feature_slugs, ["auto_passwordless_users"] }
+      before { organization.update_attribute :paid_feature_slugs, ["passwordless_users"] }
       it "creates a user" do
         Sidekiq::Worker.clear_all
         expect do

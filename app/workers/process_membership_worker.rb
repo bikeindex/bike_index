@@ -37,7 +37,7 @@ class ProcessMembershipWorker
   end
 
   def auto_generate_user_for_organization(membership)
-    return false unless membership.organization.paid_for?("auto_passwordless_users") &&
+    return false unless membership.organization.paid_for?("passwordless_users") &&
                         membership.user.blank?
     password = SecurityTokenizer.new_token.slice(12, 50)
     user = User.new(skip_create_jobs: true,
