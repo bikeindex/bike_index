@@ -971,9 +971,9 @@ nl:
       wheels: TRME Wheels
       wide: TRME Wide
     edit_groups:
-      add_an_organization: TRME Add an organization
+      add_an_organization: TRME Add another organization
       are_you_part_of_a_school_want_to_bolster_: >-
-        TRME Are you part of a school? Want to bolster a local advocacy organization?
+        TRME Are you a student of one of our school or university partners? Want to let a local advocacy organization know that you love them?
         Add the organization here.
       can_edit_this_bike: TRME Can edit this %{bike_type}
       choose_organization: TRME Choose organization

@@ -966,10 +966,10 @@ en:
       wheels: Wheels
       wide: Wide
     edit_groups:
-      add_an_organization: Add an organization
+      add_an_organization: Add another organization
       are_you_part_of_a_school_want_to_bolster_: >-
-        Are you part of a school? Want to bolster a local advocacy organization? Add
-        the organization here.
+        Are you a student of one of our school or university partners? Want to let a local advocacy organization know that you love them?
+        Add the organization here.
       can_edit_this_bike: Can edit this %{bike_type}
       choose_organization: Choose organization
       creation_organization: Creation organization
@@ -1334,7 +1334,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1360,7 +1360,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March

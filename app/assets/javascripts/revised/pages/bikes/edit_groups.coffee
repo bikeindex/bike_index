@@ -16,13 +16,18 @@ class BikeIndex.BikesEditGroups extends BikeIndex
       @updateBikeOrganizations()
 
   initializeAdditionalOrganizations: ->
-    add_organization_template = $('#additional-organization-template').html()
-    Mustache.parse(add_organization_template)
+    window.addOrganizationTemplate = $('#additional-organization-template').html()
+    Mustache.parse(window.addOrganizationTemplate)
     $('#add_additional_organization').click (e) =>
       e.preventDefault()
-      $('#additional_organization_fields').append(Mustache.render(add_organization_template, { organizations: window.organizations }))
-      window.BikeIndex.Init.loadFancySelects()
-      $('#additional_organization_fields .collapse').collapse('show')
+      @addAdditionalOrganizationSelector()
+    # We also want to add one organization on page load
+    @addAdditionalOrganizationSelector()
+
+  addAdditionalOrganizationSelector: ->
+    $('#additional_organization_fields').append(Mustache.render(window.addOrganizationTemplate, { organizations: window.organizations }))
+    window.BikeIndex.Init.loadFancySelects()
+    $('#additional_organization_fields .collapse').collapse('show')
 
   bikeOrganizationIds: ->
     _.compact( # remove nil values
