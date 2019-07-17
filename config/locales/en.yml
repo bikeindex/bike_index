@@ -1139,7 +1139,7 @@ en:
       link_url_for_online_sighting: Link url for online sighting
       mark_bike_recovered: Mark bike recovered
       message_owner: Message %{bike_type} owner
-      missing_address: missing Address
+      missing_address: missing address
       missing_owner_name: missing user name
       or_call_owner_html: "<em>Or call</em> <strong>Owner's phone number:</strong>"
       org_can_edit_bike: "%{org_name} can edit this %{bike_type}"
@@ -1334,7 +1334,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1360,7 +1360,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
