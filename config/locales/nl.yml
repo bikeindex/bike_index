@@ -884,6 +884,25 @@ nl:
         unknown: TRME unknown
         water_bottle_cage: TRME water bottle cage
         wheel: TRME wheel
+      stolen_record:
+        bike_was_not_locked: TRME Bike was not locked
+        cable_lock: TRME Cable lock
+        chain_with_padlock: TRME Chain with padlock
+        heavy_duty_bicycle_security_chain: TRME Heavy duty bicycle security chain
+        lock_is_missing_along_with_the_bike: TRME Lock is missing, along with the
+          bike
+        lock_was_cut_and_left_at_the_scene: TRME Lock was cut, and left at the scene
+        lock_was_opened_and_left_unharmed_at_the_scene: TRME Lock was opened, and
+          left unharmed at the scene
+        not_locked: TRME Not locked
+        object_that_bike_was_locked_to_was_broken_removed_or_otherwise_compromised: >-
+          TRME Object that bike was locked to was broken, removed, or otherwise compromised
+        other: TRME Other
+        other_situation_please_describe_below: TRME Other situation, please describe
+          below
+        two_u_locks: TRME Two U-locks
+        u_lock: TRME U-lock
+        u_lock_and_cable: TRME U-lock and cable
   bikes:
     bike:
       location: TRME Location

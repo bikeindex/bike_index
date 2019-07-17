@@ -91,28 +91,46 @@ class StolenRecord < ActiveRecord::Base
      zipcode].reject(&:blank?).join(",")
   end
 
-  def self.locking_description
-    ["U-lock", "Two U-locks", "U-lock and cable", "Chain with padlock",
-     "Cable lock", "Heavy duty bicycle security chain", "Not locked", "Other"].freeze
+  def self.select_option(name, locale: nil)
+    I18n.t(name.to_s.downcase.gsub(/[^[:alnum:]]+/, "_"),
+           scope: [:activerecord, :select_options, self.name.underscore],
+           locale: locale)
   end
 
-  def self.locking_description_select
-    locking_description.map { |l| [l, l] }
+  LOCKING_DESCRIPTIONS = [
+    "U-lock",
+    "Two U-locks",
+    "U-lock and cable",
+    "Chain with padlock",
+    "Cable lock",
+    "Heavy duty bicycle security chain",
+    "Not locked",
+    "Other",
+  ].freeze
+
+  def self.locking_description
+    LOCKING_DESCRIPTIONS
   end
+
+  def self.locking_description_select_options(locale: nil)
+    locking_description.map { |name| [select_option(name, locale: locale), name] }
+  end
+
+  LOCKING_DEFEAT_DESCRIPTIONS = [
+    "Lock was cut, and left at the scene",
+    "Lock was opened, and left unharmed at the scene",
+    "Lock is missing, along with the bike",
+    "Object that bike was locked to was broken, removed, or otherwise compromised",
+    "Other situation, please describe below",
+    "Bike was not locked",
+  ].freeze
 
   def self.locking_defeat_description
-    [
-      "Lock was cut, and left at the scene.",
-      "Lock was opened, and left unharmed at the scene.",
-      "Lock is missing, along with the bike.",
-      "Object that bike was locked to was broken, removed, or otherwise compromised.",
-      "Other situation, please describe below.",
-      "Bike was not locked",
-    ]
+    LOCKING_DEFEAT_DESCRIPTIONS
   end
 
-  def self.locking_defeat_description_select
-    locking_defeat_description.map { |l| [l, l] }
+  def self.locking_defeat_description_select_options(locale: nil)
+    locking_defeat_description.map { |name| [select_option(name, locale: locale), name] }
   end
 
   def set_calculated_attributes

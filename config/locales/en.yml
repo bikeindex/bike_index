@@ -884,6 +884,23 @@ en:
         unknown: unknown
         water_bottle_cage: water bottle cage
         wheel: wheel
+      stolen_record:
+        bike_was_not_locked: Bike was not locked
+        cable_lock: Cable lock
+        chain_with_padlock: Chain with padlock
+        heavy_duty_bicycle_security_chain: Heavy duty bicycle security chain
+        lock_is_missing_along_with_the_bike: Lock is missing, along with the bike
+        lock_was_cut_and_left_at_the_scene: Lock was cut, and left at the scene
+        lock_was_opened_and_left_unharmed_at_the_scene: Lock was opened, and left
+          unharmed at the scene
+        not_locked: Not locked
+        object_that_bike_was_locked_to_was_broken_removed_or_otherwise_compromised: Object
+          that bike was locked to was broken, removed, or otherwise compromised
+        other: Other
+        other_situation_please_describe_below: Other situation, please describe below
+        two_u_locks: Two U-locks
+        u_lock: U-lock
+        u_lock_and_cable: U-lock and cable
   bikes:
     bike:
       location: Location
