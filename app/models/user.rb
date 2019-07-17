@@ -343,6 +343,7 @@ class User < ActiveRecord::Base
   def update_auth_token(auth_token_type, time = nil)
     generate_auth_token(auth_token_type, time)
     save
+    reload
   end
 
   def generate_auth_token(auth_token_type, time = nil)
