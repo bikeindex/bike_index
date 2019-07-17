@@ -348,7 +348,7 @@ RSpec.describe User, type: :model do
       end
       it "gets the time" do
         user = User.new
-        user.update_auth_token("magic_link_token")
+        user.generate_auth_token("magic_link_token")
         expect(user.auth_token_time("magic_link_token")).to be > Time.current - 2.seconds
       end
       it "uses input time" do
