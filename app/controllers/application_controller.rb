@@ -63,30 +63,13 @@ class ApplicationController < ActionController::Base
     requested_locale if I18n.available_locales.include?(requested_locale)
   end
 
-  def t(key)
-    I18n.t(key, scope: [:controllers, controller_namespace, controller_name].compact)
-  end
-
   def requested_locale
-
-    # logger.info({ locale_current: "#{I18n.locale}",
-    #               locale_params: locale_from_request_params,
-    #               locale_user_profile: current_user&.preferred_language,
-    #               locale_headers: locale_from_request_header,
-    #               locale_default: I18n.default_locale }.to_json)
-
-    requested_locale =
-      locale_from_request_params ||
+    locale_from_request_params ||
       current_user&.preferred_language.presence ||
       locale_from_request_header ||
       I18n.default_locale
-
-    # logger.info("* Locale set to '#{requested_locale}'")
-
-    requested_locale
   end
 
-  # TODO: Remove logging in #requested_locale when feature flag is removed
   def set_locale
     unless Flipper.enabled?(:localization, current_user)
       return I18n.with_locale(I18n.default_locale) { yield }

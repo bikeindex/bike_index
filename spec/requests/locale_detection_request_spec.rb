@@ -16,10 +16,6 @@ RSpec.describe "Locale detection", type: :request do
         get "/"
         expect(response.body).to match(/bike registration/i)
 
-        current_user.update(preferred_language: :es)
-        get "/"
-        expect(response.body).to match(/registro de bicicleta/i)
-
         current_user.update(preferred_language: :nl)
         get "/"
         expect(response.body).to match(/fietsregistratie/i)
@@ -30,8 +26,6 @@ RSpec.describe "Locale detection", type: :request do
       it "renders the homepage in the requested language" do
         get "/", locale: :en
         expect(response.body).to match(/bike registration/i)
-        get "/", locale: :es
-        expect(response.body).to match(/registro de bicicleta/i)
         get "/", locale: :nl
         expect(response.body).to match(/fietsregistratie/i)
       end
@@ -48,9 +42,6 @@ RSpec.describe "Locale detection", type: :request do
       it "renders the homepage in the requested language" do
         get "/", {}, { "HTTP_ACCEPT_LANGUAGE" => "en-US,en;q=0.9" }
         expect(response.body).to match(/bike registration/i)
-
-        get "/", {}, { "HTTP_ACCEPT_LANGUAGE" => "es,en;q=0.9" }
-        expect(response.body).to match(/registro de bicicleta/i)
 
         get "/", {}, { "HTTP_ACCEPT_LANGUAGE" => "nl,en;q=0.9" }
         expect(response.body).to match(/fietsregistratie/i)
@@ -77,9 +68,9 @@ RSpec.describe "Locale detection", type: :request do
       end
 
       it "gives secondary precedence to user preference" do
-        current_user.update(preferred_language: :es)
+        current_user.update(preferred_language: :nl)
         get "/", {}, { "HTTP_ACCEPT_LANGUAGE" => "en-US,en;q=0.9" }
-        expect(response.body).to match(/registro de bicicleta/i)
+        expect(response.body).to match(/fietsregistratie/i)
       end
 
       it "gives lowest precedence to request headers" do
@@ -89,12 +80,12 @@ RSpec.describe "Locale detection", type: :request do
       end
 
       it "falls back to the app default if no other locales are provided or recognized" do
-        allow(I18n).to receive(:default_locale).and_return(:es)
+        allow(I18n).to receive(:default_locale).and_return(:nl)
         current_user.update(preferred_language: nil)
 
         get "/", { locale: :klingon }, { "HTTP_ACCEPT_LANGUAGE" => "k3" }
 
-        expect(response.body).to match(/registro de bicicleta/i)
+        expect(response.body).to match(/fietsregistratie/i)
         allow(I18n).to receive(:default_locale).and_call_original
       end
     end

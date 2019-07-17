@@ -44,7 +44,7 @@
         = form_tag bikes_path, method: :get do
           = text_field_tag :serial,
           params[:serial],
-          placeholder: t("bike_serial_number"),
+          placeholder: t(".bike_serial_number"),
           class: 'faq-search-search-field'
 
           = button_tag(type: "submit", class: "searchit") do
