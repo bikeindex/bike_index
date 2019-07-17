@@ -5,10 +5,12 @@
   .col-md-8
     %ul
       %li.nav-item
-        = link_to "Edit organization", edit_admin_organization_url(@organization), class: "btn btn-primary float-right"
+        = link_to "Organization view", organization_root_path(organization_id: @organization.to_param), class: "btn btn-outline-success btn-sm"
+      %li.nav-item
+        = link_to "Edit organization", edit_admin_organization_url(@organization), class: "nav-link"
       - if current_user.developer?
         %li.nav-item
-          = link_to "edit custom layouts", admin_organization_custom_layouts_path(organization_id: @organization.to_param), class: "btn btn-link btn-sm less-strong"
+          = link_to "edit custom layouts", admin_organization_custom_layouts_path(organization_id: @organization.to_param), class: "nav-link less-strong"
 
 - if @organization.is_suspended
   %h2.text-danger
@@ -61,11 +63,6 @@
           = @organization.slug
           \|
           = link_to "embed", embed_registrations_url(organization_id: @organization.to_param)
-          \|
-          - if @organization.ambassador?
-            = link_to "dashboard", organization_ambassador_dashboard_path(organization_id: passive_organization.to_param)
-          - else
-            = link_to "org's manage", organization_manage_index_path(organization_id: @organization.to_param)
       %tr
         %td
           Created
