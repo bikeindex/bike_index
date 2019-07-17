@@ -33,5 +33,5 @@ class BikeIndex.BikesEditAccessories extends BikeIndex
     time = new Date().getTime()
     regexp = new RegExp($target.attr('data-id'), 'g')
     $target.before($target.data('fields').replace(regexp, time))
-    window.BikeIndex.Init.loadFancySelects()
+    @loadFancySelects()
     @fancySelectForManufacturers()

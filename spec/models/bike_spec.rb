@@ -77,29 +77,6 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "show_sticker_edit?" do
-    it "is false by default" do
-      expect(Bike.new.show_sticker_edit?).to be_falsey
-    end
-    context "organization with stickers" do
-      let(:organization) { FactoryBot.create(:organization) }
-      let(:bike) { FactoryBot.create(:bike_organized, organization: organization) }
-      before { organization.update_attribute :paid_feature_slugs, ["bike_codes"] }
-      it "is truthy" do
-        bike.reload
-        expect(bike.show_sticker_edit?).to be_truthy
-      end
-    end
-    context "bike has bike_code" do
-      let(:bike) { FactoryBot.create(:bike) }
-      let!(:bike_code) { FactoryBot.create(:bike_code_claimed, bike: bike) }
-      it "is truthy" do
-        bike.reload
-        expect(bike.show_sticker_edit?).to be_truthy
-      end
-    end
-  end
-
   describe "phoneable_by?" do
     let(:bike) { Bike.new }
     let(:user) { User.new }

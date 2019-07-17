@@ -54,6 +54,12 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 | Caching   | `bin/rake dev:cache` | disabled |
 | [letter_opener](https://github.com/ryanb/letter_opener) | `bin/rake dev:letter_opener` | enabled |
 
+## Translation
+
+We are in the process of translating Bike Index! When finished we'll link to the translation service here.
+
+If you modify the translation files (e.g. [config/locales/en.yml]), run `bin/rake prepare_translations` before pushing up.
+
 ## Testing
 
 We use [RSpec](https://github.com/rspec/rspec) and

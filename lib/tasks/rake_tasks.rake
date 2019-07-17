@@ -2,7 +2,7 @@ task run_scheduler: :environment do
   ScheduledWorkerRunner.perform_async if ScheduledWorkerRunner.should_enqueue?
 end
 
-task :slow_save => :environment do
+task slow_save: :environment do
   User.find_in_batches(batch_size: 500) do |b|
     b.each { |i| i.save }
   end
@@ -14,6 +14,12 @@ task :slow_save => :environment do
 end
 
 desc "Create frame_makers and push to redis"
-task :sm_import_manufacturers => :environment do
+task sm_import_manufacturers: :environment do
   AutocompleteLoaderWorker.perform_async("load_manufacturers")
+end
+
+desc "Prepare translations"
+task prepare_translations: :environment do
+  `i18n-tasks add-missing -v 'TRME %{value}' nl`
+  `i18n-tasks normalize`
 end
