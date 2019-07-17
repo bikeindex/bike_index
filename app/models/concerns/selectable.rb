@@ -11,8 +11,7 @@ module Selectable
     end
 
     def select_options(locale: nil)
-      pluck(:id, :name)
-        .map { |id, name| [name_translation(name, locale: locale), id] }
+      pluck(:id, :name).map { |id, name| [name_translation(name, locale: locale), id] }
     end
   end
 end

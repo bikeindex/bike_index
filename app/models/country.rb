@@ -5,6 +5,14 @@ class Country < ActiveRecord::Base
   has_many :stolen_records
   has_many :locations
 
+  def self.name_translation(iso, locale: nil)
+    I18n.t(iso, scope: :countries, locale: locale)
+  end
+
+  def self.select_options(locale: nil)
+    pluck(:id, :iso).map { |id, iso| [name_translation(iso, locale: locale), id] }
+  end
+
   def self.fuzzy_find(str)
     return nil unless str.present?
     fuzzy_iso_find(str) || where("lower(name) = ?", str.downcase.strip).first
