@@ -3247,6 +3247,9 @@ nl:
       new:
         1_email_per_line: TRME 1 email per line
         admin_of_organization: TRME Admin of organization
+        automatic_passwordless: >-
+          TRME Your organization is set up with automatic passwordless log in. The
+          Emails you add will receive a message with a link to sign in.
         email_youre_inviting: TRME Email you're inviting
         invite_multiple_emails: TRME Invite multiple emails
         invite_user: TRME Invite user

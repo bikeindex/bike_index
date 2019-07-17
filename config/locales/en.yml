@@ -3260,6 +3260,9 @@ en:
       new:
         1_email_per_line: 1 email per line
         admin_of_organization: Admin of organization
+        automatic_passwordless: >-
+          Your organization is set up with automatic passwordless log in. The Emails
+          you add will receive a message with a link to sign in.
         email_youre_inviting: Email you're inviting
         invite_multiple_emails: Invite multiple emails
         invite_user: Invite user

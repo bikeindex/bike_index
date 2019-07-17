@@ -31,7 +31,7 @@ RSpec.describe "I18n" do
     error_message = <<~STR
       The following files need to be normalized:
       #{non_normalized.map { |path| "  #{path}" }.join("\n")}\n
-      Please run `i18n-tasks` normalize to fix.
+      Please run `i18n-tasks normalize` normalize to fix.
     STR
 
     expect(non_normalized).to be_empty, error_message
