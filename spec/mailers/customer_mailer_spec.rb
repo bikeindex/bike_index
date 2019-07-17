@@ -45,7 +45,7 @@ RSpec.describe CustomerMailer, type: :mailer do
     it "renders email" do
       user.update_auth_token("magic_link_token")
       mail = CustomerMailer.magic_login_link_email(user)
-      expect(mail.subject).to eq("Instructions to reset your password")
+      expect(mail.subject).to eq("Sign in to Bike Index")
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.body.encoded).to match(user.magic_link_token)
     end
