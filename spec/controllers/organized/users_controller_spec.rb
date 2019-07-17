@@ -247,9 +247,8 @@ RSpec.describe Organized::UsersController, type: :controller do
           let!(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization) }
           it "invites whatever" do
             # We have to actually assign the invoice here because membership creation bumps the organization -
-            # so the organization still has the paid feature after the first membership is created
+            # and the organization needs to have the paid feature after the first membership is created
             invoice.update_attributes(paid_feature_ids: [paid_feature.id])
-            # invoice.reload
             # TODO: Rails 5 update - this is an after_commit issue
             organization.update_attributes(updated_at: Time.current)
             organization.reload
