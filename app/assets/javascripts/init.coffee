@@ -3,6 +3,15 @@ unless String::trim then String::trim = -> @replace /^\s+|\s+$/g, ""
 
 # All the classes inherit from this
 class window.BikeIndex
+  loadFancySelects: ->
+    $('.unfancy.fancy-select select').selectize
+      create: false
+      plugins: ['restore_on_backspace']
+    $('.unfancy.fancy-select-placeholder select').selectize # When empty options are allowed
+      create: false
+      plugins: ['restore_on_backspace', 'selectable_placeholder']
+    # Remove them so we don't initialize twice
+    $('.unfancy.fancy-select, .unfancy.fancy-select-placeholder').removeClass('unfancy')
 
 # This file initializes scripts for the application
 class BikeIndex.Init extends BikeIndex
@@ -48,16 +57,6 @@ class BikeIndex.Init extends BikeIndex
       locks_edit: BikeIndex.LocksForm
       locks_create: BikeIndex.LocksForm
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
-
-  loadFancySelects: ->
-    $('.unfancy.fancy-select select').selectize
-      create: false
-      plugins: ['restore_on_backspace']
-    $('.unfancy.fancy-select-placeholder select').selectize # When empty options are allowed
-      create: false
-      plugins: ['restore_on_backspace', 'selectable_placeholder']
-    # Remove them so we don't initialize twice
-    $('.unfancy.fancy-select, .unfancy.fancy-select-placeholder').removeClass('unfancy')
 
   initializeNoTabLinks: ->
     # So in forms we can provide help without breaking tab index
