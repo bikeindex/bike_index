@@ -20,7 +20,9 @@ end
 
 desc "Prepare translations for committing to master"
 task prepare_translations: :environment do
-  `i18n-tasks add-missing -v 'TRME %{value}' nl`
-  `i18n-tasks normalize`
-  `i18n-tasks health`
+  require "i18n/tasks/cli"
+  i18n_tasks = I18n::Tasks::CLI.new
+  i18n_tasks.start(["add-missing", "-v", "'TRME %{value}'"])
+  i18n_tasks.start(["normalize"])
+  i18n_tasks.start(["health"])
 end
