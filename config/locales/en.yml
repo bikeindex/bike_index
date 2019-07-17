@@ -1061,6 +1061,7 @@ en:
         Without a valid report number, your bike won't be included in partner searches
         by <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
     index:
+      all: All
       anywhere: Anywhere
       miles_of: miles of
       no_bikes_matched: No %{stolenness} bikes matched your search
@@ -1074,7 +1075,6 @@ en:
       with_serial_numbers_html: "%{stolenness} with serial numbers close to <em>%{serial}</em>"
       within: within
       you: you
-      all: all
     new:
       additional_serial_sticker_number: Additional serial/sticker number
       affiliation: "%{org_name} affiliation"

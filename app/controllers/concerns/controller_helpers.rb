@@ -70,7 +70,7 @@ module ControllerHelpers
   end
 
   def default_bike_search_path
-    bikes_path(location: "ip", stolenness: "proximity")
+    bikes_path(stolenness: "all")
   end
 
   # Generally this is implicitly set, via the passed parameters - however! it can also be explicitly set

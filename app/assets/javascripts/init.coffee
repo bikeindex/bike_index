@@ -160,27 +160,6 @@ window.updateSearchBikesHeaderLink = ->
     else
       localStorage.setItem('distance', distance)
 
-  distance ||= 100
-
-  # update search params, retaining any other query params
-  $bike_search_link = $("#search_bikes_header_link")
-  return true unless $bike_search_link.length
-  bike_search_query = $bike_search_link[0].search
-
-  tuples_to_object = (tuples_list) =>
-     tuples_list.reduce ((obj, tuple) -> (obj[tuple[0]] = tuple[1]) && obj), {}
-  params = tuples_to_object(bike_search_query.replace("?", "").split("&").map((e) => e.split("=")))
-
-  params["stolenness"] = "proximity"
-  params["location"] = location
-  params["distance"] = distance
-
-  bike_search_path = $bike_search_link[0].pathname
-  query_string = Object.entries(params).map((e) => e.join("=")).join("&")
-  $bike_search_link.attr("href", "#{bike_search_path}?#{query_string}")
-  $(".defaultBikeSearchLink").attr("href", "#{bike_search_path}?#{query_string}")
-
-
 $(document).ready ->
   window.updateSearchBikesHeaderLink()
   window.BikeIndex.Init = new BikeIndex.Init
