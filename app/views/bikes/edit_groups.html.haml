@@ -27,7 +27,7 @@
                       %span.context-display-help
                         &ndash;
                       = t(".remove")
-              - @bike.bike_organizations.each_with_index do |bike_organization, index|
+              - @bike.bike_organizations.reorder(:created_at).each_with_index do |bike_organization, index|
                 - next if bike_organization.organization == @bike.creation_organization
                 .form-group.row
                   %label.form-well-label.less-strong

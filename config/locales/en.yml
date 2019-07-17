@@ -944,6 +944,9 @@ en:
       update_serial_number: Update serial number
       updated_serial: Updated serial
       zipcode: zip code
+      existing_stickers: Existing stickers
+      a_qr_sticker: A QR Sticker
+      add_a_sticker_label: Add a %{sticker_information_link} to your bike
     edit_drivetrain:
       all_diameters: All diameters
       belt_drive: Belt Drive
