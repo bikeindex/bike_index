@@ -290,7 +290,7 @@ RSpec.describe SessionsController, type: :controller do
             post :create, session: { password: "would be correct" }
             expect(cookies.signed[:auth][1]).to eq(user.auth_token)
             expect(session[:render_donation_request]).to eq "law_enforcement"
-            expect(response).to redirect_to bikes_path(location: "ip", stolenness: "proximity")
+            expect(response).to redirect_to bikes_path(stolenness: "all")
           end
         end
       end

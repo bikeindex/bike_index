@@ -1067,6 +1067,7 @@ nl:
         TRME Without a valid report number, your bike won't be included in partner
         searches by <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
     index:
+      all: TRME all
       anywhere: TRME Anywhere
       miles_of: TRME miles of
       no_bikes_matched: TRME No %{stolenness} bikes matched your search

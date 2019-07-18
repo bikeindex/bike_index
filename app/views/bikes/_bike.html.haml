@@ -15,7 +15,7 @@
       - if bike.current_stolen_record.present?
         %ul.attr-list
           %li
-            %span.attr-title
+            %span.attr-title.text-danger
               = bike.recovered ? t(".recovered") : t(".stolen")
             %span.convertTime
               = l bike.current_stolen_record.date_stolen, format: :convert_time

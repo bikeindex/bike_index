@@ -1061,6 +1061,7 @@ en:
         Without a valid report number, your bike won't be included in partner searches
         by <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
     index:
+      all: All
       anywhere: Anywhere
       miles_of: miles of
       no_bikes_matched: No %{stolenness} bikes matched your search
