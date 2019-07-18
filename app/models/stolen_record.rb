@@ -91,13 +91,6 @@ class StolenRecord < ActiveRecord::Base
      zipcode].reject(&:blank?).join(",")
   end
 
-  def self.select_option(name)
-    I18n.t(
-      name.to_s.downcase.gsub(/[^[:alnum:]]+/, "_"),
-      scope: [:activerecord, :select_options, self.name.underscore],
-    )
-  end
-
   LOCKING_DESCRIPTIONS = [
     "U-lock",
     "Two U-locks",
@@ -114,7 +107,13 @@ class StolenRecord < ActiveRecord::Base
   end
 
   def self.locking_description_select_options
-    locking_description.map { |name| [select_option(name), name] }
+    normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
+    translation_scope = [:activerecord, :select_options, self.name.underscore]
+
+    locking_description.map do |name|
+      localized_name = I18n.t(normalize.call(name), scope: translation_scope)
+      [localized_name, name]
+    end
   end
 
   LOCKING_DEFEAT_DESCRIPTIONS = [
@@ -131,7 +130,13 @@ class StolenRecord < ActiveRecord::Base
   end
 
   def self.locking_defeat_description_select_options
-    locking_defeat_description.map { |name| [select_option(name), name] }
+    normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
+    translation_scope = [:activerecord, :select_options, self.name.underscore]
+
+    locking_defeat_description.map do |name|
+      localized_name = I18n.t(normalize.call(name), scope: translation_scope)
+      [localized_name, name]
+    end
   end
 
   def set_calculated_attributes

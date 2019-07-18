@@ -1,7 +1,6 @@
 class Color < ActiveRecord::Base
   include AutocompleteHashable
   include FriendlyNameFindable
-  include Selectable
   validates_presence_of :name, :priority
   validates_uniqueness_of :name
   has_many :bikes
@@ -12,6 +11,16 @@ class Color < ActiveRecord::Base
 
   def self.black
     where(name: "Black", priority: 1, display: "#000").first_or_create
+  end
+
+  def self.select_options
+    normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
+    translation_scope = [:activerecord, :select_options, self.name.underscore]
+
+    pluck(:id, :name).map do |id, name|
+      localized_name = I18n.t(normalize.call(name), scope: translation_scope)
+      [localized_name, id]
+    end
   end
 
   def autocomplete_hash
