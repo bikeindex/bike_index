@@ -28,7 +28,7 @@
         .row
           .col-lg-6
             .form-group.fancy-select.unfancy
-              = f.collection_select(:country_id, Country.all, :id, :name, class: "form-control mt-1" )
+              = f.select(:country_id, Country.select_options, class: "form-control mt-1" )
           .col-lg-6
             .form-group.text-center
               = f.check_box :_destroy, class: "d-none"

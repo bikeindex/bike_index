@@ -13,17 +13,14 @@ class Color < ActiveRecord::Base
     where(name: "Black", priority: 1, display: "#000").first_or_create
   end
 
-  def self.name_translation(name, locale: nil)
-    I18n.t(
-      name.to_s.downcase.gsub(/[^[:alnum:]]+/, "_"),
-      scope: [:activerecord, :select_options, self.name.underscore],
-      locale: locale,
-    )
-  end
+  def self.select_options
+    normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
+    translation_scope = [:activerecord, :select_options, self.name.underscore]
 
-  def self.select_options(locale: nil)
-    pluck(:id, :name)
-      .map { |id, name| [name_translation(name, locale: locale), id] }
+    pluck(:id, :name).map do |id, name|
+      localized_name = I18n.t(normalize.call(name), scope: translation_scope)
+      [localized_name, id]
+    end
   end
 
   def autocomplete_hash

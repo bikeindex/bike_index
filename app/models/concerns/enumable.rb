@@ -2,20 +2,19 @@ module Enumable
   extend ActiveSupport::Concern
 
   class_methods do
-    def slug_translation(slug, locale: nil)
+    def slug_translation(slug)
       I18n.t(
         slug.to_s.underscore,
         scope: [:activerecord, :enums, self.name.underscore],
-        locale: locale,
       )
     end
 
-    def select_options(locale: nil)
-      slugs.map { |slug| [slug_translation(slug, locale: locale), slug] }
+    def select_options
+      slugs.map { |slug| [slug_translation(slug), slug] }
     end
 
-    def legacy_selections(locale: nil)
-      slugs.map { |slug| { slug: slug, name: slug_translation(slug, locale: locale) } }
+    def legacy_selections
+      slugs.map { |slug| { slug: slug, name: slug_translation(slug) } }
     end
 
     def slugs

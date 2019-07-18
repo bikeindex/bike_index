@@ -832,6 +832,77 @@ nl:
         teal: TRME Teal
         white: TRME White
         yellow_or_gold: TRME Yellow or Gold
+      ctype:
+        aero_bars_extensions_bar_ends: TRME aero bars/extensions/bar ends
+        axle_nuts: TRME axle nuts
+        bashguard_chain_guide: TRME bashguard/chain guide
+        basket: TRME basket
+        bell_noisemaker: TRME bell/noisemaker
+        bottom_bracket: TRME bottom bracket
+        brake: TRME brake
+        brake_cable: TRME brake cable
+        brake_lever: TRME brake lever
+        brake_pad: TRME brake pad
+        brake_rotor: TRME brake rotor
+        chain: TRME chain
+        chain_tensioners: TRME chain tensioners
+        chainrings: TRME chainrings
+        cog_cassette_freewheel: TRME cog/cassette/freewheel
+        computer: TRME computer
+        crankset: TRME crankset
+        derailleur: TRME derailleur
+        detangler: TRME detangler
+        fairing: TRME fairing
+        fender: TRME fender
+        fork: TRME fork
+        generator_dynamo: TRME generator/dynamo
+        grips_tape: TRME grips/tape
+        handlebar: TRME handlebar
+        headset: TRME headset
+        hub: TRME hub
+        hub_guard: TRME hub guard
+        kickstand: TRME kickstand
+        lights: TRME lights
+        other: TRME other
+        pedals: TRME pedals
+        pegs: TRME pegs
+        rack: TRME rack
+        rear_suspension: TRME rear suspension
+        rim: TRME rim
+        saddle: TRME saddle
+        seatpost: TRME seatpost
+        seatpost_clamp: TRME seatpost clamp
+        shift_and_brake_lever: TRME shift and brake lever
+        shift_cable: TRME shift cable
+        shifter: TRME shifter
+        spokes: TRME spokes
+        stem: TRME stem
+        tire: TRME tire
+        toe_clips: TRME toe clips
+        training_wheels: TRME training wheels
+        tube: TRME tube
+        unknown: TRME unknown
+        water_bottle_cage: TRME water bottle cage
+        wheel: TRME wheel
+      stolen_record:
+        bike_was_not_locked: TRME Bike was not locked
+        cable_lock: TRME Cable lock
+        chain_with_padlock: TRME Chain with padlock
+        heavy_duty_bicycle_security_chain: TRME Heavy duty bicycle security chain
+        lock_is_missing_along_with_the_bike: TRME Lock is missing, along with the
+          bike
+        lock_was_cut_and_left_at_the_scene: TRME Lock was cut, and left at the scene
+        lock_was_opened_and_left_unharmed_at_the_scene: TRME Lock was opened, and
+          left unharmed at the scene
+        not_locked: TRME Not locked
+        object_that_bike_was_locked_to_was_broken_removed_or_otherwise_compromised: >-
+          TRME Object that bike was locked to was broken, removed, or otherwise compromised
+        other: TRME Other
+        other_situation_please_describe_below: TRME Other situation, please describe
+          below
+        two_u_locks: TRME Two U-locks
+        u_lock: TRME U-lock
+        u_lock_and_cable: TRME U-lock and cable
   bikes:
     bike:
       location: TRME Location

@@ -16,7 +16,7 @@ Bikeindex::Application.routes.draw do
   resources :organizations do
     member do
       get :embed
-      get :embed_extended
+      get :embed_extended, as: :embed_extended
       get :embed_create_success
     end
   end

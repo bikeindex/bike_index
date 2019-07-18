@@ -7,7 +7,7 @@ class BikeIndex.BikesEdit extends BikeIndex
       when 'bike_details' then new BikeIndex.BikesEditBikeDetails
       when 'drivetrain' then new BikeIndex.BikesEditDrivetrain
       when 'report_recovered' then new BikeIndex.BikesEditStolen
-      when 'report_stolen' then new BikeIndex.BikesEditStolen
+      when 'theft_details' then new BikeIndex.BikesEditStolen
       when 'photos' then new BikeIndex.BikesEditPhotos
       when 'accessories' then new BikeIndex.BikesEditAccessories
       when 'remove' then new BikeIndex.BikesEditRemove
