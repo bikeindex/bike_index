@@ -91,10 +91,11 @@ class StolenRecord < ActiveRecord::Base
      zipcode].reject(&:blank?).join(",")
   end
 
-  def self.select_option(name, locale: nil)
-    I18n.t(name.to_s.downcase.gsub(/[^[:alnum:]]+/, "_"),
-           scope: [:activerecord, :select_options, self.name.underscore],
-           locale: locale)
+  def self.select_option(name)
+    I18n.t(
+      name.to_s.downcase.gsub(/[^[:alnum:]]+/, "_"),
+      scope: [:activerecord, :select_options, self.name.underscore],
+    )
   end
 
   LOCKING_DESCRIPTIONS = [
@@ -112,8 +113,8 @@ class StolenRecord < ActiveRecord::Base
     LOCKING_DESCRIPTIONS
   end
 
-  def self.locking_description_select_options(locale: nil)
-    locking_description.map { |name| [select_option(name, locale: locale), name] }
+  def self.locking_description_select_options
+    locking_description.map { |name| [select_option(name), name] }
   end
 
   LOCKING_DEFEAT_DESCRIPTIONS = [
@@ -129,8 +130,8 @@ class StolenRecord < ActiveRecord::Base
     LOCKING_DEFEAT_DESCRIPTIONS
   end
 
-  def self.locking_defeat_description_select_options(locale: nil)
-    locking_defeat_description.map { |name| [select_option(name, locale: locale), name] }
+  def self.locking_defeat_description_select_options
+    locking_defeat_description.map { |name| [select_option(name), name] }
   end
 
   def set_calculated_attributes

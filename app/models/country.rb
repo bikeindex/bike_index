@@ -5,12 +5,12 @@ class Country < ActiveRecord::Base
   has_many :stolen_records
   has_many :locations
 
-  def self.name_translation(iso, locale: nil)
-    I18n.t(iso, scope: :countries, locale: locale)
+  def self.name_translation(iso)
+    I18n.t(iso, scope: :countries)
   end
 
-  def self.select_options(locale: nil)
-    pluck(:id, :iso).map { |id, iso| [name_translation(iso, locale: locale), id] }
+  def self.select_options
+    pluck(:id, :iso).map { |id, iso| [name_translation(iso), id] }
   end
 
   def self.fuzzy_find(str)
