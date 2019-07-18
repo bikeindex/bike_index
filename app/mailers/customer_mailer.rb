@@ -55,10 +55,13 @@ class CustomerMailer < ActionMailer::Base
 
   def stolen_notification_email(stolen_notification)
     @stolen_notification = stolen_notification
+
     mail(to: @stolen_notification.receiver_email,
          cc: ["bryan@bikeindex.org", "lily@bikeindex.org"],
          reply_to: @stolen_notification.sender.email,
-         from: "bryan@bikeindex.org", subject: @stolen_notification.display_subject)
+         from: "bryan@bikeindex.org",
+         subject: @stolen_notification.subject || default_i18n_subject)
+
     dates = stolen_notification.send_dates_parsed + [Time.current.to_i]
     stolen_notification.update_attribute :send_dates, dates
   end
@@ -76,8 +79,6 @@ class CustomerMailer < ActionMailer::Base
   def updated_terms_email(user)
     @user = user
     @_action_has_layout = false # layout is manually included here
-    mail(to: @user.email,
-         from: '"Lily Williams" <lily@bikeindex.org>',
-         subject: "Bike Index Terms and Privacy Policy Update")
+    mail(to: @user.email, from: '"Lily Williams" <lily@bikeindex.org>')
   end
 end

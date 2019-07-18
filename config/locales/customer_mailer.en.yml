@@ -12,3 +12,9 @@ en:
       subject: Sign in to Bike Index
     additional_email_confirmation:
       subject: Confirm your additional email
+    recovered_from_link:
+      subject: Your %{biketype} has been marked recovered!
+    stolen_notification_email:
+      subject: Stolen bike contact
+    updated_terms_email:
+      subject: Bike Index Terms and Privacy Policy Update
