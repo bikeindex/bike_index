@@ -60,7 +60,7 @@
     .control-group.special-select-single
       = f.label :primary_frame_color_id, "Frame color", class: "control-label"
       .controls
-        = select( :bike, :primary_frame_color_id, Color.select_options, required: true, prompt: "Choose color" )
+        = select(:bike, :primary_frame_color_id, Color.select_options, required: true, prompt: "Choose color")
     %a#add-secondary.optional-form-block{data: {target: "#secondary-color", toggle: "#rm-secondary"}}
       Add a color
     %a#rm-secondary.optional-form-block.rm-block.currently-hidden{data: {target: "#secondary-color", toggle: "#add-secondary"}}
@@ -70,7 +70,7 @@
         %label.control-label
           Secondary color
         .controls
-          = select( :bike, :secondary_frame_color_id, Color.select_options, prompt: "Choose color" )
+          = select(:bike, :secondary_frame_color_id, Color.select_options, prompt: "Choose color")
       %a#add-tertiary.optional-form-block{data: {target: "#tertiary-color", toggle: "#rm-tertiary"}}
         Add a color
       %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{data: {target: "#tertiary-color", toggle: "#add-tertiary"}}
@@ -80,7 +80,7 @@
         %label.control-label
           Third color
         .controls.special-select-single
-          = select( :bike, :tertiary_frame_color_id, Color.select_options, prompt: "Choose color" )
+          = select(:bike, :tertiary_frame_color_id, Color.select_options, prompt: "Choose color")
 
   #stolen_fields_container
     #stolen_fields
