@@ -73,7 +73,7 @@ class CustomerMailer < ActionMailer::Base
     @recovering_user = stolen_record.recovering_user
     mail(to: [@bike.owner_email],
          from: "bryan@bikeindex.org",
-         subject: "Your #{@biketype} has been marked recovered!")
+         subject: default_i18n_subject(biketype: @biketype))
   end
 
   def updated_terms_email(user)
