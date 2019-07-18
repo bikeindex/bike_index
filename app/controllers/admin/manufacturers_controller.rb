@@ -22,7 +22,7 @@ class Admin::ManufacturersController < Admin::BaseController
     if @manufacturer.update_attributes(permitted_parameters)
       flash[:success] = "Manufacturer Saved!"
       expire_fragment "header_search"
-      AutocompleteLoaderWorker.perform_async("load_manufacturers")
+      AutocompleteLoaderWorker.perform_async("reset")
       redirect_to admin_manufacturer_url(@manufacturer)
     else
       render action: :edit
@@ -34,7 +34,7 @@ class Admin::ManufacturersController < Admin::BaseController
     if @manufacturer.save
       flash[:success] = "Manufacturer Created!"
       expire_fragment "header_search"
-      AutocompleteLoaderWorker.perform_async("load_manufacturers")
+      AutocompleteLoaderWorker.perform_async("reset")
       redirect_to admin_manufacturer_url(@manufacturer)
     else
       render action: :new
