@@ -27,3 +27,9 @@ footer.primary-footer {
 @import '@uppy/core/dist/style.css';
 @import '@uppy/dashboard/dist/style.css';
 @import '@uppy/progress-bar/dist/style.css';
+// Hide uppy file upload button because it's not needed
+.uppy {
+  .uppy-FileInput-btn {
+    display: none;
+  }
+}

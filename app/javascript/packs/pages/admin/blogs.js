@@ -3,8 +3,6 @@ import log from "../../utils/log";
 // required for uppy file upload
 import 'es6-promise/auto'
 import 'whatwg-fetch'
-import 'es6-promise/auto'
-import 'whatwg-fetch'
 require('@uppy/core/dist/style.css')
 require('@uppy/dashboard/dist/style.css')
 window.Uppy = require('@uppy/core')
@@ -24,7 +22,6 @@ function BinxAdminBlogs() {
       this.editDate()
       this.uppyFileUpload();
       this.setIndexImage();
-      this.listicleEdit();
     },
 
     editDate() {
@@ -69,7 +66,10 @@ function BinxAdminBlogs() {
     },
 
     setIndexImage(e) {
-      return $('#blog_index_image_id').val($(e.target).val());
+      $('.index-image-select input').on("change", e => {
+        e.preventDefault();
+         return $('#blog_index_image_id').val($(e.target).val());
+      })
     },
   };
 }
