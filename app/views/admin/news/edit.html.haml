@@ -24,7 +24,7 @@
 = form_for [:admin, @blog], :url => url do |f|
   - if @blog.errors.any?
     = render partial: "/shared/errors", locals: { name: "Blog", obj: @blog }
-  = f.hidden_field :index_image_id
+
   - if @blog.is_listicle
     = render partial: "listicle_form", locals: { f: f }
   - else
@@ -79,6 +79,7 @@
               %label
                 <input type="radio" name="index_image_id" value="0" class="index_image_0">
                 No primary image
+              = f.hidden_field :index_image_id
       .row.mt-4
         .col-md-6
           .form-group

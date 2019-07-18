@@ -22,6 +22,8 @@ function BinxAdminBlogs() {
       this.editDate()
       this.uppyFileUpload();
       this.setIndexImage();
+      this.setIndex();
+      this.noPrimaryPhotoToggle();
     },
 
     editDate() {
@@ -65,10 +67,27 @@ function BinxAdminBlogs() {
       })
     },
 
+    noPrimaryPhotoToggle() {
+      const $noPrimaryBox = $(".index_image_0")
+      $noPrimaryBox.on("change", e => {
+        if($noPrimaryBox.prop("checked")) {
+          $(".index-image-select input").prop("checked", false)
+        }
+      })
+    },
+
+    setIndex(){
+      const index_image = $('#blog_index_image_id').val()
+      return $("li#" + index_image).find($("input")).prop("checked", true)
+    },
+
     setIndexImage(e) {
       $('.index-image-select input').on("change", e => {
         e.preventDefault();
-         return $('#blog_index_image_id').val($(e.target).val());
+        if ($('#blog_index_image_id').val != 0) {
+          $('#blog_index_image_id').val($(e.target).val());
+          $(".index_image_0").prop("checked", false)
+        }
       })
     },
   };
