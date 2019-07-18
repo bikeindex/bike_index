@@ -47,4 +47,35 @@ RSpec.describe Color, type: :model do
       end
     end
   end
+
+  describe "#select_options" do
+    it "returns an array of arrays as expected by the rails select helper" do
+      FactoryBot.create_list(:color, 4)
+      options = Color.select_options
+      expect(options).to be_an_instance_of(Array)
+      expect(options.length).to eq(4)
+
+      expect(options).to all(be_an_instance_of(Array))
+      expect(options.map(&:length).uniq).to eq([2])
+    end
+
+    it "localizes as needed" do
+      I18n.with_locale(:nl) do
+        black = FactoryBot.create(:color, name: :black)
+        blue = FactoryBot.create(:color, name: :blue)
+
+        options = Color.select_options
+
+        localized_black = options.first
+        expect(localized_black.first).to be_an_instance_of(String)
+        expect(localized_black.first).to_not eq(black.name)
+        expect(localized_black.last).to eq(black.id)
+
+        localized_blue = options.last
+        expect(localized_blue.first).to be_an_instance_of(String)
+        expect(localized_blue.first).to_not eq(blue.name)
+        expect(localized_blue.last).to eq(blue.id)
+      end
+    end
+  end
 end
