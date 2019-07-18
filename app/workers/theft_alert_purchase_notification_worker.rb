@@ -1,7 +1,5 @@
-class TheftAlertPurchaseNotificationWorker
-  include Sidekiq::Worker
+class TheftAlertPurchaseNotificationWorker < ApplicationWorker
   sidekiq_options queue: "notify"
-  sidekiq_options backtrace: true
 
   def perform(theft_alert_id)
     theft_alert = TheftAlert.find(theft_alert_id)

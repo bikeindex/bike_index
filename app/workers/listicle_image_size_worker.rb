@@ -1,7 +1,5 @@
-class ListicleImageSizeWorker
-  include Sidekiq::Worker
+class ListicleImageSizeWorker < ApplicationWorker
   sidekiq_options queue: "carrierwave"
-  sidekiq_options backtrace: true
 
   def perform(id)
     listicle = Listicle.find(id)

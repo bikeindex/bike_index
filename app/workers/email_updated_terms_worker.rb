@@ -1,7 +1,6 @@
-class EmailUpdatedTermsWorker
-  include Sidekiq::Worker
+class EmailUpdatedTermsWorker < ApplicationWorker
+
   sidekiq_options queue: "low_priority"
-  sidekiq_options backtrace: true
   sidekiq_options retry: false
 
   def perform

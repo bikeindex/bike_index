@@ -1,6 +1,6 @@
-class EmailStolenNotificationWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "notify", backtrace: true
+class EmailStolenNotificationWorker < ApplicationWorker
+
+  sidekiq_options queue: "notify"
 
   def perform(stolen_notification_id)
     stolen_notification = StolenNotification.find(stolen_notification_id)

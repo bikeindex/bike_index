@@ -1,7 +1,6 @@
-class EmailMagicLoginLinkWorker
-  include Sidekiq::Worker
+class EmailMagicLoginLinkWorker < ApplicationWorker
+
   sidekiq_options queue: "notify"
-  sidekiq_options backtrace: true
 
   def perform(user_id)
     user = User.find(user_id)

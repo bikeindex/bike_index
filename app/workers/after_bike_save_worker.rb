@@ -1,9 +1,9 @@
 # This will replace WebhookRunner - which is brittle and not flexible enough for what I'm looking for now
 # I need to refactor that, but I don't want to right now because I don't want to break existing stuff yet
 
-class AfterBikeSaveWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "low_priority", backtrace: true, retry: false
+class AfterBikeSaveWorker < ApplicationWorker
+  sidekiq_options retry: false
+
   POST_URL = ENV["BIKE_WEBHOOK_URL"]
   AUTH_TOKEN = ENV["BIKE_WEBHOOK_AUTH_TOKEN"]
 
