@@ -19,9 +19,8 @@ data:
   # Locale files or `File.find` patterns where translations are read from:
   read:
     ## Default:
-    # - config/locales/%{locale}.yml
-    ## More files:
-    # - config/locales/**/*.%{locale}.yml
+    - config/locales/%{locale}.yml
+    - config/locales/**/*.%{locale}.yml
 
   # Locale files to write new keys to, based on a list of key pattern => file
   # rules. Matched from top to bottom:
@@ -29,6 +28,7 @@ data:
   write:
     ## For example, write devise and simple form keys to their respective files:
     - ['{doorkeeper}.*', 'config/locales/\1.%{locale}.yml']
+    - ['{mailer}.*', 'config/locales/\1.%{locale}.yml']
     ## Catch-all default:
     # - config/locales/%{locale}.yml
 
@@ -107,7 +107,7 @@ ignore_unused:
 - 'activerecord.attributes.*'
 - 'activerecord.enums.*'
 - 'activerecord.select_options.*'
-- '{devise,kaminari,will_paginate}.*'
+- '{devise,kaminari,will_paginate,doorkeeper,gflash}.*'
 - 'simple_form.{yes,no}'
 - 'simple_form.{placeholders,hints,labels}.*'
 - 'simple_form.{error_notification,required}.:'
