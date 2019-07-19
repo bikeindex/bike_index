@@ -198,6 +198,7 @@ class User < ActiveRecord::Base
   end
 
   def update_last_login(ip_address)
+    pp save! unless id.present? # throw an error that shows why the user isn't created
     update_columns(last_login_at: Time.current, last_login_ip: ip_address)
   end
 
