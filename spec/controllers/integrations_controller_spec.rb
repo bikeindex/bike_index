@@ -48,6 +48,8 @@ RSpec.describe IntegrationsController, type: :controller do
         expect(response.code).to eq("302")
         user = User.last
         expect(User.from_auth(cookies.signed[:auth])).to eq(user)
+        expect(user.integrations.count).to eq 1
+        expect(user.integrations.first.provider_name).to eq "facebook"
       end
     end
 
