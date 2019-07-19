@@ -64,7 +64,8 @@ class ApplicationController < ActionController::Base
   end
 
   def requested_locale
-    locale_from_request_params ||
+    @requested_locale ||=
+      locale_from_request_params ||
       current_user&.preferred_language.presence ||
       locale_from_request_header ||
       I18n.default_locale
@@ -76,9 +77,13 @@ class ApplicationController < ActionController::Base
     end
 
     if controller_namespace == "admin"
-      I18n.with_locale(I18n.default_locale) { yield }
-    else
-      I18n.with_locale(requested_locale) { yield }
+      return I18n.with_locale(I18n.default_locale) { yield }
     end
+
+    if current_user&.preferred_language != requested_locale
+      current_user&.update_attributes(preferred_language: requested_locale)
+    end
+
+    I18n.with_locale(requested_locale) { yield }
   end
 end

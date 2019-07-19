@@ -7,36 +7,55 @@ class CustomerMailer < ActionMailer::Base
 
   def welcome_email(user)
     @user = user
-    mail(to: @user.email)
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(to: @user.email)
+    end
   end
 
   def confirmation_email(user)
     @user = user
     @partner = @user.partner_sign_up
-    mail(to: @user.email)
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(to: @user.email)
+    end
   end
 
   def password_reset_email(user)
     @user = user
     @url = password_reset_form_users_url(token: @user.password_reset_token)
-    mail(to: @user.email)
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(to: @user.email)
+    end
   end
 
   def magic_login_link_email(user)
     @user = user
     @url = magic_link_session_url(token: @user.magic_link_token)
-    mail(to: @user.email)
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(to: @user.email)
+    end
   end
 
   def additional_email_confirmation(user_email)
     @user_email = user_email
     @user = @user_email.user
-    mail(to: @user_email.email)
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(to: @user_email.email)
+    end
   end
 
   def invoice_email(payment)
     @payment = payment
-    mail(to: @payment.email)
+    @user = payment.user
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(to: @payment.email)
+    end
   end
 
   def stolen_bike_alert_email(customer_contact)
@@ -44,21 +63,44 @@ class CustomerMailer < ActionMailer::Base
     @info = customer_contact.info_hash
     @bike = customer_contact.bike
     @biketype = @bike.cycle_type_name&.downcase
-    mail(to: @customer_contact.user_email, subject: @customer_contact.title)
+    @user = @customer_contact.user
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(
+        to: @customer_contact.user_email,
+        subject: @customer_contact.title,
+      )
+    end
   end
 
   def admin_contact_stolen_email(customer_contact)
     @customer_contact = customer_contact
-    mail(to: @customer_contact.user_email, sender: @customer_contact.creator_email,
-         reply_to: @customer_contact.creator_email, subject: @customer_contact.title)
+    @user = customer_contact.user
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(
+        to: @customer_contact.user_email,
+        sender: @customer_contact.creator_email,
+        reply_to: @customer_contact.creator_email,
+        subject: @customer_contact.title,
+      )
+    end
   end
 
   def stolen_notification_email(stolen_notification)
     @stolen_notification = stolen_notification
-    mail(to: @stolen_notification.receiver_email,
-         cc: ["bryan@bikeindex.org", "lily@bikeindex.org"],
-         reply_to: @stolen_notification.sender.email,
-         from: "bryan@bikeindex.org", subject: @stolen_notification.display_subject)
+    @user = stolen_notification.receiver
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(
+        to: @stolen_notification.receiver_email,
+        cc: ["bryan@bikeindex.org", "lily@bikeindex.org"],
+        reply_to: @stolen_notification.sender.email,
+        from: "bryan@bikeindex.org",
+        subject: @stolen_notification.subject || default_i18n_subject,
+      )
+    end
+
     dates = stolen_notification.send_dates_parsed + [Time.current.to_i]
     stolen_notification.update_attribute :send_dates, dates
   end
@@ -68,16 +110,22 @@ class CustomerMailer < ActionMailer::Base
     @bike = stolen_record.bike
     @biketype = @bike.cycle_type_name&.downcase
     @recovering_user = stolen_record.recovering_user
-    mail(to: [@bike.owner_email],
-         from: "bryan@bikeindex.org",
-         subject: "Your #{@biketype} has been marked recovered!")
+
+    I18n.with_locale(@bike.owner&.preferred_language) do
+      mail(
+        to: [@bike.owner_email],
+        from: "bryan@bikeindex.org",
+        subject: default_i18n_subject(biketype: @biketype),
+      )
+    end
   end
 
   def updated_terms_email(user)
     @user = user
     @_action_has_layout = false # layout is manually included here
-    mail(to: @user.email,
-         from: '"Lily Williams" <lily@bikeindex.org>',
-         subject: "Bike Index Terms and Privacy Policy Update")
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(to: @user.email, from: '"Lily Williams" <lily@bikeindex.org>')
+    end
   end
 end

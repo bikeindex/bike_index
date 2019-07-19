@@ -23,14 +23,6 @@ class StolenNotification < ActiveRecord::Base
     !bike.stolen? && !bike.contact_owner?(sender)
   end
 
-  def default_subject
-    "Stolen bike contact"
-  end
-
-  def display_subject
-    subject || default_subject
-  end
-
   def send_dates_parsed # Required for compatibility with rails 3 & 4
     return [] unless send_dates
     send_dates.is_a?(String) ? JSON.parse(send_dates) : send_dates

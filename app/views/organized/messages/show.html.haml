@@ -33,7 +33,9 @@
 
     %tr
       %td= t(".subject")
-      %td= @organization_message.subject
+      - org_name = @organization_message.organization.short_name
+      - mnfg_name = @organization_message.bike.mnfg_name
+      %td= t("organized_mailer.custom_message.subject", org_name: org_name, mnfg_name: mnfg_name)
 
     %tr
       %td= t(".additional_text")

@@ -294,10 +294,8 @@ en:
         authorized_tokens: Authorized tokens
         can_send_stolen_notifications: Can send stolen notifications
         is_internal: Is internal
-        name: Name
         owner: :activerecord.models.owner
         owner_type: Owner type
-        redirect_uri: Redirect URI
         scopes: Scopes
         secret: Secret
         uid: Uid
@@ -1497,9 +1495,6 @@ en:
       month: Month
       second: Seconds
       year: Year
-  doorkeeper:
-    scopes:
-      public: Authenticate with you, view public information
   errors:
     bad_request:
       explanation: We're sorry, we didn't understand what you just asked. Why don't

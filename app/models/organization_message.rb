@@ -44,8 +44,4 @@ class OrganizationMessage < ActiveRecord::Base
     # Enable skipping so we can generate sample messages
     EmailOrganizationMessageWorker.perform_async(id) unless ENV["SKIP_ORGANIZED_MESSAGE_SEND"]
   end
-
-  def subject
-    "#{organization.short_name} - the location of your #{bike.mnfg_name}"
-  end
 end
