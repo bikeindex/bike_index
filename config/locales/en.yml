@@ -1396,6 +1396,35 @@ en:
         report_recovered: Mark this Bike Recovered
         report_stolen: Report Stolen or Missing
         theft_details: Theft details
+  customer_mailer:
+    additional_email_confirmation:
+      subject: Confirm your additional email
+      html:
+        please_confirm_your_additional_email: Please confirm your additional email
+        user_would_like_to_merge: "%{name} would like to merge this email into their account (%{email})."
+        verify_email: Verify email
+        click_verify_email_html: Click the <em>Verify email</em> button to merge these accounts on BikeIndex.org!
+        if_you_didnt_request_this: If you didn't request this merge please reply to this email and tell us.
+      text:
+        user_would_like_to_merge: "** %{name} would like to merge this email into their account **"
+        go_to_this_url_if_you_want_to_confirm: 'Go to this url if you want to confirm this email:'
+        if_you_didnt_request_this_merge: If you didn't request this merge please reply to this email and tell us.
+    confirmation_email:
+      subject: Please confirm your Bike Index email!
+    invoice_email:
+      subject: Thank you for supporting Bike Index!
+    magic_login_link_email:
+      subject: Sign in to Bike Index
+    password_reset_email:
+      subject: Instructions to reset your password
+    recovered_from_link:
+      subject: Your %{biketype} has been marked recovered!
+    stolen_notification_email:
+      subject: Stolen bike contact
+    updated_terms_email:
+      subject: Bike Index Terms and Privacy Policy Update
+    welcome_email:
+      subject: Welcome to Bike Index!
   date:
     abbr_day_names:
     - Sun
@@ -3344,6 +3373,130 @@ en:
         send_invitation: Send invitation
         user: user
         you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
+  organized_mailer:
+    custom_message:
+      subject: "%{org_name} - the location of your %{mnfg_name}"
+    finished_owned_registration:
+      subject: "%{organization_name} Bike Index registration successful"
+    finished_registration:
+      html:
+        a_correctly_locked_bike: >-
+          A correctly locked bike. The frame is locked to the bike rack and both wheels
+          are secured.
+        a_donation_will_prioritize_html: >-
+          A donation will %{prioritize_link} and help us get your bike back to you.
+          We're a 501(c)(3) nonprofit and depend on donations to operate
+        before_locking_check: Before locking, check that what you are locking to can't
+          be easily removed.
+        bike_register_with_bike_index: Congrats on registering your %{biketype} with
+          Bike Index
+        bike_register_with_bike_index_and_org: Congrats on registering your %{biketype}
+          with Bike Index and %{org_name}
+        biketype_thieves_are_jerks: "%{biketype} thieves are jerks."
+        cable_locks_should_never_be_used: Cable locks should never be used as a primary
+          means of locking a bike in a city.
+        claim_the_biketype: Claim the %{biketype}
+        confirm_this_biketype: Confirm this %{biketype}
+        correctly_locking_a_bike: Correctly locking a bike
+        donating: donating
+        give_us_a_heads_up: Give us a heads up
+        hopefully_you_find_the_bike_html: Hopefully you find the %{biketype} soon.
+        hopefully_you_find_the_owner_html: Hopefully you find the owner soon. %{edit_bike_link}
+          when you do!
+        mark_recovered_link_html: "%{mark_recovered_link} when you do!"
+        mark_your_bike_recovered: Mark your bike recovered
+        org_added_a_bike_html: "<strong>%{org_name}</strong> added a %{bike_type}
+          on Bike Index for you"
+        org_sent_a_bike_html: "<strong>%{org_name}</strong> sent you a %{bike_type}
+          on Bike Index"
+        pink_power_ulocks_tm: Pink Power U-Locks are a registered trademark of Bike
+          Index, NFP
+        please_consider_donating_html: Please consider %{donating_link} to Bike Index!
+        prioritize_your_listing: prioritize your listing
+        protect_your_bike_by_following_these_lock: Protect your bike by following
+          these locking guidelines.
+        protecting_your_bike_here: protecting your bike here
+        read_more_about_protecting_html: Read more about %{link}.
+        recovered_biketype: recovered/found %{biketype}
+        secure_both_wheels_either_with_two_ulocks: >-
+          Secure both wheels - either with two U-locks, or one U-lock and one heavy
+          duty cable.
+        sign_up_on_bikeindexorg_to_claim_your_bik: >-
+          Sign up on BikeIndex.org to claim your %{biketype} and edit it, upload photos
+          and make sure you never lose track of your trusty steed!
+        stolen_biketype: stolen %{biketype}
+        thanks_for_adding_this_biketype_you_found: Thanks for adding this %{biketype}
+          you found to Bike Index
+        use_a_ulock: Use a U-Lock.
+        welcome_to_bike_index: Welcome to Bike Index
+        were_sorry_your_biketype_was_stolen: We're sorry your %{biketype} was stolen.
+        you_added_a_bike_type_on_bike_index: You added a %{bike_type} on Bike Index
+        youre_almost_done_registering: You're almost done registering
+      subject: Confirm your %{organization_name} Bike Index registration
+      text:
+        before_locking_check: "- Before locking, check that what you are locking to
+          can't be easily removed."
+        bike_colors: 'Color(s): %{frame_colors}'
+        bike_date: 'Date: %{date}'
+        bike_found_at: 'Found: %{country}'
+        bike_make: 'Make: %{bike_mnfg_name}'
+        bike_serial: 'Serial: %{bike_serial_number}'
+        bike_stolen_from: 'Stolen from: %{address}'
+        claim_the_biketype_at_this_url: 'Claim the %{biketype} at this URL: %{bike_url}'
+        color_may_be_incorrect: Color may be incorrect. Claim your bike and update
+          it if necessary!
+        edit_it_upload_photos: Edit it, upload photos and make sure you never lose
+          track of your trusty steed!
+        give_us_a_heads_up_when_you_do: Give us a heads up when you do (%{bike_edit_url})
+        hopefully_you_find_the_biketype_soon: Hopefully you find the %{biketype} soon.
+        hopefully_you_find_the_owner_soon: Hopefully you find the owner soon.
+        org_added_a_bike: "%{org_name} added a %{bike_type} on Bike Index for you"
+        org_sent_a_bike: "%{org_name} sent you a %{bike_type} on Bike Index"
+        protect_your_bike: Protect your bike by following these locking guidelines.
+        read_more_here: 'Read more here: %{protect_your_bike_url}'
+        recovered_biketype: recovered/found %{biketype}
+        secure_both_wheels: >-
+          - Secure both wheels - either with two U-locks, or one U-lock and one heavy
+          duty cable.
+        sign_up_on_bikeindex_to_claim: Sign up on BikeIndex.org to claim your %{biketype}
+        stolen_biketype: stolen %{biketype}
+        use_a_ulock: >-
+          - *Use a U-Lock.* Cable locks should never be used as a primary means of
+          locking a bike in a city.
+        you_added_a_bike_type_on_bike_index: You added a %{bike_type} on Bike Index
+    finished_stolen_registration:
+      subject: Confirm your %{organization_name} stolen %{bike_type} on Bike Index
+    partial_registration:
+      subject: Finish your %{organization_name} Bike Index registration!
+      html:
+        youre_almost_done: You’re Almost Done!
+        just_a_few_steps_away_html: You're just a few steps away from registering your <strong>%{color_and_brand}</strong> on the world's most comprehensive bike registry!
+        click_below_to_complete_your_registration: Click below to complete your registration
+        finish_it: Finish it!
+      text:
+        youre_almost_done: You're Almost Done!
+        youre_just_a_few_steps_away_from_register: You're just a few steps away from registering your bike on the world's most comprehensive bike registry.
+        go_to_the_following_url_to_finish: 'Go to the following URL to finish:'
+    geolocated_message:
+      html:
+        your_bike: Your %{bike_title}
+        is_located_at_html: 'Is located at: <strong>%{address}</strong>'
+        sent_by: 'Sent by: %{sender_name} at %{org_name}'
+      text:
+        sent_you: "%{org_name} sent you a message about your %{bike_title}"
+        your_bike_is_at: 'Your %{bike} is at: %{address}'
+    organization_invitation:
+      subject: Join %{organization_name} on Bike Index
+      html:
+        hello_name: Hello %{name},
+        welcome_to_bike_index: Welcome to Bike Index
+        you_are_a_member: "%{sender_name} has indicated that you are a member of %{org_name}."
+        join_org: Join %{org_name}
+      text:
+        hello_welcome_to_bike_index: Hello, welcome to Bike Index
+        hello: Hello
+        you_are_a_member: "%{sender_name} has indicated that you are a member of %{org_name}."
+        sign_up_or_sign_in: Sign up or sign in to BikeIndex.org to join %{org_name}!
   plan_features:
     add_form_fields: Add specific form fields to your landing page
     add_logos: Add logos and text to Bike Index emails

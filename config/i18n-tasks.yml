@@ -28,9 +28,7 @@ data:
   write:
     ## For example, write devise and simple form keys to their respective files:
     - ['{doorkeeper}.*', 'config/locales/\1.%{locale}.yml']
-    - ['{mailer}.*', 'config/locales/\1.%{locale}.yml']
-    ## Catch-all default:
-    # - config/locales/%{locale}.yml
+    - config/locales/%{locale}.yml
 
   # External locale data (e.g. gems).
   # This data is not considered unused and is never written to.

@@ -1410,6 +1410,25 @@ nl:
         report_recovered: TRME Mark this Bike Recovered
         report_stolen: TRME Report Stolen or Missing
         theft_details: TRME Theft details
+  customer_mailer:
+    additional_email_confirmation:
+      subject: TRME Confirm your additional email
+    confirmation_email:
+      subject: TRME Please confirm your Bike Index email!
+    invoice_email:
+      subject: TRME Thank you for supporting Bike Index!
+    magic_login_link_email:
+      subject: TRME Sign in to Bike Index
+    password_reset_email:
+      subject: TRME Instructions to reset your password
+    recovered_from_link:
+      subject: TRME Your %{biketype} has been marked recovered!
+    stolen_notification_email:
+      subject: TRME Stolen bike contact
+    updated_terms_email:
+      subject: TRME Bike Index Terms and Privacy Policy Update
+    welcome_email:
+      subject: TRME Welcome to Bike Index!
   date:
     abbr_day_names: TRME ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     abbr_month_names: >-
@@ -3338,6 +3357,116 @@ nl:
         send_invitation: TRME Send invitation
         user: TRME user
         you_have_invited_html: 'TRME You have invited: <strong>%{users_count}</strong>'
+  organized_mailer:
+    custom_message:
+      subject: TRME %{org_name} - the location of your %{mnfg_name}
+    finished_owned_registration:
+      subject: TRME %{organization_name}Bike Index registration successful
+    finished_registration:
+      html:
+        a_correctly_locked_bike: >-
+          'TRME A correctly locked bike. The frame is locked to the bike rack and
+          both wheels are secured.'
+        a_donation_will_prioritize_html: >-
+          'TRME A donation will %{prioritize_link} and help us get your bike back
+          to you. We're a 501(c)(3) nonprofit and depend on donations to operate'
+        before_locking_check: >-
+          'TRME Before locking, check that what you are locking to can't be easily
+          removed.'
+        bike_register_with_bike_index: "'TRME Congrats on registering your %{biketype}
+          with Bike Index'"
+        bike_register_with_bike_index_and_org: "'TRME Congrats on registering your
+          %{biketype} with Bike Index and %{org_name}'"
+        biketype_thieves_are_jerks: "'TRME %{biketype} thieves are jerks.'"
+        cable_locks_should_never_be_used: >-
+          'TRME Cable locks should never be used as a primary means of locking a bike
+          in a city.'
+        claim_the_biketype: "'TRME Claim the %{biketype}'"
+        confirm_this_biketype: "'TRME Confirm this %{biketype}'"
+        correctly_locking_a_bike: "'TRME Correctly locking a bike'"
+        donating: "'TRME donating'"
+        give_us_a_heads_up: "'TRME Give us a heads up'"
+        hopefully_you_find_the_bike_html: "'TRME Hopefully you find the %{biketype}
+          soon.'"
+        hopefully_you_find_the_owner_html: "'TRME Hopefully you find the owner soon.
+          %{edit_bike_link} when you do!'"
+        mark_recovered_link_html: "'TRME %{mark_recovered_link} when you do!'"
+        mark_your_bike_recovered: "'TRME Mark your bike recovered'"
+        org_added_a_bike_html: "'TRME <strong>%{org_name}</strong> added a %{bike_type}
+          on Bike Index for you'"
+        org_sent_a_bike_html: "'TRME <strong>%{org_name}</strong> sent you a %{bike_type}
+          on Bike Index'"
+        pink_power_ulocks_tm: "'TRME Pink Power U-Locks are a registered trademark
+          of Bike Index, NFP'"
+        please_consider_donating_html: "'TRME Please consider %{donating_link} to
+          Bike Index!'"
+        prioritize_your_listing: "'TRME prioritize your listing'"
+        protect_your_bike_by_following_these_lock: "'TRME Protect your bike by following
+          these locking guidelines.'"
+        protecting_your_bike_here: "'TRME protecting your bike here'"
+        read_more_about_protecting_html: "'TRME Read more about %{link}.'"
+        recovered_biketype: "'TRME recovered/found %{biketype}'"
+        secure_both_wheels_either_with_two_ulocks: >-
+          'TRME Secure both wheels - either with two U-locks, or one U-lock and one
+          heavy duty cable.'
+        sign_up_on_bikeindexorg_to_claim_your_bik: >-
+          'TRME Sign up on BikeIndex.org to claim your %{biketype} and edit it, upload
+          photos and make sure you never lose track of your trusty steed!'
+        stolen_biketype: "'TRME stolen %{biketype}'"
+        thanks_for_adding_this_biketype_you_found: "'TRME Thanks for adding this %{biketype}
+          you found to Bike Index'"
+        use_a_ulock: "'TRME Use a U-Lock.'"
+        welcome_to_bike_index: "'TRME Welcome to Bike Index'"
+        were_sorry_your_biketype_was_stolen: "'TRME We're sorry your %{biketype} was
+          stolen.'"
+        you_added_a_bike_type_on_bike_index: "'TRME You added a %{bike_type} on Bike
+          Index'"
+        youre_almost_done_registering: "'TRME You're almost done registering'"
+      subject: TRME Confirm your %{organization_name}Bike Index registration
+      text:
+        before_locking_check: >-
+          'TRME - Before locking, check that what you are locking to can't be easily
+          removed.'
+        bike_colors: "'TRME Color(s): %{frame_colors}'"
+        bike_date: "'TRME Date: %{date}'"
+        bike_found_at: "'TRME Found: %{country}'"
+        bike_make: "'TRME Make: %{bike_mnfg_name}'"
+        bike_serial: "'TRME Serial: %{bike_serial_number}'"
+        bike_stolen_from: "'TRME Stolen from: %{address}'"
+        claim_the_biketype_at_this_url: "'TRME Claim the %{biketype} at this URL:
+          %{bike_url}'"
+        color_may_be_incorrect: "'TRME Color may be incorrect. Claim your bike and
+          update it if necessary!'"
+        edit_it_upload_photos: >-
+          'TRME Edit it, upload photos and make sure you never lose track of your
+          trusty steed!'
+        give_us_a_heads_up_when_you_do: "'TRME Give us a heads up when you do (%{bike_edit_url})'"
+        hopefully_you_find_the_biketype_soon: "'TRME Hopefully you find the %{biketype}
+          soon.'"
+        hopefully_you_find_the_owner_soon: "'TRME Hopefully you find the owner soon.'"
+        org_added_a_bike: "'TRME %{org_name} added a %{bike_type} on Bike Index for
+          you'"
+        org_sent_a_bike: "'TRME %{org_name} sent you a %{bike_type} on Bike Index'"
+        protect_your_bike: "'TRME Protect your bike by following these locking guidelines.'"
+        read_more_here: "'TRME Read more here: %{protect_your_bike_url}'"
+        recovered_biketype: TRME recovered/found %{biketype}
+        secure_both_wheels: >-
+          'TRME - Secure both wheels - either with two U-locks, or one U-lock and
+          one heavy duty cable.'
+        sign_up_on_bikeindex_to_claim: "'TRME Sign up on BikeIndex.org to claim your
+          %{biketype}'"
+        stolen_biketype: "'TRME stolen %{biketype}'"
+        use_a_ulock: >-
+          'TRME - *Use a U-Lock.* Cable locks should never be used as a primary means
+          of locking a bike in a city.'
+        you_added_a_bike_type_on_bike_index: "'TRME You added a %{bike_type} on Bike
+          Index'"
+    finished_stolen_registration:
+      subject: TRME Confirm your %{organization_name}stolen %{bike_type}on Bike Index
+    organization_invitation:
+      subject: TRME Join %{organization_name}on Bike Index
+    partial_registration:
+      subject: TRME Finish your %{organization_name}Bike Index registration!
   plan_features:
     add_form_fields: TRME Add specific form fields to your landing page
     add_logos: TRME Add logos and text to Bike Index emails

@@ -1,0 +1,7 @@
+= t(".sent_you", org_name: @organization_message.organization.name, bike_title: @bike.title_string)
+
+
+= t(".your_bike_is_at", bike: @bike.type, address: @organization_message.address)
+
+
+= @organization_message.body
