@@ -67,6 +67,17 @@
     margin: 1em 0 0 1em;
   }
 
+  .side-by-side-blocks {
+    @extend .row;
+    margin-bottom: 20px;
+    img {
+      max-height: 300%; // Override the max height that is already there
+    }
+    & > div {
+      align-self: center !important;
+    }
+  }
+
   //________________________
   //
   // Listicles!
