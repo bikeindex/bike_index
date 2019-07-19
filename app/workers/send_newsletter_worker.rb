@@ -1,6 +1,5 @@
-class SendNewsletterWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "notify", backtrace: true, retry: false
+class SendNewsletterWorker < ApplicationWorker
+  sidekiq_options queue: "notify", retry: false
   API_KEY = ENV["SPARKPOST_API_KEY"]
 
   def client; @client ||= SimpleSpark::Client.new(api_key: API_KEY) end

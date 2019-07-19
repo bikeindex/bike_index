@@ -1,6 +1,6 @@
-class MergeAdditionalEmailWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "high_priority", backtrace: true
+class MergeAdditionalEmailWorker < ApplicationWorker
+
+  sidekiq_options queue: "high_priority"
 
   def perform(user_email_id)
     user_email = UserEmail.find(user_email_id)

@@ -1,7 +1,6 @@
 # Not called in the code, only called if manually expiring
-class UpdateAuthTokenWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "high_priority", backtrace: true
+class UpdateAuthTokenWorker < ApplicationWorker
+  sidekiq_options queue: "high_priority"
 
   def perform(id)
     user = User.find(id)

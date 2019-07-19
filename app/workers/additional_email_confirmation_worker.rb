@@ -1,7 +1,5 @@
-class AdditionalEmailConfirmationWorker
-  include Sidekiq::Worker
+class AdditionalEmailConfirmationWorker < ApplicationWorker
   sidekiq_options queue: "notify"
-  sidekiq_options backtrace: true
 
   def perform(user_email_id)
     user_email = UserEmail.find(user_email_id)

@@ -1,6 +1,5 @@
-class ExternalImageUrlStoreWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "carrierwave", backtrace: true
+class ExternalImageUrlStoreWorker < ApplicationWorker
+  sidekiq_options queue: "carrierwave"
 
   def perform(public_image_id)
     public_image = PublicImage.find(public_image_id)

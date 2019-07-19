@@ -1,6 +1,5 @@
-class ProcessMembershipWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "high_priority", backtrace: true
+class ProcessMembershipWorker < ApplicationWorker
+  sidekiq_options queue: "high_priority"
 
   def perform(membership_id, user_id = nil)
     membership = Membership.find(membership_id)

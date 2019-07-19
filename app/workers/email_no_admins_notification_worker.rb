@@ -1,7 +1,6 @@
-class EmailNoAdminsNotificationWorker
-  include Sidekiq::Worker
+class EmailNoAdminsNotificationWorker < ApplicationWorker
+
   sidekiq_options queue: "notify"
-  sidekiq_options backtrace: true
 
   def perform(organization_id)
     @organization = Organization.find(organization_id)
