@@ -1,0 +1,15 @@
+---
+nl:
+  organized_mailer:
+    custom_message:
+      subject: TRME %{org_name} - the location of your %{mnfg_name}
+    finished_owned_registration:
+      subject: TRME %{organization_name}Bike Index registration successful
+    finished_registration:
+      subject: TRME Confirm your %{organization_name}Bike Index registration
+    finished_stolen_registration:
+      subject: TRME Confirm your %{organization_name}stolen %{bike_type}on Bike Index
+    organization_invitation:
+      subject: TRME Join %{organization_name}on Bike Index
+    partial_registration:
+      subject: TRME Finish your %{organization_name}Bike Index registration!
