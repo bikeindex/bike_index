@@ -187,6 +187,7 @@ class UsersController < ApplicationController
                   :show_bikes, :show_phone, :my_bikes_link_target, :my_bikes_link_title, :password,
                   :password_confirmation, :preferred_language)
           .merge(sign_in_partner.present? ? { partner_data: { sign_up: sign_in_partner } } : {})
+          .merge({ preferred_language: I18n.locale })
   end
 
   def permitted_update_parameters
