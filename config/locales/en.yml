@@ -1362,7 +1362,7 @@ en:
       leads_online_url: https://bikeindex.org/news/bike-index-partners-with-leads-online
       list_bike_type_on_bike_index: List %{bike_type} on Bike Index
       location_where_the_theft_occurred: location where the theft occurred
-      premium_stolen_bike_alerts: Premium Stolen Bike Alerts
+      promoted_stolen_bike_alerts: Promoted Stolen Bike Alerts
       push_bike_info_to: Push bike info to
       push_bike_info_to_law_enforcement: >-
         Push bike info to law enforcement databases (Bike Index does this when you
@@ -1384,7 +1384,7 @@ en:
     bikes:
       edit:
         accessories: Accessories and Components
-        alert: Activate Premium Alert
+        alert: Activate Promoted Alert
         bike_details: Bike Details
         drivetrain: Wheels and Drivetrain
         groups: Groups and Organizations

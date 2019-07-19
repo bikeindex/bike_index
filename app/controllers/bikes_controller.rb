@@ -251,7 +251,7 @@ class BikesController < ApplicationController
       h[:theft_details] = translation(:recovery_details) if @bike.recovered?
       h[:theft_details] = translation(:theft_details) unless @bike.recovered?
       h[:publicize] = translation(:publicize)
-      h[:alert] = translation(:alert) if Flipper.enabled?(:premium_listings, current_user)
+      h[:alert] = translation(:alert)
       h[:report_recovered] = translation(:report_recovered) unless @bike.recovered?
     end
   end

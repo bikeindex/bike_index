@@ -946,7 +946,7 @@ RSpec.describe BikesController, type: :controller do
       {
         theft_details: "Theft details",
         publicize: "Share on Social Media",
-        alert: "Activate Premium Alert",
+        alert: "Activate Promoted Alert",
         report_recovered: "Mark this Bike Recovered",
       }
     end
@@ -1018,10 +1018,6 @@ RSpec.describe BikesController, type: :controller do
             end
           end
           context "stolen bike" do
-            before do
-              allow(Flipper).to receive(:enabled?).with(:premium_listings, user).and_return(true)
-            end
-
             it "renders with stolen as first template, different description" do
               bike.update_attribute(:stolen, true)
               bike.reload
@@ -1036,9 +1032,6 @@ RSpec.describe BikesController, type: :controller do
             end
           end
           context "recovered bike" do
-            before do
-              allow(Flipper).to receive(:enabled?).with(:premium_listings, user).and_return(true)
-            end
             it "renders with recovered as first template, different description" do
               bike.update_attributes(stolen: true, recovered: true)
               bike.reload
