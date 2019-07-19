@@ -187,5 +187,8 @@
   font-size: 12px;
   @include media-breakpoint-down(sm) {
     max-height: 100%;
+    .img-box{
+      text-align: center;
+    }
   }
 }

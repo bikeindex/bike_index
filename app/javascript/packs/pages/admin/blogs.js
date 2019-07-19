@@ -65,18 +65,28 @@ function BinxAdminBlogs() {
         submitOnSuccess: false,
         triggerUploadOnSubmit: false
       })
+      uppy.on('upload-success', (file, response) => {
+        const div = document.createElement('div')
+        const list = document.querySelector("ul#public_images")
+        div.html("<%= j render partial: 'admin/news/public_image, locals: {public_image:" + response.body.public_image + "}%>")
+        const img = new Image()
+        img.alt = file.id
+        img.src = response.body.public_image.image.url
+        img.size = 100
+        list.append(div)
+      })
     },
 
     noPrimaryPhotoToggle() {
       const $noPrimaryBox = $(".index_image_0")
       $noPrimaryBox.on("change", e => {
-        if($noPrimaryBox.prop("checked")) {
+        if ($noPrimaryBox.prop("checked")) {
           $(".index-image-select input").prop("checked", false)
         }
       })
     },
 
-    setIndex(){
+    setIndex() {
       const index_image = $('#blog_index_image_id').val()
       return $("li#" + index_image).find($("input")).prop("checked", true)
     },

@@ -14,7 +14,8 @@
           %textarea.form-control
             \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
       .col-md-2.col-sm-12
-        = image_tag(public_image.image_url(:small)) if public_image.image?
+        .img-box
+          = image_tag(public_image.image_url(:small)) if public_image.image?
     %hr
     .row.mt-2
       .col-md-2

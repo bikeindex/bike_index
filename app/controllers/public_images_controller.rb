@@ -25,7 +25,7 @@ class PublicImagesController < ApplicationController
         @public_image.imageable = current_organization
       end
       @public_image.save
-      render json: { success: true} and return
+      render json: { public_image: @public_image} and return
     end
     flash[:error] = "Whoops! We can't let you create that image."
     redirect_to @public_image.present? ? @public_image.imageable : user_root_url
