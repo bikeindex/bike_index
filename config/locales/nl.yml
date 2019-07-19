@@ -1374,7 +1374,7 @@ nl:
       leads_online_url: TRME https://bikeindex.org/news/bike-index-partners-with-leads-online
       list_bike_type_on_bike_index: TRME List %{bike_type} on Bike Index
       location_where_the_theft_occurred: TRME location where the theft occurred
-      premium_stolen_bike_alerts: TRME Premium Stolen Bike Alerts
+      promoted_stolen_bike_alerts: TRME Promoted Stolen Bike Alerts
       push_bike_info_to: TRME Push bike info to
       push_bike_info_to_law_enforcement: >-
         TRME Push bike info to law enforcement databases (Bike Index does this when
@@ -1398,7 +1398,7 @@ nl:
     bikes:
       edit:
         accessories: TRME Accessories and Components
-        alert: TRME Activate Premium Alert
+        alert: TRME Activate Promoted Alert
         bike_details: TRME Bike Details
         drivetrain: TRME Wheels and Drivetrain
         groups: TRME Groups and Organizations
