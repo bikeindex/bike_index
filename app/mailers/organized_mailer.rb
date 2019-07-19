@@ -10,11 +10,19 @@ class OrganizedMailer < ActionMailer::Base
   def partial_registration(b_param)
     @b_param = b_param
     @organization = @b_param.creation_organization
-    mail(reply_to: reply_to, to: @b_param.owner_email, subject: default_i18n_subject(default_subject_vars))
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(
+        reply_to: reply_to,
+        to: @b_param.owner_email,
+        subject: default_i18n_subject(default_subject_vars),
+      )
+    end
   end
 
   def finished_registration(ownership)
     @ownership = ownership
+    @user = ownership.owner
     @bike = Bike.unscoped.find(@ownership.bike_id)
     @vars = {
       new_bike: (@bike.ownerships.count == 1),
@@ -25,7 +33,10 @@ class OrganizedMailer < ActionMailer::Base
     @organization = @bike.creation_organization if @bike.creation_organization.present? && @vars[:new_bike]
     @vars[:donation_message] = @bike.stolen? && !(@organization && !@organization.is_paid?)
     subject = t("organized_mailer.finished#{finished_registration_type}_registration.subject", default_subject_vars)
-    mail(reply_to: reply_to, to: @vars[:email], subject: subject)
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(reply_to: reply_to, to: @vars[:email], subject: subject)
+    end
   end
 
   def organization_invitation(membership)
@@ -34,7 +45,10 @@ class OrganizedMailer < ActionMailer::Base
     @sender = @membership.sender
     @vars = { email: @membership.invited_email }
     @new_user = User.fuzzy_email_find(@vars[:email]).present?
-    mail(reply_to: reply_to, to: @vars[:email], subject: default_i18n_subject(default_subject_vars))
+
+    I18n.with_locale(@sender&.preferred_language) do
+      mail(reply_to: reply_to, to: @vars[:email], subject: default_i18n_subject(default_subject_vars))
+    end
   end
 
   def custom_message(organization_message)
@@ -48,11 +62,13 @@ class OrganizedMailer < ActionMailer::Base
       mnfg_name: @bike.mnfg_name,
     )
 
-    mail(reply_to: @organization_message.sender.email,
-         to: @organization_message.email,
-         subject: subject) do |format|
-      format.html { render "geolocated_message" }
-      format.text { render "geolocated_message_text" }
+    I18n.with_locale(@sender&.preferred_language) do
+      mail(reply_to: @organization_message.sender.email,
+           to: @organization_message.email,
+           subject: subject) do |format|
+        format.html { render "geolocated_message" }
+        format.text { render "geolocated_message_text" }
+      end
     end
   end
 
