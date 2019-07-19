@@ -10,3 +10,5 @@ en:
       subject: "%{organization_name}Bike Index registration successful"
     organization_invitation:
       subject: Join %{organization_name}on Bike Index
+    custom_message:
+      subject: '%{org_name} - the location of your %{mnfg_name}'

@@ -43,7 +43,14 @@ class OrganizedMailer < ActionMailer::Base
     @bike = @organization_message.bike
     @sender = @organization_message.sender
 
-    mail(reply_to: @organization_message.sender.email, to: @organization_message.email, subject: @organization_message.subject) do |format|
+    subject = default_i18n_subject(
+      org_name: @organization.short_name,
+      mnfg_name: @bike.mnfg_name,
+    )
+
+    mail(reply_to: @organization_message.sender.email,
+         to: @organization_message.email,
+         subject: subject) do |format|
       format.html { render "geolocated_message" }
       format.text { render "geolocated_message_text" }
     end
