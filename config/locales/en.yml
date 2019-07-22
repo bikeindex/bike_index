@@ -3597,7 +3597,7 @@ en:
     custom_message:
       subject: "%{org_name} - the location of your %{mnfg_name}"
     finished_owned_registration:
-      subject: "%{organization_name} Bike Index registration successful"
+      subject: "%{organization_name}Bike Index registration successful"
     finished_registration:
       html:
         a_correctly_locked_bike: >-
@@ -3652,7 +3652,7 @@ en:
         were_sorry_your_biketype_was_stolen: We're sorry your %{biketype} was stolen.
         you_added_a_bike_type_on_bike_index: You added a %{bike_type} on Bike Index
         youre_almost_done_registering: You're almost done registering
-      subject: Confirm your %{organization_name} Bike Index registration
+      subject: Confirm your %{organization_name}Bike Index registration
       text:
         before_locking_check: "- Before locking, check that what you are locking to
           can't be easily removed."
@@ -3685,7 +3685,7 @@ en:
           locking a bike in a city.
         you_added_a_bike_type_on_bike_index: You added a %{bike_type} on Bike Index
     finished_stolen_registration:
-      subject: Confirm your %{organization_name} stolen %{bike_type} on Bike Index
+      subject: Confirm your %{organization_name}stolen %{bike_type}on Bike Index
     geolocated_message:
       html:
         is_located_at_html: 'Is located at: <strong>%{address}</strong>'
@@ -3700,7 +3700,7 @@ en:
         join_org: Join %{org_name}
         welcome_to_bike_index: Welcome to Bike Index
         you_are_a_member: "%{sender_name} has indicated that you are a member of %{org_name}."
-      subject: Join %{organization_name} on Bike Index
+      subject: Join %{organization_name}on Bike Index
       text:
         hello: Hello
         hello_welcome_to_bike_index: Hello, welcome to Bike Index
@@ -3714,7 +3714,7 @@ en:
           You're just a few steps away from registering your <strong>%{color_and_brand}</strong>
           on the world's most comprehensive bike registry!
         youre_almost_done: You’re Almost Done!
-      subject: Finish your %{organization_name} Bike Index registration!
+      subject: Finish your %{organization_name}Bike Index registration!
       text:
         go_to_the_following_url_to_finish: 'Go to the following URL to finish:'
         youre_almost_done: You're Almost Done!
