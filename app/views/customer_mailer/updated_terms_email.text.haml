@@ -1,16 +1,17 @@
-Hello #{@user.display_name}!
+= t(".text.hello", name: @user.display_name)
 
-You may not know, but Bike Index recently became a 501(c)(3) nonprofit.
+= t(".text.you_may_not_know_but_bike_index_recently_")
 
-We've always wanted to provide one free, universal registration and being a nonprofit helps us get there. You can read more at https://bikeindex.org/news/bike-index--now-a-nonprofit
+= t(".text.weve_always_wanted_to_provide_one_free_un", url: news_url("bike-index--now-a-nonprofit"))
 
-We're emailing you because we updated our privacy policy to reflect the fact that we're now a nonprofit. We also made some copy edits and clarifications. The updated versions of our privacy policy and terms of service are live on Bike Index (https://bikeindex.org/privacy and https://bikeindex.org/terms).
+= t(".text.were_emailing_you_because_we_updated_our_")
 
-Nothing significant has changed about how we handle your data or trust. We will always protect your information and never sell or trade it. This is the first substantive change we've made to our privacy policy and terms since we first drafted them in 2014. We take your trust very seriously and don't plan on having to do this often. Even three years was too soon.
-
-
-As always, thanks for helping register bikes,
-Lily Williams and the Bike Index Team
+= t(".text.nothing_significant_has_changed_about_how")
 
 
-p.s. If you like reading these kinds of documents or have any questions, just reply to this email!
+= t(".text.as_always_thanks_for_helping_register_bik")
+
+= t(".text.lily_williams_and_the_bike_index_team")
+
+
+= t(".text.ps_if_you_like_reading_these_kinds_of_doc")

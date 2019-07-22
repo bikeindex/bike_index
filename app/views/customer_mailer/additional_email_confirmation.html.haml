@@ -1,16 +1,16 @@
 %h2.center-text
-  = t(".please_confirm_your_additional_email")
+  = t(".html.please_confirm_your_additional_email")
   %br
   %small
     %em= @user_email.email
 
 %p.center-text{ style: 'margin-bottom: 3em;' }
-  = t(".user_would_like_to_merge", name: @user.display_name, email: @user.email)
+  = t(".html.user_would_like_to_merge", name: @user.display_name, email: @user.email)
 
-= link_to t(".verify_email"), confirm_user_email_url(id: @user_email.id, confirmation_token: @user_email.confirmation_token), class: 'binx-button'
+= link_to t(".html.verify_email"), confirm_user_email_url(id: @user_email.id, confirmation_token: @user_email.confirmation_token), class: 'binx-button'
 
-%p.center-text.less-strong= t(".click_verify_email_html")
+%p.center-text.less-strong= t(".html.click_verify_email_html")
 
 %hr
 
-%p.center-text= t(".if_you_didnt_request_this")
+%p.center-text= t(".html.if_you_didnt_request_this")

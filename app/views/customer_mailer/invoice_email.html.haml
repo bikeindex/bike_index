@@ -1,14 +1,13 @@
 %h1
-  Thank you so much!
+  = t(".html.thank_you_so_much")
 
 %p
-  We really appreciate your support of Bike Index!
+  = t(".html.we_really_appreciate_your_support")
 
 - if @payment.is_recurring
-  %p
-    That you for signing up to be a member of Bike Index. We'll send you invoices every month to this email address
+  %p= t(".html.thanks_for_signing_up")
 %p
   - if @payment.is_donation
-    Your donation of #{@payment.amount_formatted} really will help us rescue more bikes.
+    = t(".html.donation_will_help", amount: @payment.amount_formatted)
   - else
-    Your payment of #{@payment.amount_formatted} has been received.
+    = t(".html.payment_received", amount: @payment.amount_formatted)

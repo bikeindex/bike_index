@@ -1,9 +1,7 @@
-** #{@stolen_notification.sender.email} sent a message about your stolen #{@stolen_notification.bike.type}! **
+= t(".text.message_about_stolen_bike", sender_email: @stolen_notification.sender.email, bike_type: @stolen_notification.bike.type)
 
+= @stolen_notification.message
 
-\#{@stolen_notification.message}
+= t(".text.view_your_notification", bike_type: @stolen_notification.bike.type)
 
-
-View your #{@stolen_notification.bike.type} on Bike Index:
-
-\#{bike_url(@stolen_notification.bike)}
+= bike_url(@stolen_notification.bike)

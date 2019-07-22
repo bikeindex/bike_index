@@ -1,9 +1,9 @@
-%h1= t(".hello", name: @membership.invited_display_name)
+%h1= t(".html.hello", name: @membership.invited_display_name)
 
 - if @is_new_user
-  %h2= t(".welcome_to_bike_index")
+  %h2= t(".html.welcome_to_bike_index")
 
 - if @sender.present?
-  %p= t(".you_are_a_member", sender_name: @sender.display_name, org_name: @organization.name)
+  %p= t(".html.you_are_a_member", sender_name: @sender.display_name, org_name: @organization.name)
 
-= link_to t(".join_org", org_name: @organization.short_name), new_user_url(email: @vars[:email]), class: 'binx-button'
+= link_to t(".html.join_org", org_name: @organization.short_name), new_user_url(email: @vars[:email]), class: 'binx-button'

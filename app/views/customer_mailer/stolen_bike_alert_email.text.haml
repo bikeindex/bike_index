@@ -1,23 +1,32 @@
 = @customer_contact.body.html_safe
+
 \--------------------------------
 
 \---
-Make: #{@customer_contact.bike.mnfg_name}
 
-Serial: #{@customer_contact.bike.serial_number}
+= t(".text.make")
+= @customer_contact.bike.mnfg_name
 
-Color:
+= t(".text.serial")
+= @customer_contact.bike.serial_number
+
+= t(".text.color")
 - if @customer_contact.bike.paint.present?
   = @customer_contact.bike.paint.name
 - else
   = @customer_contact.bike.primary_frame_color.name
+
 \---
+
+- bike_type = @customer_contact.bike.type
+- bike_url = bike_url(@customer_contact.bike)
+
 - if @customer_contact.bike.stolen
-  Hopefully you find the #{@customer_contact.bike.type} soon. Give us a heads up when you do!
-* Claim the #{@customer_contact.bike.type} here: #{bike_url(@customer_contact.bike)} *
+  = t(".text.hopefully_you_find_the_bike_soon", bike_type: bike_type)
 
-Sign up or sign in to BikeIndex.org to claim your #{@customer_contact.bike.type} and edit it, upload photos and make sure you never lose track of your trusty steed!
+= t(".text.claim_the_bike_type_here_bike_url", bike_type: bike_type, bike_url: bike_url)
 
+= t(".text.sign_up_or_in", bike_type: bike_type)
 
 
 \--------------------------------
