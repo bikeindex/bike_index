@@ -66,15 +66,15 @@ function BinxAdminBlogs() {
         triggerUploadOnSubmit: false
       })
       uppy.on('upload-success', (file, response) => {
-        const div = document.createElement('div')
-        const list = document.querySelector("ul#public_images")
-        div.html("<%= j render partial: 'admin/news/public_image, locals: {public_image:" + response.body.public_image + "}%>")
-        const img = new Image()
-        img.alt = file.id
-        img.src = response.body.public_image.image.url
-        img.size = 100
-        list.append(div)
+        this.appendPublicImage(response.body.public_image);
       })
+    },
+
+    appendPublicImage(image) {
+      const partial = "<%img src="+ image.image_url +">"
+
+      const list = $("ul#public_images")
+      list.append(partial)
     },
 
     noPrimaryPhotoToggle() {
