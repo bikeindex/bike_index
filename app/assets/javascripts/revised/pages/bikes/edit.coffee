@@ -6,6 +6,7 @@ class BikeIndex.BikesEdit extends BikeIndex
     switch $('.form-well-header.container').attr('data-template')
       when 'bike_details' then new BikeIndex.BikesEditBikeDetails
       when 'drivetrain' then new BikeIndex.BikesEditDrivetrain
+      when 'report_stolen' then new BikeIndex.BikesEditStolen
       when 'report_recovered' then new BikeIndex.BikesEditStolen
       when 'theft_details' then new BikeIndex.BikesEditStolen
       when 'photos' then new BikeIndex.BikesEditPhotos
