@@ -41,6 +41,12 @@ RSpec.describe TimeParser do
         expect(Time.zone).to eq subject::DEFAULT_TIMEZONE
       end
     end
+    context "time" do
+      let(:time) { Time.current - 55.minutes }
+      it "returns the time" do
+        expect(subject.parse(time)).to be_within(1).of time
+      end
+    end
   end
 
   describe "timezone_parser" do
