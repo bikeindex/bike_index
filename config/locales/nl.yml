@@ -1412,23 +1412,261 @@ nl:
         theft_details: TRME Theft details
   customer_mailer:
     additional_email_confirmation:
+      html:
+        click_verify_email_html: >-
+          TRME Click the <em>Verify email</em> button to merge these accounts on BikeIndex.org!
+        if_you_didnt_request_this: TRME If you didn't request this merge please reply
+          to this email and tell us.
+        please_confirm_your_additional_email: TRME Please confirm your additional
+          email
+        user_would_like_to_merge: TRME %{name} would like to merge this email into
+          their account (%{email}).
+        verify_email: TRME Verify email
       subject: TRME Confirm your additional email
+      text:
+        go_to_this_url_if_you_want_to_confirm: 'TRME Go to this url if you want to
+          confirm this email:'
+        if_you_didnt_request_this_merge: TRME If you didn't request this merge please
+          reply to this email and tell us.
+        user_would_like_to_merge: TRME ** %{name} would like to merge this email into
+          their account **
+    admin_contact_stolen_email:
+      html:
+        this_email_is_about: >-
+          TRME This email is about the %{bike} registered on Bike Index on %{registration_date}
+      text:
+        claim_the_bike: 'TRME * Claim the %{bike_type} here: %{bike_url} *'
+        color: 'TRME Color:'
+        hopefully_you_find: TRME Hopefully you find the %{bike_type} soon. Give us
+          a heads up when you do!
+        make: 'TRME Make:'
+        serial: 'TRME Serial:'
+        sign_up_or_in: >-
+          TRME Sign up or sign in to BikeIndex.org to claim your %{bike_type} and
+          edit it, upload photos and make sure you never lose track of your trusty
+          steed!
     confirmation_email:
+      html:
+        click_to_verify_html: TRME Click the <em>Verify email</em> button to finish
+          signing up!
+        please_confirm_your_email_address: TRME Please confirm your email address
+        verify_email: TRME Verify email
+        youre_almost_there: TRME You're almost there!
       subject: TRME Please confirm your Bike Index email!
+      text:
+        bike_index_team: TRME Bike Index Team
+        good_thinking: TRME Good thinking! We’re glad you’ve joined.
+        paste_url: 'TRME Paste the following confirmation url into your internet browser:'
+        thanks: TRME Thanks,
+        to_finish_signing_up: TRME To finish signing up you have to confirm your email
+          address.
+        verify_email: TRME Verify email
+        welcome_to_bike_index: TRME * Welcome to Bike Index! *
     invoice_email:
+      html:
+        donation_will_help: TRME Your donation of %{amount} really will help us rescue
+          more bikes.
+        payment_received: TRME Your payment of %{amount} has been received.
+        thank_you_so_much: TRME Thank you so much!
+        thanks_for_signing_up: >-
+          TRME Thank you for signing up to be a member of Bike Index. We'll send you
+          invoices every month to this email address
+        we_really_appreciate_your_support: TRME We really appreciate your support
+          of Bike Index!
       subject: TRME Thank you for supporting Bike Index!
+      text:
+        bike_index_management: TRME Bike Index Management
+        donation_will_help: TRME Your donation of $%{amount} just saved the bikes.
+        payment_received: TRME Your payment of %{amount} has been received.
+        thanks: TRME Thanks,
+        thanks_for_signing_up: TRME * Thank you so much for supporting Bike Index
+          *
     magic_login_link_email:
+      html:
+        click_the_button: TRME Click the button below to sign in to Bike Index
+        if_you_did_not_request: >-
+          TRME If you did not request a passwordless sign in link, please reply to
+          this email and let us know.
+        only_valid_once: TRME This link is only valid for one sign in. It expires
+          in 45 minutes.
+        sign_in: TRME Sign in to Bike Index
       subject: TRME Sign in to Bike Index
+      text:
+        here_is_your_login_url: TRME Here is your passwordless sign in url
+        if_you_did_not_request: >-
+          TRME If you did not request a passwordless sign in link, please reply to
+          this email and let us know.
+        this_link_is_only_valid_once: TRME This link is only valid for one sign in.
+          It expires in 45 minutes.
     password_reset_email:
+      html:
+        if_you_did_not_request_a_new_password_html: TRME If you did not request a
+          new password, you should probably %{link}.
+        please_click_the_button_below_to_create_a: TRME Please click the button below
+          to create a new password.
+        reset_password: TRME Reset password
+        tell_us: TRME tell us
+        whoops_it_appears_you_have_forgotten_your: TRME Whoops! It appears you have
+          forgotten your Bike Index password!
       subject: TRME Instructions to reset your password
+      text:
+        bike_index_management: TRME Bike Index Management
+        if_you_did_not_request_a_new_password_to_: >-
+          TRME If you did not request a new password to be created, you should probably
+          hit us up: support@bikeindex.org
+        thanks: TRME Thanks,
+        whoops_it_appears_you_have_forgotten_your: >-
+          TRME Whoops! It appears you have forgotten your Bike Index password! Please
+          click the link below (or paste it into your browser) to create a new password.
     recovered_from_link:
+      html:
+        marked_recovered_by: 'TRME Marked recovered by:'
+        note_if_you_didnt_recover_html: >-
+          TRME <strong>Note:</strong> If you didn't recover your bike, or marked it
+          recovered accidentally, reply to this email and let us know!
+        the_description_of_the_recovery_was: 'TRME The description of the recovery
+          was:'
+        were_so_glad_you_got_your_biketype_back: TRME We're so glad you got your %{biketype}
+          back!
+        your_biketype_was_marked_recovered_on_bik: 'TRME Your %{biketype} was marked
+          recovered on Bike Index:'
       subject: TRME Your %{biketype} has been marked recovered!
+      text:
+        if_you_didnt_recover_your_bike_or_marked_: >-
+          TRME If you didn't recover your bike, or marked it recovered accidentally,
+          reply to this email and let us know!
+        were_so_glad_you_got_your_biketype_back: TRME We're so glad you got your %{biketype}
+          back!
+        your_biketype_was_marked_recovered: 'TRME Your %{biketype} was marked recovered
+          on Bike Index: %{bike_url}'
+    stolen_bike_alert_email:
+      html:
+        alert_retweeted_by_html: TRME Alert retweeted by %{retweets}
+        area: TRME area
+        improve_your_chances_of_recovery_by_doing: TRME Improve your chances of recovery
+          by doing all these things!
+        recovered_or_found: TRME recovered/found
+        stolen: TRME stolen
+        stolen_bike_alerter: TRME stolen bike alerter.
+        this_email_is_about_the_stolen_bike: >-
+          TRME This email is about the %{was_stolen} %{bike_type} registered on Bike
+          Index on %{date}
+        we_sent_out_this_tweet_from: TRME We sent out this tweet from
+        were_spreading_the_word_about_your_stolen: TRME We're spreading the word about
+          your %{stolen_word} %{bike_type}!
+      text:
+        claim_the_bike_type_here_bike_url: 'TRME * Claim the %{bike_type} here: %{bike_url}
+          *'
+        color: 'TRME Color:'
+        hopefully_you_find_the_bike_soon: TRME Hopefully you find the %{bike_type}
+          soon. Give us a heads up when you do!
+        make: 'TRME Make:'
+        serial: 'TRME Serial:'
+        sign_up_or_in: >-
+          TRME Sign up or sign in to BikeIndex.org to claim your %{bike_type} and
+          edit it, upload photos and make sure you never lose track of your trusty
+          steed!
     stolen_notification_email:
+      html:
+        if_you_believe_this_email_is_illegitimate: >-
+          TRME If you believe this email is illegitimate, please contact support@bikeindex.org
+        link: 'TRME link:'
+        please_help_sender_html: >-
+          TRME Please help %{sender_name} contact the owner of this %{link}, they
+          believe it is <span class='stolen-color'>stolen</span>!
+        sender_email_sent_you_a_message_html: TRME %{sender_email} sent you a message
+          about your %{link}!
+        stolen_biketype: TRME stolen %{biketype}
+        they_believe_it_is_stolen: TRME They believe it is stolen!
+        this_email_is_about_the_biketype_register: TRME This email is about the %{biketype}
+          registered on Bike Index on %{date}
+        you_can_just_forward_this_message_to: >-
+          TRME You can just forward this message to the owner's email address: %{bikeowner_email}
+        you_registered_this_biketype_on: >-
+          TRME You registered this %{biketype} on %{date}. The owner hasn't claimed
+          it yet and it isn't marked stolen, so you have received this email to authorize
+          contacting them.
       subject: TRME Stolen bike contact
+      text:
+        message_about_stolen_bike: TRME ** %{sender_email} sent a message about your
+          stolen %{bike_type}! **
+        view_your_notification: 'TRME View your %{bike_type} on Bike Index:'
     updated_terms_email:
+      html:
+        as_always_thanks_for_helping_register_bik: TRME As always, thanks for helping
+          register bikes,
+        bike_index: TRME Bike Index
+        bike_index_privacy_policy: TRME Bike Index Privacy Policy
+        bike_index_terms_of_service: TRME Bike Index Terms of Service
+        bike_index_vendor_terms_of_service: TRME Bike Index Vendor Terms of Service
+        check_link_to_see_more_html: TRME Check %{link} to see more of what we’ve
+          been up to.
+        hello: TRME Hello %{name}!
+        help_prevent_bike_theft_html: TRME Help prevent bike theft, %{link}
+        here: TRME here
+        lily_williams_and_the_bike_index_team: TRME Lily Williams and the Bike Index
+          Team
+        make_a_donation: TRME make a donation
+        nothing_significant_has_changed_about_how: >-
+          TRME Nothing significant has changed about how we handle your data or trust.
+          We will always protect your information and never sell or trade it. This
+          is the first substantive change we've made to our privacy policy and terms
+          since we first drafted them in 2014. We take your trust very seriously and
+          don't plan on having to do this often. Even three years was too soon.
+        ps_if_you_like_reading_these_kinds_of_doc: >-
+          TRME p.s. If you like reading these kinds of documents or have any questions,
+          just reply to this email!
+        were_emailing_you_because_we_updated_our_: >-
+          TRME We're emailing you because we updated our privacy policy to reflect
+          the fact that we're now a nonprofit. We also made some copy edits and clarifications.
+          The updated versions of the following are live on Bike Index:
+        weve_always_wanted_to_provide_html: >-
+          TRME We've always wanted to provide one free, universal registration and
+          being a nonprofit helps us get there. You can read more %{link}.
+        you_may_not_know_but_bike_index_recently_: TRME You may not know, but Bike
+          Index recently became a 501(c)(3) nonprofit.
       subject: TRME Bike Index Terms and Privacy Policy Update
+      text:
+        as_always_thanks_for_helping_register_bik: TRME As always, thanks for helping
+          register bikes,
+        hello: TRME Hello %{name}!
+        lily_williams_and_the_bike_index_team: TRME Lily Williams and the Bike Index
+          Team
+        nothing_significant_has_changed_about_how: >-
+          TRME Nothing significant has changed about how we handle your data or trust.
+          We will always protect your information and never sell or trade it. This
+          is the first substantive change we've made to our privacy policy and terms
+          since we first drafted them in 2014. We take your trust very seriously and
+          don't plan on having to do this often. Even three years was too soon.
+        ps_if_you_like_reading_these_kinds_of_doc: >-
+          TRME p.s. If you like reading these kinds of documents or have any questions,
+          just reply to this email!
+        were_emailing_you_because_we_updated_our_: >-
+          TRME We're emailing you because we updated our privacy policy to reflect
+          the fact that we're now a nonprofit. We also made some copy edits and clarifications.
+          The updated versions of our privacy policy and terms of service are live
+          on Bike Index (https://bikeindex.org/privacy and https://bikeindex.org/terms).
+        weve_always_wanted_to_provide_one_free_un: >-
+          TRME We've always wanted to provide one free, universal registration and
+          being a nonprofit helps us get there. You can read more at %{url}
+        you_may_not_know_but_bike_index_recently_: TRME You may not know, but Bike
+          Index recently became a 501(c)(3) nonprofit.
     welcome_email:
+      html:
+        add_some_information_about_your_bikes_whe: TRME Add some information about
+          your bikes when you have the chance.
+        good_thinking_were_glad_youve_joined: TRME Good thinking! We’re glad you’ve
+          joined.
+        welcome_to_bike_index: TRME Welcome to Bike Index
       subject: TRME Welcome to Bike Index!
+      text:
+        add_some_information_about_your_bikes_whe: TRME Add some information about
+          your bikes when you've got the chance!
+        bike_index_management: TRME Bike Index Management
+        good_thinking_were_glad_youve_joined_you_: TRME Good thinking! We’re glad
+          you’ve joined, you smarty pants.
+        thanks: TRME Thanks,
+        welcome_to_bike_index: TRME * Welcome to Bike Index! *
   date:
     abbr_day_names: TRME ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
     abbr_month_names: >-
@@ -3463,10 +3701,44 @@ nl:
           Index'"
     finished_stolen_registration:
       subject: TRME Confirm your %{organization_name}stolen %{bike_type}on Bike Index
+    geolocated_message:
+      html:
+        is_located_at_html: 'TRME Is located at: <strong>%{address}</strong>'
+        sent_by: 'TRME Sent by: %{sender_name} at %{org_name}'
+        your_bike: TRME Your %{bike_title}
+      text:
+        sent_you: TRME %{org_name} sent you a message about your %{bike_title}
+        your_bike_is_at: 'TRME Your %{bike} is at: %{address}'
     organization_invitation:
+      html:
+        hello: TRME Hello %{name},
+        join_org: TRME Join %{org_name}
+        welcome_to_bike_index: TRME Welcome to Bike Index
+        you_are_a_member: TRME %{sender_name} has indicated that you are a member
+          of %{org_name}.
       subject: TRME Join %{organization_name}on Bike Index
+      text:
+        hello: TRME Hello
+        hello_welcome_to_bike_index: TRME Hello, welcome to Bike Index
+        sign_up_or_sign_in: TRME Sign up or sign in to BikeIndex.org to join %{org_name}!
+        you_are_a_member: TRME %{sender_name} has indicated that you are a member
+          of %{org_name}.
     partial_registration:
+      html:
+        click_below_to_complete_your_registration: TRME Click below to complete your
+          registration
+        finish_it: TRME Finish it!
+        just_a_few_steps_away_html: >-
+          TRME You're just a few steps away from registering your <strong>%{color_and_brand}</strong>
+          on the world's most comprehensive bike registry!
+        youre_almost_done: TRME You’re Almost Done!
       subject: TRME Finish your %{organization_name}Bike Index registration!
+      text:
+        go_to_the_following_url_to_finish: 'TRME Go to the following URL to finish:'
+        youre_almost_done: TRME You're Almost Done!
+        youre_just_a_few_steps_away_from_register: >-
+          TRME You're just a few steps away from registering your bike on the world's
+          most comprehensive bike registry.
   plan_features:
     add_form_fields: TRME Add specific form fields to your landing page
     add_logos: TRME Add logos and text to Bike Index emails

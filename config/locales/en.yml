@@ -1426,7 +1426,9 @@ en:
           up when you do!
         make: 'Make:'
         serial: 'Serial:'
-        sign_up_or_in: Sign up or sign in to BikeIndex.org to claim your %{bike_type} and edit it, upload photos and make sure you never lose track of your trusty steed!
+        sign_up_or_in: >-
+          Sign up or sign in to BikeIndex.org to claim your %{bike_type} and edit
+          it, upload photos and make sure you never lose track of your trusty steed!
     confirmation_email:
       html:
         click_to_verify_html: Click the <em>Verify email</em> button to finish signing
@@ -1505,7 +1507,6 @@ en:
         note_if_you_didnt_recover_html: >-
           <strong>Note:</strong> If you didn't recover your bike, or marked it recovered
           accidentally, reply to this email and let us know!
-        sharedemail_bike_box:
         the_description_of_the_recovery_was: 'The description of the recovery was:'
         were_so_glad_you_got_your_biketype_back: We're so glad you got your %{biketype}
           back!
@@ -1654,7 +1655,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -1680,7 +1681,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
