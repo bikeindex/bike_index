@@ -1,0 +1,35 @@
+- stolen_word = @bike.recovered ? "recovered/found" : "stolen"
+%h1{:style => "font-weight: 400; font-size: 30px;"}
+  We're spreading the word about your #{stolen_word} #{@biketype}!
+%p{:style => ""}
+  We sent out this tweet from
+  = succeed "," do
+    %a{:href => "https://twitter.com/#{@info[:tweet_account_screen_name]}"}
+      @#{@info[:tweet_account_screen_name]}
+  - if @info[:location].present?
+    = @info[:location]
+    area
+  stolen bike alerter.
+%div{:style => "margin: 30px 0 0; border: 1px solid #dfe3ee;border-radius: 4px; padding: 15px 2%; min-height: 120px;"}
+  %div{:style => "width: 10%; float: left; height: 120px;"}
+    %a{:href => "https://twitter.com/#{@info[:tweet_account_screen_name]}"}
+      %img{:src => "#{@info[:tweet_account_image]}", :style => "max-width: 100%;"}/
+  %div{:style => "width: 86%; margin-left: 2%; float: right;"}
+    %a{:href => "https://twitter.com/#{@info[:tweet_account_screen_name]}/status/#{@info[:tweet_id]}", :style => "display: block; text-decoration: none; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;"}
+      %h3{:style => "font-size: 14px; line-height: 14px; margin: 0; font-weight: bold; color: #333333;"}= @info[:tweet_account_name]
+      %h3{:style => "font-size: 14px; line-height: 17px; margin: 0; color: #999; font-weight: 400;"}
+        @#{@info[:tweet_account_screen_name]}
+    %p{:style => "margin:0;color:#333333;font-family:Georgia,'Times New Roman',serif;font-size:22px;line-height:27px;margin-bottom:0;margin-top:5px;"}
+      = @info[:tweet_string].split('https://bikeindex.org')[0]
+      %a{:href => "https://bikeindex.org/bikes/#{@bike.id}", :style => "border:none;color:#0084b4;text-decoration:none"} Bike Index link
+    %a{:href => "https://twitter.com/#{@info[:tweet_account_screen_name]}/status/#{@info[:tweet_id]}", :style => "display:block;border:none;color:#0084b4;text-decoration:none;color:#999999;font-size: 12px; margin-top: 5px;", :target => "_blank"}= Time.current.strftime("%I:%M %P - %d %b %y")
+- if @info[:retweet_screen_names].present?
+  - retweets = @info[:retweet_screen_names].map{ |sn| "<a href='https://twitter.com/#{sn}'>@#{sn}</a>" }
+  %p{:style => "color: #95A5A5; font-size: .9em; text-align: center; margin: 0 auto; clear: both; padding: .25em 1em .75em; width: 90%; background: #f7f7f7; border: 1px solid #dfe3ee; border-radius: 0 0 4px 4px;"}
+    Alert retweeted by #{retweets.to_sentence.html_safe}
+%h3{:style => "margin: 2rem 0 1rem"} Improve your chances of recovery by doing all these things!
+= render partial: "/bikes/stolen_checklist", locals: { stolen_record: @bike.current_stolen_record }
+%hr/
+%p{:style => "margin: 50px 0 0; padding: 20px 0 0; font-weight: 400; color: #95A5A5; text-align: center;"}
+  This email is about the #{stolen_word} #{@biketype} registered on Bike Index on #{@bike.created_at.strftime("%m.%d.%y")}
+= render partial: '/shared/email_bike_box', locals: { bike_url: bike_url(@bike) }
