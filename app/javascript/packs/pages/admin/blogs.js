@@ -66,15 +66,36 @@ function BinxAdminBlogs() {
         triggerUploadOnSubmit: false
       })
       uppy.on('upload-success', (file, response) => {
-        this.appendPublicImage(response.body.public_image);
+        this.appendPublicImage(response)
       })
     },
 
     appendPublicImage(image) {
-      const partial = "<%img src="+ image.image_url +">"
+      const alt = image.body.public_image.name
+      const src = image.body.public_image.image.url
+      const publicImage =
+      "<div class='card bg-light admin-public-image'>\
+        <div class='card-body'>\
+          <div class='row'>\
+            <div class='col-md-2 col-sm-6 mt-auto'>\
+              <p>\
+                 " + alt +"\
+              </p>\
+            </div>\
+            <div class='col-md-8 col-sm-6 mt-auto'>\
+             <textarea class='form-control'> &lt;img class='post-image' src='"+ image.body.public_image.image.url +"' alt='ENTER YOUR TEXT HERE'&gt; </textarea>\
+            </div>\
+            <div class='col-md-2 col-sm-12'>\
+              <div class='img-box'>\
+                <img src='"+src  +"'' alt='"+alt+"'/>\
+              </div>\
+            </div>\
+          </div>\
+        </div>\
+      </div>"
 
       const list = $("ul#public_images")
-      list.append(partial)
+      list.append(publicImage)
     },
 
     noPrimaryPhotoToggle() {
