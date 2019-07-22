@@ -1,9 +1,9 @@
-We're so glad you got your #{@biketype} back!
+= t(".text.were_so_glad_you_got_your_biketype_back", biketype: @biketype)
 
-Your #{ @biketype } was marked recovered on Bike Index: #{ bike_url(@bike) }
+= t(".text.your_biketype_was_marked_recovered", biketype: @biketype, bike_url: bike_url(@bike) )
 
 = @stolen_record.recovered_description
 
 \-----------
 
-If you didn't recover your bike, or marked it recovered accidentally, reply to this email and let us know!
+= t(".text.if_you_didnt_recover_your_bike_or_marked_")

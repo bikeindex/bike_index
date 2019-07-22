@@ -1,0 +1,9 @@
+= t(".text.user_would_like_to_merge", name: @user.display_name)
+
+= t(".text.go_to_this_url_if_you_want_to_confirm")
+
+= confirm_user_email_url(id: @user_email.id, confirmation_token: @user_email.confirmation_token)
+
+/------
+
+= t(".text.if_you_didnt_request_this_merge")

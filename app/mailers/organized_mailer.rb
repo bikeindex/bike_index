@@ -67,7 +67,7 @@ class OrganizedMailer < ActionMailer::Base
            to: @organization_message.email,
            subject: subject) do |format|
         format.html { render "geolocated_message" }
-        format.text { render "geolocated_message_text" }
+        format.text { render "geolocated_message" }
       end
     end
   end

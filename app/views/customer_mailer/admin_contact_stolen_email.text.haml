@@ -1,0 +1,30 @@
+= @customer_contact.body.html_safe
+
+\--------------------------------
+
+\---
+
+= t(".text.make")
+= @customer_contact.bike.mnfg_name
+
+= t(".text.serial")
+= @customer_contact.bike.serial_number
+
+- if @customer_contact.bike.paint.present?
+  = t(".text.color")
+  = @customer_contact.bike.paint.name
+- else
+  = t(".text.color")
+  = @customer_contact.bike.primary_frame_color.name
+
+\---
+
+- if @customer_contact.bike.stolen
+  = t(".text.hopefully_you_find", bike_type: @customer_contact.bike.type)
+
+= t(".text.claim_the_bike", bike_type: @customer_contact.bike.type, bike_url: bike_url(@customer_contact.bike))
+
+= t(".text.sign_up_or_in", bike_type: @customer_contact.bike.type)
+
+
+\--------------------------------
