@@ -1,31 +1,20 @@
 %h1
   New #{@dignified_name}
 
-.row-fluid
-  .span6.padded.well
-    .form.form-horizontal#chosen-container
-      - url = {action: "create", controller: "news"}
-    
-      = form_for [:admin, @blog], :url => url do |f|
-        - if @blog.errors.any?
-          #alert-block
-            .alert.alert-error
-              %h4
-                Please fix the following 
-                = pluralize(@blog.errors.count, "error")
-              %ul
-                - @blog.errors.full_messages.each do |msg|
-                  %li
-                    = msg
-        .blog-field
-          = f.text_field :title, placeholder: "Blog title"
-        
-        / .controls.radio-controls
-        /   %label.checkbox
-        /     = f.check_box :is_listicle
-        /     Is a collection of vignettes
-          
-       
-  
-        .padded
-          = f.submit 'Create Blog!', class: 'button-green pull-right'
+- url = {action: "create", controller: "news"}
+= form_for [:admin, @blog], :url => url do |f|
+  - if @blog.errors.any?
+    = render partial: "/shared/errors", locals: { name: "Blog", obj: @blog }
+  .row
+    .col-auto
+      .form-group
+        = f.text_field :title, placeholder: "Blog title", class: "form-control"
+
+  / .controls.radio-controls
+  /   %label.checkbox
+  /     = f.check_box :is_listicle
+  /     Is a collection of vignettes
+
+  .row.mt-2
+    .col-auto
+      = f.submit 'Create Blog!', class: 'btn btn-success'
