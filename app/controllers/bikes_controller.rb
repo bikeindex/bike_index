@@ -248,11 +248,11 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = translation(:recovery_details) if @bike.recovered?
-      h[:theft_details] = translation(:theft_details) unless @bike.recovered?
-      h[:publicize] = translation(:publicize)
-      h[:alert] = translation(:alert)
-      h[:report_recovered] = translation(:report_recovered) unless @bike.recovered?
+      h[:theft_details] = translation(:recovery_details, scope: %i[controllers bikes edit]) if @bike.recovered?
+      h[:theft_details] = translation(:theft_details, scope: %i[controllers bikes edit]) unless @bike.recovered?
+      h[:publicize] = translation(:publicize, scope: %i[controllers bikes edit])
+      h[:alert] = translation(:alert, scope: %i[controllers bikes edit])
+      h[:report_recovered] = translation(:report_recovered, scope: %i[controllers bikes edit]) unless @bike.recovered?
     end
   end
 
@@ -261,14 +261,14 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def bike_templates
     {}.with_indifferent_access.tap do |h|
-      h[:bike_details] = translation(:bike_details)
-      h[:photos] = translation(:photos)
-      h[:drivetrain] = translation(:drivetrain)
-      h[:accessories] = translation(:accessories)
-      h[:ownership] = translation(:ownership)
-      h[:groups] = translation(:groups)
-      h[:remove] = translation(:remove)
-      h[:report_stolen] = translation(:report_stolen) unless @bike.stolen?
+      h[:bike_details] = translation(:bike_details, scope: %i[controllers bikes edit])
+      h[:photos] = translation(:photos, scope: %i[controllers bikes edit])
+      h[:drivetrain] = translation(:drivetrain, scope: %i[controllers bikes edit])
+      h[:accessories] = translation(:accessories, scope: %i[controllers bikes edit])
+      h[:ownership] = translation(:ownership, scope: %i[controllers bikes edit])
+      h[:groups] = translation(:groups, scope: %i[controllers bikes edit])
+      h[:remove] = translation(:remove, scope: %i[controllers bikes edit])
+      h[:report_stolen] = translation(:report_stolen, scope: %i[controllers bikes edit]) unless @bike.stolen?
     end
   end
 

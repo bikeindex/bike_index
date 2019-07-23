@@ -29,7 +29,7 @@
                     - faq_link = link_to t(".faqs"), support_path(anchor: 'public-serials')
                     = t(".you_can_read_more_html", faq_link: faq_link)
                   %p
-                    = t(".we_strongly_recommend", bike_type: @bike.type, bike_type: @bike.type)
+                    = t(".we_strongly_recommend", bike_type: @bike.type)
                   %p.text-xs-center
                     - btn_type = @bike.user_hidden ? 'btn-success' : 'btn-danger'
                     %a.btn.btn-lg#hide_bike_toggle{role: 'button', class: btn_type }
