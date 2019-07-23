@@ -2,8 +2,8 @@
 nl:
   gflash:
     titles:
-      error: TRME Error
-      notice: TRME Notice
-      progress: TRME Progress
-      success: TRME Success
-      warning: TRME Warning
+      error:
+      notice:
+      progress:
+      success:
+      warning:

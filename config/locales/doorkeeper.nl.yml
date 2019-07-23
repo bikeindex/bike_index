@@ -1,136 +1,117 @@
 ---
 nl:
   activerecord:
+    attributes:
+      doorkeeper/application:
+        name:
+        redirect_uri:
     errors:
       models:
         doorkeeper/application:
           attributes:
             redirect_uri:
-              fragment_present: TRME cannot contain a fragment.
-              invalid_uri: TRME must be a valid URI.
-              relative_uri: TRME must be an absolute URI.
-              secured_uri: TRME must be an HTTPS/SSL URI.
+              fragment_present:
+              invalid_uri:
+              relative_uri:
+              secured_uri:
   doorkeeper:
     applications:
       buttons:
-        authorize: TRME Authorize
-        cancel: TRME Cancel
-        destroy: TRME Destroy
-        edit: TRME Edit
-        submit: TRME Submit
+        authorize:
+        cancel:
+        destroy:
+        edit:
+        submit:
       confirmations:
-        destroy: TRME Are you sure?
+        destroy:
       edit:
-        title: TRME Edit application
+        title:
       form:
-        error: TRME Whoops! Check your form for possible errors
+        error:
       help:
-        native_redirect_uri: TRME Use %{native_redirect_uri} for local tests
-        redirect_uri: TRME Use one line per URI
+        native_redirect_uri:
+        redirect_uri:
       index:
-        callback_url: TRME Callback URL
-        name: TRME Name
-        new: TRME New Application
-        title: TRME Your applications
+        callback_url:
+        name:
+        new:
+        title:
       new:
-        title: TRME New Application
+        title:
       show:
-        actions: TRME Actions
-        application_id: TRME Application Id
-        callback_urls: TRME Callback urls
-        secret: TRME Secret
-        title: 'TRME Application: %{name}'
+        actions:
+        application_id:
+        callback_urls:
+        secret:
+        title:
     authorizations:
       buttons:
-        authorize: TRME Authorize
-        deny: TRME Deny
+        authorize:
+        deny:
       error:
-        title: TRME An error has occurred
+        title:
       new:
-        able_to: TRME This application will be able to
-        prompt: TRME Authorize %{client_name} to use your account?
-        title: TRME Authorize required
+        able_to:
+        prompt:
+        title:
       show:
-        title: TRME Authorization code
+        title:
     authorized_applications:
       buttons:
-        revoke: TRME Revoke
+        revoke:
       confirmations:
-        revoke: TRME Are you sure?
+        revoke:
       index:
-        application: TRME Application
-        created_at: TRME Created At
-        date_format: TRME %Y-%m-%d %H:%M:%S
-        title: TRME Your authorized applications
+        application:
+        created_at:
+        date_format:
+        title:
     errors:
       messages:
-        access_denied: TRME The resource owner or authorization server denied the
-          request.
-        credential_flow_not_configured: >-
-          TRME Resource Owner Password Credentials flow failed due to Doorkeeper.configure.resource_owner_from_credentials
-          being unconfigured.
-        invalid_client: >-
-          TRME Client authentication failed due to unknown client, no client authentication
-          included, or unsupported authentication method.
-        invalid_grant: >-
-          TRME The provided authorization grant is invalid, expired, revoked, does
-          not match the redirection URI used in the authorization request, or was
-          issued to another client.
-        invalid_redirect_uri: TRME The redirect uri included is not valid.
-        invalid_request: >-
-          TRME The request is missing a required parameter, includes an unsupported
-          parameter value, or is otherwise malformed.
-        invalid_resource_owner: >-
-          TRME The provided resource owner credentials are not valid, or resource
-          owner cannot be found
-        invalid_scope: TRME The requested scope is invalid, unknown, or malformed.
+        access_denied:
+        credential_flow_not_configured:
+        invalid_client:
+        invalid_grant:
+        invalid_redirect_uri:
+        invalid_request:
+        invalid_resource_owner:
+        invalid_scope:
         invalid_token:
-          expired: TRME The access token expired
-          revoked: TRME The access token was revoked
-          unknown: TRME The access token is invalid
-        resource_owner_authenticator_not_configured: >-
-          TRME Resource Owner find failed due to Doorkeeper.configure.resource_owner_authenticator
-          being unconfiged.
-        server_error: >-
-          TRME The authorization server encountered an unexpected condition which
-          prevented it from fulfilling the request.
-        temporarily_unavailable: >-
-          TRME The authorization server is currently unable to handle the request
-          due to a temporary overloading or maintenance of the server.
-        unauthorized_client: TRME The client is not authorized to perform this request
-          using this method.
-        unsupported_grant_type: TRME The authorization grant type is not supported
-          by the authorization server.
-        unsupported_response_type: TRME The authorization server does not support
-          this response type.
+          expired:
+          revoked:
+          unknown:
+        resource_owner_authenticator_not_configured:
+        server_error:
+        temporarily_unavailable:
+        unauthorized_client:
+        unsupported_grant_type:
+        unsupported_response_type:
     flash:
       applications:
         create:
-          notice: TRME Application created.
+          notice:
         destroy:
-          notice: TRME Application deleted.
+          notice:
         update:
-          notice: TRME Application updated.
+          notice:
       authorized_applications:
         destroy:
-          notice: TRME Application revoked.
+          notice:
     layouts:
       admin:
         nav:
-          applications: TRME Applications
-          oauth2_provider: TRME OAuth2 Provider
+          applications:
+          oauth2_provider:
       application:
-        title: TRME OAuth authorize required
+        title:
     scopes:
-      read_bikes: TRME Permission to see what bikes you have on Bike Index
-      read_bikewise: TRME Permission to see information from Bikewise.org
-      read_organization_membership: TRME Permission to see the organizations you belong
-        to
-      read_user: >-
-        TRME Permission to see information about you (name, email, shared public information)
-      unconfirmed: TRME Permission to get unconfirmed users and ability to see if
-        user is confirmed
-      write_bikes: TRME Permission to *update* the bikes you have on Bike Index
-      write_bikewise: TRME Permission to *update* information for Bikewise.org
-      write_organizations: TRME Permission to *create* organizations on Bike Index
-      write_user: TRME Permission to *update* information about you
+      public:
+      read_bikes:
+      read_bikewise:
+      read_organization_membership:
+      read_user:
+      unconfirmed:
+      write_bikes:
+      write_bikewise:
+      write_organizations:
+      write_user:
