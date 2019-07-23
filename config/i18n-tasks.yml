@@ -19,8 +19,13 @@ data:
   # Locale files or `File.find` patterns where translations are read from:
   read:
     ## Default:
-    - config/locales/%{locale}.yml
-    - config/locales/**/*.%{locale}.yml
+    - config/locales/doorkeeper.en.yml
+    - config/locales/doorkeeper.nl.yml
+    - config/locales/gflash.en.yml
+    - config/locales/gflash.nl.yml
+    - config/locales/en.yml
+    - config/locales/nl.yml
+
 
   # Locale files to write new keys to, based on a list of key pattern => file
   # rules. Matched from top to bottom:
