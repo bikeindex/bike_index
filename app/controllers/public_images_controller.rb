@@ -56,11 +56,7 @@ class PublicImagesController < ApplicationController
     if params[:page].present?
       redirect_to edit_bike_url(imageable_id, page: params[:page]) and return
     elsif imageable_type == "Blog"
-      if request.xhr?
-        render json: {success: true} and return
-      else
-        redirect_to edit_admin_news_url(@imageable.title_slug) and return
-      end
+      redirect_to edit_admin_news_url(@imageable.title_slug), status: 303 and return
     else
       redirect_to edit_bike_url(imageable_id)
     end

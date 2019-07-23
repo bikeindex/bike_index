@@ -67,7 +67,7 @@ function BinxAdminBlogs() {
         triggerUploadOnSubmit: false
       })
       uppy.on('upload-success', (file, response) => {
-        this.appendPublicImage(response.body.public_image)
+        this.publicImageTemplate(response.body.public_image)
       })
     },
 
@@ -77,13 +77,16 @@ function BinxAdminBlogs() {
         const id = $(".image-delete-button").closest(".row").find("input").val()
         $.ajax({
           url: `/public_images/${id}`,
-          type: 'delete'
+          type: 'delete',
+          success: function(result) {
+            window.location.reload;
+          }
         });
         this.closest('li').remove()
       })
     },
 
-    appendPublicImage(image) {
+    publicImageTemplate(image) {
       const alt = image.name
       const src = image.image.url
       const id = image.id
@@ -143,7 +146,7 @@ function BinxAdminBlogs() {
     },
 
     setIndexImage(e) {
-      $("ul#public_images").on("change", '.index-image-select input', function(e){
+      $("ul#public_images").on("change", '.index-image-select input', function(e) {
         e.preventDefault();
         if ($('#blog_index_image_id').val != 0) {
           $('#blog_index_image_id').val($(e.target).val());
