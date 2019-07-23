@@ -16,7 +16,7 @@
         =# TODO: localized price points
         %h3= number_to_currency(plan_data[:cost], precision: 0)
         %p
-          = t("number.currency.alphabetic_code")
+          = default_currency
           = "/"
           = t(".year")
 

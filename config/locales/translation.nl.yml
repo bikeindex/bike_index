@@ -4485,3 +4485,7 @@ nl:
   locales:
     en: Engels
     nl: Nederlands
+  money:
+    currencies:
+      en: USD
+      nl: EUR

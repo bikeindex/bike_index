@@ -3140,9 +3140,14 @@ en:
     users_request_password_reset: Reset password - Bike Index
     welcome_goodbye: Logged out
     welcome_index: Bike Index - Bike registration that works
+  money:
+    currencies:
+      en: USD
+      en-GB: GBP
+      es: EUR
+      nl: EUR
   number:
     currency:
-      alphabetic_code: USD
       format:
         delimiter: ","
         format: "%u%n"

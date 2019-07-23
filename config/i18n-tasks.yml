@@ -127,6 +127,8 @@ ignore_unused:
 - 'meta_titles.*'
 - 'meta_descriptions.*'
 - 'helpers.page_entries_info.*'
+- 'locales.*'
+- 'money.*'
 
 ## Exclude these keys from the `i18n-tasks eq-base' report:
 # ignore_eq_base:
