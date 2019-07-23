@@ -9,10 +9,10 @@ nl:
   gflash:
     titles:
       warning: waarschuwing
-      error: 
-      notice: 
-      progress: 
-      success: 
+      error: Fout
+      notice: Merk op
+      progress: Vooruitgang
+      success: Succes
   date:
     day_names:
     - zondag
@@ -31,7 +31,7 @@ nl:
     - vr
     - za
     month_names:
-    - 
+    -
     - januari
     - februari
     - maart
@@ -45,7 +45,7 @@ nl:
     - november
     - december
     abbr_month_names:
-    - 
+    -
     - jan
     - feb
     - mrt
@@ -3109,153 +3109,153 @@ nl:
       apply_to_be_an_ambassador_here: Meld u hier aan als ambassadeur
       apply_today: Meld je vandaag aan
       be_a_bike_saver: Wees een fietsspaarder
-      become_a_bike_index_ambassador: 
-      become_an_ambassador: 
-      bike_index_is_a_nonprofit_with_a_big_miss: 
-      bike_index_launches_new_ambassador_progra: 
-      check_out_our_media_resources: 
-      connect_us_with_city_officials_law_enforc: 
+      become_a_bike_index_ambassador:
+      become_an_ambassador:
+      bike_index_is_a_nonprofit_with_a_big_miss:
+      bike_index_launches_new_ambassador_progra:
+      check_out_our_media_resources:
+      connect_us_with_city_officials_law_enforc:
       current_ambassadors: Huidige ambassadeurs
-      follow_bike_index_on_twitter_facebook_and: 
-      get_bike_shops_signed_up_for_bike_index_u: 
-      give_you_shoutouts_on_social_media: 
-      here: 
+      follow_bike_index_on_twitter_facebook_and:
+      get_bike_shops_signed_up_for_bike_index_u:
+      give_you_shoutouts_on_social_media:
+      here:
       how_it_works: Hoe het werkt
-      join_our_list_of_ambassadors_and_advocate: 
-      monitoring_online_sales_platforms_like_cr: 
-      pos_integrations: 
-      relevant_articles: 
-      share_bike_index_on_social_channels_inclu: 
-      start_here: 
-      to_become_a_bike_index_ambassador_fill_ou: 
-      typical_ambassador_activities: 
-      typical_ambassador_activities_include: 
-      view_current_ambassadors: 
-      want_to_help_fight_bike_theft_in_your_com: 
-      we_provide_you_with_the_resources_to_make: 
-      why_work_with_bike_index: 
-      you_bring_the_ideas_make_the_connections_: 
+      join_our_list_of_ambassadors_and_advocate:
+      monitoring_online_sales_platforms_like_cr:
+      pos_integrations:
+      relevant_articles:
+      share_bike_index_on_social_channels_inclu:
+      start_here:
+      to_become_a_bike_index_ambassador_fill_ou:
+      typical_ambassador_activities:
+      typical_ambassador_activities_include:
+      view_current_ambassadors:
+      want_to_help_fight_bike_theft_in_your_com:
+      we_provide_you_with_the_resources_to_make:
+      why_work_with_bike_index:
+      you_bring_the_ideas_make_the_connections_:
     ascend:
-      ascend_knowledge_base_article: 
-      automatic_bicycle_registration: 
-      email_shops_html: 
-      email_us_the_password_to_finish_setting_u: 
-      follow_the_setup_instructions_html: 
-      if_your_shop_uses_lightspeed_html: 
-      link_your_ascend_retail_and_bike_index: 
-      new_bike_shop_org: 
-      once_youve_set_up_the_trek_ascenwd: 
-      sign_up_as_a_new_org_html: 
-      then_if_a_customers_bike_goes_missing_html: 
-      we_have_a_new_free_bicycle_registration: 
+      ascend_knowledge_base_article:
+      automatic_bicycle_registration:
+      email_shops_html:
+      email_us_the_password_to_finish_setting_u:
+      follow_the_setup_instructions_html:
+      if_your_shop_uses_lightspeed_html:
+      link_your_ascend_retail_and_bike_index:
+      new_bike_shop_org:
+      once_youve_set_up_the_trek_ascenwd:
+      sign_up_as_a_new_org_html:
+      then_if_a_customers_bike_goes_missing_html:
+      we_have_a_new_free_bicycle_registration:
     bike_shop_packages:
       additional: Extra
-      bike_index_for_bike_shops: 
-      choose_a_package_size: 
-      compare_plans_and_features: 
+      bike_index_for_bike_shops:
+      choose_a_package_size:
+      compare_plans_and_features:
       contact_us: Contacteer ons
-      contact_us_for_trial: 
+      contact_us_for_trial:
       forever: Voor altijd
       free: GRATIS
-      package_title: 
-      questions_want_to_get_started: 
+      package_title:
+      questions_want_to_get_started:
       sign_up: Registreren
       sign_up_now: Meld je nu aan
-      simply_the_best_bike_registry: 
-      supporting_shop: 
+      simply_the_best_bike_registry:
+      supporting_shop:
       try_for_free: Probeer gratis
       year: jaar
     campus_packages:
       additional: Extra
-      all_plans_come_with_a_30day_free_trial: 
-      bike_index_for_colleges_universities: 
-      choose_a_package_size: 
-      clean_up_your_campus_messy_registry: 
-      compare_plans_and_features: 
+      all_plans_come_with_a_30day_free_trial:
+      bike_index_for_colleges_universities:
+      choose_a_package_size:
+      clean_up_your_campus_messy_registry:
+      compare_plans_and_features:
       contact_us: Contacteer ons
-      contact_us_for_trial: 
+      contact_us_for_trial:
       forever: Voor altijd
       free: GRATIS
-      keep_us_pedaling: 
-      number_of_members: 
-      package_title: 
-      questions_want_to_get_started: 
+      keep_us_pedaling:
+      number_of_members:
+      package_title:
+      questions_want_to_get_started:
       sign_up: Registreren
       sign_up_now: Meld je nu aan
       try_for_free: Probeer gratis
       year: jaar
     cities_packages:
       additional: Extra
-      all_plans_come_with_a_30day_free_trial: 
-      bike_index_for_cities: 
-      choose_a_package_size: 
-      compare_plans_and_features: 
+      all_plans_come_with_a_30day_free_trial:
+      bike_index_for_cities:
+      choose_a_package_size:
+      compare_plans_and_features:
       contact_us: Contacteer ons
-      contact_us_for_trial: 
+      contact_us_for_trial:
       forever: Voor altijd
       free: GRATIS
-      give_your_constituents_the_bike_registry_: 
-      keep_us_pedaling: 
-      metropolis: 
-      package_title: 
-      questions_want_to_get_started: 
+      give_your_constituents_the_bike_registry_:
+      keep_us_pedaling:
+      metropolis:
+      package_title:
+      questions_want_to_get_started:
       sign_up: Registreren
       sign_up_now: Meld je nu aan
-      small_city: 
-      town: 
+      small_city:
+      town:
       try_for_free: Probeer gratis
       year: jaar
     find_out_more:
-      custom_development_available: 
-      find_out_more_html: 
+      custom_development_available:
+      find_out_more_html:
       get_in_touch_link: Neem contact op
     for_bike_shops:
-      5_ways_to_grow_community_for_your_bike_sh: 
-      ascend_retail: 
-      bike_index_for_bike_shops: 
-      bikes_before_they: 
-      build_goodwill_with_your_customers_with_a: 
-      connect_your_ascend_account_html: 
-      connect_your_lightspeed_account: 
-      do_right_by_your_customers: 
-      dont_use_ascend_or_lightspeed_html: 
-      driving_service_revenues_with_bicycle_reg: 
-      features_and_pricing: 
-      for_completely_free_we_provide_you_with_t: 
+      5_ways_to_grow_community_for_your_bike_sh:
+      ascend_retail:
+      bike_index_for_bike_shops:
+      bikes_before_they:
+      build_goodwill_with_your_customers_with_a:
+      connect_your_ascend_account_html:
+      connect_your_lightspeed_account:
+      do_right_by_your_customers:
+      dont_use_ascend_or_lightspeed_html:
+      driving_service_revenues_with_bicycle_reg:
+      features_and_pricing:
+      for_completely_free_we_provide_you_with_t:
       here: hier
-      join_our_network_link_html: 
+      join_our_network_link_html:
       learn_more: Leer meer
-      network_of_shop_partners: 
-      once_you_do_this_link_your_account_to_you: 
+      network_of_shop_partners:
+      once_you_do_this_link_your_account_to_you:
       or: of
-      our_official_lightspeed_integration_provi: 
-      printed_materials: 
-      register_bikes_for_your_customers: 
-      related_articles: 
-      sign_up_for_a_free_bike_index_account_html: 
-      trusted_by_bike_shops_everywhere: 
-      use_lightspeed_retail: 
-      used_at_bike_shops_everywhere: 
+      our_official_lightspeed_integration_provi:
+      printed_materials:
+      register_bikes_for_your_customers:
+      related_articles:
+      sign_up_for_a_free_bike_index_account_html:
+      trusted_by_bike_shops_everywhere:
+      use_lightspeed_retail:
+      used_at_bike_shops_everywhere:
     for_cities:
-      actually_get_people_registered_and_do_it_: 
-      bike_index_for_cities: 
-      bike_index_is_the_community_registration_: 
-      bike_index_unveils_partnership_with_the_c: 
-      bring_together_bike_shops_schools_municip: 
-      engage_your_residents_and_recover_their_b: 
-      features_amp_pricing: 
-      mitigate_the_registration_mess: 
-      no_more_index_cards_or_excel_sheets_give_: 
-      our_community_is_your_community: 
-      plug_your_city_in_nationally: 
-      related_articles: 
-      trusted_by_law_enforcement_everywhere: 
-      trusted_by_municipalities_everywhere: 
+      actually_get_people_registered_and_do_it_:
+      bike_index_for_cities:
+      bike_index_is_the_community_registration_:
+      bike_index_unveils_partnership_with_the_c:
+      bring_together_bike_shops_schools_municip:
+      engage_your_residents_and_recover_their_b:
+      features_amp_pricing:
+      mitigate_the_registration_mess:
+      no_more_index_cards_or_excel_sheets_give_:
+      our_community_is_your_community:
+      plug_your_city_in_nationally:
+      related_articles:
+      trusted_by_law_enforcement_everywhere:
+      trusted_by_municipalities_everywhere:
     for_community_groups:
-      bike_index_for_community_groups: 
-      bike_index_launches_new_ambassadors_progr: 
-      bike_index_welcomes_stolen_bikes_nola: 
-      gone_are_the_days_where_you_had_to_regist: 
+      bike_index_for_community_groups:
+      bike_index_launches_new_ambassadors_progr:
+      bike_index_welcomes_stolen_bikes_nola:
+      gone_are_the_days_where_you_had_to_regist:
       help_us_help_you: Help ons u te helpen
       here: hier
       partners_made_in_heaven: Partners gemaakt in de hemel
@@ -3263,7 +3263,7 @@ nl:
       registrations_are_free_forever_join_bike_: Inschrijvingen zijn gratis. Voor
         altijd. Word lid van Bike Index en begin vandaag nog met registreren.
       related_articles: 'Gerelateerde artikelen:'
-      sign_up_for_free: 
+      sign_up_for_free:
       spread_the_bike_index_word_html: Verspreid het Bike Index-woord naar uw kiezers
         om ze beschermd te rijden. Maak een gratis organisatieaccount %{link}.
       the_most_widereaching_and_effective_tools: De meest uitgebreide en effectieve
@@ -3277,11 +3277,11 @@ nl:
         fietser, we willen alle fietsen laten rijden met de eigenaren die ze nodig
         hebben.
     for_law_enforcement:
-      automated_tweets: 
+      automated_tweets:
       bend_reduces_bike_theft_by_60_percent: Bocht vermindert fietsdiefstal met 60
         procent
       bike_index_for_law_enforcement: Fietsindex voor wetshandhaving
-      bike_indexs_newest_municipal_partner: 
+      bike_indexs_newest_municipal_partner:
       here: hier
       if_you_want_to_collaborate_html: Als je wilt samenwerken met andere afdelingen
         in je stad om een register te beheren, lees je meer over Bike Index voor gemeenten
@@ -4264,191 +4264,224 @@ nl:
       superuser_home: Superuser thuis
       you: U
       your_bikes: Je fietsen
-      your_preferences: 
+      your_preferences: Jouw voorkeuren
     period_select:
-      all: 
-      last_30_days: 
-      last_7_days: 
-      last_day: 
-      last_hour: 
-      last_year: 
+      all: Alle
+      last_30_days: Laatste 30 dagen
+      last_7_days: Afgelopen 7 dagen
+      last_day: laatste dag
+      last_hour: laatste uur
+      last_year: Afgelopen jaar
   users:
     accept_terms:
-      i_agree_to_tos_html: 
-      submit: 
+      i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
+        Bike Index.
+      submit: Opslaan
     accept_vendor_terms:
-      i_agree_to_tos_html: 
-      submit: 
+      i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
+        Bike Index <strong>voor organisaties</strong> .
+      submit: Opslaan
     confirm_error_404:
-      we_couldnt_find_a_user_with_that_id: 
-      woops: 
+      we_couldnt_find_a_user_with_that_id: We konden geen gebruiker met die ID vinden.
+        Er is iets vreemds aan de hand.
+      woops: Woops
     confirm_error_bad_token:
-      could_not_find_matching_ticket: 
-      woops: 
+      could_not_find_matching_ticket: Dat ticket komt met niets overeen in onze administratie.
+        Sorry.
+      woops: Woops
     edit:
-      save_changes: 
-      you_are_editing: 
+      save_changes: Wijzigingen opslaan
+      you_are_editing: Je bent aan het bewerken
     edit_password:
-      for_password_update: 
-      new_password: 
-      new_password_confirmation: 
-      reset_password: 
+      for_password_update: Voor wachtwoordupdate
+      new_password: Nieuw wachtwoord
+      new_password_confirmation: Bevestiging van nieuwe wachtwoord
+      reset_password: Reset wachtwoord
     edit_root:
-      add_additional_email: 
-      additional_email: 
-      address: 
-      any_use_of_your_personal_information_html: 
-      choose_country: 
-      choose_language: 
-      city: 
-      confirmed_emails: 
-      give_us_permission_html: 
-      have_multiple_emails: 
-      make_primary_email: 
-      notifications_email: 
-      personal_information_for_user: 
-      preferred_language: 
-      primary_email: 
-      receive_the_bike_index_newsletter: 
-      remove_email: 
-      resend_confirmation: 
-      state: 
-      unconfirmed_emails: 
-      zipcode: 
+      add_additional_email: Voeg extra e-mail toe
+      additional_email: Extra E-mail
+      address: Adres
+      any_use_of_your_personal_information_html: Elk gebruik van uw persoonlijke informatie
+        valt onder de voorwaarden van onze %{privacy_policy}. We verkopen, verhandelen
+        of verhuren uw persoonlijke gegevens niet aan derden.
+      choose_country: Kies land
+      choose_language: Kies een taal
+      city: City
+      confirmed_emails: Bevestigde e-mails
+      give_us_permission_html: Geef ons toestemming om contact met u op te nemen als
+        we denken dat uw fiets is gestolen, <em>zelfs als deze niet als gestolen is
+        gemarkeerd -</em> <strong>%{why_you_should_link}</strong>
+      have_multiple_emails: Heeft u meerdere e-mails? Consolideer ze hier in één account
+      make_primary_email: Maak primaire e-mail
+      notifications_email: Dit is de e-mail waarnaar we meldingen sturen
+      personal_information_for_user: Persoonlijke informatie voor %{user_name}
+      preferred_language: Voorkeurstaal
+      primary_email: primaire email
+      receive_the_bike_index_newsletter: Ontvang de Bike Index-nieuwsbrief
+      remove_email: E-mail verwijderen
+      resend_confirmation: Opnieuw verzenden Bevestiging
+      state: Staat
+      unconfirmed_emails: Niet-bevestigde e-mails
+      zipcode: Postcode
     edit_sharing:
-      additional_link: 
-      choose_file: 
-      create_page: 
-      create_public_page: 
-      example_url: 
-      my_awesome_link: 
-      no_personal_site: 
-      no_please_dont_create_me_a_page: 
-      no_twitter: 
-      page_text: 
-      page_title: 
-      personal_site_url: 
-      preview_page: 
-      profile_avatar: 
-      sharing_and_personal_page_settings: 
-      show_personal_site: 
-      show_personal_website: 
-      show_twitter: 
-      the_bike_index_can_create_a_page: 
-      this_users_bikes: 
-      title_for_link: 
-      twitter_handle: 
-      your_username_is_the_url_for_your_sharing: 
+      additional_link: Aanvullende link
+      choose_file: Kies bestand...
+      create_page: Creëer pagina
+      create_public_page: Maak een openbare pagina
+      example_url: http://example.com
+      my_awesome_link: Mijn geweldige link
+      no_personal_site: Geen persoonlijke site
+      no_please_dont_create_me_a_page: Nee, maak alsjeblieft geen pagina voor me
+      no_twitter: Geen Twitter
+      page_text: Paginatekst
+      page_title: Pagina titel
+      personal_site_url: Persoonlijke site-URL
+      preview_page: voorbeeldpagina
+      profile_avatar: Profiel avatar
+      sharing_and_personal_page_settings: Instellingen voor delen en persoonlijke
+        pagina
+      show_personal_site: Persoonlijke site weergeven
+      show_personal_website: Persoonlijke website tonen
+      show_twitter: Twitter weergeven
+      the_bike_index_can_create_a_page: Met de fietsindex kunt u een pagina maken
+        met al uw fietsen met alle informatie die u wilt delen. Het is je persoonlijke
+        pagina.
+      this_users_bikes: De fietsen van deze gebruiker
+      title_for_link: Titel voor link
+      twitter_handle: Twitter account
+      your_username_is_the_url_for_your_sharing: Uw gebruikersnaam is de URL voor
+        uw deelpagina en het embed-formulier van de fiets. Update het als je om die
+        dingen geeft.
     globalid:
-      sign_in_with_globalid: 
+      sign_in_with_globalid: Log in met GlobaliD
     new:
-      agree_bikeindex_bikehub_toc_html: 
-      agree_bikeindex_toc_html: 
-      already_have_a_bike_index_account: 
-      already_have_an_account: 
-      bikehub_terms_url: 
-      forgot_your_password: 
-      get_bike_indexs_newsletter: 
-      get_on_bike_index: 
-      log_in: 
-      or: 
-      sign_up: 
-      sign_up_using_facebook: 
-      sign_up_using_strava: 
-      terms_and_conditions: 
+      agree_bikeindex_bikehub_toc_html: Ik ga akkoord met BikeHub's %{bikehub_toc_link}
+        en Bike Index's %{bikeindex_toc_link}.
+      agree_bikeindex_toc_html: Ik ga akkoord met Bike Index's %{bikeindex_toc_link}.
+      already_have_a_bike_index_account: al een Bike Index-account?
+      already_have_an_account: Heeft u al een account?
+      bikehub_terms_url: https://basic.bikehub.com/terms.html
+      forgot_your_password: Wachtwoord vergeten?
+      get_bike_indexs_newsletter: Ontvang Bike Index's nieuwsbrief
+      get_on_bike_index: Ga op Bike Index
+      log_in: Log in
+      or: of
+      sign_up: Registreren
+      sign_up_using_facebook: Meld je aan met Facebook
+      sign_up_using_strava: Meld je aan met Strava
+      terms_and_conditions: Termen en voorwaarden
     password_reset:
-      follow_the_link_back: 
-      password_reset: 
-      weve_sent_an_email: 
+      follow_the_link_back: Volg de link terug naar de site om uw wachtwoord opnieuw
+        in te stellen!
+      password_reset: Wachtwoord reset
+      weve_sent_an_email: We hebben een e-mail gestuurd naar het adres dat u bij ons
+        hebt geregistreerd.
     please_confirm_email:
-      please_verify_your_email: 
-      thanks_for_signing_up_for_bike_index: 
-      we_sent_an_email: 
-      we_sent_an_email_to_user_email_html: 
+      please_verify_your_email: Verifieer uw e-mailadres
+      thanks_for_signing_up_for_bike_index: Bedankt voor het aanmelden voor Bike Index!
+      we_sent_an_email: We hebben een e-mail verzonden met een bevestigingslink erin.
+        Volg de link in de e-mail om het aanmelden te voltooien!
+      we_sent_an_email_to_user_email_html: We hebben een e-mail verzonden naar <strong
+        class="stolen-color">%{user_email}</strong> met een bevestigingslink erin.
+        Volg de link in de e-mail om het aanmelden te voltooien!
     request_password_reset:
-      enter_the_email_address: 
-      reset_your_password: 
-      your_email_address: 
+      enter_the_email_address: Voer het e-mailadres in dat je hebt gebruikt om je
+        aan te melden. We sturen u een e-mail met een link om uw wachtwoord opnieuw
+        in te stellen.
+      reset_your_password: Stel je wachtwoord opnieuw in
+      your_email_address: Uw e-mailadres
     show:
-      bikes: 
-      recovered: 
-      stolen: 
-      this_user_has_no_bikes_yet: 
-      this_users_bikes: 
+      bikes: Bikes
+      recovered: hersteld
+      stolen: Gestolen!
+      this_user_has_no_bikes_yet: Deze gebruiker heeft nog geen fietsen!
+      this_users_bikes: De fietsen van deze gebruiker
     update_password:
-      and_try_not_to_forget_it: 
-      choose_a_new_password: 
-      password: 
-      password_confirmation: 
-      update_password: 
-      update_your_password: 
+      and_try_not_to_forget_it: en probeer het niet te vergeten ...
+      choose_a_new_password: Kies een nieuw wachtwoord!
+      password: Wachtwoord
+      password_confirmation: Wachtwoord bevestigen
+      update_password: password-update
+      update_your_password: Update uw wachtwoord
   welcome:
     choose_registration:
-      add_a_bike_through: 
-      add_a_stolen_bike: 
-      add_a_stolenfound_bike: 
-      add_your_own_bike: 
-      register_bike: 
+      add_a_bike_through: Voeg een fiets toe door
+      add_a_stolen_bike: Voeg een gestolen fiets toe
+      add_a_stolenfound_bike: Voeg een gestolen / gevonden fiets toe die je hebt hersteld
+      add_your_own_bike: Voeg je eigen fiets toe
+      register_bike: Fiets aanmelden
     goodbye:
-      come_back_soon: 
-      youve_been_logged_out: 
+      come_back_soon: Kom snel terug!
+      youve_been_logged_out: U bent uitgelogd
     index:
-      alert_the_community: 
-      bike_index_statistics: 
-      bikes_registered_this_week: 
-      but_how_does_it_work: 
-      hero: 
-      how_it_works: 
-      identifying_your_bike: 
-      if_your_bike_goes_missing: 
-      partner_organizations: 
-      read_more_recovery_stories: 
-      recover_your_bike_for_free: 
-      register_now: 
-      register_your_bike: 
-      stolen_bikes_recovered: 
-      stolen_bikes_registered: 
-      the_community_responds: 
-      total_bikes_registered: 
-      total_recovery_value: 
-      used_by: 
-      value_of_bikes_recovered: 
-      you_get_your_bike_back: 
+      alert_the_community: Waarschuw de community
+      bike_index_statistics: Bike Index-statistieken
+      bikes_registered_this_week: Fietsen zijn deze week geregistreerd
+      but_how_does_it_work: Maar hoe werkt het?
+      hero: Fietsregistratie die werkt
+      how_it_works: Het is makkelijk. Voer uw naam, fietsfabrikant, serienummer en
+        componentinformatie in om uw fiets in te voeren in het meest gebruikte fietsregister
+        ter wereld.
+      identifying_your_bike: Een gebruiker of partner ontmoet uw fiets, gebruikt Bike
+        Index om deze te identificeren en neemt contact met u op.
+      if_your_bike_goes_missing: Als je fiets vermist raakt, markeer deze dan als
+        verloren of gestolen om de hele Bike Index-gemeenschap en haar partners op
+        de hoogte te stellen.
+      partner_organizations: Partnerorganisaties
+      read_more_recovery_stories: Lees meer herstelverhalen
+      recover_your_bike_for_free: Met de hulp van de Bike Index-gemeenschap en haar
+        partners beschikt u over de informatie die nodig is om uw verloren of gestolen
+        fiets kosteloos terug te vorderen. Het is wat we doen.
+      register_now: Registreer nu!
+      register_your_bike: Registreer uw fiets
+      stolen_bikes_recovered: Gestolen fietsen hersteld
+      stolen_bikes_registered: Gestolen fietsen geregistreerd
+      the_community_responds: De community reageert
+      total_bikes_registered: Totaal aantal geregistreerde fietsen
+      total_recovery_value: Totale herstelwaarde
+      used_by: Gebruikt door
+      value_of_bikes_recovered: Meer dan %{value} Waarde van fietsen hersteld
+      you_get_your_bike_back: Je krijgt je fiets terug
     recovery_stories:
-      recovery_stories: 
+      recovery_stories: Herstelverhalen
     update_browser:
-      go_here_to_learn_more: 
-      oh_no: 
-      unsupported_browser: 
+      go_here_to_learn_more: Ga hierheen voor meer informatie
+      oh_no: Oh nee!
+      unsupported_browser: Helaas ondersteunt Bike Index uw browser niet.
     user_home:
-      add_a_bike: 
-      add_a_lock: 
-      add_a_photo: 
-      add_some_info: 
-      bikes: 
-      combination: 
-      date_recovered: 
-      date_stolen: 
-      edit: 
-      edit_bike: 
-      key_serial: 
-      location: 
-      lock_type: 
-      locks: 
-      manufacturer: 
-      mark_bike_stolen: 
-      primary_colors: 
-      printable_pdf: 
-      recovered: 
-      register_new_items: 
-      serial: 
-      sorry_your_bike_was_stolen: 
-      stolen: 
-      tell_us_more_about_yourself: 
-      thanks_for_adding_your_bike: 
-      to_bike_index_thanks_for_signing_up: 
-      update_your_profile: 
-      user_bikes: 
-      welcome: 
-      you_have_no_registered_bikes: 
-      you_have_no_registered_locks: 
+      add_a_bike: Voeg een fiets toe
+      add_a_lock: Voeg een slot toe
+      add_a_photo: Voeg een foto toe
+      add_some_info: Voeg wat info toe
+      bikes: Bikes
+      combination: Combinatie
+      date_recovered: Datum hersteld
+      date_stolen: Datum gestolen
+      edit: Bewerken
+      edit_bike: Fiets bewerken
+      key_serial: Sleutel serienummer
+      location: Plaats
+      lock_type: Slottype
+      locks: sloten
+      manufacturer: Fabrikant
+      mark_bike_stolen: Markeer fiets gestolen
+      primary_colors: Primaire kleuren
+      printable_pdf: Afdrukbaar (pdf)
+      recovered: hersteld
+      register_new_items: Registreer nieuwe items
+      serial: serie-
+      sorry_your_bike_was_stolen: Het spijt ons dat je %{bikes_last_type} is gestolen,
+        maar hopelijk krijg je het terug, als iedereen er naar kan zoeken.
+      stolen: Gestolen
+      tell_us_more_about_yourself: Vertel ons meer over jezelf.
+      thanks_for_adding_your_bike: Geweldig! We zijn gepompt dat je een %{bikes_last_type}
+        hebt toegevoegd aan de index.
+      to_bike_index_thanks_for_signing_up: naar Bike Index. Bedankt voor het aanmelden!
+      update_your_profile: update je profiel
+      user_bikes: "%{current_user_name} Fietsen"
+      welcome: Welkom
+      you_have_no_registered_bikes: U hebt geen geregistreerde fietsen
+      you_have_no_registered_locks: U hebt geen geregistreerde sloten
+  locales:
+    en: Engels
+    nl: Nederlands
