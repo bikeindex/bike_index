@@ -24,6 +24,7 @@ function BinxAdminBlogs() {
       this.setIndexImage();
       this.setIndex();
       this.noPrimaryPhotoToggle();
+      this.publicImageDelete();
     },
 
     editDate() {
@@ -66,33 +67,65 @@ function BinxAdminBlogs() {
         triggerUploadOnSubmit: false
       })
       uppy.on('upload-success', (file, response) => {
-        this.appendPublicImage(response)
+        this.appendPublicImage(response.body.public_image)
+      })
+    },
+
+    publicImageDelete() {
+      $('ul#public_images').on('click', ".image-delete-button", function(e) {
+        e.preventDefault();
+        const id = $(".image-delete-button").closest(".row").find("input").val()
+        console.log(id)
+        let url_string = `/public_images/${id}`;
+        $.ajax({
+          url: url_string,
+          type: 'delete'
+        });
+        this.closest('li').remove()
       })
     },
 
     appendPublicImage(image) {
-      const alt = image.body.public_image.name
-      const src = image.body.public_image.image.url
+      const alt = image.name
+      const src = image.image.url
+      const id = image.id
       const publicImage =
-      "<div class='card bg-light admin-public-image'>\
-        <div class='card-body'>\
-          <div class='row'>\
-            <div class='col-md-2 col-sm-6 mt-auto'>\
-              <p>\
-                 " + alt +"\
-              </p>\
-            </div>\
-            <div class='col-md-8 col-sm-6 mt-auto'>\
-             <textarea class='form-control'> &lt;img class='post-image' src='"+ image.body.public_image.image.url +"' alt='ENTER YOUR TEXT HERE'&gt; </textarea>\
-            </div>\
-            <div class='col-md-2 col-sm-12'>\
-              <div class='img-box'>\
-                <img src='"+src  +"'' alt='"+alt+"'/>\
-              </div>\
-            </div>\
-          </div>\
-        </div>\
-      </div>"
+
+        `<li>
+          <div class='card bg-light admin-public-image'>
+            <div class='card-body'>
+              <div class='row'>
+                <div class='col-md-2 col-sm-6 mt-auto'>
+                  <p>
+                    ${alt}
+                  </p>
+              </div>
+              <div class='col-md-8 col-sm-6 mt-auto'>
+               <textarea class='form-control'> &lt;img class='post-image' src='${src}' alt='ENTER YOUR TEXT HERE'&gt; </textarea>
+              </div>
+              <div class='col-md-2 col-sm-12'>
+                <div class='img-box'>
+                  <img src='${src}' alt='${alt}'/>
+                </div>
+              </div>
+            </div>
+            <hr/>
+            <div class='row mt-2'>
+              <div class='col-md-2'>
+                <a href='#' class="image-delete-button"> Delete</a>
+              </div>
+              <div class='col-md-8'>
+                <span> Copy the above text and paste it where you'd like it to appear in the post </span>
+              </div>
+              <div class='col-md-2'>
+                <div class="index-image-select">
+                  <input class="index_image_${id}" name="index_image_id" type="radio" value="${id}"></input>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>`
 
       const list = $("ul#public_images")
       list.append(publicImage)
@@ -113,7 +146,7 @@ function BinxAdminBlogs() {
     },
 
     setIndexImage(e) {
-      $('.index-image-select input').on("change", e => {
+      $("ul#public_images").on("change", '.index-image-select input', function(e){
         e.preventDefault();
         if ($('#blog_index_image_id').val != 0) {
           $('#blog_index_image_id').val($(e.target).val());
