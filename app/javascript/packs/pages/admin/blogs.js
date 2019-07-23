@@ -77,10 +77,7 @@ function BinxAdminBlogs() {
         const id = $(".image-delete-button").closest(".row").find("input").val()
         $.ajax({
           url: `/public_images/${id}`,
-          type: 'delete',
-          success: function(result) {
-            window.location.reload;
-          }
+          type: 'delete'
         });
         this.closest('li').remove()
       })
@@ -132,9 +129,9 @@ function BinxAdminBlogs() {
     },
 
     noPrimaryPhotoToggle() {
-      const $noPrimaryBox = $(".index_image_0")
-      $noPrimaryBox.on("change", e => {
-        if ($noPrimaryBox.prop("checked")) {
+      const noPrimaryBox = $(".index_image_0")
+      noPrimaryBox.on("change", e => {
+        if (noPrimaryBox.prop("checked")) {
           $(".index-image-select input").prop("checked", false)
         }
       })
