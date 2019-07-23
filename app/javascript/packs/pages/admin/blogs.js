@@ -75,10 +75,8 @@ function BinxAdminBlogs() {
       $('ul#public_images').on('click', ".image-delete-button", function(e) {
         e.preventDefault();
         const id = $(".image-delete-button").closest(".row").find("input").val()
-        console.log(id)
-        let url_string = `/public_images/${id}`;
         $.ajax({
-          url: url_string,
+          url: `/public_images/${id}`,
           type: 'delete'
         });
         this.closest('li').remove()
@@ -127,8 +125,7 @@ function BinxAdminBlogs() {
         </div>
       </li>`
 
-      const list = $("ul#public_images")
-      list.append(publicImage)
+      $("ul#public_images").append(publicImage)
     },
 
     noPrimaryPhotoToggle() {

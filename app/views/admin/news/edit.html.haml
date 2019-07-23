@@ -26,6 +26,8 @@
     = render partial: "/shared/errors", locals: { name: "Blog", obj: @blog }
 
   - if @blog.is_listicle
+    %h2.text-danger
+      Listicles are no longer actively maintained. Many things on this page are no longer working.
     = render partial: "listicle_form", locals: { f: f }
   - else
     = render partial: "form", locals: { f: f }

@@ -1,15 +1,14 @@
 class Admin::NewsController < Admin::BaseController
   before_filter :find_blog, only: [:show, :edit, :update, :destroy]
   before_filter :set_dignified_name
+  layout "new_admin"
 
   def index
     @blogs = Blog.order("created_at asc")
-    render layout: "new_admin"
   end
 
   def new
     @blog = Blog.new(published_at: Time.current, user_id: current_user.id)
-    render layout: "new_admin"
   end
 
   def image_edit
@@ -22,7 +21,6 @@ class Admin::NewsController < Admin::BaseController
   end
 
   def edit
-    render layout: "new_admin"
   end
 
   def update
