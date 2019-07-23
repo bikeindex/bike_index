@@ -84,11 +84,12 @@
 
           %li
             %span.attr-title #{t(".manufacturer")}:
-            -# We want to display the whole manufacturer name here, not just the simple name. So only use mnfg_name if it's other (which sanitizes)
-            - if @bike.manufacturer.name == "Other"
+            -# We want to display the whole manufacturer name here, not just the
+            -# simple name. So only use mnfg_name if it's other (which sanitizes)
+            - if @bike.manufacturer&.name == "Other"
               = @bike.mnfg_name
             - else
-              = @bike.manufacturer.name
+              = @bike.manufacturer&.name
           = @bike.attr_list_item(@bike.name, t(".name"), with_colon: true)
           = @bike.attr_list_item(@bike.frame_model, t(".model"), with_colon: true)
           = @bike.attr_list_item(@bike.year.to_s, t(".year"), with_colon: true)
