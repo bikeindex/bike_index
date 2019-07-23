@@ -2967,7 +2967,6 @@ en:
       sign_up_now: Sign Up Now
       try_for_free: Try For Free
       year: year
-  language: English
   layouts:
     application_revised:
       about: About
@@ -3042,6 +3041,9 @@ en:
     revised_messages:
       error: error
       please_fix_the_following: Please fix the following %{errors}
+  locales:
+    en: English
+    nl: Dutch
   meta_descriptions:
     bikes_index: Search for bikes that have been registered on Bike Index
     bikes_new: >-
