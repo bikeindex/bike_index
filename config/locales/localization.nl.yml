@@ -1,0 +1,226 @@
+# THIS FILE CONTAINS LOCALIZATION KEYS : date and number formats, number precisions,
+# number separators and all non-textual values depending on the language.
+# These values must not reach the translator, so they are separated in this file.
+#
+# More info here: https://translation.io/blog/gettext-is-better-than-rails-i18n#localization
+#
+# You can edit and/or add new localization keys here, they won't be touched by Translation.io.
+#
+# If you want to add a new localization key prefix, use the option described here:
+# https://github.com/translation/rails#custom-localization-key-prefixes
+#
+---
+nl:
+  date:
+    formats:
+      default: 
+      long: 
+      short: 
+    order:
+    - :day
+    - :month
+    - :year
+  number:
+    currency:
+      format:
+        delimiter: 
+        format: 
+        precision: 
+        separator: 
+        significant: 
+        strip_insignificant_zeros: 
+        unit: 
+      alphabetic_code: 
+    format:
+      delimiter: 
+      precision: 
+      separator: 
+      significant: 
+      strip_insignificant_zeros: 
+    human:
+      decimal_units:
+        format: 
+        units:
+          unit: 
+      format:
+        delimiter: 
+        precision: 
+        significant: 
+        strip_insignificant_zeros: 
+      storage_units:
+        format: 
+    percentage:
+      format:
+        delimiter: 
+        format: 
+    precision:
+      format:
+        delimiter: 
+  support:
+    array:
+      last_word_connector: 
+      two_words_connector: 
+      words_connector: 
+  time:
+    formats:
+      default: "%a %d %b %Y %H:%M:%S %Z"
+      long: "%d %B %Y %H:%M"
+      short: "%d %b %H:%M"
+      blog: 
+      convert_time: 
+      dotted: 
+      no_day_with_year: 
+      short_with_hour: 
+      short_with_year: 
+      standard_display: 
+  activerecord:
+    attributes:
+      ad:
+        organization: :activerecord.models.organization
+      ambassador:
+        country: :activerecord.models.country
+        state: :activerecord.models.state
+      ambassador_task_assignment:
+        ambassador: :activerecord.models.ambassador
+        ambassador_task: :activerecord.models.ambassador_task
+      b_param:
+        created_bike: :activerecord.models.created_bike
+        creator: :activerecord.models.creator
+        organization: :activerecord.models.organization
+      bike:
+        creation_organization: :activerecord.models.creation_organization
+        creator: :activerecord.models.creator
+        current_stolen_record: :activerecord.models.current_stolen_record
+        front_gear_type: :activerecord.models.front_gear_type
+        front_wheel_size: :activerecord.models.front_wheel_size
+        invoice: :activerecord.models.invoice
+        location: :activerecord.models.location
+        manufacturer: :activerecord.models.manufacturer
+        paint: :activerecord.models.paint
+        primary_frame_color: :activerecord.models.primary_frame_color
+        rear_gear_type: :activerecord.models.rear_gear_type
+        rear_wheel_size: :activerecord.models.rear_wheel_size
+        secondary_frame_color: :activerecord.models.secondary_frame_color
+        tertiary_frame_color: :activerecord.models.tertiary_frame_color
+        updator: :activerecord.models.updator
+      bike_code:
+        bike: :activerecord.models.bike
+        bike_code_batch: :activerecord.models.bike_code_batch
+        organization: :activerecord.models.organization
+        user: :activerecord.models.user
+      bike_code_batch:
+        organization: :activerecord.models.organization
+        user: :activerecord.models.user
+      bike_organization:
+        bike: :activerecord.models.bike
+        organization: :activerecord.models.organization
+      blog:
+        user: :activerecord.models.user
+      bulk_import:
+        organization: :activerecord.models.organization
+        user: :activerecord.models.user
+      component:
+        bike: :activerecord.models.bike
+        ctype: :activerecord.models.ctype
+        manufacturer: :activerecord.models.manufacturer
+      creation_state:
+        bike: :activerecord.models.bike
+        bulk_import: :activerecord.models.bulk_import
+        creator: :activerecord.models.creator
+        organization: :activerecord.models.organization
+      ctype:
+        cgroup: :activerecord.models.cgroup
+      customer_contact:
+        bike: :activerecord.models.bike
+        creator: :activerecord.models.creator
+        user: :activerecord.models.user
+      doorkeeper/access_grant:
+        application: :activerecord.models.application
+      doorkeeper/access_token:
+        application: :activerecord.models.application
+      doorkeeper/application:
+        owner: :activerecord.models.owner
+      export:
+        organization: :activerecord.models.organization
+        user: :activerecord.models.user
+      feedback:
+        user: :activerecord.models.user
+      integration:
+        user: :activerecord.models.user
+      invoice:
+        first_invoice: :activerecord.models.first_invoice
+        organization: :activerecord.models.organization
+      invoice_paid_feature:
+        invoice: :activerecord.models.invoice
+        paid_feature: :activerecord.models.paid_feature
+      listicle:
+        blog: :activerecord.models.blog
+      location:
+        country: :activerecord.models.country
+        organization: :activerecord.models.organization
+        state: :activerecord.models.state
+      lock:
+        lock_type: :activerecord.models.lock_type
+        manufacturer: :activerecord.models.manufacturer
+        user: :activerecord.models.user
+      mail_snippet:
+        organization: :activerecord.models.organization
+      membership:
+        organization: :activerecord.models.organization
+        sender: :activerecord.models.sender
+        user: :activerecord.models.user
+      normalized_serial_segment:
+        bike: :activerecord.models.bike
+        duplicate_bike_group: :activerecord.models.duplicate_bike_group
+      organization:
+        auto_user: :activerecord.models.auto_user
+        parent_organization: :activerecord.models.parent_organization
+      organization_message:
+        bike: :activerecord.models.bike
+        organization: :activerecord.models.organization
+        sender: :activerecord.models.sender
+      other_listing:
+        bike: :activerecord.models.bike
+      ownership:
+        bike: :activerecord.models.bike
+        creator: :activerecord.models.creator
+        user: :activerecord.models.user
+      paint:
+        color: :activerecord.models.color
+        manufacturer: :activerecord.models.manufacturer
+        secondary_color: :activerecord.models.secondary_color
+        tertiary_color: :activerecord.models.tertiary_color
+      payment:
+        invoice: :activerecord.models.invoice
+        organization: :activerecord.models.organization
+        theft_alert: :activerecord.models.theft_alert
+        user: :activerecord.models.user
+      public_image:
+        imageable: :activerecord.models.imageable
+      recovery_display:
+        stolen_record: :activerecord.models.stolen_record
+      state:
+        country: :activerecord.models.country
+      stolen_notification:
+        bike: :activerecord.models.bike
+        receiver: :activerecord.models.receiver
+        sender: :activerecord.models.sender
+      stolen_record:
+        bike: :activerecord.models.bike
+        country: :activerecord.models.country
+        creation_organization: :activerecord.models.creation_organization
+        current_bike: :activerecord.models.current_bike
+        recovering_user: :activerecord.models.recovering_user
+        recovery_display: :activerecord.models.recovery_display
+        state: :activerecord.models.state
+      theft_alert:
+        creator: :activerecord.models.creator
+        payment: :activerecord.models.payment
+        stolen_record: :activerecord.models.stolen_record
+        theft_alert_plan: :activerecord.models.theft_alert_plan
+      user:
+        country: :activerecord.models.country
+        state: :activerecord.models.state
+      user_email:
+        old_user: :activerecord.models.old_user
+        user: :activerecord.models.user
