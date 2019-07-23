@@ -5,10 +5,12 @@ RSpec.describe Ctype, type: :model do
 
   describe "#select_options" do
     it "returns an array of arrays as expected by the rails select helper" do
-      FactoryBot.create_list(:ctype, 4)
+      FactoryBot.create(:ctype, name: "axle nuts")
+      FactoryBot.create(:ctype, name: "basket")
+
       options = Ctype.select_options
       expect(options).to be_an_instance_of(Array)
-      expect(options.length).to eq(4)
+      expect(options.length).to eq(2)
 
       expect(options).to all(be_an_instance_of(Array))
       expect(options.map(&:length).uniq).to eq([2])
