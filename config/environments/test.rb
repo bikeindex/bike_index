@@ -41,7 +41,8 @@ Rails.application.configure do
   config.active_support.deprecation = :stderr
 
   # Raises error for missing translations
-  # config.action_view.raise_on_missing_translations = true
+  config.action_view.raise_on_missing_translations = true
+  config.i18n.exception_handler = Proc.new { |exception| raise exception.to_exception }
   config.action_mailer.default_url_options = { host: ENV["BASE_URL"] }
 
   config.cache_store = :file_store, Rails.root.join("tmp", "cache", "test#{ENV["TEST_ENV_NUMBER"]}")

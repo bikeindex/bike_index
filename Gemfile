@@ -20,6 +20,7 @@ gem "flipper-ui"
 # I18n
 gem "i18n-country-translations"
 gem "rails-i18n"
+gem "translation"
 group :development, :test do
   gem "i18n-tasks"
   gem "i18n_generators"

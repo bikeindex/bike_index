@@ -5,7 +5,7 @@ module MoneyHelper
   Money.default_bank.add_rate(:USD, :EUR, 0.88)
 
   def default_currency
-    t("number.currency.alphabetic_code")
+    t(I18n.locale, scope: [:money, :currencies])
   end
 
   def money_usd(dollars, exchange_to: default_currency)
