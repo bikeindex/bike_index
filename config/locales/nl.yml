@@ -1291,8 +1291,8 @@ nl:
       or_click_html: >-
         TRME Or, click <em>link it</em> on of your bikes to connect it to this %{bike_code_kind}:
       please_email_support_html: >-
-        TRME Please email %{support_email} if you don't understand why you're seeing
-        this message or if you need an exception made.
+        TRME Please email %{support_email_link} if you don't understand why you're
+        seeing this message or if you need an exception made.
       please_sign_in: TRME please sign in
       to_link_that_card_with_a_bike: TRME To link that card with a bike,
       update: TRME Update
