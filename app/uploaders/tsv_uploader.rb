@@ -1,9 +1,4 @@
-# encoding: utf-8
-class TsvUploader < CarrierWave::Uploader::Base
-  def cache_dir
-    Rails.root.join("tmp", "cache")
-  end
-
+class TsvUploader < ApplicationUploader
   def store_dir
     "#{base_store_dir}tsvs"
   end

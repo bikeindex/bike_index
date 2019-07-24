@@ -1,11 +1,5 @@
-# encoding: utf-8
-
 # We really should obfuscate the filename, for this and bulk imports
-class ExportUploader < CarrierWave::Uploader::Base
-  def cache_dir
-    Rails.root.join("tmp", "cache")
-  end
-
+class ExportUploader < ApplicationUploader
   def store_dir
     "#{base_store_dir}exports/#{model.id}"
   end
