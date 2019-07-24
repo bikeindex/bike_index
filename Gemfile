@@ -61,7 +61,7 @@ gem "unicorn" # Use Puma as the app server
 gem "unicorn-worker-killer"
 
 # Making other files
-gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
+# gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
 gem "wicked_pdf"
 gem "wkhtmltopdf-binary"
 
