@@ -16,14 +16,10 @@ gem "flipper"
 gem "flipper-active_record"
 gem "flipper-ui"
 
-# I18n
+# I18n - localization/translation
 gem "i18n-country-translations"
 gem "rails-i18n"
 gem "translation"
-group :development, :test do
-  gem "i18n-tasks"
-  gem "i18n_generators"
-end
 
 # Redis and redis dependents
 gem "hiredis"
@@ -65,7 +61,7 @@ gem "unicorn" # Use Puma as the app server
 gem "unicorn-worker-killer"
 
 # Making other files
-gem "axlsx" # Write Excel files - OrganizationExports
+gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
 gem "wicked_pdf"
 gem "wkhtmltopdf-binary"
 
@@ -109,7 +105,7 @@ gem "rack-mini-profiler", require: false # If you can't see it you can't make it
 gem "stackprof", require: false
 
 gem "responders", "~> 2.0" # required because of class level respond_to blocks (API v1)
-gem "thor", "0.19.1" # Locking it; http://stackoverflow.com/questions/40986923/meaning-of-expected-string-default-value-for-on-ruby-on-rails
+gem "thor"
 
 gem "bundler", ">= 1.8.4" # required for rails-assets.org - JS and CSS assets
 source "https://rails-assets.org" do # JS land is crazy, so lock everything
@@ -165,6 +161,9 @@ group :development, :test do
   gem "rubocop-daemon", "~> 0.3.1", require: false
   gem "rubocop-performance", "~> 1.1.0", require: false
   gem "rufo", "~> 0.7.0", require: false
+  # I18n - localization/translation
+  gem "i18n-tasks"
+  gem "i18n_generators"
 end
 
 group :test do

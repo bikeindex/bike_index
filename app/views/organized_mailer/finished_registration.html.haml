@@ -53,7 +53,7 @@
       - donating_link = link_to t(".html.donating"), support_bike_index_url
       = t(".html.please_consider_donating_html", donating_link: donating_link)
     %p
-      - prioritize_link = link_to t(".html.prioritize_your_listing"), news_path('get-your-donations-in-this-summer-to-help-bike-index-master-bike-seaso')
+      - prioritize_link = link_to t(".html.prioritize_your_listing"), news_url('get-your-donations-in-this-summer-to-help-bike-index-master-bike-seaso')
       = t(".html.a_donation_will_prioritize_html", prioritize_link: prioritize_link)
 
 - unless @ownership.claimed?

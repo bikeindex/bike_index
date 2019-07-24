@@ -2911,9 +2911,9 @@ en:
         partner in law enforcement.
       you_have_the_authority_to_bring_html: >-
         You have the authority to bring bikes back - that’s no small responsibility.
-        That’s why we have tools - such as our integration with LeadsOnline and %{link}
-        of stolen bikes - to keep your community safe. Connect with %{link} and spotters
-        to quickly confiscate and block sales of stolen bikes.
+        That’s why we have tools - such as our integration with LeadsOnline and %{automated_tweets_link}
+        of stolen bikes - to keep your community safe. Connect with %{local_ambassadors_link}
+        and spotters to quickly confiscate and block sales of stolen bikes.
       youre_the_first_one: >-
         You're the first one your citizens look to when their bikes are stolen. Access
         and search our international database to return your community's bikes to
