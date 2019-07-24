@@ -7,11 +7,11 @@
     .sign-in-up-wrap
       .row
         .oauth-providers
-          / %a.facebook-login{ href: '/auth/facebook' }
-          /   %span.oauth-logo-block= image_tag 'revised/facebook_login.svg'
-          /   %span.oauth-text-block= t(".sign_in_using_facebook")
+          = link_to create_integration_path(provider: "facebook", method: "POST"), class: "facebook-login" do
+            %span.oauth-logo-block= image_tag 'revised/facebook_login.svg'
+            %span.oauth-text-block= t(".sign_in_using_facebook")
 
-          %a.strava-login{ href: '/auth/strava' }
+          = link_to create_integration_path(provider: "strava", method: "POST"), class: "strava-login" do
             %span.oauth-logo-block= image_tag 'revised/strava_login.svg'
             %span.oauth-text-block= t(".sign_in_using_strava")
 
