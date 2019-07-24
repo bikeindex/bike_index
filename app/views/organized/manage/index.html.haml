@@ -29,7 +29,7 @@
     %label.org-form-label
       = t(".organization_type")
     .col-sm-4
-      - Organization.creatable_kinds.each do |kind|
+      - Organization.user_creatable_kinds.each do |kind|
         .radio
           %label
             = f.radio_button :kind, kind

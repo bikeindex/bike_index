@@ -102,7 +102,7 @@ class OrganizationsController < ApplicationController
 
   def permitted_create_params
     approved_kind = params.dig(:organization, :kind)
-    approved_kind = "other" unless Organization.creatable_kinds.include?(approved_kind)
+    approved_kind = "other" unless Organization.user_creatable_kinds.include?(approved_kind)
     params.require(:organization)
           .permit(:name, :website)
           .merge(auto_user_id: current_user.id, kind: approved_kind)

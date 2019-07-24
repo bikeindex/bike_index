@@ -10,6 +10,7 @@ class Organization < ActiveRecord::Base
     property_management: 6,
     other: 7,
     ambassador: 8,
+    bike_depot: 9,
   }.freeze
 
   POS_KIND_ENUM = {
@@ -62,13 +63,16 @@ class Organization < ActiveRecord::Base
   scope :bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications]) }
 
   before_validation :set_calculated_attributes
-  before_save :set_ambassador_organization_defaults
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
   def self.pos_kinds; POS_KIND_ENUM.keys.map(&:to_s) end
+
+  def self.admin_required_kinds; %w[ambassador bike_depot].freeze end
+
+  def self.user_creatable_kinds; kinds - admin_required_kinds end
 
   def self.friendly_find(n)
     return nil unless n.present?
@@ -98,11 +102,6 @@ class Organization < ActiveRecord::Base
     matching_slugs = PaidFeature.matching_slugs(slugs)
     return nil unless matching_slugs.present?
     where("paid_feature_slugs ?& array[:keys]", keys: matching_slugs)
-  end
-
-  # Organization kinds creatable by non-superadmins
-  def self.creatable_kinds
-    kinds.reject { |kind| kind == "ambassador" }
   end
 
   def to_param; slug end
@@ -200,6 +199,7 @@ class Organization < ActiveRecord::Base
     end
     generate_access_token unless self.access_token.present?
     set_auto_user
+    set_ambassador_organization_defaults if ambassador?
     locations.each { |l| l.save unless l.shown == allowed_show }
     true # TODO: Rails 5 update
   end
@@ -279,7 +279,6 @@ class Organization < ActiveRecord::Base
   private
 
   def set_ambassador_organization_defaults
-    return unless kind == "ambassador"
     self.show_on_map = false
     self.lock_show_on_map = false
     self.api_access_approved = false
