@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Define a way to check if an update hash matches an object. Particularly useful for request specs
 def expect_attrs_to_match_hash(obj, hash)
   unmatched_hash = {}
   hash.each do |key, value|

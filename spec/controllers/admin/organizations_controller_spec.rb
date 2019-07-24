@@ -65,7 +65,9 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
           expect(Organization.count).to eq(1)
           organization = Organization.last
           expect(organization.kind).to eq(kind)
-          expect_attrs_to_match_hash(organization, create_attributes.except(:kind))
+          unless organization.ambassador? # Ambassadors have special attrs set
+            expect_attrs_to_match_hash(organization, create_attributes.except(:kind))
+          end
           expect(user.organizations.count).to eq 0 # it doesn't assign the user
         end
       end
@@ -134,7 +136,7 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
       location1.reload
       expect(location1.organization).to eq organization
       location1_update_attributes = update_attributes[:locations_attributes]["0"]
-      expect_attrs_to_match_hash(location1, target_location1_hash.except(:latitude, :longitude, :organization_id, :created_at, :_destroy))
+      expect_attrs_to_match_hash(location1, location1_update_attributes.except(:latitude, :longitude, :organization_id, :created_at, :_destroy))
 
       # still existing location
       location2 = organization.locations.last
