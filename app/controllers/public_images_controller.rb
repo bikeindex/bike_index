@@ -25,7 +25,7 @@ class PublicImagesController < ApplicationController
         @public_image.imageable = current_organization
       end
       @public_image.save
-      render json: { success: true} and return
+      render json: { public_image: @public_image} and return
     end
     flash[:error] = "Whoops! We can't let you create that image."
     redirect_to @public_image.present? ? @public_image.imageable : user_root_url
@@ -56,7 +56,7 @@ class PublicImagesController < ApplicationController
     if params[:page].present?
       redirect_to edit_bike_url(imageable_id, page: params[:page]) and return
     elsif imageable_type == "Blog"
-      redirect_to edit_admin_news_url(@imageable.title_slug) and return
+      redirect_to edit_admin_news_url(@imageable.title_slug), status: 303 and return
     else
       redirect_to edit_bike_url(imageable_id)
     end
