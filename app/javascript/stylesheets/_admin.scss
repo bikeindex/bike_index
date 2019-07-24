@@ -183,7 +183,6 @@
     width: 85px;
     height: auto;
   }
-  max-height: 165px;
   font-size: 12px;
   @include media-breakpoint-down(sm) {
     max-height: 100%;

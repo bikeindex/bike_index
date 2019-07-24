@@ -67,7 +67,7 @@ function BinxAdminBlogs() {
         triggerUploadOnSubmit: false
       })
       uppy.on('upload-success', (file, response) => {
-        this.publicImageTemplate(response.body.public_image)
+        $("ul#public_images").append(this.publicImageTemplate(response.body.public_image))
       })
     },
 
@@ -87,7 +87,7 @@ function BinxAdminBlogs() {
       const alt = image.name
       const src = image.image.url
       const id = image.id
-      const publicImage =
+      const template =
 
         `<li>
           <div class='card bg-light admin-public-image'>
@@ -125,7 +125,8 @@ function BinxAdminBlogs() {
         </div>
       </li>`
 
-      $("ul#public_images").append(publicImage)
+      return template;
+
     },
 
     noPrimaryPhotoToggle() {
