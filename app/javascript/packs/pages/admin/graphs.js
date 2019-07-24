@@ -1,8 +1,10 @@
+import moment from "moment-timezone";
+
 function BinxAdminGraphs() {
   return {
     init() {
-      this.changeGraphCalendarBox()
-      this.setCustomGraphStartAndSlide()
+      this.changeGraphCalendarBox();
+      this.setCustomGraphStartAndSlide();
     },
     changeGraphCalendarBox() {
       $("select#graph_date_option").on("change", e => {
@@ -29,7 +31,7 @@ function BinxAdminGraphs() {
         $(".calendar-box").slideUp();
         this.startGraphTimeSet();
       }
-    },
-  }
+    }
+  };
 }
 export default BinxAdminGraphs;
