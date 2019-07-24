@@ -17,14 +17,10 @@ gem "flipper"
 gem "flipper-active_record"
 gem "flipper-ui"
 
-# I18n
+# I18n - localization/translation
 gem "i18n-country-translations"
 gem "rails-i18n"
 gem "translation"
-group :development, :test do
-  gem "i18n-tasks"
-  gem "i18n_generators"
-end
 
 # Redis and redis dependents
 gem "hiredis"
@@ -166,6 +162,9 @@ group :development, :test do
   gem "rubocop-daemon", "~> 0.3.1", require: false
   gem "rubocop-performance", "~> 1.1.0", require: false
   gem "rufo", "~> 0.7.0", require: false
+  # I18n - localization/translation
+  gem "i18n-tasks"
+  gem "i18n_generators"
 end
 
 group :test do
