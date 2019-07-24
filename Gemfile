@@ -5,6 +5,7 @@ gem "rails", "5.2.3"
 
 gem "active_model_serializers", "~> 0.9.3"
 gem "bcrypt", "~> 3.1.7"
+gem "jquery-rails"
 gem "pg"
 
 # Speed
@@ -85,12 +86,10 @@ gem "rack-throttle"
 gem "secure_headers", "~> 2.5.0"
 
 # Frontend
-gem "jquery-rails"
 gem "bootstrap", "~> 4.0.0.alpha3" # Bootstrap 4 - used for revised stylesheets
 gem "chartkick" # Display charts
 gem "coffee-rails"
 gem "groupdate" # Required for charts
-# gem "jquery-datatables-rails", "~>3.4.0"
 gem "premailer-rails" # Inline styles for email
 gem "sprockets-rails"
 gem "therubyracer"
@@ -103,7 +102,7 @@ gem "memory_profiler", require: false
 gem "rack-mini-profiler", require: false # If you can't see it you can't make it better
 gem "stackprof", require: false
 
-# gem "responders" # required because of class level respond_to blocks (API v1)
+gem "responders" # required because of class level respond_to blocks (API v1)
 gem "thor"
 
 gem "bundler", ">= 1.8.4" # required for rails-assets.org - JS and CSS assets
