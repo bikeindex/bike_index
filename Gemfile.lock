@@ -51,11 +51,6 @@ GEM
     autoprefixer-rails (6.5.0.2)
       execjs
     awesome_print (1.8.0)
-    aws-sdk (1.66.0)
-      aws-sdk-v1 (= 1.66.0)
-    aws-sdk-v1 (1.66.0)
-      json (~> 1.4)
-      nokogiri (>= 1.4.4)
     axiom-types (0.1.1)
       descendants_tracker (~> 0.0.4)
       ice_nine (~> 0.11.0)
@@ -137,7 +132,7 @@ GEM
     erubi (1.8.0)
     erubis (2.7.0)
     eventmachine (1.2.0.1)
-    excon (0.62.0)
+    excon (0.65.0)
     execjs (2.7.0)
     factory_bot (4.11.1)
       activesupport (>= 3.0.0)
@@ -158,12 +153,12 @@ GEM
       flipper (~> 0.16.2)
       rack (>= 1.4, < 3)
       rack-protection (>= 1.5.3, < 2.1.0)
-    fog-aws (3.0.0)
+    fog-aws (3.5.2)
       fog-core (~> 2.1)
       fog-json (~> 1.1)
       fog-xml (~> 0.1)
       ipaddress (~> 0.8)
-    fog-core (2.1.0)
+    fog-core (2.1.2)
       builder
       excon (~> 0.58)
       formatador (~> 0.2)
@@ -661,7 +656,6 @@ DEPENDENCIES
   active_model_serializers (~> 0.9.3)
   airborne
   api-pagination
-  aws-sdk (~> 1.33)
   axlsx
   backbone-on-rails (~> 0.9.10.0)
   bcrypt (~> 3.1.7)
