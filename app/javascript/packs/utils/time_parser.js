@@ -35,10 +35,10 @@ const TimeParser = () => {
     },
 
     localize() {
-      if (!window.timezone) {
-        window.timezone = moment.tz.guess();
+      if (!window.localTimezone) {
+        window.localTimezone = moment.tz.guess();
       }
-      moment.tz.setDefault(window.timezone);
+      moment.tz.setDefault(window.localTimezone);
       window.yesterday = moment()
         .subtract(1, "day")
         .startOf("day");
@@ -47,6 +47,9 @@ const TimeParser = () => {
 
       let displayLocalDate = this.displayLocalDate;
       let preciseTimeSeconds = this.preciseTimeSeconds;
+      // Update any hidden fields with current timezone
+      $(".hiddenFieldTimezone").val(window.localTimezone);
+
       // Write local time
       $(".convertTime").each(function() {
         let $this = $(this);

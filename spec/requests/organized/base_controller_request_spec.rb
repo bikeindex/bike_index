@@ -34,7 +34,7 @@ RSpec.describe Organized::BaseController, type: :request do
         expect(response).to redirect_to(organization_bikes_path(organization_id: current_organization.to_param))
         get "/user_root_url_redirect"
         # default_bike_search_path
-        expect(response).to redirect_to(bikes_path(location: "ip", stolenness: "proximity"))
+        expect(response).to redirect_to(bikes_path(stolenness: "all"))
       end
     end
   end

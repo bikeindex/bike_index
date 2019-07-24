@@ -152,6 +152,7 @@ RSpec.describe Organized::UsersController, type: :controller do
     end
 
     describe "create" do
+      before { Sidekiq::Worker.clear_all }
       let(:membership_params) do
         {
           role: "member",
@@ -218,20 +219,64 @@ RSpec.describe Organized::UsersController, type: :controller do
         end
       end
       context "multiple invitations" do
-        let(:multiple_emails_invited) { %w[stuff@stuff.com  stuff@stuff2.com stuff@stuff.com stuff3@stuff.com stuff4@stuff.com stuff4@stuff.com stuff4@stuff.com] }
-        let(:target_invited_emails) { %w[stuff@stuff.com  stuff@stuff2.com stuff3@stuff.com stuff4@stuff.com] + [user.email] }
+        let(:multiple_emails_invited) { %w[stuff@stuff.com stuff@stuff2.com stuff@stuff.com stuff3@stuff.com stuff4@stuff.com stuff4@stuff.com stuff4@stuff.com] }
+        let(:target_invited_emails) { %w[stuff@stuff.com stuff@stuff2.com stuff3@stuff.com stuff4@stuff.com] + [user.email] }
         it "invites, dedupes" do
-          ActionMailer::Base.deliveries = []
-          expect(organization.remaining_invitation_count).to eq 4
-          expect do
-            put :create, organization_id: organization.to_param,
-                         membership: membership_params,
-                         multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
-          end.to change(Membership, :count).by 4
-          organization.reload
-          expect(organization.remaining_invitation_count).to eq 0
-          expect(organization.sent_invitation_count).to eq 5
-          expect(organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
+          Sidekiq::Testing.inline! do
+            ActionMailer::Base.deliveries = []
+            og_membership_ids = organization.memberships.pluck(:id)
+            expect(organization.remaining_invitation_count).to eq 4
+            expect do
+              put :create, organization_id: organization.to_param,
+                           membership: membership_params,
+                           multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
+            end.to change(Membership, :count).by 4
+            organization.reload
+            expect(organization.remaining_invitation_count).to eq 0
+            expect(organization.sent_invitation_count).to eq 5
+            expect(organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
+            # TODO: Rails 5 update - this is an after_commit issue
+            organization.memberships.where.not(id: og_membership_ids).each { |m| m.enqueue_processing_worker }
+            organization.reload
+            expect(organization.users.count).to eq 1
+            expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+          end
+        end
+        context "auto_passwordless_users" do
+          let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 0, feature_slugs: ["passwordless_users"]) }
+          let!(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization) }
+          it "invites whatever" do
+            # We have to actually assign the invoice here because membership creation bumps the organization -
+            # and the organization needs to have the paid feature after the first membership is created
+            invoice.update_attributes(paid_feature_ids: [paid_feature.id])
+            # TODO: Rails 5 update - this is an after_commit issue
+            organization.update_attributes(updated_at: Time.current)
+            organization.reload
+            expect(organization.paid_feature_slugs).to eq(["passwordless_users"])
+            Sidekiq::Testing.inline! do
+              ActionMailer::Base.deliveries = []
+              expect(organization.remaining_invitation_count).to eq 4
+              expect(organization.users.count).to eq 1
+              expect(organization.users.confirmed.count).to eq 1
+              og_membership_ids = organization.memberships.pluck(:id)
+              expect do
+                put :create, organization_id: organization.to_param,
+                             membership: membership_params,
+                             multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
+              end.to change(Membership, :count).by 4
+              organization.reload
+              expect(organization.remaining_invitation_count).to eq 0
+              expect(organization.sent_invitation_count).to eq 5
+              expect(organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
+              # TODO: Rails 5 update - this is an after_commit issue
+              organization.memberships.where.not(id: og_membership_ids).each { |m| m.enqueue_processing_worker }
+              organization.reload
+              expect(organization.users.count).to eq 5
+              expect(organization.users.confirmed.count).to eq 5
+              expect(organization.users.pluck(:email)).to match_array(target_invited_emails)
+              expect(ActionMailer::Base.deliveries.empty?).to be_truthy
+            end
+          end
         end
       end
     end

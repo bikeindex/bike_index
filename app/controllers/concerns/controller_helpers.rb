@@ -70,7 +70,7 @@ module ControllerHelpers
   end
 
   def default_bike_search_path
-    bikes_path(location: "ip", stolenness: "proximity")
+    bikes_path(stolenness: "all")
   end
 
   # Generally this is implicitly set, via the passed parameters - however! it can also be explicitly set
@@ -96,6 +96,11 @@ module ControllerHelpers
     elsif session[:discourse_redirect]
       redirect_to discourse_authentication_url and return true
     end
+  end
+
+  def translation(key, scope: nil)
+    scope ||= [:controllers, controller_namespace, controller_name, action_name]
+    I18n.t(key, scope: scope.compact)
   end
 
   def controller_namespace

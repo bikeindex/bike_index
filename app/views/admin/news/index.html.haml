@@ -8,7 +8,7 @@
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
-      %th.d-none.d-lg-table-cell
+      %th
         Date&nbsp;<small class="convertTimezone"></small>
       %th.d-none.d-lg-table-cell
         Creator
@@ -21,9 +21,13 @@
     %tbody
       - @blogs.each do |blog|
         %tr
-          %td.d-none.d-lg-table-cell
-            %span.convertTime
-              = l blog.published_at, format: :convert_time
+          %td
+            .less-strong-hold
+              %span.convertTime
+                = l blog.published_at, format: :convert_time
+              - if current_user.developer?
+                %small.less-strong-right
+                  = blog.id
           %td.d-none.d-lg-table-cell
             = blog.user&.name || blog.user&.email
           %td

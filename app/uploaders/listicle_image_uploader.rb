@@ -1,29 +1,5 @@
-# encoding: utf-8
-
-class ListicleImageUploader < CarrierWave::Uploader::Base
+class ListicleImageUploader < ApplicationUploader
   include CarrierWave::MiniMagick
-
-  if Rails.env.production?
-    storage :fog
-  else
-    storage :file
-  end
-
-  after :remove, :delete_empty_upstream_dirs
-
-  def delete_empty_upstream_dirs
-    path = ::File.expand_path(store_dir, root)
-    Dir.delete(path) # fails if path not empty dir
-
-    path = ::File.expand_path(base_store_dir, root)
-    Dir.delete(path) # fails if path not empty dir
-  rescue SystemCallError
-    true # nothing, the dir is not empty
-  end
-
-  def cache_dir
-    Rails.root.join("tmp", "cache")
-  end
 
   def store_dir
     "#{base_store_dir}/#{model.id}"

@@ -67,8 +67,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   end
 
   def clear_index_wrap_cache
-    expire_fragment "root_head_wrap"
-    expire_fragment "root_body_wrap"
+    expire_fragment "root_recovery_stories"
   end
 
   def find_recovery_displays

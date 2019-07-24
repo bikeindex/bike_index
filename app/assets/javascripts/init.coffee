@@ -3,6 +3,15 @@ unless String::trim then String::trim = -> @replace /^\s+|\s+$/g, ""
 
 # All the classes inherit from this
 class window.BikeIndex
+  loadFancySelects: ->
+    $('.unfancy.fancy-select select').selectize
+      create: false
+      plugins: ['restore_on_backspace']
+    $('.unfancy.fancy-select-placeholder select').selectize # When empty options are allowed
+      create: false
+      plugins: ['restore_on_backspace', 'selectable_placeholder']
+    # Remove them so we don't initialize twice
+    $('.unfancy.fancy-select, .unfancy.fancy-select-placeholder').removeClass('unfancy')
 
 # This file initializes scripts for the application
 class BikeIndex.Init extends BikeIndex
@@ -49,16 +58,6 @@ class BikeIndex.Init extends BikeIndex
       locks_create: BikeIndex.LocksForm
     window.pageScript = new pageClasses[body_id] if Object.keys(pageClasses).includes(body_id)
 
-  loadFancySelects: ->
-    $('.unfancy.fancy-select select').selectize
-      create: false
-      plugins: ['restore_on_backspace']
-    $('.unfancy.fancy-select-placeholder select').selectize # When empty options are allowed
-      create: false
-      plugins: ['restore_on_backspace', 'selectable_placeholder']
-    # Remove them so we don't initialize twice
-    $('.unfancy.fancy-select, .unfancy.fancy-select-placeholder').removeClass('unfancy')
-
   initializeNoTabLinks: ->
     # So in forms we can provide help without breaking tab index
     $('.no-tab').click (e) ->
@@ -95,13 +94,13 @@ class BikeIndex.Init extends BikeIndex
       if preciseTime then time.format("YYYY-MM-DD h:mma") else time.format("YYYY-MM-DD")
 
   localizeTimes: ->
-    window.timezone ||= moment.tz.guess()
-    moment.tz.setDefault(window.timezone)
+    window.localTimezone ||= moment.tz.guess()
+    moment.tz.setDefault(window.localTimezone)
     window.yesterday = moment().subtract(1, "day").startOf("day")
     window.today = moment().startOf("day")
     window.tomorrow = moment().endOf("day")
     # Update any hidden fields with current timezone
-    $(".hiddenFieldTimezone").val(window.timezone)
+    $(".hiddenFieldTimezone").val(window.localTimezone)
 
     displayLocalDate = @displayLocalDate
 
@@ -161,32 +160,10 @@ window.updateSearchBikesHeaderLink = ->
     else
       localStorage.setItem('distance', distance)
 
-  distance ||= 100
-
-  # update search params, retaining any other query params
-  $bike_search_link = $("#search_bikes_header_link")
-  return true unless $bike_search_link.length
-  bike_search_query = $bike_search_link[0].search
-
-  tuples_to_object = (tuples_list) =>
-     tuples_list.reduce ((obj, tuple) -> (obj[tuple[0]] = tuple[1]) && obj), {}
-  params = tuples_to_object(bike_search_query.replace("?", "").split("&").map((e) => e.split("=")))
-
-  params["stolenness"] = "proximity"
-  params["location"] = location
-  params["distance"] = distance
-
-  bike_search_path = $bike_search_link[0].pathname
-  query_string = Object.entries(params).map((e) => e.join("=")).join("&")
-  $bike_search_link.attr("href", "#{bike_search_path}?#{query_string}")
-  $(".defaultBikeSearchLink").attr("href", "#{bike_search_path}?#{query_string}")
-
-
 $(document).ready ->
   window.updateSearchBikesHeaderLink()
   window.BikeIndex.Init = new BikeIndex.Init
   if document.getElementById('binx_registration_widget')
     new window.ManufacturersSelect('#binx_registration_widget #b_param_manufacturer_id')
-  new window.AdDisplayer
   warnIfUnsupportedBrowser()
   enableEscapeForModals()

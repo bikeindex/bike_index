@@ -352,4 +352,44 @@ RSpec.describe StolenRecord, type: :model do
       end
     end
   end
+
+  describe "locking_description_description_select_options" do
+    it "returns an array of arrays" do
+      options = StolenRecord.locking_description_select_options
+
+      expect(options).to be_an_instance_of(Array)
+      expect(options).to all(be_an_instance_of(Array))
+      options.each { |label, value| expect(label).to eq(value) }
+    end
+
+    it "localizes as needed" do
+      I18n.with_locale(:nl) do
+        options = StolenRecord.locking_description_select_options
+        options.each do |label, value|
+          expect(label).to be_an_instance_of(String)
+          expect(label).to_not eq(value)
+        end
+      end
+    end
+  end
+
+  describe "locking_defeat_description_select_options" do
+    it "returns an array of arrays" do
+      options = StolenRecord.locking_defeat_description_select_options
+
+      expect(options).to be_an_instance_of(Array)
+      expect(options).to all(be_an_instance_of(Array))
+      options.each { |label, value| expect(label).to eq(value) }
+    end
+
+    it "localizes as needed" do
+      I18n.with_locale(:nl) do
+        options = StolenRecord.locking_description_select_options
+        options.each do |label, value|
+          expect(label).to be_an_instance_of(String)
+          expect(label).to_not eq(value)
+        end
+      end
+    end
+  end
 end

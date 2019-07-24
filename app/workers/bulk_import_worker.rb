@@ -1,9 +1,7 @@
 require "csv"
 
-class BulkImportWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "low_priority" # Because it's low priority!
-  sidekiq_options backtrace: true, retry: false
+class BulkImportWorker < ApplicationWorker
+  sidekiq_options retry: false
 
   attr_accessor :bulk_import, :line_errors # Only necessary for testing
 

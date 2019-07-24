@@ -15,7 +15,8 @@ class BikesController < ApplicationController
 
   def index
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
-    if params[:stolenness] == "proximity" && @interpreted_params[:stolenness] != "proximity"
+    @stolenness = @interpreted_params[:stolenness]
+    if params[:stolenness] == "proximity" && @stolenness != "proximity"
       flash[:info] = "Sorry, we don't know the location \"#{params[:location]}\". Please try a different location to search nearby stolen bikes"
     end
     @bikes = Bike.search(@interpreted_params).page(params[:page] || 1).per(params[:per_page] || 10).decorate
@@ -247,11 +248,11 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = t(:recovery_details) if @bike.recovered?
-      h[:theft_details] = t(:theft_details) unless @bike.recovered?
-      h[:publicize] = t(:publicize)
-      h[:alert] = t(:alert) if Flipper.enabled?(:premium_listings, current_user)
-      h[:report_recovered] = t(:report_recovered) unless @bike.recovered?
+      h[:theft_details] = translation(:recovery_details, scope: %i[controllers bikes edit]) if @bike.recovered?
+      h[:theft_details] = translation(:theft_details, scope: %i[controllers bikes edit]) unless @bike.recovered?
+      h[:publicize] = translation(:publicize, scope: %i[controllers bikes edit])
+      h[:alert] = translation(:alert, scope: %i[controllers bikes edit])
+      h[:report_recovered] = translation(:report_recovered, scope: %i[controllers bikes edit]) unless @bike.recovered?
     end
   end
 
@@ -260,14 +261,14 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def bike_templates
     {}.with_indifferent_access.tap do |h|
-      h[:bike_details] = t(:bike_details)
-      h[:photos] = t(:photos)
-      h[:drivetrain] = t(:drivetrain)
-      h[:accessories] = t(:accessories)
-      h[:ownership] = t(:ownership)
-      h[:groups] = t(:groups)
-      h[:remove] = t(:remove)
-      h[:report_stolen] = t(:report_stolen) unless @bike.stolen?
+      h[:bike_details] = translation(:bike_details, scope: %i[controllers bikes edit])
+      h[:photos] = translation(:photos, scope: %i[controllers bikes edit])
+      h[:drivetrain] = translation(:drivetrain, scope: %i[controllers bikes edit])
+      h[:accessories] = translation(:accessories, scope: %i[controllers bikes edit])
+      h[:ownership] = translation(:ownership, scope: %i[controllers bikes edit])
+      h[:groups] = translation(:groups, scope: %i[controllers bikes edit])
+      h[:remove] = translation(:remove, scope: %i[controllers bikes edit])
+      h[:report_stolen] = translation(:report_stolen, scope: %i[controllers bikes edit]) unless @bike.stolen?
     end
   end
 

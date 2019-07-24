@@ -7,15 +7,15 @@
     .sign-in-up-wrap
       .row
         .oauth-providers
-          %a.facebook-login{ href: '/auth/facebook' }
-            %span.oauth-logo-block= image_tag 'revised/facebook_login.svg'
-            %span.oauth-text-block= t(".sign_in_using_facebook")
+          / %a.facebook-login{ href: '/auth/facebook' }
+          /   %span.oauth-logo-block= image_tag 'revised/facebook_login.svg'
+          /   %span.oauth-text-block= t(".sign_in_using_facebook")
 
           %a.strava-login{ href: '/auth/strava' }
             %span.oauth-logo-block= image_tag 'revised/strava_login.svg'
             %span.oauth-text-block= t(".sign_in_using_strava")
 
-          %a.magic_link-login{ href: '/session/magic_link' }
+          %a.magic_link-login{ href: magic_link_session_path }
             %span.oauth-logo-block
               %i.fas.fa-envelope-open-text
             %span.oauth-text-block= t(".sign_in_using_magic_link")

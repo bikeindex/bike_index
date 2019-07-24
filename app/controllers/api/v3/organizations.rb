@@ -25,7 +25,7 @@ module API
         params do
           requires :name, type: String, desc: "The organization name"
           requires :website, type: String, desc: "The organization website", regexp: URI::regexp(%w(http https))
-          requires :kind, type: String, desc: "The kind of organization", values: Organization.creatable_kinds
+          requires :kind, type: String, desc: "The kind of organization", values: Organization.user_creatable_kinds
 
           optional :locations, type: Array, desc: "The organization locations" do
             requires :name, type: String, desc: "The location's name"

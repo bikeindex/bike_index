@@ -89,13 +89,24 @@
                       %td= t(".address")
                       %td
                         - address = @bike.registration_address
-                        - if address.present?
+                        - if @bike.valid_registration_address_present?
                           %br
                           &nbsp;&nbsp;&nbsp;
                           = address["address"]
                           %br
                           &nbsp;&nbsp;&nbsp;
-                          = "#{address['city']}, #{address['state']} #{address['zipcode']}"
+                          = [address['city'], address['state']].reject(&:blank?).join(", ")
+                          = address['zipcode']
+                        - else
+                          - address.except("latitude", "longitude").each do |k, v|
+                            %span.less-strong
+                              #{k == "address" ? "street" : k}:
+                            = v
+                            %br
+                          %span.text-warning
+                            %small invalid address
+
+
                   - else
                     %tr
                       %td
@@ -121,7 +132,7 @@
                         %small.em
                           - unless @bike.owner_name.present?
                             = t(".missing_owner_name")
-                          - unless @bike.registration_address.present? && @bike.registration_address["address"].present?
+                          - unless @bike.valid_registration_address_present?
                             = t(".missing_address")
 
           - if !@bike.organized?(passive_organization) # Apologize, bike isn't organizations

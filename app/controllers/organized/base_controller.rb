@@ -31,9 +31,13 @@ module Organized
       redirect_to organization_root_path and return
     end
 
-    def ensure_ambassador_or_superuser!
-      return true if current_user && current_user.superuser? || current_user.ambassador?
-      flash[:error] = "You have to be an ambassador to do that!"
+    def ensure_ambassador_authorized!
+      if current_organization&.ambassador?
+        return true if current_user && current_user.superuser? || current_user.ambassador?
+        flash[:error] = "You have to be an ambassador to do that!"
+      else
+        flash[:error] = "You have to be in an ambassador organization to see that!"
+      end
       redirect_to user_root_url
     end
 

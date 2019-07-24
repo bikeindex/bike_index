@@ -43,11 +43,11 @@ RSpec.describe CustomerMailer, type: :mailer do
 
   describe "magic_login_link_email" do
     it "renders email" do
-      user.update_auth_token("password_reset_token")
-      mail = CustomerMailer.password_reset_email(user)
-      expect(mail.subject).to eq("Instructions to reset your password")
+      user.update_auth_token("magic_link_token")
+      mail = CustomerMailer.magic_login_link_email(user)
+      expect(mail.subject).to eq("Sign in to Bike Index")
       expect(mail.from).to eq(["contact@bikeindex.org"])
-      expect(mail.body.encoded).to match(user.password_reset_token)
+      expect(mail.body.encoded).to match(user.magic_link_token)
     end
   end
 
@@ -148,10 +148,10 @@ RSpec.describe CustomerMailer, type: :mailer do
     let(:stolen_record) { FactoryBot.create(:stolen_record) }
     let!(:ownership) { FactoryBot.create(:ownership, bike: stolen_record.bike) }
     let(:sender) { FactoryBot.create(:user, email: "party@example.com") }
-    let(:stolen_notification) { FactoryBot.create(:stolen_notification, message: "Test Message", reference_url: "something.com", bike: stolen_record.bike, sender: sender) }
+    let(:stolen_notification) { FactoryBot.create(:stolen_notification, subject: "test subject", message: "Test Message", reference_url: "something.com", bike: stolen_record.bike, sender: sender) }
     it "renders email and update sent_dates" do
       mail = CustomerMailer.stolen_notification_email(stolen_notification)
-      expect(mail.subject).to eq(stolen_notification.default_subject)
+      expect(mail.subject).to eq(stolen_notification.subject)
       expect(mail.from.count).to eq(1)
       expect(mail.from.first).to eq("bryan@bikeindex.org")
       expect(mail.body.encoded).to match(stolen_notification.message)
@@ -163,7 +163,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(stolen_notification.send_dates[0]).to be_within(1).of(stolen_notification.updated_at.to_i)
       stolen_note = StolenNotification.where(id: stolen_notification.id).first
       mail2 = CustomerMailer.stolen_notification_email(stolen_note)
-      expect(mail2.subject).to eq(stolen_notification.default_subject)
+      expect(mail2.subject).to eq(stolen_notification.subject)
       stolen_notification.reload
       expect(stolen_notification.send_dates[1]).to be > stolen_notification.updated_at.to_i - 2
     end

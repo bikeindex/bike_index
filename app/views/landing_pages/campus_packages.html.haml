@@ -59,7 +59,7 @@
                   %h4 #{plan.to_s.titleize} #{lead_type}
                   %h3= number_to_currency(plan_data[:cost], precision: 0)
                   %p
-                    = t("number.currency.alphabetic_code")
+                    = default_currency
                     = "/"
                     = t(".year")
                   %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => plan.to_s }

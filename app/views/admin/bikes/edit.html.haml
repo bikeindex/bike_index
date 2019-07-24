@@ -159,7 +159,7 @@
             #stolen-bike-location.form-group.fancy-select.unfancy.col-6
               #country_select_container
                 = label :country, "Country"
-                = s.collection_select(:country_id, Country.all, :id, :name, prompt: "Choose country")
+                = s.select(:country_id, Country.select_options, prompt: "Choose country")
                 %p.d-none
                   = Country.united_states.id
             .form-group.fancy-select.unfancy.col-6

@@ -1,6 +1,6 @@
-class MergeAdditionalEmailWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "high_priority", backtrace: true
+class MergeAdditionalEmailWorker < ApplicationWorker
+
+  sidekiq_options queue: "high_priority"
 
   def perform(user_email_id)
     user_email = UserEmail.find(user_email_id)
@@ -22,6 +22,7 @@ class MergeAdditionalEmailWorker
     old_user.integrations.each { |i| i.update_attribute :user_id, user_email.user_id }
     old_user.sent_stolen_notifications.each { |i| i.update_attribute :sender_id, user_email.user_id }
     old_user.received_stolen_notifications.each { |i| i.update_attribute :receiver_id, user_email.user_id }
+    old_user.theft_alerts.each { |i| i.update_attribute :user_id, user_email.user_id }
     Doorkeeper::Application.where(owner_id: old_user.id).each { |i| i.update_attribute :owner_id, user_email.user_id }
     CustomerContact.where(user_id: old_user.id).each { |i| i.update_attribute :user_id, user_email.user_id }
     CustomerContact.where(creator_id: old_user.id).each { |i| i.update_attribute :creator_id, user_email.user_id }

@@ -1,7 +1,6 @@
-class EmailInvoiceWorker
-  include Sidekiq::Worker
+class EmailInvoiceWorker < ApplicationWorker
+
   sidekiq_options queue: "notify"
-  sidekiq_options backtrace: true
 
   def perform(id)
     @payment = Payment.find(id)

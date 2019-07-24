@@ -167,7 +167,7 @@ RSpec.describe BikeCreator do
           "cycle_type" => "stroller",
           "serial_number" => "BIKE TOKENd",
           "manufacturer_id" => manufacturer.id,
-          "rear_tire_narrow" => "wheelchair",
+          "rear_tire_narrow" => false,
           "rear_wheel_size_id" => wheel_size.id,
           "primary_frame_color_id" => color.id,
           "handlebar_type" => "bmx",

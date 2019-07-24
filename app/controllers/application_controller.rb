@@ -49,9 +49,9 @@ class ApplicationController < ActionController::Base
     params.permit(*Bike.permitted_search_params).merge(stolenness: @stolenness)
   end
 
-  def default_url_options
+  def default_url_options(options = {})
     # forward locale param when provided
-    params.slice(:locale)
+    params.slice(:locale).merge(options)
   end
 
   def locale_from_request_header
@@ -63,39 +63,27 @@ class ApplicationController < ActionController::Base
     requested_locale if I18n.available_locales.include?(requested_locale)
   end
 
-  def t(key)
-    I18n.t(key, scope: [:controllers, controller_namespace, controller_name].compact)
-  end
-
   def requested_locale
-
-    # logger.info({ locale_current: "#{I18n.locale}",
-    #               locale_params: locale_from_request_params,
-    #               locale_user_profile: current_user&.preferred_language,
-    #               locale_headers: locale_from_request_header,
-    #               locale_default: I18n.default_locale }.to_json)
-
-    requested_locale =
+    @requested_locale ||=
       locale_from_request_params ||
       current_user&.preferred_language.presence ||
       locale_from_request_header ||
       I18n.default_locale
-
-    # logger.info("* Locale set to '#{requested_locale}'")
-
-    requested_locale
   end
 
-  # TODO: Remove logging in #requested_locale when feature flag is removed
   def set_locale
     unless Flipper.enabled?(:localization, current_user)
       return I18n.with_locale(I18n.default_locale) { yield }
     end
 
     if controller_namespace == "admin"
-      I18n.with_locale(I18n.default_locale) { yield }
-    else
-      I18n.with_locale(requested_locale) { yield }
+      return I18n.with_locale(I18n.default_locale) { yield }
     end
+
+    if current_user&.preferred_language != requested_locale
+      current_user&.update_attributes(preferred_language: requested_locale)
+    end
+
+    I18n.with_locale(requested_locale) { yield }
   end
 end

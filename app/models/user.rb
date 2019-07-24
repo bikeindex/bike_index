@@ -34,6 +34,7 @@ class User < ActiveRecord::Base
 
   has_many :sent_stolen_notifications, class_name: "StolenNotification", foreign_key: :sender_id
   has_many :received_stolen_notifications, class_name: "StolenNotification", foreign_key: :receiver_id
+  has_many :theft_alerts
 
   belongs_to :state
   belongs_to :country
@@ -66,10 +67,10 @@ class User < ActiveRecord::Base
   before_validation :normalize_attributes
   validate :ensure_unique_email
   before_create :generate_username_confirmation_and_auth
-  after_commit :perform_create_jobs, on: :create
+  after_commit :perform_create_jobs, on: :create, if: lambda { !self.skip_create_jobs }
   before_save :set_calculated_attributes
 
-  attr_accessor :skip_geocode
+  attr_accessor :skip_geocode, :skip_create_jobs
 
   geocoded_by :address
   after_validation :geocode, if: lambda { !self.skip_geocode && self.geocodeable_attributes_changed? }
@@ -197,6 +198,7 @@ class User < ActiveRecord::Base
   end
 
   def update_last_login(ip_address)
+    save! unless id.present? # throw an error that shows why the user isn't created
     update_columns(last_login_at: Time.current, last_login_ip: ip_address)
   end
 

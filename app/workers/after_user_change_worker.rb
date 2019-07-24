@@ -1,6 +1,6 @@
-class AfterUserChangeWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "low_priority", backtrace: true, retry: false
+class AfterUserChangeWorker < ApplicationWorker
+  sidekiq_options retry: false
+
   # This is called when a user is updated
   # Or when a bike a user owns is updated
 

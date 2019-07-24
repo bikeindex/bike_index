@@ -1,14 +1,13 @@
 %h4{ style: 'margin-bottom: 2em;' }
-  Click the button below to sign in to Bike Index
+  = t(".html.click_the_button")
 
-= link_to 'Sign in to Bike Index', @url, class: 'binx-button'
+= link_to t(".html.sign_in"), @url, class: 'binx-button'
 
 %p
   %em.less-strong
-    This link is only valid for one sign in. It expires in 45 minutes.
+    = t(".html.only_valid_once")
 
 %hr{ style: 'margin-top: 40px;' }
 
 %p.center-text.less-strong
-  If you did not request a passwordless sign in link, please reply to this email and let us know.
-
+  = t(".html.if_you_did_not_request")

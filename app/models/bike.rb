@@ -214,8 +214,6 @@ class Bike < ActiveRecord::Base
 
   def no_serial?; made_without_serial? || serial_unknown? end
 
-  def show_sticker_edit?; bike_codes.present? || organizations.with_paid_feature_slugs("bike_codes").any? end
-
   # This is for organizations - might be useful for admin as well. We want it to be nil if it isn't present
   # User - not ownership, because we don't want registrar
   def owner_name
@@ -475,6 +473,11 @@ class Bike < ActiveRecord::Base
 
   def paint_description
     paint.name.titleize if paint.present?
+  end
+
+  def valid_registration_address_present?
+    return false if registration_address.blank?
+    registration_address["address"].present? && registration_address["city"].present?
   end
 
   def registration_address # Goes along with organization additional_registration_fields

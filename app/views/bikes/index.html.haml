@@ -2,14 +2,12 @@
 
 .container
   .row.first-row
-    .col-md-8
+    .col-md-12
       %h1
         = t(".search_for_stolenness_desc_bikes", stolenness_desc: stolenness_desc)
-    .col-md-4.ad-col
-      .ad-block#top468x60
 
   .row
-    .col-md-8
+    .col-md-12
       = form_tag bikes_path, id: 'bikes_search_form', class: 'bikes-search-form', enforce_utf8: false, method: :get do
         .query-field-wrap.nojs
           - opt_vals = @selected_query_items_options.map { |i| i.is_a?(String) ? [i, i] : [i['text'], i['search_id']]  }
@@ -28,28 +26,30 @@
           %span
             = t(".within")
           = hidden_field_tag :stolenness, params[:stolenness]
-      - unless params[:stolenness] == 'all'
-        .search-type-tabs
-          %ul#stolenness_tabs.nav.nav-tabs{ role: 'tablist' }
-            %li#stolenness_tab_proximity.nav-item{ data: { stolenness: 'proximity' } }
-              %a.nav-link{ href: '#', class: ('active' if @interpreted_params[:stolenness] == 'proximity'), role: 'tab' }
-                = t(".stolen_within")
-                %span#search_distance
-                  X
-                = t(".miles_of")
-                %span#search_location
-                  = t(".you")
-                %span.count
-            %li#stolenness_tab_stolen.nav-item{ data: { stolenness: 'stolen' } }
-              %a.nav-link{ href: '#', class: ('active' if @interpreted_params[:stolenness] == 'stolen'), role: 'tab' }
-                = t(".stolen_anywhere")
-                %span.count
-            %li#stolenness_tab_non.nav-item{ data: { stolenness: 'non' } }
-              %a.nav-link{ href: '#', class: ('active' if @interpreted_params[:stolenness] == 'non'), role: 'tab' }
-                = t(".not_marked_stolen")
-                %span.count
+      .search-type-tabs
+        %ul#stolenness_tabs.nav.nav-tabs{ role: 'tablist' }
+          %li#stolenness_tab_proximity.nav-item{ data: { stolenness: 'proximity' } }
+            %a.nav-link{ href: '#', class: ('active' if @stolenness == 'proximity'), role: 'tab' }
+              = t(".stolen_within")
+              %span#search_distance
+                X
+              = t(".miles_of")
+              %span#search_location
+                = t(".you")
+              %span.count
+          %li#stolenness_tab_stolen.nav-item{ data: { stolenness: 'stolen' } }
+            %a.nav-link{ href: '#', class: ('active' if @stolenness == 'stolen'), role: 'tab' }
+              = t(".stolen_anywhere")
+              %span.count
+          %li#stolenness_tab_non.nav-item{ data: { stolenness: 'non' } }
+            %a.nav-link{ href: '#', class: ('active' if @stolenness == 'non'), role: 'tab' }
+              = t(".not_marked_stolen")
+              %span.count
+          %li#stolenness_tab_all.nav-item{ data: { stolenness: 'all' } }
+            %a.nav-link{ href: '#', class: ('active' if @stolenness == 'all'), role: 'tab' }
+              = t(".all")
   .row
-    .col-md-8
+    .col-md-12
       - if @bikes.present?
         %ul.bike-boxes
           = render partial: 'bikes/bike', collection: @bikes, as: :bike
