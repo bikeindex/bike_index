@@ -24,6 +24,7 @@ function BinxAdminBlogs() {
       this.setIndexImage();
       this.setIndex();
       this.noPrimaryPhotoToggle();
+      this.publicImageDelete();
     },
 
     editDate() {
@@ -65,24 +66,85 @@ function BinxAdminBlogs() {
         submitOnSuccess: false,
         triggerUploadOnSubmit: false
       })
+      uppy.on('upload-success', (file, response) => {
+        $("ul#public_images").append(this.publicImageTemplate(response.body.public_image))
+      })
+    },
+
+    publicImageDelete() {
+      $('ul#public_images').on('click', ".image-delete-button", function(e) {
+        e.preventDefault();
+        const id = $(".image-delete-button").closest(".row").find("input").val()
+        $.ajax({
+          url: `/public_images/${id}`,
+          type: 'delete'
+        });
+        this.closest('li').remove()
+      })
+    },
+
+    publicImageTemplate(image) {
+      const alt = image.name
+      const src = image.image.url
+      const id = image.id
+      const template =
+
+        `<li>
+          <div class='card bg-light admin-public-image'>
+            <div class='card-body'>
+              <div class='row'>
+                <div class='col-md-2 col-sm-6 mt-auto'>
+                  <p>
+                    ${alt}
+                  </p>
+              </div>
+              <div class='col-md-8 col-sm-6 mt-auto'>
+               <textarea class='form-control'> &lt;img class='post-image' src='${src}' alt='ENTER YOUR TEXT HERE'&gt; </textarea>
+              </div>
+              <div class='col-md-2 col-sm-12'>
+                <div class='img-box'>
+                  <img src='${src}' alt='${alt}'/>
+                </div>
+              </div>
+            </div>
+            <hr/>
+            <div class='row mt-2'>
+              <div class='col-md-2'>
+                <a href='#' class="image-delete-button"> Delete</a>
+              </div>
+              <div class='col-md-8'>
+                <span> Copy the above text and paste it where you'd like it to appear in the post </span>
+              </div>
+              <div class='col-md-2'>
+                <div class="index-image-select">
+                  <input class="index_image_${id}" name="index_image_id" type="radio" value="${id}"></input>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </li>`
+
+      return template;
+
     },
 
     noPrimaryPhotoToggle() {
-      const $noPrimaryBox = $(".index_image_0")
-      $noPrimaryBox.on("change", e => {
-        if($noPrimaryBox.prop("checked")) {
+      const noPrimaryBox = $(".index_image_0")
+      noPrimaryBox.on("change", e => {
+        if (noPrimaryBox.prop("checked")) {
           $(".index-image-select input").prop("checked", false)
         }
       })
     },
 
-    setIndex(){
+    setIndex() {
       const index_image = $('#blog_index_image_id').val()
       return $("li#" + index_image).find($("input")).prop("checked", true)
     },
 
     setIndexImage(e) {
-      $('.index-image-select input').on("change", e => {
+      $("ul#public_images").on("change", '.index-image-select input', function(e) {
         e.preventDefault();
         if ($('#blog_index_image_id').val != 0) {
           $('#blog_index_image_id').val($(e.target).val());

@@ -26,6 +26,8 @@
     = render partial: "/shared/errors", locals: { name: "Blog", obj: @blog }
 
   - if @blog.is_listicle
+    %h2.text-danger
+      Listicles are no longer actively maintained. Many things on this page are no longer working.
     = render partial: "listicle_form", locals: { f: f }
   - else
     = render partial: "form", locals: { f: f }
@@ -90,10 +92,10 @@
           .form-group
             = f.text_field :description_abbr, placeholder: "Description/subtitle shown on the homepage - will be the text below unless you enter something.", class: "form-control"
       .row.mt-4
-        .col-2
+        .col-5
           %a.btn.btn-primary{target: "_blank", href: blog_url(@blog)}
             preview post
-        .col-2
+        .col-3
           = f.submit 'Save', class: 'btn btn-success'
 
 
@@ -103,9 +105,10 @@
     .card-body.bg-light
       %ul.list-unstyled#public_images{ :"data-order-url" => order_public_images_url }
         - if @blog.public_images
-          = render partial: "/public_images/public_image", collection: @blog.public_images, as: :public_image
-      %section
-        = render partial: "/public_images/admin_new_form", locals: { imageable_type: 'Blog', admin: true }
-    .alert.alert-info
-      %p
-        The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank"} if you're curious.
+          = render partial: "public_image", collection: @blog.public_images, as: :public_image
+  %section.mt-2
+    = render partial: "/public_images/admin_new_form", locals: { imageable_type: 'Blog', admin: true }
+.alert.alert-info.mt-2
+  %p
+    The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank"} if you're curious.
+
