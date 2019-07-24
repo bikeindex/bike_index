@@ -663,7 +663,7 @@ DEPENDENCIES
   bootstrap (~> 4.0.0.alpha3)
   bullet
   bundler (>= 1.8.4)
-  carrierwave (~> 0.11.2)
+  carrierwave
   carrierwave_backgrounder
   chartkick
   coffee-rails
