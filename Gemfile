@@ -5,7 +5,7 @@ gem "rails", "5.2.3"
 
 gem "active_model_serializers", "~> 0.9.3"
 gem "bcrypt", "~> 3.1.7"
-gem "jquery-rails"
+# gem "jquery-rails"
 gem "pg"
 
 # Speed
@@ -17,16 +17,16 @@ gem "flipper-active_record"
 gem "flipper-ui"
 
 # I18n - localization/translation
-gem "i18n-country-translations"
-gem "rails-i18n"
-gem "translation"
+# gem "i18n-country-translations"
+# gem "rails-i18n"
+# gem "translation"
 
 # Redis and redis dependents
 gem "hiredis"
 gem "redis", ">= 3.2.0", require: ["redis", "redis/connection/hiredis"]
 gem "sidekiq", "~> 5.1.0" # Background processing
 gem "sidekiq-failures"
-gem "soulheart", "~> 0.3.0"
+# gem "soulheart"
 
 gem "carrierwave", "~> 0.11.2"
 gem "carrierwave_backgrounder"
@@ -43,15 +43,15 @@ gem "kaminari" # pagination
 gem "kramdown" # Markdown
 gem "libv8", "~> 3.16.14.7"
 gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
-gem "money-rails"
-gem "nokogiri", "~> 1.8.1"
+# gem "money-rails"
+gem "nokogiri"
 gem "omniauth", "~> 1.6"
 gem "omniauth-facebook"
 gem "omniauth-globalid"
 gem "omniauth-strava"
-gem "paranoia"
+# gem "paranoia"
 gem "pg_search"
-gem "rack-contrib"
+# gem "rack-contrib" # IDK why/if we need this
 gem "redcarpet" # Something to do with swagger? Guess we needed another markdown parser
 gem "rmagick"
 gem "rqrcode-rails3"
@@ -90,7 +90,7 @@ gem "bootstrap", "~> 4.0.0.alpha3" # Bootstrap 4 - used for revised stylesheets
 gem "chartkick" # Display charts
 gem "coffee-rails"
 gem "groupdate" # Required for charts
-gem "jquery-datatables-rails", "~>3.4.0"
+# gem "jquery-datatables-rails", "~>3.4.0"
 gem "premailer-rails" # Inline styles for email
 gem "sprockets-rails"
 gem "therubyracer"
@@ -103,7 +103,7 @@ gem "memory_profiler", require: false
 gem "rack-mini-profiler", require: false # If you can't see it you can't make it better
 gem "stackprof", require: false
 
-gem "responders", "~> 2.0" # required because of class level respond_to blocks (API v1)
+# gem "responders" # required because of class level respond_to blocks (API v1)
 gem "thor"
 
 gem "bundler", ">= 1.8.4" # required for rails-assets.org - JS and CSS assets
@@ -124,8 +124,8 @@ source "https://rails-assets.org" do # JS land is crazy, so lock everything
 end
 
 gem "grape_logging" # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
-gem "lograge" # Structure log data, put it in single lines to improve the functionality
-gem "logstash-event" # Use logstash format for logging data
+# gem "lograge" # Structure log data, put it in single lines to improve the functionality
+# gem "logstash-event" # Use logstash format for logging data
 
 group :production do
   gem "skylight" # Performance monitoring
@@ -146,8 +146,8 @@ end
 
 group :development, :test do
   gem "database_cleaner"
-  gem "dotenv-rails"
-  gem "foreman"
+  # gem "dotenv-rails"
+  # gem "foreman"
   gem "jazz_fingers"
   gem "parallel_tests"
   gem "pry-byebug"
@@ -162,7 +162,7 @@ group :development, :test do
   gem "rufo", "~> 0.7.0", require: false
   # I18n - localization/translation
   # gem "i18n-tasks"
-  gem "i18n_generators"
+  # gem "i18n_generators"
 end
 
 group :test do
