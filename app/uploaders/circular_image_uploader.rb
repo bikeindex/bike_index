@@ -1,33 +1,9 @@
-# encoding: utf-8
-
-class CircularImageUploader < CarrierWave::Uploader::Base
+class CircularImageUploader < ApplicationUploader
   include CarrierWave::MiniMagick
   include ::CarrierWave::Backgrounder::Delay
 
-  if Rails.env.production?
-    storage :fog
-  else
-    storage :file
-  end
-
-  after :remove, :delete_empty_upstream_dirs
-
-  def delete_empty_upstream_dirs
-    path = ::File.expand_path(store_dir, root)
-    Dir.delete(path) # fails if path not empty dir
-
-    path = ::File.expand_path(base_store_dir, root)
-    Dir.delete(path) # fails if path not empty dir
-  rescue SystemCallError
-    true # nothing, the dir is not empty
-  end
-
   def store_dir
     "#{base_store_dir}/#{model.id}"
-  end
-
-  def cache_dir
-    Rails.root.join("tmp", "cache")
   end
 
   def base_store_dir

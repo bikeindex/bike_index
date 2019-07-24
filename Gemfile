@@ -4,7 +4,6 @@ ruby "2.5.5"
 gem "rails", "4.2.11"
 
 gem "active_model_serializers", "~> 0.9.3"
-gem "aws-sdk", "~> 1.33"
 gem "bcrypt", "~> 3.1.7"
 gem "jquery-rails"
 gem "pg"
