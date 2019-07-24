@@ -76,14 +76,18 @@ RSpec.describe OrganizationsController, type: :controller do
       expect(organization.kind).to eq "other"
     end
 
-    it "prevents creating privileged organization kinds" do
-      user = FactoryBot.create(:user_confirmed)
-      set_current_user(user)
+    describe "privileged kinds" do
+      Organization.admin_creatable_kinds.each do |kind|
+        it "prevents creating privileged #{kind}" do
+          user = FactoryBot.create(:user_confirmed)
+          set_current_user(user)
 
-      post :create, organization: org_attrs.merge(kind: "ambassador")
+          post :create, organization: org_attrs.merge(kind: kind)
 
-      expect(Organization.count).to eq(1)
-      expect(Organization.last.kind).to eq("other")
+          expect(Organization.count).to eq(1)
+          expect(Organization.last.kind).to eq("other")
+        end
+      end
     end
   end
 
