@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 # If you bump the Ruby version, make sure to update the Vagrantfile appropriately
 ruby "2.5.5"
-gem "rails", "4.2.11"
+gem "rails", "5.2.3"
 
 gem "active_model_serializers", "~> 0.9.3"
 gem "aws-sdk", "~> 1.33"
@@ -22,7 +22,7 @@ gem "i18n-country-translations"
 gem "rails-i18n"
 gem "translation"
 group :development, :test do
-  gem "i18n-tasks"
+  # gem "i18n-tasks"
   gem "i18n_generators"
 end
 
@@ -91,14 +91,13 @@ gem "rack-throttle"
 gem "secure_headers", "~> 2.5.0"
 
 # Frontend
-gem "backbone-on-rails", "~>0.9.10.0" # Legacy js
 gem "bootstrap", "~> 4.0.0.alpha3" # Bootstrap 4 - used for revised stylesheets
 gem "chartkick" # Display charts
 gem "coffee-rails"
 gem "groupdate" # Required for charts
 gem "jquery-datatables-rails", "~>3.4.0"
 gem "premailer-rails" # Inline styles for email
-gem "sprockets-rails", "~> 3.0.4"
+gem "sprockets-rails"
 gem "therubyracer"
 gem "uglifier"
 gem "webpacker", "~> 4.x"
@@ -110,7 +109,7 @@ gem "rack-mini-profiler", require: false # If you can't see it you can't make it
 gem "stackprof", require: false
 
 gem "responders", "~> 2.0" # required because of class level respond_to blocks (API v1)
-gem "thor", "0.19.1" # Locking it; http://stackoverflow.com/questions/40986923/meaning-of-expected-string-default-value-for-on-ruby-on-rails
+gem "thor"
 
 gem "bundler", ">= 1.8.4" # required for rails-assets.org - JS and CSS assets
 source "https://rails-assets.org" do # JS land is crazy, so lock everything
