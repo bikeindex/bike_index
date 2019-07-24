@@ -2,16 +2,6 @@
 
 class AvatarUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
-  # include Sprockets::Helpers::RailsHelper # Deprecated. Should be removed
-  # include Sprockets::Helpers::IsolatedHelper # Deprecated. Should be removed
-
-  if Rails.env.test?
-    storage :file
-  elsif Rails.env.development?
-    storage :file
-  else
-    storage :fog
-  end
 
   after :remove, :delete_empty_upstream_dirs
 

@@ -2,14 +2,6 @@
 
 # We really should obfuscate the filename, for this and bulk imports
 class ExportUploader < CarrierWave::Uploader::Base
-  if Rails.env.test?
-    storage :file
-  elsif Rails.env.development?
-    storage :file
-  else
-    storage :fog
-  end
-
   def cache_dir
     Rails.root.join("tmp", "cache")
   end

@@ -1,12 +1,6 @@
 class ImageUploader < CarrierWave::Uploader::Base
   include CarrierWave::MiniMagick
 
-  if Rails.env.production?
-    storage :fog
-  else
-    storage :file
-  end
-
   after :remove, :delete_empty_upstream_dirs
 
   def delete_empty_upstream_dirs
