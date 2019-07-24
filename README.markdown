@@ -68,9 +68,8 @@ If you modify any English translation files locally (e.g.
 GitHub. This will normalize translation file formatting and check for missing or
 unused keys.
 
-Non-English translation files should be treated as read-only. We can sync these
-with our translation.io project by issuing `bin/rake translation:sync` see the
-[Rails client docs](https://github.com/translation/rails) for details.
+Non-English translation files should be treated as read-only. We sync these
+with our translation.io project during prepare_translations if the project API key is set.
 
 ## Testing
 

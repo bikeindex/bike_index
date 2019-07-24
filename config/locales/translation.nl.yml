@@ -2,7 +2,7 @@
 # IF YOU UPDATE IT, YOUR CHANGES WILL BE LOST AT THE NEXT SYNC.
 #
 # To update this file, use this translation interface:
-# https://translation.io/jmromer/bike_index/nl
+# https://translation.io/bikeindex/bike_index/nl
 #
 ---
 nl:
@@ -31,7 +31,7 @@ nl:
     - vr
     - za
     month_names:
-    -
+    - 
     - januari
     - februari
     - maart
@@ -45,7 +45,7 @@ nl:
     - november
     - december
     abbr_month_names:
-    -
+    - 
     - jan
     - feb
     - mrt
@@ -3109,153 +3109,153 @@ nl:
       apply_to_be_an_ambassador_here: Meld u hier aan als ambassadeur
       apply_today: Meld je vandaag aan
       be_a_bike_saver: Wees een fietsspaarder
-      become_a_bike_index_ambassador:
-      become_an_ambassador:
-      bike_index_is_a_nonprofit_with_a_big_miss:
-      bike_index_launches_new_ambassador_progra:
-      check_out_our_media_resources:
-      connect_us_with_city_officials_law_enforc:
+      become_a_bike_index_ambassador: 
+      become_an_ambassador: 
+      bike_index_is_a_nonprofit_with_a_big_miss: 
+      bike_index_launches_new_ambassador_progra: 
+      check_out_our_media_resources: 
+      connect_us_with_city_officials_law_enforc: 
       current_ambassadors: Huidige ambassadeurs
-      follow_bike_index_on_twitter_facebook_and:
-      get_bike_shops_signed_up_for_bike_index_u:
-      give_you_shoutouts_on_social_media:
-      here:
+      follow_bike_index_on_twitter_facebook_and: 
+      get_bike_shops_signed_up_for_bike_index_u: 
+      give_you_shoutouts_on_social_media: 
+      here: 
       how_it_works: Hoe het werkt
-      join_our_list_of_ambassadors_and_advocate:
-      monitoring_online_sales_platforms_like_cr:
-      pos_integrations:
-      relevant_articles:
-      share_bike_index_on_social_channels_inclu:
-      start_here:
-      to_become_a_bike_index_ambassador_fill_ou:
-      typical_ambassador_activities:
-      typical_ambassador_activities_include:
-      view_current_ambassadors:
-      want_to_help_fight_bike_theft_in_your_com:
-      we_provide_you_with_the_resources_to_make:
-      why_work_with_bike_index:
-      you_bring_the_ideas_make_the_connections_:
+      join_our_list_of_ambassadors_and_advocate: 
+      monitoring_online_sales_platforms_like_cr: 
+      pos_integrations: 
+      relevant_articles: 
+      share_bike_index_on_social_channels_inclu: 
+      start_here: 
+      to_become_a_bike_index_ambassador_fill_ou: 
+      typical_ambassador_activities: 
+      typical_ambassador_activities_include: 
+      view_current_ambassadors: 
+      want_to_help_fight_bike_theft_in_your_com: 
+      we_provide_you_with_the_resources_to_make: 
+      why_work_with_bike_index: 
+      you_bring_the_ideas_make_the_connections_: 
     ascend:
-      ascend_knowledge_base_article:
-      automatic_bicycle_registration:
-      email_shops_html:
-      email_us_the_password_to_finish_setting_u:
-      follow_the_setup_instructions_html:
-      if_your_shop_uses_lightspeed_html:
-      link_your_ascend_retail_and_bike_index:
-      new_bike_shop_org:
-      once_youve_set_up_the_trek_ascenwd:
-      sign_up_as_a_new_org_html:
-      then_if_a_customers_bike_goes_missing_html:
-      we_have_a_new_free_bicycle_registration:
+      ascend_knowledge_base_article: 
+      automatic_bicycle_registration: 
+      email_shops_html: 
+      email_us_the_password_to_finish_setting_u: 
+      follow_the_setup_instructions_html: 
+      if_your_shop_uses_lightspeed_html: 
+      link_your_ascend_retail_and_bike_index: 
+      new_bike_shop_org: 
+      once_youve_set_up_the_trek_ascenwd: 
+      sign_up_as_a_new_org_html: 
+      then_if_a_customers_bike_goes_missing_html: 
+      we_have_a_new_free_bicycle_registration: 
     bike_shop_packages:
       additional: Extra
-      bike_index_for_bike_shops:
-      choose_a_package_size:
-      compare_plans_and_features:
+      bike_index_for_bike_shops: 
+      choose_a_package_size: 
+      compare_plans_and_features: 
       contact_us: Contacteer ons
-      contact_us_for_trial:
+      contact_us_for_trial: 
       forever: Voor altijd
       free: GRATIS
-      package_title:
-      questions_want_to_get_started:
+      package_title: 
+      questions_want_to_get_started: 
       sign_up: Registreren
       sign_up_now: Meld je nu aan
-      simply_the_best_bike_registry:
-      supporting_shop:
+      simply_the_best_bike_registry: 
+      supporting_shop: 
       try_for_free: Probeer gratis
       year: jaar
     campus_packages:
       additional: Extra
-      all_plans_come_with_a_30day_free_trial:
-      bike_index_for_colleges_universities:
-      choose_a_package_size:
-      clean_up_your_campus_messy_registry:
-      compare_plans_and_features:
+      all_plans_come_with_a_30day_free_trial: 
+      bike_index_for_colleges_universities: 
+      choose_a_package_size: 
+      clean_up_your_campus_messy_registry: 
+      compare_plans_and_features: 
       contact_us: Contacteer ons
-      contact_us_for_trial:
+      contact_us_for_trial: 
       forever: Voor altijd
       free: GRATIS
-      keep_us_pedaling:
-      number_of_members:
-      package_title:
-      questions_want_to_get_started:
+      keep_us_pedaling: 
+      number_of_members: 
+      package_title: 
+      questions_want_to_get_started: 
       sign_up: Registreren
       sign_up_now: Meld je nu aan
       try_for_free: Probeer gratis
       year: jaar
     cities_packages:
       additional: Extra
-      all_plans_come_with_a_30day_free_trial:
-      bike_index_for_cities:
-      choose_a_package_size:
-      compare_plans_and_features:
+      all_plans_come_with_a_30day_free_trial: 
+      bike_index_for_cities: 
+      choose_a_package_size: 
+      compare_plans_and_features: 
       contact_us: Contacteer ons
-      contact_us_for_trial:
+      contact_us_for_trial: 
       forever: Voor altijd
       free: GRATIS
-      give_your_constituents_the_bike_registry_:
-      keep_us_pedaling:
-      metropolis:
-      package_title:
-      questions_want_to_get_started:
+      give_your_constituents_the_bike_registry_: 
+      keep_us_pedaling: 
+      metropolis: 
+      package_title: 
+      questions_want_to_get_started: 
       sign_up: Registreren
       sign_up_now: Meld je nu aan
-      small_city:
-      town:
+      small_city: 
+      town: 
       try_for_free: Probeer gratis
       year: jaar
     find_out_more:
-      custom_development_available:
-      find_out_more_html:
+      custom_development_available: 
+      find_out_more_html: 
       get_in_touch_link: Neem contact op
     for_bike_shops:
-      5_ways_to_grow_community_for_your_bike_sh:
-      ascend_retail:
-      bike_index_for_bike_shops:
-      bikes_before_they:
-      build_goodwill_with_your_customers_with_a:
-      connect_your_ascend_account_html:
-      connect_your_lightspeed_account:
-      do_right_by_your_customers:
-      dont_use_ascend_or_lightspeed_html:
-      driving_service_revenues_with_bicycle_reg:
-      features_and_pricing:
-      for_completely_free_we_provide_you_with_t:
+      5_ways_to_grow_community_for_your_bike_sh: 
+      ascend_retail: 
+      bike_index_for_bike_shops: 
+      bikes_before_they: 
+      build_goodwill_with_your_customers_with_a: 
+      connect_your_ascend_account_html: 
+      connect_your_lightspeed_account: 
+      do_right_by_your_customers: 
+      dont_use_ascend_or_lightspeed_html: 
+      driving_service_revenues_with_bicycle_reg: 
+      features_and_pricing: 
+      for_completely_free_we_provide_you_with_t: 
       here: hier
-      join_our_network_link_html:
+      join_our_network_link_html: 
       learn_more: Leer meer
-      network_of_shop_partners:
-      once_you_do_this_link_your_account_to_you:
+      network_of_shop_partners: 
+      once_you_do_this_link_your_account_to_you: 
       or: of
-      our_official_lightspeed_integration_provi:
-      printed_materials:
-      register_bikes_for_your_customers:
-      related_articles:
-      sign_up_for_a_free_bike_index_account_html:
-      trusted_by_bike_shops_everywhere:
-      use_lightspeed_retail:
-      used_at_bike_shops_everywhere:
+      our_official_lightspeed_integration_provi: 
+      printed_materials: 
+      register_bikes_for_your_customers: 
+      related_articles: 
+      sign_up_for_a_free_bike_index_account_html: 
+      trusted_by_bike_shops_everywhere: 
+      use_lightspeed_retail: 
+      used_at_bike_shops_everywhere: 
     for_cities:
-      actually_get_people_registered_and_do_it_:
-      bike_index_for_cities:
-      bike_index_is_the_community_registration_:
-      bike_index_unveils_partnership_with_the_c:
-      bring_together_bike_shops_schools_municip:
-      engage_your_residents_and_recover_their_b:
-      features_amp_pricing:
-      mitigate_the_registration_mess:
-      no_more_index_cards_or_excel_sheets_give_:
-      our_community_is_your_community:
-      plug_your_city_in_nationally:
-      related_articles:
-      trusted_by_law_enforcement_everywhere:
-      trusted_by_municipalities_everywhere:
+      actually_get_people_registered_and_do_it_: 
+      bike_index_for_cities: 
+      bike_index_is_the_community_registration_: 
+      bike_index_unveils_partnership_with_the_c: 
+      bring_together_bike_shops_schools_municip: 
+      engage_your_residents_and_recover_their_b: 
+      features_amp_pricing: 
+      mitigate_the_registration_mess: 
+      no_more_index_cards_or_excel_sheets_give_: 
+      our_community_is_your_community: 
+      plug_your_city_in_nationally: 
+      related_articles: 
+      trusted_by_law_enforcement_everywhere: 
+      trusted_by_municipalities_everywhere: 
     for_community_groups:
-      bike_index_for_community_groups:
-      bike_index_launches_new_ambassadors_progr:
-      bike_index_welcomes_stolen_bikes_nola:
-      gone_are_the_days_where_you_had_to_regist:
+      bike_index_for_community_groups: 
+      bike_index_launches_new_ambassadors_progr: 
+      bike_index_welcomes_stolen_bikes_nola: 
+      gone_are_the_days_where_you_had_to_regist: 
       help_us_help_you: Help ons u te helpen
       here: hier
       partners_made_in_heaven: Partners gemaakt in de hemel
@@ -3263,7 +3263,7 @@ nl:
       registrations_are_free_forever_join_bike_: Inschrijvingen zijn gratis. Voor
         altijd. Word lid van Bike Index en begin vandaag nog met registreren.
       related_articles: 'Gerelateerde artikelen:'
-      sign_up_for_free:
+      sign_up_for_free: 
       spread_the_bike_index_word_html: Verspreid het Bike Index-woord naar uw kiezers
         om ze beschermd te rijden. Maak een gratis organisatieaccount %{link}.
       the_most_widereaching_and_effective_tools: De meest uitgebreide en effectieve
@@ -3277,11 +3277,11 @@ nl:
         fietser, we willen alle fietsen laten rijden met de eigenaren die ze nodig
         hebben.
     for_law_enforcement:
-      automated_tweets:
+      automated_tweets: 
       bend_reduces_bike_theft_by_60_percent: Bocht vermindert fietsdiefstal met 60
         procent
       bike_index_for_law_enforcement: Fietsindex voor wetshandhaving
-      bike_indexs_newest_municipal_partner:
+      bike_indexs_newest_municipal_partner: 
       here: hier
       if_you_want_to_collaborate_html: Als je wilt samenwerken met andere afdelingen
         in je stad om een register te beheren, lees je meer over Bike Index voor gemeenten
@@ -3307,8 +3307,8 @@ nl:
         partner in wetshandhaving.
       you_have_the_authority_to_bring_html: Je hebt de bevoegdheid om fietsen terug
         te brengen - dat is geen kleine verantwoordelijkheid. Daarom hebben we tools
-        - zoals onze integratie met LeadsOnline en %{automated_tweets_link} van gestolen fietsen -
-        om uw community veilig te houden. Maak verbinding met %{local_ambassadors_link} en spotters
+        - zoals onze integratie met LeadsOnline en %{link} van gestolen fietsen -
+        om uw community veilig te houden. Maak verbinding met %{link} en spotters
         om de verkoop van gestolen fietsen snel in beslag te nemen en te blokkeren.
       youre_the_first_one: Jij bent de eerste waar je burgers naar kijken als hun
         fietsen worden gestolen. Ga naar en doorzoek onze internationale database
