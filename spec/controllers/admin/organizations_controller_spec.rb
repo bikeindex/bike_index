@@ -59,7 +59,7 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
       }
     end
     context "privileged kinds" do
-      Organization.admin_creatable_kinds.each do |kind|
+      Organization.admin_required_kinds.each do |kind|
         it "prevents creating privileged #{kind}" do
           post :create, organization: create_attributes.merge(kind: kind)
           expect(Organization.count).to eq(1)
