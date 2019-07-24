@@ -72,7 +72,6 @@ class Organization < ActiveRecord::Base
 
   def self.admin_creatable_kinds; %w[ambassador bike_depot].freeze end
 
-  # Organization kinds creatable by non-superadmins
   def self.user_creatable_kinds; kinds - admin_creatable_kinds end
 
   def self.friendly_find(n)
