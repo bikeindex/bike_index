@@ -5,7 +5,6 @@ gem "rails", "5.2.3"
 
 gem "active_model_serializers", "~> 0.9.3"
 gem "bcrypt", "~> 3.1.7"
-# gem "jquery-rails"
 gem "pg"
 
 # Speed
@@ -17,9 +16,9 @@ gem "flipper-active_record"
 gem "flipper-ui"
 
 # I18n - localization/translation
-# gem "i18n-country-translations"
-# gem "rails-i18n"
-# gem "translation"
+gem "i18n-country-translations"
+gem "rails-i18n"
+gem "translation"
 
 # Redis and redis dependents
 gem "hiredis"
@@ -43,15 +42,15 @@ gem "kaminari" # pagination
 gem "kramdown" # Markdown
 gem "libv8", "~> 3.16.14.7"
 gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
-# gem "money-rails"
+gem "money-rails"
 gem "nokogiri"
 gem "omniauth", "~> 1.6"
 gem "omniauth-facebook"
 gem "omniauth-globalid"
 gem "omniauth-strava"
-# gem "paranoia"
+gem "paranoia"
 gem "pg_search"
-# gem "rack-contrib" # IDK why/if we need this
+gem "rack-contrib" # IDK why/if we need this. Check if can be removed
 gem "redcarpet" # Something to do with swagger? Guess we needed another markdown parser
 gem "rmagick"
 gem "rqrcode-rails3"
@@ -86,6 +85,7 @@ gem "rack-throttle"
 gem "secure_headers", "~> 2.5.0"
 
 # Frontend
+gem "jquery-rails"
 gem "bootstrap", "~> 4.0.0.alpha3" # Bootstrap 4 - used for revised stylesheets
 gem "chartkick" # Display charts
 gem "coffee-rails"
@@ -124,8 +124,8 @@ source "https://rails-assets.org" do # JS land is crazy, so lock everything
 end
 
 gem "grape_logging" # Grape logging. Also how we pass it to lograge. Always used, not just in Prod
-# gem "lograge" # Structure log data, put it in single lines to improve the functionality
-# gem "logstash-event" # Use logstash format for logging data
+gem "lograge" # Structure log data, put it in single lines to improve the functionality
+gem "logstash-event" # Use logstash format for logging data
 
 group :production do
   gem "skylight" # Performance monitoring
@@ -146,8 +146,8 @@ end
 
 group :development, :test do
   gem "database_cleaner"
-  # gem "dotenv-rails"
-  # gem "foreman"
+  gem "dotenv-rails"
+  gem "foreman"
   gem "jazz_fingers"
   gem "parallel_tests"
   gem "pry-byebug"
@@ -161,8 +161,8 @@ group :development, :test do
   gem "rubocop-performance", "~> 1.1.0", require: false
   gem "rufo", "~> 0.7.0", require: false
   # I18n - localization/translation
-  # gem "i18n-tasks"
-  # gem "i18n_generators"
+  gem "i18n-tasks"
+  gem "i18n_generators"
 end
 
 group :test do
