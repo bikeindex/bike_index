@@ -27,7 +27,8 @@
       .col-md-4
         %section.graph_time_select.fancy-select.unfancy
           = label_tag :selection, "Graph time slice"
-          = select_tag(:graph_date_option, options_for_select([["Custom","custom"],["Past day", "1,days"],["Past week", "1,weeks"], ["Past month", "1,months"], ["Past six months", "6,months"], ["Past year", "1,years"]], params[:graph_date_option]))
+          - time_opts = [["Custom","custom"],["Past day", "1,days"],["Past week", "1,weeks"], ["Past month", "1,months"], ["Past six months", "6,months"], ["Past year", "1,years"]]
+          = select_tag :graph_date_option, options_for_select(time_opts, params[:graph_date_option]), class: "form-control"
       .col-md-4
         .form-group.calendar-box{style: "display: none"}
           = label_tag :start_at, "Start at", class: "control-label"
@@ -40,6 +41,6 @@
     .row
       .col-md-auto
         = submit_tag "Update chart", class: "btn btn-success mb-4"
-    = line_chart variable_admin_graphs_path(params)
+    = line_chart variable_admin_graphs_path(params.except(:controller, :action))
     %em.small.less-strong
       graph is grouped by #{@group_period}

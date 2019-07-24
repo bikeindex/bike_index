@@ -160,8 +160,8 @@ $(document).ready ->
   toggleRegistrationType() if $('#stolen_registration_first').length > 0
 
   # Update any hidden fields with current timezone
-  window.timezone ||= moment.tz.guess()
-  $(".hiddenFieldTimezone").val(window.timezone)
+  window.localTimezone ||= moment.tz.guess()
+  $(".hiddenFieldTimezone").val(window.localTimezone)
 
   # prevent double posting
   $('#new_bike').submit ->

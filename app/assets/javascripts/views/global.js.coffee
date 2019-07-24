@@ -34,8 +34,8 @@ class BikeIndex.Views.Global extends Backbone.View
       if preciseTime then time.format("YYYY-MM-DD h:mma") else time.format("YYYY-MM-DD")
 
   localizeTimes: ->
-    window.timezone = moment.tz.guess()
-    moment.tz.setDefault(window.timezone)
+    window.localTimezone = moment.tz.guess()
+    moment.tz.setDefault(window.localTimezone)
     window.yesterday = moment().subtract(1, "day").startOf("day")
     window.today = moment().startOf("day")
     window.tomorrow = moment().endOf("day")
@@ -54,7 +54,7 @@ class BikeIndex.Views.Global extends Backbone.View
       $this = $(this)
       $this.text(moment().format("z"))
       $this.removeClass("convertTimezone")
-    $(".hiddenFieldTimezone").val(window.timezone)
+    $(".hiddenFieldTimezone").val(window.localTimezone)
 
   openNewWindow: (e) ->
     e.preventDefault()
