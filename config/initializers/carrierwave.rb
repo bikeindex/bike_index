@@ -37,7 +37,7 @@ CarrierWave.configure do |config|
 
   if Rails.env.production?
     config.fog_provider "fog/aws"
-    config.asset_host = "https://files.bikeindex.org" if Rails.env.production?
+    config.asset_host = "https://files.bikeindex.org"
     config.fog_credentials = {
       provider: "AWS",
       aws_access_key_id: ENV["S3_ACCESS_KEY"],
