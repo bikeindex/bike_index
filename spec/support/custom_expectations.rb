@@ -1,5 +1,16 @@
 # frozen_string_literal: true
 
+def expect_attrs_to_match_hash(obj, hash)
+  unmatched_hash = {}
+  hash.each do |key, value|
+    # Just in case there are some type issues
+    next if obj.send(key).to_s == value.to_s
+    unmatched_hash[key] = obj.send(key)
+  end
+  return true unless unmatched_hash.present?
+  expect(hash.slice(*unmatched_hash.keys)).to eq unmatched_hash
+end
+
 # Define a hash matchers to display better results and match more loosely (not on type, indifferent access)
 def expect_hashes_to_match(hash1, hash2, inside = nil)
   hash1 = hash1.with_indifferent_access if hash1&.is_a?(Hash)
