@@ -63,14 +63,17 @@ We're using [translation.io](https://translation.io) to manage internationalizat
 To contribute, sign up for an account there and ask to be added to the project
 as a translator.
 
-If you modify any English translation files locally (e.g.
-`config/locales/en.yml`), run `bin/rake prepare_translations` before pushing to
-GitHub. This will normalize translation file formatting and check for missing or
-unused keys.
+**Non-English translation files should be treated as read-only.** We sync these
+with our translation.io project
 
-Non-English translation files should be treated as read-only. We can sync these
-with our translation.io project by issuing `bin/rake translation:sync` see the
-[Rails client docs](https://github.com/translation/rails) for details.
+If you modify the English translation file [config/locales/en.yml], run:
+
+```
+bin/rake prepare_translations
+```
+
+before pushing to GitHub. This will normalize translation file formatting and check for missing or
+unused keys.
 
 ## Testing
 

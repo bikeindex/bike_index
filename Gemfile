@@ -4,7 +4,6 @@ ruby "2.5.5"
 gem "rails", "5.2.3"
 
 gem "active_model_serializers", "~> 0.9.3"
-gem "aws-sdk", "~> 1.33"
 gem "bcrypt", "~> 3.1.7"
 gem "jquery-rails"
 gem "pg"
@@ -17,14 +16,10 @@ gem "flipper"
 gem "flipper-active_record"
 gem "flipper-ui"
 
-# I18n
+# I18n - localization/translation
 gem "i18n-country-translations"
 gem "rails-i18n"
 gem "translation"
-group :development, :test do
-  # gem "i18n-tasks"
-  gem "i18n_generators"
-end
 
 # Redis and redis dependents
 gem "hiredis"
@@ -66,7 +61,7 @@ gem "unicorn" # Use Puma as the app server
 gem "unicorn-worker-killer"
 
 # Making other files
-gem "axlsx" # Write Excel files - OrganizationExports
+gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/c gem isn't otherwise updated
 gem "wicked_pdf"
 gem "wkhtmltopdf-binary"
 
@@ -165,6 +160,9 @@ group :development, :test do
   gem "rubocop-daemon", "~> 0.3.1", require: false
   gem "rubocop-performance", "~> 1.1.0", require: false
   gem "rufo", "~> 0.7.0", require: false
+  # I18n - localization/translation
+  # gem "i18n-tasks"
+  gem "i18n_generators"
 end
 
 group :test do

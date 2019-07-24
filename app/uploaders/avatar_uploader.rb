@@ -1,37 +1,9 @@
-# encoding: utf-8
-
-class AvatarUploader < CarrierWave::Uploader::Base
+class AvatarUploader < ApplicationUploader
   include CarrierWave::MiniMagick
-  # include Sprockets::Helpers::RailsHelper # Deprecated. Should be removed
-  # include Sprockets::Helpers::IsolatedHelper # Deprecated. Should be removed
-
-  if Rails.env.test?
-    storage :file
-  elsif Rails.env.development?
-    storage :file
-  else
-    storage :fog
-  end
-
-  after :remove, :delete_empty_upstream_dirs
-
-  def delete_empty_upstream_dirs
-    path = ::File.expand_path(store_dir, root)
-    Dir.delete(path) # fails if path not empty dir
-
-    path = ::File.expand_path(base_store_dir, root)
-    Dir.delete(path) # fails if path not empty dir
-  rescue SystemCallError
-    true # nothing, the dir is not empty
-  end
 
   # Fallback so the page doesn't break if the image isn't there
   def default_url
     "https://files.bikeindex.org/blank.png"
-  end
-
-  def cache_dir
-    Rails.root.join("tmp", "cache")
   end
 
   def store_dir

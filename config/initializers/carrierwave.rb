@@ -1,20 +1,3 @@
-# Configure carrierwave
-
-CarrierWave.configure do |config|
-  config.cache_dir = "#{Rails.root}/tmp/uploads"
-  config.storage = :fog # For some reason, uploading sitemap doesn't work unless this is included.
-  config.asset_host = "https://files.bikeindex.org" if Rails.env.production?
-  config.fog_credentials = {
-    provider: "AWS",
-    aws_access_key_id: ENV["S3_ACCESS_KEY"],
-    aws_secret_access_key: ENV["S3_SECRET_KEY"],
-    region: "us-east-1",
-
-  }
-  config.fog_directory = ENV["S3_BUCKET"]
-  config.fog_attributes = { "Cache-Control" => "max-age=315576000" }
-end
-
 # Monkey Patch carrierwave
 module CarrierWave
   module MiniMagick
@@ -45,5 +28,26 @@ module CarrierWave
         img
       end
     end
+  end
+end
+
+# Additional carrierwave configurations
+CarrierWave.configure do |config|
+  config.cache_dir = "#{Rails.root}/tmp/uploads"
+
+  if Rails.env.production?
+    config.fog_provider "fog/aws"
+    config.asset_host = ENV["S3_ASSET_HOST"]
+    config.fog_credentials = {
+      provider: "AWS",
+      aws_access_key_id: ENV["S3_ACCESS_KEY"],
+      aws_secret_access_key: ENV["S3_SECRET_KEY"],
+      region: "us-east-1",
+    }
+    config.fog_directory = ENV["S3_BUCKET"]
+    config.fog_attributes = { "Cache-Control" => "max-age=315576000" }
+    config.storage :fog
+  else
+    config.storage :file
   end
 end
