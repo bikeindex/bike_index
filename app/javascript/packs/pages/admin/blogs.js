@@ -87,9 +87,7 @@ function BinxAdminBlogs() {
       const alt = image.name
       const src = image.image.url
       const id = image.id
-      const template =
-
-        `<li>
+      return  `<li>
           <div class='card bg-light admin-public-image'>
             <div class='card-body'>
               <div class='row'>
@@ -124,8 +122,6 @@ function BinxAdminBlogs() {
           </div>
         </div>
       </li>`
-
-      return template;
 
     },
 
