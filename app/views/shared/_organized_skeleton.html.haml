@@ -80,11 +80,15 @@
   - orgcontainer = "container-fluid" if controller_name == "bikes" && action_name == "index" || controller_name == "messages"
   %div{ class: orgcontainer || "container" }
     - if current_organization.law_enforcement_missing_verified_features?
-      .organization-wide-alert
+      .organization-wide-alert.alert.alert-info.in
+        %button.close{'aria-label' => 'Close', 'data-dismiss' => 'alert', type: 'button'}
+          %span{'aria-hidden' => 'true' } &times;
         %p
           Bike Index provides additional features for verified Law Enforcement organizations. Please contact #{link_to "lily@bikeindex.org", "mailto:lily@bikeindex.org"} to get them enabled.
     - if current_organization.bike_shop_display_integration_alert?
-      .organization-wide-alert
+      .organization-wide-alert.alert.alert-info.in
+        %button.close{'aria-label' => 'Close', 'data-dismiss' => 'alert', type: 'button'}
+          %span{'aria-hidden' => 'true' } &times;
         %p
           Use Lightspeed Retail POS?
           %ul
@@ -105,8 +109,12 @@
           Other Point of Sale system?
           %ul
             %li
-              Register bikes with our
-              %strong
-                = link_to "streamlined Bike Shop registration page", new_organization_bike_path(organization_id: current_organization.to_param)
+              - if controller_name == "bikes" && action_name == "new"
+                You're currently viewing our streamlined Bike Shop registration page, which is what we recommend using
+
+              - else
+                Register bikes with our
+                %strong
+                  = link_to "streamlined Bike Shop registration page", new_organization_bike_path(organization_id: current_organization.to_param)
 
     = yield
