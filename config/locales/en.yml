@@ -1655,7 +1655,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1681,7 +1681,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -1855,6 +1855,11 @@ en:
         <strong>Seth Herr</strong> learned to program so that he could build
         Bike Index, because he was a bike mechanic and was frustrated that
         something like it didn't exist.
+      bobby_gervais_bio_html: |
+        <strong>Bobby Gervais</strong> has had a long history of delivering and
+        carrying stuff on his bike for work and now he's making a living out of helping
+        people recover their bikes. Bobby helps to maintain the Bike Index, and work
+        on new features.
       seth_herr_image_title: >-
         Those are not official Bike Index arm warmers, we don't have Bike Index arm
         warmers
