@@ -1,6 +1,4 @@
 class Admin::FailedBikesController < Admin::BaseController
-  layout "new_admin"
-
   def index
     page = params.fetch(:page, 1)
     per_page = params.fetch(:per_page, 25)

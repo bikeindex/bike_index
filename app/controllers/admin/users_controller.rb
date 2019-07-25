@@ -1,7 +1,6 @@
 class Admin::UsersController < Admin::BaseController
   include SortableTable
   before_filter :find_user, only: [:edit, :update, :destroy]
-  layout "new_admin"
 
   def index
     page = params[:page] || 1

@@ -1,6 +1,4 @@
 class Admin::AmbassadorTasksController < Admin::BaseController
-  layout "new_admin"
-
   before_action :find_ambassador_task, only: %w[edit update]
 
   def index
