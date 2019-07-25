@@ -16,7 +16,7 @@ window.Form = require("@uppy/form")
 
 
 
-function BinxCustomLayouts() {
+function BinxAdminImageUploader() {
   return {
     init() {
       this.uppyFileUpload();
@@ -56,12 +56,14 @@ function BinxCustomLayouts() {
       })
       uppy.on('upload-success', (file, response) => {
         $("ul#public_images").append(this.publicImageTemplate(response.body.public_image))
+        this.ensureCorrectTemplate();
       })
     },
 
     publicImageTemplate(image) {
       const alt = image.name
       const src = image.image.url
+      const id = image.id
       return `<li>
           <div class='card bg-light admin-public-image'>
             <div class='card-body'>
@@ -82,16 +84,31 @@ function BinxCustomLayouts() {
             </div>
             <hr/>
             <div class='row mt-2'>
+              <div class='col-md-2'>
+                <a href='#' class="image-delete-button"> Delete</a>
+              </div>
               <div class='col-md-8'>
                 <span> Copy the above text and paste it where you'd like it to appear in the post </span>
+              </div>
+              <div class='col-md-2'>
+                <div class="index-image-select">
+                  <input class="index_image_${id}" name="index_image_id" type="radio" value="${id}"></input>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </li>`
+    },
+
+    ensureCorrectTemplate() {
+      if (location.href.match(/organizations/)) {
+        $(".index-image-select").hide()
+        $(".image-delete-button").hide()
+      }
     }
   };
 }
 
 
-export default BinxCustomLayouts
+export default BinxAdminImageUploader

@@ -7,7 +7,7 @@ import BinxAdminRecoveryDisplayForm from "./recovery_display_form.js";
 import BinxAdminInvoices from "./invoices.js";
 import BinxAdminOrganizationForm from "./organization_form.js";
 import BinxAdminBlogs from "./blogs.js"
-import BinxCustomLayouts from "./custom_layouts.js"
+import BinxAdminImageUploader from "./image_uploader.js"
 
 function BinxAdmin() {
   return {
@@ -55,9 +55,9 @@ function BinxAdmin() {
         const binxAdminBlogs = BinxAdminBlogs();
         binxAdminBlogs.init();
       }
-      if ($(".custom-layouts").length > 0) {
-        const binxCustomLayouts = BinxCustomLayouts();
-        binxCustomLayouts.init();
+      if ($(".uppy").length > 0) {
+        const binxAdminImageUploader = BinxAdminImageUploader();
+        binxAdminImageUploader.init();
       }
     },
 
