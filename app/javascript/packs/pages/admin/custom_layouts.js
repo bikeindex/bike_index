@@ -20,7 +20,6 @@ function BinxCustomLayouts() {
   return {
     init() {
       this.uppyFileUpload();
-      log.debug("Hey")
     },
 
     uppyFileUpload() {
