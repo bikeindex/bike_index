@@ -1,8 +1,11 @@
-class GetManufacturerLogoWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "low_priority", backtrace: true, :retry => false
+class GetManufacturerLogoWorker < ScheduledWorker
+  def self.frequency
+    1.week
+  end
 
-  def perform(id)
+  def perform(id = nil)
+    return enqueue_scheduled_jobs if id.blank?
+
     manufacturer = Manufacturer.find(id)
     return true if manufacturer.website.blank? || manufacturer.logo.present?
 
@@ -14,5 +17,12 @@ class GetManufacturerLogoWorker
     manufacturer.remote_logo_url = clearbit_url
     manufacturer.logo_source = "Clearbit"
     manufacturer.save
+  end
+
+  def enqueue_scheduled_jobs
+    record_scheduler_started
+    Manufacturer.with_websites.pluck(:id).each_with_index do |id, index|
+      GetManufacturerLogoWorker.perform_in((5 * index).seconds, id)
+    end
   end
 end

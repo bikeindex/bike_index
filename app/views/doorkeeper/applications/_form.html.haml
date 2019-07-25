@@ -10,7 +10,7 @@
   = content_tag :div, class: "form-group#{' has-error' if application.errors[:redirect_uri].present?}" do
     = f.label :redirect_uri, class: 'col-sm-2 control-label', for: 'application_redirect_uri'
     .col-sm-10
-      = f.text_area :redirect_uri, class: 'form-control'
+      = f.text_area :redirect_uri, rows: 4, class: 'form-control'
       = doorkeeper_errors_for application, :redirect_uri
       %span.help-block
         Use one line per URI
@@ -25,5 +25,5 @@
         Include <code>#{authorize_documentation_index_url}</code> to be able to add new tokens #{link_to "from the documentation", api_v3_documentation_index_url, tabindex: -1}.
   .form-group
     .offset-sm-2.col-sm-10
-      = f.submit 'Submit', class: "btn binxbtn-primary"
-      = link_to "Cancel", oauth_applications_path, :class => "btn binxbtn-default"
+      = f.submit 'Submit', class: "btn btn-primary"
+      = link_to "Cancel", oauth_applications_path, class: "btn btn-secondary"

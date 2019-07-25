@@ -18,7 +18,7 @@ class BikeIndex.OrganizedManageLocations extends BikeIndex
       regexp = new RegExp($(this).data('id'), 'g')
       $('#fieldsetend').before($(this).data('fields').replace(regexp, time))
       setDefaultCountryAndName()
-      window.BikeIndex.Init.loadFancySelects()
+      @loadFancySelects()
 
 
   setDefaultCountryAndName: ->

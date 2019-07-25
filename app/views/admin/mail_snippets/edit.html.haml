@@ -1,12 +1,11 @@
-%h1.padded
+%h1.mt-4
   Edit Snippet
 
-.form.form-horizontal
-  = form_for [:admin, @mail_snippet] do |f|
-    = render partial: 'form', locals: { f: f }
+= form_for [:admin, @mail_snippet] do |f|
+  = render partial: 'form', locals: { f: f }
 
-    .form-group
-      = f.label :is_enabled, "Enabled?"
-      = f.check_box :is_enabled
+  .form-group
+    = f.label :is_enabled, "Enabled?"
+    = f.check_box :is_enabled
 
-    = f.submit "Update", class: 'btn btn-success float-right'
+  = f.submit "Update", class: 'btn btn-success float-right'

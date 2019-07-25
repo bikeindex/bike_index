@@ -1,68 +1,59 @@
+- help_link = link_to "lily@bikeindex.org", "mailto:lily@bikeindex.org"
+
 %h1.header-font-uncap
-  Welcome to your Ambassador homepage
+  = t(".welcome_to_your_ambassador_homepage")
 
-%p
-  This page contains the resources you need to become a great bike advocate in
-  your community. Here you will find documents, tips, articles, and
-  recommendations for helping cyclists where you live and connecting with
-  Ambassadors around the world doing the same in their communities.
+%p= t(".this_page_contains_the_resources_you_need")
+%p= t(".being_a_bike_index_ambassador")
+%p= t(".activities_for_registering_cyclists_html", help_link: help_link)
 
-%p
-  Being a Bike Index Ambassador means helping people, where you live, to
-  register and protect their bikes in case of theft. Share Bike Index with bike
-  shops, advocacy groups, universities, and law enforcement to aid larger
-  numbers and more kinds of cyclists in your area.
+- if @suggested_activities.present?
+  %h2= t(".suggested_activities")
+  .full-screen-table
+    %table.table.table-striped.table-bordered.ambassador-tasks-table
+      %thead.small-header
+        %tr
+          %th= t(".activity")
+          %th= t(".actions")
+      %tbody
+        - @suggested_activities.each do |task|
+          %tr
+            %td
+              %strong= task.title
+              %br
+              = task.description_html.html_safe
+            %td.ambassador-toggle
+              - if task.is_a?(AmbassadorTaskAssignment)
+                = button_to_toggle_task_completion_status(task, current_user, current_organization)
 
-%p
-  On this page, we've listed effective activities for registering cyclists in
-  Bike Index. You can track progress and get ideas from other Ambassadors in
-  your area about successful strategies. If you have any questions, post them in
-  our Slack channel or email
-  #{link_to "lily@bikeindex.org", "mailto:lily@bikeindex.org"}.
+- if @completed_activities.present?
+  %h2= t(".completed_activities")
+  .full-screen-table
+    %table.table.table-striped.table-bordered.ambassador-tasks-table
+      %thead.small-header
+        %tr
+          %th= t(".activity")
+          %th= t(".completed")
+      %tbody
+        - @completed_activities.each do |task|
+          %tr
+            %td
+              %strong= task.title
+              %br
+              = task.description_html.html_safe
+            %td
+              %span.convertTime= l task.completed_at, format: :convert_time
 
-- if suggested_activities.present?
-  %h2 Suggested Activities
-  %table.table.table-striped.table-bordered.ambassador-tasks-table
+
+%h2= t(".leaderboard")
+.full-screen-table
+  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
     %thead.small-header
       %tr
-        %th Activity
-        %th Actions
+        %th= t(".name")
+        %th= t(".activities")
     %tbody
-      - suggested_activities.each do |task|
+      - @ambassadors.each do |ambassador|
         %tr
-          %td
-            %strong= task.title
-            %br
-            = task.description_html.html_safe
-          %td
-            = task.button_to_toggle_completion_status(current_user, current_organization)
-
-- if completed_activities.present?
-  %h2 Completed activities
-  %table.table.table-striped.table-bordered.ambassador-tasks-table
-    %thead.small-header
-      %tr
-        %th Activity
-        %th Completed
-    %tbody
-      - completed_activities.each do |task|
-        %tr
-          %td
-            %strong= task.title
-            %br
-            = task.description_html.html_safe
-          %td
-            %span.convertTime= l task.completed_at, format: :convert_time
-
-
-%h2 Leaderboard
-%table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border
-  %thead.small-header
-    %tr
-      %th Name
-      %th Activities
-  %tbody
-    - ambassadors.each do |ambassador|
-      %tr
-        %td= ambassador.name
-        %td= ambassador.progress_count
+          %td= ambassador.name
+          %td= ambassador.progress_count

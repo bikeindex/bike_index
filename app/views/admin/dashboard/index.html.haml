@@ -5,7 +5,7 @@
   Recent
   = link_to "Bikes", admin_bikes_url
 
-= render partial: "/admin/bikes/admin_bikes_table", locals: { bikes: @bikes }
+= render partial: "/admin/bikes/table", locals: { bikes: @bikes }
 
 
 .row.justify-content-end
@@ -19,7 +19,7 @@
         (#{number_with_delimiter(today)} today, #{number_with_delimiter(yesterday)} yesterday)
     - bikes = [ { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.current).count }, { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.current).count }]
 
-= line_chart bikes
+= line_chart bikes, curve: false, thousands: ",", defer: true
 
 %hr
 

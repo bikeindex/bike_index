@@ -2,10 +2,12 @@ class BikeIndex.BikesEditAccessories extends BikeIndex
   constructor: ->
     @initializeEventListeners()
     @fancySelectForManufacturers()
-
+    ctype_other_val = $('#form_well_wrap').data('ctypeother')
     manufacturer_other_val = $('#form_well_wrap').data('manufacturerother')
     ctype_other_val = $('#form_well_wrap').data('ctypeother')
+    handlebar_type_other_val = $('#form_well_wrap').data('handlebartypeother')
     new BikeIndex.ToggleHiddenOther('.component-manufacturer-input', manufacturer_other_val)
+    new BikeIndex.ToggleHiddenOther('.handlebar-type-input', handlebar_type_other_val)
     new BikeIndex.ToggleHiddenOther('.component-ctype-input', ctype_other_val)
 
   initializeEventListeners: ->
@@ -31,5 +33,5 @@ class BikeIndex.BikesEditAccessories extends BikeIndex
     time = new Date().getTime()
     regexp = new RegExp($target.attr('data-id'), 'g')
     $target.before($target.data('fields').replace(regexp, time))
-    window.BikeIndex.Init.loadFancySelects()
+    @loadFancySelects()
     @fancySelectForManufacturers()

@@ -2,71 +2,68 @@
   %header.jumbotron.root-landing-banner-header.bg-image-bike-hero
     .container
       .root-landing-header-text
-        %h2
-          Over $#{number_with_delimiter(Counts.recoveries_value)} Worth of Bikes Recovered
-        %h1.upcase
-          Bike registration that works
+        %h2= t(".value_of_bikes_recovered", value: as_currency(Counts.recoveries_value))
+        %h1.upcase= t(".hero")
         %h2
           = link_to new_bike_path do
-            Register Now
+            = t(".register_now")
             %span.chevron &raquo;
 
   = render partial: "/landing_pages/for_organizations_photo_list"
 
-  - cache "root_body_wrap", skip_digest: true do # Expired in recovery_displays_controller
+  -# Expired in admin/recovery_displays_controller
+  - cache("root_recovery_stories", skip_digest: true) do
     .root-landing-recovery-stories
       .container
         #recovery-stories-container.extras-hidden
           = render @recovery_displays
           .recovery-block.recovery-see-more
-            %a.see-more-link{href: recovery_stories_path}
-              Read more recovery stories
+            = link_to t(".read_more_recovery_stories"),
+              recovery_stories_path,
+              class: "see-more-link"
 
+  - cache("root_body") do
     .root-landing-how-it-works
       .container
-        %h3.landing-container-label But How Does it work?
+        %h3.landing-container-label= t(".but_how_does_it_work")
         .row
           .col-md-2.root-landing-how-icon
-            = render '/landing_pages/icons/how_icon_register_svg'
-            = image_tag 'landing_pages/dashed_line.svg', class: 'root-icon-connector'
+            = render "/landing_pages/icons/how_icon_register_svg"
+            = image_tag "landing_pages/dashed_line.svg", class: "root-icon-connector"
           .col-md-7.root-landing-explanation
             .root-landing-explanation-wrap
-              %h4 Register Your Bike
-              %p
-                It’s simple. Submit your name, bike manufacturer, serial number, and component information to enter your bike into the most widely used bike registry on the planet.
+              %h4= t(".register_your_bike")
+              %p= t(".how_it_works")
         .row
           .col-md-2.root-landing-how-icon
             = render '/landing_pages/icons/how_icon_alert_svg'
             = image_tag 'landing_pages/dashed_line.svg', class: 'root-icon-connector'
           .col-md-7.root-landing-explanation
             .root-landing-explanation-wrap
-              %h4 Alert the Community
-              %p
-                If your bike goes missing, mark it as lost or stolen to notify the entire Bike Index community and its partners.
+              %h4= t(".alert_the_community")
+              %p= t(".if_your_bike_goes_missing")
         .row
           .col-md-2.root-landing-how-icon
             = render '/landing_pages/icons/how_icon_responds_svg'
-            = image_tag 'landing_pages/dashed_line.svg', class: 'root-icon-connector'
+            = image_tag "landing_pages/dashed_line.svg", class: "root-icon-connector"
           .col-md-7.root-landing-explanation
             .root-landing-explanation-wrap
-              %h4 The community responds
-              %p
-                A user or partner encounters your bike, uses Bike Index to identify it, and contacts you.
+              %h4= t(".the_community_responds")
+              %p= t(".identifying_your_bike")
         .row
           .col-md-2.root-landing-how-icon
-            = render '/landing_pages/icons/how_icon_recover_svg'
+            = render "/landing_pages/icons/how_icon_recover_svg"
           .col-md-7.root-landing-explanation
             .root-landing-explanation-wrap
-              %h4 You Get your Bike Back
-              %p
-                With the help of the Bike Index community and its partners, you have the information necessary to recover your lost or stolen bike at no cost to you. It’s what we do.
+              %h4= t(".you_get_your_bike_back")
+              %p= t(".recover_your_bike_for_free")
 
       %a.btn.btn-lg.btn-success.root-action-btn{ href: new_bike_path }
-        Register now!
+        = t(".register_now")
 
   .root-landing-who
     .container
-      %h3.landing-container-label Used By
+      %h3.landing-container-label= t(".used_by")
 
       .root-landing-who-wrap
         .root-landing-who-square
@@ -105,7 +102,7 @@
 
   .root-by-the-numbers
     .container-fluid
-      %h3.landing-container-label Bike Index statistics
+      %h3.landing-container-label= t(".bike_index_statistics")
       .row
         .col-md-10.charted
           :ruby
@@ -128,31 +125,30 @@
 
           = column_chart Counts.week_creation_chart, thousands: ",", defer: true, library: chartkick_library_props
           %h4.chart-label
-            Bikes registered this week
+            = t(".bikes_registered_this_week")
         .col-md-2
           .count-block
             %h4
-              Total Bikes Registered
+              = t(".total_bikes_registered")
               %span.count-display
                 = number_with_delimiter(Counts.total_bikes)
           .count-block
             %h4
-              Stolen Bikes Registered
+              = t(".stolen_bikes_registered")
               %span.count-display
                 = number_with_delimiter(Counts.stolen_bikes)
           .count-block
             %h4
-              Stolen Bikes Recovered
+              = t(".stolen_bikes_recovered")
               %span.count-display
                 = number_with_delimiter(Counts.recoveries)
           .count-block
             %h4
-              Total Recovery value
+              = t(".total_recovery_value")
               %span.count-display
                 $#{number_with_delimiter(Counts.recoveries_value)}
           .count-block
             %h4
-              Partner Organizations
+              = t(".partner_organizations")
               %span.count-display
                 = number_with_delimiter(Counts.organizations)
-

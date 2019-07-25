@@ -1,6 +1,5 @@
-class ScheduledWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "low_priority", backtrace: true, retry: false
+class ScheduledWorker < ApplicationWorker
+  sidekiq_options retry: false
 
   def self.frequency
     30.seconds

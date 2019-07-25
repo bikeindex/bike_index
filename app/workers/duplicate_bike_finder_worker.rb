@@ -1,6 +1,5 @@
-class DuplicateBikeFinderWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "low_priority", backtrace: true, :retry => false
+class DuplicateBikeFinderWorker < ApplicationWorker
+  sidekiq_options retry: false
 
   def perform(bike_id)
     serial_segments = Bike.find(bike_id).normalized_serial_segments

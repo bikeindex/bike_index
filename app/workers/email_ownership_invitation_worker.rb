@@ -1,7 +1,6 @@
-class EmailOwnershipInvitationWorker
-  include Sidekiq::Worker
+class EmailOwnershipInvitationWorker < ApplicationWorker
+
   sidekiq_options queue: "notify"
-  sidekiq_options backtrace: true
 
   def perform(ownership_id)
     ownership = Ownership.where(id: ownership_id).first

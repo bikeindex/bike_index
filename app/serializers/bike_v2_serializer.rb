@@ -11,9 +11,11 @@ class BikeV2Serializer < ActiveModel::Serializer
     :is_stock_img,
     :stolen,
     :stolen_location,
-    :date_stolen,
-    :frame_material,
-    :handlebar_type
+    :date_stolen
+
+  def serial
+    object.serial_display
+  end
 
   def manufacturer_name
     object.mnfg_name
@@ -51,13 +53,5 @@ class BikeV2Serializer < ActiveModel::Serializer
 
   def stolen_location
     object.current_stolen_record && object.current_stolen_record.address_short
-  end
-
-  def frame_material
-    object.frame_material_name
-  end
-
-  def handlebar_type
-    object.handlebar_type_name
   end
 end

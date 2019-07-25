@@ -1,14 +1,23 @@
 class SerialNormalizer
   def self.unknown_and_absent_corrected(str = nil)
     str = str.to_s.strip
-    return "absent" if str.blank? || str.downcase == "absent"
-    return "unknown" if str.gsub(/\s|\?/, "").blank? # Only ?
-    if str[/(no)|(remember)/i].present?
-      return "unknown" if str[/unkno/i].present?
-      return "unknown" if str[/(do.?n.?t)|(not?).?k?no/i].present? # Don't know
-      return "unknown" if str[/(do.?n.?t)|(not?).?remember/i].present? # Don't remember
-    end
+    # Return unknown if blank, '?' or 'absent' (legacy concern - 'unknown' used to be stored as 'absent')
+    return "unknown" if str.blank? || str.gsub(/\s|\?/, "").blank? || str.downcase == "absent"
+    return "made_without_serial" if str == "made_without_serial"
+    return "unknown" if looks_like_unknown?(str.downcase)
     str
+  end
+
+  def self.looks_like_unknown?(str_downcase)
+    return true if ["na", "idk", "no", "unkown", "no serial", "none"].include?(str_downcase) # specific things
+    if str_downcase[/(no)|(remember)/].present?
+      return true if str_downcase[/unkno/].present?
+      return true if str_downcase[/(do.?n.?t)|(not?).?k?no/].present? # Don't know
+      return true if str_downcase[/(do.?n.?t)|(not?).?remember/].present? # Don't remember
+    end
+    return true if str_downcase[/n\/a/].present?
+    return true if str_downcase[/missing/].present? # Don't remember
+    false
   end
 
   def initialize(serial: nil, bike_id: nil)
@@ -17,7 +26,7 @@ class SerialNormalizer
   end
 
   def normalized
-    return "absent" if @serial.blank? || @serial == "ABSENT"
+    return nil if @serial.blank? || %w[UNKNOWN MADE_WITHOUT_SERIAL].include?(@serial)
     normed = @serial.dup
     serial_substitutions.each do |key, value|
       normed.gsub!(/[#{key}]/, value)
@@ -27,7 +36,7 @@ class SerialNormalizer
   end
 
   def normalized_segments
-    return [] if normalized == "absent"
+    return [] if normalized.blank?
     normalized.split(" ").reject(&:empty?).uniq
   end
 

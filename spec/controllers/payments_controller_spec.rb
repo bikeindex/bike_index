@@ -26,24 +26,13 @@ RSpec.describe PaymentsController, type: :controller do
   end
 
   describe "create" do
-    let(:token) do
-      Stripe::Token.create(
-        card: {
-          number: "4242424242424242",
-          exp_month: 12,
-          exp_year: 2025,
-          cvc: "314",
-        },
-      )
-    end
-
     context "with user" do
       before do
         set_current_user(user)
       end
       it "makes a onetime payment with current user (and renders with revised_layout if suppose to)" do
         expect do
-          post :create, stripe_token: token.id,
+          post :create, stripe_token: stripe_token.id,
                         stripe_email: user.email,
                         stripe_amount: 4000
         end.to change(Payment, :count).by(1)
@@ -58,7 +47,7 @@ RSpec.describe PaymentsController, type: :controller do
 
       it "signs up for a plan" do
         expect do
-          post :create, stripe_token: token.id,
+          post :create, stripe_token: stripe_token.id,
                         stripe_email: user.email,
                         stripe_amount: 4000,
                         stripe_subscription: 1,
@@ -78,7 +67,7 @@ RSpec.describe PaymentsController, type: :controller do
     context "email of signed up user" do
       it "makes a onetime payment with email for signed up user" do
         expect do
-          post :create, stripe_token: token.id,
+          post :create, stripe_token: stripe_token.id,
                         stripe_amount: 4000,
                         stripe_email: user.email,
                         stripe_plan: "",
@@ -97,7 +86,7 @@ RSpec.describe PaymentsController, type: :controller do
     context "no user email on file" do
       it "makes a onetime payment with no user, but associate with stripe" do
         expect do
-          post :create, stripe_token: token.id,
+          post :create, stripe_token: stripe_token.id,
                         stripe_amount: 4000,
                         stripe_email: "test_user@test.com",
                         is_payment: 1

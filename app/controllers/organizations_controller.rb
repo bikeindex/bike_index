@@ -9,12 +9,12 @@ class OrganizationsController < ApplicationController
     @active_section = "contact"
   end
 
-  def connect_lightspeed
+  def lightspeed_interface
     if current_user && current_user.organizations.any?
       redirect_to "https://posintegration.bikeindex.org" and return
     end
 
-    session[:return_to] = connect_lightspeed_path
+    session[:return_to] = lightspeed_interface_path
     if current_user.present?
       flash[:info] = "You have to create an organization on Bike Index before you can connect with Lightspeed"
       redirect_to new_organization_path
@@ -102,7 +102,7 @@ class OrganizationsController < ApplicationController
 
   def permitted_create_params
     approved_kind = params.dig(:organization, :kind)
-    approved_kind = "other" unless Organization.creatable_kinds.include?(approved_kind)
+    approved_kind = "other" unless Organization.user_creatable_kinds.include?(approved_kind)
     params.require(:organization)
           .permit(:name, :website)
           .merge(auto_user_id: current_user.id, kind: approved_kind)

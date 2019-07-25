@@ -1,0 +1,69 @@
+- memberships ||= @memberships
+- skip_organization ||= false
+- render_sortable ||= false
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th
+        - if render_sortable
+          = sortable "created_at"
+        - else
+          Created&nbsp;<small class="convertTimezone"></small>
+      %th
+        - if render_sortable
+          = sortable "invited_email", "recipient"
+        - else
+          recipient
+      - unless skip_organization
+        %th
+          - if render_sortable
+            = sortable "organization_id"
+          - else
+            Organization
+      %th
+        - if render_sortable
+          = sortable "claimed_at"
+        - else
+          Claimed
+      %th
+        %small
+          - if render_sortable
+            = sortable "sender_id", "Sender"
+          - else
+            Sender
+      %th
+        %small
+          - if render_sortable
+            = sortable "membership_role", "Admin?"
+          - else
+            Admin?
+
+    %tbody
+      - memberships.each do |membership|
+        %tr
+          %td
+            .less-strong-hold
+              %a.convertTime{ href: admin_membership_url(membership) }
+                = l membership.created_at, format: :convert_time
+              %span.less-strong-right.d-none.d-md-block
+                = membership.id
+          %td
+            - if membership.user.present?
+              = link_to membership.invited_email, admin_user_path(membership.user.to_param)
+            - else
+              = membership.invited_email
+          - unless skip_organization
+            %td
+              = link_to membership.organization.name, admin_organization_path(membership.organization)
+          %td
+            - if membership.claimed_at.present?
+              %span.convertTime
+                = l membership.claimed_at, format: :convert_time
+          %td
+            - if membership.sender.present?
+              = link_to membership.sender.display_name, admin_user_path(membership.sender_id)
+            - else
+              = membership.sender_id
+          %td
+            = "&#x2713;".html_safe if membership.admin?

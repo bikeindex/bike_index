@@ -1,0 +1,7 @@
+.admin-subnav
+  .col-md-12
+    %h1 Theft Alerts
+
+= render partial: "/admin/theft_alerts/table", locals: { render_sortable: true, theft_alerts: @theft_alerts }
+
+= paginate @theft_alerts, views_prefix: "admin"

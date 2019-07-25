@@ -1,0 +1,7 @@
+= t(".text.message_about_stolen_bike", sender_email: @stolen_notification.sender.email, bike_type: @stolen_notification.bike.type)
+
+= @stolen_notification.message
+
+= t(".text.view_your_notification", bike_type: @stolen_notification.bike.type)
+
+= bike_url(@stolen_notification.bike)

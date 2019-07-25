@@ -1,4 +1,4 @@
-# <p align="center">![BIKE INDEX][bike-index-logo]</p> [Bike Index][bike-index] 🚲 ![Cloud66 Deployment Status][cloud66-badge] [![CircleCI][circleci-badge]][circleci] [![Test Coverage][codeclimate-badge]][codeclimate] [![View performance data on Skylight][skylight-badge]][skylight]
+# [![BIKE INDEX][bike-index-logo]][bike-index] ![Cloud66 Deployment Status][cloud66-badge] [![CircleCI][circleci-badge]][circleci] [![Test Coverage][codeclimate-badge]][codeclimate] [![View performance data on Skylight][skylight-badge]][skylight]
 
 [bike-index-logo]: https://github.com/bikeindex/bike_index/blob/master/bike_index.png?raw=true
 [circleci]: https://circleci.com/gh/bikeindex/bike_index/tree/master
@@ -12,7 +12,7 @@
 
 Bike registration that works: online, powerful, free.
 
-Registering a bike only takes a few minutes and gives cyclists a permanent record linked to their identity that proves ownership in the case of a theft.
+Registering a 🚲 only takes a few minutes and gives 🚴‍♀️ a permanent record linked to their identity that proves ownership in the case of a theft.
 
 We're an open source project. Take a gander through our code, report bugs, or download it and run it locally.
 
@@ -48,12 +48,32 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
 - Go to [localhost:3001](http://localhost:3001)
 
-**Additional options:**
+| Toggle in development | command | default |
+| --------- | ------- | ------- |
+| Spring    | `bin/rake dev:spring` | disabled |
+| Caching   | `bin/rake dev:cache` | disabled |
+| [letter_opener](https://github.com/ryanb/letter_opener) | `bin/rake dev:letter_opener` | enabled |
 
-Toggle Spring with `rake dev:spring` (defaults to disabled)
+## Translation
 
-Toggle Caching in development with `rake dev:cache` (defaults to disabled)
+We're using [translation.io](https://translation.io) to manage internationalization:
 
+[translation.io/bikeindex/bike_index](https://translation.io/bikeindex/bike_index)
+
+To contribute, sign up for an account there and ask to be added to the project
+as a translator.
+
+**Non-English translation files should be treated as read-only.** We sync these
+with our translation.io project
+
+If you modify the English translation file [config/locales/en.yml], run:
+
+```
+bin/rake prepare_translations
+```
+
+before pushing to GitHub. This will normalize translation file formatting and check for missing or
+unused keys.
 
 ## Testing
 
@@ -147,7 +167,7 @@ If the initial provisioning fails for any reason, try running `vagrant provision
 
 ## Bug tracker
 
-Have a bug or a feature request? [Open a new issue](https://github.com/bikeindex/bike_index/issues/new).
+Have a bug or a feature request? [Open an issue](https://github.com/bikeindex/bike_index/issues/new).
 
 
 ## Community
@@ -165,7 +185,7 @@ Don't wait until you have a finished feature before before opening the PR, unfin
 
 Once the PR is ready for review, request review from the relevant person.
 
-If your pull request contains Ruby patches or features, you must include relevant rspec tests.
+If your pull request contains Ruby patches or features, you must include relevant Rspec tests.
 
 
 ... and go hard

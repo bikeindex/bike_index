@@ -1,44 +1,85 @@
-thead.sortable {
-  th {
-    font-weight: normal;
+.full-screen-table {
+  // Enable scrolling
+  overflow-x: scroll;
 
-    a.sortable-link {
-      display: block;
-      position: relative;
+  // Make it edge to edge on xs screens
+  @include media-breakpoint-down(sm) {
+    margin-left: -15px;
+    margin-right: -15px;
+  }
+  td ul {
+    padding: 0 0 0 1.5rem;
+    margin: 0.5rem 0 0.5rem;
+  }
+}
 
-      // To give a spot for the sortable direction
-      &.active {
-        padding-right: 1.5rem;
-      }
-
-      span.sortable-direction {
-        display: block;
-        position: absolute;
-        right: 0;
-        top: 0;
-      }
-
-      &.active {
-        font-weight: bold;
-        text-decoration: underline;
-      }
+.table-list {
+  @extend .table;
+  @extend .table-striped;
+  @extend .table-bordered;
+  @extend .table-sm;
+  tr td {
+    line-height: 1.5;
+    &:first-child {
+      font-size: 75%;
+      font-style: italic;
+      text-align: right;
+      padding: 9px 4px 4px;
+      line-height: 1.25;
+    }
+    &:first-child.full-width-data {
+      font-size: 100%;
+      font-style: normal;
+    }
+    // use last, rather than first, to enable full width single rows
+    &:last-child {
+      width: 85%; // This is effectively min-width for tables
     }
   }
 }
 
-table .table-cell-check {
-  font-family: Courier;
-  text-align: center;
-  font-weight: bold;
-}
+table {
+  .table-cell-check {
+    font-family: Courier;
+    text-align: center;
+    font-weight: bold;
+  }
 
-.fullscreen-table-wrapper {
-  // Enable scrolling
-  overflow-x: scroll;
+  .less-strong-hold {
+    position: relative;
+    display: block;
+  }
 
-  // Make it edge to edge on sm screens
-  @include media-breakpoint-down(sm) {
-    margin-left: -15px;
-    margin-right: -15px;
+  .less-strong-right {
+    position: absolute;
+    right: -0.3em;
+    line-height: 1;
+    bottom: -0.2em;
+    font-size: 0.8em;
+    @extend .less-strong;
+  }
+
+  thead.sortable {
+    th {
+      font-weight: normal;
+      a.sortable-link {
+        display: block;
+        position: relative;
+        // To give a spot for the sortable direction
+        &.active {
+          padding-right: 1.5rem;
+        }
+        span.sortable-direction {
+          display: block;
+          position: absolute;
+          right: 0;
+          top: 0;
+        }
+        &.active {
+          font-weight: strong;
+          text-decoration: underline;
+        }
+      }
+    }
   }
 }

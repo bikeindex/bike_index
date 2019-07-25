@@ -15,7 +15,8 @@ class BikesController < ApplicationController
 
   def index
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
-    if params[:stolenness] == "proximity" && @interpreted_params[:stolenness] != "proximity"
+    @stolenness = @interpreted_params[:stolenness]
+    if params[:stolenness] == "proximity" && @stolenness != "proximity"
       flash[:info] = "Sorry, we don't know the location \"#{params[:location]}\". Please try a different location to search nearby stolen bikes"
     end
     @bikes = Bike.search(@interpreted_params).page(params[:page] || 1).per(params[:per_page] || 10).decorate
@@ -62,7 +63,8 @@ class BikesController < ApplicationController
   def scanned
     @bike_code = BikeCode.lookup_with_fallback(scanned_id, organization_id: params[:organization_id], user: current_user)
     if @bike_code.blank?
-      raise ActiveRecord::RecordNotFound
+      flash[:error] = "Unable to find sticker: '#{params[:scanned_id]}'"
+      redirect_to user_root_url
     elsif @bike_code.bike.present?
       redirect_to bike_url(@bike_code.bike_id) and return
     elsif current_user.present?
@@ -129,7 +131,7 @@ class BikesController < ApplicationController
       else
         if params[:bike][:embeded_extended]
           flash[:success] = "Success! #{@bike.type} was sent to #{@bike.owner_email}."
-          @persist_email = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:persist_email])
+          @persist_email = ParamsNormalizer.boolean(params[:persist_email])
           redirect_to embed_extended_organization_url(@bike.creation_organization, email: @persist_email ? @bike.owner_email : nil) and return
         else
           redirect_to controller: :organizations, action: :embed_create_success, id: @bike.creation_organization.slug, bike_id: @bike.id and return
@@ -155,20 +157,33 @@ class BikesController < ApplicationController
     @page_errors = @bike.errors
     @edit_templates = edit_templates
 
-    result = target_edit_template(requested_page: params[:page])
-    @edit_template = result[:template]
-
-    if !result[:is_valid]
+    requested_page = target_edit_template(requested_page: params[:page])
+    @edit_template = requested_page[:template]
+    if !requested_page[:is_valid]
       redirect_to edit_bike_url(@bike, page: @edit_template) and return
     end
 
-    if @edit_template == "photos"
+    case @edit_template
+    when "photos"
       @private_images =
         PublicImage
           .unscoped
           .where(imageable_type: "Bike")
           .where(imageable_id: @bike.id)
           .where(is_private: true)
+    when /alert/
+      @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc
+      @selected_theft_alert_plan =
+        @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
+        @theft_alert_plans.min_by(&:amount_cents)
+      @theft_alerts =
+        @bike
+          .current_stolen_record
+          .theft_alerts
+          .includes(:theft_alert_plan)
+          .creation_ordered_desc
+          .where(creator: current_user)
+          .references(:theft_alert_plan)
     end
 
     render "edit_#{@edit_template}".to_sym
@@ -180,11 +195,14 @@ class BikesController < ApplicationController
     rescue => e
       flash[:error] = e.message
     end
+    update_organizations_can_edit_claimed(@bike, params[:organization_ids_can_edit_claimed]) if params.key?(:organization_ids_can_edit_claimed)
+    assign_bike_codes(params[:bike_code]) if params[:bike_code].present?
     @bike = @bike.decorate
+
     if @bike.errors.any? || flash[:error].present?
       edit and return
     else
-      flash[:success] = "Bike successfully updated!"
+      flash[:success] ||= "Bike successfully updated!"
       return if return_to_if_present
       redirect_to edit_bike_url(@bike, page: params[:edit_template]) and return
     end
@@ -207,13 +225,14 @@ class BikesController < ApplicationController
   # Return a Hash with keys :is_valid (boolean), :template (string)
   def target_edit_template(requested_page:)
     result = {}
+    valid_pages = [*edit_templates.keys, "alert_purchase"]
     default_page = @bike.stolen? ? :theft_details : :bike_details
 
     case
     when requested_page.blank?
       result[:is_valid] = true
       result[:template] = default_page.to_s
-    when edit_templates.has_key?(requested_page)
+    when requested_page.in?(valid_pages)
       result[:is_valid] = true
       result[:template] = requested_page.to_s
     else
@@ -229,11 +248,11 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = "Recovery details" if @bike.recovered?
-      h[:theft_details] = "Theft details" unless @bike.recovered?
-      h[:publicize] = "Publicize Theft" if Flipper.enabled?(:publicize_theft, current_user)
-      h[:alert] = "Activate Bike Index Alert" if Flipper.enabled?(:premium_listings, current_user)
-      h[:report_recovered] = "Mark this Bike Recovered" unless @bike.recovered?
+      h[:theft_details] = translation(:recovery_details, scope: %i[controllers bikes edit]) if @bike.recovered?
+      h[:theft_details] = translation(:theft_details, scope: %i[controllers bikes edit]) unless @bike.recovered?
+      h[:publicize] = translation(:publicize, scope: %i[controllers bikes edit])
+      h[:alert] = translation(:alert, scope: %i[controllers bikes edit])
+      h[:report_recovered] = translation(:report_recovered, scope: %i[controllers bikes edit]) unless @bike.recovered?
     end
   end
 
@@ -242,14 +261,14 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def bike_templates
     {}.with_indifferent_access.tap do |h|
-      h[:bike_details] = "Bike Details"
-      h[:photos] = "Photos"
-      h[:drivetrain] = "Wheels and Drivetrain"
-      h[:accessories] = "Accessories and Components"
-      h[:ownership] = "Transfer Ownership"
-      h[:groups] = "Groups and Organizations"
-      h[:remove] = "Hide or Delete"
-      h[:report_stolen] = "Report Stolen or Missing" unless @bike.stolen?
+      h[:bike_details] = translation(:bike_details, scope: %i[controllers bikes edit])
+      h[:photos] = translation(:photos, scope: %i[controllers bikes edit])
+      h[:drivetrain] = translation(:drivetrain, scope: %i[controllers bikes edit])
+      h[:accessories] = translation(:accessories, scope: %i[controllers bikes edit])
+      h[:ownership] = translation(:ownership, scope: %i[controllers bikes edit])
+      h[:groups] = translation(:groups, scope: %i[controllers bikes edit])
+      h[:remove] = translation(:remove, scope: %i[controllers bikes edit])
+      h[:report_stolen] = translation(:report_stolen, scope: %i[controllers bikes edit]) unless @bike.stolen?
     end
   end
 
@@ -289,7 +308,7 @@ class BikesController < ApplicationController
   def ensure_user_allowed_to_edit
     @current_ownership = @bike.current_ownership
     type = @bike && @bike.type || "bike"
-    return true if @bike.authorize_for_user!(current_user)
+    return true if @bike.authorize_and_claim_for_user(current_user)
     if current_user.present?
       error = "Oh no! It looks like you don't own that #{type}."
     else
@@ -304,6 +323,23 @@ class BikesController < ApplicationController
       redirect_to bike_path(@bike) and return
     end
     authenticate_user("Please create an account", flash_type: :info)
+  end
+
+  def update_organizations_can_edit_claimed(bike, organization_ids)
+    organization_ids = organization_ids.map(&:to_i)
+    bike.bike_organizations.each do |bike_organization|
+      bike_organization.update_attribute :can_not_edit_claimed, !organization_ids.include?(bike_organization.organization_id)
+    end
+  end
+
+  def assign_bike_codes(bike_code)
+    bike_code = BikeCode.lookup_with_fallback(bike_code)
+    return flash[:error] = "Unable to find a sticker matching #{bike_code}" unless bike_code.present?
+    if bike_code.claim_if_permitted(current_user, @bike)
+      flash[:success] = "Success! Sticker '#{bike_code.pretty_code}' has been assigned to your #{@bike.type}"
+    else
+      flash[:error] = bike_code.errors.full_messages
+    end
   end
 
   def render_ad

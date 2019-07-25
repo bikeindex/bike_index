@@ -1,15 +1,13 @@
-* Welcome to Bike Index! *
+= t(".text.welcome_to_bike_index")
 
-Good thinking! We’re glad you’ve joined, you smarty pants.
+= t(".text.good_thinking")
 
-To finish signing up you have to confirm your email address. 
+= t(".text.to_finish_signing_up")
 
-Normally, we'd tell you to click a link, but, for some reason you are only receiving text email. 
+= t(".text.paste_url")
 
-So you have to actually paste the confirmation url into your internet thingy.
+= confirm_users_url(id: @user.id, code: @user.confirmation_token, partner: @partner)
 
-= link_to "Verify email", confirm_users_url(id: @user.id, code: @user.confirmation_token, partner: @partner), class: "binx-button"
+= t(".text.thanks")
 
-
-Thanks,
-Bike Index Team
+= t(".text.bike_index_team")

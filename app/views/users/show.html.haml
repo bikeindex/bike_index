@@ -13,7 +13,7 @@
               - if @user.title.present?
                 = @user.title
               - else
-                This user's bikes
+                = t(".this_users_bikes")
             %p.sharing-links
               = show_twitter_and_website(@user)
       .col-md-6.ad-col
@@ -25,7 +25,7 @@
             = @user.description
     .row
       .col-md-8
-        %h3 Bikes
+        %h3= t(".bikes")
       .sharing-section.col-md-4
         = render '/shared/share_this'
     .row.shared-bikes-row
@@ -39,10 +39,10 @@
                     = bike.thumb_image
                     - if bike.stolen
                       %span.personal-page-stolen-tag
-                        - if bike.recovered
-                          Recovered
+                        - if bike.recovered?
+                          = t(".recovered")
                         - else
-                          Stolen!
+                          = t(".stolen")
                   .card-title
                     %h4
                       = link_to bike.title_string, bike.list_link_url(bike)
@@ -52,4 +52,4 @@
                 = paginate @bikes
         - else
           %h2
-            This user has no bikes yet!
+            = t(".this_user_has_no_bikes_yet")

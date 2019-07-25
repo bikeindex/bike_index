@@ -1,11 +1,9 @@
 .form-wrap
-  .form-well-form-header
+  .form-well-form-header-always-visible
     %h3
-      Personal Information for 
-      = @user.display_name
+      = t(".personal_information_for_user", user_name: @user.display_name)
   .col-xs-12
-    %p
-      Any use of your personal information is governed by the terms of our #{link_to "Privacy policy", privacy_url}. We do not sell, trade, or rent your personal information to third parties.
+    %p= t(".any_use_of_your_personal_information_html", privacy_policy: link_to("Privacy policy", privacy_url))
   .form-group.row
     = f.label :name, class: "form-well-label"
     .form-well-input
@@ -14,51 +12,61 @@
     %label.form-well-label
     %label.form-well-input
       = f.check_box :notification_newsletters
-      Receive Bike Index newsletter
+      = t(".receive_the_bike_index_newsletter")
   .form-group.row.unnested-field
     %label.form-well-label
     %label.form-well-input{ style: "line-height: 1.5em;" }
       = f.check_box :notification_unstolen
-      Bike Index has permission to contact you if we believe your bike has been stolen,
-      %em
-        even if it hasn't been marked stolen yet -
-      %strong
-        #{link_to "Read why", "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen"}
+      - why_you_should_link = link_to("Read why you should", "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen")
+      = t(".give_us_permission_html", why_you_should_link: why_you_should_link)
   .form-group.row
     = f.label :phone, class: "form-well-label"
     .form-well-input
       = f.text_field :phone, value: Phonifyer.display(@user.phone), class: "form-control"
-  .form-group.row.fancy-select.unfancy
-    = f.label :country_id, class: "form-well-label" do
-      Address
-    .form-well-input#stolen_record_us_id{ data: { usid: Country.united_states.id } }
-      = f.collection_select(:country_id, Country.all, :id, :name, { prompt: "Choose country" }, { class: "country-select-input form-control" } )
-  .form-group.row
-    %label.form-well-label
-    .form-well-input
-      = f.text_field :street, placeholder: "Address", class: "form-control"
-  .form-group.row
-    %label.form-well-label
-    .form-well-input
-      = f.text_field :city, placeholder: "City", class: "form-control"
-  - state_class = (@user.country_id == Country.united_states.id) ? "unhidden" : ""
-  .form-group.row.fancy-select-placeholder.unfancy.hidden-other{ class: state_class }
-    %label.form-well-label
-    .form-well-input
-      = f.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: "State" }, { class: "form-control" })
-  .form-group.row.mb-4
-    %label.form-well-label
-    .form-well-input
-      = f.text_field :zipcode, placeholder: "zipcode", class: "form-control"
+
+  .related-fields
+    .form-group.row.fancy-select.unfancy
+      = f.label :country_id, class: "form-well-label" do
+        = t(".address")
+      .form-well-input#stolen_record_us_id{ data: { usid: Country.united_states.id } }
+        = f.select(:country_id, Country.select_options, { prompt: t(".choose_country") }, { class: "country-select-input form-control" } )
+    .form-group.row
+      %label.form-well-label
+      .form-well-input
+        = f.text_field :street, placeholder: t(".address"), class: "form-control"
+    .form-group.row
+      %label.form-well-label
+      .form-well-input
+        = f.text_field :city, placeholder: t(".city"), class: "form-control"
+    - state_class = (@user.country_id == Country.united_states.id) ? "unhidden" : ""
+    .form-group.row.fancy-select-placeholder.unfancy.hidden-other{ class: state_class }
+      %label.form-well-label
+      .form-well-input
+        = f.collection_select(:state_id, State.all, :id, :name, { include_blank: true, prompt: t(".state") }, { class: "form-control" })
+    .form-group.row.mb-4
+      %label.form-well-label
+      .form-well-input
+        = f.text_field :zipcode, placeholder: t(".zipcode"), class: "form-control"
+
+  - if Flipper.enabled?(:localization, current_user)
+    .form-group.row.fancy-select.unfancy
+      = f.label :country_id, class: "form-well-label" do
+        = t(".preferred_language")
+      .form-well-input
+        = f.select(:preferred_language,
+        options_for_select(language_choices, selected: current_user.preferred_language),
+        { prompt: t(".choose_language"), include_blank: true },
+        { class: "language-select-input form-control" } )
+
   .col-xs-12
     %p
-      Have multiple emails? Consolidate them into one account here
+      = t(".have_multiple_emails")
   .form-group.row.unnested-field.no-divider-row
-    = f.label :email, 'Primary email', class: 'form-well-label'
+    = f.label :email, t(".primary_email"), class: 'form-well-label'
     %p.form-well-input-static-full-width
       = @user.email
       %span.below-input-help
-        This is the email we send notifications to
+        = t(".notifications_email")
 
   - if @user.user_emails.count > 1
     - if @user.user_emails.confirmed.count > 1
@@ -69,12 +77,12 @@
           .form-group.row
             %label.form-well-label
               - unless labeled
-                Confirmed emails
+                = t(".confirmed_emails")
                 - labeled = true
             %p.form-well-input-static
               = user_email.email
             .right-input-help.right-text-help.full-width
-              = link_to 'Make primary email', make_primary_user_email_path(user_email.id), method: :post
+              = link_to t(".make_primary_email"), make_primary_user_email_path(user_email.id), method: :post
     - if @user.user_emails.unconfirmed.count > 0
       .related-fields.no-divider-row
         - labeled = false
@@ -82,27 +90,29 @@
           .form-group.row
             %label.form-well-label
               - unless labeled
-                Unconfirmed emails
+                = t(".unconfirmed_emails")
                 - labeled = true
             %p.form-well-input-static
               = user_email.email
             .right-input-help.right-text-help.full-width
-              = link_to 'Resend confirmation', resend_confirmation_user_email_path(user_email.id), method: :post
-              = link_to 'Remove email', user_email_path(user_email.id), method: :delete, class: 'delete-email'
+              = link_to t(".resend_confirmation"), resend_confirmation_user_email_path(user_email.id), method: :post
+              = link_to t(".remove_email"), user_email_path(user_email.id), method: :delete, class: 'delete-email'
 
   .related-fields#additional_email_fields
     = f.hidden_field :additional_emails, value: nil
     :plain
       <script id="additional-email-template" type="x-tmpl-mustache">
         <div class='form-group row collapse'>
-          <label class='form-well-label'>Additional email</label>
+          <label class='form-well-label'>
+            #{t(".additional_email")}
+          </label>
           <div class='form-well-input'>
             <input class='form-control add-email-field' id='additional_email_field_{{num}}' type='email'>
           </div>
           <div class="right-input-help">
             <a class="optional-form-block remove-add-email">
               <span class="context-display-help">&ndash;</span>
-              Remove email
+              #{t(".remove_email")}
             </a>
           </div>
         </div>
@@ -112,4 +122,6 @@
     %a.add_fields#add_additional_email{ href: '#', role: 'button' }
       %span.context-display-help
         +
-      Add additional email
+      = t(".add_additional_email")
+
+  = render "/shared/form_well_footer_save"

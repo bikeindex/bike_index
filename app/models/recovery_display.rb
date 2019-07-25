@@ -9,6 +9,7 @@ class RecoveryDisplay < ActiveRecord::Base
   attr_accessor :date_input
 
   before_validation :set_time
+  after_commit :update_associations
 
   def set_time
     if date_input.present?
@@ -33,8 +34,25 @@ class RecoveryDisplay < ActiveRecord::Base
     self.quote_by = sr.bike.current_ownership && sr.bike.owner && sr.bike.owner.name
   end
 
+  def image_processing?
+    return false unless image.present? && updated_at > Time.current - 1.minute
+    !image_exists?
+  end
+
+  def image_exists?
+    image.present? && image.file.exists?
+  end
+
   def bike
     return nil unless stolen_record_id.present?
     StolenRecord.unscoped.find(stolen_record_id).bike
+  end
+
+  def stolen_record
+    stolen_record_id.present? ? StolenRecord.unscoped.find_by_id(stolen_record_id) : nil
+  end
+
+  def update_associations
+    stolen_record&.update_attributes(updated_at: Time.current)
   end
 end

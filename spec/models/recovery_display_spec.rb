@@ -1,6 +1,33 @@
 require "rails_helper"
 
 RSpec.describe RecoveryDisplay, type: :model do
+  describe "stolen_record" do
+    let!(:recovery_display) { FactoryBot.create(:recovery_display_with_stolen_record) }
+    it "finds the stolen_record" do
+      recovery_display.reload
+      expect(recovery_display.stolen_record).to be_present
+    end
+  end
+
+  describe "image_exists? and image_processing" do
+    let(:recovery_display) { RecoveryDisplay.new }
+    it "is false by default" do
+      expect(recovery_display.image_exists?).to be_falsey
+      expect(recovery_display.image_processing?).to be_falsey
+    end
+    context "with image present" do
+      let(:recovery_display) { RecoveryDisplay.new(updated_at: Time.current) }
+      it "processing is true if recently updated" do
+        # Sort of hacky, but gets us something
+        allow(recovery_display).to receive(:image) { OpenStruct.new(file: OpenStruct.new("exists?" => false)) }
+        expect(recovery_display.image_exists?).to be_falsey
+        expect(recovery_display.image_processing?).to be_truthy
+        recovery_display.updated_at = Time.now - 2.minutes
+        expect(recovery_display.image_processing?).to be_falsey
+      end
+    end
+  end
+
   describe "set_time" do
     it "sets time from input" do
       recovery_display = RecoveryDisplay.new(date_input: "04-27-1999")

@@ -1,28 +1,39 @@
-%h5
-  Bike Index is meant to be usable and expandable by everyone. We're way into the open source.
+- bikeindex_github_root_url = "https://github.com/bikeindex"
+- bikeindex_github_url = "#{bikeindex_github_root_url}/bike_index"
+- stolen_bikes_widget_url = "#{bikeindex_github_root_url}/stolen_bikes_widget_html"
 
-%h3.mt-4
-  Design resources
+%h5= t(".meant_to_be_usable")
+
+%h3.mt-4= t(".design_resources")
+
 %ul
   %li
-    #{link_to "Image assets", image_resources_path} - vector and png Bike Index logos
+    - image_assets_link = link_to t(".image_assets"), image_resources_path
+    = t(".bike_index_logos_html", link: image_assets_link)
   %li
-    #{link_to "Trifold Flyer", "https://files.bikeindex.org/stored/Bike-Index-TriFold.pdf"} - Print color & double-sided (<em>do not</em> rescale, have printer print as close to the edges as it can)
+    - trifold_flyer_link = link_to t(".trifold_flyer"), t(".trifold_flyer_pdf_url")
+    = t(".flyers_html", link: trifold_flyer_link)
   %li
-    #{link_to "Bike shop card", "https://files.bikeindex.org/stored/Bike-Index-Shop-Card.pdf"} - design is for notecard size (5.5" x 4.25")
+    - bike_shop_card_link = link_to(t(".bike_shop_card"), t(".bike_shop_card_pdf_url"))
+    = t(".bike_shop_cards_html", link: bike_shop_card_link)
 
-%h3.mt-4 Development resources
+%h3.mt-4= t(".development_resources")
 %ul
   %li
-    Bike Index itself is open source - check it out #{ link_to "on GitHub", "https://github.com/bikeindex/bike_index" }.
+    - github_link = link_to t(".on_github"), bikeindex_github_url
+    = t(".open_source_html", link: github_link)
   %li
-    = link_to "Our API documentation", documentation_index_path
+    = link_to t(".our_api_documentation"), documentation_index_path
   %li
-    #{ link_to "Nearby stolen widget", "https://github.com/bikeindex/stolen_bikes_widget_html" } (on GitHub)
+    - nearby_stolen_widget_link = link_to t(".nearby_stolen_widget"), stolen_bikes_widget_url
+    = t(".nearby_stolen_widget_html", link: nearby_stolen_widget_link)
   %li
     - url_for_embed = current_user ? user_embed_path(current_user) : new_user_url(return_to: dev_and_design_path)
-    #{link_to "Personal bike display widget", url_for_embed} (must be logged in - also, has no usage instructions...)
+    - display_widget_link = link_to "Personal bike display widget", url_for_embed
+    = t(".display_widget_html", link: display_widget_link)
   %li
-    #{link_to "OAuth Applications you've made", oauth_applications_path} (must be logged in)
+    - oauth_apps_link = link_to "OAuth Applications you've made", oauth_applications_path
+    = t(".oauth_apps_html", link: oauth_apps_link).html_safe
   %li
-    #{link_to "OAuth Applications you've authorized", oauth_authorized_applications_path} (must be logged in)
+    - oauth_authorized_apps_link = link_to "OAuth Applications you've authorized", oauth_authorized_applications_path
+    = t(".oauth_authorized_apps_html", link: oauth_authorized_apps_link).html_safe

@@ -2,13 +2,15 @@ class UsersController < ApplicationController
   layout "application_revised"
   include Sessionable
   before_action :authenticate_user, only: [:edit]
-  before_action :skip_if_signed_in, only: [:new]
+  before_action :skip_if_signed_in, only: [:new, :globalid]
   before_action :assign_edit_template, only: [:edit, :update]
 
   def new
     @user ||= User.new(email: params[:email])
     render_partner_or_default_signin_layout
   end
+
+  def globalid; end
 
   def create
     @user = User.new(permitted_parameters)
@@ -54,7 +56,7 @@ class UsersController < ApplicationController
   def password_reset
     if params[:token].present?
       @user = User.find_by_password_reset_token(params[:token])
-      if @user.present? && !@user.reset_token_expired?
+      if @user.present? && !@user.auth_token_expired?("password_reset_token")
         session[:return_to] = "password_reset"
         # They got the password reset email, which counts as confirming their email
         @user.confirm(@user.confirmation_token) if @user.unconfirmed?
@@ -104,7 +106,7 @@ class UsersController < ApplicationController
         remove_session
         flash[:error] = "Doesn't match user's password reset token"
         redirect_to user_home_url and return
-      elsif @user.reset_token_expired?
+      elsif @user.auth_token_expired?("password_reset_token")
         remove_session
         flash[:error] = "Password reset token expired, try resetting password again"
         redirect_to user_home_url and return
@@ -117,33 +119,31 @@ class UsersController < ApplicationController
     if !@user.errors.any? && @user.update_attributes(permitted_update_parameters)
       AfterUserChangeWorker.perform_async(@user.id)
       if params[:user][:terms_of_service].present?
-        if params[:user][:terms_of_service] == "1"
+        if ParamsNormalizer.boolean(params[:user][:terms_of_service])
           @user.terms_of_service = true
           @user.save
           flash[:success] = "Thanks! Now you can use Bike Index"
           redirect_to user_home_url and return
         else
           flash[:notice] = "You have to accept the Terms of Service if you would like to use Bike Index"
-          redirect_to accept_vendor_terms_url and return
+          redirect_to accept_terms_url and return
         end
       elsif params[:user][:vendor_terms_of_service].present?
-        if params[:user][:vendor_terms_of_service] == "1"
-          @user.accept_vendor_terms_of_service
+        if ParamsNormalizer.boolean(params[:user][:vendor_terms_of_service])
+          @user.update_attributes(accepted_vendor_terms_of_service: true)
           if @user.memberships.any?
             flash[:success] = "Thanks! Now you can use Bike Index as #{@user.memberships.first.organization.name}"
           else
             flash[:success] = "Thanks for accepting the terms of service!"
           end
-          redirect_to user_home_url and return
-          # TODO: Redirect to the correct page, somehow this breaks things right now though.
-          # redirect_to organization_home and return
+          redirect_to user_root_url and return
         else
-          redirect_to accept_vendor_terms_url, notice: "You have to accept the Terms of Service if you would like to use Bike Index as through the organization" and return
+          redirect_to accept_vendor_terms_path, notice: "You have to accept the Terms of Service if you would like to use Bike Index through an organization" and return
         end
       end
       if params[:user][:password].present?
-        @user.generate_auth_token
-        @user.set_password_reset_token
+        @user.generate_auth_token("auth_token")
+        @user.update_auth_token("password_reset_token")
         @user.reload
         default_session_set(@user)
       end
@@ -181,11 +181,13 @@ class UsersController < ApplicationController
 
   def permitted_parameters
     params.require(:user)
-          .permit(:name, :username, :email, :notification_newsletters, :notification_unstolen,
+          .permit(:name, :username, :email, :notification_newsletters, :notification_unstolen, :terms_of_service,
                   :additional_emails, :title, :description, :phone, :street, :city, :zipcode, :country_id,
                   :state_id, :avatar, :avatar_cache, :twitter, :show_twitter, :website, :show_website,
-                  :show_bikes, :show_phone, :my_bikes_link_target, :my_bikes_link_title, :password, :password_confirmation)
+                  :show_bikes, :show_phone, :my_bikes_link_target, :my_bikes_link_title, :password,
+                  :password_confirmation, :preferred_language)
           .merge(sign_in_partner.present? ? { partner_data: { sign_up: sign_in_partner } } : {})
+          .merge({ preferred_language: params.dig(:user, :preferred_language) || I18n.locale })
   end
 
   def permitted_update_parameters

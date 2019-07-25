@@ -86,12 +86,13 @@ RSpec.describe "Bikes API V2", type: :request do
           expect(response.code).to eq("201")
           result = json_result["bike"]
           expect(result["manufacturer_name"]).to eq bike_attrs[:manufacturer]
-          %i[serial year frame_material frame_model].each do |k|
+          %i[serial year frame_model].each do |k|
             pp k unless bike_attrs[k].downcase == result[k]&.to_s&.downcase
             expect(bike_attrs[k].downcase).to eq result[k].to_s.downcase
           end
           expect(result["description"]).to match bike_attrs[:description]
           expect(result["frame_colors"]).to eq(["White"])
+          expect(result["frame_material_slug"]).to eq("aluminum")
           expect(result["components"].count).to be > 10
         end
       end
@@ -179,7 +180,7 @@ RSpec.describe "Bikes API V2", type: :request do
     it "creates a stolen bike through an organization and uses the passed phone" do
       organization = FactoryBot.create(:organization)
       user.update_attribute :phone, "0987654321"
-      FactoryBot.create(:membership, user: user, organization: organization)
+      FactoryBot.create(:membership_claimed, user: user, organization: organization)
       FactoryBot.create(:country, iso: "US")
       FactoryBot.create(:state, abbreviation: "NY")
       organization.save
@@ -219,20 +220,6 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
       expect(bike.current_stolen_record.phone).to eq("1234567890")
     end
-
-    it "does not register a stolen bike unless attrs are present" do
-      bike_attrs[:stolen_record] = {
-        phone: "",
-        theft_description: "This bike was stolen and that's no fair.",
-        city: "Chicago",
-      }
-      expect do
-        post "/api/v2/bikes?access_token=#{token.token}",
-             bike_attrs.to_json,
-             json_headers
-      end.to change(Ownership, :count).by 0
-      expect(json_result["error"]).to be_present
-    end
   end
 
   describe "create v2_accessor" do
@@ -250,12 +237,10 @@ RSpec.describe "Bikes API V2", type: :request do
       }
     end
     let!(:tokenized_url) { "/api/v2/bikes?access_token=#{v2_access_token.token}" }
-    before :each do
-      FactoryBot.create(:wheel_size, iso_bsd: 559)
-    end
+    before { FactoryBot.create(:wheel_size, iso_bsd: 559) }
 
     it "also sets front wheel bsd" do
-      FactoryBot.create(:membership, user: user, organization: organization, role: "admin")
+      FactoryBot.create(:membership_claimed, user: user, organization: organization, role: "admin")
       organization.save
       wheel_size_2 = FactoryBot.create(:wheel_size, iso_bsd: 622)
       additional_attrs = {
@@ -275,7 +260,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "creates a bike for organization with v2_accessor" do
-      FactoryBot.create(:membership, user: user, organization: organization, role: "admin")
+      FactoryBot.create(:membership_claimed, user: user, organization: organization, role: "admin")
       organization.save
       post tokenized_url, bike_attrs.to_json, json_headers
       result = json_result["bike"]
@@ -294,7 +279,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "doesn't create a bike without an organization with v2_accessor" do
-      FactoryBot.create(:membership, user: user, organization: organization, role: "admin")
+      FactoryBot.create(:membership_claimed, user: user, organization: organization, role: "admin")
       organization.save
       bike_attrs.delete(:organization_slug)
       post tokenized_url, bike_attrs.to_json, json_headers
@@ -332,7 +317,7 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(response.body).to match(/permission/i)
     end
 
-    it "fails to update bike if required stolen attrs aren't present" do
+    it "updates bike even if stolen record doesn't have important things" do
       FactoryBot.create(:country, iso: "US")
       expect(bike.year).to be_nil
       params[:stolen_record] = {
@@ -340,8 +325,9 @@ RSpec.describe "Bikes API V2", type: :request do
         city: "Chicago",
       }
       put url, params.to_json, json_headers
-      expect(response.code).to eq("401")
-      expect(response.body.match("missing phone")).to be_present
+      expect(response.code).to eq("200")
+      bike.reload
+      expect(bike.current_stolen_record.city).to eq "Chicago"
     end
 
     it "updates a bike, adds a stolen record, doesn't update locked attrs" do

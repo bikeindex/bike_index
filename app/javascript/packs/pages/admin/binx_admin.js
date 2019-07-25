@@ -1,7 +1,9 @@
 import log from "../../utils/log";
 import moment from "moment-timezone";
-import LoadFancySelects from "../../utils/LoadFancySelects";
+import LoadFancySelects from "../../utils/load_fancy_selects.js";
 import BinxAdminGraphs from "./graphs.js";
+import BinxAdminBikesEdit from "./bikes_edit.js";
+import BinxAdminRecoveryDisplayForm from "./recovery_display_form.js";
 import BinxAdminInvoices from "./invoices.js";
 import BinxAdminOrganizationForm from "./organization_form.js";
 
@@ -9,35 +11,41 @@ function BinxAdmin() {
   return {
     init() {
       this.initAdminSearchSelect();
+      // Enable bootstrap custom file upload boxes
+      binxApp.enableFilenameForUploads();
+      LoadFancySelects();
+      this.enablePeriodSelection();
 
       if ($(".calendar-box")[0]) {
         const binxAdminGraphs = BinxAdminGraphs();
         binxAdminGraphs.init();
       }
-      if ($("#use_image_for_display").length > 0) {
-        this.useBikeImageForDisplay();
+
+      if ($("#recovery-display-form").length) {
+        const binxAdminRecoveryDisplayForm = BinxAdminRecoveryDisplayForm();
+        binxAdminRecoveryDisplayForm.init();
       }
-      if ($("#admin-locations-fields").length > 0) {
+
+      if ($("#admin-locations-fields").length) {
         this.adminLocations();
       }
-      if ($(".inputTriggerRecalculation")) {
+
+      if ($(".inputTriggerRecalculation").length) {
         const binxAdminInvoices = BinxAdminInvoices();
         binxAdminInvoices.init();
       }
-      if ($("#admin-recovery-fields")) {
-        this.bikesEditRecoverySlide();
+
+      if ($("#admin_bikes_edit").length) {
+        const binxAdminBikesEdit = BinxAdminBikesEdit();
+        binxAdminBikesEdit.init();
       }
-      // Enable bootstrap custom file upload boxes
-      binxApp.enableFilenameForUploads();
-      LoadFancySelects();
 
-      this.enablePeriodSelection();
-
-      if ($("#admin_organizations_new,#admin_organizations_edit").length > 0) {
+      if ($("#admin_organizations_new, #admin_organizations_edit").length) {
         const $organizationForm = $("form").first();
         new BinxAdminOrganizationForm($organizationForm);
       }
-      if ($("#multi-mnfg-selector").length > 0) {
+
+      if ($("#multi-mnfg-selector").length) {
         this.bikesMultiManufacturerUpdate();
       }
     },
@@ -50,39 +58,6 @@ function BinxAdmin() {
         if (newValue != window.initialValue && newValue.length > 0) {
           location.href = newValue;
         }
-      });
-    },
-
-    // Non Fast Attr bikes edit
-    bikesEditRecoverySlide() {
-      const $this = $("#bike_stolen");
-      $this.on("change", e => {
-        e.preventDefault();
-        if ($this.prop("checked")) {
-          $("#admin-recovery-fields").slideUp();
-        } else {
-          $("#admin-recovery-fields").slideDown();
-        }
-      });
-    },
-
-    // Bike Recoveries
-    useBikeImageForDisplay() {
-      $("#use_image_for_display").on("click", e => {
-        e.preventDefault();
-        const image_btn = $("#use_image_for_display");
-        if (image_btn.hasClass("using_bikes")) {
-          $("#recovery-photo-upload-input").slideDown();
-          $("#recovery_display_remote_image_url").val("");
-          image_btn.text("Use first image");
-        } else {
-          $("#recovery-photo-upload-input").slideUp();
-          $("#recovery_display_remote_image_url").val(
-            image_btn.attr("data-url")
-          );
-          image_btn.text("nvrmind");
-        }
-        return image_btn.toggleClass("using_bikes");
       });
     },
 

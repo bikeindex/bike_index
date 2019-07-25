@@ -1,15 +1,15 @@
-%h1
-  You’re Almost Done!
-%p
-  You’re just a few steps away from registering your
-  %strong
-    = Color.find(@b_param.primary_frame_color_id).name if @b_param.primary_frame_color_id.present?
-    = @b_param.mnfg_name
-  on the world’s most comprehensive bike registry!
-%p
-  Click below to complete your registration
+%h1= t(".html.youre_almost_done")
 
-= link_to "Finish it!", new_bike_url(b_param_token: @b_param.id_token), class: 'binx-button'
+- color_and_brand = []
+- color_and_brand << Color.find(@b_param.primary_frame_color_id).name if @b_param.primary_frame_color_id.present?
+- color_and_brand << @b_param.mnfg_name
+- color_and_brand = color_and_brand.compact.join(" ")
+
+%p= t(".html.just_a_few_steps_away_html", color_and_brand: color_and_brand)
+
+%p= t(".html.click_below_to_complete_your_registration")
+
+= link_to t(".html.finish_it"), new_bike_url(b_param_token: @b_param.id_token), class: 'binx-button'
 
 - if @organization && @organization.mail_snippet_body("partial").present?
   = @organization.mail_snippet_body("partial").html_safe

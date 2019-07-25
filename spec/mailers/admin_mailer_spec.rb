@@ -61,7 +61,7 @@ RSpec.describe AdminMailer, type: :mailer do
     context "org email" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:user) { FactoryBot.create(:user) }
-      let(:membership) { FactoryBot.create(:membership, user: user, organization: organization) }
+      let(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: organization) }
       let(:feedback) { FactoryBot.create(:feedback, feedback_type: "organization_created", feedback_hash: { organization_id: organization.id }) }
       it "sends a new org email" do
         mail = AdminMailer.feedback_notification_email(feedback)
@@ -117,6 +117,40 @@ RSpec.describe AdminMailer, type: :mailer do
     it "renders email" do
       expect(mail.to).to eq(["lily@bikeindex.org", "craig@bikeindex.org"])
       expect(mail.subject).to match("Unknown organization for ascend import")
+    end
+  end
+
+  describe "#theft_alert_purchased" do
+    it "renders email" do
+      theft_alert = FactoryBot.create(:theft_alert_paid)
+
+      mail = described_class.theft_alert_purchased(theft_alert)
+
+      expect(mail.to).to eq(["stolenbikealerts@bikeindex.org"])
+      expect(mail.subject).to match("Theft Alert purchased: #{theft_alert.id}")
+      body = mail.body.encoded
+      expect(body).to include(theft_alert.creator.name)
+      expect(body).to include(theft_alert.creator.email)
+      expect(body).to include(theft_alert.theft_alert_plan.name)
+      expect(body).to include(theft_alert.bike.title_string)
+      expect(body).to include("payments/#{theft_alert.payment.id}/edit")
+    end
+
+    context "given a purchase with a payment failure" do
+      it "notes the failure in the email" do
+        theft_alert = FactoryBot.create(:theft_alert_unpaid)
+
+        mail = described_class.theft_alert_purchased(theft_alert)
+
+        expect(mail.to).to eq(["stolenbikealerts@bikeindex.org"])
+        expect(mail.subject).to match("Theft Alert purchased: #{theft_alert.id}")
+        body = mail.body.encoded
+        expect(body).to include(theft_alert.creator.name)
+        expect(body).to include(theft_alert.creator.email)
+        expect(body).to include(theft_alert.theft_alert_plan.name)
+        expect(body).to include(theft_alert.bike.title_string)
+        expect(body).to include("Payment Failed")
+      end
     end
   end
 end

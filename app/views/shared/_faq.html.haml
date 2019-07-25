@@ -11,187 +11,135 @@
     });
   }
 
-
 %article
   .faq-block#main-faq-block
-    %h3
-      Common issues & frequently asked questions
+    %h3= t(".faqs")
     %dl
       %dt.collapse-faq
         %a.collapsed{ href: "#who-can-register", data: { toggle: "collapse"} }
-          %span
-            &#x25B6;
-          Who can register bikes?
+          %span &#x25B6;
+          = t(".who_can_register_bikes")
+
       %dd#who-can-register.collapse
-        %p
-          Everyone can register bikes, for free.
-     
+        %p= t(".everyone_can_register_bikes_for_free")
+
       %dt.collapse-faq
         %a.collapsed{ href: "#how-verify", data: { toggle: "collapse"} }
-          %span
-            &#x25B6;
-          How do you verify the bikes that people register? 
+          %span &#x25B6;
+          = t(".how_bikes_are_verified")
+
       %dd#how-verify.collapse
-        %p
-          Registering your bike at #{ link_to 'one of our partner shops', where_url } verifies the registration (shops may choose to only register bikes that they sell).
-        %p
-          Any question of verification is dealt with by reviewing your registration information. This hasn't been an issue.
-      
+        %p= t(".registration_html", partner_link: link_to(t(".partner_link"), where_url))
+        %p= t(".verification_questions")
+
       %dt.collapse-faq
         %a.collapsed{ href: "#bike-by-serial", data: { toggle: "collapse"} }
-          %span
-            &#x25B6;
-          Can you tell me what bike I have based on its serial number?
+          %span &#x25B6;
+          = t(".can_you_tell_me_what_bike_by_serial")
+
       %dd#bike-by-serial.collapse
-        %p
-          No. This is a feature we're working on, but we aren't there yet.
-        %p
-          For now, we recommend searching for your bike's serial number. We will show you any registered bikes that have similar serial numbers.
-        = form_tag bikes_path, method: :get do 
-          = text_field_tag :serial, params[:serial], placeholder: 'Bike serial number', class: 'faq-search-search-field'
+        %p= t(".not_yet")
+        %p= t(".we_recommend_searching")
+
+        = form_tag bikes_path, method: :get do
+          = text_field_tag :serial,
+          params[:serial],
+          placeholder: t(".bike_serial_number"),
+          class: 'faq-search-search-field'
+
           = button_tag(type: "submit", class: "searchit") do
-            = image_tag 'stolen/search.svg'        
-        %p
-          If there are any bikes with similar serial numbers, particularly if just the last few numbers are different &mdash; your bike is most likely that make and model.
-      
+            = image_tag "stolen/search.svg"
+        %p= t(".similar_serials")
+
       %dt.collapse-faq
         %a.collapsed{ href: "#what-if-i-sell", data: { toggle: "collapse"} }
-          %span
-            &#x25B6;
-          What if I sell my bike?
+          %span &#x25B6;
+          = t(".what_if_i_sell_my_bike")
+
       %dd#what-if-i-sell.collapse
-        %p
-          Bike registration is permanent, it's free to transfer bikes.
-        %p.steps
-          Go to the edit page for the bike and click on the link at the bottom
-        = image_tag "home/transfer_shot1.png", alt: "Click to reveal the transfer fields", class: "demo-screen"
-        %p.steps
-          This will reveal the owner's email. Enter in the new owners email and click 
-          %em
-            Send Bike.
-        = image_tag "home/transfer_shot2.png", alt: "Click to reveal the transfer fields", class: "demo-screen"
+        %p= t(".free_to_transfer")
+
+        %p.steps= t(".go_to_edit_page")
+
+        %p.steps= t(".reveal_owner_email_html")
 
       %dt.collapse-faq
         %a.collapsed{ href: "#how-vendor", data: { toggle: "collapse"} }
-          %span
-            &#x25B6;
-          Can my local bike shop partner with Bike Index?
+          %span &#x25B6;
+          = t(".can_partner_with_bikeindex")
+
       %dd#how-vendor.collapse
-        %p
-          Absolutely!
-        %p
-          Have them visit the #{link_to "organization signup page", new_organization_path}, we'll set them up with a organization account so they can register bikes for free.
+        %p= t(".absolutely")
+        %p= t(".organization_signup_html", signup_link: link_to(t(".organization_signup_link"), new_organization_path))
 
       %dt.collapse-faq
         %a.collapsed{ href: "#how-advertising", data: { toggle: "collapse"} }
-          %span
-            &#x25B6;
-          How can I advertise on Bike Index
+          %span &#x25B6;
+          = t(".how_can_i_advertise")
+
       %dd#how-advertising.collapse
-        %p
-          We're in the process of setting up advertising opportunities throughout the site, particularly for local bike shops.
-        %p
-          Email #{link_to "lily@bikeindex.org", "mailto:lily@bikeindex.org"} to find out more!
-        
+        %p= t(".in_the_process_of_setting_up_advertising")
+        %p= t(".email_us_html", email_link: link_to("lily@bikeindex.org", "mailto:lily@bikeindex.org"))
+
       %dt.collapse-faq
         %a.collapsed{ href: "#already-stolen", data: { toggle: "collapse"} }
-          %span
-            &#x25B6;
-          My bike was already stolen. What should I do?
+          %span &#x25B6;
+          = t(".bike_was_already_stolen")
+
         %dd#already-stolen.collapse
           %p
-            %strong
-              Add the bike and details about the theft to the Index now!
-          %p
-            Bike Index is a comprehensive public database - if your bike was stolen, we think everyone should know about it.
-          %p
-            Visit the #{link_to "stolen bikes page", stolen_bikes_url} to for more information, or #{link_to "add a stolen bike here", new_bike_url(stolen: true)}.        
+            %strong= t(".add_details")
+          %p= t(".comprehensive_public_database")
+          %p= t(".visit_or_add_html", add_link: link_to(t(".add_a_stolen_bike_link"), new_bike_url(stolen: true)))
+
       %dt.collapse-faq
         %a.collapsed{ href: "#does-this-prevent-theft", data: { toggle: "collapse"} }
-          %span
-            &#x25B6;
-          How does this prevent bike theft?
-      %dd#does-this-prevent-theft.collapse
-        %p
-          Right now people with good intentions buy stolen bikes because there isn't a single searchable, simple resource to check before buying a bike.
-        %p
-          Bike Index is that resource. The next time you buy a used bike, check the Index first.
-        %p
-          We offer bike shops and law enforcement an easy to use interface to look up any suspicious bikes they encounter, and a way to quickly contact the proper owner.
-        %p 
-          We successfully recover stolen bikes every week through this process.
+          %span &#x25B6;
+          = t(".how_does_this_prevent_bike_theft")
 
+      %dd#does-this-prevent-theft.collapse
+        %p= t(".people_with_good_intentions")
+        %p= t(".bike_index_is_that_resource")
+        %p= t(".we_offer_bike_shops")
+        %p= t(".we_successfully_recover")
 
       %dt.collapse-faq
         %a.collapsed{ href: "#kit-bro", data: { toggle: "collapse"} }
-          %span
-            &#x25B6;
-          How can I stay up to date on what Bike Index is doing?
+          %span &#x25B6;
+          = t(".how_can_i_stay_up_to_date")
+
         %dd#kit-bro.collapse
-          %p
-            Read our #{link_to "blog", blogs_url}! We post most cool things we do there.
-          %p
-            You can also follow us on #{link_to "Twitter", "https://twitter.com/BikeIndex"} and #{link_to "Facebook", "https://facebook.com/bikeindex"}.
-          
-      / %dt.collapse-faq
-      /   %a.collapsed{ href: "#business-type", data: { toggle: "collapse"} }
-      /     %span
-      /       &#x25B6;
-      /     Is Bike Index a not-for-profit?
-      /   %dd#business-type.collapse
-      /     %p
-      /       We're an Illinois 
-      /       = succeed "," do
-      /         %a{ href: "http://en.wikipedia.org/wiki/Benefit_corporation" }
-      /           benefit corporation
-      /       a type of company that is required by law to create benefit for society as well as shareholders.
-      /     %p
-      /       Essentially, it's a hybrid of a for-profit and not-for-profit company.
-          
-      /     %p
-      /       We decided to form a benefit corporation because we believe it's the best way to build an excellent service, be awesome, and fight bike theft.
+          %p= t(".read_our_blog_html", blog_link: link_to(t(".blog_link"), blogs_url))
+          %p= t(".follow_us_html", twitter_link: link_to("Twitter", "https://twitter.com/BikeIndex"), facebook_link: link_to("Facebook", "https://facebook.com/bikeindex"))
 
       %dt.collapse-faq
         %a.collapsed{ href: "#used-for-evil", data: { toggle: "collapse"} }
-          %span
-            &#x25B6;
-          Is it possible for bike thieves to search Index to check if a bike is listed as stolen before they sell it?
+          %span &#x25B6;
+          = t(".can_thieves_search")
         %dd#used-for-evil.collapse
-          %p
-            It is possible, but not common. We track and flag suspect activities to prevent abuse of Bike Index. 
+          %p= t(".possible_but_uncommon")
 
       %dt.collapse-faq
         %a.collapsed{ href: "#what-about-privacy", data: { toggle: "collapse"} }
-          %span
-            &#x25B6;
-          What about my privacy?
+          %span &#x25B6;
+          = t(".what_about_my_privacy")
+
       %dd#what-about-privacy.collapse
-        %p
-          Your personal information is never viewed, shared or sold without your permission.
-        %p
-          Bikes are public and searchable, but no information about the owner is visible. You can choose to share information (such as your twitter or personal website) but this is turned off by default.
-        %p
-          To learn more check out 
-          = link_to "our article", "https://www.bikeindex.org/news/privacy-on-the-bike-index"
-          about privacy.
+        %p= t(".your_personal_information_is_never_viewed")
+        %p= t(".bikes_are_public_and_searchable")
+        %p= t(".to_learn_more_html", article_link: link_to(t(".article_link"), "https://www.bikeindex.org/news/privacy-on-the-bike-index"))
 
       %dt.collapse-faq
         %a.collapsed{ href: "#public-serials", data: { toggle: "collapse"} }
-          %span
-            &#x25B6;
-          Why are serial numbers and non-stolen bikes public?
+          %span &#x25B6;
+          = t(".why_public")
+
         %dd#public-serials.collapse
           %p
-            %strong
-              We make serial numbers public because it's the best way to recover stolen bikes and deter theft.
-            The faster and easier it is to access serials, the more stolen bikes we recover. Restricting access to serial numbers only helps thieves.
-          %p
-            This isn't optimistic speculation: we've proved this and continue to do so with every stolen bike we recover.
-          %p
-            We've recovered bikes before they could even be marked stolen because they could be found on the Index.
-          %p
-            Other registries generally hide serials because of their technical limitations. They keep information away from those most likely to use it for good, even though #{link_to "security by obscurity", "https://en.wikipedia.org/wiki/Security_through_obscurity"} doesn't work.
-          %p
-            While serial numbers and bike information is public, there is nothing to connect users to the bikes they own. We never make user information available unless the user explicitly choses to do so.
-          %p
-            We care about your privacy more than anyone&mdash;you can hide your registration so nobody but you can see it. We just don't think it's a good idea.
+            %strong= t(".serial_numbers_public")
+            = t(".the_faster_and_easier_it_is")
+          %p= t(".this_isnt_optimistic_speculation")
+          %p= t(".weve_recovered_bikes")
+          %p= t(".other_registries_html", wikipedia_link: link_to(t(".security_by_obscurity_link"), "https://en.wikipedia.org/wiki/Security_through_obscurity"))
+          %p= t(".while_serial_numbers")
+          %p= t(".we_care_about_your_privacy")

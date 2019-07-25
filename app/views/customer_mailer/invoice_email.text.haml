@@ -1,8 +1,9 @@
-* Thank you so much for supporting Bike Index *
-- if @payment.is_donation
-  Your donation of $#{@payment.amount_formatted} just saved the bikes.
-- else
-  Your payment of #{@payment.amount_formatted} has been received.
+= t(".text.thanks_for_signing_up")
 
-Thanks,
-Bike Index Management
+- if @payment.is_donation
+  = t(".text.donation_will_help", amount: @payment.amount_formatted)
+- else
+  = t(".text.payment_received", amount: @payment.amount_formatted)
+
+= t(".text.thanks")
+= t(".text.bike_index_management")

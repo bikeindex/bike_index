@@ -24,11 +24,8 @@
           = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
     .has-no-serial.optional-block
       %label
-        = f.check_box :has_no_serial, tabindex: -1 
-        %span.stolen          
-          Unknown
-        %span.not-stolen          
-          Has no serial
+        = check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1
+        Unknown serial
 
   .input-group.with-additional-block
     .control-group.select-jsonified
@@ -52,7 +49,7 @@
       %label
         %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
         Unknown year
-        
+
   .input-group
     .control-group
       = f.label :frame_model, class: "control-label"
@@ -63,7 +60,7 @@
     .control-group.special-select-single
       = f.label :primary_frame_color_id, "Frame color", class: "control-label"
       .controls
-        = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
+        = select(:bike, :primary_frame_color_id, Color.select_options, required: true, prompt: "Choose color")
     %a#add-secondary.optional-form-block{data: {target: "#secondary-color", toggle: "#rm-secondary"}}
       Add a color
     %a#rm-secondary.optional-form-block.rm-block.currently-hidden{data: {target: "#secondary-color", toggle: "#add-secondary"}}
@@ -73,7 +70,7 @@
         %label.control-label
           Secondary color
         .controls
-          = collection_select( :bike, :secondary_frame_color_id, Color.all, :id, :name, prompt: "Choose color" )
+          = select(:bike, :secondary_frame_color_id, Color.select_options, prompt: "Choose color")
       %a#add-tertiary.optional-form-block{data: {target: "#tertiary-color", toggle: "#rm-tertiary"}}
         Add a color
       %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{data: {target: "#tertiary-color", toggle: "#add-tertiary"}}
@@ -83,8 +80,8 @@
         %label.control-label
           Third color
         .controls.special-select-single
-          = collection_select( :bike, :tertiary_frame_color_id, Color.all, :id, :name, prompt: "Choose color" )
-  
+          = select(:bike, :tertiary_frame_color_id, Color.select_options, prompt: "Choose color")
+
   #stolen_fields_container
     #stolen_fields
       = f.hidden_field :stolen, value: true
@@ -106,7 +103,7 @@
           .control-group.special-select-single
             = builder.label :street, 'Where was it stolen?', class: 'control-label'
             #country_select_container.controls.special-select-single
-              = builder.collection_select(:country_id, Country.all, :id, :name, prompt: 'Choose country')
+              = builder.select(:country_id, Country.select_options, prompt: 'Choose country')
           .control-group.extra-group.special-select-single
             .controls
               = builder.text_field :street, placeholder: "Intersection or address"
@@ -123,10 +120,10 @@
               = builder.text_area :theft_description, rows: 3
         .input-group
           %p.stolen-suggestion
-            Filing a 
+            Filing a
             %strong
               police report
-            is 
+            is
             %span.stolen-color
               extremely important
             for stolen bike recovery.
@@ -178,7 +175,7 @@
       %span.what-you-register
         this
       = select(:bike, :cycle_type, CycleType.select_options, { required: true })
-      
+
   .input-group.optional-group.form-photo-group
     - if @b_param.image.present? or @b_param.image_tmp.present?
       %strong

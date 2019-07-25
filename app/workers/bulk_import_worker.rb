@@ -1,9 +1,7 @@
 require "csv"
 
-class BulkImportWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "low_priority" # Because it's low priority!
-  sidekiq_options backtrace: true, retry: false
+class BulkImportWorker < ApplicationWorker
+  sidekiq_options retry: false
 
   attr_accessor :bulk_import, :line_errors # Only necessary for testing
 
@@ -89,14 +87,7 @@ class BulkImportWorker
   end
 
   def rescue_blank_serial(serial)
-    return "absent" unless serial.present?
-
-    serial.strip!
-    if ["n.?a", "none", "unkn?own"].any? { |m| serial.match(/\A#{m}\z/i).present? }
-      "absent"
-    else
-      serial
-    end
+    SerialNormalizer.unknown_and_absent_corrected(serial)
   end
 
   def creator_id

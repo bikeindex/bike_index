@@ -1,9 +1,10 @@
 require "rails_helper"
 
 RSpec.describe StolenRecord, type: :model do
-  it "marks current true by default" do
+  it "marks current true by default, display_checklist? false" do
     stolen_record = StolenRecord.new
     expect(stolen_record.current).to be_truthy
+    expect(stolen_record.display_checklist?).to be_falsey
   end
 
   describe "find_or_create_recovery_link_token" do
@@ -69,6 +70,7 @@ RSpec.describe StolenRecord, type: :model do
       expect(stolen_record.address(override_show_address: true)).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
       stolen_record.show_address = true
       expect(stolen_record.address).to eq("2200 N Milwaukee Ave, Chicago, XXX, 60647, NEVVVV")
+      expect(stolen_record.display_checklist?).to be_truthy
     end
     it "is ok with missing information" do
       stolen_record = StolenRecord.new(street: "2200 N Milwaukee Ave",
@@ -347,6 +349,46 @@ RSpec.describe StolenRecord, type: :model do
         expect(stolen_record.date_recovered.to_i).to be_within(1).of target_timestamp
         expect(stolen_record.recovering_user_owner?).to be_falsey
         expect(stolen_record.pre_recovering_user?).to be_truthy
+      end
+    end
+  end
+
+  describe "locking_description_description_select_options" do
+    it "returns an array of arrays" do
+      options = StolenRecord.locking_description_select_options
+
+      expect(options).to be_an_instance_of(Array)
+      expect(options).to all(be_an_instance_of(Array))
+      options.each { |label, value| expect(label).to eq(value) }
+    end
+
+    it "localizes as needed" do
+      I18n.with_locale(:nl) do
+        options = StolenRecord.locking_description_select_options
+        options.each do |label, value|
+          expect(label).to be_an_instance_of(String)
+          expect(label).to_not eq(value)
+        end
+      end
+    end
+  end
+
+  describe "locking_defeat_description_select_options" do
+    it "returns an array of arrays" do
+      options = StolenRecord.locking_defeat_description_select_options
+
+      expect(options).to be_an_instance_of(Array)
+      expect(options).to all(be_an_instance_of(Array))
+      options.each { |label, value| expect(label).to eq(value) }
+    end
+
+    it "localizes as needed" do
+      I18n.with_locale(:nl) do
+        options = StolenRecord.locking_description_select_options
+        options.each do |label, value|
+          expect(label).to be_an_instance_of(String)
+          expect(label).to_not eq(value)
+        end
       end
     end
   end

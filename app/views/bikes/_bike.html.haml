@@ -6,18 +6,17 @@
       %h5.title-link
         %a{ href: bike_url(bike) }
           %strong
-            - unless bike.type == 'bike'
-              = bike.type
+            = bike.type unless bike.type == 'bike'
             = [bike.year, bike.mnfg_name].reject(&:blank?).join(' ')
-          #{bike.frame_model}
+          = bike.frame_model.to_s
       %ul.attr-list
-        = bike.attr_list_item(bike.serial_display, 'Serial')
-        = bike.attr_list_item(bike.frame_colors.to_sentence, 'Primary colors')
+        = bike.attr_list_item(bike.serial_display, t(".serial"))
+        = bike.attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
       - if bike.current_stolen_record.present?
         %ul.attr-list
           %li
-            %span.attr-title
-              = bike.recovered ? "Recovered" : "Stolen"
+            %span.attr-title.text-danger
+              = bike.recovered ? t(".recovered") : t(".stolen")
             %span.convertTime
               = l bike.current_stolen_record.date_stolen, format: :convert_time
-          = bike.attr_list_item(bike.short_address(bike.current_stolen_record), 'Location')
+          = bike.attr_list_item(bike.short_address(bike.current_stolen_record), t(".location"))

@@ -1,0 +1,54 @@
+- landing_page_target = "community_groups"
+
+.signup-landing-page.landing-page{ class: "signup-landing-page-#{landing_page_target}" }
+  %header.banner-header
+    .container
+      .row
+        .icon-wrapper
+          = render "landing_pages/icons/header_#{landing_page_target}_svg"
+
+        .banner-text
+          %h1= t(".bike_index_for_community_groups")
+          %h3= t(".the_most_widereaching_and_effective_tools")
+
+    .ribbon.mobile-contact-link
+      .container
+        %h2= link_to t(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
+
+  .container
+    .row.main-body-row
+      .landing-why-col
+        %h3= t(".help_us_help_you")
+
+        %p= t(".we_provide_free_and_easy_access_to_our_re")
+
+        %p= t(".spread_the_bike_index_word_html", link: link_to(t(".here"), new_organization_path))
+
+        %p= render partial: "landing_pages/tweet", locals: { tweet_id: 875377223322259457 }
+
+        %h3= t(".partners_made_in_heaven")
+        %p= t(".gone_are_the_days_where_you_had_to_regist")
+
+        %p= t(".registrations_are_free_forever_join_bike_")
+
+        %p= t(".purchase_a_pack_of_advocacy_html", link: link_to(t(".here"), 'https://bikeindex.myshopify.com/'))
+
+        %h4= t(".related_articles")
+        %ul
+          %li= link_to t(".bike_index_launches_new_ambassadors_progr"), news_path("bike-index-launches-ambassadors-program")
+          %li= link_to t(".bike_index_welcomes_stolen_bikes_nola"), news_path("bike-index-welcomes-our-newest-partner---stolen-bikes-nola")
+
+
+        .trusted-by.hidden-lg-up
+          %h3= t(".trusted_by_community_groups_everywhere")
+          = image_tag "landing_pages/logos/community-groups.png", alt: "community group partners"
+
+      .next-steps-col
+        .next-steps-wrap
+          %header
+            = t(".trusted_by_community_groups_everywhere")
+            = link_to t(".sign_up_for_free"), new_organization_path, class: "btn btn-primary btn-lg"
+          .trusted-by
+            .header
+              = t(".used_by_community_groups_everywhere")
+            = image_tag "landing_pages/logos/community-groups.png", alt: "community group partners"

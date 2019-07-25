@@ -3,9 +3,34 @@ require "rails_helper"
 RSpec.describe BikeV2ShowSerializer do
   describe "standard validations" do
     let(:bike) { FactoryBot.create(:bike, frame_size: "42", additional_registration: "XXYY") }
-    let(:component) { FactoryBot.create(:component, bike: bike) }
-    let(:public_image) { FactoryBot.create(:public_image, imageable_type: "Bike", imageable_id: bike.id) }
+    let!(:component) { FactoryBot.create(:component, bike: bike) }
+    let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
     subject { BikeV2ShowSerializer.new(bike) }
+
+    let(:public_image_target) do
+      {
+        name: public_image.name,
+        full: public_image.image_url,
+        large: public_image.image_url(:large),
+        medium: public_image.image_url(:medium),
+        thumb: public_image.image_url(:small),
+        id: public_image.id,
+      }
+    end
+    let(:component_target) do
+      {
+        id: component.id,
+        description: component.description,
+        serial_number: component.serial_number,
+        component_type: component.component_type,
+        component_group: component.component_group,
+        rear: component.rear,
+        front: component.front,
+        manufacturer_name: component.manufacturer_name,
+        model_name: component.cmodel_name,
+        year: component.year,
+      }
+    end
 
     let(:target) do
       {
@@ -16,14 +41,12 @@ RSpec.describe BikeV2ShowSerializer do
         frame_model: nil,
         year: nil,
         frame_colors: ["Black"],
-        thumb: nil,
-        large_img: nil,
+        thumb: public_image.image_url(:small),
+        large_img: public_image.image_url(:large),
         is_stock_img: false,
         stolen: false,
         stolen_location: nil,
         date_stolen: nil,
-        frame_material: nil,
-        handlebar_type: nil,
         registration_created_at: bike.created_at.to_i,
         registration_updated_at: bike.updated_at.to_i,
         url: "http://test.host/bikes/#{bike.id}",
@@ -37,6 +60,7 @@ RSpec.describe BikeV2ShowSerializer do
         front_tire_narrow: nil,
         type_of_cycle: "Bike",
         test_bike: false,
+        frame_material_slug: nil,
         rear_wheel_size_iso_bsd: nil,
         front_wheel_size_iso_bsd: nil,
         handlebar_type_slug: nil,
@@ -44,12 +68,13 @@ RSpec.describe BikeV2ShowSerializer do
         rear_gear_type_slug: nil,
         additional_registration: "XXYY",
         stolen_record: nil,
-        public_images: [],
-        components: [],
+        public_images: [public_image_target],
+        components: [component_target],
       }
     end
 
     it "returns the expected thing" do
+      bike.reload
       expect(subject.as_json(root: false)).to eq target
     end
   end

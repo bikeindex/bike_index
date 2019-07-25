@@ -1,35 +1,48 @@
-%h1
-  Edit Payment
-
-.form.form-horizontal{ style: "margin-bottom: 80px" }
-  = form_for [:admin, @payment] do |f|
-    - if @payment.errors.any?
-      = render partial: "/shared/errors", locals: { name: "Payment", obj: @payment }
-
-    .control-group.padded
-      .control-label
-        = f.label :kind
-      .controls
-        %span.less-strong
+.row
+  .col-md-4
+    %h1
+      Edit Payment
+  .col-md-8
+    %table.table-list
+      %tr
+        %td
+          Kind
+        %td
+          %span.less-strong
           = @payment.kind
-
-    .control-group.padded
-      .control-label
-        = f.label :amount
-      .controls
-        %span.less-strong
+      %tr
+        %td
+          Amount
+        %td
           = @payment.amount_formatted
+      - if @payment.stripe_id.present?
+        %tr
+          %td
+            Stripe ID
+          %td
+            = link_to @payment.stripe_id, "https://dashboard.stripe.com/payments/#{@payment.stripe_id}"
+      %tr
+        %td
+          For
+        %td
+          - if @payment.theft_alert.present?
+            = link_to "Theft alert", edit_admin_theft_alert_path(@payment.theft_alert)
 
-    - organizations = Organization.all
-    .control-group.chosen-select
-      = f.label :organization_id, class: "control-label"
-      .controls
+
+= form_for [:admin, @payment] do |f|
+  - if @payment.errors.any?
+    = render partial: "/shared/errors", locals: { name: "Payment", obj: @payment }
+
+  - organizations = Organization.all
+  .row
+    .col-md-6
+      .form-group.fancy-select.unfancy
+        = f.label :organization_id
         = collection_select(:payment, :organization_id, organizations, :id, :name, prompt: "Choose organization")
-    .control-group.padded
-      .control-label
+    .col-md-6
+      .form-group
         = f.label :invoice_id, "Invoice #"
-      .controls
-        = f.text_field :invoice_id
+        = f.text_field :invoice_id, class: "form-control"
 
-    = f.submit "Submit", class: 'button-green'
+  = f.submit "Submit", class: 'btn btn-success float-right'
 

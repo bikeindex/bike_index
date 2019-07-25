@@ -11,16 +11,18 @@ RSpec.describe SerialNormalizer do
     end
 
     it "normalizes blank and strips" do
-      expect(SerialNormalizer.unknown_and_absent_corrected("   \n")).to eq "absent"
-      expect(SerialNormalizer.unknown_and_absent_corrected(" absenT   \n")).to eq "absent"
+      expect(SerialNormalizer.unknown_and_absent_corrected("   \n")).to eq "unknown"
+      expect(SerialNormalizer.unknown_and_absent_corrected(" absenT   \n")).to eq "unknown"
       expect(SerialNormalizer.unknown_and_absent_corrected("   UNKNOWN \n")).to eq "unknown"
+      expect(SerialNormalizer.unknown_and_absent_corrected("   missing \n")).to eq "unknown"
     end
 
     context "misentries" do
       let(:sample_misentries) do
         [
           "dont know ", "I don't know it", "i dont fucking know", "sadly I don't know... ", "I do not remember",
-          "???? ??", "Unknown Serial", "IDONTKNOWTHESERIALNUMBER", "I dont remember", "Not known", "dont no",
+          "???? ??", "Unknown Serial", "IDONTKNOWTHESERIALNUMBER", "I dont remember", "Not known", "dont no", "missing",
+          "n/a", "do not have", "no serial", "idk", "unkown",
         ]
       end
       it "normalizes a bunch of misentries" do
@@ -28,6 +30,15 @@ RSpec.describe SerialNormalizer do
           expect(SerialNormalizer.unknown_and_absent_corrected(serial)).to eq "unknown"
         end
       end
+    end
+  end
+
+  describe "made_without_serial" do
+    it "returns made_without_serial and normalizes to nil" do
+      expect(SerialNormalizer.unknown_and_absent_corrected("made_without_serial")).to eq "made_without_serial"
+      serial_normalizer = SerialNormalizer.new(serial: "made_without_serial")
+      expect(serial_normalizer.normalized).to be_nil
+      expect(serial_normalizer.normalized_segments).to eq([])
     end
   end
 
@@ -48,7 +59,7 @@ RSpec.describe SerialNormalizer do
       expect(result).to eq("38675971596")
     end
     it "returns absent unless present" do
-      expect(SerialNormalizer.new(serial: " ").normalized).to eq "absent"
+      expect(SerialNormalizer.new(serial: " ").normalized).to be_nil
     end
   end
 
@@ -59,7 +70,7 @@ RSpec.describe SerialNormalizer do
       expect(segments[0]).to eq("50ME")
     end
     it "returns nil if serial is absent" do
-      segments = SerialNormalizer.new(serial: "absent").normalized_segments
+      segments = SerialNormalizer.new(serial: "unknown").normalized_segments
       expect(segments).to eq([])
     end
   end
@@ -71,9 +82,15 @@ RSpec.describe SerialNormalizer do
       expect(NormalizedSerialSegment.where(bike_id: bike.id).count).to eq(2)
     end
 
-    it "does not save absent segments" do
+    it "does not save made_without_serial segments" do
       bike = FactoryBot.create(:bike)
-      SerialNormalizer.new(serial: "absent").save_segments(bike.id)
+      SerialNormalizer.new(serial: "made_without_serial").save_segments(bike.id)
+      expect(NormalizedSerialSegment.where(bike_id: bike.id).count).to eq(0)
+    end
+
+    it "does not save unknown segments" do
+      bike = FactoryBot.create(:bike)
+      SerialNormalizer.new(serial: "unknown").save_segments(bike.id)
       expect(NormalizedSerialSegment.where(bike_id: bike.id).count).to eq(0)
     end
 

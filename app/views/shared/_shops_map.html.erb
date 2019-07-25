@@ -8,17 +8,17 @@
   var map;
 
   function createMap(lat, lng, zoom) {
-    var mapOptions = { center: new google.maps.LatLng(lat, lng), 
+    var mapOptions = { center: new google.maps.LatLng(lat, lng),
       zoom: zoom,
       mapTypeId: google.maps.MapTypeId.ROADMAP };
-    
+
     map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
-    
+
     var infowindow = new google.maps.InfoWindow();
 
     var marker, i;
 
-    for (i = 0; i < window.shop_locations.length; i++) {  
+    for (i = 0; i < window.shop_locations.length; i++) {
       marker = new google.maps.Marker({
         position: new google.maps.LatLng(window.shop_locations[i][1], window.shop_locations[i][2]),
         map: map,
@@ -42,4 +42,3 @@
   }
 
 </script>
-

@@ -22,19 +22,6 @@ RSpec.describe TsvCreator do
     end
   end
 
-  describe "enqueue_creation" do
-    it "creates jobs for the TSV creation" do
-      expect do
-        TsvCreator.enqueue_creation
-      end.to change(TsvCreatorWorker.jobs, :size).by(4)
-
-      expect(TsvCreatorWorker.jobs.select { |j| j["args"] == ["create_manufacturer"] }).to be_present
-      expect(TsvCreatorWorker.jobs.select { |j| j["args"] == ["create_stolen_with_reports", true] }).to be_present
-      expect(TsvCreatorWorker.jobs.select { |j| j["args"] == ["create_stolen", true] }).to be_present
-      expect(TsvCreatorWorker.jobs.select { |j| j["args"] == ["create_daily_tsvs"] }).to be_present
-    end
-  end
-
   describe "create_daily_tsvs" do
     it "calls create_stolen and create_stolen_with_reports with scoped query" do
       stolen_record = FactoryBot.create(:stolen_record, current: true, tsved_at: nil)

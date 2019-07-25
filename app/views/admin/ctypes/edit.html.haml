@@ -4,4 +4,4 @@
 
 = render partial: "form"
 
-= link_to "Delete component type", admin_ctype_url(@ctype), method: :delete, confirm: "Are you sure?", class: "btn btn-danger float-right"
+= link_to "Delete component type", admin_ctype_url(@ctype), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger float-right"

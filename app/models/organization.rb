@@ -10,14 +10,16 @@ class Organization < ActiveRecord::Base
     property_management: 6,
     other: 7,
     ambassador: 8,
+    bike_depot: 9,
   }.freeze
 
   POS_KIND_ENUM = {
-    not_pos: 0,
+    no_pos: 0,
     other_pos: 1,
     lightspeed_pos: 2,
     ascend_pos: 3,
     broken_pos: 4,
+    does_not_need_pos: 5,
   }.freeze
 
   acts_as_paranoid
@@ -31,7 +33,6 @@ class Organization < ActiveRecord::Base
   has_many :memberships, dependent: :destroy
   has_many :mail_snippets
   has_many :users, through: :memberships
-  has_many :organization_invitations, dependent: :destroy
   has_many :organization_messages
   has_many :bike_organizations
   has_many :bikes, through: :bike_organizations
@@ -57,12 +58,11 @@ class Organization < ActiveRecord::Base
   scope :shown_on_map, -> { where(show_on_map: true, approved: true) }
   scope :paid, -> { where(is_paid: true) }
   scope :unpaid, -> { where(is_paid: true) }
-  scope :valid, -> { where(is_suspended: false) }
+  scope :approved, -> { where(is_suspended: false, approved: true) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
   scope :bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications]) }
 
   before_validation :set_calculated_attributes
-  before_save :set_ambassador_organization_defaults
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
 
@@ -70,9 +70,14 @@ class Organization < ActiveRecord::Base
 
   def self.pos_kinds; POS_KIND_ENUM.keys.map(&:to_s) end
 
+  def self.admin_required_kinds; %w[ambassador bike_depot].freeze end
+
+  def self.user_creatable_kinds; kinds - admin_required_kinds end
+
   def self.friendly_find(n)
     return nil unless n.present?
-    return find(n) if integer_slug?(n)
+    return n if n.is_a?(Organization)
+    return find_by_id(n) if integer_slug?(n)
     slug = Slugifyer.slugify(n)
     # First try slug, then previous slug, and finally, just give finding by name a shot
     find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first
@@ -99,14 +104,11 @@ class Organization < ActiveRecord::Base
     where("paid_feature_slugs ?& array[:keys]", keys: matching_slugs)
   end
 
-  # Organization kinds creatable by non-superadmins
-  def self.creatable_kinds
-    kinds.reject { |kind| kind == "ambassador" }
-  end
+  def to_param; slug end
 
-  def to_param
-    slug
-  end
+  def sent_invitation_count; memberships.count end
+
+  def remaining_invitation_count; available_invitation_count - sent_invitation_count end
 
   def ascend_imports?; ascend_name.present? end
 
@@ -158,6 +160,10 @@ class Organization < ActiveRecord::Base
     law_enforcement? && !paid_for?("unstolen_notifications")
   end
 
+  def bike_shop_display_integration_alert?
+    bike_shop? && %w[no_pos broken_pos].include?(pos_kind)
+  end
+
   def paid_for?(feature_name)
     features =
       Array(feature_name)
@@ -193,6 +199,7 @@ class Organization < ActiveRecord::Base
     end
     generate_access_token unless self.access_token.present?
     set_auto_user
+    set_ambassador_organization_defaults if ambassador?
     locations.each { |l| l.save unless l.shown == allowed_show }
     true # TODO: Rails 5 update
   end
@@ -245,7 +252,10 @@ class Organization < ActiveRecord::Base
     return "lightspeed_pos" if recent_bikes.lightspeed_pos.count > 0
     return "ascend_pos" if recent_bikes.ascend_pos.count > 0
     return "other_pos" if recent_bikes.any_pos.count > 0
-    bikes.any_pos.count > 0 ? "broken_pos" : "not_pos"
+    if bike_shop? && created_at < Time.current - 1.week
+      return "does_not_need_pos" if recent_bikes.count > 2
+    end
+    bikes.any_pos.count > 0 ? "broken_pos" : "no_pos"
   end
 
   def allowed_show
@@ -269,7 +279,6 @@ class Organization < ActiveRecord::Base
   private
 
   def set_ambassador_organization_defaults
-    return unless kind == "ambassador"
     self.show_on_map = false
     self.lock_show_on_map = false
     self.api_access_approved = false

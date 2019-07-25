@@ -1,1 +1,2 @@
-<iframe src="#{ENV['BASE_URL']}/organizations/#{current_organization.slug}/embed_extended" style="width: 100%; border: none; height: 1030px;"></iframe>
+- iframe_url = embed_extended_organization_url(current_organization.slug)
+<iframe src="#{iframe_url}" style="width: 100%; border: none; height: 1030px;"></iframe>

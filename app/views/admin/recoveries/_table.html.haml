@@ -1,7 +1,8 @@
 - render_sortable ||= false
+- skip_bike ||= false
 
 .full-screen-table
-  %table.table.table-striped.table-bordered
+  %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light.sortable
       %th
         - if render_sortable
@@ -13,8 +14,9 @@
           = sortable "recovery_display_status", "Status"
         - else
           Status
-      %th
-        Bike
+      - unless skip_bike
+        %th
+          Bike
       %th
         Recovery info
       %th
@@ -46,15 +48,16 @@
             %small
               = recovery.recovery_display_status.gsub("_", "&nbsp;").html_safe
 
-          %td
-            - if recovery.bike.present?
-              .less-strong-hold
-                %span.less-strong-right
-                  = link_to recovery.bike_id, edit_admin_bike_url(recovery.bike)
-                = recovery.bike.title_string
-                - if recovery.estimated_value.present?
-                  %small.less-strong
-                    $#{recovery.estimated_value}
+          - unless skip_bike
+            %td
+              - if recovery.bike.present?
+                .less-strong-hold
+                  %span.less-strong-right
+                    = link_to recovery.bike_id, edit_admin_bike_url(recovery.bike)
+                  = recovery.bike.title_string
+                  - if recovery.estimated_value.present?
+                    %small.less-strong
+                      $#{recovery.estimated_value}
           %td
             - if recovery.recovered_description.present?
               %small

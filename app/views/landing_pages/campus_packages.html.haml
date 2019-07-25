@@ -3,46 +3,46 @@
 :ruby
   plans = {
     free: { cost: 0, subhead: nil },
-    supporting: { cost: 299, subhead: "Keep us pedaling" },
-    small: { cost: 3999, subhead: "0-10k Members" },
-    medium: { cost: 5999, subhead: "10k-20k Members", popular: true },
-    large: { cost: 8999, subhead: "20k+ Members" },
+    supporting: { cost: 299, subhead: t(".keep_us_pedaling")},
+    small: { cost: 3999, subhead: t(".number_of_members", range: "0-10k") },
+    medium: { cost: 5999, subhead: t(".number_of_members", range: "10k-20k"), popular: true },
+    large: { cost: 8999, subhead: t(".number_of_members", range: "20k+") },
   }
   plan_sizes = plans.keys
   plan_features = [
-    { free: true, supporting: true, small: true, medium: true, large: true, title: "Supporting our nonprofit" },
-    { free: true, supporting: true, small: true, medium: true, large: true, title: "Create organization account and contact registrants" },
-    { free: true, supporting: true, small: true, medium: true, large: true, title: "Embed a basic registration form on your website" },
-    { free: false, supporting: true, small: true, medium: true, large: true, title: "Search bikes in organization account" },
-    { free: false, supporting: true, small: true, medium: true, large: true, title: "Import CSV file of registrations from former system" },
-    { free: "10", supporting: "10", small: "10", medium: "unlimited", large: "unlimited", title: "Staff accounts" },
-    { free: false, supporting: false, small: true, medium: true, large: true, title: "Branded registration landing page" },
-    { free: false, supporting: false, small: true, medium: true, large: true, title: "QR sticker scanning and messaging" },
-    { free: false, supporting: false, small: true, medium: true, large: true, title: "Ongoing programming, hosting, and support" },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "Contact registrants who have not finished registration" },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "Add logos and text to Bike Index emails " },
-    { free: false, supporting: false, small: false, medium: true, large: true, title: "Export custom data into CSV/XLSX files" },
-    { free: false, supporting: false, small: false, medium: false, large: true, title: "Add specific form fields to your landing page" },
-    { free: false, supporting: false, small: false, medium: false, large: true, title: "Automated migration of graduated bikes out of system" },
-    { free: false, supporting: false, small: false, medium: false, large: true, title: "Avery mailing address formatted XLS export for mailing stickers" },
+    { free: true, supporting: true, small: true, medium: true, large: true, title: t("plan_features.supporting_our_nonprofit") },
+    { free: true, supporting: true, small: true, medium: true, large: true, title: t("plan_features.create_organization_account") },
+    { free: true, supporting: true, small: true, medium: true, large: true, title: t("plan_features.embed_a_registration_form") },
+    { free: false, supporting: true, small: true, medium: true, large: true, title: t("plan_features.search_bikes_in_organization") },
+    { free: false, supporting: true, small: true, medium: true, large: true, title: t("plan_features.import_csv_file") },
+    { free: "10", supporting: "10", small: "10", medium: "unlimited", large: "unlimited", title: t("plan_features.staff_accounts") },
+    { free: false, supporting: false, small: true, medium: true, large: true, title: t("plan_features.landing_page") },
+    { free: false, supporting: false, small: true, medium: true, large: true, title: t("plan_features.qr_sticker") },
+    { free: false, supporting: false, small: true, medium: true, large: true, title: t("plan_features.ongoing_programming") },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: t("plan_features.contact_registrants") },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: t("plan_features.add_logos") },
+    { free: false, supporting: false, small: false, medium: true, large: true, title: t("plan_features.export_custom_data") },
+    { free: false, supporting: false, small: false, medium: false, large: true, title: t("plan_features.add_form_fields") },
+    { free: false, supporting: false, small: false, medium: false, large: true, title: t("plan_features.automated_migration") },
+    { free: false, supporting: false, small: false, medium: false, large: true, title: t("plan_features.mailing_stickers") },
   ]
 
 .signup-landing-page.signup-landing-page-packages.signup-landing-page-campus-packages
   %header.banner-header
     .container
       .packages-main-title
-        %h1
-          Bike Index for Colleges & Universities
+        %h1= t(".bike_index_for_colleges_universities")
         %h2
-          Clean up your Campus' messy registry.
+          = t(".clean_up_your_campus_messy_registry")
           %br
-          All plans come with a 30-day free trial
+          = t(".all_plans_come_with_a_30day_free_trial")
       %ul.packages-price-list
-        = render partial: "/landing_pages/packages_list", locals: { lead_type: lead_type, plan_features: plan_features, plans: plans, render_features: false }
+        = render partial: "landing_pages/packages_list",
+        locals: { lead_type: lead_type, plan_features: plan_features, plans: plans, render_features: false }
 
   .container.main-compare-packages-container
     %h2.header-font-uncap
-      Compare Plans and Features
+      = t(".compare_plans_and_features")
     %table.table.compare-packages-table.table-striped
       %thead
         %tr
@@ -50,30 +50,25 @@
           %th
             - plans.each do |plan, plan_data|
               - if plan == :free
-                %h4
-                  Free
-                %h3
-                  $0
-                %p
-                  Forever
-                %a.btn.btn-primary{ href: new_organization_path }
-                  Sign Up Now
+                %h4= t(".free")
+                %h3= number_to_currency(0, precision: 0)
+                %p= t(".forever")
+                = link_to t(".sign_up_now"), new_organization_path, class: "btn btn-primary"
               - else
                 %th
-                  %h4
-                    #{plan.to_s.titleize} #{lead_type}
-                  %h3
-                    $#{number_with_delimiter(plan_data[:cost])}
+                  %h4 #{plan.to_s.titleize} #{lead_type}
+                  %h3= number_to_currency(plan_data[:cost], precision: 0)
                   %p
-                    (USD/annually)
+                    = default_currency
+                    = "/"
+                    = t(".year")
                   %a.btn.btn-primary.tryPaidButton{ href: "#", "data-plan" => plan.to_s }
-                    Try For Free
+                    = t(".try_for_free")
 
       %tbody
         - plan_features.each do |feature|
           %tr
-            %td
-              = feature[:title]
+            %td= feature[:title]
             - plan_sizes.each do |size|
               %td
                 - if feature[size].is_a?(String)
@@ -88,26 +83,23 @@
 
 
     %ul.packages-price-list-small-screens
-      = render partial: "/landing_pages/packages_list", locals: { lead_type: lead_type, plan_features: plan_features, plans: plans, render_features: true }
+      = render partial: "landing_pages/packages_list",
+      locals: { lead_type: lead_type, plan_features: plan_features, plans: plans, render_features: true }
 
     %p.mt-4
-      %em.less-strong
-        A la carte features and custom development available.
-        %a.tryPaidButton{ href: "#" }
-          Get in touch
-        to find out more
+      = render partial: "landing_pages/find_out_more"
 
   .contact-us-callout-wrapper
     .contact-us-callout
-      Questions? Want to get started?
-      = link_to "Contact us", "#", class: "btn btn-primary tryPaidButton"
+      = t(".questions_want_to_get_started")
+      = link_to t(".contact_us"), nil, class: "btn btn-primary tryPaidButton"
 
 - modal_body = capture_haml do
   = form_for @feedback, html: { class: 'organized-form' } do |f|
     .modal-body
       .form-group.currently-hidden
-        - package_opts = plan_sizes.map { |s| ["#{s.to_s.titleize} package", s] }
-        = f.select(:package_size, package_opts, { prompt: "Choose a package size" }, { class: "form-control" })
+        - package_opts = plan_sizes.map { |s| [t(".package_title", name: s.to_s.titleize), s] }
+        = f.select(:package_size, package_opts, { prompt: t(".choose_a_package_size") }, { class: "form-control" })
       .form-group
         = f.label :name, lead_type.titleize, class: "form-label"
         = f.text_field :name, required: true, class: "form-control"
@@ -115,18 +107,21 @@
         = f.label :phone_number, class: "form-label"
         = f.text_field :phone_number, class: "form-control"
       .form-group.additional-field
-        = f.label :additional, "Additional", class: "form-label"
+        = f.label :additional, t(".additional"), class: "form-label"
         = f.text_area :additional, class: "form-control"
       .form-group
         = f.label :email, class: "form-label"
         = f.email_field :email, value: current_user&.email, required: true, class: "form-control"
+
       - if @feedback.errors.present?
         .form-group.additional-field
           = f.text_area :body,  class: "form-control", rows: 2, required: true
       - else
         = f.hidden_field :body
+
       = f.hidden_field :feedback_type, value: "lead_for_#{lead_type}"
 
-      = f.submit "Sign up", class: "btn btn-primary btn-lg"
+      = f.submit t(".sign_up"), class: "btn btn-primary btn-lg"
 
-= render partial: '/shared/modal', locals: { title: "Contact us for a free trial", id: "organizationSignupModal", modal_body: modal_body, start_open: @page_errors }
+= render partial: "/shared/modal",
+locals: { title: t(".contact_us_for_trial"), id: "organizationSignupModal", modal_body: modal_body, start_open: @page_errors }

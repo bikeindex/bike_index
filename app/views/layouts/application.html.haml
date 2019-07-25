@@ -1,22 +1,23 @@
 !!!
 %html
-  = render 'shared/header'
-  
+  = render "shared/header"
+
   - body_class = "welcome-page" if current_page?(root_path) and controller_name == "welcome"
   - body_class = "vendor-signup-page" if current_page?(:vendor_signup)
   - body_class = "news-page" if controller_name == "news"
   %body#body{ class: body_class }
-    = render 'layouts/messages'
+    = render "layouts/messages"
     %header.global-header#header
-      = render 'shared/header_nav'
+      = render "shared/header_nav"
 
     %section.content
       .receptacle
         .inner-recep
 
           = yield
-      
-    = render 'shared/footer'
+
+    = render "shared/footer"
+
   :javascript
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

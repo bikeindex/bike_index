@@ -4,7 +4,7 @@
       - if current_organization.display_avatar
         = image_tag current_organization.avatar.url(:medium)
       %h3
-        Admin panel
+        Admin Panel
         %span
           = current_organization.name
 
@@ -29,7 +29,7 @@
         %li
           - if current_organization.paid_for?("show_partial_registrations")
             = active_link "Incomplete registrations", incompletes_organization_bikes_path(current_organization), class: "menu-item"
-          - else
+          - elsif !current_organization.bike_shop?
             %span.disabled-menu-item.menu-item
               Incomplete registrations
         - if current_organization.show_multi_serial?
@@ -43,6 +43,8 @@
           %li
             - bulk_link_name = current_organization.ascend_imports? ? "Ascend Imports" : "Bulk Imports"
             = active_link bulk_link_name, organization_bulk_imports_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
+        - if current_organization.lightspeed_pos?
+          = active_link "Lightspeed Integration Panel", lightspeed_interface_path, class: "menu-item"
         %li.divider-above
           - if current_organization.paid_for?("bike_codes")
             = active_link "Registration stickers", organization_stickers_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
@@ -78,7 +80,33 @@
   - orgcontainer = "container-fluid" if controller_name == "bikes" && action_name == "index" || controller_name == "messages"
   %div{ class: orgcontainer || "container" }
     - if current_organization.law_enforcement_missing_verified_features?
-      .alert.alert-info.mb-4
+      .organization-wide-alert
         %p
           Bike Index provides additional features for verified Law Enforcement organizations. Please contact #{link_to "lily@bikeindex.org", "mailto:lily@bikeindex.org"} to get them enabled.
+    - if current_organization.bike_shop_display_integration_alert?
+      .organization-wide-alert
+        %p
+          Use Lightspeed Retail POS?
+          %ul
+            %li
+              %strong
+                = link_to "Integrate Bike Index with Lightspeed", lightspeed_interface_path, class: ""
+              to automatically register the bikes you sell to your customers.
+            %li
+              Read an full explanation of #{link_to "how the integration works", lightspeed_path}.
+        %p.mt-2
+          Use Ascend?
+          %ul
+            %li
+              %strong
+                = link_to "Integrate Bike Index with Ascend", ascend_path, class: ""
+              to automatically register the bikes you sell to your customers.
+        %p.mt-2
+          Other Point of Sale system?
+          %ul
+            %li
+              Register bikes with our
+              %strong
+                = link_to "streamlined Bike Shop registration page", new_organization_bike_path(organization_id: current_organization.to_param)
+
     = yield

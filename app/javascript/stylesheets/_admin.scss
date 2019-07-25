@@ -4,10 +4,30 @@
 }
 
 .admin-bike-partial {
+  margin: -1.5rem -15px 0;
+  padding: 1.5rem 15px;
+  overflow-x: hidden;
+  background: $gray-900;
+  position: relative;
+  border-bottom: 1px solid #ccc;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    color: #fff;
+  }
+  table {
+    background: #fff;
+  }
   .admin-image-thumb {
+    @include media-breakpoint-up(md) {
+      max-width: 220px;
+    }
     img {
       max-width: 100%;
-      max-height: 110px;
+      width: 180px;
+      height: auto;
     }
     h3 {
       text-align: center;
@@ -26,12 +46,16 @@
   .fancy-select {
     min-width: 300px;
     margin-top: 4px;
+    @include media-breakpoint-down(xs) {
+      min-width: 240px;
+    }
   }
 }
 
 .admin-graphs-list a.active {
   font-weight: bold;
 }
+
 .variable-admin-graphs-form {
   .control-group {
     width: 220px;
@@ -46,6 +70,16 @@
   @extend .row;
   border-bottom: 1px solid $gray-400;
   padding-bottom: 20px;
+  h1 {
+    font-size: 2rem;
+  }
+  h1,
+  h2,
+  h3 {
+    @include media-breakpoint-down(sm) {
+      font-size: 1.5rem;
+    }
+  }
   ul {
     @extend .nav;
     @extend .nav-pills;
@@ -61,6 +95,12 @@
   .subtitle {
     @extend .mt-4;
     @extend .col-12;
+  }
+
+  &.midpage-subnav {
+    border-bottom: none;
+    margin-top: 40px;
+    padding-top: 20px;
   }
 }
 
@@ -121,4 +161,18 @@
 
 .admin-filter-menu {
   float: right;
+}
+
+#recovery-bike-image-text {
+  .using-bike-image {
+    display: none;
+  }
+  &.bike-image-added {
+    .using-bike-image {
+      display: inline-block;
+    }
+    .not-using-bike-image {
+      display: none;
+    }
+  }
 }

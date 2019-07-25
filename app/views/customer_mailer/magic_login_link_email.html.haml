@@ -1,0 +1,13 @@
+%h4{ style: 'margin-bottom: 2em;' }
+  = t(".html.click_the_button")
+
+= link_to t(".html.sign_in"), @url, class: 'binx-button'
+
+%p
+  %em.less-strong
+    = t(".html.only_valid_once")
+
+%hr{ style: 'margin-top: 40px;' }
+
+%p.center-text.less-strong
+  = t(".html.if_you_did_not_request")

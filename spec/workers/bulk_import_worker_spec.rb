@@ -190,7 +190,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike1.phone).to eq("(888) 777-6666")
           expect(bike1.registration_address).to eq default_location_registration_address
           expect(bike1.additional_registration).to be_nil
-          expect(bike1.user_name).to be_nil
+          expect(bike1.owner_name).to be_nil
 
           bike2 = bulk_import.bikes.reorder(:created_at).last
           expect(bike2.primary_frame_color).to eq white
@@ -207,7 +207,7 @@ RSpec.describe BulkImportWorker, type: :job do
           expect(bike2.registration_address).to_not be_present
           expect(bike2.phone).to be_nil
           expect(bike2.additional_registration).to eq "extra serial number"
-          expect(bike2.user_name).to eq "Sally"
+          expect(bike2.owner_name).to eq "Sally"
         end
       end
     end
@@ -317,7 +317,7 @@ RSpec.describe BulkImportWorker, type: :job do
 
           expect(bike.owner_email).to eq row[:owner_email]
           expect(bike.manufacturer).to eq manufacturer
-          expect(bike.serial_number).to eq "absent"
+          expect(bike.serial_number).to eq "unknown"
           expect(bike.frame_model).to eq "Midnight Special"
           expect(bike.primary_frame_color).to eq black
 
@@ -347,10 +347,10 @@ RSpec.describe BulkImportWorker, type: :job do
       let(:non_blank_examples) { %w[somethingna none8xc9x] }
       it "rescues blank serials, doesn't rescue non blank serials" do
         blank_examples.each do |e|
-          expect(instance.rescue_blank_serial(e)).to eq "absent"
+          expect(instance.rescue_blank_serial(e)).to eq "unknown"
         end
         non_blank_examples.each do |e|
-          expect(instance.rescue_blank_serial(e)).to_not eq "absent"
+          expect(instance.rescue_blank_serial(e)).to_not eq "unknown"
         end
       end
     end

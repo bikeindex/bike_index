@@ -1,6 +1,5 @@
-class BikeBookUpdateWorker
-  include Sidekiq::Worker
-  sidekiq_options queue: "high_priority", backtrace: true
+class BikeBookUpdateWorker < ApplicationWorker
+  sidekiq_options queue: "high_priority"
 
   def perform(bike_id)
     bike = Bike.unscoped.where(id: bike_id).first

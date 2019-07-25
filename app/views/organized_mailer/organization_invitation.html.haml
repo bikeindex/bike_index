@@ -1,8 +1,9 @@
-%h1
-  Hello #{@organization_invitation.invitee_name},
-- if @is_new_user
-  %h2
-    Welcome to Bike Index
-%p #{@inviter.display_name} has indicated that you are a member of #{@organization.name}.
+%h1= t(".html.hello", name: @membership.invited_display_name)
 
-= link_to "Join #{@organization.short_name}", new_user_url(email: @vars[:email]), class: 'binx-button'
+- if @is_new_user
+  %h2= t(".html.welcome_to_bike_index")
+
+- if @sender.present?
+  %p= t(".html.you_are_a_member", sender_name: @sender.display_name, org_name: @organization.name)
+
+= link_to t(".html.join_org", org_name: @organization.short_name), new_user_url(email: @vars[:email]), class: 'binx-button'

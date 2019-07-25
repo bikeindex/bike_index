@@ -38,7 +38,7 @@ class RegistrationsController < ApplicationController
   end
 
   def find_selectable_child_organizations
-    return [] unless @organization.present? && ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:select_child_organization])
+    return [] unless @organization.present? && ParamsNormalizer.boolean(params[:select_child_organization])
     @organization.child_organizations
   end
 

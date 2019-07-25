@@ -1,0 +1,24 @@
+.primary-edit-bike-form
+  .form-well-container.container{ class: "edit-bike-page-alert" }
+    .row
+      = render partial: "bikes/edit_primary_menu", locals: { is_disabled: true }
+
+      .col-md-8.form-well
+        .form-wrap
+          .form-well-form-header
+            %h3.text-center.w-100
+              -# 'alert'-prefixed templates should all have the same header and
+              -# highlight the same nav menu item
+              = @edit_templates.select { |k, v| @edit_template.match(/#{k}/) }.values.first
+
+            .row
+              %h3.text-center.w-100= t(".thanks")
+              .col-md-12
+                .copy.text-center
+                  = t(".your_order_is_pending")
+            .row
+              .col-md-12
+                .copy.text-center
+                  = t(".stay_tuned_for_an_update_once_weve_proces")
+
+        = render partial: "theft_alerts_table", locals: { theft_alerts: @theft_alerts }

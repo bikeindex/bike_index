@@ -26,8 +26,13 @@ Rails.application.configure do
 
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.default_url_options = { host: "localhost", port: 3001 }
-  config.action_mailer.delivery_method = :letter_opener
-  config.action_mailer.perform_deliveries = true
+  if Rails.root.join("tmp", "skip-letter_opener.txt").exist?
+    config.action_mailer.perform_deliveries = false
+    config.action_mailer.delivery_method = :smtp
+  else
+    config.action_mailer.perform_deliveries = true
+    config.action_mailer.delivery_method = :letter_opener
+  end
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
@@ -68,7 +73,7 @@ Rails.application.configure do
   end
 
   # Raises error for missing translations
-  # config.action_view.raise_on_missing_translations = true
+  config.action_view.raise_on_missing_translations = true
 
   # Make sure we reload the API after every request!
   @last_api_change = Time.current

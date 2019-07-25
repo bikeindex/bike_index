@@ -1,0 +1,103 @@
+.signup-landing-page.landing-page.signup-landing-page-ambassadors.signup-landing-page-ambassadors-current
+  %header.banner-header
+    .container
+      .row
+        .icon-wrapper
+          = render "landing_pages/icons/header_ambassadors_svg"
+      .row
+        %h1= t(".current_ambassadors")
+        %h3= t(".the_heroes_of_bikedom")
+        %a.btn.btn-primary.btn-lg{ href: new_ambassador_path }
+          = t(".join_their_ranks")
+
+    .ribbon
+      .container
+        .noribbon
+  -# TODO: Un-hardcode this list: Ambassador.all
+  .container.ambassadors-list
+    -# Right now, this looks better with justify-content: center - but
+    -# space-around looks better depending on the item count.
+    .row
+      .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/Steve-Piercy.jpg', alt: 'Steve Piercy'
+        %h2 Steve Piercy
+        %h3 Eugene, OR
+        %h4= t(".why_bike_index")
+        %p= t(".bike_index_helps_people_recover_their_sto")
+
+      .col-md-3.col-xs-6
+        .sponsored-by-block
+          - gears_link = link_to t(".gears"), "https://eugenegears.org/"
+          %p= t(".steve_piercys_ambassadorship_is_sponsored_html", sponsor_link: gears_link)
+          = link_to image_tag('landing_pages/ambassadors/sponsor-GEARs.png', alt: 'Greater Eugene Area Riders', class: "no-clip"), "https://eugenegears.org/"
+
+      .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/StolenBikesEdmonton.png', alt: 'Stolen Bikes Edmonton', class: "no-clip"
+        %h2 Brent Thorvaldson
+        %h3 Edmonton, Alberta
+        %h4= t(".why_bike_index")
+        %p= t(".bike_index_allows_us_to_verify_details_ab")
+
+      .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/Greg-Finnin.jpg', alt: 'Greg Finnin'
+        %h2 Greg Finnin
+        %h3 Culver City, CA
+        %h4= t(".why_bike_index")
+        %p= t(".bike_index_helped_me_recover_my_beloved_b")
+
+      .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/Michelle-Farris.jpg', alt: 'Michelle Farris'
+        %h2 Michelle Farris
+        %h3 Seattle, WA
+        %h4= t(".why_bike_index")
+        %p= t(".educating_kids_about_how_to_lock_their_bi")
+
+      .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/Jason-Cawood.jpg', alt: 'Jason Cawood'
+        %h2 Jason Cawood
+        %h3 Troutdale, OR
+        %h4= t(".why_bike_index")
+        %p= t(".i_believe_community_involvement_makes_a_d")
+
+      .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/David-Saunders.jpg', alt: 'David Saunders'
+        %h2 David Saunders
+        %h3 Buffalo-Niagara, NY
+        %h4= t(".why_bike_index")
+        %p= t(".bike_index_provides_ease_of_use_and_secur")
+
+      .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/Larry-Hager.jpg', alt: 'Larry Hager'
+        %h2 Larry Hager
+        %h3 Leduc, AB, Canada
+        %h4= t(".why_bike_index")
+        %p= t(".if_a_person_loses_their_bike_there_is_suc")
+
+    .row
+      .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/Brock-Howell.jpg', alt: 'Brock Howell'
+        %h2 Brock Howell
+        %h3 Seattle, WA
+        %h4= t(".why_bike_index")
+        %p= t(".as_the_founder_of_bicycle_security_adviso")
+
+      .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/Chris-Olin.jpg', alt: 'Chris Olin'
+        %h2 Chris Olin
+        %h3 Rochester, NY
+        %h4= t(".why_bike_index")
+        %p= t(".bike_index_isnt_the_only_internet_bike_re")
+
+      .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/Dirk-Degroot.jpg', alt: 'Dirk Degroot'
+        %h2 Dirk Degroot
+        %h3 Seattle, WA
+        %h4= t(".why_bike_index")
+        %p= t(".after_a_couple_of_recoveries_i_got_hooked")
+
+      .col-md-3.col-xs-6
+        = image_tag 'landing_pages/ambassadors/placeholder.png', alt: 'This could be you!'
+        %h2= t(".your_name_here")
+        %h3= t(".anytown_earth")
+        %h4= t(".whats_your_story")
+        %p= t(".become_a_bike_index_ambassador_and_help_s")

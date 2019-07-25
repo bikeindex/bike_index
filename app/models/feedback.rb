@@ -19,6 +19,11 @@ class Feedback < ActiveRecord::Base
     where("(feedback_hash->>'bike_id') = ?", bike_id.to_s)
   end
 
+  def self.feedback_types
+    # Quick semi-hack to get a list of types, good enough till it's not ;)
+    @feedback_types ||= pluck("DISTINCT feedback_type").reject(&:blank?)
+  end
+
   def package_size=(val)
     self.feedback_hash = (feedback_hash || {}).merge(package_size: val)
   end

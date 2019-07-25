@@ -24,7 +24,7 @@
         %br
         %small.less-strong
           Used slugs:
-          - PaidFeature::EXPECTED_SLUGS.each do |slug|
+          - PaidFeature::EXPECTED_SLUGS.sort.each do |slug|
             %code
               = slug
     .row

@@ -1,10 +1,15 @@
-
-.row.mb-4
-  .col-lg-10
+.admin-subnav
+  .col-md-6
     %h1
-      #{ link_to @organization.name, admin_organization_path(@organization) } Invoices
-  .col-lg-2
-    = link_to "New Invoice", new_admin_organization_invoice_path(organization_id: @organization.to_param), class: "btn btn-success"
+      %em
+        = @organization.name
+      Invoices
+  .col-md-6
+    %ul
+      %li.nav-item
+        = link_to "New Invoice", new_admin_organization_invoice_path(organization_id: @organization.to_param), class: "nav-link"
+  %p.subtitle
+    View #{link_to @organization.name, admin_organization_path(@organization.to_param)} admin page
 
 = render partial: "/admin/organizations/invoices/table", locals: { invoices: @organization.invoices }
 

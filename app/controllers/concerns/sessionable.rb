@@ -10,7 +10,7 @@ module Sessionable
     if current_user.present?
       return if return_to_if_present # If this returns true, we're returning already
       flash[:success] = "You're already signed in!"
-      redirect_to user_home_url and return
+      redirect_to user_root_url and return
     end
   end
 
@@ -18,7 +18,8 @@ module Sessionable
     session[:last_seen] = Time.current
     session[:render_donation_request] = user.render_donation_request if user&.render_donation_request
     set_passive_organization(user.default_organization) # Set that organization!
-    if ActiveRecord::Type::Boolean.new.type_cast_from_database(params.dig(:session, :remember_me))
+    user.update_last_login(forwarded_ip_address)
+    if ParamsNormalizer.boolean(params.dig(:session, :remember_me))
       cookies.permanent.signed[:auth] = cookie_options(user)
     else
       default_session_set(user)

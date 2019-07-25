@@ -1,7 +1,6 @@
-class EmailAdminContactStolenWorker
-  include Sidekiq::Worker
+class EmailAdminContactStolenWorker < ApplicationWorker
+
   sidekiq_options queue: "notify"
-  sidekiq_options backtrace: true
 
   def perform(customer_contact_id)
     customer_contact = CustomerContact.find(customer_contact_id)

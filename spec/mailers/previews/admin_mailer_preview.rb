@@ -24,4 +24,9 @@ class AdminMailerPreview < ActionMailer::Preview
     bulk_import = BulkImport.ascend.last || BulkImport.last
     AdminMailer.unknown_organization_for_ascend_import(bulk_import)
   end
+
+  def theft_alert_purchased
+    theft_alert = TheftAlert.last
+    AdminMailer.theft_alert_purchased(theft_alert)
+  end
 end

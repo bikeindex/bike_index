@@ -79,7 +79,8 @@
 
   // Search button
   .search-button-wrap {
-    flex: 0 0 16.6%;
+    // Slightly smaller, don't break line on non-retina screens
+    flex: 0 0 16.4%;
     padding-right: 0.9375rem;
   }
 
@@ -181,16 +182,19 @@
     }
 
     &#stolenness_tab_proximity {
-      flex: 0 0 40%;
+      flex: 0 0 35%;
     }
 
     // location info takes up the most space
     &#stolenness_tab_stolen {
-      flex: 0 0 27%;
+      flex: 0 0 22%;
     }
 
     &#stolenness_tab_non {
-      flex: 0 0 33%;
+      flex: 0 0 28%;
+    }
+    &#stolenness_tab_all {
+      flex: 0 0 15%;
     }
 
     // 'Not marked stolen' is longer than 'Stolen anywhere'

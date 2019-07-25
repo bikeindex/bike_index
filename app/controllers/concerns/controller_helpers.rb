@@ -6,9 +6,18 @@ module ControllerHelpers
 
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
-                  :current_organization, :passive_organization, :controller_namespace, :page_id,
+                  :user_root_bike_search?, :current_organization, :passive_organization, :controller_namespace, :page_id,
                   :default_bike_search_path
     before_filter :enable_rack_profiler
+  end
+
+  def append_info_to_payload(payload)
+    super
+    payload[:ip] = forwarded_ip_address
+  end
+
+  def forwarded_ip_address
+    @forwarded_ip_address ||= ForwardedIpAddress.parse(request)
   end
 
   def enable_rack_profiler
@@ -44,15 +53,24 @@ module ControllerHelpers
     end
   end
 
+  def user_root_bike_search?
+    current_user.present? && current_user.default_organization.present? &&
+      current_user.default_organization.law_enforcement?
+  end
+
   def user_root_url
     return root_url unless current_user.present?
     return admin_root_url if current_user.superuser
     return user_home_url(subdomain: false) unless current_user.default_organization.present?
-    organization_root_url(organization_id: current_user.default_organization.to_param)
+    if user_root_bike_search?
+      default_bike_search_path
+    else
+      organization_root_url(organization_id: current_user.default_organization.to_param)
+    end
   end
 
   def default_bike_search_path
-    bikes_path(location: "ip", stolenness: "proximity")
+    bikes_path(stolenness: "all")
   end
 
   # Generally this is implicitly set, via the passed parameters - however! it can also be explicitly set
@@ -78,6 +96,11 @@ module ControllerHelpers
     elsif session[:discourse_redirect]
       redirect_to discourse_authentication_url and return true
     end
+  end
+
+  def translation(key, scope: nil)
+    scope ||= [:controllers, controller_namespace, controller_name, action_name]
+    I18n.t(key, scope: scope.compact)
   end
 
   def controller_namespace

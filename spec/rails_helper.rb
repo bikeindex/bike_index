@@ -40,19 +40,47 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.render_views
 
-  # Add our request spec helpers
+  # include translation / localization methods
+  config.include AbstractController::Translation
+
+  # Add our request/controller spec helpers
   config.include RequestSpecHelpers, type: :request
-  config.include RequestSpecHelpers, type: :controller
+  config.include ControllerSpecHelpers, type: :controller
+  config.include JsonHelpers, type: :controller
+  config.include JsonHelpers, type: :request
+  config.include StripeHelpers, type: :request
+  config.include StripeHelpers, type: :controller
+  config.include StripeHelpers, type: :service
 end
 
 VCR.configure do |config|
   config.cassette_library_dir = "spec/vcr_cassettes"
   config.allow_http_connections_when_no_cassette = true
   config.hook_into :webmock
+  config.configure_rspec_metadata!
+
+  config.default_cassette_options = {
+    record: :new_episodes,
+    match_requests_on: [:method, :host, :path],
+  }
+
+  config.before_record do |i|
+    i.response.headers.delete("Set-Cookie")
+    i.request.headers.delete("Authorization")
+    i.request.headers.delete("X-Stripe-Client-User-Agent")
+  end
 end
 
 RSpec::Sidekiq.configure do |config|
   config.warn_when_jobs_not_processed_by_sidekiq = false
+end
+
+RSpec.configure do |config|
+  config.before(:each) do
+    # Reset feature-flipping between examples
+    # (In test examples, stub Flipper as needed, passing specific args to #with)
+    allow(Flipper).to receive(:enabled?).with(any_args).and_call_original
+  end
 end
 
 # DB Cleaner metadata tags

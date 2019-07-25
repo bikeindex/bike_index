@@ -33,12 +33,18 @@ RSpec.describe Admin::DashboardController, type: :controller do
       end
     end
 
+    describe "scheduled_jobs" do
+      it "renders" do
+        get :scheduled_jobs
+        expect(response.code).to eq "200"
+        expect(response).to render_template(:scheduled_jobs)
+      end
+    end
+
     describe "maintenance" do
       it "renders" do
         FactoryBot.create(:manufacturer, name: "other")
         FactoryBot.create(:ctype, name: "other")
-        user = FactoryBot.create(:admin)
-        set_current_user(user)
         BParam.create(creator_id: user.id)
         get :maintenance
         expect(response.code).to eq "200"
@@ -48,8 +54,6 @@ RSpec.describe Admin::DashboardController, type: :controller do
 
     describe "tsvs" do
       it "renders and assigns tsvs" do
-        user = FactoryBot.create(:admin)
-        set_current_user(user)
         t = Time.current
         FileCacheMaintainer.reset_file_info("current_stolen_bikes.tsv", t)
         # tsvs = [{ filename: 'current_stolen_bikes.tsv', updated_at: t.to_i.to_s, description: 'Approved Stolen bikes' }]
@@ -64,8 +68,6 @@ RSpec.describe Admin::DashboardController, type: :controller do
 
     describe "update_tsv_blacklist" do
       it "renders and updates" do
-        user = FactoryBot.create(:admin)
-        set_current_user(user)
         ids = "\n1\n2\n69\n200\n22222\n\n\n"
         put :update_tsv_blacklist, blacklist: ids
         expect(FileCacheMaintainer.blacklist).to eq([1, 2, 69, 200, 22222].map(&:to_s))

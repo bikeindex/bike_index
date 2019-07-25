@@ -17,8 +17,8 @@
           = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
     .has-no-serial.optional-block
       %label
-        = f.check_box :has_no_serial, tabindex: -1
-        Has no serial
+        = check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1
+        Unknown serial
 
   .input-group.with-additional-block
     .control-group.select-jsonified
@@ -53,7 +53,7 @@
     .control-group.special-select-single
       = f.label :primary_frame_color_id, "Frame color", class: "control-label"
       .controls
-        = collection_select( :bike, :primary_frame_color_id, Color.all, :id, :name, required: true, prompt: "Choose color" )
+        = select(:bike, :primary_frame_color_id, Color.select_options, required: true, prompt: "Choose color")
     %a#add-secondary.optional-form-block{data: {target: "#secondary-color", toggle: "#rm-secondary"}}
       Add a color
     %a#rm-secondary.optional-form-block.rm-block.currently-hidden{data: {target: "#secondary-color", toggle: "#add-secondary"}}
@@ -63,7 +63,7 @@
         %label.control-label
           Secondary color
         .controls
-          = collection_select( :bike, :secondary_frame_color_id, Color.all, :id, :name, prompt: "Choose color" )
+          = select(:bike, :secondary_frame_color_id, Color.select_options, prompt: "Choose color")
       %a#add-tertiary.optional-form-block{data: {target: "#tertiary-color", toggle: "#rm-tertiary"}}
         Add a color
       %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{data: {target: "#tertiary-color", toggle: "#add-tertiary"}}
@@ -73,7 +73,7 @@
         %label.control-label
           Third color
         .controls.special-select-single
-          = collection_select( :bike, :tertiary_frame_color_id, Color.all, :id, :name, prompt: "Choose color" )
+          = select(:bike, :tertiary_frame_color_id, Color.select_options, prompt: "Choose color")
   .input-group
     .control-group
       %label.control-label{ for: 'bike_owner_email' }

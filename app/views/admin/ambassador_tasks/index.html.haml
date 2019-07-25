@@ -1,19 +1,22 @@
-%h1 Ambassador Activities
+.admin-subnav
+  .col-md-4
+    %h1 Ambassador Activities
+  .col-md-8
+    %ul
+      %li.nav-item
+        = link_to "New Activity", new_admin_ambassador_task_path
 
-%p= link_to "New Activity", new_admin_ambassador_task_path
-
-%table.table.table-striped.table-bordered.ambassador-tasks-table
-  %thead.small-header
-    %tr
-      %th Title
-      %th Description
-      %th
-  %tbody
-    - @ambassador_tasks.each do |task|
+.full-screen-table
+  %table.table.table-striped.table-bordered.ambassador-tasks-table
+    %thead.small-header
       %tr
-        %td= task.title
-        %td= task.description_html.html_safe
-        %td
-          %span= link_to "Edit", edit_admin_ambassador_task_path(task)
-          &nbsp;
-          %span= link_to "Delete", admin_ambassador_task_path(task), method: :delete
+        %th Title
+        %th Description
+        %th
+    %tbody
+      - @ambassador_tasks.each do |task|
+        %tr
+          %td= task.title
+          %td= task.description_html.html_safe
+          %td
+            = link_to "Edit", edit_admin_ambassador_task_path(task)

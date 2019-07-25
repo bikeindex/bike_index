@@ -1,4 +1,5 @@
 class Bike < ActiveRecord::Base
+  include Phonifyerable
   include ActiveModel::Dirty
   include BikeSearchable
   mount_uploader :pdf, PdfUploader
@@ -22,11 +23,13 @@ class Bike < ActiveRecord::Base
 
   has_many :bike_organizations, dependent: :destroy
   has_many :organizations, through: :bike_organizations
+  has_many :can_edit_claimed_bike_organizations, -> { can_edit_claimed }, class_name: "BikeOrganization"
+  has_many :can_edit_claimed_organizations, through: :can_edit_claimed_bike_organizations, source: :organization
   has_many :creation_states, dependent: :destroy
   # delegate :creator, to: :creation_state, source: :creator
   # has_one :creation_organization, through: :creation_state, source: :organization
-  has_many :stolen_notifications, dependent: :destroy
-  has_many :stolen_records, dependent: :destroy
+  has_many :stolen_notifications
+  has_many :stolen_records
   has_many :other_listings, dependent: :destroy
   has_many :normalized_serial_segments, dependent: :destroy
   has_many :ownerships, dependent: :destroy
@@ -49,10 +52,9 @@ class Bike < ActiveRecord::Base
   validates_presence_of :creator
   validates_presence_of :manufacturer_id
 
-  validates_uniqueness_of :card_id, allow_nil: true
   validates_presence_of :primary_frame_color_id
 
-  attr_accessor :other_listing_urls, :date_stolen, :receive_notifications,
+  attr_accessor :other_listing_urls, :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
                 :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
                 :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
                 :b_param_id_token, :address, :address_city, :address_state, :address_zipcode
@@ -72,7 +74,7 @@ class Bike < ActiveRecord::Base
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
   scope :organized, -> { where.not(creation_organization_id: nil) }
-  scope :with_serial, -> { where.not(serial_number: ["absent", "unknown"]) }
+  scope :with_known_serial, -> { where.not(serial_number: "unknown") }
   # "Recovered" bikes are bikes that were found and are waiting to be claimed. This is confusing and should be fixed
   # so that it no longer is the same word as stolen recoveries
   scope :non_recovered, -> { where(recovered: false) }
@@ -80,7 +82,7 @@ class Bike < ActiveRecord::Base
   scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 2 }) }
   scope :ascend_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 3 }) }
   scope :any_pos, -> { includes(:creation_states).where.not(creation_states: { pos_kind: 0 }) }
-  scope :not_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 0 }) }
+  scope :no_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 0 }) }
   scope :example, -> { where(example: true) }
   scope :non_example, -> { where(example: false) }
 
@@ -100,19 +102,18 @@ class Bike < ActiveRecord::Base
 
   class << self
     def old_attr_accessible
-      # made_without_serial - GUARANTEE there was no serial
       (%w(manufacturer_id manufacturer_other serial_number
-          serial_normalized has_no_serial made_without_serial additional_registration
+          serial_normalized made_without_serial additional_registration
           creation_organization_id manufacturer year thumb_path name stolen
           current_stolen_record_id recovered frame_material cycle_type frame_model number_of_seats
-          handlebar_type frame_size frame_size_number frame_size_unit
+          handlebar_type handlebar_type_other frame_size frame_size_number frame_size_unit
           rear_tire_narrow front_wheel_size_id rear_wheel_size_id front_tire_narrow
           primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id paint_id paint_name
           propulsion_type zipcode country_id belt_drive
           coaster_brake rear_gear_type_slug rear_gear_type_id front_gear_type_slug front_gear_type_id description owner_email
           timezone date_stolen receive_notifications phone creator creator_id image
           components_attributes b_param_id embeded embeded_extended example hidden
-          card_id stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
+          stock_photo_url pdf send_email other_listing_urls listing_order approved_stolen
           marked_user_hidden marked_user_unhidden b_param_id_token is_for_sale bike_organization_ids
       ).map(&:to_sym) + [stolen_records_attributes: StolenRecord.old_attr_accessible,
                          components_attributes: Component.old_attr_accessible]).freeze
@@ -176,7 +177,7 @@ class Bike < ActiveRecord::Base
 
   def pos_kind; creation_state&.pos_kind end
 
-  def pos?; pos_kind != "not_pos" end
+  def pos?; pos_kind != "no_pos" end
 
   def current_ownership; ownerships.reorder(:created_at).last end
 
@@ -196,23 +197,37 @@ class Bike < ActiveRecord::Base
   # Small helper because we call this a lot
   def type; cycle_type && cycle_type_name.downcase end
 
-  # this should be put somewhere else sometime
-  def serial; serial_number unless recovered end
-
   def user_hidden; hidden && current_ownership&.user_hidden end
 
   def fake_deleted; hidden && !user_hidden end
 
-  # This is for organizations - might be useful for admin as well. We want it to be nil if it isn't present
-  # User - not ownership, because we don't want registrar
-  def user_name
-    return user.name if user&.name.present?
-    # Only grab the name from b_params if it's the first owner - or if no owner, which means testing probably
-    return nil unless current_ownership.blank? || current_ownership&.first?
-    b_params.map(&:user_name).reject(&:blank?).first
+  def serial_display
+    return "Hidden" if recovered
+    return serial_number.humanize if no_serial?
+    serial_number
   end
 
-  def user_name_or_email; user_name || owner_email end
+  # We may eventually remove the boolean. For now, we're just going with it.
+  def made_without_serial?; made_without_serial end
+
+  def serial_unknown?; serial_number == "unknown" end
+
+  def no_serial?; made_without_serial? || serial_unknown? end
+
+  # This is for organizations - might be useful for admin as well. We want it to be nil if it isn't present
+  # User - not ownership, because we don't want registrar
+  def owner_name
+    return user.name if user&.name.present?
+    # Only look deeper for the name if it's the first owner - or if no owner, which means testing probably
+    return nil unless current_ownership.blank? || current_ownership&.first?
+    oname = b_params.map(&:user_name).reject(&:blank?).first
+    return oname if oname.present?
+    # If this bike is unclaimed and was created by an organization member, then we don't have an owner_name
+    return nil if creation_organization.present? && owner&.member_of?(creation_organization)
+    owner&.name
+  end
+
+  def owner_name_or_email; owner_name || owner_email end
 
   def first_ownership; ownerships.reorder(:id).first end
 
@@ -227,14 +242,21 @@ class Bike < ActiveRecord::Base
   # check if this is the first ownership - or if no owner, which means testing probably
   def first_ownership?; current_ownership&.blank? || current_ownership == first_ownership end
 
+  def editable_organizations
+    return organizations if first_ownership? && organized? && !claimed?
+    can_edit_claimed_organizations
+  end
+
   def authorized_by_organization?(u: nil, org: nil)
-    return false unless first_ownership? && organized? && !claimed?
+    editable_organization_ids = editable_organizations.pluck(:id)
+    return false unless editable_organization_ids.any?
     return true unless u.present? || org.present?
-    return creation_organization == org if org.present? && u.blank?
-    # so, we know a user was passed
-    return false if claimable_by?(u) # this is authorized by owner, not organization
-    return organizations.any? { |o| u.member_of?(o) } unless org.present?
-    creation_organization == org && u.member_of?(org)
+    # We have either a org or a user - if no user, we only need to check org
+    return editable_organization_ids.include?(org.id) if u.blank?
+    return false if claimable_by?(u) || u == owner # authorized by owner, not organization
+    # Ensure the user is part of the organization and the organization can edit if passed both
+    return u.member_of?(org) && editable_organization_ids.include?(org.id) if org.present?
+    editable_organizations.any? { |o| u.member_of?(o) }
   end
 
   def first_owner_email; first_ownership.owner_email end
@@ -246,11 +268,11 @@ class Bike < ActiveRecord::Base
 
   def authorized_for_user?(u)
     return true if u == owner || claimable_by?(u)
-    return false if u.blank? || current_ownership&.claimed
+    return false if u.blank?
     authorized_by_organization?(u: u)
   end
 
-  def authorize_for_user!(u)
+  def authorize_and_claim_for_user(u)
     return authorized_for_user?(u) unless claimable_by?(u)
     current_ownership.mark_claimed
     true
@@ -282,12 +304,25 @@ class Bike < ActiveRecord::Base
 
   def phone
     # use @phone because attr_accessor
+    @phone ||= current_stolen_record&.phone
     @phone ||= user&.phone
     # Only grab the phone number from b_params if this is the first_ownership
-    if first_ownership?
-      @phone ||= b_params.map(&:phone).reject(&:blank?).first
-    end
+    @phone ||= b_params.map(&:phone).reject(&:blank?).first if first_ownership?
     @phone
+  end
+
+  def phoneable_by?(passed_user = nil)
+    return false unless phone.present?
+    return true if passed_user&.superuser
+    if current_stolen_record.blank?
+      return false unless contact_owner?(passed_user) # This return false if user isn't present
+      return !passed_user.ambassador? # we aren't giving ambassadors access to phones rn
+    end
+    return true if current_stolen_record.phone_for_everyone
+    return false if passed_user.blank?
+    return true if current_stolen_record.phone_for_shops && passed_user.has_shop_membership?
+    return true if current_stolen_record.phone_for_police && passed_user.has_police_membership?
+    current_stolen_record.phone_for_users
   end
 
   def visible_by(passed_user = nil)
@@ -372,7 +407,8 @@ class Bike < ActiveRecord::Base
   end
 
   def normalize_attributes
-    self.serial_number = SerialNormalizer.unknown_and_absent_corrected(serial)
+    self.serial_number = "made_without_serial" if made_without_serial?
+    self.serial_number = SerialNormalizer.unknown_and_absent_corrected(serial_number)
     self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
     if User.fuzzy_email_find(owner_email)
       self.owner_email = User.fuzzy_email_find(owner_email).email
@@ -437,6 +473,11 @@ class Bike < ActiveRecord::Base
 
   def paint_description
     paint.name.titleize if paint.present?
+  end
+
+  def valid_registration_address_present?
+    return false if registration_address.blank?
+    registration_address["address"].present? && registration_address["city"].present?
   end
 
   def registration_address # Goes along with organization additional_registration_fields

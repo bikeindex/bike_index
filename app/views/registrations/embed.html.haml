@@ -8,7 +8,7 @@
     %span.below-input-help
       Select 'Other' if manufacturer doesn't show up when entered
   .form-group.fancy-select.unfancy
-    = f.collection_select(:primary_frame_color_id, Color.all, :id, :name, required: true, prompt: 'primary frame color', class: 'form-control')
+    = f.select(:primary_frame_color_id, Color.select_options, required: true, prompt: 'primary frame color', class: 'form-control')
   - if @selectable_child_organizations.any?
     .form-group
       = f.collection_select(:creation_organization_id, @selectable_child_organizations, :id, :name, { prompt: "Choose Specific Organization (optional)" }, { required: true, class: "form-control" })

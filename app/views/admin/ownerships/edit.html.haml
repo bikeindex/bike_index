@@ -1,68 +1,60 @@
-#chosen-container
-  %header.with-subtitle
-    %h1
-      Edit ownership
-    %p
-      = link_to "Back to editing bike", edit_admin_bike_path(@bike)
+= render partial: "/admin/bikes/bike", locals: {bike: @bike, target: "show" }
 
-  %ul.bike-boxes
-    = render partial: "/admin/bikes/bike", locals: {bike: @bike, target: "show" }
-  .dl-holder
-    %dl.dl-horizontal
-      = @bike.dl_list_item(@bike.created_at.strftime("%m-%d-%Y"), "Created")
-      = @bike.dl_from_attribute("owner_email")
-      = @bike.dl_list_item(@bike.owner.email, "Current Owner")
-      = @bike.dl_from_attribute("cached_data")
-  %hr
+.admin-subnav.midpage-subnav
+  .col-12
+    %h1 Edit ownership
+.row
+  .col-auto
+    %h2
+      %span.text-danger
+        BE CAREFUL. YOU CAN BREAK STUFF HERE
+.row
+  .col-md-6
+    = form_for [:admin, @ownership], html: { class: "form form-horizontal" } do |f|
+      - if @ownership.errors.any?
+        = render partial: "/shared/errors", locals: { name: "Ownership", obj: @ownership }
+      .form-group
+        = f.label :creator_id
+        = f.email_field :creator_email, value: @ownership.creator.email, required: true, prompt: "Creator's email", class: "form-control"
 
-  %h2
-    %span.table-error
-      BE CAREFUL.
-    YOU CAN BREAK STUFF HERE
-  = form_for [:admin, @ownership], html: { class: "form form-horizontal" } do |f|
-    - if @ownership.errors.any?
-      #alert-block
-        .alert.alert-error
-          %h4
-            Please fix the following
-            = pluralize(@ownership.errors.count, "error")
-          %ul
-            - @ownership.errors.full_messages.each do |msg|
-              %li
-                = msg
-
-
-    .control-group
-      = f.label :current, class: "control-label"
-      .controls
-        = f.check_box :current
-
-    .control-group
-      = f.label :user_hidden, class: "control-label"
-      .controls
-        = f.check_box :user_hidden
-
-    .control-group
-      = f.label :claimed, class: "control-label"
-      .controls
-        = f.check_box :claimed
-
-    .control-group.chosen-select
-      = f.label :creator_id, class: "control-label"
-      .controls
-        = f.email_field :creator_email, value: @ownership.creator.email, required: true, prompt: "Creator's email"
-
-    .control-group.chosen-select
-      = f.label :user_id, class: "control-label"
-      .controls
+      .form-group
+        = f.label :user_id
         - user_email = @ownership.user.present? ? @ownership.user.email : ''
-        = f.email_field :user_email, value: user_email, required: true, prompt: "Owner's email"
+        = f.email_field :user_email, value: user_email, required: true, prompt: "Owner's email", class: "form-control"
+      .form-group
+        = f.label :owner_email
+        = f.text_field :owner_email, required: true, class: "form-control"
 
-    .control-group
-      = f.label :owner_email, class: "control-label"
-      .controls
-        = f.text_field :owner_email, required: true
-
-    .actions
-      .control-group
-        = submit_tag "Update the ownership", class: "button-green"
+      .form-check.form-check-inline
+        = f.check_box :current, class: "form-check-input"
+        = f.label :current, class: "form-check-label"
+      .form-check.form-check-inline
+        = f.check_box :user_hidden, class: "form-check-input"
+        = f.label :user_hidden, class: "form-check-label"
+      .form-check.form-check-inline
+        = f.check_box :claimed, class: "form-check-input"
+        = f.label :claimed, class: "form-check-label"
+      .form-group.mt-4
+        = submit_tag "Update the ownership", class: "btn btn-success"
+  .col-md-6
+    %table.table-list
+      %tr
+        %td
+          Created At
+        %td.convertTime
+          = l @bike.created_at, format: :convert_time
+      %tr
+        %td
+          Owner Email
+        %td
+          = @bike.owner_email
+      %tr
+        %td
+          Current Owner
+        %td
+          = @bike.owner.email
+      %tr
+        %td
+          Cached Data
+        %td
+          = @bike.cached_data

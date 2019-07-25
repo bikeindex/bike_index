@@ -161,14 +161,9 @@ export default class BinxAppOrgMessages {
     // Render the body - whether it says no messages or messages
     $("#messages_table tbody").html(body_html);
     // And localize the times since we added times to the table
-    binxApp.localizeTimes();
+    window.timeParser.localize();
 
     $("#messagesCount .number").text(messages.length);
-    if (messages.length == 1) {
-      $("#messagesCount").removeClass("number-is-plural");
-    } else {
-      $("#messagesCount").addClass("number-is-plural");
-    }
   }
 
   addMarkerPointsForMessages(messages) {

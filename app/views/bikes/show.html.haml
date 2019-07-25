@@ -2,52 +2,53 @@
 
 .container
   - if current_user&.superuser
-    %p.mb-4.text-right
-      = link_to "#{@bike.type.titleize} in Admin", admin_bike_path(@bike.to_param), class: "btn btn-primary uncap"
+    %p.mb-4.text-center
+      = link_to t(".bike_in_admin", bike_type: @bike.type.titleize), admin_bike_path(@bike.to_param), class: "btn btn-outline-info uncap", style: "display: block;"
     - if @bike.user_hidden
       %h2.text-danger.mb-4.text-center
-        HIDDEN by owner
+        = t(".hidden_by_owner")
         %small.less-strong
-          no one but the user (and Bike Index admins) can see it
-  / Authorize check here, even though we're checking in controller too, because otherwise we're displaying user data
+          = t(".no_one_but_the_user_and_bike_index_admins")
+
+  -# Authorize check here, even though we're checking in controller too, because
+  -# otherwise we're displaying user data
   - if current_user.present? && passive_organization.present? && current_user.authorized?(passive_organization)
     = render partial: "organized_access_panel"
   .row
     .col-md-8
       %h1
         - if @bike.stolen
-          - stolen_type = @bike.recovered ? 'recovered' : 'stolen'
           %strong.stolen
-            = "Recovered" if @bike.recovered
-            Stolen
+            = t(".recovered") if @bike.recovered
+            = t(".stolen")
         = @bike.title_u
       - if @bike.stolen && @stolen_record.present?
         %p
           %strong
             - if @bike.recovered
-              Recovered
+              = t(".recovered")
             - else
-              Stolen
+              = t(".stolen")
           %span.convertTime
             = l @stolen_record.date_stolen, format: :convert_time
           %small.convertTimezone
           %strong
-            at
+            = t(".at")
           = @stolen_record.address(skip_default_country: true)
 
       - if @bike.should_show_other_bikes
         %h4
-          = link_to "View user's other registrations", user_path(@bike.owner.username)
+          = link_to t(".view_users_other_registrations"), user_path(@bike.owner.username)
     .col-md-4.ad-col
       .ad-block#top468x60
   .row
-    / Bike Photo!
+    -# Bike Photo!
     .col-md-8
       .bike-photos.horizontal-thumbnails
         - if @bike.public_images.any?
           #selected-photo{ class: "image-holder #{"just1photo" if @bike.public_images.count == 1}" }
             .current-photo{ id: "image#{@bike.public_images.first.id}"}
-              = image_tag(@bike.public_images.first.image_url(:large), alt: "#{@bike.type.titleize} photo", id: "i|#{@bike.public_images.first.listing_order}", data: { action: 'zoom', original: @bike.public_images.first.image_url })
+              = image_tag(@bike.public_images.first.image_url(:large), alt: t(".bike_photo", bike_type: @bike.type.titleize), id: "i|#{@bike.public_images.first.listing_order}", data: { action: "zoom", original: @bike.public_images.first.image_url })
           - if @bike.public_images.count > 1
             %span.thumbnail-shadow
             %span.thumbnail-shadow-r
@@ -67,57 +68,68 @@
         - elsif @bike.stock_photo_url.present?
           #selected-photo.image-holder.just1photo
             %h3.stock-photo
-              Stock photo of a #{@bike.year} #{@bike.frame_model}
-              %em
-                Color may not match!
+              = t(".stock_photo", year: @bike.year, model: @bike.frame_model)
+              %em= t(".color_may_not_match")
             .current-photo#stock_photo_img
-              = image_tag(@bike.stock_photo_url, alt: "#{@bike.type.titleize} photo", id: "i|0", data: {action: 'zoom', original: @bike.stock_photo_url})
+              = image_tag(@bike.stock_photo_url, alt: t(".bike_photo", bike_type: @bike.type.titleize), id: "i|0", data: {action: 'zoom', original: @bike.stock_photo_url})
 
       .show-bike-details
         %ul.attr-list.split-sm
-          = @bike.attr_list_item(@bike.serial_display, 'Serial', with_colon: true)
+          = @bike.attr_list_item(@bike.serial_display, t(".serial"), with_colon: true)
+
           - unless @bike.recovered
-            = @bike.attr_list_item(@bike.additional_registration, "Other serial/registration/sticker", with_colon: true)
+            = @bike.attr_list_item(@bike.additional_registration, t(".other_serial"), with_colon: true)
           - unless @bike.type == 'bike'
-            = @bike.attr_list_item(@bike.type.titleize, 'Cycle type', with_colon: true)
-          = @bike.attr_list_item(@bike.mnfg_name, 'Manufacturer', with_colon: true)
-          = @bike.attr_list_item(@bike.name, 'Name', with_colon: true)
-          = @bike.attr_list_item(@bike.frame_model, 'Model', with_colon: true)
-          = @bike.attr_list_item(@bike.year.to_s, 'Year', with_colon: true)
-          = @bike.attr_list_item(@bike.frame_colors.to_sentence, 'Primary colors', with_colon: true)
-          = @bike.attr_list_item(@bike.frame_size&.upcase, 'Frame size', with_colon: true)
+            = @bike.attr_list_item(@bike.type.titleize, t(".cycle_type"), with_colon: true)
+
+          %li
+            %span.attr-title #{t(".manufacturer")}:
+            -# We want to display the whole manufacturer name here, not just the
+            -# simple name. So only use mnfg_name if it's other (which sanitizes)
+            - if @bike.manufacturer&.name == "Other"
+              = @bike.mnfg_name
+            - else
+              = @bike.manufacturer&.name
+          = @bike.attr_list_item(@bike.name, t(".name"), with_colon: true)
+          = @bike.attr_list_item(@bike.frame_model, t(".model"), with_colon: true)
+          = @bike.attr_list_item(@bike.year.to_s, t(".year"), with_colon: true)
+          = @bike.attr_list_item(@bike.frame_colors.to_sentence, t(".primary_colors"), with_colon: true)
+          = @bike.attr_list_item(@bike.frame_size&.upcase, t(".frame_size"), with_colon: true)
+
           - if @bike.front_wheel_size_id.present?
             - front_tire_width = @bike.front_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
             - if @bike.front_wheel_size_id == @bike.rear_wheel_size_id
-              = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), 'Wheel diameter', with_colon: true)
+              = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), t('.wheel_diameter'), with_colon: true)
             - else
-              = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), 'Front wheel diameter', with_colon: true)
+              = @bike.attr_list_item(@bike.ass_name('front_wheel_size', front_tire_width), t(".front_wheel_diameter"), with_colon: true)
               - rear_tire_width = @bike.rear_tire_narrow ? '(Narrow tire)' : '(Wide tire)'
-              = @bike.attr_list_item(@bike.ass_name('rear_wheel_size', rear_tire_width), 'Rear wheel diameter', with_colon: true)
-          = @bike.attr_list_item(@bike.frame_material_name, 'Frame Material', with_colon: true)
-          = @bike.attr_list_item(@bike.handlebar_type_name, 'Handlebar type', with_colon: true)
+              = @bike.attr_list_item(@bike.ass_name('rear_wheel_size', rear_tire_width), t(".rear_wheel_diameter"), with_colon: true)
+
+          = @bike.attr_list_item(@bike.frame_material_name, t(".frame_material"), with_colon: true)
+          = @bike.attr_list_item(@bike.handlebar_type_name, t(".handlebar_type"), with_colon: true)
         - if @bike.description.present?
           %h3
-            Distinguishing features
+            = t(".distinguishing_features")
           %p
             = @bike.description
         - if @bike.stolen && @stolen_record.present?
           %h3
-            #{@bike.recovered ? 'Recovery' : 'Theft'} Details
+            = t(".theft_details", bike_recovered: @bike.recovered ? 'Recovery' : 'Theft')
           .row
             - if @bike.current_stolen_record.latitude.present?
               = render 'stolen_map'
             .col-md-4
               %ul.attr-list.separate-lines
-                = @bike.attr_list_item(@stolen_record.address(skip_default_country: true), 'Location')
-                = @bike.attr_list_item(@stolen_record.locking_description, 'Locking description')
-                = @bike.attr_list_item(@stolen_record.lock_defeat_description, 'Locking circumvented')
-                = @bike.attr_list_item((l @stolen_record.date_stolen, format: :dotted), "Date #{stolen_type}") # stolen_type defined at start of document
-                = @bike.attr_list_item(@stolen_record.police_report_number, 'Police report #')
-                = @bike.attr_list_item(@stolen_record.police_report_department, 'Department & city')
+                = @bike.attr_list_item(@stolen_record.address(skip_default_country: true), t(".location"))
+                = @bike.attr_list_item(@stolen_record.locking_description, t(".locking_description"))
+                = @bike.attr_list_item(@stolen_record.lock_defeat_description, t(".locking_circumvented"))
+                - stolen_type = @bike.recovered ? 'recovered' : 'stolen'
+                = @bike.attr_list_item((l @stolen_record.date_stolen, format: :dotted), t(".date_stolen_type", stolen_type: stolen_type))
+                = @bike.attr_list_item(@stolen_record.police_report_number, t(".police_report"))
+                = @bike.attr_list_item(@stolen_record.police_report_department, t(".department_city"))
           - if @stolen_record.theft_description.present?
             %h3
-              Description of incident
+              = t(".description_of_incident")
             %p
               = @stolen_record.theft_description
 
@@ -142,58 +154,58 @@
                   %li
                     %span.attr-title
                       - if component.front && component.rear
-                        Front & rear
+                        = t(".front_rear")
                       - elsif component.front
-                        Front
+                        = t(".front")
                       - elsif component.rear
-                        Rear
+                        = t(".rear")
                       - if component.component_type == "unknown"
-                        Other
+                        = t(".other")
                       - else
                         = component.component_type.titleize if component.component_type.present?
                     = component.description
                     - if component.year.present? ||  component.cmodel_name.present? || component.manufacturer.present?
-                      #{component.cmodel_name}
-                      = "#{component.year}" if component.year.present?
-                      (#{component.manufacturer_name})
+                      = t(".componentcmodel_name", componentcmodel_name: component.cmodel_name)
+                      = t(".componentyear", componentyear: component.year) if component.year.present?
+                      = "(#{component.manufacturer_name})"
     .col-md-4
       .social-share-bike
         %h4
           - if @bike.stolen
-            Spread the word!
+            = t(".spread_the_word")
           - else
-            Share it!
-        = render '/shared/share_this'
+            = t(".share_it")
+        = render 'shared/share_this'
       - if @bike.display_contact_owner?(current_user)
         .contact-the-owner
           %p.preface
             %em
-              Know something about this #{@bike.type}?
+              = t(".know_something_about_this_bike_type", bike_type: @bike.type)
           %h3
-            Contact the owner
+            = t(".contact_the_owner")
           - if @bike.recovered
             %p
-              Is this your bike? Send proof of ownership (such as the bike's serial number or a link to a photo of you with the bike)
-          - redirect = new_session_url(return_to: "/bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
+              = t(".is_this_your_bike_send_proof_of_ownership")
+          - redirect = new_session_url(return_to: "bikes/#{@bike.id}?contact_owner=true") unless current_user.present?
           #write_them_a_message.collapse{ class: ("in" unless @contact_owner_open), data: { redirect: redirect } }
             %a.btn.btn-primary.btn-lg{ href: '#new_stolen_message', 'aria-controls' => 'new_stolen_message', 'data-toggle' => 'collapse' }
-              Write them a message
+              = t(".write_them_a_message")
 
           .collapse#new_stolen_message{ class: ("in" if @contact_owner_open) }
             - @stolen_notification ||= StolenNotification.new(bike: @bike)
             = form_for @stolen_notification do |f|
               = f.hidden_field :bike_id, value: @bike.id
-              = f.text_area :message, required: true, placeholder: "Where did you see this #{@bike.type}? If you're contacting about an ad you found online, include a link in the field below", rows: 6, class: "form-control"
-              = f.text_field :reference_url, placeholder: 'Link url', class: "form-control additional-field"
+              = f.text_area :message, required: true, placeholder: t(".where_did_you_see_this_bike", bike_type: @bike.type), rows: 6, class: "form-control"
+              = f.text_field :reference_url, placeholder: t(".link_url"), class: "form-control additional-field"
 
               .send-message
-                = f.submit "Send message", class: 'btn btn-primary btn-lg'
+                = f.submit t(".send_message"), class: 'btn btn-primary btn-lg'
           - if @bike.phoneable_by?(current_user)
             %p.phoneable-by
               %em
-                Or call
+                = t(".or_call")
               %strong
-                Owner's phone number:
-              %a{ href: "tell:#{@stolen_record.phone}" }
+                = t(".owners_phone_number")
+              %a{ href: "tel:#{@stolen_record.phone}" }
                 = @stolen_record.phone_display
       .ad-block#right300x600

@@ -1,59 +1,54 @@
 .mb-4
-  %h1
-    Register bikes from a CSV
+  %h1= t(".register_bikes_from_a_csv")
   %p
     %strong
-      Your CSV <em>must</em> have our required headers.
-    The required headers are <code>manufacturer</code>, <code>model</code> <code>color</code> <code>email</code> and <code>serial</code>.
+      = t(".must_have_required_headers_html")
+    = t(".required_headers_are_html")
 
   %p
-    Look at #{link_to "our example CSV here", "https://raw.githubusercontent.com/bikeindex/bike_index/master/public/import_only_required.csv"}.
+    - link_to_example_csv = link_to t(".our_example_csv_here"), t('.example_csv_url')
+    = t(".look_at_example_csv_html", link_to_example_csv: link_to_example_csv)
 
-  %h5 Notes on successfully importing:
+  %h5= t(".notes_on_successfully_importing")
   %ul
-    %li
-      You must upload a <code>.CSV</code>
-    %li
-      For best results, put quotes around all the cells.
-    %li
-      Your headers must match our headers <em>exactly</em> - for example if you have "serial #" as a header, the import will not work.
-    %li
-      Doing an import for the first time? Try importing a sample of your CSV with just 1 or 2 rows, and replace the email with your own email - so if the bikes don't import correctly, you can make adjustments and delete the bikes, without having to delete a large number of bikes.
+    %li= t(".you_must_upload_a_dot_csv_html")
+    %li= t(".for_best_results")
+    %li= t(".your_headers_must_match_html")
+    %li= t(".doing_an_import")
 
 = form_for @bulk_import, { url: organization_bulk_imports_path(organization_id: current_organization.to_param), action: "create", html: { class: "organized-form" } } do |f|
   .card.col-sm-6
     .card-block
-      = f.label :file, "CSV File with bikes"
+      = f.label :file, t(".csv_file_with_bikes")
       .form-group.row.file-upload-wrapper
         .form-well-input
           %label.file
             = f.file_field :file, class: "avatar-upload-field"
             %span.file-custom
-              %span.file-upload-text Choose file...
+              %span.file-upload-text= t(".choose_file")
 
       .form-group.row
         .form-well-input
-          = f.submit "Upload and begin import", class: "btn btn-secondary btn-lg"
+          = f.submit t(".upload_and_begin_import"), class: "btn btn-secondary btn-lg"
 
 %hr{ style: "margin: 24px 0 48px;" }
 %h5
-  Optional additions:
+  = t(".optional_additions")
 %ul
+  %li= t(".we_support_a_few_additional")
   %li
-    We support a few additional, optional columns. You do not have to include them unless you want to.
+    - link_to_example_csv = link_to(t(".example_csv_link"), t(".example_csv_url"))
+    = t(".view_an_example_csv_html", link_to_example_csv: link_to_example_csv)
+  %li= t(".if_only_some_of_your_bikes_html")
   %li
-    View an #{link_to "example CSV with all optional columns here", "https://github.com/bikeindex/bike_index/blob/master/public/import_all_optional_fields.csv"}.
-  %li
-    If only some of your bikes have values in optional columns, leave the cell blank for the ones that don't have it (rather than putting <em>unknown</em> or <em>n/a</em>).
-  %li
-    If you are including "photo_url" make sure the url is of the image itself. If it's of a webpage with the photo on it, <em>the photo import will not work</em>. Examples:
+    = t(".if_you_are_including_photo_url_html")
     %ul
       %li
-        <span class="text-success">Correct:</span> actual image url
-        %a.small{ href: "https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg", style: "word-wrap: break-word;" }
-          https://upload.wikimedia.org/wikipedia/commons/6/68/Bike_Index_registration_spokecard.jpg
+        = t(".correct_actual_image_url_html")
+        = link_to t(".spokecard_image_url"), style: "word-wrap: break-word;", class: "small"
       %li
-        <span class="text-danger">INCORRECT:</span> image on webpage
-        %a.small{ href: "https://en.wikipedia.org/wiki/Bike_Index#/media/File:Bike_Index_registration_spokecard.jpg", style: "word-wrap: break-word;" }
-          https://en.wikipedia.org/wiki/Bike_Index#/media/File:Bike_Index_registration_spokecard.jpg
-        <em class="text-danger">- this will not work!</em>
+        = t(".incorrect_image_on_webpage_html")
+        = link_to t(".spokecard_page_url"), style: "word-wrap: break-word;", class: "small"
+        %em.text-danger
+          \-
+          = t(".this_will_not_work")

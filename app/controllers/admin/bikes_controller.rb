@@ -2,25 +2,24 @@ class Admin::BikesController < Admin::BaseController
   include SortableTable
   before_filter :find_bike, only: [:edit, :destroy, :update, :get_destroy]
   before_action :set_period, only: [:index]
+  layout "new_admin"
 
   def index
     @page = params[:page] || 1
     per_page = params[:per_page] || 100
-    @render_chart = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:render_chart])
+    @render_chart = ParamsNormalizer.boolean(params[:render_chart])
     @bikes = matching_bikes.includes(:creation_organization, :creation_states, :paint).reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(per_page)
-    render layout: "new_admin"
   end
 
   def missing_manufacturer
     session.delete(:missing_manufacturer_time_order) if params[:reset_view].present?
-    session[:missing_manufacturer_time_order] = ActiveRecord::Type::Boolean.new.type_cast_from_database(params[:time_ordered]) if params[:time_ordered].present?
+    session[:missing_manufacturer_time_order] = ParamsNormalizer.boolean(params[:time_ordered]) if params[:time_ordered].present?
     bikes = Bike.unscoped.where(manufacturer_id: Manufacturer.other.id)
     bikes = bikes.where("manufacturer_other ILIKE ?", "%#{params[:search_other_name]}%") if params[:search_other_name].present?
     bikes = session[:missing_manufacturer_time_order] ? bikes.order("created_at desc") : bikes.order("manufacturer_other ASC")
     page = params[:page] || 1
     per_page = params[:per_page] || 100
     @bikes = bikes.page(page).per(per_page)
-    render layout: "new_admin"
   end
 
   def update_manufacturers
@@ -45,7 +44,6 @@ class Admin::BikesController < Admin::BaseController
     @page = params[:page] || 1
     per_page = params[:per_page] || 25
     @duplicate_groups = duplicate_groups.page(@page).per(per_page)
-    render layout: "new_admin"
   end
 
   def ignore_duplicate_toggle
@@ -65,14 +63,13 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def show
-    redirect_to edit_admin_bike_url
+    redirect_to edit_admin_bike_path
   end
 
   def edit
     @bike = @bike.decorate
     @recoveries = @bike.recovered_records
     @organizations = Organization.all
-    render layout: "new_admin"
   end
 
   def update
@@ -93,7 +90,7 @@ class Admin::BikesController < Admin::BaseController
       flash[:success] = "Bike was successfully updated."
       redirect_to edit_admin_bike_url(@bike) and return
     else
-      render action: "edit", layout: "new_admin"
+      render action: "edit"
     end
   end
 
@@ -157,7 +154,7 @@ class Admin::BikesController < Admin::BaseController
     bikes = bikes.organization(current_organization) if current_organization.present?
     bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email].present?
     bikes = bikes.stolen if params[:search_stolen].present?
-    @pos_search_type = %w[lightspeed_pos ascend_pos any_pos not_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
+    @pos_search_type = %w[lightspeed_pos ascend_pos any_pos no_pos].include?(params[:search_pos]) ? params[:search_pos] : nil
     bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
     bikes = bikes.ascend_pos if params[:search_ascend].present?
     bikes = bikes.lightspeed_pos if params[:search_lightspeed].present?

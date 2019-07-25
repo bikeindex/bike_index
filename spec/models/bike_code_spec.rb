@@ -44,21 +44,65 @@ RSpec.describe BikeCode, type: :model do
     end
   end
 
+  describe "claimed?" do
+    it "is not claimed if bike doesn't exist" do
+      expect(BikeCode.new(bike_id: 12123123).claimed?).to be_falsey
+    end
+  end
+
+  describe "code_integer code_prefix and pretty_lookup" do
+    let(:bike_code) { BikeCode.new(code: "b02012012") }
+    before { bike_code.set_calculated_attributes }
+    it "separates" do
+      expect(bike_code.code_integer).to eq 2012012
+      expect(bike_code.code_prefix).to eq "B"
+      expect(bike_code.pretty_code).to eq("B 201 201 2")
+    end
+    context "0" do
+      let(:bike_code) { BikeCode.new(code: "a00") }
+      it "separates" do
+        expect(bike_code.code_integer).to eq 0
+        expect(bike_code.code_prefix).to eq "A"
+        expect(bike_code.pretty_code).to eq("A 0")
+      end
+    end
+    context "bike_code_batch has a set length" do
+      let(:bike_code) { FactoryBot.create(:bike_code, code: "A0001", bike_code_batch_id: bike_code_batch.id) }
+      let(:bike_code2) { FactoryBot.create(:bike_code, code: "A102", bike_code_batch_id: bike_code_batch.id) }
+      let(:bike_code_batch) { FactoryBot.create(:bike_code_batch, code_number_length: 5) }
+      it "renders the pretty print from the batch length" do
+        expect(bike_code.pretty_code).to eq "A 000 01"
+        expect(bike_code2.pretty_code).to eq "A 001 02"
+        expect(BikeCode.lookup("A 01")).to eq(bike_code)
+        expect(BikeCode.lookup("A 001 02")).to eq(bike_code2)
+      end
+    end
+  end
+
   describe "lookup_with_fallback" do
-    let(:organization1) { FactoryBot.create(:organization, short_name: "BikeIndex") }
-    let(:organization2) { FactoryBot.create(:organization) }
-    let!(:bikecode) { FactoryBot.create(:bike_code, code: "a0010", organization: organization2) }
-    let(:bikecode_duplicate) { FactoryBot.create(:bike_code, code: "a0010", organization: organization1) }
-    let!(:user) { FactoryBot.create(:organization_member, organization: organization2) }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:organization_duplicate) { FactoryBot.create(:organization, short_name: "DuplicateOrg") }
+    let(:organization_no_match) { FactoryBot.create(:organization) }
+    let!(:bike_code_initial) { FactoryBot.create(:bike_code, code: "a0010", organization: organization) }
+    let(:bike_code_duplicate) { FactoryBot.create(:bike_code, code: "a0010", organization: organization_duplicate) }
+    let!(:user) { FactoryBot.create(:organization_member, organization: organization_duplicate) }
     it "looks up, falling back to the orgs for the user, falling back to any org" do
-      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex")).to eq bikecode
-      expect(BikeCode.lookup_with_fallback("0010", organization_id: "bikeindex")).to eq bikecode
-      # It finds the bike_code that exists, even though it doesn't match the organization passed
-      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex", user: nil)).to eq bikecode
-      expect(bikecode_duplicate).to be_present
-      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex", user: nil)).to eq bikecode_duplicate
-      # It finds bike_code that matches the users organizations
-      expect(BikeCode.lookup_with_fallback("a0010", organization_id: "bikeindex", user: user)).to eq bikecode
+      expect(bike_code_duplicate).to be_present # Ensure it's created after initial
+      # It finds the first record in the database
+      expect(BikeCode.lookup_with_fallback("a0010")).to eq bike_code_initial
+      expect(BikeCode.lookup_with_fallback("0010")).to eq bike_code_initial
+      # If there is an organization passed, it finds matching that organization
+      expect(BikeCode.lookup_with_fallback("0010", organization_id: organization_duplicate.name)).to eq bike_code_duplicate
+      expect(BikeCode.lookup_with_fallback("A10", organization_id: "duplicateorg")).to eq bike_code_duplicate
+      # It finds the bike_code that exists, even if it doesn't match the organization passed
+      expect(BikeCode.lookup_with_fallback("a0010", organization_id: organization_no_match.short_name)).to eq bike_code_initial
+      # It finds the bike_code from the user's organization
+      expect(BikeCode.lookup_with_fallback("a0010", user: user)).to eq bike_code_duplicate
+      # It finds bike_code that matches the passed organization - overriding the user organization
+      expect(BikeCode.lookup_with_fallback("a0010", organization_id: organization, user: user)).to eq bike_code_initial
+      # It falls back to the user's organization bike codes if passed an organization that doesn't match any codes, or an org that doesn't exist
+      expect(BikeCode.lookup_with_fallback("A 00 10", organization_id: organization_no_match.id, user: user)).to eq bike_code_duplicate
+      expect(BikeCode.lookup_with_fallback("A 000 10", organization_id: "dfddfdfs", user: user)).to eq bike_code_duplicate
     end
   end
 
@@ -90,15 +134,16 @@ RSpec.describe BikeCode, type: :model do
   describe "claimable_by?" do
     let(:user) { FactoryBot.create(:user) }
     let(:organization) { FactoryBot.create(:organization) }
-    let(:membership) { FactoryBot.create(:membership, user: user, organization: organization) }
+    let(:membership) { FactoryBot.create(:membership_claimed, user: user, organization: organization) }
+    let(:bike) { FactoryBot.create(:bike) }
     before { stub_const("BikeCode::MAX_UNORGANIZED", 1) }
     it "is truthy" do
       expect(BikeCode.new.claimable_by?(user)).to be_truthy
       # Already claimed bikes can't be linked
-      expect(BikeCode.new(bike_id: 1243).claimable_by?(user)).to be_falsey
+      expect(BikeCode.new(bike_id: bike.id).claimable_by?(user)).to be_falsey
     end
     context "user has too many bike_codes" do
-      let!(:bike_code) { FactoryBot.create(:bike_code, user_id: user.id) }
+      let!(:bike_code) { FactoryBot.create(:bike_code_claimed, user_id: user.id, bike: bike) }
       it "has expected values" do
         expect(BikeCode.new.claimable_by?(user)).to be_falsey
         expect(membership).to be_present
@@ -194,9 +239,15 @@ RSpec.describe BikeCode, type: :model do
     context "organized" do
       let(:organization) { FactoryBot.create(:organization) }
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-      let(:bike_code) { FactoryBot.create(:bike_code, bike: bike, organization: organization) }
+      let(:bike_code) { FactoryBot.create(:bike_code, organization: organization) }
       it "permits unclaiming of organized bikes if already claimed" do
+        expect(bike.organizations).to eq([])
+        bike_code.claim(user, bike)
+        bike.reload
         bike_code.reload
+        expect(bike.organizations.pluck(:id)).to eq([organization.id])
+        expect(bike.can_edit_claimed_organizations.pluck(:id)).to eq([])
+        expect(bike_code.claimed?).to be_truthy
         expect(bike_code.errors.full_messages).to_not be_present
         bike_code.claim(user, "\n ")
         expect(bike_code.errors.full_messages).to_not be_present
@@ -217,7 +268,9 @@ RSpec.describe BikeCode, type: :model do
         expect(bike_code.previous_bike_id).to eq bike.id
       end
       context "unclaiming with bikeindex.org url" do
+        let(:bike_code) { FactoryBot.create(:bike_code_claimed, bike: bike, organization: organization) }
         it "adds an error" do
+          expect(bike_code.bike).to eq bike
           # Doesn't permit unclaiming by a bikeindex.org/ url, because that's probably a mistake
           bike_code.claim(user, "www.bikeindex.org/bikes/ ")
           expect(bike_code.errors.full_messages).to be_present
@@ -226,7 +279,7 @@ RSpec.describe BikeCode, type: :model do
       end
 
       context "unorganized" do
-        let(:bike_code) { FactoryBot.create(:bike_code, bike: bike, organization: FactoryBot.create(:organization)) }
+        let(:bike_code) { FactoryBot.create(:bike_code_claimed, bike: bike, organization: FactoryBot.create(:organization)) }
         it "can't unclaim other orgs bikes" do
           bike_code.claim(user, nil)
           expect(bike_code.errors.full_messages).to be_present

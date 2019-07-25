@@ -20,6 +20,7 @@ RSpec.describe OrganizationsController, type: :controller do
   end
 
   describe "create" do
+    include_context :logged_in_as_user
     let(:org_attrs) do
       {
         name: "a new org",
@@ -28,8 +29,6 @@ RSpec.describe OrganizationsController, type: :controller do
     end
     it "creates org, membership, filters approved attrs & redirect to org with current_user" do
       expect(Organization.count).to eq(0)
-      user = FactoryBot.create(:user_confirmed)
-      set_current_user(user)
       post :create, organization: org_attrs
       expect(Organization.count).to eq(1)
       organization = Organization.where(name: "a new org").first
@@ -45,8 +44,6 @@ RSpec.describe OrganizationsController, type: :controller do
     it "creates org, membership, filters approved attrs & redirect to org with current_user and mails" do
       Sidekiq::Testing.inline! do
         expect(Organization.count).to eq(0)
-        user = FactoryBot.create(:user_confirmed)
-        set_current_user(user)
         ActionMailer::Base.deliveries = []
         post :create, organization: org_attrs.merge(kind: "property_management", approved: false, api_access_approved: true)
         expect(ActionMailer::Base.deliveries).not_to be_empty
@@ -64,26 +61,27 @@ RSpec.describe OrganizationsController, type: :controller do
 
     it "Doesn't xss" do
       expect(Organization.count).to eq(0)
-      user = FactoryBot.create(:user_confirmed)
-      set_current_user(user)
       post :create, organization: org_attrs.merge(name: "<script>alert(document.cookie)</script>",
                                                   website: "<script>alert(document.cookie)</script>",
                                                   kind: "cooooooolll_software")
       expect(Organization.count).to eq(1)
+      user.reload
+      expect(user.organizations.count).to eq 1
       organization = Organization.last
       expect(organization.name).not_to eq("<script>alert(document.cookie)</script>")
       expect(organization.website).not_to eq("<script>alert(document.cookie)</script>")
       expect(organization.kind).to eq "other"
     end
 
-    it "prevents creating privileged organization kinds" do
-      user = FactoryBot.create(:user_confirmed)
-      set_current_user(user)
+    context "privileged kinds" do
+      Organization.admin_required_kinds.each do |kind|
+        it "prevents creating privileged #{kind}" do
+          post :create, organization: org_attrs.merge(kind: kind)
 
-      post :create, organization: org_attrs.merge(kind: "ambassador")
-
-      expect(Organization.count).to eq(1)
-      expect(Organization.last.kind).to eq("other")
+          expect(Organization.count).to eq(1)
+          expect(Organization.last.kind).to eq("other")
+        end
+      end
     end
   end
 
@@ -152,28 +150,28 @@ RSpec.describe OrganizationsController, type: :controller do
     end
   end
 
-  describe "connect_lightspeed" do
+  describe "lightspeed_interface" do
     context "with user with organization" do
       include_context :logged_in_as_organization_admin
       it "redirects to posintegration" do
-        get :connect_lightspeed
+        get :lightspeed_interface
         expect(response).to redirect_to "https://posintegration.bikeindex.org"
       end
     end
     context "with user without organization" do
       include_context :logged_in_as_user
       it "redirects to posintegration" do
-        get :connect_lightspeed
+        get :lightspeed_interface
         expect(flash[:info]).to match(/organization/)
         expect(response).to redirect_to new_organization_path
       end
     end
     context "without user" do
       it "redirects to posintegration" do
-        get :connect_lightspeed
+        get :lightspeed_interface
         expect(response).to redirect_to new_user_path
         expect(flash[:info]).to match(/sign up/)
-        expect(session[:return_to]).to eq connect_lightspeed_path
+        expect(session[:return_to]).to eq lightspeed_interface_path
       end
     end
   end

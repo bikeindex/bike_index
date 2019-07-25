@@ -1,96 +1,96 @@
 - if @vars[:new_user]
   %h2{ style: 'margin-bottom: 12px;' }
-    Welcome to Bike Index
+    = t(".html.welcome_to_bike_index")
 
-- if @organization && @organization.mail_snippet_body('welcome').present?
+-# `MailSnippet`s are only available in english for now
+- is_rendering_in_english = I18n.locale == :en
+- if is_rendering_in_english && @organization&.mail_snippet_body('welcome').present?
   = @organization.mail_snippet_body('welcome').html_safe
-
 - else
-  - if @bike.recovered
-    %h1
-      Thanks for adding this #{ @bike.type } you found to Bike Index
-  - elsif @bike.stolen
-    %h1
-      #{ @bike.type } thieves are jerks.
-    %p
-      We're sorry your #{ @bike.type } was stolen.
+  - if @bike.recovered?
+    %h1= t(".html.thanks_for_adding_this_biketype_you_found", biketype: @bike.type )
+  - elsif @bike.stolen?
+    %h1= t(".html.biketype_thieves_are_jerks", biketype: @bike.type )
+    %p= t(".html.were_sorry_your_biketype_was_stolen", biketype: @bike.type )
   - else
     %h1
-      Congrats on registering your #{ @bike.type } with Bike Index #{ "and #{@organization.short_name}" if @organization }
+      - if @organization.present?
+        = t(".html.bike_register_with_bike_index_and_org", biketype: @bike.type, org_name: @organization.short_name)
+      - else
+        = t(".html.bike_register_with_bike_index", biketype: @bike.type)
 
 %p
-  - if @vars[:registered_by_owner]
-    You added a
+  - org_name = @creation_org&.name || @ownership&.creator&.display_name
+  - if @bike.stolen?
+    - bike_type = @bike.recovered? ? t(".html.recovered_biketype", biketype: @bike.type) : t(".html.stolen_biketype", biketype: @bike.type)
   - else
-    %strong
-      = @creation_org.present? ? @creation_org.name : @ownership.creator.display_name
+    - bike_type = @bike.type
 
-    - if @vars[:new_registration]
-      added a
-    - else
-      sent you a
-  - if @bike.stolen? || @bike.recovered
-    = @bike.recovered ? 'recovered/found ' : 'stolen '
-  #{ @bike.type } on Bike Index#{ ' for you' if @vars[:new_registration] && !@vars[:registered_by_owner] }:
+  - if @vars[:registered_by_owner]
+    = t(".html.you_added_a_bike_type_on_bike_index", bike_type: bike_type)
+  - elsif @vars[:new_registration]
+    = t(".html.org_added_a_bike_html", org_name: org_name, bike_type: bike_type)
+  - else
+    = t(".html.org_sent_a_bike_html", org_name: org_name, bike_type: bike_type)
 
 - unless @ownership.claimed
-  %h2
-    You're almost done registering
+  %h2= t(".html.youre_almost_done_registering")
 
-= render partial: '/shared/email_bike_box'
+= render partial: 'shared/email_bike_box'
 
 - if @bike.stolen
   %p
     - if @bike.recovered
-      Hopefully you find the owner soon. #{ link_to "Give us a heads up", edit_bike_url(@bike) } when you do!
+      - edit_bike_link = link_to t(".html.give_us_a_heads_up"), edit_bike_url(@bike)
+      = t(".html.hopefully_you_find_the_owner_html", edit_bike_link: edit_bike_link)
     - else
-      Hopefully you find the #{ @bike.type } soon.
+      = t(".html.hopefully_you_find_the_bike_html", biketype: @bike.type )
       %strong
-        #{ link_to "Mark your bike recovered", edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token) }
-      when you do!
+        - mark_recovered_link = link_to(t(".html.mark_your_bike_recovered"), edit_bike_recovery_url(bike_id: @bike.id, token: @bike.current_stolen_record.find_or_create_recovery_link_token))
+        = t(".html.mark_recovered_link_html", mark_recovered_link: mark_recovered_link)
 
 - if @vars[:donation_message]
   .donate-message
     %h5
-      Please consider #{ link_to 'donating', support_bike_index_url } to Bike Index!
+      - donating_link = link_to t(".html.donating"), support_bike_index_url
+      = t(".html.please_consider_donating_html", donating_link: donating_link)
     %p
-      A donation will #{ link_to 'prioritize your listing', 'https://bikeindex.org/news/get-your-donations-in-this-summer-to-help-bike-index-master-bike-seaso' } and help us get your bike back to you. We're a 501(c)(3) nonprofit and depend on donations to operate
+      - prioritize_link = link_to t(".html.prioritize_your_listing"), news_url('get-your-donations-in-this-summer-to-help-bike-index-master-bike-seaso')
+      = t(".html.a_donation_will_prioritize_html", prioritize_link: prioritize_link)
 
-- unless @ownership.claimed
-  - claim_type = @vars[:registered_by_owner] ? 'Claim the' : 'Confirm this'
-  = link_to "#{claim_type} #{ @bike.type }", bike_url(@bike, email: @vars[:email]), class: 'binx-button'
-  %p
-    Sign up on BikeIndex.org to claim your #{ @bike.type }
-    - if @bike.stolen
-      and edit it, upload photos and add any information that will help people identify your missing bike.
-    - else
-      and edit it, upload photos and make sure you never lose track of your trusty steed!
+- unless @ownership.claimed?
+  - if @vars[:registered_by_owner]
+    = link_to t(".html.claim_the_biketype", biketype: @bike.type), bike_url(@bike, email: @vars[:email]), class: 'binx-button'
+  - else
+    = link_to t(".html.confirm_this_biketype", biketype: @bike.type), bike_url(@bike, email: @vars[:email]), class: 'binx-button'
+
+  - if @bike.stolen?
+    %p= t(".html.sign_up_on_bikeindexorg_to_claim_your_bik", biketype: @bike.type)
+  - else
+    %p= t(".html.sign_up_on_bikeindexorg_to_claim_your_bik", biketype: @bike.type)
 
 - if @organization && @organization.mail_snippet_body("security").present?
   = @organization.mail_snippet_body("security").html_safe
 - else
   - unless @bike.recovered
-    / Just to keep things wrapped up
+    -# Just to keep things wrapped up
     %div
       - unless @vars[:donation_message]
         %hr
-
       %h2
-        Protect your bike by following these locking guidelines.
+        = t(".html.protect_your_bike_by_following_these_lock")
       %ul.binx-bulleted-list
         %li
-          %strong
-            Use a U-Lock.
-          Cable locks should never be used as a primary means of locking a bike in a city.
+          %strong= t(".html.use_a_ulock")
+          = t(".html.cable_locks_should_never_be_used")
         %li
-          Secure both wheels - either with two U-locks, or one U-lock and one heavy duty cable.
+          = t(".html.secure_both_wheels_either_with_two_ulocks")
         %li
-          Before locking, check that what you are locking to can't be easily removed.
+          = t(".html.before_locking_check")
       %p
-        Read more about #{ link_to 'protecting your bike here', protect_your_bike_url }
+        - protecting_your_bike_link = link_to t(".html.protecting_your_bike_here"), protect_your_bike_url
+        = t(".html.read_more_about_protecting_html", link: protecting_your_bike_link)
       .locking-demonstration
-        %img{ alt: 'Correctly locking a bike', src: 'https://files.bikeindex.org/email_assets/locking.gif', title: 'Pink Power U-Locks are a registered trademark of Bike Index, NFP' }
+        %img{ alt: t(".html.correctly_locking_a_bike"), src: 'https://files.bikeindex.org/email_assets/locking.gif', title: t(".html.pink_power_ulocks_tm") }
       %p.center-text
-        %em
-          A correctly locked bike. The frame is locked to the bike rack and both wheels are secured.
-
+        %em= t(".html.a_correctly_locked_bike")

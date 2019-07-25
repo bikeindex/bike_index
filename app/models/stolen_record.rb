@@ -28,6 +28,7 @@ class StolenRecord < ActiveRecord::Base
   belongs_to :state
   belongs_to :creation_organization, class_name: "Organization"
   belongs_to :recovering_user, class_name: "User"
+  has_many :theft_alerts
 
   validates_presence_of :bike
   validates_presence_of :date_stolen
@@ -59,11 +60,14 @@ class StolenRecord < ActiveRecord::Base
   def recovered?; !current? end
 
   # TODO: check based on the ownership of the bike at the time of recovery
-  def recovering_user_owner?; recovering_user.present? && bike.owner == recovering_user end
+  def recovering_user_owner?; recovering_user.present? && bike&.owner == recovering_user end
 
   def pre_recovering_user?; date_recovered.present? && date_recovered < self.class.recovering_user_recording_start end
 
-  def address_override_show_address; address(override_show_address: true) end
+  # Only display if they have put in an address - so that we don't show on initial creation
+  def display_checklist?; address.present? end
+
+  def address_override_show_address; address(skip_default_country: true) end
 
   def address(skip_default_country: false, override_show_address: false)
     country_string = country && country.iso
@@ -87,28 +91,52 @@ class StolenRecord < ActiveRecord::Base
      zipcode].reject(&:blank?).join(",")
   end
 
+  LOCKING_DESCRIPTIONS = [
+    "U-lock",
+    "Two U-locks",
+    "U-lock and cable",
+    "Chain with padlock",
+    "Cable lock",
+    "Heavy duty bicycle security chain",
+    "Not locked",
+    "Other",
+  ].freeze
+
   def self.locking_description
-    ["U-lock", "Two U-locks", "U-lock and cable", "Chain with padlock",
-     "Cable lock", "Heavy duty bicycle security chain", "Not locked", "Other"].freeze
+    LOCKING_DESCRIPTIONS
   end
 
-  def self.locking_description_select
-    locking_description.map { |l| [l, l] }
+  def self.locking_description_select_options
+    normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
+    translation_scope = [:activerecord, :select_options, self.name.underscore]
+
+    locking_description.map do |name|
+      localized_name = I18n.t(normalize.call(name), scope: translation_scope)
+      [localized_name, name]
+    end
   end
+
+  LOCKING_DEFEAT_DESCRIPTIONS = [
+    "Lock was cut, and left at the scene",
+    "Lock was opened, and left unharmed at the scene",
+    "Lock is missing, along with the bike",
+    "Object that bike was locked to was broken, removed, or otherwise compromised",
+    "Other situation, please describe below",
+    "Bike was not locked",
+  ].freeze
 
   def self.locking_defeat_description
-    [
-      "Lock was cut, and left at the scene.",
-      "Lock was opened, and left unharmed at the scene.",
-      "Lock is missing, along with the bike.",
-      "Object that bike was locked to was broken, removed, or otherwise compromised.",
-      "Other situation, please describe below.",
-      "Bike was not locked",
-    ]
+    LOCKING_DEFEAT_DESCRIPTIONS
   end
 
-  def self.locking_defeat_description_select
-    locking_defeat_description.map { |l| [l, l] }
+  def self.locking_defeat_description_select_options
+    normalize = ->(value) { value.to_s.downcase.gsub(/[^[:alnum:]]+/, "_") }
+    translation_scope = [:activerecord, :select_options, self.name.underscore]
+
+    locking_defeat_description.map do |name|
+      localized_name = I18n.t(normalize.call(name), scope: translation_scope)
+      [localized_name, name]
+    end
   end
 
   def set_calculated_attributes
@@ -167,7 +195,7 @@ class StolenRecord < ActiveRecord::Base
     row << "\t"
     row << tsv_col(b.frame_model)
     row << "\t"
-    row << tsv_col(b.serial) unless b.serial == "absent"
+    row << tsv_col(b.serial_display)
     row << "\t"
     row << tsv_col(b.frame_colors.to_sentence)
     row << tsv_col(b.description)
@@ -210,10 +238,7 @@ class StolenRecord < ActiveRecord::Base
 
   def find_or_create_recovery_link_token
     return recovery_link_token if recovery_link_token.present?
-    begin
-      self.recovery_link_token = SecureRandom.urlsafe_base64
-    end while self.class.where(recovery_link_token: recovery_link_token).exists?
-    save
+    update_attributes(recovery_link_token: SecurityTokenizer.new_token)
     recovery_link_token
   end
 end

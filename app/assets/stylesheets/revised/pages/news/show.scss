@@ -1,4 +1,12 @@
 #news_show {
+  .blog-header {
+    h1,
+    h2,
+    h3,
+    h4 {
+      @extend .uncap;
+    }
+  }
   .post-image {
     max-width: 100%;
     max-height: 75%;
@@ -59,43 +67,14 @@
     margin: 1em 0 0 1em;
   }
 
-  .page-content {
-    blockquote {
-      background: $gray-lighter;
-      border-left: 10px solid #ccc;
-      margin: 1.5em 10px 0;
-      padding: 0.5em 10px;
-      quotes: "“" "”" "‘" "’";
-
-      &.beside-float-40 {
-        margin: 0;
-      }
+  .side-by-side-blocks {
+    @extend .row;
+    margin-bottom: 20px;
+    img {
+      max-height: 300%; // Override the max height that is already there
     }
-
-    blockquote:before {
-      color: #ccc;
-      content: open-quote;
-      font-size: 3em;
-      vertical-align: -0.4em;
-      line-height: 0.1em;
-      margin-right: 0.25em;
-    }
-
-    blockquote:after {
-      content: close-quote;
-      color: $gray-lighter;
-      font-size: 4px;
-    }
-
-    blockquote p {
-      display: inline;
-    }
-
-    .blockquote-cite {
-      text-align: right;
-      padding: 0.5em 10px 1em 0;
-      color: $gray;
-      font-weight: 200;
+    & > div {
+      align-self: center !important;
     }
   }
 
@@ -138,5 +117,46 @@
     .next {
       float: right;
     }
+  }
+}
+
+.page-content {
+  blockquote {
+    background: $gray-lighter;
+    border-left: 10px solid #ccc;
+    margin: 1.5em 10px 0;
+    padding: 0.5em 10px;
+    quotes: "“" "”" "‘" "’";
+
+    &.beside-float-40 {
+      margin: 0;
+    }
+  }
+
+  blockquote:before {
+    color: #ccc;
+    content: open-quote;
+    font-size: 3em;
+    vertical-align: -0.4em;
+    line-height: 0.1em;
+    margin-right: 0.25em;
+  }
+
+  blockquote:after {
+    content: close-quote;
+    color: $gray-lighter;
+    font-size: 4px;
+  }
+
+  blockquote p {
+    display: inline;
+  }
+
+  .blockquote-cite {
+    text-align: right;
+    padding: 0 10px 1em 0;
+    line-height: 2em;
+    color: $gray;
+    font-style: italic;
   }
 }
