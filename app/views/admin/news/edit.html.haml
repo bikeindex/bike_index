@@ -105,7 +105,7 @@
     .card-body.bg-light
       %ul.list-unstyled#public_images{ :"data-order-url" => order_public_images_url }
         - if @blog.public_images
-          = render partial: "public_image", collection: @blog.public_images, as: :public_image
+          = render partial: "public_images/admin_public_image", collection: @blog.public_images, as: :public_image
   %section.mt-2
     = render partial: "/public_images/admin_new_form", locals: { imageable_type: 'Blog', admin: true }
 .alert.alert-info.mt-2
