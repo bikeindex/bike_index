@@ -71,7 +71,7 @@ en:
         vendor_terms_of_service: Vendor terms of service
         website: Website
         when_vendor_terms_of_service: When vendor terms of service
-        zipcode: Zipcode
+        zipcode: Postal Code
       ambassador_task:
         ambassador_task_assignments: Ambassador task assignments
         ambassadors: Ambassadors
@@ -168,7 +168,7 @@ en:
         updator: :activerecord.models.updator
         video_embed: Video embed
         year: Year
-        zipcode: Zipcode
+        zipcode: Postal code
       bike_code:
         bike: :activerecord.models.bike
         bike_code_batch: :activerecord.models.bike_code_batch
@@ -381,7 +381,7 @@ en:
         shown: Shown
         state: :activerecord.models.state
         street: Street
-        zipcode: Zipcode
+        zipcode: Postal code
       lock:
         combination: Combination
         has_combination: Has combination
@@ -611,7 +611,7 @@ en:
         theft_description: Theft description
         time: Time
         tsved_at: Tsved at
-        zipcode: Zipcode
+        zipcode: Postal code
       theft_alert:
         begin_at: Begin at
         creator: :activerecord.models.creator
@@ -699,7 +699,7 @@ en:
         vendor_terms_of_service: Vendor terms of service
         website: Website
         when_vendor_terms_of_service: When vendor terms of service
-        zipcode: Zipcode
+        zipcode: Postal code
       user_email:
         confirmation_token: Confirmation token
         email: Email
@@ -934,7 +934,7 @@ en:
         publicly_display_exact_address: Publicly display exact address theft occurred
         state: State
         where_was_it_stolen_type: Where was it %{stolen_type}?
-        zipcode: Zipcode
+        zipcode: Postal code
     bike_show_overlays:
       add_a_picture_of_it: Add a picture of it, so everyone can admire its beauty!
       add_a_picture_so_people_know_what_to_look: Add a picture so people know what
@@ -1013,7 +1013,7 @@ en:
       unsure_or_unknown: Unsure or unknown
       update_serial_number: Update serial number
       updated_serial: Updated serial
-      zipcode: zip code
+      zipcode: Postal code
     edit_drivetrain:
       all_diameters: All diameters
       belt_drive: Belt Drive
@@ -1182,7 +1182,7 @@ en:
       without_serial: This %{bike_type} was made without a serial
       without_serial_number: This %{bike_type} was made without a serial number
       your_full_address_is_required: Your full address is required by %{org_name}
-      zipcode: Zipcode
+      zipcode: Postal code
     organized_access_panel:
       access_panel: Access Panel
       additional_message: Additional message
@@ -3504,7 +3504,7 @@ en:
         remove: Remove
         state: State
         street: Street
-        zipcode: Zipcode
+        zipcode: Postal code
       locations:
         add_location: Add location
         bike_index_partner_map: Bike Index partner map
@@ -4025,7 +4025,7 @@ en:
       resend_confirmation: Resend confirmation
       state: State
       unconfirmed_emails: Unconfirmed emails
-      zipcode: ZIP code
+      zipcode: Postal code
     edit_sharing:
       additional_link: Additional Link
       choose_file: Choose file...

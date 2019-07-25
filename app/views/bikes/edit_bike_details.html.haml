@@ -90,7 +90,7 @@
           .form-group.row.unnested-field.no-divider-row
             = f.label :zipcode, class: 'form-well-label'
             .form-well-input
-              = f.text_field :zipcode, class: 'form-control', placeholder: t(".zipcode")
+              = f.text_field :zipcode, class: 'form-control', required: true, placeholder: t(".zipcode")
 
           = render "shared/form_well_footer_save"
 
