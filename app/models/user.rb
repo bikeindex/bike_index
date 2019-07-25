@@ -152,6 +152,8 @@ class User < ActiveRecord::Base
 
   def paid_org?; organizations.paid.any? end
 
+  def can_impound?; organizations.any? { |o| o.can_impound? } end
+
   def authorized?(obj)
     return true if superuser?
     return obj.authorized_for_user?(self) if obj.is_a?(Bike)

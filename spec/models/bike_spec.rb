@@ -444,7 +444,7 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "authorized_by_organization" do
+  describe "authorized_by_organization?" do
     let(:user) { FactoryBot.create(:user) }
     let(:organization) { FactoryBot.create(:organization) }
     let!(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
@@ -467,6 +467,37 @@ RSpec.describe Bike, type: :model do
       # Also, if passed a user, the user must be a member of the organization that was passed
       expect(bike.authorized_by_organization?(u: FactoryBot.create(:user), org: organization2)).to be_falsey
     end
+  end
+
+  describe "impound" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:organization) { FactoryBot.create(:organization, kind: "bike_depot") }
+    let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+    it "impounds the bike, returns true" do
+      expect(bike.impound(user: user, organization: organization)).to be_truthy
+      bike.reload
+      expect(bike.impounded?).to be_truthy
+    end
+    context "bike impounded by same organization" do
+      let(:user2) { FactoryBot.create(:organization_member, organization: organization) }
+      let!(:impound_record) { FactoryBot.create(:impound_record, user: user2, bike: bike) }
+      it "returns true, doesn't create a new record" do
+        expect(bike.impounded?).to be_truthy
+        expect(bike.impound(user: user, organization: organization)).to be_truthy
+        bike.reload
+        expect(bike.impounded?).to be_truthy
+        expect(bike.impound_records.count).to eq 1
+        expect(bike.impound_records.first.user).to eq user2
+      end
+    end
+    context "passed organization user isn't permitted for" do
+      let(:organization2) { FactoryBot.create(:) }
+      it "raises an error"
+    end
+    context "bike impounded by different organization" do
+      it "raises the error"
+    end
+    context "user not permitted"
   end
 
   describe "display_contact_owner?" do

@@ -39,6 +39,7 @@ class Bike < ActiveRecord::Base
   has_many :b_params, foreign_key: :created_bike_id, dependent: :destroy
   has_many :duplicate_bike_groups, through: :normalized_serial_segments
   has_many :recovered_records, -> { recovered }, class_name: "StolenRecord"
+  has_many :impound_records
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true
@@ -194,6 +195,8 @@ class Bike < ActiveRecord::Base
 
   def stolen_recovery?; recovered_records.any? end
 
+  def impounded?; impound_records.current.any? end
+
   # Small helper because we call this a lot
   def type; cycle_type && cycle_type_name.downcase end
 
@@ -272,10 +275,15 @@ class Bike < ActiveRecord::Base
     authorized_by_organization?(u: u)
   end
 
+  # Going forward, bang methods should raise errors if they fail rather than returning false
   def authorize_for_user!(u)
     return authorized_for_user?(u) unless claimable_by?(u)
     current_ownership.mark_claimed
     true
+  end
+
+  def impound(user: user, organization: nil)
+    bike_impounds.create(user)
   end
 
   def bike_code?(organization_id = nil) # This method only accepts numerical org ids
