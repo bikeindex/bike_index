@@ -515,7 +515,14 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "user not permitted" do
+      let(:user) { FactoryBot.create(:user_confirmed) }
       it "returns with an error" do
+        expect(bike.impounded?).to be_truthy
+        impound_record = bike.impound(user: user, organization: organization2)
+        expect(impound_record).to be_falsey
+        expect(impound_record.errors.full_messages.to_s).to match(/authorized/)
+        bike.reload
+        expect(bike.impound_records.count).to eq 0
       end
     end
   end
