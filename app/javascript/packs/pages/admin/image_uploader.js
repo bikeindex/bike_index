@@ -103,8 +103,8 @@ function BinxAdminImageUploader() {
 
     ensureCorrectTemplate() {
       if (location.href.match(/organizations/)) {
-        $(".index-image-select").hide()
-        $(".image-delete-button").hide()
+        $(".index-image-select").addClass("d-none")
+        $(".image-delete-button").addClass("d-none")
       }
     }
   };
