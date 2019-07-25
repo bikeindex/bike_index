@@ -9,19 +9,21 @@
       .form-group
         = snippet.label :body, "#{snippet.object.name.titleize} snippet"
         = snippet.text_area :body, placeholder: snippet_description, rows: 10, class: "form-control"
-      .form-check
-        %label
-          = snippet.check_box :is_enabled, class: "form-check-input"
-          Enable
-          %strong
-            #{@edit_template.titleize} snippet
-          %em
-            only possible if there is content
-
-    = f.submit 'Save', class: 'btn btn-success float-right'
+      .row
+        .col-md-6
+          .form-check
+            %label
+              = snippet.check_box :is_enabled, class: "form-check-input"
+              Enable
+              %strong
+                #{@edit_template.titleize} snippet
+              %em
+                only possible if there is content
+        .col-md-6
+          = f.submit 'Save', class: 'btn btn-success float-right'
   .mt-4
 
-%ul.list-unstyled#public_images{ :"data-order-url" => order_public_images_url }
+%ul.list-unstyled#public_images.mt-4{ :"data-order-url" => order_public_images_url }
   - if @mail_snippet.public_images
     = render partial: 'public_images/admin_public_image', collection: @mail_snippet.public_images, as: :public_image, locals: { skip_order: true }
 %section.custom-layouts
