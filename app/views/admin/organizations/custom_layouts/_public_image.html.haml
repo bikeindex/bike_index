@@ -1,0 +1,18 @@
+.card.bg-light.admin-public-image
+  .card-body
+    .row
+      .col-md-2.col-sm-6.mt-auto
+        %p
+          = public_image.name.truncate(18)
+      .col-md-8.col-sm-6.mt-auto
+        .form-group
+          %textarea.form-control
+            \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
+      .col-md-2.col-sm-12
+        .img-box
+          = image_tag(public_image.image_url(:small)) if public_image.image?
+    %hr
+    .row
+      .col-md-8
+        %p
+          %span Copy the above text and paste it where you'd like it to appear
