@@ -15,7 +15,13 @@ class ImpoundRecord < ActiveRecord::Base
   def retrieved?; !current? end
 
   def user_authorized
-    return true if id.present?
+    return true if id.present? # Already authorized, doesn't matter if still is
+    # return true if user.present? && user.can_impound? && organization.present? &&
+    #                user.authorized?(organization) && organization.can_impound?
+    if user.present? && organization.present? && user.can_impound?
+      return true if user.authorized?(organization) && organization.can_impound?
+    end
+    errors.add(:user_id, :user_not_authorized)
   end
 
   def mark_retrieved

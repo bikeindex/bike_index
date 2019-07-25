@@ -17,26 +17,53 @@ RSpec.describe ImpoundRecord, type: :model do
       expect(impound_record.organization).to eq organization
       expect(impound_record.user).to eq user
       expect(impound_record.current?).to be_truthy
-
-      new_impound_record = bike.impound(user: user)
-      bike.reload
-      expect(bike.impound_records.count).to eq 1
-      expect(new_impound_record.errors.full_messages.join).to match(/already impounded/)
     end
-    context "user not authorized" do
-      let(:organization) { FactoryBot.create(:organization, kind: "bike_shop") }
+    context "bike already impounded" do
+      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
+      it "errors" do
+        bike.reload
+        expect(bike.impounded?).to be_truthy
+        expect(bike.impound_records.count).to eq 1
+        new_impound_record = bike.impound(user: user)
+        bike.reload
+        expect(bike.impound_records.count).to eq 1
+        expect(new_impound_record.errors.full_messages.join).to match(/already/)
+        expect(bike.impounded?).to be_truthy
+      end
+    end
+    context "unauthorized" do
+      let(:organization2) { FactoryBot.create(:organization, kind: "bike_shop") }
+      let(:user2) { FactoryBot.create(:organization_member, organization: organization2) }
       it "does not impound" do
-        expect(organization.can_impound?).to be_truthy
-        expect(user.can_impound?).to be_falsey
+        expect(organization2.can_impound?).to be_falsey
+        expect(user2.can_impound?).to be_falsey
+        expect(user.can_impound?).to be_truthy
         expect(bike.impounded?).to be_falsey
-        impound_record = bike.impound_records.create(user: user, bike: bike, organization: organization)
+        # authorized user, unauthorized organization
+        impound_record = bike.impound_records.create(user: user, bike: bike, organization: organization2)
         bike.reload
         expect(bike.impounded?).to be_falsey
-        expect(impound_record.errors.full_messages).to match(/authorized/)
+        expect(impound_record.errors.full_messages.to_s).to match(/permission/)
+        # unauthorized user, authorized organization
+        impound_record = bike.impound_records.create(user: user2, bike: bike, organization: organization)
+        bike.reload
+        expect(bike.impounded?).to be_falsey
+        expect(impound_record.errors.full_messages.to_s).to match(/permission/)
+        # unauthorized user, no org
+        impound_record = bike.impound(user: user2)
+        bike.reload
+        expect(bike.impounded?).to be_falsey
+        expect(impound_record.errors.full_messages.to_s).to match(/permission/)
+        # no user
+        impound_record = bike.impound_records.create(organization: organization)
+        bike.reload
+        expect(bike.impounded?).to be_falsey
+        expect(impound_record.errors.full_messages.to_s).to be_present
+        expect(impound_record.errors.full_messages.to_s).to match(/permission/)
       end
     end
     context "user loses authorization" do
-      let!(:impound_record) { FactoryBot.create(:impound_record, user: user, bike: bike) }
+      let!(:impound_record) { FactoryBot.create(:impound_record, user: user, bike: bike, organization: organization) }
       it "record is still valid and updateable" do
         expect(bike.impounded?).to be_truthy
         user.memberships.first.destroy
@@ -50,7 +77,12 @@ RSpec.describe ImpoundRecord, type: :model do
     end
     context "retrieved bike" do
       let(:retrieved_at) { Time.current - 1.minute }
-      let!(:impound_record) { FactoryBot.create(:impound_record, user: user, bike: bike, retrieved_at: retrieved_at) }
+      let!(:impound_record) do
+        FactoryBot.create(:impound_record, user: user,
+                                           bike: bike,
+                                           organization: organization,
+                                           retrieved_at: retrieved_at)
+      end
       it "re-retrieving doesn't alter time, can be re-impounded" do
         impound_record.mark_retrieved
         impound_record.reload
