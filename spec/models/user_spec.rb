@@ -634,8 +634,20 @@ RSpec.describe User, type: :model do
     end
     context "member of organization" do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:organization_child) { FactoryBot.create(:organization, parent_organization: organization) }
+      let!(:user_child) { FactoryBot.create(:organization_member, organization: organization_child) }
       it "returns true" do
+        organization.reload
+        expect(organization.child_organizations).to eq([organization_child])
         expect(user.member_of?(organization)).to be_truthy
+        expect(user.member_of?(organization_child)).to be_falsey
+        expect(user.authorized?(organization)).to be_truthy
+        expect(user.authorized?(organization_child)).to be_falsey
+        # And also check child
+        expect(user_child.member_of?(organization)).to be_falsey
+        expect(user_child.member_of?(organization_child)).to be_truthy
+        expect(user_child.authorized?(organization)).to be_falsey
+        expect(user_child.authorized?(organization_child)).to be_truthy
       end
     end
     context "superadmin" do

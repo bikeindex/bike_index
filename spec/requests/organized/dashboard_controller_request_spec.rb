@@ -38,4 +38,12 @@ RSpec.describe Organized::BaseController, type: :request do
       end
     end
   end
+
+  describe "/dashboard" do
+    include_context :request_spec_logged_in_as_organization_member
+    it "renders" do
+      get "/o/#{current_organization.to_param}/dashboard"
+      expect(response).to render_template(:index)
+    end
+  end
 end
