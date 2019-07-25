@@ -15,12 +15,15 @@ RSpec.describe BikeCodeBatch, type: :model do
     let(:bike_code_batch) { FactoryBot.create(:bike_code_batch, prefix: "XD", code_number_length: nil, organization: organization) }
     let(:target_codes) { %w[XD9999 XD10000 XD10001] }
     it "create_codes works and derives last code" do
+      bike_code_batch.update_column :updated_at, Time.current - 1.hour
+      expect(bike_code_batch.updated_at).to be < Time.current - 50.minutes
       expect(bike_code_batch.code_number_length_or_default).to eq 4
       expect(bike_code_batch.bike_codes.count).to eq 0
       expect do
         bike_code_batch.create_codes(3, initial_code_integer: 9999)
       end.to change(BikeCode, :count).by 3
       bike_code_batch.reload
+      expect(bike_code_batch.updated_at).to be_within(1.second).of Time.current
       expect(bike_code_batch.bike_codes.count).to eq 3
       expect(bike_code_batch.bike_codes.sticker.count).to eq 3
       expect(organization.bike_codes.count).to eq 3

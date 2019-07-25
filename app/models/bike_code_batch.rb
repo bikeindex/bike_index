@@ -18,7 +18,7 @@ class BikeCodeBatch < ActiveRecord::Base
                          kind: kind,
                          code: prefix + code_integer_with_padding)
     end
-    update_attributes(updated_at: Time.current) # Bump
+    touch # Bump
   end
 
   def code_number_length_or_default
