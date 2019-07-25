@@ -202,7 +202,8 @@ CREATE TABLE public.bike_code_batches (
     notes text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    code_number_length integer
+    code_number_length integer,
+    prefix character varying
 );
 
 
@@ -4386,4 +4387,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190709011902');
 INSERT INTO schema_migrations (version) VALUES ('20190710203715');
 
 INSERT INTO schema_migrations (version) VALUES ('20190710230727');
+
+INSERT INTO schema_migrations (version) VALUES ('20190725172835');
 
