@@ -7,7 +7,7 @@
     new_organization_export_path(organization_id: current_organization.to_param),
     class: "btn btn-secondary pull-right"
 
-  .table-responsive.mt-4
+  .full-screen-table.mt-4
     %p{ style: "margin-bottom: 0;" }
       %strong
         = pluralize(number_with_delimiter(@exports.total_count), t(".export"))

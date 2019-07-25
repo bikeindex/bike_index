@@ -24,13 +24,17 @@ RSpec.describe PaidFeature, type: :model do
     it "inherits from the parent organization, not other way around" do
       invoice.update_attributes(paid_feature_ids: [paid_feature.id])
       invoice2.update_attributes(paid_feature_ids: [paid_feature2.id])
-      organization.update_attributes(updated_at: Time.current)
       organization_child.update_attributes(updated_at: Time.current)
+      organization.update_attributes(updated_at: Time.current)
       organization.reload
       organization_child.reload
       expect(organization.kind).to eq "law_enforcement"
       expect(organization_child.kind).to eq "bike_shop"
-      expect(organization.paid_feature_slugs).to eq %w[bike_codes]
+      expect(organization.paid_feature_slugs).to eq %w[bike_codes child_organizations]
+      expect(organization_child.paid_feature_slugs).to eq %w[bike_codes bike_search]
+      # Just to make sure it doesn't get child_organizations # TODO: Rails 5 update - after_commit
+      organization_child.update_attributes(updated_at: Time.current)
+      organization_child.reload
       expect(organization_child.paid_feature_slugs).to eq %w[bike_codes bike_search]
     end
   end

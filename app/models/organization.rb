@@ -63,6 +63,7 @@ class Organization < ActiveRecord::Base
   scope :bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications]) }
 
   before_validation :set_calculated_attributes
+  after_commit :update_associations
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
 
@@ -111,6 +112,8 @@ class Organization < ActiveRecord::Base
   def remaining_invitation_count; available_invitation_count - sent_invitation_count end
 
   def ascend_imports?; ascend_name.present? end
+
+  def parent?; paid_for?("child_organizations") end
 
   def mail_snippet_body(type)
     return nil unless MailSnippet.organization_snippet_types.include?(type)
@@ -186,7 +189,7 @@ class Organization < ActiveRecord::Base
     self.is_paid = current_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
-    self.paid_feature_slugs = current_invoices.feature_slugs
+    self.paid_feature_slugs = calculated_paid_feature_slugs
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, "")
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
@@ -197,7 +200,7 @@ class Organization < ActiveRecord::Base
       end
       self.slug = new_slug
     end
-    generate_access_token unless self.access_token.present?
+    self.access_token ||= SecurityTokenizer.new_token
     set_auto_user
     set_ambassador_organization_defaults if ambassador?
     locations.each { |l| l.save unless l.shown == allowed_show }
@@ -270,13 +273,16 @@ class Organization < ActiveRecord::Base
     is_suspended?
   end
 
-  def generate_access_token
-    begin
-      self.access_token = SecureRandom.hex
-    end while self.class.exists?(access_token: access_token)
+  def update_associations
+    parent_organization&.update_attributes(updated_at: Time.now)
   end
 
   private
+
+  def calculated_paid_feature_slugs
+    slugs = current_invoices.feature_slugs
+    child_ids.any? ? slugs + ["child_organizations"] : slugs
+  end
 
   def set_ambassador_organization_defaults
     self.show_on_map = false
