@@ -10,7 +10,6 @@ class PublicImagesController < ApplicationController
   end
 
   def create
-    pp params
     @public_image = PublicImage.new(permitted_parameters)
     if params[:bike_id].present?
       @public_image.imageable = @bike
@@ -98,7 +97,6 @@ class PublicImagesController < ApplicationController
     if params[:upload_plugin] == "uppy"
       { image: params[:file], name: params[:name] }
     else
-      pp params
       params.require(:public_image).permit(:image, :name, :imageable, :listing_order, :remote_image_url, :is_private)
     end
   end

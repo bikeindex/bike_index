@@ -93,12 +93,26 @@ RSpec.describe PublicImagesController, type: :controller do
     end
     context "mail_snippet" do
       let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
+      let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
       context "admin authorized" do
         include_context :logged_in_as_super_admin
         it "creates an image" do
-          post :create, mail_snippet_id: mail_snippet.to_param, public_image: { name: "cool name" }, format: :js
+          post :create, mail_snippet_id: mail_snippet.to_param, public_image: { name: "cool name", image: file }, format: :js
           mail_snippet.reload
           expect(mail_snippet.public_images.first.name).to eq "cool name"
+        end
+        context "sent from uppy" do
+          it "creates an image" do
+            user = FactoryBot.create(:admin)
+            set_current_user(user)
+            post :create, mail_snippet_id: mail_snippet.id, upload_plugin: "uppy", name: "cool name", image: file, format: :js
+            public_image = PublicImage.last
+            expect(JSON.parse(response.body)).to be_present
+            mail_snippet.reload
+            expect(mail_snippet.public_images).not_to be_empty
+            expect(mail_snippet.public_images.first.name).to eq "cool name"
+            expect(public_image.imageable).to eq(mail_snippet)
+          end
         end
       end
       context "not signed in" do

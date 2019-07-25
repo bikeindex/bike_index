@@ -17,7 +17,6 @@ window.Form = require("@uppy/form")
 
 
 function BinxAdminBlogs() {
-  log.debug("hey)")
   return {
     init() {
       this.editDate()
