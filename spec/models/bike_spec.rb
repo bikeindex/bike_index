@@ -283,7 +283,7 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "authorize_for_user!, authorized_for_user?" do
+  describe "authorize_and_claim_for_user, authorized_for_user?" do
     let(:bike) { ownership.bike }
     let(:creator) { ownership.creator }
     let(:user) { FactoryBot.create(:user) }
@@ -293,19 +293,19 @@ RSpec.describe Bike, type: :model do
       context "no user" do
         it "returns false" do
           expect(bike.authorized_for_user?(nil)).to be_falsey
-          expect(bike.authorize_for_user!(nil)).to be_falsey
+          expect(bike.authorize_and_claim_for_user(nil)).to be_falsey
         end
       end
       context "unauthorized" do
         it "returns false" do
           expect(bike.authorized_for_user?(user)).to be_falsey
-          expect(bike.authorize_for_user!(user)).to be_falsey
+          expect(bike.authorize_and_claim_for_user(user)).to be_falsey
         end
       end
       context "creator" do
         it "returns true" do
           expect(bike.authorized_for_user?(creator)).to be_truthy
-          expect(bike.authorize_for_user!(creator)).to be_truthy
+          expect(bike.authorize_and_claim_for_user(creator)).to be_truthy
         end
       end
       context "claimed" do
@@ -315,8 +315,8 @@ RSpec.describe Bike, type: :model do
           expect(bike.claimed?).to be_truthy
           expect(bike.authorized_for_user?(creator)).to be_falsey
           expect(bike.authorized_for_user?(user)).to be_truthy
-          expect(bike.authorize_for_user!(creator)).to be_falsey
-          expect(bike.authorize_for_user!(user)).to be_truthy
+          expect(bike.authorize_and_claim_for_user(creator)).to be_falsey
+          expect(bike.authorize_and_claim_for_user(user)).to be_truthy
         end
       end
       context "claimable_by?" do
@@ -325,11 +325,11 @@ RSpec.describe Bike, type: :model do
           expect(ownership.claimed?).to be_falsey
           expect(bike.claimed?).to be_falsey
           expect(ownership.owner).to eq creator
-          expect(bike.authorize_for_user!(creator)).to be_truthy
+          expect(bike.authorize_and_claim_for_user(creator)).to be_truthy
           expect(bike.authorized_for_user?(user)).to be_truthy
-          expect(bike.authorize_for_user!(user)).to be_truthy
+          expect(bike.authorize_and_claim_for_user(user)).to be_truthy
           expect(bike.claimed?).to be_truthy
-          expect(bike.authorize_for_user!(creator)).to be_falsey
+          expect(bike.authorize_and_claim_for_user(creator)).to be_falsey
           ownership.reload
           expect(ownership.owner).to eq user
           expect(bike.ownerships.count).to eq 1
@@ -353,8 +353,8 @@ RSpec.describe Bike, type: :model do
         expect(bike.creation_organization).to eq organization
         expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
         expect(bike.claimed?).to be_falsey
-        expect(bike.authorize_for_user!(member)).to be_truthy
-        expect(bike.authorize_for_user!(member)).to be_truthy
+        expect(bike.authorize_and_claim_for_user(member)).to be_truthy
+        expect(bike.authorize_and_claim_for_user(member)).to be_truthy
         expect(bike.claimed?).to be_falsey
         # And test authorized_by_organization?
         expect(bike.authorized_by_organization?).to be_truthy
@@ -377,9 +377,9 @@ RSpec.describe Bike, type: :model do
         expect(bike.authorized_by_organization?(u: user, org: organization)).to be_falsey
         expect(bike.authorized_by_organization?(org: Organization.new)).to be_falsey
         expect(bike.authorized_for_user?(user)).to be_falsey
-        expect(bike.authorize_for_user!(user)).to be_falsey
+        expect(bike.authorize_and_claim_for_user(user)).to be_falsey
         # Also test the post-claim authorization
-        bike.authorize_for_user!(owner)
+        bike.authorize_and_claim_for_user(owner)
         expect(bike.authorized_for_user?(owner)).to be_truthy
         expect(bike.authorized_by_organization?(u: owner)).to be_falsey # Also doesn't work for user if bike is claimed
       end
@@ -423,7 +423,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.ownerships.count).to eq 2
           expect(bike.authorized_by_organization?).to be_falsey
           expect(bike.authorized_for_user?(member)).to be_falsey
-          expect(bike.authorize_for_user!(member)).to be_falsey
+          expect(bike.authorize_and_claim_for_user(member)).to be_falsey
           expect(bike.claimed?).to be_falsey
         end
         context "can_edit_claimed true" do
@@ -436,7 +436,7 @@ RSpec.describe Bike, type: :model do
             expect(bike.authorized_by_organization?).to be_truthy
             expect(bike.authorized_by_organization?(org: organization)).to be_truthy
             expect(bike.authorized_for_user?(member)).to be_truthy
-            expect(bike.authorize_for_user!(member)).to be_truthy
+            expect(bike.authorize_and_claim_for_user(member)).to be_truthy
             expect(bike.claimed?).to be_falsey
           end
         end
