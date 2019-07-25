@@ -72,6 +72,8 @@ bin/rake prepare_translations
 
 before pushing to GitHub. This will normalize translation file formatting and check for missing or unused keys.
 
+To update the keys on translation.io, run `bin/rake translation:sync` (requires having an active API key locally).
+
 ## Testing
 
 We use [RSpec](https://github.com/rspec/rspec) and
