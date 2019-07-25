@@ -56,7 +56,6 @@ function BinxAdminImageUploader() {
       })
       uppy.on('upload-success', (file, response) => {
         $("ul#public_images").append(this.publicImageTemplate(response.body.public_image))
-        this.ensureCorrectTemplate();
       })
     },
 
@@ -99,13 +98,6 @@ function BinxAdminImageUploader() {
           </div>
         </div>
       </li>`
-    },
-
-    ensureCorrectTemplate() {
-      if (location.href.match(/organizations/)) {
-        $(".index-image-select").addClass("d-none")
-        $(".image-delete-button").addClass("d-none")
-      }
     }
   };
 }

@@ -23,7 +23,7 @@
           = f.submit 'Save', class: 'btn btn-success float-right'
   .mt-4
 
-%ul.list-unstyled#public_images.mt-4{ :"data-order-url" => order_public_images_url }
+%ul.list-unstyled#public_images.mt-4.not-blog-public-images{ :"data-order-url" => order_public_images_url }
   - if @mail_snippet.public_images
     = render partial: 'public_images/admin_public_image', collection: @mail_snippet.public_images, as: :public_image, locals: { skip_order: true }
 %section.custom-layouts

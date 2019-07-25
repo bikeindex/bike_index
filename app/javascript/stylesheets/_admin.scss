@@ -191,3 +191,12 @@
     }
   }
 }
+
+.not-blog-public-images {
+  .image-delete-button {
+    display: none;
+  }
+  .index-image-select {
+    display: none;
+  }
+}
