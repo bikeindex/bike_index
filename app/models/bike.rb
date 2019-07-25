@@ -275,8 +275,7 @@ class Bike < ActiveRecord::Base
     authorized_by_organization?(u: u)
   end
 
-  # Going forward, bang methods should raise errors if they fail rather than returning false
-  def authorize_for_user!(u)
+  def authorize_and_claim_for_user(u)
     return authorized_for_user?(u) unless claimable_by?(u)
     current_ownership.mark_claimed
     true

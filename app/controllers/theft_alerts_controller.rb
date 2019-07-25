@@ -34,7 +34,7 @@ class TheftAlertsController < ApplicationController
   def ensure_user_allowed_to_create_theft_alert
     @bike = Bike.find_by(id: params[:bike_id])
     @current_ownership = @bike&.current_ownership
-    return true if @bike&.authorize_for_user!(current_user)
+    return true if @bike&.authorize_and_claim_for_user(current_user)
 
     flash[:error] = "You don't have permission to do that. Please contact support."
     redirect_to bikes_url and return
