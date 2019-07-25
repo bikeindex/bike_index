@@ -10,6 +10,6 @@
 // Because somewhere, there is overflow hidden and it cuts off the bottom of the save button
 %ul.list-unstyled#public_images.mt-4{ :"data-order-url" => order_public_images_url }
   - if @organization.public_images
-    = render partial: 'public_image', collection: @organization.public_images, as: :public_image, locals: { skip_order: true }
+    = render partial: 'public_images/admin_public_image', collection: @organization.public_images, as: :public_image, locals: { skip_order: true }
 %section.custom-layouts
   = render partial: 'public_images/admin_new_form', locals: { imageable_type: 'Organization' }

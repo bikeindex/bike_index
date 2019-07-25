@@ -10,7 +10,6 @@
           - if public_image.imageable_type != 'Blog'
             %textarea.form-control
               \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
-            }
           - else
             %textarea.form-control
               \&lt;img class="post-image" src="#{public_image.image_url}" alt="ENTER YOUR TEXT HERE"&gt;
@@ -20,7 +19,8 @@
       %hr
       .row.mt-2
         .col-md-2
-          = link_to "Delete", public_image_url(public_image, return_url: edit_admin_news_url(@blog)), method: :delete
+          - if public_image.imageable_type == 'Blog'
+            = link_to "Delete", public_image_url(public_image, return_url: edit_admin_news_url(@blog)), method: :delete
         .col-md-8
           %p
             %span
