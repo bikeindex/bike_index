@@ -173,6 +173,8 @@ nl:
               invalid_uri: moet een geldige URI zijn.
               relative_uri: moet een absolute URI zijn.
               secured_uri: moet een HTTPS/SSL URI zijn.
+        impound_record:
+          user_not_authorized: heeft geen toestemming om deze fiets in beslag te nemen
     attributes:
       doorkeeper/application:
         name: Naam
