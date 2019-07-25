@@ -1,0 +1,24 @@
+.organized-page-header.mb-4
+  %h1
+    %em= current_organization.name
+    Dashboard
+
+- if current_organization.parent?
+  %h3.mt-4
+    Associated organizations
+  .full-screen-table.mt-4
+    %table.table.table-striped.table-bordered.table-sm
+      %thead
+        %th Organization
+        %th Signed up
+        %th Bikes
+      %tbody
+        - current_organization.child_organizations.each do |organization|
+          %tr
+            %td
+              = organization.name
+            %td
+              %span.convertTime
+                = l(organization.created_at, format: :convert_time)
+            %td
+              = number_with_delimiter(organization.bikes.count)

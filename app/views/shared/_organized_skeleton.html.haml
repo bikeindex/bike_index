@@ -69,6 +69,9 @@
             %span.disabled-menu-item.menu-item
               GeoMessaging
         - if current_user.admin_of?(current_organization) || current_user.superuser?
+          - if current_organization.parent?
+            %li
+              = active_link "#{current_organization.short_name} dashboard", organization_dashboard_index_path(organization_id: current_organization.to_param), class: "menu-item"
           %li.divider-above
             = active_link "Users", organization_users_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
           %li
