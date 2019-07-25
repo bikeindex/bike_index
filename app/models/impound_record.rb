@@ -16,11 +16,8 @@ class ImpoundRecord < ActiveRecord::Base
 
   def user_authorized
     return true if id.present? # Already authorized, doesn't matter if still is
-    # return true if user.present? && user.can_impound? && organization.present? &&
-    #                user.authorized?(organization) && organization.can_impound?
-    if user.present? && organization.present? && user.can_impound?
-      return true if user.authorized?(organization) && organization.can_impound?
-    end
+    return true if user.present? && user.can_impound? && organization.present? &&
+                   user.authorized?(organization) && organization.can_impound?
     errors.add(:user_id, :user_not_authorized)
   end
 
