@@ -480,7 +480,7 @@ RSpec.describe Bike, type: :model do
     end
     context "bike impounded by same organization" do
       let(:user2) { FactoryBot.create(:organization_member, organization: organization) }
-      let!(:impound_record) { FactoryBot.create(:impound_record, user: user2, bike: bike) }
+      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike, user: user2, organization: organization) }
       it "returns true, doesn't create a new record" do
         expect(bike.impounded?).to be_truthy
         expect(bike.impound(user: user, organization: organization)).to be_truthy
@@ -493,10 +493,9 @@ RSpec.describe Bike, type: :model do
     context "passed organization user isn't permitted for" do
       let(:organization2) { FactoryBot.create(:organization, kind: "bike_depot") }
       it "returns with an error" do
-        expect(bike.impounded?).to be_truthy
         impound_record = bike.impound(user: user, organization: organization2)
-        expect(impound_record).to be_falsey
-        expect(impound_record.errors.full_messages.to_s).to match(/authorized/)
+        expect(impound_record.valid?).to be_falsey
+        expect(impound_record.errors.full_messages.to_s).to match(/permission/)
         bike.reload
         expect(bike.impound_records.count).to eq 0
       end
@@ -504,11 +503,12 @@ RSpec.describe Bike, type: :model do
     context "bike impounded by different organization" do
       let(:organization2) { FactoryBot.create(:organization, kind: "bike_depot") }
       let(:user2) { FactoryBot.create(:organization_member, organization: organization2) }
-      let!(:impound_record) { FactoryBot.create(:impound_record, user: user2, bike: bike) }
+      let!(:impound_record) { bike.impound(user: user2) }
       it "returns with an error" do
+        expect(impound_record.organization).to eq organization2
         expect(bike.impounded?).to be_truthy
-        impound_record2 = bike.impound(user: user, organization: organization2)
-        expect(impound_record2).to be_falsey
+        impound_record2 = bike.impound(user: user, organization: organization)
+        expect(impound_record2.valid?).to be_falsey
         expect(impound_record2.errors.full_messages.to_s).to match(/already/)
         bike.reload
         expect(bike.impound_records.count).to eq 1
@@ -517,10 +517,9 @@ RSpec.describe Bike, type: :model do
     context "user not permitted" do
       let(:user) { FactoryBot.create(:user_confirmed) }
       it "returns with an error" do
-        expect(bike.impounded?).to be_truthy
-        impound_record = bike.impound(user: user, organization: organization2)
-        expect(impound_record).to be_falsey
-        expect(impound_record.errors.full_messages.to_s).to match(/authorized/)
+        impound_record = bike.impound(user: user, organization: organization)
+        expect(impound_record.valid?).to be_falsey
+        expect(impound_record.errors.full_messages.to_s).to match(/permission/)
         bike.reload
         expect(bike.impound_records.count).to eq 0
       end
