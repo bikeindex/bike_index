@@ -47,23 +47,17 @@
                   - if bike_code_batch.organization.present?
                     = link_to bike_code_batch.organization.name, admin_bike_codes_path(organization_id: bike_code_batch.organization_id)
                 %td
-                  %small
-                    = number_with_delimiter(bike_code_batch.bike_codes.count)
+                  %small= number_with_delimiter(bike_code_batch.bike_codes.count)
                 %td
-                  %small
-                    = number_with_delimiter(bike_code_batch.bike_codes.claimed.count)
+                  %small= number_with_delimiter(bike_code_batch.bike_codes.claimed.count)
                 %td
-                  %small
-                    = bike_code_batch.prefix
+                  %small= bike_code_batch.prefix
                 %td
-                  %small
-                    = number_with_delimiter(bike_code_batch.min_code_integer)
+                  %small= number_with_delimiter(bike_code_batch.min_code_integer)
                 %td
-                  %small
-                    = number_with_delimiter(bike_code_batch.max_code_integer)
+                  %small= number_with_delimiter(bike_code_batch.max_code_integer)
                 %td
-                  %small
-                    = bike_code_batch.notes
+                  %small= bike_code_batch.notes
 
 .row
   .col-md-6
@@ -112,18 +106,12 @@
 .full-screen-table
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.small-header
-      %th
-        = sortable "created_at"
-      %th
-        = sortable "organization_id"
-      %th
-        = sortable "bike_code_batch_id", "Batch"
-      %th
-        Linked
-      %th
-        Bike
-      %th
-        = sortable "code_integer", "Code #"
+      %th= sortable "created_at"
+      %th= sortable "organization_id"
+      %th= sortable "bike_code_batch_id", "Batch"
+      %th Linked
+      %th Bike
+      %th= sortable "code_integer", "Code #"
     %tbody
       - @bike_codes.each do |bike_code|
         %tr

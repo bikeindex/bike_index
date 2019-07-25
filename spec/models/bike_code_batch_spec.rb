@@ -39,7 +39,7 @@ RSpec.describe BikeCodeBatch, type: :model do
       end.to change(BikeCode, :count).by 1
       expect(bike_code_batch.bike_codes.pluck(:code)).to match_array(target_codes + %w[XD10002 XD10003])
 
-      # It can do earlier numbers too. If doing so, it left pads accordingly
+      # It can do earlier numbers too. If doing so, it pads accordingly
       expect do
         bike_code_batch.create_codes(1, initial_code_integer: 12)
       end.to change(BikeCode, :count).by 1
