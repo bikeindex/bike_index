@@ -473,7 +473,7 @@ RSpec.describe Bike, type: :model do
     let(:bike) { FactoryBot.create(:bike) }
     let(:organization) { FactoryBot.create(:organization, kind: "bike_depot") }
     let(:user) { FactoryBot.create(:organization_member, organization: organization) }
-    it "impounds the bike, returns true" do
+    it "impounds the bike, returns record" do
       expect(bike.impound(user: user, organization: organization)).to be_truthy
       bike.reload
       expect(bike.impounded?).to be_truthy
@@ -491,13 +491,33 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "passed organization user isn't permitted for" do
-      let(:organization2) { FactoryBot.create(:) }
-      it "raises an error"
+      let(:organization2) { FactoryBot.create(:organization, kind: "bike_depot") }
+      it "returns with an error" do
+        expect(bike.impounded?).to be_truthy
+        impound_record = bike.impound(user: user, organization: organization2)
+        expect(impound_record).to be_falsey
+        expect(impound_record.errors.full_messages.to_s).to match(/authorized/)
+        bike.reload
+        expect(bike.impound_records.count).to eq 0
+      end
     end
     context "bike impounded by different organization" do
-      it "raises the error"
+      let(:organization2) { FactoryBot.create(:organization, kind: "bike_depot") }
+      let(:user2) { FactoryBot.create(:organization_member, organization: organization2) }
+      let!(:impound_record) { FactoryBot.create(:impound_record, user: user2, bike: bike) }
+      it "returns with an error" do
+        expect(bike.impounded?).to be_truthy
+        impound_record2 = bike.impound(user: user, organization: organization2)
+        expect(impound_record2).to be_falsey
+        expect(impound_record2.errors.full_messages.to_s).to match(/already/)
+        bike.reload
+        expect(bike.impound_records.count).to eq 1
+      end
     end
-    context "user not permitted"
+    context "user not permitted" do
+      it "returns with an error" do
+      end
+    end
   end
 
   describe "display_contact_owner?" do
