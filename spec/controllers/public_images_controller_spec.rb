@@ -126,6 +126,19 @@ RSpec.describe PublicImagesController, type: :controller do
     end
   end
   describe "destroy" do
+    let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
+    context "mail_snippet" do
+      it "cannot be deleted" do
+        user = FactoryBot.create(:admin)
+        set_current_user(user)
+        public_image = FactoryBot.create(:public_image, imageable_type: "MailSnippet", imageable: mail_snippet)
+        public_image.reload
+        expect do
+          delete :destroy, id: public_image.id
+        end.not_to change(PublicImage, :count)
+        expect(flash).to be_present
+      end
+    end
     context "with owner" do
       it "allows the destroy of public_image" do
         user = FactoryBot.create(:user_confirmed)

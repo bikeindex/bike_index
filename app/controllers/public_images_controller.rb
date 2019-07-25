@@ -25,7 +25,7 @@ class PublicImagesController < ApplicationController
         @public_image.imageable = current_organization
       end
       @public_image.save
-      render json: { public_image: @public_image} and return
+      render json: { public_image: @public_image } and return
     end
     flash[:error] = "Whoops! We can't let you create that image."
     redirect_to @public_image.present? ? @public_image.imageable : user_root_url
@@ -51,6 +51,10 @@ class PublicImagesController < ApplicationController
     @imageable = @public_image.imageable
     imageable_id = @public_image.imageable_id
     imageable_type = @public_image.imageable_type
+    if imageable_type == "MailSnippet"
+      flash[:error] = "Whoops! How'd you do that? Can't delete mail snippet images."
+      redirect_to admin_organization_custom_layouts_path(imageable_id) and return
+    end
     @public_image.destroy
     flash[:success] = "Image was successfully deleted"
     if params[:page].present?
@@ -88,7 +92,7 @@ class PublicImagesController < ApplicationController
   def current_user_image_owner(public_image)
     if public_image.imageable_type == "Bike"
       Bike.unscoped.find(public_image.imageable_id).owner == current_user
-    elsif public_image.imageable_type == "Blog"
+    elsif public_image.imageable_type == "Blog" || public_image.imageable_type == "MailSnippet"
       current_user && current_user.superuser?
     end
   end
