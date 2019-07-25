@@ -3,6 +3,8 @@ class BikeCodeBatch < ActiveRecord::Base
   belongs_to :organization
   has_many :bike_codes
 
+  def min_code_integer; bike_codes.minimum(:code_integer) || 0 end
+
   def max_code_integer; bike_codes.maximum(:code_integer) || 0 end
 
   def create_codes(number_to_create, initial_code_integer: nil, kind: "sticker")
@@ -16,6 +18,7 @@ class BikeCodeBatch < ActiveRecord::Base
                          kind: kind,
                          code: prefix + code_integer_with_padding)
     end
+    update_attributes(updated_at: Time.current) # Bump
   end
 
   def code_number_length_or_default

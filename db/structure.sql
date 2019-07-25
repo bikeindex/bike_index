@@ -929,41 +929,6 @@ ALTER SEQUENCE public.front_gear_types_id_seq OWNED BY public.front_gear_types.i
 
 
 --
--- Name: impound_records; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.impound_records (
-    id integer NOT NULL,
-    bike_id integer,
-    user_id integer,
-    organization_id integer,
-    retrieved_at timestamp without time zone,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: impound_records_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.impound_records_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: impound_records_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.impound_records_id_seq OWNED BY public.impound_records.id;
-
-
---
 -- Name: integrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2438,13 +2403,6 @@ ALTER TABLE ONLY public.front_gear_types ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- Name: impound_records id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.impound_records ALTER COLUMN id SET DEFAULT nextval('public.impound_records_id_seq'::regclass);
-
-
---
 -- Name: integrations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2857,14 +2815,6 @@ ALTER TABLE ONLY public.flipper_gates
 
 ALTER TABLE ONLY public.front_gear_types
     ADD CONSTRAINT front_gear_types_pkey PRIMARY KEY (id);
-
-
---
--- Name: impound_records impound_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.impound_records
-    ADD CONSTRAINT impound_records_pkey PRIMARY KEY (id);
 
 
 --
@@ -4437,8 +4387,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190709011902');
 INSERT INTO schema_migrations (version) VALUES ('20190710203715');
 
 INSERT INTO schema_migrations (version) VALUES ('20190710230727');
-
-INSERT INTO schema_migrations (version) VALUES ('20190725141309');
 
 INSERT INTO schema_migrations (version) VALUES ('20190725172835');
 
