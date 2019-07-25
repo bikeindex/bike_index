@@ -6,6 +6,8 @@ import BinxAdminBikesEdit from "./bikes_edit.js";
 import BinxAdminRecoveryDisplayForm from "./recovery_display_form.js";
 import BinxAdminInvoices from "./invoices.js";
 import BinxAdminOrganizationForm from "./organization_form.js";
+import BinxAdminBlogs from "./blogs.js"
+import BinxAdminImageUploader from "./image_uploader.js"
 
 function BinxAdmin() {
   return {
@@ -47,6 +49,15 @@ function BinxAdmin() {
 
       if ($("#multi-mnfg-selector").length) {
         this.bikesMultiManufacturerUpdate();
+      }
+
+      if ($("#blog-image-form").length > 0) {
+        const binxAdminBlogs = BinxAdminBlogs();
+        binxAdminBlogs.init();
+      }
+      if ($(".uppy").length > 0) {
+        const binxAdminImageUploader = BinxAdminImageUploader();
+        binxAdminImageUploader.init();
       }
     },
 

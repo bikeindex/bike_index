@@ -27,20 +27,45 @@ RSpec.describe PublicImagesController, type: :controller do
     end
     context "blog" do
       let(:blog) { FactoryBot.create(:blog) }
+      let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
       context "admin authorized" do
         it "creates an image" do
           user = FactoryBot.create(:admin)
           set_current_user(user)
-          post :create, blog_id: blog.id, public_image: { name: "cool name" }, format: :js
+          post :create, blog_id: blog.id, public_image: { name: "cool name", image: file }, format: :js
+          expect(JSON.parse(response.body)).to be_present
           blog.reload
           expect(blog.public_images.first.name).to eq "cool name"
+        end
+        context "sent from uppy" do
+          it "creates an image" do
+            user = FactoryBot.create(:admin)
+            set_current_user(user)
+            post :create, blog_id: blog.id, upload_plugin: "uppy", name: "cool name", image: file, format: :js
+            public_image = PublicImage.last
+            expect(JSON.parse(response.body)).to be_present
+            blog.reload
+            expect(blog.public_images).not_to be_empty
+            expect(blog.public_images.first.name).to eq "cool name"
+            expect(public_image.imageable).to eq(blog)
+          end
+        end
+        context "blog_id not given" do
+          it "creates an image" do
+            user = FactoryBot.create(:admin)
+            set_current_user(user)
+            expect do
+              post :create, blog_id: "", public_image: { name: "cool name", image: file }, format: :js
+            end.to change(PublicImage, :count).by 1
+            expect(JSON.parse(response.body)).to be_present
+          end
         end
       end
       context "not admin" do
         it "does not create an image" do
           set_current_user(FactoryBot.create(:user_confirmed))
           expect do
-            post :create, blog_id: blog.id, public_image: { name: "cool name" }, format: :js
+            post :create, blog_id: blog.id, public_image: { name: "cool name", image: file }, format: :js
             expect(response.code).to eq("401")
           end.to change(PublicImage, :count).by 0
         end
@@ -68,12 +93,26 @@ RSpec.describe PublicImagesController, type: :controller do
     end
     context "mail_snippet" do
       let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
+      let(:file) { Rack::Test::UploadedFile.new(File.open(File.join(Rails.root, "/spec/fixtures/bike.jpg"))) }
       context "admin authorized" do
         include_context :logged_in_as_super_admin
         it "creates an image" do
-          post :create, mail_snippet_id: mail_snippet.to_param, public_image: { name: "cool name" }, format: :js
+          post :create, mail_snippet_id: mail_snippet.to_param, public_image: { name: "cool name", image: file }, format: :js
           mail_snippet.reload
           expect(mail_snippet.public_images.first.name).to eq "cool name"
+        end
+        context "sent from uppy" do
+          it "creates an image" do
+            user = FactoryBot.create(:admin)
+            set_current_user(user)
+            post :create, mail_snippet_id: mail_snippet.id, upload_plugin: "uppy", name: "cool name", image: file, format: :js
+            public_image = PublicImage.last
+            expect(JSON.parse(response.body)).to be_present
+            mail_snippet.reload
+            expect(mail_snippet.public_images).not_to be_empty
+            expect(mail_snippet.public_images.first.name).to eq "cool name"
+            expect(public_image.imageable).to eq(mail_snippet)
+          end
         end
       end
       context "not signed in" do
@@ -87,6 +126,19 @@ RSpec.describe PublicImagesController, type: :controller do
     end
   end
   describe "destroy" do
+    let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
+    context "mail_snippet" do
+      it "rejects the destroy" do
+        user = FactoryBot.create(:admin)
+        set_current_user(user)
+        public_image = FactoryBot.create(:public_image, imageable_type: "MailSnippet", imageable: mail_snippet)
+        public_image.reload
+        expect do
+          delete :destroy, id: public_image.id
+        end.not_to change(PublicImage, :count)
+        expect(flash).to be_present
+      end
+    end
     context "with owner" do
       it "allows the destroy of public_image" do
         user = FactoryBot.create(:user_confirmed)
