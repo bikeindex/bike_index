@@ -6,7 +6,6 @@ class Admin::UsersController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     @users = matching_users.reorder("users.#{sort_column} #{sort_direction}").page(page).per(per_page)
-    render layout: "new_admin"
   end
 
   def show

@@ -38,6 +38,9 @@ class Admin::OrganizationsController < Admin::BaseController
     if @organization.update_attributes(permitted_parameters)
       flash[:success] = "Organization Saved!"
       redirect_to admin_organization_url(@organization)
+    else
+      render action: :edit
+    end
   end
 
   def create
@@ -46,6 +49,9 @@ class Admin::OrganizationsController < Admin::BaseController
     if @organization.save
       flash[:success] = "Organization Created!"
       redirect_to edit_admin_organization_url(@organization)
+    else
+      render action: :create
+    end
   end
 
   def destroy
