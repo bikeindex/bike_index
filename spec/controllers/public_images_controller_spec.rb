@@ -128,7 +128,7 @@ RSpec.describe PublicImagesController, type: :controller do
   describe "destroy" do
     let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
     context "mail_snippet" do
-      it "cannot be deleted" do
+      it "rejects the destroy" do
         user = FactoryBot.create(:admin)
         set_current_user(user)
         public_image = FactoryBot.create(:public_image, imageable_type: "MailSnippet", imageable: mail_snippet)
