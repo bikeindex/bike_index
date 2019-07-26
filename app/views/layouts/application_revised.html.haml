@@ -35,6 +35,9 @@
                 %li
                   = active_link t(".discuss"), "https://discuss.bikeindex.org", class: "nav-link"
               - else
+                - if passive_organization.parent?
+                  %li
+                    = active_link "#{passive_organization.short_name} dashboard", organization_dashboard_index_path(organization_id: passive_organization.to_param), class: "nav-link"
                 %li
                   = active_link t(".org_bikes", org_name: passive_organization.short_name), organization_bikes_path(organization_id: passive_organization.to_param), class: "nav-link"
                 %li
