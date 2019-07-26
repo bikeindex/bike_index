@@ -197,6 +197,39 @@ RSpec.describe BikeCode, type: :model do
     end
   end
 
+  describe "authorized?" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
+    let(:ownership) { FactoryBot.create(:ownership) }
+    let(:bike) { ownership.bike }
+    let(:owner) { ownership.creator }
+    let(:bike_code_user) { FactoryBot.create(:user_confirmed) }
+    let(:admin) { User.new(superuser: true) }
+    let(:rando) { FactoryBot.create(:user_confirmed) }
+    let!(:bike_code) { FactoryBot.create(:bike_code_claimed, bike: bike, organization: organization, user: bike_code_user) }
+    it "is truthy for admins and org members and code claimer" do
+      # Sanity Check organization authorizations
+      expect(bike_code_user.authorized?(organization)).to be_falsey
+      expect(owner.authorized?(organization)).to be_falsey
+      expect(organization_member.authorized?(organization)).to be_truthy
+      expect(admin.authorized?(organization)).to be_truthy
+      expect(rando.authorized?(organization)).to be_falsey
+      # Sanity check bike authorizations
+      expect(bike.authorized_for_user?(bike_code_user)).to be_falsey
+      expect(bike.authorized_for_user?(owner)).to be_truthy
+      expect(bike.authorized_for_user?(organization_member)).to be_falsey
+      expect(bike.authorized_for_user?(admin)).to be_falsey
+      expect(bike.authorized_for_user?(rando)).to be_falsey
+      # Check authorizations on the code itself
+      expect(bike_code.authorized?(bike_code_user)).to be_truthy
+      expect(bike_code.authorized?(owner)).to be_truthy
+      expect(bike_code.authorized?(organization_member)).to be_truthy
+      expect(bike_code.authorized?(admin)).to be_truthy
+      expect(bike_code.authorized?(rando)).to be_falsey
+      expect(bike_code.authorized?(User.new)).to be_falsey
+    end
+  end
+
   describe "claim" do
     let(:ownership) { FactoryBot.create(:ownership) }
     let(:bike) { ownership.bike }
@@ -204,7 +237,9 @@ RSpec.describe BikeCode, type: :model do
     let(:bike_code) { FactoryBot.create(:bike_code) }
     it "claims, doesn't update when unable to parse" do
       bike_code.reload
+      expect(bike_code.authorized?(user)).to be_falsey
       bike_code.claim(user, bike.id)
+      expect(bike_code.authorized?(user)).to be_truthy
       expect(bike_code.previous_bike_id).to be_nil
       expect(bike_code.user).to eq user
       expect(bike_code.bike).to eq bike
@@ -218,7 +253,8 @@ RSpec.describe BikeCode, type: :model do
       expect(bike_code.claimed_at).to be_within(1.second).of Time.current
       expect(bike_code.previous_bike_id).to be_nil
       reloaded_code = BikeCode.find bike_code.id # Hard reload, it wasn't resetting errors
-      expect(reloaded_code.unclaimable_by?(user)).to be_falsey
+      expect(reloaded_code.authorized?(user)).to be_truthy
+      expect(reloaded_code.unclaimable_by?(user)).to be_truthy
       expect(ownership.creator.authorized?(bike)).to be_truthy
       expect(reloaded_code.unclaimable_by?(ownership.creator)).to be_truthy
       reloaded_code.claim(ownership.creator, "")
