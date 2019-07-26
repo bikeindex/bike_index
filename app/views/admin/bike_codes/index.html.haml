@@ -101,6 +101,6 @@
 
 = paginate @bike_codes, views_prefix: "admin"
 
-= render partial: "table", locals: { bike_codes: @bike_codes }
+= render partial: "table", locals: { bike_codes: @bike_codes, render_sortable: true }
 
 = paginate @bike_codes, views_prefix: "admin"
