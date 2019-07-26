@@ -256,7 +256,7 @@ RSpec.describe BikeCode, type: :model do
     let(:bike_code) { FactoryBot.create(:bike_code) }
     it "claims, doesn't update when unable to parse" do
       bike_code.reload
-      expect(bike_code.authorized?(user)).to be_falsey
+      expect(bike_code.authorized?(user)).to be_truthy
       bike_code.claim(user, bike.id)
       expect(bike_code.authorized?(user)).to be_truthy
       expect(bike_code.previous_bike_id).to be_nil
