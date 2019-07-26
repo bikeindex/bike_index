@@ -1324,6 +1324,11 @@ en:
       name: Name
       no_one_but_the_user_and_bike_index_admins: no one but the user (and Bike Index
         admins) can see it
+      you_scanned_this_sticker_html: You scanned the sticker <strong>%{pretty_code}</strong> which is assigned to this %{bike_type}.
+      is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
+      change_the_bike_sticker_linked_to: Change the bike it links to
+      switch_to_new_bike_id: Switch to a new bike ID
+      update: Update
       or_call: Or call
       other: Other
       other_serial: Other serial/registration/sticker
@@ -1655,7 +1660,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1681,7 +1686,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
