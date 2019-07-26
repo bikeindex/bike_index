@@ -115,7 +115,8 @@ class BikeCode < ActiveRecord::Base
 
   def authorized?(passed_user)
     return true if passed_user == user || passed_user.superuser?
-    organization.present? && passed_user.member_of?(organization) || passed_user.authorized?(bike)
+    return true if organization.present? && passed_user.member_of?(organization)
+    passed_user.authorized?(bike) || claimable_by?(passed_user)
   end
 
   def unclaimable_by?(passed_user)
