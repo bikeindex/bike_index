@@ -3665,7 +3665,7 @@ en:
           can't be easily removed."
         bike_colors: 'Color(s): %{frame_colors}'
         bike_date: 'Date: %{date}'
-        bike_found_at: 'Found: %{country}'
+        bike_found_at: 'Found: %{address}'
         bike_make: 'Make: %{bike_mnfg_name}'
         bike_serial: 'Serial: %{bike_serial_number}'
         bike_stolen_from: 'Stolen from: %{address}'
