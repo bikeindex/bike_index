@@ -205,11 +205,12 @@
             = "&#x2713;".html_safe if ownership.claimed
           %td.table-cell-check.d-none.d-md-table-cell
             = "&#x2713;".html_safe if ownership.user_hidden
-.mt-4
+
 - if @bike.bike_codes.present?
-  %h3
+  %h3.mt-4
     Stickers
   = render partial: "/admin/bike_codes/table", locals: { bike_codes: @bike.bike_codes }
+
 .row.mt-4.mb-4
   .col-6
     = link_to "Bike messages", admin_feedbacks_path(search_bike_id: @bike.to_param), class: "btn btn-outline-primary"
