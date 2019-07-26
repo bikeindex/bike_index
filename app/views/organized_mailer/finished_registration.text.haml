@@ -26,7 +26,7 @@
   - if @bike.recovered?
     = t(".text.bike_found_at", address: stolen_record.address(skip_default_country: true))
   - else
-    = t(".text.bike_stolen_from", address:  stolen_record.address(skip_default_country: true))
+    = t(".text.bike_stolen_from", address: stolen_record.address(skip_default_country: true))
 
   = t(".text.bike_date", date: l(stolen_record.date_stolen, format: :dotted))
 
