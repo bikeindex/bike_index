@@ -3,9 +3,7 @@ class BikeCodesController < ApplicationController
   before_filter :find_bike_code
 
   def update
-    if !@bike_code.claimable_by?(current_user)
-      flash[:error] = "You can't update that #{@bike_code.kind}. Please contact support@bikeindex.org if you think you should be able to"
-    else
+    if current_user.present? && current_user.authorized?(@bike_code)
       @bike_code.claim(current_user, params[:bike_id])
       if @bike_code.errors.any?
         flash[:error] = @bike_code.errors.full_messages.to_sentence
@@ -15,6 +13,8 @@ class BikeCodesController < ApplicationController
           redirect_to bike_path(@bike_code.bike_id) and return
         end
       end
+    else
+      flash[:error] = "You can't update that #{@bike_code.kind}. Please contact support@bikeindex.org if you think you should be able to"
     end
     redirect_to :back
   end
