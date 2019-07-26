@@ -1,6 +1,5 @@
 class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
   include SortableTable
-  layout "new_admin"
 
   def index
     matching_assignments =

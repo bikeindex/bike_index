@@ -1,6 +1,5 @@
 class Admin::FeedbacksController < Admin::BaseController
   include SortableTable
-  layout "new_admin"
   before_action :set_period, only: [:index]
 
   def index

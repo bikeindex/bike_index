@@ -1,6 +1,5 @@
 class Admin::CtypesController < Admin::BaseController
   before_filter :find_ctypes, only: [:edit, :update, :destroy]
-  layout "new_admin"
 
   def index
     @ctypes = Ctype.all

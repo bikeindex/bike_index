@@ -6,7 +6,6 @@ class Admin::OrganizationsController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     @organizations = matching_organizations.reorder("organizations.#{sort_column} #{sort_direction}").page(page).per(per_page)
-    render layout: "new_admin"
   end
 
   def show
@@ -15,12 +14,10 @@ class Admin::OrganizationsController < Admin::BaseController
     page = params[:page] || 1
     per_page = params[:per_page] || 25
     @bikes = bikes.page(page).per(per_page)
-    render layout: "new_admin"
   end
 
   def show_deleted
     @organizations = Organization.only_deleted.all
-    render layout: "new_admin"
   end
 
   def recover
@@ -30,12 +27,10 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def new
     @organization = Organization.new
-    render layout: "new_admin"
   end
 
   def edit
     @embedable_email = @organization.auto_user.email if @organization.auto_user
-    render layout: "new_admin"
   end
 
   def update
@@ -44,7 +39,7 @@ class Admin::OrganizationsController < Admin::BaseController
       flash[:success] = "Organization Saved!"
       redirect_to admin_organization_url(@organization)
     else
-      render action: :edit, layout: "new_admin"
+      render action: :edit
     end
   end
 
@@ -55,7 +50,7 @@ class Admin::OrganizationsController < Admin::BaseController
       flash[:success] = "Organization Created!"
       redirect_to edit_admin_organization_url(@organization)
     else
-      render action: :new, layout: "new_admin"
+      render action: :create
     end
   end
 
