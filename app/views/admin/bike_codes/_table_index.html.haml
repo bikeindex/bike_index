@@ -101,6 +101,8 @@
 
 = paginate @bike_codes, views_prefix: "admin"
 
-= render partial: "table", locals: { bike_codes: @bike_codes }
+- bike_code_batch_organizations = BikeCodeBatch.all.map { |b| [b.id.to_s, b.organization&.short_name] }.to_h
+
+
 
 = paginate @bike_codes, views_prefix: "admin"
