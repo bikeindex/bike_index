@@ -31,11 +31,11 @@ class Integration < ActiveRecord::Base
   end
 
   def create_user(email:, name:)
-    pword = SecurityTokenizer.new_password_token
+    password = SecurityTokenizer.new_password_token
     i_user = User.new(email: email,
                       name: name,
-                      password: pword,
-                      password_confirmation: pword)
+                      password: password,
+                      password_confirmation: password)
     if i_user.save
       i_user.confirm(i_user.confirmation_token)
     else
