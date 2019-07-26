@@ -15,7 +15,7 @@ RSpec.describe PaidFeature, type: :model do
 
   describe "child organization" do
     let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 10_000, feature_slugs: ["bike_codes"]) }
-    let(:paid_feature2) { FactoryBot.create(:paid_feature, feature_slugs: ["bike_search"] ) }
+    let(:paid_feature2) { FactoryBot.create(:paid_feature, feature_slugs: ["bike_search"]) }
     let!(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization) }
     let!(:invoice2) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization_child) }
     let(:organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
@@ -30,7 +30,8 @@ RSpec.describe PaidFeature, type: :model do
       organization_child.reload
       expect(organization.kind).to eq "law_enforcement"
       expect(organization_child.kind).to eq "bike_shop"
-      expect(organization.paid_feature_slugs).to eq %w[bike_codes child_organizations]
+      expect(organization.paid_feature_slugs).to eq %w[bike_codes]
+      expect(organization.child_ids).to eq([organization_child.id])
       expect(organization_child.paid_feature_slugs).to eq %w[bike_codes bike_search]
       # Just to make sure it doesn't get child_organizations # TODO: Rails 5 update - after_commit
       organization_child.update_attributes(updated_at: Time.current)

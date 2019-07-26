@@ -115,6 +115,8 @@ class Organization < ActiveRecord::Base
 
   def parent?; paid_for?("child_organizations") end
 
+  def child_organizations; Organization.where(id: child_ids) end
+
   def mail_snippet_body(type)
     return nil unless MailSnippet.organization_snippet_types.include?(type)
     snippet = mail_snippets.enabled.where(name: type).first
