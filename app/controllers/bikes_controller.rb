@@ -34,6 +34,9 @@ class BikesController < ApplicationController
       @stolen_record = @bike.current_stolen_record
     end
     @bike = @bike.decorate
+    if params[:scanned_id].present?
+      @bike_code = BikeCode.lookup_with_fallback(scanned_id, organization_id: params[:organization_id], user: current_user)
+    end
     respond_to do |format|
       format.html { render :show }
       format.gif { render qrcode: bike_url(@bike), level: :h, unit: 50 }
@@ -66,7 +69,7 @@ class BikesController < ApplicationController
       flash[:error] = "Unable to find sticker: '#{params[:scanned_id]}'"
       redirect_to user_root_url
     elsif @bike_code.bike.present?
-      redirect_to bike_url(@bike_code.bike_id) and return
+      redirect_to bike_url(@bike_code.bike_id, scanned_id: params[:scanned_id], organization_id: params[:organization_id]) and return
     elsif current_user.present?
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
