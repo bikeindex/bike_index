@@ -5,7 +5,10 @@
   .col-md-7
     %ul
       %li.nav-item
-        = link_to "New Membership", new_admin_membership_url, class: "nav-link"
+        - if current_organization.present? && !current_organization.ambassador?
+          = link_to "New membership", new_organization_user_path(organization_id: current_organization.to_param)
+        - else
+          = link_to "New Membership", new_admin_membership_url, class: "nav-link"
 
 %h4
   = number_with_delimiter @memberships.total_count
