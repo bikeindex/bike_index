@@ -35,7 +35,7 @@ class BikesController < ApplicationController
     end
     @bike = @bike.decorate
     if params[:scanned_id].present?
-      @bike_code = BikeCode.lookup_with_fallback(scanned_id, organization_id: params[:organization_id], user: current_user)
+      @bike_code = BikeCode.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
     end
     respond_to do |format|
       format.html { render :show }
