@@ -6,6 +6,10 @@ class SecurityTokenizer
     "#{t}-" + SecureRandom.hex + Digest::MD5.hexdigest("#{SecureRandom.hex}-#{t}")
   end
 
+  def self.new_password_token(time = nil)
+    new_token(time).slice(12, 50)
+  end
+
   def self.token_time(str)
     t = str.to_s.split("-")[0]
     t = (t.present? && t.to_i > EARLIEST_TOKEN_TIME) ? t.to_i : EARLIEST_TOKEN_TIME
