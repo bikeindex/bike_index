@@ -12,48 +12,6 @@
     Recoveries
   = render partial: "/admin/recoveries/table", locals: { recoveries: @recoveries, skip_bike: true }
 
-%h3.mt-4
-  Ownerships
-.full-screen-table
-  %table.table.table-striped.table-bordered.table-sm
-    %thead.thead-light
-      %th.d-none.d-lg-table-cell
-        ID
-      %th
-        Created&nbsp;<small class="convertTimezone"></small>
-      %th
-        Creator
-      %th
-        Owner email
-      %th
-        Current?
-      %th
-        Claimed?
-      %th.d-none.d-md-table-cell
-        User hidden
-    %tbody
-      - @bike.ownerships.each do |ownership|
-        %tr
-          %td.d-none.d-lg-table-cell
-            = ownership.id
-          %td
-            %a.convertTime{href: edit_admin_ownership_url(ownership.id)}
-              = l ownership.created_at, format: :convert_time
-          %td
-            - u = ownership.creator
-            - if u.name.present?
-              = u.name
-            - else
-              = u.email
-          %td
-            = ownership.owner_email
-          %td.table-cell-check
-            = "&#x2713;".html_safe if ownership.current
-          %td.table-cell-check
-            = "&#x2713;".html_safe if ownership.claimed
-          %td.table-cell-check.d-none.d-md-table-cell
-            = "&#x2713;".html_safe if ownership.user_hidden
-
 .admin-subnav.midpage-subnav
   .col-12
     %h1
@@ -142,11 +100,6 @@
   .row.mt-4
     .col-12.text-center
       = submit_tag "Update the bike", class: "btn btn-success btn-lg"
-  .row.mt-4.mb-4
-    .col-6
-      = link_to "Bike messages", admin_feedbacks_path(search_bike_id: @bike.to_param), class: "btn btn-outline-primary"
-    .col-6.text-right
-      = link_to "Delete bike", admin_bike_url(@bike), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger ml-4"
 
   - if @bike.stolen and @bike.current_stolen_record.present?
     %h4.mt-4#edit-stolen-record
@@ -211,3 +164,55 @@
               = label_tag :can_share_recovery do
                 = check_box_tag :can_share_recovery, true
                 Can Share
+%h3.mt-4
+  Ownerships
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th.d-none.d-lg-table-cell
+        ID
+      %th
+        Created&nbsp;<small class="convertTimezone"></small>
+      %th
+        Creator
+      %th
+        Owner email
+      %th
+        Current?
+      %th
+        Claimed?
+      %th.d-none.d-md-table-cell
+        User hidden
+    %tbody
+      - @bike.ownerships.each do |ownership|
+        %tr
+          %td.d-none.d-lg-table-cell
+            = ownership.id
+          %td
+            %a.convertTime{href: edit_admin_ownership_url(ownership.id)}
+              = l ownership.created_at, format: :convert_time
+          %td
+            - u = ownership.creator
+            - if u.name.present?
+              = u.name
+            - else
+              = u.email
+          %td
+            = ownership.owner_email
+          %td.table-cell-check
+            = "&#x2713;".html_safe if ownership.current
+          %td.table-cell-check
+            = "&#x2713;".html_safe if ownership.claimed
+          %td.table-cell-check.d-none.d-md-table-cell
+            = "&#x2713;".html_safe if ownership.user_hidden
+.mt-4
+- if @bike.bike_codes.present?
+  %h3
+    Stickers
+  = render partial: "/admin/bike_codes/table", locals: { bike_codes: @bike.bike_codes }
+.row.mt-4.mb-4
+  .col-6
+    = link_to "Bike messages", admin_feedbacks_path(search_bike_id: @bike.to_param), class: "btn btn-outline-primary"
+  .col-6.text-right
+    = link_to "Delete bike", admin_bike_url(@bike), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger ml-4"
+
