@@ -513,6 +513,20 @@ class Bike < ActiveRecord::Base
     b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
   end
 
+  def generate_alert_image
+    return if current_stolen_record.blank?
+    return if current_stolen_record.alert_image.present?
+
+    # Remove any old alert images
+    stolen_records.each { |sr| sr.alert_image&.remove! }
+
+    return if public_images.none?
+
+    # Generate alert image for current stolen record
+    current_stolen_record.alert_image = public_images.first.image
+    current_stolen_record.save
+  end
+
   def load_external_images(urls = nil)
     (urls || external_image_urls).reject(&:blank?).each do |url|
       next if public_images.where(external_image_url: url).present?

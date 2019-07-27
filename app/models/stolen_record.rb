@@ -52,6 +52,8 @@ class StolenRecord < ActiveRecord::Base
 
   mount_uploader :alert_image, AlertImageUploader
   process_in_background :alert_image
+  delegate :generate_alert_image, to: :bike
+  after_create :generate_alert_image
 
   def self.find_matching_token(bike_id:, recovery_link_token:)
     return nil unless bike_id.present? && recovery_link_token.present?
