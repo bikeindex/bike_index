@@ -156,8 +156,12 @@ RSpec.describe StolenRecord, type: :model do
       end
     end
     context "stolen_record is not_displayed" do
-      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, recovery_display_status: "not_displayed", can_share_recovery: true) }
       it "is not_displayed" do
+        expect(StolenRecord.count).to eq(0)
+        stolen_record = FactoryBot.create(:stolen_record_recovered,
+                                          recovery_display_status: "not_displayed",
+                                          can_share_recovery: true)
+        expect(StolenRecord.count).to eq(1)
         stolen_record.reload.update_attributes(updated_at: Time.current)
         expect(stolen_record.recovery_display_status).to eq "not_displayed"
       end
