@@ -33,7 +33,7 @@ end
 
 # Additional carrierwave configurations
 CarrierWave.configure do |config|
-  config.cache_dir = "#{Rails.root}/tmp/uploads"
+  config.cache_dir = Rails.root.join("tmp", "uploads")
 
   if Rails.env.production?
     # config.fog_provider "fog/aws" # Once carrierwave is updated
