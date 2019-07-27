@@ -50,6 +50,8 @@ class StolenRecord < ActiveRecord::Base
   geocoded_by :address_override_show_address
   after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
 
+  mount_uploader :alert_image, AlertImageUploader
+
   def self.find_matching_token(bike_id:, recovery_link_token:)
     return nil unless bike_id.present? && recovery_link_token.present?
     unscoped.where(bike_id: bike_id, recovery_link_token: recovery_link_token).first
