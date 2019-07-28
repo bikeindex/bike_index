@@ -222,9 +222,6 @@ class Organization < ActiveRecord::Base
     BParam.where(organization_id: child_ids + [id]).partial_registrations.without_bike
   end
 
-  # This will probably be enabled for other organizations eventually
-  def can_impound?; bike_depot? end
-
   # Enable this if they have paid for showing it, or if they use ascend
   def show_bulk_import?; paid_for?("show_bulk_import") || ascend_imports? end
 

@@ -282,7 +282,7 @@ class Bike < ActiveRecord::Base
   end
 
   def impound(user: user, organization: nil)
-    organization ||= user.organizations.detect { |o| o.can_impound? }
+    organization ||= user.organizations.detect { |o| o.paid_for?("impound_bikes") }
     impound_record = impound_records.where(organization_id: organization&.id).first
     impound_record ||= impound_records.create(user: user, organization: organization)
   end
