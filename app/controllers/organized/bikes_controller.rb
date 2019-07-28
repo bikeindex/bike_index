@@ -81,13 +81,16 @@ module Organized
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       org = current_organization || passive_organization
       if org.present?
-        bikes = org.bikes.search(@interpreted_params)
+        if params[:search_impoundedness] == "only_impounded"
+          bikes = org.impounded_bikes
+        else
+          bikes = org.bikes
+        end
+        bikes = bikes.search(@interpreted_params)
         bikes = bikes.organized_email_search(params[:email]) if params[:email].present?
       else
         bikes = Bike.search(@interpreted_params)
       end
-      bikes = bikes.impounded if params[:search_impoundedness] == "only_impounded"
-      bikes = bikes.not_impounded if params[:search_impoundedness] == "only_not"
       @search_stickers = false
       if params[:search_stickers].present?
         @search_stickers = params[:search_stickers] == "none" ? "none" : "with"

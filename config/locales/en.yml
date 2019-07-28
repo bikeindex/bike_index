@@ -1670,7 +1670,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1696,7 +1696,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -3361,9 +3361,10 @@ en:
         only_not: only not
         only_with: only with
         only_with_stickers_html: Only <strong>with</strong> stickers
+        impounded: Impounded at
         owner_name: Owner name
         registered: Registered
-        registered_bikes_html: "<strong>%{bikes}</strong> registered with %{org_name}"
+        registered_bikes_html: "<strong>%{bikes}</strong> matching for %{org_name}"
         search_bike_descriptions: Search bike descriptions
         search_for_serial_number: Search for serial number
         search_owner_email: Search owner email
@@ -3377,6 +3378,7 @@ en:
         view_all_bikes: view all bikes
         view_just_stolen_bikes: view just stolen bikes
         visible_columns: Visible columns
+        email_hidden: email hidden
     bulk_imports:
       index:
         added: Added

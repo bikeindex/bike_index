@@ -77,7 +77,6 @@ class Bike < ActiveRecord::Base
   scope :organized, -> { where.not(creation_organization_id: nil) }
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
   scope :impounded, -> { includes(:impound_records).where(impound_records: { retrieved_at: nil }).where.not(impound_records: { id: nil }) }
-  scope :not_impounded, -> { includes(:impound_records).where(impound_records: { retrieved_at: nil, id: nil }) }
   # "Recovered" bikes are bikes that were found and are waiting to be claimed. This is confusing and should be fixed
   # so that it no longer is the same word as stolen recoveries
   scope :non_recovered, -> { where(recovered: false) }
@@ -197,7 +196,9 @@ class Bike < ActiveRecord::Base
 
   def stolen_recovery?; recovered_records.any? end
 
-  def impounded?; impound_records.current.any? end
+  def current_impound_record; impound_records.current.last end
+
+  def impounded?; current_impound_record.present? end
 
   # Small helper because we call this a lot
   def type; cycle_type && cycle_type_name.downcase end
@@ -205,6 +206,10 @@ class Bike < ActiveRecord::Base
   def user_hidden; hidden && current_ownership&.user_hidden end
 
   def fake_deleted; hidden && !user_hidden end
+
+  def email_visible_for?(org)
+    organizations.include?(org)
+  end
 
   def serial_display
     return "Hidden" if recovered

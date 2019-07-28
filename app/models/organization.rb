@@ -105,6 +105,12 @@ class Organization < ActiveRecord::Base
     where("paid_feature_slugs ?& array[:keys]", keys: matching_slugs)
   end
 
+  def impounded_bikes
+    Bike.includes(:impound_records)
+        .where(impound_records: { retrieved_at: nil, organization_id: id })
+        .where.not(impound_records: { id: nil })
+  end
+
   def to_param; slug end
 
   def sent_invitation_count; memberships.count end

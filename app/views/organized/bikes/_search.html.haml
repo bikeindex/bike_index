@@ -144,6 +144,8 @@
             = t(".link")
             %br
             = t(".sticker")
+        - if params[:search_impoundedness] == "only_impounded"
+          %th=(".impounded")
     %tbody
       - @bikes.each do |bike|
         %tr
@@ -167,7 +169,11 @@
               %small.hidden-sm-up
                 = organized_bike_text(bike)
                 %br
-              = bike.owner_email
+              - if bike.email_visible_for?(current_organization)
+                = bike.owner_email
+              - else
+                %em.less-strong
+                  = t(".email_hidden")
               - if bike.creation_description
                 %small.less-strong
                   = bike.creation_description
