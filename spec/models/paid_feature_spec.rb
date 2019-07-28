@@ -14,12 +14,10 @@ RSpec.describe PaidFeature, type: :model do
   end
 
   describe "child organization" do
-    let(:organization) { FactoryBot.create(:organization_with_paid_feature, kind: "law_enforcement", paid_feature_slugs: ["bike_codes"]) }
-    let(:organization_child) { FactoryBot.create(:organization_with_paid_feature, parent_organization: organization, kind: "bike_shop", paid_feature_slugs: "bike_search") }
+    let(:organization) { FactoryBot.create(:organization_with_paid_features, kind: "law_enforcement", paid_feature_slugs: ["bike_codes"]) }
+    let(:organization_child) { FactoryBot.create(:organization_with_paid_features, parent_organization: organization, kind: "bike_shop", paid_feature_slugs: "bike_search") }
     it "inherits from the parent organization, not other way around" do
       expect(organization.paid_feature_slugs).to eq(["bike_codes"])
-      invoice1 = organization.invoices.first
-      invoice2 = organization_child.invoices.first
       expect(organization_child.current_invoices.pluck(:id)).to match_array([organization.invoices.first.id, organization_child.invoices.first.id])
       organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after commit doesn't run - for parent org update
       expect(organization.kind).to eq "law_enforcement"

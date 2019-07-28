@@ -1205,6 +1205,11 @@ en:
       creator: Creator
       edit: Edit
       email_to_deal_with_this_html: Email %{support_link} to deal with this.
+      already_impounded: This %{bike_type} is already impounded by %{organization_name}
+      impound: Impound
+      impound_are_you_sure: Are you sure you want to %{bike_type}?
+      impounded_by: By
+      impounded_at: at
       geomessage: GeoMessage
       is_false: 'false'
       is_not_registered_html: "<em>not</em> reged with %{org_name}"
@@ -1296,7 +1301,7 @@ en:
         number of Bike Codes.
     show:
       at: at
-      bike_in_admin: "%{bike_type} in Admin"
+      bike_in_admin: "%{bike_type} in Super Admin"
       bike_photo: "%{bike_type} photo"
       change_the_bike_sticker_linked_to: Change the bike it links to
       color_may_not_match: Color may not match!
@@ -1355,7 +1360,7 @@ en:
       write_them_a_message: Write them a message
       year: Year
       you_scanned_this_sticker_html: >-
-        You scanned the sticker <strong>%{pretty_code}</strong> which is assigned
+        You scanned the sticker <strong>%{pretty_code}</strong>, which is assigned
         to this %{bike_type}.
     stolen_checklist:
       a_photo_of_your_bike_type: a photo of your %{bike_type}
@@ -1665,7 +1670,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1691,7 +1696,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March

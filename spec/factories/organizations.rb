@@ -8,7 +8,7 @@ FactoryBot.define do
     api_access_approved { false }
     sequence(:website) { |n| "http://organization#{n}.com" }
 
-    factory :organization_with_paid_feature do
+    factory :organization_with_paid_features do
       transient do
         paid_feature_slugs { ["csv_export"] }
         paid_feature { FactoryBot.create(:paid_feature, amount_cents: 10_000, feature_slugs: Array(paid_feature_slugs)) }

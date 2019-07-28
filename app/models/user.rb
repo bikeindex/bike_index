@@ -152,7 +152,7 @@ class User < ActiveRecord::Base
 
   def paid_org?; organizations.paid.any? end
 
-  def can_impound?; organizations.any? { |o| o.paid_for?("impound_bikes") } end
+  def can_impound?; superuser? || organizations.any? { |o| o.paid_for?("impound_bikes") } end
 
   def authorized?(obj)
     return true if superuser?

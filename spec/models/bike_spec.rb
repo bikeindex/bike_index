@@ -471,7 +471,7 @@ RSpec.describe Bike, type: :model do
 
   describe "impound" do
     let(:bike) { FactoryBot.create(:bike) }
-    let(:organization) { FactoryBot.create(:organization, kind: "bike_depot") }
+    let(:organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: "impound_bikes") }
     let(:user) { FactoryBot.create(:organization_member, organization: organization) }
     it "impounds the bike, returns record" do
       expect(bike.impound(user: user, organization: organization)).to be_truthy
@@ -491,7 +491,7 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "passed organization user isn't permitted for" do
-      let(:organization2) { FactoryBot.create(:organization, kind: "bike_depot") }
+      let(:organization2) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: "impound_bikes") }
       it "returns with an error" do
         impound_record = bike.impound(user: user, organization: organization2)
         expect(impound_record.valid?).to be_falsey
@@ -501,7 +501,7 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "bike impounded by different organization" do
-      let(:organization2) { FactoryBot.create(:organization, kind: "bike_depot") }
+      let(:organization2) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: "impound_bikes") }
       let(:user2) { FactoryBot.create(:organization_member, organization: organization2) }
       let!(:impound_record) { bike.impound(user: user2) }
       it "returns with an error" do

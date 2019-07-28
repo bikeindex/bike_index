@@ -174,17 +174,36 @@
               %p
                 = support_link = link_to(t(".support_email"), "mailto:#{t('.support_email')}")
                 = t(".email_to_deal_with_this_html", support_link: support_link)
+  - if passive_organization.message_kinds.any? || passive_organization.paid_for?("impound_bikes")
+    .organized-actions-wrap
+      .row
+        .col-sm-6
+          - if passive_organization.paid_for?("impound_bikes")
+            - impound_record = @bike.impound_records.current.first
+            - if @bike.impounded?
+              %em
+                = t(".already_impounded", bike_type: @bike.type, organization_name: impound_record.organization.short_name)
+              - if impound_record.organization == passive_organization
+                %br
+                = t(".impounded_by")
+                %em= impound_record.user.display_name
+                = t(".impounded_at")
+                %span.convertTime
+                  = l impound_record.created_at, format: :convert_time
 
-  - if passive_organization.message_kinds.any?
-    .geomessages-wrap
-      %span
-        = t(".send")
-      - passive_organization.message_kinds.each do |kind|
-        %a.btn.btn-secondary.openMessageModal{ "data-kind" => kind }
-          - if kind == "geolocated_messages"
-            = t(".geomessage")
-          - else
-            = kind.humanize
+            - else
+              = link_to t(".impound"), organization_bike_path(@bike.to_param, organization_id: passive_organization.to_param, bike: { impound: true }), method: "PUT", class: "btn btn-outline-warning", data: { confirm: t(".impound_are_you_sure", bike_type: @bike.type) }
+
+        .col-sm-6.text-right
+          - if passive_organization.message_kinds.any?
+            %span
+              = t(".send")
+            - passive_organization.message_kinds.each do |kind|
+              %a.btn.btn-secondary.openMessageModal{ "data-kind" => kind }
+                - if kind == "geolocated_messages"
+                  = t(".geomessage")
+                - else
+                  = kind.humanize
 
 - if passive_organization.message_kinds.any?
   - modal_body = capture_haml do
