@@ -1190,6 +1190,7 @@ en:
       access_panel: Access Panel
       additional_message: Additional message
       address: 'Address:'
+      already_impounded: This %{bike_type} is already impounded by %{organization_name}
       as_a_bikeindex_ambassador_html: >-
         <em><span class="hidden-md-down">As a Bike Index ambassador,</span> you can
         mark it as recovered:</em>
@@ -1205,12 +1206,11 @@ en:
       creator: Creator
       edit: Edit
       email_to_deal_with_this_html: Email %{support_link} to deal with this.
-      already_impounded: This %{bike_type} is already impounded by %{organization_name}
+      geomessage: GeoMessage
       impound: Impound
       impound_are_you_sure: Are you sure you want to %{bike_type}?
-      impounded_by: By
       impounded_at: at
-      geomessage: GeoMessage
+      impounded_by: By
       is_false: 'false'
       is_not_registered_html: "<em>not</em> reged with %{org_name}"
       is_registered: reged with %{org_name}
@@ -1670,7 +1670,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -1696,7 +1696,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March

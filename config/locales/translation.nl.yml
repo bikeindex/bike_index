@@ -1935,6 +1935,11 @@ nl:
         opneemt over een advertentie die u online hebt gevonden, neemt u een link
         op in het onderstaande veld
       write_them_a_message: Schrijf ze een bericht
+      already_impounded: Deze %{bike_type} is al in beslag genomen door %{organization_name}
+      impound: confisqueren
+      impound_are_you_sure: Weet je zeker dat je %{bike_type} wilt?
+      impounded_at: bij
+      impounded_by: Door
     pdf:
       bike_description: 'Fiets beschrijving:'
       bike_serial: Bike Serial
