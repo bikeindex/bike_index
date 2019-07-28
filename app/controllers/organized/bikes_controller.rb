@@ -86,6 +86,8 @@ module Organized
       else
         bikes = Bike.search(@interpreted_params)
       end
+      bikes = bikes.impounded if params[:search_impoundedness] == "only_impounded"
+      bikes = bikes.not_impounded if params[:search_impoundedness] == "only_not"
       @search_stickers = false
       if params[:search_stickers].present?
         @search_stickers = params[:search_stickers] == "none" ? "none" : "with"

@@ -122,6 +122,9 @@ RSpec.describe Organized::BikesController, type: :controller do
             expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
           end
         end
+        context "with search_impoundedness only_impounded" do
+          it "returns only impounded"
+        end
       end
       describe "recoveries" do
         let(:bike) { FactoryBot.create(:stolen_bike) }
