@@ -1292,14 +1292,14 @@ RSpec.describe BikesController, type: :controller do
             expect(bike.owner_email).to eq email
             expect(bike.claimed?).to be_falsey
             expect(bike.user).to be_nil
-            expect(bike.authorized_for_user?(user)).to be_truthy
+            expect(bike.authorized?(user)).to be_truthy
             expect do
               put :update, id: bike.id, bike: { owner_email: new_email }
             end.to change(Ownership, :count).by(1)
             expect_bike_transferred_but_unclaimed(bike, user)
             expect(bike.owner).to eq user
             expect(bike.current_ownership.user).to be_nil
-            expect(bike.authorized_for_user?(user)).to be_truthy
+            expect(bike.authorized?(user)).to be_truthy
           end
           context "claimed ownership" do
             let(:user) { FactoryBot.create(:user_confirmed, email: email) }
@@ -1308,14 +1308,14 @@ RSpec.describe BikesController, type: :controller do
               expect(bike.owner_email).to eq email
               expect(bike.claimed?).to be_truthy
               expect(bike.user).to eq user
-              expect(bike.authorized_for_user?(user)).to be_truthy
+              expect(bike.authorized?(user)).to be_truthy
               expect do
                 put :update, id: bike.id, bike: { owner_email: "#{new_email.upcase} " }
               end.to change(Ownership, :count).by(1)
               expect_bike_transferred_but_unclaimed(bike, user)
               expect(bike.owner).to eq user
               expect(bike.current_ownership.user).to be_nil
-              expect(bike.authorized_for_user?(user)).to be_truthy
+              expect(bike.authorized?(user)).to be_truthy
             end
           end
         end

@@ -266,14 +266,14 @@ class Bike < ActiveRecord::Base
     user == u || current_ownership.claimable_by?(u)
   end
 
-  def authorized_for_user?(u)
+  def authorized?(u)
     return true if u == owner || claimable_by?(u)
     return false if u.blank?
     authorized_by_organization?(u: u)
   end
 
   def authorize_and_claim_for_user(u)
-    return authorized_for_user?(u) unless claimable_by?(u)
+    return authorized?(u) unless claimable_by?(u)
     current_ownership.mark_claimed
     true
   end
