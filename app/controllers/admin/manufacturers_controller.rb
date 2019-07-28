@@ -1,7 +1,6 @@
 class Admin::ManufacturersController < Admin::BaseController
   include SortableTable
   before_filter :find_manufacturer, only: [:edit, :update, :destroy, :show]
-  layout "new_admin"
 
   def index
     @manufacturers = Manufacturer.reorder("manufacturers.#{sort_column} #{sort_direction}")

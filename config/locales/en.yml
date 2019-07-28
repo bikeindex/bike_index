@@ -71,7 +71,7 @@ en:
         vendor_terms_of_service: Vendor terms of service
         website: Website
         when_vendor_terms_of_service: When vendor terms of service
-        zipcode: Zipcode
+        zipcode: Postal Code
       ambassador_task:
         ambassador_task_assignments: Ambassador task assignments
         ambassadors: Ambassadors
@@ -168,7 +168,7 @@ en:
         updator: :activerecord.models.updator
         video_embed: Video embed
         year: Year
-        zipcode: Zipcode
+        zipcode: Postal code
       bike_code:
         bike: :activerecord.models.bike
         bike_code_batch: :activerecord.models.bike_code_batch
@@ -381,7 +381,7 @@ en:
         shown: Shown
         state: :activerecord.models.state
         street: Street
-        zipcode: Zipcode
+        zipcode: Postal code
       lock:
         combination: Combination
         has_combination: Has combination
@@ -611,7 +611,7 @@ en:
         theft_description: Theft description
         time: Time
         tsved_at: Tsved at
-        zipcode: Zipcode
+        zipcode: Postal code
       theft_alert:
         begin_at: Begin at
         creator: :activerecord.models.creator
@@ -699,7 +699,7 @@ en:
         vendor_terms_of_service: Vendor terms of service
         website: Website
         when_vendor_terms_of_service: When vendor terms of service
-        zipcode: Zipcode
+        zipcode: Postal code
       user_email:
         confirmation_token: Confirmation token
         email: Email
@@ -937,7 +937,7 @@ en:
         publicly_display_exact_address: Publicly display exact address theft occurred
         state: State
         where_was_it_stolen_type: Where was it %{stolen_type}?
-        zipcode: Zipcode
+        zipcode: Postal code
     bike_show_overlays:
       add_a_picture_of_it: Add a picture of it, so everyone can admire its beauty!
       add_a_picture_so_people_know_what_to_look: Add a picture so people know what
@@ -1016,7 +1016,7 @@ en:
       unsure_or_unknown: Unsure or unknown
       update_serial_number: Update serial number
       updated_serial: Updated serial
-      zipcode: zip code
+      zipcode: Postal code
     edit_drivetrain:
       all_diameters: All diameters
       belt_drive: Belt Drive
@@ -1185,7 +1185,7 @@ en:
       without_serial: This %{bike_type} was made without a serial
       without_serial_number: This %{bike_type} was made without a serial number
       your_full_address_is_required: Your full address is required by %{org_name}
-      zipcode: Zipcode
+      zipcode: Postal code
     organized_access_panel:
       access_panel: Access Panel
       additional_message: Additional message
@@ -1298,6 +1298,7 @@ en:
       at: at
       bike_in_admin: "%{bike_type} in Admin"
       bike_photo: "%{bike_type} photo"
+      change_the_bike_sticker_linked_to: Change the bike it links to
       color_may_not_match: Color may not match!
       componentcmodel_name: "%{componentcmodel_name}"
       componentyear: "%{componentyear}"
@@ -1314,6 +1315,7 @@ en:
       front_wheel_diameter: Front wheel diameter
       handlebar_type: Handlebar type
       hidden_by_owner: HIDDEN by owner
+      is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
       is_this_your_bike_send_proof_of_ownership: >-
         Is this your bike? Send proof of ownership (such as the bike's serial number
         or a link to a photo of you with the bike)
@@ -1342,7 +1344,9 @@ en:
       spread_the_word: Spread the word!
       stock_photo: Stock photo of a %{year} %{model}
       stolen: Stolen
+      switch_to_new_bike_id: Switch to a new bike ID
       theft_details: "%{bike_recovered} Details"
+      update: Update
       view_users_other_registrations: View user's other registrations
       wheel_diameter: Wheel diameter
       where_did_you_see_this_bike: >-
@@ -1350,6 +1354,9 @@ en:
         found online, include a link in the field below
       write_them_a_message: Write them a message
       year: Year
+      you_scanned_this_sticker_html: >-
+        You scanned the sticker <strong>%{pretty_code}</strong> which is assigned
+        to this %{bike_type}.
     stolen_checklist:
       a_photo_of_your_bike_type: a photo of your %{bike_type}
       a_police_report: a Police Report Number
@@ -3507,7 +3514,7 @@ en:
         remove: Remove
         state: State
         street: Street
-        zipcode: Zipcode
+        zipcode: Postal code
       locations:
         add_location: Add location
         bike_index_partner_map: Bike Index partner map
@@ -3668,7 +3675,7 @@ en:
           can't be easily removed."
         bike_colors: 'Color(s): %{frame_colors}'
         bike_date: 'Date: %{date}'
-        bike_found_at: 'Found: %{country}'
+        bike_found_at: 'Found: %{address}'
         bike_make: 'Make: %{bike_mnfg_name}'
         bike_serial: 'Serial: %{bike_serial_number}'
         bike_stolen_from: 'Stolen from: %{address}'
@@ -4028,7 +4035,7 @@ en:
       resend_confirmation: Resend confirmation
       state: State
       unconfirmed_emails: Unconfirmed emails
-      zipcode: ZIP code
+      zipcode: Postal code
     edit_sharing:
       additional_link: Additional Link
       choose_file: Choose file...

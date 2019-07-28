@@ -1,7 +1,6 @@
 class Admin::PaidFeaturesController < Admin::BaseController
   include SortableTable
   before_filter :find_paid_feature, only: %i[edit update]
-  layout "new_admin"
 
   def index
     @paid_features = PaidFeature.order(sort_column + " " + sort_direction)

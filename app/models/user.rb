@@ -158,6 +158,7 @@ class User < ActiveRecord::Base
     return true if superuser?
     return obj.authorized_for_user?(self) if obj.is_a?(Bike)
     return member_of?(obj) if obj.is_a?(Organization)
+    return obj.authorized?(self) if obj.is_a?(BikeCode)
     false
   end
 

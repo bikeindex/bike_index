@@ -40,7 +40,7 @@
           %input{ type: "radio", name: "claimedness", autocomplete: "off", checked: claimedness == "unclaimed", value: "unclaimed" }
           = t(".unclaimed")
 
-.table-responsive.mt-4
+.full-screen-table.mt-4
   %p{ style: "margin-bottom: 0;" }
     %strong= pluralize(number_with_delimiter(@bike_codes.total_count), t(".sticker"))
 

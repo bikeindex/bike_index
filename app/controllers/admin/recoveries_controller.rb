@@ -1,6 +1,5 @@
 class Admin::RecoveriesController < Admin::BaseController
   include SortableTable
-  layout "new_admin"
 
   def index
     page = params[:page] || 1

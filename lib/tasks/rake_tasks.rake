@@ -24,8 +24,4 @@ task prepare_translations: :environment do
   i18n_tasks = I18n::Tasks::CLI.new
   i18n_tasks.start(["normalize"])
   i18n_tasks.start(["health"])
-  if ENV["TRANSLATION_IO_API_KEY"] != "something"
-    puts "Syncing translations"
-    `bin/rake translation:sync`
-  end
 end

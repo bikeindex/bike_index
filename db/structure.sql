@@ -202,7 +202,8 @@ CREATE TABLE public.bike_code_batches (
     notes text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    code_number_length integer
+    code_number_length integer,
+    prefix character varying
 );
 
 
@@ -1557,7 +1558,8 @@ CREATE TABLE public.organizations (
     ascend_name character varying,
     registration_field_labels jsonb DEFAULT '{}'::jsonb,
     pos_kind integer DEFAULT 0,
-    previous_slug character varying
+    previous_slug character varying,
+    child_ids jsonb
 );
 
 
@@ -4438,4 +4440,8 @@ INSERT INTO schema_migrations (version) VALUES ('20190710203715');
 INSERT INTO schema_migrations (version) VALUES ('20190710230727');
 
 INSERT INTO schema_migrations (version) VALUES ('20190725141309');
+
+INSERT INTO schema_migrations (version) VALUES ('20190725172835');
+
+INSERT INTO schema_migrations (version) VALUES ('20190726160009');
 

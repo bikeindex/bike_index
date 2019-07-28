@@ -156,6 +156,33 @@ RSpec.describe BikesController, type: :controller do
         expect(session[:passive_organization_id]).to eq organization.id
       end
     end
+    context "assigned sticker" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:bike_code) { FactoryBot.create(:bike_code, organization: organization, bike: bike, code: "ED09999") }
+      it "renders with the sticker assigned" do
+        expect(user.authorized?(bike_code)).to be_truthy
+        get :show, id: bike.id, scanned_id: "ED009999", organization_id: organization.id
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(assigns(:bike)).to be_decorated
+        expect(flash).to_not be_present
+        expect(assigns(:bike_code)).to eq bike_code
+        expect(user.authorized?(assigns(:bike_code))).to be_truthy
+      end
+      context "user not bike owner" do
+        let(:user) { FactoryBot.create(:user_confirmed) }
+        it "renders with the sticker assigned and user authorized for sticker" do
+          expect(user.authorized?(bike_code)).to be_falsey
+          get :show, id: bike.id, scanned_id: "ED009999", organization_id: organization.id
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:show)
+          expect(assigns(:bike)).to be_decorated
+          expect(flash).to_not be_present
+          expect(assigns(:bike_code)).to eq bike_code
+          expect(user.authorized?(assigns(:bike_code))).to be_falsey
+        end
+      end
+    end
     context "example bike" do
       it "shows the bike" do
         ownership.bike.update_attributes(example: true)
@@ -317,7 +344,16 @@ RSpec.describe BikesController, type: :controller do
       let!(:bike_code) { FactoryBot.create(:bike_code, code: "sss", bike: bike) }
       it "redirects to the proper page" do
         get :scanned, scanned_id: "sss"
-        expect(response).to redirect_to bike_url(bike)
+        expect(response).to redirect_to bike_url(bike, scanned_id: "sss")
+      end
+      context "organization bike code" do
+        let(:organization) { FactoryBot.create(:organization) }
+        let(:code) { "XD934292" }
+        let!(:bike_code) { FactoryBot.create(:bike_code, code: code, organization_id: organization.id, bike: bike) }
+        it "redirects to the proper page" do
+          get :scanned, scanned_id: code, organization_id: organization.id
+          expect(response).to redirect_to bike_url(bike, scanned_id: code, organization_id: organization.id)
+        end
       end
     end
     context "id" do

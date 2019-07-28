@@ -1,6 +1,4 @@
 class Admin::DashboardController < Admin::BaseController
-  layout "new_admin"
-
   def index
     @organizations = Organization.unscoped.order("created_at DESC").limit(10)
     @bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint).order("created_at desc").limit(10)

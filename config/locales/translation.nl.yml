@@ -2044,6 +2044,13 @@ nl:
         op in het onderstaande veld
       write_them_a_message: Schrijf ze een bericht
       year: jaar
+      change_the_bike_sticker_linked_to: Verander de fiets waarnaar het linkt
+      is_this_linked_to_incorrect_bike: Is deze sticker gekoppeld aan de verkeerde
+        fiets?
+      switch_to_new_bike_id: Schakel over naar een nieuwe fiets-ID
+      update: Bijwerken
+      you_scanned_this_sticker_html: U hebt de sticker <strong>%{pretty_code}</strong>
+        gescand die aan deze %{bike_type} is toegewezen.
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
       a_police_report: een politierapportnummer

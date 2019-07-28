@@ -1,6 +1,5 @@
 class Admin::BikeCodesController < Admin::BaseController
   include SortableTable
-  layout "new_admin"
 
   def index
     page = params[:page] || 1
@@ -14,7 +13,7 @@ class Admin::BikeCodesController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[created_at code organization_id bike_code_batch_id]
+    %w[created_at code_integer organization_id bike_code_batch_id]
   end
 
   def matching_bike_codes
