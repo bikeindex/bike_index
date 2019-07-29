@@ -34,3 +34,17 @@
     }
   }
 }
+
+#organized_bikes_new {
+  @include media-breakpoint-down(sm) {
+    .organized-wrap > .container {
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+  .container > iframe {
+    min-height: 1400px;
+    width: 100%;
+    border: none;
+  }
+}
