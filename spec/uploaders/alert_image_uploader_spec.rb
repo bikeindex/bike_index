@@ -33,6 +33,24 @@ RSpec.describe AlertImageUploader do
   end
 
   describe "#bike_location" do
+    context "given a stolen record with location (city and state)" do
+      it "returns the city and state" do
+        ny_state = FactoryBot.create(:state, abbreviation: "NY")
+        stolen_record = FactoryBot.create(:stolen_record, city: "New Paltz", state: ny_state)
+        uploader = described_class.new(stolen_record, :theft_alert_image)
+        expect(uploader.bike_location).to eq("New Paltz, NY")
+      end
+    end
+
+    context "given a stolen record with location (state only)" do
+      it "returns only the state" do
+        ny_state = FactoryBot.create(:state, abbreviation: "NY")
+        stolen_record = FactoryBot.create(:stolen_record, state: ny_state)
+        uploader = described_class.new(stolen_record, :theft_alert_image)
+        expect(uploader.bike_location).to eq("NY")
+      end
+    end
+
     context "given a bike registration address with no state" do
       it "returns an empty string" do
         stolen_record = FactoryBot.create(:stolen_record)

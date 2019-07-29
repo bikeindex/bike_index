@@ -34,8 +34,18 @@ class AlertImageUploader < ApplicationUploader
   end
 
   def bike_location
-    city = bike.registration_address[:city]&.titleize
-    state = bike.registration_address[:state]&.upcase
+    city = model.city&.titleize
+    state = model.state&.abbreviation&.upcase
+
+    if city && state
+      return "#{city}, #{state}"
+    elsif state
+      return state
+    end
+
+    registration_address = bike.registration_address.with_indifferent_access
+    city = registration_address[:city]&.titleize
+    state = registration_address[:state]&.upcase
 
     if city && state
       "#{city}, #{state}"
