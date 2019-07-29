@@ -666,6 +666,7 @@ DEPENDENCIES
   carrierwave
   carrierwave_backgrounder
   chartkick
+  coderay
   coffee-rails
   dalli
   database_cleaner
