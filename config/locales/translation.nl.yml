@@ -3407,6 +3407,7 @@ nl:
       users: Gebruikers
       view_org: Bekijk %{org_name}
       your_bikes: Je fietsen
+      org_impounded_bikes: "%{org_name} In beslag genomen fietsen"
     application_revised_bikehub:
       bike_security: Bij BikeHub geloven we dat fietsbeveiliging meer is dan alleen
         een sterk U-slot.
@@ -3697,6 +3698,8 @@ nl:
         view_all_bikes: bekijk alle fietsen
         view_just_stolen_bikes: bekijk alleen gestolen fietsen
         visible_columns: Zichtbare kolommen
+        email_hidden: email verborgen
+        impounded: In beslag genomen bij
     bulk_imports:
       index:
         added: Toegevoegd

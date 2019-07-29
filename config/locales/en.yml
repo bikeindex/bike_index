@@ -1670,7 +1670,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -1696,7 +1696,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -2999,6 +2999,7 @@ en:
       multi_serial_search: Multi serial search
       org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"
+      org_impounded_bikes: "%{org_name} Impounded Bikes"
       org_locations: "%{org_name} locations"
       org_profile: "%{org_name} profile"
       recoveries: Recoveries
@@ -3352,6 +3353,8 @@ en:
         all: All
         bike: bike
         color: Color
+        email_hidden: email hidden
+        impounded: Impounded at
         link: Link
         manufacturer: Manufacturer
         matching_bikes_html: "<strong>%{bikes}</strong> matching"
@@ -3361,7 +3364,6 @@ en:
         only_not: only not
         only_with: only with
         only_with_stickers_html: Only <strong>with</strong> stickers
-        impounded: Impounded at
         owner_name: Owner name
         registered: Registered
         registered_bikes_html: "<strong>%{bikes}</strong> matching for %{org_name}"
@@ -3378,7 +3380,6 @@ en:
         view_all_bikes: view all bikes
         view_just_stolen_bikes: view just stolen bikes
         visible_columns: Visible columns
-        email_hidden: email hidden
     bulk_imports:
       index:
         added: Added
