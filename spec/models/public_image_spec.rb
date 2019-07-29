@@ -20,11 +20,14 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
-  describe "lottapixel" do
-    it "doesn't break" do
-      lottapixel = File.open(File.join(Rails.root, "spec", "fixtures", "hugeimg.png"))
-      public_image = FactoryBot.build(:public_image, image: lottapixel)
-      public_image.save
+  describe "large images that exceed the size restriction" do
+    before { ImageUploader.enable_processing = true }
+    after { ImageUploader.enable_processing = false }
+
+    it "are not created" do
+      large_image = File.open(File.join(Rails.root, "spec", "fixtures", "hugeimg.png"))
+      public_image = FactoryBot.build(:public_image, image: large_image)
+      expect(public_image.save).to eq(false)
       expect(public_image.id).to be_nil
       # Because updated versions of imagemagick respond with different errors
       error_msg = public_image.errors.full_messages.to_s
