@@ -173,6 +173,8 @@ nl:
               invalid_uri: moet een geldige URI zijn.
               relative_uri: moet een absolute URI zijn.
               secured_uri: moet een HTTPS/SSL URI zijn.
+        impound_record:
+          user_not_authorized: heeft geen toestemming om deze fiets in beslag te nemen
     attributes:
       doorkeeper/application:
         name: Naam
@@ -1933,6 +1935,10 @@ nl:
         opneemt over een advertentie die u online hebt gevonden, neemt u een link
         op in het onderstaande veld
       write_them_a_message: Schrijf ze een bericht
+      already_impounded: Deze %{bike_type} is al in beslag genomen door %{organization_name}
+      impound: confisqueren
+      impound_are_you_sure: Weet je zeker dat je %{bike_type} wilt?
+      impounded_by: Door
     pdf:
       bike_description: 'Fiets beschrijving:'
       bike_serial: Bike Serial
@@ -3400,6 +3406,7 @@ nl:
       users: Gebruikers
       view_org: Bekijk %{org_name}
       your_bikes: Je fietsen
+      org_impounded_bikes: "%{org_name} In beslag genomen fietsen"
     application_revised_bikehub:
       bike_security: Bij BikeHub geloven we dat fietsbeveiliging meer is dan alleen
         een sterk U-slot.
@@ -3690,6 +3697,8 @@ nl:
         view_all_bikes: bekijk alle fietsen
         view_just_stolen_bikes: bekijk alleen gestolen fietsen
         visible_columns: Zichtbare kolommen
+        email_hidden: email verborgen
+        impounded: In beslag genomen bij
     bulk_imports:
       index:
         added: Toegevoegd

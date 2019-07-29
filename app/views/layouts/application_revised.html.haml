@@ -38,8 +38,13 @@
                 - if passive_organization.parent?
                   %li
                     = active_link "#{passive_organization.short_name} dashboard", organization_dashboard_index_path(organization_id: passive_organization.to_param), class: "nav-link"
+                - on_bikes_path = controller_name == "bikes" && action_name == "index" # Because we want to ignore queries and stuff
+                - on_impound_bikes_path = on_bikes_path && params[:search_impoundedness] == "only_impounded"
                 %li
-                  = active_link t(".org_bikes", org_name: passive_organization.short_name), organization_bikes_path(organization_id: passive_organization.to_param), class: "nav-link"
+                  = link_to t(".org_bikes", org_name: passive_organization.short_name), organization_bikes_path(organization_id: passive_organization.to_param), class: "nav-link #{(on_bikes_path && !on_impound_bikes_path) ? 'active' : ''}"
+                - if passive_organization.paid_for?("impound_bikes")
+                  %li
+                    = link_to t(".org_impounded_bikes", org_name: passive_organization.short_name), organization_bikes_path(organization_id: passive_organization.to_param, search_impoundedness: "only_impounded"), class: "nav-link #{on_impound_bikes_path ? 'active' : ''}"
                 %li
                   = active_link t(".add_a_bike"), new_organization_bike_path(passive_organization), class: "nav-link"
                 - if passive_organization.paid_for?("show_partial_registrations")
