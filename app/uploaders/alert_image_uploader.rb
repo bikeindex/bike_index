@@ -34,8 +34,8 @@ class AlertImageUploader < ApplicationUploader
   end
 
   def bike_location
-    city = bike.registration_address["city"]&.capitalize
-    state = bike.registration_address["state"]&.upcase
+    city = bike.registration_address[:city]&.titleize
+    state = bike.registration_address[:state]&.upcase
 
     if city && state
       "#{city}, #{state}"
