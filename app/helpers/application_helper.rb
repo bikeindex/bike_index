@@ -212,6 +212,13 @@ module ApplicationHelper
     end
   end
 
+  def pretty_print_json(data)
+    content_tag(:pre,
+                content_tag(:code, data.to_json.gsub("\",", "\",\n")),
+                style: "padding: 1rem .5rem; border: 1px solid #ccc;")
+
+  end
+
   def language_choices
     @language_choices ||= I18n.available_locales.map do |locale|
       [t(locale, scope: [:locales]), locale.to_s]
