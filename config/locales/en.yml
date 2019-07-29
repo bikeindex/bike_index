@@ -1293,7 +1293,7 @@ en:
         number of Bike Codes.
     show:
       at: at
-      bike_in_admin: "%{bike_type} in Admin"
+      bike_in_admin: "%{bike_type} in Super Admin"
       bike_photo: "%{bike_type} photo"
       change_the_bike_sticker_linked_to: Change the bike it links to
       color_may_not_match: Color may not match!
@@ -1352,7 +1352,7 @@ en:
       write_them_a_message: Write them a message
       year: Year
       you_scanned_this_sticker_html: >-
-        You scanned the sticker <strong>%{pretty_code}</strong> which is assigned
+        You scanned the sticker <strong>%{pretty_code}</strong>, which is assigned
         to this %{bike_type}.
     stolen_checklist:
       a_photo_of_your_bike_type: a photo of your %{bike_type}
