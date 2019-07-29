@@ -25,7 +25,7 @@ RSpec.describe PublicImage, type: :model do
     after { ImageUploader.enable_processing = false }
 
     it "are not created" do
-      large_image = File.open(File.join(Rails.root, "spec", "fixtures", "hugeimg.png"))
+      large_image = File.open(Rails.root.join("spec", "fixtures", "hugeimg.png"))
       public_image = FactoryBot.build(:public_image, image: large_image)
       expect(public_image.save).to eq(false)
       expect(public_image.id).to be_nil
@@ -65,7 +65,7 @@ RSpec.describe PublicImage, type: :model do
         end.to change(ExternalImageUrlStoreWorker.jobs, :size).by(1)
       end
       context "image present" do
-        let(:public_image) { PublicImage.new(imageable: bike, external_image_url: "http://example.com/image.png", image: File.open(File.join(Rails.root, "spec", "fixtures", "bike.jpg"))) }
+        let(:public_image) { PublicImage.new(imageable: bike, external_image_url: "http://example.com/image.png", image: File.open(Rails.root.join("spec", "fixtures", "bike.jpg"))) }
         it "enqueues after_bike_save_worker" do
           # TODO: Rails 5 update - after commit doesn't run :(
           expect(public_image.save).to be_truthy
