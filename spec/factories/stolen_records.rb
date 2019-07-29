@@ -10,7 +10,7 @@ FactoryBot.define do
       current { false }
     end
 
-    trait :no_photo do
+    trait :no_image do
       bike { FactoryBot.create(:bike) }
     end
   end

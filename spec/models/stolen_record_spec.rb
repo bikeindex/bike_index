@@ -139,7 +139,7 @@ RSpec.describe StolenRecord, type: :model do
     context "stolen record is recovered, sharable but no bike photo" do
       it "is not displayed" do
         stolen_record = FactoryBot.create(:stolen_record_recovered,
-                                          :no_photo,
+                                          :no_image,
                                           can_share_recovery: true)
         expect(stolen_record.recovery_display_status).to eq "displayable_no_photo"
       end
@@ -263,7 +263,7 @@ RSpec.describe StolenRecord, type: :model do
     context "recovery is eligible for display but has no photo" do
       it "returns displayable_no_photo" do
         stolen_record = FactoryBot.create(:stolen_record_recovered,
-                                          :no_photo,
+                                          :no_image,
                                           can_share_recovery: true)
         expect(stolen_record.calculated_recovery_display_status).to eq "displayable_no_photo"
       end
