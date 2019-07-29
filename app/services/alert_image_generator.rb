@@ -1,5 +1,6 @@
 module AlertImageGenerator
-  BASE_TEMPLATE_PATH = Rails.root.join("app", "assets", "images", "premium_alert_template.png")
+  BASE_TEMPLATE_NAME = "promoted_alert_template.png"
+  BASE_TEMPLATE_PATH = Rails.root.join("app", "assets", "images", BASE_TEMPLATE_NAME)
   HEADER_HEIGHT = 100
   FOOTER_HEIGHT = 50
   PADDING = 200
