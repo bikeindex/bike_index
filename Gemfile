@@ -97,6 +97,7 @@ gem "sprockets-rails", "~> 3.0.4"
 gem "therubyracer"
 gem "uglifier"
 gem "webpacker", "~> 4.x"
+gem "coderay" # Pretty print code
 
 # Show performance metrics
 gem "flamegraph", require: false

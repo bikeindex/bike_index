@@ -213,10 +213,8 @@ module ApplicationHelper
   end
 
   def pretty_print_json(data)
-    content_tag(:pre,
-                content_tag(:code, data.to_json.gsub("\",", "\",\n")),
-                style: "padding: 1rem .5rem; border: 1px solid #ccc;")
-
+    require "coderay"
+    CodeRay.scan(JSON.pretty_generate(data), :json).div.html_safe
   end
 
   def language_choices
