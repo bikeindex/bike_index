@@ -28,7 +28,7 @@ RSpec.describe ImpoundRecord, type: :model do
         bike.reload
         expect(bike.impounded?).to be_truthy
         expect(bike.impound_records.count).to eq 1
-        new_impound_record = bike.impound(user: user)
+        new_impound_record = bike.impound(user)
         bike.reload
         expect(bike.impound_records.count).to eq 1
         expect(new_impound_record.errors.full_messages.join).to match(/already/)
@@ -54,7 +54,7 @@ RSpec.describe ImpoundRecord, type: :model do
         expect(bike.impounded?).to be_falsey
         expect(impound_record.errors.full_messages.to_s).to match(/permission/)
         # unauthorized user, no org
-        impound_record = bike.impound(user: user2)
+        impound_record = bike.impound(user2)
         bike.reload
         expect(bike.impounded?).to be_falsey
         expect(impound_record.errors.full_messages.to_s).to match(/permission/)

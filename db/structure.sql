@@ -1558,8 +1558,7 @@ CREATE TABLE public.organizations (
     ascend_name character varying,
     registration_field_labels jsonb DEFAULT '{}'::jsonb,
     pos_kind integer DEFAULT 0,
-    previous_slug character varying,
-    child_ids jsonb
+    previous_slug character varying
 );
 
 
@@ -3350,6 +3349,27 @@ CREATE UNIQUE INDEX index_flipper_gates_on_feature_key_and_key_and_value ON publ
 
 
 --
+-- Name: index_impound_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_records_on_bike_id ON public.impound_records USING btree (bike_id);
+
+
+--
+-- Name: index_impound_records_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_records_on_organization_id ON public.impound_records USING btree (organization_id);
+
+
+--
+-- Name: index_impound_records_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_records_on_user_id ON public.impound_records USING btree (user_id);
+
+
+--
 -- Name: index_integrations_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4442,6 +4462,4 @@ INSERT INTO schema_migrations (version) VALUES ('20190710230727');
 INSERT INTO schema_migrations (version) VALUES ('20190725141309');
 
 INSERT INTO schema_migrations (version) VALUES ('20190725172835');
-
-INSERT INTO schema_migrations (version) VALUES ('20190726160009');
 

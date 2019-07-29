@@ -288,10 +288,10 @@ class Bike < ActiveRecord::Base
     true
   end
 
-  def impound(user: user, organization: nil)
-    organization ||= user.organizations.detect { |o| o.paid_for?("impound_bikes") }
+  def impound(passed_user, organization: nil)
+    organization ||= passed_user.organizations.detect { |o| o.paid_for?("impound_bikes") }
     impound_record = impound_records.where(organization_id: organization&.id).first
-    impound_record ||= impound_records.create(user: user, organization: organization)
+    impound_record ||= impound_records.create(user: passed_user, organization: organization)
   end
 
   def bike_code?(organization_id = nil) # This method only accepts numerical org ids

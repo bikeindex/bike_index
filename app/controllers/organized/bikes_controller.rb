@@ -39,7 +39,7 @@ module Organized
       if params.dig(:bike, :impound)
         if current_organization.paid_for?("impound_bikes")
           bike = Bike.find(params[:id])
-          impound_record = bike.impound(user: current_user, organization: current_organization)
+          impound_record = bike.impound(current_user, organization: current_organization)
           if impound_record.valid?
             flash[:success] = "#{bike.type} impounded!"
           else
