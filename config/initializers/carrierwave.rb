@@ -35,6 +35,10 @@ end
 CarrierWave.configure do |config|
   config.cache_dir = Rails.root.join("tmp", "uploads")
 
+  if Rails.env.test?
+    config.enable_processing = false
+  end
+
   if Rails.env.production?
     # config.fog_provider "fog/aws" # Once carrierwave is updated
     config.storage = :fog
@@ -50,5 +54,25 @@ CarrierWave.configure do |config|
     config.storage :fog
   else
     config.storage :file
+  end
+end
+
+# Add :enable_image_processing tag to example / group
+# to process images
+RSpec.configure do |config|
+  config.before(:each) do |example|
+    next unless example.metadata[:enable_image_processing]
+
+    CarrierWave.configure do |c|
+      c.enable_processing = true
+    end
+  end
+
+  config.after(:each) do |example|
+    next unless example.metadata[:enable_image_processing]
+
+    CarrierWave.configure do |c|
+      c.enable_processing = false
+    end
   end
 end
