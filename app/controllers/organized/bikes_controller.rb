@@ -82,6 +82,7 @@ module Organized
       org = current_organization || passive_organization
       if org.present?
         if params[:search_impoundedness] == "only_impounded"
+          @impoundedness = "only_impounded"
           bikes = org.impounded_bikes
         else
           bikes = org.bikes

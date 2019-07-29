@@ -73,7 +73,8 @@ RSpec.describe Organized::BikesController, type: :controller do
   context "logged_in_as_organization_member" do
     include_context :logged_in_as_organization_member
     context "paid organization" do
-      before { organization.update_columns(is_paid: true, paid_feature_slugs: %w[bike_search show_recoveries show_partial_registrations bike_codes]) } # Stub organization having paid feature
+      let(:paid_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_codes impound_bikes] }
+      before { organization.update_columns(is_paid: true, paid_feature_slugs: paid_feature_slugs) } # Stub organization having paid feature
       describe "index" do
         context "with params" do
           let(:query_params) do
@@ -123,7 +124,16 @@ RSpec.describe Organized::BikesController, type: :controller do
           end
         end
         context "with search_impoundedness only_impounded" do
-          it "returns only impounded"
+          let(:impound_record) { FactoryBot.create(:impound_record, organization: organization, user: user) }
+          let!(:impounded_bike) { impound_record.bike }
+          it "returns only impounded" do
+            get :index, organization_id: organization.to_param, search_impoundedness: "only_impounded"
+            expect(response.status).to eq(200)
+            expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
+            expect(assigns(:current_organization)).to eq organization
+            expect(assigns(:search_query_present)).to be_falsey
+            expect(assigns(:bikes).pluck(:id)).to eq([impounded_bike.id])
+          end
         end
       end
       describe "recoveries" do
