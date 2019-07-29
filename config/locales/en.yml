@@ -1209,7 +1209,6 @@ en:
       geomessage: GeoMessage
       impound: Impound
       impound_are_you_sure: Are you sure you want to %{bike_type}?
-      impounded_at: at
       impounded_by: By
       is_false: 'false'
       is_not_registered_html: "<em>not</em> reged with %{org_name}"
@@ -3354,7 +3353,7 @@ en:
         bike: bike
         color: Color
         email_hidden: email hidden
-        impounded: Impounded at
+        impounded: Impounded
         link: Link
         manufacturer: Manufacturer
         matching_bikes_html: "<strong>%{bikes}</strong> matching"

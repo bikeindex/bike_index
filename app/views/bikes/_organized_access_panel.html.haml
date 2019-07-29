@@ -186,8 +186,8 @@
               - if impound_record.organization == passive_organization
                 %br
                 = t(".impounded_by")
-                %em= impound_record.user.display_name
-                = t(".impounded_at")
+                %em
+                  #{impound_record.user.display_name},
                 %span.convertTime
                   = l impound_record.created_at, format: :convert_time
 

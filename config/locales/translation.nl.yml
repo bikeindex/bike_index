@@ -1938,7 +1938,6 @@ nl:
       already_impounded: Deze %{bike_type} is al in beslag genomen door %{organization_name}
       impound: confisqueren
       impound_are_you_sure: Weet je zeker dat je %{bike_type} wilt?
-      impounded_at: bij
       impounded_by: Door
     pdf:
       bike_description: 'Fiets beschrijving:'
