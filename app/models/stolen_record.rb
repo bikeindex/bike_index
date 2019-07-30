@@ -96,11 +96,11 @@ class StolenRecord < ActiveRecord::Base
   end
 
   def address_location
-    return "" if state&.abbreviation&.upcase.blank?
+    return "" if state&.abbreviation.blank?
 
     @address_location ||= [
       city&.titleize,
-      state&.abbreviation&.upcase,
+      state.abbreviation.upcase,
     ].compact.join(", ")
   end
 
