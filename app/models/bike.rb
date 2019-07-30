@@ -511,7 +511,7 @@ class Bike < ActiveRecord::Base
     state = address[:state]&.upcase
     return "" if state.blank?
 
-    [city, state].compact.join(", ")
+    [city, state].reject(&:blank?).join(", ")
   end
 
   def organization_affiliation
