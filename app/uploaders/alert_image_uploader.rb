@@ -12,8 +12,8 @@ class AlertImageUploader < ApplicationUploader
 
   def filename
     return if stolen_record.alert_image.blank?
-    filename, _ = File.basename(stolen_record.alert_image.path, ".*").split("-")
-    "#{filename}-alert.jpg"
+    file, _ = File.basename(stolen_record.alert_image.path, ".*").split("-")
+    "#{file}-alert.jpg"
   end
 
   def extension_white_list

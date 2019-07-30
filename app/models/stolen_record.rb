@@ -267,10 +267,14 @@ class StolenRecord < ActiveRecord::Base
   #
   # TODO: Allow selection of which bike image to use for the alert image
   def generate_alert_image
-    new_image = bike.public_images.order(:created_at).last.image
-    new_file = File.basename(new_image.path, ".*")
-    cur_file = File.basename(alert_image.path, ".*")
-    return if new_file == cur_file
+    new_image = bike.reload.public_images.order(:created_at).last&.image
+    return if new_image.blank?
+
+    if alert_image.present?
+      new_file = File.basename(new_image.path, ".*")
+      cur_file = File.basename(alert_image.path, ".*")
+      return if "#{new_file}-alert" == cur_file
+    end
 
     alert_image.remove!
     update(alert_image: new_image)

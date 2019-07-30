@@ -27,6 +27,78 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
+  describe "#generate_alert_image" do
+    context "given no bike image" do
+      it "returns with no changes" do
+        stolen_record = FactoryBot.create(:stolen_record, :no_bike_image, alert_image: nil)
+        stolen_record.generate_alert_image
+        expect(stolen_record.alert_image).to be_blank
+      end
+    end
+
+    context "given a bike image" do
+      it "updated alert_image" do
+        stolen_record = FactoryBot.create(:stolen_record, alert_image: nil)
+        stolen_record.generate_alert_image
+        expect(stolen_record.alert_image).to be_present
+      end
+    end
+
+    context "given multiple bike images" do
+      it "uses the most recently created one for the alert image" do
+        bike = FactoryBot.create(:bike)
+        image1 = FactoryBot.create(:public_image, imageable: bike)
+        image2 = FactoryBot.create(:public_image, imageable: bike)
+        stolen_record = FactoryBot.create(:stolen_record, alert_image: nil, bike: bike)
+        expect(stolen_record.alert_image).to be_blank
+
+        stolen_record.generate_alert_image
+        expect(stolen_record.alert_image).to be_present
+
+        alert_image_name = File.basename(stolen_record.alert_image.path, ".*")
+        image1_name = File.basename(image1.image.path, ".*")
+        image2_name = File.basename(image2.image.path, ".*")
+        expect(alert_image_name).to_not eq("#{image1_name}-alert")
+        expect(alert_image_name).to eq("#{image2_name}-alert")
+      end
+    end
+
+    context "given a pre-existing alert_image" do
+      it "re-generates the image if the bike image filename differs" do
+        stolen_record = FactoryBot.create(:stolen_record)
+        bike_image0 = stolen_record.bike.public_images.last.image
+        bike_image_name = File.basename(bike_image0.path, ".*")
+        alert_image_name = File.basename(stolen_record.alert_image.path, ".*")
+        expect(alert_image_name).to_not eq("#{bike_image_name}-alert")
+
+        stolen_record.generate_alert_image
+
+        expect(stolen_record.alert_image).to be_present
+        alert_image_name = File.basename(stolen_record.reload.alert_image.path, ".*")
+        expect(alert_image_name).to eq("#{bike_image_name}-alert")
+      end
+
+      it "returns without updating if the bike image filename does not differ" do
+        stolen_record = FactoryBot.create(:stolen_record, alert_image: nil)
+        bike_image_name = File.basename(stolen_record.bike.public_images.last.image.path, ".*")
+
+        # Set alert image to bike image
+        stolen_record.generate_alert_image
+        expect(stolen_record.alert_image).to be_present
+
+        alert_image_name = File.basename(stolen_record.reload.alert_image.path, ".*")
+        expect(alert_image_name).to eq("#{bike_image_name}-alert")
+
+        # Attempt to generate with no change to bike image
+        allow(stolen_record).to receive(:update)
+        stolen_record.generate_alert_image
+        expect(stolen_record).to_not have_received(:update)
+
+        expect(alert_image_name).to eq("#{bike_image_name}-alert")
+      end
+    end
+  end
+
   it "marks current true by default, display_checklist? false" do
     stolen_record = StolenRecord.new
     expect(stolen_record.current).to be_truthy
@@ -165,7 +237,7 @@ RSpec.describe StolenRecord, type: :model do
     context "stolen record is recovered, sharable but no bike photo" do
       it "is not displayed" do
         stolen_record = FactoryBot.create(:stolen_record_recovered,
-                                          :no_image,
+                                          :no_bike_image,
                                           can_share_recovery: true)
         expect(stolen_record.recovery_display_status).to eq "displayable_no_photo"
       end
@@ -289,7 +361,7 @@ RSpec.describe StolenRecord, type: :model do
     context "recovery is eligible for display but has no photo" do
       it "returns displayable_no_photo" do
         stolen_record = FactoryBot.create(:stolen_record_recovered,
-                                          :no_image,
+                                          :no_bike_image,
                                           can_share_recovery: true)
         expect(stolen_record.calculated_recovery_display_status).to eq "displayable_no_photo"
       end
