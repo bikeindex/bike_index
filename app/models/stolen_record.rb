@@ -53,7 +53,7 @@ class StolenRecord < ActiveRecord::Base
   mount_uploader :alert_image, AlertImageUploader
   process_in_background :alert_image
   delegate :generate_alert_image, to: :bike
-  after_create :generate_alert_image
+  after_commit :remove_outdated_alert_image
 
   def self.find_matching_token(bike_id:, recovery_link_token:)
     return nil unless bike_id.present? && recovery_link_token.present?
@@ -245,5 +245,9 @@ class StolenRecord < ActiveRecord::Base
     return recovery_link_token if recovery_link_token.present?
     update_attributes(recovery_link_token: SecurityTokenizer.new_token)
     recovery_link_token
+  end
+  # If the bike has been recovered, remove the alert_image
+  def remove_outdated_alert_image
+    alert_image.remove! if date_recovered.present?
   end
 end

@@ -1,6 +1,32 @@
 require "rails_helper"
 
 RSpec.describe StolenRecord, type: :model do
+  describe "after_commit hooks" do
+    context "if being marked as recovered" do
+      it "removes alert_image" do
+        stolen_record = FactoryBot.create(:stolen_record)
+        expect(stolen_record.alert_image).to be_present
+
+        stolen_record.update(date_recovered: Time.current)
+        stolen_record.run_callbacks(:commit)
+
+        expect(stolen_record.alert_image).to be_blank
+      end
+    end
+
+    context "if not being marked as recovered" do
+      it "does not removes alert_image" do
+        stolen_record = FactoryBot.create(:stolen_record)
+        expect(stolen_record.alert_image).to be_present
+
+        stolen_record.update(date_recovered: nil)
+        stolen_record.run_callbacks(:commit)
+
+        expect(stolen_record.alert_image).to be_present
+      end
+    end
+  end
+
   it "marks current true by default, display_checklist? false" do
     stolen_record = StolenRecord.new
     expect(stolen_record.current).to be_truthy
