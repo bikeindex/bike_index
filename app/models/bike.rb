@@ -509,14 +509,7 @@ class Bike < ActiveRecord::Base
     address = registration_address.with_indifferent_access
     city = address[:city]&.titleize
     state = address[:state]&.upcase
-
-    if city && state
-      "#{city}, #{state}"
-    elsif state
-      state
-    else
-      ""
-    end
+    [city, state].compact.join(", ")
   end
 
   def organization_affiliation

@@ -249,14 +249,7 @@ class StolenRecord < ActiveRecord::Base
   def location
     city = self.city&.titleize
     state = self.state&.abbreviation&.upcase
-
-    if city && state
-      "#{city}, #{state}"
-    elsif state
-      state
-    else
-      ""
-    end
+    [city, state].compact.join(", ")
   end
 
   # Generate the "premium alert image"
