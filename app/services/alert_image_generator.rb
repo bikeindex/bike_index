@@ -33,6 +33,8 @@ module AlertImageGenerator
         i.font "Helvetica-Oblique"
       elsif system("mogrify -list font | grep --silent 'Font: ArialI$'")
         i.font "ArialI"
+      elsif system("mogrify -list font | grep --silent 'Font: DejaVu-Sans$'")
+        i.font "DejaVu-Sans"
       end
 
       # Overlay bike url within lower border
