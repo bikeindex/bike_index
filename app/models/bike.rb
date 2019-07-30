@@ -514,8 +514,8 @@ class Bike < ActiveRecord::Base
   end
 
   def alert_image_url
-    return if current_stolen_record.blank?
-    return unless current_stolen_record.generate_alert_image
+    return if current_stolen_record.blank? || public_images.none?
+    current_stolen_record.generate_alert_image
     current_stolen_record.alert_image_url
   end
 

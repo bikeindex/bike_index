@@ -246,18 +246,21 @@ class StolenRecord < ActiveRecord::Base
     recovery_link_token
   end
 
-  def alert_image_outdated?
-    alert_image.blank?
-  end
-
-  # Generate the alert image (the current bike image on a branded template)
-  # The URL is available immediately, processin is performed in the background.
+  # Generate the "premium alert image"
+  # (the most recently created bike image placed on a branded template)
+  #
+  # The URL is available immediately, processing is performed in the background.
   # If processing fails, the unprocessed image will be loaded.
+  #
+  # TODO: Allow selection of which bike image to use for the alert image
   def generate_alert_image
-    return if bike.public_images.none?
-    return unless alert_image_outdated?
+    new_image = bike.public_images.order(:created_at).last.image
+    new_file = File.basename(new_image.path, ".*")
+    cur_file = File.basename(alert_image.path, ".*")
+    return if new_file == cur_file
 
-    update(alert_image: bike.public_images.first.image)
+    alert_image.remove!
+    update(alert_image: new_image)
   end
 
   # If the bike has been recovered, remove the alert_image

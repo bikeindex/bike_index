@@ -11,7 +11,9 @@ class AlertImageUploader < ApplicationUploader
   end
 
   def filename
-    "alert_#{model.id}.jpg"
+    raise ArgumentError, "missing alert_image" if model.alert_image.blank?
+    filename, _ = File.basename(model.alert_image.path, ".*").split("-")
+    "#{filename}-alert.jpg"
   end
 
   def extension_white_list
