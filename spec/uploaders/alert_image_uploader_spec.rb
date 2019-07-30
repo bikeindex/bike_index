@@ -14,53 +14,23 @@ RSpec.describe AlertImageUploader do
   end
 
   describe "#bike_location" do
-    context "given a stolen record with location (city and state)" do
-      it "returns the city and state" do
-        ny_state = FactoryBot.create(:state, abbreviation: "NY")
-        stolen_record = FactoryBot.create(:stolen_record, city: "New Paltz", state: ny_state)
-        uploader = described_class.new(stolen_record, :theft_alert_image)
-        expect(uploader.bike_location).to eq("New Paltz, NY")
-      end
-    end
-
-    context "given a stolen record with location (state only)" do
-      it "returns only the state" do
-        ny_state = FactoryBot.create(:state, abbreviation: "NY")
-        stolen_record = FactoryBot.create(:stolen_record, state: ny_state)
-        uploader = described_class.new(stolen_record, :theft_alert_image)
-        expect(uploader.bike_location).to eq("NY")
-      end
-    end
-
-    context "given a bike registration address with no state" do
-      it "returns an empty string" do
+    context "given a stolen record location" do
+      it "returns the stolen record location" do
         stolen_record = FactoryBot.create(:stolen_record)
+        allow(stolen_record).to receive(:location).and_return("City, State")
         uploader = described_class.new(stolen_record, :theft_alert_image)
-        expect(uploader.bike_location).to eq("")
+        expect(uploader.bike_location).to eq("City, State")
       end
     end
 
-    context "given a bike registration address only a state" do
-      it "returns the state" do
-        bike = FactoryBot.create(:bike)
-        allow(bike).to receive(:registration_address).and_return({ "state": "ny" })
-        stolen_record = FactoryBot.create(:stolen_record, bike: bike)
-
+    context "given a bike registration location" do
+      it "returns registration location if stolen record location is present" do
+        stolen_record = FactoryBot.create(:stolen_record)
+        allow(stolen_record).to receive(:location).and_return("")
+        bike = stolen_record.bike
+        allow(bike).to receive(:registration_location).and_return("Another City, State")
         uploader = described_class.new(stolen_record, :theft_alert_image)
-
-        expect(uploader.bike_location).to eq("NY")
-      end
-    end
-
-    context "given a bike registration address with a city and state" do
-      it "returns the city and state" do
-        bike = FactoryBot.create(:bike)
-        allow(bike).to receive(:registration_address).and_return({ "state": "ny", city: "New York" })
-        stolen_record = FactoryBot.create(:stolen_record, bike: bike)
-
-        uploader = described_class.new(stolen_record, :theft_alert_image)
-
-        expect(uploader.bike_location).to eq("New York, NY")
+        expect(uploader.bike_location).to eq("Another City, State")
       end
     end
   end

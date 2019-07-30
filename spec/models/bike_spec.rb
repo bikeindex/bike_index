@@ -1304,4 +1304,30 @@ RSpec.describe Bike, type: :model do
       expect(bike.propulsion_type_name).to eq(normalized_name)
     end
   end
+
+  describe "#registration_location" do
+    context "given a registration address with no state" do
+      it "returns an empty string" do
+        bike = FactoryBot.create(:bike)
+        allow(bike).to receive(:registration_address).and_return({ "city": "New Paltz" })
+        expect(bike.registration_location).to eq("")
+      end
+    end
+
+    context "given a registration address only a state" do
+      it "returns the state" do
+        bike = FactoryBot.create(:bike)
+        allow(bike).to receive(:registration_address).and_return({ "state": "ny" })
+        expect(bike.registration_location).to eq("NY")
+      end
+    end
+
+    context "given a registration address with a city and state" do
+      it "returns the city and state" do
+        bike = FactoryBot.create(:bike)
+        allow(bike).to receive(:registration_address).and_return({ "state": "ny", city: "New York" })
+        expect(bike.registration_location).to eq("New York, NY")
+      end
+    end
+  end
 end

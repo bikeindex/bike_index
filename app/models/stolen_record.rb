@@ -246,6 +246,19 @@ class StolenRecord < ActiveRecord::Base
     recovery_link_token
   end
 
+  def location
+    city = self.city&.titleize
+    state = self.state&.abbreviation&.upcase
+
+    if city && state
+      "#{city}, #{state}"
+    elsif state
+      state
+    else
+      ""
+    end
+  end
+
   # Generate the "premium alert image"
   # (the most recently created bike image placed on a branded template)
   #

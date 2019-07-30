@@ -420,4 +420,29 @@ RSpec.describe StolenRecord, type: :model do
       end
     end
   end
+
+  describe "#location" do
+    context "given a city and state" do
+      it "returns the city and state" do
+        ny_state = FactoryBot.create(:state, abbreviation: "NY")
+        stolen_record = FactoryBot.create(:stolen_record, city: "New Paltz", state: ny_state)
+        expect(stolen_record.location).to eq("New Paltz, NY")
+      end
+    end
+
+    context "given only a state" do
+      it "returns only the state" do
+        ny_state = FactoryBot.create(:state, abbreviation: "NY")
+        stolen_record = FactoryBot.create(:stolen_record, city: nil, state: ny_state)
+        expect(stolen_record.location).to eq("NY")
+      end
+    end
+
+    context "given only a city" do
+      it "returns an empty string" do
+        stolen_record = FactoryBot.create(:stolen_record, city: "New Paltz", state: nil)
+        expect(stolen_record.location).to eq("")
+      end
+    end
+  end
 end

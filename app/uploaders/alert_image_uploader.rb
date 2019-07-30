@@ -3,16 +3,16 @@ class AlertImageUploader < ApplicationUploader
   include ::CarrierWave::Backgrounder::Delay
 
   def store_dir
-    "#{base_store_dir}/#{model.id}"
+    "#{base_store_dir}/#{stolen_record.id}"
   end
 
   def base_store_dir
-    "uploads/#{model.class.to_s[0, 2]}"
+    "uploads/#{stolen_record.class.to_s[0, 2]}"
   end
 
   def filename
-    return if model.alert_image.blank?
-    filename, _ = File.basename(model.alert_image.path, ".*").split("-")
+    return if stolen_record.alert_image.blank?
+    filename, _ = File.basename(stolen_record.alert_image.path, ".*").split("-")
     "#{filename}-alert.jpg"
   end
 
@@ -23,6 +23,7 @@ class AlertImageUploader < ApplicationUploader
   process :generate_alert_image
   process convert: "jpg"
 
+  alias stolen_record model
   delegate :bike, to: :model
 
   def bike_url
@@ -30,25 +31,10 @@ class AlertImageUploader < ApplicationUploader
   end
 
   def bike_location
-    city = model.city&.titleize
-    state = model.state&.abbreviation&.upcase
-
-    if city && state
-      return "#{city}, #{state}"
-    elsif state
-      return state
-    end
-
-    registration_address = bike.registration_address.with_indifferent_access
-    city = registration_address[:city]&.titleize
-    state = registration_address[:state]&.upcase
-
-    if city && state
-      "#{city}, #{state}"
-    elsif state
-      state
+    if stolen_record.location.present?
+      stolen_record.location
     else
-      ""
+      bike.registration_location
     end
   end
 
