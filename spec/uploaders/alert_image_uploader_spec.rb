@@ -17,7 +17,7 @@ RSpec.describe AlertImageUploader do
     context "given a stolen record location" do
       it "returns the stolen record location" do
         stolen_record = FactoryBot.create(:stolen_record)
-        allow(stolen_record).to receive(:location).and_return("City, State")
+        allow(stolen_record).to receive(:address_location).and_return("City, State")
         uploader = described_class.new(stolen_record, :theft_alert_image)
         expect(uploader.bike_location).to eq("City, State")
       end
@@ -26,7 +26,7 @@ RSpec.describe AlertImageUploader do
     context "given a bike registration location" do
       it "returns registration location if stolen record location is present" do
         stolen_record = FactoryBot.create(:stolen_record)
-        allow(stolen_record).to receive(:location).and_return("")
+        allow(stolen_record).to receive(:address_location).and_return("")
         bike = stolen_record.bike
         allow(bike).to receive(:registration_location).and_return("Another City, State")
         uploader = described_class.new(stolen_record, :theft_alert_image)

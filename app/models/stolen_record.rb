@@ -95,6 +95,15 @@ class StolenRecord < ActiveRecord::Base
      zipcode].reject(&:blank?).join(",")
   end
 
+  def address_location
+    return "" if state&.abbreviation&.upcase.blank?
+
+    @address_location ||= [
+      city&.titleize,
+      state&.abbreviation&.upcase,
+    ].compact.join(", ")
+  end
+
   LOCKING_DESCRIPTIONS = [
     "U-lock",
     "Two U-locks",
@@ -244,12 +253,6 @@ class StolenRecord < ActiveRecord::Base
     return recovery_link_token if recovery_link_token.present?
     update_attributes(recovery_link_token: SecurityTokenizer.new_token)
     recovery_link_token
-  end
-
-  def location
-    city = self.city&.titleize
-    state = self.state&.abbreviation&.upcase
-    [city, state].compact.join(", ")
   end
 
   # Generate the "premium alert image"

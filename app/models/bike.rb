@@ -509,6 +509,8 @@ class Bike < ActiveRecord::Base
     address = registration_address.with_indifferent_access
     city = address[:city]&.titleize
     state = address[:state]&.upcase
+    return "" if state.blank?
+
     [city, state].compact.join(", ")
   end
 

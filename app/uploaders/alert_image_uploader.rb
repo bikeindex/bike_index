@@ -31,8 +31,8 @@ class AlertImageUploader < ApplicationUploader
   end
 
   def bike_location
-    if stolen_record.location.present?
-      stolen_record.location
+    if stolen_record.address_location.present?
+      stolen_record.address_location
     else
       bike.registration_location
     end
