@@ -89,10 +89,9 @@ class StolenRecord < ActiveRecord::Base
     ].reject(&:blank?).join(", ")
   end
 
-  def address_short # Doesn't include street
-    [city,
-     (state && state.abbreviation),
-     zipcode].reject(&:blank?).join(",")
+  # Doesn't include street
+  def address_short
+    [city, state&.abbreviation, zipcode].reject(&:blank?).join(",")
   end
 
   def address_location
