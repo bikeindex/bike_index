@@ -1305,6 +1305,35 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "#alert_image_url" do
+    context "given no current_stolen_record" do
+      it "returns nil" do
+        bike = FactoryBot.create(:bike, :with_image, current_stolen_record: nil)
+        expect(bike.alert_image_url).to be_nil
+      end
+    end
+
+    context "given no public images" do
+      it "returns nil" do
+        bike = FactoryBot.create(:bike)
+        stolen_record = FactoryBot.create(:stolen_record, bike: bike)
+        bike.update(current_stolen_record: stolen_record)
+        expect(bike.current_stolen_record).to be_present
+        expect(bike.alert_image_url).to be_nil
+      end
+    end
+
+    context "given a current_stolen_record and public images" do
+      it "returns the alert_image url" do
+        stolen_record = FactoryBot.create(:stolen_record)
+        bike = stolen_record.bike
+        bike.update(current_stolen_record: stolen_record)
+
+        expect(bike.alert_image_url).to match(%r{https?://.+/bike.+-alert.jpg})
+      end
+    end
+  end
+
   describe "#registration_location" do
     context "given a registration address with no state" do
       it "returns an empty string" do
