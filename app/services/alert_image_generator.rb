@@ -26,9 +26,14 @@ module AlertImageGenerator
     end
 
     alert_image.combine_options do |i|
-      i.font "ArialI"
       i.fill "#FFFFFF"
       i.antialias
+
+      if system("mogrify -list font | grep --silent 'Font: Helvetica-Oblique$'")
+        i.font "Helvetica-Oblique"
+      elsif system("mogrify -list font | grep --silent 'Font: ArialI$'")
+        i.font "ArialI"
+      end
 
       # Overlay bike url within lower border
       i.gravity "South"
