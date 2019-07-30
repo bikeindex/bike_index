@@ -11,7 +11,7 @@ class AlertImageUploader < ApplicationUploader
   end
 
   def filename
-    raise ArgumentError, "missing alert_image" if model.alert_image.blank?
+    return if model.alert_image.blank?
     filename, _ = File.basename(model.alert_image.path, ".*").split("-")
     "#{filename}-alert.jpg"
   end
