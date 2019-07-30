@@ -52,7 +52,6 @@ class StolenRecord < ActiveRecord::Base
 
   mount_uploader :alert_image, AlertImageUploader
   process_in_background :alert_image
-  delegate :generate_alert_image, to: :bike
   after_commit :remove_outdated_alert_image
 
   def self.find_matching_token(bike_id:, recovery_link_token:)
@@ -246,6 +245,21 @@ class StolenRecord < ActiveRecord::Base
     update_attributes(recovery_link_token: SecurityTokenizer.new_token)
     recovery_link_token
   end
+
+  def alert_image_outdated?
+    alert_image.blank?
+  end
+
+  # Generate the alert image (the current bike image on a branded template)
+  # The URL is available immediately, processin is performed in the background.
+  # If processing fails, the unprocessed image will be loaded.
+  def generate_alert_image
+    return if bike.public_images.none?
+    return unless alert_image_outdated?
+
+    update(alert_image: bike.public_images.first.image)
+  end
+
   # If the bike has been recovered, remove the alert_image
   def remove_outdated_alert_image
     alert_image.remove! if date_recovered.present?

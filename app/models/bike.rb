@@ -515,23 +515,8 @@ class Bike < ActiveRecord::Base
 
   def alert_image_url
     return if current_stolen_record.blank?
-
-    generate_alert_image
+    return unless current_stolen_record.generate_alert_image
     current_stolen_record.alert_image_url
-  end
-
-  def generate_alert_image
-    return if current_stolen_record.blank?
-    return if current_stolen_record.alert_image.present?
-
-    # Remove any old alert images
-    stolen_records.each { |sr| sr.alert_image&.remove! }
-
-    return if public_images.none?
-
-    # Generate alert image for current stolen record
-    current_stolen_record.alert_image = public_images.first.image
-    current_stolen_record.save
   end
 
   def load_external_images(urls = nil)
