@@ -23,12 +23,6 @@ class AlertImageUploader < ApplicationUploader
 
   delegate :bike, to: :model
 
-  def bike_image
-    public_image = bike.public_images.first&.image
-    raise ArgumentError, "No bike image for Bike #{bike.id}" if public_image.blank?
-    public_image
-  end
-
   def bike_url
     "bikeindex.org/bikes/#{bike.id}"
   end
@@ -58,7 +52,7 @@ class AlertImageUploader < ApplicationUploader
 
   def generate_alert_image
     AlertImageGenerator.generate_image(
-      bike_image_path: bike_image.path,
+      bike_image_path: model.alert_image.path,
       bike_url: bike_url,
       bike_location: bike_location,
       output_path: current_path,
