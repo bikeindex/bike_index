@@ -175,3 +175,4 @@ group :test do
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
 end
+bundle exec rake translations:sync
