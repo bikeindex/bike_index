@@ -1,0 +1,9 @@
+=== kgio 2.11.2 - fix Ruby 2.5 compatibility for accept_class / 2018-01-30 21:11 UTC
+
+  This release fixes a bug affecting the Rainbows! web server
+  which uses Kgio.accept_class:
+
+  https://bogomips.org/rainbows-public/CANp6QoJXRbPLqmOPpG7XmZBc+oYqLWCcq1ipvOyNEQPXDEwx9Q@mail.gmail.com/
+
+  * accept: avoid passing unnecessary arg to rb_funcall
+

@@ -1,0 +1,36 @@
+#!/bin/sh
+
+# wrap-for-bin.sh: Template for git executable wrapper scripts
+# to run test suite against sandbox, but with only bindir-installed
+# executables in PATH.  The Makefile copies this into various
+# files in bin-wrappers, substituting
+# /home/circleci/bikeindex/bike_index/deps-git/git-2.22.0 and git-shell.
+
+GIT_EXEC_PATH='/home/circleci/bikeindex/bike_index/deps-git/git-2.22.0'
+if test -n "$NO_SET_GIT_TEMPLATE_DIR"
+then
+	unset GIT_TEMPLATE_DIR
+else
+	GIT_TEMPLATE_DIR='/home/circleci/bikeindex/bike_index/deps-git/git-2.22.0/templates/blt'
+	export GIT_TEMPLATE_DIR
+fi
+GITPERLLIB='/home/circleci/bikeindex/bike_index/deps-git/git-2.22.0/perl/build/lib'"${GITPERLLIB:+:$GITPERLLIB}"
+GIT_TEXTDOMAINDIR='/home/circleci/bikeindex/bike_index/deps-git/git-2.22.0/po/build/locale'
+PATH='/home/circleci/bikeindex/bike_index/deps-git/git-2.22.0/bin-wrappers:'"$PATH"
+
+export GIT_EXEC_PATH GITPERLLIB PATH GIT_TEXTDOMAINDIR
+
+case "$GIT_DEBUGGER" in
+'')
+	exec "${GIT_EXEC_PATH}/git-shell" "$@"
+	;;
+1)
+	unset GIT_DEBUGGER
+	exec gdb --args "${GIT_EXEC_PATH}/git-shell" "$@"
+	;;
+*)
+	GIT_DEBUGGER_ARGS="$GIT_DEBUGGER"
+	unset GIT_DEBUGGER
+	exec ${GIT_DEBUGGER_ARGS} "${GIT_EXEC_PATH}/git-shell" "$@"
+	;;
+esac
