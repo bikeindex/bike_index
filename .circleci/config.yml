@@ -9,6 +9,7 @@ jobs:
       RACK_ENV: test
       COVERAGE: true
       DISABLE_SPRING: true
+      TRANSLATION_BRANCH: master
       TZ: /usr/share/zoneinfo/America/Chicago
 
     docker:
@@ -35,16 +36,48 @@ jobs:
           environment:
             DOCKERIZE_VERSION: v0.6.1
 
+      - restore_cache:
+          key: v2-git-2.22.0
+      - run:
+          name: Install Git
+          environment:
+            GIT_VERSION: 2.22.0
+          command: |
+            mkdir deps-git
+            cd    deps-git
+
+            sudo apt-get update
+            sudo apt-get install libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev
+
+            wget -O git.tgz https://mirrors.edge.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz
+            tar -xzf git.tgz
+            cd git-${GIT_VERSION}
+
+            sudo make prefix=/usr/local all
+            sudo cp ./git /usr/local/bin/git
+      - save_cache:
+          key: v2-git-2.22.0
+          paths:
+            - deps-git
+
+      - restore_cache:
+          key: v2-hub-2.12.3
       - run:
           name: Install Hub
-          command: |
-            command -v hub >/dev/null && exit 0
-            wget -O hub.tgz https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
-            tar -xzf hub.tgz
-            sudo mv hub-linux-amd64-${HUB_VERSION}/bin/hub /usr/bin/
-            rm -rf hub-linux-amd64-${HUB_VERSION} hub.tgz
           environment:
             HUB_VERSION: 2.12.3
+          command: |
+            mkdir deps-hub
+            cd    deps-hub
+
+            wget -O hub.tgz https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
+            tar -xzf hub.tgz
+
+            sudo cp ./hub-linux-amd64-${HUB_VERSION}/bin/hub /usr/local/bin/hub
+      - save_cache:
+          key: v2-hub-2.12.3
+          paths:
+            - deps-hub
 
       - run:
           name: Install system libraries
@@ -68,43 +101,7 @@ jobs:
 
       - run:
           name: Sync translations (only on master by default)
-          command: |
-            # Quit as success if not on the branch to be synced
-            if ! git branch --list | grep "^* ${TRANSLATION_BRANCH}$"; then
-              echo Skipping: Not on branch ${TRANSLATION_BRANCH}
-              exit 0
-            fi
-
-            # TODO: Delete test code
-            echo bundle exec rake translations:sync >> Gemfile
-            # bundle exec rake translations:sync
-
-            if [[ -n `git status --porcelain --short` ]]; then
-              echo ------------------------
-              echo Uncommitted translations:
-              echo ------------------------
-              git --no-pager diff
-
-              echo ------------------------
-              git config user.email "ci@bikeindex.org"
-              git config user.name "CircleCI"
-
-              BRANCH="translation-update-${CIRCLE_BUILD_NUM}"
-              git stash
-              git clean -df
-              git checkout -b ${BRANCH}
-              git reset --hard origin/master
-              git stash pop
-              git add .
-              git commit -m "Translation update [ci skip]"
-              git push -u origin ${BRANCH}
-              hub pull-request \
-              -m "[CircleCI] Translation update
-
-              Merge to Unblock CircleCI Job ${CIRCLE_BUILD_NUM}: ${CIRCLE_BUILD_URL}
-              Related: PR ${CIRCLE_PULL_REQUEST}"
-              exit 1
-            fi
+          command: bin/check_translations
 
       # Node dependencies
       - restore_cache:
