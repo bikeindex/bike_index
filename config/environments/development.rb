@@ -54,9 +54,6 @@ Rails.application.configure do
   # Raises helpful error messages.
   config.assets.raise_runtime_errors = true
 
-  # Enable serving of images, stylesheets, and JavaScripts from an asset server.
-  config.action_controller.asset_host = ENV["BASE_URL"]
-
   config.lograge.enabled = true
   config.log_level = :debug
   config.lograge.formatter = Lograge::Formatters::Logstash.new # Use logstash format

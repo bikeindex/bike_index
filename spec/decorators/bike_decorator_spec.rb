@@ -83,7 +83,7 @@ RSpec.describe BikeDecorator do
         decorator = BikeDecorator.new(bike)
         allow(decorator).to receive(:title_string).and_return("Title")
         expect(decorator.thumb_image).to match(%r{img alt="Title"})
-        expect(decorator.thumb_image).to match(%r{src=".+/images/pathy"})
+        expect(decorator.thumb_image).to match(%r{src=".+images/pathy"})
       end
     end
     context "bike photo does not exist" do
