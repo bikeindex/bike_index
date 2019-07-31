@@ -1,0 +1,29 @@
+=== unicorn 5.4.0 / 2017-12-23 23:33 UTC
+
+  Rack hijack support improves as the app code can capture and use
+  the Rack `env' privately without copying it (to avoid clobbering
+  by another client).  Thanks to Sam Saffron for reporting and
+  testing this new feature:
+    https://bogomips.org/unicorn-public/CAAtdryPG3nLuyo0jxfYW1YHu1Q+ZpkLkd4KdWC8vA46B5haZxw@mail.gmail.com/T/
+
+  We also now support $DEBUG being set by the Rack app (instead of
+  relying on the "-d" CLI switch).  Thanks to James P Robinson Jr
+  for reporting this bug:
+    https://bogomips.org/unicorn-public/D6324CB4.7BC3E%25james.robinson3@cigna.com/T/
+    (Coincidentally, this fix will be irrelevant for Ruby 2.5
+     which requires 'pp' by default)
+
+  There's a few minor test cleanups and documentation updates, too.
+
+  All commits since v5.3.1 (2017-10-03):
+
+      reduce method calls with String#start_with?
+      require 'pp' if $DEBUG is set by Rack app
+      avoid reusing env on hijack
+      tests: cleanup some unused variable warnings
+      ISSUES: add a note about Debian BTS interopability
+
+  Roughly all mailing discussions since the last release:
+
+    https://bogomips.org/unicorn-public/?q=d:20171004..20171223
+
