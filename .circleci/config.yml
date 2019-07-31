@@ -23,33 +23,83 @@ jobs:
       - image: redis:4.0.9
 
     steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "b7:01:89:de:d8:f8:77:cc:9e:5a:ca:ee:0c:24:57:13"
+
       - checkout
 
       - run:
-          name: install dockerize
+          name: Install Dockerize
           command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
           environment:
             DOCKERIZE_VERSION: v0.6.1
 
       - run:
-          name: install system libraries
+          name: Install Hub
+          command: |
+            command -v hub >/dev/null && exit 0
+            wget -O hub.tgz https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
+            tar -xzf hub.tgz
+            sudo mv hub-linux-amd64-${HUB_VERSION}/bin/hub /usr/bin/
+            rm -rf hub-linux-amd64-${HUB_VERSION} hub.tgz
+          environment:
+            HUB_VERSION: 2.12.3
+
+      - run:
+          name: Install system libraries
           command: sudo apt-get update && sudo apt-get -y install imagemagick postgresql-client
 
       - run:
-          name: install bundler
+          name: Install Bundler
           command: gem install bundler
 
       # Ruby dependencies
       - restore_cache:
           key: v2-bundler-{{ checksum "Gemfile.lock" }}
       - run:
-          name: bundle gems
+          name: Bundle Gems
           command: bundle install --path=vendor/bundle --jobs=4 --retry=3
       - save_cache:
           key: v2-bundler-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
             - ~/.bundle
+
+      - run:
+          name: Sync translations (only on master by default)
+          command: |
+            # Quit as success if not on the branch to be synced
+            if ! git branch --list | grep "^* ${TRANSLATION_BRANCH}$"; then
+              echo Skipping: Not on branch ${TRANSLATION_BRANCH}
+              exit 0
+            fi
+
+            # TODO: Delete test code
+            echo bundle exec rake translations:sync >> Gemfile
+            # bundle exec rake translations:sync
+
+            if [[ -n `git status --porcelain --short` ]]; then
+              echo ------------------------
+              echo Uncommitted translations:
+              echo ------------------------
+              git --no-pager diff
+
+              echo ------------------------
+              git config user.email "ci@bikeindex.org"
+              git config user.name "CircleCI"
+
+              BRANCH="translation-update-$(date +'%s')"
+              git stash
+              git checkout -b ${BRANCH}
+              git stash pop
+              git clean -df
+              git add .
+              git commit -m "Translation update [ci skip]"
+              git push -u origin ${BRANCH}
+              hub pull-request --no-edit
+              exit 1
+            fi
 
       # Node dependencies
       - restore_cache:
@@ -135,7 +185,7 @@ jobs:
 
   upload-coverage:
     docker:
-      - image: circleci/ruby:2.5.1-stretch-node
+      - image: circleci/ruby:2.5.5-stretch-node
     environment:
       CC_TEST_REPORTER_ID: 04daa6564351115dc1515504790cd379ad8dc25e7778f0641e0f8c63185f887c
     working_directory: ~/bikeindex/bike_index
