@@ -54,14 +54,3 @@ CarrierWave.configure do |config|
     config.enable_processing = false
   end
 end
-
-RSpec.configure do |config|
-  config.before(:all) do
-    FileUtils.mkdir_p(ApplicationUploader.cache_dir)
-  end
-
-  config.after(:all) do
-    FileUtils.rm_rf(ApplicationUploader.cache_dir)
-    FileUtils.mkdir_p(ApplicationUploader.cache_dir)
-  end
-end
