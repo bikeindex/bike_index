@@ -92,7 +92,8 @@ jobs:
               BRANCH="translation-update-$(date +'%s')"
               git stash
               git clean -df
-              git checkout -b ${BRANCH} master
+              git checkout master
+              git checkout -b ${BRANCH}
               git stash pop
               git add .
               git commit -m "Translation update [ci skip]"
