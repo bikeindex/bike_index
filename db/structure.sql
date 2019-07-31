@@ -2003,7 +2003,8 @@ CREATE TABLE public.stolen_records (
     recovery_link_token text,
     show_address boolean DEFAULT false,
     recovering_user_id integer,
-    recovery_display_status integer DEFAULT 0
+    recovery_display_status integer DEFAULT 0,
+    alert_image character varying
 );
 
 
@@ -4462,4 +4463,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190710230727');
 INSERT INTO schema_migrations (version) VALUES ('20190725141309');
 
 INSERT INTO schema_migrations (version) VALUES ('20190725172835');
+
+INSERT INTO schema_migrations (version) VALUES ('20190726183859');
 

@@ -46,4 +46,7 @@ Rails.application.configure do
   config.action_mailer.default_url_options = { host: ENV["BASE_URL"] }
 
   config.cache_store = :file_store, Rails.root.join("tmp", "cache", "test#{ENV["TEST_ENV_NUMBER"]}")
+
+  # Enable serving of images, stylesheets, and JavaScripts from an asset server.
+  config.action_controller.asset_host = ENV["BASE_URL"]
 end

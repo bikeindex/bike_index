@@ -505,12 +505,27 @@ class Bike < ActiveRecord::Base
     end
   end
 
+  def registration_location
+    address = registration_address.with_indifferent_access
+    city = address[:city]&.titleize
+    state = address[:state]&.upcase
+    return "" if state.blank?
+
+    [city, state].reject(&:blank?).join(", ")
+  end
+
   def organization_affiliation
     b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
   end
 
   def external_image_urls
     b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
+  end
+
+  def alert_image_url
+    return if current_stolen_record.blank? || public_images.none?
+    current_stolen_record.generate_alert_image
+    current_stolen_record.alert_image_url
   end
 
   def load_external_images(urls = nil)
