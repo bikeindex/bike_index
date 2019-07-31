@@ -166,3 +166,16 @@ RSpec.configure do |config|
     DatabaseCleaner.clean
   end
 end
+
+# CarrierWave Settings
+# ====================
+RSpec.configure do |config|
+  config.before(:all) do
+    FileUtils.mkdir_p(ApplicationUploader.cache_dir)
+  end
+
+  config.after(:all) do
+    FileUtils.rm_rf(ApplicationUploader.cache_dir)
+    FileUtils.mkdir_p(ApplicationUploader.cache_dir)
+  end
+end
