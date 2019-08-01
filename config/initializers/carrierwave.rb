@@ -50,8 +50,5 @@ CarrierWave.configure do |config|
     config.fog_directory = ENV["S3_BUCKET"]
     config.fog_attributes = { "Cache-Control" => "max-age=315576000" }
     config.storage :fog
-  elsif Rails.env.test?
-    config.cache_dir = Rails.root.join("tmp", "cache", "carrierwave#{ENV["TEST_ENV_NUMBER"]}")
-    config.enable_processing = false
   end
 end

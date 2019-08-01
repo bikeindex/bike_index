@@ -179,3 +179,8 @@ RSpec.configure do |config|
     FileUtils.mkdir_p(ApplicationUploader.cache_dir)
   end
 end
+
+CarrierWave.configure do |config|
+  config.cache_dir = Rails.root.join("tmp", "cache", "carrierwave#{ENV["TEST_ENV_NUMBER"]}")
+  config.enable_processing = false
+end
