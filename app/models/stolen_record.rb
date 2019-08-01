@@ -277,6 +277,6 @@ class StolenRecord < ActiveRecord::Base
 
   # If the bike has been recovered, remove the alert_image
   def remove_outdated_alert_image
-    alert_image.remove! if date_recovered.present?
+    alert_image.remove! unless bike.reload.stolen?
   end
 end

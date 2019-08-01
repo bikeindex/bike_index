@@ -7,7 +7,8 @@ RSpec.describe StolenRecord, type: :model do
         stolen_record = FactoryBot.create(:stolen_record)
         expect(stolen_record.alert_image).to be_present
 
-        stolen_record.update(date_recovered: Time.current)
+        stolen_record.add_recovery_information
+        stolen_record.save
         stolen_record.run_callbacks(:commit)
 
         expect(stolen_record.alert_image).to be_blank
@@ -16,10 +17,10 @@ RSpec.describe StolenRecord, type: :model do
 
     context "if not being marked as recovered" do
       it "does not removes alert_image" do
-        stolen_record = FactoryBot.create(:stolen_record)
+        stolen_bike = FactoryBot.create(:stolen_bike)
+        stolen_record = stolen_bike.current_stolen_record
         expect(stolen_record.alert_image).to be_present
 
-        stolen_record.update(date_recovered: nil)
         stolen_record.run_callbacks(:commit)
 
         expect(stolen_record.alert_image).to be_present

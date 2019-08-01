@@ -5,6 +5,7 @@ FactoryBot.define do
     sequence(:alert_image) { |i| File.open(ApplicationUploader.cache_dir.join("alert_image-#{i}-alert.jpg"), "w+") }
 
     factory :stolen_record_recovered do
+      bike { FactoryBot.create(:bike, :with_image) }
       date_recovered { Time.current }
       recovered_description { "Awesome help by Bike Index" }
       current { false }
