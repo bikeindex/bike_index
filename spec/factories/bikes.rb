@@ -16,7 +16,7 @@ FactoryBot.define do
 
     trait :with_image do
       after(:create) do |bike|
-        FactoryBot.create(:public_image, imageable: bike)
+        FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike)
         bike.reload
         bike.save
       end

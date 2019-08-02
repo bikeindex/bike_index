@@ -1319,17 +1319,15 @@ RSpec.describe Bike, type: :model do
         stolen_record = FactoryBot.create(:stolen_record, bike: bike)
         bike.update(current_stolen_record: stolen_record)
         expect(bike.current_stolen_record).to be_present
+        expect(bike.public_images).to be_empty
         expect(bike.alert_image_url).to be_nil
       end
     end
 
     context "given a current_stolen_record and public images" do
       it "returns the alert_image url" do
-        stolen_record = FactoryBot.create(:stolen_record)
-        bike = stolen_record.bike
-        bike.update(current_stolen_record: stolen_record)
-
-        expect(bike.alert_image_url).to match(%r{https?://.+/bike.+-alert.jpg})
+        bike = FactoryBot.create(:stolen_bike, :with_image)
+        expect(bike.alert_image_url).to match(%r{https?://.+/bike-#{bike.id}.jpg})
       end
     end
   end
