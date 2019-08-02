@@ -37,6 +37,7 @@ gem "fog-aws"
 gem "geocoder"
 gem "hamlit"
 gem "high_voltage"
+gem "honeybadger"
 gem "httparty"
 gem "journey", "~> 1.0.3"
 gem "kaminari" # pagination
@@ -131,7 +132,6 @@ gem "logstash-event" # Use logstash format for logging data
 
 group :production do
   gem "skylight" # Performance monitoring
-  gem "honeybadger"
 end
 
 group :development do
