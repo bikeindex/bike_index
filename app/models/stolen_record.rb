@@ -289,6 +289,7 @@ class StolenRecord < ActiveRecord::Base
   def remove_outdated_alert_image
     if bike.blank? || !bike.stolen?
       alert_image.remove!
+      self.alert_image = nil
     end
   end
 end
