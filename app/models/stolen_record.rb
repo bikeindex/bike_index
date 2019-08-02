@@ -266,17 +266,21 @@ class StolenRecord < ActiveRecord::Base
   # TODO: Allow selection of which bike image to use for the alert image
   def generate_alert_image(bike_image: bike_main_image)
     return if bike_image.blank?
-
-    alert_image.remove!
+    remove_alert_image
     self.alert_image = bike_image
     save
+  end
+
+  def remove_alert_image
+    alert_image.remove!
+    self.alert_image = nil
+    reload.save
   end
 
   # If the bike has been recovered, remove the alert_image
   def remove_outdated_alert_image
     if bike.blank? || !bike.stolen?
-      alert_image.remove!
-      self.alert_image = nil
+      remove_alert_image
     end
   end
 end

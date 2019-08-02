@@ -13,7 +13,13 @@
 = link_to "Regenerate",
   regenerate_alert_image_admin_stolen_bike_path(@bike),
   method: :patch,
-  data: { confirm: "Are you sure you want to regenerate premium alert images?" },
+  data: { confirm: "Are you sure you want to regenerate promoted alert images?" },
+  class: "btn btn-danger mb-4"
+
+= link_to "Delete",
+  remove_alert_image_admin_stolen_bike_path(@bike),
+  method: :patch,
+  data: { confirm: "Are you sure you want to remove promoted alert images?" },
   class: "btn btn-danger mb-4"
 
 .row.mt-2.mb-4
