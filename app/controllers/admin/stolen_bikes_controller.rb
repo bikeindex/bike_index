@@ -21,7 +21,7 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def regenerate_alert_image
-    @bike.current_stolen_record.generate_alert_image!
+    @bike.current_stolen_record.generate_alert_image
     redirect_to edit_admin_stolen_bike_url(@bike), notice: "Premium alert images regenerated."
   end
 

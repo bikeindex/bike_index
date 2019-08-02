@@ -40,24 +40,57 @@ class AlertImageUploader < ApplicationUploader
   process :strip
   process convert: "jpg"
 
+  version :landscape do
+    process :generate_landscape
+    process resize_to_fill: [1200, 630]
+  end
+
   version :square do
     process :generate_square
     process resize_to_fill: [1200, 1200]
   end
 
-  def caption_font
-    if system("mogrify -list font | grep --silent 'Font: Helvetica-Oblique$'")
-      "Helvetica-Oblique"
-    elsif system("mogrify -list font | grep --silent 'Font: ArialI$'")
-      "ArialI"
-    elsif system("mogrify -list font | grep --silent 'Font: DejaVu-Sans$'")
-      "DejaVu-Sans"
+  def generate_landscape
+    Rails.logger.info "Processing #{current_path}"
+
+    premium_alerts_path = "app/assets/images/promoted_alerts"
+    base_template_path = Rails.root.join(premium_alerts_path, "landscape-template.png")
+    caption_template_path = Rails.root.join(premium_alerts_path, "landscape-caption.png")
+    banner_width = 60
+    padding = 75
+
+    manipulate! do |img|
+      template = MiniMagick::Image.open(base_template_path)
+      width = template.width - banner_width
+      height = template.height
+
+      bike = img.tap { |i| resize_bike_image(i, width, height, padding) }
+
+      alert_image =
+        template
+          .composite(bike) { |i| compose_bike_image(i, banner_width) }
+
+      if bike_location.present?
+        caption =
+          MiniMagick::Image
+            .open(caption_template_path)
+            .tap { |image| image.combine_options { |i| format_caption(i, bike_location, image) } }
+
+        alert_image = alert_image.composite(caption) { |i| compose_caption(i) }
+      end
+
+      img = alert_image
     end
+
+    Rails.logger.info "Finished processing #{current_path}"
   end
 
   def generate_square
-    base_template_name = "promoted_alert_template.png"
-    base_template_path = Rails.root.join("app", "assets", "images", base_template_name)
+    Rails.logger.info "Processing #{current_path}"
+
+    premium_alerts_path = "app/assets/images/promoted_alerts"
+    base_template_path = Rails.root.join(premium_alerts_path, "square-template.png")
+
     header_height = 100
     footer_height = 50
     padding = 200
@@ -101,5 +134,50 @@ class AlertImageUploader < ApplicationUploader
 
       img = alert_image
     end
+
+    Rails.logger.info "Finished processing #{current_path}"
   end
+
+  def caption_font
+    if system("mogrify -list font | grep --silent 'Font: Helvetica-Oblique$'")
+      "Helvetica-Oblique"
+    elsif system("mogrify -list font | grep --silent 'Font: ArialI$'")
+      "ArialI"
+    elsif system("mogrify -list font | grep --silent 'Font: DejaVu-Sans$'")
+      "DejaVu-Sans"
+    end
+  end
+end
+
+def format_caption(image, text, container)
+  image.font "ArialI"
+  image.fill "#FFFFFF"
+  image.antialias
+  image.gravity "Center"
+  image.pointsize 50
+  image.size [container.height, container.width].join("x")
+  image.draw "text 0,0 '#{text}'"
+end
+
+def compose_bike_image(image, banner_width)
+  image.gravity "Center"
+  image.compose "Over"
+  # right-offset to account for LHS banner
+  image.geometry "+#{banner_width}+0"
+end
+
+def compose_caption(image)
+  image.gravity "Southeast"
+  image.compose "Over"
+  image.size [nil, 100].join("x")
+  image.geometry "+0+5"
+end
+
+def resize_bike_image(image, container_width, container_height, padding)
+  dimensions =
+    [container_width, container_height]
+      .map { |d| d - padding }
+      .join("x")
+
+  image.resize(dimensions)
 end
