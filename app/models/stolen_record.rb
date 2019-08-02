@@ -259,25 +259,12 @@ class StolenRecord < ActiveRecord::Base
   end
 
   # Generate the "premium alert image"
-  # (the most recently created bike image placed on a branded template)
+  # (One of the stolen bike's public images, placed on a branded template)
   #
-  # The URL is available immediately, processing is performed in the background.
-  # If processing fails, the unprocessed image will be loaded.
+  # The URL is available immediately - processing is performed in the background.
   #
   # TODO: Allow selection of which bike image to use for the alert image
   def generate_alert_image(bike_image: bike_main_image)
-    return if bike_image.blank?
-
-    if alert_image.present?
-      new_file = File.basename(bike_image.path, ".*")
-      cur_file = File.basename(alert_image.path, ".*")
-      return if "#{new_file}-alert" == cur_file
-    end
-
-    generate_alert_image!(bike_image: bike_image)
-  end
-
-  def generate_alert_image!(bike_image: bike_main_image)
     return if bike_image.blank?
 
     alert_image.remove!

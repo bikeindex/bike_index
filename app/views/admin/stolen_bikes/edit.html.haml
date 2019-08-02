@@ -18,8 +18,8 @@
 
 .row.mt-2.mb-4
   .col-3.mb-2.col-lg-2
-    = link_to @bike.alert_image_url, target: "_blank" do
-      = image_tag @bike.alert_image_url,
+    = link_to @bike.alert_image_url(:square), target: "_blank" do
+      = image_tag @bike.alert_image_url(:square),
         class: "ml-auto mr-auto",
         style: "display: block; max-width: 150px; height: auto;"
 
