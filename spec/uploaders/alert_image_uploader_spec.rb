@@ -4,6 +4,38 @@ require "carrierwave/test/matchers"
 RSpec.describe AlertImageUploader do
   include CarrierWave::Test::Matchers
 
+  describe "#filename" do
+    it "returns nil if no alert image" do
+      stolen_record = FactoryBot.create(:stolen_record, alert_image: nil)
+      uploader = described_class.new(stolen_record, :theft_alert_image)
+      expect(uploader.filename).to be_nil
+    end
+
+    it "ignores -alert suffix" do
+      image = double(:image, path: "/path/name-alert.jpg")
+      stolen_record = FactoryBot.create(:stolen_record)
+      allow(stolen_record).to receive(:alert_image).and_return(image)
+      uploader = described_class.new(stolen_record, :theft_alert_image)
+      expect(uploader.filename).to eq("name-alert.jpg")
+    end
+
+    it "appends -alert suffix if none present" do
+      image = double(:image, path: "/path/name.jpg")
+      stolen_record = FactoryBot.create(:stolen_record)
+      allow(stolen_record).to receive(:alert_image).and_return(image)
+      uploader = described_class.new(stolen_record, :theft_alert_image)
+      expect(uploader.filename).to eq("name-alert.jpg")
+    end
+
+    it "correctly handles punctuation-filled filenames" do
+      image = double(:image, path: "/path/2019-07-06T18-alert_16_05_078Z.bike.jpg")
+      stolen_record = FactoryBot.create(:stolen_record)
+      allow(stolen_record).to receive(:alert_image).and_return(image)
+      uploader = described_class.new(stolen_record, :theft_alert_image)
+      expect(uploader.filename).to eq("2019-07-06T18-alert_16_05_078Z.bike-alert.jpg")
+    end
+  end
+
   describe "#bike_url" do
     it "returns a simplified url string to the given bike" do
       stolen_record = FactoryBot.create(:stolen_record)

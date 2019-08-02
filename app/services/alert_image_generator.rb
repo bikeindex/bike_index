@@ -46,7 +46,8 @@ module AlertImageGenerator
       i.gravity "Northeast"
       i.pointsize 110
       i.size [nil, HEADER_HEIGHT].join("x")
-      i.draw "text 30,30 '#{bike_location}'"
+      sanitized_bike_location = bike_location.gsub("'", "\\'")
+      i.draw "text 30,30 '#{sanitized_bike_location}'"
     end
 
     alert_image.write(output_path)

@@ -9,7 +9,7 @@ RSpec.describe AlertImageGenerator do
       AlertImageGenerator.generate_image(
         bike_image_path: Rails.root.join("spec/fixtures/bike.jpg"),
         bike_url: "bikeindex.org/bikes/1",
-        bike_location: "New City, OR",
+        bike_location: "Coeur d'Alene, ID",
         output_path: output_location,
       )
 
