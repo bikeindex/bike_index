@@ -63,11 +63,12 @@ RSpec.describe StolenRecord, type: :model do
     end
 
     context "given multiple bike images" do
-      it "uses the most recently created one for the alert image" do
+      it "uses the first bike image for the alert image" do
         bike = FactoryBot.create(:bike)
-        image1 = FactoryBot.create(:public_image, imageable: bike)
-        image2 = FactoryBot.create(:public_image, imageable: bike)
         stolen_record = FactoryBot.create(:stolen_record, alert_image: nil, bike: bike)
+
+        image1 = FactoryBot.create(:public_image, imageable: bike)
+        FactoryBot.create(:public_image, imageable: bike)
         expect(stolen_record.alert_image).to be_blank
 
         stolen_record.generate_alert_image
@@ -75,9 +76,7 @@ RSpec.describe StolenRecord, type: :model do
 
         alert_image_name = File.basename(stolen_record.alert_image.path, ".*")
         image1_name = File.basename(image1.image.path, ".*")
-        image2_name = File.basename(image2.image.path, ".*")
-        expect(alert_image_name).to_not eq("#{image1_name}-alert")
-        expect(alert_image_name).to eq("#{image2_name}-alert")
+        expect(alert_image_name).to eq("#{image1_name}-alert")
       end
     end
 

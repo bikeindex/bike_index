@@ -1,5 +1,5 @@
 class Admin::StolenBikesController < Admin::BaseController
-  before_filter :find_bike, only: [:edit, :destroy, :approve, :update]
+  before_filter :find_bike, only: [:edit, :destroy, :approve, :update, :regenerate_alert_image]
 
   def index
     if params[:unapproved]
@@ -18,6 +18,11 @@ class Admin::StolenBikesController < Admin::BaseController
     @bike.update_attribute :approved_stolen, true
     ApproveStolenListingWorker.perform_async(@bike.id)
     redirect_to edit_admin_stolen_bike_url(@bike), notice: "Bike was approved."
+  end
+
+  def regenerate_alert_image
+    @bike.current_stolen_record.generate_alert_image!
+    redirect_to edit_admin_stolen_bike_url(@bike), notice: "Premium alert images regenerated."
   end
 
   def show

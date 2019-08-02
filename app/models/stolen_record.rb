@@ -254,6 +254,10 @@ class StolenRecord < ActiveRecord::Base
     recovery_link_token
   end
 
+  def bike_main_image
+    bike&.public_images&.order(:id)&.first&.image
+  end
+
   # Generate the "premium alert image"
   # (the most recently created bike image placed on a branded template)
   #
@@ -261,18 +265,24 @@ class StolenRecord < ActiveRecord::Base
   # If processing fails, the unprocessed image will be loaded.
   #
   # TODO: Allow selection of which bike image to use for the alert image
-  def generate_alert_image
-    new_image = bike.reload.public_images.order(:created_at).last&.image
-    return if new_image.blank?
+  def generate_alert_image(bike_image: bike_main_image)
+    return if bike_image.blank?
 
     if alert_image.present?
-      new_file = File.basename(new_image.path, ".*")
+      new_file = File.basename(bike_image.path, ".*")
       cur_file = File.basename(alert_image.path, ".*")
       return if "#{new_file}-alert" == cur_file
     end
 
+    generate_alert_image!(bike_image: bike_image)
+  end
+
+  def generate_alert_image!(bike_image: bike_main_image)
+    return if bike_image.blank?
+
     alert_image.remove!
-    update(alert_image: new_image)
+    self.alert_image = bike_image
+    save
   end
 
   # If the bike has been recovered, remove the alert_image
