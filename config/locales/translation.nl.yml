@@ -4280,6 +4280,7 @@ nl:
       vendor_terms: leveranciersvoorwaarden
       where_we_are: Waar we zijn
       who_we_serve: Wie we dienen
+      change_preferred_language: voorkeurstaal wijzigen
     form_well_footer_save:
       save_changes: Wijzigingen opslaan
     header_nav:
@@ -4349,6 +4350,7 @@ nl:
       state: Staat
       unconfirmed_emails: Niet-bevestigde e-mails
       zipcode: Postcode
+      why_you_should_text: Lees waarom u zou moeten
     edit_sharing:
       additional_link: Aanvullende link
       choose_file: Kies bestand...
@@ -4509,7 +4511,7 @@ nl:
       you_have_no_registered_bikes: U hebt geen geregistreerde fietsen
       you_have_no_registered_locks: U hebt geen geregistreerde sloten
   locales:
-    en: Engels
+    en: English (Engels)
     nl: Nederlands
   money:
     currencies:
