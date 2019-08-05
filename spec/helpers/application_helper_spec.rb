@@ -361,8 +361,8 @@ RSpec.describe ApplicationHelper, type: :helper do
   describe "language_choices" do
     let(:target) do
       [
-        ["Dutch (Nederlands)", "nl"],
         ["English", "en"],
+        ["Nederlands (Dutch)", "nl"],
       ]
     end
     it "returns the language choices with english included" do

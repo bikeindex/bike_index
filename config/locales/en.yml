@@ -1669,7 +1669,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1695,7 +1695,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -3058,7 +3058,7 @@ en:
       please_fix_the_following: Please fix the following %{errors}
   locales:
     en: English
-    nl: Dutch (Nederlands)
+    nl: Nederlands (Dutch)
   meta_descriptions:
     bikes_index: Search for bikes that have been registered on Bike Index
     bikes_new: >-
