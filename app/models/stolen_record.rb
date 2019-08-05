@@ -241,4 +241,28 @@ class StolenRecord < ActiveRecord::Base
     update_attributes(recovery_link_token: SecurityTokenizer.new_token)
     recovery_link_token
   end
+
+  def bike_main_image
+    bike&.public_images&.order(:id)&.first&.image
+  end
+
+  # Generate the "promoted alert image"
+  # (One of the stolen bike's public images, placed on a branded template)
+  #
+  # The URL is available immediately - processing is performed in the background.
+  #
+  # TODO: Allow selection of which bike image to use for the alert image
+  def generate_alert_image(bike_image: bike_main_image)
+    return if bike_image.blank?
+    alert_image.remove!
+    self.alert_image = bike_image
+    save
+  end
+
+  # If the bike has been recovered, remove the alert_image
+  def remove_outdated_alert_image
+    if bike.blank? || !bike.stolen?
+      alert_image.remove!
+    end
+  end
 end
