@@ -258,7 +258,7 @@ class StolenRecord < ActiveRecord::Base
     bike&.public_images&.order(:id)&.first&.image
   end
 
-  # Generate the "premium alert image"
+  # Generate the "promoted alert image"
   # (One of the stolen bike's public images, placed on a branded template)
   #
   # The URL is available immediately - processing is performed in the background.

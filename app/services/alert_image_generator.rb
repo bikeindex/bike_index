@@ -1,8 +1,8 @@
 class AlertImageGenerator
-  PREMIUM_ALERTS_PATH = "app/assets/images/promoted_alerts"
-  LANDSCAPE_TEMPLATE = Rails.root.join(PREMIUM_ALERTS_PATH, "landscape-template.png")
-  LANDSCAPE_CAPTION = Rails.root.join(PREMIUM_ALERTS_PATH, "landscape-caption.png")
-  SQUARE_TEMPLATE = Rails.root.join(PREMIUM_ALERTS_PATH, "square-template.png")
+  PROMOTED_ALERTS_PATH = "app/assets/images/promoted_alerts"
+  LANDSCAPE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "landscape-template.png")
+  LANDSCAPE_CAPTION = Rails.root.join(PROMOTED_ALERTS_PATH, "landscape-caption.png")
+  SQUARE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "square-template.png")
 
   attr_accessor :stolen_record, :bike, :bike_image
 
@@ -103,7 +103,7 @@ class AlertImageGenerator
     alert_image
   end
 
-  # The bike location to be displayed on the premium alert image
+  # The bike location to be displayed on the promoted alert image
   def bike_location
     location =
       if stolen_record.address_location.present?
@@ -117,7 +117,7 @@ class AlertImageGenerator
     location.gsub("'", "\\'")
   end
 
-  # The bike url to be displayed on the premium alert image
+  # The bike url to be displayed on the promoted alert image
   def bike_url
     "bikeindex.org/bikes/#{bike.id}"
   end
