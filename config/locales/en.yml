@@ -4043,6 +4043,7 @@ en:
       resend_confirmation: Resend confirmation
       state: State
       unconfirmed_emails: Unconfirmed emails
+      why_you_should_text: Read why you should
       zipcode: Postal code
     edit_sharing:
       additional_link: Additional Link

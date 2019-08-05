@@ -17,7 +17,7 @@
     %label.form-well-label
     %label.form-well-input{ style: "line-height: 1.5em;" }
       = f.check_box :notification_unstolen
-      - why_you_should_link = link_to("Read why you should", "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen")
+      - why_you_should_link = link_to(t(".why_you_should_text"), "https://bikeindex.org/news/recovering-bikes-before-they-are-marked-stolen")
       = t(".give_us_permission_html", why_you_should_link: why_you_should_link)
   .form-group.row
     = f.label :phone, class: "form-well-label"
@@ -57,7 +57,7 @@
         { prompt: t(".choose_language"), include_blank: true },
         { class: "language-select-input form-control" } )
 
-  .col-xs-12
+  .col-xs-12.mt-4
     %p
       = t(".have_multiple_emails")
   .form-group.row.unnested-field.no-divider-row
