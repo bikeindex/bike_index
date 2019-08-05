@@ -86,7 +86,6 @@ gem "rack-throttle"
 gem "secure_headers", "~> 2.5.0"
 
 # Frontend
-gem "backbone-on-rails", "~>0.9.10.0" # Legacy js
 gem "bootstrap", "~> 4.0.0.alpha3" # Bootstrap 4 - used for revised stylesheets
 gem "chartkick" # Display charts
 gem "coffee-rails"
