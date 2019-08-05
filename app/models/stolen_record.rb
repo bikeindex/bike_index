@@ -273,7 +273,6 @@ class StolenRecord < ActiveRecord::Base
 
   def remove_alert_image
     alert_image.remove!
-    self.alert_image = nil
     reload.save
   end
 
