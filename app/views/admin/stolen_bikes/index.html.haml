@@ -32,13 +32,17 @@
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
       %th
-        Stolen record created&nbsp;<small class="convertTimezone"></small>
+        Stolen created&nbsp;<small class="convertTimezone"></small>
+      %th
+        Stolen
       %th
         Bike info
       %th
         Theft info
       %th
-        Location
+        Country
+      %th
+        City
       %th
         Approved
 
@@ -61,6 +65,10 @@
                   %span.convertTime
                     = l created_date, format: :convert_time
           %td
+            - if current_stolen_record&.date_stolen&.present?
+              %small.convertTime
+                = l current_stolen_record.date_stolen, format: :convert_time
+          %td
             = bike.title_string
 
             - if current_stolen_record && current_stolen_record.estimated_value.present?
@@ -71,9 +79,14 @@
           - if current_stolen_record.present?
             %td
               = current_stolen_record.theft_description
+            %td.small
+              - if current_stolen_record.country.present?
+                - if current_stolen_record.country == Country.united_states
+                  %small.less-strong US
+                - else
+                  %small.text-success= current_stolen_record.country.iso
             %td
-              - if current_stolen_record.address.present?
-                = current_stolen_record.city
+              = current_stolen_record.city
             %td.table-cell-check
               = "&#x2713;".html_safe if current_stolen_record.approved
               - if bike.owner&.donor?
@@ -81,6 +94,7 @@
               - elsif bike.owner&.paid_org?
                 <span class="paid-org-icon">O</span>
           - else
+            %td
             %td
             %td
             %td
