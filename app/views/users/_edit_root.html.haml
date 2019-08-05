@@ -48,12 +48,11 @@
       .form-well-input
         = f.text_field :zipcode, placeholder: t(".zipcode"), class: "form-control"
 
-  - if Flipper.enabled?(:localization, current_user)
-    .form-group.row.fancy-select.unfancy
-      = f.label :country_id, class: "form-well-label" do
-        = t(".preferred_language")
-      .form-well-input
-        = f.select(:preferred_language,
+  .form-group.row.fancy-select.unfancy
+    = f.label :country_id, class: "form-well-label" do
+      = t(".preferred_language")
+    .form-well-input
+      = f.select(:preferred_language,
         options_for_select(language_choices, selected: current_user.preferred_language),
         { prompt: t(".choose_language"), include_blank: true },
         { class: "language-select-input form-control" } )

@@ -72,16 +72,8 @@ class ApplicationController < ActionController::Base
   end
 
   def set_locale
-    unless Flipper.enabled?(:localization, current_user)
-      return I18n.with_locale(I18n.default_locale) { yield }
-    end
-
     if controller_namespace == "admin"
       return I18n.with_locale(I18n.default_locale) { yield }
-    end
-
-    if current_user&.preferred_language != requested_locale
-      current_user&.update_attributes(preferred_language: requested_locale)
     end
 
     I18n.with_locale(requested_locale) { yield }

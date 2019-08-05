@@ -55,21 +55,20 @@
     .container
       .row
         .col-md-6.text-left
-          - if Flipper.enabled?(:localization, current_user)
-            = form_tag nil, method: :get, class: "locale-form" do
-              .row
-                .form-group
-                  = label_tag(:locale, t(".language"))
-                  = select_tag(:locale,
+          = form_tag nil, method: :get, class: "locale-form" do
+            .row
+              .form-group
+                = label_tag(:locale, t(".language"))
+                = select_tag(:locale,
                   options_for_select(language_choices, selected: I18n.locale),
                   class: "form-control-sm",
                   onchange: "this.form.submit()")
-          - else
-            &nbsp;
+                - if current_user.present? && current_user.preferred_language != I18n.locale
+                  = link_to t(".change_preferred_language"), my_account_path
         .col-md-6.text-right
           %p
             = [link_to(t(".privacy_policy"), privacy_url),
-            (current_user&.has_membership? ? link_to(t(".vendor_terms"), vendor_terms_url) : nil),
+              (current_user&.has_membership? ? link_to(t(".vendor_terms"), vendor_terms_url) : nil),
             link_to(t(".terms_and_conditions"), terms_url)].compact.to_sentence.html_safe
 
           %p
