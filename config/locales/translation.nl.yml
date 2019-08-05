@@ -191,7 +191,7 @@ nl:
         uid: Uid
       ad:
         body: Lichaam
-        image: afbeelding
+        image: Afbeelding
         live: Leven
         target_url: Doel-URL
         title: Titel
@@ -200,10 +200,10 @@ nl:
         ambassador_tasks: Ambassadortaken
         auth_token: Auth Token
         avatar: Avatar
-        banned: verboden
+        banned: Verboden
         can_send_many_stolen_notifications: Kan veel gestolen meldingen verzenden
         city: City
-        confirmation_token: Bevestigingstoken
+        confirmation_token: Opnieuw verzenden Bevestiging
         confirmed: Bevestigd
         created_bikes: Fietsen gemaakt
         created_ownerships: Eigendom gecreëerd
@@ -3097,9 +3097,8 @@ nl:
         is er zo'n gevoel van verlies, maar wanneer hij is hersteld, is er zo'n gevoel
         van vernieuwing en herstel. Dat is de reden dat ik Bike Index promoot
       join_their_ranks: Sluit je aan bij hun gelederen
-      steve_piercys_ambassadorship_is_sponsored_html: "<em>Het</em> ambassadeurschap
-        van <em>Steve Piercy</em> wordt gesponsord door <strong>%{sponsor_link}</strong>
-        ."
+      steve_piercys_ambassadorship_is_sponsored_html: Het ambassadeurschap van <em>Steve
+        Piercy</em> wordt gesponsord door <strong>%{sponsor_link}</strong> .
       the_heroes_of_bikedom: De helden van bikedom
       whats_your_story: Wat is jouw verhaal?
       why_bike_index: Waarom Bike Index?
@@ -3122,19 +3121,30 @@ nl:
       apply_to_be_an_ambassador_here: Meld u hier aan als ambassadeur
       apply_today: Meld je vandaag aan
       be_a_bike_saver: Wees een fietsspaarder
-      become_a_bike_index_ambassador: 
-      become_an_ambassador: 
-      bike_index_is_a_nonprofit_with_a_big_miss: 
-      bike_index_launches_new_ambassador_progra: 
-      check_out_our_media_resources: 
-      connect_us_with_city_officials_law_enforc: 
+      become_a_bike_index_ambassador: Word een ambassadeur van Bike Index
+      become_an_ambassador: 'Word een ambassadeur '
+      bike_index_is_a_nonprofit_with_a_big_miss: 'Bike Index is een non-profit organisatie
+        met een grote missie: alle bestaande fietsen registeren en elke gestolen fiets
+        terug kunnen krijgen. Daarom hebben wij jouw hulp nodig. Wij zijn een nationaal
+        register, maar jij kent jouw fietsgemeenschap het beste.'
+      bike_index_launches_new_ambassador_progra: Bike Index lanceert een nieuw ambassadeurs
+        programma
+      check_out_our_media_resources: Bekijk onze mediabronnen
+      connect_us_with_city_officials_law_enforc: Verbind ons met ambtenaren, wetshandhavers
+        en lokale universiteiten die geïnteresseerd zijn in het gebruik van Bike Index,
+        als officieel registratiesysteem van het desbetreffende gebied
       current_ambassadors: Huidige ambassadeurs
-      follow_bike_index_on_twitter_facebook_and: 
-      get_bike_shops_signed_up_for_bike_index_u: 
-      give_you_shoutouts_on_social_media: 
-      here: 
+      follow_bike_index_on_twitter_facebook_and: Volg Bike Index op twitter, Facebook
+        en instagram zodat we je terug kunnen volgen!
+      get_bike_shops_signed_up_for_bike_index_u: Laat fietsenwinkels zich aanmelden
+        bij Bike Index door gebruik te maken van een van onze
+      give_you_shoutouts_on_social_media: " "
+      here: hier.
       how_it_works: Hoe het werkt
-      join_our_list_of_ambassadors_and_advocate: 
+      join_our_list_of_ambassadors_and_advocate: Word lid van onze lijst van ambassadeurs
+        en vertegenwoordigers. Het is makkelijk. We zijn een groeiende non-profit
+        organisatie met de missie om fietsen te registreren en terug te krijgen wanneer
+        ze gestolen zijn. Sluit je vandaag nog bij ons aan.
       monitoring_online_sales_platforms_like_cr: 
       pos_integrations: 
       relevant_articles: 
