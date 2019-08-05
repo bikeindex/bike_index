@@ -1,5 +1,5 @@
 class Admin::StolenBikesController < Admin::BaseController
-  before_filter :find_bike, only: [:edit, :destroy, :approve, :update, :regenerate_alert_image, :remove_alert_image]
+  before_filter :find_bike, only: [:edit, :destroy, :approve, :update, :regenerate_alert_image]
 
   def index
     if params[:unapproved]
@@ -23,11 +23,6 @@ class Admin::StolenBikesController < Admin::BaseController
   def regenerate_alert_image
     @bike.current_stolen_record.generate_alert_image
     redirect_to edit_admin_stolen_bike_url(@bike), notice: "Promoted alert images regenerated."
-  end
-
-  def remove_alert_image
-    @bike.current_stolen_record.remove_alert_image
-    redirect_to edit_admin_stolen_bike_url(@bike), notice: "Promoted alert images removed."
   end
 
   def show
