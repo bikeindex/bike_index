@@ -83,9 +83,9 @@ RSpec.describe UsersController, type: :controller do
     context "legacy" do
       let(:user_attributes) { FactoryBot.attributes_for(:user, email: "poo@pile.com") }
       describe "success" do
-        it "creates a non-confirmed record" do
+        it "creates a non-confirmed record, doesn't block on unknown language" do
           expect do
-            post :create, user: FactoryBot.attributes_for(:user)
+            post :create, locale: "klingon", user: user_attributes
           end.to change(User, :count).by(1)
           expect(flash).to_not be_present
           expect(response).to redirect_to(please_confirm_email_users_path)
@@ -94,6 +94,28 @@ RSpec.describe UsersController, type: :controller do
           expect(user.partner_sign_up).to be_nil
           expect(user.partner_sign_up).to be_nil
           expect(user.unconfirmed?).to be_truthy
+          expect(user.preferred_language).to be_blank # Because language wasn't passed
+        end
+        context "with locale passed" do
+          it "creates a user with a preferred_language" do
+            request.env["HTTP_CF_CONNECTING_IP"] = "99.99.99.9"
+            post :create, locale: "nl", user: user_attributes
+            # TODO: Rails 5 update - this is an after_commit issue
+            user = User.order(:created_at).last
+            user.perform_create_jobs
+            # Because of the after_commit issue, we can't track that response redirects correctly :(
+            # expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
+            # expect(session[:passive_organization_id]).to eq organization.id
+            expect(User.from_auth(cookies.signed[:auth])).to eq user
+            expect(user.partner_sign_up).to be_nil
+            expect(user.partner_sign_up).to be_nil
+            expect(user.unconfirmed?).to be_truthy
+            expect(user.last_login_at).to be_within(3.seconds).of Time.current
+            expect(user.last_login_ip).to eq "99.99.99.9"
+            expect(user.preferred_language).to eq "nl"
+            expect(flash).to_not be_present
+            expect(response).to redirect_to(please_confirm_email_users_path)
+          end
         end
         context "with membership and an example bike" do
           let(:email) { "test@stuff.com" }
@@ -130,6 +152,7 @@ RSpec.describe UsersController, type: :controller do
               expect(user.confirmed?).to be_truthy
               expect(user.last_login_at).to be_within(3.seconds).of Time.current
               expect(user.last_login_ip).to eq "99.99.99.9"
+              expect(user.preferred_language).to be_blank # Because language wasn't passed
             end.to change(EmailWelcomeWorker.jobs, :count)
           end
         end

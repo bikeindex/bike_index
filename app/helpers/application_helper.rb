@@ -219,7 +219,6 @@ module ApplicationHelper
 
   def language_choices
     @language_choices ||= I18n.available_locales.map do |locale|
-      pp locale
       [t(locale, scope: [:locales]), locale.to_s]
     end
   end
