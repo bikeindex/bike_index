@@ -158,9 +158,10 @@ RSpec.describe UsersController, type: :controller do
         end
         context "with membership, partner param" do
           let!(:membership) { FactoryBot.create(:membership, invited_email: "poo@pile.com") }
-          it "creates a confirmed user, log in, and send welcome" do
+          it "creates a confirmed user, log in, and send welcome, language header" do
             session[:passive_organization_id] = "0"
             expect_any_instance_of(AfterUserCreateWorker).to receive(:send_welcoming_email)
+            request.env["HTTP_ACCEPT_LANGUAGE"] = "nl,en;q=0.9"
             post :create, user: user_attributes, partner: "bikehub"
             expect(response).to redirect_to("https://new.bikehub.com/account")
             user = User.order(:created_at).last
@@ -169,7 +170,8 @@ RSpec.describe UsersController, type: :controller do
             expect(user.partner_sign_up).to eq "bikehub"
             expect(user.email).to eq "poo@pile.com"
             expect(User.from_auth(cookies.signed[:auth])).to eq user
-            expect(user.last_login_at).to be_within(1.second).of Time.now
+            expect(user.last_login_at).to be_within(2.seconds).of Time.now
+            expect(user.preferred_language).to eq "nl"
             # TODO: Rails 5 update - this is an after_commit issue
             # Because of the after_commit issue, we can't track that response redirects correctly :(
             # expect(session[:passive_organization_id]).to eq membership.organization_id

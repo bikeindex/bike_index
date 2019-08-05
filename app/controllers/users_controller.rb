@@ -15,8 +15,8 @@ class UsersController < ApplicationController
   def create
     @user = User.new(permitted_parameters)
     # Set the user's preferred locale if they have a locale we recognize
-    if params[:locale].present? && I18n.available_locales.include?(params[:locale].to_sym)
-      @user.preferred_language = params[:locale]
+    if requested_locale != I18n.default_locale
+      @user.preferred_language = requested_locale
     end
     if @user.save
       sign_in_and_redirect(@user)
