@@ -273,7 +273,6 @@ class StolenRecord < ActiveRecord::Base
 
   def remove_alert_image
     alert_image.remove!
-    reload.save
   end
 
   # If the bike has been recovered, remove the alert_image
