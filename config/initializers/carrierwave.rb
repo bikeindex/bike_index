@@ -33,7 +33,9 @@ end
 
 # Additional carrierwave configurations
 CarrierWave.configure do |config|
-  config.cache_dir = "#{Rails.root}/tmp/uploads"
+  config.cache_dir = Rails.root.join("tmp", "uploads")
+  config.storage = :file
+  config.asset_host = ENV["BASE_URL"]
 
   if Rails.env.production?
     # config.fog_provider "fog/aws" # Once carrierwave is updated
@@ -47,8 +49,5 @@ CarrierWave.configure do |config|
     }
     config.fog_directory = ENV["S3_BUCKET"]
     config.fog_attributes = { "Cache-Control" => "max-age=315576000" }
-    config.storage :fog
-  else
-    config.storage :file
   end
 end

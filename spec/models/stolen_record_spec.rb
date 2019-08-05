@@ -1,6 +1,86 @@
 require "rails_helper"
 
 RSpec.describe StolenRecord, type: :model do
+  describe "after_commit hooks" do
+    context "if bike no longer exists" do
+      it "removes alert_image" do
+        stolen_record = FactoryBot.create(:stolen_record, :with_alert_image)
+        stolen_record.update_attribute(:bike, nil)
+        expect(stolen_record.bike).to be_blank
+        expect(stolen_record.alert_image).to be_present
+
+        stolen_record.run_callbacks(:commit)
+
+        expect(stolen_record.alert_image).to be_blank
+      end
+    end
+
+    context "if being marked as recovered" do
+      it "removes alert_image" do
+        bike = FactoryBot.create(:bike, stolen: true)
+        stolen_record = FactoryBot.create(:stolen_record, :with_alert_image, bike: bike)
+        expect(stolen_record.alert_image).to be_present
+        expect(stolen_record.bike.stolen).to eq(true)
+
+        stolen_record.add_recovery_information
+        stolen_record.save
+        expect(stolen_record.bike.stolen).to eq(false)
+
+        stolen_record.run_callbacks(:commit)
+
+        expect(stolen_record.alert_image).to be_blank
+      end
+    end
+
+    context "if not being marked as recovered" do
+      it "does not removes alert_image" do
+        bike = FactoryBot.create(:bike, stolen: true)
+        stolen_record = FactoryBot.create(:stolen_record, :with_alert_image, bike: bike)
+        expect(stolen_record.reload.alert_image).to be_present
+
+        stolen_record.run_callbacks(:commit)
+
+        expect(stolen_record.alert_image).to be_present
+      end
+    end
+  end
+
+  describe "#generate_alert_image" do
+    context "given no bike image" do
+      it "returns with no changes" do
+        stolen_record = FactoryBot.create(:stolen_record, :no_bike_image, alert_image: nil)
+        stolen_record.generate_alert_image
+        expect(stolen_record.alert_image).to be_blank
+      end
+    end
+
+    context "given a bike image" do
+      it "updated alert_image" do
+        stolen_record = FactoryBot.create(:stolen_record, alert_image: nil)
+        stolen_record.generate_alert_image
+        expect(stolen_record.alert_image).to be_present
+      end
+    end
+
+    context "given multiple bike images" do
+      it "uses the first bike image for the alert image" do
+        bike = FactoryBot.create(:bike, stolen: true)
+        stolen_record = FactoryBot.create(:stolen_record, alert_image: nil, bike: bike)
+
+        image1 = FactoryBot.create(:public_image, imageable: bike)
+        FactoryBot.create(:public_image, imageable: bike)
+        expect(stolen_record.alert_image).to be_blank
+
+        stolen_record.generate_alert_image
+        expect(stolen_record.alert_image).to be_present
+
+        alert_image_name = File.basename(stolen_record.alert_image.path, ".*")
+        image1_name = File.basename(image1.image.path, ".*")
+        expect(alert_image_name).to eq(image1_name)
+      end
+    end
+  end
+
   it "marks current true by default, display_checklist? false" do
     stolen_record = StolenRecord.new
     expect(stolen_record.current).to be_truthy
@@ -122,43 +202,43 @@ RSpec.describe StolenRecord, type: :model do
       expect(StolenRecord.new.recovery_display_status).to eq "not_eligible"
     end
     context "stolen record is recovered, unable to share" do
-      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: false) }
       it "is not displayed" do
-        stolen_record.reload
+        stolen_record = FactoryBot.create(:stolen_record_recovered, can_share_recovery: false)
         expect(stolen_record.recovery_display_status).to eq "not_eligible"
       end
     end
     context "stolen record is recovered, able to share" do
-      let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
-      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
-      let(:bike) { stolen_record.bike }
       it "is waiting on decision when user marks that we can share" do
-        bike.reload.update_attributes(updated_at: Time.current)
-        stolen_record.reload.update_attributes(updated_at: Time.current)
+        stolen_record = FactoryBot.create(:stolen_record_recovered, can_share_recovery: true)
+
         expect(stolen_record.bike.thumb_path).to be_present
         expect(stolen_record.can_share_recovery).to be_truthy
         expect(stolen_record.recovery_display_status).to eq "waiting_on_decision"
       end
     end
-    context "stolen record is recovered, sharable but no photo" do
-      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
+    context "stolen record is recovered, sharable but no bike photo" do
       it "is not displayed" do
-        stolen_record.reload
+        stolen_record = FactoryBot.create(:stolen_record_recovered,
+                                          :no_bike_image,
+                                          can_share_recovery: true)
         expect(stolen_record.recovery_display_status).to eq "displayable_no_photo"
       end
     end
     context "stolen_record is displayed" do
-      let(:recovery_display) { FactoryBot.create(:recovery_display) }
-      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true, recovery_display: recovery_display) }
       it "is displayed" do
-        stolen_record.reload.update_attributes(updated_at: Time.current)
+        recovery_display = FactoryBot.create(:recovery_display)
+        stolen_record = FactoryBot.create(:stolen_record_recovered,
+                                          can_share_recovery: true,
+                                          recovery_display: recovery_display)
+
         expect(stolen_record.recovery_display_status).to eq "displayed"
       end
     end
     context "stolen_record is not_displayed" do
-      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, recovery_display_status: "not_displayed", can_share_recovery: true) }
       it "is not_displayed" do
-        stolen_record.reload.update_attributes(updated_at: Time.current)
+        stolen_record = FactoryBot.create(:stolen_record_recovered,
+                                          recovery_display_status: "not_displayed",
+                                          can_share_recovery: true)
         expect(stolen_record.recovery_display_status).to eq "not_displayed"
       end
     end
@@ -261,31 +341,33 @@ RSpec.describe StolenRecord, type: :model do
       end
     end
     context "recovery is eligible for display but has no photo" do
-      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
       it "returns displayable_no_photo" do
+        stolen_record = FactoryBot.create(:stolen_record_recovered,
+                                          :no_bike_image,
+                                          can_share_recovery: true)
         expect(stolen_record.calculated_recovery_display_status).to eq "displayable_no_photo"
       end
     end
     context "recovery is eligible for display" do
-      let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
-      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true) }
-      let(:bike) { stolen_record.bike }
       it "returns waiting_on_decision" do
-        bike.reload
-        bike.update_attributes(updated_at: Time.current)
+        stolen_record = FactoryBot.create(:stolen_record_recovered, can_share_recovery: true)
         expect(stolen_record.calculated_recovery_display_status).to eq "waiting_on_decision"
       end
     end
     context "recovery is displayed" do
-      let(:recovery_display) { FactoryBot.create(:recovery_display) }
-      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true, recovery_display: recovery_display) }
       it "returns displayed" do
+        recovery_display = FactoryBot.create(:recovery_display)
+        stolen_record = FactoryBot.create(:stolen_record_recovered,
+                                          can_share_recovery: true,
+                                          recovery_display: recovery_display)
         expect(stolen_record.calculated_recovery_display_status).to eq "displayed"
       end
     end
     context "recovery has been marked as not eligible for display" do
-      let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, can_share_recovery: true, recovery_display_status: "not_displayed") }
       it "returns not_displayed" do
+        stolen_record = FactoryBot.create(:stolen_record_recovered,
+                                          can_share_recovery: true,
+                                          recovery_display_status: "not_displayed")
         expect(stolen_record.calculated_recovery_display_status).to eq "not_displayed"
       end
     end
@@ -389,6 +471,31 @@ RSpec.describe StolenRecord, type: :model do
           expect(label).to be_an_instance_of(String)
           expect(label).to_not eq(value)
         end
+      end
+    end
+  end
+
+  describe "#address_location" do
+    context "given a city and state" do
+      it "returns the city and state" do
+        ny_state = FactoryBot.create(:state, abbreviation: "NY")
+        stolen_record = FactoryBot.create(:stolen_record, city: "New Paltz", state: ny_state)
+        expect(stolen_record.address_location).to eq("New Paltz, NY")
+      end
+    end
+
+    context "given only a state" do
+      it "returns only the state" do
+        ny_state = FactoryBot.create(:state, abbreviation: "NY")
+        stolen_record = FactoryBot.create(:stolen_record, city: nil, state: ny_state)
+        expect(stolen_record.address_location).to eq("NY")
+      end
+    end
+
+    context "given only a city" do
+      it "returns an empty string" do
+        stolen_record = FactoryBot.create(:stolen_record, city: "New Paltz", state: nil)
+        expect(stolen_record.address_location).to eq("")
       end
     end
   end

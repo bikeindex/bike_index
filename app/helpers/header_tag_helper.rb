@@ -101,7 +101,9 @@ module HeaderTagHelper
     elsif action_name == "show"
       self.page_title = "#{"Stolen " if @bike.stolen}#{@bike.title_string}"
       self.page_description = "#{@bike.frame_colors.to_sentence} #{@bike.title_string}, serial: #{@bike.serial_number}. #{@bike.stolen_string}#{@bike.description}"
-      if @bike.thumb_path.present? && @bike.public_images.present?
+      if @bike.current_stolen_record.present?
+        self.page_image = @bike.alert_image_url(:landscape)
+      elsif @bike.thumb_path.present? && @bike.public_images.present?
         self.page_image = @bike.public_images.first.image_url
       elsif @bike.stock_photo_url.present?
         self.page_image = @bike.stock_photo_url

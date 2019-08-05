@@ -37,6 +37,7 @@ gem "fog-aws"
 gem "geocoder"
 gem "hamlit"
 gem "high_voltage"
+gem "honeybadger"
 gem "httparty"
 gem "journey", "~> 1.0.3"
 gem "kaminari" # pagination
@@ -97,6 +98,7 @@ gem "sprockets-rails", "~> 3.0.4"
 gem "therubyracer"
 gem "uglifier"
 gem "webpacker", "~> 4.x"
+gem "coderay" # Pretty print code
 
 # Show performance metrics
 gem "flamegraph", require: false
@@ -130,7 +132,6 @@ gem "logstash-event" # Use logstash format for logging data
 
 group :production do
   gem "skylight" # Performance monitoring
-  gem "honeybadger"
 end
 
 group :development do

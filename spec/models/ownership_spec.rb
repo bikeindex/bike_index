@@ -13,6 +13,33 @@ RSpec.describe Ownership, type: :model do
     end
   end
 
+  describe "validate owner_email format" do
+    it "disallows owner_emails without an @ sign" do
+      ownership = FactoryBot.build_stubbed(:ownership, owner_email: "n/a")
+      expect(ownership).to_not be_valid
+      expect(ownership.errors.full_messages).to eq(["Owner email invalid format"])
+    end
+
+    it "disallows owner_emails without a tld" do
+      ownership = FactoryBot.build_stubbed(:ownership, owner_email: "name@email")
+      expect(ownership).to_not be_valid
+      expect(ownership.errors.full_messages).to eq(["Owner email invalid format"])
+    end
+
+    it "disallows owner_emails without a mailbox" do
+      ownership = FactoryBot.build_stubbed(:ownership, owner_email: "@email.com")
+      expect(ownership).to_not be_valid
+      expect(ownership.errors.full_messages).to eq(["Owner email invalid format"])
+    end
+
+    it "allows owner_emails with valid modifications" do
+      ownership = FactoryBot.build_stubbed(:ownership, owner_email: "name.1@email.com")
+      expect(ownership).to be_valid
+      ownership = FactoryBot.build_stubbed(:ownership, owner_email: "name+two@email.com")
+      expect(ownership).to be_valid
+    end
+  end
+
   describe "mark_claimed" do
     it "associates with a user" do
       ownership = FactoryBot.create(:ownership)

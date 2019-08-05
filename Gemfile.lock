@@ -230,7 +230,7 @@ GEM
     high_voltage (3.0.0)
     highline (2.0.2)
     hiredis (0.6.3)
-    honeybadger (4.3.1)
+    honeybadger (4.4.2)
     htmlentities (4.3.4)
     http (3.3.0)
       addressable (~> 2.3)
@@ -666,6 +666,7 @@ DEPENDENCIES
   carrierwave
   carrierwave_backgrounder
   chartkick
+  coderay
   coffee-rails
   dalli
   database_cleaner

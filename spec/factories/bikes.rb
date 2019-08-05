@@ -14,6 +14,14 @@ FactoryBot.define do
     cycle_type { CycleType.slugs.first }
     propulsion_type { "foot-pedal" }
 
+    trait :with_image do
+      after(:create) do |bike|
+        FactoryBot.create(:public_image, filename: "bike-#{bike.id}.jpg", imageable: bike)
+        bike.reload
+        bike.save
+      end
+    end
+
     factory :stolen_bike do
       transient do
         latitude { 40.7143528 }
