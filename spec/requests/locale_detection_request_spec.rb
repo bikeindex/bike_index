@@ -50,9 +50,6 @@ RSpec.describe "Locale detection", type: :request do
 
     context "given multiple detected locales" do
       include_context :request_spec_logged_in_as_user
-      before do
-        allow(Flipper).to receive(:enabled?).with(:localization, current_user).and_return(true)
-      end
 
       it "gives highest precedence to query param" do
         current_user.update_attribute :preferred_language, :es
@@ -63,15 +60,19 @@ RSpec.describe "Locale detection", type: :request do
       end
 
       it "gives secondary precedence to user preference" do
-        current_user.update(preferred_language: :nl)
+        current_user.update_attribute :preferred_language, :nl
         get "/", {}, { "HTTP_ACCEPT_LANGUAGE" => "en-US,en;q=0.9" }
         expect(response.body).to match(/fietsregistratie/i)
+        # It doesn't reset users preferences based on request
+        expect(current_user.reload.preferred_language).to eq "nl"
       end
 
       it "gives lowest precedence to request headers" do
-        current_user.update(preferred_language: nil)
+        current_user.update_attribute :preferred_language, nil
         get "/", {}, { "HTTP_ACCEPT_LANGUAGE" => "nl,en;q=0.9" }
         expect(response.body).to match(/fietsregistratie/i)
+        # It doesn't reset users preferences based on request
+        expect(current_user.reload.preferred_language).to eq nil
       end
 
       it "falls back to the app default if no other locales are provided or recognized" do
@@ -88,9 +89,6 @@ RSpec.describe "Locale detection", type: :request do
 
   describe "requesting an admin path" do
     include_context :request_spec_logged_in_as_superuser
-    before do
-      allow(Flipper).to receive(:enabled?).with(:localization, current_user).and_return(true)
-    end
 
     context "given a user preference" do
       it "renders the admin dashboard in English" do

@@ -358,6 +358,29 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
   end
 
+  describe "language_choices" do
+    let(:target) do
+      [
+        ["English", "en"],
+        ["Nederlands (Dutch)", "nl"],
+      ]
+    end
+    it "returns the language choices with english included" do
+      expect(language_choices).to eq target
+    end
+    context "in dutch" do
+      let(:target) do
+        [
+          ["English (Engels)", "en"],
+          ["Nederlands", "nl"],
+        ]
+      end
+      xit "returns with dutch included" do
+        expect(language_choices).to eq target
+      end
+    end
+  end
+
   describe "group_by_method" do
     context "hourly" do
       it "returns group_by_minute" do
