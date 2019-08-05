@@ -83,9 +83,9 @@ RSpec.describe UsersController, type: :controller do
     context "legacy" do
       let(:user_attributes) { FactoryBot.attributes_for(:user, email: "poo@pile.com") }
       describe "success" do
-        it "creates a non-confirmed record" do
+        it "creates a non-confirmed record, doesn't block on unknown language" do
           expect do
-            post :create, user: FactoryBot.attributes_for(:user)
+            post :create, locale: "klingon", user: user_attributes
           end.to change(User, :count).by(1)
           expect(flash).to_not be_present
           expect(response).to redirect_to(please_confirm_email_users_path)
@@ -94,6 +94,28 @@ RSpec.describe UsersController, type: :controller do
           expect(user.partner_sign_up).to be_nil
           expect(user.partner_sign_up).to be_nil
           expect(user.unconfirmed?).to be_truthy
+          expect(user.preferred_language).to be_blank # Because language wasn't passed
+        end
+        context "with locale passed" do
+          it "creates a user with a preferred_language" do
+            request.env["HTTP_CF_CONNECTING_IP"] = "99.99.99.9"
+            post :create, locale: "nl", user: user_attributes
+            # TODO: Rails 5 update - this is an after_commit issue
+            user = User.order(:created_at).last
+            user.perform_create_jobs
+            # Because of the after_commit issue, we can't track that response redirects correctly :(
+            # expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
+            # expect(session[:passive_organization_id]).to eq organization.id
+            expect(User.from_auth(cookies.signed[:auth])).to eq user
+            expect(user.partner_sign_up).to be_nil
+            expect(user.partner_sign_up).to be_nil
+            expect(user.unconfirmed?).to be_truthy
+            expect(user.last_login_at).to be_within(3.seconds).of Time.current
+            expect(user.last_login_ip).to eq "99.99.99.9"
+            expect(user.preferred_language).to eq "nl"
+            expect(flash).to_not be_present
+            expect(response).to redirect_to(please_confirm_email_users_path)
+          end
         end
         context "with membership and an example bike" do
           let(:email) { "test@stuff.com" }
@@ -130,14 +152,16 @@ RSpec.describe UsersController, type: :controller do
               expect(user.confirmed?).to be_truthy
               expect(user.last_login_at).to be_within(3.seconds).of Time.current
               expect(user.last_login_ip).to eq "99.99.99.9"
+              expect(user.preferred_language).to be_blank # Because language wasn't passed
             end.to change(EmailWelcomeWorker.jobs, :count)
           end
         end
         context "with membership, partner param" do
           let!(:membership) { FactoryBot.create(:membership, invited_email: "poo@pile.com") }
-          it "creates a confirmed user, log in, and send welcome" do
+          it "creates a confirmed user, log in, and send welcome, language header" do
             session[:passive_organization_id] = "0"
             expect_any_instance_of(AfterUserCreateWorker).to receive(:send_welcoming_email)
+            request.env["HTTP_ACCEPT_LANGUAGE"] = "nl,en;q=0.9"
             post :create, user: user_attributes, partner: "bikehub"
             expect(response).to redirect_to("https://new.bikehub.com/account")
             user = User.order(:created_at).last
@@ -146,7 +170,8 @@ RSpec.describe UsersController, type: :controller do
             expect(user.partner_sign_up).to eq "bikehub"
             expect(user.email).to eq "poo@pile.com"
             expect(User.from_auth(cookies.signed[:auth])).to eq user
-            expect(user.last_login_at).to be_within(1.second).of Time.now
+            expect(user.last_login_at).to be_within(2.seconds).of Time.now
+            expect(user.preferred_language).to eq "nl"
             # TODO: Rails 5 update - this is an after_commit issue
             # Because of the after_commit issue, we can't track that response redirects correctly :(
             # expect(session[:passive_organization_id]).to eq membership.organization_id
@@ -574,22 +599,33 @@ RSpec.describe UsersController, type: :controller do
       expect(user.reload.terms_of_service).to be_truthy
     end
 
-    it "updates the preferred_language if valid" do
-      expect(user.preferred_language).to eq(nil)
-      set_current_user(user)
-      patch :update, id: user.username, user: { preferred_language: "en" }
-      expect(flash[:success]).to match(/successfully updated/i)
-      expect(response).to redirect_to(my_account_url)
-      expect(user.reload.preferred_language).to eq("en")
-    end
+    describe "preferred_language" do
+      it "updates if valid" do
+        expect(user.preferred_language).to eq(nil)
+        set_current_user(user)
+        patch :update, id: user.username, locale: "nl", user: { preferred_language: "en" }
+        expect(flash[:success]).to match(/successfully updated/i)
+        expect(response).to redirect_to(my_account_url)
+        expect(user.reload.preferred_language).to eq("en")
+      end
 
-    it "does not update the preferred_language if invalid" do
-      expect(user.preferred_language).to eq(nil)
-      set_current_user(user)
-      patch :update, id: user.username, user: { preferred_language: "klingon" }
-      expect(flash[:success]).to be_blank
-      expect(response).to render_template(:edit)
-      expect(user.reload.preferred_language).to eq(nil)
+      it "changes from previous if valid" do
+        user.update_attribute :preferred_language, "en"
+        set_current_user(user)
+        patch :update, id: user.username, locale: "en", user: { preferred_language: "nl" }
+        expect(flash[:success]).to match(/successfully updated/i)
+        expect(response).to redirect_to(my_account_url)
+        expect(user.reload.preferred_language).to eq("nl")
+      end
+
+      it "does not update the preferred_language if invalid" do
+        expect(user.preferred_language).to eq(nil)
+        set_current_user(user)
+        patch :update, id: user.username, user: { preferred_language: "klingon" }
+        expect(flash[:success]).to be_blank
+        expect(response).to render_template(:edit)
+        expect(user.reload.preferred_language).to eq(nil)
+      end
     end
 
     it "updates notification" do

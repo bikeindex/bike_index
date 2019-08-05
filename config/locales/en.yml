@@ -3058,7 +3058,7 @@ en:
       please_fix_the_following: Please fix the following %{errors}
   locales:
     en: English
-    nl: Dutch
+    nl: Nederlands (Dutch)
   meta_descriptions:
     bikes_index: Search for bikes that have been registered on Bike Index
     bikes_new: >-
@@ -3939,6 +3939,7 @@ en:
       bike_manufacturer_list: Bike Manufacturer List
       bike_shops: Bike Shops
       blog: Blog
+      change_preferred_language: change preferred language
       cities: Cities
       community_groups: Community Groups
       copyright_html: "%{current_year} &copy; Bike Index, a 501(c)(3) nonprofit -
@@ -4042,6 +4043,7 @@ en:
       resend_confirmation: Resend confirmation
       state: State
       unconfirmed_emails: Unconfirmed emails
+      why_you_should_text: Read why you should
       zipcode: Postal code
     edit_sharing:
       additional_link: Additional Link
