@@ -77,7 +77,7 @@
                 $#{current_stolen_record.estimated_value}
 
           - if current_stolen_record.present?
-            %td
+            %td{ style: "width: 50%;" }
               = current_stolen_record.theft_description
             %td.small
               - if current_stolen_record.country.present?
@@ -86,7 +86,8 @@
                 - else
                   %small.text-success= current_stolen_record.country.iso
             %td
-              = current_stolen_record.city
+              %span{ class: current_stolen_record.city.blank? ? "less-strong" : "" }
+                = [current_stolen_record.city, current_stolen_record.state&.abbreviation, current_stolen_record.zipcode].reject(&:blank?).first
             %td.table-cell-check
               = "&#x2713;".html_safe if current_stolen_record.approved
               - if bike.owner&.donor?
