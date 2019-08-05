@@ -4511,7 +4511,7 @@ nl:
       you_have_no_registered_bikes: U hebt geen geregistreerde fietsen
       you_have_no_registered_locks: U hebt geen geregistreerde sloten
   locales:
-    en: Engels
+    en: English (Engels)
     nl: Nederlands
   money:
     currencies:
