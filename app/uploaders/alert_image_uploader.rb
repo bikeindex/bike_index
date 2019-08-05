@@ -2,6 +2,8 @@ class AlertImageUploader < ApplicationUploader
   include CarrierWave::MiniMagick
   include ::CarrierWave::Backgrounder::Delay
 
+  alias stolen_record model
+
   def store_dir
     "#{base_store_dir}/#{stolen_record.id}"
   end
@@ -10,40 +12,47 @@ class AlertImageUploader < ApplicationUploader
     "uploads/#{stolen_record.class.to_s[0, 2]}"
   end
 
-  def filename
-    return if stolen_record.alert_image.blank?
-    file = File.basename(stolen_record.alert_image.path, ".*").chomp("-alert")
-    "#{file}-alert.jpg"
-  end
-
   def extension_white_list
     %w(jpg jpeg gif png tiff tif)
   end
 
-  process :generate_alert_image
+  process :fix_exif_rotation
+  process :strip
   process convert: "jpg"
 
-  alias stolen_record model
-  delegate :bike, to: :model
-
-  def bike_url
-    "bikeindex.org/bikes/#{bike.id}"
+  version :landscape do
+    process :generate_landscape
+    process resize_to_fill: [1200, 630]
   end
 
-  def bike_location
-    if stolen_record.address_location.present?
-      stolen_record.address_location
-    else
-      bike.registration_location
+  version :square do
+    process :generate_square
+    process resize_to_fill: [1200, 1200]
+  end
+
+  def generate_landscape
+    Rails.logger.info "Processing landscape #{current_path}"
+
+    manipulate! do |img|
+      alert_image =
+        AlertImageGenerator.new(stolen_record: stolen_record, bike_image: img)
+
+      img = alert_image.build_landscape
     end
+
+    Rails.logger.info "Finished processing landscape #{current_path}"
   end
 
-  def generate_alert_image
-    AlertImageGenerator.generate_image(
-      bike_image_path: model.alert_image.path,
-      bike_url: bike_url,
-      bike_location: bike_location,
-      output_path: current_path,
-    )
+  def generate_square
+    Rails.logger.info "Processing square #{current_path}"
+
+    manipulate! do |img|
+      alert_image =
+        AlertImageGenerator.new(stolen_record: stolen_record, bike_image: img)
+
+      img = alert_image.build_square
+    end
+
+    Rails.logger.info "Finished processing square #{current_path}"
   end
 end

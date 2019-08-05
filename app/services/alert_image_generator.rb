@@ -1,55 +1,136 @@
-module AlertImageGenerator
-  BASE_TEMPLATE_NAME = "promoted_alert_template.png"
-  BASE_TEMPLATE_PATH = Rails.root.join("app", "assets", "images", BASE_TEMPLATE_NAME)
-  HEADER_HEIGHT = 100
-  FOOTER_HEIGHT = 50
-  PADDING = 200
+class AlertImageGenerator
+  PROMOTED_ALERTS_PATH = "app/assets/images/promoted_alerts"
+  LANDSCAPE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "landscape-template.png")
+  LANDSCAPE_CAPTION = Rails.root.join(PROMOTED_ALERTS_PATH, "landscape-caption.png")
+  SQUARE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "square-template.png")
 
-  def self.generate_image(bike_image_path:, bike_url:, bike_location:, output_path:)
-    template = MiniMagick::Image.open(BASE_TEMPLATE_PATH)
-    container_width = template.width
-    container_height = template.height - HEADER_HEIGHT - FOOTER_HEIGHT
+  attr_accessor :stolen_record, :bike, :bike_image
 
-    bike = MiniMagick::Image.open(bike_image_path).tap do |b|
+  def initialize(stolen_record:, bike_image:)
+    self.stolen_record = stolen_record
+    self.bike = stolen_record.bike
+    self.bike_image = bike_image
+  end
+
+  def build_landscape
+    banner_width = 60
+    padding = 75
+    template_image = MiniMagick::Image.open(LANDSCAPE_TEMPLATE)
+
+    # Resize bike image to fit within template dimensions
+    bike_image = self.bike_image.tap do |bike|
       dimensions =
-        [container_width, container_height]
-          .map { |dim| dim - PADDING }
+        [template_image.width - banner_width, template_image.height]
+          .map { |d| d - padding }
           .join("x")
 
-      b.resize(dimensions)
+      bike.resize(dimensions)
     end
 
-    alert_image = template.composite(bike) do |c|
-      c.gravity "Center"
-      c.compose "Over"
-      c.geometry "+0+#{HEADER_HEIGHT - FOOTER_HEIGHT}"
+    # Compose template with bike image
+    alert_image = template_image.composite(bike_image) do |alert|
+      alert.gravity "Center"
+      alert.compose "Over"
+      # right-offset to account for LHS banner
+      alert.geometry "+#{banner_width}+0"
     end
 
-    alert_image.combine_options do |i|
-      i.fill "#FFFFFF"
-      i.antialias
-
-      if system("mogrify -list font | grep --silent 'Font: Helvetica-Oblique$'")
-        i.font "Helvetica-Oblique"
-      elsif system("mogrify -list font | grep --silent 'Font: ArialI$'")
-        i.font "ArialI"
-      elsif system("mogrify -list font | grep --silent 'Font: DejaVu-Sans$'")
-        i.font "DejaVu-Sans"
+    # Compose with caption image if a location is available
+    if bike_location.present?
+      caption_image = MiniMagick::Image.open(LANDSCAPE_CAPTION).tap do |caption|
+        caption.combine_options do |i|
+          i.font "ArialI"
+          i.fill "#FFFFFF"
+          i.antialias
+          i.gravity "Center"
+          i.pointsize 50
+          i.size [caption.height, caption.width].join("x")
+          i.draw "text 0,0 '#{bike_location}'"
+        end
       end
 
-      # Overlay bike url within lower border
-      i.gravity "South"
-      i.pointsize 50
-      i.draw "text 0,25 '#{bike_url}'"
-
-      # Overlay bike location on RHS of top border
-      i.gravity "Northeast"
-      i.pointsize 110
-      i.size [nil, HEADER_HEIGHT].join("x")
-      sanitized_bike_location = bike_location.gsub("'", "\\'")
-      i.draw "text 30,30 '#{sanitized_bike_location}'"
+      alert_image = alert_image.composite(caption_image) do |alert|
+        alert.gravity "Southeast"
+        alert.compose "Over"
+        alert.size [nil, 100].join("x")
+        alert.geometry "+0+5"
+      end
     end
 
-    alert_image.write(output_path)
+    alert_image
+  end
+
+  def build_square
+    header_height = 100
+    footer_height = 50
+    padding = 200
+    template_image = MiniMagick::Image.open(SQUARE_TEMPLATE)
+
+    # Resize bike image to fit within template dimensions
+    bike_image = self.bike_image.tap do |bike|
+      dimensions = [
+        template_image.width,
+        template_image.height - header_height - footer_height,
+      ].map { |dim| dim - padding }.join("x")
+
+      bike.resize(dimensions)
+    end
+
+    # Compose bike image onto alert template
+    alert_image = template_image.composite(bike_image) do |alert|
+      alert.gravity "Center"
+      alert.compose "Over"
+      alert.geometry "+0+#{header_height - footer_height}"
+    end
+
+    alert_image.combine_options do |alert|
+      alert.fill "#FFFFFF"
+      alert.antialias
+      alert.font caption_font
+
+      # Overlay bike url within lower border
+      alert.gravity "South"
+      alert.pointsize 50
+      alert.draw "text 0,25 '#{bike_url}'"
+
+      # Overlay bike location on RHS of top border
+      alert.gravity "Northeast"
+      alert.pointsize 110
+      alert.size "x#{header_height}"
+      alert.draw "text 30,30 '#{bike_location}'"
+    end
+
+    alert_image
+  end
+
+  # The bike location to be displayed on the promoted alert image
+  def bike_location
+    location =
+      if stolen_record.address_location.present?
+        stolen_record.address_location
+      else
+        bike.registration_location
+      end
+
+    # escape single-quotes: location is passed to Imagemagick CLI inside
+    # single-quotes
+    location.gsub("'", "\\'")
+  end
+
+  # The bike url to be displayed on the promoted alert image
+  def bike_url
+    "bikeindex.org/bikes/#{bike.id}"
+  end
+
+  # The font to use in the caption. Set fallbacks since different environments
+  # have different fonts available.
+  def caption_font
+    if system("mogrify -list font | grep --silent 'Font: Helvetica-Oblique$'")
+      "Helvetica-Oblique"
+    elsif system("mogrify -list font | grep --silent 'Font: ArialI$'")
+      "ArialI"
+    elsif system("mogrify -list font | grep --silent 'Font: DejaVu-Sans$'")
+      "DejaVu-Sans"
+    end
   end
 end

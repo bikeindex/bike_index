@@ -4,7 +4,7 @@ RSpec.describe StolenRecord, type: :model do
   describe "after_commit hooks" do
     context "if bike no longer exists" do
       it "removes alert_image" do
-        stolen_record = FactoryBot.create(:stolen_record)
+        stolen_record = FactoryBot.create(:stolen_record, :with_alert_image)
         stolen_record.update_attribute(:bike, nil)
         expect(stolen_record.bike).to be_blank
         expect(stolen_record.alert_image).to be_present
@@ -17,8 +17,8 @@ RSpec.describe StolenRecord, type: :model do
 
     context "if being marked as recovered" do
       it "removes alert_image" do
-        bike = FactoryBot.create(:stolen_bike)
-        stolen_record = bike.current_stolen_record
+        bike = FactoryBot.create(:bike, stolen: true)
+        stolen_record = FactoryBot.create(:stolen_record, :with_alert_image, bike: bike)
         expect(stolen_record.alert_image).to be_present
         expect(stolen_record.bike.stolen).to eq(true)
 
@@ -34,9 +34,9 @@ RSpec.describe StolenRecord, type: :model do
 
     context "if not being marked as recovered" do
       it "does not removes alert_image" do
-        stolen_bike = FactoryBot.create(:stolen_bike)
-        stolen_record = stolen_bike.current_stolen_record
-        expect(stolen_record.alert_image).to be_present
+        bike = FactoryBot.create(:bike, stolen: true)
+        stolen_record = FactoryBot.create(:stolen_record, :with_alert_image, bike: bike)
+        expect(stolen_record.reload.alert_image).to be_present
 
         stolen_record.run_callbacks(:commit)
 
@@ -64,7 +64,7 @@ RSpec.describe StolenRecord, type: :model do
 
     context "given multiple bike images" do
       it "uses the first bike image for the alert image" do
-        bike = FactoryBot.create(:bike)
+        bike = FactoryBot.create(:bike, stolen: true)
         stolen_record = FactoryBot.create(:stolen_record, alert_image: nil, bike: bike)
 
         image1 = FactoryBot.create(:public_image, imageable: bike)
@@ -76,42 +76,7 @@ RSpec.describe StolenRecord, type: :model do
 
         alert_image_name = File.basename(stolen_record.alert_image.path, ".*")
         image1_name = File.basename(image1.image.path, ".*")
-        expect(alert_image_name).to eq("#{image1_name}-alert")
-      end
-    end
-
-    context "given a pre-existing alert_image" do
-      it "re-generates the image if the bike image filename differs" do
-        stolen_record = FactoryBot.create(:stolen_record)
-        bike_image0 = stolen_record.bike.public_images.last.image
-        bike_image_name = File.basename(bike_image0.path, ".*")
-        alert_image_name = File.basename(stolen_record.alert_image.path, ".*")
-        expect(alert_image_name).to_not eq("#{bike_image_name}-alert")
-
-        stolen_record.generate_alert_image
-
-        expect(stolen_record.alert_image).to be_present
-        alert_image_name = File.basename(stolen_record.reload.alert_image.path, ".*")
-        expect(alert_image_name).to eq("#{bike_image_name}-alert")
-      end
-
-      it "returns without updating if the bike image filename does not differ" do
-        stolen_record = FactoryBot.create(:stolen_record, alert_image: nil)
-        bike_image_name = File.basename(stolen_record.bike.public_images.last.image.path, ".*")
-
-        # Set alert image to bike image
-        stolen_record.generate_alert_image
-        expect(stolen_record.alert_image).to be_present
-
-        alert_image_name = File.basename(stolen_record.reload.alert_image.path, ".*")
-        expect(alert_image_name).to eq("#{bike_image_name}-alert")
-
-        # Attempt to generate with no change to bike image
-        allow(stolen_record).to receive(:update)
-        stolen_record.generate_alert_image
-        expect(stolen_record).to_not have_received(:update)
-
-        expect(alert_image_name).to eq("#{bike_image_name}-alert")
+        expect(alert_image_name).to eq(image1_name)
       end
     end
   end
