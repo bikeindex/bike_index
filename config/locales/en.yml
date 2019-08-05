@@ -757,9 +757,6 @@ en:
         restrict_dependent_destroy:
           has_many: Cannot delete record because dependent %{record} exist
           has_one: Cannot delete record because a dependent %{record} exists
-      models:
-        impound_record:
-          user_not_authorized: does not have permission to impound this bike
     models:
       ad: Ad
       ambassador: Ambassador
@@ -1190,7 +1187,6 @@ en:
       access_panel: Access Panel
       additional_message: Additional message
       address: 'Address:'
-      already_impounded: This %{bike_type} is already impounded by %{organization_name}
       as_a_bikeindex_ambassador_html: >-
         <em><span class="hidden-md-down">As a Bike Index ambassador,</span> you can
         mark it as recovered:</em>
@@ -1207,9 +1203,6 @@ en:
       edit: Edit
       email_to_deal_with_this_html: Email %{support_link} to deal with this.
       geomessage: GeoMessage
-      impound: Impound
-      impound_are_you_sure: Are you sure you want to %{bike_type}?
-      impounded_by: By
       is_false: 'false'
       is_not_registered_html: "<em>not</em> reged with %{org_name}"
       is_registered: reged with %{org_name}
@@ -1300,7 +1293,7 @@ en:
         number of Bike Codes.
     show:
       at: at
-      bike_in_admin: "%{bike_type} in Super Admin"
+      bike_in_admin: "%{bike_type} in Admin"
       bike_photo: "%{bike_type} photo"
       change_the_bike_sticker_linked_to: Change the bike it links to
       color_may_not_match: Color may not match!
@@ -1359,7 +1352,7 @@ en:
       write_them_a_message: Write them a message
       year: Year
       you_scanned_this_sticker_html: >-
-        You scanned the sticker <strong>%{pretty_code}</strong>, which is assigned
+        You scanned the sticker <strong>%{pretty_code}</strong> which is assigned
         to this %{bike_type}.
     stolen_checklist:
       a_photo_of_your_bike_type: a photo of your %{bike_type}
@@ -2998,7 +2991,6 @@ en:
       multi_serial_search: Multi serial search
       org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"
-      org_impounded_bikes: "%{org_name} Impounded Bikes"
       org_locations: "%{org_name} locations"
       org_profile: "%{org_name} profile"
       recoveries: Recoveries
@@ -3352,8 +3344,6 @@ en:
         all: All
         bike: bike
         color: Color
-        email_hidden: email hidden
-        impounded: Impounded
         link: Link
         manufacturer: Manufacturer
         matching_bikes_html: "<strong>%{bikes}</strong> matching"
@@ -3365,7 +3355,7 @@ en:
         only_with_stickers_html: Only <strong>with</strong> stickers
         owner_name: Owner name
         registered: Registered
-        registered_bikes_html: "<strong>%{bikes}</strong> matching for %{org_name}"
+        registered_bikes_html: "<strong>%{bikes}</strong> registered with %{org_name}"
         search_bike_descriptions: Search bike descriptions
         search_for_serial_number: Search for serial number
         search_owner_email: Search owner email

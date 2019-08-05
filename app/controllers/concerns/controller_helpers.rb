@@ -9,12 +9,6 @@ module ControllerHelpers
                   :user_root_bike_search?, :current_organization, :passive_organization, :controller_namespace, :page_id,
                   :default_bike_search_path
     before_filter :enable_rack_profiler
-
-    before_action do
-      if current_user.present?
-        Honeybadger.context(user_id: current_user.id, user_email: current_user.email)
-      end
-    end
   end
 
   def append_info_to_payload(payload)

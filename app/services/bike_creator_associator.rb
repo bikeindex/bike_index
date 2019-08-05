@@ -67,7 +67,7 @@ class BikeCreatorAssociator
       attach_photo(bike)
       attach_photos(bike)
       add_other_listings(bike)
-      bike.reload.save
+      bike.reload
     rescue => e
       bike.errors.add(:association_error, e.message)
     end

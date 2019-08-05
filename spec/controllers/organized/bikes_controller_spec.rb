@@ -73,8 +73,7 @@ RSpec.describe Organized::BikesController, type: :controller do
   context "logged_in_as_organization_member" do
     include_context :logged_in_as_organization_member
     context "paid organization" do
-      let(:paid_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_codes impound_bikes] }
-      before { organization.update_columns(is_paid: true, paid_feature_slugs: paid_feature_slugs) } # Stub organization having paid feature
+      before { organization.update_columns(is_paid: true, paid_feature_slugs: %w[bike_search show_recoveries show_partial_registrations bike_codes]) } # Stub organization having paid feature
       describe "index" do
         context "with params" do
           let(:query_params) do
@@ -121,18 +120,6 @@ RSpec.describe Organized::BikesController, type: :controller do
             expect(assigns(:current_organization)).to eq organization
             expect(assigns(:search_query_present)).to be_falsey
             expect(assigns(:bikes).pluck(:id).include?(non_organization_bike.id)).to be_falsey
-          end
-        end
-        context "with search_impoundedness only_impounded" do
-          let(:impound_record) { FactoryBot.create(:impound_record, organization: organization, user: user) }
-          let!(:impounded_bike) { impound_record.bike }
-          it "returns only impounded" do
-            get :index, organization_id: organization.to_param, search_impoundedness: "only_impounded"
-            expect(response.status).to eq(200)
-            expect(assigns(:interpreted_params)[:stolenness]).to eq "all"
-            expect(assigns(:current_organization)).to eq organization
-            expect(assigns(:search_query_present)).to be_falsey
-            expect(assigns(:bikes).pluck(:id)).to eq([impounded_bike.id])
           end
         end
       end
@@ -235,37 +222,6 @@ RSpec.describe Organized::BikesController, type: :controller do
         expect(response.status).to eq(200)
         expect(response).to render_template :new
         expect(assigns(:current_organization)).to eq organization
-      end
-    end
-
-    describe "impound bike" do
-      let(:ownership) { FactoryBot.create(:ownership) }
-      let(:bike) { ownership.bike }
-      it "renders flash message about not permitted" do
-        expect(bike.impounded?).to be_falsey
-        request.env["HTTP_REFERER"] = bike_path(bike)
-        put :update, organization_id: organization.to_param, id: bike.id, bike: { impound: true }
-        expect(flash[:error]).to be_present
-        expect(response).to redirect_to(bike_path(bike))
-        bike.reload
-        expect(bike.impounded?).to be_falsey
-      end
-      context "organization has impound_bikes" do
-        let(:organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: "impound_bikes") }
-        it "impounds the bike" do
-          expect(bike.impounded?).to be_falsey
-          request.env["HTTP_REFERER"] = bike_path(bike)
-          expect do
-            put :update, organization_id: organization.to_param, id: bike.id, bike: { impound: true }
-          end.to change(ImpoundRecord, :count).by 1
-          expect(flash[:success]).to be_present
-          expect(response).to redirect_to(bike_path(bike))
-          bike.reload
-          expect(bike.impounded?).to be_truthy
-          impound_record = bike.impound_records.last
-          expect(impound_record.user).to eq user
-          expect(impound_record.organization).to eq organization
-        end
       end
     end
   end

@@ -359,7 +359,7 @@ RSpec.shared_examples "bike_searchable" do
     context "no serial param" do
       let(:query_params) { { query_items: [manufacturer.search_id], stolenness: "non" } }
       it "returns nil" do
-        expect(Bike.search_close_serials(interpreted_params)).to be_blank
+        expect(Bike.search_close_serials(interpreted_params)).to be_nil
       end
     end
     context "exact normalized serial" do

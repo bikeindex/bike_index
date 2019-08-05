@@ -54,7 +54,7 @@
                 = number_to_currency(theft_alert_plan.amount_cents / 100.0, unit: "$")
           %td
             - if theft_alert.recovered?
-              = link_to "recovered!", admin_recovery_path(theft_alert.stolen_record), class: "text-success"
+              = link_to "recovered!", admin_recovery_path(theft_alert.bike), class: "text-success"
             - else
               - text_class = "text-info" if theft_alert.active?
               - text_class ||= "text-danger" if theft_alert.pending?

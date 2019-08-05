@@ -131,9 +131,7 @@ RSpec.describe PublicImagesController, type: :controller do
       it "rejects the destroy" do
         user = FactoryBot.create(:admin)
         set_current_user(user)
-        public_image = FactoryBot.create(:public_image,
-                                         imageable_type: "MailSnippet",
-                                         imageable: mail_snippet)
+        public_image = FactoryBot.create(:public_image, imageable_type: "MailSnippet", imageable: mail_snippet)
         public_image.reload
         expect do
           delete :destroy, id: public_image.id

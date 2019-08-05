@@ -185,7 +185,6 @@ Bikeindex::Application.routes.draw do
 
     resources :stolen_bikes do
       member { post :approve }
-      member { patch :regenerate_alert_image }
     end
     resources :customer_contacts, only: [:create]
     resources :recoveries do
@@ -297,7 +296,7 @@ Bikeindex::Application.routes.draw do
     get "/", to: "dashboard#root", as: :root
     resources :dashboard, only: [:index]
     get "landing", to: "manage#landing", as: :landing
-    resources :bikes, only: %i[index new show update] do
+    resources :bikes, only: %i[index new show] do
       collection do
         get :recoveries
         get :incompletes

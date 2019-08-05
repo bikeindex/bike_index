@@ -1,7 +1,6 @@
 module Organized
   class BikesController < Organized::BaseController
     include SortableTable
-    rescue_from ActionController::RedirectBackError, with: :redirect_back # Gross. TODO: Rails 5 update
     skip_before_filter :ensure_not_ambassador_organization!, only: [:multi_serial_search]
 
     def index
@@ -35,25 +34,6 @@ module Organized
 
     def multi_serial_search; end
 
-    def update
-      if params.dig(:bike, :impound)
-        if current_organization.paid_for?("impound_bikes")
-          bike = Bike.find(params[:id])
-          impound_record = bike.impound(current_user, organization: current_organization)
-          if impound_record.valid?
-            flash[:success] = "#{bike.type} impounded!"
-          else
-            flash[:error] = "Unable to impound #{bike.type}: #{impound_record.errors.full_messages.to_sentence}"
-          end
-        else
-          flash[:error] = "Your organization doesn't have permission to impound bikes, please contact support@bikeindex.org"
-        end
-      else
-        flash[:error] = "Unknown update action. Please contact support@bikeindex.org"
-      end
-      redirect_to :back
-    end
-
     private
 
     def sortable_columns
@@ -68,26 +48,12 @@ module Organized
       organization_bikes_path(organization_id: current_organization.to_param)
     end
 
-    def redirect_back
-      if params[:id].present?
-        redirect_to bike_path(params[:id]) and return
-      else
-        redirect_to organization_bikes_path and return
-      end
-    end
-
     def search_organization_bikes
       @search_query_present = permitted_org_bike_search_params.except(:stolenness).values.reject(&:blank?).any?
       @interpreted_params = Bike.searchable_interpreted_params(permitted_org_bike_search_params, ip: forwarded_ip_address)
       org = current_organization || passive_organization
       if org.present?
-        if params[:search_impoundedness] == "only_impounded"
-          @impoundedness = "only_impounded"
-          bikes = org.impounded_bikes
-        else
-          bikes = org.bikes
-        end
-        bikes = bikes.search(@interpreted_params)
+        bikes = org.bikes.search(@interpreted_params)
         bikes = bikes.organized_email_search(params[:email]) if params[:email].present?
       else
         bikes = Bike.search(@interpreted_params)

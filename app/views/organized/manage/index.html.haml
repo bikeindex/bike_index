@@ -25,16 +25,15 @@
       %span.below-input-help
         = t(".org_email_address_html", org_name: @organization.name)
 
-  - unless Organization.admin_required_kinds.include?(@organization.kind)
-    .form-group.row
-      %label.org-form-label
-        = t(".organization_type")
-      .col-sm-4
-        - Organization.user_creatable_kinds.each do |kind|
-          .radio
-            %label
-              = f.radio_button :kind, kind
-              = kind.humanize
+  .form-group.row
+    %label.org-form-label
+      = t(".organization_type")
+    .col-sm-4
+      - Organization.user_creatable_kinds.each do |kind|
+        .radio
+          %label
+            = f.radio_button :kind, kind
+            = kind.humanize
 
   .form-group.row
     = f.label :website, class: 'org-form-label'

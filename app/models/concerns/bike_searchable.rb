@@ -28,7 +28,7 @@ module BikeSearchable
     end
 
     def search_close_serials(interpreted_params)
-      return Bike.none unless interpreted_params[:serial]
+      return nil unless interpreted_params[:serial]
       # Skip the exact match ids
       where.not(id: search(interpreted_params).pluck(:id))
         .non_serial_matches(interpreted_params)

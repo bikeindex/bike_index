@@ -212,11 +212,6 @@ module ApplicationHelper
     end
   end
 
-  def pretty_print_json(data)
-    require "coderay"
-    CodeRay.scan(JSON.pretty_generate(data), :json).div.html_safe
-  end
-
   def language_choices
     @language_choices ||= I18n.available_locales.map do |locale|
       [t(locale, scope: [:locales]), locale.to_s]

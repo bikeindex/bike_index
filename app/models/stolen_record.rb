@@ -50,10 +50,6 @@ class StolenRecord < ActiveRecord::Base
   geocoded_by :address_override_show_address
   after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
 
-  mount_uploader :alert_image, AlertImageUploader
-  process_in_background :alert_image
-  after_commit :remove_outdated_alert_image
-
   def self.find_matching_token(bike_id:, recovery_link_token:)
     return nil unless bike_id.present? && recovery_link_token.present?
     unscoped.where(bike_id: bike_id, recovery_link_token: recovery_link_token).first
@@ -89,18 +85,10 @@ class StolenRecord < ActiveRecord::Base
     ].reject(&:blank?).join(", ")
   end
 
-  # Doesn't include street
-  def address_short
-    [city, state&.abbreviation, zipcode].reject(&:blank?).join(",")
-  end
-
-  def address_location
-    return "" if state&.abbreviation.blank?
-
-    @address_location ||=
-      [city&.titleize, state.abbreviation.upcase]
-        .reject(&:blank?)
-        .join(", ")
+  def address_short # Doesn't include street
+    [city,
+     (state && state.abbreviation),
+     zipcode].reject(&:blank?).join(",")
   end
 
   LOCKING_DESCRIPTIONS = [
@@ -252,34 +240,5 @@ class StolenRecord < ActiveRecord::Base
     return recovery_link_token if recovery_link_token.present?
     update_attributes(recovery_link_token: SecurityTokenizer.new_token)
     recovery_link_token
-  end
-
-  def bike_main_image
-    bike&.public_images&.order(:id)&.first&.image
-  end
-
-  # Generate the "promoted alert image"
-  # (One of the stolen bike's public images, placed on a branded template)
-  #
-  # The URL is available immediately - processing is performed in the background.
-  #
-  # TODO: Allow selection of which bike image to use for the alert image
-  def generate_alert_image(bike_image: bike_main_image)
-    return if bike_image.blank?
-    remove_alert_image
-    self.alert_image = bike_image
-    save
-  end
-
-  def remove_alert_image
-    alert_image.remove!
-    reload.save
-  end
-
-  # If the bike has been recovered, remove the alert_image
-  def remove_outdated_alert_image
-    if bike.blank? || !bike.stolen?
-      remove_alert_image
-    end
   end
 end

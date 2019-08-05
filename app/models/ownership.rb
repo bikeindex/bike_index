@@ -4,8 +4,6 @@ class Ownership < ActiveRecord::Base
   validates_presence_of :owner_email
   validates_presence_of :creator_id
   validates_presence_of :bike_id
-  validates :owner_email,
-            format: { with: /\A.+@.+\..+\z/, message: "invalid format" }
 
   belongs_to :bike, touch: true
   belongs_to :user, touch: true

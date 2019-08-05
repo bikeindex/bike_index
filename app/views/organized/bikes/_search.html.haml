@@ -50,7 +50,6 @@
     = t(".settings")
 
 :ruby
-  # TODO: Now that we have translations, we need to localize this. I believe the easiest way to do so would be to pull the text from the header cell and use that.
   column_renames = {
     "created_at_cell" => "Registered",
     "updated_at_cell" => "Updated",
@@ -65,11 +64,9 @@
     "reg_phone_cell" => "Phone",
     "reg_address_cell" => "Address",
     "sticker_cell" => "Sticker",
-    "impounded_cell" => "Impounded",
   }
   optional_columns = current_organization.paid_for?("bike_codes") ? ["sticker_cell"] : []
   optional_columns += current_organization.additional_registration_fields.map { |f| "#{f}_cell" }
-  optional_columns += ["impounded_cell"] if @impoundedness == "only_impounded"
   default_columns = %w[created_at_cell
                        stolen_cell
                        manufacturer_cell
@@ -129,10 +126,7 @@
         - if current_organization.paid_for?("bike_codes")
           %th.hiddenColumn.hidden-xs-down{ class: "sticker_cell" }
             = t(".sticker")
-            - if @bike_code.present?
-              %th
-                = t(".link")
-            - elsif params[:search_stickers].present?
+            - if params[:search_stickers].present?
               %em.small
                 %a.less-strong{ href: "#organizedSearchSettings", "aria-controls" => "organizedSearchSettings", "data-toggle" => "collapse" }
                   - if @search_stickers == "with"
@@ -145,8 +139,11 @@
         / - if current_organization.paid_for?("avery_export")
         /   %th{ class: "avery_export_cell" }
         /     Export
-        - if @impoundedness == "only_impounded"
-          %th.impounded_cell=t(".impounded")
+        - if @bike_code.present?
+          %th
+            = t(".link")
+            %br
+            = t(".sticker")
     %tbody
       - @bikes.each do |bike|
         %tr
@@ -170,11 +167,7 @@
               %small.hidden-sm-up
                 = organized_bike_text(bike)
                 %br
-              - if bike.email_visible_for?(current_organization)
-                = bike.owner_email
-              - else
-                %em.less-strong
-                  = t(".email_hidden")
+              = bike.owner_email
               - if bike.creation_description
                 %small.less-strong
                   = bike.creation_description
@@ -196,22 +189,19 @@
             /   %td.hiddenColumn{ class: "avery_export" }
             - if current_organization.paid_for?("bike_codes")
               %td.hidden-xs-down{ class: "sticker_cell" }
-                - if @bike_code.present?
-                  %small
-                    = link_to t(".link"), bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id, bike_id: bike.id), method: "PUT"
-                - else
-                  - bike.bike_codes.each_with_index do |bike_code, index|
-                    - if bike_code.organization.present?
-                      = link_to bike_code.code, edit_organization_sticker_path(id: bike_code.code, organization_id: bike_code.organization&.to_param), class: "small"
-                    - else
-                      %small
-                        = bike_code.code
-                    - if index > 0
-                      %br
-          - if @impoundedness == "only_impounded"
-            %td.impounded_cell
-              %small.convertTime
-                = l bike.current_impound_record.created_at, format: :convert_time
+                - bike.bike_codes.each_with_index do |bike_code, index|
+                  - if bike_code.organization.present?
+                    = link_to bike_code.code, edit_organization_sticker_path(id: bike_code.code, organization_id: bike_code.organization&.to_param), class: "small"
+                  - else
+                    %small
+                      = bike_code.code
+                  - if index > 0
+                    %br
+
+          - if @bike_code.present?
+            %td
+              %small
+                = link_to t(".link"), bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id, bike_id: bike.id), method: "PUT"
 
 .paginate-container.paginate-container-bottom
   = paginate @bikes

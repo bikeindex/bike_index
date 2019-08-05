@@ -56,8 +56,7 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
 ## Translation
 
-We're using [translation.io](https://translation.io) to manage internationalization:
-[translation.io/bikeindex/bike_index](https://translation.io/bikeindex/bike_index)
+We're using [translation.io](https://translation.io) to manage internationalization: [translation.io/bikeindex/bike_index](https://translation.io/bikeindex/bike_index)
 
 To contribute, sign up for an account there and ask to be added to the project
 as a translator.
@@ -65,25 +64,15 @@ as a translator.
 **Non-English translation files should be treated as read-only.** We sync these
 with our translation.io project
 
-If you modify the English translation file
-[config/locales/en.yml](config/locales/en.yml), run:
+If you modify the English translation file [config/locales/en.yml](config/locales/en.yml), run:
 
-```shell
+```
 bin/rake prepare_translations
 ```
 
-before pushing to GitHub. This will normalize translation file formatting and
-check for missing or unused keys.
+before pushing to GitHub. This will normalize translation file formatting and check for missing or unused keys.
 
-### Syncing Translations
-
-When building master, we check for un-synced translations and, if any are found,
-stop the build and open a PR to master with the translation updates. (See
-[#1100](https://github.com/bikeindex/bike_index/pull/1100) for details.)
-
-To update the keys on translation.io, run `bin/rake translation:sync` (requires
-having an active API key locally).
-
+To update the keys on translation.io, run `bin/rake translation:sync` (requires having an active API key locally).
 
 ## Testing
 

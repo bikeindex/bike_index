@@ -172,10 +172,10 @@ RSpec.describe User, type: :model do
       let(:bike_code) { FactoryBot.create(:bike_code_claimed, bike: bike) }
       it "is truthy for admins and org members and code claimer" do
         # Sanity check bike authorization
-        expect(bike.authorized?(user)).to be_falsey
-        expect(bike.authorized?(owner)).to be_truthy
-        expect(bike.authorized?(organization_member)).to be_truthy
-        expect(bike.authorized?(admin)).to be_truthy
+        expect(bike.authorized_for_user?(user)).to be_falsey
+        expect(bike.authorized_for_user?(owner)).to be_truthy
+        expect(bike.authorized_for_user?(organization_member)).to be_truthy
+        expect(bike.authorized_for_user?(admin)).to be_truthy
         # Check user authorization
         expect(user.authorized?(bike)).to be_falsey
         expect(owner.authorized?(bike)).to be_truthy

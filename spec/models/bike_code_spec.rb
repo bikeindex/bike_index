@@ -216,11 +216,11 @@ RSpec.describe BikeCode, type: :model do
         expect(admin.authorized?(organization)).to be_truthy
         expect(rando.authorized?(organization)).to be_falsey
         # Sanity check bike authorizations
-        expect(bike.authorized?(bike_code_user)).to be_falsey
-        expect(bike.authorized?(owner)).to be_truthy
-        expect(bike.authorized?(organization_member)).to be_falsey
-        expect(bike.authorized?(admin)).to be_falsey
-        expect(bike.authorized?(rando)).to be_falsey
+        expect(bike.authorized_for_user?(bike_code_user)).to be_falsey
+        expect(bike.authorized_for_user?(owner)).to be_truthy
+        expect(bike.authorized_for_user?(organization_member)).to be_falsey
+        expect(bike.authorized_for_user?(admin)).to be_falsey
+        expect(bike.authorized_for_user?(rando)).to be_falsey
         # Check authorizations on the code itself
         expect(bike_code.authorized?(bike_code_user)).to be_truthy
         expect(bike_code.authorized?(owner)).to be_truthy
