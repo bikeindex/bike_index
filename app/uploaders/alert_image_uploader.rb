@@ -20,9 +20,14 @@ class AlertImageUploader < ApplicationUploader
   process :strip
   process convert: "jpg"
 
-  version :landscape do
-    process :generate_landscape
+  version :facebook do
+    process generate_landscape: :facebook
     process resize_to_fill: [1200, 630]
+  end
+
+  version :twitter do
+    process generate_landscape: :twitter
+    process resize_to_fill: [1200, 600]
   end
 
   version :square do
@@ -30,29 +35,21 @@ class AlertImageUploader < ApplicationUploader
     process resize_to_fill: [1200, 1200]
   end
 
-  def generate_landscape
-    Rails.logger.info "Processing landscape #{current_path}"
-
+  def generate_landscape(variant)
+    Rails.logger.info "Processing #{variant} #{current_path}"
     manipulate! do |img|
-      alert_image =
-        AlertImageGenerator.new(stolen_record: stolen_record, bike_image: img)
-
-      img = alert_image.build_landscape
+      alert_image = AlertImageGenerator.new(stolen_record: stolen_record, bike_image: img)
+      img = alert_image.build_landscape(variant)
     end
-
-    Rails.logger.info "Finished processing landscape #{current_path}"
+    Rails.logger.info "Finished #{variant} #{current_path}"
   end
 
   def generate_square
     Rails.logger.info "Processing square #{current_path}"
-
     manipulate! do |img|
-      alert_image =
-        AlertImageGenerator.new(stolen_record: stolen_record, bike_image: img)
-
+      alert_image = AlertImageGenerator.new(stolen_record: stolen_record, bike_image: img)
       img = alert_image.build_square
     end
-
-    Rails.logger.info "Finished processing square #{current_path}"
+    Rails.logger.info "Finished square #{current_path}"
   end
 end
