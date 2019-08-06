@@ -1,4 +1,5 @@
 class Bike < ActiveRecord::Base
+  acts_as_paranoid
   include Phonifyerable
   include ActiveModel::Dirty
   include BikeSearchable
