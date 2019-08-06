@@ -523,12 +523,7 @@ class Bike < ActiveRecord::Base
   end
 
   def alert_image_url(version = nil)
-    return if current_stolen_record.blank?
-
-    if current_stolen_record&.alert_image.present? ||
-       current_stolen_record.generate_alert_image
-      current_stolen_record.alert_image_url(version)
-    end
+    current_stolen_record&.current_alert_image&.image_url(version)
   end
 
   def load_external_images(urls = nil)
