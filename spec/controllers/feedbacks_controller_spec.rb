@@ -25,6 +25,16 @@ RSpec.describe FeedbacksController, type: :controller do
     end
     let!(:user) { FactoryBot.create(:user_confirmed) }
 
+    context "user deleting bike" do
+      let(:ownership) { FactoryBot.create(:ownership_organization_bike, owner_email: user.email) }
+      let(:bike) { ownership.bike }
+      it "soft deletes bike" do
+        delete :destroy, id: bike.id
+        expect(Feedback, :count).to change_by(1)
+        expect(bike.paranoia_destroyed?).to_be true
+      end
+    end
+
     context "valid feedback" do
       it "creates a feedback message" do
         expect(user.name).to be_present
