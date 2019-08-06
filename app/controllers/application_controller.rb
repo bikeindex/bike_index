@@ -59,16 +59,23 @@ class ApplicationController < ActionController::Base
   end
 
   def locale_from_request_params
-    requested_locale = params.fetch(:locale, "").strip.to_sym
-    requested_locale if I18n.available_locales.include?(requested_locale)
+    params.fetch(:locale, "").strip
   end
 
   def requested_locale
-    @requested_locale ||=
-      locale_from_request_params ||
+    return @requested_locale if defined?(@requested_locale)
+
+    requested_locale =
+      locale_from_request_params.presence ||
       current_user&.preferred_language.presence ||
-      locale_from_request_header ||
-      I18n.default_locale
+      locale_from_request_header.presence
+
+    @requested_locale =
+      if I18n.available_locales.include?(requested_locale.to_s.to_sym)
+        requested_locale
+      else
+        I18n.default_locale
+      end
   end
 
   def set_locale
