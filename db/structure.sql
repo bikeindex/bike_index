@@ -77,7 +77,7 @@ ALTER SEQUENCE public.ads_id_seq OWNED BY public.ads.id;
 CREATE TABLE public.alert_images (
     id integer NOT NULL,
     stolen_record_id integer NOT NULL,
-    current boolean DEFAULT true NOT NULL,
+    retired_at timestamp without time zone,
     image character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL

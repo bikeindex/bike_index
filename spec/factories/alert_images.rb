@@ -4,7 +4,7 @@ FactoryBot.define do
     image { nil }
 
     trait :retired do
-      current { false }
+      retired_at { Time.current }
     end
 
     trait :with_image do
