@@ -37,6 +37,5 @@
 //= require moment
 //= require moment-timezone
 //= require bike_index
-//= require_tree ./views
 //= require Chart.bundle
 //= require chartkick
