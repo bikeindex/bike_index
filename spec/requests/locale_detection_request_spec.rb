@@ -43,7 +43,8 @@ RSpec.describe "Locale detection", type: :request do
 
     context "given an unrecognized ACCEPT_LANGUAGE header" do
       it "renders the homepage in the default language" do
-        get "/", {}, { "HTTP_ACCEPT_LANGUAGE" => "es-ES;q=0.8,nl-NL;q=0.7" }
+        unrecognized_locales = "zh;q=0.8,es-ES;q=0.7"
+        get "/", {}, { "HTTP_ACCEPT_LANGUAGE" => unrecognized_locales }
         expect(response.body).to match(/bike registration/i)
       end
     end
