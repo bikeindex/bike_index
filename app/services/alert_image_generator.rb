@@ -1,6 +1,7 @@
 class AlertImageGenerator
   PROMOTED_ALERTS_PATH = "app/assets/images/promoted_alerts"
-  LANDSCAPE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "landscape-template.png")
+  FACEBOOK_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "facebook-template.png")
+  TWITTER_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "twitter-template.png")
   LANDSCAPE_CAPTION = Rails.root.join(PROMOTED_ALERTS_PATH, "landscape-caption.png")
   SQUARE_TEMPLATE = Rails.root.join(PROMOTED_ALERTS_PATH, "square-template.png")
 
@@ -12,10 +13,19 @@ class AlertImageGenerator
     self.bike_image = bike_image
   end
 
-  def build_landscape
-    banner_width = 60
-    padding = 75
-    template_image = MiniMagick::Image.open(LANDSCAPE_TEMPLATE)
+  def build_landscape(variant = :facebook)
+    case variant
+    when :facebook
+      template_image = MiniMagick::Image.open(FACEBOOK_TEMPLATE)
+      banner_width = 60
+      padding = 75
+    when :twitter
+      template_image = MiniMagick::Image.open(TWITTER_TEMPLATE)
+      banner_width = 70
+      padding = 75
+    else
+      raise ArgumentError, "unrecognized landscape variant: '#{variant}'"
+    end
 
     # Resize bike image to fit within template dimensions
     bike_image = self.bike_image.tap do |bike|
