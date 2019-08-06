@@ -1,11 +1,17 @@
 module MoneyHelper
   include MoneyRails::ActionViewExtension
 
+  PERMITTED_CURRENCIES = %w[USD EUR CAD].freeze
+
   # TODO: Add a bank implementation that fetches conversion rate values
-  Money.default_bank.add_rate(:USD, :EUR, 0.88)
+  Money.default_bank.add_rate(:USD, :EUR, 0.89)
+  Money.default_bank.add_rate(:USD, :CAD, 1.32)
 
   def default_currency
-    t(I18n.locale, scope: [:money, :currencies])
+    currency = t(I18n.locale, scope: [:money, :currencies])
+    PERMITTED_CURRENCIES.include?(currency) ? currency : PERMITTED_CURRENCIES.first
+  rescue I18n::MissingTranslationData
+    return PERMITTED_CURRENCIES.first
   end
 
   def money_usd(dollars, exchange_to: default_currency)

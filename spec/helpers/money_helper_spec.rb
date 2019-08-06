@@ -20,7 +20,7 @@ RSpec.describe MoneyHelper, type: :helper do
     context "given the current locale is set to a locale with a fallback" do
       it "returns the alphabetic_code for the fallback locale's currency" do
         I18n.with_locale(:"en-GB") do
-          expect(default_currency).to eq("GBP")
+          expect(default_currency).to eq("USD")
         end
       end
     end
@@ -28,7 +28,7 @@ RSpec.describe MoneyHelper, type: :helper do
     context "given the current locale is set to an unavailable locale" do
       it "returns the alphabetic_code for the default locale's currency" do
         I18n.with_locale(:"unavailable") do
-          expect { default_currency }.to raise_error(I18n::MissingTranslationData)
+          expect(default_currency).to eq("USD")
         end
       end
     end
@@ -64,7 +64,13 @@ RSpec.describe MoneyHelper, type: :helper do
   describe "#as_currency" do
     context "given a valid target currency" do
       it "returns a Money object converting to the default currency" do
-        expect(as_currency(100, exchange_to: :EUR)).to eq("€88")
+        expect(as_currency(100, exchange_to: :EUR)).to eq("€89")
+      end
+    end
+
+    context "given a valid target currency" do
+      it "returns a Money object converting to the default currency" do
+        expect(as_currency(100, exchange_to: :CAD)).to eq("$132")
       end
     end
 
