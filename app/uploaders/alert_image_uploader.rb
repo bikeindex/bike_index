@@ -36,20 +36,16 @@ class AlertImageUploader < ApplicationUploader
   end
 
   def generate_landscape(variant)
-    Rails.logger.info "Processing #{variant} #{current_path}"
     manipulate! do |img|
       alert_image = AlertImageGenerator.new(stolen_record: stolen_record, bike_image: img)
       img = alert_image.build_landscape(variant)
     end
-    Rails.logger.info "Finished #{variant} #{current_path}"
   end
 
   def generate_square
-    Rails.logger.info "Processing square #{current_path}"
     manipulate! do |img|
       alert_image = AlertImageGenerator.new(stolen_record: stolen_record, bike_image: img)
       img = alert_image.build_square
     end
-    Rails.logger.info "Finished square #{current_path}"
   end
 end
