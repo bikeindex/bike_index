@@ -32,8 +32,6 @@
 //= require external_scripts/jquery.fileupload.js
 //= require dataTables/jquery.dataTables
 //= require dataTables/bootstrap/2/jquery.dataTables.bootstrap
-//= require underscore
-//= require backbone
 //= require moment
 //= require moment-timezone
 //= require bike_index
