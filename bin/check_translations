@@ -52,16 +52,28 @@ else
   git stash pop
   git add .
   git commit -m "Translation update [ci skip]"
-  git push -u origin ${BRANCH}
+  git fetch
   set +x
 
+  if git ls-remote --exit-code --heads origin "${BRANCH}" >/dev/null; then
+    output "${GREEN}" "Translation update PR already created."
+    exit 1
+  fi
+
   output "${YELLOW}" "Creating Update Pull Request"
+
+  if [[ "${TRANSLATION_BRANCH}" != "master" ]]; then
+    PR_URL="Related PR: ${CIRCLE_PULL_REQUEST}"
+  fi
+
+  git push -u origin "${BRANCH}"
+
   hub pull-request \
       -m "[i18n] Translation update
 
           Merge to unblock CI job ${CIRCLE_BUILD_NUM}: ${CIRCLE_BUILD_URL}
-          Related: PR ${CIRCLE_PULL_REQUEST}"
+          ${PR_URL}"
 
-  output "${GREEN}" "Translation update PR Created."
+  output "${GREEN}" "Translation update PR created."
   exit 1
 fi
