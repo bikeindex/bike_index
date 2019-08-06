@@ -7,9 +7,9 @@ required_plugins = %w(vagrant-vbguest)
 
 plugins_to_install = required_plugins.select { |plugin| not Vagrant.has_plugin? plugin }
 if not plugins_to_install.empty?
-  puts "Installing required plugins: #{plugins_to_install.join(' ')}"
-  if system "vagrant plugin install #{plugins_to_install.join(' ')}"
-    exec "vagrant #{ARGV.join(' ')}"
+  puts "Installing required plugins: #{plugins_to_install.join(" ")}"
+  if system "vagrant plugin install #{plugins_to_install.join(" ")}"
+    exec "vagrant #{ARGV.join(" ")}"
   else
     abort "Installation of one or more plugins has failed. Aborting. Please read the Bike Index README."
   end
@@ -21,7 +21,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Configurate the virtual machine to use 1.5GB of RAM
   config.vm.provider :virtualbox do |vb|
-	  vb.customize ["modifyvm", :id, "--memory", "1536"]
+    vb.customize ["modifyvm", :id, "--memory", "1536"]
   end
 
   # Forward the Rails server default port to the host
@@ -41,9 +41,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # This provisioner runs on every `vagrant provision`, `vagrant reload`, and the initial `vagrant up`.
   # Use echo to create a provisioning script, chmod +x it, and execute it.
-  config.vm.provision "recompose", type: "shell",
-	  run: "reload", privileged: false, inline: <<-SHELL
-  echo -e '#!/bin/bash -l\nsudo -u postgres -H bash << EOL\npsql -c "CREATE ROLE vagrant WITH PASSWORD '"'vagrant'"' SUPERUSER CREATEDB LOGIN;"\nEOL\ncreatedb vagrant\nnewgrp rvm\nrvm install 2.5.1\ngem update --system\ngem install bundler\ncd /vagrant\nbundle install\nrake db:setup\nrake seed_test_users_and_bikes' > ~/rubydevprovision.sh && chmod +x rubydevprovision.sh
+  config.vm.provision "recompose",
+                      type: "shell",
+                      run: "reload",
+                      privileged: false,
+                      inline: <<-SHELL
+  echo -e '#!/bin/bash -l\nsudo -u postgres -H bash << EOL\npsql -c "CREATE ROLE vagrant WITH PASSWORD '"'vagrant'"' SUPERUSER CREATEDB LOGIN;"\nEOL\ncreatedb vagrant\nnewgrp rvm\nrvm install 2.5.5\ngem update --system\ngem install bundler\ncd /vagrant\nbundle install\nrake db:setup\nrake seed_test_users_and_bikes' > ~/rubydevprovision.sh && chmod +x rubydevprovision.sh
   sg rvm -c './rubydevprovision.sh'
   echo -e 'Vagrant provisioning has completed. You can now "vagrant ssh" and start using it. If any\nerrors were thrown during provisioning, try running "./rubydevprovision.sh" inside the\nvagrant environment or run all of the provisioning scripts a second time\nwith "vagrant provision". You can find your local git repo in /vagrant.'
   SHELL
