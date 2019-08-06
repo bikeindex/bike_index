@@ -211,9 +211,6 @@ class BikesController < ApplicationController
     end
   end
 
-  def destroy
-  end
-
   def edit_templates
     return @edit_templates if defined?(@edit_templates)
     @theft_templates = @bike.stolen? ? theft_templates : {}

@@ -1543,17 +1543,6 @@ RSpec.describe BikesController, type: :controller do
     end
   end
 
-  describe "destroy" do
-    let(:user) { FactoryBot.create(:user_confirmed) }
-    let(:ownership) { FactoryBot.create(:ownership_organization_bike, owner_email: user.email) }
-    let(:bike) { ownership.bike }
-    it "hits route and changes scope of bike" do
-      delete :destroy, id: bike.id
-      expect(Feedback, :count).to change_by(1)
-      expect(bike.paranoia_destroyed).to_be true
-    end
-  end
-
   describe "show with recovery token present" do
     let(:bike) { FactoryBot.create(:stolen_bike) }
     let(:stolen_record) { bike.current_stolen_record }
