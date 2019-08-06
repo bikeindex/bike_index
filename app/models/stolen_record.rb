@@ -29,7 +29,7 @@ class StolenRecord < ActiveRecord::Base
   belongs_to :creation_organization, class_name: "Organization"
   belongs_to :recovering_user, class_name: "User"
   has_many :theft_alerts
-  has_many :alert_images
+  has_one :alert_image
 
   validates_presence_of :bike
   validates_presence_of :date_stolen
@@ -258,7 +258,7 @@ class StolenRecord < ActiveRecord::Base
   end
 
   def current_alert_image
-    alert_images.current.first || generate_alert_image
+    alert_image || generate_alert_image
   end
 
   # Generate the "promoted alert image"
@@ -268,12 +268,15 @@ class StolenRecord < ActiveRecord::Base
   # bike_image: [PublicImage]
   def generate_alert_image(bike_image: bike_main_image)
     return if bike_image&.image.blank?
-    alert_images.retire_all
-    alert_images.create(image: bike_image.image)
+    alert_image&.destroy
+    AlertImage.create(image: bike_image.image, stolen_record: self)
   end
 
   # If the bike has been recovered, remove the alert_image
   def remove_outdated_alert_images
-    alert_images.retire_all if bike.blank? || !bike.stolen?
+    if bike.blank? || !bike.stolen?
+      alert_image&.destroy
+      reload
+    end
   end
 end
