@@ -23,6 +23,7 @@ module HeaderTagHelper
   end
 
   attr_writer :page_image
+  attr_accessor :twitter_image, :facebook_image
 
   def page_image
     @page_image ||= DEFAULT_IMAGE
@@ -49,8 +50,8 @@ module HeaderTagHelper
       "og:title" => page_title,
       "twitter:title" => page_title,
       "og:url" => request.url.to_s,
-      "og:image" => page_image,
-      "twitter:image" => page_image,
+      "og:image" => facebook_image || page_image,
+      "twitter:image" => twitter_image || page_image,
       "og:site_name" => "Bike Index",
       "fb:app_id" => "223376277803071",
       "twitter:card" => (page_image == DEFAULT_IMAGE ? "summary" : "summary_large_image"),
@@ -102,7 +103,9 @@ module HeaderTagHelper
       self.page_title = "#{"Stolen " if @bike.stolen}#{@bike.title_string}"
       self.page_description = "#{@bike.frame_colors.to_sentence} #{@bike.title_string}, serial: #{@bike.serial_number}. #{@bike.stolen_string}#{@bike.description}"
       if @bike.current_stolen_record.present?
-        self.page_image = @bike.alert_image_url(:landscape)
+        self.page_image = @bike.alert_image_url(:square)
+        self.twitter_image = @bike.alert_image_url(:twitter)
+        self.facebook_image = @bike.alert_image_url(:facebook)
       elsif @bike.thumb_path.present? && @bike.public_images.present?
         self.page_image = @bike.public_images.first.image_url
       elsif @bike.stock_photo_url.present?
