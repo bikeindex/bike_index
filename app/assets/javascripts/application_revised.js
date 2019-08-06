@@ -37,6 +37,3 @@
 // Our actual scripts:
 //= require init.coffee
 //= require_tree ./revised
-
-
-//= require external_scripts/selectize.js
