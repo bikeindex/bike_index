@@ -1,5 +1,5 @@
 class Bike < ActiveRecord::Base
-  acts_as_paranoid
+  acts_as_paranoid without default scope: true
   include Phonifyerable
   include ActiveModel::Dirty
   include BikeSearchable
