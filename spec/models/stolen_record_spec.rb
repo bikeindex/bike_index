@@ -1,16 +1,15 @@
 require "rails_helper"
 
 RSpec.describe StolenRecord, type: :model do
-  describe "after_commit hooks" do
+  describe "after_save hooks" do
     context "if bike no longer exists" do
       it "removes alert_image" do
         stolen_record = FactoryBot.create(:stolen_record, :with_alert_image)
-        stolen_record.update_attribute(:bike, nil)
-        expect(stolen_record.bike).to be_blank
         expect(stolen_record.current_alert_image).to be_present
 
-        stolen_record.run_callbacks(:commit)
+        stolen_record.update_attribute(:bike, nil)
 
+        expect(stolen_record.bike).to be_blank
         expect(stolen_record.current_alert_image).to be_blank
       end
     end

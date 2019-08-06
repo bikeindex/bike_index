@@ -6,6 +6,7 @@ class AlertImage < ActiveRecord::Base
   process_in_background :image
 
   scope :current, -> { where(current: true) }
+
   after_save :remove_image_if_retired
 
   def self.retire_all

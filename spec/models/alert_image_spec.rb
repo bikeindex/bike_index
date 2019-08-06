@@ -1,6 +1,26 @@
 require "rails_helper"
 
 RSpec.describe AlertImage, type: :model do
+  describe "after_save commit hooks" do
+    it "removes alert_image if no longer current" do
+      alert_image = FactoryBot.create(:alert_image, :with_image, current: true)
+      expect(alert_image.image).to be_present
+
+      alert_image.update(current: false)
+
+      expect(alert_image.image).to be_blank
+    end
+
+    it "does not remove alert_image if still current" do
+      alert_image = FactoryBot.create(:alert_image, :with_image, current: true)
+      expect(alert_image.image).to be_present
+
+      alert_image.update(updated_at: Time.current)
+
+      expect(alert_image.image).to be_present
+    end
+  end
+
   describe ".retire_all" do
     it "toggles current status and removes images" do
       image1 = FactoryBot.create(:alert_image, :with_image)
@@ -62,8 +82,5 @@ RSpec.describe AlertImage, type: :model do
       curr_image = FactoryBot.build_stubbed(:alert_image)
       expect(curr_image).to_not be_retired
     end
-  end
-
-  describe "after_save commit hooks" do
   end
 end
