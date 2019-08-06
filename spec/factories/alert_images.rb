@@ -3,10 +3,6 @@ FactoryBot.define do
     stolen_record { FactoryBot.create(:stolen_record) }
     image { nil }
 
-    trait :retired do
-      retired_at { Time.current }
-    end
-
     trait :with_image do
       transient do
         filename { nil }
