@@ -88,8 +88,6 @@ class Bike < ActiveRecord::Base
   scope :no_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 0 }) }
   scope :example, -> { where(example: true) }
   scope :non_example, -> { where(example: false) }
-  scope :not_deleted, -> { where(deleted_at: nil) }
-  scope :deleted, -> { where.not(deleted_at: nil) }
 
   before_save :set_calculated_attributes
 
