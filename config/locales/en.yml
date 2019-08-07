@@ -1830,6 +1830,11 @@ en:
       about_bike_index: About Bike Index
       alumni: Alumni
       bike_registration_that_works: Bike registration that works.
+      bobby_gervais_bio_html: |
+        <strong>Bobby Gervais</strong> has had a long history of delivering and
+        carrying stuff on his bike for work and now he's making a living out of helping
+        people recover their bikes. Bobby helps to maintain the Bike Index, and work
+        on new features.
       bryan_hance_bio_html: |
         <strong>Bryan Hance</strong> created StolenBicycleRegistry.com in 2004
         because 5 of his bikes were stolen in 9 years&mdash;and realized
@@ -1869,11 +1874,6 @@ en:
         <strong>Seth Herr</strong> learned to program so that he could build
         Bike Index, because he was a bike mechanic and was frustrated that
         something like it didn't exist.
-      bobby_gervais_bio_html: |
-        <strong>Bobby Gervais</strong> has had a long history of delivering and
-        carrying stuff on his bike for work and now he's making a living out of helping
-        people recover their bikes. Bobby helps to maintain the Bike Index, and work
-        on new features.
       seth_herr_image_title: >-
         Those are not official Bike Index arm warmers, we don't have Bike Index arm
         warmers
