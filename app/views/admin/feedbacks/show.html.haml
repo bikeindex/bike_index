@@ -36,20 +36,20 @@
                 user present
               - else
                 = link_to @feedback.email, admin_users_path(user_query: @feedback.email)
-        - if feedback_hash.present?
+        - if f@feedback.feedback_hash.present?
           %tr
             %td
               data
             %td
               %pre
                 %code
-                  = feedback_hash.to_yaml.gsub("---\n", "")
+                  = @feedback.feedback_hash.to_yaml.gsub("---\n", "")
         - if @feedback.feedback_type == "bike_delete_request"
           %tr
             %td
               View Bike
             %td
-              = link_to "Deleted Bike", edit_admin_bike_path(id: feedback_hash["bike_id"])
+              = link_to "Deleted Bike", edit_admin_bike_path(id: @feedback.feedback_hash["bike_id"])
   .col-sm-6
     .card
       .card-body
