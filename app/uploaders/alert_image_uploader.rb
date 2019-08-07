@@ -2,14 +2,14 @@ class AlertImageUploader < ApplicationUploader
   include CarrierWave::MiniMagick
   include ::CarrierWave::Backgrounder::Delay
 
-  alias stolen_record model
+  delegate :stolen_record, to: :model
 
   def store_dir
-    "#{base_store_dir}/#{stolen_record.id}"
+    "#{base_store_dir}/#{model.id}"
   end
 
   def base_store_dir
-    "uploads/#{stolen_record.class.to_s[0, 2]}"
+    "uploads/#{model.class.to_s[0, 2]}"
   end
 
   def extension_white_list
@@ -37,15 +37,19 @@ class AlertImageUploader < ApplicationUploader
 
   def generate_landscape(variant)
     manipulate! do |img|
-      alert_image = AlertImageGenerator.new(stolen_record: stolen_record, bike_image: img)
-      img = alert_image.build_landscape(variant)
+      img =
+        AlertImageGenerator
+          .new(stolen_record: stolen_record, bike_image: img)
+          .build_landscape(variant)
     end
   end
 
   def generate_square
     manipulate! do |img|
-      alert_image = AlertImageGenerator.new(stolen_record: stolen_record, bike_image: img)
-      img = alert_image.build_square
+      img =
+        AlertImageGenerator
+          .new(stolen_record: stolen_record, bike_image: img)
+          .build_square
     end
   end
 end
