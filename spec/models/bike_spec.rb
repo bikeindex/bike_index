@@ -4,7 +4,7 @@ RSpec.describe Bike, type: :model do
   it_behaves_like "bike_searchable"
   describe "scopes" do
     it "default scopes to created_at desc" do
-      expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false).order("listing_order desc").to_sql)
+      expect(Bike.all.to_sql).to eq(Bike.unscoped.without_deleted.where(example: false, hidden: false).order("listing_order desc").to_sql)
     end
     it "scopes to only stolen bikes" do
       expect(Bike.stolen.to_sql).to eq(Bike.where(stolen: true).to_sql)
