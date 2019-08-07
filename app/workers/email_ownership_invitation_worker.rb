@@ -7,6 +7,7 @@ class EmailOwnershipInvitationWorker < ApplicationWorker
     return true unless ownership.present?
     ownership.bike.save
     ownership.reload
+    return true unless ownership.calculated_send_email
     OrganizedMailer.finished_registration(ownership).deliver_now
   end
 end

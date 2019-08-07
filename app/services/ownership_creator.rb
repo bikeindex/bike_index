@@ -21,8 +21,6 @@ class OwnershipCreator
   end
 
   def send_notification_email(ownership)
-    return true if ownership.example
-    return true unless ownership.send_email
     EmailOwnershipInvitationWorker.perform_in(5.seconds, ownership.id)
   end
 
