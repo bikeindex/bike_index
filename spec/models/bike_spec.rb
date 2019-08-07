@@ -1324,7 +1324,7 @@ RSpec.describe Bike, type: :model do
       end
     end
 
-    context "given a current_stolen_record and public images" do
+    context "given a current_stolen_record and public bike images" do
       it "returns the alert_image url" do
         bike = FactoryBot.create(:stolen_bike, :with_image)
         expect(bike.alert_image_url).to match(%r{https?://.+/bike-#{bike.id}.jpg})
