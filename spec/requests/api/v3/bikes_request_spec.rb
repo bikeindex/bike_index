@@ -408,6 +408,7 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "doesn't send an email" do
+      ActionMailer::Base.deliveries = []
       post "/api/v3/bikes?access_token=#{token.token}",
            bike_attrs.merge(no_notify: true).to_json,
            json_headers
@@ -418,6 +419,7 @@ RSpec.describe "Bikes API V3", type: :request do
 
     it "creates an example bike" do
       FactoryBot.create(:organization, name: "Example organization")
+      ActionMailer::Base.deliveries = []
       post "/api/v3/bikes?access_token=#{token.token}",
            bike_attrs.merge(test: true).to_json,
            json_headers
