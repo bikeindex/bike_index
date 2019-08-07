@@ -60,11 +60,6 @@ GEM
       mimemagic (~> 0.3)
       nokogiri (~> 1.8, >= 1.8.2)
       rubyzip (~> 1.2, >= 1.2.1)
-    backbone-on-rails (0.9.10.0)
-      eco
-      ejs
-      jquery-rails
-      rails (>= 3.1)
     bcrypt (3.1.11)
     bootstrap (4.0.0.alpha4)
       autoprefixer-rails (>= 6.0.3)
@@ -123,12 +118,6 @@ GEM
       activemodel (>= 3.0)
       activesupport (>= 3.0)
       request_store (~> 1.0)
-    eco (1.0.0)
-      coffee-script
-      eco-source
-      execjs
-    eco-source (1.1.0.rc.1)
-    ejs (1.1.1)
     equalizer (0.0.11)
     erubi (1.8.0)
     erubis (2.7.0)
@@ -658,7 +647,6 @@ DEPENDENCIES
   airborne
   api-pagination
   axlsx (~> 3.0.0.pre)
-  backbone-on-rails (~> 0.9.10.0)
   bcrypt (~> 3.1.7)
   bootstrap (~> 4.0.0.alpha3)
   bullet
