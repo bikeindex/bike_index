@@ -169,7 +169,7 @@
           %td
             More to come soon
 .row.mt-4
-  .col-6
+  .col-md-6
     %p
       %strong
         = link_to "Edit/Create Invoices", admin_organization_invoices_path(organization_id: @organization.to_param)
@@ -182,7 +182,6 @@
     = render partial: "/admin/organizations/invoices/table", locals: { invoices: @organization.invoices.order(id: :desc).limit(3) }
 
   .col-md-6
-
     - if @organization.is_paid
       %table.table-list
         %tbody
@@ -255,21 +254,18 @@
           %tr
             %td
               Features
-            %td
+            %td{ style: "font-size: 80%" }
               - @organization.paid_feature_slugs.each do |slug|
                 %code
                   = slug
-- if @bikes.present?
-  %h2.mt-4
-    = number_with_delimiter(@bikes.total_count)
-    = "Bike".pluralize(@bikes.total_count)
-    %em.small
-      view #{link_to "org bikes view", organization_bikes_path(organization_id: @organization.to_param)}
-  = paginate @bikes, views_prefix: "admin"
-  = render partial: "/admin/bikes/table", locals: { bikes: @bikes }
-- else
-  %h2.mt-4
-    No bikes
+
+%h2.mt-4
+  = number_with_delimiter(@bikes.total_count)
+  = "Bike".pluralize(@bikes.total_count)
+  %em.small
+    view #{link_to "org bikes view", organization_bikes_path(organization_id: @organization.to_param)}
+= paginate @bikes, views_prefix: "admin"
+= render partial: "/admin/bikes/table", locals: { bikes: @bikes }
 
 .row.mt-4
   .col-6
@@ -283,7 +279,6 @@
     = link_to "View all memberships", admin_memberships_path(organization_id: @organization.to_param)
 - if @organization.memberships.count > 0
   = render partial: "/admin/memberships/table", locals: { memberships: @organization.memberships.reorder(created_at: :asc).limit(25), skip_organization: true }
-
 
 %hr.mt-4
 %h4

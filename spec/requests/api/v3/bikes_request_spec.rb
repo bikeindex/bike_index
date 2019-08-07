@@ -794,7 +794,7 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike.public_images.count).to eq 0
         expect(bike.owner).to_not eq(user)
         expect(bike.authorized_by_organization?(u: user)).to be_truthy
-        expect(bike.authorized_for_user?(user)).to be_truthy
+        expect(bike.authorized?(user)).to be_truthy
         expect(bike.claimed?).to be_falsey
         expect(bike.current_ownership.claimed?).to be_falsey
         put url, params.to_json, json_headers
@@ -824,7 +824,7 @@ RSpec.describe "Bikes API V3", type: :request do
         expect(bike.owner_email).to eq user.email
         expect(bike.claimed?).to be_falsey
         expect(bike.user).to eq user
-        expect(bike.authorized_for_user?(user)).to be_truthy
+        expect(bike.authorized?(user)).to be_truthy
         expect(bike.owner).not_to eq user
         expect do
           put url, { owner_email: "newuser@EXAMPLE.com " }.to_json, json_headers

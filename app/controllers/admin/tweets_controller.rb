@@ -1,6 +1,5 @@
 class Admin::TweetsController < Admin::BaseController
   before_filter :find_tweet, except: [:new, :create, :index]
-  layout "new_admin"
 
   def index
     @tweets = Tweet.order(created_at: :desc)

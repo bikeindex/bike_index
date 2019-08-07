@@ -185,6 +185,7 @@ Bikeindex::Application.routes.draw do
 
     resources :stolen_bikes do
       member { post :approve }
+      member { patch :regenerate_alert_image }
     end
     resources :customer_contacts, only: [:create]
     resources :recoveries do
@@ -293,9 +294,10 @@ Bikeindex::Application.routes.draw do
   # prepends a :organization_id/ to every nested URL.
   # Down here so that it doesn't override any other routes
   resources :organizations, only: [], path: "o", module: "organized" do
-    get "/", to: "base#root", as: :root
+    get "/", to: "dashboard#root", as: :root
+    resources :dashboard, only: [:index]
     get "landing", to: "manage#landing", as: :landing
-    resources :bikes, only: %i[index new show] do
+    resources :bikes, only: %i[index new show update] do
       collection do
         get :recoveries
         get :incompletes

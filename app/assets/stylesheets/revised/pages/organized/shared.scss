@@ -20,7 +20,6 @@ hr.delete-organization-section {
 }
 
 .organization-wide-alert {
-  @extend .alert;
   @extend .alert-info;
   margin: 0 auto 40px;
   p,

@@ -15,8 +15,17 @@ RSpec.describe "organizations routing", type: :routing do
     describe "root" do
       it "routes to base index action" do
         expect(get: "/o/university").to route_to(
-          controller: "organized/base",
+          controller: "organized/dashboard",
           action: "root",
+          organization_id: "university",
+        )
+      end
+    end
+    describe "dashboard" do
+      it "routes to base index action" do
+        expect(get: "/o/university/dashboard").to route_to(
+          controller: "organized/dashboard",
+          action: "index",
           organization_id: "university",
         )
       end

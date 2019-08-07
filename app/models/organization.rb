@@ -60,9 +60,10 @@ class Organization < ActiveRecord::Base
   scope :unpaid, -> { where(is_paid: true) }
   scope :approved, -> { where(is_suspended: false, approved: true) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
-  scope :bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications]) }
+  scope :bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications impound_bikes]) }
 
   before_validation :set_calculated_attributes
+  after_commit :update_associations
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
 
@@ -104,6 +105,12 @@ class Organization < ActiveRecord::Base
     where("paid_feature_slugs ?& array[:keys]", keys: matching_slugs)
   end
 
+  def impounded_bikes
+    Bike.includes(:impound_records)
+        .where(impound_records: { retrieved_at: nil, organization_id: id })
+        .where.not(impound_records: { id: nil })
+  end
+
   def to_param; slug end
 
   def sent_invitation_count; memberships.count end
@@ -111,6 +118,8 @@ class Organization < ActiveRecord::Base
   def remaining_invitation_count; available_invitation_count - sent_invitation_count end
 
   def ascend_imports?; ascend_name.present? end
+
+  def parent?; paid_for?("child_organizations") end
 
   def mail_snippet_body(type)
     return nil unless MailSnippet.organization_snippet_types.include?(type)
@@ -152,8 +161,8 @@ class Organization < ActiveRecord::Base
     registration_field_labels && registration_field_labels[field_slug.to_s]
   end
 
-  def bike_actions? # Eventually there will be other actions beside organization_messages, so use this as general reference
-    message_kinds.any? || paid_for?("unstolen_notifications")
+  def bike_actions?
+    message_kinds.any? || paid_for?("unstolen_notifications") || paid_for?("impound_bikes")
   end
 
   def law_enforcement_missing_verified_features?
@@ -186,7 +195,7 @@ class Organization < ActiveRecord::Base
     self.is_paid = current_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
-    self.paid_feature_slugs = current_invoices.feature_slugs
+    self.paid_feature_slugs = calculated_paid_feature_slugs
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, "")
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
@@ -197,7 +206,7 @@ class Organization < ActiveRecord::Base
       end
       self.slug = new_slug
     end
-    generate_access_token unless self.access_token.present?
+    self.access_token ||= SecurityTokenizer.new_token
     set_auto_user
     set_ambassador_organization_defaults if ambassador?
     locations.each { |l| l.save unless l.shown == allowed_show }
@@ -212,8 +221,8 @@ class Organization < ActiveRecord::Base
 
   def child_ids; child_organizations.pluck(:id) end
 
-  # Parent invoice serves as invoice
-  def current_invoices; parent_organization.present? ? parent_organization.current_invoices : invoices.active end
+  # Include parent invoice features serves as invoice
+  def current_invoices; Invoice.where(organization_id: [id, parent_organization_id].compact).active end
 
   def incomplete_b_params
     BParam.where(organization_id: child_ids + [id]).partial_registrations.without_bike
@@ -270,13 +279,16 @@ class Organization < ActiveRecord::Base
     is_suspended?
   end
 
-  def generate_access_token
-    begin
-      self.access_token = SecureRandom.hex
-    end while self.class.exists?(access_token: access_token)
+  def update_associations
+    parent_organization&.update_attributes(updated_at: Time.now)
   end
 
   private
+
+  def calculated_paid_feature_slugs
+    slugs = current_invoices.feature_slugs
+    child_ids.any? ? slugs + ["child_organizations"] : slugs
+  end
 
   def set_ambassador_organization_defaults
     self.show_on_map = false

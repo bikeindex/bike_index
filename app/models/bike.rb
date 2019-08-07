@@ -39,6 +39,7 @@ class Bike < ActiveRecord::Base
   has_many :b_params, foreign_key: :created_bike_id, dependent: :destroy
   has_many :duplicate_bike_groups, through: :normalized_serial_segments
   has_many :recovered_records, -> { recovered }, class_name: "StolenRecord"
+  has_many :impound_records
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true
@@ -75,6 +76,7 @@ class Bike < ActiveRecord::Base
   scope :non_stolen, -> { where(stolen: false) }
   scope :organized, -> { where.not(creation_organization_id: nil) }
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
+  scope :impounded, -> { includes(:impound_records).where(impound_records: { retrieved_at: nil }).where.not(impound_records: { id: nil }) }
   # "Recovered" bikes are bikes that were found and are waiting to be claimed. This is confusing and should be fixed
   # so that it no longer is the same word as stolen recoveries
   scope :non_recovered, -> { where(recovered: false) }
@@ -194,12 +196,20 @@ class Bike < ActiveRecord::Base
 
   def stolen_recovery?; recovered_records.any? end
 
+  def current_impound_record; impound_records.current.last end
+
+  def impounded?; current_impound_record.present? end
+
   # Small helper because we call this a lot
   def type; cycle_type && cycle_type_name.downcase end
 
   def user_hidden; hidden && current_ownership&.user_hidden end
 
   def fake_deleted; hidden && !user_hidden end
+
+  def email_visible_for?(org)
+    organizations.include?(org)
+  end
 
   def serial_display
     return "Hidden" if recovered
@@ -266,16 +276,22 @@ class Bike < ActiveRecord::Base
     user == u || current_ownership.claimable_by?(u)
   end
 
-  def authorized_for_user?(u)
+  def authorized?(u)
     return true if u == owner || claimable_by?(u)
     return false if u.blank?
     authorized_by_organization?(u: u)
   end
 
   def authorize_and_claim_for_user(u)
-    return authorized_for_user?(u) unless claimable_by?(u)
+    return authorized?(u) unless claimable_by?(u)
     current_ownership.mark_claimed
     true
+  end
+
+  def impound(passed_user, organization: nil)
+    organization ||= passed_user.organizations.detect { |o| o.paid_for?("impound_bikes") }
+    impound_record = impound_records.where(organization_id: organization&.id).first
+    impound_record ||= impound_records.create(user: passed_user, organization: organization)
   end
 
   def bike_code?(organization_id = nil) # This method only accepts numerical org ids
@@ -489,12 +505,25 @@ class Bike < ActiveRecord::Base
     end
   end
 
+  def registration_location
+    address = registration_address.with_indifferent_access
+    city = address[:city]&.titleize
+    state = address[:state]&.upcase
+    return "" if state.blank?
+
+    [city, state].reject(&:blank?).join(", ")
+  end
+
   def organization_affiliation
     b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
   end
 
   def external_image_urls
     b_params.map { |bp| bp.external_image_urls }.flatten.reject(&:blank?).uniq
+  end
+
+  def alert_image_url(version = nil)
+    current_stolen_record&.current_alert_image&.image_url(version)
   end
 
   def load_external_images(urls = nil)

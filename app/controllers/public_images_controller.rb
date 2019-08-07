@@ -25,7 +25,7 @@ class PublicImagesController < ApplicationController
         @public_image.imageable = current_organization
       end
       @public_image.save
-      render "create" and return
+      render json: { public_image: @public_image } and return
     end
     flash[:error] = "Whoops! We can't let you create that image."
     redirect_to @public_image.present? ? @public_image.imageable : user_root_url
@@ -51,12 +51,16 @@ class PublicImagesController < ApplicationController
     @imageable = @public_image.imageable
     imageable_id = @public_image.imageable_id
     imageable_type = @public_image.imageable_type
+    if imageable_type == "MailSnippet"
+      flash[:error] = "Whoops! How'd you do that? Can't delete mail snippet images."
+      redirect_to admin_organization_custom_layouts_path(imageable_id) and return
+    end
     @public_image.destroy
     flash[:success] = "Image was successfully deleted"
     if params[:page].present?
       redirect_to edit_bike_url(imageable_id, page: params[:page]) and return
     elsif imageable_type == "Blog"
-      redirect_to edit_admin_news_url(@imageable.title_slug) and return
+      redirect_to edit_admin_news_url(@imageable.title_slug), status: 303 and return
     else
       redirect_to edit_bike_url(imageable_id)
     end
@@ -88,13 +92,17 @@ class PublicImagesController < ApplicationController
   def current_user_image_owner(public_image)
     if public_image.imageable_type == "Bike"
       Bike.unscoped.find(public_image.imageable_id).owner == current_user
-    elsif public_image.imageable_type == "Blog"
+    elsif public_image.imageable_type == "Blog" || public_image.imageable_type == "MailSnippet"
       current_user && current_user.superuser?
     end
   end
 
   def permitted_parameters
-    params.require(:public_image).permit(:image, :name, :imageable, :listing_order, :remote_image_url, :is_private)
+    if params[:upload_plugin] == "uppy"
+      { image: params[:file], name: params[:name] }
+    else
+      params.require(:public_image).permit(:image, :name, :imageable, :listing_order, :remote_image_url, :is_private)
+    end
   end
 
   def find_image_if_owned

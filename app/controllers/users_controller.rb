@@ -14,6 +14,10 @@ class UsersController < ApplicationController
 
   def create
     @user = User.new(permitted_parameters)
+    # Set the user's preferred locale if they have a locale we recognize
+    if requested_locale != I18n.default_locale
+      @user.preferred_language = requested_locale
+    end
     if @user.save
       sign_in_and_redirect(@user)
     else
@@ -187,7 +191,6 @@ class UsersController < ApplicationController
                   :show_bikes, :show_phone, :my_bikes_link_target, :my_bikes_link_title, :password,
                   :password_confirmation, :preferred_language)
           .merge(sign_in_partner.present? ? { partner_data: { sign_up: sign_in_partner } } : {})
-          .merge({ preferred_language: params.dig(:user, :preferred_language) || I18n.locale })
   end
 
   def permitted_update_parameters

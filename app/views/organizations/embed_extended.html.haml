@@ -118,6 +118,12 @@
         = f.label :bike_code, "Sticker id", class: "control-label"
         .controls
           = f.text_field :bike_code, value: @b_param.bike_code
+  / if the organization doesn't require a phone, show the phone as optional
+  - if !@organization&.include_field_reg_phone?
+    .input-group
+      = f.label :phone, "Owner's phone"
+      .controls
+        = f.text_field :phone
   .input-group
     .control-group.special-select-single
       = f.label :frame_material, "Primary frame material", class: "control-label"

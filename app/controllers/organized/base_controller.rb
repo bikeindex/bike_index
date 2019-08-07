@@ -6,14 +6,6 @@ module Organized
 
     layout "application_revised"
 
-    def root
-      if current_organization.ambassador?
-        redirect_to organization_ambassador_dashboard_path
-      else
-        redirect_to organization_bikes_path
-      end
-    end
-
     def ensure_member!
       if current_user && current_user.member_of?(current_organization)
         return true if current_user.accepted_vendor_terms_of_service?

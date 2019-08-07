@@ -30,6 +30,7 @@
     &:first-child.full-width-data {
       font-size: 100%;
       font-style: normal;
+      text-align: left;
     }
     // use last, rather than first, to enable full width single rows
     &:last-child {

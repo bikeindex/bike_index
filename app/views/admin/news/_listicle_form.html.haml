@@ -1,4 +1,4 @@
-= f.submit 'Save', class: 'button-green save-listicles'
+= f.submit 'Save', class: 'btn btn-success'
 #listicle_image
   - @blog.listicles.each do |l|
     - if l.image.present?
@@ -14,5 +14,6 @@
         /   Crop image
 = f.fields_for :listicles do |builder|
   = render 'listicle_fields', f: builder
-.padded.clearfix.listicle-block
-  = link_to_add_fields "Add a vignette", f, :listicles
+.row.mt-4.justify-content-center
+  .col.auto
+    = link_to_add_fields "Add a Vignette", f, :listicles

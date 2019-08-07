@@ -37,6 +37,7 @@ gem "fog-aws"
 gem "geocoder"
 gem "hamlit"
 gem "high_voltage"
+gem "honeybadger"
 gem "httparty"
 gem "journey", "~> 1.0.3"
 gem "kaminari" # pagination
@@ -86,7 +87,6 @@ gem "rack-throttle"
 gem "secure_headers", "~> 2.5.0"
 
 # Frontend
-gem "backbone-on-rails", "~>0.9.10.0" # Legacy js
 gem "bootstrap", "~> 4.0.0.alpha3" # Bootstrap 4 - used for revised stylesheets
 gem "chartkick" # Display charts
 gem "coffee-rails"
@@ -97,6 +97,7 @@ gem "sprockets-rails", "~> 3.0.4"
 gem "therubyracer"
 gem "uglifier"
 gem "webpacker", "~> 4.x"
+gem "coderay" # Pretty print code
 
 # Show performance metrics
 gem "flamegraph", require: false
@@ -130,7 +131,6 @@ gem "logstash-event" # Use logstash format for logging data
 
 group :production do
   gem "skylight" # Performance monitoring
-  gem "honeybadger"
 end
 
 group :development do

@@ -9,6 +9,7 @@ class IntegrationsController < ApplicationController
     @integration.save
     if @integration.valid? && @integration.user.present?
       @user = @integration.user
+      @user.reload
       sign_in_and_redirect(@user)
     else
       integrations_controller_creation_error

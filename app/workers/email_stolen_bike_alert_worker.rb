@@ -1,5 +1,4 @@
 class EmailStolenBikeAlertWorker < ApplicationWorker
-
   sidekiq_options queue: "notify"
 
   def perform(customer_contact_id)

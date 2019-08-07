@@ -52,7 +52,7 @@
           .col-xs-6.col-xs-push-3
             = link_to t(".claim_bike_type", bike_type: @bike.type), ownership_path(@bike.current_ownership), class: "btn btn-success"
 
-  - elsif @bike.authorized_for_user?(current_user) && !@bike.authorized_by_organization?(u: current_user)
+  - elsif @bike.authorized?(current_user) && !@bike.authorized_by_organization?(u: current_user)
     .bike-overlay-wrapper
       .bike-edit-overlay
         %p
