@@ -1,7 +1,7 @@
 = form_for [:admin, @membership] do |f|
   - if @membership.errors.any?
     = render partial: "/shared/errors", locals: { name: "Membership", obj: @membership }
-  .form-group
+  .form-group.fancy-select.unfancy
     = f.label :organization
     = collection_select :membership, :organization_id, @organizations, :id, :name, { include_blank: "Please select an organization" }, required: true,  class: "form-control w-25"
 
