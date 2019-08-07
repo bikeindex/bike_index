@@ -3145,11 +3145,14 @@ nl:
         en vertegenwoordigers. Het is makkelijk. We zijn een groeiende non-profit
         organisatie met de missie om fietsen te registreren en terug te krijgen wanneer
         ze gestolen zijn. Sluit je vandaag nog bij ons aan.
-      monitoring_online_sales_platforms_like_cr: 
-      pos_integrations: 
-      relevant_articles: 
-      share_bike_index_on_social_channels_inclu: 
-      start_here: 
+      monitoring_online_sales_platforms_like_cr: Online verkoopplatforms zoals Craigslist
+        en Offerup controleren op verdachte fietsen en controleren of die fietsen
+        als gestolen worden vermeld op Bike Index.
+      pos_integrations: POS-intergratie
+      relevant_articles: 'Relevante artikelen:'
+      share_bike_index_on_social_channels_inclu: Deel Bike Index op social media kanalen
+        - inclusief Facebook fietsgroepen in jouw regio.
+      start_here: Begin hier!
       to_become_a_bike_index_ambassador_fill_ou: 
       typical_ambassador_activities: 
       typical_ambassador_activities_include: 
