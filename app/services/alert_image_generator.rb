@@ -139,6 +139,8 @@ class AlertImageGenerator
       "Helvetica-Oblique"
     elsif system("mogrify -list font | grep --silent 'Font: ArialI$'")
       "ArialI"
+    elsif system("mogrify -list font | grep --silent 'Font: Lato-Italic$'")
+      "Lato-Italic"
     elsif system("mogrify -list font | grep --silent 'Font: DejaVu-Sans$'")
       "DejaVu-Sans"
     end
