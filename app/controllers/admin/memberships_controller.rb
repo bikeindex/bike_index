@@ -18,7 +18,7 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def new
-    @membership = Membership.new
+    @membership = Membership.new(organization_id: current_organization&.id)
   end
 
   def edit
