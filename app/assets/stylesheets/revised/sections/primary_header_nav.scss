@@ -141,7 +141,7 @@ $mainmenu-open-zindex: 10;
 
   .open > .current-organization-submenu {
     display: block;
-    z-index: 10000; // Override to fix issues with safari opening
+    z-index: 10000; // Override to fix issues with safari not opening links
   }
 
   .current-organization-submenu {
@@ -437,7 +437,7 @@ $mainmenu-open-zindex: 10;
 
   .open > .primary-submenu {
     display: block;
-    z-index: 10000; // Override to fix issues with safari opening
+    z-index: 10000; // Override to fix issues with safari not opening links
   }
 
   .primary-submenu {

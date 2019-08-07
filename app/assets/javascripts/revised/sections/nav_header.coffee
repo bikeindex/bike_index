@@ -11,7 +11,7 @@ class BikeIndex.NavHeader extends BikeIndex
     if $(window).width() < 768
       # TODO: fix when new bootstrap applied - right now, on iphone, clicking doesn't always work,
       # we're trying to catch it here
-      $(".current-organization-submenu, .current-organization-submenu a").click (e) =>
+      $(".current-organization-submenu").click (e) =>
         $target = $(event.target)
         if $target.attr("href")
           window.location = $target.attr("href")
