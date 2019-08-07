@@ -62,7 +62,7 @@ class AlertImageGenerator
       alert_image = alert_image.composite(caption_image) do |alert|
         alert.gravity "Southeast"
         alert.compose "Over"
-        alert.size "x#{100}"
+        alert.size "x100"
         alert.geometry "+0+5"
       end
     end
