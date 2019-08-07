@@ -311,11 +311,12 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           description: "something else",
           owner_email: "fun_times@examples.com",
         }
+        ActionMailer::Base.deliveries = []
         expect do
-          expect do
-            post :create, bike: bike_attrs, organization_slug: org.slug, access_token: org.access_token
-          end.to change(Ownership, :count).by(1)
-        end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
+          post :create, bike: bike_attrs, organization_slug: org.slug, access_token: org.access_token
+        end.to change(Ownership, :count).by(1)
+        EmailOwnershipInvitationWorker.drain
+        expect(ActionMailer::Base.deliveries).to eq([])
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 example bikez").first
         expect(bike.creation_state.origin).to eq "api_v1"
@@ -344,9 +345,12 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           cycle_type: "tandem",
         }
         options = { bike: bike_attrs.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
+        ActionMailer::Base.deliveries = []
         expect do
           post :create, options
         end.to change(Ownership, :count).by(1)
+        EmailOwnershipInvitationWorker.drain
+        expect(ActionMailer::Base.deliveries.count).to eq 1
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 string").first
         expect(bike.creation_state.origin).to eq "api_v1"
@@ -367,11 +371,12 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           cycle_type_name: " trailer ",
         }
         options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
+        ActionMailer::Base.deliveries = []
         expect do
-          expect do
-            post :create, options
-          end.to change(Ownership, :count).by(1)
-        end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
+          post :create, options
+        end.to change(Ownership, :count).by(1)
+        EmailOwnershipInvitationWorker.drain
+        expect(ActionMailer::Base.deliveries.count).to eq(0)
         expect(response.code).to eq("200")
         bike = Bike.unscoped.where(serial_number: "69 string").first
         expect(bike.creation_state.origin).to eq "api_v1"

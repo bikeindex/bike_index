@@ -48,7 +48,8 @@ class Ownership < ActiveRecord::Base
 
   def calculated_send_email
     return false if !send_email || bike.blank? || bike.example?
-    return true unless bike.creation_organization.present?
+    # Unless this is the first ownership for a bike with a creation organization, it's good to send!
+    return true unless bike.creation_organization.present? && first?
     !bike.creation_organization.paid_for?("skip_ownership_email")
   end
 end

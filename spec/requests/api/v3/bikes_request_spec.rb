@@ -408,21 +408,21 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "doesn't send an email" do
-      expect do
-        post "/api/v3/bikes?access_token=#{token.token}",
-             bike_attrs.merge(no_notify: true).to_json,
-             json_headers
-      end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
+      post "/api/v3/bikes?access_token=#{token.token}",
+           bike_attrs.merge(no_notify: true).to_json,
+           json_headers
+      EmailOwnershipInvitationWorker.drain
+      expect(ActionMailer::Base.deliveries).to be_empty
       expect(response.code).to eq("201")
     end
 
     it "creates an example bike" do
       FactoryBot.create(:organization, name: "Example organization")
-      expect do
-        post "/api/v3/bikes?access_token=#{token.token}",
-             bike_attrs.merge(test: true).to_json,
-             json_headers
-      end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
+      post "/api/v3/bikes?access_token=#{token.token}",
+           bike_attrs.merge(test: true).to_json,
+           json_headers
+      EmailOwnershipInvitationWorker.drain
+      expect(ActionMailer::Base.deliveries).to be_empty
       expect(response.code).to eq("201")
       result = json_result["bike"]
       expect(result["serial"]).to eq(bike_attrs[:serial])
@@ -559,7 +559,8 @@ RSpec.describe "Bikes API V3", type: :request do
 
         context "non-matching email" do
           let(:email) { "another_email@example.com" }
-          it "creates a bike for organization with v3_accessor" do
+          it "creates a bike for organization with v3_accessor, doesn't send email because skip_email" do
+            organization.update_attribute :paid_feature_slugs, ["skip_ownership_email"]
             bike = FactoryBot.create(:bike, serial_number: bike_attrs[:serial], owner_email: email)
             ownership = FactoryBot.create(:ownership, bike: bike, owner_email: email)
             expect(ownership.claimed).to be_falsey
@@ -580,7 +581,7 @@ RSpec.describe "Bikes API V3", type: :request do
             # expect(bike.creation_state.origin).to eq 'api_v3'
             expect(bike.creation_state.organization).to eq organization
             EmailOwnershipInvitationWorker.drain
-            expect(ActionMailer::Base.deliveries).to_not be_empty
+            expect(ActionMailer::Base.deliveries).to be_empty
           end
         end
       end

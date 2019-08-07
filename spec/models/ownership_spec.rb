@@ -123,7 +123,7 @@ RSpec.describe Ownership, type: :model do
         expect(ownership.calculated_send_email).to be_falsey
         ownership2.save
         ownership2.reload
-        expect(ownership2.calculated_send_email).to be_falsey
+        expect(ownership2.calculated_send_email).to be_truthy
       end
     end
   end
