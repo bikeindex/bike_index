@@ -44,7 +44,12 @@
               %pre
                 %code
                   = @feedback.feedback_hash.to_yaml.gsub("---\n", "")
-
+        - if @feedback.feedback_type == "bike_delete_request"
+          %tr
+            %td
+              View Bike
+            %td
+              = link_to "Deleted Bike", edit_admin_bike_path(id: @feedback.feedback_hash["bike_id"])
   .col-sm-6
     .card
       .card-body
