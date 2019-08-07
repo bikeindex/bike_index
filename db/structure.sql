@@ -4532,6 +4532,3 @@ INSERT INTO schema_migrations (version) VALUES ('20190806155914');
 INSERT INTO schema_migrations (version) VALUES ('20190806170520');
 
 INSERT INTO schema_migrations (version) VALUES ('20190806214815');
-
-INSERT INTO schema_migrations (version) VALUES ('20190807175348');
-

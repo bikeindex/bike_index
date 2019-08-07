@@ -2396,6 +2396,10 @@ nl:
       widely_used: Het is de meest gebruikte en succesvolle fietsregistratieservice
         ter wereld met meer dan %{bikes_count} gecatalogiseerde fietsen, %{partners_count}
         communitypartners en tienduizenden dagelijkse zoekopdrachten.
+      bobby_gervais_bio_html: "<strong>Bobby Gervais</strong> heeft een lange geschiedenis
+        in het leveren en dragen van spullen op zijn fiets voor werk en nu verdient
+        hij de kost door mensen te helpen hun fietsen te herstellen. Bobby helpt de
+        Bike Index bij te houden en aan nieuwe functies te werken."
     dev_and_design:
       bike_index_logos_html: "%{link} - logo's van vector- en png-fietsindex"
       bike_shop_card: Fietswinkel kaart
