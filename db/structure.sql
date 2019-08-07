@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.4
--- Dumped by pg_dump version 11.4
+-- Dumped from database version 11.3
+-- Dumped by pg_dump version 11.3
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -384,7 +384,8 @@ CREATE TABLE public.bikes (
     frame_material integer,
     handlebar_type integer,
     cycle_type integer DEFAULT 0,
-    propulsion_type integer DEFAULT 0
+    propulsion_type integer DEFAULT 0,
+    deleted_at timestamp without time zone
 );
 
 
@@ -1902,7 +1903,7 @@ ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays
 --
 
 CREATE TABLE public.schema_migrations (
-    version character varying NOT NULL
+    version character varying(255) NOT NULL
 );
 
 
@@ -3269,6 +3270,13 @@ CREATE INDEX index_bikes_on_current_stolen_record_id ON public.bikes USING btree
 
 
 --
+-- Name: index_bikes_on_deleted_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_deleted_at ON public.bikes USING btree (deleted_at);
+
+
+--
 -- Name: index_bikes_on_listing_order; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4522,4 +4530,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190726183859');
 INSERT INTO schema_migrations (version) VALUES ('20190806155914');
 
 INSERT INTO schema_migrations (version) VALUES ('20190806170520');
+
+INSERT INTO schema_migrations (version) VALUES ('20190806214815');
 

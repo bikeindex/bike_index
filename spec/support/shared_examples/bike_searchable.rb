@@ -211,8 +211,8 @@ RSpec.shared_examples "bike_searchable" do
   describe "search" do
     context "color_ids of primary, secondary and tertiary" do
       let(:color_2) { FactoryBot.create(:color) }
-      let(:bike_1) { FactoryBot.create(:bike, primary_frame_color: color) }
-      let(:bike_2) { FactoryBot.create(:bike, secondary_frame_color: color, tertiary_frame_color: color_2) }
+      let(:bike_1) { FactoryBot.create(:bike, primary_frame_color: color, updated_at: Time.current - 2.weeks) }
+      let(:bike_2) { FactoryBot.create(:bike, secondary_frame_color: color, tertiary_frame_color: color_2, updated_at: Time.current - 4.days) }
       let(:bike_3) { FactoryBot.create(:bike, tertiary_frame_color: color, manufacturer: manufacturer) }
       let(:all_color_ids) do
         [
@@ -233,7 +233,9 @@ RSpec.shared_examples "bike_searchable" do
       context "single color" do
         let(:query_params) { { colors: [color.id], stolenness: "all" } }
         it "matches bikes with the given color" do
-          expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_1.id, bike_2.id, bike_3.id])
+          expect(bike_1.listing_order < bike_2.listing_order).to be_truthy
+          expect(bike_2.listing_order < bike_3.listing_order).to be_truthy
+          expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_3.id, bike_2.id, bike_1.id])
         end
       end
       context "second color" do

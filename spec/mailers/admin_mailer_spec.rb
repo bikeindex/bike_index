@@ -16,15 +16,6 @@ RSpec.describe AdminMailer, type: :mailer do
   describe "special_feedback_notification_email" do
     let(:feedback) { FactoryBot.create(:feedback, feedback_type: feedback_type, feedback_hash: { bike_id: bike.id }) }
     let(:bike) { FactoryBot.create(:bike) }
-    context "a delete request email" do
-      let(:feedback_type) { "bike_delete_request" }
-      it "sends a delete request email" do
-        mail = AdminMailer.feedback_notification_email(feedback)
-        expect(mail.subject).to eq("New Feedback Submitted")
-        expect(mail.to).to eq(["contact@bikeindex.org"])
-        expect(mail.reply_to).to eq([feedback.email])
-      end
-    end
     context "a recovery email" do
       let(:feedback_type) { "bike_recovery" }
       it "sends a recovery email" do

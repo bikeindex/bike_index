@@ -10,7 +10,7 @@ class Feedback < ActiveRecord::Base
   scope :no_notification_types, -> { where(feedback_type: no_notification_types) }
 
   def self.no_notification_types
-    %w(manufacturer_update_request serial_update_request)
+    %w(manufacturer_update_request serial_update_request bike_delete_request)
   end
 
   def self.bike(bike_or_bike_id = nil)
@@ -33,6 +33,7 @@ class Feedback < ActiveRecord::Base
   end
 
   def notify_admins
+    bike.destroy if delete_request? && bike.present?
     return true if self.class.no_notification_types.include?(feedback_type)
     EmailFeedbackNotificationWorker.perform_async(id)
   end

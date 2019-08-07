@@ -1,4 +1,5 @@
 class Bike < ActiveRecord::Base
+  acts_as_paranoid without_default_scope: true
   include Phonifyerable
   include ActiveModel::Dirty
   include BikeSearchable
@@ -69,7 +70,7 @@ class Bike < ActiveRecord::Base
 
   default_scope {
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
-      .where(example: false, hidden: false)
+      .where(example: false, hidden: false, deleted_at: nil)
       .order("listing_order desc")
   }
   scope :stolen, -> { where(stolen: true) }
@@ -165,7 +166,7 @@ class Bike < ActiveRecord::Base
     errors.full_messages.reject { |m| m[/(bike can.t be blank|are you sure the bike was created)/i] }
   end
 
-  def get_listing_order
+  def calculated_listing_order
     return current_stolen_record.date_stolen.to_time.to_i.abs if stolen && current_stolen_record.present?
     t = (updated_at || Time.current).to_i / 10000
     stock_photo_url.present? || public_images.present? ? t : t / 100
@@ -204,8 +205,6 @@ class Bike < ActiveRecord::Base
   def type; cycle_type && cycle_type_name.downcase end
 
   def user_hidden; hidden && current_ownership&.user_hidden end
-
-  def fake_deleted; hidden && !user_hidden end
 
   def email_visible_for?(org)
     organizations.include?(org)
@@ -342,9 +341,10 @@ class Bike < ActiveRecord::Base
   end
 
   def visible_by(passed_user = nil)
-    return true unless hidden
+    return true unless hidden || deleted?
     if passed_user.present?
-      return true if passed_user.superuser
+      return true if passed_user.superuser?
+      return false if deleted?
       return true if owner == passed_user && user_hidden
     end
     false
@@ -550,7 +550,7 @@ class Bike < ActiveRecord::Base
   end
 
   def set_calculated_attributes
-    self.listing_order = get_listing_order
+    self.listing_order = calculated_listing_order
     clean_frame_size
     set_mnfg_name
     set_user_hidden

@@ -365,8 +365,8 @@ GEM
     parallel (1.17.0)
     parallel_tests (2.29.0)
       parallel
-    paranoia (2.1.5)
-      activerecord (~> 4.0)
+    paranoia (2.4.2)
+      activerecord (>= 4.0, < 6.1)
     parser (2.6.3.0)
       ast (~> 2.4.0)
     pg (0.18.4)
