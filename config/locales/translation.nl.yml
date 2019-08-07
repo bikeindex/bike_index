@@ -2396,6 +2396,10 @@ nl:
       widely_used: Het is de meest gebruikte en succesvolle fietsregistratieservice
         ter wereld met meer dan %{bikes_count} gecatalogiseerde fietsen, %{partners_count}
         communitypartners en tienduizenden dagelijkse zoekopdrachten.
+      bobby_gervais_bio_html: "<strong>Bobby Gervais</strong> heeft een lange geschiedenis
+        in het leveren en dragen van spullen op zijn fiets voor werk en nu verdient
+        hij de kost door mensen te helpen hun fietsen te herstellen. Bobby helpt de
+        Bike Index bij te houden en aan nieuwe functies te werken."
     dev_and_design:
       bike_index_logos_html: "%{link} - logo's van vector- en png-fietsindex"
       bike_shop_card: Fietswinkel kaart
@@ -3145,11 +3149,14 @@ nl:
         en vertegenwoordigers. Het is makkelijk. We zijn een groeiende non-profit
         organisatie met de missie om fietsen te registreren en terug te krijgen wanneer
         ze gestolen zijn. Sluit je vandaag nog bij ons aan.
-      monitoring_online_sales_platforms_like_cr: 
-      pos_integrations: 
-      relevant_articles: 
-      share_bike_index_on_social_channels_inclu: 
-      start_here: 
+      monitoring_online_sales_platforms_like_cr: Online verkoopplatforms zoals Craigslist
+        en Offerup controleren op verdachte fietsen en controleren of die fietsen
+        als gestolen worden vermeld op Bike Index.
+      pos_integrations: POS-intergratie
+      relevant_articles: 'Relevante artikelen:'
+      share_bike_index_on_social_channels_inclu: Deel Bike Index op social media kanalen
+        - inclusief Facebook fietsgroepen in jouw regio.
+      start_here: Begin hier!
       to_become_a_bike_index_ambassador_fill_ou: 
       typical_ambassador_activities: 
       typical_ambassador_activities_include: 

@@ -49,12 +49,12 @@ class AlertImageGenerator
     if bike_location.present?
       caption_image = MiniMagick::Image.open(LANDSCAPE_CAPTION).tap do |caption|
         caption.combine_options do |i|
-          i.font "ArialI"
+          i.font caption_font
           i.fill "#FFFFFF"
           i.antialias
           i.gravity "Center"
           i.pointsize 50
-          i.size [caption.height, caption.width].join("x")
+          i.size "#{caption.height}x#{caption.width}"
           i.draw "text 0,0 '#{bike_location}'"
         end
       end
@@ -62,7 +62,7 @@ class AlertImageGenerator
       alert_image = alert_image.composite(caption_image) do |alert|
         alert.gravity "Southeast"
         alert.compose "Over"
-        alert.size [nil, 100].join("x")
+        alert.size "x100"
         alert.geometry "+0+5"
       end
     end
@@ -139,6 +139,8 @@ class AlertImageGenerator
       "Helvetica-Oblique"
     elsif system("mogrify -list font | grep --silent 'Font: ArialI$'")
       "ArialI"
+    elsif system("mogrify -list font | grep --silent 'Font: Lato-Italic$'")
+      "Lato-Italic"
     elsif system("mogrify -list font | grep --silent 'Font: DejaVu-Sans$'")
       "DejaVu-Sans"
     end
