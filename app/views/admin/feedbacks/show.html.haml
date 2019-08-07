@@ -36,7 +36,7 @@
                 user present
               - else
                 = link_to @feedback.email, admin_users_path(user_query: @feedback.email)
-        - if f@feedback.feedback_hash.present?
+        - if @feedback.feedback_hash.present?
           %tr
             %td
               data
