@@ -45,26 +45,39 @@ RSpec.describe StolenRecord, type: :model do
 
   describe "#generate_alert_image" do
     context "given no bike image" do
-      it "returns with no changes" do
+      it "returns falsey with no changes" do
         stolen_record = FactoryBot.create(:stolen_record)
 
         result = stolen_record.generate_alert_image
 
-        expect(result).to be_falsey
+        expect(result).to be_nil
         expect(stolen_record.alert_image).to be_blank
-        expect(AlertImage.count).to eq(0)
+        expect(AlertImage.count).to be_zero
       end
     end
 
     context "given a bike image" do
-      it "updates alert_image" do
+      it "returns truthy and persists the alert image" do
         stolen_record = FactoryBot.create(:stolen_record, :with_bike_image)
 
         result = stolen_record.generate_alert_image
 
-        expect(result).to be_truthy
-        expect(stolen_record.alert_image).to be_present
+        expect(result).to be_an_instance_of(AlertImage)
+        expect(stolen_record.alert_image).to eq(result)
         expect(AlertImage.count).to eq(1)
+      end
+    end
+
+    context "given alert image creation fails" do
+      it "returns falsey with no changes" do
+        stolen_record = FactoryBot.create(:stolen_record, :with_bike_image)
+
+        bad_image = double(:image, image: 0)
+        result = stolen_record.generate_alert_image(bike_image: bad_image)
+
+        expect(result).to be_nil
+        expect(stolen_record.alert_image).to be_nil
+        expect(AlertImage.count).to eq(0)
       end
     end
 

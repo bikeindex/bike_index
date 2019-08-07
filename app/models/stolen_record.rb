@@ -268,8 +268,16 @@ class StolenRecord < ActiveRecord::Base
   # bike_image: [PublicImage]
   def generate_alert_image(bike_image: bike_main_image)
     return if bike_image&.image.blank?
+
     alert_image&.destroy
-    AlertImage.create(image: bike_image.image, stolen_record: self)
+    new_image = AlertImage.create(image: bike_image.image, stolen_record: self)
+
+    if new_image.valid?
+      new_image
+    else
+      update(alert_image: nil)
+      nil
+    end
   end
 
   # If the bike has been recovered, remove the alert_image
