@@ -43,7 +43,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
           ActionMailer::Base.deliveries = []
           post :send_request, delete_request
           expect(response.code).to eq("200")
-          expect(ActionMailer::Base.deliveries).not_to be_empty
+          expect(ActionMailer::Base.deliveries).to be_empty
           expect(bike.paranoia_destroyed?).to be_truthy
         end
       end
