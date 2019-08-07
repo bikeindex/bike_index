@@ -48,17 +48,27 @@ else
   git stash
   git checkout -b ${BRANCH}
   git reset --hard origin/master
-  git stash pop
+
+  # Commit translation changes
   git stash pop
   git add .
-  git commit -m "Translation update [ci skip]"
-  git fetch
+  git commit -m "Translation update: diff [ci skip]"
+
+  # Commit timestamp update
+  git stash pop
+  git add .
+  git commit -m "Translation update: timestamp [ci skip]"
   set +x
 
+
+  output "${YELLOW}" "Checking for existing Pull Request"
+
+  git fetch
   if git ls-remote --exit-code --heads origin "${BRANCH}" >/dev/null; then
     output "${GREEN}" "Translation update PR already created."
     exit 1
   fi
+
 
   output "${YELLOW}" "Creating Update Pull Request"
 
@@ -69,7 +79,7 @@ else
   git push -u origin "${BRANCH}"
 
   hub pull-request \
-      -m "[i18n] Translation update
+      -m "[i18n] Translation update: Build ${CIRCLE_BUILD_NUM}
 
           Merge to unblock CI job ${CIRCLE_BUILD_NUM}: ${CIRCLE_BUILD_URL}
           ${PR_URL}"
