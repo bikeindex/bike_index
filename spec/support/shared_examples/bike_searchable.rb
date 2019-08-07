@@ -211,8 +211,8 @@ RSpec.shared_examples "bike_searchable" do
   describe "search" do
     context "color_ids of primary, secondary and tertiary" do
       let(:color_2) { FactoryBot.create(:color) }
-      let(:bike_1) { FactoryBot.create(:bike, primary_frame_color: color, updated_at: Time.current - 2.weeks) }
-      let(:bike_2) { FactoryBot.create(:bike, secondary_frame_color: color, tertiary_frame_color: color_2, updated_at: Time.current - 4.days) }
+      let(:bike_1) { FactoryBot.create(:bike, primary_frame_color: color, updated_at: Time.current - 2.months) }
+      let(:bike_2) { FactoryBot.create(:bike, secondary_frame_color: color, tertiary_frame_color: color_2, updated_at: Time.current - 1.week) }
       let(:bike_3) { FactoryBot.create(:bike, tertiary_frame_color: color, manufacturer: manufacturer) }
       let(:all_color_ids) do
         [
