@@ -28,7 +28,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
       let(:ownership) { FactoryBot.create(:ownership) }
       let(:user) { ownership.creator }
       let(:bike) { ownership.bike }
-      it "actuallies send the mail" do
+      it "actually send the mail" do
         Sidekiq::Testing.inline! do
           # We don't test that this is being added to Sidekiq
           # Because we're testing that sidekiq does what it
@@ -44,6 +44,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
           post :send_request, delete_request
           expect(response.code).to eq("200")
           expect(ActionMailer::Base.deliveries).to be_empty
+          bike.reload
           expect(bike.paranoia_destroyed?).to be_truthy
         end
       end
@@ -67,7 +68,9 @@ RSpec.describe Api::V1::UsersController, type: :controller do
             ActionMailer::Base.deliveries = []
             post :send_request, delete_request
             expect(response.code).to eq("200")
-            expect(ActionMailer::Base.deliveries).not_to be_empty
+            expect(ActionMailer::Base.deliveries).to be_empty
+            bike.reload
+            expect(bike.paranoia_destroyed?).to be_truthy
           end
         end
       end
