@@ -51,29 +51,44 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "visible_by" do
-    it "isn't be visible to owner unless user hidden" do
-      bike = Bike.new(hidden: true)
-      user = User.new
-      allow(bike).to receive(:owner).and_return(user)
-      allow(bike).to receive(:user_hidden).and_return(false)
-      expect(bike.visible_by(user)).to be_falsey
-    end
-    it "is visible to owner" do
-      bike = Bike.new(hidden: true)
-      user = User.new
-      allow(bike).to receive(:owner).and_return(user)
-      allow(bike).to receive(:user_hidden).and_return(true)
-      expect(bike.visible_by(user)).to be_truthy
-    end
-    it "is visible to superuser" do
-      bike = Bike.new(hidden: true)
-      user = User.new
-      user.superuser = true
-      expect(bike.visible_by(user)).to be_truthy
-    end
+    let(:owner) { User.new }
+    let(:superuser) { User.new(superuser: true) }
     it "is visible if not hidden" do
       bike = Bike.new
       expect(bike.visible_by).to be_truthy
+      expect(bike.visible_by(User.new)).to be_truthy
+    end
+    context "hidden" do
+      it "isn't visible by user or owner" do
+        bike = Bike.new(hidden: true)
+        allow(bike).to receive(:owner).and_return(owner)
+        allow(bike).to receive(:user_hidden).and_return(false)
+        expect(bike.visible_by(owner)).to be_falsey
+        expect(bike.visible_by(User.new)).to be_falsey
+        expect(bike.visible_by(superuser)).to be_truthy
+      end
+    end
+    context "user hidden" do
+      it "is visible to owner" do
+        bike = Bike.new(hidden: true)
+        allow(bike).to receive(:owner).and_return(owner)
+        allow(bike).to receive(:user_hidden).and_return(true)
+        expect(bike.visible_by(owner)).to be_truthy
+        expect(bike.visible_by(User.new)).to be_falsey
+        expect(bike.visible_by(superuser)).to be_truthy
+      end
+    end
+    context "deleted?" do
+      it "is not visible to owner" do
+        bike = Bike.new(deleted_at: Time.current)
+        allow(bike).to receive(:owner).and_return(owner)
+        expect(bike.deleted?).to be_truthy
+        expect(bike.visible_by(owner)).to be_falsey
+        expect(bike.visible_by(User.new)).to be_falsey
+        expect(bike.visible_by(superuser)).to be_truthy
+        bike.hidden = true
+        expect(bike.visible_by(superuser)).to be_truthy
+      end
     end
   end
 
@@ -628,19 +643,6 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "fake_deleted" do
-    it "is true if bike is hidden and ownership is user hidden" do
-      bike = Bike.new(hidden: true)
-      ownership = Ownership.new(user_hidden: true)
-      allow(bike).to receive(:current_ownership).and_return(ownership)
-      expect(bike.fake_deleted).to be_falsey
-    end
-    it "is false otherwise" do
-      bike = Bike.new(hidden: true)
-      expect(bike.fake_deleted).to be_truthy
-    end
-  end
-
   describe "set_user_hidden" do
     let(:ownership) { FactoryBot.create(:ownership) }
     let(:bike) { ownership.bike }
@@ -850,16 +852,9 @@ RSpec.describe Bike, type: :model do
 
   describe "pg search" do
     it "returns a bike which has a matching part of its description" do
-      @bike = FactoryBot.create(:bike, description: "Phil wood hub")
-      @bikes = Bike.text_search("phil wood hub")
-      expect(@bikes).to include(@bike)
-    end
-
-    it "returns the bikes in the default scope pattern if there is no query" do
       bike = FactoryBot.create(:bike, description: "Phil wood hub")
       FactoryBot.create(:bike)
-      bikes = Bike.text_search("")
-      expect(bikes.first).to eq(bike)
+      expect(Bike.text_search("phil wood hub").pluck(:id)).to eq([bike.id])
     end
   end
 
@@ -1166,10 +1161,10 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "get_listing_order" do
+  describe "calculated_listing_order" do
     let(:bike) { Bike.new }
     it "is 1/1000 of the current timestamp" do
-      expect(bike.get_listing_order).to eq(Time.current.to_i / 1000000)
+      expect(bike.calculated_listing_order).to eq(Time.current.to_i / 1000000)
     end
 
     it "is the current stolen record date stolen * 1000" do
@@ -1178,14 +1173,14 @@ RSpec.describe Bike, type: :model do
       yesterday = Time.current - 1.days
       allow(stolen_record).to receive(:date_stolen).and_return(yesterday)
       allow(bike).to receive(:current_stolen_record).and_return(stolen_record)
-      expect(bike.get_listing_order).to eq(yesterday.to_time.to_i)
+      expect(bike.calculated_listing_order).to eq(yesterday.to_time.to_i)
     end
 
     it "is the updated_at" do
       last_week = Time.current - 7.days
       bike.updated_at = last_week
       allow(bike).to receive(:stock_photo_url).and_return("https://some_photo.cum")
-      expect(bike.get_listing_order).to eq(last_week.to_time.to_i / 10000)
+      expect(bike.calculated_listing_order).to eq(last_week.to_time.to_i / 10000)
     end
 
     context "problem date" do
