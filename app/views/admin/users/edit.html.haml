@@ -60,6 +60,19 @@
     %table.table-list
       %tr
         %td
+          email
+        %td
+          = @user.email
+          - if @user.secondary_emails.any?
+            %small
+              = @user.secondary_emails.join(", ")
+      %tr
+        %td
+          Name
+        %td
+          = @user.name
+      %tr
+        %td
           Photo
         %td
           - if @user.avatar?
@@ -81,11 +94,6 @@
         %td
           %strong
             = @user.ambassador?
-      %tr
-        %td
-          Name
-        %td
-          = @user.name
       %tr
         %td
           Phone
