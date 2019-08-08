@@ -13,7 +13,7 @@ RSpec.describe Bike, type: :model do
       expect(Bike.non_stolen.to_sql).to eq(Bike.where(stolen: false).to_sql)
     end
     it "non_recovered scopes to only non_recovered bikes" do
-      expect(Bike.non_recovered.to_sql).to eq(Bike.where(recovered: false).to_sql)
+      expect(Bike.non_recovered.to_sql).to eq(Bike.where(abandoned: false).to_sql)
     end
     it "recovered_records default scopes to created_at desc" do
       bike = FactoryBot.create(:bike)
