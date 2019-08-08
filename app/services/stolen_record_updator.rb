@@ -33,7 +33,7 @@ class StolenRecordUpdator
         update_with_params(stolen_record).save
       end
     else
-      @bike.update_attributes(abandoned: false) if @bike.recovered == true
+      @bike.update_attributes(abandoned: false) if @bike.abandoned == true
       mark_records_not_current
     end
   end

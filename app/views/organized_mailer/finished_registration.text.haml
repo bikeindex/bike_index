@@ -2,7 +2,7 @@
 - bike_url = ownership_url(@ownership)
 - frame_colors = @bike.frame_colors
 
-- bike_type = if @bike.stolen? && @bike.recovered?
+- bike_type = if @bike.stolen? && @bike.abandoned?
   - t(".text.recovered_biketype", biketype: @bike.type)
 - else
   - t(".text.stolen_biketype", biketype: @bike.type)
