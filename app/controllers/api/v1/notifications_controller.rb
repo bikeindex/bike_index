@@ -34,7 +34,7 @@ module Api
       end
 
       def title_tag(bike)
-        if bike.recovered
+        if bike.abandoned
           "We tweeted about the bike you recovered!"
         else
           "We tweeted about your stolen bike!"
