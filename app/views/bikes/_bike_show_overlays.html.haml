@@ -63,7 +63,7 @@
               = t(".no_one_can_see_it_but_you")
 
             - if @bike.user?
-              - if @bike.recovered
+              - if @bike.abandoned
                 = t(".thank_you_for_recovering_this_bike_type", bike_type: @bike.type)
               - elsif @bike.stolen
                 = t(".were_really_bummed_your_bike_type_was_stolen", bike_type: @bike.type)

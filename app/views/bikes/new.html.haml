@@ -12,7 +12,7 @@
     = f.hidden_field :stolen, value: true
     = hidden_field_tag :stolen, value: true
 
-  - if @bike.recovered
+  - if @bike.abandoned
     = f.hidden_field :recovered, value: true
 
   .form-well-container.container

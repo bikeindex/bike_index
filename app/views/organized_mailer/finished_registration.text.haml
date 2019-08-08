@@ -35,7 +35,7 @@
   = "\n"
 
 - if @bike.stolen
-  - if @bike.recovered
+  - if @bike.abandoned
     = t(".text.hopefully_you_find_the_owner_soon")
   - else
     = t(".text.hopefully_you_find_the_biketype_soon", biketype: @bike.type)
