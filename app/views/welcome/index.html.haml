@@ -16,7 +16,7 @@
     .root-landing-recovery-stories
       .container
         #recovery-stories-container.extras-hidden
-          = render @recovery_displays
+          = render RecoveryDisplay.limit(5)
           .recovery-block.recovery-see-more
             = link_to t(".read_more_recovery_stories"),
               recovery_stories_path,

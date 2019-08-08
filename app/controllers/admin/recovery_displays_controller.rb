@@ -54,6 +54,7 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
 
   def destroy
     @recovery_display.destroy
+    clear_index_wrap_cache
     redirect_to admin_recovery_displays_url
   end
 
@@ -66,7 +67,9 @@ class Admin::RecoveryDisplaysController < Admin::BaseController
   end
 
   def clear_index_wrap_cache
-    expire_fragment "root_recovery_stories"
+    I18n.available_locales.each do |locale|
+      expire_fragment(["root_recovery_stories", "locale", locale])
+    end
   end
 
   def find_recovery_displays
