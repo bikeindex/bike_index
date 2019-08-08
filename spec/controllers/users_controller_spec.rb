@@ -170,7 +170,7 @@ RSpec.describe UsersController, type: :controller do
             expect(user.partner_sign_up).to eq "bikehub"
             expect(user.email).to eq "poo@pile.com"
             expect(User.from_auth(cookies.signed[:auth])).to eq user
-            expect(user.last_login_at).to be_within(2.seconds).of Time.now
+            expect(user.last_login_at).to be_within(2.seconds).of Time.current
             expect(user.preferred_language).to eq "nl"
             # TODO: Rails 5 update - this is an after_commit issue
             # Because of the after_commit issue, we can't track that response redirects correctly :(

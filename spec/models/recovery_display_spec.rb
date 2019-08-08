@@ -22,7 +22,7 @@ RSpec.describe RecoveryDisplay, type: :model do
         allow(recovery_display).to receive(:image) { OpenStruct.new(file: OpenStruct.new("exists?" => false)) }
         expect(recovery_display.image_exists?).to be_falsey
         expect(recovery_display.image_processing?).to be_truthy
-        recovery_display.updated_at = Time.now - 2.minutes
+        recovery_display.updated_at = Time.current - 2.minutes
         expect(recovery_display.image_processing?).to be_falsey
       end
     end

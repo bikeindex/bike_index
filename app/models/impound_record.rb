@@ -22,6 +22,6 @@ class ImpoundRecord < ActiveRecord::Base
   end
 
   def mark_retrieved
-    update_attributes(retrieved_at: Time.now) if current?
+    update_attributes(retrieved_at: Time.current) if current?
   end
 end
