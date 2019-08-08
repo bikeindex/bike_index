@@ -9,7 +9,7 @@ jobs:
       RACK_ENV: test
       COVERAGE: true
       DISABLE_SPRING: true
-      TRANSLATION_BRANCH: normalize-when-syncing
+      TRANSLATION_BRANCH: master
       TZ: /usr/share/zoneinfo/America/Chicago
 
     docker:
