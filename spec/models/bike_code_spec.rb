@@ -197,6 +197,58 @@ RSpec.describe BikeCode, type: :model do
     end
   end
 
+  describe "authorized?" do
+    context "organization" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let!(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
+      let(:ownership) { FactoryBot.create(:ownership) }
+      let(:bike) { ownership.bike }
+      let(:owner) { ownership.creator }
+      let(:bike_code_user) { FactoryBot.create(:user_confirmed) }
+      let(:admin) { User.new(superuser: true) }
+      let(:rando) { FactoryBot.create(:user_confirmed) }
+      let!(:bike_code) { FactoryBot.create(:bike_code_claimed, bike: bike, organization: organization, user: bike_code_user) }
+      it "is truthy for admins and org members and code claimer" do
+        # Sanity Check organization authorizations
+        expect(bike_code_user.authorized?(organization)).to be_falsey
+        expect(owner.authorized?(organization)).to be_falsey
+        expect(organization_member.authorized?(organization)).to be_truthy
+        expect(admin.authorized?(organization)).to be_truthy
+        expect(rando.authorized?(organization)).to be_falsey
+        # Sanity check bike authorizations
+        expect(bike.authorized?(bike_code_user)).to be_falsey
+        expect(bike.authorized?(owner)).to be_truthy
+        expect(bike.authorized?(organization_member)).to be_falsey
+        expect(bike.authorized?(admin)).to be_falsey
+        expect(bike.authorized?(rando)).to be_falsey
+        # Check authorizations on the code itself
+        expect(bike_code.authorized?(bike_code_user)).to be_truthy
+        expect(bike_code.authorized?(owner)).to be_truthy
+        expect(bike_code.authorized?(organization_member)).to be_truthy
+        expect(bike_code.authorized?(admin)).to be_truthy
+        expect(bike_code.authorized?(rando)).to be_falsey
+        expect(bike_code.authorized?(User.new)).to be_falsey
+      end
+    end
+    context "unclaimed bike_code" do
+      let(:bike) { FactoryBot.create(:bike) }
+      let(:bike_code) { FactoryBot.create(:bike_code) }
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      it "permits user to authorize" do
+        expect(bike_code.claimable_by?(user)).to be_truthy
+        expect(bike_code.authorized?(user)).to be_truthy
+        expect(user.authorized?(bike_code)).to be_truthy
+        expect(User.new.authorized?(bike_code)).to be_truthy
+        # User has claimed max claimable bike codes
+        BikeCode::MAX_UNORGANIZED.times { FactoryBot.create(:bike_code_claimed, bike: bike, user: user) }
+        expect(bike_code.claimable_by?(user)).to be_falsey
+        expect(bike_code.authorized?(user)).to be_falsey
+        expect(user.authorized?(bike_code)).to be_falsey
+        expect(User.new.authorized?(bike_code)).to be_truthy
+      end
+    end
+  end
+
   describe "claim" do
     let(:ownership) { FactoryBot.create(:ownership) }
     let(:bike) { ownership.bike }
@@ -204,7 +256,9 @@ RSpec.describe BikeCode, type: :model do
     let(:bike_code) { FactoryBot.create(:bike_code) }
     it "claims, doesn't update when unable to parse" do
       bike_code.reload
+      expect(bike_code.authorized?(user)).to be_truthy
       bike_code.claim(user, bike.id)
+      expect(bike_code.authorized?(user)).to be_truthy
       expect(bike_code.previous_bike_id).to be_nil
       expect(bike_code.user).to eq user
       expect(bike_code.bike).to eq bike
@@ -218,7 +272,8 @@ RSpec.describe BikeCode, type: :model do
       expect(bike_code.claimed_at).to be_within(1.second).of Time.current
       expect(bike_code.previous_bike_id).to be_nil
       reloaded_code = BikeCode.find bike_code.id # Hard reload, it wasn't resetting errors
-      expect(reloaded_code.unclaimable_by?(user)).to be_falsey
+      expect(reloaded_code.authorized?(user)).to be_truthy
+      expect(reloaded_code.unclaimable_by?(user)).to be_truthy
       expect(ownership.creator.authorized?(bike)).to be_truthy
       expect(reloaded_code.unclaimable_by?(ownership.creator)).to be_truthy
       reloaded_code.claim(ownership.creator, "")

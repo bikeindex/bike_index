@@ -84,6 +84,38 @@ ALTER SEQUENCE public.ads_id_seq OWNED BY public.ads.id;
 
 
 --
+-- Name: alert_images; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.alert_images (
+    id integer NOT NULL,
+    stolen_record_id integer NOT NULL,
+    image character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: alert_images_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.alert_images_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: alert_images_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.alert_images_id_seq OWNED BY public.alert_images.id;
+
+
+--
 -- Name: ambassador_task_assignments; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -364,7 +396,8 @@ CREATE TABLE public.bikes (
     frame_material integer,
     handlebar_type integer,
     cycle_type integer DEFAULT 0,
-    propulsion_type integer DEFAULT 0
+    propulsion_type integer DEFAULT 0,
+    deleted_at timestamp without time zone
 );
 
 
@@ -926,6 +959,40 @@ CREATE SEQUENCE public.front_gear_types_id_seq
 --
 
 ALTER SEQUENCE public.front_gear_types_id_seq OWNED BY public.front_gear_types.id;
+
+
+--
+-- Name: impound_records; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.impound_records (
+    id integer NOT NULL,
+    bike_id integer,
+    user_id integer,
+    organization_id integer,
+    retrieved_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: impound_records_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.impound_records_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: impound_records_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.impound_records_id_seq OWNED BY public.impound_records.id;
 
 
 --
@@ -2250,6 +2317,13 @@ ALTER TABLE ONLY public.ads ALTER COLUMN id SET DEFAULT nextval('public.ads_id_s
 
 
 --
+-- Name: alert_images id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.alert_images ALTER COLUMN id SET DEFAULT nextval('public.alert_images_id_seq'::regclass);
+
+
+--
 -- Name: ambassador_task_assignments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2401,6 +2475,13 @@ ALTER TABLE ONLY public.flipper_gates ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 ALTER TABLE ONLY public.front_gear_types ALTER COLUMN id SET DEFAULT nextval('public.front_gear_types_id_seq'::regclass);
+
+
+--
+-- Name: impound_records id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.impound_records ALTER COLUMN id SET DEFAULT nextval('public.impound_records_id_seq'::regclass);
 
 
 --
@@ -2643,6 +2724,14 @@ ALTER TABLE ONLY public.ads
 
 
 --
+-- Name: alert_images alert_images_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.alert_images
+    ADD CONSTRAINT alert_images_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: ambassador_task_assignments ambassador_task_assignments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2816,6 +2905,14 @@ ALTER TABLE ONLY public.flipper_gates
 
 ALTER TABLE ONLY public.front_gear_types
     ADD CONSTRAINT front_gear_types_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: impound_records impound_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.impound_records
+    ADD CONSTRAINT impound_records_pkey PRIMARY KEY (id);
 
 
 --
@@ -3083,6 +3180,13 @@ ALTER TABLE ONLY public.wheel_sizes
 
 
 --
+-- Name: index_alert_images_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_alert_images_on_stolen_record_id ON public.alert_images USING btree (stolen_record_id);
+
+
+--
 -- Name: index_ambassador_task_assignments_on_ambassador_task_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3171,6 +3275,13 @@ CREATE INDEX index_bikes_on_creation_state_id ON public.bikes USING btree (creat
 --
 
 CREATE INDEX index_bikes_on_current_stolen_record_id ON public.bikes USING btree (current_stolen_record_id);
+
+
+--
+-- Name: index_bikes_on_deleted_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_deleted_at ON public.bikes USING btree (deleted_at);
 
 
 --
@@ -3297,6 +3408,27 @@ CREATE UNIQUE INDEX index_flipper_features_on_key ON public.flipper_features USI
 --
 
 CREATE UNIQUE INDEX index_flipper_gates_on_feature_key_and_key_and_value ON public.flipper_gates USING btree (feature_key, key, value);
+
+
+--
+-- Name: index_impound_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_records_on_bike_id ON public.impound_records USING btree (bike_id);
+
+
+--
+-- Name: index_impound_records_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_records_on_organization_id ON public.impound_records USING btree (organization_id);
+
+
+--
+-- Name: index_impound_records_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_impound_records_on_user_id ON public.impound_records USING btree (user_id);
 
 
 --
@@ -3631,6 +3763,14 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 
 ALTER TABLE ONLY public.theft_alerts
     ADD CONSTRAINT fk_rails_6dac5d87d9 FOREIGN KEY (payment_id) REFERENCES public.payments(id);
+
+
+--
+-- Name: alert_images fk_rails_95dc479c85; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.alert_images
+    ADD CONSTRAINT fk_rails_95dc479c85 FOREIGN KEY (stolen_record_id) REFERENCES public.stolen_records(id);
 
 
 --
@@ -4389,7 +4529,17 @@ INSERT INTO schema_migrations (version) VALUES ('20190710203715');
 
 INSERT INTO schema_migrations (version) VALUES ('20190710230727');
 
+INSERT INTO schema_migrations (version) VALUES ('20190725141309');
+
 INSERT INTO schema_migrations (version) VALUES ('20190725172835');
 
 INSERT INTO schema_migrations (version) VALUES ('20190726160009');
+
+INSERT INTO schema_migrations (version) VALUES ('20190726183859');
+
+INSERT INTO schema_migrations (version) VALUES ('20190806155914');
+
+INSERT INTO schema_migrations (version) VALUES ('20190806170520');
+
+INSERT INTO schema_migrations (version) VALUES ('20190806214815');
 

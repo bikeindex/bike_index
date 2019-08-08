@@ -101,21 +101,27 @@ class BikeCode < ActiveRecord::Base
       .flatten.compact.join(" ")
   end
 
-  def claimable_by?(user)
-    return false unless user.present?
-    return true if user.superuser?
-    user_organization_ids = user.memberships.pluck(:organization_id)
+  def claimable_by?(passed_user)
+    return false unless passed_user.present?
+    return true if passed_user.superuser?
+    user_organization_ids = passed_user.memberships.pluck(:organization_id)
     return true if user_organization_ids.include?(organization_id)
     return false if claimed?
     # Because the way activerecord where.not works in rails 4, we need this nil explicitly
-    total_codes = BikeCode.where(user_id: user.id, organization_id: nil).count
-    total_codes += BikeCode.where(user_id: user.id).where.not(organization_id: user_organization_ids).count
+    total_codes = BikeCode.where(user_id: passed_user.id, organization_id: nil).count
+    total_codes += BikeCode.where(user_id: passed_user.id).where.not(organization_id: user_organization_ids).count
     total_codes < MAX_UNORGANIZED
   end
 
-  def unclaimable_by?(user)
+  def authorized?(passed_user)
+    return true if passed_user == user || passed_user.superuser?
+    return true if organization.present? && passed_user.member_of?(organization)
+    passed_user.authorized?(bike) || claimable_by?(passed_user)
+  end
+
+  def unclaimable_by?(passed_user)
     return false unless errors.none? && claimed?
-    organization.present? && user.member_of?(organization) || user.authorized?(bike)
+    authorized?(passed_user)
   end
 
   def unclaim!
@@ -123,22 +129,22 @@ class BikeCode < ActiveRecord::Base
     update(bike_id: nil, user_id: nil, claimed_at: nil)
   end
 
-  def claim_if_permitted(user, bike_or_string)
-    return claim(user, bike_or_string) if claimable_by?(user)
+  def claim_if_permitted(passed_user, bike_or_string)
+    return claim(passed_user, bike_or_string) if claimable_by?(passed_user)
     errors.add(:user, "do not have permission to claim this")
     false
   end
 
-  def claim(user, bike_or_string)
-    errors.add(:user, "not found") unless user.present?
+  def claim(passed_user, bike_or_string)
+    errors.add(:user, "not found") unless passed_user.present?
     claiming_bike = bike_or_string.is_a?(Bike) ? bike_or_string : Bike.friendly_find(bike_or_string)
     # Check bike_or_string, not bike_id, because we don't want to allow people adding bikes
-    if bike_or_string.blank? && claiming_bike.blank? && unclaimable_by?(user)
+    if bike_or_string.blank? && claiming_bike.blank? && unclaimable_by?(passed_user)
       unclaim!
     elsif claiming_bike.present?
       self.previous_bike_id = bike_id || previous_bike_id # Don't erase previous_bike_id if double unclaiming
       unless errors.any?
-        update(bike_id: claiming_bike.id, user_id: user.id, claimed_at: Time.current)
+        update(bike_id: claiming_bike.id, user_id: passed_user.id, claimed_at: Time.current)
         bike.bike_organizations.create(organization_id: organization_id, can_not_edit_claimed: true) if organization.present?
       end
     else

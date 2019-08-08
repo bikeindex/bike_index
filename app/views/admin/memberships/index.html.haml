@@ -5,7 +5,7 @@
   .col-md-7
     %ul
       %li.nav-item
-        = link_to "New Membership", new_admin_membership_url, class: "nav-link"
+        = link_to "New Membership", new_admin_membership_url(organization_id: current_organization&.to_param), class: "nav-link"
 
 %h4
   = number_with_delimiter @memberships.total_count

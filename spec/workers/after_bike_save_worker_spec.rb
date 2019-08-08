@@ -28,13 +28,13 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
       bike.update_attribute :listing_order, -22
       instance.perform(bike.id)
       bike.reload
-      expect(bike.listing_order).to eq bike.get_listing_order
+      expect(bike.listing_order).to eq bike.calculated_listing_order
     end
 
     context "unchanged listing order" do
       it "does not update the listing order or enqueue afterbikesave" do
         bike = FactoryBot.create(:bike)
-        bike.update_attribute :listing_order, bike.get_listing_order
+        bike.update_attribute :listing_order, bike.calculated_listing_order
         expect_any_instance_of(Bike).to_not receive(:update_attribute)
         instance.perform(bike.id)
       end

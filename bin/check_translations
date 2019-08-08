@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+set -e
+
+CYAN="\033[0;36m"
+YELLOW="\033[0;33m"
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+NONE="\033[0m"
+
+output() {
+  printf "\n${1}${2}${NONE}\n\n"
+}
+
+alias git=/usr/local/bin/git
+
+output "${CYAN}" "Checking Translations"
+
+# Quit as success if not on the branch to be synced
+if ! git branch --list | grep --silent "^* ${TRANSLATION_BRANCH}$"; then
+  output "${GREEN}" "Skipping: Not on TRANSLATION_BRANCH: ${TRANSLATION_BRANCH}"
+  exit 0
+fi
+
+echo bundle exec rake translation:sync
+bundle exec rake translation:sync
+
+output "${YELLOW}" "Stashing translation.io timestamp file"
+set -x
+git stash -- config/locales/.translation_io
+git status --short
+set +x
+
+if [[ -z "$(git --no-pager diff)" ]]; then
+  output "${GREEN}" "No uncommitted translations. Done."
+  exit 0
+else
+  output "${RED}" "Uncommitted Translations"
+  git --no-pager diff
+
+  git config user.email "ci@bikeindex.org"
+  git config user.name "CircleCI"
+
+  output "${YELLOW}" "Committing and pushing translation update"
+  BRANCH="translation-update-${CIRCLE_BUILD_NUM}"
+  set -x
+  git clean --quiet --force -d -x
+  git stash
+  git checkout -b ${BRANCH}
+  git reset --hard origin/master
+
+  # Commit translation changes
+  git stash pop
+  git add .
+  git commit -m "Translation update: diff [ci skip]"
+
+  # Commit timestamp update
+  git stash pop
+  git add .
+  git commit -m "Translation update: timestamp [ci skip]"
+  set +x
+
+
+  output "${YELLOW}" "Checking for existing Pull Request"
+
+  git fetch
+  if git ls-remote --exit-code --heads origin "${BRANCH}" >/dev/null; then
+    output "${GREEN}" "Translation update PR already created."
+    exit 1
+  fi
+
+
+  output "${YELLOW}" "Creating Update Pull Request"
+
+  if [[ "${TRANSLATION_BRANCH}" != "master" ]]; then
+    PR_URL="Related PR: ${CIRCLE_PULL_REQUEST}"
+  fi
+
+  git push -u origin "${BRANCH}"
+
+  hub pull-request \
+      -m "[i18n] Translation update: Build ${CIRCLE_BUILD_NUM}
+
+          Merge to unblock CI job ${CIRCLE_BUILD_NUM}: ${CIRCLE_BUILD_URL}
+          ${PR_URL}"
+
+  output "${GREEN}" "Translation update PR created."
+  exit 1
+fi

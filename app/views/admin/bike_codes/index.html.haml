@@ -101,49 +101,6 @@
 
 = paginate @bike_codes, views_prefix: "admin"
 
-- bike_code_batch_organizations = BikeCodeBatch.all.map { |b| [b.id.to_s, b.organization&.short_name] }.to_h
-
-.full-screen-table
-  %table.table.table-striped.table-bordered.table-sm.without-exterior-border
-    %thead.small-header
-      %th= sortable "created_at"
-      %th= sortable "organization_id"
-      %th= sortable "bike_code_batch_id", "Batch"
-      %th Linked
-      %th Bike
-      %th= sortable "code_integer", "Code #"
-    %tbody
-      - @bike_codes.each do |bike_code|
-        %tr
-          %td
-            - if bike_code.organization.present?
-              - bike_code_url = edit_organization_sticker_path(organization_id: bike_code.organization_id, id: bike_code.code)
-            - else
-              - bike_code_url = "/bikes/scanned/#{bike_code.code}"
-            %a.convertTime{ href: bike_code_url }
-              = l bike_code.created_at, format: :convert_time
-          %td
-            - if bike_code.organization.present?
-              = link_to bike_code.organization.name, admin_bike_codes_path(sortable_search_params.merge(organization_id: bike_code.organization_id))
-          %td
-            - if bike_code.bike_code_batch.present?
-              = link_to bike_code.bike_code_batch_id, admin_bike_codes_path(sortable_search_params.merge(search_bike_code_batch_id: bike_code.bike_code_batch_id))
-              %small.less-strong
-                = bike_code_batch_organizations[bike_code.bike_code_batch_id.to_s]
-          %td
-            - if bike_code.claimed? && bike_code.claimed_at.present?
-              %span.convertTime
-                = l bike_code.claimed_at, format: :convert_time
-          %td
-            - if bike_code.claimed?
-              / For these, use bike_id to avoid loading association
-              = organized_bike_text(bike_code.bike)
-          %td
-            %strong
-              = link_to bike_code.pretty_code, "/bikes/scanned/#{bike_code.code}?organization_id=#{bike_code.organization.to_param}"
-            - unless bike_code.sticker?
-              %em.small.text-warning
-                = bike_code.kind
-
+= render partial: "table", locals: { bike_codes: @bike_codes, render_sortable: true }
 
 = paginate @bike_codes, views_prefix: "admin"

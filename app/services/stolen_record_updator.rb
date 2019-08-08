@@ -17,7 +17,7 @@ class StolenRecordUpdator
         s.save
       end
     end
-    @bike.update_attribute :current_stolen_record_id, nil
+    @bike.reload.update_attribute :current_stolen_record_id, nil
   end
 
   def update_records

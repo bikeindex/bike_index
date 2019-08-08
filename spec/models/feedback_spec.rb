@@ -2,7 +2,6 @@ require "rails_helper"
 
 RSpec.describe Feedback, type: :model do
   describe "bike" do
-    let(:_bike) { FactoryBot.create(:bike) }
     let(:bike) { FactoryBot.create(:bike) }
     let!(:feedback) { FactoryBot.create(:feedback_serial_update_request, bike: bike) }
     it "finds it, returns bike" do
@@ -19,10 +18,10 @@ RSpec.describe Feedback, type: :model do
       end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(1)
     end
 
-    it "enqueues an email job for delete requests" do
+    it "doesn't send email" do
       expect do
         FactoryBot.create(:feedback, feedback_type: "bike_delete_request")
-      end.to change(EmailFeedbackNotificationWorker.jobs, :size).by(1)
+      end.to_not change(EmailFeedbackNotificationWorker.jobs, :size)
     end
 
     it "doesn't enqueue an email job for serial updates" do
@@ -79,6 +78,17 @@ RSpec.describe Feedback, type: :model do
       it "returns type" do
         expect(Feedback.new(feedback_type: "lead_for_school").lead_type).to eq "School"
       end
+    end
+  end
+  describe "delete bike" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:feedback) { FactoryBot.build(:feedback_bike_delete_request, bike: bike) }
+    it "deletes the bike" do
+      expect(bike.paranoia_destroyed?).to be_falsey
+      feedback.save
+      bike.reload
+      expect(bike.deleted_at).to be_present
+      expect(bike.paranoia_destroyed?).to be_truthy
     end
   end
 end

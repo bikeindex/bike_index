@@ -126,11 +126,12 @@ RSpec.describe "Bikes API V2", type: :request do
                         is_bulk: true,
                         is_new: true,
                         is_pos: true)
-      expect do
-        post "/api/v2/bikes?access_token=#{token.token}",
-             bike_attrs.to_json,
-             json_headers
-      end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
+      ActionMailer::Base.deliveries = []
+      post "/api/v2/bikes?access_token=#{token.token}",
+           bike_attrs.to_json,
+           json_headers
+      EmailOwnershipInvitationWorker.drain
+      expect(ActionMailer::Base.deliveries.count).to eq 1
       expect(response.code).to eq("201")
       result = json_result["bike"]
       expect(result["serial"]).to eq(bike_attrs[:serial])
@@ -151,21 +152,23 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "doesn't send an email" do
-      expect do
-        post "/api/v2/bikes?access_token=#{token.token}",
-             bike_attrs.merge(no_notify: true).to_json,
-             json_headers
-      end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
+      ActionMailer::Base.deliveries = []
+      post "/api/v2/bikes?access_token=#{token.token}",
+           bike_attrs.merge(no_notify: true).to_json,
+           json_headers
+      EmailOwnershipInvitationWorker.drain
+      expect(ActionMailer::Base.deliveries).to eq([])
       expect(response.code).to eq("201")
     end
 
     it "creates an example bike" do
       FactoryBot.create(:organization, name: "Example organization")
-      expect do
-        post "/api/v2/bikes?access_token=#{token.token}",
-             bike_attrs.merge(test: true).to_json,
-             json_headers
-      end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
+      ActionMailer::Base.deliveries = []
+      post "/api/v2/bikes?access_token=#{token.token}",
+           bike_attrs.merge(test: true).to_json,
+           json_headers
+      EmailOwnershipInvitationWorker.drain
+      expect(ActionMailer::Base.deliveries.count).to eq 0
       expect(response.code).to eq("201")
       result = json_result["bike"]
       expect(result["serial"]).to eq(bike_attrs[:serial])

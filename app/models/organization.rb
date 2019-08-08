@@ -60,7 +60,7 @@ class Organization < ActiveRecord::Base
   scope :unpaid, -> { where(is_paid: true) }
   scope :approved, -> { where(is_suspended: false, approved: true) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
-  scope :bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications]) }
+  scope :bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications impound_bikes]) }
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
@@ -103,6 +103,12 @@ class Organization < ActiveRecord::Base
     matching_slugs = PaidFeature.matching_slugs(slugs)
     return nil unless matching_slugs.present?
     where("paid_feature_slugs ?& array[:keys]", keys: matching_slugs)
+  end
+
+  def impounded_bikes
+    Bike.includes(:impound_records)
+        .where(impound_records: { retrieved_at: nil, organization_id: id })
+        .where.not(impound_records: { id: nil })
   end
 
   def to_param; slug end
@@ -157,8 +163,8 @@ class Organization < ActiveRecord::Base
     registration_field_labels && registration_field_labels[field_slug.to_s]
   end
 
-  def bike_actions? # Eventually there will be other actions beside organization_messages, so use this as general reference
-    message_kinds.any? || paid_for?("unstolen_notifications")
+  def bike_actions?
+    message_kinds.any? || paid_for?("unstolen_notifications") || paid_for?("impound_bikes")
   end
 
   def law_enforcement_missing_verified_features?

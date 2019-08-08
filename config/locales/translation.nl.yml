@@ -173,6 +173,8 @@ nl:
               invalid_uri: moet een geldige URI zijn.
               relative_uri: moet een absolute URI zijn.
               secured_uri: moet een HTTPS/SSL URI zijn.
+        impound_record:
+          user_not_authorized: heeft geen toestemming om deze fiets in beslag te nemen
     attributes:
       doorkeeper/application:
         name: Naam
@@ -189,7 +191,7 @@ nl:
         uid: Uid
       ad:
         body: Lichaam
-        image: afbeelding
+        image: Afbeelding
         live: Leven
         target_url: Doel-URL
         title: Titel
@@ -198,10 +200,10 @@ nl:
         ambassador_tasks: Ambassadortaken
         auth_token: Auth Token
         avatar: Avatar
-        banned: verboden
+        banned: Verboden
         can_send_many_stolen_notifications: Kan veel gestolen meldingen verzenden
         city: City
-        confirmation_token: Bevestigingstoken
+        confirmation_token: Opnieuw verzenden Bevestiging
         confirmed: Bevestigd
         created_bikes: Fietsen gemaakt
         created_ownerships: Eigendom gecreëerd
@@ -1933,6 +1935,10 @@ nl:
         opneemt over een advertentie die u online hebt gevonden, neemt u een link
         op in het onderstaande veld
       write_them_a_message: Schrijf ze een bericht
+      already_impounded: Deze %{bike_type} is al in beslag genomen door %{organization_name}
+      impound: confisqueren
+      impound_are_you_sure: Weet je zeker dat je %{bike_type} wilt?
+      impounded_by: Door
     pdf:
       bike_description: 'Fiets beschrijving:'
       bike_serial: Bike Serial
@@ -2042,6 +2048,13 @@ nl:
         op in het onderstaande veld
       write_them_a_message: Schrijf ze een bericht
       year: jaar
+      change_the_bike_sticker_linked_to: Verander de fiets waarnaar het linkt
+      is_this_linked_to_incorrect_bike: Is deze sticker gekoppeld aan de verkeerde
+        fiets?
+      switch_to_new_bike_id: Schakel over naar een nieuwe fiets-ID
+      update: Bijwerken
+      you_scanned_this_sticker_html: U hebt de sticker <strong>%{pretty_code}</strong>
+        gescand die aan deze %{bike_type} is toegewezen.
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
       a_police_report: een politierapportnummer
@@ -2383,6 +2396,10 @@ nl:
       widely_used: Het is de meest gebruikte en succesvolle fietsregistratieservice
         ter wereld met meer dan %{bikes_count} gecatalogiseerde fietsen, %{partners_count}
         communitypartners en tienduizenden dagelijkse zoekopdrachten.
+      bobby_gervais_bio_html: "<strong>Bobby Gervais</strong> heeft een lange geschiedenis
+        in het leveren en dragen van spullen op zijn fiets voor werk en nu verdient
+        hij de kost door mensen te helpen hun fietsen te herstellen. Bobby helpt de
+        Bike Index bij te houden en aan nieuwe functies te werken."
     dev_and_design:
       bike_index_logos_html: "%{link} - logo's van vector- en png-fietsindex"
       bike_shop_card: Fietswinkel kaart
@@ -3084,9 +3101,8 @@ nl:
         is er zo'n gevoel van verlies, maar wanneer hij is hersteld, is er zo'n gevoel
         van vernieuwing en herstel. Dat is de reden dat ik Bike Index promoot
       join_their_ranks: Sluit je aan bij hun gelederen
-      steve_piercys_ambassadorship_is_sponsored_html: "<em>Het</em> ambassadeurschap
-        van <em>Steve Piercy</em> wordt gesponsord door <strong>%{sponsor_link}</strong>
-        ."
+      steve_piercys_ambassadorship_is_sponsored_html: Het ambassadeurschap van <em>Steve
+        Piercy</em> wordt gesponsord door <strong>%{sponsor_link}</strong> .
       the_heroes_of_bikedom: De helden van bikedom
       whats_your_story: Wat is jouw verhaal?
       why_bike_index: Waarom Bike Index?
@@ -3109,24 +3125,38 @@ nl:
       apply_to_be_an_ambassador_here: Meld u hier aan als ambassadeur
       apply_today: Meld je vandaag aan
       be_a_bike_saver: Wees een fietsspaarder
-      become_a_bike_index_ambassador: 
-      become_an_ambassador: 
-      bike_index_is_a_nonprofit_with_a_big_miss: 
-      bike_index_launches_new_ambassador_progra: 
-      check_out_our_media_resources: 
-      connect_us_with_city_officials_law_enforc: 
+      become_a_bike_index_ambassador: Word een ambassadeur van Bike Index
+      become_an_ambassador: 'Word een ambassadeur '
+      bike_index_is_a_nonprofit_with_a_big_miss: 'Bike Index is een non-profit organisatie
+        met een grote missie: alle bestaande fietsen registeren en elke gestolen fiets
+        terug kunnen krijgen. Daarom hebben wij jouw hulp nodig. Wij zijn een nationaal
+        register, maar jij kent jouw fietsgemeenschap het beste.'
+      bike_index_launches_new_ambassador_progra: Bike Index lanceert een nieuw ambassadeurs
+        programma
+      check_out_our_media_resources: Bekijk onze mediabronnen
+      connect_us_with_city_officials_law_enforc: Verbind ons met ambtenaren, wetshandhavers
+        en lokale universiteiten die geïnteresseerd zijn in het gebruik van Bike Index,
+        als officieel registratiesysteem van het desbetreffende gebied
       current_ambassadors: Huidige ambassadeurs
-      follow_bike_index_on_twitter_facebook_and: 
-      get_bike_shops_signed_up_for_bike_index_u: 
-      give_you_shoutouts_on_social_media: 
-      here: 
+      follow_bike_index_on_twitter_facebook_and: Volg Bike Index op twitter, Facebook
+        en instagram zodat we je terug kunnen volgen!
+      get_bike_shops_signed_up_for_bike_index_u: Laat fietsenwinkels zich aanmelden
+        bij Bike Index door gebruik te maken van een van onze
+      give_you_shoutouts_on_social_media: " "
+      here: hier.
       how_it_works: Hoe het werkt
-      join_our_list_of_ambassadors_and_advocate: 
-      monitoring_online_sales_platforms_like_cr: 
-      pos_integrations: 
-      relevant_articles: 
-      share_bike_index_on_social_channels_inclu: 
-      start_here: 
+      join_our_list_of_ambassadors_and_advocate: Word lid van onze lijst van ambassadeurs
+        en vertegenwoordigers. Het is makkelijk. We zijn een groeiende non-profit
+        organisatie met de missie om fietsen te registreren en terug te krijgen wanneer
+        ze gestolen zijn. Sluit je vandaag nog bij ons aan.
+      monitoring_online_sales_platforms_like_cr: Online verkoopplatforms zoals Craigslist
+        en Offerup controleren op verdachte fietsen en controleren of die fietsen
+        als gestolen worden vermeld op Bike Index.
+      pos_integrations: POS-intergratie
+      relevant_articles: 'Relevante artikelen:'
+      share_bike_index_on_social_channels_inclu: Deel Bike Index op social media kanalen
+        - inclusief Facebook fietsgroepen in jouw regio.
+      start_here: Begin hier!
       to_become_a_bike_index_ambassador_fill_ou: 
       typical_ambassador_activities: 
       typical_ambassador_activities_include: 
@@ -3393,6 +3423,7 @@ nl:
       users: Gebruikers
       view_org: Bekijk %{org_name}
       your_bikes: Je fietsen
+      org_impounded_bikes: "%{org_name} In beslag genomen fietsen"
     application_revised_bikehub:
       bike_security: Bij BikeHub geloven we dat fietsbeveiliging meer is dan alleen
         een sterk U-slot.
@@ -3683,6 +3714,8 @@ nl:
         view_all_bikes: bekijk alle fietsen
         view_just_stolen_bikes: bekijk alleen gestolen fietsen
         visible_columns: Zichtbare kolommen
+        email_hidden: email verborgen
+        impounded: In beslag genomen bij
     bulk_imports:
       index:
         added: Toegevoegd
@@ -4254,6 +4287,7 @@ nl:
       vendor_terms: leveranciersvoorwaarden
       where_we_are: Waar we zijn
       who_we_serve: Wie we dienen
+      change_preferred_language: voorkeurstaal wijzigen
     form_well_footer_save:
       save_changes: Wijzigingen opslaan
     header_nav:
@@ -4323,6 +4357,7 @@ nl:
       state: Staat
       unconfirmed_emails: Niet-bevestigde e-mails
       zipcode: Postcode
+      why_you_should_text: Lees waarom u zou moeten
     edit_sharing:
       additional_link: Aanvullende link
       choose_file: Kies bestand...
@@ -4483,7 +4518,7 @@ nl:
       you_have_no_registered_bikes: U hebt geen geregistreerde fietsen
       you_have_no_registered_locks: U hebt geen geregistreerde sloten
   locales:
-    en: Engels
+    en: English (Engels)
     nl: Nederlands
   money:
     currencies:

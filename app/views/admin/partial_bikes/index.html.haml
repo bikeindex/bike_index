@@ -74,10 +74,7 @@
               = b_param.creation_organization.name
           %td{ style: "width: 30%;" }
             %div{ style: "overflow: scroll; white-space: nowrap;" }
-              %pre
-                %code
-                  = b_param.params.to_json.gsub('":{', "\":{\n ").gsub('":', '": ').gsub(",", ",\n ")
-
+              = pretty_print_json(b_param.params)
 
 
 

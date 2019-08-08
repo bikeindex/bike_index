@@ -3,12 +3,30 @@
 .container
   - if current_user&.superuser
     %p.mb-4.text-center
-      = link_to t(".bike_in_admin", bike_type: @bike.type.titleize), admin_bike_path(@bike.to_param), class: "btn btn-outline-info uncap", style: "display: block;"
+      = link_to t(".bike_in_admin", bike_type: @bike.type.titleize), admin_bike_path(@bike.to_param), class: "btn btn-outline-info uncap less-strong", style: "display: block;"
     - if @bike.user_hidden
       %h2.text-danger.mb-4.text-center
         = t(".hidden_by_owner")
         %small.less-strong
           = t(".no_one_but_the_user_and_bike_index_admins")
+
+  - if @bike_code.present?
+    .alert.alert-success
+      %p= t(".you_scanned_this_sticker_html", pretty_code: @bike_code.pretty_code, bike_type: @bike.type)
+      - if current_user&.authorized?(@bike_code)
+        %p.mt-2
+          %em.less-strong
+            = t(".is_this_linked_to_incorrect_bike")
+            %a.gray-link{ href: "#updateBikeCodeLink", data: { toggle: "collapse" } }
+              = t(".change_the_bike_sticker_linked_to")
+        .collapse#updateBikeCodeLink
+          = form_tag bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id), method: :put, class: "row mt-4" do
+            .col-sm-8.col-lg-10
+              .form-group
+                = label_tag :bike_id, t(".switch_to_new_bike_id")
+                = text_field_tag :bike_id, nil, placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
+            .col-sm-4.col-lg-2.mt-4
+              = submit_tag t(".update"), class: "btn btn-success"
 
   -# Authorize check here, even though we're checking in controller too, because
   -# otherwise we're displaying user data

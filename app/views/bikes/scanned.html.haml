@@ -17,7 +17,7 @@
       = form_tag bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id), method: :put, class: "row" do
         .col-sm-8.col-lg-10
           .form-group
-            = text_field_tag :bike_id, placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
+            = text_field_tag :bike_id, nil, placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
         .col-sm-4.col-lg-2
           = submit_tag t(".update"), class: "btn btn-success"
 

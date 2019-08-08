@@ -1,6 +1,4 @@
 class Admin::TheftAlertPlansController < Admin::BaseController
-  layout "new_admin"
-
   def index
     @theft_alert_plans = TheftAlertPlan.order(:amount_cents)
   end

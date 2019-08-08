@@ -13,8 +13,8 @@ class AfterBikeSaveWorker < ApplicationWorker
     bike.load_external_images
     update_matching_partial_registrations(bike)
     DuplicateBikeFinderWorker.perform_async(bike_id)
-    if bike.present? && bike.listing_order != bike.get_listing_order
-      bike.update_attribute :listing_order, bike.get_listing_order
+    if bike.present? && bike.listing_order != bike.calculated_listing_order
+      bike.update_attribute :listing_order, bike.calculated_listing_order
     end
     return true unless bike.stolen # For now, only hooking on stolen bikes
     post_bike_to_webhook(serialized(bike))

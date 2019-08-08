@@ -4,7 +4,7 @@ RSpec.describe Bike, type: :model do
   it_behaves_like "bike_searchable"
   describe "scopes" do
     it "default scopes to created_at desc" do
-      expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false).order("listing_order desc").to_sql)
+      expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false, deleted_at: nil).order("listing_order desc").to_sql)
     end
     it "scopes to only stolen bikes" do
       expect(Bike.stolen.to_sql).to eq(Bike.where(stolen: true).to_sql)
@@ -51,29 +51,44 @@ RSpec.describe Bike, type: :model do
   end
 
   describe "visible_by" do
-    it "isn't be visible to owner unless user hidden" do
-      bike = Bike.new(hidden: true)
-      user = User.new
-      allow(bike).to receive(:owner).and_return(user)
-      allow(bike).to receive(:user_hidden).and_return(false)
-      expect(bike.visible_by(user)).to be_falsey
-    end
-    it "is visible to owner" do
-      bike = Bike.new(hidden: true)
-      user = User.new
-      allow(bike).to receive(:owner).and_return(user)
-      allow(bike).to receive(:user_hidden).and_return(true)
-      expect(bike.visible_by(user)).to be_truthy
-    end
-    it "is visible to superuser" do
-      bike = Bike.new(hidden: true)
-      user = User.new
-      user.superuser = true
-      expect(bike.visible_by(user)).to be_truthy
-    end
+    let(:owner) { User.new }
+    let(:superuser) { User.new(superuser: true) }
     it "is visible if not hidden" do
       bike = Bike.new
       expect(bike.visible_by).to be_truthy
+      expect(bike.visible_by(User.new)).to be_truthy
+    end
+    context "hidden" do
+      it "isn't visible by user or owner" do
+        bike = Bike.new(hidden: true)
+        allow(bike).to receive(:owner).and_return(owner)
+        allow(bike).to receive(:user_hidden).and_return(false)
+        expect(bike.visible_by(owner)).to be_falsey
+        expect(bike.visible_by(User.new)).to be_falsey
+        expect(bike.visible_by(superuser)).to be_truthy
+      end
+    end
+    context "user hidden" do
+      it "is visible to owner" do
+        bike = Bike.new(hidden: true)
+        allow(bike).to receive(:owner).and_return(owner)
+        allow(bike).to receive(:user_hidden).and_return(true)
+        expect(bike.visible_by(owner)).to be_truthy
+        expect(bike.visible_by(User.new)).to be_falsey
+        expect(bike.visible_by(superuser)).to be_truthy
+      end
+    end
+    context "deleted?" do
+      it "is not visible to owner" do
+        bike = Bike.new(deleted_at: Time.current)
+        allow(bike).to receive(:owner).and_return(owner)
+        expect(bike.deleted?).to be_truthy
+        expect(bike.visible_by(owner)).to be_falsey
+        expect(bike.visible_by(User.new)).to be_falsey
+        expect(bike.visible_by(superuser)).to be_truthy
+        bike.hidden = true
+        expect(bike.visible_by(superuser)).to be_truthy
+      end
     end
   end
 
@@ -283,7 +298,7 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "authorize_and_claim_for_user, authorized_for_user?" do
+  describe "authorize_and_claim_for_user, authorized?" do
     let(:bike) { ownership.bike }
     let(:creator) { ownership.creator }
     let(:user) { FactoryBot.create(:user) }
@@ -292,19 +307,19 @@ RSpec.describe Bike, type: :model do
       let(:ownership) { FactoryBot.create(:ownership) }
       context "no user" do
         it "returns false" do
-          expect(bike.authorized_for_user?(nil)).to be_falsey
+          expect(bike.authorized?(nil)).to be_falsey
           expect(bike.authorize_and_claim_for_user(nil)).to be_falsey
         end
       end
       context "unauthorized" do
         it "returns false" do
-          expect(bike.authorized_for_user?(user)).to be_falsey
+          expect(bike.authorized?(user)).to be_falsey
           expect(bike.authorize_and_claim_for_user(user)).to be_falsey
         end
       end
       context "creator" do
         it "returns true" do
-          expect(bike.authorized_for_user?(creator)).to be_truthy
+          expect(bike.authorized?(creator)).to be_truthy
           expect(bike.authorize_and_claim_for_user(creator)).to be_truthy
         end
       end
@@ -313,8 +328,8 @@ RSpec.describe Bike, type: :model do
         let(:user) { ownership.user }
         it "returns true for user, not creator" do
           expect(bike.claimed?).to be_truthy
-          expect(bike.authorized_for_user?(creator)).to be_falsey
-          expect(bike.authorized_for_user?(user)).to be_truthy
+          expect(bike.authorized?(creator)).to be_falsey
+          expect(bike.authorized?(user)).to be_truthy
           expect(bike.authorize_and_claim_for_user(creator)).to be_falsey
           expect(bike.authorize_and_claim_for_user(user)).to be_truthy
         end
@@ -326,7 +341,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.claimed?).to be_falsey
           expect(ownership.owner).to eq creator
           expect(bike.authorize_and_claim_for_user(creator)).to be_truthy
-          expect(bike.authorized_for_user?(user)).to be_truthy
+          expect(bike.authorized?(user)).to be_truthy
           expect(bike.authorize_and_claim_for_user(user)).to be_truthy
           expect(bike.claimed?).to be_truthy
           expect(bike.authorize_and_claim_for_user(creator)).to be_falsey
@@ -369,18 +384,18 @@ RSpec.describe Bike, type: :model do
         expect(bike.authorized_by_organization?(u: member)).to be_truthy
         expect(bike.authorized_by_organization?(u: member, org: new_membership.organization)).to be_falsey
         # It should be authorized for the owner, but not be authorized_by_organization
-        expect(bike.authorized_for_user?(owner)).to be_truthy
+        expect(bike.authorized?(owner)).to be_truthy
         expect(bike.authorized_by_organization?(u: owner)).to be_falsey # Because this bike is authorized by owning it, not organization
         expect(bike.authorized_by_organization?(u: member)).to be_truthy # Sanity check - we haven't broken this
         # And it isn't authorized for a random user or a random org
         expect(bike.authorized_by_organization?(u: user)).to be_falsey
         expect(bike.authorized_by_organization?(u: user, org: organization)).to be_falsey
         expect(bike.authorized_by_organization?(org: Organization.new)).to be_falsey
-        expect(bike.authorized_for_user?(user)).to be_falsey
+        expect(bike.authorized?(user)).to be_falsey
         expect(bike.authorize_and_claim_for_user(user)).to be_falsey
         # Also test the post-claim authorization
         bike.authorize_and_claim_for_user(owner)
-        expect(bike.authorized_for_user?(owner)).to be_truthy
+        expect(bike.authorized?(owner)).to be_truthy
         expect(bike.authorized_by_organization?(u: owner)).to be_falsey # Also doesn't work for user if bike is claimed
       end
       context "claimed" do
@@ -392,7 +407,7 @@ RSpec.describe Bike, type: :model do
         it "returns false" do
           expect(bike.organizations.pluck(:id)).to eq([organization.id])
           expect(bike.editable_organizations).to eq([])
-          expect(bike.authorized_for_user?(member)).to be_falsey
+          expect(bike.authorized?(member)).to be_falsey
           expect(member.authorized?(bike)).to be_falsey
           expect(bike.authorized_by_organization?).to be_falsey
           expect(bike.organized?).to be_truthy
@@ -404,7 +419,7 @@ RSpec.describe Bike, type: :model do
           it "returns true" do
             expect(bike.owner).to eq owner
             expect(bike.editable_organizations.pluck(:id)).to eq([organization.id])
-            expect(bike.authorized_for_user?(member)).to be_truthy
+            expect(bike.authorized?(member)).to be_truthy
             expect(member.authorized?(bike)).to be_truthy
             expect(bike.authorized_by_organization?).to be_truthy
             expect(bike.claimed?).to be_truthy
@@ -422,7 +437,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.owner).to eq user
           expect(bike.ownerships.count).to eq 2
           expect(bike.authorized_by_organization?).to be_falsey
-          expect(bike.authorized_for_user?(member)).to be_falsey
+          expect(bike.authorized?(member)).to be_falsey
           expect(bike.authorize_and_claim_for_user(member)).to be_falsey
           expect(bike.claimed?).to be_falsey
         end
@@ -435,7 +450,7 @@ RSpec.describe Bike, type: :model do
             expect(bike.ownerships.count).to eq 2
             expect(bike.authorized_by_organization?).to be_truthy
             expect(bike.authorized_by_organization?(org: organization)).to be_truthy
-            expect(bike.authorized_for_user?(member)).to be_truthy
+            expect(bike.authorized?(member)).to be_truthy
             expect(bike.authorize_and_claim_for_user(member)).to be_truthy
             expect(bike.claimed?).to be_falsey
           end
@@ -444,7 +459,7 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "authorized_by_organization" do
+  describe "authorized_by_organization?" do
     let(:user) { FactoryBot.create(:user) }
     let(:organization) { FactoryBot.create(:organization) }
     let!(:organization_member) { FactoryBot.create(:organization_member, organization: organization) }
@@ -466,6 +481,63 @@ RSpec.describe Bike, type: :model do
       expect(bike.authorized_by_organization?(u: organization_member, org: organization2)).to be_truthy
       # Also, if passed a user, the user must be a member of the organization that was passed
       expect(bike.authorized_by_organization?(u: FactoryBot.create(:user), org: organization2)).to be_falsey
+    end
+  end
+
+  describe "impound" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let(:organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: "impound_bikes") }
+    let(:user) { FactoryBot.create(:organization_member, organization: organization) }
+    it "impounds the bike, returns record" do
+      expect(bike.impound(user, organization: organization)).to be_truthy
+      bike.reload
+      expect(bike.impounded?).to be_truthy
+    end
+    context "bike impounded by same organization" do
+      let(:user2) { FactoryBot.create(:organization_member, organization: organization) }
+      let!(:impound_record) { FactoryBot.create(:impound_record, bike: bike, user: user2, organization: organization) }
+      it "returns true, doesn't create a new record" do
+        expect(bike.impounded?).to be_truthy
+        expect(bike.impound(user, organization: organization)).to be_truthy
+        bike.reload
+        expect(bike.impounded?).to be_truthy
+        expect(bike.impound_records.count).to eq 1
+        expect(bike.impound_records.first.user).to eq user2
+      end
+    end
+    context "passed organization user isn't permitted for" do
+      let(:organization2) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: "impound_bikes") }
+      it "returns with an error" do
+        impound_record = bike.impound(user, organization: organization2)
+        expect(impound_record.valid?).to be_falsey
+        expect(impound_record.errors.full_messages.to_s).to match(/permission/)
+        bike.reload
+        expect(bike.impound_records.count).to eq 0
+      end
+    end
+    context "bike impounded by different organization" do
+      let(:organization2) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: "impound_bikes") }
+      let(:user2) { FactoryBot.create(:organization_member, organization: organization2) }
+      let!(:impound_record) { bike.impound(user2) }
+      it "returns with an error" do
+        expect(impound_record.organization).to eq organization2
+        expect(bike.impounded?).to be_truthy
+        impound_record2 = bike.impound(user, organization: organization)
+        expect(impound_record2.valid?).to be_falsey
+        expect(impound_record2.errors.full_messages.to_s).to match(/already/)
+        bike.reload
+        expect(bike.impound_records.count).to eq 1
+      end
+    end
+    context "user not permitted" do
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      it "returns with an error" do
+        impound_record = bike.impound(user, organization: organization)
+        expect(impound_record.valid?).to be_falsey
+        expect(impound_record.errors.full_messages.to_s).to match(/permission/)
+        bike.reload
+        expect(bike.impound_records.count).to eq 0
+      end
     end
   end
 
@@ -568,19 +640,6 @@ RSpec.describe Bike, type: :model do
     it "is false otherwise" do
       bike = Bike.new(hidden: true)
       expect(bike.user_hidden).to be_falsey
-    end
-  end
-
-  describe "fake_deleted" do
-    it "is true if bike is hidden and ownership is user hidden" do
-      bike = Bike.new(hidden: true)
-      ownership = Ownership.new(user_hidden: true)
-      allow(bike).to receive(:current_ownership).and_return(ownership)
-      expect(bike.fake_deleted).to be_falsey
-    end
-    it "is false otherwise" do
-      bike = Bike.new(hidden: true)
-      expect(bike.fake_deleted).to be_truthy
     end
   end
 
@@ -793,16 +852,9 @@ RSpec.describe Bike, type: :model do
 
   describe "pg search" do
     it "returns a bike which has a matching part of its description" do
-      @bike = FactoryBot.create(:bike, description: "Phil wood hub")
-      @bikes = Bike.text_search("phil wood hub")
-      expect(@bikes).to include(@bike)
-    end
-
-    it "returns the bikes in the default scope pattern if there is no query" do
       bike = FactoryBot.create(:bike, description: "Phil wood hub")
       FactoryBot.create(:bike)
-      bikes = Bike.text_search("")
-      expect(bikes.first).to eq(bike)
+      expect(Bike.text_search("phil wood hub").pluck(:id)).to eq([bike.id])
     end
   end
 
@@ -1109,10 +1161,10 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "get_listing_order" do
+  describe "calculated_listing_order" do
     let(:bike) { Bike.new }
     it "is 1/1000 of the current timestamp" do
-      expect(bike.get_listing_order).to eq(Time.current.to_i / 1000000)
+      expect(bike.calculated_listing_order).to eq(Time.current.to_i / 1000000)
     end
 
     it "is the current stolen record date stolen * 1000" do
@@ -1121,14 +1173,14 @@ RSpec.describe Bike, type: :model do
       yesterday = Time.current - 1.days
       allow(stolen_record).to receive(:date_stolen).and_return(yesterday)
       allow(bike).to receive(:current_stolen_record).and_return(stolen_record)
-      expect(bike.get_listing_order).to eq(yesterday.to_time.to_i)
+      expect(bike.calculated_listing_order).to eq(yesterday.to_time.to_i)
     end
 
     it "is the updated_at" do
       last_week = Time.current - 7.days
       bike.updated_at = last_week
       allow(bike).to receive(:stock_photo_url).and_return("https://some_photo.cum")
-      expect(bike.get_listing_order).to eq(last_week.to_time.to_i / 10000)
+      expect(bike.calculated_listing_order).to eq(last_week.to_time.to_i / 10000)
     end
 
     context "problem date" do
@@ -1245,6 +1297,59 @@ RSpec.describe Bike, type: :model do
     it "returns the normalized name" do
       normalized_name = PropulsionType.new(bike.propulsion_type).name
       expect(bike.propulsion_type_name).to eq(normalized_name)
+    end
+  end
+
+  describe "#alert_image_url" do
+    context "given no current_stolen_record" do
+      it "returns nil" do
+        bike = FactoryBot.create(:bike, :with_image, current_stolen_record: nil)
+        expect(bike.alert_image_url).to be_nil
+      end
+    end
+
+    context "given no public images" do
+      it "returns nil" do
+        bike = FactoryBot.create(:bike)
+        stolen_record = FactoryBot.create(:stolen_record, bike: bike)
+        bike.update(current_stolen_record: stolen_record)
+        expect(bike.current_stolen_record).to be_present
+        expect(bike.public_images).to be_empty
+        expect(bike.alert_image_url).to be_nil
+      end
+    end
+
+    context "given a current_stolen_record and public bike images" do
+      it "returns the alert_image url" do
+        bike = FactoryBot.create(:stolen_bike, :with_image)
+        expect(bike.alert_image_url).to match(%r{https?://.+/bike-#{bike.id}.jpg})
+      end
+    end
+  end
+
+  describe "#registration_location" do
+    context "given a registration address with no state" do
+      it "returns an empty string" do
+        bike = FactoryBot.create(:bike)
+        allow(bike).to receive(:registration_address).and_return({ "city": "New Paltz" })
+        expect(bike.registration_location).to eq("")
+      end
+    end
+
+    context "given a registration address only a state" do
+      it "returns the state" do
+        bike = FactoryBot.create(:bike)
+        allow(bike).to receive(:registration_address).and_return({ "state": "ny" })
+        expect(bike.registration_location).to eq("NY")
+      end
+    end
+
+    context "given a registration address with a city and state" do
+      it "returns the city and state" do
+        bike = FactoryBot.create(:bike)
+        allow(bike).to receive(:registration_address).and_return({ "state": "ny", city: "New York" })
+        expect(bike.registration_location).to eq("New York, NY")
+      end
     end
   end
 end

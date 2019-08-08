@@ -1,6 +1,5 @@
 class Admin::StolenBikesController < Admin::BaseController
-  before_filter :find_bike, only: [:edit, :destroy, :approve, :update]
-  layout "new_admin"
+  before_filter :find_bike, only: [:edit, :destroy, :approve, :update, :regenerate_alert_image]
 
   def index
     if params[:unapproved]
@@ -21,6 +20,11 @@ class Admin::StolenBikesController < Admin::BaseController
     redirect_to edit_admin_stolen_bike_url(@bike), notice: "Bike was approved."
   end
 
+  def regenerate_alert_image
+    @bike.current_stolen_record.generate_alert_image
+    redirect_to edit_admin_stolen_bike_url(@bike), notice: "Promoted alert images regenerated."
+  end
+
   def show
     redirect_to edit_admin_stolen_bike_url
   end
@@ -28,6 +32,8 @@ class Admin::StolenBikesController < Admin::BaseController
   def edit
     @customer_contact = CustomerContact.new(user_email: @bike.owner_email)
     @bike = @bike.decorate
+    @alert_image_versions =
+      @bike&.current_stolen_record&.current_alert_image&.image&.versions || []
   end
 
   def update

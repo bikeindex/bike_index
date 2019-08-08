@@ -20,9 +20,8 @@ class OwnershipCreator
     @user_id ||= User.fuzzy_email_find(@bike.owner_email)&.id
   end
 
+  # TODO: Rails 5 update - switch this to an after commit callback
   def send_notification_email(ownership)
-    return true if ownership.example
-    return true unless ownership.send_email
     EmailOwnershipInvitationWorker.perform_in(5.seconds, ownership.id)
   end
 

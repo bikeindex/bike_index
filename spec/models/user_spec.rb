@@ -164,6 +164,30 @@ RSpec.describe User, type: :model do
       expect(organization_member.authorized?(bike)).to be_truthy
       expect(organization_member.authorized?(organization)).to be_truthy
     end
+    context "bike_code" do
+      let(:organization2) { FactoryBot.create(:organization) }
+      let(:organization2_member) { FactoryBot.create(:organization_member, organization: organization2) }
+      let(:owner) { ownership.creator }
+      let!(:bike_organization) { FactoryBot.create(:bike_organization, bike: bike, organization: organization2, can_edit_claimed: true) }
+      let(:bike_code) { FactoryBot.create(:bike_code_claimed, bike: bike) }
+      it "is truthy for admins and org members and code claimer" do
+        # Sanity check bike authorization
+        expect(bike.authorized?(user)).to be_falsey
+        expect(bike.authorized?(owner)).to be_truthy
+        expect(bike.authorized?(organization_member)).to be_truthy
+        expect(bike.authorized?(admin)).to be_truthy
+        # Check user authorization
+        expect(user.authorized?(bike)).to be_falsey
+        expect(owner.authorized?(bike)).to be_truthy
+        expect(organization_member.authorized?(bike)).to be_truthy
+        expect(admin.authorized?(bike)).to be_truthy
+        # Check bike code authorization
+        expect(bike_code.authorized?(user)).to be_falsey
+        expect(bike_code.authorized?(owner)).to be_truthy
+        expect(bike_code.authorized?(organization_member)).to be_truthy
+        expect(bike_code.authorized?(admin)).to be_truthy
+      end
+    end
   end
 
   describe "fuzzy finds" do
