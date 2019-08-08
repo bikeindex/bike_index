@@ -111,15 +111,6 @@
                   - if bike.creation_state.bulk_import.ascend?
                     %small
                       Ascend
-          %tr
-            %td
-              Deleted at
-            - if bike.deleted_at.present?
-              %td.convertTime
-                = l bike.deleted_at, format: :convert_time
-            - else
-              %td
-                Bike not deleted
   - if stolen_record.present?
     %h4.mt-2
       %span.text-danger
