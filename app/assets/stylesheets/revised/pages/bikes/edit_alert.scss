@@ -68,20 +68,28 @@
       background: $blue;
     }
 
+    .selection-preview {
+      margin-bottom: 4rem;
+    }
+
     .selection-preview-image-template {
       background-image: image-url('promoted_alerts/facebook-template.png');
       background-size: cover;
-      height: 225px;
-      margin-bottom: 4rem;
-      padding: 13px 0;
+      margin: auto;
+      max-width: 420px;
+      padding: 13px 0 13px 40px;
       position: relative;
+      vertical-align: middle;
+      width: auto;
     }
 
     .selection-preview-image {
-      height: 90%;
-      left: 42px;
-      position: absolute;
-      width: 90%;
+      display: inline-block;
+      vertical-align: middle;
+
+      img {
+        max-width: 300px;
+      }
     }
 
     .selection-preview-caption {
