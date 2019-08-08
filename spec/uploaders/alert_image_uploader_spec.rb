@@ -18,17 +18,13 @@ RSpec.describe AlertImageUploader do
   end
 
   context "given a valid bike image" do
-    let(:bike_with_valid_image) do
-      FactoryBot.create(:stolen_bike).tap do |bike|
-        FactoryBot.create(:public_image, imageable: bike, image: valid_image)
-      end
-    end
-
+    # define in a let in order to close file handler during teardown
     let(:valid_image) { File.open(Rails.root.join("app/assets/images/pandabike.jpg"), "r") }
     after(:each) { valid_image.close }
 
     it "generates landscape variant" do
-      stolen_record = FactoryBot.create(:stolen_record, bike: bike_with_valid_image)
+      image = FactoryBot.create(:public_image, :for_stolen_bike, image: valid_image)
+      stolen_record = image.imageable.current_stolen_record
       image_uploader = stolen_record.bike_main_image.image
 
       image_path = image_uploader.manipulate! { |img| img }
