@@ -14,5 +14,9 @@ FactoryBot.define do
       public_image.image = File.open(ApplicationUploader.cache_dir.join(filename), "w+")
       public_image.save
     end
+
+    trait :for_stolen_bike do
+      imageable { FactoryBot.create(:stolen_bike) }
+    end
   end
 end
