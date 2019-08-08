@@ -5,7 +5,7 @@ RSpec.describe AlertImageUploader do
   include CarrierWave::Test::Matchers
 
   context "given a non-image or invalid base image" do
-    it "raises AlertImageGeneratorError" do
+    it "raises CarrierWave::ProcessingError" do
       stolen_record = FactoryBot.create(:stolen_record, :with_bike_image)
 
       image_assignment = -> do
