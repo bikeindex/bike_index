@@ -66,6 +66,7 @@ RSpec.describe RegistrationsController, type: :controller do
       context "with user" do
         let!(:organization_child) { FactoryBot.create(:organization, parent_organization_id: organization.id) }
         it "renders, testing variables" do
+          organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
           set_current_user(user)
           get :embed, organization_id: organization.id, stolen: true, select_child_organization: true
           expect_it_to_render_correctly
