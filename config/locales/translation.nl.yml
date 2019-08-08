@@ -3142,7 +3142,7 @@ nl:
         en instagram zodat we je terug kunnen volgen!
       get_bike_shops_signed_up_for_bike_index_u: Laat fietsenwinkels zich aanmelden
         bij Bike Index door gebruik te maken van een van onze
-      give_you_shoutouts_on_social_media: " "
+      give_you_shoutouts_on_social_media: Geef een shoutout op social media
       here: hier.
       how_it_works: Hoe het werkt
       join_our_list_of_ambassadors_and_advocate: Word lid van onze lijst van ambassadeurs
@@ -3157,20 +3157,34 @@ nl:
       share_bike_index_on_social_channels_inclu: Deel Bike Index op social media kanalen
         - inclusief Facebook fietsgroepen in jouw regio.
       start_here: Begin hier!
-      to_become_a_bike_index_ambassador_fill_ou: 
-      typical_ambassador_activities: 
-      typical_ambassador_activities_include: 
-      view_current_ambassadors: 
-      want_to_help_fight_bike_theft_in_your_com: 
-      we_provide_you_with_the_resources_to_make: 
-      why_work_with_bike_index: 
-      you_bring_the_ideas_make_the_connections_: 
+      to_become_a_bike_index_ambassador_fill_ou: Vul de bovenstaande applicatie in
+        om ambassadeur bij Bike Index te worden. Als we de aanvraag goedkeuren - en
+        waarom zouden wij dat niet doen?! - Dan hoef je ons alleen nog maar te verbinden
+        met je lokale fietsorganisaties. Er is geen organisatie van tafel, dus wees
+        creatief.
+      typical_ambassador_activities: 'Typische ambassadeursactiviteiten '
+      typical_ambassador_activities_include: 'Typische ambassadeursactiviteiten zijn
+        onder meer:'
+      view_current_ambassadors: Bekijk de huidige ambassadeurs
+      want_to_help_fight_bike_theft_in_your_com: Wil je helpen bij het bestrijden
+        van fietsendiefstal in jouw omgeving?
+      we_provide_you_with_the_resources_to_make: 'Wij bieden je de middelen om Bike
+        Index tot een realiteit te maken in jouw omgeving. Elk niveau van ambassadeurschap
+        ontvangt het volgende:'
+      why_work_with_bike_index: Waarom samenwerken met Bike Index?
+      you_bring_the_ideas_make_the_connections_: Jij brengt de ideeën, maakt verbindingen
+        en wij zorgen ervoor dat je over de middelen beschikt om dingen voor elkaar
+        te krijgen.
     ascend:
-      ascend_knowledge_base_article: 
-      automatic_bicycle_registration: 
-      email_shops_html: 
-      email_us_the_password_to_finish_setting_u: 
-      follow_the_setup_instructions_html: 
+      ascend_knowledge_base_article: 'Ascend basis kennisartikel '
+      automatic_bicycle_registration: Automatische fietsregistratie voor fietsenwinkels
+        met behulp van Ascend POS
+      email_shops_html: E-mail %{shops_email_link} als je vragen hebt. Bedankt voor
+        het registreren van fietsen in Bike Index!
+      email_us_the_password_to_finish_setting_u: E-mail ons het wachtwoord om het
+        instellen af te ronden!
+      follow_the_setup_instructions_html: Volg de installatie-instructies <strong>%{ascend_link}</strong>
+        op Bike Index
       if_your_shop_uses_lightspeed_html: 
       link_your_ascend_retail_and_bike_index: 
       new_bike_shop_org: 
