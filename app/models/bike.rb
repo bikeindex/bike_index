@@ -211,7 +211,7 @@ class Bike < ActiveRecord::Base
   end
 
   def serial_display
-    return "Hidden" if recovered
+    return "Hidden" if abandoned
     return serial_number.humanize if no_serial?
     serial_number
   end
