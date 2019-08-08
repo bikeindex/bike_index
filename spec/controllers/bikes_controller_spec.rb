@@ -1069,7 +1069,7 @@ RSpec.describe BikesController, type: :controller do
           end
           context "recovered bike" do
             it "renders with recovered as first template, different description" do
-              bike.update_attributes(stolen: true, recovered: true)
+              bike.update_attributes(stolen: true, abandoned: true)
               bike.reload
               expect(bike.recovered).to be_truthy
 
