@@ -50,7 +50,7 @@
                   $
                 = srecord.number_field :estimated_value, min: '1', class: 'form-control'
 
-            - unless @bike.recovered?
+            - unless @bike.abandoned?
               .form-group.row.unnested-field.fancy-select-placeholder.unfancy
                 = srecord.label :locking_description, class:  'form-well-label'
                 .form-well-input
@@ -61,7 +61,7 @@
                   = srecord.select(:lock_defeat_description, StolenRecord.locking_defeat_description_select_options, prompt: '')
 
             .form-group.row.unnested-field
-              - description_label = @bike.recovered ? t(".how_did_you_recover", bike_type: @bike.type) : t(".description_of_the_incident")
+              - description_label = @bike.abandoned ? t(".how_did_you_recover", bike_type: @bike.type) : t(".description_of_the_incident")
 
               = srecord.label :theft_description, description_label, class:  'form-well-label'
               .form-well-input-large
