@@ -20,15 +20,8 @@ class BikeIndex.BikesEditAlert extends BikeIndex
 
   previewSelectedImage: ($selectedImage) =>
     selectedImageUrl = $selectedImage.data("image-url")
-    previewImage = "<img src='#{selectedImageUrl}' alt='alert image preview'>"
-
-    # ensure preview container is visible
-    $preview = @$imageSelectionContainer.find("#js-selection-preview")
-    $preview.removeClass("d-none")
-
-    # display / switch preview image
-    $previewImage = $preview.find("#js-selection-preview-image")
-    $previewImage.html(previewImage)
+    $previewImage = @$imageSelectionContainer.find("#js-selection-preview-image img")
+    $previewImage.attr("src", selectedImageUrl)
 
   setSelectedImageId: ($selectedImage) =>
     selectedImageId = $selectedImage.data("image-id")
