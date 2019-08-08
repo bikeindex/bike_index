@@ -25,6 +25,8 @@ fi
 echo bundle exec rake translation:sync
 bundle exec rake translation:sync prepare_translations
 
+echo changes >> README.markdown
+
 output "${YELLOW}" "Stashing translation.io timestamp file"
 set -x
 git stash -- config/locales/.translation_io
