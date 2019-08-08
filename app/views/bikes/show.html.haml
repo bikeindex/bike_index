@@ -37,13 +37,13 @@
       %h1
         - if @bike.stolen
           %strong.stolen
-            = t(".recovered") if @bike.recovered
+            = t(".recovered") if @bike.abandoned
             = t(".stolen")
         = @bike.title_u
       - if @bike.stolen && @stolen_record.present?
         %p
           %strong
-            - if @bike.recovered
+            - if @bike.abandoned
               = t(".recovered")
             - else
               = t(".stolen")
@@ -95,7 +95,7 @@
         %ul.attr-list.split-sm
           = @bike.attr_list_item(@bike.serial_display, t(".serial"), with_colon: true)
 
-          - unless @bike.recovered
+          - unless @bike.abandoned
             = @bike.attr_list_item(@bike.additional_registration, t(".other_serial"), with_colon: true)
           - unless @bike.type == 'bike'
             = @bike.attr_list_item(@bike.type.titleize, t(".cycle_type"), with_colon: true)
@@ -132,7 +132,7 @@
             = @bike.description
         - if @bike.stolen && @stolen_record.present?
           %h3
-            = t(".theft_details", bike_recovered: @bike.recovered ? 'Recovery' : 'Theft')
+            = t(".theft_details", bike_recovered: @bike.abandoned ? 'Recovery' : 'Theft')
           .row
             - if @bike.current_stolen_record.latitude.present?
               = render 'stolen_map'
@@ -141,7 +141,7 @@
                 = @bike.attr_list_item(@stolen_record.address(skip_default_country: true), t(".location"))
                 = @bike.attr_list_item(@stolen_record.locking_description, t(".locking_description"))
                 = @bike.attr_list_item(@stolen_record.lock_defeat_description, t(".locking_circumvented"))
-                - stolen_type = @bike.recovered ? 'recovered' : 'stolen'
+                - stolen_type = @bike.abandoned ? 'recovered' : 'stolen'
                 = @bike.attr_list_item((l @stolen_record.date_stolen, format: :dotted), t(".date_stolen_type", stolen_type: stolen_type))
                 = @bike.attr_list_item(@stolen_record.police_report_number, t(".police_report"))
                 = @bike.attr_list_item(@stolen_record.police_report_department, t(".department_city"))
@@ -201,7 +201,7 @@
               = t(".know_something_about_this_bike_type", bike_type: @bike.type)
           %h3
             = t(".contact_the_owner")
-          - if @bike.recovered
+          - if @bike.abandoned
             %p
               = t(".is_this_your_bike_send_proof_of_ownership")
           - redirect = new_session_url(return_to: "bikes/#{@bike.id}?contact_owner=true") unless current_user.present?

@@ -19,7 +19,7 @@
             %h3= @edit_templates[@edit_template]
 
           -# Helper text display
-          - stolen_type = @bike.abandoned? t(".recovered") : t(".stolen")
+          - stolen_type = @bike.abandoned ? t(".recovered") : t(".stolen")
           = f.fields_for :stolen_records do |srecord|
             - next unless srecord.object.current # Because they may have multiple stolen records
 
