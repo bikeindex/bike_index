@@ -99,15 +99,19 @@ class AlertImageGenerator
       alert.font caption_font
 
       # Overlay bike url within lower border
-      alert.gravity "South"
-      alert.pointsize 50
-      alert.draw "text 0,25 '#{bike_url}'"
+      if bike_url.present?
+        alert.gravity "South"
+        alert.pointsize 50
+        alert.draw "text 0,25 '#{bike_url}'"
+      end
 
       # Overlay bike location on RHS of top border
-      alert.gravity "Northeast"
-      alert.pointsize 110
-      alert.size "x#{header_height}"
-      alert.draw "text 30,30 '#{bike_location}'"
+      if bike_location.present?
+        alert.gravity "Northeast"
+        alert.pointsize 110
+        alert.size "x#{header_height}"
+        alert.draw "text 30,30 '#{bike_location}'"
+      end
     end
 
     alert_image
@@ -129,6 +133,7 @@ class AlertImageGenerator
 
   # The bike url to be displayed on the promoted alert image
   def bike_url
+    return if bike&.id.blank?
     "bikeindex.org/bikes/#{bike.id}"
   end
 
