@@ -361,7 +361,7 @@ CREATE TABLE public.bikes (
     frame_size character varying(255),
     frame_size_unit character varying(255),
     pdf character varying(255),
-    abandoned boolean DEFAULT false NOT NULL,
+    recovered boolean DEFAULT false NOT NULL,
     paint_id integer,
     registered_new boolean,
     example boolean DEFAULT false NOT NULL,
@@ -4532,6 +4532,4 @@ INSERT INTO schema_migrations (version) VALUES ('20190806155914');
 INSERT INTO schema_migrations (version) VALUES ('20190806170520');
 
 INSERT INTO schema_migrations (version) VALUES ('20190806214815');
-
-INSERT INTO schema_migrations (version) VALUES ('20190807175348');
 
