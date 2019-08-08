@@ -32,13 +32,16 @@
 
                   .image-selection-container#js-select-image-container
                     %ul
-                      - @bike.public_images.each do |image|
-                        %li.js-image-select{"data-image-url" => image.image_url(:medium), "data-image-id" => image.id}
+                      - @bike.public_images.each_with_index do |image, i|
+                        = content_tag "li",
+                          class: (i.zero? ? "selected js-image-select" : "js-image-select"),
+                          data: {"image-url" => image.image_url(:medium), "image-id" => image.id} do
                           = image_tag image.image_url(:medium)
-                    .text-center.w-100.d-none#js-selection-preview
+                    .text-center.w-100#js-selection-preview
                       %h5= t(".preview")
                       .selection-preview-image-template
                         .selection-preview-image#js-selection-preview-image
+                          = image_tag @bike.public_images.first.image_url(:medium)
                         .selection-preview-caption
                           -# Fall back to "City, State" as a nudge to add
                           -# location info to stolen record
