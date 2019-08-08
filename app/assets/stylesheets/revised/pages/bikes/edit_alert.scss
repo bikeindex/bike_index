@@ -77,7 +77,7 @@
       background-size: cover;
       margin: auto;
       max-width: 420px;
-      padding: 13px 0 13px 40px;
+      padding: 13px 0 13px 36px;
       position: relative;
       vertical-align: middle;
       width: auto;
@@ -86,9 +86,10 @@
     .selection-preview-image {
       display: inline-block;
       vertical-align: middle;
+      width: 100%;
 
       img {
-        max-width: 300px;
+        max-width: 95%;
       }
     }
 
