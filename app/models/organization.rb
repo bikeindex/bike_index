@@ -209,7 +209,7 @@ class Organization < ActiveRecord::Base
       self.slug = new_slug
     end
     self.access_token ||= SecurityTokenizer.new_token
-    self.child_ids = calculated_child_ids
+    self.child_ids = calculated_children.pluck(:id)
     set_auto_user
     set_ambassador_organization_defaults if ambassador?
     locations.each { |l| l.save unless l.shown == allowed_show }
@@ -283,12 +283,10 @@ class Organization < ActiveRecord::Base
   def update_associations
     return true if skip_update
     parent_organization&.update_attributes(updated_at: Time.now, skip_update: true)
-    actual_children.each { |o| o.update_attributes(updated_at: Time.current, skip_update: true) }
+    calculated_children.each { |o| o.update_attributes(updated_at: Time.current, skip_update: true) }
   end
 
   private
-
-  def calculated_child_ids; calculated_children.pluck(:id) end
 
   def set_ambassador_organization_defaults
     self.show_on_map = false

@@ -174,10 +174,12 @@ RSpec.describe Organization, type: :model do
       expect(organization_child.is_paid).to be_falsey
       organization_child.update_attributes(parent_organization: organization)
       organization_child.reload
+      organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
       expect(organization_child.is_paid).to be_truthy
       expect(organization_child.current_invoices.first).to eq invoice
       expect(organization_child.paid_feature_slugs).to eq(["csv_exports"])
       expect(organization_child.paid_for?("csv_exports")).to be_truthy # It also checks for the full name version
+      expect(organization.child_ids).to eq([organization_child.id])
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
     end
     context "messages" do
