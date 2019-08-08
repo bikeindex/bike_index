@@ -23,22 +23,22 @@ RSpec.describe OwnershipCreator do
       end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
     end
 
-    it "does not send a notification email for example bikes" do
+    it "enqueues a notification email for example bikes (worker handles not sending)" do
       ownership = Ownership.new
       allow(ownership).to receive(:id).and_return(2)
       allow(ownership).to receive(:example).and_return(true)
       expect do
         OwnershipCreator.new.send_notification_email(ownership)
-      end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
+      end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
     end
 
-    it "does not send a notification email for ownerships with no_email set" do
+    it "enqueues a notification email for ownerships with no_email set (worker handles not sending" do
       ownership = Ownership.new
       allow(ownership).to receive(:id).and_return(2)
       allow(ownership).to receive(:send_email).and_return(false)
       expect do
         OwnershipCreator.new.send_notification_email(ownership)
-      end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(0)
+      end.to change(EmailOwnershipInvitationWorker.jobs, :size).by(1)
     end
   end
 

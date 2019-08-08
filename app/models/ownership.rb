@@ -14,10 +14,11 @@ class Ownership < ActiveRecord::Base
   default_scope { order(:created_at) }
   scope :current, -> { where(current: true) }
 
-  before_save :normalize_email
+  before_save :set_calculated_attributes
 
-  def normalize_email
+  def set_calculated_attributes
     self.owner_email = EmailNormalizer.normalize(owner_email)
+    true # TODO: Rails 5 update
   end
 
   def first?; bike&.ownerships&.reorder(:created_at)&.first&.id == id end
@@ -43,5 +44,12 @@ class Ownership < ActiveRecord::Base
 
   def claimable_by?(u)
     u == User.fuzzy_email_find(owner_email) || u == user
+  end
+
+  def calculated_send_email
+    return false if !send_email || bike.blank? || bike.example?
+    # Unless this is the first ownership for a bike with a creation organization, it's good to send!
+    return true unless bike.creation_organization.present? && first?
+    !bike.creation_organization.paid_for?("skip_ownership_email")
   end
 end
