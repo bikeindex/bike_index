@@ -282,7 +282,7 @@ class Organization < ActiveRecord::Base
 
   def update_associations
     return true if skip_update
-    parent_organization&.update_attributes(updated_at: Time.now, skip_update: true)
+    parent_organization&.update_attributes(updated_at: Time.current, skip_update: true)
     calculated_children.each { |o| o.update_attributes(updated_at: Time.current, skip_update: true) }
   end
 

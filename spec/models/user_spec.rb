@@ -661,6 +661,7 @@ RSpec.describe User, type: :model do
       let(:organization_child) { FactoryBot.create(:organization, parent_organization: organization) }
       let!(:user_child) { FactoryBot.create(:organization_member, organization: organization_child) }
       it "returns true" do
+        organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
         organization.reload
         expect(organization.child_organizations).to eq([organization_child])
         expect(user.member_of?(organization)).to be_truthy

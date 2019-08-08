@@ -11,21 +11,21 @@ RSpec.describe UpdateExpiredInvoiceWorker, type: :lib do
 
   describe "perform" do
     let(:invoice_active) { FactoryBot.create(:invoice_paid) }
-    let(:invoice_active_updated_at) { Time.now - 1.day }
+    let(:invoice_active_updated_at) { Time.current - 1.day }
     let(:organization1) { invoice_active.organization }
-    let(:invoice_expired) { FactoryBot.create(:invoice_paid, start_at: Time.now - 2.weeks) }
+    let(:invoice_expired) { FactoryBot.create(:invoice_paid, start_at: Time.current - 2.weeks) }
     let(:organization2) { invoice_expired.organization }
     it "schedules all the workers" do
       invoice_active.update_column :updated_at, invoice_active_updated_at
       # TODO: Rails 5 update - after commit. Also done below below
-      organization1.update_attributes(updated_at: Time.now)
-      organization2.update_attributes(updated_at: Time.now)
+      organization1.update_attributes(updated_at: Time.current)
+      organization2.update_attributes(updated_at: Time.current)
       invoice_active.reload
       expect(invoice_active.updated_at).to be_within(1.second).of invoice_active_updated_at
       expect(organization1.is_paid).to be_truthy
       expect(organization1.current_invoices.first.paid_in_full?).to be_truthy
       # Manually make invoice expired
-      invoice_expired.update_column :subscription_end_at, Time.now - 1.day
+      invoice_expired.update_column :subscription_end_at, Time.current - 1.day
       invoice_expired.reload
       expect(invoice_expired.should_expire?).to be_truthy
       expect(invoice_expired.active?).to be_truthy
@@ -38,8 +38,8 @@ RSpec.describe UpdateExpiredInvoiceWorker, type: :lib do
       # TODO: Rails 5 update - after commit.
       organization1.reload
       organization2.reload
-      organization1.update_attributes(updated_at: Time.now)
-      organization2.update_attributes(updated_at: Time.now)
+      organization1.update_attributes(updated_at: Time.current)
+      organization2.update_attributes(updated_at: Time.current)
       invoice_active.reload
       invoice_expired.reload
       expect(organization1.is_paid).to be_truthy
