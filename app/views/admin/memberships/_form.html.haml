@@ -1,28 +1,26 @@
-= form_for [:admin, @membership] do |f|
-  - if @membership.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Membership", obj: @membership }
-  .form-group.fancy-select.unfancy
-    = f.label :organization
-    = collection_select :membership, :organization_id, @organizations, :id, :name, { include_blank: "Please select an organization" }, required: true,  class: "form-control w-25"
+.row
+  .col-md-4
+    = form_for [:admin, @membership] do |f|
+      - if @membership.errors.any?
+        = render partial: "/shared/errors", locals: { name: "Membership", obj: @membership }
+      .form-group.fancy-select.unfancy
+        = f.label :organization
+        = collection_select :membership, :organization_id, @organizations, :id, :name, { include_blank: "Please select an organization" }, required: true,  class: "form-control"
 
+      .form-group
+        = f.label :invited_email
+        = f.text_field :invited_email, required: true, class: "form-control"
 
-  .form-group
-    = f.label :invited_email
-    = f.text_field :invited_email, class: "form-control w-25"
+      .form-group
+        %label
+          Role
+        .form-check
+          %label
+            = f.radio_button :role, "admin", class: "form-check-input"
+            Admin of organization
+        .form-check
+          %label
+            = f.radio_button :role, "member", class: "form-check-input"
+            Member of organization
 
-  .form-group
-    %label
-      Role
-    .form-check
-      %label
-        = f.radio_button :role, "admin", class: "form-check-input"
-        Admin of organization
-    .form-check
-      %label
-        = f.radio_button :role, "member", class: "form-check-input"
-        Member of organization
-
-
-
-
-  = f.submit 'Save', class: 'btn btn-success'
+      = f.submit 'Save', class: 'btn btn-success'
