@@ -118,17 +118,10 @@ class AlertImageGenerator
   end
 
   # The bike location to be displayed on the promoted alert image
+  # Escape single-quotes: location is passed to Imagemagick CLI inside
+  # single-quotes
   def bike_location
-    location =
-      if stolen_record.address_location.present?
-        stolen_record.address_location
-      else
-        bike.registration_location
-      end
-
-    # escape single-quotes: location is passed to Imagemagick CLI inside
-    # single-quotes
-    location.gsub("'", "\\'")
+    stolen_record.bike_location&.gsub("'", "\\'")
   end
 
   # The bike url to be displayed on the promoted alert image

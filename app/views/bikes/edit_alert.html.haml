@@ -19,7 +19,30 @@
           = form_tag edit_bike_url(@bike), method: :get, id: "js-select-plan-form" do
             = hidden_field_tag :page, :alert_purchase
             = hidden_field_tag :selected_plan_id
+            = hidden_field_tag :selected_bike_image_id
             = hidden_field_tag :locale, params[:locale] if params[:locale].presence
+
+            .row
+              %h3.text-center.w-100= t(".select_an_image")
+              .col-sm-12
+                - if @bike.public_images.none?
+                  %p= t(".no_photos_add_photos_here_html", link: link_to(t(".here"), edit_bike_url(@bike, page: :photos)))
+                - else
+                  = t(".select_an_image_to_see_preview")
+
+                  .image-selection-container#js-select-image-container
+                    %ul
+                      - @bike.public_images.each do |image|
+                        %li.js-image-select{"data-image-url" => image.image_url(:medium), "data-image-id" => image.id}
+                          = image_tag image.image_url(:medium)
+                    .text-center.w-100.d-none#js-selection-preview
+                      %h5= t(".preview")
+                      .selection-preview-image-template
+                        .selection-preview-image#js-selection-preview-image
+                        .selection-preview-caption
+                          -# Fall back to "City, State" as a nudge to add
+                          -# location info to stolen record
+                          = @bike.current_stolen_record.bike_location || t(".city_state")
             .row
               %h3.text-center.w-100
                 = t(".select_plan")

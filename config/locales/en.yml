@@ -975,6 +975,16 @@ en:
       bike_index_can_help: >-
         Bike Index can help by purchasing targeted ads on Facebook to spread the word
         about your stolen %{bike_type}.
+      city_state: City, State
+      here: here
+      no_photos_add_photos_here_html: >-
+        Uh oh. We don't have any photos of your bike available. Upload one %{link}
+        to set up a promoted alert!
+      preview: Preview
+      select_an_image: Select an image
+      select_an_image_to_see_preview: >-
+        Select an image of your bike to see a preview of what your promoted alert
+        will look like:
       select_plan: Select Plan
       targeted_sharing_html: >-
         We've found targeted sharing on social media to have a <em>huge</em> effect
