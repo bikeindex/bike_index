@@ -18,7 +18,7 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def new
-    @membership = Membership.new
+    @membership = Membership.new(organization_id: current_organization&.id)
   end
 
   def edit
@@ -34,15 +34,7 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def create
-    user = User.fuzzy_email_find(params[:membership][:invited_email])
-    unless user.present?
-      flash[:error] = "User not found. Perhaps you should invite them instead?"
-      @membership = Membership.new
-      render action: :new and return
-    end
-    @membership = Membership.new(user_id: user.id,
-                                 organization_id: params[:membership][:organization_id],
-                                 role: params[:membership][:role])
+    @membership = Membership.new(permitted_parameters.merge(sender: current_user))
     if @membership.save
       flash[:success] = "Membership Created!"
       redirect_to admin_membership_url(@membership)

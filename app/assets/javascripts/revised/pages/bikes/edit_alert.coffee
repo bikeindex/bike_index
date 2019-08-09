@@ -2,11 +2,30 @@ class BikeIndex.BikesEditAlert extends BikeIndex
   constructor: ->
     super()
     @$planSelectionForm = $('#js-select-plan-form')
+    @$imageSelectionContainer = $('#js-select-image-container')
     @initializeEventListeners()
 
   initializeEventListeners: =>
     @$planSelectionForm.on "click", ".js-plan-select", (event) =>
       @highlightSelectedPlan(event)
+    @$imageSelectionContainer.on "click", ".js-image-select", (event) =>
+      $selectedImage = $(event.target).closest(".js-image-select")
+      @highlightSelectedImage($selectedImage)
+      @setSelectedImageId($selectedImage)
+      @previewSelectedImage($selectedImage)
+
+  highlightSelectedImage: ($selectedImage) =>
+    $allImages = $selectedImage.siblings(".js-image-select").removeClass("selected")
+    $selectedImage.addClass("selected")
+
+  previewSelectedImage: ($selectedImage) =>
+    selectedImageUrl = $selectedImage.data("image-url")
+    $previewImage = @$imageSelectionContainer.find("#js-selection-preview-image img")
+    $previewImage.attr("src", selectedImageUrl)
+
+  setSelectedImageId: ($selectedImage) =>
+    selectedImageId = $selectedImage.data("image-id")
+    @$planSelectionForm.find("#selected_bike_image_id").val(selectedImageId)
 
   highlightSelectedPlan: (event) =>
     third = event.target.offsetWidth / 3

@@ -2,14 +2,21 @@ require "rails_helper"
 
 RSpec.describe AlertImageGenerator do
   describe "#bike_url" do
-    it "returns a simplified url string to the given bike" do
-      stolen_record = FactoryBot.create(:stolen_record)
+    context "given a bike id" do
+      it "returns a simplified url string to the given bike" do
+        stolen_record = FactoryBot.create(:stolen_record)
+        generator = described_class.new(stolen_record: stolen_record, bike_image: nil)
+        expect(generator.bike_url).to eq("bikeindex.org/bikes/#{stolen_record.bike.id}")
+      end
+    end
 
-      generator = described_class.new(stolen_record: stolen_record,
-                                      bike_image: stolen_record.bike_main_image)
-
-      bike_id = stolen_record.bike.id
-      expect(generator.bike_url).to eq("bikeindex.org/bikes/#{bike_id}")
+    context "given no bike id" do
+      it "returns a simplified url string to the given bike" do
+        stolen_record = FactoryBot.create(:stolen_record)
+        stolen_record.update_attribute(:bike, nil)
+        generator = described_class.new(stolen_record: stolen_record, bike_image: nil)
+        expect(generator.bike_url).to be_nil
+      end
     end
   end
 
@@ -18,10 +25,7 @@ RSpec.describe AlertImageGenerator do
       it "returns the stolen record location" do
         stolen_record = FactoryBot.create(:stolen_record)
         allow(stolen_record).to receive(:address_location).and_return("City, State")
-
-        generator = described_class.new(stolen_record: stolen_record,
-                                        bike_image: stolen_record.bike_main_image)
-
+        generator = described_class.new(stolen_record: stolen_record, bike_image: nil)
         expect(generator.bike_location).to eq("City, State")
       end
     end
@@ -32,10 +36,7 @@ RSpec.describe AlertImageGenerator do
         allow(stolen_record).to receive(:address_location).and_return("")
         bike = stolen_record.bike
         allow(bike).to receive(:registration_location).and_return("Another City, State")
-
-        generator = described_class.new(stolen_record: stolen_record,
-                                        bike_image: stolen_record.bike_main_image)
-
+        generator = described_class.new(stolen_record: stolen_record, bike_image: nil)
         expect(generator.bike_location).to eq("Another City, State")
       end
     end

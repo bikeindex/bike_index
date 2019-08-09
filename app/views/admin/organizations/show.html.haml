@@ -275,6 +275,8 @@
       %small
         = number_with_delimiter(@organization.memberships.claimed.count)
         claimed
+        %small
+          = link_to "new membership", new_admin_membership_url(organization_id: @organization.to_param), class: "gray-link"
   .col-6.text-right
     = link_to "View all memberships", admin_memberships_path(organization_id: @organization.to_param)
 - if @organization.memberships.count > 0

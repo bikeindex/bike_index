@@ -23,7 +23,7 @@ if ! git branch --list | grep --silent "^* ${TRANSLATION_BRANCH}$"; then
 fi
 
 echo bundle exec rake translation:sync
-bundle exec rake translation:sync
+bundle exec rake translation:sync prepare_translations
 
 output "${YELLOW}" "Stashing translation.io timestamp file"
 set -x

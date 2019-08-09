@@ -40,7 +40,7 @@ class Organization < ActiveRecord::Base
   has_many :invoices
   has_many :payments
   has_many :bike_codes
-  has_many :child_organizations, class_name: "Organization", foreign_key: :parent_organization_id
+  has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :creation_states
   has_many :created_bikes, through: :creation_states, source: :bike
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other paid features
@@ -65,7 +65,7 @@ class Organization < ActiveRecord::Base
   before_validation :set_calculated_attributes
   after_commit :update_associations
 
-  attr_accessor :embedable_user_email, :lightspeed_cloud_api_key
+  attr_accessor :embedable_user_email, :lightspeed_cloud_api_key, :skip_update
 
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
@@ -120,6 +120,8 @@ class Organization < ActiveRecord::Base
   def ascend_imports?; ascend_name.present? end
 
   def parent?; paid_for?("child_organizations") end
+
+  def child_organizations; Organization.where(id: child_ids) end
 
   def mail_snippet_body(type)
     return nil unless MailSnippet.organization_snippet_types.include?(type)
@@ -195,7 +197,7 @@ class Organization < ActiveRecord::Base
     self.is_paid = current_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
-    self.paid_feature_slugs = calculated_paid_feature_slugs
+    self.paid_feature_slugs = current_invoices.feature_slugs
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, "")
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
@@ -207,6 +209,7 @@ class Organization < ActiveRecord::Base
       self.slug = new_slug
     end
     self.access_token ||= SecurityTokenizer.new_token
+    self.child_ids = calculated_children.pluck(:id)
     set_auto_user
     set_ambassador_organization_defaults if ambassador?
     locations.each { |l| l.save unless l.shown == allowed_show }
@@ -218,8 +221,6 @@ class Organization < ActiveRecord::Base
     self.embedable_user_email = users.first && users.first.email || ENV["AUTO_ORG_MEMBER"]
     save
   end
-
-  def child_ids; child_organizations.pluck(:id) end
 
   # Include parent invoice features serves as invoice
   def current_invoices; Invoice.where(organization_id: [id, parent_organization_id].compact).active end
@@ -280,15 +281,12 @@ class Organization < ActiveRecord::Base
   end
 
   def update_associations
-    parent_organization&.update_attributes(updated_at: Time.now)
+    return true if skip_update
+    parent_organization&.update_attributes(updated_at: Time.current, skip_update: true)
+    calculated_children.each { |o| o.update_attributes(updated_at: Time.current, skip_update: true) }
   end
 
   private
-
-  def calculated_paid_feature_slugs
-    slugs = current_invoices.feature_slugs
-    child_ids.any? ? slugs + ["child_organizations"] : slugs
-  end
 
   def set_ambassador_organization_defaults
     self.show_on_map = false

@@ -1,15 +1,15 @@
 require "rails_helper"
 
 RSpec.describe Ownership, type: :model do
-  describe "normalize_email" do
+  describe "set_calculated_attributes" do
     it "removes leading and trailing whitespace and downcase email" do
-      ownership = Ownership.new
-      allow(ownership).to receive(:owner_email).and_return("   SomE@dd.com ")
-      expect(ownership.normalize_email).to eq("some@dd.com")
+      ownership = Ownership.new(owner_email: "   SomE@dd.com ")
+      ownership.set_calculated_attributes
+      expect(ownership.owner_email).to eq("some@dd.com")
     end
 
     it "haves before save callback" do
-      expect(Ownership._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:normalize_email)).to eq(true)
+      expect(Ownership._save_callbacks.select { |cb| cb.kind.eql?(:before) }.map(&:raw_filter).include?(:set_calculated_attributes)).to eq(true)
     end
   end
 
@@ -91,6 +91,40 @@ RSpec.describe Ownership, type: :model do
     it "false if it can't be claimed by user" do
       ownership = Ownership.new(owner_email: "fake#{user.email.titleize}")
       expect(ownership.claimable_by?(user)).to be_falsey
+    end
+  end
+
+  describe "calculated_send_email" do
+    let(:bike) { Bike.new }
+    it "is true" do
+      expect(Ownership.new(bike: bike).calculated_send_email).to be_truthy
+    end
+    context "send email is false" do
+      it "is false" do
+        expect(Ownership.new(send_email: false, bike: bike).calculated_send_email).to be_falsey
+      end
+    end
+    context "example bike" do
+      let(:bike) { Bike.new(example: true) }
+      let(:ownership) { Ownership.new(bike: bike) }
+      it "is false" do
+        expect(ownership.calculated_send_email).to be_falsey
+      end
+    end
+    context "organization with paid feature of skip_ownership_email" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let!(:ownership) { FactoryBot.create(:ownership_organization_bike, organization: organization) }
+      let(:bike) { ownership.bike }
+      let(:ownership2) { FactoryBot.build(:ownership_organization_bike, organization: organization, bike: bike) }
+      it "returns false" do
+        organization.update_attribute :paid_feature_slugs, ["skip_ownership_email"]
+        ownership.reload
+        expect(ownership.first?).to be_truthy
+        expect(ownership.calculated_send_email).to be_falsey
+        ownership2.save
+        ownership2.reload
+        expect(ownership2.calculated_send_email).to be_truthy
+      end
     end
   end
 end
