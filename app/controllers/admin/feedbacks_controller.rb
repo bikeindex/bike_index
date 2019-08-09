@@ -11,7 +11,7 @@ class Admin::FeedbacksController < Admin::BaseController
 
   def show
     @feedback = Feedback.find(params[:id])
-    if @feedback.feedback_hash.include?("bike_id")
+    if @feedback&.feedback_hash.include?("bike_id")
       @bike = Bike.unscoped.find_by_id(@feedback.feedback_hash["bike_id"])
     end
   end
