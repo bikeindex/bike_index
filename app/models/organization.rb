@@ -292,8 +292,7 @@ class Organization < ActiveRecord::Base
   def calculated_paid_feature_slugs
     fslugs = current_invoices.feature_slugs
     return fslugs unless parent_organization_id.present?
-    (fslugs + current_parent_invoices.map(&:child_paid_feature_slugs).flatten)
-      .uniq
+    (fslugs + current_parent_invoices.map(&:child_paid_feature_slugs).flatten).uniq
   end
 
   def set_ambassador_organization_defaults
