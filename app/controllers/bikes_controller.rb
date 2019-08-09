@@ -28,9 +28,6 @@ class BikesController < ApplicationController
 
   def show
     @components = @bike.components
-    if @bike.deleted?
-      redirect_to user_home_path and return
-    end
     if @bike.stolen and @bike.current_stolen_record.present?
       # Show contact owner box on load - happens if user has clicked on it and then logged in
       @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
@@ -302,6 +299,8 @@ class BikesController < ApplicationController
         flash[:error] = "Bike deleted"
         redirect_to root_url and return
       end
+    elsif @bike.deleted?
+      redirect_to user_home_path and return
     end
   end
 
