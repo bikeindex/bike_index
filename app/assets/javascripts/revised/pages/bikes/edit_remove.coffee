@@ -16,8 +16,7 @@ class BikeIndex.BikesEditRemove extends BikeIndex
 
   requestDeleteRequestCallback: (data, success) ->
     if success
-      msg = 'Deleting your bike now. We delete all bikes by hand, it could take up to a day before your bike is gone. Thanks for your patience!'
-      window.BikeIndexAlerts.add('info', msg, window.pageScript.submitBikeEditForm)
+      msg = "Your bike's been deleted!"
     else
       msg = "Oh no! Something went wrong and we couldn't send the delete request."
       window.BikeIndexAlerts.add('error', msg)
@@ -33,4 +32,3 @@ class BikeIndex.BikesEditRemove extends BikeIndex
       response_callback = @requestDeleteRequestCallback
       new BikeIndex.SubmitUserRequest(data, response_callback)
     else
-      $('#request-delete .alert').slideDown('fast').removeClass('currently-hidden')

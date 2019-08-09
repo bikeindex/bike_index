@@ -298,7 +298,7 @@ class BikesController < ApplicationController
     rescue ActiveRecord::StatementInvalid => e
       fail e.to_s =~ /PG..NumericValueOutOfRange/ ? ActiveRecord::RecordNotFound : e
     end
-    if @bike.hidden
+    if @bike.hidden || @bike.deleted?
       unless current_user.present? && @bike.visible_by(current_user)
         flash[:error] = "Bike deleted"
         redirect_to root_url and return

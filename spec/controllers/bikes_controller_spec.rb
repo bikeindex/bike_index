@@ -280,6 +280,28 @@ RSpec.describe BikesController, type: :controller do
         expect(response.status).to eq(200)
       end
     end
+    context "bike is soft deleted" do
+      include_context :logged_in_as_user
+      it "redirects the user" do
+        bike.destroy
+        bike.reload
+        get :show, id: bike.id
+        expect(bike.deleted?).to be_truthy
+        expect(flash).to be_present
+        expect(response).to redirect_to(:root)
+      end
+      context "user is super_admin" do
+        include_context :logged_in_as_super_admin
+        it "shows the bike" do
+          bike.destroy
+          bike.reload
+          get :show, id: bike.id
+          expect(bike.deleted?).to be_truthy
+          expect(response.status).to eq(200)
+          expect(response).to render_template(:show)
+        end
+      end
+    end
   end
 
   describe "spokecard" do
