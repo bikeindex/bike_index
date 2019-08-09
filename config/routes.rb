@@ -83,7 +83,6 @@ Bikeindex::Application.routes.draw do
   end
 
   resources :ownerships, only: [:show]
-  resources :memberships, only: %i[update destroy]
 
   resources :stolen_notifications, only: %i[create new]
 

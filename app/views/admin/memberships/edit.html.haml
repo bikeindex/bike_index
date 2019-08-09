@@ -1,6 +1,61 @@
 %h1
   Editing Membership
+- if @membership.deleted?
+  %h2.text-danger.mb-4
+    Membership deleted
+    %span.convertTime.preciseTime
+      = l @membership.deleted_at, format: :convert_time
 
 
+.row
+  .col-md-6
+    %table.table-list
+      %tbody
+        %tr
+          %td
+            Sender
+          %td
+            - sender = @membership.sender
+            - if sender.present?
+              = link_to sender.display_name, admin_user_path(sender)
+            - else
+              %small.less-strong
+                self created
+        %tr
+          %td
+            Receiver
+          %td
+            - user = @membership.user
+            - if user.present?
+              = link_to user.display_name, admin_user_path(user)
+        %tr
+          %td
+            Created
+          %td
+            %span.convertTime.preciseTime
+              = l @membership.created_at, format: :convert_time
+        %tr
+          %td
+            Updated
+          %td
+            %span.convertTime.preciseTime
+              = l @membership.updated_at, format: :convert_time
+        %tr
+          %td
+            Claimed
+          %td
+            - if @membership.claimed_at.present?
+              %span.convertTime.preciseTime
+                = l @membership.claimed_at, format: :convert_time
+        %tr
+          %td
+            Emailed
+          %td
+            - if @membership.email_invitation_sent_at.present?
+              %span.convertTime.preciseTime
+                = l @membership.email_invitation_sent_at, format: :convert_time
 
-= render partial: 'form'
+  .col-md-4
+    = render partial: "form"
+    .mt-4.text-right
+      = link_to "Delete membership", admin_membership_path(@membership), method: :delete, data: { confirm: "Are you sure you want to delete this membership?" }, class: "btn btn-danger"

@@ -1,49 +1,48 @@
-.card.bg-light.p-4
-  = form_for [:admin, @paid_feature] do |f|
-    .row
-      .col-xs-12
-        - if @paid_feature.errors.any?
-          = render partial: "/shared/errors", locals: { name: "Paid feature", obj: @paid_feature }
+= form_for [:admin, @paid_feature] do |f|
+  .row
+    .col-xs-12
+      - if @paid_feature.errors.any?
+        = render partial: "/shared/errors", locals: { name: "Paid feature", obj: @paid_feature }
+  .row
+    .col-md-6.col-xs-12
+      .form-group
+        = f.label :kind
+        = f.select :kind, PaidFeature.kinds.map { |k| [k.humanize, k] }, {}, class: "form-control"
+    .col-md-6.col-xs-12
+      .form-group
+        = f.label :name
+        = f.text_field :name, class: "form-control"
+  - if current_user.developer?
     .row
       .col-md-6.col-xs-12
         .form-group
-          = f.label :kind
-          = f.select :kind, PaidFeature.kinds.map { |k| [k.humanize, k] }, {}, class: "form-control"
-      .col-md-6.col-xs-12
-        .form-group
-          = f.label :name
-          = f.text_field :name, class: "form-control"
-    - if current_user.developer?
-      .row
-        .col-md-6.col-xs-12
-          .form-group
-            = f.label :feature_slugs_string do
-              Paid Feature Slugs <small>comma delineated</small>
+          = f.label :feature_slugs_string do
+            Paid Feature Slugs <small>comma delineated</small>
 
-        = f.text_area :feature_slugs_string, style: "width: 100%;", class: "form-control"
-        %br
-        %small.less-strong
-          Used slugs:
-          - PaidFeature::EXPECTED_SLUGS.sort.each do |slug|
-            %code
-              = slug
-    .row
-      .col-md-6.col-xs-12
-        .form-group
-          = f.label :amount
-          .input-group.mb-2
-            .input-group-prepend
-              .input-group-text $
-            = f.number_field :amount, step: 1, min: 0, class: "form-control"
+      = f.text_area :feature_slugs_string, style: "width: 100%;", class: "form-control"
+      %br
+      %small.less-strong
+        Used slugs:
+        - PaidFeature::EXPECTED_SLUGS.sort.each do |slug|
+          %code
+            = slug
+  .row
+    .col-md-6.col-xs-12
+      .form-group
+        = f.label :amount
+        .input-group.mb-2
+          .input-group-prepend
+            .input-group-text $
+          = f.number_field :amount, step: 1, min: 0, class: "form-control"
 
-      .col-md-6.col-xs-12
-        .form-group
-          = f.label :description
-          = f.text_area :description, style: "width: 100%;", class: "form-control"
-    .row
-      .col-xs-12.col-md-6
-        .form-group
-          = f.label :details_link
-          = f.text_field :details_link, class: "form-control"
+    .col-md-6.col-xs-12
+      .form-group
+        = f.label :description
+        = f.text_area :description, style: "width: 100%;", class: "form-control"
+  .row
+    .col-xs-12.col-md-6
+      .form-group
+        = f.label :details_link
+        = f.text_field :details_link, class: "form-control"
 
-    = f.submit (@paid_feature.id.present? ? "Update" : "Create"), class: 'btn btn-success'
+  = f.submit (@paid_feature.id.present? ? "Update" : "Create"), class: 'btn btn-success'

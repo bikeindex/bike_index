@@ -1,5 +1,11 @@
-.row
-  .col-md-4
+.card
+  .card-body
+    - if @membership.id.present?
+      %h4.text-danger.mb-4
+        DANGER! Don't edit
+        %em
+          %br
+          It would be better to delete and re-add
     = form_for [:admin, @membership] do |f|
       - if @membership.errors.any?
         = render partial: "/shared/errors", locals: { name: "Membership", obj: @membership }
