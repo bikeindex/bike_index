@@ -194,10 +194,10 @@ class Organization < ActiveRecord::Base
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = (short_name || name).truncate(30)
-    self.is_paid = current_invoices.any?
+    self.is_paid = current_invoices.any? || current_parent_invoices.any?
     self.kind ||= "other" # We need to always have a kind specified - generally we catch this, but just in case...
     # For now, just use them. However - nesting organizations probably need slightly modified paid_feature slugs
-    self.paid_feature_slugs = current_invoices.feature_slugs
+    self.paid_feature_slugs = calculated_paid_feature_slugs
     new_slug = Slugifyer.slugify(self.short_name).gsub(/\Aadmin/, "")
     if new_slug != slug
       # If the organization exists, don't invalidate because of it's own slug
@@ -222,8 +222,9 @@ class Organization < ActiveRecord::Base
     save
   end
 
-  # Include parent invoice features serves as invoice
-  def current_invoices; Invoice.where(organization_id: [id, parent_organization_id].compact).active end
+  def current_invoices; invoices.active end
+
+  def current_parent_invoices; Invoice.where(organization_id: parent_organization_id).active end
 
   def incomplete_b_params
     BParam.where(organization_id: child_ids + [id]).partial_registrations.without_bike
@@ -287,6 +288,12 @@ class Organization < ActiveRecord::Base
   end
 
   private
+
+  def calculated_paid_feature_slugs
+    fslugs = current_invoices.feature_slugs
+    return fslugs unless parent_organization_id.present?
+    (fslugs + current_parent_invoices.map(&:child_paid_feature_slugs).flatten).uniq
+  end
 
   def set_ambassador_organization_defaults
     self.show_on_map = false

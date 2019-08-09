@@ -84,7 +84,21 @@
       .col-md-6
         .form-group
           = f.label :notes
-          = f.text_area :notes, rows: 4, style: "width: 100%;", class: "form-control"
+          = f.text_area :notes, rows: 4, class: "form-control"
       .col-md-6
         .form-group
           = f.submit "Save", class: 'btn btn-lg btn-success mt-4'
+
+    %hr
+    .row.mt-4
+      .col-md-6
+        .form-group
+          = f.label :child_paid_feature_slugs_string do
+            Features passed on to children
+            %small.em
+              If this is for a parent organization, choose which features from this invoice should apply to the child organizations
+          = f.text_area :child_paid_feature_slugs_string, rows: 2, placeholder: "comma separated list of features", class: "form-control"
+          %small.below-input-help
+            %em
+              available features in current invoice:
+            = safe_join(@invoice.feature_slugs.map { |slug| content_tag(:code, slug) }, ", ")

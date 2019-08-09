@@ -165,6 +165,7 @@ RSpec.describe Organization, type: :model do
     it "uses associations to determine is_paid" do
       expect(organization.paid_for?("csv_exports")).to be_falsey
       invoice.update_attributes(paid_feature_ids: [paid_feature.id])
+      invoice.update_attributes(child_paid_feature_slugs_string: "csv_exports")
       expect(invoice.feature_slugs).to eq(["csv_exports"])
       organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
       expect(organization.is_paid).to be_truthy
@@ -176,7 +177,7 @@ RSpec.describe Organization, type: :model do
       organization_child.reload
       organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
       expect(organization_child.is_paid).to be_truthy
-      expect(organization_child.current_invoices.first).to eq invoice
+      expect(organization_child.current_invoices.first).to be_blank
       expect(organization_child.paid_feature_slugs).to eq(["csv_exports"])
       expect(organization_child.paid_for?("csv_exports")).to be_truthy # It also checks for the full name version
       expect(organization.child_ids).to eq([organization_child.id])

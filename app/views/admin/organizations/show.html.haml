@@ -137,7 +137,7 @@
           %td
             Children
           %td
-            .ul
+            .ul{ style: "font-size: 80%;" }
               - @organization.child_organizations.each do |org|
                 .li
                   = link_to org.name, admin_organization_url(org)
@@ -179,6 +179,16 @@
           and
           %strong
             #{@organization.invoices.active.count} active
+    - if @organization.parent_organization.present?
+      %p
+        Parent
+        %strong.em
+          = @organization.parent_organization.short_name
+        has
+        = link_to admin_organization_invoices_path(organization_id: @organization.parent_organization.to_param) do
+          = pluralize(@organization.parent_organization.invoices.count, "invoice")
+        %small.less-strong
+          which may add features to this organization
     = render partial: "/admin/organizations/invoices/table", locals: { invoices: @organization.invoices.order(id: :desc).limit(3) }
 
   .col-md-6
@@ -255,9 +265,7 @@
             %td
               Features
             %td{ style: "font-size: 80%" }
-              - @organization.paid_feature_slugs.each do |slug|
-                %code
-                  = slug
+              = safe_join(@organization.paid_feature_slugs.map { |slug| content_tag(:code, slug) }, ", ")
 
 %h2.mt-4
   = number_with_delimiter(@bikes.total_count)
