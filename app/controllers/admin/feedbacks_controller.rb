@@ -11,6 +11,9 @@ class Admin::FeedbacksController < Admin::BaseController
 
   def show
     @feedback = Feedback.find(params[:id])
+    if @feedback.feedback_type == "bike_delete_request"
+      @bike = Bike.unscoped.find(@feedback.feedback_hash["bike_id"])
+    end
   end
 
   helper_method :available_feedbacks
