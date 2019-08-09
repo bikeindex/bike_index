@@ -90,8 +90,5 @@
                   %em{ style: "font-size: 70%;" }
                     = paid_feature.kind
 
-            - if current_user.developer?
-              %small
-                - invoice.feature_slugs.each do |slug|
-                  %code
-                    = slug
+            %small
+              = safe_join(invoice.feature_slugs.map { |slug| content_tag(:code, slug) }, ", ")

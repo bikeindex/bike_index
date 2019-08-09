@@ -77,7 +77,7 @@ RSpec.describe Invoice, type: :model do
   describe "child_paid_feature_slugs" do
     let(:invoice) { FactoryBot.create(:invoice) }
     it "rejects unmatching feature slugs" do
-      invoice.update_attributes(assign_child_paid_feature_slugs: ["passwordless_users"])
+      invoice.update_attributes(child_paid_feature_slugs_string: ["passwordless_users"])
       expect(invoice.child_paid_feature_slugs).to eq([])
     end
     context "with paid features" do
@@ -87,10 +87,10 @@ RSpec.describe Invoice, type: :model do
         invoice.reload
         expect(invoice.feature_slugs).to eq(%w[passwordless_users reg_phone reg_address])
         expect(invoice.child_paid_feature_slugs).to be_blank
-        invoice.update_attributes(assign_child_paid_feature_slugs: %w[passwordless_users reg_phone reg_address])
+        invoice.update_attributes(child_paid_feature_slugs_string: %w[passwordless_users reg_phone reg_address])
         invoice.reload
         expect(invoice.child_paid_feature_slugs).to eq(%w[passwordless_users reg_phone reg_address])
-        invoice.update_attributes(assign_child_paid_feature_slugs: "stuff, passwordless_users, reg_address, show_partial_registrations, reg_address, \n")
+        invoice.update_attributes(child_paid_feature_slugs_string: "stuff, passwordless_users, reg_address, show_partial_registrations, reg_address, \n")
         expect(invoice.child_paid_feature_slugs).to eq(%w[passwordless_users reg_address])
       end
     end

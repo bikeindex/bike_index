@@ -76,7 +76,9 @@ class Invoice < ActiveRecord::Base
     end
   end
 
-  def assign_child_paid_feature_slugs=(val)
+  def child_paid_feature_slugs_string; child_paid_feature_slugs.join(", ") end
+
+  def child_paid_feature_slugs_string=(val)
     return true unless val.present?
     unless val.is_a?(Array)
       val = val.strip.split(",").map(&:strip)
@@ -152,6 +154,7 @@ class Invoice < ActiveRecord::Base
       self.subscription_end_at ||= subscription_start_at + subscription_duration
     end
     self.is_active = !expired? && (force_active || paid_in_full?)
+    self.child_paid_feature_slugs ||= []
     true # TODO: Rails 5 update
   end
 
