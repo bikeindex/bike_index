@@ -92,7 +92,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
     describe "update" do
       let(:paid_feature3) { FactoryBot.create(:paid_feature) }
       let(:invoice) { FactoryBot.create(:invoice, organization: organization, amount_due: 10) }
-      let(:update_params) { params.merge(end_at: "2019-07-05T23:00:00", child_paid_feature_slugs: "stufffff,#{paid_feature1.feature_slugs.first}, #{paid_feature2.feature_slugs.first}\n") }
+      let(:update_params) { params.merge(end_at: "2019-07-05T23:00:00", child_paid_feature_slugs_string: "stufffff,#{paid_feature1.feature_slugs.first}, #{paid_feature2.feature_slugs.first}\n") }
       it "updates, removes paid_features that aren't matching, sets child_paid_feature_slugs" do
         expect(paid_feature_slugs.count).to eq 2
         invoice.paid_feature_ids = [paid_feature3.id]
