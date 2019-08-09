@@ -31,9 +31,6 @@ class BikeCodesController < ApplicationController
       redirect_to :back
       return
     end
-    if @bike&.deleted?
-      redirect_to user_home_path and return
-    end
     bike_code = BikeCode.lookup_with_fallback(bike_code_code, organization_id: passive_organization&.id, user: current_user)
     # use the loosest lookup, but only permit it if the user can claim that
     @bike_code = bike_code if bike_code.present? && bike_code.claimable_by?(current_user)
