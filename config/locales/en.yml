@@ -1309,6 +1309,7 @@ en:
       you_have_claimed_the_maximum_permitted: You have claimed the maximum permitted
         number of Bike Codes.
     show:
+      abandoned: Abandoned
       at: at
       bike_in_admin: "%{bike_type} in Super Admin"
       bike_photo: "%{bike_type} photo"
@@ -1351,7 +1352,6 @@ en:
       primary_colors: Primary colors
       rear: Rear
       rear_wheel_diameter: Rear wheel diameter
-      recovered: Recovered
       send_message: Send message
       serial: Serial
       share_it: Share it!
