@@ -74,6 +74,28 @@ RSpec.describe Invoice, type: :model do
     end
   end
 
+  describe "child_paid_feature_slugs" do
+    let(:invoice) { FactoryBot.create(:invoice) }
+    it "rejects unmatching feature slugs" do
+      invoice.update_attributes(assign_child_paid_feature_slugs: ["passwordless_users"])
+      expect(invoice.child_paid_feature_slugs).to eq([])
+    end
+    context "with paid features" do
+      let(:paid_feature) { FactoryBot.create(:paid_feature, feature_slugs: %w[passwordless_users reg_phone reg_address]) }
+      it "permits matching paid feature slugs" do
+        invoice.paid_feature_ids = [paid_feature.id]
+        invoice.reload
+        expect(invoice.feature_slugs).to eq(%w[passwordless_users reg_phone reg_address])
+        expect(invoice.child_paid_feature_slugs).to be_blank
+        invoice.update_attributes(assign_child_paid_feature_slugs: %w[passwordless_users reg_phone reg_address])
+        invoice.reload
+        expect(invoice.child_paid_feature_slugs).to eq(%w[passwordless_users reg_phone reg_address])
+        invoice.update_attributes(assign_child_paid_feature_slugs: "stuff, passwordless_users, reg_address, show_partial_registrations, reg_address, \n")
+        expect(invoice.child_paid_feature_slugs).to eq(%w[passwordless_users reg_address])
+      end
+    end
+  end
+
   describe "paid_feature_ids" do
     let(:invoice) { FactoryBot.create(:invoice, amount_due_cents: nil, subscription_start_at: Time.current - 1.week) }
     let(:paid_feature) { FactoryBot.create(:paid_feature, amount_cents: 100_000) }

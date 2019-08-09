@@ -76,6 +76,15 @@ class Invoice < ActiveRecord::Base
     end
   end
 
+  def assign_child_paid_feature_slugs=(val)
+    return true unless val.present?
+    unless val.is_a?(Array)
+      val = val.strip.split(",").map(&:strip)
+    end
+    valid_slugs = (val & feature_slugs)
+    self.child_paid_feature_slugs = valid_slugs
+  end
+
   # So that we can read and write
   def start_at; subscription_start_at end
   def end_at; subscription_end_at end
@@ -133,6 +142,7 @@ class Invoice < ActiveRecord::Base
                                                first_invoice_id: subscription_first_invoice_id)
     new_invoice.paid_feature_ids = paid_features.recurring.pluck(:id)
     new_invoice.reload
+    new_invoice.update_attributes(child_paid_feature_slugs: child_paid_feature_slugs)
     new_invoice
   end
 

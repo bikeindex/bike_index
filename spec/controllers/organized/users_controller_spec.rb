@@ -173,6 +173,7 @@ RSpec.describe Organized::UsersController, type: :controller do
           Sidekiq::Testing.inline! do
             ActionMailer::Base.deliveries = []
             expect(organization.remaining_invitation_count).to eq 4
+            expect(User.count).to eq 2
             expect do
               put :create, organization_id: organization.to_param,
                            membership: membership_params
@@ -190,6 +191,7 @@ RSpec.describe Organized::UsersController, type: :controller do
             expect(membership.claimed?).to be_falsey
             expect(membership.email_invitation_sent_at).to be_present
             expect(organization.sent_invitation_count).to eq 2
+            expect(User.count).to eq 2 # make sure we aren't creating an extra user (aka not doing passwordless users)
             expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           end
         end
