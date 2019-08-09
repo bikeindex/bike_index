@@ -16,6 +16,13 @@
   .col-12
     %h1
       Edit Bike
+      - if @bike.deleted?.present?
+        %span.text-danger
+          Deleted at:
+          %span.convertTime
+            = l @bike.deleted_at, format: :convert_time
+
+
 
 - if @bike.user_hidden
   %h2.text-danger.mb-4{ style: "margin-bottom: 2rem; text-align: center;" }
