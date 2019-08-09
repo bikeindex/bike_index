@@ -1077,7 +1077,8 @@ CREATE TABLE public.invoices (
     amount_paid_cents integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    notes text
+    notes text,
+    child_paid_feature_slugs jsonb
 );
 
 
@@ -4544,4 +4545,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190806170520');
 INSERT INTO schema_migrations (version) VALUES ('20190806214815');
 
 INSERT INTO schema_migrations (version) VALUES ('20190809214414');
+
+INSERT INTO schema_migrations (version) VALUES ('20190809200257');
 
