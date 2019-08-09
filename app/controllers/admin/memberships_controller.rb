@@ -45,6 +45,7 @@ class Admin::MembershipsController < Admin::BaseController
 
   def destroy
     @membership.destroy
+    flash[:success] = "membership deleted successfully"
     redirect_to admin_memberships_url
   end
 
@@ -59,7 +60,7 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def find_membership
-    @membership = Membership.find(params[:id])
+    @membership = Membership.unscoped.find(params[:id])
   end
 
   def find_users

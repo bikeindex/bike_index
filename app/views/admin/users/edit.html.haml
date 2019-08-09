@@ -29,7 +29,7 @@
             Vendor terms?
           %td
             - if @user.when_vendor_terms_of_service.present?
-              %span.convertTime
+              %span.convertTime.preciseTime
                 = l @user.when_vendor_terms_of_service, format: :convert_time
         %tr
           %td
@@ -39,19 +39,19 @@
         %tr
           %td
             Created
-          %td.convertTime
+          %td.convertTime.preciseTime
             = l @user.created_at, format: :convert_time
         %tr
           %td
             Updated
-          %td.convertTime
+          %td.convertTime.preciseTime
             = l @user.updated_at, format: :convert_time
         %tr
           %td
             Last&nbsp;login
           %td
             - if @user.last_login_at.present?
-              %span.convertTime
+              %span.convertTime.preciseTime
                 = l @user.last_login_at, format: :convert_time
             - if @user.last_login_ip.present?
               %small.less-strong
@@ -158,7 +158,7 @@
       %tr
         %td
           = link_to l(payment.created_at, format: :convert_time), admin_payment_path(payment), class: "convertTime"
-          %small.convertTimezone
+          %small.convertTimezone.preciseTime
         %td
           = payment.amount
         %td
@@ -193,7 +193,7 @@
             .less-strong-hold
               %span.less-strong-right.medium-screens
                 = user_email.id
-              %span.convertTime
+              %span.convertTime.preciseTime
                 = l user_email.created_at, format: :convert_time
           %td= user_email.email
           %td
