@@ -77,7 +77,7 @@ RSpec.describe SessionsController, type: :controller do
         expect(cookies.signed[:auth][1]).to eq(user.auth_token)
         expect(response).to redirect_to user_home_url
         user.reload
-        expect(user.last_login_at).to be_within(1.second).of Time.now
+        expect(user.last_login_at).to be_within(1.second).of Time.current
         expect(user.last_login_ip).to eq "66.66.66.66"
         expect(user.magic_link_token).to be_blank
       end
@@ -91,7 +91,7 @@ RSpec.describe SessionsController, type: :controller do
           expect(cookies.signed[:auth][1]).to eq(user.auth_token)
           expect(response).to redirect_to user_home_url
           user.reload
-          expect(user.last_login_at).to be_within(1.second).of Time.now
+          expect(user.last_login_at).to be_within(1.second).of Time.current
           expect(user.magic_link_token).to be_blank
           expect(user.confirmed?).to be_truthy
         end
@@ -175,19 +175,18 @@ RSpec.describe SessionsController, type: :controller do
       end
 
       describe "when authentication works" do
-
-      it "signs in" do
-        expect(user).to receive(:authenticate).and_return(true)
-        request.env["HTTP_REFERER"] = user_home_url
-        request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
-        post :create, session: { password: "would be correct" }
-        expect(cookies.signed[:auth][1]).to eq(user.auth_token)
-        expect(response).to redirect_to user_home_url
-        expect(session[:partner]).to be_nil
-        user.reload
-        expect(user.last_login_at).to be_within(1.second).of Time.now
-        expect(user.last_login_ip).to eq "66.66.66.66"
-      end
+        it "signs in" do
+          expect(user).to receive(:authenticate).and_return(true)
+          request.env["HTTP_REFERER"] = user_home_url
+          request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
+          post :create, session: { password: "would be correct" }
+          expect(cookies.signed[:auth][1]).to eq(user.auth_token)
+          expect(response).to redirect_to user_home_url
+          expect(session[:partner]).to be_nil
+          user.reload
+          expect(user.last_login_at).to be_within(1.second).of Time.current
+          expect(user.last_login_ip).to eq "66.66.66.66"
+        end
         context "partner" do
           it "authenticates and removes partner session" do
             expect(user.last_login_at).to be_blank
@@ -201,7 +200,7 @@ RSpec.describe SessionsController, type: :controller do
             expect(response).to redirect_to "https://new.bikehub.com/account"
             expect(session[:partner]).to be_nil
             user.reload
-            expect(user.last_login_at).to be_within(1.second).of Time.now
+            expect(user.last_login_at).to be_within(1.second).of Time.current
             expect(user.last_login_ip).to eq "66.66.66.66"
           end
         end

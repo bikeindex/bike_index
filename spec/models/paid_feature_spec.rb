@@ -22,7 +22,8 @@ RSpec.describe PaidFeature, type: :model do
       organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after commit doesn't run - for parent org update
       expect(organization.kind).to eq "law_enforcement"
       expect(organization_child.kind).to eq "bike_shop"
-      expect(organization.paid_feature_slugs).to eq %w[bike_codes child_organizations]
+      expect(organization.paid_feature_slugs).to eq %w[bike_codes]
+      expect(organization.child_ids).to eq([organization_child.id])
       expect(organization_child.paid_feature_slugs).to eq %w[bike_codes bike_search]
       # Just to make sure it doesn't get child_organizations # TODO: Rails 5 update - after_commit
       organization_child.update_attributes(updated_at: Time.current)

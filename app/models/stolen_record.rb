@@ -253,6 +253,14 @@ class StolenRecord < ActiveRecord::Base
     recovery_link_token
   end
 
+  # The stolen bike's general location (city and state)
+  # Prefers the stolen record's address location, falls back to the bike's
+  # registration location, returns nil if neither yields an adequate location.
+  def bike_location
+    address_location.presence || bike.registration_location.presence
+  end
+
+  # The associated bike's first public image, if available. Else nil.
   def bike_main_image
     bike&.public_images&.order(:id)&.first
   end
