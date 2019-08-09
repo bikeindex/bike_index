@@ -37,14 +37,14 @@
       %h1
         - if @bike.stolen
           %strong.stolen
-            = t(".recovered") if @bike.abandoned
+            = t(".abandoned") if @bike.abandoned
             = t(".stolen")
         = @bike.title_u
       - if @bike.stolen && @stolen_record.present?
         %p
           %strong
             - if @bike.abandoned
-              = t(".recovered")
+              = t(".abandoned")
             - else
               = t(".stolen")
           %span.convertTime
@@ -132,7 +132,7 @@
             = @bike.description
         - if @bike.stolen && @stolen_record.present?
           %h3
-            = t(".theft_details", bike_recovered: @bike.abandoned ? 'Recovery' : 'Theft')
+            = t(".theft_details", bike_recovered: @bike.abandoned ? 'Abandoned' : 'Theft')
           .row
             - if @bike.current_stolen_record.latitude.present?
               = render 'stolen_map'
@@ -141,7 +141,7 @@
                 = @bike.attr_list_item(@stolen_record.address(skip_default_country: true), t(".location"))
                 = @bike.attr_list_item(@stolen_record.locking_description, t(".locking_description"))
                 = @bike.attr_list_item(@stolen_record.lock_defeat_description, t(".locking_circumvented"))
-                - stolen_type = @bike.abandoned ? 'recovered' : 'stolen'
+                - stolen_type = @bike.abandoned ? 'abandoned' : 'stolen'
                 = @bike.attr_list_item((l @stolen_record.date_stolen, format: :dotted), t(".date_stolen_type", stolen_type: stolen_type))
                 = @bike.attr_list_item(@stolen_record.police_report_number, t(".police_report"))
                 = @bike.attr_list_item(@stolen_record.police_report_department, t(".department_city"))
