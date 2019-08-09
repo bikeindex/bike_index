@@ -904,9 +904,9 @@ en:
         u_lock_and_cable: U-lock and cable
   bikes:
     bike:
+      abandoned: Abandoned
       location: Location
       primary_colors: Primary colors
-      abandoned: Abandoned
       serial: Serial
       stolen: Stolen
     bike_fields:
@@ -1679,7 +1679,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -1705,7 +1705,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
