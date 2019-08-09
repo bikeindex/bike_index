@@ -29,7 +29,7 @@
             Vendor terms?
           %td
             - if @user.when_vendor_terms_of_service.present?
-              %span.convertTime
+              %span.convertTime.preciseTime
                 = l @user.when_vendor_terms_of_service, format: :convert_time
         %tr
           %td
@@ -39,25 +39,44 @@
         %tr
           %td
             Created
-          %td.convertTime
+          %td.convertTime.preciseTime
             = l @user.created_at, format: :convert_time
         %tr
           %td
             Updated
-          %td.convertTime
+          %td.convertTime.preciseTime
             = l @user.updated_at, format: :convert_time
         %tr
           %td
             Last&nbsp;login
           %td
             - if @user.last_login_at.present?
-              %span.convertTime
+              %span.convertTime.preciseTime
                 = l @user.last_login_at, format: :convert_time
             - if @user.last_login_ip.present?
               %small.less-strong
                 = @user.last_login_ip
   .col-md-6.mt-auto
     %table.table-list
+      %tr
+        %td
+          Confirmed?
+        %td
+          - if @user.confirmed?
+            = "&#x2713;".html_safe
+      %tr
+        %td
+          email
+        %td
+          = @user.email
+          - if @user.secondary_emails.any?
+            %small
+              = @user.secondary_emails.join(", ")
+      %tr
+        %td
+          Name
+        %td
+          = @user.name
       %tr
         %td
           Photo
@@ -79,13 +98,7 @@
         %td
           Ambassador?
         %td
-          %strong
-            = @user.ambassador?
-      %tr
-        %td
-          Name
-        %td
-          = @user.name
+          = "&#x2713;".html_safe if @user.ambassador?
       %tr
         %td
           Phone
@@ -145,7 +158,7 @@
       %tr
         %td
           = link_to l(payment.created_at, format: :convert_time), admin_payment_path(payment), class: "convertTime"
-          %small.convertTimezone
+          %small.convertTimezone.preciseTime
         %td
           = payment.amount
         %td
@@ -160,36 +173,37 @@
   = render partial: "/admin/memberships/table", locals: { memberships: @user.memberships }
 
 
-- if @user.user_emails.count > 1
-  %h2 User emails
-  .full-screen-table
-    %table.table.table-striped.table-bordered.table-sm
-      %thead
-        %th
-          Created&nbsp;<small class="convertTimezone"></small>
-        %th
-          Confirmed
-        %th
-          Primary
-        %th
-          Old User Id
-      %tbody
-        - @user.user_emails.each do |user_email|
-          %tr
-            %td
-              .less-strong-hold
-                %span.less-strong-right.medium-screens
-                  = user_email.id
-              %span.convertTime
+%h4.mt-4 User emails
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm
+    %thead
+      %th
+        Created&nbsp;<small class="convertTimezone"></small>
+      %th
+      %th
+        Confirmed
+      %th
+        Primary
+      %th
+        Old User Id
+    %tbody
+      - @user.user_emails.each do |user_email|
+        %tr
+          %td
+            .less-strong-hold
+              %span.less-strong-right.medium-screens
+                = user_email.id
+              %span.convertTime.preciseTime
                 = l user_email.created_at, format: :convert_time
-            %td
-              = "&#x2713;".html_safe if user_email.confirmed
-            %td
-              = "&#x2713;".html_safe if user_email.primary
-            %td
-              = user_email.old_user_id
+          %td= user_email.email
+          %td
+            = "&#x2713;".html_safe if user_email.confirmed
+          %td
+            = "&#x2713;".html_safe if user_email.primary
+          %td
+            = user_email.old_user_id
 
-%hr
+%hr.mt-4
 %h4 Edit
 = form_for [:admin, @user] do |f|
   - if @user.errors.any?

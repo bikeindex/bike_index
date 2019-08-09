@@ -2,7 +2,9 @@ class DuplicateBikeFinderWorker < ApplicationWorker
   sidekiq_options retry: false
 
   def perform(bike_id)
-    serial_segments = Bike.find(bike_id).normalized_serial_segments
+    bike = Bike.find_by_id(bike_id)
+    return true unless bike.present?
+    serial_segments = bike.normalized_serial_segments
 
     serial_segments.each do |serial_segment|
       existing_duplicate = DuplicateBikeGroup.includes(:normalized_serial_segments).

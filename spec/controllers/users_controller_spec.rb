@@ -138,7 +138,7 @@ RSpec.describe UsersController, type: :controller do
               request.env["HTTP_CF_CONNECTING_IP"] = "99.99.99.9"
               post :create, user: user_attributes
               # TODO: Rails 5 update - this is an after_commit issue
-              user = User.order(:created_at).last
+              user = User.where(email: email).first
               user.perform_create_jobs
               # Because of the after_commit issue, we can't track that response redirects correctly :(
               # expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
@@ -153,6 +153,10 @@ RSpec.describe UsersController, type: :controller do
               expect(user.last_login_at).to be_within(3.seconds).of Time.current
               expect(user.last_login_ip).to eq "99.99.99.9"
               expect(user.preferred_language).to be_blank # Because language wasn't passed
+              expect(user.confirmed?).to be_truthy
+              expect(user.user_emails.count).to eq 1
+              expect(user.user_emails.first.email).to eq email
+              expect(User.fuzzy_email_find(email)).to eq user
             end.to change(EmailWelcomeWorker.jobs, :count)
           end
         end
@@ -164,7 +168,7 @@ RSpec.describe UsersController, type: :controller do
             request.env["HTTP_ACCEPT_LANGUAGE"] = "nl,en;q=0.9"
             post :create, user: user_attributes, partner: "bikehub"
             expect(response).to redirect_to("https://new.bikehub.com/account")
-            user = User.order(:created_at).last
+            user = User.find_by_email("poo@pile.com")
             user.perform_create_jobs # TODO: Rails 5 update - this is an after_commit issue
             user.reload
             expect(user.partner_sign_up).to eq "bikehub"

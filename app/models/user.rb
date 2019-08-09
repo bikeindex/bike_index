@@ -96,9 +96,12 @@ class User < ActiveRecord::Base
       end
     end
 
-    def friendly_id_find(n)
-      u = self.fuzzy_email_find(n)
-      u && u.id
+    def friendly_find(str)
+      self.fuzzy_email_find(str) || username_friendly_find(str)
+    end
+
+    def friendly_id_find(str)
+      friendly_find(str)&.id
     end
 
     def admin_text_search(n)

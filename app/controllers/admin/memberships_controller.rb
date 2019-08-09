@@ -1,10 +1,7 @@
 class Admin::MembershipsController < Admin::BaseController
   include SortableTable
   before_filter :find_membership, only: [:show, :edit, :update, :destroy]
-  before_filter :find_users, only: [:new, :create, :edit]
-  before_filter :find_user, only: [:show]
   before_filter :find_organizations
-  before_filter :find_organization, only: [:show]
 
   def index
     page = params[:page] || 1
@@ -45,6 +42,7 @@ class Admin::MembershipsController < Admin::BaseController
 
   def destroy
     @membership.destroy
+    flash[:success] = "membership deleted successfully"
     redirect_to admin_memberships_url
   end
 
@@ -59,23 +57,11 @@ class Admin::MembershipsController < Admin::BaseController
   end
 
   def find_membership
-    @membership = Membership.find(params[:id])
-  end
-
-  def find_users
-    @users = User.all
-  end
-
-  def find_user
-    @user = User.find(@membership[:user_id])
+    @membership = Membership.unscoped.find(params[:id])
   end
 
   def find_organizations
     @organizations = Organization.all
-  end
-
-  def find_organization
-    @organization = Organization.find(@membership[:organization_id])
   end
 
   def matching_memberships
