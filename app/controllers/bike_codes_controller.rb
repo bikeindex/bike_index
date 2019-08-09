@@ -31,7 +31,7 @@ class BikeCodesController < ApplicationController
       redirect_to :back
       return
     end
-    if @bike.deleted?
+    if @bike_code.bike.deleted?
       redirect_to user_home_path and return
     end
     bike_code = BikeCode.lookup_with_fallback(bike_code_code, organization_id: passive_organization&.id, user: current_user)
