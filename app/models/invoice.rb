@@ -76,7 +76,7 @@ class Invoice < ActiveRecord::Base
     end
   end
 
-  def child_paid_feature_slugs_string; child_paid_feature_slugs.join(", ") end
+  def child_paid_feature_slugs_string; (child_paid_feature_slugs || []).join(", ") end
 
   def child_paid_feature_slugs_string=(val)
     return true unless val.present?
