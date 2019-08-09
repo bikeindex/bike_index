@@ -79,7 +79,7 @@ class Invoice < ActiveRecord::Base
   def child_paid_feature_slugs_string; (child_paid_feature_slugs || []).join(", ") end
 
   def child_paid_feature_slugs_string=(val)
-    return true unless val.present?
+    return true if val.blank?
     unless val.is_a?(Array)
       val = val.strip.split(",").map(&:strip)
     end
