@@ -4323,11 +4323,11 @@ nl:
       your_preferences: Jouw voorkeuren
     period_select:
       all: Alle
-      last_30_days: Laatste 30 dagen
-      last_7_days: Afgelopen 7 dagen
-      last_day: laatste dag
-      last_hour: laatste uur
-      last_year: Afgelopen jaar
+      past_30_days: Afgelopen 30 dagen
+      past_7_days: Afgelopen 7 dagen
+      past_day: Gisteren
+      past_hour: afgelopen uur
+      past_year: afgelopen jaar
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
