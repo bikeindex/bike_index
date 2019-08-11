@@ -43,7 +43,7 @@
       / %li.nav-item
       /   = link_to "Lightspeed", admin_bikes_path(sortable_search_params.merge(search_ascend: nil, search_lightspeed: true)), class: "nav-link #{params[:search_lightspeed].present? ? 'active' : ''}"
       %li.nav-item
-        = link_to "chart", admin_bikes_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+        = link_to "graph", admin_bikes_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
   - if current_organization.present?
     %p.subtitle
       #{link_to current_organization.name, admin_organization_path(current_organization.to_param)} bikes
