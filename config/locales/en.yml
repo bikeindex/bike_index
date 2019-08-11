@@ -3990,11 +3990,11 @@ en:
       your_preferences: Your preferences
     period_select:
       all: All
-      last_30_days: last 30 days
-      last_7_days: last 7 days
-      last_day: last day
-      last_hour: last hour
-      last_year: last year
+      past_30_days: past 30 days
+      past_7_days: past 7 days
+      past_day: past day
+      past_hour: past hour
+      past_year: past year
   support:
     array:
       last_word_connector: ", and "
