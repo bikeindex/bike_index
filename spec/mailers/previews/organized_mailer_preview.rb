@@ -18,7 +18,7 @@ class OrganizedMailerPreview < ActionMailer::Preview
   end
 
   def finished_registration_recovered
-    render_finished_registration(Bike.where(recovered: true))
+    render_finished_registration(Bike.where(abandoned: true))
   end
 
   def organization_invitation
