@@ -50,7 +50,7 @@ class ProcessMembershipWorker < ApplicationWorker
   end
 
   def assign_all_ambassador_tasks_to(membership)
-    return unless membership.ambassador?
+    return unless membership.ambassador? && membership.user.present?
     ambassador = membership.user.becomes(Ambassador)
 
     already_assigned_task_ids =
