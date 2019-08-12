@@ -104,10 +104,10 @@ class User < ActiveRecord::Base
       friendly_find(str)&.id
     end
 
-    def admin_text_search(n)
-      str = "%#{n.to_s.strip}%"
-      joins(:user_emails)
-        .where("users.name ILIKE ? OR users.email ILIKE ? OR user_emails.email ILIKE ?", str, str, str)
+    def admin_text_search(str)
+      q = "%#{str.to_s.strip}%"
+      includes(:user_emails)
+        .where("users.name ILIKE ? OR users.email ILIKE ? OR user_emails.email ILIKE ?", q, q, q)
         .distinct
     end
 
