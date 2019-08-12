@@ -4128,8 +4128,8 @@ en:
       reset_your_password: Reset your Password
       your_email_address: your email address
     show:
+      abandoned: Abandoned
       bikes: Bikes
-      recovered: Recovered
       stolen: Stolen!
       this_user_has_no_bikes_yet: This user has no bikes yet!
       this_users_bikes: This user's bikes
@@ -4196,6 +4196,7 @@ en:
       oh_no: Oh No!
       unsupported_browser: We're sorry, Bike Index does not support your browser.
     user_home:
+      abandoned: ABANDONED
       add_a_bike: Add a bike
       add_a_lock: Add a lock
       add_a_photo: Add a photo
@@ -4214,7 +4215,6 @@ en:
       mark_bike_stolen: Mark bike stolen
       primary_colors: Primary colors
       printable_pdf: Printable (pdf)
-      recovered: RECOVERED
       register_new_items: Register new items
       serial: Serial
       sorry_your_bike_was_stolen: >-
