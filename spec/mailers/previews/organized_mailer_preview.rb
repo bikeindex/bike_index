@@ -17,7 +17,7 @@ class OrganizedMailerPreview < ActionMailer::Preview
     render_finished_registration(Bike.unscoped.stolen)
   end
 
-  def finished_registration_recovered
+  def finished_registration_abandoned
     render_finished_registration(Bike.where(abandoned: true))
   end
 
