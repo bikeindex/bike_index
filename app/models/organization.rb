@@ -119,7 +119,7 @@ class Organization < ActiveRecord::Base
 
   def ascend_imports?; ascend_name.present? end
 
-  def parent?; child_ids.any? end
+  def parent?; child_ids.present? end
 
   def child_organizations; Organization.where(id: child_ids) end
 

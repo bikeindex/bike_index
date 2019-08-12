@@ -1,4 +1,6 @@
-.row.mt-4.mb-4#recovery-display-form
+/ Toggle image initially if the recovery display hasn't been created, and there is an image to toggle
+- toggle_image_initially = @recovery_display.id.blank? && (@bike&.public_images&.present? || @bike&.stock_photo_url&.present?)
+.row.mt-4.mb-4#recovery-display-form{ "data-toggleimageinitially" => toggle_image_initially.to_s }
   .col-md-10.col-lg-8.ml-auto.mr-auto
     %h4
       Recovery display approval process
@@ -6,12 +8,16 @@
       %li
         Remove last name from "Quote by" field
       %li
-        Make sure there is a picture! Either click "Use first image" (if there is a bike that has an image), or find an image for the bike elsewhere and upload it
+        Make sure there is a picture!
+        %small.less-strong
+          By default, if the bike has an image, it will use that image.  click "upload a different image" if you want to use a different.
       %li
         Edit the "Body" field and:
         %ul
           %li
-            Make sure the text is under the character count (there's a counter below that updates as you type)
+            Make sure the text is under the character count
+            %small.less-strong
+              there's a counter below that updates as you type
           %li
             Remove any references to race, class, homelessness, etc. of the thief
           %li
@@ -26,7 +32,10 @@
   .row
     .col-lg-6
       .form-group
-        = f.label :quote_by
+        = f.label :quote_by do
+          Quote By
+          %small.less-strong
+            (full name: <em>#{@recovery_display.calculated_owner_name}</em>)
         = f.text_field :quote_by, class: "form-control"
     .col-lg-6
       .form-group
@@ -89,7 +98,7 @@
                 %span.not-using-bike-image
                   Use first image
                 %span.using-bike-image
-                  nvrmind, upload an image
+                  upload a different image
           - else
             Bike has no image
 
