@@ -32,8 +32,8 @@
                     %h5.title-link
                       - if bike.stolen
                         %strong.stolen-color
-                          - if bike.recovered
-                            = t(".recovered")
+                          - if bike.abandoned
+                            = t(".abandoned")
                           - else
                             = t(".stolen")
                       %strong
