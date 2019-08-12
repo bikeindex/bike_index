@@ -10,10 +10,7 @@ class Admin::OrganizationsController < Admin::BaseController
 
   def show
     @locations = @organization.locations
-    bikes = @organization.bikes.reorder("created_at desc")
-    page = params[:page] || 1
-    per_page = params[:per_page] || 25
-    @bikes = bikes.page(page).per(per_page)
+    @bikes = @organization.bikes.reorder("created_at desc").page(1).per(10)
   end
 
   def show_deleted
