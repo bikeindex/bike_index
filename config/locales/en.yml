@@ -1120,6 +1120,7 @@ en:
     edit_report_stolen:
       this_bike_type_is_stolen_or_missing: This %{bike_type} is stolen or missing!
     edit_theft_details:
+      abandoned: Abandoned
       department_city: Department & city
       description_of_the_incident: Description of the incident
       do_these_things_for_the_best_chance: Do these things for the best chance of
@@ -1134,7 +1135,6 @@ en:
       police_report: 'Police report #'
       receive_notifications: Receive notifications from Bike Index about this stolen
         %{bike_type}
-      recovered: Recovered
       stolen: Stolen
       when_was_it_stolen: When was it %{stolen_type}
       without_a_valid_report_number_html: >-
