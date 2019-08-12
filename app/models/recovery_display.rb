@@ -28,10 +28,15 @@ class RecoveryDisplay < ActiveRecord::Base
   def from_stolen_record(sr_id)
     sr = StolenRecord.unscoped.where(id: sr_id).first
     return true unless sr.present?
-    self.stolen_record_id = sr_id
+    self.stolen_record = sr
     self.date_recovered = sr.date_recovered
     self.quote = sr.recovered_description
-    self.quote_by = sr.bike.current_ownership && sr.bike.owner && sr.bike.owner.name
+    self.quote_by = calculated_owner_name&.split(/\s/)&.first
+  end
+
+  def calculated_owner_name
+    return nil unless stolen_record&.bike&.current_ownership&.present? && stolen_record.bike.owner.present?
+    stolen_record.bike.owner.name
   end
 
   def image_processing?
