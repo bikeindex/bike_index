@@ -1,5 +1,5 @@
 / Toggle image initially if the recovery display hasn't been created, and there is an image to toggle
-- toggle_image_initially = @recovery_display.id.blank? && (@bike.public_images.present? || @bike.stock_photo_url.present?)
+- toggle_image_initially = @recovery_display.id.blank? && (@bike&.public_images&.present? || @bike&.stock_photo_url&.present?)
 .row.mt-4.mb-4#recovery-display-form{ "data-toggleimageinitially" => toggle_image_initially.to_s }
   .col-md-10.col-lg-8.ml-auto.mr-auto
     %h4
