@@ -199,10 +199,6 @@ class Bike < ActiveRecord::Base
 
   def impounded?; current_impound_record.present? end
 
-  def abandoned?; recovered end
-
-  def abandoned; abandoned end
-
   # Small helper because we call this a lot
   def type; cycle_type && cycle_type_name.downcase end
 
