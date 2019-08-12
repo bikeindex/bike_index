@@ -106,9 +106,9 @@ class User < ActiveRecord::Base
 
     def admin_text_search(str)
       q = "%#{str.to_s.strip}%"
-      includes(:user_emails)
+      unscoped.includes(:user_emails)
         .where("users.name ILIKE ? OR users.email ILIKE ? OR user_emails.email ILIKE ?", q, q, q)
-        .distinct
+        .distinct.references(:user_emails)
     end
 
     def from_auth(auth)
