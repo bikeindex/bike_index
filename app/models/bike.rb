@@ -201,6 +201,8 @@ class Bike < ActiveRecord::Base
 
   def impounded?; current_impound_record.present? end
 
+  def recovered?; recovered end
+
   def recovered; abandoned end
 
   # Small helper because we call this a lot
