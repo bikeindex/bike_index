@@ -266,13 +266,16 @@
               Features
             %td{ style: "font-size: 80%" }
               = safe_join(@organization.paid_feature_slugs.map { |slug| content_tag(:code, slug) }, ", ")
+.row.mt-4
+  .col-sm-6
+    %h2
+      = number_with_delimiter(@bikes.total_count)
+      = "Bike".pluralize(@bikes.total_count)
+      %em.small
+        = link_to "view all bikes", admin_bikes_path(organization_id: @organization.to_param)
 
-%h2.mt-4
-  = number_with_delimiter(@bikes.total_count)
-  = "Bike".pluralize(@bikes.total_count)
-  %em.small
-    view #{link_to "org bikes view", organization_bikes_path(organization_id: @organization.to_param)}
-= paginate @bikes, views_prefix: "admin"
+  .col-sm-6.text-right
+    = link_to "org bikes view", organization_bikes_path(organization_id: @organization.to_param), class: "gray-link mt-3 d-inline-block"
 = render partial: "/admin/bikes/table", locals: { bikes: @bikes }
 
 .row.mt-4

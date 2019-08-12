@@ -47,8 +47,8 @@
   - if current_organization.present?
     %p.subtitle
       #{link_to current_organization.name, admin_organization_path(current_organization.to_param)} bikes
-      %em.small
-        = link_to "orgs view", organization_bikes_path(organization_id: current_organization.to_param), class: "less-strong"
+      %em
+        = link_to "org bikes view", organization_bikes_path(organization_id: current_organization.to_param), class: "gray-link"
   - if @render_chart
     .col-12.mt-2
       = line_chart available_bikes.send(group_by_method(@time_range), "bikes.created_at").count, curve: false, thousands: ",", defer: true
@@ -56,9 +56,9 @@
       .row.justify-content-end
         .col-md-2.col-12
           %p
-            %em.small.less-strong
+            %em.small.text-info
               = number_with_delimiter(available_bikes.count)
-              charted
+              graphed
         = render partial: "/shared/period_select"
 
 
