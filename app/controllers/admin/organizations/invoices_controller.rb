@@ -1,5 +1,4 @@
 class Admin::Organizations::InvoicesController < Admin::BaseController
-  layout "new_admin"
   before_action :find_organization
   before_action :find_invoice, only: %i[edit update]
   before_action :find_paid_features, only: %i[new edit]
