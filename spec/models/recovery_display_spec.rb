@@ -49,6 +49,7 @@ RSpec.describe RecoveryDisplay, type: :model do
       recovery_display = RecoveryDisplay.new
       recovery_display.from_stolen_record(69)
       expect(recovery_display.errors).not_to be_present
+      expect(recovery_display.calculated_owner_name).to be_nil
     end
     it "sets attrs from stolen record" do
       t = Time.current
@@ -57,15 +58,18 @@ RSpec.describe RecoveryDisplay, type: :model do
       recovery_display.from_stolen_record(stolen_record.id)
       expect(recovery_display.quote).to eq("stuff")
       expect(recovery_display.date_recovered).to be > Time.current - 5.seconds
+      expect(recovery_display.calculated_owner_name).to be_nil
       expect(recovery_display.stolen_record_id).to eq(stolen_record.id)
+      expect(recovery_display.quote_by).to be_nil
     end
-    it "sets name from stolen record" do
-      user = FactoryBot.create(:user, name: "somebody special")
+    it "sets first name from stolen record" do
+      user = FactoryBot.create(:user, name: "somebody Special")
       ownership = FactoryBot.create(:ownership, creator: user, user: user)
       stolen_record = FactoryBot.create(:stolen_record, bike: ownership.bike)
       recovery_display = RecoveryDisplay.new
       recovery_display.from_stolen_record(stolen_record.id)
-      expect(recovery_display.quote_by).to eq("somebody special")
+      expect(recovery_display.calculated_owner_name).to eq "somebody Special"
+      expect(recovery_display.quote_by).to eq("somebody")
     end
   end
 end
