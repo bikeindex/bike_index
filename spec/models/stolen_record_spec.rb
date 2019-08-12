@@ -211,7 +211,7 @@ RSpec.describe StolenRecord, type: :model do
 
     it "doesn't show the serial for recovered bikes" do
       stolen_record = FactoryBot.create(:stolen_record)
-      stolen_record.bike.update_attributes(serial_number: "SERIAL_SERIAL", recovered: true)
+      stolen_record.bike.update_attributes(serial_number: "SERIAL_SERIAL", abandoned: true)
       row = stolen_record.tsv_row
       expect(row).not_to match(/serial_serial/i)
     end

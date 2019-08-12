@@ -2,7 +2,7 @@
 - bike_url = ownership_url(@ownership)
 - frame_colors = @bike.frame_colors
 
-- bike_type = if @bike.stolen? && @bike.recovered?
+- bike_type = if @bike.stolen? && @bike.abandoned?
   - t(".text.recovered_biketype", biketype: @bike.type)
 - else
   - t(".text.stolen_biketype", biketype: @bike.type)
@@ -23,7 +23,7 @@
 
 - if @bike.stolen
   - stolen_record = @bike.current_stolen_record
-  - if @bike.recovered?
+  - if @bike.abandoned?
     = t(".text.bike_found_at", address: stolen_record.address(skip_default_country: true))
   - else
     = t(".text.bike_stolen_from", address: stolen_record.address(skip_default_country: true))
@@ -35,7 +35,7 @@
   = "\n"
 
 - if @bike.stolen
-  - if @bike.recovered
+  - if @bike.abandoned
     = t(".text.hopefully_you_find_the_owner_soon")
   - else
     = t(".text.hopefully_you_find_the_biketype_soon", biketype: @bike.type)
@@ -47,7 +47,7 @@
   = t(".text.sign_up_on_bikeindex_to_claim", biketype: @bike.type)
   = t(".text.edit_it_upload_photos")
 
-- unless @bike.recovered
+- unless @bike.abandoned
   = "\n"
 
   = t(".text.protect_your_bike")

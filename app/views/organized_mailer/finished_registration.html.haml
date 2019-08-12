@@ -7,7 +7,7 @@
 - if is_rendering_in_english && @organization&.mail_snippet_body('welcome').present?
   = @organization.mail_snippet_body('welcome').html_safe
 - else
-  - if @bike.recovered?
+  - if @bike.abandoned?
     %h1= t(".html.thanks_for_adding_this_biketype_you_found", biketype: @bike.type )
   - elsif @bike.stolen?
     %h1= t(".html.biketype_thieves_are_jerks", biketype: @bike.type )
@@ -22,7 +22,7 @@
 %p
   - org_name = @creation_org&.name || @ownership&.creator&.display_name
   - if @bike.stolen?
-    - bike_type = @bike.recovered? ? t(".html.recovered_biketype", biketype: @bike.type) : t(".html.stolen_biketype", biketype: @bike.type)
+    - bike_type = @bike.abandoned? ? t(".html.recovered_biketype", biketype: @bike.type) : t(".html.stolen_biketype", biketype: @bike.type)
   - else
     - bike_type = @bike.type
 
@@ -40,7 +40,7 @@
 
 - if @bike.stolen
   %p
-    - if @bike.recovered
+    - if @bike.abandoned
       - edit_bike_link = link_to t(".html.give_us_a_heads_up"), edit_bike_url(@bike)
       = t(".html.hopefully_you_find_the_owner_html", edit_bike_link: edit_bike_link)
     - else
@@ -72,7 +72,7 @@
 - if @organization && @organization.mail_snippet_body("security").present?
   = @organization.mail_snippet_body("security").html_safe
 - else
-  - unless @bike.recovered
+  - unless @bike.abandoned
     -# Just to keep things wrapped up
     %div
       - unless @vars[:donation_message]

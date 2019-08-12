@@ -29,7 +29,7 @@
       - stolen_record = @bike.current_stolen_record
       %li
         %strong
-          = @bike.recovered ? t(".found") : t(".stolen_from")
+          = @bike.abandoned ? t(".found") : t(".stolen_from")
         = stolen_record.address(skip_default_country: true)
       %li
         %strong

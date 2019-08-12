@@ -34,7 +34,7 @@ class BikeCreatorVerifier
   end
 
   def recoverize
-    @bike.recovered = true
+    @bike.abandoned = true
     stolenize
   end
 
@@ -43,9 +43,9 @@ class BikeCreatorVerifier
       stolenize
     elsif @b_param.params["bike"].present? and @b_param.params["bike"]["stolen"]
       stolenize
-    elsif @b_param.params["recovered"]
+    elsif @b_param.params["abandoned"]
       recoverize
-    elsif @b_param.params["bike"].present? and @b_param.params["bike"]["recovered"]
+    elsif @b_param.params["bike"].present? and @b_param.params["bike"]["abandonded"]
       recoverize
     end
   end
