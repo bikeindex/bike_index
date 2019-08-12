@@ -13,6 +13,7 @@ $bikehub-header: #92d149;
 }
 
 nav.bikehub-nav {
+  font-weight:bold;
   background: #fff;
 
   @include clearfix;
