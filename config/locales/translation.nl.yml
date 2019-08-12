@@ -318,7 +318,6 @@ nl:
         propulsion_type_other: Aandrijving type anders
         public_images: Publieke afbeeldingen
         rear_tire_narrow: Achterband smal
-        recovered: hersteld
         recovered_records: Herstelde records
         registered_new: Nieuw geregistreerd
         serial_normalized: Serieel genormaliseerd
@@ -333,6 +332,7 @@ nl:
         video_embed: Video insluiten
         year: jaar
         zipcode: Postcode
+        abandoned: Verlaten
       bike_code:
         claimed_at: Geclaimd op
         code: Code
@@ -1606,9 +1606,9 @@ nl:
     bike:
       location: Plaats
       primary_colors: Primaire kleuren
-      recovered: hersteld
       serial: serie-
       stolen: Gestolen
+      abandoned: Verlaten
     bike_fields:
       revised_colors:
         add_a_color: Voeg een kleur toe
@@ -2041,7 +2041,6 @@ nl:
       primary_colors: Primaire kleuren
       rear: achterkant
       rear_wheel_diameter: Diameter achterwiel
-      recovered: hersteld
       send_message: Verstuur bericht
       serial: serie-
       share_it: Deel het!
@@ -2063,6 +2062,7 @@ nl:
       update: Bijwerken
       you_scanned_this_sticker_html: U hebt de sticker <strong>%{pretty_code}</strong>
         gescand die aan deze %{bike_type} is toegewezen.
+      abandoned: Verlaten
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
       a_police_report: een politierapportnummer
