@@ -45,8 +45,8 @@
                       = bike.attr_list_item(bike.serial_display, t(".serial"))
                       = bike.attr_list_item(bike.frame_colors.to_sentence, t(".primary_colors"))
                       - if bike.current_stolen_record.present?
-                        - recovered_or_stolen =  bike.abandoned? ? t(".date_recovered") : t('.date_stolen')
-                        = bike.attr_list_item(l(bike.current_stolen_record.date_stolen, format: :dotted), recovered_or_stolen)
+                        - abandoned_or_stolen =  bike.abandoned? ? t(".date_recovered") : t('.date_stolen')
+                        = bike.attr_list_item(l(bike.current_stolen_record.date_stolen, format: :dotted), abandoned_or_stolen)
                         = bike.attr_list_item(bike.short_address(bike.current_stolen_record), t(".location"))
                     %ul.attr-list
                       %li= link_to t(".edit_bike"), edit_bike_path(bike)
