@@ -43,11 +43,11 @@ RSpec.describe StolenRecordUpdator do
     end
 
     it "marks all stolen records false and mark the bike unrecovered if the bike isn't stolen" do
-      bike = FactoryBot.create(:bike, stolen: false, recovered: true)
+      bike = FactoryBot.create(:bike, stolen: false, abandoned: true)
       update_stolen_record = StolenRecordUpdator.new(bike: bike)
       expect(update_stolen_record).to receive(:mark_records_not_current)
       update_stolen_record.update_records
-      expect(bike.recovered).to be_falsey
+      expect(bike.abandoned).to be_falsey
     end
   end
 

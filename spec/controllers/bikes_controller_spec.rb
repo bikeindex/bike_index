@@ -409,9 +409,9 @@ RSpec.describe BikesController, type: :controller do
       end
       context "passed recovered param" do
         it "renders a new recovered bike" do
-          get :new, recovered: true
+          get :new, abandoned: true
           expect(response.code).to eq("200")
-          expect(assigns(:bike).recovered).to be_truthy
+          expect(assigns(:bike).abandoned).to be_truthy
         end
       end
       context "with organization id" do
@@ -1091,9 +1091,9 @@ RSpec.describe BikesController, type: :controller do
           end
           context "recovered bike" do
             it "renders with recovered as first template, different description" do
-              bike.update_attributes(stolen: true, recovered: true)
+              bike.update_attributes(stolen: true, abandoned: true)
               bike.reload
-              expect(bike.recovered).to be_truthy
+              expect(bike.abandoned).to be_truthy
 
               get :edit, id: bike.id
 

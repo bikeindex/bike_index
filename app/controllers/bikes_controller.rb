@@ -97,7 +97,7 @@ class BikesController < ApplicationController
     redirect_to bike_path(@b_param.created_bike_id) and return if @b_param.created_bike.present?
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
     flash[:info] = "Oops! We couldn't find that registration, please re-enter the information here" if @b_param.id.blank? && params[:b_param_token].present?
-    @bike ||= @b_param.bike_from_attrs(is_stolen: params[:stolen], recovered: params[:recovered])
+    @bike ||= @b_param.bike_from_attrs(is_stolen: params[:stolen], abandoned: params[:abandoned])
     # Fallback to active (i.e. passed organization_id), then passive_organization
     @bike.creation_organization ||= current_organization || passive_organization
     @organization = @bike.creation_organization
@@ -255,11 +255,11 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = translation(:recovery_details, scope: %i[controllers bikes edit]) if @bike.recovered?
-      h[:theft_details] = translation(:theft_details, scope: %i[controllers bikes edit]) unless @bike.recovered?
+      h[:theft_details] = translation(:recovery_details, scope: %i[controllers bikes edit]) if @bike.abandoned?
+      h[:theft_details] = translation(:theft_details, scope: %i[controllers bikes edit]) unless @bike.abandoned?
       h[:publicize] = translation(:publicize, scope: %i[controllers bikes edit])
       h[:alert] = translation(:alert, scope: %i[controllers bikes edit])
-      h[:report_recovered] = translation(:report_recovered, scope: %i[controllers bikes edit]) unless @bike.recovered?
+      h[:report_recovered] = translation(:report_recovered, scope: %i[controllers bikes edit]) unless @bike.abandoned?
     end
   end
 

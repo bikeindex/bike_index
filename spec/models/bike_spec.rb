@@ -12,8 +12,8 @@ RSpec.describe Bike, type: :model do
     it "non_stolen scopes to only non_stolen bikes" do
       expect(Bike.non_stolen.to_sql).to eq(Bike.where(stolen: false).to_sql)
     end
-    it "non_recovered scopes to only non_recovered bikes" do
-      expect(Bike.non_recovered.to_sql).to eq(Bike.where(recovered: false).to_sql)
+    it "non_abandoned scopes to only non_abandoned bikes" do
+      expect(Bike.non_abandoned.to_sql).to eq(Bike.where(abandoned: false).to_sql)
     end
     it "recovered_records default scopes to created_at desc" do
       bike = FactoryBot.create(:bike)
@@ -830,8 +830,8 @@ RSpec.describe Bike, type: :model do
     end
     context "recovered" do
       it "only returns the serial if we should show people the serial" do
-        # We're hiding serial numbers for recovered bikes to provide a method of verifying ownership
-        bike = Bike.new(serial_number: "something", recovered: true)
+        # We're hiding serial numbers for abandoned bikes to provide a method of verifying ownership
+        bike = Bike.new(serial_number: "something", abandoned: true)
         expect(bike.serial_display).to eq "Hidden"
       end
     end

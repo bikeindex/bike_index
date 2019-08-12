@@ -42,7 +42,7 @@ RSpec.describe Api::V1::NotificationsController, type: :controller do
       expect(CustomerContact.count).to eq(0)
       stolen_record = FactoryBot.create(:stolen_record)
       bike = stolen_record.bike
-      bike.update_attribute :recovered, true
+      bike.update_attribute :abandoned, true
       options = {
         access_token: ENV["NOTIFICATIONS_API_KEY"],
         notification_hash: {

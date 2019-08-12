@@ -62,7 +62,7 @@ class BParam < ActiveRecord::Base
 
   def self.assignable_attrs
     %w(manufacturer_id manufacturer_other frame_model year owner_email creation_organization_id
-       stolen recovered serial_number made_without_serial
+       stolen abandoned serial_number made_without_serial
        primary_frame_color_id secondary_frame_color_id tertiary_frame_color_id)
   end
 
@@ -323,9 +323,9 @@ class BParam < ActiveRecord::Base
   # To protect organization registration and other non-user-set options in revised setup,
   # Set the protected attrs separately from the params hash and merging over the passed params
   # Now that we're on rails 4, this is just a giant headache.
-  def bike_from_attrs(is_stolen: nil, recovered: nil)
+  def bike_from_attrs(is_stolen: nil, abandoned: nil)
     is_stolen = params["bike"]["stolen"] if params["bike"] && params["bike"].keys.include?("stolen")
-    Bike.new(safe_bike_attrs({ "stolen" => is_stolen, "recovered" => recovered }).as_json)
+    Bike.new(safe_bike_attrs({ "stolen" => is_stolen, "abandoned" => abandoned }).as_json)
   end
 
   def safe_bike_attrs(param_overrides)

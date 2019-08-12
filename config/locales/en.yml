@@ -96,6 +96,7 @@ en:
         origin: Origin
         params: Params
       bike:
+        abandoned: Abandoned
         additional_registration: Additional registration
         all_description: All description
         approved_stolen: Approved stolen
@@ -151,7 +152,6 @@ en:
         rear_gear_type: :activerecord.models.rear_gear_type
         rear_tire_narrow: Rear tire narrow
         rear_wheel_size: :activerecord.models.rear_wheel_size
-        recovered: Recovered
         recovered_records: Recovered records
         registered_new: Registered new
         secondary_frame_color: :activerecord.models.secondary_frame_color
@@ -904,9 +904,9 @@ en:
         u_lock_and_cable: U-lock and cable
   bikes:
     bike:
+      abandoned: Abandoned
       location: Location
       primary_colors: Primary colors
-      recovered: Recovered
       serial: Serial
       stolen: Stolen
     bike_fields:
@@ -1309,6 +1309,7 @@ en:
       you_have_claimed_the_maximum_permitted: You have claimed the maximum permitted
         number of Bike Codes.
     show:
+      abandoned: Abandoned
       at: at
       bike_in_admin: "%{bike_type} in Super Admin"
       bike_photo: "%{bike_type} photo"
@@ -1351,7 +1352,6 @@ en:
       primary_colors: Primary colors
       rear: Rear
       rear_wheel_diameter: Rear wheel diameter
-      recovered: Recovered
       send_message: Send message
       serial: Serial
       share_it: Share it!

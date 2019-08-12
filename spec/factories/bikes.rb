@@ -36,8 +36,8 @@ FactoryBot.define do
         bike.save # updates current_stolen_record
         bike.reload
       end
-      factory :recovered_bike do
-        recovered { true }
+      factory :abandoned_bike do
+        abandoned { true }
       end
     end
 
