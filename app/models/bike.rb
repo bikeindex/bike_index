@@ -80,7 +80,7 @@ class Bike < ActiveRecord::Base
   scope :impounded, -> { includes(:impound_records).where(impound_records: { retrieved_at: nil }).where.not(impound_records: { id: nil }) }
   # "Recovered" bikes are bikes that were found and are waiting to be claimed. This is confusing and should be fixed
   # so that it no longer is the same word as stolen recoveries
-  scope :non_recovered, -> { where(abandoned: false) }
+  scope :non_abandoned, -> { where(abandoned: false) }
   # TODO: Rails 5 update - use left_joins method and the text version of enum
   scope :lightspeed_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 2 }) }
   scope :ascend_pos, -> { includes(:creation_states).where(creation_states: { pos_kind: 3 }) }
