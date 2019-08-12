@@ -233,7 +233,7 @@ RSpec.describe User, type: :model do
       end
       let!(:user) { user_email.user }
       it "finds users, deduping" do
-        expect(User.admin_text_search("econd")).to eq([user])
+        expect(User.admin_text_search("econd").pluck(:id)).to eq([user.id])
       end
     end
     context "unconfirmed user partial match" do
