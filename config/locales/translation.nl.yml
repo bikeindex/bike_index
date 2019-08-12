@@ -3193,12 +3193,22 @@ nl:
         instellen af te ronden!
       follow_the_setup_instructions_html: Volg de installatie-instructies <strong>%{ascend_link}</strong>
         op Bike Index
-      if_your_shop_uses_lightspeed_html: 
-      link_your_ascend_retail_and_bike_index: 
-      new_bike_shop_org: 
-      once_youve_set_up_the_trek_ascenwd: 
-      sign_up_as_a_new_org_html: 
-      then_if_a_customers_bike_goes_missing_html: 
+      if_your_shop_uses_lightspeed_html: Wanneer je winkel gebruik maakt van Lightspeed,
+        bekijk dan onze Lightspeed POS-intergratie <a target="none" href="%{lightspeed_path}">hier</a>.
+      link_your_ascend_retail_and_bike_index: Koppel je Ascend Retail- en Bike Index-accounts
+        gratis
+      new_bike_shop_org: 'Nieuwe fietsenwinkel organisatie '
+      once_youve_set_up_the_trek_ascenwd: Als je eenmaal de Trek Ascend POS-fietsregistratie
+        ingesteld hebt, ben je klaar! Bike Index haalt elke dag nieuwe informatie
+        over verkochte fietsen van Ascend, om Bike Index-accounts voor je klanten
+        aan te maken. Hun nieuwe fietsen wachten op hem bij het inloggen. Ze hoeven
+        enkel hun e-mail te checken en de nieuwe fiets staat op hen te wachten.
+      sign_up_as_a_new_org_html: Login als %{new_org_link} bij Bike Index
+      then_if_a_customers_bike_goes_missing_html: 'Als de fiets van een klant vermist
+        raakt, wordt de informatie over de fiets en het serienummer van de fiets opgeslagen,
+        zodat de klant te allen tijde toegang heeft tot deze informatie. Maak je geen
+        zorgen:  <a target="none" href="%{privacy_path}">we zullen deze informatie
+        nooit vrijgeven</a>.'
       we_have_a_new_free_bicycle_registration: 
     bike_shop_packages:
       additional: Extra
