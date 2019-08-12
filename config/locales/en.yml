@@ -1359,7 +1359,7 @@ en:
       stock_photo: Stock photo of a %{year} %{model}
       stolen: Stolen
       switch_to_new_bike_id: Switch to a new bike ID
-      theft_details: "%{bike_recovered} Details"
+      theft_details: "%{bike_abandoned} Details"
       update: Update
       view_users_other_registrations: View user's other registrations
       wheel_diameter: Wheel diameter
