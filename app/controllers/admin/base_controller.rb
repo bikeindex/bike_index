@@ -1,6 +1,6 @@
 class Admin::BaseController < ApplicationController
   before_filter :require_index_admin!
-  layout "new_admin"
+  layout "admin"
 
   def set_period
     @period = params[:period]

@@ -1679,7 +1679,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1705,7 +1705,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -2997,7 +2997,7 @@ en:
       try_for_free: Try For Free
       year: year
   layouts:
-    application_revised:
+    application:
       about: About
       add_a_bike: Add a bike
       blog: Blog
@@ -3028,7 +3028,7 @@ en:
       users: Users
       view_org: View %{org_name}
       your_bikes: Your bikes
-    application_revised_bikehub:
+    application_bikehub:
       bike_security: At BikeHub, we believe bike security is more than just a strong
         U-lock.
       bikehub_login: BikeHub Login

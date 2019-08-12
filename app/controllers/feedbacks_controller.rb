@@ -1,5 +1,4 @@
 class FeedbacksController < ApplicationController
-  layout "application_revised"
   before_filter :set_feedback_active_section
   before_filter :set_permitted_format
 

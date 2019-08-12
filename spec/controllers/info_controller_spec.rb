@@ -14,7 +14,7 @@ RSpec.describe InfoController, type: :controller do
             if page == "support_bike_index"
               expect(response).to render_template("layouts/payments_layout")
             else
-              expect(response).to render_template("layouts/application_revised")
+              expect(response).to render_template("layouts/application")
             end
           end
         end
@@ -36,7 +36,7 @@ RSpec.describe InfoController, type: :controller do
             if page == "support_bike_index"
               expect(response).to render_template("layouts/payments_layout")
             else
-              expect(response).to render_template("layouts/application_revised")
+              expect(response).to render_template("layouts/application")
             end
           end
         end
