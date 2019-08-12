@@ -132,7 +132,7 @@
             = @bike.description
         - if @bike.stolen && @stolen_record.present?
           %h3
-            = t(".theft_details", bike_recovered: @bike.abandoned ? 'Abandoned' : 'Theft')
+            = t(".theft_details", bike_abandoned: @bike.abandoned ? 'Abandoned' : 'Theft')
           .row
             - if @bike.current_stolen_record.latitude.present?
               = render 'stolen_map'
