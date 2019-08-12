@@ -5,7 +5,20 @@ RSpec.describe ProcessMembershipWorker, type: :job do
   before { ActionMailer::Base.deliveries = [] }
 
   describe "#perform" do
-    context "ambassador" do
+    context "ambassador membership" do
+      context "when sending a membership intvitation" do
+        it "does not create ambassador_task_assignments" do
+          org = FactoryBot.create(:organization_ambassador)
+          membership = FactoryBot.create(:membership, organization: org)
+          FactoryBot.create(:ambassador_task)
+          expect(AmbassadorTaskAssignment.count).to eq(0)
+
+          instance.perform(membership.id)
+
+          expect(AmbassadorTaskAssignment.count).to eq(0)
+        end
+      end
+
       context "given a non-ambassador" do
         it "does not create ambassador_task_assignments" do
           membership = FactoryBot.create(:membership_claimed)
