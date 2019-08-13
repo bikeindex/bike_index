@@ -38,7 +38,7 @@ class BikeCreatorVerifier
     stolenize
   end
 
-  def check_stolen_and_recovered
+  def check_stolen_and_abandoned
     if @b_param.params["stolen"]
       stolenize
     elsif @b_param.params["bike"].present? and @b_param.params["bike"]["stolen"]
@@ -52,7 +52,7 @@ class BikeCreatorVerifier
 
   def verify
     check_organization
-    check_stolen_and_recovered
+    check_stolen_and_abandoned
     check_example
     @bike
   end
