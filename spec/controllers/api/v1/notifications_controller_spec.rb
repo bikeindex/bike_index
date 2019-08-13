@@ -64,7 +64,7 @@ RSpec.describe Api::V1::NotificationsController, type: :controller do
       customer_contact = CustomerContact.first
       expect(customer_contact.info_hash[:bike_id].to_i).to eq(stolen_record.bike.id)
       expect(customer_contact.info_hash[:tweet_string]).to eq("FOUND - something special")
-      expect(customer_contact.title).to eq("We tweeted about the bike you recovered!")
+      expect(customer_contact.title).to eq("We tweeted about the bike you found!")
       expect(customer_contact.info_hash[:notification_type]).to eq("stolen_twitter_alerter")
     end
   end

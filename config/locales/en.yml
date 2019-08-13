@@ -1120,6 +1120,7 @@ en:
     edit_report_stolen:
       this_bike_type_is_stolen_or_missing: This %{bike_type} is stolen or missing!
     edit_theft_details:
+      abandoned: Abandoned
       department_city: Department & city
       description_of_the_incident: Description of the incident
       do_these_things_for_the_best_chance: Do these things for the best chance of
@@ -1134,7 +1135,6 @@ en:
       police_report: 'Police report #'
       receive_notifications: Receive notifications from Bike Index about this stolen
         %{bike_type}
-      recovered: Recovered
       stolen: Stolen
       when_was_it_stolen: When was it %{stolen_type}
       without_a_valid_report_number_html: >-
@@ -1359,7 +1359,7 @@ en:
       stock_photo: Stock photo of a %{year} %{model}
       stolen: Stolen
       switch_to_new_bike_id: Switch to a new bike ID
-      theft_details: "%{bike_recovered} Details"
+      theft_details: "%{bike_abandoned} Details"
       update: Update
       view_users_other_registrations: View user's other registrations
       wheel_diameter: Wheel diameter
@@ -4128,8 +4128,8 @@ en:
       reset_your_password: Reset your Password
       your_email_address: your email address
     show:
+      abandoned: Abandoned
       bikes: Bikes
-      recovered: Recovered
       stolen: Stolen!
       this_user_has_no_bikes_yet: This user has no bikes yet!
       this_users_bikes: This user's bikes
@@ -4196,13 +4196,14 @@ en:
       oh_no: Oh No!
       unsupported_browser: We're sorry, Bike Index does not support your browser.
     user_home:
+      abandoned: ABANDONED
       add_a_bike: Add a bike
       add_a_lock: Add a lock
       add_a_photo: Add a photo
       add_some_info: Add some info
       bikes: bikes
       combination: Combination
-      date_recovered: Date recovered
+      date_abandoned: Date abandoned
       date_stolen: Date stolen
       edit: Edit
       edit_bike: Edit Bike
@@ -4214,7 +4215,6 @@ en:
       mark_bike_stolen: Mark bike stolen
       primary_colors: Primary colors
       printable_pdf: Printable (pdf)
-      recovered: RECOVERED
       register_new_items: Register new items
       serial: Serial
       sorry_your_bike_was_stolen: >-
