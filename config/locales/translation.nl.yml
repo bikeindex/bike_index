@@ -31,7 +31,7 @@ nl:
     - vr
     - za
     month_names:
-    -
+    - 
     - januari
     - februari
     - maart
@@ -45,7 +45,7 @@ nl:
     - november
     - december
     abbr_month_names:
-    -
+    - 
     - jan
     - feb
     - mrt
@@ -197,13 +197,13 @@ nl:
         title: Titel
       ambassador:
         ambassador_task_assignments: Taken van ambassadeurs
-        ambassador_tasks: Ambassadortaken
+        ambassador_tasks: Ambassadeurs taken
         auth_token: Auth Token
         avatar: Avatar
         banned: Verboden
         can_send_many_stolen_notifications: Kan veel gestolen meldingen verzenden
         city: City
-        confirmation_token: Opnieuw verzenden Bevestiging
+        confirmation_token: 'Verzendbevestiging '
         confirmed: Bevestigd
         created_bikes: Fietsen gemaakt
         created_ownerships: Eigendom gecreëerd
@@ -2047,7 +2047,7 @@ nl:
       spread_the_word: Vertel het verder!
       stock_photo: Stock foto van een %{year} %{model}
       stolen: Gestolen
-      theft_details: "%{bike_abandoned} Details"
+      theft_details: "%{bike_recovered} Details"
       view_users_other_registrations: Bekijk andere registraties van gebruiker
       wheel_diameter: Wiel diameter
       where_did_you_see_this_bike: Waar heb je dit gezien %{bike_type}? Als u contact
@@ -3193,131 +3193,174 @@ nl:
         instellen af te ronden!
       follow_the_setup_instructions_html: Volg de installatie-instructies <strong>%{ascend_link}</strong>
         op Bike Index
-      if_your_shop_uses_lightspeed_html: Wanneer je winkel gebruik maakt van Lightspeed,
+      if_your_shop_uses_lightspeed_html: Wanneer uw winkel gebruik maakt van Lightspeed,
         bekijk dan onze Lightspeed POS-intergratie <a target="none" href="%{lightspeed_path}">hier</a>.
-      link_your_ascend_retail_and_bike_index: Koppel je Ascend Retail- en Bike Index-accounts
+      link_your_ascend_retail_and_bike_index: Koppel uw Ascend Retail- en Bike Index-accounts
         gratis
       new_bike_shop_org: 'Nieuwe fietsenwinkel organisatie '
-      once_youve_set_up_the_trek_ascenwd: Als je eenmaal de Trek Ascend POS-fietsregistratie
-        ingesteld hebt, ben je klaar! Bike Index haalt elke dag nieuwe informatie
-        over verkochte fietsen van Ascend, om Bike Index-accounts voor je klanten
-        aan te maken. Hun nieuwe fietsen wachten op hem bij het inloggen. Ze hoeven
+      once_youve_set_up_the_trek_ascenwd: Als u eenmaal de Trek Ascend POS-fietsregistratie
+        ingesteld hebt, bent u klaar! Bike Index haalt elke dag nieuwe informatie
+        over verkochte fietsen van Ascend, om Bike Index-accounts voor uw klanten
+        aan te maken. Hun nieuwe fietsen wachten op hen bij het inloggen. Ze hoeven
         enkel hun e-mail te checken en de nieuwe fiets staat op hen te wachten.
       sign_up_as_a_new_org_html: Login als %{new_org_link} bij Bike Index
       then_if_a_customers_bike_goes_missing_html: 'Als de fiets van een klant vermist
         raakt, wordt de informatie over de fiets en het serienummer van de fiets opgeslagen,
-        zodat de klant te allen tijde toegang heeft tot deze informatie. Maak je geen
-        zorgen:  <a target="none" href="%{privacy_path}">we zullen deze informatie
+        zodat de klant te allen tijde toegang heeft tot deze informatie. Maakt u zich
+        geen zorgen:  <a target="none" href="%{privacy_path}">we zullen deze informatie
         nooit vrijgeven</a>.'
-      we_have_a_new_free_bicycle_registration:
+      we_have_a_new_free_bicycle_registration: We hebben een nieuwe, gratis fietsregistratie
+        voor fietsenwinkels. Als u een winkel bent die Ascend als POS-intergratie
+        gebruikt, kunt u met onze nieuwe Ascend 'point of sale integration' elke fiets
+        die u verkoopt automatisch registreren. Installatie duurt ongeveer 10 minuten.
     bike_shop_packages:
       additional: Extra
-      bike_index_for_bike_shops:
-      choose_a_package_size:
-      compare_plans_and_features:
+      bike_index_for_bike_shops: 'Bike Index voor fietsenwinkels '
+      choose_a_package_size: 'Kies een pakketgrootte '
+      compare_plans_and_features: Vergelijk Plannen en Functies
       contact_us: Contacteer ons
-      contact_us_for_trial:
+      contact_us_for_trial: Neem contact met ons op voor een gratis proefperiode
       forever: Voor altijd
       free: GRATIS
-      package_title:
-      questions_want_to_get_started:
+      package_title: "%{name} pakket"
+      questions_want_to_get_started: Vragen? Wilt u beginnen?
       sign_up: Registreren
       sign_up_now: Meld je nu aan
-      simply_the_best_bike_registry:
-      supporting_shop:
+      simply_the_best_bike_registry: Het beste fietsregister
+      supporting_shop: Ondersteunende Winkel
       try_for_free: Probeer gratis
       year: jaar
     campus_packages:
       additional: Extra
-      all_plans_come_with_a_30day_free_trial:
-      bike_index_for_colleges_universities:
-      choose_a_package_size:
-      clean_up_your_campus_messy_registry:
-      compare_plans_and_features:
+      all_plans_come_with_a_30day_free_trial: Alle abonnementen bevatten een gratis
+        proefperiode van 30 dagen
+      bike_index_for_colleges_universities: Bike Index voor Hogescholen en Universiteiten
+      choose_a_package_size: Kies een pakketgrootte
+      clean_up_your_campus_messy_registry: Ruim het rommelige register van uw Campus
+        op.
+      compare_plans_and_features: Vergelijk plannen en functies
       contact_us: Contacteer ons
-      contact_us_for_trial:
+      contact_us_for_trial: Neem contact met ons op voor een gratis proefperiode
       forever: Voor altijd
       free: GRATIS
-      keep_us_pedaling:
-      number_of_members:
-      package_title:
-      questions_want_to_get_started:
+      keep_us_pedaling: Houd ons fietsende
+      number_of_members: "%{range} Leden"
+      package_title: "%{name} pakket"
+      questions_want_to_get_started: Vragen? Wilt u beginnen?
       sign_up: Registreren
       sign_up_now: Meld je nu aan
       try_for_free: Probeer gratis
       year: jaar
     cities_packages:
       additional: Extra
-      all_plans_come_with_a_30day_free_trial:
-      bike_index_for_cities:
-      choose_a_package_size:
-      compare_plans_and_features:
+      all_plans_come_with_a_30day_free_trial: Alle abonnementen bevatten een gratis
+        proefperiode van 30 dagen
+      bike_index_for_cities: Bike Index voor steden
+      choose_a_package_size: Kies een pakketgrootte
+      compare_plans_and_features: Vergelijk Plannen en Functies
       contact_us: Contacteer ons
-      contact_us_for_trial:
+      contact_us_for_trial: Neem contact met ons op voor een gratis proefperiode
       forever: Voor altijd
       free: GRATIS
-      give_your_constituents_the_bike_registry_:
-      keep_us_pedaling:
-      metropolis:
-      package_title:
-      questions_want_to_get_started:
+      give_your_constituents_the_bike_registry_: Geef uw afnemers het fietsregister
+        dat ze willen
+      keep_us_pedaling: Houd ons fietsende
+      metropolis: Metropolis
+      package_title: "%{name} pakket"
+      questions_want_to_get_started: Vragen? Wilt u beginnen?
       sign_up: Registreren
       sign_up_now: Meld je nu aan
-      small_city:
-      town:
+      small_city: Kleine stad
+      town: Stad
       try_for_free: Probeer gratis
       year: jaar
     find_out_more:
-      custom_development_available:
-      find_out_more_html:
+      custom_development_available: A la carte functies en aangepaste ontwikkeling
+        beschikbaar.
+      find_out_more_html: "%{get_in_touch_link} voor meer informatie."
       get_in_touch_link: Neem contact op
     for_bike_shops:
-      5_ways_to_grow_community_for_your_bike_sh:
-      ascend_retail:
-      bike_index_for_bike_shops:
-      bikes_before_they:
-      build_goodwill_with_your_customers_with_a:
-      connect_your_ascend_account_html:
-      connect_your_lightspeed_account:
-      do_right_by_your_customers:
-      dont_use_ascend_or_lightspeed_html:
-      driving_service_revenues_with_bicycle_reg:
-      features_and_pricing:
-      for_completely_free_we_provide_you_with_t:
+      5_ways_to_grow_community_for_your_bike_sh: 5 manieren om community te laten
+        groeien voor uw fietsenwinkel
+      ascend_retail: Ascend Retail
+      bike_index_for_bike_shops: Bike Index voor fietsenwinkels
+      bikes_before_they: Laten we ons verenigen om fietsendiefstal tegen te gaan en
+        bescherm ook de fietsen van uw klanten, voordat ze überhaupt verkocht zijn.
+      build_goodwill_with_your_customers_with_a: Bouw goodwill op bij uw klanten met
+        een service die u gratis kunt aanbieden.  een gestolen fiets en je hebt een
+        klant voor het leven.
+      connect_your_ascend_account_html: Verbind uw Ascend-account en uw Bike Index-winkelaccount.
+        Elke nacht exporteert Ascend de fietsen die u heeft verkocht en importeren
+        we deze in Bike Index voor uw klanten. U hoeft het alleen in te stellen en
+        dan bent u klaar! Meer informatie over de Ascend-integratie %{ascend_link}.
+      connect_your_lightspeed_account: verbind uw Lightspeed-account
+      do_right_by_your_customers: Help uw klanten in slechts 5 klikken.
+      dont_use_ascend_or_lightspeed_html: Maakt u geen gebruik van Ascend of Lightspeed
+        POS? Vraag ons naar %{printed_materials}.
+      driving_service_revenues_with_bicycle_reg: 'Lopende service inkomsten met behulp
+        van fietsregistratie '
+      features_and_pricing: Functies & prijzen
+      for_completely_free_we_provide_you_with_t: Wij bieden u gratis de middelen die
+        u nodig heeft, om elke fiets die u verkoopt in Bike Index, te registreren
+        via uw POS. Het kost slechts een paar minuten om het te verwerken met uw Ascend-
+        of Lightspeed Retail-account,
       here: hier
-      join_our_network_link_html:
+      join_our_network_link_html: Doe mee met onze %{network_link}.
       learn_more: Leer meer
-      network_of_shop_partners:
-      once_you_do_this_link_your_account_to_you:
+      network_of_shop_partners: netwerk van winkelpartners
+      once_you_do_this_link_your_account_to_you: Zodra u dit heeft gedaan, koppel
+        dan uw account aan Lightspeed of registreer de fietsen in Bike Index via Ascend.
       or: of
-      our_official_lightspeed_integration_provi:
-      printed_materials:
-      register_bikes_for_your_customers:
-      related_articles:
-      sign_up_for_a_free_bike_index_account_html:
-      trusted_by_bike_shops_everywhere:
-      use_lightspeed_retail:
-      used_at_bike_shops_everywhere:
+      our_official_lightspeed_integration_provi: Onze officiële Lightspeed-integratie
+        biedt volledig geautomatiseerde registratie voor elke fiets die u verkoopt.
+        Het enige dat u hoeft te doen, is ervoor zorgen dat u het serienummer invoert
+        en de e-mail van de klant opneemt.
+      printed_materials: bedrukte materialen
+      register_bikes_for_your_customers: Registreer fietsen voor uw klanten
+      related_articles: 'Gerelateerde artikelen:'
+      sign_up_for_a_free_bike_index_account_html: Meld u aan voor een gratis Bike
+        Index-account voor uw winkel %{new_org_link}.
+      trusted_by_bike_shops_everywhere: Vertrouwd door fietsenwinkels overal ter wereld
+      use_lightspeed_retail: Lightspeed Retail gebruiken?
+      used_at_bike_shops_everywhere: Overal gebruikt door fietsenwinkels
     for_cities:
-      actually_get_people_registered_and_do_it_:
-      bike_index_for_cities:
-      bike_index_is_the_community_registration_:
-      bike_index_unveils_partnership_with_the_c:
-      bring_together_bike_shops_schools_municip:
-      engage_your_residents_and_recover_their_b:
-      features_amp_pricing:
-      mitigate_the_registration_mess:
-      no_more_index_cards_or_excel_sheets_give_:
-      our_community_is_your_community:
-      plug_your_city_in_nationally:
-      related_articles:
-      trusted_by_law_enforcement_everywhere:
-      trusted_by_municipalities_everywhere:
+      actually_get_people_registered_and_do_it_: Eigenlijk, mensen zich laten registreren.
+        En doe het goedkoop.
+      bike_index_for_cities: Bike Index voor steden
+      bike_index_is_the_community_registration_: Bike Index is het favoriete registratiesysteem
+        van de gemeenschap. Wij zijn het fietsregistratiesysteem van meer dan 600
+        organisaties - gemeenschappen in alle uithoeken van het land. Word lid van
+        het meest gebruikte fietsregistratienetwerk in het land.
+      bike_index_unveils_partnership_with_the_c: Bike Index onthult samenwerking met
+        de stad Palo Alto
+      bring_together_bike_shops_schools_municip: Breng fietsenwinkels, scholen, gemeentelijke
+        afdelingen en wetshandhavers samen om fietsen in één systeem te registreren.
+        Voorbij zijn de dagen van wachten op mensen die niet binnenkomen om hun fietsen
+        te registreren, of zich afvragen of die andere afdeling er voor heeft gezorgd.
+        Bike Index consolideert alles op één beheersbare plaats.
+      engage_your_residents_and_recover_their_b: Betrek uw bewoners, krijg hun fietsen
+        terug, en zij zullen voor altijd van u houden.
+      features_amp_pricing: Functies & prijzen
+      mitigate_the_registration_mess: Beperk de registratiepuinhoop
+      no_more_index_cards_or_excel_sheets_give_: Geen indexkaarten of excel sheets
+        meer. Geef uw burgers de tools om zich in minder dan twee minuten vanaf een
+        smartphone te registreren en gebruik deze registraties om gestolen fietsen
+        terug te krijgen en terug te brengen.
+      our_community_is_your_community: Onze gemeenschap is uw gemeenschap
+      plug_your_city_in_nationally: Sluit je stad landelijk aan.
+      related_articles: 'Gerelateerde artikelen:'
+      trusted_by_law_enforcement_everywhere: Overal vertrouwd door wetshandhavers
+      trusted_by_municipalities_everywhere: Overal vertrouwd door gemeenten
     for_community_groups:
-      bike_index_for_community_groups:
-      bike_index_launches_new_ambassadors_progr:
-      bike_index_welcomes_stolen_bikes_nola:
-      gone_are_the_days_where_you_had_to_regist:
+      bike_index_for_community_groups: Bike Index voor Gemeenschapsgroepen
+      bike_index_launches_new_ambassadors_progr: Bike Index lanceert een nieuw Ambassadeurs
+        programma
+      bike_index_welcomes_stolen_bikes_nola: Bike Index verwelkomt Stolen Bikes NOLA
+      gone_are_the_days_where_you_had_to_regist: Voorbij zijn de dagen dat u uw fiets
+        moest registreren in uw buurt, provincie, stad, staat en land. Registreer
+        simpelweg alle fietsen in Bike Index en een registratie voor fietsers is overal
+        geldig. Registratie-testen uitvoeren? Gemeenschappelijke wielerevenementen
+        hosten? Laat het ons weten en we sturen u Bike Index-materialen toe.
       help_us_help_you: Help ons u te helpen
       here: hier
       partners_made_in_heaven: Partners gemaakt in de hemel
@@ -3325,7 +3368,7 @@ nl:
       registrations_are_free_forever_join_bike_: Inschrijvingen zijn gratis. Voor
         altijd. Word lid van Bike Index en begin vandaag nog met registreren.
       related_articles: 'Gerelateerde artikelen:'
-      sign_up_for_free:
+      sign_up_for_free: Meld u aan gratis aan
       spread_the_bike_index_word_html: Verspreid het Bike Index-woord naar uw kiezers
         om ze beschermd te rijden. Maak een gratis organisatieaccount %{link}.
       the_most_widereaching_and_effective_tools: De meest uitgebreide en effectieve
@@ -3339,11 +3382,12 @@ nl:
         fietser, we willen alle fietsen laten rijden met de eigenaren die ze nodig
         hebben.
     for_law_enforcement:
-      automated_tweets:
+      automated_tweets: geautomatiseerde tweets
       bend_reduces_bike_theft_by_60_percent: Bocht vermindert fietsdiefstal met 60
         procent
       bike_index_for_law_enforcement: Fietsindex voor wetshandhaving
-      bike_indexs_newest_municipal_partner:
+      bike_indexs_newest_municipal_partner: 'Bike Index''s nieuwste gemeentelijke
+        partner: New Orleans'
       here: hier
       if_you_want_to_collaborate_html: Als je wilt samenwerken met andere afdelingen
         in je stad om een register te beheren, lees je meer over Bike Index voor gemeenten
@@ -3367,17 +3411,18 @@ nl:
         de marktleider op het gebied van fietsregistratie. Word gratis lid van ons
         netwerk %{link}, of vraag ons om u in contact te brengen met een bestaande
         partner in wetshandhaving.
-      you_have_the_authority_to_bring_html: Je hebt de bevoegdheid om fietsen terug
+      you_have_the_authority_to_bring_html: U heeft de bevoegdheid om fietsen terug
         te brengen - dat is geen kleine verantwoordelijkheid. Daarom hebben we tools
         - zoals onze integratie met LeadsOnline en %{link} van gestolen fietsen -
         om uw community veilig te houden. Maak verbinding met %{link} en spotters
-        om de verkoop van gestolen fietsen snel in beslag te nemen en te blokkeren.
+        om de verkoop van gestolen fietsen tegen te houden, gestolen fietsen snel
+        in beslag te nemen en te blokkeren.
       youre_the_first_one: Jij bent de eerste waar je burgers naar kijken als hun
         fietsen worden gestolen. Ga naar en doorzoek onze internationale database
         om de fietsen van uw gemeenschap terug te geven aan hun rechtmatige eigenaars.
     for_organizations_photo_list:
       bike_shops: Fietsenwinkels
-      cities: Cities
+      cities: Steden
       community_groups: Gemeenschapsgroepen
       for: Voor
       schools: scholen
@@ -3561,9 +3606,9 @@ nl:
     landing_pages_bike_shop_packages: Fietsindex voor fietsenwinkels - functies en
       prijzen
     landing_pages_campus_packages: Fietsindex voor scholen - functies en prijzen
-    landing_pages_cities_packages: Fietsindex voor steden - functies en prijzen
+    landing_pages_cities_packages: Bike Index voor steden - functies en prijzen
     landing_pages_for_bike_shops: Fietsindex voor fietsenwinkels
-    landing_pages_for_cities: Fietsindex voor steden
+    landing_pages_for_cities: Bike Index voor steden
     landing_pages_for_community_groups: Fietsindex voor communitygroepen
     landing_pages_for_law_enforcement: Fietsindex voor wetshandhaving
     landing_pages_for_schools: Fietsindex voor scholen
@@ -4297,7 +4342,7 @@ nl:
       bike_manufacturer_list: Lijst met fietsfabrikanten
       bike_shops: Fietsenwinkels
       blog: Blog
-      cities: Cities
+      cities: Steden
       community_groups: Gemeenschapsgroepen
       copyright_html: "%{current_year} & kopiëren; Bike Index, een 501 (c) (3) non-profit
         - EIN 81-4296194"
