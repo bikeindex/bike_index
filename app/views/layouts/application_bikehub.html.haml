@@ -31,56 +31,28 @@
             Log In
           %a.bikehub-nav-item{ href: "#"}
             Select a station
-    .row
-      .col-lg-2
-        = image_tag "icon_high-five.svg", class: "primary-nav", alt: "Bike Index home"
-      .col-lg-5.text-center
+    .row.text-center.teamed-up-with-bike-index.d-flex.align-items-center
+      .col-lg-4
+        %h1.mb-auto
+          We teamed up with Bike Index!
+        = image_tag "high-five.svg", alt: "High Five"
+      .col-lg-8
         %p
           Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration service in the world.
         %p
           At BikeHub, we believe bike security is more than just a strong U-lock
         %p
           Through this partnership, BikeHub patrons enjoy access to the most secure public bike parking - and registration with the nation's largest network, used by law enforcement agencies, universities and advocates to connect recovery bikes with their owners.
-      .form-box
-        %h1
-          BikeHub accounts are powered by Bike Index - The premier bike registry.
-        %h1
-          Logging in here will log you into BikeHub
-
-    .log-in
-      = render "layouts/revised_messages"
-      = yield
+    .login-info
+      %h1
+        BikeHub accounts are powered by Bike Index - The premier bike registry.
+      %h1
+        Logging in here will log you into BikeHub
 
 
-    .container.bikehub-explanation.mb-4
-      .row
-        .col-sm-12
-          %h1
-            - if signup_page
-              = t(".bikehub_signup")
-            - else
-              = t(".bikehub_login")
-      .row
-        .col-sm-12
-          - if signup_page
-            %p
-              = t(".powered_by_bike_index")
-              = t(".signup_message")
-          - else
-            %p
-              = t(".powered_by_bike_index")
-              = t(".login_message")
+    = render "layouts/revised_messages"
+    = yield
 
-    .container.bikehub-explanation{ style: "margin-top: 60px;" }
-      .row
-        .col-sm-12
-          %h2
-            = t(".why_bikeindex")
-      .row
-        .col-sm-12
-          %p= t(".bikeindex_a_nonprofit")
-          %p= t(".bike_security")
-          %p= t(".bikeindex_bikehub_partnership")
 
   :javascript
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

@@ -4,7 +4,34 @@ $bikehub-header: #92d149;
 .bike-hub-bike-index-about {
   max-width: 610px;
 }
+.login-info {
+  h1{
+    color: #05A334;
+    font-size: 35px;
+    text-align: center
+  }
+}
 
+.teamed-up-with-bike-index {
+  max-width: 675px;
+  max-height: 300px;
+  border-style: solid;
+  margin: 0 auto;
+  margin-bottom: 25px;
+  padding-top: 20px;
+  h1 {
+    font-size: 22px;
+    font-weight: bold;
+    color: #05A334;
+  }
+  img {
+    max-height: 100%;
+    max-width: 120px;
+  }
+  p {
+    font-size: 12px;
+  }
+}
 .bikehub-explanation {
   h1,
   h2 {
