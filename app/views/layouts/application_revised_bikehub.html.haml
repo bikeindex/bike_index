@@ -47,7 +47,8 @@
         Logging in here will log you into BikeHub
 
       .log-in
-
+        = render "layouts/revised_messages"
+        = yield
 
 
     .container.bikehub-explanation.mb-4
@@ -68,9 +69,6 @@
             %p
               = t(".powered_by_bike_index")
               = t(".login_message")
-
-    = render "layouts/revised_messages"
-    / = yield
 
     .container.bikehub-explanation{ style: "margin-top: 60px;" }
       .row
