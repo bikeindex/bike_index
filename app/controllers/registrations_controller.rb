@@ -6,7 +6,7 @@ class RegistrationsController < ApplicationController
 
   def new
     @stolen = params[:stolen] # Passed into embed form
-    render layout: "application_revised"
+    render layout: "application"
   end
 
   def embed # Attributes assigned in the partial, but can be overridden so it can be used anywhere

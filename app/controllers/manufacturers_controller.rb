@@ -1,6 +1,4 @@
 class ManufacturersController < ApplicationController
-  layout "application_revised"
-
   def index
     @manufacturers = Manufacturer.all
     respond_to do |format|

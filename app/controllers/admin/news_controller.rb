@@ -1,7 +1,6 @@
 class Admin::NewsController < Admin::BaseController
   before_filter :find_blog, only: [:show, :edit, :update, :destroy]
   before_filter :set_dignified_name
-  layout "new_admin"
 
   def index
     @blogs = Blog.order("created_at asc")

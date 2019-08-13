@@ -1,5 +1,4 @@
 class LocksController < ApplicationController
-  layout "application_revised"
   before_filter :authenticate_user
   before_filter :find_lock, only: [:edit, :update, :destroy]
 

@@ -49,7 +49,7 @@ module ControllerHelpers
   end
 
   def render_partner_or_default_signin_layout(render_action: nil, redirect_path: nil)
-    layout = sign_in_partner == "bikehub" ? "application_revised_bikehub" : "application_revised"
+    layout = sign_in_partner == "bikehub" ? "application_bikehub" : "application"
     if redirect_path
       redirect_to redirect_path, layout: layout
     elsif render_action

@@ -1,6 +1,5 @@
 class SessionsController < ApplicationController
   include Sessionable
-  layout "application_revised"
   before_action :skip_if_signed_in, only: [:new]
 
   def new

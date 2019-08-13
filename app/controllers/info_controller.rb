@@ -1,6 +1,4 @@
 class InfoController < ApplicationController
-  layout "application_revised"
-
   def about
   end
 

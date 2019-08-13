@@ -1,6 +1,5 @@
 class Admin::Organizations::CustomLayoutsController < Admin::BaseController
   before_filter :find_and_authorize_organization
-  layout "new_admin"
 
   def index
   end
