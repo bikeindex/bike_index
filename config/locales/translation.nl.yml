@@ -2047,7 +2047,7 @@ nl:
       spread_the_word: Vertel het verder!
       stock_photo: Stock foto van een %{year} %{model}
       stolen: Gestolen
-      theft_details: "%{bike_recovered} Details"
+      theft_details: "%{bike_abandoned} Details"
       view_users_other_registrations: Bekijk andere registraties van gebruiker
       wheel_diameter: Wiel diameter
       where_did_you_see_this_bike: Waar heb je dit gezien %{bike_type}? Als u contact
@@ -3413,10 +3413,10 @@ nl:
         partner in wetshandhaving.
       you_have_the_authority_to_bring_html: U heeft de bevoegdheid om fietsen terug
         te brengen - dat is geen kleine verantwoordelijkheid. Daarom hebben we tools
-        - zoals onze integratie met LeadsOnline en %{link} van gestolen fietsen -
-        om uw community veilig te houden. Maak verbinding met %{link} en spotters
-        om de verkoop van gestolen fietsen tegen te houden, gestolen fietsen snel
-        in beslag te nemen en te blokkeren.
+        - zoals onze integratie met LeadsOnline en %{automated_tweets_link} van gestolen
+        fietsen - om uw community veilig te houden. Maak verbinding met %{local_ambassadors_link}
+        en spotters om de verkoop van gestolen fietsen tegen te houden, gestolen fietsen
+        snel in beslag te nemen en te blokkeren.
       youre_the_first_one: Jij bent de eerste waar je burgers naar kijken als hun
         fietsen worden gestolen. Ga naar en doorzoek onze internationale database
         om de fietsen van uw gemeenschap terug te geven aan hun rechtmatige eigenaars.
@@ -3470,57 +3470,6 @@ nl:
       try_for_free: Probeer gratis
       year: jaar
   layouts:
-    application_revised:
-      about: Over
-      add_a_bike: Voeg een fiets toe
-      blog: Blog
-      discuss: Bespreken
-      donate: schenken
-      exports: Uitvoer
-      getting_started: Ermee beginnen
-      help: Helpen
-      incomplete_registrations: Onvolledige registraties
-      lightspeed_integration_panel: Lightspeed-integratiepaneel
-      log_in: Log in
-      logout: Afmelden
-      multi_serial_search: Multi-serieel zoeken
-      org_bikes: "%{org_name} Fietsen"
-      org_dashboard: "%{org_name} Dashboard"
-      org_locations: "%{org_name} locaties"
-      org_profile: "%{org_name} profiel"
-      recoveries: terugvorderingen
-      register_a_new_bike: Registreer een nieuwe fiets
-      registration_stickers: Registratie stickers
-      resources: Middelen
-      search_bikes: Zoek fietsen
-      sign_up: Registreren
-      super_admin_view: Super beheerdersweergave %{org_name}
-      the_nonprofit_bike_registry: het fietsregister zonder winstoogmerk
-      user_settings: "%{user_email} instellingen"
-      users: Gebruikers
-      view_org: Bekijk %{org_name}
-      your_bikes: Je fietsen
-      org_impounded_bikes: "%{org_name} In beslag genomen fietsen"
-    application_revised_bikehub:
-      bike_security: Bij BikeHub geloven we dat fietsbeveiliging meer is dan alleen
-        een sterk U-slot.
-      bikehub_login: BikeHub-aanmelding
-      bikehub_signup: BikeHub-aanmelding
-      bikeindex_a_nonprofit: Bike Index is een 501 (c) (3) non-profit en de meest
-        gebruikte fietsregistratieservice ter wereld.
-      bikeindex_bikehub_partnership: Door dit partnerschap hebben BikeHub-klanten
-        toegang tot de veiligste openbare fietsparking - en registratie bij het grootste
-        netwerk van het land, dat wordt gebruikt door wetshandhavingsinstanties, universiteiten
-        en advocaten om herstelde fietsen met hun eigenaren te verbinden.
-      contact: contact
-      log_in: Log in
-      login_message: Als u hier inlogt, logt u in op BikeHub.
-      powered_by: Aangedreven door
-      powered_by_bike_index: BikeHub-accounts worden mogelijk gemaakt door Bike Index
-        - het belangrijkste fietsregister.
-      sign_up: Registreren
-      signup_message: Als u hier een account aanmaakt, wordt u aangemeld voor BikeHub
-      why_bikeindex: WAAROM BIKEINDEX?
     email:
       bike_index: Bike Index
       help_prevent_theft: Helpt fietsdiefstal voorkomen,
@@ -3542,6 +3491,57 @@ nl:
     revised_messages:
       error: Fout
       please_fix_the_following: Corrigeer het volgende %{errors}
+    application_revised:
+      about: Over
+      add_a_bike: Voeg een fiets toe
+      blog: Blog
+      discuss: Bespreken
+      donate: schenken
+      exports: Uitvoer
+      getting_started: Ermee beginnen
+      help: Helpen
+      incomplete_registrations: Onvolledige registraties
+      lightspeed_integration_panel: Lightspeed-integratiepaneel
+      log_in: Log in
+      logout: Afmelden
+      multi_serial_search: Multi-serieel zoeken
+      org_bikes: "%{org_name} Fietsen"
+      org_dashboard: "%{org_name} Dashboard"
+      org_impounded_bikes: "%{org_name} In beslag genomen fietsen"
+      org_locations: "%{org_name} locaties"
+      org_profile: "%{org_name} profiel"
+      recoveries: terugvorderingen
+      register_a_new_bike: Registreer een nieuwe fiets
+      registration_stickers: Registratie stickers
+      resources: Middelen
+      search_bikes: Zoek fietsen
+      sign_up: Registreren
+      super_admin_view: Super beheerdersweergave %{org_name}
+      the_nonprofit_bike_registry: het fietsregister zonder winstoogmerk
+      user_settings: "%{user_email} instellingen"
+      users: Gebruikers
+      view_org: Bekijk %{org_name}
+      your_bikes: Je fietsen
+    application_revised_bikehub:
+      bike_security: Bij BikeHub geloven we dat fietsbeveiliging meer is dan alleen
+        een sterk U-slot.
+      bikehub_login: BikeHub-aanmelding
+      bikehub_signup: BikeHub-aanmelding
+      bikeindex_a_nonprofit: Bike Index is een 501 (c) (3) non-profit en de meest
+        gebruikte fietsregistratieservice ter wereld.
+      bikeindex_bikehub_partnership: Door dit partnerschap hebben BikeHub-klanten
+        toegang tot de veiligste openbare fietsparking - en registratie bij het grootste
+        netwerk van het land, dat wordt gebruikt door wetshandhavingsinstanties, universiteiten
+        en advocaten om herstelde fietsen met hun eigenaren te verbinden.
+      contact: contact
+      log_in: Log in
+      login_message: Als u hier inlogt, logt u in op BikeHub.
+      powered_by: Aangedreven door
+      powered_by_bike_index: BikeHub-accounts worden mogelijk gemaakt door Bike Index
+        - het belangrijkste fietsregister.
+      sign_up: Registreren
+      signup_message: Als u hier een account aanmaakt, wordt u aangemeld voor BikeHub
+      why_bikeindex: WAAROM BIKEINDEX?
   meta_descriptions:
     bikes_index: Zoeken naar fietsen die zijn geregistreerd op Bike Index
     bikes_new: Registreer een fiets snel, eenvoudig en gratis op Bike Index. Maak
@@ -4089,7 +4089,7 @@ nl:
           u vergrendelt niet eenvoudig kan worden verwijderd."
         bike_colors: 'Kleur (en): %{frame_colors}'
         bike_date: 'Datum: %{date}'
-        bike_found_at: 'Gevonden: %{country}'
+        bike_found_at: 'Gevonden: %{address}'
         bike_make: 'Merk: %{bike_mnfg_name}'
         bike_serial: 'Serieel: %{bike_serial_number}'
         bike_stolen_from: 'Gestolen van: %{address}'
@@ -4552,10 +4552,10 @@ nl:
       total_bikes_registered: Totaal aantal geregistreerde fietsen
       total_recovery_value: Totale herstelwaarde
       used_by: Gebruikt door
-      value_of_bikes_recovered: Meer dan %{value} Waarde van fietsen hersteld
-      you_get_your_bike_back: Je krijgt je fiets terug
+      value_of_bikes_recovered: Meer dan %{value} Fietsen die teruggevonden zijn
+      you_get_your_bike_back: U krijgt uw fiets terug
     recovery_stories:
-      recovery_stories: Herstelverhalen
+      recovery_stories: Verhalen over teruggekregen fietsen
     update_browser:
       go_here_to_learn_more: Ga hierheen voor meer informatie
       oh_no: Oh nee!
@@ -4564,7 +4564,7 @@ nl:
       add_a_bike: Voeg een fiets toe
       add_a_lock: Voeg een slot toe
       add_a_photo: Voeg een foto toe
-      add_some_info: Voeg wat info toe
+      add_some_info: Voeg info toe
       bikes: Bikes
       combination: Combinatie
       date_stolen: Datum gestolen
@@ -4575,25 +4575,25 @@ nl:
       lock_type: Slottype
       locks: sloten
       manufacturer: Fabrikant
-      mark_bike_stolen: Markeer fiets gestolen
+      mark_bike_stolen: Markeer fiets als gestolen
       primary_colors: Primaire kleuren
       printable_pdf: Afdrukbaar (pdf)
       register_new_items: Registreer nieuwe items
       serial: serie-
-      sorry_your_bike_was_stolen: Het spijt ons dat je %{bikes_last_type} is gestolen,
-        maar hopelijk krijg je het terug, als iedereen er naar kan zoeken.
+      sorry_your_bike_was_stolen: Het spijt ons dat uw %{bikes_last_type} is gestolen,
+        maar hopelijk krijgt u hem terug, als iedereen er naar kan zoeken.
       stolen: Gestolen
-      tell_us_more_about_yourself: Vertel ons meer over jezelf.
-      thanks_for_adding_your_bike: Geweldig! We zijn gepompt dat je een %{bikes_last_type}
-        hebt toegevoegd aan de index.
+      tell_us_more_about_yourself: Vertel ons meer over uzelf.
+      thanks_for_adding_your_bike: Geweldig! We zijn blij dat u een %{bikes_last_type}
+        heeft toegevoegd aan de index.
       to_bike_index_thanks_for_signing_up: naar Bike Index. Bedankt voor het aanmelden!
-      update_your_profile: update je profiel
+      update_your_profile: update uw profiel
       user_bikes: "%{current_user_name} Fietsen"
       welcome: Welkom
-      you_have_no_registered_bikes: U hebt geen geregistreerde fietsen
-      you_have_no_registered_locks: U hebt geen geregistreerde sloten
-      abandoned: Verlaten
-      date_abandoned: Datum verlaten
+      you_have_no_registered_bikes: U heeft geen geregistreerde fietsen
+      you_have_no_registered_locks: U heeft geen geregistreerde sloten
+      abandoned: VERLATEN
+      date_abandoned: Datum van vermissing
   locales:
     en: English (Engels)
     nl: Nederlands
