@@ -11,7 +11,6 @@ class BikesController < ApplicationController
   before_action :store_return_to, only: [:edit]
   before_action :remove_subdomain, only: [:index]
   before_action :assign_current_organization, only: [:index, :show, :edit]
-  layout "application_revised"
 
   def index
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)

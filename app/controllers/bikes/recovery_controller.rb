@@ -2,7 +2,6 @@ module Bikes
   class RecoveryController < ApplicationController
     before_filter :find_bike
     before_filter :ensure_token_match!
-    layout "application_revised"
 
     def edit
       # redirect to bike show and set session - so the token isn't available to on page js

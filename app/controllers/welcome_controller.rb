@@ -1,5 +1,4 @@
 class WelcomeController < ApplicationController
-  layout "application_revised"
   before_action :force_html_response
   before_filter :authenticate_user_for_welcome_controller, only: [:user_home, :choose_registration]
   # Allow iframes on the index URL because safari is an asshole, and doesn't honor our iframe options

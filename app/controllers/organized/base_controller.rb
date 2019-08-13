@@ -4,8 +4,6 @@ module Organized
     before_filter :ensure_current_organization!
     before_filter :ensure_member!
 
-    layout "application_revised"
-
     def ensure_member!
       if current_user && current_user.member_of?(current_organization)
         return true if current_user.accepted_vendor_terms_of_service?

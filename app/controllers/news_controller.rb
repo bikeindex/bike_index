@@ -1,6 +1,4 @@
 class NewsController < ApplicationController
-  layout "application_revised"
-
   def show
     @blog = Blog.friendly_find(params[:id])
     unless @blog
