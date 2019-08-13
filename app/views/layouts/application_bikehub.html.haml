@@ -31,24 +31,25 @@
             Log In
           %a.bikehub-nav-item{ href: "#"}
             Select a station
+    .row
+      .col-lg-2
+        = image_tag "icon_high-five.svg", class: "primary-nav", alt: "Bike Index home"
+      .col-lg-5.text-center
+        %p
+          Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration service in the world.
+        %p
+          At BikeHub, we believe bike security is more than just a strong U-lock
+        %p
+          Through this partnership, BikeHub patrons enjoy access to the most secure public bike parking - and registration with the nation's largest network, used by law enforcement agencies, universities and advocates to connect recovery bikes with their owners.
+      .form-box
+        %h1
+          BikeHub accounts are powered by Bike Index - The premier bike registry.
+        %h1
+          Logging in here will log you into BikeHub
 
-    .bike-hub-bike-index-about
-      / render header image
-      %p
-        Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration service in the world.
-      %p
-        At BikeHub, we believe bike security is more than just a strong U-lock
-      %p
-        Through this partnership, BikeHub patrons enjoy access to the most secure public bike parking - and registration with the nation's largest network, used by law enforcement agencies, universities and advocates to connect recovery bikes with their owners.
-    .form-box
-      %h1
-        BikeHub accounts are powered by Bike Index - The premier bike registry.
-      %h1
-        Logging in here will log you into BikeHub
-
-      .log-in
-        = render "layouts/revised_messages"
-        = yield
+    .log-in
+      = render "layouts/revised_messages"
+      = yield
 
 
     .container.bikehub-explanation.mb-4
