@@ -32,7 +32,7 @@
           %a.bikehub-nav-item{ href: "#"}
             Select a station
 
-    .header-box
+    .bike-hub-bike-index-about
       / render header image
       %p
         Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration service in the world.
@@ -49,38 +49,39 @@
       .log-in
 
 
-    / .container.bikehub-explanation.mb-4
-    /   .row
-    /     .col-sm-12
-    /       %h1
-    /         - if signup_page
-    /           = t(".bikehub_signup")
-    /         - else
-    /           = t(".bikehub_login")
-    /   .row
-    /     .col-sm-12
-    /       - if signup_page
-    /         %p
-    /           = t(".powered_by_bike_index")
-    /           = t(".signup_message")
-    /       - else
-    /         %p
-    /           = t(".powered_by_bike_index")
-    /           = t(".login_message")
 
-    / = render "layouts/revised_messages"
+    .container.bikehub-explanation.mb-4
+      .row
+        .col-sm-12
+          %h1
+            - if signup_page
+              = t(".bikehub_signup")
+            - else
+              = t(".bikehub_login")
+      .row
+        .col-sm-12
+          - if signup_page
+            %p
+              = t(".powered_by_bike_index")
+              = t(".signup_message")
+          - else
+            %p
+              = t(".powered_by_bike_index")
+              = t(".login_message")
+
+    = render "layouts/revised_messages"
     / = yield
 
-    / .container.bikehub-explanation{ style: "margin-top: 60px;" }
-    /   .row
-    /     .col-sm-12
-    /       %h2
-    /         = t(".why_bikeindex")
-    /   .row
-    /     .col-sm-12
-    /       %p= t(".bikeindex_a_nonprofit")
-    /       %p= t(".bike_security")
-    /       %p= t(".bikeindex_bikehub_partnership")
+    .container.bikehub-explanation{ style: "margin-top: 60px;" }
+      .row
+        .col-sm-12
+          %h2
+            = t(".why_bikeindex")
+      .row
+        .col-sm-12
+          %p= t(".bikeindex_a_nonprofit")
+          %p= t(".bike_security")
+          %p= t(".bikeindex_bikehub_partnership")
 
   :javascript
     (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
