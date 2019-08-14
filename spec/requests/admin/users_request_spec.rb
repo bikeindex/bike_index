@@ -13,6 +13,13 @@ RSpec.describe Admin::UsersController, type: :request do
     end
   end
 
+  describe "show" do
+    it "links to edit" do
+      get "#{base_url}/#{user_subject.username}"
+      expect(response).to redirect_to(edit_admin_user_path(user_subject.id))
+    end
+  end
+
   describe "edit" do
     context "user doesn't exist" do
       it "404s" do
@@ -22,8 +29,14 @@ RSpec.describe Admin::UsersController, type: :request do
         end.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
-    it "shows the edit page if the user exists" do
-      get "#{base_url}/#{user_subject.username}/edit"
+    context "username" do
+      it "shows the edit page if the user exists" do
+        get "#{base_url}/#{user_subject.username}/edit"
+        expect(response).to redirect_to(edit_admin_user_path(user_subject.id))
+      end
+    end
+    it "renders" do
+      get "#{base_url}/#{user_subject.id}/edit"
       expect(response).to render_template :edit
     end
   end

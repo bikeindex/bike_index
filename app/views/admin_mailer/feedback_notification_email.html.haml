@@ -6,7 +6,7 @@
   %p
     From
     - if @feedback.user_id
-      = link_to @feedback.email, edit_admin_user_url(@feedback.user)
+      = link_to @feedback.email, edit_admin_user_url(@feedback.user_id)
     - else
       = @feedback.email
   %p
@@ -26,7 +26,7 @@
   %p
     From
     - if @feedback.user_id
-      = link_to @feedback.email, edit_admin_user_url(@feedback.user)
+      = link_to @feedback.email, edit_admin_user_url(@feedback.user_id)
     - else
       = @feedback.email
   %p
@@ -66,7 +66,7 @@
   %p
     From:
     - if @feedback.user_id
-      = link_to @feedback.email, edit_admin_user_url(@feedback.user)
+      = link_to @feedback.email, edit_admin_user_url(@feedback.user_id)
     - else
       = @feedback.email
   %p
@@ -89,7 +89,7 @@
   %p
     From:
     - if @feedback.user_id
-      = link_to @feedback.email, edit_admin_user_url(@feedback.user)
+      = link_to @feedback.email, edit_admin_user_url(@feedback.user_id)
     - else
       = @feedback.email
 

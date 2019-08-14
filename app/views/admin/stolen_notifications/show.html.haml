@@ -50,13 +50,13 @@
         %td
           Sender
         %td
-          = link_to @stolen_notification.sender.name, edit_admin_user_url(@stolen_notification.sender)
+          = link_to @stolen_notification.sender.name, edit_admin_user_url(@stolen_notification.sender_id)
     - else
       %tr
         %td
           Sender
         %td
-          = link_to @stolen_notification.sender.email, edit_admin_user_url(@stolen_notification.sender)
+          = link_to @stolen_notification.sender.email, edit_admin_user_url(@stolen_notification.sender_id)
     %tr
       %td
         User sent count
