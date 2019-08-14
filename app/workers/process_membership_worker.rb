@@ -17,7 +17,9 @@ class ProcessMembershipWorker < ApplicationWorker
     membership.organization.update_attributes(updated_at: Time.current) if membership.organization.present?
 
     # Assign ambassador tasks too
-    assign_all_ambassador_tasks_to(membership) if membership.user.present?
+    if membership.ambassador? && membership.user.present?
+      assign_all_ambassador_tasks_to(membership)
+    end
   end
 
   def assign_membership_user(membership, user_id)
@@ -50,7 +52,6 @@ class ProcessMembershipWorker < ApplicationWorker
   end
 
   def assign_all_ambassador_tasks_to(membership)
-    return unless membership.ambassador?
     ambassador = membership.user.becomes(Ambassador)
 
     already_assigned_task_ids =
