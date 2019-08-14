@@ -13,6 +13,13 @@ RSpec.describe Admin::UsersController, type: :request do
     end
   end
 
+  describe "show" do
+    it "links to edit" do
+      get "#{base_url}/#{user_subject.username}"
+      expect(response).to redirect_to(edit_admin_user_path(user_subject.id))
+    end
+  end
+
   describe "edit" do
     context "user doesn't exist" do
       it "404s" do
