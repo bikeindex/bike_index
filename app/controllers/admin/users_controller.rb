@@ -13,7 +13,7 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def edit
-    # It's more helpful to have admins share urls with user IDs rather than usernames
+    # urls with user IDs rather than usernames are more helpful in superadmin
     if params[:id] == @user.username
       redirect_to edit_admin_user_path(@user.id)
     end
