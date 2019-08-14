@@ -12,6 +12,7 @@
   %body{ id: page_id, class:  body_class, style: "padding-top: 0;" }
     -# This is either the signup or signin page
     - signup_page = controller_name != "sessions"
+    - landing_page_target = "bike-hub"
     .bikehub
       %nav.navbar.nav.bikehub-nav.navbar-fixed-top
         .container-fluid
@@ -32,19 +33,24 @@
               Log In
             %a.bikehub-nav-item{ href: "#"}
               Select a station
-      = image_tag "landing_pages/header_bg_school"
-      .row.text-center.teamed-up-with-bike-index
-        .col-lg-4
-          %h1.mb-auto
-            We teamed up with Bike Index!
-          = image_tag "high-five.svg", alt: "High Five"
-        .col-lg-8
-          %p
-            Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration service in the world.
-          %p
-            At BikeHub, we believe bike security is more than just a strong U-lock
-          %p
-            Through this partnership, BikeHub patrons enjoy access to the most secure public bike parking - and registration with the nation's largest network, used by law enforcement agencies, universities and advocates to connect recovery bikes with their owners.
+
+
+      .signup-landing-page.landing-page{ class: "signup-landing-page-#{landing_page_target}" }
+        %header.banner-header
+          .row
+            .teamed-up-with-bike-index
+              .row.text-center
+                .col-lg-4
+                  %h1.mb-auto
+                    We teamed up with Bike Index!
+                  = image_tag "high-five.svg", alt: "High Five"
+                .col-lg-8
+                  %p
+                    Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration service in the world.
+                  %p
+                    At BikeHub, we believe bike security is more than just a strong U-lock
+                  %p
+                    Through this partnership, BikeHub patrons enjoy access to the most secure public bike parking - and registration with the nation's largest network, used by law enforcement agencies, universities and advocates to connect recovery bikes with their owners.
       .login-info
         %h1
           BikeHub accounts are powered by Bike Index - The premier bike registry.
