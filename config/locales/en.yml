@@ -3029,27 +3029,24 @@ en:
       view_org: View %{org_name}
       your_bikes: Your bikes
     application_bikehub:
-      bike_security: At BikeHub, we believe bike security is more than just a strong
-        U-lock.
-      bikehub_login: BikeHub Login
-      bikehub_signup: BikeHub Sign-Up
-      bikeindex_a_nonprofit: >-
+      accounts: BikeHub accounts are powered by Bike Index - The premier bike registry
+      contact: Contact
+      home: Home
+      logging_in_here: Logging in here will log you into BikeHub
+      login: Login
+      non_profit: >-
         Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration
         service in the world.
-      bikeindex_bikehub_partnership: >-
+      partnership: >-
         Through this partnership, BikeHub patrons enjoy access to the most secure
-        public bike parking – and registration with nation’s largest network, used
-        by law enforcement agencies, universities, and advocates to connect recovered
+        public bike parking - and registration with the nation's largest network,
+        used by law enforcement agencies, universities and advocates to connect recovery
         bikes with their owners.
-      contact: Contact
-      log_in: Log in
-      login_message: Logging in here will log you in to BikeHub.
       powered_by: powered by
-      powered_by_bike_index: BikeHub accounts are powered by Bike Index – the premier
-        bike registry.
-      sign_up: Sign up
-      signup_message: Creating an account here will sign you up for BikeHub
-      why_bikeindex: WHY BIKEINDEX?
+      register: Register
+      security: At BikeHub, we believe bike security is more than just a strong U-lock.
+      select_a_station: Select a Station
+      teamed_up: We teamed up with Bike Index!
     email:
       bike_index: Bike Index
       help_prevent_theft: Help prevent bike theft,
