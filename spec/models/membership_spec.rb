@@ -60,4 +60,24 @@ RSpec.describe Membership, type: :model do
       end
     end
   end
+
+  describe "ambassador membership without user" do
+    let!(:organization) { FactoryBot.create(:organization_ambassador) }
+    let!(:ambassador_task) { FactoryBot.create(:ambassador_task) }
+    let(:email) { "new@ambassador.edu" }
+    let(:membership) { FactoryBot.build(:membership, organization: organization, invited_email: email) }
+    it "creates the tasks when it can create the tasks" do
+      Sidekiq::Worker.clear_all
+      membership.save
+      expect(membership.ambassador?).to be_truthy
+      membership.enqueue_processing_worker # TODO: Rails 5 update, after commit
+      Sidekiq::Worker.drain_all
+      user = FactoryBot.create(:user, email: email)
+      user.perform_create_jobs # TODO: Rails 5 update
+      Sidekiq::Worker.drain_all
+      user.reload
+      expect(user.ambassador?).to be_truthy
+      expect(user.ambassador_tasks).to eq([ambassador_task])
+    end
+  end
 end
