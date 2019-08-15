@@ -1,21 +1,6 @@
 = render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show", stolen_record: @stolen_record }
 
-%h3.mt-4 Promoted Alert Images
-- alert_image_versions = @bike&.current_stolen_record&.current_alert_image&.image&.versions || []
-- if alert_image_versions.blank?
-  None
-- else
-  = link_to "Regenerate",
-    regenerate_alert_image_admin_stolen_bike_path(@bike),
-    method: :patch,
-    data: { confirm: "Are you sure you want to regenerate promoted alert images?" },
-    class: "btn btn-danger mb-4"
-  .row.mt-2.mb-4
-    - alert_image_versions.each do |name, image|
-      .col-3.mb-2.col-lg-2
-        = link_to image.url, target: "_blank" do
-          = image_tag image.url, class: "ml-auto mr-auto", style: "display: block; max-width: 150px; height: auto;"
-        .text-center= name
+= render partial: "/admin/bikes/theft_alert_images", locals: { bike: @bike }
 
 .admin-subnav.midpage-subnav
   .col-12
