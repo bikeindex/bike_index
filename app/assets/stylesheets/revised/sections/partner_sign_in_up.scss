@@ -1,5 +1,6 @@
 // Bikehub
 $bikehub-header: #92d149;
+$bikehub-green: 82cb39;
 
 .bikehub{
   .signup-landing-page {
@@ -12,7 +13,7 @@ $bikehub-header: #92d149;
   }
   .bike-hub-login{
     h1{
-      color: #05A334;
+      color: $bikehub-green;
       font-size: 35px;
       text-align: center;
     }
@@ -30,7 +31,7 @@ $bikehub-header: #92d149;
     h1 {
       font-size: 22px!important;
       font-weight: bold!important;
-      color: #05A334!important;
+      color: $bikehub-green!important;
       text-shadow: none!important;
       text-align: center!important;
     }
