@@ -28,9 +28,9 @@
               = t(".home")
             %a.bikehub-nav-item{ href: "https://bikehub.com/contact/" }
               = t(".contact")
-            %a.bikehub-nav-item{ href: "#"}
+            %a.bikehub-nav-item{ href: "#", class: (signup_page ? "active" : "") }
               = t(".register")
-            %a.bikehub-nav-item{ href: "#"}
+            %a.bikehub-nav-item{ href: "#", class: (signup_page ? "" : "active")}
               = t(".login")
             %a.bikehub-nav-item{ href: "#"}
               = t(".select_a_station")
@@ -51,10 +51,16 @@
               %p
                 = t(".partnership")
       .bike-hub-login
-        %h1
-          = t(".accounts")
-        %h1
-          = t(".logging_in_here")
+        - if signup_page
+          %h1
+            = t(".accounts")
+          %h1
+            = t(".signup_message")
+        - else
+          %h1
+            = t(".powered_by_bike_index")
+          %h1
+            = t(".login_message")
 
 
       = render "layouts/revised_messages"
