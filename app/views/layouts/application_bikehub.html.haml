@@ -12,7 +12,6 @@
   %body{ id: page_id, class:  body_class, style: "padding-top: 0;" }
     -# This is either the signup or signin page
     - signup_page = controller_name != "sessions"
-    - landing_page_target = "bike-hub"
     .bikehub
       %nav.navbar.nav.bikehub-nav.navbar-fixed-top
         .container-fluid
@@ -36,8 +35,8 @@
               = t(".select_a_station")
 
 
-      .signup-landing-page.landing-page{ class: "signup-landing-page-#{landing_page_target}" }
-        %header.banner-header
+      .bikehub-signup-landing-page.bikehub-signup-page.landing-page
+        %header.bikehub-banner-header
           .row.teamed-up-with-bike-index.text-center
             .col-lg-4
               %h1.mb-auto

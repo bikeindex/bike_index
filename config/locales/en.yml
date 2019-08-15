@@ -1679,7 +1679,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -1705,7 +1705,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -3032,8 +3032,8 @@ en:
       accounts: BikeHub accounts are powered by Bike Index - The premier bike registry
       contact: Contact
       home: Home
-      signup_message: Logging in here will log you into BikeHub
       login: Login
+      login_message: Logging in here will log you in to BikeHub.
       non_profit: >-
         Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration
         service in the world.
@@ -3043,10 +3043,12 @@ en:
         used by law enforcement agencies, universities and advocates to connect recovery
         bikes with their owners.
       powered_by: powered by
-      powered_by_bike_index: BikeHub accounts are powered by Bike Index – the premier bike registry.
+      powered_by_bike_index: BikeHub accounts are powered by Bike Index – the premier
+        bike registry.
       register: Register
       security: At BikeHub, we believe bike security is more than just a strong U-lock.
       select_a_station: Select a Station
+      signup_message: Logging in here will log you into BikeHub
       teamed_up: We teamed up with Bike Index!
     email:
       bike_index: Bike Index

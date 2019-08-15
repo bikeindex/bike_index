@@ -1,10 +1,15 @@
 // Bikehub
 $bikehub-header: #92d149;
 $bikehub-green: #82cb39;
+.bikehub-signup-page {
+  .bikehub-banner-header {
+    background-image: image-url("landing_pages/header_bg_bike-hub.jpg");
+  }
+}
 
 .bikehub{
   .signup-landing-page {
-    .banner-header {
+    .bikehub-banner-header {
       margin-top: 68px;
     }
   }
@@ -24,16 +29,15 @@ $bikehub-green: #82cb39;
     // @include make-col(12);
     background: white;
     max-width: 675px;
-    max-height: 300px;
     margin: 0 auto;
     margin-bottom: 25px;
     padding-top: 20px;
     h1 {
-      font-size: 22px!important;
-      font-weight: bold!important;
-      color: $bikehub-green!important;
-      text-shadow: none!important;
-      text-align: center!important;
+      font-size: 22px;
+      font-weight: bold;
+      color: $bikehub-green;
+      text-shadow: none;
+      text-align: center;
     }
     img {
       max-height: 100%;
@@ -155,6 +159,52 @@ nav.bikehub-nav {
     .bikehub-nav-item {
       font-size: 14px;
       padding: 0.75rem 0.5rem 0;
+    }
+  }
+}
+
+
+.bikehub-signup-landing-page.landing-page {
+  @include media-breakpoint-down(lg) {
+    .bikehub-banner-header {
+      padding-top: 100px;
+      padding-bottom: 0;
+    }
+  }
+
+  @include media-breakpoint-up(lg) {
+    .bikehub-banner-header {
+      padding-top: 100px;
+      padding-bottom: 100px;
+    }
+  }
+}
+
+.bikehub-signup-landing-page {
+  .bikehub-banner-header {
+    margin-top: 65px;
+    background-size: auto 100%;
+    background-position: right center;
+    background-repeat: no-repeat;
+    border-bottom: 3px solid black;
+    background-size: cover;
+
+    // For extra wide screens, make sure we cover the whole screen
+    @include media-breakpoint-up(lg) {
+      background-size: cover;
+    }
+
+    .icon-wrapper {
+      width: 100%;
+      margin: 0;
+      clear: both;
+
+      svg,
+      img {
+        width: 25%;
+        display: block;
+        margin: 0 auto;
+      }
     }
   }
 }
