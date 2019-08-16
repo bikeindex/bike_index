@@ -16,23 +16,29 @@
       %nav.navbar.nav.bikehub-nav.navbar-fixed-top
         .container-fluid
           .row
-            %a.bikehub-logo{ href: "https://bikehub.com" }
-              = image_tag "logos/bikehub_logo.png", class: "primary-nav", alt: "BikeHub home"
-            .poweredby
-              %p
-                = t(".powered_by")
-              %a.primary-logo{ href: user_root_url }
-                = image_tag "logo.svg", class: "primary-nav", alt: "Bike Index home"
-            %a.bikehub-nav-item.bikehub-nav-item-first{href: "#"}
-              = t(".home")
-            %a.bikehub-nav-item{ href: "https://bikehub.com/contact/" }
-              = t(".contact")
-            %a.bikehub-nav-item{ href: "#", class: (signup_page ? "active" : "") }
-              = t(".register")
-            %a.bikehub-nav-item{ href: "#", class: (signup_page ? "" : "active")}
-              = t(".login")
-            %a.bikehub-nav-item{ href: "#"}
-              = t(".select_a_station")
+            .col-md-5
+              %a.bikehub-logo{ href: "https://bikehub.com" }
+                = image_tag "logos/bikehub_logo.png", class: "primary-nav", alt: "BikeHub home"
+              .poweredby
+                %p
+                  = t(".powered_by")
+                %a.primary-logo{ href: user_root_url }
+                  = image_tag "logo.svg", class: "primary-nav", alt: "Bike Index home"
+            .col-md-7
+              %a.navbar-brand{:href => "#"}
+                %button.navbar-toggler{"aria-controls" => "navbarSupportedContent", "aria-expanded" => "false", "aria-label" => "Toggle navigation", "data-target" => "#navbarSupportedContent", "data-toggle" => "collapse", :type => "button"}
+                  %span.navbar-toggler-icon
+
+              %a.bikehub-nav-item.bikehub-nav-item-first{href: "#"}
+                = t(".home")
+              %a.bikehub-nav-item{ href: "https://bikehub.com/contact/" }
+                = t(".contact")
+              %a.bikehub-nav-item{ href: "#", class: (signup_page ? "active" : "") }
+                = t(".register")
+              %a.bikehub-nav-item{ href: "#", class: (signup_page ? "" : "active")}
+                = t(".login")
+              %a.bikehub-nav-item{ href: "#"}
+                = t(".select_a_station")
 
 
       .bikehub-signup-landing-page.bikehub-signup-page.landing-page
@@ -49,7 +55,7 @@
                 = t(".security")
               %p
                 = t(".partnership")
-      .bike-hub-login
+      .bike-hub-login.mt-4
         - if signup_page
           %h1
             = t(".accounts")
