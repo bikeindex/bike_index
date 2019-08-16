@@ -128,4 +128,7 @@ class CustomerMailer < ActionMailer::Base
       mail(to: @user.email, from: '"Lily Williams" <lily@bikeindex.org>')
     end
   end
+
+  def promoted_alert
+  end
 end

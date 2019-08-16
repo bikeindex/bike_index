@@ -30,4 +30,13 @@ RSpec.describe TheftAlert, type: :model do
       expect(theft_alert.recovered?).to be_truthy
     end
   end
+
+  describe "set_alert_timestamp" do
+    let(:stolen_record) { FactoryBot.create(:stolen_record_recovered) }
+    let(:bike) { stolen_record.bike }
+    let!(:theft_alert) { FactoryBot.create(:theft_alert, stolen_record: stolen_record) }
+    it "sends the user an email" do
+      theft_alert.update(set_alert_timestamp())
+    end
+  end
 end
