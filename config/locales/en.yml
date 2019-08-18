@@ -3819,6 +3819,15 @@ en:
       multiple_serial_search_pane: Multiple serial search pane
       thank_you: Thank you so much for using Bike Index!
       thanks_for_using_bike_index: Thanks for using Bike Index!
+    edit_bike_skeleton:
+      abandoned: abandoned
+      edit: Edit
+      owned_but_hasnt_been_claimed_html: Owned by <em>%{owner_email}</em> but it hasn't
+        been claimed yet
+      owned_with_permission_to_edit_html: Owned by <em>%{owner_email}</em> but %{org_name}
+        has permission to edit
+      stolen: stolen
+      view_bike: View %{bike_type}
     email_bike_box:
       color: color
       color_may_be_incorrect: Color may be incorrect. Please update it if necessary!
