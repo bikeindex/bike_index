@@ -24,7 +24,7 @@
         - on_bikes_path = controller_name == "bikes" && action_name == "index" # Because we want to ignore queries and stuff
         - on_impound_bikes_path = on_bikes_path && params[:search_impoundedness] == "only_impounded"
         %li
-          = link_to t(".bikes"), organization_bikes_path(organization_id: current_organization.to_param), class: "menu-item #{(on_bikes_path && !on_impound_bikes_path) ? t(".active") : ''}"
+          = link_to t(".bikes"), organization_bikes_path(organization_id: current_organization.to_param), class: "menu-item #{(on_bikes_path && !on_impound_bikes_path) ? 'active' : ''}"
         - if current_organization.paid_for?("impound_bikes")
           %li
             = link_to t(".impounded_bikes"), organization_bikes_path(organization_id: current_organization.to_param, search_impoundedness: "only_impounded"), class: "menu-item #{on_impound_bikes_path ? 'active' : ''}"
