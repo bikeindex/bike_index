@@ -129,7 +129,7 @@ class CustomerMailer < ActionMailer::Base
     end
   end
 
-  def theft_alert_email(user, bike)
+  def promoted_alert_email(user, bike)
     @user = user
     @bike = bike
     @_action_has_layout = false
