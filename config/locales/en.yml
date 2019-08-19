@@ -4021,7 +4021,6 @@ en:
         <strong>%{link}</strong> to automatically register the bikes you sell to your
         customers.
       multi_serial_search: Multi serial search
-      only_impounded: only_impounded
       organization_dashboard: "%{org_name} dashboard"
       organization_locations: "%{org_name} locations"
       organization_profile: "%{org_name} profile"
