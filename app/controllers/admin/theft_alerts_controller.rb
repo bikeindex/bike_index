@@ -26,6 +26,10 @@ class Admin::TheftAlertsController < Admin::BaseController
 
   private
 
+  def send_promoted_alert_email
+    EmailPromotedAlertWorker.new.perform(@theft_alert)
+  end
+
   def find_theft_alert
     @theft_alert ||= TheftAlert.find(params[:id])
     @stolen_record ||= @theft_alert.stolen_record
@@ -60,6 +64,7 @@ class Admin::TheftAlertsController < Admin::BaseController
       theft_alert_plan = TheftAlertPlan.find(theft_alert_attrs[:theft_alert_plan_id])
       now = Time.current
       theft_alert_attrs[:begin_at] = now
+      send_promoted_alert_email
       CustomerMailer.promoted_alert_email(@bike).deliver_now
       theft_alert_attrs[:end_at] = now + theft_alert_plan.duration_days.days
     elsif transitioning_to_pending
