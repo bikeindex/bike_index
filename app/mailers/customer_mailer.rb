@@ -129,6 +129,14 @@ class CustomerMailer < ActionMailer::Base
     end
   end
 
-  def promoted_alert
+  def theft_alert_email(user, bike)
+    @user = user
+    @bike = bike
+    @_action_has_layout = false
+    I18n.with_locale(@user&.preferred_language) do
+      mail(
+        to: @user.email,
+        subject: "Your promoted alert has gone out!")
+    end
   end
 end

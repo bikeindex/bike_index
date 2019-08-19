@@ -12,6 +12,16 @@ RSpec.describe CustomerMailer, type: :mailer do
     end
   end
 
+  describe "theft_alert_email" do
+    let(:bike) { FactoryBot.create(:bike) }
+    it "renders an email" do
+      mail = CustomerMailer.theft_alert_email(user, bike)
+      expect(mail.subject).to eq("Your promoted alert has gone out!")
+      expect(mail.from).to eq(["contact@bikeindex.org"])
+      expect(mail.to).to eq([user.email])
+    end
+  end
+
   describe "confirmation_email" do
     it "renders email" do
       mail = CustomerMailer.confirmation_email(user)
