@@ -59,9 +59,8 @@ class Admin::TheftAlertsController < Admin::BaseController
     if currently_pending && transitioning_to_active
       theft_alert_plan = TheftAlertPlan.find(theft_alert_attrs[:theft_alert_plan_id])
       now = Time.current
-      # Right here!
       theft_alert_attrs[:begin_at] = now
-      # Right here!
+      CustomerMailer.promoted_alert_email(@bike).deliver_now
       theft_alert_attrs[:end_at] = now + theft_alert_plan.duration_days.days
     elsif transitioning_to_pending
       theft_alert_attrs[:begin_at] = nil

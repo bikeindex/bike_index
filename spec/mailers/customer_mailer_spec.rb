@@ -13,12 +13,16 @@ RSpec.describe CustomerMailer, type: :mailer do
   end
 
   describe "theft_alert_email" do
-    let(:bike) { FactoryBot.create(:bike) }
+    let(:stolen_record) { FactoryBot.create(:stolen_record_recovered) }
+    let(:ownership) { FactoryBot.create(:ownership) }
+    let(:theft_alert_owner) { ownership.creator }
+    let(:bike) { ownership.bike }
+    let!(:theft_alert) { FactoryBot.create(:theft_alert, stolen_record: stolen_record, user_id: theft_alert_owner.id) }
     it "renders an email" do
-      mail = CustomerMailer.promoted_alert_email(user, bike)
+      mail = CustomerMailer.promoted_alert_email(theft_alert)
       expect(mail.subject).to eq("Your promoted alert has gone out!")
       expect(mail.from).to eq(["contact@bikeindex.org"])
-      expect(mail.to).to eq([user.email])
+      expect(mail.to).to eq([theft_alert_owner.email])
     end
   end
 
