@@ -12,6 +12,7 @@ RSpec.describe Admin::TheftAlertsController, type: :controller do
       ActionMailer::Base.deliveries = []
       put :update, id: theft_alert.id, status: "active"
       expect(response.status).to eq(200)
+      expect(ActionMailer::Base.deliveries).not_to be_empty
     end
   end
 end
