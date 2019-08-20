@@ -1537,15 +1537,15 @@ en:
           a tax deductible donation so we can expand our efforts on behalf of the
           cycling community.
         sorry_to_hear_about_your_bike: >-
-          Sorry to hear about your <bike brand>. We've started to share the word on
-          Facebook, Twitter and Instagram about your stolen bike. We encourage you
-          to continue to share aggressively on your social media channels. Be sure
-          to look out for local stolen bike user groups on Facebook as another place
-          to connect with supporters.
+          Sorry to hear about your %{brand}. We've started to share the word on Facebook,
+          Twitter and Instagram about your stolen bike. We encourage you to continue
+          to share aggressively on your social media channels. Be sure to look out
+          for local stolen bike user groups on Facebook as another place to connect
+          with supporters.
         team: Team Bike Index
         your_promoted_alert: >-
-          Your promoted alert has begun showing to cycling enthusiasts in <city>.
-          You can share using your bike URL <bikeindex bike url>.
+          Your promoted alert has begun showing to cycling enthusiasts in %{city}.
+          You can share using your bike URL https://bikeindex.org/bikes/%{id}.
       text:
         additional_info: >-
           If you have any additional information to add or need to extend the alert,
@@ -1557,15 +1557,15 @@ en:
           a tax deductible donation so we can expand our efforts on behalf of the
           cycling community.
         sorry_to_hear_about_your_bike: >-
-          Sorry to hear about your <bike brand>. We've started to share the word on
-          Facebook, Twitter and Instagram about your stolen bike. We encourage you
-          to continue to share aggressively on your social media channels. Be sure
-          to look out for local stolen bike user groups on Facebook as another place
-          to connect with supporters.
+          Sorry to hear about your %{brand}. We've started to share the word on Facebook,
+          Twitter and Instagram about your stolen bike. We encourage you to continue
+          to share aggressively on your social media channels. Be sure to look out
+          for local stolen bike user groups on Facebook as another place to connect
+          with supporters.
         team: Team Bike Index
         your_promoted_alert: >-
-          Your promoted alert has begun showing to cycling enthusiasts in <city>.
-          You can share using your bike URL <bikeindex bike url>.
+          Your promoted alert has begun showing to cycling enthusiasts in %{city}.
+          You can share using your bike URL https://bikeindex.org/bikes/%{id}.
     recovered_from_link:
       html:
         marked_recovered_by: 'Marked recovered by:'
