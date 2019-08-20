@@ -4,8 +4,8 @@
 = t(".html.sorry_to_hear_about_your_bike", brand: @bike.manufacturer)
 
 = t(".html.your_promoted_alert", city: @user.city.present? ? @user.city : "your city", id: @bike.id)
-
-= image_tag @alert_image.url
+- if @alert_image.present?
+  = image_tag @alert_image.url
 
 = t(".text.additional_info")
 
