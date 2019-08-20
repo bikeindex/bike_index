@@ -27,7 +27,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   private
 
   def send_promoted_alert_email
-    EmailPromotedAlertWorker.new.perform_async(@theft_alert)
+    EmailPromotedAlertWorker.perform_async(@theft_alert)
   end
 
   def find_theft_alert
