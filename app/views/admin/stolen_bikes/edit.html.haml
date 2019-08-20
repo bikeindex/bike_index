@@ -8,22 +8,7 @@
     .col-3.mb-2.col-lg-2
       = image_tag img.image_url(:small), class: "ml-auto mr-auto", style: "display: block; max-width: 150px; height: auto;"
 
-%h3 Promoted Alert Images
-
-- if @alert_image_versions.blank?
-  None
-- else
-  = link_to "Regenerate",
-    regenerate_alert_image_admin_stolen_bike_path(@bike),
-    method: :patch,
-    data: { confirm: "Are you sure you want to regenerate promoted alert images?" },
-    class: "btn btn-danger mb-4"
-  .row.mt-2.mb-4
-    - @alert_image_versions.each do |name, image|
-      .col-3.mb-2.col-lg-2
-        = link_to image.url, target: "_blank" do
-          = image_tag image.url, class: "ml-auto mr-auto", style: "display: block; max-width: 150px; height: auto;"
-        .text-center= name
+= render partial: "/admin/bikes/theft_alert_images", locals: { bike: @bike }
 
 - if @stolen_record.blank?
   %h1.mt-4
