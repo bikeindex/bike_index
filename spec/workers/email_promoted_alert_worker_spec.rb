@@ -1,4 +1,4 @@
-require 'rails_helper'
+require "rails_helper"
 
 RSpec.describe EmailPromotedAlertWorker, type: :worker do
   let(:stolen_record) { FactoryBot.create(:stolen_record_recovered) }
@@ -8,7 +8,7 @@ RSpec.describe EmailPromotedAlertWorker, type: :worker do
   let!(:theft_alert) { FactoryBot.create(:theft_alert, stolen_record: stolen_record) }
   it "sends a promoted alert emails" do
     ActionMailer::Base.deliveries = []
-    EmailPromotedAlertWorker.new.perform(theft_alert.id)
+    EmailPromotedAlertWorker.new.perform_async(theft_alert.id)
     expect(ActionMailer::Base.deliveries.empty?).to be_falsey
   end
 end

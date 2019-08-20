@@ -4,9 +4,9 @@
   = t(".html.sorry_to_hear_about_your_bike", brand: @bike.manufacturer)
 %p
   = t(".html.your_promoted_alert", city: @user.city.present? ? @user.city : "your city", id: @bike.id)
-
-.bike-box
-  = image_tag @alert_image.url
+- if @alert_image.present?
+  .bike-box
+    = image_tag @alert_image.url
 
 %p
   = t(".html.additional_info")
