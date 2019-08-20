@@ -212,6 +212,25 @@ module ApplicationHelper
     end
   end
 
+  def instagramable(user)
+    if user.show_instagram and user.instagram
+      link_to "instagram", "https://instagram.com/#{user.instagram}"
+    end
+  end
+
+  def show_instagram_and_website(user)
+    if instagramable(user) or websiteable(user)
+      html = ""
+      if instagramable(user)
+        html << twitterable(user)
+        html << " and #{websiteable(user)}" if websiteable(user)
+      else
+        html << websiteable(user)
+      end
+      html.html_safe
+    end
+  end
+
   def pretty_print_json(data)
     require "coderay"
     CodeRay.scan(JSON.pretty_generate(data), :json).div.html_safe

@@ -13,6 +13,7 @@ module API
                 email: current_user.email,
                 secondary_emails: current_user.secondary_emails,
                 twitter: (current_user.twitter if current_user.show_twitter),
+                instagram: (current_user.instagram if current_user.show_instagram),
                 image: (current_user.avatar_url if current_user.show_bikes),
               },
             }

@@ -11,6 +11,7 @@ module API
               name: current_user.name,
               email: current_user.email,
               twitter: (current_user.twitter if current_user.show_twitter),
+              instagram: (current_user.instagram if current_user.show_instagram),
               image: (current_user.avatar_url if current_user.show_bikes),
             }
           end
