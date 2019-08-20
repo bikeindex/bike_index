@@ -27,7 +27,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   private
 
   def send_promoted_alert_email
-    EmailPromotedAlertWorker.new.perform(@theft_alert)
+    EmailPromotedAlertWorker.new.perform_async(@theft_alert)
   end
 
   def find_theft_alert
@@ -65,7 +65,6 @@ class Admin::TheftAlertsController < Admin::BaseController
       now = Time.current
       theft_alert_attrs[:begin_at] = now
       send_promoted_alert_email
-      CustomerMailer.promoted_alert_email(@bike).deliver_now
       theft_alert_attrs[:end_at] = now + theft_alert_plan.duration_days.days
     elsif transitioning_to_pending
       theft_alert_attrs[:begin_at] = nil
