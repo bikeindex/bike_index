@@ -315,7 +315,7 @@ GEM
     mimemagic (0.3.3)
     mini_magick (4.9.4)
     mini_mime (1.0.2)
-    mini_portile2 (2.3.0)
+    mini_portile2 (2.4.0)
     minitest (5.11.3)
     monetize (1.4.0)
       money (~> 6.7)
@@ -336,8 +336,8 @@ GEM
     naught (1.1.0)
     nenv (0.3.0)
     netrc (0.11.0)
-    nokogiri (1.8.5)
-      mini_portile2 (~> 2.3.0)
+    nokogiri (1.10.4)
+      mini_portile2 (~> 2.4.0)
     notiffany (0.1.1)
       nenv (~> 0.1)
       shellany (~> 0.0)
@@ -700,7 +700,7 @@ DEPENDENCIES
   memory_profiler
   mini_magick
   money-rails
-  nokogiri (~> 1.8.1)
+  nokogiri (>= 1.10.4)
   omniauth (~> 1.6)
   omniauth-facebook
   omniauth-globalid
