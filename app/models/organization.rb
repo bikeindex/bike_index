@@ -227,7 +227,7 @@ class Organization < ActiveRecord::Base
   def current_parent_invoices; Invoice.where(organization_id: parent_organization_id).active end
 
   def incomplete_b_params
-    BParam.where(organization_id: [*child_ids, id]).partial_registrations.without_bike
+    BParam.where(organization_id: [child_ids, id].flatten.compact).partial_registrations.without_bike
   end
 
   # Enable this if they have paid for showing it, or if they use ascend
