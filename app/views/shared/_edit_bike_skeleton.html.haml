@@ -1,24 +1,23 @@
 .form-well-header.container{ data: { template: @edit_template } }
   .edit-bike-header
     %h1
-      - if @bike.stolen and @bike.find_current_stolen_record.present?
+      - if @bike.stolen && @bike.find_current_stolen_record.present?
         %span.text-danger
-          = @bike.abandoned ? 'abandoned' : 'stolen'
+          = @bike.abandoned ? t(".abandoned") : t(".stolen")
       - else
-        Edit
+        = t(".edit")
       = @bike.year
       = @bike.mnfg_name
       = @bike.frame_model
       = @bike.type unless @bike.type == 'bike'
+
     - unless @bike.user?
       %p.mb-0
-        Owned by
-        %em
-          = @bike.owner_email
         - if @bike.authorized_by_organization?(org: passive_organization)
-          but #{passive_organization&.short_name} has permission to edit
+          = t(".owned_with_permission_to_edit_html", owner_email: @bike.owner_email, org_name: passive_organization&.short_name)
         - else # it's almost certainly because the user hasn't claimed it
-          but it hasn't been claimed yet
+          = t(".owned_but_hasnt_been_claimed_html", owner_email: @bike.owner_email)
+
     %p.mb-4
-      = link_to "View #{@bike.type.titleize}", bike_path(@bike), class: "gray-link"
+      = link_to t(".view_bike", bike_type: @bike.type.titleize), bike_path(@bike), class: "gray-link"
 = yield

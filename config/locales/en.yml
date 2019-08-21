@@ -3819,6 +3819,15 @@ en:
       multiple_serial_search_pane: Multiple serial search pane
       thank_you: Thank you so much for using Bike Index!
       thanks_for_using_bike_index: Thanks for using Bike Index!
+    edit_bike_skeleton:
+      abandoned: abandoned
+      edit: Edit
+      owned_but_hasnt_been_claimed_html: Owned by <em>%{owner_email}</em> but it hasn't
+        been claimed yet
+      owned_with_permission_to_edit_html: Owned by <em>%{owner_email}</em> but %{org_name}
+        has permission to edit
+      stolen: stolen
+      view_bike: View %{bike_type}
     email_bike_box:
       color: color
       color_may_be_incorrect: Color may be incorrect. Please update it if necessary!
@@ -3988,6 +3997,46 @@ en:
       you: You
       your_bikes: Your bikes
       your_preferences: Your preferences
+    organized_skeleton:
+      add_a_bike: Add a bike
+      additional_features_html: >-
+        Bike Index provides additional features for verified Law Enforcement organizations.
+        Please contact %{email_link} to get them enabled.
+      admin_panel: Admin Panel
+      ascend_imports: Ascend Imports
+      bikes: Bikes
+      bulk_imports: Bulk Imports
+      discuss: Discuss
+      exports: Exports
+      geomessaging: GeoMessaging
+      getting_started: Getting started
+      how_integration_works: how the integration works
+      impounded_bikes: Impounded Bikes
+      incomplete_registrations: Incomplete registrations
+      integrate_bike_index_with_ascend: Integrate Bike Index with Ascend
+      integrate_bike_index_with_lightspeed: Integrate Bike Index with Lightspeed
+      lightspeed_integration_panel: Lightspeed Integration Panel
+      link_to_register_html: >-
+        <strong>%{link}</strong> to automatically register the bikes you sell to your
+        customers.
+      multi_serial_search: Multi serial search
+      organization_dashboard: "%{org_name} dashboard"
+      organization_locations: "%{org_name} locations"
+      organization_profile: "%{org_name} profile"
+      other_point_of_sale_system: Other Point of Sale system?
+      read_a_full_explanation_html: Read a full explanation of %{link}.
+      recoveries: Recoveries
+      register_bikes_with_link_html: Register bikes with our <strong>%{bike_shop_registration_link}</strong>
+      registration_stickers: Registration stickers
+      resources: Resources
+      streamlined_bike_shop_registration_page: streamlined Bike Shop registration
+        page
+      use_ascend: Use Ascend?
+      use_lightspeed_retail_pos: Use Lightspeed Retail POS?
+      users: Users
+      viewing_our_streamlined_page: >-
+        You're currently viewing our streamlined Bike Shop registration page, which
+        is what we recommend using
     period_select:
       all: All
       past_30_days: past 30 days
