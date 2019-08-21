@@ -8,7 +8,8 @@ RSpec.describe EmailPromotedAlertWorker, type: :worker do
   let!(:theft_alert) { FactoryBot.create(:theft_alert, stolen_record: stolen_record) }
   it "sends a promoted alert emails" do
     ActionMailer::Base.deliveries = []
-    EmailPromotedAlertWorker.perform_async(theft_alert.id)
+    EmailPromotedAlertWorker.new.perform(theft_alert.id)
+    pp ActionMailer::Base.deliveries
     expect(ActionMailer::Base.deliveries.empty?).to be_falsey
   end
 end
