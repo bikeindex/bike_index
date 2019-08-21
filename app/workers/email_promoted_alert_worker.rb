@@ -1,5 +1,6 @@
-class EmailPromotedAlertWorker
-  include Sidekiq::Worker
+class EmailPromotedAlertWorker < ApplicationWorker
+
+  sidekiq_options queue: "notify"
 
   def perform(theft_alert_id)
     theft_alert = TheftAlert.find(theft_alert_id)
