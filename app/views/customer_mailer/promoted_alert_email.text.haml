@@ -3,7 +3,7 @@
 
 = t(".text.sorry_to_hear_about_your_bike", brand: @bike.manufacturer)
 
-= t(".text.your_promoted_alert", city: @user.city.present? ? @user.city : "your city", id: @bike.id)
+= t(".text.your_promoted_alert", city: @theft_alert.stolen_record.city.present? ? @theft_alert.stolen_record.city : "your city", id: @bike.id)
 - if @alert_image.present?
   = image_tag @alert_image.url
 
