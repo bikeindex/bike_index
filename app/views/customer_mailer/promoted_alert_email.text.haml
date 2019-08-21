@@ -1,9 +1,9 @@
 
 = @user.name
 
-= t(".html.sorry_to_hear_about_your_bike", brand: @bike.manufacturer)
+= t(".text.sorry_to_hear_about_your_bike", brand: @bike.manufacturer)
 
-= t(".html.your_promoted_alert", city: @user.city.present? ? @user.city : "your city", id: @bike.id)
+= t(".text.your_promoted_alert", city: @user.city.present? ? @user.city : "your city", id: @bike.id)
 - if @alert_image.present?
   = image_tag @alert_image.url
 
