@@ -55,6 +55,11 @@ class CustomerMailerPreview < ActionMailer::Preview
     CustomerMailer.recovered_from_link(recovered_record)
   end
 
+  def promoted_alert
+    theft_alert = TheftAlert.last
+    CustomerMailer.promoted_alert_email(theft_alert)
+  end
+
   private
 
   def preview_user
