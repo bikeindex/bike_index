@@ -120,7 +120,7 @@
               - if controller_name == "bikes" && action_name == "new"
                 = t(".viewing_our_streamlined_page")
               - else
-                - bike_shop_registration_link = link_to t(".streamlined_bike_shop_registration_page"), new_organization_bike_path(organization_id: current_organization.to_param)
-                = t(".register_bikes_with_link_html", link: bike_shop_registration_link)
+                - link = link_to t(".streamlined_bike_shop_registration_page"), new_organization_bike_path(organization_id: current_organization.to_param)
+                = t(".register_bikes_with_link_html", link: link)
 
     = yield

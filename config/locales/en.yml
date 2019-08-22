@@ -4026,7 +4026,7 @@ en:
       other_point_of_sale_system: Other Point of Sale system?
       read_a_full_explanation_html: Read a full explanation of %{link}.
       recoveries: Recoveries
-      register_bikes_with_link_html: Register bikes with our <strong>%{bike_shop_registration_link}</strong>
+      register_bikes_with_link_html: Register bikes with our <strong>%{link}</strong>
       registration_stickers: Registration stickers
       resources: Resources
       streamlined_bike_shop_registration_page: streamlined Bike Shop registration
