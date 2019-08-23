@@ -26,4 +26,18 @@ class BikeCodeBatch < ActiveRecord::Base
     # minimum of 4. Return a larger number if there's a larger code in the batch
     max_code_integer.to_s.length > 4 ? max_code_integer.to_s.length : 4
   end
+
+  # Really simple implementation for internal use
+  def non_sequential_integers
+    non_sequential = []
+    previous = nil
+    bike_codes.pluck(:code_integer).sort.each do |i|
+      # Only run this if previous is present
+      if previous.present? && previous + 1 != i
+        non_sequential << [previous, i]
+      end
+      previous = i
+    end
+    non_sequential
+  end
 end
