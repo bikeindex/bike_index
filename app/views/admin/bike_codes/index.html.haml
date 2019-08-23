@@ -85,14 +85,17 @@
           Viewing Just Batch ##{@bike_code_batch.id}
         %small
           = link_to "view all batches", admin_bike_codes_path(sortable_search_params.except(:search_bike_code_batch_id))
-      %em
-        Duplicated:
-      %ul
-        - @bike_code_batch.duplicated_integers.each do |int|
-          %li.small
-            %code
-              = int
-      Non-sequential:
+
+      - duplicated = @bike_code_batch.duplicated_integers
+      - if duplicated.any?
+        %em
+          Duplicated:
+        %ul
+          - duplicated.each do |int|
+            %li.small
+              %code
+                = int
+      Non-sequential codes:
       %ul
         - @bike_code_batch.non_sequential_integers.each do |arr|
           %li.small

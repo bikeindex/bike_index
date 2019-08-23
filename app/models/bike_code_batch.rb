@@ -27,7 +27,7 @@ class BikeCodeBatch < ActiveRecord::Base
     max_code_integer.to_s.length > 4 ? max_code_integer.to_s.length : 4
   end
 
-  # Shouldn't actually occur, but included for diagnostic purposes
+  # Shouldn't occur anymore, but included for legacy diagnostic purposes
   def duplicated_integers
     bike_code_integers.map do |int|
       next unless bike_code_integers.count(int) > 1
