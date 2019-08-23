@@ -47,6 +47,7 @@ RSpec.describe BikeCodeBatch, type: :model do
         bike_code_batch.create_codes(1, initial_code_integer: 12)
       end.to change(BikeCode, :count).by 1
       expect(bike_code_batch.bike_codes.pluck(:code)).to match_array(target_codes + %w[XD10002 XD10003 XD00012])
+      expect(bike_code_batch.non_sequential_integers).to eq([[12, 9999]])
     end
     context "without a prefix" do
       let(:bike_code_batch) { FactoryBot.create(:bike_code_batch, prefix: nil) }
