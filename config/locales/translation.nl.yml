@@ -202,7 +202,7 @@ nl:
         avatar: Avatar
         banned: Verboden
         can_send_many_stolen_notifications: Kan veel gestolen meldingen verzenden
-        city: City
+        city: Stad
         confirmation_token: 'Verzendbevestiging '
         confirmed: Bevestigd
         created_bikes: Fietsen gemaakt
@@ -217,7 +217,7 @@ nl:
         last_login_at: Laatste login om
         last_login_ip: Laatste login ip
         latitude: Breedte
-        locks: sloten
+        locks: Sloten
         longitude: Lengte
         magic_link_token: Magisch linktoken
         memberships: lidmaatschappen
@@ -227,7 +227,7 @@ nl:
         notification_unstolen: Melding niet gestolen
         oauth_applications: Oauth-applicaties
         organization_embeds: Organisatie sluit in
-        organizations: organisaties
+        organizations: Organisaties
         owned_bikes: Eigen fietsen
         ownerships: ownerships
         partner_data: Partner gegevens
@@ -249,7 +249,7 @@ nl:
         superuser: Super gebruiker
         terms_of_service: Servicevoorwaarden
         title: Titel
-        twitter: Tjilpen
+        twitter: Twitter
         user_emails: Gebruiker e-mails
         username: Gebruikersnaam
         vendor_terms_of_service: Servicevoorwaarden van de leverancier
@@ -436,9 +436,9 @@ nl:
         file: file
         file_format: Bestandsformaat
         kind: Soort
-        options: opties
+        options: Opties
         progress: Vooruitgang
-        rows: rijen
+        rows: Rijen
       feedback:
         body: Lichaam
         email: E-mailadres
@@ -2445,7 +2445,7 @@ nl:
         elk gewenst moment te raadplegen, te wijzigen, te corrigeren of te verwijderen.
         Neem hiervoor contact op met <a href="mailto:contact@bikeindex.org">contact@bikeindex.org</a>
         .
-      cookies: koekjes
+      cookies: Cookies
       cookies_p1: Een cookie is een kleine hoeveelheid gegevens, die vaak een anonieme
         unieke identificatie bevat, die vanaf uw computer naar de browser wordt verzonden
         en op de harde schijf van uw computer wordt opgeslagen. De opgeslagen informatie
@@ -4612,7 +4612,7 @@ nl:
       add_a_lock: Voeg een slot toe
       add_a_photo: Voeg een foto toe
       add_some_info: Voeg info toe
-      bikes: Bikes
+      bikes: fietsen
       combination: Combinatie
       date_stolen: Datum gestolen
       edit: Bewerken
@@ -4629,7 +4629,7 @@ nl:
       serial: serie-
       sorry_your_bike_was_stolen: Het spijt ons dat uw %{bikes_last_type} is gestolen,
         maar hopelijk krijgt u hem terug, als iedereen er naar kan zoeken.
-      stolen: Gestolen
+      stolen: GESTOLEN
       tell_us_more_about_yourself: Vertel ons meer over uzelf.
       thanks_for_adding_your_bike: Geweldig! We zijn blij dat u een %{bikes_last_type}
         heeft toegevoegd aan de index.
