@@ -27,11 +27,19 @@ class BikeCodeBatch < ActiveRecord::Base
     max_code_integer.to_s.length > 4 ? max_code_integer.to_s.length : 4
   end
 
-  # Really simple implementation for internal use
+  # Shouldn't actually occur, but included for diagnostic purposes
+  def duplicated_integers
+    bike_code_integers.map do |int|
+      next unless bike_code_integers.count(int) > 1
+      int
+    end.reject(&:blank?)
+  end
+
+  # Really simple implementation for diagnostic purposes
   def non_sequential_integers
     non_sequential = []
     previous = nil
-    bike_codes.pluck(:code_integer).sort.each do |i|
+    bike_code_integers.uniq.sort.each do |i|
       # Only run this if previous is present
       if previous.present? && previous + 1 != i
         non_sequential << [previous, i]
@@ -39,5 +47,11 @@ class BikeCodeBatch < ActiveRecord::Base
       previous = i
     end
     non_sequential
+  end
+
+  private
+
+  def bike_code_integers
+    @bike_code_integers ||= bike_codes.pluck(:code_integer)
   end
 end
