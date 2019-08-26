@@ -1931,6 +1931,63 @@ en:
       logo_with_blue_shield_html: Logo with blue shield and white text (%{svg_link},
         %{png_link})
       striped_logo_html: Striped logo (%{svg_link}, %{png_link})
+    lightspeed:
+      a_few_things_to_note: 'A few things to note:'
+      a_listing_on_bike_index_will_be_created: >-
+        Once your Lightspeed Retail account is connected to your Bike Index account
+        with automatic registration turned on, a listing on Bike Index will be automatically
+        created for every bicycle you sell. All you need to do is add the customer's
+        email address and the bicycle's serial number during a normal Lightspeed Retail
+        checkout.
+      all_you_have_to_do_is_go_to_html: >-
+        All you have to do is go to %{link}, where you'll be asked to authorize Bike
+        Index to access your Lightspeed Account.
+      bicycles_sold_before_you_activated_lights: >-
+        Bicycles sold before you activated Lightspeed Retail integration will not
+        be registered.
+      bike_index_cofounder: Bike Index co-founder
+      how_to_lightspeed_retail: 'How to: Lightspeed Retail and Bike Index Integration'
+      i_started_bike_index_because: >-
+        I started Bike Index because I wanted to register bikes for my customers at
+        the shop where I worked – with this integration, we finally give shops a way
+        to register bikes that doesn't interfere with selling them.
+      learn_more_about: Learn more about
+      lightspeed_retail: Lightspeed Retail
+      once_you_have_a_bike_index_account_set_up: >-
+        Once you have a Bike Index account set up for your shop, there will be a link
+        on this page to take you to the integration.
+      privacy_policy_here: Privacy Policy here
+      sign_your_shop_up: Sign your shop up
+      the_bicycles_owner_will_receive_an_email: >-
+        The bicycle's owner will receive an email with all the information he or she
+        needs to log in and maintain the account as well as a PDF copy of the registration
+        information.
+      the_first_step_is_to_create_an_account_html: >-
+        The first step is to create an account for yourself and your shop - you can
+        do that <a href='#add_organization' class='scroll-to-ref'>at the bottom of
+        this page</a>
+      this_page_gives_instructions_html: >-
+        This page gives instructions on integrating Bike Index registration with your
+        Lightspeed Retail POS system. <strong><a href=\"%{about_url}\">Read our about
+        page</a></strong> for general information about what Bike Index is and why
+        it's important.
+      we_believe_that_bicycle_registration: >-
+        At Bike Index we believe that bicycle registration is one of the simplest
+        and most effective ways to fight bicycle theft. By offering complete integration
+        with Lightspeed Retail, we've made registration a quick, painless, and automated
+        process for you and your customers.
+      we_know_you_and_your_customers_html: >-
+        We know you and your customers are concerned about privacy and access to your
+        sales and customer information. Bike Index is committed to keeping your information
+        safe and secure, and we will never send your customers unsolicited email.
+        You can view our %{link}.
+      were_happy_to_answer_any_questions_html: >-
+        We're happy to answer any questions you have about making Bike Index work
+        with Lightspeed Retail and we're always looking for ways to improve the integration.
+        Please %{link} with any questions, concerns, comments, or suggestions.
+      write_do_not_register: >-
+        If a customer doesn't want a bike to be added to Bike Index, simply write
+        "DO NOT REGISTER" in the notes for the sale and the bicycle will not be registered.
     privacy:
       available_here: available here
       changes: Changes
