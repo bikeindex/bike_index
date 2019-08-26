@@ -1917,6 +1917,20 @@ en:
       our_api_documentation: Our API documentation
       trifold_flyer: Trifold Flyer
       trifold_flyer_pdf_url: https://files.bikeindex.org/stored/Bike-Index-TriFold.pdf
+    image_resources:
+      basic_logo_html: Basic logo (%{svg_link}, %{png_link})
+      basic_logo_in_white_html: Basic logo in white (%{svg_link}, %{png_link})
+      bike_index_image_assets: Bike Index image assets
+      black_background_shown_here: Black background shown here for visibility
+      check_out_resources_html: Check out %{resources_link} for additional design
+        resources
+      image_has_no_background: image has no background, shown here with black for
+        visibility
+      logo_with_background_cutout_html: Logo with background cutout (%{svg_link},
+        %{png_link})
+      logo_with_blue_shield_html: Logo with blue shield and white text (%{svg_link},
+        %{png_link})
+      striped_logo_html: Striped logo (%{svg_link}, %{png_link})
     privacy:
       available_here: available here
       changes: Changes
