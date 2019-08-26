@@ -2062,6 +2062,52 @@ en:
         Any questions about this Privacy Policy should be addressed to <a href="mailto:contact@bikeindex.org">contact@bikeindex.org</a>
       see_terms_link_html: Please see the %{terms_link} for definitions of terms.
       terms_of_service: Terms of Service
+    protect_your_bike:
+      211547_bikes_were_reported_stolen: 211,547 bikes were reported stolen
+      9_in_10_incidents_of_bike_theft: 9 in 10 incidents of bike theft
+      a_correctly_locked_bicycle: A correctly locked bicycle
+      according_to_fbi_statistics_html: >-
+        According to FBI statistics, %{stolen_link} in 2014, the most recent available
+        year with data. An estimated %{theft_link} go unreported. That's a lot of
+        bikes! If you would like to read more about bike theft in the US, check out
+        Priceonomics's %{priceonomics_link} of the topic. %{back_link}.
+      aim_to_have_the_hardest_bike_to_steal_on_: >-
+        Aim to have the hardest bike to steal on the rack. We consider two U-locks,
+        or a U-lock and one heavy duty cable, to be the minimum required in large
+        cities to keep a bike secure.
+      cable_locks_should_never_be_used_as_primary: Cable locks should never be used
+        as a primary means of locking a bike in a city.
+      cheaper_and_older_ulocks_can_often_be_broken: Cheaper and older U-locks can
+        often be broken without any tools.
+      correctly_locking_a_bike: Correctly locking a bike
+      dont_rely_on_foot_traffic_to_keep_your_bi: >-
+        Don't rely on foot traffic to keep your bike safe; years of reports have taught
+        us that many thefts, particularly those involving cutting cable locks, occur
+        under the cover of crowd activity or in front of bustling cafés or restaurants.
+      dont_rely_on_the_presence_of_cameras_to_k: >-
+        Don't rely on the presence of cameras to keep your bike secure. Security footage
+        is rarely of much use once a bike is gone, and thieves know this.
+      exploration: exploration
+      jump_to_footnote_1: Jump back to footnote 1 in the text
+      make_sure_your_bike_isnt_one_of_them: Make sure your bike isn't one of them
+      many_bicycles_are_stolen_from_garages_and: >-
+        Many bicycles are stolen from garages and store rooms. Lock your bike securely
+        to an immovable object even if in a "secure" place.
+      over_a_million_bikes_are_stolen_yearly: Over a million bikes are stolen every
+        year in the US
+      pink_power_ulocks: Pink Power U-Locks are a registered trademark of Bike Index,
+        NFP
+      protect_your_bike: Protect your bike!
+      thanks_to_researchers_html: >-
+        Thanks to %{chicago_link} for suggestions and the research behind these guidelines.
+        Thanks to %{sweethome_link} for their excellent article on choosing a lock.
+      the_frame_is_locked_to_an_immovable_objec: The frame is locked to an immovable
+        object. Both wheels are secured.
+      tug_on_whatever_youre_about_to_lock_to_ma: >-
+        Tug on whatever you're about to lock to make sure it can't be easily removed.
+        Signposts in particular can be easily removed by unbolting them and some are
+        already unattached.
+      use_a_ulock_that_costs_at_least_40: Use a u-lock that costs at least $40.
     terms_text:
       about_our_terms_of_service: About our Terms of Service
       available_here: available here
