@@ -2108,6 +2108,23 @@ en:
         Signposts in particular can be easily removed by unbolting them and some are
         already unattached.
       use_a_ulock_that_costs_at_least_40: Use a u-lock that costs at least $40.
+    resources:
+      api_documentation: API documentation
+      bike_index_resources: Bike Index Resources
+      check_out_our_link_html: Check out our %{link}.
+      did_you_know_every_bike_html: Did you know every bike has a unique, identifying
+        number? %{link}.
+      get_bike_index_html: Get Bike Index %{link}.
+      how_not_to_buy_a_stolen_bike: How not to buy a stolen bike in 4 easy steps
+      infographic_html: "<strong>Infographic</strong>: %{link}"
+      learn_about_serial_numbers_here: Learn about serial numbers here
+      logos_and_design_assets: logos and design assets
+      map_of_bike_thefts: map of bike thefts
+      the_manufacturers: the manufacturers
+      view_the_list_of_all_html: View the list of all %{link} we know about.
+      we_have_an_open_api_check_out_html: We have an open API - check out our %{link}.
+      were_open_source_view_this_app_html: We're open source, view this app (and other
+        things) on %{github_link}.
     terms_text:
       about_our_terms_of_service: About our Terms of Service
       available_here: available here
