@@ -3,7 +3,7 @@
 %ul.serial-pictures
   %li
     %a.serial-image.blackbg{ href: image_path('resources/logo_bordered.svg') }
-      = image_tag('resources/logo_bordered.svg', alt: 'Basic logo')
+      = image_tag('resources/logo_bordered.svg', alt: t('.basic_logo_alt'))
     %p
       - svg_link = link_to 'svg', image_path('resources/logo_bordered.svg')
       - png_link = link_to 'png', image_path('resources/logo_bordered.png')
@@ -13,14 +13,14 @@
         = t(".black_background_shown_here")
   %li
     %a.serial-image{ href: image_path('resources/logo_striped.svg') }
-      = image_tag('resources/logo_striped_short.svg', alt: 'Logo with stripes')
+      = image_tag('resources/logo_striped_short.svg', alt: t('.logo_with_stripes'))
     %p
       - svg_link = link_to 'svg', image_path('resources/logo_striped.svg')
       - png_link = link_to 'png', image_path('resources/logo_striped.png')
       = t(".striped_logo_html", svg_link: svg_link, png_link: png_link)
   %li
     %a.serial-image{ href: image_path('resources/logo.svg') }
-      = image_tag('resources/logo.svg', alt: 'Single color logo')
+      = image_tag('resources/logo.svg', alt: t('.single_color_logo'))
     %p
       - svg_link = link_to 'svg', image_path('resources/logo.svg')
       - png_link = link_to 'png', image_path('resources/logo.png')
@@ -28,7 +28,7 @@
 
   %li
     %a.serial-image.blackbg{ href: image_path('resources/logo_white.svg') }
-      = image_tag('resources/logo_white.svg', alt: 'Single color logo in white')
+      = image_tag('resources/logo_white.svg', alt: t('.single_color_logo_in_white'))
     %p
       - svg_link = link_to 'svg', image_path('resources/logo_white.svg')
       - png_link = link_to 'png', image_path('resources/logo_white.png')
@@ -39,7 +39,7 @@
 
   %li
     %a.serial-image.blackbg{ href: image_path('resources/logo_backgrounded.svg') }
-      = image_tag('resources/logo_backgrounded.svg', alt: 'Logo with background cutout')
+      = image_tag('resources/logo_backgrounded.svg', alt: t('.logo_with_cutout'))
     %p
       - svg_link = link_to 'svg', image_path('resources/logo_backgrounded.svg')
       - png_link = link_to 'png', image_path('resources/logo_backgrounded.png')

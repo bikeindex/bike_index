@@ -1918,6 +1918,7 @@ en:
       trifold_flyer: Trifold Flyer
       trifold_flyer_pdf_url: https://files.bikeindex.org/stored/Bike-Index-TriFold.pdf
     image_resources:
+      basic_logo_alt: Basic logo
       basic_logo_html: Basic logo (%{svg_link}, %{png_link})
       basic_logo_in_white_html: Basic logo in white (%{svg_link}, %{png_link})
       bike_index_image_assets: Bike Index image assets
@@ -1930,6 +1931,10 @@ en:
         %{png_link})
       logo_with_blue_shield_html: Logo with blue shield and white text (%{svg_link},
         %{png_link})
+      logo_with_cutout: Logo with background cutout
+      logo_with_stripes: Logo with stripes
+      single_color_logo: Single color logo
+      single_color_logo_in_white: Single color logo in white
       striped_logo_html: Striped logo (%{svg_link}, %{png_link})
     lightspeed:
       a_few_things_to_note: 'A few things to note:'
