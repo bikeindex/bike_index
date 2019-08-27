@@ -61,11 +61,11 @@ class BikeV2Serializer < ActiveModel::Serializer
         .assets["revised/bike_photo_placeholder.svg"]
         .digest_path
 
-    "/assets/#{svg_path}"
+    "#{ENV["BASE_URL"]}/assets/#{svg_path}"
   end
 
   def url
-    Rails.application.routes.url_helpers.bike_path(object)
+    "#{ENV["BASE_URL"]}/bikes/#{object.id}"
   end
 
   def is_stock_img

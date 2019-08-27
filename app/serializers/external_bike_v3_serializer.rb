@@ -60,7 +60,7 @@ class ExternalBikeV3Serializer < ActiveModel::Serializer
         .assets["revised/bike_photo_placeholder.svg"]
         .digest_path
 
-    "/assets/#{svg_path}"
+    "#{ENV["BASE_URL"]}/assets/#{svg_path}"
   end
 
   def thumb

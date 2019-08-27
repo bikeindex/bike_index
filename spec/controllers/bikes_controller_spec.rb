@@ -43,7 +43,6 @@ RSpec.describe BikesController, type: :controller do
           expect(assigns(:interpreted_params)).to eq target_interpreted_params
           expect(assigns(:selected_query_items_options)).to eq target_selected_query_items_options
           expect(assigns(:bikes).map(&:id)).to eq([])
-          expect(assigns(:close_serials).map(&:id)).to eq([non_stolen_bike.id])
         end
       end
       context "ip proximity" do

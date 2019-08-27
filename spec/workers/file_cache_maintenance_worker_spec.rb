@@ -27,8 +27,8 @@ RSpec.describe FileCacheMaintenanceWorker, type: :job do
       result = JSON.parse(File.read(cache_all_stolen_worker.tmp_path))
       expect(result["bikes"].count).to eq(1)
       expect(result["bikes"][0]["serial"]).to eq("party seri8al")
-      bike_v2_serializer_keys = %w(id title serial manufacturer_name frame_model year frame_colors thumb large_img is_stock_img stolen stolen_location date_stolen)
-      expect(result["bikes"][0].keys).to eq bike_v2_serializer_keys
+      bike_v2_serializer_keys = %w(id title serial manufacturer_name frame_model year frame_colors thumb large_img is_stock_img stolen stolen_location date_stolen date_stolen_string placeholder_image url)
+      expect(result["bikes"][0].keys).to match_array(bike_v2_serializer_keys)
     end
   end
 
