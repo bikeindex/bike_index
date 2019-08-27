@@ -9,9 +9,12 @@ class BikeV2Serializer < ActiveModel::Serializer
     :thumb,
     :large_img,
     :is_stock_img,
+    :placeholder_image,
     :stolen,
     :stolen_location,
-    :date_stolen
+    :date_stolen_string,
+    :date_stolen,
+    :url
 
   def serial
     object.serial_display
@@ -27,6 +30,10 @@ class BikeV2Serializer < ActiveModel::Serializer
 
   def date_stolen
     object.current_stolen_record && object.current_stolen_record.date_stolen.to_i
+  end
+
+  def date_stolen_string
+    object.current_stolen_record&.date_stolen&.to_date&.to_s
   end
 
   def thumb
@@ -45,6 +52,20 @@ class BikeV2Serializer < ActiveModel::Serializer
     elsif object.stock_photo_url.present?
       object.stock_photo_url
     end
+  end
+
+  def placeholder_image
+    svg_path =
+      Rails
+        .application
+        .assets["revised/bike_photo_placeholder.svg"]
+        .digest_path
+
+    "/assets/#{svg_path}"
+  end
+
+  def url
+    Rails.application.routes.url_helpers.bike_path(object)
   end
 
   def is_stock_img
