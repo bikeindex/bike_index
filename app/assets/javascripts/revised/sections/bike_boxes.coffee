@@ -23,9 +23,10 @@ class BikeIndex.BikeBoxes extends BikeIndex
     return true if $target.find('.hover-expand-block').length > 0
     # Manually replace the image url with src for medium images - brittle...
     # but we don't want to have to query every bikes public images
+    img_src = $target.data('img-src') or $target.find('img').prop('src')
     data =
       title: $target.parents('.bike-box-item').find('.title-link').text()
-      img_src: $target.find('img').prop('src').replace /\/small_/, '/medium_'
+      img_src: img_src.replace /\/small_/, '/medium_'
     $target.append Mustache.to_html(window.hoverExpandBlockTemplate, data)
 
   hoverExpandBlockTemplate: ->
