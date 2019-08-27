@@ -20,6 +20,37 @@ const bikeResponse = {
   ],
 };
 
+
+const externalBikeResponse = {
+  bikes: [
+    {
+      date_stolen: "2010-10-06",
+      debug: "corps_code: PL1600\nregistration_number: 2010027007\ncolor: GRIJS\nbrand: BATAVUS\nbrand_type: LIVE\ncategory: DK42\nobject: FIETS\nlicense_plate_number: BA6038224\nengine_serial_number: \nchassis_number: \nunique_number: \ndate_input: 2010-03-22T00:00:00\nchange_of_date: 2010-03-22T15:40:00\ninsert_date: 2010-10-06T15:04:00\nsource: KOH\nsource_name: POLITIE HOLLANDS MIDDEN\nsource_unique_id: 90765\nmatch_type: PARTIAL HIT",
+      description: null,
+      frame_colors: ["Grijs"],
+      frame_model: "Live",
+      id: "2010027007",
+      is_stock_img: true,
+      large_img: "/assets/revised/bike_photo_placeholder-ff15adbd9bf89e10bf3cd2cd6c4e85e5d1056e50463ae722822493624db72e56.svg",
+      location_found: null,
+      manufacturer_name: "Batavus",
+      registry_id: "2010027007",
+      registry_name: "stopheling.nl",
+      registry_url: "https://www.stopheling.nl",
+      serial: "BA6038224",
+      source_name: "Politie Hollands Midden",
+      source_unique_id: "90765",
+      status: "Stolen",
+      stolen: true,
+      stolen_location: null,
+      thumb: "/assets/revised/bike_photo_placeholder-ff15adbd9bf89e10bf3cd2cd6c4e85e5d1056e50463ae722822493624db72e56.svg",
+      title: "Batavus Live",
+      url: "https://www.stopheling.nl"
+    }
+  ]
+};
+
 export {
   bikeResponse,
+  externalBikeResponse,
 };

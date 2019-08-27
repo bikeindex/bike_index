@@ -151,7 +151,7 @@ RSpec.describe StolenRecord, type: :model do
       stolen1 = FactoryBot.create(:stolen_record, current: true, tsved_at: Time.current)
       stolen2 = FactoryBot.create(:stolen_record, current: true, tsved_at: nil)
 
-      expect(StolenRecord.tsv_today.pluck(:id)).to eq([stolen1.id, stolen2.id])
+      expect(StolenRecord.tsv_today.pluck(:id)).to match_array([stolen1.id, stolen2.id])
     end
   end
 

@@ -19,9 +19,11 @@ class BikesController < ApplicationController
       flash[:info] = "Sorry, we don't know the location \"#{params[:location]}\". Please try a different location to search nearby stolen bikes"
     end
     @bikes = Bike.search(@interpreted_params).page(params[:page] || 1).per(params[:per_page] || 10).decorate
-    if @interpreted_params[:serial]
+
+    if @interpreted_params[:serial].present?
       @close_serials = Bike.search_close_serials(@interpreted_params).limit(10).decorate
     end
+
     @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
   end
 

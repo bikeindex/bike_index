@@ -52,7 +52,7 @@ module API
           notes: <<-NOTE,
             If you want to search for bikes stolen near a specific location, you need to use this endpoint.
             Keep in mind that it only returns stolen bikes - so if you do a serial search, and nothing turns up that doesn't mean that the bike isn't registered.
-            **Notes on location searching**: 
+            **Notes on location searching**:
             - `proximity` accepts an ip address (IPv6 is supported), an address, zipcode, city, or latitude,longitude. e.g. `70.210.133.87`, `210 NW 11th Ave, Portland, OR`, `60647`, `Chicago, IL`, or `45.521728,-122.67326`
             - `proximity_square` sets the length of the sides of the square to find matches inside of. The square is centered on the location specified by `proximity`. It defaults to 100.
           NOTE
@@ -87,13 +87,13 @@ module API
             ```javascript
             {
               "proximity": 19,
-              "stolen": 100, 
+              "stolen": 100,
               "non_stolen": 111
             }
             ```
             `proximity` is the count of matching stolen bikes within the proximity of your search. If no location was included, the location is determined via IP geolocation.
             If you include a serial query, we return `close_serials`
-            
+
             *the `stolen` paramater is ignored, but shown here for consistency*
           NOTE
         }
@@ -126,7 +126,7 @@ module API
 
         desc "All stolen bikes", {
           notes: <<-NOTE,
-            Returns all the stolen bikes. Not paginated, the response is over > 10mb 
+            Returns all the stolen bikes. Not paginated, the response is over > 10mb
 
             This is a cached response, updated a few times a day. The most recent update time is in the `Last-Modified` header.
 
