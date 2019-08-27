@@ -244,7 +244,7 @@ nl:
         show_phone: Toon telefoon
         show_twitter: Twitter weergeven
         show_website: Website weergeven
-        street: straat
+        street: Straat
         subscriptions: abonnementen
         superuser: Super gebruiker
         terms_of_service: Servicevoorwaarden
@@ -3069,6 +3069,140 @@ nl:
         informatie en andere zaken bevat hierin uiteengezet en waarin wordt uitgelegd
         hoe en voor welke doeleinden we de informatie die u ons verstrekt verzamelen,
         gebruiken, bewaren, openbaar maken en beveiligen.
+    image_resources:
+      basic_logo_alt: Basis logo
+      basic_logo_html: Basislogo (%{svg_link}, %{png_link})
+      basic_logo_in_white_html: Basislogo in wit (%{svg_link}, %{png_link})
+      bike_index_image_assets: Bike Index afbeelding activa
+      black_background_shown_here: Zwarte achtergrond hier getoond voor zichtbaarheid
+      check_out_resources_html: Bekijk %{resources_link} voor extra ontwerpbronnen
+      image_has_no_background: afbeelding heeft geen achtergrond, hier weergegeven
+        met zwart voor zichtbaarheid
+      logo_with_background_cutout_html: Logo met achtergrondafbeelding (%{svg_link},
+        %{png_link})
+      logo_with_blue_shield_html: Logo met blauw schild en witte tekst (%{svg_link},
+        %{png_link})
+      logo_with_cutout: Logo met achtergrondknipsel
+      logo_with_stripes: Logo met strepen
+      single_color_logo: Eén kleur logo
+      single_color_logo_in_white: Wit logo in één kleur
+      striped_logo_html: Gestreept logo (%{svg_link}, %{png_link})
+    lightspeed:
+      a_few_things_to_note: 'Een paar dingen om op te merken:'
+      a_listing_on_bike_index_will_be_created: Zodra uw Lightspeed Retail-account
+        is gekoppeld aan uw Bike Index-account met automatische registratie ingeschakeld,
+        wordt automatisch een vermelding op Bike Index gemaakt voor elke fiets die
+        u verkoopt. Het enige wat u hoeft te doen is het e-mailadres van de klant
+        en het serienummer van de fiets toevoegen tijdens een normale Lightspeed Retail-kassa.
+      all_you_have_to_do_is_go_to_html: Het enige wat u hoeft te doen is naar %{link}
+        te gaan, waar u wordt gevraagd Bike Index te autoriseren voor toegang tot
+        uw Lightspeed-account.
+      bicycles_sold_before_you_activated_lights: Fietsen die zijn verkocht voordat
+        u Lightspeed Retail-integratie hebt geactiveerd, worden niet geregistreerd.
+      bike_index_cofounder: Medeoprichter van Bike Index
+      how_to_lightspeed_retail: 'How to: Lightspeed Retail en Bike Index-integratie'
+      i_started_bike_index_because: Ik begon Bike Index omdat ik fietsen wilde registreren
+        voor mijn klanten in de winkel waar ik werkte - met deze integratie geven
+        we winkels eindelijk een manier om fietsen te registreren die de verkoop niet
+        belemmeren.
+      learn_more_about: Leer meer over
+      lightspeed_retail: Lightspeed Retail
+      once_you_have_a_bike_index_account_set_up: Nadat u een Bike Index-account voor
+        uw winkel heeft ingesteld, staat er een link op deze pagina om u naar de integratie
+        te brengen.
+      privacy_policy_here: Privacybeleid hier
+      sign_your_shop_up: Meld je winkel aan
+      the_bicycles_owner_will_receive_an_email: De eigenaar van de fiets ontvangt
+        een e-mail met alle informatie die hij of zij nodig heeft om in te loggen
+        en het account te onderhouden, evenals een PDF-kopie van de registratie-informatie.
+      the_first_step_is_to_create_an_account_html: De eerste stap is om een account
+        aan te maken voor uzelf en uw winkel - u kunt dat <a href='#add_organization'
+        class='scroll-to-ref'>onderaan deze pagina doen</a>
+      this_page_gives_instructions_html: Deze pagina geeft instructies voor het integreren
+        van Bike Index-registratie met uw Lightspeed Retail-kassasysteem. <strong><a
+        href=\"%{about_url}\">Lees onze over-pagina</a></strong> voor algemene informatie
+        over wat Bike Index is en waarom het belangrijk is.
+      we_believe_that_bicycle_registration: Bij Bike Index geloven we dat fietsregistratie
+        een van de eenvoudigste en meest effectieve manieren is om fietsdiefstal te
+        bestrijden. Door volledige integratie met Lightspeed Retail aan te bieden,
+        hebben we registratie voor u en uw klanten tot een snel, pijnloos en geautomatiseerd
+        proces gemaakt.
+      we_know_you_and_your_customers_html: We weten dat u en uw klanten bezorgd zijn
+        over privacy en toegang tot uw verkoop- en klantinformatie. Bike Index doet
+        er alles aan om uw informatie veilig te houden en we zullen uw klanten nooit
+        ongevraagde e-mail sturen. U kunt onze %{link} bekijken.
+      were_happy_to_answer_any_questions_html: We beantwoorden graag uw vragen over
+        het laten werken van Bike Index met Lightspeed Retail en we zijn altijd op
+        zoek naar manieren om de integratie te verbeteren. Gelieve %{link} met vragen,
+        opmerkingen, opmerkingen of suggesties.
+      write_do_not_register: Als een klant niet wil dat een fiets wordt toegevoegd
+        aan de fietsindex, schrijft u gewoon "NIET REGISTREREN" in de notities voor
+        de verkoop en de fiets wordt niet geregistreerd.
+    protect_your_bike:
+      211547_bikes_were_reported_stolen: 211.547 fietsen werden als gestolen gemeld
+      9_in_10_incidents_of_bike_theft: 9 op 10 incidenten van fietsdiefstal
+      a_correctly_locked_bicycle: Een correct vergrendelde fiets
+      according_to_fbi_statistics_html: Volgens de FBI-statistieken %{stolen_link}
+        in 2014, het meest recente beschikbare jaar met gegevens. Een geschatte %{theft_link}
+        wordt niet gerapporteerd. Dat zijn veel fietsen! Als u meer wilt lezen over
+        fietsdiefstal in de VS, bekijk dan Priceonomics's %{priceonomics_link} van
+        het onderwerp. %{back_link}.
+      aim_to_have_the_hardest_bike_to_steal_on_: Probeer de moeilijkste fiets te hebben
+        om op het rek te stelen. We beschouwen twee U-sloten, of een U-slot en een
+        kabel voor zwaar gebruik, als het minimale vereiste in grote steden om een
+        fiets veilig te houden.
+      cable_locks_should_never_be_used_as_primary: Kabelsloten mogen nooit worden
+        gebruikt als primair middel om een fiets in een stad te vergrendelen.
+      cheaper_and_older_ulocks_can_often_be_broken: Goedkopere en oudere U-sloten
+        kunnen vaak zonder gereedschap worden gebroken.
+      correctly_locking_a_bike: Een fiets correct vergrendelen
+      dont_rely_on_foot_traffic_to_keep_your_bi: Vertrouw niet op voetverkeer om uw
+        fiets veilig te houden; Jarenlange rapporten hebben ons geleerd dat veel diefstallen,
+        met name die waarbij kabelsloten worden geknipt, plaatsvinden onder dekking
+        van menigte-activiteiten of voor drukke cafés of restaurants.
+      dont_rely_on_the_presence_of_cameras_to_k: Vertrouw niet op de aanwezigheid
+        van camera's om uw fiets veilig te houden. Beveiligingsbeelden zijn zelden
+        van veel nut als een fiets weg is, en dieven weten dit.
+      exploration: exploratie
+      jump_to_footnote_1: Spring terug naar voetnoot 1 in de tekst
+      make_sure_your_bike_isnt_one_of_them: Zorg ervoor dat uw fiets daar niet bij
+        hoort
+      many_bicycles_are_stolen_from_garages_and: Veel fietsen worden gestolen uit
+        garages en opslagruimten. Vergrendel uw fiets veilig aan een onbeweeglijk
+        object, zelfs op een "veilige" plaats.
+      over_a_million_bikes_are_stolen_yearly: Meer dan een miljoen fietsen worden
+        elk jaar in de VS gestolen
+      pink_power_ulocks: Pink Power U-Locks zijn een geregistreerd handelsmerk van
+        Bike Index, NFP
+      protect_your_bike: Bescherm je fiets!
+      thanks_to_researchers_html: Met dank aan %{chicago_link} voor suggesties en
+        het onderzoek achter deze richtlijnen. Met dank aan %{sweethome_link} voor
+        hun uitstekende artikel over het kiezen van een slot.
+      the_frame_is_locked_to_an_immovable_objec: Het frame is vergrendeld aan een
+        onbeweeglijk object. Beide wielen zijn beveiligd.
+      tug_on_whatever_youre_about_to_lock_to_ma: Trek aan wat je gaat vergrendelen
+        om ervoor te zorgen dat het niet gemakkelijk kan worden verwijderd. Vooral
+        wegwijzers kunnen gemakkelijk worden verwijderd door ze los te maken en sommige
+        zijn al niet bevestigd.
+      use_a_ulock_that_costs_at_least_40: Gebruik een u-lock die minstens $ 40 kost.
+    resources:
+      api_documentation: API-documentatie
+      bike_index_resources: Bike Index middelen
+      check_out_our_link_html: Bekijk onze %{link}.
+      did_you_know_every_bike_html: Wist je dat elke fiets een uniek, identificerend
+        nummer heeft? %{link}.
+      get_bike_index_html: Download fietsindex %{link}.
+      how_not_to_buy_a_stolen_bike: Hoe koop je geen gestolen fiets in 4 eenvoudige
+        stappen?
+      infographic_html: "<strong>Infographic</strong> : %{link}"
+      learn_about_serial_numbers_here: Lees hier meer over serienummers
+      logos_and_design_assets: logo's en ontwerpelementen
+      map_of_bike_thefts: kaart van fietsdiefstallen
+      the_manufacturers: de fabrikanten
+      view_the_list_of_all_html: Bekijk de lijst met alle %{link} die we kennen.
+      we_have_an_open_api_check_out_html: We hebben een open API - bekijk onze %{link}.
+      were_open_source_view_this_app_html: We zijn open source, bekijk deze app (en
+        andere dingen) op %{github_link}.
   landing_pages:
     ambassadors_current:
       after_a_couple_of_recoveries_i_got_hooked: Na een paar herstelacties raakte
