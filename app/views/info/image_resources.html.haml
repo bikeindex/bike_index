@@ -1,43 +1,54 @@
-%h1 Bike Index image assets
+%h1= t(".bike_index_image_assets")
 
 %ul.serial-pictures
   %li
     %a.serial-image.blackbg{ href: image_path('resources/logo_bordered.svg') }
-      = image_tag('resources/logo_bordered.svg', alt: 'Basic logo')
+      = image_tag('resources/logo_bordered.svg', alt: t('.basic_logo_alt'))
     %p
-      Logo with blue shield and white text (#{link_to 'svg', image_path('resources/logo_bordered.svg') }, #{link_to 'png', image_path('resources/logo_bordered.png') })
+      - svg_link = link_to 'svg', image_path('resources/logo_bordered.svg')
+      - png_link = link_to 'png', image_path('resources/logo_bordered.png')
+      = t(".logo_with_blue_shield_html", svg_link: svg_link, png_link: png_link)
       %br
       %small.less-strong
-        Black background shown here for visibility
+        = t(".black_background_shown_here")
   %li
     %a.serial-image{ href: image_path('resources/logo_striped.svg') }
-      = image_tag('resources/logo_striped_short.svg', alt: 'Logo with stripes')
+      = image_tag('resources/logo_striped_short.svg', alt: t('.logo_with_stripes'))
     %p
-      Striped logo (#{link_to 'svg', image_path('resources/logo_striped.svg') }, #{link_to 'png', image_path('resources/logo_striped.png') })
+      - svg_link = link_to 'svg', image_path('resources/logo_striped.svg')
+      - png_link = link_to 'png', image_path('resources/logo_striped.png')
+      = t(".striped_logo_html", svg_link: svg_link, png_link: png_link)
   %li
     %a.serial-image{ href: image_path('resources/logo.svg') }
-      = image_tag('resources/logo.svg', alt: 'Single color logo')
+      = image_tag('resources/logo.svg', alt: t('.single_color_logo'))
     %p
-      Basic logo (#{link_to 'svg', image_path('resources/logo.svg') }, #{link_to 'png', image_path('resources/logo.png') })
+      - svg_link = link_to 'svg', image_path('resources/logo.svg')
+      - png_link = link_to 'png', image_path('resources/logo.png')
+      = t(".basic_logo_html", svg_link: svg_link, png_link: png_link)
 
   %li
     %a.serial-image.blackbg{ href: image_path('resources/logo_white.svg') }
-      = image_tag('resources/logo_white.svg', alt: 'Single color logo in white')
+      = image_tag('resources/logo_white.svg', alt: t('.single_color_logo_in_white'))
     %p
-      Basic logo in white (#{link_to 'svg', image_path('resources/logo_white.svg') }, #{link_to 'png', image_path('resources/logo_white.png') })
+      - svg_link = link_to 'svg', image_path('resources/logo_white.svg')
+      - png_link = link_to 'png', image_path('resources/logo_white.png')
+      = t(".basic_logo_in_white_html", svg_link: svg_link, png_link: png_link)
       %br
       %small.less-strong
-        image has no background, shown here with black for visibility
+        = t(".image_has_no_background")
 
   %li
     %a.serial-image.blackbg{ href: image_path('resources/logo_backgrounded.svg') }
-      = image_tag('resources/logo_backgrounded.svg', alt: 'Logo with background cutout')
+      = image_tag('resources/logo_backgrounded.svg', alt: t('.logo_with_cutout'))
     %p
-      Logo with background cutout (#{link_to 'svg', image_path('resources/logo_backgrounded.svg') }, #{link_to 'png', image_path('resources/logo_backgrounded.png') })
+      - svg_link = link_to 'svg', image_path('resources/logo_backgrounded.svg')
+      - png_link = link_to 'png', image_path('resources/logo_backgrounded.png')
+      = t(".logo_with_background_cutout_html", svg_link: svg_link, png_link: png_link)
       %br
       %small.less-strong
-        Black background shown here for visibility
+        = t(".black_background_shown_here")
 
 
 %h5
-  Check out #{link_to "Dev and Design resources", dev_and_design_path} for additional design resources
+  - resources_link = link_to "Dev and Design resources", dev_and_design_path
+  = t(".check_out_resources_html", resources_link: resources_link)

@@ -1917,6 +1917,82 @@ en:
       our_api_documentation: Our API documentation
       trifold_flyer: Trifold Flyer
       trifold_flyer_pdf_url: https://files.bikeindex.org/stored/Bike-Index-TriFold.pdf
+    image_resources:
+      basic_logo_alt: Basic logo
+      basic_logo_html: Basic logo (%{svg_link}, %{png_link})
+      basic_logo_in_white_html: Basic logo in white (%{svg_link}, %{png_link})
+      bike_index_image_assets: Bike Index image assets
+      black_background_shown_here: Black background shown here for visibility
+      check_out_resources_html: Check out %{resources_link} for additional design
+        resources
+      image_has_no_background: image has no background, shown here with black for
+        visibility
+      logo_with_background_cutout_html: Logo with background cutout (%{svg_link},
+        %{png_link})
+      logo_with_blue_shield_html: Logo with blue shield and white text (%{svg_link},
+        %{png_link})
+      logo_with_cutout: Logo with background cutout
+      logo_with_stripes: Logo with stripes
+      single_color_logo: Single color logo
+      single_color_logo_in_white: Single color logo in white
+      striped_logo_html: Striped logo (%{svg_link}, %{png_link})
+    lightspeed:
+      a_few_things_to_note: 'A few things to note:'
+      a_listing_on_bike_index_will_be_created: >-
+        Once your Lightspeed Retail account is connected to your Bike Index account
+        with automatic registration turned on, a listing on Bike Index will be automatically
+        created for every bicycle you sell. All you need to do is add the customer's
+        email address and the bicycle's serial number during a normal Lightspeed Retail
+        checkout.
+      all_you_have_to_do_is_go_to_html: >-
+        All you have to do is go to %{link}, where you'll be asked to authorize Bike
+        Index to access your Lightspeed Account.
+      bicycles_sold_before_you_activated_lights: >-
+        Bicycles sold before you activated Lightspeed Retail integration will not
+        be registered.
+      bike_index_cofounder: Bike Index co-founder
+      how_to_lightspeed_retail: 'How to: Lightspeed Retail and Bike Index Integration'
+      i_started_bike_index_because: >-
+        I started Bike Index because I wanted to register bikes for my customers at
+        the shop where I worked – with this integration, we finally give shops a way
+        to register bikes that doesn't interfere with selling them.
+      learn_more_about: Learn more about
+      lightspeed_retail: Lightspeed Retail
+      once_you_have_a_bike_index_account_set_up: >-
+        Once you have a Bike Index account set up for your shop, there will be a link
+        on this page to take you to the integration.
+      privacy_policy_here: Privacy Policy here
+      sign_your_shop_up: Sign your shop up
+      the_bicycles_owner_will_receive_an_email: >-
+        The bicycle's owner will receive an email with all the information he or she
+        needs to log in and maintain the account as well as a PDF copy of the registration
+        information.
+      the_first_step_is_to_create_an_account_html: >-
+        The first step is to create an account for yourself and your shop - you can
+        do that <a href='#add_organization' class='scroll-to-ref'>at the bottom of
+        this page</a>
+      this_page_gives_instructions_html: >-
+        This page gives instructions on integrating Bike Index registration with your
+        Lightspeed Retail POS system. <strong><a href=\"%{about_url}\">Read our about
+        page</a></strong> for general information about what Bike Index is and why
+        it's important.
+      we_believe_that_bicycle_registration: >-
+        At Bike Index we believe that bicycle registration is one of the simplest
+        and most effective ways to fight bicycle theft. By offering complete integration
+        with Lightspeed Retail, we've made registration a quick, painless, and automated
+        process for you and your customers.
+      we_know_you_and_your_customers_html: >-
+        We know you and your customers are concerned about privacy and access to your
+        sales and customer information. Bike Index is committed to keeping your information
+        safe and secure, and we will never send your customers unsolicited email.
+        You can view our %{link}.
+      were_happy_to_answer_any_questions_html: >-
+        We're happy to answer any questions you have about making Bike Index work
+        with Lightspeed Retail and we're always looking for ways to improve the integration.
+        Please %{link} with any questions, concerns, comments, or suggestions.
+      write_do_not_register: >-
+        If a customer doesn't want a bike to be added to Bike Index, simply write
+        "DO NOT REGISTER" in the notes for the sale and the bicycle will not be registered.
     privacy:
       available_here: available here
       changes: Changes
@@ -1991,6 +2067,69 @@ en:
         Any questions about this Privacy Policy should be addressed to <a href="mailto:contact@bikeindex.org">contact@bikeindex.org</a>
       see_terms_link_html: Please see the %{terms_link} for definitions of terms.
       terms_of_service: Terms of Service
+    protect_your_bike:
+      211547_bikes_were_reported_stolen: 211,547 bikes were reported stolen
+      9_in_10_incidents_of_bike_theft: 9 in 10 incidents of bike theft
+      a_correctly_locked_bicycle: A correctly locked bicycle
+      according_to_fbi_statistics_html: >-
+        According to FBI statistics, %{stolen_link} in 2014, the most recent available
+        year with data. An estimated %{theft_link} go unreported. That's a lot of
+        bikes! If you would like to read more about bike theft in the US, check out
+        Priceonomics's %{priceonomics_link} of the topic. %{back_link}.
+      aim_to_have_the_hardest_bike_to_steal_on_: >-
+        Aim to have the hardest bike to steal on the rack. We consider two U-locks,
+        or a U-lock and one heavy duty cable, to be the minimum required in large
+        cities to keep a bike secure.
+      cable_locks_should_never_be_used_as_primary: Cable locks should never be used
+        as a primary means of locking a bike in a city.
+      cheaper_and_older_ulocks_can_often_be_broken: Cheaper and older U-locks can
+        often be broken without any tools.
+      correctly_locking_a_bike: Correctly locking a bike
+      dont_rely_on_foot_traffic_to_keep_your_bi: >-
+        Don't rely on foot traffic to keep your bike safe; years of reports have taught
+        us that many thefts, particularly those involving cutting cable locks, occur
+        under the cover of crowd activity or in front of bustling cafés or restaurants.
+      dont_rely_on_the_presence_of_cameras_to_k: >-
+        Don't rely on the presence of cameras to keep your bike secure. Security footage
+        is rarely of much use once a bike is gone, and thieves know this.
+      exploration: exploration
+      jump_to_footnote_1: Jump back to footnote 1 in the text
+      make_sure_your_bike_isnt_one_of_them: Make sure your bike isn't one of them
+      many_bicycles_are_stolen_from_garages_and: >-
+        Many bicycles are stolen from garages and store rooms. Lock your bike securely
+        to an immovable object even if in a "secure" place.
+      over_a_million_bikes_are_stolen_yearly: Over a million bikes are stolen every
+        year in the US
+      pink_power_ulocks: Pink Power U-Locks are a registered trademark of Bike Index,
+        NFP
+      protect_your_bike: Protect your bike!
+      thanks_to_researchers_html: >-
+        Thanks to %{chicago_link} for suggestions and the research behind these guidelines.
+        Thanks to %{sweethome_link} for their excellent article on choosing a lock.
+      the_frame_is_locked_to_an_immovable_objec: The frame is locked to an immovable
+        object. Both wheels are secured.
+      tug_on_whatever_youre_about_to_lock_to_ma: >-
+        Tug on whatever you're about to lock to make sure it can't be easily removed.
+        Signposts in particular can be easily removed by unbolting them and some are
+        already unattached.
+      use_a_ulock_that_costs_at_least_40: Use a u-lock that costs at least $40.
+    resources:
+      api_documentation: API documentation
+      bike_index_resources: Bike Index Resources
+      check_out_our_link_html: Check out our %{link}.
+      did_you_know_every_bike_html: Did you know every bike has a unique, identifying
+        number? %{link}.
+      get_bike_index_html: Get Bike Index %{link}.
+      how_not_to_buy_a_stolen_bike: How not to buy a stolen bike in 4 easy steps
+      infographic_html: "<strong>Infographic</strong>: %{link}"
+      learn_about_serial_numbers_here: Learn about serial numbers here
+      logos_and_design_assets: logos and design assets
+      map_of_bike_thefts: map of bike thefts
+      the_manufacturers: the manufacturers
+      view_the_list_of_all_html: View the list of all %{link} we know about.
+      we_have_an_open_api_check_out_html: We have an open API - check out our %{link}.
+      were_open_source_view_this_app_html: We're open source, view this app (and other
+        things) on %{github_link}.
     terms_text:
       about_our_terms_of_service: About our Terms of Service
       available_here: available here
