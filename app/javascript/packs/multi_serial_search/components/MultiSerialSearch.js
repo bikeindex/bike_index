@@ -3,7 +3,7 @@
 import React, { useState, Fragment } from "react";
 import searchIcon from "images/stolen/search.svg";
 import SearchResults from "./SearchResults";
-import { fetchSerialResults, fetchFuzzyResults } from "../api";
+import { fetchSerialResults, fetchFuzzyResults } from "../../api";
 import honeybadger from "../../utils/honeybadger";
 
 const MultiSerialSearch = () => {

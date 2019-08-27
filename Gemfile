@@ -33,6 +33,7 @@ gem "carrierwave_backgrounder"
 gem "dalli"
 gem "draper", require: false # NB: Draper is deprecated in this project
 gem "eventmachine"
+gem "faraday_middleware"
 gem "fog-aws"
 gem "geocoder"
 gem "hamlit"
@@ -135,6 +136,7 @@ end
 
 group :development do
   gem "bullet"
+  gem "faraday-request_response_logger", git: "https://github.com/pramod-sharma/faraday-request_response_logger"
   gem "guard"
   gem "guard-rspec", require: false
   gem "guard-rubocop", require: false

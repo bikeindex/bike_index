@@ -1,3 +1,9 @@
+GIT
+  remote: https://github.com/pramod-sharma/faraday-request_response_logger
+  revision: c07780bae0c1e9e93de55997991a5ec40a1a4f11
+  specs:
+    faraday-request_response_logger (0.1.0)
+
 GEM
   remote: https://rubygems.org/
   remote: https://rails-assets.org/
@@ -131,6 +137,8 @@ GEM
       railties (>= 3.0.0)
     faraday (0.15.4)
       multipart-post (>= 1.2, < 3)
+    faraday_middleware (0.13.1)
+      faraday (>= 0.7.4, < 1.0)
     fast_blank (1.0.0)
     ffi (1.11.1)
     flamegraph (0.9.5)
@@ -663,6 +671,8 @@ DEPENDENCIES
   draper
   eventmachine
   factory_bot_rails
+  faraday-request_response_logger!
+  faraday_middleware
   fast_blank (~> 1.0)
   flamegraph
   flipper

@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe Counts, type: :model do
   let(:redis) { Redis.new }
-  before { redis.expire(Counts::STOREAGE_KEY, 0) }
+  before { redis.del(Counts::STOREAGE_KEY) }
 
   context "total_bikes" do
     it "saves things to redis" do

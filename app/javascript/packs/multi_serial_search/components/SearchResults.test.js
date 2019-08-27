@@ -5,13 +5,13 @@ import { shallow, mount } from "enzyme";
 import toJson from "enzyme-to-json";
 import { bikeResponse } from "helpers/bikes";
 import { event } from "helpers/utils";
-import * as api from "../api";
+import * as api from "../../api";
 import SearchResults from "./SearchResults";
 
 /*
   api mocks
 */
-jest.mock("../api");
+jest.mock("../../api");
 api.fetchFuzzyResults.mockImplementation(
   () => new Promise(resolve => resolve(bikeResponse))
 );

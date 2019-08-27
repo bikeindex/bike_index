@@ -1,3 +1,5 @@
+= javascript_pack_tag "external_registry_search/index"
+
 - stolenness_desc = { 'proximity' => 'nearby stolen', 'non' => 'non-stolen', 'stolen' => 'stolen', 'all' => 'all' }[@interpreted_params[:stolenness]]
 
 .container
@@ -66,6 +68,13 @@
 
         %ul.bike-boxes
           = render partial: 'bikes/bike', collection: @close_serials, as: :bike
+
+      - if Flipper.enabled?(:external_registry_search, current_user)
+        %h3.secondary-matches#js-external-registry-search-header
+          .loading.d-none= t(".searching_external_registries")
+          .loaded.d-none= t(".external_matches_found")
+          .loaded-none.no-exact-results.d-none= t(".no_external_matches_found")
+        #js-external-registry-search
 
     .col-md-4.ad-col
       .ad-block#right300x600

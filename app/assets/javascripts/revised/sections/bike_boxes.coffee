@@ -10,12 +10,14 @@ class BikeIndex.BikeBoxes extends BikeIndex
     # Disable preview images on touch devices
     # iOS opens the preview windows and you can't close them
     unless 'ontouchstart' of document.documentElement
-      $('a.hover-expand').hover (->
+      $('body').on "mouseenter", ".hover-expand", ->
         $target = $(this)
         hoverExpand($target)
         $target.addClass 'img-expanded'
-      ), ->
-        $(this).removeClass 'img-expanded'
+
+      $('body').on "mouseleave", ".hover-expand", ->
+        $target = $(this)
+        $target.removeClass 'img-expanded'
 
   hoverExpand: ($target) ->
     return true if $target.find('.hover-expand-block').length > 0
