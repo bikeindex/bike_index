@@ -3214,6 +3214,11 @@ en:
     en: English
     nl: Nederlands (Dutch)
   locks:
+    edit:
+      are_you_sure: Are you sure?
+      back_to_viewing_all_locks: back to viewing all locks
+      delete_this_lock: Delete this lock
+      edit_the_lock: Edit the lock
     form:
       add_the_lock: Add the lock!
       additional_notes: Additional notes
