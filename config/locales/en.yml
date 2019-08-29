@@ -3944,6 +3944,15 @@ en:
     staff_accounts: Staff accounts
     supporting_our_nonprofit: Supporting our nonprofit
     welcome_campaign: Welcome campaign on Facebook, Twitter, and Instagram
+  registrations:
+    create:
+      in_it_youll_find_instructions: In it, you'll find instructions on how to complete
+        the registration of your bike
+      radicool: Radicool!
+      we_got_this: We got this.
+      we_sent_an_email_to: 'We sent an email to:'
+      well_do_our_best_to_help_you_recover_it: We'll do our best to help you get it
+        back
   sessions:
     magic_link:
       enter_email_address: Enter your email address, we'll send you an email with
