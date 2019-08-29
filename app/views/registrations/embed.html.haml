@@ -1,23 +1,30 @@
-= form_for @b_param, { url: registrations_path, action: 'create' } do |f|
+= form_for @b_param, { url: registrations_path, action: "create" } do |f|
   .form-group
-    - email_placeholder = current_organization && current_organization.school? ? "#{current_organization.slug} email" : 'your email'
-    = f.email_field :owner_email, required: true, value: @owner_email, placeholder: email_placeholder, class: 'form-control'
+    - email_owner = current_organization&.school? ? current_organization.slug : t(".your")
+    - email_placeholder = t(".owner_email", owner: email_owner)
+
+    = f.email_field :owner_email, required: true, value: @owner_email, placeholder: email_placeholder, class: "form-control"
+
   .form-group
     - initial_mnfg = @b_param.manufacturer && { id: @b_param.manufacturer.id, text: @b_param.manufacturer.name }.to_json
-    = f.text_field :manufacturer_id, value: @b_param.manufacturer && @b_param.manufacturer.name, class: 'form-control unfancy', placeholder: 'bike manufacturer', data: { initial: initial_mnfg }
+    = f.text_field :manufacturer_id, value: @b_param.manufacturer&.name, class: "form-control unfancy", placeholder: t(".bike_manufacturer"), data: { initial: initial_mnfg }
+
     %span.below-input-help
-      Select 'Other' if manufacturer doesn't show up when entered
+      = t(".select_other_if_manufacturer_doesnt_show")
+
   .form-group.fancy-select.unfancy
-    = f.select(:primary_frame_color_id, Color.select_options, required: true, prompt: 'primary frame color', class: 'form-control')
+    = f.select(:primary_frame_color_id, Color.select_options, required: true, prompt: t(".primary_frame_color"), class: "form-control")
+
   - if @selectable_child_organizations.any?
     .form-group
-      = f.collection_select(:creation_organization_id, @selectable_child_organizations, :id, :name, { prompt: "Choose Specific Organization (optional)" }, { required: true, class: "form-control" })
+      = f.collection_select(:creation_organization_id, @selectable_child_organizations, :id, :name, { prompt: t(".choose_specific_organization_optional") }, { required: true, class: "form-control" })
   - else
     = f.hidden_field :creation_organization_id
+
   .form-group
     %label
       = f.check_box :stolen
-      This bike is either missing or stolen
+      = t(".this_bike_is_either_missing_or_stolen")
 
   .submit-wrapper
-    = submit_tag 'Register', class: 'btn btn-lg btn-primary'
+    = submit_tag t(".register"), class: "btn btn-lg btn-primary"

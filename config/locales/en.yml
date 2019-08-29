@@ -3953,6 +3953,16 @@ en:
       we_sent_an_email_to: 'We sent an email to:'
       well_do_our_best_to_help_you_recover_it: We'll do our best to help you get it
         back
+    embed:
+      bike_manufacturer: bike manufacturer
+      choose_specific_organization_optional: Choose Specific Organization (optional)
+      owner_email: "%{owner} email"
+      primary_frame_color: primary frame color
+      register: Register
+      select_other_if_manufacturer_doesnt_show: Select 'Other' if manufacturer doesn't
+        show up when entered
+      this_bike_is_either_missing_or_stolen: This bike is either missing or stolen
+      your: your
   sessions:
     magic_link:
       enter_email_address: Enter your email address, we'll send you an email with
