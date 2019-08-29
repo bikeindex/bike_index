@@ -3365,6 +3365,15 @@ en:
     precision:
       format:
         delimiter: ''
+  organization_invitations:
+    not_available:
+      contact_us: Contact us
+      contact_us_if_you_think_were_wrong_html: "%{contact_us_link} if you think we're
+        wrong."
+      perhaps_that_link_has_already_been_used_t: Perhaps that link has already been
+        used to join the group?
+      whoops_that_link_isnt_connected_to_a_bike: Whoops, that link isn't connected
+        to a bike
   organized:
     ambassador_dashboards:
       getting_started:
