@@ -3920,6 +3920,7 @@ en:
       bike_index_is_a_nonprofit_html: Bike Index is a %{nonprofit_link}.
       donate_today: Donate today
       next: next  >
+      other_amount: Other amount
       pay_bike_index: Pay Bike Index
       select_an_amount: Select an amount
   plan_features:
