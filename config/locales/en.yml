@@ -3908,6 +3908,20 @@ en:
         youre_just_a_few_steps_away_from_register: >-
           You're just a few steps away from registering your bike on the world's most
           comprehensive bike registry.
+  payments:
+    create:
+      bike_index_team: Bike Index team
+      thank_you_for_supporting_bike_index: Thank you for supporting Bike Index!
+      we_received_your_payment_of: We received your payment of %{amount}
+      xoxo: XOXO,
+      your_donation_saved_bikes: Your donation of $%{amount} just saved the bikes.
+    form:
+      501c3_nonprofit: 501(c)(3) nonprofit
+      bike_index_is_a_nonprofit_html: Bike Index is a %{nonprofit_link}.
+      donate_today: Donate today
+      next: next  >
+      pay_bike_index: Pay Bike Index
+      select_an_amount: Select an amount
   plan_features:
     add_form_fields: Add specific form fields to your landing page
     add_logos: Add logos and text to Bike Index emails
