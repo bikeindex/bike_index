@@ -3250,6 +3250,9 @@ en:
       save_information_about_your_bike_lock: Save information about your bike lock!
       you_can_also_record_your_lock_html: You can also <strong>record your lock combinations</strong>.
       your_locks: Your locks
+    new:
+      save_information_about_one_of_your_locks: Save information about one of your
+        locks
   meta_descriptions:
     bikes_index: Search for bikes that have been registered on Bike Index
     bikes_new: >-
