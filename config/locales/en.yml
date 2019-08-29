@@ -3213,6 +3213,22 @@ en:
   locales:
     en: English
     nl: Nederlands (Dutch)
+  locks:
+    form:
+      add_the_lock: Add the lock!
+      additional_notes: Additional notes
+      basic: Basic
+      choose_manufacturer: Choose manufacturer
+      examples_of_serial_numbers_found_on_diffe: Examples of serial numbers found
+        on different types of bike lock keys
+      has_combination: Has combination
+      has_key: Has key
+      large_kryptonite_key: Large Kryptonite key
+      lock_type: Lock type
+      other_lock_manufacturer: Other lock manufacturer
+      pinhead_locking_skewer_key: Pinhead locking skewer key
+      small_kryptonite_key: Small Kryptonite key
+      update_the_lock: Update the lock!
   meta_descriptions:
     bikes_index: Search for bikes that have been registered on Bike Index
     bikes_new: >-
