@@ -3998,6 +3998,10 @@ en:
       make: 'Make:'
       serial: 'Serial:'
       stolen_from: 'Stolen from:'
+    errors:
+      error: error
+      errors_prevented_this_from_being_saved: "%{errors_count} prevented this %{object_name}
+        from being saved:"
     faq:
       absolutely: Absolutely!
       add_a_stolen_bike_link: add your your stolen bike to Bike Index!
