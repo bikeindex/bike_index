@@ -1,10 +1,11 @@
 - if current_user.present?
   %p
     %em
-      Your current account (<strong>#{current_user.email}</strong>) will be a member of the organization you create.
+      = t(".your_current_account_will_be_a_member_html", user_email: current_user.email)
   %p
     %em
-      If you don't want that to be the case, #{link_to 'log out', session_path(redirect_location: 'new_user'), method: :delete} and sign up with the email you would like to use instead.
+      - logout_link = link_to t(".log_out"), session_path(redirect_location: 'new_user'), method: :delete
+      = t(".if_you_dont_want_that_to_be_the_case_html", logout_link: logout_link)
 
   = form_for @organization, html: { class: 'organized-form mt-4' } do |f|
 
@@ -13,25 +14,24 @@
         .alert.alert-error
           %a.close{"data-dismiss" => "alert"} ×
           %h4
-            Please fix the following
-            = pluralize(@organization.errors.count, "error")
+            = t(".please_fix_the_following_errors", errors: pluralize(@organization.errors.count, t(".error")))
           %ul
             - @organization.errors.full_messages.each do |msg|
-              %li
-                = msg
+              %li= msg
     .card
       .card-block
         %h3.card-title
-          New organization
+          = t(".new_organization")
         - if current_user.memberships.count > 0
           .alert.alert-info.mt-4.mb-4
             - org = current_user.organizations.first
             %h3.padded.header-font-alt.text-center
-              You are already a member of #{link_to org.name, organization_root_path(org.slug)}.
+              - org_link = link_to org.name, organization_root_path(org.slug)
+              = t(".you_are_already_a_member_of_org_html", org_link: org_link)
             %p.text-center
-              Filling out this form will create a new, different organization
+              = t(".filling_out_this_form_will_create_a_new_org")
         .form-group.row.mt-4
-          = f.label :name, 'Organization name', class: 'org-form-label'
+          = f.label :name, t(".organization_name"), class: 'org-form-label'
           .col-sm-4
             = f.text_field :name, required: true, class: 'form-control'
 
@@ -42,7 +42,7 @@
 
         .form-group.row
           %label.org-form-label
-            Organization kind
+            = t(".organization_kind")
           .col-sm-4
             - Organization.user_creatable_kinds.each do |kind|
               .radio
@@ -51,17 +51,15 @@
                   = kind.humanize
         .form-group.row
           .col-sm-4.col-sm-push-4
-            = f.submit 'add organization', class: 'btn btn-success'
+            = f.submit t(".add_organization"), class: 'btn btn-success'
 - else
   %h3.header-font-alt
-    Add your organization to Bike Index, for free, in three easy steps:
+    = t(".add_your_organization_to_bike_index")
   %ol
     %li
-      Sign up for a #{link_to "Bike Index account", new_user_url(return_to: "/organizations/new")}
+      - new_account_link = link_to t(".bike_index_account"), new_user_url(return_to: "/organizations/new")
+      = t(".sign_up_for_a_new_account_html", new_account_link: new_account_link)
     %li
-      Confirm your email
+      = t(".confirm_your_email")
     %li
-      Fill out the form that will appear on this page once you're signed in.
-
-
-
+      = t(".fill_out_the_form_that_will_appear")

@@ -3591,6 +3591,31 @@ en:
       zipcode: Zipcode
     new:
       bike_index_for_organizations: Bike Index for organizations
+    new_form:
+      add_organization: add organization
+      add_your_organization_to_bike_index: 'Add your organization to Bike Index, for
+        free, in three easy steps:'
+      bike_index_account: Bike Index account
+      confirm_your_email: Confirm your email
+      error: error
+      fill_out_the_form_that_will_appear: Fill out the form that will appear on this
+        page once you're signed in.
+      filling_out_this_form_will_create_a_new_org: Filling out this form will create
+        a new, different organization
+      if_you_dont_want_that_to_be_the_case_html: >-
+        If you don't want that to be the case, %{logout_link} and sign up with the
+        email you would like to use instead.
+      log_out: log out
+      new_organization: New organization
+      new_user: new_user
+      organization_kind: Organization kind
+      organization_name: Organization name
+      please_fix_the_following_errors: Please fix the following %{errors}
+      sign_up_for_a_new_account_html: Sign up for a %{new_account_link}
+      you_are_already_a_member_of_org_html: You are already a member of %{org_link}.
+      your_current_account_will_be_a_member_html: >-
+        Your current account (<strong>%{user_email}</strong>) will be a member of
+        the organization you create.
   organized:
     ambassador_dashboards:
       getting_started:
