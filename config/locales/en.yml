@@ -1679,7 +1679,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -1705,7 +1705,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -3607,7 +3607,6 @@ en:
         email you would like to use instead.
       log_out: log out
       new_organization: New organization
-      new_user: new_user
       organization_kind: Organization kind
       organization_name: Organization name
       please_fix_the_following_errors: Please fix the following %{errors}
