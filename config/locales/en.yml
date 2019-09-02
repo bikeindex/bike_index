@@ -3502,6 +3502,40 @@ en:
       whoops_that_link_isnt_connected_to_a_bike: Whoops, that link isn't connected
         to a bike
   organizations:
+    embed_extended:
+      add_a_color: Add a color
+      additional_serial: Additional serial/sticker number
+      address: Address
+      any_extra_words: Any extra words?
+      choose_color: Choose color
+      choose_handlebar: Choose handlebar
+      choose_material: Choose material
+      choose_photo: Choose photo
+      city: City
+      frame_color: Frame color
+      image_has_been_uploaded: Image has been uploaded
+      manufacturer_name: Manufacturer name
+      model_year: Model year
+      optional_additions: Optional additions
+      org_affiliation: "%{org_name} affiliation"
+      other_defining_features: Other defining features
+      other_manufacturer: Other manufacturer
+      owners_email_address: Owner's email address
+      owners_phone: Owner's phone
+      owners_street_address: Owner's Street address
+      primary_frame_material: Primary frame material
+      register_this: Register this
+      remove_color: Remove color
+      secondary_color: Secondary color
+      select_other_if_manufacturer_isnt_listed: Select 'Other' if manufacturer isn't
+        listed
+      state: State
+      sticker_id: Sticker id
+      third_color: Third color
+      unknown_serial: Unknown serial
+      unknown_year: Unknown year
+      unsure_or_unknown: Unsure or unknown
+      zipcode: Zipcode
     new:
       bike_index_for_organizations: Bike Index for organizations
   organized:
