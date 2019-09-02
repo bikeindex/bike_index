@@ -3502,6 +3502,13 @@ en:
       whoops_that_link_isnt_connected_to_a_bike: Whoops, that link isn't connected
         to a bike
   organizations:
+    embed_create_success:
+      bike_was_registered_to_you_html: "%{bike_link} was registered to you through
+        <strong>%{org_name}</strong>."
+      you_will_receive_an_email_confirmation: You will receive an email confirmation
+        shortly.
+      your_bike_has_been_added_to_bike_index: Your %{bike_type} has been added to
+        Bike Index!
     embed_extended:
       add_a_color: Add a color
       additional_serial: Additional serial/sticker number
