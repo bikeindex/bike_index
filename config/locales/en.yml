@@ -1679,7 +1679,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1705,7 +1705,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -3501,6 +3501,9 @@ en:
         used to join the group?
       whoops_that_link_isnt_connected_to_a_bike: Whoops, that link isn't connected
         to a bike
+  organizations:
+    new:
+      bike_index_for_organizations: Bike Index for organizations
   organized:
     ambassador_dashboards:
       getting_started:
