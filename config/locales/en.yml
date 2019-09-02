@@ -3502,6 +3502,52 @@ en:
       whoops_that_link_isnt_connected_to_a_bike: Whoops, that link isn't connected
         to a bike
   organizations:
+    embed:
+      add_a_color: Add a color
+      additional_serial: Additional serial/sticker number
+      address: Address
+      choose_color: Choose color
+      choose_country: Choose country
+      city: City
+      currently_registering_a_nonstolen_bike: >-
+        Currently registering a non-stolen bike. Click here to register a STOLEN bike
+        instead.
+      department_city: Department & city
+      description_of_the_theft: Description of the theft
+      eg_if_we_tweet_about_or_someone_searches: e.g., if we tweet about or someone
+        searches for its serial number
+      filing_a_police_report_is_important_html: >-
+        Filing a <strong>police report</strong> is <span class="stolen-color">extremely
+        important</span> for stolen bike recovery.
+      frame_color: Frame color
+      image_has_been_uploaded: Image has been uploaded
+      intersection_or_address: Intersection or address
+      manufacturer_name: Manufacturer name
+      model_year: Model year
+      optional_upload_a_photo: Optional - upload a photo
+      other_manufacturer: Other manufacturer
+      owners_street_address: Owner's Street address
+      police_report_number: Police report number
+      receive_notifications_from_bike_index: Receive notifications from the Index
+        about this stolen %{bike_type}
+      register: Register
+      registering_a_stolen_bike_click_here: Registering a stolen bike. Click here
+        to register a non-stolen bike
+      remove_color: Remove color
+      secondary_color: Secondary color
+      select_other_if_manufacturer_isnt_listed: Select 'Other' if manufacturer isn't
+        listed
+      state: State
+      third_color: Third color
+      this: this
+      unknown_serial: Unknown serial
+      unknown_year: Unknown year
+      unsure_or_unknown: Unsure or unknown
+      when_was_it_stolen: When was it stolen?
+      where_was_it_stolen: Where was it stolen?
+      your_email_address: Your email address
+      your_phone_number: Your phone number
+      zipcode: Zipcode
     embed_create_success:
       bike_was_registered_to_you_html: "%{bike_link} was registered to you through
         <strong>%{org_name}</strong>."
