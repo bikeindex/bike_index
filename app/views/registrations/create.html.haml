@@ -1,15 +1,15 @@
-
 %h2
   - if @b_param.stolen
-    We got this.
+    = t(".we_got_this")
   - else
-    Radicool!
+    = t(".radicool")
 %p
-  We sent an email to:
+  = t(".we_sent_an_email_to")
   %strong #{@b_param.owner_email}
+
 %p
-  In it, you'll find instructions on how to complete the registration of your bike
+  = t(".in_it_youll_find_instructions")
 
 - if @b_param.stolen
   %p
-    We'll do our best to help you get it back
+    = t(".well_do_our_best_to_help_you_recover_it")

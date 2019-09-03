@@ -1,10 +1,7 @@
-%h2
-  Whoops, that link isn't connected to a bike
+%h2= t(".whoops_that_link_isnt_connected_to_a_bike")
+
+%p= t(".perhaps_that_link_has_already_been_used_t")
 
 %p
-  Perhaps that link has already been used to join the group?
-
-
-%p
-  = link_to "Contact us", contact_us_url
-  if you think we're wrong.
+  - link = link_to t(".contact_us"), contact_us_url
+  = t(".contact_us_if_you_think_were_wrong_html", contact_us_link: link)

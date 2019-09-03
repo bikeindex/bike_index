@@ -3492,6 +3492,15 @@ en:
     precision:
       format:
         delimiter: ''
+  organization_invitations:
+    not_available:
+      contact_us: Contact us
+      contact_us_if_you_think_were_wrong_html: "%{contact_us_link} if you think we're
+        wrong."
+      perhaps_that_link_has_already_been_used_t: Perhaps that link has already been
+        used to join the group?
+      whoops_that_link_isnt_connected_to_a_bike: Whoops, that link isn't connected
+        to a bike
   organized:
     ambassador_dashboards:
       getting_started:
@@ -4026,6 +4035,21 @@ en:
         youre_just_a_few_steps_away_from_register: >-
           You're just a few steps away from registering your bike on the world's most
           comprehensive bike registry.
+  payments:
+    create:
+      bike_index_team: Bike Index team
+      thank_you_for_supporting_bike_index: Thank you for supporting Bike Index!
+      we_received_your_payment_of: We received your payment of %{amount}
+      xoxo: XOXO,
+      your_donation_saved_bikes: Your donation of $%{amount} just saved the bikes.
+    form:
+      501c3_nonprofit: 501(c)(3) nonprofit
+      bike_index_is_a_nonprofit_html: Bike Index is a %{nonprofit_link}.
+      donate_today: Donate today
+      next: next  >
+      other_amount: Other amount
+      pay_bike_index: Pay Bike Index
+      select_an_amount: Select an amount
   plan_features:
     add_form_fields: Add specific form fields to your landing page
     add_logos: Add logos and text to Bike Index emails
@@ -4048,6 +4072,25 @@ en:
     staff_accounts: Staff accounts
     supporting_our_nonprofit: Supporting our nonprofit
     welcome_campaign: Welcome campaign on Facebook, Twitter, and Instagram
+  registrations:
+    create:
+      in_it_youll_find_instructions: In it, you'll find instructions on how to complete
+        the registration of your bike
+      radicool: Radicool!
+      we_got_this: We got this.
+      we_sent_an_email_to: 'We sent an email to:'
+      well_do_our_best_to_help_you_recover_it: We'll do our best to help you get it
+        back
+    embed:
+      bike_manufacturer: bike manufacturer
+      choose_specific_organization_optional: Choose Specific Organization (optional)
+      owner_email: "%{owner} email"
+      primary_frame_color: primary frame color
+      register: Register
+      select_other_if_manufacturer_doesnt_show: Select 'Other' if manufacturer doesn't
+        show up when entered
+      this_bike_is_either_missing_or_stolen: This bike is either missing or stolen
+      your: your
   sessions:
     magic_link:
       enter_email_address: Enter your email address, we'll send you an email with
@@ -4102,6 +4145,10 @@ en:
       make: 'Make:'
       serial: 'Serial:'
       stolen_from: 'Stolen from:'
+    errors:
+      error: error
+      errors_prevented_this_from_being_saved: "%{errors_count} prevented this %{object_name}
+        from being saved:"
     faq:
       absolutely: Absolutely!
       add_a_stolen_bike_link: add your your stolen bike to Bike Index!
