@@ -71,7 +71,6 @@ RSpec.describe BikeV2ShowSerializer do
         stolen_record: nil,
         public_images: [public_image_target],
         components: [component_target],
-        placeholder_image: "http://test.host/assets/revised/bike_photo_placeholder-ff15adbd9bf89e10bf3cd2cd6c4e85e5d1056e50463ae722822493624db72e56.svg",
         debug: nil,
         location_found: nil,
         registry_id: nil,
