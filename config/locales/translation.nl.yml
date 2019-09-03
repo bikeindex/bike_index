@@ -1849,6 +1849,9 @@ nl:
       with_serial_numbers_html: "%{stolenness} met serienummers dicht bij <em>%{serial}</em>"
       within: binnen
       you: U
+      external_matches_found: Bijna-overeenkomsten gevonden in externe registers
+      no_external_matches_found: Geen bijna-overeenkomsten gevonden in externe registers
+      searching_external_registries: Zoeken naar externe registers ...
     new:
       additional_serial_sticker_number: Extra serienummer / stickernummer
       affiliation: "%{org_name} aansluiting"
