@@ -58,13 +58,11 @@ class BikeV2Serializer < ActiveModel::Serializer
   end
 
   def placeholder_image
-    svg_path =
-      Rails
-        .application
-        .assets["revised/bike_photo_placeholder.svg"]
-        .digest_path
+    assets = Rails.application.assets
+    return if assets.blank?
 
-    "#{ENV["BASE_URL"]}/assets/#{svg_path}"
+    svg_path = assets["revised/bike_photo_placeholder.svg"]&.digest_path
+    "#{ENV["BASE_URL"]}/assets/#{svg_path}" if svg_path.present?
   end
 
   def thumb
