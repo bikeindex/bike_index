@@ -2130,6 +2130,82 @@ en:
       we_have_an_open_api_check_out_html: We have an open API - check out our %{link}.
       were_open_source_view_this_app_html: We're open source, view this app (and other
         things) on %{github_link}.
+    serials:
+      a_serial_number_located_on_a_html: >-
+        A serial number located on a <em>rear dropout</em>. Some BMX bikes and a few
+        Schwinn bicycles place the serial on the rear dropout.  On older Schwinns
+        there are numbers stamped on both the drive side and non-drive side rear dropouts;
+        the one on the non-drive side dropout is the serial number.
+      a_serial_number_on_the_underside_html: A serial number on the underside of a
+        <em>bottom bracket</em>.
+      all_bikes: All bikes
+      all_have_unique_serial_numbers: all have unique serial numbers.
+      another_serial_number_beneath_html: >-
+        Another serial number beneath the <em>bottom bracket</em>, aligned parallel
+        to the frame.
+      another_standard_serial_number: >-
+        Another standard serial number. Sometime to be replaced with a serial number
+        covered up by routing.
+      bike_serial_numbers: Bike Serial numbers
+      bike_with_bottom_circled: Bike with bottom bracket circled
+      certain_numbers_and_letters_html: >-
+        Certain numbers and letters are difficult or impossible to distinguish between
+        (e.g. 0 and O, S and 5). We treat all these numbers the same way - <em>a search
+        for <code>005LLL</code> will match a bike with the serial <code>OOS111</code></em>.
+      doberman_serial: Doberman dropout serial number
+      finding_a_bicycle_serial_number: Finding a bicycle serial number
+      finding_bicycles_by_serial_number_html: >-
+        Finding bicycles by serial number on Bike Index is a <em>critical</em> part
+        of our functionality. When searching for a serial number, use our serial search
+        bar - it's the second bar on %{search_form_link}.
+      hopefully_you_can_find_the_serial_html: >-
+        Hopefully you can find the serial number on the bicycle you're looking at
+        - email %{link} if you're having trouble.
+      in_this_picture_html: >-
+        In this picture <em>200910427-2A</em> is a manufacturer number and not a serial
+        number. However, to make bikes as easy as possible to find, we'd love it if
+        you entered all numbers you encounter.
+      jump_back_to_footnote: Jump back to footnote %{num} in the text.
+      look_serial: Look serial number
+      most_bicycles_have_their_serial_number_en: >-
+        Most bicycles have their serial number engraved beneath their bottom bracket,
+        but sometimes serial numbers are found in other places. Here are some examples
+        of where and what to look for:
+      okay_fine_so_maybe_html: >-
+        Okay, fine, so <em>maybe</em> there are a few bikes without serial numbers,
+        but this is rare and typical only on hand made bikes or really old bicycles.
+      our_search_form: our search form
+      schwinn_serial: Schwinn serial number.
+      searching_serials_on_bike_index: Searching serials on Bike Index
+      serial_search_input: Serial search input
+      some_bikes_have_multiple_html: Some bikes have <em>multiple serial numbers</em>.
+      some_schwinn_bicycles_have_html: >-
+        Some Schwinn bicycles have the unique identifying number (their serial number)
+        on the <em>head tube</em>. This is on the front of the bike.
+      standard_serial_number: Standard serial number
+      the_bottom_bracket_html: >-
+        The <em>bottom bracket</em> (where serial numbers are typically located) is
+        circled.
+      we_do_close_serial_matching_html: >-
+        We do close serial matching - bikes with serial numbers that are close to
+        the serial you entered are shown below the matching results under the heading
+        "Serial Numbers Close to..." - <em>given a search of a serial number with
+        a couple numbers/letters that are different or missing</em>.
+      we_do_not_currently_do_partial_html: >-
+        We do not currently do partial serial searches. If you search for <code>1234</code>,
+        you will only find bikes with serial numbers of <code>1234</code> and serials
+        close to that - not a bike with serial number of <code>12345689</code>.
+      we_split_bike_serials_up_by_html: >-
+        We split bike serials up by spaces and store each separately. If you see multiple
+        numbers on a bicycle - such as in the photo of the Look bike above - try searching
+        for <strong>just one</strong> of the numbers at a time. Searching for <em>either</em>
+        <code>M4106I9CA1</code> or <code>200910427-2A</code> will find the bike.
+      weve_done_a_few_things_to_make_it_more_li: >-
+        We've done a few things to make it more likely that you'll find the bike you're
+        looking for.
+      when_adding_a_bike_to_the_index: >-
+        When adding a bike to the Index, it's best to enter all the groups of numbers
+        and letters separated by spaces.
     terms_text:
       about_our_terms_of_service: About our Terms of Service
       available_here: available here
@@ -2730,6 +2806,16 @@ en:
         well as other matters set forth therein and which explains how and for what
         purposes we collect, use, retain, disclose and safeguard the information you
         provide to us.
+    where:
+      bike_index_partners: Bike Index partners
+      if_you_would_like_to_join_html: If you're a bike shop and would like to join
+        us, check out our %{signup_link}.
+      international_partner_organizations: International Partner organizations
+      show_location_on_map: Show %{location_name} on map
+      sign_up_your_organization: Sign up your organization
+      signup_page: signup page
+      us_partner_organizations: US Partner organizations
+      website_for_organization: "%{org_name} website"
   landing_pages:
     ambassadors_current:
       after_a_couple_of_recoveries_i_got_hooked: >-
