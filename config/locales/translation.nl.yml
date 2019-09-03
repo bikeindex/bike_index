@@ -4954,3 +4954,114 @@ nl:
         niet verschijnt wanneer deze wordt ingevoerd
       this_bike_is_either_missing_or_stolen: Deze fiets ontbreekt of is gestolen
       your: jouw
+  organizations:
+    embed:
+      add_a_color: Voeg een kleur toe
+      additional_serial: Extra serienummer / stickernummer
+      address: Adres
+      choose_color: Kies een kleur
+      choose_country: Kies land
+      city: City
+      currently_registering_a_nonstolen_bike: Momenteel wordt een niet-gestolen fiets
+        geregistreerd. Klik hier om in plaats daarvan een STOLEN-fiets te registreren.
+      department_city: Afdeling & stad
+      description_of_the_theft: Beschrijving van de diefstal
+      eg_if_we_tweet_about_or_someone_searches: bijvoorbeeld als we tweeten of iemand
+        zoekt naar het serienummer
+      filing_a_police_report_is_important_html: Het indienen van een <strong>politierapport</strong>
+        is <span class="stolen-color">uiterst belangrijk</span> voor het herstel van
+        gestolen fietsen.
+      frame_color: Framekleur
+      image_has_been_uploaded: Afbeelding is geüpload
+      intersection_or_address: Kruising of adres
+      manufacturer_name: Naam van de fabrikant
+      model_year: Modeljaar
+      optional_upload_a_photo: Optioneel - upload een foto
+      other_manufacturer: Andere fabrikant
+      owners_street_address: Straatnaam van de eigenaar
+      police_report_number: Nummer politie rapport
+      receive_notifications_from_bike_index: Ontvang meldingen van de Index over deze
+        gestolen %{bike_type}
+      register: Registreer
+      registering_a_stolen_bike_click_here: Een gestolen fiets registreren. Klik hier
+        om een niet-gestolen fiets te registreren
+      remove_color: Verwijder kleur
+      secondary_color: Secundaire Kleur
+      select_other_if_manufacturer_isnt_listed: Selecteer 'Overig' als de fabrikant
+        niet wordt vermeld
+      state: Staat
+      third_color: Derde kleur
+      this: deze
+      unknown_serial: Onbekende serie
+      unknown_year: Onbekend jaar
+      unsure_or_unknown: Onzeker of onbekend
+      when_was_it_stolen: Wanneer is het gestolen?
+      where_was_it_stolen: Waar is het gestolen?
+      your_email_address: Uw e-mailadres
+      your_phone_number: Je telefoonnummer
+      zipcode: Postcode
+    embed_create_success:
+      bike_was_registered_to_you_html: "%{bike_link} is bij u geregistreerd via <strong>%{org_name}</strong>
+        ."
+      you_will_receive_an_email_confirmation: U ontvangt binnenkort een e-mailbevestiging.
+      your_bike_has_been_added_to_bike_index: Uw %{bike_type} is toegevoegd aan Bike
+        Index!
+    embed_extended:
+      add_a_color: Voeg een kleur toe
+      additional_serial: Extra serienummer / stickernummer
+      address: Adres
+      any_extra_words: Nog extra woorden?
+      choose_color: Kies een kleur
+      choose_handlebar: Kies stuur
+      choose_material: Kies materiaal
+      choose_photo: Kies foto
+      city: City
+      frame_color: Framekleur
+      image_has_been_uploaded: Afbeelding is geüpload
+      manufacturer_name: Naam van de fabrikant
+      model_year: Modeljaar
+      optional_additions: Optionele toevoegingen
+      org_affiliation: "%{org_name} aansluiting"
+      other_defining_features: Andere bepalende kenmerken
+      other_manufacturer: Andere fabrikant
+      owners_email_address: E-mailadres van de eigenaar
+      owners_phone: Telefoon van de eigenaar
+      owners_street_address: Straatnaam van de eigenaar
+      primary_frame_material: Primair framemateriaal
+      register_this: Registreer dit
+      remove_color: Verwijder kleur
+      secondary_color: Secundaire Kleur
+      select_other_if_manufacturer_isnt_listed: Selecteer 'Overig' als de fabrikant
+        niet wordt vermeld
+      state: Staat
+      sticker_id: Sticker-ID
+      third_color: Derde kleur
+      unknown_serial: Onbekende serie
+      unknown_year: Onbekend jaar
+      unsure_or_unknown: Onzeker of onbekend
+      zipcode: Postcode
+    new:
+      bike_index_for_organizations: Bike Index voor organisaties
+    new_form:
+      add_organization: Organisatie toevoegen
+      add_your_organization_to_bike_index: 'Voeg uw organisatie gratis toe aan Bike
+        Index in drie eenvoudige stappen:'
+      bike_index_account: Bike Index-account
+      confirm_your_email: bevestig je email
+      error: Fout
+      fill_out_the_form_that_will_appear: Vul het formulier in dat op deze pagina
+        verschijnt zodra u bent ingelogd.
+      filling_out_this_form_will_create_a_new_org: Als u dit formulier invult, wordt
+        een nieuwe, andere organisatie gecreëerd
+      if_you_dont_want_that_to_be_the_case_html: Als u niet wilt dat dat het geval
+        is, %{logout_link} en meld u aan met de e-mail die u in plaats daarvan wilt
+        gebruiken.
+      log_out: Uitloggen
+      new_organization: Nieuwe organisatie
+      organization_kind: Soort organisatie
+      organization_name: Organisatie naam
+      please_fix_the_following_errors: Corrigeer het volgende %{errors}
+      sign_up_for_a_new_account_html: Meld u aan voor een %{new_account_link}
+      you_are_already_a_member_of_org_html: Je bent al lid van %{org_link}.
+      your_current_account_will_be_a_member_html: Uw huidige account ( <strong>%{user_email}</strong>
+        ) wordt lid van de organisatie die u maakt.
