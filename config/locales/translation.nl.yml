@@ -3203,6 +3203,86 @@ nl:
       we_have_an_open_api_check_out_html: We hebben een open API - bekijk onze %{link}.
       were_open_source_view_this_app_html: We zijn open source, bekijk deze app (en
         andere dingen) op %{github_link}.
+    serials:
+      a_serial_number_located_on_a_html: Een serienummer op een <em>achterste uitval</em>
+        . Sommige BMX-fietsen en enkele Schwinn-fietsen plaatsen de serie op de achterste
+        uitval. Op oudere Schwinns zijn er nummers gestempeld op zowel de achterste
+        uitvaleinden als de aandrijfzijde; degene aan de drop-out aan de niet-schijfzijde
+        is het serienummer.
+      a_serial_number_on_the_underside_html: Een serienummer aan de onderkant van
+        een <em>trapas</em> .
+      all_bikes: Alle fietsen
+      all_have_unique_serial_numbers: hebben allemaal unieke serienummers.
+      another_serial_number_beneath_html: Nog een serienummer onder de <em>trapas</em>
+        , evenwijdig aan het frame.
+      another_standard_serial_number: Nog een standaard serienummer. Soms te vervangen
+        door een serienummer dat door routing is bedekt.
+      bike_serial_numbers: Serienummers van de fiets
+      bike_with_bottom_circled: Fiets met trapas omcirkeld
+      certain_numbers_and_letters_html: Bepaalde cijfers en letters zijn moeilijk
+        of onmogelijk te onderscheiden (bijvoorbeeld 0 en O, S en 5). We behandelen
+        al deze nummers op dezelfde manier - <em>een zoekopdracht naar <code>005LLL</code>
+        zal een fiets matchen met de seriële <code>OOS111</code></em> .
+      doberman_serial: Doberman uitval serienummer
+      finding_a_bicycle_serial_number: Het serienummer van een fiets vinden
+      finding_bicycles_by_serial_number_html: Het vinden van fietsen op serienummer
+        op Bike Index is een <em>cruciaal</em> onderdeel van onze functionaliteit.
+        Gebruik bij het zoeken naar een serienummer onze seriële zoekbalk - dit is
+        de tweede balk op %{search_form_link}.
+      hopefully_you_can_find_the_serial_html: Hopelijk vindt u het serienummer op
+        de fiets waarnaar u kijkt - e-mail %{link} als u problemen ondervindt.
+      in_this_picture_html: Op deze foto is <em>200910427-2A</em> een fabrikantnummer
+        en geen serienummer. Om fietsen zo gemakkelijk mogelijk te maken te vinden,
+        zouden we het erg leuk vinden als u alle nummers die u tegenkomt invoert.
+      jump_back_to_footnote: Spring terug naar voetnoot %{num} in de tekst.
+      look_serial: Kijk serienummer
+      most_bicycles_have_their_serial_number_en: 'De meeste fietsen hebben hun serienummer
+        gegraveerd onder hun trapas, maar soms worden serienummers op andere plaatsen
+        gevonden. Hier zijn enkele voorbeelden van waar en wat u moet zoeken:'
+      okay_fine_so_maybe_html: Oké, prima, dus <em>misschien zijn</em> er een paar
+        fietsen zonder serienummers, maar dit is zeldzaam en typisch alleen op handgemaakte
+        fietsen of echt oude fietsen.
+      our_search_form: ons zoekformulier
+      schwinn_serial: Schwinn serienummer.
+      searching_serials_on_bike_index: Zoeken naar series op Bike Index
+      serial_search_input: Seriële zoekinvoer
+      some_bikes_have_multiple_html: Sommige fietsen hebben <em>meerdere serienummers</em>
+        .
+      some_schwinn_bicycles_have_html: Sommige Schwinn-fietsen hebben het unieke identificatienummer
+        (hun serienummer) op de <em>balhoofdbuis</em> . Dit bevindt zich aan de voorzijde
+        van de fiets.
+      standard_serial_number: Standaard serienummer
+      the_bottom_bracket_html: De <em>trapas</em> (waar serienummers zich meestal
+        bevinden) is omcirkeld.
+      we_do_close_serial_matching_html: We sluiten seriële overeenkomsten - fietsen
+        met serienummers die dicht bij de serienummer staan die je hebt ingevoerd,
+        worden onder de overeenkomende resultaten weergegeven onder de kop "Serienummers
+        in de buurt van ..." - <em>gegeven een zoekopdracht van een serienummer met
+        een paar cijfers / letters die anders zijn of ontbreken</em> .
+      we_do_not_currently_do_partial_html: We voeren momenteel geen gedeeltelijke
+        seriële zoekopdrachten uit. Als u naar <code>1234</code> zoekt, vindt u alleen
+        fietsen met serienummers van <code>1234</code> en serienummers in de buurt
+        - geen fiets met serienummer van <code>12345689</code> .
+      we_split_bike_serials_up_by_html: We splitsen fietsseries op in spaties en slaan
+        ze afzonderlijk op. Als u meerdere nummers op een fiets ziet, zoals op de
+        foto van de Look-fiets hierboven, probeer dan <strong>slechts een</strong>
+        van de nummers tegelijk te zoeken. Op zoek naar <em>een van beide</em> <code>M4106I9CA1</code>
+        of <code>200910427-2A</code> de fiets te vinden.
+      weve_done_a_few_things_to_make_it_more_li: We hebben een paar dingen gedaan
+        om het waarschijnlijker te maken dat je de fiets vindt die je zoekt.
+      when_adding_a_bike_to_the_index: Wanneer u een fiets aan de index toevoegt,
+        kunt u het beste alle groepen cijfers en letters invoeren die door spaties
+        worden gescheiden.
+    where:
+      bike_index_partners: Bike Index-partners
+      if_you_would_like_to_join_html: Als je een fietsenwinkel bent en je wilt meedoen,
+        bekijk dan onze %{signup_link}.
+      international_partner_organizations: Internationale partnerorganisaties
+      show_location_on_map: Toon %{location_name} op de kaart
+      sign_up_your_organization: Meld uw organisatie aan
+      signup_page: aanmeldpagina
+      us_partner_organizations: Amerikaanse partnerorganisaties
+      website_for_organization: "%{org_name} website"
   landing_pages:
     ambassadors_current:
       after_a_couple_of_recoveries_i_got_hooked: Na een paar herstelacties raakte
@@ -4784,3 +4864,44 @@ nl:
       nl: EUR
       en-GB: GBP
       es: EUR
+  locks:
+    edit:
+      are_you_sure: Weet je het zeker?
+      back_to_viewing_all_locks: terug naar het bekijken van alle sloten
+      delete_this_lock: Verwijder dit slot
+      edit_the_lock: Bewerk het slot
+    form:
+      add_the_lock: Voeg het slot toe!
+      additional_notes: Extra notities
+      basic: basis-
+      choose_manufacturer: Kies fabrikant
+      examples_of_serial_numbers_found_on_diffe: Voorbeelden van serienummers op verschillende
+        soorten fietsslottoetsen
+      has_combination: Heeft combinatie
+      has_key: Heeft sleutel
+      large_kryptonite_key: Grote Kryptonite-sleutel
+      lock_type: Slottype
+      other_lock_manufacturer: Andere slotfabrikant
+      pinhead_key: Pinhead-toets
+      pinhead_locking_skewer_key: Pinhead spies sleutel
+      small_kryptonite_key: Kleine Kryptonite-sleutel
+      update_the_lock: Update het slot!
+    lock_home:
+      add_a_new_lock: Voeg een nieuw slot toe
+      any_lock_information_you_enter_on_bike_in: Alle slotinformatie die u op Bike
+        Index invoert, is privé en alleen zichtbaar voor u.
+      if_you_want_you_can_save_serial_html: Als je wilt, kun je <strong>de serienummers
+        van je sleutels opslaan</strong> op Bike Index, zodat je geen pech hebt als
+        je ze verliest.
+      lock_keys_often_have_serial_numbers_so_yo: Vergrendelingssleutels hebben vaak
+        serienummers, zodat u vervangingen kunt bestellen als u de sleutels verliest.
+      lock_type: Slottype
+      manufacturer: Fabrikant
+      save_information_about_a_lock: Informatie opslaan over een slot
+      save_information_about_your_bike_lock: Informatie opslaan over uw fietsslot!
+      you_can_also_record_your_lock_html: U kunt ook <strong>uw slotcombinaties opnemen</strong>
+        .
+      your_locks: Je sloten
+    new:
+      save_information_about_one_of_your_locks: Informatie opslaan over een van uw
+        sloten
