@@ -3501,6 +3501,120 @@ en:
         used to join the group?
       whoops_that_link_isnt_connected_to_a_bike: Whoops, that link isn't connected
         to a bike
+  organizations:
+    embed:
+      add_a_color: Add a color
+      additional_serial: Additional serial/sticker number
+      address: Address
+      choose_color: Choose color
+      choose_country: Choose country
+      city: City
+      currently_registering_a_nonstolen_bike: >-
+        Currently registering a non-stolen bike. Click here to register a STOLEN bike
+        instead.
+      department_city: Department & city
+      description_of_the_theft: Description of the theft
+      eg_if_we_tweet_about_or_someone_searches: e.g., if we tweet about or someone
+        searches for its serial number
+      filing_a_police_report_is_important_html: >-
+        Filing a <strong>police report</strong> is <span class="stolen-color">extremely
+        important</span> for stolen bike recovery.
+      frame_color: Frame color
+      image_has_been_uploaded: Image has been uploaded
+      intersection_or_address: Intersection or address
+      manufacturer_name: Manufacturer name
+      model_year: Model year
+      optional_upload_a_photo: Optional - upload a photo
+      other_manufacturer: Other manufacturer
+      owners_street_address: Owner's Street address
+      police_report_number: Police report number
+      receive_notifications_from_bike_index: Receive notifications from the Index
+        about this stolen %{bike_type}
+      register: Register
+      registering_a_stolen_bike_click_here: Registering a stolen bike. Click here
+        to register a non-stolen bike
+      remove_color: Remove color
+      secondary_color: Secondary color
+      select_other_if_manufacturer_isnt_listed: Select 'Other' if manufacturer isn't
+        listed
+      state: State
+      third_color: Third color
+      this: this
+      unknown_serial: Unknown serial
+      unknown_year: Unknown year
+      unsure_or_unknown: Unsure or unknown
+      when_was_it_stolen: When was it stolen?
+      where_was_it_stolen: Where was it stolen?
+      your_email_address: Your email address
+      your_phone_number: Your phone number
+      zipcode: Zipcode
+    embed_create_success:
+      bike_was_registered_to_you_html: "%{bike_link} was registered to you through
+        <strong>%{org_name}</strong>."
+      you_will_receive_an_email_confirmation: You will receive an email confirmation
+        shortly.
+      your_bike_has_been_added_to_bike_index: Your %{bike_type} has been added to
+        Bike Index!
+    embed_extended:
+      add_a_color: Add a color
+      additional_serial: Additional serial/sticker number
+      address: Address
+      any_extra_words: Any extra words?
+      choose_color: Choose color
+      choose_handlebar: Choose handlebar
+      choose_material: Choose material
+      choose_photo: Choose photo
+      city: City
+      frame_color: Frame color
+      image_has_been_uploaded: Image has been uploaded
+      manufacturer_name: Manufacturer name
+      model_year: Model year
+      optional_additions: Optional additions
+      org_affiliation: "%{org_name} affiliation"
+      other_defining_features: Other defining features
+      other_manufacturer: Other manufacturer
+      owners_email_address: Owner's email address
+      owners_phone: Owner's phone
+      owners_street_address: Owner's Street address
+      primary_frame_material: Primary frame material
+      register_this: Register this
+      remove_color: Remove color
+      secondary_color: Secondary color
+      select_other_if_manufacturer_isnt_listed: Select 'Other' if manufacturer isn't
+        listed
+      state: State
+      sticker_id: Sticker id
+      third_color: Third color
+      unknown_serial: Unknown serial
+      unknown_year: Unknown year
+      unsure_or_unknown: Unsure or unknown
+      zipcode: Zipcode
+    new:
+      bike_index_for_organizations: Bike Index for organizations
+    new_form:
+      add_organization: add organization
+      add_your_organization_to_bike_index: 'Add your organization to Bike Index, for
+        free, in three easy steps:'
+      bike_index_account: Bike Index account
+      confirm_your_email: Confirm your email
+      error: error
+      fill_out_the_form_that_will_appear: Fill out the form that will appear on this
+        page once you're signed in.
+      filling_out_this_form_will_create_a_new_org: Filling out this form will create
+        a new, different organization
+      if_you_dont_want_that_to_be_the_case_html: >-
+        If you don't want that to be the case, %{logout_link} and sign up with the
+        email you would like to use instead.
+      log_out: log out
+      new_organization: New organization
+      organization_kind: Organization kind
+      organization_name: Organization name
+      please_fix_the_following_errors: Please fix the following %{errors}
+      sign_up_for_a_new_account_html: Sign up for a %{new_account_link}
+      you_are_already_a_member_of_org_html: You are already a member of %{org_link}.
+      your_current_account_will_be_a_member_html: >-
+        Your current account (<strong>%{user_email}</strong>) will be a member of
+        the organization you create.
   organized:
     ambassador_dashboards:
       getting_started:
