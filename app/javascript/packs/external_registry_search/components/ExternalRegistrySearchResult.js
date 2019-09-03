@@ -60,7 +60,7 @@ const ResultImage = ({ bike }) => {
 
   if (bike.is_stock_img) {
     return (<a href={bike.url} className="bike-list-image" target="_blank">
-              <img src={bike.thumb} className="no-image"/>
+              <img src={window.bike_placeholder_image} className="no-image"/>
             </a>);
   }
 

@@ -27,11 +27,11 @@ class ExternalBikeV3Serializer < BikeV2Serializer
   def year; end
 
   def thumb
-    object.image_url || placeholder_image
+    object.image_url
   end
 
   def large_img
-    object.image_url || placeholder_image
+    object.image_url
   end
 
   def is_stock_img

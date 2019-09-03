@@ -11,7 +11,6 @@ class BikeV2Serializer < ActiveModel::Serializer
     :large_img,
     :location_found,
     :manufacturer_name,
-    :placeholder_image,
     :registry_id,
     :registry_name,
     :registry_url,
@@ -55,14 +54,6 @@ class BikeV2Serializer < ActiveModel::Serializer
 
   def date_stolen_string
     object.current_stolen_record&.date_stolen&.to_date&.to_s
-  end
-
-  def placeholder_image
-    assets = Rails.application.assets
-    return if assets.blank?
-
-    svg_path = assets["revised/bike_photo_placeholder.svg"]&.digest_path
-    "#{ENV["BASE_URL"]}/assets/#{svg_path}" if svg_path.present?
   end
 
   def thumb

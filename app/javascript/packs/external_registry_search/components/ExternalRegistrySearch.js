@@ -17,7 +17,7 @@ class ExternalRegistrySearch extends Component {
     const { stolenness, query, serial } = this.props;
     // Only search external registries if looking for
     // stolen/all bikes with no query
-    if (stolenness === "non" || query) { return; }
+    if (stolenness === "non" || query || !serial) { return; }
 
     this.resultsBeingFetched();
 
