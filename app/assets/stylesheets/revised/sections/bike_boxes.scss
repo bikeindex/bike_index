@@ -70,7 +70,8 @@ $bike-box-bg: $gray-lighter;
 
 // Outside of bike-boxes because used on the user personal page
 .bike-list-image {
-  flex: 0 0 25%;
+  display: inherit;
+  flex: 0 0 20%;
   position: relative;
 
   img {
@@ -78,29 +79,30 @@ $bike-box-bg: $gray-lighter;
   }
 
   .no-image {
-    padding: 2 * $vertical-height;
     background: $bike-box-bg;
+    padding: 2 * $vertical-height;
+    vertical-align: middle;
   }
 }
 
 .thumb-overlay {
-  position: absolute;
-  width: 100%;
-  height: 100%;
   background: #c2c2c2;
-  opacity: 0.8;
+  height: 100%;
+  opacity: .8;
+  position: absolute;
   text-align: center;
+  width: 100%;
 
   h4 {
+    color: $white;
     margin: 0;
-    color: white;
   }
 
   img {
-    width: 50%;
-    max-width: 60px;
-    margin: $vertical-height auto;
     display: block;
+    margin: $vertical-height auto;
+    max-width: 60px;
+    width: 50%;
   }
 }
 
@@ -114,8 +116,8 @@ $bike-box-bg: $gray-lighter;
       @include clearfix;
 
       .attr-list {
-        width: 50%;
         float: left;
+        width: 50%;
 
         .multi-attr-lists {
           &:first-of-type {

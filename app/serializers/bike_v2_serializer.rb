@@ -1,17 +1,41 @@
 class BikeV2Serializer < ActiveModel::Serializer
-  attributes :id,
-    :title,
-    :serial,
-    :manufacturer_name,
-    :frame_model,
-    :year,
+  attributes \
+    :date_stolen,
+    :date_stolen_string,
+    :debug,
+    :description,
     :frame_colors,
-    :thumb,
-    :large_img,
+    :frame_model,
+    :id,
     :is_stock_img,
+    :large_img,
+    :location_found,
+    :manufacturer_name,
+    :placeholder_image,
+    :registry_id,
+    :registry_name,
+    :registry_url,
+    :serial,
+    :source_name,
+    :source_unique_id,
+    :status,
     :stolen,
     :stolen_location,
-    :date_stolen
+    :thumb,
+    :title,
+    :url,
+    :year
+
+  attr_accessor \
+    :debug,
+    :location_found,
+    :registry_id,
+    :registry_name,
+    :registry_url,
+    :source_name,
+    :source_unique_id,
+    :status,
+    :url
 
   def serial
     object.serial_display
@@ -27,6 +51,20 @@ class BikeV2Serializer < ActiveModel::Serializer
 
   def date_stolen
     object.current_stolen_record && object.current_stolen_record.date_stolen.to_i
+  end
+
+  def date_stolen_string
+    object.current_stolen_record&.date_stolen&.to_date&.to_s
+  end
+
+  def placeholder_image
+    svg_path =
+      Rails
+        .application
+        .assets["revised/bike_photo_placeholder.svg"]
+        .digest_path
+
+    "#{ENV["BASE_URL"]}/assets/#{svg_path}"
   end
 
   def thumb

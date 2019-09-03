@@ -1,0 +1,1771 @@
+{
+  "took": 46,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": 244,
+    "max_score": null,
+    "hits": [
+      {
+        "_shard": "[vog_dev][0]",
+        "_node": "AwAJTLMoS0aNimcS25KDDg",
+        "_index": "vog_dev",
+        "_type": "doc",
+        "_id": "308633",
+        "_score": null,
+        "_source": {
+          "ObjectId": "308633",
+          "ObjectNumber": "F0772f-20023202",
+          "ExternalNumber": "20023202",
+          "CityId": "1228",
+          "City": "Eindhoven",
+          "StorageLocationId": "1150458",
+          "StorageLocation": {
+            "StorageLocationId": "1150458",
+            "CustomerId": "245",
+            "Name": "Fietsdepot Eindhoven",
+            "Streetname": "Vestdijk 147",
+            "Zipcode": "5611 CB",
+            "CityId": "1228",
+            "City": "Eindhoven                                         ",
+            "Phone": "06 - 55405585",
+            "Email": "fietsdepot@eindhoven.nl",
+            "WebsiteUrl": "http:\\/\\/www.eindhoven.nl",
+            "PrivacyUrl": "https:\\/\\/www.eindhoven.nl\\/privacyverklaring?suggestie=Privacyverklaring",
+            "OrderId": "1",
+            "Instructions": "Op werkdagen zijn wij geopend van 9.00 - tot 16.00 uur.\r\nAls u uw fiets op komt halen wilt u dan uw legitimatiebewijs en fietssleutel meebrengen. Voor het ophalen van uw fiets betaalt u \\u20ac 20,00 administratie en opslagkosten."
+          },
+          "CategoryId": "3",
+          "Category": "fiets",
+          "SubCategoryId": "26",
+          "SubCategory": "herenfiets",
+          "ColorId": "2",
+          "Color": "blauw",
+          "Description": "herenfiets Gazelle ( blauw ) met framenummer '4259876'.\r\nLocatie gevonden: Keizersgracht, Centrum Eindhoven.\r\nBesluit Weesfiets op 30-7-2019 en overgebracht naar depot Fietsdepot Vestdijk 147 op 23-8-2019, opslag t\\/m 23-11-2019.",
+          "Brand": "Gazelle",
+          "RegistrationDate": "2019-08-23T08:35:00Z",
+          "Deleted": "false",
+          "ImageCount": "1",
+          "CustomerId": "245",
+          "OrganisationName": "Fietsdepot Eindhoven",
+          "Country": "Nederland",
+          "FormLink": "&Number=F0772f-20023202"
+        },
+        "sort": [
+          1566549300000
+        ],
+        "_explanation": {
+          "value": 1,
+          "description": "sum of:",
+          "details": [
+            {
+              "value": 1,
+              "description": "sum of:",
+              "details": [
+                {
+                  "value": 1,
+                  "description": "max of:",
+                  "details": [
+                    {
+                      "value": 1,
+                      "description": "ObjectNumber:*232*",
+                      "details": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "RegistrationDate:[1535241600000 TO 1566863999999]",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Country:nederland",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Deleted:false",
+                  "details": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "_shard": "[vog_dev][0]",
+        "_node": "AwAJTLMoS0aNimcS25KDDg",
+        "_index": "vog_dev",
+        "_type": "doc",
+        "_id": "310072",
+        "_score": null,
+        "_source": {
+          "ObjectId": "310072",
+          "ObjectNumber": "G0321-20190232413",
+          "ExternalNumber": "",
+          "CityId": "1976",
+          "City": "Houten",
+          "StorageLocationId": "1150279",
+          "StorageLocation": {
+            "StorageLocationId": "1150279",
+            "CustomerId": "47",
+            "Name": "gemeente Houten",
+            "Streetname": "Onderdoor 25",
+            "Zipcode": "3995 DW",
+            "CityId": "1976",
+            "City": "Houten                                            ",
+            "Phone": "0306392611",
+            "Email": "gemeentehuis@houten.nl",
+            "WebsiteUrl": "http:\\/\\/www.houten.nl",
+            "PrivacyUrl": "",
+            "OrderId": "1",
+            "Instructions": ""
+          },
+          "CategoryId": "7",
+          "Category": "kleding",
+          "SubCategoryId": "110",
+          "SubCategory": "blouse, trui, vest",
+          "ColorId": "2",
+          "Color": "blauw",
+          "Description": "Blauw vest met knoopjes, gevonden te Houten.",
+          "Brand": "",
+          "RegistrationDate": "2019-08-23T00:00:00Z",
+          "Deleted": false,
+          "ImageCount": "0",
+          "CustomerId": "47",
+          "OrganisationName": "Gemeente Houten",
+          "Country": "Nederland",
+          "FormLink": "&Number=G0321-20190232413"
+        },
+        "sort": [
+          1566518400000
+        ],
+        "_explanation": {
+          "value": 1,
+          "description": "sum of:",
+          "details": [
+            {
+              "value": 1,
+              "description": "sum of:",
+              "details": [
+                {
+                  "value": 1,
+                  "description": "max of:",
+                  "details": [
+                    {
+                      "value": 1,
+                      "description": "ObjectNumber:*232*",
+                      "details": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "RegistrationDate:[1535241600000 TO 1566863999999]",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Country:nederland",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Deleted:false",
+                  "details": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "_shard": "[vog_dev][0]",
+        "_node": "AwAJTLMoS0aNimcS25KDDg",
+        "_index": "vog_dev",
+        "_type": "doc",
+        "_id": "308323",
+        "_score": null,
+        "_source": {
+          "ObjectId": "308323",
+          "ObjectNumber": "F0014f-2019003872",
+          "ExternalNumber": "",
+          "CityId": "1554",
+          "City": "Groningen",
+          "StorageLocationId": "1150461",
+          "StorageLocation": {
+            "StorageLocationId": "1150461",
+            "CustomerId": "248",
+            "Name": "Fietsdepot Groningen",
+            "Streetname": "Travertijnstraat naast nummer 2",
+            "Zipcode": "",
+            "CityId": "1554",
+            "City": "Groningen                                         ",
+            "Phone": "050 367 1110",
+            "Email": "fietsdepot@groningen.nl",
+            "WebsiteUrl": "http:\\/\\/gemeente.groningen.nl",
+            "PrivacyUrl": "https:\\/\\/groningen.nl\\/privacy-statement",
+            "OrderId": "1",
+            "Instructions": "Openingstijden AFAC Groningen\r\nMaandag tot en met Vrijdag 16:00-19:00\r\nZaterdag, Zondag en feestdagen gesloten\r\n\r\nTer bewijs van eigendom heeft u een fietssleutel nodig passend op het fietsslot. Indien deze sleutel niet aanwezig is, dient er in overleg gegaan te worden met de medewerkers van het AFAC."
+          },
+          "CategoryId": "3",
+          "Category": "fiets",
+          "SubCategoryId": "25",
+          "SubCategory": "damesfiets",
+          "ColorId": "10",
+          "Color": "groen",
+          "Description": "damesfiets Gazelle ( groen ) met framenummer '0452328'.\r\nLocatie gevonden: , Stationsgebied Groningen.\r\nWeesfiets op 22-8-2019 en overgebracht naar depot Fietservicepunt Groningen op 22-8-2019, opslag t\\/m 26-9-2019.",
+          "Brand": "Gazelle",
+          "RegistrationDate": "2019-08-22T13:46:00Z",
+          "Deleted": "false",
+          "ImageCount": "1",
+          "CustomerId": "248",
+          "OrganisationName": "Gemeente Groningen",
+          "Country": "Nederland",
+          "FormLink": "&Number=F0014f-2019003872"
+        },
+        "highlight": {
+          "Description": [
+            "damesfiets Gazelle ( groen ) met framenummer '<strong>0452328</strong>'.\r\nLocatie gevonden: , Stationsgebied Groningen.\r\nWeesfiets op 22-8-2019 en overgebracht naar depot Fietservicepunt Groningen op 22-8-2019, opslag t/m 26-9-2019."
+          ]
+        },
+        "sort": [
+          1566481560000
+        ],
+        "_explanation": {
+          "value": 1,
+          "description": "sum of:",
+          "details": [
+            {
+              "value": 1,
+              "description": "sum of:",
+              "details": [
+                {
+                  "value": 1,
+                  "description": "max of:",
+                  "details": [
+                    {
+                      "value": 1,
+                      "description": "Description:*232*",
+                      "details": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "RegistrationDate:[1535241600000 TO 1566863999999]",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Country:nederland",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Deleted:false",
+                  "details": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "_shard": "[vog_dev][0]",
+        "_node": "AwAJTLMoS0aNimcS25KDDg",
+        "_index": "vog_dev",
+        "_type": "doc",
+        "_id": "308205",
+        "_score": null,
+        "_source": {
+          "ObjectId": "308205",
+          "ObjectNumber": "F0518f-GM0518-FG-397634",
+          "ExternalNumber": "GM0518-FG-397634",
+          "CityId": "4",
+          "City": "Den Haag",
+          "StorageLocationId": "1150551",
+          "StorageLocation": {
+            "StorageLocationId": "1150551",
+            "CustomerId": "255",
+            "Name": "Gemeente Den Haag",
+            "Streetname": "",
+            "Zipcode": "",
+            "CityId": "4",
+            "City": "Den Haag                                          ",
+            "Phone": "070 7528809",
+            "Email": "fietsdepot@haeghegroep.nl",
+            "WebsiteUrl": "www.fietsdepothaaglanden.nl",
+            "PrivacyUrl": "https:\\/\\/www.denhaag.nl\\/nl\\/verklaring-inzake-gegevensbescherming.htm",
+            "OrderId": "1",
+            "Instructions": "voorwerp kan bij vinder thuis liggen, graag bellen voor informatie"
+          },
+          "CategoryId": "3",
+          "Category": "fiets",
+          "SubCategoryId": "25",
+          "SubCategory": "damesfiets",
+          "ColorId": "11",
+          "Color": "oranje",
+          "Description": "damesfiets Omafiets Swapfiets ( oranje ) met framenummer '12232618'.\r\nLocatie gevonden: Bezuidenhoutseweg, Den Haag CS Den Haag.\r\nFout gestald op 22-8-2019 en overgebracht naar depot Fietsdepot Haaglanden op 22-8-2019, opslag t\\/m 3-10-2019.",
+          "Brand": "Swapfiets",
+          "RegistrationDate": "2019-08-22T11:50:00Z",
+          "Deleted": "false",
+          "ImageCount": "1",
+          "CustomerId": "255",
+          "OrganisationName": "Gemeente Den Haag",
+          "Country": "Nederland",
+          "FormLink": "https:\\/\\/formulieren.verlorenofgevonden.nl\\/eigenaar?db=5fa8d3ff-c3a4-441b-b22d-4b3c352f9ce5&Number=F0518f-GM0518-FG-397634"
+        },
+        "highlight": {
+          "Description": [
+            "damesfiets Omafiets Swapfiets ( oranje ) met framenummer '<strong>12232618</strong>'.\r\nLocatie gevonden: Bezuidenhoutseweg, Den Haag CS Den Haag.\r\nFout gestald op 22-8-2019 en overgebracht naar depot Fietsdepot Haaglanden op 22-8-2019, opslag t/m 3-10-2019."
+          ]
+        },
+        "sort": [
+          1566474600000
+        ],
+        "_explanation": {
+          "value": 1,
+          "description": "sum of:",
+          "details": [
+            {
+              "value": 1,
+              "description": "sum of:",
+              "details": [
+                {
+                  "value": 1,
+                  "description": "max of:",
+                  "details": [
+                    {
+                      "value": 1,
+                      "description": "Description:*232*",
+                      "details": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "RegistrationDate:[1535241600000 TO 1566863999999]",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Country:nederland",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Deleted:false",
+                  "details": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "_shard": "[vog_dev][0]",
+        "_node": "AwAJTLMoS0aNimcS25KDDg",
+        "_index": "vog_dev",
+        "_type": "doc",
+        "_id": "308165",
+        "_score": null,
+        "_source": {
+          "ObjectId": "308165",
+          "ObjectNumber": "F0855f-20017149",
+          "ExternalNumber": "20017149",
+          "CityId": "3974",
+          "City": "Tilburg",
+          "StorageLocationId": "1150453",
+          "StorageLocation": {
+            "StorageLocationId": "1150453",
+            "CustomerId": "239",
+            "Name": "Fietsdepot Tilburg",
+            "Streetname": "Koopvaardij straat 19a",
+            "Zipcode": "5017 BC",
+            "CityId": "3974",
+            "City": "Tilburg                                           ",
+            "Phone": "013-5820022",
+            "Email": "afac@tilburg.nl",
+            "WebsiteUrl": "http:\\/\\/www.tilburg.nl",
+            "PrivacyUrl": "https:\\/\\/www.tilburg.nl\\/footer\\/privacystatement\\/",
+            "OrderId": "1",
+            "Instructions": "Alle  door de gemeente Tilburg geruimde fietsen worden geregistreerd bij de Algemene Fiets Afhandel Centrale (AFAC), Koopvaardijstraat 19a in Tilburg. De eigenaar van de fiets kan deze bij het AFAC ophalen op maandag t\\/m vrijdag 08:30-17:00 uur en op zaterdag 08:30-13:00 uur met  legitimatiebewijs, fietssleuteltje en tegen betaling van 10 euro (alleen PIN!)."
+          },
+          "CategoryId": "3",
+          "Category": "fiets",
+          "SubCategoryId": "25",
+          "SubCategory": "damesfiets",
+          "ColorId": "9",
+          "Color": "grijs",
+          "Description": "damesfiets Union Swapfiets ( grijs ) met framenummer '12320379'.\r\nLocatie gevonden: Heuvelring, Centrum Tilburg.\r\nHinderlijk gestald op 22-8-2019 en overgebracht naar depot Koopvaardijstraat 19a op 22-8-2019, opslag t\\/m 21-11-2019.",
+          "Brand": "Union",
+          "RegistrationDate": "2019-08-22T11:33:00Z",
+          "Deleted": "false",
+          "ImageCount": "1",
+          "CustomerId": "239",
+          "OrganisationName": "Gemeente Tilburg",
+          "Country": "Nederland",
+          "FormLink": "&Number=F0855f-20017149"
+        },
+        "highlight": {
+          "Description": [
+            "damesfiets Union Swapfiets ( grijs ) met framenummer '<strong>12320379</strong>'.\r\nLocatie gevonden: Heuvelring, Centrum Tilburg.\r\nHinderlijk gestald op 22-8-2019 en overgebracht naar depot Koopvaardijstraat 19a op 22-8-2019, opslag t/m 21-11-2019."
+          ]
+        },
+        "sort": [
+          1566473580000
+        ],
+        "_explanation": {
+          "value": 1,
+          "description": "sum of:",
+          "details": [
+            {
+              "value": 1,
+              "description": "sum of:",
+              "details": [
+                {
+                  "value": 1,
+                  "description": "max of:",
+                  "details": [
+                    {
+                      "value": 1,
+                      "description": "Description:*232*",
+                      "details": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "RegistrationDate:[1535241600000 TO 1566863999999]",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Country:nederland",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Deleted:false",
+                  "details": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "_shard": "[vog_dev][0]",
+        "_node": "AwAJTLMoS0aNimcS25KDDg",
+        "_index": "vog_dev",
+        "_type": "doc",
+        "_id": "308102",
+        "_score": null,
+        "_source": {
+          "ObjectId": "308102",
+          "ObjectNumber": "F0518f-05035010232",
+          "ExternalNumber": "05035010232",
+          "CityId": "986",
+          "City": "Delft",
+          "StorageLocationId": "1150551",
+          "StorageLocation": {
+            "StorageLocationId": "1150551",
+            "CustomerId": "255",
+            "Name": "Gemeente Den Haag",
+            "Streetname": "",
+            "Zipcode": "",
+            "CityId": "4",
+            "City": "Den Haag                                          ",
+            "Phone": "070 7528809",
+            "Email": "fietsdepot@haeghegroep.nl",
+            "WebsiteUrl": "www.fietsdepothaaglanden.nl",
+            "PrivacyUrl": "https:\\/\\/www.denhaag.nl\\/nl\\/verklaring-inzake-gegevensbescherming.htm",
+            "OrderId": "1",
+            "Instructions": "voorwerp kan bij vinder thuis liggen, graag bellen voor informatie"
+          },
+          "CategoryId": "3",
+          "Category": "fiets",
+          "SubCategoryId": "25",
+          "SubCategory": "damesfiets",
+          "ColorId": "2",
+          "Color": "blauw",
+          "Description": "damesfiets Stadsfiets Batavus ( blauw ) met framenummer 'BA7311264'.\r\nLocatie gevonden: Storklaan, 13 Hof van Delft Delft.\r\nWeesfiets 28 dagen op 22-7-2019 en overgebracht naar depot Fietsdepot Haaglanden op 22-8-2019, opslag t\\/m 5-9-2019.",
+          "Brand": "Batavus",
+          "RegistrationDate": "2019-08-22T10:31:00Z",
+          "Deleted": "false",
+          "ImageCount": "1",
+          "CustomerId": "255",
+          "OrganisationName": "Gemeente Den Haag",
+          "Country": "Nederland",
+          "FormLink": "https:\\/\\/formulieren.verlorenofgevonden.nl\\/eigenaar?db=5fa8d3ff-c3a4-441b-b22d-4b3c352f9ce5&Number=F0518f-05035010232"
+        },
+        "sort": [
+          1566469860000
+        ],
+        "_explanation": {
+          "value": 1,
+          "description": "sum of:",
+          "details": [
+            {
+              "value": 1,
+              "description": "sum of:",
+              "details": [
+                {
+                  "value": 1,
+                  "description": "max of:",
+                  "details": [
+                    {
+                      "value": 1,
+                      "description": "ObjectNumber:*232*",
+                      "details": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "RegistrationDate:[1535241600000 TO 1566863999999]",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Country:nederland",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Deleted:false",
+                  "details": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "_shard": "[vog_dev][0]",
+        "_node": "AwAJTLMoS0aNimcS25KDDg",
+        "_index": "vog_dev",
+        "_type": "doc",
+        "_id": "307866",
+        "_score": null,
+        "_source": {
+          "ObjectId": "307866",
+          "ObjectNumber": "F0014f-2019003845",
+          "ExternalNumber": "",
+          "CityId": "1554",
+          "City": "Groningen",
+          "StorageLocationId": "1150461",
+          "StorageLocation": {
+            "StorageLocationId": "1150461",
+            "CustomerId": "248",
+            "Name": "Fietsdepot Groningen",
+            "Streetname": "Travertijnstraat naast nummer 2",
+            "Zipcode": "",
+            "CityId": "1554",
+            "City": "Groningen                                         ",
+            "Phone": "050 367 1110",
+            "Email": "fietsdepot@groningen.nl",
+            "WebsiteUrl": "http:\\/\\/gemeente.groningen.nl",
+            "PrivacyUrl": "https:\\/\\/groningen.nl\\/privacy-statement",
+            "OrderId": "1",
+            "Instructions": "Openingstijden AFAC Groningen\r\nMaandag tot en met Vrijdag 16:00-19:00\r\nZaterdag, Zondag en feestdagen gesloten\r\n\r\nTer bewijs van eigendom heeft u een fietssleutel nodig passend op het fietsslot. Indien deze sleutel niet aanwezig is, dient er in overleg gegaan te worden met de medewerkers van het AFAC."
+          },
+          "CategoryId": "3",
+          "Category": "fiets",
+          "SubCategoryId": "25",
+          "SubCategory": "damesfiets",
+          "ColorId": "17",
+          "Color": "zwart",
+          "Description": "damesfiets Reflection ( zwart ) met framenummer 'B130720232'.\r\nLocatie gevonden: , Stationsgebied Groningen.\r\nWeesfiets op 21-8-2019 en overgebracht naar depot Fietservicepunt Groningen op 21-8-2019, opslag t\\/m 25-9-2019.",
+          "Brand": "Reflection",
+          "RegistrationDate": "2019-08-21T15:05:00Z",
+          "Deleted": "false",
+          "ImageCount": "1",
+          "CustomerId": "248",
+          "OrganisationName": "Gemeente Groningen",
+          "Country": "Nederland",
+          "FormLink": "&Number=F0014f-2019003845"
+        },
+        "highlight": {
+          "Description": [
+            "damesfiets Reflection ( zwart ) met framenummer '<strong>B130720232</strong>'.\r\nLocatie gevonden: , Stationsgebied Groningen.\r\nWeesfiets op 21-8-2019 en overgebracht naar depot Fietservicepunt Groningen op 21-8-2019, opslag t/m 25-9-2019."
+          ]
+        },
+        "sort": [
+          1566399900000
+        ],
+        "_explanation": {
+          "value": 1,
+          "description": "sum of:",
+          "details": [
+            {
+              "value": 1,
+              "description": "sum of:",
+              "details": [
+                {
+                  "value": 1,
+                  "description": "max of:",
+                  "details": [
+                    {
+                      "value": 1,
+                      "description": "Description:*232*",
+                      "details": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "RegistrationDate:[1535241600000 TO 1566863999999]",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Country:nederland",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Deleted:false",
+                  "details": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "_shard": "[vog_dev][0]",
+        "_node": "AwAJTLMoS0aNimcS25KDDg",
+        "_index": "vog_dev",
+        "_type": "doc",
+        "_id": "307822",
+        "_score": null,
+        "_source": {
+          "ObjectId": "307822",
+          "ObjectNumber": "F0599f-0599-VH-031843",
+          "ExternalNumber": "0599-VH-031843",
+          "CityId": "2906",
+          "City": "Noord",
+          "StorageLocationId": "1150569",
+          "StorageLocation": {
+            "StorageLocationId": "1150569",
+            "CustomerId": "302",
+            "Name": "Fietsdepot Rotterdam",
+            "Streetname": "Koperstraat 23",
+            "Zipcode": "3067 GL",
+            "CityId": "3473",
+            "City": "Rotterdam                                         ",
+            "Phone": "14010",
+            "Email": "fietspunt@rotterdam.nl",
+            "WebsiteUrl": "www.rotterdam.nl",
+            "PrivacyUrl": "",
+            "OrderId": "4",
+            "Instructions": ""
+          },
+          "CategoryId": "3",
+          "Category": "fiets",
+          "SubCategoryId": "25",
+          "SubCategory": "damesfiets",
+          "ColorId": "2",
+          "Color": "blauw",
+          "Description": "damesfiets Omafiets Swapfiets ( blauw ) met framenummer '12329998'.\r\nLocatie gevonden: Stationssingel, Provenierswijk Noord.\r\nVerkeerd geparkeerd op 21-8-2019 en overgebracht naar depot Verkeerd \\/ hinderlijk gestald op 21-8-2019, opslag t\\/m 20-11-2019.",
+          "Brand": "Swapfiets",
+          "RegistrationDate": "2019-08-21T14:54:00Z",
+          "Deleted": "false",
+          "ImageCount": "1",
+          "CustomerId": "302",
+          "OrganisationName": "Fietsdepot Rotterdam",
+          "Country": "Nederland",
+          "FormLink": "&Number=F0599f-0599-VH-031843"
+        },
+        "highlight": {
+          "Description": [
+            "damesfiets Omafiets Swapfiets ( blauw ) met framenummer '<strong>12329998</strong>'.\r\nLocatie gevonden: Stationssingel, Provenierswijk Noord.\r\nVerkeerd geparkeerd op 21-8-2019 en overgebracht naar depot Verkeerd / hinderlijk gestald op 21-8-2019, opslag t/m 20-11-2019."
+          ]
+        },
+        "sort": [
+          1566399240000
+        ],
+        "_explanation": {
+          "value": 1,
+          "description": "sum of:",
+          "details": [
+            {
+              "value": 1,
+              "description": "sum of:",
+              "details": [
+                {
+                  "value": 1,
+                  "description": "max of:",
+                  "details": [
+                    {
+                      "value": 1,
+                      "description": "Description:*232*",
+                      "details": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "RegistrationDate:[1535241600000 TO 1566863999999]",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Country:nederland",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Deleted:false",
+                  "details": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "_shard": "[vog_dev][0]",
+        "_node": "AwAJTLMoS0aNimcS25KDDg",
+        "_index": "vog_dev",
+        "_type": "doc",
+        "_id": "307718",
+        "_score": null,
+        "_source": {
+          "ObjectId": "307718",
+          "ObjectNumber": "F0080f-2019000713",
+          "ExternalNumber": "",
+          "CityId": "2393",
+          "City": "Leeuwarden",
+          "StorageLocationId": "1150459",
+          "StorageLocation": {
+            "StorageLocationId": "1150459",
+            "CustomerId": "246",
+            "Name": "fietsdepot Leeuwarden",
+            "Streetname": "Toutenburgstraat 9",
+            "Zipcode": "8912 AG",
+            "CityId": "2393",
+            "City": "Leeuwarden                                        ",
+            "Phone": "0582131301",
+            "Email": "afac@omrin.nl",
+            "WebsiteUrl": "",
+            "PrivacyUrl": "",
+            "OrderId": "1",
+            "Instructions": ""
+          },
+          "CategoryId": "3",
+          "Category": "fiets",
+          "SubCategoryId": "25",
+          "SubCategory": "damesfiets",
+          "ColorId": "9",
+          "Color": "grijs",
+          "Description": "damesfiets Swapfiets ( grijs ) met framenummer '12325726'.\r\nLocatie gevonden: , N.S. Stationsgebied Leeuwarden.\r\nFout\\/gevaarlijk gestald op 20-8-2019 en overgebracht naar depot AFAC op 20-8-2019, opslag t\\/m 16-10-2019.",
+          "Brand": "Swapfiets",
+          "RegistrationDate": "2019-08-21T13:26:00Z",
+          "Deleted": "false",
+          "ImageCount": "1",
+          "CustomerId": "246",
+          "OrganisationName": "Gemeente Leeuwarden",
+          "Country": "Nederland",
+          "FormLink": "&Number=F0080f-2019000713"
+        },
+        "highlight": {
+          "Description": [
+            "damesfiets Swapfiets ( grijs ) met framenummer '<strong>12325726</strong>'.\r\nLocatie gevonden: , N.S. Stationsgebied Leeuwarden.\r\nFout/gevaarlijk gestald op 20-8-2019 en overgebracht naar depot AFAC op 20-8-2019, opslag t/m 16-10-2019."
+          ]
+        },
+        "sort": [
+          1566393960000
+        ],
+        "_explanation": {
+          "value": 1,
+          "description": "sum of:",
+          "details": [
+            {
+              "value": 1,
+              "description": "sum of:",
+              "details": [
+                {
+                  "value": 1,
+                  "description": "max of:",
+                  "details": [
+                    {
+                      "value": 1,
+                      "description": "Description:*232*",
+                      "details": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "RegistrationDate:[1535241600000 TO 1566863999999]",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Country:nederland",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Deleted:false",
+                  "details": []
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "_shard": "[vog_dev][0]",
+        "_node": "AwAJTLMoS0aNimcS25KDDg",
+        "_index": "vog_dev",
+        "_type": "doc",
+        "_id": "307711",
+        "_score": null,
+        "_source": {
+          "ObjectId": "307711",
+          "ObjectNumber": "F0080f-2019000712",
+          "ExternalNumber": "",
+          "CityId": "2393",
+          "City": "Leeuwarden",
+          "StorageLocationId": "1150459",
+          "StorageLocation": {
+            "StorageLocationId": "1150459",
+            "CustomerId": "246",
+            "Name": "fietsdepot Leeuwarden",
+            "Streetname": "Toutenburgstraat 9",
+            "Zipcode": "8912 AG",
+            "CityId": "2393",
+            "City": "Leeuwarden                                        ",
+            "Phone": "0582131301",
+            "Email": "afac@omrin.nl",
+            "WebsiteUrl": "",
+            "PrivacyUrl": "",
+            "OrderId": "1",
+            "Instructions": ""
+          },
+          "CategoryId": "3",
+          "Category": "fiets",
+          "SubCategoryId": "25",
+          "SubCategory": "damesfiets",
+          "ColorId": "2",
+          "Color": "blauw",
+          "Description": "damesfiets Swapfiets ( blauw ) met framenummer '12327492'.\r\nLocatie gevonden: , N.S. Stationsgebied Leeuwarden.\r\nFout\\/gevaarlijk gestald op 20-8-2019 en overgebracht naar depot AFAC op 20-8-2019, opslag t\\/m 16-10-2019.",
+          "Brand": "Swapfiets",
+          "RegistrationDate": "2019-08-21T13:23:00Z",
+          "Deleted": "false",
+          "ImageCount": "1",
+          "CustomerId": "246",
+          "OrganisationName": "Gemeente Leeuwarden",
+          "Country": "Nederland",
+          "FormLink": "&Number=F0080f-2019000712"
+        },
+        "highlight": {
+          "Description": [
+            "damesfiets Swapfiets ( blauw ) met framenummer '<strong>12327492</strong>'.\r\nLocatie gevonden: , N.S. Stationsgebied Leeuwarden.\r\nFout/gevaarlijk gestald op 20-8-2019 en overgebracht naar depot AFAC op 20-8-2019, opslag t/m 16-10-2019."
+          ]
+        },
+        "sort": [
+          1566393780000
+        ],
+        "_explanation": {
+          "value": 1,
+          "description": "sum of:",
+          "details": [
+            {
+              "value": 1,
+              "description": "sum of:",
+              "details": [
+                {
+                  "value": 1,
+                  "description": "max of:",
+                  "details": [
+                    {
+                      "value": 1,
+                      "description": "Description:*232*",
+                      "details": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "RegistrationDate:[1535241600000 TO 1566863999999]",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Country:nederland",
+                  "details": []
+                }
+              ]
+            },
+            {
+              "value": 0,
+              "description": "match on required clause, product of:",
+              "details": [
+                {
+                  "value": 0,
+                  "description": "# clause",
+                  "details": []
+                },
+                {
+                  "value": 1,
+                  "description": "Deleted:false",
+                  "details": []
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "aggregations": {
+    "soort_voorwerp": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": [
+        {
+          "key": "damesfiets",
+          "doc_count": 102
+        },
+        {
+          "key": "herenfiets",
+          "doc_count": 50
+        },
+        {
+          "key": "sleutelbos",
+          "doc_count": 8
+        },
+        {
+          "key": "bril",
+          "doc_count": 7
+        },
+        {
+          "key": "kinderfiets",
+          "doc_count": 7
+        },
+        {
+          "key": "huissleutel",
+          "doc_count": 6
+        },
+        {
+          "key": "portemonnee",
+          "doc_count": 6
+        },
+        {
+          "key": "blouse, trui, vest",
+          "doc_count": 5
+        },
+        {
+          "key": "iets anders",
+          "doc_count": 5
+        },
+        {
+          "key": "mobiele telefoon",
+          "doc_count": 4
+        },
+        {
+          "key": "mountainbike",
+          "doc_count": 4
+        },
+        {
+          "key": "rugzak",
+          "doc_count": 4
+        },
+        {
+          "key": "OV-chipkaart",
+          "doc_count": 3
+        },
+        {
+          "key": "colbert, spijkerjack, jas",
+          "doc_count": 3
+        },
+        {
+          "key": "handschoenen, sjaal, riem",
+          "doc_count": 3
+        },
+        {
+          "key": "paspoort, identiteitskaart",
+          "doc_count": 3
+        },
+        {
+          "key": "rijbewijs",
+          "doc_count": 3
+        },
+        {
+          "key": "armband",
+          "doc_count": 2
+        },
+        {
+          "key": "bankpas",
+          "doc_count": 2
+        },
+        {
+          "key": "fietstas",
+          "doc_count": 2
+        },
+        {
+          "key": "speelgoed",
+          "doc_count": 2
+        },
+        {
+          "key": "fietssleutel",
+          "doc_count": 1
+        },
+        {
+          "key": "hanger",
+          "doc_count": 1
+        },
+        {
+          "key": "horloge",
+          "doc_count": 1
+        },
+        {
+          "key": "ketting",
+          "doc_count": 1
+        },
+        {
+          "key": "laptoptas",
+          "doc_count": 1
+        },
+        {
+          "key": "mapje of etui",
+          "doc_count": 1
+        },
+        {
+          "key": "portefeuille",
+          "doc_count": 1
+        },
+        {
+          "key": "slaapzak, luchtbed, tent",
+          "doc_count": 1
+        },
+        {
+          "key": "sportartikel",
+          "doc_count": 1
+        },
+        {
+          "key": "tas, aktetas",
+          "doc_count": 1
+        },
+        {
+          "key": "toegangskaart",
+          "doc_count": 1
+        },
+        {
+          "key": "vouwfiets",
+          "doc_count": 1
+        },
+        {
+          "key": "zorgpas",
+          "doc_count": 1
+        }
+      ]
+    },
+    "kleuren": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": [
+        {
+          "key": "zwart",
+          "doc_count": 64
+        },
+        {
+          "key": "grijs",
+          "doc_count": 38
+        },
+        {
+          "key": "blauw",
+          "doc_count": 26
+        },
+        {
+          "key": "onbekend",
+          "doc_count": 21
+        },
+        {
+          "key": "groen",
+          "doc_count": 18
+        },
+        {
+          "key": "rood",
+          "doc_count": 13
+        },
+        {
+          "key": "diverse",
+          "doc_count": 12
+        },
+        {
+          "key": "wit",
+          "doc_count": 9
+        },
+        {
+          "key": "paars",
+          "doc_count": 8
+        },
+        {
+          "key": "bruin",
+          "doc_count": 7
+        },
+        {
+          "key": "zilver",
+          "doc_count": 7
+        },
+        {
+          "key": "geel",
+          "doc_count": 4
+        },
+        {
+          "key": "oranje",
+          "doc_count": 4
+        },
+        {
+          "key": "roze",
+          "doc_count": 4
+        },
+        {
+          "key": "beige",
+          "doc_count": 3
+        },
+        {
+          "key": "goud",
+          "doc_count": 3
+        },
+        {
+          "key": "chroom",
+          "doc_count": 2
+        },
+        {
+          "key": "crème",
+          "doc_count": 1
+        }
+      ]
+    },
+    "plaatsen": {
+      "doc_count_error_upper_bound": 0,
+      "sum_other_doc_count": 0,
+      "buckets": [
+        {
+          "key": "Nijmegen",
+          "doc_count": 17
+        },
+        {
+          "key": "Den Haag",
+          "doc_count": 15
+        },
+        {
+          "key": "Haarlem",
+          "doc_count": 15
+        },
+        {
+          "key": "Schiedam",
+          "doc_count": 15
+        },
+        {
+          "key": "Eindhoven",
+          "doc_count": 14
+        },
+        {
+          "key": "Zwolle",
+          "doc_count": 14
+        },
+        {
+          "key": "Rotterdam",
+          "doc_count": 12
+        },
+        {
+          "key": "Tilburg",
+          "doc_count": 12
+        },
+        {
+          "key": "'s-Hertogenbosch",
+          "doc_count": 11
+        },
+        {
+          "key": "Breda",
+          "doc_count": 9
+        },
+        {
+          "key": "Groningen",
+          "doc_count": 9
+        },
+        {
+          "key": "Hengelo",
+          "doc_count": 8
+        },
+        {
+          "key": "Delft",
+          "doc_count": 7
+        },
+        {
+          "key": "Feijenoord",
+          "doc_count": 4
+        },
+        {
+          "key": "Leeuwarden",
+          "doc_count": 4
+        },
+        {
+          "key": "Noord",
+          "doc_count": 4
+        },
+        {
+          "key": "Venlo",
+          "doc_count": 4
+        },
+        {
+          "key": "Maastricht",
+          "doc_count": 3
+        },
+        {
+          "key": "Oss",
+          "doc_count": 3
+        },
+        {
+          "key": "Zoetermeer",
+          "doc_count": 3
+        },
+        {
+          "key": "Amersfoort",
+          "doc_count": 2
+        },
+        {
+          "key": "Deurne",
+          "doc_count": 2
+        },
+        {
+          "key": "Goes",
+          "doc_count": 2
+        },
+        {
+          "key": "Houten",
+          "doc_count": 2
+        },
+        {
+          "key": "Pijnacker",
+          "doc_count": 2
+        },
+        {
+          "key": "Utrecht",
+          "doc_count": 2
+        },
+        {
+          "key": "Voorhout",
+          "doc_count": 2
+        },
+        {
+          "key": "Zaandam",
+          "doc_count": 2
+        },
+        {
+          "key": "Alblasserdam",
+          "doc_count": 1
+        },
+        {
+          "key": "Almelo",
+          "doc_count": 1
+        },
+        {
+          "key": "Amstelveen",
+          "doc_count": 1
+        },
+        {
+          "key": "Apeldoorn",
+          "doc_count": 1
+        },
+        {
+          "key": "Barwoutswaarder",
+          "doc_count": 1
+        },
+        {
+          "key": "Bavel",
+          "doc_count": 1
+        },
+        {
+          "key": "Biddinghuizen",
+          "doc_count": 1
+        },
+        {
+          "key": "Blijdorp",
+          "doc_count": 1
+        },
+        {
+          "key": "Charlois",
+          "doc_count": 1
+        },
+        {
+          "key": "Dalfsen",
+          "doc_count": 1
+        },
+        {
+          "key": "De Cocksdorp",
+          "doc_count": 1
+        },
+        {
+          "key": "De Lier",
+          "doc_count": 1
+        },
+        {
+          "key": "Delfshaven",
+          "doc_count": 1
+        },
+        {
+          "key": "Deventer",
+          "doc_count": 1
+        },
+        {
+          "key": "Doetinchem",
+          "doc_count": 1
+        },
+        {
+          "key": "Etten-Leur",
+          "doc_count": 1
+        },
+        {
+          "key": "Glanerbrug",
+          "doc_count": 1
+        },
+        {
+          "key": "Gouda",
+          "doc_count": 1
+        },
+        {
+          "key": "Heemskerk",
+          "doc_count": 1
+        },
+        {
+          "key": "Hernen",
+          "doc_count": 1
+        },
+        {
+          "key": "Hoofddorp",
+          "doc_count": 1
+        },
+        {
+          "key": "Hoogland",
+          "doc_count": 1
+        },
+        {
+          "key": "Horst",
+          "doc_count": 1
+        },
+        {
+          "key": "Huizen",
+          "doc_count": 1
+        },
+        {
+          "key": "Leiden",
+          "doc_count": 1
+        },
+        {
+          "key": "Leiderdorp",
+          "doc_count": 1
+        },
+        {
+          "key": "Lelystad",
+          "doc_count": 1
+        },
+        {
+          "key": "Middelburg",
+          "doc_count": 1
+        },
+        {
+          "key": "Middelharnis",
+          "doc_count": 1
+        },
+        {
+          "key": "Nijkerk",
+          "doc_count": 1
+        },
+        {
+          "key": "Oldenzaal",
+          "doc_count": 1
+        },
+        {
+          "key": "Oostkapelle",
+          "doc_count": 1
+        },
+        {
+          "key": "Raalte",
+          "doc_count": 1
+        },
+        {
+          "key": "Schoonebeek",
+          "doc_count": 1
+        },
+        {
+          "key": "Segbroek",
+          "doc_count": 1
+        },
+        {
+          "key": "Soest",
+          "doc_count": 1
+        },
+        {
+          "key": "Spijkenisse",
+          "doc_count": 1
+        },
+        {
+          "key": "Tegelen",
+          "doc_count": 1
+        },
+        {
+          "key": "Valkenburg LB",
+          "doc_count": 1
+        },
+        {
+          "key": "Venray",
+          "doc_count": 1
+        },
+        {
+          "key": "Vlissingen",
+          "doc_count": 1
+        },
+        {
+          "key": "Waddinxveen",
+          "doc_count": 1
+        },
+        {
+          "key": "Zandvoort",
+          "doc_count": 1
+        },
+        {
+          "key": "Zeist",
+          "doc_count": 1
+        },
+        {
+          "key": "Zierikzee",
+          "doc_count": 1
+        }
+      ]
+    }
+  }
+}

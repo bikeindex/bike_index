@@ -1,6 +1,4 @@
 class FileCacheMaintenanceWorker < ScheduledWorker
-  attr_reader :filename
-
   def self.frequency
     6.hours
   end

@@ -92,7 +92,7 @@ jobs:
           key: v2-bundler-{{ checksum "Gemfile.lock" }}
       - run:
           name: Bundle Gems
-          command: bundle install --path=vendor/bundle --jobs=4 --retry=3
+          command: bundle install --without development --path=vendor/bundle --jobs=4 --retry=3
       - save_cache:
           key: v2-bundler-{{ checksum "Gemfile.lock" }}
           paths:

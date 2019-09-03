@@ -47,6 +47,7 @@ RSpec.describe BikeV2ShowSerializer do
         stolen: false,
         stolen_location: nil,
         date_stolen: nil,
+        date_stolen_string: nil,
         registration_created_at: bike.created_at.to_i,
         registration_updated_at: bike.updated_at.to_i,
         url: "http://test.host/bikes/#{bike.id}",
@@ -70,6 +71,15 @@ RSpec.describe BikeV2ShowSerializer do
         stolen_record: nil,
         public_images: [public_image_target],
         components: [component_target],
+        placeholder_image: "http://test.host/assets/revised/bike_photo_placeholder-ff15adbd9bf89e10bf3cd2cd6c4e85e5d1056e50463ae722822493624db72e56.svg",
+        debug: nil,
+        location_found: nil,
+        registry_id: nil,
+        registry_name: nil,
+        registry_url: nil,
+        source_name: nil,
+        source_unique_id: nil,
+        status: nil,
       }
     end
 
