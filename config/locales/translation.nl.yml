@@ -4644,6 +4644,10 @@ nl:
       users: Gebruikers
       viewing_our_streamlined_page: U bekijkt momenteel onze gestroomlijnde registratiepagina
         voor Bike Shop, die wij aanbevelen te gebruiken
+    errors:
+      error: Fout
+      errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
+        dit %{object_name} wordt opgeslagen:"
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -4905,3 +4909,48 @@ nl:
     new:
       save_information_about_one_of_your_locks: Informatie opslaan over een van uw
         sloten
+  organization_invitations:
+    not_available:
+      contact_us: Contacteer ons
+      contact_us_if_you_think_were_wrong_html: "%{contact_us_link} als u denkt dat
+        we het mis hebben."
+      perhaps_that_link_has_already_been_used_t: Misschien is die link al gebruikt
+        om lid te worden van de groep?
+      whoops_that_link_isnt_connected_to_a_bike: Oeps, die link is niet verbonden
+        met een fiets
+  payments:
+    create:
+      bike_index_team: Bike Index Team
+      thank_you_for_supporting_bike_index: Bedankt voor het ondersteunen van Bike
+        Index!
+      we_received_your_payment_of: We hebben uw betaling van %{amount} ontvangen
+      xoxo: XOXO,
+      your_donation_saved_bikes: Uw donatie van $ %{amount} heeft zojuist de fietsen
+        gered.
+    form:
+      501c3_nonprofit: 501 (c) (3) non-profit
+      bike_index_is_a_nonprofit_html: Bike Index is een %{nonprofit_link}.
+      donate_today: Doneer vandaag nog
+      next: volgende>
+      other_amount: Ander bedrag
+      pay_bike_index: Pay Bike Index
+      select_an_amount: Selecteer een bedrag
+  registrations:
+    create:
+      in_it_youll_find_instructions: Hierin vindt u instructies voor het voltooien
+        van de registratie van uw fiets
+      radicool: Radicool!
+      we_got_this: We hebben dit.
+      we_sent_an_email_to: 'We hebben een e-mail gestuurd naar:'
+      well_do_our_best_to_help_you_recover_it: We zullen ons best doen om u te helpen
+        het terug te krijgen
+    embed:
+      bike_manufacturer: fietsfabrikant
+      choose_specific_organization_optional: Kies specifieke organisatie (optioneel)
+      owner_email: "%{owner} e-mail"
+      primary_frame_color: primaire framekleur
+      register: Registreer
+      select_other_if_manufacturer_doesnt_show: Selecteer 'Overig' als de fabrikant
+        niet verschijnt wanneer deze wordt ingevoerd
+      this_bike_is_either_missing_or_stolen: Deze fiets ontbreekt of is gestolen
+      your: jouw
