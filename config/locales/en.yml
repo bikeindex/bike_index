@@ -3299,6 +3299,47 @@ en:
   locales:
     en: English
     nl: Nederlands (Dutch)
+  locks:
+    edit:
+      are_you_sure: Are you sure?
+      back_to_viewing_all_locks: back to viewing all locks
+      delete_this_lock: Delete this lock
+      edit_the_lock: Edit the lock
+    form:
+      add_the_lock: Add the lock!
+      additional_notes: Additional notes
+      basic: Basic
+      choose_manufacturer: Choose manufacturer
+      examples_of_serial_numbers_found_on_diffe: Examples of serial numbers found
+        on different types of bike lock keys
+      has_combination: Has combination
+      has_key: Has key
+      large_kryptonite_key: Large Kryptonite key
+      lock_type: Lock type
+      other_lock_manufacturer: Other lock manufacturer
+      pinhead_key: Pinhead key
+      pinhead_locking_skewer_key: Pinhead locking skewer key
+      small_kryptonite_key: Small Kryptonite key
+      update_the_lock: Update the lock!
+    lock_home:
+      add_a_new_lock: Add a new lock
+      any_lock_information_you_enter_on_bike_in: Any lock information you enter on
+        Bike Index is private and visible only to you.
+      if_you_want_you_can_save_serial_html: >-
+        If you want, you can <strong>save the serial numbers of your keys</strong>
+        on Bike Index&mdash;so you won't be out of luck if you lose them.
+      lock_keys_often_have_serial_numbers_so_yo: >-
+        Lock keys often have serial numbers, so you can order replacements if you
+        lose the keys.
+      lock_type: Lock Type
+      manufacturer: Manufacturer
+      save_information_about_a_lock: Save information about a lock
+      save_information_about_your_bike_lock: Save information about your bike lock!
+      you_can_also_record_your_lock_html: You can also <strong>record your lock combinations</strong>.
+      your_locks: Your locks
+    new:
+      save_information_about_one_of_your_locks: Save information about one of your
+        locks
   meta_descriptions:
     bikes_index: Search for bikes that have been registered on Bike Index
     bikes_new: >-
