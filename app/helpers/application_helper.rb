@@ -222,4 +222,8 @@ module ApplicationHelper
       [t(locale, scope: [:locales]), locale.to_s]
     end.sort { |a, b| a[0].downcase <=> b[0].downcase }
   end
+
+  def bike_placeholder_image_path
+    image_path("revised/bike_photo_placeholder.svg")
+  end
 end
