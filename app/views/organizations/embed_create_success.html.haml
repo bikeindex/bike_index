@@ -1,10 +1,9 @@
-
 .embed-success-block
   = image_tag "resources/logo_striped.svg"
   %h1
-    Your #{@bike.type} has been added to Bike Index!
+    = t(".your_bike_has_been_added_to_bike_index", bike_type: @bike.type)
   %p
-    = link_to @bike.title, bike_url(@bike), target: "_blank"
-    was registered to you through <strong>#{@organization.name}</strong>.
+    - bike_link = link_to @bike.title, bike_url(@bike), target: "_blank"
+    = t(".bike_was_registered_to_you_html", bike_link: bike_link, org_name: @organization.name)
   %p
-    You will receive an email confirmation shortly.
+    = t(".you_will_receive_an_email_confirmation")
