@@ -4864,3 +4864,44 @@ nl:
       nl: EUR
       en-GB: GBP
       es: EUR
+  locks:
+    edit:
+      are_you_sure: Weet je het zeker?
+      back_to_viewing_all_locks: terug naar het bekijken van alle sloten
+      delete_this_lock: Verwijder dit slot
+      edit_the_lock: Bewerk het slot
+    form:
+      add_the_lock: Voeg het slot toe!
+      additional_notes: Extra notities
+      basic: basis-
+      choose_manufacturer: Kies fabrikant
+      examples_of_serial_numbers_found_on_diffe: Voorbeelden van serienummers op verschillende
+        soorten fietsslottoetsen
+      has_combination: Heeft combinatie
+      has_key: Heeft sleutel
+      large_kryptonite_key: Grote Kryptonite-sleutel
+      lock_type: Slottype
+      other_lock_manufacturer: Andere slotfabrikant
+      pinhead_key: Pinhead-toets
+      pinhead_locking_skewer_key: Pinhead spies sleutel
+      small_kryptonite_key: Kleine Kryptonite-sleutel
+      update_the_lock: Update het slot!
+    lock_home:
+      add_a_new_lock: Voeg een nieuw slot toe
+      any_lock_information_you_enter_on_bike_in: Alle slotinformatie die u op Bike
+        Index invoert, is privé en alleen zichtbaar voor u.
+      if_you_want_you_can_save_serial_html: Als je wilt, kun je <strong>de serienummers
+        van je sleutels opslaan</strong> op Bike Index, zodat je geen pech hebt als
+        je ze verliest.
+      lock_keys_often_have_serial_numbers_so_yo: Vergrendelingssleutels hebben vaak
+        serienummers, zodat u vervangingen kunt bestellen als u de sleutels verliest.
+      lock_type: Slottype
+      manufacturer: Fabrikant
+      save_information_about_a_lock: Informatie opslaan over een slot
+      save_information_about_your_bike_lock: Informatie opslaan over uw fietsslot!
+      you_can_also_record_your_lock_html: U kunt ook <strong>uw slotcombinaties opnemen</strong>
+        .
+      your_locks: Je sloten
+    new:
+      save_information_about_one_of_your_locks: Informatie opslaan over een van uw
+        sloten
