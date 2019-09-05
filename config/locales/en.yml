@@ -3357,6 +3357,14 @@ en:
     new:
       save_information_about_one_of_your_locks: Save information about one of your
         locks
+  manufacturers:
+    index:
+      give_us_a_heads_up_in_a_comment_below: Give us a heads up in a comment below.
+      manufacturers_we_know_about: Manufacturers we know about
+      name: Name
+      oh_no_were_missing_a_manufacturer: OH NO! We're missing a manufacturer?
+      only_makes_components: Only makes components
+      thats_not_actually_surprising: That's not actually surprising, there are a bunch.
   meta_descriptions:
     bikes_index: Search for bikes that have been registered on Bike Index
     bikes_new: >-
