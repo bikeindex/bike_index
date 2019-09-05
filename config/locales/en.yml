@@ -3365,26 +3365,6 @@ en:
       oh_no_were_missing_a_manufacturer: OH NO! We're missing a manufacturer?
       only_makes_components: Only makes components
       thats_not_actually_surprising: That's not actually surprising, there are a bunch.
-  memberships:
-    edit:
-      admin_of_organization: Admin of organization
-      are_you_sure_you_want_to_remove_user: Are you sure you want to remove %{user_email}
-        from your organization?
-      at: at
-      bikes_indexed_for_org_html: Bikes indexed for <strong>%{org_name}</strong> by
-        %{user}
-      color: Color
-      date_indexed: Date indexed
-      delete_member: Delete member
-      edit: Edit
-      edit_membership_for: Edit membership for
-      joined_bike_index_date: Joined Bike Index %{date}
-      manufacturer: Manufacturer
-      member_of_organization: Member of organization
-      sent_to: Sent to
-      today_at_timestamp: Today at %{timestamp}
-      update_role: Update role
-      yesterday_at_timestmap: Yesterday at %{timestmap}
   meta_descriptions:
     bikes_index: Search for bikes that have been registered on Bike Index
     bikes_new: >-
