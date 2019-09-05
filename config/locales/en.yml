@@ -3491,6 +3491,8 @@ en:
     index:
       bike_index_blog: Bike Index Blog
       bike_index_blog_feed: Bike Index blog feed
+    show:
+      by: by
   number:
     currency:
       format:
