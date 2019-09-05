@@ -4522,6 +4522,70 @@ en:
       past_day: past day
       past_hour: past hour
       past_year: past year
+  stolen:
+    index:
+      ambassador: ambassador
+      bike_chopshop_report: Bike ChopShop report
+      bike_index: Bike Index
+      bike_index_will_broadcast: >-
+        Bike Index will broadcast your stolen bike to the local Stolen Bike Twitter
+        handle and spread the word via other social channels. Our stolen bike data
+        is linked to LeadsOnline so if your bike ends up in the 'system' it will get
+        flagged and you will be contacted. Our community will be on the look out on
+        various resale channels.
+      check_out_your_local_flea_market: Check out your local flea market for your
+        bike.
+      donation: donation
+      error: error
+      file_a_police_report: >-
+        File a police report. If you can, go into your local precinct and make an
+        officer come and take a report. Get them engaged in your situation!
+      if_you_are_here_your_bike_was_probably_stolen: >-
+        If you are here, your bike was probably stolen. That sucks, but we are here
+        to help. Here is what you should do:
+      keep_an_eye_on_craigslist: >-
+        Keep an eye on Craigslist. Set up a specific alert using ifttt.com to flag
+        listing that matches your bike. Track apps such as OfferUp and LetGo as they
+        are frequently used in fencing bikes.
+      list_recent_stolen_bikes_html: List recent stolen bikes on your site with our
+        %{stolen_widget_link}
+      look_for_local_stolen_bike_groups_on_face: >-
+        Look for local stolen bike groups on Facebook (search 'stolen bike {city name}'
+        Many of these volunteer groups exist across the globe and can support your
+        recovery efforts.
+      make_sure_your_bike_is_registered_html: >-
+        Make sure your bike is registered on %{new_bike_link} and any local registry
+        in your community that might exist. Mark your bike as <strong>stolen</strong>
+        on Bike Index to trigger our community.
+      other_recovery_tools: Other recovery tools
+      please_fix_the_following: Please fix the following %{errors}
+      please_login_to_make_report_html: Please %{login_link} to make this report
+      register_it: register it
+      report_a_bicycle_chop_shop: Report a bicycle chop shop
+      report_bike_theft_issues: 'Report bike theft issues:'
+      report_someone_selling_a_stolen_bike: Report someone selling a stolen bike
+      reporting_your_own_bike_stolen_html: Reporting your own bike stolen? You need
+        to %{register_it_link} first
+      send_alert: Send alert!
+      sign_in: sign in
+      someone_is_selling_a_stolen_bike: Someone is selling a stolen bike
+      stolen_widget: stolen widget
+      tell_everyone_you_know: >-
+        Tell everyone you know about your stolen bike. Hit all your social networks
+        (Facebook, Instagram, Twitter, etc.) and text/email everyone you know.
+      we_wish_you_the_best_of_luck_html: >-
+        We wish you the best of luck in recovering your bicycle. We'd love to add
+        your story to our %{recoveries_count} recovered bikes. If you wish to support
+        our cause, please consider a %{donations_link} or join our %{ambassadors_link}
+        program.
+      what_happens_next: What happens next?
+      what_to_do_if_your_bike_is_stolen: What to do if your bike is stolen
+      where_is_this_happening: Where is this happening? URL, address - any information
+        you have
+      your_email_address: Your email address
+      your_local_police_department_will_do_what: >-
+        Your local police department will do what it does to help recover your bike.
+        Stay in communication with them.
   support:
     array:
       last_word_connector: ", and "
