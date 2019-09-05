@@ -4609,6 +4609,11 @@ en:
       short_with_hour: "%m.%d.%y - %l%P"
       short_with_year: "%a, %B %d %Y"
       standard_display: "%A, %B %d"
+  user_embeds:
+    show:
+      bike: Bike
+      my_indexed_bikes: My Indexed %{bikes_count}
+      no_photo: no photo
   users:
     accept_terms:
       i_agree_to_tos_html: I agree to Bike Index's <strong>Terms of Service</strong>.
