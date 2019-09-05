@@ -3487,6 +3487,10 @@ en:
       en-GB: GBP
       es: EUR
       nl: EUR
+  news:
+    index:
+      bike_index_blog: Bike Index Blog
+      bike_index_blog_feed: Bike Index blog feed
   number:
     currency:
       format:
