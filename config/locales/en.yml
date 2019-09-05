@@ -4595,6 +4595,11 @@ en:
       last_word_connector: ", and "
       two_words_connector: " and "
       words_connector: ", "
+  theft_alert_plans:
+    theft_alert_plan:
+      best_value: Best value
+      days: Days
+      views: Views
   time:
     formats:
       blog: "%m_%d_%Y"
