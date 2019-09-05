@@ -4237,6 +4237,10 @@ en:
     staff_accounts: Staff accounts
     supporting_our_nonprofit: Supporting our nonprofit
     welcome_campaign: Welcome campaign on Facebook, Twitter, and Instagram
+  recovery_displays:
+    recovery_display:
+      bike: Bike
+      recovered_date: recovered %{date}
   registrations:
     create:
       in_it_youll_find_instructions: In it, you'll find instructions on how to complete
