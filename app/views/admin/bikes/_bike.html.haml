@@ -165,7 +165,7 @@
               %td
                 Approved?
               %td
-                = "&#x2713;".html_safe if stolen_record.approved
+                = check_mark if stolen_record.approved
             %tr
               %td
                 Estimated $
@@ -234,12 +234,12 @@
               %td
                 We Helped
               %td
-                = "&#x2713;".html_safe if stolen_record.index_helped_recovery
+                = check_mark if stolen_record.index_helped_recovery
             %tr
               %td
                 Can Share
               %td
-                = "&#x2713;".html_safe if stolen_record.can_share_recovery
+                = check_mark if stolen_record.can_share_recovery
       .col-sm-12.col-lg-6
         %table.table-list
           %tbody

@@ -67,4 +67,4 @@
             - else
               = membership.sender_id
           %td
-            = "&#x2713;".html_safe if membership.admin?
+            = check_mark if membership.admin?

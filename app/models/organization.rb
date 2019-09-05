@@ -126,7 +126,7 @@ class Organization < ActiveRecord::Base
   def mail_snippet_body(type)
     return nil unless MailSnippet.organization_snippet_types.include?(type)
     snippet = mail_snippets.enabled.where(name: type).first
-    snippet && snippet.body
+    snippet&.body
   end
 
   def message_kinds # Matches organization_message kinds

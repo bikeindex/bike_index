@@ -33,4 +33,4 @@
           %td
             = strip_tags(tweet.body_html)
           %td
-            = "&#x2713;".html_safe if tweet.image.present?
+            = check_mark if tweet.image.present?

@@ -89,7 +89,7 @@
               %span{ class: current_stolen_record.city.blank? ? "less-strong" : "" }
                 = [current_stolen_record.city, current_stolen_record.state&.abbreviation, current_stolen_record.zipcode].reject(&:blank?).first
             %td.table-cell-check
-              = "&#x2713;".html_safe if current_stolen_record.approved
+              = check_mark if current_stolen_record.approved
               - if bike.owner&.donor?
                 <span class="donor-icon">D</span>
               - elsif bike.owner&.paid_org?
