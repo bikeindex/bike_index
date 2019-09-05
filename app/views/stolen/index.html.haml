@@ -1,96 +1,88 @@
 .container
-  %h2
-    What to do if your bike is stolen
+  %h2= t(".what_to_do_if_your_bike_is_stolen")
 
-  %p
-    If you are here, your bike was probably stolen. That sucks, but we are here to help. Here is what you should do:
+  %p= t(".if_you_are_here_your_bike_was_probably_stolen")
 
   %ol
-    %li
-      File a police report. If you can, go into your local precinct and make an officer come and take a report. Get them engaged in your situation!
-    %li
-      Make sure your bike is registered on #{link_to "Bike Index", new_bike_url(stolen: true)} and any local registry in your community that might exist. Mark your bike as <strong>stolen</strong> on Bike Index to trigger our community.
-    %li
-      Look for local stolen bike groups on Facebook (search "stolen bike {city name} Many of these volunteer groups exist across the globe and can support your recovery efforts.
-    %li
-      Tell everyone you know about your stolen bike. Hit all your social networks (Facebook, Instagram, Twitter, etc.) and text/email everyone you know.
+    %li= t(".file_a_police_report")
+    %li= t(".make_sure_your_bike_is_registered_html", new_bike_link: link_to(t(".bike_index"), new_bike_url(stolen: true)))
+    %li= t(".look_for_local_stolen_bike_groups_on_face")
+    %li= t(".tell_everyone_you_know")
 
-  %h2
-    What happens next?
+  %h2= t(".what_happens_next")
 
   %ol
-    %li
-      Your local police department will do what it does to help recover your bike. Stay in communication with them.
-    %li
-      Bike Index will broadcast your stolen bike to the local Stolen Bike Twitter handle and spread the word via other social channels. Our stolen bike data is linked to LeadsOnline so if your bike ends up in the 'system' it will get flagged and you will be contacted. Our community will be on the look out on various resale channels.
-    %li
-      Keep an eye on Craigslist. Set up a specific alert using ifttt.com to flag listing that matches your bike. Track apps such as OfferUp and LetGo as they are frequently used in fencing bikes.
-    %li
-      Check out your local flea market for your bike.
+    %li= t(".your_local_police_department_will_do_what")
+    %li= t(".bike_index_will_broadcast")
+    %li= t(".keep_an_eye_on_craigslist")
+    %li= t(".check_out_your_local_flea_market")
 
 
   %p
-    We wish you the best of luck in recovering your bicycle. We'd love to add your story to our #{number_with_delimiter Counts.recoveries} recovered bikes. If you wish to support our cause, please consider a #{link_to "donation", support_bike_index_url} or join our #{link_to "ambassador", ambassadors_url} program.
+    - recoveries_count = number_with_delimiter(Counts.recoveries)
+    - donations_link = link_to t(".donation"), support_bike_index_url
+    - ambassadors_link = link_to t(".ambassador"), ambassadors_url
+    = t(".we_wish_you_the_best_of_luck_html", recoveries_count: recoveries_count, donations_link: donations_link, ambassadors_link: ambassadors_link)
 
   %hr.mt-4.mb-4
 
 
   %section.sbr-get-involved.mt-4.mb-4
     %h2.text-center.mt-4
-      Other recovery tools
+      = t(".other_recovery_tools")
 
     .involve-yerself.mt-4
       .involve-report
         %h3.header-font-alt
-          Report bike theft issues:
+          = t(".report_bike_theft_issues")
         .involve-report-form
 
           = form_for @feedback do |f|
-            = f.hidden_field :feedback_type, value: 'stolen_information'
+            = f.hidden_field :feedback_type, value: "stolen_information"
             - if @feedback.errors.any?
               #alert-block
                 .alert.alert-error
                   %a.close{"data-dismiss" => "alert"} ×
                   %h4
-                    Please fix the following
-                    = pluralize(@feedback.errors.count, "error")
+                    = t(".please_fix_the_following", errors: pluralize(@feedback.errors.count, t(".error")))
                   %ul
                     - @feedback.errors.full_messages.each do |msg|
                       %li
                         = msg
             .report-type
               %label
-                = f.radio_button :title, "Someone is selling a stolen bike", checked: true
-                Report someone selling a stolen bike
+                = f.radio_button :title, t(".someone_is_selling_a_stolen_bike"), checked: true
+                = t(".report_someone_selling_a_stolen_bike")
               %label
-                = f.radio_button :title, "Bike ChopShop report"
-                Report a bicycle chop shop
+                = f.radio_button :title, t(".bike_chopshop_report")
+                = t(".report_a_bicycle_chop_shop")
             %label
-              Reporting your own bike stolen? You need to
-              %a{ href: new_bike_path, style: "font-weight: bold; color: #fff; text-decoration: underline;" }
-                register it
-              first
+              - register_it_link = link_to t(".register_it"), new_bike_path, style: "font-weight: bold; color: #fff; text-decoration: underline;"
+              = t(".reporting_your_own_bike_stolen_html", register_it_link: register_it_link)
+
             .contact-text
-              = f.text_area :body, placeholder: "Where is this happening? URL, address - any information you have", rows: 5, class: 'form-control'
+              = f.text_area :body, placeholder: t(".where_is_this_happening"), rows: 5, class: 'form-control'
             - if current_user.present?
               .contact-actions.control-group
-                = f.email_field :email, placeholder: "Your email address", class: 'form-control'
+                = f.email_field :email, placeholder: t(".your_email_address"), class: 'form-control'
 
-                = f.submit 'Send alert!', class: 'btn pull-right'
+                = f.submit t(".send_alert"), class: 'btn pull-right'
             - else
               .contact-actions.control-group{ style: "text-align: center;" }
-                Please #{link_to "sign in", new_session_url, style: "color: #ccc;"} to make this report
+                - login_link = link_to t(".sign_in"), new_session_url, style: "color: #ccc;"
+                = t(".please_login_to_make_report_html", login_link: login_link)
 
       .involve-widget
         %h3.header-font-alt
-          List recent stolen bikes on your site with our #{link_to "stolen widget", "https://github.com/bikeindex/stolen_bikes_widget_html"}
+          - stolen_widget_link = link_to t(".stolen_widget"), "https://github.com/bikeindex/stolen_bikes_widget_html"
+          = t(".list_recent_stolen_bikes_html", stolen_widget_link: stolen_widget_link)
         #binx_stolen_widget
 
   #multi-serial-search
 
 = javascript_pack_tag "multi_serial_search/index"
 
-/ Stolen Bike Widget
+-# Stolen Bike Widget
 %script{type: "text/javascript", src: "https://widget.bikeindex.org/stolen-widget.js"}
 :javascript
   $(document).ready(function() {

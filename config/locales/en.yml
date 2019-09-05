@@ -1827,6 +1827,20 @@ en:
         We're sorry, We can't do what you just asked. Think you ought to be able to?
         Email us: %{email_link}.
       send_me_back: Send me back from whence I came!
+  feedbacks:
+    form:
+      email_address: Email address
+      name: Name
+      send_it: Send it!
+      subject: Subject
+      your_message: Your message
+    index:
+      contact_us: Contact us!
+      have_a_question_we_havent_answered: Have a question we haven't answered?
+      help_with_bike_index: Help with Bike Index
+      log_in_to_send_a_comment: Log in to send a comment!
+      you_can_reach_us_at_contact_html: You can reach us at %{contact_link}, or send
+        your message right here.
   helpers:
     page_entries_info:
       more_pages:
@@ -3343,6 +3357,14 @@ en:
     new:
       save_information_about_one_of_your_locks: Save information about one of your
         locks
+  manufacturers:
+    index:
+      give_us_a_heads_up_in_a_comment_below: Give us a heads up in a comment below.
+      manufacturers_we_know_about: Manufacturers we know about
+      name: Name
+      oh_no_were_missing_a_manufacturer: OH NO! We're missing a manufacturer?
+      only_makes_components: Only makes components
+      thats_not_actually_surprising: That's not actually surprising, there are a bunch.
   meta_descriptions:
     bikes_index: Search for bikes that have been registered on Bike Index
     bikes_new: >-
@@ -3445,6 +3467,12 @@ en:
       en-GB: GBP
       es: EUR
       nl: EUR
+  news:
+    index:
+      bike_index_blog: Bike Index Blog
+      bike_index_blog_feed: Bike Index blog feed
+    show:
+      by: by
   number:
     currency:
       format:
@@ -4189,6 +4217,10 @@ en:
     staff_accounts: Staff accounts
     supporting_our_nonprofit: Supporting our nonprofit
     welcome_campaign: Welcome campaign on Facebook, Twitter, and Instagram
+  recovery_displays:
+    recovery_display:
+      bike: Bike
+      recovered_date: recovered %{date}
   registrations:
     create:
       in_it_youll_find_instructions: In it, you'll find instructions on how to complete
@@ -4474,11 +4506,80 @@ en:
       past_day: past day
       past_hour: past hour
       past_year: past year
+  stolen:
+    index:
+      ambassador: ambassador
+      bike_chopshop_report: Bike ChopShop report
+      bike_index: Bike Index
+      bike_index_will_broadcast: >-
+        Bike Index will broadcast your stolen bike to the local Stolen Bike Twitter
+        handle and spread the word via other social channels. Our stolen bike data
+        is linked to LeadsOnline so if your bike ends up in the 'system' it will get
+        flagged and you will be contacted. Our community will be on the look out on
+        various resale channels.
+      check_out_your_local_flea_market: Check out your local flea market for your
+        bike.
+      donation: donation
+      error: error
+      file_a_police_report: >-
+        File a police report. If you can, go into your local precinct and make an
+        officer come and take a report. Get them engaged in your situation!
+      if_you_are_here_your_bike_was_probably_stolen: >-
+        If you are here, your bike was probably stolen. That sucks, but we are here
+        to help. Here is what you should do:
+      keep_an_eye_on_craigslist: >-
+        Keep an eye on Craigslist. Set up a specific alert using ifttt.com to flag
+        listing that matches your bike. Track apps such as OfferUp and LetGo as they
+        are frequently used in fencing bikes.
+      list_recent_stolen_bikes_html: List recent stolen bikes on your site with our
+        %{stolen_widget_link}
+      look_for_local_stolen_bike_groups_on_face: >-
+        Look for local stolen bike groups on Facebook (search 'stolen bike {city name}'
+        Many of these volunteer groups exist across the globe and can support your
+        recovery efforts.
+      make_sure_your_bike_is_registered_html: >-
+        Make sure your bike is registered on %{new_bike_link} and any local registry
+        in your community that might exist. Mark your bike as <strong>stolen</strong>
+        on Bike Index to trigger our community.
+      other_recovery_tools: Other recovery tools
+      please_fix_the_following: Please fix the following %{errors}
+      please_login_to_make_report_html: Please %{login_link} to make this report
+      register_it: register it
+      report_a_bicycle_chop_shop: Report a bicycle chop shop
+      report_bike_theft_issues: 'Report bike theft issues:'
+      report_someone_selling_a_stolen_bike: Report someone selling a stolen bike
+      reporting_your_own_bike_stolen_html: Reporting your own bike stolen? You need
+        to %{register_it_link} first
+      send_alert: Send alert!
+      sign_in: sign in
+      someone_is_selling_a_stolen_bike: Someone is selling a stolen bike
+      stolen_widget: stolen widget
+      tell_everyone_you_know: >-
+        Tell everyone you know about your stolen bike. Hit all your social networks
+        (Facebook, Instagram, Twitter, etc.) and text/email everyone you know.
+      we_wish_you_the_best_of_luck_html: >-
+        We wish you the best of luck in recovering your bicycle. We'd love to add
+        your story to our %{recoveries_count} recovered bikes. If you wish to support
+        our cause, please consider a %{donations_link} or join our %{ambassadors_link}
+        program.
+      what_happens_next: What happens next?
+      what_to_do_if_your_bike_is_stolen: What to do if your bike is stolen
+      where_is_this_happening: Where is this happening? URL, address - any information
+        you have
+      your_email_address: Your email address
+      your_local_police_department_will_do_what: >-
+        Your local police department will do what it does to help recover your bike.
+        Stay in communication with them.
   support:
     array:
       last_word_connector: ", and "
       two_words_connector: " and "
       words_connector: ", "
+  theft_alert_plans:
+    theft_alert_plan:
+      best_value: Best value
+      days: Days
+      views: Views
   time:
     formats:
       blog: "%m_%d_%Y"
@@ -4488,6 +4589,11 @@ en:
       short_with_hour: "%m.%d.%y - %l%P"
       short_with_year: "%a, %B %d %Y"
       standard_display: "%A, %B %d"
+  user_embeds:
+    show:
+      bike: Bike
+      my_indexed_bikes: My Indexed %{bikes_count}
+      no_photo: no photo
   users:
     accept_terms:
       i_agree_to_tos_html: I agree to Bike Index's <strong>Terms of Service</strong>.

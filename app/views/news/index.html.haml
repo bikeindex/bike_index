@@ -1,7 +1,7 @@
 #news_display
   %h1.blog-index-head
-    Bike Index Blog
-    = link_to image_tag('feed_icon.svg'), news_index_url(format: 'atom'), { title: 'Bike Index blog feed' }
+    = t(".bike_index_blog")
+    = link_to image_tag('feed_icon.svg'), news_index_url(format: 'atom'), { title: t('.bike_index_blog_feed' )}
 
   %hr
 %article
