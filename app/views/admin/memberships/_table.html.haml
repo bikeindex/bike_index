@@ -50,7 +50,8 @@
                 = membership.id
           %td
             - if membership.user.present?
-              = link_to membership.invited_email, admin_user_path(membership.user.to_param)
+              = link_to membership.invited_email || membership.user.display_name,
+                admin_user_path(membership.user.to_param)
             - else
               = membership.invited_email
           - unless skip_organization
