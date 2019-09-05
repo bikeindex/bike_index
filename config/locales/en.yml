@@ -1834,6 +1834,13 @@ en:
       send_it: Send it!
       subject: Subject
       your_message: Your message
+    index:
+      contact_us: Contact us!
+      have_a_question_we_havent_answered: Have a question we haven't answered?
+      help_with_bike_index: Help with Bike Index
+      log_in_to_send_a_comment: Log in to send a comment!
+      you_can_reach_us_at_contact_html: You can reach us at %{contact_link}, or send
+        your message right here.
   helpers:
     page_entries_info:
       more_pages:
