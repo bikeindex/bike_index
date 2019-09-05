@@ -1827,6 +1827,13 @@ en:
         We're sorry, We can't do what you just asked. Think you ought to be able to?
         Email us: %{email_link}.
       send_me_back: Send me back from whence I came!
+  feedbacks:
+    form:
+      email_address: Email address
+      name: Name
+      send_it: Send it!
+      subject: Subject
+      your_message: Your message
   helpers:
     page_entries_info:
       more_pages:
