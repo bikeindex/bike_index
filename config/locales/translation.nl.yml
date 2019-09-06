@@ -2858,9 +2858,9 @@ nl:
         nu kan bestaan of hierna kan ontstaan, en alle aanvragen daarom en registraties,
         verlengingen en uitbreidingen daarvan, volgens de wetten van elke staat, land,
         territorium of andere jurisdictie.
-      ownership_p3: U kunt ervoor kiezen of we kunnen u uitnodigen om opmerkingen
+      ownership_p3: Je kunt ervoor kiezen of we kunnen je uitnodigen om opmerkingen
         of ideeën over de Service in te dienen, inclusief maar niet beperkt tot hoe
-        de Service of onze producten te verbeteren ("Ideeën"). Door een Idee in te
+        de Service of onze producten te verbeteren ("Ideeën"). Door een idee in te
         dienen, gaat u ermee akkoord dat uw openbaarmaking kosteloos, ongevraagd en
         zonder beperking is en Bike Index niet onder een fiduciaire of andere verplichting
         plaatst, en dat we vrij zijn om het Idee te gebruiken zonder extra compensatie
@@ -4451,47 +4451,48 @@ nl:
       add_details: Voeg de fiets en details over de diefstal nu toe aan de Index!
       article_link: ons artikel
       bike_index_is_that_resource: Bike Index is dat middel. Bekijk de volgende keer
-        dat u een gebruikte fiets koopt eerst de index.
+        dat je een tweedehands fiets koopt eerst Bike Index.
       bike_serial_number: Serienummer van de fiets
       bike_was_already_stolen: Mijn fiets was al gestolen. Wat moet ik doen?
       bikes_are_public_and_searchable: Fietsen zijn openbaar en doorzoekbaar, maar
-        er is geen informatie over de eigenaar zichtbaar. U kunt ervoor kiezen om
-        informatie te delen (zoals uw twitter of persoonlijke website), maar dit is
-        standaard uitgeschakeld.
+        er is geen informatie over de eigenaar zichtbaar. Je kunt ervoor kiezen om
+        informatie te delen (zoals je twitter of website), maar dit is standaard uitgeschakeld.
       blog_link: Blog
       can_partner_with_bikeindex: Kan mijn lokale fietsenwinkel samenwerken met Bike
         Index?
-      can_thieves_search: Is het mogelijk voor fietsendieven om in de Index te zoeken
-        om te controleren of een fiets als gestolen wordt vermeld voordat ze het verkopen?
+      can_thieves_search: Is het mogelijk voor fietsendieven om te controleren of
+        een fiets als gestolen wordt vermeld voordat ze het verkopen?
       can_you_tell_me_what_bike_by_serial: Kun je me vertellen welke fiets ik heb
         op basis van het serienummer?
       comprehensive_public_database: Bike Index is een uitgebreide openbare database
-        - als uw fiets is gestolen, denken we dat iedereen erover moet weten.
+        - wij vinden dat iedereen het mag weten als jouw fiets gestolen is.
       email_us_html: E-mail %{email_link} voor meer informatie!
       everyone_can_register_bikes_for_free: Iedereen kan gratis fietsen registreren.
       faqs: Veelvoorkomende problemen en veelgestelde vragen
       follow_us_html: Je kunt ons ook volgen op %{twitter_link} en %{facebook_link}.
-      free_to_transfer: Fietsregistratie is permanent, het is gratis om fietsen over
-        te zetten.
-      go_to_edit_page: Ga naar de bewerkpagina voor de fiets en selecteer de "Eigendomoverdrachtpagina"
+      free_to_transfer: De fietsregistratie is permanent, het is weliswaar gratis
+        om fietsen over te zetten.
+      go_to_edit_page: Ga naar de bewerk-pagina voor de fiets en selecteer de "Eigendom
+        overdracht pagina".
       how_bikes_are_verified: Hoe verifieer je de fietsen die mensen registreren?
       how_can_i_advertise: Hoe kan ik adverteren op Bike Index
       how_can_i_stay_up_to_date: Hoe kan ik op de hoogte blijven van wat Bike Index
         doet?
-      how_does_this_prevent_bike_theft: Hoe voorkomt dit fietsdiefstal?
+      how_does_this_prevent_bike_theft: 'Hoe voorkomt dit fietsendiefstal? '
       in_the_process_of_setting_up_advertising: We zijn bezig met het opzetten van
         advertentiemogelijkheden op de hele site, met name voor lokale fietsenwinkels.
       not_yet: Nee. Dit is een functie waar nog aan gewerkt wordt.
-      organization_signup_html: Laat ze de %{signup_link} bezoeken, we zullen ze instellen
-        met een organisatieaccount zodat ze fietsen gratis kunnen registreren.
+      organization_signup_html: Laat ze de %{signup_link} bezoeken. Dan zullen wij
+        ze een organisatieaccount aanmaken, waar ze de fietsen gratis kunnen registreren.
       organization_signup_link: organisatie aanmeldpagina
-      other_registries_html: Andere registers verbergen over het algemeen series vanwege
-        hun technische beperkingen. Ze houden informatie weg van diegenen die het
-        waarschijnlijk voor goed gebruiken, hoewel %{wikipedia_link} niet werkt.
+      other_registries_html: Andere registers verbergen over het algemeen serienummers
+        vanwege hun technische beperkingen. Ze houden informatie achter van diegenen
+        die het waarschijnlijk voor een goed doel gebruiken, hoewel %{wikipedia_link}
+        niet werkt.
       partner_link: een van onze partnerwinkels
       people_with_good_intentions: Op dit moment kopen mensen met goede bedoelingen
-        gestolen fietsen omdat er geen enkele doorzoekbare, eenvoudige bron is om
-        te controleren voordat ze een fiets kopen.
+        gestolen fietsen, omdat er geen enkele eenvoudig doorzoekbare bron is om te
+        controleren of de fiets gestolen is, voordat ze een fiets kopen.
       possible_but_uncommon: Het is mogelijk, maar niet gebruikelijk. We volgen en
         markeren verdachte activiteiten om misbruik van Bike Index te voorkomen.
       read_our_blog_html: Lees onze %{blog_link}! We plaatsen de meeste coole dingen
@@ -4500,8 +4501,8 @@ nl:
         registratie geverifieerd (winkels kunnen ervoor kiezen om alleen de fietsen
         te registreren die ze verkopen).
       reveal_owner_email_html: Voer het e-mailadres van de nieuwe eigenaar in en sla
-        de wijzigingen op! Je kunt de fiets nog steeds bewerken totdat de nieuwe eigenaar
-        hem claimt.
+        de wijzigingen op! Je kunt de gegevens van de fiets nog steeds bewerken totdat
+        de nieuwe eigenaar hem claimt.
       security_by_obscurity_link: beveiliging door obscurity
       serial_numbers_public: We maken serienummers openbaar omdat dit de beste manier
         is om gestolen fietsen te herstellen en diefstal af te schrikken.
@@ -4509,21 +4510,23 @@ nl:
         als de laatste paar nummers hetzelfde zijn, dan is het goed mogelijk dat de
         fietsen van hetzelfde merk en model zijn.
       the_faster_and_easier_it_is: Hoe sneller en gemakkelijker het is om toegang
-        te krijgen tot series, hoe meer gestolen fietsen we herstellen. Toegang tot
-        serienummers beperken helpt alleen dieven.
+        te krijgen tot de serienummers, hoe meer gestolen fietsen we herstellen. Toegang
+        tot serienummers beperken, helpt alleen dieven.
       this_isnt_optimistic_speculation: 'Dit is geen optimistische speculatie: we
         hebben dit bewezen en blijven dit doen met elke gestolen fiets die we herstellen.'
       to_learn_more_html: Bekijk %{article_link} over privacy voor meer informatie.
       verification_questions: Elke kwestie van verificatie wordt behandeld door uw
         registratiegegevens te controleren. Dit is geen probleem geweest.
-      visit_or_add_html: Eerst %{add_link}. Zodra u dat hebt gedaan, laten we u een
-        checklist zien met wat u kunt doen om uw kansen op herstel te verbeteren.
-      we_care_about_your_privacy: Wij geven om uw privacy meer dan wie ook - u kunt
-        uw registratie verbergen zodat niemand anders dan u deze kan zien. We vinden
-        het gewoon geen goed idee.
-      we_offer_bike_shops: We bieden fietsenwinkels en wetshandhavers een eenvoudig
-        te gebruiken interface om verdachte fietsen die ze tegenkomen op te zoeken
-        en een manier om snel contact op te nemen met de juiste eigenaar.
+      visit_or_add_html: 'Allereerst: %{add_link}. Zodra je dat hebt gedaan, laten
+        we je een checklist zien met wat je kan doen om de kans op het terugvinden
+        van je fiets, te vergroten.'
+      we_care_about_your_privacy: Wij geven om uw privacy meer dan wie ook - je kan
+        jouw registratie verbergen zodat niemand anders dan jij deze kan zien. We
+        vinden het gewoon geen goed idee.
+      we_offer_bike_shops: 'We bieden fietsenwinkels en politie een eenvoudige te
+        gebruike interface, om de fietsen die ze tegenkomen, en verdacht lijken, op
+        te zoeken. Bovendien kunnen ze hierdoor snel contact opnemen met de juiste
+        eigenaar. '
       we_recommend_searching: Voor nu raden we je aan te zoeken naar het serienummer
         van de fiets. Wij laten dan alle geregistreerde fietsen, met een soortgelijk
         serienummer, zien.
