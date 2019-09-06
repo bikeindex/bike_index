@@ -2148,7 +2148,10 @@ CREATE TABLE public.tweets (
     image character varying,
     alignment character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    twitter_account_id character varying,
+    stolen_record_id character varying,
+    original_tweet_id integer
 );
 
 
@@ -2169,6 +2172,55 @@ CREATE SEQUENCE public.tweets_id_seq
 --
 
 ALTER SEQUENCE public.tweets_id_seq OWNED BY public.tweets.id;
+
+
+--
+-- Name: twitter_accounts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.twitter_accounts (
+    id integer NOT NULL,
+    active boolean DEFAULT false NOT NULL,
+    "default" boolean DEFAULT false NOT NULL,
+    "national" boolean DEFAULT false NOT NULL,
+    latitude double precision,
+    longitude double precision,
+    address character varying,
+    append_block character varying,
+    city character varying,
+    consumer_key character varying,
+    consumer_secret character varying,
+    country character varying,
+    language character varying,
+    neighborhood character varying,
+    screen_name character varying,
+    state character varying,
+    user_secret character varying,
+    user_token character varying,
+    twitter_account_info text,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: twitter_accounts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.twitter_accounts_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: twitter_accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.twitter_accounts_id_seq OWNED BY public.twitter_accounts.id;
 
 
 --
@@ -2697,6 +2749,13 @@ ALTER TABLE ONLY public.tweets ALTER COLUMN id SET DEFAULT nextval('public.tweet
 
 
 --
+-- Name: twitter_accounts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.twitter_accounts ALTER COLUMN id SET DEFAULT nextval('public.twitter_accounts_id_seq'::regclass);
+
+
+--
 -- Name: user_emails id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -3155,6 +3214,14 @@ ALTER TABLE ONLY public.theft_alerts
 
 ALTER TABLE ONLY public.tweets
     ADD CONSTRAINT tweets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: twitter_accounts twitter_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.twitter_accounts
+    ADD CONSTRAINT twitter_accounts_pkey PRIMARY KEY (id);
 
 
 --
@@ -3697,6 +3764,13 @@ CREATE INDEX index_theft_alerts_on_theft_alert_plan_id ON public.theft_alerts US
 --
 
 CREATE INDEX index_theft_alerts_on_user_id ON public.theft_alerts USING btree (user_id);
+
+
+--
+-- Name: index_twitter_accounts_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_twitter_accounts_on_latitude_and_longitude ON public.twitter_accounts USING btree (latitude, longitude);
 
 
 --
@@ -4551,8 +4625,10 @@ INSERT INTO schema_migrations (version) VALUES ('20190809200257');
 
 INSERT INTO schema_migrations (version) VALUES ('20190809214414');
 
-INSERT INTO schema_migrations (version) VALUES ('20190809200257');
+INSERT INTO schema_migrations (version) VALUES ('20190829221522');
 
 INSERT INTO schema_migrations (version) VALUES ('20190903145420');
+
+INSERT INTO schema_migrations (version) VALUES ('20190904161424');
 
 INSERT INTO schema_migrations (version) VALUES ('20190909190050');
