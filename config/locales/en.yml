@@ -4217,6 +4217,19 @@ en:
     staff_accounts: Staff accounts
     supporting_our_nonprofit: Supporting our nonprofit
     welcome_campaign: Welcome campaign on Facebook, Twitter, and Instagram
+  public_images:
+    form:
+      cancel_update: Cancel Update
+      do_not_display: Do not display
+      error: Error
+      errors_prevented_photo_from_saving: "%{errors_count} prevented photo from saving"
+      image_name: Image name
+      no_one_will_be_able_to_see_this_image_exc: "(no one will be able to see this
+        image except for you)"
+      save_image: Save image
+      use_this_if_youd_like_to_attach_a_photo: >-
+        Use this if you'd like to attach a photo of your receipt or something similarly
+        private.
   recovery_displays:
     recovery_display:
       bike: Bike
