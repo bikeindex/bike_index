@@ -10,7 +10,6 @@ RSpec.describe OrganizationMessage, type: :model do
   end
 
   describe "set_calculated_attributes" do
-    include_context :geocoder_default_location
     context "geolocated" do
       let(:ownership) { FactoryBot.create(:ownership, owner_email: "stuff@stuff.com") }
       let(:bike) { ownership.bike }

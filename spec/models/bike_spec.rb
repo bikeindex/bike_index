@@ -867,7 +867,6 @@ RSpec.describe Bike, type: :model do
       expect(bike.registration_address).to eq({})
     end
     context "with user with address" do
-      include_context :geocoder_default_location
       let(:country) { Country.united_states }
       let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
       let(:user) { FactoryBot.create(:user, country_id: country.id, state_id: state.id, city: "New York", street: "278 Broadway", zipcode: "10007") }

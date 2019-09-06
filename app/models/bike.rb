@@ -46,7 +46,7 @@ class Bike < ActiveRecord::Base
   accepts_nested_attributes_for :components, allow_destroy: true
 
   geocoded_by nil, latitude: :stolen_lat, longitude: :stolen_long
-  after_validation :geocode, if: lambda { |o| false } # Never geocode, it's from stolen_record
+  after_validation :geocode, if: lambda { false } # Never geocode, it's from stolen_record
 
   validates_presence_of :serial_number
   validates_presence_of :propulsion_type

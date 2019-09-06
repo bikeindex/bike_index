@@ -160,7 +160,6 @@ RSpec.describe BulkImportWorker, type: :job do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
       let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
-      include_context :geocoder_default_location
       it "creates the bikes, doesn't have any errors" do
         # In production, we actually use remote files rather than local files.
         # simulate what that process looks like by loading a remote file in the way we use open_file in BulkImport

@@ -42,7 +42,6 @@ RSpec.describe "Bikes API V2", type: :request do
     before :each do
       FactoryBot.create(:wheel_size, iso_bsd: 559)
     end
-    include_context :geocoder_default_location
 
     it "responds with 401" do
       post "/api/v2/bikes", bike_attrs.to_json
