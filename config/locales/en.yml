@@ -4797,7 +4797,7 @@ en:
       locks: locks
       manufacturer: Manufacturer
       mark_bike_stolen: Mark bike stolen
-      next_steps: Next steps
+      next: Next steps
       primary_colors: Primary colors
       printable_pdf: Printable (pdf)
       register_new_items: Register new items
