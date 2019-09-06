@@ -1,0 +1,12 @@
+.admin-subnav
+  .col-6
+    = link_to 'View all Twitter accounts', admin_twitter_accounts_url
+
+.container
+  %h1 New Twitter Account
+
+  = render "form",
+    twitter_account: @twitter_account,
+    action: admin_twitter_accounts_path,
+    method: :post,
+    submit_label: "Create"

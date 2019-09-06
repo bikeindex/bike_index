@@ -25,6 +25,7 @@ module AdminHelper
       { title: "Graphs", path: admin_graphs_path, match_controller: true },
       { title: "Edit Paints", path: admin_paints_path, match_controller: true },
       { title: "Feedback & Messages", path: admin_feedbacks_path, match_controller: true },
+      { title: "Twitter Accounts", path: admin_twitter_accounts_path, match_controller: true },
       { title: "Tweets", path: admin_tweets_path, match_controller: true },
       { title: "Stickers", path: admin_bike_codes_path, match_controller: true },
       { title: "Exports", path: admin_exports_path, match_controller: true },
