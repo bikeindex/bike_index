@@ -207,11 +207,11 @@
           %td
             = ownership.owner_email
           %td.table-cell-check
-            = "&#x2713;".html_safe if ownership.current
+            = check_mark if ownership.current
           %td.table-cell-check
-            = "&#x2713;".html_safe if ownership.claimed
+            = check_mark if ownership.claimed
           %td.table-cell-check.d-none.d-md-table-cell
-            = "&#x2713;".html_safe if ownership.user_hidden
+            = check_mark if ownership.user_hidden
 
 - if @bike.bike_codes.present?
   %h3.mt-4

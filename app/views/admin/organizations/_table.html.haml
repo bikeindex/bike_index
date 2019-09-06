@@ -41,7 +41,7 @@
               %small.less-strong
                 = "paid" if organization.is_paid
             %td.table-cell-check
-              = "&#x2713;".html_safe if organization.approved
+              = check_mark if organization.approved
             %td
               %span.convertTime
                 = l organization.created_at, format: :convert_time

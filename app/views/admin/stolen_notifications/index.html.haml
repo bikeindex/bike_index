@@ -41,7 +41,7 @@
             = stolen_notification.message.truncate(120)
           %td.table-cell-check
             - if stolen_notification.send_dates_parsed.count == 1
-              = "&#x2713;".html_safe
+              = check_mark
             - else
               = stolen_notification.send_dates_parsed.count
 

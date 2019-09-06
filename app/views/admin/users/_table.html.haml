@@ -73,4 +73,4 @@
                 = "super" if user.superuser?
                 = "developer" if user.developer?
             %td.table-cell-check
-              = "&#x2713;".html_safe if user.confirmed
+              = check_mark if user.confirmed

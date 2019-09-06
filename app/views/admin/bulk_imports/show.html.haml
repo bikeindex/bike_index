@@ -73,7 +73,7 @@
         %td
           Ascend
         %td
-          = "&#x2713;".html_safe if @bulk_import.ascend?
+          = check_mark if @bulk_import.ascend?
 
 - if @bulk_import.creation_states.count < 1 || params[:show_reprocess]
   = link_to "Reprocess Import", admin_bulk_import_path(@bulk_import, reprocess: true), method: "PUT", class: "btn btn-secondary float-right"

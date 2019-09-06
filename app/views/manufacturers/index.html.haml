@@ -18,7 +18,7 @@
             - else
               = manufacturer.name
           %td.large-screens.table-cell-check
-            = "&#x2713;".html_safe unless manufacturer.frame_maker
+            = check_mark unless manufacturer.frame_maker
 
   %h2.padded
     = t(".oh_no_were_missing_a_manufacturer")

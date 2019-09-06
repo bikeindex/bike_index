@@ -36,6 +36,6 @@
               %br
               = blog.body_abbr.html_safe if blog.body_abbr
           %td.table-cell-check
-            = "&#x2713;".html_safe if blog.is_listicle
+            = check_mark if blog.is_listicle
           %td.table-cell-check
-            = "&#x2713;".html_safe if blog.published
+            = check_mark if blog.published

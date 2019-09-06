@@ -25,4 +25,4 @@
           %td= plan.duration_days
           %td= plan.description_html.html_safe
           %td
-            = "&#x2713;".html_safe if plan.active?
+            = check_mark if plan.active?

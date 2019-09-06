@@ -42,7 +42,7 @@
             - if membership.claimed_at.present?
               %span.convertTime
                 = l(membership.created_at, format: :convert_time)
-          %td= "&#x2713;".html_safe if membership.admin?
+          %td= check_mark if membership.admin?
           %td
             - if membership.sender.present?
               %small
