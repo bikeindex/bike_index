@@ -465,7 +465,7 @@ RSpec.describe UsersController, type: :controller do
         user.reload
         expect(user.username).to eq "something"
         set_current_user(user)
-        post :update, id: user.username, user: { username: " ", name: "tim" }, page: "sharing"
+        patch :update, id: user.username, user: { username: " ", name: "tim" }, page: "sharing"
         expect(assigns(:edit_template)).to eq("sharing")
         user.reload
         expect(user.username).to eq("something")
@@ -474,23 +474,23 @@ RSpec.describe UsersController, type: :controller do
 
     it "doesn't update user if current password not present" do
       set_current_user(user)
-      post :update, id: user.username,
-                    user: {
-                      password: "new_pass",
-                      password_confirmation: "new_pass",
-                    }
+      patch :update, id: user.username,
+                     user: {
+                       password: "new_pass",
+                       password_confirmation: "new_pass",
+                     }
       expect(user.reload.authenticate("new_pass")).to be_falsey
     end
 
     it "doesn't update user if password doesn't match" do
       set_current_user(user)
-      post :update, id: user.username,
-                    user: {
-                      current_password: "old_pass",
-                      password: "new_pass",
-                      name: "Mr. Slick",
-                      password_confirmation: "new_passd",
-                    }
+      patch :update, id: user.username,
+                     user: {
+                       current_password: "old_pass",
+                       password: "new_pass",
+                       name: "Mr. Slick",
+                       password_confirmation: "new_passd",
+                     }
       expect(user.reload.authenticate("new_pass")).to be_falsey
       expect(user.name).not_to eq("Mr. Slick")
     end
@@ -501,13 +501,13 @@ RSpec.describe UsersController, type: :controller do
       auth = user.auth_token
       email = user.email
       set_current_user(user)
-      post :update, id: user.username,
-                    user: {
-                      email: "cool_new_email@something.com",
-                      password_reset_token: user.password_reset_token,
-                      password: "new_pass",
-                      password_confirmation: "new_pass",
-                    }
+      patch :update, id: user.username,
+                     user: {
+                       email: "cool_new_email@something.com",
+                       password_reset_token: user.password_reset_token,
+                       password: "new_pass",
+                       password_confirmation: "new_pass",
+                     }
       expect(user.reload.authenticate("new_pass")).to be_truthy
       expect(user.email).to eq(email)
       expect(user.password_reset_token).not_to eq("stuff")
@@ -523,12 +523,12 @@ RSpec.describe UsersController, type: :controller do
       user.auth_token
       user.email
       set_current_user(user)
-      post :update, id: user.username,
-                    user: {
-                      password_reset_token: "something_else",
-                      password: "new_pass",
-                      password_confirmation: "new_pass",
-                    }
+      patch :update, id: user.username,
+                     user: {
+                       password_reset_token: "something_else",
+                       password: "new_pass",
+                       password_confirmation: "new_pass",
+                     }
       expect(response).to_not redirect_to(my_account_url)
       expect(flash[:error]).to be_present
       expect(user.reload.authenticate("new_pass")).to be_falsey
@@ -540,12 +540,12 @@ RSpec.describe UsersController, type: :controller do
       auth = user.auth_token
       user.email
       set_current_user(user)
-      post :update, id: user.username,
-                    user: {
-                      password_reset_token: user.password_reset_token,
-                      password: "new_pass",
-                      password_confirmation: "new_pass",
-                    }
+      patch :update, id: user.username,
+                     user: {
+                       password_reset_token: user.password_reset_token,
+                       password: "new_pass",
+                       password_confirmation: "new_pass",
+                     }
       expect(response).to_not redirect_to(my_account_url)
       expect(flash[:error]).to be_present
       user.reload
@@ -560,14 +560,14 @@ RSpec.describe UsersController, type: :controller do
       auth = user.auth_token
       email = user.email
       set_current_user(user)
-      post :update, id: user.username,
-                    user: {
-                      email: "cool_new_email@something.com",
-                      current_password: "old_pass",
-                      password: "new_pass",
-                      name: "Mr. Slick",
-                      password_confirmation: "new_pass",
-                    }
+      patch :update, id: user.username,
+                     user: {
+                       email: "cool_new_email@something.com",
+                       current_password: "old_pass",
+                       password: "new_pass",
+                       name: "Mr. Slick",
+                       password_confirmation: "new_pass",
+                     }
       expect(response).to redirect_to(my_account_url)
       expect(flash[:error]).to_not be_present
       expect(user.reload.authenticate("new_pass")).to be_truthy
@@ -585,17 +585,17 @@ RSpec.describe UsersController, type: :controller do
       it "sets address, geocodes" do
         set_current_user(user)
         expect(user.notification_newsletters).to be_falsey
-        post :update, id: user.username,
-                      user: {
-                        name: "Mr. Slick",
-                        country_id: country.id,
-                        state_id: state.id,
-                        city: "New York",
-                        street: "278 Broadway",
-                        zipcode: "10007",
-                        notification_newsletters: "1",
-                        phone: "3223232",
-                      }
+        patch :update, id: user.username,
+                       user: {
+                         name: "Mr. Slick",
+                         country_id: country.id,
+                         state_id: state.id,
+                         city: "New York",
+                         street: "278 Broadway",
+                         zipcode: "10007",
+                         notification_newsletters: "1",
+                         phone: "3223232",
+                       }
         expect(response).to redirect_to(my_account_url)
         expect(flash[:error]).to_not be_present
         user.reload
@@ -613,7 +613,7 @@ RSpec.describe UsersController, type: :controller do
 
     it "updates the terms of service" do
       set_current_user(user)
-      post :update, id: user.username, user: { terms_of_service: "1" }
+      patch :update, id: user.username, user: { terms_of_service: "1" }
       expect(response).to redirect_to(user_home_url)
       expect(user.reload.terms_of_service).to be_truthy
     end
@@ -650,7 +650,7 @@ RSpec.describe UsersController, type: :controller do
     it "updates notification" do
       set_current_user(user)
       expect(user.notification_unstolen).to be_truthy # Because it's set to true by default
-      post :update, id: user.username, user: { notification_newsletters: "1", notification_unstolen: "0" }
+      patch :update, id: user.username, user: { notification_newsletters: "1", notification_unstolen: "0" }
       expect(response).to redirect_to my_account_url
       user.reload
       expect(user.notification_newsletters).to be_truthy
@@ -658,14 +658,14 @@ RSpec.describe UsersController, type: :controller do
     end
 
     it "updates the vendor terms of service and emailable" do
-      user = FactoryBot.create(:user_confirmed, terms_of_service: false, notification_newsletters: false)
+      user = FactoryBot.create(:user_confirmed, terms_of_service: true, notification_newsletters: false)
       expect(user.notification_newsletters).to be_falsey
       organization = FactoryBot.create(:organization)
       FactoryBot.create(:membership_claimed, organization: organization, user: user)
       user.reload
       expect(user.default_organization).to eq organization
       set_current_user(user)
-      post :update, id: user.username, user: { vendor_terms_of_service: "1", notification_newsletters: true }
+      patch :update, id: user.username, user: { vendor_terms_of_service: "1", notification_newsletters: true }
       expect(response.code).to eq("302")
       expect(response).to redirect_to organization_root_url(organization_id: organization.to_param)
       expect(user.reload.accepted_vendor_terms_of_service?).to be_truthy
@@ -676,7 +676,7 @@ RSpec.describe UsersController, type: :controller do
     it "enqueues job (it enqueues job whenever update is successful)" do
       set_current_user(user)
       expect do
-        post :update, id: user.username, user: { name: "Cool stuff" }
+        patch :update, id: user.username, user: { name: "Cool stuff" }
       end.to change(AfterUserChangeWorker.jobs, :size).by(1)
       expect(user.reload.name).to eq("Cool stuff")
     end
@@ -684,7 +684,7 @@ RSpec.describe UsersController, type: :controller do
     describe "submit without updating terms" do
       it "redirects to accept the terms" do
         set_current_user(user)
-        post :update, id: user.username, user: { terms_of_service: "0" }
+        patch :update, id: user.username, user: { terms_of_service: "0" }
         expect(response).to redirect_to accept_terms_path
         expect(user.reload.terms_of_service).to be_falsey
       end
@@ -694,7 +694,7 @@ RSpec.describe UsersController, type: :controller do
           expect(user.terms_of_service).to be_truthy
           expect(user.accepted_vendor_terms_of_service?).to be_falsey
           set_current_user(user)
-          post :update, id: user.username, user: { vendor_terms_of_service: "0" }
+          patch :update, id: user.username, user: { vendor_terms_of_service: "0" }
           expect(response).to redirect_to accept_vendor_terms_path
           expect(user.reload.vendor_terms_of_service).to be_falsey
         end
