@@ -444,7 +444,7 @@ RSpec.describe UsersController, type: :controller do
   end
 
   describe "update" do
-    let!(:user) { FactoryBot.create(:user_confirmed, terms_of_service: false, password: "old_pass", password_confirmation: "old_pass", username: "something") }
+    let!(:user) { FactoryBot.create(:user_confirmed, terms_of_service: true, password: "old_pass", password_confirmation: "old_pass", username: "something") }
 
     context "given no authenticated current_user" do
       it "responds with a redirect to the login page" do
@@ -556,7 +556,7 @@ RSpec.describe UsersController, type: :controller do
     end
 
     it "resets users auth if password changed, updates current session" do
-      user = FactoryBot.create(:user_confirmed, terms_of_service: false, password: "old_pass", password_confirmation: "old_pass", password_reset_token: "stuff")
+      user = FactoryBot.create(:user_confirmed, terms_of_service: true, password: "old_pass", password_confirmation: "old_pass", password_reset_token: "stuff")
       auth = user.auth_token
       email = user.email
       set_current_user(user)
