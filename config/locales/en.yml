@@ -4231,6 +4231,10 @@ en:
         Use this if you'd like to attach a photo of your receipt or something similarly
         private.
   recovery_displays:
+    new_form:
+      drag_and_drop_html: Drag and drop files here to or use the <em>Upload Photos</em>
+        button.
+      upload_photos: Upload photos
     public_image:
       copy_and_paste: Copy the above text and paste it where you'd like it to appear
       copy_and_paste_in_post: Copy the above text and paste it where you'd like it

@@ -3,11 +3,12 @@
     <%= hidden_field_tag :bike_id, @bike.id %>
     <div class="upload-buttons">
       <div class="multifilefield-button">
-        Upload photos
+        <%= t(".upload_photos") %>
         <%= f.file_field :image, multiple: true, name: "public_image[image]" %>
       </div>
-      <!-- <p class="smaller-text">Use the shift key to select multiple photos</p> -->
     </div>
-    <p class="extra-info">Drag and drop files here to or use the <em>Upload Photos</em> button.</p>
+    <p class="extra-info">
+      <%= t(".drag_and_drop_html") %>
+    </p>
   </div>
 <% end %>
