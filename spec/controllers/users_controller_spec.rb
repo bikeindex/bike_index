@@ -445,6 +445,16 @@ RSpec.describe UsersController, type: :controller do
 
   describe "update" do
     let!(:user) { FactoryBot.create(:user_confirmed, terms_of_service: false, password: "old_pass", password_confirmation: "old_pass", username: "something") }
+
+    context "given no authenticated current_user" do
+      it "redirects" do
+        put :update, id: user.username,
+                     user: { username: "username", name: "tim" },
+                     page: "sharing"
+        expect(user.username).to eq("something")
+      end
+    end
+
     context "nil username" do
       it "doesn't update username" do
         user.reload
