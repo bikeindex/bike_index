@@ -4218,6 +4218,9 @@ en:
     supporting_our_nonprofit: Supporting our nonprofit
     welcome_campaign: Welcome campaign on Facebook, Twitter, and Instagram
   public_images:
+    edit:
+      editing_bike_html: "<span>Back Arrow</span>Back to <em>Editing Bike</em>"
+      editing_image: Editing Image
     form:
       cancel_update: Cancel Update
       do_not_display: Do not display
