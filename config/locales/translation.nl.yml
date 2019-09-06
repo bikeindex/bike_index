@@ -4837,7 +4837,6 @@ nl:
       add_a_bike: Voeg een fiets toe
       add_a_lock: Voeg een slot toe
       add_a_photo: Voeg een foto toe
-      add_some_info: Voeg info toe
       bikes: fietsen
       combination: Combinatie
       date_stolen: Datum gestolen
@@ -4867,6 +4866,7 @@ nl:
       you_have_no_registered_locks: U heeft geen geregistreerde sloten
       abandoned: VERLATEN
       date_abandoned: Datum van vermissing
+      next_steps: Voeg info toe
   locales:
     en: English (Engels)
     nl: Nederlands
