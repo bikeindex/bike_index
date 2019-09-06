@@ -447,10 +447,15 @@ RSpec.describe UsersController, type: :controller do
     let!(:user) { FactoryBot.create(:user_confirmed, terms_of_service: false, password: "old_pass", password_confirmation: "old_pass", username: "something") }
 
     context "given no authenticated current_user" do
-      it "redirects" do
-        put :update, id: user.username,
-                     user: { username: "username", name: "tim" },
-                     page: "sharing"
+      it "responds with a redirect to the login page" do
+        expect(user.username).to eq("something")
+
+        patch :update, id: user.username,
+                       user: { username: "username", name: "tim" },
+                       page: "sharing"
+
+        expect(response.status).to eq(302)
+        expect(response).to redirect_to(new_session_path)
         expect(user.username).to eq("something")
       end
     end

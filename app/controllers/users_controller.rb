@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   include Sessionable
-  before_action :authenticate_user, only: [:edit]
+  before_action :authenticate_user, only: [:edit, :update]
   before_action :skip_if_signed_in, only: [:new, :globalid]
   before_action :assign_edit_template, only: [:edit, :update]
 
