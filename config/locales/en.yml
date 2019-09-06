@@ -4231,6 +4231,12 @@ en:
         Use this if you'd like to attach a photo of your receipt or something similarly
         private.
   recovery_displays:
+    public_image:
+      copy_and_paste: Copy the above text and paste it where you'd like it to appear
+      copy_and_paste_in_post: Copy the above text and paste it where you'd like it
+        to appear in the post
+      enter_text_here: ENTER YOUR TEXT HERE
+      processing: "... processing"
     recovery_display:
       bike: Bike
       recovered_date: recovered %{date}
