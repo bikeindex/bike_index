@@ -4234,6 +4234,8 @@ en:
         Use this if you'd like to attach a photo of your receipt or something similarly
         private.
   recovery_displays:
+    new:
+      add_a_public_image: Add a public_image
     new_form:
       drag_and_drop_html: Drag and drop files here to or use the <em>Upload Photos</em>
         button.
@@ -4250,6 +4252,14 @@ en:
     revised_public_image:
       keep_image_private: keep image private
       processing: "... processing"
+    show:
+      are_you_sure: Are you sure?
+      back_to_images: Back to public images
+      bike_image: Bike Image
+      destroy: Destroy
+      edit: Edit
+      image_from: Image from %{image_title}
+      looks_like_this_is_your_image: Looks like this is your image.
   registrations:
     create:
       in_it_youll_find_instructions: In it, you'll find instructions on how to complete
