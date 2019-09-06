@@ -51,6 +51,16 @@ class StolenRecord < ActiveRecord::Base
   geocoded_by :address_override_show_address
   after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
 
+  reverse_geocoded_by :latitude, :longitude do |stolen_record, results|
+    if (geo = results.first)
+      stolen_record.country ||= Country.find_by(name: geo.country)
+      stolen_record.city ||= geo.city
+      stolen_record.state ||= State.find_by(abbreviation: geo.state_code)
+      stolen_record.neighborhood ||= geo.neighborhood
+    end
+  end
+  after_validation :reverse_geocode
+
   after_save :remove_outdated_alert_images
 
   def self.find_matching_token(bike_id:, recovery_link_token:)
