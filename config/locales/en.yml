@@ -4785,7 +4785,6 @@ en:
       add_a_bike: Add a bike
       add_a_lock: Add a lock
       add_a_photo: Add a photo
-      add_some_info: Next steps
       bikes: bikes
       combination: Combination
       date_abandoned: Date abandoned
@@ -4798,6 +4797,7 @@ en:
       locks: locks
       manufacturer: Manufacturer
       mark_bike_stolen: Mark bike stolen
+      next_steps: Next steps
       primary_colors: Primary colors
       printable_pdf: Printable (pdf)
       register_new_items: Register new items
