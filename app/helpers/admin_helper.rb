@@ -16,7 +16,6 @@ module AdminHelper
       { title: "Invoices", path: admin_invoices_path(query: "active", direction: "asc", sort: "subscription_end_at"), match_controller: true },
       { title: "Recoveries", path: admin_recoveries_path, match_controller: true },
       { title: "Recovery Displays", path: admin_recovery_displays_path, match_controller: true },
-      { title: "Stolen Twitterbot", path: ENV["STOLEN_TWITTERBOT_URL"].gsub(/bikes\z/, ""), match_controller: false },
       { title: "Memberships", path: admin_memberships_path, match_controller: true },
       { title: "Manufacturers", path: admin_manufacturers_path, match_controller: true },
       { title: "TSV Exports", path: admin_tsvs_path, match_controller: false },
