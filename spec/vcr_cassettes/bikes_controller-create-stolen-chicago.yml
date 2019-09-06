@@ -128,6 +128,792 @@ http_interactions:
            ],
            "status" : "OK"
         }
-    http_version: 
+    http_version:
   recorded_at: Thu, 10 Jan 2019 02:17:29 GMT
+- request:
+    method: get
+    uri: https://maps.googleapis.com/maps/api/geocode/json?language=en&latlng=41.9027357,-87.68927599999999&sensor=false
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+      User-Agent:
+      - Ruby
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Date:
+      - Fri, 06 Sep 2019 19:41:14 GMT
+      Pragma:
+      - no-cache
+      Expires:
+      - Fri, 01 Jan 1990 00:00:00 GMT
+      Cache-Control:
+      - no-cache, must-revalidate
+      Access-Control-Allow-Origin:
+      - "*"
+      Server:
+      - mafe
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      Server-Timing:
+      - gfet4t7; dur=278
+      Alt-Svc:
+      - quic=":443"; ma=2592000; v="46,43,39"
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+           "plus_code" : {
+              "compound_code" : "W836+37 Chicago, IL, USA",
+              "global_code" : "86HJW836+37"
+           },
+           "results" : [
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "2459",
+                       "short_name" : "2459",
+                       "types" : [ "street_number" ]
+                    },
+                    {
+                       "long_name" : "West Division Street",
+                       "short_name" : "W Division St",
+                       "types" : [ "route" ]
+                    },
+                    {
+                       "long_name" : "West Town",
+                       "short_name" : "West Town",
+                       "types" : [ "neighborhood", "political" ]
+                    },
+                    {
+                       "long_name" : "Chicago",
+                       "short_name" : "Chicago",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    },
+                    {
+                       "long_name" : "60622",
+                       "short_name" : "60622",
+                       "types" : [ "postal_code" ]
+                    },
+                    {
+                       "long_name" : "2941",
+                       "short_name" : "2941",
+                       "types" : [ "postal_code_suffix" ]
+                    }
+                 ],
+                 "formatted_address" : "2459 W Division St, Chicago, IL 60622, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 41.9028658,
+                          "lng" : -87.6891698
+                       },
+                       "southwest" : {
+                          "lat" : 41.9025376,
+                          "lng" : -87.6893626
+                       }
+                    },
+                    "location" : {
+                       "lat" : 41.9027357,
+                       "lng" : -87.68927599999999
+                    },
+                    "location_type" : "ROOFTOP",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 41.9040506802915,
+                          "lng" : -87.68791721970851
+                       },
+                       "southwest" : {
+                          "lat" : 41.9013527197085,
+                          "lng" : -87.69061518029152
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJSyHyaa7SD4gRQRfAc7ZrFBg",
+                 "types" : [ "premise" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "2459",
+                       "short_name" : "2459",
+                       "types" : [ "street_number" ]
+                    },
+                    {
+                       "long_name" : "West Division Street",
+                       "short_name" : "W Division St",
+                       "types" : [ "route" ]
+                    },
+                    {
+                       "long_name" : "West Town",
+                       "short_name" : "West Town",
+                       "types" : [ "neighborhood", "political" ]
+                    },
+                    {
+                       "long_name" : "Chicago",
+                       "short_name" : "Chicago",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    },
+                    {
+                       "long_name" : "60622",
+                       "short_name" : "60622",
+                       "types" : [ "postal_code" ]
+                    },
+                    {
+                       "long_name" : "2941",
+                       "short_name" : "2941",
+                       "types" : [ "postal_code_suffix" ]
+                    }
+                 ],
+                 "formatted_address" : "2459 W Division St, Chicago, IL 60622, USA",
+                 "geometry" : {
+                    "location" : {
+                       "lat" : 41.9027111,
+                       "lng" : -87.6892702
+                    },
+                    "location_type" : "ROOFTOP",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 41.9040600802915,
+                          "lng" : -87.6879212197085
+                       },
+                       "southwest" : {
+                          "lat" : 41.9013621197085,
+                          "lng" : -87.69061918029151
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJA4_3Q67SD4gRrtQq_pjjxs4",
+                 "plus_code" : {
+                    "compound_code" : "W836+37 Chicago, Illinois, United States",
+                    "global_code" : "86HJW836+37"
+                 },
+                 "types" : [ "establishment", "point_of_interest" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "1147",
+                       "short_name" : "1147",
+                       "types" : [ "street_number" ]
+                    },
+                    {
+                       "long_name" : "North Campbell Avenue",
+                       "short_name" : "N Campbell Ave",
+                       "types" : [ "route" ]
+                    },
+                    {
+                       "long_name" : "West Town",
+                       "short_name" : "West Town",
+                       "types" : [ "neighborhood", "political" ]
+                    },
+                    {
+                       "long_name" : "Chicago",
+                       "short_name" : "Chicago",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    },
+                    {
+                       "long_name" : "60622",
+                       "short_name" : "60622",
+                       "types" : [ "postal_code" ]
+                    },
+                    {
+                       "long_name" : "2906",
+                       "short_name" : "2906",
+                       "types" : [ "postal_code_suffix" ]
+                    }
+                 ],
+                 "formatted_address" : "1147 N Campbell Ave, Chicago, IL 60622, USA",
+                 "geometry" : {
+                    "location" : {
+                       "lat" : 41.9027321,
+                       "lng" : -87.68946520000001
+                    },
+                    "location_type" : "ROOFTOP",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 41.9040810802915,
+                          "lng" : -87.68811621970852
+                       },
+                       "southwest" : {
+                          "lat" : 41.9013831197085,
+                          "lng" : -87.69081418029153
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJJ6tqb67SD4gRPNLj9TYHksk",
+                 "plus_code" : {
+                    "compound_code" : "W836+36 Chicago, Illinois, United States",
+                    "global_code" : "86HJW836+36"
+                 },
+                 "types" : [ "street_address" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "Division & Campbell",
+                       "short_name" : "Division & Campbell",
+                       "types" : [ "establishment", "point_of_interest", "transit_station" ]
+                    },
+                    {
+                       "long_name" : "West Town",
+                       "short_name" : "West Town",
+                       "types" : [ "neighborhood", "political" ]
+                    },
+                    {
+                       "long_name" : "Chicago",
+                       "short_name" : "Chicago",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    },
+                    {
+                       "long_name" : "60622",
+                       "short_name" : "60622",
+                       "types" : [ "postal_code" ]
+                    }
+                 ],
+                 "formatted_address" : "Division & Campbell, Chicago, IL 60622, USA",
+                 "geometry" : {
+                    "location" : {
+                       "lat" : 41.90296499999999,
+                       "lng" : -87.68946699999999
+                    },
+                    "location_type" : "GEOMETRIC_CENTER",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 41.9043139802915,
+                          "lng" : -87.68811801970848
+                       },
+                       "southwest" : {
+                          "lat" : 41.9016160197085,
+                          "lng" : -87.6908159802915
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJL3lnQ67SD4gRcOjeVrBstBI",
+                 "plus_code" : {
+                    "compound_code" : "W836+56 Chicago, Illinois, United States",
+                    "global_code" : "86HJW836+56"
+                 },
+                 "types" : [ "establishment", "point_of_interest", "transit_station" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "1149",
+                       "short_name" : "1149",
+                       "types" : [ "street_number" ]
+                    },
+                    {
+                       "long_name" : "North Campbell Avenue",
+                       "short_name" : "N Campbell Ave",
+                       "types" : [ "route" ]
+                    },
+                    {
+                       "long_name" : "West Town",
+                       "short_name" : "West Town",
+                       "types" : [ "neighborhood", "political" ]
+                    },
+                    {
+                       "long_name" : "Chicago",
+                       "short_name" : "Chicago",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    },
+                    {
+                       "long_name" : "60622",
+                       "short_name" : "60622",
+                       "types" : [ "postal_code" ]
+                    }
+                 ],
+                 "formatted_address" : "1149 N Campbell Ave, Chicago, IL 60622, USA",
+                 "geometry" : {
+                    "location" : {
+                       "lat" : 41.9027415,
+                       "lng" : -87.6894787
+                    },
+                    "location_type" : "RANGE_INTERPOLATED",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 41.90409048029149,
+                          "lng" : -87.6881297197085
+                       },
+                       "southwest" : {
+                          "lat" : 41.90139251970849,
+                          "lng" : -87.69082768029151
+                       }
+                    }
+                 },
+                 "place_id" : "EisxMTQ5IE4gQ2FtcGJlbGwgQXZlLCBDaGljYWdvLCBJTCA2MDYyMiwgVVNBIhsSGQoUChIJy0HAQq7SD4gRkTE_2LszLbIQ_Qg",
+                 "types" : [ "street_address" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "2529-2501",
+                       "short_name" : "2529-2501",
+                       "types" : [ "street_number" ]
+                    },
+                    {
+                       "long_name" : "West Division Street",
+                       "short_name" : "W Division St",
+                       "types" : [ "route" ]
+                    },
+                    {
+                       "long_name" : "West Town",
+                       "short_name" : "West Town",
+                       "types" : [ "neighborhood", "political" ]
+                    },
+                    {
+                       "long_name" : "Chicago",
+                       "short_name" : "Chicago",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    },
+                    {
+                       "long_name" : "60622",
+                       "short_name" : "60622",
+                       "types" : [ "postal_code" ]
+                    }
+                 ],
+                 "formatted_address" : "2529-2501 W Division St, Chicago, IL 60622, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 41.9029809,
+                          "lng" : -87.68948379999999
+                       },
+                       "southwest" : {
+                          "lat" : 41.9029709,
+                          "lng" : -87.6907112
+                       }
+                    },
+                    "location" : {
+                       "lat" : 41.9029759,
+                       "lng" : -87.69009749999999
+                    },
+                    "location_type" : "GEOMETRIC_CENTER",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 41.9043248802915,
+                          "lng" : -87.68874851970848
+                       },
+                       "southwest" : {
+                          "lat" : 41.90162691970851,
+                          "lng" : -87.6914464802915
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJJ-i0WK7SD4gRGglEC0qF3go",
+                 "types" : [ "route" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "60622",
+                       "short_name" : "60622",
+                       "types" : [ "postal_code" ]
+                    },
+                    {
+                       "long_name" : "Chicago",
+                       "short_name" : "Chicago",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    }
+                 ],
+                 "formatted_address" : "Chicago, IL 60622, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 41.9195731,
+                          "lng" : -87.66615299999999
+                       },
+                       "southwest" : {
+                          "lat" : 41.88872,
+                          "lng" : -87.7067041
+                       }
+                    },
+                    "location" : {
+                       "lat" : 41.9013087,
+                       "lng" : -87.68276759999999
+                    },
+                    "location_type" : "APPROXIMATE",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 41.9195731,
+                          "lng" : -87.66615299999999
+                       },
+                       "southwest" : {
+                          "lat" : 41.88872,
+                          "lng" : -87.7067041
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJDe0hzsnSD4gRKquVpZ1evcI",
+                 "types" : [ "postal_code" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "Humboldt Park",
+                       "short_name" : "Humboldt Park",
+                       "types" : [ "neighborhood", "political" ]
+                    },
+                    {
+                       "long_name" : "Chicago",
+                       "short_name" : "Chicago",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    }
+                 ],
+                 "formatted_address" : "Humboldt Park, Chicago, IL, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 41.9103577,
+                          "lng" : -87.6866186
+                       },
+                       "southwest" : {
+                          "lat" : 41.8879657,
+                          "lng" : -87.72651669999999
+                       }
+                    },
+                    "location" : {
+                       "lat" : 41.8991969,
+                       "lng" : -87.7066823
+                    },
+                    "location_type" : "APPROXIMATE",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 41.9103577,
+                          "lng" : -87.6866186
+                       },
+                       "southwest" : {
+                          "lat" : 41.8879657,
+                          "lng" : -87.72651669999999
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJmfhZ6FHND4gR3h6uyywnPuA",
+                 "types" : [ "neighborhood", "political" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "Chicago",
+                       "short_name" : "Chicago",
+                       "types" : [ "locality", "political" ]
+                    },
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    }
+                 ],
+                 "formatted_address" : "Chicago, IL, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 42.023131,
+                          "lng" : -87.52366099999999
+                       },
+                       "southwest" : {
+                          "lat" : 41.6443349,
+                          "lng" : -87.9402669
+                       }
+                    },
+                    "location" : {
+                       "lat" : 41.8781136,
+                       "lng" : -87.6297982
+                    },
+                    "location_type" : "APPROXIMATE",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 42.023131,
+                          "lng" : -87.52366099999999
+                       },
+                       "southwest" : {
+                          "lat" : 41.6443349,
+                          "lng" : -87.9402669
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJ7cv00DwsDogRAMDACa2m4K8",
+                 "types" : [ "locality", "political" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "Cook County",
+                       "short_name" : "Cook County",
+                       "types" : [ "administrative_area_level_2", "political" ]
+                    },
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    }
+                 ],
+                 "formatted_address" : "Cook County, IL, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 42.1543239,
+                          "lng" : -87.1111619
+                       },
+                       "southwest" : {
+                          "lat" : 41.46953389999999,
+                          "lng" : -88.2634779
+                       }
+                    },
+                    "location" : {
+                       "lat" : 41.7376587,
+                       "lng" : -87.697554
+                    },
+                    "location_type" : "APPROXIMATE",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 42.1543239,
+                          "lng" : -87.1111619
+                       },
+                       "southwest" : {
+                          "lat" : 41.46953389999999,
+                          "lng" : -88.2634779
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJdRNDZqqxD4gRPOAOIwnX2Yo",
+                 "types" : [ "administrative_area_level_2", "political" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "Illinois",
+                       "short_name" : "IL",
+                       "types" : [ "administrative_area_level_1", "political" ]
+                    },
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    }
+                 ],
+                 "formatted_address" : "Illinois, USA",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 42.5083379,
+                          "lng" : -87.01993499999999
+                       },
+                       "southwest" : {
+                          "lat" : 36.970298,
+                          "lng" : -91.5130789
+                       }
+                    },
+                    "location" : {
+                       "lat" : 40.6331249,
+                       "lng" : -89.3985283
+                    },
+                    "location_type" : "APPROXIMATE",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 42.5083379,
+                          "lng" : -87.01993499999999
+                       },
+                       "southwest" : {
+                          "lat" : 36.970298,
+                          "lng" : -91.5130789
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJGSZubzgtC4gRVlkRZFCCFX8",
+                 "types" : [ "administrative_area_level_1", "political" ]
+              },
+              {
+                 "address_components" : [
+                    {
+                       "long_name" : "United States",
+                       "short_name" : "US",
+                       "types" : [ "country", "political" ]
+                    }
+                 ],
+                 "formatted_address" : "United States",
+                 "geometry" : {
+                    "bounds" : {
+                       "northeast" : {
+                          "lat" : 71.5388001,
+                          "lng" : -66.885417
+                       },
+                       "southwest" : {
+                          "lat" : 18.7763,
+                          "lng" : 170.5957
+                       }
+                    },
+                    "location" : {
+                       "lat" : 37.09024,
+                       "lng" : -95.712891
+                    },
+                    "location_type" : "APPROXIMATE",
+                    "viewport" : {
+                       "northeast" : {
+                          "lat" : 71.5388001,
+                          "lng" : -66.885417
+                       },
+                       "southwest" : {
+                          "lat" : 18.7763,
+                          "lng" : 170.5957
+                       }
+                    }
+                 },
+                 "place_id" : "ChIJCzYy5IS16lQRQrfeQ5K5Oxw",
+                 "types" : [ "country", "political" ]
+              }
+           ],
+           "status" : "OK"
+        }
+    http_version:
+  recorded_at: Fri, 06 Sep 2019 19:41:14 GMT
 recorded_with: VCR 4.0.0
