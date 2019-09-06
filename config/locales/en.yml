@@ -4244,6 +4244,7 @@ en:
       copy_and_paste: Copy the above text and paste it where you'd like it to appear
       copy_and_paste_in_post: Copy the above text and paste it where you'd like it
         to appear in the post
+      delete_image: Delete image
       enter_text_here: ENTER YOUR TEXT HERE
       processing: "... processing"
     recovery_display:
