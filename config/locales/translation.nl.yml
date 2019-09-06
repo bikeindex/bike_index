@@ -31,7 +31,7 @@ nl:
     - vr
     - za
     month_names:
-    -
+    - 
     - januari
     - februari
     - maart
@@ -45,7 +45,7 @@ nl:
     - november
     - december
     abbr_month_names:
-    -
+    - 
     - jan
     - feb
     - mrt
@@ -4866,6 +4866,7 @@ nl:
       you_have_no_registered_locks: U heeft geen geregistreerde sloten
       abandoned: VERLATEN
       date_abandoned: Datum van vermissing
+      next: Voeg info toe
   locales:
     en: English (Engels)
     nl: Nederlands
