@@ -43,7 +43,6 @@ RSpec.describe "Bikes API V3", type: :request do
     before :each do
       FactoryBot.create(:wheel_size, iso_bsd: 559)
     end
-    include_context :geocoder_default_location
 
     context "no token" do
       let(:token) { nil }

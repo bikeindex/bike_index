@@ -566,7 +566,6 @@ RSpec.describe UsersController, type: :controller do
     context "setting address" do
       let(:country) { Country.united_states }
       let(:state) { FactoryBot.create(:state, name: "New York", abbreviation: "NY") }
-      include_context :geocoder_default_location
       it "sets address, geocodes" do
         set_current_user(user)
         expect(user.notification_newsletters).to be_falsey

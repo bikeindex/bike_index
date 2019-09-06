@@ -7,7 +7,7 @@
       %li.nav-item
         = link_to "all bikes", admin_bikes_path, class: "nav-link"
       %li.nav-item
-        = link_to "Alphabeticall view", missing_manufacturer_admin_bikes_path(reset_view: true), class: !session[:missing_manufacturer_time_order] ? "nav-link active" : "nav-link"
+        = link_to "Alphabetical view", missing_manufacturer_admin_bikes_path(reset_view: true), class: !session[:missing_manufacturer_time_order] ? "nav-link active" : "nav-link"
       %li.nav-item
         = link_to "Time ordered view", missing_manufacturer_admin_bikes_path(time_ordered: true), class: session[:missing_manufacturer_time_order] ? "nav-link active" : "nav-link"
 
@@ -36,7 +36,7 @@
       %thead.thead-light
         %th.table-cell-check
           %a#multi-mnfg-selector{ href: "#" }
-            &#x2713;
+            = check_mark
         %th
           Date indexed
         %th

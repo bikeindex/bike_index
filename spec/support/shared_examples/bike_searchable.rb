@@ -117,7 +117,6 @@ RSpec.shared_examples "bike_searchable" do
         end
       end
       context "proximity" do
-        include_context :geocoder_default_location
         context "ignored locations" do
           context "proximity of anywhere" do
             let(:query_params) { { stolenness: "proximity", location: "anywhere", distance: 100 } }
@@ -143,7 +142,8 @@ RSpec.shared_examples "bike_searchable" do
           end
           context "with a broken bounding box" do
             let(:nan) { 0.0 / 0 }
-            let(:bounding_box) { [nan, nan, nan, nan] } # Override bounding box stub in geocoder_default_location
+            # Override bounding box stub in geocoder_default_location shared_context
+            let(:bounding_box) { [nan, nan, nan, nan] }
             let(:target) { { stolenness: "stolen" } }
             it "returns a non-proximity search" do
               expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
@@ -319,7 +319,6 @@ RSpec.shared_examples "bike_searchable" do
         end
       end
       context "proximity" do
-        include_context :geocoder_default_location
         let(:bike_1) { FactoryBot.create(:stolen_bike, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
         let(:stolen_record_1) { bike_1.find_current_stolen_record }
         let(:bike_2) { FactoryBot.create(:stolen_bike, latitude: 41.8961603, longitude: -87.677215) }
