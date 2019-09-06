@@ -61,6 +61,13 @@ class StolenRecord < ActiveRecord::Base
   end
   after_validation :reverse_geocode
 
+  def twitter_accounts_in_proximity
+    [
+      TwitterAccount.default_account_for_country(country),
+      TwitterAccount.active.near(self, 50),
+    ].flatten.compact.uniq
+  end
+
   after_save :remove_outdated_alert_images
 
   def self.find_matching_token(bike_id:, recovery_link_token:)
