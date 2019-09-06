@@ -24,14 +24,6 @@ RSpec.describe TwitterAccount, type: :model do
     end
   end
 
-  describe "#twitter_link" do
-    it "creates the correct twitter link" do
-      twitter_account = TwitterAccount.new(screen_name: "stolenbikesindy")
-      link = twitter_account.twitter_link
-      expect(link).to match("<a href='https://twitter.com/stolenbikesindy'>@stolenbikesindy</a>")
-    end
-  end
-
   describe "#fetch_account_info" do
     it "gets the twitter account info" do
       twitter_account = FactoryBot.create(:twitter_account_1, :active)

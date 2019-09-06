@@ -49,10 +49,6 @@ class TwitterAccount < ActiveRecord::Base
     "https://twitter.com/#{screen_name}"
   end
 
-  def twitter_link
-    "<a href='#{twitter_account_url}'>@#{screen_name}</a>"
-  end
-
   def fetch_account_info
     self.twitter_account_info ||= twitter_user.to_h
   end
