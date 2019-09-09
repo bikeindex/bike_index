@@ -227,7 +227,11 @@
         = f.label :secondary_emails
         = text_area_tag :secondary_emails, @user.secondary_emails.join(", "), disabled: true, rows: 1, class: "form-control"
   .row
-    .col-md-5
+    .col-md-6
+      .form-group
+        = f.label :phone
+        = f.text_field :phone, class: "form-control"
+    .col-lg-3.col-6
       .form-group
         .form-check
           = f.check_box :confirmed, disabled: @user.confirmed, class: "form-check-input"
@@ -240,7 +244,7 @@
         .form-check.form-check-inline
           = f.check_box :can_send_many_stolen_notifications, class: "form-check-input"
           = f.label :can_send_many_stolen_notifications, class: "form-check-label"
-    .col-md-5
+    .col-lg-3.col-6
       .form-group
         .form-check.form-check-inline
           = f.check_box :superuser, class: "form-check-input"
@@ -250,8 +254,9 @@
           .form-check.form-check-inline
             = f.check_box :developer, class: "form-check-input"
             = f.label :developer, class: "form-check-label"
-    .col-md-2
-      = f.submit 'Save', class: 'btn btn-success'
+    .col-6
+      .form-group.mt-2
+        = f.submit 'Save', class: 'btn btn-success'
 
 %hr{ style: "margin-top: 60px;" }
 .mt-4.mb-4.row

@@ -53,6 +53,7 @@ RSpec.describe Admin::UsersController, type: :request do
                                                 developer: true,
                                                 can_send_many_stolen_notifications: true,
                                                 banned: true,
+                                                phone: "9876543210",
                                               }
         expect(user_subject.reload.name).to eq("New Name")
         expect(user_subject.email).to eq("newemailexample.com")
@@ -61,6 +62,7 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(user_subject.developer).to be_falsey
         expect(user_subject.can_send_many_stolen_notifications).to be_truthy
         expect(user_subject.banned).to be_truthy
+        expect(user_subject.phone).to eq "9876543210"
       end
     end
     context "developer" do
