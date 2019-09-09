@@ -4217,6 +4217,46 @@ en:
     staff_accounts: Staff accounts
     supporting_our_nonprofit: Supporting our nonprofit
     welcome_campaign: Welcome campaign on Facebook, Twitter, and Instagram
+  public_images:
+    edit:
+      editing_bike_html: "<span>Back Arrow</span>Back to <em>Editing Bike</em>"
+      editing_image: Editing Image
+    form:
+      cancel_update: Cancel Update
+      do_not_display: Do not display
+      error: Error
+      errors_prevented_photo_from_saving: "%{errors_count} prevented photo from saving"
+      image_name: Image name
+      no_one_will_be_able_to_see_this_image_exc: "(no one will be able to see this
+        image except for you)"
+      save_image: Save image
+      use_this_if_youd_like_to_attach_a_photo: >-
+        Use this if you'd like to attach a photo of your receipt or something similarly
+        private.
+    new:
+      add_a_public_image: Add a public_image
+    new_form:
+      drag_and_drop_html: Drag and drop files here to or use the <em>Upload Photos</em>
+        button.
+      upload_photos: Upload photos
+    public_image:
+      copy_and_paste: Copy the above text and paste it where you'd like it to appear
+      copy_and_paste_in_post: Copy the above text and paste it where you'd like it
+        to appear in the post
+      delete_image: Delete image
+      enter_text_here: ENTER YOUR TEXT HERE
+      processing: "... processing"
+    revised_public_image:
+      keep_image_private: keep image private
+      processing: "... processing"
+    show:
+      are_you_sure: Are you sure?
+      back_to_images: Back to public images
+      bike_image: Bike Image
+      destroy: Destroy
+      edit: Edit
+      image_from: Image from %{image_title}
+      looks_like_this_is_your_image: Looks like this is your image.
   recovery_displays:
     recovery_display:
       bike: Bike
