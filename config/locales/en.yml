@@ -547,7 +547,7 @@ en:
         slug: Slug
         standard: Standard
       recovery_display:
-        date_recovered: Date recovered
+        recovered_at: Date recovered
         image: Image
         link: Link
         quote: Quote
@@ -578,7 +578,7 @@ en:
         creation_organization: :activerecord.models.creation_organization
         current: Current
         current_bike: :activerecord.models.current_bike
-        date_recovered: Date recovered
+        recovered_at: Date recovered
         date_stolen: Date stolen
         estimated_value: Estimated value
         index_helped_recovery: Index helped recovery
@@ -1682,7 +1682,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1708,7 +1708,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -3777,7 +3777,7 @@ en:
         sent_to_a_new_owner: sent to a new owner
         sticker: Sticker
       recoveries:
-        date_recovered: Date Recovered
+        recovered_at: Date Recovered
         description: Description
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
         org_recoveries_html: "<em>%{org_name}</em> Recoveries"

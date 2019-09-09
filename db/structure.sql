@@ -2024,7 +2024,7 @@ CREATE TABLE public.stolen_records (
     approved boolean DEFAULT false NOT NULL,
     receive_notifications boolean DEFAULT true,
     proof_of_ownership boolean,
-    date_recovered timestamp without time zone,
+    recovered_at timestamp without time zone,
     recovered_description text,
     index_helped_recovery boolean DEFAULT false NOT NULL,
     can_share_recovery boolean DEFAULT false NOT NULL,
@@ -4544,7 +4544,9 @@ INSERT INTO schema_migrations (version) VALUES ('20190806170520');
 
 INSERT INTO schema_migrations (version) VALUES ('20190806214815');
 
+INSERT INTO schema_migrations (version) VALUES ('20190809200257');
+
 INSERT INTO schema_migrations (version) VALUES ('20190809214414');
 
-INSERT INTO schema_migrations (version) VALUES ('20190809200257');
+INSERT INTO schema_migrations (version) VALUES ('20190909190050');
 

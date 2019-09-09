@@ -41,7 +41,7 @@ class Admin::RecoveriesController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[date_recovered recovery_display_status]
+    %w[recovered_at recovery_display_status]
   end
 
   def recovery_display_status_searched

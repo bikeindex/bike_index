@@ -200,7 +200,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
         expect(stolen_record.bike).to eq(bike)
         expect(stolen_record.recovered?).to be_truthy
         expect(stolen_record.recovered_description).to eq recovery_request[:request_reason]
-        expect(stolen_record.date_recovered).to be_present
+        expect(stolen_record.recovered_at).to be_present
         expect(stolen_record.recovery_posted).to be_falsey
         expect(stolen_record.index_helped_recovery).to be_truthy
         expect(stolen_record.can_share_recovery).to be_truthy
