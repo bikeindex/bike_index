@@ -1882,7 +1882,7 @@ CREATE TABLE public.recovery_displays (
     stolen_record_id integer,
     quote text,
     quote_by character varying(255),
-    date_recovered timestamp without time zone,
+    recovered_at timestamp without time zone,
     link character varying(255),
     image character varying(255),
     created_at timestamp without time zone NOT NULL,
