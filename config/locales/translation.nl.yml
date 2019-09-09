@@ -5179,3 +5179,43 @@ nl:
       bike: Fiets
       my_indexed_bikes: Mijn geïndexeerde %{bikes_count}
       no_photo: geen foto
+  public_images:
+    edit:
+      editing_bike_html: "<span>Pijl</span> terug Terug naar <em>fiets bewerken</em>"
+      editing_image: Afbeelding bewerken
+    form:
+      cancel_update: Update annuleren
+      do_not_display: Geef niet weer
+      error: Fout
+      errors_prevented_photo_from_saving: "%{errors_count} heeft voorkomen dat de
+        foto werd opgeslagen"
+      image_name: Naam Afbeelding
+      no_one_will_be_able_to_see_this_image_exc: "(niemand kan deze afbeelding zien
+        behalve jij)"
+      save_image: Afbeelding opslaan
+      use_this_if_youd_like_to_attach_a_photo: Gebruik dit als u een foto van uw kwitantie
+        of iets dergelijks privé wilt toevoegen.
+    new:
+      add_a_public_image: Voeg een public_image toe
+    new_form:
+      drag_and_drop_html: Sleep bestanden naar hier of gebruik de knop <em>Foto's
+        uploaden</em> .
+      upload_photos: Foto's uploaden
+    public_image:
+      copy_and_paste: Kopieer de bovenstaande tekst en plak deze op de gewenste plek
+      copy_and_paste_in_post: Kopieer de bovenstaande tekst en plak deze op de gewenste
+        plek in het bericht
+      delete_image: Verwijder afbeelding
+      enter_text_here: VOER HIER UW TEKST IN
+      processing: "... verwerken"
+    revised_public_image:
+      keep_image_private: houd afbeelding privé
+      processing: "... verwerken"
+    show:
+      are_you_sure: Weet je het zeker?
+      back_to_images: Terug naar openbare afbeeldingen
+      bike_image: Bike afbeelding
+      destroy: Verwijderen
+      edit: Bewerken
+      image_from: Afbeelding van %{image_title}
+      looks_like_this_is_your_image: Het lijkt erop dat dit jouw afbeelding is.
