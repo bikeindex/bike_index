@@ -35,6 +35,7 @@ class Admin::UsersController < Admin::BaseController
     @user.banned = params[:user][:banned]
     @user.username = params[:user][:username]
     @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
+    @user.phone = params[:user][:phone]
     if @user.save
       @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
       redirect_to admin_users_url, notice: "User Updated"
