@@ -19,7 +19,7 @@ module Organized
       redirect_to current_index_path and return unless current_organization.paid_for?("show_recoveries")
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      @recoveries = current_organization.recovered_records.order(date_recovered: :desc).page(@page).per(@per_page)
+      @recoveries = current_organization.recovered_records.order(recovered_at: :desc).page(@page).per(@per_page)
     end
 
     def incompletes

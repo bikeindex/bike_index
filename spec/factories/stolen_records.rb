@@ -5,7 +5,7 @@ FactoryBot.define do
 
     factory :stolen_record_recovered do
       bike { FactoryBot.create(:bike) }
-      date_recovered { Time.current }
+      recovered_at { Time.current }
       recovered_description { "Awesome help by Bike Index" }
       current { false }
     end

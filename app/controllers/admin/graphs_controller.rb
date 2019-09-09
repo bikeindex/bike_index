@@ -36,8 +36,8 @@ class Admin::GraphsController < Admin::BaseController
       ]
     elsif @kind == "recoveries"
       recoveries = StolenRecord.unscoped
-      chart_data = recoveries.where(date_recovered: @start_at..@end_at)
-        .group_by_period(@group_period, :date_recovered, time_zone: @timezone)
+      chart_data = recoveries.where(recovered_at: @start_at..@end_at)
+        .group_by_period(@group_period, :recovered_at, time_zone: @timezone)
         .count
     end
     if chart_data.present?

@@ -50,7 +50,7 @@
               %span.less-strong
                 = s_project + count
           %td
-            = count = StolenRecord.unscoped.where(date_recovered: date.all_year).count
+            = count = StolenRecord.unscoped.where(recovered_at: date.all_year).count
             - if year == Time.current.year
               %span.less-strong
                 = count + (BigDecimal.new(count) / yday * days_left).to_i
@@ -113,7 +113,7 @@
               %span.less-strong
                 = s_project + count
           %td
-            = count = StolenRecord.unscoped.where(date_recovered: date.all_year).within_bounding_box(box).count
+            = count = StolenRecord.unscoped.where(recovered_at: date.all_year).within_bounding_box(box).count
             - if year == Time.current.year
               %span.less-strong
                 = count + (BigDecimal.new(count) / yday * days_left).to_i

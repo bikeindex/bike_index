@@ -17,7 +17,7 @@ RSpec.describe Bike, type: :model do
     end
     it "recovered_records default scopes to created_at desc" do
       bike = FactoryBot.create(:bike)
-      expect(bike.recovered_records.to_sql).to eq(StolenRecord.unscoped.where(bike_id: bike.id, current: false).order("date_recovered desc").to_sql)
+      expect(bike.recovered_records.to_sql).to eq(StolenRecord.unscoped.where(bike_id: bike.id, current: false).order("recovered_at desc").to_sql)
     end
     context "unknown, absent serials" do
       let(:bike_with_serial) { FactoryBot.create(:bike, serial_number: "CCcc99FFF") }

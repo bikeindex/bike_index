@@ -19,10 +19,10 @@
             = f.label :recovered_description, t(".how_did_you_get_it_back")
             = f.text_area :recovered_description, class: 'form-control'
           .form-group
-            = f.label :date_recovered, t(".when_did_you_recover_it"), class: 'form-well-label'
-            - f.object.date_recovered = TimeParser.round(f.object.date_recovered || Time.current)
+            = f.label :recovered_at, t(".when_did_you_recover_it"), class: 'form-well-label'
+            - f.object.recovered_at = TimeParser.round(f.object.recovered_at || Time.current)
             = f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
-            = f.datetime_local_field :date_recovered, max: Time.current.end_of_day, step: 3600, required: true, class: 'form-control'
+            = f.datetime_local_field :recovered_at, max: Time.current.end_of_day, step: 3600, required: true, class: 'form-control'
           .checkbox
             %label
               = f.check_box :index_helped_recovery

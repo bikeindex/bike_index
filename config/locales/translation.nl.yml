@@ -31,7 +31,7 @@ nl:
     - vr
     - za
     month_names:
-    - 
+    -
     - januari
     - februari
     - maart
@@ -45,7 +45,7 @@ nl:
     - november
     - december
     abbr_month_names:
-    - 
+    -
     - jan
     - feb
     - mrt
@@ -635,7 +635,7 @@ nl:
         slug: Naaktslak
         standard: Standaard
       recovery_display:
-        date_recovered: Datum hersteld
+        recovered_at: Datum hersteld
         image: afbeelding
         link: Link
         quote: Citaat
@@ -657,7 +657,7 @@ nl:
         city: City
         create_open311: Maak open311
         current: Stroom
-        date_recovered: Datum hersteld
+        recovered_at: Datum hersteld
         date_stolen: Datum gestolen
         estimated_value: Geschatte waarde
         index_helped_recovery: Index hielp herstel
@@ -3975,7 +3975,7 @@ nl:
         sent_to_a_new_owner: verzonden naar een nieuwe eigenaar
         sticker: Sticker
       recoveries:
-        date_recovered: Datum hersteld
+        recovered_at: Datum hersteld
         description: Beschrijving
         mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
         org_recoveries_html: "<em>%{org_name}</em> Herstellingen"

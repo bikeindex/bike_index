@@ -1,10 +1,10 @@
 class RecoveryDisplay < ActiveRecord::Base
-  validates_presence_of :quote, :date_recovered
+  validates_presence_of :quote, :recovered_at
   mount_uploader :image, CircularImageUploader
   process_in_background :image, CarrierWaveProcessWorker
   belongs_to :stolen_record
 
-  default_scope { order("date_recovered desc") }
+  default_scope { order("recovered_at desc") }
 
   attr_accessor :date_input
 
@@ -13,9 +13,9 @@ class RecoveryDisplay < ActiveRecord::Base
 
   def set_time
     if date_input.present?
-      self.date_recovered = DateTime.strptime("#{date_input} 06", "%m-%d-%Y %H")
+      self.recovered_at = DateTime.strptime("#{date_input} 06", "%m-%d-%Y %H")
     end
-    self.date_recovered = Time.current unless date_recovered.present?
+    self.recovered_at = Time.current unless recovered_at.present?
   end
 
   validate :quote_not_too_long
@@ -29,7 +29,7 @@ class RecoveryDisplay < ActiveRecord::Base
     sr = StolenRecord.unscoped.where(id: sr_id).first
     return true unless sr.present?
     self.stolen_record = sr
-    self.date_recovered = sr.date_recovered
+    self.recovered_at = sr.recovered_at
     self.quote = sr.recovered_description
     self.quote_by = calculated_owner_name&.split(/\s/)&.first
   end

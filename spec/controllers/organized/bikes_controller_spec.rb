@@ -149,7 +149,7 @@ RSpec.describe Organized::BikesController, type: :controller do
             recovered_description: "recovered it on a special corner",
             index_helped_recovery: true,
             can_share_recovery: true,
-            date_recovered: "2016-01-10 13:59:59",
+            recovered_at: "2016-01-10 13:59:59",
           }
         end
         before do
@@ -157,7 +157,7 @@ RSpec.describe Organized::BikesController, type: :controller do
           recovered_record2.add_recovery_information(recovery_information)
         end
         it "renders, assigns search_query_present and stolenness all" do
-          expect(recovered_record2.date_recovered.to_date).to eq Date.parse("2016-01-10")
+          expect(recovered_record2.recovered_at.to_date).to eq Date.parse("2016-01-10")
           get :recoveries, organization_id: organization.to_param
           expect(response.status).to eq(200)
           expect(assigns(:recoveries).pluck(:id)).to eq([recovered_record.id, recovered_record2.id])

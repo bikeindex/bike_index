@@ -6,7 +6,7 @@
     %thead.thead-light.sortable
       %th
         - if render_sortable
-          = sortable "date_recovered"
+          = sortable "recovered_at"
         - else
           Date recovered
       %th
@@ -35,8 +35,8 @@
         %tr
           %td
             %a{href: edit_admin_recovery_url(recovery.id) }
-              - if recovery.date_recovered.present?
-                - date = recovery.date_recovered
+              - if recovery.recovered_at.present?
+                - date = recovery.recovered_at
               - else
                 %small
                 - date = recovery.created_at

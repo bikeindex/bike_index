@@ -51,7 +51,7 @@ class CustomerMailerPreview < ActionMailer::Preview
   end
 
   def recovered_from_link
-    recovered_record = StolenRecord.recovered.where.not(date_recovered: nil).first
+    recovered_record = StolenRecord.recovered.where.not(recovered_at: nil).first
     CustomerMailer.recovered_from_link(recovered_record)
   end
 
