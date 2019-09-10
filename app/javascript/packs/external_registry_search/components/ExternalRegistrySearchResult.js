@@ -27,7 +27,7 @@ const ExternalRegistrySearchResult = ({ bike }) => (
       <ul className="attr-list">
         <li>
           <span className="attr-title text-danger">{bike.status}</span>
-          <span className="convertTime">{bike.date_stolen}</span>
+          <span className="convertTime">{bike.date_stolen_string}</span>
         </li>
         <li>
           <span className="attr-title">Registry</span>
