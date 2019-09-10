@@ -22,6 +22,14 @@
       = f.label :national, class: "form-label mr-4"
       = f.text_field :national, class: "form-control"
 
+  %small
+    Credentials can be found on the
+    = link_to "Twitter Apps Dashboard", "https://developer.twitter.com/apps", target: :_blank
+    by selecting the desired app, then navigating to
+    %strong Details
+    >
+    %strong Keys and Tokens
+
   %fieldset
     .input-group
       = f.label :user_secret, class: "form-label mr-4"
