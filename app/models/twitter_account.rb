@@ -4,7 +4,6 @@ class TwitterAccount < ActiveRecord::Base
 
   has_many :tweets, dependent: :destroy
 
-  serialize :twitter_account_info
   attr_accessor :no_geocode
 
   validates :screen_name,
@@ -17,7 +16,7 @@ class TwitterAccount < ActiveRecord::Base
   geocoded_by :address
   after_validation :geocode, if: lambda { !no_geocode && address.present? && (latitude.blank? || address_changed?) }
   before_save :reverse_geocode, if: lambda { !no_geocode && latitude.present? && (state.blank? || state_changed?) }
-  before_save :fetch_account_info
+  before_save :fetch_account_info, if: lambda { twitter_account_info.blank? }
 
   reverse_geocoded_by :latitude, :longitude do |account, results|
     if (geo = results.first)
@@ -46,7 +45,8 @@ class TwitterAccount < ActiveRecord::Base
   end
 
   def fetch_account_info
-    self.twitter_account_info ||= twitter_user.to_h
+    return if twitter_account_info.present?
+    self.twitter_account_info = twitter_user.to_h
   end
 
   def twitter_user
@@ -64,11 +64,11 @@ class TwitterAccount < ActiveRecord::Base
 
   def account_info_name
     return if twitter_account_info.blank?
-    twitter_account_info[:name]
+    twitter_account_info["name"]
   end
 
   def account_info_image
     return if twitter_account_info.blank?
-    twitter_account_info[:profile_image_url_https]
+    twitter_account_info["profile_image_url_https"]
   end
 end

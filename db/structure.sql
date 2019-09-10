@@ -2197,16 +2197,16 @@ CREATE TABLE public.twitter_accounts (
     address character varying,
     append_block character varying,
     city character varying,
-    consumer_key character varying,
-    consumer_secret character varying,
+    consumer_key character varying NOT NULL,
+    consumer_secret character varying NOT NULL,
     country character varying,
     language character varying,
     neighborhood character varying,
-    screen_name character varying,
+    screen_name character varying NOT NULL,
     state character varying,
-    user_secret character varying,
-    user_token character varying,
-    twitter_account_info text,
+    user_secret character varying NOT NULL,
+    user_token character varying NOT NULL,
+    twitter_account_info jsonb DEFAULT '{}'::jsonb,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -3804,6 +3804,13 @@ CREATE INDEX index_twitter_accounts_on_latitude_and_longitude ON public.twitter_
 
 
 --
+-- Name: index_twitter_accounts_on_screen_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_twitter_accounts_on_screen_name ON public.twitter_accounts USING btree (screen_name);
+
+
+--
 -- Name: index_user_emails_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4648,8 +4655,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190806155914');
 INSERT INTO schema_migrations (version) VALUES ('20190806170520');
 
 INSERT INTO schema_migrations (version) VALUES ('20190806214815');
-
-INSERT INTO schema_migrations (version) VALUES ('20190809200257');
 
 INSERT INTO schema_migrations (version) VALUES ('20190809200257');
 

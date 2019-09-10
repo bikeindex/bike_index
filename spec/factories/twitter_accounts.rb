@@ -5,7 +5,7 @@ FactoryBot.define do
     consumer_secret { "CONSUMER_SECRET" }
     user_token { "ACCESS_TOKEN" }
     user_secret { "ACCESS_SECRET" }
-    twitter_account_info { { name: "name", profile_image_url_https: "https://example.com/image.jpg" } }
+    twitter_account_info { {} }
 
     address { "278 Broadway, New York, NY 10007, USA" }
     latitude { 40.7143528 }

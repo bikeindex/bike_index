@@ -9,16 +9,16 @@ class CreateTwitterAccounts < ActiveRecord::Migration
       t.string :address
       t.string :append_block
       t.string :city
-      t.string :consumer_key
-      t.string :consumer_secret
+      t.string :consumer_key, null: false
+      t.string :consumer_secret, null: false
       t.string :country
       t.string :language
       t.string :neighborhood
-      t.string :screen_name
+      t.string :screen_name, null: false, index: true
       t.string :state
-      t.string :user_secret
-      t.string :user_token
-      t.text :twitter_account_info
+      t.string :user_secret, null: false
+      t.string :user_token, null: false
+      t.jsonb :twitter_account_info, default: {}
 
       t.timestamps null: false
     end
