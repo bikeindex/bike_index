@@ -90,6 +90,7 @@ gem "secure_headers", "~> 2.5.0"
 # Frontend
 gem "bootstrap", "~> 4.0.0.alpha3" # Bootstrap 4 - used for revised stylesheets
 gem "chartkick" # Display charts
+gem "coderay" # Pretty print code
 gem "coffee-rails"
 gem "groupdate" # Required for charts
 gem "jquery-datatables-rails", "~>3.4.0"
@@ -98,7 +99,6 @@ gem "sprockets-rails", "~> 3.0.4"
 gem "therubyracer"
 gem "uglifier"
 gem "webpacker", "~> 4.x"
-gem "coderay" # Pretty print code
 
 # Show performance metrics
 gem "flamegraph", require: false
@@ -145,6 +145,7 @@ group :development do
   gem "spring"
   gem "spring-commands-rspec"
   gem "spring-commands-rubocop"
+  gem "terminal-notifier"
 end
 
 group :development, :test do
