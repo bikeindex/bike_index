@@ -107,6 +107,36 @@ $bike-box-bg: $gray-lighter;
 }
 
 @media (min-width: $grid-breakpoint-md) {
+  .bike-list-image .no-image {
+    padding: 3 * $vertical-height;
+  }
+}
+
+@media (max-width: $grid-breakpoint-md) {
+  .bike-boxes .bike-box-item {
+    text-align: center;
+    padding-top: 10px;
+  }
+
+  .bike-list-image {
+    flex: none;
+    margin: auto;
+    max-height: 200px;
+    max-width: 200px;
+  }
+
+  .no-image {
+    margin: auto;
+    height: 200px;
+  }
+
+  .bike-information {
+    flex: none;
+    margin: auto;
+  }
+}
+
+@media (min-width: $grid-breakpoint-md) {
   .bike-boxes {
     .hover-expand-block {
       width: 200%;
