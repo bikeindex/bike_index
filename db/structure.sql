@@ -101,6 +101,7 @@ CREATE TABLE public.alert_images (
 --
 
 CREATE SEQUENCE public.alert_images_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -134,6 +135,7 @@ CREATE TABLE public.ambassador_task_assignments (
 --
 
 CREATE SEQUENCE public.ambassador_task_assignments_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -166,6 +168,7 @@ CREATE TABLE public.ambassador_tasks (
 --
 
 CREATE SEQUENCE public.ambassador_tasks_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -244,6 +247,7 @@ CREATE TABLE public.bike_code_batches (
 --
 
 CREATE SEQUENCE public.bike_code_batches_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -879,6 +883,7 @@ CREATE TABLE public.flipper_features (
 --
 
 CREATE SEQUENCE public.flipper_features_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -912,6 +917,7 @@ CREATE TABLE public.flipper_gates (
 --
 
 CREATE SEQUENCE public.flipper_gates_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -981,6 +987,7 @@ CREATE TABLE public.impound_records (
 --
 
 CREATE SEQUENCE public.impound_records_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2083,6 +2090,7 @@ CREATE TABLE public.theft_alert_plans (
 --
 
 CREATE SEQUENCE public.theft_alert_plans_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2122,6 +2130,7 @@ CREATE TABLE public.theft_alerts (
 --
 
 CREATE SEQUENCE public.theft_alerts_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2149,8 +2158,8 @@ CREATE TABLE public.tweets (
     alignment character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    twitter_account_id character varying,
-    stolen_record_id character varying,
+    twitter_account_id integer,
+    stolen_record_id integer,
     original_tweet_id integer
 );
 
@@ -2305,8 +2314,8 @@ CREATE TABLE public.users (
     notification_unstolen boolean DEFAULT true,
     my_bikes_hash jsonb,
     preferred_language character varying,
-    last_login_ip character varying,
-    magic_link_token text
+    magic_link_token text,
+    last_login_ip character varying
 );
 
 
@@ -3764,6 +3773,27 @@ CREATE INDEX index_theft_alerts_on_theft_alert_plan_id ON public.theft_alerts US
 --
 
 CREATE INDEX index_theft_alerts_on_user_id ON public.theft_alerts USING btree (user_id);
+
+
+--
+-- Name: index_tweets_on_original_tweet_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tweets_on_original_tweet_id ON public.tweets USING btree (original_tweet_id);
+
+
+--
+-- Name: index_tweets_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tweets_on_stolen_record_id ON public.tweets USING btree (stolen_record_id);
+
+
+--
+-- Name: index_tweets_on_twitter_account_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tweets_on_twitter_account_id ON public.tweets USING btree (twitter_account_id);
 
 
 --
