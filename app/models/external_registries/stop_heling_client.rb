@@ -54,7 +54,10 @@ module ExternalRegistries
         if Rails.env.production?
           # Fail gracefully but notify Honeybadger if the request fails.
           # Typically an HMAC key error message will be returned as a Hash.
-          Honeybadger.notify(request: req_params, response: response_body)
+          Honeybadger.notify("StopHeling API request failed", {
+            error_class: "StopHelingClient",
+            context: { request: req_params, response: response_body },
+          })
         end
         []
       end
