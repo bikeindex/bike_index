@@ -7,6 +7,13 @@ class TwitterAccount < ActiveRecord::Base
   serialize :twitter_account_info
   attr_accessor :no_geocode
 
+  validates :screen_name,
+            :consumer_key,
+            :consumer_secret,
+            :user_token,
+            :user_secret,
+            presence: true
+
   geocoded_by :address
   after_validation :geocode, if: lambda { !no_geocode && address.present? && (latitude.blank? || address_changed?) }
   before_save :reverse_geocode, if: lambda { !no_geocode && latitude.present? && (state.blank? || state_changed?) }
@@ -19,17 +26,6 @@ class TwitterAccount < ActiveRecord::Base
       account.state = geo.state_code
       account.neighborhood = geo.neighborhood
     end
-  end
-
-  def self.create_from_twitter_oauth(info)
-    create(
-      screen_name: info.dig("info", "nickname"),
-      address: info.dig("info", "location"),
-      consumer_key: ENV.fetch("TWITTER_CONSUMER_KEY"),
-      consumer_secret: ENV.fetch("TWITTER_CONSUMER_SECRET"),
-      user_token: info.dig("credentials", "token"),
-      user_secret: info.dig("credentials", "secret"),
-    )
   end
 
   def self.fuzzy_screen_name_find(name)

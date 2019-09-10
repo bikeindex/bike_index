@@ -1,5 +1,12 @@
 FactoryBot.define do
   factory :twitter_account do
+    sequence(:screen_name) { "TestTwitterAccount" }
+    consumer_key { "CONSUMER_KEY" }
+    consumer_secret { "CONSUMER_SECRET" }
+    user_token { "ACCESS_TOKEN" }
+    user_secret { "ACCESS_SECRET" }
+    twitter_account_info { { name: "name", profile_image_url_https: "https://example.com/image.jpg" } }
+
     address { "278 Broadway, New York, NY 10007, USA" }
     latitude { 40.7143528 }
     longitude { -74.0059731 }

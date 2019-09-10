@@ -11,7 +11,7 @@ RSpec.describe TwitterAccount, type: :model do
     end
 
     it "should geocode and then reverse geocode on save" do
-      twitter_account = TwitterAccount.new(address: "3554 W Shakespeare Ave, Chicago IL 60647")
+      twitter_account = FactoryBot.create(:twitter_account, address: "3554 W Shakespeare Ave, Chicago IL 60647")
       expect(twitter_account).to receive(:fetch_account_info).and_return(true)
 
       twitter_account.save
