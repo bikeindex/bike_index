@@ -14,9 +14,9 @@ class TwitterAccount < ActiveRecord::Base
             presence: true
 
   geocoded_by :address
-  after_validation :geocode, if: lambda { !no_geocode && address.present? && (latitude.blank? || address_changed?) }
-  before_save :reverse_geocode, if: lambda { !no_geocode && latitude.present? && (state.blank? || state_changed?) }
-  before_save :fetch_account_info, if: lambda { twitter_account_info.blank? }
+  after_validation :geocode, if: -> { !no_geocode && address.present? && (latitude.blank? || address_changed?) }
+  before_save :reverse_geocode, if: -> { !no_geocode && latitude.present? && (state.blank? || state_changed?) }
+  before_save :fetch_account_info
 
   reverse_geocoded_by :latitude, :longitude do |account, results|
     if (geo = results.first)
