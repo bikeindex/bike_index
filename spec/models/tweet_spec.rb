@@ -24,6 +24,24 @@ RSpec.describe Tweet, type: :model do
     end
   end
 
+  describe "#retweet?" do
+    context "given no original tweet" do
+      it "returns false" do
+        tweet = FactoryBot.create(:tweet, original_tweet: nil)
+        expect(tweet).to_not be_retweet
+      end
+    end
+
+    context "given an original tweet" do
+      it "returns true" do
+        tweet = FactoryBot.create(:tweet, original_tweet: nil)
+        retweet = FactoryBot.create(:tweet, original_tweet: tweet)
+        expect(tweet).to_not be_retweet
+        expect(retweet).to be_retweet
+      end
+    end
+  end
+
   describe "ensure_valid_alignment" do
     it "adds an error if alignment invalid" do
       expect(Tweet.new(twitter_id: 111, alignment: "weird").valid?).to be_falsey

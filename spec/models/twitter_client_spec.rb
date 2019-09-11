@@ -6,16 +6,14 @@ RSpec.describe TwitterClient, type: :model do
     expect(TwitterClient).to_not respond_to(:new)
   end
 
-  it "delegates class methods to the client instance" do
-    client = double("Twitter::REST::Client", status: {}, user_timeline: {})
-    allow(Twitter::REST::Client).to receive(:new).and_return(client)
+  it "delegates class methods to the client instance", vcr: true do
+    tweet_id = 1170061123191791622
+    status = TwitterClient.status(tweet_id)
+    expect(status).to be_an_instance_of(Twitter::Tweet)
+    expect(status.id).to eq(tweet_id)
 
-    tweet_id = 133453
-    TwitterClient.status(tweet_id)
-    expect(client).to have_received(:status).with(tweet_id)
-
-    handle = "sferik"
-    TwitterClient.user_timeline(handle)
-    expect(client).to have_received(:user_timeline).with(handle)
+    timeline = TwitterClient.user_timeline("BikeIndexTest")
+    expect(timeline).to be_an_instance_of(Array)
+    expect(timeline).to all(be_an_instance_of(Twitter::Tweet))
   end
 end

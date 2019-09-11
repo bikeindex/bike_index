@@ -73,11 +73,6 @@ FactoryBot.define do
     ctype { FactoryBot.create(:ctype) }
   end
 
-  factory :country do
-    name
-    sequence(:iso) { |n| "D#{n}" }
-  end
-
   factory :state do
     name
     country { FactoryBot.create(:country) }

@@ -101,6 +101,7 @@ CREATE TABLE public.alert_images (
 --
 
 CREATE SEQUENCE public.alert_images_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -134,6 +135,7 @@ CREATE TABLE public.ambassador_task_assignments (
 --
 
 CREATE SEQUENCE public.ambassador_task_assignments_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -166,6 +168,7 @@ CREATE TABLE public.ambassador_tasks (
 --
 
 CREATE SEQUENCE public.ambassador_tasks_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -244,6 +247,7 @@ CREATE TABLE public.bike_code_batches (
 --
 
 CREATE SEQUENCE public.bike_code_batches_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -879,6 +883,7 @@ CREATE TABLE public.flipper_features (
 --
 
 CREATE SEQUENCE public.flipper_features_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -912,6 +917,7 @@ CREATE TABLE public.flipper_gates (
 --
 
 CREATE SEQUENCE public.flipper_gates_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -981,6 +987,7 @@ CREATE TABLE public.impound_records (
 --
 
 CREATE SEQUENCE public.impound_records_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2037,7 +2044,8 @@ CREATE TABLE public.stolen_records (
     recovery_link_token text,
     show_address boolean DEFAULT false,
     recovering_user_id integer,
-    recovery_display_status integer DEFAULT 0
+    recovery_display_status integer DEFAULT 0,
+    neighborhood character varying
 );
 
 
@@ -2082,6 +2090,7 @@ CREATE TABLE public.theft_alert_plans (
 --
 
 CREATE SEQUENCE public.theft_alert_plans_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2121,6 +2130,7 @@ CREATE TABLE public.theft_alerts (
 --
 
 CREATE SEQUENCE public.theft_alerts_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2147,7 +2157,10 @@ CREATE TABLE public.tweets (
     image character varying,
     alignment character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    twitter_account_id integer,
+    stolen_record_id integer,
+    original_tweet_id integer
 );
 
 
@@ -2168,6 +2181,55 @@ CREATE SEQUENCE public.tweets_id_seq
 --
 
 ALTER SEQUENCE public.tweets_id_seq OWNED BY public.tweets.id;
+
+
+--
+-- Name: twitter_accounts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.twitter_accounts (
+    id integer NOT NULL,
+    active boolean DEFAULT false NOT NULL,
+    "default" boolean DEFAULT false NOT NULL,
+    "national" boolean DEFAULT false NOT NULL,
+    latitude double precision,
+    longitude double precision,
+    address character varying,
+    append_block character varying,
+    city character varying,
+    consumer_key character varying NOT NULL,
+    consumer_secret character varying NOT NULL,
+    country character varying,
+    language character varying,
+    neighborhood character varying,
+    screen_name character varying NOT NULL,
+    state character varying,
+    user_secret character varying NOT NULL,
+    user_token character varying NOT NULL,
+    twitter_account_info jsonb DEFAULT '{}'::jsonb,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: twitter_accounts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.twitter_accounts_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: twitter_accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.twitter_accounts_id_seq OWNED BY public.twitter_accounts.id;
 
 
 --
@@ -2252,8 +2314,8 @@ CREATE TABLE public.users (
     notification_unstolen boolean DEFAULT true,
     my_bikes_hash jsonb,
     preferred_language character varying,
-    last_login_ip character varying,
-    magic_link_token text
+    magic_link_token text,
+    last_login_ip character varying
 );
 
 
@@ -2693,6 +2755,13 @@ ALTER TABLE ONLY public.theft_alerts ALTER COLUMN id SET DEFAULT nextval('public
 --
 
 ALTER TABLE ONLY public.tweets ALTER COLUMN id SET DEFAULT nextval('public.tweets_id_seq'::regclass);
+
+
+--
+-- Name: twitter_accounts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.twitter_accounts ALTER COLUMN id SET DEFAULT nextval('public.twitter_accounts_id_seq'::regclass);
 
 
 --
@@ -3154,6 +3223,14 @@ ALTER TABLE ONLY public.theft_alerts
 
 ALTER TABLE ONLY public.tweets
     ADD CONSTRAINT tweets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: twitter_accounts twitter_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.twitter_accounts
+    ADD CONSTRAINT twitter_accounts_pkey PRIMARY KEY (id);
 
 
 --
@@ -3696,6 +3773,41 @@ CREATE INDEX index_theft_alerts_on_theft_alert_plan_id ON public.theft_alerts US
 --
 
 CREATE INDEX index_theft_alerts_on_user_id ON public.theft_alerts USING btree (user_id);
+
+
+--
+-- Name: index_tweets_on_original_tweet_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tweets_on_original_tweet_id ON public.tweets USING btree (original_tweet_id);
+
+
+--
+-- Name: index_tweets_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tweets_on_stolen_record_id ON public.tweets USING btree (stolen_record_id);
+
+
+--
+-- Name: index_tweets_on_twitter_account_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tweets_on_twitter_account_id ON public.tweets USING btree (twitter_account_id);
+
+
+--
+-- Name: index_twitter_accounts_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_twitter_accounts_on_latitude_and_longitude ON public.twitter_accounts USING btree (latitude, longitude);
+
+
+--
+-- Name: index_twitter_accounts_on_screen_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_twitter_accounts_on_screen_name ON public.twitter_accounts USING btree (screen_name);
 
 
 --
@@ -4547,6 +4659,12 @@ INSERT INTO schema_migrations (version) VALUES ('20190806214815');
 INSERT INTO schema_migrations (version) VALUES ('20190809200257');
 
 INSERT INTO schema_migrations (version) VALUES ('20190809214414');
+
+INSERT INTO schema_migrations (version) VALUES ('20190829221522');
+
+INSERT INTO schema_migrations (version) VALUES ('20190903145420');
+
+INSERT INTO schema_migrations (version) VALUES ('20190904161424');
 
 INSERT INTO schema_migrations (version) VALUES ('20190909190050');
 

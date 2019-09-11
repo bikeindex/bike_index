@@ -1,0 +1,77 @@
+.row
+  .col-sm-9.col-md-10
+    %h1 Twitter Accounts
+  .col-sm-3.col-md-2
+    = link_to "New Account", new_admin_twitter_account_path, class: "btn btn-success float-right"
+
+%h4
+  = pluralize(TwitterAccount.count, "Twitter account")
+  stored
+
+.full-screen-table-wrapper
+  %table.table.table-striped.table-bordered.table-sm
+    %thead.thead-light
+      %th Created
+      %th Handle
+      %th Active?
+      %th Default?
+      %th National?
+      %th Credentials
+      %th Latitude
+      %th Longitude
+      %th Language
+      %th Address
+      %th Neighborhood
+      %th City
+      %th State
+      %th Country
+      %th Tweets
+
+    %tbody
+      - @twitter_accounts.each do |twitter_account|
+        %tr
+          %td
+            %a.convertTime{ href: admin_twitter_account_path(twitter_account) }
+              = l twitter_account.created_at, format: :convert_time
+          %td= twitter_account.screen_name
+          %td= twitter_account.active?
+          %td= twitter_account.default?
+          %td= twitter_account.national?
+          %td
+            %p
+              %small.less-strong
+                Consumer Key
+                %br
+                = twitter_account.consumer_key
+            %p
+              %small.less-strong
+                Consumer Secret
+                %br
+                = twitter_account.consumer_secret
+            %p
+              %small.less-strong
+                User Secret
+                %br
+                = twitter_account.user_secret
+            %p
+              %small.less-strong
+                User Token
+                %br
+                = twitter_account.user_token
+          %td
+            %small.less-strong= twitter_account.latitude
+          %td
+            %small.less-strong= twitter_account.longitude
+          %td
+            = twitter_account.language
+          %td
+            %small.less-strong= twitter_account.address
+          %td
+            %small.less-strong= twitter_account.neighborhood
+          %td
+            %small.less-strong= twitter_account.city
+          %td
+            %small.less-strong= twitter_account.state
+          %td
+            %small.less-strong= twitter_account.country
+          %td= twitter_account.tweets.count
