@@ -37,7 +37,9 @@ class TwitterTweeterIntegration
       long: stolen_record.longitude,
       display_coordinates: "true",
     }
-    client = twitter_client_start(close_twitter_accounts.first)
+
+    near_twitter_account = close_twitter_accounts.first
+    client = twitter_client_start(near_twitter_account)
     raise ArgumentError, "failed initializing Twitter client" if client.nil?
 
     posted_tweet = nil # If this isn't instantiated, it isn't accessible outside media block.
@@ -54,7 +56,9 @@ class TwitterTweeterIntegration
         posted_tweet = client.update(update_str, update_opts)
       end
     rescue Twitter::Error::Unauthorized => e
-      raise Twitter::Error::Unauthorized, "#{close_twitter_accounts.first.screen_name} #{e}"
+      raise Twitter::Error::Unauthorized, "#{near_twitter_account} #{e}"
+    rescue Twitter::Error::Forbidden => e
+      raise Twitter::Error::Forbidden, "#{near_twitter_account}: #{e}"
     end
 
     self.tweet = Tweet.create(
@@ -71,9 +75,9 @@ class TwitterTweeterIntegration
   def retweet(posted_tweet)
     self.retweets = [posted_tweet]
 
-    close_twitter_accounts.each do |twitter_name|
-      next if twitter_name.id.to_i == tweet.twitter_account_id.to_i
-      client = twitter_client_start(twitter_name)
+    close_twitter_accounts.each do |twitter_account|
+      next if twitter_account.id.to_i == tweet.twitter_account_id.to_i
+      client = twitter_client_start(twitter_account)
       begin
         # retweet returns an array even with scalar parameters
         posted_retweet = client.retweet(tweet.twitter_id).first
@@ -82,13 +86,15 @@ class TwitterTweeterIntegration
         retweets.push(posted_retweet)
         retweet = Tweet.create(
           twitter_id: posted_retweet.id,
-          twitter_account_id: twitter_name.id,
+          twitter_account_id: twitter_account.id,
           stolen_record_id: stolen_record.id,
           original_tweet_id: tweet.id,
         )
         raise StandardError, retweet.errors.full_messages.to_sentence if retweet.id.blank?
       rescue Twitter::Error::Unauthorized => e
-        raise Twitter::Error::Unauthorized, "#{close_twitter_accounts.first.screen_name} #{e}"
+        raise Twitter::Error::Unauthorized, "#{twitter_account}: #{e}"
+      rescue Twitter::Error::Forbidden => e
+        raise Twitter::Error::Forbidden, "#{twitter_account}: #{e}"
       end
     end
     retweets
