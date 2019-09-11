@@ -6,12 +6,13 @@ class TwitterAccount < ActiveRecord::Base
 
   attr_accessor :no_geocode
 
-  validates :screen_name,
-            :consumer_key,
-            :consumer_secret,
-            :user_token,
-            :user_secret,
-            presence: true
+  validates \
+    :consumer_key,
+    :consumer_secret,
+    :user_secret,
+    :user_token,
+    :screen_name,
+    presence: true
 
   geocoded_by :address
   after_validation :geocode, if: -> { !no_geocode && address.present? && (latitude.blank? || address_changed?) }
