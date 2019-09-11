@@ -56,9 +56,9 @@ class TwitterTweeterIntegration
         posted_tweet = client.update(update_str, update_opts)
       end
     rescue Twitter::Error::Unauthorized => e
-      raise Twitter::Error::Unauthorized, "#{near_twitter_account} #{e}"
+      raise Twitter::Error::Unauthorized, "#{near_twitter_account.screen_name} #{e}"
     rescue Twitter::Error::Forbidden => e
-      raise Twitter::Error::Forbidden, "#{near_twitter_account}: #{e}"
+      raise Twitter::Error::Forbidden, "#{near_twitter_account.screen_name}: #{e}"
     end
 
     self.tweet = Tweet.create(
@@ -92,9 +92,9 @@ class TwitterTweeterIntegration
         )
         raise StandardError, retweet.errors.full_messages.to_sentence if retweet.id.blank?
       rescue Twitter::Error::Unauthorized => e
-        raise Twitter::Error::Unauthorized, "#{twitter_account}: #{e}"
+        raise Twitter::Error::Unauthorized, "#{twitter_account.screen_name}: #{e}"
       rescue Twitter::Error::Forbidden => e
-        raise Twitter::Error::Forbidden, "#{twitter_account}: #{e}"
+        raise Twitter::Error::Forbidden, "#{twitter_account.screen_name}: #{e}"
       end
     end
     retweets
