@@ -36,8 +36,13 @@ FactoryBot.define do
         bike.save # updates current_stolen_record
         bike.reload
       end
+
       factory :abandoned_bike do
         abandoned { true }
+      end
+
+      factory :recovered_bike do
+        stolen { false }
       end
     end
 
@@ -92,6 +97,18 @@ FactoryBot.define do
           bike.reload
         end
       end
+    end
+
+    trait :blue_trek_930 do
+      manufacturer { FactoryBot.create(:manufacturer, name: "Trek") }
+      primary_frame_color { FactoryBot.create(:color, name: "Blue") }
+      frame_model { "930" }
+    end
+
+    trait :green_novara_torero do
+      manufacturer { FactoryBot.create(:manufacturer, name: "Novara") }
+      primary_frame_color { FactoryBot.create(:color, name: "Green") }
+      frame_model { "Torero 29\"" }
     end
   end
 end
