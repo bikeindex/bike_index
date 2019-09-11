@@ -5,8 +5,8 @@ class Admin::PaymentsController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @payments = Payment.includes(:user, :organization, :invoice)
-                       .order(sort_column + " " + sort_direction).page(page).per(per_page)
+    @payments = matching_payments.order(sort_column + " " + sort_direction)
+                                 .page(page).per(per_page)
   end
 
   def new
@@ -49,7 +49,18 @@ class Admin::PaymentsController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[id created_at user_id organization_id kind invoice_id amount_cents]
+    %w[created_at user_id organization_id kind invoice_id amount_cents]
+  end
+
+  def matching_payments
+    matching_payments = Payment.includes(:user, :organization, :invoice)
+    if sort_column == "invoice_id"
+      matching_payments.where.not(invoice_id: nil)
+    elsif sort_column == "organization_id"
+      matching_payments.where.not(organization_id: nil)
+    else
+      matching_payments
+    end
   end
 
   def valid_invoice_parameters?
