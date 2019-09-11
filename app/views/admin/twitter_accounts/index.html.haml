@@ -13,13 +13,9 @@
     %thead.thead-light
       %th Created
       %th Handle
-      %th Active?
-      %th Default?
-      %th National?
+      %th Attributes
       %th Credentials
-      %th Latitude
-      %th Longitude
-      %th Language
+      %th Geo
       %th Address
       %th Neighborhood
       %th City
@@ -33,37 +29,56 @@
           %td
             %a.convertTime{ href: admin_twitter_account_path(twitter_account) }
               = l twitter_account.created_at, format: :convert_time
-          %td= twitter_account.screen_name
-          %td= twitter_account.active?
-          %td= twitter_account.default?
-          %td= twitter_account.national?
+          %td= link_to twitter_account.screen_name, "https://twitter.com/#{twitter_account.screen_name}", target: "_blank"
+
           %td
-            %p
-              %small.less-strong
-                Consumer Key
-                %br
-                = twitter_account.consumer_key
-            %p
-              %small.less-strong
-                Consumer Secret
-                %br
-                = twitter_account.consumer_secret
-            %p
-              %small.less-strong
-                User Secret
-                %br
-                = twitter_account.user_secret
-            %p
-              %small.less-strong
-                User Token
-                %br
-                = twitter_account.user_token
+            %small.less-strong
+              %strong active?
+              %br
+              = twitter_account.active?
+              %br
+              %strong default?
+              %br
+              = twitter_account.default?
+              %br
+              %strong national?
+              %br
+              = twitter_account.national?
+              %br
+              %strong language
+              = twitter_account.language || "none set"
+
           %td
-            %small.less-strong= twitter_account.latitude
+            %small.less-strong
+              %strong Consumer Key
+              %br
+              = twitter_account.consumer_key
+              %br
+            %small.less-strong
+              %strong Consumer Secret
+              %br
+              = twitter_account.consumer_secret
+              %br
+            %small.less-strong
+              %strong User Secret
+              %br
+              = twitter_account.user_secret
+              %br
+            %small.less-strong
+              %strong User Token
+              %br
+              = twitter_account.user_token
+              %br
           %td
-            %small.less-strong= twitter_account.longitude
-          %td
-            = twitter_account.language
+            %small.less-strong
+              %strong Latitude
+              %br
+              = twitter_account.latitude || "none"
+              %br
+              %strong Longitude
+              %br
+              = twitter_account.longitude || "none"
+              %br
           %td
             %small.less-strong= twitter_account.address
           %td
