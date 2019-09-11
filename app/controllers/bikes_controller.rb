@@ -203,7 +203,7 @@ class BikesController < ApplicationController
     rescue => e
       flash[:error] = e.message
     end
-    if ParamsNormalizer.boolean(params[:organization_ids_can_edit_claimed_present])
+    if ParamsNormalizer.boolean(params[:organization_ids_can_edit_claimed_present]) || params.key?(:organization_ids_can_edit_claimed)
       update_organizations_can_edit_claimed(@bike, params[:organization_ids_can_edit_claimed])
     end
     assign_bike_codes(params[:bike_code]) if params[:bike_code].present?
