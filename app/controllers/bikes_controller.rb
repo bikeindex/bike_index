@@ -203,7 +203,9 @@ class BikesController < ApplicationController
     rescue => e
       flash[:error] = e.message
     end
-    update_organizations_can_edit_claimed(@bike, params[:organization_ids_can_edit_claimed]) if params.key?(:organization_ids_can_edit_claimed)
+    if ParamsNormalizer.boolean(params[:organization_ids_can_edit_claimed_present])
+      update_organizations_can_edit_claimed(@bike, params[:organization_ids_can_edit_claimed])
+    end
     assign_bike_codes(params[:bike_code]) if params[:bike_code].present?
     @bike = @bike.decorate
 
@@ -334,7 +336,7 @@ class BikesController < ApplicationController
   end
 
   def update_organizations_can_edit_claimed(bike, organization_ids)
-    organization_ids = organization_ids.map(&:to_i)
+    organization_ids = (organization_ids || []).map(&:to_i)
     bike.bike_organizations.each do |bike_organization|
       bike_organization.update_attribute :can_not_edit_claimed, !organization_ids.include?(bike_organization.organization_id)
     end

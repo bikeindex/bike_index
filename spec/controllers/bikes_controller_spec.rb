@@ -1491,11 +1491,29 @@ RSpec.describe BikesController, type: :controller do
         expect(bike.editable_organizations.pluck(:id)).to eq([organization_2.id])
       end
       context "empty organization_ids_can_edit_claimed" do
-        it "updates the bike with the allowed_attributes" do
+        it "updates the bike with the allowed_attributes, marks no organizations can edit claimed" do
           put :update,
               id: bike.id,
               bike: allowed_attributes,
               organization_ids_can_edit_claimed: []
+          expect(response).to redirect_to edit_bike_url(bike)
+          expect(assigns(:bike)).to be_decorated
+          bike.reload
+          expect(bike.hidden).to be_falsey
+          allowed_attributes.except(*skipped_attrs).each do |key, value|
+            pp value, key unless bike.send(key) == value
+            expect(bike.send(key)).to eq value
+          end
+          expect(bike.bike_organization_ids).to match_array([organization.id, organization_2.id])
+          expect(bike.editable_organizations.pluck(:id)).to eq([])
+        end
+      end
+      context "organization_ids_can_edit_claimed_present" do
+        it "updates the bike with the allowed_attributes, marks no organizations can edit claimed" do
+          put :update,
+              id: bike.id,
+              bike: allowed_attributes,
+              organization_ids_can_edit_claimed_present: "1"
           expect(response).to redirect_to edit_bike_url(bike)
           expect(assigns(:bike)).to be_decorated
           bike.reload
