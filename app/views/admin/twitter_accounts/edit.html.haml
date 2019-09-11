@@ -1,20 +1,16 @@
 .admin-subnav
-  .col-6
-    = link_to 'View all Twitter accounts', admin_twitter_accounts_url
+  .col-sm-6
+    %h1
+      %small Update Twitter Account:
+      = @twitter_account.screen_name
+  .col-sm-6.text-right
+    = link_to "Delete account",
+      admin_twitter_account_path(@twitter_account),
+      method: :delete,
+      data: { confirm: "Are you sure you want to delete this? This can't be undone" },
+      class: "btn btn-danger"
 
-  .col-6
-    .text-right
-      = link_to "Delete account",
-        admin_twitter_account_path(@twitter_account),
-        method: :delete,
-        data: { confirm: "Are you sure you want to delete this? This can't be undone" },
-        class: "btn btn-danger"
-
-.container
-  %h1
-    %small Update Twitter Account:
-    = @twitter_account.screen_name
-
+.container-fluid
   = render "form",
     twitter_account: @twitter_account,
     action: admin_twitter_account_path(@twitter_account),
