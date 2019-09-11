@@ -13,9 +13,10 @@
     %thead.thead-light
       %th Created
       %th Handle
-      %th Attributes
-      %th Credentials
-      %th Geo
+      %th Active?
+      %th Default?
+      %th National?
+      %th Language
       %th Address
       %th Neighborhood
       %th City
@@ -28,57 +29,14 @@
         %tr
           %td
             %a.convertTime{ href: admin_twitter_account_path(twitter_account) }
-              = l twitter_account.created_at, format: :convert_time
-          %td= link_to twitter_account.screen_name, "https://twitter.com/#{twitter_account.screen_name}", target: "_blank"
+              = l(twitter_account.created_at, format: :convert_time)
+          %td
+            = link_to twitter_account.screen_name, "https://twitter.com/#{twitter_account.screen_name}", target: "_blank"
 
-          %td
-            %small.less-strong
-              %strong active?
-              %br
-              = twitter_account.active?
-              %br
-              %strong default?
-              %br
-              = twitter_account.default?
-              %br
-              %strong national?
-              %br
-              = twitter_account.national?
-              %br
-              %strong language
-              = twitter_account.language || "none set"
-
-          %td
-            %small.less-strong
-              %strong Consumer Key
-              %br
-              = twitter_account.consumer_key
-              %br
-            %small.less-strong
-              %strong Consumer Secret
-              %br
-              = twitter_account.consumer_secret
-              %br
-            %small.less-strong
-              %strong User Secret
-              %br
-              = twitter_account.user_secret
-              %br
-            %small.less-strong
-              %strong User Token
-              %br
-              = twitter_account.user_token
-              %br
-          %td
-            %small.less-strong
-              %strong Latitude
-              %br
-              = twitter_account.latitude || "none"
-              %br
-              %strong Longitude
-              %br
-              = twitter_account.longitude || "none"
-              %br
+          %td= check_mark if twitter_account.active?
+          %td= check_mark if twitter_account.default?
+          %td= check_mark if twitter_account.national?
+          %td= twitter_account.language
           %td
             %small.less-strong= twitter_account.address
           %td
