@@ -3614,7 +3614,7 @@ en:
       select_other_if_manufacturer_isnt_listed: Select 'Other' if manufacturer isn't
         listed
       state: State
-      sticker_id: Sticker id
+      sticker_id_html: Sticker id <small class='less-strong'>optional</small>
       third_color: Third color
       unknown_serial: Unknown serial
       unknown_year: Unknown year

@@ -4808,7 +4808,7 @@ nl:
         overige informatie in, om je fiets te registreren bij het meest gebruikte
         fietsregister ter wereld.
 
-'
+        '
       identifying_your_bike: Een gebruiker of partner van Bike Index komt jouw fiets
         tegen, gebruikt Bike Index om de fiets te identificeren en kan dan contact
         met je opnemen.
@@ -5045,12 +5045,12 @@ nl:
       select_other_if_manufacturer_isnt_listed: Selecteer 'Overig' als de fabrikant
         niet wordt vermeld
       state: Staat
-      sticker_id: Sticker-ID
       third_color: Derde kleur
       unknown_serial: Onbekende serie
       unknown_year: Onbekend jaar
       unsure_or_unknown: Onzeker of onbekend
       zipcode: Postcode
+      sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
     new:
       bike_index_for_organizations: Bike Index voor organisaties
     new_form:

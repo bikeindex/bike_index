@@ -106,18 +106,18 @@
       .controls
         - affiliation_options = @organization.reg_affiliation_options.map { |a| [a.humanize, a] }
         = f.select :organization_affiliation, affiliation_options, class: "form-control"
+  - if @organization.paid_for?("bike_codes")
+    .input-group
+      .control-group
+        = f.label :bike_code, t(".sticker_id_html"), class: "control-label"
+        .controls
+          = f.text_field :bike_code, value: @b_param.bike_code
   .input-group
     .submit-registration
       = submit_tag t(".register_this"), class: "button-submit"
       = select(:bike, :cycle_type, CycleType.select_options, { required: true })
   %h3
     = t(".optional_additions")
-  - if @organization.paid_for?("bike_codes")
-    .input-group
-      .control-group
-        = f.label :bike_code, t(".sticker_id"), class: "control-label"
-        .controls
-          = f.text_field :bike_code, value: @b_param.bike_code
   / if the organization doesn't require a phone, show the phone as optional
   - if !@organization&.include_field_reg_phone?
     .input-group
