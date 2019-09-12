@@ -16,9 +16,6 @@
       %th Active?
       %th Default?
       %th National?
-      %th Credentials
-      %th Latitude
-      %th Longitude
       %th Language
       %th Address
       %th Neighborhood
@@ -32,38 +29,14 @@
         %tr
           %td
             %a.convertTime{ href: admin_twitter_account_path(twitter_account) }
-              = l twitter_account.created_at, format: :convert_time
-          %td= twitter_account.screen_name
-          %td= twitter_account.active?
-          %td= twitter_account.default?
-          %td= twitter_account.national?
+              = l(twitter_account.created_at, format: :convert_time)
           %td
-            %p
-              %small.less-strong
-                Consumer Key
-                %br
-                = twitter_account.consumer_key
-            %p
-              %small.less-strong
-                Consumer Secret
-                %br
-                = twitter_account.consumer_secret
-            %p
-              %small.less-strong
-                User Secret
-                %br
-                = twitter_account.user_secret
-            %p
-              %small.less-strong
-                User Token
-                %br
-                = twitter_account.user_token
-          %td
-            %small.less-strong= twitter_account.latitude
-          %td
-            %small.less-strong= twitter_account.longitude
-          %td
-            = twitter_account.language
+            = link_to twitter_account.screen_name, "https://twitter.com/#{twitter_account.screen_name}", target: "_blank"
+
+          %td= check_mark if twitter_account.active?
+          %td= check_mark if twitter_account.default?
+          %td= check_mark if twitter_account.national?
+          %td= twitter_account.language
           %td
             %small.less-strong= twitter_account.address
           %td
