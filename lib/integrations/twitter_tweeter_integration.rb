@@ -54,7 +54,7 @@ class TwitterTweeterIntegration
         posted_tweet = client.update(update_str, update_opts)
       end
     rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
-      near_twitter_account.update(last_error: err.message)
+      near_twitter_account.set_error(err.message)
     end
 
     self.tweet = Tweet.new(
@@ -65,9 +65,9 @@ class TwitterTweeterIntegration
     )
 
     if tweet.save
-      near_twitter_account.update(last_error: nil)
+      near_twitter_account.clear_error
     else
-      near_twitter_account.update(last_error: tweet.errors.full_messages.to_sentence)
+      near_twitter_account.set_error(tweet.errors.full_messages.to_sentence)
     end
 
     retweet(posted_tweet)
@@ -95,12 +95,12 @@ class TwitterTweeterIntegration
         )
 
         if retweet.save
-          twitter_account.update(last_error: nil)
+          twitter_account.clear_error
         else
-          twitter_account.update(last_error: retweet.errors.full_messages.to_sentence)
+          twitter_account.set_error(retweet.errors.full_messages.to_sentence)
         end
       rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
-        twitter_account.update(last_error: err.message)
+        twitter_account.set_error(err.message)
       end
     end
 
