@@ -73,6 +73,12 @@ class TwitterAccount < ActiveRecord::Base
     twitter_account_info["profile_image_url_https"]
   end
 
+  def check_credentials
+    update(last_error: nil) if twitter_client.verify_credentials.present?
+  rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
+    update(last_error: err.message)
+  end
+
   def errored?
     last_error.present?
   end
