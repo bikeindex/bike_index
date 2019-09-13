@@ -72,4 +72,8 @@ class TwitterAccount < ActiveRecord::Base
     return if twitter_account_info.blank?
     twitter_account_info["profile_image_url_https"]
   end
+
+  def errored?
+    last_error.present?
+  end
 end

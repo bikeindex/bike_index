@@ -3,6 +3,10 @@ module ApplicationHelper
     "&#x2713;".html_safe
   end
 
+  def cross_mark
+    "&#x274C;".html_safe
+  end
+
   def active_link(link_text, link_path, html_options = {})
     match_controller = html_options.delete(:match_controller)
     html_options[:class] ||= ""
