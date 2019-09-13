@@ -39,9 +39,7 @@ class TwitterTweeterIntegration
     }
 
     near_twitter_account = close_twitter_accounts.first
-    client = twitter_client_start(near_twitter_account)
-    raise ArgumentError, "failed initializing Twitter client" if client.nil?
-
+    client = near_twitter_account.twitter_client
     posted_tweet = nil # If this isn't instantiated, it isn't accessible outside media block.
 
     begin
@@ -81,7 +79,8 @@ class TwitterTweeterIntegration
 
     close_twitter_accounts.each do |twitter_account|
       next if twitter_account.id.to_i == tweet.twitter_account_id.to_i
-      client = twitter_client_start(twitter_account)
+      client = twitter_account.twitter_client
+
       begin
         # retweet returns an array even with scalar parameters
         posted_retweet = client.retweet(tweet.twitter_id).first
@@ -200,17 +199,6 @@ class TwitterTweeterIntegration
 
     bike_slug = components.select(&:present?).join(" ")
     tweet_string_with_options(stolen_slug, bike_slug, bike_url(bike))
-  end
-
-  def twitter_client_start(twitter_account)
-    return if twitter_account.blank?
-
-    Twitter::REST::Client.new do |config|
-      config.consumer_key = twitter_account[:consumer_key]
-      config.consumer_secret = twitter_account[:consumer_secret]
-      config.access_token = twitter_account[:user_token]
-      config.access_token_secret = twitter_account[:user_secret]
-    end
   end
 
   private
