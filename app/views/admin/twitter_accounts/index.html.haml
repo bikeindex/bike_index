@@ -13,6 +13,7 @@
     %thead.thead-light
       %th Created
       %th Handle
+      %th Errored?
       %th Active?
       %th Default?
       %th National?
@@ -33,6 +34,7 @@
           %td
             = link_to twitter_account.screen_name, "https://twitter.com/#{twitter_account.screen_name}", target: "_blank"
 
+          %td= cross_mark if twitter_account.errored?
           %td= check_mark if twitter_account.active?
           %td= check_mark if twitter_account.default?
           %td= check_mark if twitter_account.national?

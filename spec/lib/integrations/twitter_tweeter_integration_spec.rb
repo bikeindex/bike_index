@@ -1,20 +1,6 @@
 require "rails_helper"
 
 RSpec.describe TwitterTweeterIntegration do
-  describe "#twitter_client_start" do
-    it "returns a functional Twitter::REST::Client" do
-      bike = FactoryBot.create(:stolen_bike)
-      twitter_account = FactoryBot.build(:twitter_account_1, :active)
-      allow(bike.current_stolen_record)
-        .to(receive(:twitter_accounts_in_proximity).and_return([twitter_account]))
-
-      integration = TwitterTweeterIntegration.new(bike)
-      client = integration.twitter_client_start(twitter_account)
-
-      expect(client).to be_an_instance_of(Twitter::REST::Client)
-    end
-  end
-
   describe "#build_bike_status" do
     context "stolen bike" do
       let(:bike) { FactoryBot.create(:stolen_bike, :blue_trek_930) }

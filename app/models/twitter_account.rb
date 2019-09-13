@@ -54,15 +54,6 @@ class TwitterAccount < ActiveRecord::Base
     twitter_client.user(screen_name)
   end
 
-  def twitter_client
-    @twitter_client ||= Twitter::REST::Client.new do |config|
-      config.consumer_key = consumer_key
-      config.consumer_secret = consumer_secret
-      config.access_token = user_token
-      config.access_token_secret = user_secret
-    end
-  end
-
   def account_info_name
     return if twitter_account_info.blank?
     twitter_account_info["name"]
@@ -71,5 +62,56 @@ class TwitterAccount < ActiveRecord::Base
   def account_info_image
     return if twitter_account_info.blank?
     twitter_account_info["profile_image_url_https"]
+  end
+
+  def set_error(message)
+    update(last_error: "#{Time.current}: #{message}")
+  end
+
+  def clear_error
+    update(last_error: nil)
+  end
+
+  def errored?
+    last_error.present?
+  end
+
+  def check_credentials
+    clear_error if twitter_client.verify_credentials.present?
+  rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
+    set_error(err.message)
+  end
+
+  def tweet(text, photo = nil, **opts)
+    return unless text.present?
+
+    if photo.present?
+      twitter_client.update_with_media(text, photo, opts)
+    else
+      twitter_client.update(text, opts)
+    end
+  rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
+    set_error(err.message)
+    return
+  end
+
+  def retweet(tweet_id)
+    return unless tweet_id.present?
+
+    twitter_client.retweet(tweet_id).first
+  rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
+    set_error(err.message)
+    return
+  end
+
+  private
+
+  def twitter_client
+    @twitter_client ||= Twitter::REST::Client.new do |config|
+      config.consumer_key = consumer_key
+      config.consumer_secret = consumer_secret
+      config.access_token = user_token
+      config.access_token_secret = user_secret
+    end
   end
 end

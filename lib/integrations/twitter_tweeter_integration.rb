@@ -10,6 +10,7 @@ class TwitterTweeterIntegration
     :city,
     :close_twitter_accounts,
     :max_char,
+    :nearest_twitter_account,
     :neighborhood,
     :retweets,
     :state,
@@ -20,7 +21,8 @@ class TwitterTweeterIntegration
     self.bike = bike
     self.stolen_record = bike.current_stolen_record
     self.bike_photo_url = bike.public_images.first&.image_url
-    self.close_twitter_accounts = stolen_record&.twitter_accounts_in_proximity
+    self.close_twitter_accounts = stolen_record&.twitter_accounts_in_proximity || []
+    self.nearest_twitter_account = close_twitter_accounts.first
     self.city = stolen_record&.city
     self.state = stolen_record&.state&.abbreviation
     self.neighborhood = stolen_record&.neighborhood
@@ -29,44 +31,27 @@ class TwitterTweeterIntegration
   # To manually send a tweet (e.g. if authentication failed)
   # TwitterTweeterIntegration.new(Bike.find_by_bike_index_bike_id(XXX)).create_tweet
   def create_tweet
-    return unless stolen_record.present?
+    return if stolen_record.blank? || nearest_twitter_account.blank?
 
-    update_str = build_bike_status
-    update_opts = {
-      lat: stolen_record.latitude,
-      long: stolen_record.longitude,
-      display_coordinates: "true",
-    }
+    posted_tweet =
+      post_tweet_with_account(nearest_twitter_account,
+                              build_bike_status,
+                              lat: stolen_record.latitude,
+                              long: stolen_record.longitude,
+                              display_coordinates: "true")
 
-    near_twitter_account = close_twitter_accounts.first
-    client = twitter_client_start(near_twitter_account)
-    raise ArgumentError, "failed initializing Twitter client" if client.nil?
+    return if posted_tweet.blank?
 
-    posted_tweet = nil # If this isn't instantiated, it isn't accessible outside media block.
-
-    begin
-      if bike_photo_url.present?
-        Tempfile.open("foto.jpg") do |foto|
-          foto.binmode
-          foto.write open(bike_photo_url).read
-          foto.rewind
-          posted_tweet = client.update_with_media(update_str, foto, update_opts)
-        end
-      else
-        posted_tweet = client.update(update_str, update_opts)
-      end
-    rescue Twitter::Error::Unauthorized => e
-      raise Twitter::Error::Unauthorized, "#{near_twitter_account.screen_name} #{e}"
-    rescue Twitter::Error::Forbidden => e
-      raise Twitter::Error::Forbidden, "#{near_twitter_account.screen_name}: #{e}"
-    end
-
-    self.tweet = Tweet.create(
+    self.tweet = Tweet.new(
       twitter_id: posted_tweet.id,
-      twitter_account_id: close_twitter_accounts.first&.id,
+      twitter_account_id: nearest_twitter_account&.id,
       stolen_record_id: stolen_record&.id,
       twitter_response: posted_tweet.to_json,
     )
+
+    if !tweet.save
+      nearest_twitter_account.set_error(tweet.errors.full_messages.to_sentence)
+    end
 
     retweet(posted_tweet)
     tweet
@@ -77,26 +62,24 @@ class TwitterTweeterIntegration
 
     close_twitter_accounts.each do |twitter_account|
       next if twitter_account.id.to_i == tweet.twitter_account_id.to_i
-      client = twitter_client_start(twitter_account)
-      begin
-        # retweet returns an array even with scalar parameters
-        posted_retweet = client.retweet(tweet.twitter_id).first
-        next if posted_retweet.blank?
+      # retweet returns an array even with scalar parameters
+      posted_retweet = twitter_account.retweet(tweet.twitter_id)
+      next if posted_retweet.blank?
 
-        retweets.push(posted_retweet)
-        retweet = Tweet.create(
-          twitter_id: posted_retweet.id,
-          twitter_account_id: twitter_account.id,
-          stolen_record_id: stolen_record.id,
-          original_tweet_id: tweet.id,
-        )
-        raise StandardError, retweet.errors.full_messages.to_sentence if retweet.id.blank?
-      rescue Twitter::Error::Unauthorized => e
-        raise Twitter::Error::Unauthorized, "#{twitter_account.screen_name}: #{e}"
-      rescue Twitter::Error::Forbidden => e
-        raise Twitter::Error::Forbidden, "#{twitter_account.screen_name}: #{e}"
+      retweets << posted_retweet
+
+      retweet = Tweet.new(
+        twitter_id: posted_retweet.id,
+        twitter_account_id: twitter_account.id,
+        stolen_record_id: stolen_record.id,
+        original_tweet_id: tweet.id,
+      )
+
+      if !retweet.save
+        twitter_account.set_error(retweet.errors.full_messages.to_sentence)
       end
     end
+
     retweets
   end
 
@@ -134,7 +117,7 @@ class TwitterTweeterIntegration
     ts = tweet_string(stolen_slug, bike_slug, url)
 
     if close_twitter_accounts&.first&.append_block.present?
-      block = close_twitter_accounts.first.append_block
+      block = nearest_twitter_account.append_block
       ts << " #{block}" if (ts.length + block.length) < max_char
     end
 
@@ -194,20 +177,27 @@ class TwitterTweeterIntegration
     tweet_string_with_options(stolen_slug, bike_slug, bike_url(bike))
   end
 
-  def twitter_client_start(twitter_account)
-    return if twitter_account.blank?
-
-    Twitter::REST::Client.new do |config|
-      config.consumer_key = twitter_account[:consumer_key]
-      config.consumer_secret = twitter_account[:consumer_secret]
-      config.access_token = twitter_account[:user_token]
-      config.access_token_secret = twitter_account[:user_secret]
-    end
-  end
-
   private
 
   def bike_url(bike)
     "https://bikeindex.org/bikes/#{bike.id}"
+  end
+
+  def post_tweet_with_account(account, text, **opts)
+    return if account.blank?
+    tweet = nil
+
+    if bike_photo_url.present?
+      Tempfile.open("foto.jpg") do |foto|
+        foto.binmode
+        foto.write open(bike_photo_url).read # TODO: Refactor this.
+        foto.rewind
+        tweet = account.tweet(text, foto, opts)
+      end
+    else
+      tweet = account.tweet(text, opts)
+    end
+
+    tweet
   end
 end

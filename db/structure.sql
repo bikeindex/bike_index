@@ -135,7 +135,6 @@ CREATE TABLE public.ambassador_task_assignments (
 --
 
 CREATE SEQUENCE public.ambassador_task_assignments_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -168,7 +167,6 @@ CREATE TABLE public.ambassador_tasks (
 --
 
 CREATE SEQUENCE public.ambassador_tasks_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -247,7 +245,6 @@ CREATE TABLE public.bike_code_batches (
 --
 
 CREATE SEQUENCE public.bike_code_batches_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2208,7 +2205,8 @@ CREATE TABLE public.twitter_accounts (
     user_token character varying NOT NULL,
     twitter_account_info jsonb DEFAULT '{}'::jsonb,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    last_error character varying
 );
 
 
@@ -4667,4 +4665,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190903145420');
 INSERT INTO schema_migrations (version) VALUES ('20190904161424');
 
 INSERT INTO schema_migrations (version) VALUES ('20190909190050');
+
+INSERT INTO schema_migrations (version) VALUES ('20190913132047');
 
