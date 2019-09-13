@@ -55,18 +55,22 @@ class TwitterTweeterIntegration
       else
         posted_tweet = client.update(update_str, update_opts)
       end
-    rescue Twitter::Error::Unauthorized => e
-      raise Twitter::Error::Unauthorized, "#{near_twitter_account.screen_name} #{e}"
-    rescue Twitter::Error::Forbidden => e
-      raise Twitter::Error::Forbidden, "#{near_twitter_account.screen_name}: #{e}"
+    rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
+      near_twitter_account.update(last_error: err.message)
     end
 
-    self.tweet = Tweet.create(
+    self.tweet = Tweet.new(
       twitter_id: posted_tweet.id,
       twitter_account_id: close_twitter_accounts.first&.id,
       stolen_record_id: stolen_record&.id,
       twitter_response: posted_tweet.to_json,
     )
+
+    if tweet.save
+      near_twitter_account.update(last_error: nil)
+    else
+      near_twitter_account.update(last_error: tweet.errors.full_messages.to_sentence)
+    end
 
     retweet(posted_tweet)
     tweet
@@ -84,19 +88,23 @@ class TwitterTweeterIntegration
         next if posted_retweet.blank?
 
         retweets.push(posted_retweet)
-        retweet = Tweet.create(
+        retweet = Tweet.new(
           twitter_id: posted_retweet.id,
           twitter_account_id: twitter_account.id,
           stolen_record_id: stolen_record.id,
           original_tweet_id: tweet.id,
         )
-        raise StandardError, retweet.errors.full_messages.to_sentence if retweet.id.blank?
-      rescue Twitter::Error::Unauthorized => e
-        raise Twitter::Error::Unauthorized, "#{twitter_account.screen_name}: #{e}"
-      rescue Twitter::Error::Forbidden => e
-        raise Twitter::Error::Forbidden, "#{twitter_account.screen_name}: #{e}"
+
+        if retweet.save
+          twitter_account.update(last_error: nil)
+        else
+          twitter_account.update(last_error: retweet.errors.full_messages.to_sentence)
+        end
+      rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
+        twitter_account.update(last_error: err.message)
       end
     end
+
     retweets
   end
 
