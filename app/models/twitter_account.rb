@@ -83,6 +83,8 @@ class TwitterAccount < ActiveRecord::Base
   end
 
   def tweet(text, photo = nil, **opts)
+    return unless text.present?
+
     if photo.present?
       twitter_client.update_with_media(text, photo, opts)
     else
@@ -94,6 +96,8 @@ class TwitterAccount < ActiveRecord::Base
   end
 
   def retweet(tweet_id)
+    return unless tweet_id.present?
+
     twitter_client.retweet(tweet_id).first
   rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
     set_error(err.message)
