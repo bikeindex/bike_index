@@ -3,7 +3,7 @@ class ApproveStolenListingWorker < ApplicationWorker
 
   def perform(bike_id)
     bike = Bike.find(bike_id)
-    new_tweet = TwitterTweeterIntegration.new(bike).create_tweet
+    new_tweet = TwitterTweeterIntegration.new(bike)&.create_tweet
     send_stolen_bike_alert_email(bike, new_tweet)
   end
 

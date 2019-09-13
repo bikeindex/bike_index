@@ -21,7 +21,7 @@ class TwitterTweeterIntegration
     self.bike = bike
     self.stolen_record = bike.current_stolen_record
     self.bike_photo_url = bike.public_images.first&.image_url
-    self.close_twitter_accounts = stolen_record&.twitter_accounts_in_proximity
+    self.close_twitter_accounts = stolen_record&.twitter_accounts_in_proximity || []
     self.nearest_twitter_account = close_twitter_accounts.first
     self.city = stolen_record&.city
     self.state = stolen_record&.state&.abbreviation
@@ -184,6 +184,7 @@ class TwitterTweeterIntegration
   end
 
   def post_tweet_with_account(account, text, **opts)
+    return if account.blank?
     tweet = nil
 
     if bike_photo_url.present?
