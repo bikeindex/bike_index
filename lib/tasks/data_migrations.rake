@@ -12,7 +12,9 @@ namespace :data do
         customer_contacts.find_each.with_index(1) do |customer_contact, i|
           customer_contact.update(info_hash: customer_contact.info_hash_text)
 
-          $stdout.print "#{i.to_s.rjust(digits, " ")}/#{total_count}\r"
+          count = [i.to_s.rjust(digits, " "), total_count].join("/")
+          percent = (i * 100 / total_count.to_f).round(1).to_s.rjust(5, " ")
+          $stdout.print "#{count} : #{percent}%\r"
           $stdout.flush
         end
       end
@@ -32,7 +34,9 @@ namespace :data do
         customer_contacts.find_each.with_index(1) do |customer_contact, i|
           customer_contact.update(info_hash_text: customer_contact.info_hash)
 
-          $stdout.print "#{i.to_s.rjust(digits, " ")}/#{total_count}\r"
+          count = [i.to_s.rjust(digits, " "), total_count].join("/")
+          percent = (i * 100 / total_count.to_f).round(1).to_s.rjust(5, " ")
+          $stdout.print "#{count} : #{percent}%\r"
           $stdout.flush
         end
       end
