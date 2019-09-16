@@ -3,6 +3,8 @@
     %h1
       %small Update Twitter Account:
       = @twitter_account.screen_name
+    %small
+      = link_to "View account data", admin_twitter_account_path(@twitter_account)
   .col-sm-6.text-right
     = link_to "Delete account",
       admin_twitter_account_path(@twitter_account),

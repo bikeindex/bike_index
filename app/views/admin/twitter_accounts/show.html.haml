@@ -1,36 +1,58 @@
 .admin-subnav
   .col-6
     .mr-4
-      = link_to 'Update this account', edit_admin_twitter_account_url(@twitter_account)
-  .col-6
-    .text-right
-      = link_to "Delete account",
-        admin_twitter_account_path(@twitter_account),
-        method: :delete,
-        data: { confirm: "Are you sure you want to delete this? This can't be undone" },
-        class: "btn btn-danger"
+      = link_to "Edit", edit_admin_twitter_account_url(@twitter_account), class: "btn btn-lg btn-success"
 
+- if @twitter_account.errored?
+  .row.mt-4.mb-4
+    .card.ml-auto.mr-auto.col-8
+      .card-body
+        %h4.text-danger
+          %em
+            #{@twitter_account.screen_name} has an Error!
+        %table.table-list.mt-4
+          %tbody
+            %tr
+              %td
+                Error at:
+              %td
+                %span.convertTime
+                  = l @twitter_account.last_error_at, format: :convert_time
+            %tr
+              %td
+                Error
+              %td
+                = @twitter_account.last_error
 .row
   .col-md-6
     %h1
       %small Twitter Account:
       = @twitter_account.screen_name
+    %small
+      = link_to "view on twitter", "https://twitter.com/#{@twitter_account.screen_name}"
 
-    %table.table-list
+    %table.table-list.mt-2
       %tbody
-        - @twitter_account.attributes.except("twitter_account_info").each_pair do |attr, value|
+        - %w[created_at updated_at last_error_at].each do |attr|
+          %tr
+            %td= attr.humanize
+            %td
+              - if @twitter_account.send(attr).present?
+                %span.convertTime
+                  = l @twitter_account.send(attr), format: :convert_time
+        - @twitter_account.attributes.except("twitter_account_info", "last_error_at", "created_at", "updated_at", "last_error").each_pair do |attr, value|
           %tr
             %td= attr
             %td= value
-
-.row
-  .col-md-6
-    %h3 Tweets
-    = render "admin/tweets/tweets", tweets: @twitter_account.tweets
-
-
-.row
   .col-md-6
     %h3 Twitter Response Data
-    %pre{style: "max-height: 400px; overflow: scroll;"}
+    %pre{ style: "max-height: 600px; overflow: scroll; background: #eeeeee; padding: 10px 2px;" }
       = @twitter_account.twitter_account_info.to_yaml
+
+%h3.mt-4
+  #{@twitter_account.tweets.count} Tweets
+  - if @twitter_account.tweets.count > 25
+    Showing most recent 25
+= render "admin/tweets/tweets", tweets: @twitter_account.tweets.reorder(:created_at).limit(25)
+
+

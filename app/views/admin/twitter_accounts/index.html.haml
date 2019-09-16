@@ -32,7 +32,7 @@
             %a.convertTime{ href: admin_twitter_account_path(twitter_account) }
               = l(twitter_account.created_at, format: :convert_time)
           %td
-            = link_to twitter_account.screen_name, "https://twitter.com/#{twitter_account.screen_name}", target: "_blank"
+            = twitter_account.screen_name
 
           %td= cross_mark if twitter_account.errored?
           %td= check_mark if twitter_account.active?

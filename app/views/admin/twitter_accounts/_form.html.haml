@@ -4,7 +4,7 @@
   html: { class: "form" } do |f|
   .row
     .col-md-6.mb-4
-      .input-group
+      .input-group.mt-2
         = f.label :screen_name, "Twitter handle", class: "form-label mr-4"
         = f.text_field :screen_name, class: 'form-control'
 
@@ -37,36 +37,36 @@
             %strong Keys and Tokens
 
           %fieldset
-            .input-group
+            .input-group.mt-2
               = f.label :user_secret, class: "form-label mr-4"
               = f.text_field :user_secret, class: "form-control"
-            .input-group
+            .input-group.mt-2
               = f.label :user_token, class: "form-label mr-4"
               = f.text_field :user_token, class: "form-control"
-            .input-group
+            .input-group.mt-2
               = f.label :consumer_key, class: "form-label mr-4"
               = f.text_field :consumer_key, class: "form-control"
-            .input-group
+            .input-group.mt-2
               = f.label :consumer_secret, class: "form-label mr-4"
               = f.text_field :consumer_secret, class: "form-control"
 
     %fieldset.col-md-6.mb-4
-      .input-group
+      .input-group.mt-2
         = f.label :address, class: "form-label mr-4"
         = f.text_field :address, class: "form-control"
-      .input-group
+      .input-group.mt-2
         = f.label :city, class: "form-label mr-4"
         = f.text_field :city, class: "form-control"
-      .input-group
+      .input-group.mt-2
         = f.label :neighborhood, class: "form-label mr-4"
         = f.text_field :neighborhood, class: "form-control"
-      .input-group
+      .input-group.mt-2
         = f.label :state, class: "form-label mr-4"
         = f.text_field :state, class: "form-control"
-      .input-group
+      .input-group.mt-2
         = f.label :country, class: "form-label mr-4"
         = f.text_field :country, class: "form-control"
-      .input-group
+      .input-group.mt-2
         = f.label :language, class: "form-label mr-4"
         = f.text_field :language, class: "form-control"
     .col-md-6
@@ -76,10 +76,10 @@
             %em.text-warning
               Probably don't edit
             Latitude and Longitude will be set automatically from the address
-          .input-group
+          .input-group.mt-2
             = f.label :latitude, class: "form-label mr-4"
             = f.text_field :latitude, class: "form-control"
-          .input-group
+          .input-group.mt-2
             = f.label :longitude, class: "form-label mr-4"
             = f.text_field :longitude, class: "form-control"
 
