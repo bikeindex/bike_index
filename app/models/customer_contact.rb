@@ -14,21 +14,9 @@ class CustomerContact < ActiveRecord::Base
 
   before_save :normalize_emails_and_find_users
 
-  # TODO: Remove below once `info_hash` migration is complete
-
-  serialize :info_hash_text
-  before_save :sync_info_hash_fields
-
   def info_hash
-    (info_hash_text || {}).with_indifferent_access
+    @info_hash ||= self[:info_hash].with_indifferent_access
   end
-
-  def sync_info_hash_fields
-    self[:info_hash_text] ||= self[:info_hash]
-    self[:info_hash] ||= self[:info_hash_text]
-  end
-
-  # TODO: Remove above once `info_hash` migration is complete
 
   def normalize_emails_and_find_users
     self.user_email = EmailNormalizer.normalize(user_email)
