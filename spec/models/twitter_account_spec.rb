@@ -27,20 +27,21 @@ RSpec.describe TwitterAccount, type: :model do
     it "gets the twitter account info" do
       twitter_account = FactoryBot.create(:twitter_account_1, :active)
 
-      twitter_account.fetch_account_info
+      pp twitter_account.fetch_account_info
 
       account_hash = twitter_account.twitter_account_info
       expect(account_hash["name"]).to be_present
       expect(account_hash["profile_image_url_https"]).to be_present
     end
 
-    it "sets the account info from fetch_account_info" do
+    it "sets the account info from fetch_account_info on save" do
       twitter_account = FactoryBot.build(:twitter_account, twitter_account_info: {})
-      expect(twitter_account).to receive(:twitter_user).and_return({ screen_name: "foo" })
+      expect(twitter_account).to receive(:twitter_user).and_return({ screen_name: "foo", created_at: "Sun Jun 22 20:46:35 +0000 2014" })
 
-      twitter_account.fetch_account_info
-
-      expect(twitter_account.twitter_account_info).to eq({ "screen_name" => "foo" })
+      twitter_account.save
+      twitter_account.reload
+      expect(twitter_account.twitter_account_info).to be_present
+      expect(twitter_account.created_at).to be_within(1.second).of Time.at(1403469995)
     end
 
     it "does nothing if account info is present" do
@@ -51,11 +52,6 @@ RSpec.describe TwitterAccount, type: :model do
 
       expect(twitter_account).to_not have_received(:twitter_user)
       expect(twitter_account.twitter_account_info).to eq("screen_name" => "BikeIndex")
-    end
-
-    it "has a before_save filter" do
-      expect(TwitterAccount._save_callbacks.select { |cb| cb.kind.eql?(:before) }.
-        map(&:raw_filter).include?(:fetch_account_info)).to be_truthy
     end
   end
 

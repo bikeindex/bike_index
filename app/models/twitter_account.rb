@@ -46,12 +46,13 @@ class TwitterAccount < ActiveRecord::Base
   end
 
   def fetch_account_info
-    return if twitter_account_info.present?
-    self.twitter_account_info = twitter_user.to_h
+    return twitter_account_url if twitter_account_info.present?
+    self.twitter_account_info = twitter_user
+    self.created_at = TimeParser.parse(twitter_account_info["created_at"])
   end
 
   def twitter_user
-    twitter_client.user(screen_name)
+    @twitter_user ||= twitter_client.user(screen_name).to_h
   end
 
   def account_info_name
