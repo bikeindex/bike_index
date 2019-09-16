@@ -1,7 +1,4 @@
 class TwitterAccount < ActiveRecord::Base
-  scope :active, -> { where(active: true) }
-  scope :national, -> { active.where(national: true) }
-
   has_many :tweets, dependent: :destroy
 
   attr_accessor :no_geocode
@@ -18,6 +15,10 @@ class TwitterAccount < ActiveRecord::Base
   after_validation :geocode, if: -> { !no_geocode && address.present? && (latitude.blank? || address_changed?) }
   before_save :reverse_geocode, if: -> { !no_geocode && latitude.present? && (state.blank? || state_changed?) }
   before_save :fetch_account_info
+
+  scope :active, -> { where(active: true) }
+  scope :national, -> { active.where(national: true) }
+  scope :errored, -> { where.not(last_error_at: nil) }
 
   reverse_geocoded_by :latitude, :longitude do |account, results|
     if (geo = results.first)
@@ -49,6 +50,7 @@ class TwitterAccount < ActiveRecord::Base
     return twitter_account_url if twitter_account_info.present?
     self.twitter_account_info = twitter_user
     self.created_at = TimeParser.parse(twitter_account_info["created_at"])
+    twitter_account_info
   end
 
   def twitter_user
@@ -66,11 +68,11 @@ class TwitterAccount < ActiveRecord::Base
   end
 
   def set_error(message)
-    update(last_error: "#{Time.current}: #{message}")
+    update(last_error: message, last_error_at: Time.current)
   end
 
   def clear_error
-    update(last_error: nil)
+    update(last_error: nil, last_error_at: nil)
   end
 
   def errored?
