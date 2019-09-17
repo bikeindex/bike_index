@@ -1,22 +1,42 @@
 class CustomerContact < ActiveRecord::Base
-  validates_presence_of :title
-  validates_presence_of :body
-  validates_presence_of :contact_type
-  # validates_presence_of :creator_id
-  validates_presence_of :bike_id
-  validates_presence_of :creator_email
-  validates_presence_of :user_email
-  serialize :info_hash
-
   belongs_to :bike
   belongs_to :user
   belongs_to :creator, class_name: "User"
 
-  before_save :normalize_email_and_find_user
+  validates \
+    :bike,
+    :body,
+    :contact_type,
+    :creator_email,
+    :title,
+    :user_email,
+    presence: true
 
-  def normalize_email_and_find_user
+  before_save :normalize_emails_and_find_users
+
+  # TODO: Remove below once `info_hash` migration is complete
+
+  serialize :info_hash_text
+  before_save :sync_info_hash_fields
+
+  def info_hash
+    (info_hash_text || {}).with_indifferent_access
+  end
+
+  def sync_info_hash_fields
+    self[:info_hash_text] ||= self[:info_hash]
+    self[:info_hash] ||= self[:info_hash_text]
+  end
+
+  # TODO: Remove above once `info_hash` migration is complete
+
+  def normalize_emails_and_find_users
     self.user_email = EmailNormalizer.normalize(user_email)
     self.user ||= User.fuzzy_confirmed_or_unconfirmed_email_find(user_email)
+
+    self.creator_email = EmailNormalizer.normalize(creator_email)
+    self.creator ||= User.fuzzy_confirmed_or_unconfirmed_email_find(creator_email)
+
     true
   end
 end
