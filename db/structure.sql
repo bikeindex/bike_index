@@ -732,7 +732,8 @@ CREATE TABLE public.customer_contacts (
     bike_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    info_hash text
+    info_hash_text text,
+    info_hash jsonb DEFAULT '{}'::jsonb
 );
 
 
@@ -4661,6 +4662,8 @@ INSERT INTO schema_migrations (version) VALUES ('20190904161424');
 INSERT INTO schema_migrations (version) VALUES ('20190909190050');
 
 INSERT INTO schema_migrations (version) VALUES ('20190913132047');
+
+INSERT INTO schema_migrations (version) VALUES ('20190916190441');
 
 INSERT INTO schema_migrations (version) VALUES ('20190916191514');
 
