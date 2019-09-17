@@ -1,8 +1,9 @@
 class Admin::TwitterAccountsController < Admin::BaseController
+  include SortableTable
   before_filter :find_twitter_account, only: %i[show edit update destroy]
 
   def index
-    @twitter_accounts = TwitterAccount.order(created_at: :desc)
+    @twitter_accounts = matching_twitter_accounts.reorder(sort_column + " " + sort_direction)
   end
 
   def show; end
@@ -46,6 +47,10 @@ class Admin::TwitterAccountsController < Admin::BaseController
 
   private
 
+  def sortable_columns
+    %w[screen_name created_at email language country city last_error_at national]
+  end
+
   def permitted_parameters
     params.require(:twitter_account).permit(
       :active,
@@ -66,6 +71,16 @@ class Admin::TwitterAccountsController < Admin::BaseController
       :user_secret,
       :user_token,
     )
+  end
+
+  def matching_twitter_accounts
+    if sort_column == "last_error_at" # If sorting by last_error_at, show the error
+      sort_direction == "desc" ? TwitterAccount.errored : TwitterAccount.where(last_error_at: nil)
+    elsif sort_column == "national" # If national, show only national one direction, only non the other
+      TwitterAccount.where(national: sort_direction == "asc")
+    else
+      TwitterAccount
+    end
   end
 
   def find_twitter_account

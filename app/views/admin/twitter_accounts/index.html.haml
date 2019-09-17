@@ -1,28 +1,28 @@
-.row
+.admin-subnav
   .col-sm-9.col-md-10
     %h1 Twitter Accounts
   .col-sm-3.col-md-2
     = link_to "New Account", new_admin_twitter_account_path, class: "btn btn-success float-right"
 
-%h4
-  = pluralize(TwitterAccount.count, "Twitter account")
-  stored
+  .col-12.mt-4
+    %h4
+      = pluralize(@twitter_accounts.count, "Matching Twitter account")
 
 .full-screen-table-wrapper
   %table.table.table-striped.table-bordered.table-sm
     %thead.thead-light
-      %th Created
-      %th Handle
-      %th Errored?
+      %th= sortable "created_at"
+      %th= sortable "screen_name", "Handle"
+      %th= sortable "last_error_at", "Errored?"
       %th Active?
       %th Default?
-      %th National?
-      %th Language
+      %th= sortable "national", "National?"
+      %th= sortable "language"
       %th Address
       %th Neighborhood
-      %th City
+      %th= sortable "city"
       %th State
-      %th Country
+      %th= sortable "country"
       %th Tweets
 
     %tbody
@@ -32,7 +32,7 @@
             %a.convertTime{ href: admin_twitter_account_path(twitter_account) }
               = l(twitter_account.created_at, format: :convert_time)
           %td
-            = link_to twitter_account.screen_name, "https://twitter.com/#{twitter_account.screen_name}", target: "_blank"
+            = twitter_account.screen_name
 
           %td= cross_mark if twitter_account.errored?
           %td= check_mark if twitter_account.active?
