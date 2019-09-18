@@ -270,6 +270,7 @@ en:
         creator: :activerecord.models.creator
         creator_email: Creator email
         info_hash: Info hash
+        kind: Kind
         title: Title
         user: :activerecord.models.user
         user_email: User email

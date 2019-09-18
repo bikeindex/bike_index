@@ -13,6 +13,7 @@ RSpec.describe Admin::CustomerContactsController, type: :controller do
         title: "some title",
         body: "some message",
         contact_type: "stolen_contact",
+        kind: :stolen_contact,
       }
       set_current_user(user)
       expect do
