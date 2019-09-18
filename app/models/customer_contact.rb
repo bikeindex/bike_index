@@ -15,9 +15,8 @@ class CustomerContact < ActiveRecord::Base
   validates \
     :bike,
     :body,
-    :contact_type,
-    :kind,
     :creator_email,
+    :kind,
     :title,
     :user_email,
     presence: true
@@ -36,12 +35,5 @@ class CustomerContact < ActiveRecord::Base
     self.creator ||= User.fuzzy_confirmed_or_unconfirmed_email_find(creator_email)
 
     true
-  end
-
-  # TODO: Remove after `contact_type` is migrated to `kind` enum
-  before_save :sync_contact_type_and_kind
-
-  def sync_contact_type_and_kind
-    self[:kind] = self.class.kinds[self[:contact_type]]
   end
 end

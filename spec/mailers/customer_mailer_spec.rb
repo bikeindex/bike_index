@@ -132,7 +132,6 @@ RSpec.describe CustomerMailer, type: :mailer do
                              creator_email: user.email,
                              body: "some message",
                              kind: :stolen_contact,
-                             contact_type: "stolen_contact",
                              bike_id: stolen_record.bike.id,
                              title: "some title")
     end

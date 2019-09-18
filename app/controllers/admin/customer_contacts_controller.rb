@@ -17,7 +17,6 @@ class Admin::CustomerContactsController < Admin::BaseController
     params.require(:customer_contact).permit(
       :bike_id,
       :body,
-      :contact_type,
       :creator_email,
       :creator_id,
       :kind,

@@ -16,9 +16,9 @@ RSpec.describe CustomerContact, type: :model do
       expect(subject).to be_invalid
     end
 
-    it "validates presence of contact_type" do
+    it "validates presence of kind" do
       expect(subject).to be_valid
-      subject.contact_type = nil
+      subject.kind = nil
       expect(subject).to be_invalid
     end
 
