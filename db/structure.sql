@@ -727,7 +727,6 @@ CREATE TABLE public.customer_contacts (
     creator_id integer,
     creator_email character varying(255),
     title character varying(255),
-    contact_type character varying(255),
     body text,
     bike_id integer,
     created_at timestamp without time zone NOT NULL,
@@ -4670,4 +4669,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190916190442');
 INSERT INTO schema_migrations (version) VALUES ('20190916191514');
 
 INSERT INTO schema_migrations (version) VALUES ('20190918121951');
+
+INSERT INTO schema_migrations (version) VALUES ('20190918143646');
 

@@ -266,7 +266,6 @@ en:
       customer_contact:
         bike: :activerecord.models.bike
         body: Body
-        contact_type: Contact type
         creator: :activerecord.models.creator
         creator_email: Creator email
         info_hash: Info hash
