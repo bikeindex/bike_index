@@ -410,7 +410,6 @@ nl:
         slug: Naaktslak
       customer_contact:
         body: Lichaam
-        contact_type: Contact type
         creator_email: E-mailadres van maker
         info_hash: Info Hash
         title: Titel
