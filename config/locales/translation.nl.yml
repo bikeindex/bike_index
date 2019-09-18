@@ -415,6 +415,7 @@ nl:
         info_hash: Info Hash
         title: Titel
         user_email: gebruikers e-mail
+        kind: Soort
       doorkeeper/access_grant:
         expires_in: Verloopt in
         redirect_uri: redirect URI
