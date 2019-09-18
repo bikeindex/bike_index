@@ -3,10 +3,20 @@ class CustomerContact < ActiveRecord::Base
   belongs_to :user
   belongs_to :creator, class_name: "User"
 
+  KIND_ENUM = {
+    stolen_contact: 0,
+    stolen_twitter_alerter: 1,
+    held_bike_notification: 2,
+    externally_held_bike_notification: 3,
+  }.freeze
+
+  enum kind: KIND_ENUM
+
   validates \
     :bike,
     :body,
     :contact_type,
+    :kind,
     :creator_email,
     :title,
     :user_email,
