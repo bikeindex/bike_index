@@ -23,6 +23,18 @@ class CustomerContact < ActiveRecord::Base
 
   before_save :normalize_emails_and_find_users
 
+  def self.build_held_bike_notification(bike:, subject:, body:, sender:)
+    attrs = {
+      bike: bike,
+      body: body,
+      creator_email: sender,
+      kind: :held_bike_notification,
+      title: subject,
+      user_email: bike.owner_email,
+    }
+    new(attrs)
+  end
+
   def info_hash
     @info_hash ||= self[:info_hash].with_indifferent_access
   end
