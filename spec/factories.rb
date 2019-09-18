@@ -114,5 +114,6 @@ FactoryBot.define do
     creator_email { "something@example.com" }
     user_email { "something_else@example.com" }
     contact_type { "stolen_message" }
+    kind { :stolen_message }
   end
 end

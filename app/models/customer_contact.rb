@@ -37,4 +37,11 @@ class CustomerContact < ActiveRecord::Base
 
     true
   end
+
+  # TODO: Remove after `contact_type` is migrated to `kind` enum
+  before_save :sync_contact_type_and_kind
+
+  def sync_contact_type_and_kind
+    self[:kind] = self.class.kinds[self[:contact_type]]
+  end
 end

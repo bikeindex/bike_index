@@ -11,6 +11,7 @@ module Api
             customer_contact = CustomerContact.new(body: "EMPTY",
                                                    bike_id: bike.id,
                                                    contact_type: "stolen_twitter_alerter",
+                                                   kind: :stolen_twitter_alerter,
                                                    title: title_tag(bike),
                                                    user_email: bike.owner_email,
                                                    creator_email: "bryan@bikeindex.org",
