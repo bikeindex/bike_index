@@ -266,6 +266,7 @@ en:
       customer_contact:
         bike: :activerecord.models.bike
         body: Body
+        contact_type: Contact type
         creator: :activerecord.models.creator
         creator_email: Creator email
         info_hash: Info hash
@@ -1376,7 +1377,6 @@ en:
         to this %{bike_type}.
     stolen_checklist:
       a_photo_of_your_bike_type: a photo of your %{bike_type}
-      a_police_report: a Police Report Number
       add: Add
       add_bike_link_to_your_theft_report_html: Add %{bike_link} to your theft report
       add_serial_number: Add serial number
@@ -1400,6 +1400,18 @@ en:
         listing)
       share_widely_on_your_personal_social: Share widely on your personal social media
       supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
+      your_police_report: your Police Report Number
+    stolen_checklist_how_to_police_report:
+      nl_digid_required: "(DigiD required)"
+      nl_file_police_report: File a Police report!
+      nl_online: Online
+      nl_person: In Person
+      nl_person_report: Search for the closest police station,
+      nl_phone: By Phone
+      nl_phone_report: >-
+        call 0900-8844. You will usually get a phone call appointment for later, at
+        which point you'll give the information to the Police
+      nl_website_link_text: at this plitie.nl webpage
     theft_alerts_table:
       created: Created
       end: End

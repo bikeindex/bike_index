@@ -415,6 +415,7 @@ nl:
         title: Titel
         user_email: gebruikers e-mail
         kind: Soort
+        contact_type: Contact type
       doorkeeper/access_grant:
         expires_in: Verloopt in
         redirect_uri: redirect URI
@@ -2068,7 +2069,6 @@ nl:
       abandoned: Verlaten
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
-      a_police_report: een politierapportnummer
       add: Toevoegen
       add_bike_link_to_your_theft_report_html: Voeg %{bike_link} toe aan uw diefstalrapport
       add_serial_number: Voeg serienummer toe
@@ -2091,6 +2091,7 @@ nl:
         hebben bekeken)
       share_widely_on_your_personal_social: Deel veel op uw persoonlijke sociale media
       supercharge_sharing_on_facebook: Superchar delen op Facebook met Bike Index
+      your_police_report: uw politierapportnummer
     theft_alerts_table:
       created: Gemaakt
       end: Einde
@@ -2098,6 +2099,16 @@ nl:
       plan: Plan
       start: Begin
       status: Toestand
+    stolen_checklist_how_to_police_report:
+      nl_digid_required: "(DigiD vereist)"
+      nl_file_police_report: Dien een politierapport in!
+      nl_online: Online
+      nl_person: Persoonlijk
+      nl_person_report: Zoeken naar het dichtstbijzijnde politiebureau,
+      nl_phone: Per telefoon
+      nl_phone_report: bel 0900-8844. Meestal krijgt u later een telefoongesprekafspraak,
+        waarna u de informatie aan de politie doorgeeft
+      nl_website_link_text: op deze plitie.nl webpagina
   controllers:
     bikes:
       edit:
@@ -4808,7 +4819,7 @@ nl:
         overige informatie in, om je fiets te registreren bij het meest gebruikte
         fietsregister ter wereld.
 
-'
+        '
       identifying_your_bike: Een gebruiker of partner van Bike Index komt jouw fiets
         tegen, gebruikt Bike Index om de fiets te identificeren en kan dan contact
         met je opnemen.
