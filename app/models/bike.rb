@@ -75,6 +75,8 @@ class Bike < ActiveRecord::Base
   }
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
+  scope :abandoned, -> { where(abandoned: true) }
+  scope :held, -> { stolen.abandoned }
   scope :organized, -> { where.not(creation_organization_id: nil) }
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
   scope :impounded, -> { includes(:impound_records).where(impound_records: { retrieved_at: nil }).where.not(impound_records: { id: nil }) }
