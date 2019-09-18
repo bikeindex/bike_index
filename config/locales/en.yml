@@ -1401,6 +1401,15 @@ en:
         listing)
       share_widely_on_your_personal_social: Share widely on your personal social media
       supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
+    stolen_checklist_how_to_police_report:
+      nl_file_police_report: File a Police report!
+      nl_online: Online
+      nl_website_link_text: at this plitie.nl webpage
+      nl_digid_required: (DigiD required)
+      nl_phone: By Phone
+      nl_phone_report: call 0900-8844. You will usually get a phone call appointment for later, at which point you'll give the information to the Police
+      nl_person: In Person
+      nl_person_report: Search for the closest police station,
     theft_alerts_table:
       created: Created
       end: End

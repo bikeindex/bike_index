@@ -6,15 +6,24 @@
     %span.checklist-checkbox
       = "&#10003;".html_safe if police_report_present
     %span.checklist-text
-      File a Police report!
+      = t(".nl_file_police_report")
     - unless police_report_present
       %ul
         %li
           %span.checklist-uncheckbox
-          <strong>Online</strong> <a href="https://www.politie.nl/aangifte-of-melding-doen/voorbereiding-aangifte/diefstal-fiets.html" target="_blank">at this plitie.nl webpage</a> <em>(DigiD required)</em>
+          %strong
+            = t(".nl_online")
+          = link_to t(".nl_website_link_text"), "https://www.politie.nl/aangifte-of-melding-doen/voorbereiding-aangifte/diefstal-fiets.html", target: "_blank"
+          %em
+            = t(".nl_digid_required")
         %li
           %span.checklist-uncheckbox
-          <strong>By Phone</strong> call 0900-8844. You will usually get a phone call appointment for later, at which point you give Police the information.
+          %strong
+            = t(".nl_phone")
+          = t(".nl_phone_report")
         %li
           %span.checklist-uncheckbox
-          <strong>In Person</strong> Search for the closest police station via: https://www.politie.nl/mijn-buurt/politiebureaus
+          %strong
+            = t(".nl_person")
+          = t(".nl_person_report")
+          = link_to "www.politie.nl/mijn-buurt/politiebureaus", "https://www.politie.nl/mijn-buurt/politiebureaus"
