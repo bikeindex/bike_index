@@ -100,7 +100,7 @@ module ExternalRegistries
 
     def parse_date_found
       match_data = DATE_REGEX.match(description)
-      return registration_date.in_time_zone("UTC") unless match_data
+      return registration_date&.in_time_zone("UTC") unless match_data
 
       %i[year month day]
         .map { |m| match_data[m] }
@@ -116,7 +116,7 @@ module ExternalRegistries
       return storage_location if storage_location.is_a?(String)
 
       %w[Name City]
-        .map { |key| storage_location[key].presence }
+        .map { |key| storage_location&.fetch(key, nil).presence }
         .compact
         .join(",")
     end

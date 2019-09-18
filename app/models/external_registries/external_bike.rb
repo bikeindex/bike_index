@@ -15,7 +15,6 @@ module ExternalRegistries
       :registry_id,
       :registry_name,
       :registry_url,
-      :serial_number,
       :source_unique_id,
       :thumb,
       :thumb_url,
@@ -26,10 +25,15 @@ module ExternalRegistries
       :frame_colors,
       :frame_model,
       :mnfg_name,
+      :serial_number,
       :source_name,
       :status
 
     alias_method :id, :registry_id
+
+    def serial_number
+      @serial_number ||= SerialNormalizer.new(serial: @serial_number)
+    end
 
     def stolen
       status&.downcase == "stolen"

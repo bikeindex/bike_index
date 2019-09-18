@@ -24,7 +24,10 @@ module ExternalRegistries
 
     # Return an Array of ExternalBike objects
     def search(query, all_pages: true)
-      return [] if query.to_s.length.to_i < MINIMUM_QUERY_LENGTH
+      # The API matches text case-sensitively, indexes it downcased
+      query = query.to_s.downcase
+
+      return [] if query.length.to_i < MINIMUM_QUERY_LENGTH
 
       get_page(query)
 
@@ -60,6 +63,8 @@ module ExternalRegistries
           response.body
         end
 
+      return unless response_json.is_a?(Hash)
+
       set_total(response_json)
       add_page(page, response_json)
     end
@@ -78,14 +83,15 @@ module ExternalRegistries
     def set_total(response, per_page: ITEMS_RECEIVED_PER_PAGE)
       return if response.blank?
 
-      self.total_results ||= response["hits"]["total"]
+      self.total_results ||= response.dig("hits", "total").to_i
       self.total_pages ||= (self.total_results / per_page.to_f).ceil
     end
 
     def add_page(page, response)
       return if response.blank?
 
-      self.result_pages[page] = response["hits"]["hits"].map { |hit| hit["_source"] }
+      results = response.dig("hits", "hits") || []
+      self.result_pages[page] = results.map { |hit| hit["_source"] }
     end
   end
 end

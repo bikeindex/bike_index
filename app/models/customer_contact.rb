@@ -35,6 +35,12 @@ class CustomerContact < ActiveRecord::Base
     new(attrs)
   end
 
+  def self.build_externally_held_bike_notification(**kwargs)
+    contact = build_held_bike_notification(**kwargs)
+    contact.kind = :externally_held_bike_notification
+    contact
+  end
+
   def info_hash
     @info_hash ||= self[:info_hash].with_indifferent_access
   end
