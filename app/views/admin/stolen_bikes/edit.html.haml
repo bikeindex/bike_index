@@ -108,7 +108,6 @@
           .form-group.col-12
             = f.label :bike, "Your stolen bike"
             = f.text_field :title, value: "Your stolen #{@bike.title_string}", class: "form-control"
-            = f.hidden_field :contact_type, value: 'stolen_contact'
             = f.hidden_field :kind, value: 'stolen_contact'
             = f.hidden_field :creator_id, value: current_user.id
             = f.hidden_field :bike_id, value: @bike.id

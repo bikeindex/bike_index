@@ -23,7 +23,6 @@ class ApproveStolenListingWorker < ApplicationWorker
       CustomerContact.new(
         body: "EMPTY",
         bike_id: bike.id,
-        contact_type: "stolen_twitter_alerter",
         kind: :stolen_twitter_alerter,
         title: title_string,
         user_email: bike.owner_email,
