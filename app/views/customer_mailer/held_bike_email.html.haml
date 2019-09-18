@@ -1,0 +1,9 @@
+%p= t(".html.we_think_your_stolen_bike_html", bike_title: @bike.title_string)
+
+%ul
+  %li= link_to @bike.title_string, bike_url(@bike)
+
+  - if @external_registry_match.present?
+    %li
+      = t(".html.found_on")
+      = link_to @external_registry_match.registry_name, @external_registry_match.url

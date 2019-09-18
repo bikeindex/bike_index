@@ -179,4 +179,16 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.body.encoded).to_not match "vendor terms"
     end
   end
+
+  describe "#held_bike_email" do
+    it "renders the held_bike notification email" do
+      bike = FactoryBot.create(:bike, :green_novara_torero)
+
+      mail = CustomerMailer.held_bike_email(bike)
+
+      expect(mail.subject).to eq "We may have found your stolen #{bike.title_string}"
+      expect(mail.from.count).to eq(1)
+      expect(mail.from.first).to eq("contact@bikeindex.org")
+    end
+  end
 end

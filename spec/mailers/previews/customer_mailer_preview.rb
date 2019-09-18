@@ -55,6 +55,15 @@ class CustomerMailerPreview < ActionMailer::Preview
     CustomerMailer.recovered_from_link(recovered_record)
   end
 
+  def held_bike_email
+    bike = Bike.held.last
+    match = ExternalRegistries::VerlorenOfGevondenResult.new("ObjectNumber" => "registry-id")
+
+    customer_contact = CustomerContact.held_bike_notification(bike: bike)
+
+    CustomerMailer.held_bike_email(customer_contact, match)
+  end
+
   private
 
   def preview_user

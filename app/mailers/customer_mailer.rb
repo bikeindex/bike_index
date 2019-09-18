@@ -105,6 +105,17 @@ class CustomerMailer < ActionMailer::Base
     stolen_notification.update_attribute :send_dates, dates
   end
 
+  def held_bike_email(bike, external_registry_match = nil)
+    @bike = bike
+    @user = User.fuzzy_email_find(bike.owner_email)
+    @external_registry_match = external_registry_match
+
+    I18n.with_locale(@user&.preferred_language || I18n.default_locale) do
+      mail(to: bike.owner_email,
+           subject: "We may have found your stolen #{bike.title_string}")
+    end
+  end
+
   def recovered_from_link(stolen_record)
     @stolen_record = stolen_record
     @bike = stolen_record.bike
