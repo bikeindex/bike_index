@@ -1,0 +1,29 @@
+/ = render partial: "stolen_localized_police_checklist", locals: { stolen_record: @bike.current_stolen_record, police_report_present: police_report_present }
+-# We only have recommendations for reporting your theft to police if your bike is reported stolen in the netherlands, country_code: NL
+- netherlands = Country.find_by_iso("NL")
+- if stolen_record.country_id == netherlands.id
+  %li
+    PARTTTTYYY
+  / %li{ class: police_report_present ? "completed-item" : "" }
+  /   %span.checklist-checkbox
+  /     = "&#10003;".html_safe if police_report_present
+  /   %span.checklist-text
+  /     - bike_link = link_to(t(".a_police_report"), edit_bike_path(id: @bike.to_param, page: "theft_details"))
+  /     = t(".add_bike_link_to_your_theft_report_html", bike_link: bike_link)
+  /   %ul
+  /     %li{ class: submitted_to_police_services ? "completed-item" : "" }
+  /       %span.checklist-checkbox
+  /         = "&#10003;".html_safe if submitted_to_police_services
+  /       %span.checklist-text
+  /         = t(".push_bike_info_to")
+  /         = link_to t(".leads_online"), t(".leads_online_url")
+  /         = t(".bike_index_does_this")
+  /       - if serial_unknown
+  /         %span.text-danger= t(".requires_a_serial_number")
+  /     %li{ class: submitted_to_police_services ? "completed-item" : "" }
+  /       %span.checklist-checkbox
+  /         = "&#10003;".html_safe if submitted_to_police_services
+  /       %span.checklist-text
+  /         = t(".push_bike_info_to_law_enforcement")
+  /         - if serial_unknown
+  /           %span.text-danger= t(".requires_a_serial_number")

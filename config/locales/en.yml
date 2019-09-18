@@ -1377,7 +1377,7 @@ en:
         to this %{bike_type}.
     stolen_checklist:
       a_photo_of_your_bike_type: a photo of your %{bike_type}
-      a_police_report: a Police Report Number
+      your_police_report: your Police Report Number
       add: Add
       add_bike_link_to_your_theft_report_html: Add %{bike_link} to your theft report
       add_serial_number: Add serial number
@@ -1683,7 +1683,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1709,7 +1709,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March

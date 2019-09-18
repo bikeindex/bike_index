@@ -31,7 +31,7 @@ nl:
     - vr
     - za
     month_names:
-    - 
+    -
     - januari
     - februari
     - maart
@@ -45,7 +45,7 @@ nl:
     - november
     - december
     abbr_month_names:
-    - 
+    -
     - jan
     - feb
     - mrt
@@ -2068,7 +2068,6 @@ nl:
       abandoned: Verlaten
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
-      a_police_report: een politierapportnummer
       add: Toevoegen
       add_bike_link_to_your_theft_report_html: Voeg %{bike_link} toe aan uw diefstalrapport
       add_serial_number: Voeg serienummer toe
