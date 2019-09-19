@@ -231,6 +231,11 @@ module ApplicationHelper
     end.sort { |a, b| a[0].downcase <=> b[0].downcase }
   end
 
+  def blog_languages
+    @blog_languages ||=
+      Blog.languages.map { |lang, num| [t(lang, scope: [:locales]), num] }
+  end
+
   def bike_placeholder_image_path
     image_path("revised/bike_photo_placeholder.svg")
   end
