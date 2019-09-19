@@ -84,7 +84,9 @@
               = f.hidden_field :index_image_id
           .form-group
             = f.label :language, class: "control-label"
-            = f.select :language, options_for_select(blog_languages), class: "form-control"
+            = f.select :language,
+              options_for_select(blog_languages, selected: Blog.languages[@blog.language]),
+              class: "form-control"
 
       .row.mt-4
         .col-md-6
