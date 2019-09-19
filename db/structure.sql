@@ -101,6 +101,7 @@ CREATE TABLE public.alert_images (
 --
 
 CREATE SEQUENCE public.alert_images_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -441,7 +442,8 @@ CREATE TABLE public.blogs (
     is_listicle boolean DEFAULT false NOT NULL,
     index_image character varying(255),
     index_image_id integer,
-    index_image_lg character varying(255)
+    index_image_lg character varying(255),
+    language integer DEFAULT 0 NOT NULL
 );
 
 
@@ -879,6 +881,7 @@ CREATE TABLE public.flipper_features (
 --
 
 CREATE SEQUENCE public.flipper_features_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -912,6 +915,7 @@ CREATE TABLE public.flipper_gates (
 --
 
 CREATE SEQUENCE public.flipper_gates_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -981,6 +985,7 @@ CREATE TABLE public.impound_records (
 --
 
 CREATE SEQUENCE public.impound_records_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2083,6 +2088,7 @@ CREATE TABLE public.theft_alert_plans (
 --
 
 CREATE SEQUENCE public.theft_alert_plans_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2122,6 +2128,7 @@ CREATE TABLE public.theft_alerts (
 --
 
 CREATE SEQUENCE public.theft_alerts_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2210,6 +2217,7 @@ CREATE TABLE public.twitter_accounts (
 --
 
 CREATE SEQUENCE public.twitter_accounts_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2306,8 +2314,8 @@ CREATE TABLE public.users (
     notification_unstolen boolean DEFAULT true,
     my_bikes_hash jsonb,
     preferred_language character varying,
-    last_login_ip character varying,
-    magic_link_token text
+    magic_link_token text,
+    last_login_ip character varying
 );
 
 
@@ -4671,4 +4679,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190916191514');
 INSERT INTO schema_migrations (version) VALUES ('20190918121951');
 
 INSERT INTO schema_migrations (version) VALUES ('20190918143646');
+
+INSERT INTO schema_migrations (version) VALUES ('20190919145324');
 
