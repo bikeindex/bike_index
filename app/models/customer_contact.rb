@@ -35,6 +35,10 @@ class CustomerContact < ActiveRecord::Base
     new(attrs)
   end
 
+  def should_be_sent?
+    bike&.current_stolen_record&.receive_notifications?
+  end
+
   def info_hash
     @info_hash ||= self[:info_hash].with_indifferent_access
   end
