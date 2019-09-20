@@ -70,9 +70,10 @@ class Bike < ActiveRecord::Base
 
   default_scope {
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
-      .where(example: false, hidden: false, deleted_at: nil)
+      .current
       .order("listing_order desc")
   }
+  scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
   scope :abandoned, -> { where(abandoned: true) }
@@ -168,7 +169,9 @@ class Bike < ActiveRecord::Base
           .where.not(stolen: true)
           .select(:serial_normalized)
 
-      stolen
+      unscoped
+        .current
+        .stolen
         .where.not(abandoned: true)
         .where(serial_normalized: abandoned_serials)
     end
