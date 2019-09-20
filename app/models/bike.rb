@@ -78,6 +78,7 @@ class Bike < ActiveRecord::Base
   scope :abandoned, -> { where(abandoned: true) }
   scope :organized, -> { where.not(creation_organization_id: nil) }
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
+  scope :with_known_normalized_serial, -> { where.not(serial_normalized: %w[absent N0NE]) }
   scope :impounded, -> { includes(:impound_records).where(impound_records: { retrieved_at: nil }).where.not(impound_records: { id: nil }) }
   scope :non_abandoned, -> { where(abandoned: false) }
   # TODO: Rails 5 update - use left_joins method and the text version of enum
@@ -163,14 +164,11 @@ class Bike < ActiveRecord::Base
     # Bikes in a `held` state are stolen bikes that have a counterpart record
     # (matching by normalized serial number) in an abandoned state.
     def held
-      abandoned_bikes =
-        unscoped.abandoned.where.not(serial_normalized: absent_serials)
+      abandoned_bikes = abandoned.with_known_normalized_serial
 
-      unscoped
-        .stolen
-        .where(example: false, hidden: false, deleted_at: nil)
+      stolen
+        .with_known_normalized_serial
         .where.not(id: abandoned_bikes.pluck(:id))
-        .where.not(serial_normalized: absent_serials)
         .where(serial_normalized: abandoned_bikes.pluck(:serial_normalized))
     end
 
@@ -178,7 +176,7 @@ class Bike < ActiveRecord::Base
     # abandoned bike.
     def held_with_match
       abandoned_bikes =
-        unscoped.abandoned.where.not(serial_normalized: absent_serials)
+        unscoped.abandoned.with_known_normalized_serial
 
       # index by normalized serial
       matches = abandoned_bikes.each_with_object({}) do |bike, results|
@@ -193,11 +191,6 @@ class Bike < ActiveRecord::Base
 
         pairs << [bike, match]
       end
-    end
-
-    # Normalized serials that flag an absence of a serial number
-    def absent_serials
-      %w[absent N0NE]
     end
   end
 
