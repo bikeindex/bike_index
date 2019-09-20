@@ -18,7 +18,6 @@
   %div{style: "width: 10%; float: left; height: 120px;"}
     = link_to @twitter_account_url do
       = image_tag @twitter_account_image_url, style: "max-width: 100%;"
-
   %div{style: "width: 86%; margin-left: 2%; float: right;"}
     %a{href: @tweet_url, style: "display: block; text-decoration: none; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif;"}
       %h3{style: "font-size: 14px; line-height: 14px; margin: 0; font-weight: bold; color: #333333;"}= @tweet_account_name
@@ -27,12 +26,12 @@
     %p{style: "margin:0;color:#333333;font-family:Georgia,'Times New Roman',serif;font-size:22px;line-height:27px;margin-bottom:0;margin-top:5px;"}
       = @info["tweet_string"].split('https://bikeindex.org')[0]
       %a{href: @bike_url, style: "border:none;color:#0084b4;text-decoration:none"} Bike Index link
-    %a{href: @tweet_url, style: "display:block;border:none;color:#0084b4;text-decoration:none;color:#999999;font-size: 12px; margin-top: 5px;", :target => "_blank"}= Time.current.strftime("%I:%M %P - %d %b %y")
-
-- if @retweet_screen_names.present?
-  - retweets = @retweet_screen_names.map{ |sn| "<a href='https://twitter.com/#{sn}'>@#{sn}</a>" }
-  %p{style: "color: #95A5A5; font-size: .9em; text-align: center; margin: 0 auto; clear: both; padding: .25em 1em .75em; width: 90%; background: #f7f7f7; border: 1px solid #dfe3ee; border-radius: 0 0 4px 4px;"}
-    = t(".html.alert_retweeted_by_html", retweets: retweets.to_sentence.html_safe)
+    %a{href: @tweet_url, style: "display:block;border:none;color:#0084b4;text-decoration:none;color:#999999;font-size: 12px; margin-top: 5px;", :target => "_blank"}
+      = Time.current.strftime("%I:%M %P - %d %b %y")
+  - if @retweet_screen_names.present?
+    - retweets = @retweet_screen_names.map{ |sn| "<a href='https://twitter.com/#{sn}'>@#{sn}</a>" }
+    %p{style: "color: #95A5A5; font-size: .9em; text-align: center; margin: 0 auto; clear: both; padding: .25em 1em .75em; width: 90%; background: #f7f7f7; border: 1px solid #dfe3ee; border-radius: 0 0 4px 4px;"}
+      = t(".html.alert_retweeted_by_html", retweets: retweets.to_sentence.html_safe)
 
 %h3{style: "margin: 2rem 0 1rem"}= t(".html.improve_your_chances_of_recovery_by_doing")
 

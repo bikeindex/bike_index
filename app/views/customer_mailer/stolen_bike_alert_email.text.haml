@@ -1,4 +1,5 @@
-= @customer_contact.body.html_safe
+- unless @customer_contact.body == "EMPTY"
+  = @customer_contact.body.html_safe
 
 \--------------------------------
 

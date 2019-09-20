@@ -37,7 +37,7 @@ class CustomerMailerPreview < ActionMailer::Preview
         .includes(:bike)
         .limit(50)
         .where.not(info_hash: {})
-        .select { |cc| cc.info_hash&.fetch("tweet_id", nil) && cc.bike.present? }
+        .select { |cc| cc.info_hash&.fetch("tweet_account_name", nil) && cc.bike.present? }
         .first
 
     CustomerMailer.stolen_bike_alert_email(customer_contact)

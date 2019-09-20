@@ -69,8 +69,8 @@ class CustomerMailer < ActionMailer::Base
     @bike_url = "https://bikeindex.org/bikes/#{@bike.id}"
     @retweet_screen_names = @info["retweet_screen_names"]
     @twitter_account_image_url = @info["tweet_account_image"]
-    @twitter_account_name = @info["tweet_account_name"]
-    @twitter_account_screen_name = @info["tweet_account_screen_name"]
+    @tweet_account_name = @info["tweet_account_name"]
+    @tweet_account_screen_name = @info["tweet_account_screen_name"]
     @twitter_account_url = "https://twitter.com/#{@tweet_account_screen_name}"
     tweet_id = @info["tweet_id"]
     @tweet_url = "https://twitter.com/#{@tweet_account_screen_name}/status/#{tweet_id}"
@@ -120,6 +120,8 @@ class CustomerMailer < ActionMailer::Base
     @match =
       if contact.info_hash["match_type"] == "Bike"
         Bike.find_by(id: contact.info_hash["match_id"])
+      else
+        # initialize an ExternalBike from info_hash["match"]
       end
 
     I18n.with_locale(@user&.preferred_language || I18n.default_locale) do
