@@ -105,10 +105,13 @@ class CustomerMailer < ActionMailer::Base
     stolen_notification.update_attribute :send_dates, dates
   end
 
-  def bike_possibly_found_email(target_bike, potential_match)
-    @bike = target_bike
+  def bike_possibly_found_email(contact)
+    @bike = contact.bike
     @user = User.fuzzy_email_find(@bike.owner_email)
-    @match = potential_match
+    @match =
+      if contact.info_hash["match_type"] == "Bike"
+        Bike.find_by(id: contact.info_hash["match_id"])
+      end
 
     I18n.with_locale(@user&.preferred_language || I18n.default_locale) do
       mail(to: @bike.owner_email,

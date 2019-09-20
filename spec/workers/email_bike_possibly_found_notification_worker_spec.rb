@@ -34,17 +34,15 @@ RSpec.describe EmailBikePossiblyFoundNotificationWorker, type: :job do
   end
 
   it "skips the bike if a notification for it has already been sent" do
-    allow(CustomerMailer).to receive(:bike_possibly_found_email).and_call_original
-
-    # stolen but not abandoned bike
     bike = FactoryBot.create(:stolen_bike, abandoned: false, serial_number: "HELL0")
-    # abandoned but not stolen bike with matching normalized serial
-    FactoryBot.create(:abandoned_bike, stolen: false, serial_number: "HE11O")
+    match = FactoryBot.create(:abandoned_bike, stolen: false, serial_number: "HE11O")
+
     # an already-sent notification
-    FactoryBot.create(:customer_contact,
-                      bike: bike,
-                      user_email: bike.owner_email,
-                      kind: :bike_possibly_found)
+    contact = CustomerContact.build_bike_possibly_found_notification(bike, match)
+    contact.email = CustomerMailer.bike_possibly_found_email(contact)
+    contact.save
+
+    allow(CustomerMailer).to receive(:bike_possibly_found_email).and_call_original
 
     described_class.new.perform
 

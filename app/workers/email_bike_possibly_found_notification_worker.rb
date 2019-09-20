@@ -11,19 +11,14 @@ class EmailBikePossiblyFoundNotificationWorker < ScheduledWorker
 
   def notify_of_bike_index_held
     Bike.possibly_found_with_match.each do |bike, match|
-      next if CustomerContact.bike_possibly_found.exists?(bike_id: bike.id, user_email: bike.owner_email)
+      next if CustomerContact.possibly_found_notification_sent?(bike, match)
 
-      email = CustomerMailer.bike_possibly_found_email(bike, match)
-      contact = CustomerContact.build_bike_possibly_found_notification(
-        bike: bike,
-        subject: email.subject,
-        body: email.text_part.to_s,
-        sender: email.from.first,
-      )
+      contact = CustomerContact.build_bike_possibly_found_notification(bike, match)
+      next unless contact.receives_stolen_bike_notifications?
 
-      if contact.stolen_record_receives_notifications? && contact.save
-        email.deliver_now
-      end
+      email = CustomerMailer.bike_possibly_found_email(contact)
+      contact.email = email
+      email.deliver_now if contact.save
     end
   end
 end

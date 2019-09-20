@@ -41,11 +41,11 @@ RSpec.describe CustomerContact, type: :model do
     end
   end
 
-  describe "#stolen_record_receives_notifications?" do
+  describe "#receives_stolen_bike_notifications?" do
     context "given no stolen record" do
       it "returns true" do
         customer_contact = FactoryBot.create(:customer_contact)
-        result = customer_contact.stolen_record_receives_notifications?
+        result = customer_contact.receives_stolen_bike_notifications?
         expect(result).to eq(true)
       end
     end
@@ -53,7 +53,7 @@ RSpec.describe CustomerContact, type: :model do
     context "given a stolen record that receives notifications" do
       it "returns true" do
         customer_contact = FactoryBot.create(:customer_contact, :stolen_bike)
-        result = customer_contact.stolen_record_receives_notifications?
+        result = customer_contact.receives_stolen_bike_notifications?
         expect(result).to eq(true)
       end
     end
@@ -63,7 +63,7 @@ RSpec.describe CustomerContact, type: :model do
         customer_contact = FactoryBot.create(:customer_contact, :stolen_bike)
         stolen_record = customer_contact.bike.current_stolen_record
         stolen_record.update(receive_notifications: false)
-        result = customer_contact.stolen_record_receives_notifications?
+        result = customer_contact.receives_stolen_bike_notifications?
         expect(result).to eq(false)
       end
     end

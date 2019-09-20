@@ -57,8 +57,9 @@ class CustomerMailerPreview < ActionMailer::Preview
 
   def bike_possibly_found_email
     target = Bike.stolen.limit(1).first
-    match = Bike.held.limit(1).first
-    CustomerMailer.bike_possibly_found_email(target, match)
+    match = Bike.abandoned.limit(1).first
+    contact = CustomerContact.build_bike_possibly_found_notification(target, match)
+    CustomerMailer.bike_possibly_found_email(contact)
   end
 
   private
