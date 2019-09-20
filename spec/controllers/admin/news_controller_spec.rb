@@ -27,7 +27,7 @@ RSpec.describe Admin::NewsController, type: :controller do
       blog_attrs = {
         title: "new title thing stuff",
         body: "<p>html</p>",
-        language: "1",
+        language: "en",
       }
       put :update, id: subject.to_param, blog: blog_attrs
       subject.reload

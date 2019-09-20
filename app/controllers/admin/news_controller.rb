@@ -1,7 +1,6 @@
 class Admin::NewsController < Admin::BaseController
   before_filter :find_blog, only: [:show, :edit, :update, :destroy]
   before_filter :set_dignified_name
-  before_filter :normalize_params
 
   def index
     @blogs = Blog.order("created_at asc")
@@ -83,11 +82,6 @@ class Admin::NewsController < Admin::BaseController
       :user_email,
       :user_id,
     )
-  end
-
-  def normalize_params
-    language = params.dig(:blog, :language)
-    params[:blog][:language] = language.to_i if language.present?
   end
 
   def set_dignified_name

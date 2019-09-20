@@ -17,18 +17,6 @@
           onchange: "this.form.submit()"
   %hr
 
-:javascript
-  const setBlogLanguageSelection = () => {
-    // Set the language drop-down to the currently selected language.
-    // Workaround for the selection sticking when navigating using the back
-    // button.
-    const langOptions = document.querySelector("#js-blog-language-selection #language");
-    const langSelection = document.location.search.split("&").filter(e => e.match("language"));
-    const language = (langSelection[0] || "language=0").split("=")[1];
-    langOptions.selectedIndex = language;
-  }
-  setBlogLanguageSelection()
-
 %article
   %ul.news-index-list
     - @blogs.each_with_index do |blog, index|

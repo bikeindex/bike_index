@@ -135,6 +135,7 @@ CREATE TABLE public.ambassador_task_assignments (
 --
 
 CREATE SEQUENCE public.ambassador_task_assignments_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -167,6 +168,7 @@ CREATE TABLE public.ambassador_tasks (
 --
 
 CREATE SEQUENCE public.ambassador_tasks_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -245,6 +247,7 @@ CREATE TABLE public.bike_code_batches (
 --
 
 CREATE SEQUENCE public.bike_code_batches_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE

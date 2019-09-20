@@ -1,8 +1,9 @@
 class NewsController < ApplicationController
   def index
     selected_language = params[:language].presence || I18n.locale.to_s
+    language_code = Blog.languages[selected_language]
 
-    @blogs = Blog.published.where(language: selected_language)
+    @blogs = Blog.published.where(language: language_code)
 
     redirect_to news_index_url(format: "atom") if request.format == "xml"
   end

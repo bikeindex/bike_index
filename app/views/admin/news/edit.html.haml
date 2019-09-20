@@ -85,7 +85,7 @@
           .form-group
             = f.label :language, class: "control-label"
             = f.select :language,
-              options_for_select(blog_languages, selected: Blog.languages[@blog.language]),
+              options_for_select(blog_languages, selected: @blog.language),
               class: "form-control"
 
       .row.mt-4
