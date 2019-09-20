@@ -33,9 +33,9 @@ RSpec.describe Api::V1::NotificationsController, type: :controller do
       expect(response.code).to eq("200")
       expect(CustomerContact.count).to eq(1)
       customer_contact = CustomerContact.first
-      expect(customer_contact.info_hash[:bike_id].to_i).to eq(stolen_record.bike.id)
-      expect(customer_contact.info_hash[:tweet_string]).to eq("STOLEN - something special")
-      expect(customer_contact.info_hash[:notification_type]).to eq("stolen_twitter_alerter")
+      expect(customer_contact.info_hash["bike_id"].to_i).to eq(stolen_record.bike.id)
+      expect(customer_contact.info_hash["tweet_string"]).to eq("STOLEN - something special")
+      expect(customer_contact.info_hash["notification_type"]).to eq("stolen_twitter_alerter")
     end
 
     it "sends a recovered email if the authorization works" do
@@ -62,10 +62,10 @@ RSpec.describe Api::V1::NotificationsController, type: :controller do
       expect(response.code).to eq("200")
       expect(CustomerContact.count).to eq(1)
       customer_contact = CustomerContact.first
-      expect(customer_contact.info_hash[:bike_id].to_i).to eq(stolen_record.bike.id)
-      expect(customer_contact.info_hash[:tweet_string]).to eq("FOUND - something special")
+      expect(customer_contact.info_hash["bike_id"].to_i).to eq(stolen_record.bike.id)
+      expect(customer_contact.info_hash["tweet_string"]).to eq("FOUND - something special")
       expect(customer_contact.title).to eq("We tweeted about the bike you found!")
-      expect(customer_contact.info_hash[:notification_type]).to eq("stolen_twitter_alerter")
+      expect(customer_contact.info_hash["notification_type"]).to eq("stolen_twitter_alerter")
     end
   end
 end

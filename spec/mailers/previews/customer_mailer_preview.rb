@@ -32,12 +32,26 @@ class CustomerMailerPreview < ActionMailer::Preview
   end
 
   def stolen_bike_alert_email
-    customer_contact = CustomerContact.last
+    customer_contact =
+      CustomerContact
+        .includes(:bike)
+        .limit(50)
+        .where.not(info_hash: {})
+        .select { |cc| cc.info_hash&.fetch("tweet_id", nil) && cc.bike.present? }
+        .first
+
     CustomerMailer.stolen_bike_alert_email(customer_contact)
   end
 
   def admin_contact_stolen_email
-    customer_contact = CustomerContact.where(kind: :stolen_contact).last
+    customer_contact =
+      CustomerContact
+        .includes(:bike)
+        .stolen_contact
+        .limit(50)
+        .select(&:bike)
+        .first
+
     CustomerMailer.admin_contact_stolen_email(customer_contact)
   end
 
@@ -56,8 +70,8 @@ class CustomerMailerPreview < ActionMailer::Preview
   end
 
   def bike_possibly_found_email
-    target = Bike.stolen.limit(1).first
-    match = Bike.abandoned.limit(1).first
+    target = Bike.stolen.last
+    match = Bike.abandoned.last
     contact = CustomerContact.build_bike_possibly_found_notification(target, match)
     CustomerMailer.bike_possibly_found_email(contact)
   end

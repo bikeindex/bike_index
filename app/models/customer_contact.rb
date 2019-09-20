@@ -70,10 +70,6 @@ class CustomerContact < ActiveRecord::Base
     self.creator_email = email.from.first
   end
 
-  def info_hash
-    @info_hash ||= self[:info_hash].with_indifferent_access
-  end
-
   def normalize_emails_and_find_users
     self.user_email = EmailNormalizer.normalize(user_email)
     self.user ||= User.fuzzy_confirmed_or_unconfirmed_email_find(user_email)

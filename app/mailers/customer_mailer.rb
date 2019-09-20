@@ -62,20 +62,29 @@ class CustomerMailer < ActionMailer::Base
     @customer_contact = customer_contact
     @info = customer_contact.info_hash
     @bike = customer_contact.bike
-    @biketype = @bike.cycle_type_name&.downcase
+    @bike_type = @bike.cycle_type_name&.downcase
     @user = @customer_contact.user
 
+    @location = @info["location"]
+    @bike_url = "https://bikeindex.org/bikes/#{@bike.id}"
+    @retweet_screen_names = @info["retweet_screen_names"]
+    @twitter_account_image_url = @info["tweet_account_image"]
+    @twitter_account_name = @info["tweet_account_name"]
+    @twitter_account_screen_name = @info["tweet_account_screen_name"]
+    @twitter_account_url = "https://twitter.com/#{@tweet_account_screen_name}"
+    tweet_id = @info["tweet_id"]
+    @tweet_url = "https://twitter.com/#{@tweet_account_screen_name}/status/#{tweet_id}"
+
     I18n.with_locale(@user&.preferred_language) do
-      mail(
-        to: @customer_contact.user_email,
-        subject: @customer_contact.title,
-      )
+      mail(to: @customer_contact.user_email, subject: @customer_contact.title)
     end
   end
 
   def admin_contact_stolen_email(customer_contact)
     @customer_contact = customer_contact
     @user = customer_contact.user
+    @bike = @customer_contact.bike
+    return if @bike.blank?
 
     I18n.with_locale(@user&.preferred_language) do
       mail(
