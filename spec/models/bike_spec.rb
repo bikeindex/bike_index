@@ -55,15 +55,27 @@ RSpec.describe Bike, type: :model do
 
   describe ".possibly_found_with_match" do
     it "returns stolen bikes with a matching normalized serial on another abandoned bike" do
-      bike1 = FactoryBot.create(:bike, stolen: true, serial_number: "he110")
-      match1 = FactoryBot.create(:bike, abandoned: true, serial_number: "HEllO")
+      pair0 = [
+        FactoryBot.create(:bike, stolen: true, abandoned: true, serial_number: "He10o"),
+        FactoryBot.create(:bike, stolen: true, abandoned: true, serial_number: "He10o"),
+      ]
 
-      bike2 = FactoryBot.create(:bike, stolen: true, serial_number: "1100ll")
-      match2 = FactoryBot.create(:bike, abandoned: true, serial_number: "IIOO11")
+      pair1 = [
+        FactoryBot.create(:bike, stolen: true, serial_number: "he110"),
+        FactoryBot.create(:bike, abandoned: true, serial_number: "HEllO"),
+      ]
+
+      pair2 = [
+        FactoryBot.create(:bike, stolen: true, serial_number: "1100ll"),
+        FactoryBot.create(:bike, abandoned: true, serial_number: "IIOO11"),
+      ]
 
       results = Bike.possibly_found_with_match
+      expect(results.length).to eq(2)
 
-      expect(results).to match_array([[bike1, match1], [bike2, match2]])
+      result_ids = results.map { |pair| pair.map(&:id) }
+      expect(result_ids).to_not include(pair0.map(&:id))
+      expect(result_ids).to match_array([pair1.map(&:id), pair2.map(&:id)])
     end
   end
 

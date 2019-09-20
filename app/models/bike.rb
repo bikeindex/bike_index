@@ -78,7 +78,6 @@ class Bike < ActiveRecord::Base
   scope :abandoned, -> { where(abandoned: true) }
   scope :organized, -> { where.not(creation_organization_id: nil) }
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
-  scope :with_known_normalized_serial, -> { where.not(serial_normalized: %w[absent N0NE]) }
   scope :impounded, -> { includes(:impound_records).where(impound_records: { retrieved_at: nil }).where.not(impound_records: { id: nil }) }
   scope :non_abandoned, -> { where(abandoned: false) }
   # TODO: Rails 5 update - use left_joins method and the text version of enum
@@ -164,22 +163,20 @@ class Bike < ActiveRecord::Base
     # Possibly-found bikes are stolen bikes that have a counterpart record
     # (matching by normalized serial number) in an abandoned state.
     def possibly_found
-      abandoned_bikes = abandoned.with_known_normalized_serial
+      abandoned_serials =
+        abandoned
+          .where.not(stolen: true)
+          .select(:serial_normalized)
 
       stolen
-        .with_known_normalized_serial
-        .where.not(id: abandoned_bikes.pluck(:id))
-        .where(serial_normalized: abandoned_bikes.pluck(:serial_normalized))
+        .where.not(abandoned: true)
+        .where(serial_normalized: abandoned_serials)
     end
 
     # Return an array of tuples, each pairing a possibly-found bike with its
     # counterpart abandoned bike.
     def possibly_found_with_match
-      abandoned_bikes =
-        unscoped.abandoned.with_known_normalized_serial
-
-      # index by normalized serial
-      matches = abandoned_bikes.each_with_object({}) do |bike, results|
+      matches = abandoned.each_with_object({}) do |bike, results|
         results[bike.serial_normalized] = bike
       end
 
