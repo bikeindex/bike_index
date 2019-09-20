@@ -1,12 +1,12 @@
 require "rails_helper"
 
-RSpec.describe EmailHeldBikeNotificationWorker, type: :job do
+RSpec.describe EmailBikePossiblyFoundNotificationWorker, type: :job do
   before do
     ActionMailer::Base.deliveries = []
   end
 
   it "triggers emails for every potentially held bike" do
-    allow(CustomerMailer).to receive(:held_bike_email).and_call_original
+    allow(CustomerMailer).to receive(:bike_possibly_found_email).and_call_original
     FactoryBot.create(:stolen_bike)
     # stolen but not abandoned bike
     bike = FactoryBot.create(:stolen_bike, abandoned: false, serial_number: "HELL0")
@@ -18,23 +18,23 @@ RSpec.describe EmailHeldBikeNotificationWorker, type: :job do
     described_class.new.perform
 
     expect(ActionMailer::Base.deliveries.length).to eq(1)
-    expect(CustomerMailer).to have_received(:held_bike_email).once
+    expect(CustomerMailer).to have_received(:bike_possibly_found_email).once
   end
 
   it "skips the bike if it's its own match" do
-    allow(CustomerMailer).to receive(:held_bike_email).and_call_original
+    allow(CustomerMailer).to receive(:bike_possibly_found_email).and_call_original
 
     # same bike with stolen and abandoned set to true (should not trigger)
     FactoryBot.create(:bike, stolen: true, abandoned: true)
 
     described_class.new.perform
 
-    expect(CustomerMailer).to_not have_received(:held_bike_email)
+    expect(CustomerMailer).to_not have_received(:bike_possibly_found_email)
     expect(ActionMailer::Base.deliveries.length).to eq(0)
   end
 
   it "skips the bike if a notification for it has already been sent" do
-    allow(CustomerMailer).to receive(:held_bike_email).and_call_original
+    allow(CustomerMailer).to receive(:bike_possibly_found_email).and_call_original
 
     # stolen but not abandoned bike
     bike = FactoryBot.create(:stolen_bike, abandoned: false, serial_number: "HELL0")
@@ -44,11 +44,11 @@ RSpec.describe EmailHeldBikeNotificationWorker, type: :job do
     FactoryBot.create(:customer_contact,
                       bike: bike,
                       user_email: bike.owner_email,
-                      kind: :held_bike_notification)
+                      kind: :bike_possibly_found)
 
     described_class.new.perform
 
-    expect(CustomerMailer).to_not have_received(:held_bike_email)
+    expect(CustomerMailer).to_not have_received(:bike_possibly_found_email)
     expect(ActionMailer::Base.deliveries.length).to eq(0)
   end
 end

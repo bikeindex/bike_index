@@ -180,12 +180,12 @@ RSpec.describe CustomerMailer, type: :mailer do
     end
   end
 
-  describe "#held_bike_email" do
+  describe "#bike_possibly_found_email" do
     it "renders the held_bike notification email" do
       bike = FactoryBot.create(:bike, serial_number: "he110")
       match = FactoryBot.create(:bike, serial_number: "HEllO")
 
-      mail = CustomerMailer.held_bike_email(bike, match)
+      mail = CustomerMailer.bike_possibly_found_email(bike, match)
 
       expect(mail.subject).to eq "We may have found your stolen #{bike.title_string}"
       expect(mail.from.count).to eq(1)

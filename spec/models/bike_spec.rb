@@ -53,7 +53,7 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe ".held_with_match" do
+  describe ".possibly_found_with_match" do
     it "returns stolen bikes with a matching normalized serial on another abandoned bike" do
       bike1 = FactoryBot.create(:bike, stolen: true, serial_number: "he110")
       match1 = FactoryBot.create(:bike, abandoned: true, serial_number: "HEllO")
@@ -61,7 +61,7 @@ RSpec.describe Bike, type: :model do
       bike2 = FactoryBot.create(:bike, stolen: true, serial_number: "1100ll")
       match2 = FactoryBot.create(:bike, abandoned: true, serial_number: "IIOO11")
 
-      results = Bike.held_with_match
+      results = Bike.possibly_found_with_match
 
       expect(results).to match_array([[bike1, match1], [bike2, match2]])
     end

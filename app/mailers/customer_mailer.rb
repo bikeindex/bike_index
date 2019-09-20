@@ -105,7 +105,7 @@ class CustomerMailer < ActionMailer::Base
     stolen_notification.update_attribute :send_dates, dates
   end
 
-  def held_bike_email(target_bike, potential_match)
+  def bike_possibly_found_email(target_bike, potential_match)
     @bike = target_bike
     @user = User.fuzzy_email_find(@bike.owner_email)
     @match = potential_match

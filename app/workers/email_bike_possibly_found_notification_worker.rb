@@ -1,4 +1,4 @@
-class EmailHeldBikeNotificationWorker < ScheduledWorker
+class EmailBikePossiblyFoundNotificationWorker < ScheduledWorker
   def self.frequency
     24.hours
   end
@@ -10,11 +10,11 @@ class EmailHeldBikeNotificationWorker < ScheduledWorker
   end
 
   def notify_of_bike_index_held
-    Bike.held_with_match.each do |bike, match|
-      next if CustomerContact.held_bike_notification.exists?(bike_id: bike.id, user_email: bike.owner_email)
+    Bike.possibly_found_with_match.each do |bike, match|
+      next if CustomerContact.bike_possibly_found.exists?(bike_id: bike.id, user_email: bike.owner_email)
 
-      email = CustomerMailer.held_bike_email(bike, match)
-      contact = CustomerContact.build_held_bike_notification(
+      email = CustomerMailer.bike_possibly_found_email(bike, match)
+      contact = CustomerContact.build_bike_possibly_found_notification(
         bike: bike,
         subject: email.subject,
         body: email.text_part.to_s,

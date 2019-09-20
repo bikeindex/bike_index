@@ -6,8 +6,8 @@ class CustomerContact < ActiveRecord::Base
   KIND_ENUM = {
     stolen_contact: 0,
     stolen_twitter_alerter: 1,
-    held_bike_notification: 2,
-    externally_held_bike_notification: 3,
+    bike_possibly_found: 2,
+    bike_possibly_found_externally: 3,
   }.freeze
 
   enum kind: KIND_ENUM
@@ -23,12 +23,12 @@ class CustomerContact < ActiveRecord::Base
 
   before_save :normalize_emails_and_find_users
 
-  def self.build_held_bike_notification(bike:, subject:, body:, sender:)
+  def self.build_bike_possibly_found_notification(bike:, subject:, body:, sender:)
     attrs = {
       bike: bike,
       body: body,
       creator_email: sender,
-      kind: :held_bike_notification,
+      kind: :bike_possibly_found,
       title: subject,
       user_email: bike.owner_email,
     }

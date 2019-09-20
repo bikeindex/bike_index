@@ -42,8 +42,9 @@ class ScheduledWorkerRunner < ScheduledWorker
       TsvCreatorWorker,
       GetManufacturerLogoWorker,
       DeactivateExpiredTheftAlertWorker,
-      EmailHeldBikeNotificationWorker,
-    ] + [self]
+      EmailBikePossiblyFoundNotificationWorker,
+      self,
+    ]
   end
 
   def self.scheduled_non_scheduler_workers

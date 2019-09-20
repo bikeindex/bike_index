@@ -55,10 +55,10 @@ class CustomerMailerPreview < ActionMailer::Preview
     CustomerMailer.recovered_from_link(recovered_record)
   end
 
-  def held_bike_email
+  def bike_possibly_found_email
     target = Bike.stolen.limit(1).first
     match = Bike.held.limit(1).first
-    CustomerMailer.held_bike_email(target, match)
+    CustomerMailer.bike_possibly_found_email(target, match)
   end
 
   private

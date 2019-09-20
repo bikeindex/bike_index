@@ -161,9 +161,9 @@ class Bike < ActiveRecord::Base
       includes(:bike_organizations).where(bike_organizations: { organization_id: organization.id })
     end
 
-    # Bikes in a `held` state are stolen bikes that have a counterpart record
+    # Possibly-found bikes are stolen bikes that have a counterpart record
     # (matching by normalized serial number) in an abandoned state.
-    def held
+    def possibly_found
       abandoned_bikes = abandoned.with_known_normalized_serial
 
       stolen
@@ -172,9 +172,9 @@ class Bike < ActiveRecord::Base
         .where(serial_normalized: abandoned_bikes.pluck(:serial_normalized))
     end
 
-    # Return an array of tuples, each pairing a held bike with its counterpart
-    # abandoned bike.
-    def held_with_match
+    # Return an array of tuples, each pairing a possibly-found bike with its
+    # counterpart abandoned bike.
+    def possibly_found_with_match
       abandoned_bikes =
         unscoped.abandoned.with_known_normalized_serial
 
@@ -183,7 +183,7 @@ class Bike < ActiveRecord::Base
         results[bike.serial_normalized] = bike
       end
 
-      held.each_with_object([]) do |bike, pairs|
+      possibly_found.each_with_object([]) do |bike, pairs|
         match = matches[bike.serial_normalized]
 
         # Assume a duplicate entry if both the serial and owner emails match
