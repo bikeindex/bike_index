@@ -34,11 +34,10 @@ class CustomerContact < ActiveRecord::Base
         kinds["bike_possibly_found_externally"]
       end
 
-    where(kind: contact_kind)
+    where(kind: contact_kind, bike: bike, user_email: bike.owner_email)
       .where("info_hash->>'match_id' = ?", match.id.to_s)
       .where("info_hash->>'match_type' = ?", match.class.to_s)
       .where("info_hash->>'stolen_record_id' = ?", bike&.current_stolen_record&.id.to_s)
-      .where(bike: bike, user_email: bike.owner_email)
       .exists?
   end
 
@@ -50,7 +49,9 @@ class CustomerContact < ActiveRecord::Base
         kinds["bike_possibly_found_externally"]
       end
 
-    new(bike: bike, kind: contact_kind, info_hash: {
+    new(bike: bike,
+        kind: contact_kind,
+        info_hash: {
           stolen_record_id: bike&.current_stolen_record&.id.to_s,
           match_type: match.class.to_s,
           match_id: match.id.to_s,
