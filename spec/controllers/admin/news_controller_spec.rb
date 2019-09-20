@@ -24,7 +24,11 @@ RSpec.describe Admin::NewsController, type: :controller do
 
   describe "update" do
     it "updates available attributes" do
-      blog_attrs = { title: "new title thing stuff", body: "<p>html</p>" }
+      blog_attrs = {
+        title: "new title thing stuff",
+        body: "<p>html</p>",
+        language: "en",
+      }
       put :update, id: subject.to_param, blog: blog_attrs
       subject.reload
       expect(subject.title).to eq blog_attrs[:title]

@@ -1,9 +1,22 @@
 #news_display
-  %h1.blog-index-head
-    = t(".bike_index_blog")
-    = link_to image_tag('feed_icon.svg'), news_index_url(format: 'atom'), { title: t('.bike_index_blog_feed' )}
+  .row
+    .col-md-12.col-lg-8.col-xl-9
+      %h1
+        = t(".bike_index_blog")
+        = link_to image_tag('feed_icon.svg', class: "rss-svg"),
+          news_index_url(format: 'atom'),
+          title: t('.bike_index_blog_feed'),
+          class: "blog-rss-link"
 
+    .col-md-12.col-lg-3.blog-language-selection-container
+      View posts in
+      = form_tag nil, method: :get,
+        class: "blog-language-selection", id: "js-blog-language-selection" do
+        = select_tag :language,
+          options_for_select(blog_languages, selected: params[:language].presence),
+          onchange: "this.form.submit()"
   %hr
+
 %article
   %ul.news-index-list
     - @blogs.each_with_index do |blog, index|

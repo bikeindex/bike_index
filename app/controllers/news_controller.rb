@@ -1,9 +1,20 @@
 class NewsController < ApplicationController
+  def index
+    selected_language = params[:language].presence || I18n.locale.to_s
+    language_code = Blog.languages[selected_language]
+
+    @blogs = Blog.published.where(language: language_code)
+
+    redirect_to news_index_url(format: "atom") if request.format == "xml"
+  end
+
   def show
     @blog = Blog.friendly_find(params[:id])
+
     unless @blog
       raise ActionController::RoutingError.new("Not Found")
     end
+
     if @blog.is_listicle
       @page = params[:page].to_i
       @page = 1 unless @page > 0
@@ -11,11 +22,7 @@ class NewsController < ApplicationController
       @next_item = true unless @page >= @blog.listicles.count
       @prev_item = true unless @page == 1
     end
-    @blogger = @blog.user
-  end
 
-  def index
-    @blogs = Blog.published
-    redirect_to news_index_url(format: "atom") if request.format == "xml"
+    @blogger = @blog.user
   end
 end

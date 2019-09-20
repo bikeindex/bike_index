@@ -231,6 +231,14 @@ module ApplicationHelper
     end.sort { |a, b| a[0].downcase <=> b[0].downcase }
   end
 
+  # Language choices available for displaying blog entries.
+  # Return an array of tuples, each of the form:
+  # [<localized language name>, <language key (from Blog::LANGUAGE_ENUM)>]
+  def blog_languages
+    @blog_languages ||=
+      Blog.languages.map { |lang, _| [t(lang, scope: [:locales]), lang] }
+  end
+
   def bike_placeholder_image_path
     image_path("revised/bike_photo_placeholder.svg")
   end

@@ -46,6 +46,18 @@ RSpec.describe NewsController, type: :controller do
           expect(response).to render_template("index")
         end
       end
+      context "given a language selection" do
+        it "renders blog posts in that language" do
+          FactoryBot.create(:blog, :published)
+          FactoryBot.create(:blog, :published, :dutch)
+
+          get :index, language: "nl"
+
+          expect(response.status).to eq(200)
+          expect(response).to render_template("index")
+          expect(assigns(:blogs).length).to eq(1)
+        end
+      end
       context "xml" do
         it "redirects to atom" do
           get :index, format: :xml
