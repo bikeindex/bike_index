@@ -15,6 +15,12 @@ RSpec.describe Bike, type: :model do
     it "non_abandoned scopes to only non_abandoned bikes" do
       expect(Bike.non_abandoned.to_sql).to eq(Bike.where(abandoned: false).to_sql)
     end
+    it "abandoned scopes to only abandoned bikes" do
+      expect(Bike.abandoned.to_sql).to eq(Bike.where(abandoned: true).to_sql)
+    end
+    it "held scopes to the intersection of abandoned and recoverd bikes" do
+      expect(Bike.held.to_sql).to eq(Bike.where(stolen: true, abandoned: true).to_sql)
+    end
     it "recovered_records default scopes to created_at desc" do
       bike = FactoryBot.create(:bike)
       expect(bike.recovered_records.to_sql).to eq(StolenRecord.unscoped.where(bike_id: bike.id, current: false).order("recovered_at desc").to_sql)
