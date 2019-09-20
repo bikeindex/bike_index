@@ -21,7 +21,7 @@ class EmailBikePossiblyFoundNotificationWorker < ScheduledWorker
         sender: email.from.first,
       )
 
-      if contact.should_be_sent? && contact.save
+      if contact.stolen_record_receives_notifications? && contact.save
         email.deliver_now
       end
     end

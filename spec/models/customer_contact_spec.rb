@@ -41,6 +41,34 @@ RSpec.describe CustomerContact, type: :model do
     end
   end
 
+  describe "#stolen_record_receives_notifications?" do
+    context "given no stolen record" do
+      it "returns true" do
+        customer_contact = FactoryBot.create(:customer_contact)
+        result = customer_contact.stolen_record_receives_notifications?
+        expect(result).to eq(true)
+      end
+    end
+
+    context "given a stolen record that receives notifications" do
+      it "returns true" do
+        customer_contact = FactoryBot.create(:customer_contact, :stolen_bike)
+        result = customer_contact.stolen_record_receives_notifications?
+        expect(result).to eq(true)
+      end
+    end
+
+    context "given a stolen record that doesn't receive notifications" do
+      it "returns false" do
+        customer_contact = FactoryBot.create(:customer_contact, :stolen_bike)
+        stolen_record = customer_contact.bike.current_stolen_record
+        stolen_record.update(receive_notifications: false)
+        result = customer_contact.stolen_record_receives_notifications?
+        expect(result).to eq(false)
+      end
+    end
+  end
+
   describe "normalize_emails_and_find_users" do
     it "finds user by email and associates to user" do
       user = FactoryBot.create(:user)

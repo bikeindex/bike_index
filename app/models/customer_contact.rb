@@ -35,8 +35,9 @@ class CustomerContact < ActiveRecord::Base
     new(attrs)
   end
 
-  def should_be_sent?
-    bike&.current_stolen_record&.receive_notifications?
+  def stolen_record_receives_notifications?
+    return true if bike.current_stolen_record.blank?
+    bike.current_stolen_record.receive_notifications?
   end
 
   def info_hash

@@ -122,5 +122,9 @@ FactoryBot.define do
     creator_email { "something@example.com" }
     user_email { "something_else@example.com" }
     kind { :stolen_contact }
+
+    trait :stolen_bike do
+      bike { FactoryBot.create(:stolen_bike) }
+    end
   end
 end
