@@ -2092,14 +2092,6 @@ nl:
       share_widely_on_your_personal_social: Deel veel op uw persoonlijke sociale media
       supercharge_sharing_on_facebook: Superchar delen op Facebook met Bike Index
       your_police_report: uw politierapportnummer
-    theft_alerts_table:
-      created: Gemaakt
-      end: Einde
-      existing_theft_alerts: Bestaande diefstalmeldingen
-      plan: Plan
-      start: Begin
-      status: Toestand
-    stolen_checklist_how_to_police_report:
       nl_digid_required: "(DigiD vereist)"
       nl_file_police_report: Dien een politierapport in!
       nl_online: Online
@@ -2109,6 +2101,13 @@ nl:
       nl_phone_report: bel 0900-8844. Meestal krijgt u later een telefoongesprekafspraak,
         waarna u de informatie aan de politie doorgeeft
       nl_website_link_text: op deze plitie.nl webpagina
+    theft_alerts_table:
+      created: Gemaakt
+      end: Einde
+      existing_theft_alerts: Bestaande diefstalmeldingen
+      plan: Plan
+      start: Begin
+      status: Toestand
   controllers:
     bikes:
       edit:
