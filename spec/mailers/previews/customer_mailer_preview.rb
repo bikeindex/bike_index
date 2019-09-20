@@ -56,8 +56,9 @@ class CustomerMailerPreview < ActionMailer::Preview
   end
 
   def held_bike_email
-    bike = Bike.held.last
-    CustomerMailer.held_bike_email(bike)
+    target = Bike.stolen.limit(1).first
+    match = Bike.held.limit(1).first
+    CustomerMailer.held_bike_email(target, match)
   end
 
   private

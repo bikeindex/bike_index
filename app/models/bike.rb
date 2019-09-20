@@ -76,7 +76,6 @@ class Bike < ActiveRecord::Base
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
   scope :abandoned, -> { where(abandoned: true) }
-  scope :held, -> { stolen.abandoned }
   scope :organized, -> { where.not(creation_organization_id: nil) }
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
   scope :impounded, -> { includes(:impound_records).where(impound_records: { retrieved_at: nil }).where.not(impound_records: { id: nil }) }
@@ -159,6 +158,46 @@ class Bike < ActiveRecord::Base
     def organization(org_or_org_id)
       organization = org_or_org_id.is_a?(Organization) ? org_or_org_id : Organization.friendly_find(org_or_org_id)
       includes(:bike_organizations).where(bike_organizations: { organization_id: organization.id })
+    end
+
+    # Bikes in a `held` state are stolen bikes that have a counterpart record
+    # (matching by normalized serial number) in an abandoned state.
+    def held
+      abandoned_bikes =
+        unscoped.abandoned.where.not(serial_normalized: absent_serials)
+
+      unscoped
+        .stolen
+        .where(example: false, hidden: false, deleted_at: nil)
+        .where.not(id: abandoned_bikes.pluck(:id))
+        .where.not(serial_normalized: absent_serials)
+        .where(serial_normalized: abandoned_bikes.pluck(:serial_normalized))
+    end
+
+    # Return an array of tuples, each pairing a held bike with its counterpart
+    # abandoned bike.
+    def held_with_match
+      abandoned_bikes =
+        unscoped.abandoned.where.not(serial_normalized: absent_serials)
+
+      # index by normalized serial
+      matches = abandoned_bikes.each_with_object({}) do |bike, results|
+        results[bike.serial_normalized] = bike
+      end
+
+      held.each_with_object([]) do |bike, pairs|
+        match = matches[bike.serial_normalized]
+
+        # Assume a duplicate entry if both the serial and owner emails match
+        next if match&.owner_email == bike.owner_email
+
+        pairs << [bike, match]
+      end
+    end
+
+    # Normalized serials that flag an absence of a serial number
+    def absent_serials
+      %w[absent N0NE]
     end
   end
 

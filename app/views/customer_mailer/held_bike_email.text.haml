@@ -2,7 +2,7 @@
 
 = bike_url(@bike)
 
-- if @external_registry_match.present?
-  = t(".text.found_on")
-  = @external_registry_match.registry_name
-  = @external_registry_match.url
+= t(".text.check_out_match_here")
+
+= @match.title_string
+= bike_url(@match)

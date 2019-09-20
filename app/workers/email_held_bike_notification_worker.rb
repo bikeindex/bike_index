@@ -10,10 +10,10 @@ class EmailHeldBikeNotificationWorker < ScheduledWorker
   end
 
   def notify_of_bike_index_held
-    Bike.held.find_each do |bike|
+    Bike.held_with_match.each do |bike, match|
       next if CustomerContact.held_bike_notification.exists?(bike_id: bike.id, user_email: bike.owner_email)
 
-      email = CustomerMailer.held_bike_email(bike)
+      email = CustomerMailer.held_bike_email(bike, match)
       contact = CustomerContact.build_held_bike_notification(
         bike: bike,
         subject: email.subject,
