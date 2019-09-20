@@ -33,8 +33,7 @@ class BikeV2Serializer < ActiveModel::Serializer
     :registry_url,
     :source_name,
     :source_unique_id,
-    :status,
-    :url
+    :status
 
   def serial
     object.serial_display
@@ -72,6 +71,20 @@ class BikeV2Serializer < ActiveModel::Serializer
     elsif object.stock_photo_url.present?
       object.stock_photo_url
     end
+  end
+
+  def placeholder_image
+    svg_path =
+      Rails
+        .application
+        .assets["revised/bike_photo_placeholder.svg"]
+        .digest_path
+
+    "#{ENV["BASE_URL"]}/assets/#{svg_path}"
+  end
+
+  def url
+    "#{ENV["BASE_URL"]}/bikes/#{object.id}"
   end
 
   def is_stock_img

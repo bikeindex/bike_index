@@ -4,13 +4,24 @@
 
 const url = urn => [process.env.BASE_URL, urn].join("/");
 
-const serialSearchUrl = serial => url(`api/v2/bikes_search?serial=${serial}`);
+const serialSearchUrl = serial =>
+  url(`api/v2/bikes_search?serial=${serial}`);
 
 const fuzzySearchUrl = serial =>
   url(`api/v2/bikes_search/close_serials?serial=${serial}`);
 
 const serialExternalSearchUrl = serial =>
   url(`api/v3/search/external_registries?serial=${serial}`);
+
+const serialPartialSearchUrl = ({serial, stolenness, location, query }) => {
+  const params = {};
+  if (serial) { params.serial = serial; }
+  if (stolenness) { params.stolenness = stolenness; }
+  if (location) { params.location = location; }
+  if (query) { params.query = query; }
+  const queryString = Object.keys(params).map(k => `${k}=${params[k]}`).join("&");
+  return url(`api/v3/search/close_serials?${queryString}`);
+}
 
 const request = async url => {
   const resp = await fetch(url);
@@ -37,4 +48,14 @@ const fetchSerialExternalSearch = serial => {
   return request(url);
 }
 
-export { fetchSerialResults, fetchFuzzyResults, fetchSerialExternalSearch };
+const fetchSerialPartialSearch = interpretedParams => {
+  const url = serialPartialSearchUrl(interpretedParams);
+  return request(url);
+}
+
+export {
+  fetchSerialResults,
+  fetchFuzzyResults,
+  fetchSerialExternalSearch,
+  fetchSerialPartialSearch,
+};
