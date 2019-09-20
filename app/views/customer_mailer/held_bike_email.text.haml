@@ -1,0 +1,8 @@
+= t(".text.we_think_your_stolen_bike", bike_title: @bike.title_string)
+
+= bike_url(@bike)
+
+- if @external_registry_match.present?
+  = t(".text.found_on")
+  = @external_registry_match.registry_name
+  = @external_registry_match.url

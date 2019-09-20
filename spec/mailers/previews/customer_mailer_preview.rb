@@ -55,6 +55,11 @@ class CustomerMailerPreview < ActionMailer::Preview
     CustomerMailer.recovered_from_link(recovered_record)
   end
 
+  def held_bike_email
+    bike = Bike.held.last
+    CustomerMailer.held_bike_email(bike)
+  end
+
   private
 
   def preview_user

@@ -1484,6 +1484,15 @@ en:
           address.
         verify_email: Verify email
         welcome_to_bike_index: "* Welcome to Bike Index! *"
+    held_bike_email:
+      html:
+        found_on: 'Found on:'
+        we_think_your_stolen_bike_html: We think your stolen <strong>%{bike_title}</strong>
+          may have been recovered!
+      text:
+        found_on: 'Found on:'
+        we_think_your_stolen_bike: We think your stolen %{bike_title} may have been
+          recovered!
     invoice_email:
       html:
         donation_will_help: Your donation of %{amount} really will help us rescue
