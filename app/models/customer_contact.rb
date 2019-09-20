@@ -7,7 +7,6 @@ class CustomerContact < ActiveRecord::Base
     stolen_contact: 0,
     stolen_twitter_alerter: 1,
     bike_possibly_found: 2,
-    bike_possibly_found_externally: 3,
   }.freeze
 
   enum kind: KIND_ENUM
@@ -27,14 +26,7 @@ class CustomerContact < ActiveRecord::Base
   # ExternalBike), determine if an email has been sent alerting the current
   # `bike` owner that the given `match` may be their found bike.
   def self.possibly_found_notification_sent?(bike, match)
-    contact_kind =
-      if match.is_a?(Bike)
-        kinds["bike_possibly_found"]
-      else
-        kinds["bike_possibly_found_externally"]
-      end
-
-    where(kind: contact_kind, bike: bike, user_email: bike.owner_email)
+    where(kind: kinds["bike_possibly_found"], bike: bike, user_email: bike.owner_email)
       .where("info_hash->>'match_id' = ?", match.id.to_s)
       .where("info_hash->>'match_type' = ?", match.class.to_s)
       .where("info_hash->>'stolen_record_id' = ?", bike&.current_stolen_record&.id.to_s)
@@ -42,15 +34,8 @@ class CustomerContact < ActiveRecord::Base
   end
 
   def self.build_bike_possibly_found_notification(bike, match)
-    contact_kind =
-      if match.is_a?(Bike)
-        kinds["bike_possibly_found"]
-      else
-        kinds["bike_possibly_found_externally"]
-      end
-
     new(bike: bike,
-        kind: contact_kind,
+        kind: kinds["bike_possibly_found"],
         info_hash: {
           stolen_record_id: bike&.current_stolen_record&.id.to_s,
           match_type: match.class.to_s,
