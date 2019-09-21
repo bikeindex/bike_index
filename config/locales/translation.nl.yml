@@ -2372,6 +2372,14 @@ nl:
           je lid bent geworden, jij slimme broek.
         thanks: Bedankt,
         welcome_to_bike_index: "* Welkom bij Bike Index! *"
+    bike_possibly_found_email:
+      html:
+        check_out_match_here: 'Bekijk hier de wedstrijd:'
+        we_think_your_stolen_bike_html: We hebben mogelijk uw gestolen <strong>%{bike_title}
+          gevonden</strong> !
+      text:
+        check_out_match_here: 'Bekijk hier de wedstrijd:'
+        we_think_your_stolen_bike: We hebben mogelijk uw gestolen %{bike_title} gevonden!
   info:
     about:
       about_bike_index: Over Bike Index
