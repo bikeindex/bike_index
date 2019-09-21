@@ -474,6 +474,9 @@ class Bike < ActiveRecord::Base
     if serial_number == "made_without_serial"
       self.serial_normalized = nil
       self.made_without_serial = true
+    elsif serial_number == "unknown"
+      self.serial_normalized = nil
+      self.made_without_serial = false
     else
       self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
       self.made_without_serial = false
