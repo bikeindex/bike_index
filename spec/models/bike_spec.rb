@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe Bike, type: :model do
   it_behaves_like "bike_searchable"
+
   describe "scopes" do
     it "default scopes to created_at desc" do
       expect(Bike.all.to_sql).to eq(Bike.unscoped.where(example: false, hidden: false, deleted_at: nil).order("listing_order desc").to_sql)
@@ -22,34 +23,83 @@ RSpec.describe Bike, type: :model do
       bike = FactoryBot.create(:bike)
       expect(bike.recovered_records.to_sql).to eq(StolenRecord.unscoped.where(bike_id: bike.id, current: false).order("recovered_at desc").to_sql)
     end
-    context "unknown, absent serials" do
-      let(:bike_with_serial) { FactoryBot.create(:bike, serial_number: "CCcc99FFF") }
-      let(:bike_made_without_serial) { FactoryBot.create(:bike, made_without_serial: true) }
-      let(:bike_with_unknown_serial) { FactoryBot.create(:bike, serial_number: "????  \n") }
-      it "corrects poorly entered serial numbers" do
-        [bike_with_serial, bike_made_without_serial, bike_with_unknown_serial].each { |b| b.reload }
-        expect(bike_with_serial.made_without_serial?).to be_falsey
-        expect(bike_with_serial.serial_unknown?).to be_falsey
-        expect(bike_made_without_serial.serial_number).to eq "made_without_serial"
-        expect(bike_made_without_serial.made_without_serial?).to be_truthy
-        expect(bike_made_without_serial.serial_unknown?).to be_falsey
-        expect(bike_with_unknown_serial.made_without_serial?).to be_falsey
-        expect(bike_with_unknown_serial.serial_unknown?).to be_truthy
-        expect(bike_with_serial.serial_number).to eq "CCcc99FFF"
-        expect(bike_made_without_serial.serial_number).to eq "made_without_serial"
-        expect(bike_with_unknown_serial.serial_number).to eq "unknown"
-        expect(Bike.with_known_serial.pluck(:id)).to match_array([bike_with_serial.id, bike_made_without_serial.id])
+  end
+
+  context "unknown, absent serials" do
+    let(:bike_with_serial) { FactoryBot.create(:bike, serial_number: "CCcc99FFF") }
+    let(:bike_made_without_serial) { FactoryBot.create(:bike, made_without_serial: true) }
+    let(:bike_with_unknown_serial) { FactoryBot.create(:bike, serial_number: "????  \n") }
+    it "corrects poorly entered serial numbers" do
+      [bike_with_serial, bike_made_without_serial, bike_with_unknown_serial].each { |b| b.reload }
+      expect(bike_with_serial.made_without_serial?).to be_falsey
+      expect(bike_with_serial.serial_unknown?).to be_falsey
+      expect(bike_made_without_serial.serial_number).to eq "made_without_serial"
+      expect(bike_made_without_serial.made_without_serial?).to be_truthy
+      expect(bike_made_without_serial.serial_unknown?).to be_falsey
+      expect(bike_with_unknown_serial.made_without_serial?).to be_falsey
+      expect(bike_with_unknown_serial.serial_unknown?).to be_truthy
+      expect(bike_with_serial.serial_number).to eq "CCcc99FFF"
+      expect(bike_made_without_serial.serial_number).to eq "made_without_serial"
+      expect(bike_with_unknown_serial.serial_number).to eq "unknown"
+      expect(Bike.with_known_serial.pluck(:id)).to match_array([bike_with_serial.id, bike_made_without_serial.id])
+    end
+  end
+
+  describe "#normalize_serial_number" do
+    context "given a bike made with no serial number" do
+      no_serials = [
+        "custom bike no serial has a unique frame design",
+        "custom built",
+        "custom",
+        "none",
+        "no serial",
+      ]
+      no_serials.each do |value|
+        it "('#{value}') sets the 'made_without_serial' state correctly" do
+          bike = FactoryBot.build(:bike, serial_number: value)
+          bike.normalize_serial_number
+          expect(bike.serial_number).to eq("made_without_serial")
+          expect(bike.made_without_serial).to eq(true)
+          expect(bike.serial_normalized).to eq(nil)
+        end
       end
     end
-    context "actual tests for ascend and lightspeed" do
-      let!(:bike_lightspeed_pos) { FactoryBot.create(:bike_lightspeed_pos) }
-      let!(:bike_ascend_pos) { FactoryBot.create(:bike_ascend_pos) }
-      it "scopes correctly" do
-        expect(bike_lightspeed_pos.pos_kind).to eq "lightspeed_pos"
-        expect(bike_ascend_pos.pos_kind).to eq "ascend_pos"
-        expect(Bike.lightspeed_pos.pluck(:id)).to eq([bike_lightspeed_pos.id])
-        expect(Bike.ascend_pos.pluck(:id)).to eq([bike_ascend_pos.id])
+
+    context "given a bike with an unknown serial number" do
+      unknown_serials = [
+        " UNKNOWn ",
+        "I don't know it",
+        "I don't remember",
+        "Sadly I don't know",
+        "absent",
+        "don't know",
+        "i don't know",
+        "idk",
+        "missing serial",
+        "missing",
+        "probably has one don't know it",
+        "unknown",
+      ]
+      unknown_serials.each do |value|
+        it "('#{value}') sets the 'unknown' state correctly" do
+          bike = FactoryBot.build(:bike, serial_number: value)
+          bike.normalize_serial_number
+          expect(bike.serial_number).to eq("unknown")
+          expect(bike.made_without_serial).to eq(false)
+          expect(bike.serial_normalized).to eq(nil)
+        end
       end
+    end
+  end
+
+  context "actual tests for ascend and lightspeed" do
+    let!(:bike_lightspeed_pos) { FactoryBot.create(:bike_lightspeed_pos) }
+    let!(:bike_ascend_pos) { FactoryBot.create(:bike_ascend_pos) }
+    it "scopes correctly" do
+      expect(bike_lightspeed_pos.pos_kind).to eq "lightspeed_pos"
+      expect(bike_ascend_pos.pos_kind).to eq "ascend_pos"
+      expect(Bike.lightspeed_pos.pluck(:id)).to eq([bike_lightspeed_pos.id])
+      expect(Bike.ascend_pos.pluck(:id)).to eq([bike_ascend_pos.id])
     end
   end
 
@@ -813,17 +863,10 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "set_normalized_attributes" do
-    it "sets a bikes normalized_serial and switches unknown to absent" do
-      bike = Bike.new(serial_number: " UNKNOWn ")
-      expect_any_instance_of(SerialNormalizer).to receive(:normalized).and_return("normal")
-      bike.normalize_attributes
-      expect(bike.serial_number).to eq("unknown")
-      expect(bike.serial_normalized).to eq("normal")
-    end
+  describe "#normalize_emails" do
     it "sets normalized owner email" do
       bike = Bike.new(owner_email: "  somethinG@foo.orG")
-      bike.normalize_attributes
+      bike.normalize_emails
       expect(bike.owner_email).to eq("something@foo.org")
     end
 
@@ -834,7 +877,7 @@ RSpec.describe Bike, type: :model do
         bike = FactoryBot.build(:bike, owner_email: user_email.email)
         expect(user.email).to_not eq user_email.email
         expect(bike.owner_email).to eq user_email.email
-        bike.normalize_attributes
+        bike.normalize_emails
         expect(bike.owner_email).to eq user.email
       end
     end
@@ -870,10 +913,10 @@ RSpec.describe Bike, type: :model do
         expect(bike.serial_display).to eq("Unknown")
       end
     end
-    context "Made without" do
+    context "Made without serial" do
       it "returns made_without_serial" do
         bike = Bike.new(made_without_serial: true)
-        bike.normalize_attributes
+        bike.normalize_serial_number
         expect(bike.serial_display).to eq("Made without serial")
       end
     end
