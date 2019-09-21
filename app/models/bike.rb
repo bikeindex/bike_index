@@ -454,15 +454,31 @@ class Bike < ActiveRecord::Base
     true
   end
 
-  def normalize_attributes
-    self.serial_number = "made_without_serial" if made_without_serial?
-    self.serial_number = SerialNormalizer.unknown_and_absent_corrected(serial_number)
-    self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
+  def normalize_emails
     if User.fuzzy_email_find(owner_email)
       self.owner_email = User.fuzzy_email_find(owner_email).email
     else
       self.owner_email = EmailNormalizer.normalize(owner_email)
     end
+    true
+  end
+
+  def normalize_serial_number
+    if made_without_serial?
+      self.serial_number = "made_without_serial"
+      self.serial_normalized = nil
+      return true
+    end
+
+    self.serial_number = SerialNormalizer.unknown_and_absent_corrected(serial_number)
+    if serial_number == "made_without_serial"
+      self.serial_normalized = nil
+      self.made_without_serial = true
+    else
+      self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
+      self.made_without_serial = false
+    end
+
     true
   end
 
@@ -586,7 +602,8 @@ class Bike < ActiveRecord::Base
     clean_frame_size
     set_mnfg_name
     set_user_hidden
-    normalize_attributes
+    normalize_emails
+    normalize_serial_number
     set_paints
     cache_bike
   end
