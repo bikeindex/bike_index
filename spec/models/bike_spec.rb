@@ -51,7 +51,6 @@ RSpec.describe Bike, type: :model do
         "custom bike no serial has a unique frame design",
         "custom built",
         "custom",
-        "none",
         "no serial",
       ]
       no_serials.each do |value|
@@ -77,6 +76,7 @@ RSpec.describe Bike, type: :model do
         "idk",
         "missing serial",
         "missing",
+        "none",
         "probably has one don't know it",
         "unknown",
       ]
