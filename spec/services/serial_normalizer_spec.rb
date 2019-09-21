@@ -22,12 +22,12 @@ RSpec.describe SerialNormalizer do
         [
           "dont know ", "I don't know it", "i dont fucking know", "sadly I don't know... ", "I do not remember",
           "???? ??", "Unknown Serial", "IDONTKNOWTHESERIALNUMBER", "I dont remember", "Not known", "dont no", "missing",
-          "n/a", "do not have", "no serial", "idk", "unkown",
+          "n/a", "do not have", "idk", "unkown",
         ]
       end
       it "normalizes a bunch of misentries" do
         sample_misentries.each do |serial|
-          expect(SerialNormalizer.unknown_and_absent_corrected(serial)).to eq "unknown"
+          expect(SerialNormalizer.unknown_and_absent_corrected(serial)).to eq("unknown"), "Failure: '#{serial}'"
         end
       end
     end
@@ -39,6 +39,23 @@ RSpec.describe SerialNormalizer do
       serial_normalizer = SerialNormalizer.new(serial: "made_without_serial")
       expect(serial_normalizer.normalized).to be_nil
       expect(serial_normalizer.normalized_segments).to eq([])
+    end
+
+    context "verbose entries" do
+      entries = [
+        "custom bike no serial has a unique frame design",
+        "custom built ",
+        "custom",
+        "none",
+        " none ",
+        "no serial",
+      ]
+      entries.each do |entry|
+        it "normalizes '#{entry}' to 'made_without_serial'" do
+          corrected_serial = SerialNormalizer.unknown_and_absent_corrected(entry)
+          expect(corrected_serial).to eq("made_without_serial")
+        end
+      end
     end
   end
 

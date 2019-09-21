@@ -3,9 +3,17 @@ class SerialNormalizer
     str = str.to_s.strip
     # Return unknown if blank, '?' or 'absent' (legacy concern - 'unknown' used to be stored as 'absent')
     return "unknown" if str.blank? || str.gsub(/\s|\?/, "").blank? || str.downcase == "absent"
-    return "made_without_serial" if str == "made_without_serial"
+    return "made_without_serial" if str == "made_without_serial" || looks_like_made_without?(str.downcase)
     return "unknown" if looks_like_unknown?(str.downcase)
     str
+  end
+
+  def self.looks_like_made_without?(str_downcase)
+    case str_downcase
+    when /none/i then true
+    when /no serial/i then true
+    when /custom/i then true
+    end
   end
 
   def self.looks_like_unknown?(str_downcase)
