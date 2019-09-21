@@ -100,15 +100,15 @@ FactoryBot.define do
     end
 
     trait :blue_trek_930 do
+      frame_model { "930" }
       manufacturer { FactoryBot.create(:manufacturer, name: "Trek") }
       primary_frame_color { FactoryBot.create(:color, name: "Blue") }
-      frame_model { "930" }
     end
 
     trait :green_novara_torero do
+      frame_model { "Torero 29\"" }
       manufacturer { FactoryBot.create(:manufacturer, name: "Novara") }
       primary_frame_color { FactoryBot.create(:color, name: "Green") }
-      frame_model { "Torero 29\"" }
     end
   end
 end

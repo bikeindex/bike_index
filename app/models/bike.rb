@@ -70,11 +70,13 @@ class Bike < ActiveRecord::Base
 
   default_scope {
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
-      .where(example: false, hidden: false, deleted_at: nil)
+      .current
       .order("listing_order desc")
   }
+  scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
+  scope :abandoned, -> { where(abandoned: true) }
   scope :organized, -> { where.not(creation_organization_id: nil) }
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
   scope :impounded, -> { includes(:impound_records).where(impound_records: { retrieved_at: nil }).where.not(impound_records: { id: nil }) }
@@ -157,6 +159,38 @@ class Bike < ActiveRecord::Base
     def organization(org_or_org_id)
       organization = org_or_org_id.is_a?(Organization) ? org_or_org_id : Organization.friendly_find(org_or_org_id)
       includes(:bike_organizations).where(bike_organizations: { organization_id: organization.id })
+    end
+
+    # Possibly-found bikes are stolen bikes that have a counterpart record
+    # (matching by normalized serial number) in an abandoned state.
+    def possibly_found
+      abandoned_serials =
+        abandoned
+          .where.not(stolen: true)
+          .select(:serial_normalized)
+
+      unscoped
+        .current
+        .stolen
+        .where.not(abandoned: true)
+        .where(serial_normalized: abandoned_serials)
+    end
+
+    # Return an array of tuples, each pairing a possibly-found bike with its
+    # counterpart abandoned bike.
+    def possibly_found_with_match
+      matches = abandoned.each_with_object({}) do |bike, results|
+        results[bike.serial_normalized] = bike
+      end
+
+      possibly_found.each_with_object([]) do |bike, pairs|
+        match = matches[bike.serial_normalized]
+
+        # Assume a duplicate entry if both the serial and owner emails match
+        next if match&.owner_email == bike.owner_email
+
+        pairs << [bike, match]
+      end
     end
   end
 

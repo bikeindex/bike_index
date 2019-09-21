@@ -6,8 +6,7 @@ class CustomerContact < ActiveRecord::Base
   KIND_ENUM = {
     stolen_contact: 0,
     stolen_twitter_alerter: 1,
-    held_bike_notification: 2,
-    externally_held_bike_notification: 3,
+    bike_possibly_found: 2,
   }.freeze
 
   enum kind: KIND_ENUM
@@ -23,8 +22,38 @@ class CustomerContact < ActiveRecord::Base
 
   before_save :normalize_emails_and_find_users
 
-  def info_hash
-    @info_hash ||= self[:info_hash].with_indifferent_access
+  # Given a Bike `bike` and a corresponding matching record `match` (a Bike or
+  # ExternalBike), determine if an email has been sent alerting the current
+  # `bike` owner that the given `match` may be their found bike.
+  def self.possibly_found_notification_sent?(bike, match)
+    where(kind: kinds["bike_possibly_found"], bike: bike, user_email: bike.owner_email)
+      .where("info_hash->>'match_id' = ?", match.id.to_s)
+      .where("info_hash->>'match_type' = ?", match.class.to_s)
+      .where("info_hash->>'stolen_record_id' = ?", bike&.current_stolen_record&.id.to_s)
+      .exists?
+  end
+
+  def self.build_bike_possibly_found_notification(bike, match)
+    new(bike: bike,
+        kind: kinds["bike_possibly_found"],
+        info_hash: {
+          stolen_record_id: bike&.current_stolen_record&.id.to_s,
+          match_type: match.class.to_s,
+          match_id: match.id.to_s,
+          match: match.as_json,
+        })
+  end
+
+  def receives_stolen_bike_notifications?
+    return true if bike.current_stolen_record.blank?
+    bike.current_stolen_record.receive_notifications?
+  end
+
+  def email=(email)
+    self.title = email.subject
+    self.body = email.text_part.to_s
+    self.user_email = email.to.first
+    self.creator_email = email.from.first
   end
 
   def normalize_emails_and_find_users

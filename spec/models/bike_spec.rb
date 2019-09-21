@@ -15,6 +15,9 @@ RSpec.describe Bike, type: :model do
     it "non_abandoned scopes to only non_abandoned bikes" do
       expect(Bike.non_abandoned.to_sql).to eq(Bike.where(abandoned: false).to_sql)
     end
+    it "abandoned scopes to only abandoned bikes" do
+      expect(Bike.abandoned.to_sql).to eq(Bike.where(abandoned: true).to_sql)
+    end
     it "recovered_records default scopes to created_at desc" do
       bike = FactoryBot.create(:bike)
       expect(bike.recovered_records.to_sql).to eq(StolenRecord.unscoped.where(bike_id: bike.id, current: false).order("recovered_at desc").to_sql)
@@ -47,6 +50,32 @@ RSpec.describe Bike, type: :model do
         expect(Bike.lightspeed_pos.pluck(:id)).to eq([bike_lightspeed_pos.id])
         expect(Bike.ascend_pos.pluck(:id)).to eq([bike_ascend_pos.id])
       end
+    end
+  end
+
+  describe ".possibly_found_with_match" do
+    it "returns stolen bikes with a matching normalized serial on another abandoned bike" do
+      pair0 = [
+        FactoryBot.create(:bike, stolen: true, abandoned: true, serial_number: "He10o"),
+        FactoryBot.create(:bike, stolen: true, abandoned: true, serial_number: "He10o"),
+      ]
+
+      pair1 = [
+        FactoryBot.create(:bike, stolen: true, serial_number: "he110"),
+        FactoryBot.create(:bike, abandoned: true, serial_number: "HEllO"),
+      ]
+
+      pair2 = [
+        FactoryBot.create(:bike, stolen: true, serial_number: "1100ll"),
+        FactoryBot.create(:bike, abandoned: true, serial_number: "IIOO11"),
+      ]
+
+      results = Bike.possibly_found_with_match
+      expect(results.length).to eq(2)
+
+      result_ids = results.map { |pair| pair.map(&:id) }
+      expect(result_ids).to_not include(pair0.map(&:id))
+      expect(result_ids).to match_array([pair1.map(&:id), pair2.map(&:id)])
     end
   end
 

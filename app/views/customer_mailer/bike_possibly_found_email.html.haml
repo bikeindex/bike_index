@@ -1,0 +1,7 @@
+%p
+  - bike_link = link_to(@bike.title_string, bike_url(@bike))
+  = t(".html.we_think_your_stolen_bike_html", bike_title: bike_link)
+
+%p
+  = t(".html.check_out_match_here")
+  = link_to(@match.title_string, bike_url(@match))

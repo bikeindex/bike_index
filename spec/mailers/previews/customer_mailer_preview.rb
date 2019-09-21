@@ -32,12 +32,24 @@ class CustomerMailerPreview < ActionMailer::Preview
   end
 
   def stolen_bike_alert_email
-    customer_contact = CustomerContact.last
+    customer_contact =
+      CustomerContact
+        .includes(:bike)
+        .where(bike_id: Bike.select(:id))
+        .where.not("info_hash->>'tweet_account_name' = ''")
+        .last
+
     CustomerMailer.stolen_bike_alert_email(customer_contact)
   end
 
   def admin_contact_stolen_email
-    customer_contact = CustomerContact.where(kind: :stolen_contact).last
+    customer_contact =
+      CustomerContact
+        .includes(:bike)
+        .stolen_contact
+        .where(bike_id: Bike.select(:id))
+        .last
+
     CustomerMailer.admin_contact_stolen_email(customer_contact)
   end
 
@@ -53,6 +65,11 @@ class CustomerMailerPreview < ActionMailer::Preview
   def recovered_from_link
     recovered_record = StolenRecord.recovered.where.not(recovered_at: nil).first
     CustomerMailer.recovered_from_link(recovered_record)
+  end
+
+  def bike_possibly_found_email
+    contact = CustomerContact.bike_possibly_found.last
+    CustomerMailer.bike_possibly_found_email(contact)
   end
 
   private

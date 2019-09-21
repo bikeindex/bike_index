@@ -1467,6 +1467,13 @@ en:
         sign_up_or_in: >-
           Sign up or sign in to BikeIndex.org to claim your %{bike_type} and edit
           it, upload photos and make sure you never lose track of your trusty steed!
+    bike_possibly_found_email:
+      html:
+        check_out_match_here: 'Check out the match here:'
+        we_think_your_stolen_bike_html: We may have found your stolen <strong>%{bike_title}</strong>!
+      text:
+        check_out_match_here: 'Check out the match here:'
+        we_think_your_stolen_bike: We may have found your stolen %{bike_title}!
     confirmation_email:
       html:
         click_to_verify_html: Click the <em>Verify email</em> button to finish signing
