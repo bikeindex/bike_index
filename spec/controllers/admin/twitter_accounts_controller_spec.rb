@@ -41,6 +41,35 @@ RSpec.describe Admin::TwitterAccountsController, type: :controller, vcr: true do
     end
   end
 
+  describe "update" do
+    let(:twitter_account) { FactoryBot.create(:twitter_account_1, is_active: false) }
+    before { twitter_account.set_error("Something") }
+    it "updates without check_credentials" do
+      expect(twitter_account.errored?).to be_truthy
+      expect(twitter_account).to_not receive(:check_credentials)
+      patch :update,
+            id: ambassador_task.id,
+            twitter_account: { append_block: "Something special" }
+      twitter_account.reload
+      expect(twitter_account.append_block).to eq "Something special"
+      expect(twitter_account.errored?).to be_truthy
+      expect(twitter_account.is_active).to be_falsey
+    end
+    context "switching to is_active" do
+      it "updates and checks_credentials" do
+        expect(twitter_account.errored?).to be_truthy
+        expect(twitter_account).to receive(:check_credentials) { }
+        patch :update,
+              id: ambassador_task.id,
+              verify_credentials: true,
+              twitter_account: { is_active: true }
+        twitter_account.reload
+        expect(twitter_account.errored?).to be_falsey
+        expect(twitter_account.is_active).to be_truthy
+      end
+    end
+  end
+
   describe "#destroy" do
     context "given a successful deletion" do
       it "deletes the tweet, redirects to tweet index url with an appropriate flash" do
