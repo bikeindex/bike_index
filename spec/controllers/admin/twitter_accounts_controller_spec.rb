@@ -42,7 +42,7 @@ RSpec.describe Admin::TwitterAccountsController, type: :controller, vcr: true do
   end
 
   describe "update" do
-    let(:twitter_account) { FactoryBot.create(:twitter_account_1, is_active: false) }
+    let(:twitter_account) { FactoryBot.create(:twitter_account_1, active: false) }
     before { twitter_account.set_error("Something") }
     it "updates without check_credentials" do
       expect(twitter_account.errored?).to be_truthy
@@ -53,19 +53,19 @@ RSpec.describe Admin::TwitterAccountsController, type: :controller, vcr: true do
       twitter_account.reload
       expect(twitter_account.append_block).to eq "Something special"
       expect(twitter_account.errored?).to be_truthy
-      expect(twitter_account.is_active).to be_falsey
+      expect(twitter_account.active).to be_falsey
     end
-    context "switching to is_active" do
+    context "switching to active" do
       it "updates and checks_credentials" do
         expect(twitter_account.errored?).to be_truthy
         expect(twitter_account).to receive(:check_credentials) { }
         patch :update,
               id: ambassador_task.id,
               verify_credentials: true,
-              twitter_account: { is_active: true }
+              twitter_account: { active: true }
         twitter_account.reload
         expect(twitter_account.errored?).to be_falsey
-        expect(twitter_account.is_active).to be_truthy
+        expect(twitter_account.active).to be_truthy
       end
     end
   end
