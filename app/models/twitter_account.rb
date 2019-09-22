@@ -76,11 +76,12 @@ class TwitterAccount < ActiveRecord::Base
   end
 
   def errored?
-    last_error.present?
+    last_error_at.present?
   end
 
   def check_credentials
-    clear_error if twitter_client.verify_credentials.present?
+    clear_error
+    twitter_client.verify_credentials
   rescue Twitter::Error::Unauthorized, Twitter::Error::Forbidden => err
     set_error(err.message)
   end

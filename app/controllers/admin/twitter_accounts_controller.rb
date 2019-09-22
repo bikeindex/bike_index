@@ -28,6 +28,10 @@ class Admin::TwitterAccountsController < Admin::BaseController
 
   def update
     if @twitter_account.update_attributes(permitted_parameters)
+      if ParamsNormalizer.boolean(params[:check_credentials])
+        @twitter_account.reload
+        @twitter_account.check_credentials
+      end
       flash[:notice] = "Twitter account saved!"
       redirect_to admin_twitter_account_url(@twitter_account)
     else
