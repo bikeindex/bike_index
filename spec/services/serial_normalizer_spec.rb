@@ -22,7 +22,7 @@ RSpec.describe SerialNormalizer do
         [
           "dont know ", "I don't know it", "i dont fucking know", "sadly I don't know... ", "I do not remember",
           "???? ??", "Unknown Serial", "IDONTKNOWTHESERIALNUMBER", "I dont remember", "Not known", "dont no", "missing",
-          "n/a", "do not have", "idk", "unkown", "none",
+          "n/a", "do not have", "idk", "unkown", "none", "no serial",
         ]
       end
       it "normalizes a bunch of misentries" do
@@ -46,7 +46,6 @@ RSpec.describe SerialNormalizer do
         "custom bike no serial has a unique frame design",
         "custom built ",
         " custom ",
-        "no serial",
       ]
       entries.each do |entry|
         it "normalizes '#{entry}' to 'made_without_serial'" do

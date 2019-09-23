@@ -9,10 +9,7 @@ class SerialNormalizer
   end
 
   def self.looks_like_made_without?(str_downcase)
-    case str_downcase
-    when /no serial/i then true
-    when /custom/i then true
-    end
+    (/custom/).match?(str_downcase)
   end
 
   def self.looks_like_unknown?(str_downcase)
