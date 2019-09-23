@@ -345,11 +345,11 @@ RSpec.describe BulkImportWorker, type: :job do
       let(:blank_examples) { ["NA", "N/A", "unkown", "unkown", "           ", "none"] }
       let(:non_blank_examples) { %w[somethingna none8xc9x] }
       it "rescues blank serials, doesn't rescue non blank serials" do
-        blank_examples.each do |e|
-          expect(instance.rescue_blank_serial(e)).to eq "unknown"
+        blank_examples.each do |blank|
+          expect(instance.rescue_blank_serial(blank)).to eq("unknown"), "Failure: '#{blank}'"
         end
-        non_blank_examples.each do |e|
-          expect(instance.rescue_blank_serial(e)).to_not eq "unknown"
+        non_blank_examples.each do |non_blank|
+          expect(instance.rescue_blank_serial(non_blank)).to_not eq("unknown"), "Failure: #{non_blank}"
         end
       end
     end
