@@ -192,6 +192,22 @@ class Bike < ActiveRecord::Base
         pairs << [bike, match]
       end
     end
+
+    # Search for currently stolen bikes reported stolen in the given city, state
+    # and/or country. `city`, `state` and `country` are accepted as strings /
+    # symbols of the name or abbreviation, and are matched conjointly.
+    def currently_stolen_in(city: nil, state: nil, country: nil)
+      location = { city: city, state: state, country: country }.select { |_, v| v.present? }
+      location[:state] &&= State.find_by("name = ? OR abbreviation = ?", state, state)
+      location[:country] &&= Country.find_by("name = ? OR iso = ?", country, country)
+      return none if location.values.any?(&:blank?)
+
+      unscoped
+        .stolen
+        .current
+        .includes(:current_stolen_record)
+        .where(stolen_records: location)
+    end
   end
 
   def cleaned_error_messages # We don't actually want to show these messages to the user, since they just tell us the bike wasn't created
