@@ -3,11 +3,6 @@ FactoryBot.define do
     bike { FactoryBot.create(:bike, stolen: true) }
     date_stolen { Time.current }
 
-    after(:create) do |stolen_record, _evaluator|
-      bike = stolen_record.bike
-      bike.save # sets current_stolen_record
-    end
-
     factory :stolen_record_recovered do
       bike { FactoryBot.create(:bike) }
       recovered_at { Time.current }

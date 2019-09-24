@@ -44,6 +44,28 @@ FactoryBot.define do
       factory :recovered_bike do
         stolen { false }
       end
+
+      factory :stolen_bike_in_amsterdam do
+        after(:create) do |bike, evaluator|
+          create(:stolen_record, :in_amsterdam, bike: bike, latitude: evaluator.latitude, longitude: evaluator.longitude)
+          bike.save # updates current_stolen_record
+          bike.reload
+        end
+      end
+      factory :stolen_bike_in_los_angeles do
+        after(:create) do |bike, evaluator|
+          create(:stolen_record, :in_los_angeles, bike: bike, latitude: evaluator.latitude, longitude: evaluator.longitude)
+          bike.save # updates current_stolen_record
+          bike.reload
+        end
+      end
+      factory :stolen_bike_in_nyc do
+        after(:create) do |bike, evaluator|
+          create(:stolen_record, :in_nyc, bike: bike, latitude: evaluator.latitude, longitude: evaluator.longitude)
+          bike.save # updates current_stolen_record
+          bike.reload
+        end
+      end
     end
 
     factory :organized_bikes do # don't use this factory exactly, it's used to wrap all the organized bikes

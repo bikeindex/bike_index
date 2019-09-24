@@ -3,11 +3,11 @@ require "rails_helper"
 RSpec.describe EmailStolenBikeAlertWorker, type: :job do
   describe "perform" do
     it "sends an email" do
-      stolen_record = FactoryBot.create(:stolen_record)
-      FactoryBot.create(:ownership, bike: stolen_record.bike)
+      bike = FactoryBot.create(:stolen_bike)
+      FactoryBot.create(:ownership, bike: bike)
       info_hash = {
         notification_type: "stolen_twitter_alerter",
-        bike_id: stolen_record.bike.id,
+        bike_id: bike.id,
         tweet_id: 69,
         tweet_string: "STOLEN - something special",
         tweet_account_screen_name: "bikeindex",
@@ -16,7 +16,7 @@ RSpec.describe EmailStolenBikeAlertWorker, type: :job do
         location: "Everywhere",
         retweet_screen_names: ["someother_screename"],
       }
-      customer_contact = FactoryBot.create(:customer_contact, bike: stolen_record.bike, info_hash: info_hash)
+      customer_contact = FactoryBot.create(:customer_contact, bike: bike, info_hash: info_hash)
       ActionMailer::Base.deliveries = []
       EmailStolenBikeAlertWorker.new.perform(customer_contact.id)
       expect(ActionMailer::Base.deliveries).not_to be_empty

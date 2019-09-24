@@ -84,12 +84,12 @@ RSpec.describe CustomerMailer, type: :mailer do
   end
 
   describe "stolen_bike_alert_email" do
-    let!(:ownership) { FactoryBot.create(:ownership, bike: stolen_record.bike) }
-    let(:stolen_record) { FactoryBot.create(:stolen_record) }
+    let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
+    let(:bike) { FactoryBot.create(:stolen_bike) }
     let(:notification_hash) do
       {
         notification_type: "stolen_twitter_alerter",
-        bike_id: stolen_record.bike.id,
+        bike_id: bike.id,
         tweet_id: 69,
         tweet_string: "STOLEN - something special",
         tweet_account_screen_name: "bikeindex",
@@ -99,7 +99,7 @@ RSpec.describe CustomerMailer, type: :mailer do
         retweet_screen_names: %w(someother_screename and_another),
       }
     end
-    let(:customer_contact) { FactoryBot.create(:customer_contact, info_hash: notification_hash, title: "CUSTOM CUSTOMER contact Title", bike: stolen_record.bike) }
+    let(:customer_contact) { FactoryBot.create(:customer_contact, info_hash: notification_hash, title: "CUSTOM CUSTOMER contact Title", bike: bike) }
     it "renders email" do
       mail = CustomerMailer.stolen_bike_alert_email(customer_contact)
       expect(mail.to).to eq([customer_contact.user_email])
@@ -111,7 +111,7 @@ RSpec.describe CustomerMailer, type: :mailer do
   describe "recovered_from_link" do
     let(:bike) { FactoryBot.create(:stolen_bike, cycle_type: "tall-bike") }
     let(:stolen_record) { bike.current_stolen_record }
-    let!(:ownership) { FactoryBot.create(:ownership, bike: stolen_record.bike) }
+    let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
     let(:recovered_description) { "Bike Index helped me find my stolen bike and get it back!" }
     before { stolen_record.add_recovery_information(recovered_description: recovered_description) }
     it "renders email" do
@@ -124,15 +124,15 @@ RSpec.describe CustomerMailer, type: :mailer do
   end
 
   describe "admin_contact_stolen_email" do
-    let!(:ownership) { FactoryBot.create(:ownership, bike: stolen_record.bike) }
-    let(:stolen_record) { FactoryBot.create(:stolen_record) }
+    let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
+    let(:bike) { FactoryBot.create(:stolen_bike) }
     let(:user) { FactoryBot.create(:admin, email: "something@stuff.com") }
     let(:customer_contact) do
-      CustomerContact.create(user_email: stolen_record.bike.owner_email,
+      CustomerContact.create(user_email: bike.owner_email,
                              creator_email: user.email,
                              body: "some message",
                              kind: :stolen_contact,
-                             bike_id: stolen_record.bike.id,
+                             bike_id: bike.id,
                              title: "some title")
     end
     it "renders email" do
@@ -145,10 +145,10 @@ RSpec.describe CustomerMailer, type: :mailer do
   end
 
   describe "stolen_notification_email" do
-    let(:stolen_record) { FactoryBot.create(:stolen_record) }
-    let!(:ownership) { FactoryBot.create(:ownership, bike: stolen_record.bike) }
+    let(:bike) { FactoryBot.create(:stolen_bike) }
+    let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
     let(:sender) { FactoryBot.create(:user, email: "party@example.com") }
-    let(:stolen_notification) { FactoryBot.create(:stolen_notification, subject: "test subject", message: "Test Message", reference_url: "something.com", bike: stolen_record.bike, sender: sender) }
+    let(:stolen_notification) { FactoryBot.create(:stolen_notification, subject: "test subject", message: "Test Message", reference_url: "something.com", bike: bike, sender: sender) }
     it "renders email and update sent_dates" do
       mail = CustomerMailer.stolen_notification_email(stolen_notification)
       expect(mail.subject).to eq(stolen_notification.subject)
