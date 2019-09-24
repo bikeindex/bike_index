@@ -126,5 +126,27 @@ FactoryBot.define do
     trait :stolen_bike do
       bike { FactoryBot.create(:stolen_bike) }
     end
+
+    factory :customer_contact_potentially_found_bike do
+      creator { FactoryBot.create(:user) }
+      bike { FactoryBot.create(:stolen_bike) }
+      title { "We may have found your bike" }
+      body { "Your bike may have been found" }
+      creator_email { "sender@example.com" }
+      kind { :bike_possibly_found }
+
+      transient do
+        match { FactoryBot.create(:abandoned_bike) }
+      end
+
+      after(:create) do |cc, evaluator|
+        info_hash = {
+          "match_id" => evaluator.match.id.to_s,
+          "match_type" => evaluator.match.class.to_s,
+          "stolen_record_id" => cc.bike.current_stolen_record.id.to_s,
+        }
+        cc.update(info_hash: info_hash, user_email: cc.bike.owner_email)
+      end
+    end
   end
 end
