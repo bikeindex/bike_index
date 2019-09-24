@@ -118,10 +118,13 @@ class CustomerMailer < ActionMailer::Base
     @bike = contact.bike
     @user = User.fuzzy_email_find(@bike.owner_email)
     @match =
-      if contact.info_hash["match_type"] == "Bike"
+      case contact.info_hash["match_type"]
+      when "Bike"
         Bike.find_by(id: contact.info_hash["match_id"])
+      when "ExternalRegistryBike"
+        ExternalRegistryBike.find_by(id: contact.info_hash["match_id"])
       else
-        # initialize an ExternalRegistryBike from info_hash["match"]
+        raise ArgumentError, "Unrecognized match type: '#{contact.info_hash["match_type"]}'"
       end
 
     I18n.with_locale(@user&.preferred_language || I18n.default_locale) do

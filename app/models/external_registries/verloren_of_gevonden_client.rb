@@ -58,6 +58,8 @@ module ExternalRegistries
 
       set_total(response_json)
       add_page(page, response_json)
+    rescue Faraday::ConnectionFailed
+      add_page(page, {})
     end
 
     def request_params(query, page, per_page)

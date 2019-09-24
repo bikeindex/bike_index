@@ -4,6 +4,7 @@ class Country < ActiveRecord::Base
 
   has_many :stolen_records
   has_many :locations
+  has_many :external_registries
 
   def self.select_options
     pluck(:id, :iso).map do |id, iso|

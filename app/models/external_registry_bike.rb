@@ -13,6 +13,13 @@ class ExternalRegistryBike < ActiveRecord::Base
 
   before_save :normalize_serial_number
 
+  def self.registered_in_country(iso: "NL")
+    country_id = Country.where(iso: iso.upcase).select(:id)
+
+    includes(external_registry: :country)
+      .where(external_registries: { country_id: country_id })
+  end
+
   def self.find_or_search_registry_for(serial_number:)
     matches = ExternalRegistryBike.where(serial_number: serial_number)
     return matches if matches.any?

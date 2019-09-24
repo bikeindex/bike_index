@@ -35,6 +35,18 @@ class CustomerContact < ActiveRecord::Base
       .exists?
   end
 
+  # Initialize a "bike possibly found" CustomerContact object for the given
+  # bike/match pair. Use Bike#email= to populate remaining attributes based on
+  # the mailer-generated message.
+  #
+  # Example:
+  #
+  #     contact = CustomerContact.build_bike_possibly_found_notification(bike, match)
+  #     email = CustomerMailer.bike_possibly_found_email(contact)
+  #
+  #     contact.email = email
+  #     email.deliver_now if contact.save
+  #
   def self.build_bike_possibly_found_notification(bike, match)
     new(bike: bike,
         kind: kinds["bike_possibly_found"],

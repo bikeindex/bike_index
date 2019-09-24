@@ -179,6 +179,32 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe ".possibly_found_externally_with_match" do
+    it "returns stolen bikes with a matching normalized serial on an external-registry bike" do
+      pair0 = [
+        FactoryBot.create(:stolen_bike, serial_number: "He10o"),
+        FactoryBot.create(:external_registry_bike, serial_number: "He10o"),
+      ]
+
+      pair1 = [
+        FactoryBot.create(:stolen_bike_in_amsterdam, serial_number: "he110"),
+        FactoryBot.create(:external_registry_bike, serial_number: "He1lo"),
+      ]
+
+      pair2 = [
+        FactoryBot.create(:stolen_bike_in_amsterdam, serial_number: "1100ll"),
+        FactoryBot.create(:external_registry_bike, serial_number: "IIOO11"),
+      ]
+
+      results = Bike.possibly_found_externally_with_match(country_iso: "NL")
+      expect(results.length).to eq(2)
+
+      result_ids = results.map { |pair| pair.map(&:id) }
+      expect(result_ids).to_not include(pair0.map(&:id))
+      expect(result_ids).to match_array([pair1.map(&:id), pair2.map(&:id)])
+    end
+  end
+
   describe "visible_by" do
     let(:owner) { User.new }
     let(:superuser) { User.new(superuser: true) }
