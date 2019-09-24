@@ -3143,7 +3143,7 @@ nl:
         class='scroll-to-ref'>onderaan deze pagina doen</a>
       this_page_gives_instructions_html: Deze pagina geeft instructies voor het integreren
         van Bike Index-registratie met uw Lightspeed Retail-kassasysteem. <strong><a
-        href=\"%{about_url}\">Lees onze over-pagina</a></strong> voor algemene informatie
+        href="%{about_url}">Lees onze over-pagina</a></strong> voor algemene informatie
         over wat Bike Index is en waarom het belangrijk is.
       we_believe_that_bicycle_registration: Bij Bike Index geloven we dat fietsregistratie
         een van de eenvoudigste en meest effectieve manieren is om fietsdiefstal te
