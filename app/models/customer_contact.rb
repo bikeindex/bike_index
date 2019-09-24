@@ -26,6 +26,8 @@ class CustomerContact < ActiveRecord::Base
   # ExternalBike), determine if an email has been sent alerting the current
   # `bike` owner that the given `match` may be their found bike.
   def self.possibly_found_notification_sent?(bike, match)
+    return false unless bike.present? && match.present?
+
     where(kind: kinds["bike_possibly_found"], bike: bike, user_email: bike.owner_email)
       .where("info_hash->>'match_id' = ?", match.id.to_s)
       .where("info_hash->>'match_type' = ?", match.class.to_s)

@@ -1,6 +1,75 @@
 require "rails_helper"
 
 RSpec.describe CustomerContact, type: :model do
+  describe "#possibly_found_notification_sent?" do
+    context "given a blank bike" do
+      it "returns false" do
+        match = FactoryBot.build(:bike)
+        already_sent = CustomerContact.possibly_found_notification_sent?(nil, match)
+        expect(already_sent).to eq(false)
+      end
+    end
+
+    context "given a blank matching record" do
+      it "returns false" do
+        bike = FactoryBot.build(:bike)
+        already_sent = CustomerContact.possibly_found_notification_sent?(bike, nil)
+        expect(already_sent).to eq(false)
+      end
+    end
+
+    context "given a bike and match that have already triggered an email to the user" do
+      it "returns true" do
+        match = FactoryBot.create(:abandoned_bike)
+        contact = FactoryBot.create(:customer_contact_potentially_found_bike, match: match)
+        bike = contact.bike
+
+        already_sent = CustomerContact.possibly_found_notification_sent?(bike, match)
+
+        expect(already_sent).to eq(true)
+      end
+    end
+
+    context "given a bike and match where the match has changed" do
+      it "returns false" do
+        match = FactoryBot.create(:abandoned_bike)
+        contact = FactoryBot.create(:customer_contact_potentially_found_bike, match: match)
+        bike = contact.bike
+        new_match = FactoryBot.create(:abandoned_bike)
+
+        already_sent = CustomerContact.possibly_found_notification_sent?(bike, new_match)
+
+        expect(already_sent).to eq(false)
+      end
+    end
+
+    context "given a bike and match where the current_stolen_record has changed" do
+      it "returns false" do
+        match = FactoryBot.create(:abandoned_bike)
+        contact = FactoryBot.create(:customer_contact_potentially_found_bike, match: match)
+        bike = contact.bike
+        bike.update(current_stolen_record: FactoryBot.create(:stolen_record, bike: bike))
+
+        already_sent = CustomerContact.possibly_found_notification_sent?(bike, match)
+
+        expect(already_sent).to eq(false)
+      end
+    end
+
+    context "given a bike and match where the owner email has changed" do
+      it "returns false" do
+        match = FactoryBot.create(:abandoned_bike)
+        contact = FactoryBot.create(:customer_contact_potentially_found_bike, match: match)
+        bike = contact.bike
+        bike.update(owner_email: "new_owner@example.com")
+
+        already_sent = CustomerContact.possibly_found_notification_sent?(bike, match)
+
+        expect(already_sent).to eq(false)
+      end
+    end
+  end
+
   describe "validations" do
     subject { FactoryBot.build(:customer_contact) }
 
