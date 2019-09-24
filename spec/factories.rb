@@ -130,9 +130,6 @@ FactoryBot.define do
     factory :customer_contact_potentially_found_bike do
       creator { FactoryBot.create(:user) }
       bike { FactoryBot.create(:stolen_bike) }
-      title { "We may have found your bike" }
-      body { "Your bike may have been found" }
-      creator_email { "sender@example.com" }
       kind { :bike_possibly_found }
 
       transient do
@@ -145,7 +142,13 @@ FactoryBot.define do
           "match_type" => evaluator.match.class.to_s,
           "stolen_record_id" => cc.bike.current_stolen_record.id.to_s,
         }
-        cc.update(info_hash: info_hash, user_email: cc.bike.owner_email)
+        cc.update(
+          info_hash: info_hash,
+          user_email: cc.bike.owner_email,
+          creator_email: cc.creator.email,
+          title: "We may have found your stolen #{cc.bike.title_string}",
+          body: "Check this matching bike: #{evaluator.match.title_string}",
+        )
       end
     end
   end
