@@ -1700,7 +1700,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1726,7 +1726,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -2008,7 +2008,7 @@ en:
         this page</a>
       this_page_gives_instructions_html: >-
         This page gives instructions on integrating Bike Index registration with your
-        Lightspeed Retail POS system. <strong><a href=\"%{about_url}\">Read our about
+        Lightspeed Retail POS system. <strong><a href="%{about_url}">Read our about
         page</a></strong> for general information about what Bike Index is and why
         it's important.
       we_believe_that_bicycle_registration: >-
