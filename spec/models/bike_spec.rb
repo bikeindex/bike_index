@@ -29,8 +29,8 @@ RSpec.describe Bike, type: :model do
     context "given no matching state or country" do
       it "returns none" do
         FactoryBot.create(:country_nl)
-        FactoryBot.create(:stolen_record, :currently_stolen, :in_nyc)
-        FactoryBot.create(:stolen_record, :currently_stolen, :in_los_angeles)
+        FactoryBot.create(:stolen_record, :in_nyc)
+        FactoryBot.create(:stolen_record, :in_los_angeles)
         expect(Bike.currently_stolen_in(country: "New York City")).to be_empty
         expect(Bike.currently_stolen_in(state: "New York City", country: "Svenborgia")).to be_empty
         expect(Bike.currently_stolen_in(city: "Los Angeles", country: "NL")).to be_empty
@@ -46,9 +46,9 @@ RSpec.describe Bike, type: :model do
 
     context "given a currently stolen bike in a matching city or state" do
       it "returns only the requested bikes" do
-        FactoryBot.create(:stolen_record, :currently_stolen, :in_amsterdam)
-        FactoryBot.create(:stolen_record, :currently_stolen, :in_los_angeles)
-        FactoryBot.create(:stolen_record, :currently_stolen, :in_nyc)
+        FactoryBot.create(:stolen_record, :in_amsterdam)
+        FactoryBot.create(:stolen_record, :in_los_angeles)
+        FactoryBot.create(:stolen_record, :in_nyc)
 
         bikes = Bike.currently_stolen_in(city: "Los Angeles")
         expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["Los Angeles"])
@@ -63,9 +63,9 @@ RSpec.describe Bike, type: :model do
 
     context "given currently stolen bikes in a matching country" do
       it "returns only the requested bikes" do
-        FactoryBot.create(:stolen_record, :currently_stolen, :in_amsterdam)
-        FactoryBot.create(:stolen_record, :currently_stolen, :in_los_angeles)
-        FactoryBot.create(:stolen_record, :currently_stolen, :in_nyc)
+        FactoryBot.create(:stolen_record, :in_amsterdam)
+        FactoryBot.create(:stolen_record, :in_los_angeles)
+        FactoryBot.create(:stolen_record, :in_nyc)
 
         bikes = Bike.currently_stolen_in(country: "NL")
         expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["Amsterdam"])
