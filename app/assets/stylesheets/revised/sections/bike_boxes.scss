@@ -76,10 +76,16 @@ $bike-box-bg: $gray-lighter;
 
   img {
     display: block;
+    margin: auto;
+    max-height: 200px;
+    min-width: 70px;
   }
 
   .no-image {
     background: $bike-box-bg;
+    height: 200px;
+    margin: auto;
+    min-width: 70px;
     padding: 2 * $vertical-height;
     vertical-align: middle;
   }
