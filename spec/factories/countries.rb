@@ -12,5 +12,10 @@ FactoryBot.define do
       name { "United Kingdom" }
       iso { "UK" }
     end
+
+    factory :country_nl do
+      name { "Netherlands" }
+      iso { "NL" }
+    end
   end
 end

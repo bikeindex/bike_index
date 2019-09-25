@@ -25,6 +25,57 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe ".currently_stolen_in" do
+    context "given no matching state or country" do
+      it "returns none" do
+        FactoryBot.create(:country_nl)
+        FactoryBot.create(:stolen_bike_in_nyc)
+        FactoryBot.create(:stolen_bike_in_los_angeles)
+        expect(Bike.currently_stolen_in(country: "New York City")).to be_empty
+        expect(Bike.currently_stolen_in(state: "New York City", country: "Svenborgia")).to be_empty
+        expect(Bike.currently_stolen_in(city: "Los Angeles", country: "NL")).to be_empty
+      end
+    end
+
+    context "given no matching stolen bikes in a valid state or country" do
+      it "returns none" do
+        expect(StolenRecord.count).to eq(0)
+        expect(Bike.currently_stolen_in(country: "US")).to be_empty
+      end
+    end
+
+    context "given a currently stolen bike in a matching city or state" do
+      it "returns only the requested bikes" do
+        FactoryBot.create(:stolen_bike_in_amsterdam)
+        FactoryBot.create(:stolen_bike_in_los_angeles)
+        FactoryBot.create(:stolen_bike_in_nyc)
+
+        bikes = Bike.currently_stolen_in(city: "Los Angeles")
+        expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["Los Angeles"])
+
+        bikes = Bike.currently_stolen_in(state: "NY", country: "US")
+        expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["New York"])
+
+        bikes = Bike.currently_stolen_in(state: "NY", country: "NL")
+        expect(bikes).to be_empty
+      end
+    end
+
+    context "given currently stolen bikes in a matching country" do
+      it "returns only the requested bikes" do
+        FactoryBot.create(:stolen_bike_in_amsterdam)
+        FactoryBot.create(:stolen_bike_in_los_angeles)
+        FactoryBot.create(:stolen_bike_in_nyc)
+
+        bikes = Bike.currently_stolen_in(country: "NL")
+        expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["Amsterdam"])
+
+        bikes = Bike.currently_stolen_in(country: "US")
+        expect(bikes.map(&:current_stolen_record).map(&:city)).to match_array(["New York", "Los Angeles"])
+      end
+    end
+  end
+
   context "unknown, absent serials" do
     let(:bike_with_serial) { FactoryBot.create(:bike, serial_number: "CCcc99FFF") }
     let(:bike_made_without_serial) { FactoryBot.create(:bike, made_without_serial: true) }
