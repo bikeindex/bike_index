@@ -69,7 +69,7 @@ class Bike < ActiveRecord::Base
   enum propulsion_type: PropulsionType::SLUGS
 
   default_scope {
-    includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, current_stolen_record: [:state, :country])
+    includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
       .current
       .order("listing_order desc")
   }
