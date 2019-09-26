@@ -1,6 +1,14 @@
 require "rails_helper"
 
 RSpec.describe ExternalRegistry, type: :model do
+  before(:all) do
+    ::ExternalRegistry.create_all
+  end
+
+  after(:all) do
+    ::ExternalRegistry.destroy_all
+  end
+
   describe ".search_for_bikes_with" do
     context "when matches are found" do
       it "returns an ActiveRecord relation of ExternalRegistryBikes" do

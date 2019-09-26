@@ -2,6 +2,14 @@ require "rails_helper"
 
 module ExternalRegistries
   RSpec.describe VerlorenOfGevondenResult, type: :model do
+    before(:all) do
+      ::ExternalRegistry.create_all
+    end
+
+    after(:all) do
+      ::ExternalRegistry.destroy_all
+    end
+
     describe "#bike?" do
       it "returns true given a bike entry" do
         result = described_class.new(bike_json)

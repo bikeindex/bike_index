@@ -1,6 +1,14 @@
 require "rails_helper"
 
 RSpec.describe "Search API V3", type: :request do
+  before(:all) do
+    ::ExternalRegistry.create_all
+  end
+
+  after(:all) do
+    ::ExternalRegistry.destroy_all
+  end
+
   let(:manufacturer) { FactoryBot.create(:manufacturer) }
   let(:color) { FactoryBot.create(:color) }
   describe "/" do

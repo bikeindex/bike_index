@@ -2,6 +2,14 @@ require "rails_helper"
 
 module ExternalRegistries
   RSpec.describe StopHelingClient, type: :model do
+    before(:all) do
+      ::ExternalRegistry.create_all
+    end
+
+    after(:all) do
+      ::ExternalRegistry.destroy_all
+    end
+
     before do
       null_cache = ActiveSupport::Cache.lookup_store(:null_store)
       allow(Rails).to receive(:cache).and_return(null_cache)

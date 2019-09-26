@@ -2,6 +2,14 @@ require "rails_helper"
 
 module ExternalRegistries
   RSpec.describe ExternalRegistries::StopHelingResult, type: :model do
+    before(:all) do
+      ::ExternalRegistry.create_all
+    end
+
+    after(:all) do
+      ::ExternalRegistry.destroy_all
+    end
+
     let(:response_object) do
       {}.tap do |h|
         h[:brand] = "Huffy"
