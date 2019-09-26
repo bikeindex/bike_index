@@ -238,8 +238,62 @@ class Bike < ActiveRecord::Base
       unscoped
         .stolen
         .current
+        .with_known_serial
         .includes(:current_stolen_record)
         .where(stolen_records: location)
+    end
+
+    # Generate a list of substrings held in common by multiple normalized
+    # serials among the bike records being worked on.
+    #
+    # Used to reduce the number of API queries made against
+    # external registries that return partial matches.
+    #
+    # Experiment to adjust `stem_length` as needed.
+    #
+    # A `stem_length` of 4 produced a ~15-20% reduction in the number of queries
+    # needed when grouping at the country level. A higher stem length appears to
+    # be more effective (again with a ~15-20% reduction) when grouping at the
+    # state level.
+    #
+    # Examples:
+    #
+    #   Netherlands
+    #   -----------
+    #   unique_serials: 84
+    #   selected_stems + remainder: 72 (stem length 4)
+    #
+    #   United States
+    #   -------------
+    #   unique_serials: 40,908
+    #   selected_stems + remainder: 32,408 (stem length 4)
+    #
+    #   New York
+    #   --------
+    #   unique_serials: 956
+    #   selected_stems + remainder: 811 (stem length 5)
+    #
+    #   California
+    #   ----------
+    #   unique_serials: 9,243
+    #   selected_stems + remainder: 8,033 (stem length 6)
+    #
+    # Return an array of strings
+    def normalized_serial_stems(stem_length: 4)
+      serials = all.pluck(:serial_normalized).compact.uniq
+
+      # NB: Unoptimized
+      candidate_stems = serials.each_with_object(Hash.new { |h, k| h[k] = [] }) do |serial, acc|
+        serial.chars.each_cons(stem_length) { |substring| acc[substring.join] << serial }
+      end
+
+      # Select stems that map to multiple serials
+      selected_stems = candidate_stems.select { |_, v| v.length > 1 }
+
+      # Select any serials not mapped to by the selected serial stems
+      remainder = serials - selected_stems.values.flatten.uniq
+
+      selected_stems.keys.concat(remainder)
     end
   end
 

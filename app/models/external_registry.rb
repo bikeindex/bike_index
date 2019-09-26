@@ -7,7 +7,7 @@ class ExternalRegistry < ActiveRecord::Base
   has_many :external_registry_bikes, dependent: :destroy
   alias_method :bikes, :external_registry_bikes
 
-  scope :netherlands, -> { where(country: Country.netherlands) }
+  scope :in_country, ->(country_iso) { where(country: Country.fuzzy_iso_find(country_iso)) }
 
   def self.search_for_bikes_with(serial_number:)
     results = all

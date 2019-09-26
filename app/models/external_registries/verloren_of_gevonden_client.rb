@@ -2,7 +2,8 @@
 
 module ExternalRegistries
   class VerlorenOfGevondenClient
-    attr_accessor :conn, :base_url, :result_pages, :total_results, :total_pages
+    attr_accessor :conn, :base_url, :result_pages, :total_results, :total_pages,
+                  :request_gap_seconds, :backoff, :backoff_factor, :retry_pages
 
     # The API responds with 10 items per page of results
     ITEMS_RECEIVED_PER_PAGE = 10
@@ -13,6 +14,10 @@ module ExternalRegistries
 
     def initialize(base_url: nil)
       self.base_url = base_url || ENV["VERLOREN_OF_GEVONDEN_BASE_URL"]
+      self.request_gap_seconds = 1
+      self.backoff = 0
+      self.backoff_factor = 10
+      self.retry_pages = []
       self.conn = Faraday.new(url: self.base_url) do |conn|
         conn.response :json, content_type: /\bjson$/
         conn.use Faraday::RequestResponseLogger::Middleware,
@@ -33,6 +38,10 @@ module ExternalRegistries
         (2..total_pages)
           .map { |page| Thread.new { get_page(query, page: page) } }
           .map(&:value)
+
+        retry_pages
+          .map { |page| Thread.new { get_page(query, page: page) } }
+          .map(&:value)
       end
 
       results = results_from(result_pages: result_pages)
@@ -49,6 +58,7 @@ module ExternalRegistries
 
       response_json =
         Rails.cache.fetch(cache_key, expires_in: TTL_HOURS) do
+          sleep(self.request_gap_seconds)
           response = conn.post("ez.php") do |req|
             req.params = req_params
             req.params["timestamp"] = Time.current.to_i
@@ -56,8 +66,15 @@ module ExternalRegistries
           response.body
         end
 
-      set_total(response_json)
-      add_page(page, response_json)
+      if response_json.is_a?(String)
+        Rails.cache.delete(cache_key)
+        self.backoff += 1
+        sleep(self.backoff * self.backoff_factor)
+        self.retry_pages << page
+      elsif response_json.is_a?(Hash)
+        set_total(response_json)
+        add_page(page, response_json)
+      end
     rescue Faraday::ConnectionFailed
       add_page(page, {})
     end
@@ -81,7 +98,7 @@ module ExternalRegistries
     end
 
     def add_page(page, response)
-      return if response.blank?
+      return unless response.present?
 
       matches = response.dig("hits", "hits").presence || []
       self.result_pages[page] = matches.map { |hit| hit["_source"] }

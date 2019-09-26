@@ -6,10 +6,11 @@ module ExternalRegistries
     API_KEY = ENV["STOP_HELING_API_KEY"]
     TTL_HOURS = ENV.fetch("STOP_HELING_API_TTL_HOURS", 24).to_i.hours
 
-    attr_accessor :conn, :base_url
+    attr_accessor :conn, :base_url, :request_gap_seconds
 
     def initialize(base_url: nil)
       self.base_url = base_url || ENV["STOP_HELING_BASE_URL"]
+      self.request_gap_seconds = 1
       self.conn = Faraday.new(url: self.base_url) do |conn|
         conn.response :json, content_type: /\bjson$/
         conn.use Faraday::RequestResponseLogger::Middleware,
@@ -36,13 +37,15 @@ module ExternalRegistries
       req_params = request_params(search_term, brand, ip_address, location)
       cache_key = ["stopheling.nl", endpoint, req_params]
 
-      response_body = Rails.cache.fetch(cache_key, expires_in: TTL_HOURS) do
-        response = conn.get(endpoint) do |req|
-          req.headers["Content-Type"] = "application/json;charset=UTF-8"
-          req.params = req_params
+      response_body =
+        Rails.cache.fetch(cache_key, expires_in: TTL_HOURS) do
+          sleep(self.request_gap_seconds)
+          response = conn.get(endpoint) do |req|
+            req.headers["Content-Type"] = "application/json;charset=UTF-8"
+            req.params = req_params
+          end
+          response.body
         end
-        response.body
-      end
 
       results = results_from(response_body: response_body)
       ::ExternalRegistryBike.where(id: results.map(&:id))
