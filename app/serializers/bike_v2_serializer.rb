@@ -2,7 +2,7 @@ class BikeV2Serializer < ActiveModel::Serializer
   attributes \
     :date_stolen,
     :date_stolen_string,
-    :debug,
+    :info_hash,
     :description,
     :frame_colors,
     :frame_model,
@@ -11,7 +11,7 @@ class BikeV2Serializer < ActiveModel::Serializer
     :large_img,
     :location_found,
     :manufacturer_name,
-    :registry_id,
+    :external_id,
     :registry_name,
     :registry_url,
     :serial,
@@ -26,9 +26,9 @@ class BikeV2Serializer < ActiveModel::Serializer
     :year
 
   attr_accessor \
-    :debug,
+    :info_hash,
     :location_found,
-    :registry_id,
+    :external_id,
     :registry_name,
     :registry_url,
     :source_name,

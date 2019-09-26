@@ -9,6 +9,7 @@ module ExternalRegistries
 
     MINIMUM_QUERY_LENGTH = 3
     START_DATE = 1.year.ago.beginning_of_month
+    TTL_HOURS = ENV.fetch("VERLOREN_OF_GEVONDEN_TTL_HOURS", 24).to_i.hours
 
     def initialize(base_url: nil)
       self.base_url = base_url || ENV["VERLOREN_OF_GEVONDEN_BASE_URL"]
@@ -22,9 +23,9 @@ module ExternalRegistries
       self.result_pages = {}
     end
 
-    # Return an Array of ExternalBike objects
+    # Return an ActiveRecord collection of ExternalRegistryBike objects
     def search(query, all_pages: true)
-      return [] if query.to_s.length.to_i < MINIMUM_QUERY_LENGTH
+      return ::ExternalRegistryBike.none if query.to_s.length < MINIMUM_QUERY_LENGTH
 
       get_page(query)
 
@@ -34,13 +35,8 @@ module ExternalRegistries
           .map(&:value)
       end
 
-      result_pages
-        .values
-        .flatten
-        .compact
-        .map { |result| ExternalRegistries::VerlorenOfGevondenResult.new(result) }
-        .select(&:bike?)
-        .map(&:to_external_bike)
+      results = results_from(result_pages: result_pages)
+      ::ExternalRegistryBike.where(id: results.map(&:id))
     end
 
     private
@@ -52,7 +48,7 @@ module ExternalRegistries
       cache_key = ["verlorenofgevonden.nl", query, req_params]
 
       response_json =
-        Rails.cache.fetch(cache_key, expires_in: 12.hours) do
+        Rails.cache.fetch(cache_key, expires_in: TTL_HOURS) do
           response = conn.post("ez.php") do |req|
             req.params = req_params
             req.params["timestamp"] = Time.current.to_i
@@ -78,14 +74,27 @@ module ExternalRegistries
     def set_total(response, per_page: ITEMS_RECEIVED_PER_PAGE)
       return if response.blank?
 
-      self.total_results ||= response["hits"]["total"]
+      self.total_results ||= response.dig("hits", "total").presence || 0
       self.total_pages ||= (self.total_results / per_page.to_f).ceil
     end
 
     def add_page(page, response)
       return if response.blank?
 
-      self.result_pages[page] = response["hits"]["hits"].map { |hit| hit["_source"] }
+      matches = response.dig("hits", "hits").presence || []
+      self.result_pages[page] = matches.map { |hit| hit["_source"] }
+    end
+
+    def results_from(result_pages:)
+      result_pages
+        .values
+        .flatten
+        .compact
+        .map { |result| VerlorenOfGevondenResult.new(result) }
+        .select(&:bike?)
+        .map(&:to_external_registry_bike)
+        .each(&:save)
+        .select(&:persisted?)
     end
   end
 end

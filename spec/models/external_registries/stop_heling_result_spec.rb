@@ -17,11 +17,11 @@ module ExternalRegistries
       end
     end
 
-    describe "#to_external_bike" do
-      it "returns a validly constructed ExternalBike" do
+    describe "#to_external_registry_bike" do
+      it "returns a validly constructed ExternalRegistryBike" do
         result = described_class.new(**response_object)
-        bike = result.to_external_bike
-        expect(bike).to be_an_instance_of(ExternalBike)
+        bike = result.to_external_registry_bike
+        expect(bike).to be_an_instance_of(ExternalRegistryBike)
         expect(bike.type).to eq("bike")
         expect(bike.status).to eq("Stolen")
         expect(bike.url).to eq("https://www.stopheling.nl")

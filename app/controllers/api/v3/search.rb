@@ -101,9 +101,11 @@ module API
 
         desc "Search external registries", {
                notes: <<-NOTE,
-                 This endpoint accepts a serial number and searches external registries for it.
+                 This endpoint accepts a serial number and searches external
+                 bike registries for it.
 
-                 It returns matches found.
+                 If exact matches are found, only those will be returned.
+                 If no exact matches are found, partial matches are returned.
                NOTE
              }
         paginate
@@ -113,13 +115,13 @@ module API
           optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
         end
         get "/external_registries" do
-          bikes = Bike.search_external_registries_for(
-            serial: interpreted_params[:serial],
+          bikes = ExternalRegistryBike.find_or_search_registry_for(
+            serial_number: interpreted_params[:serial],
           )
 
           ActiveModel::ArraySerializer.new(
             paginate(bikes),
-            each_serializer: ExternalBikeV3Serializer,
+            each_serializer: ExternalRegistryBikeV3Serializer,
             root: "bikes",
           )
         end

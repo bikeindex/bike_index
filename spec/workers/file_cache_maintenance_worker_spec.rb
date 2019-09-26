@@ -30,7 +30,7 @@ RSpec.describe FileCacheMaintenanceWorker, type: :job do
       expect(result["bikes"][0].keys).to(match_array <<~KEYS.split)
         id title serial manufacturer_name frame_model year frame_colors
         thumb large_img is_stock_img stolen stolen_location date_stolen
-        date_stolen_string debug description location_found registry_id
+        date_stolen_string info_hash description location_found external_id
         registry_name registry_url source_name source_unique_id status url
       KEYS
     end

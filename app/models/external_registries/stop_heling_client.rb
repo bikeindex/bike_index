@@ -4,6 +4,7 @@ module ExternalRegistries
   class StopHelingClient
     APP_ID = ENV["STOP_HELING_APP_ID"]
     API_KEY = ENV["STOP_HELING_API_KEY"]
+    TTL_HOURS = ENV.fetch("STOP_HELING_API_TTL_HOURS", 24).to_i.hours
 
     attr_accessor :conn, :base_url
 
@@ -35,7 +36,7 @@ module ExternalRegistries
       req_params = request_params(search_term, brand, ip_address, location)
       cache_key = ["stopheling.nl", endpoint, req_params]
 
-      response_body = Rails.cache.fetch(cache_key, expires_in: 12.hours) do
+      response_body = Rails.cache.fetch(cache_key, expires_in: TTL_HOURS) do
         response = conn.get(endpoint) do |req|
           req.headers["Content-Type"] = "application/json;charset=UTF-8"
           req.params = req_params
@@ -43,24 +44,8 @@ module ExternalRegistries
         response.body
       end
 
-      case response_body
-      when Array
-        response_body
-          .map { |result| translate_keys(result) }
-          .map { |attrs| StopHelingResult.new(**attrs) }
-          .select(&:bike?)
-          .map(&:to_external_bike)
-      else
-        if Rails.env.production?
-          # Fail gracefully but notify Honeybadger if the request fails.
-          # Typically an HMAC key error message will be returned as a Hash.
-          Honeybadger.notify("StopHeling API request failed", {
-            error_class: "StopHelingClient",
-            context: { request: req_params, response: response_body },
-          })
-        end
-        []
-      end
+      results = results_from(response_body: response_body)
+      ::ExternalRegistryBike.where(id: results.map(&:id))
     end
 
     private
@@ -75,6 +60,29 @@ module ExternalRegistries
       query["IpAddress"] = ip_address if ip_address.present?
       query["Loc"] = location if location.present?
       query
+    end
+
+    def results_from(response_body:)
+      case response_body
+      when Array
+        response_body
+          .map { |result| translate_keys(result) }
+          .map { |attrs| StopHelingResult.new(**attrs) }
+          .select(&:bike?)
+          .map(&:to_external_registry_bike)
+          .each(&:save)
+          .select(&:persisted?)
+      else
+        if Rails.env.production?
+          # Fail gracefully but notify Honeybadger if the request fails.
+          # Typically an HMAC key error message will be returned as a Hash.
+          Honeybadger.notify("StopHeling API request failed", {
+            error_class: "StopHelingClient",
+            context: { request: req_params, response: response_body },
+          })
+        end
+        []
+      end
     end
 
     KEY_TRANSLATION = {

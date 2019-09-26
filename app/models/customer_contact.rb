@@ -23,8 +23,8 @@ class CustomerContact < ActiveRecord::Base
   before_save :normalize_emails_and_find_users
 
   # Given a Bike `bike` and a corresponding matching record `match` (a Bike or
-  # ExternalBike), determine if an email has been sent alerting the current
-  # `bike` owner that the given `match` may be their found bike.
+  # ExternalRegistryBike), determine if an email has been sent alerting the
+  # current `bike` owner that the given `match` may be their found bike.
   def self.possibly_found_notification_sent?(bike, match)
     return false unless bike.present? && match.present?
 

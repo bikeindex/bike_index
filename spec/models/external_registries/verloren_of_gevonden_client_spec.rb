@@ -14,74 +14,36 @@ module ExternalRegistries
     describe "#search" do
       context "given a valid query" do
         it "returns search results" do
-          results = []
+          VCR.use_cassette("external_registries/verlorenofgevonden_2722_with_results") do
+            results = described_class.new.search(2722)
 
-          with_json_response(page: 1) do |json|
-            client = build_client(endpoint: "ez.php", response_body: json)
-            results = client.search(27222)
+            expect(results).to be_present
+            expect(results).to be_an(ActiveRecord::Relation)
+            expect(results).to all(be_an_instance_of(ExternalRegistryBike))
+            expect(results.map(&:description)).to all(match(/fiets/))
+            expect(results.first.external_id).to match(/F\d+\w*-.+/)
+            expect(results.first.serial_number).to be_present
           end
-
-          expect(results).to be_present
-          expect(results).to be_an_instance_of(Array)
-          expect(results).to all(be_an_instance_of(ExternalBike))
-          expect(results.map(&:description)).to all(match(/fiets/))
-          expect(results.first.registry_id).to match(/F\d+\w*-.+/)
-          expect(results.first.serial_number).to be_present
         end
       end
 
       context "given no results" do
-        it "returns an empty array" do
-          results = []
-
-          with_json_response(page: 9999) do |json|
-            client = build_client(endpoint: "ez.php", response_body: json)
-            results = client.search(27222)
+        it "returns an empty collection" do
+          VCR.use_cassette("external_registries/verlorenofgevonden_13949483_no_results") do
+            results = described_class.new.search(13949483)
+            expect(results).to be_an(ActiveRecord::Relation)
+            expect(results).to be_empty
           end
-
-          expect(results).to be_an_instance_of(Array)
-          expect(results).to be_empty
         end
       end
 
       context "given an invalid query" do
-        it "returns an empty array" do
-          results = []
-
-          with_json_response(page: 1) do |json|
-            client = build_client(endpoint: "ez.php", response_body: json)
-            results = client.search("")
-          end
-
-          expect(results).to be_an_instance_of(Array)
+        it "returns an empty collection" do
+          results = described_class.new.search("")
+          expect(results).to be_an(ActiveRecord::Relation)
           expect(results).to be_empty
         end
       end
-    end
-
-    def build_client(endpoint:, response_body:)
-      client = described_class.new
-
-      unless ENV["LIVE_EXTERNAL_API_SPECS"] == "true"
-        allow(client.conn).to(receive(:post)
-          .with(endpoint)
-          .and_return(double(:json, body: response_body)))
-      end
-
-      client
-    end
-
-    def with_json_response(page: 1)
-      fixture = "lost_and_found_response_#{page}.json"
-      filename = Rails.root.join("spec/fixtures/#{fixture}")
-      json =
-        if File.exist?(filename)
-          JSON.parse(File.read(filename))
-        else
-          {}
-        end
-
-      yield json
     end
   end
 end

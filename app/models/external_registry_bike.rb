@@ -7,26 +7,36 @@ class ExternalRegistryBike < ActiveRecord::Base
     :serial_number,
     presence: true
 
-  # :category
-  # :date_stolen
-  # :description
-  # :frame_colors
-  # :frame_model
-  # :image_url
-  # :is_stock_img
-  # :large_img
-  # :location_found
-  # :mnfg_name
-  # :source_name
-  # :source_unique_id
-  # :status
-  # :thumb
-  # :thumb_url
-  # :type
-  # :url
+  validates :external_id, uniqueness: { scope: :external_registry }
+
+  default_scope { includes(:external_registry) }
+
+  def self.find_or_search_registry_for(serial_number:)
+    matches = ExternalRegistryBike.where(serial_number: serial_number)
+    return matches if matches.any?
+
+    matches = ExternalRegistry.search_for_bikes_with(serial_number: serial_number)
+
+    exact_matches = matches.where(serial_number: serial_number)
+    return exact_matches if exact_matches.any?
+
+    matches
+  end
+
+  def type
+    cycle_type
+  end
 
   def stolen
     status&.downcase == "stolen"
+  end
+
+  def registry_name
+    external_registry&.name
+  end
+
+  def registry_url
+    external_registry&.url
   end
 
   def title_string
@@ -42,7 +52,9 @@ class ExternalRegistryBike < ActiveRecord::Base
   end
 
   def frame_colors
-    self[:frame_colors]&.split(/\s*,\s*/)&.to_a&.map(&:titleize)
+    self[:frame_colors]
+      &.split(/\s*,\s*/)
+      &.map(&:titleize)
   end
 
   def source_name

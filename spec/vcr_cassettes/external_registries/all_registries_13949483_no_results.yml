@@ -1,0 +1,111 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.controleergoed.nl/DesktopModules/Stopheling/API/v1/WebAPI/GetSearchItems?ApplicationID=123&Hmac=55B886A0EEA52EEF91D13521581A5219&SearchTerm=13949483
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Content-Type:
+      - application/json;charset=UTF-8
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Cache-Control:
+      - no-cache
+      Pragma:
+      - no-cache
+      Content-Type:
+      - application/json; charset=utf-8
+      Expires:
+      - "-1"
+      Access-Control-Allow-Origin:
+      - domain
+      Access-Control-Allow-Headers:
+      - Origin, X-Requested-With, Content-Type, Accept, x-appid, x-hmac, x-value,
+        x-customercode
+      Access-Control-Allow-Methods:
+      - GET, POST, PUT, OPTIONS
+      Access-Control-Request-Method:
+      - "*"
+      Content-Security-Policy:
+      - 'default-src * ''unsafe-inline'' ''unsafe-eval''; script-src * ''unsafe-inline''
+        ''unsafe-eval''; connect-src * ''unsafe-inline''; img-src * data: blob: ''unsafe-inline'';
+        frame-src *; style-src * ''unsafe-inline'';'
+      Referrer-Policy:
+      - no-referrer-when-downgrade
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - ''
+      Strict-Transport-Security:
+      - max-age=31536000
+      Date:
+      - Wed, 25 Sep 2019 12:53:38 GMT
+      Content-Length:
+      - '2'
+    body:
+      encoding: UTF-8
+      string: "[]"
+    http_version: 
+  recorded_at: Wed, 25 Sep 2019 12:53:39 GMT
+- request:
+    method: post
+    uri: https://accept.verlorenofgevonden.nl/ez.php?date_from=01-09-2018&date_to=25-09-2019&from=0&org=&q=13949483&site=nl&timestamp=1569416018
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Content-Length:
+      - '0'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Wed, 25 Sep 2019 12:53:39 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '191'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - POST, GET, OPTIONS
+      Access-Control-Allow-Headers:
+      - Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type,
+        Access-Control-Request-Method, Access-Control-Request-Headers
+      Vary:
+      - Accept-Encoding,User-Agent
+      X-Cache-Date:
+      - Wed, 25 Sep 2019 12:53:39 GMT
+    body:
+      encoding: ASCII-8BIT
+      string: '{"took":13,"timed_out":false,"_shards":{"total":1,"successful":1,"skipped":0,"failed":0},"hits":{"total":0,"max_score":null,"hits":[]},"aggregations":{"soort_voorwerp":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[]},"kleuren":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[]},"plaatsen":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[]}}}'
+    http_version: 
+  recorded_at: Wed, 25 Sep 2019 12:53:39 GMT
+recorded_with: VCR 4.0.0

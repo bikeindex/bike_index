@@ -2,8 +2,6 @@ module ExternalRegistries
   class VerlorenOfGevondenResult
     attr_accessor \
       :json,
-      :registry_name,
-      :registry_url,
       :category,
       :city,
       :color,
@@ -22,8 +20,6 @@ module ExternalRegistries
 
     def initialize(json)
       self.json = json
-      self.registry_name = "verlorenofgevonden.nl"
-      self.registry_url = "https://#{registry_name}"
 
       self.category = json["Category"].presence
       self.city = json["City"].presence
@@ -41,6 +37,18 @@ module ExternalRegistries
       self.date_found = parse_date_found
       self.location_found = parse_location_found
       self.serial_number = parse_serial_number
+    end
+
+    def external_registry
+      ExternalRegistry.verloren_of_gevonden
+    end
+
+    def registry_name
+      external_registry&.name
+    end
+
+    def registry_url
+      external_registry&.url
     end
 
     def brand
@@ -61,32 +69,39 @@ module ExternalRegistries
       "#{registry_url}/overzicht?search=#{object_number}"
     end
 
-    def to_external_bike
-      attrs = {}.tap do |h|
-        h[:type] = "bike"
-        h[:status] = "abandoned"
-        h[:registry_name] = registry_name
-        h[:registry_id] = object_number
-        h[:registry_url] = registry_url
-        h[:url] = url
-        h[:thumb_url] = image_url
-        h[:image_url] = image_url
-        h[:mnfg_name] = brand
-        h[:frame_model] = subcategory
-        h[:frame_colors] = colors
-        h[:date_stolen] = date_found
-        h[:serial_number] = serial_number
-        h[:location_found] = [location_found, country].join(", ")
-        h[:description] = description
-        h[:debug] = json.map { |e| e.join(": ") }.join("\n")
-      end
+    def to_external_registry_bike
+      bike = ::ExternalRegistryBike.find_or_initialize_by(
+        external_id: object_number,
+        external_registry: external_registry,
+        serial_number: serial_number,
+      )
 
-      ExternalRegistries::ExternalBike.new(**attrs)
+      bike.cycle_type = "bike"
+      bike.status = "abandoned"
+      bike.url = url
+      bike.thumb_url = image_url
+      bike.image_url = image_url
+      bike.mnfg_name = brand
+      bike.frame_model = subcategory
+      bike.frame_colors = colors
+      bike.date_stolen = date_found
+      bike.location_found = location
+      bike.description = description
+      bike.info_hash = json
+
+      bike
+    end
+
+    def location
+      [location_found, country]
+        .select(&:present?)
+        .map(&:titleize)
+        .join(", ")
     end
 
     def colors
-      return ["Unknown"] if absent?(color)
-      [color]
+      return "Unknown" if absent?(color)
+      color
     end
 
     private
@@ -116,9 +131,9 @@ module ExternalRegistries
       return storage_location if storage_location.is_a?(String)
 
       %w[Name City]
-        .map { |key| storage_location[key].presence }
-        .compact
-        .join(",")
+        .map { |key| storage_location[key] }
+        .select(&:present?)
+        .join(", ")
     end
 
     SERIAL_NUMBER_REGEX = %r{framenummer '(?:<strong>)?(.+)(?:</strong>)?'}

@@ -35,11 +35,6 @@ module BikeSearchable
         .search_matching_close_serials(interpreted_params[:serial])
     end
 
-    def search_external_registries_for(serial:)
-      return [] unless serial.present?
-      ExternalRegistries::ExternalRegistrySearch.by_serial(serial)
-    end
-
     # Initial autocomplete options hashes for the main select search input
     # ignores manufacturer_id and color_ids we don't have
     def selected_query_items_options(interpreted_params)

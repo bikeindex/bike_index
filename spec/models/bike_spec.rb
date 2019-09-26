@@ -28,7 +28,6 @@ RSpec.describe Bike, type: :model do
   describe ".currently_stolen_in" do
     context "given no matching state or country" do
       it "returns none" do
-        FactoryBot.create(:country_nl)
         FactoryBot.create(:stolen_bike_in_nyc)
         FactoryBot.create(:stolen_bike_in_los_angeles)
         expect(Bike.currently_stolen_in(country: "New York City")).to be_empty

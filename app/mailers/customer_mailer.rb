@@ -121,7 +121,7 @@ class CustomerMailer < ActionMailer::Base
       if contact.info_hash["match_type"] == "Bike"
         Bike.find_by(id: contact.info_hash["match_id"])
       else
-        # initialize an ExternalBike from info_hash["match"]
+        # initialize an ExternalRegistryBike from info_hash["match"]
       end
 
     I18n.with_locale(@user&.preferred_language || I18n.default_locale) do

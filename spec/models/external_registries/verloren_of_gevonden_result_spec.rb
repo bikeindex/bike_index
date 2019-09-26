@@ -90,10 +90,13 @@ module ExternalRegistries
       end
     end
 
-    describe "#to_external_bike" do
-      it "returns an ExternalBike" do
-        result = described_class.new(bike_json)
-        expect(result.to_external_bike).to be_an_instance_of(ExternalBike)
+    describe "#to_external_registry_bike" do
+      it "returns an ExternalRegistryBike" do
+        result =
+          described_class
+            .new(bike_json)
+            .to_external_registry_bike
+        expect(result).to be_an_instance_of(ExternalRegistryBike)
       end
     end
 

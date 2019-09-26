@@ -34,21 +34,23 @@ RSpec.describe "Search API V3", type: :request do
     context "returns bikes" do
       it "returns matching bikes" do
         serial_number = "38224"
-        external_bikes = [ExternalRegistries::ExternalBike.new]
-        allow(ExternalRegistries::ExternalRegistrySearch)
-          .to(receive(:by_serial).with(serial_number).and_return(external_bikes))
+        FactoryBot.create(:external_registry_bike, serial_number: serial_number)
+
+        allow(ExternalRegistry).to(receive(:search_for_bikes_with)
+          .with(serial_number: serial_number).and_return(ExternalRegistryBike.all))
 
         get "/api/v3/search/external_registries",
             serial: serial_number,
             format: :json
 
+        expect(json_result[:error]).to be_blank
         bike_list = json_result[:bikes]
         expect(bike_list.count).to eq(1)
         expect(bike_list.first.keys)
           .to(match_array(%w[
             id title serial manufacturer_name frame_model frame_colors
             thumb large_img is_stock_img stolen stolen_location date_stolen
-            debug location_found registry_id registry_name registry_url
+            info_hash location_found external_id registry_name registry_url
             source_name source_unique_id status url description
             date_stolen_string year
           ]))

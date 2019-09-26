@@ -29,11 +29,11 @@ module ExternalRegistries
       end
 
       context "given matching results but no bikes" do
-        it "returns an array of ExternalBikes" do
+        it "returns an array of ExternalRegistryBikes" do
           client = build_client(results: [bike_result])
           results = client.search("28484")
           expect(results).to_not be_empty
-          expect(results).to all(be_an_instance_of(ExternalBike))
+          expect(results).to all(be_an_instance_of(ExternalRegistryBike))
         end
       end
     end

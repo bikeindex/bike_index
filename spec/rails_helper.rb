@@ -189,3 +189,14 @@ CarrierWave.configure do |config|
   config.cache_dir = Rails.root.join("tmp", "cache", "carrierwave#{ENV["TEST_ENV_NUMBER"]}")
   config.enable_processing = false
 end
+
+# Create external registries
+RSpec.configure do |config|
+  config.before(:all) do
+    ExternalRegistry.create_all
+  end
+
+  config.after(:all) do
+    ExternalRegistry.destroy_all
+  end
+end
