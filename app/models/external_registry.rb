@@ -3,6 +3,7 @@ class ExternalRegistry < ActiveRecord::Base
 
   validates :name, :url, :client_class, presence: true
 
+  belongs_to :country
   has_many :external_registry_bikes, dependent: :destroy
   alias_method :bikes, :external_registry_bikes
 

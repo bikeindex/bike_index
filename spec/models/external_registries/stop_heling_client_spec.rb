@@ -33,7 +33,7 @@ module ExternalRegistries
           client = build_client(results: [bike_result])
           results = client.search("28484")
           expect(results).to_not be_empty
-          expect(results).to all(be_an_instance_of(ExternalRegistryBike))
+          expect(results).to all(be_an(ExternalRegistryBike))
         end
       end
     end

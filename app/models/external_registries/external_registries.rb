@@ -1,6 +1,6 @@
 module ExternalRegistries::ExternalRegistries
-  def create_all
-    registries = [
+  def registries_attrs
+    [
       {
         name: "verlorenofgevonden.nl",
         url: "https://verlorenofgevonden.nl",
@@ -15,14 +15,21 @@ module ExternalRegistries::ExternalRegistries
         country_id: Country.netherlands.id,
       },
     ]
-    ExternalRegistry.create(registries)
+  end
+
+  def create_all
+    registries_attrs.map.with_index(1) do |registry_attrs, i|
+      record = ExternalRegistry.find_or_create_by(registry_attrs)
+      yield(record, i) if block_given?
+      record
+    end
   end
 
   def verloren_of_gevonden
-    find_by(name: "verlorenofgevonden.nl")
+    where(name: "verlorenofgevonden.nl").first
   end
 
   def stop_heling
-    find_by(name: "stopheling.nl")
+    where(name: "stopheling.nl").first
   end
 end
