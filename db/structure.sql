@@ -101,7 +101,6 @@ CREATE TABLE public.alert_images (
 --
 
 CREATE SEQUENCE public.alert_images_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -135,7 +134,6 @@ CREATE TABLE public.ambassador_task_assignments (
 --
 
 CREATE SEQUENCE public.ambassador_task_assignments_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -168,7 +166,6 @@ CREATE TABLE public.ambassador_tasks (
 --
 
 CREATE SEQUENCE public.ambassador_tasks_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -247,7 +244,6 @@ CREATE TABLE public.bike_code_batches (
 --
 
 CREATE SEQUENCE public.bike_code_batches_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -831,6 +827,93 @@ ALTER SEQUENCE public.exports_id_seq OWNED BY public.exports.id;
 
 
 --
+-- Name: external_registries; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.external_registries (
+    id integer NOT NULL,
+    name character varying NOT NULL,
+    client_class character varying NOT NULL,
+    url character varying,
+    country_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: external_registries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.external_registries_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: external_registries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.external_registries_id_seq OWNED BY public.external_registries.id;
+
+
+--
+-- Name: external_registry_bikes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.external_registry_bikes (
+    id integer NOT NULL,
+    external_registry_id integer NOT NULL,
+    serial_number character varying NOT NULL,
+    external_id character varying NOT NULL,
+    category character varying,
+    date_stolen character varying,
+    description character varying,
+    frame_colors character varying,
+    frame_model character varying,
+    image_url character varying,
+    is_stock_img character varying,
+    large_img character varying,
+    location_found character varying,
+    mnfg_name character varying,
+    source_name character varying,
+    source_unique_id character varying,
+    status character varying,
+    thumb character varying,
+    thumb_url character varying,
+    cycle_type character varying,
+    url character varying,
+    info_hash jsonb DEFAULT '{}'::jsonb NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: external_registry_bikes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.external_registry_bikes_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: external_registry_bikes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.external_registry_bikes_id_seq OWNED BY public.external_registry_bikes.id;
+
+
+--
 -- Name: feedbacks; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -884,7 +967,6 @@ CREATE TABLE public.flipper_features (
 --
 
 CREATE SEQUENCE public.flipper_features_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -918,7 +1000,6 @@ CREATE TABLE public.flipper_gates (
 --
 
 CREATE SEQUENCE public.flipper_gates_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -988,7 +1069,6 @@ CREATE TABLE public.impound_records (
 --
 
 CREATE SEQUENCE public.impound_records_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2091,7 +2171,6 @@ CREATE TABLE public.theft_alert_plans (
 --
 
 CREATE SEQUENCE public.theft_alert_plans_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2131,7 +2210,6 @@ CREATE TABLE public.theft_alerts (
 --
 
 CREATE SEQUENCE public.theft_alerts_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2220,7 +2298,6 @@ CREATE TABLE public.twitter_accounts (
 --
 
 CREATE SEQUENCE public.twitter_accounts_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2317,8 +2394,8 @@ CREATE TABLE public.users (
     notification_unstolen boolean DEFAULT true,
     my_bikes_hash jsonb,
     preferred_language character varying,
-    magic_link_token text,
-    last_login_ip character varying
+    last_login_ip character varying,
+    magic_link_token text
 );
 
 
@@ -2513,6 +2590,20 @@ ALTER TABLE ONLY public.duplicate_bike_groups ALTER COLUMN id SET DEFAULT nextva
 --
 
 ALTER TABLE ONLY public.exports ALTER COLUMN id SET DEFAULT nextval('public.exports_id_seq'::regclass);
+
+
+--
+-- Name: external_registries id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.external_registries ALTER COLUMN id SET DEFAULT nextval('public.external_registries_id_seq'::regclass);
+
+
+--
+-- Name: external_registry_bikes id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.external_registry_bikes ALTER COLUMN id SET DEFAULT nextval('public.external_registry_bikes_id_seq'::regclass);
 
 
 --
@@ -2946,6 +3037,22 @@ ALTER TABLE ONLY public.duplicate_bike_groups
 
 ALTER TABLE ONLY public.exports
     ADD CONSTRAINT exports_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: external_registries external_registries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.external_registries
+    ADD CONSTRAINT external_registries_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: external_registry_bikes external_registry_bikes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.external_registry_bikes
+    ADD CONSTRAINT external_registry_bikes_pkey PRIMARY KEY (id);
 
 
 --
@@ -3471,6 +3578,34 @@ CREATE INDEX index_exports_on_user_id ON public.exports USING btree (user_id);
 
 
 --
+-- Name: index_external_registries_on_country_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_external_registries_on_country_id ON public.external_registries USING btree (country_id);
+
+
+--
+-- Name: index_external_registry_bikes_on_external_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_external_registry_bikes_on_external_id ON public.external_registry_bikes USING btree (external_id);
+
+
+--
+-- Name: index_external_registry_bikes_on_external_registry_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_external_registry_bikes_on_external_registry_id ON public.external_registry_bikes USING btree (external_registry_id);
+
+
+--
+-- Name: index_external_registry_bikes_on_serial_number; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_external_registry_bikes_on_serial_number ON public.external_registry_bikes USING btree (serial_number);
+
+
+--
 -- Name: index_feedbacks_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3882,6 +4017,14 @@ ALTER TABLE ONLY public.theft_alerts
 
 
 --
+-- Name: external_registry_bikes fk_rails_937fddf7ae; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.external_registry_bikes
+    ADD CONSTRAINT fk_rails_937fddf7ae FOREIGN KEY (external_registry_id) REFERENCES public.external_registries(id) ON DELETE CASCADE;
+
+
+--
 -- Name: alert_images fk_rails_95dc479c85; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3895,6 +4038,14 @@ ALTER TABLE ONLY public.alert_images
 
 ALTER TABLE ONLY public.ambassador_task_assignments
     ADD CONSTRAINT fk_rails_d557be2cfa FOREIGN KEY (ambassador_task_id) REFERENCES public.ambassador_tasks(id) ON DELETE CASCADE;
+
+
+--
+-- Name: external_registries fk_rails_d623f5a373; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.external_registries
+    ADD CONSTRAINT fk_rails_d623f5a373 FOREIGN KEY (country_id) REFERENCES public.countries(id);
 
 
 --
@@ -4684,4 +4835,8 @@ INSERT INTO schema_migrations (version) VALUES ('20190918121951');
 INSERT INTO schema_migrations (version) VALUES ('20190918143646');
 
 INSERT INTO schema_migrations (version) VALUES ('20190919145324');
+
+INSERT INTO schema_migrations (version) VALUES ('20190923181351');
+
+INSERT INTO schema_migrations (version) VALUES ('20190923181352');
 
