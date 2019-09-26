@@ -3,7 +3,8 @@
 module ExternalRegistries
   class VerlorenOfGevondenClient
     attr_accessor :conn, :base_url, :result_pages, :total_results, :total_pages,
-                  :request_gap_seconds, :backoff, :backoff_factor, :retry_pages
+                  :request_gap_seconds, :backoff, :backoff_factor, :retry_pages,
+                  :backoff_max
 
     # The API responds with 10 items per page of results
     ITEMS_RECEIVED_PER_PAGE = 10
@@ -16,7 +17,8 @@ module ExternalRegistries
       self.base_url = base_url || ENV["VERLOREN_OF_GEVONDEN_BASE_URL"]
       self.request_gap_seconds = 1
       self.backoff = 0
-      self.backoff_factor = 10
+      self.backoff_max = 60
+      self.backoff_factor = 5
       self.retry_pages = []
       self.conn = Faraday.new(url: self.base_url) do |conn|
         conn.response :json, content_type: /\bjson$/
@@ -40,12 +42,13 @@ module ExternalRegistries
           .map(&:value)
 
         retry_pages
+          .each { |page| Rails.logger.info("Retrying page #{page}") }
           .map { |page| Thread.new { get_page(query, page: page) } }
           .map(&:value)
       end
 
-      results = results_from(result_pages: result_pages)
-      ::ExternalRegistryBike.where(id: results.map(&:id))
+      persisted = external_registry_bikes_from(result_pages: result_pages.values.flatten.compact)
+      ::ExternalRegistryBike.where(id: persisted.map(&:id))
     end
 
     private
@@ -53,6 +56,7 @@ module ExternalRegistries
     # Query for the results page `page_num`.
     # Return the JSON response body as a Hash
     def get_page(query, page: 1, per_page: ITEMS_RECEIVED_PER_PAGE)
+      Rails.logger.info("Requesting page #{page}")
       req_params = request_params(query, page, per_page)
       cache_key = ["verlorenofgevonden.nl", query, req_params]
 
@@ -69,9 +73,12 @@ module ExternalRegistries
       if response_json.is_a?(String)
         Rails.cache.delete(cache_key)
         self.backoff += 1
-        sleep(self.backoff * self.backoff_factor)
+        wait_time = [self.backoff * self.backoff_factor, self.backoff_max].min
+        sleep(wait_time)
+        Rails.logger.info("Enqueued page #{page} for retry. Waiting #{wait_time}s...")
         self.retry_pages << page
       elsif response_json.is_a?(Hash)
+        self.backoff = 0
         set_total(response_json)
         add_page(page, response_json)
       end
@@ -104,11 +111,8 @@ module ExternalRegistries
       self.result_pages[page] = matches.map { |hit| hit["_source"] }
     end
 
-    def results_from(result_pages:)
+    def external_registry_bikes_from(result_pages:)
       result_pages
-        .values
-        .flatten
-        .compact
         .map { |result| VerlorenOfGevondenResult.new(result) }
         .select(&:bike?)
         .map(&:to_external_registry_bike)
