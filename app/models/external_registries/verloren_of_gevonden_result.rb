@@ -84,7 +84,7 @@ module ExternalRegistries
       bike.mnfg_name = brand
       bike.frame_model = subcategory
       bike.frame_colors = colors
-      bike.date_stolen = date_found
+      bike.date_stolen = date_found.to_datetime
       bike.location_found = location
       bike.description = description
 

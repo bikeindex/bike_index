@@ -69,7 +69,7 @@ module ExternalRegistries
       bike.frame_model = brand_type
       bike.location_found = location
       bike.frame_colors = colors
-      bike.date_stolen = date_found
+      bike.date_stolen = date_found.to_datetime
       bike.source_name = source_name
       bike.source_unique_id = source_unique_id
 

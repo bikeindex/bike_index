@@ -5,9 +5,10 @@ class CreateExternalRegistryBikes < ActiveRecord::Migration
       t.string :serial_number, null: false, index: true
       t.string :serial_normalized, null: false, index: true
       t.string :external_id, null: false, index: true
+      t.string :source_name
+      t.string :source_unique_id
 
       t.string :category
-      t.string :date_stolen
       t.string :description
       t.string :frame_colors
       t.string :frame_model
@@ -16,13 +17,12 @@ class CreateExternalRegistryBikes < ActiveRecord::Migration
       t.string :large_img
       t.string :location_found
       t.string :mnfg_name
-      t.string :source_name
-      t.string :source_unique_id
       t.string :status
       t.string :thumb
       t.string :thumb_url
       t.string :cycle_type
       t.string :url
+      t.datetime :date_stolen
 
       t.timestamps null: false
     end
