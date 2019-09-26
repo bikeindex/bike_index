@@ -869,6 +869,7 @@ CREATE TABLE public.external_registry_bikes (
     id integer NOT NULL,
     external_registry_id integer NOT NULL,
     serial_number character varying NOT NULL,
+    serial_normalized character varying NOT NULL,
     external_id character varying NOT NULL,
     category character varying,
     date_stolen character varying,
@@ -887,10 +888,8 @@ CREATE TABLE public.external_registry_bikes (
     thumb_url character varying,
     cycle_type character varying,
     url character varying,
-    info_hash jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    serial_normalized character varying NOT NULL
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -3600,6 +3599,13 @@ CREATE INDEX index_external_registry_bikes_on_external_registry_id ON public.ext
 
 
 --
+-- Name: index_external_registry_bikes_on_serial_normalized; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_external_registry_bikes_on_serial_normalized ON public.external_registry_bikes USING btree (serial_normalized);
+
+
+--
 -- Name: index_external_registry_bikes_on_serial_number; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4840,6 +4846,4 @@ INSERT INTO schema_migrations (version) VALUES ('20190919145324');
 INSERT INTO schema_migrations (version) VALUES ('20190923181351');
 
 INSERT INTO schema_migrations (version) VALUES ('20190923181352');
-
-INSERT INTO schema_migrations (version) VALUES ('20190925162318');
 

@@ -3,6 +3,7 @@ class CreateExternalRegistryBikes < ActiveRecord::Migration
     create_table :external_registry_bikes do |t|
       t.belongs_to :external_registry, null: false, index: true
       t.string :serial_number, null: false, index: true
+      t.string :serial_normalized, null: false, index: true
       t.string :external_id, null: false, index: true
 
       t.string :category
@@ -22,7 +23,6 @@ class CreateExternalRegistryBikes < ActiveRecord::Migration
       t.string :thumb_url
       t.string :cycle_type
       t.string :url
-      t.jsonb :info_hash, null: false, default: {}
 
       t.timestamps null: false
     end
