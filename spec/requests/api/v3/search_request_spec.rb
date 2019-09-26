@@ -60,7 +60,7 @@ RSpec.describe "Search API V3", type: :request do
             thumb large_img is_stock_img stolen stolen_location date_stolen
             location_found external_id registry_name registry_url
             source_name source_unique_id status url description
-            date_stolen_string year
+            year
           ]))
         expect(response.header["Total"]).to eq("1")
       end

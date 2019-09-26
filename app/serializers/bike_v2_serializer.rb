@@ -1,7 +1,6 @@
 class BikeV2Serializer < ActiveModel::Serializer
   attributes \
     :date_stolen,
-    :date_stolen_string,
     :description,
     :frame_colors,
     :frame_model,
@@ -48,10 +47,6 @@ class BikeV2Serializer < ActiveModel::Serializer
 
   def date_stolen
     object.current_stolen_record && object.current_stolen_record.date_stolen.to_i
-  end
-
-  def date_stolen_string
-    object.current_stolen_record&.date_stolen&.to_date&.to_s
   end
 
   def thumb
