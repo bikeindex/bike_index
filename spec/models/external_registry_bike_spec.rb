@@ -16,6 +16,18 @@ RSpec.describe ExternalRegistryBike, type: :model do
     end
   end
 
+  describe "#normalize_serial_number before_save hooks" do
+    it "normalizes the serial number" do
+      bike1 = FactoryBot.build(:external_registry_bike, serial_number: "hello")
+      bike1.save
+      expect(bike1.serial_normalized).to eq("HE110")
+
+      bike2 = FactoryBot.build(:external_registry_bike, serial_number: "heIIO")
+      bike2.save
+      expect(bike2.serial_normalized).to eq("HE110")
+    end
+  end
+
   describe ".find_or_search_registry_for" do
     context "given a locally found exact match" do
       it "returns only the exact match" do

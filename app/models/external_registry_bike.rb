@@ -11,6 +11,8 @@ class ExternalRegistryBike < ActiveRecord::Base
 
   default_scope { includes(:external_registry) }
 
+  before_save :normalize_serial_number
+
   def self.find_or_search_registry_for(serial_number:)
     matches = ExternalRegistryBike.where(serial_number: serial_number)
     return matches if matches.any?
@@ -63,5 +65,11 @@ class ExternalRegistryBike < ActiveRecord::Base
 
   def status
     self[:status]&.titleize
+  end
+
+  private
+
+  def normalize_serial_number
+    self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
   end
 end

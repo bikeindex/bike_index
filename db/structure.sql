@@ -889,7 +889,8 @@ CREATE TABLE public.external_registry_bikes (
     url character varying,
     info_hash jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    serial_normalized character varying NOT NULL
 );
 
 
@@ -4839,4 +4840,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190919145324');
 INSERT INTO schema_migrations (version) VALUES ('20190923181351');
 
 INSERT INTO schema_migrations (version) VALUES ('20190923181352');
+
+INSERT INTO schema_migrations (version) VALUES ('20190925162318');
 
