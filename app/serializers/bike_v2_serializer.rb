@@ -2,7 +2,6 @@ class BikeV2Serializer < ActiveModel::Serializer
   attributes \
     :date_stolen,
     :date_stolen_string,
-    :info_hash,
     :description,
     :frame_colors,
     :frame_model,
@@ -26,7 +25,6 @@ class BikeV2Serializer < ActiveModel::Serializer
     :year
 
   attr_accessor \
-    :info_hash,
     :location_found,
     :external_id,
     :registry_name,

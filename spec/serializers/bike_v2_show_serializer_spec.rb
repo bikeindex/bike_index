@@ -71,7 +71,6 @@ RSpec.describe BikeV2ShowSerializer do
         stolen_record: nil,
         public_images: [public_image_target],
         components: [component_target],
-        info_hash: nil,
         location_found: nil,
         external_id: nil,
         registry_name: nil,

@@ -87,7 +87,6 @@ module ExternalRegistries
       bike.date_stolen = date_found
       bike.location_found = location
       bike.description = description
-      bike.info_hash = json
 
       bike
     end

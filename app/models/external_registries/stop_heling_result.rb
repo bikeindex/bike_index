@@ -70,7 +70,6 @@ module ExternalRegistries
       bike.location_found = location
       bike.frame_colors = colors
       bike.date_stolen = date_found
-      bike.info_hash = json
       bike.source_name = source_name
       bike.source_unique_id = source_unique_id
 

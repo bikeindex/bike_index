@@ -1,6 +1,5 @@
 class ExternalRegistryBikeV3Serializer < BikeV2Serializer
   delegate \
-    :info_hash,
     :location_found,
     :external_id,
     :registry_name,
