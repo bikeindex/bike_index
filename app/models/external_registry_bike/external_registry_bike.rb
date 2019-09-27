@@ -1,13 +1,14 @@
 class ExternalRegistryBike < ActiveRecord::Base
-  belongs_to :external_registry
+  # belongs_to :external_registry
 
   validates \
+    :type,
     :external_id,
     :external_registry,
     :serial_number,
     presence: true
 
-  validates :external_id, uniqueness: { scope: :external_registry }
+  validates :external_id, uniqueness: { scope: :type }
 
   default_scope { includes(:external_registry) }
 
