@@ -20,10 +20,6 @@ class ExternalBikeV3Serializer < BikeV2Serializer
     object.date_stolen&.to_i
   end
 
-  def date_stolen_string
-    object.date_stolen&.to_date&.to_s
-  end
-
   def year; end
 
   def thumb
