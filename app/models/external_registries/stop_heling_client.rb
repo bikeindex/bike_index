@@ -110,7 +110,7 @@ module ExternalRegistries
     def hmac(search_term)
       raise ArgumentError, "search term required" if search_term.blank?
 
-      date = Time.now.strftime("%Y%m%d")
+      date = Time.now.in_time_zone("Amsterdam").strftime("%Y%m%d")
       data = "#{search_term}#{date}#{APP_ID}"
 
       digest = OpenSSL::Digest.new("md5")
