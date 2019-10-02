@@ -42,15 +42,15 @@ RSpec.describe "Search API V3", type: :request do
             serial: serial_number,
             format: :json
 
+        expect(json_result[:error]).to be_blank
         bike_list = json_result[:bikes]
         expect(bike_list.count).to eq(1)
         expect(bike_list.first.keys)
           .to(match_array(%w[
-            id title serial manufacturer_name frame_model frame_colors
-            thumb large_img is_stock_img stolen stolen_location date_stolen
-            debug location_found registry_id registry_name registry_url
-            source_name source_unique_id status url description
-            date_stolen_string year
+            id title serial manufacturer_name frame_model frame_colors thumb
+            large_img is_stock_img stolen stolen_location date_stolen debug
+            location_found registry_id registry_name registry_url source_name
+            source_unique_id status url description year
           ]))
         expect(response.header["Total"]).to eq("1")
       end

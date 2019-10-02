@@ -28,10 +28,10 @@ RSpec.describe FileCacheMaintenanceWorker, type: :job do
       expect(result["bikes"].count).to eq(1)
       expect(result["bikes"][0]["serial"]).to eq("party seri8al")
       expect(result["bikes"][0].keys).to(match_array <<~KEYS.split)
-        id title serial manufacturer_name frame_model year frame_colors
-        thumb large_img is_stock_img stolen stolen_location date_stolen
-        date_stolen_string debug description location_found registry_id
-        registry_name registry_url source_name source_unique_id status url
+        date_stolen debug description frame_colors frame_model id is_stock_img
+        large_img location_found manufacturer_name registry_id registry_name
+        registry_url serial source_name source_unique_id status stolen
+        stolen_location thumb title url year
       KEYS
     end
   end

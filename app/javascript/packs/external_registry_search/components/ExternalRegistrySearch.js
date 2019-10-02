@@ -6,6 +6,7 @@ import ExternalRegistrySearchResult from "./ExternalRegistrySearchResult";
 import { fetchSerialExternalSearch } from "../../api";
 import Loading from "../../Loading";
 import honeybadger from "../../utils/honeybadger";
+import TimeParser from "../../utils/time_parser";
 
 class ExternalRegistrySearch extends Component {
   state = {
@@ -55,6 +56,10 @@ class ExternalRegistrySearch extends Component {
 
     const sectionTitle = header.getElementsByClassName(titleDisplay)[0];
     sectionTitle.classList.remove("d-none");
+  }
+
+  componentDidUpdate() {
+    TimeParser().localize();
   }
 
   render() {
