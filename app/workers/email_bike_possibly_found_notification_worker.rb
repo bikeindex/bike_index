@@ -1,12 +1,12 @@
 class EmailBikePossiblyFoundNotificationWorker < ScheduledWorker
+  prepend ScheduledWorkerRecorder
+
   def self.frequency
     24.hours
   end
 
   def perform
-    record_scheduler_started
     notify_of_bike_index_held
-    record_scheduler_finished
   end
 
   def notify_of_bike_index_held
