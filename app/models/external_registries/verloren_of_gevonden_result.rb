@@ -54,7 +54,7 @@ module ExternalRegistries
     end
 
     def image_url
-      "#{self.registry_url}/images/pv_api/get_from_api.php?id=#{object_id}"
+      "#{self.registry_url}/assets/image/#{object_id}"
     end
 
     def url
