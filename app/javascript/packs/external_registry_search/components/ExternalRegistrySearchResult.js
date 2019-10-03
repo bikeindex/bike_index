@@ -35,7 +35,7 @@ const ExternalRegistrySearchResult = ({ bike }) => (
         </li>
         <li>
           <span className="attr-title">Registry ID</span>
-          {bike.registry_id}
+          {bike.external_id}
         </li>
         <li>
           <span className="attr-title">Location</span>
@@ -43,10 +43,6 @@ const ExternalRegistrySearchResult = ({ bike }) => (
         </li>
       </ul>
     </div>
-
-    <pre className="d-none">
-      {bike.debug}
-    </pre>
   </li>
 )
 
