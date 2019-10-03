@@ -11,6 +11,7 @@ module ExternalRegistry
     MINIMUM_QUERY_LENGTH = 3
     START_DATE = 1.year.ago.beginning_of_month
     TTL_HOURS = ENV.fetch("VERLOREN_OF_GEVONDEN_TTL_HOURS", 24).to_i.hours
+    TIMEOUT_SECS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_TIMEOUT", 5).to_i
 
     def initialize(base_url: nil)
       self.base_url = base_url || ENV["VERLOREN_OF_GEVONDEN_BASE_URL"]
@@ -24,7 +25,7 @@ module ExternalRegistry
                  logger_level: :info,
                  logger: Rails.logger if Rails.env.development?
         conn.adapter Faraday.default_adapter
-        conn.options.timeout = 5
+        conn.options.timeout = TIMEOUT_SECS
       end
       self.result_pages = {}
     end
