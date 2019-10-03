@@ -66,7 +66,6 @@ const ResultImage = ({ bike }) => {
 
   return (<a href={bike.url}
              style={backgroundStyles(bike)}
-             data-img-src={bike.thumb}
              className="bike-list-image hover-expand"
              target="_blank"></a>);
 }
