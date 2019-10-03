@@ -58,6 +58,15 @@ class CustomerContact < ActiveRecord::Base
     self.creator_email = email.from.first
   end
 
+  def matching_bike
+    return unless info_hash["match_type"].present? && info_hash["match_id"].present?
+
+    match_class = info_hash["match_type"]
+    match_id = info_hash["match_id"]
+
+    match_class.constantize.find_by(id: match_id)
+  end
+
   def normalize_emails_and_find_users
     self.user_email = EmailNormalizer.normalize(user_email)
     self.user ||= User.fuzzy_confirmed_or_unconfirmed_email_find(user_email)

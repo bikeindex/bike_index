@@ -117,12 +117,7 @@ class CustomerMailer < ActionMailer::Base
   def bike_possibly_found_email(contact)
     @bike = contact.bike
     @user = User.fuzzy_email_find(@bike.owner_email)
-    @match =
-      if contact.info_hash["match_type"] == "Bike"
-        Bike.find_by(id: contact.info_hash["match_id"])
-      else
-        # initialize an ExternalBike from info_hash["match"]
-      end
+    @match = contact.matching_bike
 
     I18n.with_locale(@user&.preferred_language || I18n.default_locale) do
       mail(to: @bike.owner_email,
