@@ -479,9 +479,8 @@ RSpec.describe "Bikes API V3", type: :request do
     it "does not register a stolen bike unless attrs are present" do
       bike_attrs[:stolen_record] = {
         phone: "",
-        theft_description: "This bike was stolen and that's no fair.",
-        city: "Chicago",
         theft_description: "I was away for a little bit and suddenly the bike was gone",
+        city: "Chicago",
       }
       expect do
         post "/api/v3/bikes?access_token=#{token.token}",
