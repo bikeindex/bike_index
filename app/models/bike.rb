@@ -161,36 +161,69 @@ class Bike < ActiveRecord::Base
       includes(:bike_organizations).where(bike_organizations: { organization_id: organization.id })
     end
 
-    # Possibly-found bikes are stolen bikes that have a counterpart record
+    # Possibly-found bikes are stolen bikes that have a counterpart record(s)
     # (matching by normalized serial number) in an abandoned state.
     def possibly_found
-      abandoned_serials =
-        abandoned
-          .where.not(stolen: true)
-          .select(:serial_normalized)
-
       unscoped
         .current
         .stolen
-        .where.not(abandoned: true)
-        .where(serial_normalized: abandoned_serials)
+        .non_abandoned
+        .where(serial_normalized: abandoned.non_stolen.select(:serial_normalized))
     end
 
-    # Return an array of tuples, each pairing a possibly-found bike with its
+    # Return an array of tuples, each pairing a possibly-found bike with a
     # counterpart abandoned bike.
     def possibly_found_with_match
-      matches = abandoned.each_with_object({}) do |bike, results|
-        results[bike.serial_normalized] = bike
-      end
+      matches_by_serial =
+        unscoped
+          .current
+          .abandoned
+          .non_stolen
+          .where.not(serial_normalized: nil)
+          .group_by(&:serial_normalized)
 
-      possibly_found.each_with_object([]) do |bike, pairs|
-        match = matches[bike.serial_normalized]
+      possibly_found
+        .select { |bike| matches_by_serial.key?(bike.serial_normalized) }
+        .map { |bike| [bike, matches_by_serial[bike.serial_normalized]] }
+        .flat_map { |bike, matches| matches.map { |match| [bike, match] } }
+        .reject { |bike, match| bike.owner_email == match.owner_email }
+    end
 
-        # Assume a duplicate entry if both the serial and owner emails match
-        next if match&.owner_email == bike.owner_email
+    # Externally possibly-found bikes are stolen bikes that have a counterpart
+    # record(s) (matching by normalized serial number) in an external registry.
+    #
+    # External-registry searches can be delimited by country by passing
+    # `country_iso`.
+    def possibly_found_externally(country_iso: "NL")
+      normalized_serials =
+        ExternalRegistryBike
+          .where(country: Country.where(iso: country_iso))
+          .where.not(serial_normalized: nil)
+          .select(:serial_normalized)
+          .distinct
+          .pluck(:serial_normalized)
 
-        pairs << [bike, match]
-      end
+      unscoped
+        .current
+        .currently_stolen_in(country: country_iso)
+        .non_abandoned
+        .where(serial_normalized: normalized_serials)
+    end
+
+    # Return an array of tuples, each pairing a possibly-found bike with a
+    # counterpart possible match found on an external registry associated with
+    # the given `country_iso`.
+    def possibly_found_externally_with_match(country_iso: "NL")
+      matches_by_serial =
+        ExternalRegistryBike
+          .where(country: Country.where(iso: country_iso))
+          .where.not(serial_normalized: nil)
+          .group_by(&:serial_normalized)
+
+      possibly_found_externally(country_iso: country_iso)
+        .select { |bike| matches_by_serial.key?(bike.serial_normalized) }
+        .map { |bike| [bike, matches_by_serial[bike.serial_normalized]] }
+        .flat_map { |bike, matches| matches.map { |match| [bike, match] } }
     end
 
     # Search for currently stolen bikes reported stolen in the given city, state
@@ -205,6 +238,7 @@ class Bike < ActiveRecord::Base
       unscoped
         .stolen
         .current
+        .with_known_serial
         .includes(:current_stolen_record)
         .where(stolen_records: location)
     end
