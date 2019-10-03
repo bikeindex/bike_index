@@ -1,4 +1,6 @@
 class UnusedOwnershipRemovalWorker < ScheduledWorker
+  prepend ScheduledWorkerRecorder
+
   def self.frequency
     23.hours
   end
@@ -12,13 +14,11 @@ class UnusedOwnershipRemovalWorker < ScheduledWorker
   end
 
   def enqueue_scheduled_jobs
-    record_scheduler_started
     # Rather than doing all the ownerships, just do a random slice
     Ownership.where(current: true)
              .order("RANDOM()")
              .limit(50_000)
              .pluck(:id)
              .each { |id| UnusedOwnershipRemovalWorker.perform_async(id) }
-    record_scheduler_finished
   end
 end
