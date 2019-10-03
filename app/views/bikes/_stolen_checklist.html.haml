@@ -35,7 +35,7 @@
     - submitted_to_police_services = police_report_present && !serial_unknown
 
     -# We only have recommendations for reporting your theft to police if your bike is reported stolen in the Netherlands
-    - if stolen_record.country_id == Country.find_by_iso("NL").id
+    - if stolen_record.country == Country.netherlands
       %li{ class: police_report_present ? "completed-item" : "" }
         %span.checklist-checkbox
           = "&#10003;".html_safe if police_report_present
