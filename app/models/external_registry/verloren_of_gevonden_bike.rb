@@ -70,11 +70,11 @@ module ExternalRegistry
 
       def parse_location_found(description, storage_location)
         match_data = LOCATION_REGEX.match(description)
-        return match_data[1] if match_data
-        return storage_location if storage_location.is_a?(String)
+        return match_data[1].strip if match_data
+        return storage_location&.strip&.titleize if storage_location.is_a?(String)
 
         %w[Name City]
-          .map { |key| storage_location[key]&.titleize }
+          .map { |key| storage_location[key]&.strip&.titleize }
           .select(&:present?)
           .join(", ")
       end

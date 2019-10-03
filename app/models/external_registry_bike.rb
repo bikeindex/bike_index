@@ -39,7 +39,7 @@ class ExternalRegistryBike < ActiveRecord::Base
     end
 
     def absent?(value)
-      value.presence.blank? || value.match?(/geen|onbekend/i)
+      value.presence.blank? || (/geen|onbekend/i).match?(value)
     end
   end
 
