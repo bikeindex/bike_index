@@ -8,7 +8,7 @@ class EnqueueBikePossiblyFoundNotificationsWorker < ScheduledWorker
   def perform
     bikes_with_matches.each do |bike, match|
       EmailBikePossiblyFoundNotificationWorker
-        .perform_async(bike.id, match.class, match.id)
+        .perform_async(bike.id, match.class.to_s, match.id)
     end
   end
 
