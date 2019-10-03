@@ -16,6 +16,7 @@ module ExternalRegistry
                  logger_level: :info,
                  logger: Rails.logger if Rails.env.development?
         conn.adapter Faraday.default_adapter
+        conn.options.timeout = 5
       end
     end
 
