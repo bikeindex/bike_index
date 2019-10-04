@@ -27,6 +27,7 @@
     "honeybadger-js": "^0.5.5",
     "jquery": "^3.4.0",
     "lodash": "^4.17.13",
+    "lodash-inflection": "^1.5.0",
     "loglevel": "^1.6.1",
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.23",
