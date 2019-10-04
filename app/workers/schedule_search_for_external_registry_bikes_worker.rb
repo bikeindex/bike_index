@@ -1,4 +1,4 @@
-class EnqueueSearchForExternalRegistryBikesWorker < ScheduledWorker
+class ScheduleSearchForExternalRegistryBikesWorker < ScheduledWorker
   prepend ScheduledWorkerRecorder
 
   def self.frequency

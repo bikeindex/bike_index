@@ -42,8 +42,8 @@ class ScheduledWorkerRunner < ScheduledWorker
       TsvCreatorWorker,
       GetManufacturerLogoWorker,
       DeactivateExpiredTheftAlertWorker,
-      EnqueueBikePossiblyFoundNotificationWorker,
-      EnqueueSearchForExternalRegistryBikesWorker,
+      ScheduleBikePossiblyFoundNotificationWorker,
+      ScheduleSearchForExternalRegistryBikesWorker,
       self,
     ]
   end

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe EnqueueSearchForExternalRegistryBikesWorker, type: :job do
+RSpec.describe ScheduleSearchForExternalRegistryBikesWorker, type: :job do
   before { ExternalRegistryBike.delete_all }
 
   describe "#perform" do
