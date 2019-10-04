@@ -13,14 +13,14 @@ class ExternalRegistryBike < ActiveRecord::Base
 
   class << self
     def find_or_search_registry_for(serial_number:)
-      matches = ExternalRegistryBike.where(serial_number: serial_number)
+      serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
+
+      matches = ExternalRegistryBike.where(serial_normalized: serial_normalized)
       return matches if matches.any?
 
-      matches = ExternalRegistry::ExternalRegistry.search_for_bikes_with(
-        serial_number: serial_number,
-      )
+      matches = ExternalRegistry::ExternalRegistry.search_for_bikes_with(serial_normalized)
 
-      exact_matches = matches.where(serial_number: serial_number)
+      exact_matches = matches.where(serial_normalized: serial_normalized)
       return exact_matches if exact_matches.any?
 
       matches

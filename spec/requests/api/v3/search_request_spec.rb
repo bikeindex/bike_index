@@ -37,7 +37,7 @@ RSpec.describe "Search API V3", type: :request do
         FactoryBot.create(:external_registry_bike, serial_number: serial_number)
 
         allow(ExternalRegistry::ExternalRegistry).to(receive(:search_for_bikes_with)
-          .with(serial_number: serial_number).and_return(ExternalRegistryBike.all))
+          .with(serial_number).and_return(ExternalRegistryBike.all))
 
         get "/api/v3/search/external_registries",
             serial: serial_number,

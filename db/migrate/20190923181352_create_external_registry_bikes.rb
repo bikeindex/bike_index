@@ -4,7 +4,7 @@ class CreateExternalRegistryBikes < ActiveRecord::Migration
       t.string :type, null: false, index: true
       t.belongs_to :country, null: false, index: true
 
-      t.string :serial_number, null: false, index: true
+      t.string :serial_number, null: false
       t.string :serial_normalized, null: false, index: true
       t.string :external_id, null: false, index: true
       t.string :additional_registration

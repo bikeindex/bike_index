@@ -7,10 +7,10 @@ module ExternalRegistry
       ]
     end
 
-    def self.search_for_bikes_with(serial_number:, registries: all)
+    def self.search_for_bikes_with(query, registries: all)
       results =
         registries
-          .map { |registry| Thread.new { registry.new.search(serial_number) } }
+          .map { |registry| Thread.new { registry.new.search(query) } }
           .map(&:value)
           .flatten
           .compact

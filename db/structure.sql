@@ -3544,13 +3544,6 @@ CREATE INDEX index_external_registry_bikes_on_serial_normalized ON public.extern
 
 
 --
--- Name: index_external_registry_bikes_on_serial_number; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_external_registry_bikes_on_serial_number ON public.external_registry_bikes USING btree (serial_number);
-
-
---
 -- Name: index_external_registry_bikes_on_type; Type: INDEX; Schema: public; Owner: -
 --
 
