@@ -27,14 +27,6 @@ class ExternalRegistryBikeV3Serializer < BikeV2Serializer
     object.frame_colors&.split(/\s*,\s*/)&.map(&:titleize)
   end
 
-  def registry_name
-    object.external_registry_name
-  end
-
-  def registry_url
-    object.external_registry_url
-  end
-
   def serial
     object.serial_number
   end

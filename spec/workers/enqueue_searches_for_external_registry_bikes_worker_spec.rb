@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe EnqueueSearchesForExternalRegistryBikesWorker, type: :job do
+  before { ExternalRegistryBike.delete_all }
+
   describe "#perform" do
     context "given no bikes currently stolen in the Netherlands" do
       it "does not enqueue any work" do

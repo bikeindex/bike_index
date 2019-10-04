@@ -51,11 +51,11 @@ class ExternalRegistryBike < ActiveRecord::Base
     "#{mnfg_name} #{frame_model}"
   end
 
-  def external_registry_name
+  def registry_name
     raise NotImplementedError
   end
 
-  def external_registry_url
+  def registry_url
     raise NotImplementedError
   end
 

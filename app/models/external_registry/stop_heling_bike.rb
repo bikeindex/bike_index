@@ -1,15 +1,15 @@
 module ExternalRegistry
   class StopHelingBike < ExternalRegistryBike
-    def external_registry_name
+    def registry_name
       "stopheling.nl"
     end
 
-    def external_registry_url
+    def registry_url
       "https://www.stopheling.nl"
     end
 
     def url
-      external_registry_url
+      registry_url
     end
 
     class << self

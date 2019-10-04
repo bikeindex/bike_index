@@ -1,20 +1,20 @@
 module ExternalRegistry
   class VerlorenOfGevondenBike < ExternalRegistryBike
-    def external_registry_name
+    def registry_name
       "verlorenofgevonden.nl"
     end
 
-    def external_registry_url
+    def registry_url
       "https://verlorenofgevonden.nl"
     end
 
     def url
-      [external_registry_url, "overzicht?search=#{external_id}"].join("/")
+      [registry_url, "overzicht?search=#{external_id}"].join("/")
     end
 
     def image_url
       return if info_hash["object_id"].blank?
-      [external_registry_url, "assets", "image", info_hash["object_id"]].join("/")
+      [registry_url, "assets", "image", info_hash["object_id"]].join("/")
     end
 
     def thumb_url
