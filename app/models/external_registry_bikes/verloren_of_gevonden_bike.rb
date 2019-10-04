@@ -1,4 +1,4 @@
-module ExternalRegistry
+module ExternalRegistryBikes
   class VerlorenOfGevondenBike < ExternalRegistryBike
     def registry_name
       "verlorenofgevonden.nl"
@@ -30,8 +30,8 @@ module ExternalRegistry
 
         bike = find_or_initialize_by(
           external_id: attrs["ObjectNumber"].presence,
-          type: "ExternalRegistry::VerlorenOfGevondenBike",
           serial_number: parse_serial_number(description),
+          type: to_s,
         )
 
         bike.cycle_type = "bike"

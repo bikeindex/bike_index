@@ -70,7 +70,7 @@ module ExternalRegistry
       when Array
         response_body
           .map { |result| translate_keys(result) }
-          .map { |attrs| StopHelingBike.build_from_api_response(attrs) }
+          .map { |attrs| ExternalRegistryBikes::StopHelingBike.build_from_api_response(attrs) }
           .compact
           .each(&:save)
           .select(&:persisted?)

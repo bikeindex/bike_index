@@ -113,7 +113,7 @@ module ExternalRegistry
 
     def external_registry_bikes_from(result_pages:)
       result_pages
-        .map { |result| VerlorenOfGevondenBike.build_from_api_response(result) }
+        .map { |result| ExternalRegistryBikes::VerlorenOfGevondenBike.build_from_api_response(result) }
         .compact
         .each(&:save)
         .select(&:persisted?)

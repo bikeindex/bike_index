@@ -19,7 +19,7 @@ module ExternalRegistry
 
             expect(results).to be_present
             expect(results).to be_an(ActiveRecord::Relation)
-            expect(results).to all(be_an_instance_of(VerlorenOfGevondenBike))
+            expect(results).to all(be_an_instance_of(ExternalRegistryBikes::VerlorenOfGevondenBike))
             expect(results.map(&:description)).to all(match(/fiets/))
             expect(results.first.external_id).to match(/F\d+\w*-.+/)
             expect(results.first.serial_number).to be_present

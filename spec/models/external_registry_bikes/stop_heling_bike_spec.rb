@@ -1,6 +1,6 @@
 require "rails_helper"
 
-module ExternalRegistry
+module ExternalRegistryBikes
   RSpec.describe StopHelingBike, type: :model do
     let(:api_response) do
       {

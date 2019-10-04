@@ -1,4 +1,4 @@
-module ExternalRegistry
+module ExternalRegistryBikes
   class StopHelingBike < ExternalRegistryBike
     def registry_name
       "stopheling.nl"
@@ -19,8 +19,8 @@ module ExternalRegistry
 
         bike = find_or_initialize_by(
           external_id: attrs[:registration_number].presence,
-          type: "ExternalRegistry::StopHelingBike",
           serial_number: serial_number(attrs),
+          type: to_s,
         )
 
         bike.cycle_type = "bike"

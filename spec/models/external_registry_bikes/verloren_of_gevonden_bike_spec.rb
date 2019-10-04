@@ -1,6 +1,6 @@
 require "rails_helper"
 
-module ExternalRegistry
+module ExternalRegistryBikes
   RSpec.describe VerlorenOfGevondenBike, type: :model do
     describe "#build_from_api_response" do
       context "given a non-bike api response object" do
