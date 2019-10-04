@@ -1,6 +1,6 @@
 require "rails_helper"
 
-module ExternalRegistries
+module ExternalRegistry
   RSpec.describe StopHelingClient, type: :model do
     before do
       null_cache = ActiveSupport::Cache.lookup_store(:null_store)
@@ -29,11 +29,11 @@ module ExternalRegistries
       end
 
       context "given matching results but no bikes" do
-        it "returns an array of ExternalBikes" do
+        it "returns an array of ExternalRegistryBikes" do
           client = build_client(results: [bike_result])
           results = client.search("28484")
           expect(results).to_not be_empty
-          expect(results).to all(be_an_instance_of(ExternalBike))
+          expect(results).to all(be_an_instance_of(ExternalRegistryBikes::StopHelingBike))
         end
       end
     end

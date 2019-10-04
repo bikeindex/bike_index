@@ -1,0 +1,470 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://www.controleergoed.nl/DesktopModules/Stopheling/API/v1/WebAPI/GetSearchItems?ApplicationID=123&Hmac=B52A1B46BF8030DE18C2584DB5A45EE2&SearchTerm=2722
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Content-Type:
+      - application/json;charset=UTF-8
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 403
+      message: Forbidden
+    headers:
+      Cache-Control:
+      - no-cache
+      Pragma:
+      - no-cache
+      Content-Type:
+      - application/json; charset=utf-8
+      Expires:
+      - "-1"
+      Access-Control-Allow-Origin:
+      - domain
+      Access-Control-Allow-Headers:
+      - Origin, X-Requested-With, Content-Type, Accept, x-appid, x-hmac, x-value,
+        x-customercode
+      Access-Control-Allow-Methods:
+      - GET, POST, PUT, OPTIONS
+      Access-Control-Request-Method:
+      - "*"
+      Content-Security-Policy:
+      - 'default-src * ''unsafe-inline'' ''unsafe-eval''; script-src * ''unsafe-inline''
+        ''unsafe-eval''; connect-src * ''unsafe-inline''; img-src * data: blob: ''unsafe-inline'';
+        frame-src *; style-src * ''unsafe-inline'';'
+      Referrer-Policy:
+      - no-referrer-when-downgrade
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - ''
+      Strict-Transport-Security:
+      - max-age=31536000
+      Date:
+      - Wed, 25 Sep 2019 01:02:35 GMT
+      Content-Length:
+      - '26'
+    body:
+      encoding: UTF-8
+      string: '{"Message":"Invalid HMAC"}'
+    http_version: 
+  recorded_at: Wed, 25 Sep 2019 01:02:36 GMT
+- request:
+    method: post
+    uri: https://accept.verlorenofgevonden.nl/ez.php?date_from=01-09-2018&date_to=24-09-2019&from=0&org=&q=2722&site=nl&timestamp=1569373356
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Content-Length:
+      - '0'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Wed, 25 Sep 2019 01:02:36 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '3558'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - POST, GET, OPTIONS
+      Access-Control-Allow-Headers:
+      - Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type,
+        Access-Control-Request-Method, Access-Control-Request-Headers
+      Vary:
+      - Accept-Encoding,User-Agent
+      X-Cache-Date:
+      - Wed, 25 Sep 2019 01:02:36 GMT
+    body:
+      encoding: ASCII-8BIT
+      string: '{"took":47,"timed_out":false,"_shards":{"total":1,"successful":1,"skipped":0,"failed":0},"hits":{"total":7,"max_score":null,"hits":[{"_shard":"[vog_dev][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_dev","_type":"doc","_id":"315985","_score":null,"_source":{"ObjectId":"315985","ObjectNumber":"F0518f-2019025679","ExternalNumber":"","CityId":"986","City":"Delft","StorageLocationId":"1150551","StorageLocation":{"StorageLocationId":"1150551","CustomerId":"255","Name":"Gemeente
+        Den Haag","Streetname":"","Zipcode":"","CityId":"4","City":"Den Haag                                          ","Phone":"070-752
+        8800","Email":"fietsdepot@haeghegroep.nl","WebsiteUrl":"www.fietsdepothaaglanden.nl","PrivacyUrl":"https:\/\/www.denhaag.nl\/nl\/verklaring-inzake-gegevensbescherming.htm","OrderId":"1","Instructions":"U
+        krijgt uw fiets mee als u: \r\nuw geldige legitimatiebewijs laat zien \r\neen
+        passende fietssleutel bij zich heeft \r\nheeft betaalt. Dit kan alleen (voor
+        uw en onze veiligheid) met PIN\r\n\r\nSWAP fietsen worden binnen twee weken
+        (na de verwijderingsdatum) afgevoerd naar SWAP en staan dan niet meer op het
+        Fietsdepot"},"CategoryId":"3","Category":"fiets","SubCategoryId":"25","SubCategory":"damesfiets","ColorId":"10","Color":"groen","Description":"damesfiets
+        Stadsfiets Gazelle ( groen ) met framenummer ''5127227''.\r\nLocatie gevonden:
+        Rij 14 rek140, NS-stalling1 Delft Delft.\r\nNS-stalling Delft Wees 14 dgn
+        op 13-8-2019 en overgebracht naar depot Fietsdepot Haaglanden op 3-9-2019,
+        opslag t\/m 15-10-2019.","Brand":"Gazelle","RegistrationDate":"2019-09-03T15:25:00Z","Deleted":"false","ImageCount":"1","CustomerId":"255","OrganisationName":"Gemeente
+        Den Haag","Country":"Nederland","FormLink":"https:\/\/formulieren.verlorenofgevonden.nl\/eigenaar?db=5fa8d3ff-c3a4-441b-b22d-4b3c352f9ce5&Number=F0518f-2019025679"},"highlight":{"Description":["damesfiets
+        Stadsfiets Gazelle ( groen ) met framenummer ''<strong>5127227</strong>''.\r\nLocatie
+        gevonden: Rij 14 rek140, NS-stalling1 Delft Delft.\r\nNS-stalling Delft Wees
+        14 dgn op 13-8-2019 en overgebracht naar depot Fietsdepot Haaglanden op 3-9-2019,
+        opslag t/m 15-10-2019."]},"sort":[1567524300000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"Description:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1535760000000
+        TO 1569369599999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}},{"_shard":"[vog_dev][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_dev","_type":"doc","_id":"315040","_score":null,"_source":{"ObjectId":"315040","ObjectNumber":"G0855-2019002722","ExternalNumber":"","CityId":"3974","City":"Tilburg","StorageLocationId":"1150444","StorageLocation":{"StorageLocationId":"1150444","CustomerId":"227","Name":"Gemeente
+        Tilburg","Streetname":"Stadskantoor 6 - Spoorlaan 181","Zipcode":"5038 CB","CityId":"3974","City":"Tilburg                                           ","Phone":"","Email":"gevondenvoorwerpen@tilburg.nl","WebsiteUrl":"www.tilburg.nl","PrivacyUrl":"https:\/\/www.tilburg.nl\/footer\/privacystatement\/","OrderId":"1","Instructions":"U
+        kunt het gevonden voorwerp ophalen in  \r\nStadswinkel Centrum, Spoorlaan
+        181, 5038 CB  Tilburg.\r\n\r\nU dient hiervoor een afspraak te maken via.
+        www.tilburg.nl  of telefoonnummer 14013.\r\n\r\nBij het afhalen een legitimatie
+        meebrengen en het meldingsnummer bij de hand houden."},"CategoryId":"2","Category":"documenten
+        \/ pasjes","SubCategoryId":"18","SubCategory":"iets anders","ColorId":"2","Color":"blauw","Description":"iets
+        anders (blauw)\r\nGevonden in de \/ op de Westermarkt (winkelcentrum) te Tilburg.","Brand":"","RegistrationDate":"2019-09-02T02:00:00Z","Deleted":"false","ImageCount":"0","CustomerId":"227","OrganisationName":"Gemeente
+        Tilburg","Country":"Nederland","FormLink":"https:\/\/formulieren.verlorenofgevonden.nl\/eigenaar?db=48644183-909A-4791-9D95-1AF56CEF70BA&Number=G0855-2019002722"},"sort":[1567389600000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"ObjectNumber:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1535760000000
+        TO 1569369599999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}},{"_shard":"[vog_dev][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_dev","_type":"doc","_id":"270300","_score":null,"_source":{"ObjectId":"270300","ObjectNumber":"F0034f-0034-WF-001579","ExternalNumber":"0034-WF-001579","CityId":"147","City":"Almere","StorageLocationId":"1150503","StorageLocation":{"StorageLocationId":"1150503","CustomerId":"306","Name":"Gemeente
+        Almere","Streetname":"Fietsdepot Esplanade         00","Zipcode":"1315 TC","CityId":"147","City":"Almere                                            ","Phone":"","Email":"verlorenofgevonden@almere.nl","WebsiteUrl":"http:\/\/parkeren.almere.nl\/parkeren-fietser\/fietsdepot\/","PrivacyUrl":"https:\/\/www.almere.nl\/privacyverklaring\/","OrderId":"1","Instructions":"Uw
+        fiets kunt u tegen betaling van \u20ac 25,-- ophalen uit het Fietsdepot op
+        dinsdag, donderdag en vrijdag van 10.00 tot 17.00 uur. Zorgt u ervoor dat
+        u in het bezit bent van een geldig identiteitsbewijs, fietssleutel of ander
+        eigendomsbewijs. Het Fietsdepot bevindt zich aan de Esplanade, Almere Stad
+        (ingang Foodpassage)."},"CategoryId":"3","Category":"fiets","SubCategoryId":"25","SubCategory":"damesfiets","ColorId":"6","Color":"diverse","Description":"damesfiets
+        Batavus ( diverse ) met framenummer ''BA9272297''.\r\nLocatie gevonden: Spoordreef,
+        4. Almere Stad Centrum Almere.\r\nWeesfiets 21 dagen op 18-6-2019 en overgebracht
+        naar depot Fietsdepot Esplanade op 25-7-2019, opslag t\/m 31-10-2019.","Brand":"Batavus","RegistrationDate":"2019-08-01T13:50:00Z","Deleted":"false","ImageCount":"1","CustomerId":"306","OrganisationName":"Gemeente
+        Almere","Country":"Nederland","FormLink":"&Number=F0034f-0034-WF-001579"},"highlight":{"Description":["damesfiets
+        Batavus ( diverse ) met framenummer ''<strong>BA9272297</strong>''.\r\nLocatie
+        gevonden: Spoordreef, 4. Almere Stad Centrum Almere.\r\nWeesfiets 21 dagen
+        op 18-6-2019 en overgebracht naar depot Fietsdepot Esplanade op 25-7-2019,
+        opslag t/m 31-10-2019."]},"sort":[1564667400000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"Description:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1535760000000
+        TO 1569369599999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}},{"_shard":"[vog_dev][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_dev","_type":"doc","_id":"273332","_score":null,"_source":{"ObjectId":"273332","ObjectNumber":"F0599f-0599-PO-000375","ExternalNumber":"0599-PO-000375","CityId":"3322","City":"Prins
+        Alexander","StorageLocationId":"1150569","StorageLocation":{"StorageLocationId":"1150569","CustomerId":"302","Name":"Fietsdepot
+        Rotterdam","Streetname":"Koperstraat 23","Zipcode":"3067 GL","CityId":"3473","City":"Rotterdam                                         ","Phone":"14010","Email":"fietspunt@rotterdam.nl","WebsiteUrl":"www.rotterdam.nl","PrivacyUrl":"","OrderId":"4","Instructions":""},"CategoryId":"3","Category":"fiets","SubCategoryId":"26","SubCategory":"herenfiets","ColorId":"10","Color":"groen","Description":"herenfiets
+        Stadsfiets Union ( groen ) met framenummer ''WKM272225T''.\r\nLocatie gevonden:
+        Koperstraat, Prinsenland Prins Alexander.\r\nPolitie op 8-7-2019 en overgebracht
+        naar depot Verkeerd \/ hinderlijk gestald op 8-7-2019, opslag t\/m 8-10-2019.","Brand":"Union","RegistrationDate":"2019-07-09T08:50:00Z","Deleted":"false","ImageCount":"1","CustomerId":"302","OrganisationName":"Fietsdepot
+        Rotterdam","Country":"Nederland","FormLink":"&Number=F0599f-0599-PO-000375"},"highlight":{"Description":["herenfiets
+        Stadsfiets Union ( groen ) met framenummer ''<strong>WKM272225T</strong>''.\r\nLocatie
+        gevonden: Koperstraat, Prinsenland Prins Alexander.\r\nPolitie op 8-7-2019
+        en overgebracht naar depot Verkeerd / hinderlijk gestald op 8-7-2019, opslag
+        t/m 8-10-2019."]},"sort":[1562662200000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"Description:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1535760000000
+        TO 1569369599999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}},{"_shard":"[vog_dev][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_dev","_type":"doc","_id":"302751","_score":null,"_source":{"ObjectId":"302751","ObjectNumber":"G0598-2019002722","ExternalNumber":"","CityId":"3322","City":"Prins
+        Alexander","StorageLocationId":"1150335","StorageLocation":{"StorageLocationId":"1150335","CustomerId":"106","Name":"gemeente
+        Rotterdam","Streetname":"Koperstraat 23","Zipcode":"3067 GL","CityId":"3473","City":"Rotterdam                                         ","Phone":"14010","Email":"verlorenofgevonden@rotterdam.nl","WebsiteUrl":"http:\/\/www.rotterdam.nl","PrivacyUrl":"","OrderId":"1","Instructions":""},"CategoryId":"15","Category":"tas
+        of koffer (met inhoud)","SubCategoryId":"78","SubCategory":"iets anders","ColorId":"15","Color":"wit","Description":"iets
+        anders (wit) met opschrift oh happy day.\r\nGevonden in de \/ op de  (rotterdam)
+        te Prins Alexander.","Brand":"","RegistrationDate":"2019-07-04T14:37:00Z","Deleted":"false","ImageCount":"1","CustomerId":"106","OrganisationName":"Gemeente
+        Rotterdam","Country":"Nederland","FormLink":"&Number=G0598-2019002722"},"sort":[1562251020000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"ObjectNumber:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1535760000000
+        TO 1569369599999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}},{"_shard":"[vog_dev][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_dev","_type":"doc","_id":"292325","_score":null,"_source":{"ObjectId":"292325","ObjectNumber":"F0772f-2019002722","ExternalNumber":"","CityId":"1228","City":"Eindhoven","StorageLocationId":"1150458","StorageLocation":{"StorageLocationId":"1150458","CustomerId":"245","Name":"Fietsdepot
+        Eindhoven","Streetname":"Vestdijk 147","Zipcode":"5611 CB","CityId":"1228","City":"Eindhoven                                         ","Phone":"06
+        - 55405585","Email":"fietsdepot@eindhoven.nl","WebsiteUrl":"http:\/\/www.eindhoven.nl","PrivacyUrl":"https:\/\/www.eindhoven.nl\/privacyverklaring?suggestie=Privacyverklaring","OrderId":"1","Instructions":"Op
+        werkdagen zijn wij geopend van 9.00 - tot 16.00 uur.\r\nAls u uw fiets op
+        komt halen wilt u dan uw legitimatiebewijs en fietssleutel meebrengen. Voor
+        het ophalen van uw fiets betaalt u \u20ac 20,00 administratie en opslagkosten."},"CategoryId":"3","Category":"fiets","SubCategoryId":"29","SubCategory":"iets
+        anders","ColorId":"6","Color":"diverse","Description":"( diverse ) met framenummer
+        ''YP20140''.\r\nLocatie gevonden: , Centrum Eindhoven.\r\nWeesfiets 28 dagen
+        op 26-6-2019 en overgebracht naar depot Fietsdepot Vestdijk 147 op 26-6-2019,
+        opslag t\/m 26-9-2019.","Brand":"<onbekend>","RegistrationDate":"2019-06-26T12:57:00Z","Deleted":"false","ImageCount":"1","CustomerId":"245","OrganisationName":"Fietsdepot
+        Eindhoven","Country":"Nederland","FormLink":"&Number=F0772f-2019002722"},"sort":[1561553820000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"ObjectNumber:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1535760000000
+        TO 1569369599999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}},{"_shard":"[vog_dev][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_dev","_type":"doc","_id":"269187","_score":null,"_source":{"ObjectId":"269187","ObjectNumber":"F0193f-193310555","ExternalNumber":"193310555","CityId":"4692","City":"Zwolle","StorageLocationId":"1150565","StorageLocation":{"StorageLocationId":"1150565","CustomerId":"249","Name":"AFAC
+        Westerlaan","Streetname":"Derk Buismanstraat 23","Zipcode":"8011GP","CityId":"4692","City":"Zwolle                                            ","Phone":"0384214211","Email":"afac@zwolle.nl","WebsiteUrl":"http:\/\/www.zwolle.nl","PrivacyUrl":"https:\/\/www.zwolle.nl\/privacy","OrderId":"2","Instructions":"U
+        kunt telefonisch of per e-mail een afspraak maken om uw fiets op te halen.\r\nGraag
+        ons registratienummer vermelden, deze begint met 193...\r\nFietssleutel en
+        legitimatiebewijs zijn verplicht.,\r\nDe kosten zijn 15 euro . \r\nU kunt
+        de fiets ophalen aan de Derk Buismanstraat 23 8011 GA Zwolle\r\nt: 038-4214211\r\nE:
+        afac@zwolle.nl\r\n\r\nopeningstijden \r\nma t\/m vr van 9.00 uur tot 16.00
+        uur.\r\ndonderdag van 9.00 uur tot 19.00 uur."},"CategoryId":"3","Category":"fiets","SubCategoryId":"26","SubCategory":"herenfiets","ColorId":"2","Color":"blauw","Description":"herenfiets
+        Gazelle ( blauw ) met framenummer ''1132722''.\r\nLocatie gevonden: Hanzelaan,
+        Zwolle.\r\nOverschrijding stallingstermijn (14 dagen) op 13-9-2018 en overgebracht
+        naar depot AFAC Westerlaan op 18-9-2018, opslag t\/m 13-11-2018.","Brand":"Gazelle","RegistrationDate":"2018-09-18T14:30:00Z","Deleted":"false","ImageCount":"1","CustomerId":"249","OrganisationName":"Gemeente
+        Zwolle","Country":"Nederland","FormLink":"&Number=F0193f-193310555"},"highlight":{"Description":["herenfiets
+        Gazelle ( blauw ) met framenummer ''<strong>1132722</strong>''.\r\nLocatie
+        gevonden: Hanzelaan, Zwolle.\r\nOverschrijding stallingstermijn (14 dagen)
+        op 13-9-2018 en overgebracht naar depot AFAC Westerlaan op 18-9-2018, opslag
+        t/m 13-11-2018."]},"sort":[1537281000000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"Description:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1535760000000
+        TO 1569369599999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}}]},"aggregations":{"soort_voorwerp":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"iets
+        anders","doc_count":3},{"key":"damesfiets","doc_count":2},{"key":"herenfiets","doc_count":2}]},"kleuren":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"blauw","doc_count":2},{"key":"diverse","doc_count":2},{"key":"groen","doc_count":2},{"key":"wit","doc_count":1}]},"plaatsen":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"Prins
+        Alexander","doc_count":2},{"key":"Almere","doc_count":1},{"key":"Delft","doc_count":1},{"key":"Eindhoven","doc_count":1},{"key":"Tilburg","doc_count":1},{"key":"Zwolle","doc_count":1}]}}}'
+    http_version: 
+  recorded_at: Wed, 25 Sep 2019 01:02:36 GMT
+- request:
+    method: post
+    uri: https://verlorenofgevonden.nl/scripts/ez.php?date_from=01-10-2018&date_to=02-10-2019&from=0&org=&q=2722&site=nl&timestamp=1570059910
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Content-Length:
+      - '0'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Wed, 02 Oct 2019 23:45:11 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '2754'
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=15768000; includeSubDomains; preload
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - same-origin
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - POST, GET, OPTIONS
+      Access-Control-Allow-Headers:
+      - Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type,
+        Access-Control-Request-Method, Access-Control-Request-Headers
+      Vary:
+      - Accept-Encoding,User-Agent
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Cache-Date:
+      - Wed, 02 Oct 2019 23:45:11 GMT
+    body:
+      encoding: ASCII-8BIT
+      string: '{"took":40,"timed_out":false,"_shards":{"total":1,"successful":1,"skipped":0,"failed":0},"hits":{"total":15,"max_score":null,"hits":[{"_shard":"[vog_prod][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_prod","_type":"doc","_id":"332923","_score":null,"_source":{"ObjectId":"332923","ObjectNumber":"F0606a-6064002722","ExternalNumber":"6064002722","CityId":"3553","City":"Schiedam","StorageLocationId":"1150337","StorageLocation":{"StorageLocationId":"1150337","CustomerId":"109","Name":"fietsdepot
+        Schiedam","Streetname":"Stadserf 48","Zipcode":"3112 DX","CityId":"3553","City":"Schiedam                                          ","Phone":"14010","Email":"contact@schiedam.nl","WebsiteUrl":"https:\/\/www.schiedam.nl\/","PrivacyUrl":"","OrderId":"1","Instructions":""},"CategoryId":"3","Category":"fiets","SubCategoryId":"27","SubCategory":"kinderfiets","ColorId":"14","Color":"roze","Description":"kinderfiets
+        ( roze ).\r\nLocatie gevonden: Vlaardingerdijk, Overig Schiedam.\r\nWeesfietsen
+        op 10-8-2019 en overgebracht naar depot Fietsdepot Schiedam op 26-9-2019,
+        opslag t\/m 26-12-2019.","Brand":"<onbekend>","RegistrationDate":"2019-09-26T19:37:00Z","Deleted":"false","ImageCount":"1","CustomerId":"109","OrganisationName":"Gemeente
+        Schiedam","Country":"Nederland","FormLink":"&Number=F0606a-6064002722","Customer":{"name":"fietsdepot
+        Schiedam","noFound":"1","noLost":"1","noOwner":"1","type":"2"}},"sort":[1569526620000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"ObjectNumber:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1538352000000
+        TO 1570060799999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}},{"_shard":"[vog_prod][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_prod","_type":"doc","_id":"331923","_score":null,"_source":{"ObjectId":"331923","ObjectNumber":"F0599f-0599-VH-027228","ExternalNumber":"0599-VH-027228","CityId":"2906","City":"Noord","StorageLocationId":"1150569","StorageLocation":{"StorageLocationId":"1150569","CustomerId":"302","Name":"Fietsdepot
+        Rotterdam","Streetname":"Koperstraat 23","Zipcode":"3067 GL","CityId":"3473","City":"Rotterdam                                         ","Phone":"14010","Email":"fietspunt@rotterdam.nl","WebsiteUrl":"www.rotterdam.nl","PrivacyUrl":"","OrderId":"4","Instructions":""},"CategoryId":"3","Category":"fiets","SubCategoryId":"26","SubCategory":"herenfiets","ColorId":"10","Color":"groen","Description":"herenfiets
+        Stadsfiets Union ( groen ) met framenummer ''Y70083002486024398''.\r\nLocatie
+        gevonden: Stationssingel, Provenierswijk Noord.\r\nVerkeerd geparkeerd op
+        25-9-2019 en overgebracht naar depot Verkeerd \/ hinderlijk gestald op 25-9-2019,
+        opslag t\/m 25-12-2019. handremmen, 7 versnellingen, zadelhoes groen, frameslot
+        grijs","Brand":"Union","RegistrationDate":"2019-09-25T15:36:00Z","Deleted":"false","ImageCount":"1","CustomerId":"302","OrganisationName":"Fietsdepot
+        Rotterdam","Country":"Nederland","FormLink":"&Number=F0599f-0599-VH-027228","Customer":{"name":"Fietsdepot
+        Rotterdam","noFound":"1","noLost":"1","noOwner":"1","type":"2"}},"sort":[1569425760000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"ObjectNumber:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1538352000000
+        TO 1570060799999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}},{"_shard":"[vog_prod][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_prod","_type":"doc","_id":"331905","_score":null,"_source":{"ObjectId":"331905","ObjectNumber":"F0599f-0599-VH-027223","ExternalNumber":"0599-VH-027223","CityId":"2906","City":"Noord","StorageLocationId":"1150569","StorageLocation":{"StorageLocationId":"1150569","CustomerId":"302","Name":"Fietsdepot
+        Rotterdam","Streetname":"Koperstraat 23","Zipcode":"3067 GL","CityId":"3473","City":"Rotterdam                                         ","Phone":"14010","Email":"fietspunt@rotterdam.nl","WebsiteUrl":"www.rotterdam.nl","PrivacyUrl":"","OrderId":"4","Instructions":""},"CategoryId":"3","Category":"fiets","SubCategoryId":"25","SubCategory":"damesfiets","ColorId":"2","Color":"blauw","Description":"damesfiets
+        Stadsfiets Giant ( blauw ) met framenummer ''GEM2268662''.\r\nLocatie gevonden:
+        Stationssingel, Provenierswijk Noord.\r\nVerkeerd geparkeerd op 25-9-2019
+        en overgebracht naar depot Verkeerd \/ hinderlijk gestald op 25-9-2019, opslag
+        t\/m 25-12-2019. handremmen, 3 versnellingen, frameslot zwart, zadelhoes roze
+        met zwarte mieren","Brand":"Giant","RegistrationDate":"2019-09-25T15:33:00Z","Deleted":"false","ImageCount":"1","CustomerId":"302","OrganisationName":"Fietsdepot
+        Rotterdam","Country":"Nederland","FormLink":"&Number=F0599f-0599-VH-027223","Customer":{"name":"Fietsdepot
+        Rotterdam","noFound":"1","noLost":"1","noOwner":"1","type":"2"}},"sort":[1569425580000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"ObjectNumber:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1538352000000
+        TO 1570060799999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}},{"_shard":"[vog_prod][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_prod","_type":"doc","_id":"331889","_score":null,"_source":{"ObjectId":"331889","ObjectNumber":"F0599f-0599-VH-027224","ExternalNumber":"0599-VH-027224","CityId":"2906","City":"Noord","StorageLocationId":"1150569","StorageLocation":{"StorageLocationId":"1150569","CustomerId":"302","Name":"Fietsdepot
+        Rotterdam","Streetname":"Koperstraat 23","Zipcode":"3067 GL","CityId":"3473","City":"Rotterdam                                         ","Phone":"14010","Email":"fietspunt@rotterdam.nl","WebsiteUrl":"www.rotterdam.nl","PrivacyUrl":"","OrderId":"4","Instructions":""},"CategoryId":"3","Category":"fiets","SubCategoryId":"28","SubCategory":"mountainbike","ColorId":"2","Color":"blauw","Description":"mountainbike
+        Stadsfiets Kyoso ( blauw ) met framenummer ''13984554409020''.\r\nLocatie
+        gevonden: Stationssingel, Provenierswijk Noord.\r\nVerkeerd geparkeerd op
+        25-9-2019 en overgebracht naar depot Verkeerd \/ hinderlijk gestald op 25-9-2019,
+        opslag t\/m 25-12-2019. handremmen, 24  versnellingen, frameslot zwart,","Brand":"Kyoso","RegistrationDate":"2019-09-25T15:30:00Z","Deleted":"false","ImageCount":"1","CustomerId":"302","OrganisationName":"Fietsdepot
+        Rotterdam","Country":"Nederland","FormLink":"&Number=F0599f-0599-VH-027224","Customer":{"name":"Fietsdepot
+        Rotterdam","noFound":"1","noLost":"1","noOwner":"1","type":"2"}},"sort":[1569425400000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"ObjectNumber:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1538352000000
+        TO 1570060799999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}},{"_shard":"[vog_prod][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_prod","_type":"doc","_id":"331857","_score":null,"_source":{"ObjectId":"331857","ObjectNumber":"F0599f-0599-VH-027225","ExternalNumber":"0599-VH-027225","CityId":"2906","City":"Noord","StorageLocationId":"1150569","StorageLocation":{"StorageLocationId":"1150569","CustomerId":"302","Name":"Fietsdepot
+        Rotterdam","Streetname":"Koperstraat 23","Zipcode":"3067 GL","CityId":"3473","City":"Rotterdam                                         ","Phone":"14010","Email":"fietspunt@rotterdam.nl","WebsiteUrl":"www.rotterdam.nl","PrivacyUrl":"","OrderId":"4","Instructions":""},"CategoryId":"3","Category":"fiets","SubCategoryId":"26","SubCategory":"herenfiets","ColorId":"17","Color":"zwart","Description":"herenfiets
+        Stadsfiets Cortina ( zwart ) met framenummer ''CO0920859''.\r\nLocatie gevonden:
+        Stationssingel, Provenierswijk Noord.\r\nVerkeerd geparkeerd op 25-9-2019
+        en overgebracht naar depot Verkeerd \/ hinderlijk gestald op 25-9-2019, opslag
+        t\/m 25-12-2019. kabelslot met cijfers, telefoonhouder op stuur, zwart rekje
+        voor, ketting en kettingslot verroest","Brand":"Cortina","RegistrationDate":"2019-09-25T15:18:00Z","Deleted":"false","ImageCount":"1","CustomerId":"302","OrganisationName":"Fietsdepot
+        Rotterdam","Country":"Nederland","FormLink":"&Number=F0599f-0599-VH-027225","Customer":{"name":"Fietsdepot
+        Rotterdam","noFound":"1","noLost":"1","noOwner":"1","type":"2"}},"sort":[1569424680000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"ObjectNumber:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1538352000000
+        TO 1570060799999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}},{"_shard":"[vog_prod][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_prod","_type":"doc","_id":"331848","_score":null,"_source":{"ObjectId":"331848","ObjectNumber":"F0599f-0599-VH-027229","ExternalNumber":"0599-VH-027229","CityId":"2906","City":"Noord","StorageLocationId":"1150569","StorageLocation":{"StorageLocationId":"1150569","CustomerId":"302","Name":"Fietsdepot
+        Rotterdam","Streetname":"Koperstraat 23","Zipcode":"3067 GL","CityId":"3473","City":"Rotterdam                                         ","Phone":"14010","Email":"fietspunt@rotterdam.nl","WebsiteUrl":"www.rotterdam.nl","PrivacyUrl":"","OrderId":"4","Instructions":""},"CategoryId":"3","Category":"fiets","SubCategoryId":"25","SubCategory":"damesfiets","ColorId":"10","Color":"groen","Description":"damesfiets
+        Stadsfiets Gazelle ( groen ) met framenummer ''GA912063''.\r\nLocatie gevonden:
+        Stationssingel, Provenierswijk Noord.\r\nVerkeerd geparkeerd op 25-9-2019
+        en overgebracht naar depot Verkeerd \/ hinderlijk gestald op 25-9-2019, opslag
+        t\/m 25-12-2019. frameslot zwart, kettingslot geel, ketting en kettingkast
+        verroest","Brand":"Gazelle","RegistrationDate":"2019-09-25T15:13:00Z","Deleted":"false","ImageCount":"1","CustomerId":"302","OrganisationName":"Fietsdepot
+        Rotterdam","Country":"Nederland","FormLink":"&Number=F0599f-0599-VH-027229","Customer":{"name":"Fietsdepot
+        Rotterdam","noFound":"1","noLost":"1","noOwner":"1","type":"2"}},"sort":[1569424380000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"ObjectNumber:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1538352000000
+        TO 1570060799999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}},{"_shard":"[vog_prod][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_prod","_type":"doc","_id":"331836","_score":null,"_source":{"ObjectId":"331836","ObjectNumber":"F0599f-0599-VH-027227","ExternalNumber":"0599-VH-027227","CityId":"2906","City":"Noord","StorageLocationId":"1150569","StorageLocation":{"StorageLocationId":"1150569","CustomerId":"302","Name":"Fietsdepot
+        Rotterdam","Streetname":"Koperstraat 23","Zipcode":"3067 GL","CityId":"3473","City":"Rotterdam                                         ","Phone":"14010","Email":"fietspunt@rotterdam.nl","WebsiteUrl":"www.rotterdam.nl","PrivacyUrl":"","OrderId":"4","Instructions":""},"CategoryId":"3","Category":"fiets","SubCategoryId":"25","SubCategory":"damesfiets","ColorId":"2","Color":"blauw","Description":"damesfiets
+        Stadsfiets Avancer ( blauw ) met framenummer ''B720865K''.\r\nLocatie gevonden:
+        Stationssingel, Provenierswijk Noord.\r\nVerkeerd geparkeerd op 25-9-2019
+        en overgebracht naar depot Verkeerd \/ hinderlijk gestald op 25-9-2019, opslag
+        t\/m 25-12-2019. frameslot zwart, fietspomp achter, handremmen, 6 versnellingen,
+        geen kettingslot","Brand":"Avancer","RegistrationDate":"2019-09-25T15:09:00Z","Deleted":"false","ImageCount":"1","CustomerId":"302","OrganisationName":"Fietsdepot
+        Rotterdam","Country":"Nederland","FormLink":"&Number=F0599f-0599-VH-027227","Customer":{"name":"Fietsdepot
+        Rotterdam","noFound":"1","noLost":"1","noOwner":"1","type":"2"}},"sort":[1569424140000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"ObjectNumber:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1538352000000
+        TO 1570060799999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}},{"_shard":"[vog_prod][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_prod","_type":"doc","_id":"331820","_score":null,"_source":{"ObjectId":"331820","ObjectNumber":"F0599f-0599-VH-027220","ExternalNumber":"0599-VH-027220","CityId":"2906","City":"Noord","StorageLocationId":"1150569","StorageLocation":{"StorageLocationId":"1150569","CustomerId":"302","Name":"Fietsdepot
+        Rotterdam","Streetname":"Koperstraat 23","Zipcode":"3067 GL","CityId":"3473","City":"Rotterdam                                         ","Phone":"14010","Email":"fietspunt@rotterdam.nl","WebsiteUrl":"www.rotterdam.nl","PrivacyUrl":"","OrderId":"4","Instructions":""},"CategoryId":"3","Category":"fiets","SubCategoryId":"25","SubCategory":"damesfiets","ColorId":"2","Color":"blauw","Description":"damesfiets
+        Stadsfiets Ov-fiets.nl ( blauw ) met framenummer ''OV52432''.\r\nLocatie gevonden:
+        Stationssingel, Provenierswijk Noord.\r\nVerkeerd geparkeerd op 25-9-2019
+        en overgebracht naar depot Verkeerd \/ hinderlijk gestald op 25-9-2019, opslag
+        t\/m 25-12-2019.","Brand":"Ov-fiets.nl","RegistrationDate":"2019-09-25T15:03:00Z","Deleted":"false","ImageCount":"1","CustomerId":"302","OrganisationName":"Fietsdepot
+        Rotterdam","Country":"Nederland","FormLink":"&Number=F0599f-0599-VH-027220","Customer":{"name":"Fietsdepot
+        Rotterdam","noFound":"1","noLost":"1","noOwner":"1","type":"2"}},"sort":[1569423780000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"ObjectNumber:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1538352000000
+        TO 1570060799999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}},{"_shard":"[vog_prod][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_prod","_type":"doc","_id":"331807","_score":null,"_source":{"ObjectId":"331807","ObjectNumber":"F0599f-0599-VH-027222","ExternalNumber":"0599-VH-027222","CityId":"2906","City":"Noord","StorageLocationId":"1150569","StorageLocation":{"StorageLocationId":"1150569","CustomerId":"302","Name":"Fietsdepot
+        Rotterdam","Streetname":"Koperstraat 23","Zipcode":"3067 GL","CityId":"3473","City":"Rotterdam                                         ","Phone":"14010","Email":"fietspunt@rotterdam.nl","WebsiteUrl":"www.rotterdam.nl","PrivacyUrl":"","OrderId":"4","Instructions":""},"CategoryId":"3","Category":"fiets","SubCategoryId":"25","SubCategory":"damesfiets","ColorId":"17","Color":"zwart","Description":"damesfiets
+        Omafiets Ranger ( zwart ) met framenummer ''Y700830024''.\r\nLocatie gevonden:
+        Stationssingel, Provenierswijk Noord.\r\nVerkeerd geparkeerd op 25-9-2019
+        en overgebracht naar depot Verkeerd \/ hinderlijk gestald op 25-9-2019, opslag
+        t\/m 25-12-2019. terugtraprem, bel zwart, kettingslot zwart","Brand":"Ranger","RegistrationDate":"2019-09-25T14:57:00Z","Deleted":"false","ImageCount":"1","CustomerId":"302","OrganisationName":"Fietsdepot
+        Rotterdam","Country":"Nederland","FormLink":"&Number=F0599f-0599-VH-027222","Customer":{"name":"Fietsdepot
+        Rotterdam","noFound":"1","noLost":"1","noOwner":"1","type":"2"}},"sort":[1569423420000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"ObjectNumber:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1538352000000
+        TO 1570060799999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}},{"_shard":"[vog_prod][0]","_node":"AwAJTLMoS0aNimcS25KDDg","_index":"vog_prod","_type":"doc","_id":"315985","_score":null,"_source":{"ObjectId":"315985","ObjectNumber":"F0518f-2019025679","ExternalNumber":"","CityId":"986","City":"Delft","StorageLocationId":"1150551","StorageLocation":{"StorageLocationId":"1150551","CustomerId":"255","Name":"Gemeente
+        Den Haag","Streetname":"","Zipcode":"","CityId":"4","City":"Den Haag                                          ","Phone":"070-752
+        8800","Email":"fietsdepot@haeghegroep.nl","WebsiteUrl":"www.fietsdepothaaglanden.nl","PrivacyUrl":"https:\/\/www.denhaag.nl\/nl\/verklaring-inzake-gegevensbescherming.htm","OrderId":"1","Instructions":"U
+        krijgt uw fiets mee als u: \r\nuw geldige legitimatiebewijs laat zien \r\neen
+        passende fietssleutel bij zich heeft \r\nheeft betaalt. Dit kan alleen (voor
+        uw en onze veiligheid) met PIN\r\n\r\nSWAP fietsen worden binnen twee weken
+        (na de verwijderingsdatum) afgevoerd naar SWAP en staan dan niet meer op het
+        Fietsdepot"},"CategoryId":"3","Category":"fiets","SubCategoryId":"25","SubCategory":"damesfiets","ColorId":"10","Color":"groen","Description":"damesfiets
+        Stadsfiets Gazelle ( groen ) met framenummer ''5127227''.\r\nLocatie gevonden:
+        Rij 14 rek140, NS-stalling1 Delft Delft.\r\nNS-stalling Delft Wees 14 dgn
+        op 13-8-2019 en overgebracht naar depot Fietsdepot Haaglanden op 3-9-2019,
+        opslag t\/m 15-10-2019.","Brand":"Gazelle","RegistrationDate":"2019-09-03T15:25:00Z","Deleted":"false","ImageCount":"1","CustomerId":"255","OrganisationName":"Gemeente
+        Den Haag","Country":"Nederland","FormLink":"https:\/\/formulieren.verlorenofgevonden.nl\/eigenaar?db=5fa8d3ff-c3a4-441b-b22d-4b3c352f9ce5&Number=F0518f-2019025679","Customer":{"name":"fietsdepot
+        ''s-Gravenhage","noFound":"1","noLost":"1","noOwner":"1","type":"2"}},"highlight":{"Description":["damesfiets
+        Stadsfiets Gazelle ( groen ) met framenummer ''<strong>5127227</strong>''.\r\nLocatie
+        gevonden: Rij 14 rek140, NS-stalling1 Delft Delft.\r\nNS-stalling Delft Wees
+        14 dgn op 13-8-2019 en overgebracht naar depot Fietsdepot Haaglanden op 3-9-2019,
+        opslag t/m 15-10-2019."]},"sort":[1567524300000],"_explanation":{"value":1.0,"description":"sum
+        of:","details":[{"value":1.0,"description":"sum of:","details":[{"value":1.0,"description":"max
+        of:","details":[{"value":1.0,"description":"Description:*2722*","details":[]}]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"RegistrationDate:[1538352000000
+        TO 1570060799999]","details":[]}]},{"value":0.0,"description":"match on required
+        clause, product of:","details":[{"value":0.0,"description":"# clause","details":[]},{"value":1.0,"description":"Country:nederland","details":[]}]},{"value":0.0,"description":"match
+        on required clause, product of:","details":[{"value":0.0,"description":"#
+        clause","details":[]},{"value":1.0,"description":"Deleted:false","details":[]}]}]}}]},"aggregations":{"soort_voorwerp":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"damesfiets","doc_count":7},{"key":"herenfiets","doc_count":3},{"key":"iets
+        anders","doc_count":3},{"key":"kinderfiets","doc_count":1},{"key":"mountainbike","doc_count":1}]},"kleuren":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"blauw","doc_count":5},{"key":"groen","doc_count":4},{"key":"diverse","doc_count":2},{"key":"zwart","doc_count":2},{"key":"roze","doc_count":1},{"key":"wit","doc_count":1}]},"plaatsen":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[{"key":"Noord","doc_count":8},{"key":"Prins
+        Alexander","doc_count":2},{"key":"Almere","doc_count":1},{"key":"Delft","doc_count":1},{"key":"Eindhoven","doc_count":1},{"key":"Schiedam","doc_count":1},{"key":"Tilburg","doc_count":1}]}}}'
+    http_version: 
+  recorded_at: Wed, 02 Oct 2019 23:45:11 GMT
+recorded_with: VCR 4.0.0

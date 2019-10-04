@@ -1,16 +1,17 @@
-class ExternalBikeV3Serializer < BikeV2Serializer
+class ExternalRegistryBikeV3Serializer < BikeV2Serializer
   delegate \
-    :debug,
+    :external_id,
     :location_found,
-    :registry_id,
     :registry_name,
     :registry_url,
-    :source_name,
-    :source_unique_id,
     :status,
     :url,
     to: :object,
     allow_nil: true
+
+  def stolen
+    object.stolen?
+  end
 
   def serial
     object.serial_number
@@ -23,7 +24,7 @@ class ExternalBikeV3Serializer < BikeV2Serializer
   def year; end
 
   def thumb
-    object.image_url
+    object.thumb_url
   end
 
   def large_img

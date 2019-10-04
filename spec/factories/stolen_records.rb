@@ -42,7 +42,7 @@ FactoryBot.define do
     trait :in_amsterdam do
       city { "Amsterdam" }
       state { nil }
-      country { Country.find_or_create_by(FactoryBot.attributes_for(:country_nl)) }
+      country { Country.netherlands }
     end
   end
 end

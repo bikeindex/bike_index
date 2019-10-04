@@ -1,24 +1,16 @@
-class EmailBikePossiblyFoundNotificationWorker < ScheduledWorker
-  prepend ScheduledWorkerRecorder
+class EmailBikePossiblyFoundNotificationWorker < ApplicationWorker
+  def perform(bike_id, match_class, match_id)
+    bike = Bike.find(bike_id)
+    match = match_class.to_s.constantize.find(match_id)
 
-  def self.frequency
-    24.hours
-  end
+    return if bike == match
+    return if CustomerContact.possibly_found_notification_sent?(bike, match)
 
-  def perform
-    notify_of_bike_index_held
-  end
+    contact = CustomerContact.build_bike_possibly_found_notification(bike, match)
+    return unless contact.receives_stolen_bike_notifications?
 
-  def notify_of_bike_index_held
-    Bike.possibly_found_with_match.each do |bike, match|
-      next if CustomerContact.possibly_found_notification_sent?(bike, match)
-
-      contact = CustomerContact.build_bike_possibly_found_notification(bike, match)
-      next unless contact.receives_stolen_bike_notifications?
-
-      email = CustomerMailer.bike_possibly_found_email(contact)
-      contact.email = email
-      email.deliver_now if contact.save
-    end
+    email = CustomerMailer.bike_possibly_found_email(contact)
+    contact.email = email
+    email.deliver_now if contact.save
   end
 end

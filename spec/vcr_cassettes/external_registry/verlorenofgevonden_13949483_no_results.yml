@@ -1,0 +1,105 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://accept.verlorenofgevonden.nl/ez.php?date_from=01-09-2018&date_to=25-09-2019&from=0&org=&q=13949483&site=nl&timestamp=1569417425
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Content-Length:
+      - '0'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Wed, 25 Sep 2019 13:17:05 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '191'
+      Connection:
+      - keep-alive
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - POST, GET, OPTIONS
+      Access-Control-Allow-Headers:
+      - Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type,
+        Access-Control-Request-Method, Access-Control-Request-Headers
+      Vary:
+      - Accept-Encoding,User-Agent
+      X-Cache-Date:
+      - Wed, 25 Sep 2019 13:17:05 GMT
+    body:
+      encoding: ASCII-8BIT
+      string: '{"took":31,"timed_out":false,"_shards":{"total":1,"successful":1,"skipped":0,"failed":0},"hits":{"total":0,"max_score":null,"hits":[]},"aggregations":{"soort_voorwerp":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[]},"kleuren":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[]},"plaatsen":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[]}}}'
+    http_version: 
+  recorded_at: Wed, 25 Sep 2019 13:17:05 GMT
+- request:
+    method: post
+    uri: https://verlorenofgevonden.nl/scripts/ez.php?date_from=01-10-2018&date_to=02-10-2019&from=0&org=&q=13949483&site=nl&timestamp=1570059903
+    body:
+      encoding: UTF-8
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Content-Length:
+      - '0'
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Wed, 02 Oct 2019 23:45:04 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '191'
+      Connection:
+      - keep-alive
+      Strict-Transport-Security:
+      - max-age=15768000; includeSubDomains; preload
+      X-Frame-Options:
+      - SAMEORIGIN
+      Referrer-Policy:
+      - same-origin
+      Access-Control-Allow-Origin:
+      - "*"
+      Access-Control-Allow-Methods:
+      - POST, GET, OPTIONS
+      Access-Control-Allow-Headers:
+      - Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type,
+        Access-Control-Request-Method, Access-Control-Request-Headers
+      Vary:
+      - Accept-Encoding,User-Agent
+      X-Content-Type-Options:
+      - nosniff
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Cache-Date:
+      - Wed, 02 Oct 2019 23:45:04 GMT
+    body:
+      encoding: ASCII-8BIT
+      string: '{"took":20,"timed_out":false,"_shards":{"total":1,"successful":1,"skipped":0,"failed":0},"hits":{"total":0,"max_score":null,"hits":[]},"aggregations":{"soort_voorwerp":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[]},"kleuren":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[]},"plaatsen":{"doc_count_error_upper_bound":0,"sum_other_doc_count":0,"buckets":[]}}}'
+    http_version: 
+  recorded_at: Wed, 02 Oct 2019 23:45:04 GMT
+recorded_with: VCR 4.0.0
