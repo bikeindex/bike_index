@@ -39,10 +39,19 @@ RSpec.describe ExternalRegistryBike, type: :model do
     end
 
     context "given no locally found exact match" do
-      it "searches external registries and returns exact matches" do
+      it "searches external registries and returns remotely found exact matches" do
         exact_match_serial = "5127227"
         _local_non_match = FactoryBot.create(:external_registry_bike)
+
+        allow(ExternalRegistry::ExternalRegistry)
+          .to(receive(:search_for_bikes_with)
+            .with(serial_number: exact_match_serial) {
+            FactoryBot.create(:external_registry_bike, serial_number: exact_match_serial)
+            ExternalRegistryBike.where(serial_number: exact_match_serial)
+          })
+
         results = described_class.find_or_search_registry_for(serial_number: exact_match_serial)
+
         expect(results.length).to eq(1)
         expect(results.pluck(:serial_number)).to eq([exact_match_serial])
       end
