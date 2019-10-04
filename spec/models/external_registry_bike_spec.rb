@@ -2,6 +2,7 @@ require "rails_helper"
 
 RSpec.describe ExternalRegistryBike, type: :model do
   before do
+    ExternalRegistryBike.delete_all
     null_cache = ActiveSupport::Cache.lookup_store(:null_store)
     allow(Rails).to receive(:cache).and_return(null_cache)
   end
