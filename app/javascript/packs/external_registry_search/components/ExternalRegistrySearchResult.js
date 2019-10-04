@@ -1,6 +1,10 @@
 /* eslint import/no-unresolved: 0 */
 
 import React, { Fragment } from "react";
+import _ from "lodash";
+import lodashInflection from "lodash-inflection";
+
+_.mixin(lodashInflection);
 
 const ExternalRegistrySearchResult = ({ bike }) => (
   <li className="bike-box-item">
@@ -9,14 +13,15 @@ const ExternalRegistrySearchResult = ({ bike }) => (
     <div className="bike-information">
       <h5 className="title-link">
         <a href={bike.url} target="_blank">
-          <strong>{bike.manufacturer_name}</strong> {bike.frame_model}
+          <strong>{_.titleize(bike.manufacturer_name)}</strong>&nbsp;
+          {_.titleize(bike.frame_model)}
         </a>
       </h5>
 
       <ul className="attr-list">
         <li>
           <span className="attr-title">Color</span>
-          {bike.frame_colors.join(", ")}
+          {bike.frame_colors.map(c => _.titleize(c)).join(", ")}
         </li>
         <li>
           <span className="attr-title">Serial</span>
@@ -26,7 +31,7 @@ const ExternalRegistrySearchResult = ({ bike }) => (
 
       <ul className="attr-list">
         <li>
-          <span className="attr-title text-danger">{bike.status}</span>
+          <span className="attr-title text-danger">{_.titleize(bike.status)}</span>
           <span className="convertTime">{bike.date_stolen}</span>
         </li>
         <li>

@@ -2,6 +2,8 @@ class ExternalRegistryBikeV3Serializer < BikeV2Serializer
   delegate \
     :external_id,
     :location_found,
+    :registry_name,
+    :registry_url,
     :status,
     :url,
     to: :object,
@@ -9,22 +11,6 @@ class ExternalRegistryBikeV3Serializer < BikeV2Serializer
 
   def stolen
     object.stolen?
-  end
-
-  def status
-    object.status&.titleize
-  end
-
-  def mnfg_name
-    object.mnfg_name&.titleize
-  end
-
-  def frame_model
-    object.frame_model&.titleize
-  end
-
-  def frame_colors
-    object.frame_colors&.split(/\s*,\s*/)&.map(&:titleize)
   end
 
   def serial

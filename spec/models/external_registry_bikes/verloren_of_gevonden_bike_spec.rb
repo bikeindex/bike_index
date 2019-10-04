@@ -39,7 +39,7 @@ module ExternalRegistryBikes
         end
 
         it "parses the frame colors" do
-          expect(bike.frame_colors).to eq("blauw")
+          expect(bike.frame_colors).to eq(["blauw"])
         end
 
         it "returns the location with country name if one is available" do
