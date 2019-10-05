@@ -43,7 +43,7 @@ class Counts
 
     def assign_recoveries
       # StolenBikeRegistry.com had just over 2k recoveries prior to merging. The recoveries weren't imported, so manually calculate
-      assign_for("recoveries", StolenRecord.recovered.where("date_recovered < ?", Time.current.beginning_of_day).count + 2_041)
+      assign_for("recoveries", StolenRecord.recovered.where("recovered_at < ?", Time.current.beginning_of_day).count + 2_041)
     end
 
     def assign_week_creation_chart
@@ -53,7 +53,7 @@ class Counts
     def recoveries; retrieve_for("recoveries") end
 
     def assign_recoveries_value
-      valued = StolenRecord.recovered.where("date_recovered < ?", Time.current.beginning_of_day).pluck(:estimated_value).reject(&:blank?)
+      valued = StolenRecord.recovered.where("recovered_at < ?", Time.current.beginning_of_day).pluck(:estimated_value).reject(&:blank?)
       # Sum of the recovered bikes with estimated_values + recovery_average_value * the number of bikes without an estimated_value
       assign_for("recoveries_value", valued.sum + (recoveries - valued.count) * recovery_average_value)
     end

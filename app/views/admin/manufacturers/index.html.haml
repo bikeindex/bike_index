@@ -31,7 +31,7 @@
           %td
             = link_to manufacturer.name, admin_manufacturer_url(manufacturer)
           %td.table-cell-check
-            = "&#x2713;".html_safe if manufacturer.frame_maker
+            = check_mark if manufacturer.frame_maker
           %td
             - if manufacturer.website
               = link_to "Company website", manufacturer.website

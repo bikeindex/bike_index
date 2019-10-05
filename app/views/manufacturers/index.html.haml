@@ -1,13 +1,13 @@
 - cache(['manufacturers_index', @manufacturers.maximum(:updated_at)]) do
   %h1
-    Manufacturers we know about
+    = t(".manufacturers_we_know_about")
   .mt-4
   %table#manufacturers-list.table.table-striped.table-bordered.table-sm
     %thead
       %th
-        Name
+        = t(".name")
       %th.large-screens
-        Only makes components
+        = t(".only_makes_components")
     %tbody
       - @manufacturers.each do |manufacturer|
         %tr
@@ -18,14 +18,12 @@
             - else
               = manufacturer.name
           %td.large-screens.table-cell-check
-            = "&#x2713;".html_safe unless manufacturer.frame_maker
+            = check_mark unless manufacturer.frame_maker
 
   %h2.padded
-    OH NO! We're missing a manufacturer?
-  %p
-    That's not actually surprising, there are a bunch.
-  %p
-    Give us a heads up in a comment below.
+    = t(".oh_no_were_missing_a_manufacturer")
+  %p= t(".thats_not_actually_surprising")
+  %p= t(".give_us_a_heads_up_in_a_comment_below")
 
 
 

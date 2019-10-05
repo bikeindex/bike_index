@@ -23,7 +23,7 @@
 - url = {action: "update", controller: "news"}
 = form_for [:admin, @blog], :url => url do |f|
   - if @blog.errors.any?
-    = render partial: "/shared/errors", locals: { name: "Blog", obj: @blog }
+    = render partial: "shared/errors", locals: { name: "Blog", obj: @blog }
 
   - if @blog.is_listicle
     %h2.text-danger
@@ -82,14 +82,22 @@
                 <input type="radio" name="index_image_id" value="0" class="index_image_0">
                 No primary image
               = f.hidden_field :index_image_id
+          .form-group
+            = f.label :language, class: "control-label"
+            = f.select :language,
+              options_for_select(blog_languages, selected: @blog.language),
+              class: "form-control"
+
       .row.mt-4
         .col-md-6
           .form-group
+            = f.label :title, class: "control-label"
             = f.text_field :title, placeholder: "Blog title", class: "form-control"
           %em.less-strong
             = @blog.body_abbr
         .col-md-6
           .form-group
+            = f.label :description_abbr, "Abbreviated description", class: "control-label"
             = f.text_field :description_abbr, placeholder: "Description/subtitle shown on the homepage - will be the text below unless you enter something.", class: "form-control"
       .row.mt-4
         .col-5
@@ -111,4 +119,3 @@
 .alert.alert-info.mt-2
   %p
     The content blocks accept HTML or Markdown for styling and linking things. Check out this #{link_to "Markdown cheat sheet", "https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet", target: "_blank"} if you're curious.
-

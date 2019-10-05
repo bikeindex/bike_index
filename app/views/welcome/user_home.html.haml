@@ -87,7 +87,7 @@
           = link_to t(".add_a_bike"), choose_registration_path, class: "btn btn-primary btn-lg"
           = link_to t(".add_a_lock"), new_lock_url, class: "btn btn-primary-offset btn-lg"
         %h3
-          = t(".add_some_info")
+          = t(".next")
         .inner.last-item
           - if @bikes.present?
             .lock-group
@@ -106,7 +106,6 @@
                   - else
                     %strong= t(".welcome")
                     = t(".to_bike_index_thanks_for_signing_up")
-
           .lock-group
             .image-column
               = image_tag 'revised/lock_icon.svg'
@@ -115,4 +114,12 @@
                 %strong
                   = t(".tell_us_more_about_yourself")
                 = link_to t(".update_your_profile"), my_account_url
+          - if @bikes.present?
+            .lock-group
+              .image-column
+                = image_tag "logos/bikefair.svg"
+              .col-xs-10
+                %p
+                  Want to sell one of your registered bikes?
+                  = link_to "List a bike on BikeFair", "https://bikefair.org/auth/bikeindex"
       .ad-block#right300x600

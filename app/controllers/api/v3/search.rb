@@ -98,6 +98,33 @@ module API
           close_serials = Bike.search_close_serials(interpreted_params)
           serialized_bikes_results(paginate(close_serials))
         end
+
+        desc "Search external registries", {
+               notes: <<-NOTE,
+                 This endpoint accepts a serial number and searches external
+                 bike registries for it.
+
+                 If exact matches are found, only those will be returned.
+                 If no exact matches are found, partial matches are returned.
+               NOTE
+             }
+        paginate
+        params do
+          requires :serial, type: String, desc: "Serial, homoglyph matched"
+          use :non_serial_search_params
+          optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
+        end
+        get "/external_registries" do
+          bikes = ExternalRegistryBike.find_or_search_registry_for(
+            serial_number: interpreted_params[:serial],
+          )
+
+          ActiveModel::ArraySerializer.new(
+            paginate(bikes),
+            each_serializer: ExternalRegistryBikeV3Serializer,
+            root: "bikes",
+          )
+        end
       end
     end
   end

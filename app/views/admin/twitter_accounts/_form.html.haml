@@ -1,0 +1,90 @@
+= form_for twitter_account,
+  url: action,
+  method: method,
+  html: { class: "form" } do |f|
+  .row
+    .col-md-6.mb-4
+      .input-group.mt-2
+        = f.label :screen_name, "Twitter handle", class: "form-label mr-4"
+        = f.text_field :screen_name, class: 'form-control'
+
+      .form-group
+        = f.label :append_block, class: "form-label mr-4"
+        = f.text_area :append_block, class: "form-control"
+      %fieldset
+        .input-group
+          = f.label :active do
+            = f.check_box :active
+            is active?
+        .input-group
+          = f.label :default do
+            = f.check_box :default
+            is default?
+        .input-group
+          = f.label :national do
+            = f.check_box :national
+            national
+        .input-group
+          = label_tag :check_credentials do
+            = check_box_tag :check_credentials
+            Test Twitter connection on update
+
+    .col-md-6.mb-4
+      .card
+        .card-body
+          %small
+            Credentials can be found on the
+            = link_to "Twitter Apps Dashboard", "https://developer.twitter.com/apps", target: :_blank
+            by selecting the desired app, then navigating to
+            %strong Details
+            >
+            %strong Keys and Tokens
+
+          %fieldset
+            .input-group.mt-2
+              = f.label :user_secret, class: "form-label mr-4"
+              = f.text_field :user_secret, class: "form-control"
+            .input-group.mt-2
+              = f.label :user_token, class: "form-label mr-4"
+              = f.text_field :user_token, class: "form-control"
+            .input-group.mt-2
+              = f.label :consumer_key, class: "form-label mr-4"
+              = f.text_field :consumer_key, class: "form-control"
+            .input-group.mt-2
+              = f.label :consumer_secret, class: "form-label mr-4"
+              = f.text_field :consumer_secret, class: "form-control"
+
+    %fieldset.col-md-6.mb-4
+      .input-group.mt-2
+        = f.label :address, class: "form-label mr-4"
+        = f.text_field :address, class: "form-control"
+      .input-group.mt-2
+        = f.label :city, class: "form-label mr-4"
+        = f.text_field :city, class: "form-control"
+      .input-group.mt-2
+        = f.label :neighborhood, class: "form-label mr-4"
+        = f.text_field :neighborhood, class: "form-control"
+      .input-group.mt-2
+        = f.label :state, class: "form-label mr-4"
+        = f.text_field :state, class: "form-control"
+      .input-group.mt-2
+        = f.label :country, class: "form-label mr-4"
+        = f.text_field :country, class: "form-control"
+      .input-group.mt-2
+        = f.label :language, class: "form-label mr-4"
+        = f.text_field :language, class: "form-control"
+    .col-md-6
+      .card
+        .card-body
+          %p
+            %em.text-warning
+              Probably don't edit
+            Latitude and Longitude will be set automatically from the address
+          .input-group.mt-2
+            = f.label :latitude, class: "form-label mr-4"
+            = f.text_field :latitude, class: "form-control"
+          .input-group.mt-2
+            = f.label :longitude, class: "form-label mr-4"
+            = f.text_field :longitude, class: "form-control"
+
+  = submit_tag submit_label, class: 'btn btn-success btn-lg'

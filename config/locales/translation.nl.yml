@@ -202,7 +202,7 @@ nl:
         avatar: Avatar
         banned: Verboden
         can_send_many_stolen_notifications: Kan veel gestolen meldingen verzenden
-        city: City
+        city: Stad
         confirmation_token: 'Verzendbevestiging '
         confirmed: Bevestigd
         created_bikes: Fietsen gemaakt
@@ -217,7 +217,7 @@ nl:
         last_login_at: Laatste login om
         last_login_ip: Laatste login ip
         latitude: Breedte
-        locks: sloten
+        locks: Sloten
         longitude: Lengte
         magic_link_token: Magisch linktoken
         memberships: lidmaatschappen
@@ -227,7 +227,7 @@ nl:
         notification_unstolen: Melding niet gestolen
         oauth_applications: Oauth-applicaties
         organization_embeds: Organisatie sluit in
-        organizations: organisaties
+        organizations: Organisaties
         owned_bikes: Eigen fietsen
         ownerships: ownerships
         partner_data: Partner gegevens
@@ -244,12 +244,12 @@ nl:
         show_phone: Toon telefoon
         show_twitter: Twitter weergeven
         show_website: Website weergeven
-        street: straat
+        street: Straat
         subscriptions: abonnementen
         superuser: Super gebruiker
         terms_of_service: Servicevoorwaarden
         title: Titel
-        twitter: Tjilpen
+        twitter: Twitter
         user_emails: Gebruiker e-mails
         username: Gebruikersnaam
         vendor_terms_of_service: Servicevoorwaarden van de leverancier
@@ -410,11 +410,12 @@ nl:
         slug: Naaktslak
       customer_contact:
         body: Lichaam
-        contact_type: Contact type
         creator_email: E-mailadres van maker
         info_hash: Info Hash
         title: Titel
         user_email: gebruikers e-mail
+        kind: Soort
+        contact_type: Contact type
       doorkeeper/access_grant:
         expires_in: Verloopt in
         redirect_uri: redirect URI
@@ -436,9 +437,9 @@ nl:
         file: file
         file_format: Bestandsformaat
         kind: Soort
-        options: opties
+        options: Opties
         progress: Vooruitgang
-        rows: rijen
+        rows: Rijen
       feedback:
         body: Lichaam
         email: E-mailadres
@@ -635,11 +636,11 @@ nl:
         slug: Naaktslak
         standard: Standaard
       recovery_display:
-        date_recovered: Datum hersteld
         image: afbeelding
         link: Link
         quote: Citaat
         quote_by: Citaat door
+        recovered_at: Datum hersteld
       state:
         abbreviation: Afkorting
         locations: Locaties
@@ -657,7 +658,6 @@ nl:
         city: City
         create_open311: Maak open311
         current: Stroom
-        date_recovered: Datum hersteld
         date_stolen: Datum gestolen
         estimated_value: Geschatte waarde
         index_helped_recovery: Index hielp herstel
@@ -688,6 +688,7 @@ nl:
         time: tijd
         tsved_at: Tsved om
         zipcode: Postcode
+        recovered_at: Datum hersteld
       theft_alert:
         begin_at: Begin bij
         end_at: Eindig op
@@ -1606,7 +1607,7 @@ nl:
     bike:
       location: Plaats
       primary_colors: Primaire kleuren
-      serial: serie-
+      serial: Serie
       stolen: Gestolen
       abandoned: Verlaten
     bike_fields:
@@ -1844,11 +1845,14 @@ nl:
       search_for_serial_number: Zoek naar serienummer
       search_for_stolenness_desc_bikes: Zoek naar %{stolenness_desc} fietsen
       stolen_anywhere: Overal gestolen
-      stolen_within: Binnen gestolen
+      stolen_within: Gestolen binnen
       submit: Voorleggen
       with_serial_numbers_html: "%{stolenness} met serienummers dicht bij <em>%{serial}</em>"
       within: binnen
-      you: U
+      you: jou
+      external_matches_found: Bijna-overeenkomsten gevonden in externe registers
+      no_external_matches_found: Geen bijna-overeenkomsten gevonden in externe registers
+      searching_external_registries: Zoeken naar externe registers ...
     new:
       additional_serial_sticker_number: Extra serienummer / stickernummer
       affiliation: "%{org_name} aansluiting"
@@ -1856,7 +1860,7 @@ nl:
       city: City
       enter_bike_type_details: Voer %{bike_type} details in
       highly_recommended: sterk aanbevolen
-      how_to_find_serial: hoe u uw serienummer kunt vinden
+      how_to_find_serial: hoe je het serienummer kan vinden
       i_just_dont_know_the_serial: Ik ken de serie gewoon niet
       im_100_sure: Ik ben 100% zeker
       is_a_handmade_frame: Is een handgemaakt frame
@@ -2065,7 +2069,6 @@ nl:
       abandoned: Verlaten
     stolen_checklist:
       a_photo_of_your_bike_type: een foto van je %{bike_type}
-      a_police_report: een politierapportnummer
       add: Toevoegen
       add_bike_link_to_your_theft_report_html: Voeg %{bike_link} toe aan uw diefstalrapport
       add_serial_number: Voeg serienummer toe
@@ -2088,6 +2091,16 @@ nl:
         hebben bekeken)
       share_widely_on_your_personal_social: Deel veel op uw persoonlijke sociale media
       supercharge_sharing_on_facebook: Superchar delen op Facebook met Bike Index
+      your_police_report: uw politierapportnummer
+      nl_digid_required: "(DigiD vereist)"
+      nl_file_police_report: Dien een politierapport in!
+      nl_online: Online
+      nl_person: Persoonlijk
+      nl_person_report: Zoeken naar het dichtstbijzijnde politiebureau,
+      nl_phone: Per telefoon
+      nl_phone_report: bel 0900-8844. Meestal krijgt u later een telefoongesprekafspraak,
+        waarna u de informatie aan de politie doorgeeft
+      nl_website_link_text: op deze plitie.nl webpagina
     theft_alerts_table:
       created: Gemaakt
       end: Einde
@@ -2174,7 +2187,7 @@ nl:
       subject: Bedankt voor het ondersteunen van Bike Index!
       text:
         bike_index_management: Beheer van fietsindexen
-        donation_will_help: Uw donatie van $ %{amount} heeft zojuist de fietsen gered.
+        donation_will_help: Uw donatie van € %{amount} heeft zojuist de fietsen gered.
         payment_received: Uw betaling van %{amount} is ontvangen.
         thanks: Bedankt,
         thanks_for_signing_up: "* Heel erg bedankt voor het ondersteunen van Bike
@@ -2359,55 +2372,65 @@ nl:
           je lid bent geworden, jij slimme broek.
         thanks: Bedankt,
         welcome_to_bike_index: "* Welkom bij Bike Index! *"
+    bike_possibly_found_email:
+      html:
+        check_out_match_here: 'Bekijk hier de wedstrijd:'
+        we_think_your_stolen_bike_html: We hebben mogelijk uw gestolen <strong>%{bike_title}
+          gevonden</strong> !
+      text:
+        check_out_match_here: 'Bekijk hier de wedstrijd:'
+        we_think_your_stolen_bike: We hebben mogelijk uw gestolen %{bike_title} gevonden!
   info:
     about:
       about_bike_index: Over Bike Index
       alumni: alumni
-      bike_registration_that_works: Fietsregistratie die werkt.
+      bike_registration_that_works: De fietsregistratie die werkt.
       bryan_hance_bio_html: "<strong>Bryan Hance</strong> creëerde StolenBicycleRegistry.com
-        in 2004 omdat 5 van zijn fietsen in 9 jaar werden gestolen - en besefte dat
-        het herstellen van fietsen erg leuk was. Hij woont in Portland en herstelt
-        veel fietsen."
+        in 2004 omdat 5 van zijn fietsen in een tijdsbestek van 9 jaar gestolen zijn
+        - en bovendien besefte dat het herstellen van fietsen erg leuk is. Hij woont
+        in Portland en herstelt veel fietsen."
       cofounded_by_html: Mede opgericht door Seth Herr en Bryan Hance in 2013, is
-        Bike Index een %{description_link}.
-      craig_dalton_bio_html: "<strong>Craig Dalton</strong> dacht dat hij de fietsindustrie
-        uit zijn systeem had tot Bike Index klopte. Craig brengt zijn ondernemerservaring
-        naar de zakelijke kant van Bike Index."
-      jan_pecnik_bio_html: "<strong>Jan Pecnik</strong> werd verliefd op fietsen terwijl
-        hij zijn meesters in Nederland bestudeerde, gericht op sociaal ondernemerschap.
-        Na een paar jaar solo rijden, helpt hij nu de Bike Index uit te breiden in
-        Europa en daarbuiten."
-      lily_williams_bio_html: "<strong>Lily Williams</strong> heeft een masterdiploma
-        behaald aan de Medill School of Journalism maar realiseerde zich tegelijkertijd
-        dat fietsen de meest verdienstelijke ontvangers van woorden zijn. Ze schrijft
-        en communiceert voor Bike Index."
-      merging_the_services: Samenvoeging van de twee diensten Seth en Bryan creëerden
-        de universele fietsregistratieservice waar ze allebei van droomden - een database
-        die wordt gebruikt en doorzocht door particulieren, fietswinkels, politiediensten
-        en andere apps. Een fietsregister dat iedereen de mogelijkheid geeft om fietsen
-        te registreren en te herstellen.
-      mike_oleon_bio_html: "<strong>Mike Oleon</strong> doet het grafische ontwerp
-        en de illustratie voor de Index. Als iets er goed uitziet, is het waarschijnlijk
+        Bike Index een %{description_link} organisatie.
+      craig_dalton_bio_html: "<strong>Craig Dalton</strong> dacht dat hij uit de fietsenindustrie
+        gegroeid was, totdat Bike Index op zijn pad kwam. Craig zijn ondernemerservaring
+        zijn de aanwinst voor de zakelijke kant van Bike Index."
+      jan_pecnik_bio_html: "<strong>Jan Pecnik</strong> werd verliefd op fietsen toen
+        hij met zijn masters, sociale ondernemerschap, in Nederland bezig was. Na
+        een aantal jaren hier alleen mee bezig te zijn geweest, helpt hij nu Bike
+        Index uit te breiden binnen en buiten Europa."
+      lily_williams_bio_html: "<strong>Lily Williams</strong> heeft haar masterdiploma
+        behaald aan de Medill School of Journalism, maar kwam er al gauw achter dat
+        ze meer voldoening putte uit het werken of schrijven over fietsen. Zij doet
+        dan ook de communicatie voor Bike Index."
+      merging_the_services: Door het samenvoegen van de diensten van Seth en Bryan,
+        ontstond er een universele fiets-registratieservice. Dit was een droom die
+        uitkwam, een database die wordt gebruikt en doorzocht door zowel particulieren
+        als fietsenwinkels, politie en andere apps. Een fietsregister dat iedereen
+        de mogelijkheid geeft om fietsen te registreren en te herstellen nadat hij/zij
+        hem op de een of andere manier kwijtgeraakt is
+      mike_oleon_bio_html: "<strong>Mike Oleon</strong> houdt zich bezig met de grafische
+        vormgeving van Bike Index. Als het er goed uitziet, dan is het waarschijnlijk
         zijn fout."
       nonprofit_status: 501 (c) (3) non-profit
-      seth_built: Seth heeft Bike Index gebouwd toen hij fietsmonteur was omdat hij
-        fietsen voor zijn klanten wilde kunnen registreren. Bryan ontwikkelde en beheerde
-        een community-gestuurde fietsherstelservice (StolenBikeRegistry.com) die fietsen
-        herstelde vanaf de eerste week dat het werd opgericht in 2004.
-      seth_herr_bio_html: "<strong>Seth Herr</strong> leerde programmeren zodat hij
-        Bike Index kon bouwen, omdat hij een fietsenmaker was en gefrustreerd was
-        dat zoiets niet bestond."
+      seth_built: 'Seth heeft Bike Index gemaakt toen hij nog werkzaam was als fietsenmaker.
+        Hij wilde namelijk de fietsen voor zijn klanten kunnen registreren. Bryan
+        ontwikkelde en beheerde een fietsherstel-service die door een hele community
+        gestuurd werd (StolenBikeRegistry.com). Hier werden fietsen teruggevonden/teruggebracht,
+        eigenlijk al vanaf de eerste week dat het werd opgericht, dit was in 2004. '
+      seth_herr_bio_html: "<strong>Seth Herr</strong> een fietsenmaker die heeft leren
+        programmeren omdat hij baalde dat er niet zoiets als Bike Index bestond en
+        het daarom zelf heeft gecreëerd."
       seth_herr_image_title: Dat zijn geen officiële Bike Index-armwarmers, we hebben
         geen Bike Index-armwarmers
       simple_efficient_effective: Eenvoudig. Efficiënt. Effectief.
       the_team: Het team
       widely_used: Het is de meest gebruikte en succesvolle fietsregistratieservice
-        ter wereld met meer dan %{bikes_count} gecatalogiseerde fietsen, %{partners_count}
+        ter wereld, met meer dan %{bikes_count} gecatalogiseerde fietsen, %{partners_count}
         communitypartners en tienduizenden dagelijkse zoekopdrachten.
       bobby_gervais_bio_html: "<strong>Bobby Gervais</strong> heeft een lange geschiedenis
-        in het leveren en dragen van spullen op zijn fiets voor werk en nu verdient
-        hij de kost door mensen te helpen hun fietsen te herstellen. Bobby helpt de
-        Bike Index bij te houden en aan nieuwe functies te werken."
+        in het bezorgen en vervoeren van dingen op zijn fiets, voor werk. Nu leeft
+        hij van mensen helpen om hun fiets terug te vinden. Bobby helpt met het bijhouden
+        van Bike Index en creëert nieuwe functies."
     dev_and_design:
       bike_index_logos_html: "%{link} - logo's van vector- en png-fietsindex"
       bike_shop_card: Fietswinkel kaart
@@ -2445,7 +2468,7 @@ nl:
         elk gewenst moment te raadplegen, te wijzigen, te corrigeren of te verwijderen.
         Neem hiervoor contact op met <a href="mailto:contact@bikeindex.org">contact@bikeindex.org</a>
         .
-      cookies: koekjes
+      cookies: Cookies
       cookies_p1: Een cookie is een kleine hoeveelheid gegevens, die vaak een anonieme
         unieke identificatie bevat, die vanaf uw computer naar de browser wordt verzonden
         en op de harde schijf van uw computer wordt opgeslagen. De opgeslagen informatie
@@ -2853,9 +2876,9 @@ nl:
         nu kan bestaan of hierna kan ontstaan, en alle aanvragen daarom en registraties,
         verlengingen en uitbreidingen daarvan, volgens de wetten van elke staat, land,
         territorium of andere jurisdictie.
-      ownership_p3: U kunt ervoor kiezen of we kunnen u uitnodigen om opmerkingen
+      ownership_p3: Je kunt ervoor kiezen of we kunnen je uitnodigen om opmerkingen
         of ideeën over de Service in te dienen, inclusief maar niet beperkt tot hoe
-        de Service of onze producten te verbeteren ("Ideeën"). Door een Idee in te
+        de Service of onze producten te verbeteren ("Ideeën"). Door een idee in te
         dienen, gaat u ermee akkoord dat uw openbaarmaking kosteloos, ongevraagd en
         zonder beperking is en Bike Index niet onder een fiduciaire of andere verplichting
         plaatst, en dat we vrij zijn om het Idee te gebruiken zonder extra compensatie
@@ -3069,6 +3092,220 @@ nl:
         informatie en andere zaken bevat hierin uiteengezet en waarin wordt uitgelegd
         hoe en voor welke doeleinden we de informatie die u ons verstrekt verzamelen,
         gebruiken, bewaren, openbaar maken en beveiligen.
+    image_resources:
+      basic_logo_alt: Basis logo
+      basic_logo_html: Basislogo (%{svg_link}, %{png_link})
+      basic_logo_in_white_html: Basislogo in wit (%{svg_link}, %{png_link})
+      bike_index_image_assets: Bike Index afbeelding activa
+      black_background_shown_here: Zwarte achtergrond hier getoond voor zichtbaarheid
+      check_out_resources_html: Bekijk %{resources_link} voor extra ontwerpbronnen
+      image_has_no_background: afbeelding heeft geen achtergrond, hier weergegeven
+        met zwart voor zichtbaarheid
+      logo_with_background_cutout_html: Logo met achtergrondafbeelding (%{svg_link},
+        %{png_link})
+      logo_with_blue_shield_html: Logo met blauw schild en witte tekst (%{svg_link},
+        %{png_link})
+      logo_with_cutout: Logo met achtergrondknipsel
+      logo_with_stripes: Logo met strepen
+      single_color_logo: Eén kleur logo
+      single_color_logo_in_white: Wit logo in één kleur
+      striped_logo_html: Gestreept logo (%{svg_link}, %{png_link})
+    lightspeed:
+      a_few_things_to_note: 'Een paar dingen om op te merken:'
+      a_listing_on_bike_index_will_be_created: Zodra uw Lightspeed Retail-account
+        is gekoppeld aan uw Bike Index-account met automatische registratie ingeschakeld,
+        wordt automatisch een vermelding op Bike Index gemaakt voor elke fiets die
+        u verkoopt. Het enige wat u hoeft te doen is het e-mailadres van de klant
+        en het serienummer van de fiets toevoegen tijdens een normale Lightspeed Retail-kassa.
+      all_you_have_to_do_is_go_to_html: Het enige wat u hoeft te doen is naar %{link}
+        te gaan, waar u wordt gevraagd Bike Index te autoriseren voor toegang tot
+        uw Lightspeed-account.
+      bicycles_sold_before_you_activated_lights: Fietsen die zijn verkocht voordat
+        u Lightspeed Retail-integratie hebt geactiveerd, worden niet geregistreerd.
+      bike_index_cofounder: Medeoprichter van Bike Index
+      how_to_lightspeed_retail: 'How to: Lightspeed Retail en Bike Index-integratie'
+      i_started_bike_index_because: Ik begon Bike Index omdat ik fietsen wilde registreren
+        voor mijn klanten in de winkel waar ik werkte - met deze integratie geven
+        we winkels eindelijk een manier om fietsen te registreren die de verkoop niet
+        belemmeren.
+      learn_more_about: Leer meer over
+      lightspeed_retail: Lightspeed Retail
+      once_you_have_a_bike_index_account_set_up: Nadat u een Bike Index-account voor
+        uw winkel heeft ingesteld, staat er een link op deze pagina om u naar de integratie
+        te brengen.
+      privacy_policy_here: Privacybeleid hier
+      sign_your_shop_up: Meld je winkel aan
+      the_bicycles_owner_will_receive_an_email: De eigenaar van de fiets ontvangt
+        een e-mail met alle informatie die hij of zij nodig heeft om in te loggen
+        en het account te onderhouden, evenals een PDF-kopie van de registratie-informatie.
+      the_first_step_is_to_create_an_account_html: De eerste stap is om een account
+        aan te maken voor uzelf en uw winkel - u kunt dat <a href='#add_organization'
+        class='scroll-to-ref'>onderaan deze pagina doen</a>
+      this_page_gives_instructions_html: Deze pagina geeft instructies voor het integreren
+        van Bike Index-registratie met uw Lightspeed Retail-kassasysteem. <strong><a
+        href="%{about_url}">Lees onze over-pagina</a></strong> voor algemene informatie
+        over wat Bike Index is en waarom het belangrijk is.
+      we_believe_that_bicycle_registration: Bij Bike Index geloven we dat fietsregistratie
+        een van de eenvoudigste en meest effectieve manieren is om fietsdiefstal te
+        bestrijden. Door volledige integratie met Lightspeed Retail aan te bieden,
+        hebben we registratie voor u en uw klanten tot een snel, pijnloos en geautomatiseerd
+        proces gemaakt.
+      we_know_you_and_your_customers_html: We weten dat u en uw klanten bezorgd zijn
+        over privacy en toegang tot uw verkoop- en klantinformatie. Bike Index doet
+        er alles aan om uw informatie veilig te houden en we zullen uw klanten nooit
+        ongevraagde e-mail sturen. U kunt onze %{link} bekijken.
+      were_happy_to_answer_any_questions_html: We beantwoorden graag uw vragen over
+        het laten werken van Bike Index met Lightspeed Retail en we zijn altijd op
+        zoek naar manieren om de integratie te verbeteren. Gelieve %{link} met vragen,
+        opmerkingen, opmerkingen of suggesties.
+      write_do_not_register: Als een klant niet wil dat een fiets wordt toegevoegd
+        aan de fietsindex, schrijft u gewoon "NIET REGISTREREN" in de notities voor
+        de verkoop en de fiets wordt niet geregistreerd.
+    protect_your_bike:
+      211547_bikes_were_reported_stolen: 211.547 fietsen werden als gestolen gemeld
+      9_in_10_incidents_of_bike_theft: 9 op 10 incidenten van fietsdiefstal
+      a_correctly_locked_bicycle: Een correct vergrendelde fiets
+      according_to_fbi_statistics_html: Volgens de FBI-statistieken %{stolen_link}
+        in 2014, het meest recente beschikbare jaar met gegevens. Een geschatte %{theft_link}
+        wordt niet gerapporteerd. Dat zijn veel fietsen! Als u meer wilt lezen over
+        fietsdiefstal in de VS, bekijk dan Priceonomics's %{priceonomics_link} van
+        het onderwerp. %{back_link}.
+      aim_to_have_the_hardest_bike_to_steal_on_: Probeer de moeilijkste fiets te hebben
+        om op het rek te stelen. We beschouwen twee U-sloten, of een U-slot en een
+        kabel voor zwaar gebruik, als het minimale vereiste in grote steden om een
+        fiets veilig te houden.
+      cable_locks_should_never_be_used_as_primary: Kabelsloten mogen nooit worden
+        gebruikt als primair middel om een fiets in een stad te vergrendelen.
+      cheaper_and_older_ulocks_can_often_be_broken: Goedkopere en oudere U-sloten
+        kunnen vaak zonder gereedschap worden gebroken.
+      correctly_locking_a_bike: Een fiets correct vergrendelen
+      dont_rely_on_foot_traffic_to_keep_your_bi: Vertrouw niet op voetverkeer om uw
+        fiets veilig te houden; Jarenlange rapporten hebben ons geleerd dat veel diefstallen,
+        met name die waarbij kabelsloten worden geknipt, plaatsvinden onder dekking
+        van menigte-activiteiten of voor drukke cafés of restaurants.
+      dont_rely_on_the_presence_of_cameras_to_k: Vertrouw niet op de aanwezigheid
+        van camera's om uw fiets veilig te houden. Beveiligingsbeelden zijn zelden
+        van veel nut als een fiets weg is, en dieven weten dit.
+      exploration: exploratie
+      jump_to_footnote_1: Spring terug naar voetnoot 1 in de tekst
+      make_sure_your_bike_isnt_one_of_them: Zorg ervoor dat uw fiets daar niet bij
+        hoort
+      many_bicycles_are_stolen_from_garages_and: Veel fietsen worden gestolen uit
+        garages en opslagruimten. Vergrendel uw fiets veilig aan een onbeweeglijk
+        object, zelfs op een "veilige" plaats.
+      over_a_million_bikes_are_stolen_yearly: Meer dan een miljoen fietsen worden
+        elk jaar in de VS gestolen
+      pink_power_ulocks: Pink Power U-Locks zijn een geregistreerd handelsmerk van
+        Bike Index, NFP
+      protect_your_bike: Bescherm je fiets!
+      thanks_to_researchers_html: Met dank aan %{chicago_link} voor suggesties en
+        het onderzoek achter deze richtlijnen. Met dank aan %{sweethome_link} voor
+        hun uitstekende artikel over het kiezen van een slot.
+      the_frame_is_locked_to_an_immovable_objec: Het frame is vergrendeld aan een
+        onbeweeglijk object. Beide wielen zijn beveiligd.
+      tug_on_whatever_youre_about_to_lock_to_ma: Trek aan wat je gaat vergrendelen
+        om ervoor te zorgen dat het niet gemakkelijk kan worden verwijderd. Vooral
+        wegwijzers kunnen gemakkelijk worden verwijderd door ze los te maken en sommige
+        zijn al niet bevestigd.
+      use_a_ulock_that_costs_at_least_40: Gebruik een u-lock die minstens € 40 kost.
+    resources:
+      api_documentation: API-documentatie
+      bike_index_resources: Bike Index middelen
+      check_out_our_link_html: Bekijk onze %{link}.
+      did_you_know_every_bike_html: Wist je dat elke fiets een uniek, identificerend
+        nummer heeft? %{link}.
+      get_bike_index_html: Download fietsindex %{link}.
+      how_not_to_buy_a_stolen_bike: Hoe koop je geen gestolen fiets in 4 eenvoudige
+        stappen?
+      infographic_html: "<strong>Infographic</strong> : %{link}"
+      learn_about_serial_numbers_here: Lees hier meer over serienummers
+      logos_and_design_assets: logo's en ontwerpelementen
+      map_of_bike_thefts: kaart van fietsdiefstallen
+      the_manufacturers: de fabrikanten
+      view_the_list_of_all_html: Bekijk de lijst met alle %{link} die we kennen.
+      we_have_an_open_api_check_out_html: We hebben een open API - bekijk onze %{link}.
+      were_open_source_view_this_app_html: We zijn open source, bekijk deze app (en
+        andere dingen) op %{github_link}.
+    serials:
+      a_serial_number_located_on_a_html: Een serienummer op een <em>achterste uitval</em>
+        . Sommige BMX-fietsen en enkele Schwinn-fietsen plaatsen de serie op de achterste
+        uitval. Op oudere Schwinns zijn er nummers gestempeld op zowel de achterste
+        uitvaleinden als de aandrijfzijde; degene aan de drop-out aan de niet-schijfzijde
+        is het serienummer.
+      a_serial_number_on_the_underside_html: Een serienummer aan de onderkant van
+        een <em>trapas</em> .
+      all_bikes: Alle fietsen
+      all_have_unique_serial_numbers: hebben allemaal unieke serienummers.
+      another_serial_number_beneath_html: Nog een serienummer onder de <em>trapas</em>
+        , evenwijdig aan het frame.
+      another_standard_serial_number: Nog een standaard serienummer. Soms te vervangen
+        door een serienummer dat door routing is bedekt.
+      bike_serial_numbers: Serienummers van de fiets
+      bike_with_bottom_circled: Fiets met trapas omcirkeld
+      certain_numbers_and_letters_html: Bepaalde cijfers en letters zijn moeilijk
+        of onmogelijk te onderscheiden (bijvoorbeeld 0 en O, S en 5). We behandelen
+        al deze nummers op dezelfde manier - <em>een zoekopdracht naar <code>005LLL</code>
+        zal een fiets matchen met de seriële <code>OOS111</code></em> .
+      doberman_serial: Doberman uitval serienummer
+      finding_a_bicycle_serial_number: Het serienummer van een fiets vinden
+      finding_bicycles_by_serial_number_html: Het vinden van fietsen op serienummer
+        op Bike Index is een <em>cruciaal</em> onderdeel van onze functionaliteit.
+        Gebruik bij het zoeken naar een serienummer onze seriële zoekbalk - dit is
+        de tweede balk op %{search_form_link}.
+      hopefully_you_can_find_the_serial_html: Hopelijk vindt u het serienummer op
+        de fiets waarnaar u kijkt - e-mail %{link} als u problemen ondervindt.
+      in_this_picture_html: Op deze foto is <em>200910427-2A</em> een fabrikantnummer
+        en geen serienummer. Om fietsen zo gemakkelijk mogelijk te maken te vinden,
+        zouden we het erg leuk vinden als u alle nummers die u tegenkomt invoert.
+      jump_back_to_footnote: Spring terug naar voetnoot %{num} in de tekst.
+      look_serial: Kijk serienummer
+      most_bicycles_have_their_serial_number_en: 'De meeste fietsen hebben hun serienummer
+        gegraveerd onder hun trapas, maar soms worden serienummers op andere plaatsen
+        gevonden. Hier zijn enkele voorbeelden van waar en wat u moet zoeken:'
+      okay_fine_so_maybe_html: Oké, prima, dus <em>misschien zijn</em> er een paar
+        fietsen zonder serienummers, maar dit is zeldzaam en typisch alleen op handgemaakte
+        fietsen of echt oude fietsen.
+      our_search_form: ons zoekformulier
+      schwinn_serial: Schwinn serienummer.
+      searching_serials_on_bike_index: Zoeken naar series op Bike Index
+      serial_search_input: Seriële zoekinvoer
+      some_bikes_have_multiple_html: Sommige fietsen hebben <em>meerdere serienummers</em>
+        .
+      some_schwinn_bicycles_have_html: Sommige Schwinn-fietsen hebben het unieke identificatienummer
+        (hun serienummer) op de <em>balhoofdbuis</em> . Dit bevindt zich aan de voorzijde
+        van de fiets.
+      standard_serial_number: Standaard serienummer
+      the_bottom_bracket_html: De <em>trapas</em> (waar serienummers zich meestal
+        bevinden) is omcirkeld.
+      we_do_close_serial_matching_html: We sluiten seriële overeenkomsten - fietsen
+        met serienummers die dicht bij de serienummer staan die je hebt ingevoerd,
+        worden onder de overeenkomende resultaten weergegeven onder de kop "Serienummers
+        in de buurt van ..." - <em>gegeven een zoekopdracht van een serienummer met
+        een paar cijfers / letters die anders zijn of ontbreken</em> .
+      we_do_not_currently_do_partial_html: We voeren momenteel geen gedeeltelijke
+        seriële zoekopdrachten uit. Als u naar <code>1234</code> zoekt, vindt u alleen
+        fietsen met serienummers van <code>1234</code> en serienummers in de buurt
+        - geen fiets met serienummer van <code>12345689</code> .
+      we_split_bike_serials_up_by_html: We splitsen fietsseries op in spaties en slaan
+        ze afzonderlijk op. Als u meerdere nummers op een fiets ziet, zoals op de
+        foto van de Look-fiets hierboven, probeer dan <strong>slechts een</strong>
+        van de nummers tegelijk te zoeken. Op zoek naar <em>een van beide</em> <code>M4106I9CA1</code>
+        of <code>200910427-2A</code> de fiets te vinden.
+      weve_done_a_few_things_to_make_it_more_li: We hebben een paar dingen gedaan
+        om het waarschijnlijker te maken dat je de fiets vindt die je zoekt.
+      when_adding_a_bike_to_the_index: Wanneer u een fiets aan de index toevoegt,
+        kunt u het beste alle groepen cijfers en letters invoeren die door spaties
+        worden gescheiden.
+    where:
+      bike_index_partners: Bike Index-partners
+      if_you_would_like_to_join_html: Als je een fietsenwinkel bent en je wilt meedoen,
+        bekijk dan onze %{signup_link}.
+      international_partner_organizations: Internationale partnerorganisaties
+      show_location_on_map: Toon %{location_name} op de kaart
+      sign_up_your_organization: Meld uw organisatie aan
+      signup_page: aanmeldpagina
+      us_partner_organizations: Amerikaanse partnerorganisaties
+      website_for_organization: "%{org_name} website"
   landing_pages:
     ambassadors_current:
       after_a_couple_of_recoveries_i_got_hooked: Na een paar herstelacties raakte
@@ -3132,7 +3369,7 @@ nl:
         upgrade hun register. (Of misschien hebben ze er nog niet eens een).
       apply_to_be_an_ambassador_here: Meld u hier aan als ambassadeur
       apply_today: Meld je vandaag aan
-      be_a_bike_saver: Wees een fietsspaarder
+      be_a_bike_saver: Red het leven van een fiets
       become_a_bike_index_ambassador: Word een ambassadeur van Bike Index
       become_an_ambassador: 'Word een ambassadeur '
       bike_index_is_a_nonprofit_with_a_big_miss: 'Bike Index is een non-profit organisatie
@@ -3352,7 +3589,7 @@ nl:
       trusted_by_law_enforcement_everywhere: Overal vertrouwd door wetshandhavers
       trusted_by_municipalities_everywhere: Overal vertrouwd door gemeenten
     for_community_groups:
-      bike_index_for_community_groups: Bike Index voor Gemeenschapsgroepen
+      bike_index_for_community_groups: Bike Index voor Community's
       bike_index_launches_new_ambassadors_progr: Bike Index lanceert een nieuw Ambassadeurs
         programma
       bike_index_welcomes_stolen_bikes_nola: Bike Index verwelkomt Stolen Bikes NOLA
@@ -3374,7 +3611,7 @@ nl:
       the_most_widereaching_and_effective_tools: De meest uitgebreide en effectieve
         tools tegen fietsdiefstal - periode.
       trusted_by_community_groups_everywhere: Overal vertrouwd door communitygroepen
-      used_by_community_groups_everywhere: Overal gebruikt door gemeenschapsgroepen
+      used_by_community_groups_everywhere: Overal gebruikt door Community's
       we_provide_free_and_easy_access_to_our_re: We bieden gratis en gemakkelijke
         toegang tot ons register voor iedereen en iedereen die op een fiets rijdt,
         in welke hoedanigheid dan ook. Bike Index is een gemeenschapsgedreven poging
@@ -3423,7 +3660,7 @@ nl:
     for_organizations_photo_list:
       bike_shops: Fietsenwinkels
       cities: Steden
-      community_groups: Gemeenschapsgroepen
+      community_groups: Community's
       for: Voor
       schools: scholen
     for_schools:
@@ -3480,8 +3717,8 @@ nl:
       please_fix_the_following: Los het volgende op
       register_through_org: Registreer een fiets via %{org_name}
     payments_layout:
-      be_a_bike_saver: Wees een fietsspaarder.
-      support_bike_index_today: Ondersteuning Bike Index vandaag.
+      be_a_bike_saver: Red het leven van een fiets.
+      support_bike_index_today: Ondersteun Bike Index vandaag.
       until_every_bike_is_safe: Totdat elke fiets veilig is
     reg_embed:
       its_free: Het is gratis.
@@ -3595,7 +3832,7 @@ nl:
     feedbacks_index: Hulp bij Bike Index
     feedbacks_new: Neem contact op met Bike Index
     feedbacks_vendor_signup: Winkel aanmelden - Bike Index
-    info_about: Bike Index - Fietsregistratie die werkt
+    info_about: Bike Index - de fietsregistratie die werkt
     info_serials: Serienummers van de fiets
     info_spokecard: Gesproken kaarten - Bike Index
     info_stolen_bikes: Reageren op diefstal
@@ -3756,12 +3993,12 @@ nl:
         sent_to_a_new_owner: verzonden naar een nieuwe eigenaar
         sticker: Sticker
       recoveries:
-        date_recovered: Datum hersteld
         description: Beschrijving
         mfg_model_color_html: fabrikant, model, <span class="less-strong">kleur</span>
         org_recoveries_html: "<em>%{org_name}</em> Herstellingen"
         owner: Eigenaar
         recovery: Herstel
+        recovered_at: Datum hersteld
       search:
         all: Alle
         bike: Fiets
@@ -4232,82 +4469,85 @@ nl:
       add_details: Voeg de fiets en details over de diefstal nu toe aan de Index!
       article_link: ons artikel
       bike_index_is_that_resource: Bike Index is dat middel. Bekijk de volgende keer
-        dat u een gebruikte fiets koopt eerst de index.
+        dat je een tweedehands fiets koopt eerst Bike Index.
       bike_serial_number: Serienummer van de fiets
       bike_was_already_stolen: Mijn fiets was al gestolen. Wat moet ik doen?
       bikes_are_public_and_searchable: Fietsen zijn openbaar en doorzoekbaar, maar
-        er is geen informatie over de eigenaar zichtbaar. U kunt ervoor kiezen om
-        informatie te delen (zoals uw twitter of persoonlijke website), maar dit is
-        standaard uitgeschakeld.
+        er is geen informatie over de eigenaar zichtbaar. Je kunt ervoor kiezen om
+        informatie te delen (zoals je twitter of website), maar dit is standaard uitgeschakeld.
       blog_link: Blog
       can_partner_with_bikeindex: Kan mijn lokale fietsenwinkel samenwerken met Bike
         Index?
-      can_thieves_search: Is het mogelijk voor fietsendieven om in de Index te zoeken
-        om te controleren of een fiets als gestolen wordt vermeld voordat ze het verkopen?
+      can_thieves_search: Is het mogelijk voor fietsendieven om te controleren of
+        een fiets als gestolen wordt vermeld voordat ze het verkopen?
       can_you_tell_me_what_bike_by_serial: Kun je me vertellen welke fiets ik heb
         op basis van het serienummer?
       comprehensive_public_database: Bike Index is een uitgebreide openbare database
-        - als uw fiets is gestolen, denken we dat iedereen erover moet weten.
+        - wij vinden dat iedereen het mag weten als jouw fiets gestolen is.
       email_us_html: E-mail %{email_link} voor meer informatie!
-      everyone_can_register_bikes_for_free: Iedereen kan fietsen gratis registreren.
+      everyone_can_register_bikes_for_free: Iedereen kan gratis fietsen registreren.
       faqs: Veelvoorkomende problemen en veelgestelde vragen
       follow_us_html: Je kunt ons ook volgen op %{twitter_link} en %{facebook_link}.
-      free_to_transfer: Fietsregistratie is permanent, het is gratis om fietsen over
-        te zetten.
-      go_to_edit_page: Ga naar de bewerkpagina voor de fiets en selecteer de "Eigendomoverdrachtpagina"
+      free_to_transfer: De fietsregistratie is permanent, het is weliswaar gratis
+        om fietsen over te zetten.
+      go_to_edit_page: Ga naar de bewerk-pagina voor de fiets en selecteer de "Eigendom
+        overdracht pagina".
       how_bikes_are_verified: Hoe verifieer je de fietsen die mensen registreren?
       how_can_i_advertise: Hoe kan ik adverteren op Bike Index
       how_can_i_stay_up_to_date: Hoe kan ik op de hoogte blijven van wat Bike Index
         doet?
-      how_does_this_prevent_bike_theft: Hoe voorkomt dit fietsdiefstal?
+      how_does_this_prevent_bike_theft: 'Hoe voorkomt dit fietsendiefstal? '
       in_the_process_of_setting_up_advertising: We zijn bezig met het opzetten van
         advertentiemogelijkheden op de hele site, met name voor lokale fietsenwinkels.
-      not_yet: Nee. Dit is een functie waaraan we werken, maar we zijn er nog niet.
-      organization_signup_html: Laat ze de %{signup_link} bezoeken, we zullen ze instellen
-        met een organisatieaccount zodat ze fietsen gratis kunnen registreren.
+      not_yet: Nee. Dit is een functie waar nog aan gewerkt wordt.
+      organization_signup_html: Laat ze de %{signup_link} bezoeken. Dan zullen wij
+        ze een organisatieaccount aanmaken, waar ze de fietsen gratis kunnen registreren.
       organization_signup_link: organisatie aanmeldpagina
-      other_registries_html: Andere registers verbergen over het algemeen series vanwege
-        hun technische beperkingen. Ze houden informatie weg van diegenen die het
-        waarschijnlijk voor goed gebruiken, hoewel %{wikipedia_link} niet werkt.
+      other_registries_html: Andere registers verbergen over het algemeen serienummers
+        vanwege hun technische beperkingen. Ze houden informatie achter van diegenen
+        die het waarschijnlijk voor een goed doel gebruiken, hoewel %{wikipedia_link}
+        niet werkt.
       partner_link: een van onze partnerwinkels
       people_with_good_intentions: Op dit moment kopen mensen met goede bedoelingen
-        gestolen fietsen omdat er geen enkele doorzoekbare, eenvoudige bron is om
-        te controleren voordat ze een fiets kopen.
+        gestolen fietsen, omdat er geen enkele eenvoudig doorzoekbare bron is om te
+        controleren of de fiets gestolen is, voordat ze een fiets kopen.
       possible_but_uncommon: Het is mogelijk, maar niet gebruikelijk. We volgen en
         markeren verdachte activiteiten om misbruik van Bike Index te voorkomen.
       read_our_blog_html: Lees onze %{blog_link}! We plaatsen de meeste coole dingen
         die we daar doen.
       registration_html: Als u uw fiets registreert bij %{partner_link}, wordt de
-        registratie geverifieerd (winkels kunnen ervoor kiezen om alleen fietsen te
-        registreren die ze verkopen).
+        registratie geverifieerd (winkels kunnen ervoor kiezen om alleen de fietsen
+        te registreren die ze verkopen).
       reveal_owner_email_html: Voer het e-mailadres van de nieuwe eigenaar in en sla
-        de wijzigingen op! Je kunt de fiets nog steeds bewerken totdat de nieuwe eigenaar
-        hem claimt.
+        de wijzigingen op! Je kunt de gegevens van de fiets nog steeds bewerken totdat
+        de nieuwe eigenaar hem claimt.
       security_by_obscurity_link: beveiliging door obscurity
       serial_numbers_public: We maken serienummers openbaar omdat dit de beste manier
         is om gestolen fietsen te herstellen en diefstal af te schrikken.
-      similar_serials: Als er fietsen met vergelijkbare serienummers zijn, vooral
-        als alleen de laatste paar nummers verschillen, is uw fiets waarschijnlijk
-        dat merk en model.
+      similar_serials: Als er fietsen met vergelijkbare serienummers zijn, voornamelijk
+        als de laatste paar nummers hetzelfde zijn, dan is het goed mogelijk dat de
+        fietsen van hetzelfde merk en model zijn.
       the_faster_and_easier_it_is: Hoe sneller en gemakkelijker het is om toegang
-        te krijgen tot series, hoe meer gestolen fietsen we herstellen. Toegang tot
-        serienummers beperken helpt alleen dieven.
+        te krijgen tot de serienummers, hoe meer gestolen fietsen we herstellen. Toegang
+        tot serienummers beperken, helpt alleen dieven.
       this_isnt_optimistic_speculation: 'Dit is geen optimistische speculatie: we
         hebben dit bewezen en blijven dit doen met elke gestolen fiets die we herstellen.'
       to_learn_more_html: Bekijk %{article_link} over privacy voor meer informatie.
       verification_questions: Elke kwestie van verificatie wordt behandeld door uw
         registratiegegevens te controleren. Dit is geen probleem geweest.
-      visit_or_add_html: Eerst %{add_link}. Zodra u dat hebt gedaan, laten we u een
-        checklist zien met wat u kunt doen om uw kansen op herstel te verbeteren.
-      we_care_about_your_privacy: Wij geven om uw privacy meer dan wie ook - u kunt
-        uw registratie verbergen zodat niemand anders dan u deze kan zien. We vinden
-        het gewoon geen goed idee.
-      we_offer_bike_shops: We bieden fietsenwinkels en wetshandhavers een eenvoudig
-        te gebruiken interface om verdachte fietsen die ze tegenkomen op te zoeken
-        en een manier om snel contact op te nemen met de juiste eigenaar.
-      we_recommend_searching: Voor nu raden we aan te zoeken naar het serienummer
-        van uw fiets. We zullen je geregistreerde fietsen met vergelijkbare serienummers
-        tonen.
+      visit_or_add_html: 'Allereerst: %{add_link}. Zodra je dat hebt gedaan, laten
+        we je een checklist zien met wat je kan doen om de kans op het terugvinden
+        van je fiets, te vergroten.'
+      we_care_about_your_privacy: Wij geven om uw privacy meer dan wie ook - je kan
+        jouw registratie verbergen zodat niemand anders dan jij deze kan zien. We
+        vinden het gewoon geen goed idee.
+      we_offer_bike_shops: 'We bieden fietsenwinkels en politie een eenvoudige te
+        gebruike interface, om de fietsen die ze tegenkomen, en verdacht lijken, op
+        te zoeken. Bovendien kunnen ze hierdoor snel contact opnemen met de juiste
+        eigenaar. '
+      we_recommend_searching: Voor nu raden we je aan te zoeken naar het serienummer
+        van de fiets. Wij laten dan alle geregistreerde fietsen, met een soortgelijk
+        serienummer, zien.
       we_successfully_recover: Via dit proces herstellen we elke week gestolen fietsen.
       weve_recovered_bikes: We hebben fietsen teruggevonden voordat ze zelfs als gestolen
         konden worden gemarkeerd omdat ze in de Index konden worden gevonden.
@@ -4343,7 +4583,7 @@ nl:
       bike_shops: Fietsenwinkels
       blog: Blog
       cities: Steden
-      community_groups: Gemeenschapsgroepen
+      community_groups: Community's
       copyright_html: "%{current_year} & kopiëren; Bike Index, een 501 (c) (3) non-profit
         - EIN 81-4296194"
       design_logos: Ontwerp & logo's
@@ -4383,6 +4623,57 @@ nl:
       past_day: Gisteren
       past_hour: afgelopen uur
       past_year: afgelopen jaar
+    edit_bike_skeleton:
+      abandoned: Verlaten
+      edit: Bewerken
+      owned_but_hasnt_been_claimed_html: Eigendom van <em>%{owner_email}</em> maar
+        het is nog niet geclaimd
+      owned_with_permission_to_edit_html: Eigendom van <em>%{owner_email}</em> maar
+        %{org_name} heeft toestemming om te bewerken
+      stolen: Gestolen
+      view_bike: Bekijk %{bike_type}
+    organized_skeleton:
+      add_a_bike: Voeg een fiets toe
+      additional_features_html: Bike Index biedt extra functies voor geverifieerde
+        wetshandhavingsorganisaties. Neem contact op met %{email_link} om ze ingeschakeld
+        te krijgen.
+      admin_panel: Admin panel
+      ascend_imports: Opvoer importeren
+      bikes: Bikes
+      bulk_imports: Bulkinvoer
+      discuss: Bespreken
+      exports: Uitvoer
+      geomessaging: GeoMessaging
+      getting_started: Ermee beginnen
+      how_integration_works: hoe de integratie werkt
+      impounded_bikes: In beslag genomen fietsen
+      incomplete_registrations: Onvolledige registraties
+      integrate_bike_index_with_ascend: Integreer Bike Index met Ascend
+      integrate_bike_index_with_lightspeed: Integreer Bike Index met Lightspeed
+      lightspeed_integration_panel: Lightspeed-integratiepaneel
+      link_to_register_html: "<strong>%{link}</strong> om de fietsen die u aan uw
+        klanten verkoopt automatisch te registreren."
+      multi_serial_search: Multi-serieel zoeken
+      organization_dashboard: "%{org_name} Dashboard"
+      organization_locations: "%{org_name} locaties"
+      organization_profile: "%{org_name} profiel"
+      other_point_of_sale_system: Ander Point of Sale-systeem?
+      read_a_full_explanation_html: Lees een volledige uitleg van %{link}.
+      recoveries: terugvorderingen
+      register_bikes_with_link_html: Registreer fietsen met onze <strong>%{link}</strong>
+      registration_stickers: Registratie stickers
+      resources: Middelen
+      streamlined_bike_shop_registration_page: gestroomlijnde registratiepagina voor
+        Bike Shop
+      use_ascend: Ascend gebruiken?
+      use_lightspeed_retail_pos: Lightspeed Retail POS gebruiken?
+      users: Gebruikers
+      viewing_our_streamlined_page: U bekijkt momenteel onze gestroomlijnde registratiepagina
+        voor Bike Shop, die wij aanbevelen te gebruiken
+    errors:
+      error: Fout
+      errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
+        dit %{object_name} wordt opgeslagen:"
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -4530,20 +4821,21 @@ nl:
       bike_index_statistics: Bike Index-statistieken
       bikes_registered_this_week: Fietsen zijn deze week geregistreerd
       but_how_does_it_work: Maar hoe werkt het?
-      hero: Fietsregistratie die werkt
-      how_it_works: Het is makkelijk. Voer uw naam, fietsfabrikant, serienummer en
-        componentinformatie in om uw fiets in te voeren in het meest gebruikte fietsregister
-        ter wereld.
-      identifying_your_bike: Een gebruiker of partner ontmoet uw fiets, gebruikt Bike
-        Index om deze te identificeren en neemt contact met u op.
-      if_your_bike_goes_missing: Als je fiets vermist raakt, markeer deze dan als
-        verloren of gestolen om de hele Bike Index-gemeenschap en haar partners op
-        de hoogte te stellen.
+      hero: De fietsregistratie die werkt
+      how_it_works: Het is makkelijk. Voer je naam, fietsfabrikant, serienummer en
+        overige informatie in, om je fiets te registreren bij het meest gebruikte
+        fietsregister ter wereld.
+      identifying_your_bike: Een gebruiker of partner van Bike Index komt jouw fiets
+        tegen, gebruikt Bike Index om de fiets te identificeren en kan dan contact
+        met je opnemen.
+      if_your_bike_goes_missing: Als je fiets gestolen wordt of vermist raakt, markeer
+        deze dan als gestolen of verloren om de Bike Index community en haar partners
+        hierover te informeren.
       partner_organizations: Partnerorganisaties
       read_more_recovery_stories: Lees meer herstelverhalen
-      recover_your_bike_for_free: Met de hulp van de Bike Index-gemeenschap en haar
-        partners beschikt u over de informatie die nodig is om uw verloren of gestolen
-        fiets kosteloos terug te vorderen. Het is wat we doen.
+      recover_your_bike_for_free: Met de hulp van de Bike Index community en haar
+        partners beschik je over de informatie die je nodig hebt om jouw gestolen
+        of verloren fiets (kosteloos) terug te krijgen. Dit is wat we doen.
       register_now: Registreer nu!
       register_your_bike: Registreer uw fiets
       stolen_bikes_recovered: Gestolen fietsen hersteld
@@ -4552,7 +4844,7 @@ nl:
       total_bikes_registered: Totaal aantal geregistreerde fietsen
       total_recovery_value: Totale herstelwaarde
       used_by: Gebruikt door
-      value_of_bikes_recovered: Meer dan %{value} Fietsen die teruggevonden zijn
+      value_of_bikes_recovered: Meer dan %{value} aan fietsen die teruggevonden zijn
       you_get_your_bike_back: U krijgt uw fiets terug
     recovery_stories:
       recovery_stories: Verhalen over teruggekregen fietsen
@@ -4564,8 +4856,7 @@ nl:
       add_a_bike: Voeg een fiets toe
       add_a_lock: Voeg een slot toe
       add_a_photo: Voeg een foto toe
-      add_some_info: Voeg info toe
-      bikes: Bikes
+      bikes: fietsen
       combination: Combinatie
       date_stolen: Datum gestolen
       edit: Bewerken
@@ -4582,7 +4873,7 @@ nl:
       serial: serie-
       sorry_your_bike_was_stolen: Het spijt ons dat uw %{bikes_last_type} is gestolen,
         maar hopelijk krijgt u hem terug, als iedereen er naar kan zoeken.
-      stolen: Gestolen
+      stolen: GESTOLEN
       tell_us_more_about_yourself: Vertel ons meer over uzelf.
       thanks_for_adding_your_bike: Geweldig! We zijn blij dat u een %{bikes_last_type}
         heeft toegevoegd aan de index.
@@ -4594,6 +4885,7 @@ nl:
       you_have_no_registered_locks: U heeft geen geregistreerde sloten
       abandoned: VERLATEN
       date_abandoned: Datum van vermissing
+      next: Volgende stappen
   locales:
     en: English (Engels)
     nl: Nederlands
@@ -4603,3 +4895,343 @@ nl:
       nl: EUR
       en-GB: GBP
       es: EUR
+  locks:
+    edit:
+      are_you_sure: Weet je het zeker?
+      back_to_viewing_all_locks: terug naar het bekijken van alle sloten
+      delete_this_lock: Verwijder dit slot
+      edit_the_lock: Bewerk het slot
+    form:
+      add_the_lock: Voeg het slot toe!
+      additional_notes: Extra notities
+      basic: basis-
+      choose_manufacturer: Kies fabrikant
+      examples_of_serial_numbers_found_on_diffe: Voorbeelden van serienummers op verschillende
+        soorten fietsslottoetsen
+      has_combination: Heeft combinatie
+      has_key: Heeft sleutel
+      large_kryptonite_key: Grote Kryptonite-sleutel
+      lock_type: Slottype
+      other_lock_manufacturer: Andere slotfabrikant
+      pinhead_key: Pinhead-toets
+      pinhead_locking_skewer_key: Pinhead spies sleutel
+      small_kryptonite_key: Kleine Kryptonite-sleutel
+      update_the_lock: Update het slot!
+    lock_home:
+      add_a_new_lock: Voeg een nieuw slot toe
+      any_lock_information_you_enter_on_bike_in: Alle slotinformatie die u op Bike
+        Index invoert, is privé en alleen zichtbaar voor u.
+      if_you_want_you_can_save_serial_html: Als je wilt, kun je <strong>de serienummers
+        van je sleutels opslaan</strong> op Bike Index, zodat je geen pech hebt als
+        je ze verliest.
+      lock_keys_often_have_serial_numbers_so_yo: Vergrendelingssleutels hebben vaak
+        serienummers, zodat u vervangingen kunt bestellen als u de sleutels verliest.
+      lock_type: Slottype
+      manufacturer: Fabrikant
+      save_information_about_a_lock: Informatie opslaan over een slot
+      save_information_about_your_bike_lock: Informatie opslaan over uw fietsslot!
+      you_can_also_record_your_lock_html: U kunt ook <strong>uw slotcombinaties opnemen</strong>
+        .
+      your_locks: Je sloten
+    new:
+      save_information_about_one_of_your_locks: Informatie opslaan over een van uw
+        sloten
+  organization_invitations:
+    not_available:
+      contact_us: Contacteer ons
+      contact_us_if_you_think_were_wrong_html: "%{contact_us_link} als u denkt dat
+        we het mis hebben."
+      perhaps_that_link_has_already_been_used_t: Misschien is die link al gebruikt
+        om lid te worden van de groep?
+      whoops_that_link_isnt_connected_to_a_bike: Oeps, die link is niet verbonden
+        met een fiets
+  payments:
+    create:
+      bike_index_team: Bike Index Team
+      thank_you_for_supporting_bike_index: Bedankt voor het ondersteunen van Bike
+        Index!
+      we_received_your_payment_of: We hebben uw betaling van %{amount} ontvangen
+      xoxo: XOXO,
+      your_donation_saved_bikes: Uw donatie van € %{amount} heeft zojuist de fietsen
+        gered.
+    form:
+      501c3_nonprofit: 501 (c) (3) non-profit
+      bike_index_is_a_nonprofit_html: Bike Index is een %{nonprofit_link}.
+      donate_today: Doneer vandaag nog
+      next: volgende>
+      other_amount: Ander bedrag
+      pay_bike_index: Pay Bike Index
+      select_an_amount: Selecteer een bedrag
+  registrations:
+    create:
+      in_it_youll_find_instructions: Hierin vindt u instructies voor het voltooien
+        van de registratie van uw fiets
+      radicool: Radicool!
+      we_got_this: We hebben dit.
+      we_sent_an_email_to: 'We hebben een e-mail gestuurd naar:'
+      well_do_our_best_to_help_you_recover_it: We zullen ons best doen om u te helpen
+        het terug te krijgen
+    embed:
+      bike_manufacturer: fietsfabrikant
+      choose_specific_organization_optional: Kies specifieke organisatie (optioneel)
+      owner_email: "%{owner} e-mail"
+      primary_frame_color: primaire framekleur
+      register: Registreer
+      select_other_if_manufacturer_doesnt_show: Selecteer 'Overig' als de fabrikant
+        niet verschijnt wanneer deze wordt ingevoerd
+      this_bike_is_either_missing_or_stolen: Deze fiets ontbreekt of is gestolen
+      your: jouw
+  organizations:
+    embed:
+      add_a_color: Voeg een kleur toe
+      additional_serial: Extra serienummer / stickernummer
+      address: Adres
+      choose_color: Kies een kleur
+      choose_country: Kies land
+      city: City
+      currently_registering_a_nonstolen_bike: Momenteel wordt een niet-gestolen fiets
+        geregistreerd. Klik hier om in plaats daarvan een STOLEN-fiets te registreren.
+      department_city: Afdeling & stad
+      description_of_the_theft: Beschrijving van de diefstal
+      eg_if_we_tweet_about_or_someone_searches: bijvoorbeeld als we tweeten of iemand
+        zoekt naar het serienummer
+      filing_a_police_report_is_important_html: Het indienen van een <strong>politierapport</strong>
+        is <span class="stolen-color">uiterst belangrijk</span> voor het herstel van
+        gestolen fietsen.
+      frame_color: Framekleur
+      image_has_been_uploaded: Afbeelding is geüpload
+      intersection_or_address: Kruising of adres
+      manufacturer_name: Naam van de fabrikant
+      model_year: Modeljaar
+      optional_upload_a_photo: Optioneel - upload een foto
+      other_manufacturer: Andere fabrikant
+      owners_street_address: Straatnaam van de eigenaar
+      police_report_number: Nummer politie rapport
+      receive_notifications_from_bike_index: Ontvang meldingen van de Index over deze
+        gestolen %{bike_type}
+      register: Registreer
+      registering_a_stolen_bike_click_here: Een gestolen fiets registreren. Klik hier
+        om een niet-gestolen fiets te registreren
+      remove_color: Verwijder kleur
+      secondary_color: Secundaire Kleur
+      select_other_if_manufacturer_isnt_listed: Selecteer 'Overig' als de fabrikant
+        niet wordt vermeld
+      state: Staat
+      third_color: Derde kleur
+      this: deze
+      unknown_serial: Onbekende serie
+      unknown_year: Onbekend jaar
+      unsure_or_unknown: Onzeker of onbekend
+      when_was_it_stolen: Wanneer is het gestolen?
+      where_was_it_stolen: Waar is het gestolen?
+      your_email_address: Uw e-mailadres
+      your_phone_number: Je telefoonnummer
+      zipcode: Postcode
+    embed_create_success:
+      bike_was_registered_to_you_html: "%{bike_link} is bij u geregistreerd via <strong>%{org_name}</strong>
+        ."
+      you_will_receive_an_email_confirmation: U ontvangt binnenkort een e-mailbevestiging.
+      your_bike_has_been_added_to_bike_index: Uw %{bike_type} is toegevoegd aan Bike
+        Index!
+    embed_extended:
+      add_a_color: Voeg een kleur toe
+      additional_serial: Extra serienummer / stickernummer
+      address: Adres
+      any_extra_words: Nog extra woorden?
+      choose_color: Kies een kleur
+      choose_handlebar: Kies stuur
+      choose_material: Kies materiaal
+      choose_photo: Kies foto
+      city: City
+      frame_color: Framekleur
+      image_has_been_uploaded: Afbeelding is geüpload
+      manufacturer_name: Naam van de fabrikant
+      model_year: Modeljaar
+      optional_additions: Optionele toevoegingen
+      org_affiliation: "%{org_name} aansluiting"
+      other_defining_features: Andere bepalende kenmerken
+      other_manufacturer: Andere fabrikant
+      owners_email_address: E-mailadres van de eigenaar
+      owners_phone: Telefoon van de eigenaar
+      owners_street_address: Straatnaam van de eigenaar
+      primary_frame_material: Primair framemateriaal
+      register_this: Registreer dit
+      remove_color: Verwijder kleur
+      secondary_color: Secundaire Kleur
+      select_other_if_manufacturer_isnt_listed: Selecteer 'Overig' als de fabrikant
+        niet wordt vermeld
+      state: Staat
+      third_color: Derde kleur
+      unknown_serial: Onbekende serie
+      unknown_year: Onbekend jaar
+      unsure_or_unknown: Onzeker of onbekend
+      zipcode: Postcode
+      sticker_id_html: Sticker-ID <small class='less-strong'>optioneel</small>
+    new:
+      bike_index_for_organizations: Bike Index voor organisaties
+    new_form:
+      add_organization: Organisatie toevoegen
+      add_your_organization_to_bike_index: 'Voeg uw organisatie gratis toe aan Bike
+        Index in drie eenvoudige stappen:'
+      bike_index_account: Bike Index-account
+      confirm_your_email: bevestig je email
+      error: Fout
+      fill_out_the_form_that_will_appear: Vul het formulier in dat op deze pagina
+        verschijnt zodra u bent ingelogd.
+      filling_out_this_form_will_create_a_new_org: Als u dit formulier invult, wordt
+        een nieuwe, andere organisatie gecreëerd
+      if_you_dont_want_that_to_be_the_case_html: Als u niet wilt dat dat het geval
+        is, %{logout_link} en meld u aan met de e-mail die u in plaats daarvan wilt
+        gebruiken.
+      log_out: Uitloggen
+      new_organization: Nieuwe organisatie
+      organization_kind: Soort organisatie
+      organization_name: Organisatie naam
+      please_fix_the_following_errors: Corrigeer het volgende %{errors}
+      sign_up_for_a_new_account_html: Meld u aan voor een %{new_account_link}
+      you_are_already_a_member_of_org_html: Je bent al lid van %{org_link}.
+      your_current_account_will_be_a_member_html: Uw huidige account ( <strong>%{user_email}</strong>
+        ) wordt lid van de organisatie die u maakt.
+  feedbacks:
+    form:
+      email_address: E-mailadres
+      name: Naam
+      send_it: Stuur het!
+      subject: Onderwerp
+      your_message: Uw bericht
+    index:
+      contact_us: Neem contact met ons op!
+      have_a_question_we_havent_answered: Heeft u een vraag die we niet hebben beantwoord?
+      help_with_bike_index: Hulp bij Bike Index
+      log_in_to_send_a_comment: Log in om een reactie te sturen!
+      you_can_reach_us_at_contact_html: U kunt ons bereiken op %{contact_link}, of
+        stuur uw bericht hier naartoe.
+  manufacturers:
+    index:
+      give_us_a_heads_up_in_a_comment_below: Geef ons een waarschuwing in een reactie
+        hieronder.
+      manufacturers_we_know_about: Fabrikanten die we kennen
+      name: Naam
+      oh_no_were_missing_a_manufacturer: OH NEE! We missen een fabrikant?
+      only_makes_components: Maakt alleen componenten
+      thats_not_actually_surprising: Dat is eigenlijk niet zo verwonderlijk, er zijn
+        er een heleboel.
+  news:
+    index:
+      bike_index_blog: Bike Index Blog
+      bike_index_blog_feed: Bike Index blog feed
+    show:
+      by: Door
+  recovery_displays:
+    recovery_display:
+      bike: Fiets
+      recovered_date: hersteld %{date}
+  stolen:
+    index:
+      ambassador: Ambassadeur
+      bike_chopshop_report: Bike ChopShop-rapport
+      bike_index: Bike Index
+      bike_index_will_broadcast: Bike Index zendt je gestolen fiets uit naar de lokale
+        Gestolen Bike Twitter-handle en verspreidt het via andere sociale kanalen.
+        Onze gestolen fietsgegevens zijn gekoppeld aan LeadsOnline, dus als uw fiets
+        in het 'systeem' terechtkomt, wordt deze gemarkeerd en wordt er contact met
+        u opgenomen. Onze community zal uitkijken naar verschillende wederverkoopkanalen.
+      check_out_your_local_flea_market: Bekijk uw lokale rommelmarkt voor uw fiets.
+      donation: Schenking
+      error: Fout
+      file_a_police_report: Dien een politierapport in. Als je kunt, ga dan naar je
+        lokale district en laat een officier komen en een rapport opnemen. Betrek
+        ze bij uw situatie!
+      if_you_are_here_your_bike_was_probably_stolen: 'Als je hier bent, is je fiets
+        waarschijnlijk gestolen. Dat is klote, maar we zijn hier om te helpen. Dit
+        is wat je moet doen:'
+      keep_an_eye_on_craigslist: Houd Craigslist in de gaten. Stel een specifieke
+        waarschuwing in met behulp van ifttt.com om de lijst te markeren die overeenkomt
+        met uw fiets. Volg apps zoals OfferUp en LetGo omdat ze vaak worden gebruikt
+        in schermfietsen.
+      list_recent_stolen_bikes_html: Maak een lijst van recent gestolen fietsen op
+        uw site met onze %{stolen_widget_link}
+      look_for_local_stolen_bike_groups_on_face: Zoek naar lokale gestolen fietsgroepen
+        op Facebook (zoek op 'gestolen fiets {plaatsnaam}') Veel van deze vrijwilligersgroepen
+        bestaan over de hele wereld en kunnen uw herstelwerkzaamheden ondersteunen.
+      make_sure_your_bike_is_registered_html: Zorg ervoor dat uw fiets is geregistreerd
+        op %{new_bike_link} en elk lokaal register in uw community dat bestaat. Markeer
+        je fiets als <strong>gestolen</strong> op Bike Index om onze community te
+        activeren.
+      other_recovery_tools: Andere herstelhulpmiddelen
+      please_fix_the_following: Corrigeer het volgende %{errors}
+      please_login_to_make_report_html: Gelieve %{login_link} om dit rapport te maken
+      register_it: registreer het
+      report_a_bicycle_chop_shop: Meld een fietsenwinkel
+      report_bike_theft_issues: 'Problemen met fietsdiefstal melden:'
+      report_someone_selling_a_stolen_bike: Meld iemand die een gestolen fiets verkoopt
+      reporting_your_own_bike_stolen_html: Je eigen fiets gestolen melden? U moet
+        eerst %{register_it_link}
+      send_alert: Stuur melding!
+      sign_in: Log in
+      someone_is_selling_a_stolen_bike: Iemand verkoopt een gestolen fiets
+      stolen_widget: gestolen widget
+      tell_everyone_you_know: Vertel iedereen die je kent over je gestolen fiets.
+        Raak al je sociale netwerken (Facebook, Instagram, Twitter, etc.) en sms /
+        e-mail iedereen die je kent.
+      we_wish_you_the_best_of_luck_html: Wij wensen u veel succes bij het herstellen
+        van uw fiets. We willen je verhaal graag toevoegen aan onze %{recoveries_count}
+        herstelde fietsen. Als je ons doel wilt ondersteunen, overweeg dan een %{donations_link}
+        of neem deel aan ons %{ambassadors_link} -programma.
+      what_happens_next: Wat gebeurt er nu?
+      what_to_do_if_your_bike_is_stolen: Wat te doen als uw fiets wordt gestolen
+      where_is_this_happening: Waar gebeurt dit URL, adres - alle informatie die u
+        heeft
+      your_email_address: Uw e-mailadres
+      your_local_police_department_will_do_what: Uw lokale politie-afdeling zal doen
+        wat het doet om uw fiets te herstellen. Blijf in contact met hen.
+  theft_alert_plans:
+    theft_alert_plan:
+      best_value: Beste waarde
+      days: dagen
+      views: Uitzichten
+  user_embeds:
+    show:
+      bike: Fiets
+      my_indexed_bikes: Mijn geïndexeerde %{bikes_count}
+      no_photo: geen foto
+  public_images:
+    edit:
+      editing_bike_html: "<span>Pijl</span> terug Terug naar <em>fiets bewerken</em>"
+      editing_image: Afbeelding bewerken
+    form:
+      cancel_update: Update annuleren
+      do_not_display: Geef niet weer
+      error: Fout
+      errors_prevented_photo_from_saving: "%{errors_count} heeft voorkomen dat de
+        foto werd opgeslagen"
+      image_name: Naam Afbeelding
+      no_one_will_be_able_to_see_this_image_exc: "(niemand kan deze afbeelding zien
+        behalve jij)"
+      save_image: Afbeelding opslaan
+      use_this_if_youd_like_to_attach_a_photo: Gebruik dit als u een foto van uw kwitantie
+        of iets dergelijks privé wilt toevoegen.
+    new:
+      add_a_public_image: Voeg een public_image toe
+    new_form:
+      drag_and_drop_html: Sleep bestanden naar hier of gebruik de knop <em>Foto's
+        uploaden</em> .
+      upload_photos: Foto's uploaden
+    public_image:
+      copy_and_paste: Kopieer de bovenstaande tekst en plak deze op de gewenste plek
+      copy_and_paste_in_post: Kopieer de bovenstaande tekst en plak deze op de gewenste
+        plek in het bericht
+      delete_image: Verwijder afbeelding
+      enter_text_here: VOER HIER UW TEKST IN
+      processing: "... verwerken"
+    revised_public_image:
+      keep_image_private: houd afbeelding privé
+      processing: "... verwerken"
+    show:
+      are_you_sure: Weet je het zeker?
+      back_to_images: Terug naar openbare afbeeldingen
+      bike_image: Bike afbeelding
+      destroy: Verwijderen
+      edit: Bewerken
+      image_from: Afbeelding van %{image_title}
+      looks_like_this_is_your_image: Het lijkt erop dat dit jouw afbeelding is.

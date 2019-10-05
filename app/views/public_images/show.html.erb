@@ -1,21 +1,24 @@
 <% if @public_image.name.present? %>
   <% name = @public_image.name %>
 <% else %>
-  <% name = "Bike Image" %>
+  <% name = t(".bike_image") %>
 <% end %>
+
 <% if @public_image.imageable_type == "Blog" %>
-  <% name = "Image from #{@public_image.imageable.title}" %>
+  <% name = t(".image_from", image_title: @public_image.imageable.title) %>
 <% end %>
+
 <h1><%= link_to name, polymorphic_path(@public_image.imageable) %></h1>
 
 <%= image_tag @public_image.image_url(:large) %>
+
 <% if @owner_viewing %>
   <div class="padded">
-    <p class="padded">Looks like this is your image.</p>
+    <p class="padded"><%= t(".looks_like_this_is_your_image") %></p>
     <p>
-      <%= link_to "Edit", edit_public_image_path(@public_image) %> |
-      <%= link_to "Destroy", @public_image, confirm: 'Are you sure?', method: :delete %> |
-      <%= link_to "Back to public_images", public_images_path %>
+      <%= link_to t(".edit"), edit_public_image_path(@public_image) %> |
+      <%= link_to t(".destroy"), @public_image, confirm: t(".are_you_sure"), method: :delete %> |
+      <%= link_to t(".back_to_images"), public_images_path %>
     </p>
   </div>
 <% end %>

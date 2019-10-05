@@ -75,6 +75,11 @@ RSpec::Sidekiq.configure do |config|
   config.warn_when_jobs_not_processed_by_sidekiq = false
 end
 
+# Set default geocoder location
+RSpec.configure do |config|
+  config.include_context :geocoder_default_location
+end
+
 RSpec.configure do |config|
   config.before(:each) do
     # Reset feature-flipping between examples

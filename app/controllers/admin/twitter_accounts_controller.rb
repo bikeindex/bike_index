@@ -1,0 +1,93 @@
+class Admin::TwitterAccountsController < Admin::BaseController
+  include SortableTable
+  before_filter :find_twitter_account, only: %i[show edit update destroy]
+
+  def index
+    @twitter_accounts = matching_twitter_accounts.reorder(sort_column + " " + sort_direction)
+  end
+
+  def show; end
+
+  def new
+    @twitter_account = TwitterAccount.new
+  end
+
+  def create
+    @twitter_account = TwitterAccount.new(permitted_parameters)
+    @twitter_account.twitter_account_info =
+      TwitterClient.user(@twitter_account.screen_name).to_json
+
+    if @twitter_account.save
+      redirect_to admin_twitter_account_url(@twitter_account)
+    else
+      render action: :new
+    end
+  end
+
+  def edit; end
+
+  def update
+    if @twitter_account.update_attributes(permitted_parameters)
+      if ParamsNormalizer.boolean(params[:check_credentials])
+        @twitter_account.reload
+        @twitter_account.check_credentials
+      end
+      flash[:notice] = "Twitter account saved!"
+      redirect_to admin_twitter_account_url(@twitter_account)
+    else
+      render action: :edit
+    end
+  end
+
+  def destroy
+    if @twitter_account.present? && @twitter_account.destroy
+      flash[:info] = "Twitter account deleted."
+      redirect_to admin_twitter_accounts_url
+    else
+      flash[:error] = "Could not delete Twitter account."
+      redirect_to edit_admin_twitter_account_url(@twitter_account)
+    end
+  end
+
+  private
+
+  def sortable_columns
+    %w[screen_name created_at email language country city last_error_at national]
+  end
+
+  def permitted_parameters
+    params.require(:twitter_account).permit(
+      :active,
+      :address,
+      :append_block,
+      :city,
+      :consumer_key,
+      :consumer_secret,
+      :country,
+      :default,
+      :language,
+      :latitude,
+      :longitude,
+      :national,
+      :neighborhood,
+      :screen_name,
+      :state,
+      :user_secret,
+      :user_token,
+    )
+  end
+
+  def matching_twitter_accounts
+    if sort_column == "last_error_at" # If sorting by last_error_at, show the error
+      sort_direction == "desc" ? TwitterAccount.errored : TwitterAccount.where(last_error_at: nil)
+    elsif sort_column == "national" # If national, show only national one direction, only non the other
+      TwitterAccount.where(national: sort_direction == "asc")
+    else
+      TwitterAccount
+    end
+  end
+
+  def find_twitter_account
+    @twitter_account = TwitterAccount.find(params[:id])
+  end
+end

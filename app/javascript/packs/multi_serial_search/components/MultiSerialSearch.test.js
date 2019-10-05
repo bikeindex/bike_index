@@ -5,13 +5,13 @@ import { shallow } from "enzyme";
 import toJson from "enzyme-to-json";
 import { bikeResponse } from "helpers/bikes";
 import { event } from "helpers/utils";
-import * as api from "../api";
+import * as api from "../../api";
 import MultiSerialSearch from "./MultiSerialSearch";
 
 /*
   api mocks
 */
-jest.mock("../api");
+jest.mock("../../api");
 api.fetchSerialResults.mockImplementation(
   () => new Promise(resolve => resolve(bikeResponse))
 );

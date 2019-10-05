@@ -1,11 +1,11 @@
 FactoryBot.define do
   factory :stolen_record do
-    bike { FactoryBot.create(:bike) }
+    bike { FactoryBot.create(:bike, stolen: true) }
     date_stolen { Time.current }
 
     factory :stolen_record_recovered do
       bike { FactoryBot.create(:bike) }
-      date_recovered { Time.current }
+      recovered_at { Time.current }
       recovered_description { "Awesome help by Bike Index" }
       current { false }
     end
@@ -25,6 +25,24 @@ FactoryBot.define do
 
     trait :with_bike_image do
       bike { FactoryBot.create(:bike, :with_image) }
+    end
+
+    trait :in_los_angeles do
+      city { "Los Angeles" }
+      state { State.find_or_create_by(FactoryBot.attributes_for(:state_california)) }
+      country { Country.united_states }
+    end
+
+    trait :in_nyc do
+      city { "New York" }
+      state { State.find_or_create_by(FactoryBot.attributes_for(:state_new_york)) }
+      country { Country.united_states }
+    end
+
+    trait :in_amsterdam do
+      city { "Amsterdam" }
+      state { nil }
+      country { Country.netherlands }
     end
   end
 end

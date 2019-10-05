@@ -32,8 +32,6 @@ class Admin::StolenBikesController < Admin::BaseController
   def edit
     @customer_contact = CustomerContact.new(user_email: @bike.owner_email)
     @bike = @bike.decorate
-    @alert_image_versions =
-      @bike&.current_stolen_record&.current_alert_image&.image&.versions || []
   end
 
   def update

@@ -4,14 +4,13 @@
       - if @text.present?
         = @text
       - else
-        My Indexed
-        = "Bike".pluralize(@bikes.count)
+        = t(".my_indexed_bikes", bikes_count: t(".bike").pluralize(@bikes.count))
+
   .bi-slide-over
   - if @bikes.count > 1
-    %a#bi-slide-prev.controleys
-      <
-    %a#bi-slide-next.controleys
-      >
+    %a#bi-slide-prev.controleys <
+    %a#bi-slide-next.controleys >
+
   #slider
     .swipe-wrap
       - @bikes.each do |bike|
@@ -20,9 +19,7 @@
           - if bike.thumb_path
             = image_tag(bike.thumb_path, alt: bike.title_string, class: "bike-photo")
           - else
-            %span.no-bike-photo
-              no photo
+            %span.no-bike-photo= t(".no_photo")
             = image_tag("bike_photo_placeholder.png", alt: bike.title_string, class: "bike-photo")
           .bi-title
             = bike.title_string
-            

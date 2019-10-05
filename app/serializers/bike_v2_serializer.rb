@@ -1,17 +1,33 @@
 class BikeV2Serializer < ActiveModel::Serializer
-  attributes :id,
-    :title,
-    :serial,
-    :manufacturer_name,
-    :frame_model,
-    :year,
+  attributes \
+    :date_stolen,
+    :description,
     :frame_colors,
-    :thumb,
-    :large_img,
+    :frame_model,
+    :id,
     :is_stock_img,
+    :large_img,
+    :location_found,
+    :manufacturer_name,
+    :external_id,
+    :registry_name,
+    :registry_url,
+    :serial,
+    :status,
     :stolen,
     :stolen_location,
-    :date_stolen
+    :thumb,
+    :title,
+    :url,
+    :year
+
+  attr_accessor \
+    :location_found,
+    :external_id,
+    :registry_name,
+    :registry_url,
+    :status,
+    :url
 
   def serial
     object.serial_display

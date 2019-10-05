@@ -23,7 +23,7 @@
           %td
             Email: Newsletters
           %td
-            = "&#x2713;".html_safe if @user.notification_newsletters
+            = check_mark if @user.notification_newsletters
         %tr
           %td
             Vendor terms?
@@ -35,7 +35,7 @@
           %td
             Email: Unstolen
           %td
-            = "&#x2713;".html_safe if @user.notification_unstolen
+            = check_mark if @user.notification_unstolen
         %tr
           %td
             Created
@@ -63,7 +63,7 @@
           Confirmed?
         %td
           - if @user.confirmed?
-            = "&#x2713;".html_safe
+            = check_mark
       %tr
         %td
           email
@@ -98,7 +98,7 @@
         %td
           Ambassador?
         %td
-          = "&#x2713;".html_safe if @user.ambassador?
+          = check_mark if @user.ambassador?
       %tr
         %td
           Phone
@@ -162,7 +162,7 @@
         %td
           = payment.amount
         %td
-          = "&#x2713;".html_safe if payment.is_payment
+          = check_mark if payment.is_payment
 
 .row
   .col-md-6
@@ -197,9 +197,9 @@
                 = l user_email.created_at, format: :convert_time
           %td= user_email.email
           %td
-            = "&#x2713;".html_safe if user_email.confirmed
+            = check_mark if user_email.confirmed
           %td
-            = "&#x2713;".html_safe if user_email.primary
+            = check_mark if user_email.primary
           %td
             = user_email.old_user_id
 
@@ -227,7 +227,11 @@
         = f.label :secondary_emails
         = text_area_tag :secondary_emails, @user.secondary_emails.join(", "), disabled: true, rows: 1, class: "form-control"
   .row
-    .col-md-5
+    .col-md-6
+      .form-group
+        = f.label :phone
+        = f.text_field :phone, class: "form-control"
+    .col-lg-3.col-6
       .form-group
         .form-check
           = f.check_box :confirmed, disabled: @user.confirmed, class: "form-check-input"
@@ -240,7 +244,7 @@
         .form-check.form-check-inline
           = f.check_box :can_send_many_stolen_notifications, class: "form-check-input"
           = f.label :can_send_many_stolen_notifications, class: "form-check-label"
-    .col-md-5
+    .col-lg-3.col-6
       .form-group
         .form-check.form-check-inline
           = f.check_box :superuser, class: "form-check-input"
@@ -250,8 +254,9 @@
           .form-check.form-check-inline
             = f.check_box :developer, class: "form-check-input"
             = f.label :developer, class: "form-check-label"
-    .col-md-2
-      = f.submit 'Save', class: 'btn btn-success'
+    .col-6
+      .form-group.mt-2
+        = f.submit 'Save', class: 'btn btn-success'
 
 %hr{ style: "margin-top: 60px;" }
 .mt-4.mb-4.row

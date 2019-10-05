@@ -1,15 +1,17 @@
 .container-fluid
   .row.donate-block
     .col-xs-12
-      %h3 Thank you for supporting Bike Index!
+      %h3= t(".thank_you_for_supporting_bike_index")
     .select-amount
+      - payment_amount = "$#{@payment.amount}"
+
       - if @payment.is_donation
         %p
-          Your donation of $#{@payment.amount} just saved the bikes.
+          = t(".your_donation_saved_bikes", amount: payment_amount)
         %p.padded
-          XOXO,
+          = t(".xoxo")
           %br
-          Bike Index team
+          = t(".bike_index_team")
       - else
         %p
-          We received your payment of $#{@payment.amount}
+          = t(".we_received_your_payment_of", amount: payment_amount)

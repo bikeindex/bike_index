@@ -33,11 +33,40 @@
 
     - police_report_present = stolen_record.police_report_number.present?
     - submitted_to_police_services = police_report_present && !serial_unknown
+
+    -# We only have recommendations for reporting your theft to police if your bike is reported stolen in the Netherlands
+    - if stolen_record.country == Country.netherlands
+      %li{ class: police_report_present ? "completed-item" : "" }
+        %span.checklist-checkbox
+          = "&#10003;".html_safe if police_report_present
+        %span.checklist-text
+          = t(".nl_file_police_report")
+        - unless police_report_present
+          %ul
+            %li
+              %span.checklist-uncheckbox
+              %strong
+                = t(".nl_online")
+              = link_to t(".nl_website_link_text"), "https://www.politie.nl/aangifte-of-melding-doen/voorbereiding-aangifte/diefstal-fiets.html", target: "_blank"
+              %em
+                = t(".nl_digid_required")
+            %li
+              %span.checklist-uncheckbox
+              %strong
+                = t(".nl_phone")
+              = t(".nl_phone_report")
+            %li
+              %span.checklist-uncheckbox
+              %strong
+                = t(".nl_person")
+              = t(".nl_person_report")
+              = link_to "www.politie.nl/mijn-buurt/politiebureaus", "https://www.politie.nl/mijn-buurt/politiebureaus"
+
     %li{ class: police_report_present ? "completed-item" : "" }
       %span.checklist-checkbox
         = "&#10003;".html_safe if police_report_present
       %span.checklist-text
-        - bike_link = link_to(t(".a_police_report"), edit_bike_path(id: @bike.to_param, page: "theft_details"))
+        - bike_link = link_to(t(".your_police_report"), edit_bike_path(id: @bike.to_param, page: "theft_details"))
         = t(".add_bike_link_to_your_theft_report_html", bike_link: bike_link)
       %ul
         %li{ class: submitted_to_police_services ? "completed-item" : "" }

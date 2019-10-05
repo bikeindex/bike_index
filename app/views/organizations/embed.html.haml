@@ -10,22 +10,22 @@
     - unless @stolen || @non_stolen
       #registration-type-tabs
         %a.registration-type-tab{ href: '#', data: { stype: 'description' } }
-          Registering a stolen bike. Click here to register a non-stolen bike
+          = t(".registering_a_stolen_bike_click_here")
         %a.registration-type-tab.stolen.current-type{ href: '#', data: { stype: 'serial' } }
-          Currently registering a non-stolen bike. Click here to register a STOLEN bike instead.
+          = t(".currently_registering_a_nonstolen_bike")
     .control-group
       = f.label :serial_number, class: "control-label"
       .controls
         = f.text_field :serial_number, :required =>true, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
       - if @organization.include_field_reg_secondary_serial?
-        - label_secondary_serial = @organization.registration_field_label("reg_secondary_serial") || "Additional serial/sticker number"
+        - label_secondary_serial = @organization.registration_field_label("reg_secondary_serial") || t(".additional_serial")
         = f.label :additional_registration, label_secondary_serial, class: "control-label"
         .controls
           = f.text_field :additional_registration, autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off'
     .has-no-serial.optional-block
       %label
         = check_box_tag :has_no_serial, true, @bike.serial_unknown?, tabindex: -1
-        Unknown serial
+        = t(".unknown_serial")
 
   .input-group.with-additional-block
     .control-group.select-jsonified
@@ -33,22 +33,22 @@
       .controls
         = f.text_field :manufacturer_id, value: @bike.manufacturer && @bike.manufacturer.name
         %span.help-block
-          Select 'Other' if manufacturer isn't listed
+          = t(".select_other_if_manufacturer_isnt_listed")
     .hidden-other.control-group.manufacturer-other-input
-      = f.label :manufacturer_other, "Other manufacturer", class: "control-label"
+      = f.label :manufacturer_other, t(".other_manufacturer"), class: "control-label"
       .controls
-        = f.text_field :manufacturer_other, placeholder: "Manufacturer name"
+        = f.text_field :manufacturer_other, placeholder: t(".manufacturer_name")
 
   .input-group
     .control-group.special-select-single
-      = f.label :year, "Model year", class: "control-label"
+      = f.label :year, t(".model_year"), class: "control-label"
       .controls
         - years = (1900..Time.current.year+1).to_a.reverse.map {|i| [i,i] }
-        = f.select :year, years, selected: Time.current.year, prompt: "Unsure or unknown"
+        = f.select :year, years, selected: Time.current.year, prompt: t(".unsure_or_unknown")
     .unknown-year.optional-block
       %label
         %input#bike_unknown_year{ type: 'checkbox', tabindex: -1 }
-        Unknown year
+        = t(".unknown_year")
 
   .input-group
     .control-group
@@ -58,29 +58,29 @@
 
   .input-group.with-optional-blocks
     .control-group.special-select-single
-      = f.label :primary_frame_color_id, "Frame color", class: "control-label"
+      = f.label :primary_frame_color_id, t(".frame_color"), class: "control-label"
       .controls
-        = select(:bike, :primary_frame_color_id, Color.select_options, required: true, prompt: "Choose color")
+        = select(:bike, :primary_frame_color_id, Color.select_options, required: true, prompt: t(".choose_color"))
     %a#add-secondary.optional-form-block{data: {target: "#secondary-color", toggle: "#rm-secondary"}}
-      Add a color
+      = t(".add_a_color")
     %a#rm-secondary.optional-form-block.rm-block.currently-hidden{data: {target: "#secondary-color", toggle: "#add-secondary"}}
-      Remove color
+      = t(".remove_color")
     #secondary-color.hidden-other
       .control-group.special-select-single
         %label.control-label
-          Secondary color
+          = t(".secondary_color")
         .controls
-          = select(:bike, :secondary_frame_color_id, Color.select_options, prompt: "Choose color")
+          = select(:bike, :secondary_frame_color_id, Color.select_options, prompt: t(".choose_color"))
       %a#add-tertiary.optional-form-block{data: {target: "#tertiary-color", toggle: "#rm-tertiary"}}
-        Add a color
+        = t(".add_a_color")
       %a#rm-tertiary.optional-form-block.rm-block.currently-hidden{data: {target: "#tertiary-color", toggle: "#add-tertiary"}}
-        Remove color
+        = t(".remove_color")
     #tertiary-color.hidden-other
       .control-group
         %label.control-label
-          Third color
+          = t(".third_color")
         .controls.special-select-single
-          = select(:bike, :tertiary_frame_color_id, Color.select_options, prompt: "Choose color")
+          = select(:bike, :tertiary_frame_color_id, Color.select_options, prompt: t(".choose_color"))
 
   #stolen_fields_container
     #stolen_fields
@@ -95,44 +95,38 @@
                 = builder.text_field :phone, required: "true"
         .input-group#stolenDisplay
           .control-group{ style: "width: 300px; max-width: 100%;" }
-            = builder.label :date_stolen, "When was it stolen?", class: "control-label"
+            = builder.label :date_stolen, t(".when_was_it_stolen"), class: "control-label"
             - builder.object.date_stolen = TimeParser.round(builder.object.date_stolen || Time.current)
             = builder.hidden_field :timezone, value: "", class: "hiddenFieldTimezone"
             = builder.datetime_local_field :date_stolen, max: Time.current + 1.day, step: 3600, required: true, class: 'form-control', style: "font-size: 90%; width: 100%;"
         #stolen-bike-location.input-group
           .control-group.special-select-single
-            = builder.label :street, 'Where was it stolen?', class: 'control-label'
+            = builder.label :street, t(".where_was_it_stolen"), class: 'control-label'
             #country_select_container.controls.special-select-single
-              = builder.select(:country_id, Country.select_options, prompt: 'Choose country')
+              = builder.select(:country_id, Country.select_options, prompt: t(".choose_country"))
           .control-group.extra-group.special-select-single
             .controls
-              = builder.text_field :street, placeholder: "Intersection or address"
+              = builder.text_field :street, placeholder: t(".intersection_or_address")
             .controls.extra-field
-              = builder.text_field :city, placeholder: "City"
+              = builder.text_field :city, placeholder: t(".city")
             .controls.extra-field
-              = builder.text_field :zipcode, placeholder: "Zipcode"
+              = builder.text_field :zipcode, placeholder: t(".zipcode")
             #state-select.controls.extra-field.special-select-single
-              = builder.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: "State" )
+              = builder.collection_select(:state_id, State.all, :id, :name, include_blank: true, prompt: t(".state") )
         .input-group
           .control-group.large-text
-            = builder.label :theft_description, "Description of the theft", class: "control-label"
+            = builder.label :theft_description, t(".description_of_the_theft"), class: "control-label"
             .controls
               = builder.text_area :theft_description, rows: 3
         .input-group
           %p.stolen-suggestion
-            Filing a
-            %strong
-              police report
-            is
-            %span.stolen-color
-              extremely important
-            for stolen bike recovery.
+            = t(".filing_a_police_report_is_important_html")
           .control-group
-            = builder.label :police_report_number, "Police report number", class: 'control-label'
+            = builder.label :police_report_number, t(".police_report_number"), class: 'control-label'
             .controls
               = builder.text_field :police_report_number
           .control-group.extra-group
-            = builder.label :police_report_department, "Department & city", class: 'control-label'
+            = builder.label :police_report_department, t(".department_city"), class: 'control-label'
             .controls
               = builder.text_field :police_report_department
         .input-group
@@ -140,25 +134,25 @@
             .receive-notifications
               = builder.label :receive_notifications do
                 = builder.check_box :receive_notifications, checked: true
-                Receive notifications from the Index about this stolen #{@bike.type}
+                = t(".receive_notifications_from_bike_index", bike_type: @bike.type)
                 %span
-                  eg if we tweet about or someone searches for it's serial number
+                  = t(".eg_if_we_tweet_about_or_someone_searches")
   - if @organization&.include_field_reg_address?
-    - label_address = @organization.registration_field_label("reg_address") || "Owner's Street address"
+    - label_address = @organization.registration_field_label("reg_address") || t(".owners_street_address")
     / Set all the bike address attrs
     - @bike.attributes = { address: @b_param.address("address"), address_city: @b_param.address("city"), address_zipcode: @b_param.address("zipcode"), address_state: @b_param.address("state") }
     .input-group
       = f.label :address, label_address
       .controls
-        = f.text_field :address, required: true, placeholder: "Address"
+        = f.text_field :address, required: true, placeholder: t(".address")
       .controls.extra-field
-        = f.text_field :address_city, required: true, placeholder: "City"
+        = f.text_field :address_city, required: true, placeholder: t(".city")
       .controls.extra-field
-        = f.text_field :address_zipcode, required: true, placeholder: "Zipcode"
+        = f.text_field :address_zipcode, required: true, placeholder: t(".zipcode")
       #state-select.controls.extra-field.special-select-single
-        = f.collection_select(:address_state, State.all, :abbreviation, :name, include_blank: true, required: true, prompt: "State" )
+        = f.collection_select(:address_state, State.all, :abbreviation, :name, include_blank: true, required: true, prompt: t(".state"))
   - if @organization&.include_field_reg_phone?
-    - label_phone = @organization.registration_field_label("reg_phone") || "Your phone number"
+    - label_phone = @organization.registration_field_label("reg_phone") || t(".your_phone_number")
     .input-group
       = f.label :phone, label_phone
       .controls
@@ -167,22 +161,22 @@
   .input-group.form-foot
     .control-group
       %label.control-label{ for: 'bike_owner_email' }
-        Your email address
+        = t(".your_email_address")
       .controls
         = f.email_field :owner_email
     .submit-registration
-      = submit_tag "Register", class: "button-submit"
+      = submit_tag t(".register"), class: "button-submit"
       %span.what-you-register
-        this
+        = t(".this")
       = select(:bike, :cycle_type, CycleType.select_options, { required: true })
 
   .input-group.optional-group.form-photo-group
     - if @b_param.image.present? or @b_param.image_tmp.present?
       %strong
-        Image has been uploaded
+        = t(".image_has_been_uploaded")
     - else
       .filefield-button
         = f.file_field :image
       #filepath
       %span
-        Optional - upload a photo
+        = t(".optional_upload_a_photo")

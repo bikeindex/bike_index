@@ -1,7 +1,9 @@
-/ Rendering errors requires an `obj` and also a `name`
+-# Rendering errors requires an `obj` and also a `name`
+
 .alert.alert-danger
   %h4
-    #{ pluralize(obj.errors.count, 'error') } prevented this #{name} from being saved:
+    - errors_count = pluralize(obj.errors.count, t(".error"))
+    = t(".errors_prevented_this_from_being_saved", errors_count: errors_count, object_name: name)
   %ul
     - obj.errors.full_messages.each do |message|
       %li

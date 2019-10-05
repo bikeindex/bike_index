@@ -36,8 +36,35 @@ FactoryBot.define do
         bike.save # updates current_stolen_record
         bike.reload
       end
+
       factory :abandoned_bike do
         abandoned { true }
+      end
+
+      factory :recovered_bike do
+        stolen { false }
+      end
+
+      factory :stolen_bike_in_amsterdam do
+        after(:create) do |bike, evaluator|
+          create(:stolen_record, :in_amsterdam, bike: bike, latitude: evaluator.latitude, longitude: evaluator.longitude)
+          bike.save # updates current_stolen_record
+          bike.reload
+        end
+      end
+      factory :stolen_bike_in_los_angeles do
+        after(:create) do |bike, evaluator|
+          create(:stolen_record, :in_los_angeles, bike: bike, latitude: evaluator.latitude, longitude: evaluator.longitude)
+          bike.save # updates current_stolen_record
+          bike.reload
+        end
+      end
+      factory :stolen_bike_in_nyc do
+        after(:create) do |bike, evaluator|
+          create(:stolen_record, :in_nyc, bike: bike, latitude: evaluator.latitude, longitude: evaluator.longitude)
+          bike.save # updates current_stolen_record
+          bike.reload
+        end
       end
     end
 
@@ -92,6 +119,18 @@ FactoryBot.define do
           bike.reload
         end
       end
+    end
+
+    trait :blue_trek_930 do
+      frame_model { "930" }
+      manufacturer { FactoryBot.create(:manufacturer, name: "Trek") }
+      primary_frame_color { FactoryBot.create(:color, name: "Blue") }
+    end
+
+    trait :green_novara_torero do
+      frame_model { "Torero 29\"" }
+      manufacturer { FactoryBot.create(:manufacturer, name: "Novara") }
+      primary_frame_color { FactoryBot.create(:color, name: "Green") }
     end
   end
 end

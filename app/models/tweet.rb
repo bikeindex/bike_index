@@ -1,9 +1,22 @@
 class Tweet < ActiveRecord::Base
   validates :twitter_id, presence: true, uniqueness: true
   has_many :public_images, as: :imageable, dependent: :destroy
+
+  belongs_to :twitter_account
+  belongs_to :stolen_record
+
+  belongs_to :original_tweet, class_name: "Tweet"
+  has_many :retweets,
+           foreign_key: :original_tweet_id,
+           class_name: "Tweet",
+           dependent: :destroy
+
   mount_uploader :image, ImageUploader
+
   before_save :set_body_from_response
   before_validation :ensure_valid_alignment
+
+  scope :excluding_retweets, -> { where(original_tweet: nil) }
 
   def self.friendly_find(id)
     return nil if id.blank?
@@ -20,6 +33,10 @@ class Tweet < ActiveRecord::Base
       hashtag = Regexp.last_match[0]
       "<a href=\"https://twitter.com/hashtag/#{hashtag.delete("#")}\" target=\"_blank\">#{hashtag}</a>"
     end
+  end
+
+  def retweet?
+    original_tweet.present?
   end
 
   def to_param
@@ -47,6 +64,7 @@ class Tweet < ActiveRecord::Base
   end
 
   def tweetor
+    return twitter_account.screen_name if twitter_account&.screen_name.present?
     trh["user"] && trh["user"]["screen_name"]
   end
 
@@ -59,10 +77,33 @@ class Tweet < ActiveRecord::Base
   end
 
   def tweetor_link
-    "https://twitter.com/#{tweetor}"
+    twitter_account&.twitter_account_url || "https://twitter.com/#{tweetor}"
   end
 
   def tweet_link
-    "https://twitter.com/#{tweetor}/status/#{twitter_id}"
+    if twitter_account.present?
+      [twitter_account.twitter_account_url, "status", twitter_id].join("/")
+    else
+      "https://twitter.com/#{tweetor}/status/#{twitter_id}"
+    end
+  end
+
+  def details_hash
+    @details_hash ||= begin
+      {}.tap do |details|
+        details[:notification_type] = "stolen_twitter_alerter"
+        details[:bike_id] = stolen_record&.bike&.id
+        details[:tweet_id] = twitter_id
+        details[:tweet_string] = body_html
+        details[:tweet_account_screen_name] = tweetor
+        details[:tweet_account_name] = twitter_account&.account_info_name
+        details[:tweet_account_image] = twitter_account&.account_info_image
+        details[:retweet_screen_names] = retweets.map(&:tweetor)
+
+        if !twitter_account&.national? && twitter_account&.address.present?
+          details[:location] = twitter_account.address.split(",").first.strip
+        end
+      end
+    end
   end
 end

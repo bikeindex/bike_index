@@ -1,36 +1,8 @@
 .row
   .col-sm-9.col-md-10
-    %h1
-      Tweets
+    %h1 Tweets
   .col-sm-3.col-md-2
     = link_to 'New Tweet', new_admin_tweet_path, class: "btn btn-success float-right"
-%h4
-  #{Tweet.count} tweets stored
-.full-screen-table-wrapper
-  %table.table.table-striped.table-bordered.table-sm
-    %thead.thead-light
-      %th
-        Created
-      %th
-        Twitter id
-      %th
-        By
-      %th
-        Tweet
-      %th
-        Image?
-    %tbody
-      - @tweets.each do |tweet|
-        %tr
-          %td
-            %a.convertTime{ href: admin_tweet_path(tweet.id) }
-              = l tweet.created_at, format: :convert_time
-          %td
-            %small.less-strong
-              = tweet.twitter_id
-          %td
-            = tweet.tweetor
-          %td
-            = strip_tags(tweet.body_html)
-          %td
-            = "&#x2713;".html_safe if tweet.image.present?
+
+%h4= "#{Tweet.count} tweets stored"
+= render "admin/tweets/tweets", tweets: @tweets

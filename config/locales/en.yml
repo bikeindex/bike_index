@@ -270,6 +270,7 @@ en:
         creator: :activerecord.models.creator
         creator_email: Creator email
         info_hash: Info hash
+        kind: Kind
         title: Title
         user: :activerecord.models.user
         user_email: User email
@@ -547,11 +548,11 @@ en:
         slug: Slug
         standard: Standard
       recovery_display:
-        date_recovered: Date recovered
         image: Image
         link: Link
         quote: Quote
         quote_by: Quote by
+        recovered_at: Date recovered
         stolen_record: :activerecord.models.stolen_record
       state:
         abbreviation: Abbreviation
@@ -578,7 +579,6 @@ en:
         creation_organization: :activerecord.models.creation_organization
         current: Current
         current_bike: :activerecord.models.current_bike
-        date_recovered: Date recovered
         date_stolen: Date stolen
         estimated_value: Estimated value
         index_helped_recovery: Index helped recovery
@@ -595,6 +595,7 @@ en:
         police_report_number: Police report number
         proof_of_ownership: Proof of ownership
         receive_notifications: Receive notifications
+        recovered_at: Date recovered
         recovered_description: Recovered description
         recovering_user: :activerecord.models.recovering_user
         recovery_display: :activerecord.models.recovery_display
@@ -1143,12 +1144,15 @@ en:
     index:
       all: All
       anywhere: Anywhere
+      external_matches_found: Matches found in external registries
       miles_of: miles of
       no_bikes_matched: No %{stolenness} bikes matched your search
+      no_external_matches_found: No matches found in external registries
       not_marked_stolen: Not marked stolen
       search_bike_descriptions: Search bike descriptions
       search_for_serial_number: Search for serial number
       search_for_stolenness_desc_bikes: Search for %{stolenness_desc} bikes
+      searching_external_registries: Searching external registries...
       stolen_anywhere: Stolen anywhere
       stolen_within: Stolen within
       submit: submit
@@ -1373,7 +1377,6 @@ en:
         to this %{bike_type}.
     stolen_checklist:
       a_photo_of_your_bike_type: a photo of your %{bike_type}
-      a_police_report: a Police Report Number
       add: Add
       add_bike_link_to_your_theft_report_html: Add %{bike_link} to your theft report
       add_serial_number: Add serial number
@@ -1386,6 +1389,16 @@ en:
       leads_online_url: https://bikeindex.org/news/bike-index-partners-with-leads-online
       list_bike_type_on_bike_index: List %{bike_type} on Bike Index
       location_where_the_theft_occurred: location where the theft occurred
+      nl_digid_required: "(DigiD required)"
+      nl_file_police_report: File a Police report!
+      nl_online: Online
+      nl_person: In Person
+      nl_person_report: Search for the closest police station,
+      nl_phone: By Phone
+      nl_phone_report: >-
+        call 0900-8844. You will usually get a phone call appointment for later, at
+        which point you'll give the information to the Police
+      nl_website_link_text: at this plitie.nl webpage
       promoted_stolen_bike_alerts: Promoted Stolen Bike Alerts
       push_bike_info_to: Push bike info to
       push_bike_info_to_law_enforcement: >-
@@ -1397,6 +1410,7 @@ en:
         listing)
       share_widely_on_your_personal_social: Share widely on your personal social media
       supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
+      your_police_report: your Police Report Number
     theft_alerts_table:
       created: Created
       end: End
@@ -1453,6 +1467,13 @@ en:
         sign_up_or_in: >-
           Sign up or sign in to BikeIndex.org to claim your %{bike_type} and edit
           it, upload photos and make sure you never lose track of your trusty steed!
+    bike_possibly_found_email:
+      html:
+        check_out_match_here: 'Check out the match here:'
+        we_think_your_stolen_bike_html: We may have found your stolen <strong>%{bike_title}</strong>!
+      text:
+        check_out_match_here: 'Check out the match here:'
+        we_think_your_stolen_bike: We may have found your stolen %{bike_title}!
     confirmation_email:
       html:
         click_to_verify_html: Click the <em>Verify email</em> button to finish signing
@@ -1824,6 +1845,20 @@ en:
         We're sorry, We can't do what you just asked. Think you ought to be able to?
         Email us: %{email_link}.
       send_me_back: Send me back from whence I came!
+  feedbacks:
+    form:
+      email_address: Email address
+      name: Name
+      send_it: Send it!
+      subject: Subject
+      your_message: Your message
+    index:
+      contact_us: Contact us!
+      have_a_question_we_havent_answered: Have a question we haven't answered?
+      help_with_bike_index: Help with Bike Index
+      log_in_to_send_a_comment: Log in to send a comment!
+      you_can_reach_us_at_contact_html: You can reach us at %{contact_link}, or send
+        your message right here.
   helpers:
     page_entries_info:
       more_pages:
@@ -1917,6 +1952,82 @@ en:
       our_api_documentation: Our API documentation
       trifold_flyer: Trifold Flyer
       trifold_flyer_pdf_url: https://files.bikeindex.org/stored/Bike-Index-TriFold.pdf
+    image_resources:
+      basic_logo_alt: Basic logo
+      basic_logo_html: Basic logo (%{svg_link}, %{png_link})
+      basic_logo_in_white_html: Basic logo in white (%{svg_link}, %{png_link})
+      bike_index_image_assets: Bike Index image assets
+      black_background_shown_here: Black background shown here for visibility
+      check_out_resources_html: Check out %{resources_link} for additional design
+        resources
+      image_has_no_background: image has no background, shown here with black for
+        visibility
+      logo_with_background_cutout_html: Logo with background cutout (%{svg_link},
+        %{png_link})
+      logo_with_blue_shield_html: Logo with blue shield and white text (%{svg_link},
+        %{png_link})
+      logo_with_cutout: Logo with background cutout
+      logo_with_stripes: Logo with stripes
+      single_color_logo: Single color logo
+      single_color_logo_in_white: Single color logo in white
+      striped_logo_html: Striped logo (%{svg_link}, %{png_link})
+    lightspeed:
+      a_few_things_to_note: 'A few things to note:'
+      a_listing_on_bike_index_will_be_created: >-
+        Once your Lightspeed Retail account is connected to your Bike Index account
+        with automatic registration turned on, a listing on Bike Index will be automatically
+        created for every bicycle you sell. All you need to do is add the customer's
+        email address and the bicycle's serial number during a normal Lightspeed Retail
+        checkout.
+      all_you_have_to_do_is_go_to_html: >-
+        All you have to do is go to %{link}, where you'll be asked to authorize Bike
+        Index to access your Lightspeed Account.
+      bicycles_sold_before_you_activated_lights: >-
+        Bicycles sold before you activated Lightspeed Retail integration will not
+        be registered.
+      bike_index_cofounder: Bike Index co-founder
+      how_to_lightspeed_retail: 'How to: Lightspeed Retail and Bike Index Integration'
+      i_started_bike_index_because: >-
+        I started Bike Index because I wanted to register bikes for my customers at
+        the shop where I worked – with this integration, we finally give shops a way
+        to register bikes that doesn't interfere with selling them.
+      learn_more_about: Learn more about
+      lightspeed_retail: Lightspeed Retail
+      once_you_have_a_bike_index_account_set_up: >-
+        Once you have a Bike Index account set up for your shop, there will be a link
+        on this page to take you to the integration.
+      privacy_policy_here: Privacy Policy here
+      sign_your_shop_up: Sign your shop up
+      the_bicycles_owner_will_receive_an_email: >-
+        The bicycle's owner will receive an email with all the information he or she
+        needs to log in and maintain the account as well as a PDF copy of the registration
+        information.
+      the_first_step_is_to_create_an_account_html: >-
+        The first step is to create an account for yourself and your shop - you can
+        do that <a href='#add_organization' class='scroll-to-ref'>at the bottom of
+        this page</a>
+      this_page_gives_instructions_html: >-
+        This page gives instructions on integrating Bike Index registration with your
+        Lightspeed Retail POS system. <strong><a href="%{about_url}">Read our about
+        page</a></strong> for general information about what Bike Index is and why
+        it's important.
+      we_believe_that_bicycle_registration: >-
+        At Bike Index we believe that bicycle registration is one of the simplest
+        and most effective ways to fight bicycle theft. By offering complete integration
+        with Lightspeed Retail, we've made registration a quick, painless, and automated
+        process for you and your customers.
+      we_know_you_and_your_customers_html: >-
+        We know you and your customers are concerned about privacy and access to your
+        sales and customer information. Bike Index is committed to keeping your information
+        safe and secure, and we will never send your customers unsolicited email.
+        You can view our %{link}.
+      were_happy_to_answer_any_questions_html: >-
+        We're happy to answer any questions you have about making Bike Index work
+        with Lightspeed Retail and we're always looking for ways to improve the integration.
+        Please %{link} with any questions, concerns, comments, or suggestions.
+      write_do_not_register: >-
+        If a customer doesn't want a bike to be added to Bike Index, simply write
+        "DO NOT REGISTER" in the notes for the sale and the bicycle will not be registered.
     privacy:
       available_here: available here
       changes: Changes
@@ -1991,6 +2102,145 @@ en:
         Any questions about this Privacy Policy should be addressed to <a href="mailto:contact@bikeindex.org">contact@bikeindex.org</a>
       see_terms_link_html: Please see the %{terms_link} for definitions of terms.
       terms_of_service: Terms of Service
+    protect_your_bike:
+      211547_bikes_were_reported_stolen: 211,547 bikes were reported stolen
+      9_in_10_incidents_of_bike_theft: 9 in 10 incidents of bike theft
+      a_correctly_locked_bicycle: A correctly locked bicycle
+      according_to_fbi_statistics_html: >-
+        According to FBI statistics, %{stolen_link} in 2014, the most recent available
+        year with data. An estimated %{theft_link} go unreported. That's a lot of
+        bikes! If you would like to read more about bike theft in the US, check out
+        Priceonomics's %{priceonomics_link} of the topic. %{back_link}.
+      aim_to_have_the_hardest_bike_to_steal_on_: >-
+        Aim to have the hardest bike to steal on the rack. We consider two U-locks,
+        or a U-lock and one heavy duty cable, to be the minimum required in large
+        cities to keep a bike secure.
+      cable_locks_should_never_be_used_as_primary: Cable locks should never be used
+        as a primary means of locking a bike in a city.
+      cheaper_and_older_ulocks_can_often_be_broken: Cheaper and older U-locks can
+        often be broken without any tools.
+      correctly_locking_a_bike: Correctly locking a bike
+      dont_rely_on_foot_traffic_to_keep_your_bi: >-
+        Don't rely on foot traffic to keep your bike safe; years of reports have taught
+        us that many thefts, particularly those involving cutting cable locks, occur
+        under the cover of crowd activity or in front of bustling cafés or restaurants.
+      dont_rely_on_the_presence_of_cameras_to_k: >-
+        Don't rely on the presence of cameras to keep your bike secure. Security footage
+        is rarely of much use once a bike is gone, and thieves know this.
+      exploration: exploration
+      jump_to_footnote_1: Jump back to footnote 1 in the text
+      make_sure_your_bike_isnt_one_of_them: Make sure your bike isn't one of them
+      many_bicycles_are_stolen_from_garages_and: >-
+        Many bicycles are stolen from garages and store rooms. Lock your bike securely
+        to an immovable object even if in a "secure" place.
+      over_a_million_bikes_are_stolen_yearly: Over a million bikes are stolen every
+        year in the US
+      pink_power_ulocks: Pink Power U-Locks are a registered trademark of Bike Index,
+        NFP
+      protect_your_bike: Protect your bike!
+      thanks_to_researchers_html: >-
+        Thanks to %{chicago_link} for suggestions and the research behind these guidelines.
+        Thanks to %{sweethome_link} for their excellent article on choosing a lock.
+      the_frame_is_locked_to_an_immovable_objec: The frame is locked to an immovable
+        object. Both wheels are secured.
+      tug_on_whatever_youre_about_to_lock_to_ma: >-
+        Tug on whatever you're about to lock to make sure it can't be easily removed.
+        Signposts in particular can be easily removed by unbolting them and some are
+        already unattached.
+      use_a_ulock_that_costs_at_least_40: Use a u-lock that costs at least $40.
+    resources:
+      api_documentation: API documentation
+      bike_index_resources: Bike Index Resources
+      check_out_our_link_html: Check out our %{link}.
+      did_you_know_every_bike_html: Did you know every bike has a unique, identifying
+        number? %{link}.
+      get_bike_index_html: Get Bike Index %{link}.
+      how_not_to_buy_a_stolen_bike: How not to buy a stolen bike in 4 easy steps
+      infographic_html: "<strong>Infographic</strong>: %{link}"
+      learn_about_serial_numbers_here: Learn about serial numbers here
+      logos_and_design_assets: logos and design assets
+      map_of_bike_thefts: map of bike thefts
+      the_manufacturers: the manufacturers
+      view_the_list_of_all_html: View the list of all %{link} we know about.
+      we_have_an_open_api_check_out_html: We have an open API - check out our %{link}.
+      were_open_source_view_this_app_html: We're open source, view this app (and other
+        things) on %{github_link}.
+    serials:
+      a_serial_number_located_on_a_html: >-
+        A serial number located on a <em>rear dropout</em>. Some BMX bikes and a few
+        Schwinn bicycles place the serial on the rear dropout.  On older Schwinns
+        there are numbers stamped on both the drive side and non-drive side rear dropouts;
+        the one on the non-drive side dropout is the serial number.
+      a_serial_number_on_the_underside_html: A serial number on the underside of a
+        <em>bottom bracket</em>.
+      all_bikes: All bikes
+      all_have_unique_serial_numbers: all have unique serial numbers.
+      another_serial_number_beneath_html: >-
+        Another serial number beneath the <em>bottom bracket</em>, aligned parallel
+        to the frame.
+      another_standard_serial_number: >-
+        Another standard serial number. Sometime to be replaced with a serial number
+        covered up by routing.
+      bike_serial_numbers: Bike Serial numbers
+      bike_with_bottom_circled: Bike with bottom bracket circled
+      certain_numbers_and_letters_html: >-
+        Certain numbers and letters are difficult or impossible to distinguish between
+        (e.g. 0 and O, S and 5). We treat all these numbers the same way - <em>a search
+        for <code>005LLL</code> will match a bike with the serial <code>OOS111</code></em>.
+      doberman_serial: Doberman dropout serial number
+      finding_a_bicycle_serial_number: Finding a bicycle serial number
+      finding_bicycles_by_serial_number_html: >-
+        Finding bicycles by serial number on Bike Index is a <em>critical</em> part
+        of our functionality. When searching for a serial number, use our serial search
+        bar - it's the second bar on %{search_form_link}.
+      hopefully_you_can_find_the_serial_html: >-
+        Hopefully you can find the serial number on the bicycle you're looking at
+        - email %{link} if you're having trouble.
+      in_this_picture_html: >-
+        In this picture <em>200910427-2A</em> is a manufacturer number and not a serial
+        number. However, to make bikes as easy as possible to find, we'd love it if
+        you entered all numbers you encounter.
+      jump_back_to_footnote: Jump back to footnote %{num} in the text.
+      look_serial: Look serial number
+      most_bicycles_have_their_serial_number_en: >-
+        Most bicycles have their serial number engraved beneath their bottom bracket,
+        but sometimes serial numbers are found in other places. Here are some examples
+        of where and what to look for:
+      okay_fine_so_maybe_html: >-
+        Okay, fine, so <em>maybe</em> there are a few bikes without serial numbers,
+        but this is rare and typical only on hand made bikes or really old bicycles.
+      our_search_form: our search form
+      schwinn_serial: Schwinn serial number.
+      searching_serials_on_bike_index: Searching serials on Bike Index
+      serial_search_input: Serial search input
+      some_bikes_have_multiple_html: Some bikes have <em>multiple serial numbers</em>.
+      some_schwinn_bicycles_have_html: >-
+        Some Schwinn bicycles have the unique identifying number (their serial number)
+        on the <em>head tube</em>. This is on the front of the bike.
+      standard_serial_number: Standard serial number
+      the_bottom_bracket_html: >-
+        The <em>bottom bracket</em> (where serial numbers are typically located) is
+        circled.
+      we_do_close_serial_matching_html: >-
+        We do close serial matching - bikes with serial numbers that are close to
+        the serial you entered are shown below the matching results under the heading
+        "Serial Numbers Close to..." - <em>given a search of a serial number with
+        a couple numbers/letters that are different or missing</em>.
+      we_do_not_currently_do_partial_html: >-
+        We do not currently do partial serial searches. If you search for <code>1234</code>,
+        you will only find bikes with serial numbers of <code>1234</code> and serials
+        close to that - not a bike with serial number of <code>12345689</code>.
+      we_split_bike_serials_up_by_html: >-
+        We split bike serials up by spaces and store each separately. If you see multiple
+        numbers on a bicycle - such as in the photo of the Look bike above - try searching
+        for <strong>just one</strong> of the numbers at a time. Searching for <em>either</em>
+        <code>M4106I9CA1</code> or <code>200910427-2A</code> will find the bike.
+      weve_done_a_few_things_to_make_it_more_li: >-
+        We've done a few things to make it more likely that you'll find the bike you're
+        looking for.
+      when_adding_a_bike_to_the_index: >-
+        When adding a bike to the Index, it's best to enter all the groups of numbers
+        and letters separated by spaces.
     terms_text:
       about_our_terms_of_service: About our Terms of Service
       available_here: available here
@@ -2591,6 +2841,16 @@ en:
         well as other matters set forth therein and which explains how and for what
         purposes we collect, use, retain, disclose and safeguard the information you
         provide to us.
+    where:
+      bike_index_partners: Bike Index partners
+      if_you_would_like_to_join_html: If you're a bike shop and would like to join
+        us, check out our %{signup_link}.
+      international_partner_organizations: International Partner organizations
+      show_location_on_map: Show %{location_name} on map
+      sign_up_your_organization: Sign up your organization
+      signup_page: signup page
+      us_partner_organizations: US Partner organizations
+      website_for_organization: "%{org_name} website"
   landing_pages:
     ambassadors_current:
       after_a_couple_of_recoveries_i_got_hooked: >-
@@ -3074,6 +3334,55 @@ en:
   locales:
     en: English
     nl: Nederlands (Dutch)
+  locks:
+    edit:
+      are_you_sure: Are you sure?
+      back_to_viewing_all_locks: back to viewing all locks
+      delete_this_lock: Delete this lock
+      edit_the_lock: Edit the lock
+    form:
+      add_the_lock: Add the lock!
+      additional_notes: Additional notes
+      basic: Basic
+      choose_manufacturer: Choose manufacturer
+      examples_of_serial_numbers_found_on_diffe: Examples of serial numbers found
+        on different types of bike lock keys
+      has_combination: Has combination
+      has_key: Has key
+      large_kryptonite_key: Large Kryptonite key
+      lock_type: Lock type
+      other_lock_manufacturer: Other lock manufacturer
+      pinhead_key: Pinhead key
+      pinhead_locking_skewer_key: Pinhead locking skewer key
+      small_kryptonite_key: Small Kryptonite key
+      update_the_lock: Update the lock!
+    lock_home:
+      add_a_new_lock: Add a new lock
+      any_lock_information_you_enter_on_bike_in: Any lock information you enter on
+        Bike Index is private and visible only to you.
+      if_you_want_you_can_save_serial_html: >-
+        If you want, you can <strong>save the serial numbers of your keys</strong>
+        on Bike Index&mdash;so you won't be out of luck if you lose them.
+      lock_keys_often_have_serial_numbers_so_yo: >-
+        Lock keys often have serial numbers, so you can order replacements if you
+        lose the keys.
+      lock_type: Lock Type
+      manufacturer: Manufacturer
+      save_information_about_a_lock: Save information about a lock
+      save_information_about_your_bike_lock: Save information about your bike lock!
+      you_can_also_record_your_lock_html: You can also <strong>record your lock combinations</strong>.
+      your_locks: Your locks
+    new:
+      save_information_about_one_of_your_locks: Save information about one of your
+        locks
+  manufacturers:
+    index:
+      give_us_a_heads_up_in_a_comment_below: Give us a heads up in a comment below.
+      manufacturers_we_know_about: Manufacturers we know about
+      name: Name
+      oh_no_were_missing_a_manufacturer: OH NO! We're missing a manufacturer?
+      only_makes_components: Only makes components
+      thats_not_actually_surprising: That's not actually surprising, there are a bunch.
   meta_descriptions:
     bikes_index: Search for bikes that have been registered on Bike Index
     bikes_new: >-
@@ -3176,6 +3485,12 @@ en:
       en-GB: GBP
       es: EUR
       nl: EUR
+  news:
+    index:
+      bike_index_blog: Bike Index Blog
+      bike_index_blog_feed: Bike Index blog feed
+    show:
+      by: by
   number:
     currency:
       format:
@@ -3226,6 +3541,129 @@ en:
     precision:
       format:
         delimiter: ''
+  organization_invitations:
+    not_available:
+      contact_us: Contact us
+      contact_us_if_you_think_were_wrong_html: "%{contact_us_link} if you think we're
+        wrong."
+      perhaps_that_link_has_already_been_used_t: Perhaps that link has already been
+        used to join the group?
+      whoops_that_link_isnt_connected_to_a_bike: Whoops, that link isn't connected
+        to a bike
+  organizations:
+    embed:
+      add_a_color: Add a color
+      additional_serial: Additional serial/sticker number
+      address: Address
+      choose_color: Choose color
+      choose_country: Choose country
+      city: City
+      currently_registering_a_nonstolen_bike: >-
+        Currently registering a non-stolen bike. Click here to register a STOLEN bike
+        instead.
+      department_city: Department & city
+      description_of_the_theft: Description of the theft
+      eg_if_we_tweet_about_or_someone_searches: e.g., if we tweet about or someone
+        searches for its serial number
+      filing_a_police_report_is_important_html: >-
+        Filing a <strong>police report</strong> is <span class="stolen-color">extremely
+        important</span> for stolen bike recovery.
+      frame_color: Frame color
+      image_has_been_uploaded: Image has been uploaded
+      intersection_or_address: Intersection or address
+      manufacturer_name: Manufacturer name
+      model_year: Model year
+      optional_upload_a_photo: Optional - upload a photo
+      other_manufacturer: Other manufacturer
+      owners_street_address: Owner's Street address
+      police_report_number: Police report number
+      receive_notifications_from_bike_index: Receive notifications from the Index
+        about this stolen %{bike_type}
+      register: Register
+      registering_a_stolen_bike_click_here: Registering a stolen bike. Click here
+        to register a non-stolen bike
+      remove_color: Remove color
+      secondary_color: Secondary color
+      select_other_if_manufacturer_isnt_listed: Select 'Other' if manufacturer isn't
+        listed
+      state: State
+      third_color: Third color
+      this: this
+      unknown_serial: Unknown serial
+      unknown_year: Unknown year
+      unsure_or_unknown: Unsure or unknown
+      when_was_it_stolen: When was it stolen?
+      where_was_it_stolen: Where was it stolen?
+      your_email_address: Your email address
+      your_phone_number: Your phone number
+      zipcode: Zipcode
+    embed_create_success:
+      bike_was_registered_to_you_html: "%{bike_link} was registered to you through
+        <strong>%{org_name}</strong>."
+      you_will_receive_an_email_confirmation: You will receive an email confirmation
+        shortly.
+      your_bike_has_been_added_to_bike_index: Your %{bike_type} has been added to
+        Bike Index!
+    embed_extended:
+      add_a_color: Add a color
+      additional_serial: Additional serial/sticker number
+      address: Address
+      any_extra_words: Any extra words?
+      choose_color: Choose color
+      choose_handlebar: Choose handlebar
+      choose_material: Choose material
+      choose_photo: Choose photo
+      city: City
+      frame_color: Frame color
+      image_has_been_uploaded: Image has been uploaded
+      manufacturer_name: Manufacturer name
+      model_year: Model year
+      optional_additions: Optional additions
+      org_affiliation: "%{org_name} affiliation"
+      other_defining_features: Other defining features
+      other_manufacturer: Other manufacturer
+      owners_email_address: Owner's email address
+      owners_phone: Owner's phone
+      owners_street_address: Owner's Street address
+      primary_frame_material: Primary frame material
+      register_this: Register this
+      remove_color: Remove color
+      secondary_color: Secondary color
+      select_other_if_manufacturer_isnt_listed: Select 'Other' if manufacturer isn't
+        listed
+      state: State
+      sticker_id_html: Sticker id <small class='less-strong'>optional</small>
+      third_color: Third color
+      unknown_serial: Unknown serial
+      unknown_year: Unknown year
+      unsure_or_unknown: Unsure or unknown
+      zipcode: Zipcode
+    new:
+      bike_index_for_organizations: Bike Index for organizations
+    new_form:
+      add_organization: add organization
+      add_your_organization_to_bike_index: 'Add your organization to Bike Index, for
+        free, in three easy steps:'
+      bike_index_account: Bike Index account
+      confirm_your_email: Confirm your email
+      error: error
+      fill_out_the_form_that_will_appear: Fill out the form that will appear on this
+        page once you're signed in.
+      filling_out_this_form_will_create_a_new_org: Filling out this form will create
+        a new, different organization
+      if_you_dont_want_that_to_be_the_case_html: >-
+        If you don't want that to be the case, %{logout_link} and sign up with the
+        email you would like to use instead.
+      log_out: log out
+      new_organization: New organization
+      organization_kind: Organization kind
+      organization_name: Organization name
+      please_fix_the_following_errors: Please fix the following %{errors}
+      sign_up_for_a_new_account_html: Sign up for a %{new_account_link}
+      you_are_already_a_member_of_org_html: You are already a member of %{org_link}.
+      your_current_account_will_be_a_member_html: >-
+        Your current account (<strong>%{user_email}</strong>) will be a member of
+        the organization you create.
   organized:
     ambassador_dashboards:
       getting_started:
@@ -3357,11 +3795,11 @@ en:
         sent_to_a_new_owner: sent to a new owner
         sticker: Sticker
       recoveries:
-        date_recovered: Date Recovered
         description: Description
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
         org_recoveries_html: "<em>%{org_name}</em> Recoveries"
         owner: Owner
+        recovered_at: Date Recovered
         recovery: recovery
       search:
         all: All
@@ -3760,6 +4198,21 @@ en:
         youre_just_a_few_steps_away_from_register: >-
           You're just a few steps away from registering your bike on the world's most
           comprehensive bike registry.
+  payments:
+    create:
+      bike_index_team: Bike Index team
+      thank_you_for_supporting_bike_index: Thank you for supporting Bike Index!
+      we_received_your_payment_of: We received your payment of %{amount}
+      xoxo: XOXO,
+      your_donation_saved_bikes: Your donation of $%{amount} just saved the bikes.
+    form:
+      501c3_nonprofit: 501(c)(3) nonprofit
+      bike_index_is_a_nonprofit_html: Bike Index is a %{nonprofit_link}.
+      donate_today: Donate today
+      next: next  >
+      other_amount: Other amount
+      pay_bike_index: Pay Bike Index
+      select_an_amount: Select an amount
   plan_features:
     add_form_fields: Add specific form fields to your landing page
     add_logos: Add logos and text to Bike Index emails
@@ -3782,6 +4235,69 @@ en:
     staff_accounts: Staff accounts
     supporting_our_nonprofit: Supporting our nonprofit
     welcome_campaign: Welcome campaign on Facebook, Twitter, and Instagram
+  public_images:
+    edit:
+      editing_bike_html: "<span>Back Arrow</span>Back to <em>Editing Bike</em>"
+      editing_image: Editing Image
+    form:
+      cancel_update: Cancel Update
+      do_not_display: Do not display
+      error: Error
+      errors_prevented_photo_from_saving: "%{errors_count} prevented photo from saving"
+      image_name: Image name
+      no_one_will_be_able_to_see_this_image_exc: "(no one will be able to see this
+        image except for you)"
+      save_image: Save image
+      use_this_if_youd_like_to_attach_a_photo: >-
+        Use this if you'd like to attach a photo of your receipt or something similarly
+        private.
+    new:
+      add_a_public_image: Add a public_image
+    new_form:
+      drag_and_drop_html: Drag and drop files here to or use the <em>Upload Photos</em>
+        button.
+      upload_photos: Upload photos
+    public_image:
+      copy_and_paste: Copy the above text and paste it where you'd like it to appear
+      copy_and_paste_in_post: Copy the above text and paste it where you'd like it
+        to appear in the post
+      delete_image: Delete image
+      enter_text_here: ENTER YOUR TEXT HERE
+      processing: "... processing"
+    revised_public_image:
+      keep_image_private: keep image private
+      processing: "... processing"
+    show:
+      are_you_sure: Are you sure?
+      back_to_images: Back to public images
+      bike_image: Bike Image
+      destroy: Destroy
+      edit: Edit
+      image_from: Image from %{image_title}
+      looks_like_this_is_your_image: Looks like this is your image.
+  recovery_displays:
+    recovery_display:
+      bike: Bike
+      recovered_date: recovered %{date}
+  registrations:
+    create:
+      in_it_youll_find_instructions: In it, you'll find instructions on how to complete
+        the registration of your bike
+      radicool: Radicool!
+      we_got_this: We got this.
+      we_sent_an_email_to: 'We sent an email to:'
+      well_do_our_best_to_help_you_recover_it: We'll do our best to help you get it
+        back
+    embed:
+      bike_manufacturer: bike manufacturer
+      choose_specific_organization_optional: Choose Specific Organization (optional)
+      owner_email: "%{owner} email"
+      primary_frame_color: primary frame color
+      register: Register
+      select_other_if_manufacturer_doesnt_show: Select 'Other' if manufacturer doesn't
+        show up when entered
+      this_bike_is_either_missing_or_stolen: This bike is either missing or stolen
+      your: your
   sessions:
     magic_link:
       enter_email_address: Enter your email address, we'll send you an email with
@@ -3819,6 +4335,15 @@ en:
       multiple_serial_search_pane: Multiple serial search pane
       thank_you: Thank you so much for using Bike Index!
       thanks_for_using_bike_index: Thanks for using Bike Index!
+    edit_bike_skeleton:
+      abandoned: abandoned
+      edit: Edit
+      owned_but_hasnt_been_claimed_html: Owned by <em>%{owner_email}</em> but it hasn't
+        been claimed yet
+      owned_with_permission_to_edit_html: Owned by <em>%{owner_email}</em> but %{org_name}
+        has permission to edit
+      stolen: stolen
+      view_bike: View %{bike_type}
     email_bike_box:
       color: color
       color_may_be_incorrect: Color may be incorrect. Please update it if necessary!
@@ -3827,6 +4352,10 @@ en:
       make: 'Make:'
       serial: 'Serial:'
       stolen_from: 'Stolen from:'
+    errors:
+      error: error
+      errors_prevented_this_from_being_saved: "%{errors_count} prevented this %{object_name}
+        from being saved:"
     faq:
       absolutely: Absolutely!
       add_a_stolen_bike_link: add your your stolen bike to Bike Index!
@@ -3988,6 +4517,46 @@ en:
       you: You
       your_bikes: Your bikes
       your_preferences: Your preferences
+    organized_skeleton:
+      add_a_bike: Add a bike
+      additional_features_html: >-
+        Bike Index provides additional features for verified Law Enforcement organizations.
+        Please contact %{email_link} to get them enabled.
+      admin_panel: Admin Panel
+      ascend_imports: Ascend Imports
+      bikes: Bikes
+      bulk_imports: Bulk Imports
+      discuss: Discuss
+      exports: Exports
+      geomessaging: GeoMessaging
+      getting_started: Getting started
+      how_integration_works: how the integration works
+      impounded_bikes: Impounded Bikes
+      incomplete_registrations: Incomplete registrations
+      integrate_bike_index_with_ascend: Integrate Bike Index with Ascend
+      integrate_bike_index_with_lightspeed: Integrate Bike Index with Lightspeed
+      lightspeed_integration_panel: Lightspeed Integration Panel
+      link_to_register_html: >-
+        <strong>%{link}</strong> to automatically register the bikes you sell to your
+        customers.
+      multi_serial_search: Multi serial search
+      organization_dashboard: "%{org_name} dashboard"
+      organization_locations: "%{org_name} locations"
+      organization_profile: "%{org_name} profile"
+      other_point_of_sale_system: Other Point of Sale system?
+      read_a_full_explanation_html: Read a full explanation of %{link}.
+      recoveries: Recoveries
+      register_bikes_with_link_html: Register bikes with our <strong>%{link}</strong>
+      registration_stickers: Registration stickers
+      resources: Resources
+      streamlined_bike_shop_registration_page: streamlined Bike Shop registration
+        page
+      use_ascend: Use Ascend?
+      use_lightspeed_retail_pos: Use Lightspeed Retail POS?
+      users: Users
+      viewing_our_streamlined_page: >-
+        You're currently viewing our streamlined Bike Shop registration page, which
+        is what we recommend using
     period_select:
       all: All
       past_30_days: past 30 days
@@ -3995,11 +4564,80 @@ en:
       past_day: past day
       past_hour: past hour
       past_year: past year
+  stolen:
+    index:
+      ambassador: ambassador
+      bike_chopshop_report: Bike ChopShop report
+      bike_index: Bike Index
+      bike_index_will_broadcast: >-
+        Bike Index will broadcast your stolen bike to the local Stolen Bike Twitter
+        handle and spread the word via other social channels. Our stolen bike data
+        is linked to LeadsOnline so if your bike ends up in the 'system' it will get
+        flagged and you will be contacted. Our community will be on the look out on
+        various resale channels.
+      check_out_your_local_flea_market: Check out your local flea market for your
+        bike.
+      donation: donation
+      error: error
+      file_a_police_report: >-
+        File a police report. If you can, go into your local precinct and make an
+        officer come and take a report. Get them engaged in your situation!
+      if_you_are_here_your_bike_was_probably_stolen: >-
+        If you are here, your bike was probably stolen. That sucks, but we are here
+        to help. Here is what you should do:
+      keep_an_eye_on_craigslist: >-
+        Keep an eye on Craigslist. Set up a specific alert using ifttt.com to flag
+        listing that matches your bike. Track apps such as OfferUp and LetGo as they
+        are frequently used in fencing bikes.
+      list_recent_stolen_bikes_html: List recent stolen bikes on your site with our
+        %{stolen_widget_link}
+      look_for_local_stolen_bike_groups_on_face: >-
+        Look for local stolen bike groups on Facebook (search 'stolen bike {city name}'
+        Many of these volunteer groups exist across the globe and can support your
+        recovery efforts.
+      make_sure_your_bike_is_registered_html: >-
+        Make sure your bike is registered on %{new_bike_link} and any local registry
+        in your community that might exist. Mark your bike as <strong>stolen</strong>
+        on Bike Index to trigger our community.
+      other_recovery_tools: Other recovery tools
+      please_fix_the_following: Please fix the following %{errors}
+      please_login_to_make_report_html: Please %{login_link} to make this report
+      register_it: register it
+      report_a_bicycle_chop_shop: Report a bicycle chop shop
+      report_bike_theft_issues: 'Report bike theft issues:'
+      report_someone_selling_a_stolen_bike: Report someone selling a stolen bike
+      reporting_your_own_bike_stolen_html: Reporting your own bike stolen? You need
+        to %{register_it_link} first
+      send_alert: Send alert!
+      sign_in: sign in
+      someone_is_selling_a_stolen_bike: Someone is selling a stolen bike
+      stolen_widget: stolen widget
+      tell_everyone_you_know: >-
+        Tell everyone you know about your stolen bike. Hit all your social networks
+        (Facebook, Instagram, Twitter, etc.) and text/email everyone you know.
+      we_wish_you_the_best_of_luck_html: >-
+        We wish you the best of luck in recovering your bicycle. We'd love to add
+        your story to our %{recoveries_count} recovered bikes. If you wish to support
+        our cause, please consider a %{donations_link} or join our %{ambassadors_link}
+        program.
+      what_happens_next: What happens next?
+      what_to_do_if_your_bike_is_stolen: What to do if your bike is stolen
+      where_is_this_happening: Where is this happening? URL, address - any information
+        you have
+      your_email_address: Your email address
+      your_local_police_department_will_do_what: >-
+        Your local police department will do what it does to help recover your bike.
+        Stay in communication with them.
   support:
     array:
       last_word_connector: ", and "
       two_words_connector: " and "
       words_connector: ", "
+  theft_alert_plans:
+    theft_alert_plan:
+      best_value: Best value
+      days: Days
+      views: Views
   time:
     formats:
       blog: "%m_%d_%Y"
@@ -4009,6 +4647,11 @@ en:
       short_with_hour: "%m.%d.%y - %l%P"
       short_with_year: "%a, %B %d %Y"
       standard_display: "%A, %B %d"
+  user_embeds:
+    show:
+      bike: Bike
+      my_indexed_bikes: My Indexed %{bikes_count}
+      no_photo: no photo
   users:
     accept_terms:
       i_agree_to_tos_html: I agree to Bike Index's <strong>Terms of Service</strong>.
@@ -4200,7 +4843,6 @@ en:
       add_a_bike: Add a bike
       add_a_lock: Add a lock
       add_a_photo: Add a photo
-      add_some_info: Add some info
       bikes: bikes
       combination: Combination
       date_abandoned: Date abandoned
@@ -4213,6 +4855,7 @@ en:
       locks: locks
       manufacturer: Manufacturer
       mark_bike_stolen: Mark bike stolen
+      next: Next steps
       primary_colors: Primary colors
       printable_pdf: Printable (pdf)
       register_new_items: Register new items

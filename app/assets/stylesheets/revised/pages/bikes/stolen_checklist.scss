@@ -1,3 +1,5 @@
+$checklist-border: #919197;
+
 .stolen-checklist-wrap {
   padding-bottom: 0;
   ul {
@@ -12,13 +14,14 @@
     margin: 0 0 0.25rem;
     position: relative;
 
-    .checklist-checkbox {
+    .checklist-checkbox,
+    .checklist-uncheckbox {
       display: block;
       position: absolute;
       background: #fff;
       left: 0.25em;
       top: 0.25em;
-      border: 2px solid #919197;
+      border: 2px solid $checklist-border;
       border-radius: 50%;
       min-width: 1.5em;
       min-height: 1.5em;
@@ -26,13 +29,19 @@
       line-height: 1;
       padding: 0.1em;
     }
+    .checklist-uncheckbox {
+      top: 0.75rem;
+      border-radius: 0;
+      background: $checklist-border;
+      min-height: 0.2em;
+    }
     &.completed-item {
       opacity: 0.75;
       & > .checklist-text {
         text-decoration: line-through;
       }
       .checklist-checkbox {
-        color: #919197;
+        color: $checklist-border;
         font-family: "zp-icons";
         font-style: normal;
         font-variant: normal;

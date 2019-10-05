@@ -1,4 +1,12 @@
 module ApplicationHelper
+  def check_mark
+    "&#x2713;".html_safe
+  end
+
+  def cross_mark
+    "&#x274C;".html_safe
+  end
+
   def active_link(link_text, link_path, html_options = {})
     match_controller = html_options.delete(:match_controller)
     html_options[:class] ||= ""
@@ -221,5 +229,17 @@ module ApplicationHelper
     @language_choices ||= I18n.available_locales.map do |locale|
       [t(locale, scope: [:locales]), locale.to_s]
     end.sort { |a, b| a[0].downcase <=> b[0].downcase }
+  end
+
+  # Language choices available for displaying blog entries.
+  # Return an array of tuples, each of the form:
+  # [<localized language name>, <language key (from Blog::LANGUAGE_ENUM)>]
+  def blog_languages
+    @blog_languages ||=
+      Blog.languages.map { |lang, _| [t(lang, scope: [:locales]), lang] }
+  end
+
+  def bike_placeholder_image_path
+    image_path("revised/bike_photo_placeholder.svg")
   end
 end

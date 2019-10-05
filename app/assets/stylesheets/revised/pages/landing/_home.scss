@@ -466,6 +466,7 @@
   .root-landing-who-wrap {
     display: none;
     flex-wrap: wrap;
+    justify-content: center; // When things overflow onto additional lines
   }
 
   &.scrolled .root-landing-who-wrap {

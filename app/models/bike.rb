@@ -46,7 +46,7 @@ class Bike < ActiveRecord::Base
   accepts_nested_attributes_for :components, allow_destroy: true
 
   geocoded_by nil, latitude: :stolen_lat, longitude: :stolen_long
-  after_validation :geocode, if: lambda { |o| false } # Never geocode, it's from stolen_record
+  after_validation :geocode, if: lambda { false } # Never geocode, it's from stolen_record
 
   validates_presence_of :serial_number
   validates_presence_of :propulsion_type
@@ -70,11 +70,13 @@ class Bike < ActiveRecord::Base
 
   default_scope {
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
-      .where(example: false, hidden: false, deleted_at: nil)
+      .current
       .order("listing_order desc")
   }
+  scope :current, -> { where(example: false, hidden: false, deleted_at: nil) }
   scope :stolen, -> { where(stolen: true) }
   scope :non_stolen, -> { where(stolen: false) }
+  scope :abandoned, -> { where(abandoned: true) }
   scope :organized, -> { where.not(creation_organization_id: nil) }
   scope :with_known_serial, -> { where.not(serial_number: "unknown") }
   scope :impounded, -> { includes(:impound_records).where(impound_records: { retrieved_at: nil }).where.not(impound_records: { id: nil }) }
@@ -157,6 +159,88 @@ class Bike < ActiveRecord::Base
     def organization(org_or_org_id)
       organization = org_or_org_id.is_a?(Organization) ? org_or_org_id : Organization.friendly_find(org_or_org_id)
       includes(:bike_organizations).where(bike_organizations: { organization_id: organization.id })
+    end
+
+    # Possibly-found bikes are stolen bikes that have a counterpart record(s)
+    # (matching by normalized serial number) in an abandoned state.
+    def possibly_found
+      unscoped
+        .current
+        .stolen
+        .non_abandoned
+        .where(serial_normalized: abandoned.non_stolen.select(:serial_normalized))
+    end
+
+    # Return an array of tuples, each pairing a possibly-found bike with a
+    # counterpart abandoned bike.
+    def possibly_found_with_match
+      matches_by_serial =
+        unscoped
+          .current
+          .abandoned
+          .non_stolen
+          .where.not(serial_normalized: nil)
+          .group_by(&:serial_normalized)
+
+      possibly_found
+        .select { |bike| matches_by_serial.key?(bike.serial_normalized) }
+        .map { |bike| [bike, matches_by_serial[bike.serial_normalized]] }
+        .flat_map { |bike, matches| matches.map { |match| [bike, match] } }
+        .reject { |bike, match| bike.owner_email == match.owner_email }
+    end
+
+    # Externally possibly-found bikes are stolen bikes that have a counterpart
+    # record(s) (matching by normalized serial number) in an external registry.
+    #
+    # External-registry searches can be delimited by country by passing
+    # `country_iso`.
+    def possibly_found_externally(country_iso: "NL")
+      normalized_serials =
+        ExternalRegistryBike
+          .where(country: Country.where(iso: country_iso))
+          .where.not(serial_normalized: nil)
+          .select(:serial_normalized)
+          .distinct
+          .pluck(:serial_normalized)
+
+      unscoped
+        .current
+        .currently_stolen_in(country: country_iso)
+        .non_abandoned
+        .where(serial_normalized: normalized_serials)
+    end
+
+    # Return an array of tuples, each pairing a possibly-found bike with a
+    # counterpart possible match found on an external registry associated with
+    # the given `country_iso`.
+    def possibly_found_externally_with_match(country_iso: "NL")
+      matches_by_serial =
+        ExternalRegistryBike
+          .where(country: Country.where(iso: country_iso))
+          .where.not(serial_normalized: nil)
+          .group_by(&:serial_normalized)
+
+      possibly_found_externally(country_iso: country_iso)
+        .select { |bike| matches_by_serial.key?(bike.serial_normalized) }
+        .map { |bike| [bike, matches_by_serial[bike.serial_normalized]] }
+        .flat_map { |bike, matches| matches.map { |match| [bike, match] } }
+    end
+
+    # Search for currently stolen bikes reported stolen in the given city, state
+    # and/or country. `city`, `state` and `country` are accepted as strings /
+    # symbols of the name or abbreviation, and are matched conjointly.
+    def currently_stolen_in(city: nil, state: nil, country: nil)
+      location = { city: city, state: state, country: country }.select { |_, v| v.present? }
+      location[:state] &&= State.find_by("name = ? OR abbreviation = ?", state, state)
+      location[:country] &&= Country.find_by("name = ? OR iso = ?", country, country)
+      return none if location.values.any?(&:blank?)
+
+      unscoped
+        .stolen
+        .current
+        .with_known_serial
+        .includes(:current_stolen_record)
+        .where(stolen_records: location)
     end
   end
 
@@ -420,15 +504,36 @@ class Bike < ActiveRecord::Base
     true
   end
 
-  def normalize_attributes
-    self.serial_number = "made_without_serial" if made_without_serial?
-    self.serial_number = SerialNormalizer.unknown_and_absent_corrected(serial_number)
-    self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
+  def normalize_emails
     if User.fuzzy_email_find(owner_email)
       self.owner_email = User.fuzzy_email_find(owner_email).email
     else
       self.owner_email = EmailNormalizer.normalize(owner_email)
     end
+    true
+  end
+
+  def normalize_serial_number
+    if made_without_serial?
+      self.serial_number = "made_without_serial"
+      self.serial_normalized = nil
+      return true
+    end
+
+    self.serial_number = SerialNormalizer.unknown_and_absent_corrected(serial_number)
+
+    case serial_number
+    when "made_without_serial"
+      self.serial_normalized = nil
+      self.made_without_serial = true
+    when "unknown"
+      self.serial_normalized = nil
+      self.made_without_serial = false
+    else
+      self.serial_normalized = SerialNormalizer.new(serial: serial_number).normalized
+      self.made_without_serial = false
+    end
+
     true
   end
 
@@ -552,7 +657,8 @@ class Bike < ActiveRecord::Base
     clean_frame_size
     set_mnfg_name
     set_user_hidden
-    normalize_attributes
+    normalize_emails
+    normalize_serial_number
     set_paints
     cache_bike
   end

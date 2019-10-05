@@ -1,24 +1,26 @@
 - cache("where/shown-#{@organizations.count}-#{@organizations.maximum(:updated_at)}") do
-  / Cache these queries
+  -# Cache these queries
   - @states = State.includes(:locations).all
   - @countries = Country.where('iso != ?', 'US').includes(:locations)
-  / Set the locations on the window for the partial
+
+  -# Set the locations on the window for the partial
   - locations = []
   - @organizations.each do |organization|
     - organization.locations.each_with_index do |location, index|
       - next unless location.latitude && location.longitude
       - locations << [ "#shop#{location.org_location_id}", location.latitude, location.longitude]
+
   :javascript
     window.shop_locations = #{locations};
+
   %h1#where-bike-index
-    Bike Index partners
-    %small
-      = link_to 'Sign up your organization', new_organization_path
+    = t(".bike_index_partners")
+    %small= link_to t(".sign_up_your_organization"), new_organization_path
   %article
     .map-of-shops
       = render '/shared/shops_map'
   %h3.padded
-    US Partner organizations
+    = t(".us_partner_organizations")
 
   %article.where-shops-list#list_of_partners
     - @states.each do |state|
@@ -35,34 +37,29 @@
                   &#x25B6;
                 = location.display_name
                 %em
-                  &nbsp;&nbsp;#{location.city}
+                  &nbsp;&nbsp;
+                  = location.city
             .shop-info.collapse{ id: "shop#{location.org_location_id}" }
               - if location.street.present?
                 %a.where-shop-location{data: { lat: location.latitude, long: location.longitude } }
-                  Show #{location.display_name} on map
-                %p
-                  #{location.street}, #{location.city}, #{location.state.abbreviation} #{location.zipcode}
-              - if location.phone
-                %p
-                  %a{ href: "tel:#{ location.phone }" }
-                    = display_phone(location.phone)
+                  = t(".show_location_on_map", location_name: location.display_name)
+                %p= [location.street, location.city, "#{location.state.abbreviation} #{location.zipcode}"].join(", ")
+              - if location.phone.present?
+                %p= link_to display_phone(location.phone), "tel:#{ location.phone }"
               - if location&.organization&.website.present?
-                %p
-                  = link_to "#{location.organization.name} website", location.organization.website, target: "_blank", class: "shop-site"
+                %p= link_to t(".website_for_organization", org_name: location.organization.name), location.organization.website, target: "_blank", class: "shop-site"
               .map-window
                 .window-content
-                  %h3
-                    = location.display_name
+                  %h3= location.display_name
                   %p
                     = location.street
                     %br
-                    #{location.city}, #{location.state.abbreviation} #{location.zipcode}
-                  - if location.phone
+                    = [location.city, "#{location.state.abbreviation} #{location.zipcode}"].join(", ")
+                  - if location.phone.present?
                     .map-telephone
-                      %a{ href: "tel:#{ location.phone }" }
-                        = number_to_phone(location.phone)
+                      = link_to number_to_phone(location.phone), "tel:#{ location.phone }"
     %h3.padded
-      International Partner organizations
+      = t(".international_partner_organizations")
 
     - @countries.each do |country|
       - next unless country.locations.where(shown: true).any?
@@ -78,35 +75,35 @@
                   &#x25B6;
                 = location.display_name
                 %em
-                  &nbsp;&nbsp;#{location.city}
+                  &nbsp;&nbsp;
+                  = location.city
             .shop-info.collapse{ id: "shop#{location.org_location_id}" }
               - if location.street.present?
                 %a.where-shop-location{data: { lat: location.latitude, long: location.longitude } }
-                  Show #{location.display_name} on map
-                %p
-                  #{location.street}, #{location.city}, #{location.zipcode}, #{location.country.name}
-              - if location.phone
-                %p
-                  %a{ href: "tel:#{ location.phone }" }
-                    = display_phone(location.phone)
+                  = t(".show_location_on_map", location_name: location.display_name)
+                %p= [location.street, location.city, location.zipcode, location.country.name].join(", ")
+
+              - if location.phone.present?
+                %p= link_to display_phone(location.phone), "tel:#{ location.phone }"
+
               - if location&.organization&.website.present?
-                %p
-                  = link_to "#{location.organization.name} website", location.organization.website, target: "_blank", class: "shop-site"
+                %p= link_to t(".website_for_organization", org_name: location.organization.name), location.organization.website, target: "_blank", class: "shop-site"
+
               .map-window
                 .window-content
-                  %h3
-                    = location.display_name
+                  %h3= location.display_name
                   %p
                     = location.street
                     %br
-                    #{location.city}, #{location.zipcode}, #{location.country.name}
-                  - if location.phone
+                    = [location.city, location.zipcode, location.country.name].join(", ")
+
+                  - if location.phone.present?
                     .map-telephone
-                      %a{ href: "tel:#{ location.phone }" }
-                        = number_to_phone(location.phone)
+                      = link_to number_to_phone(location.phone), "tel:#{ location.phone }"
 
 
   %hr.where-add-shops
 
   %p
-    If you're a bike shop and would like to join us, check out our #{link_to "signup page", new_organization_path}.
+    - signup_link = link_to t(".signup_page"), new_organization_path
+    = t(".if_you_would_like_to_join_html", signup_link: signup_link)

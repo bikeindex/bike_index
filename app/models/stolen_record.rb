@@ -17,7 +17,7 @@ class StolenRecord < ActiveRecord::Base
        timezone date_stolen bike creation_organization_id country_id state_id street zipcode city latitude
        longitude theft_description current phone secondary_phone phone_for_everyone
        phone_for_users phone_for_shops phone_for_police receive_notifications proof_of_ownership
-       approved date_recovered recovered_description index_helped_recovery can_share_recovery
+       approved recovered_at recovered_description index_helped_recovery can_share_recovery
        recovery_posted tsved_at estimated_value).map(&:to_sym).freeze
   end
 
@@ -42,7 +42,7 @@ class StolenRecord < ActiveRecord::Base
   scope :not_tsved, -> { where("tsved_at IS NULL") }
   scope :tsv_today, -> { where("tsved_at IS NULL OR tsved_at >= '#{Time.current.beginning_of_day}'") }
 
-  scope :recovered, -> { unscoped.where(current: false).order("date_recovered desc") }
+  scope :recovered, -> { unscoped.where(current: false).order("recovered_at desc") }
   scope :displayable, -> { recovered.where(can_share_recovery: true) }
   scope :recovery_unposted, -> { unscoped.where(current: false, recovery_posted: false) }
 
@@ -50,6 +50,23 @@ class StolenRecord < ActiveRecord::Base
 
   geocoded_by :address_override_show_address
   after_validation :geocode, if: lambda { (self.city.present? || self.zipcode.present?) && self.country.present? }
+
+  reverse_geocoded_by :latitude, :longitude do |stolen_record, results|
+    if (geo = results.first)
+      stolen_record.country ||= Country.find_by(name: geo.country)
+      stolen_record.city ||= geo.city
+      stolen_record.state ||= State.find_by(abbreviation: geo.state_code)
+      stolen_record.neighborhood ||= geo.neighborhood
+    end
+  end
+  after_validation :reverse_geocode
+
+  def twitter_accounts_in_proximity
+    [
+      TwitterAccount.default_account_for_country(country),
+      TwitterAccount.active.near(self, 50),
+    ].flatten.compact.uniq
+  end
 
   after_save :remove_outdated_alert_images
 
@@ -65,7 +82,7 @@ class StolenRecord < ActiveRecord::Base
   # TODO: check based on the ownership of the bike at the time of recovery
   def recovering_user_owner?; recovering_user.present? && bike&.owner == recovering_user end
 
-  def pre_recovering_user?; date_recovered.present? && date_recovered < self.class.recovering_user_recording_start end
+  def pre_recovering_user?; recovered_at.present? && recovered_at < self.class.recovering_user_recording_start end
 
   # Only display if they have put in an address - so that we don't show on initial creation
   def display_checklist?; address.present? end
@@ -237,7 +254,7 @@ class StolenRecord < ActiveRecord::Base
 
   def add_recovery_information(info = {})
     info = ActiveSupport::HashWithIndifferentAccess.new(info)
-    self.date_recovered = TimeParser.parse(info[:date_recovered], info[:timezone]) || Time.current
+    self.recovered_at = TimeParser.parse(info[:recovered_at], info[:timezone]) || Time.current
     update_attributes(current: false,
                       recovered_description: info[:recovered_description],
                       recovering_user_id: info[:recovering_user_id],

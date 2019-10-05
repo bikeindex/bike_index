@@ -44,9 +44,9 @@
   .row
     .col-lg-6
       .form-group
-        = f.label :date_recovered
-        - f.object.date_recovered ||= Time.current
-        = f.datetime_local_field :date_recovered, max: Time.current + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(f.object.date_recovered, format: :convert_time)
+        = f.label :recovered_at
+        - f.object.recovered_at ||= Time.current
+        = f.datetime_local_field :recovered_at, max: Time.current + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(f.object.recovered_at, format: :convert_time)
 
     - if @bike.present?
       .col-lg-6

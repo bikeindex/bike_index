@@ -30,6 +30,50 @@ RSpec.describe "Search API V3", type: :request do
       end
     end
   end
+  describe "/external_registries" do
+    context "returns bikes" do
+      it "returns matching bikes" do
+        serial_number = "38224"
+        FactoryBot.create(:external_registry_bike, serial_number: serial_number)
+
+        allow(ExternalRegistry::ExternalRegistry).to(receive(:search_for_bikes_with)
+          .with(serial_number).and_return(ExternalRegistryBike.all))
+
+        get "/api/v3/search/external_registries",
+            serial: serial_number,
+            format: :json
+
+        expect(json_result[:error]).to be_blank
+        bike_list = json_result[:bikes]
+        expect(bike_list.count).to eq(1)
+        expect(bike_list.first.keys)
+          .to(match_array(%w[
+            date_stolen
+            description
+            external_id
+            frame_colors
+            frame_model
+            id
+            is_stock_img
+            large_img
+            location_found
+            manufacturer_name
+            registry_name
+            registry_url
+            serial
+            status
+            stolen
+            stolen_location
+            thumb
+            title
+            url
+            year
+          ]))
+        expect(response.header["Total"]).to eq("1")
+      end
+    end
+  end
+
   describe "/count" do
     context "incorrect stolenness value" do
       it "returns an error message" do

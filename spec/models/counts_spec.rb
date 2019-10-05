@@ -35,7 +35,7 @@ RSpec.describe Counts, type: :model do
   end
 
   context "recoveries" do
-    let!(:recovered_bike) { FactoryBot.create(:stolen_record_recovered, date_recovered: Time.current - 1.day) }
+    let!(:recovered_bike) { FactoryBot.create(:stolen_record_recovered, recovered_at: Time.current - 1.day) }
     it "returns constant" do
       expect(StolenRecord.recovered.count).to eq 1
       expect(Counts.assign_recoveries).to eq 2042

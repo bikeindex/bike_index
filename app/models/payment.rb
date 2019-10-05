@@ -5,8 +5,6 @@ class Payment < ActiveRecord::Base
   scope :current, -> { where(is_current: true) }
   scope :subscription, -> { where(is_recurring: true) }
   scope :organizations, -> { where.not(organization_id: nil) }
-  scope :stripe, -> { where.not(stripe_id: nil) }
-  scope :check, -> { where(is_check: true) }
 
   enum kind: KIND_ENUM
 

@@ -73,15 +73,22 @@ FactoryBot.define do
     ctype { FactoryBot.create(:ctype) }
   end
 
-  factory :country do
-    name
-    sequence(:iso) { |n| "D#{n}" }
-  end
-
   factory :state do
     name
     country { FactoryBot.create(:country) }
     sequence(:abbreviation) { |n| "Q#{n}" }
+
+    factory :state_new_york do
+      abbreviation { "NY" }
+      country { Country.united_states }
+      name { "New York" }
+    end
+
+    factory :state_california do
+      abbreviation { "CA" }
+      country { Country.united_states }
+      name { "California" }
+    end
   end
 
   factory :lock_type do
@@ -102,6 +109,14 @@ FactoryBot.define do
     user
     body { "Some sweet blog content that everyone loves" }
     sequence(:title) { |n| "Blog title #{n}" }
+
+    trait :published do
+      published { true }
+    end
+
+    trait :dutch do
+      language { "nl" }
+    end
   end
 
   factory :stolen_notification do
@@ -118,6 +133,35 @@ FactoryBot.define do
     body { "some message" }
     creator_email { "something@example.com" }
     user_email { "something_else@example.com" }
-    contact_type { "stolen_message" }
+    kind { :stolen_contact }
+
+    trait :stolen_bike do
+      bike { FactoryBot.create(:stolen_bike) }
+    end
+
+    factory :customer_contact_potentially_found_bike do
+      creator { FactoryBot.create(:user) }
+      bike { FactoryBot.create(:stolen_bike) }
+      kind { :bike_possibly_found }
+
+      transient do
+        match { FactoryBot.create(:abandoned_bike) }
+      end
+
+      after(:create) do |cc, evaluator|
+        info_hash = {
+          "match_id" => evaluator.match.id.to_s,
+          "match_type" => evaluator.match.class.to_s,
+          "stolen_record_id" => cc.bike.current_stolen_record.id.to_s,
+        }
+        cc.update(
+          info_hash: info_hash,
+          user_email: cc.bike.owner_email,
+          creator_email: cc.creator.email,
+          title: "We may have found your stolen #{cc.bike.title_string}",
+          body: "Check this matching bike: #{evaluator.match.title_string}",
+        )
+      end
+    end
   end
 end

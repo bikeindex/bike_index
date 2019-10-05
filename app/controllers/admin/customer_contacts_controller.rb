@@ -14,6 +14,14 @@ class Admin::CustomerContactsController < Admin::BaseController
   private
 
   def permitted_parameters
-    params.require(:customer_contact).permit(:creator_email, :user_email, :title, :contact_type, :creator_id, :bike_id, :body)
+    params.require(:customer_contact).permit(
+      :bike_id,
+      :body,
+      :creator_email,
+      :creator_id,
+      :kind,
+      :title,
+      :user_email
+    )
   end
 end

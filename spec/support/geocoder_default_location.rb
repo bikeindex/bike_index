@@ -5,8 +5,10 @@ RSpec.shared_context :geocoder_default_location do
       longitude: -74.0059731,
       address: "New York, NY, USA",
       formatted_address: "278 Broadway, New York, NY 10007, USA",
+      city: "New York",
       state: "New York",
       state_code: "NY",
+      neighborhood: "Tribeca",
       country: "United States",
       country_code: "US",
     }

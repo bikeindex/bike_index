@@ -1,29 +1,26 @@
-%h1
-  Bike Index Resources
+%h1= t(".bike_index_resources")
 
 %ul
   %li
     %p
-      <strong>Infographic</strong>:
-      %a{ href: how_not_to_buy_stolen_url }
-        How not to buy a stolen bike in 4 easy steps
+      - link = link_to t(".how_not_to_buy_a_stolen_bike"), how_not_to_buy_stolen_url
+      = t(".infographic_html", link: link)
+
   %li
-    %p
-      Check out our #{link_to "map of bike thefts", "http://map.bikewise.org"}.
+    - link = link_to t(".map_of_bike_thefts"), "http://map.bikewise.org"
+    %p= t(".check_out_our_link_html", link: link)
   %li
-    %p
-      Get Bike Index #{link_to "logos and design assets", image_resources_url}.
+    - link = link_to t(".logos_and_design_assets"), image_resources_url
+    %p= t(".get_bike_index_html", link: link)
   %li
-    %p
-      Did you know every bike has a unique, identifying number? #{link_to "Learn about serial numbers here", serials_url}.
+    - link = link_to t(".learn_about_serial_numbers_here"), serials_url
+    %p= t(".did_you_know_every_bike_html", link: link)
   %li
-    %p
-      View the list of all
-      = link_to "the manufacturers", manufacturers_url
-      we know about.
+    - link = link_to t(".the_manufacturers"), manufacturers_url
+    %p= t(".view_the_list_of_all_html", link: link)
   %li
-    %p
-      We're open source, view this app (and other things) on #{link_to "GitHub", "https://github.com/bikeindex", target: "_blank"}.
+    - github_link = link_to "GitHub", "https://github.com/bikeindex", target: "_blank"
+    %p= t(".were_open_source_view_this_app_html", github_link: github_link)
   %li
-    %p
-      We have an open API - check out our #{link_to "API documentation", documentation_index_url}.
+    - link = link_to t(".api_documentation"), documentation_index_url
+    %p= t(".we_have_an_open_api_check_out_html", link: link)

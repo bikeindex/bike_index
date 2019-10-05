@@ -29,7 +29,7 @@
           %small.less-strong
             page  #{ link_to 'previewable here', organization_landing_path(organization_id: @organization.to_param) }, even if "off"
         %td.table-cell-check
-          = "&#x2713;".html_safe if @organization.landing_html.present?
+          = check_mark if @organization.landing_html.present?
         %td.table-cell-check
           = link_to LandingPages::ORGANIZATIONS.include?(@organization.slug).to_s, "https://github.com/bikeindex/bike_index/blob/master/config/landing_pages.rb"
       - MailSnippet.organization_snippets.each do |snippet_name, snippet_description|
@@ -38,6 +38,6 @@
           %td
             = link_to snippet_description, edit_admin_organization_custom_layout_path(organization_id: @organization.to_param, id: snippet_name)
           %td.table-cell-check
-            = "&#x2713;".html_safe if snippet && snippet.body.present?
+            = check_mark if snippet&.body.present?
           %td.table-cell-check
-            = "&#x2713;".html_safe if snippet && snippet.is_enabled
+            = check_mark if snippet&.is_enabled

@@ -4,7 +4,6 @@ RSpec.describe BikesController, type: :controller do
   let(:manufacturer) { FactoryBot.create(:manufacturer) }
   let(:color) { FactoryBot.create(:color, name: "black") }
   describe "index" do
-    include_context :geocoder_default_location
     let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "1234567890") }
     let!(:stolen_bike) { FactoryBot.create(:stolen_bike, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
     let(:serial) { "1234567890" }
@@ -79,7 +78,8 @@ RSpec.describe BikesController, type: :controller do
           end
         end
         context "unknown location" do
-          let(:bounding_box) { [66.00, -84.22, 67.000, (0.0 / 0)] } # Override bounding box stub in geocoder_default_location
+          # Override bounding box stub in geocoder_default_location shared context
+          let(:bounding_box) { [66.00, -84.22, 67.000, (0.0 / 0)] }
           it "includes a flash[:info] for unknown location, renders non-proximity" do
             get :index, query_params
             expect(response.status).to eq 200
@@ -895,7 +895,6 @@ RSpec.describe BikesController, type: :controller do
               owner_email: "something@stuff.com",
             }
           end
-          include_context :geocoder_default_location
           let(:target_address) { { address: "278 Broadway", city: "New York", state: "NY", zipcode: "10007", country: "USA" } }
           let(:b_param) { BParam.create(params: { "bike" => bike_params.as_json }, origin: "embed_partial") }
           before do
@@ -1492,11 +1491,29 @@ RSpec.describe BikesController, type: :controller do
         expect(bike.editable_organizations.pluck(:id)).to eq([organization_2.id])
       end
       context "empty organization_ids_can_edit_claimed" do
-        it "updates the bike with the allowed_attributes" do
+        it "updates the bike with the allowed_attributes, marks no organizations can edit claimed" do
           put :update,
               id: bike.id,
               bike: allowed_attributes,
               organization_ids_can_edit_claimed: []
+          expect(response).to redirect_to edit_bike_url(bike)
+          expect(assigns(:bike)).to be_decorated
+          bike.reload
+          expect(bike.hidden).to be_falsey
+          allowed_attributes.except(*skipped_attrs).each do |key, value|
+            pp value, key unless bike.send(key) == value
+            expect(bike.send(key)).to eq value
+          end
+          expect(bike.bike_organization_ids).to match_array([organization.id, organization_2.id])
+          expect(bike.editable_organizations.pluck(:id)).to eq([])
+        end
+      end
+      context "organization_ids_can_edit_claimed_present" do
+        it "updates the bike with the allowed_attributes, marks no organizations can edit claimed" do
+          put :update,
+              id: bike.id,
+              bike: allowed_attributes,
+              organization_ids_can_edit_claimed_present: "1"
           expect(response).to redirect_to edit_bike_url(bike)
           expect(assigns(:bike)).to be_decorated
           bike.reload

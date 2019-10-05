@@ -1,24 +1,29 @@
 class Blog < ActiveRecord::Base
   include ActionView::Helpers::TextHelper
 
+  belongs_to :user
+  has_many :public_images, as: :imageable, dependent: :destroy
   has_many :listicles, dependent: :destroy
   accepts_nested_attributes_for :listicles, allow_destroy: true
-
-  attr_accessor :post_date, :post_now, :update_title, :user_email, :timezone
 
   validates_presence_of :title, :body, :user_id
   validates_uniqueness_of :title, message: "has already been taken. If you believe that this message is an error, contact us!"
   validates_uniqueness_of :title_slug, message: "somehow that overlaps with another title! Sorrys."
 
-  belongs_to :user
-  has_many :public_images, as: :imageable, dependent: :destroy
+  before_save :set_calculated_attributes
+  before_create :set_title_slug
+
+  attr_accessor :post_date, :post_now, :update_title, :user_email, :timezone
+
+  LANGUAGE_ENUM = {
+    en: 0,
+    nl: 1,
+  }.freeze
+  enum language: LANGUAGE_ENUM
 
   scope :published, -> { where(published: true) }
   scope :listicle_blogs, -> { where(is_listicle: true) }
   default_scope { order("published_at desc") }
-
-  before_save :set_calculated_attributes
-  before_create :set_title_slug
 
   def self.slugify_title(str)
     # Truncate, slugify, also - remove last char if a dash (slugify should take care of removing the dash now, but whatever)

@@ -33,6 +33,7 @@ gem "carrierwave_backgrounder"
 gem "dalli"
 gem "draper", require: false # NB: Draper is deprecated in this project
 gem "eventmachine"
+gem "faraday_middleware"
 gem "fog-aws"
 gem "geocoder"
 gem "hamlit"
@@ -45,7 +46,7 @@ gem "kramdown" # Markdown
 gem "libv8", "~> 3.16.14.7"
 gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
 gem "money-rails"
-gem "nokogiri", "~> 1.8.1"
+gem "nokogiri", ">= 1.10.4"
 gem "omniauth", "~> 1.6"
 gem "omniauth-facebook"
 gem "omniauth-globalid"
@@ -89,6 +90,7 @@ gem "secure_headers", "~> 2.5.0"
 # Frontend
 gem "bootstrap", "~> 4.0.0.alpha3" # Bootstrap 4 - used for revised stylesheets
 gem "chartkick" # Display charts
+gem "coderay" # Pretty print code
 gem "coffee-rails"
 gem "groupdate" # Required for charts
 gem "jquery-datatables-rails", "~>3.4.0"
@@ -97,7 +99,6 @@ gem "sprockets-rails", "~> 3.0.4"
 gem "therubyracer"
 gem "uglifier"
 gem "webpacker", "~> 4.x"
-gem "coderay" # Pretty print code
 
 # Show performance metrics
 gem "flamegraph", require: false
@@ -135,6 +136,7 @@ end
 
 group :development do
   gem "bullet"
+  gem "faraday-request_response_logger", git: "https://github.com/pramod-sharma/faraday-request_response_logger"
   gem "guard"
   gem "guard-rspec", require: false
   gem "guard-rubocop", require: false
@@ -143,6 +145,7 @@ group :development do
   gem "spring"
   gem "spring-commands-rspec"
   gem "spring-commands-rubocop"
+  gem "terminal-notifier"
 end
 
 group :development, :test do

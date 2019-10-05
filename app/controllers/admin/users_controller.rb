@@ -1,6 +1,6 @@
 class Admin::UsersController < Admin::BaseController
   include SortableTable
-  before_filter :find_user, only: [:edit, :update, :destroy]
+  before_filter :find_user, only: [:show, :edit, :update, :destroy]
 
   def index
     page = params[:page] || 1
@@ -9,10 +9,14 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def show
-    redirect_to edit_admin_user_url
+    redirect_to edit_admin_user_url(@user&.id)
   end
 
   def edit
+    # urls with user IDs rather than usernames are more helpful in superadmin
+    if params[:id] == @user.username
+      redirect_to edit_admin_user_path(@user.id)
+    end
     # If the user has a bunch of bikes, it can cause timeouts. In those cases, use rough approximation
     if @user.rough_approx_bikes.count > 25
       bikes = @user.rough_approx_bikes
@@ -31,6 +35,7 @@ class Admin::UsersController < Admin::BaseController
     @user.banned = params[:user][:banned]
     @user.username = params[:user][:username]
     @user.can_send_many_stolen_notifications = params[:user][:can_send_many_stolen_notifications]
+    @user.phone = params[:user][:phone]
     if @user.save
       @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
       redirect_to admin_users_url, notice: "User Updated"

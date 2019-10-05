@@ -104,7 +104,7 @@ class BikeIndex.Init extends BikeIndex
 
     displayLocalDate = @displayLocalDate
 
-    # Write local time
+    # Write local time (format: 2018-07-14T01:00:00-0500)
     $(".convertTime").each ->
       $this = $(this)
       $this.removeClass("convertTime")

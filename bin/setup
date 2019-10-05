@@ -9,6 +9,7 @@ Dir.chdir APP_ROOT do
   # Add necessary setup steps to this file:
 
   puts "== Installing dependencies =="
+  system "command -v brew >/dev/null && brew cask info growlnotify"
   system "gem install bundler --conservative"
   system "yarn install"
 

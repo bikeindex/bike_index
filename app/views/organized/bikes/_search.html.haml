@@ -158,7 +158,7 @@
               %small.convertTime
                 = l bike.updated_at, format: :convert_time
             %td.hiddenColumn.hidden-xs-down.table-cell-check.stolen_cell
-              = bike.stolen ? "&#x2713;".html_safe : ""
+              = check_mark if bike.stolen?
             %td.hiddenColumn.hidden-xs-down.manufacturer_cell
               = bike.mnfg_name
             %td.hiddenColumn.hidden-xs-down.model_cell

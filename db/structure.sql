@@ -441,7 +441,8 @@ CREATE TABLE public.blogs (
     is_listicle boolean DEFAULT false NOT NULL,
     index_image character varying(255),
     index_image_id integer,
-    index_image_lg character varying(255)
+    index_image_lg character varying(255),
+    language integer DEFAULT 0 NOT NULL
 );
 
 
@@ -727,12 +728,12 @@ CREATE TABLE public.customer_contacts (
     creator_id integer,
     creator_email character varying(255),
     title character varying(255),
-    contact_type character varying(255),
     body text,
     bike_id integer,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    info_hash text
+    info_hash jsonb DEFAULT '{}'::jsonb,
+    kind integer DEFAULT 0 NOT NULL
 );
 
 
@@ -823,6 +824,53 @@ CREATE SEQUENCE public.exports_id_seq
 --
 
 ALTER SEQUENCE public.exports_id_seq OWNED BY public.exports.id;
+
+
+--
+-- Name: external_registry_bikes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.external_registry_bikes (
+    id integer NOT NULL,
+    type character varying NOT NULL,
+    country_id integer NOT NULL,
+    serial_number character varying NOT NULL,
+    serial_normalized character varying NOT NULL,
+    external_id character varying NOT NULL,
+    additional_registration character varying,
+    date_stolen timestamp without time zone,
+    category character varying,
+    cycle_type character varying,
+    description character varying,
+    frame_colors character varying,
+    frame_model character varying,
+    location_found character varying,
+    mnfg_name character varying,
+    status character varying,
+    info_hash jsonb DEFAULT '{}'::jsonb,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: external_registry_bikes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.external_registry_bikes_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: external_registry_bikes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.external_registry_bikes_id_seq OWNED BY public.external_registry_bikes.id;
 
 
 --
@@ -1882,7 +1930,7 @@ CREATE TABLE public.recovery_displays (
     stolen_record_id integer,
     quote text,
     quote_by character varying(255),
-    date_recovered timestamp without time zone,
+    recovered_at timestamp without time zone,
     link character varying(255),
     image character varying(255),
     created_at timestamp without time zone NOT NULL,
@@ -2024,7 +2072,7 @@ CREATE TABLE public.stolen_records (
     approved boolean DEFAULT false NOT NULL,
     receive_notifications boolean DEFAULT true,
     proof_of_ownership boolean,
-    date_recovered timestamp without time zone,
+    recovered_at timestamp without time zone,
     recovered_description text,
     index_helped_recovery boolean DEFAULT false NOT NULL,
     can_share_recovery boolean DEFAULT false NOT NULL,
@@ -2037,7 +2085,8 @@ CREATE TABLE public.stolen_records (
     recovery_link_token text,
     show_address boolean DEFAULT false,
     recovering_user_id integer,
-    recovery_display_status integer DEFAULT 0
+    recovery_display_status integer DEFAULT 0,
+    neighborhood character varying
 );
 
 
@@ -2147,7 +2196,10 @@ CREATE TABLE public.tweets (
     image character varying,
     alignment character varying,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    twitter_account_id integer,
+    stolen_record_id integer,
+    original_tweet_id integer
 );
 
 
@@ -2168,6 +2220,56 @@ CREATE SEQUENCE public.tweets_id_seq
 --
 
 ALTER SEQUENCE public.tweets_id_seq OWNED BY public.tweets.id;
+
+
+--
+-- Name: twitter_accounts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.twitter_accounts (
+    id integer NOT NULL,
+    active boolean DEFAULT false NOT NULL,
+    "default" boolean DEFAULT false NOT NULL,
+    "national" boolean DEFAULT false NOT NULL,
+    latitude double precision,
+    longitude double precision,
+    address character varying,
+    append_block character varying,
+    city character varying,
+    consumer_key character varying NOT NULL,
+    consumer_secret character varying NOT NULL,
+    country character varying,
+    language character varying,
+    neighborhood character varying,
+    screen_name character varying NOT NULL,
+    state character varying,
+    user_secret character varying NOT NULL,
+    user_token character varying NOT NULL,
+    twitter_account_info jsonb DEFAULT '{}'::jsonb,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    last_error character varying,
+    last_error_at timestamp without time zone
+);
+
+
+--
+-- Name: twitter_accounts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.twitter_accounts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: twitter_accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.twitter_accounts_id_seq OWNED BY public.twitter_accounts.id;
 
 
 --
@@ -2451,6 +2553,13 @@ ALTER TABLE ONLY public.exports ALTER COLUMN id SET DEFAULT nextval('public.expo
 
 
 --
+-- Name: external_registry_bikes id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.external_registry_bikes ALTER COLUMN id SET DEFAULT nextval('public.external_registry_bikes_id_seq'::regclass);
+
+
+--
 -- Name: feedbacks id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2696,6 +2805,13 @@ ALTER TABLE ONLY public.tweets ALTER COLUMN id SET DEFAULT nextval('public.tweet
 
 
 --
+-- Name: twitter_accounts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.twitter_accounts ALTER COLUMN id SET DEFAULT nextval('public.twitter_accounts_id_seq'::regclass);
+
+
+--
 -- Name: user_emails id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2874,6 +2990,14 @@ ALTER TABLE ONLY public.duplicate_bike_groups
 
 ALTER TABLE ONLY public.exports
     ADD CONSTRAINT exports_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: external_registry_bikes external_registry_bikes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.external_registry_bikes
+    ADD CONSTRAINT external_registry_bikes_pkey PRIMARY KEY (id);
 
 
 --
@@ -3157,6 +3281,14 @@ ALTER TABLE ONLY public.tweets
 
 
 --
+-- Name: twitter_accounts twitter_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.twitter_accounts
+    ADD CONSTRAINT twitter_accounts_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: user_emails user_emails_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3388,6 +3520,34 @@ CREATE INDEX index_exports_on_organization_id ON public.exports USING btree (org
 --
 
 CREATE INDEX index_exports_on_user_id ON public.exports USING btree (user_id);
+
+
+--
+-- Name: index_external_registry_bikes_on_country_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_external_registry_bikes_on_country_id ON public.external_registry_bikes USING btree (country_id);
+
+
+--
+-- Name: index_external_registry_bikes_on_external_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_external_registry_bikes_on_external_id ON public.external_registry_bikes USING btree (external_id);
+
+
+--
+-- Name: index_external_registry_bikes_on_serial_normalized; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_external_registry_bikes_on_serial_normalized ON public.external_registry_bikes USING btree (serial_normalized);
+
+
+--
+-- Name: index_external_registry_bikes_on_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_external_registry_bikes_on_type ON public.external_registry_bikes USING btree (type);
 
 
 --
@@ -3696,6 +3856,41 @@ CREATE INDEX index_theft_alerts_on_theft_alert_plan_id ON public.theft_alerts US
 --
 
 CREATE INDEX index_theft_alerts_on_user_id ON public.theft_alerts USING btree (user_id);
+
+
+--
+-- Name: index_tweets_on_original_tweet_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tweets_on_original_tweet_id ON public.tweets USING btree (original_tweet_id);
+
+
+--
+-- Name: index_tweets_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tweets_on_stolen_record_id ON public.tweets USING btree (stolen_record_id);
+
+
+--
+-- Name: index_tweets_on_twitter_account_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tweets_on_twitter_account_id ON public.tweets USING btree (twitter_account_id);
+
+
+--
+-- Name: index_twitter_accounts_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_twitter_accounts_on_latitude_and_longitude ON public.twitter_accounts USING btree (latitude, longitude);
+
+
+--
+-- Name: index_twitter_accounts_on_screen_name; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_twitter_accounts_on_screen_name ON public.twitter_accounts USING btree (screen_name);
 
 
 --
@@ -4544,7 +4739,31 @@ INSERT INTO schema_migrations (version) VALUES ('20190806170520');
 
 INSERT INTO schema_migrations (version) VALUES ('20190806214815');
 
+INSERT INTO schema_migrations (version) VALUES ('20190809200257');
+
 INSERT INTO schema_migrations (version) VALUES ('20190809214414');
 
-INSERT INTO schema_migrations (version) VALUES ('20190809200257');
+INSERT INTO schema_migrations (version) VALUES ('20190829221522');
+
+INSERT INTO schema_migrations (version) VALUES ('20190903145420');
+
+INSERT INTO schema_migrations (version) VALUES ('20190904161424');
+
+INSERT INTO schema_migrations (version) VALUES ('20190909190050');
+
+INSERT INTO schema_migrations (version) VALUES ('20190913132047');
+
+INSERT INTO schema_migrations (version) VALUES ('20190916190441');
+
+INSERT INTO schema_migrations (version) VALUES ('20190916190442');
+
+INSERT INTO schema_migrations (version) VALUES ('20190916191514');
+
+INSERT INTO schema_migrations (version) VALUES ('20190918121951');
+
+INSERT INTO schema_migrations (version) VALUES ('20190918143646');
+
+INSERT INTO schema_migrations (version) VALUES ('20190919145324');
+
+INSERT INTO schema_migrations (version) VALUES ('20190923181352');
 

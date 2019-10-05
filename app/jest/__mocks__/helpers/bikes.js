@@ -20,6 +20,34 @@ const bikeResponse = {
   ],
 };
 
+
+const externalBikeResponse = {
+  bikes: [
+    {
+      date_stolen: "2010-10-06",
+      description: null,
+      frame_colors: ["Grijs"],
+      frame_model: "Live",
+      id: "2010027007",
+      is_stock_img: true,
+      large_img: "/assets/revised/bike_photo_placeholder-ff15adbd9bf89e10bf3cd2cd6c4e85e5d1056e50463ae722822493624db72e56.svg",
+      location_found: null,
+      manufacturer_name: "Batavus",
+      external_id: "2010027007",
+      registry_name: "stopheling.nl",
+      registry_url: "https://www.stopheling.nl",
+      serial: "BA6038224",
+      status: "Stolen",
+      stolen: true,
+      stolen_location: null,
+      thumb: "/assets/revised/bike_photo_placeholder-ff15adbd9bf89e10bf3cd2cd6c4e85e5d1056e50463ae722822493624db72e56.svg",
+      title: "Batavus Live",
+      url: "https://www.stopheling.nl"
+    }
+  ]
+};
+
 export {
   bikeResponse,
+  externalBikeResponse,
 };

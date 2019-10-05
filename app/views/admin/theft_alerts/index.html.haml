@@ -1,6 +1,17 @@
 .admin-subnav
   .col-md-12
-    %h1 Theft Alerts
+    %h1 Promoted Alerts
+
+.row.mt-4
+  .col-md-5
+    %p
+      %strong
+        = number_with_delimiter(@theft_alerts.total_count)
+      = "Matching Promoted Alerts".pluralize(@theft_alerts.total_count)
+      - if @user.present?
+        %strong
+          Owned by
+          = link_to "#{@user.email}", admin_user_path(@user)
 
 = render partial: "/admin/theft_alerts/table", locals: { render_sortable: true, theft_alerts: @theft_alerts }
 

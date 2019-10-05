@@ -5,19 +5,24 @@
 
       %span.precovery
         = recovery_display.quote.html_safe
+
     %span.recovery-user
       - if recovery_display.image.present?
-        %img{ src: recovery_display.image_url(:medium)}
+        = image_tag recovery_display.image_url(:medium)
       - else
         %span.no-image-spacer
+
       - if recovery_display.quote_by
         %span.h3recovery
           = recovery_display.quote_by
+
       %span.h4recovery
-        - txt = recovery_display.bike.present? ? recovery_display.bike.type.titleize : 'Bike'
-        - txt += " <span class='recover-date'>recovered #{l recovery_display.date_recovered, format: :dotted}</span>"
+        - bike_type = recovery_display&.bike&.type&.titleize.presence || t(".bike")
+        - date = l(recovery_display.recovered_at, format: :dotted)
+        - recovery_date = content_tag(:span, t(".recovered_date", date: date), class: "recover-date")
+        - recovery_text = safe_join([bike_type, recovery_date], " ")
+
         - if recovery_display.link.present?
-          %a.recover-date{ href: recovery_display.link }
-            = txt.html_safe
+          = link_to recovery_text, recovery_display.link, class: "recover-date"
         - else
-          = txt.html_safe
+          = recovery_text

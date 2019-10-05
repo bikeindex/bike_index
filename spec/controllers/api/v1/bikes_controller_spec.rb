@@ -242,6 +242,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
       end
 
       include_context :geocoder_real
+
       it "creates a stolen record" do
         VCR.use_cassette("v1_bikes_create-stolen") do
           manufacturer = FactoryBot.create(:manufacturer)

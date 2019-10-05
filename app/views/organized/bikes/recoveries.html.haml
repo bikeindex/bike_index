@@ -8,7 +8,7 @@
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border.table-compact-long
     %thead.small-header
       %tr
-        %th.date-added= t(".date_recovered")
+        %th.date-added= t(".recovered_at")
         %th= t(".description")
         %th= t(".mfg_model_color_html")
         %th= t(".owner")
@@ -19,9 +19,9 @@
         - bike = recovered_record.bike
         %tr
           %td
-            - if recovered_record.date_recovered.present?
+            - if recovered_record.recovered_at.present?
               %a.convertTime{ href: bike_path(bike) }
-                = l recovered_record.date_recovered, format: :convert_time
+                = l recovered_record.recovered_at, format: :convert_time
             - if display_recovery_ids
               %small.less-strong
                 = recovered_record.id

@@ -17,6 +17,8 @@
       %th.d-none.d-lg-table-cell
         Vignettes
       %th
+        Language
+      %th
         Published
     %tbody
       - @blogs.each do |blog|
@@ -36,6 +38,8 @@
               %br
               = blog.body_abbr.html_safe if blog.body_abbr
           %td.table-cell-check
-            = "&#x2713;".html_safe if blog.is_listicle
+            = check_mark if blog.is_listicle
+          %td
+            = t(blog.language, scope: [:locales])
           %td.table-cell-check
-            = "&#x2713;".html_safe if blog.published
+            = check_mark if blog.published

@@ -1,12 +1,11 @@
 class FileCacheMaintenanceWorker < ScheduledWorker
-  attr_reader :filename
+  prepend ScheduledWorkerRecorder
 
   def self.frequency
     6.hours
   end
 
   def perform
-    record_scheduler_started
     write_stolen
     uploader = JsonUploader.new
     file = File.open(tmp_path)
@@ -14,7 +13,6 @@ class FileCacheMaintenanceWorker < ScheduledWorker
     file.close
     FileCacheMaintainer.update_file_info(output_url(uploader))
     expired_file_hashes.each { |fh| FileCacheMaintainer.remove_file(fh) }
-    record_scheduler_finished
   end
 
   def output_url(uploader)

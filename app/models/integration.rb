@@ -36,7 +36,7 @@ class Integration < ActiveRecord::Base
                       name: name,
                       password: password,
                       password_confirmation: password)
-    if i_user.save
+    if i_user.save!
       i_user.confirm(i_user.confirmation_token)
     else
       errors.add :user_errors, i_user.errors

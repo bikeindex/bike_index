@@ -160,7 +160,6 @@ RSpec.describe BulkImportWorker, type: :job do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       # We're stubbing the method to use a remote file, don't pass the file in and let it use the factory default
       let!(:bulk_import) { FactoryBot.create(:bulk_import, progress: "pending", user_id: nil, organization_id: organization.id) }
-      include_context :geocoder_default_location
       it "creates the bikes, doesn't have any errors" do
         # In production, we actually use remote files rather than local files.
         # simulate what that process looks like by loading a remote file in the way we use open_file in BulkImport
@@ -346,11 +345,11 @@ RSpec.describe BulkImportWorker, type: :job do
       let(:blank_examples) { ["NA", "N/A", "unkown", "unkown", "           ", "none"] }
       let(:non_blank_examples) { %w[somethingna none8xc9x] }
       it "rescues blank serials, doesn't rescue non blank serials" do
-        blank_examples.each do |e|
-          expect(instance.rescue_blank_serial(e)).to eq "unknown"
+        blank_examples.each do |blank|
+          expect(instance.rescue_blank_serial(blank)).to eq("unknown"), "Failure: '#{blank}'"
         end
-        non_blank_examples.each do |e|
-          expect(instance.rescue_blank_serial(e)).to_not eq "unknown"
+        non_blank_examples.each do |non_blank|
+          expect(instance.rescue_blank_serial(non_blank)).to_not eq("unknown"), "Failure: #{non_blank}"
         end
       end
     end

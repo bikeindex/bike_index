@@ -6,7 +6,7 @@
     %thead.thead-light.sortable
       %th
         - if render_sortable
-          = sortable "date_recovered"
+          = sortable "recovered_at"
         - else
           Date recovered
       %th
@@ -35,8 +35,8 @@
         %tr
           %td
             %a{href: edit_admin_recovery_url(recovery.id) }
-              - if recovery.date_recovered.present?
-                - date = recovery.date_recovered
+              - if recovery.recovered_at.present?
+                - date = recovery.recovered_at
               - else
                 %small
                 - date = recovery.created_at
@@ -77,11 +77,11 @@
               = recovery.city
           %td.table-cell-check
             / Posted
-            / = "&#x2713;".html_safe if recovery.recovery_posted
-            = "&#x2713;".html_safe if recovery.index_helped_recovery
+            / = check_mark if recovery.recovery_posted
+            = check_mark if recovery.index_helped_recovery
           %td.table-cell-check
-            = "&#x2713;".html_safe if recovery.can_share_recovery
+            = check_mark if recovery.can_share_recovery
           %td.table-cell-check
             - if recovery.recovery_display.present?
-              = link_to "&#x2713;".html_safe, edit_admin_recovery_display_url(recovery.recovery_display)
+              = link_to check_mark, edit_admin_recovery_display_url(recovery.recovery_display)
 
