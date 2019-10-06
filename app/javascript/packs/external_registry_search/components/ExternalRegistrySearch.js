@@ -27,6 +27,10 @@ class ExternalRegistrySearch extends Component {
       .catch(this.handleError);
   }
 
+  componentDidUpdate() {
+    TimeParser().localize();
+  }
+
   resultsBeingFetched = () => {
     this.setState({ loading: true });
     this.toggleHeader({ isLoading: true });
@@ -56,10 +60,6 @@ class ExternalRegistrySearch extends Component {
 
     const sectionTitle = header.getElementsByClassName(titleDisplay)[0];
     sectionTitle.classList.remove("d-none");
-  }
-
-  componentDidUpdate() {
-    TimeParser().localize();
   }
 
   render() {
