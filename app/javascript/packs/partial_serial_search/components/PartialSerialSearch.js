@@ -6,6 +6,7 @@ import PartialSerialSearchResult from "./PartialSerialSearchResult";
 import { fetchSerialPartialSearch } from "../../api";
 import Loading from "../../Loading";
 import honeybadger from "../../utils/honeybadger";
+import TimeParser from "../../utils/time_parser";
 
 class PartialSerialSearch extends Component {
   state = {
@@ -20,14 +21,19 @@ class PartialSerialSearch extends Component {
       .catch(this.handleError);
   }
 
+  componentDidUpdate() {
+    TimeParser().localize();
+  }
+
   resultsBeingFetched = () => {
     this.setState({ loading: true });
     this.toggleHeader({ isLoading: true });
   }
 
-  resultsFetched = response => {
-    this.setState({ results: response.bikes || [], loading: false });
+  resultsFetched = ({ bikes, error }) => {
+    this.setState({ results: bikes || [], loading: false });
     this.toggleHeader({ isLoading: false, resultsCount: this.state.results.length });
+    if (error) { this.handleError(error) }
   }
 
   handleError = error => {
