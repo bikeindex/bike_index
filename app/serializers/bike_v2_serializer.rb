@@ -82,6 +82,15 @@ class BikeV2Serializer < ActiveModel::Serializer
   end
 
   def stolen_location
-    object.current_stolen_record && object.current_stolen_record.address_short
+    stolen_record = object.current_stolen_record
+    return if stolen_record.blank?
+
+    [
+      [
+        stolen_record.city,
+        stolen_record.state&.abbreviation,
+      ].select(&:present?).join(", "),
+      stolen_record.country&.iso,
+    ].select(&:present?).join(" - ")
   end
 end
