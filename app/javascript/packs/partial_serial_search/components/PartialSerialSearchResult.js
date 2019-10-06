@@ -6,7 +6,7 @@ const PartialSerialSearchResult = ({bike}) => (
   <li className="bike-box-item">
     <ResultImage bike={bike}/>
 
-    <div className="bike-information">
+    <div className="bike-information multi-attr-lists">
       <h5 className="title-link">
         <a href={bike.url} target="_blank">
           <strong>
@@ -27,44 +27,53 @@ const PartialSerialSearchResult = ({bike}) => (
       </ul>
 
       <ul className="attr-list">
-        <li>
-          <span className="attr-title text-danger">
-            {bike.stolen ? "Stolen" : "Abandoned"}
-          </span>
-          <span className="convertTime">{bike.date_stolen_string}</span>
-        </li>
-        <li>
-          <span className="attr-title">Location</span>
-          {bike.stolen_location}
-        </li>
+        {<AbandonedOrStolenDateItem bike={bike}/>}
+        {<LocationItem bike={bike}/>}
       </ul>
     </div>
-
-    <pre className="d-none">
-      {JSON.stringify(bike)}
-    </pre>
   </li>
 )
 
-const ResultImage = ({ bike }) => {
-  const backgroundStyles = ({ thumb }) => ({
-    backgroundSize: "contain",
-    backgroundPosition: "left",
-    backgroundRepeat: "no-repeat",
-    backgroundImage: `url('${thumb}')`
-  });
+const AbandonedOrStolenDateItem = ({bike}) => {
+  if (!bike.date_stolen) {
+    return <li/>
+  }
 
+  return (
+    <li>
+      <span className="attr-title text-danger">
+        {bike.stolen ? "Stolen" : "Abandoned"}
+      </span>
+      <span className="convertTime">{bike.date_stolen}</span>
+    </li>
+  )
+}
+
+const LocationItem = ({bike}) => {
+  if (!bike.stolen_location) {
+    return <li/>
+  }
+
+  return (
+    <li>
+      <span className="attr-title">Location</span>
+      {bike.stolen_location}
+    </li>
+  )
+}
+
+const ResultImage = ({ bike }) => {
   if (bike.is_stock_img) {
-    return (<a href={bike.url} className="bike-list-image" target="_blank">
-              <img src={bike.placeholder_image} className="no-image"/>
+    return (<a className="bike-list-image" target="_blank" href={bike.url}>
+              <img src={window.bike_placeholder_image} className="no-image"/>
             </a>);
   }
 
-  return (<a href={bike.url}
-             style={backgroundStyles(bike)}
-             data-img-src={bike.thumb}
-             className="bike-list-image hover-expand"
-             target="_blank" />);
+  return (<a className="bike-list-image hover-expand"
+             target="_blank"
+             href={bike.url}>
+            <img alt="" src={bike.thumb}></img>
+          </a>);
 }
 
 export default PartialSerialSearchResult;

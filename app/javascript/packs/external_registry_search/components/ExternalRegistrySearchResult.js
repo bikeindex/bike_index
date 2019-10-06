@@ -13,8 +13,9 @@ const ExternalRegistrySearchResult = ({ bike }) => (
     <div className="bike-information">
       <h5 className="title-link">
         <a href={bike.url} target="_blank">
-          <strong>{_.titleize(bike.manufacturer_name)}</strong>&nbsp;
-          {_.titleize(bike.frame_model)}
+          <strong>
+            {_.titleize(bike.manufacturer_name)}
+          </strong> {_.titleize(bike.frame_model)}
         </a>
       </h5>
 
@@ -31,8 +32,12 @@ const ExternalRegistrySearchResult = ({ bike }) => (
 
       <ul className="attr-list">
         <li>
-          <span className="attr-title text-danger">{_.titleize(bike.status)}</span>
-          <span className="convertTime">{bike.date_stolen}</span>
+          <span className="attr-title text-danger">
+            {_.titleize(bike.status)}
+          </span>
+          <span className="convertTime">
+            {bike.date_stolen}
+          </span>
         </li>
         <li>
           <span className="attr-title">Registry</span>
@@ -61,7 +66,7 @@ const ResultImage = ({ bike }) => {
 
   if (bike.is_stock_img) {
     return (<a href={bike.url} className="bike-list-image" target="_blank">
-              <img src={window.bike_placeholder_image} className="no-image"/>
+              <img src={window.bike_placeholder_image} className="no-image" />
             </a>);
   }
 
