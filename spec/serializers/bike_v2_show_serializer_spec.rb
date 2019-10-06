@@ -53,7 +53,6 @@ RSpec.describe BikeV2ShowSerializer do
         api_url: "http://test.host/api/v1/bikes/#{bike.id}",
         manufacturer_id: bike.manufacturer_id,
         paint_description: nil,
-        placeholder_image: "http://test.host/assets/revised/bike_photo_placeholder-ff15adbd9bf89e10bf3cd2cd6c4e85e5d1056e50463ae722822493624db72e56.svg",
         name: nil,
         frame_size: "42cm",
         description: nil,
