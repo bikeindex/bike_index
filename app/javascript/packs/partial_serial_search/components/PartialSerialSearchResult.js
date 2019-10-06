@@ -63,16 +63,14 @@ const LocationItem = ({bike}) => {
 }
 
 const ResultImage = ({ bike }) => {
-  if (bike.is_stock_img) {
+  if (!bike.thumb || bike.is_stock_img) {
     return (<a className="bike-list-image" target="_blank" href={bike.url}>
               <img src={window.bike_placeholder_image} className="no-image"/>
             </a>);
   }
 
-  return (<a className="bike-list-image hover-expand"
-             target="_blank"
-             href={bike.url}>
-            <img alt="" src={bike.thumb}></img>
+  return (<a className="bike-list-image hover-expand" target="_blank" href={bike.url}>
+            <img alt={bike.description} src={bike.thumb}></img>
           </a>);
 }
 
