@@ -1,0 +1,257 @@
+$bikehub-header: #92d149;
+$bikehub-green: #82cb39;
+$bikehub-green-secondary: rgba($bikehub-green, 0.8);
+$bikehub-text-color: #212529;
+
+.bikehub-nav {
+  background: #fff;
+  padding: 0.5rem 0;
+  @include media-breakpoint-up(md) {
+    padding: 0;
+  }
+
+  .primary-logos {
+    span,
+    a,
+    img {
+      display: inline-block;
+    }
+  }
+
+  .bikehub-logo {
+    padding: 0;
+    img {
+      height: 30px;
+      width: auto;
+    }
+  }
+
+  // Shared with BikeHub styles
+  .powered-by-text,
+  .powered-by-logo {
+    opacity: 0.7;
+  }
+
+  .powered-by-text {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #000;
+    text-align: center;
+    vertical-align: center;
+    padding: 3px 0.5rem 0 0.75rem;
+    line-height: 1.2;
+  }
+
+  .powered-by-logo {
+    padding: 2px 0 0 0;
+    img {
+      height: 42px;
+      width: auto;
+    }
+  }
+
+  // Importing the styles from BikeHub's newer version of bootstrap
+  // Can probably be deleted once we're on bootstrap 4.3 and just copy BikeHub's navbar styles
+  .bikehub-logo,
+  .powered-by-text,
+  .powered-by-logo {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -ms-flex-flow: row nowrap;
+    flex-flow: row nowrap;
+    -webkit-box-pack: start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+  .container-fluid {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: left;
+    @include media-breakpoint-up(md) {
+      justify-content: space-between;
+    }
+  }
+  .navbar-collapse {
+    flex-grow: 1;
+    align-items: center;
+
+    @include media-breakpoint-up(md) {
+      display: flex !important;
+      flex-basis: auto !important;
+    }
+
+    &.collapsing,
+    &.in {
+      display: flex;
+      flex-basis: 100%;
+    }
+  }
+
+  .navbar-toggler {
+    margin-left: auto;
+    color: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0.25rem 0.75rem;
+    font-size: 20px;
+    line-height: 1;
+    border-radius: 2px;
+
+    @include media-breakpoint-up(md) {
+      display: none;
+    }
+  }
+  .navbar-toggler-icon {
+    display: inline-block;
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: middle;
+    content: "";
+    color: rgba(0, 0, 0, 0.5);
+    border-color: rgba(0, 0, 0, 0.1);
+    background: no-repeat center center;
+    background-size: 100% 100%;
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0,0,0, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
+  }
+
+  .navbar-nav {
+    padding: 0;
+    margin: 0;
+    .nav-item {
+      display: block;
+      float: none;
+      margin: 0;
+      font-weight: bold;
+      .nav-link {
+        color: $bikehub-text-color;
+        font-size: 16px;
+        padding: 0.5rem 0;
+      }
+    }
+    @include media-breakpoint-up(md) {
+      flex-direction: row;
+      display: flex;
+      flex-direction: column;
+      flex-flow: row nowrap;
+      justify-content: flex-start;
+      list-style: none;
+      margin-left: auto;
+
+      .nav-item {
+        display: list-item;
+        border-left: 1px solid #ededed;
+        &:last-of-type {
+          border-right: 1px solid #ededed;
+        }
+        // There is some bug where the dropdown doubles border :/
+        &.dropdown {
+          border-left: 0;
+        }
+        .nav-link {
+          padding: 1rem 2rem;
+          margin: 0;
+          text-decoration: none;
+          &:hover {
+            color: #fff;
+            background: $bikehub-green-secondary;
+          }
+          // active after, because if it's active it shouldn't change color
+          &:active,
+          &.active {
+            color: #fff;
+            background: $bikehub-green;
+          }
+        }
+      }
+    }
+  }
+}
+
+.bikehub {
+  .bikehub-banner-header {
+    background-image: image-url("landing_pages/header_bg_bike-hub.jpg");
+    background-size: auto 100%;
+    background-position: right center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding: 100px 0;
+    border-bottom: 0px;
+  }
+
+  .teamed-up-with-bike-index {
+    background: white;
+    max-width: 675px;
+    margin: 0 auto;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    h1 {
+      font-size: 26px;
+      font-weight: bold;
+      color: $bikehub-green;
+      text-align: center;
+    }
+    img {
+      max-width: 120px;
+      height: auto;
+    }
+    p {
+      font-size: 12px;
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+    }
+    .team-title-box {
+      @include media-breakpoint-down(md) {
+        display: flex;
+        padding-bottom: 20px;
+        h1,
+        .high-five-wrapper {
+          flex: 0 0 50%;
+        }
+        h1 {
+          padding-top: 36px;
+        }
+      }
+    }
+  }
+
+  .bike-hub-login {
+    h2 {
+      color: $bikehub-green;
+      font-size: 22px;
+      text-align: center;
+      line-height: 34px;
+    }
+  }
+
+  .sign-in-up-main-form-header {
+    color: $bikehub-green;
+  }
+  .main-form .btn-primary {
+    background: $bikehub-green;
+    border-color: $bikehub-green;
+    &:hover,
+    &:active,
+    &:focus {
+      background-color: $bikehub-green-secondary;
+      border-color: $bikehub-green-secondary;
+    }
+  }
+  .forgot-password-link a,
+  .sign-in-up .main-form h3.sign-in-up-main-form-header a {
+    color: $bikehub-green;
+    &:hover,
+    &:active,
+    &:focus {
+      color: $bikehub-green-secondary;
+    }
+  }
+}

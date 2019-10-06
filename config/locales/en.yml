@@ -3289,27 +3289,24 @@ en:
       view_org: View %{org_name}
       your_bikes: Your bikes
     application_bikehub:
-      bike_security: At BikeHub, we believe bike security is more than just a strong
-        U-lock.
-      bikehub_login: BikeHub Login
-      bikehub_signup: BikeHub Sign-Up
-      bikeindex_a_nonprofit: >-
+      accounts_powered_by_bike_index: BikeHub accounts are powered by Bike Index –
+        the premier bike registry.
+      contact: Contact
+      home: Home
+      log_in_message: Logging in here will log you in to BikeHub
+      login: Login
+      non_profit: >-
         Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration
         service in the world.
-      bikeindex_bikehub_partnership: >-
+      partnership: >-
         Through this partnership, BikeHub patrons enjoy access to the most secure
-        public bike parking – and registration with nation’s largest network, used
-        by law enforcement agencies, universities, and advocates to connect recovered
+        public bike parking - and registration with the nation's largest network,
+        used by law enforcement agencies, universities and advocates to connect recovery
         bikes with their owners.
-      contact: Contact
-      log_in: Log in
-      login_message: Logging in here will log you in to BikeHub.
-      powered_by: powered by
-      powered_by_bike_index: BikeHub accounts are powered by Bike Index – the premier
-        bike registry.
-      sign_up: Sign up
-      signup_message: Creating an account here will sign you up for BikeHub
-      why_bikeindex: WHY BIKEINDEX?
+      register: Register
+      security: At BikeHub, we believe bike security is more than just a strong U-lock.
+      sign_up_message: Signing up here will log you in to BikeHub
+      teamed_up: We teamed up with Bike Index!
     email:
       bike_index: Bike Index
       help_prevent_theft: Help prevent bike theft,
@@ -4314,7 +4311,7 @@ en:
       get_on_bike_index: Get on Bike Index
       keep_me_logged_in: Keep me logged in
       log_in: Log in
-      no_bike_index_account: no Bike Index account?
+      no_bike_index_account: No Bike Index account?
       or: Or
       password: password
       sign_in_using_facebook: Sign in using Facebook
@@ -4737,10 +4734,8 @@ en:
       agree_bikeindex_bikehub_toc_html: I agree to BikeHub's %{bikehub_toc_link} and
         Bike Index's %{bikeindex_toc_link}.
       agree_bikeindex_toc_html: I agree to Bike Index's %{bikeindex_toc_link}.
-      already_have_a_bike_index_account: already have a Bike Index account?
+      already_have_a_bike_index_account: Already have a Bike Index account?
       already_have_an_account: already have an account?
-      bikehub_terms_url: https://basic.bikehub.com/terms.html
-      forgot_your_password: Forgot your password?
       get_bike_indexs_newsletter: Get Bike Index's Newsletter
       get_on_bike_index: Get on Bike Index
       log_in: log in
