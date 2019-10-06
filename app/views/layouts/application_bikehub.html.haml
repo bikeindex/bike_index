@@ -26,7 +26,6 @@
 
           %button.navbar-toggler{ type: "button", "data-toggle" => "collapse", "data-target" => "#mainNavbarContent", "aria-controls" => "mainNavbarContent", "aria-expanded" => "false", "aria-label" => "Toggle navigation" }
             %span.navbar-toggler-icon
-              &#8801;
 
           .collapse.navbar-collapse#mainNavbarContent
             %ul.navbar-nav
@@ -46,10 +45,11 @@
       .bikehub-signup-landing-page.bikehub-signup-page.landing-page
         %header.bikehub-banner-header
           .row.teamed-up-with-bike-index.text-center
-            .col-lg-4
-              %h1.mb-auto
+            .col-lg-4.team-title-box
+              %h1
                 = t(".teamed_up")
-              = image_tag "bikehub/high-five.svg", alt: "High Five"
+              %span.high-five-wrapper
+                = image_tag "bikehub/high-five.svg", alt: "High Five"
             .col-lg-8
               %p
                 = t(".non_profit")
@@ -60,11 +60,11 @@
       .bike-hub-login.mt-4
         %h2
           = t(".accounts_powered_by_bike_index")
-          %span
-            - if signup_page
-              = t(".sign_up_message")
-            - else
-              = t(".log_in_message")
+          %br
+          - if signup_page
+            = t(".sign_up_message")
+          - else
+            = t(".log_in_message")
 
 
       = render "layouts/revised_messages"

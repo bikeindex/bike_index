@@ -1,5 +1,6 @@
 $bikehub-header: #92d149;
 $bikehub-green: #82cb39;
+$bikehub-green-secondary: rgba($bikehub-green, 0.8);
 $bikehub-text-color: #212529;
 
 .bikehub-nav {
@@ -25,20 +26,7 @@ $bikehub-text-color: #212529;
     }
   }
 
-  .bikehub-logo,
-  .powered-by-text,
-  .powered-by-logo {
-    -webkit-box-orient: horizontal;
-    -webkit-box-direction: normal;
-    -ms-flex-flow: row nowrap;
-    flex-flow: row nowrap;
-    -webkit-box-pack: start;
-    -ms-flex-pack: start;
-    justify-content: flex-start;
-  }
-
   // Shared with BikeHub styles
-
   .powered-by-text,
   .powered-by-logo {
     opacity: 0.7;
@@ -64,7 +52,18 @@ $bikehub-text-color: #212529;
   }
 
   // Importing the styles from BikeHub's newer version of bootstrap
-  // Can probably be deleted once we're on bootstrap 4.3
+  // Can probably be deleted once we're on bootstrap 4.3 and just copy BikeHub's navbar styles
+  .bikehub-logo,
+  .powered-by-text,
+  .powered-by-logo {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -ms-flex-flow: row nowrap;
+    flex-flow: row nowrap;
+    -webkit-box-pack: start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
   .container-fluid {
     display: -webkit-box;
     display: -ms-flexbox;
@@ -112,9 +111,15 @@ $bikehub-text-color: #212529;
   }
   .navbar-toggler-icon {
     display: inline-block;
-    font-size: 60px;
-    line-height: 0;
-    padding: 10px 0 0 0;
+    width: 1.5em;
+    height: 1.5em;
+    vertical-align: middle;
+    content: "";
+    color: rgba(0, 0, 0, 0.5);
+    border-color: rgba(0, 0, 0, 0.1);
+    background: no-repeat center center;
+    background-size: 100% 100%;
+    background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(0,0,0, 0.5)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
   }
 
   .navbar-nav {
@@ -124,6 +129,7 @@ $bikehub-text-color: #212529;
       display: block;
       float: none;
       margin: 0;
+      font-weight: bold;
       .nav-link {
         color: $bikehub-text-color;
         font-size: 16px;
@@ -155,7 +161,7 @@ $bikehub-text-color: #212529;
           text-decoration: none;
           &:hover {
             color: #fff;
-            background: rgba($bikehub-green, 0.8);
+            background: $bikehub-green-secondary;
           }
           // active after, because if it's active it shouldn't change color
           &:active,
@@ -170,45 +176,6 @@ $bikehub-text-color: #212529;
 }
 
 .bikehub {
-  .bike-hub-bike-index-about {
-    max-width: 610px;
-  }
-
-  .bike-hub-login {
-    h2 {
-      color: $bikehub-green;
-      font-size: 35px;
-      text-align: center;
-      span {
-        display: block;
-      }
-    }
-  }
-
-  .teamed-up-with-bike-index {
-    // @include make-col-ready;
-    // @include make-col(12);
-    background: white;
-    max-width: 675px;
-    margin: 0 auto;
-    margin-bottom: 25px;
-    padding-top: 20px;
-    h1 {
-      font-size: 22px;
-      font-weight: bold;
-      color: $bikehub-green;
-      text-shadow: none;
-      text-align: center;
-    }
-    img {
-      max-height: 100%;
-      max-width: 120px;
-    }
-    p {
-      font-size: 12px;
-    }
-  }
-
   .bikehub-banner-header {
     background-image: image-url("landing_pages/header_bg_bike-hub.jpg");
     background-size: auto 100%;
@@ -217,18 +184,74 @@ $bikehub-text-color: #212529;
     background-size: cover;
     padding: 100px 0;
     border-bottom: 0px;
+  }
 
-    .icon-wrapper {
-      width: 100%;
-      margin: 0;
-      clear: both;
-
-      svg,
-      img {
-        width: 25%;
-        display: block;
-        margin: 0 auto;
+  .teamed-up-with-bike-index {
+    background: white;
+    max-width: 675px;
+    margin: 0 auto;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    h1 {
+      font-size: 26px;
+      font-weight: bold;
+      color: $bikehub-green;
+      text-align: center;
+    }
+    img {
+      max-width: 120px;
+      height: auto;
+    }
+    p {
+      font-size: 12px;
+      &:last-of-type {
+        margin-bottom: 0;
       }
+    }
+    .team-title-box {
+      @include media-breakpoint-down(md) {
+        display: flex;
+        padding-bottom: 20px;
+        h1,
+        .high-five-wrapper {
+          flex: 0 0 50%;
+        }
+        h1 {
+          padding-top: 36px;
+        }
+      }
+    }
+  }
+
+  .bike-hub-login {
+    h2 {
+      color: $bikehub-green;
+      font-size: 22px;
+      text-align: center;
+      line-height: 34px;
+    }
+  }
+
+  .sign-in-up-main-form-header {
+    color: $bikehub-green;
+  }
+  .main-form .btn-primary {
+    background: $bikehub-green;
+    border-color: $bikehub-green;
+    &:hover,
+    &:active,
+    &:focus {
+      background-color: $bikehub-green-secondary;
+      border-color: $bikehub-green-secondary;
+    }
+  }
+  .forgot-password-link a,
+  .sign-in-up .main-form h3.sign-in-up-main-form-header a {
+    color: $bikehub-green;
+    &:hover,
+    &:active,
+    &:focus {
+      color: $bikehub-green-secondary;
     }
   }
 }

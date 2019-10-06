@@ -43,7 +43,6 @@
             .checkbox.terms-and-conditions
               %label
                 = f.check_box :terms_of_service
-
                 - if sign_in_partner == "bikehub"
                   = t(".agree_bikeindex_bikehub_toc_html",
                   bikehub_toc_link: link_to(t(".terms_and_conditions"), nil, data: { target: "https://new.bikehub.com/terms" }, class: "no-tab"),
@@ -58,5 +57,3 @@
                   = t(".get_bike_indexs_newsletter")
 
             = f.submit t(".sign_up"), class: 'btn btn-primary btn-lg'
-
-          %p= link_to t(".forgot_your_password"), request_password_reset_users_path

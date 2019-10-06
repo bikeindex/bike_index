@@ -4311,7 +4311,7 @@ en:
       get_on_bike_index: Get on Bike Index
       keep_me_logged_in: Keep me logged in
       log_in: Log in
-      no_bike_index_account: no Bike Index account?
+      no_bike_index_account: No Bike Index account?
       or: Or
       password: password
       sign_in_using_facebook: Sign in using Facebook
@@ -4734,9 +4734,8 @@ en:
       agree_bikeindex_bikehub_toc_html: I agree to BikeHub's %{bikehub_toc_link} and
         Bike Index's %{bikeindex_toc_link}.
       agree_bikeindex_toc_html: I agree to Bike Index's %{bikeindex_toc_link}.
-      already_have_a_bike_index_account: already have a Bike Index account?
+      already_have_a_bike_index_account: Already have a Bike Index account?
       already_have_an_account: already have an account?
-      forgot_your_password: Forgot your password?
       get_bike_indexs_newsletter: Get Bike Index's Newsletter
       get_on_bike_index: Get on Bike Index
       log_in: log in
