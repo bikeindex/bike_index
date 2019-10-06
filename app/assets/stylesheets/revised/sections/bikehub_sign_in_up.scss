@@ -82,34 +82,66 @@ $bikehub-text-color: #212529;
     }
   }
   .navbar-collapse {
-    flex-basis: auto;
     flex-grow: 1;
     align-items: center;
 
     @include media-breakpoint-up(md) {
-      display: -webkit-box !important;
-      display: -ms-flexbox !important;
       display: flex !important;
-      -ms-flex-preferred-size: auto;
+      flex-basis: auto !important;
+    }
+
+    &.collapsing,
+    &.in {
+      display: flex;
+      flex-basis: 100%;
     }
   }
 
-  @include media-breakpoint-up(md) {
-    .navbar-nav {
+  .navbar-toggler {
+    margin-left: auto;
+    color: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 0.25rem 0.75rem;
+    font-size: 20px;
+    line-height: 1;
+    border-radius: 2px;
+
+    @include media-breakpoint-up(md) {
+      display: none;
+    }
+  }
+  .navbar-toggler-icon {
+    display: inline-block;
+    font-size: 60px;
+    line-height: 0;
+    padding: 10px 0 0 0;
+  }
+
+  .navbar-nav {
+    padding: 0;
+    margin: 0;
+    .nav-item {
+      display: block;
+      float: none;
+      margin: 0;
+      .nav-link {
+        color: $bikehub-text-color;
+        font-size: 16px;
+        padding: 0.5rem 0;
+      }
+    }
+    @include media-breakpoint-up(md) {
       flex-direction: row;
       display: flex;
       flex-direction: column;
       flex-flow: row nowrap;
       justify-content: flex-start;
       list-style: none;
-      padding: 0;
-      margin: 0 0 0 auto;
+      margin-left: auto;
 
       .nav-item {
         display: list-item;
         border-left: 1px solid #ededed;
-        margin: 0;
-        float: none;
         &:last-of-type {
           border-right: 1px solid #ededed;
         }
@@ -118,7 +150,6 @@ $bikehub-text-color: #212529;
           border-left: 0;
         }
         .nav-link {
-          color: $bikehub-text-color;
           padding: 1rem 2rem;
           margin: 0;
           text-decoration: none;
