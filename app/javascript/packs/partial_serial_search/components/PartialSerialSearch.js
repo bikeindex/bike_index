@@ -26,7 +26,7 @@ class PartialSerialSearch extends Component {
   }
 
   resultsFetched = response => {
-    this.setState({ results: response.bikes, loading: false });
+    this.setState({ results: response.bikes || [], loading: false });
     this.toggleHeader({ isLoading: false, resultsCount: this.state.results.length });
   }
 
