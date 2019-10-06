@@ -1700,7 +1700,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1726,7 +1726,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -3289,27 +3289,24 @@ en:
       view_org: View %{org_name}
       your_bikes: Your bikes
     application_bikehub:
-      accounts: BikeHub accounts are powered by Bike Index - The premier bike registry
       contact: Contact
       home: Home
       login: Login
-      login_message: Logging in here will log you in to BikeHub.
+      register: Register
+      teamed_up: We teamed up with Bike Index!
       non_profit: >-
         Bike Index is a 501(c)(3) nonprofit and the most widely used bicycle registration
         service in the world.
+      security: At BikeHub, we believe bike security is more than just a strong U-lock.
       partnership: >-
         Through this partnership, BikeHub patrons enjoy access to the most secure
         public bike parking - and registration with the nation's largest network,
         used by law enforcement agencies, universities and advocates to connect recovery
         bikes with their owners.
-      powered_by: powered by
-      powered_by_bike_index: BikeHub accounts are powered by Bike Index – the premier
+      accounts_powered_by_bike_index: BikeHub accounts are powered by Bike Index – the premier
         bike registry.
-      register: Register
-      security: At BikeHub, we believe bike security is more than just a strong U-lock.
-      select_a_station: Select a Station
-      signup_message: Logging in here will log you into BikeHub
-      teamed_up: We teamed up with Bike Index!
+      log_in_message: Logging in here will log you in to BikeHub
+      sign_up_message: Signing up here will log you in to BikeHub
     email:
       bike_index: Bike Index
       help_prevent_theft: Help prevent bike theft,
@@ -4739,7 +4736,6 @@ en:
       agree_bikeindex_toc_html: I agree to Bike Index's %{bikeindex_toc_link}.
       already_have_a_bike_index_account: already have a Bike Index account?
       already_have_an_account: already have an account?
-      bikehub_terms_url: https://basic.bikehub.com/terms.html
       forgot_your_password: Forgot your password?
       get_bike_indexs_newsletter: Get Bike Index's Newsletter
       get_on_bike_index: Get on Bike Index

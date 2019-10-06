@@ -46,7 +46,7 @@
 
                 - if sign_in_partner == "bikehub"
                   = t(".agree_bikeindex_bikehub_toc_html",
-                  bikehub_toc_link: link_to(t(".terms_and_conditions"), nil, data: { target: t(".bikehub_terms_url") }, class: "no-tab"),
+                  bikehub_toc_link: link_to(t(".terms_and_conditions"), nil, data: { target: "https://new.bikehub.com/terms" }, class: "no-tab"),
                   bikeindex_toc_link: link_to(t(".terms_and_conditions"), nil, data: { target: terms_path }, class: "no-tab"))
                 - else
                   = t(".agree_bikeindex_toc_html", bikeindex_toc_link: link_to(t(".terms_and_conditions"), nil, data: { target: terms_path }, class: "no-tab"))

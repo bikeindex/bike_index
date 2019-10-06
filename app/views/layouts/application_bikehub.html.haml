@@ -13,29 +13,34 @@
     -# This is either the signup or signin page
     - signup_page = controller_name != "sessions"
     .bikehub
-      %nav.navbar.nav.bikehub-nav.navbar-fixed-top
+      .navbar.nav.bikehub-nav.navbar-expand-md
         .container-fluid
-          .row
-            .col-md-5
-              %a.bikehub-logo{ href: "https://bikehub.com" }
-                = image_tag "logos/bikehub_logo.png", class: "primary-nav", alt: "BikeHub home"
-              .poweredby
-                %p
-                  = t(".powered_by")
-                %a.primary-logo{ href: user_root_url }
-                  = image_tag "logo.svg", class: "primary-nav", alt: "Bike Index home"
-            .col-md-7
-              %a.bikehub-nav-item.bikehub-nav-item-first{href: "#"}
-                = t(".home")
-              %a.bikehub-nav-item{ href: "https://bikehub.com/contact/" }
-                = t(".contact")
-              %a.bikehub-nav-item{ href: "#", class: (signup_page ? "active" : "") }
-                = t(".register")
-              %a.bikehub-nav-item{ href: "#", class: (signup_page ? "" : "active")}
-                = t(".login")
-              %a.bikehub-nav-item{ href: "#"}
-                = t(".select_a_station")
+          %a.bikehub-logo{ href: "https://bikehub.com" }
+            = image_tag "bikehub/bikehub_logo.png", alt: "BikeHub home"
+          %span.powered-by-text
+            Powered
+            %br
+            by
+          %a.powered-by-logo{ href: user_root_url }
+            = image_tag "logo.svg", alt: "Bike Index home"
 
+          %button.navbar-toggler{ type: "button", "data-toggle" => "collapse", "data-target" => "#mainNavbarContent", "aria-controls" => "mainNavbarContent", "aria-expanded" => "false", "aria-label" => "Toggle navigation" }
+            %span.navbar-toggler-icon
+
+          .collapse.navbar-collapse#mainNavbarContent
+            %ul.navbar-nav
+              %li.nav-item
+                %a.nav-link{ href: "https://bikehub.com/" }
+                  = t(".home")
+              %li.nav-item
+                %a.nav-link{ href: "https://bikehub.com/contact/" }
+                  = t(".contact")
+              %li.nav-item
+                %a.nav-link{ href: new_user_path(partner: sign_in_partner), class: (signup_page ? "active" : "") }
+                  = t(".register")
+              %li.nav-item
+                %a.nav-link{ href:  new_session_path(partner: sign_in_partner), class: (signup_page ? "" : "active") }
+                  = t(".login")
 
       .bikehub-signup-landing-page.bikehub-signup-page.landing-page
         %header.bikehub-banner-header
@@ -43,7 +48,7 @@
             .col-lg-4
               %h1.mb-auto
                 = t(".teamed_up")
-              = image_tag "high-five.svg", alt: "High Five"
+              = image_tag "bikehub/high-five.svg", alt: "High Five"
             .col-lg-8
               %p
                 = t(".non_profit")
@@ -52,16 +57,13 @@
               %p
                 = t(".partnership")
       .bike-hub-login.mt-4
-        - if signup_page
-          %h1
-            = t(".accounts")
-          %h1
-            = t(".signup_message")
-        - else
-          %h1
-            = t(".powered_by_bike_index")
-          %h1
-            = t(".login_message")
+        %h2
+          = t(".accounts_powered_by_bike_index")
+          %span
+            - if signup_page
+              = t(".sign_up_message")
+            - else
+              = t(".log_in_message")
 
 
       = render "layouts/revised_messages"

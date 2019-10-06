@@ -1,0 +1,203 @@
+$bikehub-header: #92d149;
+$bikehub-green: #82cb39;
+$bikehub-text-color: #212529;
+
+.bikehub-nav {
+  background: #fff;
+  padding: 0.5rem 0;
+  @include media-breakpoint-up(md) {
+    padding: 0;
+  }
+
+  .primary-logos {
+    span,
+    a,
+    img {
+      display: inline-block;
+    }
+  }
+
+  .bikehub-logo {
+    padding: 0;
+    img {
+      height: 30px;
+      width: auto;
+    }
+  }
+
+  .bikehub-logo,
+  .powered-by-text,
+  .powered-by-logo {
+    -webkit-box-orient: horizontal;
+    -webkit-box-direction: normal;
+    -ms-flex-flow: row nowrap;
+    flex-flow: row nowrap;
+    -webkit-box-pack: start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+  }
+
+  // Shared with BikeHub styles
+
+  .powered-by-text,
+  .powered-by-logo {
+    opacity: 0.7;
+  }
+
+  .powered-by-text {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #000;
+    text-align: center;
+    vertical-align: center;
+    padding: 3px 0.5rem 0 0.75rem;
+    line-height: 1.2;
+  }
+
+  .powered-by-logo {
+    padding: 2px 0 0 0;
+    img {
+      height: 42px;
+      width: auto;
+    }
+  }
+
+  // Importing the styles from BikeHub's newer version of bootstrap
+  // Can probably be deleted once we're on bootstrap 4.3
+  .container-fluid {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-box-pack: justify;
+    -ms-flex-pack: justify;
+    justify-content: left;
+    @include media-breakpoint-up(md) {
+      justify-content: space-between;
+    }
+  }
+  .navbar-collapse {
+    flex-basis: auto;
+    flex-grow: 1;
+    align-items: center;
+
+    @include media-breakpoint-up(md) {
+      display: -webkit-box !important;
+      display: -ms-flexbox !important;
+      display: flex !important;
+      -ms-flex-preferred-size: auto;
+    }
+  }
+
+  @include media-breakpoint-up(md) {
+    .navbar-nav {
+      flex-direction: row;
+      display: flex;
+      flex-direction: column;
+      flex-flow: row nowrap;
+      justify-content: flex-start;
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0 auto;
+
+      .nav-item {
+        display: list-item;
+        border-left: 1px solid #ededed;
+        margin: 0;
+        float: none;
+        &:last-of-type {
+          border-right: 1px solid #ededed;
+        }
+        // There is some bug where the dropdown doubles border :/
+        &.dropdown {
+          border-left: 0;
+        }
+        .nav-link {
+          color: $bikehub-text-color;
+          padding: 1rem 2rem;
+          margin: 0;
+          text-decoration: none;
+          &:hover {
+            color: #fff;
+            background: rgba($bikehub-green, 0.8);
+          }
+          // active after, because if it's active it shouldn't change color
+          &:active,
+          &.active {
+            color: #fff;
+            background: $bikehub-green;
+          }
+        }
+      }
+    }
+  }
+}
+
+.bikehub {
+  .bike-hub-bike-index-about {
+    max-width: 610px;
+  }
+
+  .bike-hub-login {
+    h2 {
+      color: $bikehub-green;
+      font-size: 35px;
+      text-align: center;
+      span {
+        display: block;
+      }
+    }
+  }
+
+  .teamed-up-with-bike-index {
+    // @include make-col-ready;
+    // @include make-col(12);
+    background: white;
+    max-width: 675px;
+    margin: 0 auto;
+    margin-bottom: 25px;
+    padding-top: 20px;
+    h1 {
+      font-size: 22px;
+      font-weight: bold;
+      color: $bikehub-green;
+      text-shadow: none;
+      text-align: center;
+    }
+    img {
+      max-height: 100%;
+      max-width: 120px;
+    }
+    p {
+      font-size: 12px;
+    }
+  }
+
+  .bikehub-banner-header {
+    background-image: image-url("landing_pages/header_bg_bike-hub.jpg");
+    background-size: auto 100%;
+    background-position: right center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding: 100px 0;
+    border-bottom: 0px;
+
+    .icon-wrapper {
+      width: 100%;
+      margin: 0;
+      clear: both;
+
+      svg,
+      img {
+        width: 25%;
+        display: block;
+        margin: 0 auto;
+      }
+    }
+  }
+}
