@@ -63,18 +63,23 @@
         %h3.no-exact-results
           = t(".no_bikes_matched", stolenness: stolenness_desc)
 
-      %h3.secondary-matches#js-partial-serial-search-header
-        .loading.d-none Searching for near-matching serial numbers...
-        .loaded.d-none= t(".with_serial_numbers_html", stolenness: stolenness_desc, serial: params[:serial])
-        .loaded-none.no-exact-results.d-none No near-matching serials found
-      #js-partial-serial-search
+  - if @interpreted_params[:serial].present?
+    .row
+      .col-md-12
+        %h3.secondary-matches#js-partial-serial-search-header
+          .loading.d-none Searching for near-matching serial numbers...
+          .loaded.d-none= t(".with_serial_numbers_html", stolenness: stolenness_desc, serial: params[:serial])
+          .loaded-none.no-exact-results.d-none No near-matching serials found
+        #js-partial-serial-search
 
-      - if Flipper.enabled?(:external_registry_search, current_user)
-        %h3.secondary-matches#js-external-registry-search-header
-          .loading.d-none= t(".searching_external_registries")
-          .loaded.d-none= t(".external_matches_found")
-          .loaded-none.no-exact-results.d-none= t(".no_external_matches_found")
-        #js-external-registry-search
+    - if Flipper.enabled?(:external_registry_search, current_user)
+      .row
+        .col-md-12
+          %h3.secondary-matches#js-external-registry-search-header
+            .loading.d-none= t(".searching_external_registries")
+            .loaded.d-none= t(".external_matches_found")
+            .loaded-none.no-exact-results.d-none= t(".no_external_matches_found")
+          #js-external-registry-search
 
     .col-md-4.ad-col
       .ad-block#right300x600
