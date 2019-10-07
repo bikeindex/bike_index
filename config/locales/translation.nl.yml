@@ -2126,6 +2126,28 @@ nl:
         report_recovered: Markeer deze fiets hersteld
         report_stolen: Melden als gestolen of vermist
         theft_details: Diefstal details
+      create:
+        bike_was_added: Bike met succes toegevoegd aan de index!
+        bike_was_sent_to: Succes! %{bike_type} is verzonden naar %{owner_email}.
+      ensure_user_allowed_to_edit:
+        bike_has_not_been_claimed_yet: Dat %{bike_type} is nog niet geclaimd. Als
+          het jouw %{bike_type} is, meld je dan aan en je kunt het bewerken!
+        please_create_an_account: Maak een account aan
+        you_dont_own_that: Oh nee! Het lijkt erop dat je dat niet bezit %{bike_type}.
+        you_have_to_sign_in: Whoops! Je moet inloggen om dat te kunnen bewerken %{bike_type}.
+      find_bike:
+        bike_deleted: Fiets verwijderd
+      index:
+        we_dont_know_location: Sorry, we kennen de locatie \ "%{location} \" niet.
+          Probeer een andere locatie om gestolen fietsen in de buurt te zoeken.
+      new:
+        please_sign_in_to_register: Meld u aan om een fiets te registreren
+        we_couldnt_find_that_registration: Oops! We konden die registratie niet vinden.
+          Voer de informatie hier opnieuw in
+      scanned:
+        unable_to_find_sticker: 'Kan sticker niet vinden: %{scanned_id}'
+      update:
+        bike_was_updated: Fiets succesvol bijgewerkt!
   customer_mailer:
     additional_email_confirmation:
       html:
