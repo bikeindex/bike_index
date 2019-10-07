@@ -104,9 +104,9 @@ module ControllerHelpers
     end
   end
 
-  def translation(key, scope: nil)
+  def translation(key, scope: nil, **kwargs)
     scope ||= [:controllers, controller_namespace, controller_name, action_name]
-    I18n.t(key, scope: scope.compact)
+    I18n.t(key, kwargs, scope: scope.compact)
   end
 
   def controller_namespace
