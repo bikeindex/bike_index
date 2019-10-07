@@ -1,4 +1,5 @@
 = javascript_pack_tag "external_registry_search/index"
+= javascript_pack_tag "partial_serial_search/index"
 
 - stolenness_desc = { 'proximity' => 'nearby stolen', 'non' => 'non-stolen', 'stolen' => 'stolen', 'all' => 'all' }[@interpreted_params[:stolenness]]
 
@@ -62,14 +63,17 @@
         %h3.no-exact-results
           = t(".no_bikes_matched", stolenness: stolenness_desc)
 
-      - if @close_serials.present?
-        %h3.secondary-matches
-          = t(".with_serial_numbers_html", stolenness: stolenness_desc, serial: params[:serial])
+  - if @interpreted_params[:serial].present?
+    .row
+      .col-md-12
+        %h3.secondary-matches#js-partial-serial-search-header
+          .loading.d-none= t(".searching_for_near_matches")
+          .loaded.d-none= t(".with_serial_numbers_html", stolenness: stolenness_desc, serial: params[:serial])
+          .loaded-none.no-exact-results.d-none= t(".no_near_matches_found")
+        #js-partial-serial-search
 
-        %ul.bike-boxes
-          = render partial: 'bikes/bike', collection: @close_serials, as: :bike
-
-      - if Flipper.enabled?(:external_registry_search, current_user)
+    .row
+      .col-md-12
         %h3.secondary-matches#js-external-registry-search-header
           .loading.d-none= t(".searching_external_registries")
           .loaded.d-none= t(".external_matches_found")

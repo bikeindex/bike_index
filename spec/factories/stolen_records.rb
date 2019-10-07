@@ -28,18 +28,24 @@ FactoryBot.define do
     end
 
     trait :in_los_angeles do
+      latitude { nil }
+      longitude { nil }
       city { "Los Angeles" }
       state { State.find_or_create_by(FactoryBot.attributes_for(:state_california)) }
       country { Country.united_states }
     end
 
     trait :in_nyc do
+      latitude { nil }
+      longitude { nil }
       city { "New York" }
       state { State.find_or_create_by(FactoryBot.attributes_for(:state_new_york)) }
       country { Country.united_states }
     end
 
     trait :in_amsterdam do
+      latitude { nil }
+      longitude { nil }
       city { "Amsterdam" }
       state { nil }
       country { Country.netherlands }

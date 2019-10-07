@@ -2,27 +2,21 @@
 
 import React, { Fragment, Component } from "react";
 
-import ExternalRegistrySearchResult from "./ExternalRegistrySearchResult";
-import { fetchSerialExternalSearch } from "../../api";
+import PartialSerialSearchResult from "./PartialSerialSearchResult";
+import { fetchSerialPartialSearch } from "../../api";
 import Loading from "../../Loading";
 import honeybadger from "../../utils/honeybadger";
 import TimeParser from "../../utils/time_parser";
 
-class ExternalRegistrySearch extends Component {
+class PartialSerialSearch extends Component {
   state = {
     loading: false,
     results: []
   }
 
   componentWillMount() {
-    const { stolenness, query, serial } = this.props;
-    // Only search external registries if looking for
-    // stolen/all bikes with no query
-    if (stolenness === "non" || query || !serial) { return; }
-
     this.resultsBeingFetched();
-
-    fetchSerialExternalSearch(serial)
+    fetchSerialPartialSearch(this.props.interpretedParams)
       .then(this.resultsFetched)
       .catch(this.handleError);
   }
@@ -43,11 +37,11 @@ class ExternalRegistrySearch extends Component {
   }
 
   handleError = error => {
-    honeybadger.notify(error, { component: "MultiSerialSearch" });
+    honeybadger.notify(error, { component: "PartialSerialSearch" });
   }
 
   toggleHeader = ({ isLoading, resultsCount }) => {
-    const header = document.getElementById("js-external-registry-search-header");
+    const header = document.getElementById("js-partial-serial-search-header");
     if (!header) { return; }
 
     header.childNodes.forEach(node => node.classList && node.classList.add("d-none"));
@@ -58,7 +52,7 @@ class ExternalRegistrySearch extends Component {
           ? "loaded"
           : "loaded-none";
 
-    const sectionTitle = header.getElementsByClassName(titleDisplay)[0];
+    const sectionTitle = header.getElementsByClassName(titleDisplay)[0]
     sectionTitle.classList.remove("d-none");
   }
 
@@ -70,11 +64,11 @@ class ExternalRegistrySearch extends Component {
     return (
       <Fragment>
         <ul className="bike-boxes">
-          {this.state.results.map(bike => <ExternalRegistrySearchResult key={bike.id} bike={bike}/>)}
+          {this.state.results.map(bike => <PartialSerialSearchResult key={bike.id} bike={bike} />)}
         </ul>
       </Fragment>
     );
   }
 };
 
-export default ExternalRegistrySearch;
+export default PartialSerialSearch;

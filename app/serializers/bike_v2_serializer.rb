@@ -26,8 +26,7 @@ class BikeV2Serializer < ActiveModel::Serializer
     :external_id,
     :registry_name,
     :registry_url,
-    :status,
-    :url
+    :status
 
   def serial
     object.serial_display
@@ -42,13 +41,14 @@ class BikeV2Serializer < ActiveModel::Serializer
   end
 
   def date_stolen
-    object.current_stolen_record && object.current_stolen_record.date_stolen.to_i
+    object.current_stolen_record&.date_stolen&.to_i
   end
 
   def thumb
-    if object.public_images.present?
-      object.public_images.first.image_url(:small)
-    elsif object.stock_photo_url.present?
+    image = object.public_images&.first&.image_url(:small)
+    return image if image.present?
+
+    if object.stock_photo_url.present?
       small = object.stock_photo_url.split("/")
       ext = "/small_" + small.pop
       small.join("/") + ext
@@ -56,18 +56,19 @@ class BikeV2Serializer < ActiveModel::Serializer
   end
 
   def large_img
-    if object.public_images.present?
-      object.public_images.first.image_url(:large)
-    elsif object.stock_photo_url.present?
+    object.public_images&.first&.image_url(:large).presence ||
       object.stock_photo_url
-    end
+  end
+
+  def url
+    "#{ENV["BASE_URL"]}/bikes/#{object.id}"
   end
 
   def is_stock_img
-    object.public_images.present? ? false : object.stock_photo_url.present?
+    object.public_images.blank? && object.stock_photo_url.present?
   end
 
   def stolen_location
-    object.current_stolen_record && object.current_stolen_record.address_short
+    object.current_stolen_record&.address_location(include_all: true)
   end
 end

@@ -47,7 +47,7 @@
                       - if bike.current_stolen_record.present?
                         - abandoned_or_stolen =  bike.abandoned? ? t(".date_abandoned") : t('.date_stolen')
                         = bike.attr_list_item(l(bike.current_stolen_record.date_stolen, format: :dotted), abandoned_or_stolen)
-                        = bike.attr_list_item(bike.short_address(bike.current_stolen_record), t(".location"))
+                        = bike.attr_list_item(bike.current_stolen_record.address_location(include_all: true), t(".location"))
                     %ul.attr-list
                       %li= link_to t(".edit_bike"), edit_bike_path(bike)
                       %li

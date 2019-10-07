@@ -52,12 +52,4 @@ class ApplicationDecorator < Draper::Decorator
       object.send(attribute)
     end
   end
-
-  def short_address(item)
-    return nil unless item.country
-    html = "#{item.city}"
-    html << ", #{item.state.abbreviation}" if item.state.present?
-    html << " - #{item.country.iso}"
-    html
-  end
 end

@@ -105,18 +105,20 @@ class StolenRecord < ActiveRecord::Base
     ].reject(&:blank?).join(", ")
   end
 
-  # Doesn't include street
-  def address_short
-    [city, state&.abbreviation, zipcode].reject(&:blank?).join(",")
-  end
+  # The stolen bike's general location (city and state / city and country if non-US)
+  # Include all available components (city, state, country) unconditionally if
+  # `include_all` is passed.
+  def address_location(include_all: false)
+    city_and_state =
+      [city&.titleize, state&.abbreviation&.upcase].reject(&:blank?).join(", ")
 
-  def address_location
-    return "" if state&.abbreviation.blank?
-
-    @address_location ||=
-      [city&.titleize, state.abbreviation.upcase]
-        .reject(&:blank?)
-        .join(", ")
+    if include_all.present?
+      [city_and_state, country&.iso].reject(&:blank?).join(" - ")
+    elsif state.present?
+      city_and_state
+    elsif country.present?
+      [city&.titleize, country&.iso].reject(&:blank?).join(" - ")
+    end
   end
 
   LOCKING_DESCRIPTIONS = [
@@ -270,7 +272,8 @@ class StolenRecord < ActiveRecord::Base
     recovery_link_token
   end
 
-  # The stolen bike's general location (city and state)
+  # The stolen bike's general location (city and state, or country if non-US)
+  # Rendered on promoted alert images.
   # Prefers the stolen record's address location, falls back to the bike's
   # registration location, returns nil if neither yields an adequate location.
   def bike_location

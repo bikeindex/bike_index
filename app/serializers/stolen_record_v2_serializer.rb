@@ -20,6 +20,6 @@ class StolenRecordV2Serializer < ActiveModel::Serializer
   end
 
   def location
-    object.address_short
+    object.address_location(include_all: true)
   end
 end
