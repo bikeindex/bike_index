@@ -6,6 +6,7 @@ import honeybadger from "../utils/honeybadger";
 
 document.addEventListener("DOMContentLoaded", () => {
   const el = document.getElementById("js-partial-serial-search");
+  if (!el) { return; }
 
   ReactDOM.render(
     <ErrorBoundary honeybadger={honeybadger}>
