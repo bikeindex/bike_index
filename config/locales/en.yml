@@ -1400,7 +1400,7 @@ en:
       nl_phone_report: >-
         call 0900-8844. You will usually get a phone call appointment for later, at
         which point you'll give the information to the Police
-      nl_website_link_text: at this plitie.nl webpage
+      nl_website_link_text: at this politie.nl webpage
       promoted_stolen_bike_alerts: Promoted Stolen Bike Alerts
       push_bike_info_to: Push bike info to
       push_bike_info_to_law_enforcement: >-
@@ -1726,7 +1726,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -1752,7 +1752,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
