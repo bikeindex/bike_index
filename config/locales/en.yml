@@ -1422,6 +1422,9 @@ en:
       status: Status
   controllers:
     bikes:
+      create:
+        bike_was_added: Bike successfully added to the index!
+        bike_was_sent_to: Success! %{bike_type} was sent to %{owner_email}.
       edit:
         accessories: Accessories and Components
         alert: Activate Promoted Alert
@@ -1436,6 +1439,27 @@ en:
         report_recovered: Mark this Bike Recovered
         report_stolen: Report Stolen or Missing
         theft_details: Theft details
+      ensure_user_allowed_to_edit:
+        bike_has_not_been_claimed_yet: >-
+          That %{bike_type} hasn't been claimed yet. If it's your %{bike_type}, sign
+          up and you'll be able to edit it!
+        please_create_an_account: Please create an account
+        you_dont_own_that: Oh no! It looks like you don't own that %{bike_type}.
+        you_have_to_sign_in: Whoops! You have to sign in to be able to edit that %{bike_type}.
+      find_bike:
+        bike_deleted: Bike deleted
+      index:
+        we_dont_know_location: >-
+          Sorry, we don't know the location \"%{location}\". Please try a different
+          location to search nearby stolen bikes.
+      new:
+        please_sign_in_to_register: Please sign in to register a bike
+        we_couldnt_find_that_registration: Oops! We couldn't find that registration,
+          please re-enter the information here
+      scanned:
+        unable_to_find_sticker: 'Unable to find sticker: %{scanned_id}'
+      update:
+        bike_was_updated: Bike successfully updated!
   customer_mailer:
     additional_email_confirmation:
       html:

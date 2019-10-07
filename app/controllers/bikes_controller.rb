@@ -16,7 +16,7 @@ class BikesController < ApplicationController
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
     @stolenness = @interpreted_params[:stolenness]
     if params[:stolenness] == "proximity" && @stolenness != "proximity"
-      flash[:info] = "Sorry, we don't know the location \"#{params[:location]}\". Please try a different location to search nearby stolen bikes"
+      flash[:info] = translation("we_dont_know_location", location: params[:location])
     end
     @bikes = Bike.search(@interpreted_params).page(params[:page] || 1).per(params[:per_page] || 10).decorate
     @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
@@ -62,7 +62,7 @@ class BikesController < ApplicationController
   def scanned
     @bike_code = BikeCode.lookup_with_fallback(scanned_id, organization_id: params[:organization_id], user: current_user)
     if @bike_code.blank?
-      flash[:error] = "Unable to find sticker: '#{params[:scanned_id]}'"
+      flash[:error] = translation("unable_to_find_sticker", scanned_id: params[:scanned_id])
       redirect_to user_root_url
     elsif @bike_code.bike.present?
       redirect_to bike_url(@bike_code.bike_id, scanned_id: params[:scanned_id], organization_id: params[:organization_id]) and return
@@ -86,13 +86,13 @@ class BikesController < ApplicationController
   def new
     unless current_user.present?
       store_return_to(new_bike_path(b_param_token: params[:b_param_token], stolen: params[:stolen]))
-      flash[:info] = "Please sign in to register a bike"
+      flash[:info] = translation("please_sign_in_to_register")
       redirect_to new_user_path and return
     end
     find_or_new_b_param
     redirect_to bike_path(@b_param.created_bike_id) and return if @b_param.created_bike.present?
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
-    flash[:info] = "Oops! We couldn't find that registration, please re-enter the information here" if @b_param.id.blank? && params[:b_param_token].present?
+    flash[:info] = translation("we_couldnt_find_that_registration") if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= @b_param.bike_from_attrs(is_stolen: params[:stolen], abandoned: params[:abandoned])
     # Fallback to active (i.e. passed organization_id), then passive_organization
     @bike.creation_organization ||= current_organization || passive_organization
@@ -129,7 +129,7 @@ class BikesController < ApplicationController
         end
       else
         if params[:bike][:embeded_extended]
-          flash[:success] = "Success! #{@bike.type} was sent to #{@bike.owner_email}."
+          flash[:success] = translation("bike_was_sent_to", bike_type: @bike.type, owner_email: @bike.owner_email)
           @persist_email = ParamsNormalizer.boolean(params[:persist_email])
           redirect_to embed_extended_organization_url(@bike.creation_organization, email: @persist_email ? @bike.owner_email : nil) and return
         else
@@ -146,7 +146,7 @@ class BikesController < ApplicationController
         @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
         redirect_to new_bike_url(b_param_token: @b_param.id_token)
       else
-        flash[:success] = "Bike successfully added to the index!"
+        flash[:success] = translation("bike_was_added")
         redirect_to edit_bike_url(@bike)
       end
     end
@@ -207,7 +207,7 @@ class BikesController < ApplicationController
     if @bike.errors.any? || flash[:error].present?
       edit and return
     else
-      flash[:success] ||= "Bike successfully updated!"
+      flash[:success] ||= translation("bike_was_updated")
       return if return_to_if_present
       redirect_to edit_bike_url(@bike, page: params[:edit_template]) and return
     end
@@ -298,7 +298,7 @@ class BikesController < ApplicationController
     end
     if @bike.hidden || @bike.deleted?
       unless current_user.present? && @bike.visible_by(current_user)
-        flash[:error] = "Bike deleted"
+        flash[:error] = translation("bike_deleted", scope: %i[controllers bikes find_bike])
         redirect_to root_url and return
       end
     end
@@ -312,22 +312,28 @@ class BikesController < ApplicationController
 
   def ensure_user_allowed_to_edit
     @current_ownership = @bike.current_ownership
-    type = @bike && @bike.type || "bike"
+    type = @bike&.type || "bike"
+
     return true if @bike.authorize_and_claim_for_user(current_user)
+
+    translation_scope = %i[controllers bikes ensure_user_allowed_to_edit]
+
     if current_user.present?
-      error = "Oh no! It looks like you don't own that #{type}."
+      error = translation("you_dont_own_that", bike_type: type, scope: translation_scope)
     else
       if @current_ownership && @bike.current_ownership.claimed
-        error = "Whoops! You have to sign in to be able to edit that #{type}."
+        error = translation("you_have_to_sign_in", bike_type: type, scope: translation_scope)
       else
-        error = "That #{type} hasn't been claimed yet. If it's your #{type}, sign up and you'll be able to edit it!"
+        error = translation("bike_has_not_been_claimed_yet", bike_type: type, scope: translation_scope)
       end
     end
+
     if error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
       flash[:error] = error
       redirect_to bike_path(@bike) and return
     end
-    authenticate_user("Please create an account", flash_type: :info)
+
+    authenticate_user(translation("please_create_an_account", scope: translation_scope), flash_type: :info)
   end
 
   def update_organizations_can_edit_claimed(bike, organization_ids)
