@@ -1148,11 +1148,13 @@ en:
       miles_of: miles of
       no_bikes_matched: No %{stolenness} bikes matched your search
       no_external_matches_found: No matches found in external registries
+      no_near_matches_found: No near-matching serials found
       not_marked_stolen: Not marked stolen
       search_bike_descriptions: Search bike descriptions
       search_for_serial_number: Search for serial number
       search_for_stolenness_desc_bikes: Search for %{stolenness_desc} bikes
       searching_external_registries: Searching external registries...
+      searching_for_near_matches: Searching for near-matching serial numbers...
       stolen_anywhere: Stolen anywhere
       stolen_within: Stolen within
       submit: submit

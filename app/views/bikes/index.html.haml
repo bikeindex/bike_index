@@ -67,9 +67,9 @@
     .row
       .col-md-12
         %h3.secondary-matches#js-partial-serial-search-header
-          .loading.d-none Searching for near-matching serial numbers...
+          .loading.d-none= t(".searching_for_near_matches")
           .loaded.d-none= t(".with_serial_numbers_html", stolenness: stolenness_desc, serial: params[:serial])
-          .loaded-none.no-exact-results.d-none No near-matching serials found
+          .loaded-none.no-exact-results.d-none= t("no_near_matches_found")
         #js-partial-serial-search
 
     .row
