@@ -19,4 +19,4 @@
               = bike.abandoned ? t(".abandoned") : t(".stolen")
             %span.convertTime
               = l bike.current_stolen_record.date_stolen, format: :convert_time
-          = bike.attr_list_item(bike.short_address(bike.current_stolen_record), t(".location"))
+          = bike.attr_list_item(bike.current_stolen_record.address_location(include_all: true), t(".location"))

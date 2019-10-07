@@ -496,11 +496,35 @@ RSpec.describe StolenRecord, type: :model do
   end
 
   describe "#address_location" do
-    context "given a city and state" do
+    context "given include_all" do
+      it "returns all available location components" do
+        stolen_record = FactoryBot.create(:stolen_record, :in_nyc)
+        expect(stolen_record.address_location(include_all: true)).to eq("New York, NY - US")
+
+        ca = FactoryBot.create(:state, name: "California", abbreviation: "CA")
+        stolen_record = FactoryBot.create(:stolen_record, city: nil, state: ca, country: Country.united_states)
+        expect(stolen_record.address_location(include_all: true)).to eq("CA - US")
+      end
+    end
+
+    context "given an domestic location" do
       it "returns the city and state" do
-        ny_state = FactoryBot.create(:state, abbreviation: "NY")
-        stolen_record = FactoryBot.create(:stolen_record, city: "New Paltz", state: ny_state)
-        expect(stolen_record.address_location).to eq("New Paltz, NY")
+        stolen_record = FactoryBot.create(:stolen_record, :in_nyc)
+        expect(stolen_record.address_location).to eq("New York, NY")
+      end
+    end
+
+    context "given an international location" do
+      it "returns the city and state" do
+        stolen_record = FactoryBot.create(:stolen_record, :in_amsterdam, state: nil)
+        expect(stolen_record.address_location).to eq("Amsterdam - NL")
+      end
+    end
+
+    context "given only a country" do
+      it "returns only the country" do
+        stolen_record = FactoryBot.create(:stolen_record, city: nil, state: nil, country: Country.netherlands)
+        expect(stolen_record.address_location).to eq("NL")
       end
     end
 
@@ -513,9 +537,9 @@ RSpec.describe StolenRecord, type: :model do
     end
 
     context "given only a city" do
-      it "returns an empty string" do
+      it "returns nil" do
         stolen_record = FactoryBot.create(:stolen_record, city: "New Paltz", state: nil)
-        expect(stolen_record.address_location).to eq("")
+        expect(stolen_record.address_location).to eq(nil)
       end
     end
   end
