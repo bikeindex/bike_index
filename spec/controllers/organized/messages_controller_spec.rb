@@ -57,7 +57,7 @@ RSpec.describe Organized::MessagesController, type: :controller do
             expect do
               post :create, organization_id: organization.to_param, organization_message: message_params.except(:latitude)
               expect(response).to redirect_to bike_url(bike)
-              expect(flash[:error]).to match(/location/i)
+              expect(flash[:error]).to match(/latitude/i)
             end.to_not change(EmailOrganizationMessageWorker.jobs, :count)
           end
         end
