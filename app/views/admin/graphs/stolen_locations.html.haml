@@ -22,8 +22,7 @@
 %section
   %h2
     Stolen states past year
-  - us = Country.fuzzy_iso_find('us').id
-  - states = StolenRecord.unscoped.where("created_at >= ?", 1.years.ago).where(country_id: us).where('state_id IS NOT NULL').group(:state).count
+  - states = StolenRecord.unscoped.where("created_at >= ?", 1.years.ago).where(country: Country.united_states).where('state_id IS NOT NULL').group(:state).count
   - display = ''
   - states.keys.each { |state| display += ",['#{state.name}', #{states[state]}]" }
 
@@ -51,4 +50,3 @@
       var chart = new google.visualization.GeoChart(document.getElementById('stolen_month_us'));
       chart.draw(data, options);
     };
-

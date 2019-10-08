@@ -11,14 +11,12 @@ class Country < ActiveRecord::Base
     end
   end
 
-  def self.fuzzy_find(str)
-    return nil unless str.present?
-    fuzzy_iso_find(str) || where("lower(name) = ?", str.downcase.strip).first
-  end
+  def self.fuzzy_find(name_or_iso)
+    name_or_iso = name_or_iso.to_s.strip.downcase
+    return if name_or_iso.blank?
+    return united_states if name_or_iso.in? %w[us usa]
 
-  def self.fuzzy_iso_find(str)
-    str = "us" if str.match(/usa/i)
-    str && where("lower(iso) = ?", str.downcase.strip).first
+    find_by("lower(name) = ? or lower(iso) = ?", name_or_iso, name_or_iso)
   end
 
   def self.united_states

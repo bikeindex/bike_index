@@ -51,9 +51,9 @@ class StolenRecordUpdator
     stolen_record.date_stolen = TimeParser.parse(sr["date_stolen"], sr["timezone"]) || Time.current unless @date_stolen.present?
 
     if sr["country"].present?
-      country = Country.fuzzy_iso_find(sr["country"])
-      stolen_record.country_id = country&.id
+      stolen_record.country = Country.fuzzy_find(sr["country"])
     end
+
     stolen_record.state_id = State.fuzzy_abbr_find(sr["state"])&.id if sr["state"].present?
     if sr["phone_no_show"]
       stolen_record.attributes = {
