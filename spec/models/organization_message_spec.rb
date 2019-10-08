@@ -19,7 +19,7 @@ RSpec.describe OrganizationMessage, type: :model do
         organization_message.save
         expect(organization_message.email).to eq "stuff@stuff.com"
         expect(organization_message.valid?).to be_falsey
-        expect(organization_message.errors.messages.to_s).to match(/location/)
+        expect(organization_message.errors.messages.to_s).to match(/latitude and longitude required/)
         expect(EmailOrganizationMessageWorker.jobs.count).to eq 0
       end
     end
