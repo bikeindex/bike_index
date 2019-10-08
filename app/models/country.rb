@@ -13,8 +13,8 @@ class Country < ActiveRecord::Base
 
   def self.fuzzy_find(name_or_iso)
     name_or_iso = name_or_iso.to_s.strip.downcase
-    name_or_iso = "us" if name_or_iso == "usa"
     return if name_or_iso.blank?
+    return united_states if name_or_iso.in? %w[us usa]
 
     find_by("lower(name) = ? or lower(iso) = ?", name_or_iso, name_or_iso)
   end
