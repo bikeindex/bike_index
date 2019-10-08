@@ -580,13 +580,11 @@ RSpec.describe User, type: :model do
   describe "userlink" do
     it "returns user path if user show" do
       user = User.new(show_bikes: true, username: "coolstuff")
-      # pp user
       expect(user.userlink).to eq("/users/coolstuff")
     end
 
     it "returns twitter if user twitter" do
       user = User.new(show_bikes: false, username: "coolstuff", twitter: "bikeindex")
-      # pp user
       expect(user.userlink).to eq("https://twitter.com/bikeindex")
     end
   end
@@ -626,8 +624,6 @@ RSpec.describe User, type: :model do
         user.additional_emails = "stuffthings@oooooooooh.com,another_email@cool.com"
         user.save
         user.reload
-        # pp user.user_emails
-        # pp UserEmail.all
         expect(UserEmail.unconfirmed.where(user_id: user.id).count).to eq 2
         second_confirmed = UserEmail.where(user_id: user.id, email: "stuffthings@oooooooooh.com").first
         second_confirmed.confirm(second_confirmed.confirmation_token)
