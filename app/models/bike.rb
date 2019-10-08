@@ -480,9 +480,11 @@ class Bike < ActiveRecord::Base
     return organization.id if organization && !organization.suspended?
 
     if organization.present?
-      errors.add(:organization, :suspended)
+      suspended = I18n.t(:suspended, scope: %i[activerecord errors models bike])
+      errors.add(:organizations, "#{organization_id} #{suspended}")
     else
-      errors.add(:organization, :not_found)
+      not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike])
+      errors.add(:organizations, "#{organization_id} #{not_found}")
     end
 
     nil

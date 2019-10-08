@@ -1378,13 +1378,15 @@ RSpec.describe Bike, type: :model do
       let(:organization) { FactoryBot.create(:organization, is_suspended: true) }
       it "adds an error to the bike" do
         expect(bike.validated_organization_id(organization.id)).to be_nil
+        expect(bike.errors[:organizations].to_s).to match(/suspended/)
+        expect(bike.errors[:organizations].to_s).to match(organization.id.to_s)
       end
     end
     context "unable to find organization" do
       it "adds an error to the bike" do
         expect(bike.validated_organization_id("some org")).to be_nil
-        expect(bike.errors[:organization].to_s).to match(/not found/)
-        expect(bike.errors[:organization].to_s).to match(/some org/)
+        expect(bike.errors[:organizations].to_s).to match(/not found/)
+        expect(bike.errors[:organizations].to_s).to match(/some org/)
       end
     end
   end
