@@ -475,10 +475,16 @@ class Bike < ActiveRecord::Base
 
   def validated_organization_id(organization_id)
     return nil unless organization_id.present?
+
     organization = Organization.friendly_find(organization_id)
     return organization.id if organization && !organization.suspended?
-    msg = organization ? "suspended and can't be used" : "not found"
-    errors.add(:organization, "#{organization_id} is #{msg}")
+
+    if organization.present?
+      errors.add(:organization, :suspended)
+    else
+      errors.add(:organization, :not_found)
+    end
+
     nil
   end
 

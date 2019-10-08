@@ -128,7 +128,7 @@ class User < ActiveRecord::Base
   def ensure_unique_email
     return true unless self.class.fuzzy_confirmed_or_unconfirmed_email_find(email)
     return true if id.present? # Because existing users shouldn't see this error
-    errors.add(:email, "That email is already signed up on Bike Index.")
+    errors.add(:email, :email_already_exists)
   end
 
   def confirmed?; confirmed end
@@ -383,6 +383,6 @@ class User < ActiveRecord::Base
   def preferred_language_is_an_available_locale
     return if preferred_language.blank?
     return if I18n.available_locales.include?(preferred_language.to_sym)
-    errors.add(:preferred_language, "not an available language")
+    errors.add(:preferred_language, :not_an_available_language)
   end
 end

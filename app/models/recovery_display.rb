@@ -22,7 +22,7 @@ class RecoveryDisplay < ActiveRecord::Base
 
   def quote_not_too_long
     return true if quote.blank? || quote.length < 301
-    errors.add :base, "That quote is too long. Please shorten it to be less than 300 characters"
+    errors.add :base, :quote_too_long
   end
 
   def from_stolen_record(sr_id)

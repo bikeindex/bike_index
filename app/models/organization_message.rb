@@ -35,8 +35,8 @@ class OrganizationMessage < ActiveRecord::Base
   end
 
   def validate_requirements_for_kind # currently all require geolocation and bike, but eventually some won't, e.g. partial registrations
-    self.errors.add(:bike, "Required") unless bike.present?
-    self.errors.add(:location, "(latitude and longitude) required") unless latitude.present? && longitude.present?
+    self.errors.add(:bike, :required) unless bike.present?
+    self.errors.add(:location, :latlon_required) unless latitude.present? && longitude.present?
     true # Legacy concerns, so excited for TODO: Rails 5 update
   end
 

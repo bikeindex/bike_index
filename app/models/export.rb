@@ -181,7 +181,7 @@ class Export < ActiveRecord::Base
 
   def set_calculated_attributes
     self.options = validated_options(options)
-    errors.add :organization_id, "required" if kind == "organization" && organization_id.blank?
+    errors.add :organization_id, :required if kind == "organization" && organization_id.blank?
     self.progress = calculated_progress
     true # TODO: Rails 5 update
   end

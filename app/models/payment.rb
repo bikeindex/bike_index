@@ -39,7 +39,7 @@ class Payment < ActiveRecord::Base
   end
 
   def email_or_organization_present
-    errors.add(:organization_or_email, "Requires an email address or organization") unless email.present? || organization_id.present?
+    errors.add(:organization_or_email, :requires_email_or_org) unless email.present? || organization_id.present?
   end
 
   def update_invoice
