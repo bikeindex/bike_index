@@ -3825,7 +3825,7 @@ nl:
       fiets op de Index zijn gekoppeld. Meer informatie over hoe ze werken en hoe
       u uw eigen kunt maken.
     info_stolen_bikes: Wat te doen als uw fiets wordt gestolen - de volgende stappen
-      die Bike Index aanbeveelt.
+      worden door Bike Index aanbevolen.
     info_where: Organisaties die Bike Index gebruiken om fietsen te zoeken en te registreren.
     landing_pages_for_law_enforcement: Is uw bureau uitgerust om fietsdiefstal te
       bestrijden? Bike Index kan officieren helpen fietsen weer in de juiste handen
@@ -5151,33 +5151,33 @@ nl:
       ambassador: Ambassadeur
       bike_chopshop_report: Bike ChopShop-rapport
       bike_index: Bike Index
-      bike_index_will_broadcast: Bike Index zendt je gestolen fiets uit naar de lokale
-        Gestolen Bike Twitter-handle en verspreidt het via andere sociale kanalen.
-        Onze gestolen fietsgegevens zijn gekoppeld aan LeadsOnline, dus als uw fiets
-        in het 'systeem' terechtkomt, wordt deze gemarkeerd en wordt er contact met
-        u opgenomen. Onze community zal uitkijken naar verschillende wederverkoopkanalen.
-      check_out_your_local_flea_market: Bekijk uw lokale rommelmarkt voor uw fiets.
+      bike_index_will_broadcast: Bike Index zal je gestolen fiets op de lokale 'Gestolen
+        Fiets Twitter-handle' publiceren en via andere social media verspreiden. Onze
+        gestolen fietsgegevens zijn bovendien gekoppeld aan LeadsOnline, dus als jouw
+        fiets in het 'systeem' terechtkomt, zal deze gemarkeerd worden en wordt er
+        contact met je opgenomen. Onze community zal dit ook in de gaten houden via
+        verschillende doorverkoop plekken.
+      check_out_your_local_flea_market: Bekijk je lokale rommelmarkt voor jouw fiets.
       donation: Schenking
       error: Fout
-      file_a_police_report: Dien een politierapport in. Als je kunt, ga dan naar je
-        lokale district en laat een officier komen en een rapport opnemen. Betrek
-        ze bij uw situatie!
+      file_a_police_report: Doe aangifte wegens diefstal. Als je kunt, ga dan naar
+        het politiebureau in jouw omgeving en doe aangifte. Betrek ze bij jouw situatie!
       if_you_are_here_your_bike_was_probably_stolen: 'Als je hier bent, is je fiets
-        waarschijnlijk gestolen. Dat is klote, maar we zijn hier om te helpen. Dit
-        is wat je moet doen:'
+        waarschijnlijk gestolen. Dat is balen, maar wij zijn hier om je te helpen.
+        Dit is wat je moet doen:'
       keep_an_eye_on_craigslist: Houd Craigslist in de gaten. Stel een specifieke
-        waarschuwing in met behulp van ifttt.com om de lijst te markeren die overeenkomt
-        met uw fiets. Volg apps zoals OfferUp en LetGo omdat ze vaak worden gebruikt
-        in schermfietsen.
+        waarschuwing in met behulp van ifttt.com om de advertentie te markeren die
+        overeenkomt met jouw fiets. Volg apps zoals OfferUp en LetGo omdat ze vaak
+        worden gebruikt in gestolen fietsen.
       list_recent_stolen_bikes_html: Maak een lijst van recent gestolen fietsen op
         uw site met onze %{stolen_widget_link}
-      look_for_local_stolen_bike_groups_on_face: Zoek naar lokale gestolen fietsgroepen
-        op Facebook (zoek op 'gestolen fiets {plaatsnaam}') Veel van deze vrijwilligersgroepen
-        bestaan over de hele wereld en kunnen uw herstelwerkzaamheden ondersteunen.
-      make_sure_your_bike_is_registered_html: Zorg ervoor dat uw fiets is geregistreerd
-        op %{new_bike_link} en elk lokaal register in uw community dat bestaat. Markeer
-        je fiets als <strong>gestolen</strong> op Bike Index om onze community te
-        activeren.
+      look_for_local_stolen_bike_groups_on_face: Zoek naar Facebook groepen voor gestolen
+        fietsen (zoek op 'gestolen fiets {plaatsnaam}'). Veel van deze vrijwilligersgroepen
+        bestaan over de hele wereld en kunnen je helpen bij het terugvinden van je
+        fiets.
+      make_sure_your_bike_is_registered_html: Zorg ervoor dat je fiets geregistreerd
+        is op %{new_bike_link} en register in jouw community. Markeer je fiets als
+        <strong>gestolen</strong> op Bike Index om onze community te activeren.
       other_recovery_tools: Andere herstelhulpmiddelen
       please_fix_the_following: Corrigeer het volgende %{errors}
       please_login_to_make_report_html: Gelieve %{login_link} om dit rapport te maken
@@ -5192,19 +5192,19 @@ nl:
       someone_is_selling_a_stolen_bike: Iemand verkoopt een gestolen fiets
       stolen_widget: gestolen widget
       tell_everyone_you_know: Vertel iedereen die je kent over je gestolen fiets.
-        Raak al je sociale netwerken (Facebook, Instagram, Twitter, etc.) en sms /
-        e-mail iedereen die je kent.
-      we_wish_you_the_best_of_luck_html: Wij wensen u veel succes bij het herstellen
-        van uw fiets. We willen je verhaal graag toevoegen aan onze %{recoveries_count}
-        herstelde fietsen. Als je ons doel wilt ondersteunen, overweeg dan een %{donations_link}
+        Gebruik hiervoor al je social media (Facebook, Instagram, Twitter, etc.) en
+        sms / e-mail iedereen die je kent.
+      we_wish_you_the_best_of_luck_html: Wij wensen je veel succes bij het terugvinden
+        van jouw gestolen fiets. We willen je verhaal graag toevoegen aan onze %{recoveries_count}
+        teruggevonden fietsen. Als je ons doel wilt steunen, overweeg dan een %{donations_link}
         of neem deel aan ons %{ambassadors_link} -programma.
       what_happens_next: Wat gebeurt er nu?
       what_to_do_if_your_bike_is_stolen: Wat te doen als uw fiets wordt gestolen
       where_is_this_happening: Waar gebeurt dit URL, adres - alle informatie die u
         heeft
       your_email_address: Uw e-mailadres
-      your_local_police_department_will_do_what: Uw lokale politie-afdeling zal doen
-        wat het doet om uw fiets te herstellen. Blijf in contact met hen.
+      your_local_police_department_will_do_what: Jouw lokale politie-afdeling zal
+        doen wat het moet doet om de fiets terug te vinden. Blijf in contact met hen.
   theft_alert_plans:
     theft_alert_plan:
       best_value: Beste waarde
