@@ -175,6 +175,29 @@ nl:
               secured_uri: moet een HTTPS/SSL URI zijn.
         impound_record:
           user_not_authorized: heeft geen toestemming om deze fiets in beslag te nemen
+        bike:
+          not_found: niet gevonden
+          suspended: geschorst en kan niet worden gebruikt
+        bike_code:
+          not_found: niet gevonden
+          unauthorized_to_claim: hebben geen toestemming om dit te claimen
+        export:
+          required: verplicht
+        manufacturer:
+          cannot_match_a_color_name: Kan niet hetzelfde zijn als een kleurnaam
+        organization_message:
+          latlon_required: breedte- en lengtegraad vereist
+          required: verplicht
+        payment:
+          requires_email_or_org: Vereist een e-mailadres of organisatie
+        recovery_display:
+          quote_too_long: Dat citaat is te lang. Kort deze in tot minder dan 300 tekens
+        theft_alert:
+          must_be_later_than_start_time: moet later zijn dan de starttijd
+          must_be_present: Moet aanwezig zijn
+        user:
+          email_already_exists: Die e-mail is al aangemeld op Bike Index.
+          not_an_available_language: geen beschikbare taal
     attributes:
       doorkeeper/application:
         name: Naam
