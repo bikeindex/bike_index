@@ -131,12 +131,12 @@ class BikeCode < ActiveRecord::Base
 
   def claim_if_permitted(passed_user, bike_or_string)
     return claim(passed_user, bike_or_string) if claimable_by?(passed_user)
-    errors.add(:user, "do not have permission to claim this")
+    errors.add(:user, :unauthorized_to_claim)
     false
   end
 
   def claim(passed_user, bike_or_string)
-    errors.add(:user, "not found") unless passed_user.present?
+    errors.add(:user, :not_found) unless passed_user.present?
     claiming_bike = bike_or_string.is_a?(Bike) ? bike_or_string : Bike.friendly_find(bike_or_string)
     # Check bike_or_string, not bike_id, because we don't want to allow people adding bikes
     if bike_or_string.blank? && claiming_bike.blank? && unclaimable_by?(passed_user)
@@ -148,7 +148,8 @@ class BikeCode < ActiveRecord::Base
         bike.bike_organizations.create(organization_id: organization_id, can_not_edit_claimed: true) if organization.present?
       end
     else
-      errors.add(:bike, "\"#{bike_or_string}\" not found")
+      not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike_code])
+      errors.add(:bike, "\"#{bike_or_string}\" #{not_found}")
     end
     self
   end

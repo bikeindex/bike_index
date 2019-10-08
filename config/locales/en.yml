@@ -759,8 +759,32 @@ en:
           has_many: Cannot delete record because dependent %{record} exist
           has_one: Cannot delete record because a dependent %{record} exists
       models:
+        bike:
+          not_found: not found
+          suspended: suspended and can't be used
+        bike_code:
+          not_found: not found
+          unauthorized_to_claim: do not have permission to claim this
+        export:
+          required: required
         impound_record:
           user_not_authorized: does not have permission to impound this bike
+        manufacturer:
+          cannot_match_a_color_name: Cannot be the same as a color name
+        organization_message:
+          latlon_required: latitude and longitude required
+          required: required
+        payment:
+          requires_email_or_org: Requires an email address or organization
+        recovery_display:
+          quote_too_long: That quote is too long. Please shorten it to be less than
+            300 characters
+        theft_alert:
+          must_be_later_than_start_time: must be later than start time
+          must_be_present: must be present
+        user:
+          email_already_exists: That email is already signed up on Bike Index.
+          not_an_available_language: not an available language
     models:
       ad: Ad
       ambassador: Ambassador

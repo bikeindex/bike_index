@@ -37,11 +37,11 @@ class TheftAlert < ActiveRecord::Base
     return if begin_at.blank? && end_at.blank?
 
     if begin_at.blank?
-      errors.add(:begin_at, "must be present")
+      errors.add(:begin_at, :must_be_present)
     elsif end_at.blank?
-      errors.add(:end_at, "must be present")
+      errors.add(:end_at, :must_be_present)
     elsif begin_at >= end_at
-      errors.add(:end_at, "must be later than 'begin_at'")
+      errors.add(:end_at, :must_be_later_than_start_time)
     end
   end
 end
