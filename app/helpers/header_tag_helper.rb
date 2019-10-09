@@ -40,7 +40,7 @@ module HeaderTagHelper
 
   def auto_description
     return translation_description if translation_description.present?
-    "The best bike registry: Simple, secure and free."
+    t("meta_descriptions.welcome_index")
   end
 
   def default_meta_hash
