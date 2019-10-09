@@ -4,18 +4,8 @@
 class BikeDecorator < ApplicationDecorator
   delegate_all
 
-  def creation_organization_name
-    object.creation_organization&.name
-  end
-
   def should_show_other_bikes
     object.user? && object.user.show_bikes
-  end
-
-  def show_other_bikes
-    return nil unless should_show_other_bikes
-    html = "<a href='/users/#{object.user.username}'>View user's other bikes</a>"
-    html.html_safe
   end
 
   def title
@@ -31,11 +21,6 @@ class BikeDecorator < ApplicationDecorator
     t += h.content_tag(:strong, object.mnfg_name)
     t += Rack::Utils.escape_html(" #{object.frame_model}") if object.frame_model.present?
     t.html_safe
-  end
-
-  def tire_width(position)
-    return "narrow" if object.send("#{position}_tire_narrow")
-    "wide"
   end
 
   def list_link_url(target = nil)
@@ -55,14 +40,6 @@ class BikeDecorator < ApplicationDecorator
       h.image_tag(small.join("/") + ext, alt: title_string)
     else
       h.image_tag("revised/bike_photo_placeholder.svg", alt: title_string, title: "No image", class: "no-image")
-    end
-  end
-
-  def list_image(target = nil)
-    h.content_tag :div, class: "blist-image-holder" do
-      h.link_to(list_link_url(target)) do
-        thumb_image
-      end
     end
   end
 end
