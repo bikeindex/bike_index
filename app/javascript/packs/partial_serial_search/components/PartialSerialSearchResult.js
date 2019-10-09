@@ -70,7 +70,7 @@ const ResultImage = ({ bike }) => {
   }
 
   return (<a className="bike-list-image hover-expand" target="_blank" href={bike.url}>
-            <img alt={bike.description} src={bike.thumb}></img>
+            <img alt={bike.title} src={bike.thumb}></img>
           </a>);
 }
 
