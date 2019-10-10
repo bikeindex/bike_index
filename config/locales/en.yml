@@ -1504,7 +1504,7 @@ en:
         thanks_for_your_message: Thanks for your message!
         we_will_contact_you: Thank you! We'll contact you soon.
     integrations:
-      create:
+      integrations_controller_creation_error:
         problem_authenticating_with_provider: >-
           There was a problem authenticating you with %{provider_name}. Please sign
           in a different way or email us at contact@bikeindex.org
