@@ -1460,7 +1460,8 @@ en:
           think you should be able to.
     bikes:
       assign_bike_codes:
-        sticker_assigned: Success! Sticker '%{code}' has been assigned to your %{bike_type}
+        sticker_assigned: Success! Sticker '%{bike_code}' has been assigned to your
+          %{bike_type}
         unable_to_find_sticker: Unable to find a sticker matching %{bike_code}
       create:
         bike_was_added: Bike successfully added to the index!

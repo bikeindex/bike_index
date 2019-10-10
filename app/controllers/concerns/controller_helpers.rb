@@ -116,7 +116,7 @@ module ControllerHelpers
     end
 
     scope ||= [:controllers, controller_namespace, controller_name, controller_method.to_sym]
-    I18n.t(key, kwargs, scope: scope.compact)
+    I18n.t(key, **kwargs, scope: scope.compact)
   end
 
   def controller_namespace

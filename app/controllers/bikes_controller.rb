@@ -343,9 +343,9 @@ class BikesController < ApplicationController
 
   def assign_bike_codes(bike_code)
     bike_code = BikeCode.lookup_with_fallback(bike_code)
-    return flash[:error] = translation(:unable_to_find_sticker, code: bike_code) unless bike_code.present?
+    return flash[:error] = translation(:unable_to_find_sticker, bike_code: bike_code) unless bike_code.present?
     if bike_code.claim_if_permitted(current_user, @bike)
-      flash[:success] = translation(:sticker_assigned, code: bike_code.pretty_code, bike_type: @bike.type)
+      flash[:success] = translation(:sticker_assigned, bike_code: bike_code.pretty_code, bike_type: @bike.type)
     else
       flash[:error] = bike_code.errors.full_messages
     end
