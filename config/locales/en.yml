@@ -1517,6 +1517,12 @@ en:
         no_permission_to_edit: Sorry! You don't have permission to edit that image.
       update:
         image_updated: Image was successfully updated.
+    stolen_notifications:
+      create:
+        failure: Crap! We couldn't send your notification. Please try again.
+        thanks: Thanks for looking out!
+        unauthorized: >-
+          You don't have permission to send that notification! Please contact support@bikeindex.org
     theft_alerts:
       create:
         order_is_pending: >-

@@ -10,13 +10,13 @@ class StolenNotificationsController < ApplicationController
     @stolen_notification.sender = current_user
     @bike = @stolen_notification.bike
     if !@bike.contact_owner?(current_user)
-      flash[:error] = "You don't have permission to send that notification! Please contact support@bikeindex.org"
+      flash[:error] = translation(:unauthorized)
       redirect_to @bike
     elsif @stolen_notification.save
-      flash[:success] = "Thanks for looking out!"
+      flash[:success] = translation(:thanks)
       redirect_to @bike
     else
-      flash[:error] = "Crap! We couldn't send your notification. Please try again."
+      flash[:error] = translation(:failure)
       render @bike
     end
   end
