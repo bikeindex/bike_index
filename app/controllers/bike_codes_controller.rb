@@ -14,7 +14,7 @@ class BikeCodesController < ApplicationController
         end
       end
     else
-      flash[:error] = "You can't update that #{@bike_code.kind}. Please contact support@bikeindex.org if you think you should be able to"
+      flash[:error] = translation(:cannot_update, kind: @bike_code.kind)
     end
     redirect_to :back
   end
@@ -27,7 +27,7 @@ class BikeCodesController < ApplicationController
 
   def find_bike_code
     unless current_user.present?
-      flash[:error] = "You must be signed in to do that"
+      flash[:error] = translation(:must_be_signed_in, scope: %i[controllers bike_codes find_bike_code])
       redirect_to :back
       return
     end
@@ -35,7 +35,9 @@ class BikeCodesController < ApplicationController
     # use the loosest lookup, but only permit it if the user can claim that
     @bike_code = bike_code if bike_code.present? && bike_code.claimable_by?(current_user)
     return @bike_code if @bike_code.present?
-    flash[:error] = "Unable to find sticker with code: #{bike_code_code}"
+    flash[:error] = translation(:unable_to_find_sticker,
+                                code: bike_code_code,
+                                scope: %i[controllers bike_codes find_bike_code])
     redirect_to :back and return
   end
 

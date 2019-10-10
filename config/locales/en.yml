@@ -1450,6 +1450,14 @@ en:
         csrf_invalid: >-
           CSRF invalid. If you don't know why you're receiving this message, please
           contact us.
+    bike_codes:
+      find_bike_code:
+        must_be_signed_in: You must be signed in to do that.
+        unable_to_find_sticker: 'Unable to find sticker with code: %{code}'
+      update:
+        cannot_update: >-
+          You can't update that %{kind}. Please contact support@bikeindex.org if you
+          think you should be able to.
     bikes:
       create:
         bike_was_added: Bike successfully added to the index!
