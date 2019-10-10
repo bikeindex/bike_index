@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
                           x_permitted_cross_domain_policies: false)
 
   def handle_unverified_request
-    flash[:error] = "CSRF invalid. If you don't know why you're receiving this message, please contact us"
+    flash[:error] = translation(:csrf_invalid, scope: %i[controllers application handle_unverified_request])
     redirect_to user_root_url
   end
 

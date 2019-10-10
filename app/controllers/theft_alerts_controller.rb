@@ -18,11 +18,11 @@ class TheftAlertsController < ApplicationController
 
     theft_alert.update(payment: payment)
   rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotFound
-    flash[:error] = "We were unable to process your order. Please contact support."
+    flash[:error] = translation(:unable_to_process_order)
     redirect_to edit_bike_url(@bike, params: { page: :alert_purchase })
   rescue Stripe::CardError
     TheftAlertPurchaseNotificationWorker.perform_async(theft_alert.id)
-    flash[:error] = "Your order is pending, but we were unable to complete payment. Please contact support to complete your purchase."
+    flash[:error] = translation(:order_is_pending)
     redirect_to edit_bike_url(@bike, params: { page: :alert_purchase })
   else
     TheftAlertPurchaseNotificationWorker.perform_async(theft_alert.id)
@@ -36,7 +36,8 @@ class TheftAlertsController < ApplicationController
     @current_ownership = @bike&.current_ownership
     return true if @bike&.authorize_and_claim_for_user(current_user)
 
-    flash[:error] = "You don't have permission to do that. Please contact support."
+    t_scope = %i[controllers theft_alerts ensure_user_allowed_to_create_theft_alert]
+    flash[:error] = translation(:unauthorized, scope: t_scope)
     redirect_to bikes_url and return
   end
 end

@@ -1445,6 +1445,11 @@ en:
       start: Start
       status: Status
   controllers:
+    application:
+      handle_unverified_request:
+        csrf_invalid: >-
+          CSRF invalid. If you don't know why you're receiving this message, please
+          contact us.
     bikes:
       create:
         bike_was_added: Bike successfully added to the index!
@@ -1484,6 +1489,15 @@ en:
         unable_to_find_sticker: 'Unable to find sticker: %{scanned_id}'
       update:
         bike_was_updated: Bike successfully updated!
+    theft_alerts:
+      create:
+        order_is_pending: >-
+          Your order is pending, but we were unable to complete payment. Please contact
+          support to complete your purchase.
+        unable_to_process_order: We were unable to process your order. Please contact
+          support.
+      ensure_user_allowed_to_create_theft_alert:
+        unauthorized: You don't have permission to do that. Please contact support.
   customer_mailer:
     additional_email_confirmation:
       html:
