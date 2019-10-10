@@ -1493,6 +1493,12 @@ en:
         please_sign_in_to_register: Please sign in to register a bike
         we_couldnt_find_that_registration: Oops! We couldn't find that registration,
           please re-enter the information here
+      recovery:
+        ensure_token_match:
+          already_recovered: Bike has already been marked recovered!
+          incorrect_token: Incorrect Token, check your email again
+        update:
+          bike_recovered: Bike marked recovered! Thank you!
       scanned:
         unable_to_find_sticker: 'Unable to find sticker: %{scanned_id}'
       update:

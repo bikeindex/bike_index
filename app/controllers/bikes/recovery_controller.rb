@@ -13,7 +13,7 @@ module Bikes
     def update
       if @stolen_record.add_recovery_information(permitted_params)
         EmailRecoveredFromLinkWorker.perform_async(@stolen_record.id)
-        flash[:success] = "Bike marked recovered! Thank you!"
+        flash[:success] = translation(:bike_recovered)
         redirect_to bike_path(@bike)
       else
         render :edit, bike_id: @bike.id, token: params[:token]
@@ -39,13 +39,14 @@ module Bikes
     end
 
     def ensure_token_match!
+      t_scope = %i[controllers bikes recovery ensure_token_match]
       @stolen_record = StolenRecord.find_matching_token(bike_id: @bike && @bike.id,
                                                         recovery_link_token: params[:token])
       if @stolen_record.present?
         return true if @bike.stolen
-        flash[:info] = "Bike has already been marked recovered!"
+        flash[:info] = translation(:already_recovered, scope: t_scope)
       else
-        flash[:error] = "Incorrect Token, check your email again"
+        flash[:error] = translation(:incorrect_token, scope: t_scope)
       end
       redirect_to bike_path(@bike) and return
     end
