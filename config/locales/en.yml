@@ -1541,6 +1541,11 @@ en:
           support.
       ensure_user_allowed_to_create_theft_alert:
         unauthorized: You don't have permission to do that. Please contact support.
+    welcome:
+      authenticate_user_for_welcome_controller:
+        create_account: Please create an account
+      recovery_stories:
+        no_stories_to_display: No recovery stories to display
   customer_mailer:
     additional_email_confirmation:
       html:
