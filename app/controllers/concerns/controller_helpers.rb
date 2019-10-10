@@ -112,6 +112,8 @@ module ControllerHelpers
     I18n.t(key, kwargs, scope: scope.compact)
   end
 
+  alias_method :t, :translation
+
   def controller_namespace
     @controller_namespace ||= self.class.parent.name != "Object" ? self.class.parent.name.downcase : nil
   end

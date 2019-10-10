@@ -46,7 +46,7 @@ class WelcomeController < ApplicationController
     @recovery_displays = RecoveryDisplay.page(page).per(@per_page)
     @slice1, @slice2 = list_halves(@recovery_displays)
 
-    flash[:notice] = translation(:no_stories_to_display) if @recovery_displays.empty?
+    flash[:notice] = t(:no_stories_to_display) if @recovery_displays.empty?
   end
 
   # Adding for testing purposes - so we can test where the root url for a user goes - sethherr, 2019-7-9
@@ -55,7 +55,7 @@ class WelcomeController < ApplicationController
   private
 
   def authenticate_user_for_welcome_controller
-    authenticate_user(translation(:create_account), flash_type: :info)
+    authenticate_user(t(:create_account), flash_type: :info)
   end
 
   # Split the given array `list` into two halves
