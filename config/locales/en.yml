@@ -1489,6 +1489,24 @@ en:
         unable_to_find_sticker: 'Unable to find sticker: %{scanned_id}'
       update:
         bike_was_updated: Bike successfully updated!
+    organizations:
+      create:
+        organization_created: Organization Created successfully!
+      find_organization:
+        not_found: >-
+          We're sorry, that organization isn't on Bike Index yet. Email contact@bikeindex.org
+          if this seems like an error.
+      lightspeed_interface:
+        must_create_an_account_first: >-
+          You have to sign up for an account on Bike Index before you can connect
+          with Lightspeed
+        must_create_an_organization_first: >-
+          You have to create an organization on Bike Index before you can connect
+          with Lightspeed
+      set_bparam:
+        no_user: >-
+          We're sorry, that organization doesn't have a user set up to register bikes
+          through. Email contact@bikeindex.org if this seems like an error.
     theft_alerts:
       create:
         order_is_pending: >-
