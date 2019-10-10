@@ -1459,6 +1459,9 @@ en:
           You can't update that %{kind}. Please contact support@bikeindex.org if you
           think you should be able to.
     bikes:
+      assign_bike_codes:
+        sticker_assigned: Success! Sticker '%{code}' has been assigned to your %{bike_type}
+        unable_to_find_sticker: Unable to find a sticker matching %{bike_code}
       create:
         bike_was_added: Bike successfully added to the index!
         bike_was_sent_to: Success! %{bike_type} was sent to %{owner_email}.
