@@ -106,13 +106,14 @@ module ControllerHelpers
   end
 
   def translation(key, scope: nil, controller_method: nil, **kwargs)
-    controller_method = controller_method.presence
-    controller_method ||=
-      caller_locations
-        .map(&:label)
-        .slice(0, 2)
-        .reject { |label| label =~ /rescue in/ }
-        .first
+    if scope.blank? && controller_method.blank?
+      controller_method =
+        caller_locations
+          .map(&:label)
+          .slice(0, 2)
+          .reject { |label| label =~ /rescue in/ }
+          .first
+    end
 
     scope ||= [:controllers, controller_namespace, controller_name, controller_method.to_sym]
     I18n.t(key, kwargs, scope: scope.compact)
