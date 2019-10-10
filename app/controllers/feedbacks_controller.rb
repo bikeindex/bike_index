@@ -42,7 +42,7 @@ class FeedbacksController < ApplicationController
     # Previously, we were authenticating users in a before_filter
     # But to make it possible for non-signed in users to generate leads, we're trying this out
     return false unless feedback.looks_like_spam?
-    flash[:error] = translation(:please_sign_in, controller_method: __method__)
+    flash[:error] = translation(:please_sign_in)
     redirect_to :back and return true
   end
 

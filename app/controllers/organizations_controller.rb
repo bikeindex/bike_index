@@ -69,7 +69,7 @@ class OrganizationsController < ApplicationController
   def set_bparam
     return true unless find_organization.present?
     unless find_organization.auto_user.present?
-      flash[:error] = translation(:no_user, controller_method: __method__)
+      flash[:error] = translation(:no_user)
       redirect_to root_url and return
     end
     if params[:b_param_id_token].present?
@@ -110,7 +110,7 @@ class OrganizationsController < ApplicationController
   def find_organization
     @organization = Organization.friendly_find(params[:id])
     return @organization if @organization.present?
-    flash[:error] = translation(:not_found, controller_method: __method__)
+    flash[:error] = translation(:not_found)
     redirect_to root_url and return
   end
 

@@ -298,7 +298,7 @@ class BikesController < ApplicationController
     end
     if @bike.hidden || @bike.deleted?
       unless current_user.present? && @bike.visible_by(current_user)
-        flash[:error] = translation("bike_deleted", controller_method: __method__)
+        flash[:error] = translation("bike_deleted")
         redirect_to root_url and return
       end
     end
@@ -317,12 +317,12 @@ class BikesController < ApplicationController
     return true if @bike.authorize_and_claim_for_user(current_user)
 
     if current_user.present?
-      error = translation("you_dont_own_that", bike_type: type, controller_method: __method__)
+      error = translation("you_dont_own_that", bike_type: type)
     else
       if @current_ownership && @bike.current_ownership.claimed
-        error = translation("you_have_to_sign_in", bike_type: type, controller_method: __method__)
+        error = translation("you_have_to_sign_in", bike_type: type)
       else
-        error = translation("bike_has_not_been_claimed_yet", bike_type: type, controller_method: __method__)
+        error = translation("bike_has_not_been_claimed_yet", bike_type: type)
       end
     end
 
@@ -331,7 +331,7 @@ class BikesController < ApplicationController
       redirect_to bike_path(@bike) and return
     end
 
-    authenticate_user(translation("please_create_an_account", controller_method: __method__), flash_type: :info)
+    authenticate_user(translation("please_create_an_account"), flash_type: :info)
   end
 
   def update_organizations_can_edit_claimed(bike, organization_ids)

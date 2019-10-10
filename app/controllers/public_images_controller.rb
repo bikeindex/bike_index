@@ -108,7 +108,7 @@ class PublicImagesController < ApplicationController
   def find_image_if_owned
     @public_image = PublicImage.unscoped.find(params[:id])
     unless current_user_image_owner(@public_image)
-      flash[:error] = translation(:no_permission_to_edit, controller_method: __method__)
+      flash[:error] = translation(:no_permission_to_edit)
       redirect_to @public_image.imageable and return
     end
   end

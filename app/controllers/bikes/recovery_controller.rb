@@ -43,9 +43,9 @@ module Bikes
                                                         recovery_link_token: params[:token])
       if @stolen_record.present?
         return true if @bike.stolen
-        flash[:info] = translation(:already_recovered, controller_method: __method__)
+        flash[:info] = translation(:already_recovered)
       else
-        flash[:error] = translation(:incorrect_token, controller_method: __method__)
+        flash[:error] = translation(:incorrect_token)
       end
       redirect_to bike_path(@bike) and return
     end

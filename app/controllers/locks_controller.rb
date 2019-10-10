@@ -39,7 +39,7 @@ class LocksController < ApplicationController
   def find_lock
     @lock = current_user.locks.where(id: params[:id]).first
     unless @lock.present?
-      flash[:error] = translation(:not_your_lock, controller_method: __method__)
+      flash[:error] = translation(:not_your_lock)
       redirect_to user_home_path and return
     end
   end
