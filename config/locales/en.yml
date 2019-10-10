@@ -1500,6 +1500,11 @@ en:
         problem_authenticating_with_provider: >-
           There was a problem authenticating you with %{provider_name}. Please sign
           in a different way or email us at contact@bikeindex.org
+    locks:
+      create:
+        lock_created: Lock created successfully!
+      find_lock:
+        not_your_lock: Whoops, that's not your lock!
     organizations:
       create:
         organization_created: Organization Created successfully!
