@@ -104,8 +104,9 @@ module ControllerHelpers
     end
   end
 
-  def translation(key, scope: nil, **kwargs)
-    scope ||= [:controllers, controller_namespace, controller_name, action_name]
+  def translation(key, scope: nil, controller_method: nil, **kwargs)
+    controller_method = controller_method.presence || action_name
+    scope ||= [:controllers, controller_namespace, controller_name, controller_method.to_sym]
     I18n.t(key, kwargs, scope: scope.compact)
   end
 

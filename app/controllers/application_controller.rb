@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
                           x_permitted_cross_domain_policies: false)
 
   def handle_unverified_request
-    flash[:error] = translation(:csrf_invalid, scope: %i[controllers application handle_unverified_request])
+    flash[:error] = translation(:csrf_invalid, controller_method: __method__)
     redirect_to user_root_url
   end
 

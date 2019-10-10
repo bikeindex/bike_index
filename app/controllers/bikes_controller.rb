@@ -253,11 +253,11 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = translation(:recovery_details, scope: %i[controllers bikes edit]) if @bike.abandoned?
-      h[:theft_details] = translation(:theft_details, scope: %i[controllers bikes edit]) unless @bike.abandoned?
-      h[:publicize] = translation(:publicize, scope: %i[controllers bikes edit])
-      h[:alert] = translation(:alert, scope: %i[controllers bikes edit])
-      h[:report_recovered] = translation(:report_recovered, scope: %i[controllers bikes edit]) unless @bike.abandoned?
+      h[:theft_details] = translation(:recovery_details, controller_method: :edit) if @bike.abandoned?
+      h[:theft_details] = translation(:theft_details, controller_method: :edit) unless @bike.abandoned?
+      h[:publicize] = translation(:publicize, controller_method: :edit)
+      h[:alert] = translation(:alert, controller_method: :edit)
+      h[:report_recovered] = translation(:report_recovered, controller_method: :edit) unless @bike.abandoned?
     end
   end
 
@@ -266,14 +266,14 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def bike_templates
     {}.with_indifferent_access.tap do |h|
-      h[:bike_details] = translation(:bike_details, scope: %i[controllers bikes edit])
-      h[:photos] = translation(:photos, scope: %i[controllers bikes edit])
-      h[:drivetrain] = translation(:drivetrain, scope: %i[controllers bikes edit])
-      h[:accessories] = translation(:accessories, scope: %i[controllers bikes edit])
-      h[:ownership] = translation(:ownership, scope: %i[controllers bikes edit])
-      h[:groups] = translation(:groups, scope: %i[controllers bikes edit])
-      h[:remove] = translation(:remove, scope: %i[controllers bikes edit])
-      h[:report_stolen] = translation(:report_stolen, scope: %i[controllers bikes edit]) unless @bike.stolen?
+      h[:bike_details] = translation(:bike_details, controller_method: :edit)
+      h[:photos] = translation(:photos, controller_method: :edit)
+      h[:drivetrain] = translation(:drivetrain, controller_method: :edit)
+      h[:accessories] = translation(:accessories, controller_method: :edit)
+      h[:ownership] = translation(:ownership, controller_method: :edit)
+      h[:groups] = translation(:groups, controller_method: :edit)
+      h[:remove] = translation(:remove, controller_method: :edit)
+      h[:report_stolen] = translation(:report_stolen, controller_method: :edit) unless @bike.stolen?
     end
   end
 
@@ -298,7 +298,7 @@ class BikesController < ApplicationController
     end
     if @bike.hidden || @bike.deleted?
       unless current_user.present? && @bike.visible_by(current_user)
-        flash[:error] = translation("bike_deleted", scope: %i[controllers bikes find_bike])
+        flash[:error] = translation("bike_deleted", controller_method: __method__)
         redirect_to root_url and return
       end
     end
@@ -316,15 +316,13 @@ class BikesController < ApplicationController
 
     return true if @bike.authorize_and_claim_for_user(current_user)
 
-    translation_scope = %i[controllers bikes ensure_user_allowed_to_edit]
-
     if current_user.present?
-      error = translation("you_dont_own_that", bike_type: type, scope: translation_scope)
+      error = translation("you_dont_own_that", bike_type: type, controller_method: __method__)
     else
       if @current_ownership && @bike.current_ownership.claimed
-        error = translation("you_have_to_sign_in", bike_type: type, scope: translation_scope)
+        error = translation("you_have_to_sign_in", bike_type: type, controller_method: __method__)
       else
-        error = translation("bike_has_not_been_claimed_yet", bike_type: type, scope: translation_scope)
+        error = translation("bike_has_not_been_claimed_yet", bike_type: type, controller_method: __method__)
       end
     end
 
@@ -333,7 +331,7 @@ class BikesController < ApplicationController
       redirect_to bike_path(@bike) and return
     end
 
-    authenticate_user(translation("please_create_an_account", scope: translation_scope), flash_type: :info)
+    authenticate_user(translation("please_create_an_account", controller_method: __method__), flash_type: :info)
   end
 
   def update_organizations_can_edit_claimed(bike, organization_ids)

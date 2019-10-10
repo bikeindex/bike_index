@@ -27,7 +27,7 @@ class BikeCodesController < ApplicationController
 
   def find_bike_code
     unless current_user.present?
-      flash[:error] = translation(:must_be_signed_in, scope: %i[controllers bike_codes find_bike_code])
+      flash[:error] = translation(:must_be_signed_in, controller_method: __method__)
       redirect_to :back
       return
     end

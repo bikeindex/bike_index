@@ -39,14 +39,13 @@ module Bikes
     end
 
     def ensure_token_match!
-      t_scope = %i[controllers bikes recovery ensure_token_match]
       @stolen_record = StolenRecord.find_matching_token(bike_id: @bike && @bike.id,
                                                         recovery_link_token: params[:token])
       if @stolen_record.present?
         return true if @bike.stolen
-        flash[:info] = translation(:already_recovered, scope: t_scope)
+        flash[:info] = translation(:already_recovered, controller_method: __method__)
       else
-        flash[:error] = translation(:incorrect_token, scope: t_scope)
+        flash[:error] = translation(:incorrect_token, controller_method: __method__)
       end
       redirect_to bike_path(@bike) and return
     end

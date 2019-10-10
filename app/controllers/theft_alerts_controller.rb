@@ -36,8 +36,7 @@ class TheftAlertsController < ApplicationController
     @current_ownership = @bike&.current_ownership
     return true if @bike&.authorize_and_claim_for_user(current_user)
 
-    t_scope = %i[controllers theft_alerts ensure_user_allowed_to_create_theft_alert]
-    flash[:error] = translation(:unauthorized, scope: t_scope)
+    flash[:error] = translation(:unauthorized, controller_method: __method__)
     redirect_to bikes_url and return
   end
 end

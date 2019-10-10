@@ -1494,7 +1494,7 @@ en:
         we_couldnt_find_that_registration: Oops! We couldn't find that registration,
           please re-enter the information here
       recovery:
-        ensure_token_match:
+        ensure_token_match!:
           already_recovered: Bike has already been marked recovered!
           incorrect_token: Incorrect Token, check your email again
         update:

@@ -55,8 +55,7 @@ class WelcomeController < ApplicationController
   private
 
   def authenticate_user_for_welcome_controller
-    t_scope = %i[controllers welcome authenticate_user_for_welcome_controller]
-    authenticate_user(translation(:create_account, scope: t_scope), flash_type: :info)
+    authenticate_user(translation(:create_account, controller_method: __method__), flash_type: :info)
   end
 
   # Split the given array `list` into two halves
