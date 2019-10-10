@@ -13,7 +13,7 @@ module Bikes
     def update
       if @stolen_record.add_recovery_information(permitted_params)
         EmailRecoveredFromLinkWorker.perform_async(@stolen_record.id)
-        flash[:success] = t(:bike_recovered)
+        flash[:success] = translation(:bike_recovered)
         redirect_to bike_path(@bike)
       else
         render :edit, bike_id: @bike.id, token: params[:token]
@@ -43,9 +43,9 @@ module Bikes
                                                         recovery_link_token: params[:token])
       if @stolen_record.present?
         return true if @bike.stolen
-        flash[:info] = t(:already_recovered)
+        flash[:info] = translation(:already_recovered)
       else
-        flash[:error] = t(:incorrect_token)
+        flash[:error] = translation(:incorrect_token)
       end
       redirect_to bike_path(@bike) and return
     end

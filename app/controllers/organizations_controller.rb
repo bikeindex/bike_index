@@ -15,10 +15,10 @@ class OrganizationsController < ApplicationController
 
     session[:return_to] = lightspeed_interface_path
     if current_user.present?
-      flash[:info] = t(:must_create_an_organization_first)
+      flash[:info] = translation(:must_create_an_organization_first)
       redirect_to new_organization_path
     else
-      flash[:info] = t(:must_create_an_account_first)
+      flash[:info] = translation(:must_create_an_account_first)
       redirect_to new_user_path and return
     end
   end
@@ -28,7 +28,7 @@ class OrganizationsController < ApplicationController
     if @organization.save
       Membership.create(user_id: current_user.id, role: "admin", organization_id: @organization.id)
       notify_admins("organization_created")
-      flash[:success] = t(:organization_created)
+      flash[:success] = translation(:organization_created)
       if current_user.present?
         redirect_to organization_manage_index_path(organization_id: @organization.to_param)
       end
@@ -69,7 +69,7 @@ class OrganizationsController < ApplicationController
   def set_bparam
     return true unless find_organization.present?
     unless find_organization.auto_user.present?
-      flash[:error] = t(:no_user)
+      flash[:error] = translation(:no_user)
       redirect_to root_url and return
     end
     if params[:b_param_id_token].present?
@@ -110,7 +110,7 @@ class OrganizationsController < ApplicationController
   def find_organization
     @organization = Organization.friendly_find(params[:id])
     return @organization if @organization.present?
-    flash[:error] = t(:not_found)
+    flash[:error] = translation(:not_found)
     redirect_to root_url and return
   end
 

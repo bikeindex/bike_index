@@ -22,10 +22,10 @@ class SessionsController < ApplicationController
     user = User.fuzzy_confirmed_or_unconfirmed_email_find(params[:email])
     if user.present?
       user.send_magic_link_email
-      flash[:success] = t(:link_sent)
+      flash[:success] = translation(:link_sent)
       redirect_to root_path
     else
-      flash[:error] = t(:user_not_found)
+      flash[:error] = translation(:user_not_found)
       redirect_to new_user_path
     end
   end
@@ -37,16 +37,16 @@ class SessionsController < ApplicationController
         sign_in_and_redirect(@user)
       else
         # User couldn't authenticate, so password is invalid
-        flash.now[:error] = t(:invalid_email_or_password)
+        flash.now[:error] = translation(:invalid_email_or_password)
         # If user is banned, tell them about it.
         if @user.banned?
-          flash.now[:error] = t(:user_is_banned)
+          flash.now[:error] = translation(:user_is_banned)
         end
         render_partner_or_default_signin_layout(render_action: :new)
       end
     else
       # Email address is not in the DB
-      flash.now[:error] = t(:invalid_email_or_password)
+      flash.now[:error] = translation(:invalid_email_or_password)
       render_partner_or_default_signin_layout(render_action: :new)
     end
   end

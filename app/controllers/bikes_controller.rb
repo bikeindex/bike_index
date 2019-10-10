@@ -16,7 +16,7 @@ class BikesController < ApplicationController
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
     @stolenness = @interpreted_params[:stolenness]
     if params[:stolenness] == "proximity" && @stolenness != "proximity"
-      flash[:info] = t(:we_dont_know_location, location: params[:location])
+      flash[:info] = translation(:we_dont_know_location, location: params[:location])
     end
     @bikes = Bike.search(@interpreted_params).page(params[:page] || 1).per(params[:per_page] || 10).decorate
     @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
@@ -62,7 +62,7 @@ class BikesController < ApplicationController
   def scanned
     @bike_code = BikeCode.lookup_with_fallback(scanned_id, organization_id: params[:organization_id], user: current_user)
     if @bike_code.blank?
-      flash[:error] = t(:unable_to_find_sticker, scanned_id: params[:scanned_id])
+      flash[:error] = translation(:unable_to_find_sticker, scanned_id: params[:scanned_id])
       redirect_to user_root_url
     elsif @bike_code.bike.present?
       redirect_to bike_url(@bike_code.bike_id, scanned_id: params[:scanned_id], organization_id: params[:organization_id]) and return
@@ -86,13 +86,13 @@ class BikesController < ApplicationController
   def new
     unless current_user.present?
       store_return_to(new_bike_path(b_param_token: params[:b_param_token], stolen: params[:stolen]))
-      flash[:info] = t(:please_sign_in_to_register)
+      flash[:info] = translation(:please_sign_in_to_register)
       redirect_to new_user_path and return
     end
     find_or_new_b_param
     redirect_to bike_path(@b_param.created_bike_id) and return if @b_param.created_bike.present?
     # Let them know if they sent an invalid b_param token - use flash#info rather than error because we're aggressive about removing b_params
-    flash[:info] = t(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
+    flash[:info] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
     @bike ||= @b_param.bike_from_attrs(is_stolen: params[:stolen], abandoned: params[:abandoned])
     # Fallback to active (i.e. passed organization_id), then passive_organization
     @bike.creation_organization ||= current_organization || passive_organization
@@ -129,7 +129,7 @@ class BikesController < ApplicationController
         end
       else
         if params[:bike][:embeded_extended]
-          flash[:success] = t("bike_was_sent_to", bike_type: @bike.type, owner_email: @bike.owner_email)
+          flash[:success] = translation(:bike_was_sent_to, bike_type: @bike.type, owner_email: @bike.owner_email)
           @persist_email = ParamsNormalizer.boolean(params[:persist_email])
           redirect_to embed_extended_organization_url(@bike.creation_organization, email: @persist_email ? @bike.owner_email : nil) and return
         else
@@ -146,7 +146,7 @@ class BikesController < ApplicationController
         @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
         redirect_to new_bike_url(b_param_token: @b_param.id_token)
       else
-        flash[:success] = t(:bike_was_added)
+        flash[:success] = translation(:bike_was_added)
         redirect_to edit_bike_url(@bike)
       end
     end
@@ -207,7 +207,7 @@ class BikesController < ApplicationController
     if @bike.errors.any? || flash[:error].present?
       edit and return
     else
-      flash[:success] ||= t(:bike_was_updated)
+      flash[:success] ||= translation(:bike_was_updated)
       return if return_to_if_present
       redirect_to edit_bike_url(@bike, page: params[:edit_template]) and return
     end
@@ -253,11 +253,11 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def theft_templates
     {}.with_indifferent_access.tap do |h|
-      h[:theft_details] = t(:recovery_details, controller_method: :edit) if @bike.abandoned?
-      h[:theft_details] = t(:theft_details, controller_method: :edit) unless @bike.abandoned?
-      h[:publicize] = t(:publicize, controller_method: :edit)
-      h[:alert] = t(:alert, controller_method: :edit)
-      h[:report_recovered] = t(:report_recovered, controller_method: :edit) unless @bike.abandoned?
+      h[:theft_details] = translation(:recovery_details, controller_method: :edit) if @bike.abandoned?
+      h[:theft_details] = translation(:theft_details, controller_method: :edit) unless @bike.abandoned?
+      h[:publicize] = translation(:publicize, controller_method: :edit)
+      h[:alert] = translation(:alert, controller_method: :edit)
+      h[:report_recovered] = translation(:report_recovered, controller_method: :edit) unless @bike.abandoned?
     end
   end
 
@@ -266,14 +266,14 @@ class BikesController < ApplicationController
   # are used as haml header tag text in the corresponding templates.
   def bike_templates
     {}.with_indifferent_access.tap do |h|
-      h[:bike_details] = t(:bike_details, controller_method: :edit)
-      h[:photos] = t(:photos, controller_method: :edit)
-      h[:drivetrain] = t(:drivetrain, controller_method: :edit)
-      h[:accessories] = t(:accessories, controller_method: :edit)
-      h[:ownership] = t(:ownership, controller_method: :edit)
-      h[:groups] = t(:groups, controller_method: :edit)
-      h[:remove] = t(:remove, controller_method: :edit)
-      h[:report_stolen] = t(:report_stolen, controller_method: :edit) unless @bike.stolen?
+      h[:bike_details] = translation(:bike_details, controller_method: :edit)
+      h[:photos] = translation(:photos, controller_method: :edit)
+      h[:drivetrain] = translation(:drivetrain, controller_method: :edit)
+      h[:accessories] = translation(:accessories, controller_method: :edit)
+      h[:ownership] = translation(:ownership, controller_method: :edit)
+      h[:groups] = translation(:groups, controller_method: :edit)
+      h[:remove] = translation(:remove, controller_method: :edit)
+      h[:report_stolen] = translation(:report_stolen, controller_method: :edit) unless @bike.stolen?
     end
   end
 
@@ -298,7 +298,7 @@ class BikesController < ApplicationController
     end
     if @bike.hidden || @bike.deleted?
       unless current_user.present? && @bike.visible_by(current_user)
-        flash[:error] = t(:bike_deleted)
+        flash[:error] = translation(:bike_deleted)
         redirect_to root_url and return
       end
     end
@@ -317,12 +317,12 @@ class BikesController < ApplicationController
     return true if @bike.authorize_and_claim_for_user(current_user)
 
     if current_user.present?
-      error = t(:you_dont_own_that, bike_type: type)
+      error = translation(:you_dont_own_that, bike_type: type)
     else
       if @current_ownership && @bike.current_ownership.claimed
-        error = t(:you_have_to_sign_in, bike_type: type)
+        error = translation(:you_have_to_sign_in, bike_type: type)
       else
-        error = t(:bike_has_not_been_claimed_yet, bike_type: type)
+        error = translation(:bike_has_not_been_claimed_yet, bike_type: type)
       end
     end
 
@@ -331,7 +331,7 @@ class BikesController < ApplicationController
       redirect_to bike_path(@bike) and return
     end
 
-    authenticate_user(t(:please_create_an_account), flash_type: :info)
+    authenticate_user(translation(:please_create_an_account), flash_type: :info)
   end
 
   def update_organizations_can_edit_claimed(bike, organization_ids)

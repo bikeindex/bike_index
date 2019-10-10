@@ -12,9 +12,9 @@ class FeedbacksController < ApplicationController
     return true if block_the_spam(@feedback)
     if @feedback.save
       if @feedback.lead?
-        flash[:success] = t(:we_will_contact_you)
+        flash[:success] = translation(:we_will_contact_you)
       else
-        flash[:success] = t(:thanks_for_your_message)
+        flash[:success] = translation(:thanks_for_your_message)
       end
       if request.env["HTTP_REFERER"].present? and request.env["HTTP_REFERER"] != request.env["REQUEST_URI"]
         redirect_to :back
@@ -42,7 +42,7 @@ class FeedbacksController < ApplicationController
     # Previously, we were authenticating users in a before_filter
     # But to make it possible for non-signed in users to generate leads, we're trying this out
     return false unless feedback.looks_like_spam?
-    flash[:error] = t(:please_sign_in)
+    flash[:error] = translation(:please_sign_in)
     redirect_to :back and return true
   end
 
