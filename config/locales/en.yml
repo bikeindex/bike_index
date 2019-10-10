@@ -1489,6 +1489,12 @@ en:
         unable_to_find_sticker: 'Unable to find sticker: %{scanned_id}'
       update:
         bike_was_updated: Bike successfully updated!
+    feedbacks:
+      block_the_spam:
+        please_sign_in: Please sign in to send that message
+      create:
+        thanks_for_your_message: Thanks for your message!
+        we_will_contact_you: Thank you! We'll contact you soon.
     organizations:
       create:
         organization_created: Organization Created successfully!
