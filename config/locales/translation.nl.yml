@@ -2171,6 +2171,98 @@ nl:
         unable_to_find_sticker: 'Kan sticker niet vinden: %{scanned_id}'
       update:
         bike_was_updated: Fiets succesvol bijgewerkt!
+      assign_bike_codes:
+        sticker_assigned: Succes! Sticker '%{bike_code}' is toegewezen aan uw %{bike_type}
+        unable_to_find_sticker: Kan geen overeenkomende sticker vinden %{bike_code}
+      recovery:
+        ensure_token_match!:
+          already_recovered: Fiets is al gemarkeerd als hersteld!
+          incorrect_token: Onjuist token, controleer uw e-mail opnieuw
+        update:
+          bike_recovered: Fiets gemarkeerd hersteld! Dank je!
+    application:
+      handle_unverified_request:
+        csrf_invalid: CSRF ongeldig. Neem contact met ons op als u niet weet waarom
+          u dit bericht ontvangt.
+    bike_codes:
+      find_bike_code:
+        must_be_signed_in: Je moet aangemeld zijn om dat te doen.
+        unable_to_find_sticker: 'Kan sticker met code niet vinden: %{code}'
+      update:
+        cannot_update: Je kunt dat %{kind} niet bijwerken. Neem contact op met support@bikeindex.org
+          als u denkt dat dit mogelijk zou moeten zijn.
+    feedbacks:
+      block_the_spam:
+        please_sign_in: Meld je aan om dat bericht te verzenden
+      create:
+        thanks_for_your_message: Bedankt voor je bericht!
+        we_will_contact_you: Dank je! We nemen spoedig contact met u op.
+    integrations:
+      integrations_controller_creation_error:
+        problem_authenticating_with_provider: Er is een probleem opgetreden bij het
+          verifiëren van je met %{provider_name}. Meld u op een andere manier aan
+          of mail ons op contact@bikeindex.org
+    locks:
+      create:
+        lock_created: Lock succesvol aangemaakt!
+      find_lock:
+        not_your_lock: Oeps, dat is niet jouw slot!
+    organizations:
+      create:
+        organization_created: Organisatie met succes gemaakt!
+      find_organization:
+        not_found: Het spijt ons, die organisatie staat nog niet op Bike Index. E-mail
+          contact@bikeindex.org als dit op een fout lijkt.
+      lightspeed_interface:
+        must_create_an_account_first: Je moet je aanmelden voor een account op Bike
+          Index voordat je verbinding kunt maken met Lightspeed
+        must_create_an_organization_first: U moet een organisatie op Bike Index maken
+          voordat u verbinding kunt maken met Lightspeed
+      set_bparam:
+        no_user: Het spijt ons, die organisatie heeft geen gebruiker ingesteld om
+          fietsen te registreren via. E-mail contact@bikeindex.org als dit op een
+          fout lijkt.
+    public_images:
+      create:
+        cannot_create: Whoops! We kunnen je dat beeld niet laten maken.
+      destroy:
+        cannot_delete: Whoops! Hoe heb je dat gedaan? Kan afbeeldingen van e-mailfragmenten
+          niet verwijderen.
+        image_deleted: Afbeelding is succesvol verwijderd
+      find_image_if_owned:
+        no_permission_to_edit: Sorry! U hebt geen toestemming om die afbeelding te
+          bewerken.
+      update:
+        image_updated: Afbeelding is succesvol bijgewerkt.
+    sessions:
+      create:
+        invalid_email_or_password: Ongeldig e-mailadres / wachtwoord
+        user_is_banned: Het spijt ons, maar het lijkt erop dat uw account is vergrendeld.
+          Neem contact met ons op als u niet zeker weet waarom.
+      create_magic_link:
+        link_sent: Aanmelden link verzonden! Klik op de link in uw e-mail om in te
+          loggen
+        user_not_found: Kan die gebruiker niet vinden
+    stolen_notifications:
+      create:
+        failure: Crap! We konden uw melding niet verzenden. Probeer het opnieuw.
+        thanks: Bedankt voor het kijken!
+        unauthorized: U hebt geen toestemming om die melding te verzenden! Neem contact
+          op met support@bikeindex.org
+    theft_alerts:
+      create:
+        order_is_pending: Uw bestelling is in behandeling, maar we konden de betaling
+          niet voltooien. Neem contact op met ondersteuning om uw aankoop te voltooien.
+        unable_to_process_order: We konden uw bestelling niet verwerken. Neem contact
+          op met ondersteuning.
+      ensure_user_allowed_to_create_theft_alert:
+        unauthorized: Je hebt geen toestemming om dat te doen. Neem contact op met
+          ondersteuning.
+    welcome:
+      authenticate_user_for_welcome_controller:
+        create_account: Maak een account aan
+      recovery_stories:
+        no_stories_to_display: Geen herstelverhalen om weer te geven
   customer_mailer:
     additional_email_confirmation:
       html:
