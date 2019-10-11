@@ -1445,7 +1445,24 @@ en:
       start: Start
       status: Status
   controllers:
+    application:
+      handle_unverified_request:
+        csrf_invalid: >-
+          CSRF invalid. If you don't know why you're receiving this message, please
+          contact us.
+    bike_codes:
+      find_bike_code:
+        must_be_signed_in: You must be signed in to do that.
+        unable_to_find_sticker: 'Unable to find sticker with code: %{code}'
+      update:
+        cannot_update: >-
+          You can't update that %{kind}. Please contact support@bikeindex.org if you
+          think you should be able to.
     bikes:
+      assign_bike_codes:
+        sticker_assigned: Success! Sticker '%{bike_code}' has been assigned to your
+          %{bike_type}
+        unable_to_find_sticker: Unable to find a sticker matching %{bike_code}
       create:
         bike_was_added: Bike successfully added to the index!
         bike_was_sent_to: Success! %{bike_type} was sent to %{owner_email}.
@@ -1480,10 +1497,89 @@ en:
         please_sign_in_to_register: Please sign in to register a bike
         we_couldnt_find_that_registration: Oops! We couldn't find that registration,
           please re-enter the information here
+      recovery:
+        ensure_token_match!:
+          already_recovered: Bike has already been marked recovered!
+          incorrect_token: Incorrect Token, check your email again
+        update:
+          bike_recovered: Bike marked recovered! Thank you!
       scanned:
         unable_to_find_sticker: 'Unable to find sticker: %{scanned_id}'
       update:
         bike_was_updated: Bike successfully updated!
+    feedbacks:
+      block_the_spam:
+        please_sign_in: Please sign in to send that message
+      create:
+        thanks_for_your_message: Thanks for your message!
+        we_will_contact_you: Thank you! We'll contact you soon.
+    integrations:
+      integrations_controller_creation_error:
+        problem_authenticating_with_provider: >-
+          There was a problem authenticating you with %{provider_name}. Please sign
+          in a different way or email us at contact@bikeindex.org
+    locks:
+      create:
+        lock_created: Lock created successfully!
+      find_lock:
+        not_your_lock: Whoops, that's not your lock!
+    organizations:
+      create:
+        organization_created: Organization Created successfully!
+      find_organization:
+        not_found: >-
+          We're sorry, that organization isn't on Bike Index yet. Email contact@bikeindex.org
+          if this seems like an error.
+      lightspeed_interface:
+        must_create_an_account_first: >-
+          You have to sign up for an account on Bike Index before you can connect
+          with Lightspeed
+        must_create_an_organization_first: >-
+          You have to create an organization on Bike Index before you can connect
+          with Lightspeed
+      set_bparam:
+        no_user: >-
+          We're sorry, that organization doesn't have a user set up to register bikes
+          through. Email contact@bikeindex.org if this seems like an error.
+    public_images:
+      create:
+        cannot_create: Whoops! We can't let you create that image.
+      destroy:
+        cannot_delete: Whoops! How'd you do that? Can't delete mail snippet images.
+        image_deleted: Image was successfully deleted
+      find_image_if_owned:
+        no_permission_to_edit: Sorry! You don't have permission to edit that image.
+      update:
+        image_updated: Image was successfully updated.
+    sessions:
+      create:
+        invalid_email_or_password: Invalid email/password
+        user_is_banned: >-
+          We're sorry, but it appears that your account has been locked. If you are
+          unsure as to the reasons for this, please contact us.
+      create_magic_link:
+        link_sent: Sign in link sent! Just click the link in your email to sign in
+        user_not_found: Unable to find that user
+    stolen_notifications:
+      create:
+        failure: Crap! We couldn't send your notification. Please try again.
+        thanks: Thanks for looking out!
+        unauthorized: >-
+          You don't have permission to send that notification! Please contact support@bikeindex.org
+    theft_alerts:
+      create:
+        order_is_pending: >-
+          Your order is pending, but we were unable to complete payment. Please contact
+          support to complete your purchase.
+        unable_to_process_order: We were unable to process your order. Please contact
+          support.
+      ensure_user_allowed_to_create_theft_alert:
+        unauthorized: You don't have permission to do that. Please contact support.
+    welcome:
+      authenticate_user_for_welcome_controller:
+        create_account: Please create an account
+      recovery_stories:
+        no_stories_to_display: No recovery stories to display
   customer_mailer:
     additional_email_confirmation:
       html:

@@ -27,7 +27,7 @@ class PublicImagesController < ApplicationController
       @public_image.save
       render json: { public_image: @public_image } and return
     end
-    flash[:error] = "Whoops! We can't let you create that image."
+    flash[:error] = translation(:cannot_create)
     redirect_to @public_image.present? ? @public_image.imageable : user_root_url
   end
 
@@ -41,7 +41,7 @@ class PublicImagesController < ApplicationController
 
   def update
     if @public_image.update_attributes(permitted_parameters)
-      redirect_to edit_bike_url(@public_image.imageable), notice: "Image was successfully updated."
+      redirect_to edit_bike_url(@public_image.imageable), notice: translation(:image_updated)
     else
       render :edit
     end
@@ -52,11 +52,11 @@ class PublicImagesController < ApplicationController
     imageable_id = @public_image.imageable_id
     imageable_type = @public_image.imageable_type
     if imageable_type == "MailSnippet"
-      flash[:error] = "Whoops! How'd you do that? Can't delete mail snippet images."
+      flash[:error] = translation(:cannot_delete)
       redirect_to admin_organization_custom_layouts_path(imageable_id) and return
     end
     @public_image.destroy
-    flash[:success] = "Image was successfully deleted"
+    flash[:success] = translation(:image_deleted)
     if params[:page].present?
       redirect_to edit_bike_url(imageable_id, page: params[:page]) and return
     elsif imageable_type == "Blog"
@@ -108,7 +108,7 @@ class PublicImagesController < ApplicationController
   def find_image_if_owned
     @public_image = PublicImage.unscoped.find(params[:id])
     unless current_user_image_owner(@public_image)
-      flash[:error] = "Sorry! You don't have permission to edit that image."
+      flash[:error] = translation(:no_permission_to_edit)
       redirect_to @public_image.imageable and return
     end
   end

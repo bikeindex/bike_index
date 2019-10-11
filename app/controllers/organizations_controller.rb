@@ -15,10 +15,10 @@ class OrganizationsController < ApplicationController
 
     session[:return_to] = lightspeed_interface_path
     if current_user.present?
-      flash[:info] = "You have to create an organization on Bike Index before you can connect with Lightspeed"
+      flash[:info] = translation(:must_create_an_organization_first)
       redirect_to new_organization_path
     else
-      flash[:info] = "You have to sign up for an account on Bike Index before you can connect with Lightspeed"
+      flash[:info] = translation(:must_create_an_account_first)
       redirect_to new_user_path and return
     end
   end
@@ -28,7 +28,7 @@ class OrganizationsController < ApplicationController
     if @organization.save
       Membership.create(user_id: current_user.id, role: "admin", organization_id: @organization.id)
       notify_admins("organization_created")
-      flash[:success] = "Organization Created successfully!"
+      flash[:success] = translation(:organization_created)
       if current_user.present?
         redirect_to organization_manage_index_path(organization_id: @organization.to_param)
       end
@@ -69,7 +69,7 @@ class OrganizationsController < ApplicationController
   def set_bparam
     return true unless find_organization.present?
     unless find_organization.auto_user.present?
-      flash[:error] = "We're sorry, that organization doesn't have a user set up to register bikes through. Email contact@bikeindex.org if this seems like an error."
+      flash[:error] = translation(:no_user)
       redirect_to root_url and return
     end
     if params[:b_param_id_token].present?
@@ -110,7 +110,7 @@ class OrganizationsController < ApplicationController
   def find_organization
     @organization = Organization.friendly_find(params[:id])
     return @organization if @organization.present?
-    flash[:error] = "We're sorry, that organization isn't on Bike Index yet. Email contact@bikeindex.org if this seems like an error."
+    flash[:error] = translation(:not_found)
     redirect_to root_url and return
   end
 

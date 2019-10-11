@@ -31,7 +31,8 @@ module ControllerHelpers
     Rack::MiniProfiler.authorize_request unless Rails.env.test?
   end
 
-  def authenticate_user(msg = "Sorry, you have to log in", flash_type: :error)
+  def authenticate_user(msg = nil, flash_type: :error)
+    msg ||= "Sorry, you have to log in"
     # Make absolutely sure the current user is confirmed - mainly for testing
     if current_user&.confirmed?
       return true if current_user.terms_of_service
@@ -104,9 +105,18 @@ module ControllerHelpers
     end
   end
 
-  def translation(key, scope: nil, **kwargs)
-    scope ||= [:controllers, controller_namespace, controller_name, action_name]
-    I18n.t(key, kwargs, scope: scope.compact)
+  def translation(key, scope: nil, controller_method: nil, **kwargs)
+    if scope.blank? && controller_method.blank?
+      controller_method =
+        caller_locations
+          .slice(0, 2)
+          .map(&:label)
+          .reject { |label| label =~ /rescue in/ }
+          .first
+    end
+
+    scope ||= [:controllers, controller_namespace, controller_name, controller_method.to_sym]
+    I18n.t(key, **kwargs, scope: scope.compact)
   end
 
   def controller_namespace
