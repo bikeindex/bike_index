@@ -1,0 +1,48 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://project529.com/garage/services/v1/bikes?access_token=test&page=1&per_page=10&updated_at=2001-01-01
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Wed, 09 Oct 2019 18:59:21 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Content-Length:
+      - '39'
+      Connection:
+      - keep-alive
+      Cache-Control:
+      - no-store
+      Pragma:
+      - no-cache
+      X-Request-Id:
+      - bc9cdc97-e932-43b2-a327-7e7221010da4
+      X-Runtime:
+      - '0.035328'
+      Strict-Transport-Security:
+      - max-age=31536000
+    body:
+      encoding: UTF-8
+      string: '{"bikes":[]}'
+    http_version:
+  recorded_at: Wed, 09 Oct 2019 18:59:21 GMT
+recorded_with: VCR 4.0.0

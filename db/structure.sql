@@ -874,6 +874,43 @@ ALTER SEQUENCE public.external_registry_bikes_id_seq OWNED BY public.external_re
 
 
 --
+-- Name: external_registry_credentials; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.external_registry_credentials (
+    id integer NOT NULL,
+    type character varying NOT NULL,
+    app_id character varying,
+    access_token character varying,
+    access_token_expires_at timestamp without time zone,
+    refresh_token character varying,
+    info_hash jsonb DEFAULT '{}'::jsonb,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: external_registry_credentials_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.external_registry_credentials_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: external_registry_credentials_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.external_registry_credentials_id_seq OWNED BY public.external_registry_credentials.id;
+
+
+--
 -- Name: feedbacks; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2560,6 +2597,13 @@ ALTER TABLE ONLY public.external_registry_bikes ALTER COLUMN id SET DEFAULT next
 
 
 --
+-- Name: external_registry_credentials id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.external_registry_credentials ALTER COLUMN id SET DEFAULT nextval('public.external_registry_credentials_id_seq'::regclass);
+
+
+--
 -- Name: feedbacks id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2998,6 +3042,14 @@ ALTER TABLE ONLY public.exports
 
 ALTER TABLE ONLY public.external_registry_bikes
     ADD CONSTRAINT external_registry_bikes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: external_registry_credentials external_registry_credentials_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.external_registry_credentials
+    ADD CONSTRAINT external_registry_credentials_pkey PRIMARY KEY (id);
 
 
 --
@@ -3548,6 +3600,13 @@ CREATE INDEX index_external_registry_bikes_on_serial_normalized ON public.extern
 --
 
 CREATE INDEX index_external_registry_bikes_on_type ON public.external_registry_bikes USING btree (type);
+
+
+--
+-- Name: index_external_registry_credentials_on_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_external_registry_credentials_on_type ON public.external_registry_credentials USING btree (type);
 
 
 --
@@ -4766,4 +4825,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190918143646');
 INSERT INTO schema_migrations (version) VALUES ('20190919145324');
 
 INSERT INTO schema_migrations (version) VALUES ('20190923181352');
+
+INSERT INTO schema_migrations (version) VALUES ('20191010182940');
 
