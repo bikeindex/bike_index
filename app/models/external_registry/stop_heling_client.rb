@@ -4,7 +4,7 @@ module ExternalRegistry
   class StopHelingClient
     APP_ID = ENV["STOP_HELING_APP_ID"]
     API_KEY = ENV["STOP_HELING_API_KEY"]
-    TTL_HOURS = ENV.fetch("STOP_HELING_API_TTL_HOURS", 24).to_i.hours
+    TTL_HOURS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_CACHE_TTL_HOURS", 24).to_i.hours
     TIMEOUT_SECS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_TIMEOUT", 5).to_i
 
     attr_accessor :conn, :base_url
