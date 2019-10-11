@@ -1,0 +1,46 @@
+.admin-subnav
+  .col-md-5
+    %h1
+      Manage External Registry Bikes
+  .col-md-7
+    %ul
+      %li.nav-item
+        - all_ignored_params = %w[render_chart period sort direction]
+        - all_active = !@unknown && (sortable_search_params.keys - all_ignored_params).blank?
+        = link_to "All", admin_external_registry_bikes_path(sortable_search_params.slice(*all_ignored_params)),
+          class: "nav-link #{all_active ? 'active' : ''}"
+
+- if all_active
+  %p
+    = number_with_delimiter(ExternalRegistryBike.count)
+    stored external registry bikes,
+    %em
+      (#{ExternalRegistryBike.where("created_at >= ?", Time.current.beginning_of_day).count} today)
+
+.row.mt-4
+  .col-md-5
+    %p
+      %strong
+        = number_with_delimiter(@bikes.total_count)
+      = "Matching Bike".pluralize(@bikes.total_count)
+
+  .col-md-7
+    = form_tag admin_external_registry_bikes_path, method: :get, class: "form-inline" do
+      = hidden_field_tag :sort, params[:sort]
+      = hidden_field_tag :direction, params[:direction]
+      = hidden_field_tag :type, params[:type]
+      .form-group.ml-auto.mr-2.mb-2
+        = text_field_tag :search_serial_normalized,
+          params[:search_serial_normalized],
+          placeholder: "Search by serial number",
+          class: "form-control"
+
+      = submit_tag "Search", name: "search", class: "btn btn-primary mb-2"
+
+.row.mt-4
+  .col
+    = paginate @bikes, views_prefix: "admin"
+
+= render partial: "table", locals: { render_sortable: true }
+
+= paginate @bikes, views_prefix: "admin"

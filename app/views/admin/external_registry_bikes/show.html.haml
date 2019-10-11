@@ -1,0 +1,60 @@
+.admin-subnav.midpage-subnav
+  .col-12
+    %h1 External Registry Bike
+
+.admin-bike-partial
+  .row
+    .col-lg-2.col-3.mt-auto.mb-2.admin-image-thumb
+      - if @bike.thumb_url.present?
+        = image_tag @bike.thumb_url, alt: @bike.title_string
+      - else
+        %h3.less-strong
+          No Image
+    .col-lg-5.col-9.mt-auto.mb-2
+      %p.strong.mb-0
+        %span.text-danger= @bike.status.titleize
+        = @bike.title_string
+      %table.table-list.mb-0
+        %tbody
+          %tr
+            %td Serial number
+            %td= @bike.serial_number
+          %tr
+            %td Registry
+            %td= @bike.registry_name
+          %tr
+            %td Registry ID
+            %td= @bike.external_id
+          %tr
+            %td Description
+            %td= @bike.description
+          %tr
+            %td Colors
+            %td= @bike.frame_colors.to_sentence
+          %tr
+            %td Created
+            %td
+              %span.convertTime= l @bike.created_at, format: :convert_time
+              %small.convertTimezone
+          %tr
+            %td Updated
+            %td
+              %span.convertTime= l @bike.updated_at, format: :convert_time
+
+    .col-lg-5.col-9.mt-auto.mb-2
+      %table.table-list
+        %tr
+          %td Date Stolen
+          %td.convertTime= l @bike.date_stolen, format: :convert_time
+        %tr
+          %td Location Found
+          %td= @bike.location_found
+        %tr
+          %td Registry Link
+          %td= link_to @bike.url, @bike.url, target: :_blank
+
+.container.mt-4
+  .row
+    %h3 Info hash
+  .row
+    = debug @bike.info_hash
