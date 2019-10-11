@@ -1,6 +1,6 @@
 module ExternalRegistry
   class Project529Client
-    BASE_URL = ENV.fetch("PROJECT_529_BASE_URL", "https://project529.com/garage/services/v1")
+    BASE_URL = ENV.fetch("PROJECT_529_BASE_URL", "https://project529.com/garage")
     APP_ID = ENV["PROJECT_529_APP_ID"]
 
     TTL_HOURS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_CACHE_TTL_HOURS", 24).to_i.hours
@@ -20,7 +20,7 @@ module ExternalRegistry
       end
     end
 
-    def oauth_token
+    def get_oauth_token
       response = conn.post("oauth/token") do |req|
         req.headers["Content-Type"] = "application/json"
         req.params = {
@@ -50,7 +50,7 @@ module ExternalRegistry
 
       response =
         Rails.cache.fetch(cache_key, expires_in: TTL_HOURS) do
-          response = conn.get("bikes") do |req|
+          response = conn.get("services/v1/bikes") do |req|
             req.headers["Content-Type"] = "application/json"
             req.params = req_params.merge(access_token: credentials.access_token)
           end
@@ -58,27 +58,24 @@ module ExternalRegistry
           { status: response.status, body: response.body.with_indifferent_access }
         end
 
-      case response[:status]
-      when 200
-        results =
-          response
-            .dig(:body, :bikes)
-            .map { |attrs| ExternalRegistryBikes::Project529Bike.build_from_api_response(attrs) }
-            .compact
-            .each(&:save)
-            .select(&:persisted?)
-        ExternalRegistryBike.where(id: results.map(&:id))
-      else
+      unless response[:status] == 200 && response[:body].is_a?(Hash)
         raise Project529ClientError, response
       end
+
+      results =
+        response
+          .dig(:body, :bikes)
+          .map { |attrs| ExternalRegistryBikes::Project529Bike.build_from_api_response(attrs) }
+          .compact
+          .each(&:save)
+          .select(&:persisted?)
+      ExternalRegistryBike.where(id: results.map(&:id))
     rescue Faraday::TimeoutError
       ExternalRegistryBike.none
     end
 
     def credentials
-      @credentials ||= Project529Credential.last.tap do |creds|
-        creds.api_client = self
-      end
+      @credentials ||= ExternalRegistryCredential::Project529Credential.last
     end
   end
 

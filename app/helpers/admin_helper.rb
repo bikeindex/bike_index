@@ -4,6 +4,7 @@ module AdminHelper
       { title: "Users", path: admin_users_path, match_controller: true },
       { title: "Bikes", path: admin_bikes_path, match_controller: true },
       { title: "Stolen Bikes", path: admin_stolen_bikes_path, match_controller: true },
+      { title: "External Registry Credentials", path: admin_external_registry_credentials_path, match_controller: true },
       { title: "Organizations", path: admin_organizations_path, match_controller: true },
       { title: "News", path: admin_news_index_path, match_controller: true },
       { title: "POS Integration", path: lightspeed_interface_path, match_controller: false },
