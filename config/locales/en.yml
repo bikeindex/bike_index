@@ -1592,6 +1592,35 @@ en:
           support.
       ensure_user_allowed_to_create_theft_alert:
         unauthorized: You don't have permission to do that. Please contact support.
+    user_emails:
+      confirm:
+        already_confirmed: >-
+          %{user_email} is already confirmed. It may take up to an hour for the attributes
+          from your account to fully merge in, please be patient.
+        email_confirmed: >-
+          %{user_email} has been confirmed and added to your account. It may take
+          up to an hour for the attributes from your account to fully merge in, please
+          be patient.
+        incorrect_token: Incorrect token for %{user_email}. Try resending the confirmation
+          email
+      destroy:
+        email_confirmed: >-
+          %{user_email} is confirmed and can't be removed. Email contact@bikeindex.org
+          for help.
+        email_removed: "%{user_email} removed."
+        only_confirmed_email: >-
+          %{user_email} is your only confirmed email and can't be removed. Email contact@bikeindex.org
+          for help.
+      ensure_user_email_ownership:
+        you_must_be_signed_in: >-
+          You must be signed in with primary email! Email contact@bikeindex.org if
+          this doesn't make sense.
+      make_primary:
+        confirm_email_first: You must confirm %{user_email} before making it your
+          primary email
+        email_has_been_made_primary: "%{user_email} has been made your primary email."
+      resend_confirmation:
+        resend_confirmation: Email confirmation re-sent
     welcome:
       authenticate_user_for_welcome_controller:
         create_account: Please create an account
