@@ -22,7 +22,7 @@ class OwnershipsController < ApplicationController
   def no_user_flash_msg
     return translation(:cannot_find_bike) if @ownership&.bike.blank?
 
-    if @ownership.user.present?
+    if @ownership&.user.present?
       translation(:owner_already_has_account, bike_type: @ownership.bike.type)
     else
       translation(:create_an_account_to_claim, bike_type: @ownership.bike.type)
