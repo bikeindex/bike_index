@@ -9,12 +9,12 @@
       %thead.thead-light.sortable
         %th
           - if render_sortable
-            = sortable "id", "Added"
+            = sortable "created_at", "Added"
           - else
             Added
         %th
           - if render_sortable
-            = sortable "manufacturer_id"
+            = sortable "mnfg_name", "Manufacturer"
           - else
             Manufacturer
         %th.d-none.d-lg-table-cell
@@ -49,4 +49,5 @@
                 = bike.serial_number
             %td.d-sm-table-cell
               .less-strong-hold
-                = link_to bike.registry_name, admin_external_registry_bikes_path(sortable_search_params.merge(type: bike.type))
+                = link_to bike.registry_name,
+                  admin_external_registry_bikes_path(sortable_search_params.merge(type: bike.type))
