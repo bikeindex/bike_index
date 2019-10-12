@@ -11,8 +11,7 @@ class Admin::ExternalRegistryBikesController < Admin::BaseController
         .per(params[:per_page] || 100)
   end
 
-  def show
-  end
+  def show; end
 
   private
 
@@ -29,10 +28,14 @@ class Admin::ExternalRegistryBikesController < Admin::BaseController
       @matching_bikes = @matching_bikes.where(serial_normalized: params[:search_serial_normalized])
     end
 
+    if params[:type].present?
+      @matching_bikes = @matching_bikes.where(type: params[:type])
+    end
+
     @matching_bikes
   end
 
   def sortable_columns
-    %i[type country date_stolen created_at]
+    %w[created_at mnfg_name]
   end
 end

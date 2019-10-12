@@ -607,7 +607,7 @@ RSpec.describe UsersController, type: :controller do
         expect(user.preferred_language).to eq(nil)
         set_current_user(user)
         patch :update, id: user.username, locale: "nl", user: { preferred_language: "en" }
-        expect(flash[:success]).to match(/successfully updated/i)
+        expect(flash[:success]).to match(/succesvol/i)
         expect(response).to redirect_to(my_account_url)
         expect(user.reload.preferred_language).to eq("en")
       end
