@@ -43,7 +43,7 @@ RSpec.describe ExternalRegistryBike, type: :model do
         exact_match_serial = "5127227"
         _local_non_match = FactoryBot.create(:external_registry_bike)
 
-        allow(ExternalRegistry::ExternalRegistry)
+        allow(ExternalRegistryClient)
           .to(receive(:search_for_bikes_with)
             .with(exact_match_serial) {
             FactoryBot.create(:external_registry_bike, serial_number: exact_match_serial)

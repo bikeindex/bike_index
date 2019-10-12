@@ -18,7 +18,7 @@ class ExternalRegistryBike < ActiveRecord::Base
       matches = ExternalRegistryBike.where(serial_normalized: serial_normalized)
       return matches if matches.any?
 
-      matches = ExternalRegistry::ExternalRegistry.search_for_bikes_with(serial_normalized)
+      matches = ExternalRegistryClient.search_for_bikes_with(serial_normalized)
 
       exact_matches = matches.where(serial_normalized: serial_normalized)
       return exact_matches if exact_matches.any?
