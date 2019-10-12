@@ -74,6 +74,7 @@ class CustomerMailer < ActionMailer::Base
     @twitter_account_url = "https://twitter.com/#{@tweet_account_screen_name}"
     tweet_id = @info["tweet_id"]
     @tweet_url = "https://twitter.com/#{@tweet_account_screen_name}/status/#{tweet_id}"
+    @tweet_text = @info["tweet_string"]&.split("https://bikeindex.org")&.first
 
     I18n.with_locale(@user&.preferred_language) do
       mail(to: @customer_contact.user_email, subject: @customer_contact.title)

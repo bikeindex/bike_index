@@ -1792,26 +1792,29 @@ en:
         area: area
         improve_your_chances_of_recovery_by_doing: Improve your chances of recovery
           by doing all these things!
-        recovered_or_found: recovered/found
-        stolen: stolen
-        stolen_bike_alerter: stolen bike alerter.
-        this_email_is_about_the_stolen_bike: >-
-          This email is about the %{was_stolen} %{bike_type} registered on Bike Index
-          on %{date}
+        stolen_bike_alerter: 'a Bike Index stolen bike alerter:'
+        this_email_is_about_the_found_bike: >-
+          This email is about the recovered/found %{bike_type} registered on Bike
+          Index on %{date}
+        this_email_is_about_the_stolen_bike: This email is about the stolen %{bike_type}
+          registered on Bike Index on %{date}
         we_sent_out_this_tweet_from: We sent out this tweet from
+        were_spreading_the_word_about_your_found: We're spreading the word about your
+          recovered/found %{bike_type}!
         were_spreading_the_word_about_your_stolen: We're spreading the word about
-          your %{stolen_word} %{bike_type}!
+          your stolen %{bike_type}!
       text:
-        claim_the_bike_type_here_bike_url: "* Claim the %{bike_type} here: %{bike_url}
-          *"
         color: 'Color:'
         hopefully_you_find_the_bike_soon: Hopefully you find the %{bike_type} soon.
           Give us a heads up when you do!
         make: 'Make:'
         serial: 'Serial:'
-        sign_up_or_in: >-
-          Sign up or sign in to BikeIndex.org to claim your %{bike_type} and edit
-          it, upload photos and make sure you never lose track of your trusty steed!
+        we_sent_out_this_tweet_from: 'We sent out this tweet from %{twitter_handle},
+          a Bike Index stolen bike alerter:'
+        were_spreading_the_word_about_your_recovered: We are spreading the word about
+          your recovered/found %{bike_type}!
+        were_spreading_the_word_about_your_stolen: We are spreading the word about
+          your stolen %{bike_type}!
     stolen_notification_email:
       html:
         if_you_believe_this_email_is_illegitimate: If you believe this email is illegitimate,
