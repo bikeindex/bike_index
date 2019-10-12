@@ -2263,6 +2263,74 @@ nl:
         create_account: Maak een account aan
       recovery_stories:
         no_stories_to_display: Geen herstelverhalen om weer te geven
+    ownerships:
+      no_user_flash_msg:
+        create_an_account_to_claim: Maak een account aan om te beweren dat %{bike_type}!
+          Gebruik de e-mail die u hebt gebruikt bij het registreren en u kunt deze
+          claimen na aanmelding!
+        owner_already_has_account: De eigenaar van deze %{bike_type} heeft al een
+          account op Bike Index. Log in om het te claimen!
+      show:
+        no_longer_your_bike: Dat was vroeger je %{bike_type} maar is dat niet meer!
+          Neem contact met ons op als dit niet logisch is.
+        not_your_bike: Dat lijkt niet jouw %{bike_type} te zijn! Neem contact met
+          ons op als dit niet logisch is.
+        you_claimed_it: Het lijkt erop dat dit jouw %{bike_type} is! Goed gedaan,
+          je hebt het net beweerd.
+    user_emails:
+      confirm:
+        already_confirmed: "%{user_email} is al bevestigd. Het kan een uur duren voordat
+          de kenmerken van uw account volledig zijn samengevoegd, even geduld."
+        email_confirmed: "%{user_email} is bevestigd en toegevoegd aan uw account.
+          Het kan een uur duren voordat de kenmerken van uw account volledig zijn
+          samengevoegd, even geduld."
+        incorrect_token: Onjuist token voor %{user_email}. Probeer de bevestigingsmail
+          opnieuw te verzenden
+      destroy:
+        email_confirmed: "%{user_email} is bevestigd en kan niet worden verwijderd.
+          E-mail contact@bikeindex.org voor hulp."
+        email_removed: "%{user_email} verwijderd."
+        only_confirmed_email: "%{user_email} is uw enige bevestigde e-mail en kan
+          niet worden verwijderd. E-mail contact@bikeindex.org voor hulp."
+      ensure_user_email_ownership:
+        you_must_be_signed_in: U moet zijn aangemeld met primaire e-mail! E-mail contact@bikeindex.org
+          als dit niet logisch is.
+      make_primary:
+        confirm_email_first: U moet %{user_email} bevestigen voordat u dit uw primaire
+          e-mailadres maakt
+        email_has_been_made_primary: "%{user_email} is uw primaire e-mailadres gemaakt."
+      resend_confirmation:
+        resend_confirmation: E-mailbevestiging opnieuw verzonden
+    users:
+      confirm:
+        already_confirmed: Uw gebruikersaccount is al bevestigd. Log alsjeblieft in.
+      edit_templates:
+        password: Wachtwoord
+        sharing: Delen + persoonlijke pagina
+        user_settings: Gebruikersinstellingen
+      password_reset:
+        email_not_found: Sorry, dat e-mailadres staat niet in ons systeem.
+        link_no_longer_valid: Het spijt ons, maar die link is niet langer geldig.
+      show:
+        user_not_sharing: Sorry, die gebruiker deelt zijn fietsen niet.
+      unsubscribe:
+        successfully_unsubscribed: U bent afgemeld voor updates van Bike Index.
+      update:
+        accept_tos: Je moet de Servicevoorwaarden accepteren als je Bike Index wilt
+          gebruiken.
+        accept_tos_to_use_as_org: Je moet de Servicevoorwaarden accepteren als je
+          Bike Index via een organisatie wilt gebruiken
+        current_password_doesnt_match: Het huidige wachtwoord komt niet overeen, het
+          is vereist voor het bijwerken van uw wachtwoord.
+        does_not_match_token: Komt niet overeen met het wachtwoord-reset-token van
+          de gebruiker
+        successfully_updated: Uw gegevens zijn succesvol bijgewerkt.
+        thanks_for_accepting_tos: Bedankt voor het accepteren van de servicevoorwaarden!
+        token_expired: Wachtwoord-reset-token is verlopen, probeer het wachtwoord
+          opnieuw in te stellen.
+        you_can_use_bike_index: Bedankt! Nu kunt u Bike Index gebruiken.
+        you_can_use_bike_index_as_org: Bedankt! Nu kunt u Bike Index gebruiken als
+          %{org_name}
   customer_mailer:
     additional_email_confirmation:
       html:
