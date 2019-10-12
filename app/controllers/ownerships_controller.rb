@@ -7,28 +7,25 @@ class OwnershipsController < ApplicationController
     if @ownership.claimable_by?(current_user)
       if @ownership.current
         @ownership.mark_claimed
-        flash[:success] = "Looks like this is your #{bike.type}! Good work, you just claimed it."
+        flash[:success] = translation(:you_claimed_it, bike_type: bike.type)
         redirect_to edit_bike_url(bike)
       else
-        flash[:error] = "That used to be your #{bike.type} but isn't anymore! Contact us if this doesn't make sense."
+        flash[:error] = translation(:no_longer_your_bike, bike_type: bike.type)
         redirect_to bike_url(bike)
       end
     else
-      flash[:error] = "That doesn't appear to be your #{bike.type}! Contact us if this doesn't make sense."
+      flash[:error] = translation(:not_your_bike, bike_type: bike.type)
       redirect_to bike_url(bike)
     end
   end
 
   def no_user_flash_msg
-    if @ownership && @ownership.bike.present?
-      type = "#{@ownership.bike.type}"
-      if @ownership.user.present?
-        "The owner of this #{type} already has an account on Bike Index. Sign in to claim it!"
-      else
-        "Create an account to claim that #{type}! Use the email you used when registering it and you will be able to claim it after signing up!"
-      end
+    return translation(:cannot_find_bike) if @ownership&.bike.blank?
+
+    if @ownership&.user.present?
+      translation(:owner_already_has_account, bike_type: @ownership.bike.type)
     else
-      "Sorry, unable to find that bike"
+      translation(:create_an_account_to_claim, bike_type: @ownership.bike.type)
     end
   end
 

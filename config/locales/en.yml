@@ -1541,6 +1541,23 @@ en:
         no_user: >-
           We're sorry, that organization doesn't have a user set up to register bikes
           through. Email contact@bikeindex.org if this seems like an error.
+    ownerships:
+      no_user_flash_msg:
+        create_an_account_to_claim: >-
+          Create an account to claim that %{bike_type}! Use the email you used when
+          registering it and you will be able to claim it after signing up!
+        owner_already_has_account: >-
+          The owner of this %{bike_type} already has an account on Bike Index. Sign
+          in to claim it!
+      show:
+        no_longer_your_bike: >-
+          That used to be your %{bike_type} but isn't anymore! Contact us if this
+          doesn't make sense.
+        not_your_bike: >-
+          That doesn't appear to be your %{bike_type}! Contact us if this doesn't
+          make sense.
+        you_claimed_it: Looks like this is your %{bike_type}! Good work, you just
+          claimed it.
     public_images:
       create:
         cannot_create: Whoops! We can't let you create that image.
@@ -1575,6 +1592,63 @@ en:
           support.
       ensure_user_allowed_to_create_theft_alert:
         unauthorized: You don't have permission to do that. Please contact support.
+    user_emails:
+      confirm:
+        already_confirmed: >-
+          %{user_email} is already confirmed. It may take up to an hour for the attributes
+          from your account to fully merge in, please be patient.
+        email_confirmed: >-
+          %{user_email} has been confirmed and added to your account. It may take
+          up to an hour for the attributes from your account to fully merge in, please
+          be patient.
+        incorrect_token: Incorrect token for %{user_email}. Try resending the confirmation
+          email
+      destroy:
+        email_confirmed: >-
+          %{user_email} is confirmed and can't be removed. Email contact@bikeindex.org
+          for help.
+        email_removed: "%{user_email} removed."
+        only_confirmed_email: >-
+          %{user_email} is your only confirmed email and can't be removed. Email contact@bikeindex.org
+          for help.
+      ensure_user_email_ownership:
+        you_must_be_signed_in: >-
+          You must be signed in with primary email! Email contact@bikeindex.org if
+          this doesn't make sense.
+      make_primary:
+        confirm_email_first: You must confirm %{user_email} before making it your
+          primary email
+        email_has_been_made_primary: "%{user_email} has been made your primary email."
+      resend_confirmation:
+        resend_confirmation: Email confirmation re-sent
+    users:
+      confirm:
+        already_confirmed: Your user account is already confirmed. Please log in.
+      edit_templates:
+        password: Password
+        sharing: Sharing + Personal Page
+        user_settings: User Settings
+      password_reset:
+        email_not_found: Sorry, that email address isn't in our system.
+        link_no_longer_valid: We're sorry, but that link is no longer valid.
+      show:
+        user_not_sharing: Sorry, that user isn't sharing their bikes.
+      unsubscribe:
+        successfully_unsubscribed: You have been unsubscribed from Bike Index updates.
+      update:
+        accept_tos: You have to accept the Terms of Service if you would like to use
+          Bike Index.
+        accept_tos_to_use_as_org: >-
+          You have to accept the Terms of Service if you would like to use Bike Index
+          through an organization
+        current_password_doesnt_match: Current password doesn't match, it's required
+          for updating your password.
+        does_not_match_token: Doesn't match user's password reset token
+        successfully_updated: Your information was successfully updated.
+        thanks_for_accepting_tos: Thanks for accepting the terms of service!
+        token_expired: Password reset token expired, try resetting password again.
+        you_can_use_bike_index: Thanks! Now you can use Bike Index.
+        you_can_use_bike_index_as_org: Thanks! Now you can use Bike Index as %{org_name}
     welcome:
       authenticate_user_for_welcome_controller:
         create_account: Please create an account

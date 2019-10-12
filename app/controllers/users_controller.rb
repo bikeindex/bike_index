@@ -35,7 +35,7 @@ class UsersController < ApplicationController
     begin
       @user = User.find(params[:id])
       if @user.confirmed?
-        flash[:success] = "Your user account is already confirmed. Please log in"
+        flash[:success] = translation(:already_confirmed)
         render_partner_or_default_signin_layout(redirect_path: new_session_path)
       else
         if @user.confirm(params[:code])
@@ -65,7 +65,7 @@ class UsersController < ApplicationController
         @user.confirm(@user.confirmation_token) if @user.unconfirmed?
         sign_in_and_redirect(@user)
       else
-        flash[:error] = "We're sorry, but that link is no longer valid."
+        flash[:error] = translation(:link_no_longer_valid)
         render action: :request_password_reset
       end
     elsif params[:email].present?
@@ -73,11 +73,11 @@ class UsersController < ApplicationController
       if @user.present?
         @user.send_password_reset_email
       else
-        flash[:error] = "Sorry, that email address isn't in our system."
+        flash[:error] = translation(:email_not_found)
         render action: :request_password_reset
       end
     else
-      redirect_to "/users/request_password_reset"
+      redirect_to request_password_reset_users_url
     end
   end
 
@@ -89,7 +89,7 @@ class UsersController < ApplicationController
     @owner = user
     @user = user
     unless user == current_user || @user.show_bikes
-      redirect_to user_home_url, notice: "Sorry, that user isn't sharing their bikes" and return
+      redirect_to user_home_url, notice: translation(:user_not_sharing) and return
     end
     @page = params[:page] || 1
     @per_page = params[:per_page] || 9
@@ -107,16 +107,16 @@ class UsersController < ApplicationController
     if params[:user][:password_reset_token].present?
       if @user.password_reset_token != params[:user][:password_reset_token]
         remove_session
-        flash[:error] = "Doesn't match user's password reset token"
+        flash[:error] = translation(:does_not_match_token)
         redirect_to user_home_url and return
       elsif @user.auth_token_expired?("password_reset_token")
         remove_session
-        flash[:error] = "Password reset token expired, try resetting password again"
+        flash[:error] = translation(:token_expired)
         redirect_to user_home_url and return
       end
     elsif params[:user][:password].present?
       unless @user.authenticate(params[:user][:current_password])
-        @user.errors.add(:base, "Current password doesn't match, it's required for updating your password")
+        @user.errors.add(:base, translation(:current_password_doesnt_match))
       end
     end
     if !@user.errors.any? && @user.update_attributes(permitted_update_parameters)
@@ -125,23 +125,23 @@ class UsersController < ApplicationController
         if ParamsNormalizer.boolean(params[:user][:terms_of_service])
           @user.terms_of_service = true
           @user.save
-          flash[:success] = "Thanks! Now you can use Bike Index"
+          flash[:success] = translation(:you_can_use_bike_index)
           redirect_to user_home_url and return
         else
-          flash[:notice] = "You have to accept the Terms of Service if you would like to use Bike Index"
+          flash[:notice] = translation(:accept_tos)
           redirect_to accept_terms_url and return
         end
       elsif params[:user][:vendor_terms_of_service].present?
         if ParamsNormalizer.boolean(params[:user][:vendor_terms_of_service])
           @user.update_attributes(accepted_vendor_terms_of_service: true)
           if @user.memberships.any?
-            flash[:success] = "Thanks! Now you can use Bike Index as #{@user.memberships.first.organization.name}"
+            flash[:success] = translation(:you_can_use_bike_index_as_org, org_name: @user.memberships.first.organization.name)
           else
-            flash[:success] = "Thanks for accepting the terms of service!"
+            flash[:success] = translation(:thanks_for_accepting_tos)
           end
           redirect_to user_root_url and return
         else
-          redirect_to accept_vendor_terms_path, notice: "You have to accept the Terms of Service if you would like to use Bike Index through an organization" and return
+          redirect_to accept_vendor_terms_path, notice: translation(:accept_tos_to_use_as_org) and return
         end
       end
       if params[:user][:password].present?
@@ -150,7 +150,7 @@ class UsersController < ApplicationController
         @user.reload
         default_session_set(@user)
       end
-      flash[:success] = "Your information was successfully updated."
+      flash[:success] = translation(:successfully_updated)
       redirect_to my_account_url(page: params[:page]) and return
     end
     @page_errors = @user.errors.full_messages
@@ -176,7 +176,7 @@ class UsersController < ApplicationController
   def unsubscribe
     user = User.find_by_username(params[:id])
     user.update_attribute :notification_newsletters, false if user.present?
-    flash[:success] = "You have been unsubscribed from Bike Index updates"
+    flash[:success] = translation(:successfully_unsubscribed)
     redirect_to user_root_url and return
   end
 
@@ -202,9 +202,9 @@ class UsersController < ApplicationController
 
   def edit_templates
     @edit_templates ||= {
-      root: "User Settings",
-      password: "Password",
-      sharing: "Sharing + Personal Page",
+      root: translation(:user_settings),
+      password: translation(:password),
+      sharing: translation(:sharing),
     }.as_json
   end
 
