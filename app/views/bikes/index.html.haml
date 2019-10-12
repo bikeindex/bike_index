@@ -13,6 +13,7 @@
     .col-md-12
       = form_tag bikes_path, id: 'bikes_search_form', class: 'bikes-search-form', enforce_utf8: false, method: :get do
         .query-field-wrap.nojs
+          = hidden_field_tag :locale, params[:locale]
           - opt_vals = @selected_query_items_options.map { |i| i.is_a?(String) ? [i, i] : [i['text'], i['search_id']]  }
           = select_tag :query_items, options_for_select(opt_vals, selected: opt_vals.map(&:last)), placeholder: t(".search_bike_descriptions"), class: 'form-control query-field', multiple: true
           = text_field_tag :query, params[:query], placeholder: t(".search_bike_descriptions"), class: 'form-control query-field'

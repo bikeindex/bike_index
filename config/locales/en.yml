@@ -1491,7 +1491,7 @@ en:
         bike_deleted: Bike deleted
       index:
         we_dont_know_location: >-
-          Sorry, we don't know the location \"%{location}\". Please try a different
+          Sorry, we don't know the location "%{location}". Please try a different
           location to search nearby stolen bikes.
       new:
         please_sign_in_to_register: Please sign in to register a bike
