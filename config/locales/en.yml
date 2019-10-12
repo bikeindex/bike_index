@@ -1811,7 +1811,7 @@ en:
         serial: 'Serial:'
         we_sent_out_this_tweet_from: 'We sent out this tweet from %{twitter_handle},
           a Bike Index stolen bike alerter:'
-        were_spreading_the_word_about_your_recovered: We are spreading the word about
+        were_spreading_the_word_about_your_found: We are spreading the word about
           your recovered/found %{bike_type}!
         were_spreading_the_word_about_your_stolen: We are spreading the word about
           your stolen %{bike_type}!
