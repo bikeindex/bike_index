@@ -2161,8 +2161,8 @@ nl:
       find_bike:
         bike_deleted: Fiets verwijderd
       index:
-        we_dont_know_location: Sorry, we kennen de locatie \ "%{location} \" niet.
-          Probeer een andere locatie om gestolen fietsen in de buurt te zoeken.
+        we_dont_know_location: Sorry, we kennen de locatie "%{location}" niet. Probeer
+          een andere locatie om gestolen fietsen in de buurt te zoeken.
       new:
         please_sign_in_to_register: Meld u aan om een fiets te registreren
         we_couldnt_find_that_registration: Oops! We konden die registratie niet vinden.
