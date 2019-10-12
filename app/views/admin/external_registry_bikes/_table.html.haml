@@ -1,0 +1,52 @@
+- bikes ||= @bikes
+- no_show_header ||= false
+- show_serial ||= params[:show_serial].present?
+- render_sortable ||= false
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.table-sm{ class: show_serial ? "show-admin-bike-table-serial-cell" : "" }
+    - unless no_show_header
+      %thead.thead-light.sortable
+        %th
+          - if render_sortable
+            = sortable "id", "Added"
+          - else
+            Added
+        %th
+          - if render_sortable
+            = sortable "manufacturer_id"
+          - else
+            Manufacturer
+        %th.d-none.d-lg-table-cell
+          Info
+        %th.admin-bike-table-serial-cell
+          Serial
+        %th.d-sm-table-cell
+          Registry
+
+    %tbody
+      - bikes.each do |bike|
+        - cache(bike) do
+          %tr
+            %td
+              .less-strong-hold
+                %a.small.convertTime{ href: admin_external_registry_bike_url(bike) }
+                  = l bike.created_at, format: :convert_time
+                %span.less-strong-right.d-none.d-md-block
+                  = bike.id
+            %td
+              = bike.mnfg_name
+            %td.d-none.d-lg-table-cell
+              .less-strong-hold
+                = bike.title_string
+                %span.less-strong
+                  = bike.frame_colors.to_sentence
+                - if bike.stolen?
+                  %span.less-strong-right
+                    stolen
+            %td.admin-bike-table-serial-cell
+              %small.less-strong
+                = bike.serial_number
+            %td.d-sm-table-cell
+              .less-strong-hold
+                = link_to bike.registry_name, admin_external_registry_bikes_path(sortable_search_params.merge(type: bike.type))
