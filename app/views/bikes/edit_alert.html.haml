@@ -20,7 +20,7 @@
             = hidden_field_tag :page, :alert_purchase
             = hidden_field_tag :selected_plan_id
             = hidden_field_tag :selected_bike_image_id
-            = hidden_field_tag :locale, params[:locale] if params[:locale].presence
+            = hidden_field_tag :locale, params[:locale] if params[:locale].present?
 
             .row
               %h3.text-center.w-100= t(".select_an_image")

@@ -28,6 +28,9 @@ RSpec.describe "Locale detection", type: :request do
       it "renders the homepage in the default language" do
         get "/", locale: :klingon
         expect(response.body).to match(/bike registration/i)
+
+        get "/", locale: nil
+        expect(response.body).to match(/bike registration/i)
       end
     end
 

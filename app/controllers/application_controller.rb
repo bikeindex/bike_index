@@ -59,7 +59,7 @@ class ApplicationController < ActionController::Base
   end
 
   def locale_from_request_params
-    params.fetch(:locale, "").strip
+    params[:locale].to_s.strip
   end
 
   def requested_locale
