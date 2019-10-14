@@ -1558,6 +1558,17 @@ en:
           not_a_member_of_that_org: You're not a member of that organization!
         ensure_not_ambassador_organization!:
           must_be_an_admin: You have to be an admin to do that!
+      bulk_imports:
+        create:
+          bulk_import_created: Bulk Import created!
+          file_imported: File imported
+          unable_to_create_bulk_import: Unable to create bulk import.
+        ensure_access_to_bulk_import!:
+          org_does_not_have_access: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
+        show:
+          unable_to_find_import: Unable to find that import.
       exports:
         create:
           wait_to_download: >-

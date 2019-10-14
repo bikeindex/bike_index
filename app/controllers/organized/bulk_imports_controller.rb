@@ -17,7 +17,7 @@ module Organized
     def show
       @bulk_import = bulk_imports.where(id: params[:id]).first
       unless @bulk_import.present?
-        flash[:error] = "Unable to find that import"
+        flash[:error] = translation(:unable_to_find_import)
         redirect_to organization_bulk_imports_path(organization_id: current_organization.to_param) and return
       end
       page = params[:page] || 1
@@ -35,16 +35,16 @@ module Organized
       if @bulk_import.save
         BulkImportWorker.perform_async(@bulk_import.id)
         if @is_api
-          render json: { success: "File imported" }, status: 201
+          render json: { success: translation(:file_imported) }, status: 201
         else
-          flash[:success] = "Bulk Import created!"
+          flash[:success] = translation(:bulk_import_created)
           redirect_to organization_bulk_imports_path(organization_id: current_organization.to_param)
         end
       else
         if @is_api
           render json: { error: @bulk_import.errors.full_messages }
         else
-          flash[:error] = "Unable to create bulk import"
+          flash[:error] = translation(:unable_to_create_bulk_import)
           render action: :new
         end
       end
@@ -83,7 +83,7 @@ module Organized
       # ensure_admin! passes with superuser - this allow superuser to see even if org not enabled
       return true if current_user.superuser? || current_organization.show_bulk_import?
 
-      flash[:error] = "Your organization doesn't have access to that, please contact Bike Index support"
+      flash[:error] = translation(:org_does_not_have_access)
       redirect_to organization_root_path and return
     end
 
