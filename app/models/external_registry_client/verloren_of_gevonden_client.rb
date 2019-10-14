@@ -9,7 +9,7 @@ class ExternalRegistryClient::VerlorenOfGevondenClient
 
   MINIMUM_QUERY_LENGTH = 3
   START_DATE = 1.year.ago.beginning_of_month
-  TTL_HOURS = ENV.fetch("VERLOREN_OF_GEVONDEN_TTL_HOURS", 24).to_i.hours
+  TTL_HOURS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_CACHE_TTL_HOURS", 24).to_i.hours
   TIMEOUT_SECS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_TIMEOUT", 5).to_i
 
   def initialize(base_url: nil)
