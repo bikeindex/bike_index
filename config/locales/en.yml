@@ -1545,6 +1545,15 @@ en:
         no_user: >-
           We're sorry, that organization doesn't have a user set up to register bikes
           through. Email contact@bikeindex.org if this seems like an error.
+    organized:
+      messages:
+        create:
+          message_sent: "%{message_kind} message sent"
+          unable_to_send: Unable to send message - %{errors}
+        ensure_permitted_message_kind!:
+          your_org_does_not_have_access: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
     ownerships:
       no_user_flash_msg:
         create_an_account_to_claim: >-
