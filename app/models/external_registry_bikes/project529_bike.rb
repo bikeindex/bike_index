@@ -22,6 +22,8 @@ module ExternalRegistryBikes
 
     class << self
       def build_from_api_response(attrs = {})
+        return if attrs["status"]&.downcase == "recovered"
+
         bike = find_or_initialize_by(
           external_id: attrs["id"],
           serial_number: attrs["serial_number"],
@@ -29,7 +31,7 @@ module ExternalRegistryBikes
         )
 
         bike.cycle_type = "bike"
-        bike.status = attrs["status"]
+        bike.status = attrs["status"]&.downcase
         bike.frame_model = attrs["model_string"]
         bike.mnfg_name = attrs["manufacturer_string"]
         bike.location_found = attrs.dig("active_incident", "location_address")
@@ -48,9 +50,9 @@ module ExternalRegistryBikes
         photo = primary_photo(attrs)
 
         {
-          url: attrs.dig("active_incident", "url"),
+          url: attrs["url"],
           image_url: photo["original_url"],
-          thumb_url: photo["thumb_url"],
+          thumb_url: photo["medium_url"],
         }
       end
 
@@ -80,15 +82,15 @@ module ExternalRegistryBikes
       end
 
       def primary_photo(attrs)
-        all_photos = attrs.dig("active_incident", "bolo_photos").to_a
+        all_photos = attrs["bike_photos"].to_a
 
         photo =
           all_photos
-            .select { |ph| ph["photo_type"] == "Bike Side" }
-            .first ||
+            .select { |ph| ph["photo_type"].downcase.in?(["side"]) }.first ||
           all_photos
-            .select { |ph| ph["photo_type"] != "Serial Number" }
-            .first
+            .select { |ph| ph["photo_type"].downcase.in?(["what to look for"]) }.first ||
+          all_photos
+            .reject { |ph| ph["photo_type"].downcase.in?(["serial number", "shield"]) }.first
 
         photo || {}
       end

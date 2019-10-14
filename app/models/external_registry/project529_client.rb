@@ -30,11 +30,11 @@ module ExternalRegistry
         }
       end
 
-      if response.status == 200
-        response.body.with_indifferent_access
-      else
-        raise Project529ClientError, response
+      unless response.status == 200 && response.body.is_a?(Hash)
+        raise Project529ClientError, response.body
       end
+
+      response.body.with_indifferent_access
     end
 
     def bikes(updated_at: nil, page: 1, per_page: 10)
@@ -64,6 +64,7 @@ module ExternalRegistry
           response
             .dig(:body, :bikes)
             .map { |attrs| ExternalRegistryBikes::Project529Bike.build_from_api_response(attrs) }
+            .compact
             .each(&:save)
             .select(&:persisted?)
         ExternalRegistryBike.where(id: results.map(&:id))

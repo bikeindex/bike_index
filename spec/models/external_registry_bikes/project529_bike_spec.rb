@@ -22,13 +22,13 @@ module ExternalRegistryBikes
         expect(bike.type).to eq(described_class.to_s)
         expect(bike.external_id).to eq(bike_json["id"].to_s)
         expect(bike.serial_number).to eq(bike_json["serial_number"].to_s)
-        expect(bike.status).to eq(bike_json["status"])
-        expect(bike.description).to eq("We The People Arcade")
-        expect(bike.mnfg_name).to eq("We The People")
-        expect(bike.frame_colors).to eq(["Red", "Gold"])
-        expect(bike.frame_model).to eq("Arcade")
+        expect(bike.status).to eq(bike_json["status"].downcase)
+        expect(bike.frame_model).to eq(bike_json["model_string"])
         expect(bike.date_stolen).to eq(bike_json.dig("active_incident", "last_seen"))
         expect(bike.location_found).to eq(bike_json.dig("active_incident", "location_address"))
+        expect(bike.mnfg_name).to eq(bike_json["manufacturer_string"])
+        expect(bike.description).to eq("2015 SE Racing 700C Lager")
+        expect(bike.frame_colors).to eq(["Red", "Gold"])
         expect(bike.url).to match("https://project529.com/.+")
         expect(bike.image_url).to match("https://529garage-production.s3.amazonaws.com/photos/attachments")
         expect(bike.thumb_url).to match("https://529garage-production.s3.amazonaws.com/photos/attachments")
@@ -38,97 +38,100 @@ module ExternalRegistryBikes
     let(:bike_json) do
       JSON.parse(<<~JSON)
         {
-          "id": 539617,
-          "serial_number": "HMQIL848992",
-          "manufacturer_string": "We The People",
-          "model_string": "Arcade",
-          "build_string": null,
-          "primary_color": "Red",
-          "secondary_color": "Gold",
-          "model_year": null,
-          "size": null,
-          "bike_type": null,
-          "shield": "",
-          "ext_number": null,
-          "description": null,
-          "status": "Stolen",
-          "show_on_hotsheet": true,
-          "updated_at": "2019-10-07T02:29:04.880Z",
-          "created_at": "2019-08-23T01:18:05.191Z",
-          "active_incident": {
-            "id": 23307,
-            "bolo_message": "Greenhorn sticker on front post, DGK white letter sticker on lef bottom post",
-            "case_number": "",
-            "created_at": "2019-10-07T02:29:01.250Z",
-            "last_seen": "2019-06-11T00:50:00.000Z",
-            "lat": "50.264911",
-            "lng": "-119.273843",
-            "location_address": "1630 23 St, London, BC Y8T 9O9, Canada",
-            "location_description": "",
-            "recovered_at": null,
-            "recovered_how": null,
-            "reward": "$100",
-            "bolo_photos": [
-              {
-                "id": 585812,
-                "mobile_uuid": null,
-                "photo_type": "Unique Feature",
-                "photo_type_id": 8,
-                "description": null,
-                "show_on_bolo": true,
-                "private": false,
-                "original_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/585/812/large/P529_20190822_181729_393_original.jpg?1566523100",
-                "medium_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/585/812/medium/P529_20190822_181729_393_original.jpg?1566523100",
-                "square_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/585/812/square/P529_20190822_181729_393_original.jpg?1566523100",
-                "thumb_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/585/812/thumb/P529_20190822_181729_393_original.jpg?1566523100",
-                "lat": null,
-                "lon": null,
-                "created_at": "2019-08-23T01:18:32.029Z",
-                "updated_at": "2019-08-23T01:18:32.029Z"
-              },
-              {
-                "id": 585814,
-                "mobile_uuid": null,
-                "photo_type": "Bike Side",
-                "photo_type_id": 3,
-                "description": null,
-                "show_on_bolo": true,
-                "private": false,
-                "original_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/585/814/large/P529_20190822_181747_070_original.jpg?1566523144",
-                "medium_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/585/814/medium/P529_20190822_181747_070_original.jpg?1566523144",
-                "square_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/585/814/square/P529_20190822_181747_070_original.jpg?1566523144",
-                "thumb_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/585/814/thumb/P529_20190822_181747_070_original.jpg?1566523144",
-                "lat": null,
-                "lon": null,
-                "created_at": "2019-08-23T01:19:17.459Z",
-                "updated_at": "2019-08-23T01:19:17.459Z"
-              },
-              {
-                "id": 591083,
-                "mobile_uuid": null,
-                "photo_type": "Serial Number",
-                "photo_type_id": 5,
-                "description": null,
-                "show_on_bolo": true,
-                "private": false,
-                "original_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/591/083/large/P529_20190822_181606_579_original.jpg?1566926411",
-                "medium_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/591/083/medium/P529_20190822_181606_579_original.jpg?1566926411",
-                "square_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/591/083/square/P529_20190822_181606_579_original.jpg?1566926411",
-                "thumb_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/591/083/thumb/P529_20190822_181606_579_original.jpg?1566926411",
-                "lat": null,
-                "lon": null,
-                "created_at": "2019-08-27T17:20:16.598Z",
-                "updated_at": "2019-08-27T17:20:16.598Z"
-              }
+            "id": 263367,
+            "url": "https://project529.com/fender-wrench-pannier-bell",
+            "additional_equipment": null,
+            "bike_type": null,
+            "build_string": null,
+            "number_of_gears": null,
+            "wheel_size": null,
+            "insured": null,
+            "manufacturer_id": 358,
+            "manufacturer_string": "SE Racing",
+            "model_string": "700C Lager",
+            "model_year": 2015,
+            "primary_color": "Red",
+            "secondary_color": "Gold",
+            "serial_number": "8282928474",
+            "shield": null,
+            "size": null,
+            "slug": "fender-wrench-pannier-bell",
+            "status": "Stolen",
+            "value": 0,
+            "created_at": "2017-04-09T02:12:19.509Z",
+            "updated_at": "2019-10-02T03:25:47.080Z",
+            "bike_photos": [
+                {
+                    "id": 155529,
+                    "photo_type": "Side",
+                    "description": "",
+                    "original_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/529/large/image.jpg?1491729146",
+                    "medium_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/529/medium/image.jpg?1491729146",
+                    "square_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/529/square/image.jpg?1491729146",
+                    "thumb_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/529/thumb/image.jpg?1491729146",
+                    "lat": null,
+                    "lon": null,
+                    "created_at": "2017-04-09T09:12:28.431Z",
+                    "updated_at": "2017-04-09T09:12:28.431Z"
+                },
+                {
+                    "id": 155532,
+                    "photo_type": "What to look for",
+                    "description": "",
+                    "original_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/532/large/image.jpg?1491729159",
+                    "medium_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/532/medium/image.jpg?1491729159",
+                    "square_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/532/square/image.jpg?1491729159",
+                    "thumb_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/532/thumb/image.jpg?1491729159",
+                    "lat": null,
+                    "lon": null,
+                    "created_at": "2017-04-09T09:12:40.898Z",
+                    "updated_at": "2017-04-09T09:12:40.898Z"
+                },
+                {
+                    "id": 155530,
+                    "photo_type": "Serial Number",
+                    "description": "",
+                    "original_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/530/large/image.jpg?1491729150",
+                    "medium_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/530/medium/image.jpg?1491729150",
+                    "square_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/530/square/image.jpg?1491729150",
+                    "thumb_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/530/thumb/image.jpg?1491729150",
+                    "lat": null,
+                    "lon": null,
+                    "created_at": "2017-04-09T09:12:31.807Z",
+                    "updated_at": "2017-04-09T09:12:31.807Z"
+                },
+                {
+                    "id": 155531,
+                    "photo_type": "Shield",
+                    "description": "",
+                    "original_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/531/large/image.jpg?1491729154",
+                    "medium_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/531/medium/image.jpg?1491729154",
+                    "square_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/531/square/image.jpg?1491729154",
+                    "thumb_url": "https://529garage-production.s3.amazonaws.com/photos/attachments/000/155/531/thumb/image.jpg?1491729154",
+                    "lat": null,
+                    "lon": null,
+                    "created_at": "2017-04-09T09:12:36.618Z",
+                    "updated_at": "2017-04-09T09:12:36.618Z"
+                }
             ],
-            "bolo_hero": null,
-            "status": 2,
-            "url": "https://project529.com/frame-shifter-gear-ring",
-            "email": null,
-            "phone": "928774922",
-            "name": "John Doe",
-            "updated_at": "2019-10-07T02:35:10.947Z"
-          }
+            "active_incident": {
+                "id": 23122,
+                "bolo_message": "has a sport seat and white drop bars, and clip in pedals\\n",
+                "case_number": null,
+                "last_seen": "2019-09-20T03:20:00.000Z",
+                "lat": "0.0",
+                "lng": "0.0",
+                "law_enforcement_agency_string": null,
+                "location_address": "Cambridge, MA 02138, USA",
+                "location_description": "stolen out of garage\\n1212 patterson\\nwhite bar tape",
+                "lock_defeated": null,
+                "lock_type": null,
+                "notes": null,
+                "reward": "$50",
+                "was_locked": null,
+                "updated_at": "2019-10-02T03:25:46.964Z",
+                "created_at": "2019-10-02T03:25:46.782Z"
+            }
         }
       JSON
     end
