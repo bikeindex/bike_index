@@ -1523,6 +1523,10 @@ en:
         lock_created: Lock created successfully!
       find_lock:
         not_your_lock: Whoops, that's not your lock!
+    oauth:
+      applications:
+        ensure_app_owner!:
+          not_your_application: That isn't your application
     organizations:
       create:
         organization_created: Organization Created successfully!
