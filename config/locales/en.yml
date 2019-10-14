@@ -1546,6 +1546,10 @@ en:
           We're sorry, that organization doesn't have a user set up to register bikes
           through. Email contact@bikeindex.org if this seems like an error.
     organized:
+      ambassador_task_assignments:
+        update:
+          could_not_update: Could not update activity status. Please try again later.
+          status_updated: Activity status updated.
       base:
         ensure_admin!:
           must_be_org_admin: You have to be an organization administrator to do that!
