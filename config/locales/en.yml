@@ -1508,6 +1508,15 @@ en:
       update:
         bike_was_updated: Bike successfully updated!
     concerns:
+      controller_helpers:
+        require_admin!:
+          not_an_org_admin: You have to be an organization administrator to do that!
+        require_index_admin!:
+          not_permitted_to_do_that: You don't have permission to do that!
+        require_member!:
+          not_an_org_member: You're not a member of that organization!
+        return_to_if_present:
+          reset_your_password: You've been logged in. Please reset your password
       sessionable:
         sign_in_and_redirect:
           logged_in: Logged in!

@@ -41,6 +41,7 @@ module ControllerHelpers
       redirect_to please_confirm_email_users_path and return
     else
       flash[flash_type] = msg
+      # TODO: Refactor to use translation key instead of the flash string
       if msg.match(/create an account/i).present?
         redirect_to new_user_url(subdomain: false, partner: sign_in_partner) and return
       else
@@ -93,7 +94,9 @@ module ControllerHelpers
       cookies[:return_to] = nil
       case target.downcase
       when "password_reset"
-        flash[:success] = "You've been logged in. Please reset your password"
+        flash[:success] =
+          translation(:reset_your_password,
+                      scope: [:controllers, :concerns, :controller_helpers, __method__])
         render action: :update_password and return true
       when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
         redirect_to(target) and return true
@@ -191,13 +194,13 @@ module ControllerHelpers
 
   def require_member!
     return true if current_user.member_of?(current_organization)
-    flash[:error] = "You're not a member of that organization!"
+    flash[:error] = translation(:not_an_org_member, scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to user_home_url(subdomain: false) and return
   end
 
   def require_admin!
     return true if current_user.admin_of?(current_organization)
-    flash[:error] = "You have to be an organization administrator to do that!"
+    flash[:error] = translation(:not_an_org_admin, scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to user_home_url and return
   end
 
@@ -206,7 +209,7 @@ module ControllerHelpers
     content_accessible = ["news"]
     type = "content" if content_accessible.include?(controller_name)
     return true if current_user.present? && current_user.superuser?
-    flash[:error] = "You don't have permission to do that!"
+    flash[:error] = translation(:not_permitted_to_do_that, scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to user_root_url and return
   end
 end
