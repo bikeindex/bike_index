@@ -44,6 +44,7 @@ class ScheduledWorkerRunner < ScheduledWorker
       DeactivateExpiredTheftAlertWorker,
       ScheduleBikePossiblyFoundNotificationWorker,
       ScheduleSearchForExternalRegistryBikesWorker,
+      FetchProject529BikesWorker,
       self,
     ]
   end

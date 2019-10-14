@@ -1,0 +1,102 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://project529.com/garage/bikes?access_token&page=1&per_page=10&updated_at=2019-09-19
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 302
+      message: Found
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Wed, 09 Oct 2019 16:01:08 GMT
+      Content-Type:
+      - text/html; charset=utf-8
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+      X-Content-Type-Options:
+      - nosniff
+      Location:
+      - https://project529.com/garage/users/sign_in
+      Cache-Control:
+      - no-cache
+      X-Request-Id:
+      - b86f966a-f948-400a-ba6b-1743ffbd5579
+      X-Runtime:
+      - '0.038170'
+      Strict-Transport-Security:
+      - max-age=31536000
+    body:
+      encoding: UTF-8
+      string: <html><body>You are being <a href="https://project529.com/garage/users/sign_in">redirected</a>.</body></html>
+    http_version:
+  recorded_at: Wed, 09 Oct 2019 16:01:08 GMT
+- request:
+    method: get
+    uri: https://project529.com/garage/services/v1/bikes?access_token=test&page=1&per_page=10&updated_at=2019-09-19
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v0.15.4
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 401
+      message: Unauthorized
+    headers:
+      Server:
+      - nginx
+      Date:
+      - Wed, 09 Oct 2019 18:59:22 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Content-Length:
+      - '39'
+      Connection:
+      - keep-alive
+      Cache-Control:
+      - no-store
+      Pragma:
+      - no-cache
+      Www-Authenticate:
+      - Bearer realm="Doorkeeper", error="invalid_token", error_description="The access
+        token is invalid"
+      X-Request-Id:
+      - 71e030ab-f483-4703-bdda-cc631b8bc620
+      X-Runtime:
+      - '0.019792'
+      Strict-Transport-Security:
+      - max-age=31536000
+    body:
+      encoding: UTF-8
+      string: '{"error":"The access token is invalid"}'
+    http_version:
+  recorded_at: Wed, 09 Oct 2019 18:59:22 GMT
+recorded_with: VCR 4.0.0
