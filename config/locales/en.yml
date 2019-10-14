@@ -1507,6 +1507,12 @@ en:
         unable_to_find_sticker: 'Unable to find sticker: %{scanned_id}'
       update:
         bike_was_updated: Bike successfully updated!
+    concerns:
+      sessionable:
+        sign_in_and_redirect:
+          logged_in: Logged in!
+        skip_if_signed_in:
+          already_signed_in: You're already signed in!
     feedbacks:
       block_the_spam:
         please_sign_in: Please sign in to send that message
