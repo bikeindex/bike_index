@@ -7,8 +7,13 @@ module Organized
     def index
       page = params[:page] || 1
       per_page = params[:per_page] || 25
-      @memberships = matching_memberships.includes(:user, :sender).reorder("memberships.#{sort_column} #{sort_direction}")
-                                         .page(page).per(per_page)
+
+      @memberships =
+        matching_memberships
+          .includes(:user, :sender)
+          .reorder("memberships.#{sort_column} #{sort_direction}")
+          .page(page)
+          .per(per_page)
     end
 
     def edit
@@ -16,13 +21,13 @@ module Organized
 
     def update
       @membership.update_attributes(permitted_update_params)
-      flash[:success] = "Updated membership for #{@membership.user.email}"
+      flash[:success] = translation(:updated_membership, user_email: @membership.user.email)
       redirect_to current_index_path
     end
 
     def destroy
       @membership.destroy
-      flash[:success] = "Deleted user from your organization"
+      flash[:success] = translation(:deleted_user)
       redirect_to current_index_path
     end
 
@@ -33,22 +38,31 @@ module Organized
 
     def create
       unless current_organization.remaining_invitation_count > 0
-        flash[:error] = "#{current_organization.name} is out of user invitations. Contact support@bikeindex.org"
+        flash[:error] = translation(:no_remaining_user_invitations, org_name: current_organization.name)
         redirect_to current_index_path and return
       end
       @membership = Membership.new(permitted_create_params)
       if params[:multiple_emails_invited].present?
         if multiple_emails_invited.count > current_organization.remaining_invitation_count
-          flash[:error] = "You tried to invite #{multiple_emails_invited.count} users, but #{current_organization.name} only can invite *#{current_organization.remaining_invitation_count} more*. Invite fewer or contact support"
+          flash[:error] = translation(:insufficient_invitations,
+                                      invite_count: multiple_emails_invited.count,
+                                      org_name: current_organization.name,
+                                      remaining_invite_count: current_organization.remaining_invitation_count)
           render :new
         else
-          flash[:success] = "#{multiple_emails_invited.count} users invited to #{current_organization.name}"
-          multiple_emails_invited.each { |email| Membership.create(permitted_create_params.merge(invited_email: email)) }
+          flash[:success] = translation(:users_invited,
+                                        invite_count: multiple_emails_invited.count,
+                                        org_name: current_organization.name)
+          multiple_emails_invited
+            .each { |email| Membership.create(permitted_create_params.merge(invited_email: email)) }
+
           redirect_to current_index_path and return
         end
       else
         if @membership.save
-          flash[:success] = "#{@membership.invited_email} was invited to #{current_organization.name}!"
+          flash[:success] = translation(:user_was_invited,
+                                        invited_email: @membership.invited_email,
+                                        org_name: current_organization.name)
           redirect_to current_index_path
         else
           render :new
@@ -76,7 +90,7 @@ module Organized
 
     def reject_self_updates
       if @membership && @membership.user == current_user
-        flash[:error] = "Sorry, you can't remove yourself from the organization. Contact us at support@bikeindex.org if this is problematic."
+        flash[:error] = translation(:cannot_remove_yourself)
         redirect_to organization_users_path(organization_id: current_organization) and return
       end
     end

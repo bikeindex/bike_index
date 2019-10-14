@@ -1597,6 +1597,23 @@ en:
           your_org_does_not_have_access: >-
             Your organization doesn't have access to that, please contact Bike Index
             support.
+      users:
+        create:
+          insufficient_invitations: >-
+            You tried to invite %{invite_count} users, but %{org_name} only can invite
+            *%{remaining_invite_count} more*. Invite fewer or contact support.
+          no_remaining_user_invitations: "%{org_name} is out of user invitations.
+            Contact support@bikeindex.org."
+          user_was_invited: "%{invited_email} was invited to %{org_name}!"
+          users_invited: "%{invite_count} users invited to %{org_name}"
+        destroy:
+          deleted_user: Deleted user from your organization.
+        reject_self_updates:
+          cannot_remove_yourself: >-
+            Sorry, you can't remove yourself from the organization. Contact us at
+            support@bikeindex.org if this is problematic.
+        update:
+          updated_membership: Updated membership for %{user_email}.
     ownerships:
       no_user_flash_msg:
         create_an_account_to_claim: >-
