@@ -1558,6 +1558,29 @@ en:
           not_a_member_of_that_org: You're not a member of that organization!
         ensure_not_ambassador_organization!:
           must_be_an_admin: You have to be an admin to do that!
+      exports:
+        create:
+          wait_to_download: >-
+            Export Created. Please wait for it to finish processing to be able to
+            download it.
+          with_avery_redirect: >-
+            Export Created. Once it's finished processing you will be automatically
+            directed to download the Avery labels.
+        create_avery_export:
+          do_not_have_permission: >-
+            You don't have permission to make that sort of export! Please contact
+            support@bikeindex.org.
+          sticker_already_assigned: >-
+            That sticker has already been assigned! Please choose a new initial Stickery_assigned.
+        destroy:
+          export_deleted: Export was successfully deleted!
+        ensure_access_to_exports!:
+          your_org_does_not_have_access: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
+        update:
+          bike_codes_removed: Bike codes removed!
+          unknown_update_action: Unknown update action!
       messages:
         create:
           message_sent: "%{message_kind} message sent"

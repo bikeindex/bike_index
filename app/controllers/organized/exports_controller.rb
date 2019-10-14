@@ -27,10 +27,10 @@ module Organized
       if flash[:error].blank? && @export.update_attributes(kind: "organization", organization_id: current_organization.id, user_id: current_user.id)
         OrganizationExportWorker.perform_async(@export.id)
         if @export.avery_export? # Send to the show page, with avery export parameter set so we can redirect when the processing is finished
-          flash[:success] = "Export Created. Once it's finished processing you will be automatically directed to download the Avery labels"
+          flash[:success] = translation(:with_avery_redirect)
           redirect_to organization_export_path(organization_id: current_organization.to_param, id: @export.id, avery_redirect: true)
         else
-          flash[:success] = "Export Created. Please wait for it to finish processing to be able to download it"
+          flash[:success] = translation(:wait_to_download)
           redirect_to organization_exports_path(organization_id: current_organization.to_param)
         end
       else
@@ -42,9 +42,9 @@ module Organized
     def update
       if params[:remove_bike_codes] && @export.assign_bike_codes?
         @export.remove_bike_codes_and_record!
-        flash[:success] = "Bike codes removed!"
+        flash[:success] = translation(:bike_codes_removed)
       else
-        flash[:error] = "Unknown update action!"
+        flash[:error] = translation(:unknown_update_action)
       end
       redirect_to organization_export_path(organization_id: current_organization.to_param, id: @export.id)
     end
@@ -52,7 +52,7 @@ module Organized
     def destroy
       @export.remove_bike_codes
       @export.destroy
-      flash[:success] = "export was successfully deleted!"
+      flash[:success] = translation(:export_deleted)
       redirect_to organization_exports_path(organization_id: current_organization.to_param)
     end
 
@@ -63,10 +63,10 @@ module Organized
         @export = Export.new(avery_export_parameters)
         bike_code = current_organization.bike_codes.lookup(@export.bike_code_start) if @export.bike_code_start.present?
         if bike_code.present? && bike_code.claimed?
-          flash[:error] = "That sticker has already been assigned! Please choose a new initial Sticker"
+          flash[:error] = translation(:sticker_already_assigned)
         end
       else
-        flash[:error] = "You don't have permission to make that sort of export! Please contact support@bikeindex.org"
+        flash[:error] = translation(:do_not_have_permission)
       end
     end
 
@@ -89,7 +89,7 @@ module Organized
 
     def ensure_access_to_exports!
       return true if current_organization.paid_for?("csv_exports") || current_user.superuser?
-      flash[:error] = "Your organization doesn't have access to that, please contact Bike Index support"
+      flash[:error] = translation(:your_org_does_not_have_access)
       redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
     end
   end
