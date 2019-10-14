@@ -152,6 +152,11 @@ Bikeindex::Application.routes.draw do
     resources :ambassador_task_assignments, only: [:index]
 
     resources :external_registry_bikes, only: %i[index show]
+    resources :external_registry_credentials, only: %i[index new create edit update] do
+      member do
+        put :reset
+      end
+    end
 
     resources :bikes do
       collection do

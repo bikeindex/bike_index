@@ -1,12 +1,20 @@
 class ExternalRegistryClient
-  def self.all
-    [
-      VerlorenOfGevondenClient,
-      StopHelingClient,
-    ]
-  end
+  TTL_HOURS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_CACHE_TTL_HOURS", 24).to_i.hours
+  TIMEOUT_SECS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_TIMEOUT", 5).to_i
 
-  def self.search_for_bikes_with(query, registries: all)
+  # Search external registries for the provided query string `query`.
+  #
+  # The set of registries searched can be customized by passing an array of
+  # class names as `registries`.
+  #
+  # Returns an ExternalRegistryBike ActiveRecord::Relation containing any
+  # records found that were successfully persisted.
+  def self.search_for_bikes_with(query, registries: nil)
+    registries ||= [
+      StopHelingClient,
+      VerlorenOfGevondenClient,
+    ]
+
     results =
       registries
         .map { |registry| Thread.new { registry.new.search(query) } }
@@ -15,5 +23,38 @@ class ExternalRegistryClient
         .compact
 
     ExternalRegistryBike.where(id: results.map(&:id))
+  end
+
+  attr_accessor :base_url
+
+  def credentials
+    @credentials ||=
+      self
+        .class
+        .to_s
+        .gsub("Client", "Credential")
+        .constantize
+        .first
+        .tap { |creds| raise CredentialsNotFoundError.new(self.class) if creds.blank? }
+  end
+
+  def conn
+    @conn ||= Faraday.new(url: self.base_url) do |conn|
+      conn.response :json, content_type: /\bjson$/
+      conn.use Faraday::RequestResponseLogger::Middleware,
+               logger_level: :info,
+               logger: Rails.logger if Rails.env.development?
+      conn.adapter Faraday.default_adapter
+      conn.options.timeout = TIMEOUT_SECS
+    end
+  end
+
+  class ExternalRegistryClientError < StandardError; end
+
+  class CredentialsNotFoundError < ExternalRegistryClientError
+    def initialize(classname)
+      @message = "Credentials not found for #{classname}"
+      super
+    end
   end
 end

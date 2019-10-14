@@ -1,23 +1,10 @@
 # frozen_string_literal: true
 
-class ExternalRegistryClient::StopHelingClient
-  APP_ID = ENV["STOP_HELING_APP_ID"]
-  API_KEY = ENV["STOP_HELING_API_KEY"]
-  TTL_HOURS = ENV.fetch("STOP_HELING_API_TTL_HOURS", 24).to_i.hours
-  TIMEOUT_SECS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_TIMEOUT", 5).to_i
+class ExternalRegistryClient::StopHelingClient < ExternalRegistryClient
+  BASE_URL = ENV["STOP_HELING_BASE_URL"]
 
-  attr_accessor :conn, :base_url
-
-  def initialize(base_url: nil)
-    self.base_url = base_url || ENV["STOP_HELING_BASE_URL"]
-    self.conn = Faraday.new(url: self.base_url) do |conn|
-      conn.response :json, content_type: /\bjson$/
-      conn.use Faraday::RequestResponseLogger::Middleware,
-               logger_level: :info,
-               logger: Rails.logger if Rails.env.development?
-      conn.adapter Faraday.default_adapter
-      conn.options.timeout = TIMEOUT_SECS
-    end
+  def initialize(base_url: BASE_URL)
+    self.base_url = base_url
   end
 
   # GET /GetSearchItems
@@ -54,8 +41,8 @@ class ExternalRegistryClient::StopHelingClient
 
   def request_params(search_term, brand, ip_address, location)
     query = {}
-    query["ApplicationID"] = APP_ID
-    query["Hmac"] = hmac(search_term)
+    query["ApplicationID"] = credentials.app_id
+    query["Hmac"] = credentials.hmac_key(search_term)
     query["SearchTerm"] = search_term
 
     query["SearchMerk"] = brand if brand.present?
@@ -78,7 +65,7 @@ class ExternalRegistryClient::StopHelingClient
         # Fail gracefully but notify Honeybadger if the request fails.
         # Typically an HMAC key error message will be returned as a Hash.
         Honeybadger.notify("StopHeling API request failed", {
-          error_class: "StopHelingClient",
+          error_class: self.class.to_s,
           context: { request: req_params, response: response_body },
         })
       end
@@ -114,15 +101,5 @@ class ExternalRegistryClient::StopHelingClient
     end
 
     translated.to_h
-  end
-
-  def hmac(search_term)
-    raise ArgumentError, "search term required" if search_term.blank?
-
-    date = Time.now.in_time_zone("Amsterdam").strftime("%Y%m%d")
-    data = "#{search_term}#{date}#{APP_ID}"
-
-    digest = OpenSSL::Digest.new("md5")
-    OpenSSL::HMAC.hexdigest(digest, API_KEY, data).upcase
   end
 end

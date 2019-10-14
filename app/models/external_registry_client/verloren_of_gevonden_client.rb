@@ -1,31 +1,28 @@
 # frozen_string_literal: true
 
-class ExternalRegistryClient::VerlorenOfGevondenClient
-  attr_accessor :conn, :base_url, :result_pages, :total_results, :total_pages,
-                :backoff, :backoff_factor, :retry_pages, :backoff_max
+class ExternalRegistryClient::VerlorenOfGevondenClient < ExternalRegistryClient
+  BASE_URL = ENV["VERLOREN_OF_GEVONDEN_BASE_URL"]
 
   # The API responds with 10 items per page of results
   ITEMS_RECEIVED_PER_PAGE = 10
-
   MINIMUM_QUERY_LENGTH = 3
   START_DATE = 1.year.ago.beginning_of_month
-  TTL_HOURS = ENV.fetch("VERLOREN_OF_GEVONDEN_TTL_HOURS", 24).to_i.hours
-  TIMEOUT_SECS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_TIMEOUT", 5).to_i
 
-  def initialize(base_url: nil)
-    self.base_url = base_url || ENV["VERLOREN_OF_GEVONDEN_BASE_URL"]
+  attr_accessor \
+    :backoff,
+    :backoff_factor,
+    :backoff_max,
+    :result_pages,
+    :retry_pages,
+    :total_pages,
+    :total_results
+
+  def initialize(base_url: BASE_URL)
+    self.base_url = base_url
     self.backoff = 0
     self.backoff_max = 60
     self.backoff_factor = 5
     self.retry_pages = []
-    self.conn = Faraday.new(url: self.base_url) do |conn|
-      conn.response :json, content_type: /\bjson$/
-      conn.use Faraday::RequestResponseLogger::Middleware,
-               logger_level: :info,
-               logger: Rails.logger if Rails.env.development?
-      conn.adapter Faraday.default_adapter
-      conn.options.timeout = TIMEOUT_SECS
-    end
     self.result_pages = {}
   end
 

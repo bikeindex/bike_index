@@ -1,0 +1,8 @@
+.container
+  %h1 New External Registry Credential
+
+  = render "form",
+    external_registry_credential: @external_registry_credential ,
+    action: admin_external_registry_credentials_path,
+    method: :post,
+    submit_label: "Create"

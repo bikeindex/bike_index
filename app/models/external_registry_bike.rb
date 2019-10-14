@@ -44,7 +44,7 @@ class ExternalRegistryBike < ActiveRecord::Base
   end
 
   def frame_colors
-    self[:frame_colors]&.split(/\s+,\s+/) || []
+    self[:frame_colors]&.split(/\s*,\s*/) || []
   end
 
   def stolen?
