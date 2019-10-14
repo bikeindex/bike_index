@@ -27,6 +27,14 @@ class ExternalRegistryClient
 
   attr_accessor :base_url
 
+  def registry_name
+    self.class.to_s.split("::").last.to_s.chomp("Client")
+  end
+
+  def credentials
+    @credentials ||= "ExternalRegistryCredential::#{registry_name}Credential".constantize.first
+  end
+
   def conn
     @conn ||= Faraday.new(url: self.base_url) do |conn|
       conn.response :json, content_type: /\bjson$/

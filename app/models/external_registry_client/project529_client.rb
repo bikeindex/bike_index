@@ -61,10 +61,6 @@ class ExternalRegistryClient::Project529Client < ExternalRegistryClient
     ExternalRegistryBike.none
   end
 
-  def credentials
-    @credentials ||= ExternalRegistryCredential::Project529Credential.first
-  end
-
   class Project529ClientError < StandardError; end
   class Project529ClientInvalidCredentialsError < Project529ClientError; end
 end
