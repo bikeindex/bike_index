@@ -4,7 +4,10 @@
   html: { class: "form" } do |f|
   %fieldset
     = f.label :type, "Type (required)", class: "form-label"
-    = f.select :type, external_registry_type_options, include_blank: true, class: "form-control"
+    = f.select :type,
+      external_registry_type_options(selected: external_registry_credential&.type),
+      include_blank: true,
+      class: "form-control"
 
   %fieldset
     = f.label :app_id, "App ID (required)", class: "form-label"

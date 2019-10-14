@@ -1,8 +1,8 @@
 module Admin::ExternalRegistryCredentialHelper
-  def external_registry_type_options
+  def external_registry_type_options(selected:)
     types = ExternalRegistryCredential.types
     labels = types.map { |type| type.split("::").last }
-    options_for_select(labels.zip(types))
+    options_for_select(labels.zip(types), selected)
   end
 
   def external_registry_credential_expires_in(external_registry_credential)
