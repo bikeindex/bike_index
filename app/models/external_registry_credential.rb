@@ -1,4 +1,7 @@
 class ExternalRegistryCredential < ActiveRecord::Base
+  validates :type, uniqueness: true
+  validates :app_id, uniqueness: { scope: :type }
+
   def self.types
     %w[
       Project529Credential

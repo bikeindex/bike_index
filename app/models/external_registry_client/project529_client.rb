@@ -37,7 +37,7 @@ class ExternalRegistryClient::Project529Client
   end
 
   def bikes(updated_at: nil, page: 1, per_page: 10)
-    credentials.set_access_token if credentials.access_token_expired?
+    credentials.set_access_token unless credentials.access_token_valid?
 
     req_params = {
       updated_at: (updated_at.presence || Time.current - 20.days).strftime("%Y-%m-%d"),
@@ -74,7 +74,7 @@ class ExternalRegistryClient::Project529Client
   end
 
   def credentials
-    @credentials ||= ExternalRegistryCredential::Project529Credential.last
+    @credentials ||= ExternalRegistryCredential::Project529Credential.first
   end
 
   class Project529ClientError < StandardError; end

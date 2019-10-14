@@ -1,10 +1,5 @@
 class ExternalRegistryCredential::Project529Credential < ExternalRegistryCredential
-  BASE_URL = ENV.fetch("PROJECT_529_BASE_URL", "https://project529.com/garage/services/v1")
-  TIMEOUT_SECS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_TIMEOUT", 5).to_i
-
-  validates :type, uniqueness: true
   validates :app_id, :refresh_token, presence: true
-  validates :app_id, uniqueness: { scope: :type }
 
   def set_access_token
     return unless access_token_expired?
