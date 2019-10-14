@@ -1,23 +1,12 @@
 # frozen_string_literal: true
 
-class ExternalRegistryClient::StopHelingClient
+class ExternalRegistryClient::StopHelingClient < ExternalRegistryClient
   APP_ID = ENV["STOP_HELING_APP_ID"]
   API_KEY = ENV["STOP_HELING_API_KEY"]
-  TTL_HOURS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_CACHE_TTL_HOURS", 24).to_i.hours
-  TIMEOUT_SECS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_TIMEOUT", 5).to_i
+  BASE_URL = ENV["STOP_HELING_BASE_URL"]
 
-  attr_accessor :conn, :base_url
-
-  def initialize(base_url: nil)
-    self.base_url = base_url || ENV["STOP_HELING_BASE_URL"]
-    self.conn = Faraday.new(url: self.base_url) do |conn|
-      conn.response :json, content_type: /\bjson$/
-      conn.use Faraday::RequestResponseLogger::Middleware,
-               logger_level: :info,
-               logger: Rails.logger if Rails.env.development?
-      conn.adapter Faraday.default_adapter
-      conn.options.timeout = TIMEOUT_SECS
-    end
+  def initialize(base_url: BASE_URL)
+    self.base_url = base_url
   end
 
   # GET /GetSearchItems

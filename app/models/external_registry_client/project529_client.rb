@@ -1,22 +1,10 @@
-class ExternalRegistryClient::Project529Client
+# frozen_string_literal: true
+
+class ExternalRegistryClient::Project529Client < ExternalRegistryClient
   BASE_URL = ENV.fetch("PROJECT_529_BASE_URL", "https://project529.com/garage")
-  APP_ID = ENV["PROJECT_529_APP_ID"]
 
-  TTL_HOURS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_CACHE_TTL_HOURS", 24).to_i.hours
-  TIMEOUT_SECS = ENV.fetch("EXTERNAL_REGISTRY_REQUEST_TIMEOUT", 5).to_i
-
-  attr_accessor :conn, :base_url
-
-  def initialize(base_url: nil)
-    self.base_url = base_url || BASE_URL
-    self.conn = Faraday.new(url: self.base_url) do |conn|
-      conn.response :json, content_type: /\bjson$/
-      conn.use Faraday::RequestResponseLogger::Middleware,
-               logger_level: :info,
-               logger: Rails.logger if Rails.env.development?
-      conn.adapter Faraday.default_adapter
-      conn.options.timeout = TIMEOUT_SECS
-    end
+  def initialize(base_url: BASE_URL)
+    self.base_url = base_url
   end
 
   def get_oauth_token
