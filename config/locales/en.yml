@@ -1581,6 +1581,14 @@ en:
         update:
           bike_codes_removed: Bike codes removed!
           unknown_update_action: Unknown update action!
+      manage:
+        destroy:
+          contact_support_to_delete: Please contact support@bikeindex.org to delete
+            %{org_name}.
+          deleted_org: Deleted %{org_name}.
+        update:
+          could_not_update: We're sorry, we had trouble updating %{org_name}.
+          updated_successfully: "%{org_name} updated successfully."
       messages:
         create:
           message_sent: "%{message_kind} message sent"
