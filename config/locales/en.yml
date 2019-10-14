@@ -1546,6 +1546,18 @@ en:
           We're sorry, that organization doesn't have a user set up to register bikes
           through. Email contact@bikeindex.org if this seems like an error.
     organized:
+      base:
+        ensure_admin!:
+          must_be_org_admin: You have to be an organization administrator to do that!
+        ensure_ambassador_authorized!:
+          must_be_ambassador: You have to be an ambassador to do that!
+          must_be_in_ambassador_org: You have to be in an ambassador organization
+            to see that!
+        ensure_member!:
+          accept_tos_for_orgs: Please accept the terms of service for organizations.
+          not_a_member_of_that_org: You're not a member of that organization!
+        ensure_not_ambassador_organization!:
+          must_be_an_admin: You have to be an admin to do that!
       messages:
         create:
           message_sent: "%{message_kind} message sent"
