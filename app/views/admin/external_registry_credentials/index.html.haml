@@ -1,0 +1,28 @@
+.admin-subnav
+  .col-md-4
+    %h1 External Registry Credentials
+  .col-md-8
+    %ul
+      %li.nav-item
+        = link_to "New Credential",
+          new_admin_external_registry_credential_path
+
+.full-screen-table
+  %table.table.table-striped.table-bordered.ambassador-tasks-table
+    %thead.small-header
+      %tr
+        %th Registry
+        %th Expires in
+        %th
+
+    %tbody
+      - @external_registry_credentials.each do |creds|
+        %tr
+          %td
+            = link_to creds.registry_name, edit_admin_external_registry_credential_path(creds)
+          %td
+            = external_registry_credential_expires_in(creds)
+          %td
+            = link_to "set / update access token",
+              reset_admin_external_registry_credential_path(creds),
+              method: :put, class: "btn btn-success btn-sm"
