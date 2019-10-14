@@ -3,14 +3,14 @@
   method: method,
   html: { class: "form" } do |f|
   %fieldset
-    = f.label :type, "Type (required)", class: "form-label"
+    = f.label :type, "Type", class: "form-label"
     = f.select :type,
       external_registry_type_options(selected: external_registry_credential&.type),
       include_blank: true,
       class: "form-control"
 
   %fieldset
-    = f.label :app_id, "App ID (required)", class: "form-label"
+    = f.label :app_id, "App ID", class: "form-label"
     = f.text_field :app_id, class: "form-control"
 
   %fieldset
@@ -18,7 +18,7 @@
     = f.text_field :access_token, class: "form-control"
 
   %fieldset
-    = f.label :refresh_token, "Refresh token (required)", class: "form-label"
+    = f.label :refresh_token, "Refresh token", class: "form-label"
     = f.text_field :refresh_token, class: "form-control"
 
   %br

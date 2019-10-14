@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ExternalRegistryClient::StopHelingClient < ExternalRegistryClient
-  APP_ID = ENV["STOP_HELING_APP_ID"]
-  API_KEY = ENV["STOP_HELING_API_KEY"]
   BASE_URL = ENV["STOP_HELING_BASE_URL"]
 
   def initialize(base_url: BASE_URL)
@@ -43,8 +41,8 @@ class ExternalRegistryClient::StopHelingClient < ExternalRegistryClient
 
   def request_params(search_term, brand, ip_address, location)
     query = {}
-    query["ApplicationID"] = APP_ID
-    query["Hmac"] = hmac(search_term)
+    query["ApplicationID"] = credentials.app_id
+    query["Hmac"] = credentials.hmac_key(search_term)
     query["SearchTerm"] = search_term
 
     query["SearchMerk"] = brand if brand.present?
@@ -67,7 +65,7 @@ class ExternalRegistryClient::StopHelingClient < ExternalRegistryClient
         # Fail gracefully but notify Honeybadger if the request fails.
         # Typically an HMAC key error message will be returned as a Hash.
         Honeybadger.notify("StopHeling API request failed", {
-          error_class: "StopHelingClient",
+          error_class: self.class.to_s,
           context: { request: req_params, response: response_body },
         })
       end
@@ -103,15 +101,5 @@ class ExternalRegistryClient::StopHelingClient < ExternalRegistryClient
     end
 
     translated.to_h
-  end
-
-  def hmac(search_term)
-    raise ArgumentError, "search term required" if search_term.blank?
-
-    date = Time.now.in_time_zone("Amsterdam").strftime("%Y%m%d")
-    data = "#{search_term}#{date}#{APP_ID}"
-
-    digest = OpenSSL::Digest.new("md5")
-    OpenSSL::HMAC.hexdigest(digest, API_KEY, data).upcase
   end
 end

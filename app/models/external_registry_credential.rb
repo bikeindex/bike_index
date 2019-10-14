@@ -2,6 +2,8 @@ class ExternalRegistryCredential < ActiveRecord::Base
   validates :type, uniqueness: true
   validates :app_id, uniqueness: { scope: :type }
 
+  attr_reader :api
+
   # The list of acceptable STI types.
   #
   # Return an array containing each ExternalRegistryCredential subclass name,
@@ -9,6 +11,7 @@ class ExternalRegistryCredential < ActiveRecord::Base
   def self.types
     %w[
       Project529Credential
+      StopHelingCredential
     ].map { |type| [to_s, type].join("::") }
   end
 
@@ -29,9 +32,5 @@ class ExternalRegistryCredential < ActiveRecord::Base
     return true unless access_token_expires_at.present? && access_token_valid?
     errors.add(:access_token, "not expired")
     false
-  end
-
-  def api
-    raise NotImplementedError
   end
 end

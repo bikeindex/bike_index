@@ -23,6 +23,7 @@
           %td
             = external_registry_credential_expires_in(creds)
           %td
-            = link_to "set / update access token",
-              reset_admin_external_registry_credential_path(creds),
-              method: :put, class: "btn btn-success btn-sm"
+            - if creds.access_token_can_be_reset?
+              = link_to "set / update access token",
+                reset_admin_external_registry_credential_path(creds),
+                method: :put, class: "btn btn-success btn-sm"
