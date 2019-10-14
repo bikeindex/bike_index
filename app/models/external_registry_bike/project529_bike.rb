@@ -81,15 +81,18 @@ class ExternalRegistryBike::Project529Bike < ExternalRegistryBike
     end
 
     def primary_photo(attrs)
-      all_photos = attrs["bike_photos"].to_a
+      all_photos =
+        attrs["bike_photos"]
+          .to_a
+          .group_by { |ph| ph["photo_type"] }
+          .map { |photo_type, photos| [photo_type.downcase, photos.first] }
+          .reject { |photo_type, _photos| photo_type.in?(["serial number", "shield"]) }
+          .to_h
 
       photo =
-        all_photos
-          .select { |ph| ph["photo_type"].downcase.in?(["side"]) }.first ||
-        all_photos
-          .select { |ph| ph["photo_type"].downcase.in?(["what to look for"]) }.first ||
-        all_photos
-          .reject { |ph| ph["photo_type"].downcase.in?(["serial number", "shield"]) }.first
+        all_photos["side"] ||
+        all_photos["what to look for"] ||
+        all_photos.values.flatten.first
 
       photo || {}
     end
