@@ -2,7 +2,7 @@ class ExternalRegistryCredential::Project529Credential < ExternalRegistryCredent
   validates :app_id, :refresh_token, presence: true
 
   def set_access_token
-    return unless access_token_expired?
+    return unless access_token_can_be_reset?
 
     credentials = api&.get_oauth_token
     expires_at_unix =

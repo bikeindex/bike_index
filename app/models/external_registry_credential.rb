@@ -12,13 +12,16 @@ class ExternalRegistryCredential < ActiveRecord::Base
     self.class.to_s.split("::").last.chomp("Credential")
   end
 
+  # Return true if the access token expiration is set and the access_token has
+  # not yet expired.
   def access_token_valid?
-    return if access_token_expires_at.blank?
+    return false if access_token_expires_at.blank?
     Time.current < access_token_expires_at
   end
 
-  def access_token_expired?
-    return true unless access_token_valid?
+  # Set an error and return false if access_token is not yet expired.
+  def access_token_can_be_reset?
+    return true unless access_token_expires_at.present? && access_token_valid?
     errors.add(:access_token, "not expired")
     false
   end
