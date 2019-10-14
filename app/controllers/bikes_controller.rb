@@ -331,7 +331,7 @@ class BikesController < ApplicationController
       redirect_to bike_path(@bike) and return
     end
 
-    authenticate_user(translation(:please_create_an_account), flash_type: :info)
+    authenticate_user(:create_account, flash_type: :info)
   end
 
   def update_organizations_can_edit_claimed(bike, organization_ids)

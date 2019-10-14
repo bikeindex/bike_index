@@ -19,13 +19,15 @@ class OwnershipsController < ApplicationController
     end
   end
 
+  # Return the translation key and, optionally, any keyword args to provide to
+  # `authenticate_user`.
   def no_user_flash_msg
-    return translation(:cannot_find_bike) if @ownership&.bike.blank?
+    return :cannot_find_bike if @ownership&.bike.blank?
 
     if @ownership&.user.present?
-      translation(:owner_already_has_account, bike_type: @ownership.bike.type)
+      [:owner_already_has_account, { bike_type: @ownership.bike.type }]
     else
-      translation(:create_an_account_to_claim, bike_type: @ownership.bike.type)
+      [:create_account_to_claim, { bike_type: @ownership.bike.type }]
     end
   end
 

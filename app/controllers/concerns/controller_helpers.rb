@@ -31,8 +31,10 @@ module ControllerHelpers
     Rack::MiniProfiler.authorize_request unless Rails.env.test?
   end
 
-  def authenticate_user(msg = nil, flash_type: :error)
-    msg ||= "Sorry, you have to log in"
+  def authenticate_user(translation_args = nil, flash_type: :error)
+    t_key, kwargs = Array(translation_args).compact
+    t_key ||= :you_have_to_log_in
+
     # Make absolutely sure the current user is confirmed - mainly for testing
     if current_user&.confirmed?
       return true if current_user.terms_of_service
@@ -40,9 +42,10 @@ module ControllerHelpers
     elsif current_user&.unconfirmed? || unconfirmed_current_user.present?
       redirect_to please_confirm_email_users_path and return
     else
-      flash[flash_type] = msg
-      # TODO: Refactor to use translation key instead of the flash string
-      if msg.match(/create an account/i).present?
+      flash[flash_type] =
+        translation(t_key, **kwargs.to_h, scope: [:controllers, :concerns, :controller_helpers, __method__])
+
+      if t_key.to_s.match?(/create.+account/)
         redirect_to new_user_url(subdomain: false, partner: sign_in_partner) and return
       else
         redirect_to new_session_url(subdomain: false, partner: sign_in_partner) and return

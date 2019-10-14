@@ -1484,7 +1484,6 @@ en:
         bike_has_not_been_claimed_yet: >-
           That %{bike_type} hasn't been claimed yet. If it's your %{bike_type}, sign
           up and you'll be able to edit it!
-        please_create_an_account: Please create an account
         you_dont_own_that: Oh no! It looks like you don't own that %{bike_type}.
         you_have_to_sign_in: Whoops! You have to sign in to be able to edit that %{bike_type}.
       find_bike:
@@ -1509,6 +1508,16 @@ en:
         bike_was_updated: Bike successfully updated!
     concerns:
       controller_helpers:
+        authenticate_user:
+          cannot_find_bike: Cannot find that bike.
+          create_account: Please create an account.
+          create_account_to_claim: >-
+            Create an account to claim that %{bike_type}! Use the email you used when
+            registering it and you will be able to claim it after signing up!
+          owner_already_has_account: >-
+            The owner of this %{bike_type} already has an account on Bike Index. Sign
+            in to claim it!
+          you_have_to_log_in: Sorry, you have to log in.
         require_admin!:
           not_an_org_admin: You have to be an organization administrator to do that!
         require_index_admin!:
@@ -1664,13 +1673,6 @@ en:
         update:
           updated_membership: Updated membership for %{user_email}.
     ownerships:
-      no_user_flash_msg:
-        create_an_account_to_claim: >-
-          Create an account to claim that %{bike_type}! Use the email you used when
-          registering it and you will be able to claim it after signing up!
-        owner_already_has_account: >-
-          The owner of this %{bike_type} already has an account on Bike Index. Sign
-          in to claim it!
       show:
         no_longer_your_bike: >-
           That used to be your %{bike_type} but isn't anymore! Contact us if this
@@ -1772,8 +1774,6 @@ en:
         you_can_use_bike_index: Thanks! Now you can use Bike Index.
         you_can_use_bike_index_as_org: Thanks! Now you can use Bike Index as %{org_name}
     welcome:
-      authenticate_user_for_welcome_controller:
-        create_account: Please create an account
       recovery_stories:
         no_stories_to_display: No recovery stories to display
   customer_mailer:
