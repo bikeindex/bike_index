@@ -1,4 +1,4 @@
-= render partial: "admin/bikes/bike", locals: { bike: @bike, target: "show", stolen_record: @stolen_record }
+= render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show", stolen_record: @stolen_record }
 
 = render partial: "/admin/twitter_accounts/errored"
 
@@ -6,7 +6,6 @@
 
 .row.mt-2.mb-4
   - @bike.public_images.each_with_index do |img, index|
-    - next if index == 1
     .col-3.mb-2.col-lg-2
       = image_tag img.image_url(:small), class: "ml-auto mr-auto", style: "display: block; max-width: 150px; height: auto;"
 
