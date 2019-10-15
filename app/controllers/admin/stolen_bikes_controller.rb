@@ -21,8 +21,15 @@ class Admin::StolenBikesController < Admin::BaseController
   end
 
   def regenerate_alert_image
-    @bike.current_stolen_record.generate_alert_image
-    redirect_to edit_admin_stolen_bike_url(@bike), notice: "Promoted alert images regenerated."
+    selected_image = PublicImage.find(params[:public_image_id])
+
+    if @bike.current_stolen_record.generate_alert_image(bike_image: selected_image)
+      flash[:notice] = "Promoted alert bike image updated."
+    else
+      flash[:error] = "Could not update promoted alert image."
+    end
+
+    redirect_to edit_admin_stolen_bike_url(@bike)
   end
 
   def show

@@ -5,7 +5,7 @@
 %h3 Public Images
 
 .row.mt-2.mb-4
-  - @bike.public_images.each_with_index do |img, index|
+  - @bike.public_images.each do |img|
     .col-3.mb-2.col-lg-2
       = image_tag img.image_url(:small), class: "ml-auto mr-auto", style: "display: block; max-width: 150px; height: auto;"
 
