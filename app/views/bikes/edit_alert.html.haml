@@ -4,11 +4,9 @@
       = render partial: "bikes/edit_primary_menu", locals: { is_disabled: true }
 
       .col-md-8.form-well
-        = render partial: "theft_alerts_table", locals: { theft_alerts: @theft_alerts, first_form_well: true }
-
         .form-wrap{ class: @theft_alerts.present? ? "secondary-form-wrap" : "" }
           .form-well-form-header-always-visible
-            -# Activate Bike Index Alert
+            -# Activate Promoted Alert
             %h3.text-center.w-100
               = @edit_templates[@edit_template]
           .row
@@ -22,23 +20,23 @@
             = hidden_field_tag :selected_bike_image_id
             = hidden_field_tag :locale, params[:locale] if params[:locale].present?
 
+            -# Select a Plan
             .row
+              %h3.text-center.w-100
+                = t(".select_plan")
+            .row
+              = render @theft_alert_plans, selected_plan: @selected_theft_alert_plan, preferred_plan: @theft_alert_plans.max_by(&:amount_cents)
+
+            -# Select an image
+            .row.mt-4
               %h3.text-center.w-100= t(".select_an_image")
               .col-sm-12
                 - if @bike.public_images.none?
                   %p= t(".no_photos_add_photos_here_html", link: link_to(t(".here"), edit_bike_url(@bike, page: :photos)))
                 - else
-                  = t(".select_an_image_to_see_preview")
-
                   .image-selection-container#js-select-image-container
-                    %ul
-                      - @bike.public_images.each_with_index do |image, i|
-                        = content_tag "li",
-                          class: (i.zero? ? "selected js-image-select" : "js-image-select"),
-                          data: {"image-url" => image.image_url(:medium), "image-id" => image.id} do
-                          = image_tag image.image_url(:medium)
+                    -# Image Preview
                     .selection-preview.text-center.w-100#js-selection-preview
-                      %h5= t(".preview")
                       .selection-preview-image-template
                         .selection-preview-image#js-selection-preview-image
                           = image_tag @bike.public_images.first.image_url(:medium)
@@ -46,13 +44,24 @@
                           -# Fall back to "City, State" as a nudge to add
                           -# location info to stolen record
                           = @bike.current_stolen_record.bike_location || t(".city_state")
-            .row
-              %h3.text-center.w-100
-                = t(".select_plan")
-            .row
-              = render @theft_alert_plans, selected_plan: @selected_theft_alert_plan, preferred_plan: @theft_alert_plans.max_by(&:amount_cents)
+                      %h5= t(".preview")
 
+                    = t(".select_an_image_to_see_preview")
+                    %ul
+                      - @bike.public_images.each_with_index do |image, i|
+                        = content_tag "li",
+                          class: (i.zero? ? "selected js-image-select" : "js-image-select"),
+                          data: {"image-url" => image.image_url(:medium), "image-id" => image.id} do
+                          = image_tag image.image_url(:medium)
+
+            -# Submit form / Select a plan
             .row
               .text-center.w-100.mt-2
                 %button.btn.btn-lg.btn-primary
                   = t(".select_plan")
+
+
+
+      .col-md-8.form-well
+        .mt-4
+          = render partial: "theft_alerts_table", locals: { theft_alerts: @theft_alerts, first_form_well: true }

@@ -14,6 +14,13 @@ $menu-select-overlay-line-height: 12px;
     li {
       display: block;
 
+      &.edit-menu-alert {
+        a h4 {
+          color: $red;
+          font-weight: 700;
+        }
+      }
+
       &.edit-menu-ownership {
         border-top: 1px solid $gray-light;
       }
