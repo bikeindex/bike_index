@@ -1005,7 +1005,7 @@ en:
       no_photos_add_photos_here_html: >-
         Uh oh. We don't have any photos of your bike available. Upload one %{link}
         to set up a promoted alert!
-      preview: Preview
+      preview: Promoted Alert Preview
       select_an_image: Select an image
       select_an_image_to_see_preview: >-
         Select an image of your bike to see a preview of what your promoted alert
@@ -1146,6 +1146,11 @@ en:
       this_bike_type_is_stolen_or_missing: This %{bike_type} is stolen or missing!
     edit_theft_details:
       abandoned: Abandoned
+      charges_go_to_cost_of_ad: Charges go directly toward the cost of hosting the
+        ad on Facebook.
+      click_to_see_promoted_alert_blog_post_html: >-
+        Click %{link} to read about how Bike Index's Promoted Theft Alerts helped
+        recover a stolen bike in less than one day.
       department_city: Department & city
       description_of_the_incident: Description of the incident
       do_these_things_for_the_best_chance: Do these things for the best chance of
@@ -1153,14 +1158,23 @@ en:
       do_you_have_proof_of_ownership: Do you have proof of ownership of this %{bike_type}?
       eg_if_we_tweet_about_it: e.g. if we tweet about it or see someone searching
         for its serial number
+      here: here
       how_did_you_recover: How did you recovered the %{bike_type}
       if_this_bike_type_was_added: >-
         If this %{bike_type} was added to the Index by a bike shop, that counts as
         proof of ownership
       police_report: 'Police report #'
+      promoted_theft_alert_service_description: >-
+        Bike Index's new Promoted Theft Alert service gets eyes on your bike by folks
+        in the cycling community in the neighborhood where your bike was last seen.
+      promoted_theft_alerts: Promoted Theft Alerts
       receive_notifications: Receive notifications from Bike Index about this stolen
         %{bike_type}
       stolen: Stolen
+      try_one_now: Try one now!
+      we_can_create_fb_ads_for_you: >-
+        Did you know we can create targeted Facebook ads to spread the word about
+        your stolen bike for you?
       when_was_it_stolen: When was it %{stolen_type}
       without_a_valid_report_number_html: >-
         Without a valid report number, your bike won't be included in partner searches

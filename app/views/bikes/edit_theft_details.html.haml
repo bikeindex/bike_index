@@ -94,3 +94,37 @@
                 = t(".eg_if_we_tweet_about_it")
 
             = render "shared/form_well_footer_save"
+
+-# "Try a Promoted Theft Alert" modal
+
+- stolen_record_id = @bike&.current_stolen_record&.id
+- session_key = "promoted_theft_alert_modal_#{stolen_record_id}_seen"
+- if session[session_key].blank?
+  - session[session_key] = true
+  - modal_title = t(".promoted_theft_alerts")
+  - modal_body = capture_haml do
+    .modal-body
+      %p
+        = t(".we_can_create_fb_ads_for_you")
+
+      .mb-4.text-center
+        = image_tag "promoted_alerts/sample.jpg",
+          alt: "Sample Promoted Alert Image",
+          class: "m-auto mw-100"
+
+      %p
+        = t(".promoted_theft_alert_service_description")
+
+      %p
+        - blog_post_link = link_to t(".here"),
+          news_url("bike-indexs-new-promoted-alerts-are-the-megaphone-crooks-dont-want-you"),
+          target: :_blank
+        = t(".click_to_see_promoted_alert_blog_post_html", link: blog_post_link)
+
+      %p
+        = t(".charges_go_to_cost_of_ad")
+
+      %p.text-center
+        = link_to t(".try_one_now"), edit_bike_path(@bike, params: { page: :alert })
+
+  = render partial: "/shared/modal", locals: { title: modal_title, id: "tryAPromotedAlert", modal_body: modal_body, start_open: true }
