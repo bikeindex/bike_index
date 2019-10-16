@@ -31,7 +31,7 @@ module ControllerHelpers
     Rack::MiniProfiler.authorize_request unless Rails.env.test?
   end
 
-  def authenticate_user(translation_key = nil, translation_args = {}, flash_type: :error)
+  def authenticate_user(translation_key: nil, translation_args: {}, flash_type: :error)
     translation_key ||= :you_have_to_log_in
 
     # Make absolutely sure the current user is confirmed - mainly for testing

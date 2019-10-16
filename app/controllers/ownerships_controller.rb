@@ -1,6 +1,6 @@
 class OwnershipsController < ApplicationController
   before_filter :find_ownership
-  before_filter -> { authenticate_user(*no_user_flash_msg_translation_args) }
+  before_filter :authenticate_user_and_determine_flash_message
 
   def show
     bike = Bike.unscoped.find(@ownership.bike_id)
@@ -32,6 +32,11 @@ class OwnershipsController < ApplicationController
   end
 
   private
+
+  def authenticate_user_and_determine_flash_message
+    key, args = no_user_flash_msg_translation_args
+    authenticate_user(translation_key: key, translation_args: args)
+  end
 
   def find_ownership
     @ownership = Ownership.find(params[:id])
