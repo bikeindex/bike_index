@@ -97,8 +97,10 @@
 
 -# "Try a Promoted Theft Alert" modal
 
-- if session[:promoted_theft_alert_modal_seen].blank?
-  - session[:promoted_theft_alert_modal_seen] = true
+- stolen_record_id = @bike&.current_stolen_record&.id
+- session_key = "promoted_theft_alert_modal_#{stolen_record_id}_seen"
+- if session[session_key].blank?
+  - session[session_key] = true
   - modal_title = t(".promoted_theft_alerts")
   - modal_body = capture_haml do
     .modal-body
