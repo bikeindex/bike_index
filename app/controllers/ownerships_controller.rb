@@ -1,6 +1,6 @@
 class OwnershipsController < ApplicationController
   before_filter :find_ownership
-  before_filter -> { authenticate_user(no_user_flash_msg) }
+  before_filter -> { authenticate_user(*no_user_flash_msg_translation_args) }
 
   def show
     bike = Bike.unscoped.find(@ownership.bike_id)
@@ -21,8 +21,8 @@ class OwnershipsController < ApplicationController
 
   # Return the translation key and, optionally, any keyword args to provide to
   # `authenticate_user`.
-  def no_user_flash_msg
-    return :cannot_find_bike if @ownership&.bike.blank?
+  def no_user_flash_msg_translation_args
+    return [:cannot_find_bike, {}] if @ownership&.bike.blank?
 
     if @ownership&.user.present?
       [:owner_already_has_account, { bike_type: @ownership.bike.type }]

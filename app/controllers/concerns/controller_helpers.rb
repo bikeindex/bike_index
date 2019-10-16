@@ -31,9 +31,8 @@ module ControllerHelpers
     Rack::MiniProfiler.authorize_request unless Rails.env.test?
   end
 
-  def authenticate_user(translation_args = nil, flash_type: :error)
-    t_key, kwargs = Array(translation_args).compact
-    t_key ||= :you_have_to_log_in
+  def authenticate_user(translation_key = nil, translation_args = {}, flash_type: :error)
+    translation_key ||= :you_have_to_log_in
 
     # Make absolutely sure the current user is confirmed - mainly for testing
     if current_user&.confirmed?
@@ -42,10 +41,13 @@ module ControllerHelpers
     elsif current_user&.unconfirmed? || unconfirmed_current_user.present?
       redirect_to please_confirm_email_users_path and return
     else
-      flash[flash_type] =
-        translation(t_key, **kwargs.to_h, scope: [:controllers, :concerns, :controller_helpers, __method__])
+      flash[flash_type] = translation(
+        translation_key,
+        **translation_args,
+        scope: [:controllers, :concerns, :controller_helpers, __method__],
+      )
 
-      if t_key.to_s.match?(/create.+account/)
+      if translation_key.to_s.match?(/create.+account/)
         redirect_to new_user_url(subdomain: false, partner: sign_in_partner) and return
       else
         redirect_to new_session_url(subdomain: false, partner: sign_in_partner) and return
