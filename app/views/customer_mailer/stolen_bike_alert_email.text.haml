@@ -3,6 +3,15 @@
 
 \--------------------------------
 
+- if @bike.abandoned?
+  = t(".text.were_spreading_the_word_about_your_found", bike_type: @bike_type)
+- else
+  = t(".text.were_spreading_the_word_about_your_stolen", bike_type: @bike_type)
+
+= t(".text.we_sent_out_this_tweet_from", twitter_handle: @tweet_account_screen_name)
+
+= @tweet_url
+
 \---
 
 = t(".text.make")
@@ -24,10 +33,6 @@
 
 - if @customer_contact.bike.stolen
   = t(".text.hopefully_you_find_the_bike_soon", bike_type: bike_type)
-
-= t(".text.claim_the_bike_type_here_bike_url", bike_type: bike_type, bike_url: bike_url)
-
-= t(".text.sign_up_or_in", bike_type: bike_type)
 
 
 \--------------------------------
