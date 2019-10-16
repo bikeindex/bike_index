@@ -94,3 +94,34 @@
                 = t(".eg_if_we_tweet_about_it")
 
             = render "shared/form_well_footer_save"
+
+-# "Try a Promoted Theft Alert" modal
+
+- unless session[:promoted_theft_alert_modal_seen].present?
+  - session[:promoted_theft_alert_modal_seen] = true
+  - modal_title = "Promoted Theft Alerts"
+  - modal_body = capture_haml do
+    .modal-body
+      %p
+        Did you know we can create targeted Facebook ads to spread the word about
+        your stolen bike for you?
+
+      %div.mb-4.text-center
+        = image_tag "promoted_alerts/sample.jpg", style: "max-width: 500px;", class: "m-auto"
+
+      %p
+        Bike Index's new Promoted Theft Alert service gets eyes on your bike by
+        folks in the cycling community in the neighborhood where your bike was
+        last seen.
+
+      - blog_post_link = link_to "here", news_url("bike-indexs-new-promoted-alerts-are-the-megaphone-crooks-dont-want-you"), target: :_blank
+      %p
+        = "Click #{blog_post_link} to read about how Bike Index's Promoted Theft Alerts helped recover a stolen bike in less than one day.".html_safe
+
+      %p
+        Charges go directly toward the cost of hosting the ad on Facebook.
+
+      %p.text-center
+        = link_to "Try one now!", edit_bike_path(@bike, params: { page: :alert })
+
+  = render partial: "/shared/modal", locals: { title: modal_title, id: "tryAPromotedAlert", modal_body: modal_body, start_open: true }
