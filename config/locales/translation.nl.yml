@@ -2461,25 +2461,28 @@ nl:
         area: gebied
         improve_your_chances_of_recovery_by_doing: Vergroot uw kansen op herstel door
           al deze dingen te doen!
-        recovered_or_found: teruggewonnen / gevonden
-        stolen: Gestolen
         stolen_bike_alerter: gestolen fiets alerter.
         this_email_is_about_the_stolen_bike: Deze e-mail gaat over de %{was_stolen}
           %{bike_type} geregistreerd op Bike Index op %{date}
         we_sent_out_this_tweet_from: We hebben deze tweet verstuurd vanuit
         were_spreading_the_word_about_your_stolen: We verspreiden het woord over uw
           %{stolen_word} %{bike_type}!
+        this_email_is_about_the_found_bike: Deze e-mail gaat over de herstelde / gevonden
+          %{bike_type} geregistreerd op Bike Index op %{date}
+        were_spreading_the_word_about_your_found: We verspreiden het woord over je
+          herstelde / gevonden %{bike_type}!
       text:
-        claim_the_bike_type_here_bike_url: "* Claim de %{bike_type} hier: %{bike_url}
-          *"
         color: 'Kleur:'
         hopefully_you_find_the_bike_soon: Hopelijk vindt u de %{bike_type} binnenkort.
           Geef ons een seintje als je dat doet!
         make: 'Maken:'
         serial: 'Serial:'
-        sign_up_or_in: Meld u aan of meld u aan bij BikeIndex.org om uw %{bike_type}
-          te claimen en te bewerken, foto's te uploaden en ervoor te zorgen dat u
-          nooit uw vertrouwde ros uit het oog verliest!
+        we_sent_out_this_tweet_from: 'We hebben deze tweet verstuurd van %{twitter_handle},
+          een Bike Index gestolen fietsalerter:'
+        were_spreading_the_word_about_your_found: We verspreiden het woord over uw
+          herstelde / gevonden %{bike_type}!
+        were_spreading_the_word_about_your_stolen: We verspreiden het woord over uw
+          gestolen %{bike_type}!
     stolen_notification_email:
       html:
         if_you_believe_this_email_is_illegitimate: Als u denkt dat deze e-mail onwettig
