@@ -1857,6 +1857,19 @@ nl:
         fiets niet opgenomen in <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">partnerzoekopdrachten</a>
         door <a href="https://bikeindex.org/news/bike-index-partners-with-leads-online">LeadsOnline</a>
       abandoned: Verlaten
+      charges_go_to_cost_of_ad: De kosten gaan rechtstreeks naar de kosten van het
+        hosten van de advertentie op Facebook.
+      click_to_see_promoted_alert_blog_post_html: Klik op %{link} om te lezen hoe
+        de gesponsorde diefstalmeldingen van Bike Index een gestolen fiets in minder
+        dan één dag hebben hersteld.
+      here: hier
+      promoted_theft_alert_service_description: De nieuwe Promoted Theft Alert-service
+        van Bike Index krijgt uw fiets in de gaten van mensen in de fietsgemeenschap
+        in de buurt waar uw fiets voor het laatst werd gezien.
+      promoted_theft_alerts: Gepromoveerde diefstalmeldingen
+      try_one_now: Probeer er nu een!
+      we_can_create_fb_ads_for_you: Wist je dat we gerichte Facebook-advertenties
+        kunnen maken om het woord over je gestolen fiets voor jou te verspreiden?
     index:
       all: Alle
       anywhere: Overal
