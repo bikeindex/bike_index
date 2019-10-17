@@ -8,7 +8,8 @@
           "browsers": "> 1%",
           "node": "current"
         },
-        "useBuiltIns": "usage"
+        "useBuiltIns": "usage",
+        "corejs": "2"
       }
     ],
     "@babel/react"

@@ -37,7 +37,7 @@ jobs:
             DOCKERIZE_VERSION: v0.6.1
 
       - restore_cache:
-          key: v2-git-2.22.0
+          key: cache-{{ .Environment.CACHE_VERSION }}-git-2.22.0
       - run:
           name: Install Git
           environment:
@@ -56,12 +56,12 @@ jobs:
             sudo make prefix=/usr/local all
             sudo cp ./git /usr/local/bin/git
       - save_cache:
-          key: v2-git-2.22.0
+          key: cache-{{ .Environment.CACHE_VERSION }}-git-2.22.0
           paths:
             - deps-git
 
       - restore_cache:
-          key: v2-hub-2.12.3
+          key: cache-{{ .Environment.CACHE_VERSION }}-hub-2.12.3
       - run:
           name: Install Hub
           environment:
@@ -75,7 +75,7 @@ jobs:
 
             sudo cp ./hub-linux-amd64-${HUB_VERSION}/bin/hub /usr/local/bin/hub
       - save_cache:
-          key: v2-hub-2.12.3
+          key: cache-{{ .Environment.CACHE_VERSION }}-hub-2.12.3
           paths:
             - deps-hub
 
@@ -89,12 +89,12 @@ jobs:
 
       # Ruby dependencies
       - restore_cache:
-          key: v2-bundler-{{ checksum "Gemfile.lock" }}
+          key: cache-{{ .Environment.CACHE_VERSION }}-bundler-{{ checksum "Gemfile.lock" }}
       - run:
           name: Bundle Gems
           command: bundle install --without development --path=vendor/bundle --jobs=4 --retry=3
       - save_cache:
-          key: v2-bundler-{{ checksum "Gemfile.lock" }}
+          key: cache-{{ .Environment.CACHE_VERSION }}-bundler-{{ checksum "Gemfile.lock" }}
           paths:
             - vendor/bundle
             - ~/.bundle
@@ -105,12 +105,12 @@ jobs:
 
       # Node dependencies
       - restore_cache:
-          key: v2-yarn-{{ checksum "yarn.lock" }}
+          key: cache-{{ .Environment.CACHE_VERSION }}-yarn-{{ checksum "yarn.lock" }}
       - run:
           name: Yarn Install
           command: yarn install --cache-folder ~/.cache/yarn
       - save_cache:
-          key: v2-yarn-{{ checksum "yarn.lock" }}
+          key: cache-{{ .Environment.CACHE_VERSION }}-yarn-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
 
@@ -118,13 +118,13 @@ jobs:
       - restore_cache:
           keys:
             # This branch if available
-            - v2-assets-{{ .Branch }}
+            - cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Branch }}
             # Default branch if not
-            - v2-assets-master-
-            - v2-assets-
+            - cache-{{ .Environment.CACHE_VERSION }}-assets-master-
+            - cache-{{ .Environment.CACHE_VERSION }}-assets-
       - run: bundle exec rake assets:precompile
       - save_cache:
-          key: v2-assets-{{ .Branch }}
+          key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Branch }}
           paths:
             - public/assets
             - tmp/cache/assets/sprockets
