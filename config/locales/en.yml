@@ -1000,7 +1000,7 @@ en:
       bike_index_can_help: >-
         Bike Index can help by purchasing targeted ads on Facebook to spread the word
         about your stolen %{bike_type}.
-      city_state: City, State
+      city_state_country: City, State - Country
       here: here
       no_photos_add_photos_here_html: >-
         Uh oh. We don't have any photos of your bike available. Upload one %{link}
