@@ -1703,7 +1703,6 @@ nl:
       select_plan: Selecteer Plan
       targeted_sharing_html: We hebben vastgesteld dat gericht delen op sociale media
         een <em>enorm</em> effect heeft op het terughalen van gestolen fietsen.
-      city_state: Stad, staat
       here: hier
       no_photos_add_photos_here_html: Oh Oh. We hebben geen foto's van je fiets beschikbaar.
         Upload een %{link} om een gepromote melding in te stellen!
@@ -1711,6 +1710,7 @@ nl:
       select_an_image: Selecteer een afbeelding
       select_an_image_to_see_preview: 'Selecteer een afbeelding van uw fiets om een
         voorbeeld te zien van hoe uw gepromote melding eruit zal zien:'
+      city_state_country: Stad staat Land
     edit_alert_purchase:
       cancel: Annuleren
       charge: 'Opladen: %{price}'
