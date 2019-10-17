@@ -35,17 +35,17 @@
                   %p= t(".no_photos_add_photos_here_html", link: link_to(t(".here"), edit_bike_url(@bike, page: :photos)))
                 - else
                   .image-selection-container#js-select-image-container
-                    -# Image Preview
-                    .selection-preview.text-center.w-100#js-selection-preview
+                    -# Promoted Alert Image Preview
+                    .selection-preview.text-center.w-100#js-selection-preview.mb-2
                       .selection-preview-image-template
                         .selection-preview-image#js-selection-preview-image
                           = image_tag @bike.public_images.first.image_url(:medium)
                         .selection-preview-caption
-                          -# Fall back to "City, State" as a nudge to add
-                          -# location info to stolen record
-                          = @bike.current_stolen_record.bike_location || t(".city_state")
-                      %h5= t(".preview")
-
+                          -# Display a generic location "City, State - Country"
+                             since users may see this preview before having
+                             entered theft details.
+                          = t(".city_state_country")
+                      = t(".preview")
                     = t(".select_an_image_to_see_preview")
                     %ul
                       - @bike.public_images.each_with_index do |image, i|
