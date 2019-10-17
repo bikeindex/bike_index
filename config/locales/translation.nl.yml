@@ -2168,7 +2168,6 @@ nl:
       ensure_user_allowed_to_edit:
         bike_has_not_been_claimed_yet: Dat %{bike_type} is nog niet geclaimd. Als
           het jouw %{bike_type} is, meld je dan aan en je kunt het bewerken!
-        please_create_an_account: Maak een account aan
         you_dont_own_that: Oh nee! Het lijkt erop dat je dat niet bezit %{bike_type}.
         you_have_to_sign_in: Whoops! Je moet inloggen om dat te kunnen bewerken %{bike_type}.
       find_bike:
@@ -2272,17 +2271,9 @@ nl:
         unauthorized: Je hebt geen toestemming om dat te doen. Neem contact op met
           ondersteuning.
     welcome:
-      authenticate_user_for_welcome_controller:
-        create_account: Maak een account aan
       recovery_stories:
         no_stories_to_display: Geen herstelverhalen om weer te geven
     ownerships:
-      no_user_flash_msg:
-        create_an_account_to_claim: Maak een account aan om te beweren dat %{bike_type}!
-          Gebruik de e-mail die u hebt gebruikt bij het registreren en u kunt deze
-          claimen na aanmelding!
-        owner_already_has_account: De eigenaar van deze %{bike_type} heeft al een
-          account op Bike Index. Log in om het te claimen!
       show:
         no_longer_your_bike: Dat was vroeger je %{bike_type} maar is dat niet meer!
           Neem contact met ons op als dit niet logisch is.
@@ -2344,6 +2335,130 @@ nl:
         you_can_use_bike_index: Bedankt! Nu kunt u Bike Index gebruiken.
         you_can_use_bike_index_as_org: Bedankt! Nu kunt u Bike Index gebruiken als
           %{org_name}
+    concerns:
+      controller_helpers:
+        authenticate_user:
+          cannot_find_bike: Ik kon die fiets niet vinden.
+          create_account: Maak een account aan.
+          create_account_to_claim: Maak een account aan om te beweren dat %{bike_type}!
+            Gebruik de e-mail die u hebt gebruikt bij het registreren en u kunt deze
+            claimen na aanmelding!
+          owner_already_has_account: De eigenaar van deze %{bike_type} heeft al een
+            account op Bike Index. Log in om het te claimen!
+          you_have_to_log_in: Sorry, je moet inloggen.
+        require_admin!:
+          not_an_org_admin: Je moet een organisatiebeheerder zijn om dat te doen!
+        require_index_admin!:
+          not_permitted_to_do_that: Je hebt geen toestemming om dat te doen!
+        require_member!:
+          not_an_org_member: Je bent geen lid van die organisatie!
+        return_to_if_present:
+          reset_your_password: U bent ingelogd. Stel uw wachtwoord opnieuw in
+      sessionable:
+        sign_in_and_redirect:
+          logged_in: Ingelogd!
+        skip_if_signed_in:
+          already_signed_in: Je bent al ingelogd!
+    oauth:
+      applications:
+        ensure_app_owner!:
+          not_your_application: Dat is niet jouw toepassing
+    organized:
+      ambassador_task_assignments:
+        update:
+          could_not_update: Kan activiteitsstatus niet bijwerken. Probeer het later
+            opnieuw.
+          status_updated: Activiteitsstatus bijgewerkt.
+      base:
+        ensure_admin!:
+          must_be_org_admin: Je moet een organisatiebeheerder zijn om dat te doen!
+        ensure_ambassador_authorized!:
+          must_be_ambassador: Je moet een ambassadeur zijn om dat te doen!
+          must_be_in_ambassador_org: Je moet in een ambassadeursorganisatie zijn om
+            dat te zien!
+        ensure_member!:
+          accept_tos_for_orgs: Accepteer de servicevoorwaarden voor organisaties.
+          not_a_member_of_that_org: Je bent geen lid van die organisatie!
+        ensure_not_ambassador_organization!:
+          must_be_an_admin: Je moet een admin zijn om dat te doen!
+      bikes:
+        update:
+          bike_impounded: "%{bike_type} in beslag genomen!"
+          unable_to_impound: 'Kan %{bike_type} niet in beslag nemen: %{errors}'
+          unknown_update_action: Onbekende updateactie. Neem contact op met support@bikeindex.org
+          your_org_not_permitted_to_impound: Uw organisatie heeft geen toestemming
+            om fietsen in beslag te nemen. Neem contact op met support@bikeindex.org.
+      bulk_imports:
+        create:
+          bulk_import_created: Bulkimport gemaakt!
+          file_imported: Bestand geïmporteerd
+          unable_to_create_bulk_import: Kan bulkimport niet maken.
+        ensure_access_to_bulk_import!:
+          org_does_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
+            contact op met Bike Index support.
+        show:
+          unable_to_find_import: Kan die import niet vinden.
+      exports:
+        create:
+          wait_to_download: Export gemaakt. Wacht tot het klaar is met verwerken om
+            het te kunnen downloaden.
+          with_avery_redirect: Export gemaakt. Zodra de verwerking is voltooid, wordt
+            u automatisch doorverwezen om de Avery-labels te downloaden.
+        create_avery_export:
+          do_not_have_permission: Je hebt geen toestemming om dat soort export te
+            maken! Neem contact op met support@bikeindex.org.
+          sticker_already_assigned: Die sticker is al toegewezen! Kies een nieuwe
+            initiële Stickery_assigned.
+        destroy:
+          export_deleted: Export is succesvol verwijderd!
+        ensure_access_to_exports!:
+          your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
+            neem contact op met Bike Index support.
+        update:
+          bike_codes_removed: Fietscodes verwijderd!
+          unknown_update_action: Onbekende updateactie!
+      manage:
+        destroy:
+          contact_support_to_delete: Neem contact op met support@bikeindex.org om
+            %{org_name} te verwijderen.
+          deleted_org: "%{org_name} verwijderd."
+        update:
+          could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
+            van %{org_name}.
+          updated_successfully: "%{org_name} is succesvol bijgewerkt."
+      messages:
+        create:
+          message_sent: "%{message_kind} bericht verzonden"
+          unable_to_send: Kan bericht niet verzenden - %{errors}
+        ensure_permitted_message_kind!:
+          your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
+            neem contact op met Bike Index support.
+      stickers:
+        ensure_access_to_bike_codes!:
+          org_does_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
+            contact op met Bike Index support.
+        find_bike_code:
+          unable_to_find_sticker: 'Kan sticker met code niet vinden: %{bike_code}.'
+        update:
+          cannot_update: Je kunt dat %{bike_code_kind} niet bijwerken. Neem contact
+            op met support@bikeindex.org als u denkt dat dit mogelijk zou moeten zijn.
+      users:
+        create:
+          insufficient_invitations: U hebt geprobeerd %{invite_count} gebruikers uit
+            te nodigen, maar %{org_name} kan alleen * %{remaining_invite_count} meer
+            * uitnodigen. Nodig minder uit of neem contact op met ondersteuning.
+          no_remaining_user_invitations: "%{org_name} heeft geen gebruikersuitnodigingen
+            meer. Neem contact op met support@bikeindex.org."
+          user_was_invited: "%{invited_email} was uitgenodigd voor %{org_name}!"
+          users_invited: "%{invite_count} gebruikers uitgenodigd voor %{org_name}"
+        destroy:
+          deleted_user: Verwijderde gebruiker uit uw organisatie.
+        reject_self_updates:
+          cannot_remove_yourself: Sorry, je kunt jezelf niet uit de organisatie verwijderen.
+            Neem contact met ons op via support@bikeindex.org als dit problematisch
+            is.
+        update:
+          updated_membership: Bijgewerkt lidmaatschap voor %{user_email}.
   customer_mailer:
     additional_email_confirmation:
       html:
