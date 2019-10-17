@@ -1,6 +1,6 @@
 class OwnershipsController < ApplicationController
   before_filter :find_ownership
-  before_filter -> { authenticate_user(no_user_flash_msg) }
+  before_filter :authenticate_user_and_set_flash
 
   def show
     bike = Bike.unscoped.find(@ownership.bike_id)
@@ -19,17 +19,19 @@ class OwnershipsController < ApplicationController
     end
   end
 
-  def no_user_flash_msg
-    return translation(:cannot_find_bike) if @ownership&.bike.blank?
+  private
 
-    if @ownership&.user.present?
-      translation(:owner_already_has_account, bike_type: @ownership.bike.type)
+  def authenticate_user_and_set_flash
+    if @ownership&.bike.blank?
+      authenticate_user(translation_key: :cannot_find_bike)
+    elsif @ownership&.user.present?
+      authenticate_user(translation_key: :owner_already_has_account,
+                        translation_args: { bike_type: @ownership.bike.type })
     else
-      translation(:create_an_account_to_claim, bike_type: @ownership.bike.type)
+      authenticate_user(translation_key: :create_account_to_claim,
+                        translation_args: { bike_type: @ownership.bike.type })
     end
   end
-
-  private
 
   def find_ownership
     @ownership = Ownership.find(params[:id])

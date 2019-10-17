@@ -11,12 +11,12 @@ module Organized
 
     def update
       if @organization.update_attributes(permitted_parameters)
-        flash[:success] = "#{current_organization.name} updated successfully"
+        flash[:success] = translation(:updated_successfully, org_name: current_organization.name)
         redirect_path = params[:locations_page] ? locations_organization_manage_index_path(organization_id: current_organization.to_param) : current_index_path
         redirect_to redirect_path
       else
         @page_errors = @organization.errors
-        flash[:error] = "We're sorry, we had trouble updating #{current_organization.name}"
+        flash[:error] = translation(:could_not_update, org_name: current_organization.name)
         render :index
       end
     end
@@ -24,12 +24,12 @@ module Organized
     def destroy
       organization_name = current_organization.name
       if current_organization.is_paid
-        flash[:info] = "Please contact support@bikeindex.org to delete #{organization_name}"
+        flash[:info] = translation(:contact_support_to_delete, org_name: organization_name)
         redirect_to current_index_path and return
       end
       notify_admins("organization_destroyed")
       current_organization.destroy
-      flash[:info] = "Deleted #{organization_name}"
+      flash[:info] = translation(:deleted_org, org_name: organization_name)
       redirect_to user_root_url
     end
 

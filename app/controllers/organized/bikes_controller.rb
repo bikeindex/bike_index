@@ -41,15 +41,17 @@ module Organized
           bike = Bike.find(params[:id])
           impound_record = bike.impound(current_user, organization: current_organization)
           if impound_record.valid?
-            flash[:success] = "#{bike.type} impounded!"
+            flash[:success] = translation(:bike_impounded, bike_type: bike.type)
           else
-            flash[:error] = "Unable to impound #{bike.type}: #{impound_record.errors.full_messages.to_sentence}"
+            flash[:error] = translation(:unable_to_impound,
+                                        bike_type: bike.type,
+                                        errors: impound_record.errors.full_messages.to_sentence)
           end
         else
-          flash[:error] = "Your organization doesn't have permission to impound bikes, please contact support@bikeindex.org"
+          flash[:error] = translation(:your_org_not_permitted_to_impound)
         end
       else
-        flash[:error] = "Unknown update action. Please contact support@bikeindex.org"
+        flash[:error] = translation(:unknown_update_action)
       end
       redirect_to :back
     end

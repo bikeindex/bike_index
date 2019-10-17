@@ -37,9 +37,9 @@ module Organized
     def create
       @organization_message = OrganizationMessage.new(permitted_parameters)
       if @organization_message.save
-        flash[:success] = "#{@organization_message.kind} message sent"
+        flash[:success] = translation(:message_sent, message_kind: @organization_message.kind)
       else
-        flash[:error] = "Unable to send message - #{@organization_message.errors.full_messages.to_sentence}"
+        flash[:error] = translation(:unable_to_send, errors: @organization_message.errors.full_messages.to_sentence)
       end
       redirect_to :back
     end
@@ -56,7 +56,7 @@ module Organized
       @kinds = Array(params.dig(:organization_message, :kind_slug) || params[:kind])
       @kinds = current_organization.message_kinds unless @kinds.any?
       return true if current_organization.paid_for?(@kinds)
-      flash[:error] = "Your organization doesn't have access to that, please contact Bike Index support"
+      flash[:error] = translation(:your_org_does_not_have_access)
       if current_organization.message_kinds.any?
         redirect_to organization_messages_path(organization_id: current_organization.to_param, kind: current_organization.message_kinds.first)
       else

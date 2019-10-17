@@ -19,7 +19,7 @@ module Organized
     # This is exactly the same as bike_codes_controller update - except the redirect is different
     def update
       if !@bike_code.claimable_by?(current_user)
-        flash[:error] = "You can't update that #{@bike_code.kind}. Please contact support@bikeindex.org if you think you should be able to"
+        flash[:error] = translation(:cannot_update, bike_code_kind: @bike_code.kind)
       else
         bike_id = params[:bike_id].present? ? params[:bike_id] : params.dig(:bike_code, :bike_id)
         @bike_code.claim(current_user, bike_id)
@@ -50,7 +50,7 @@ module Organized
       # use the loosest lookup, but only permit it if the user can claim that
       @bike_code = bike_code if bike_code.present? && bike_code.claimable_by?(current_user)
       return @bike_code if @bike_code.present?
-      flash[:error] = "Unable to find sticker with code: #{bike_code_code}"
+      flash[:error] = translation(:unable_to_find_sticker, bike_code: bike_code_code)
       redirect_to organization_stickers_path(organization_id: current_organization.to_param) and return
     end
 
@@ -66,7 +66,7 @@ module Organized
 
     def ensure_access_to_bike_codes!
       return true if current_organization.paid_for?("bike_codes") || current_user.superuser?
-      flash[:error] = "Your organization doesn't have access to that, please contact Bike Index support"
+      flash[:error] = translation(:org_does_not_have_access)
       redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
     end
 

@@ -31,8 +31,9 @@ module ControllerHelpers
     Rack::MiniProfiler.authorize_request unless Rails.env.test?
   end
 
-  def authenticate_user(msg = nil, flash_type: :error)
-    msg ||= "Sorry, you have to log in"
+  def authenticate_user(translation_key: nil, translation_args: {}, flash_type: :error)
+    translation_key ||= :you_have_to_log_in
+
     # Make absolutely sure the current user is confirmed - mainly for testing
     if current_user&.confirmed?
       return true if current_user.terms_of_service
@@ -40,8 +41,13 @@ module ControllerHelpers
     elsif current_user&.unconfirmed? || unconfirmed_current_user.present?
       redirect_to please_confirm_email_users_path and return
     else
-      flash[flash_type] = msg
-      if msg.match(/create an account/i).present?
+      flash[flash_type] = translation(
+        translation_key,
+        **translation_args,
+        scope: [:controllers, :concerns, :controller_helpers, __method__],
+      )
+
+      if translation_key.to_s.match?(/create.+account/)
         redirect_to new_user_url(subdomain: false, partner: sign_in_partner) and return
       else
         redirect_to new_session_url(subdomain: false, partner: sign_in_partner) and return
@@ -93,7 +99,9 @@ module ControllerHelpers
       cookies[:return_to] = nil
       case target.downcase
       when "password_reset"
-        flash[:success] = "You've been logged in. Please reset your password"
+        flash[:success] =
+          translation(:reset_your_password,
+                      scope: [:controllers, :concerns, :controller_helpers, __method__])
         render action: :update_password and return true
       when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
         redirect_to(target) and return true
@@ -191,13 +199,13 @@ module ControllerHelpers
 
   def require_member!
     return true if current_user.member_of?(current_organization)
-    flash[:error] = "You're not a member of that organization!"
+    flash[:error] = translation(:not_an_org_member, scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to user_home_url(subdomain: false) and return
   end
 
   def require_admin!
     return true if current_user.admin_of?(current_organization)
-    flash[:error] = "You have to be an organization administrator to do that!"
+    flash[:error] = translation(:not_an_org_admin, scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to user_home_url and return
   end
 
@@ -206,7 +214,7 @@ module ControllerHelpers
     content_accessible = ["news"]
     type = "content" if content_accessible.include?(controller_name)
     return true if current_user.present? && current_user.superuser?
-    flash[:error] = "You don't have permission to do that!"
+    flash[:error] = translation(:not_permitted_to_do_that, scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to user_root_url and return
   end
 end

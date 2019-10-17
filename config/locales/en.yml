@@ -1498,7 +1498,6 @@ en:
         bike_has_not_been_claimed_yet: >-
           That %{bike_type} hasn't been claimed yet. If it's your %{bike_type}, sign
           up and you'll be able to edit it!
-        please_create_an_account: Please create an account
         you_dont_own_that: Oh no! It looks like you don't own that %{bike_type}.
         you_have_to_sign_in: Whoops! You have to sign in to be able to edit that %{bike_type}.
       find_bike:
@@ -1521,6 +1520,31 @@ en:
         unable_to_find_sticker: 'Unable to find sticker: %{scanned_id}'
       update:
         bike_was_updated: Bike successfully updated!
+    concerns:
+      controller_helpers:
+        authenticate_user:
+          cannot_find_bike: Cannot find that bike.
+          create_account: Please create an account.
+          create_account_to_claim: >-
+            Create an account to claim that %{bike_type}! Use the email you used when
+            registering it and you will be able to claim it after signing up!
+          owner_already_has_account: >-
+            The owner of this %{bike_type} already has an account on Bike Index. Sign
+            in to claim it!
+          you_have_to_log_in: Sorry, you have to log in.
+        require_admin!:
+          not_an_org_admin: You have to be an organization administrator to do that!
+        require_index_admin!:
+          not_permitted_to_do_that: You don't have permission to do that!
+        require_member!:
+          not_an_org_member: You're not a member of that organization!
+        return_to_if_present:
+          reset_your_password: You've been logged in. Please reset your password
+      sessionable:
+        sign_in_and_redirect:
+          logged_in: Logged in!
+        skip_if_signed_in:
+          already_signed_in: You're already signed in!
     feedbacks:
       block_the_spam:
         please_sign_in: Please sign in to send that message
@@ -1537,6 +1561,10 @@ en:
         lock_created: Lock created successfully!
       find_lock:
         not_your_lock: Whoops, that's not your lock!
+    oauth:
+      applications:
+        ensure_app_owner!:
+          not_your_application: That isn't your application
     organizations:
       create:
         organization_created: Organization Created successfully!
@@ -1555,14 +1583,110 @@ en:
         no_user: >-
           We're sorry, that organization doesn't have a user set up to register bikes
           through. Email contact@bikeindex.org if this seems like an error.
+    organized:
+      ambassador_task_assignments:
+        update:
+          could_not_update: Could not update activity status. Please try again later.
+          status_updated: Activity status updated.
+      base:
+        ensure_admin!:
+          must_be_org_admin: You have to be an organization administrator to do that!
+        ensure_ambassador_authorized!:
+          must_be_ambassador: You have to be an ambassador to do that!
+          must_be_in_ambassador_org: You have to be in an ambassador organization
+            to see that!
+        ensure_member!:
+          accept_tos_for_orgs: Please accept the terms of service for organizations.
+          not_a_member_of_that_org: You're not a member of that organization!
+        ensure_not_ambassador_organization!:
+          must_be_an_admin: You have to be an admin to do that!
+      bikes:
+        update:
+          bike_impounded: "%{bike_type} impounded!"
+          unable_to_impound: 'Unable to impound %{bike_type}: %{errors}'
+          unknown_update_action: Unknown update action. Please contact support@bikeindex.org
+          your_org_not_permitted_to_impound: >-
+            Your organization doesn't have permission to impound bikes, please contact
+            support@bikeindex.org.
+      bulk_imports:
+        create:
+          bulk_import_created: Bulk Import created!
+          file_imported: File imported
+          unable_to_create_bulk_import: Unable to create bulk import.
+        ensure_access_to_bulk_import!:
+          org_does_not_have_access: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
+        show:
+          unable_to_find_import: Unable to find that import.
+      exports:
+        create:
+          wait_to_download: >-
+            Export Created. Please wait for it to finish processing to be able to
+            download it.
+          with_avery_redirect: >-
+            Export Created. Once it's finished processing you will be automatically
+            directed to download the Avery labels.
+        create_avery_export:
+          do_not_have_permission: >-
+            You don't have permission to make that sort of export! Please contact
+            support@bikeindex.org.
+          sticker_already_assigned: >-
+            That sticker has already been assigned! Please choose a new initial Stickery_assigned.
+        destroy:
+          export_deleted: Export was successfully deleted!
+        ensure_access_to_exports!:
+          your_org_does_not_have_access: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
+        update:
+          bike_codes_removed: Bike codes removed!
+          unknown_update_action: Unknown update action!
+      manage:
+        destroy:
+          contact_support_to_delete: Please contact support@bikeindex.org to delete
+            %{org_name}.
+          deleted_org: Deleted %{org_name}.
+        update:
+          could_not_update: We're sorry, we had trouble updating %{org_name}.
+          updated_successfully: "%{org_name} updated successfully."
+      messages:
+        create:
+          message_sent: "%{message_kind} message sent"
+          unable_to_send: Unable to send message - %{errors}
+        ensure_permitted_message_kind!:
+          your_org_does_not_have_access: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
+      stickers:
+        ensure_access_to_bike_codes!:
+          org_does_not_have_access: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
+        find_bike_code:
+          unable_to_find_sticker: 'Unable to find sticker with code: %{bike_code}.'
+        update:
+          cannot_update: >-
+            You can't update that %{bike_code_kind}. Please contact support@bikeindex.org
+            if you think you should be able to.
+      users:
+        create:
+          insufficient_invitations: >-
+            You tried to invite %{invite_count} users, but %{org_name} only can invite
+            *%{remaining_invite_count} more*. Invite fewer or contact support.
+          no_remaining_user_invitations: "%{org_name} is out of user invitations.
+            Contact support@bikeindex.org."
+          user_was_invited: "%{invited_email} was invited to %{org_name}!"
+          users_invited: "%{invite_count} users invited to %{org_name}"
+        destroy:
+          deleted_user: Deleted user from your organization.
+        reject_self_updates:
+          cannot_remove_yourself: >-
+            Sorry, you can't remove yourself from the organization. Contact us at
+            support@bikeindex.org if this is problematic.
+        update:
+          updated_membership: Updated membership for %{user_email}.
     ownerships:
-      no_user_flash_msg:
-        create_an_account_to_claim: >-
-          Create an account to claim that %{bike_type}! Use the email you used when
-          registering it and you will be able to claim it after signing up!
-        owner_already_has_account: >-
-          The owner of this %{bike_type} already has an account on Bike Index. Sign
-          in to claim it!
       show:
         no_longer_your_bike: >-
           That used to be your %{bike_type} but isn't anymore! Contact us if this
@@ -1664,8 +1788,6 @@ en:
         you_can_use_bike_index: Thanks! Now you can use Bike Index.
         you_can_use_bike_index_as_org: Thanks! Now you can use Bike Index as %{org_name}
     welcome:
-      authenticate_user_for_welcome_controller:
-        create_account: Please create an account
       recovery_stories:
         no_stories_to_display: No recovery stories to display
   customer_mailer:

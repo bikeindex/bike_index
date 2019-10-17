@@ -9,7 +9,7 @@ module Sessionable
     end
     if current_user.present?
       return if return_to_if_present # If this returns true, we're returning already
-      flash[:success] = "You're already signed in!"
+      flash[:success] = translation(:already_signed_in, scope: [:controllers, :concerns, :sessionable, __method__])
       redirect_to user_root_url and return
     end
   end
@@ -30,7 +30,7 @@ module Sessionable
     elsif user.unconfirmed?
       render_partner_or_default_signin_layout(redirect_path: please_confirm_email_users_path) and return
     elsif !return_to_if_present
-      flash[:success] = "Logged in!"
+      flash[:success] = translation(:logged_in, scope: [:controllers, :concerns, :sessionable, __method__])
       redirect_to user_root_url and return
     end
   end
