@@ -5583,3 +5583,16 @@ nl:
       edit: Bewerken
       image_from: Afbeelding van %{image_title}
       looks_like_this_is_your_image: Het lijkt erop dat dit jouw afbeelding is.
+  javascript:
+    bikes_search:
+      abandoned: Verlaten
+      color: Kleur
+      location: Plaats
+      registry: Fietsregister
+      registry_id: Fietsregister ID
+      serial: Serie
+      stolen: Gestolen
+      unknown_brand: Onbekend merk
+      unknown: Onbekend
+      absent: Afwezig
+      hidden: Verborgen
