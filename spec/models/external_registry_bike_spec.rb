@@ -27,6 +27,14 @@ RSpec.describe ExternalRegistryBike, type: :model do
       bike2.save
       expect(bike2.serial_normalized).to eq("HE110")
     end
+
+    it "ensures a normalized serial number is present" do
+      bike = FactoryBot.build(:external_registry_bike, serial_number: "unknown")
+      bike.save
+      expect(bike).to_not be_valid
+      expect(bike).to_not be_persisted
+      expect(bike.errors[:serial_normalized]).to include("can't be blank")
+    end
   end
 
   describe ".find_or_search_registry_for" do

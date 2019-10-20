@@ -5,6 +5,7 @@ class ExternalRegistryBike < ActiveRecord::Base
     :country,
     :external_id,
     :serial_number,
+    :serial_normalized,
     presence: true
 
   validates :external_id, uniqueness: { scope: :type }
