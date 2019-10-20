@@ -10,7 +10,7 @@ class ExternalRegistryBike < ActiveRecord::Base
 
   validates :external_id, uniqueness: { scope: :type }
 
-  before_save :normalize_serial_number
+  before_validation :normalize_serial_number
 
   class << self
     def find_or_search_registry_for(serial_number:)
