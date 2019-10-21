@@ -30,7 +30,7 @@ class BikeIndex.BikesEditAlertPurchase extends BikeIndex
     price = $planConfirmationForm.find("#stripe_amount").val()
     handler.open
       name: "Bike Index"
-      description: "Bike Index Theft Alert"
+      description: $planConfirmationForm.data('description')
       amount: parseInt(price, 10)
       email: $planConfirmationForm.data("email")
       allowRememberMe: false
