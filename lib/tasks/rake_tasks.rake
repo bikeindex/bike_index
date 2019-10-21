@@ -24,4 +24,7 @@ task prepare_translations: :environment do
   i18n_tasks = I18n::Tasks::CLI.new
   i18n_tasks.start(["normalize"])
   i18n_tasks.start(["health"])
+
+  # Export JS translations to public/javascripts/translations.js
+  I18n::JS.export
 end
