@@ -13,6 +13,8 @@ class Blog < ActiveRecord::Base
   before_save :set_calculated_attributes
   before_create :set_title_slug
 
+  scope :in_language, ->(code) { where(language: languages[code.presence || I18n.locale.to_s]) }
+
   attr_accessor :post_date, :post_now, :update_title, :user_email, :timezone
 
   LANGUAGE_ENUM = {

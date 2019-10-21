@@ -21,10 +21,7 @@ class TheftAlertPlan < ActiveRecord::Base
   scope :active, -> { where(active: true) }
   scope :price_ordered_desc, -> { order(amount_cents: :desc) }
   scope :price_ordered_asc, -> { order(amount_cents: :asc) }
-
-  def title_string
-    "#{name} (#{duration_days} days)"
-  end
+  scope :in_language, ->(code) { where(language: languages[code.to_s]) }
 
   def description_html
     Kramdown::Document.new(description).to_html

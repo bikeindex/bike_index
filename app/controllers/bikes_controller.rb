@@ -174,7 +174,7 @@ class BikesController < ApplicationController
       bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
       @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
 
-      @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc
+      @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
       @selected_theft_alert_plan =
         @theft_alert_plans.find_by(id: params[:selected_plan_id]) ||
         @theft_alert_plans.min_by(&:amount_cents)
