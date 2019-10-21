@@ -34,7 +34,7 @@
           = submit_tag t(".next"), class: 'btn btn-primary'
 
       %p.nfp-info
-        - nonprofit_link = link_to t(".501c3_nonprofit"), 'https://bikeindex.org/news/bike-index--now-a-nonprofit'
+        - nonprofit_link = link_to t(".501c3_nonprofit"), news_url("bike-index--now-a-nonprofit")
         = t(".bike_index_is_a_nonprofit_html", nonprofit_link: nonprofit_link)
 
   <script src="https://checkout.stripe.com/checkout.js"></script>
