@@ -39,7 +39,8 @@
 
   <script src="https://checkout.stripe.com/checkout.js"></script>
   - payment_type = @is_payment ? 'Pay' : 'Donate'
-  - stripe_form_hash = { id: 'stripe_form', data: { key: ENV['STRIPE_PUBLISHABLE_KEY'], email: current_user && current_user.email, type: payment_type } }
+  - description = @is_payment ? t(".payment_to_bike_index") : t(".donate_to_bike_index")
+  - stripe_form_hash = { id: 'stripe_form', data: { key: ENV['STRIPE_PUBLISHABLE_KEY'], email: current_user && current_user.email, type: payment_type, description: description } }
   = form_tag payments_path, stripe_form_hash do
     = hidden_field_tag :stripe_token
     = hidden_field_tag :stripe_amount
