@@ -5019,11 +5019,11 @@ nl:
       donate: schenken
       forum: Forum
       help: Helpen
+      other_pages: Andere pagina's
       protect_your_bike: Bescherm je fiets
+      related: Verwant
       sign_up_your_organization: Meld uw organisatie aan
       where: Waar
-      other_pages: Andere pagina's
-      related: Verwant
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
