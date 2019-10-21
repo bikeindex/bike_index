@@ -225,26 +225,18 @@ module ApplicationHelper
     CodeRay.scan(JSON.pretty_generate(data), :json).div.html_safe
   end
 
-  def language_choices
-    @language_choices ||= I18n.available_locales.map do |locale|
-      [t(locale, scope: [:locales]), locale.to_s]
-    end.sort { |a, b| a[0].downcase <=> b[0].downcase }
-  end
-
-  # Language choices available for displaying blog entries.
-  # Return an array of tuples, each of the form:
+  # Language choices available for request locale and localized models (Blog,
+  # TheftAlertPlan).
+  #
+  # Return an array of tuples, each with the following strings:
+  #
   # [<localized language name>, <language key (from Blog::LANGUAGE_ENUM)>]
-  def blog_languages
-    @blog_languages ||=
-      Blog.languages.map { |lang, _| [t(lang, scope: [:locales]), lang] }
-  end
-
-  # Language choices available for displaying TheftAlertPlan descriptions.
-  # Return an array of tuples, each of the form:
-  # [<localized language name>, <language key (from TheftAlertPlan::LANGUAGE_ENUM)>]
-  def theft_alert_plan_languages
-    @theft_alert_plan_languages ||=
-      TheftAlertPlan.languages.map { |lang, _| [t(lang, scope: [:locales]), lang] }
+  def language_choices
+    @language_choices ||=
+      I18n
+        .available_locales
+        .map { |locale| [t(locale, scope: [:locales]), locale.to_s] }
+        .sort_by { |language_name, _| language_name.downcase }
   end
 
   def bike_placeholder_image_path

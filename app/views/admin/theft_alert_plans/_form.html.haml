@@ -18,7 +18,7 @@
     %div
       = f.label :language, class: "control-label font-weight-bold mt-2"
     = f.select :language,
-      options_for_select(theft_alert_plan_languages, selected: record.language),
+      options_for_select(language_choices, selected: record.language),
       class: "form-control"
 
   = f.label :description, "Description", class: "form-label font-weight-bold mt-2 mb-0"
