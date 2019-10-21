@@ -18,6 +18,7 @@ gem "flipper-ui"
 
 # I18n - localization/translation
 gem "i18n-country-translations"
+gem "i18n-js"
 gem "rails-i18n"
 gem "translation"
 
@@ -165,7 +166,6 @@ group :development, :test do
   gem "rubocop-performance", "~> 1.1.0", require: false
   gem "rufo", "~> 0.7.0", require: false
   # I18n - localization/translation
-  gem "i18n-js"
   gem "i18n-tasks"
   gem "i18n_generators"
 end
