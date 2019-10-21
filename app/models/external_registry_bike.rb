@@ -30,12 +30,12 @@ class ExternalRegistryBike < ActiveRecord::Base
     private
 
     def brand(brand_name)
-      return "Unknown Brand" if absent?(brand_name)
+      return "unknown_brand" if absent?(brand_name)
       brand_name
     end
 
     def colors(frame_color)
-      return "Unknown" if absent?(frame_color)
+      return "unknown" if absent?(frame_color)
       frame_color
     end
 
