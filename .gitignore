@@ -51,3 +51,4 @@ coverage
 # Ignore test results
 test-results/
 spec/examples.txt
+public/javascripts
