@@ -147,7 +147,7 @@ class TwitterTweeterIntegration
       color.replace ""
     end
 
-    manufacturer = bike.manufacturer.name
+    manufacturer = bike.manufacturer&.name
     model = bike.frame_model
 
     full_length =
