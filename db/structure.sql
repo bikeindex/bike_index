@@ -2159,7 +2159,8 @@ CREATE TABLE public.theft_alert_plans (
     description character varying DEFAULT ''::character varying NOT NULL,
     active boolean DEFAULT true NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    language integer DEFAULT 0 NOT NULL
 );
 
 
@@ -4827,4 +4828,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190919145324');
 INSERT INTO schema_migrations (version) VALUES ('20190923181352');
 
 INSERT INTO schema_migrations (version) VALUES ('20191010182940');
+
+INSERT INTO schema_migrations (version) VALUES ('20191018140618');
 

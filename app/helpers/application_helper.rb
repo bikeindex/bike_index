@@ -239,6 +239,14 @@ module ApplicationHelper
       Blog.languages.map { |lang, _| [t(lang, scope: [:locales]), lang] }
   end
 
+  # Language choices available for displaying TheftAlertPlan descriptions.
+  # Return an array of tuples, each of the form:
+  # [<localized language name>, <language key (from TheftAlertPlan::LANGUAGE_ENUM)>]
+  def theft_alert_plan_languages
+    @theft_alert_plan_languages ||=
+      TheftAlertPlan.languages.map { |lang, _| [t(lang, scope: [:locales]), lang] }
+  end
+
   def bike_placeholder_image_path
     image_path("revised/bike_photo_placeholder.svg")
   end

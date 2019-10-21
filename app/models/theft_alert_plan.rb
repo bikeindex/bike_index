@@ -1,6 +1,12 @@
 class TheftAlertPlan < ActiveRecord::Base
   include Amountable
 
+  LANGUAGE_ENUM = {
+    en: 0,
+    nl: 1,
+  }.freeze
+  enum language: LANGUAGE_ENUM
+
   validates :name,
             :amount_cents,
             :views,
