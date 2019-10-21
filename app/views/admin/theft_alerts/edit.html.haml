@@ -21,7 +21,7 @@
           class: "form-control"
     .col-sm-6
       .form-group
-        - plan_options = TheftAlertPlan.active.map { |e| [e.title_string, e.id] }
+        - plan_options = TheftAlertPlan.active.map { |e| [theft_alert_plan_title(e), e.id] }
         = f.label :theft_alert_plan_id
         = f.select :theft_alert_plan_id,
           options_for_select(plan_options, @theft_alert.theft_alert_plan.id),
