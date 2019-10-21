@@ -17,15 +17,21 @@ RSpec.describe ExternalRegistryBike, type: :model do
     end
   end
 
-  describe "#normalize_serial_number before_save hooks" do
+  describe "#normalize_serial_number before_validation hooks" do
     it "normalizes the serial number" do
-      bike1 = FactoryBot.build(:external_registry_bike, serial_number: "hello")
-      bike1.save
+      bike1 = FactoryBot.create(:external_registry_bike, serial_number: "hello")
       expect(bike1.serial_normalized).to eq("HE110")
 
-      bike2 = FactoryBot.build(:external_registry_bike, serial_number: "heIIO")
-      bike2.save
+      bike2 = FactoryBot.create(:external_registry_bike, serial_number: "heIIO")
       expect(bike2.serial_normalized).to eq("HE110")
+    end
+
+    it "ensures a normalized serial number is present" do
+      bike = FactoryBot.build(:external_registry_bike, serial_number: "unknown")
+      bike.save
+      expect(bike).to_not be_valid
+      expect(bike).to_not be_persisted
+      expect(bike.errors[:serial_normalized]).to include("can't be blank")
     end
   end
 

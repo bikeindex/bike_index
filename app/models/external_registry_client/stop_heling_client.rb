@@ -54,6 +54,8 @@ class ExternalRegistryClient::StopHelingClient < ExternalRegistryClient
   def results_from(response_body:)
     case response_body
     when Array
+      # Exclude non-bikes, any bikes without serial numbers, since we won't be
+      # searching for these.
       response_body
         .map { |result| translate_keys(result) }
         .map { |attrs| ExternalRegistryBike::StopHelingBike.build_from_api_response(attrs) }
