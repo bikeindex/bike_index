@@ -108,6 +108,8 @@ class ExternalRegistryClient::VerlorenOfGevondenClient < ExternalRegistryClient
   end
 
   def external_registry_bikes_from(result_pages:)
+    # Exclude non-bikes, any bikes without serial numbers, since we won't be
+    # searching for these.
     result_pages
       .map { |result| ExternalRegistryBike::VerlorenOfGevondenBike.build_from_api_response(result) }
       .compact

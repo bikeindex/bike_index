@@ -49,6 +49,8 @@ class ExternalRegistryClient::Project529Client < ExternalRegistryClient
       raise Project529ClientError, response
     end
 
+    # Exclude non-bikes, any bikes without serial numbers, since we won't be
+    # searching for these.
     results =
       response
         .dig(:body, :bikes)
