@@ -3210,6 +3210,19 @@ en:
       signup_page: signup page
       us_partner_organizations: US Partner organizations
       website_for_organization: "%{org_name} website"
+  javascript:
+    bikes_search:
+      abandoned: Abandoned
+      absent: Absent
+      color: Color
+      hidden: Hidden
+      location: Location
+      registry: Registry
+      registry_id: Registry ID
+      serial: Serial
+      stolen: Stolen
+      unknown: Unknown
+      unknown_brand: Unknown Brand
   landing_pages:
     ambassadors_current:
       after_a_couple_of_recoveries_i_got_hooked: >-

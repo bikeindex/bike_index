@@ -1,0 +1,3 @@
+translations:
+- file: "public/javascripts/translations.js"
+  only: "*.javascript.*"
