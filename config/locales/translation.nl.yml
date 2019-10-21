@@ -5010,6 +5010,20 @@ nl:
       error: Fout
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
         dit %{object_name} wordt opgeslagen:"
+    content_skeleton:
+      about: Over
+      bicycle_serials: Fietsseries
+      bike_index_news: Bike Index nieuws
+      bike_index_store: Bike Index Store
+      design_and_developer_resources: Ontwerp- en ontwikkelaarbronnen
+      donate: schenken
+      forum: Forum
+      help: Helpen
+      protect_your_bike: Bescherm je fiets
+      sign_up_your_organization: Meld uw organisatie aan
+      where: Waar
+      other_pages: Andere pagina's
+      related: Verwant
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>

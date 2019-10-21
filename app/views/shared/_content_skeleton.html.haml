@@ -1,50 +1,48 @@
 .container
   .row
     / Unless one of the whitelisted pages, wrap it in .legacy-content-wrap
-    - additional_class = %w().include?(content_page_type) ? '' : 'legacy-content-wrap'
+    - additional_class = %w().include?(content_page_type) ? "" : "legacy-content-wrap"
     .col-md-8.primary-content-block{ class: additional_class }
 
       = yield
     .col-md-4.primary-content-menu
       %nav.content-nav-group
-        %h3
-          Related
+        %h3= t(".related")
         %ul
-          - if content_page_type == 'news'
+          - if content_page_type == "news"
             %li
-              = active_link 'Bike Index news', news_index_path
+              = active_link t(".bike_index_news"), news_index_path
           %li
-            = active_link 'About', about_path
+            = active_link t(".about"), about_path
           - unless content_page_type == 'news'
             %li
-              = active_link 'Forum', discuss_url
+              = active_link t(".forum"), discuss_url
             %li
-              = active_link 'Help', help_url
+              = active_link t(".help"), help_url
             %li
-              = active_link 'Where', where_path
+              = active_link t(".where"), where_path
             - if %w(manufacturers where).include?(content_page_type)
               %li
-                = active_link 'Sign up your organization', new_organization_path
+                = active_link t(".sign_up_your_organization"), new_organization_path
 
       %nav.content-nav-group
-        %h3
-          Other pages
+        %h3= t(".other_pages")
         %ul
           %li
-            = active_link 'Bike Index news', news_index_path
+            = active_link t(".bike_index_news"), news_index_path
           %li
-            = active_link 'Protect your bike', protect_your_bike_path
+            = active_link t(".protect_your_bike"), protect_your_bike_path
           %li
-            = active_link 'Bicycle Serials', serials_path
+            = active_link t(".bicycle_serials"), serials_path
           - if %w(news about manufacturers).include?(content_page_type)
             %li
-              = active_link 'Donate', support_the_index_path
+              = active_link t(".donate"), support_the_index_path
           - if %w(news serials manufacturers).include?(content_page_type)
             %li
-              = active_link 'Bike Index Store', shop_path
+              = active_link t(".bike_index_store"), shop_path
           %li
-            = active_link 'Design and developer resources', dev_and_design_path
+            = active_link t(".design_and_developer_resources"), dev_and_design_path
           %li
-            = active_link 'Sign up your organization', new_organization_path
+            = active_link t(".sign_up_your_organization"), new_organization_path
 
       .ad-block#right300x600

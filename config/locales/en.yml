@@ -4678,6 +4678,20 @@ en:
       sign_in_using_strava: Sign in using Strava
       sign_up: sign up
   shared:
+    content_skeleton:
+      about: About
+      bicycle_serials: Bicycle serials
+      bike_index_news: Bike Index news
+      bike_index_store: Bike Index Store
+      design_and_developer_resources: Design and developer resources
+      donate: Donate
+      forum: Forum
+      help: Help
+      other_pages: Other pages
+      protect_your_bike: Protect your bike
+      related: Related
+      sign_up_your_organization: Sign up your organization
+      where: Where
     donate_modal:
       bikeindex_is_a_nonprofit: >-
         Bike Index is a 501(c)(3) nonprofit. We depend on donations to provide these
