@@ -10,6 +10,10 @@
     = javascript_include_tag 'application_revised'
     = javascript_include_tag "i18n"
     = javascript_include_tag "translations", skip_pipeline: true
+    :javascript
+      window.BikeIndex.translator = (keyspace) => {
+        return (key, args={}) => I18n.t(`javascript.${keyspace}.${key}`, args);
+      }
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
   %body{ id: page_id, class:  body_class }
     %nav.primary-header-nav
@@ -155,3 +159,7 @@
     = render "/shared/donate_modal", locals: { kind: donation_request } if donation_request.present?
 
     = render 'shared/footer_revised'
+
+:javascript
+  I18n.defaultLocale = "#{I18n.default_locale}"
+  I18n.locale = "#{I18n.locale}"
