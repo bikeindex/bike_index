@@ -13,7 +13,9 @@ class PaidFeature < ActiveRecord::Base
 
   has_many :invoice_paid_features
   has_many :invoices, through: :invoice_paid_features
+
   validates_uniqueness_of :name
+  validates :currency, presence: true
 
   enum kind: KIND_ENUM
 

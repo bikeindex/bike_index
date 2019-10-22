@@ -1163,7 +1163,8 @@ CREATE TABLE public.invoices (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     notes text,
-    child_paid_feature_slugs jsonb
+    child_paid_feature_slugs jsonb,
+    currency character varying DEFAULT 'USD'::character varying NOT NULL
 );
 
 
@@ -1785,7 +1786,8 @@ CREATE TABLE public.paid_features (
     details_link character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    feature_slugs text[] DEFAULT '{}'::text[]
+    feature_slugs text[] DEFAULT '{}'::text[],
+    currency character varying DEFAULT 'USD'::character varying NOT NULL
 );
 
 
@@ -2161,7 +2163,8 @@ CREATE TABLE public.theft_alert_plans (
     active boolean DEFAULT true NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    language integer DEFAULT 0 NOT NULL
+    language integer DEFAULT 0 NOT NULL,
+    currency character varying DEFAULT 'USD'::character varying NOT NULL
 );
 
 
@@ -4833,4 +4836,6 @@ INSERT INTO schema_migrations (version) VALUES ('20191010182940');
 INSERT INTO schema_migrations (version) VALUES ('20191018140618');
 
 INSERT INTO schema_migrations (version) VALUES ('20191022123037');
+
+INSERT INTO schema_migrations (version) VALUES ('20191022143755');
 

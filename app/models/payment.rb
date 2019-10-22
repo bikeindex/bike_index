@@ -12,7 +12,9 @@ class Payment < ActiveRecord::Base
   belongs_to :organization
   belongs_to :invoice
   has_one :theft_alert
+
   validate :email_or_organization_present
+  validates :currency, presence: true
 
   before_validation :set_calculated_attributes
   after_create :send_invoice_email

@@ -1,11 +1,6 @@
 module Amountable
   extend ActiveSupport::Concern
 
-  # TODO: Remove method once all Amountable models have a `currency` column.
-  def currency
-    self[:currency].presence || "USD"
-  end
-
   def amount
     amnt = (amount_cents.to_i / 100.00)
     amnt % 1 != 0 ? amnt : amnt.round
