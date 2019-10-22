@@ -48,13 +48,15 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
 - Go to [localhost:3001](http://localhost:3001)
 
-| Toggle in development | command | default |
-| --------- | ------- | ------- |
-| Spring    | `bin/rake dev:spring` | disabled |
-| Caching   | `bin/rake dev:cache` | disabled |
-| [letter_opener](https://github.com/ryanb/letter_opener) | `bin/rake dev:letter_opener` | enabled |
+| Toggle in development | command                      | default  |
+| ---------             | -------                      | -------  |
+| Spring                | `bin/rake dev:spring`        | disabled |
+| Caching               | `bin/rake dev:cache`         | disabled |
+| [letter_opener][]     | `bin/rake dev:letter_opener` | enabled  |
 
-## Translation
+[letter_opener]: https://github.com/ryanb/letter_opener
+
+## Internationalization
 
 We're using [translation.io](https://translation.io) to manage internationalization:
 [translation.io/bikeindex/bike_index](https://translation.io/bikeindex/bike_index)
@@ -62,8 +64,7 @@ We're using [translation.io](https://translation.io) to manage internationalizat
 To contribute, sign up for an account there and ask to be added to the project
 as a translator.
 
-**Non-English translation files should be treated as read-only.** We sync these
-with our translation.io project
+**Non-English translation files should be treated as read-only.** We sync these with our translation.io project.
 
 If you modify the English translation file
 [config/locales/en.yml](config/locales/en.yml), run:
@@ -74,6 +75,119 @@ bin/rake prepare_translations
 
 before pushing to GitHub. This will normalize translation file formatting and
 check for missing or unused keys.
+
+### Conventions
+
+#### Views and Helpers
+
+In the view layer (templates and helper modules), externalize strings using the
+`I18n.t()` translation helper directly. Templates typically use the
+["lazy" lookup][i18n-lazy] form.
+
+To aid translation, it's desirable to externalize strings in a form as close to
+semantically complete as possible - i.e., use coarse conditional branching in
+templates. Duplication is desirable when its alernative breaks up a string into
+units that, in isolation, might lose their surrounding context.
+
+#### URL helpers and embedded links
+
+Prefer URL helpers to hard-coded URLs. The former will forward the `locale`
+query param when it's present.
+
+Embedded links are typically translated separately and passed to an enclosing
+[`html_safe` translation][i18n-html-safe] (note the `_html` suffix in the
+translation key):
+
+```haml
+- logout_link = link_to t(".log_out"), session_path(redirect_location: 'new_user'), method: :delete
+= t(".if_you_dont_want_that_to_be_the_case_html", logout_link: logout_link)
+```
+
+[i18n-lazy]: https://guides.rubyonrails.org/i18n.html#lazy-lookup
+[i18n-html-safe]: https://guides.rubyonrails.org/i18n.html#using-safe-html-translations
+
+#### Mailers
+
+Mailers are namespaced by mailer name, email name, and email format as follows
+(note the `.text` and `.html` in the translation keys):
+
+```yaml
+# config/locales/en.yml
+
+geolocated_message:
+  html:
+    is_located_at_html: 'Is located at: <strong>%{address}</strong>'
+  text:
+    your_bike_is_at: 'Your %{bike} is at: %{address}'
+```
+
+```haml
+-# app/views/organized_mailer/geolocated_message.html.haml
+
+%p= t(".html.is_located_at_html", address: @organization_message.address)
+```
+
+```haml
+-# app/views/organized_mailer/geolocated_message.text.haml
+
+= t(".text.your_bike_is_at", bike: @bike.type, address: @organization_message.address)
+```
+
+#### Controllers
+
+Controllers use the `translation` helper method defined in `ControllerHelpers`.
+This method wraps `I18n.translate` and infers the scope in accordance with the
+convention of scoping translations by their lexical location in the code base.
+
+Both `:scope` and `:controller_method` can be overriden using the corresponding
+keyword args. Note that base controllers should be passed `:scope` or
+`:controller_method` explicitly. See the `translation` method docstring for
+implementation details
+
+```rb
+# app/controllers/concerns/controller_helpers.rb
+
+def translation(key, scope: nil, controller_method: nil, **kwargs)
+  # . .
+  scope ||= [:controllers, controller_namespace, controller_name, controller_method.to_sym]
+  I18n.t(key, **kwargs, scope: scope.compact)
+end
+```
+
+
+#### JavaScript
+
+Client-side translations are defined under the `:javascript` keyspace in `en.yml`.
+
+```yml
+# config/locales/en.yml
+
+javascript:
+  bikes_search:
+```
+
+The translation method can be invoked directly as `I18n.t()` and passed a
+complete scope:
+
+```jsx
+<span className="attr-title">{I18n.t("javascript.bikes_search.registry")}</span>
+```
+
+Equivalently, a curried instance of `I18n.t` can be initiated locally (by
+convention, bound to `t`) with the local keyspace set as needed:
+
+```jsx
+// app/javascript/packs/external_registry_search/components/ExternalRegistrySearchResult.js
+
+const t = BikeIndex.translator("bikes_search");
+// . . .
+<span className="attr-title">{t("registry")}</span>
+```
+
+A client-side JS translations file is generated when the `prepare_translations`
+rake task is run. See [PR #1353][pr-1353] for implementation details.
+
+[pr-1353]: https://github.com/bikeindex/bike_index/pull/1353
 
 ### Syncing Translations
 
