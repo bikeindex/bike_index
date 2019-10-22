@@ -47,7 +47,7 @@
               = srecord.label :estimated_value, class: 'form-well-label'
               .form-well-input.input-group{ style: 'max-height: 2.5rem;'}
                 .input-group-addon
-                  $
+                  = t("number.currency.format.unit")
                 = srecord.number_field :estimated_value, min: '1', class: 'form-control'
 
             - unless @bike.abandoned?

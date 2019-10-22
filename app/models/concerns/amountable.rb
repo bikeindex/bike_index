@@ -1,8 +1,9 @@
 module Amountable
   extend ActiveSupport::Concern
 
+  # TODO: Remove method once all Amountable models have a `currency` column.
   def currency
-    "USD"
+    self[:currency].presence || "USD"
   end
 
   def amount

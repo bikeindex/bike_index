@@ -1863,7 +1863,8 @@ CREATE TABLE public.payments (
     is_payment boolean DEFAULT false NOT NULL,
     kind integer DEFAULT 0,
     organization_id integer,
-    invoice_id integer
+    invoice_id integer,
+    currency character varying DEFAULT 'USD'::character varying NOT NULL
 );
 
 
@@ -4830,4 +4831,6 @@ INSERT INTO schema_migrations (version) VALUES ('20190923181352');
 INSERT INTO schema_migrations (version) VALUES ('20191010182940');
 
 INSERT INTO schema_migrations (version) VALUES ('20191018140618');
+
+INSERT INTO schema_migrations (version) VALUES ('20191022123037');
 

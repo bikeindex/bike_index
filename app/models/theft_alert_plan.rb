@@ -4,6 +4,7 @@ class TheftAlertPlan < ActiveRecord::Base
 
   validates :name,
             :amount_cents,
+            :currency,
             :views,
             :duration_days,
             presence: true
