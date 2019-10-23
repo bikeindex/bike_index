@@ -113,6 +113,35 @@ module ControllerHelpers
     end
   end
 
+  # Wrap `I18n.translate` for use in controllers, abstracting away
+  # scope-setting. By default, translations are scoped as follows:
+  #
+  # :controllers
+  # > [controller_namespace] (possibly none)
+  # > [controller_name]
+  # > [controller_method where `translate` is invoked (inferred dynamically not lexically -- see note below)]
+  #
+  # Either the controller method or the entire scope can be overridden via the
+  # corresponding keyword args, the latter taking precedence if both are
+  # provided.
+  #
+  # Note that when `translation` is invoked in an ancestor controller or mixin,
+  # `scope` should be provided explicitly, as the calling method will vary
+  # dynamically but for the sake of mapping to an entry in the translation file,
+  # a one-to-one, lexically-scoped mapping is desirable.
+  #
+  # For example, in `ApplicationController#handle_unverified_request` we have
+  #
+  #   flash[:error] = translation(:csrf_invalid, scope: [:controllers, :application, __method__])
+  #
+  # which maps to controllers.application.handle_unverified_request.csrf_invalid.
+  #
+  # In `LocksController#find_lock`, by contrast, the full scope can be inferred
+  # from the method invocation:
+  #
+  #   flash[:error] = translation(:not_your_lock)
+  #
+  # maps to controllers.locks.find_lock.not_your_lock.
   def translation(key, scope: nil, controller_method: nil, **kwargs)
     if scope.blank? && controller_method.blank?
       controller_method =

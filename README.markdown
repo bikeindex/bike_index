@@ -48,42 +48,17 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
 - Go to [localhost:3001](http://localhost:3001)
 
-| Toggle in development | command | default |
-| --------- | ------- | ------- |
-| Spring    | `bin/rake dev:spring` | disabled |
-| Caching   | `bin/rake dev:cache` | disabled |
-| [letter_opener](https://github.com/ryanb/letter_opener) | `bin/rake dev:letter_opener` | enabled |
+| Toggle in development | command                      | default  |
+| ---------             | -------                      | -------  |
+| Spring                | `bin/rake dev:spring`        | disabled |
+| Caching               | `bin/rake dev:cache`         | disabled |
+| [letter_opener][]     | `bin/rake dev:letter_opener` | enabled  |
 
-## Translation
+[letter_opener]: https://github.com/ryanb/letter_opener
 
-We're using [translation.io](https://translation.io) to manage internationalization:
-[translation.io/bikeindex/bike_index](https://translation.io/bikeindex/bike_index)
+## Internationalization
 
-To contribute, sign up for an account there and ask to be added to the project
-as a translator.
-
-**Non-English translation files should be treated as read-only.** We sync these
-with our translation.io project
-
-If you modify the English translation file
-[config/locales/en.yml](config/locales/en.yml), run:
-
-```shell
-bin/rake prepare_translations
-```
-
-before pushing to GitHub. This will normalize translation file formatting and
-check for missing or unused keys.
-
-### Syncing Translations
-
-When building master, we check for un-synced translations and, if any are found,
-stop the build and open a PR to master with the translation updates. (See
-[#1100](https://github.com/bikeindex/bike_index/pull/1100) for details.)
-
-To update the keys on translation.io, run `bin/rake translation:sync` (requires
-having an active API key locally).
-
+See the [internationalization docs](docs/internationalization.md) for details.
 
 ## Testing
 
