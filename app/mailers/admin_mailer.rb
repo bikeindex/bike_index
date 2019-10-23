@@ -1,5 +1,5 @@
 class AdminMailer < ActionMailer::Base
-  helper TheftAlertPlanHelper
+  helper LocalizationHelper
 
   default from: "contact@bikeindex.org", content_type: "multipart/alternative", parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
   default to: "contact@bikeindex.org"
