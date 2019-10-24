@@ -35,6 +35,7 @@ class BikeIndex.Init extends BikeIndex
     # All the rest per-page javascripts
     pageClasses =
       welcome_index: BikeIndex.WelcomeIndex
+      welcome_recovery_stories: BikeIndex.WelcomeRecoveryStories
       info_where: BikeIndex.InfoWhere
       info_support_bike_index: BikeIndex.Payments
       payments_new: BikeIndex.Payments

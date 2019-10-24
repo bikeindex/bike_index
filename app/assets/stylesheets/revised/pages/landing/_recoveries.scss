@@ -132,6 +132,15 @@ $recovery-text-bg: #fff;
       margin: 0;
       line-height: 1.2em;
     }
+
+    .translation-credit {
+      display: block;
+      font-size: 10px;
+      font-style: italic;
+      margin-bottom: -10px;
+      margin-top: 10px;
+      text-align: right;
+    }
   }
 
   .see-more-link {

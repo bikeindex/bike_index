@@ -4651,6 +4651,7 @@ en:
     recovery_display:
       bike: Bike
       recovered_date: recovered %{date}
+      translated_from_english: translated from English
   registrations:
     create:
       in_it_youll_find_instructions: In it, you'll find instructions on how to complete
