@@ -38,6 +38,6 @@ class Admin::TheftAlertPlansController < Admin::BaseController
   def theft_alert_plan_params
     params
       .require(:theft_alert_plan)
-      .permit(:name, :amount_cents, :views, :duration_days, :description, :active)
+      .permit(:name, :amount_cents, :views, :duration_days, :description, :active, :language)
   end
 end

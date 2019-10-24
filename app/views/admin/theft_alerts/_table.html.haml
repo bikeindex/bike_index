@@ -49,7 +49,7 @@
           %td
             - theft_alert_plan = theft_alert.theft_alert_plan
             %small
-              = link_to theft_alert_plan.title_string, edit_admin_theft_alert_plan_path(theft_alert_plan)
+              = link_to theft_alert_plan_title(theft_alert_plan), edit_admin_theft_alert_plan_path(theft_alert_plan)
               %span.less-strong
                 = number_to_currency(theft_alert_plan.amount_cents / 100.0, unit: "$")
           %td
@@ -77,4 +77,3 @@
           %td
             %small
               = theft_alert.notes
-

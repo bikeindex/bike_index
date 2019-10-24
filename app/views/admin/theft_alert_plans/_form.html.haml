@@ -14,6 +14,13 @@
   = f.label :active, "Active?", class: "form-label font-weight-bold mt-2 mb-0"
   = f.check_box :active, class: "form-control"
 
+  %fieldset
+    %div
+      = f.label :language, class: "control-label font-weight-bold mt-2"
+    = f.select :language,
+      options_for_select(language_choices, selected: record.language),
+      class: "form-control"
+
   = f.label :description, "Description", class: "form-label font-weight-bold mt-2 mb-0"
   = f.text_area :description, class: "form-control", rows: "10"
 

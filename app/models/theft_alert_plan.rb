@@ -1,8 +1,10 @@
 class TheftAlertPlan < ActiveRecord::Base
   include Amountable
+  include Localizable
 
   validates :name,
             :amount_cents,
+            :currency,
             :views,
             :duration_days,
             presence: true
@@ -15,10 +17,6 @@ class TheftAlertPlan < ActiveRecord::Base
   scope :active, -> { where(active: true) }
   scope :price_ordered_desc, -> { order(amount_cents: :desc) }
   scope :price_ordered_asc, -> { order(amount_cents: :asc) }
-
-  def title_string
-    "#{name} (#{duration_days} days)"
-  end
 
   def description_html
     Kramdown::Document.new(description).to_html

@@ -1719,6 +1719,7 @@ nl:
       here_is_what_youll_get: 'Dit krijg je met het %{plan_name} -plan:'
       youve_made_an_excellent_choice: Je hebt een uitstekende keuze gemaakt! Bevestig
         het hieronder.
+      bike_index_promoted_alert: Bike Index Promoted Alert
     edit_alert_purchase_confirmation:
       stay_tuned_for_an_update_once_weve_proces: Blijf op de hoogte voor een update
         zodra we uw melding hebben verwerkt.
@@ -5310,6 +5311,8 @@ nl:
       other_amount: Ander bedrag
       pay_bike_index: Pay Bike Index
       select_an_amount: Selecteer een bedrag
+      donate_to_bike_index: Doneer aan Bike Index
+      payment_to_bike_index: Betaling aan fietsindex
   registrations:
     create:
       in_it_youll_find_instructions: Hierin vindt u instructies voor het voltooien

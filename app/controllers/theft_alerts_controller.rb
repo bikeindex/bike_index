@@ -14,6 +14,7 @@ class TheftAlertsController < ApplicationController
       stripe_email: params[:stripe_email],
       stripe_token: params[:stripe_token],
       stripe_amount: params[:stripe_amount],
+      stripe_currency: params[:stripe_currency],
     )
 
     theft_alert.update(payment: payment)

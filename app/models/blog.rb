@@ -1,5 +1,6 @@
 class Blog < ActiveRecord::Base
   include ActionView::Helpers::TextHelper
+  include Localizable
 
   belongs_to :user
   has_many :public_images, as: :imageable, dependent: :destroy
@@ -14,12 +15,6 @@ class Blog < ActiveRecord::Base
   before_create :set_title_slug
 
   attr_accessor :post_date, :post_now, :update_title, :user_email, :timezone
-
-  LANGUAGE_ENUM = {
-    en: 0,
-    nl: 1,
-  }.freeze
-  enum language: LANGUAGE_ENUM
 
   scope :published, -> { where(published: true) }
   scope :listicle_blogs, -> { where(is_listicle: true) }

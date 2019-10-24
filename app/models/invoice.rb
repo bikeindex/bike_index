@@ -10,7 +10,7 @@ class Invoice < ActiveRecord::Base
   has_many :paid_features, through: :invoice_paid_features
   has_many :payments
 
-  validates_presence_of :organization_id
+  validates :organization, :currency, presence: true
 
   before_save :set_calculated_attributes
   after_commit :update_organization

@@ -13,7 +13,7 @@
       = form_tag nil, method: :get,
         class: "blog-language-selection", id: "js-blog-language-selection" do
         = select_tag :language,
-          options_for_select(blog_languages, selected: params[:language].presence),
+          options_for_select(language_choices, selected: params[:language].presence),
           onchange: "this.form.submit()"
   %hr
 

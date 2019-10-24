@@ -4,6 +4,7 @@ module MoneyHelper
   # TODO: Add a bank implementation that fetches conversion rate values
   Money.default_bank.add_rate(:USD, :EUR, 0.88)
 
+  # Return the currency abbreviation (USD, EUR) for the current locale.
   def default_currency
     t(I18n.locale, scope: [:money, :currencies])
   end

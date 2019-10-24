@@ -15,6 +15,7 @@
         %th Views Provided
         %th Duration (days)
         %th Description
+        %th Language
         %th Active?
     %tbody
       - @theft_alert_plans.each do |plan|
@@ -24,5 +25,5 @@
           %td= number_with_delimiter(plan.views)
           %td= plan.duration_days
           %td= plan.description_html.html_safe
-          %td
-            = check_mark if plan.active?
+          %td= t(plan.language, scope: [:locales])
+          %td= check_mark if plan.active?
