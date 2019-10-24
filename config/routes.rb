@@ -214,7 +214,7 @@ Bikeindex::Application.routes.draw do
     resources :feedbacks, only: %i[index show]
     resources :ownerships, only: %i[edit update]
     resources :tweets
-    resources :twitter_accounts, except: %i[create new] do
+    resources :twitter_accounts, except: %i[new] do
       member { get :check_credentials }
     end
 
@@ -281,7 +281,7 @@ Bikeindex::Application.routes.draw do
   get "manufacturers_tsv", to: "manufacturers#tsv"
 
   resource :integrations, only: [:create]
-  get "/auth/twitter/callback", to: "admin/twitter_accounts#oauth_callback"
+  get "/auth/twitter/callback", to: "admin/twitter_accounts#create"
   get "/auth/:provider/callback", to: "integrations#create"
   get "/auth/failure", to: "integrations#integrations_controller_creation_error"
 
