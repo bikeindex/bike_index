@@ -1,3 +1,4 @@
+# coding: utf-8
 module MoneyHelper
   include MoneyRails::ActionViewExtension
 
@@ -7,6 +8,22 @@ module MoneyHelper
   # Return the currency abbreviation (USD, EUR) for the current locale.
   def default_currency
     t(I18n.locale, scope: [:money, :currencies])
+  end
+
+  # Return a list of currency abbreviations (USD, EUR) for all available locales.
+  def available_currencies
+    I18n.available_locales.map { |locale| t(locale, scope: [:money, :currencies]) }
+  end
+
+  # Return a list of currency symbols and abbreviations for all available locales:
+  # ["$ (USD)", "€ (EUR)"]
+  def currency_symbols
+    I18n.available_locales.map do |locale|
+      [
+        I18n.with_locale(locale) { number_to_currency(1, format: "%u") },
+        "(#{t(locale, scope: [:money, :currencies])})",
+      ].join(" ")
+    end
   end
 
   def money_usd(dollars, exchange_to: default_currency)

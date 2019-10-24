@@ -5,6 +5,10 @@
   = f.label :amount_cents, "Price (cents)", class: "form-label font-weight-bold mt-2 mb-0"
   = f.number_field :amount_cents, class: "form-control"
 
+  %fieldset
+    = f.label :currency, "Currency", class: "form-label font-weight-bold mt-2 mb-0"
+    = f.select :currency, options_for_select(available_currencies, selected: record.currency), class: "form-control"
+
   = f.label :views, "Views Provided", class: "form-label font-weight-bold mt-2 mb-0"
   = f.number_field :views, class: "form-control"
 
