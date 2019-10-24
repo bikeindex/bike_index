@@ -5,6 +5,8 @@
 
       %span.precovery
         = recovery_display.quote.html_safe
+      %span.translation-credit.d-none
+        = t(".translated_from_english")
 
     %span.recovery-user
       - if recovery_display.image.present?

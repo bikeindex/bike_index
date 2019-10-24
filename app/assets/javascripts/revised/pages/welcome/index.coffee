@@ -42,3 +42,4 @@ class BikeIndex.WelcomeIndex extends BikeIndex
        return if not translatedText
        @slideText($slide, translatedText)
        $slide.data("translated", true)
+       $slide.find(".translation-credit").toggleClass("d-none")
