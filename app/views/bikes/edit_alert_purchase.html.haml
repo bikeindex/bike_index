@@ -11,14 +11,13 @@
               -# highlight the same nav menu item
               = @edit_templates.select { |k, v| @edit_template.match(/#{k}/) }.values.first
 
-          - currency = t(I18n.locale, scope: %i[money currencies])
           = form_tag theft_alerts_path,
             method: :post,
             id: "js-confirm-plan-form",
             data: { key: ENV["STRIPE_PUBLISHABLE_KEY"],
             email: current_user.email,
             type:  "Pay",
-            currency: currency,
+            currency: default_currency,
             description: t(".bike_index_promoted_alert") },
             class: "confirm-form" do
             = hidden_field_tag :stripe_amount, @selected_theft_alert_plan.amount_cents

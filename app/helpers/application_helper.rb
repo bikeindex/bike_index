@@ -225,20 +225,6 @@ module ApplicationHelper
     CodeRay.scan(JSON.pretty_generate(data), :json).div.html_safe
   end
 
-  # Language choices available for request locale and localized models (Blog,
-  # TheftAlertPlan).
-  #
-  # Return an array of tuples, each with the following strings:
-  #
-  # [<localized language name>, <language key (from Blog::LANGUAGE_ENUM)>]
-  def language_choices
-    @language_choices ||=
-      I18n
-        .available_locales
-        .map { |locale| [t(locale, scope: [:locales]), locale.to_s] }
-        .sort_by { |language_name, _| language_name.downcase }
-  end
-
   def bike_placeholder_image_path
     image_path("revised/bike_photo_placeholder.svg")
   end
