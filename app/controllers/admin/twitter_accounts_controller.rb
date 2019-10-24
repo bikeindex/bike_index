@@ -1,6 +1,7 @@
 class Admin::TwitterAccountsController < Admin::BaseController
   include SortableTable
   before_filter :find_twitter_account, only: %i[show edit update destroy check_credentials]
+  skip_before_action :require_index_admin!, only: %[oauth_callback]
 
   def index
     @twitter_accounts = matching_twitter_accounts.reorder(sort_column + " " + sort_direction)
@@ -36,6 +37,19 @@ class Admin::TwitterAccountsController < Admin::BaseController
   def check_credentials
     @twitter_account.check_credentials
     redirect_to admin_twitter_account_url(@twitter_account)
+  end
+
+  def oauth_callback
+    twitter_info = request.env["omniauth.auth"]
+    twitter_account = TwitterAccount.create_from_twitter_oauth(twitter_info)
+
+    if twitter_account.persisted?
+      flash[:info] = "Twitter account #{twitter_account.screen_name} is ready to go."
+      redirect_to admin_twitter_account_url(twitter_account)
+    else
+      flash[:error] = "Could not set up your account."
+      redirect_to admin_twitter_accounts_url
+    end
   end
 
   private

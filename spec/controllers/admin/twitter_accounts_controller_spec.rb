@@ -20,27 +20,6 @@ RSpec.describe Admin::TwitterAccountsController, type: :controller, vcr: true do
     end
   end
 
-  describe "new" do
-    it "renders" do
-      get :new
-      expect(response).to be_success
-      expect(response).to render_template(:new)
-    end
-  end
-
-  describe "create" do
-    it "gets the tweet from twitter" do
-      twitter_account_attrs = FactoryBot.attributes_for(:twitter_account_1)
-      expect(TwitterAccount.count).to eq(0)
-
-      post :create, twitter_account: twitter_account_attrs
-
-      expect(TwitterAccount.count).to eq(1)
-      expect(response).to redirect_to(admin_twitter_account_url(TwitterAccount.first.id))
-      expect(flash[:error]).to be_blank
-    end
-  end
-
   describe "update" do
     let(:twitter_account) { FactoryBot.create(:twitter_account_1, active: false) }
     before { twitter_account.set_error("Something") }
