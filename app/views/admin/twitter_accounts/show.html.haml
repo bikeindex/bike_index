@@ -2,6 +2,7 @@
   .col-6
     .mr-4
       = link_to "Edit", edit_admin_twitter_account_url(@twitter_account), class: "btn btn-lg btn-success"
+      = link_to "Check Credentials", check_credentials_admin_twitter_account_url(@twitter_account), class: "btn btn-lg btn-success"
 
 - if @twitter_account.errored?
   .row.mt-4.mb-4
@@ -54,5 +55,3 @@
   - if @twitter_account.tweets.count > 25
     Showing most recent 25
 = render "admin/tweets/tweets", tweets: @twitter_account.tweets.reorder(:created_at).limit(25)
-
-

@@ -214,7 +214,11 @@ Bikeindex::Application.routes.draw do
     resources :feedbacks, only: %i[index show]
     resources :ownerships, only: %i[edit update]
     resources :tweets
-    resources :twitter_accounts, except: %i[new create]
+    resources :twitter_accounts, except: %i[new create] do
+      member do
+        get :check_credentials
+      end
+    end
 
     get "blog", to: redirect("/news")
     resources :news do

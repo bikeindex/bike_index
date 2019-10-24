@@ -1,6 +1,6 @@
 class Admin::TwitterAccountsController < Admin::BaseController
   include SortableTable
-  before_filter :find_twitter_account, only: %i[show edit update destroy]
+  before_filter :find_twitter_account, only: %i[show edit update destroy check_credentials]
 
   def index
     @twitter_accounts = matching_twitter_accounts.reorder(sort_column + " " + sort_direction)
@@ -31,6 +31,11 @@ class Admin::TwitterAccountsController < Admin::BaseController
       flash[:error] = "Could not delete Twitter account."
       redirect_to edit_admin_twitter_account_url(@twitter_account)
     end
+  end
+
+  def check_credentials
+    @twitter_account.check_credentials
+    redirect_to admin_twitter_account_url(@twitter_account)
   end
 
   private
