@@ -16,14 +16,16 @@ class BikeIndex.WelcomeIndex extends BikeIndex
     $(window).scroll ->
       $('.root-landing-who').addClass('scrolled')
 
+   # Return the DOM node for the slide with index `index` in the slides
+   # container element.
    findSlide: (index) =>
      @container.find(".js-recovery-slide")[index]
 
-   slideText: ($slide, textValue = null) =>
-     if textValue == null
-       $slide.find(".precovery").text().trim()
-     else
-       $slide.find(".precovery").text(textValue)
+   # Set or get the text of the slide.
+   slideText: ($slide, textValue) =>
+     $container = $slide.find(".precovery")
+     return $container.text().trim() if not textValue
+     $container.text(textValue)
 
    translateText: (index) =>
      return if I18n.locale == "en"
@@ -37,5 +39,6 @@ class BikeIndex.WelcomeIndex extends BikeIndex
      text = @slideText($slide)
 
      @translator.translate(text).then (translatedText) =>
+       return if not translatedText
        @slideText($slide, translatedText)
        $slide.data("translated", true)

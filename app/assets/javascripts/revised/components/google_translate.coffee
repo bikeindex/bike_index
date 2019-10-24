@@ -4,6 +4,11 @@ class BikeIndex.GoogleTranslate
     @sourceLang = sourceLang or I18n.defaultLocale
     @targetLang = targetLang or  I18n.locale
 
+  # Translate the provided text using the google translate chrome extension
+  # endpoint. This will work for the welcome index and 2-3 pages of full
+  # recovery stories before triggering a rate limit, which should be plenty.
+  #
+  # Returns the translated text. If the request errors, return null.
   translate: (text) ->
      path = "translate_a/single"
      query = [
@@ -17,4 +22,4 @@ class BikeIndex.GoogleTranslate
      fetch("#{@baseUrl}/#{path}?#{query}")
        .then((resp) => resp.json())
        .then((translations) => translations[0][0][0])
-       .catch((err) => console.error(err))
+       .catch((err) => null)
