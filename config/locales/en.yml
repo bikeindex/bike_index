@@ -5234,6 +5234,7 @@ en:
       edit: Edit
       edit_bike: Edit Bike
       key_serial: Key Serial
+      list_a_bike_on_bikefair: List a bike on BikeFair
       location: Location
       lock_type: Lock Type
       locks: locks
@@ -5254,6 +5255,7 @@ en:
       to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
       update_your_profile: Update your profile
       user_bikes: "%{current_user_name} bikes"
+      want_to_sell_your_bikes: Want to sell one of your registered bikes?
       welcome: Welcome
       you_have_no_registered_bikes: You have no registered bikes
       you_have_no_registered_locks: You have no registered locks
