@@ -42,7 +42,7 @@ class Admin::PaidFeaturesController < Admin::BaseController
   end
 
   def permitted_update_parameters
-    permitted_parameters = params.require(:paid_feature).permit(:amount, :description, :details_link, :kind, :name)
+    permitted_parameters = params.require(:paid_feature).permit(:amount, :description, :details_link, :kind, :name, :currency)
     if current_user.developer?
       permitted_parameters.merge(params.require(:paid_feature).permit(:feature_slugs_string))
     elsif @paid_feature&.id&.present? && @paid_feature.locked?
