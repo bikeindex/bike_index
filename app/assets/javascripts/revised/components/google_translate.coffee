@@ -5,8 +5,9 @@ class BikeIndex.GoogleTranslate
     @targetLang = targetLang or  I18n.locale
 
   # Translate the provided text using the google translate chrome extension
-  # endpoint. This will work for the welcome index and 2-3 pages of full
-  # recovery stories before triggering a rate limit, which should be plenty.
+  # endpoint. Targeting this endpoint will work for the welcome index and 2-3
+  # pages of full recovery stories before triggering a rate limit.
+  # Not ideal, but that should be plenty for our needs.
   #
   # Returns the translated text. If the request errors, return null.
   translate: (text) ->
