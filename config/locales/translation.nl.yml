@@ -5235,6 +5235,8 @@ nl:
       abandoned: VERLATEN
       date_abandoned: Datum van vermissing
       next: Volgende stappen
+      list_a_bike_on_bikefair: Zet een fiets op BikeFair
+      want_to_sell_your_bikes: Wilt u een van uw geregistreerde fietsen verkopen?
   locales:
     en: English (Engels)
     nl: Nederlands
