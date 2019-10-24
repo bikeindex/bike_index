@@ -8,22 +8,6 @@ class Admin::TwitterAccountsController < Admin::BaseController
 
   def show; end
 
-  def new
-    @twitter_account = TwitterAccount.new
-  end
-
-  def create
-    @twitter_account = TwitterAccount.new(permitted_parameters)
-    @twitter_account.twitter_account_info =
-      TwitterClient.user(@twitter_account.screen_name).to_json
-
-    if @twitter_account.save
-      redirect_to admin_twitter_account_url(@twitter_account)
-    else
-      render action: :new
-    end
-  end
-
   def edit; end
 
   def update
