@@ -7,7 +7,7 @@ module ControllerHelpers
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
                   :user_root_bike_search?, :current_organization, :passive_organization, :controller_namespace, :page_id,
-                  :default_bike_search_path
+                  :default_bike_search_path, :bikehub_url
     before_filter :enable_rack_profiler
 
     before_action do
@@ -245,5 +245,12 @@ module ControllerHelpers
     return true if current_user.present? && current_user.superuser?
     flash[:error] = translation(:not_permitted_to_do_that, scope: [:controllers, :concerns, :controller_helpers, __method__])
     redirect_to user_root_url and return
+  end
+
+  def bikehub_url(path)
+    [
+      ENV["BIKEHUB_URL"].presence || "https://new.bikehub.com",
+      path,
+    ].join("/")
   end
 end
