@@ -5477,6 +5477,7 @@ nl:
     recovery_display:
       bike: Fiets
       recovered_date: hersteld %{date}
+      translated_from_english: vertaald uit het engels
   stolen:
     index:
       ambassador: Ambassadeur
