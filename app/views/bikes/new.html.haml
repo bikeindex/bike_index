@@ -46,7 +46,7 @@
 
           .related-fields
             .form-group.row
-              = f.label :manufacturer_id, class: 'form-well-label'
+              = f.label :manufacturer_id, t(".manufacturer"), class: 'form-well-label'
 
               .form-well-input
                 - initial = @bike.manufacturer && { id: @bike.manufacturer.id, text: @bike.manufacturer.name }.to_json
