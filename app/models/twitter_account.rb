@@ -42,6 +42,21 @@ class TwitterAccount < ActiveRecord::Base
     national.where(country: country).first || default_account
   end
 
+  def self.create_from_twitter_oauth(info)
+    create(attrs_from_user_info(info))
+  end
+
+  def self.attrs_from_user_info(info)
+    {
+      screen_name: info["info"]["nickname"],
+      address: info["info"]["location"],
+      consumer_key: ENV["TWITTER_CONSUMER_KEY"],
+      consumer_secret: ENV["TWITTER_CONSUMER_SECRET"],
+      user_token: info["credentials"]["token"],
+      user_secret: info["credentials"]["secret"],
+    }
+  end
+
   def twitter_account_url
     "https://twitter.com/#{screen_name}"
   end

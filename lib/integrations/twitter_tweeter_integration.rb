@@ -31,7 +31,7 @@ class TwitterTweeterIntegration
   end
 
   # To manually send a tweet (e.g. if authentication failed)
-  # TwitterTweeterIntegration.new(Bike.find_by_bike_index_bike_id(XXX)).create_tweet
+  # TwitterTweeterIntegration.new(Bike.find(XXX)).create_tweet
   def create_tweet
     return if stolen_record.blank? || nearest_twitter_account.blank?
 

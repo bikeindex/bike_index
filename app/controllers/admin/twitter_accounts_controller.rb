@@ -1,28 +1,13 @@
 class Admin::TwitterAccountsController < Admin::BaseController
   include SortableTable
-  before_filter :find_twitter_account, only: %i[show edit update destroy]
+  before_filter :find_twitter_account, only: %i[show edit update destroy check_credentials]
+  skip_before_action :require_index_admin!, only: %[create]
 
   def index
     @twitter_accounts = matching_twitter_accounts.reorder(sort_column + " " + sort_direction)
   end
 
   def show; end
-
-  def new
-    @twitter_account = TwitterAccount.new
-  end
-
-  def create
-    @twitter_account = TwitterAccount.new(permitted_parameters)
-    @twitter_account.twitter_account_info =
-      TwitterClient.user(@twitter_account.screen_name).to_json
-
-    if @twitter_account.save
-      redirect_to admin_twitter_account_url(@twitter_account)
-    else
-      render action: :new
-    end
-  end
 
   def edit; end
 
@@ -39,6 +24,19 @@ class Admin::TwitterAccountsController < Admin::BaseController
     end
   end
 
+  def create
+    twitter_account =
+      TwitterAccount.create_from_twitter_oauth(request.env["omniauth.auth"])
+
+    if twitter_account.persisted?
+      flash[:notice] = "Twitter account #{twitter_account.screen_name} is persisted."
+      redirect_to admin_twitter_account_url(twitter_account)
+    else
+      flash[:error] = twitter_account.errors.full_messages.to_sentence
+      redirect_to admin_twitter_accounts_url
+    end
+  end
+
   def destroy
     if @twitter_account.present? && @twitter_account.destroy
       flash[:info] = "Twitter account deleted."
@@ -47,6 +45,11 @@ class Admin::TwitterAccountsController < Admin::BaseController
       flash[:error] = "Could not delete Twitter account."
       redirect_to edit_admin_twitter_account_url(@twitter_account)
     end
+  end
+
+  def check_credentials
+    @twitter_account.check_credentials
+    redirect_to admin_twitter_account_url(@twitter_account)
   end
 
   private
