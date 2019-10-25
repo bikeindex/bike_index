@@ -347,9 +347,15 @@
 }
 
 // Prevent overflow on tiny screens
-@media (max-width: 350px) {
-  .root-landing-banner-header .root-landing-header-text h1 {
-    font-size: 35px;
+@media (max-width: $grid-breakpoint-md) {
+  .root-landing-banner-header .root-landing-header-text {
+    h1 {
+      font-size: 2.3rem;
+    }
+
+    h2 {
+      line-height: 35px;
+    }
   }
 }
 
