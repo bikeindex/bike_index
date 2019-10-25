@@ -199,7 +199,7 @@
     h1,
     h2,
     p {
-      color: white;
+      color: $white;
       display: block;
       margin: 15px auto;
       text-align: center;
@@ -221,7 +221,7 @@
     }
 
     h2 {
-      color: #ffffff;
+      color: $white;
       font-size: 24px;
       font-weight: 600;
       letter-spacing: 0.5px;
