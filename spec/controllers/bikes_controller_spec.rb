@@ -1119,7 +1119,12 @@ RSpec.describe BikesController, type: :controller do
         templates.each do |template|
           context "with query param ?page=#{template}" do
             it "renders the #{template} template" do
+              FactoryBot.create_list(:theft_alert_plan, 3)
+              bike.update(current_stolen_record: FactoryBot.create(:stolen_record, bike: bike))
+              expect(bike.current_stolen_record).to be_present
+
               get :edit, id: bike.id, page: template
+
               expect(response.status).to eq(200)
               expect(response).to render_template("edit_#{template}")
               expect(assigns(:edit_template)).to eq(template)

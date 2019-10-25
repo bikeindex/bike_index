@@ -171,8 +171,12 @@ class BikesController < ApplicationController
           .where(imageable_id: @bike.id)
           .where(is_private: true)
     when /alert/
+      unless @bike&.current_stolen_record.present?
+        redirect_to edit_bike_url(@bike, page: @edit_template) and return
+      end
+
       bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
-      @bike.current_stolen_record&.generate_alert_image(bike_image: bike_image)
+      @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
 
       @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
       @selected_theft_alert_plan =
@@ -181,12 +185,12 @@ class BikesController < ApplicationController
 
       @theft_alerts =
         @bike
-          &.current_stolen_record
-          &.theft_alerts
-          &.includes(:theft_alert_plan)
-          &.creation_ordered_desc
-          &.where(creator: current_user)
-          &.references(:theft_alert_plan) || TheftAlert.none
+          .current_stolen_record
+          .theft_alerts
+          .includes(:theft_alert_plan)
+          .creation_ordered_desc
+          .where(creator: current_user)
+          .references(:theft_alert_plan)
     end
 
     render "edit_#{@edit_template}".to_sym

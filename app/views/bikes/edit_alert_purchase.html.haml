@@ -20,12 +20,12 @@
             currency: default_currency,
             description: t(".bike_index_promoted_alert") },
             class: "confirm-form" do
-            = hidden_field_tag :stripe_amount, @selected_theft_alert_plan&.amount_cents
+            = hidden_field_tag :stripe_amount, @selected_theft_alert_plan.amount_cents
             = hidden_field_tag :stripe_currency, default_currency
             = hidden_field_tag :stripe_email
             = hidden_field_tag :stripe_token
             = hidden_field_tag :bike_id, @bike.id
-            = hidden_field_tag :theft_alert_plan_id, @selected_theft_alert_plan&.id
+            = hidden_field_tag :theft_alert_plan_id, @selected_theft_alert_plan.id
 
             .row
               %h3.text-center.w-100
@@ -35,14 +35,14 @@
             .row
               .copy.text-center
                 %strong
-                  = t(".here_is_what_youll_get", plan_name: @selected_theft_alert_plan&.name)
+                  = t(".here_is_what_youll_get", plan_name: @selected_theft_alert_plan.name)
             .row
               .description
-                = @selected_theft_alert_plan&.description_html&.html_safe
+                = @selected_theft_alert_plan.description_html.html_safe
             .row
               .copy.text-center
                 %strong
-                  = t(".charge", price: @selected_theft_alert_plan&.amount_formatted)
+                  = t(".charge", price: @selected_theft_alert_plan.amount_formatted)
             .row
               .text-center.w-100.mt-2
                 %button.btn.btn-lg.btn-primary#js-confirm-plan-button
