@@ -910,6 +910,11 @@ en:
         unknown: unknown
         water_bottle_cage: water bottle cage
         wheel: wheel
+      organization:
+        reg_affiliation_options:
+          community_member: Community Member
+          employee: Employee
+          student: Student
       stolen_record:
         bike_was_not_locked: Bike was not locked
         cable_lock: Cable lock
@@ -944,7 +949,10 @@ en:
           else. You can put a more detailed description in paint description (once
           you've registered), <em>this</em> is to get a general color to make searching
           easier
+        primary_frame_color: Primary frame color
         remove_color: Remove color
+        secondary_frame_color: Secondary frame color
+        tertiary_frame_color: Tertiary frame color
       revised_component_fields:
         component_type: Component type
         model: Model
@@ -1213,6 +1221,7 @@ en:
       is_a_handmade_frame: Is a handmade frame
       it_probably_has_a_serial_number: It probably has a serial number.
       mailing_address: Mailing address
+      manufacturer: Manufacturer
       missing_serial: Missing serial
       model_year: Model year
       nevermind: Nevermind
