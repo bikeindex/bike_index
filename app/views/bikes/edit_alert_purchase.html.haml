@@ -42,8 +42,7 @@
             .row
               .copy.text-center
                 %strong
-                  - price = @selected_theft_alert_plan.amount_cents
-                  = t(".charge", price: number_to_currency(price / 100.0), unit: "$", separator: ".")
+                  = t(".charge", price: @selected_theft_alert_plan.amount_formatted)
             .row
               .text-center.w-100.mt-2
                 %button.btn.btn-lg.btn-primary#js-confirm-plan-button

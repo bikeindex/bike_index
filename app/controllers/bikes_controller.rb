@@ -171,6 +171,10 @@ class BikesController < ApplicationController
           .where(imageable_id: @bike.id)
           .where(is_private: true)
     when /alert/
+      unless @bike&.current_stolen_record.present?
+        redirect_to edit_bike_url(@bike, page: @edit_template) and return
+      end
+
       bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
       @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
 
@@ -230,7 +234,7 @@ class BikesController < ApplicationController
   # Return a Hash with keys :is_valid (boolean), :template (string)
   def target_edit_template(requested_page:)
     result = {}
-    valid_pages = [*edit_templates.keys, "alert_purchase"]
+    valid_pages = [*edit_templates.keys, "alert_purchase", "alert_purchase_confirmation"]
     default_page = @bike.stolen? ? :theft_details : :bike_details
 
     case

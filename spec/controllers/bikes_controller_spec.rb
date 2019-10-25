@@ -1115,10 +1115,16 @@ RSpec.describe BikesController, type: :controller do
         # can't use the let block
         bc = BikesController.new
         bc.instance_variable_set(:@bike, Bike.new)
-        bc.edit_templates.each_pair do |template, _label|
+        templates = bc.edit_templates.keys.concat(["alert_purchase", "alert_purchase_confirmation"])
+        templates.each do |template|
           context "with query param ?page=#{template}" do
             it "renders the #{template} template" do
+              FactoryBot.create_list(:theft_alert_plan, 3)
+              bike.update(current_stolen_record: FactoryBot.create(:stolen_record, bike: bike))
+              expect(bike.current_stolen_record).to be_present
+
               get :edit, id: bike.id, page: template
+
               expect(response.status).to eq(200)
               expect(response).to render_template("edit_#{template}")
               expect(assigns(:edit_template)).to eq(template)
