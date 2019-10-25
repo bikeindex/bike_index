@@ -5328,7 +5328,7 @@ nl:
       bike_manufacturer: fietsfabrikant
       choose_specific_organization_optional: Kies specifieke organisatie (optioneel)
       owner_email: "%{owner} e-mail"
-      primary_frame_color: primaire framekleur
+      primary_frame_color: Primaire framekleur
       register: Registreer
       select_other_if_manufacturer_doesnt_show: Selecteer 'Overig' als de fabrikant
         niet verschijnt wanneer deze wordt ingevoerd
