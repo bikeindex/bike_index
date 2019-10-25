@@ -153,7 +153,7 @@
                 class: "form-well-label"
               .form-well-input
                 = f.select :organization_affiliation,
-                  @organization.reg_affiliation_options.map { |a| [a.humanize, a] },
+                  @organization.reg_affiliation_options,
                   class: "form-control"
 
           .form-group.row.unnested-field.no-divider-row
