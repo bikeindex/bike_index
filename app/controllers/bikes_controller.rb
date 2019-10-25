@@ -172,7 +172,7 @@ class BikesController < ApplicationController
           .where(is_private: true)
     when /alert/
       bike_image = PublicImage.find_by(id: params[:selected_bike_image_id])
-      @bike.current_stolen_record.generate_alert_image(bike_image: bike_image)
+      @bike.current_stolen_record&.generate_alert_image(bike_image: bike_image)
 
       @theft_alert_plans = TheftAlertPlan.active.price_ordered_asc.in_language(I18n.locale)
       @selected_theft_alert_plan =
@@ -181,12 +181,12 @@ class BikesController < ApplicationController
 
       @theft_alerts =
         @bike
-          .current_stolen_record
-          .theft_alerts
-          .includes(:theft_alert_plan)
-          .creation_ordered_desc
-          .where(creator: current_user)
-          .references(:theft_alert_plan)
+          &.current_stolen_record
+          &.theft_alerts
+          &.includes(:theft_alert_plan)
+          &.creation_ordered_desc
+          &.where(creator: current_user)
+          &.references(:theft_alert_plan) || TheftAlert.none
     end
 
     render "edit_#{@edit_template}".to_sym
@@ -230,7 +230,7 @@ class BikesController < ApplicationController
   # Return a Hash with keys :is_valid (boolean), :template (string)
   def target_edit_template(requested_page:)
     result = {}
-    valid_pages = [*edit_templates.keys, "alert_purchase"]
+    valid_pages = [*edit_templates.keys, "alert_purchase", "alert_purchase_confirmation"]
     default_page = @bike.stolen? ? :theft_details : :bike_details
 
     case

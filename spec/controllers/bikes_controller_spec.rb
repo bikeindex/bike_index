@@ -1115,7 +1115,8 @@ RSpec.describe BikesController, type: :controller do
         # can't use the let block
         bc = BikesController.new
         bc.instance_variable_set(:@bike, Bike.new)
-        bc.edit_templates.each_pair do |template, _label|
+        templates = bc.edit_templates.keys.concat(["alert_purchase", "alert_purchase_confirmation"])
+        templates.each do |template|
           context "with query param ?page=#{template}" do
             it "renders the #{template} template" do
               get :edit, id: bike.id, page: template
