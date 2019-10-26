@@ -6,7 +6,7 @@
 
 .related-fields{ class: classname }
   .form-group.row
-    = f.label :primary_frame_color, class: 'form-well-label'
+    = f.label :primary_frame_color_id, t(".primary_frame_color"), class: 'form-well-label'
 
     .form-well-input.fancy-select.unfancy
       = f.select(:primary_frame_color_id, Color.select_options, required: true, prompt: t(".choose_color") )
@@ -23,7 +23,7 @@
         = t(".remove_color")
 
   #secondary-color.form-group.row.hidden-other{ class: ('unhidden' if display_secondary_color) }
-    = f.label :secondary_frame_color, class: 'form-well-label'
+    = f.label :secondary_frame_color_id, t(".secondary_frame_color"), class: 'form-well-label'
     .form-well-input.fancy-select.unfancy
       = f.select(:secondary_frame_color_id, Color.select_options, prompt: t(".choose_color") )
     .right-input-help
@@ -37,6 +37,6 @@
         = t(".remove_color")
 
   #tertiary-color.form-group.row.hidden-other{ class: ('unhidden' if display_tertiary_color) }
-    = f.label :tertiary_frame_color, class: 'form-well-label'
+    = f.label :tertiary_frame_color_id, t(".tertiary_frame_color"), class: 'form-well-label'
     .form-well-input.fancy-select.unfancy
       = f.select(:tertiary_frame_color_id, Color.select_options, prompt: t(".choose_color") )

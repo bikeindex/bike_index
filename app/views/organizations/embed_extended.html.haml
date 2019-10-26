@@ -104,8 +104,7 @@
     .input-group
       = f.label :organization_affiliation, label_affiliation
       .controls
-        - affiliation_options = @organization.reg_affiliation_options.map { |a| [a.humanize, a] }
-        = f.select :organization_affiliation, affiliation_options, class: "form-control"
+        = f.select :organization_affiliation, @organization.reg_affiliation_options, class: "form-control"
   - if @organization.paid_for?("bike_codes")
     .input-group
       .control-group

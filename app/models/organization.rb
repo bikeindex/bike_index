@@ -144,7 +144,13 @@ class Organization < ActiveRecord::Base
     additional_registration_fields.include?("reg_affiliation")
   end
 
-  def reg_affiliation_options; %w[student employee community_member] end
+  def reg_affiliation_options
+    translation_scope =
+      [:activerecord, :select_options, self.class.name.underscore, __method__]
+
+    %w[student employee community_member]
+      .map { |e| [I18n.t(e, scope: translation_scope), e] }
+  end
 
   def include_field_reg_phone?(user = nil)
     return false unless additional_registration_fields.include?("reg_phone")
