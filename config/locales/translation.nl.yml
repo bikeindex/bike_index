@@ -4081,7 +4081,7 @@ nl:
       add_a_bike: Voeg een fiets toe
       blog: Blog
       discuss: Bespreken
-      donate: schenken
+      donate: Schenken
       exports: Uitvoer
       getting_started: Ermee beginnen
       help: Helpen
@@ -4933,8 +4933,8 @@ nl:
       copyright_html: "%{current_year} & kopiëren; Bike Index, een 501 (c) (3) non-profit
         - EIN 81-4296194"
       design_logos: Ontwerp & logo's
-      dev_resources: Dev bronnen
-      donate: schenken
+      dev_resources: Dev Bronnen
+      donate: Schenken
       faq: FAQ
       help: Helpen
       language: Taal
@@ -4944,7 +4944,7 @@ nl:
       schools_and_universities: Scholen en universiteiten
       stolen_bike_map: Gestolen fietskaart
       stolen_bike_recoveries: Gestolen fietsherstel
-      store: Op te slaan
+      store: Winkel
       support_us: Steun ons
       terms_and_conditions: Termen en voorwaarden
       vendor_terms: leveranciersvoorwaarden
@@ -5024,9 +5024,9 @@ nl:
       about: Over
       bicycle_serials: Fietsseries
       bike_index_news: Bike Index nieuws
-      bike_index_store: Bike Index Store
+      bike_index_store: Bike Index Winkel
       design_and_developer_resources: Ontwerp- en ontwikkelaarbronnen
-      donate: schenken
+      donate: Schenken
       forum: Forum
       help: Helpen
       other_pages: Andere pagina's
