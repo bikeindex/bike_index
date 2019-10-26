@@ -1648,7 +1648,7 @@ nl:
           in de verfbeschrijving plaatsen (nadat u zich hebt geregistreerd), <em>dit</em>
           is om een algemene kleur te krijgen om het zoeken te vergemakkelijken
         remove_color: Verwijder kleur
-        primary_frame_color: primaire framekleur
+        primary_frame_color: Primaire framekleur
         secondary_frame_color: Secundaire framekleur
         tertiary_frame_color: Tertiaire framekleur
       revised_component_fields:
