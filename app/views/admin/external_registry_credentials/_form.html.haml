@@ -3,8 +3,8 @@
   method: method,
   html: { class: "form" } do |f|
   %fieldset
-    = f.label :type, "Type", class: "form-label"
-    = f.select :type,
+    = label :type, "Type", class: "form-label"
+    = select_tag :type,
       external_registry_type_options(selected: external_registry_credential&.type),
       include_blank: true,
       class: "form-control"

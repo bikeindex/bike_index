@@ -51,8 +51,11 @@ class Admin::ExternalRegistryCredentialsController < Admin::BaseController
   end
 
   def external_registry_credential_params
+    model_type = params[:type]&.underscore&.tr("/", "_")
+    params[model_type][:type] = params[:type]
+
     params
-      .require(:external_registry_credential)
+      .require(model_type)
       .permit(:app_id, :access_token, :refresh_token, :type)
   end
 end
