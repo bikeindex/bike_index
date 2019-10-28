@@ -61,7 +61,7 @@
       - @bike_codes.each do |bike_code|
         %tr
           %td
-            %a.convertTime{ href: edit_organization_sticker_path(organization_id: current_organization.id, id: bike_code.code) }
+            %a.convertTime{ href: edit_organization_sticker_path(organization_id: current_organization.to_param, id: bike_code.code) }
               = l(bike_code.created_at, format: :convert_time)
           %td
             - if bike_code.claimed? && bike_code.claimed_at.present?
