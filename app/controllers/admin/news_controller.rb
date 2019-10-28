@@ -64,6 +64,7 @@ class Admin::NewsController < Admin::BaseController
   def permitted_parameters
     params.require(:blog).permit(
       :body,
+      :canonical_url,
       :description_abbr,
       :index_image,
       :index_image_id,
