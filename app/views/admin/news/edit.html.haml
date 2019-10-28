@@ -87,6 +87,9 @@
             = f.select :language,
               options_for_select(language_choices, selected: @blog.language),
               class: "form-control"
+          .form-group
+            = f.label :canonical_url, "Canonical URL (e.g. https://blogspot.com/post/1)", class: "control-label"
+            = f.text_field :canonical_url, class: "form-control"
 
       .row.mt-4
         .col-md-6

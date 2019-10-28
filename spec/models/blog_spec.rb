@@ -114,6 +114,36 @@ RSpec.describe Blog, type: :model do
     end
   end
 
+  describe "canonical_url validation" do
+    context "given a blank value" do
+      it "is valid" do
+        blog = FactoryBot.build(:blog, canonical_url: "")
+        expect(blog).to be_valid
+
+        blog = FactoryBot.build(:blog, canonical_url: nil)
+        expect(blog).to be_valid
+      end
+    end
+
+    context "given a minimally complete url" do
+      it "is valid" do
+        blog = FactoryBot.build(:blog, canonical_url: "http://blogger.com/myblog")
+        expect(blog).to be_valid
+
+        blog = FactoryBot.build(:blog, canonical_url: "https://blogger.com/myblog")
+        expect(blog).to be_valid
+      end
+    end
+
+    context "given an incomplete url" do
+      it "is invalid" do
+        blog = FactoryBot.build(:blog, canonical_url: "blogger.com/myblog")
+        expect(blog).to be_invalid
+        expect(blog.errors[:canonical_url]).to include("is invalid")
+      end
+    end
+  end
+
   describe "feed_content" do
     it "returns html content for non-listicles" do
       blog = Blog.new(body: "something")

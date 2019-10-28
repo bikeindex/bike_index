@@ -10,6 +10,7 @@ class Blog < ActiveRecord::Base
   validates_presence_of :title, :body, :user_id
   validates_uniqueness_of :title, message: "has already been taken. If you believe that this message is an error, contact us!"
   validates_uniqueness_of :title_slug, message: "somehow that overlaps with another title! Sorrys."
+  validates_format_of :canonical_url, with: %r{https?://\w+\.\w+/.+}, unless: -> { self.canonical_url.blank? }
 
   before_save :set_calculated_attributes
   before_create :set_title_slug

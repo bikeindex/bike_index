@@ -442,7 +442,8 @@ CREATE TABLE public.blogs (
     index_image character varying(255),
     index_image_id integer,
     index_image_lg character varying(255),
-    language integer DEFAULT 0 NOT NULL
+    language integer DEFAULT 0 NOT NULL,
+    canonical_url character varying
 );
 
 
@@ -4838,4 +4839,6 @@ INSERT INTO schema_migrations (version) VALUES ('20191018140618');
 INSERT INTO schema_migrations (version) VALUES ('20191022123037');
 
 INSERT INTO schema_migrations (version) VALUES ('20191022143755');
+
+INSERT INTO schema_migrations (version) VALUES ('20191028130015');
 

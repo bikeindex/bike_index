@@ -1,3 +1,6 @@
+= content_for :header do
+  %link{rel: :canonical, href: canonical_url(@blog) }
+
 #news_display
   .blog-header
     %h1.global-title
