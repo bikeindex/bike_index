@@ -33,7 +33,7 @@ class ExternalRegistryClient::StopHelingClient < ExternalRegistryClient
         response.body
       end
 
-    results = results_from(response_body: response_body)
+    results = results_from(response_body: response_body, request_params: req_params)
     ::ExternalRegistryBike.where(id: results.map(&:id))
   end
 
@@ -51,7 +51,7 @@ class ExternalRegistryClient::StopHelingClient < ExternalRegistryClient
     query
   end
 
-  def results_from(response_body:)
+  def results_from(response_body:, request_params:)
     case response_body
     when Array
       # Exclude non-bikes, any bikes without serial numbers, since we won't be
@@ -68,7 +68,7 @@ class ExternalRegistryClient::StopHelingClient < ExternalRegistryClient
         # Typically an HMAC key error message will be returned as a Hash.
         Honeybadger.notify("StopHeling API request failed", {
           error_class: self.class.to_s,
-          context: { request: req_params, response: response_body },
+          context: { request: request_params, response: response_body },
         })
       end
       []
