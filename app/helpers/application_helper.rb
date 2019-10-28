@@ -228,4 +228,11 @@ module ApplicationHelper
   def bike_placeholder_image_path
     image_path("revised/bike_photo_placeholder.svg")
   end
+
+  # Return the canonical url for the given blog post.
+  # If none available, default to the bike index url, removing any query params.
+  def canonical_url(blog)
+    url = blog.canonical_url.presence || news_url(blog)
+    url.split("?").first
+  end
 end
