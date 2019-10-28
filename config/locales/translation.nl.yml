@@ -726,7 +726,7 @@ nl:
         name: Naam
         stolen_records: Gestolen records
         theft_alerts: Diefstalwaarschuwingen
-        views: Uitzichten
+        views: Weergaven
       tweet:
         alignment: opstelling
         body_html: Body html
@@ -5550,9 +5550,9 @@ nl:
         doen wat het moet doet om de fiets terug te vinden. Blijf in contact met hen.
   theft_alert_plans:
     theft_alert_plan:
-      best_value: Beste waarde
+      best_value: Beste aanbieding
       days: dagen
-      views: Uitzichten
+      views: Weergaven
   user_embeds:
     show:
       bike: Fiets
