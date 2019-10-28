@@ -71,7 +71,9 @@ RSpec.describe ExternalRegistryBike, type: :model do
       it "returns partial matches found on external registries", :skip_db_cleaner do
         serial = "2722"
         _local_non_match = FactoryBot.build(:external_registry_bike)
+
         results = described_class.find_or_search_registry_for(serial_number: serial)
+
         expect(results.where(serial_number: serial).count).to eq(0)
         expect(results.count).to eq(5)
       end

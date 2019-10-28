@@ -16,13 +16,11 @@ RSpec.describe SearchForExternalRegistryBikesWorker, type: :job do
 
     context "given matching bike returned" do
       it "persists any matches found to external_registry_bikes" do
-        expect(ExternalRegistryBike.count).to eq(0)
-
         VCR.use_cassette("external_registry/all_registries_2722_with_results") do
-          described_class.new.perform(2722)
+          expect { described_class.new.perform(2722) }
+            .to(change { ExternalRegistryBike.count }.by(5))
         end
 
-        expect(ExternalRegistryBike.count).to eq(5)
         serial_or_id_match =
           ExternalRegistryBike
             .all

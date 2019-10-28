@@ -15,7 +15,7 @@ class ExternalRegistryClient
       VerlorenOfGevondenClient,
     ]
 
-    queries = [query, SerialNormalizer.new(serial: query).serial_normalized].compact
+    queries = [query, SerialNormalizer.new(serial: query).normalized].compact
 
     results =
       registries

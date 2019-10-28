@@ -17,8 +17,8 @@ module BikeSearchable
       params = {}
 
       if query_params[:serial].present?
-        params[:serial] = query_params[:serial]
-        params[:serial_normalized] = SerialNormalizer.new(serial: query_params[:serial]).normalized
+        params[:serial] = SerialNormalizer.new(serial: query_params[:serial]).normalized
+        params[:raw_serial] = query_params[:serial]
       end
 
       params
