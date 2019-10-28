@@ -14,6 +14,8 @@
       window.BikeIndex.translator = (keyspace) => {
         return (key, args={}) => I18n.t(`javascript.${keyspace}.${key}`, args);
       }
+    -# Use with content_for(:header) -- see news/show for an example of content yielded to a named `yield`.
+    -# https://guides.rubyonrails.org/layouts_and_rendering.html#using-the-content-for-method
     = yield :header
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
   %body{ id: page_id, class:  body_class }

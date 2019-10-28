@@ -230,7 +230,8 @@ module ApplicationHelper
   end
 
   # Return the canonical url for the given blog post.
-  # If none available, default to the bike index url, removing any query params.
+  # If none available, default to the bike index url, removing any query params
+  # (e.g. the locale param).
   def canonical_url(blog)
     url = blog.canonical_url.presence || news_url(blog)
     url.split("?").first
