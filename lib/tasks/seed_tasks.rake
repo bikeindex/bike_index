@@ -34,7 +34,7 @@ task seed_test_users_and_bikes: :environment do
     bike = Bike.new(
       cycle_type: :bike,
       propulsion_type: "foot-pedal",
-      manufacturer_id: (rand(Manufacturer.frames.count) - 1),
+      manufacturer_id: (rand(Manufacturer.frame_makers.count) - 1),
       rear_tire_narrow: true,
       handlebar_type: HandlebarType.slugs.first,
       rear_wheel_size_id: (rand(WheelSize.count) - 1),
@@ -66,7 +66,7 @@ task seed_dup_bikes: :environment do
   @org = Organization.first
   @cycle_type = CycleType.new(:bike)
   @serial_number = (0...10).map { (65 + rand(26)).chr }.join
-  @manufacturer_id = (rand(Manufacturer.frames.count) + 1)
+  @manufacturer_id = (rand(Manufacturer.frame_makers.count) + 1)
   500.times do
     bike = Bike.new(
       cycle_type: :bike,

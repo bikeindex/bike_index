@@ -27,7 +27,7 @@
   .row
     .col-md-4
       .fancy-select.unfancy
-        = select_tag :manufacturer_id, options_from_collection_for_select(Manufacturer.frames, :id, :name), prompt: "Choose manufacturer"
+        = select_tag :manufacturer_id, options_from_collection_for_select(Manufacturer.frame_makers, :id, :name), prompt: "Choose manufacturer"
     .col-md-2
       = submit_tag 'Update selected', class: 'btn btn-primary'
   = paginate @bikes, views_prefix: "admin"

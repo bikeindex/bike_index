@@ -12,7 +12,7 @@ class Manufacturer < ActiveRecord::Base
   mount_uploader :logo, AvatarUploader
   default_scope { order(:name) }
 
-  scope :frames, -> { where(frame_maker: true) }
+  scope :frame_makers, -> { where(frame_maker: true) }
   scope :with_websites, -> { where("website is NOT NULL and website != ''") }
   scope :with_logos, -> { where("logo is NOT NULL and logo != ''") }
 

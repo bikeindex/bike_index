@@ -12,7 +12,7 @@ RSpec.describe "Manufacturers API V2", type: :request do
       count = Manufacturer.count
       get "/api/v2/manufacturers?per_page=1"
       expect(response.header["Total"]).to eq(count.to_s)
-      pagination_link = '<http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel="last", <http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel="next"'
+      pagination_link = '<http://www.example.com/api/v2/manufacturers?page=3&per_page=1>; rel="last", <http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel="next"'
       expect(response.header["Link"]).to eq(pagination_link)
       expect(response.code).to eq("200")
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
@@ -21,11 +21,11 @@ RSpec.describe "Manufacturers API V2", type: :request do
     end
     context "with frame_maker_only" do
       it "responds with frame_makers only" do
-        count = Manufacturer.frame_maker.count
+        count = Manufacturer.frame_makers.count
         expect(count).to be < Manufacturer.count
         get "/api/v2/manufacturers?per_page=1&only_frame=true"
         expect(response.header["Total"]).to eq(count.to_s)
-        pagination_link = '<http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel="last", <http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel="next"'
+        pagination_link = '<http://www.example.com/api/v2/manufacturers?only_frame=true&page=2&per_page=1>; rel="last", <http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel="next"'
         expect(response.header["Link"]).to eq(pagination_link)
         expect(response.code).to eq("200")
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
@@ -36,7 +36,15 @@ RSpec.describe "Manufacturers API V2", type: :request do
   end
 
   describe "find by id or name" do
-    let!(:manufacturer) { FactoryBot.create(:manufacturer) }
+    let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Giant (and LIV)") }
+    let(:target) do
+      {
+        name: manufacturer.name,
+        company_url: nil,
+        id: manufacturer.id,
+        short_name: "Giant",
+      }
+    end
     it "returns one with from an id" do
       get "/api/v2/manufacturers/#{manufacturer.id}"
       result = response.body
