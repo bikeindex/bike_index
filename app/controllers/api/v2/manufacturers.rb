@@ -17,6 +17,7 @@ module API
         }
         params do
           requires :id, type: String, desc: "Manufacturer id or slug"
+          optional :only_frame, type: Boolean, desc: "Only include Frame Manufacturers"
         end
         get ":id", serializer: ManufacturerV2ShowSerializer do
           manufacturer = Manufacturer.friendly_find(params[:id])

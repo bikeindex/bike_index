@@ -2,10 +2,13 @@ require "rails_helper"
 
 RSpec.describe "Manufacturers API V2", type: :request do
   describe "root" do
+    before do
+      # make sure it's the first manufacturer
+      @manufacturer = FactoryBot.create(:manufacturer, name: "AAAAAzz", frame_maker: true)
+      FactoryBot.create(:manufacturer, frame_maker: false)
+      FactoryBot.create(:manufacturer, frame_maker: false) unless Manufacturer.count >= 2
+    end
     it "responds on index with pagination" do
-      manufacturer = FactoryBot.create(:manufacturer, name: "AAAAAzz") # make sure it's the first manufacturer
-      FactoryBot.create(:manufacturer) unless Manufacturer.count >= 2
-      FactoryBot.create(:manufacturer) unless Manufacturer.count >= 2
       count = Manufacturer.count
       get "/api/v2/manufacturers?per_page=1"
       expect(response.header["Total"]).to eq(count.to_s)
@@ -15,6 +18,20 @@ RSpec.describe "Manufacturers API V2", type: :request do
       expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
       expect(response.headers["Access-Control-Request-Method"]).to eq("*")
       expect(JSON.parse(response.body)["manufacturers"][0]["id"]).to eq(manufacturer.id)
+    end
+    context "with frame_maker_only" do
+      it "responds with frame_makers only" do
+        count = Manufacturer.frame_maker.count
+        expect(count).to be < Manufacturer.count
+        get "/api/v2/manufacturers?per_page=1&only_frame=true"
+        expect(response.header["Total"]).to eq(count.to_s)
+        pagination_link = '<http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel="last", <http://www.example.com/api/v2/manufacturers?page=2&per_page=1>; rel="next"'
+        expect(response.header["Link"]).to eq(pagination_link)
+        expect(response.code).to eq("200")
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+        expect(response.headers["Access-Control-Request-Method"]).to eq("*")
+        expect(JSON.parse(response.body)["manufacturers"][0]["id"]).to eq(manufacturer.id)
+      end
     end
   end
 
