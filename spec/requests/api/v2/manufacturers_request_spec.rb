@@ -49,7 +49,7 @@ RSpec.describe "Manufacturers API V2", type: :request do
       get "/api/v2/manufacturers/#{manufacturer.id}"
       result = response.body
       expect(response.code).to eq("200")
-      expect(JSON.parse(result)["manufacturer"]["id"]).to eq(manufacturer.id)
+      expect(JSON.parse(result)["manufacturer"]).to eq target.as_json
     end
 
     it "responds with missing and cors headers" do
