@@ -37,7 +37,7 @@ RSpec.describe "Manufacturers API V2", type: :request do
         expect(response.code).to eq("200")
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
         expect(response.headers["Access-Control-Request-Method"]).to eq("*")
-        expect(JSON.parse(result)["manufacturer"][0]).to eq target.as_json
+        expect(JSON.parse(response.body)["manufacturers"][0]).to eq target.as_json
       end
     end
   end
@@ -46,8 +46,8 @@ RSpec.describe "Manufacturers API V2", type: :request do
     let!(:manufacturer) { FactoryBot.create(:manufacturer) }
     it "returns one with from an id" do
       get "/api/v2/manufacturers/#{manufacturer.id}"
-      result = response.body
       expect(response.code).to eq("200")
+      expect(JSON.parse(response.body)["manufacturer"]["id"])
     end
 
     it "responds with missing and cors headers" do
