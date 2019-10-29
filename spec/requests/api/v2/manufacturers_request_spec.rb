@@ -23,9 +23,9 @@ RSpec.describe "Manufacturers API V2", type: :request do
     context "with frame_maker_only" do
       let(:target) do
         {
-          name: manufacturer.name,
+          name: @manufacturer.name,
           company_url: "",
-          id: manufacturer.id,
+          id: @manufacturer.id,
           short_name: "AAGiant",
         }
       end
