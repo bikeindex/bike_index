@@ -9,7 +9,6 @@ RSpec.describe ExternalRegistryClient::StopHelingClient, type: :model do
 
   after do
     allow(Rails).to receive(:cache).and_call_original
-    ExternalRegistryCredential::StopHelingCredential.destroy_all
   end
 
   describe "#search" do

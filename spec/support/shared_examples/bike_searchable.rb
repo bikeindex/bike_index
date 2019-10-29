@@ -82,7 +82,7 @@ RSpec.shared_examples "bike_searchable" do
     end
     context "with nil query items" do
       let(:query_params) { { serial: "some serial", query_items: nil, stolenness: "non" } }
-      let(:target) { { serial: SerialNormalizer.new(serial: "some serial").normalized, stolenness: "non" } }
+      let(:target) { { serial: SerialNormalizer.new(serial: "some serial").normalized, raw_serial: "some serial", stolenness: "non" } }
       it "parses serial" do
         expect(Bike.searchable_interpreted_params(query_params, ip: ip_address)).to eq target
       end

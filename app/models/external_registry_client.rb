@@ -15,9 +15,12 @@ class ExternalRegistryClient
       VerlorenOfGevondenClient,
     ]
 
+    queries = [query, SerialNormalizer.new(serial: query).normalized].compact
+
     results =
       registries
-        .map { |registry| Thread.new { registry.new.search(query) } }
+        .flat_map { |registry| queries.map { |q| [registry, q] } }
+        .map { |registry, q| Thread.new { registry.new.search(q) } }
         .map(&:value)
         .flatten
         .compact

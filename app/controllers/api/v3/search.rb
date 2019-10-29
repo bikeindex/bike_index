@@ -116,7 +116,7 @@ module API
         end
         get "/external_registries" do
           bikes = ExternalRegistryBike.find_or_search_registry_for(
-            serial_number: interpreted_params[:serial],
+            serial_number: interpreted_params[:raw_serial],
           )
 
           ActiveModel::ArraySerializer.new(
