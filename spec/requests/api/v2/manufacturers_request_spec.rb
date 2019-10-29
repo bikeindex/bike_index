@@ -34,8 +34,6 @@ RSpec.describe "Manufacturers API V2", type: :request do
         expect(count).to be < Manufacturer.count
         get "/api/v2/manufacturers?per_page=1&only_frame=true"
         expect(response.header["Total"]).to eq(count.to_s)
-        pagination_link = '<http://www.example.com/api/v2/manufacturers?only_frame=true&page=2&per_page=1>; rel="last", <http://www.example.com/api/v2/manufacturers??only_frame=true&page=2&per_page=1>; rel="next"'
-        expect(response.header["Link"]).to eq(pagination_link)
         expect(response.code).to eq("200")
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
         expect(response.headers["Access-Control-Request-Method"]).to eq("*")
