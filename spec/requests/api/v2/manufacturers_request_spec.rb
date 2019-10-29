@@ -4,7 +4,7 @@ RSpec.describe "Manufacturers API V2", type: :request do
   describe "root" do
     before do
       # make sure it's the first manufacturer
-      @manufacturer = FactoryBot.create(:manufacturer,  name: "AAGiant (and LIV)", frame_maker: true)
+      @manufacturer = FactoryBot.create(:manufacturer, name: "AAGiant (and LIV)", frame_maker: true)
       FactoryBot.create(:manufacturer, frame_maker: false)
       FactoryBot.create(:manufacturer, frame_maker: false) unless Manufacturer.count >= 2
     end
@@ -25,7 +25,6 @@ RSpec.describe "Manufacturers API V2", type: :request do
           name: manufacturer.name,
           company_url: "",
           id: manufacturer.id,
-          frame_maker: true
           short_name: "AAGiant",
         }
       end
