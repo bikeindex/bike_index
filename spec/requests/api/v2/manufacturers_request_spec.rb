@@ -6,7 +6,8 @@ RSpec.describe "Manufacturers API V2", type: :request do
       # make sure it's the first manufacturer
       @manufacturer = FactoryBot.create(:manufacturer, name: "AAGiant (and LIV)", frame_maker: true)
       FactoryBot.create(:manufacturer, frame_maker: false)
-      FactoryBot.create(:manufacturer, frame_maker: false) unless Manufacturer.count >= 2
+      FactoryBot.create(:manufacturer, frame_maker: false) unless Manufacturer.count >= 3
+      FactoryBot.create(:manufacturer, frame_maker: false) unless Manufacturer.count >= 3
     end
     it "responds on index with pagination" do
       count = Manufacturer.count
@@ -38,7 +39,7 @@ RSpec.describe "Manufacturers API V2", type: :request do
         expect(response.code).to eq("200")
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
         expect(response.headers["Access-Control-Request-Method"]).to eq("*")
-        expect(JSON.parse(response.body)["manufacturers"][0]["id"]).to eq(@manufacturer.id)
+        expect(JSON.parse(result)["manufacturer"][0]).to eq target.as_json
       end
     end
   end
@@ -49,7 +50,6 @@ RSpec.describe "Manufacturers API V2", type: :request do
       get "/api/v2/manufacturers/#{manufacturer.id}"
       result = response.body
       expect(response.code).to eq("200")
-      expect(JSON.parse(result)["manufacturer"]).to eq target.as_json
     end
 
     it "responds with missing and cors headers" do
