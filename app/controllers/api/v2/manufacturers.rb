@@ -6,8 +6,12 @@ module API
       resource :manufacturers, desc: "Accepted manufacturers" do
         desc "All the manufacturers with pagination"
         paginate
+        params do
+          optional :only_frame, type: Boolean, desc: "Only include Frame Manufacturers"
+        end
         get "/" do
-          paginate Manufacturer.reorder(:name)
+          manufacturers = params[:only_frame].present? ? Manufacturer.frame_makers : Manufacturer
+          paginate manufacturers.reorder(:name)
         end
 
         desc "Manufacturer matching ID or name", {

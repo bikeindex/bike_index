@@ -23,11 +23,6 @@ FactoryBot.define do
     "#{n}0"
   end
 
-  factory :manufacturer do
-    name { FactoryBot.generate(:unique_name) }
-    frame_maker { true }
-  end
-
   factory :front_gear_type do
     name { FactoryBot.generate(:unique_name) }
     count { 1 }

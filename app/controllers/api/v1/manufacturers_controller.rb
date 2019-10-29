@@ -8,7 +8,7 @@ module Api
         manufacturers = Manufacturer.reorder(:name)
         if params[:query]
           if params[:query].strip == "frame_makers"
-            Manufacturer.frames
+            Manufacturer.frame_makers
           else
             manufacturers = Manufacturer.friendly_find(params[:query].to_s)
           end
