@@ -13,4 +13,4 @@
         %em
           = TwitterAccount.errored.pluck(:screen_name).sort.join(", ")
 
-
+      = link_to "Log in with any of these accounts to refresh their credentials", "/auth/twitter", class: "btn btn-success"

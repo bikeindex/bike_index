@@ -11,6 +11,8 @@ class TwitterAccount < ActiveRecord::Base
     :screen_name,
     presence: true
 
+  validates :screen_name, uniqueness: true
+
   geocoded_by :address
   after_validation :geocode, if: -> { !no_geocode && address.present? && (latitude.blank? || address_changed?) }
   before_save :reverse_geocode, if: -> { !no_geocode && latitude.present? && (state.blank? || state_changed?) }
@@ -42,8 +44,11 @@ class TwitterAccount < ActiveRecord::Base
     national.where(country: country).first || default_account
   end
 
-  def self.create_from_twitter_oauth(info)
-    create(attrs_from_user_info(info))
+  def self.find_or_create_from_twitter_oauth(info)
+    attrs = attrs_from_user_info(info)
+    twitter_account = find_or_initialize_by(screen_name: attrs.delete(:screen_name))
+    twitter_account.update(attrs)
+    twitter_account
   end
 
   def self.attrs_from_user_info(info)
