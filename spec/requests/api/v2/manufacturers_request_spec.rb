@@ -4,7 +4,7 @@ RSpec.describe "Manufacturers API V2", type: :request do
   describe "root" do
     before do
       # make sure it's the first manufacturer
-      @manufacturer = FactoryBot.create(:manufacturer, name: "AAAAAzz", frame_maker: true)
+      @manufacturer = FactoryBot.create(:manufacturer,  name: "AAGiant (and LIV)", frame_maker: true)
       FactoryBot.create(:manufacturer, frame_maker: false)
       FactoryBot.create(:manufacturer, frame_maker: false) unless Manufacturer.count >= 2
     end
@@ -20,6 +20,15 @@ RSpec.describe "Manufacturers API V2", type: :request do
       expect(JSON.parse(response.body)["manufacturers"][0]["id"]).to eq(@manufacturer.id)
     end
     context "with frame_maker_only" do
+      let(:target) do
+        {
+          name: manufacturer.name,
+          company_url: "",
+          id: manufacturer.id,
+          frame_maker: true
+          short_name: "AAGiant",
+        }
+      end
       it "responds with frame_makers only" do
         count = Manufacturer.frame_makers.count
         expect(count).to be < Manufacturer.count
@@ -36,15 +45,7 @@ RSpec.describe "Manufacturers API V2", type: :request do
   end
 
   describe "find by id or name" do
-    let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Giant (and LIV)") }
-    let(:target) do
-      {
-        name: manufacturer.name,
-        company_url: nil,
-        id: manufacturer.id,
-        short_name: "Giant",
-      }
-    end
+    let!(:manufacturer) { FactoryBot.create(:manufacturer) }
     it "returns one with from an id" do
       get "/api/v2/manufacturers/#{manufacturer.id}"
       result = response.body

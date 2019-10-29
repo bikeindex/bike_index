@@ -9,5 +9,5 @@ class ManufacturerSerializer < ActiveModel::Serializer
     object.website
   end
 
-  def short_name; simple_name end
+  def short_name; object.simple_name end
 end
