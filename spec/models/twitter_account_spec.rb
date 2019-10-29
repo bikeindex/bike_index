@@ -58,7 +58,7 @@ RSpec.describe TwitterAccount, type: :model do
   describe "#default_account" do
     it "returns first national account" do
       national_account1 = FactoryBot.create(:twitter_account_1, :national, :active)
-      _national_account2 = FactoryBot.create(:twitter_account_1, :national, :active)
+      _national_account2 = FactoryBot.create(:twitter_account_2, :national, :active)
       expect(TwitterAccount.default_account).to eq(national_account1)
     end
   end

@@ -26,9 +26,10 @@ class Admin::TwitterAccountsController < Admin::BaseController
 
   def create
     twitter_account =
-      TwitterAccount.create_from_twitter_oauth(request.env["omniauth.auth"])
+      TwitterAccount.find_or_create_from_twitter_oauth(request.env["omniauth.auth"])
 
     if twitter_account.persisted?
+      twitter_account.check_credentials
       flash[:notice] = "Twitter account #{twitter_account.screen_name} is persisted."
       redirect_to admin_twitter_account_url(twitter_account)
     else

@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :twitter_account do
-    sequence(:screen_name) { "TestTwitterAccount" }
+    sequence(:screen_name) { |n| "TestTwitterAccount#{n}" }
     consumer_key { "CONSUMER_KEY" }
     consumer_secret { "CONSUMER_SECRET" }
     user_token { "ACCESS_TOKEN" }
