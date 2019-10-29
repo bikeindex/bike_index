@@ -3,7 +3,6 @@
     .mr-4
       = link_to "Edit", edit_admin_twitter_account_url(@twitter_account), class: "btn btn-success"
       = link_to "Check Credentials", check_credentials_admin_twitter_account_url(@twitter_account), class: "btn btn-success"
-      = link_to "Log in to refresh credentials", "/auth/twitter", class: "btn btn-success"
 
 - if @twitter_account.errored?
   .row.mt-4.mb-4
@@ -25,6 +24,7 @@
                 Error
               %td
                 = @twitter_account.last_error
+        = link_to "Log in to refresh credentials", "/auth/twitter", class: "btn btn-success"
 .row
   .col-md-6
     %h1
