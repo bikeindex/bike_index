@@ -185,6 +185,7 @@ module BikeSearchable
 
     def search_matching_close_serials(serial)
       where("LEVENSHTEIN(serial_normalized, ?) < 3", serial)
+        .where.not(id: search_partial_serials(serial).select(:id))
     end
   end
 end
