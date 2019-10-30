@@ -9,7 +9,8 @@ import honeybadger from "../utils/honeybadger";
 import api from "../api";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const el = document.getElementById("js-partial-serial-search");
+  const containerId = "js-partial-serial-search";
+  const el = document.getElementById(containerId);
   if (!el) { return; }
 
   ReactDOM.render(
@@ -18,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
         interpretedParams={window.interpreted_params}
         fetchBikes={api.fetchPartialMatchSearch}
         searchName="PartialSerialSearch"
-        headerDomId="js-partial-serial-search-header"
+        headerDomId={`${containerId}-header`}
       />
     </ErrorBoundary>,
     el
@@ -26,7 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  const el = document.getElementById("js-close-serial-search");
+  const containerId = "js-close-serial-search";
+  const el = document.getElementById(containerId);
   if (!el) { return; }
 
   ReactDOM.render(
@@ -35,7 +37,7 @@ document.addEventListener("DOMContentLoaded", () => {
         interpretedParams={window.interpreted_params}
         fetchBikes={api.fetchSerialCloseSearch}
         searchName="CloseSerialSearch"
-        headerDomId="js-close-serial-search-header"
+        headerDomId={`${containerId}-header`}
       />
     </ErrorBoundary>,
     el
@@ -43,7 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener("DOMContentLoaded", () => {
-  const el = document.getElementById("js-external-registry-search");
+  const containerId ="js-external-registry-search";
+  const el = document.getElementById(containerId);
   if (!el) { return; }
 
   const { stolenness, query, serial } = window.interpreted_params;
@@ -58,7 +61,7 @@ document.addEventListener("DOMContentLoaded", () => {
         interpretedParams={window.interpreted_params}
         fetchBikes={api.fetchSerialExternalSearch}
         searchName="ExternalRegistrySearch"
-        headerDomId="js-external-registry-search-header"
+        headerDomId={`${containerId}-header`}
         resultComponent={ExternalRegistrySearchResult}
       />
     </ErrorBoundary>,
