@@ -2,13 +2,13 @@
 
 import React, { Fragment, Component } from "react";
 
-import PartialSerialSearchResult from "./PartialSerialSearchResult";
-import { fetchSerialPartialSearch } from "../../api";
+import CloseSerialSearchResult from "./CloseSerialSearchResult";
+import { fetchSerialCloseSearch } from "../../api";
 import Loading from "../../Loading";
 import honeybadger from "../../utils/honeybadger";
 import TimeParser from "../../utils/time_parser";
 
-class PartialSerialSearch extends Component {
+class CloseSerialSearch extends Component {
   state = {
     loading: false,
     results: []
@@ -16,7 +16,7 @@ class PartialSerialSearch extends Component {
 
   componentWillMount() {
     this.resultsBeingFetched();
-    fetchSerialPartialSearch(this.props.interpretedParams)
+    fetchSerialCloseSearch(this.props.interpretedParams)
       .then(this.resultsFetched)
       .catch(this.handleError);
   }
@@ -37,11 +37,11 @@ class PartialSerialSearch extends Component {
   }
 
   handleError = error => {
-    honeybadger.notify(error, { component: "PartialSerialSearch" });
+    honeybadger.notify(error, { component: "CloseSerialSearch" });
   }
 
   toggleHeader = ({ isLoading, resultsCount }) => {
-    const header = document.getElementById("js-partial-serial-search-header");
+    const header = document.getElementById("js-close-serial-search-header");
     if (!header) { return; }
 
     header.childNodes.forEach(node => node.classList && node.classList.add("d-none"));
@@ -64,11 +64,11 @@ class PartialSerialSearch extends Component {
     return (
       <Fragment>
         <ul className="bike-boxes">
-          {this.state.results.map(bike => <PartialSerialSearchResult key={bike.id} bike={bike} />)}
+          {this.state.results.map(bike => <CloseSerialSearchResult key={bike.id} bike={bike} />)}
         </ul>
       </Fragment>
     );
   }
 };
 
-export default PartialSerialSearch;
+export default CloseSerialSearch;

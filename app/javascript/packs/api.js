@@ -13,7 +13,7 @@ const fuzzySearchUrl = serial =>
 const serialExternalSearchUrl = serial =>
   url(`api/v3/search/external_registries?serial=${serial}`);
 
-const serialPartialSearchUrl = ({serial, stolenness, location, query }) => {
+const serialCloseSearchUrl = ({serial, stolenness, location, query }) => {
   const params = {};
   if (serial) { params.serial = serial; }
   if (stolenness) { params.stolenness = stolenness; }
@@ -48,8 +48,8 @@ const fetchSerialExternalSearch = serial => {
   return request(url);
 }
 
-const fetchSerialPartialSearch = interpretedParams => {
-  const url = serialPartialSearchUrl(interpretedParams);
+const fetchSerialCloseSearch = interpretedParams => {
+  const url = serialCloseSearchUrl(interpretedParams);
   return request(url);
 }
 
@@ -57,5 +57,5 @@ export {
   fetchSerialResults,
   fetchFuzzyResults,
   fetchSerialExternalSearch,
-  fetchSerialPartialSearch,
+  fetchSerialCloseSearch,
 };
