@@ -29,12 +29,13 @@ const request = async url => {
   return json;
 };
 
-const queryString = ({ serial, stolenness, location, query }) => {
+const queryString = ({ serial, stolenness, location, query, query_items }) => {
   const params = {};
   if (serial) { params.serial = serial; }
   if (stolenness) { params.stolenness = stolenness; }
   if (location) { params.location = location; }
   if (query) { params.query = query; }
+  if (query_items) { params.query_items = query_items; }
   return Object.keys(params).map(k => `${k}=${params[k]}`).join("&");
 }
 

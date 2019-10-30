@@ -83,7 +83,7 @@ module BikeSearchable
 
     def searchable_query_items_query(query_params)
       return { query: query_params[:query] } if query_params[:query].present?
-      query = query_params[:query_items] && query_params[:query_items].select { |i| !(/\A[cm]_/ =~ i) }.join(" ")
+      query = query_params[:query_items]&.select { |i| !(/\A[cm]_/ =~ i) }&.join(" ")
       query.present? ? { query: query } : {}
     end
 
