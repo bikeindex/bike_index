@@ -101,8 +101,15 @@ module API
 
         desc "Search by serial number (partially matching)", {
                notes: <<-NOTE,
-                This endpoint accepts the same parameters as the root `/search` endpoint.
-                It returns bikes with partially-matching serial numbers to the requested serial.
+                This endpoint accepts the same parameters as the root `/search`
+                endpoint.
+
+                It returns bikes with partially-matching serial numbers to the
+                requested serial.
+
+                If space-separated, multiple serial number stems can be provided
+                under the `serial` param and partial matches for all will be
+                returned.
                NOTE
              }
         paginate
@@ -112,8 +119,14 @@ module API
           optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
         end
         get "/partial_serials" do
-          partial_serials = Bike.search_partial_serials(interpreted_params)
-          serialized_bikes_results(paginate(partial_serials))
+          results =
+            params[:serial]
+              .to_s
+              .split
+              .flat_map { |serial| interpreted_params.merge(serial: serial) }
+              .flat_map { |query| Bike.search_partial_serials(query) }
+
+          serialized_bikes_results(paginate(results))
         end
 
         desc "Search external registries", {
