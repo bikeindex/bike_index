@@ -42,14 +42,17 @@ module BikeSearchable
     end
 
     def search_partial_serials(interpreted_params)
-      return Bike.none unless interpreted_params[:serial]
-      # Skip the exact match ids
-      serial = "%#{interpreted_params[:serial]}%"
+      serial_normalized =
+        SerialNormalizer
+          .new(serial: interpreted_params[:serial])
+          .normalized
+
+      return Bike.none if serial_normalized.blank?
 
       where
         .not(id: search(interpreted_params).pluck(:id))
         .non_serial_matches(interpreted_params)
-        .where("serial_number LIKE ? OR serial_normalized LIKE ?", serial, serial)
+        .where("serial_normalized LIKE ?", "%#{serial_normalized}%")
     end
 
     # Initial autocomplete options hashes for the main select search input

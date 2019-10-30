@@ -39,7 +39,8 @@ RSpec.describe "Search API V3", type: :request do
       get "/api/v3/search/partial_serials", serial: "serial_num", stolenness: "non", format: :json
 
       result = json_result
-      expect(result["bikes"][0]["id"]).to eq bike.id
+      expect(result[:bikes]).to be_present
+      expect(result[:bikes][0]["id"]).to eq bike.id
       expect(response.header["Total"]).to eq("1")
     end
 
