@@ -2,7 +2,7 @@
 
 import React, { Fragment, Component } from "react";
 
-import PartialSerialSearchResult from "./PartialSerialSearchResult";
+import BikeSearchResult from "../../components/BikeSearchResult";
 import { fetchPartialMatchSearch } from "../../api";
 import Loading from "../../Loading";
 import honeybadger from "../../utils/honeybadger";
@@ -64,7 +64,7 @@ class PartialSerialSearch extends Component {
     return (
       <Fragment>
         <ul className="bike-boxes">
-          {this.state.results.map(bike => <PartialSerialSearchResult key={bike.id} bike={bike} />)}
+          {this.state.results.map(bike => <BikeSearchResult key={bike.id} bike={bike} />)}
         </ul>
       </Fragment>
     );
