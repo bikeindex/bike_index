@@ -6,7 +6,7 @@ import BikeSearch from "./BikeSearch";
 import { fetchPartialMatchSearch } from "../../api";
 
 class PartialSerialSearch extends BikeSearch {
-  errorComponentName = "PartialSerialSearch";
+  componentName = "PartialSerialSearch";
   fetchBikes = fetchPartialMatchSearch;
   headerDomId = "js-partial-serial-search-header";
 };

@@ -6,7 +6,7 @@ import BikeSearch from "./BikeSearch";
 import { fetchSerialCloseSearch } from "../../api";
 
 class CloseSerialSearch extends BikeSearch {
-  errorComponentName = "CloseSerialSearch";
+  componentName = "CloseSerialSearch";
   fetchBikes = fetchSerialCloseSearch;
   headerDomId = "js-close-serial-search-header";
 };

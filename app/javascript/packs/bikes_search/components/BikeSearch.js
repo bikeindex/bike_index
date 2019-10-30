@@ -11,7 +11,7 @@ import TimeParser from "../../utils/time_parser";
 class BikeSearch extends Component {
   // Override
   fetchBikes = () => console.error("fetchBikes undefined")
-  errorComponentName = "BikeSearch"
+  componentName = "BikeSearch"
   headerDomId = "js-bike-search-header"
 
   state = {
@@ -42,7 +42,7 @@ class BikeSearch extends Component {
   }
 
   handleError = error => {
-    honeybadger.notify(error, { component: this.errorComponentName });
+    honeybadger.notify(error, { component: this.componentName });
   }
 
   toggleHeader = ({ isLoading, resultsCount }) => {
