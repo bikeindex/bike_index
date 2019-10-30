@@ -3,7 +3,7 @@
 import React, { useState, Fragment } from "react";
 import searchIcon from "images/stolen/search.svg";
 import SearchResults from "./SearchResults";
-import { fetchSerialResults, fetchFuzzyResults } from "../../api";
+import api from "../../api";
 import honeybadger from "../../utils/honeybadger";
 
 const MultiSerialSearch = () => {
@@ -35,7 +35,7 @@ const MultiSerialSearch = () => {
         parallel request serials
       */
       const all = await Promise.all(
-        uniqSerials.map(serial => fetchSerialResults(serial))
+        uniqSerials.map(serial => api.fetchSerialResults(serial))
       );
       const results = all.map(({ bikes }, index) => {
         const serial = uniqSerials[index];
@@ -70,7 +70,7 @@ const MultiSerialSearch = () => {
         parallel request fuzzy serials and merge
       */
       const fuzzyAll = await Promise.all(
-        serialResults.map(({ serial }) => fetchFuzzyResults(serial))
+        serialResults.map(({ serial }) => api.fetchFuzzyResults(serial))
       );
       const updatedResults = fuzzyAll.map(({ bikes: fuzzyBikes }, index) => {
         const serialResult = serialResults[index];

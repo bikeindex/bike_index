@@ -3,17 +3,12 @@
 import React, { Fragment, Component } from "react";
 
 import BikeSearchResult from "./BikeSearchResult";
-import { fetchSerialCloseSearch } from "../../api";
+import api from "../../api";
 import Loading from "../../Loading";
 import honeybadger from "../../utils/honeybadger";
 import TimeParser from "../../utils/time_parser";
 
 class BikeSearch extends Component {
-  // Override
-  fetchBikes = () => console.error("fetchBikes undefined")
-  componentName = "BikeSearch"
-  headerDomId = "js-bike-search-header"
-
   state = {
     loading: false,
     results: []
@@ -21,7 +16,7 @@ class BikeSearch extends Component {
 
   componentWillMount() {
     this.resultsBeingFetched();
-    this.fetchBikes(this.props.interpretedParams)
+    this.props.fetchBikes(this.props.interpretedParams)
       .then(this.resultsFetched)
       .catch(this.handleError);
   }
@@ -42,11 +37,11 @@ class BikeSearch extends Component {
   }
 
   handleError = error => {
-    honeybadger.notify(error, { component: this.componentName });
+    honeybadger.notify(error, { component: this.props.componentName });
   }
 
   toggleHeader = ({ isLoading, resultsCount }) => {
-    const header = document.getElementById(this.headerDomId);
+    const header = document.getElementById(this.props.headerDomId);
     if (!header) { return; }
 
     header.childNodes.forEach(node => node.classList && node.classList.add("d-none"));
@@ -62,7 +57,7 @@ class BikeSearch extends Component {
   }
 
   render() {
-    const Result = this.resultComponent || BikeSearchResult;
+    const Result = this.props.resultComponent || BikeSearchResult;
 
     if (this.state.loading) {
       return <Loading />;
