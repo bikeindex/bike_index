@@ -119,11 +119,15 @@ module API
           optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
         end
         get "/partial_serials" do
-          results =
-            params[:serial]
-              .to_s
-              .split
+          serial_numbers =
+            params[:serial].to_s.split(" ")
+
+          search_queries =
+            serial_numbers
               .flat_map { |serial| interpreted_params.merge(serial: serial) }
+
+          results =
+            search_queries
               .flat_map { |query| Bike.search_partial_serials(query) }
 
           serialized_bikes_results(paginate(results))
