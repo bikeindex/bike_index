@@ -2,7 +2,7 @@
 
 import React, { Fragment, Component } from "react";
 
-import BikeSearchResult from "../../components/BikeSearchResult";
+import BikeSearchResult from "./BikeSearchResult";
 import { fetchPartialMatchSearch } from "../../api";
 import Loading from "../../Loading";
 import honeybadger from "../../utils/honeybadger";
