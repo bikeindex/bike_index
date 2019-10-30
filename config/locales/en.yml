@@ -1207,8 +1207,8 @@ en:
       stolen_anywhere: Stolen anywhere
       stolen_within: Stolen within
       submit: submit
-      with_close_serial_numbers_html: "%{stolenness} bikes with serial numbers close to
-        <em>%{serial}</em>"
+      with_close_serial_numbers_html: "%{stolenness} bikes with serial numbers close
+        to <em>%{serial}</em>"
       with_partial_serial_numbers_html: "%{stolenness} bikes with serial numbers partially
         matching <em>%{serial}</em>"
       within: within
@@ -2074,7 +2074,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -2100,7 +2100,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
