@@ -42,11 +42,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ReactDOM.render(
     <ErrorBoundary honeybadger={honeybadger}>
 
-    <ExternalRegistrySearch
-    stolenness={window.interpreted_params.stolenness}
-    query={window.interpreted_params.query}
-    serial={window.interpreted_params.raw_serial}
-      />
+    <ExternalRegistrySearch interpretedParams={window.interpreted_params} />
     </ErrorBoundary>,
     el
   );

@@ -62,6 +62,8 @@ class BikeSearch extends Component {
   }
 
   render() {
+    const Result = this.resultComponent || BikeSearchResult;
+
     if (this.state.loading) {
       return <Loading />;
     }
@@ -69,7 +71,7 @@ class BikeSearch extends Component {
     return (
       <Fragment>
         <ul className="bike-boxes">
-          {this.state.results.map(bike => <BikeSearchResult key={bike.id} bike={bike} />)}
+          {this.state.results.map(bike => <Result key={bike.id} bike={bike}/>)}
         </ul>
       </Fragment>
     );

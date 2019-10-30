@@ -52,7 +52,7 @@ const fetchFuzzyResults = serial => {
   return request(url);
 };
 
-const fetchSerialExternalSearch = serial => {
+const fetchSerialExternalSearch = ({ serial }) => {
   const url = serialExternalSearchUrl(serial);
   return request(url);
 }
