@@ -62,6 +62,16 @@
                       %a{ href: "#", style: "opacity: 0.8; text-align: right;", data: { toggle: "modal", target: "#assignStickerModal" } }
                         = t(".link_sticker")
               - if @bike.organized?(passive_organization) # Only display information about the bike if bike is registered through org
+                - if passive_organization.parent?
+                  %tr
+                    %td
+                      = t(".organization_registered")
+                    %td
+                      - if @bike.creation_organization == passive_organization
+                        %small= @bike.creation_organization.name
+                      - else
+                        %em.small= t(".organization_child")
+                        = @bike.creation_organization.name
                 %tr
                   %td= t(".owner_name")
                   %td= @bike.owner_name
