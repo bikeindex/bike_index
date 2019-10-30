@@ -1,5 +1,6 @@
-= javascript_pack_tag "external_registry_search/index"
+= javascript_pack_tag "partial_serial_search/index"
 = javascript_pack_tag "close_serial_search/index"
+= javascript_pack_tag "external_registry_search/index"
 
 - stolenness_desc = { 'proximity' => 'nearby stolen', 'non' => 'non-stolen', 'stolen' => 'stolen', 'all' => 'all' }[@interpreted_params[:stolenness]]
 
@@ -72,6 +73,7 @@
           .loaded.d-none= t(".with_partial_serial_numbers_html", stolenness: stolenness_desc, serial: params[:serial])
           .loaded-none.no-exact-results.d-none= t(".no_partial_matches_found")
         #js-partial-serial-search
+
     .row
       .col-md-12
         %h3.secondary-matches#js-close-serial-search-header
