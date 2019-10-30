@@ -1193,7 +1193,7 @@ en:
       anywhere: Anywhere
       external_matches_found: Matches found in external registries
       miles_of: miles of
-      no_bikes_matched: No %{stolenness} bikes matched your search
+      no_bikes_matched: No bikes exactly matched your search
       no_external_matches_found: No matches found in external registries
       no_near_matches_found: No near-matching serials found
       not_marked_stolen: Not marked stolen
