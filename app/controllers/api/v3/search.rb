@@ -106,10 +106,6 @@ module API
 
                 It returns bikes with partially-matching serial numbers to the
                 requested serial.
-
-                If space-separated, multiple serial number stems can be provided
-                under the `serial` param and partial matches for all will be
-                returned.
                NOTE
              }
         paginate
@@ -119,17 +115,7 @@ module API
           optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
         end
         get "/partial_serials" do
-          serial_numbers =
-            params[:serial].to_s.split(" ")
-
-          search_queries =
-            serial_numbers
-              .flat_map { |serial| interpreted_params.merge(serial: serial) }
-
-          results =
-            search_queries
-              .flat_map { |query| Bike.search_partial_serials(query) }
-
+          results = Bike.search_partial_serials(interpreted_params)
           serialized_bikes_results(paginate(results))
         end
 

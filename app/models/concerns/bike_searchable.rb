@@ -42,11 +42,7 @@ module BikeSearchable
     end
 
     def search_partial_serials(interpreted_params)
-      serial_normalized =
-        SerialNormalizer
-          .new(serial: interpreted_params[:serial])
-          .normalized
-
+      serial_normalized = interpreted_params[:serial]
       return Bike.none if serial_normalized.blank?
 
       where

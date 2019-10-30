@@ -43,20 +43,6 @@ RSpec.describe "Search API V3", type: :request do
       expect(result[:bikes][0]["id"]).to eq bike.id
       expect(response.header["Total"]).to eq("1")
     end
-
-    context "given a space-separated list of partial serial numbers" do
-      it "returns partially matching bikes for all provided serial numbers" do
-        bike1 = FactoryBot.create(:bike, manufacturer: manufacturer, serial_number: "serial_one")
-        bike2 = FactoryBot.create(:bike, manufacturer: manufacturer, serial_number: "serial_two")
-        FactoryBot.create(:bike, manufacturer: manufacturer, serial_number: "serial_three")
-
-        get "/api/v3/search/partial_serials", serial: "one two", stolenness: "non", format: :json
-
-        result = json_result
-        expect(response.header["Total"]).to eq("2")
-        expect(result["bikes"].map { |b| b["id"] }).to match_array([bike1, bike2].map(&:id))
-      end
-    end
   end
 
   describe "/external_registries" do
