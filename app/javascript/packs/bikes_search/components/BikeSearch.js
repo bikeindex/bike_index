@@ -37,7 +37,7 @@ class BikeSearch extends Component {
   }
 
   handleError = error => {
-    honeybadger.notify(error, { component: this.props.componentName });
+    honeybadger.notify(error, { component: this.props.searchName });
   }
 
   toggleHeader = ({ isLoading, resultsCount }) => {

@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <BikeSearch
         interpretedParams={window.interpreted_params}
         fetchBikes={api.fetchPartialMatchSearch}
-        componentName="PartialSerialSearch"
+        searchName="PartialSerialSearch"
         headerDomId="js-partial-serial-search-header"
       />
     </ErrorBoundary>,
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <BikeSearch
         interpretedParams={window.interpreted_params}
         fetchBikes={api.fetchSerialCloseSearch}
-        componentName="CloseSerialSearch"
+        searchName="CloseSerialSearch"
         headerDomId="js-close-serial-search-header"
       />
     </ErrorBoundary>,
@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <BikeSearch
         interpretedParams={window.interpreted_params}
         fetchBikes={api.fetchSerialExternalSearch}
-        componentName="ExternalRegistrySearch"
+        searchName="ExternalRegistrySearch"
         headerDomId="js-external-registry-search-header"
         resultComponent={ExternalRegistrySearchResult}
       />
