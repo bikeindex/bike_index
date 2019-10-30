@@ -99,6 +99,23 @@ module API
           serialized_bikes_results(paginate(close_serials))
         end
 
+        desc "Search by serial number (partially matching)", {
+               notes: <<-NOTE,
+                This endpoint accepts the same parameters as the root `/search` endpoint.
+                It returns bikes with partially-matching serial numbers to the requested serial.
+               NOTE
+             }
+        paginate
+        params do
+          requires :serial, type: String, desc: "Serial, homoglyph matched"
+          use :non_serial_search_params
+          optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
+        end
+        get "/partial_serials" do
+          partial_serials = Bike.search_partial_serials(interpreted_params)
+          serialized_bikes_results(paginate(partial_serials))
+        end
+
         desc "Search external registries", {
                notes: <<-NOTE,
                  This endpoint accepts a serial number and searches external

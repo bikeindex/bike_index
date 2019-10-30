@@ -41,6 +41,17 @@ module BikeSearchable
         .search_matching_close_serials(interpreted_params[:serial])
     end
 
+    def search_partial_serials(interpreted_params)
+      return Bike.none unless interpreted_params[:serial]
+      # Skip the exact match ids
+      serial = "%#{interpreted_params[:serial]}%"
+
+      where
+        .not(id: search(interpreted_params).pluck(:id))
+        .non_serial_matches(interpreted_params)
+        .where("serial_number LIKE ? OR serial_normalized LIKE ?", serial, serial)
+    end
+
     # Initial autocomplete options hashes for the main select search input
     # ignores manufacturer_id and color_ids we don't have
     def selected_query_items_options(interpreted_params)
