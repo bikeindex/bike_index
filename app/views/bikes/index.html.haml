@@ -69,7 +69,7 @@
       .col-md-12
         %h3.secondary-matches#js-close-serial-search-header
           .loading.d-none= t(".searching_for_near_matches")
-          .loaded.d-none= t(".with_serial_numbers_html", stolenness: stolenness_desc, serial: params[:serial])
+          .loaded.d-none= t(".with_close_serial_numbers_html", stolenness: stolenness_desc, serial: params[:serial])
           .loaded-none.no-exact-results.d-none= t(".no_near_matches_found")
         #js-close-serial-search
 

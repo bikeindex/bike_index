@@ -1196,16 +1196,21 @@ en:
       no_bikes_matched: No bikes exactly matched your search
       no_external_matches_found: No matches found in external registries
       no_near_matches_found: No near-matching serials found
+      no_partial_matches_found: No partially matching serials found
       not_marked_stolen: Not marked stolen
       search_bike_descriptions: Search bike descriptions
       search_for_serial_number: Search for serial number
       search_for_stolenness_desc_bikes: Search for %{stolenness_desc} bikes
       searching_external_registries: Searching external registries...
       searching_for_near_matches: Searching for near-matching serial numbers...
+      searching_for_partial_matches: Searching for partially-matching serial numbers...
       stolen_anywhere: Stolen anywhere
       stolen_within: Stolen within
       submit: submit
-      with_serial_numbers_html: "%{stolenness} with serial numbers close to <em>%{serial}</em>"
+      with_close_serial_numbers_html: "%{stolenness} with serial numbers close to
+        <em>%{serial}</em>"
+      with_partial_serial_numbers_html: "%{stolenness} with serial numbers partially
+        matching <em>%{serial}</em>"
       within: within
       you: you
     new:
