@@ -49,6 +49,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const el = document.getElementById(containerId);
   if (!el) { return; }
 
+  // Only search external registries if looking for
+  // stolen/all bikes with no query
   const { stolenness, query, serial } = window.interpreted_params;
   if (stolenness === "non" || query || !serial) { return; }
 
