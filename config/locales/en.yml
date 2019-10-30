@@ -1193,10 +1193,10 @@ en:
       anywhere: Anywhere
       external_matches_found: Matches found in external registries
       miles_of: miles of
-      no_bikes_matched: No bikes exactly matched your search
+      no_bikes_matched: No serial numbers exactly matched your search
       no_external_matches_found: No matches found in external registries
-      no_near_matches_found: No near-matching serials found
-      no_partial_matches_found: No partially matching serials found
+      no_near_matches_found: No similar serials numbers found
+      no_partial_matches_found: No partially matching serials numbers found
       not_marked_stolen: Not marked stolen
       search_bike_descriptions: Search bike descriptions
       search_for_serial_number: Search for serial number
@@ -1207,9 +1207,9 @@ en:
       stolen_anywhere: Stolen anywhere
       stolen_within: Stolen within
       submit: submit
-      with_close_serial_numbers_html: "%{stolenness} with serial numbers close to
+      with_close_serial_numbers_html: "%{stolenness} bikes with serial numbers close to
         <em>%{serial}</em>"
-      with_partial_serial_numbers_html: "%{stolenness} with serial numbers partially
+      with_partial_serial_numbers_html: "%{stolenness} bikes with serial numbers partially
         matching <em>%{serial}</em>"
       within: within
       you: you
@@ -2074,7 +2074,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2100,7 +2100,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
