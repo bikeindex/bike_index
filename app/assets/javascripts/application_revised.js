@@ -28,6 +28,10 @@
 // Can use if we need a carousel, though would be nice to use rails-assets version instead
 //= require external_scripts/slick.js
 
+// Translations
+//= require i18n
+//= require i18n/translations
+
 // Things that are required for File Upload:
 //= require external_scripts/jquery_sortable_0.9.13.js
 //= require external_scripts/jquery.ui.widget.js
