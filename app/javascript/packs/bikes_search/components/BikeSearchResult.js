@@ -4,7 +4,7 @@ import React, { Fragment } from "react";
 
 const t = BikeIndex.translator("bikes_search");
 
-const CloseSerialSearchResult = ({bike}) => (
+const BikeSerialSearchResult = ({bike}) => (
   <li className="bike-box-item">
     <ResultImage bike={bike}/>
 
@@ -90,4 +90,4 @@ const ResultImage = ({ bike }) => {
           </a>);
 }
 
-export default CloseSerialSearchResult;
+export default BikeSerialSearchResult;

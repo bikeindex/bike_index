@@ -1,17 +1,18 @@
 import React from "react";
 import ReactDOM from "react-dom";
+
 import ErrorBoundary from "@honeybadger-io/react";
-import CloseSerialSearch from "./components/CloseSerialSearch";
+
+import SecondarySearches from "./components/SecondarySearches";
 import honeybadger from "../utils/honeybadger";
 
 document.addEventListener("DOMContentLoaded", () => {
-  const el = document.getElementById("js-close-serial-search");
+  const el = document.getElementById("js-secondary-searches");
   if (!el) { return; }
 
   ReactDOM.render(
     <ErrorBoundary honeybadger={honeybadger}>
-    <CloseSerialSearch interpretedParams={window.interpreted_params} />
+      <SecondarySearches interpretedParams={window.interpreted_params} />
     </ErrorBoundary>,
-    el
-  );
+    el)
 });

@@ -81,6 +81,8 @@ module API
           }
         end
 
+        # TODO: When next bumping the API version, rename this endpoint to
+        # "/similar_serials" or etc.
         desc "Search close serials", {
           notes: <<-NOTE,
             This endpoint accepts the same parameters as the root `/search` endpoint.
@@ -97,6 +99,24 @@ module API
         get "/close_serials" do
           close_serials = Bike.search_close_serials(interpreted_params)
           serialized_bikes_results(paginate(close_serials))
+        end
+
+        desc "Search by substring-match against serial number", {
+               notes: <<-NOTE,
+                This endpoint accepts the same parameters as the root `/search` endpoint.
+
+                It returns bikes with partially-matching serial numbers (for which the requested serial is a substring).
+               NOTE
+             }
+        paginate
+        params do
+          requires :serial, type: String, desc: "Serial, homoglyph matched"
+          use :non_serial_search_params
+          optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
+        end
+        get "/serials_containing" do
+          results = Bike.search_serials_containing(interpreted_params)
+          serialized_bikes_results(paginate(results))
         end
 
         desc "Search external registries", {
