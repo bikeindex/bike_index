@@ -26,25 +26,20 @@ class ExternalRegistryClient::VerlorenOfGevondenClient < ExternalRegistryClient
     self.result_pages = {}
   end
 
-  # Return an ActiveRecord collection of ExternalRegistryBike objects
-  def search(query, all_pages: false)
-    return ::ExternalRegistryBike.none if query.to_s.length < MINIMUM_QUERY_LENGTH
+  # Return an Array of Hashes
+  def search(query)
+    return [] if query.to_s.length < MINIMUM_QUERY_LENGTH
 
     get_page(query)
 
-    if all_pages && total_pages.to_i > 1
-      (2..total_pages)
-        .map { |page| Thread.new { get_page(query, page: page) } }
-        .map(&:value)
-
-      retry_pages
-        .each { |page| Rails.logger.info("Retrying page #{page}") }
-        .map { |page| Thread.new { get_page(query, page: page) } }
-        .map(&:value)
-    end
-
-    persisted = external_registry_bikes_from(result_pages: result_pages.values.flatten.compact)
-    ::ExternalRegistryBike.where(id: persisted.map(&:id))
+    # Exclude non-bikes, any bikes without serial numbers, since we won't be
+    # searching for these.
+    result_pages
+      .values
+      .flatten
+      .compact
+      .map { |result| ExternalRegistryBike::VerlorenOfGevondenBike.build_from_api_response(result) }
+      .compact
   end
 
   private
@@ -105,15 +100,5 @@ class ExternalRegistryClient::VerlorenOfGevondenClient < ExternalRegistryClient
 
     matches = response.dig("hits", "hits").presence || []
     self.result_pages[page] = matches.map { |hit| hit["_source"] }
-  end
-
-  def external_registry_bikes_from(result_pages:)
-    # Exclude non-bikes, any bikes without serial numbers, since we won't be
-    # searching for these.
-    result_pages
-      .map { |result| ExternalRegistryBike::VerlorenOfGevondenBike.build_from_api_response(result) }
-      .compact
-      .each(&:save)
-      .select(&:persisted?)
   end
 end

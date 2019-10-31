@@ -29,11 +29,12 @@ RSpec.describe ExternalRegistryClient::StopHelingClient, type: :model do
     end
 
     context "given matching results but no bikes" do
-      it "returns an array of ExternalRegistryBikes" do
+      it "returns an array of unpersisted ExternalRegistryBikes" do
         client = build_client(results: [bike_result])
         results = client.search("28484")
         expect(results).to_not be_empty
         expect(results).to all(be_an_instance_of(ExternalRegistryBike::StopHelingBike))
+        expect(results.none?(&:persisted?)).to eq(true)
       end
     end
   end

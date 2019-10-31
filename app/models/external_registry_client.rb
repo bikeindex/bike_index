@@ -21,9 +21,10 @@ class ExternalRegistryClient
       registries
         .flat_map { |registry| queries.map { |q| [registry, q] } }
         .map { |registry, q| Thread.new { registry.new.search(q) } }
-        .map(&:value)
-        .flatten
+        .flat_map(&:value)
         .compact
+        .each(&:save)
+        .select(&:persisted?)
 
     ExternalRegistryBike.where(id: results.map(&:id))
   end
