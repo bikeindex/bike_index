@@ -34,7 +34,9 @@ class BikeSearch extends Component {
   }
 
   resultsFetched = ({ bikes, error }) => {
-    this.setState({ results: bikes || [], loading: false });
+    const results = bikes || [];
+    const loading = (!results.length) ? null : false;
+    this.setState({ results , loading });
     if (error) { this.handleError(error) }
   }
 
@@ -53,7 +55,7 @@ class BikeSearch extends Component {
     if (this.state.loading === null) {
       return <div className="row">
                <div className="col-md-12">
-                 <h3 className="secondary-matches">
+                 <h3 className="no-exact-results">
                    {this.props.t("no_matches_found_html", { serial })}
                  </h3>
                </div>
