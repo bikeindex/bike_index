@@ -17,6 +17,7 @@ RSpec.describe "Search API V3", type: :request do
       end
     end
   end
+
   describe "/close_serials" do
     let!(:bike) { FactoryBot.create(:bike, manufacturer: manufacturer, serial_number: "something") }
     let(:query_params) { { serial: "somethind", stolenness: "non" } }
@@ -30,6 +31,20 @@ RSpec.describe "Search API V3", type: :request do
       end
     end
   end
+
+  describe "/serials_containing" do
+    it "returns matching bikes with partially matching serial numbers" do
+      bike = FactoryBot.create(:bike, manufacturer: manufacturer, serial_number: "serial_number")
+
+      get "/api/v3/search/serials_containing", serial: "serial_num", stolenness: "non", format: :json
+
+      result = json_result
+      expect(result[:bikes]).to be_present
+      expect(result[:bikes][0]["id"]).to eq bike.id
+      expect(response.header["Total"]).to eq("1")
+    end
+  end
+
   describe "/external_registries" do
     context "returns bikes" do
       it "returns matching bikes" do

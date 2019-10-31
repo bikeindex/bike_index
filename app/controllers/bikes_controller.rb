@@ -15,9 +15,11 @@ class BikesController < ApplicationController
   def index
     @interpreted_params = Bike.searchable_interpreted_params(permitted_search_params, ip: forwarded_ip_address)
     @stolenness = @interpreted_params[:stolenness]
+
     if params[:stolenness] == "proximity" && @stolenness != "proximity"
       flash[:info] = translation(:we_dont_know_location, location: params[:location])
     end
+
     @bikes = Bike.search(@interpreted_params).page(params[:page] || 1).per(params[:per_page] || 10).decorate
     @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
   end

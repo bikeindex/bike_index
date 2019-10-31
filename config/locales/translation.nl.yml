@@ -1892,14 +1892,8 @@ nl:
       stolen_anywhere: Overal gestolen
       stolen_within: Gestolen binnen
       submit: Voorleggen
-      with_serial_numbers_html: "%{stolenness} met framenummers dicht bij <em>%{serial}</em>"
       within: binnen
       you: jou
-      external_matches_found: Bijna-overeenkomsten gevonden in externe registers
-      no_external_matches_found: Geen bijna-overeenkomsten gevonden in externe registers
-      searching_external_registries: Zoeken naar externe registers ...
-      no_near_matches_found: Geen bijna overeenkomende series gevonden
-      searching_for_near_matches: Zoeken naar bijna overeenkomende serienummers ...
     new:
       additional_serial_sticker_number: Extra framenummer / stickernummer
       affiliation: "%{org_name} aansluiting"
@@ -5611,3 +5605,24 @@ nl:
       stolen: Gestolen
       unknown: Onbekend
       unknown_brand: Onbekend merk
+      search_external_registries:
+        matches_found_html: "%{stolenness} fietsen die overeenkomen met %{serial}
+          gevonden in externe registers"
+        no_matches_found_html: Geen overeenkomende fietsen %{serial} gevonden in externe
+          registers
+        searching_html: Zoeken naar externe registers voor overeenkomende fietsen
+          %{serial} ...
+      search_serials_containing:
+        matches_found_html: "%{stolenness} fietsen met serienummers die %{serial}
+          bevatten"
+        no_matches_found_html: Geen fietsen met serienummers met %{serial} gevonden
+        searching_html: Zoeken naar fietsen met serienummers die %{serial} bevatten
+          ...
+      search_similar_serials:
+        matches_found_html: "%{stolenness} fietsen met serienummers vergelijkbaar
+          met %{serial}"
+        no_matches_found_html: Geen fietsen met serienummers vergelijkbaar met %{serial}
+          gevonden
+        searching_html: Zoeken naar fietsen met serienummers vergelijkbaar met %{serial}
+          ...
+      serial_search: 'Serienummer: %{serial}'

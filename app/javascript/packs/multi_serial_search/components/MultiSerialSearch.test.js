@@ -5,7 +5,7 @@ import { shallow } from "enzyme";
 import toJson from "enzyme-to-json";
 import { bikeResponse } from "helpers/bikes";
 import { event } from "helpers/utils";
-import * as api from "../../api";
+import api from "../../api";
 import MultiSerialSearch from "./MultiSerialSearch";
 
 /*

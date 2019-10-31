@@ -41,6 +41,16 @@ module BikeSearchable
         .search_matching_close_serials(interpreted_params[:serial])
     end
 
+    def search_serials_containing(interpreted_params)
+      serial_normalized = interpreted_params[:serial]
+      return Bike.none if serial_normalized.blank?
+
+      where
+        .not(id: search(interpreted_params).pluck(:id))
+        .non_serial_matches(interpreted_params)
+        .where("serial_normalized LIKE ?", "%#{serial_normalized}%")
+    end
+
     # Initial autocomplete options hashes for the main select search input
     # ignores manufacturer_id and color_ids we don't have
     def selected_query_items_options(interpreted_params)
@@ -69,7 +79,7 @@ module BikeSearchable
 
     def searchable_query_items_query(query_params)
       return { query: query_params[:query] } if query_params[:query].present?
-      query = query_params[:query_items] && query_params[:query_items].select { |i| !(/\A[cm]_/ =~ i) }.join(" ")
+      query = query_params[:query_items]&.select { |i| !(/\A[cm]_/ =~ i) }&.join(" ")
       query.present? ? { query: query } : {}
     end
 
@@ -174,6 +184,7 @@ module BikeSearchable
 
     def search_matching_close_serials(serial)
       where("LEVENSHTEIN(serial_normalized, ?) < 3", serial)
+        .where.not(id: search_serials_containing(serial: serial).select(:id))
     end
   end
 end
