@@ -81,6 +81,8 @@ module API
           }
         end
 
+        # TODO: When next bumping the API version, rename this endpoint to
+        # "/similar_serials" or etc.
         desc "Search close serials", {
           notes: <<-NOTE,
             This endpoint accepts the same parameters as the root `/search` endpoint.
