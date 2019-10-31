@@ -44,9 +44,6 @@ module Bikeindex
     require_relative "../lib/i18n/middleware"
     config.middleware.use I18n::Middleware
 
-    # Add middleware for i18n-js
-    config.middleware.use I18n::JS::Middleware
-
     config.to_prepare do
       Doorkeeper::ApplicationsController.layout "doorkeeper"
       Doorkeeper::AuthorizationsController.layout "doorkeeper"
