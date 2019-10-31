@@ -1883,8 +1883,7 @@ nl:
       all: Alle
       anywhere: Overal
       miles_of: mijl van
-      no_bikes_matched: Er zijn geen %{stolenness} fietsen gevonden die overeenkomen
-        met uw zoekopdracht
+      no_bikes_matched: Er zijn geen serienummers die exact overeenkomen met uw zoekopdracht
       not_marked_stolen: Niet gemarkeerd als gestolen
       search_bike_descriptions: Zoek fietsbeschrijvingen
       search_for_serial_number: Zoek naar framenummer
