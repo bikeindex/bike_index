@@ -1191,26 +1191,15 @@ en:
     index:
       all: All
       anywhere: Anywhere
-      external_matches_found: Matches found in external registries
       miles_of: miles of
       no_bikes_matched: No serial numbers exactly matched your search
-      no_external_matches_found: No matches found in external registries
-      no_near_matches_found: No similar serials numbers found
-      no_partial_matches_found: No partially matching serials numbers found
       not_marked_stolen: Not marked stolen
       search_bike_descriptions: Search bike descriptions
       search_for_serial_number: Search for serial number
       search_for_stolenness_desc_bikes: Search for %{stolenness_desc} bikes
-      searching_external_registries: Searching external registries...
-      searching_for_near_matches: Searching for near-matching serial numbers...
-      searching_for_partial_matches: Searching for partially-matching serial numbers...
       stolen_anywhere: Stolen anywhere
       stolen_within: Stolen within
       submit: submit
-      with_close_serial_numbers_html: "%{stolenness} bikes with serial numbers close
-        to <em>%{serial}</em>"
-      with_partial_serial_numbers_html: "%{stolenness} bikes with serial numbers partially
-        matching <em>%{serial}</em>"
       within: within
       you: you
     new:
@@ -3234,7 +3223,20 @@ en:
       location: Location
       registry: Registry
       registry_id: Registry ID
+      search_external_registries:
+        matches_found_html: "%{stolenness} bikes found in external registries"
+        no_matches_found_html: No matching bikes found in external registries
+        searching_html: Searching external registries...
+      search_partial_serials:
+        matches_found_html: "%{stolenness} bikes with partially matching serial numbers"
+        no_matches_found_html: No bikes with partially matching serial numbers found
+        searching_html: Searching for bikes with partially matching serial numbers...
+      search_similar_serials:
+        matches_found_html: "%{stolenness} bikes with similar serial numbers"
+        no_matches_found_html: No bikes with similar serials numbers found
+        searching_html: Searching for bikes with similar serial numbers...
       serial: Serial
+      serial_search: 'Serial number: %{serial}'
       stolen: Stolen
       unknown: Unknown
       unknown_brand: Unknown Brand

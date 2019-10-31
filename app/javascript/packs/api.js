@@ -20,8 +20,10 @@ const serialCloseSearchUrl = params => {
   return url(`api/v3/search/close_serials?${query}`);
 }
 
-const serialExternalSearchUrl = serial =>
-  url(`api/v3/search/external_registries?serial=${serial}`);
+const serialExternalSearchUrl = ({ serial }) => {
+  const query = queryString({ serial })
+  return url(`api/v3/search/external_registries?${query}`);
+}
 
 const request = async url => {
   const resp = await fetch(url);
@@ -36,6 +38,7 @@ const queryString = ({ serial, stolenness, location, query, query_items }) => {
   if (location) { params.location = location; }
   if (query) { params.query = query; }
   if (query_items) { params.query_items = query_items; }
+
   return Object.keys(params).map(k => `${k}=${params[k]}`).join("&");
 }
 
@@ -63,8 +66,8 @@ const fetchSerialCloseSearch = interpretedParams => {
   return request(url);
 }
 
-const fetchSerialExternalSearch = ({ serial }) => {
-  const url = serialExternalSearchUrl(serial);
+const fetchSerialExternalSearch = ({ raw_serial }) => {
+  const url = serialExternalSearchUrl({ serial: raw_serial });
   return request(url);
 }
 
