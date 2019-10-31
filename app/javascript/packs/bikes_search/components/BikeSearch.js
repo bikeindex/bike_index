@@ -45,36 +45,40 @@ class BikeSearch extends Component {
   }
 
   render() {
+    const { serial } = this.props.interpretedParams;
+
+    if (this.state.loading === null) {
+      return (
+        <div className="row">
+          <div className="col-md-12">
+            <h3 className="no-exact-results">
+              {this.props.t("no_matches_found_html", { serial })}
+            </h3>
+          </div>
+        </div>
+      )
+    }
+
+    if (this.state.loading) {
+      return (
+        <div className="row">
+          <div className="col-md-12">
+            <h3 className="secondary-matches">
+              {this.props.t("searching_html", { serial })}
+            </h3>
+            <Loading/>
+          </div>
+        </div>
+      )
+    }
+
+    const Result = this.props.resultComponent;
     const stolenness = {
       "non": "abandoned",
       "all": "all",
       "stolen": "stolen",
     }[this.props.interpretedParams.stolenness];
-    const { serial } = this.props.interpretedParams;
 
-    if (this.state.loading === null) {
-      return <div className="row">
-               <div className="col-md-12">
-                 <h3 className="no-exact-results">
-                   {this.props.t("no_matches_found_html", { serial })}
-                 </h3>
-               </div>
-             </div>
-
-    }
-
-    if (this.state.loading) {
-      return <div className="row">
-               <div className="col-md-12">
-                 <h3 className="secondary-matches">
-                   {this.props.t("searching_html", { serial })}
-                 </h3>
-                 <Loading />;
-               </div>
-             </div>
-    }
-
-    const Result = this.props.resultComponent;
     return (
       <div className="row">
         <div className="col-md-12">
