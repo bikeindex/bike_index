@@ -7,7 +7,7 @@ import SecondarySearches from "./components/SecondarySearches";
 import honeybadger from "../utils/honeybadger";
 
 document.addEventListener("DOMContentLoaded", () => {
-  var el = document.getElementById("js-secondary-searches");
+  const el = document.getElementById("js-secondary-searches");
   if (!el) { return; }
 
   ReactDOM.render(
