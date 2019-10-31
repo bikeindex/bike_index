@@ -33,8 +33,7 @@ class ExternalRegistryClient::StopHelingClient < ExternalRegistryClient
         response.body
       end
 
-    results = results_from(response_body: response_body, request_params: req_params)
-    ::ExternalRegistryBike.where(id: results.map(&:id))
+    results_from(response_body: response_body, request_params: req_params)
   end
 
   private
@@ -60,8 +59,6 @@ class ExternalRegistryClient::StopHelingClient < ExternalRegistryClient
         .map { |result| translate_keys(result) }
         .map { |attrs| ExternalRegistryBike::StopHelingBike.build_from_api_response(attrs) }
         .compact
-        .each(&:save)
-        .select(&:persisted?)
     else
       if Rails.env.production?
         # Fail gracefully but notify Honeybadger if the request fails.
