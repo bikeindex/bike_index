@@ -101,13 +101,11 @@ module API
           serialized_bikes_results(paginate(close_serials))
         end
 
-        desc "Search by serial number (partially matching)", {
+        desc "Search by substring-match against serial number", {
                notes: <<-NOTE,
-                This endpoint accepts the same parameters as the root `/search`
-                endpoint.
+                This endpoint accepts the same parameters as the root `/search` endpoint.
 
-                It returns bikes with partially-matching serial numbers to the
-                requested serial.
+                It returns bikes with partially-matching serial numbers (for which the requested serial is a substring).
                NOTE
              }
         paginate
@@ -116,8 +114,8 @@ module API
           use :non_serial_search_params
           optional :per_page, type: Integer, default: 25, desc: "Bikes per page (max 100)"
         end
-        get "/partial_serials" do
-          results = Bike.search_partial_serials(interpreted_params)
+        get "/serials_containing" do
+          results = Bike.search_serials_containing(interpreted_params)
           serialized_bikes_results(paginate(results))
         end
 

@@ -3228,7 +3228,7 @@ en:
           registries"
         no_matches_found_html: No bikes matching %{serial} found in external registries
         searching_html: Searching external registries for bikes matching %{serial}...
-      search_partial_serials:
+      search_serials_containing:
         matches_found_html: "%{stolenness} bikes with serial numbers containing %{serial}"
         no_matches_found_html: No bikes with serial numbers containing %{serial} found
         searching_html: Searching for bikes with serial numbers containing %{serial}...

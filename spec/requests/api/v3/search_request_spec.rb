@@ -32,11 +32,11 @@ RSpec.describe "Search API V3", type: :request do
     end
   end
 
-  describe "/partial_serials" do
+  describe "/serials_containing" do
     it "returns matching bikes with partially matching serial numbers" do
       bike = FactoryBot.create(:bike, manufacturer: manufacturer, serial_number: "serial_number")
 
-      get "/api/v3/search/partial_serials", serial: "serial_num", stolenness: "non", format: :json
+      get "/api/v3/search/serials_containing", serial: "serial_num", stolenness: "non", format: :json
 
       result = json_result
       expect(result[:bikes]).to be_present

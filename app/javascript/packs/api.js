@@ -12,7 +12,7 @@ const fuzzySearchUrl = serial =>
 
 const partialMatchSerialSearchUrl = params => {
   const query = queryString(params)
-  return url(`api/v3/search/partial_serials?${query}`);
+  return url(`api/v3/search/serials_containing?${query}`);
 }
 
 const serialCloseSearchUrl = params => {

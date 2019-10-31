@@ -43,10 +43,10 @@ const SecondarySearches = ({ interpretedParams }) => (
                 />
                 <BikeSearch
                   fetchBikes={api.fetchPartialMatchSearch}
-                  searchName="search_partial_serials"
+                  searchName="search_serials_containing"
                   resultComponent={BikeSearchResult}
                   interpretedParams={params}
-                  t={window.BikeIndex.translator("bikes_search.search_partial_serials")}
+                  t={window.BikeIndex.translator("bikes_search.search_serials_containing")}
                 />
                 <BikeSearch
                   fetchBikes={api.fetchSerialCloseSearch}

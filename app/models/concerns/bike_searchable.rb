@@ -41,7 +41,7 @@ module BikeSearchable
         .search_matching_close_serials(interpreted_params[:serial])
     end
 
-    def search_partial_serials(interpreted_params)
+    def search_serials_containing(interpreted_params)
       serial_normalized = interpreted_params[:serial]
       return Bike.none if serial_normalized.blank?
 
@@ -184,7 +184,7 @@ module BikeSearchable
 
     def search_matching_close_serials(serial)
       where("LEVENSHTEIN(serial_normalized, ?) < 3", serial)
-        .where.not(id: search_partial_serials(serial: serial).select(:id))
+        .where.not(id: search_serials_containing(serial: serial).select(:id))
     end
   end
 end
