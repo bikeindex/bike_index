@@ -3224,17 +3224,18 @@ en:
       registry: Registry
       registry_id: Registry ID
       search_external_registries:
-        matches_found_html: "%{stolenness} bikes found in external registries"
-        no_matches_found_html: No matching bikes found in external registries
-        searching_html: Searching external registries...
+        matches_found_html: "%{stolenness} bikes matching %{serial} found in external
+          registries"
+        no_matches_found_html: No bikes matching %{serial} found in external registries
+        searching_html: Searching external registries for bikes matching %{serial}...
       search_partial_serials:
-        matches_found_html: "%{stolenness} bikes with partially matching serial numbers"
-        no_matches_found_html: No bikes with partially matching serial numbers found
-        searching_html: Searching for bikes with partially matching serial numbers...
+        matches_found_html: "%{stolenness} bikes with serial numbers containing %{serial}"
+        no_matches_found_html: No bikes with serial numbers containing %{serial} found
+        searching_html: Searching for bikes with serial numbers containing %{serial}...
       search_similar_serials:
-        matches_found_html: "%{stolenness} bikes with similar serial numbers"
-        no_matches_found_html: No bikes with similar serials numbers found
-        searching_html: Searching for bikes with similar serial numbers...
+        matches_found_html: "%{stolenness} bikes with serial numbers similar to %{serial}"
+        no_matches_found_html: No bikes with serial numbers similar to %{serial} found
+        searching_html: Searching for bikes with serial numbers similar to %{serial}...
       serial: Serial
       serial_search: 'Serial number: %{serial}'
       stolen: Stolen
