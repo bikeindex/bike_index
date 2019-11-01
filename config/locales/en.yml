@@ -730,6 +730,7 @@ en:
         tricycle: Tricycle
         unicycle: Unicycle
         wheelchair: Wheelchair
+        personal_mobility: Personal mobility device (electric scooter, skateboard, unicycle, etc)
       frame_material:
         aluminum: Aluminum
         composite: Carbon or composite
@@ -2069,7 +2070,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2095,7 +2096,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
