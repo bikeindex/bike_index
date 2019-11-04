@@ -17,7 +17,7 @@ Internationalization
 Workflow
 --------
 
-If you modify the English translation file [config/locales/en.yml][], run:
+If you modify the English translation file [config/locales/en.yml](config/locales/en.yml), run:
 
 ```shell
 bin/rake prepare_translations
