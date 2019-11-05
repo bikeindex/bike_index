@@ -1282,6 +1282,8 @@ en:
       org_can_edit_bike: "%{org_name} can edit this %{bike_type}"
       org_cannot_edit: "%{org_name} can not edit"
       organization_can_edit_after_claimed: and can edit after %{bike_type} claimed
+      organization_child: Child organization
+      organization_registered: Organization
       owner_email: Owner email
       owner_name: Owner name
       permission: Permission
