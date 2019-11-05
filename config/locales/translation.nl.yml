@@ -1992,6 +1992,8 @@ nl:
       impound: confisqueren
       impound_are_you_sure: Weet je zeker dat je %{bike_type} wilt?
       impounded_by: Door
+      organization_child: Child organisatie
+      organization_registered: Organisatie
     pdf:
       bike_description: 'Fiets beschrijving:'
       bike_serial: Bike Serial
