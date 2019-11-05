@@ -821,6 +821,8 @@ nl:
         tricycle: Driewieler
         unicycle: eenwieler
         wheelchair: Rolstoel
+        personal_mobility: Persoonlijk mobiliteitshulpmiddel (elektrische scooter,
+          skateboard, eenwieler, enz.)
       frame_material:
         aluminum: Aluminium
         composite: Koolstof of composiet
