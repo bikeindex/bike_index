@@ -45,10 +45,14 @@ class ExternalRegistryClient::VerlorenOfGevondenClient < ExternalRegistryClient
   private
 
   # Query for the results page `page_num`.
+  #
+  # NB: VOG endpoint expects lowercase letters in the query string and matches
+  # case-sensitively
+  #
   # Return the JSON response body as a Hash
   def get_page(query, page: 1, per_page: ITEMS_RECEIVED_PER_PAGE)
     Rails.logger.info("Requesting page #{page}")
-    req_params = request_params(query, page, per_page)
+    req_params = request_params(query.to_s.downcase, page, per_page)
     cache_key = ["verlorenofgevonden.nl", query, req_params]
 
     response_json =
