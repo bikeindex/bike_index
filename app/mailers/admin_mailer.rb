@@ -48,10 +48,10 @@ class AdminMailer < ActionMailer::Base
     @bike = theft_alert.bike
 
     if notify_of_recovery
-      subject = "Promoted Alert recovery: #{@theft_alert.id}"
-      @message = "A new bike with a Promoted Alert was just reported as recovered"
+      subject = "Promoted Alert recovered: #{@theft_alert.id}"
+      @message = "RECOVERED - a Promoted Alert bike was just recovered"
     else
-      subject = "Promoted Alert purchase: #{@theft_alert.id}"
+      subject = "Promoted Alert purchased: #{@theft_alert.id}"
       @message = "A new Promoted Alert was just purchased"
     end
 

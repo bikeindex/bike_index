@@ -543,4 +543,17 @@ RSpec.describe StolenRecord, type: :model do
       end
     end
   end
+
+  describe "promoted alert recovery notification" do
+    context "if marked as recovered while a promoted alert is active" do
+      it "sends an admin notification" do
+        stolen_record = FactoryBot.create(:stolen_record)
+        FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
+
+        Sidekiq::Testing.inline! do
+          expect { stolen_record.add_recovery_information }.to change { ActionMailer::Base.deliveries.length }.by(1)
+        end
+      end
+    end
+  end
 end

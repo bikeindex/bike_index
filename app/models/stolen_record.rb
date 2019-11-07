@@ -263,7 +263,12 @@ class StolenRecord < ActiveRecord::Base
                       index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
                       can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?)
     bike.stolen = false
-    bike.save
+
+    saved = bike.save
+
+    notify_of_promoted_alert_recovery if saved
+
+    saved
   end
 
   def find_or_create_recovery_link_token
@@ -314,5 +319,12 @@ class StolenRecord < ActiveRecord::Base
       alert_image&.destroy
       reload
     end
+  end
+
+  def notify_of_promoted_alert_recovery
+    return unless recovered? && theft_alerts.active.present?
+
+    TheftAlertPurchaseNotificationWorker
+      .perform_async(theft_alerts.active.last.id, true)
   end
 end
