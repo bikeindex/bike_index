@@ -41,11 +41,16 @@ class AdminMailer < ActionMailer::Base
     mail(to: "admin@bikeindex.org", subject: "Api Notification sent!")
   end
 
-  def theft_alert_purchased(theft_alert)
+  def theft_alert_notification(theft_alert, notification_type: :purchased)
     @theft_alert = theft_alert
     @theft_alert_plan = theft_alert.theft_alert_plan
     @creator = theft_alert.creator
     @bike = theft_alert.bike
-    mail(to: "stolenbikealerts@bikeindex.org", subject: "Theft Alert purchased: #{@theft_alert.id}")
+    @message = "#{notification_type.upcase} - a Promoted Alert bike was just #{notification_type}"
+
+    mail(
+      to: "stolenbikealerts@bikeindex.org",
+      subject: "Promoted Alert #{notification_type}: #{@theft_alert.id}",
+    )
   end
 end

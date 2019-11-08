@@ -111,14 +111,14 @@ RSpec.describe AdminMailer, type: :mailer do
     end
   end
 
-  describe "#theft_alert_purchased" do
+  describe "#theft_alert_notification" do
     it "renders email" do
       theft_alert = FactoryBot.create(:theft_alert_paid)
 
-      mail = described_class.theft_alert_purchased(theft_alert)
+      mail = described_class.theft_alert_notification(theft_alert)
 
       expect(mail.to).to eq(["stolenbikealerts@bikeindex.org"])
-      expect(mail.subject).to match("Theft Alert purchased: #{theft_alert.id}")
+      expect(mail.subject).to match("Promoted Alert purchased: #{theft_alert.id}")
       body = mail.body.encoded
       expect(body).to include(theft_alert.creator.name)
       expect(body).to include(theft_alert.creator.email)
@@ -131,16 +131,27 @@ RSpec.describe AdminMailer, type: :mailer do
       it "notes the failure in the email" do
         theft_alert = FactoryBot.create(:theft_alert_unpaid)
 
-        mail = described_class.theft_alert_purchased(theft_alert)
+        mail = described_class.theft_alert_notification(theft_alert, notification_type: :purchased)
 
         expect(mail.to).to eq(["stolenbikealerts@bikeindex.org"])
-        expect(mail.subject).to match("Theft Alert purchased: #{theft_alert.id}")
+        expect(mail.subject).to match("Promoted Alert purchased: #{theft_alert.id}")
         body = mail.body.encoded
         expect(body).to include(theft_alert.creator.name)
         expect(body).to include(theft_alert.creator.email)
         expect(body).to include(theft_alert.theft_alert_plan.name)
         expect(body).to include(theft_alert.bike.title_string)
         expect(body).to include("Payment Failed")
+      end
+    end
+
+    context "given notify_of_recovered true" do
+      it "renders email with recovered notification" do
+        theft_alert = FactoryBot.create(:theft_alert_paid)
+        mail = described_class.theft_alert_notification(theft_alert, notification_type: :recovered)
+
+        expect(mail.to).to eq(["stolenbikealerts@bikeindex.org"])
+        expect(mail.subject).to match("Promoted Alert recovered: #{theft_alert.id}")
+        expect(mail.body.encoded).to include("RECOVERED")
       end
     end
   end

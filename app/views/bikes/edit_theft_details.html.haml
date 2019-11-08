@@ -125,6 +125,8 @@
         = t(".charges_go_to_cost_of_ad")
 
       %p.text-center
-        = link_to t(".try_one_now"), edit_bike_path(@bike, params: { page: :alert })
+        = link_to t(".try_one_now"),
+          edit_bike_path(@bike, params: { page: :alert }),
+          class: "btn btn-md btn-primary"
 
   = render partial: "/shared/modal", locals: { title: modal_title, id: "tryAPromotedAlert", modal_body: modal_body, start_open: true }

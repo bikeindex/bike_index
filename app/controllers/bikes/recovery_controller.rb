@@ -16,7 +16,8 @@ module Bikes
         flash[:success] = translation(:bike_recovered)
         redirect_to bike_path(@bike)
       else
-        render :edit, bike_id: @bike.id, token: params[:token]
+        session[:recovery_link_token] = params[:token]
+        redirect_to bike_path(@bike)
       end
     end
 

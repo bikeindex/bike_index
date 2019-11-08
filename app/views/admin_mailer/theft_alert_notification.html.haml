@@ -1,8 +1,9 @@
-%p A new Bike Index Alert was just created.
+%p
+  = @message
 
 
 %h4{style: "margin-top: 1em;"}
-  = link_to "Theft Alert",
+  = link_to "Promoted Alert",
     edit_admin_theft_alert_url(@theft_alert, params: {state_transition: :begin}),
     target: "_blank"
 

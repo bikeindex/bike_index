@@ -1,5 +1,4 @@
 class EmailFeedbackNotificationWorker < ApplicationWorker
-
   sidekiq_options queue: "notify", retry: 1
 
   def perform(feedback_id)

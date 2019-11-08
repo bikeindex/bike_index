@@ -44,20 +44,26 @@
 - elsif @feedback.feedback_type == 'bike_recovery'
   %h1{ :style => "font-weight: 400px;" }
     A #{@feedback.bike.type} has been recovered
+
   %p
-    How the bike was recovered
-    = feedback_body
+    How the bike was recovered:
+
+  %blockquote
+    %em= feedback_body
+
   %p
     Did we help?
     %strong
-      = @feedback.feedback_hash["index_helped_recovery"]
+      = @feedback.feedback_hash["index_helped_recovery"] ? "Yes" : "No"
+
   - if @feedback.feedback_hash["index_helped_recovery"]
     %p
       Can we share?
       %strong
-        = @feedback.feedback_hash["can_share_recovery"]
+        = @feedback.feedback_hash["can_share_recovery"] ? "Yes" : "No"
+
     - if @feedback.feedback_hash["can_share_recovery"]
-      %h3{ :style => "font-weight: 400px;" }
+      %h3{ style: "font-weight: 400px;" }
         = link_to "Approve sharing this recovery!", admin_recoveries_url
   %p
     = link_to edit_admin_bike_url(@feedback.bike), edit_admin_bike_url(@feedback.bike)

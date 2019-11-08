@@ -1,5 +1,4 @@
 class EmailRecoveredFromLinkWorker < ApplicationWorker
-
   sidekiq_options queue: "notify"
 
   def perform(stolen_record_id)

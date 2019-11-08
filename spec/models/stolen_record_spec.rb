@@ -155,8 +155,6 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
-  it "only allows one current stolen record per bike"
-
   describe "address" do
     let(:country) { Country.create(name: "Neverland", iso: "NEVVVV") }
     let(:state) { State.create(country_id: country.id, name: "BullShit", abbreviation: "XXX") }
@@ -455,6 +453,24 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
+  describe "#add_recovery_information" do
+    context "given a bike save success" do
+      it "returns true" do
+        stolen_record = FactoryBot.create(:stolen_record)
+        allow(stolen_record.bike).to receive(:save).and_return(true)
+        expect(stolen_record.add_recovery_information).to eq(true)
+      end
+    end
+
+    context "given a bike save failure" do
+      it "returns false" do
+        stolen_record = FactoryBot.create(:stolen_record)
+        allow(stolen_record.bike).to receive(:save).and_return(false)
+        expect(stolen_record.add_recovery_information).to eq(false)
+      end
+    end
+  end
+
   describe "locking_description_description_select_options" do
     it "returns an array of arrays" do
       options = StolenRecord.locking_description_select_options
@@ -540,6 +556,19 @@ RSpec.describe StolenRecord, type: :model do
       it "returns nil" do
         stolen_record = FactoryBot.create(:stolen_record, city: "New Paltz", state: nil)
         expect(stolen_record.address_location).to eq(nil)
+      end
+    end
+  end
+
+  describe "promoted alert recovery notification" do
+    context "if marked as recovered while a promoted alert is active" do
+      it "sends an admin notification" do
+        stolen_record = FactoryBot.create(:stolen_record)
+        FactoryBot.create(:theft_alert, stolen_record: stolen_record, status: :active)
+
+        Sidekiq::Testing.inline! do
+          expect { stolen_record.add_recovery_information }.to change { ActionMailer::Base.deliveries.length }.by(1)
+        end
       end
     end
   end
