@@ -1,6 +1,6 @@
 require "rails_helper"
 
-RSpec.describe TheftAlertPurchaseNotificationWorker, type: :job do
+RSpec.describe EmailTheftAlertNotificationWorker, type: :job do
   describe ".perform" do
     it "sends email to admins" do
       theft_alert = FactoryBot.create(:theft_alert_paid)

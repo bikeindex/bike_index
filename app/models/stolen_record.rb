@@ -324,7 +324,7 @@ class StolenRecord < ActiveRecord::Base
   def notify_of_promoted_alert_recovery
     return unless recovered? && theft_alerts.active.present?
 
-    TheftAlertPurchaseNotificationWorker
-      .perform_async(theft_alerts.active.last.id, true)
+    EmailTheftAlertNotificationWorker
+      .perform_async(theft_alerts.active.last.id, :recovered)
   end
 end
