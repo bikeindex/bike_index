@@ -5,7 +5,7 @@ class TheftAlertPurchaseNotificationWorker < ApplicationWorker
     theft_alert = TheftAlert.find(theft_alert_id)
 
     AdminMailer
-      .theft_alert_purchased(theft_alert, notify_of_recovery: recovery)
+      .theft_alert_notification(theft_alert, notification_type: :recovered)
       .deliver_now
   end
 end
