@@ -4,8 +4,10 @@
 
 - bike_type = if @bike.stolen? && @bike.abandoned?
   - t(".text.recovered_biketype", biketype: @bike.type)
-- else
+- elsif @bike.stolen?
   - t(".text.stolen_biketype", biketype: @bike.type)
+- else
+  - @bike.type
 
 - case
 - when @vars[:registered_by_owner]
