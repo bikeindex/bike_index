@@ -21,10 +21,13 @@
 
 %p
   - org_name = @creation_org&.name || @ownership&.creator&.display_name
-  - if @bike.stolen?
-    - bike_type = @bike.abandoned? ? t(".html.recovered_biketype", biketype: @bike.type) : t(".html.stolen_biketype", biketype: @bike.type)
+
+  - bike_type = if @bike.stolen? && @bike.abandoned?
+    - t(".html.recovered_biketype", biketype: @bike.type)
+  - elsif @bike.stolen?
+    - t(".html.stolen_biketype", biketype: @bike.type)
   - else
-    - bike_type = @bike.type
+    - @bike.type
 
   - if @vars[:registered_by_owner]
     = t(".html.you_added_a_bike_type_on_bike_index", bike_type: bike_type)
