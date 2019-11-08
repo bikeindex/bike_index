@@ -44,15 +44,17 @@ RSpec.describe Bikes::RecoveryController, type: :controller do
         can_share_recovery: "1",
       }
     end
+
     context "matching recovery token" do
-      it "updates" do
+      it "updates if recovery information is valid" do
         expect do
-          put :update, bike_id: bike.id, token: recovery_link_token,
-                       stolen_record: recovery_info
+          put :update,
+              bike_id: bike.id,
+              token: recovery_link_token,
+              stolen_record: recovery_info
         end.to change(EmailRecoveredFromLinkWorker.jobs, :size).by(1)
         stolen_record.reload
         bike.reload
-
         expect(bike.stolen).to be_falsey
         expect(stolen_record.recovered?).to be_truthy
         expect(stolen_record.current).to be_falsey
@@ -63,6 +65,7 @@ RSpec.describe Bikes::RecoveryController, type: :controller do
         expect(stolen_record.reload.recovered_at.to_i).to be_within(1).of 1532822233
         expect(stolen_record.recovering_user).to be_nil
       end
+
       context "with user present" do
         include_context :logged_in_as_user
         it "updates and assigns recovering_user" do

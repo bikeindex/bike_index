@@ -155,8 +155,6 @@ RSpec.describe StolenRecord, type: :model do
     end
   end
 
-  it "only allows one current stolen record per bike"
-
   describe "address" do
     let(:country) { Country.create(name: "Neverland", iso: "NEVVVV") }
     let(:state) { State.create(country_id: country.id, name: "BullShit", abbreviation: "XXX") }
@@ -451,6 +449,24 @@ RSpec.describe StolenRecord, type: :model do
         expect(stolen_record.recovered_at.to_i).to be_within(1).of target_timestamp
         expect(stolen_record.recovering_user_owner?).to be_falsey
         expect(stolen_record.pre_recovering_user?).to be_truthy
+      end
+    end
+  end
+
+  describe "#add_recovery_information" do
+    context "given a bike save success" do
+      it "returns true" do
+        stolen_record = FactoryBot.create(:stolen_record)
+        allow(stolen_record.bike).to receive(:save).and_return(true)
+        expect(stolen_record.add_recovery_information).to eq(true)
+      end
+    end
+
+    context "given a bike save failure" do
+      it "returns false" do
+        stolen_record = FactoryBot.create(:stolen_record)
+        allow(stolen_record.bike).to receive(:save).and_return(false)
+        expect(stolen_record.add_recovery_information).to eq(false)
       end
     end
   end

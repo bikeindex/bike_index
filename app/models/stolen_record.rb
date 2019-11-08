@@ -257,18 +257,18 @@ class StolenRecord < ActiveRecord::Base
   def add_recovery_information(info = {})
     info = ActiveSupport::HashWithIndifferentAccess.new(info)
     self.recovered_at = TimeParser.parse(info[:recovered_at], info[:timezone]) || Time.current
-    update_attributes(current: false,
-                      recovered_description: info[:recovered_description],
-                      recovering_user_id: info[:recovering_user_id],
-                      index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
-                      can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?)
+
+    update_attributes(
+      current: false,
+      recovered_description: info[:recovered_description],
+      recovering_user_id: info[:recovering_user_id],
+      index_helped_recovery: ("#{info[:index_helped_recovery]}" =~ /t|1/i).present?,
+      can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?,
+    )
+
     bike.stolen = false
 
-    saved = bike.save
-
-    notify_of_promoted_alert_recovery if saved
-
-    saved
+    bike.save.tap { |was_saved| notify_of_promoted_alert_recovery if was_saved }
   end
 
   def find_or_create_recovery_link_token
