@@ -71,7 +71,7 @@
                         %small= @bike.creation_organization.name
                       - else
                         %em.small= t(".organization_child")
-                        = @bike.creation_organization.name
+                        = @bike.creation_organization&.name
                 %tr
                   %td= t(".owner_name")
                   %td= @bike.owner_name
