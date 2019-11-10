@@ -772,7 +772,10 @@ en:
         impound_record:
           user_not_authorized: does not have permission to impound this bike
         manufacturer:
-          cannot_match_a_color_name: Cannot be the same as a color name
+          cannot_match_a_color_name: cannot be the same as a color name
+        organization:
+          cannot_be_regional_and_belong_to_one: cannot be a regional org and also
+            belong to one.
         organization_message:
           latlon_required: latitude and longitude required
           required: required

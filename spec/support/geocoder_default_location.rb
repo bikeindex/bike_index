@@ -11,6 +11,7 @@ RSpec.shared_context :geocoder_default_location do
       neighborhood: "Tribeca",
       country: "United States",
       country_code: "US",
+      zipcode: "10007",
     }
   end
 
@@ -38,7 +39,7 @@ RSpec.shared_context :geocoder_default_location do
   let(:bounding_box) { [39.989124784445764, -74.96065051723293, 41.43644261555424, -73.05123208276707] }
 
   before do
-    Geocoder.configure(lookup: :test)
+    Geocoder.configure(lookup: :test, ip_lookup: :test)
     Geocoder::Lookup::Test.set_default_stub([default_location.as_json])
     allow(Geocoder::Calculations).to receive(:bounding_box) { bounding_box }
   end
