@@ -52,8 +52,26 @@
           = f.radio_button "kind", kind, class: "form-check-input"
           = f.label "kind_#{kind}", kind.humanize, class: "form-check-label"
 
-
-
+  .col-md-6
+    .form-group
+      = f.label :city
+      = f.text_field :city, class: "form-control"
+    .form-group
+      = f.label :state
+      = f.collection_select(:state_id, State.all, :id, :name,
+        { include_blank: true, prompt: "Select a state" },
+        { class: "form-control" })
+    .form-group
+      = f.label :zipcode
+      = f.text_field :zipcode, class: "form-control"
+    .form-group
+      = f.label :country_id
+      = f.select :country_id, Country.select_options,
+        { prompt: "Select a country" },
+        { class: "country-select-input form-control" }
+    .form-group
+      = f.label :search_radius, "Search radius (mi)"
+      = f.number_field :search_radius, {class: "form-control"}
 
   .col-md-6
     .form-group
@@ -73,7 +91,19 @@
     .form-group
       = f.check_box :approved
       = f.label :approved, 'Validated & approved'
+
+    .form-group
+      .form-check
+        = f.check_box :regional, class: "form-check-input"
+        = f.label :regional, "Regional organization", class: "form-check-label"
+        %small.less-strong
+          Check to give #{@organization.name} access to aggregated data from regional sub-organizations
+
 .row
+  .col-md-6
+    .form-group.fancy-select.unfancy
+      = f.label :regional_organization_id, "Regional umbrella organization"
+      = f.collection_select(:regional_organization_id, Organization.regional, :id, :name, { prompt: "Choose regional organization" }, class: "form-control")
   .col-md-6
     .form-group.fancy-select.unfancy
       = f.label :parent_organization_id

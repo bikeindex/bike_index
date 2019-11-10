@@ -27,6 +27,13 @@ class Organization < ActiveRecord::Base
 
   belongs_to :parent_organization, class_name: "Organization"
   belongs_to :auto_user, class_name: "User"
+  belongs_to :state
+  belongs_to :country
+
+  belongs_to :regional_organization, class_name: "Organization"
+  has_many :regional_suborganizations,
+           class_name: "Organization",
+           foreign_key: :regional_organization_id
 
   has_many :recovered_records, through: :bikes
   has_many :locations, inverse_of: :organization, dependent: :destroy
@@ -53,6 +60,7 @@ class Organization < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :short_name, case_sensitive: false, message: "another organization has this abbreviation - if you don't think that should be the case, contact support@bikeindex.org"
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
+  validate :not_both_regional_organization_and_suborganization
 
   default_scope { order(:name) }
   scope :shown_on_map, -> { where(show_on_map: true, approved: true) }
@@ -61,9 +69,13 @@ class Organization < ActiveRecord::Base
   scope :approved, -> { where(is_suspended: false, approved: true) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
   scope :bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications impound_bikes]) }
+  scope :regional, -> { where(regional: true) }
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
+
+  geocoded_by :search_location
+  after_validation :geocode
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key, :skip_update
 
@@ -181,6 +193,20 @@ class Organization < ActiveRecord::Base
     bike_shop? && %w[no_pos broken_pos].include?(pos_kind)
   end
 
+  def bikes_in_region_counts
+    return unless regional?
+    return @bikes_in_region_counts if defined?(@bikes_in_region_counts)
+
+    bikes_in_orgs = regional_suborganizations.includes(:bikes).flat_map(&:bikes).map(&:id)
+    bikes_in_region = search_location.blank? ? [] : Bike.all.near(search_location, search_radius).reorder(:id).pluck(:id)
+
+    @bikes_in_region_count = {
+      in_organizations: bikes_in_orgs.count,
+      in_region: bikes_in_region.count,
+      in_region_unaffiliated: (bikes_in_region - bikes_in_orgs).count,
+    }
+  end
+
   def paid_for?(feature_name)
     features =
       Array(feature_name)
@@ -293,6 +319,12 @@ class Organization < ActiveRecord::Base
     calculated_children.each { |o| o.update_attributes(updated_at: Time.current, skip_update: true) }
   end
 
+  def search_location
+    city_and_state = [city, state&.name].reject(&:blank?).join(", ")
+    with_zip = [city_and_state, zipcode].reject(&:blank?).join(" ")
+    [with_zip, country&.name].reject(&:blank?).join(" - ")
+  end
+
   private
 
   def calculated_paid_feature_slugs
@@ -309,5 +341,12 @@ class Organization < ActiveRecord::Base
     self.website = nil
     self.ascend_name = nil
     self.parent_organization_id = nil
+  end
+
+  def not_both_regional_organization_and_suborganization
+    if regional? && regional_organization_id.present?
+      errors.add(:regional, :cannot_be_regional_and_belong_to_one)
+      errors.add(:regional_organization, :cannot_be_regional_and_belong_to_one)
+    end
   end
 end

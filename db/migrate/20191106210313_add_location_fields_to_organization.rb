@@ -14,5 +14,7 @@ class AddLocationFieldsToOrganization < ActiveRecord::Migration
       t.integer :regional_organization_id, index: true
       t.boolean :regional, null: false, default: false
     end
+
+    add_index :organizations, [:latitude, :longitude]
   end
 end
