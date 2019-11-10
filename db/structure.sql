@@ -1679,7 +1679,16 @@ CREATE TABLE public.organizations (
     registration_field_labels jsonb DEFAULT '{}'::jsonb,
     pos_kind integer DEFAULT 0,
     previous_slug character varying,
-    child_ids jsonb
+    child_ids jsonb,
+    city character varying,
+    zipcode character varying,
+    state_id integer,
+    country_id integer,
+    search_radius integer DEFAULT 50 NOT NULL,
+    latitude double precision,
+    longitude double precision,
+    regional_organization_id integer,
+    regional boolean DEFAULT false NOT NULL
 );
 
 
@@ -3805,6 +3814,13 @@ CREATE INDEX index_organization_messages_on_sender_id ON public.organization_mes
 
 
 --
+-- Name: index_organizations_on_country_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organizations_on_country_id ON public.organizations USING btree (country_id);
+
+
+--
 -- Name: index_organizations_on_parent_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3816,6 +3832,13 @@ CREATE INDEX index_organizations_on_parent_organization_id ON public.organizatio
 --
 
 CREATE UNIQUE INDEX index_organizations_on_slug ON public.organizations USING btree (slug);
+
+
+--
+-- Name: index_organizations_on_state_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organizations_on_state_id ON public.organizations USING btree (state_id);
 
 
 --
@@ -3984,6 +4007,22 @@ CREATE UNIQUE INDEX unique_assignment_to_ambassador ON public.ambassador_task_as
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING btree (version);
+
+
+--
+-- Name: organizations fk_rails_0de9c8b6c9; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organizations
+    ADD CONSTRAINT fk_rails_0de9c8b6c9 FOREIGN KEY (country_id) REFERENCES public.countries(id);
+
+
+--
+-- Name: organizations fk_rails_109a98d796; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organizations
+    ADD CONSTRAINT fk_rails_109a98d796 FOREIGN KEY (state_id) REFERENCES public.states(id);
 
 
 --
@@ -4841,4 +4880,6 @@ INSERT INTO schema_migrations (version) VALUES ('20191022123037');
 INSERT INTO schema_migrations (version) VALUES ('20191022143755');
 
 INSERT INTO schema_migrations (version) VALUES ('20191028130015');
+
+INSERT INTO schema_migrations (version) VALUES ('20191106210313');
 
