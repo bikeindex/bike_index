@@ -626,6 +626,30 @@ class Bike < ActiveRecord::Base
     [city, state].reject(&:blank?).join(", ")
   end
 
+  # Set the bike's location (city, postal code, and country)
+  # based in the following order of precedence:
+  # 1. Set explicitly on the bike
+  # 2. From the creation organization, if one is present
+  # 3. From the bike owner's address
+  # 4. From the request's IP address
+  def set_location_info(request_location: nil)
+    return if zipcode.present? || country.present?
+
+    if creation_organization&.country.present? && creation_organization&.zipcode.present?
+      self.city = creation_organization&.city
+      self.country = creation_organization.country
+      self.zipcode = creation_organization.zipcode
+    elsif owner&.country.present? && owner&.zipcode.present?
+      self.city = owner.city
+      self.country = owner.country
+      self.zipcode = owner.zipcode
+    elsif request_location&.country_code.present? && request_location&.zipcode.present?
+      self.city = request_location.city
+      self.country = Country.fuzzy_find(request_location&.country_code)
+      self.zipcode = request_location.zipcode
+    end
+  end
+
   def organization_affiliation
     b_params.map { |bp| bp.organization_affiliation }.compact.join(", ")
   end

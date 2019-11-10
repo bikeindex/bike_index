@@ -69,8 +69,7 @@ class BikeCreator
   end
 
   def save_bike(bike)
-    set_location(@bike)
-
+    bike.set_location_info(request_location: @location)
     bike.save
     @bike = create_associations(bike)
     validate_record(@bike)
@@ -90,31 +89,6 @@ class BikeCreator
   def new_bike
     @bike = build_new_bike
     @bike
-  end
-
-  # Set the bike's location (postal code and country)
-  # based in the following order of precedence:
-  # 1. Set explicitly on the bike
-  # 2. From the creation organization, if one is present
-  # 3. From the bike owner's address
-  # 4. From the request's IP address
-  def set_location(bike)
-    return if bike.blank?
-    return if bike&.zipcode.present? && bike&.country.present?
-
-    country, zipcode =
-      [bike.creation_organization&.country, bike.creation_organization&.zipcode]
-        .reject(&:blank?)
-        .presence ||
-      [bike.owner&.country, bike.owner&.zipcode]
-        .reject(&:blank?)
-        .presence ||
-      [Country.find_by(iso: @location&.country_code), @location&.zipcode]
-
-    bike.country = country
-    bike.zipcode = zipcode
-
-    bike
   end
 
   def create_bike

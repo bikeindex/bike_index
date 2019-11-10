@@ -194,63 +194,6 @@ RSpec.describe BikeCreator do
     end
   end
 
-  describe "#set_location" do
-    let(:usa) { Country.united_states }
-    subject(:creator) { BikeCreator.new }
-
-    context "given a location set on the bike" do
-      it "does not change it" do
-        zipcode = "11001"
-        bike = FactoryBot.build(:bike, zipcode: zipcode, country: usa)
-        creator.set_location(bike)
-        expect(bike.zipcode).to eq(zipcode)
-        expect(bike.country).to eq(usa)
-      end
-    end
-
-    context "given no location on the bike" do
-      it "takes location from the creation org" do
-        zipcode = "11001"
-        org = FactoryBot.create(:organization, zipcode: zipcode, country: usa)
-        bike = FactoryBot.build(:bike, creation_organization: org)
-
-        creator.set_location(bike)
-
-        expect(bike.zipcode).to eq(zipcode)
-        expect(bike.country).to eq(usa)
-      end
-    end
-
-    context "given no creation org location" do
-      it "takes location from the owner location" do
-        zipcode = "10011"
-        user = FactoryBot.create(:user_confirmed, zipcode: zipcode, country: usa)
-        ownership = FactoryBot.create(:ownership, user: user, creator: user)
-        bike = ownership.bike
-
-        creator.set_location(bike)
-
-        expect(bike.zipcode).to eq(zipcode)
-        expect(bike.country).to eq(usa)
-      end
-    end
-
-    context "given no creation org or owner location" do
-      it "takes location from the geocoded request location" do
-        Country.united_states
-        zipcode = "10011"
-        bike = FactoryBot.build(:bike)
-        stub_location = double(:location, zipcode: zipcode, country_code: "US")
-
-        creator = BikeCreator.new(location: stub_location)
-        creator.set_location(bike)
-
-        expect(bike.zipcode).to eq(zipcode)
-        expect(bike.country).to eq(usa)
-      end
-    end
-  end
-
   describe "new_bike" do
     it "calls the required methods" do
       creator = BikeCreator.new
