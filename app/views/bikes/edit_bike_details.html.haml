@@ -92,6 +92,13 @@
             .form-well-input
               = f.text_field :zipcode, class: 'form-control', required: true, placeholder: t(".zipcode")
 
+          .form-group.row.unnested-field.no-divider-row
+            = f.label :country_id, class: 'form-well-label'
+            .form-well-input
+              = f.select :country_id, Country.select_options,
+                { required: true, prompt: t(".choose_country") },
+                { class: 'country-select-input form-control' }
+
           = render "shared/form_well_footer_save"
 
           %hr

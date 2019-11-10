@@ -1173,6 +1173,7 @@ RSpec.describe BikesController, type: :controller do
           component1 = FactoryBot.create(:component, bike: bike)
           other_handlebar_type = "other"
           ctype_id = component1.ctype_id
+          bike.update(country: Country.united_states)
           bike.reload
           component2_attrs = {
             _destroy: "0",
@@ -1189,6 +1190,7 @@ RSpec.describe BikesController, type: :controller do
             handlebar_type: other_handlebar_type,
             handlebar_type_other: "Joysticks",
             owner_email: "  #{bike.owner_email.upcase}",
+            country_id: Country.netherlands.id,
             components_attributes: {
               "0" => {
                 "_destroy" => "1",
@@ -1207,6 +1209,7 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.handlebar_type_other).to eq "Joysticks"
           expect(assigns(:bike)).to be_decorated
           expect(bike.hidden).to be_falsey
+          expect(bike.country&.name).to eq(Country.netherlands.name)
 
           expect(bike.components.count).to eq 1
           expect(bike.components.where(id: component1.id).any?).to be_falsey
