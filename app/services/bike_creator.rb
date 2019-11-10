@@ -1,7 +1,8 @@
 class BikeCreator
-  def initialize(b_param = nil)
+  def initialize(b_param = nil, location: nil)
     @b_param = b_param
     @bike = nil
+    @location = location
   end
 
   def add_bike_book_data
@@ -68,9 +69,12 @@ class BikeCreator
   end
 
   def save_bike(bike)
+    set_location(@bike)
+
     bike.save
     @bike = create_associations(bike)
     validate_record(@bike)
+
     if @bike.present? && @bike.id.present?
       @bike.creation_states.create(creation_state_attributes)
       AfterBikeSaveWorker.perform_async(@bike.id)
@@ -79,12 +83,38 @@ class BikeCreator
         bike_code && bike_code.claim(@bike.creator, @bike.id)
       end
     end
+
     @bike
   end
 
   def new_bike
     @bike = build_new_bike
     @bike
+  end
+
+  # Set the bike's location (postal code and country)
+  # based in the following order of precedence:
+  # 1. Set explicitly on the bike
+  # 2. From the creation organization, if one is present
+  # 3. From the bike owner's address
+  # 4. From the request's IP address
+  def set_location(bike)
+    return if bike.blank?
+    return if bike&.zipcode.present? && bike&.country.present?
+
+    country, zipcode =
+      [bike.creation_organization&.country, bike.creation_organization&.zipcode]
+        .reject(&:blank?)
+        .presence ||
+      [bike.owner&.country, bike.owner&.zipcode]
+        .reject(&:blank?)
+        .presence ||
+      [Country.find_by(iso: @location&.country_code), @location&.zipcode]
+
+    bike.country = country
+    bike.zipcode = zipcode
+
+    bike
   end
 
   def create_bike

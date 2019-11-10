@@ -516,7 +516,7 @@ RSpec.describe BikesController, type: :controller do
       }
     end
 
-    describe "embeded" do
+    describe "embedded" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       let(:user) { organization.auto_user }
       let(:b_param) { BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true }) }
@@ -548,11 +548,15 @@ RSpec.describe BikesController, type: :controller do
       end
       context "non-stolen" do
         it "creates a new ownership and bike from an organization" do
+          Country.united_states
           expect(user).to be_present
+
           expect do
             post :create, bike: bike_params
           end.to change(Ownership, :count).by 1
+
           bike = Bike.last
+          expect(bike.country.name).to eq("United States")
           expect(bike.creation_state.origin).to eq "embed"
           expect(bike.creation_state.organization).to eq organization
           expect(bike.creation_state.creator).to eq bike.creator
