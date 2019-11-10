@@ -18,6 +18,7 @@ class Bike < ActiveRecord::Base
   belongs_to :updator, class_name: "User"
   belongs_to :invoice
   belongs_to :location
+  belongs_to :country
   belongs_to :current_stolen_record, class_name: "StolenRecord"
   belongs_to :creator, class_name: "User" # to be deprecated and removed
   belongs_to :creation_organization, class_name: "Organization" # to be deprecated and removed

@@ -1042,6 +1042,7 @@ en:
       a_qr_sticker: a QR Sticker
       add_a_sticker_label_html: Add %{sticker_information_link}
       bike_name: Bike Name
+      choose_country: Choose country
       choose_material: Choose material
       existing_stickers: Existing stickers
       frame_size: Frame size
