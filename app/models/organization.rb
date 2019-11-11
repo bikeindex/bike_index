@@ -75,7 +75,7 @@ class Organization < ActiveRecord::Base
   after_commit :update_associations
 
   geocoded_by :search_location
-  after_validation :geocode
+  after_validation :geocode, if: ->(org) { org.search_location.present? }
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key, :skip_update
 

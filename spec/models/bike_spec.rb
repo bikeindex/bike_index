@@ -1248,9 +1248,15 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "no current_stolen_record" do
-      it "grabs the desc and erase current_stolen_id" do
-        bike = Bike.new(current_stolen_record_id: 69, description: "lalalala", stolen_lat: 40.7143528, stolen_long: -74.0059731)
+      it "sets the description and unsets current_stolen_record_id" do
+        bike = Bike.new(current_stolen_record_id: 99999,
+                        description: "lalalala",
+                        stolen_lat: 40.7143528,
+                        stolen_long: -74.0059731)
+
+        bike.current_stolen_record = nil
         bike.cache_stolen_attributes
+
         expect(bike.current_stolen_record_id).not_to be_present
         expect(bike.all_description).to eq("lalalala")
         expect(bike.stolen_lat).to eq nil

@@ -46,8 +46,8 @@ class Bike < ActiveRecord::Base
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true
 
-  geocoded_by nil, latitude: :stolen_lat, longitude: :stolen_long
-  after_validation :geocode, if: lambda { false } # Never geocode, it's from stolen_record
+  geocoded_by :geo_data
+  after_validation :geocode, unless: :skip_geocoding
 
   validates_presence_of :serial_number
   validates_presence_of :propulsion_type
@@ -60,7 +60,8 @@ class Bike < ActiveRecord::Base
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
                 :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
                 :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
-                :b_param_id_token, :address, :address_city, :address_state, :address_zipcode
+                :b_param_id_token, :address, :address_city, :address_state, :address_zipcode,
+                :skip_geocoding
 
   attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
 
@@ -434,7 +435,9 @@ class Bike < ActiveRecord::Base
   end
 
   def find_current_stolen_record
-    stolen_records.last if stolen_records.any?
+    return unless stolen_records.any?
+    self.current_stolen_record = stolen_records.last
+    current_stolen_record
   end
 
   def title_string
@@ -708,12 +711,13 @@ class Bike < ActiveRecord::Base
 
   def cache_stolen_attributes
     csr = find_current_stolen_record
-    self.attributes = {
-      current_stolen_record_id: csr && csr.id,
-      all_description: [description, csr && csr.theft_description].reject(&:blank?).join(" "),
-      stolen_lat: csr && csr.latitude,
-      stolen_long: csr && csr.longitude,
-    }
+    self.current_stolen_record_id = csr&.id
+    self.stolen_lat = csr&.latitude
+    self.stolen_long = csr&.longitude
+    self.all_description =
+      [description, csr&.theft_description]
+        .reject(&:blank?)
+        .join(" ")
   end
 
   def cache_bike
@@ -751,5 +755,13 @@ class Bike < ActiveRecord::Base
 
   def propulsion_type_name
     PropulsionType.new(propulsion_type).name
+  end
+
+  def geo_data
+    stolen_record_location = find_current_stolen_record&.address(override_show_address: true)
+    return stolen_record_location if stolen_record_location.present?
+
+    set_location_info
+    [city, zipcode, country&.name].select(&:present?).join(" ")
   end
 end

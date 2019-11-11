@@ -71,7 +71,8 @@ module BikeSearchable
 
     def non_serial_matches(interpreted_params)
       # For each of the of the colors, call searching_matching_color_ids with the color_id on the previous ;)
-      (interpreted_params[:colors] || [nil]).reduce(self) { |matches, c_id| matches.search_matching_color_ids(c_id) }
+      (interpreted_params[:colors] || [nil])
+        .reduce(self) { |matches, c_id| matches.search_matching_color_ids(c_id) }
         .search_matching_stolenness(interpreted_params)
         .search_matching_query(interpreted_params[:query])
         .where(interpreted_params[:manufacturer] ? { manufacturer_id: interpreted_params[:manufacturer] } : {})
@@ -160,7 +161,7 @@ module BikeSearchable
     end
 
     def search_matching_query(query)
-      query && pg_search(query) || all
+      query.presence && pg_search(query) || all
     end
 
     def search_matching_serial(interpreted_params)
