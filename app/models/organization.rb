@@ -63,7 +63,7 @@ class Organization < ActiveRecord::Base
   validate :not_both_regional_organization_and_suborganization
 
   default_scope { order(:name) }
-  scope :shown_on_map, -> { where(show_on_map: true, approved: true) }
+  scope :shown_on_map, -> { includes(:locations).where(show_on_map: true, approved: true) }
   scope :paid, -> { where(is_paid: true) }
   scope :unpaid, -> { where(is_paid: true) }
   scope :approved, -> { where(is_suspended: false, approved: true) }
