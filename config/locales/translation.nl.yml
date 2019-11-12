@@ -2597,8 +2597,8 @@ nl:
         improve_your_chances_of_recovery_by_doing: Vergroot uw kansen op herstel door
           al deze dingen te doen!
         stolen_bike_alerter: gestolen fiets alerter.
-        this_email_is_about_the_stolen_bike: Deze e-mail gaat over de %{was_stolen}
-          %{bike_type} geregistreerd op Bike Index op %{date}
+        this_email_is_about_the_stolen_bike: Deze e-mail gaat over de gestolen %{bike_type}
+          geregistreerd op Bike Index op %{date}
         we_sent_out_this_tweet_from: We hebben deze tweet verstuurd vanuit
         were_spreading_the_word_about_your_stolen: We verspreiden het woord over uw
           gestolen %{bike_type}!
