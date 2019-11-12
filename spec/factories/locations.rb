@@ -9,5 +9,6 @@ FactoryBot.define do
     street { "foo address" }
     latitude { 41.9282162 }
     longitude { -87.6327552 }
+    skip_geocoding { true }
   end
 end

@@ -1,5 +1,7 @@
 class Organization < ActiveRecord::Base
   include ActionView::Helpers::SanitizeHelper
+  include Geocodeable
+
   KIND_ENUM = {
     bike_shop: 0,
     bike_advocacy: 1,
@@ -73,9 +75,6 @@ class Organization < ActiveRecord::Base
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
-
-  geocoded_by :search_location
-  after_validation :geocode, if: :should_be_geocoded?
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key, :skip_update
 
@@ -327,15 +326,12 @@ class Organization < ActiveRecord::Base
 
   private
 
-  def skip_geocoding?
-    !!skip_geocoding
+  def geocode_data
+    @geocode_data ||= search_location
   end
 
-  # Skip geocoding if search location is blank or if no location fields have
-  # been changed.
-  def should_be_geocoded?
-    return false if search_location.blank?
-    [city_changed?, state_id_changed?, zipcode_changed?, country_id_changed?].any?
+  def geocode_columns
+    %i[city state_id zipcode country_id]
   end
 
   def calculated_paid_feature_slugs

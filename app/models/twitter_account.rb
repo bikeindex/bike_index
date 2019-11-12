@@ -1,4 +1,6 @@
 class TwitterAccount < ActiveRecord::Base
+  include Geocodeable
+
   has_many :tweets, dependent: :destroy
 
   attr_accessor :skip_geocoding
@@ -13,8 +15,6 @@ class TwitterAccount < ActiveRecord::Base
 
   validates :screen_name, uniqueness: true
 
-  geocoded_by :address
-  after_validation :geocode, if: -> { !skip_geocoding? && address.present? && (latitude.blank? || address_changed?) }
   before_save :reverse_geocode, if: -> { !skip_geocoding? && latitude.present? && (state.blank? || state_changed?) }
   before_save :fetch_account_info
 
@@ -130,8 +130,12 @@ class TwitterAccount < ActiveRecord::Base
 
   private
 
-  def skip_geocoding?
-    !!skip_geocoding
+  def geocode_data
+    @geocode_data ||= address
+  end
+
+  def geocode_columns
+    %i[address]
   end
 
   def twitter_client

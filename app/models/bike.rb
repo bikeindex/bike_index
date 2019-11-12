@@ -3,6 +3,8 @@ class Bike < ActiveRecord::Base
   include Phonifyerable
   include ActiveModel::Dirty
   include BikeSearchable
+  include Geocodeable
+
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker
 
@@ -46,9 +48,6 @@ class Bike < ActiveRecord::Base
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true
 
-  geocoded_by :geo_data
-  after_validation :geocode, if: :should_be_geocoded?
-
   validates_presence_of :serial_number
   validates_presence_of :propulsion_type
   validates_presence_of :cycle_type
@@ -60,8 +59,7 @@ class Bike < ActiveRecord::Base
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
                 :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
                 :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
-                :b_param_id_token, :address, :address_city, :address_state, :address_zipcode,
-                :skip_geocoding
+                :b_param_id_token, :address, :address_city, :address_state, :address_zipcode
 
   attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
 
@@ -778,11 +776,11 @@ class Bike < ActiveRecord::Base
 
   # Geolocate based on the full current stolen record address, if available.
   # Otherwise, use the data set by set_location_info.
-  def geo_data
-    return @geo_data if defined?(@geo_data)
+  def geocode_data
+    return @geocode_data if defined?(@geocode_data)
     set_location_info
 
-    @geo_data =
+    @geocode_data =
       current_stolen_record
         &.address(override_show_address: true)
         .presence ||
@@ -790,13 +788,5 @@ class Bike < ActiveRecord::Base
         .select(&:present?)
         .join(" ")
         .presence
-  end
-
-  def skip_geocoding?
-    !!skip_geocoding
-  end
-
-  def should_be_geocoded?
-    !skip_geocoding? && geo_data.present?
   end
 end
