@@ -122,22 +122,35 @@ RSpec.describe Organization, type: :model do
   end
 
   describe "#regional_suborganizations" do
-    context "given no regional org association" do
+    context "given an org without the regional_bike_counts feature" do
       it "returns an empty collection" do
         org = FactoryBot.create(:organization)
         expect(org.regional_suborganizations).to be_empty
       end
     end
 
-    context "given no regional org associations" do
+    context "given no other organizations in the search radius" do
+      it "returns an empty collection" do
+        org = FactoryBot.create(:organization_with_regional_bike_counts)
+        expect(org.regional_suborganizations).to be_empty
+      end
+    end
+
+    context "given other organizations in the search radius" do
       it "returns the corresponding regional sub-orgs" do
-        FactoryBot.create(:organization)
-        org = FactoryBot.create(:organization)
-        sub_org1 = FactoryBot.create(:organization, regional_organization: org)
-        sub_org2 = FactoryBot.create(:organization, regional_organization: org)
-        expect(org.regional_suborganizations).to match_array([sub_org1, sub_org2])
-        expect(sub_org1.regional_suborganizations).to be_empty
-        expect(sub_org1.regional_suborganizations).to be_empty
+        nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts)
+        expect(nyc_org1).to be_regional
+        FactoryBot.create(:location_new_york, organization: nyc_org1)
+
+        nyc_org2 = FactoryBot.create(:organization)
+        FactoryBot.create(:location_new_york, organization: nyc_org2)
+        nyc_org3 = FactoryBot.create(:organization)
+        FactoryBot.create(:location_new_york, organization: nyc_org3)
+        chicago_org = FactoryBot.create(:organization)
+        FactoryBot.create(:location_chicago, organization: chicago_org)
+        [nyc_org1, nyc_org2, nyc_org3, chicago_org].each(&:reload)
+
+        expect(nyc_org1.regional_suborganizations).to match_array([nyc_org2, nyc_org3])
       end
     end
   end
@@ -565,29 +578,6 @@ RSpec.describe Organization, type: :model do
           expect(organization.include_field_reg_phone?(user)).to be_falsey
           expect(organization.include_field_reg_address?(user)).to be_truthy
         end
-      end
-    end
-  end
-
-  describe "regional organization validations" do
-    context "if attempting to save as both a regional org and sub-org" do
-      it "invalidates the record" do
-        org = FactoryBot.build(
-          :organization,
-          regional: true,
-          regional_organization_id: 2,
-        )
-        expect(org).to be_invalid
-        expect(org.errors.keys).to match_array(%i[regional regional_organization])
-        expect(org.errors.full_messages.to_sentence)
-          .to(match(/cannot be a regional org and also belong to one/))
-
-        org.regional = false
-        expect(org).to be_valid
-
-        org.regional = true
-        org.regional_organization_id = nil
-        expect(org).to be_valid
       end
     end
   end

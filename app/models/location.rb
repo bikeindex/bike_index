@@ -15,6 +15,7 @@ class Location < ActiveRecord::Base
 
   before_save :shown_from_organization
   before_save :set_phone
+  before_save :set_organization_coordinates
   after_commit :update_organization
 
   def shown_from_organization
@@ -37,6 +38,16 @@ class Location < ActiveRecord::Base
     self.phone = Phonifyer.phonify(self.phone) if self.phone
   end
 
+  def set_organization_coordinates
+    return unless organization.present?
+    return if organization.coordinates_set?
+
+    organization.update(
+      location_latitude: latitude,
+      location_longitude: longitude,
+    )
+  end
+
   def org_location_id
     "#{self.organization_id}_#{self.id}"
   end
@@ -44,7 +55,7 @@ class Location < ActiveRecord::Base
   def update_organization
     # Because we need to update the organization and make sure it is shown on the map correctly
     # Manually update to ensure that it runs the before save stuff
-    organization && organization.update_attributes(updated_at: Time.current)
+    organization&.update_attributes(updated_at: Time.current)
   end
 
   def display_name
