@@ -18,6 +18,10 @@ FactoryBot.define do
           organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after commit doesn't run
         end
       end
+
+      factory :organization_with_regional_bike_counts do
+        paid_feature_slugs { ["regional_bike_counts"] }
+      end
     end
 
     # before(:create) { |organization| organization.short_name ||= organization.name }
