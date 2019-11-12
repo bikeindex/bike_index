@@ -10,6 +10,7 @@ class StolenRecord < ActiveRecord::Base
   }.freeze
 
   attr_accessor :timezone # Just to provide a backup and permit assignment
+  attr_accessor :skip_geocoding
 
   def self.old_attr_accessible
     # recovery_tweet, recovery_share # We edit this in the admin panel
@@ -49,7 +50,7 @@ class StolenRecord < ActiveRecord::Base
   before_save :set_calculated_attributes
 
   geocoded_by :address_override_show_address
-  after_validation :geocode, if: :should_be_geocoded
+  after_validation :geocode, if: :should_be_geocoded?
 
   reverse_geocoded_by :latitude, :longitude do |stolen_record, results|
     if (geo = results.first)
@@ -328,8 +329,13 @@ class StolenRecord < ActiveRecord::Base
       .perform_async(theft_alerts.active.last.id, :recovered)
   end
 
-  def should_be_geocoded
-    return if latitude.present? && longitude.present?
+  def skip_geocoding?
+    !!skip_geocoding
+  end
+
+  def should_be_geocoded?
+    return false if skip_geocoding?
+    return false if latitude.present? && longitude.present?
 
     (city.present? || zipcode.present?) && country.present?
   end
