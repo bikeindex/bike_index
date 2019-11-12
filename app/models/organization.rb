@@ -75,7 +75,7 @@ class Organization < ActiveRecord::Base
   after_commit :update_associations
 
   geocoded_by :search_location
-  after_validation :geocode, if: ->(org) { org.search_location.present? }
+  after_validation :geocode, if: :should_be_geocoded
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key, :skip_update
 
@@ -326,6 +326,13 @@ class Organization < ActiveRecord::Base
   end
 
   private
+
+  # Skip geocoding if search location is blank or if no location fields have
+  # been changed.
+  def should_be_geocoded
+    return if search_location.blank?
+    [city_changed?, state_id_changed?, zipcode_changed?, country_id_changed?].any?
+  end
 
   def calculated_paid_feature_slugs
     fslugs = current_invoices.feature_slugs
