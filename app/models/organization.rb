@@ -1,5 +1,6 @@
 class Organization < ActiveRecord::Base
   include ActionView::Helpers::SanitizeHelper
+
   KIND_ENUM = {
     bike_shop: 0,
     bike_advocacy: 1,
@@ -30,11 +31,6 @@ class Organization < ActiveRecord::Base
   belongs_to :state
   belongs_to :country
 
-  belongs_to :regional_organization, class_name: "Organization"
-  has_many :regional_suborganizations,
-           class_name: "Organization",
-           foreign_key: :regional_organization_id
-
   has_many :recovered_records, through: :bikes
   has_many :locations, inverse_of: :organization, dependent: :destroy
   has_many :memberships, dependent: :destroy
@@ -60,7 +56,6 @@ class Organization < ActiveRecord::Base
   validates_presence_of :name
   validates_uniqueness_of :short_name, case_sensitive: false, message: "another organization has this abbreviation - if you don't think that should be the case, contact support@bikeindex.org"
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
-  validate :not_both_regional_organization_and_suborganization
 
   default_scope { order(:name) }
   scope :shown_on_map, -> { where(show_on_map: true, approved: true) }
@@ -74,8 +69,8 @@ class Organization < ActiveRecord::Base
   before_validation :set_calculated_attributes
   after_commit :update_associations
 
-  geocoded_by :search_location
-  after_validation :geocode
+  geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
+  after_validation :geocode, if: -> { false } # never geocode, use search_location lat/long
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key, :skip_update
 
@@ -320,9 +315,24 @@ class Organization < ActiveRecord::Base
   end
 
   def search_location
-    city_and_state = [city, state&.name].reject(&:blank?).join(", ")
-    with_zip = [city_and_state, zipcode].reject(&:blank?).join(" ")
-    [with_zip, country&.name].reject(&:blank?).join(" - ")
+    locations.first
+  end
+
+  def regional?
+    paid_feature_slugs.include?("regional_bike_counts")
+  end
+
+  def coordinates_set?
+    location_latitude.present? && location_longitude.present?
+  end
+
+  def regional_suborganizations
+    return Organization.none unless regional? && coordinates_set?
+
+    address = search_location&.address
+    return Organization.none unless address.present?
+
+    Organization.near(address, search_radius).where.not(id: id)
   end
 
   private
@@ -341,12 +351,5 @@ class Organization < ActiveRecord::Base
     self.website = nil
     self.ascend_name = nil
     self.parent_organization_id = nil
-  end
-
-  def not_both_regional_organization_and_suborganization
-    if regional? && regional_organization_id.present?
-      errors.add(:regional, :cannot_be_regional_and_belong_to_one)
-      errors.add(:regional_organization, :cannot_be_regional_and_belong_to_one)
-    end
   end
 end
