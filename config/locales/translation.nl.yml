@@ -2601,7 +2601,7 @@ nl:
           %{bike_type} geregistreerd op Bike Index op %{date}
         we_sent_out_this_tweet_from: We hebben deze tweet verstuurd vanuit
         were_spreading_the_word_about_your_stolen: We verspreiden het woord over uw
-          %{stolen_word} %{bike_type}!
+          gestolen %{bike_type}!
         this_email_is_about_the_found_bike: Deze e-mail gaat over de herstelde / gevonden
           %{bike_type} geregistreerd op Bike Index op %{date}
         were_spreading_the_word_about_your_found: We verspreiden het woord over je
