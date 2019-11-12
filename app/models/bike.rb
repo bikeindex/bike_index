@@ -47,7 +47,7 @@ class Bike < ActiveRecord::Base
   accepts_nested_attributes_for :components, allow_destroy: true
 
   geocoded_by :geo_data
-  after_validation :geocode, unless: :skip_geocoding
+  after_validation :geocode, if: :should_be_geocoded?
 
   validates_presence_of :serial_number
   validates_presence_of :propulsion_type
@@ -629,24 +629,43 @@ class Bike < ActiveRecord::Base
     [city, state].reject(&:blank?).join(", ")
   end
 
+  def location_info_present?(record)
+    return false if record.blank?
+
+    if record.respond_to?(:country)
+      record.country.present? &&
+        (record.city.present? || record.zipcode.present?)
+    elsif record.respond_to?(:country_code)
+      record.country_code.present? &&
+        (record.city.present? || record.zipcode.present?)
+    end
+  end
+
   # Set the bike's location (city, postal code, and country)
   # based in the following order of precedence:
   # 1. Set explicitly on the bike
-  # 2. From the creation organization, if one is present
-  # 3. From the bike owner's address
-  # 4. From the request's IP address
+  # 2. From the current stolen record, if one is present
+  # 3. From the creation organization, if one is present
+  # 4. From the bike owner's address
+  # 5. From the request's IP address
   def set_location_info(request_location: nil)
     return if zipcode.present? || country.present?
 
-    if creation_organization&.country.present? && creation_organization&.zipcode.present?
-      self.city = creation_organization&.city
+    find_current_stolen_record
+
+    if location_info_present?(current_stolen_record)
+      self.city = current_stolen_record.city
+      self.country = current_stolen_record.country
+      self.zipcode = current_stolen_record.zipcode
+    elsif location_info_present?(creation_organization)
+      self.city = creation_organization.city
       self.country = creation_organization.country
       self.zipcode = creation_organization.zipcode
-    elsif owner&.country.present? && owner&.zipcode.present?
+    elsif location_info_present?(owner)
       self.city = owner.city
       self.country = owner.country
       self.zipcode = owner.zipcode
-    elsif request_location&.country_code.present? && request_location&.zipcode.present?
+    elsif location_info_present?(request_location)
       self.city = request_location.city
       self.country = Country.fuzzy_find(request_location&.country_code)
       self.zipcode = request_location.zipcode
@@ -757,11 +776,27 @@ class Bike < ActiveRecord::Base
     PropulsionType.new(propulsion_type).name
   end
 
+  # Geolocate based on the full current stolen record address, if available.
+  # Otherwise, use the data set by set_location_info.
   def geo_data
-    stolen_record_location = find_current_stolen_record&.address(override_show_address: true)
-    return stolen_record_location if stolen_record_location.present?
-
+    return @geo_data if defined?(@geo_data)
     set_location_info
-    [city, zipcode, country&.name].select(&:present?).join(" ")
+
+    @geo_data =
+      current_stolen_record
+        &.address(override_show_address: true)
+        .presence ||
+      [city, zipcode, country&.name]
+        .select(&:present?)
+        .join(" ")
+        .presence
+  end
+
+  def skip_geocoding?
+    !!skip_geocoding
+  end
+
+  def should_be_geocoded?
+    !skip_geocoding? && geo_data.present?
   end
 end

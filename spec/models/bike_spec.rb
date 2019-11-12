@@ -1515,7 +1515,8 @@ RSpec.describe Bike, type: :model do
       it "does not change it" do
         city = "New York"
         zipcode = "11001"
-        bike = FactoryBot.build(:bike, zipcode: zipcode, country: usa, city: city)
+        org = FactoryBot.create(:organization, zipcode: zipcode, country: usa, city: city)
+        bike = FactoryBot.build(:stolen_bike, zipcode: zipcode, country: usa, city: city, creation_organization: org)
         bike.set_location_info
         expect(bike.city).to eq(city)
         expect(bike.zipcode).to eq(zipcode)
@@ -1523,7 +1524,20 @@ RSpec.describe Bike, type: :model do
       end
     end
 
-    context "given no location on the bike" do
+    context "given a current_stolen_record and no bike location info" do
+      it "takes location from the current stolen record" do
+        bike = FactoryBot.create(:stolen_bike_in_chicago, zipcode: nil, country: nil, city: nil)
+        stolen_record = bike.current_stolen_record
+
+        bike.set_location_info
+
+        expect(bike.city).to eq(stolen_record.city)
+        expect(bike.zipcode).to eq(stolen_record.zipcode)
+        expect(bike.country).to eq(stolen_record.country)
+      end
+    end
+
+    context "given no current_stolen_record" do
       it "takes location from the creation org" do
         city = "New York"
         zipcode = "11001"
