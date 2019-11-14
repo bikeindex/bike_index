@@ -11,12 +11,13 @@
       %tbody
         %tr
           %td
-            Total registrations in regional organizations
+            Bikes in nearby organizations
           %td= number_with_delimiter(counts[:in_organizations])
         %tr
           %td
-            Total registrations not in regional organizations
-            %small (within #{current_organization.search_radius} mi of city center)
+            Bikes nearby,<sup>*</sup> not affiliated with any nearby organizations
+            %br
+            %small *within #{current_organization.search_radius} mi of city center
           %td= number_with_delimiter(counts[:in_region_unaffiliated])
       %tfoot
         %td

@@ -187,25 +187,31 @@ class Organization < ActiveRecord::Base
   end
 
   def bikes_in_nearby_organizations
-    Bike.where(creation_organization_id: organizations_nearby.reorder(id: :asc).pluck(:id))
+    # Bike.where(creation_organization_id: organizations_nearby.reorder(id: :asc).pluck(:id))
   end
 
   def bikes_nearby
     return Bike.none unless search_coordinates_set?
-    Bike.all.near(search_coordinates, search_radius)
+    # Bike.all.near(search_coordinates, search_radius)
   end
 
   def bikes_nearby_unaffiliated_with_any_organization
-    bikes_nearby.where.not(id: bikes_in_nearby_organizations.select(:id))
+    # bikes_nearby.where.not(id: bikes_in_nearby_organizations.select(:id))
   end
 
   def bikes_in_region_counts
     return unless regional?
+    return @bikes_in_region_counts if defined?(@bikes_in_region_counts)
 
-    @bikes_in_region_count ||= {
-      in_organizations: bikes_in_nearby_organizations.count(:all),
-      in_region: bikes_nearby.count(:all),
-      in_region_unaffiliated: bikes_nearby_unaffiliated_with_any_organization.count(:all),
+    bikes_in_orgs = organizations_nearby.includes(:bikes).flat_map(&:bikes).map(&:id)
+    bikes_in_region = Bike.all.near(search_location, search_radius).reorder(:id).pluck(:id)
+    bikes_unaffiliated = bikes_in_region - bikes_in_orgs
+
+    @bikes_in_region_count = {
+      in_organizations: bikes_in_orgs.count,
+      in_region: bikes_in_region.count,
+      in_region_unaffiliated: bikes_unaffiliated.count,
+      all: (bikes_in_orgs + bikes_unaffiliated).count,
     }
   end
 
