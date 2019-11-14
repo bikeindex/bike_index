@@ -64,9 +64,9 @@ class Organization < ActiveRecord::Base
   scope :approved, -> { where(is_suspended: false, approved: true) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
   scope :bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications impound_bikes]) }
-  scope :regional, -> { where(regional: true) }
 
   before_validation :set_calculated_attributes
+  before_save :set_coordinates
   after_commit :update_associations
 
   geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
@@ -316,6 +316,16 @@ class Organization < ActiveRecord::Base
     calculated_children.each { |o| o.update_attributes(updated_at: Time.current, skip_update: true) }
   end
 
+  def search_location
+    locations.order(id: :asc).first
+  end
+
+  delegate :city,
+           :country,
+           :zipcode,
+           to: :search_location,
+           allow_nil: true
+
   def regional?
     paid_feature_slugs.include?("regional_bike_counts")
   end
@@ -329,15 +339,21 @@ class Organization < ActiveRecord::Base
   end
 
   def regional_suborganizations
-    return Organization.none unless regional? && coordinates_set?
+    return self.class.none unless regional? && coordinates_set?
 
-    address = search_location&.address
-    return Organization.none unless address.present?
-
-    Organization.near(address, search_radius).where.not(id: id)
+    self
+      .class
+      .near([location_latitude, location_longitude], search_radius)
+      .where.not(id: id)
   end
 
   private
+
+  def set_coordinates
+    return if coordinates_set?
+    self.location_latitude = search_location&.latitude
+    self.location_longitude = search_location&.longitude
+  end
 
   def calculated_paid_feature_slugs
     fslugs = current_invoices.feature_slugs

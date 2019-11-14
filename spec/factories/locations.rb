@@ -11,6 +11,15 @@ FactoryBot.define do
     latitude { 41.9282162 }
     longitude { -87.6327552 }
 
+    after(:create) do |location|
+      # Save to simulate after_commit callback
+      location.organization.save
+    end
+
+    trait :regional_organization do
+      organization { FactoryBot.create(:organization_with_regional_bike_counts) }
+    end
+
     factory :location_chicago do
       sequence(:street) { |n| "#{n} W Jackson Blvd." }
       city { "Chicago" }
