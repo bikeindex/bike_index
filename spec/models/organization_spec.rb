@@ -121,18 +121,18 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "#regional_suborganizations" do
+  describe "#organizations_nearby" do
     context "given an org without the regional_bike_counts feature" do
       it "returns an empty collection" do
         org = FactoryBot.create(:organization)
-        expect(org.regional_suborganizations).to be_empty
+        expect(org.organizations_nearby).to be_empty
       end
     end
 
     context "given no other organizations in the search radius" do
       it "returns an empty collection" do
         org = FactoryBot.create(:organization_with_regional_bike_counts)
-        expect(org.regional_suborganizations).to be_empty
+        expect(org.organizations_nearby).to be_empty
       end
     end
 
@@ -143,7 +143,7 @@ RSpec.describe Organization, type: :model do
         nyc_org3 = FactoryBot.create(:location_new_york).organization
         FactoryBot.create(:location_chicago).organization
 
-        expect(nyc_org1.regional_suborganizations).to match_array([nyc_org2, nyc_org3])
+        expect(nyc_org1.organizations_nearby).to match_array([nyc_org2, nyc_org3])
       end
     end
   end
