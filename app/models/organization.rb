@@ -28,8 +28,6 @@ class Organization < ActiveRecord::Base
 
   belongs_to :parent_organization, class_name: "Organization"
   belongs_to :auto_user, class_name: "User"
-  belongs_to :state
-  belongs_to :country
 
   has_many :recovered_records, through: :bikes
   has_many :locations, inverse_of: :organization, dependent: :destroy
@@ -189,7 +187,7 @@ class Organization < ActiveRecord::Base
   end
 
   def bikes_in_nearby_organizations
-    Bike.where(organization_id: regional_suborganizations.select(:id))
+    Bike.where(organization_id: organizations_nearby.select(:id))
   end
 
   def bikes_nearby
@@ -345,13 +343,9 @@ class Organization < ActiveRecord::Base
     paid_feature_slugs.include?("regional_bike_counts")
   end
 
-  def regional_suborganizations
+  def organizations_nearby
     return self.class.none unless regional? && search_coordinates_set?
-
-    self
-      .class
-      .near(search_coordinates, search_radius)
-      .where.not(id: id)
+    self.class.near(search_coordinates, search_radius).where.not(id: id)
   end
 
   private
