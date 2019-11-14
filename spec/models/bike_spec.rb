@@ -1501,4 +1501,64 @@ RSpec.describe Bike, type: :model do
       end
     end
   end
+
+  describe "#set_location_info" do
+    let!(:usa) { Country.united_states }
+
+    context "given a location set on the bike" do
+      it "does not change it" do
+        city = "New York"
+        zipcode = "11001"
+        bike = FactoryBot.build(:bike, zipcode: zipcode, country: usa, city: city)
+        bike.set_location_info
+        expect(bike.city).to eq(city)
+        expect(bike.zipcode).to eq(zipcode)
+        expect(bike.country).to eq(usa)
+      end
+    end
+
+    context "given no location on the bike" do
+      it "takes location from the creation org" do
+        org = FactoryBot.create(:location_new_york).organization
+        bike = FactoryBot.build(:bike, creation_organization: org)
+
+        bike.set_location_info
+
+        expect(bike.city).to eq("New York")
+        expect(bike.zipcode).to eq("10011")
+        expect(bike.country).to eq(usa)
+      end
+    end
+
+    context "given no creation org location" do
+      it "takes location from the owner location" do
+        city = "New York"
+        zipcode = "10011"
+        user = FactoryBot.create(:user_confirmed, zipcode: zipcode, country: usa, city: city)
+        ownership = FactoryBot.create(:ownership, user: user, creator: user)
+        bike = ownership.bike
+
+        bike.set_location_info
+
+        expect(bike.city).to eq(city)
+        expect(bike.zipcode).to eq(zipcode)
+        expect(bike.country).to eq(usa)
+      end
+    end
+
+    context "given no creation org or owner location" do
+      it "takes location from the geocoded request location" do
+        city = "New York"
+        zipcode = "10011"
+        bike = FactoryBot.build(:bike)
+        location = double(:request_location, country_code: "US", zipcode: zipcode, city: city)
+
+        bike.set_location_info(request_location: location)
+
+        expect(bike.city).to eq(city)
+        expect(bike.zipcode).to eq(zipcode)
+        expect(bike.country).to eq(usa)
+      end
+    end
+  end
 end

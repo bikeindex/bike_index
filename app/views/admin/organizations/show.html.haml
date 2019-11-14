@@ -76,6 +76,18 @@
         %td
           %span.convertTime.preciseTime
             = l @organization.updated_at, format: :convert_time
+      %tr
+        %td
+          Search Location
+        %td
+          %span
+            = @organization.search_location&.address
+      %tr
+        %td
+          Search Radius (mi)
+        %td
+          %span
+            = @organization.search_radius
 
   .col-md-6
     %table.table-list
@@ -137,10 +149,19 @@
           %td
             Children
           %td
-            .ul{ style: "font-size: 80%;" }
+            %ul{ style: "font-size: 80%;" }
               - @organization.child_organizations.each do |org|
-                .li
+                %li
                   = link_to org.name, admin_organization_url(org)
+      %tr
+        - if @organization.regional?
+          %td
+            Regional Sub-Organizations
+          %td
+            %ul{ style: "font-size: 80%;" }
+              - @organization.regional_suborganizations.each do |suborg|
+                %li
+                  = link_to suborg.name, admin_organization_path(suborg)
 
   - if @organization.bike_shop?
     .col-md-6

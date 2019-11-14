@@ -210,7 +210,7 @@ RSpec.describe BikeCreator do
         creator = BikeCreator.new(b_param)
         expect(creator).to receive(:add_bike_book_data).at_least(1).times.and_return(nil)
         expect(creator).to receive(:build_bike).at_least(1).times.and_return(bike)
-        expect(bike).to receive(:save).and_return(true)
+        expect(bike).to receive(:save).at_least(:once).and_return(true)
         creator.create_bike
       end
     end

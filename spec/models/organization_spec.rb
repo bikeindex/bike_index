@@ -121,6 +121,33 @@ RSpec.describe Organization, type: :model do
     end
   end
 
+  describe "#organizations_nearby" do
+    context "given an org without the regional_bike_counts feature" do
+      it "returns an empty collection" do
+        org = FactoryBot.create(:organization)
+        expect(org.organizations_nearby).to be_empty
+      end
+    end
+
+    context "given no other organizations in the search radius" do
+      it "returns an empty collection" do
+        org = FactoryBot.create(:organization_with_regional_bike_counts)
+        expect(org.organizations_nearby).to be_empty
+      end
+    end
+
+    context "given other organizations in the search radius" do
+      it "returns the corresponding regional sub-orgs" do
+        nyc_org1 = FactoryBot.create(:location_new_york, :regional_organization).organization
+        nyc_org2 = FactoryBot.create(:location_new_york).organization
+        nyc_org3 = FactoryBot.create(:location_new_york).organization
+        FactoryBot.create(:location_chicago).organization
+
+        expect(nyc_org1.organizations_nearby).to match_array([nyc_org2, nyc_org3])
+      end
+    end
+  end
+
   describe "map_coordinates" do
     # There is definitely a better way to do this!
     # But for now, just stubbing it because whatever, they haven't put anything in

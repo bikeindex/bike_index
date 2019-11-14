@@ -1,7 +1,8 @@
 class BikeCreator
-  def initialize(b_param = nil)
+  def initialize(b_param = nil, location: nil)
     @b_param = b_param
     @bike = nil
+    @location = location
   end
 
   def add_bike_book_data
@@ -68,9 +69,11 @@ class BikeCreator
   end
 
   def save_bike(bike)
+    bike.set_location_info(request_location: @location)
     bike.save
     @bike = create_associations(bike)
     validate_record(@bike)
+
     if @bike.present? && @bike.id.present?
       @bike.creation_states.create(creation_state_attributes)
       AfterBikeSaveWorker.perform_async(@bike.id)
@@ -79,6 +82,7 @@ class BikeCreator
         bike_code && bike_code.claim(@bike.creator, @bike.id)
       end
     end
+
     @bike
   end
 
