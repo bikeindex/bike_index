@@ -1519,15 +1519,13 @@ RSpec.describe Bike, type: :model do
 
     context "given no location on the bike" do
       it "takes location from the creation org" do
-        city = "New York"
-        zipcode = "11001"
-        org = FactoryBot.create(:organization, zipcode: zipcode, country: usa, city: city)
+        org = FactoryBot.create(:location_new_york).organization
         bike = FactoryBot.build(:bike, creation_organization: org)
 
         bike.set_location_info
 
-        expect(bike.city).to eq(city)
-        expect(bike.zipcode).to eq(zipcode)
+        expect(bike.city).to eq("New York")
+        expect(bike.zipcode).to eq("10011")
         expect(bike.country).to eq(usa)
       end
     end
