@@ -95,7 +95,7 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       end
     end
     context "existing attributes" do
-      let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org", phone: "929292", zipcode: "89999", skip_geocode: true) }
+      let(:user) { FactoryBot.create(:user, email: "aftercreate@bikeindex.org", phone: "929292", zipcode: "89999", skip_geocoding: true) }
       it "doesn't import" do
         instance.perform(user.id, "new")
         user.reload

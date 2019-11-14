@@ -3,6 +3,47 @@
     %em= current_organization.name
     Dashboard
 
+- if current_organization.regional? && current_organization.is_paid?
+  %h3.mt-4 Bikes in Region
+  - counts = current_organization.bikes_in_region_counts
+  .full-screen-table.mt-4
+    %table.table.table-striped.table-bordered.table-sm
+      %tbody
+        %tr
+          %td
+            Total registrations in regional organizations
+          %td= number_with_delimiter(counts[:in_organizations])
+        %tr
+          %td
+            Total registrations not in regional organizations
+            %small (within #{current_organization.search_radius} mi of city center)
+          %td= number_with_delimiter(counts[:in_region_unaffiliated])
+      %tfoot
+        %td
+          %strong Total
+        %td
+          %strong= number_with_delimiter(counts[:all])
+
+  %h3.mt-4 Organizations in Region
+  .full-screen-table.mt-4
+    %table.table.table-striped.table-bordered.table-sm
+      %thead
+        %th Organization
+        %th Bikes
+      %tbody
+        - total_bikes_count = 0
+        - current_organization.organizations_nearby.each do |organization|
+          - count = organization.bikes.count
+          - total_bikes_count += count
+          %tr
+            %td= organization.name
+            %td= number_with_delimiter(count)
+      %tfoot
+        %td
+          %strong Total
+        %td
+          %strong= number_with_delimiter(total_bikes_count)
+
 - if current_organization.parent?
   %h3.mt-4
     Associated organizations

@@ -1,6 +1,5 @@
 # TODO: eventually this should merge with after_user_change_worker.rb, or something
 class AfterUserCreateWorker < ApplicationWorker
-
   sidekiq_options queue: "high_priority"
 
   # Generally, this is called inline - so it makes sense to pass in the user rather than just the user_id
@@ -70,7 +69,7 @@ class AfterUserCreateWorker < ApplicationWorker
     unless [user.street, user.city, user.zipcode, user.state, user.country].reject(&:blank?).any?
       address = user_bikes_for_attrs(user.id).map { |b| b.registration_address }.reject(&:blank?).last
       if address.present?
-        user.attributes = { skip_geocode: true,
+        user.attributes = { skip_geocoding: true,
                            street: address["address"],
                            zipcode: address["zipcode"],
                            city: address["city"],

@@ -44,7 +44,7 @@ RSpec.describe BikeCreatorAssociator do
     it "calls create stolen record" do
       b_param = BParam.new
       bike = Bike.new
-      allow(bike).to receive(:creation_organization).and_return(true)
+      allow(bike).to receive(:creation_organization)
       expect_any_instance_of(StolenRecordUpdator).to receive(:create_new_record).and_return(true)
       subject.new(b_param).create_stolen_record(bike)
     end

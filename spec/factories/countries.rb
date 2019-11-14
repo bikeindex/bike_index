@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :country do
-    name
-    sequence(:iso) { |n| "D#{n}" }
+    sequence(:name) { |n| "Country #{n}" }
+    sequence(:iso) { |n| "country-#{n}" }
 
     factory :country_us do
       name { "United States" }

@@ -7,6 +7,7 @@ FactoryBot.define do
     zipcode { "60647" }
     city { "Chicago" }
     street { "foo address" }
+    skip_geocoding { true }
     latitude { 41.9282162 }
     longitude { -87.6327552 }
 
