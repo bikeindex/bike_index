@@ -56,10 +56,6 @@ class Location < ActiveRecord::Base
 
   private
 
-  def geocode_data
-    @geocode_data ||= address
-  end
-
   def geocode_columns
     %i[street city state_id zipcode country_id]
   end

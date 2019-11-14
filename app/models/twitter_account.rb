@@ -130,10 +130,6 @@ class TwitterAccount < ActiveRecord::Base
 
   private
 
-  def geocode_data
-    @geocode_data ||= address
-  end
-
   def geocode_columns
     %i[address]
   end

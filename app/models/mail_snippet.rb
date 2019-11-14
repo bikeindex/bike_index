@@ -53,10 +53,6 @@ class MailSnippet < ActiveRecord::Base
 
   private
 
-  def geocode_data
-    address
-  end
-
   def geocode_columns
     %i[address]
   end

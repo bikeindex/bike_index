@@ -1,6 +1,5 @@
 class Organization < ActiveRecord::Base
   include ActionView::Helpers::SanitizeHelper
-  include Geocodeable
 
   KIND_ENUM = {
     bike_shop: 0,
@@ -206,6 +205,9 @@ class Organization < ActiveRecord::Base
     }
   end
 
+  def search_location
+  end
+
   def paid_for?(feature_name)
     features =
       Array(feature_name)
@@ -318,21 +320,7 @@ class Organization < ActiveRecord::Base
     calculated_children.each { |o| o.update_attributes(updated_at: Time.current, skip_update: true) }
   end
 
-  def search_location
-    city_and_state = [city, state&.name].reject(&:blank?).join(", ")
-    with_zip = [city_and_state, zipcode].reject(&:blank?).join(" ")
-    [with_zip, country&.name].reject(&:blank?).join(" - ")
-  end
-
   private
-
-  def geocode_data
-    @geocode_data ||= search_location
-  end
-
-  def geocode_columns
-    %i[city state_id zipcode country_id]
-  end
 
   def calculated_paid_feature_slugs
     fslugs = current_invoices.feature_slugs

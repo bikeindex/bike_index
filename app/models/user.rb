@@ -374,10 +374,6 @@ class User < ActiveRecord::Base
 
   private
 
-  def geocode_data
-    @geolocation_data ||= address
-  end
-
   def geocode_columns
     %i[street city zipcode]
   end

@@ -13,8 +13,10 @@ module Geocodeable
       !!skip_geocoding
     end
 
-    # Override in Geocodeable model.
-    def geocode_data; end
+    # Customize by overriding in the Geocodeable model.
+    def geocode_data
+      @geocode_data ||= address
+    end
 
     # An array of symbols of the db columns upon which `geocode_data`
     # depends.These are checked for changes before geocoding using
