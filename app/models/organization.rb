@@ -1,5 +1,6 @@
 class Organization < ActiveRecord::Base
   include ActionView::Helpers::SanitizeHelper
+
   KIND_ENUM = {
     bike_shop: 0,
     bike_advocacy: 1,
@@ -73,9 +74,6 @@ class Organization < ActiveRecord::Base
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
-
-  geocoded_by :search_location
-  after_validation :geocode, if: :should_be_geocoded
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key, :skip_update
 
@@ -209,6 +207,9 @@ class Organization < ActiveRecord::Base
     }
   end
 
+  def search_location
+  end
+
   def paid_for?(feature_name)
     features =
       Array(feature_name)
@@ -321,20 +322,7 @@ class Organization < ActiveRecord::Base
     calculated_children.each { |o| o.update_attributes(updated_at: Time.current, skip_update: true) }
   end
 
-  def search_location
-    city_and_state = [city, state&.name].reject(&:blank?).join(", ")
-    with_zip = [city_and_state, zipcode].reject(&:blank?).join(" ")
-    [with_zip, country&.name].reject(&:blank?).join(" - ")
-  end
-
   private
-
-  # Skip geocoding if search location is blank or if no location fields have
-  # been changed.
-  def should_be_geocoded
-    return if search_location.blank?
-    [city_changed?, state_id_changed?, zipcode_changed?, country_id_changed?].any?
-  end
 
   def calculated_paid_feature_slugs
     fslugs = current_invoices.feature_slugs

@@ -1,6 +1,8 @@
 class StolenRecord < ActiveRecord::Base
   include ActiveModel::Dirty
   include Phonifyerable
+  include Geocodeable
+
   RECOVERY_DISPLAY_STATUS_ENUM = {
     not_eligible: 0,
     waiting_on_decision: 1,
@@ -48,9 +50,6 @@ class StolenRecord < ActiveRecord::Base
 
   before_save :set_calculated_attributes
 
-  geocoded_by :address_override_show_address
-  after_validation :geocode, if: :should_be_geocoded
-
   reverse_geocoded_by :latitude, :longitude do |stolen_record, results|
     if (geo = results.first)
       stolen_record.country ||= Country.find_by(name: geo.country)
@@ -86,8 +85,6 @@ class StolenRecord < ActiveRecord::Base
 
   # Only display if they have put in an address - so that we don't show on initial creation
   def display_checklist?; address.present? end
-
-  def address_override_show_address; address(skip_default_country: true) end
 
   def address(skip_default_country: false, override_show_address: false)
     country_string = country && country.iso
@@ -328,9 +325,11 @@ class StolenRecord < ActiveRecord::Base
       .perform_async(theft_alerts.active.last.id, :recovered)
   end
 
-  def should_be_geocoded
-    return if latitude.present? && longitude.present?
+  def geocode_data
+    @geocode_data ||= address(skip_default_country: true)
+  end
 
-    (city.present? || zipcode.present?) && country.present?
+  def geocode_columns
+    %i[street city state_id zipcode country_id]
   end
 end

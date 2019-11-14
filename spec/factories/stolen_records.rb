@@ -2,6 +2,7 @@ FactoryBot.define do
   factory :stolen_record do
     bike { FactoryBot.create(:bike, stolen: true) }
     date_stolen { Time.current }
+    skip_geocoding { true }
 
     factory :stolen_record_recovered do
       bike { FactoryBot.create(:bike) }

@@ -1,4 +1,6 @@
 class Location < ActiveRecord::Base
+  include Geocodeable
+
   acts_as_paranoid
   belongs_to :organization, inverse_of: :locations # Locations are organization locations
   belongs_to :country
@@ -14,11 +16,6 @@ class Location < ActiveRecord::Base
   before_save :shown_from_organization
   before_save :set_phone
   after_commit :update_organization
-
-  unless Rails.env.test?
-    geocoded_by :address
-    after_validation :geocode
-  end
 
   def shown_from_organization
     self.shown = organization && organization.allowed_show
@@ -55,5 +52,11 @@ class Location < ActiveRecord::Base
     return name if name == organization.name
 
     "#{organization.name} - #{name}"
+  end
+
+  private
+
+  def geocode_columns
+    %i[street city state_id zipcode country_id]
   end
 end
