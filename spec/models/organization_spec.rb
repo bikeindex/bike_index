@@ -138,17 +138,10 @@ RSpec.describe Organization, type: :model do
 
     context "given other organizations in the search radius" do
       it "returns the corresponding regional sub-orgs" do
-        nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts)
-        expect(nyc_org1).to be_regional
-        FactoryBot.create(:location_new_york, organization: nyc_org1)
-
-        nyc_org2 = FactoryBot.create(:organization)
-        FactoryBot.create(:location_new_york, organization: nyc_org2)
-        nyc_org3 = FactoryBot.create(:organization)
-        FactoryBot.create(:location_new_york, organization: nyc_org3)
-        chicago_org = FactoryBot.create(:organization)
-        FactoryBot.create(:location_chicago, organization: chicago_org)
-        [nyc_org1, nyc_org2, nyc_org3, chicago_org].each(&:reload)
+        nyc_org1 = FactoryBot.create(:location_new_york, :regional_organization).organization
+        nyc_org2 = FactoryBot.create(:location_new_york).organization
+        nyc_org3 = FactoryBot.create(:location_new_york).organization
+        FactoryBot.create(:location_chicago).organization
 
         expect(nyc_org1.regional_suborganizations).to match_array([nyc_org2, nyc_org3])
       end

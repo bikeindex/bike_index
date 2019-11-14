@@ -162,12 +162,6 @@
               - @organization.regional_suborganizations.each do |suborg|
                 %li
                   = link_to suborg.name, admin_organization_path(suborg)
-        - elsif @organization.regional_organization.present?
-          %td
-            Affiliated with Regional Organization
-          %td
-            - regional_org = @organization.regional_organization
-            = link_to regional_org.name, admin_organization_path(regional_org)
 
   - if @organization.bike_shop?
     .col-md-6
