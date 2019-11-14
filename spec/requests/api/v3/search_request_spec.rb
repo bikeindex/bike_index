@@ -116,7 +116,7 @@ RSpec.describe "Search API V3", type: :request do
       let(:non_stolen_interpreted_params) { proximity_interpreted_params.merge(stolenness: "non") }
       let!(:non_stolen) { FactoryBot.create(:bike, manufacturer: manufacturer, primary_frame_color: color, serial_number: "s") }
       let!(:stolen) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer, primary_frame_color: color, serial_number: "5") }
-      let!(:stolen_proximity) { FactoryBot.create(:stolen_bike, manufacturer: manufacturer, secondary_frame_color: color, serial_number: "S", latitude: 41.8624488, longitude: -87.6591502) }
+      let!(:stolen_proximity) { FactoryBot.create(:stolen_bike_in_chicago, manufacturer: manufacturer, secondary_frame_color: color, serial_number: "S") }
       include_context :geocoder_real
       it "calls Bike Search with the expected interpreted_params" do
         VCR.use_cassette("v3_bike_search-count") do

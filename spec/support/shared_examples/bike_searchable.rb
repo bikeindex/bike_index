@@ -279,14 +279,19 @@ RSpec.shared_examples "bike_searchable" do
       end
     end
     context "query" do
-      let(:bike) { FactoryBot.create(:bike, description: "Booger") }
-      let(:bike_2) { FactoryBot.create(:bike) }
-      let(:query_params) { { query: "booger", stolenness: "all" } }
-      before do
-        expect([bike, bike_2].size).to eq 2
-      end
       it "selects matching the query" do
-        expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike.id])
+        bike1 = FactoryBot.create(:bike, description: "Booger")
+        bike2 = FactoryBot.create(:bike)
+        expect(bike1).to be_valid
+        expect(bike2).to be_valid
+
+        interpreted_params = Bike.searchable_interpreted_params(
+          { query: "booger", stolenness: "all" },
+          ip: "127.0.0.1",
+        )
+        results = Bike.search(interpreted_params)
+
+        expect(results.pluck(:id)).to eq([bike1.id])
       end
     end
     context "stolenness" do
@@ -319,16 +324,20 @@ RSpec.shared_examples "bike_searchable" do
         end
       end
       context "proximity" do
-        let(:bike_1) { FactoryBot.create(:stolen_bike, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
-        let(:stolen_record_1) { bike_1.find_current_stolen_record }
-        let(:bike_2) { FactoryBot.create(:stolen_bike, latitude: 41.8961603, longitude: -87.677215) }
-        let(:stolen_record_2) { bike_2.find_current_stolen_record }
-        let(:query_params) { { stolenness: "proximity", location: "New York, NY", distance: 200 } }
-        before do
-          expect(bike_2.stolen_lat).to_not eq stolen_record_1[:latitude]
-        end
-        it "finds the bike where we want it to be" do
-          expect(Bike.search(interpreted_params).pluck(:id)).to eq([bike_1.id])
+        it "returns bikes near the requested location" do
+          bike1 = FactoryBot.create(:stolen_bike_in_amsterdam)
+          bike2 = FactoryBot.create(:stolen_bike_in_nyc)
+          expect(bike1.longitude).to eq(bike1.stolen_long)
+          expect(bike2.longitude).to eq(bike2.stolen_long)
+          expect(bike1.longitude).to_not eq(bike2.longitude)
+
+          interpreted_params = Bike.searchable_interpreted_params(
+            { stolenness: "proximity", location: "New York, NY", distance: 200 },
+            ip: "127.0.0.1",
+          )
+          results = Bike.search(interpreted_params)
+
+          expect(results.pluck(:id)).to eq([bike2.id])
         end
       end
     end

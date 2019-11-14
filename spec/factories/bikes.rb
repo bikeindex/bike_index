@@ -13,6 +13,7 @@ FactoryBot.define do
     primary_frame_color { Color.black }
     cycle_type { CycleType.slugs.first }
     propulsion_type { "foot-pedal" }
+    skip_geocoding { true }
 
     trait :with_image do
       after(:create) do |bike|
@@ -24,15 +25,15 @@ FactoryBot.define do
 
     factory :stolen_bike do
       transient do
-        latitude { 40.7143528 }
-        longitude { -74.0059731 }
+        latitude { nil }
+        longitude { nil }
       end
       stolen { true }
       after(:create) do |bike, evaluator|
-        create(:stolen_record,
-               bike: bike,
-               latitude: evaluator.latitude,
-               longitude: evaluator.longitude)
+        lat, long = %i[latitude longitude].map { |k| evaluator.public_send(k).presence }
+        # default to NYC coordinates
+        lat, long = [40.7143528, -74.0059731] unless lat && long
+        create(:stolen_record, bike: bike, latitude: lat, longitude: long)
         bike.save # updates current_stolen_record
         bike.reload
       end
@@ -46,24 +47,23 @@ FactoryBot.define do
       end
 
       factory :stolen_bike_in_amsterdam do
-        after(:create) do |bike, evaluator|
-          create(:stolen_record, :in_amsterdam, bike: bike, latitude: evaluator.latitude, longitude: evaluator.longitude)
-          bike.save # updates current_stolen_record
-          bike.reload
+        after(:create) do |bike|
+          create_and_assign_stolen_record(:in_amsterdam, bike: bike)
         end
       end
       factory :stolen_bike_in_los_angeles do
-        after(:create) do |bike, evaluator|
-          create(:stolen_record, :in_los_angeles, bike: bike, latitude: evaluator.latitude, longitude: evaluator.longitude)
-          bike.save # updates current_stolen_record
-          bike.reload
+        after(:create) do |bike|
+          create_and_assign_stolen_record(:in_los_angeles, bike: bike)
         end
       end
       factory :stolen_bike_in_nyc do
-        after(:create) do |bike, evaluator|
-          create(:stolen_record, :in_nyc, bike: bike, latitude: evaluator.latitude, longitude: evaluator.longitude)
-          bike.save # updates current_stolen_record
-          bike.reload
+        after(:create) do |bike|
+          create_and_assign_stolen_record(:in_nyc, bike: bike)
+        end
+      end
+      factory :stolen_bike_in_chicago do
+        after(:create) do |bike|
+          create_and_assign_stolen_record(:in_chicago, bike: bike)
         end
       end
     end
@@ -133,4 +133,17 @@ FactoryBot.define do
       primary_frame_color { FactoryBot.create(:color, name: "Green") }
     end
   end
+end
+
+# Create a stolen record and assign to the given bike record
+def create_and_assign_stolen_record(location, bike:)
+  csr = create(:stolen_record, location, bike: bike)
+
+  # set lat / long to prevent overriding by geocoder
+  bike.latitude = csr.latitude
+  bike.longitude = csr.longitude
+
+  # updates current_stolen_record
+  bike.save
+  bike.reload
 end
