@@ -198,12 +198,14 @@ class Organization < ActiveRecord::Base
     return @bikes_in_region_counts if defined?(@bikes_in_region_counts)
 
     bikes_in_orgs = regional_suborganizations.includes(:bikes).flat_map(&:bikes).map(&:id)
-    bikes_in_region = search_location.blank? ? [] : Bike.all.near(search_location, search_radius).reorder(:id).pluck(:id)
+    bikes_in_region = Bike.all.near(search_location, search_radius).reorder(:id).pluck(:id)
+    bikes_unaffiliated = (bikes_in_region - bikes_in_orgs)
 
     @bikes_in_region_count = {
       in_organizations: bikes_in_orgs.count,
       in_region: bikes_in_region.count,
-      in_region_unaffiliated: (bikes_in_region - bikes_in_orgs).count,
+      in_region_unaffiliated: bikes_unaffiliated.count,
+      all: (bikes_in_orgs + bikes_unaffiliated).count,
     }
   end
 
