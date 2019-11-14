@@ -24,6 +24,7 @@ module Geocodeable
     def geocode_columns; []; end
 
     def any_geocode_columns_changed?
+      return true if geocode_columns.blank?
       geocode_columns.any? { |col| public_send("#{col}_changed?") }
     end
 

@@ -32,7 +32,7 @@
         %th Bikes
       %tbody
         - total_bikes_count = 0
-        - current_organization.regional_suborganizations.each do |organization|
+        - current_organization.organizations_nearby.each do |organization|
           - count = organization.bikes.count
           - total_bikes_count += count
           %tr

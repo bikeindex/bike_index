@@ -187,25 +187,25 @@ class Organization < ActiveRecord::Base
   end
 
   def bikes_in_nearby_organizations
-    Bike.where(organization_id: organizations_nearby.select(:id))
+    Bike.where(creation_organization_id: organizations_nearby.reorder(id: :asc).pluck(:id))
   end
 
   def bikes_nearby
     return Bike.none unless search_coordinates_set?
-    Bike.all.near(search_coordinates, search_radius).reorder(:id)
+    Bike.all.near(search_coordinates, search_radius)
   end
 
   def bikes_nearby_unaffiliated_with_any_organization
-    bikes_nearby.where(organization_id: nil)
+    bikes_nearby.where.not(id: bikes_in_nearby_organizations.select(:id))
   end
 
   def bikes_in_region_counts
     return unless regional?
 
     @bikes_in_region_count ||= {
-      in_organizations: bikes_in_nearby_organizations.count,
-      in_region: bikes_nearby.count,
-      in_region_unaffiliated: bikes_nearby_unaffiliated_with_any_organization.count,
+      in_organizations: bikes_in_nearby_organizations.count(:all),
+      in_region: bikes_nearby.count(:all),
+      in_region_unaffiliated: bikes_nearby_unaffiliated_with_any_organization.count(:all),
     }
   end
 

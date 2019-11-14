@@ -159,7 +159,7 @@
             Regional Sub-Organizations
           %td
             %ul{ style: "font-size: 80%;" }
-              - @organization.regional_suborganizations.each do |suborg|
+              - @organization.organizations_nearby.each do |suborg|
                 %li
                   = link_to suborg.name, admin_organization_path(suborg)
 
