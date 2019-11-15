@@ -652,14 +652,20 @@ class Bike < ActiveRecord::Base
     find_current_stolen_record
 
     if location_info_present?(current_stolen_record)
+      self.latitude = current_stolen_record.latitude
+      self.longitude = current_stolen_record.longitude
       self.city = current_stolen_record.city
       self.country = current_stolen_record.country
       self.zipcode = current_stolen_record.zipcode
     elsif location_info_present?(creation_organization)
+      self.latitude = creation_organization.location_latitude
+      self.longitude = creation_organization.location_longitude
       self.city = creation_organization.city
       self.country = creation_organization.country
       self.zipcode = creation_organization.zipcode
     elsif location_info_present?(owner)
+      self.latitude = owner.latitude
+      self.longitude = owner.longitude
       self.city = owner.city
       self.country = owner.country
       self.zipcode = owner.zipcode
