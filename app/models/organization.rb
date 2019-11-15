@@ -186,32 +186,33 @@ class Organization < ActiveRecord::Base
     bike_shop? && %w[no_pos broken_pos].include?(pos_kind)
   end
 
+  # Bikes associated with nearby organizations within `search_radius` miles.
   def bikes_in_nearby_organizations
-    # Bike.where(creation_organization_id: organizations_nearby.reorder(id: :asc).pluck(:id))
+    return Bike.none unless regional?
+    Bike
+      .includes(bike_organizations: :organization)
+      .where(bike_organizations: { organization: organizations_nearby.pluck(:id) })
   end
 
+  # Bikes geolocated within `search_radius` miles.
   def bikes_nearby
-    return Bike.none unless search_coordinates_set?
-    # Bike.all.near(search_coordinates, search_radius)
+    return Bike.none unless regional? && search_coordinates_set?
+    Bike.near(search_coordinates, search_radius).reorder(id: :asc)
   end
 
-  def bikes_nearby_unaffiliated_with_any_organization
-    # bikes_nearby.where.not(id: bikes_in_nearby_organizations.select(:id))
+  # Bikes nearby not associated with any nearby organizations.
+  def bikes_nearby_unaffiliated
+    bikes_nearby.where.not(id: bikes_in_nearby_organizations.pluck(:id))
   end
 
   def bikes_in_region_counts
     return unless regional?
     return @bikes_in_region_counts if defined?(@bikes_in_region_counts)
 
-    bikes_in_orgs = organizations_nearby.includes(:bikes).flat_map(&:bikes).map(&:id)
-    bikes_in_region = Bike.all.near(search_location, search_radius).reorder(:id).pluck(:id)
-    bikes_unaffiliated = bikes_in_region - bikes_in_orgs
-
     @bikes_in_region_count = {
-      in_organizations: bikes_in_orgs.count,
-      in_region: bikes_in_region.count,
-      in_region_unaffiliated: bikes_unaffiliated.count,
-      all: (bikes_in_orgs + bikes_unaffiliated).count,
+      in_organizations: bikes_in_nearby_organizations.count(:all),
+      in_region_unaffiliated: bikes_nearby_unaffiliated.count(:all),
+      in_region: bikes_nearby.count(:all),
     }
   end
 
@@ -351,7 +352,7 @@ class Organization < ActiveRecord::Base
 
   def organizations_nearby
     return self.class.none unless regional? && search_coordinates_set?
-    self.class.near(search_coordinates, search_radius).where.not(id: id)
+    nearbys(search_radius).reorder(id: :asc)
   end
 
   private

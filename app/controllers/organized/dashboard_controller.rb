@@ -8,6 +8,8 @@ module Organized
       end
     end
 
-    def index; end
+    def index
+      @counts = current_organization.bikes_in_region_counts
+    end
   end
 end
