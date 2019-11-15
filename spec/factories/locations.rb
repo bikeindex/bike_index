@@ -30,7 +30,7 @@ FactoryBot.define do
       longitude { -87.6327552 }
     end
 
-    factory :location_new_york do
+    factory :location_nyc do
       sequence(:street) { |n| "#{n} Madison Ave." }
       city { "New York" }
       state { State.find_or_create_by(name: "New York", abbreviation: "NY") }
@@ -38,6 +38,16 @@ FactoryBot.define do
       country { Country.united_states }
       latitude { 40.7143528 }
       longitude { -74.0059731 }
+    end
+
+    factory :location_los_angeles do
+      sequence(:street) { |n| "#{n} Manzanita Ave." }
+      city { "Los Angeles" }
+      state { State.find_or_create_by(name: "California", abbreviation: "CA") }
+      zipcode { "90021" }
+      country { Country.united_states }
+      latitude { 34.05223 }
+      longitude { -118.24368 }
     end
   end
 end

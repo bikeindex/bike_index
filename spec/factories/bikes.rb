@@ -133,6 +133,39 @@ FactoryBot.define do
       primary_frame_color { FactoryBot.create(:color, name: "Green") }
     end
   end
+
+  trait :in_los_angeles do
+    latitude { 34.05223 }
+    longitude { -118.24368 }
+    city { "Los Angeles" }
+    zipcode { "90021" }
+    country { Country.united_states }
+  end
+
+  trait :in_nyc do
+    latitude { 40.7143528 }
+    longitude { -74.0059731 }
+    city { "New York" }
+    zipcode { "10011" }
+    country { Country.united_states }
+  end
+
+  trait :in_chicago do
+    latitude { 41.8624488 }
+    longitude { -87.6591502 }
+    city { "Chicago" }
+    zipcode { "60601" }
+    country { Country.united_states }
+  end
+
+  trait :in_amsterdam do
+    latitude { 52.37403 }
+    longitude { 4.88969 }
+    city { "Amsterdam" }
+    state { nil }
+    zipcode { nil }
+    country { Country.netherlands }
+  end
 end
 
 # Create a stolen record and assign to the given bike record

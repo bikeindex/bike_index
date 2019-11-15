@@ -8,6 +8,24 @@ FactoryBot.define do
     api_access_approved { false }
     sequence(:website) { |n| "http://organization#{n}.com" }
 
+    factory :organization_nyc do
+      after(:create) do |org|
+        FactoryBot.create(:location_nyc, organization: org)
+      end
+    end
+
+    factory :organization_chicago do
+      after(:create) do |org|
+        FactoryBot.create(:location_chicago, organization: org)
+      end
+    end
+
+    factory :organization_los_angeles do
+      after(:create) do |org|
+        FactoryBot.create(:location_los_angeles, organization: org)
+      end
+    end
+
     factory :organization_with_paid_features do
       transient do
         paid_feature_slugs { ["csv_export"] }
