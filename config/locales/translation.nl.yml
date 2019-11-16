@@ -1760,6 +1760,8 @@ nl:
       update_serial_number: Framenummer bijwerken
       updated_serial: Framenummer bijgewerkt
       zipcode: Postcode
+      choose_country: Kies land
+      city: City
     edit_drivetrain:
       all_diameters: Alle diameters
       belt_drive: Riemaandrijving
