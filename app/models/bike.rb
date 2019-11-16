@@ -784,7 +784,7 @@ class Bike < ActiveRecord::Base
   def geocode_data
     return @geocode_data if defined?(@geocode_data)
 
-    # Sets lat/long, should avoid an geocode API call
+    # Sets lat/long, will avoid a geocode API call if coordinates are found
     set_location_info
 
     @geocode_data =
@@ -798,9 +798,10 @@ class Bike < ActiveRecord::Base
   end
 
   # Take lat/long from associated geocoded model
-  # Only geocode if no lat/long present
+  # Only geocode if no lat/long present and geocode data present
   def should_be_geocoded?
     return false if skip_geocoding?
-    latitude.blank? && longitude.blank?
+    return false if latitude.present? && longitude.present?
+    geocode_data.present?
   end
 end
