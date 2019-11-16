@@ -198,6 +198,9 @@ nl:
         user:
           email_already_exists: Die e-mail is al aangemeld op Bike Index.
           not_an_available_language: geen beschikbare taal
+        organization:
+          cannot_be_regional_and_belong_to_one: kan geen regionale organisatie zijn
+            en er ook toe behoren.
     attributes:
       doorkeeper/application:
         name: Naam
@@ -1760,6 +1763,8 @@ nl:
       update_serial_number: Framenummer bijwerken
       updated_serial: Framenummer bijgewerkt
       zipcode: Postcode
+      choose_country: Kies land
+      city: City
     edit_drivetrain:
       all_diameters: Alle diameters
       belt_drive: Riemaandrijving
