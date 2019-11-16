@@ -435,7 +435,6 @@ class Bike < ActiveRecord::Base
   def find_current_stolen_record
     return unless stolen_records.any?
     self.current_stolen_record = stolen_records.last
-    current_stolen_record
   end
 
   def title_string
