@@ -4,44 +4,7 @@
     Dashboard
 
 - if current_organization.regional? && current_organization.is_paid?
-  %h3.mt-4
-    Bikes Nearby
-    %small (within #{current_organization.search_radius} mi of city center)
-  .full-screen-table.mt-4
-    %table.table.table-striped.table-bordered.table-sm
-      %tbody
-        %tr
-          %td
-            Bikes associated with nearby organizations
-          %td= number_with_delimiter(@counts.fetch(:in_organizations))
-        %tr
-          %td
-            Bikes nearby
-          %td
-            = number_with_delimiter(@counts.fetch(:in_region))
-        %tr
-          %td Bikes nearby, not associated with any nearby organizations
-          %td= number_with_delimiter(@counts.fetch(:in_region_unaffiliated))
-
-  %h3.mt-4 Organization bikes in region
-  .full-screen-table.mt-4
-    %table.table.table-striped.table-bordered.table-sm
-      - total_bikes_count = 0
-      %thead
-        %th Organization
-        %th Bikes
-      %tbody
-        - current_organization.organizations_nearby.each do |organization|
-          - count = organization.bikes.count
-          - total_bikes_count += count
-          %tr
-            %td= organization.name
-            %td= number_with_delimiter(count)
-      %tfoot
-        %td
-          %strong Total bikes
-        %td
-          %strong= number_with_delimiter(total_bikes_count)
+  = render partial: "regional_bike_counts", locals: @regional_bike_counts
 
 - if current_organization.parent?
   %h3.mt-4

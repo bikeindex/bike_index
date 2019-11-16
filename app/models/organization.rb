@@ -205,17 +205,6 @@ class Organization < ActiveRecord::Base
     bikes_nearby.where.not(id: bikes_in_nearby_organizations.pluck(:id))
   end
 
-  def bikes_in_region_counts
-    return unless regional?
-    return @bikes_in_region_counts if defined?(@bikes_in_region_counts)
-
-    @bikes_in_region_count = {
-      in_organizations: bikes_in_nearby_organizations.count(:all),
-      in_region_unaffiliated: bikes_nearby_unaffiliated.count(:all),
-      in_region: bikes_nearby.count(:all),
-    }
-  end
-
   def paid_for?(feature_name)
     features =
       Array(feature_name)
