@@ -3,8 +3,6 @@ class TwitterAccount < ActiveRecord::Base
 
   has_many :tweets, dependent: :destroy
 
-  attr_accessor :skip_geocoding
-
   validates \
     :consumer_key,
     :consumer_secret,
