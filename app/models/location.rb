@@ -43,8 +43,7 @@ class Location < ActiveRecord::Base
 
   def update_organization
     # Because we need to update the organization and make sure it is shown on
-    # the map correctly, manually update to ensure that it runs the before save
-    # stuff
+    # the map correctly, manually update to ensure that it runs save callbacks
     organization&.reload&.update_attributes(updated_at: Time.current)
   end
 
