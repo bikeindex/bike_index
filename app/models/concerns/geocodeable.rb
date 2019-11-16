@@ -13,7 +13,7 @@ module Geocodeable
       !!skip_geocoding
     end
 
-    # Customize by overriding in the Geocodeable model.
+    # Customize by overwriting in the Geocodeable model.
     def geocode_data
       @geocode_data ||= address
     end
@@ -28,7 +28,7 @@ module Geocodeable
       geocode_columns.any? { |col| public_send("#{col}_changed?") }
     end
 
-    # Override to customize skip-geocoding logic.
+    # Overwrite in model to customize skip-geocoding logic.
     def should_be_geocoded?
       return false if skip_geocoding?
       geocode_data.present? && any_geocode_columns_changed?

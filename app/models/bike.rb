@@ -639,16 +639,14 @@ class Bike < ActiveRecord::Base
     end
   end
 
-  # Set the bike's location (city, postal code, and country)
-  # based in the following order of precedence:
-  # 1. Set explicitly on the bike
-  # 2. From the current stolen record, if one is present
-  # 3. From the creation organization, if one is present
-  # 4. From the bike owner's address
-  # 5. From the request's IP address
+  # Set the bike's location data (lat/long, city, postal code, country)
+  # in the following order of precedence:
+  #
+  # 1. From the current stolen record, if one is present
+  # 2. From the creation organization, if one is present
+  # 3. From the bike owner's address, if available
+  # 4. From the request's IP address, if given
   def set_location_info(request_location: nil)
-    return if zipcode.present? || country.present?
-
     find_current_stolen_record
 
     if location_info_present?(current_stolen_record)
@@ -670,6 +668,8 @@ class Bike < ActiveRecord::Base
       self.country = owner.country
       self.zipcode = owner.zipcode
     elsif location_info_present?(request_location)
+      self.latitude = request_location.latitude
+      self.longitude = request_location.longitude
       self.city = request_location.city
       self.country = Country.fuzzy_find(request_location&.country_code)
       self.zipcode = request_location.zipcode
@@ -784,6 +784,8 @@ class Bike < ActiveRecord::Base
   # Otherwise, use the data set by set_location_info.
   def geocode_data
     return @geocode_data if defined?(@geocode_data)
+
+    # Sets lat/long, should avoid an geocode API call
     set_location_info
 
     @geocode_data =
@@ -794,5 +796,12 @@ class Bike < ActiveRecord::Base
         .select(&:present?)
         .join(" ")
         .presence
+  end
+
+  # Take lat/long from associated geocoded model
+  # Only geocode if no lat/long present
+  def should_be_geocoded?
+    return false if skip_geocoding?
+    latitude.blank? && longitude.blank?
   end
 end

@@ -1511,26 +1511,14 @@ RSpec.describe Bike, type: :model do
   describe "#set_location_info" do
     let!(:usa) { Country.united_states }
 
-    context "given a location set on the bike" do
-      it "does not change it" do
-        city = "New York"
-        zipcode = "11001"
-        org = FactoryBot.create(:organization, :in_nyc)
-        bike = FactoryBot.build(:stolen_bike, zipcode: zipcode, country: usa, city: city, creation_organization: org)
-        bike.set_location_info
-        expect(bike.city).to eq(city)
-        expect(bike.zipcode).to eq(zipcode)
-        expect(bike.country).to eq(usa)
-      end
-    end
-
     context "given a current_stolen_record and no bike location info" do
       it "takes location from the current stolen record" do
-        bike = FactoryBot.create(:stolen_bike_in_chicago, zipcode: nil, country: nil, city: nil)
+        bike = FactoryBot.create(:stolen_bike_in_chicago)
         stolen_record = bike.current_stolen_record
 
         bike.set_location_info
 
+        expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
         expect(bike.city).to eq(stolen_record.city)
         expect(bike.zipcode).to eq(stolen_record.zipcode)
         expect(bike.country).to eq(stolen_record.country)
@@ -1568,15 +1556,13 @@ RSpec.describe Bike, type: :model do
 
     context "given no creation org or owner location" do
       it "takes location from the geocoded request location" do
-        city = "New York"
-        zipcode = "10011"
         bike = FactoryBot.build(:bike)
-        location = double(:request_location, country_code: "US", zipcode: zipcode, city: city)
+        location = double(:request_location, default_location)
 
         bike.set_location_info(request_location: location)
 
-        expect(bike.city).to eq(city)
-        expect(bike.zipcode).to eq(zipcode)
+        expect(bike.city).to eq(default_location[:city])
+        expect(bike.zipcode).to eq(default_location[:zipcode])
         expect(bike.country).to eq(usa)
       end
     end
