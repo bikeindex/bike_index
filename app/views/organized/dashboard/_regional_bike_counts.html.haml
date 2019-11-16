@@ -1,0 +1,35 @@
+%h3.mt-4
+  Bikes Nearby
+  %small (within #{current_organization.search_radius} mi of city center)
+.full-screen-table.mt-4
+  %table.table.table-striped.table-bordered.table-sm
+    %tbody
+      %tr
+        %td
+          Bikes associated with nearby organizations
+        %td= number_with_delimiter(bikes_in_organizations_count)
+      %tr
+        %td
+          Bikes nearby
+        %td
+          = number_with_delimiter(bikes_in_region_count)
+      %tr
+        %td Bikes nearby, not associated with any nearby organizations
+        %td= number_with_delimiter(bikes_in_region_unaffiliated_count)
+
+%h3.mt-4 Organization bikes in region
+.full-screen-table.mt-4
+  %table.table.table-striped.table-bordered.table-sm
+    %thead
+      %th Organization
+      %th Bikes
+    %tbody
+      - organizations_nearby.each do |org_name, bikes_count|
+        %tr
+          %td= org_name
+          %td= number_with_delimiter(bikes_count)
+    %tfoot
+      %td
+        %strong Total bikes
+      %td
+        %strong= number_with_delimiter(organizations_nearby.values.sum)

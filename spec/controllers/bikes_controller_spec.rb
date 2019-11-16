@@ -1,13 +1,16 @@
 require "rails_helper"
 
 RSpec.describe BikesController, type: :controller do
+  let!(:state) { FactoryBot.create(:state_illinois) }
+  let!(:country) { state.country }
+
   let(:manufacturer) { FactoryBot.create(:manufacturer) }
   let(:color) { FactoryBot.create(:color, name: "black") }
   describe "index" do
     let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "1234567890") }
-    let!(:stolen_bike) { FactoryBot.create(:stolen_bike, latitude: default_location[:latitude], longitude: default_location[:longitude]) }
+    let!(:stolen_bike) { FactoryBot.create(:stolen_bike_in_nyc) }
     let(:serial) { "1234567890" }
-    let!(:stolen_bike_2) { FactoryBot.create(:stolen_bike, latitude: 41.8961603, longitude: -87.677215) }
+    let!(:stolen_bike_2) { FactoryBot.create(:stolen_bike_in_los_angeles) }
     let(:ip_address) { "127.0.0.1" }
     let(:target_location) { ["New York", "NY", "US"] }
     let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: ip_address) }
@@ -504,8 +507,6 @@ RSpec.describe BikesController, type: :controller do
     # This is the create action for bikes controller
     let(:cycle_type) { "tandem" }
     let(:handlebar_type) { "bmx" }
-    let(:state) { FactoryBot.create(:state) }
-    let!(:country) { state.country }
     let(:chicago_stolen_params) do
       {
         country_id: country.id,
@@ -516,7 +517,7 @@ RSpec.describe BikesController, type: :controller do
       }
     end
 
-    describe "embeded" do
+    describe "embedded" do
       let(:organization) { FactoryBot.create(:organization_with_auto_user) }
       let(:user) { organization.auto_user }
       let(:b_param) { BParam.create(creator_id: organization.auto_user.id, params: { creation_organization_id: organization.id, embeded: true }) }
@@ -553,6 +554,7 @@ RSpec.describe BikesController, type: :controller do
             post :create, bike: bike_params
           end.to change(Ownership, :count).by 1
           bike = Bike.last
+          expect(bike.country.name).to eq("United States")
           expect(bike.creation_state.origin).to eq "embed"
           expect(bike.creation_state.organization).to eq organization
           expect(bike.creation_state.creator).to eq bike.creator
@@ -789,7 +791,6 @@ RSpec.describe BikesController, type: :controller do
         context "stolen b_param from user" do
           let(:b_param) { FactoryBot.create(:b_param, creator: user) }
           it "creates a new stolen bike and assigns the user phone" do
-            FactoryBot.create(:country, iso: "US")
             expect do
               post :create, stolen: "true", bike: bike_params.merge(phone: "312.379.9513")
             end.to change(StolenRecord, :count).by(1)
@@ -812,8 +813,6 @@ RSpec.describe BikesController, type: :controller do
 
       context "no existing b_param and stolen" do
         let(:wheel_size) { FactoryBot.create(:wheel_size) }
-        let(:country) { Country.united_states }
-        let(:state) { FactoryBot.create(:state, country: country) }
         let(:bike_params) do
           {
             b_param_id_token: "",
@@ -1173,6 +1172,7 @@ RSpec.describe BikesController, type: :controller do
           component1 = FactoryBot.create(:component, bike: bike)
           other_handlebar_type = "other"
           ctype_id = component1.ctype_id
+          bike.update(country: Country.united_states)
           bike.reload
           component2_attrs = {
             _destroy: "0",
@@ -1189,6 +1189,7 @@ RSpec.describe BikesController, type: :controller do
             handlebar_type: other_handlebar_type,
             handlebar_type_other: "Joysticks",
             owner_email: "  #{bike.owner_email.upcase}",
+            country_id: Country.netherlands.id,
             components_attributes: {
               "0" => {
                 "_destroy" => "1",
@@ -1207,6 +1208,7 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.handlebar_type_other).to eq "Joysticks"
           expect(assigns(:bike)).to be_decorated
           expect(bike.hidden).to be_falsey
+          expect(bike.country&.name).to eq(Country.netherlands.name)
 
           expect(bike.components.count).to eq 1
           expect(bike.components.where(id: component1.id).any?).to be_falsey
@@ -1369,8 +1371,6 @@ RSpec.describe BikesController, type: :controller do
         # Also, that we can apply stolen changes to hidden bikes
         # And finally, that it redirects to the correct page
         context "stolen update" do
-          let(:state) { FactoryBot.create(:state) }
-          let(:country) { state.country }
           let(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike, city: "party") }
           let(:target_time) { 1454925600 }
           let(:stolen_attrs) do

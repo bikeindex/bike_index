@@ -1248,9 +1248,15 @@ RSpec.describe Bike, type: :model do
       end
     end
     context "no current_stolen_record" do
-      it "grabs the desc and erase current_stolen_id" do
-        bike = Bike.new(current_stolen_record_id: 69, description: "lalalala", stolen_lat: 40.7143528, stolen_long: -74.0059731)
+      it "sets the description and unsets current_stolen_record_id" do
+        bike = Bike.new(current_stolen_record_id: 99999,
+                        description: "lalalala",
+                        stolen_lat: 40.7143528,
+                        stolen_long: -74.0059731)
+
+        bike.current_stolen_record = nil
         bike.cache_stolen_attributes
+
         expect(bike.current_stolen_record_id).not_to be_present
         expect(bike.all_description).to eq("lalalala")
         expect(bike.stolen_lat).to eq nil
@@ -1498,6 +1504,66 @@ RSpec.describe Bike, type: :model do
         bike = FactoryBot.create(:bike)
         allow(bike).to receive(:registration_address).and_return({ "state": "ny", city: "New York" })
         expect(bike.registration_location).to eq("New York, NY")
+      end
+    end
+  end
+
+  describe "#set_location_info" do
+    let!(:usa) { Country.united_states }
+
+    context "given a current_stolen_record and no bike location info" do
+      it "takes location from the current stolen record" do
+        bike = FactoryBot.create(:stolen_bike_in_chicago)
+        stolen_record = bike.current_stolen_record
+
+        bike.set_location_info
+
+        expect(bike.to_coordinates).to eq(stolen_record.to_coordinates)
+        expect(bike.city).to eq(stolen_record.city)
+        expect(bike.zipcode).to eq(stolen_record.zipcode)
+        expect(bike.country).to eq(stolen_record.country)
+      end
+    end
+
+    context "given no current_stolen_record" do
+      it "takes location from the creation org" do
+        org = FactoryBot.create(:organization, :in_nyc)
+        bike = FactoryBot.build(:bike, creation_organization: org)
+
+        bike.set_location_info
+
+        expect(bike.city).to eq("New York")
+        expect(bike.zipcode).to eq("10011")
+        expect(bike.country).to eq(usa)
+      end
+    end
+
+    context "given no creation org location" do
+      it "takes location from the owner location" do
+        city = "New York"
+        zipcode = "10011"
+        user = FactoryBot.create(:user_confirmed, zipcode: zipcode, country: usa, city: city)
+        ownership = FactoryBot.create(:ownership, user: user, creator: user)
+        bike = ownership.bike
+
+        bike.set_location_info
+
+        expect(bike.city).to eq(city)
+        expect(bike.zipcode).to eq(zipcode)
+        expect(bike.country).to eq(usa)
+      end
+    end
+
+    context "given no creation org or owner location" do
+      it "takes location from the geocoded request location" do
+        bike = FactoryBot.build(:bike)
+        location = double(:request_location, default_location)
+
+        bike.set_location_info(request_location: location)
+
+        expect(bike.city).to eq(default_location[:city])
+        expect(bike.zipcode).to eq(default_location[:zipcode])
+        expect(bike.country).to eq(usa)
       end
     end
   end

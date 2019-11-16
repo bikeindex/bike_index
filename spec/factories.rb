@@ -69,14 +69,20 @@ FactoryBot.define do
   end
 
   factory :state do
-    name
+    sequence(:name) { |n| "State #{n}" }
+    sequence(:abbreviation) { |n| "state-#{n}" }
     country { FactoryBot.create(:country) }
-    sequence(:abbreviation) { |n| "Q#{n}" }
 
     factory :state_new_york do
       abbreviation { "NY" }
       country { Country.united_states }
       name { "New York" }
+    end
+
+    factory :state_illinois do
+      abbreviation { "IL" }
+      country { Country.united_states }
+      name { "Illinois" }
     end
 
     factory :state_california do

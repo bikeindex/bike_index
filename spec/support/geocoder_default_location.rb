@@ -11,6 +11,7 @@ RSpec.shared_context :geocoder_default_location do
       neighborhood: "Tribeca",
       country: "United States",
       country_code: "US",
+      zipcode: "10007",
     }
   end
 
@@ -35,16 +36,30 @@ RSpec.shared_context :geocoder_default_location do
 
   let(:production_ip_search_result) { [OpenStruct.new(geo_hash)] }
 
-  let(:bounding_box) { [39.989124784445764, -74.96065051723293, 41.43644261555424, -73.05123208276707] }
+  let(:bounding_box) do
+    [
+      39.989124784445764,
+      -74.96065051723293,
+      41.43644261555424,
+      -73.05123208276707,
+    ]
+  end
 
   before do
-    Geocoder.configure(lookup: :test)
+    Geocoder.configure(lookup: :test, ip_lookup: :test)
     Geocoder::Lookup::Test.set_default_stub([default_location.as_json])
     allow(Geocoder::Calculations).to receive(:bounding_box) { bounding_box }
   end
 end
 
 RSpec.shared_context :geocoder_real do
-  before { Geocoder.configure(lookup: :google, use_https: true) }
-  after { Geocoder.configure(lookup: :test) }
+  before do
+    Geocoder.configure(lookup: :google, use_https: true)
+    allow(Geocoder::Calculations).to receive(:bounding_box).and_call_original
+  end
+
+  after do
+    Geocoder.configure(lookup: :test, ip_lookup: :test)
+    allow(Geocoder::Calculations).to receive(:bounding_box) { bounding_box }
+  end
 end

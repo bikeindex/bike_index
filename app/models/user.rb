@@ -2,6 +2,8 @@ class User < ActiveRecord::Base
   include Phonifyerable
   include ActionView::Helpers::SanitizeHelper
   include FeatureFlaggable
+  include Geocodeable
+
   cattr_accessor :current_user
 
   has_secure_password
@@ -70,10 +72,7 @@ class User < ActiveRecord::Base
   after_commit :perform_create_jobs, on: :create, if: lambda { !self.skip_create_jobs }
   before_save :set_calculated_attributes
 
-  attr_accessor :skip_geocode, :skip_create_jobs
-
-  geocoded_by :address
-  after_validation :geocode, if: lambda { !self.skip_geocode && self.geocodeable_attributes_changed? }
+  attr_accessor :skip_create_jobs
 
   class << self
     def fuzzy_email_find(email)
@@ -373,12 +372,11 @@ class User < ActiveRecord::Base
     true
   end
 
-  def geocodeable_attributes_changed?
-    return false unless city.present? || zipcode.present? || street.present?
-    city_changed? || zipcode_changed? || street_changed?
-  end
-
   private
+
+  def geocode_columns
+    %i[street city zipcode]
+  end
 
   def preferred_language_is_an_available_locale
     return if preferred_language.blank?

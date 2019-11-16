@@ -52,8 +52,13 @@
           = f.radio_button "kind", kind, class: "form-check-input"
           = f.label "kind_#{kind}", kind.humanize, class: "form-check-label"
 
-
-
+  .col-md-6
+    .form-group
+      = f.label :search_radius, "Search radius (mi)"
+      = f.number_field :search_radius, {class: "form-control"}
+      %em.small
+        %pre.d-inline organizations_nearby
+        will search within this radius for other organizations in the same area
 
   .col-md-6
     .form-group
@@ -69,10 +74,10 @@
       = f.label :api_access_approved
       %small.less-strong
         to be able to post updates via API, check this too
-
     .form-group
       = f.check_box :approved
       = f.label :approved, 'Validated & approved'
+
 .row
   .col-md-6
     .form-group.fancy-select.unfancy

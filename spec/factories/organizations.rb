@@ -8,6 +8,24 @@ FactoryBot.define do
     api_access_approved { false }
     sequence(:website) { |n| "http://organization#{n}.com" }
 
+    trait :in_nyc do
+      after(:create) do |org|
+        FactoryBot.create(:location_nyc, organization: org)
+      end
+    end
+
+    trait :in_chicago do
+      after(:create) do |org|
+        FactoryBot.create(:location_chicago, organization: org)
+      end
+    end
+
+    trait :in_los_angeles do
+      after(:create) do |org|
+        FactoryBot.create(:location_los_angeles, organization: org)
+      end
+    end
+
     factory :organization_with_paid_features do
       transient do
         paid_feature_slugs { ["csv_export"] }
@@ -17,6 +35,10 @@ FactoryBot.define do
           invoice.update_attributes(paid_feature_ids: [evaluator.paid_feature.id])
           organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after commit doesn't run
         end
+      end
+
+      factory :organization_with_regional_bike_counts do
+        paid_feature_slugs { ["regional_bike_counts"] }
       end
     end
 

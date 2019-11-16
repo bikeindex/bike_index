@@ -49,7 +49,7 @@ FactoryBot.define do
     end
 
     trait :canadian do
-      no_geocode { true }
+      skip_geocoding { true }
       country { "Canada" }
       city { "Vancouver" }
       state { "BC" }

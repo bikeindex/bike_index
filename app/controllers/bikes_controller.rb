@@ -120,7 +120,7 @@ class BikesController < ApplicationController
       end
       @b_param.update_attributes(params: permitted_bparams,
                                  origin: (params[:bike][:embeded_extended] ? "embed_extended" : "embed"))
-      @bike = BikeCreator.new(@b_param).create_bike
+      @bike = BikeCreator.new(@b_param, location: request.safe_location).create_bike
       if @bike.errors.any?
         @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
         flash[:error] = @b_param.bike_errors.to_sentence

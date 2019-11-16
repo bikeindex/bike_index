@@ -1,6 +1,53 @@
 require "rails_helper"
 
 RSpec.describe Organization, type: :model do
+  describe "#bikes_nearby" do
+    it "returns bikes within the search radius" do
+      FactoryBot.create(:bike, :in_los_angeles)
+      nyc_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
+      stolen_nyc_bike = FactoryBot.create(:stolen_bike_in_nyc)
+
+      chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
+      nyc_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
+
+      expect(chi_org.bikes_nearby).to be_empty
+      expect(nyc_org.bikes_nearby).to match_array([*nyc_bikes, stolen_nyc_bike])
+    end
+  end
+
+  describe "#bikes_in_nearby_organizations" do
+    it "returns bikes associated with nearby organizations" do
+      chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
+      FactoryBot.create(:bike_organized, organization: chi_org)
+      nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
+      FactoryBot.create(:bike_organized, organization: nyc_org1)
+
+      nyc_org2 = FactoryBot.create(:organization, :in_nyc)
+      bike2 = FactoryBot.create(:bike_organized, organization: nyc_org2)
+      nyc_org3 = FactoryBot.create(:organization, :in_nyc)
+      bike3 = FactoryBot.create(:bike_organized, organization: nyc_org3)
+
+      bikes = nyc_org1.bikes_in_nearby_organizations
+
+      expect(bikes).to match_array([bike2, bike3])
+    end
+  end
+
+  describe "#bikes_nearby_unaffiliated" do
+    it "returns bikes associated with nearby organizations" do
+      nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
+      nyc_org2 = FactoryBot.create(:organization, :in_nyc)
+      FactoryBot.create(:bike_organized, organization: nyc_org2)
+      nyc_org3 = FactoryBot.create(:organization, :in_nyc)
+      FactoryBot.create(:bike_organized, organization: nyc_org3)
+      unaffiliated_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
+
+      bikes = nyc_org1.bikes_nearby_unaffiliated
+
+      expect(bikes).to match_array(unaffiliated_bikes)
+    end
+  end
+
   describe "#set_ambassador_organization_defaults before_save hook" do
     context "when saving a new ambassador org" do
       it "sets non-applicable attributes to sensible ambassador org values" do
@@ -118,6 +165,33 @@ RSpec.describe Organization, type: :model do
       expect(Organization.friendly_find("trek store of SANTA CRUZ")).to eq organization2
       expect(Organization.friendly_find("bikeeastbay")).to eq organization3
       expect(Organization.friendly_find(organization)).to eq organization
+    end
+  end
+
+  describe "#organizations_nearby" do
+    context "given an org without the regional_bike_counts feature" do
+      it "returns an empty collection" do
+        org = FactoryBot.create(:organization)
+        expect(org.organizations_nearby).to be_empty
+      end
+    end
+
+    context "given no other organizations in the search radius" do
+      it "returns an empty collection" do
+        org = FactoryBot.create(:organization_with_regional_bike_counts)
+        expect(org.organizations_nearby).to be_empty
+      end
+    end
+
+    context "given other organizations in the search radius" do
+      it "returns the corresponding regional sub-orgs" do
+        nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
+        nyc_org2 = FactoryBot.create(:organization, :in_nyc)
+        nyc_org3 = FactoryBot.create(:organization, :in_nyc)
+        FactoryBot.create(:organization, :in_chicago)
+
+        expect(nyc_org1.organizations_nearby).to match_array([nyc_org2, nyc_org3])
+      end
     end
   end
 

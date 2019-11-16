@@ -397,7 +397,10 @@ CREATE TABLE public.bikes (
     handlebar_type integer,
     cycle_type integer DEFAULT 0,
     propulsion_type integer DEFAULT 0,
-    deleted_at timestamp without time zone
+    deleted_at timestamp without time zone,
+    city character varying,
+    latitude double precision,
+    longitude double precision
 );
 
 
@@ -1679,7 +1682,10 @@ CREATE TABLE public.organizations (
     registration_field_labels jsonb DEFAULT '{}'::jsonb,
     pos_kind integer DEFAULT 0,
     previous_slug character varying,
-    child_ids jsonb
+    child_ids jsonb,
+    search_radius integer DEFAULT 50 NOT NULL,
+    location_latitude double precision,
+    location_longitude double precision
 );
 
 
@@ -3476,6 +3482,13 @@ CREATE INDEX index_bikes_on_deleted_at ON public.bikes USING btree (deleted_at);
 
 
 --
+-- Name: index_bikes_on_latitude_and_longitude; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_on_latitude_and_longitude ON public.bikes USING btree (latitude, longitude);
+
+
+--
 -- Name: index_bikes_on_listing_order; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3802,6 +3815,13 @@ CREATE INDEX index_organization_messages_on_organization_id ON public.organizati
 --
 
 CREATE INDEX index_organization_messages_on_sender_id ON public.organization_messages USING btree (sender_id);
+
+
+--
+-- Name: index_organizations_on_location_latitude_and_location_longitude; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organizations_on_location_latitude_and_location_longitude ON public.organizations USING btree (location_latitude, location_longitude);
 
 
 --
@@ -4841,4 +4861,8 @@ INSERT INTO schema_migrations (version) VALUES ('20191022123037');
 INSERT INTO schema_migrations (version) VALUES ('20191022143755');
 
 INSERT INTO schema_migrations (version) VALUES ('20191028130015');
+
+INSERT INTO schema_migrations (version) VALUES ('20191106210313');
+
+INSERT INTO schema_migrations (version) VALUES ('20191108195338');
 

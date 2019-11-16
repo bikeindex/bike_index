@@ -3,6 +3,9 @@
     %em= current_organization.name
     Dashboard
 
+- if current_organization.regional? && current_organization.is_paid?
+  = render partial: "regional_bike_counts", locals: @regional_bike_counts
+
 - if current_organization.parent?
   %h3.mt-4
     Associated organizations

@@ -63,13 +63,31 @@ class Admin::OrganizationsController < Admin::BaseController
   def permitted_parameters
     approved_kind = params.dig(:organization, :kind)
     approved_kind = "other" unless Organization.kinds.include?(approved_kind)
-    params.require(:organization)
-          .permit(:available_invitation_count, :name, :short_name, :slug, :website,
-                  :ascend_name, :show_on_map, :is_suspended, :embedable_user_email, :auto_user_id, :lock_show_on_map,
-                  :api_access_approved, :access_token, :avatar, :avatar_cache, :previous_slug,
-                  :parent_organization_id, :lightspeed_cloud_api_key, :approved,
-                  [locations_attributes: permitted_locations_params])
-          .merge(kind: approved_kind)
+    params
+      .require(:organization)
+      .permit(
+        :access_token,
+        :api_access_approved,
+        :approved,
+        :ascend_name,
+        :auto_user_id,
+        :available_invitation_count,
+        :avatar,
+        :avatar_cache,
+        :embedable_user_email,
+        :is_suspended,
+        :lightspeed_cloud_api_key,
+        :lock_show_on_map,
+        :name,
+        :parent_organization_id,
+        :previous_slug,
+        :search_radius,
+        :short_name,
+        :show_on_map,
+        :slug,
+        :website,
+        [locations_attributes: permitted_locations_params],
+      ).merge(kind: approved_kind)
   end
 
   def matching_organizations

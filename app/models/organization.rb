@@ -1,5 +1,6 @@
 class Organization < ActiveRecord::Base
   include ActionView::Helpers::SanitizeHelper
+
   KIND_ENUM = {
     bike_shop: 0,
     bike_advocacy: 1,
@@ -55,7 +56,7 @@ class Organization < ActiveRecord::Base
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
 
   default_scope { order(:name) }
-  scope :shown_on_map, -> { where(show_on_map: true, approved: true) }
+  scope :shown_on_map, -> { includes(:locations).where(show_on_map: true, approved: true) }
   scope :paid, -> { where(is_paid: true) }
   scope :unpaid, -> { where(is_paid: true) }
   scope :approved, -> { where(is_suspended: false, approved: true) }
@@ -63,7 +64,11 @@ class Organization < ActiveRecord::Base
   scope :bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications impound_bikes]) }
 
   before_validation :set_calculated_attributes
+  before_save :set_search_coordinates
   after_commit :update_associations
+
+  geocoded_by nil, latitude: :location_latitude, longitude: :location_longitude
+  after_validation :geocode, if: -> { false } # never geocode, use search_location lat/long
 
   attr_accessor :embedable_user_email, :lightspeed_cloud_api_key, :skip_update
 
@@ -181,6 +186,25 @@ class Organization < ActiveRecord::Base
     bike_shop? && %w[no_pos broken_pos].include?(pos_kind)
   end
 
+  # Bikes associated with nearby organizations within `search_radius` miles.
+  def bikes_in_nearby_organizations
+    return Bike.none unless regional?
+    Bike
+      .includes(bike_organizations: :organization)
+      .where(bike_organizations: { organization: organizations_nearby.pluck(:id) })
+  end
+
+  # Bikes geolocated within `search_radius` miles.
+  def bikes_nearby
+    return Bike.none unless regional? && search_coordinates_set?
+    Bike.near(search_coordinates, search_radius).reorder(id: :asc)
+  end
+
+  # Bikes nearby not associated with any nearby organizations.
+  def bikes_nearby_unaffiliated
+    bikes_nearby.where.not(id: bikes_in_nearby_organizations.pluck(:id))
+  end
+
   def paid_for?(feature_name)
     features =
       Array(feature_name)
@@ -293,7 +317,40 @@ class Organization < ActiveRecord::Base
     calculated_children.each { |o| o.update_attributes(updated_at: Time.current, skip_update: true) }
   end
 
+  def search_location
+    locations.order(id: :asc).first
+  end
+
+  def search_coordinates
+    [location_latitude, location_longitude]
+  end
+
+  def search_coordinates_set?
+    search_coordinates.all?(&:present?)
+  end
+
+  delegate :city,
+           :country,
+           :zipcode,
+           to: :search_location,
+           allow_nil: true
+
+  def regional?
+    paid_feature_slugs.include?("regional_bike_counts")
+  end
+
+  def organizations_nearby
+    return self.class.none unless regional? && search_coordinates_set?
+    nearbys(search_radius).reorder(id: :asc)
+  end
+
   private
+
+  def set_search_coordinates
+    return if search_coordinates_set?
+    self.location_latitude = search_location&.latitude
+    self.location_longitude = search_location&.longitude
+  end
 
   def calculated_paid_feature_slugs
     fslugs = current_invoices.feature_slugs

@@ -1,4 +1,6 @@
 class Location < ActiveRecord::Base
+  include Geocodeable
+
   acts_as_paranoid
   belongs_to :organization, inverse_of: :locations # Locations are organization locations
   belongs_to :country
@@ -14,11 +16,6 @@ class Location < ActiveRecord::Base
   before_save :shown_from_organization
   before_save :set_phone
   after_commit :update_organization
-
-  unless Rails.env.test?
-    geocoded_by :address
-    after_validation :geocode
-  end
 
   def shown_from_organization
     self.shown = organization && organization.allowed_show
@@ -45,9 +42,9 @@ class Location < ActiveRecord::Base
   end
 
   def update_organization
-    # Because we need to update the organization and make sure it is shown on the map correctly
-    # Manually update to ensure that it runs the before save stuff
-    organization && organization.update_attributes(updated_at: Time.current)
+    # Because we need to update the organization and make sure it is shown on
+    # the map correctly, manually update to ensure that it runs save callbacks
+    organization&.reload&.update_attributes(updated_at: Time.current)
   end
 
   def display_name
@@ -55,5 +52,11 @@ class Location < ActiveRecord::Base
     return name if name == organization.name
 
     "#{organization.name} - #{name}"
+  end
+
+  private
+
+  def geocode_columns
+    %i[street city state_id zipcode country_id]
   end
 end
