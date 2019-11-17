@@ -159,8 +159,6 @@ en:
         serial_number: Serial number
         stock_photo_url: Stock photo url
         stolen: Stolen
-        stolen_lat: Stolen lat
-        stolen_long: Stolen long
         stolen_notifications: Stolen notifications
         stolen_records: Stolen records
         tertiary_frame_color: :activerecord.models.tertiary_frame_color
