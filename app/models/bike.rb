@@ -734,8 +734,6 @@ class Bike < ActiveRecord::Base
   def cache_stolen_attributes
     csr = find_current_stolen_record
     self.current_stolen_record_id = csr&.id
-    self.stolen_lat = csr&.latitude
-    self.stolen_long = csr&.longitude
     self.all_description =
       [description, csr&.theft_description]
         .reject(&:blank?)

@@ -327,8 +327,6 @@ RSpec.shared_examples "bike_searchable" do
         it "returns bikes near the requested location" do
           bike1 = FactoryBot.create(:stolen_bike_in_amsterdam)
           bike2 = FactoryBot.create(:stolen_bike_in_nyc)
-          expect(bike1.longitude).to eq(bike1.stolen_long)
-          expect(bike2.longitude).to eq(bike2.stolen_long)
           expect(bike1.longitude).to_not eq(bike2.longitude)
 
           interpreted_params = Bike.searchable_interpreted_params(
