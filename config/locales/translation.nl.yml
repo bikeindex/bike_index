@@ -347,8 +347,6 @@ nl:
         serial_number: Framenummer
         stock_photo_url: Stock foto url
         stolen: Gestolen
-        stolen_lat: Gestolen lat
-        stolen_long: Lang gestolen
         stolen_notifications: Gestolen meldingen
         stolen_records: Gestolen records
         thumb_path: Duim pad
