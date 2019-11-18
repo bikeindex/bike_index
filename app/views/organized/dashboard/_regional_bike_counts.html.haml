@@ -24,10 +24,10 @@
       %th Organization
       %th Bikes
     %tbody
-      - organizations_nearby.each do |org_name, bikes_count|
+      - organizations_nearby.keys.sort.each do |org_name|
         %tr
           %td= org_name
-          %td= number_with_delimiter(bikes_count)
+          %td= number_with_delimiter(organizations_nearby[org_name])
     %tfoot
       %td
         %strong Total bikes
