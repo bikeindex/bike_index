@@ -2067,7 +2067,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2093,7 +2093,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -4712,6 +4712,7 @@ en:
       or: Or
       password: password
       sign_in_using_facebook: Sign in using Facebook
+      sign_in_using_globalid: Sign in using globaliD
       sign_in_using_magic_link: Emailed sign in link
       sign_in_using_strava: Sign in using Strava
       sign_up: sign up
@@ -5139,8 +5140,6 @@ en:
       your_username_is_the_url_for_your_sharing: >-
         Your username is the URL for your sharing page and the bike embed form. Update
         it if you care about those things.
-    globalid:
-      sign_in_with_globalid: Sign in with GlobaliD
     new:
       agree_bikeindex_bikehub_toc_html: I agree to BikeHub's %{bikehub_toc_link} and
         Bike Index's %{bikeindex_toc_link}.
@@ -5153,6 +5152,7 @@ en:
       or: Or
       sign_up: Sign up
       sign_up_using_facebook: Sign up using Facebook
+      sign_up_using_globalid: Sign up using globaliD
       sign_up_using_strava: Sign up using Strava
       terms_and_conditions: terms and conditions
     password_reset:

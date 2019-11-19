@@ -62,6 +62,10 @@ $sign-in-up-form-bg: $gray-lighter;
       @include oauth-login-bar($facebook-login-color);
     }
 
+    .globalid-login {
+      @include oauth-login-bar(#0d51ff);
+    }
+
     .strava-login {
       @include oauth-login-bar($strava-login-color);
 
