@@ -9,8 +9,6 @@ class UsersController < ApplicationController
     render_partner_or_default_signin_layout
   end
 
-  def globalid; end
-
   def create
     @user = User.new(permitted_parameters)
     # Set the user's preferred locale if they have a locale we recognize

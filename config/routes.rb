@@ -101,7 +101,6 @@ Bikeindex::Application.routes.draw do
       post "password_reset"
       get "password_reset", as: :password_reset_form
       get "update_password"
-      get "globalid"
     end
     member { get "unsubscribe" }
   end
