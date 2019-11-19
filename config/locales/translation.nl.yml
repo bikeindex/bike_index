@@ -4783,6 +4783,7 @@ nl:
       sign_in_using_magic_link: E-mail aanmelden link
       sign_in_using_strava: Log in met Strava
       sign_up: Registreren
+      sign_in_using_globalid: Log in met globaliD
   shared:
     donate_modal:
       bikeindex_is_a_nonprofit: Bike Index is een 501 (c) (3) non-profit. We zijn
@@ -5112,8 +5113,6 @@ nl:
       your_username_is_the_url_for_your_sharing: Uw gebruikersnaam is de URL voor
         uw deelpagina en het embed-formulier van de fiets. Update het als je om die
         dingen geeft.
-    globalid:
-      sign_in_with_globalid: Log in met GlobaliD
     new:
       agree_bikeindex_bikehub_toc_html: Ik ga akkoord met BikeHub's %{bikehub_toc_link}
         en Bike Index's %{bikeindex_toc_link}.
@@ -5128,6 +5127,7 @@ nl:
       sign_up_using_facebook: Meld je aan met Facebook
       sign_up_using_strava: Meld je aan met Strava
       terms_and_conditions: Termen en voorwaarden
+      sign_up_using_globalid: Meld u aan met globaliD
     password_reset:
       follow_the_link_back: Volg de link terug naar de site om uw wachtwoord opnieuw
         in te stellen!
