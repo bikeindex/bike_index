@@ -2,6 +2,13 @@
   - bike_link = link_to(@bike.title_string, bike_url(@bike))
   = t(".html.we_think_your_stolen_bike_html", bike_title: bike_link)
 
-%p
-  = t(".html.check_out_match_here")
-  = link_to(@match.title_string, bike_url(@match))
+= t(".html.check_out_match_here")
+- if @match.is_a?(ExternalRegistryBike)
+  %p
+    = t(".html.bike_registry")
+    = link_to @match.registry_name, @match.registry_url
+    %br
+    = t(".html.bike")
+    = link_to @match.title_string, @match.url
+- elsif @match.is_a?(Bike)
+  %p= link_to @match.title_string, bike_url(@match)
