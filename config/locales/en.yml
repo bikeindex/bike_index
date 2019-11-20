@@ -3987,7 +3987,7 @@ en:
       where_was_it_stolen: Where was it stolen?
       your_email_address: Your email address
       your_phone_number: Your phone number
-      zipcode: Zipcode
+      zipcode: Postal Code
     embed_create_success:
       bike_was_registered_to_you_html: "%{bike_link} was registered to you through
         <strong>%{org_name}</strong>."
@@ -4028,7 +4028,7 @@ en:
       unknown_serial: Unknown serial
       unknown_year: Unknown year
       unsure_or_unknown: Unsure or unknown
-      zipcode: Zipcode
+      zipcode: Postal Code
     new:
       bike_index_for_organizations: Bike Index for organizations
     new_form:
