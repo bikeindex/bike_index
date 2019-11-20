@@ -156,9 +156,9 @@ class Bike < ActiveRecord::Base
       includes(:bike_codes).where(bike_codes: { bike_id: nil })
     end
 
-    def organization(org_or_org_id)
-      organization = org_or_org_id.is_a?(Organization) ? org_or_org_id : Organization.friendly_find(org_or_org_id)
-      includes(:bike_organizations).where(bike_organizations: { organization_id: organization.id })
+    def organization(org_or_org_ids)
+      ids = org_or_org_ids.is_a?(Organization) ? Organization.friendly_find(org_or_org_ids)&.id : org_or_org_ids
+      includes(:bike_organizations).where(bike_organizations: { organization_id: ids })
     end
 
     # Possibly-found bikes are stolen bikes that have a counterpart record(s)

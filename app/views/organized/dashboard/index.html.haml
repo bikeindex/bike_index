@@ -3,12 +3,59 @@
     %em= current_organization.name
     Dashboard
 
-- if current_organization.regional? && current_organization.is_paid?
-  = render partial: "regional_bike_counts", locals: @regional_bike_counts
-
-- if current_organization.parent?
+- if current_organization.regional?
   %h3.mt-4
-    Child organizations
+    Bikes Registered nearby
+  .full-screen-table.mt-4
+    %table.table.table-striped.table-bordered.table-sm
+      %tbody
+        - if current_organization.parent?
+          %tr
+            %td Bikes registered by affiliated organizations
+            %td= number_with_delimiter(@bikes_in_child_organizations_count)
+        - if @nearby_organizations.any?
+          %tr
+            %td
+              Bikes registered by
+              - if current_organization.parent?
+                non-affiliated organizations
+              - else
+                nearby organizations
+            %td= number_with_delimiter(@bikes_in_nearby_organizations_count)
+        %tr
+          %td Independently Bikes nearby, not associated with any nearby organizations
+          %td= number_with_delimiter(@bikes_in_region_unaffiliated_count)
+        %tr
+          %td
+            Total bikes in region
+          %td
+            - total_bikes = @bikes_in_child_organizations_count + @bikes_in_nearby_organizations_count + @bikes_in_region_unaffiliated_count
+            = number_with_delimiter(total_bikes)
+
+  - if current_organization.parent?
+    %h3.mt-4
+      Affiliated organizations
+    .full-screen-table.mt-4
+      %table.table.table-striped.table-bordered.table-sm
+        %thead
+          %th Organization
+          %th Signed up
+          %th Bikes
+        %tbody
+          - current_organization.child_organizations.reorder(:name).each do |organization|
+            %tr
+              %td
+                = organization.name
+              %td
+                %span.convertTime= l(organization.created_at, format: :convert_time)
+              %td
+                = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)
+
+- if current_organization.regional? && @nearby_organizations.any?
+  %h3.mt-4
+    - if current_organization.parent?
+      Unaffiliated
+    nearby Organization
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
       %thead
@@ -16,12 +63,12 @@
         %th Signed up
         %th Bikes
       %tbody
-        - current_organization.child_organizations.each do |organization|
+        - @nearby_organizations.reorder(:name).each do |organization|
           %tr
-            %td
-              = organization.name
-            %td
-              %span.convertTime
-                = l(organization.created_at, format: :convert_time)
-            %td
-              = number_with_delimiter(organization.bikes.count)
+            %tr
+              %td
+                = organization.name
+              %td
+                %span.convertTime= l(organization.created_at, format: :convert_time)
+              %td
+                = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)

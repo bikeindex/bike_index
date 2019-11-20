@@ -128,6 +128,11 @@ class Organization < ActiveRecord::Base
 
   def child_organizations; Organization.where(id: child_ids) end
 
+  def nearby_organizations
+    return self.class.none unless regional? && search_coordinates_set?
+    self.class.where.not(id: child_ids).near(search_radius).reorder(id: :asc)
+  end
+
   def mail_snippet_body(type)
     return nil unless MailSnippet.organization_snippet_types.include?(type)
     snippet = mail_snippets.enabled.where(name: type).first
@@ -186,23 +191,15 @@ class Organization < ActiveRecord::Base
     bike_shop? && %w[no_pos broken_pos].include?(pos_kind)
   end
 
-  # Bikes associated with nearby organizations within `search_radius` miles.
-  def bikes_in_nearby_organizations
-    return Bike.none unless regional?
-    Bike
-      .includes(bike_organizations: :organization)
-      .where(bike_organizations: { organization: organizations_nearby.pluck(:id) })
-  end
-
   # Bikes geolocated within `search_radius` miles.
   def bikes_nearby
     return Bike.none unless regional? && search_coordinates_set?
     Bike.near(search_coordinates, search_radius).reorder(id: :asc)
   end
 
-  # Bikes nearby not associated with any nearby organizations.
-  def bikes_nearby_unaffiliated
-    bikes_nearby.where.not(id: bikes_in_nearby_organizations.pluck(:id))
+  # # Bikes nearby not associated with any nearby organizations or child organizations
+  def bikes_nearby_unorganized
+    bikes_nearby.where.not(id: Bike.organization(nearby_organizations.pluck(:id) + child_ids).pluck(:id))
   end
 
   def paid_for?(feature_name)
@@ -336,12 +333,7 @@ class Organization < ActiveRecord::Base
            allow_nil: true
 
   def regional?
-    paid_feature_slugs.include?("regional_bike_counts")
-  end
-
-  def organizations_nearby
-    return self.class.none unless regional? && search_coordinates_set?
-    nearbys(search_radius).reorder(id: :asc)
+    paid_for?("regional_bike_counts")
   end
 
   private
