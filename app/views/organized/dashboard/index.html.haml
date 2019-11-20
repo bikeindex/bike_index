@@ -3,9 +3,14 @@
     %em= current_organization.name
     Dashboard
 
+= line_chart Bike.unscoped.current.organization(@affiliated_organization_ids).where(created_at: @time_period).send(group_by_method(@time_range), "bikes.created_at").count, curve: false, thousands: ",", defer: true
+
+%div{ style: "margin-top: 50px;" }
+  = render partial: "/shared/period_select"
+
 - if current_organization.regional?
   %h3.mt-4
-    Bikes Registered nearby
+    Bikes Registered nearby over the past #{@period}
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
       %tbody
