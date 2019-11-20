@@ -130,30 +130,9 @@ an appropriate plugin for on-the-fly linting.
 
 ESlint is configured to run on project JavaScript. To run it, issue `yarn lint`.
 
-## Vagrant development box
-
-In general, we recommend installing and running the app without Vagrant for local development
-
-If, however, you would prefer to have a virtual environment, this repository contains a Vagrantfile which is used to automatically set up and configure a virtual local (Ubuntu Xenial) development environment with all of the required dependencies preinstalled.
-
-### Dependencies/Requirements
-- A computer that supports hardware virtualization (Intel VT-x/AMD-V)
-
-- Vagrant
-
-- VirtualBox
-
-- At least 1.5GB of free memory
-
-Run `vagrant up` to start the virtual machine. Upon first run, it will run various provisioning scripts to install all of the required packages, configure PostgreSQL, and run all of the Ruby commands to initalize a local Bike Index dev environment. Port 3001 is forwarded locally for testing. Be warned, it will take around a half hour or longer (depending on your internet connection) on first run to download additional Vagrant dependencies and to provision the dev environment. You may observe some informational warning messages during the initial setup which you can safely ignore. `vagrant halt` to shutdown the VM. Subsequent startups will take considerably less time after the initial run.
-
-### Troubleshooting
-If the initial provisioning fails for any reason, try running `vagrant provision` and see if running the provisioner again completes without error. If not, please try to troubleshoot/google issues as much as possible before filing an issue. Many Vagrant related errors/issues have already been solved and are documented between Stackoverflow and Github. If you run in to an issue you're unable to solve, be sure to include all relevant stdout messages and errors.
-
 ## Bug tracker
 
 Have a bug or a feature request? [Open an issue](https://github.com/bikeindex/bike_index/issues/new).
-
 
 ## Community
 
