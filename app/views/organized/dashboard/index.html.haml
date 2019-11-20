@@ -3,7 +3,7 @@
     %em= current_organization.name
     Dashboard
 
-= line_chart Bike.unscoped.current.organization(@affiliated_organization_ids).where(created_at: @time_period).send(group_by_method(@time_range), "bikes.created_at").count, curve: false, thousands: ",", defer: true
+= line_chart Bike.unscoped.current.organization(@affiliated_organization_ids).where(created_at: @time_range).send(group_by_method(@time_range), "bikes.created_at").count, curve: false, thousands: ",", defer: true
 
 %div{ style: "margin-top: 50px;" }
   = render partial: "/shared/period_select"
@@ -16,19 +16,19 @@
       %tbody
         - if current_organization.parent?
           %tr
-            %td Bikes registered by affiliated organizations
+            %td Registered by affiliated organizations
             %td= number_with_delimiter(@bikes_in_child_organizations_count)
         - if @nearby_organizations.any?
           %tr
             %td
-              Bikes registered by
+              Registered by
               - if current_organization.parent?
                 non-affiliated organizations
               - else
                 nearby organizations
             %td= number_with_delimiter(@bikes_in_nearby_organizations_count)
         %tr
-          %td Independently Bikes nearby, not associated with any nearby organizations
+          %td Self-registered nearby, not associated with any nearby organizations
           %td= number_with_delimiter(@bikes_in_region_unaffiliated_count)
         %tr
           %td
@@ -39,12 +39,12 @@
 
   - if current_organization.parent?
     %h3.mt-4
-      Affiliated organizations
+      Affiliated organization registrations over the past #{@period}
     .full-screen-table.mt-4
       %table.table.table-striped.table-bordered.table-sm
         %thead
           %th Organization
-          %th Signed up
+          %th.small Signed up
           %th Bikes
         %tbody
           - current_organization.child_organizations.reorder(:name).each do |organization|
@@ -52,7 +52,7 @@
               %td
                 = organization.name
               %td
-                %span.convertTime= l(organization.created_at, format: :convert_time)
+                %small.convertTime= l(organization.created_at, format: :convert_time)
               %td
                 = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)
 
@@ -60,12 +60,12 @@
   %h3.mt-4
     - if current_organization.parent?
       Unaffiliated
-    nearby Organization
+    nearby Organization registrations over the past #{@period}
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
       %thead
         %th Organization
-        %th Signed up
+        %th.small Signed up
         %th Bikes
       %tbody
         - @nearby_organizations.reorder(:name).each do |organization|
@@ -74,6 +74,6 @@
               %td
                 = organization.name
               %td
-                %span.convertTime= l(organization.created_at, format: :convert_time)
+                %small.convertTime= l(organization.created_at, format: :convert_time)
               %td
                 = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)
