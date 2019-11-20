@@ -11,13 +11,18 @@ class Integration < ActiveRecord::Base
 
   before_create :associate_with_user
 
+  def self.email_from_globalid_pii(auth_hash)
+    decrypted_pii = auth_hash.dig("info", "decrypted_pii")&.first
+    decrypted_pii && decrypted_pii["value"]
+  end
+
   def associate_with_user
     self.provider_name ||= information["provider"]
     if provider_name == "facebook" || provider_name == "strava"
       update_or_create_user(email: information["info"]["email"], name: information["info"]["name"])
     elsif provider_name == "globalid"
-      email_pii = information["decrypted_pii"].first["value"]
-      update_or_create_user(email: email_pii, name: information["info"]["name"])
+      update_or_create_user(email: self.class.email_from_globalid_pii(information),
+                            name: information["info"]["name"])
     end
   end
 
