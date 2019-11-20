@@ -1,8 +1,10 @@
 = t(".text.we_think_your_stolen_bike", bike_title: @bike.title_string)
-
 = bike_url(@bike)
 
 = t(".text.check_out_match_here")
-
-= @match.title_string
-= bike_url(@match)
+- if @match.is_a?(ExternalRegistryBike)
+  = @match.title_string
+  = @match.url
+- elsif @match.is_a?(Bike)
+  = @match.title_string
+  = bike_url(@match)
