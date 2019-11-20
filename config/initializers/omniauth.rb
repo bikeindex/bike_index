@@ -7,5 +7,5 @@ Rails.application.config.middleware.use OmniAuth::Builder do
   provider :globalid, ENV["GLOBALID_CLIENT_ID"], ENV["GLOBALID_CLIENT_SECRET"],
     scope: "openid", decrypt_pii_on_login: true, acrc_id: ENV["ACRC_ID"],
     provider_ignores_state: true, private_key_pass: ENV["GLOBALID_PRIVATE_KEY_PASS"],
-    private_key: ENV["GLOBALID_PRIVATE_KEY"].gsub("\\n", "\n").gsub("\"", "")
+    private_key: ENV["GLOBALID_PRIVATE_KEY"]&.gsub("\\n", "\n")&.gsub("\"", "")
 end
