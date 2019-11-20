@@ -2,7 +2,13 @@
 = bike_url(@bike)
 
 = t(".text.check_out_match_here")
+
 - if @match.is_a?(ExternalRegistryBike)
+  = t(".text.bike_registry")
+  = @match.registry_name
+  = @match.registry_url
+
+  = t(".text.bike")
   = @match.title_string
   = @match.url
 - elsif @match.is_a?(Bike)
