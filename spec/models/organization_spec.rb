@@ -178,7 +178,7 @@ RSpec.describe Organization, type: :model do
         nyc_org2 = FactoryBot.create(:organization, :in_nyc)
         nyc_org3 = FactoryBot.create(:organization, :in_nyc)
         FactoryBot.create(:organization, :in_chicago)
-
+        nyc_org1.reload
         expect(nyc_org1.nearby_organizations).to match_array([nyc_org2, nyc_org3])
       end
     end

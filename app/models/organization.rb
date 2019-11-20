@@ -131,6 +131,7 @@ class Organization < ActiveRecord::Base
   def nearby_organizations
     return self.class.none unless regional? && search_coordinates_set?
     self.class.where.not(id: child_ids).near(search_radius).reorder(id: :asc)
+    # nearbys(search_radius).where.not(id: child_ids)
   end
 
   def mail_snippet_body(type)

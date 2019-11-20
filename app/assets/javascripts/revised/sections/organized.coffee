@@ -15,7 +15,7 @@ class BikeIndex.Organized extends BikeIndex
         $(".stickers-form").submit()
        ), 250
 
-    # This is copied from admin, we need to switch to es6 :(
+    # This is copied and adapted from binx_admin.js, we need to switch to es6 :(
     $('#timeSelectionBtnGroup button').on 'click', (e) ->
       period = $(e.target).attr('data-period')
       current_url = location.href.replace(/&?period=[^&]*/, '')
