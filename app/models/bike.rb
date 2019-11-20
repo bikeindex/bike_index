@@ -671,7 +671,7 @@ class Bike < ActiveRecord::Base
       self.longitude = request_location.longitude
       self.city = request_location.city
       self.country = Country.fuzzy_find(request_location&.country_code)
-      self.zipcode = request_location.zipcode
+      self.zipcode = request_location.postal_code
     end
   end
 
