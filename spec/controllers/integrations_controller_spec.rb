@@ -82,7 +82,7 @@ RSpec.describe IntegrationsController, type: :controller do
     end
   end
 
-  context "facebook" do
+  context "globalid" do
     let!(:omniauth_globalid) do
       OmniAuth.config.mock_auth[:globalid] = OmniAuth::AuthHash.new(
         "provider" => "globalid",
