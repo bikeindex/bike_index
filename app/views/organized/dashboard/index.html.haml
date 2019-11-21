@@ -9,8 +9,8 @@
   = render partial: "/shared/period_select"
 
 - if current_organization.regional?
-  %h3.mt-4
-    Bikes Registered nearby over the past #{@period}
+  %h3.mt-4.uncap
+    Registrations nearby over the past #{@period}
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
       %tbody
@@ -38,7 +38,7 @@
             = number_with_delimiter(total_bikes)
 
   - if current_organization.parent?
-    %h3.mt-4
+    %h3.mt-4.uncap
       Affiliated organization registrations over the past #{@period}
     .full-screen-table.mt-4
       %table.table.table-striped.table-bordered.table-sm
@@ -57,7 +57,7 @@
                 = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)
 
 - if current_organization.regional? && @nearby_organizations.any?
-  %h3.mt-4
+  %h3.mt-4.uncap
     - if current_organization.parent?
       Unaffiliated
     nearby Organization registrations over the past #{@period}
