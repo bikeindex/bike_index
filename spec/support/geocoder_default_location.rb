@@ -60,7 +60,6 @@ end
 RSpec.shared_context :geocoder_real do
   before do
     Geocoder.configure(lookup: :google, use_https: true)
-    allow(Geocoder::Calculations).to receive(:bounding_box).and_call_original
   end
 
   after do
