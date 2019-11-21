@@ -4,8 +4,6 @@ import React, { Fragment, Component } from "react";
 
 import Loading from "../../Loading";
 import honeybadger from "../../utils/honeybadger";
-import TimeParser from "../../utils/time_parser";
-
 
 class BikeSearch extends Component {
   // loading states :
@@ -16,33 +14,39 @@ class BikeSearch extends Component {
   state = {
     loading: null,
     results: []
-  }
+  };
 
   componentDidMount() {
     this.resultsBeingFetched();
-    this.props.fetchBikes(this.props.interpretedParams)
+    this.props
+      .fetchBikes(this.props.interpretedParams)
       .then(this.resultsFetched)
       .catch(this.handleError);
   }
 
   componentDidUpdate() {
-    TimeParser().localize();
+    if (!window.timeParser) {
+      window.timeParser = new TimeParser();
+    }
+    window.timeParser.localize();
   }
 
   resultsBeingFetched = () => {
     this.setState({ loading: true });
-  }
+  };
 
   resultsFetched = ({ bikes, error }) => {
     const results = bikes || [];
-    const loading = (!results.length) ? null : false;
-    this.setState({ results , loading });
-    if (error) { this.handleError(error) }
-  }
+    const loading = !results.length ? null : false;
+    this.setState({ results, loading });
+    if (error) {
+      this.handleError(error);
+    }
+  };
 
   handleError = error => {
     honeybadger.notify(error, { component: this.props.searchName });
-  }
+  };
 
   render() {
     const { serial } = this.props.interpretedParams;
@@ -56,7 +60,7 @@ class BikeSearch extends Component {
             </h3>
           </div>
         </div>
-      )
+      );
     }
 
     if (this.state.loading) {
@@ -66,17 +70,17 @@ class BikeSearch extends Component {
             <h3 className="secondary-matches">
               {this.props.t("searching_html", { serial })}
             </h3>
-            <Loading/>
+            <Loading />
           </div>
         </div>
-      )
+      );
     }
 
     const Result = this.props.resultComponent;
     const stolenness = {
-      "non": "abandoned",
-      "all": "all",
-      "stolen": "stolen",
+      non: "abandoned",
+      all: "all",
+      stolen: "stolen"
     }[this.props.interpretedParams.stolenness];
 
     return (
@@ -86,12 +90,14 @@ class BikeSearch extends Component {
             {this.props.t("matches_found_html", { serial, stolenness })}
           </h3>
           <ul className="bike-boxes">
-            {this.state.results.map(bike => <Result key={bike.id} bike={bike}/>)}
+            {this.state.results.map(bike => (
+              <Result key={bike.id} bike={bike} />
+            ))}
           </ul>
         </div>
       </div>
-    )
+    );
   }
-};
+}
 
 export default BikeSearch;

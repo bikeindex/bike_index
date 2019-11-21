@@ -10,8 +10,8 @@
     = render partial: "/shared/period_select"
 
   %h3.mt-4.uncap
-    Registrations nearby
-    = humanized_time_range
+    Local registrations
+    = humanized_time_range(@time_range)
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
       %tbody
@@ -20,16 +20,12 @@
           %td= number_with_delimiter(@bikes_in_organization_count)
         - if current_organization.parent?
           %tr
-            %td Registered by partner organizations
+            %td Registered by related organizations
             %td= number_with_delimiter(@bikes_in_child_organizations_count)
         - if current_organization.nearby_organizations.any?
           %tr
             %td
-              Registered by
-              - if current_organization.parent?
-                non-partner organizations
-              - else
-                nearby organizations
+              Registered by local bike shops or other organizations
             %td= number_with_delimiter(@bikes_in_nearby_organizations_count)
         %tr
           %td Self-registered nearby, not registered with an organizations
@@ -47,8 +43,8 @@
 
   - if current_organization.parent?
     %h3.mt-4.uncap
-      Partner organization registrations
-      = humanized_time_range
+      Registrations by related organizations
+      = humanized_time_range(@time_range)
     .full-screen-table.mt-4
       %table.table.table-striped.table-bordered.table-sm
         %thead
@@ -67,10 +63,8 @@
 
   - if current_organization.nearby_organizations.any?
     %h3.mt-4.uncap
-      - if current_organization.parent?
-        Non-partner
-      nearby organization registrations
-      = humanized_time_range
+      Registrations by local bike shops or other organizations
+      = humanized_time_range(@time_range)
     .full-screen-table.mt-4
       %table.table.table-striped.table-bordered.table-sm
         %thead

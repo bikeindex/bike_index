@@ -1,7 +1,10 @@
 class Admin::GraphsController < Admin::BaseController
+  before_action :set_period
+
   def index
     set_variable_graph_kind
-    set_variable_graphing_timing unless @kind == "general"
+    # We're not setting the time for specific types now
+    set_variable_graphing_timing unless %w[users general].include?(@kind)
   end
 
   def variable

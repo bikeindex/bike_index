@@ -194,6 +194,8 @@ module ControllerHelpers
       @period = "week"
       @start_time = Time.current - 7.days
     end
+    session[:timezone] ||= params[:timezone]
+    @timezone = session[:timezone] || TimeParser::DEFAULT_TIMEZONE
     @time_range = @start_time..Time.current
   end
 

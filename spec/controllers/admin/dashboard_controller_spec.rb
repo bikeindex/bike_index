@@ -27,9 +27,11 @@ RSpec.describe Admin::DashboardController, type: :controller do
         FactoryBot.create(:ownership)
         FactoryBot.create(:user)
         FactoryBot.create(:organization)
-        get :index
+        # Test that we're setting the timezone from the session
+        get :index, timezone: "America/Los_Angeles"
         expect(response.code).to eq "200"
         expect(response).to render_template(:index)
+        expect(session[:timezone]).to eq "America/Los_Angeles"
       end
     end
 
