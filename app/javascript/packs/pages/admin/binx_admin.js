@@ -97,7 +97,9 @@ function BinxAdmin() {
       $("#timeSelectionBtnGroup button").on("click", function(e) {
         let joiner;
         const period = $(e.target).attr("data-period");
-        const current_url = location.href.replace(/&?period=[^&]*/, "");
+        const current_url = location.href
+          .replace(/\??&?period=[^&]*&?/, "")
+          .replace(/\??&?period=[^&]*&?/, "");
         if (current_url.match(/\?/)) {
           joiner = "&";
         } else {
