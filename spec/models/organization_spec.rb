@@ -18,23 +18,23 @@ RSpec.describe Organization, type: :model do
   describe "bikes in/not nearby organizations" do
     it "returns bikes associated with nearby organizations" do
       chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
-      FactoryBot.create(:bike_organized, organization: chi_org)
+      bike0 = FactoryBot.create(:bike_organized, :in_nyc, organization: chi_org)
       nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
-      FactoryBot.create(:bike_organized, organization: nyc_org1)
+      bike1 = FactoryBot.create(:bike_organized, :in_chicago, organization: nyc_org1)
 
       nyc_org2 = FactoryBot.create(:organization, :in_nyc)
-      bike2 = FactoryBot.create(:bike_organized, organization: nyc_org2)
+      bike2 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org2)
       nyc_org3 = FactoryBot.create(:organization, :in_nyc)
-      bike3 = FactoryBot.create(:bike_organized, organization: nyc_org3)
-      unaffiliated_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
+      bike3 = FactoryBot.create(:bike_organized, :in_nyc, organization: nyc_org3)
+      unaffiliated_bike_ids = FactoryBot.create_list(:bike, 2, :in_nyc).map(&:id)
 
-      organized_bikes = Bike.organization(nyc_org1.nearby_organizations.pluck(:id))
+      expect(nyc_org1.bikes_nearby.pluck(:id)).to match_array([bike0.id, bike2.id, bike3.id] + unaffiliated_bike_ids)
 
-      expect(organized_bikes).to match_array([bike2, bike3])
+      # Make sure we're getting the bike from the org
+      expect(Bike.organization(nyc_org1).pluck(:id)).to match_array([bike1.id])
 
-      unorganized_bikes = nyc_org1.bikes_nearby_unorganized
-
-      expect(unorganized_bikes).to match_array(unaffiliated_bikes)
+      # Make sure we get the bikes from the org or from nearby
+      expect(Bike.organization(nyc_org1.nearby_and_partner_organization_ids)).to match_array([bike1, bike2, bike3])
     end
   end
 

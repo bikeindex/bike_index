@@ -1,4 +1,10 @@
 module ApplicationHelper
+  # Override ActionView `cache` helper, adding the current locale to the cache
+  # key.
+  def cache(key = {}, options = {}, &block)
+    super([key, locale: I18n.locale], options, &block)
+  end
+
   def check_mark
     "&#x2713;".html_safe
   end
@@ -156,20 +162,6 @@ module ApplicationHelper
   def sortable_search_params
     search_param_keys = params.keys.select { |k| k.to_s.match(/\Asearch_/) }
     params.permit(:direction, :sort, :user_id, :organization_id, :period, :query, :render_chart, *search_param_keys)
-  end
-
-  def group_by_method(timeperiod)
-    if timeperiod.last - timeperiod.first < 3601
-      :group_by_minute
-    elsif timeperiod.last - timeperiod.first < 500_000
-      :group_by_hour
-    elsif timeperiod.last - timeperiod.first < 5_000_000 # around 60 days
-      :group_by_day
-    elsif timeperiod.last - timeperiod.first < 32_000_000 # A little over a year
-      :group_by_week
-    else
-      :group_by_month
-    end
   end
 
   def button_to_toggle_task_completion_status(ambassador_task_assignment, current_user, current_organization)
