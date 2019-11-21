@@ -24,6 +24,8 @@ module GraphingHelper
   def group_by_format(timeperiod)
     if timeperiod.last - timeperiod.first < 86401 # 24 hours
       "%l:%M %p"
+    elsif timeperiod.last - timeperiod.first < 604801 # One week
+      "%a"
     else
       nil # Let it fallback to the default handling
     end

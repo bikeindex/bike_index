@@ -11,8 +11,8 @@
   today = Bike.where("created_at >= ?", Time.current.beginning_of_day).count
   yesterday = (Bike.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today
   bikes = [
-    { name: 'Registrations', data: Bike.unscoped.where(created_at: @time_range).send(group_by_method(@time_range), "bikes.created_at", range: @time_range, format: "%a").count },
-    { name: 'Stolen', data: Bike.unscoped.where(created_at: @time_range).where(stolen: true).send(group_by_method(@time_range), "bikes.created_at", range: @time_range, format: "%a").count }
+    { name: 'Registrations', data: Bike.unscoped.current.non_stolen.where(created_at: @time_range).send(group_by_method(@time_range), "bikes.created_at", range: @time_range, format: group_by_format(@time_range)).count },
+    { name: 'Stolen', data: Bike.unscoped.current.stolen.where(created_at: @time_range).send(group_by_method(@time_range), "bikes.created_at", range: @time_range, format: group_by_format(@time_range)).count }
   ]
 
 .row.justify-content-end
