@@ -363,8 +363,8 @@ GEM
       rack (>= 1.6.2, < 3)
     omniauth-facebook (4.0.0)
       omniauth-oauth2 (~> 1.2)
-    omniauth-globalid (0.1.2)
-      jwt (~> 2.2.1)
+    omniauth-globalid (0.1.4)
+      jwt (~> 2.2)
       omniauth (~> 1.2)
       omniauth-oauth2 (~> 1.1)
       rack

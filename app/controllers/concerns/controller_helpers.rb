@@ -171,6 +171,31 @@ module ControllerHelpers
     @passive_organization = organization
   end
 
+  # For setting periods on admin searches
+  def set_period
+    @period ||= params[:period]
+    case @period
+    when "hour"
+      @start_time = Time.current - 1.hour
+    when "day"
+      @start_time = Time.current - 1.day
+    when "month"
+      @start_time = Time.current - 30.days
+    when "year"
+      @start_time = Time.current - 1.year
+    when "all"
+      if current_organization.present?
+        @start_time = current_organization.created_at
+      else
+        @start_time = Time.at(1134972000) # Earliest bike created at
+      end
+    else
+      @period = "week"
+      @start_time = Time.current - 7.days
+    end
+    @time_range = @start_time..Time.current
+  end
+
   protected
 
   # passive_organization is the organization set for the user - which is persisted in session

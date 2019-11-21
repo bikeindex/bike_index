@@ -15,7 +15,7 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "#bikes_in_nearby_organizations" do
+  describe "bikes in/not nearby organizations" do
     it "returns bikes associated with nearby organizations" do
       chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
       FactoryBot.create(:bike_organized, organization: chi_org)
@@ -26,25 +26,15 @@ RSpec.describe Organization, type: :model do
       bike2 = FactoryBot.create(:bike_organized, organization: nyc_org2)
       nyc_org3 = FactoryBot.create(:organization, :in_nyc)
       bike3 = FactoryBot.create(:bike_organized, organization: nyc_org3)
-
-      bikes = nyc_org1.bikes_in_nearby_organizations
-
-      expect(bikes).to match_array([bike2, bike3])
-    end
-  end
-
-  describe "#bikes_nearby_unaffiliated" do
-    it "returns bikes associated with nearby organizations" do
-      nyc_org1 = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
-      nyc_org2 = FactoryBot.create(:organization, :in_nyc)
-      FactoryBot.create(:bike_organized, organization: nyc_org2)
-      nyc_org3 = FactoryBot.create(:organization, :in_nyc)
-      FactoryBot.create(:bike_organized, organization: nyc_org3)
       unaffiliated_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
 
-      bikes = nyc_org1.bikes_nearby_unaffiliated
+      organized_bikes = Bike.organization(nyc_org1.nearby_organizations.pluck(:id))
 
-      expect(bikes).to match_array(unaffiliated_bikes)
+      expect(organized_bikes).to match_array([bike2, bike3])
+
+      unorganized_bikes = nyc_org1.bikes_nearby_unorganized
+
+      expect(unorganized_bikes).to match_array(unaffiliated_bikes)
     end
   end
 
@@ -168,18 +158,18 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "#organizations_nearby" do
+  describe "#nearby_organizations" do
     context "given an org without the regional_bike_counts feature" do
       it "returns an empty collection" do
         org = FactoryBot.create(:organization)
-        expect(org.organizations_nearby).to be_empty
+        expect(org.nearby_organizations).to be_empty
       end
     end
 
     context "given no other organizations in the search radius" do
       it "returns an empty collection" do
         org = FactoryBot.create(:organization_with_regional_bike_counts)
-        expect(org.organizations_nearby).to be_empty
+        expect(org.nearby_organizations).to be_empty
       end
     end
 
@@ -190,7 +180,8 @@ RSpec.describe Organization, type: :model do
         nyc_org3 = FactoryBot.create(:organization, :in_nyc)
         FactoryBot.create(:organization, :in_chicago)
 
-        expect(nyc_org1.organizations_nearby).to match_array([nyc_org2, nyc_org3])
+        nyc_org1.reload
+        expect(nyc_org1.nearby_organizations).to match_array([nyc_org2, nyc_org3])
       end
     end
   end
@@ -321,7 +312,7 @@ RSpec.describe Organization, type: :model do
       expect(organization.bikes.stolen).to eq([bike])
       # Check the inverse lookup
       expect((Bike.organization(organization))).to eq([bike])
-      expect((Bike.organization(organization.name))).to eq([bike])
+      expect((Bike.organization(organization.id))).to eq([bike])
       # Check recovered
       stolen_record.add_recovery_information(recovery_information)
       bike.reload
