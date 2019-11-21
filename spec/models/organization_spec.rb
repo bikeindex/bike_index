@@ -3,15 +3,15 @@ require "rails_helper"
 RSpec.describe Organization, type: :model do
   describe "#bikes_nearby" do
     it "returns bikes within the search radius" do
-      FactoryBot.create(:bike, :in_los_angeles)
-      nyc_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
+      la_bike = FactoryBot.create(:bike, :in_los_angeles)
+      nyc_bike_ids = FactoryBot.create_list(:bike, 2, :in_nyc).map(&:id)
       stolen_nyc_bike = FactoryBot.create(:stolen_bike_in_nyc)
 
       chi_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_chicago)
       nyc_org = FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc)
 
-      expect(chi_org.bikes_nearby).to be_empty
-      expect(nyc_org.bikes_nearby).to match_array([*nyc_bikes, stolen_nyc_bike])
+      expect(chi_org.bikes_nearby.pluck(:id)).to be_empty
+      expect(nyc_org.bikes_nearby.pluck(:id)).to match_array([*nyc_bike_ids, stolen_nyc_bike.id])
     end
   end
 

@@ -6,6 +6,7 @@ RSpec.shared_examples "bike_searchable" do
   let(:multi_query_items) { [manufacturer.search_id, color.search_id, "some other string", "another string"] }
   let(:ip_address) { "127.0.0.1" }
   let(:interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: ip_address) }
+  include_context :geocoder_stubbed_bounding_box
 
   describe "searchable_interpreted_params" do
     context "multiple query_items strings" do
