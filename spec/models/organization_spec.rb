@@ -26,12 +26,13 @@ RSpec.describe Organization, type: :model do
       bike2 = FactoryBot.create(:bike_organized, organization: nyc_org2)
       nyc_org3 = FactoryBot.create(:organization, :in_nyc)
       bike3 = FactoryBot.create(:bike_organized, organization: nyc_org3)
+      unaffiliated_bikes = FactoryBot.create_list(:bike, 2, :in_nyc)
 
       organized_bikes = Bike.organization(nyc_org1.nearby_organizations.pluck(:id))
 
       expect(organized_bikes).to match_array([bike2, bike3])
 
-      unorganized_bikes = nyc_org1.bikes_nearby_unaffiliated
+      unorganized_bikes = nyc_org1.bikes_nearby_unorganized
 
       expect(unorganized_bikes).to match_array(unaffiliated_bikes)
     end
@@ -178,6 +179,7 @@ RSpec.describe Organization, type: :model do
         nyc_org2 = FactoryBot.create(:organization, :in_nyc)
         nyc_org3 = FactoryBot.create(:organization, :in_nyc)
         FactoryBot.create(:organization, :in_chicago)
+
         nyc_org1.reload
         expect(nyc_org1.nearby_organizations).to match_array([nyc_org2, nyc_org3])
       end
@@ -310,7 +312,7 @@ RSpec.describe Organization, type: :model do
       expect(organization.bikes.stolen).to eq([bike])
       # Check the inverse lookup
       expect((Bike.organization(organization))).to eq([bike])
-      expect((Bike.organization(organization.name))).to eq([bike])
+      expect((Bike.organization(organization.id))).to eq([bike])
       # Check recovered
       stolen_record.add_recovery_information(recovery_information)
       bike.reload
