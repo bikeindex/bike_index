@@ -4,7 +4,7 @@ class Admin::GraphsController < Admin::BaseController
   def index
     set_variable_graph_kind
     # We're not setting the time for specific types now
-    set_variable_graphing_timing unless %w[bikes general].include?(@kind)
+    set_variable_graphing_timing unless %w[users general].include?(@kind)
   end
 
   def variable
