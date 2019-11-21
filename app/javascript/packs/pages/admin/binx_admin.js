@@ -6,8 +6,8 @@ import BinxAdminBikesEdit from "./bikes_edit.js";
 import BinxAdminRecoveryDisplayForm from "./recovery_display_form.js";
 import BinxAdminInvoices from "./invoices.js";
 import BinxAdminOrganizationForm from "./organization_form.js";
-import BinxAdminBlogs from "./blogs.js"
-import BinxAdminImageUploader from "./image_uploader.js"
+import BinxAdminBlogs from "./blogs.js";
+import BinxAdminImageUploader from "./image_uploader.js";
 
 function BinxAdmin() {
   return {
@@ -103,7 +103,9 @@ function BinxAdmin() {
         } else {
           joiner = "?";
         }
-        return (location.href = `${current_url}${joiner}period=${period}`);
+        return (location.href = `${current_url}${joiner}period=${period}&timezone=${
+          window.localTimezone
+        }`);
       });
     },
 

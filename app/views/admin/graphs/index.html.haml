@@ -19,6 +19,22 @@
 
   = line_chart bikes_admin_graphs_path
 
+- elsif @kind == "bikes"
+  :ruby
+    graphing_data = [
+      {
+        name: "Bikes",
+        data: Bike.unscoped.where(created_at: @time_range).send(group_by_method(@time_range), "bikes.created_at", time_zone: @timezone, range: @time_range, format: group_by_format(@time_range)).count,
+      },
+       {
+         name: "Stolen records",
+         data: StolenRecord.unscoped.where(created_at: @time_range).send(group_by_method(@time_range), :created_at, time_zone: @timezone, range: @time_range, format: group_by_format(@time_range)).count,
+       },
+    ]
+  = column_chart graphing_data, stacked: true, thousands: ",", defer: true
+  %h3.mt-4.mb-4
+    Bikes #{humanized_time_range(@time_range)}
+  = render partial: "/shared/period_select"
 - else
   = form_tag admin_graphs_path, method: :get, class: "variable-admin-graphs-form" do
     = hidden_field_tag :kind, @kind
@@ -42,5 +58,4 @@
       .col-md-auto
         = submit_tag "Update chart", class: "btn btn-success mb-4"
     = line_chart variable_admin_graphs_path(params.except(:controller, :action))
-    %em.small.less-strong
-      graph is grouped by #{@group_period}
+

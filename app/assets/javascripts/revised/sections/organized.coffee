@@ -24,7 +24,7 @@ class BikeIndex.Organized extends BikeIndex
       else
         joiner = '?'
 
-      location.href = "#{current_url}#{joiner}period=#{period}"
+      location.href = "#{current_url}#{joiner}period=#{period}&timezone=#{window.localTimezone}"
 
   setOrganizedWrapHeight: ->
     min_px = $('.organized-menu-wrapper').outerHeight()

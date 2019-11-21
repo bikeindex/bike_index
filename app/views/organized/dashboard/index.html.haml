@@ -11,7 +11,7 @@
 
   %h3.mt-4.uncap
     Registrations nearby
-    = humanized_time_range
+    = humanized_time_range(@time_range)
   .full-screen-table.mt-4
     %table.table.table-striped.table-bordered.table-sm
       %tbody
@@ -48,7 +48,7 @@
   - if current_organization.parent?
     %h3.mt-4.uncap
       Partner organization registrations
-      = humanized_time_range
+      = humanized_time_range(@time_range)
     .full-screen-table.mt-4
       %table.table.table-striped.table-bordered.table-sm
         %thead
@@ -70,7 +70,7 @@
       - if current_organization.parent?
         Non-partner
       nearby organization registrations
-      = humanized_time_range
+      = humanized_time_range(@time_range)
     .full-screen-table.mt-4
       %table.table.table-striped.table-bordered.table-sm
         %thead
