@@ -73,7 +73,7 @@
             %span.disabled-menu-item.menu-item
               = t(".geomessaging")
         - if current_user.admin_of?(current_organization) || current_user.superuser?
-          - if current_organization.parent?
+          - if current_organization.parent? || current_organization.regional?
             %li
               = active_link t(".organization_dashboard", org_name: current_organization.short_name), organization_dashboard_index_path(organization_id: current_organization.to_param), class: "menu-item"
           %li.divider-above
