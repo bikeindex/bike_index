@@ -7,6 +7,13 @@
 
 = render partial: "/admin/bikes/table", locals: { bikes: @bikes }
 
+:ruby
+  today = Bike.where("created_at >= ?", Time.current.beginning_of_day).count
+  yesterday = (Bike.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today
+  bikes = [
+    { name: 'Registrations', data: Bike.unscoped.where(created_at: @time_range).send(group_by_method(@time_range), "bikes.created_at", range: @time_range, format: "%a").count },
+    { name: 'Stolen', data: Bike.unscoped.where(created_at: @time_range).where(stolen: true).send(group_by_method(@time_range), "bikes.created_at", range: @time_range, format: "%a").count }
+  ]
 
 .row.justify-content-end
   .col-auto
@@ -14,12 +21,10 @@
       = number_with_delimiter(Bike.count)
       bikes total
       %em
-        - today = Bike.where("created_at >= ?", Time.current.beginning_of_day).count
-        - yesterday = (Bike.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today
-        (#{number_with_delimiter(today)} today, #{number_with_delimiter(yesterday)} yesterday)
-    - bikes = [ { name: 'Registrations', data: Bike.unscoped.group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.current).count }, { name: 'Stolen', data: Bike.unscoped.where(stolen: true).group_by_day(:created_at, range: 1.weeks.ago.midnight..Time.current).count }]
 
-= line_chart bikes, curve: false, thousands: ",", defer: true
+        (#{number_with_delimiter(today)} today, #{number_with_delimiter(yesterday)} yesterday)
+
+= column_chart bikes, stacked: true, thousands: ",", defer: true
 
 %hr
 

@@ -6,6 +6,7 @@ RSpec.describe BikesController, type: :controller do
 
   let(:manufacturer) { FactoryBot.create(:manufacturer) }
   let(:color) { FactoryBot.create(:color, name: "black") }
+
   describe "index" do
     let!(:non_stolen_bike) { FactoryBot.create(:bike, serial_number: "1234567890") }
     let!(:stolen_bike) { FactoryBot.create(:stolen_bike_in_nyc) }
@@ -14,6 +15,8 @@ RSpec.describe BikesController, type: :controller do
     let(:ip_address) { "127.0.0.1" }
     let(:target_location) { ["New York", "NY", "US"] }
     let(:target_interpreted_params) { Bike.searchable_interpreted_params(query_params, ip: ip_address) }
+    include_context :geocoder_stubbed_bounding_box
+
     context "with subdomain" do
       it "redirects to no subdomain" do
         @request.host = "stolen.example.com"

@@ -128,9 +128,17 @@ class Organization < ActiveRecord::Base
 
   def child_organizations; Organization.where(id: child_ids) end
 
+  def bounding_box; Geocoder::Calculations.bounding_box(search_coordinates, search_radius) end
+
   def nearby_organizations
     return self.class.none unless regional? && search_coordinates_set?
-    nearbys(search_radius).where.not(id: child_ids).reorder(id: :asc)
+    @nearby_organizations ||= self.class.within_bounding_box(bounding_box)
+      .where.not(id: child_ids + [id])
+      .reorder(id: :asc)
+  end
+
+  def nearby_and_partner_organization_ids
+    [id] + child_ids + nearby_organizations.pluck(:id)
   end
 
   def mail_snippet_body(type)
@@ -194,12 +202,8 @@ class Organization < ActiveRecord::Base
   # Bikes geolocated within `search_radius` miles.
   def bikes_nearby
     return Bike.none unless regional? && search_coordinates_set?
-    Bike.near(search_coordinates, search_radius).reorder(id: :asc)
-  end
-
-  # # Bikes nearby not associated with any nearby organizations or child organizations
-  def bikes_nearby_unorganized
-    bikes_nearby.where.not(id: Bike.organization(nearby_organizations.pluck(:id) + child_ids).pluck(:id))
+    # Need to unscope it so that we can call group-by on it
+    Bike.unscoped.current.within_bounding_box(bounding_box)
   end
 
   def paid_for?(feature_name)

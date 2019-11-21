@@ -48,6 +48,11 @@ RSpec.shared_context :geocoder_default_location do
   before do
     Geocoder.configure(lookup: :test, ip_lookup: :test)
     Geocoder::Lookup::Test.set_default_stub([default_location.as_json])
+  end
+end
+
+RSpec.shared_context :geocoder_stubbed_bounding_box do
+  before do
     allow(Geocoder::Calculations).to receive(:bounding_box) { bounding_box }
   end
 end
@@ -55,11 +60,9 @@ end
 RSpec.shared_context :geocoder_real do
   before do
     Geocoder.configure(lookup: :google, use_https: true)
-    allow(Geocoder::Calculations).to receive(:bounding_box).and_call_original
   end
 
   after do
     Geocoder.configure(lookup: :test, ip_lookup: :test)
-    allow(Geocoder::Calculations).to receive(:bounding_box) { bounding_box }
   end
 end
