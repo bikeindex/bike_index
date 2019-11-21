@@ -20,10 +20,17 @@ module GraphingHelper
     "over the past #{@period}"
   end
 
-  def organization_dashboard_bikes_graph_data
+  def organization_dashboard_bikes_graph_data(timeperiod)
+    # Note: by specifying the range parameter, we force it to display empty days
     [
-      { name: "Organization registrations", data: @bikes_in_organizations.send(group_by_method(@time_range), "bikes.created_at").count },
-      { name: "Self registrations", data: @bikes_not_in_organizations.send(group_by_method(@time_range), "bikes.created_at").count },
+      {
+        name: "Organization registrations",
+        data: @bikes_in_organizations.send(group_by_method(timeperiod), "bikes.created_at", range: @time_range).count,
+      },
+      {
+        name: "Self registrations",
+        data: @bikes_not_in_organizations.send(group_by_method(timeperiod), "bikes.created_at", range: @time_range).count,
+      },
     ]
   end
 end

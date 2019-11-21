@@ -203,7 +203,6 @@ class Organization < ActiveRecord::Base
   def bikes_nearby
     return Bike.none unless regional? && search_coordinates_set?
     # Need to unscope it so that we can call group-by on it
-    # Bike.unscoped.current.near(search_coordinates, search_radius).reorder(id: :asc)
     Bike.unscoped.current.within_bounding_box(bounding_box)
   end
 

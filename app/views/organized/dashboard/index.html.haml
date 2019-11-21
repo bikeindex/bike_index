@@ -3,7 +3,7 @@
     %em= current_organization.name
     Dashboard
 
-= line_chart organization_dashboard_bikes_graph_data, curve: false, thousands: ",", defer: true
+= column_chart organization_dashboard_bikes_graph_data(@time_range), stacked: true, thousands: ",", defer: true, colors: ["#5cb85c", "#3498db"]
 
 %div{ style: "margin-top: 50px;" }
   = render partial: "/shared/period_select"
