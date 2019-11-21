@@ -23,7 +23,7 @@ module GraphingHelper
   def organization_dashboard_bikes_graph_data
     [
       { name: "Organization registrations", data: @bikes_in_organizations.send(group_by_method(@time_range), "bikes.created_at").count },
-    # { name: "Self registrations", data: @bikes_not_in_organizations.send(group_by_method(@time_range), "bikes.created_at").count },
+      { name: "Self registrations", data: @bikes_not_in_organizations.send(group_by_method(@time_range), "bikes.created_at").count },
     ]
   end
 end

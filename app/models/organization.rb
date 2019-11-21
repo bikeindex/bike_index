@@ -128,9 +128,13 @@ class Organization < ActiveRecord::Base
 
   def child_organizations; Organization.where(id: child_ids) end
 
+  def bounding_box; Geocoder::Calculations.bounding_box(search_coordinates, search_radius) end
+
   def nearby_organizations
     return self.class.none unless regional? && search_coordinates_set?
-    @nearby_organizations ||= nearbys(search_radius).where.not(id: child_ids).reorder(id: :asc)
+    @nearby_organizations ||= self.class.within_bounding_box(bounding_box)
+      .where.not(id: child_ids + [id])
+      .reorder(id: :asc)
   end
 
   def nearby_and_partner_organization_ids
@@ -199,7 +203,8 @@ class Organization < ActiveRecord::Base
   def bikes_nearby
     return Bike.none unless regional? && search_coordinates_set?
     # Need to unscope it so that we can call group-by on it
-    Bike.unscoped.current.near(search_coordinates, search_radius).reorder(id: :asc)
+    # Bike.unscoped.current.near(search_coordinates, search_radius).reorder(id: :asc)
+    Bike.unscoped.current.within_bounding_box(bounding_box)
   end
 
   def paid_for?(feature_name)
