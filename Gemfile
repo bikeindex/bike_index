@@ -98,7 +98,6 @@ gem "groupdate" # Required for charts
 gem "jquery-datatables-rails", "~>3.4.0"
 gem "premailer-rails" # Inline styles for email
 gem "sprockets-rails", "~> 3.0.4"
-gem "therubyracer"
 gem "uglifier"
 gem "webpacker", "~> 4.x"
 
