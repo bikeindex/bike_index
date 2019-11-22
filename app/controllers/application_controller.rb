@@ -80,16 +80,14 @@ class ApplicationController < ActionController::Base
 
   # Around filter to ensure locale (language and timezone) are set only per request
   def set_locale
-    # If timezone params are passed (tested in admin#dashboard#index)
+    # Parse the timezone params if they are passed (tested in admin#dashboard#index)
     if params[:timezone].present?
-      # parse out timezone
       timezone = TimeParser.parse_timezone(params[:timezone])
       # If it's a valid timezone, save to session
       session[:timezone] = timezone&.name
     end
     # Set the timezone on a per request basis if we have a timezone saved
     if session[:timezone].present?
-      # If timezone is defined, use that
       Time.zone = timezone || TimeParser.parse_timezone(session[:timezone])
     end
 
