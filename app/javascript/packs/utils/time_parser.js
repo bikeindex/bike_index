@@ -72,7 +72,7 @@ export default class TimeParser {
         );
       }
     }
-    // Otherwise, format in basic format (without timeText, which
+    // Otherwise, format in basic format
     if (time.year() === moment().year()) {
       return time.format("MMM Do[,] ha");
     } else {
