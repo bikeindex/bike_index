@@ -65,18 +65,5 @@
             %span.convertTime
               = l @invoice.subscription_end_at, format: :convert_time
 
-      %tr
-        %td Yesterday
-        %td
-          %span.convertTime= l Time.now - 14.hours, format: :convert_time
-      %tr
-        %td Today
-        %td
-          %span.convertTime= l Time.now + 5.hours, format: :convert_time
-      %tr
-        %td Tomorrow
-        %td
-          %span.convertTime= l Time.now + 26.hours, format: :convert_time
-
 
 = render "form"
