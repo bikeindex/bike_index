@@ -55,14 +55,16 @@ RSpec.describe TimeParser do
       let(:target_timezone) { ActiveSupport::TimeZone["Eastern Time (US & Canada)"] }
       it "returns correctly" do
         expect(subject.parse_timezone("")).to eq subject::DEFAULT_TIMEZONE
-        expect(subject.parse_timezone("America/New York").utc_offset).to eq target_timezone.utc_offset
+        expect(subject.parse_timezone(timezone_str).utc_offset).to eq target_timezone.utc_offset
+        # Alternative phrasing
         expect(subject.parse_timezone("Eastern Time (US & Canada)").utc_offset).to eq target_timezone.utc_offset
       end
     end
-    context "timezone obj" do
+    context "LA" do
+      let(:timezone_str) { "America/Los_Angeles" }
       let(:target_timezone) { ActiveSupport::TimeZone["America/Los_Angeles"] }
       it "returns correctly" do
-        expect(subject.parse_timezone(target_timezone).utc_offset).to eq target_timezone.utc_offset
+        expect(subject.parse_timezone(timezone_str).utc_offset).to eq TimeParser::DEFAULT_TIMEZONE.utc_offset - 2.hours
       end
     end
   end

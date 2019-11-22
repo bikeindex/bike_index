@@ -20,6 +20,22 @@
   = line_chart bikes_admin_graphs_path
 
 - elsif @kind == "users"
+  %table.table-list
+    %tr
+      %td Today
+      %td
+        %span.convertTime
+          = l Time.now.end_of_day, format: :convert_time
+    %tr
+      %td Range first
+      %td
+        %span.convertTime
+          = l @time_range.first, format: :convert_time
+    %tr
+      %td Range last
+      %td
+        %span.convertTime
+          = l @time_range.last, format: :convert_time
   = column_chart User.where(created_at: @time_range).send(group_by_method(@time_range), :created_at, time_zone: @timezone, range: @time_range, format: group_by_format(@time_range)).count, thousands: ",", defer: true
   %h3.mt-4.mb-4
     Users #{humanized_time_range(@time_range)}

@@ -8,12 +8,37 @@
 = render partial: "/admin/bikes/table", locals: { bikes: @bikes }
 
 :ruby
-  today = Bike.where("created_at >= ?", Time.current.beginning_of_day).count
-  yesterday = (Bike.where("created_at >= ?", Time.current.beginning_of_day - 1.day).count) - today
+  today_time = Time.current.beginning_of_day
+  yesterday_time = today_time - 1.day
+  today = Bike.where("created_at >= ?", today_time).count
+  yesterday = (Bike.where("created_at >= ?", yesterday_time).count) - today
   bikes = [
     { name: 'Registrations', data: Bike.unscoped.current.non_stolen.where(created_at: @time_range).send(group_by_method(@time_range), "bikes.created_at", range: @time_range, format: group_by_format(@time_range)).count },
     { name: 'Stolen', data: Bike.unscoped.current.stolen.where(created_at: @time_range).send(group_by_method(@time_range), "bikes.created_at", range: @time_range, format: group_by_format(@time_range)).count }
   ]
+
+%table.table-list
+  %tr
+    %td Today
+    %td
+      %span.convertTime
+        = l today_time, format: :convert_time
+  %tr
+    %td Today
+    %td
+      %span.convertTime
+        = l yesterday_time, format: :convert_time
+  %tr
+    %td Range first
+    %td
+      %span.convertTime
+        = l @time_range.first, format: :convert_time
+  %tr
+    %td Range last
+    %td
+      %span.convertTime
+        = l @time_range.last, format: :convert_time
+
 
 .row.justify-content-end
   .col-auto
