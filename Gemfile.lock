@@ -54,7 +54,7 @@ GEM
     api-pagination (4.3.0)
     arel (6.0.4)
     ast (2.4.0)
-    autoprefixer-rails (6.5.0.2)
+    autoprefixer-rails (9.7.2)
       execjs
     awesome_print (1.8.0)
     axiom-types (0.1.1)
@@ -667,7 +667,7 @@ DEPENDENCIES
   api-pagination
   axlsx (~> 3.0.0.pre)
   bcrypt (~> 3.1.7)
-  bootstrap (~> 4.0.0.alpha3)
+  bootstrap (= 4.0.0.alpha4)
   bullet
   bundler (>= 1.8.4)
   carrierwave
