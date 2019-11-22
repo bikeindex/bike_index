@@ -67,7 +67,7 @@ GEM
       nokogiri (~> 1.8, >= 1.8.2)
       rubyzip (~> 1.2, >= 1.2.1)
     bcrypt (3.1.11)
-    bootstrap (4.0.0.alpha4)
+    bootstrap (4.0.0.alpha5)
       autoprefixer-rails (>= 6.0.3)
       sass (>= 3.4.19)
     buftok (0.2.0)
@@ -663,7 +663,7 @@ DEPENDENCIES
   api-pagination
   axlsx (~> 3.0.0.pre)
   bcrypt (~> 3.1.7)
-  bootstrap (= 4.0.0.alpha4)
+  bootstrap (= 4.0.0.alpha5)
   bullet
   bundler (>= 1.8.4)
   carrierwave
