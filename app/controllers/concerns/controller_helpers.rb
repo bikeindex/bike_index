@@ -171,18 +171,19 @@ module ControllerHelpers
     @passive_organization = organization
   end
 
-  # For setting periods on admin searches
+  # For setting periods, particularly for graphing
   def set_period
+    # Set time period
     @period ||= params[:period]
     case @period
     when "hour"
       @start_time = Time.current - 1.hour
     when "day"
-      @start_time = Time.current - 1.day
+      @start_time = Time.current.beginning_of_day - 1.day
     when "month"
-      @start_time = Time.current - 30.days
+      @start_time = Time.current.beginning_of_day - 30.days
     when "year"
-      @start_time = Time.current - 1.year
+      @start_time = Time.current.beginning_of_day - 1.year
     when "all"
       if current_organization.present?
         @start_time = current_organization.created_at
@@ -190,12 +191,10 @@ module ControllerHelpers
       else
         @start_time = Time.at(1134972000) # Earliest bike created at
       end
-    else
+    else # Default to week view
       @period = "week"
-      @start_time = Time.current - 7.days
+      @start_time = Time.current.beginning_of_day - 7.days
     end
-    session[:timezone] ||= params[:timezone]
-    @timezone = session[:timezone] || TimeParser::DEFAULT_TIMEZONE
     @time_range = @start_time..Time.current
   end
 

@@ -21,17 +21,45 @@ RSpec.describe Admin::DashboardController, type: :controller do
 
   context "logged in as admin" do
     include_context :logged_in_as_super_admin
-    describe "index" do
-      it "renders" do
-        # Create the things we look at, so that we ensure it doesn't break
+
+    describe "index (also timezone setting tests)" do
+      before do
+        # Create the things we look at, so we ensure it doesn't break
         FactoryBot.create(:ownership)
         FactoryBot.create(:user)
         FactoryBot.create(:organization)
-        # Test that we're setting the timezone from the session
-        get :index, timezone: "America/Los_Angeles"
+      end
+      let(:timezone) { "America/Los_Angeles" }
+      let(:time_range_start) { Time.now.in_time_zone(timezone).beginning_of_day - 7.days }
+      it "renders, sets timezone from params" do
+        get :index, timezone: timezone
         expect(response.code).to eq "200"
         expect(response).to render_template(:index)
-        expect(session[:timezone]).to eq "America/Los_Angeles"
+        expect(session[:timezone]).to eq timezone
+        expect(assigns(:time_range).first).to be_within(2.seconds).of time_range_start
+        expect(Time.zone).to eq TimeParser::DEFAULT_TIMEZONE
+      end
+      context "timezone set in session, not passed" do
+        let(:timezone) { "Amsterdam" } # UTC + 1
+        it "uses session timezone" do
+          session[:timezone] = timezone
+          get :index
+          expect(response.code).to eq "200"
+          expect(response).to render_template(:index)
+          expect(session[:timezone]).to eq timezone
+          expect(assigns(:time_range).first).to be_within(2.seconds).of time_range_start
+          expect(Time.zone).to eq TimeParser::DEFAULT_TIMEZONE
+        end
+      end
+      context "passing nonsense timezone" do
+        it "doesn't set the timezone" do
+          session[:timezone] = timezone
+          get :index, timezone: "party-zone"
+          expect(response.code).to eq "200"
+          expect(response).to render_template(:index)
+          expect(session[:timezone]).to be_blank
+          expect(Time.zone).to eq TimeParser::DEFAULT_TIMEZONE
+        end
       end
     end
 

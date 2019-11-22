@@ -14,54 +14,62 @@ export default class TimeParser {
     }
     this.localTimezone = window.localTimezone;
     moment.tz.setDefault(this.localTimezone);
-    this.yesterday = moment()
+    this.yesterdayStart = moment()
       .subtract(1, "day")
       .startOf("day");
-    this.today = moment().startOf("day");
-    this.tomorrow = moment().endOf("day");
+    this.todayStart = moment().startOf("day");
+    this.todayEnd = moment().endOf("day");
+    this.tomorrowEnd = moment()
+      .add(1, "day")
+      .endOf("day");
+  }
+
+  // If we're display time with the hour, we have different formats based on whether we include seconds
+  // this manages that functionality
+  hourFormat(time, baseTimeFormat, includeSeconds) {
+    if (includeSeconds) {
+      return `${time.format(baseTimeFormat)}:<small>${time.format(
+        "ss"
+      )}</small> ${time.format("a")}`;
+    } else {
+      return time.format(`${baseTimeFormat}a`);
+    }
   }
 
   localizedDateText(time, classList) {
-    // Ensure we return something if it's today or a future day
-    if (time < this.tomorrow) {
-      if (time > this.today) {
-        if (classList.contains("preciseTimeSeconds")) {
-          return `${time.format("h:mm:")}<small>${time.format(
-            "ss"
-          )}</small> ${time.format("a")}`;
-        } else {
-          return time.format("h:mma");
-        }
+    // If we're dealing with yesterday or today (not the future)
+    if (time < this.tomorrowEnd && time > this.yesterdayStart) {
+      // If we're dealing with yesterday or tomorrow, we prepend that
+      let prefix = "";
+      if (time < this.todayStart) {
+        prefix = "Yesterday ";
+      } else if (time > this.todayEnd) {
+        prefix = "Tomorrow ";
       }
+      return (
+        prefix +
+        this.hourFormat(time, "h:mm", classList.contains("preciseTimeSeconds"))
+      );
     }
-    // Return yesterday specific things
-    if (time > this.yesterday) {
-      if (classList.contains("preciseTimeSeconds")) {
-        return `Yesterday ${time.format("h:mm:")}<small>${time.format(
-          "ss"
-        )}</small> ${time.format("a")}`;
-      } else {
-        return `Yesterday ${time.format("h:mma")}`;
-      }
-    }
-    // If it's preciseTimeSeconds, format with seconds
-    if (classList.contains("preciseTimeSeconds")) {
+
+    // If it's preciseTime (or preciseTimeSeconds), always show the hours and mins
+    if (
+      classList.contains("preciseTime") ||
+      classList.contains("preciseTimeSeconds")
+    ) {
+      // Include the year if it isn't the current year
       if (time.year() === moment().year()) {
-        return `${time.format("MMM Do[,] h:mm:")}<small>${time.format(
-          "ss"
-        )}</small> ${time.format("a")}`;
+        return this.hourFormat(
+          time,
+          "MMM Do[,] h:mm",
+          classList.contains("preciseTimeSeconds")
+        );
       } else {
-        return `${time.format("YYYY-MM-DD h:mma")}<small>${time.format(
-          "ss"
-        )}</small> ${time.format("a")}`;
-      }
-    }
-    // If it's preciseTime, always show hours and mins
-    if (classList.contains("preciseTime")) {
-      if (time.year() === moment().year()) {
-        return time.format("MMM Do[,] h:mma");
-      } else {
-        return time.format("YYYY-MM-DD h:mma");
+        return this.hourFormat(
+          time,
+          "YYYY-MM-DD h:mm",
+          classList.contains("preciseTimeSeconds")
+        );
       }
     }
     // Otherwise, format in basic format
