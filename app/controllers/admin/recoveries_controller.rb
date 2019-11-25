@@ -20,6 +20,7 @@ class Admin::RecoveriesController < Admin::BaseController
 
   def update
     @stolen_record = StolenRecord.unscoped.find(params[:id])
+    @stolen_record.bike = Bike.unscoped.find_by_id(@stolen_record.bike_id)
     if params[:stolen_record][:mark_as_eligible].present?
       @stolen_record.recovery_display_status = "waiting_on_decision"
       redirect = new_admin_recovery_display_path(@stolen_record)

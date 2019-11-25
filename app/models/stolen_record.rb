@@ -263,11 +263,7 @@ class StolenRecord < ActiveRecord::Base
       can_share_recovery: ("#{info[:can_share_recovery]}" =~ /t|1/i).present?,
     )
 
-    # Sometimes bikes are hidden or deleted, only modify bike if bike can be found
-    return true unless bike.present?
-
     bike.stolen = false
-
     bike.save.tap { |was_saved| notify_of_promoted_alert_recovery if was_saved }
   end
 
