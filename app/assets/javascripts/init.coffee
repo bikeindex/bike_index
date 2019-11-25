@@ -163,8 +163,13 @@ window.updateSearchBikesHeaderLink = ->
 
 renderGivingPopup = ->
   if window.givingTuesdayModal
-    console.log "giving tuesday modal!!!"
-    $("#givingTuesdayModal").modal("show")
+    hideModal = localStorage.getItem("hideGivingTuesdayModal")
+    unless hideModal == "true"
+      $("#givingTuesdayModal").modal("show")
+      new BikeIndex.Payments
+      # NOTE: This is also set in payments.coffee on payment submission
+      $("#givingTuesdayModal").on 'hide.bs.modal', ->
+        localStorage.setItem("hideGivingTuesdayModal", "true")
 
 $(document).ready ->
   window.updateSearchBikesHeaderLink()
