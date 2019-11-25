@@ -1,5 +1,5 @@
 import log from "../utils/log";
-import TimeParser from "../utils/time_parser";
+import TimeParser from "../utils/time_parser.js";
 import BinxMapping from "./binx_mapping.js";
 import BinxAdmin from "./admin/binx_admin.js";
 import BinxAppOrgExport from "./binx_org_export.js";

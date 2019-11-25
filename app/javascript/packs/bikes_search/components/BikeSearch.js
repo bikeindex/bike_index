@@ -3,6 +3,7 @@
 import React, { Fragment, Component } from "react";
 
 import Loading from "../../Loading";
+import TimeParser from "../../utils/time_parser.js";
 import honeybadger from "../../utils/honeybadger";
 
 class BikeSearch extends Component {
