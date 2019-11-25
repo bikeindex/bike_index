@@ -161,6 +161,11 @@ window.updateSearchBikesHeaderLink = ->
     else
       localStorage.setItem('distance', distance)
 
+renderGivingPopup = ->
+  if window.givingTuesdayModal
+    console.log "giving tuesday modal!!!"
+    $("#givingTuesdayModal").modal("show")
+
 $(document).ready ->
   window.updateSearchBikesHeaderLink()
   window.BikeIndex.Init = new BikeIndex.Init
@@ -168,3 +173,4 @@ $(document).ready ->
     new window.ManufacturersSelect('#binx_registration_widget #b_param_manufacturer_id')
   warnIfUnsupportedBrowser()
   enableEscapeForModals()
+  renderGivingPopup()

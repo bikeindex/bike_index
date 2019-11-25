@@ -156,3 +156,11 @@
               = t(".partner_organizations")
               %span.count-display
                 = number_with_delimiter(Counts.organizations)
+
+:javascript
+  window.givingTuesdayModalLoaded = true;
+- modal_body = capture_haml do
+  .modal-body
+    %p
+      Support our non-profit efforts to fight bike theft
+= render partial: "shared/modal", locals: { title: "Annual Giving Campaign", id: "givingTuesdayModal", modal_body: modal_body }
