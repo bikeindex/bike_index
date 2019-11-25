@@ -161,21 +161,10 @@ window.updateSearchBikesHeaderLink = ->
     else
       localStorage.setItem('distance', distance)
 
-renderGivingPopup = ->
-  if window.givingTuesdayModal
-    hideModal = localStorage.getItem("hideGivingTuesdayModal")
-    unless hideModal == "true"
-      $("#givingTuesdayModal").modal("show")
-      new BikeIndex.Payments
-      # NOTE: This is also set in payments.coffee on payment submission
-      $("#givingTuesdayModal").on 'hide.bs.modal', ->
-        localStorage.setItem("hideGivingTuesdayModal", "true")
-
 $(document).ready ->
   window.updateSearchBikesHeaderLink()
+  enableEscapeForModals()
   window.BikeIndex.Init = new BikeIndex.Init
   if document.getElementById('binx_registration_widget')
     new window.ManufacturersSelect('#binx_registration_widget #b_param_manufacturer_id')
   warnIfUnsupportedBrowser()
-  enableEscapeForModals()
-  renderGivingPopup()
