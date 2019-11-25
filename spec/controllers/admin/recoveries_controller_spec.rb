@@ -35,6 +35,18 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
         expect(response).to redirect_to(admin_recoveries_path)
         expect(flash).to be_present
       end
+      context "bike deleted" do
+        it "updates waiting_on_decision to not_displayed" do
+          stolen_record.bike.update_attributes(hidden: true)
+          expect do
+            put :update, params
+          end.to change(RecoveryDisplay, :count).by 0
+          stolen_record.reload
+          expect(stolen_record.recovery_display_status).to eq "not_displayed"
+          expect(response).to redirect_to(admin_recoveries_path)
+          expect(flash).to be_present
+        end
+      end
     end
     context "admin marks recovery as can_share_recovery" do
       let(:stolen_record) { FactoryBot.create(:stolen_record, can_share_recovery: true, recovery_display_status: "not_eligible") }
