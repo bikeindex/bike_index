@@ -163,15 +163,16 @@
   .modal-dialog{ role: "document" }
     .modal-content.donate-block
       .modal-body.select-amount
+        %button.close{ "aria-label" => "Close", "data-dismiss" => "modal", type: "button" }
+          %span{ "aria-hidden" => "true" }
+            &times;
+        = image_tag "revised/logo_blue_black.svg", class: "modal-title-logo", alt: "Bike Index home"
         %h2.modal-title
           Annual Giving Campaign
-          %button.close{ "aria-label" => "Close", "data-dismiss" => "modal", type: "button" }
-            %span{ "aria-hidden" => "true" }
-              &times;
         %hr
-        %p
-          %em
-            Support our non-profit effort to fight bike theft!
+        %p.mt-2
+          %strong.em
+            We rely on your donations to support our efforts!
         %form#bikeindex-stripe-initial-form
           %ul.row.amount-list
             - numbers = [10, 25, 50, 100, 200, 300, 500]
@@ -188,8 +189,10 @@
             = submit_tag t("payments.form.next"), class: "btn btn-primary"
 
         %p.nfp-info
-          - nonprofit_link = link_to t("payments.form.501c3_nonprofit"), news_url("bike-index--now-a-nonprofit")
-          = t("payments.form.bike_index_is_a_nonprofit_html", nonprofit_link: nonprofit_link)
+          Bike Index is a #{link_to "501(c)(3) nonprofit", news_url("bike-index--now-a-nonprofit")}
+          %br
+          Support our non-profit effort to fight bike theft!
+
 
 <script src="https://checkout.stripe.com/checkout.js"></script>
 

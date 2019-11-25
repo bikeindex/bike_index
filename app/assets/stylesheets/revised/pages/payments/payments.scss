@@ -170,5 +170,13 @@ $payments-page-breakpoint: "sm";
   &.modal-content {
     background: none;
     padding: 0 !important;
+    border: 6px solid #3498db;
+
+    .modal-title-logo {
+      display: block;
+      margin: 0 auto;
+      width: 4rem;
+      height: auto;
+    }
   }
 }
