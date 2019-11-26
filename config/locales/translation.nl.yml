@@ -4114,7 +4114,7 @@ nl:
       login: Login
       register: Registreer
       teamed_up: We hebben samengewerkt met Bike Index!
-      non_profit: Bike Index is een 501 (c) (3) non-profit en de meest gebruikte fietsregistratieservice
+      non_profit: Bike Index is een non-profit organisatie en de meest gebruikte fietsregistratieservice
         ter wereld.
       security: Bij BikeHub geloven we dat fietsbeveiliging meer is dan alleen een
         sterk U-slot.
@@ -5205,6 +5205,13 @@ nl:
       used_by: Gebruikt door
       value_of_bikes_recovered: Meer dan %{value} aan fietsen die teruggevonden zijn
       you_get_your_bike_back: U krijgt uw fiets terug
+      annual_giving_campaign: Jaarlijkse campagne geven
+      is_a_nonprofit_html: Bike Index is een %{blog_link} <br> Steun onze non-profit
+        inspanning om fietsdiefstal te bestrijden!
+      nonprofit_501c3: non-profit organisatie
+      skip: Overslaan
+      we_rely_on_your_contributions: We vertrouwen op uw donaties om onze inspanningen
+        te ondersteunen!
     recovery_stories:
       recovery_stories: Verhalen over teruggekregen fietsen
     update_browser:
@@ -5316,7 +5323,7 @@ nl:
       your_donation_saved_bikes: Uw donatie van € %{amount} heeft zojuist de fietsen
         gered.
     form:
-      501c3_nonprofit: 501 (c) (3) non-profit
+      501c3_nonprofit: non-profit organisatie
       bike_index_is_a_nonprofit_html: Bike Index is een %{nonprofit_link}.
       donate_today: Doneer vandaag nog
       next: volgende>
@@ -5633,3 +5640,6 @@ nl:
         searching_html: Zoeken naar fietsen met serienummers vergelijkbaar met %{serial}
           ...
       serial_search: 'Serienummer: %{serial}'
+    payments:
+      enter_the_minimum_amount: Voer een bedrag groter dan 1 in
+      select_or_enter_amount: Selecteer of voer een bedrag in

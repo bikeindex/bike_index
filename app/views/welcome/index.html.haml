@@ -166,11 +166,11 @@
             &times;
         = image_tag "revised/logo_blue_black.svg", class: "modal-title-logo", alt: "Bike Index home"
         %h2.modal-title
-          Annual Giving Campaign
+          = t(".annual_giving_campaign")
         %hr
         %p.mt-2
           %strong.em
-            We rely on your donations to support our efforts!
+            = t(".we_rely_on_your_contributions")
         %form#bikeindex-stripe-initial-form
           %ul.row.amount-list
             - numbers = [10, 25, 50, 100, 200, 300, 500]
@@ -181,19 +181,19 @@
             %li.col-xs-8
               .input-group
                 .input-group-addon
-                  $
-                %input#arbitrary-amount.form-control{ type: "number", min: "0", placeholder: t("payments.form.other_amount"), step: 0.01 }
+                  = t("number.currency.format.unit")
+                %input#arbitrary-amount.form-control{ type: "number", min: "0", placeholder: t("payments.form.other_amount"), step: 1 }
           .row
             .col-xs-6.text-left
               %a.btn.btn-secondary.no-donate-btn{ "aria-label" => "Close", "data-dismiss" => "modal" }
-                Skip
+                = t(".skip")
             .col-xs-6.text-right
               = submit_tag t("payments.form.next"), class: "btn btn-primary"
 
         %p.nfp-info
-          Bike Index is a #{link_to "501(c)(3) nonprofit", news_url("bike-index--now-a-nonprofit")}
-          %br
-          Support our non-profit effort to fight bike theft!
+          - link = link_to t(".nonprofit_501c3"), news_url("bike-index--now-a-nonprofit")
+          = t(".is_a_nonprofit_html", blog_link: link)
+
 
 
 <script src="https://checkout.stripe.com/checkout.js"></script>
