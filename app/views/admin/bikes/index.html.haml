@@ -82,10 +82,30 @@
       %strong
         = number_with_delimiter(@bikes.total_count)
       = "Matching Bike".pluralize(@bikes.total_count)
-      - if @user.present?
-        %strong
-          Owned by
-          = link_to "#{@user.email}", admin_user_path(@user)
+    - if (params.keys & %w[search_user_id search_manufacturer_id]).any? || current_organization.present?
+      %ul.mt-0
+        - if current_organization.present?
+          %li
+            By organization:
+            = link_to current_organization.name, admin_organization_path(current_organization.to_param)
+        - if params[:search_user_id].present?
+          %li
+            - if @user.present?
+              Owned by
+              = link_to "#{@user.email}", admin_user_path(@user)
+            - else
+              No user found for
+              %code
+                = params[:search_user_id]
+        - if params[:search_manufacturer_id].present?
+          %li
+            - if @manufacturer.present?
+              Made by
+              = link_to @manufacturer.name, admin_manufacturer_path(@manufacturer)
+            - else
+              No manufacturer found for
+              %code
+                = params[:search_manufacturer_id]
   .col-md-7
     = form_tag admin_bikes_path, method: :get, class: "form-inline" do
       = hidden_field_tag :sort

@@ -3,61 +3,65 @@
   = @manufacturer.name
 
 %hr
-  %table.table-list
-    %tbody
-      %tr
-        %th
-          ID
-        %td
-          = @manufacturer.id
-      %tr
-        %th
-          Slug
-        %td
-          = @manufacturer.slug
-      %tr
-        %th
-          Open Year
-        %td
-          = @manufacturer.open_year
-      %tr
-        %th
-          Close Year
-        %td
-          = @manufacturer.close_year
-      - if @manufacturer.website.present?
+.row
+  .col-6
+    %table.table-list
+      %tbody
         %tr
           %th
-            Manufacturer website
+            ID
           %td
-            = link_to @manufacturer.website, @manufacturer.website
-      %tr
-        %th
-          Description
-        %td
-          = @manufacturer.description
-      %tr
-        %th
-          Bikes
-        %td
-          = @manufacturer.bikes.count
-      %tr
-        %th
-          Components
-        %td
-          = @manufacturer.components.count
-      - if @manufacturer.logo.present?
-        %th
-          Logo
-        %td
-          = image_tag @manufacturer.logo.url(:thumb)
-      %tr
-        %th
-          Frame Maker?
-        %td.table-cell-check
-          - if @manufacturer.frame_maker
-            &#x2713
-
-
-= link_to "Edit", edit_admin_manufacturer_url(@manufacturer), class: "btn btn-success"
-= link_to "Delete", admin_manufacturer_url(@manufacturer), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger"
+            = @manufacturer.id
+        %tr
+          %th
+            Slug
+          %td
+            = @manufacturer.slug
+        %tr
+          %th
+            Open Year
+          %td
+            = @manufacturer.open_year
+        %tr
+          %th
+            Close Year
+          %td
+            = @manufacturer.close_year
+        - if @manufacturer.website.present?
+          %tr
+            %th
+              Manufacturer website
+            %td
+              = link_to @manufacturer.website, @manufacturer.website
+        %tr
+          %th
+            Description
+          %td
+            = @manufacturer.description
+        %tr
+          %th
+            Bikes
+          %td
+            %a{ href: admin_bikes_path(search_manufacturer_id: @manufacturer.slug) }
+              = @manufacturer.bikes.count
+              %small
+                view
+        %tr
+          %th
+            Components
+          %td
+            = @manufacturer.components.count
+        - if @manufacturer.logo.present?
+          %th
+            Logo
+          %td
+            = image_tag @manufacturer.logo.url(:thumb)
+        %tr
+          %th
+            Frame Maker?
+          %td.table-cell-check
+            - if @manufacturer.frame_maker
+              &#x2713
+  .col-6
+    = link_to "Edit", edit_admin_manufacturer_url(@manufacturer), class: "btn btn-success"
+    = link_to "Delete", admin_manufacturer_url(@manufacturer), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger"
