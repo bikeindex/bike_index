@@ -183,8 +183,12 @@
                 .input-group-addon
                   $
                 %input#arbitrary-amount.form-control{ type: "number", min: "0", placeholder: t("payments.form.other_amount"), step: 0.01 }
-          .next-step
-            = submit_tag t("payments.form.next"), class: "btn btn-primary"
+          .row
+            .col-xs-6.text-left
+              %a.close.btn.btn-secondary{ "aria-label" => "Close", "data-dismiss" => "modal", style: "display: inline-block; float: none;" }
+                Skip
+            .col-xs-6.text-right
+              = submit_tag t("payments.form.next"), class: "btn btn-primary"
 
         %p.nfp-info
           Bike Index is a #{link_to "501(c)(3) nonprofit", news_url("bike-index--now-a-nonprofit")}
