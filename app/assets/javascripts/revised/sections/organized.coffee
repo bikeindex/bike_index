@@ -18,7 +18,7 @@ class BikeIndex.Organized extends BikeIndex
     # This is copied and adapted from binx_admin.js, we need to switch to es6 :(
     $('#timeSelectionBtnGroup button').on 'click', (e) ->
       period = $(e.target).attr('data-period')
-      current_url = location.href..replace(/&?period=[^&]*/, "").replace(/&?timezone=[^&]*/, "").replace(/\?&/, "?").replace(/&&/g, "&").replace(/(\?|&)$/, "")
+      current_url = location.href.replace(/&?period=[^&]*/, "").replace(/&?timezone=[^&]*/, "").replace(/\?&/, "?").replace(/&&/g, "&").replace(/(\?|&)$/, "")
       if current_url.match(/\?/)
         joiner = '&'
       else
