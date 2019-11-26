@@ -192,7 +192,6 @@ RSpec.describe SessionsController, type: :controller do
             expect(user.last_login_at).to be_blank
             expect(user.last_login_ip).to be_blank
             session[:partner] = "bikehub"
-            pp session
             expect(user).to receive(:authenticate).and_return(true)
             request.env["HTTP_REFERER"] = user_home_url
             request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
