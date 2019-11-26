@@ -242,7 +242,7 @@ module ControllerHelpers
     # We set partner in session because of AuthorizationsController - but we don't want the session to stick around
     # so people can navigate around the site and return to the sign in without unexpected results
     # we ALWAYS want to remove the session partner
-    partner = session.delete(:partner)
+    partner = session[:partner]
     partner ||= params[:partner]
     # fallback to assigning via session, but if partner was set via param, still remove the session partner.
     @sign_in_partner = partner&.downcase == "bikehub" ? "bikehub" : nil # For now, only permit bikehub partner
