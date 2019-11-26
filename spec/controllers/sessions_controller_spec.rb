@@ -43,7 +43,7 @@ RSpec.describe SessionsController, type: :controller do
           it "actually sets it, renders bikehub layout" do
             session[:partner] = "bikehub"
             get :new, return_to: "/bikes/12?contact_owner=true"
-            expect(session[:partner]).to be_nil
+            # commented in PR#1435 expect(session[:partner]).to be_nil
             expect(response).to render_template("layouts/application_bikehub")
           end
         end
@@ -192,6 +192,7 @@ RSpec.describe SessionsController, type: :controller do
             expect(user.last_login_at).to be_blank
             expect(user.last_login_ip).to be_blank
             session[:partner] = "bikehub"
+            pp session
             expect(user).to receive(:authenticate).and_return(true)
             request.env["HTTP_REFERER"] = user_home_url
             request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
