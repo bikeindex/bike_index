@@ -26,7 +26,7 @@ module Sessionable
     end
 
     if sign_in_partner.present?
-      session.delete(:partner) # No longer removing in other places, PR#1435
+      session.delete(:partner) # Only removing once signed in, PR#1435
       redirect_to bikehub_url("account") and return # Only partner rn is bikehub, hardcode it
     elsif user.unconfirmed?
       render_partner_or_default_signin_layout(redirect_path: please_confirm_email_users_path) and return
