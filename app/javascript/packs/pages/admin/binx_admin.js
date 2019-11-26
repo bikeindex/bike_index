@@ -99,7 +99,8 @@ function BinxAdmin() {
         const period = $(e.target).attr("data-period");
         const current_url = location.href
           .replace(/\??&?period=[^&]*&?/, "")
-          .replace(/\??&?period=[^&]*&?/, "");
+          .replace(/\??&?timezone=[^&]*&?/, "");
+
         if (current_url.match(/\?/)) {
           joiner = "&";
         } else {
