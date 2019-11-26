@@ -28,7 +28,7 @@
             %li.col-xs-8
               .input-group
                 .input-group-addon
-                  $
+                  = t("number.currency.format.unit")
                 %input#arbitrary-amount.form-control{ type: 'number', min: '0', placeholder: t('.other_amount'), step: 1, value: @initial_amount, class: ('active' if @initial_amount) }
         .next-step
           = submit_tag t(".next"), class: 'btn btn-primary'
