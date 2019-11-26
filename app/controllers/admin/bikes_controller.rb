@@ -149,6 +149,10 @@ class Admin::BikesController < Admin::BaseController
       # do example here because it doesn't work w/ @user and also unscopes
       bikes = bikes.example if params[:search_example].present?
     end
+    if params[:search_manufacturer_id].present?
+      @manufacturer = Manufacturer.friendly_find(params[:search_manufacturer_id])
+      bikes = bikes.where(manufacturer_id: @manufacturer&.id)
+    end
     bikes = bikes.non_example if params[:search_non_example].present?
     bikes = bikes.organization(current_organization) if current_organization.present?
     bikes = bikes.admin_text_search(params[:search_email]) if params[:search_email].present?
