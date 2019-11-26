@@ -1,6 +1,7 @@
 class BikeIndex.Payments extends BikeIndex
   constructor: ->
     @initializeEventListeners()
+    @t = window.BikeIndex.translator("payments");
 
   initializeEventListeners: ->
     $('#bikeindex-stripe-initial-form').submit (e) =>
@@ -16,15 +17,15 @@ class BikeIndex.Payments extends BikeIndex
   # Returns null if there isn't a valid value selected
   getAmountSelected: ->
     unless $('.amount-list .active').length > 0
-      window.BikeIndexAlerts.add('info', 'Please select or enter an amount')
+      window.BikeIndexAlerts.add('info', @t("select_or_enter_amount"))
       return null
     $active = $('.amount-list .active')
     # Return the button amount if an arbitrary amount isn't entered
     return $active.data('amount') unless $active.attr('id') == 'arbitrary-amount'
     amount_cents = parseFloat($active.val()) * 100
-    # Return the entered amount if it's greater than $0.50 (Stripe minimum)
-    return amount_cents if amount_cents > 50
-    window.BikeIndexAlerts.add('info', 'Please enter an amount greater than 0.50')
+    # Return the entered amount if it's greater than $1 (Stripe minimum is 0.50)
+    return amount_cents if amount_cents > 100
+    window.BikeIndexAlerts.add('info', @t('enter_the_minimum_amount'))
     null
 
   selectPaymentOption: (e) ->

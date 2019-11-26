@@ -3249,6 +3249,9 @@ en:
       stolen: Stolen
       unknown: Unknown
       unknown_brand: Unknown Brand
+    payments:
+      enter_the_minimum_amount: Please enter an amount greater than 1
+      select_or_enter_amount: Please select or enter an amount
   landing_pages:
     ambassadors_current:
       after_a_couple_of_recoveries_i_got_hooked: >-
