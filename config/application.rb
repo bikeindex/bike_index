@@ -51,11 +51,14 @@ module Bikeindex
     end
 
     config.generators do |g|
-      g.factory_bot true
-      g.helper false
-      g.javascripts false
-      g.stylesheets false
+      g.factory_bot nil
+      g.helper nil
+      g.decorator nil
+      g.javascripts nil
+      g.stylesheets nil
       g.template_engine nil
+      g.serializer nil
+      g.assets nil
       g.test_framework :rspec, view_specs: false, routing_specs: false, controller_specs: false
     end
   end
