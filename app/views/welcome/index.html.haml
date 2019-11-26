@@ -160,7 +160,7 @@
 #givingTuesdayModal.modal.fade
   .modal-dialog{ role: "document" }
     .modal-content.donate-block
-      .modal-body.select-amount
+      .modal-body.select-amount{ style: "padding: 12px 15px 24px;" }
         %button.close{ "aria-label" => "Close", "data-dismiss" => "modal", type: "button" }
           %span{ "aria-hidden" => "true" }
             &times;
@@ -185,7 +185,7 @@
                 %input#arbitrary-amount.form-control{ type: "number", min: "0", placeholder: t("payments.form.other_amount"), step: 0.01 }
           .row
             .col-xs-6.text-left
-              %a.close.btn.btn-secondary{ "aria-label" => "Close", "data-dismiss" => "modal", style: "display: inline-block; float: none;" }
+              %a.btn.btn-secondary.no-donate-btn{ "aria-label" => "Close", "data-dismiss" => "modal" }
                 Skip
             .col-xs-6.text-right
               = submit_tag t("payments.form.next"), class: "btn btn-primary"
