@@ -98,9 +98,11 @@ function BinxAdmin() {
         let joiner;
         const period = $(e.target).attr("data-period");
         const current_url = location.href
-          .replace(/\??&?period=[^&]*&?/, "")
-          .replace(/\??&?timezone=[^&]*&?/, "");
-
+          .replace(/&?period=[^&]*/, "") // Grab period=
+          .replace(/&?timezone=[^&]*/, "") // Grab timezone=
+          .replace(/\?&/, "?") // replace ?& with just ?
+          .replace(/&&/g, "&") // Grab &&, replace with single
+          .replace(/(\?|&)$/, ""); // Grab ending ? or & - we don't need it
         if (current_url.match(/\?/)) {
           joiner = "&";
         } else {
