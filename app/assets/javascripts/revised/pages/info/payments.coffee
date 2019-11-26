@@ -21,10 +21,10 @@ class BikeIndex.Payments extends BikeIndex
     $active = $('.amount-list .active')
     # Return the button amount if an arbitrary amount isn't entered
     return $active.data('amount') unless $active.attr('id') == 'arbitrary-amount'
-    amount = parseFloat($active.val())
-    # Return the entered amount if it's greater than 0
-    return amount if amount > 0
-    window.BikeIndexAlerts.add('info', 'Please enter a number')
+    amount_cents = parseFloat($active.val()) * 100
+    # Return the entered amount if it's greater than $0.50 (Stripe minimum)
+    return amount_cents if amount_cents > 50
+    window.BikeIndexAlerts.add('info', 'Please enter an amount greater than 0.50')
     null
 
   selectPaymentOption: (e) ->
