@@ -95,7 +95,6 @@ gem "chartkick" # Display charts
 gem "coderay" # Pretty print code
 gem "coffee-rails"
 gem "groupdate" # Required for charts
-gem "jquery-datatables-rails", "~>3.4.0"
 gem "premailer-rails" # Inline styles for email
 gem "sprockets-rails", "~> 3.0.4"
 gem "therubyracer"
