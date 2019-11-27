@@ -10,7 +10,7 @@
       window.swagger_url = "#{ENV['BASE_URL']}/api/#{api_version}/swagger_doc";
     <link href='https://fonts.googleapis.com/css?family=Anonymous+Pro:400,400italic,700&subset=latin,latin-ext' rel='stylesheet' type='text/css'>
     = javascript_include_tag 'documentation_v2_and_v3'
-    
+
   %body.swagger-section
     %header#header
       .content-header
@@ -63,14 +63,14 @@
             Bikes
         %li
           %a#m_resource_me{ href: "#resource_me" }
-            Me        
+            Me
         %li
           %a#m_resource_manufacturers{ href: "#resource_manufacturers" }
             Manufacturers
         %li
           %a#m_resource_selections{ href: "#resource_selections" }
             Selections
-            
+
       %a#m_ref_oauth{ href: "#ref_oauth" }
         OAuth
       %ul
@@ -107,7 +107,7 @@
 
         :markdown
           #{render "documentation/api_v2/info_header"}
-      
+
       .start-of-swagger-ui
         %h2
           Bike Index API V2 endpoints
@@ -116,7 +116,7 @@
     #message-bar.swagger-ui-wrap &nbsp;
 
     #swagger-ui-container.swagger-ui-wrap
-  
+
     .applications-panel#applications_list
       .container-fluid
         .clearfix
