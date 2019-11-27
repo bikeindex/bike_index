@@ -126,10 +126,3 @@
   }
 }
 
-// Datatables pagination
-// it uses outdated shit. Has to be overridden. It has to be overridden hard.
-.dataTables_wrapper {
-  .dataTables_paginate .pagination {
-    @include legacy-pagination-override;
-  }
-}
