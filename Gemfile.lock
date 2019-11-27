@@ -276,11 +276,6 @@ GEM
       pry-byebug (~> 3.4)
       pry-coolline (~> 0.2)
     journey (1.0.4)
-    jquery-datatables-rails (3.4.0)
-      actionpack (>= 3.1)
-      jquery-rails
-      railties (>= 3.1)
-      sass-rails
     jquery-rails (4.1.1)
       rails-dom-testing (>= 1, < 3)
       railties (>= 4.2.0)
@@ -547,16 +542,6 @@ GEM
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
       rb-inotify (~> 0.9, >= 0.9.7)
-    sass-rails (6.0.0)
-      sassc-rails (~> 2.1, >= 2.1.1)
-    sassc (2.2.1)
-      ffi (~> 1.9)
-    sassc-rails (2.1.2)
-      railties (>= 4.0.0)
-      sassc (>= 2.0)
-      sprockets (> 3.0)
-      sprockets-rails
-      tilt
     secure_headers (2.5.2)
       user_agent_parser
     shellany (0.0.1)
@@ -725,7 +710,6 @@ DEPENDENCIES
   i18n_generators
   jazz_fingers
   journey (~> 1.0.3)
-  jquery-datatables-rails (~> 3.4.0)
   jquery-rails
   kaminari
   kramdown
