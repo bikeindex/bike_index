@@ -10062,6 +10062,62 @@ body .selectize-dropdown .active {
     word-break: break-all
 }
 
+div.dataTables_length label {
+    float: left;
+    text-align: left
+}
+
+div.dataTables_length select {
+    width: 75px
+}
+
+div.dataTables_filter label {
+    float: right
+}
+
+div.dataTables_info {
+    padding-top: 8px
+}
+
+div.dataTables_paginate {
+    float: right;
+    margin: 0
+}
+
+table.dataTable {
+    clear: both;
+    margin-bottom: 6px!important
+}
+
+table.dataTable thead .sorting,table.dataTable thead .sorting_asc,table.dataTable thead .sorting_desc,table.dataTable thead .sorting_asc_disabled,table.dataTable thead .sorting_desc_disabled {
+    cursor: pointer;
+    *cursor: hand
+}
+
+table.dataTable thead .sorting {
+    background: url('dataTables/sort_both-e91e6041558febe6bdfe4ae210d970ff.png') no-repeat center right
+}
+
+table.dataTable thead .sorting_asc {
+    background: url('dataTables/sort_asc-b844f85595556a633a9be83daddd145d.png') no-repeat center right
+}
+
+table.dataTable thead .sorting_desc {
+    background: url('dataTables/sort_desc-daf28f2bf7a2efeef7b4098bf01d5fb4.png') no-repeat center right
+}
+
+table.dataTable thead .sorting_asc_disabled {
+    background: url('dataTables/sort_asc_disabled-e25484c40de2bd788361458d37a39973.png') no-repeat center right
+}
+
+table.dataTable thead .sorting_desc_disabled {
+    background: url('dataTables/sort_desc_disabled-f9b354a60d62f23a71ef8b290ff7fcc5.png') no-repeat center right
+}
+
+table.dataTable th:active {
+    outline: none
+}
+
 .DTTT_dropdown {
     z-index: 2002
 }
@@ -10124,6 +10180,28 @@ body .selectize-dropdown .active {
     }
 }
 
+@media (max-width: 600px) {
+    .full-screen-table .dataTables_length {
+        *zoom: 1;
+        width: 100%;
+        margin-bottom: 20px
+    }
+
+    .full-screen-table .dataTables_length:before,.full-screen-table .dataTables_length:after {
+        display: table;
+        content: "";
+        line-height: 0
+    }
+
+    .full-screen-table .dataTables_length:after {
+        clear: both
+    }
+
+    .full-screen-table .dataTables_length label {
+        float: right;
+        margin-bottom: 0
+    }
+}
 
 .table td.table-cell-check {
     font-family: Courier;
@@ -16341,4 +16419,8 @@ body.welcome-page .content:before {
 
 .text-success {
     color: #27ae60;
+}
+
+.dataTables_length {
+    display: none;
 }
