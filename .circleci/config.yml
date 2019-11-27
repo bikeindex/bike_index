@@ -53,7 +53,14 @@ jobs:
             tar -xzf git.tgz
             cd git-${GIT_VERSION}
 
+            export DEFAULT_HELP_FORMAT="man"
+            autoconf
+            ./configure
+
             sudo make prefix=/usr/local all
+            sudo make install
+            sudo make man && sudo make install-man
+
             sudo cp ./git /usr/local/bin/git
       - save_cache:
           key: cache-{{ .Environment.CACHE_VERSION }}-git-2.22.0
