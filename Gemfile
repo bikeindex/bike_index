@@ -1,8 +1,4 @@
 source "https://rubygems.org"
-
-git_source(:github) { |repo| "https://github.com/#{repo}.git" }
-git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
-
 # If you bump the Ruby version, make sure to update the Vagrantfile appropriately
 ruby "2.5.5"
 gem "rails", "4.2.11"
@@ -86,7 +82,7 @@ gem "doorkeeper", "~> 3.1.0"
 gem "grape", "~> 0.19.1"
 gem "grape-active_model_serializers", "~> 1.4.0"
 gem "grape-swagger", "0.11"
-gem "swagger-ui_rails", github: "jmromer/swagger-ui_rails", branch: "bike_index_0.1.7"
+gem "swagger-ui_rails"
 gem "wine_bouncer"
 
 # Secure things
@@ -101,8 +97,7 @@ gem "coffee-rails"
 gem "groupdate" # Required for charts
 gem "jquery-datatables-rails", "~>3.4.0"
 gem "premailer-rails" # Inline styles for email
-gem "sprockets", "4.0.0"
-gem "sprockets-rails"
+gem "sprockets-rails", "~> 3.0.4"
 gem "therubyracer"
 gem "uglifier"
 gem "webpacker", "~> 4.x"
@@ -143,7 +138,7 @@ end
 
 group :development do
   gem "bullet"
-  gem "faraday-request_response_logger", github: "pramod-sharma/faraday-request_response_logger"
+  gem "faraday-request_response_logger", git: "https://github.com/pramod-sharma/faraday-request_response_logger"
   gem "guard"
   gem "guard-rspec", require: false
   gem "guard-rubocop", require: false
