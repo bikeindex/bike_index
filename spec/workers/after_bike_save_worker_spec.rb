@@ -78,9 +78,20 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
 
   describe "serialized" do
     let!(:bike) { FactoryBot.create(:stolen_bike) }
+    before do
+      require 'webmock/rspec'
+      stub = stub_request(:post, "example.com")
+    end
+    it "doesn't call the webhook" do
+      instance.post_bike_to_webhook(instance.serialized(bike))
+      expect(stub).to_not have_been_requested
+    end
+    context "with webhook url set" do
     it "calls the things we expect it to call" do
+      ENV["BIKE_WEBHOOK_URL"] = "example.com"
       ENV["BIKE_WEBHOOK_AUTH_TOKEN"] = "xxxx"
-      serialized = instance.serialized(bike)
+      instance.post_bike_to_webhook(instance.serialized(bike))
+      expect(stub).to_not have_been_requested
       # expect(serialized[:auth_token]).to eq "xxxx" # fails on travis :/
       expect(serialized[:bike][:id]).to be_present
       expect(serialized[:bike][:stolen_record]).to be_present
