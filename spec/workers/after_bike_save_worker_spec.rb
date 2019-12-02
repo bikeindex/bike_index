@@ -84,7 +84,6 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
     end
     context "with webhook url set" do
       it "calls the things we expect it to call" do
-        ENV["BIKE_WEBHOOK_AUTH_TOKEN"] = "xxxx"
         stub_const("AfterBikeSaveWorker::POST_URL", "https://example.com")
         expect_any_instance_of(Faraday::Connection).to receive(:post) { true }
         instance.post_bike_to_webhook(instance.serialized(bike))
