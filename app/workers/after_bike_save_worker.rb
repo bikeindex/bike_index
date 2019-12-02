@@ -21,6 +21,7 @@ class AfterBikeSaveWorker < ApplicationWorker
   end
 
   def post_bike_to_webhook(post_body)
+    return true unless POST_URL.present?
     Faraday.new(url: POST_URL).post do |req|
       req.headers["Content-Type"] = "application/json"
       req.body = post_body.to_json

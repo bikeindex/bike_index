@@ -78,13 +78,16 @@ RSpec.describe AfterBikeSaveWorker, type: :job do
 
   describe "serialized" do
     let!(:bike) { FactoryBot.create(:stolen_bike) }
-    it "calls the things we expect it to call" do
-      ENV["BIKE_WEBHOOK_AUTH_TOKEN"] = "xxxx"
-      serialized = instance.serialized(bike)
-      # expect(serialized[:auth_token]).to eq "xxxx" # fails on travis :/
-      expect(serialized[:bike][:id]).to be_present
-      expect(serialized[:bike][:stolen_record]).to be_present
-      expect(serialized[:update]).to be_truthy
+    it "doesn't call the webhook" do
+      expect_any_instance_of(Faraday::Connection).to_not receive(:post) { true }
+      instance.post_bike_to_webhook(instance.serialized(bike))
+    end
+    context "with webhook url set" do
+      it "calls the things we expect it to call" do
+        stub_const("AfterBikeSaveWorker::POST_URL", "https://example.com")
+        expect_any_instance_of(Faraday::Connection).to receive(:post) { true }
+        instance.post_bike_to_webhook(instance.serialized(bike))
+      end
     end
   end
 
