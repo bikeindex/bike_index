@@ -10,7 +10,6 @@
         - else
           = t(".donate_today")
     .select-amount
-
       - unless @is_payment
         %p= t(".select_an_amount")
       %form#bikeindex-stripe-initial-form
@@ -23,13 +22,13 @@
             - numbers = [10, 25, 50, 100, 200, 300, 500]
             - numbers.each do |amount|
               %li.col-xs-4
-                %a.btn.btn-secondary{ data: { amount: amount } }
+                %a.btn.btn-secondary{ data: { amount: amount * 100 } }
                   = number_to_currency(amount, precision: 0)
             %li.col-xs-8
               .input-group
                 .input-group-addon
                   = t("number.currency.format.unit")
-                %input#arbitrary-amount.form-control{ type: 'number', min: '0', placeholder: t('.other_amount'), step: 1, value: @initial_amount, class: ('active' if @initial_amount) }
+                %input#arbitrary-amount.form-control{ type: 'number', min: '0', placeholder: t('.other_amount'), step: 0.01, value: @initial_amount, class: ('active' if @initial_amount) }
         .next-step
           = submit_tag t(".next"), class: 'btn btn-primary'
 

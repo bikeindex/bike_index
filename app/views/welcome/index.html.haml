@@ -176,13 +176,13 @@
             - numbers = [10, 25, 50, 100, 200, 300, 500]
             - numbers.each do |amount|
               %li.col-xs-4
-                %a.btn.btn-secondary{ data: { amount: amount } }
+                %a.btn.btn-secondary{ data: { amount: amount * 100 } }
                   = number_to_currency(amount, precision: 0)
             %li.col-xs-8
               .input-group
                 .input-group-addon
                   = t("number.currency.format.unit")
-                %input#arbitrary-amount.form-control{ type: "number", min: "0", placeholder: t("payments.form.other_amount"), step: 1 }
+                %input#arbitrary-amount.form-control{ type: "number", min: "0", placeholder: t("payments.form.other_amount"), step: 0.01 }
           .row
             .col-xs-6.text-left
               %a.btn.btn-secondary.no-donate-btn{ "aria-label" => "Close", "data-dismiss" => "modal" }
