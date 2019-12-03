@@ -15,7 +15,7 @@ class BikeIndex.Payments extends BikeIndex
       @selectPaymentOption(e)
 
   # Returns null if there isn't a valid value selected
-  getAmountSelected: ->
+  getAmountCentsSelected: ->
     unless $('.amount-list .active').length > 0
       window.BikeIndexAlerts.add('info', @t("select_or_enter_amount"))
       return null
@@ -35,15 +35,14 @@ class BikeIndex.Payments extends BikeIndex
     $target.addClass('active')
 
   submitDonation: ->
-    amount = @getAmountSelected()
-    return true unless amount
+    amount_cents = @getAmountCentsSelected()
+    return true unless amount_cents
     # Remove alerts if they're around - because we've got a value now!
     $('.primary-alert-block .alert').remove()
     is_arbitrary = $('.amount-list input.active').length > 0
-    @openStripeForm(is_arbitrary, amount)
+    @openStripeForm(is_arbitrary, amount_cents)
 
-  openStripeForm: (is_arbitrary, amount) ->
-    amount_cents = amount * 100
+  openStripeForm: (is_arbitrary, amount_cents) ->
     $stripe_form = $('#stripe_form')
     # Checkout integration custom: https://stripe.com/docs/checkout#integration-custom
     # Use the token to create the charge with a server-side script.
