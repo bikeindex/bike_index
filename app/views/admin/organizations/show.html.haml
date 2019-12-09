@@ -134,6 +134,12 @@
               False
           %em.less-strong
             Set this via #{link_to "invoices", admin_organization_invoices_path(organization_id: @organization.to_param)}
+          - if @organization.paid_feature_slugs.any? && current_user.developer?
+            %br
+            %small
+              Features:
+              - @organization.paid_feature_slugs.each do |slug|
+                %code=slug
       %tr
         %td
           Parent
@@ -162,6 +168,14 @@
               - @organization.nearby_organizations.each do |suborg|
                 %li
                   = link_to suborg.name, admin_organization_path(suborg)
+        - elsif @organization.regional_parents.any?
+          %td
+            Regional Parent
+          %td
+            %ul{ style: "font-size: 80%;" }
+              - @organization.regional_parents.each do |regiona_parent|
+                %li
+                  = link_to regiona_parent.name, admin_organization_path(regiona_parent)
 
   - if @organization.bike_shop?
     .col-md-6

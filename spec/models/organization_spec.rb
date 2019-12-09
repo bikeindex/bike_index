@@ -274,18 +274,18 @@ RSpec.describe Organization, type: :model do
       end
     end
     context "regional_bike_codes" do
-      let!(:regional_org) { FactoryBot.create(:organization, :in_nyc) }
+      let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
       let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, paid_feature_slugs: %w[regional_bike_counts regional_stickers]) }
       it "sets on the regional organization" do
-        regional_org.reload
+        regional_child.reload
         regional_parent.update_attributes(updated_at: Time.current)
         expect(regional_parent.paid_feature_slugs).to eq(%w[regional_bike_counts regional_stickers])
-        expect(regional_parent.regional_ids).to eq([regional_org.id])
+        expect(regional_parent.regional_ids).to eq([regional_child.id])
         expect(Organization.regional.pluck(:id)).to eq([regional_parent.id])
-        expect(regional_org.regional_parents.pluck(:id)).to eq([regional_parent.id])
-        regional_org.reload
+        expect(regional_child.regional_parents.pluck(:id)).to eq([regional_parent.id])
+        regional_child.reload
         # It's private, so, gotta send
-        expect(regional_org.send(:calculated_paid_feature_slugs)).to eq(["bike_codes"])
+        expect(regional_child.send(:calculated_paid_feature_slugs)).to eq(["bike_codes"])
       end
     end
   end
