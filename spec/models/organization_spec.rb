@@ -233,6 +233,7 @@ RSpec.describe Organization, type: :model do
       invoice.update_attributes(child_paid_feature_slugs_string: "csv_exports")
       expect(invoice.feature_slugs).to eq(["csv_exports"])
       organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
+      # expect(UpdateAssociatedOrganizationsWorker.jobs.count).to eq 1 # TODO: Rails 5 update - after_commit, test enqueue
       expect(organization.is_paid).to be_truthy
       expect(organization.paid_feature_slugs).to eq(["csv_exports"])
       expect(organization.paid_for?("csv_exports")).to be_truthy

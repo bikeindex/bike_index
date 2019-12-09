@@ -117,6 +117,7 @@ RSpec.describe Invoice, type: :model do
       expect(invoice.paid_features.pluck(:id)).to match_array([paid_feature2.id, paid_feature_one_time.id])
       # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
       organization.update_attributes(updated_at: Time.current)
+      # expect(UpdateAssociatedOrganizationsWorker.jobs.count).to eq 1 # TODO: Rails 5 update - after_commit, test enqueue
       organization.reload
       expect(organization.paid_feature_slugs).to eq([])
     end

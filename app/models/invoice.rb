@@ -159,7 +159,6 @@ class Invoice < ActiveRecord::Base
   end
 
   def update_organization
-    organization.update_attributes(updated_at: Time.current)
-    organization.child_organizations.each { |o| o.update_attributes(updated_at: Time.current) }
+    UpdateAssociatedOrganizationsWorker.perform_async(organization_id)
   end
 end
