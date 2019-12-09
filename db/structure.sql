@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.3
--- Dumped by pg_dump version 10.3
+-- Dumped from database version 11.5
+-- Dumped by pg_dump version 11.5
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -12,22 +12,9 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
+SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
 
 --
 -- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
@@ -860,7 +847,6 @@ CREATE TABLE public.external_registry_bikes (
 --
 
 CREATE SEQUENCE public.external_registry_bikes_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -897,7 +883,6 @@ CREATE TABLE public.external_registry_credentials (
 --
 
 CREATE SEQUENCE public.external_registry_credentials_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -1683,7 +1668,8 @@ CREATE TABLE public.organizations (
     child_ids jsonb,
     search_radius integer DEFAULT 50 NOT NULL,
     location_latitude double precision,
-    location_longitude double precision
+    location_longitude double precision,
+    regional_ids jsonb
 );
 
 
@@ -4858,4 +4844,6 @@ INSERT INTO schema_migrations (version) VALUES ('20191106210313');
 INSERT INTO schema_migrations (version) VALUES ('20191108195338');
 
 INSERT INTO schema_migrations (version) VALUES ('20191117123105');
+
+INSERT INTO schema_migrations (version) VALUES ('20191209160937');
 

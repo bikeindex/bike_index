@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Organization, type: :model do
   describe "#bikes_nearby" do
     it "returns bikes within the search radius" do
-      la_bike = FactoryBot.create(:bike, :in_los_angeles)
+      FactoryBot.create(:bike, :in_los_angeles)
       nyc_bike_ids = FactoryBot.create_list(:bike, 2, :in_nyc).map(&:id)
       stolen_nyc_bike = FactoryBot.create(:stolen_bike_in_nyc)
 
@@ -233,6 +233,7 @@ RSpec.describe Organization, type: :model do
       invoice.update_attributes(child_paid_feature_slugs_string: "csv_exports")
       expect(invoice.feature_slugs).to eq(["csv_exports"])
       organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
+      # expect(UpdateAssociatedOrganizationsWorker.jobs.count).to eq 1 # TODO: Rails 5 update - after_commit, test enqueue
       expect(organization.is_paid).to be_truthy
       expect(organization.paid_feature_slugs).to eq(["csv_exports"])
       expect(organization.paid_for?("csv_exports")).to be_truthy
@@ -270,6 +271,21 @@ RSpec.describe Organization, type: :model do
         expect(Organization.bike_actions.pluck(:id)).to eq([organization.id])
         user.reload
         expect(user.send_unstolen_notifications?).to be_truthy
+      end
+    end
+    context "regional_bike_codes" do
+      let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
+      let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, paid_feature_slugs: %w[regional_bike_counts regional_stickers]) }
+      it "sets on the regional organization" do
+        regional_child.reload
+        regional_parent.update_attributes(updated_at: Time.current)
+        expect(regional_parent.paid_feature_slugs).to eq(%w[regional_bike_counts regional_stickers])
+        expect(regional_parent.regional_ids).to eq([regional_child.id])
+        expect(Organization.regional.pluck(:id)).to eq([regional_parent.id])
+        expect(regional_child.regional_parents.pluck(:id)).to eq([regional_parent.id])
+        regional_child.reload
+        # It's private, so, gotta send
+        expect(regional_child.send(:calculated_paid_feature_slugs)).to eq(["bike_codes"])
       end
     end
   end
