@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe Organization, type: :model do
   describe "#bikes_nearby" do
     it "returns bikes within the search radius" do
-      la_bike = FactoryBot.create(:bike, :in_los_angeles)
+      FactoryBot.create(:bike, :in_los_angeles)
       nyc_bike_ids = FactoryBot.create_list(:bike, 2, :in_nyc).map(&:id)
       stolen_nyc_bike = FactoryBot.create(:stolen_bike_in_nyc)
 
@@ -270,6 +270,17 @@ RSpec.describe Organization, type: :model do
         expect(Organization.bike_actions.pluck(:id)).to eq([organization.id])
         user.reload
         expect(user.send_unstolen_notifications?).to be_truthy
+      end
+    end
+    context "regional_bike_codes" do
+      let!(:regional_org) { FactoryBot.create(:organization, :in_nyc) }
+      let!(:regional_parent) { FactoryBot.create(:organization_with_regional_bike_counts, :in_nyc, paid_feature_slugs: %w[regional_bike_counts regional_stickers]) }
+      it "sets on the regional organization" do
+        # It's private, so...
+        expect(regional_parent.send(:calculated_sub_organization_ids)).to eq()
+        regional_parent.reload
+        expect(region_parent.sub_organization_ids).to eq({ child: [], regional: [regional_org.id] })
+        expect(regional_org.regional_parents.pluck(:id)).to eq([regional_parent.id])
       end
     end
   end

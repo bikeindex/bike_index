@@ -124,6 +124,10 @@ class Organization < ActiveRecord::Base
 
   def ascend_imports?; ascend_name.present? end
 
+  def child_ids; sub_organization_ids["child"] end
+
+  def regional_ids; sub_organization_ids["regional"] end
+
   def parent?; child_ids.present? end
 
   def child_organizations; Organization.where(id: child_ids) end
@@ -240,7 +244,7 @@ class Organization < ActiveRecord::Base
       self.slug = new_slug
     end
     self.access_token ||= SecurityTokenizer.new_token
-    self.child_ids = calculated_children.pluck(:id) || []
+    self.sub_organization_ids = calculated_sub_organization_ids
     set_auto_user
     set_ambassador_organization_defaults if ambassador?
     locations.each { |l| l.save unless l.shown == allowed_show }
@@ -346,6 +350,13 @@ class Organization < ActiveRecord::Base
     return if search_coordinates_set?
     self.location_latitude = search_location&.latitude
     self.location_longitude = search_location&.longitude
+  end
+
+  def calculated_sub_organization_ids
+    {
+      child: calculated_children.pluck(:id) || [],
+      regional: nearby_organizations.pluck(:id) || []
+    }
   end
 
   def calculated_paid_feature_slugs
