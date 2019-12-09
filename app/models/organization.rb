@@ -62,6 +62,8 @@ class Organization < ActiveRecord::Base
   scope :approved, -> { where(is_suspended: false, approved: true) }
   # Eventually there will be other actions beside organization_messages, but for now it's just messages
   scope :bike_actions, -> { where("paid_feature_slugs ?| array[:keys]", keys: %w[messages unstolen_notifications impound_bikes]) }
+  # Regional orgs have to have the paid feature slug AND the search location set
+  scope :regional, -> { where.not(location_latitude: nil).where.not(location_longitude: nil).where("paid_feature_slugs ?| array[:keys]", keys: ["regional_bike_counts"]) }
 
   before_validation :set_calculated_attributes
   before_save :set_search_coordinates
@@ -124,15 +126,13 @@ class Organization < ActiveRecord::Base
 
   def ascend_imports?; ascend_name.present? end
 
-  def child_ids; sub_organization_ids["child"] end
-
-  def regional_ids; sub_organization_ids["regional"] end
-
   def parent?; child_ids.present? end
 
   def child_organizations; Organization.where(id: child_ids) end
 
   def bounding_box; Geocoder::Calculations.bounding_box(search_coordinates, search_radius) end
+
+  def regional_parents; self.class.regional.where("regional_ids @> ?", [id].to_json) end
 
   def nearby_organizations
     return self.class.none unless regional? && search_coordinates_set?
@@ -244,7 +244,8 @@ class Organization < ActiveRecord::Base
       self.slug = new_slug
     end
     self.access_token ||= SecurityTokenizer.new_token
-    self.sub_organization_ids = calculated_sub_organization_ids
+    self.child_ids = calculated_children.pluck(:id) || []
+    self.regional_ids = nearby_organizations.pluck(:id) || []
     set_auto_user
     set_ambassador_organization_defaults if ambassador?
     locations.each { |l| l.save unless l.shown == allowed_show }
@@ -352,15 +353,12 @@ class Organization < ActiveRecord::Base
     self.location_longitude = search_location&.longitude
   end
 
-  def calculated_sub_organization_ids
-    {
-      child: calculated_children.pluck(:id) || [],
-      regional: nearby_organizations.pluck(:id) || []
-    }
-  end
-
   def calculated_paid_feature_slugs
     fslugs = current_invoices.feature_slugs
+    # If part of a region with regional_stickers, the organization receives the stickers paid feature
+    if regional_parents.any?
+      fslugs += ["bike_codes"] if regional_parents.any? { |o| o.paid_for?("regional_stickers") }
+    end
     return fslugs unless parent_organization_id.present?
     (fslugs + current_parent_invoices.map(&:child_paid_feature_slugs).flatten).uniq
   end

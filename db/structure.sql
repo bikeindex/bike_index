@@ -1665,11 +1665,11 @@ CREATE TABLE public.organizations (
     registration_field_labels jsonb DEFAULT '{}'::jsonb,
     pos_kind integer DEFAULT 0,
     previous_slug character varying,
-    legacy_child_ids jsonb,
+    child_ids jsonb,
     search_radius integer DEFAULT 50 NOT NULL,
     location_latitude double precision,
     location_longitude double precision,
-    sub_organization_ids jsonb
+    regional_ids jsonb
 );
 
 
