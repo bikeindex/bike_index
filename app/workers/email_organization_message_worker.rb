@@ -1,5 +1,4 @@
 class EmailOrganizationMessageWorker < ApplicationWorker
-
   sidekiq_options queue: "notify"
 
   def perform(organization_message_id)
