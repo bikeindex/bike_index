@@ -150,7 +150,7 @@ RSpec.describe AdminMailer, type: :mailer do
         mail = described_class.theft_alert_notification(theft_alert, notification_type: :recovered)
 
         expect(mail.to).to eq(["stolenbikealerts@bikeindex.org"])
-        expect(mail.subject).to match("Promoted Alert recovered: #{theft_alert.id}")
+        expect(mail.subject).to match("RECOVERED Promoted Alert: #{theft_alert.id}")
         expect(mail.body.encoded).to include("RECOVERED")
       end
     end

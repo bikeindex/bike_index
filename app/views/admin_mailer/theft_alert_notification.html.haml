@@ -1,6 +1,10 @@
 %p
   = @message
 
+- if @recovered
+  %p
+    = link_to "View recovery", admin_recovery_url(@theft_alert.stolen_record)
+  %hr
 
 %h4{style: "margin-top: 1em;"}
   = link_to "Promoted Alert",
