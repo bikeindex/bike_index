@@ -22,8 +22,6 @@
                 %td
                   %span.convertTime
                     = l(alert.created_at, format: :convert_time)
-                  %small.less-strong
-                    = alert.id
                 %td= alert.theft_alert_plan.name
                 %td= alert.status
                 %td
