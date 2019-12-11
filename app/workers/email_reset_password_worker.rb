@@ -1,5 +1,4 @@
 class EmailResetPasswordWorker < ApplicationWorker
-
   sidekiq_options queue: "notify"
 
   def perform(user_id)

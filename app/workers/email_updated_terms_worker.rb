@@ -1,5 +1,4 @@
 class EmailUpdatedTermsWorker < ApplicationWorker
-
   sidekiq_options queue: "low_priority"
   sidekiq_options retry: false
 

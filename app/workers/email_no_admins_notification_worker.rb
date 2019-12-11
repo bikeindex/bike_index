@@ -1,5 +1,4 @@
 class EmailNoAdminsNotificationWorker < ApplicationWorker
-
   sidekiq_options queue: "notify"
 
   def perform(organization_id)

@@ -1,5 +1,4 @@
 class EmailStolenNotificationWorker < ApplicationWorker
-
   sidekiq_options queue: "notify"
 
   def perform(stolen_notification_id)

@@ -1,5 +1,4 @@
 class EmailLightspeedNotificationWorker < ApplicationWorker
-
   sidekiq_options queue: "notify"
 
   def perform(organization_id, api_key)

@@ -1,5 +1,4 @@
 class EmailOwnershipInvitationWorker < ApplicationWorker
-
   sidekiq_options queue: "notify"
 
   def perform(ownership_id)

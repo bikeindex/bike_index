@@ -1,5 +1,4 @@
 class EmailInvoiceWorker < ApplicationWorker
-
   sidekiq_options queue: "notify"
 
   def perform(id)

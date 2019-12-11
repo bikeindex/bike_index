@@ -1,5 +1,4 @@
 class EmailPartialRegistrationWorker < ApplicationWorker
-
   sidekiq_options queue: "notify"
 
   def perform(b_param_id)
