@@ -1,4 +1,6 @@
 class EmailBikePossiblyFoundNotificationWorker < ApplicationWorker
+  sidekiq_options queue: "notify"
+
   def perform(bike_id, match_class, match_id)
     bike = Bike.find(bike_id)
     match = match_class.to_s.constantize.find(match_id)
