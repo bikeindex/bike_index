@@ -19,8 +19,14 @@
           %tbody
             - theft_alerts.each do |alert|
               %tr
-                %td= alert.created_at.to_date.to_s(:long)
+                %td
+                  %span.convertTime
+                    = l(alert.created_at, format: :convert_time)
                 %td= alert.theft_alert_plan.name
                 %td= alert.status
-                %td.convertTime= l(alert.begin_at, format: :convert_time) if alert.begin_at.present?
-                %td.convertTime= l(alert.end_at, format: :convert_time) if alert.end_at.present?
+                %td
+                  - if alert.begin_at.present?
+                    %span.convertTime= l(alert.begin_at, format: :convert_time)
+                %td
+                  - if alert.end_at.present?
+                    .convertTime= l(alert.end_at, format: :convert_time)

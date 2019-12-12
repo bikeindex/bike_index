@@ -46,11 +46,14 @@ class AdminMailer < ActionMailer::Base
     @theft_alert_plan = theft_alert.theft_alert_plan
     @creator = theft_alert.creator
     @bike = theft_alert.bike
+    if notification_type == :recovered
+      @recovered = true
+      msg_subject = "RECOVERED Promoted Alert: #{@theft_alert.id}"
+    else
+      msg_subject = "Promoted Alert #{notification_type}: #{@theft_alert.id}"
+    end
     @message = "#{notification_type.upcase} - a Promoted Alert bike was just #{notification_type}"
 
-    mail(
-      to: "stolenbikealerts@bikeindex.org",
-      subject: "Promoted Alert #{notification_type}: #{@theft_alert.id}",
-    )
+    mail(to: "stolenbikealerts@bikeindex.org", subject: msg_subject)
   end
 end

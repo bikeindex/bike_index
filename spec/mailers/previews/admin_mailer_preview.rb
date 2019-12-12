@@ -29,4 +29,9 @@ class AdminMailerPreview < ActionMailer::Preview
     theft_alert = TheftAlert.last
     AdminMailer.theft_alert_notification(theft_alert)
   end
+
+  def theft_alert_recovery
+    theft_alert = TheftAlert.last
+    AdminMailer.theft_alert_notification(theft_alert, notification_type: :recovered)
+  end
 end

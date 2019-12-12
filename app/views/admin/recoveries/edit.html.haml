@@ -25,6 +25,13 @@
         This recovery is not displayed.
       = button_to "Mark Eligible for display", admin_recovery_path(id: @recovery.id, stolen_record: { mark_as_eligible: true }), method: :put, class: "btn btn-lg btn-success"
   - else
+    - if !@recovery.recovered?
+      .col-12
+        %h1.text-danger.d-block
+          This #{@bike.type} has not been marked recovered
+      .col-12.mb-4
+        %p.text-warning
+          You're viewing this in error, you shouldn't be on this page
     .col-12
       %h4
         Display Status:

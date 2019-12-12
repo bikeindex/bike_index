@@ -40,6 +40,8 @@
         %tr
           %td
             = link_to l(theft_alert.created_at, format: :convert_time), edit_admin_theft_alert_path(theft_alert), class: "convertTime"
+            %small.less-strong
+              = theft_alert.id
           - unless skip_bike
             %td
               - if theft_alert.bike.present?
