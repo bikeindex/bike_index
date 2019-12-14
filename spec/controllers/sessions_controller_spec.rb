@@ -158,11 +158,10 @@ RSpec.describe SessionsController, type: :controller do
     end
     context "partner=bikehub" do
       it "redirects to bikehub" do
-        get :destroy
+        get :destroy, partner: "bikehub"
         expect(cookies.signed[:auth]).to be_nil
         expect(session[:user_id]).to be_nil
         expect(response).to redirect_to "https://new.bikehub.com"
-        expect(flash[:notice]).to be_present
         expect(session[:return_to]).to be_nil
         expect(session[:partner]).to be_nil
         expect(session[:passive_organization_id]).to be_nil
