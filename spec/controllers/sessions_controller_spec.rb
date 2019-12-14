@@ -156,6 +156,18 @@ RSpec.describe SessionsController, type: :controller do
       expect(session[:passive_organization_id]).to be_nil
       expect(session[:whatever]).to be_nil
     end
+    context "partner=bikehub" do
+      it "redirects to bikehub" do
+        get :destroy, partner: "bikehub"
+        expect(cookies.signed[:auth]).to be_nil
+        expect(session[:user_id]).to be_nil
+        expect(response).to redirect_to "https://new.bikehub.com"
+        expect(session[:return_to]).to be_nil
+        expect(session[:partner]).to be_nil
+        expect(session[:passive_organization_id]).to be_nil
+        expect(session[:whatever]).to be_nil
+      end
+    end
     context "unconfirmed user" do
       let(:user) { FactoryBot.create(:user) }
       it "logs out the user" do
