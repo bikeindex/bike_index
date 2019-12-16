@@ -167,7 +167,7 @@ RSpec.describe UsersController, type: :controller do
             expect_any_instance_of(AfterUserCreateWorker).to receive(:send_welcoming_email)
             request.env["HTTP_ACCEPT_LANGUAGE"] = "nl,en;q=0.9"
             post :create, user: user_attributes, partner: "bikehub"
-            expect(response).to redirect_to("https://new.bikehub.com/account")
+            expect(response).to redirect_to("https://new.bikehub.com/account?reauthenticate_bike_index=true")
             user = User.find_by_email("poo@pile.com")
             user.perform_create_jobs # TODO: Rails 5 update - this is an after_commit issue
             user.reload
@@ -188,7 +188,7 @@ RSpec.describe UsersController, type: :controller do
               post :create, user: user_attributes
             end.to change(User, :count).by(1)
             expect(flash).to_not be_present
-            expect(response).to redirect_to("https://new.bikehub.com/account")
+            expect(response).to redirect_to("https://new.bikehub.com/account?reauthenticate_bike_index=true")
             expect(session[:partner]).to be_nil
             user = User.order(:created_at).last
             expect(user.email).to eq(user_attributes[:email])
@@ -248,7 +248,7 @@ RSpec.describe UsersController, type: :controller do
             it "logins and redirect when confirmation succeeds" do
               get :confirm, id: user.id, code: user.confirmation_token, partner: "bikehub"
               expect(User.from_auth(cookies.signed[:auth])).to eq(user)
-              expect(response).to redirect_to "https://new.bikehub.com/account"
+              expect(response).to redirect_to "https://new.bikehub.com/account?reauthenticate_bike_index=true"
               expect(session[:partner]).to be_nil
             end
             context "in session" do
@@ -256,7 +256,7 @@ RSpec.describe UsersController, type: :controller do
                 session[:partner] = "bikehub"
                 get :confirm, id: user.id, code: user.confirmation_token
                 expect(User.from_auth(cookies.signed[:auth])).to eq(user)
-                expect(response).to redirect_to "https://new.bikehub.com/account"
+                expect(response).to redirect_to "https://new.bikehub.com/account?reauthenticate_bike_index=true"
                 expect(session[:partner]).to be_nil
               end
             end
