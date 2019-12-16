@@ -197,7 +197,7 @@ RSpec.describe SessionsController, type: :controller do
             request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
             post :create, session: { password: "would be correct" }
             expect(cookies.signed[:auth][1]).to eq(user.auth_token)
-            expect(response).to redirect_to "https://new.bikehub.com/account"
+            expect(response).to redirect_to "https://new.bikehub.com/account?reauthenticate_bike_index=true"
             expect(session[:partner]).to be_nil
             user.reload
             expect(user.last_login_at).to be_within(1.second).of Time.current
