@@ -2071,7 +2071,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2097,7 +2097,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -3705,7 +3705,6 @@ en:
         used by law enforcement agencies, universities and advocates to connect recovery
         bikes with their owners.
       register: Register
-      security: At BikeHub, we believe bike security is more than just a strong U-lock.
       sign_up_message: Signing up here will log you in to BikeHub
       teamed_up: We teamed up with Bike Index!
     email:
