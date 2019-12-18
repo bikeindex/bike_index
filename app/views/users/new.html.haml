@@ -45,7 +45,8 @@
 
             .checkbox.terms-and-conditions
               %label
-                = f.check_box :terms_of_service
+                -# BikeHub requires TOC agreement
+                = f.check_box :terms_of_service, required: sign_in_partner == "bikehub"
                 - if sign_in_partner == "bikehub"
                   = t(".agree_bikeindex_bikehub_toc_html",
                   bikehub_toc_link: link_to(t(".terms_and_conditions"), nil, data: { target: bikehub_url("terms") }, class: "no-tab"),
