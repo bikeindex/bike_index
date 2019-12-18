@@ -7,6 +7,10 @@
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     = javascript_include_tag 'application_revised'
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
+    :javascript
+      window.BikeIndex.translator = (keyspace) => {
+        return (key, args={}) => I18n.t(`javascript.${keyspace}.${key}`, args);
+      }
   %body.payments-layout-body{ id: page_id }
     = render 'layouts/revised_messages'
     .container-fluid.payments-top-container
