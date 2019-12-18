@@ -260,6 +260,17 @@ RSpec.describe UsersController, type: :controller do
                 expect(session[:partner]).to be_nil
               end
             end
+            context "user signed in" do
+              it "redirects" do
+                expect(user.confirmed?).to be_falsey
+                set_current_user(user)
+                get :confirm, id: user.id, code: user.confirmation_token, partner: "bikehub"
+                expect(User.from_auth(cookies.signed[:auth])).to eq(user)
+                expect(response).to redirect_to "https://new.bikehub.com/account?reauthenticate_bike_index=true"
+                expect(session[:partner]).to be_nil
+                expect(user.confirmed?).to be_truthy
+              end
+            end
           end
 
           it "shows a view when confirmation fails" do
@@ -267,6 +278,17 @@ RSpec.describe UsersController, type: :controller do
             get :confirm, id: user.id, code: "Wtfmate"
             expect(response).to render_template :confirm_error_bad_token
           end
+        end
+      end
+
+      context "user signed in and confirmed with partner" do
+        include_context :logged_in_as_user
+        it "redirects" do
+          expect(user.confirmed?).to be_truthy
+          get :confirm, id: user.id, code: user.confirmation_token, partner: "bikehub"
+          expect(User.from_auth(cookies.signed[:auth])).to eq(user)
+          expect(response).to redirect_to "https://new.bikehub.com/account?reauthenticate_bike_index=true"
+          expect(session[:partner]).to be_nil
         end
       end
 

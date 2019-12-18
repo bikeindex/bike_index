@@ -34,7 +34,13 @@ class UsersController < ApplicationController
       @user = User.find(params[:id])
       if @user.confirmed?
         flash[:success] = translation(:already_confirmed)
-        render_partner_or_default_signin_layout(redirect_path: new_session_path)
+        # If signed in, redirect to partner if it should
+        if current_user.present? && sign_in_partner.present?
+          session.delete(:partner) # Only removing once signed in, PR#1435
+          redirect_to bikehub_url("account?reauthenticate_bike_index=true") and return # Only partner rn is bikehub, hardcode it
+        else
+          render_partner_or_default_signin_layout(redirect_path: new_session_path)
+        end
       else
         if @user.confirm(params[:code])
           sign_in_and_redirect(@user)
