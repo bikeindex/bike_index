@@ -1,4 +1,4 @@
-class DuplicateBikeGroup < ActiveRecord::Base
+class DuplicateBikeGroup < ApplicationRecord
   has_many :normalized_serial_segments
   has_many :bikes, through: :normalized_serial_segments
 

@@ -1,4 +1,4 @@
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   include Phonifyerable
   include ActionView::Helpers::SanitizeHelper
   include FeatureFlaggable

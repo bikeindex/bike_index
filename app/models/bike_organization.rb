@@ -1,4 +1,4 @@
-class BikeOrganization < ActiveRecord::Base
+class BikeOrganization < ApplicationRecord
   belongs_to :bike
   belongs_to :organization
   validates_presence_of :bike_id, :organization_id

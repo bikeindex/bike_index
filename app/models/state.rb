@@ -1,4 +1,4 @@
-class State < ActiveRecord::Base
+class State < ApplicationRecord
   validates :country, presence: true
   validates :name, :abbreviation, uniqueness: true, presence: true
 

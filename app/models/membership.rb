@@ -1,4 +1,4 @@
-class Membership < ActiveRecord::Base
+class Membership < ApplicationRecord
   MEMBERSHIP_TYPES = %w(admin member).freeze
 
   acts_as_paranoid

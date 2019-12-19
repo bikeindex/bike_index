@@ -1,4 +1,4 @@
-class BulkImport < ActiveRecord::Base
+class BulkImport < ApplicationRecord
   VALID_PROGRESSES = %i[pending ongoing finished].freeze
   mount_uploader :file, BulkImportUploader
 

@@ -1,7 +1,7 @@
 class IntegrationAssociationError < StandardError
 end
 
-class Integration < ActiveRecord::Base
+class Integration < ApplicationRecord
   validates_presence_of :access_token
   validates_presence_of :information
 

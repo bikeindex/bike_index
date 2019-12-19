@@ -1,4 +1,4 @@
-class ExternalRegistryCredential < ActiveRecord::Base
+class ExternalRegistryCredential < ApplicationRecord
   validates :type, uniqueness: true
   validates :app_id, uniqueness: { scope: :type }
 

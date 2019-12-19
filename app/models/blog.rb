@@ -1,4 +1,4 @@
-class Blog < ActiveRecord::Base
+class Blog < ApplicationRecord
   include ActionView::Helpers::TextHelper
   include Localizable
 

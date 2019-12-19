@@ -1,4 +1,4 @@
-class BikeCodeBatch < ActiveRecord::Base
+class BikeCodeBatch < ApplicationRecord
   belongs_to :user # Creator of the batch
   belongs_to :organization
   has_many :bike_codes

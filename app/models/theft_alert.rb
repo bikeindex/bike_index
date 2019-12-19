@@ -1,4 +1,4 @@
-class TheftAlert < ActiveRecord::Base
+class TheftAlert < ApplicationRecord
   enum status: { pending: 0, active: 1, inactive: 2 }.freeze
 
   validates :theft_alert_plan,

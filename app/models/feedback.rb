@@ -1,4 +1,4 @@
-class Feedback < ActiveRecord::Base
+class Feedback < ApplicationRecord
   validates_presence_of :body, :email, :title
   belongs_to :user
   before_validation :set_calculated_attributes

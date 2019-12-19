@@ -1,4 +1,4 @@
-class AlertImage < ActiveRecord::Base
+class AlertImage < ApplicationRecord
   belongs_to :stolen_record
   validates :stolen_record, presence: true
 

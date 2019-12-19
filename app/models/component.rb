@@ -1,4 +1,4 @@
-class Component < ActiveRecord::Base
+class Component < ApplicationRecord
   include ActiveModel::Dirty
 
   def self.old_attr_accessible

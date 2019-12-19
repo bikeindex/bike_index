@@ -1,4 +1,4 @@
-class TheftAlertPlan < ActiveRecord::Base
+class TheftAlertPlan < ApplicationRecord
   include Amountable
   include Localizable
 

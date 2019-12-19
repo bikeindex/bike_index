@@ -1,4 +1,4 @@
-class Manufacturer < ActiveRecord::Base
+class Manufacturer < ApplicationRecord
   include AutocompleteHashable
 
   validates_presence_of :name

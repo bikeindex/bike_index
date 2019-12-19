@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class OrganizationMessage < ActiveRecord::Base
+class OrganizationMessage < ApplicationRecord
   KIND_ENUM = { geolocated: 0, abandoned_bike: 1 }.freeze
 
   belongs_to :organization

@@ -1,4 +1,4 @@
-class Payment < ActiveRecord::Base
+class Payment < ApplicationRecord
   include Amountable
   KIND_ENUM = { stripe: 0, check: 1 }.freeze
 

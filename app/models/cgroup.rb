@@ -1,4 +1,4 @@
-class Cgroup < ActiveRecord::Base
+class Cgroup < ApplicationRecord
   # Note: Cgroup is short for component_group
   include FriendlySlugFindable
 

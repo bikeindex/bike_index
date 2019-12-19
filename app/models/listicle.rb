@@ -1,4 +1,4 @@
-class Listicle < ActiveRecord::Base
+class Listicle < ApplicationRecord
   belongs_to :blog
   mount_uploader :image, ListicleImageUploader
 

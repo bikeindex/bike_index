@@ -1,4 +1,4 @@
-class RearGearType < ActiveRecord::Base
+class RearGearType < ApplicationRecord
   include FriendlySlugFindable
 
   validates_presence_of :name, :count

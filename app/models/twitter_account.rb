@@ -1,4 +1,4 @@
-class TwitterAccount < ActiveRecord::Base
+class TwitterAccount < ApplicationRecord
   include Geocodeable
 
   has_many :tweets, dependent: :destroy

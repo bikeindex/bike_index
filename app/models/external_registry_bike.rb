@@ -1,4 +1,4 @@
-class ExternalRegistryBike < ActiveRecord::Base
+class ExternalRegistryBike < ApplicationRecord
   belongs_to :country, class_name: "Country"
 
   validates \
