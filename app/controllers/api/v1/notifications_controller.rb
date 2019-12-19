@@ -1,8 +1,8 @@
 module Api
   module V1
     class NotificationsController < ApiV1Controller
-      before_filter :authenticate_notification_permission
-      skip_before_filter :verify_authenticity_token
+      before_action :authenticate_notification_permission
+      skip_before_action :verify_authenticity_token
 
       def create
         bike = Bike.find(params[:notification_hash][:bike_id])

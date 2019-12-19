@@ -1,7 +1,7 @@
 module Api
   module V1
     class UsersController < ApiV1Controller
-      before_filter :bust_cache!, only: [:current]
+      before_action :bust_cache!, only: [:current]
 
       def default_serializer_options
         {

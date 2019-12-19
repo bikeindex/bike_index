@@ -1,6 +1,6 @@
 module Organized
   class ManageController < Organized::AdminController
-    before_filter :assign_organization, only: [:index, :update, :locations]
+    before_action :assign_organization, only: [:index, :update, :locations]
 
     def index
       @organization.ensure_auto_user

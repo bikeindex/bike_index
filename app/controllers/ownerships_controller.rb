@@ -1,6 +1,6 @@
 class OwnershipsController < ApplicationController
-  before_filter :find_ownership
-  before_filter :authenticate_user_and_set_flash
+  before_action :find_ownership
+  before_action :authenticate_user_and_set_flash
 
   def show
     bike = Bike.unscoped.find(@ownership.bike_id)

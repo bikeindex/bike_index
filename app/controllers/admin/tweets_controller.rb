@@ -1,5 +1,5 @@
 class Admin::TweetsController < Admin::BaseController
-  before_filter :find_tweet, except: [:new, :create, :index]
+  before_action :find_tweet, except: [:new, :create, :index]
 
   def index
     @tweets = Tweet.excluding_retweets.order(created_at: :desc)

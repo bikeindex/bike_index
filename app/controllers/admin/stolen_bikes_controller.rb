@@ -1,5 +1,5 @@
 class Admin::StolenBikesController < Admin::BaseController
-  before_filter :find_bike, only: [:edit, :destroy, :approve, :update, :regenerate_alert_image]
+  before_action :find_bike, only: [:edit, :destroy, :approve, :update, :regenerate_alert_image]
 
   def index
     if params[:unapproved]

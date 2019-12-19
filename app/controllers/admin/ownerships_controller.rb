@@ -1,5 +1,5 @@
 class Admin::OwnershipsController < Admin::BaseController
-  before_filter :find_ownership
+  before_action :find_ownership
 
   def edit
   end

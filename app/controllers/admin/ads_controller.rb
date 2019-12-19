@@ -1,6 +1,6 @@
 class Admin::AdsController < Admin::BaseController
-  before_filter :find_ad, except: [:index, :new, :create]
-  before_filter :find_organizations, only: [:new, :edit]
+  before_action :find_ad, except: [:index, :new, :create]
+  before_action :find_organizations, only: [:new, :edit]
 
   def index
     @ads = Ad.all

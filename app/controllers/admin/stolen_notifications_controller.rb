@@ -1,5 +1,5 @@
 class Admin::StolenNotificationsController < Admin::BaseController
-  before_filter :find_notification, only: [:show, :resend]
+  before_action :find_notification, only: [:show, :resend]
 
   def index
     stolen_notifications = StolenNotification.order("created_at desc").includes(:bike)

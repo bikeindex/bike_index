@@ -1,5 +1,5 @@
 class Admin::RecoveryDisplaysController < Admin::BaseController
-  before_filter :find_recovery_displays, only: [:edit, :update, :destroy]
+  before_action :find_recovery_displays, only: [:edit, :update, :destroy]
 
   def index
     page = params[:page] || 1

@@ -1,6 +1,6 @@
 class Admin::ExternalRegistryBikesController < Admin::BaseController
   include SortableTable
-  before_filter :find_bike, only: %i[show]
+  before_action :find_bike, only: %i[show]
 
   def index
     @page = params[:page] || 1

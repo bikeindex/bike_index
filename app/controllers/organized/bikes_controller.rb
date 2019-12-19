@@ -2,7 +2,7 @@ module Organized
   class BikesController < Organized::BaseController
     include SortableTable
     rescue_from ActionController::RedirectBackError, with: :redirect_back # Gross. TODO: Rails 5 update
-    skip_before_filter :ensure_not_ambassador_organization!, only: [:multi_serial_search]
+    skip_before_action :ensure_not_ambassador_organization!, only: [:multi_serial_search]
 
     def index
       @page = params[:page] || 1

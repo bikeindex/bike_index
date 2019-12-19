@@ -1,8 +1,8 @@
 class WelcomeController < ApplicationController
   before_action :force_html_response
-  before_filter :authenticate_user_for_welcome_controller, only: [:user_home, :choose_registration]
+  before_action :authenticate_user_for_welcome_controller, only: [:user_home, :choose_registration]
   # Allow iframes on the index URL because safari is an asshole, and doesn't honor our iframe options
-  skip_before_filter :set_x_frame_options_header, only: [:bike_creation_graph, :index]
+  skip_before_action :set_x_frame_options_header, only: [:bike_creation_graph, :index]
 
   def index
     @recovery_displays = RecoveryDisplay.limit(5)
