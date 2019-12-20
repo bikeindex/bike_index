@@ -1,9 +1,9 @@
-class AdminMailer < ActionMailer::Base
+class AdminMailer < ApplicationMailer
   helper LocalizationHelper
 
-  default from: "contact@bikeindex.org", content_type: "multipart/alternative", parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
+  default content_type: "multipart/alternative",
+          parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
   default to: "contact@bikeindex.org"
-  layout "email"
 
   def feedback_notification_email(feedback)
     @feedback = feedback

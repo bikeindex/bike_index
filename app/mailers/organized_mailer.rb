@@ -1,11 +1,8 @@
 # Every email in here has the potential to be owned by an organization -
 # but they aren't necessarily
-class OrganizedMailer < ActionMailer::Base
-  CONTACT_BIKEINDEX = "Bike Index <contact@bikeindex.org>".freeze
-  default from: CONTACT_BIKEINDEX,
-          content_type: "multipart/alternative",
+class OrganizedMailer < ApplicationMailer
+  default content_type: "multipart/alternative",
           parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
-  layout "email"
 
   def partial_registration(b_param)
     @b_param = b_param

@@ -1,9 +1,6 @@
-class CustomerMailer < ActionMailer::Base
-  CONTACT_BIKEINDEX = '"Bike Index" <contact@bikeindex.org>'.freeze
-  default from: CONTACT_BIKEINDEX,
-          content_type: "multipart/alternative",
+class CustomerMailer < ApplicationMailer
+  default content_type: "multipart/alternative",
           parts_order: ["text/calendar", "text/plain", "text/html", "text/enriched"]
-  layout "email"
 
   def welcome_email(user)
     @user = user
