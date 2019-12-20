@@ -1,5 +1,5 @@
 class UserEmailsController < ApplicationController
-  before_filter :ensure_user_email_ownership
+  before_action :ensure_user_email_ownership
 
   def resend_confirmation
     flash[:success] = translation(:resend_confirmation)

@@ -8,7 +8,7 @@ module ControllerHelpers
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
                   :user_root_bike_search?, :current_organization, :passive_organization, :controller_namespace, :page_id,
                   :default_bike_search_path, :bikehub_url
-    before_filter :enable_rack_profiler
+    before_action :enable_rack_profiler
 
     before_action do
       if current_user.present?

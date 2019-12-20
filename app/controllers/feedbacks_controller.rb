@@ -1,6 +1,6 @@
 class FeedbacksController < ApplicationController
-  before_filter :set_feedback_active_section
-  before_filter :set_permitted_format
+  before_action :set_feedback_active_section
+  before_action :set_permitted_format
 
   def index
     @feedback = Feedback.new
@@ -39,7 +39,7 @@ class FeedbacksController < ApplicationController
   protected
 
   def block_the_spam(feedback)
-    # Previously, we were authenticating users in a before_filter
+    # Previously, we were authenticating users in a before_action
     # But to make it possible for non-signed in users to generate leads, we're trying this out
     return false unless feedback.looks_like_spam?
     flash[:error] = translation(:please_sign_in)

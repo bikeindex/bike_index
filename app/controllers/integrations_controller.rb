@@ -1,6 +1,6 @@
 class IntegrationsController < ApplicationController
   include Sessionable
-  before_filter :skip_if_signed_in
+  before_action :skip_if_signed_in
 
   def create
     @integration = Integration.new(information: request.env["omniauth.auth"],

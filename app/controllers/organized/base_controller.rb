@@ -1,8 +1,8 @@
 module Organized
   class BaseController < ApplicationController
-    before_filter :ensure_not_ambassador_organization!, except: :root
-    before_filter :ensure_current_organization!
-    before_filter :ensure_member!
+    before_action :ensure_not_ambassador_organization!, except: :root
+    before_action :ensure_current_organization!
+    before_action :ensure_member!
 
     def ensure_member!
       if current_user && current_user.member_of?(current_organization)

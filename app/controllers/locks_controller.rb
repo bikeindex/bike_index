@@ -1,6 +1,6 @@
 class LocksController < ApplicationController
-  before_filter :authenticate_user
-  before_filter :find_lock, only: [:edit, :update, :destroy]
+  before_action :authenticate_user
+  before_action :find_lock, only: [:edit, :update, :destroy]
 
   def edit
   end

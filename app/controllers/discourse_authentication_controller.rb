@@ -1,5 +1,5 @@
 class DiscourseAuthenticationController < ApplicationController
-  before_filter :authenticate_and_set_redirect
+  before_action :authenticate_and_set_redirect
 
   def index
     sso = SingleSignOn.parse(session[:discourse_redirect], discourse_secret)

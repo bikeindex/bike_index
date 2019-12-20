@@ -1,5 +1,5 @@
 class DocumentationController < ApplicationController
-  before_filter :render_swagger_for_page, only: [:api_v3, :api_v2]
+  before_action :render_swagger_for_page, only: [:api_v3, :api_v2]
   layout false
 
   def index

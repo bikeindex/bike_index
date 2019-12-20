@@ -1,5 +1,5 @@
 class Admin::MailSnippetsController < Admin::BaseController
-  before_filter :find_snippet, except: [:index, :new, :create]
+  before_action :find_snippet, except: [:index, :new, :create]
 
   def index
     @mail_snippets = MailSnippet.without_organizations

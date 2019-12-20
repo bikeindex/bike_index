@@ -1,6 +1,6 @@
 class StolenController < ApplicationController
-  before_filter :set_permitted_format, only: [:index]
-  before_filter :remove_subdomain
+  before_action :set_permitted_format, only: [:index]
+  before_action :remove_subdomain
 
   def index
     @feedback = Feedback.new

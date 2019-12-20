@@ -1,8 +1,8 @@
 module Organized
   class UsersController < Organized::AdminController
     include SortableTable
-    before_filter :find_membership, only: [:edit, :update, :destroy]
-    before_filter :reject_self_updates, only: [:update, :destroy]
+    before_action :find_membership, only: [:edit, :update, :destroy]
+    before_action :reject_self_updates, only: [:update, :destroy]
 
     def index
       page = params[:page] || 1

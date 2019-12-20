@@ -1,7 +1,7 @@
 class Admin::MembershipsController < Admin::BaseController
   include SortableTable
-  before_filter :find_membership, only: [:show, :edit, :update, :destroy]
-  before_filter :find_organizations
+  before_action :find_membership, only: [:show, :edit, :update, :destroy]
+  before_action :find_organizations
 
   def index
     page = params[:page] || 1

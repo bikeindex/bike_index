@@ -1,5 +1,5 @@
 class Admin::PaintsController < Admin::BaseController
-  before_filter :find_paint, only: [:show, :edit, :update, :destroy]
+  before_action :find_paint, only: [:show, :edit, :update, :destroy]
 
   def index
     if params[:name]

@@ -1,8 +1,8 @@
 module Oauth
   class ApplicationsController < Doorkeeper::ApplicationsController
     include ControllerHelpers
-    before_filter :authenticate_user
-    before_filter :ensure_app_owner!, except: [:index, :new, :create]
+    before_action :authenticate_user
+    before_action :ensure_app_owner!, except: [:index, :new, :create]
 
     def index
       @applications = current_user.oauth_applications.order(created_at: :desc)

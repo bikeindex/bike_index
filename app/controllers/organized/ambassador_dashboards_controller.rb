@@ -1,7 +1,7 @@
 module Organized
   class AmbassadorDashboardsController < Organized::BaseController
-    before_filter :ensure_ambassador_authorized!
-    skip_before_filter :ensure_not_ambassador_organization!
+    before_action :ensure_ambassador_authorized!
+    skip_before_action :ensure_not_ambassador_organization!
 
     def show
       @ambassadors =

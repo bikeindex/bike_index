@@ -1,6 +1,6 @@
 class BikeCodesController < ApplicationController
   rescue_from ActionController::RedirectBackError, with: :redirect_back # Gross. TODO: Rails 5 update
-  before_filter :find_bike_code
+  before_action :find_bike_code
 
   def update
     if current_user.present? && current_user.authorized?(@bike_code)

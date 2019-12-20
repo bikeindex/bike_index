@@ -1,6 +1,6 @@
 class PublicImagesController < ApplicationController
-  before_filter :find_image_if_owned, only: [:edit, :update, :destroy, :is_private]
-  before_filter :ensure_authorized_to_create!, only: [:create]
+  before_action :find_image_if_owned, only: [:edit, :update, :destroy, :is_private]
+  before_action :ensure_authorized_to_create!, only: [:create]
 
   def show
     @public_image = PublicImage.find(params[:id])
