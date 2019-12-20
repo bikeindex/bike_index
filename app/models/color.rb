@@ -1,4 +1,4 @@
-class Color < ActiveRecord::Base
+class Color < ApplicationRecord
   include AutocompleteHashable
   include FriendlyNameFindable
   validates_presence_of :name, :priority

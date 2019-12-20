@@ -1,4 +1,4 @@
-class PublicImage < ActiveRecord::Base
+class PublicImage < ApplicationRecord
   mount_uploader :image, ImageUploader # Not processed in background, because they are uploaded directly
   belongs_to :imageable, polymorphic: true
 

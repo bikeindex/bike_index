@@ -1,4 +1,4 @@
-class AmbassadorTaskAssignment < ActiveRecord::Base
+class AmbassadorTaskAssignment < ApplicationRecord
   belongs_to :ambassador_task
   belongs_to :ambassador,
              class_name: "Ambassador",

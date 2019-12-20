@@ -1,4 +1,4 @@
-class Location < ActiveRecord::Base
+class Location < ApplicationRecord
   include Geocodeable
 
   acts_as_paranoid

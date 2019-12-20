@@ -1,4 +1,4 @@
-class ImpoundRecord < ActiveRecord::Base
+class ImpoundRecord < ApplicationRecord
   belongs_to :bike
   belongs_to :user
   belongs_to :organization

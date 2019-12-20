@@ -1,5 +1,5 @@
 # b_param stands for Bike param
-class BParam < ActiveRecord::Base
+class BParam < ApplicationRecord
   mount_uploader :image, ImageUploader
   store_in_background :image, CarrierWaveStoreWorker
 

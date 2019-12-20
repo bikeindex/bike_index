@@ -1,4 +1,4 @@
-class Ownership < ActiveRecord::Base
+class Ownership < ApplicationRecord
   attr_accessor :creator_email, :user_email
 
   validates_presence_of :owner_email

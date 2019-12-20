@@ -1,4 +1,4 @@
-class AmbassadorTask < ActiveRecord::Base
+class AmbassadorTask < ApplicationRecord
   has_many :ambassador_task_assignments
   has_many :ambassadors, through: :ambassador_task_assignments
 

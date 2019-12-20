@@ -1,4 +1,4 @@
-class StolenRecord < ActiveRecord::Base
+class StolenRecord < ApplicationRecord
   include ActiveModel::Dirty
   include Phonifyerable
   include Geocodeable

@@ -1,3 +1,3 @@
-class LockType < ActiveRecord::Base
+class LockType < ApplicationRecord
   include FriendlySlugFindable
 end

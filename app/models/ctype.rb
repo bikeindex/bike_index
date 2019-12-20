@@ -1,4 +1,4 @@
-class Ctype < ActiveRecord::Base
+class Ctype < ApplicationRecord
   # Note: Ctype is short for component_type.
   # The name had to be shortened because of join table key length
   include FriendlySlugFindable

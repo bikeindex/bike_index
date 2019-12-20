@@ -1,4 +1,4 @@
-class CreationState < ActiveRecord::Base
+class CreationState < ApplicationRecord
   belongs_to :bike
   belongs_to :organization
   belongs_to :creator, class_name: "User"

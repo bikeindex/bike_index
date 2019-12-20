@@ -1,4 +1,4 @@
-class Organization < ActiveRecord::Base
+class Organization < ApplicationRecord
   include ActionView::Helpers::SanitizeHelper
 
   KIND_ENUM = {

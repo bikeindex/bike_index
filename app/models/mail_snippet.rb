@@ -1,4 +1,4 @@
-class MailSnippet < ActiveRecord::Base
+class MailSnippet < ApplicationRecord
   include Geocodeable
 
   KIND_ENUM = { custom: 0, header: 1, welcome: 2, footer: 3, security: 4, abandoned_bike: 5, location_triggered: 6 }.freeze

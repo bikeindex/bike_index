@@ -1,4 +1,4 @@
-class CustomerContact < ActiveRecord::Base
+class CustomerContact < ApplicationRecord
   belongs_to :bike
   belongs_to :user
   belongs_to :creator, class_name: "User"

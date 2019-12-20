@@ -1,4 +1,4 @@
-class Paint < ActiveRecord::Base
+class Paint < ApplicationRecord
   include FriendlyNameFindable
 
   validates_presence_of :name

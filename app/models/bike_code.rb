@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class BikeCode < ActiveRecord::Base
+class BikeCode < ApplicationRecord
   KIND_ENUM = { sticker: 0, spokecard: 1 }.freeze
   MAX_UNORGANIZED = 10
   belongs_to :bike

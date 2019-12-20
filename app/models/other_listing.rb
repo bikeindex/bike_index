@@ -1,4 +1,4 @@
-class OtherListing < ActiveRecord::Base
+class OtherListing < ApplicationRecord
   belongs_to :bike
   validates_presence_of :bike_id
   validates_presence_of :url
