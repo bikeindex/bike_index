@@ -1,5 +1,12 @@
 GIT
-  remote: https://github.com/pramod-sharma/faraday-request_response_logger
+  remote: https://github.com/jmromer/swagger-ui_rails.git
+  revision: 0377d8ecd0714901351a6bfc68491d255ad86093
+  branch: bike_index_0.1.7
+  specs:
+    swagger-ui_rails (0.1.7)
+
+GIT
+  remote: https://github.com/pramod-sharma/faraday-request_response_logger.git
   revision: c07780bae0c1e9e93de55997991a5ec40a1a4f11
   specs:
     faraday-request_response_logger (0.1.0)
@@ -530,6 +537,16 @@ GEM
     rufo (0.7.0)
     safe_yaml (1.0.4)
     sass (3.4.22)
+    sass-rails (6.0.0)
+      sassc-rails (~> 2.1, >= 2.1.1)
+    sassc (2.2.1)
+      ffi (~> 1.9)
+    sassc-rails (2.1.2)
+      railties (>= 4.0.0)
+      sassc (>= 2.0)
+      sprockets (> 3.0)
+      sprockets-rails
+      tilt
     secure_headers (2.5.2)
       user_agent_parser
     shellany (0.0.1)
@@ -571,7 +588,7 @@ GEM
       spring (>= 0.9.1)
     spring-commands-rubocop (0.2.0)
       spring (>= 1.0, < 3.0)
-    sprockets (3.7.2)
+    sprockets (4.0.0)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
     sprockets-rails (3.0.4)
@@ -581,7 +598,6 @@ GEM
     stackprof (0.2.12)
     stripe (3.3.2)
       faraday (~> 0.9)
-    swagger-ui_rails (0.1.7)
     temple (0.8.0)
     terminal-notifier (2.0.0)
     terminal-table (1.8.0)
@@ -750,6 +766,7 @@ DEPENDENCIES
   rubocop-daemon (~> 0.3.1)
   rubocop-performance (~> 1.1.0)
   rufo (~> 0.7.0)
+  sass-rails
   secure_headers (~> 2.5.0)
   sidekiq (~> 5.1.0)
   sidekiq-failures
@@ -761,10 +778,11 @@ DEPENDENCIES
   spring
   spring-commands-rspec
   spring-commands-rubocop
-  sprockets-rails (~> 3.0.4)
+  sprockets (= 4.0.0)
+  sprockets-rails
   stackprof
   stripe
-  swagger-ui_rails
+  swagger-ui_rails!
   terminal-notifier
   thor
   translation
