@@ -177,5 +177,3 @@ group :test do
   gem "vcr" # Stub external HTTP requests
   gem "webmock" # mocking for VCR
 end
-
-gem "rails_magic_renamer", "~> 2.0.0.pre.alpha"
