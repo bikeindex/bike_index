@@ -5,7 +5,7 @@
 
   / We only show this if there aren't any sortable search params, or there is a search_bike_code_batch_id, because performance
   - if !sortable_search_params? || params[:search_bike_code_batch_id].present?
-    - bike_code_batches = BikeCodeBatch.includes(:user, :organization).reorder(id: :desc)
+    - bike_code_batches = BikeStickerBatch.includes(:user, :organization).reorder(id: :desc)
     .col-12.mt-4
       %h5
         = number_with_delimiter(bike_code_batches.count)
@@ -30,34 +30,34 @@
               %small Max
             %th Notes
           %tbody
-            - bike_code_batches.each do |bike_code_batch|
+            - bike_code_batches.each do |bike_sticker_batch|
               %tr
                 %td
-                  #{link_to "##{bike_code_batch.id}", admin_bike_stickers_path(search_bike_code_batch_id: bike_code_batch.id)}
+                  #{link_to "##{bike_sticker_batch.id}", admin_bike_stickers_path(search_bike_code_batch_id: bike_sticker_batch.id)}
                 %td
                   %span.convertTime
-                    = l bike_code_batch.created_at, format: :convert_time
+                    = l bike_sticker_batch.created_at, format: :convert_time
                 %td
                   %small.convertTime
-                    = l bike_code_batch.updated_at, format: :convert_time
+                    = l bike_sticker_batch.updated_at, format: :convert_time
                 %td
                   %small
-                    = bike_code_batch.user&.display_name
+                    = bike_sticker_batch.user&.display_name
                 %td
-                  - if bike_code_batch.organization.present?
-                    = link_to bike_code_batch.organization.name, admin_bike_stickers_path(organization_id: bike_code_batch.organization_id)
+                  - if bike_sticker_batch.organization.present?
+                    = link_to bike_sticker_batch.organization.name, admin_bike_stickers_path(organization_id: bike_sticker_batch.organization_id)
                 %td
-                  %small= number_with_delimiter(bike_code_batch.bike_stickers.count)
+                  %small= number_with_delimiter(bike_sticker_batch.bike_stickers.count)
                 %td
-                  %small= number_with_delimiter(bike_code_batch.bike_stickers.claimed.count)
+                  %small= number_with_delimiter(bike_sticker_batch.bike_stickers.claimed.count)
                 %td
-                  %small= bike_code_batch.prefix
+                  %small= bike_sticker_batch.prefix
                 %td
-                  %small= number_with_delimiter(bike_code_batch.min_code_integer)
+                  %small= number_with_delimiter(bike_sticker_batch.min_code_integer)
                 %td
-                  %small= number_with_delimiter(bike_code_batch.max_code_integer)
+                  %small= number_with_delimiter(bike_sticker_batch.max_code_integer)
                 %td
-                  %small= bike_code_batch.notes
+                  %small= bike_sticker_batch.notes
 
 .row
   .col-md-6
@@ -79,14 +79,14 @@
           Viewing #{link_to current_organization.name, admin_organization_path(current_organization)} Stickers
           %small
             = link_to "view orgs view", organization_stickers_path(organization_id: current_organization.to_param), class: "less-strong"
-    - if @bike_code_batch.present?
+    - if @bike_sticker_batch.present?
       %p
         %strong
-          Viewing Just Batch ##{@bike_code_batch.id}
+          Viewing Just Batch ##{@bike_sticker_batch.id}
         %small
           = link_to "view all batches", admin_bike_stickers_path(sortable_search_params.except(:search_bike_code_batch_id))
 
-      - duplicated = @bike_code_batch.duplicated_integers
+      - duplicated = @bike_sticker_batch.duplicated_integers
       - if duplicated.any?
         %em
           Duplicated:
@@ -97,7 +97,7 @@
                 = int
       Non-sequential codes:
       %ul
-        - @bike_code_batch.non_sequential_integers.each do |arr|
+        - @bike_sticker_batch.non_sequential_integers.each do |arr|
           %li.small
             #{arr[0]} > #{arr[1]}
   .col-md-6.mt-2

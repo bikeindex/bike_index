@@ -66,10 +66,10 @@ RSpec.describe BikeSticker, type: :model do
         expect(bike_sticker.pretty_code).to eq("A 0")
       end
     end
-    context "bike_code_batch has a set length" do
-      let(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "A0001", bike_code_batch_id: bike_code_batch.id) }
-      let(:bike_code2) { FactoryBot.create(:bike_sticker, code: "A102", bike_code_batch_id: bike_code_batch.id) }
-      let(:bike_code_batch) { FactoryBot.create(:bike_code_batch, code_number_length: 5) }
+    context "bike_sticker_batch has a set length" do
+      let(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "A0001", bike_sticker_batch_id: bike_sticker_batch.id) }
+      let(:bike_code2) { FactoryBot.create(:bike_sticker, code: "A102", bike_sticker_batch_id: bike_sticker_batch.id) }
+      let(:bike_sticker_batch) { FactoryBot.create(:bike_sticker_batch, code_number_length: 5) }
       it "renders the pretty print from the batch length" do
         expect(bike_sticker.pretty_code).to eq "A 000 01"
         expect(bike_code2.pretty_code).to eq "A 001 02"

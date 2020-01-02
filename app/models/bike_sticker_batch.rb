@@ -1,4 +1,4 @@
-class BikeCodeBatch < ApplicationRecord
+class BikeStickerBatch < ApplicationRecord
   belongs_to :user # Creator of the batch
   belongs_to :organization
   has_many :bike_stickers
@@ -14,9 +14,11 @@ class BikeCodeBatch < ApplicationRecord
     clength = code_number_length_or_default # Assign so it isn't recalculated in loop
     number_to_create.times do |i|
       code_integer_with_padding = (i + initial_code_integer).to_s.rjust(clength, "0")
-      bike_stickers.create!(organization: organization,
-                         kind: kind,
-                         code: prefix + code_integer_with_padding)
+      bike_stickers.create!(
+        organization: organization,
+        kind: kind,
+        code: prefix + code_integer_with_padding,
+      )
     end
     touch # Bump
   end

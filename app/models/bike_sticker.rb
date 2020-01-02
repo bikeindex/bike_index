@@ -6,7 +6,7 @@ class BikeSticker < ApplicationRecord
   belongs_to :bike
   belongs_to :organization
   belongs_to :user # User who assigns the bike
-  belongs_to :bike_code_batch
+  belongs_to :bike_sticker_batch
 
   scope :claimed, -> { where.not(bike_id: nil) }
   scope :unclaimed, -> { where(bike_id: nil) }
@@ -176,7 +176,7 @@ class BikeSticker < ApplicationRecord
 
   def code_number_string
     str = code_integer.to_s
-    return str unless bike_code_batch&.code_number_length.present?
-    str.rjust(bike_code_batch.code_number_length, "0")
+    return str unless bike_sticker_batch&.code_number_length.present?
+    str.rjust(bike_sticker_batch.code_number_length, "0")
   end
 end

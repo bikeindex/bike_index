@@ -17,7 +17,7 @@ class Admin::BikeStickersController < Admin::BaseController
   private
 
   def sortable_columns
-    %w[created_at code_integer organization_id bike_code_batch_id]
+    %w[created_at code_integer organization_id bike_sticker_batch_id]
   end
 
   def matching_bike_stickers
@@ -26,8 +26,8 @@ class Admin::BikeStickersController < Admin::BaseController
       bike_stickers = bike_stickers.where(organization_id: current_organization.id)
     end
     if params[:search_bike_code_batch_id].present?
-      @bike_code_batch = BikeCodeBatch.find(params[:search_bike_code_batch_id].to_i)
-      bike_stickers = bike_stickers.where(bike_code_batch_id: @bike_code_batch.id)
+      @bike_sticker_batch = BikeStickerBatch.find(params[:search_bike_code_batch_id].to_i)
+      bike_stickers = bike_stickers.where(bike_sticker_batch_id: @bike_sticker_batch.id)
     end
     if params[:search_claimed].present?
       bike_stickers = bike_stickers.claimed
