@@ -168,18 +168,6 @@ ALTER SEQUENCE public.ambassador_tasks_id_seq OWNED BY public.ambassador_tasks.i
 
 
 --
--- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.ar_internal_metadata (
-    key character varying NOT NULL,
-    value character varying,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
 -- Name: b_params; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1582,8 +1570,7 @@ CREATE TABLE public.oauth_applications (
     owner_type character varying(255),
     is_internal boolean DEFAULT false NOT NULL,
     can_send_stolen_notifications boolean DEFAULT false NOT NULL,
-    scopes character varying(255) DEFAULT ''::character varying NOT NULL,
-    confidential boolean DEFAULT false NOT NULL
+    scopes character varying(255) DEFAULT ''::character varying NOT NULL
 );
 
 
@@ -2915,14 +2902,6 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 
 ALTER TABLE ONLY public.ambassador_tasks
     ADD CONSTRAINT ambassador_tasks_pkey PRIMARY KEY (id);
-
-
---
--- Name: ar_internal_metadata ar_internal_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.ar_internal_metadata
-    ADD CONSTRAINT ar_internal_metadata_pkey PRIMARY KEY (key);
 
 
 --
@@ -4868,11 +4847,5 @@ INSERT INTO schema_migrations (version) VALUES ('20191117123105');
 
 INSERT INTO schema_migrations (version) VALUES ('20191209160937');
 
-INSERT INTO schema_migrations (version) VALUES ('20191216054404');
-
 INSERT INTO schema_migrations (version) VALUES ('20200101211426');
-
-INSERT INTO schema_migrations (version) VALUES ('20200102091314');
-
-INSERT INTO schema_migrations (version) VALUES ('20200102091315');
 
