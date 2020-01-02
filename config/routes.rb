@@ -142,7 +142,7 @@ Bikeindex::Application.routes.draw do
   get "bikes/scanned/:scanned_id", to: "bikes#scanned"
   get "stickers/:scanned_id", to: "bikes#scanned"
 
-  resources :bike_codes, only: [:update]
+  resources :bike_stickers, only: [:update]
   resources :locks, except: %[show index]
 
   namespace :admin do
@@ -174,7 +174,7 @@ Bikeindex::Application.routes.draw do
     get "tsvs", to: "dashboard#tsvs"
     get "bust_z_cache", to: "dashboard#bust_z_cache"
     get "destroy_example_bikes", to: "dashboard#destroy_example_bikes"
-    resources :memberships, :bulk_imports, :exports, :bike_codes,
+    resources :memberships, :bulk_imports, :exports, :bike_stickers,
               :paints, :ads, :recovery_displays, :mail_snippets, :paid_features, :payments,
               :ctypes
 

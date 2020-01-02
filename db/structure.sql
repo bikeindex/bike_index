@@ -168,6 +168,18 @@ ALTER SEQUENCE public.ambassador_tasks_id_seq OWNED BY public.ambassador_tasks.i
 
 
 --
+-- Name: ar_internal_metadata; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ar_internal_metadata (
+    key character varying NOT NULL,
+    value character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
 -- Name: b_params; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -246,46 +258,6 @@ ALTER SEQUENCE public.bike_code_batches_id_seq OWNED BY public.bike_code_batches
 
 
 --
--- Name: bike_codes; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.bike_codes (
-    id integer NOT NULL,
-    kind integer DEFAULT 0,
-    code character varying,
-    bike_id integer,
-    organization_id integer,
-    user_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    claimed_at timestamp without time zone,
-    previous_bike_id integer,
-    bike_code_batch_id integer,
-    code_integer integer,
-    code_prefix character varying
-);
-
-
---
--- Name: bike_codes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.bike_codes_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: bike_codes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.bike_codes_id_seq OWNED BY public.bike_codes.id;
-
-
---
 -- Name: bike_organizations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -317,6 +289,46 @@ CREATE SEQUENCE public.bike_organizations_id_seq
 --
 
 ALTER SEQUENCE public.bike_organizations_id_seq OWNED BY public.bike_organizations.id;
+
+
+--
+-- Name: bike_stickers; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bike_stickers (
+    id integer NOT NULL,
+    kind integer DEFAULT 0,
+    code character varying,
+    bike_id integer,
+    organization_id integer,
+    user_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    claimed_at timestamp without time zone,
+    previous_bike_id integer,
+    bike_code_batch_id integer,
+    code_integer integer,
+    code_prefix character varying
+);
+
+
+--
+-- Name: bike_stickers_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bike_stickers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bike_stickers_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bike_stickers_id_seq OWNED BY public.bike_stickers.id;
 
 
 --
@@ -1570,7 +1582,8 @@ CREATE TABLE public.oauth_applications (
     owner_type character varying(255),
     is_internal boolean DEFAULT false NOT NULL,
     can_send_stolen_notifications boolean DEFAULT false NOT NULL,
-    scopes character varying(255) DEFAULT ''::character varying NOT NULL
+    scopes character varying(255) DEFAULT ''::character varying NOT NULL,
+    confidential boolean DEFAULT false NOT NULL
 );
 
 
@@ -2488,17 +2501,17 @@ ALTER TABLE ONLY public.bike_code_batches ALTER COLUMN id SET DEFAULT nextval('p
 
 
 --
--- Name: bike_codes id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.bike_codes ALTER COLUMN id SET DEFAULT nextval('public.bike_codes_id_seq'::regclass);
-
-
---
 -- Name: bike_organizations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.bike_organizations ALTER COLUMN id SET DEFAULT nextval('public.bike_organizations_id_seq'::regclass);
+
+
+--
+-- Name: bike_stickers id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_stickers ALTER COLUMN id SET DEFAULT nextval('public.bike_stickers_id_seq'::regclass);
 
 
 --
@@ -2905,6 +2918,14 @@ ALTER TABLE ONLY public.ambassador_tasks
 
 
 --
+-- Name: ar_internal_metadata ar_internal_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ar_internal_metadata
+    ADD CONSTRAINT ar_internal_metadata_pkey PRIMARY KEY (key);
+
+
+--
 -- Name: b_params b_params_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2921,19 +2942,19 @@ ALTER TABLE ONLY public.bike_code_batches
 
 
 --
--- Name: bike_codes bike_codes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.bike_codes
-    ADD CONSTRAINT bike_codes_pkey PRIMARY KEY (id);
-
-
---
 -- Name: bike_organizations bike_organizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.bike_organizations
     ADD CONSTRAINT bike_organizations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bike_stickers bike_stickers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bike_stickers
+    ADD CONSTRAINT bike_stickers_pkey PRIMARY KEY (id);
 
 
 --
@@ -3410,20 +3431,6 @@ CREATE INDEX index_bike_code_batches_on_user_id ON public.bike_code_batches USIN
 
 
 --
--- Name: index_bike_codes_on_bike_code_batch_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bike_codes_on_bike_code_batch_id ON public.bike_codes USING btree (bike_code_batch_id);
-
-
---
--- Name: index_bike_codes_on_bike_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_bike_codes_on_bike_id ON public.bike_codes USING btree (bike_id);
-
-
---
 -- Name: index_bike_organizations_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3442,6 +3449,20 @@ CREATE INDEX index_bike_organizations_on_deleted_at ON public.bike_organizations
 --
 
 CREATE INDEX index_bike_organizations_on_organization_id ON public.bike_organizations USING btree (organization_id);
+
+
+--
+-- Name: index_bike_stickers_on_bike_code_batch_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_stickers_on_bike_code_batch_id ON public.bike_stickers USING btree (bike_code_batch_id);
+
+
+--
+-- Name: index_bike_stickers_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_stickers_on_bike_id ON public.bike_stickers USING btree (bike_id);
 
 
 --
@@ -4846,4 +4867,8 @@ INSERT INTO schema_migrations (version) VALUES ('20191108195338');
 INSERT INTO schema_migrations (version) VALUES ('20191117123105');
 
 INSERT INTO schema_migrations (version) VALUES ('20191209160937');
+
+INSERT INTO schema_migrations (version) VALUES ('20191216054404');
+
+INSERT INTO schema_migrations (version) VALUES ('20200101211426');
 

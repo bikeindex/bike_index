@@ -7,7 +7,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
 
   before { set_current_user(user) if user.present? }
 
-  context "organization without bike_codes" do
+  context "organization without bike_stickers" do
     let(:organization) { FactoryBot.create(:organization) }
     context "logged in as organization admin" do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
@@ -115,24 +115,24 @@ RSpec.describe Organized::ExportsController, type: :controller do
       end
       context "with assigned bike codes" do
         let(:bike) { FactoryBot.create(:bike) }
-        let!(:bike_code) { FactoryBot.create(:bike_code_claimed, organization: organization, code: "a1111") }
+        let!(:bike_sticker) { FactoryBot.create(:bike_code_claimed, organization: organization, code: "a1111") }
         let(:export) { FactoryBot.create(:export_avery, organization: organization, bike_code_start: "a1111") }
         it "removes the stickers before destroying" do
           export.update_attributes(options: export.options.merge(bike_codes_assigned: ["a1111"]))
-          bike_code.reload
+          bike_sticker.reload
           export.reload
-          expect(bike_code.claimed?).to be_truthy
-          expect([bike_code.user_id, bike_code.claimed_at, bike_code.bike_id].reject(&:blank?).count).to eq 3
+          expect(bike_sticker.claimed?).to be_truthy
+          expect([bike_sticker.user_id, bike_sticker.claimed_at, bike_sticker.bike_id].reject(&:blank?).count).to eq 3
           expect(export.avery_export?).to be_truthy
           expect(export.assign_bike_codes?).to be_truthy
-          expect(export.bike_codes).to eq(["a1111"])
+          expect(export.bike_stickers).to eq(["a1111"])
           expect do
             delete :destroy, id: export.id, organization_id: organization.to_param
           end.to change(Export, :count).by(-1)
           expect(response).to redirect_to exports_root_path
           expect(flash[:success]).to be_present
-          bike_code.reload
-          expect([bike_code.user_id, bike_code.claimed_at, bike_code.bike_id].reject(&:blank?).count).to eq 0
+          bike_sticker.reload
+          expect([bike_sticker.user_id, bike_sticker.claimed_at, bike_sticker.bike_id].reject(&:blank?).count).to eq 0
         end
       end
     end
@@ -172,7 +172,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
         end
       end
       context "organization with avery export" do
-        before { organization.update_columns(paid_feature_slugs: %w[csv_exports avery_export geolocated_messages bike_codes]) } # Stub organization having features
+        before { organization.update_columns(paid_feature_slugs: %w[csv_exports avery_export geolocated_messages bike_stickers]) } # Stub organization having features
         let(:export_params) { valid_attrs.merge(file_format: "csv", avery_export: "0", end_at: "2016-02-10 02:00:00") }
         it "creates a non-avery export" do
           expect(organization.paid_for?("avery_export")).to be_truthy
@@ -194,7 +194,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
           expect(export.custom_bike_ids).to eq([1222, 999])
         end
         context "with IE 11 datetime params" do
-          let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "a221C") }
+          let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "a221C") }
           let(:crushed_datetime_attrs) do
             {
               start_at: "08/25/2018",
@@ -239,10 +239,10 @@ RSpec.describe Organized::ExportsController, type: :controller do
             expect(export.bike_code_start).to eq "A221C"
             expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
           end
-          context "avery export with already assigned bike_code" do
-            let!(:bike_code) { FactoryBot.create(:bike_code_claimed, organization: organization, code: "a221C") }
+          context "avery export with already assigned bike_sticker" do
+            let!(:bike_sticker) { FactoryBot.create(:bike_code_claimed, organization: organization, code: "a221C") }
             it "makes the avery export" do
-              expect(bike_code.claimed?).to be_truthy
+              expect(bike_sticker.claimed?).to be_truthy
               expect do
                 post :create, export: avery_params, organization_id: organization.to_param
               end.to_not change(Export, :count)
@@ -256,26 +256,26 @@ RSpec.describe Organized::ExportsController, type: :controller do
     describe "update bike_codes_removed" do
       let(:export) { FactoryBot.build(:export_avery, progress: "pending", file: nil, bike_code_start: "z ", organization: organization, user: user) }
       let(:bike) { FactoryBot.create(:creation_organization_bike, organization: organization) }
-      let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "z") }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "z") }
       it "removes the bike codes" do
         export.options = export.options.merge(bike_codes_assigned: ["Z"])
-        bike_code.claim(user, bike)
+        bike_sticker.claim(user, bike)
         export.save
         export.reload
-        bike_code.reload
+        bike_sticker.reload
         expect(export.assign_bike_codes?).to be_truthy
-        expect(export.bike_codes).to eq(["Z"])
+        expect(export.bike_stickers).to eq(["Z"])
         expect(export.bike_codes_removed?).to be_falsey
-        expect(bike_code.claimed?).to be_truthy
-        expect(bike_code.bike).to eq bike
+        expect(bike_sticker.claimed?).to be_truthy
+        expect(bike_sticker.bike).to eq bike
         put :update, organization_id: organization.to_param, id: export.id, remove_bike_codes: true
         export.reload
-        bike_code.reload
+        bike_sticker.reload
         expect(export.assign_bike_codes?).to be_truthy
-        expect(export.bike_codes).to eq(["Z"])
+        expect(export.bike_stickers).to eq(["Z"])
         expect(export.bike_codes_removed?).to be_truthy
-        expect(bike_code.claimed?).to be_falsey
-        expect(bike_code.bike).to be_nil
+        expect(bike_sticker.claimed?).to be_falsey
+        expect(bike_sticker.bike).to be_nil
       end
     end
   end

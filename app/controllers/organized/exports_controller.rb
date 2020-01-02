@@ -42,7 +42,7 @@ module Organized
     def update
       if params[:remove_bike_codes] && @export.assign_bike_codes?
         @export.remove_bike_codes_and_record!
-        flash[:success] = translation(:bike_codes_removed)
+        flash[:success] = translation(:bike_stickers_removed)
       else
         flash[:error] = translation(:unknown_update_action)
       end
@@ -61,8 +61,8 @@ module Organized
     def create_avery_export
       if current_organization.paid_for?("avery_export")
         @export = Export.new(avery_export_parameters)
-        bike_code = current_organization.bike_codes.lookup(@export.bike_code_start) if @export.bike_code_start.present?
-        if bike_code.present? && bike_code.claimed?
+        bike_sticker = current_organization.bike_stickers.lookup(@export.bike_code_start) if @export.bike_code_start.present?
+        if bike_sticker.present? && bike_sticker.claimed?
           flash[:error] = translation(:sticker_already_assigned)
         end
       else

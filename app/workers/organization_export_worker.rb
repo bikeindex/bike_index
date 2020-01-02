@@ -12,7 +12,7 @@ class OrganizationExportWorker < ApplicationWorker
     return if @export_ebraked
     @export.file = @export.tmp_file
     @export.progress = "finished"
-    @export.options = @export.options.merge(bike_codes_assigned: @bike_codes) if @export.assign_bike_codes?
+    @export.options = @export.options.merge(bike_codes_assigned: @bike_stickers) if @export.assign_bike_codes?
     @export.assign_exported_bike_ids
     @export.save
     @export.tmp_file.unlink # Remove it and unlink
@@ -91,8 +91,8 @@ class OrganizationExportWorker < ApplicationWorker
     end
     if @export.assign_bike_codes?
       @export_headers << "sticker"
-      @bike_codes = []
-      @bike_code = BikeCode.lookup(@export.bike_code_start, organization_id: @export.organization_id)
+      @bike_stickers = []
+      @bike_sticker = BikeSticker.lookup(@export.bike_code_start, organization_id: @export.organization_id)
     end
     @export.options = @export.options.merge(written_headers: @export_headers) # Write the actual headers so we have them
     @export_headers
@@ -124,11 +124,11 @@ class OrganizationExportWorker < ApplicationWorker
   end
 
   def assign_bike_code_and_increment(bike)
-    return "" unless @bike_code.present?
-    code = @bike_code.code
-    @bike_code.claim(@export.user, bike)
-    @bike_codes << code
-    @bike_code = @bike_code.next_unclaimed_code
+    return "" unless @bike_sticker.present?
+    code = @bike_sticker.code
+    @bike_sticker.claim(@export.user, bike)
+    @bike_stickers << code
+    @bike_sticker = @bike_sticker.next_unclaimed_code
     code
   end
 
@@ -141,9 +141,9 @@ class OrganizationExportWorker < ApplicationWorker
     # Specifically - if this export has been deleted, errored or somehow finished, halt processing
     return true unless reloaded_export.blank? || reloaded_export.finished_processing?
     @export_ebraked = true
-    # And because this might have processed some bike_codes after the export was deleted, remove them here
+    # And because this might have processed some bike_stickers after the export was deleted, remove them here
     return true unless @export.assign_bike_codes?
-    @export.options = @export.options.merge(bike_codes_assigned: @bike_codes)
+    @export.options = @export.options.merge(bike_codes_assigned: @bike_stickers)
     @export.remove_bike_codes
   end
 end

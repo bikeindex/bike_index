@@ -253,7 +253,7 @@ RSpec.describe BParam, type: :model do
           serial_number: "zzz",
           organization_affiliation: "employee",
           external_image_urls: ["xxxxx"],
-          bike_code: "xxxx",
+          bike_sticker: "xxxx",
           phone: "919929333",
           address: "123 Main St",
           address_city: "Nevernever Land",
@@ -268,7 +268,7 @@ RSpec.describe BParam, type: :model do
     before { allow(bike).to receive(:b_params) { [b_param] } }
     it "has the expected fields" do
       expect(b_param.fetch_formatted_address).to eq target_address
-      expect(b_param.bike_code).to eq "xxxx"
+      expect(b_param.bike_sticker).to eq "xxxx"
       expect(b_param.organization_affiliation).to eq "employee"
       expect(b_param.phone).to eq "919929333"
       expect(b_param.address("address")).to eq "123 Main St"

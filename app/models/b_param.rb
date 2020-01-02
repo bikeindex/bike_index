@@ -67,7 +67,7 @@ class BParam < ApplicationRecord
   end
 
   def self.skipped_bike_attrs # Attrs that need to be skipped on bike assignment
-    %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_code address
+    %w(cycle_type_slug cycle_type_name rear_gear_type_slug front_gear_type_slug bike_sticker address
        handlebar_type_slug is_bulk is_new is_pos no_duplicate)
   end
 
@@ -127,7 +127,7 @@ class BParam < ApplicationRecord
 
   def no_duplicate; bike["no_duplicate"] || false end
 
-  def bike_code; bike["bike_code"] end
+  def bike_sticker; bike["bike_sticker"] end
 
   def phone; bike["phone"] end
 

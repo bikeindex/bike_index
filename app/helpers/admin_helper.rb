@@ -29,7 +29,7 @@ module AdminHelper
       { title: "Feedback & Messages", path: admin_feedbacks_path, match_controller: true },
       { title: "Twitter Accounts", path: admin_twitter_accounts_path, match_controller: true },
       { title: "Tweets", path: admin_tweets_path, match_controller: true },
-      { title: "Stickers", path: admin_bike_codes_path, match_controller: true },
+      { title: "Stickers", path: admin_bike_stickers_path, match_controller: true },
       { title: "Exports", path: admin_exports_path, match_controller: true },
       { title: "Bulk Imports", path: admin_bulk_imports_path, match_controller: true },
       { title: "Partial Bikes", path: admin_partial_bikes_path, match_controller: true },

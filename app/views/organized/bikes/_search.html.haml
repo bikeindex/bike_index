@@ -1,7 +1,7 @@
 -# If no url_for_search passed in, default to organization bike search
 
 - path_for_search ||= organization_bikes_path(organization_id: current_organization.to_param)
-- skip_view_just_stolen ||= @bike_code.present?
+- skip_view_just_stolen ||= @bike_sticker.present?
 
 .mb-4
   = form_tag path_for_search, id: 'bikes_search_form', class: 'bikes-search-form', method: :get do
@@ -67,7 +67,7 @@
     "sticker_cell" => "Sticker",
     "impounded_cell" => "Impounded",
   }
-  optional_columns = current_organization.paid_for?("bike_codes") ? ["sticker_cell"] : []
+  optional_columns = current_organization.paid_for?("bike_stickers") ? ["sticker_cell"] : []
   optional_columns += current_organization.additional_registration_fields.map { |f| "#{f}_cell" }
   optional_columns += ["impounded_cell"] if @impoundedness == "only_impounded"
   default_columns = %w[created_at_cell
@@ -89,7 +89,7 @@
           %label
             = check_box_tag cell_name, cell_name
             = column_renames[cell_name]
-  - if current_organization.paid_for?("bike_codes")
+  - if current_organization.paid_for?("bike_stickers")
     %p.stickers-sort-btns
       = t(".stickers")
       = link_to t(".all"), organization_bikes_path(search_params.merge(search_stickers: nil)), class: "btn btn-secondary #{@search_stickers.blank? ? 'active' : ''}"
@@ -126,10 +126,10 @@
         - current_organization.additional_registration_fields.each do |field_name|
           %th.hiddenColumn.hidden-xs-down{ class: "#{field_name}_cell" }
             = column_renames["#{field_name}_cell"]
-        - if current_organization.paid_for?("bike_codes")
+        - if current_organization.paid_for?("bike_stickers")
           %th.hiddenColumn.hidden-xs-down{ class: "sticker_cell" }
             = t(".sticker")
-            - if @bike_code.present?
+            - if @bike_sticker.present?
               %th
                 = t(".link")
             - elsif params[:search_stickers].present?
@@ -194,18 +194,18 @@
                   = bike.organization_affiliation
             / - if current_organization.paid_for?("avery_export")
             /   %td.hiddenColumn{ class: "avery_export" }
-            - if current_organization.paid_for?("bike_codes")
+            - if current_organization.paid_for?("bike_stickers")
               %td.hidden-xs-down{ class: "sticker_cell" }
-                - if @bike_code.present?
+                - if @bike_sticker.present?
                   %small
-                    = link_to t(".link"), bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id, bike_id: bike.id), method: "PUT"
+                    = link_to t(".link"), bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: bike.id), method: "PUT"
                 - else
-                  - bike.bike_codes.each_with_index do |bike_code, index|
-                    - if bike_code.organization.present?
-                      = link_to bike_code.code, edit_organization_sticker_path(id: bike_code.code, organization_id: bike_code.organization&.to_param), class: "small"
+                  - bike.bike_stickers.each_with_index do |bike_sticker, index|
+                    - if bike_sticker.organization.present?
+                      = link_to bike_sticker.code, edit_organization_sticker_path(id: bike_sticker.code, organization_id: bike_sticker.organization&.to_param), class: "small"
                     - else
                       %small
-                        = bike_code.code
+                        = bike_sticker.code
                     - if index > 0
                       %br
           - if @impoundedness == "only_impounded"

@@ -77,9 +77,9 @@ class BikeCreator
     if @bike.present? && @bike.id.present?
       @bike.creation_states.create(creation_state_attributes)
       AfterBikeSaveWorker.perform_async(@bike.id)
-      if @b_param.bike_code.present? && @bike.creation_organization.present?
-        bike_code = BikeCode.lookup(@b_param.bike_code, organization_id: @bike.creation_organization.id)
-        bike_code && bike_code.claim(@bike.creator, @bike.id)
+      if @b_param.bike_sticker.present? && @bike.creation_organization.present?
+        bike_sticker = BikeSticker.lookup(@b_param.bike_sticker, organization_id: @bike.creation_organization.id)
+        bike_sticker && bike_sticker.claim(@bike.creator, @bike.id)
       end
     end
 

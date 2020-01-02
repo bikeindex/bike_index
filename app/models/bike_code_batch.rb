@@ -1,20 +1,20 @@
 class BikeCodeBatch < ApplicationRecord
   belongs_to :user # Creator of the batch
   belongs_to :organization
-  has_many :bike_codes
+  has_many :bike_stickers
 
-  def min_code_integer; bike_codes.minimum(:code_integer) || 0 end
+  def min_code_integer; bike_stickers.minimum(:code_integer) || 0 end
 
-  def max_code_integer; bike_codes.maximum(:code_integer) || 0 end
+  def max_code_integer; bike_stickers.maximum(:code_integer) || 0 end
 
   def create_codes(number_to_create, initial_code_integer: nil, kind: "sticker")
     raise "Prefix required to create sequential codes!" unless prefix.present?
     initial_code_integer ||= max_code_integer
-    initial_code_integer += 1 if bike_codes.where(code_integer: initial_code_integer).present?
+    initial_code_integer += 1 if bike_stickers.where(code_integer: initial_code_integer).present?
     clength = code_number_length_or_default # Assign so it isn't recalculated in loop
     number_to_create.times do |i|
       code_integer_with_padding = (i + initial_code_integer).to_s.rjust(clength, "0")
-      bike_codes.create!(organization: organization,
+      bike_stickers.create!(organization: organization,
                          kind: kind,
                          code: prefix + code_integer_with_padding)
     end
@@ -52,6 +52,6 @@ class BikeCodeBatch < ApplicationRecord
   private
 
   def bike_code_integers
-    @bike_code_integers ||= bike_codes.pluck(:code_integer)
+    @bike_code_integers ||= bike_stickers.pluck(:code_integer)
   end
 end

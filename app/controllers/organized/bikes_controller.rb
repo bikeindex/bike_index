@@ -7,7 +7,7 @@ module Organized
     def index
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      @bike_code = BikeCode.lookup_with_fallback(params[:bike_code], organization_id: current_organization.id) if params[:bike_code].present?
+      @bike_sticker = BikeSticker.lookup_with_fallback(params[:bike_sticker], organization_id: current_organization.id) if params[:bike_sticker].present?
       if current_organization.paid_for?("bike_search")
         search_organization_bikes
       else
@@ -97,7 +97,7 @@ module Organized
       @search_stickers = false
       if params[:search_stickers].present?
         @search_stickers = params[:search_stickers] == "none" ? "none" : "with"
-        bikes = @search_stickers == "none" ? bikes.no_bike_code : bikes.bike_code
+        bikes = @search_stickers == "none" ? bikes.no_bike_code : bikes.bike_sticker
       else
         @search_stickers = false
       end

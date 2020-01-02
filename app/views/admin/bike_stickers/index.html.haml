@@ -33,7 +33,7 @@
             - bike_code_batches.each do |bike_code_batch|
               %tr
                 %td
-                  #{link_to "##{bike_code_batch.id}", admin_bike_codes_path(search_bike_code_batch_id: bike_code_batch.id)}
+                  #{link_to "##{bike_code_batch.id}", admin_bike_stickers_path(search_bike_code_batch_id: bike_code_batch.id)}
                 %td
                   %span.convertTime
                     = l bike_code_batch.created_at, format: :convert_time
@@ -45,11 +45,11 @@
                     = bike_code_batch.user&.display_name
                 %td
                   - if bike_code_batch.organization.present?
-                    = link_to bike_code_batch.organization.name, admin_bike_codes_path(organization_id: bike_code_batch.organization_id)
+                    = link_to bike_code_batch.organization.name, admin_bike_stickers_path(organization_id: bike_code_batch.organization_id)
                 %td
-                  %small= number_with_delimiter(bike_code_batch.bike_codes.count)
+                  %small= number_with_delimiter(bike_code_batch.bike_stickers.count)
                 %td
-                  %small= number_with_delimiter(bike_code_batch.bike_codes.claimed.count)
+                  %small= number_with_delimiter(bike_code_batch.bike_stickers.claimed.count)
                 %td
                   %small= bike_code_batch.prefix
                 %td
@@ -63,15 +63,15 @@
   .col-md-6
     %p
       - unless params[:search_claimed].present?
-        = number_with_delimiter(@bike_codes.total_count)
+        = number_with_delimiter(@bike_stickers.total_count)
         matching stickers,
       %span.less-strong
-        = number_with_delimiter(matching_bike_codes.claimed.count)
+        = number_with_delimiter(matching_bike_stickers.claimed.count)
         claimed
       - if sortable_search_params?
         \-
         %em
-          = link_to "view all stickers", admin_bike_codes_path
+          = link_to "view all stickers", admin_bike_stickers_path
 
     - if current_organization.present?
       %p
@@ -84,7 +84,7 @@
         %strong
           Viewing Just Batch ##{@bike_code_batch.id}
         %small
-          = link_to "view all batches", admin_bike_codes_path(sortable_search_params.except(:search_bike_code_batch_id))
+          = link_to "view all batches", admin_bike_stickers_path(sortable_search_params.except(:search_bike_code_batch_id))
 
       - duplicated = @bike_code_batch.duplicated_integers
       - if duplicated.any?
@@ -101,7 +101,7 @@
           %li.small
             #{arr[0]} > #{arr[1]}
   .col-md-6.mt-2
-    = form_tag admin_bike_codes_path, method: :get, class: "form-inline" do
+    = form_tag admin_bike_stickers_path, method: :get, class: "form-inline" do
       = hidden_field_tag :sort, sort_column
       = hidden_field_tag :sort_direction, sort_direction
       = hidden_field_tag :organization_id, params[:organization_id]
@@ -114,8 +114,8 @@
 
       = submit_tag 'Search', name: 'search', class: 'btn btn-primary ml-2'
 
-= paginate @bike_codes, views_prefix: "admin"
+= paginate @bike_stickers, views_prefix: "admin"
 
-= render partial: "table", locals: { bike_codes: @bike_codes, render_sortable: true }
+= render partial: "table", locals: { bike_stickers: @bike_stickers, render_sortable: true }
 
-= paginate @bike_codes, views_prefix: "admin"
+= paginate @bike_stickers, views_prefix: "admin"

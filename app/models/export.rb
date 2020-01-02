@@ -75,8 +75,8 @@ class Export < ApplicationRecord
   # NOTE: Only does the first 100 bikes, in case there is a huge export
   def exported_bike_ids; options["exported_bike_ids"] end
 
-  # 'options' is a weird place to put the assigned bike_codes - but whatever, it's there, just using it
-  def bike_codes; options["bike_codes_assigned"] || [] end
+  # 'options' is a weird place to put the assigned bike_stickers - but whatever, it's there, just using it
+  def bike_stickers; options["bike_codes_assigned"] || [] end
 
   def remove_bike_codes_and_record!
     return true unless assign_bike_codes? && !bike_codes_removed?
@@ -85,8 +85,8 @@ class Export < ApplicationRecord
   end
 
   def remove_bike_codes
-    (bike_codes || []).each do |code|
-      BikeCode.lookup(code, organization_id: organization_id)&.unclaim!
+    (bike_stickers || []).each do |code|
+      BikeSticker.lookup(code, organization_id: organization_id)&.unclaim!
     end
   end
 
@@ -109,7 +109,7 @@ class Export < ApplicationRecord
 
   def bike_code_start=(val)
     return true unless val.present?
-    self.options = options.merge(bike_code_start: BikeCode.normalize_code(val))
+    self.options = options.merge(bike_code_start: BikeSticker.normalize_code(val))
   end
 
   def custom_bike_ids=(val)

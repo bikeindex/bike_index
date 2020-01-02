@@ -163,28 +163,28 @@ RSpec.describe BikesController, type: :controller do
     end
     context "assigned sticker" do
       let(:organization) { FactoryBot.create(:organization) }
-      let(:bike_code) { FactoryBot.create(:bike_code, organization: organization, bike: bike, code: "ED09999") }
+      let(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, bike: bike, code: "ED09999") }
       it "renders with the sticker assigned" do
-        expect(user.authorized?(bike_code)).to be_truthy
+        expect(user.authorized?(bike_sticker)).to be_truthy
         get :show, id: bike.id, scanned_id: "ED009999", organization_id: organization.id
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
         expect(assigns(:bike)).to be_decorated
         expect(flash).to_not be_present
-        expect(assigns(:bike_code)).to eq bike_code
-        expect(user.authorized?(assigns(:bike_code))).to be_truthy
+        expect(assigns(:bike_sticker)).to eq bike_sticker
+        expect(user.authorized?(assigns(:bike_sticker))).to be_truthy
       end
       context "user not bike owner" do
         let(:user) { FactoryBot.create(:user_confirmed) }
         it "renders with the sticker assigned and user authorized for sticker" do
-          expect(user.authorized?(bike_code)).to be_falsey
+          expect(user.authorized?(bike_sticker)).to be_falsey
           get :show, id: bike.id, scanned_id: "ED009999", organization_id: organization.id
           expect(response.status).to eq(200)
           expect(response).to render_template(:show)
           expect(assigns(:bike)).to be_decorated
           expect(flash).to_not be_present
-          expect(assigns(:bike_code)).to eq bike_code
-          expect(user.authorized?(assigns(:bike_code))).to be_falsey
+          expect(assigns(:bike_sticker)).to eq bike_sticker
+          expect(user.authorized?(assigns(:bike_sticker))).to be_falsey
         end
       end
     end
@@ -319,15 +319,15 @@ RSpec.describe BikesController, type: :controller do
 
   describe "scanned" do
     let(:bike) { FactoryBot.create(:bike) }
-    let!(:bike_code) { FactoryBot.create(:bike_code, bike: bike, code: "D900") }
+    let!(:bike_sticker) { FactoryBot.create(:bike_sticker, bike: bike, code: "D900") }
     let(:organization) { FactoryBot.create(:organization) }
     context "organized no bike" do
-      let!(:bike_code2) { FactoryBot.create(:bike_code, organization: organization, code: "D0900") }
+      let!(:bike_code2) { FactoryBot.create(:bike_sticker, organization: organization, code: "D0900") }
       let!(:user) { FactoryBot.create(:user_confirmed) }
       before { set_current_user(user) }
       it "renders the scanned page" do
         get :scanned, id: "000#{bike_code2.code}", organization_id: organization.to_param
-        expect(assigns(:bike_code)).to eq bike_code2
+        expect(assigns(:bike_sticker)).to eq bike_code2
         expect(response).to render_template(:scanned)
         expect(response.code).to eq("200")
         expect(assigns(:show_organization_bikes)).to be_falsey
@@ -337,9 +337,9 @@ RSpec.describe BikesController, type: :controller do
         let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
         it "makes current_organization the organization" do
           get :scanned, id: "D0900", organization_id: organization.to_param
-          expect(assigns(:bike_code)).to eq bike_code2
+          expect(assigns(:bike_sticker)).to eq bike_code2
           expect(session[:passive_organization_id]).to eq organization.id
-          expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_code: bike_code2.code)
+          expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_sticker: bike_code2.code)
         end
         context "passed a different organization id" do
           let!(:other_organization) { FactoryBot.create(:organization, short_name: "BikeIndex") }
@@ -347,9 +347,9 @@ RSpec.describe BikesController, type: :controller do
             expect(user.memberships&.pluck(:organization_id)).to eq([organization.id])
             expect(bike_code2.organization).to eq organization
             get :scanned, id: "D900", organization_id: "BikeIndex"
-            expect(assigns(:bike_code)).to eq bike_code2
+            expect(assigns(:bike_sticker)).to eq bike_code2
             expect(session[:passive_organization_id]).to eq organization.id
-            expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_code: bike_code2.code)
+            expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param, bike_sticker: bike_code2.code)
           end
         end
       end
@@ -368,7 +368,7 @@ RSpec.describe BikesController, type: :controller do
       end
     end
     context "code_id" do
-      let!(:bike_code) { FactoryBot.create(:bike_code, code: "sss", bike: bike) }
+      let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "sss", bike: bike) }
       it "redirects to the proper page" do
         get :scanned, scanned_id: "sss"
         expect(response).to redirect_to bike_url(bike, scanned_id: "sss")
@@ -376,7 +376,7 @@ RSpec.describe BikesController, type: :controller do
       context "organization bike code" do
         let(:organization) { FactoryBot.create(:organization) }
         let(:code) { "XD934292" }
-        let!(:bike_code) { FactoryBot.create(:bike_code, code: code, organization_id: organization.id, bike: bike) }
+        let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: code, organization_id: organization.id, bike: bike) }
         it "redirects to the proper page" do
           get :scanned, scanned_id: code, organization_id: organization.id
           expect(response).to redirect_to bike_url(bike, scanned_id: code, organization_id: organization.id)
@@ -699,11 +699,11 @@ RSpec.describe BikesController, type: :controller do
       end
       context "with organization bike code and signed in member" do
         let!(:user) { FactoryBot.create(:organization_member, organization: organization) }
-        let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "aaa", kind: "sticker") }
-        let!(:wrong_bike_code) { FactoryBot.create(:bike_code, code: "aaa", kind: "sticker") }
+        let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "aaa", kind: "sticker") }
+        let!(:wrong_bike_code) { FactoryBot.create(:bike_sticker, code: "aaa", kind: "sticker") }
         it "registers a bike under signed in user and redirects with persist_email" do
           set_current_user(user)
-          post :create, bike: bike_params.merge(bike_code: "AAA")
+          post :create, bike: bike_params.merge(bike_sticker: "AAA")
           expect(response).to redirect_to(embed_extended_organization_url(organization))
           bike = Bike.last
           expect(bike.creation_state.origin).to eq "embed_extended"
@@ -712,10 +712,10 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.creation_state.creator).to eq bike.creator
           expect(bike.manufacturer).to eq manufacturer
           expect(bike.creator_id).to eq user.id
-          bike_code.reload
-          expect(bike_code.claimed?).to be_truthy
-          expect(bike_code.bike).to eq bike
-          expect(bike_code.user).to eq bike.creator
+          bike_sticker.reload
+          expect(bike_sticker.claimed?).to be_truthy
+          expect(bike_sticker.bike).to eq bike
+          expect(bike_sticker.user).to eq bike.creator
           wrong_bike_code.reload
           expect(wrong_bike_code.claimed?).to be_falsey
         end
@@ -1229,60 +1229,60 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.reload.hidden).to be_falsey
         end
 
-        context "bike_code" do
+        context "bike_sticker" do
           let(:bike_attrs) { { description: "42", handlebar_type: "drop" } }
-          let!(:bike_code) { FactoryBot.create(:bike_code, code: "a00100") }
+          let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "a00100") }
           it "updates and applies the bike code" do
-            expect(bike.bike_codes.count).to eq 0
-            put :update, id: bike.id, bike: bike_attrs, bike_code: "https://bikeindex.org/bikes/scanned/A100?organization_id=europe"
-            expect(flash[:success]).to match(bike_code.pretty_code)
+            expect(bike.bike_stickers.count).to eq 0
+            put :update, id: bike.id, bike: bike_attrs, bike_sticker: "https://bikeindex.org/bikes/scanned/A100?organization_id=europe"
+            expect(flash[:success]).to match(bike_sticker.pretty_code)
             bike.reload
             expect(bike.description).to eq "42"
             expect(bike.handlebar_type).to eq "drop"
-            expect(bike.bike_codes.count).to eq 1
-            bike_code.reload
-            expect(bike_code.claimed?).to be_truthy
-            expect(bike_code.bike).to eq bike
-            expect(bike_code.user).to eq user
+            expect(bike.bike_stickers.count).to eq 1
+            bike_sticker.reload
+            expect(bike_sticker.claimed?).to be_truthy
+            expect(bike_sticker.bike).to eq bike
+            expect(bike_sticker.user).to eq user
           end
           context "bike already has a bike code" do
             let!(:bike_code_claimed) { FactoryBot.create(:bike_code_claimed, bike: bike, user: user) }
             it "assigns another bike code, doesn't remove existing" do
-              expect(bike.bike_codes.count).to eq 1
-              put :update, id: bike.id, bike: bike_attrs, bike_code: "A 100"
-              expect(flash[:success]).to match(bike_code.pretty_code)
+              expect(bike.bike_stickers.count).to eq 1
+              put :update, id: bike.id, bike: bike_attrs, bike_sticker: "A 100"
+              expect(flash[:success]).to match(bike_sticker.pretty_code)
               bike.reload
               expect(bike.description).to eq "42"
               expect(bike.handlebar_type).to eq "drop"
-              expect(bike.bike_codes.count).to eq 2
-              bike_code.reload
-              expect(bike_code.claimed?).to be_truthy
-              expect(bike_code.bike).to eq bike
-              expect(bike_code.user).to eq bike.creator
+              expect(bike.bike_stickers.count).to eq 2
+              bike_sticker.reload
+              expect(bike_sticker.claimed?).to be_truthy
+              expect(bike_sticker.bike).to eq bike
+              expect(bike_sticker.user).to eq bike.creator
               bike_code_claimed.reload
             end
             context "not allowed to assign another code" do
-              before { stub_const("BikeCode::MAX_UNORGANIZED", 1) }
+              before { stub_const("BikeSticker::MAX_UNORGANIZED", 1) }
               it "renders errors" do
-                expect(bike.bike_codes.count).to eq 1
-                put :update, id: bike.id, bike: bike_attrs, bike_code: "A 100"
+                expect(bike.bike_stickers.count).to eq 1
+                put :update, id: bike.id, bike: bike_attrs, bike_sticker: "A 100"
                 expect(flash[:error]).to be_present
                 bike.reload
                 expect(bike.description).to eq "42"
                 expect(bike.handlebar_type).to eq "drop"
-                expect(bike.bike_codes.count).to eq 1
+                expect(bike.bike_stickers.count).to eq 1
               end
             end
           end
           context "bike code not found" do
             it "renders errors" do
-              expect(bike.bike_codes.count).to eq 0
-              put :update, id: bike.id, bike: bike_attrs, bike_code: "A 10"
+              expect(bike.bike_stickers.count).to eq 0
+              put :update, id: bike.id, bike: bike_attrs, bike_sticker: "A 10"
               expect(flash[:error]).to be_present
               bike.reload
               expect(bike.description).to eq "42"
               expect(bike.handlebar_type).to eq "drop"
-              expect(bike.bike_codes.count).to eq 0
+              expect(bike.bike_stickers.count).to eq 0
             end
           end
         end

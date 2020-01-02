@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :bike_code do
+  factory :bike_sticker do
     sequence(:code) { |n| "999#{n}" }
     factory :bike_code_claimed do
       claimed_at { Time.current }

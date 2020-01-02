@@ -105,12 +105,12 @@
       = f.label :organization_affiliation, label_affiliation
       .controls
         = f.select :organization_affiliation, @organization.reg_affiliation_options, class: "form-control"
-  - if @organization.paid_for?("bike_codes")
+  - if @organization.paid_for?("bike_stickers")
     .input-group
       .control-group
-        = f.label :bike_code, t(".sticker_id_html"), class: "control-label"
+        = f.label :bike_sticker, t(".sticker_id_html"), class: "control-label"
         .controls
-          = f.text_field :bike_code, value: @b_param.bike_code
+          = f.text_field :bike_sticker, value: @b_param.bike_sticker
   .input-group
     .submit-registration
       = submit_tag t(".register_this"), class: "button-submit"
