@@ -42,7 +42,7 @@
               = link_to bike_sticker.organization.name, admin_bike_stickers_path(sortable_search_params.merge(organization_id: bike_sticker.organization_id))
           %td
             - if bike_sticker.bike_sticker_batch.present?
-              = link_to bike_sticker.bike_sticker_batch_id, admin_bike_stickers_path(sortable_search_params.merge(search_bike_code_batch_id: bike_sticker.bike_sticker_batch_id))
+              = link_to bike_sticker.bike_sticker_batch_id, admin_bike_stickers_path(sortable_search_params.merge(search_bike_sticker_batch_id: bike_sticker.bike_sticker_batch_id))
               %small.less-strong
                 = bike_code_batch_organizations[bike_sticker.bike_sticker_batch_id.to_s]
           %td

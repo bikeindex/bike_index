@@ -115,7 +115,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
       end
       context "with assigned bike codes" do
         let(:bike) { FactoryBot.create(:bike) }
-        let!(:bike_sticker) { FactoryBot.create(:bike_code_claimed, organization: organization, code: "a1111") }
+        let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: organization, code: "a1111") }
         let(:export) { FactoryBot.create(:export_avery, organization: organization, bike_code_start: "a1111") }
         it "removes the stickers before destroying" do
           export.update_attributes(options: export.options.merge(bike_codes_assigned: ["a1111"]))
@@ -240,7 +240,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
             expect(OrganizationExportWorker).to have_enqueued_sidekiq_job(export.id)
           end
           context "avery export with already assigned bike_sticker" do
-            let!(:bike_sticker) { FactoryBot.create(:bike_code_claimed, organization: organization, code: "a221C") }
+            let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, organization: organization, code: "a221C") }
             it "makes the avery export" do
               expect(bike_sticker.claimed?).to be_truthy
               expect do

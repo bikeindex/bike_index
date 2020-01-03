@@ -3,12 +3,12 @@
     %h1
       Manage Stickers
 
-  / We only show this if there aren't any sortable search params, or there is a search_bike_code_batch_id, because performance
-  - if !sortable_search_params? || params[:search_bike_code_batch_id].present?
-    - bike_code_batches = BikeStickerBatch.includes(:user, :organization).reorder(id: :desc)
+  / We only show this if there aren't any sortable search params, or there is a search_bike_sticker_batch_id, because performance
+  - if !sortable_search_params? || params[:search_bike_sticker_batch_id].present?
+    - bike_sticker_batches = BikeStickerBatch.includes(:user, :organization).reorder(id: :desc)
     .col-12.mt-4
       %h5
-        = number_with_delimiter(bike_code_batches.count)
+        = number_with_delimiter(bike_sticker_batches.count)
         Sticker Batches
     .col-12
       .full-screen-table
@@ -30,10 +30,10 @@
               %small Max
             %th Notes
           %tbody
-            - bike_code_batches.each do |bike_sticker_batch|
+            - bike_sticker_batches.each do |bike_sticker_batch|
               %tr
                 %td
-                  #{link_to "##{bike_sticker_batch.id}", admin_bike_stickers_path(search_bike_code_batch_id: bike_sticker_batch.id)}
+                  #{link_to "##{bike_sticker_batch.id}", admin_bike_stickers_path(search_bike_sticker_batch_id: bike_sticker_batch.id)}
                 %td
                   %span.convertTime
                     = l bike_sticker_batch.created_at, format: :convert_time
@@ -84,7 +84,7 @@
         %strong
           Viewing Just Batch ##{@bike_sticker_batch.id}
         %small
-          = link_to "view all batches", admin_bike_stickers_path(sortable_search_params.except(:search_bike_code_batch_id))
+          = link_to "view all batches", admin_bike_stickers_path(sortable_search_params.except(:search_bike_sticker_batch_id))
 
       - duplicated = @bike_sticker_batch.duplicated_integers
       - if duplicated.any?
@@ -105,7 +105,7 @@
       = hidden_field_tag :sort, sort_column
       = hidden_field_tag :sort_direction, sort_direction
       = hidden_field_tag :organization_id, params[:organization_id]
-      = hidden_field_tag :search_bike_code_batch_id, params[:search_bike_code_batch_id]
+      = hidden_field_tag :search_bike_sticker_batch_id, params[:search_bike_sticker_batch_id]
       .form-check.ml-auto.ml-2
         = check_box_tag :search_claimed, true, sortable_search_params[:search_claimed].present?, class: "form-check-input"
         = label_tag :search_claimed, "Claimed only"

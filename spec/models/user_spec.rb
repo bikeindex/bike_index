@@ -169,7 +169,7 @@ RSpec.describe User, type: :model do
       let(:organization2_member) { FactoryBot.create(:organization_member, organization: organization2) }
       let(:owner) { ownership.creator }
       let!(:bike_organization) { FactoryBot.create(:bike_organization, bike: bike, organization: organization2, can_edit_claimed: true) }
-      let(:bike_sticker) { FactoryBot.create(:bike_code_claimed, bike: bike) }
+      let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike) }
       it "is truthy for admins and org members and code claimer" do
         # Sanity check bike authorization
         expect(bike.authorized?(user)).to be_falsey

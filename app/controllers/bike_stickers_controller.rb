@@ -21,7 +21,7 @@ class BikeStickersController < ApplicationController
 
   protected
 
-  def bike_code_code
+  def bike_sticker_code
     params.dig(:bike_sticker, :code) || params[:id]
   end
 
@@ -31,11 +31,11 @@ class BikeStickersController < ApplicationController
       redirect_to :back
       return
     end
-    bike_sticker = BikeSticker.lookup_with_fallback(bike_code_code, organization_id: passive_organization&.id, user: current_user)
+    bike_sticker = BikeSticker.lookup_with_fallback(bike_sticker_code, organization_id: passive_organization&.id, user: current_user)
     # use the loosest lookup, but only permit it if the user can claim that
     @bike_sticker = bike_sticker if bike_sticker.present? && bike_sticker.claimable_by?(current_user)
     return @bike_sticker if @bike_sticker.present?
-    flash[:error] = translation(:unable_to_find_sticker, code: bike_code_code)
+    flash[:error] = translation(:unable_to_find_sticker, code: bike_sticker_code)
     redirect_to :back and return
   end
 

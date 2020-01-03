@@ -16,7 +16,7 @@ module Organized
     def edit
     end
 
-    # This is exactly the same as bike_codes_controller update - except the redirect is different
+    # This is exactly the same as BikeStickersController#update - except the redirect is different
     def update
       if !@bike_sticker.claimable_by?(current_user)
         flash[:error] = translation(:cannot_update, bike_sticker_kind: @bike_sticker.kind)
@@ -41,16 +41,16 @@ module Organized
       %w[created_at claimed_at code_integer]
     end
 
-    def bike_code_code
+    def bike_sticker_code
       params.dig(:bike_sticker, :code) || params[:id]
     end
 
     def find_bike_sticker
-      bike_sticker = BikeSticker.lookup_with_fallback(bike_code_code, organization_id: current_organization.id, user: current_user)
+      bike_sticker = BikeSticker.lookup_with_fallback(bike_sticker_code, organization_id: current_organization.id, user: current_user)
       # use the loosest lookup, but only permit it if the user can claim that
       @bike_sticker = bike_sticker if bike_sticker.present? && bike_sticker.claimable_by?(current_user)
       return @bike_sticker if @bike_sticker.present?
-      flash[:error] = translation(:unable_to_find_sticker, bike_sticker: bike_code_code)
+      flash[:error] = translation(:unable_to_find_sticker, bike_sticker: bike_sticker_code)
       redirect_to organization_stickers_path(organization_id: current_organization.to_param) and return
     end
 

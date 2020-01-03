@@ -152,7 +152,7 @@ class Bike < ApplicationRecord
       includes(:bike_stickers).where(bike_stickers: { organization_id: organization_id })
     end
 
-    def no_bike_code # This method doesn't accept org_id because Seth got lazy
+    def no_bike_sticker # This method doesn't accept org_id because Seth got lazy
       includes(:bike_stickers).where(bike_stickers: { bike_id: nil })
     end
 

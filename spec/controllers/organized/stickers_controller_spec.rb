@@ -52,9 +52,9 @@ RSpec.describe Organized::StickersController, type: :controller do
           expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker.id])
         end
         context "with query search" do
-          let!(:bike_code_claimed) { FactoryBot.create(:bike_sticker, organization: organization, code: "part") }
-          let!(:bike_code_no_org) { FactoryBot.create(:bike_sticker, code: "part") }
-          before { bike_code_claimed.claim(user, FactoryBot.create(:bike).id) }
+          let!(:bike_sticker_claimed) { FactoryBot.create(:bike_sticker, organization: organization, code: "part") }
+          let!(:bike_sticker_no_org) { FactoryBot.create(:bike_sticker, code: "part") }
+          before { bike_sticker_claimed.claim(user, FactoryBot.create(:bike).id) }
           it "renders" do
             get :index, organization_id: organization.to_param, claimedness: "unclaimed", query: "part"
             expect(response).to render_template(:index)
@@ -64,14 +64,14 @@ RSpec.describe Organized::StickersController, type: :controller do
         end
         context "with bike_query" do
           let!(:bike) { FactoryBot.create(:bike) }
-          let!(:bike_code_claimed) { FactoryBot.create(:bike_sticker, organization: organization, code: "part") }
-          before { bike_code_claimed.claim(user, bike.id) }
+          let!(:bike_sticker_claimed) { FactoryBot.create(:bike_sticker, organization: organization, code: "part") }
+          before { bike_sticker_claimed.claim(user, bike.id) }
           it "renders" do
-            expect(BikeSticker.where(bike_id: bike.id).pluck(:id)).to eq([bike_code_claimed.id])
+            expect(BikeSticker.where(bike_id: bike.id).pluck(:id)).to eq([bike_sticker_claimed.id])
             get :index, organization_id: organization.to_param, bike_query: "https://bikeindex.org/bikes/#{bike.id}/edit?cool=stuff"
             expect(response).to render_template(:index)
             expect(assigns(:current_organization)).to eq organization
-            expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_code_claimed.id])
+            expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker_claimed.id])
           end
         end
       end
@@ -86,7 +86,7 @@ RSpec.describe Organized::StickersController, type: :controller do
 
       describe "update" do
         let(:bike) { FactoryBot.create(:bike) }
-        let(:bike_sticker) { FactoryBot.create(:bike_code_claimed, bike_id: bike.id, organization_id: organization.id) }
+        let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike_id: bike.id, organization_id: organization.id) }
         let(:bike2) { FactoryBot.create(:bike) }
         it "updates" do
           bike2.reload

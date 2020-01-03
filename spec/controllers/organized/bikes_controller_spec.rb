@@ -102,7 +102,7 @@ RSpec.describe Organized::BikesController, type: :controller do
         end
         context "with search_stickers" do
           let!(:bike_with_sticker) { FactoryBot.create(:bike_organized, organization: organization) }
-          let!(:bike_sticker) { FactoryBot.create(:bike_code_claimed, bike: bike_with_sticker) }
+          let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike_with_sticker) }
           it "searches for bikes with stickers" do
             expect(bike_with_sticker.bike_sticker?).to be_truthy
             get :index, { organization_id: organization.to_param, search_stickers: "none" }

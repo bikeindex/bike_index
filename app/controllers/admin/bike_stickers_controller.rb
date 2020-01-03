@@ -25,8 +25,8 @@ class Admin::BikeStickersController < Admin::BaseController
     if params[:organization_id].present?
       bike_stickers = bike_stickers.where(organization_id: current_organization.id)
     end
-    if params[:search_bike_code_batch_id].present?
-      @bike_sticker_batch = BikeStickerBatch.find(params[:search_bike_code_batch_id].to_i)
+    if params[:search_bike_sticker_batch_id].present?
+      @bike_sticker_batch = BikeStickerBatch.find(params[:search_bike_sticker_batch_id].to_i)
       bike_stickers = bike_stickers.where(bike_sticker_batch_id: @bike_sticker_batch.id)
     end
     if params[:search_claimed].present?
