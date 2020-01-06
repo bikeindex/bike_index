@@ -819,40 +819,40 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "bike_code and no_bike_code" do
+  describe "bike_sticker and no_bike_sticker" do
     let(:organization1) { FactoryBot.create(:organization) }
     let(:organization2) { FactoryBot.create(:organization) }
     let(:bike1) { FactoryBot.create(:bike_organized, organization: organization1) }
     let(:bike2) { FactoryBot.create(:bike_organized, organization: organization1) }
     let!(:bike3) { FactoryBot.create(:bike_organized, organization: organization1) }
     let!(:bike4) { FactoryBot.create(:bike_organized, organization: organization2) }
-    let!(:bike_code1) { FactoryBot.create(:bike_code_claimed, bike: bike1, organization: organization1) }
-    let!(:bike_code2) { FactoryBot.create(:bike_code_claimed, bike: bike2, organization: nil) }
+    let!(:bike_sticker1) { FactoryBot.create(:bike_sticker_claimed, bike: bike1, organization: organization1) }
+    let!(:bike_sticker2) { FactoryBot.create(:bike_sticker_claimed, bike: bike2, organization: nil) }
     it "returns appropriately" do
-      expect(bike2.bike_code?).to be_truthy
-      expect(bike2.bike_code?(organization1.id)).to be_falsey
-      expect(bike2.bike_code?(organization2.id)).to be_falsey
-      # And with an bike_code with an organization
-      expect(bike1.bike_code?).to be_truthy
-      expect(bike1.bike_code?(organization1.id)).to be_truthy
-      expect(bike1.bike_code?(organization2.id)).to be_falsey
+      expect(bike2.bike_sticker?).to be_truthy
+      expect(bike2.bike_sticker?(organization1.id)).to be_falsey
+      expect(bike2.bike_sticker?(organization2.id)).to be_falsey
+      # And with an bike_sticker with an organization
+      expect(bike1.bike_sticker?).to be_truthy
+      expect(bike1.bike_sticker?(organization1.id)).to be_truthy
+      expect(bike1.bike_sticker?(organization2.id)).to be_falsey
       # We only accept numerical ids here
-      expect(bike1.bike_code?(organization1.slug)).to be_falsey
+      expect(bike1.bike_sticker?(organization1.slug)).to be_falsey
       # Class method scope/search for bike codes
-      expect(Bike.bike_code.pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(Bike.bike_sticker.pluck(:id)).to match_array([bike1.id, bike2.id])
       expect(organization1.bikes.pluck(:id)).to match_array([bike1.id, bike2.id, bike3.id])
-      expect(organization1.bikes.bike_code.pluck(:id)).to match_array([bike1.id, bike2.id])
-      expect(organization1.bikes.bike_code(organization1.id).pluck(:id)).to eq([bike1.id])
-      expect(organization2.bikes.bike_code.pluck(:id)).to eq([])
-      expect(Bike.bike_code(organization1.id).pluck(:id)).to eq([bike1.id])
+      expect(organization1.bikes.bike_sticker.pluck(:id)).to match_array([bike1.id, bike2.id])
+      expect(organization1.bikes.bike_sticker(organization1.id).pluck(:id)).to eq([bike1.id])
+      expect(organization2.bikes.bike_sticker.pluck(:id)).to eq([])
+      expect(Bike.bike_sticker(organization1.id).pluck(:id)).to eq([bike1.id])
       # And class method scope/search for bikes without code
-      expect(Bike.no_bike_code.pluck(:id)).to match_array([bike3.id, bike4.id])
-      expect(organization1.bikes.no_bike_code.pluck(:id)).to match_array([bike3.id])
+      expect(Bike.no_bike_sticker.pluck(:id)).to match_array([bike3.id, bike4.id])
+      expect(organization1.bikes.no_bike_sticker.pluck(:id)).to match_array([bike3.id])
       # I got lazy on implementing this. We don't really need to pass organization_id in, and I couldn't figure out the join,
       # So I just skipped it. Leaving these specs just in case this becomes a thing we need - Seth
-      # expect(organization1.bikes.no_bike_code(organization1.id).pluck(:id)).to eq([bike2.id, bike3.id])
-      # expect(organization2.bikes.no_bike_code.pluck(:id)).to eq([bike4.id])
-      # expect(Bike.no_bike_code(organization1.id).pluck(:id)).to eq([bike2.id])
+      # expect(organization1.bikes.no_bike_sticker(organization1.id).pluck(:id)).to eq([bike2.id, bike3.id])
+      # expect(organization2.bikes.no_bike_sticker.pluck(:id)).to eq([bike4.id])
+      # expect(Bike.no_bike_sticker(organization1.id).pluck(:id)).to eq([bike2.id])
     end
   end
 

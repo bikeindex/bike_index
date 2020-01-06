@@ -50,7 +50,7 @@
         - if current_organization.lightspeed_pos?
           = active_link t(".lightspeed_integration_panel"), lightspeed_interface_path, class: "menu-item"
         %li.divider-above
-          - if current_organization.paid_for?("bike_codes")
+          - if current_organization.paid_for?("bike_stickers")
             = active_link t(".registration_stickers"), organization_stickers_path(organization_id: current_organization.to_param), match_controller: true, class: "menu-item"
           - else
             %span.disabled-menu-item.menu-item

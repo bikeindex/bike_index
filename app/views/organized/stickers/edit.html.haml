@@ -1,11 +1,11 @@
 .mb-4
   %h1
     = t(".edit_sticker")
-    %em= @bike_code.pretty_code
-  - if @bike_code.bike_id.present?
+    %em= @bike_sticker.pretty_code
+  - if @bike_sticker.bike_id.present?
     %p.text-right
       = link_to t(".remove_bike_link"),
-        organization_sticker_path(id: @bike_code.code, organization_id: current_organization.to_param, bike_id: nil),
+        organization_sticker_path(id: @bike_sticker.code, organization_id: current_organization.to_param, bike_id: nil),
         method: :put,
         class: "btn btn-danger"
 
@@ -13,38 +13,38 @@
   %tbody
     %tr
       %td= t(".sticker")
-      %td= @bike_code.pretty_code
+      %td= @bike_sticker.pretty_code
     %tr
       %td= t(".claimed")
       %td
-        - if @bike_code.claimed_at.present?
+        - if @bike_sticker.claimed_at.present?
           %span.convertTime
-            = l(@bike_code.created_at, format: :convert_time)
+            = l(@bike_sticker.created_at, format: :convert_time)
     %tr
       %td= t(".bike")
       %td
-        - if @bike_code.claimed?
-          = link_to(organized_bike_text(@bike_code.bike), bike_path(@bike_code.bike, organization_id: current_organization.to_param))
-        - elsif @bike_code.bike_id.present?
+        - if @bike_sticker.claimed?
+          = link_to(organized_bike_text(@bike_sticker.bike), bike_path(@bike_sticker.bike, organization_id: current_organization.to_param))
+        - elsif @bike_sticker.bike_id.present?
           %span.text-danger= t(".bike_is_unavailable")
         - else
           %strong= t(".unclaimed")
     %tr
       %td= t(".claimed_by")
-      %td= @bike_code.user&.display_name
+      %td= @bike_sticker.user&.display_name
 
-    - if @bike_code.previous_bike_id
+    - if @bike_sticker.previous_bike_id
       %tr
         %td= t(".previous_bike")
         %td
-          - previous_bike = Bike.find_by_id(@bike_code.previous_bike_id)
-          - label = previous_bike&.title_string || @bike_code.previous_bike_id
-          = link_to(label, bike_path(@bike_code.previous_bike_id, organization_id: current_organization.to_param))
+          - previous_bike = Bike.find_by_id(@bike_sticker.previous_bike_id)
+          - label = previous_bike&.title_string || @bike_sticker.previous_bike_id
+          = link_to(label, bike_path(@bike_sticker.previous_bike_id, organization_id: current_organization.to_param))
 
 %hr.mt-4.mb-4
 
-= form_for @bike_code,
-  { url: organization_sticker_path(id: @bike_code.code,
+= form_for @bike_sticker,
+  { url: organization_sticker_path(id: @bike_sticker.code,
     organization_id: current_organization.to_param),
     action: "update",
     html: { class: "organized-form" } } do |f|

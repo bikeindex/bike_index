@@ -213,10 +213,10 @@
           %td.table-cell-check.d-none.d-md-table-cell
             = check_mark if ownership.user_hidden
 
-- if @bike.bike_codes.present?
+- if @bike.bike_stickers.present?
   %h3.mt-4
     Stickers
-  = render partial: "/admin/bike_codes/table", locals: { bike_codes: @bike.bike_codes }
+  = render partial: "/admin/bike_stickers/table", locals: { bike_stickers: @bike.bike_stickers }
 
 .row.mt-4.mb-4
   .col-6

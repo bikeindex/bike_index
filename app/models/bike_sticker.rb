@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-class BikeCode < ApplicationRecord
+class BikeSticker < ApplicationRecord
   KIND_ENUM = { sticker: 0, spokecard: 1 }.freeze
   MAX_UNORGANIZED = 10
   belongs_to :bike
   belongs_to :organization
   belongs_to :user # User who assigns the bike
-  belongs_to :bike_code_batch
+  belongs_to :bike_sticker_batch
 
   scope :claimed, -> { where.not(bike_id: nil) }
   scope :unclaimed, -> { where(bike_id: nil) }
@@ -58,15 +58,15 @@ class BikeCode < ApplicationRecord
     return nil unless str.present?
     normalized_code = normalize_code(str)
     matching_codes = code_integer_and_prefix_search(normalized_code)
-    bike_code ||= matching_codes.organization_search(organization_id).first
-    return bike_code if bike_code.present?
+    bike_sticker ||= matching_codes.organization_search(organization_id).first
+    return bike_sticker if bike_sticker.present?
     user_organization_ids = user&.memberships&.pluck(:organization_id) || []
     if user_organization_ids.any?
-      bike_code ||= matching_codes.where(organization_id: user_organization_ids).first
+      bike_sticker ||= matching_codes.where(organization_id: user_organization_ids).first
     end
-    bike_code ||= matching_codes.first
-    bike_code ||= organization_search(organization_id).where("code ILIKE ?", "%#{normalized_code}%").first
-    bike_code ||= where("code ILIKE ?", "%#{normalized_code}%").first
+    bike_sticker ||= matching_codes.first
+    bike_sticker ||= organization_search(organization_id).where("code ILIKE ?", "%#{normalized_code}%").first
+    bike_sticker ||= where("code ILIKE ?", "%#{normalized_code}%").first
   end
 
   def self.admin_text_search(str)
@@ -93,7 +93,7 @@ class BikeCode < ApplicationRecord
   end
 
   def next_unclaimed_code
-    BikeCode.where(organization_id: organization_id).next_unclaimed_code(id)
+    BikeSticker.where(organization_id: organization_id).next_unclaimed_code(id)
   end
 
   def pretty_code
@@ -108,8 +108,8 @@ class BikeCode < ApplicationRecord
     return true if user_organization_ids.include?(organization_id)
     return false if claimed?
     # Because the way activerecord where.not works in rails 4, we need this nil explicitly
-    total_codes = BikeCode.where(user_id: passed_user.id, organization_id: nil).count
-    total_codes += BikeCode.where(user_id: passed_user.id).where.not(organization_id: user_organization_ids).count
+    total_codes = BikeSticker.where(user_id: passed_user.id, organization_id: nil).count
+    total_codes += BikeSticker.where(user_id: passed_user.id).where.not(organization_id: user_organization_ids).count
     total_codes < MAX_UNORGANIZED
   end
 
@@ -148,7 +148,7 @@ class BikeCode < ApplicationRecord
         bike.bike_organizations.create(organization_id: organization_id, can_not_edit_claimed: true) if organization.present?
       end
     else
-      not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike_code])
+      not_found = I18n.t(:not_found, scope: %i[activerecord errors models bike_sticker])
       errors.add(:bike, "\"#{bike_or_string}\" #{not_found}")
     end
     self
@@ -176,7 +176,7 @@ class BikeCode < ApplicationRecord
 
   def code_number_string
     str = code_integer.to_s
-    return str unless bike_code_batch&.code_number_length.present?
-    str.rjust(bike_code_batch.code_number_length, "0")
+    return str unless bike_sticker_batch&.code_number_length.present?
+    str.rjust(bike_sticker_batch.code_number_length, "0")
   end
 end

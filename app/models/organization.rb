@@ -40,7 +40,7 @@ class Organization < ApplicationRecord
   has_many :b_params
   has_many :invoices
   has_many :payments
-  has_many :bike_codes
+  has_many :bike_stickers
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :creation_states
   has_many :created_bikes, through: :creation_states, source: :bike
@@ -356,7 +356,7 @@ class Organization < ApplicationRecord
     fslugs = current_invoices.feature_slugs
     # If part of a region with regional_stickers, the organization receives the stickers paid feature
     if regional_parents.any?
-      fslugs += ["bike_codes"] if regional_parents.any? { |o| o.paid_for?("regional_stickers") }
+      fslugs += ["bike_stickers"] if regional_parents.any? { |o| o.paid_for?("regional_stickers") }
     end
     return fslugs unless parent_organization_id.present?
     (fslugs + current_parent_invoices.map(&:child_paid_feature_slugs).flatten).uniq

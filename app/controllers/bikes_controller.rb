@@ -33,7 +33,7 @@ class BikesController < ApplicationController
     end
     @bike = @bike.decorate
     if params[:scanned_id].present?
-      @bike_code = BikeCode.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
+      @bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id], organization_id: params[:organization_id], user: current_user)
     end
     respond_to do |format|
       format.html { render :show }
@@ -62,18 +62,18 @@ class BikesController < ApplicationController
   end
 
   def scanned
-    @bike_code = BikeCode.lookup_with_fallback(scanned_id, organization_id: params[:organization_id], user: current_user)
-    if @bike_code.blank?
+    @bike_sticker = BikeSticker.lookup_with_fallback(scanned_id, organization_id: params[:organization_id], user: current_user)
+    if @bike_sticker.blank?
       flash[:error] = translation(:unable_to_find_sticker, scanned_id: params[:scanned_id])
       redirect_to user_root_url
-    elsif @bike_code.bike.present?
-      redirect_to bike_url(@bike_code.bike_id, scanned_id: params[:scanned_id], organization_id: params[:organization_id]) and return
+    elsif @bike_sticker.bike.present?
+      redirect_to bike_url(@bike_sticker.bike_id, scanned_id: params[:scanned_id], organization_id: params[:organization_id]) and return
     elsif current_user.present?
       @page = params[:page] || 1
       @per_page = params[:per_page] || 25
-      if current_user.member_of?(@bike_code.organization)
-        set_passive_organization(@bike_code.organization)
-        redirect_to organization_bikes_path(organization_id: passive_organization.to_param, bike_code: @bike_code.code) and return
+      if current_user.member_of?(@bike_sticker.organization)
+        set_passive_organization(@bike_sticker.organization)
+        redirect_to organization_bikes_path(organization_id: passive_organization.to_param, bike_sticker: @bike_sticker.code) and return
       else
         @bikes = current_user.bikes.reorder(created_at: :desc).limit(100)
       end
@@ -207,7 +207,7 @@ class BikesController < ApplicationController
     if ParamsNormalizer.boolean(params[:organization_ids_can_edit_claimed_present]) || params.key?(:organization_ids_can_edit_claimed)
       update_organizations_can_edit_claimed(@bike, params[:organization_ids_can_edit_claimed])
     end
-    assign_bike_codes(params[:bike_code]) if params[:bike_code].present?
+    assign_bike_stickers(params[:bike_sticker]) if params[:bike_sticker].present?
     @bike = @bike.decorate
 
     if @bike.errors.any? || flash[:error].present?
@@ -347,13 +347,13 @@ class BikesController < ApplicationController
     end
   end
 
-  def assign_bike_codes(bike_code)
-    bike_code = BikeCode.lookup_with_fallback(bike_code)
-    return flash[:error] = translation(:unable_to_find_sticker, bike_code: bike_code) unless bike_code.present?
-    if bike_code.claim_if_permitted(current_user, @bike)
-      flash[:success] = translation(:sticker_assigned, bike_code: bike_code.pretty_code, bike_type: @bike.type)
+  def assign_bike_stickers(bike_sticker)
+    bike_sticker = BikeSticker.lookup_with_fallback(bike_sticker)
+    return flash[:error] = translation(:unable_to_find_sticker, bike_sticker: bike_sticker) unless bike_sticker.present?
+    if bike_sticker.claim_if_permitted(current_user, @bike)
+      flash[:success] = translation(:sticker_assigned, bike_sticker: bike_sticker.pretty_code, bike_type: @bike.type)
     else
-      flash[:error] = bike_code.errors.full_messages
+      flash[:error] = bike_sticker.errors.full_messages
     end
   end
 

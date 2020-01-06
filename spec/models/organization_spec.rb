@@ -285,7 +285,7 @@ RSpec.describe Organization, type: :model do
         expect(regional_child.regional_parents.pluck(:id)).to eq([regional_parent.id])
         regional_child.reload
         # It's private, so, gotta send
-        expect(regional_child.send(:calculated_paid_feature_slugs)).to eq(["bike_codes"])
+        expect(regional_child.send(:calculated_paid_feature_slugs)).to eq(["bike_stickers"])
       end
     end
   end

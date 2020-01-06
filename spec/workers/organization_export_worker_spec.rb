@@ -68,10 +68,10 @@ RSpec.describe OrganizationExportWorker, type: :job do
             ["Maya Skripal", "102 Washington Pl", "State College", "PA", "16801", "A1111"],
           ]
         end
-        let!(:bike_code) { FactoryBot.create(:bike_code, organization: organization, code: "a1111") }
+        let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization: organization, code: "a1111") }
         include_context :geocoder_real
         it "exports only bike with name, email and address" do
-          expect(bike_code.claimed?).to be_falsey
+          expect(bike_sticker.claimed?).to be_falsey
           export.update_attributes(file_format: "csv") # Manually switch to csv so that we can parse it more easily :/
           expect(organization.bikes.pluck(:id)).to match_array([bike.id, bike_for_avery.id, bike_not_avery.id])
           expect(export.avery_export?).to be_truthy
@@ -86,13 +86,13 @@ RSpec.describe OrganizationExportWorker, type: :job do
           expect(export.rows).to eq 1 # The bike without a user_name and address isn't exported
           expect(export.file.read).to eq(csv_string)
           expect(export.written_headers).to eq(%w[owner_name address city state zipcode sticker])
-          expect(export.bike_codes).to eq(["A1111"])
+          expect(export.bike_stickers).to eq(["A1111"])
           expect(export.bike_codes_removed?).to be_falsey
-          bike_code.reload
-          expect(bike_code.claimed?).to be_truthy
-          expect(bike_code.bike).to eq bike_for_avery
-          expect(bike_code.user).to eq export.user
-          expect(bike_code.claimed_at).to be_within(1.second).of Time.current
+          bike_sticker.reload
+          expect(bike_sticker.claimed?).to be_truthy
+          expect(bike_sticker.bike).to eq bike_for_avery
+          expect(bike_sticker.user).to eq export.user
+          expect(bike_sticker.claimed_at).to be_within(1.second).of Time.current
         end
       end
     end

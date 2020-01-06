@@ -1,20 +1,20 @@
 .container
   %h2
-    = @bike_code.kind
-    %em= @bike_code.code
+    = @bike_sticker.kind
+    %em= @bike_sticker.code
     = t(".isnt_linked_to_a_bike")
   %hr.mb-4.mb-4
 
   - if current_user.present?
-    - if !@bike_code.claimable_by?(current_user)
+    - if !@bike_sticker.claimable_by?(current_user)
       %h3= t(".you_have_claimed_the_maximum_permitted")
       %p
         - support_email = link_to "support@bikeindex.org", "mailto:support@bikeindex.org"
         = t(".please_email_support_html", support_email_link: support_email)
     - else
       %p
-        = t(".you_can_enter_the_url", bike_code_kind: @bike_code.kind)
-      = form_tag bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id), method: :put, class: "row" do
+        = t(".you_can_enter_the_url", bike_sticker_kind: @bike_sticker.kind)
+      = form_tag bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id), method: :put, class: "row" do
         .col-sm-8.col-lg-10
           .form-group
             = text_field_tag :bike_id, nil, placeholder: "https://bikeindex.org/bikes/1234", class: "form-control"
@@ -22,7 +22,7 @@
           = submit_tag t(".update"), class: "btn btn-success"
 
       %p{ style: "margin-top: 24px;" }
-        = t(".or_click_html", bike_code_kind: @bike_code.kind)
+        = t(".or_click_html", bike_sticker_kind: @bike_sticker.kind)
 
       %table.table.table-striped.table-bordered.table-sm.without-exterior-border
         %thead.small-header
@@ -59,8 +59,8 @@
                   %br
               %td
                 %small
-                  = link_to t(".link_bike_codekind", bike_codekind: @bike_code.kind), bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id, bike_id: bike.id), method: :put
+                  = link_to t(".link_bike_sticker_kind", bike_sticker_kind: @bike_sticker.kind), bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: bike.id), method: :put
   - else
     %p{ style: "margin-top: 24px;" }
       = t(".to_link_that_card_with_a_bike")
-      = link_to t(".please_sign_in"), new_session_url(return_to: scanned_bike_path(@bike_code.code, params: { organization_id: @bike_code.organization_id }))
+      = link_to t(".please_sign_in"), new_session_url(return_to: scanned_bike_path(@bike_sticker.code, params: { organization_id: @bike_sticker.organization_id }))

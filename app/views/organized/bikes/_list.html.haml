@@ -17,7 +17,7 @@
         %th= t(".color")
         %th= t(".sent_to")
         -# %th Claimed
-        - if @bike_code.present?
+        - if @bike_sticker.present?
           %th
             = t(".link")
             %br
@@ -40,11 +40,11 @@
                 = bike.creation_description
               - unless bike.owner_email == bike.first_owner_email
                 = "(#{t('.sent_to_a_new_owner')})"
-          - if @bike_code.present?
+          - if @bike_sticker.present?
             %td
               %small
                 = link_to t(".link"),
-                bike_code_path(id: @bike_code.code, organization_id: @bike_code.organization_id, bike_id: bike.id),
+                bike_sticker_path(id: @bike_sticker.code, organization_id: @bike_sticker.organization_id, bike_id: bike.id),
                 method: "PUT"
 
 - if defined?(@bikes.total_count)

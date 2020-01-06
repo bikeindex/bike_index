@@ -102,8 +102,8 @@ en:
         approved_stolen: Approved stolen
         b_params: B params
         belt_drive: Belt drive
-        bike_codes: Bike codes
         bike_organizations: Bike organizations
+        bike_stickers: Bike codes
         cached_data: Cached data
         can_edit_claimed_bike_organizations: Can edit claimed bike organizations
         can_edit_claimed_organizations: Can edit claimed organizations
@@ -167,9 +167,14 @@ en:
         video_embed: Video embed
         year: Year
         zipcode: Postal code
-      bike_code:
+      bike_organization:
         bike: :activerecord.models.bike
-        bike_code_batch: :activerecord.models.bike_code_batch
+        can_not_edit_claimed: Can not edit claimed
+        deleted_at: Deleted at
+        organization: :activerecord.models.organization
+      bike_sticker:
+        bike: :activerecord.models.bike
+        bike_sticker_batch: :activerecord.models.bike_sticker_batch
         claimed_at: Claimed at
         code: Code
         code_integer: Code integer
@@ -177,17 +182,12 @@ en:
         kind: Kind
         organization: :activerecord.models.organization
         user: :activerecord.models.user
-      bike_code_batch:
-        bike_codes: Bike codes
+      bike_sticker_batch:
+        bike_stickers: Bike codes
         code_number_length: Code number length
         notes: Notes
         organization: :activerecord.models.organization
         user: :activerecord.models.user
-      bike_organization:
-        bike: :activerecord.models.bike
-        can_not_edit_claimed: Can not edit claimed
-        deleted_at: Deleted at
-        organization: :activerecord.models.organization
       blog:
         body: Body
         body_abbr: Body abbr
@@ -444,8 +444,8 @@ en:
         auto_user: :activerecord.models.auto_user
         avatar: Avatar
         b_params: B params
-        bike_codes: Bike codes
         bike_organizations: Bike organizations
+        bike_stickers: Bike codes
         bikes: Bikes
         child_organizations: Child organizations
         created_bikes: Created bikes
@@ -762,7 +762,7 @@ en:
         bike:
           not_found: not found
           suspended: suspended and can't be used
-        bike_code:
+        bike_sticker:
           not_found: not found
           unauthorized_to_claim: do not have permission to claim this
         export:
@@ -792,9 +792,9 @@ en:
       ambassador_task_assignment: Ambassador task assignment
       b_param: B param
       bike: Bike
-      bike_code: Bike code
-      bike_code_batch: Bike code batch
       bike_organization: Bike organization
+      bike_sticker: Bike sticker
+      bike_sticker_batch: Bike sticker batch
       blog: Blog
       bulk_import: Bulk import
       cgroup: Cgroup
@@ -1342,13 +1342,13 @@ en:
       bikemnfg_name: bike.mnfg_name
       color: Color
       isnt_linked_to_a_bike: isn't linked to a bike.
-      link_bike_codekind: Link %{bike_codekind}
+      link_bike_sticker_kind: Link %{bike_sticker_kind}
       link_it: Link IT!
       manufacturer: Manufacturer
       mnfg_model_color_html: mnfg, model, <span class="less-strong">color</span>
       model: Model
       or_click_html: >-
-        Or, click <em>link it</em> on of your bikes to connect it to this %{bike_code_kind}:
+        Or, click <em>link it</em> on of your bikes to connect it to this %{bike_sticker_kind}:
       please_email_support_html: >-
         Please email %{support_email_link} if you don't understand why you're seeing
         this message or if you need an exception made.
@@ -1356,7 +1356,7 @@ en:
       to_link_that_card_with_a_bike: To link that card with a bike,
       update: Update
       you_can_enter_the_url: >-
-        You can enter the URL of the bike you would like to link this %{bike_code_kind}
+        You can enter the URL of the bike you would like to link this %{bike_sticker_kind}
         to:
       you_have_claimed_the_maximum_permitted: You have claimed the maximum permitted
         number of Bike Codes.
@@ -1472,8 +1472,8 @@ en:
         csrf_invalid: >-
           CSRF invalid. If you don't know why you're receiving this message, please
           contact us.
-    bike_codes:
-      find_bike_code:
+    bike_stickers:
+      find_bike_sticker:
         must_be_signed_in: You must be signed in to do that.
         unable_to_find_sticker: 'Unable to find sticker with code: %{code}'
       update:
@@ -1481,10 +1481,10 @@ en:
           You can't update that %{kind}. Please contact support@bikeindex.org if you
           think you should be able to.
     bikes:
-      assign_bike_codes:
-        sticker_assigned: Success! Sticker '%{bike_code}' has been assigned to your
-          %{bike_type}
-        unable_to_find_sticker: Unable to find a sticker matching %{bike_code}
+      assign_bike_stickers:
+        sticker_assigned: Success! Sticker '%{bike_sticker}' has been assigned to
+          your %{bike_type}
+        unable_to_find_sticker: Unable to find a sticker matching %{bike_sticker}
       create:
         bike_was_added: Bike successfully added to the index!
         bike_was_sent_to: Success! %{bike_type} was sent to %{owner_email}.
@@ -1648,7 +1648,7 @@ en:
             Your organization doesn't have access to that, please contact Bike Index
             support.
         update:
-          bike_codes_removed: Bike codes removed!
+          bike_stickers_removed: Bike codes removed!
           unknown_update_action: Unknown update action!
       manage:
         destroy:
@@ -1667,15 +1667,15 @@ en:
             Your organization doesn't have access to that, please contact Bike Index
             support.
       stickers:
-        ensure_access_to_bike_codes!:
+        ensure_access_to_bike_stickers!:
           org_does_not_have_access: >-
             Your organization doesn't have access to that, please contact Bike Index
             support.
-        find_bike_code:
-          unable_to_find_sticker: 'Unable to find sticker with code: %{bike_code}.'
+        find_bike_sticker:
+          unable_to_find_sticker: 'Unable to find sticker with code: %{bike_sticker}.'
         update:
           cannot_update: >-
-            You can't update that %{bike_code_kind}. Please contact support@bikeindex.org
+            You can't update that %{bike_sticker_kind}. Please contact support@bikeindex.org
             if you think you should be able to.
       users:
         create:
@@ -4171,13 +4171,13 @@ en:
       index:
         connected_to_bike_html: It is connected to this %{bike_link}.
         enter_url_of_the_bike_html: >-
-          You can enter the URL of the bike you would like to link this %{bike_code_kind}
+          You can enter the URL of the bike you would like to link this %{bike_sticker_kind}
           to:
         is_currently_linked: is currently linked.
         isnt_linked_to_a_bike: isn't linked to a bike.
         search_org_bikes_html: >-
           Or, search %{org_name}'s bikes, view the bike and click <em>link it</em>
-          to connect it to this %{bike_code_kind}
+          to connect it to this %{bike_sticker_kind}
         update: Update
       list:
         added: Added
@@ -4338,7 +4338,7 @@ en:
         show_first_100_bikes_in_export: Show first 100 bikes in export
         specific_bikes: Specific bikes
         stickers: Stickers
-        stickers_exported: "%{bike_codes_count} Stickers exported"
+        stickers_exported: "%{bike_stickers_count} Stickers exported"
         stickers_have_been_unassigned: Stickers have been unassigned
         unable_to_export: Unable to export, not part of your organization
         unassign_stickers: Unassign stickers

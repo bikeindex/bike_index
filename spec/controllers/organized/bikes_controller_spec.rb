@@ -73,7 +73,7 @@ RSpec.describe Organized::BikesController, type: :controller do
   context "logged_in_as_organization_member" do
     include_context :logged_in_as_organization_member
     context "paid organization" do
-      let(:paid_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_codes impound_bikes] }
+      let(:paid_feature_slugs) { %w[bike_search show_recoveries show_partial_registrations bike_stickers impound_bikes] }
       before { organization.update_columns(is_paid: true, paid_feature_slugs: paid_feature_slugs) } # Stub organization having paid feature
       describe "index" do
         context "with params" do
@@ -102,9 +102,9 @@ RSpec.describe Organized::BikesController, type: :controller do
         end
         context "with search_stickers" do
           let!(:bike_with_sticker) { FactoryBot.create(:bike_organized, organization: organization) }
-          let!(:bike_code) { FactoryBot.create(:bike_code_claimed, bike: bike_with_sticker) }
+          let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike_with_sticker) }
           it "searches for bikes with stickers" do
-            expect(bike_with_sticker.bike_code?).to be_truthy
+            expect(bike_with_sticker.bike_sticker?).to be_truthy
             get :index, { organization_id: organization.to_param, search_stickers: "none" }
             expect(response.status).to eq(200)
             expect(assigns(:current_organization)).to eq organization

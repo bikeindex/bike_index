@@ -42,7 +42,7 @@
 
 .full-screen-table.mt-4
   %p{ style: "margin-bottom: 0;" }
-    %strong= pluralize(number_with_delimiter(@bike_codes.total_count), t(".sticker"))
+    %strong= pluralize(number_with_delimiter(@bike_stickers.total_count), t(".sticker"))
 
   %table.table.table-striped.table-bordered.table-sm.without-exterior-border
     %thead.sortable
@@ -58,21 +58,21 @@
         = sortable "code_integer", t(".coded")
 
     %tbody
-      - @bike_codes.each do |bike_code|
+      - @bike_stickers.each do |bike_sticker|
         %tr
           %td
-            %a.convertTime{ href: edit_organization_sticker_path(organization_id: current_organization.to_param, id: bike_code.code) }
-              = l(bike_code.created_at, format: :convert_time)
+            %a.convertTime{ href: edit_organization_sticker_path(organization_id: current_organization.to_param, id: bike_sticker.code) }
+              = l(bike_sticker.created_at, format: :convert_time)
           %td
-            - if bike_code.claimed? && bike_code.claimed_at.present?
+            - if bike_sticker.claimed? && bike_sticker.claimed_at.present?
               %span.convertTime
-                = l(bike_code.claimed_at, format: :convert_time)
+                = l(bike_sticker.claimed_at, format: :convert_time)
           %td
-            - if bike_code.claimed?
+            - if bike_sticker.claimed?
               -# For these, use bike_id to avoid loading association
-              = link_to(organized_bike_text(bike_code.bike), bike_path(bike_code.bike, organization_id: current_organization.to_param))
+              = link_to(organized_bike_text(bike_sticker.bike), bike_path(bike_sticker.bike, organization_id: current_organization.to_param))
           %td
-            %strong= bike_code.pretty_code
+            %strong= bike_sticker.pretty_code
 
 .paginate-container.paginate-container-bottom
-  = paginate @bike_codes
+  = paginate @bike_stickers

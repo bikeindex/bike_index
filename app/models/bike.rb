@@ -39,7 +39,7 @@ class Bike < ApplicationRecord
   has_many :ownerships, dependent: :destroy
   has_many :public_images, as: :imageable, dependent: :destroy
   has_many :components, dependent: :destroy
-  has_many :bike_codes
+  has_many :bike_stickers
   has_many :b_params, foreign_key: :created_bike_id, dependent: :destroy
   has_many :duplicate_bike_groups, through: :normalized_serial_segments
   has_many :recovered_records, -> { recovered }, class_name: "StolenRecord"
@@ -147,13 +147,13 @@ class Bike < ApplicationRecord
       where(id: bike_id).first
     end
 
-    def bike_code(organization_id = nil) # This method only accepts numerical org ids
-      return includes(:bike_codes).where.not(bike_codes: { bike_id: nil }) if organization_id.blank?
-      includes(:bike_codes).where(bike_codes: { organization_id: organization_id })
+    def bike_sticker(organization_id = nil) # This method only accepts numerical org ids
+      return includes(:bike_stickers).where.not(bike_stickers: { bike_id: nil }) if organization_id.blank?
+      includes(:bike_stickers).where(bike_stickers: { organization_id: organization_id })
     end
 
-    def no_bike_code # This method doesn't accept org_id because Seth got lazy
-      includes(:bike_codes).where(bike_codes: { bike_id: nil })
+    def no_bike_sticker # This method doesn't accept org_id because Seth got lazy
+      includes(:bike_stickers).where(bike_stickers: { bike_id: nil })
     end
 
     def organization(org_or_org_ids)
@@ -375,8 +375,8 @@ class Bike < ApplicationRecord
     impound_record ||= impound_records.create(user: passed_user, organization: organization)
   end
 
-  def bike_code?(organization_id = nil) # This method only accepts numerical org ids
-    bike_codes.where(organization_id.present? ? { organization_id: organization_id } : {}).any?
+  def bike_sticker?(organization_id = nil) # This method only accepts numerical org ids
+    bike_stickers.where(organization_id.present? ? { organization_id: organization_id } : {}).any?
   end
 
   def display_contact_owner?(u = nil)
