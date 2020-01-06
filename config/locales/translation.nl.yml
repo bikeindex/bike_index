@@ -178,9 +178,6 @@ nl:
         bike:
           not_found: niet gevonden
           suspended: geschorst en kan niet worden gebruikt
-        bike_code:
-          not_found: niet gevonden
-          unauthorized_to_claim: hebben geen toestemming om dit te claimen
         export:
           required: verplicht
         manufacturer:
@@ -198,6 +195,9 @@ nl:
         user:
           email_already_exists: Die e-mail is al aangemeld op Bike Index.
           not_an_available_language: geen beschikbare taal
+        bike_sticker:
+          not_found: niet gevonden
+          unauthorized_to_claim: hebben geen toestemming om dit te claimen
     attributes:
       doorkeeper/application:
         name: Naam
@@ -303,7 +303,6 @@ nl:
         approved_stolen: Goedgekeurd gestolen
         b_params: B params
         belt_drive: Riemaandrijving
-        bike_codes: Fietscodes
         bike_organizations: Fietsorganisaties
         cached_data: Gegevens in cache
         can_edit_claimed_bike_organizations: Kan geclaimde fietsorganisaties bewerken
@@ -354,16 +353,7 @@ nl:
         year: jaar
         zipcode: Postcode
         abandoned: Verlaten
-      bike_code:
-        claimed_at: Geclaimd op
-        code: Code
-        code_integer: Geheel getal code
-        code_prefix: Code voorvoegsel
-        kind: Soort
-      bike_code_batch:
-        bike_codes: Fietscodes
-        code_number_length: Codenummer lengte
-        notes: Notes
+        bike_stickers: Fietscodes
       bike_organization:
         can_not_edit_claimed: Kan geclaimd niet bewerken
         deleted_at: Verwijderd om
@@ -572,7 +562,6 @@ nl:
         ascend_name: Naam opstijgen
         avatar: Avatar
         b_params: B params
-        bike_codes: Fietscodes
         bike_organizations: Fietsorganisaties
         bikes: Bikes
         child_organizations: Kinderorganisaties
@@ -602,6 +591,7 @@ nl:
         slug: Naaktslak
         users: Gebruikers
         website: Website
+        bike_stickers: Fietscodes
       organization_message:
         accuracy: Nauwkeurigheid
         address: Adres
@@ -801,6 +791,16 @@ nl:
         iso_bsd: Iso bsd
         name: Naam
         priority: Prioriteit
+      bike_sticker:
+        claimed_at: Geclaimd op
+        code: Code
+        code_integer: Geheel getal code
+        code_prefix: Code voorvoegsel
+        kind: Soort
+      bike_sticker_batch:
+        bike_stickers: Fietscodes
+        code_number_length: Codenummer lengte
+        notes: Notes
     enums:
       cycle_type:
         bike: Fiets
@@ -850,8 +850,6 @@ nl:
       ambassador_task_assignment: Taakopdracht ambassadeur
       b_param: B param
       bike: Fiets
-      bike_code: Fietscode
-      bike_code_batch: Fietscode batch
       bike_organization: Fiets organisatie
       blog: Blog
       bulk_import: Bulk import
@@ -902,6 +900,8 @@ nl:
       user: Gebruiker
       user_email: gebruikers e-mail
       wheel_size: Wielgrootte
+      bike_sticker: Fiets sticker
+      bike_sticker_batch: Fietssticker batch
     select_options:
       color:
         black: Zwart
@@ -2032,7 +2032,6 @@ nl:
       bikemnfg_name: bike.mnfg_name
       color: Kleur
       isnt_linked_to_a_bike: is niet gekoppeld aan een fiets.
-      link_bike_codekind: Link %{bike_codekind}
       link_it: Koppelen!
       manufacturer: Fabrikant
       mnfg_model_color_html: mnfg, model, <span class="less-strong">kleur</span>
@@ -2049,6 +2048,7 @@ nl:
         koppelen %{bike_code_kind} aan:'
       you_have_claimed_the_maximum_permitted: U hebt het maximaal toegestane aantal
         fietscodes geclaimd.
+      link_bike_sticker_kind: Link %{bike_sticker_kind}
     show:
       at: bij
       bike_in_admin: "%{bike_type} in Admin"
@@ -2190,26 +2190,19 @@ nl:
         unable_to_find_sticker: 'Kan sticker niet vinden: %{scanned_id}'
       update:
         bike_was_updated: Fiets succesvol bijgewerkt!
-      assign_bike_codes:
-        sticker_assigned: Succes! Sticker '%{bike_code}' is toegewezen aan uw %{bike_type}
-        unable_to_find_sticker: Kan geen overeenkomende sticker vinden %{bike_code}
       recovery:
         ensure_token_match!:
           already_recovered: Fiets is al gemarkeerd als hersteld!
           incorrect_token: Onjuist token, controleer uw e-mail opnieuw
         update:
           bike_recovered: Fiets gemarkeerd hersteld! Dank je!
+      assign_bike_stickers:
+        sticker_assigned: Succes! Sticker '%{bike_sticker}' is toegewezen aan uw %{bike_type}
+        unable_to_find_sticker: Kan geen overeenkomende sticker vinden %{bike_sticker}
     application:
       handle_unverified_request:
         csrf_invalid: CSRF ongeldig. Neem contact met ons op als u niet weet waarom
           u dit bericht ontvangt.
-    bike_codes:
-      find_bike_code:
-        must_be_signed_in: Je moet aangemeld zijn om dat te doen.
-        unable_to_find_sticker: 'Kan sticker met code niet vinden: %{code}'
-      update:
-        cannot_update: Je kunt dat %{kind} niet bijwerken. Neem contact op met support@bikeindex.org
-          als u denkt dat dit mogelijk zou moeten zijn.
     feedbacks:
       block_the_spam:
         please_sign_in: Meld je aan om dat bericht te verzenden
@@ -2422,8 +2415,8 @@ nl:
           your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
             neem contact op met Bike Index support.
         update:
-          bike_codes_removed: Fietscodes verwijderd!
           unknown_update_action: Onbekende updateactie!
+          bike_stickers_removed: Fietscodes verwijderd!
       manage:
         destroy:
           contact_support_to_delete: Neem contact op met support@bikeindex.org om
@@ -2441,14 +2434,14 @@ nl:
           your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
             neem contact op met Bike Index support.
       stickers:
-        ensure_access_to_bike_codes!:
-          org_does_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
-            contact op met Bike Index support.
-        find_bike_code:
-          unable_to_find_sticker: 'Kan sticker met code niet vinden: %{bike_code}.'
         update:
           cannot_update: Je kunt dat %{bike_code_kind} niet bijwerken. Neem contact
             op met support@bikeindex.org als u denkt dat dit mogelijk zou moeten zijn.
+        ensure_access_to_bike_stickers!:
+          org_does_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
+            contact op met Bike Index support.
+        find_bike_sticker:
+          unable_to_find_sticker: 'Kan sticker met code niet vinden: %{bike_sticker}.'
       users:
         create:
           insufficient_invitations: U hebt geprobeerd %{invite_count} gebruikers uit
@@ -2466,6 +2459,13 @@ nl:
             is.
         update:
           updated_membership: Bijgewerkt lidmaatschap voor %{user_email}.
+    bike_stickers:
+      find_bike_sticker:
+        must_be_signed_in: Je moet aangemeld zijn om dat te doen.
+        unable_to_find_sticker: 'Kan sticker met code niet vinden: %{code}'
+      update:
+        cannot_update: Je kunt dat %{kind} niet bijwerken. Neem contact op met support@bikeindex.org
+          als u denkt dat dit mogelijk zou moeten zijn.
   customer_mailer:
     additional_email_confirmation:
       html:
