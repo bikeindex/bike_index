@@ -127,7 +127,9 @@ class BParam < ApplicationRecord
 
   def no_duplicate; bike["no_duplicate"] || false end
 
-  def bike_sticker; bike["bike_sticker"] end
+  def bike_sticker
+    bike["bike_sticker"].presence || bike["bike_code"].presence
+  end
 
   def phone; bike["phone"] end
 
