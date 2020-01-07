@@ -29,13 +29,37 @@ RSpec.describe GraphingHelper, type: :helper do
     end
   end
 
+  describe "group_by_format" do
+    let(:end_time) { Time.at(1578268910) } # 2020-01-06 00:01:38 UTC
+    let(:time_range) { start_time..end_time }
+    context "23 hours" do
+      let(:start_time) { end_time - 23.hours }
+      it "is minute:hour:second pm" do
+        expect(end_time.strftime(group_by_format(time_range))).to eq " 4:01 PM"
+      end
+    end
+    context "6 days" do
+      let(:start_time) { end_time - 10.days }
+      it "is weekday month-date" do
+        expect(end_time.strftime(group_by_format(time_range))).to eq "Sun 1-5"
+      end
+    end
+  end
+
   describe "humanized_time_range" do
     context "standard time range" do
       it "returns period" do
         @period = "week"
         expect(humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the past week"
       end
+      context "week" do
+        it "returns period" do
+          @period = "all"
+          expect(humanized_time_range((Time.current - 1.week)..Time.current)).to be_blank
+        end
+      end
     end
+
     context "custom time period" do
       let(:end_time) { Time.at(1578268910) } # 2020-01-06 00:01:38 UTC
       let(:time_range) { start_time..end_time }
@@ -49,10 +73,10 @@ RSpec.describe GraphingHelper, type: :helper do
             start_time.strftime("%FT%T%z"),
             '</em> to <em class="convertTime preciseTimeSeconds">',
             end_time.strftime("%FT%T%z") + '</em>'
-          ].join
+          ]
         end
         it "returns with preciseTimeSeconds" do
-          expect(humanized_time_range(time_range)).to eq "<span>" + target_html + "</span>"
+          expect(humanized_time_range(time_range)).to eq "<span>" + target_html.join + "</span>"
         end
       end
 
@@ -64,10 +88,17 @@ RSpec.describe GraphingHelper, type: :helper do
             start_time.strftime("%FT%T%z"),
             '</em> to <em class="convertTime preciseTime">',
             end_time.strftime("%FT%T%z") + '</em>'
-          ].join
+          ]
         end
         it "returns time in precise time" do
-          expect(humanized_time_range(time_range)).to eq "<span>" + target_html + "</span>"
+          expect(humanized_time_range(time_range)).to eq "<span>" + target_html.join + "</span>"
+        end
+        context "ending now" do
+          let(:end_time) { Time.current - 1.minute } # Because we send time by minute
+          let(:current_target_html) { target_html.slice(0, 2) + ["</em> to <em>now</em>"] }
+          it "returns time in precise time" do
+            expect(humanized_time_range(time_range)).to eq "<span>" + current_target_html.join + "</span>"
+          end
         end
       end
 
@@ -79,10 +110,10 @@ RSpec.describe GraphingHelper, type: :helper do
             start_time.strftime("%FT%T%z"),
             '</em> to <em class="convertTime ">',
             end_time.strftime("%FT%T%z") + '</em>'
-          ].join
+          ]
         end
         it "returns with preciseTimeSeconds" do
-          expect(humanized_time_range(time_range)).to eq "<span>" + target_html + "</span>"
+          expect(humanized_time_range(time_range)).to eq "<span>" + target_html.join + "</span>"
         end
       end
     end

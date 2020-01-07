@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 module GraphingHelper
+  def time_range_counts(collection:, column: "created_at", name: nil, time_range: nil)
+    time_range ||= @time_range
+    collection.send(group_by_method(time_range), column, range: time_range, format: group_by_format(time_range)).count
+  end
+
   def group_by_method(time_range)
     if time_range.last - time_range.first < 3601
       :group_by_minute
@@ -16,16 +21,17 @@ module GraphingHelper
   end
 
   def group_by_format(time_range)
-    if time_range.last - time_range.first < 86401 # 24 hours
+    if time_range.last - time_range.first < 24.hours.to_i # 24 hours
       "%l:%M %p"
-    elsif time_range.last - time_range.first < 604801 # One week
-      "%a"
+    elsif time_range.last - time_range.first < 2.weeks.to_i # One week
+      "%a %-m-%-d"
     else
       nil # Let it fallback to the default handling
     end
   end
 
   def humanized_time_range(time_range)
+    return nil if @period == "all"
     return "in the past #{@period}" unless @period == "custom"
     group_by = group_by_method(time_range)
     if group_by == :group_by_minute
@@ -39,7 +45,11 @@ module GraphingHelper
       concat "from "
       concat content_tag(:em, l(time_range.first, format: :convert_time), class: "convertTime #{precision_class}")
       concat " to "
-      concat content_tag(:em, l(time_range.last, format: :convert_time), class: "convertTime #{precision_class}")
+      if time_range.last > Time.current - 5.minutes
+        concat content_tag(:em, "now")
+      else
+        concat content_tag(:em, l(time_range.last, format: :convert_time), class: "convertTime #{precision_class}")
+      end
     end
   end
 
