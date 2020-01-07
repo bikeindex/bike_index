@@ -25,7 +25,7 @@ class Admin::TheftAlertsController < Admin::BaseController
     end
   end
 
-  helper_method = :matching_theft_alerts
+  helper_method :matching_theft_alerts
 
   private
 
