@@ -1,31 +1,30 @@
 #timeSelectionBtnGroup.col-md.col-12.text-right{ role: "group", class: @period == "custom" ? "custom-period-selected" : "" }
   %button.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "hour"), data: { period: "hour" } }
-    %span.d-none.d-md-inline-block Past
-    hour
+    %span.d-none.d-md-inline-block= t(".past")
+    = t(".hour")
   %button.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "day"), data: { period: "day" } }
-    %span.d-none.d-md-inline-block Past
-    day
+    %span.d-none.d-md-inline-block= t(".past")
+    = t(".day")
   %button.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "week"), data: { period: "week" } }
-    %span.d-none.d-md-inline-block Past
-    7 days
+    %span.d-none.d-md-inline-block= t(".past")
+    = t(".seven_days")
   %button.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "month"), data: { period: "month" } }
-    %span.d-none.d-md-inline-block Past
-    30 days
+    %span.d-none.d-md-inline-block= t(".past")
+    = t(".thirty_days")
   %button.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "year"), data: { period: "year" } }
-    %span.d-none.d-md-inline-block Past
-    year
+    %span.d-none.d-md-inline-block= t(".past")
+    = t(".year")
   %button.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "all"), data: { period: "all" } }
-    All
-  / For custom, if not passed a start_at, we use the default period we want to still select it
+    = t(".all")
   %button#periodSelectCustom.btn.btn-outline-secondary.btn-sm.ml-2{ class: ("active" if @period == "custom"), data: { period: "custom" } }
-    Custom period
+    = t(".custom")
 
 %form#timeSelectionCustom.form-inline.col-12.justify-content-end.mt-2.collapse{ class: @period == "custom" ? "show" : "" }
   .form-group
-    = label_tag :start_time_selector, "From", class: "control-label mr-2"
+    = label_tag :start_time_selector, t(".from"), class: "control-label mr-2"
     = datetime_local_field_tag :start_time_selector, @start_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
   .form-group.ml-4
-    = label_tag :end_time_selector, "To", class: "control-label mr-2"
+    = label_tag :end_time_selector, t(".to"), class: "control-label mr-2"
     = datetime_local_field_tag :end_time_selector, @end_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
   %button#updatePeriodSelectCustom.btn.btn-success.btn-sm.ml-2
-    Update
+    = t(".update")

@@ -15,6 +15,16 @@ module GraphingHelper
     end
   end
 
+  def group_by_format(time_range)
+    if time_range.last - time_range.first < 86401 # 24 hours
+      "%l:%M %p"
+    elsif time_range.last - time_range.first < 604801 # One week
+      "%a"
+    else
+      nil # Let it fallback to the default handling
+    end
+  end
+
   def humanized_time_range(time_range)
     return "in the past #{@period}" unless @period == "custom"
     group_by = group_by_method(time_range)

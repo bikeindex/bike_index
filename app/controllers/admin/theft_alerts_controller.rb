@@ -1,11 +1,13 @@
 class Admin::TheftAlertsController < Admin::BaseController
   include SortableTable
 
+  before_action :period_defaults_to_all
   before_action :set_period, only: [:index]
   before_action :find_theft_alert, only: [:edit, :update]
 
   # TODO: Add sorting and filtering
   def index
+    @render_chart = ParamsNormalizer.boolean(params[:render_chart])
     @theft_alerts =
       matching_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
         .includes(:theft_alert_plan)
@@ -35,6 +37,10 @@ class Admin::TheftAlertsController < Admin::BaseController
     @bike ||= @stolen_record.bike.decorate
   end
 
+  def period_defaults_to_all
+    @period = "all" unless params[:period].present?
+  end
+
   def theft_alert_params
     params.require(:theft_alert).permit(
       :begin_at,
@@ -51,7 +57,8 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def matching_theft_alerts
-    TheftAlert.where(created_at: @time_range)
+    return @matching_theft_alerts if defined?(@matching_theft_alerts)
+    @matching_theft_alerts = period_search? ? TheftAlert.where(created_at: @time_range) : TheftAlert
   end
 
   def set_alert_timestamps(theft_alert_attrs)
