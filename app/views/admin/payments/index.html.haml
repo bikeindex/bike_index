@@ -9,14 +9,18 @@
       %li.nav-item
         = link_to "graph", admin_payments_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 
-/ - if @render_chart
-/   :ruby
-/     theft_alerts_graph = TheftAlertPlan.all.map do |theft_alert_plan|
-/       { name: theft_alert_plan.name, data: matching_theft_alerts.where(theft_alert_plan: theft_alert_plan).send(group_by_method(@time_range), "theft_alerts.created_at", range: @time_range, format: group_by_format(@time_range)).count }
-/     end
-/   .col-12.mt-2
+- if @render_chart
+  :ruby
+    theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| matching_theft_alerts.where(theft_alert_plan: plan).any? }
+    payments_graph = theft_alert_plans.map do |theft_alert_plan|
+      {
+        name: theft_alert_plan.name,
+        data: time_range_counts(collection: matching_theft_alerts.where(theft_alert_plan: theft_alert_plan))
+      }
+    end
 
-/     = column_chart theft_alerts_graph, stacked: true, thousands: ",", defer: true
+  .col-12.mt-2
+    = column_chart payments_graph, stacked: true, thousands: ",", defer: true
 
 .col-12.mb-4.mt-2
   .row.justify-content-end
@@ -42,7 +46,7 @@
       %th
         = sortable "invoice_id"
       %th
-        = sortable "kind"
+        = sortable "payment_method", "method"
       %th
         = sortable "amount_cents", "Amount"
     %tbody
@@ -73,7 +77,7 @@
               - if payment.stripe?
                 = link_to "Stripe", "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
               - else
-                = payment.kind.humanize
+                = payment.payment_method.humanize
           %td
             = payment.amount_formatted
 = paginate @payments, views_prefix: "admin"

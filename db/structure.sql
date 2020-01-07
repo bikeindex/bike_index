@@ -1854,7 +1854,7 @@ CREATE TABLE public.payments (
     updated_at timestamp without time zone NOT NULL,
     email character varying(255),
     is_payment boolean DEFAULT false NOT NULL,
-    kind integer DEFAULT 0,
+    payment_method integer DEFAULT 0,
     organization_id integer,
     invoice_id integer,
     currency character varying DEFAULT 'USD'::character varying NOT NULL
@@ -4848,4 +4848,6 @@ INSERT INTO schema_migrations (version) VALUES ('20191117123105');
 INSERT INTO schema_migrations (version) VALUES ('20191209160937');
 
 INSERT INTO schema_migrations (version) VALUES ('20200101211426');
+
+INSERT INTO schema_migrations (version) VALUES ('20200107234030');
 

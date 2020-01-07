@@ -1,12 +1,14 @@
 class Payment < ApplicationRecord
   include Amountable
-  KIND_ENUM = { stripe: 0, check: 1 }.freeze
+  PAYMENT_METHOD_ENUM = { stripe: 0, check: 1 }.freeze
+  # KIND_ENUM = { donation: 0, payment: 1, theft_alert: 2 }
 
   scope :current, -> { where(is_current: true) }
   scope :subscription, -> { where(is_recurring: true) }
   scope :organizations, -> { where.not(organization_id: nil) }
 
-  enum kind: KIND_ENUM
+  enum payment_method: PAYMENT_METHOD_ENUM
+  # enum kind: KIND_ENUM
 
   belongs_to :user
   belongs_to :organization
@@ -20,8 +22,8 @@ class Payment < ApplicationRecord
   after_create :send_invoice_email
   after_commit :update_invoice
 
-  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
-  def self.admin_creatable_kinds; ["check"] end
+  def self.payment_methods; PAYMENT_METHOD_ENUM.keys.map(&:to_s) end
+  def self.admin_creatable_payment_methods; ["check"] end
 
   def set_calculated_attributes
     self.is_payment = true if invoice_id.present?
@@ -33,7 +35,7 @@ class Payment < ApplicationRecord
   end
 
   def send_invoice_email
-    EmailInvoiceWorker.perform_async(id) if kind == "stripe"
+    EmailInvoiceWorker.perform_async(id) if payment_method == "stripe"
   end
 
   def is_donation
