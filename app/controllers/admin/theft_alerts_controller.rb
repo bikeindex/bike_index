@@ -1,6 +1,7 @@
 class Admin::TheftAlertsController < Admin::BaseController
   include SortableTable
 
+  before_action :set_period, only: [:index]
   before_action :find_theft_alert, only: [:edit, :update]
 
   # TODO: Add sorting and filtering
@@ -23,6 +24,8 @@ class Admin::TheftAlertsController < Admin::BaseController
       render :edit
     end
   end
+
+  helper_method = :matching_theft_alerts
 
   private
 
@@ -48,7 +51,7 @@ class Admin::TheftAlertsController < Admin::BaseController
   end
 
   def matching_theft_alerts
-    TheftAlert
+    TheftAlert.where(created_at: @time_range)
   end
 
   def set_alert_timestamps(theft_alert_attrs)

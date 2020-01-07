@@ -1,5 +1,7 @@
 require "rails_helper"
 
+base_url = "/admin/theft_alerts"
+
 RSpec.describe Admin::TheftAlertsController, type: :request do
   context "given a logged-in superuser" do
     include_context :request_spec_logged_in_as_superuser
@@ -7,9 +9,44 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
     describe "GET /admin/theft_alerts" do
       let!(:theft_alert) { FactoryBot.create(:theft_alert) }
       it "responds with 200 OK and renders the index template" do
-        get "/admin/theft_alerts"
+        get base_url
         expect(response).to be_ok
         expect(response).to render_template(:index)
+      end
+      context "period of one day" do
+        let(:target_timezone) { ActiveSupport::TimeZone["Pacific Time (US & Canada)"] }
+        it "renders the period expected" do
+          get base_url, period: "day", timezone: "Pacific Time (US & Canada)"
+          expect(response.code).to eq "200"
+          expect(response).to render_template(:index)
+          Time.zone = target_timezone
+          expect(assigns(:start_time).to_i).to be_within(1).of((Time.current.beginning_of_day - 1.day).to_i)
+          expect(assigns(:end_time).to_i).to be_within(1).of Time.current.to_i
+        end
+      end
+      context "custom without end_time" do
+        let(:start_time) { Time.at(1577050824) } # 2019-12-22 15:40:50 UTC
+        xit "renders the period expected" do
+          get base_url, params: { period: "custom", start_time: start_time.to_i, end_time: "" }
+          expect(response.code).to eq "200"
+          expect(response).to render_template(:index)
+          expect(assigns(:timezone)).to eq TimeParser::DEFAULT_TIMEZONE
+          expect(assigns(:period)).to eq "custom"
+          expect(assigns(:start_time)).to be_within(1.second).of Time.current.beginning_of_day - 7.days
+          expect(assigns(:end_time)).to be_within(1.second).of Time.current
+        end
+      end
+      context "period of one day" do
+        let(:start_time) { Time.at(1577050824) } # 2019-12-22 15:40:50 UTC
+        let(:end_time) { Time.at(1578001180) } # 2020-01-02 21:42:01 UTC
+        xit "renders the period expected" do
+          get base_url, params: { period: "custom", start_time: start_time.to_i, end_time: end_time.to_i }
+          expect(response.code).to eq "200"
+          expect(response).to render_template(:index)
+          expect(assigns(:timezone)).to eq TimeParser::DEFAULT_TIMEZONE
+          expect(assigns(:start_time)).to be_within(1.second).of start_time
+          expect(assigns(:end_time)).to be_within(1.second).of end_time
+        end
       end
     end
 

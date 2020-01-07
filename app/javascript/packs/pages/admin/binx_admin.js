@@ -8,6 +8,7 @@ import BinxAdminInvoices from "./invoices.js";
 import BinxAdminOrganizationForm from "./organization_form.js";
 import BinxAdminBlogs from "./blogs.js";
 import BinxAdminImageUploader from "./image_uploader.js";
+import PeriodSelector from "../../utils/period_selector.js";
 
 function BinxAdmin() {
   return {
@@ -16,7 +17,6 @@ function BinxAdmin() {
       // Enable bootstrap custom file upload boxes
       binxApp.enableFilenameForUploads();
       LoadFancySelects();
-      this.enablePeriodSelection();
 
       if ($(".calendar-box")[0]) {
         const binxAdminGraphs = BinxAdminGraphs();
@@ -59,6 +59,8 @@ function BinxAdmin() {
         const binxAdminImageUploader = BinxAdminImageUploader();
         binxAdminImageUploader.init();
       }
+      const periodSelector = PeriodSelector();
+      periodSelector.init();
     },
 
     initAdminSearchSelect() {
@@ -90,27 +92,6 @@ function BinxAdmin() {
         );
         event.preventDefault();
         LoadFancySelects();
-      });
-    },
-
-    enablePeriodSelection() {
-      $("#timeSelectionBtnGroup button").on("click", function(e) {
-        let joiner;
-        const period = $(e.target).attr("data-period");
-        const current_url = location.href
-          .replace(/&?period=[^&]*/, "") // Grab period=
-          .replace(/&?timezone=[^&]*/, "") // Grab timezone=
-          .replace(/\?&/, "?") // replace ?& with just ?
-          .replace(/&&/g, "&") // Grab &&, replace with single
-          .replace(/(\?|&)$/, ""); // Grab ending ? or & - we don't need it
-        if (current_url.match(/\?/)) {
-          joiner = "&";
-        } else {
-          joiner = "?";
-        }
-        return (location.href = `${current_url}${joiner}period=${period}&timezone=${
-          window.localTimezone
-        }`);
       });
     },
 

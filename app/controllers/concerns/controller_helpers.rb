@@ -175,27 +175,17 @@ module ControllerHelpers
   def set_period
     # Set time period
     @period ||= params[:period]
-    case @period
-    when "hour"
-      @start_time = Time.current - 1.hour
-    when "day"
-      @start_time = Time.current.beginning_of_day - 1.day
-    when "month"
-      @start_time = Time.current.beginning_of_day - 30.days
-    when "year"
-      @start_time = Time.current.beginning_of_day - 1.year
-    when "all"
-      if current_organization.present?
-        @start_time = current_organization.created_at
-        @start_time = Time.current - 1.year if @start_time > (Time.current - 1.year)
-      else
-        @start_time = Time.at(1134972000) # Earliest bike created at
+    if @period == "custom"
+      if params[:start_time].present? && params[:end_time].present?
+        @start_time = TimeParser.parse(params[:start_time])
+        @end_time = TimeParser.parse(params[:end_time])
+      else # use the default period
+        set_default_period
       end
-    else # Default to week view
-      @period = "week"
-      @start_time = Time.current.beginning_of_day - 7.days
+    else
+      set_time_range_from_period
     end
-    @time_range = @start_time..Time.current
+    @time_range = @start_time..@end_time
   end
 
   protected
@@ -279,5 +269,29 @@ module ControllerHelpers
       ENV["BIKEHUB_URL"].presence || "https://new.bikehub.com",
       path,
     ].join("/")
+  end
+
+  def set_time_range_from_period
+    case @period
+    when "hour"
+      @start_time = Time.current - 1.hour
+    when "day"
+      @start_time = Time.current.beginning_of_day - 1.day
+    when "month"
+      @start_time = Time.current.beginning_of_day - 30.days
+    when "year"
+      @start_time = Time.current.beginning_of_day - 1.year
+    when "all"
+      @start_time = Time.at(1525818016) # 1 month before Earliest deployment created at
+    else # Default to week view
+      @period = "week"
+      set_default_period
+    end
+    @end_time ||= Time.current
+  end
+
+  def set_default_period # Separate method so it can be overriden
+    @end_time = Time.current
+    @start_time = Time.current.beginning_of_day - 7.days
   end
 end

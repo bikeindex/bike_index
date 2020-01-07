@@ -186,7 +186,7 @@
   font-size: 12px;
   @include media-breakpoint-down(sm) {
     max-height: 100%;
-    .img-box{
+    .img-box {
       text-align: center;
     }
   }
@@ -198,5 +198,14 @@
   }
   .index-image-select {
     display: none;
+  }
+}
+
+#timeSelectionBtnGroup {
+  .period-select-standard {
+    transition: opacity 0.5s ease-in-out;
+  }
+  &.custom-period-selected .period-select-standard {
+    opacity: 0.6;
   }
 }
