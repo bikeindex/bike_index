@@ -1,11 +1,16 @@
 class Admin::PaymentsController < Admin::BaseController
   include SortableTable
+
+  before_action :period_defaults_to_all
+  before_action :set_period, only: [:index]
   before_action :find_payment, only: %i[edit update]
 
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @payments = matching_payments.order(sort_column + " " + sort_direction)
+    @render_chart = ParamsNormalizer.boolean(params[:render_chart])
+    @payments = matching_payments.includes(:user, :organization, :invoice)
+                                 .order(sort_column + " " + sort_direction)
                                  .page(page).per(per_page)
   end
 
@@ -46,6 +51,8 @@ class Admin::PaymentsController < Admin::BaseController
     end
   end
 
+  helper_method :matching_payments
+
   protected
 
   def sortable_columns
@@ -53,14 +60,14 @@ class Admin::PaymentsController < Admin::BaseController
   end
 
   def matching_payments
-    matching_payments = Payment.includes(:user, :organization, :invoice)
+    return @matching_payments if defined?(@matching_payments)
+    @matching_payments = Payment
     if sort_column == "invoice_id"
-      matching_payments.where.not(invoice_id: nil)
+      @matching_payments = matching_payments.where.not(invoice_id: nil)
     elsif sort_column == "organization_id"
-      matching_payments.where.not(organization_id: nil)
-    else
-      matching_payments
+      @matching_payments = matching_payments.where.not(organization_id: nil)
     end
+    @matching_payments
   end
 
   def valid_invoice_parameters?

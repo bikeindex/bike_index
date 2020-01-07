@@ -1,0 +1,26 @@
+- payment ||= @payment
+
+%table.table-list
+  %tr
+    %td
+      Kind
+    %td
+      %span.less-strong
+      = payment.kind
+  %tr
+    %td
+      Amount
+    %td
+      = payment.amount_formatted
+  - if payment.stripe_id.present?
+    %tr
+      %td
+        Stripe ID
+      %td
+        = link_to payment.stripe_id, "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
+  %tr
+    %td
+      For
+    %td
+      - if payment.theft_alert.present?
+        = link_to "Theft alert", edit_admin_theft_alert_path(payment.theft_alert)

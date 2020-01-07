@@ -37,10 +37,6 @@ class Admin::TheftAlertsController < Admin::BaseController
     @bike ||= @stolen_record.bike.decorate
   end
 
-  def period_defaults_to_all
-    @period = "all" unless params[:period].present?
-  end
-
   def theft_alert_params
     params.require(:theft_alert).permit(
       :begin_at,

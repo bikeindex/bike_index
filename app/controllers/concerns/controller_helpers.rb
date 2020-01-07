@@ -192,6 +192,10 @@ module ControllerHelpers
     @render_chart || params[:period].present?
   end
 
+  def period_defaults_to_all
+    @period = "all" unless params[:period].present?
+  end
+
   protected
 
   # passive_organization is the organization set for the user - which is persisted in session
@@ -288,13 +292,13 @@ module ControllerHelpers
     when "all"
       @start_time = Time.at(1525818016) # 1 month before Earliest deployment created at
     else # Default to week view
-      @period = "week"
       set_default_period
     end
     @end_time ||= Time.current
   end
 
   def set_default_period # Separate method so it can be overriden
+    @period ||= "week"
     @end_time = Time.current
     @start_time = Time.current.beginning_of_day - 7.days
   end
