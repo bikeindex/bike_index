@@ -1,4 +1,4 @@
-#timeSelectionBtnGroup.col-md.col-12.text-right{ role: "group", class: @period == "custom" ? "custom-period-selected" : "" }
+#timeSelectionBtnGroup.text-right{ role: "group", class: @period == "custom" ? "custom-period-selected" : "" }
   %button.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "hour"), data: { period: "hour" } }
     %span.d-none.d-md-inline-block= t(".past")
     = t(".hour")
@@ -19,7 +19,7 @@
   %button#periodSelectCustom.btn.btn-outline-secondary.btn-sm.ml-2{ class: ("active" if @period == "custom"), data: { period: "custom" } }
     = t(".custom")
 
-%form#timeSelectionCustom.form-inline.col-12.justify-content-end.mt-2.collapse{ class: @period == "custom" ? "show" : "" }
+%form#timeSelectionCustom.custom-time-selection.mt-2.collapse{ class: @period == "custom" ? "show" : "" }
   .form-group
     = label_tag :start_time_selector, t(".from"), class: "control-label mr-2"
     = datetime_local_field_tag :start_time_selector, @start_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"

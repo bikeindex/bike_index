@@ -7,28 +7,46 @@
         = link_to "graph", admin_theft_alerts_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
 - if @render_chart
   :ruby
-    theft_alerts_graph = TheftAlertPlan.all.map do |theft_alert_plan|
-      { name: theft_alert_plan.name, data: matching_theft_alerts.where(theft_alert_plan: theft_alert_plan).send(group_by_method(@time_range), "theft_alerts.created_at", range: @time_range, format: group_by_format(@time_range)).count }
+    theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| matching_theft_alerts.where(theft_alert_plan: plan).any? }
+    theft_alerts_graph = theft_alert_plans.map do |theft_alert_plan|
+      {
+        name: theft_alert_plan.name,
+        data: time_range_counts(collection: matching_theft_alerts.where(theft_alert_plan: theft_alert_plan))
+      }
     end
+
   .col-12.mt-2
-
     = column_chart theft_alerts_graph, stacked: true, thousands: ",", defer: true
-    / # = line_chart matching_theft_alerts.send(group_by_method(@time_range), "theft_alerts.created_at").count, curve: false, thousands: ",", defer: true
 
-.col-12.mb-2.mt-2
-  .row.justify-content-end
-    = render partial: "/shared/period_select"
+= render partial: "/shared/period_select"
 
-.row.mt-4
-  .col-md-5
+.row.mb-4{ style: "margin-top: 30px;" }
+  .col
     %p
       %strong
-        = number_with_delimiter(@theft_alerts.total_count)
-      = "Matching Promoted Alerts".pluralize(@theft_alerts.total_count)
+        = number_with_delimiter(matching_theft_alerts.count)
+      - if sortable_search_params?
+        Matching
+      Promoted Alerts
       - if @user.present?
         %strong
           Owned by
           = link_to "#{@user.email}", admin_user_path(@user)
+      %em
+        = humanized_time_range(@time_range)
+  - if theft_alert_plans.present?
+    .col
+      .full-screen-table
+        %table.table.table-striped.table-bordered.table-sm.text-center
+          %thead
+            - theft_alert_plans.each do |theft_alert_plan|
+              %th
+                = theft_alert_plan.name
+          %tbody
+            %tr
+              - theft_alert_plans.each do |theft_alert_plan|
+                %td
+                  = matching_theft_alerts.where(theft_alert_plan: theft_alert_plan).count
 
 = render partial: "/admin/theft_alerts/table", locals: { render_sortable: true, theft_alerts: @theft_alerts }
 

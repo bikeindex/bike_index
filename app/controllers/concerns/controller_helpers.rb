@@ -177,8 +177,8 @@ module ControllerHelpers
     @period ||= params[:period]
     if @period == "custom"
       if params[:start_time].present? && params[:end_time].present?
-        @start_time = TimeParser.parse(params[:start_time])
-        @end_time = TimeParser.parse(params[:end_time])
+        @start_time = TimeParser.parse(params[:start_time], @timezone)
+        @end_time = TimeParser.parse(params[:end_time], @timezone)
       else # use the default period
         set_default_period
       end
@@ -189,7 +189,7 @@ module ControllerHelpers
   end
 
   def period_search?
-    @render_chart || params[:period].present?
+    @period.present? || @render_chart
   end
 
   def period_defaults_to_all
@@ -289,12 +289,23 @@ module ControllerHelpers
       @start_time = Time.current.beginning_of_day - 30.days
     when "year"
       @start_time = Time.current.beginning_of_day - 1.year
+    when "week"
+      @start_time = Time.current.beginning_of_day - 7.days
     when "all"
-      @start_time = Time.at(1525818016) # 1 month before Earliest deployment created at
+      @start_time = earliest_period_date
     else # Default to week view
       set_default_period
     end
     @end_time ||= Time.current
+  end
+
+  def earliest_period_date
+    if current_organization.present?
+      @start_time = current_organization.created_at
+      @start_time = Time.current - 1.year if @start_time > (Time.current - 1.year)
+    else
+      @start_time = Time.at(1134972000) # Earliest bike created at
+    end
   end
 
   def set_default_period # Separate method so it can be overriden

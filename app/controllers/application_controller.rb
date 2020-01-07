@@ -82,13 +82,14 @@ class ApplicationController < ActionController::Base
   def set_locale
     # Parse the timezone params if they are passed (tested in admin#dashboard#index)
     if params[:timezone].present?
-      timezone = TimeParser.parse_timezone(params[:timezone])
+      @timezone = TimeParser.parse_timezone(params[:timezone])
       # If it's a valid timezone, save to session
-      session[:timezone] = timezone&.name
+      session[:timezone] = @timezone&.name
     end
     # Set the timezone on a per request basis if we have a timezone saved
     if session[:timezone].present?
-      Time.zone = timezone || TimeParser.parse_timezone(session[:timezone])
+      @timezone ||= TimeParser.parse_timezone(session[:timezone])
+      Time.zone = @timezone
     end
 
     # We aren't translating the superadmin section

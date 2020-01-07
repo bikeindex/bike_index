@@ -200,12 +200,3 @@
     display: none;
   }
 }
-
-#timeSelectionBtnGroup {
-  .period-select-standard {
-    transition: opacity 0.5s ease-in-out;
-  }
-  &.custom-period-selected .period-select-standard {
-    opacity: 0.6;
-  }
-}

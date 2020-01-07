@@ -112,7 +112,6 @@ class Admin::GraphsController < Admin::BaseController
   end
 
   def set_variable_graphing_timing
-    @timezone = TimeParser.parse_timezone(params[:timezone] || "America/Los_Angeles")
     @start_at = params[:start_at].present? ? TimeParser.parse(params[:start_at], @timezone) : bike_index_start
     @end_at = params[:end_at].present? ? TimeParser.parse(params[:end_at], @timezone) : Time.current
     @group_period = calculated_group_period(@start_at, @end_at)

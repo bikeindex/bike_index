@@ -48,13 +48,17 @@ class Admin::TheftAlertsController < Admin::BaseController
     )
   end
 
+  def earliest_period_date
+    Time.at(1560805519) # One week before earliest created theft alert
+  end
+
   def sortable_columns
     %w[created_at theft_alert_plan_id status begin_at end_at]
   end
 
   def matching_theft_alerts
     return @matching_theft_alerts if defined?(@matching_theft_alerts)
-    @matching_theft_alerts = period_search? ? TheftAlert.where(created_at: @time_range) : TheftAlert
+    @matching_theft_alerts = TheftAlert.where(created_at: @time_range)
   end
 
   def set_alert_timestamps(theft_alert_attrs)

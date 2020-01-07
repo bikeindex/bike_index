@@ -1,0 +1,47 @@
+#timeSelectionBtnGroup {
+  .period-select-standard {
+    transition: opacity 0.5s ease-in-out;
+  }
+  &.custom-period-selected .period-select-standard {
+    opacity: 0.6;
+  }
+}
+
+.custom-time-selection {
+  @extend .row;
+  justify-content: flex-end;
+  // We always want the form to be inline, so style manually
+  .form-group {
+    display: flex;
+    flex: 0 0 auto;
+    flex-flow: row wrap;
+    align-items: center;
+    margin-bottom: 0;
+  }
+  label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0;
+  }
+  .form-control {
+    display: inline-block;
+    width: auto;
+    max-width: 100%;
+    vertical-align: middle;
+  }
+  .btn-success {
+    margin-right: 15px;
+  }
+
+  @include media-breakpoint-down(sm) {
+    justify-content: flex-start;
+    .form-group {
+      margin-top: 8px;
+      flex: 0 0 75%;
+      max-width: 75%;
+      position: relative;
+      padding-left: 15px;
+    }
+  }
+}
