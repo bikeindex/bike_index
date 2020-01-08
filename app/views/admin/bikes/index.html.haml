@@ -5,10 +5,6 @@
   .col-md-7
     %ul
       %li.nav-item
-        - all_ignored_params = %w[render_chart period sort direction]
-        - all_active = !@unknown && (sortable_search_params.keys - all_ignored_params).blank?
-        = link_to "All", admin_bikes_path(sortable_search_params.slice(*all_ignored_params)), class: "nav-link #{all_active ? 'active' : ''}"
-      %li.nav-item
         = link_to "Unknown Mnfgs", missing_manufacturer_admin_bikes_path, class: "nav-link #{@unknown ? 'active' : ''}"
       %li.nav-item
         - stolen_active = params[:search_stolen].present?
@@ -51,16 +47,9 @@
         = link_to "org bikes view", organization_bikes_path(organization_id: current_organization.to_param), class: "gray-link"
   - if @render_chart
     .col-12.mt-2
-      = line_chart available_bikes.send(group_by_method(@time_range), "bikes.created_at").count, curve: false, thousands: ",", defer: true
-    .col-12.mb-2.mt-2
-      .row.justify-content-end
-        .col-md-2.col-12
-          %p
-            %em.small.text-info
-              = number_with_delimiter(available_bikes.count)
-              graphed
-        = render partial: "/shared/period_select"
+      = column_chart time_range_counts(collection: available_bikes, column: "bikes.created_at"), stacked: true, thousands: ",", defer: true
 
+= render partial: "/shared/period_select"
 
 - if all_active
   %p
@@ -80,8 +69,10 @@
   .col-md-5
     %p
       %strong
-        = number_with_delimiter(@bikes.total_count)
-      = "Matching Bike".pluralize(@bikes.total_count)
+        = number_with_delimiter(available_bikes.count)
+      = "Matching Bike".pluralize(available_bikes.count)
+      %em
+        = humanized_time_range(@time_range)
     - if (params.keys & %w[search_user_id search_manufacturer_id]).any? || current_organization.present?
       %ul.mt-0
         - if current_organization.present?

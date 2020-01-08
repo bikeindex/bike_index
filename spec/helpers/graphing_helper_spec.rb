@@ -32,17 +32,28 @@ RSpec.describe GraphingHelper, type: :helper do
   describe "group_by_format" do
     let(:end_time) { Time.at(1578268910) } # 2020-01-06 00:01:38 UTC
     let(:time_range) { start_time..end_time }
-    context "23 hours" do
-      let(:start_time) { end_time - 23.hours }
-      it "is minute:hour:second pm" do
-        expect(Time.zone).to eq TimeParser::DEFAULT_TIMEZONE
-        expect(end_time.strftime(group_by_format(time_range))).to eq " 4:01 PM"
+    context "1 hour" do
+      let(:start_time) { end_time - 1.hour }
+      it "is hour:minute pm" do
+        expect(end_time.in_time_zone("America/New_York").strftime(group_by_format(time_range))).to eq " 7:01 PM"
+      end
+    end
+    context "3 days" do
+      let(:start_time) { end_time - 3.days }
+      it "is weekday hour pm" do
+        expect(end_time.in_time_zone("America/New_York").strftime(group_by_format(time_range))).to eq "Sun 7 PM"
       end
     end
     context "6 days" do
       let(:start_time) { end_time - 10.days }
       it "is weekday month-date" do
-        expect(end_time.strftime(group_by_format(time_range))).to eq "Sun 1-5"
+        expect(end_time.in_time_zone("America/New_York").strftime(group_by_format(time_range))).to eq "Sun 1-5"
+      end
+    end
+    context "13 months" do
+      let(:start_time) { end_time - 13.months }
+      it "is year-month" do
+        expect(end_time.strftime(group_by_format(time_range))).to eq "2020-1"
       end
     end
   end

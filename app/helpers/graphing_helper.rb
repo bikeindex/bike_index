@@ -7,7 +7,7 @@ module GraphingHelper
   end
 
   def group_by_method(time_range)
-    if time_range.last - time_range.first < 3601
+    if time_range.last - time_range.first < 3601 # 1 hour + 1 second
       :group_by_minute
     elsif time_range.last - time_range.first < 500_000 # around 6 days
       :group_by_hour
@@ -21,10 +21,14 @@ module GraphingHelper
   end
 
   def group_by_format(time_range)
-    if time_range.last - time_range.first < 24.hours.to_i # 24 hours
+    if group_by_method(time_range) == :group_by_minute
       "%l:%M %p"
+    elsif group_by_method(time_range) == :group_by_hour
+      "%a%l %p"
     elsif time_range.last - time_range.first < 2.weeks.to_i # One week
       "%a %-m-%-d"
+    elsif group_by_method(time_range) == :group_by_month
+      "%Y-%-m"
     else
       nil # Let it fallback to the default handling
     end

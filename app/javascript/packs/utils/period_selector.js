@@ -7,16 +7,17 @@ function PeriodSelector() {
     },
 
     urlWithoutPeriod() {
-      return location.href
-        .replace(/&?period=[^&]*/, "") // Grab period=
-        .replace(/&?timezone=[^&]*/, "") // Grab timezone=
+      const newUrl = location.href
+        .replace(/&?period=[^&]*/, "") // remove period
+        .replace(/&?timezone=[^&]*/, "") // remove timezone
+        .replace(/&?start_time=[^&]*/, "") // remove start_time
+        .replace(/&?end_time=[^&]*/, "") // remove start_time
         .replace(/\?&/, "?") // replace ?& with just ?
         .replace(/&&/g, "&") // Grab &&, replace with single
         .replace(/(\?|&)$/, ""); // Grab ending ? or & - we don't need it
-    },
 
-    urlWithoutPeriodJoiner() {
-      return this.urlWithoutPeriod().match(/\?/) ? "&" : "?";
+      const joiner = newUrl.match(/\?/) ? "&" : "?";
+      return newUrl + joiner;
     },
 
     enableCustomSelection() {
@@ -35,7 +36,7 @@ function PeriodSelector() {
     submitCustomPeriodSelection() {
       const startTime = $("#start_time_selector").val();
       const endTime = $("#end_time_selector").val();
-      return (location.href = `${this.urlWithoutPeriod()}${this.urlWithoutPeriodJoiner()}period=custom&timezone=${
+      return (location.href = `${this.urlWithoutPeriod()}period=custom&timezone=${
         window.localTimezone
       }&start_time=${startTime}&end_time=${endTime}`);
     },
@@ -44,14 +45,25 @@ function PeriodSelector() {
       const self = this;
 
       $("#timeSelectionBtnGroup button").on("click", function(e) {
-        const period = $(e.target).attr("data-period");
+        let period = $(e.target).attr("data-period");
+        // Sometimes, the target isn't the button, it's something inside the button. In that case, find the correct period
+        if (typeof period == "undefined") {
+          // If we can't figure out what the target was, return false, so the user clicks again
+          if (!$(e.target).parents("button").length) {
+            return false;
+          }
+          period = $(e.target)
+            .parents("button")
+            .attr("data-period");
+        }
         if (period === "custom") {
+          log.debug("custom");
           return self.enableCustomSelection();
         } else {
           // Not really necessary, but makes it a little slicker
           self.disableCustomSelection();
         }
-        return (location.href = `${self.urlWithoutPeriod()}${self.urlWithoutPeriodJoiner()}period=${period}&timezone=${
+        return (location.href = `${self.urlWithoutPeriod()}period=${period}&timezone=${
           window.localTimezone
         }`);
       });
