@@ -4787,20 +4787,6 @@ nl:
       sign_up: Registreren
       sign_in_using_globalid: Log in met globaliD
   shared:
-    donate_modal:
-      bikeindex_is_a_nonprofit: Bike Index is een 501 (c) (3) non-profit. We zijn
-        afhankelijk van donaties om deze diensten te leveren. We raden wetshandhavingsinstanties
-        zoals %{org_name} aan om minimaal $ 20 per jaar te doneren om onze inspanningen
-        te ondersteunen.
-      contact_bike_owners: Neem contact op met fietsbezitters voordat hun fietsen
-        als gestolen worden gemarkeerd
-      email_for_access_html: E-mail %{email_link} voor toegang.
-      greeting: Hallo %{user_name},
-      law_enforcement_features: 'We hebben een aantal functies die speciaal zijn ontworpen
-        voor wetshandhavers:'
-      multiple_serial_search_pane: Meervoudig serieel zoekvenster
-      thank_you: Heel erg bedankt voor het gebruik van Bike Index!
-      thanks_for_using_bike_index: Bedankt voor het gebruik van Bike Index!
     email_bike_box:
       color: Kleur
       color_may_be_incorrect: Kleur is mogelijk onjuist. Werk deze indien nodig bij!
@@ -5039,6 +5025,27 @@ nl:
       related: Verwant
       sign_up_your_organization: Meld uw organisatie aan
       where: Waar
+    donation_modal:
+      header: Help onze inspanningen ondersteunen!
+      is_a_nonprofit_html: Bike Index is een %{blog_link} <br> <strong>U</strong>
+        financiert onze efforst om fietsdiefstal te bestrijden!
+      nonprofit_501c3: 501 (c) (3) non-profit
+      skip: Overslaan
+      subheader: Als non-profit vertrouwen wij op uw steun.
+    law_enforcement_donation_modal:
+      bikeindex_is_a_nonprofit: Bike Index is een 501 (c) (3) non-profit. We zijn
+        afhankelijk van donaties om deze diensten te leveren. We raden wetshandhavingsinstanties
+        zoals %{org_name} aan om minimaal $ 20 per jaar te doneren om onze inspanningen
+        te ondersteunen.
+      contact_bike_owners: Neem contact op met fietsbezitters voordat hun fietsen
+        als gestolen worden gemarkeerd
+      email_for_access_html: E-mail %{email_link} voor toegang.
+      greeting: Hallo %{user_name},
+      law_enforcement_features: 'We hebben een aantal functies die speciaal zijn ontworpen
+        voor wetshandhavers:'
+      multiple_serial_search_pane: Meervoudig serieel zoekvenster
+      thank_you: Heel erg bedankt voor het gebruik van Bike Index!
+      thanks_for_using_bike_index: Bedankt voor het gebruik van Bike Index!
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5208,13 +5215,6 @@ nl:
       used_by: Gebruikt door
       value_of_bikes_recovered: Meer dan %{value} aan fietsen die teruggevonden zijn
       you_get_your_bike_back: U krijgt uw fiets terug
-      annual_giving_campaign: Jaarlijkse campagne geven
-      is_a_nonprofit_html: Bike Index is een %{blog_link} <br> Steun onze non-profit
-        inspanning om fietsdiefstal te bestrijden!
-      nonprofit_501c3: non-profit organisatie
-      skip: Overslaan
-      we_rely_on_your_contributions: We vertrouwen op uw donaties om onze inspanningen
-        te ondersteunen!
     recovery_stories:
       recovery_stories: Verhalen over teruggekregen fietsen
     update_browser:

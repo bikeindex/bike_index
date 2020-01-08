@@ -58,7 +58,7 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
 ## Internationalization
 
-See the [internationalization docs](docs/internationalization.md) for details.
+See the [internationalization docs](docs/internationalization.markdown) for details.
 
 ## Testing
 

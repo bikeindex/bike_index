@@ -2071,7 +2071,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -2097,7 +2097,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -4739,24 +4739,12 @@ en:
       where: Where
     donation_modal:
       header: Help support our efforts!
-      subheader: As a non-profit, we rely on your support.
       is_a_nonprofit_html: >-
-        Bike Index is a %{blog_link}<br><strong>You</strong> fund our efforst to fight bike theft!
+        Bike Index is a %{blog_link}<br><strong>You</strong> fund our efforst to fight
+        bike theft!
       nonprofit_501c3: 501(c)(3) nonprofit
       skip: No donation
-    law_enforcement_donation_modal:
-      bikeindex_is_a_nonprofit: >-
-        Bike Index is a 501(c)(3) nonprofit. We depend on donations to provide these
-        services. We recommend law enforcement agencies like %{org_name} donate at
-        least $20 a year to help support our efforts.
-      contact_bike_owners: Contact bike owners before their bikes are marked stolen
-      email_for_access_html: Email %{email_link} for access.
-      greeting: Hello %{user_name},
-      law_enforcement_features: 'We have a number of features specifically designed
-        for law enforcement officers:'
-      multiple_serial_search_pane: Multiple serial search pane
-      thank_you: Thank you so much for using Bike Index!
-      thanks_for_using_bike_index: Thanks for using Bike Index!
+      subheader: As a non-profit, we rely on your support.
     edit_bike_skeleton:
       abandoned: abandoned
       edit: Edit
@@ -4939,6 +4927,19 @@ en:
       you: You
       your_bikes: Your bikes
       your_preferences: Your preferences
+    law_enforcement_donation_modal:
+      bikeindex_is_a_nonprofit: >-
+        Bike Index is a 501(c)(3) nonprofit. We depend on donations to provide these
+        services. We recommend law enforcement agencies like %{org_name} donate at
+        least $20 a year to help support our efforts.
+      contact_bike_owners: Contact bike owners before their bikes are marked stolen
+      email_for_access_html: Email %{email_link} for access.
+      greeting: Hello %{user_name},
+      law_enforcement_features: 'We have a number of features specifically designed
+        for law enforcement officers:'
+      multiple_serial_search_pane: Multiple serial search pane
+      thank_you: Thank you so much for using Bike Index!
+      thanks_for_using_bike_index: Thanks for using Bike Index!
     organized_skeleton:
       add_a_bike: Add a bike
       additional_features_html: >-
