@@ -1,13 +1,8 @@
+# frozen_string_literal: true
+
 module Amountable
   extend ActiveSupport::Concern
-
-  module ClassMethods
-    def default_currency; "USD" end
-
-    def money_formatted(amnt, currency: nil)
-      Money.new(amnt || 0, currency || default_currency).format
-    end
-  end
+  include MoneyFormattable
 
   def amount
     amnt = (amount_cents.to_i / 100.00)
@@ -15,10 +10,10 @@ module Amountable
   end
 
   def amount=(val)
-    self.amount_cents = val.to_f * 100
+    self.amount_cents = self.class.convert_to_cents(val)
   end
 
   def amount_formatted
-    money_formatted(amount_cents)
+    self.class.money_formatted(amount_cents, currency)
   end
 end

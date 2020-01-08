@@ -48,7 +48,7 @@ RSpec.describe Admin::PaymentsController, type: :controller do
         expect(subject.created_at).to be_within(1.minute).of Time.current
         expect(subject.user).to eq user
         expect(subject.amount_cents).to_not eq 22_222
-        expect(subject.is_payment).to be_truthy
+        expect(subject.kind).to eq "invoice_payment"
         # invoice.reload
         # expect(invoice.updated_at).to be_within(1.second).of Time.current # TODO: Rails 5 update - enable this, rspec doesn't correctly manage after_commit right now
       end

@@ -32,7 +32,7 @@ class Payment < ApplicationRecord
   def non_donation?; !donation? end
 
   def set_calculated_attributes
-    self.kind ||= calculated_kind
+    self.kind = calculated_kind
     if user.present?
       self.email ||= user.email
     elsif email.present?
@@ -58,6 +58,6 @@ class Payment < ApplicationRecord
   def calculated_kind
     return "invoice_payment" if invoice_id.present?
     return "theft_alert" if theft_alert.present?
-    "donation"
+    kind || "donation" # Use the current kind, if it exists
   end
 end

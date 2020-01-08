@@ -91,6 +91,7 @@ class ApplicationController < ActionController::Base
       @timezone ||= TimeParser.parse_timezone(session[:timezone])
       Time.zone = @timezone
     end
+    @timezone ||= TimeParser::DEFAULT_TIMEZONE
 
     # We aren't translating the superadmin section
     if controller_namespace == "admin"

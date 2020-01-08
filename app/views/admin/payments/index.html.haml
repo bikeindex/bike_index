@@ -1,13 +1,13 @@
-  :ruby
-    payments_counts = Payment.kinds.map do |kind|
-      payments_of_kind = matching_payments.where(kind: kind)
-      {
-        name: kind,
-        data: time_range_counts(collection: payments_of_kind),
-        count: payments_of_kind.count,
-        sum: Payment.money_formatted(payments_of_kind.sum(:amount_cents)),
-      }
-    end
+:ruby
+  payments_counts = Payment.kinds.map do |kind|
+    payments_of_kind = matching_payments.where(kind: kind)
+    {
+      name: kind,
+      data: time_range_counts(collection: payments_of_kind),
+      count: payments_of_kind.count,
+      sum: Payment.money_formatted(payments_of_kind.sum(:amount_cents)),
+    }
+  end
 
 .admin-subnav
   .col-md-5

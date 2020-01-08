@@ -21,19 +21,19 @@ class Admin::GraphsController < Admin::BaseController
           name: "All",
           data: Payment.where(created_at: @start_at..@end_at)
             .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            .count
+            .count,
         },
         {
           name: "Payments",
           data: Payment.where(created_at: @start_at..@end_at).payment
             .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            .count
+            .count,
         },
         {
           name: "Donations",
-          data: Payment.where(created_at: @start_at..@end_at).donation,
+          data: Payment.where(created_at: @start_at..@end_at).donation
             .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            .count
+            .count,
         },
       ]
     elsif @kind == "bikes"
@@ -43,13 +43,13 @@ class Admin::GraphsController < Admin::BaseController
           name: "Registered",
           data: bikes.where(created_at: @start_at..@end_at)
             .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            .count
+            .count,
         },
         {
           name: "Stolen bikes",
           data: StolenRecord.where(created_at: @start_at..@end_at)
             .group_by_period(@group_period, :created_at, time_zone: @timezone)
-            .count
+            .count,
         },
       ]
     elsif @kind == "recoveries"

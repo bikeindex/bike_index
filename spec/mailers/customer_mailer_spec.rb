@@ -72,7 +72,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       end
     end
     context "payment" do
-      let(:payment) { FactoryBot.create(:payment, user: user, is_payment: true) }
+      let(:payment) { FactoryBot.create(:payment, user: user, kind: "payment") }
       it "renders email" do
         mail = CustomerMailer.invoice_email(payment)
         expect(mail.subject).to eq("Thank you for supporting Bike Index!")
