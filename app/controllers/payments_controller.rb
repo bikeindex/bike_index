@@ -52,7 +52,7 @@ class PaymentsController < ApplicationController
       amount_cents: amount_cents,
     )
     @payment.is_recurring = true if subscription
-    @payment.is_payment = true if params[:is_payment]
+    @payment.kind = "payment" if params[:is_payment]
     unless @payment.save
       raise StandardError, "Unable to create a payment. #{payment.to_yaml}"
     end

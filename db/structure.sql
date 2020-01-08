@@ -1857,7 +1857,8 @@ CREATE TABLE public.payments (
     payment_method integer DEFAULT 0,
     organization_id integer,
     invoice_id integer,
-    currency character varying DEFAULT 'USD'::character varying NOT NULL
+    currency character varying DEFAULT 'USD'::character varying NOT NULL,
+    kind integer
 );
 
 

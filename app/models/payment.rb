@@ -1,14 +1,14 @@
 class Payment < ApplicationRecord
   include Amountable
   PAYMENT_METHOD_ENUM = { stripe: 0, check: 1 }.freeze
-  # KIND_ENUM = { donation: 0, payment: 1, theft_alert: 2 }
+  KIND_ENUM = { donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3 }
 
   scope :current, -> { where(is_current: true) }
   scope :subscription, -> { where(is_recurring: true) }
   scope :organizations, -> { where.not(organization_id: nil) }
 
   enum payment_method: PAYMENT_METHOD_ENUM
-  # enum kind: KIND_ENUM
+  enum kind: KIND_ENUM
 
   belongs_to :user
   belongs_to :organization
@@ -26,7 +26,7 @@ class Payment < ApplicationRecord
   def self.admin_creatable_payment_methods; ["check"] end
 
   def set_calculated_attributes
-    self.is_payment = true if invoice_id.present?
+    self.kind ||= calculated_kind
     if user.present?
       self.email ||= user.email
     elsif email.present?
@@ -38,10 +38,6 @@ class Payment < ApplicationRecord
     EmailInvoiceWorker.perform_async(id) if payment_method == "stripe"
   end
 
-  def is_donation
-    !is_payment
-  end
-
   def email_or_organization_present
     return if email.present? || organization_id.present?
     errors.add(:organization, :requires_email_or_org)
@@ -51,5 +47,11 @@ class Payment < ApplicationRecord
   def update_invoice
     return true unless invoice.present?
     invoice.update_attributes(updated_at: Time.current) # Manually trigger invoice update
+  end
+
+  def calculated_kind
+    return "invoice_payment" if invoice_id.present?
+    return "theft_alert" if theft_alert.present?
+    "donation"
   end
 end

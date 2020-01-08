@@ -17,25 +17,40 @@ class Admin::GraphsController < Admin::BaseController
                        .count
     elsif @kind == "payments"
       chart_data = [
-        { name: "All", data: Payment.where(created_at: @start_at..@end_at)
-          .group_by_period(@group_period, :created_at, time_zone: @timezone)
-          .count },
-        { name: "Payments", data: Payment.where(created_at: @start_at..@end_at, is_payment: true)
-          .group_by_period(@group_period, :created_at, time_zone: @timezone)
-          .count },
-        { name: "Donations", data: Payment.where(created_at: @start_at..@end_at, is_payment: false)
-          .group_by_period(@group_period, :created_at, time_zone: @timezone)
-          .count },
+        {
+          name: "All",
+          data: Payment.where(created_at: @start_at..@end_at)
+            .group_by_period(@group_period, :created_at, time_zone: @timezone)
+            .count
+        },
+        {
+          name: "Payments",
+          data: Payment.where(created_at: @start_at..@end_at).payment
+            .group_by_period(@group_period, :created_at, time_zone: @timezone)
+            .count
+        },
+        {
+          name: "Donations",
+          data: Payment.where(created_at: @start_at..@end_at).donation,
+            .group_by_period(@group_period, :created_at, time_zone: @timezone)
+            .count
+        },
       ]
     elsif @kind == "bikes"
       bikes = Bike.unscoped
       chart_data = [
-        { name: "Registered", data: bikes.where(created_at: @start_at..@end_at)
-          .group_by_period(@group_period, :created_at, time_zone: @timezone)
-          .count },
-        { name: "Stolen bikes", data: StolenRecord.where(created_at: @start_at..@end_at)
-          .group_by_period(@group_period, :created_at, time_zone: @timezone)
-          .count },
+        {
+          name: "Registered",
+          data: bikes.where(created_at: @start_at..@end_at)
+            .group_by_period(@group_period, :created_at, time_zone: @timezone)
+            .count
+        },
+        {
+          name: "Stolen bikes",
+          data: StolenRecord.where(created_at: @start_at..@end_at)
+            .group_by_period(@group_period, :created_at, time_zone: @timezone)
+            .count
+        },
       ]
     elsif @kind == "recoveries"
       recoveries = StolenRecord.unscoped

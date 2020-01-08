@@ -80,7 +80,7 @@ RSpec.describe PaymentsController, type: :controller do
         expect(payment.stripe_id).to be_present
         expect(payment.first_payment_date).to be_present
         expect(payment.last_payment_date).to_not be_present
-        expect(payment.is_donation).to be_truthy
+        expect(payment.donation?).to be_truthy
       end
     end
     context "no user email on file" do
@@ -96,7 +96,8 @@ RSpec.describe PaymentsController, type: :controller do
         expect(payment.stripe_id).to be_present
         expect(payment.first_payment_date).to be_present
         expect(payment.last_payment_date).to_not be_present
-        expect(payment.is_donation).to be_falsey
+        expect(payment.donation?).to be_falsey
+        expect(payment.payment?).to be_truthy
       end
     end
   end
