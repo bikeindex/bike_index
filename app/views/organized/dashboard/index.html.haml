@@ -81,3 +81,5 @@
                   %small.convertTime= l(organization.created_at, format: :convert_time)
                 %td
                   = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)
+
+= javascript_pack_tag "application"

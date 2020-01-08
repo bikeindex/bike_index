@@ -20,6 +20,8 @@ RSpec.describe TheftAlertPaymentCreator, type: :service, vcr: true do
 
         expect(Payment.count).to eq(1)
         expect(payment).to be_persisted
+        payment.reload
+        expect(payment.kind).to eq "theft_alert"
       end
     end
 

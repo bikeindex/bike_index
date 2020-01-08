@@ -1,16 +1,53 @@
 .admin-subnav
-  .col-md-6
+  .col-md-5
     %h1
       Payments
-  .col-md-6
-    = link_to "New payment", new_admin_payment_url, class: "btn btn-success float-right"
+  .col-md-7
+    %ul
+      %li.nav-item
+        = link_to "New payment", new_admin_payment_url, class: "nav-link"
+      %li.nav-item
+        = link_to "graph", admin_payments_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+
+:ruby
+  payments_counts = Payment.kinds.map do |kind|
+    # Legacy enum issue so excited for TODO: Rails 5 update
+    payment_enum = Payment::KIND_ENUM[kind.to_sym]
+    payments_of_kind = matching_payments.where(kind: payment_enum)
+    {
+      name: Payment.display_kind(kind),
+      data: time_range_counts(collection: payments_of_kind),
+      count: payments_of_kind.count,
+      money: Payment.money_formatted(payments_of_kind.sum(:amount_cents)),
+    }
+  end
+
+- if @render_chart
+  .col-12.mt-2
+    = column_chart payments_counts, stacked: true, thousands: ",", defer: true
+
+.col-12.mb-4.mt-2
+  .row.justify-content-end
+    = render partial: "/shared/period_select"
 
 .row.mb-4
-  .col-md-6
-    %h4
+  .col-sm
+    %h4.mt-2
       = pluralize(@payments.total_count, "matching payment")
-  .col-md-6
-    = paginate @payments, views_prefix: "admin"
+  .col-sm
+    .full-screen-table
+      %table.table.table-striped.table-bordered.table-sm.text-center
+        %thead
+          - payments_counts.each do |payment_count|
+            %th
+              = payment_count[:name]
+        %tbody
+          %tr
+            - payments_counts.each do |payment_count|
+              %td
+                #{number_with_delimiter(payment_count[:count])} - #{payment_count[:money]}
+
+= paginate @payments, views_prefix: "admin"
 
 
 .full-screen-table
@@ -21,11 +58,13 @@
       %th
         = sortable "user_id"
       %th
-        = sortable "organization_id"
-      %th
-        = sortable "invoice_id"
-      %th
         = sortable "kind"
+      %th
+        %small= sortable "organization_id"
+      %th
+        %small= sortable "invoice_id"
+      %th
+        %small= sortable "payment_method", "method"
       %th
         = sortable "amount_cents", "Amount"
     %tbody
@@ -41,7 +80,11 @@
               = payment.email
               %small.less-strong
                 no user
-
+          %td
+            - if payment.theft_alert?
+              = link_to "Promoted alert", edit_admin_theft_alert_path(payment.theft_alert)
+            - else
+              = payment.display_kind
           %td
             - if payment.organization.present?
               = link_to payment.organization.short_name, admin_organization_path(payment.organization)
@@ -54,9 +97,9 @@
           %td
             %small
               - if payment.stripe?
-                = link_to "Stripe", "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
+                = link_to "stripe", "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
               - else
-                = payment.kind.humanize
+                = payment.payment_method.humanize.downcase
           %td
             = payment.amount_formatted
 = paginate @payments, views_prefix: "admin"

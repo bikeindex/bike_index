@@ -7,7 +7,7 @@ module ControllerHelpers
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
                   :user_root_bike_search?, :current_organization, :passive_organization, :controller_namespace, :page_id,
-                  :default_bike_search_path, :bikehub_url
+                  :default_bike_search_path, :bikehub_url, :period_search?
     before_action :enable_rack_profiler
 
     before_action do
@@ -173,29 +173,30 @@ module ControllerHelpers
 
   # For setting periods, particularly for graphing
   def set_period
+    @timezone ||= Time.zone
     # Set time period
     @period ||= params[:period]
-    case @period
-    when "hour"
-      @start_time = Time.current - 1.hour
-    when "day"
-      @start_time = Time.current.beginning_of_day - 1.day
-    when "month"
-      @start_time = Time.current.beginning_of_day - 30.days
-    when "year"
-      @start_time = Time.current.beginning_of_day - 1.year
-    when "all"
-      if current_organization.present?
-        @start_time = current_organization.created_at
-        @start_time = Time.current - 1.year if @start_time > (Time.current - 1.year)
-      else
-        @start_time = Time.at(1134972000) # Earliest bike created at
+    if @period == "custom"
+      if params[:start_time].present? && params[:end_time].present?
+        @start_time = TimeParser.parse(params[:start_time], @timezone)
+        @end_time = TimeParser.parse(params[:end_time], @timezone)
+        if @start_time > @end_time
+          new_end_time = @start_time
+          @start_time = @end_time
+          @end_time = new_end_time
+        end
+      else # use the default period
+        @period = "all"
+        set_default_period
       end
-    else # Default to week view
-      @period = "week"
-      @start_time = Time.current.beginning_of_day - 7.days
+    else
+      set_time_range_from_period
     end
-    @time_range = @start_time..Time.current
+    @time_range = @start_time..@end_time
+  end
+
+  def period_search?
+    @period.present? || @render_chart
   end
 
   protected
@@ -279,5 +280,38 @@ module ControllerHelpers
       ENV["BIKEHUB_URL"].presence || "https://new.bikehub.com",
       path,
     ].join("/")
+  end
+
+  def set_time_range_from_period
+    case @period
+    when "hour"
+      @start_time = Time.current - 1.hour
+    when "day"
+      @start_time = Time.current.beginning_of_day - 1.day
+    when "month"
+      @start_time = Time.current.beginning_of_day - 30.days
+    when "year"
+      @start_time = Time.current.beginning_of_day - 1.year
+    when "week"
+      @start_time = Time.current.beginning_of_day - 1.week
+    else # Default to all
+      set_default_period
+    end
+    @end_time ||= Time.current
+  end
+
+  def set_default_period # Separate method so it can be overriden
+    @period ||= "all"
+    @end_time = Time.current
+    @start_time = earliest_period_date
+  end
+
+  def earliest_period_date
+    if current_organization.present?
+      @start_time = current_organization.created_at
+      @start_time = Time.current - 1.year if @start_time > (Time.current - 1.year)
+    else
+      @start_time = Time.at(1134972000) # Earliest bike created at
+    end
   end
 end

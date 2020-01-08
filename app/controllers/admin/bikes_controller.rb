@@ -7,7 +7,9 @@ class Admin::BikesController < Admin::BaseController
     @page = params[:page] || 1
     per_page = params[:per_page] || 100
     @render_chart = ParamsNormalizer.boolean(params[:render_chart])
-    @bikes = matching_bikes.includes(:creation_organization, :creation_states, :paint).reorder("bikes.#{sort_column} #{sort_direction}").page(@page).per(per_page)
+    @bikes = available_bikes.includes(:creation_organization, :creation_states, :paint)
+                            .reorder("bikes.#{sort_column} #{sort_direction}")
+                            .page(@page).per(per_page)
   end
 
   def missing_manufacturer
@@ -136,7 +138,6 @@ class Admin::BikesController < Admin::BaseController
   end
 
   def matching_bikes
-    return @matching_bikes if defined?(@matching_bikes)
     if params[:search_user_id].present?
       @user = User.username_friendly_find(params[:search_user_id])
       if @user.rough_approx_bikes.count > 25
@@ -161,10 +162,10 @@ class Admin::BikesController < Admin::BaseController
     bikes = bikes.send(@pos_search_type) if @pos_search_type.present?
     bikes = bikes.ascend_pos if params[:search_ascend].present?
     bikes = bikes.lightspeed_pos if params[:search_lightspeed].present?
-    @matching_bikes = bikes
+    bikes
   end
 
   def available_bikes
-    matching_bikes.where(created_at: @time_range)
+    @available_bikes ||= matching_bikes.where(created_at: @time_range)
   end
 end

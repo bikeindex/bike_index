@@ -2,17 +2,11 @@
   .col-12
     %h1
       Feedback & Messages
-  .col-12.mt-4
-    = line_chart available_feedbacks.send(group_by_method(@time_range), "feedbacks.created_at").count, curve: false, thousands: ",", defer: true
-  .col-12.mb-2.mt-2
-    .row.justify-content-end
-      .col-2
-        %p
-          %em.small.less-strong
-            = number_with_delimiter(available_feedbacks.count)
-            charted
-      = render partial: "/shared/period_select"
 
+.col-12.mt-4
+  = column_chart time_range_counts(collection: available_feedbacks), stacked: true, thousands: ",", defer: true
+
+= render partial: "/shared/period_select"
 
 %p
   = number_with_delimiter(@feedbacks.total_count)
@@ -31,8 +25,13 @@
 .row
   .col-12
     = form_tag admin_feedbacks_path, method: :get, class: "form-inline" do
-      = hidden_field_tag :sort, sort_column
-      = hidden_field_tag :sort_direction, sort_direction
+      = hidden_field_tag :sort, params[:sort]
+      = hidden_field_tag :direction, params[:direction]
+      = hidden_field_tag :render_chart, params[:render_chart]
+      = hidden_field_tag :period, params[:period]
+      = hidden_field_tag :start_time, params[:start_time]
+      = hidden_field_tag :end_time, params[:end_time]
+
       .form-group.mr-2.mb-2
         = text_field_tag :search_bike_id, params[:search_bike_id], placeholder: "Search for Bike ID", class: "form-control"
       .form-group.mr-2.mb-2

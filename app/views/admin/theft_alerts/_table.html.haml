@@ -51,9 +51,12 @@
           %td
             - theft_alert_plan = theft_alert.theft_alert_plan
             %small
-              = link_to theft_alert_plan_title(theft_alert_plan), edit_admin_theft_alert_plan_path(theft_alert_plan)
-              %span.less-strong
-                = number_to_currency(theft_alert_plan.amount_cents / 100.0, unit: "$")
+              = link_to theft_alert_plan.name, edit_admin_theft_alert_plan_path(theft_alert_plan)
+              - if theft_alert.payment.present?
+                = link_to theft_alert_plan.amount_formatted, admin_payment_path(theft_alert.payment_id), class: "less-strong"
+              - else
+                %span.less-strong
+                  = theft_alert_plan.amount_formatted
           %td
             - if theft_alert.recovered?
               = link_to "recovered!", admin_recovery_path(theft_alert.stolen_record), class: "text-success"

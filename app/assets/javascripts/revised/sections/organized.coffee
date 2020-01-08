@@ -15,17 +15,6 @@ class BikeIndex.Organized extends BikeIndex
         $(".stickers-form").submit()
        ), 250
 
-    # This is copied and adapted from binx_admin.js, we need to switch to es6 :(
-    $('#timeSelectionBtnGroup button').on 'click', (e) ->
-      period = $(e.target).attr('data-period')
-      current_url = location.href.replace(/&?period=[^&]*/, "").replace(/&?timezone=[^&]*/, "").replace(/\?&/, "?").replace(/&&/g, "&").replace(/(\?|&)$/, "")
-      if current_url.match(/\?/)
-        joiner = '&'
-      else
-        joiner = '?'
-
-      location.href = "#{current_url}#{joiner}period=#{period}&timezone=#{window.localTimezone}"
-
   setOrganizedWrapHeight: ->
     min_px = $('.organized-menu-wrapper').outerHeight()
     $('.organized-wrap').css('min-height', "#{min_px + 24}px")

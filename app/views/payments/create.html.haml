@@ -5,7 +5,7 @@
     .select-amount
       - payment_amount = "$#{@payment.amount}"
 
-      - if @payment.is_donation
+      - if @payment.donation?
         %p
           = t(".your_donation_saved_bikes", amount: payment_amount)
         %p.padded

@@ -1,16 +1,19 @@
 class Admin::TheftAlertsController < Admin::BaseController
   include SortableTable
 
+  before_action :set_period, only: [:index]
   before_action :find_theft_alert, only: [:edit, :update]
 
-  # TODO: Add sorting and filtering
   def index
+    @render_chart = ParamsNormalizer.boolean(params[:render_chart])
     @theft_alerts =
       matching_theft_alerts.reorder("theft_alerts.#{sort_column} #{sort_direction}")
         .includes(:theft_alert_plan)
         .page(params.fetch(:page, 1))
         .per(params.fetch(:per_page, 25))
   end
+
+  def show; redirect_to edit_admin_theft_alert_path end
 
   def edit; end
 
@@ -23,6 +26,8 @@ class Admin::TheftAlertsController < Admin::BaseController
       render :edit
     end
   end
+
+  helper_method :matching_theft_alerts
 
   private
 
@@ -43,12 +48,18 @@ class Admin::TheftAlertsController < Admin::BaseController
     )
   end
 
+  # Override, set one week before earliest created theft alert
+  def earliest_period_date
+    Time.at(1560805519)
+  end
+
   def sortable_columns
     %w[created_at theft_alert_plan_id status begin_at end_at]
   end
 
   def matching_theft_alerts
-    TheftAlert
+    return @matching_theft_alerts if defined?(@matching_theft_alerts)
+    @matching_theft_alerts = TheftAlert.where(created_at: @time_range)
   end
 
   def set_alert_timestamps(theft_alert_attrs)

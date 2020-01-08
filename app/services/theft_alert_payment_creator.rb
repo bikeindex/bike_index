@@ -17,8 +17,10 @@ module TheftAlertPaymentCreator
       )
 
       payment = Payment.new(
+        payment_method: "stripe",
         user_id: user.id,
         email: customer.email,
+        kind: "theft_alert",
         is_current: true,
         stripe_id: charge.id,
         first_payment_date: Time.at(charge.created).utc.to_datetime,
@@ -26,7 +28,6 @@ module TheftAlertPaymentCreator
         currency: stripe_currency,
       )
 
-      payment.is_payment = true
       payment.save!
 
       payment

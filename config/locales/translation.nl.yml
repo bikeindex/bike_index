@@ -4964,11 +4964,16 @@ nl:
       your_preferences: Jouw voorkeuren
     period_select:
       all: Alle
-      past_30_days: Afgelopen 30 dagen
-      past_7_days: Afgelopen 7 dagen
-      past_day: Gisteren
-      past_hour: afgelopen uur
-      past_year: afgelopen jaar
+      past: Verleden
+      thirty_days: 30 dagen
+      seven_days: 7 dagen
+      day: dag
+      hour: Uur
+      year: jaar
+      custom: Custom
+      from: uit
+      to: Naar
+      update: Bijwerken
     edit_bike_skeleton:
       abandoned: Verlaten
       edit: Bewerken

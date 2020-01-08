@@ -76,7 +76,7 @@
               %ul
                 - invoice.payments.each do |payment|
                   %li{ style: "font-size: 80%;" }
-                    #{link_to "#{payment.amount_formatted} #{payment.kind}", admin_payment_path(payment)},
+                    #{link_to "#{payment.amount_formatted} #{payment.payment_method}", admin_payment_path(payment)},
                     %span.convertTime
                       = l payment.created_at, format: :convert_time
           %td

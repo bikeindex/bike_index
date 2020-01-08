@@ -1,5 +1,6 @@
 class Admin::DashboardController < Admin::BaseController
   def index
+    @period = "week"
     set_period # graphing set up
     @organizations = Organization.unscoped.order("created_at DESC").limit(10)
     @bikes = Bike.unscoped.includes(:creation_organization, :creation_states, :paint).order("created_at desc").limit(10)

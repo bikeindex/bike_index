@@ -1,6 +1,18 @@
 = render partial: "/admin/bikes/bike", locals: { bike: @bike, target: "show", stolen_record: @stolen_record }
 
+%h2.mt-4
+  Payment
+  %small
+    - if @theft_alert.payment.present?
+      = link_to "view payment", edit_admin_payment_path(@theft_alert.payment_id)
+
+- if @theft_alert.payment.present?
+  = render partial: "/admin/payments/display_table", locals: { payment: @theft_alert.payment }
+- else
+  No payment present!
+
 = render partial: "/admin/bikes/theft_alert_images", locals: { bike: @bike }
+
 
 .admin-subnav.midpage-subnav
   .col-12

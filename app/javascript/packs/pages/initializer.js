@@ -6,6 +6,7 @@ import BinxAppOrgExport from "./binx_org_export.js";
 import BinxAppOrgMessages from "./binx_org_messages.js";
 import BinxAppOrgBikes from "./binx_org_bikes.js";
 import BinxAppOrgUserForm from "./binx_org_user_form";
+import PeriodSelector from "../utils/period_selector.js";
 
 window.binxApp || (window.binxApp = {});
 
@@ -31,6 +32,11 @@ binxApp.enableFilenameForUploads = function() {
 $(document).ready(function() {
   window.timeParser = new TimeParser();
   window.timeParser.localize();
+  // Period selector
+  if ($("#timeSelectionBtnGroup").length) {
+    const periodSelector = PeriodSelector();
+    periodSelector.init();
+  }
   // Load admin, whatever
   if ($("#admin-content").length > 0) {
     const binxAdmin = BinxAdmin();

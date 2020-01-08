@@ -1,11 +1,15 @@
 class Admin::PaymentsController < Admin::BaseController
   include SortableTable
+
+  before_action :set_period, only: [:index]
   before_action :find_payment, only: %i[edit update]
 
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @payments = matching_payments.order(sort_column + " " + sort_direction)
+    @render_chart = ParamsNormalizer.boolean(params[:render_chart])
+    @payments = matching_payments.includes(:user, :organization, :invoice)
+                                 .order(sort_column + " " + sort_direction)
                                  .page(page).per(per_page)
   end
 
@@ -32,35 +36,42 @@ class Admin::PaymentsController < Admin::BaseController
 
   def create
     @payment = Payment.new(permitted_create_parameters)
-    valid_kind = Payment.admin_creatable_kinds.include?(permitted_create_parameters[:kind])
-    if valid_kind && valid_invoice_parameters? && @payment.save
+    valid_method = Payment.admin_creatable_payment_methods.include?(permitted_create_parameters[:payment_method])
+    if valid_method && valid_invoice_parameters? && @payment.save
       flash[:success] = "Payment created"
       redirect_to admin_payments_path
     else
-      if valid_kind
+      if valid_method
         flash[:error] ||= "Unable to create"
       else
-        flash[:error] ||= "Not able to create #{permitted_create_parameters[:kind]} kind of payments"
+        flash[:error] ||= "Not able to create #{permitted_create_parameters[:payment_method]} method of payments"
       end
       render :new
     end
   end
 
+  helper_method :matching_payments
+
   protected
 
   def sortable_columns
-    %w[created_at user_id organization_id kind invoice_id amount_cents]
+    %w[created_at user_id organization_id kind payment_method invoice_id amount_cents]
   end
 
   def matching_payments
-    matching_payments = Payment.includes(:user, :organization, :invoice)
+    return @matching_payments if defined?(@matching_payments)
+    @matching_payments = Payment
     if sort_column == "invoice_id"
-      matching_payments.where.not(invoice_id: nil)
+      @matching_payments = matching_payments.where.not(invoice_id: nil)
     elsif sort_column == "organization_id"
-      matching_payments.where.not(organization_id: nil)
-    else
-      matching_payments
+      @matching_payments = matching_payments.where.not(organization_id: nil)
     end
+    @matching_payments.where(created_at: @time_range)
+  end
+
+  # Override earliest period date, to use 1 week before first feedback created
+  def earliest_period_date
+    Time.at(1417588530)
   end
 
   def valid_invoice_parameters?
@@ -83,7 +94,7 @@ class Admin::PaymentsController < Admin::BaseController
   end
 
   def permitted_create_parameters
-    params.require(:payment).permit(:kind, :amount, :email, :currency, :created_at).merge(invoice_parameters)
+    params.require(:payment).permit(:payment_method, :amount, :email, :currency, :created_at).merge(invoice_parameters)
   end
 
   def find_payment

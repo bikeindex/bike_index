@@ -5,10 +5,6 @@
   .col-md-7
     %ul
       %li.nav-item
-        - all_ignored_params = %w[render_chart period sort direction]
-        - all_active = !@unknown && (sortable_search_params.keys - all_ignored_params).blank?
-        = link_to "All", admin_bikes_path(sortable_search_params.slice(*all_ignored_params)), class: "nav-link #{all_active ? 'active' : ''}"
-      %li.nav-item
         = link_to "Unknown Mnfgs", missing_manufacturer_admin_bikes_path, class: "nav-link #{@unknown ? 'active' : ''}"
       %li.nav-item
         - stolen_active = params[:search_stolen].present?
@@ -51,18 +47,15 @@
         = link_to "org bikes view", organization_bikes_path(organization_id: current_organization.to_param), class: "gray-link"
   - if @render_chart
     .col-12.mt-2
-      = line_chart available_bikes.send(group_by_method(@time_range), "bikes.created_at").count, curve: false, thousands: ",", defer: true
-    .col-12.mb-2.mt-2
-      .row.justify-content-end
-        .col-md-2.col-12
-          %p
-            %em.small.text-info
-              = number_with_delimiter(available_bikes.count)
-              graphed
-        = render partial: "/shared/period_select"
+      - if params[:search_email] || params[:search_user_id].present?
+        %hr
+        %h2.mt-4.text-warning Can't graph with user search
+      - else
+        = column_chart time_range_counts(collection: available_bikes, column: "bikes.created_at"), stacked: true, thousands: ",", defer: true
 
+= render partial: "/shared/period_select"
 
-- if all_active
+- unless admin_nav_display_view_all
   %p
     There are currently #{number_with_delimiter(PublicImage.count)} bike images
     %em
@@ -80,8 +73,10 @@
   .col-md-5
     %p
       %strong
-        = number_with_delimiter(@bikes.total_count)
-      = "Matching Bike".pluralize(@bikes.total_count)
+        = number_with_delimiter(available_bikes.count)
+      Matching Bikes
+      %em
+        = humanized_time_range(@time_range)
     - if (params.keys & %w[search_user_id search_manufacturer_id]).any? || current_organization.present?
       %ul.mt-0
         - if current_organization.present?
@@ -108,8 +103,13 @@
                 = params[:search_manufacturer_id]
   .col-md-7
     = form_tag admin_bikes_path, method: :get, class: "form-inline" do
-      = hidden_field_tag :sort
-      = hidden_field_tag :direction
+      = hidden_field_tag :sort, params[:sort]
+      = hidden_field_tag :direction, params[:direction]
+      = hidden_field_tag :render_chart, params[:render_chart]
+      = hidden_field_tag :period, params[:period]
+      = hidden_field_tag :start_time, params[:start_time]
+      = hidden_field_tag :end_time, params[:end_time]
+
       = hidden_field_tag :organization_id
       .form-group.ml-auto.mr-2.mb-2
         = text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "form-control"
