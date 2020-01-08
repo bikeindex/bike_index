@@ -45,7 +45,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
             timezone: "Pacific Time (US & Canada)"
           expect(response.code).to eq "200"
           expect(response).to render_template(:index)
-          expect(assigns(:period)).to eq "all"
+          expect(assigns(:period)).to eq "custom"
           expect(assigns(:start_time)).to be_within(2.seconds).of end_time
           expect(assigns(:end_time)).to be_within(2.seconds).of start_time
         end
