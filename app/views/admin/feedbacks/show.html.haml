@@ -2,8 +2,6 @@
   .col
     %h1
       Messages
-      %small
-        = link_to "view all", admin_feedbacks_path
 .row
   .col-sm-6
     %table.table-list
@@ -52,6 +50,8 @@
                 = link_to "Soft Deleted", edit_admin_bike_path(id: @feedback.feedback_hash["bike_id"])
               - else
                 = link_to @bike.id, edit_admin_bike_path(id: @feedback.feedback_hash["bike_id"])
+            - elsif @feedback.bike_id.blank?
+              %small.less-strong no bike
             - else
               Bike permanently deleted
   .col-sm-6

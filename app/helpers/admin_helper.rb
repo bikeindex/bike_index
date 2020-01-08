@@ -56,8 +56,10 @@ module AdminHelper
   end
 
   def admin_nav_display_view_all
-    # If there is a admin_nav_select_link_active, and it's not the main page, we should have a display all link
+    # If there is a admin_nav_select_link_active, and it matches controller
     return false unless admin_nav_select_link_active.present? && admin_nav_select_link_active[:match_controller]
+    # If it's not the main page, we should have a display all link
+    return true unless current_page_active?(admin_nav_select_link_active[:path])
     # Don't show "view all" if the path is the exact same
     return true if params[:period].present? && params[:period] != "all"
     # If there are any parameters that aren't

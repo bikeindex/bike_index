@@ -47,11 +47,15 @@
         = link_to "org bikes view", organization_bikes_path(organization_id: current_organization.to_param), class: "gray-link"
   - if @render_chart
     .col-12.mt-2
-      = column_chart time_range_counts(collection: available_bikes, column: "bikes.created_at"), stacked: true, thousands: ",", defer: true
+      - if params[:search_email] || params[:search_user_id].present?
+        %hr
+        %h2.mt-4.text-warning Can't graph with user search
+      - else
+        = column_chart time_range_counts(collection: available_bikes, column: "bikes.created_at"), stacked: true, thousands: ",", defer: true
 
 = render partial: "/shared/period_select"
 
-- if all_active
+- unless admin_nav_display_view_all
   %p
     There are currently #{number_with_delimiter(PublicImage.count)} bike images
     %em
@@ -70,7 +74,7 @@
     %p
       %strong
         = number_with_delimiter(available_bikes.count)
-      = "Matching Bike".pluralize(available_bikes.count)
+      Matching Bikes
       %em
         = humanized_time_range(@time_range)
     - if (params.keys & %w[search_user_id search_manufacturer_id]).any? || current_organization.present?
@@ -99,8 +103,13 @@
                 = params[:search_manufacturer_id]
   .col-md-7
     = form_tag admin_bikes_path, method: :get, class: "form-inline" do
-      = hidden_field_tag :sort
-      = hidden_field_tag :direction
+      = hidden_field_tag :sort, params[:sort]
+      = hidden_field_tag :direction, params[:direction]
+      = hidden_field_tag :render_chart, params[:render_chart]
+      = hidden_field_tag :period, params[:period]
+      = hidden_field_tag :start_time, params[:start_time]
+      = hidden_field_tag :end_time, params[:end_time]
+
       = hidden_field_tag :organization_id
       .form-group.ml-auto.mr-2.mb-2
         = text_field_tag :search_email, params[:search_email], placeholder: "Search bikes by email", class: "form-control"

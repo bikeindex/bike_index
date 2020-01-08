@@ -12,7 +12,8 @@ RSpec.describe AdminHelper, type: :helper do
       allow(helper).to receive(:admin_nav_select_link_active) { admin_nav_active }
       # current_page? needs to be stubbed
       allow(view).to receive(:current_page?) { true }
-      allow(helper).to receive(:current_page_active?) { false }
+      # allow(helper).to receive(:current_page_active?) { true }
+      # allow(helper).to receive(:current_page_active?).with(admin_nav_active[:link]) { true }
     end
 
     context "period all" do
@@ -29,7 +30,13 @@ RSpec.describe AdminHelper, type: :helper do
       end
       context "with period != all" do
         let(:passed_params) { { period: "week", timezone: "Party" } }
-        it "is false" do
+        it "is true" do
+          expect(helper.admin_nav_display_view_all).to be_truthy
+        end
+      end
+      context "not actual current_page" do
+        it "is true" do
+          allow(helper).to receive(:current_page_active?) { false }
           expect(helper.admin_nav_display_view_all).to be_truthy
         end
       end

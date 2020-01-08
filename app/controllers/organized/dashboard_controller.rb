@@ -13,6 +13,7 @@ module Organized
     end
 
     def index
+      @period = "week" unless params[:period].present?
       @child_organizations = current_organization.child_organizations
       if current_organization.regional?
         @bikes_in_organizations = Bike.unscoped.current.organization(current_organization.nearby_and_partner_organization_ids).where(created_at: @time_range)

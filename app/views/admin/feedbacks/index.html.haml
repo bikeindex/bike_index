@@ -25,8 +25,13 @@
 .row
   .col-12
     = form_tag admin_feedbacks_path, method: :get, class: "form-inline" do
-      = hidden_field_tag :sort, sort_column
-      = hidden_field_tag :sort_direction, sort_direction
+      = hidden_field_tag :sort, params[:sort]
+      = hidden_field_tag :direction, params[:direction]
+      = hidden_field_tag :render_chart, params[:render_chart]
+      = hidden_field_tag :period, params[:period]
+      = hidden_field_tag :start_time, params[:start_time]
+      = hidden_field_tag :end_time, params[:end_time]
+
       .form-group.mr-2.mb-2
         = text_field_tag :search_bike_id, params[:search_bike_id], placeholder: "Search for Bike ID", class: "form-control"
       .form-group.mr-2.mb-2
