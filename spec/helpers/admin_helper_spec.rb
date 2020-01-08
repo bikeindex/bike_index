@@ -10,10 +10,7 @@ RSpec.describe AdminHelper, type: :helper do
       controller.params = ActionController::Parameters.new(passed_params)
       admin_nav_active = helper.admin_nav_select_links.select { |v| v[:title] == "Bikes" }.first
       allow(helper).to receive(:admin_nav_select_link_active) { admin_nav_active }
-      # current_page? needs to be stubbed
       allow(view).to receive(:current_page?) { true }
-      # allow(helper).to receive(:current_page_active?) { true }
-      # allow(helper).to receive(:current_page_active?).with(admin_nav_active[:link]) { true }
     end
 
     context "period all" do
