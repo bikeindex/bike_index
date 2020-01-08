@@ -23,6 +23,9 @@ class Payment < ApplicationRecord
   after_commit :update_invoice
 
   def self.payment_methods; PAYMENT_METHOD_ENUM.keys.map(&:to_s) end
+
+  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
+
   def self.admin_creatable_payment_methods; ["check"] end
 
   def set_calculated_attributes

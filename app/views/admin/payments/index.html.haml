@@ -11,27 +11,40 @@
 
 - if @render_chart
   :ruby
-    theft_alert_plans = TheftAlertPlan.price_ordered_desc.select { |plan| matching_theft_alerts.where(theft_alert_plan: plan).any? }
-    payments_graph = theft_alert_plans.map do |theft_alert_plan|
+    payments_counts = Payment.kinds.map do |kind|
+      payments_of_kind = matching_payments.where(kind: kind)
       {
-        name: theft_alert_plan.name,
-        data: time_range_counts(collection: matching_theft_alerts.where(theft_alert_plan: theft_alert_plan))
+        name: kind,
+        data: time_range_counts(collection: payments_of_kind),
+        count: payments_of_kind.count,
+        sum: Payment.money_formatted(payments_of_kind.sum(:amount_cents)),
       }
     end
 
   .col-12.mt-2
-    = column_chart payments_graph, stacked: true, thousands: ",", defer: true
+    = column_chart payments_counts, stacked: true, thousands: ",", defer: true
 
 .col-12.mb-4.mt-2
   .row.justify-content-end
     = render partial: "/shared/period_select"
 
 .row.mb-4
-  .col-md-6
+  .col
     %h4
       = pluralize(@payments.total_count, "matching payment")
-  .col-md-6
-    = paginate @payments, views_prefix: "admin"
+  .col
+    .full-screen-table
+      %table.table.table-striped.table-bordered.table-sm.text-center
+        %thead
+          - payments_counts.each do |payment_count|
+            %th
+              = payment_count.name
+        %tbody
+          %tr
+            - theft_alert_plans.each do |theft_alert_plan|
+              %td
+                = matching_payments.where(theft_alert_plan: theft_alert_plan).count
+= paginate @payments, views_prefix: "admin"
 
 
 .full-screen-table
