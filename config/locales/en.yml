@@ -4737,19 +4737,14 @@ en:
       related: Related
       sign_up_your_organization: Sign up your organization
       where: Where
-    donate_modal:
-      bikeindex_is_a_nonprofit: >-
-        Bike Index is a 501(c)(3) nonprofit. We depend on donations to provide these
-        services. We recommend law enforcement agencies like %{org_name} donate at
-        least $20 a year to help support our efforts.
-      contact_bike_owners: Contact bike owners before their bikes are marked stolen
-      email_for_access_html: Email %{email_link} for access.
-      greeting: Hello %{user_name},
-      law_enforcement_features: 'We have a number of features specifically designed
-        for law enforcement officers:'
-      multiple_serial_search_pane: Multiple serial search pane
-      thank_you: Thank you so much for using Bike Index!
-      thanks_for_using_bike_index: Thanks for using Bike Index!
+    donation_modal:
+      header: Help support our efforts!
+      is_a_nonprofit_html: >-
+        Bike Index is a %{blog_link}<br><strong>You</strong> fund our efforst to fight
+        bike theft!
+      nonprofit_501c3: 501(c)(3) nonprofit
+      skip: No donation
+      subheader: As a non-profit, we rely on your support.
     edit_bike_skeleton:
       abandoned: abandoned
       edit: Edit
@@ -4932,6 +4927,19 @@ en:
       you: You
       your_bikes: Your bikes
       your_preferences: Your preferences
+    law_enforcement_donation_modal:
+      bikeindex_is_a_nonprofit: >-
+        Bike Index is a 501(c)(3) nonprofit. We depend on donations to provide these
+        services. We recommend law enforcement agencies like %{org_name} donate at
+        least $20 a year to help support our efforts.
+      contact_bike_owners: Contact bike owners before their bikes are marked stolen
+      email_for_access_html: Email %{email_link} for access.
+      greeting: Hello %{user_name},
+      law_enforcement_features: 'We have a number of features specifically designed
+        for law enforcement officers:'
+      multiple_serial_search_pane: Multiple serial search pane
+      thank_you: Thank you so much for using Bike Index!
+      thanks_for_using_bike_index: Thanks for using Bike Index!
     organized_skeleton:
       add_a_bike: Add a bike
       additional_features_html: >-
@@ -5219,7 +5227,6 @@ en:
       youve_been_logged_out: You've been logged out
     index:
       alert_the_community: Alert the Community
-      annual_giving_campaign: Annual Giving Campaign
       bike_index_statistics: Bike Index statistics
       bikes_registered_this_week: Bikes registered this week
       but_how_does_it_work: But How Does it work?
@@ -5234,10 +5241,6 @@ en:
       if_your_bike_goes_missing: >-
         If your bike goes missing, mark it as lost or stolen to notify the entire
         Bike Index community and its partners.
-      is_a_nonprofit_html: >-
-        Bike Index is a %{blog_link}<br>Support our non-profit effort to fight bike
-        theft!
-      nonprofit_501c3: 501(c)(3) nonprofit
       partner_organizations: Partner Organizations
       read_more_recovery_stories: Read more recovery stories
       recover_your_bike_for_free: >-
@@ -5246,7 +5249,6 @@ en:
         we do.
       register_now: Register now!
       register_your_bike: Register Your Bike
-      skip: No donation
       stolen_bikes_recovered: Stolen Bikes Recovered
       stolen_bikes_registered: Stolen Bikes Registered
       the_community_responds: The community responds
@@ -5254,7 +5256,6 @@ en:
       total_recovery_value: Total Recovery value
       used_by: Used By
       value_of_bikes_recovered: Over %{value} Worth of Bikes Recovered
-      we_rely_on_your_contributions: We rely on your donations to support our efforts!
       you_get_your_bike_back: You Get your Bike Back
     recovery_stories:
       recovery_stories: Recovery Stories

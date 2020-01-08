@@ -3,7 +3,6 @@ class BikeIndex.WelcomeIndex extends BikeIndex
     @translator = new BikeIndex.GoogleTranslate()
     @container = $('#recovery-stories-container')
     @container.removeClass('extras-hidden')
-    @renderGivingPopup()
     @container.slick
       infinite: false
       lazyLoad: 'ondemand'
@@ -44,12 +43,3 @@ class BikeIndex.WelcomeIndex extends BikeIndex
       @slideText($slide, translatedText)
       $slide.data("translated", true)
       $slide.find(".translation-credit").toggleClass("d-none")
-
-  renderGivingPopup: ->
-    hideModal = localStorage.getItem("hideGivingTuesdayModal")
-    unless hideModal == "true"
-      $("#givingTuesdayModal").modal("show")
-      new BikeIndex.Payments
-      # NOTE: This is also set in payments.coffee on payment submission
-      $("#givingTuesdayModal").on 'hide.bs.modal', ->
-        localStorage.setItem("hideGivingTuesdayModal", "true")

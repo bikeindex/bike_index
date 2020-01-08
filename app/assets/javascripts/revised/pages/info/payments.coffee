@@ -7,7 +7,7 @@ class BikeIndex.Payments extends BikeIndex
     $('#bikeindex-stripe-initial-form').submit (e) =>
       @submitDonation()
       # For giving tuesday modal
-      localStorage.setItem("hideGivingTuesdayModal", "true")
+      localStorage.setItem("hideDonationModal", "true")
       return false
     $('.amount-list a').click (e) =>
       @selectPaymentOption(e)
