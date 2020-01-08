@@ -2037,7 +2037,7 @@ nl:
       mnfg_model_color_html: mnfg, model, <span class="less-strong">kleur</span>
       model: Model
       or_click_html: 'Of klik op het <em>koppelen</em> van uw fietsen om het te verbinden
-        met deze %{bike_code_kind}:'
+        met deze %{bike_sticker_kind}:'
       please_email_support_html: Stuur een e-mail naar %{support_email_link} als u
         niet begrijpt waarom dit bericht wordt weergegeven of als u een uitzondering
         nodig hebt.
@@ -2045,7 +2045,7 @@ nl:
       to_link_that_card_with_a_bike: Om die kaart aan een fiets te koppelen,
       update: Bijwerken
       you_can_enter_the_url: 'U kunt de URL invoeren van de fiets waaraan u deze wilt
-        koppelen %{bike_code_kind} aan:'
+        koppelen %{bike_sticker_kind} aan:'
       you_have_claimed_the_maximum_permitted: U hebt het maximaal toegestane aantal
         fietscodes geclaimd.
       link_bike_sticker_kind: Link %{bike_sticker_kind}
@@ -2435,7 +2435,7 @@ nl:
             neem contact op met Bike Index support.
       stickers:
         update:
-          cannot_update: Je kunt dat %{bike_code_kind} niet bijwerken. Neem contact
+          cannot_update: Je kunt dat %{bike_sticker_kind} niet bijwerken. Neem contact
             op met support@bikeindex.org als u denkt dat dit mogelijk zou moeten zijn.
         ensure_access_to_bike_stickers!:
           org_does_not_have_access: Uw organisatie heeft hier geen toegang toe, neem
@@ -4319,11 +4319,11 @@ nl:
       index:
         connected_to_bike_html: Het is hiermee verbonden %{bike_link}.
         enter_url_of_the_bike_html: 'U kunt de URL invoeren van de fiets waaraan u
-          deze wilt koppelen %{bike_code_kind} aan:'
+          deze wilt koppelen %{bike_sticker_kind} aan:'
         is_currently_linked: is momenteel gekoppeld.
         isnt_linked_to_a_bike: is niet gekoppeld aan een fiets.
         search_org_bikes_html: Of zoek de fietsen van %{org_name}, bekijk de fiets
-          en klik <em>erop</em> om <em>hem</em> te verbinden met deze %{bike_code_kind}
+          en klik <em>erop</em> om <em>hem</em> te verbinden met deze %{bike_sticker_kind}
         update: Bijwerken
       list:
         added: Toegevoegd

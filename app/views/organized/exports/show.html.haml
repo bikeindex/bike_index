@@ -97,7 +97,7 @@
           %td= t(".stickers")
           %td
             - if @export.assign_bike_codes?
-              %em= t(".stickers_exported", bike_codes_count: @export.bike_stickers&.count.to_i)
+              %em= t(".stickers_exported", bike_stickers_count: @export.bike_stickers&.count.to_i)
               - if @export.bike_stickers.any?
                 %ul.exported-link-list
                   - bike_code_links = @export.bike_stickers.each do |code, i|
