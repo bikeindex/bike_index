@@ -7,7 +7,7 @@
 - if @payment.is_recurring
   %p= t(".html.thanks_for_signing_up")
 %p
-  - if @payment.is_donation
+  - if @payment.donation?
     = t(".html.donation_will_help", amount: @payment.amount_formatted)
   - else
     = t(".html.payment_received", amount: @payment.amount_formatted)

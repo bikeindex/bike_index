@@ -28,4 +28,34 @@ RSpec.describe Payment, type: :model do
       end
     end
   end
+
+  describe "set_calculated_attributes" do
+    let(:payment) { Payment.new }
+    it "sets donation" do
+      payment.set_calculated_attributes
+      expect(payment.kind).to eq "donation"
+    end
+    context "theft_alert" do
+      let(:payment) { Payment.new(kind: "theft_alert") }
+      it "does not change from theft_alert" do
+        payment.set_calculated_attributes
+        expect(payment.kind).to eq "theft_alert"
+      end
+    end
+    context "payment" do
+      let(:payment) { Payment.new(kind: "payment") }
+      it "stays payment" do
+        payment.set_calculated_attributes
+        expect(payment.kind).to eq "payment"
+      end
+      context "with invoice" do
+        let(:invoice) { Invoice.new }
+        it "becomes invoice" do
+          payment.invoice = invoice
+          payment.set_calculated_attributes
+          expect(payment.kind).to eq "payment"
+        end
+      end
+    end
+  end
 end

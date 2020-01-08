@@ -4,7 +4,7 @@
 
 - if @bike.current_stolen_record.present? && @bike.current_stolen_record.theft_alerts.any?
   %h4.mt-2
-    Theft Alerts
+    Promoted Alerts
   = render partial: "/admin/theft_alerts/table", locals: { theft_alerts: @bike.current_stolen_record.theft_alerts, skip_bike: true }
 
 - if @recoveries.present?

@@ -53,6 +53,6 @@
                   = l payment.invoice.subscription_start_at, format: :convert_time
           %td
             %small
-              = payment.kind.humanize
+              = payment.payment_method.humanize
           %td
             = payment.amount_formatted

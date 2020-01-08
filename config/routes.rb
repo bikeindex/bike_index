@@ -179,7 +179,7 @@ Bikeindex::Application.routes.draw do
               :ctypes
 
     resources :invoices, only: [:index]
-    resources :theft_alerts, only: %i[index edit update]
+    resources :theft_alerts, only: %i[show index edit update]
     resources :theft_alert_plans, only: %i[index edit update new create]
 
     resources :organizations do

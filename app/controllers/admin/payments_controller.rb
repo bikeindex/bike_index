@@ -37,15 +37,15 @@ class Admin::PaymentsController < Admin::BaseController
 
   def create
     @payment = Payment.new(permitted_create_parameters)
-    valid_kind = Payment.admin_creatable_kinds.include?(permitted_create_parameters[:kind])
-    if valid_kind && valid_invoice_parameters? && @payment.save
+    valid_method = Payment.admin_creatable_payment_methods.include?(permitted_create_parameters[:payment_method])
+    if valid_method && valid_invoice_parameters? && @payment.save
       flash[:success] = "Payment created"
       redirect_to admin_payments_path
     else
-      if valid_kind
+      if valid_method
         flash[:error] ||= "Unable to create"
       else
-        flash[:error] ||= "Not able to create #{permitted_create_parameters[:kind]} kind of payments"
+        flash[:error] ||= "Not able to create #{permitted_create_parameters[:payment_method]} method of payments"
       end
       render :new
     end
@@ -56,7 +56,7 @@ class Admin::PaymentsController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at user_id organization_id kind invoice_id amount_cents]
+    %w[created_at user_id organization_id kind payment_method invoice_id amount_cents]
   end
 
   def matching_payments
@@ -67,7 +67,7 @@ class Admin::PaymentsController < Admin::BaseController
     elsif sort_column == "organization_id"
       @matching_payments = matching_payments.where.not(organization_id: nil)
     end
-    @matching_payments
+    @matching_payments.where(created_at: @time_range)
   end
 
   def valid_invoice_parameters?
@@ -90,7 +90,7 @@ class Admin::PaymentsController < Admin::BaseController
   end
 
   def permitted_create_parameters
-    params.require(:payment).permit(:kind, :amount, :email, :currency, :created_at).merge(invoice_parameters)
+    params.require(:payment).permit(:payment_method, :amount, :email, :currency, :created_at).merge(invoice_parameters)
   end
 
   def find_payment
