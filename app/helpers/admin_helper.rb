@@ -56,8 +56,16 @@ module AdminHelper
   end
 
   def admin_nav_display_view_all
+    # - all_ignored_params = %w[render_chart period sort direction]
+    # - all_active = !@unknown && (sortable_search_params.keys - all_ignored_params).blank? && @period == "all"
+    # = link_to "All", admin_bikes_path(sortable_search_params.slice(*all_ignored_params)), class: "nav-link #{all_active ? 'active' : ''}"
     # If there is a admin_nav_select_link_active, and it's not the main page, we should have a display all link
     return false unless admin_nav_select_link_active.present? && admin_nav_select_link_active[:match_controller]
-    !current_page_active?(admin_nav_select_link_active[:path])
+    # Don't show "view all" if the path is the exact same
+    return false if current_page_active?(admin_nav_select_link_active[:path])
+    return true if params[:period].present? && params[:period] != "all"
+    # If there are any parameters that aren't
+    ignored_keys = %w[render_chart sort period direction]
+    (sortable_search_params.reject { |k, v| v.blank? }.keys - ignored_keys).any?
   end
 end

@@ -291,8 +291,8 @@ module ControllerHelpers
     when "year"
       @start_time = Time.current.beginning_of_day - 1.year
     when "week"
-      @start_time = Time.current.beginning_of_day - 7.days
-    else # Default to week view
+      @start_time = Time.current.beginning_of_day - 1.week
+    else # Default to all
       set_default_period
     end
     @end_time ||= Time.current

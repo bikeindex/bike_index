@@ -2,17 +2,11 @@
   .col-12
     %h1
       Feedback & Messages
-  .col-12.mt-4
-    = line_chart available_feedbacks.send(group_by_method(@time_range), "feedbacks.created_at").count, curve: false, thousands: ",", defer: true
-  .col-12.mb-2.mt-2
-    .row.justify-content-end
-      .col-2
-        %p
-          %em.small.less-strong
-            = number_with_delimiter(available_feedbacks.count)
-            charted
-      = render partial: "/shared/period_select"
 
+.col-12.mt-4
+  = column_chart time_range_counts(collection: available_feedbacks), stacked: true, thousands: ",", defer: true
+
+= render partial: "/shared/period_select"
 
 %p
   = number_with_delimiter(@feedbacks.total_count)
