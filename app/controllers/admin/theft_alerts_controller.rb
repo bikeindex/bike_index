@@ -4,7 +4,6 @@ class Admin::TheftAlertsController < Admin::BaseController
   before_action :set_period, only: [:index]
   before_action :find_theft_alert, only: [:edit, :update]
 
-  # TODO: Add sorting and filtering
   def index
     @render_chart = ParamsNormalizer.boolean(params[:render_chart])
     @theft_alerts =
