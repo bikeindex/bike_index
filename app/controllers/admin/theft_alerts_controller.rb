@@ -1,7 +1,6 @@
 class Admin::TheftAlertsController < Admin::BaseController
   include SortableTable
 
-  before_action :period_defaults_to_all
   before_action :set_period, only: [:index]
   before_action :find_theft_alert, only: [:edit, :update]
 

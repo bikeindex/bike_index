@@ -62,11 +62,13 @@ module GraphingHelper
     [
       {
         name: "Organization registrations",
-        data: @bikes_in_organizations.send(group_by_method(time_range), "bikes.created_at", time_zone: @timezone, range: @time_range, format: group_by_format(@time_range)).count,
+        data: time_range_counts(collection: @bikes_in_organizations, column: "bikes.created_at"),
+        # data: @bikes_in_organizations.send(group_by_method(time_range), "bikes.created_at", time_zone: @timezone, range: @time_range, format: group_by_format(@time_range)).count,
       },
       {
         name: "Self registrations",
-        data: @bikes_not_in_organizations.send(group_by_method(time_range), "bikes.created_at", time_zone: @timezone, range: @time_range, format: group_by_format(@time_range)).count,
+        data: time_range_counts(collection: @bikes_not_in_organizations, column: "bikes.created_at"),
+        # data: @bikes_not_in_organizations.send(group_by_method(time_range), "bikes.created_at", time_zone: @timezone, range: @time_range, format: group_by_format(@time_range)).count,
       },
     ]
   end

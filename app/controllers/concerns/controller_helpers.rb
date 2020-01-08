@@ -180,6 +180,11 @@ module ControllerHelpers
       if params[:start_time].present? && params[:end_time].present?
         @start_time = TimeParser.parse(params[:start_time], @timezone)
         @end_time = TimeParser.parse(params[:end_time], @timezone)
+        if @start_time > @end_time
+          new_end_time = @start_time
+          @start_time = @end_time
+          @end_time = new_end_time
+        end
       else # use the default period
         set_default_period
       end
@@ -191,10 +196,6 @@ module ControllerHelpers
 
   def period_search?
     @period.present? || @render_chart
-  end
-
-  def period_defaults_to_all
-    @period = "all" unless params[:period].present?
   end
 
   protected

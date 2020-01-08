@@ -1,4 +1,45 @@
-// Styles are duplicated in organized/dashboard - make sure to update there too!
+// Ambassador dash styles
+#organized_ambassador_dashboards_show {
+  .ambassador-toggle {
+    padding: 1rem 0;
+    text-align: center;
+    .btn {
+      margin: auto;
+    }
+    @include media-breakpoint-down(md) {
+      width: 90px;
+      .btn {
+        padding: 0.5rem 0;
+        white-space: normal;
+        display: block;
+        max-width: 90%;
+        font-size: 80%;
+      }
+    }
+  }
+}
+
+// Non-ambassador dash styles
+
+// Special styles, because older bootstrap:
+#timeSelectionCustom {
+  margin: 15px 0 0 0;
+  &.show {
+    display: flex;
+  }
+  label {
+    margin-right: 0.5rem;
+  }
+  input {
+    margin-right: 1rem;
+    padding: 0.25rem;
+  }
+  .btn-success {
+    margin-right: 0;
+  }
+}
+
+// Duplicated from period_selection in packs
 #timeSelectionBtnGroup {
   .period-select-standard {
     transition: opacity 0.5s ease-in-out;

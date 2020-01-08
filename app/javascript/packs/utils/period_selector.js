@@ -25,11 +25,19 @@ function PeriodSelector() {
       $("#timeSelectionBtnGroup .period-select-standard").removeClass("active");
       $("#periodSelectCustom").addClass("active");
       $("#timeSelectionBtnGroup").addClass("custom-period-selected");
-      $("#timeSelectionCustom").collapse("show");
+      // Sometimes bootstrap isn't loaded
+      if (typeof $().collapse == "function") {
+        $("#timeSelectionCustom").collapse("show");
+      } else {
+        $("#timeSelectionCustom").addClass("in");
+        $("#timeSelectionCustom").css("display", "flex");
+      }
     },
 
     disableCustomSelection() {
-      $("#timeSelectionCustom").collapse("hide");
+      if (typeof $().collapse == "function") {
+        $("#timeSelectionCustom").collapse("hide");
+      }
       $("#timeSelectionBtnGroup").removeClass("custom-period-selected");
     },
 
@@ -57,7 +65,6 @@ function PeriodSelector() {
             .attr("data-period");
         }
         if (period === "custom") {
-          log.debug("custom");
           return self.enableCustomSelection();
         } else {
           // Not really necessary, but makes it a little slicker

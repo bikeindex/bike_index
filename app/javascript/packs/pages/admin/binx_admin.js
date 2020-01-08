@@ -8,7 +8,6 @@ import BinxAdminInvoices from "./invoices.js";
 import BinxAdminOrganizationForm from "./organization_form.js";
 import BinxAdminBlogs from "./blogs.js";
 import BinxAdminImageUploader from "./image_uploader.js";
-import PeriodSelector from "../../utils/period_selector.js";
 
 function BinxAdmin() {
   return {
@@ -59,8 +58,6 @@ function BinxAdmin() {
         const binxAdminImageUploader = BinxAdminImageUploader();
         binxAdminImageUploader.init();
       }
-      const periodSelector = PeriodSelector();
-      periodSelector.init();
     },
 
     initAdminSearchSelect() {

@@ -13,8 +13,8 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         expect(response).to be_ok
         expect(response).to render_template(:index)
       end
+      let(:target_timezone) { ActiveSupport::TimeZone["Pacific Time (US & Canada)"] }
       context "period of one day" do
-        let(:target_timezone) { ActiveSupport::TimeZone["Pacific Time (US & Canada)"] }
         it "renders the period expected" do
           get base_url, period: "day", timezone: "Pacific Time (US & Canada)"
           expect(response.code).to eq "200"
@@ -26,26 +26,27 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
       end
       context "custom without end_time" do
         let(:start_time) { Time.at(1577050824) } # 2019-12-22 15:40:50 UTC
-        xit "renders the period expected" do
-          get base_url, params: { period: "custom", start_time: start_time.to_i, end_time: "" }
+        it "renders the period expected" do
+          get base_url, period: "custom", start_time: start_time.to_i, end_time: ""
           expect(response.code).to eq "200"
           expect(response).to render_template(:index)
-          expect(assigns(:timezone)).to eq TimeParser::DEFAULT_TIMEZONE
-          expect(assigns(:period)).to eq "custom"
-          expect(assigns(:start_time)).to be_within(1.second).of Time.current.beginning_of_day - 7.days
-          expect(assigns(:end_time)).to be_within(1.second).of Time.current
+          expect(assigns(:period)).to eq "all"
+          expect(assigns(:start_time)).to be_within(1.second).of Time.at(1560805519)
+          expect(assigns(:end_time)).to be_within(2.seconds).of Time.current
         end
       end
-      context "period of one day" do
+      context "reversed period" do
         let(:start_time) { Time.at(1577050824) } # 2019-12-22 15:40:50 UTC
-        let(:end_time) { Time.at(1578001180) } # 2020-01-02 21:42:01 UTC
-        xit "renders the period expected" do
-          get base_url, params: { period: "custom", start_time: start_time.to_i, end_time: end_time.to_i }
+        let(:end_time) { Time.at(1515448980) } # 2018-01-08 14:03:00 -0800
+        it "renders the period expected" do
+          get base_url, period: "custom",
+            start_time: start_time.to_i,
+            end_time: "2018-01-08T14:03",
+            timezone: "Pacific Time (US & Canada)"
           expect(response.code).to eq "200"
           expect(response).to render_template(:index)
-          expect(assigns(:timezone)).to eq TimeParser::DEFAULT_TIMEZONE
-          expect(assigns(:start_time)).to be_within(1.second).of start_time
-          expect(assigns(:end_time)).to be_within(1.second).of end_time
+          expect(assigns(:start_time)).to be_within(2.seconds).of end_time
+          expect(assigns(:end_time)).to be_within(2.seconds).of start_time
         end
       end
     end

@@ -19,7 +19,7 @@
   %button#periodSelectCustom.btn.btn-outline-secondary.btn-sm.ml-2{ class: ("active" if @period == "custom"), data: { period: "custom" } }
     = t(".custom")
 
-%form#timeSelectionCustom.custom-time-selection.mt-2.collapse{ class: @period == "custom" ? "show" : "" }
+%form#timeSelectionCustom.custom-time-selection.mt-2.collapse{ class: @period == "custom" ? "in show" : "" }
   .form-group
     = label_tag :start_time_selector, t(".from"), class: "control-label mr-2"
     = datetime_local_field_tag :start_time_selector, @start_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"

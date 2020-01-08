@@ -1,6 +1,6 @@
 module Organized
   class DashboardController < Organized::BaseController
-    before_action :set_default_period
+    before_action :set_fallback_period
     before_action :set_period, only: [:index]
     helper_method :bikes_for_graph
 
@@ -13,7 +13,6 @@ module Organized
     end
 
     def index
-      @period = "week" unless params[:period].present?
       @child_organizations = current_organization.child_organizations
       if current_organization.regional?
         @bikes_in_organizations = Bike.unscoped.current.organization(current_organization.nearby_and_partner_organization_ids).where(created_at: @time_range)
@@ -28,7 +27,7 @@ module Organized
 
     private
 
-    def set_default_period
+    def set_fallback_period
       @period = "year" unless params[:period].present?
     end
   end
