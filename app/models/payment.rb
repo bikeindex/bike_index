@@ -29,13 +29,15 @@ class Payment < ApplicationRecord
 
   def self.admin_creatable_payment_methods; ["check"] end
 
-  def non_donation?; !donation? end
-
-  def display_kind
+  def self.display_kind(kind)
     return "NO KIND!" unless kind.present?
-    return "Promoted alert" if theft_alert?
+    return "Promoted alert" if kind == "theft_alert"
     kind.humanize
   end
+
+  def non_donation?; !donation? end
+
+  def display_kind; self.class.display_kind(kind) end
 
   def set_calculated_attributes
     self.kind = calculated_kind
