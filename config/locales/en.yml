@@ -2071,7 +2071,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -2097,7 +2097,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -4974,16 +4974,16 @@ en:
         is what we recommend using
     period_select:
       all: All
-      past: past
-      thirty_days: 30 days
-      seven_days: 7 days
-      day: day
-      hour: hour
-      year: year
       custom: custom
+      day: day
       from: From
+      hour: hour
+      past: past
+      seven_days: 7 days
+      thirty_days: 30 days
       to: To
       update: Update
+      year: year
   stolen:
     index:
       ambassador: ambassador
