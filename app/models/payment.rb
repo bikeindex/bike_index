@@ -63,6 +63,8 @@ class Payment < ApplicationRecord
     invoice.update_attributes(updated_at: Time.current) # Manually trigger invoice update
   end
 
+  private
+
   def calculated_kind
     return "invoice_payment" if invoice_id.present?
     return "theft_alert" if theft_alert.present?
