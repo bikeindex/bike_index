@@ -186,6 +186,7 @@ module ControllerHelpers
           @end_time = new_end_time
         end
       else # use the default period
+        @period = "all"
         set_default_period
       end
     else
