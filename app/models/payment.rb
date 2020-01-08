@@ -6,6 +6,7 @@ class Payment < ApplicationRecord
   scope :current, -> { where(is_current: true) }
   scope :subscription, -> { where(is_recurring: true) }
   scope :organizations, -> { where.not(organization_id: nil) }
+  scope :non_donation, -> { where.not(kind: "donation") }
 
   enum payment_method: PAYMENT_METHOD_ENUM
   enum kind: KIND_ENUM
@@ -27,6 +28,8 @@ class Payment < ApplicationRecord
   def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
   def self.admin_creatable_payment_methods; ["check"] end
+
+  def non_donation?; !donation? end
 
   def set_calculated_attributes
     self.kind ||= calculated_kind
