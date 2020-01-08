@@ -30,7 +30,7 @@ RSpec.describe Admin::DashboardController, type: :controller do
         FactoryBot.create(:organization)
       end
       let(:timezone) { "America/Los_Angeles" }
-      let(:time_range_start) { Time.at(1134972000) }
+      let(:time_range_start) { Time.now.in_time_zone(timezone).beginning_of_day - 7.days }
       it "renders, sets timezone from params" do
         get :index, timezone: timezone
         expect(response.code).to eq "200"

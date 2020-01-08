@@ -70,6 +70,11 @@ class Admin::PaymentsController < Admin::BaseController
     @matching_payments.where(created_at: @time_range)
   end
 
+  # Override earliest period date, to use 1 week before first feedback created
+  def earliest_period_date
+    Time.at(1417588530)
+  end
+
   def valid_invoice_parameters?
     invoice_parameters # To parse the invoice params
     return true unless @params_invoice.present?

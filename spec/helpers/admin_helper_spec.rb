@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe AdminHelper, type: :helper do
-  helper.extend(ApplicationHelper)
+  # This is sort of gross, because of all the stubbing, but it's still useful, so...
   describe "admin_nav_display_view_all" do
     before do
       allow(helper).to receive(:request) { double("request", url: bikes_path) }

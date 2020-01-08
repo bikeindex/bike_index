@@ -42,4 +42,9 @@ class Admin::FeedbacksController < Admin::BaseController
   def available_feedbacks
     available_feedbacks ||= matching_feedbacks.where(created_at: @time_range)
   end
+
+  # Override earliest period date, to use 1 week before first feedback created
+  def earliest_period_date
+    Time.at(1362190586)
+  end
 end

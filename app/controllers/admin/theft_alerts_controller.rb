@@ -50,8 +50,9 @@ class Admin::TheftAlertsController < Admin::BaseController
     )
   end
 
+  # Override, set one week before earliest created theft alert
   def earliest_period_date
-    Time.at(1560805519) # One week before earliest created theft alert
+    Time.at(1560805519)
   end
 
   def sortable_columns
