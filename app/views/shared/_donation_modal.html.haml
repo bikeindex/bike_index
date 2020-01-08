@@ -1,0 +1,49 @@
+#donationModal.modal.fade
+  .modal-dialog{ role: "document" }
+    .modal-content.donate-block
+      .modal-body.select-amount{ style: "padding: 12px 15px 24px;" }
+        %button.close{ "aria-label" => "Close", "data-dismiss" => "modal", type: "button" }
+          %span{ "aria-hidden" => "true" }
+            &times;
+        = image_tag "revised/logo_blue_black.svg", class: "modal-title-logo", alt: "Bike Index home"
+        %h2.modal-title
+          = t(".header")
+        %hr
+        %p.mt-2
+          %strong.em
+            = t(".subheader")
+        %form#bikeindex-stripe-initial-form
+          %ul.row.amount-list
+            - numbers = [10, 25, 50, 100, 200, 300, 500]
+            - numbers.each do |amount|
+              %li.col-xs-4
+                %a.btn.btn-secondary{ data: { amount: amount * 100 } }
+                  = number_to_currency(amount, precision: 0)
+            %li.col-xs-8
+              .input-group
+                .input-group-addon
+                  = t("number.currency.format.unit")
+                %input#arbitrary-amount.form-control{ type: "number", min: "0", placeholder: t("payments.form.other_amount"), step: 0.01 }
+          .row
+            .col-xs-6.text-left
+              %a.btn.btn-secondary.no-donate-btn{ "aria-label" => "Close", "data-dismiss" => "modal" }
+                = t(".skip")
+            .col-xs-6.text-right
+              = submit_tag t("payments.form.next"), class: "btn btn-primary"
+
+        %p.nfp-info
+          - link = link_to t(".nonprofit_501c3"), news_url("bike-index--now-a-nonprofit")
+          = t(".is_a_nonprofit_html", blog_link: link)
+
+
+
+<script src="https://checkout.stripe.com/checkout.js"></script>
+
+- stripe_form_hash = { id: 'stripe_form', data: { key: ENV['STRIPE_PUBLISHABLE_KEY'], email: current_user&.email, type: "Donate", currency: default_currency, description: t("payments.form.donate_to_bike_index") } }
+
+= form_tag payments_path, stripe_form_hash do
+  = hidden_field_tag :stripe_token
+  = hidden_field_tag :stripe_amount
+  = hidden_field_tag :stripe_currency, default_currency
+  = hidden_field_tag :stripe_email
+  = hidden_field_tag :is_payment, false
