@@ -225,7 +225,7 @@ class Organization < ApplicationRecord
 
   def set_calculated_attributes
     return true unless name.present?
-    self.name = strip_tags(name)
+    self.name = strip_name_tags(name)
     self.name = "Stop messing about" unless name[/\d|\w/].present?
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = (short_name || name).truncate(30)
@@ -345,6 +345,10 @@ class Organization < ApplicationRecord
   end
 
   private
+
+  def strip_name_tags(str)
+    strip_tags(name).gsub("&amp;", "&")
+  end
 
   def set_search_coordinates
     return if search_coordinates_set?

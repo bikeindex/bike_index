@@ -357,6 +357,13 @@ RSpec.describe Organization, type: :model do
       expect(org.short_name).to match(/stop messing about/i)
     end
 
+    it "permits & in names" do
+      organization = Organization.new(name: "Bikes & Trikes")
+      organization.set_calculated_attributes
+      expect(organization.slug).to eq "bikes-amp-trikes"
+      expect(organization.name).to eq "Bikes & Trikes"
+    end
+
     it "protects from name collisions, without erroring because of it's own slug" do
       org1 = Organization.create(name: "Bicycle shop")
       org1.reload.save

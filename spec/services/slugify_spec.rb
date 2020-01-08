@@ -23,6 +23,13 @@ RSpec.describe Slugifyer do
     end
   end
 
+  describe "slugify" do
+    it "handles &" do
+      expect(Slugifyer.slugify("Bikes &amp; Trikes")).to eq "bikes-amp-trikes"
+      expect(Slugifyer.slugify("Bikes & Trikes")).to eq "bikes-amp-trikes"
+    end
+  end
+
   describe "manufacturer" do
     it "removes works rivendell" do
       slug = Slugifyer.manufacturer("Rivendell Bicycle Works")
