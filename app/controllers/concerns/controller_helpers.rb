@@ -173,6 +173,7 @@ module ControllerHelpers
 
   # For setting periods, particularly for graphing
   def set_period
+    @timezone ||= Time.zone
     # Set time period
     @period ||= params[:period]
     if @period == "custom"
@@ -291,12 +292,16 @@ module ControllerHelpers
       @start_time = Time.current.beginning_of_day - 1.year
     when "week"
       @start_time = Time.current.beginning_of_day - 7.days
-    when "all"
-      @start_time = earliest_period_date
     else # Default to week view
       set_default_period
     end
     @end_time ||= Time.current
+  end
+
+  def set_default_period # Separate method so it can be overriden
+    @period ||= "all"
+    @end_time = Time.current
+    @start_time = earliest_period_date
   end
 
   def earliest_period_date
@@ -306,11 +311,5 @@ module ControllerHelpers
     else
       @start_time = Time.at(1134972000) # Earliest bike created at
     end
-  end
-
-  def set_default_period # Separate method so it can be overriden
-    @period ||= "week"
-    @end_time = Time.current
-    @start_time = Time.current.beginning_of_day - 7.days
   end
 end

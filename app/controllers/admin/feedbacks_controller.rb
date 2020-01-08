@@ -5,7 +5,7 @@ class Admin::FeedbacksController < Admin::BaseController
   def index
     page = params[:page] || 1
     per_page = params[:per_page] || 50
-    @feedbacks = matching_feedbacks.reorder("feedbacks.#{sort_column} #{sort_direction}")
+    @feedbacks = available_feedbacks.reorder("feedbacks.#{sort_column} #{sort_direction}")
                                    .page(page).per(per_page)
   end
 
@@ -40,6 +40,6 @@ class Admin::FeedbacksController < Admin::BaseController
   end
 
   def available_feedbacks
-    matching_feedbacks.where(created_at: @time_range)
+    available_feedbacks ||= matching_feedbacks.where(created_at: @time_range)
   end
 end

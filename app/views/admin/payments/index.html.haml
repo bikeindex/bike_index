@@ -1,14 +1,3 @@
-:ruby
-  payments_counts = Payment.kinds.map do |kind|
-    payments_of_kind = matching_payments.where(kind: kind)
-    {
-      name: kind,
-      data: time_range_counts(collection: payments_of_kind),
-      count: payments_of_kind.count,
-      sum: Payment.money_formatted(payments_of_kind.sum(:amount_cents)),
-    }
-  end
-
 .admin-subnav
   .col-md-5
     %h1
@@ -19,6 +8,17 @@
         = link_to "New payment", new_admin_payment_url, class: "nav-link"
       %li.nav-item
         = link_to "graph", admin_payments_path(sortable_search_params.merge(render_chart: !@render_chart)), class: "nav-link #{@render_chart ? 'active' : ''}"
+
+:ruby
+  payments_counts = Payment.kinds.map do |kind|
+    payments_of_kind = matching_payments.where(kind: kind)
+    {
+      name: kind,
+      data: time_range_counts(collection: payments_of_kind),
+      count: payments_of_kind.count,
+      money: Payment.money_formatted(payments_of_kind.sum(:amount_cents)),
+    }
+  end
 
 - if @render_chart
   .col-12.mt-2
@@ -43,8 +43,7 @@
           %tr
             - payments_counts.each do |payment_count|
               %td
-                #{payment_count
-                = matching_payments.where(theft_alert_plan: theft_alert_plan).count
+                #{payment_count[:count]} - #{payment_count[:money]}
 = paginate @payments, views_prefix: "admin"
 
 
