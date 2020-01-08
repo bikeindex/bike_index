@@ -3,7 +3,7 @@
 %table.table-list
   %tr
     %td
-      Kind
+      Method
     %td
       %span.less-strong
       = payment.payment_method
@@ -23,4 +23,6 @@
       For
     %td
       - if payment.theft_alert.present?
-        = link_to "Theft alert", edit_admin_theft_alert_path(payment.theft_alert)
+        = link_to "Promoted alert", edit_admin_theft_alert_path(payment.theft_alert)
+      - else
+        = payment.display_kind

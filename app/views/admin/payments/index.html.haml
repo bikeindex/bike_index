@@ -11,14 +11,18 @@
 
 :ruby
   payments_counts = Payment.kinds.map do |kind|
-    payments_of_kind = matching_payments.where(kind: kind)
+    # Legacy enum issue so excited for TODO: Rails 5 update
+    payment_enum = Payment::KIND_ENUM[kind.to_sym] || 0
+    payments_of_kind = matching_payments.where(kind: )
     {
       name: kind,
-      data: time_range_counts(collection: payments_of_kind),
+      # data: time_range_counts(collection: payments_of_kind),
       count: payments_of_kind.count,
       money: Payment.money_formatted(payments_of_kind.sum(:amount_cents)),
     }
   end
+
+= pretty_print_json(payments_counts.as_json)
 
 - if @render_chart
   .col-12.mt-2
@@ -55,11 +59,13 @@
       %th
         = sortable "user_id"
       %th
-        = sortable "organization_id"
+        = sortable "kind"
       %th
-        = sortable "invoice_id"
+        %small= sortable "organization_id"
       %th
-        = sortable "payment_method", "method"
+        %small= sortable "invoice_id"
+      %th
+        %small= sortable "payment_method", "method"
       %th
         = sortable "amount_cents", "Amount"
     %tbody
@@ -75,7 +81,11 @@
               = payment.email
               %small.less-strong
                 no user
-
+          %td
+            - if payment.theft_alert?
+              = link_to "Promoted alert", edit_admin_theft_alert_path(payment.theft_alert)
+            - else
+              = payment.display_kind
           %td
             - if payment.organization.present?
               = link_to payment.organization.short_name, admin_organization_path(payment.organization)
@@ -88,9 +98,9 @@
           %td
             %small
               - if payment.stripe?
-                = link_to "Stripe", "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
+                = link_to "stripe", "https://dashboard.stripe.com/payments/#{payment.stripe_id}"
               - else
-                = payment.payment_method.humanize
+                = payment.payment_method.humanize.downcase
           %td
             = payment.amount_formatted
 = paginate @payments, views_prefix: "admin"

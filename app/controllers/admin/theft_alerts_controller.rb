@@ -15,6 +15,8 @@ class Admin::TheftAlertsController < Admin::BaseController
         .per(params.fetch(:per_page, 25))
   end
 
+  def show; redirect_to edit_admin_theft_alert_path end
+
   def edit; end
 
   def update

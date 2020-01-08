@@ -31,6 +31,12 @@ class Payment < ApplicationRecord
 
   def non_donation?; !donation? end
 
+  def display_kind
+    return "NO KIND!" unless kind.present?
+    return "Promoted alert" if theft_alert?
+    kind.humanize
+  end
+
   def set_calculated_attributes
     self.kind = calculated_kind
     if user.present?

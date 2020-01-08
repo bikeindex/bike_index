@@ -1,3 +1,4 @@
+# Note: Called "Promoted alert" on the frontend
 class TheftAlert < ApplicationRecord
   enum status: { pending: 0, active: 1, inactive: 2 }.freeze
 

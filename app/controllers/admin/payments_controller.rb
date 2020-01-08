@@ -56,7 +56,7 @@ class Admin::PaymentsController < Admin::BaseController
   protected
 
   def sortable_columns
-    %w[created_at user_id organization_id payment_method invoice_id amount_cents]
+    %w[created_at user_id organization_id kind payment_method invoice_id amount_cents]
   end
 
   def matching_payments
@@ -67,7 +67,7 @@ class Admin::PaymentsController < Admin::BaseController
     elsif sort_column == "organization_id"
       @matching_payments = matching_payments.where.not(organization_id: nil)
     end
-    @matching_payments
+    @matching_payments.where(created_at: @time_range)
   end
 
   def valid_invoice_parameters?

@@ -30,6 +30,7 @@ RSpec.describe GraphingHelper, type: :helper do
   end
 
   describe "group_by_format" do
+    before { Time.zone = TimeParser::DEFAULT_TIMEZONE }
     let(:end_time) { Time.at(1578268910) } # 2020-01-06 00:01:38 UTC
     let(:time_range) { start_time..end_time }
     context "23 hours" do
