@@ -3,6 +3,7 @@
 module GraphingHelper
   def time_range_counts(collection:, column: "created_at", name: nil, time_range: nil)
     time_range ||= @time_range
+    # Note: by specifying the range parameter, we force it to display empty days
     collection.send(group_by_method(time_range), column, range: time_range, format: group_by_format(time_range)).count
   end
 
@@ -25,7 +26,7 @@ module GraphingHelper
       "%l:%M %p"
     elsif group_by_method(time_range) == :group_by_hour
       "%a%l %p"
-    elsif time_range.last - time_range.first < 2.weeks.to_i # One week
+    elsif time_range.last - time_range.first < 2.weeks.to_i
       "%a %-m-%-d"
     elsif group_by_method(time_range) == :group_by_month
       "%Y-%-m"
@@ -58,17 +59,14 @@ module GraphingHelper
   end
 
   def organization_dashboard_bikes_graph_data(time_range)
-    # Note: by specifying the range parameter, we force it to display empty days
     [
       {
         name: "Organization registrations",
         data: time_range_counts(collection: @bikes_in_organizations, column: "bikes.created_at"),
-        # data: @bikes_in_organizations.send(group_by_method(time_range), "bikes.created_at", time_zone: @timezone, range: @time_range, format: group_by_format(@time_range)).count,
       },
       {
         name: "Self registrations",
         data: time_range_counts(collection: @bikes_not_in_organizations, column: "bikes.created_at"),
-        # data: @bikes_not_in_organizations.send(group_by_method(time_range), "bikes.created_at", time_zone: @timezone, range: @time_range, format: group_by_format(@time_range)).count,
       },
     ]
   end
