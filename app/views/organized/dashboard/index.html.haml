@@ -1,10 +1,10 @@
 .organized-page-header.mb-4
-  %h1
+  %h1.text-center
     %em= current_organization.name
     Dashboard
 
 - if current_organization.regional?
-  = column_chart organization_dashboard_bikes_graph_data(@time_range), stacked: true, thousands: ",", defer: true, colors: ["#5cb85c", "#3498db"]
+  = column_chart organization_dashboard_bikes_graph_data, stacked: true, thousands: ",", defer: true, colors: ["#5cb85c", "#3498db"]
 
   %div{ style: "margin-top: 50px;" }
     = render partial: "/shared/period_select"
@@ -32,10 +32,12 @@
           %td= number_with_delimiter(@bikes_in_region_not_in_organizations_count)
         %tr
           %td
-            Total registrations
+            %strong
+              Total registrations
           %td
-            - total_bikes = @bikes_in_organizations.count(:all) + @bikes_not_in_organizations.count(:all)
-            = number_with_delimiter(total_bikes)
+            %strong
+              - total_bikes = @bikes_in_organizations.count(:all) + @bikes_not_in_organizations.count(:all)
+              = number_with_delimiter(total_bikes)
     %small.less-strong.d-md-block{ style: "display: none; padding: 0.25rem 0.5rem; margin: -1rem 0 0 0;" }
       %em
         Total registrations

@@ -47,7 +47,7 @@
             %tr
               - theft_alert_plans.each do |theft_alert_plan|
                 %td
-                  = matching_theft_alerts.where(theft_alert_plan: theft_alert_plan).count
+                  = number_with_delimiter(matching_theft_alerts.where(theft_alert_plan: theft_alert_plan).count)
 
 = render partial: "/admin/theft_alerts/table", locals: { render_sortable: true, theft_alerts: @theft_alerts }
 
