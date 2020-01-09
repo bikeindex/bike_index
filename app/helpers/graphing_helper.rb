@@ -1,20 +1,30 @@
 # frozen_string_literal: true
 
 module GraphingHelper
-  def time_range_counts(collection:, column: "created_at", name: nil, time_range: nil)
+  def time_range_counts(collection:, column: "created_at", time_range: nil)
     time_range ||= @time_range
     # Note: by specifying the range parameter, we force it to display empty days
-    collection.send(group_by_method(time_range), column, range: time_range, format: group_by_format(time_range)).count
+    collection.send(group_by_method(time_range), column, range: time_range, format: group_by_format(time_range))
+              .count
+  end
+
+  def time_range_amounts(collection:, column: "created_at", amount_column: "amount_cents", time_range: nil)
+    time_range ||= @time_range
+    # Note: by specifying the range parameter, we force it to display empty days
+    collection.send(group_by_method(time_range), column, range: time_range, format: group_by_format(time_range))
+              .sum(amount_column)
+              .map { |k, v| [k, (v.to_f / 100.00).round(2)] } # Convert cents to dollars
+              .to_h
   end
 
   def group_by_method(time_range)
-    if time_range.last - time_range.first < 3601 # 1 hour + 1 second
+    if time_range.last - time_range.first < 3601 # 1.hour + 1 second
       :group_by_minute
     elsif time_range.last - time_range.first < 500_000 # around 6 days
       :group_by_hour
     elsif time_range.last - time_range.first < 5_000_000 # around 60 days
       :group_by_day
-    elsif time_range.last - time_range.first < 32_000_000 # A little over a year
+    elsif time_range.last - time_range.first < 31730400 # 1.year + 2.days
       :group_by_week
     else
       :group_by_month
@@ -58,7 +68,7 @@ module GraphingHelper
     end
   end
 
-  def organization_dashboard_bikes_graph_data(time_range)
+  def organization_dashboard_bikes_graph_data
     [
       {
         name: "Organization registrations",

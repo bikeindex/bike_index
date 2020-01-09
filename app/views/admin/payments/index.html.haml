@@ -18,14 +18,17 @@
     {
       name: Payment.display_kind(kind),
       data: time_range_counts(collection: payments_of_kind),
+      data_money: time_range_amounts(collection: payments_of_kind),
       count: payments_of_kind.count,
       money: Payment.money_formatted(payments_of_kind.sum(:amount_cents)),
     }
   end.compact
 
 - if @render_chart
-  .col-12.mt-2
-    = column_chart payments_counts, stacked: true, thousands: ",", defer: true
+  %h4.mt-2 Counts
+  = column_chart payments_counts.map { |c| { name: c[:name], data: c[:data] } }, stacked: true, thousands: ",", defer: true
+  %h4.mt-2 Amounts
+  = column_chart payments_counts.map { |c| { name: c[:name], data: c[:data_money] } }, stacked: true, thousands: ",", prefix: "$", round: 2, defer: true
 
 .col-12.mb-4.mt-2
   .row.justify-content-end
@@ -34,14 +37,19 @@
 .row.mb-4
   .col-sm
     %h4.mt-2
-      = pluralize(@payments.total_count, "matching payment")
+      = pluralize(number_with_delimiter(matching_payments.count), "matching payment")
   - if payments_counts.present?
     .col-sm
       .full-screen-table
         %table.table.table-striped.table-bordered.table-sm.text-center
           %thead
             - payments_counts.each do |payment_count|
-              %th= payment_count[:name]
+              %th
+                = payment_count[:name].pluralize
+                - if params[:search_kind].present?
+                  = link_to "view all kinds", admin_payments_path(sortable_search_params.merge(search_kind: "")), class: "small em"
+                - elsif payments_counts.count > 1
+                  = link_to "view", admin_payments_path(sortable_search_params.merge(search_kind: params[:search_kind])), class: "small em"
           %tbody
             %tr
               - payments_counts.each do |payment_count|
