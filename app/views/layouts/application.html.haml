@@ -159,7 +159,7 @@
     - donation_request = session.delete(:render_donation_request)
     - if donation_request.present?
       = render "/shared/law_enforcement_donation_modal", locals: { kind: donation_request }
-    - elsif show_missing_location_alert?
+    - elsif show_missing_location_alert
       = render "/shared/stolen_missing_location_modal"
 
     = render 'shared/footer_revised'

@@ -14,7 +14,7 @@ RSpec.describe PaymentsController, type: :controller do
         expect(response.code).to eq("200")
         expect(response).to render_template("new")
         expect(flash).to_not be_present
-        expect(assigns(:show_missing_location_alert?)).to be_falsey
+        expect(assigns(:show_missing_location_alert)).to be_falsey
       end
     end
     context "without user" do

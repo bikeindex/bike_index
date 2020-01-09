@@ -1064,41 +1064,31 @@ RSpec.describe BikesController, type: :controller do
     context "user allowed to edit the bike" do
       let(:user) { ownership.creator }
       context "revised" do
-        before { set_current_user(user) }
+        before do
+          user.update_column :has_stolen_bikes_without_locations, true
+          set_current_user(user)
+        end
         context "root" do
           context "non-stolen bike" do
             it "renders the bike_details template" do
-              user.update_column :has_stolen_bikes_without_locations, true
               get :edit, id: bike.id
               expect(response.status).to eq(200)
               expect(assigns(:edit_template)).to eq "bike_details"
               expect(assigns(:edit_templates)).to eq non_stolen_edit_templates.as_json
               expect(response).to render_template "edit_bike_details"
-              expect(assigns(:show_missing_location_alert?)).to be_falsey
+              expect(assigns(:show_missing_location_alert)).to be_truthy
             end
           end
           context "stolen bike" do
-            let(:user) { FactoryBot.create(:user_confirmed) }
-            let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, user: user) }
-            let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike, street: "") }
             it "renders with stolen as first template, different description" do
+              bike.update_attribute(:stolen, true)
               bike.reload
-              bike.update_attributes(stolen: true, updated_at: Time.current)
-              # Unmemoize stolen missing locations
-              user_id = user.id
-              user = User.find user_id
-              user.update_attributes(updated_at: Time.current)
-              expect(user.has_stolen_bikes_without_locations).to be_truthy
-              expect(bike.stolen).to be_truthy
-              expect(bike.current_stolen_record).to eq stolen_record
-              expect(bike.current_stolen_record.missing_location?).to be_truthy
-              # Actually test the thing
               get :edit, id: bike.id
 
               expect(response).to be_success
               expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq stolen_edit_templates.as_json
-              expect(assigns(:show_missing_location_alert?)).to be_falsey
+              expect(assigns(:show_missing_location_alert)).to be_falsey
               expect(response).to render_template "edit_theft_details"
             end
           end
