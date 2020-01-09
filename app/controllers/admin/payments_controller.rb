@@ -66,6 +66,7 @@ class Admin::PaymentsController < Admin::BaseController
     elsif sort_column == "organization_id"
       @matching_payments = matching_payments.where.not(organization_id: nil)
     end
+    @matching_payments = @matching_payments.where(kind: params[:search_kind]) if params[:search_kind].present?
     @matching_payments.where(created_at: @time_range)
   end
 
