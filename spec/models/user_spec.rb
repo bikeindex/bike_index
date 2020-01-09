@@ -283,8 +283,14 @@ RSpec.describe User, type: :model do
       expect(stolen_record.bike.user).to eq user
       expect(stolen_record_with_location.bike.user).to eq user
       expect(stolen_record_unclaimed.bike.user).to be_blank
+      # Unmemoize the stolen_bikes_without_locations
+      user_id = user.id
+      user = User.find(user_id)
+      # TODO: Rails 5 update - after commit
+      user.update_attributes(updated_at: Time.current)
       user.reload
       expect(user.stolen_bikes_without_locations.map(&:id)).to eq([stolen_record.bike_id])
+      expect(user.has_stolen_bikes_without_locations).to be_truthy
     end
   end
 

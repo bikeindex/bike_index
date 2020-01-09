@@ -147,6 +147,28 @@ RSpec.describe WelcomeController, type: :controller do
             expect(assigns[:passive_organization]).to eq organization
           end
         end
+        context "with show_missing_location_alert" do
+          let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, user: user) }
+          let(:bike) { ownership.bike }
+          let!(:stolen_record) { FactoryBot.create(:stolen_record, bike: bike, street: "") }
+          it "renders with show_missing_location_alert" do
+            bike.reload
+            bike.update_attributes(stolen: true, updated_at: Time.current)
+            # Unmemoize stolen missing locations
+            user_id = user.id
+            user = User.find user_id
+            user.update_attributes(updated_at: Time.current)
+            expect(user.has_stolen_bikes_without_locations).to be_truthy
+            expect(bike.stolen).to be_truthy
+            expect(bike.current_stolen_record).to eq stolen_record
+            expect(bike.current_stolen_record.missing_location?).to be_truthy
+            get :user_home
+
+            expect(response).to be_success
+            expect(assigns(:show_missing_location_alert)).to be_falsey
+            expect(response).to render_template("user_home")
+          end
+        end
       end
     end
 

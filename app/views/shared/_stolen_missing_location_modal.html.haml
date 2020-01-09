@@ -1,0 +1,4 @@
+- modal_body = capture_haml do
+  .modal-body
+    %h2 party
+= render partial: "shared/modal", locals: { title: "please add location", modal_body: modal_body, id: "stolenMissingLocationModal", start_open: true}

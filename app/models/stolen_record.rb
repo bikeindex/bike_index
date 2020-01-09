@@ -50,6 +50,9 @@ class StolenRecord < ApplicationRecord
   scope :missing_location, -> { where(street: ["", nil]) }
 
   before_save :set_calculated_attributes
+  after_validation :reverse_geocode
+  after_save :remove_outdated_alert_images
+  after_commit :update_associations
 
   reverse_geocoded_by :latitude, :longitude do |stolen_record, results|
     if (geo = results.first)
@@ -59,7 +62,6 @@ class StolenRecord < ApplicationRecord
       stolen_record.neighborhood ||= geo.neighborhood
     end
   end
-  after_validation :reverse_geocode
 
   def twitter_accounts_in_proximity
     [
@@ -67,8 +69,6 @@ class StolenRecord < ApplicationRecord
       TwitterAccount.active.near(self, 50),
     ].flatten.compact.uniq
   end
-
-  after_save :remove_outdated_alert_images
 
   def self.find_matching_token(bike_id:, recovery_link_token:)
     return nil unless bike_id.present? && recovery_link_token.present?
@@ -319,6 +319,10 @@ class StolenRecord < ApplicationRecord
       alert_image&.destroy
       reload
     end
+  end
+
+  def update_associations
+    bike&.user&.update_attributes(updated_at: Time.current)
   end
 
   def notify_of_promoted_alert_recovery
