@@ -47,6 +47,7 @@ class StolenRecord < ApplicationRecord
   scope :recovered, -> { unscoped.where(current: false).order("recovered_at desc") }
   scope :displayable, -> { recovered.where(can_share_recovery: true) }
   scope :recovery_unposted, -> { unscoped.where(current: false, recovery_posted: false) }
+  scope :missing_location, -> { where(street: ["", nil]) }
 
   before_save :set_calculated_attributes
 
@@ -85,6 +86,8 @@ class StolenRecord < ApplicationRecord
 
   # Only display if they have put in an address - so that we don't show on initial creation
   def display_checklist?; address.present? end
+
+  def missing_location?; street.present? end
 
   def address(skip_default_country: false, override_show_address: false)
     country_string = country && country.iso
@@ -169,6 +172,7 @@ class StolenRecord < ApplicationRecord
   def set_calculated_attributes
     set_phone
     fix_date
+    self.street = nil unless street.present? # Make it easier to find blank addresses
     titleize_city
     update_tsved_at
     self.recovery_display_status = calculated_recovery_display_status
