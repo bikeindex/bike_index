@@ -24,7 +24,7 @@ module GraphingHelper
       :group_by_hour
     elsif time_range.last - time_range.first < 5_000_000 # around 60 days
       :group_by_day
-    elsif time_range.last - time_range.first < 31557601 # 1.year + 1.second
+    elsif time_range.last - time_range.first < 31730400 # 1.year + 2.days
       :group_by_week
     else
       :group_by_month
