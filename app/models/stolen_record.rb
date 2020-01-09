@@ -87,7 +87,7 @@ class StolenRecord < ApplicationRecord
   # Only display if they have put in an address - so that we don't show on initial creation
   def display_checklist?; address.present? end
 
-  def missing_location?; street.present? end
+  def missing_location?; street.blank? end
 
   def address(skip_default_country: false, override_show_address: false)
     country_string = country && country.iso

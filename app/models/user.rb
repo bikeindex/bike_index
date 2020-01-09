@@ -273,6 +273,10 @@ class User < ApplicationRecord
     ows.reject(&:blank?)
   end
 
+  def stolen_bikes_without_locations
+    rough_approx_bikes.select { |b| b.current_stolen_record&.missing_location? }
+  end
+
   def current_subscription
     subscriptions.current.first
   end
