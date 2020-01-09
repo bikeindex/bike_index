@@ -37,7 +37,7 @@
 .row.mb-4
   .col-sm
     %h4.mt-2
-      = pluralize(@payments.total_count, "matching payment")
+      = pluralize(number_with_delimiter(matching_payments.count), "matching payment")
   - if payments_counts.present?
     .col-sm
       .full-screen-table
