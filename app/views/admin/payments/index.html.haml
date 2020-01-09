@@ -14,13 +14,14 @@
     # Legacy enum issue so excited for TODO: Rails 5 update
     payment_enum = Payment::KIND_ENUM[kind.to_sym]
     payments_of_kind = matching_payments.where(kind: payment_enum)
+    next unless payments_of_kind.count > 0
     {
       name: Payment.display_kind(kind),
       data: time_range_counts(collection: payments_of_kind),
       count: payments_of_kind.count,
       money: Payment.money_formatted(payments_of_kind.sum(:amount_cents)),
     }
-  end
+  end.compact
 
 - if @render_chart
   .col-12.mt-2
@@ -34,18 +35,21 @@
   .col-sm
     %h4.mt-2
       = pluralize(@payments.total_count, "matching payment")
-  .col-sm
-    .full-screen-table
-      %table.table.table-striped.table-bordered.table-sm.text-center
-        %thead
-          - payments_counts.each do |payment_count|
-            %th
-              = payment_count[:name]
-        %tbody
-          %tr
+  - if payments_counts.present?
+    .col-sm
+      .full-screen-table
+        %table.table.table-striped.table-bordered.table-sm.text-center
+          %thead
             - payments_counts.each do |payment_count|
-              %td
-                #{number_with_delimiter(payment_count[:count])} - #{payment_count[:money]}
+              %th= payment_count[:name]
+          %tbody
+            %tr
+              - payments_counts.each do |payment_count|
+                %td
+                  #{number_with_delimiter(payment_count[:count])} - #{payment_count[:money]}
+                  - if payment_count[:name] == "payment" && payment_count[:count] > 0
+                    %br
+                    %small.text-warning There shouldn't be payments without invoices
 
 = paginate @payments, views_prefix: "admin"
 
