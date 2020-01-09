@@ -7,7 +7,7 @@ module ControllerHelpers
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
                   :user_root_bike_search?, :current_organization, :passive_organization, :controller_namespace, :page_id,
-                  :default_bike_search_path, :bikehub_url, :period_search?
+                  :default_bike_search_path, :bikehub_url
     before_action :enable_rack_profiler
 
     before_action do
@@ -193,10 +193,6 @@ module ControllerHelpers
       set_time_range_from_period
     end
     @time_range = @start_time..@end_time
-  end
-
-  def period_search?
-    @period.present? || @render_chart
   end
 
   protected
