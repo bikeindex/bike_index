@@ -1068,12 +1068,13 @@ RSpec.describe BikesController, type: :controller do
         context "root" do
           context "non-stolen bike" do
             it "renders the bike_details template" do
+              user.update_column :has_stolen_bikes_without_locations, true
               get :edit, id: bike.id
               expect(response.status).to eq(200)
               expect(assigns(:edit_template)).to eq "bike_details"
               expect(assigns(:edit_templates)).to eq non_stolen_edit_templates.as_json
-              expect(assigns(:show_missing_location_alert)).to be_falsey
               expect(response).to render_template "edit_bike_details"
+              expect(assigns(:show_missing_location_alert?)).to be_falsey
             end
           end
           context "stolen bike" do
@@ -1097,7 +1098,7 @@ RSpec.describe BikesController, type: :controller do
               expect(response).to be_success
               expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq stolen_edit_templates.as_json
-              expect(assigns(:show_missing_location_alert)).to be_falsey
+              expect(assigns(:show_missing_location_alert?)).to be_falsey
               expect(response).to render_template "edit_theft_details"
             end
           end

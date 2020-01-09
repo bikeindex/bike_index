@@ -9,10 +9,12 @@ RSpec.describe PaymentsController, type: :controller do
         set_current_user(user)
       end
       it "renders" do
+        user.update_column :has_stolen_bikes_without_locations, true
         get :new
         expect(response.code).to eq("200")
         expect(response).to render_template("new")
         expect(flash).to_not be_present
+        expect(assigns(:show_missing_location_alert?)).to be_falsey
       end
     end
     context "without user" do

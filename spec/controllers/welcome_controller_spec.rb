@@ -165,7 +165,7 @@ RSpec.describe WelcomeController, type: :controller do
             get :user_home
 
             expect(response).to be_success
-            expect(assigns(:show_missing_location_alert)).to be_falsey
+            expect(assigns(:show_missing_location_alert?)).to be_falsey
             expect(response).to render_template("user_home")
           end
         end
