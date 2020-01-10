@@ -1,5 +1,5 @@
 class EmailNoAdminsNotificationWorker < ApplicationWorker
-  sidekiq_options queue: "notify"
+  sidekiq_options queue: "notify", retry: 3
 
   def perform(organization_id)
     @organization = Organization.find(organization_id)

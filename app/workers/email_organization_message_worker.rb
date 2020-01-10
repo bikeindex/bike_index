@@ -1,5 +1,5 @@
 class EmailOrganizationMessageWorker < ApplicationWorker
-  sidekiq_options queue: "notify"
+  sidekiq_options queue: "notify", retry: 3
 
   def perform(organization_message_id)
     organization_message = OrganizationMessage.find(organization_message_id)

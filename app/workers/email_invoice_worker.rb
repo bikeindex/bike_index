@@ -1,5 +1,5 @@
 class EmailInvoiceWorker < ApplicationWorker
-  sidekiq_options queue: "notify"
+  sidekiq_options queue: "notify", retry: 3
 
   def perform(id)
     @payment = Payment.find(id)

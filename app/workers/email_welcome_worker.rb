@@ -1,5 +1,5 @@
 class EmailWelcomeWorker < ApplicationWorker
-  sidekiq_options queue: "notify"
+  sidekiq_options queue: "notify", retry: 3
 
   def perform(user_id)
     user = User.find(user_id)
