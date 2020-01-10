@@ -2071,7 +2071,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -2097,7 +2097,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -4963,10 +4963,10 @@ en:
         <strong>%{link}</strong> to automatically register the bikes you sell to your
         customers.
       multi_serial_search: Multi serial search
-      overview_dashboard: Dashboard
       organization_locations: "%{org_name} locations"
       organization_profile: "%{org_name} profile"
       other_point_of_sale_system: Other Point of Sale system?
+      overview_dashboard: Dashboard
       read_a_full_explanation_html: Read a full explanation of %{link}.
       recoveries: Recoveries
       register_bikes_with_link_html: Register bikes with our <strong>%{link}</strong>

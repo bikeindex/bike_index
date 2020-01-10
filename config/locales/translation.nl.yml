@@ -4991,7 +4991,6 @@ nl:
       link_to_register_html: "<strong>%{link}</strong> om de fietsen die u aan uw
         klanten verkoopt automatisch te registreren."
       multi_serial_search: Multi-serieel zoeken
-      organization_dashboard: "%{org_name} Dashboard"
       organization_locations: "%{org_name} locaties"
       organization_profile: "%{org_name} profiel"
       other_point_of_sale_system: Ander Point of Sale-systeem?
@@ -5007,6 +5006,7 @@ nl:
       users: Gebruikers
       viewing_our_streamlined_page: U bekijkt momenteel onze gestroomlijnde registratiepagina
         voor Bike Shop, die wij aanbevelen te gebruiken
+      overview_dashboard: Dashboard
     errors:
       error: Fout
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
