@@ -1,5 +1,5 @@
 class EmailOwnershipInvitationWorker < ApplicationWorker
-  sidekiq_options queue: "notify"
+  sidekiq_options queue: "notify", retry: 3
 
   def perform(ownership_id)
     ownership = Ownership.where(id: ownership_id).first

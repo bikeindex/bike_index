@@ -1,5 +1,5 @@
 class EmailTheftAlertNotificationWorker < ApplicationWorker
-  sidekiq_options queue: "notify"
+  sidekiq_options queue: "notify", retry: 3
 
   def perform(theft_alert_id, notification_type = :purchased)
     theft_alert = TheftAlert.find(theft_alert_id)

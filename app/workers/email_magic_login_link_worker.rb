@@ -1,5 +1,5 @@
 class EmailMagicLoginLinkWorker < ApplicationWorker
-  sidekiq_options queue: "notify", retry: false # Don't retry, because it will reset the magic link token
+  sidekiq_options queue: "notify", retry: 3
 
   def perform(user_id)
     user = User.find(user_id)
