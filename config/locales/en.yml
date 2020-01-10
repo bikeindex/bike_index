@@ -4992,6 +4992,15 @@ en:
       to: To
       update: Update
       year: year
+    stolen_missing_location_modal:
+      add_location_theft_bike_title_html: Add the location of the theft of your <strong>%{bike_title}</strong>
+      location_critical_html: >-
+        <strong>It is critical for recovery</strong> that you include the address
+        or cross-street where your %{bike_type} was stolen.
+      stolen_missing_location_title: Please add theft location
+      without_location_all_is_lost: >-
+        Without a location we can't spread the word about the theft and people won't
+        know where to look for your %{bike_type}.
   stolen:
     index:
       ambassador: ambassador

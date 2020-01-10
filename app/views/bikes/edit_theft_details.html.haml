@@ -31,7 +31,8 @@
                 - srecord.object.date_stolen = TimeParser.round(srecord.object.date_stolen || Time.current)
                 = srecord.datetime_local_field :date_stolen, max: Time.current + 1.day, step: 60, required: true, class: 'form-control dateInputUpdateZone', "data-initialtime" => l(srecord.object.date_stolen, format: :convert_time)
 
-            .form-group.row.unnested-field
+            -# Add an ID to this element because we want to link to the specific location
+            .form-group.row.unnested-field#where-theft-happened
               = srecord.label :phone, class: 'form-well-label'
               .form-well-input
                 = srecord.text_field :phone, class: 'form-control'
