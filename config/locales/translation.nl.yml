@@ -5046,6 +5046,15 @@ nl:
       multiple_serial_search_pane: Meervoudig serieel zoekvenster
       thank_you: Heel erg bedankt voor het gebruik van Bike Index!
       thanks_for_using_bike_index: Bedankt voor het gebruik van Bike Index!
+    stolen_missing_location_modal:
+      add_location_theft_bike_title_html: Voeg de locatie van de diefstal van uw <strong>%{bike_title}
+        toe</strong>
+      location_critical_html: "<strong>Het is van cruciaal belang voor herstel</strong>
+        dat u het adres of kruispunt opgeeft waar uw %{bike_type} is gestolen."
+      stolen_missing_location_title: Voeg diefstallocatie toe
+      without_location_all_is_lost: Zonder een locatie kunnen we het woord over de
+        diefstal niet verspreiden en mensen zullen niet weten waar ze naar uw %{bike_type}
+        moeten zoeken.
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>

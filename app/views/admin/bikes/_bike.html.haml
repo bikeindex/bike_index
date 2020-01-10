@@ -173,9 +173,11 @@
                 = stolen_record.estimated_value
             %tr
               %td
-                Address
+                Location
               %td
                 = stolen_record.address
+                - if stolen_record.missing_location?
+                  %em.small.text-warning missing address (user alerted)
             %tr
               %td
                 Phone

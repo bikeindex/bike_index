@@ -273,6 +273,10 @@ class User < ApplicationRecord
     ows.reject(&:blank?)
   end
 
+  def stolen_bikes_without_locations
+    @stolen_bikes_without_locations ||= rough_approx_bikes.select { |b| b.current_stolen_record&.missing_location? }
+  end
+
   def current_subscription
     subscriptions.current.first
   end
@@ -296,6 +300,7 @@ class User < ApplicationRecord
       mbh["link_title"] = my_bikes_link_title if my_bikes_link_title.present?
       self.my_bikes_hash = mbh
     end
+    self.has_stolen_bikes_without_locations = stolen_bikes_without_locations.any?
     true
   end
 

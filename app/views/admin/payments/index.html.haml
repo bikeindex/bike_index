@@ -38,6 +38,9 @@
   .col-sm
     %h4.mt-2
       = pluralize(number_with_delimiter(matching_payments.count), "matching payment")
+      %small
+        for
+        = Payment.money_formatted(matching_payments.sum(:amount_cents))
   - if payments_counts.present?
     .col-sm
       .full-screen-table

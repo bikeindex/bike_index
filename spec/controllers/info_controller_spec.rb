@@ -43,4 +43,28 @@ RSpec.describe InfoController, type: :controller do
       end
     end
   end
+  describe "user with stolen info" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    before do
+      user.update_column :has_stolen_bikes_without_locations, true
+      set_current_user(user)
+    end
+    it "renders with show alert" do
+      expect(user.has_stolen_bikes_without_locations).to be_truthy
+      get :lightspeed
+      expect(response.code).to eq("200")
+      expect(response).to render_template("lightspeed")
+      expect(flash).to_not be_present
+      expect(assigns(:show_missing_location_alert)).to be_truthy
+    end
+    context "support_bike_index" do
+      it "renders without show alert" do
+        get :support_bike_index
+        expect(response.code).to eq("200")
+        expect(response).to render_template("support_bike_index")
+        expect(flash).to_not be_present
+        expect(assigns(:show_missing_location_alert)).to be_falsey
+      end
+    end
+  end
 end
