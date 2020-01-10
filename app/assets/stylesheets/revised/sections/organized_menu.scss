@@ -21,7 +21,16 @@ $organized-menu-bg: $gray-lighter;
     margin-top: -2 * $vertical-height;
     padding: 0 $vertical-height;
 
-    @extend .divider-below;
+    // if the dashboard menu item is there, it moves up to be closer to the menu
+    &.with-dashboard-link {
+      h3 {
+        margin-bottom: 0px;
+      }
+    }
+    // If the dashboard item is not there, the top should have a border
+    &.with-divider-below {
+      @extend .divider-below;
+    }
 
     overflow-x: hidden;
 
