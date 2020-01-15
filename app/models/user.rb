@@ -353,7 +353,7 @@ class User < ApplicationRecord
 
   def update_auth_token(auth_token_type, time = nil)
     generate_auth_token(auth_token_type, time)
-    save && attributes[auth_token_type]
+    save
   end
 
   def generate_auth_token(auth_token_type, time = nil)

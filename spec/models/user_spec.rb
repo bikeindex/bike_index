@@ -408,9 +408,8 @@ RSpec.describe User, type: :model do
       end
       it "uses input time, it returns the token" do
         user = FactoryBot.create(:user)
-        token = user.update_auth_token("magic_link_token", (Time.current - 61.minutes).to_i)
+        user.update_auth_token("magic_link_token", (Time.current - 61.minutes).to_i)
         user.reload
-        expect(user.magic_link_token).to eq token
         expect(user.auth_token_time("magic_link_token")).to be < (Time.current - 1.hours)
       end
     end
