@@ -300,7 +300,7 @@ class User < ApplicationRecord
       mbh["link_title"] = my_bikes_link_title if my_bikes_link_title.present?
       self.my_bikes_hash = mbh
     end
-    self.has_stolen_bikes_without_locations = stolen_bikes_without_locations.any?
+    self.has_stolen_bikes_without_locations = calculated_has_stolen_bikes_without_locations
     true
   end
 
@@ -365,6 +365,12 @@ class User < ApplicationRecord
   end
 
   protected
+
+  def calculated_has_stolen_bikes_without_locations
+    return false if superuser
+    return false if memberships.admin.any?
+    stolen_bikes_without_locations.any?
+  end
 
   def generate_username_confirmation_and_auth
     usrname = username || SecureRandom.urlsafe_base64

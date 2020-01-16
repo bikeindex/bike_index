@@ -291,6 +291,8 @@ RSpec.describe User, type: :model do
       user.reload
       expect(user.stolen_bikes_without_locations.map(&:id)).to eq([stolen_record.bike_id])
       expect(user.has_stolen_bikes_without_locations).to be_truthy
+      user.update_attributes(superuser: true)
+      expect(user.has_stolen_bikes_without_locations).to be_falsey
     end
   end
 

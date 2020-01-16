@@ -14,6 +14,7 @@ class Membership < ApplicationRecord
 
   scope :unclaimed, -> { where(claimed_at: nil) }
   scope :claimed, -> { where.not(claimed_at: nil) }
+  scope :admin, -> { where(role: "admin") }
   scope :ambassador_organizations, -> { where(organization: Organization.ambassador) }
 
   def self.membership_types
