@@ -38,7 +38,7 @@ class AfterUserCreateWorker < ApplicationWorker
     if user.confirmed?
       EmailWelcomeWorker.perform_async(user.id)
     else
-      EmailConfirmationWorker.perform_async(user.id)
+      EmailConfirmationWorker.perform_in(1.second, user.id)
     end
   end
 

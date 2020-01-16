@@ -54,6 +54,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
         let(:bike) { FactoryBot.create(:bike_organized, organization: organization) }
         let!(:ownership) { FactoryBot.create(:ownership, bike: bike) }
         it "actually sends the email" do
+          expect(user).to be_present
           Sidekiq::Testing.inline! do
             # We don't test that this is being added to Sidekiq
             # Because we're testing that sidekiq does what it
