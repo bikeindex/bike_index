@@ -148,7 +148,7 @@ class BikeSearcher
     bike_ids = fuzzy_find_serial_ids
     # Don't return exact matches
     bike_ids = bike_ids.uniq - matching_serial.map(&:id)
-    Bike.where("id in (?)", bike_ids)
+    Bike.where(id: bike_ids)
   end
 
   def by_proximity
@@ -162,8 +162,8 @@ class BikeSearcher
     @location = Geocoder.search(@params[:proximity]) if @params[:reverse_geocode]
     box = Geocoder::Calculations.bounding_box((@location || @params[:proximity]), radius)
     unless box[0].nan?
-      bike_ids = StolenRecord.where("id in (?)", stolen_ids).within_bounding_box(box).pluck(:bike_id)
-      @bikes = @bikes.where("id in (?)", bike_ids)
+      bike_ids = StolenRecord.where(id: stolen_ids).within_bounding_box(box).pluck(:bike_id)
+      @bikes = @bikes.where(id: bike_ids)
     end
     @bikes
   end
@@ -171,7 +171,7 @@ class BikeSearcher
   def by_date
     return unless stolenness == "stolen"
     return @bikes unless @params[:stolen_before].present? || @params[:stolen_after].present?
-    stolen_records = StolenRecord.where("id in (?)", @bikes.pluck(:current_stolen_record_id))
+    stolen_records = StolenRecord.where(id: @bikes.pluck(:current_stolen_record_id))
     if @params[:stolen_before].present?
       before = Time.at(@params[:stolen_before]).utc.to_datetime
       stolen_records = stolen_records.where("date_stolen <= ?", before)
@@ -180,7 +180,7 @@ class BikeSearcher
       after = Time.at(@params[:stolen_after]).utc.to_datetime
       stolen_records = stolen_records.where("date_stolen >= ?", after)
     end
-    @bikes = @bikes.where("id in (?)", stolen_records.pluck(:bike_id))
+    @bikes = @bikes.where(id: stolen_records.pluck(:bike_id))
   end
 
   def find_bikes
