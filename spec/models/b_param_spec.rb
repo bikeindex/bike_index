@@ -139,13 +139,13 @@ RSpec.describe BParam, type: :model do
   describe "manufacturer_name" do
     context "manufacturer_id" do
       let(:manufacturer) { FactoryBot.create(:manufacturer) }
-      let(:b_param) { BParam.new(params: { bike: { manufacturer_id: manufacturer.id } }.to_json) }
+      let(:b_param) { BParam.new(params: { bike: { manufacturer_id: manufacturer.id } }) }
       it "is the manufacturers name" do
         expect(b_param.mnfg_name).to eq manufacturer.name
       end
     end
     context "other" do
-      let(:b_param) { BParam.new(params: { bike: { manufacturer_id: Manufacturer.other.id, manufacturer_other: '<a href="bad_site.js">stuff</a>' } }.to_json) }
+      let(:b_param) { BParam.new(params: { bike: { manufacturer_id: Manufacturer.other.id, manufacturer_other: '<a href="bad_site.js">stuff</a>' } }) }
       it "is a sanitized version" do
         expect(b_param.mnfg_name).to eq("stuff")
       end
@@ -287,7 +287,7 @@ RSpec.describe BParam, type: :model do
             organization_affiliation: "employee",
             handlebar_type: nil,
             address: "0229 HAMMOND BLDG",
-          }
+          },
         }.as_json
       end
       include_context :geocoder_real
