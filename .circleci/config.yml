@@ -6,6 +6,7 @@ jobs:
     shell: /bin/bash --login
     environment:
       RAILS_ENV: test
+      NODE_ENV: test
       RACK_ENV: test
       COVERAGE: true
       DISABLE_SPRING: true
@@ -31,110 +32,211 @@ jobs:
       - checkout
 
       - run:
-          name: Install Dockerize
-          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          name: "Apt: install system / build dependencies"
+          command: |
+            sudo apt-get update
+            sudo apt-get -y install \
+              curl \
+              gettext \
+              imagemagick \
+              libcurl4-gnutls-dev \
+              libexpat1-dev \
+              libssl-dev \
+              libz-dev \
+              postgresql-client
+
+      - type: cache-restore
+        name: "Dockerize: cache restore"
+        key: cache-{{ .Environment.CACHE_VERSION }}-dockerize-0.6.1
+
+      - run:
+          name: "Dockerize: install"
           environment:
             DOCKERIZE_VERSION: v0.6.1
+          command: |
+            dockerize_tar=dockerize-linux-amd64-${DOCKERIZE_VERSION}.tar.gz
+            if [[ ! -f ~/.cache/dockerize/${dockerize_tar} ]]; then
+              wget https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/${dockerize_tar}
+            fi
+            sudo tar -C /usr/local/bin -xzvf ${dockerize_tar}
 
-      - restore_cache:
-          key: cache-{{ .Environment.CACHE_VERSION }}-git-2.22.0
+      - type: cache-save
+        name: "Dockerize: cache save"
+        key: cache-{{ .Environment.CACHE_VERSION }}-dockerize-0.6.1
+        paths:
+          - ~/.cache/dockerize
+
+
+      - type: cache-restore
+        name: "Node: cache restore"
+        key: cache-{{ .Environment.CACHE_VERSION }}-node-13.x
+
       - run:
-          name: Install Git
+          name: "Node: install"
+          command: |
+            node -v
+            node_version='13.x'
+
+            if [[ ! -f ~/.cache/node/node-${node_version}/nodejs ]]; then
+              curl -sL https://deb.nodesource.com/setup_${node_version} | sudo -E bash -
+              sudo apt-get update
+              sudo apt-get install -y nodejs
+
+              rm -rf ~/.cache/node
+              mkdir -p ~/.cache/node/node-${node_version}
+              sudo cp /usr/bin/nodejs ~/.cache/node/node-${node_version}
+            fi
+
+            sudo ln -sf ~/.cache/node/node-${node_version}/nodejs /usr/local/bin/node
+            node -v
+
+      - type: cache-save
+        name: "Node: cache save"
+        key: cache-{{ .Environment.CACHE_VERSION }}-node-13.x
+        paths:
+          - ~/.cache/node/node-13.x
+
+
+      - type: cache-restore
+        name: "Git: cache restore"
+        key: cache-{{ .Environment.CACHE_VERSION }}-git-2.22.0
+
+      - run:
+          name: "Git: install"
           environment:
             GIT_VERSION: 2.22.0
           command: |
-            mkdir deps-git
-            cd    deps-git
+            set -x
 
-            sudo apt-get update
-            sudo apt-get install libcurl4-gnutls-dev libexpat1-dev gettext libz-dev libssl-dev
+            git_binary=~/.cache/git/git-${GIT_VERSION}/git
 
-            wget -O git.tgz https://mirrors.edge.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz
-            tar -xzf git.tgz
-            cd git-${GIT_VERSION}
+            if [[ ! -f $git_binary ]]; then
+              rm -rf ~/.cache/git
+              mkdir -p ~/.cache/git
+              cd ~/.cache/git
 
-            export DEFAULT_HELP_FORMAT="man"
-            autoconf
-            ./configure
+              wget -O git.tgz https://mirrors.edge.kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.gz
+              tar -xzf git.tgz
+              cd git-${GIT_VERSION}
 
+              export DEFAULT_HELP_FORMAT="man"
+              autoconf
+              ./configure
+
+              sudo make man
+              sudo make install-man
+            fi
+
+            cd ~/.cache/git/git-${GIT_VERSION}
             sudo make prefix=/usr/local all
             sudo make install
-            sudo make man && sudo make install-man
+            sudo cp ${git_binary} /usr/local/bin/git
 
-            sudo cp ./git /usr/local/bin/git
-      - save_cache:
-          key: cache-{{ .Environment.CACHE_VERSION }}-git-2.22.0
-          paths:
-            - deps-git
+      - type: cache-save
+        name: "Git: cache save"
+        key: cache-{{ .Environment.CACHE_VERSION }}-git-2.22.0
+        paths:
+          - ~/.cache/git/git-2.22.0
 
-      - restore_cache:
-          key: cache-{{ .Environment.CACHE_VERSION }}-hub-2.12.3
+      - type: cache-restore
+        name: "Hub: cache restore"
+        key: cache-{{ .Environment.CACHE_VERSION }}-hub-2.12.3
+
       - run:
-          name: Install Hub
+          name: "Hub: install"
           environment:
             HUB_VERSION: 2.12.3
           command: |
-            mkdir deps-hub
-            cd    deps-hub
+            set -x
 
-            wget -O hub.tgz https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
-            tar -xzf hub.tgz
+            hub_binary=~/.cache/hub/hub-linux-amd64-${HUB_VERSION}/bin/hub
 
-            sudo cp ./hub-linux-amd64-${HUB_VERSION}/bin/hub /usr/local/bin/hub
-      - save_cache:
-          key: cache-{{ .Environment.CACHE_VERSION }}-hub-2.12.3
-          paths:
-            - deps-hub
+            if [[ ! -f ${hub_binary} ]]; then
+              rm -rf ~/.cache/hub
+              mkdir -p ~/.cache/hub
+              cd ~/.cache/hub
+
+              wget -O hub.tgz https://github.com/github/hub/releases/download/v${HUB_VERSION}/hub-linux-amd64-${HUB_VERSION}.tgz
+              tar -xzf hub.tgz
+            fi
+
+            sudo cp ${hub_binary} /usr/local/bin/hub
+
+      - type: cache-restore
+        name: "Hub: cache save"
+        key: cache-{{ .Environment.CACHE_VERSION }}-hub-2.12.3
+        paths:
+          - ~/.cache/hub
+
 
       - run:
-          name: Install system libraries
-          command: sudo apt-get update && sudo apt-get -y install imagemagick postgresql-client
+          name: "Bundler: install"
+          command: gem install bundler -v 1.17.3
+
+
+      - type: cache-restore
+        name: "Ruby dependencies: cache restore"
+        key: cache-{{ .Environment.CACHE_VERSION }}-gems-{{ checksum "Gemfile.lock" }}
 
       - run:
-          name: Install Bundler
-          command: gem install bundler
+          name: "Ruby dependencies: install"
+          command: |
+            set -x
+            bundle check --path=~/.cache/bundle && use_local="--local"
+            bundle install --deployment --frozen --path=~/.cache/bundle $use_local
 
-      # Ruby dependencies
-      - restore_cache:
-          key: cache-{{ .Environment.CACHE_VERSION }}-bundler-{{ checksum "Gemfile.lock" }}
-      - run:
-          name: Bundle Gems
-          command: bundle install --without development --path=vendor/bundle --jobs=4 --retry=3
-      - save_cache:
-          key: cache-{{ .Environment.CACHE_VERSION }}-bundler-{{ checksum "Gemfile.lock" }}
-          paths:
-            - vendor/bundle
-            - ~/.bundle
+      - type: cache-save
+        name: "Ruby dependencies: cache save"
+        key: cache-{{ .Environment.CACHE_VERSION }}-gems-{{ checksum "Gemfile.lock" }}
+        paths:
+          - ~/.cache/bundle
+
 
       - run:
           name: Sync translations (only on master by default)
           command: bin/check_translations
 
-      # Node dependencies
-      - restore_cache:
-          key: cache-{{ .Environment.CACHE_VERSION }}-yarn-{{ checksum "yarn.lock" }}
-      - run:
-          name: Yarn Install
-          command: yarn install --cache-folder ~/.cache/yarn
-      - save_cache:
-          key: cache-{{ .Environment.CACHE_VERSION }}-yarn-{{ checksum "yarn.lock" }}
-          paths:
-            - ~/.cache/yarn
 
-      # Asset compilation
-      - restore_cache:
-          keys:
-            # This branch if available
-            - cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Branch }}
-            # Default branch if not
-            - cache-{{ .Environment.CACHE_VERSION }}-assets-master-
-            - cache-{{ .Environment.CACHE_VERSION }}-assets-
-      - run: bundle exec rake assets:precompile
-      - save_cache:
-          key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Branch }}
-          paths:
-            - public/assets
-            - tmp/cache/assets/sprockets
+      - type: cache-restore
+        name: "Node dependencies: cache restore"
+        key: cache-{{ .Environment.CACHE_VERSION }}-yarn-{{ checksum "yarn.lock" }}
+
+      - run:
+          name: "Node dependencies: install"
+          command: |
+            set -x
+            [[ -d ~/.cache/yarn ]] && use_local="--prefer-offline"
+            yarn install --cache-folder ~/.cache/yarn $use_local
+
+      - type: cache-save
+        name: "Node dependencies: cache save"
+        key: cache-{{ .Environment.CACHE_VERSION }}-yarn-{{ checksum "yarn.lock" }}
+        paths:
+          - ~/.cache/yarn
+
+
+      - type: cache-restore
+        name: "Assets: cache restore"
+        key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Environment.CIRCLE_SHA1 }}
+
+      - run:
+          name: "Assets: precompile"
+          command: |
+            set -x
+            node --version
+            bundle exec rails assets:precompile assets:clean --trace
+
+      - type: cache-save
+        name: "Assets: cache save"
+        key: cache-{{ .Environment.CACHE_VERSION }}-assets-{{ .Environment.CIRCLE_SHA1 }}
+        paths:
+          - .sass-cache
+          - public/assets
+          - public/packs
+          - public/packs-test
+          - tmp/cache/assets
+          - tmp/cache/webpacker
+
 
       - run:
           name: Install Code Climate Test Reporter
@@ -149,7 +251,7 @@ jobs:
       - run:
           name: Setup Database
           command: |
-            bundle exec rake db:create db:structure:load
+            bundle exec rails db:structure:load --trace
 
       - run:
           name: RSpec
@@ -165,11 +267,6 @@ jobs:
                               --out test-results/rspec/rspec.xml \
                               --format progress \
                               -- ${TESTFILES}
-
-      - run:
-          name: "Jest: Install junit coverage"
-          command: yarn add --dev jest-junit
-
       - run:
           name: "Jest: Tests"
           command: yarn jest --ci --runInBand --reporters=default --reporters=jest-junit
@@ -224,7 +321,6 @@ jobs:
 
 workflows:
   version: 2
-
   commit:
     jobs:
       - build
