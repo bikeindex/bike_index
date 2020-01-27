@@ -149,6 +149,7 @@ group :development do
   gem "guard-rspec", require: false
   gem "guard-rubocop", require: false
   gem "letter_opener"
+  gem "parser", "2.6.3.0" # for Ruby 2.5.5. Unlock version when upgrading Ruby.
   gem "rerun"
   gem "terminal-notifier"
 end
