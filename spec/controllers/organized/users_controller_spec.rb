@@ -33,11 +33,10 @@ RSpec.describe Organized::UsersController, type: :controller do
           put :update, params: {
                          organization_id: organization.to_param,
                          id: membership.id,
-                         membership: membership_params
+                         membership: membership_params,
                        }
           expect(response).to redirect_to(organization_root_path)
           expect(flash[:error]).to be_present
-          membership.reload
           expect(membership.role).to eq "member"
         end
       end
@@ -113,7 +112,7 @@ RSpec.describe Organized::UsersController, type: :controller do
           expect do
             delete :destroy, params: {
                                organization_id: organization.to_param,
-                               id: membership.id
+                               id: membership.id,
                              }
           end.to change(Membership, :count).by(-1)
           expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
@@ -166,7 +165,7 @@ RSpec.describe Organized::UsersController, type: :controller do
           expect do
             put :create, params: {
                            organization_id: organization.to_param,
-                           membership: membership_params.merge(invited_email: " ")
+                           membership: membership_params.merge(invited_email: " "),
                          }
           end.to change(Membership, :count).by(0)
           expect(assigns(:membership).errors.full_messages).to be_present
@@ -181,7 +180,7 @@ RSpec.describe Organized::UsersController, type: :controller do
             expect do
               put :create, params: {
                              organization_id: organization.to_param,
-                             membership: membership_params
+                             membership: membership_params,
                            }
             end.to change(Membership, :count).by(1)
             expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
@@ -189,8 +188,6 @@ RSpec.describe Organized::UsersController, type: :controller do
             organization.reload
             expect(organization.remaining_invitation_count).to eq 3
             membership = Membership.last
-            membership.enqueue_processing_worker # TODO: Rails 5 update - this is an after_commit issue
-            membership.reload
             expect(membership.role).to eq "member"
             expect(membership.sender).to eq user
             expect(membership.invited_email).to eq "bike_email@bike_shop.com"
@@ -222,7 +219,7 @@ RSpec.describe Organized::UsersController, type: :controller do
               put :create, params: {
                              organization_id: organization.to_param,
                              membership: membership_params,
-                             multiple_emails_invited: multiple_emails_invited.join("\n")
+                             multiple_emails_invited: multiple_emails_invited.join("\n"),
                            }
             end.to_not change(Membership, :count)
           end
@@ -234,22 +231,17 @@ RSpec.describe Organized::UsersController, type: :controller do
         it "invites, dedupes" do
           Sidekiq::Testing.inline! do
             ActionMailer::Base.deliveries = []
-            og_membership_ids = organization.memberships.pluck(:id)
             expect(organization.remaining_invitation_count).to eq 4
             expect do
               put :create, params: {
                              organization_id: organization.to_param,
                              membership: membership_params,
-                             multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
+                             multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n",
                            }
             end.to change(Membership, :count).by 4
-            organization.reload
             expect(organization.remaining_invitation_count).to eq 0
             expect(organization.sent_invitation_count).to eq 5
             expect(organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
-            # TODO: Rails 5 update - this is an after_commit issue
-            organization.memberships.where.not(id: og_membership_ids).each { |m| m.enqueue_processing_worker }
-            organization.reload
             expect(organization.users.count).to eq 1
             expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           end
@@ -260,31 +252,27 @@ RSpec.describe Organized::UsersController, type: :controller do
           it "invites whatever" do
             # We have to actually assign the invoice here because membership creation bumps the organization -
             # and the organization needs to have the paid feature after the first membership is created
-            invoice.update_attributes(paid_feature_ids: [paid_feature.id])
-            # TODO: Rails 5 update - this is an after_commit issue
-            organization.update_attributes(updated_at: Time.current)
-            organization.reload
-            expect(organization.paid_feature_slugs).to eq(["passwordless_users"])
             Sidekiq::Testing.inline! do
+              invoice.update_attributes(paid_feature_ids: [paid_feature.id])
+              expect(organization.reload.paid_feature_slugs).to eq(["passwordless_users"])
+
               ActionMailer::Base.deliveries = []
               expect(organization.remaining_invitation_count).to eq 4
               expect(organization.users.count).to eq 1
               expect(organization.users.confirmed.count).to eq 1
-              og_membership_ids = organization.memberships.pluck(:id)
+
               expect do
                 put :create, params: {
                                organization_id: organization.to_param,
                                membership: membership_params,
-                               multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
+                               multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n",
                              }
               end.to change(Membership, :count).by 4
-              organization.reload
+
               expect(organization.remaining_invitation_count).to eq 0
               expect(organization.sent_invitation_count).to eq 5
               expect(organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
-              # TODO: Rails 5 update - this is an after_commit issue
-              organization.memberships.where.not(id: og_membership_ids).each { |m| m.enqueue_processing_worker }
-              organization.reload
+
               expect(organization.users.count).to eq 5
               expect(organization.users.confirmed.count).to eq 5
               expect(organization.users.pluck(:email)).to match_array(target_invited_emails)
