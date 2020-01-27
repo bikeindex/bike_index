@@ -56,8 +56,6 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :controller do
         expect do
           post :create, params: { organization_id: organization.to_param, invoice: params }
         end.to change(Invoice, :count).by 1
-        # TODO: Rails 5 update
-        organization.update_attributes(updated_at: Time.current)
         invoice = organization.invoices.last
         expect(invoice.active?).to be_falsey
         expect(organization.is_paid).to be_falsey
