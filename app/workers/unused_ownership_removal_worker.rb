@@ -22,10 +22,11 @@ class UnusedOwnershipRemovalWorker < ScheduledWorker
 
   def enqueue_scheduled_jobs
     # Rather than doing all the ownerships, just do a random slice
-    Ownership.where(current: true)
-             .order("RANDOM()")
-             .limit(50_000)
-             .pluck(:id)
-             .each { |id| UnusedOwnershipRemovalWorker.perform_async(id) }
+    Ownership
+      .where(current: true)
+      .order(Arel.sql("random()"))
+      .limit(50_000)
+      .pluck(:id)
+      .each { |id| UnusedOwnershipRemovalWorker.perform_async(id) }
   end
 end
