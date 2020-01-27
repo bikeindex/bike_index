@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.3
+-- Dumped from database version 11.5
 -- Dumped by pg_dump version 11.5
 
 SET statement_timeout = 0;
@@ -859,7 +859,6 @@ CREATE TABLE public.external_registry_bikes (
 --
 
 CREATE SEQUENCE public.external_registry_bikes_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -896,7 +895,6 @@ CREATE TABLE public.external_registry_credentials (
 --
 
 CREATE SEQUENCE public.external_registry_credentials_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
