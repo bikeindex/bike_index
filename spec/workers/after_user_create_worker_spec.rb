@@ -133,23 +133,24 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       expect(user.organizations.count).to eq 2
     end
 
-    # We are processing the first organization inline so we can redirect users
-    # to the organization they belong to
-    it "non-async processes the first" do
-      membership.reload
-      expect(membership.claimed?).to be_falsey
+    # We are processing the first organization inline so we can
+    # redirect users to the organization they belong to
+    it "synchronously associates the first memberhsip" do
+      user = FactoryBot.build(:user, email: "owner1@A.COM")
+      membership1 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
+      membership2 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
+      expect(membership1).to_not be_claimed
+      expect(membership2).to_not be_claimed
       user.save
-      user.reload
-      expect(membership.created_at < user.created_at).to be_truthy
-      # This is called on create, so we just test that things happen correctly here
-      membership.reload
+      membership1.reload
       membership2.reload
-      expect(user.confirmed?).to be_truthy
-      expect(membership.claimed?).to be_truthy
-      expect(membership2.claimed?).to be_falsey
-      expect(membership.user).to eq user
-      expect(user.memberships.count).to eq 1
-      expect(user.organizations.count).to eq 1
+
+      expect(membership1.created_at).to be < user.created_at
+      expect(user).to be_confirmed
+      expect(membership1).to be_claimed
+      expect(membership1.user).to eq user
+      expect(user.memberships.count).to be >= 1
+      expect(user.organizations.count).to be >= 1
     end
   end
 

@@ -51,13 +51,16 @@ class AfterUserCreateWorker < ApplicationWorker
   def associate_membership_invites(user, email, without_confirm: false)
     memberships = Membership.unclaimed.where(invited_email: email)
     return false unless memberships.any?
-    memberships.pluck(:id).each_with_index do |m_id, index|
-      if index == 0 # We want to do the first one inline so we can redirect the user to the org page
-        ProcessMembershipWorker.new.perform(m_id, user.id)
-      else
-        ProcessMembershipWorker.perform_async(m_id, user.id)
-      end
+
+    first, *rest = memberships.pluck(:id)
+    ProcessMembershipWorker.new.perform(first, user.id)
+
+    # We want to do the first one inline so we can redirect
+    # the user to the org page
+    rest.each do |membership_id|
+      ProcessMembershipWorker.perform_async(membership_id, user.id)
     end
+
     user.confirm(user.confirmation_token) unless without_confirm
   end
 
