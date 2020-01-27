@@ -30,17 +30,15 @@ module Bikeindex
     # Force sql schema use so we get psql extensions
     config.active_record.schema_format = :sql
 
+    # Disable default implicit presence validation for belongs_to relations
+    config.active_record.belongs_to_required_by_default = false
+
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     config.i18n.load_path += Dir[Rails.root.join("config", "locales", "**", "*.{rb,yml}").to_s]
     config.i18n.enforce_available_locales = false
     config.i18n.default_locale = :en
     config.i18n.available_locales = %i[en nl]
     config.i18n.fallbacks = { "en-US": :en, "en-GB": :en }
-
-    # Do not swallow errors in after_commit/after_rollback callbacks.
-    # DEPRECATION WARNING: ActiveRecord::Base.raise_in_transactional_callbacks=
-    # is deprecated, has no effect and will be removed without replacement.
-    # config.active_record.raise_in_transactional_callbacks = true
 
     # Throttle stuff
     config.middleware.use Rack::Throttle::Minute, :max => ENV["MIN_MAX_RATE"].to_i, :cache => Redis.new, :key_prefix => :throttle
