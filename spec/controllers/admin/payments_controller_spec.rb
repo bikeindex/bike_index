@@ -7,7 +7,16 @@ RSpec.describe Admin::PaymentsController, type: :controller do
   let(:invoice) { FactoryBot.create(:invoice, organization: organization) }
   let(:user2) { FactoryBot.create(:user) }
   let(:create_time) { Time.current - 2.weeks }
-  let(:params) { { organization_id: organization.id, invoice_id: invoice.id, email: user2.email, amount: 222.22, payment_method: "stripe", created_at: create_time.strftime("%FT%T%:z") } }
+  let(:params) do
+    {
+      organization_id: organization.id,
+      invoice_id: invoice.id,
+      email: user2.email,
+      amount: 222.22,
+      payment_method: "stripe",
+      created_at: create_time.strftime("%FT%T%:z"),
+    }
+  end
 
   describe "index" do
     it "renders" do
@@ -100,16 +109,19 @@ RSpec.describe Admin::PaymentsController, type: :controller do
     context "stripe payment" do
       it "does not create" do
         expect do
-          post :create, params: { payment: params.merge(kind: "stripe") }
+          post :create, params: { payment: params.merge(payment_method: "stripe") }
           expect(flash[:error]).to match(/stripe/i)
         end.to_not change(Payment, :count)
       end
     end
     context "check payment" do
       it "creates" do
+        payment_attrs = params.merge(payment_method: "check")
+
         expect do
-          post :create, params: { payment: params.merge(kind: "check") }
+          post :create, params: { payment: payment_attrs }
         end.to change(Payment, :count).by 1
+
         payment = Payment.last
         expect(payment.organization).to eq organization
         expect(payment.invoice).to eq invoice
@@ -121,9 +133,14 @@ RSpec.describe Admin::PaymentsController, type: :controller do
       end
       context "no organization" do
         it "creates" do
+          payment_attrs =
+            params.merge(payment_method: "check",
+                         organization_id: "",
+                         invoice_id: "Invoice ##{invoice.id}")
           expect do
-            post :create, params: { payment: params.merge(kind: "check", organization_id: "", invoice_id: "Invoice ##{invoice.id}") }
+            post :create, params: { payment: payment_attrs }
           end.to change(Payment, :count).by 1
+
           payment = Payment.last
           expect(payment.organization).to eq organization
           expect(payment.invoice).to eq invoice
