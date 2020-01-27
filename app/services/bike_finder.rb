@@ -18,7 +18,7 @@ module BikeFinder
         .joins("LEFT JOIN user_emails ON user_emails.user_id = users.id")
         .where("users.email = ? OR user_emails.email = ?", email, email)
         .select(:id)
-        .uniq
+        .distinct
 
     Bike
       .joins("LEFT JOIN ownerships ON bikes.id = ownerships.bike_id")
