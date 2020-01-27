@@ -1,4 +1,11 @@
 GIT
+  remote: https://github.com/bikeindex/rqrcode-rails3.git
+  revision: 712b88d933c152a1bc3411c5c9ef899fec240d5f
+  specs:
+    rqrcode-rails3 (0.1.7)
+      rqrcode (>= 0.4.2)
+
+GIT
   remote: https://github.com/bikeindex/swagger-ui_rails.git
   revision: 0377d8ecd0714901351a6bfc68491d255ad86093
   branch: bike_index_0.1.7
@@ -508,8 +515,6 @@ GEM
     rmagick (4.0.0)
     rqrcode (0.10.1)
       chunky_png (~> 1.0)
-    rqrcode-rails3 (0.1.7)
-      rqrcode (>= 0.4.2)
     rspec (3.9.0)
       rspec-core (~> 3.9.0)
       rspec-expectations (~> 3.9.0)
@@ -780,7 +785,7 @@ DEPENDENCIES
   responders (~> 2.0)
   rmagick
   rqrcode (= 0.10.1)
-  rqrcode-rails3 (= 0.1.7)
+  rqrcode-rails3!
   rspec (~> 3.4)
   rspec-rails (~> 3.8)
   rspec-sidekiq
