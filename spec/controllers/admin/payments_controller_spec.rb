@@ -48,7 +48,9 @@ RSpec.describe Admin::PaymentsController, type: :controller do
       let(:invoice) { FactoryBot.create(:invoice, organization: organization, updated_at: og_time) }
       it "updates available attributes" do
         expect(subject.invoice).to be_nil
+
         put :update, params: { id: subject.to_param, payment: params }
+
         subject.reload
         expect(subject.organization).to eq organization
         expect(subject.invoice).to eq invoice
@@ -58,8 +60,7 @@ RSpec.describe Admin::PaymentsController, type: :controller do
         expect(subject.user).to eq user
         expect(subject.amount_cents).to_not eq 22_222
         expect(subject.kind).to eq "invoice_payment"
-        # invoice.reload
-        # expect(invoice.updated_at).to be_within(1.second).of Time.current # TODO: Rails 5 update - enable this, rspec doesn't correctly manage after_commit right now
+        expect(invoice.reload.updated_at).to be_within(1.second).of Time.current
       end
     end
     context "check payment" do
