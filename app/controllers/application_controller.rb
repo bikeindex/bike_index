@@ -79,7 +79,7 @@ class ApplicationController < ActionController::Base
   end
 
   # Around filter to ensure locale (language and timezone) are set only per request
-  def set_locale
+  def set_locale(&action)
     # Parse the timezone params if they are passed (tested in admin#dashboard#index)
     if params[:timezone].present?
       timezone = TimeParser.parse_timezone(params[:timezone])
@@ -93,9 +93,9 @@ class ApplicationController < ActionController::Base
 
     # We aren't translating the superadmin section
     if controller_namespace == "admin"
-      return I18n.with_locale(I18n.default_locale) { yield }
+      return I18n.with_locale(I18n.default_locale, &action)
     end
-    I18n.with_locale(requested_locale) { yield }
+    I18n.with_locale(requested_locale, &action)
   ensure # Make sure we reset default timezone
     Time.zone = TimeParser::DEFAULT_TIMEZONE
   end

@@ -44,7 +44,6 @@ module Bikeindex
     config.middleware.use Rack::Throttle::Minute, :max => ENV["MIN_MAX_RATE"].to_i, :cache => Redis.new, :key_prefix => :throttle
 
     # Add middleware to make i18n configuration thread-safe
-    require_relative "../lib/i18n/middleware"
     config.middleware.use I18n::Middleware
 
     ActiveSupport::Reloader.to_prepare do
