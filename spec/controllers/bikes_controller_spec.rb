@@ -1244,7 +1244,7 @@ RSpec.describe BikesController, type: :controller do
         end
 
         context "bike_sticker" do
-          let(:bike_attrs) { { description: "42", handlebar_type: "drop" } }
+          let(:bike_attrs) { { description: "42", handlebar_type: "drop_bar" } }
           let!(:bike_sticker) { FactoryBot.create(:bike_sticker, code: "a00100") }
           it "updates and applies the bike code" do
             expect(bike.bike_stickers.count).to eq 0
@@ -1252,7 +1252,7 @@ RSpec.describe BikesController, type: :controller do
             expect(flash[:success]).to match(bike_sticker.pretty_code)
             bike.reload
             expect(bike.description).to eq "42"
-            expect(bike.handlebar_type).to eq "drop"
+            expect(bike.handlebar_type).to eq "drop_bar"
             expect(bike.bike_stickers.count).to eq 1
             bike_sticker.reload
             expect(bike_sticker.claimed?).to be_truthy
@@ -1267,7 +1267,7 @@ RSpec.describe BikesController, type: :controller do
               expect(flash[:success]).to match(bike_sticker.pretty_code)
               bike.reload
               expect(bike.description).to eq "42"
-              expect(bike.handlebar_type).to eq "drop"
+              expect(bike.handlebar_type).to eq "drop_bar"
               expect(bike.bike_stickers.count).to eq 2
               bike_sticker.reload
               expect(bike_sticker.claimed?).to be_truthy
@@ -1283,7 +1283,7 @@ RSpec.describe BikesController, type: :controller do
                 expect(flash[:error]).to be_present
                 bike.reload
                 expect(bike.description).to eq "42"
-                expect(bike.handlebar_type).to eq "drop"
+                expect(bike.handlebar_type).to eq "drop_bar"
                 expect(bike.bike_stickers.count).to eq 1
               end
             end
@@ -1295,7 +1295,7 @@ RSpec.describe BikesController, type: :controller do
               expect(flash[:error]).to be_present
               bike.reload
               expect(bike.description).to eq "42"
-              expect(bike.handlebar_type).to eq "drop"
+              expect(bike.handlebar_type).to eq "drop_bar"
               expect(bike.bike_stickers.count).to eq 0
             end
           end
