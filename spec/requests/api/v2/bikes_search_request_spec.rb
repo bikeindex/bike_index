@@ -8,7 +8,7 @@ RSpec.describe "Bikes API V2", type: :request do
       FactoryBot.create(:abandoned_bike)
     end
     it "all bikes (root) search works" do
-      get "/api/v2/bikes_search?per_page=1", headers: { format: :json }
+      get "/api/v2/bikes_search?per_page=1", params: { format: :json }
       expect(response.code).to eq("200")
       expect(response.header["Total"]).to eq("2")
       expect(response.header["Link"].match('page=2&per_page=1>; rel=\"next\"')).to be_present
@@ -17,7 +17,7 @@ RSpec.describe "Bikes API V2", type: :request do
     end
 
     it "non_stolen bikes search works" do
-      get "/api/v2/bikes_search/non_stolen?per_page=1", headers: { format: :json }
+      get "/api/v2/bikes_search/non_stolen?per_page=1", params: { format: :json }
       expect(response.code).to eq("200")
       expect(response.header["Total"]).to eq("2")
       expect(response.header["Link"].match('page=2&per_page=1>; rel=\"next\"')).to be_present
@@ -27,7 +27,7 @@ RSpec.describe "Bikes API V2", type: :request do
 
     it "serial search works" do
       bike = FactoryBot.create(:bike, serial_number: "0000HEYBB")
-      get "/api/v2/bikes_search/?serial=0HEYBB", headers: { format: :json }
+      get "/api/v2/bikes_search/?serial=0HEYBB", params: { format: :json }
       result = JSON.parse(response.body)
       expect(response.code).to eq("200")
       expect(response.header["Total"]).to eq("1")
@@ -36,7 +36,7 @@ RSpec.describe "Bikes API V2", type: :request do
 
     it "stolen search works" do
       FactoryBot.create(:stolen_bike)
-      get "/api/v2/bikes_search/stolen?per_page=1", headers: { format: :json }
+      get "/api/v2/bikes_search/stolen?per_page=1", params: { format: :json }
       expect(response.code).to eq("200")
       expect(response.header["Total"]).to eq("1")
       result = response.body
@@ -48,7 +48,7 @@ RSpec.describe "Bikes API V2", type: :request do
     it "finds a close one" do
       bike = FactoryBot.create(:bike, serial_number: "Something1")
       bike.create_normalized_serial_segments
-      get "/api/v2/bikes_search/close_serials?serial=s0meth1nglvv", headers: { format: :json }
+      get "/api/v2/bikes_search/close_serials?serial=s0meth1nglvv", params: { format: :json }
       result = JSON.parse(response.body)
       expect(response.code).to eq("200")
       expect(response.header["Total"]).to eq("1")
@@ -60,7 +60,7 @@ RSpec.describe "Bikes API V2", type: :request do
     it "returns the count hash for matching bikes, doesn't need access_token" do
       FactoryBot.create(:bike, serial_number: "awesome")
       FactoryBot.create(:bike)
-      get "/api/v2/bikes_search/count?query=awesome", headers: { format: :json }
+      get "/api/v2/bikes_search/count?query=awesome", params: { format: :json }
       result = JSON.parse(response.body)
       expect(result["non_stolen"]).to eq(1)
       expect(result["stolen"]).to eq(0)
@@ -72,7 +72,7 @@ RSpec.describe "Bikes API V2", type: :request do
       opts = { proximity_square: 100, proximity_radius: "10" }
       target = Hashie::Mash.new(opts.merge(proximity: "ip"))
       expect_any_instance_of(BikeSearcher).to receive(:initialize).with(target)
-      get "/api/v2/bikes_search/count", params: opts, headers: { format: :json }
+      get "/api/v2/bikes_search/count", params: opts, params: { format: :json }
     end
   end
 
@@ -83,7 +83,7 @@ RSpec.describe "Bikes API V2", type: :request do
       FileCacheMaintenanceWorker.new.perform
       cached_all_stolen = FileCacheMaintainer.cached_all_stolen
       expect(cached_all_stolen["updated_at"].to_i).to be >= t
-      get "/api/v2/bikes_search/all_stolen", headers: { format: :json }
+      get "/api/v2/bikes_search/all_stolen", params: { format: :json }
       result = JSON.parse(response.body)
       expect(response.header["Last-Modified"]).to eq Time.at(cached_all_stolen["updated_at"].to_i).httpdate
       expect(result).to eq(JSON.parse(File.read(cached_all_stolen["path"])))
