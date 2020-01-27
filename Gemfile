@@ -49,7 +49,7 @@ gem "honeybadger"
 gem "httparty"
 gem "journey", "~> 1.0.3"
 gem "kaminari" # pagination
-gem "kramdown" # Markdown
+gem "kramdown", "1.11.1" # Markdown
 gem "libv8", "~> 3.16.14.7"
 gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
 gem "money-rails"

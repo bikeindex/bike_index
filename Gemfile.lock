@@ -310,7 +310,7 @@ GEM
       kaminari-core (= 1.1.1)
     kaminari-core (1.1.1)
     kgio (2.11.2)
-    kramdown (2.1.0)
+    kramdown (1.11.1)
     launchy (2.4.3)
       addressable (~> 2.3)
     letter_opener (1.7.0)
@@ -740,7 +740,7 @@ DEPENDENCIES
   journey (~> 1.0.3)
   jquery-rails
   kaminari
-  kramdown
+  kramdown (= 1.11.1)
   letter_opener
   libv8 (~> 3.16.14.7)
   lograge
