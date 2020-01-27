@@ -45,6 +45,8 @@ module Bikeindex
     config.middleware.use I18n::Middleware
 
     ActiveSupport::Reloader.to_prepare do
+      # TODO: Bump doorkeeper to 5.2.3 to fix before_filter deprecation
+      # https://github.com/doorkeeper-gem/doorkeeper/commit/27ee4af3e932817c7597fc2c97477258ff3b5062
       Doorkeeper::ApplicationsController.layout "doorkeeper"
       Doorkeeper::AuthorizationsController.layout "doorkeeper"
       Doorkeeper::AuthorizedApplicationsController.layout "doorkeeper"
