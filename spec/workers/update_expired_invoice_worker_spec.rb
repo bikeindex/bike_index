@@ -1,6 +1,6 @@
-require "spec_helper"
+require "rails_helper"
 
-RSpec.describe UpdateExpiredInvoiceWorker, type: :lib do
+RSpec.describe UpdateExpiredInvoiceWorker, type: :job do
   include_context :scheduled_worker
   include_examples :scheduled_worker_tests
 
@@ -17,10 +17,10 @@ RSpec.describe UpdateExpiredInvoiceWorker, type: :lib do
     let(:organization2) { invoice_expired.organization }
     it "schedules all the workers" do
       invoice_active.update_column :updated_at, invoice_active_updated_at
-      # TODO: Rails 5 update - after commit. Also done below below
-      organization1.update_attributes(updated_at: Time.current)
-      organization2.update_attributes(updated_at: Time.current)
-      invoice_active.reload
+
+      organization1.save
+      organization2.save
+
       expect(invoice_active.updated_at).to be_within(1.second).of invoice_active_updated_at
       expect(organization1.is_paid).to be_truthy
       expect(organization1.current_invoices.first.paid_in_full?).to be_truthy
@@ -35,13 +35,12 @@ RSpec.describe UpdateExpiredInvoiceWorker, type: :lib do
       expect(organization2.current_invoices.first.paid_in_full?).to be_truthy
       expect(organization2.current_invoices.first.active?).to be_truthy
       described_class.new.perform
-      # TODO: Rails 5 update - after commit.
-      organization1.reload
-      organization2.reload
-      organization1.update_attributes(updated_at: Time.current)
-      organization2.update_attributes(updated_at: Time.current)
+
+      organization1.save
+      organization2.save
       invoice_active.reload
       invoice_expired.reload
+
       expect(organization1.is_paid).to be_truthy
       expect(organization1.current_invoices.first.paid_in_full?).to be_truthy
       # the active invoice updated_at hasn't been bumped
