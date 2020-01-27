@@ -16,7 +16,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
       let(:target_timezone) { ActiveSupport::TimeZone["Pacific Time (US & Canada)"] }
       context "period of one day" do
         it "renders the period expected" do
-          get base_url, period: "day", timezone: "Pacific Time (US & Canada)"
+          get base_url, params: { period: "day", timezone: "Pacific Time (US & Canada)" }
           expect(response.code).to eq "200"
           expect(response).to render_template(:index)
           Time.zone = target_timezone
@@ -27,7 +27,7 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
       context "custom without end_time" do
         let(:start_time) { Time.at(1577050824) } # 2019-12-22 15:40:50 UTC
         it "renders the period expected" do
-          get base_url, period: "custom", start_time: start_time.to_i, end_time: ""
+          get base_url, params: { period: "custom", start_time: start_time.to_i, end_time: "" }
           expect(response.code).to eq "200"
           expect(response).to render_template(:index)
           expect(assigns(:period)).to eq "all"
@@ -39,10 +39,12 @@ RSpec.describe Admin::TheftAlertsController, type: :request do
         let(:start_time) { Time.at(1577050824) } # 2019-12-22 15:40:50 UTC
         let(:end_time) { Time.at(1515448980) } # 2018-01-08 14:03:00 -0800
         it "renders the period expected" do
-          get base_url, period: "custom",
-            start_time: start_time.to_i,
-            end_time: "2018-01-08T14:03",
-            timezone: "Pacific Time (US & Canada)"
+          get base_url, params: {
+              period: "custom",
+              start_time: start_time.to_i,
+              end_time: "2018-01-08T14:03",
+              timezone: "Pacific Time (US & Canada)"
+            }
           expect(response.code).to eq "200"
           expect(response).to render_template(:index)
           expect(assigns(:period)).to eq "custom"
