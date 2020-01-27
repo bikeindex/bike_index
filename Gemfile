@@ -12,7 +12,7 @@ gem "rails", "5.0.0"
 gem "active_model_serializers", "~> 0.9.3"
 gem "bcrypt", "~> 3.1.7"
 gem "jquery-rails"
-gem "pg"
+gem "pg", "~> 0.18"
 
 # Speed
 gem "fast_blank", "~> 1.0"
