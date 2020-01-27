@@ -4,6 +4,7 @@ module MoneyHelper
 
   # TODO: Add a bank implementation that fetches conversion rate values
   Money.default_bank.add_rate(:USD, :EUR, 0.88)
+  Money.rounding_mode = BigDecimal::ROUND_HALF_UP
 
   # Return the currency abbreviation (USD, EUR) for the current locale.
   def default_currency
