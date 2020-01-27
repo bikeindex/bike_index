@@ -75,7 +75,6 @@ RSpec.describe AfterUserCreateWorker, type: :job do
                         creator: bike.creator,
                         params: { bike: { address: "Pier 15 The Embarcadero, 94111", phone: "(111) 222-3333" } })
     end
-    # We need to manually set the user in this ownership because otherwise rspec can't find it TODO: Rails 5 update maybe
     let(:ownership) { FactoryBot.create(:ownership, user: user, owner_email: "aftercreate@bikeindex.org") }
     let!(:bike) { ownership.bike }
     include_context :geocoder_real
