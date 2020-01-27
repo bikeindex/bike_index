@@ -10,7 +10,7 @@ RSpec.describe Admin::BulkImportsController, type: :controller do
     let!(:bulk_import) { FactoryBot.create(:bulk_import) }
     it "renders" do
       get :index
-      expect(response).to be_success
+      expect(response).to be_ok
       expect(response).to render_template(:index)
       expect(flash).to_not be_present
     end
@@ -20,7 +20,7 @@ RSpec.describe Admin::BulkImportsController, type: :controller do
     let!(:bulk_import) { FactoryBot.create(:bulk_import) }
     it "renders" do
       get :show, params: { id: bulk_import.id }
-      expect(response).to be_success
+      expect(response).to be_ok
       expect(response).to render_template(:show)
       expect(flash).to_not be_present
     end
@@ -29,7 +29,7 @@ RSpec.describe Admin::BulkImportsController, type: :controller do
   describe "new" do
     it "renders" do
       get :new
-      expect(response).to be_success
+      expect(response).to be_ok
       expect(response).to render_template(:new)
       expect(flash).to_not be_present
       bulk_import = assigns(:bulk_import)
@@ -40,7 +40,7 @@ RSpec.describe Admin::BulkImportsController, type: :controller do
       let(:organization) { FactoryBot.create(:organization) }
       it "includes them" do
         get :new, params: { organization_id: organization.slug, no_notify: 1 }
-        expect(response).to be_success
+        expect(response).to be_ok
         expect(response).to render_template(:new)
         expect(flash).to_not be_present
         bulk_import = assigns(:bulk_import)

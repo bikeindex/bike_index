@@ -8,7 +8,7 @@ RSpec.describe Admin::TweetsController, type: :controller do
   describe "index" do
     it "renders" do
       get :index
-      expect(response).to be_success
+      expect(response).to be_ok
       expect(response).to render_template(:index)
     end
   end
@@ -16,7 +16,7 @@ RSpec.describe Admin::TweetsController, type: :controller do
   describe "edit" do
     it "renders" do
       get :edit, params: { id: subject.twitter_id }
-      expect(response).to be_success
+      expect(response).to be_ok
       expect(response).to render_template(:edit)
     end
   end
@@ -24,7 +24,7 @@ RSpec.describe Admin::TweetsController, type: :controller do
   describe "new" do
     it "renders" do
       get :new
-      expect(response).to be_success
+      expect(response).to be_ok
       expect(response).to render_template(:new)
     end
   end

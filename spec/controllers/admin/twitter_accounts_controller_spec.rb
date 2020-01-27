@@ -6,7 +6,7 @@ RSpec.describe Admin::TwitterAccountsController, type: :controller, vcr: true do
   describe "index" do
     it "renders" do
       get :index
-      expect(response).to be_success
+      expect(response).to be_ok
       expect(response).to render_template(:index)
     end
   end
@@ -15,7 +15,7 @@ RSpec.describe Admin::TwitterAccountsController, type: :controller, vcr: true do
     it "renders" do
       twitter_account = FactoryBot.create(:twitter_account_1)
       get :edit, params: { id: twitter_account.id }
-      expect(response).to be_success
+      expect(response).to be_ok
       expect(response).to render_template(:edit)
     end
   end
@@ -30,7 +30,7 @@ RSpec.describe Admin::TwitterAccountsController, type: :controller, vcr: true do
             params: {
               id: twitter_account.id,
               check_credentials: "0",
-              twitter_account: { append_block: "Something special" }
+              twitter_account: { append_block: "Something special" },
             }
       twitter_account.reload
       expect(twitter_account.append_block).to eq "Something special"
@@ -47,7 +47,7 @@ RSpec.describe Admin::TwitterAccountsController, type: :controller, vcr: true do
               params: {
                 id: twitter_account.id,
                 check_credentials: true,
-                twitter_account: { active: true }
+                twitter_account: { active: true },
               }
         twitter_account.reload
         expect(twitter_account.active).to be_truthy

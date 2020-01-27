@@ -5,7 +5,7 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
   describe "index" do
     it "renders" do
       get :index
-      expect(response).to be_success
+      expect(response).to be_ok
       expect(response).to render_template(:index)
       expect(flash).to_not be_present
     end
@@ -18,7 +18,7 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
       expect(stolen_record).to be_present
       bike.destroy
       edit_admin_recovery_path(stolen_record.id)
-      expect(response).to be_success
+      expect(response).to be_ok
       expect(flash).to_not be_present
     end
   end

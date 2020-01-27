@@ -1055,7 +1055,7 @@ RSpec.describe BikesController, type: :controller do
           get :edit, params: { id: bike.id }
           bike.reload
           expect(bike.owner).to eq user
-          expect(response).to be_success
+          expect(response).to be_ok
           expect(assigns(:edit_template)).to eq "bike_details"
         end
       end
@@ -1067,7 +1067,7 @@ RSpec.describe BikesController, type: :controller do
           expect(bike.owner).to_not eq user
           expect(bike.creation_organization).to eq user.organizations.first
           get :edit, params: { id: bike.id }
-          expect(response).to be_success
+          expect(response).to be_ok
           expect(assigns(:edit_template)).to eq "bike_details"
         end
       end
@@ -1097,7 +1097,7 @@ RSpec.describe BikesController, type: :controller do
 
               get :edit, params: { id: bike.id }
 
-              expect(response).to be_success
+              expect(response).to be_ok
               expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq stolen_edit_templates.as_json
               expect(assigns(:show_missing_location_alert)).to be_falsey
@@ -1112,7 +1112,7 @@ RSpec.describe BikesController, type: :controller do
 
               get :edit, params: { id: bike.id }
 
-              expect(response).to be_success
+              expect(response).to be_ok
               expect(assigns(:edit_template)).to eq "theft_details"
               expect(assigns(:edit_templates)).to eq recovery_edit_templates.as_json
               expect(response).to render_template "edit_theft_details"

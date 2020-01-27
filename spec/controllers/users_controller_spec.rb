@@ -437,7 +437,7 @@ RSpec.describe UsersController, type: :controller do
     context "no page given" do
       it "renders root" do
         get :edit
-        expect(response).to be_success
+        expect(response).to be_ok
         expect(assigns(:edit_template)).to eq("root")
         expect(response).to render_template("edit")
         expect(response).to render_template("layouts/application")
@@ -448,7 +448,7 @@ RSpec.describe UsersController, type: :controller do
         context template do
           it "renders the template" do
             get :edit, params: { page: template }
-            expect(response).to be_success
+            expect(response).to be_ok
             expect(assigns(:edit_template)).to eq(template)
             expect(response).to render_template(partial: "_edit_#{template}")
             expect(response).to render_template("layouts/application")

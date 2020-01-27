@@ -103,7 +103,7 @@ RSpec.describe "Organization API V3", type: :request do
 
       it "creates a new organization with locations" do
         post url, params: organization_json, headers: json_headers
-        expect(response).to be_successful
+        expect(response).to be_created
         expect_status 201
         expect_json(organization: {
                       name: "Geoff's Bike Shop",
@@ -119,7 +119,7 @@ RSpec.describe "Organization API V3", type: :request do
       context "location" do
         it "is not required" do
           post url, params: organization_attrs.except(:locations).to_json, headers: json_headers
-          expect(response).to be_successful
+          expect(response).to be_created
           expect_status 201
         end
 
@@ -147,7 +147,7 @@ RSpec.describe "Organization API V3", type: :request do
           location_attrs = location_1.except(:phone, :zipcode)
           org_json = organization_attrs.merge!(locations: [location_attrs]).to_json
           post url, params: org_json, headers: json_headers
-          expect(response).to be_successful
+          expect(response).to be_created
           expect_status 201
         end
       end

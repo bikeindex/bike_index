@@ -9,7 +9,7 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :controller do
   describe "index" do
     it "renders" do
       get :index
-      expect(response).to be_success
+      expect(response).to be_ok
       expect(response).to render_template(:index)
       expect(flash).to_not be_present
     end
@@ -29,14 +29,14 @@ RSpec.describe Admin::RecoveryDisplaysController, type: :controller do
     let(:recovery_display) { FactoryBot.create(:recovery_display) }
     it "renders" do
       get :edit, params: { id: recovery_display.id }
-      expect(response).to be_success
+      expect(response).to be_ok
       expect(response).to render_template(:edit)
       expect(flash).to_not be_present
     end
     it "doesn't break if the recovery_display's bike is deleted" do
       recovery_display.reload
       get :edit, params: { id: recovery_display.id }
-      expect(response).to be_success
+      expect(response).to be_ok
       expect(response).to render_template(:edit)
       expect(flash).to_not be_present
     end
