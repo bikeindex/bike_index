@@ -75,9 +75,6 @@ gem "axlsx", "~> 3.0.0.pre" # Write Excel files (OrganizationExports), on pre b/
 gem "wicked_pdf"
 gem "wkhtmltopdf-binary"
 
-# Rails upgrade
-gem "where-or" # backports rails 5 or query support - TODO: Rails 5 update, remove
-
 # API wrappers
 gem "simple_spark" # Sparkpost gem - we use it to send newsletters
 gem "twitter" # Twitter. For rendering tweets
