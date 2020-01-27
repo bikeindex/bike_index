@@ -9,6 +9,9 @@ Bundler.require(*Rails.groups)
 
 module Bikeindex
   class Application < Rails::Application
+    # Initialize configuration defaults for originally generated Rails version.
+    config.load_defaults 5.1
+
     # Use our custom error pages
     config.exceptions_app = self.routes
     require "draper"
