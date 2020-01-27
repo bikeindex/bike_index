@@ -177,6 +177,7 @@ end
 group :test do
   gem "airborne"
   gem "factory_bot_rails"
+  gem "rails-controller-testing"
   gem "rspec-sidekiq"
   gem "simplecov", require: false
   gem "vcr" # Stub external HTTP requests
