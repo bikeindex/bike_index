@@ -9,17 +9,16 @@ RSpec.describe PublicImagesController, type: :controller do
       context "valid owner" do
         it "creates an image" do
           set_current_user(user)
-          post :create, params: { bike_id: bike.id, public_image: { name: "cool name" } }, format: :js
+          post :create, params: { bike_id: bike.id, public_image: { name: "cool name" }, format: :js }
           bike.reload
           expect(bike.public_images.first.name).to eq "cool name"
-          # TODO: Rails 5 update - after commit doesn't run :(, commented out until that change happens
-          # expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
         end
       end
       context "no user" do
         it "does not create an image" do
           expect do
-            post :create, params: { bike_id: bike.id, public_image: { name: "cool name" } }, format: :js
+            post :create, params: { bike_id: bike.id, public_image: { name: "cool name" }, format: :js }
             expect(response.code).to eq("401")
           end.to change(PublicImage, :count).by 0
         end
@@ -32,7 +31,7 @@ RSpec.describe PublicImagesController, type: :controller do
         it "creates an image" do
           user = FactoryBot.create(:admin)
           set_current_user(user)
-          post :create, params: { blog_id: blog.id, public_image: { name: "cool name", image: file } }, format: :js
+          post :create, params: { blog_id: blog.id, public_image: { name: "cool name", image: file }, format: :js }
           expect(JSON.parse(response.body)).to be_present
           blog.reload
           expect(blog.public_images.first.name).to eq "cool name"
@@ -41,7 +40,7 @@ RSpec.describe PublicImagesController, type: :controller do
           it "creates an image" do
             user = FactoryBot.create(:admin)
             set_current_user(user)
-            post :create, params: { blog_id: blog.id, upload_plugin: "uppy", name: "cool name", image: file }, format: :js
+            post :create, params: { blog_id: blog.id, upload_plugin: "uppy", name: "cool name", image: file, format: :js }
             public_image = PublicImage.last
             expect(JSON.parse(response.body)).to be_present
             blog.reload
@@ -55,7 +54,7 @@ RSpec.describe PublicImagesController, type: :controller do
             user = FactoryBot.create(:admin)
             set_current_user(user)
             expect do
-              post :create, params: { blog_id: "", public_image: { name: "cool name", image: file } }, format: :js
+              post :create, params: { blog_id: "", public_image: { name: "cool name", image: file }, format: :js }
             end.to change(PublicImage, :count).by 1
             expect(JSON.parse(response.body)).to be_present
           end
@@ -65,7 +64,7 @@ RSpec.describe PublicImagesController, type: :controller do
         it "does not create an image" do
           set_current_user(FactoryBot.create(:user_confirmed))
           expect do
-            post :create, params: { blog_id: blog.id, public_image: { name: "cool name", image: file } }, format: :js
+            post :create, params: { blog_id: blog.id, public_image: { name: "cool name", image: file }, format: :js }
             expect(response.code).to eq("401")
           end.to change(PublicImage, :count).by 0
         end
@@ -76,7 +75,7 @@ RSpec.describe PublicImagesController, type: :controller do
       context "admin authorized" do
         include_context :logged_in_as_super_admin
         it "creates an image" do
-          post :create, params: { organization_id: organization.to_param, public_image: { name: "cool name" } }, format: :js
+          post :create, params: { organization_id: organization.to_param, public_image: { name: "cool name" }, format: :js }
           organization.reload
           expect(organization.public_images.first.name).to eq "cool name"
         end
@@ -85,7 +84,7 @@ RSpec.describe PublicImagesController, type: :controller do
         include_context :logged_in_as_user
         it "does not create an image" do
           expect do
-            post :create, params: { organization_id: organization.to_param, public_image: { name: "cool name" } }, format: :js
+            post :create, params: { organization_id: organization.to_param, public_image: { name: "cool name" }, format: :js }
             expect(response.code).to eq("401")
           end.to change(PublicImage, :count).by 0
         end
@@ -97,7 +96,7 @@ RSpec.describe PublicImagesController, type: :controller do
       context "admin authorized" do
         include_context :logged_in_as_super_admin
         it "creates an image" do
-          post :create, params: { mail_snippet_id: mail_snippet.to_param, public_image: { name: "cool name", image: file } }, format: :js
+          post :create, params: { mail_snippet_id: mail_snippet.to_param, public_image: { name: "cool name", image: file }, format: :js }
           mail_snippet.reload
           expect(mail_snippet.public_images.first.name).to eq "cool name"
         end
@@ -105,7 +104,7 @@ RSpec.describe PublicImagesController, type: :controller do
           it "creates an image" do
             user = FactoryBot.create(:admin)
             set_current_user(user)
-            post :create, params: { mail_snippet_id: mail_snippet.id, upload_plugin: "uppy", name: "cool name", image: file }, format: :js
+            post :create, params: { mail_snippet_id: mail_snippet.id, upload_plugin: "uppy", name: "cool name", image: file, format: :js }
             public_image = PublicImage.last
             expect(JSON.parse(response.body)).to be_present
             mail_snippet.reload
@@ -118,7 +117,7 @@ RSpec.describe PublicImagesController, type: :controller do
       context "not signed in" do
         it "does not create an image" do
           expect do
-            post :create, params: { organization_id: mail_snippet.to_param, public_image: { name: "cool name" } }, format: :js
+            post :create, params: { organization_id: mail_snippet.to_param, public_image: { name: "cool name" }, format: :js }
             expect(response.code).to eq("401")
           end.to change(PublicImage, :count).by 0
         end
