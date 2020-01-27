@@ -8,7 +8,7 @@ RSpec.describe "Bikes API V3", type: :request do
   describe "find by id" do
     it "returns one with from an id" do
       bike = FactoryBot.create(:bike)
-      get "/api/v3/bikes/#{bike.id}", params: {headers: { format: :json }}
+      get "/api/v3/bikes/#{bike.id}", params: { format: :json }
       expect(response.code).to eq("200")
       expect(json_result["bike"]["id"]).to eq(bike.id)
       expect(response.headers["Content-Type"].match("json")).to be_present
@@ -17,7 +17,7 @@ RSpec.describe "Bikes API V3", type: :request do
     end
 
     it "responds with missing" do
-      get "/api/v3/bikes/10", params: { headers: { format: :json } }
+      get "/api/v3/bikes/10", params: { format: :json }
       expect(response.code).to eq("404")
       expect(json_result["error"].present?).to be_truthy
       expect(response.headers["Content-Type"].match("json")).to be_present

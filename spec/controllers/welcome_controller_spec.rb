@@ -10,7 +10,7 @@ RSpec.describe WelcomeController, type: :controller do
     end
     context "json request format" do
       it "renders revised_layout (ignoring response format)" do
-        get :index, format: :json
+        get :index, params: { format: :json }
         expect(response.status).to eq(200)
         expect(response).to render_template("index")
         expect(flash).to_not be_present
