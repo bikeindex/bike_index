@@ -20,7 +20,14 @@ class BikeCreatorBuilder
   end
 
   def new_bike
-    bike = Bike.new(@b_param.bike.except(*BParam.skipped_bike_attrs))
+    bike_attrs =
+      @b_param
+        .bike
+        .map { |k, v| [k, v.presence] }
+        .to_h
+        .except(*BParam.skipped_bike_attrs)
+
+    bike = Bike.new(bike_attrs)
     bike.b_param_id = @b_param.id
     bike.b_param_id_token = @b_param.id_token
     bike.creator_id = @b_param.creator_id
