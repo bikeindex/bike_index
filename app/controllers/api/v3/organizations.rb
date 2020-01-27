@@ -44,14 +44,14 @@ module API
 
           permitted = declared(params, include_missing: false)
           organization = Organization.new(
-            permitted.to_hash.except("locations").merge(auto_user_id: current_user.id)
+            permitted.to_h.except("locations").merge(auto_user_id: current_user.id)
           )
 
           if locations = permitted.locations
             relations = locations.map do |loc|
               state = State.where(name: loc.state).first
               country = Country.where(name: loc.country).first
-              loc.merge(state: state, country: country).to_hash
+              loc.merge(state: state, country: country).to_h
             end
             organization.locations.build(relations)
           end

@@ -55,7 +55,7 @@ class Manufacturer < ApplicationRecord
     def import(file)
       CSV.foreach(file.path, headers: true, header_converters: :symbol) do |row|
         mnfg = find_by_name(row[:name]) || new
-        mnfg.attributes = row.to_hash.slice(*old_attr_accessible)
+        mnfg.attributes = row.to_h.slice(*old_attr_accessible)
         next if mnfg.save
         puts "\n#{row} \n"
         fail mnfg.errors.full_messages.to_sentence
