@@ -52,7 +52,7 @@ gem "kaminari" # pagination
 gem "kramdown", "1.11.1" # Markdown
 gem "libv8", "~> 3.16.14.7"
 gem "mini_magick" # a smaller implementation of rmagick, required for rqrcode
-gem "money-rails"
+gem "money-rails", "~> 1.11"
 gem "nokogiri", ">= 1.10.4"
 gem "omniauth", "~> 1.6"
 gem "omniauth-facebook"

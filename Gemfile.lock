@@ -742,7 +742,7 @@ DEPENDENCIES
   logstash-event
   memory_profiler
   mini_magick
-  money-rails
+  money-rails (~> 1.11)
   nokogiri (>= 1.10.4)
   omniauth (~> 1.6)
   omniauth-facebook
