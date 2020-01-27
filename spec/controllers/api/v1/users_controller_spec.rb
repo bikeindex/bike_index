@@ -211,8 +211,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
     it "does not create a new serial request mailer if a user isn't present" do
       bike = FactoryBot.create(:bike)
       message = { request_bike_id: bike.id, serial_update_serial: "some update", request_reason: "Some reason" }
-      # pp message
-      post :send_request, params: message, session: { format: :json }
+      post :send_request, params: message.merge(format: :json)
       expect(response.code).to eq("403")
     end
 
@@ -223,7 +222,6 @@ RSpec.describe Api::V1::UsersController, type: :controller do
       set_current_user(user)
       params = { request_bike_id: bike.id, serial_update_serial: "some update", request_reason: "Some reason" }
       post :send_request, params: params
-      # pp response
       expect(response.code).to eq("403")
     end
   end

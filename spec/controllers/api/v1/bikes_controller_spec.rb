@@ -83,7 +83,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
       end
       it "creates a bike and does not duplicate" do
         expect do
-          post :create, params: bike_hash.as_json.merge(format: :json)
+          post :create, params: bike_hash.as_json
         end.to change(Ownership, :count).by(1)
 
         expect(response.code).to eq("200")
@@ -101,7 +101,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect(creation_state.origin).to eq "api_v1"
         expect do
           updated_hash = bike_hash.merge(bike: bike_hash[:bike].merge(no_duplicate: true))
-          post :create, params: updated_hash.as_json, session: { headers: { "Content-Type" => "application/json" } }
+          post :create, params: updated_hash.as_json
         end.to change(Ownership, :count).by 0
       end
     end
