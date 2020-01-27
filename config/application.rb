@@ -44,7 +44,7 @@ module Bikeindex
     require_relative "../lib/i18n/middleware"
     config.middleware.use I18n::Middleware
 
-    config.to_prepare do
+    ActiveSupport::Reloader.to_prepare do
       Doorkeeper::ApplicationsController.layout "doorkeeper"
       Doorkeeper::AuthorizationsController.layout "doorkeeper"
       Doorkeeper::AuthorizedApplicationsController.layout "doorkeeper"

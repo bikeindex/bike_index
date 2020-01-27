@@ -21,11 +21,11 @@ Rails.application.configure do
     config.cache_store = :dalli_store, {
       namespace: Bikeindex,
       expires_in: 0,
-      compress: true 
+      compress: true,
     }
 
     config.public_file_server.headers = {
-      'Cache-Control' => 'public, max-age=172800'
+      "Cache-Control" => "public, max-age=172800",
     }
   else
     config.action_controller.perform_caching = false
@@ -112,7 +112,7 @@ Rails.application.configure do
     Rails.application.eager_load!
   end
 
-  ActionDispatch::Reloader.to_prepare do
+  ActiveSupport::Reloader.to_prepare do
     api_reloader.execute_if_updated
   end
 end
