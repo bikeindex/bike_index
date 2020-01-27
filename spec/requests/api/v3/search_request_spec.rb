@@ -36,7 +36,7 @@ RSpec.describe "Search API V3", type: :request do
     it "returns matching bikes with partially matching serial numbers" do
       bike = FactoryBot.create(:bike, manufacturer: manufacturer, serial_number: "serial_number")
 
-      get "/api/v3/search/serials_containing", params: { serial: "serial_num", stolenness: "non" }, format: :json
+      get "/api/v3/search/serials_containing", params: { serial: "serial_num", stolenness: "non" }, headers: { format: :json }
 
       result = json_result
       expect(result[:bikes]).to be_present
@@ -54,11 +54,7 @@ RSpec.describe "Search API V3", type: :request do
         allow(ExternalRegistryClient).to(receive(:search_for_bikes_with)
           .with(serial_number).and_return(ExternalRegistryBike.all))
 
-        get "/api/v3/search/external_registries",
-            params: {
-              serial: serial_number
-            },
-            format: :json
+        get "/api/v3/search/external_registries", params: { serial: serial_number }, headers: { format: :json }
 
         expect(json_result[:error]).to be_blank
         bike_list = json_result[:bikes]
@@ -94,7 +90,7 @@ RSpec.describe "Search API V3", type: :request do
   describe "/count" do
     context "incorrect stolenness value" do
       it "returns an error message" do
-        get "/api/v3/search/count", params: { stolenness: "something else" }, format: :json
+        get "/api/v3/search/count", params: { stolenness: "something else" }, headers: { format: :json }
         result = JSON.parse(response.body)
         expect(result["error"]).to match(/stolenness/i)
         expect(response.status).to eq(400)
