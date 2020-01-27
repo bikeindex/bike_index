@@ -7,7 +7,7 @@ git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
 # Update Vagrantfile and CircleCI config if Ruby version is bumped
 ruby "2.5.5"
-gem "rails", "5.1.3"
+gem "rails", "5.1.4"
 
 gem "active_model_serializers", "~> 0.9.3"
 gem "bcrypt", "~> 3.1.7"
