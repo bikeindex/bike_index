@@ -5,10 +5,10 @@ RSpec.describe Organized::ManageController, type: :controller do
     include_context :logged_in_as_ambassador
 
     it "redirects to the organization root" do
-      expect(get(:index, organization_id: organization)).to redirect_to(organization_root_path)
-      expect(get(:locations, organization_id: organization)).to redirect_to(organization_root_path)
-      expect(get(:update, organization_id: organization, id: 1)).to redirect_to(organization_root_path)
-      expect(get(:destroy, organization_id: organization, id: 1)).to redirect_to(organization_root_path)
+      expect(get(:index, params: { organization_id: organization })).to redirect_to(organization_root_path)
+      expect(get(:locations, params: { organization_id: organization })).to redirect_to(organization_root_path)
+      expect(get(:update, params: { organization_id: organization, id: 1 })).to redirect_to(organization_root_path)
+      expect(get(:destroy, params: { organization_id: organization, id: 1 })).to redirect_to(organization_root_path)
     end
   end
 
@@ -16,7 +16,7 @@ RSpec.describe Organized::ManageController, type: :controller do
     include_context :logged_in_as_organization_member
     describe "index" do
       it "redirects to the organization root path" do
-        get :index, organization_id: organization.to_param
+        get :index, params: { organization_id: organization.to_param }
         expect(response).to redirect_to(organization_root_path)
         expect(flash[:error]).to be_present
       end
@@ -24,7 +24,7 @@ RSpec.describe Organized::ManageController, type: :controller do
 
     describe "locations" do
       it "redirects to the organization root path" do
-        get :locations, organization_id: organization.to_param
+        get :locations, params: { organization_id: organization.to_param }
         expect(response).to redirect_to(organization_root_path)
         expect(flash[:error]).to be_present
       end
@@ -33,7 +33,7 @@ RSpec.describe Organized::ManageController, type: :controller do
     describe "standard organization" do
       it "does not destroy" do
         expect do
-          delete :destroy, id: organization.id, organization_id: organization.to_param
+          delete :destroy, params: { id: organization.id, organization_id: organization.to_param }
         end.to change(Organization, :count).by(0)
         expect(response).to redirect_to(organization_root_path)
         expect(flash[:error]).to be_present
@@ -45,7 +45,7 @@ RSpec.describe Organized::ManageController, type: :controller do
     describe "index" do
       it "renders, sets active organization" do
         session[:passive_organization_id] = "XXXYYY"
-        get :index, organization_id: organization.to_param
+        get :index, params: { organization_id: organization.to_param }
         expect(response.status).to eq(200)
         expect(response).to render_template :index
         expect(assigns(:current_organization)).to eq organization
@@ -57,7 +57,7 @@ RSpec.describe Organized::ManageController, type: :controller do
     describe "landing" do
       it "renders" do
         session[:passive_organization_id] = "XXXYYY"
-        get :landing, organization_id: organization.to_param
+        get :landing, params: { organization_id: organization.to_param }
         expect(response.status).to eq(200)
         expect(assigns(:current_organization)).to eq organization
         expect(assigns(:passive_organization)).to eq organization
@@ -67,7 +67,7 @@ RSpec.describe Organized::ManageController, type: :controller do
 
     describe "locations" do
       it "renders" do
-        get :locations, organization_id: organization.to_param
+        get :locations, params: { organization_id: organization.to_param }
         expect(response.status).to eq(200)
         expect(response).to render_template :locations
         expect(assigns(:current_organization)).to eq organization
@@ -116,7 +116,7 @@ RSpec.describe Organized::ManageController, type: :controller do
           organization.update_attributes(org_attributes)
         end
         it "updates, sends message about maps" do
-          put :update, organization_id: organization.to_param, id: organization.to_param, organization: update_attributes
+          put :update, params: { organization_id: organization.to_param, id: organization.to_param, organization: update_attributes }
           expect(response).to redirect_to organization_manage_index_path(organization_id: organization.to_param)
           expect(flash[:success]).to be_present
           organization.reload
@@ -187,7 +187,7 @@ RSpec.describe Organized::ManageController, type: :controller do
           it "updates and adds the locations and shows on map" do
             expect(organization.kind).to_not eq "ambassador"
             expect do
-              put :update, organization_id: organization.to_param, id: organization.to_param, organization: update_attributes
+              put :update, params: { organization_id: organization.to_param, id: organization.to_param, organization: update_attributes }
             end.to change(Location, :count).by 1
             organization.reload
             expect(organization.show_on_map).to be_truthy
@@ -220,9 +220,11 @@ RSpec.describe Organized::ManageController, type: :controller do
           let!(:organization2) { FactoryBot.create(:organization, short_name: "cool short name") }
           it "doesn't update" do
             put :update,
-                organization_id: organization.to_param,
-                id: organization.to_param,
-                organization: { kind: "property_management", short_name: "cool short name" }
+                params: {
+                  organization_id: organization.to_param,
+                  id: organization.to_param,
+                  organization: { kind: "property_management", short_name: "cool short name" }
+                }
 
             expect(assigns[:page_errors]).to be_present
             organization.reload
@@ -237,9 +239,11 @@ RSpec.describe Organized::ManageController, type: :controller do
 
             expect do
               put :update,
-                  organization_id: organization.to_param,
-                  id: organization.to_param,
-                  organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name")
+                  params: {
+                    organization_id: organization.to_param,
+                    id: organization.to_param,
+                    organization: update_attributes.merge(kind: "bike_shop", short_name: "cool other name")
+                  }
             end.to change(Location, :count).by 0
 
             organization.reload
@@ -255,7 +259,7 @@ RSpec.describe Organized::ManageController, type: :controller do
         it "destroys" do
           expect_any_instance_of(AdminNotifier).to receive(:for_organization).with(organization: organization, user: user, type: "organization_destroyed")
           expect do
-            delete :destroy, id: organization.id, organization_id: organization.to_param
+            delete :destroy, params: { id: organization.id, organization_id: organization.to_param }
           end.to change(Organization, :count).by(-1)
           expect(response).to redirect_to user_home_url
           expect(flash[:info]).to be_present
@@ -265,7 +269,7 @@ RSpec.describe Organized::ManageController, type: :controller do
         it "does not destroy" do
           organization.update_attribute :is_paid, true
           expect do
-            delete :destroy, id: organization.id, organization_id: organization.to_param
+            delete :destroy, params: { id: organization.id, organization_id: organization.to_param }
           end.to change(Organization, :count).by(0)
           expect(response).to redirect_to organization_manage_index_path(organization_id: organization.to_param)
           expect(flash[:info]).to be_present

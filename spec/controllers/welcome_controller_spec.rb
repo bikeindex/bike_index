@@ -136,7 +136,7 @@ RSpec.describe WelcomeController, type: :controller do
           end
           it "renders and user things are assigned" do
             session[:passive_organization_id] = organization.id # Even though the user isn't part of the organization, permit it
-            get :user_home, per_page: 1
+            get :user_home, params: { per_page: 1 }
             expect(response.status).to eq(200)
             expect(response).to render_template("user_home")
             expect(assigns(:bikes).count).to eq 1
@@ -164,7 +164,7 @@ RSpec.describe WelcomeController, type: :controller do
     describe "recovery_stories" do
       it "renders recovery stories" do
         FactoryBot.create_list(:recovery_display, 3)
-        get :recovery_stories, per_page: 2
+        get :recovery_stories, params: { per_page: 2 }
         expect(assigns(:recovery_displays).count).to eq 2
         expect(response.status).to eq(200)
         expect(response).to render_template("recovery_stories")
@@ -173,7 +173,7 @@ RSpec.describe WelcomeController, type: :controller do
 
       it "renders no recovery stories if requested page exceeds valid range" do
         FactoryBot.create_list(:recovery_display, 2)
-        get :recovery_stories, per_page: 2, page: 2
+        get :recovery_stories, params: { per_page: 2, page: 2 }
         expect(assigns(:recovery_displays)).to be_empty
         expect(response.status).to eq(200)
         expect(response).to render_template("recovery_stories")

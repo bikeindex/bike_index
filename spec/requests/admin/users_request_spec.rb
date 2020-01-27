@@ -45,16 +45,18 @@ RSpec.describe Admin::UsersController, type: :request do
     context "non developer" do
       let(:user_subject) { FactoryBot.create(:user, confirmed: false) }
       it "updates all the things that can be edited (finding via user id)" do
-        put "#{base_url}/#{user_subject.id}", user: {
-                                                name: "New Name",
-                                                email: "newemailexample.com",
-                                                confirmed: true,
-                                                superuser: true,
-                                                developer: true,
-                                                can_send_many_stolen_notifications: true,
-                                                banned: true,
-                                                phone: "9876543210",
-                                              }
+        put "#{base_url}/#{user_subject.id}", params: {
+                                                user: {
+                                                                                        name: "New Name",
+                                                                                        email: "newemailexample.com",
+                                                                                        confirmed: true,
+                                                                                        superuser: true,
+                                                                                        developer: true,
+                                                                                        can_send_many_stolen_notifications: true,
+                                                                                        banned: true,
+                                                                                        phone: "9876543210",
+                                                                                      }
+        }
         expect(user_subject.reload.name).to eq("New Name")
         expect(user_subject.email).to eq("newemailexample.com")
         expect(user_subject.confirmed).to be_truthy
@@ -68,13 +70,15 @@ RSpec.describe Admin::UsersController, type: :request do
     context "developer" do
       let(:current_user) { FactoryBot.create(:admin_developer) }
       it "updates developer" do
-        put "#{base_url}/#{user_subject.id}", user: {
-                                                developer: true,
-                                                email: user_subject.email,
-                                                superuser: false,
-                                                can_send_many_stolen_notifications: true,
-                                                banned: true,
-                                              }
+        put "#{base_url}/#{user_subject.id}", params: {
+                                                user: {
+                                                                                        developer: true,
+                                                                                        email: user_subject.email,
+                                                                                        superuser: false,
+                                                                                        can_send_many_stolen_notifications: true,
+                                                                                        banned: true,
+                                                                                      }
+        }
         user_subject.reload
         expect(user_subject.developer).to be_truthy
       end

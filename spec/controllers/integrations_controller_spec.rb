@@ -61,8 +61,7 @@ RSpec.describe IntegrationsController, type: :controller do
 
         it "creates a new integration given a refresh token and access token" do
           expect do
-            get :create, access_token: "123456", expires_in: "3920",
-                         token_type: "Bearer", refresh_token: "1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI"
+            get :create, params: { access_token: "123456", expires_in: "3920", token_type: "Bearer", refresh_token: "1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI" }
             expect(flash[:success]).to be_present
             expect(response).to redirect_to(user_home_url)
           end.to change(Integration, :count).by 1
@@ -72,8 +71,7 @@ RSpec.describe IntegrationsController, type: :controller do
           before { set_current_user(user) }
           it "skips" do
             expect do
-              get :create, access_token: "123456", expires_in: "3920",
-                           token_type: "Bearer", refresh_token: "1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI"
+              get :create, params: { access_token: "123456", expires_in: "3920", token_type: "Bearer", refresh_token: "1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI" }
             end.to change(Integration, :count).by 0
             expect(response).to redirect_to(user_home_url)
           end
@@ -134,8 +132,7 @@ RSpec.describe IntegrationsController, type: :controller do
 
         it "creates a new integration given a refresh token and access token" do
           expect do
-            get :create, access_token: "123456", expires_in: "3920",
-                         token_type: "Bearer", refresh_token: "1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI"
+            get :create, params: { access_token: "123456", expires_in: "3920", token_type: "Bearer", refresh_token: "1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI" }
             expect(flash[:success]).to be_present
             expect(response).to redirect_to(user_home_url)
           end.to change(Integration, :count).by 1
@@ -145,8 +142,7 @@ RSpec.describe IntegrationsController, type: :controller do
           before { set_current_user(user) }
           it "skips" do
             expect do
-              get :create, access_token: "123456", expires_in: "3920",
-                           token_type: "Bearer", refresh_token: "1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI"
+              get :create, params: { access_token: "123456", expires_in: "3920", token_type: "Bearer", refresh_token: "1/xEoDL4iW3cxlI7yDbSRFYNG01kVKM2C-259HOF2aQbI" }
             end.to change(Integration, :count).by 0
             expect(response).to redirect_to(user_home_url)
           end
@@ -157,7 +153,7 @@ RSpec.describe IntegrationsController, type: :controller do
 
   describe "failure" do
     it "renders sessions new with a flash" do
-      get :integrations_controller_creation_error, message: "csrf_detected", strategy: "facebook"
+      get :integrations_controller_creation_error, params: { message: "csrf_detected", strategy: "facebook" }
       expect(flash[:error]).to match("email us at contact@bikeindex.org")
       expect(response).to redirect_to new_session_path
     end

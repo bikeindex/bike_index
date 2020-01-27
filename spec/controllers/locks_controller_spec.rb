@@ -35,14 +35,14 @@ RSpec.describe LocksController, type: :controller do
   describe "edit" do
     context "not lock owner" do
       it "redirects to user_home" do
-        get :edit, id: lock.id
+        get :edit, params: { id: lock.id }
         expect(flash[:error]).to be_present
         expect(response).to redirect_to(:user_home)
       end
     end
     context "lock owner" do
       it "renders" do
-        get :edit, id: owner_lock.id
+        get :edit, params: { id: owner_lock.id }
         expect(response.code).to eq("200")
         expect(response).to render_template("edit")
       end
@@ -52,7 +52,7 @@ RSpec.describe LocksController, type: :controller do
   describe "update" do
     context "not lock owner" do
       it "redirects to user_home" do
-        put :update, id: lock.id, combination: "123"
+        put :update, params: { id: lock.id, combination: "123" }
         expect(flash[:error]).to be_present
         expect(response).to redirect_to(:user_home)
         expect(lock.combination).to_not eq("123")
@@ -60,7 +60,7 @@ RSpec.describe LocksController, type: :controller do
     end
     context "lock owner" do
       it "renders" do
-        put :update, id: owner_lock.id, lock: valid_attributes
+        put :update, params: { id: owner_lock.id, lock: valid_attributes }
         owner_lock.reload
         expect(response.code).to eq("200")
         expect(response).to render_template("edit")
@@ -75,7 +75,7 @@ RSpec.describe LocksController, type: :controller do
   describe "create" do
     context "success" do
       it "redirects you to user_home locks table" do
-        post :create, lock: valid_attributes
+        post :create, params: { lock: valid_attributes }
         user.reload
         lock = user.locks.first
         expect(response).to redirect_to user_home_path(active_tab: "locks")
@@ -91,7 +91,7 @@ RSpec.describe LocksController, type: :controller do
     context "not lock owner" do
       it "redirects to user_home" do
         expect(lock).to be_present
-        delete :destroy, id: lock.id
+        delete :destroy, params: { id: lock.id }
         expect(flash[:error]).to be_present
         expect(response).to redirect_to(:user_home)
         expect(lock.reload).to be_truthy
@@ -101,7 +101,7 @@ RSpec.describe LocksController, type: :controller do
       it "renders" do
         expect(owner_lock).to be_present
         expect do
-          delete :destroy, id: owner_lock.id
+          delete :destroy, params: { id: owner_lock.id }
         end.to change(Lock, :count).by(-1)
         expect(response).to redirect_to user_home_path(active_tab: "locks")
       end

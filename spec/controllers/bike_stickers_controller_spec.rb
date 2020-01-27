@@ -38,7 +38,7 @@ RSpec.describe BikeStickersController, type: :controller do
       end
       context "code not found" do
         it "responds with flash error" do
-          put :update, id: "asdffdf", organization_id: "cvxcvcv"
+          put :update, params: { id: "asdffdf", organization_id: "cvxcvcv" }
           expect(flash[:error]).to be_present
         end
       end

@@ -26,7 +26,7 @@ RSpec.describe Admin::ManufacturersController, type: :controller do
 
   describe "show" do
     it "renders" do
-      get :show, id: subject.slug
+      get :show, params: { id: subject.slug }
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
     end
@@ -35,14 +35,14 @@ RSpec.describe Admin::ManufacturersController, type: :controller do
   describe "edit" do
     context "slug" do
       it "renders" do
-        get :edit, id: subject.slug
+        get :edit, params: { id: subject.slug }
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
       end
     end
     context "id" do
       it "renders" do
-        get :edit, id: subject.id
+        get :edit, params: { id: subject.id }
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
       end
@@ -51,7 +51,7 @@ RSpec.describe Admin::ManufacturersController, type: :controller do
 
   describe "update" do
     it "updates available attributes" do
-      put :update, id: subject.to_param, manufacturer: permitted_attributes
+      put :update, params: { id: subject.to_param, manufacturer: permitted_attributes }
       subject.reload
       permitted_attributes.each do |attribute, val|
         pp attribute unless subject.send(attribute) == val
@@ -64,7 +64,7 @@ RSpec.describe Admin::ManufacturersController, type: :controller do
     it "creates with available attributes" do
       expect(Manufacturer.where(name: "new name and things").count).to eq 0
       expect do
-        post :create, manufacturer: permitted_attributes
+        post :create, params: { manufacturer: permitted_attributes }
       end.to change(Manufacturer, :count).by 1
       target = Manufacturer.where(name: "new name and things").first
       permitted_attributes.each { |attribute, val| expect(target.send(attribute)).to eq val }

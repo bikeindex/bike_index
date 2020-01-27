@@ -15,12 +15,14 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
     context "given the theft alert and payment both succeed" do
       it "redirects to purchase confirmation template" do
         post "/theft_alerts",
-             theft_alert_plan_id: theft_alert_plan.id,
-             bike_id: bike.id,
-             stripe_token: stripe_token.id,
-             stripe_amount: 100,
-             stripe_email: current_user.email,
-             stripe_currency: "USD"
+             params: {
+               theft_alert_plan_id: theft_alert_plan.id,
+               bike_id: bike.id,
+               stripe_token: stripe_token.id,
+               stripe_amount: 100,
+               stripe_email: current_user.email,
+               stripe_currency: "USD"
+             }
 
         expect(Payment.count).to eq(1)
         expect(TheftAlert.count).to eq(1)
@@ -39,12 +41,14 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
         invalid_plan_id = 999
 
         post "/theft_alerts",
-             theft_alert_plan_id: invalid_plan_id,
-             bike_id: bike.id,
-             stripe_token: stripe_token.id,
-             stripe_amount: 100,
-             stripe_email: current_user.email,
-             stripe_currency: "USD"
+             params: {
+               theft_alert_plan_id: invalid_plan_id,
+               bike_id: bike.id,
+               stripe_token: stripe_token.id,
+               stripe_amount: 100,
+               stripe_email: current_user.email,
+               stripe_currency: "USD"
+             }
 
         expect(Payment.count).to eq(0)
         expect(TheftAlert.count).to eq(0)
@@ -57,12 +61,14 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
     context "given the payment request fails" do
       it "redirects to the bike edit page with a flash message" do
         post "/theft_alerts",
-             theft_alert_plan_id: theft_alert_plan.id,
-             bike_id: bike.id,
-             stripe_token: stripe_token_declined.id,
-             stripe_amount: 100,
-             stripe_email: current_user.email,
-             stripe_currency: "USD"
+             params: {
+               theft_alert_plan_id: theft_alert_plan.id,
+               bike_id: bike.id,
+               stripe_token: stripe_token_declined.id,
+               stripe_amount: 100,
+               stripe_email: current_user.email,
+               stripe_currency: "USD"
+             }
 
         expect(Payment.count).to eq(0)
         expect(TheftAlert.count).to eq(1)
@@ -78,7 +84,7 @@ RSpec.describe TheftAlertsController, type: :request, vcr: true do
 
     context "given an unauthenticated user" do
       it "it redirects to the bikes url" do
-        post "/theft_alerts", theft_alert_plan_id: 1, bike_id: 1
+        post "/theft_alerts", params: { theft_alert_plan_id: 1, bike_id: 1 }
         expect(response).to redirect_to(bikes_url)
       end
     end

@@ -13,7 +13,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       describe "index" do
         it "redirects" do
-          get :index, organization_id: organization.to_param
+          get :index, params: { organization_id: organization.to_param }
           expect(response).to redirect_to root_path
           expect(flash[:error]).to be_present
         end
@@ -21,7 +21,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
 
       describe "show" do
         it "redirects" do
-          get :show, organization_id: organization.to_param, id: export.id
+          get :show, params: { organization_id: organization.to_param, id: export.id }
           expect(response).to redirect_to root_path
           expect(flash[:error]).to be_present
         end
@@ -32,7 +32,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
       let(:user) { FactoryBot.create(:admin) }
       describe "index" do
         it "renders" do
-          get :index, organization_id: organization.to_param
+          get :index, params: { organization_id: organization.to_param }
           expect(response).to render_template(:index)
           expect(assigns(:current_organization)).to eq organization
         end
@@ -50,7 +50,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
         expect(export).to be_present # So that we're actually rendering an export
         organization.reload
         expect(organization.paid_for?("csv_exports")).to be_truthy
-        get :index, organization_id: organization.to_param
+        get :index, params: { organization_id: organization.to_param }
         expect(response.code).to eq("200")
         expect(response).to render_template(:index)
         expect(assigns(:current_organization)).to eq organization
@@ -60,7 +60,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
 
     describe "show" do
       it "renders" do
-        get :show, organization_id: organization.to_param, id: export.id
+        get :show, params: { organization_id: organization.to_param, id: export.id }
         expect(response.code).to eq("200")
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
@@ -70,7 +70,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
         it "404s" do
           expect(export.organization.id).to_not eq organization.id
           expect do
-            get :show, organization_id: organization.to_param, id: export.id
+            get :show, params: { organization_id: organization.to_param, id: export.id }
           end.to raise_error(ActiveRecord::RecordNotFound)
         end
       end
@@ -80,7 +80,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
           ENV["AVERY_EXPORT_URL"] = "https://avery.com?mergeDataURL="
           allow_any_instance_of(Export).to receive(:file_url) { "https://files.bikeindex.org/exports/820181214ccc.xlsx" }
           export.update_attributes(progress: "finished", options: export.options.merge(avery_export: true))
-          get :show, organization_id: organization.to_param, id: export.id, avery_redirect: true
+          get :show, params: { organization_id: organization.to_param, id: export.id, avery_redirect: true }
           expect(response).to redirect_to target_redirect_url
         end
       end
@@ -88,7 +88,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
 
     describe "new" do
       it "renders" do
-        get :new, organization_id: organization.to_param
+        get :new, params: { organization_id: organization.to_param }
         expect(response.code).to eq("200")
         expect(response).to render_template(:new)
         expect(flash).to_not be_present
@@ -96,7 +96,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
       context "organization has all feature slugs" do
         it "renders still" do
           organization.update_column :paid_feature_slugs, ["csv_exports"] + PaidFeature::REG_FIELDS # Stub organization having features
-          get :new, organization_id: organization.to_param
+          get :new, params: { organization_id: organization.to_param }
           expect(response.code).to eq("200")
           expect(response).to render_template(:new)
           expect(flash).to_not be_present
@@ -108,7 +108,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
       it "renders" do
         expect(export).to be_present
         expect do
-          delete :destroy, id: export.id, organization_id: organization.to_param
+          delete :destroy, params: { id: export.id, organization_id: organization.to_param }
         end.to change(Export, :count).by(-1)
         expect(response).to redirect_to exports_root_path
         expect(flash[:success]).to be_present
@@ -127,7 +127,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
           expect(export.assign_bike_codes?).to be_truthy
           expect(export.bike_stickers).to eq(["a1111"])
           expect do
-            delete :destroy, id: export.id, organization_id: organization.to_param
+            delete :destroy, params: { id: export.id, organization_id: organization.to_param }
           end.to change(Export, :count).by(-1)
           expect(response).to redirect_to exports_root_path
           expect(flash[:success]).to be_present
@@ -151,7 +151,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
       let(:avery_params) { valid_attrs.merge(end_at: "2016-03-08 02:00:00", avery_export: true, bike_code_start: "a221C ") }
       it "creates the expected export" do
         expect do
-          post :create, export: valid_attrs, organization_id: organization.to_param
+          post :create, params: { export: valid_attrs, organization_id: organization.to_param }
         end.to change(Export, :count).by 1
         expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
         export = Export.last
@@ -166,7 +166,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
       context "avery export without feature" do
         it "fails" do
           expect do
-            post :create, export: avery_params, organization_id: organization.to_param
+            post :create, params: { export: avery_params, organization_id: organization.to_param }
           end.to_not change(Export, :count)
           expect(flash[:error]).to be_present
         end
@@ -177,8 +177,10 @@ RSpec.describe Organized::ExportsController, type: :controller do
         it "creates a non-avery export" do
           expect(organization.paid_for?("avery_export")).to be_truthy
           expect do
-            post :create, export: export_params.merge(bike_code_start: 1, custom_bike_ids: "1222, https://bikeindex.org/bikes/999"),
-                          organization_id: organization.to_param
+            post :create, params: {
+                            export: export_params.merge(bike_code_start: 1, custom_bike_ids: "1222, https://bikeindex.org/bikes/999"),
+                            organization_id: organization.to_param
+                          }
           end.to change(Export, :count).by 1
           expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
           export = Export.last
@@ -207,7 +209,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
           end
           it "creates the expected export" do
             expect do
-              post :create, export: crushed_datetime_attrs, organization_id: organization.to_param
+              post :create, params: { export: crushed_datetime_attrs, organization_id: organization.to_param }
             end.to change(Export, :count).by 1
             expect(response).to redirect_to organization_exports_path(organization_id: organization.to_param)
             export = Export.last
@@ -225,7 +227,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
           let(:end_at) { 1457431200 }
           it "makes the avery export" do
             expect do
-              post :create, export: avery_params, organization_id: organization.to_param
+              post :create, params: { export: avery_params, organization_id: organization.to_param }
             end.to change(Export, :count).by 1
             export = Export.last
             expect(response).to redirect_to organization_export_path(organization_id: organization.to_param, id: export.id, avery_redirect: true)
@@ -244,7 +246,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
             it "makes the avery export" do
               expect(bike_sticker.claimed?).to be_truthy
               expect do
-                post :create, export: avery_params, organization_id: organization.to_param
+                post :create, params: { export: avery_params, organization_id: organization.to_param }
               end.to_not change(Export, :count)
               expect(flash[:error]).to match(/sticker/)
             end

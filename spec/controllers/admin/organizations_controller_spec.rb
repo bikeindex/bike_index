@@ -13,7 +13,7 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
     context "search" do
       let!(:organization) { FactoryBot.create(:organization, name: "Cool Bikes") }
       it "renders, finds organization" do
-        get :index, search_query: "cool"
+        get :index, params: { search_query: "cool" }
         expect(response.status).to eq 200
         expect(response).to render_template(:index)
         expect(assigns(:organizations)).to eq([organization])
@@ -23,13 +23,13 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
 
   describe "show" do
     it "renders" do
-      get :show, id: organization.to_param
+      get :show, params: { id: organization.to_param }
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
     end
     context "unknown organization" do
       it "redirects" do
-        get :show, id: "d89safdf"
+        get :show, params: { id: "d89safdf" }
         expect(flash[:error]).to be_present
         expect(response).to redirect_to(:admin_organizations)
       end
@@ -38,7 +38,7 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
 
   describe "edit" do
     it "renders" do
-      get :edit, id: organization.to_param
+      get :edit, params: { id: organization.to_param }
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)
     end
@@ -61,7 +61,7 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
     context "privileged kinds" do
       Organization.admin_required_kinds.each do |kind|
         it "prevents creating privileged #{kind}" do
-          post :create, organization: create_attributes.merge(kind: kind)
+          post :create, params: { organization: create_attributes.merge(kind: kind) }
           expect(Organization.count).to eq(1)
           organization = Organization.last
           expect(organization.kind).to eq(kind)
@@ -125,7 +125,7 @@ RSpec.describe Admin::OrganizationsController, type: :controller do
     it "updates the organization" do
       expect(location1).to be_present
       expect do
-        put :update, organization_id: organization.to_param, id: organization.to_param, organization: update_attributes
+        put :update, params: { organization_id: organization.to_param, id: organization.to_param, organization: update_attributes }
       end.to change(Location, :count).by 1
       organization.reload
       expect(organization.parent_organization).to eq parent_organization

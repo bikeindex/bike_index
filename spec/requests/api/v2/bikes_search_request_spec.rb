@@ -72,7 +72,7 @@ RSpec.describe "Bikes API V2", type: :request do
       opts = { proximity_square: 100, proximity_radius: "10" }
       target = Hashie::Mash.new(opts.merge(proximity: "ip"))
       expect_any_instance_of(BikeSearcher).to receive(:initialize).with(target)
-      get "/api/v2/bikes_search/count", opts, format: :json
+      get "/api/v2/bikes_search/count", params: opts, headers: { format: :json }
     end
   end
 

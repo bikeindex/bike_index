@@ -25,7 +25,7 @@ RSpec.describe Admin::MembershipsController, type: :request do
     let!(:organization) { FactoryBot.create(:organization) }
     it "creates" do
       expect(organization.memberships.count).to eq 0
-      post base_url, membership: { role: "member", organization_id: organization.id, invited_email: "new_email@stuff.com" }
+      post base_url, params: { membership: { role: "member", organization_id: organization.id, invited_email: "new_email@stuff.com" } }
       organization.reload
       expect(organization.memberships.count).to eq 1
       membership = Membership.last

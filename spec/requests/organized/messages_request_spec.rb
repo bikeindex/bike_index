@@ -9,7 +9,7 @@ RSpec.describe Organized::MessagesController, type: :request do
   describe "messages root" do
     let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
     it "renders" do
-      get base_url, json_headers
+      get base_url, params: json_headers
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
     end

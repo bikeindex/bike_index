@@ -31,12 +31,14 @@ RSpec.describe Admin::TheftAlertPlansController, type: :request do
         expect(TheftAlertPlan.count).to eq(0)
 
         post "/admin/theft_alert_plans",
-             theft_alert_plan: {
-               name: "New Plan",
-               amount_cents: 22_00,
-               views: 5_000,
-               duration_days: 7,
-             }
+             params: {
+                            theft_alert_plan: {
+                      name: "New Plan",
+                      amount_cents: 22_00,
+                      views: 5_000,
+                      duration_days: 7,
+                    }
+        }
 
         expect(TheftAlertPlan.count).to eq(1)
         new_plan = TheftAlertPlan.first
@@ -45,7 +47,7 @@ RSpec.describe Admin::TheftAlertPlansController, type: :request do
       end
 
       it "re-renders the edit template with a flash on update failure" do
-        post "/admin/theft_alert_plans", theft_alert_plan: { amount_cents: 22_00 }
+        post "/admin/theft_alert_plans", params: { theft_alert_plan: { amount_cents: 22_00 } }
         expect(response).to render_template(:new)
         expect(flash[:errors]).to include("Name can't be blank")
       end
@@ -68,7 +70,7 @@ RSpec.describe Admin::TheftAlertPlansController, type: :request do
         plan = FactoryBot.create(:theft_alert_plan, name: "Old Name")
 
         patch "/admin/theft_alert_plans/#{plan.id}",
-              theft_alert_plan: { name: "New Name" }
+              params: {theft_alert_plan: { name: "New Name" }}
 
         expect(response).to redirect_to(admin_theft_alert_plans_path)
         expect(flash[:errors]).to be_blank
@@ -79,7 +81,7 @@ RSpec.describe Admin::TheftAlertPlansController, type: :request do
         plan = FactoryBot.create(:theft_alert_plan)
 
         patch "/admin/theft_alert_plans/#{plan.id}",
-              theft_alert_plan: { name: "" }
+              params: {theft_alert_plan: { name: "" }}
 
         expect(response).to be_ok
         expect(response).to render_template(:edit)

@@ -30,7 +30,7 @@ RSpec.describe FeedbacksController, type: :controller do
         expect(user.name).to be_present
         set_current_user(user)
         expect do
-          post :create, feedback: feedback_attrs.except(:email, :name)
+          post :create, params: { feedback: feedback_attrs.except(:email, :name) }
         end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(1)
         expect(response).to redirect_to help_path
         expect(flash[:success]).to be_present
@@ -47,7 +47,7 @@ RSpec.describe FeedbacksController, type: :controller do
           set_current_user(user)
           expect(Feedback.count).to eq 0
           expect do
-            post :create, feedback: feedback_attrs.except(:email, :name)
+            post :create, params: { feedback: feedback_attrs.except(:email, :name) }
           end.to_not change(EmailFeedbackNotificationWorker.jobs, :count)
           expect(Feedback.count).to eq 0
         end
@@ -58,13 +58,15 @@ RSpec.describe FeedbacksController, type: :controller do
       it "creates a feedback" do
         request.env["HTTP_REFERER"] = "http://localhost:3000/partyyyyy"
         expect do
-          post :create, feedback: {
-                          name: "Cool School",
-                          feedback_type: "lead_for_school",
-                          email: "example@example.com",
-                          body: "ffff",
-                          package_size: "small",
-                        }
+          post :create, params: {
+                          feedback: {
+                                          name: "Cool School",
+                                          feedback_type: "lead_for_school",
+                                          email: "example@example.com",
+                                          body: "ffff",
+                                          package_size: "small",
+                                        }
+          }
         end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(1)
         expect(response).to redirect_to "http://localhost:3000/partyyyyy"
         expect(flash[:success]).to be_present
@@ -78,13 +80,15 @@ RSpec.describe FeedbacksController, type: :controller do
         it "creates a feedback" do
           request.env["HTTP_REFERER"] = "http://localhost:3000/cities_packages"
           expect do
-            post :create, feedback: {
-                            name: "Chicago",
-                            feedback_type: "lead_for_city",
-                            email: "example@example.com",
-                            phone_number: "891024123",
-                            package_size: "",
-                          }
+            post :create, params: {
+                            feedback: {
+                                            name: "Chicago",
+                                            feedback_type: "lead_for_city",
+                                            email: "example@example.com",
+                                            phone_number: "891024123",
+                                            package_size: "",
+                                          }
+            }
           end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(1)
           expect(response).to redirect_to "http://localhost:3000/cities_packages"
           expect(flash[:success]).to be_present
@@ -101,7 +105,7 @@ RSpec.describe FeedbacksController, type: :controller do
       it "does not create a feedback message" do
         request.env["HTTP_REFERER"] = for_schools_url
         expect do
-          post :create, feedback: feedback_attrs.merge(additional: "stuff")
+          post :create, params: { feedback: feedback_attrs.merge(additional: "stuff") }
         end.to_not change(EmailFeedbackNotificationWorker.jobs, :count)
         expect(flash[:error]).to match(/sign in/i)
       end
@@ -111,7 +115,7 @@ RSpec.describe FeedbacksController, type: :controller do
       context "no referrer" do
         it "does not create a feedback message" do
           expect do
-            post :create, feedback: feedback_attrs.merge(email: "")
+            post :create, params: { feedback: feedback_attrs.merge(email: "") }
           end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(0)
           expect(response).to render_template(:index)
           feedback = assigns(:feedback)
@@ -124,7 +128,7 @@ RSpec.describe FeedbacksController, type: :controller do
           set_current_user(user)
           request.env["HTTP_REFERER"] = for_schools_url
           expect do
-            post :create, feedback: feedback_attrs.merge(body: "")
+            post :create, params: { feedback: feedback_attrs.merge(body: "") }
           end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(0)
           expect(response).to render_template("landing_pages/for_schools")
           feedback = assigns(:feedback)

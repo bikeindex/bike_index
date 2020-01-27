@@ -13,7 +13,7 @@ RSpec.describe Organized::StickersController, type: :controller do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       describe "index" do
         it "redirects" do
-          get :index, organization_id: organization.to_param
+          get :index, params: { organization_id: organization.to_param }
           expect(response).to redirect_to root_path
         end
       end
@@ -30,7 +30,7 @@ RSpec.describe Organized::StickersController, type: :controller do
       let(:user) { FactoryBot.create(:admin) }
       describe "index" do
         it "renders" do
-          get :index, organization_id: organization.to_param
+          get :index, params: { organization_id: organization.to_param }
           expect(response).to render_template(:index)
           expect(assigns(:current_organization)).to eq organization
         end
@@ -46,7 +46,7 @@ RSpec.describe Organized::StickersController, type: :controller do
     context "logged in as organization member" do
       describe "index" do
         it "renders" do
-          get :index, organization_id: organization.to_param
+          get :index, params: { organization_id: organization.to_param }
           expect(response).to render_template(:index)
           expect(assigns(:current_organization)).to eq organization
           expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker.id])
@@ -56,7 +56,7 @@ RSpec.describe Organized::StickersController, type: :controller do
           let!(:bike_sticker_no_org) { FactoryBot.create(:bike_sticker, code: "part") }
           before { bike_sticker_claimed.claim(user, FactoryBot.create(:bike).id) }
           it "renders" do
-            get :index, organization_id: organization.to_param, claimedness: "unclaimed", query: "part"
+            get :index, params: { organization_id: organization.to_param, claimedness: "unclaimed", query: "part" }
             expect(response).to render_template(:index)
             expect(assigns(:current_organization)).to eq organization
             expect(assigns(:bike_stickers).pluck(:id)).to eq([bike_sticker.id])

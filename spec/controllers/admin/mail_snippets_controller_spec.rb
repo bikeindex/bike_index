@@ -19,14 +19,14 @@ RSpec.describe Admin::MailSnippetsController, type: :controller do
       let(:mail_snippet) { FactoryBot.create(:organization_mail_snippet) }
       it "redirects" do
         expect do
-          get :edit, id: mail_snippet.id
+          get :edit, params: { id: mail_snippet.id }
         end.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
     context "non organized" do
       let(:mail_snippet) { FactoryBot.create(:mail_snippet) }
       it "renders" do
-        get :edit, id: mail_snippet.id
+        get :edit, params: { id: mail_snippet.id }
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
       end

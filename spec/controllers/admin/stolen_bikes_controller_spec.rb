@@ -25,7 +25,7 @@ RSpec.describe Admin::StolenBikesController, type: :controller do
     let(:stolen_record) { bike.current_stolen_record }
     it "renders" do
       expect(stolen_record.recovery_link_token).to_not be_present
-      get :edit, id: bike.id
+      get :edit, params: { id: bike.id }
       stolen_record.reload
 
       expect(assigns(:current_stolen_record)).to be_truthy
@@ -41,7 +41,7 @@ RSpec.describe Admin::StolenBikesController, type: :controller do
         bike.reload
         expect(stolen_record.recovery_link_token).to_not be_present
         expect(bike.current_stolen_record).to eq stolen_record
-        get :edit, id: recovered_record.id, stolen_record_id: true
+        get :edit, params: { id: recovered_record.id, stolen_record_id: true }
         expect(assigns(:stolen_record)).to eq recovered_record
         expect(assigns(:current_stolen_record)).to be_falsey
         expect(response.code).to eq("200")
@@ -58,7 +58,7 @@ RSpec.describe Admin::StolenBikesController, type: :controller do
         expect_any_instance_of(SerialNormalizer).to receive(:save_segments)
         ownership = FactoryBot.create(:ownership)
         bike = ownership.bike
-        put :update, id: bike.id, bike: { serial_number: "stuff" }
+        put :update, params: { id: bike.id, bike: { serial_number: "stuff" } }
         expect(response).to redirect_to(:edit_admin_stolen_bike)
         expect(flash).to be_present
       end

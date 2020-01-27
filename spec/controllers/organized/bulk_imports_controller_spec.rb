@@ -10,7 +10,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
     context "not logged in" do
       let(:user) { nil }
       it "redirects" do
-        get :index, organization_id: organization.to_param
+        get :index, params: { organization_id: organization.to_param }
         expect(response).to redirect_to(organization_root_path)
       end
     end
@@ -19,19 +19,19 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       describe "index" do
         it "redirects" do
-          get :index, organization_id: organization.to_param
+          get :index, params: { organization_id: organization.to_param }
           expect(response).to redirect_to(organization_root_path)
         end
       end
       describe "new" do
         it "redirects" do
-          get :new, organization_id: organization.to_param
+          get :new, params: { organization_id: organization.to_param }
           expect(response).to redirect_to(organization_root_path)
         end
       end
       describe "show" do
         it "redirects" do
-          get :show, id: bulk_import.id, organization_id: organization.to_param
+          get :show, params: { id: bulk_import.id, organization_id: organization.to_param }
           expect(response).to redirect_to(organization_root_path)
         end
       end
@@ -41,7 +41,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
       let(:user) { FactoryBot.create(:admin) }
       describe "index" do
         it "renders" do
-          get :index, organization_id: organization.to_param
+          get :index, params: { organization_id: organization.to_param }
           expect(response.status).to eq(200)
           expect(response).to render_template :index
           expect(assigns(:current_organization)).to eq organization
@@ -50,7 +50,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
 
       describe "new" do
         it "renders" do
-          get :new, organization_id: organization.to_param
+          get :new, params: { organization_id: organization.to_param }
           expect(response.status).to eq(200)
           expect(response).to render_template :new
           expect(assigns(:current_organization)).to eq organization
@@ -67,19 +67,19 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
       let(:user) { FactoryBot.create(:organization_member, organization: organization) }
       describe "index" do
         it "redirects" do
-          get :index, organization_id: organization.to_param
+          get :index, params: { organization_id: organization.to_param }
           expect(response).to redirect_to(organization_root_path)
         end
       end
       describe "new" do
         it "redirects" do
-          get :new, organization_id: organization.to_param
+          get :new, params: { organization_id: organization.to_param }
           expect(response).to redirect_to(organization_root_path)
         end
       end
       describe "show" do
         it "redirects" do
-          get :show, id: bulk_import.id, organization_id: organization.to_param
+          get :show, params: { id: bulk_import.id, organization_id: organization.to_param }
           expect(response).to redirect_to(organization_root_path)
         end
       end
@@ -88,7 +88,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
       let(:user) { FactoryBot.create(:organization_admin, organization: organization) }
       describe "index" do
         it "renders" do
-          get :index, organization_id: organization.to_param
+          get :index, params: { organization_id: organization.to_param }
           expect(response.status).to eq(200)
           expect(response).to render_template :index
           expect(assigns(:current_organization)).to eq organization
@@ -97,7 +97,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
 
       describe "new" do
         it "renders" do
-          get :new, organization_id: organization.to_param
+          get :new, params: { organization_id: organization.to_param }
           expect(response.status).to eq(200)
           expect(response).to render_template :new
           expect(assigns(:current_organization)).to eq organization
@@ -106,7 +106,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
 
       describe "show" do
         it "redirects" do
-          get :show, id: bulk_import.id, organization_id: organization.to_param
+          get :show, params: { id: bulk_import.id, organization_id: organization.to_param }
           expect(response.status).to eq(200)
           expect(response).to render_template :show
         end
@@ -114,7 +114,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
           let(:bulk_import) { FactoryBot.create(:bulk_import) }
           it "redirects" do
             expect(bulk_import.organization).to_not eq organization
-            get :show, id: bulk_import.id, organization_id: organization.to_param
+            get :show, params: { id: bulk_import.id, organization_id: organization.to_param }
             expect(response).to redirect_to organization_bulk_imports_path(organization_id: organization.to_param)
             expect(flash[:error]).to be_present
           end
@@ -126,7 +126,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
           let(:bulk_import_params) { { file: file, organization_id: 392, no_notify: "1" } }
           it "creates" do
             expect do
-              post :create, organization_id: organization.to_param, bulk_import: bulk_import_params
+              post :create, params: { organization_id: organization.to_param, bulk_import: bulk_import_params }
             end.to change(BulkImport, :count).by 1
 
             bulk_import = BulkImport.last
@@ -144,7 +144,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
           context "invalid API token" do
             it "returns JSON message" do
               request.headers["Authorization"] = "a9s0dfsdf" # Rspec doesn't support headers key here. TODO: Rails 5 update
-              post :create, organization_id: organization.to_param, file: file
+              post :create, params: { organization_id: organization.to_param, file: file }
               expect(response.status).to eq(401)
               expect(json_result["error"]).to be_present
             end
@@ -153,7 +153,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
             it "returns JSON message" do
               expect(organization.auto_user).to be_present
               request.headers["Authorization"] = organization.access_token # Rspec doesn't support headers key here. TODO: Rails 5 update
-              post :create, organization_id: organization.to_param, file: file
+              post :create, params: { organization_id: organization.to_param, file: file }
               expect(response.status).to eq(201)
               expect(json_result["success"]).to be_present
 
@@ -172,7 +172,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
             it "returns JSON message" do
               request.headers["Authorization"] = "a9s0dfsdf" # Rspec doesn't support headers key here. TODO: Rails 5 update
               expect do
-                post :create, organization_id: "ascend", file: file
+                post :create, params: { organization_id: "ascend", file: file }
               end.to change(BulkImport, :count).by 0
               expect(response.status).to eq(401)
               expect(json_result["error"]).to be_present
@@ -181,7 +181,7 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
               it "returns JSON message" do
                 request.headers["Authorization"] = "XXXZZZ" # Rspec doesn't support headers key here. TODO: Rails 5 update
                 expect do
-                  post :create, organization_id: "ascend", file: file
+                  post :create, params: { organization_id: "ascend", file: file }
                 end.to change(BulkImport, :count).by 1
                 expect(response.status).to eq(201)
                 expect(json_result["success"]).to be_present

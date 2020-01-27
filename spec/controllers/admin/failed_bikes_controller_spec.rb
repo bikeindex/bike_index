@@ -20,7 +20,7 @@ RSpec.describe Admin::FailedBikesController, type: :controller do
       set_current_user(user)
       b_param = BParam.create(creator_id: user.id)
 
-      get :show, id: b_param.id
+      get :show, params: { id: b_param.id }
 
       expect(response).to be_ok
       expect(response.status).to eq(200)

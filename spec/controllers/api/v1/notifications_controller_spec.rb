@@ -7,7 +7,7 @@ RSpec.describe Api::V1::NotificationsController, type: :controller do
       options = { some_stuff: "things",
                  other_stuff: "Things",
                  bike_id: bike.id }
-      post :create, options
+      post :create, params: options
       expect(response.code).to eq("401")
     end
 
@@ -28,7 +28,7 @@ RSpec.describe Api::V1::NotificationsController, type: :controller do
         },
       }
       expect do
-        post :create, options, format: :json
+        post :create, params: options, session: { format: :json }
       end.to change(EmailStolenBikeAlertWorker.jobs, :size).by(1)
       expect(response.code).to eq("200")
       expect(CustomerContact.count).to eq(1)
@@ -57,7 +57,7 @@ RSpec.describe Api::V1::NotificationsController, type: :controller do
         },
       }
       expect do
-        post :create, options, format: :json
+        post :create, params: options, session: { format: :json }
       end.to change(EmailStolenBikeAlertWorker.jobs, :size).by(1)
       expect(response.code).to eq("200")
       expect(CustomerContact.count).to eq(1)

@@ -13,7 +13,7 @@ RSpec.describe SessionsController, type: :controller do
     context "signed in user" do
       include_context :logged_in_as_user
       it "redirects" do
-        get :new, return_to: "/bikes/12?contact_owner=true"
+        get :new, params: { return_to: "/bikes/12?contact_owner=true" }
         expect(response).to redirect_to "/bikes/12?contact_owner=true"
       end
       context "unconfirmed" do
@@ -21,7 +21,7 @@ RSpec.describe SessionsController, type: :controller do
         it "redirects to please_confirm_email" do
           user.reload
           expect(user.confirmed?).to be_falsey
-          get :new, return_to: "/bikes/12?contact_owner=true"
+          get :new, params: { return_to: "/bikes/12?contact_owner=true" }
           expect(response).to redirect_to please_confirm_email_users_path
           expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
         end
@@ -29,20 +29,20 @@ RSpec.describe SessionsController, type: :controller do
     end
     context "setting return_to" do
       it "actually sets it" do
-        get :new, return_to: "/bikes/12?contact_owner=true"
+        get :new, params: { return_to: "/bikes/12?contact_owner=true" }
         expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
         expect(response).to render_template("layouts/application")
       end
       context "with partner" do
         it "actually sets it, renders bikehub layout" do
-          get :new, return_to: "/bikes/12?contact_owner=true", partner: "bikehub"
+          get :new, params: { return_to: "/bikes/12?contact_owner=true", partner: "bikehub" }
           expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
           expect(response).to render_template("layouts/application_bikehub")
         end
         context "partner in session" do
           it "actually sets it, renders bikehub layout" do
             session[:partner] = "bikehub"
-            get :new, return_to: "/bikes/12?contact_owner=true"
+            get :new, params: { return_to: "/bikes/12?contact_owner=true" }
             # commented in PR#1435 expect(session[:partner]).to be_nil
             expect(response).to render_template("layouts/application_bikehub")
           end
@@ -61,7 +61,7 @@ RSpec.describe SessionsController, type: :controller do
     end
     context "unmatched magic_link" do
       it "renders" do
-        get :magic_link, token: SecurityTokenizer.new_token
+        get :magic_link, params: { token: SecurityTokenizer.new_token }
         expect(assigns(:incorrect_token)).to be_truthy
         expect(cookies.signed[:auth]).to be_nil
         expect(response.code).to eq "200"
@@ -73,7 +73,7 @@ RSpec.describe SessionsController, type: :controller do
       it "signs in and redirects" do
         user.update_auth_token("magic_link_token")
         request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
-        get :magic_link, token: user.magic_link_token
+        get :magic_link, params: { token: user.magic_link_token }
         expect(cookies.signed[:auth][1]).to eq(user.auth_token)
         expect(response).to redirect_to user_home_url
         user.reload
@@ -87,7 +87,7 @@ RSpec.describe SessionsController, type: :controller do
           user.update_auth_token("magic_link_token")
           user.reload
           expect(user.confirmed?).to be_falsey
-          get :magic_link, token: user.magic_link_token
+          get :magic_link, params: { token: user.magic_link_token }
           expect(cookies.signed[:auth][1]).to eq(user.auth_token)
           expect(response).to redirect_to user_home_url
           user.reload
@@ -100,7 +100,7 @@ RSpec.describe SessionsController, type: :controller do
         it "renders" do
           user.update_auth_token("magic_link_token", Time.current - 61.minutes)
           request.env["HTTP_CF_CONNECTING_IP"] = "66.66.66.66"
-          get :magic_link, token: user.magic_link_token
+          get :magic_link, params: { token: user.magic_link_token }
           expect(assigns(:incorrect_token)).to be_truthy
           expect(cookies.signed[:auth]).to be_nil
           expect(response.code).to eq "200"
@@ -117,7 +117,7 @@ RSpec.describe SessionsController, type: :controller do
       ActionMailer::Base.deliveries = []
       Sidekiq::Worker.clear_all
       Sidekiq::Testing.inline! do
-        post :create_magic_link, email: user.email
+        post :create_magic_link, params: { email: user.email }
         expect(ActionMailer::Base.deliveries.count).to eq 1
         mail = ActionMailer::Base.deliveries.last
         expect(mail.subject).to eq("Sign in to Bike Index")
@@ -130,7 +130,7 @@ RSpec.describe SessionsController, type: :controller do
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
         Sidekiq::Testing.inline! do
-          post :create_magic_link, email: "something@stuff.bike"
+          post :create_magic_link, params: { email: "something@stuff.bike" }
           expect(flash[:error]).to be_present
           expect(response).to redirect_to new_user_path
           expect(ActionMailer::Base.deliveries.count).to eq 0
@@ -158,7 +158,7 @@ RSpec.describe SessionsController, type: :controller do
     end
     context "partner=bikehub" do
       it "redirects to bikehub" do
-        get :destroy, partner: "bikehub"
+        get :destroy, params: { partner: "bikehub" }
         expect(cookies.signed[:auth]).to be_nil
         expect(session[:user_id]).to be_nil
         expect(response).to redirect_to "https://new.bikehub.com"
