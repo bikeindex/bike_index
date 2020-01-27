@@ -1,6 +1,5 @@
 module Organized
   class MessagesController < Organized::BaseController
-    rescue_from ActionController::RedirectBackError, with: :redirect_back # Gross. TODO: Rails 5 update
     before_action :ensure_permitted_message_kind!, only: %i[index create]
 
     def index
@@ -41,7 +40,10 @@ module Organized
       else
         flash[:error] = translation(:unable_to_send, errors: @organization_message.errors.full_messages.to_sentence)
       end
-      redirect_to :back
+
+      redirect_kind = @kinds || current_organization.message_kinds.first
+      fallback_path = organization_messages_path(organization_id: current_organization.to_param, kind: redirect_kind)
+      redirect_back(fallback_location: fallback_path)
     end
 
     helper_method :organization_messages
@@ -68,12 +70,6 @@ module Organized
     def permitted_parameters
       params.require(:organization_message).permit(:kind_slug, :body, :bike_id, :latitude, :longitude, :accuracy)
             .merge(sender_id: current_user.id, organization_id: current_organization.id)
-    end
-
-    def redirect_back
-      redirect_kind = @kinds || current_organization.message_kinds.first
-      redirect_to organization_messages_path(organization_id: current_organization.to_param, kind: redirect_kind)
-      return
     end
   end
 end
