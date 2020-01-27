@@ -1,10 +1,3 @@
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 11.5
--- Dumped by pg_dump version 11.5
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -4067,7 +4060,7 @@ ALTER TABLE ONLY public.ambassador_task_assignments
 
 SET search_path TO "$user", public;
 
-INSERT INTO schema_migrations (version) VALUES
+INSERT INTO "schema_migrations" (version) VALUES
 ('20120911182934'),
 ('20120911183639'),
 ('20120911184407'),
@@ -4469,14 +4462,10 @@ INSERT INTO schema_migrations (version) VALUES
 ('20191108195338'),
 ('20191117123105'),
 ('20191209160937'),
-('20191216054404');
+('20191216054404'),
+('20200101211426'),
+('20200107234030'),
+('20200108232256'),
+('20200109005657');
 
-
-INSERT INTO schema_migrations (version) VALUES ('20200101211426');
-
-INSERT INTO schema_migrations (version) VALUES ('20200107234030');
-
-INSERT INTO schema_migrations (version) VALUES ('20200108232256');
-
-INSERT INTO schema_migrations (version) VALUES ('20200109005657');
 
