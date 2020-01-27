@@ -15,7 +15,7 @@ RSpec.describe Admin::TweetsController, type: :controller do
 
   describe "edit" do
     it "renders" do
-      get :edit, id: subject.twitter_id
+      get :edit, params: { id: subject.twitter_id }
       expect(response).to be_success
       expect(response).to render_template(:edit)
     end
@@ -32,7 +32,7 @@ RSpec.describe Admin::TweetsController, type: :controller do
   describe "create" do
     xit "gets the tweet from twitter" do
       # expect do
-      post :create, tweet: { twitter_id: "839247587521679360" }
+      post :create, params: { tweet: { twitter_id: "839247587521679360" } }
       # end.to change(Tweet, :count).by(1)
       expect(response).to redirect_to edit_admin_tweet_url
       expect(flash[:success]).to be_present
@@ -45,7 +45,7 @@ RSpec.describe Admin::TweetsController, type: :controller do
       it "deletes the tweet, redirects to tweet index url with an appropriate flash" do
         tweet = FactoryBot.create(:tweet)
 
-        delete :destroy, id: tweet.id
+        delete :destroy, params: { id: tweet.id }
 
         expect(response).to redirect_to(admin_tweets_url)
         expect(flash[:error]).to be_blank
@@ -59,7 +59,7 @@ RSpec.describe Admin::TweetsController, type: :controller do
         allow(tweet).to receive(:destroy).and_return(false)
         allow(Tweet).to receive(:friendly_find).with(tweet.id.to_s).and_return(tweet)
 
-        delete :destroy, id: tweet.id
+        delete :destroy, params: { id: tweet.id }
 
         expect(response).to redirect_to(edit_admin_tweet_url)
         expect(flash[:info]).to be_blank
