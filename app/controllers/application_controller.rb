@@ -34,7 +34,7 @@ class ApplicationController < ActionController::Base
       headers["Access-Control-Allow-Methods"] = "POST, GET, OPTIONS"
       headers["Access-Control-Allow-Headers"] = "*"
       headers["Access-Control-Max-Age"] = "1728000"
-      render text: "", content_type: "text/plain"
+      render plain: ""
     end
   end
 

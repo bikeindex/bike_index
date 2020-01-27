@@ -3,7 +3,7 @@ class ManufacturersController < ApplicationController
     @manufacturers = Manufacturer.all
     respond_to do |format|
       format.html
-      format.csv { render text: @manufacturers.to_csv }
+      format.csv { render plain: @manufacturers.to_csv }
     end
   end
 
