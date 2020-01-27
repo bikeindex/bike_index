@@ -15,7 +15,7 @@ RSpec.describe Organized::MessagesController, type: :request do
     end
     context "json" do
       it "returns empty" do
-        get base_url, format: :json
+        get base_url, params: { format: :json }
         expect(response.status).to eq(200)
         expect(json_result).to eq("messages" => [])
         expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
@@ -41,7 +41,7 @@ RSpec.describe Organized::MessagesController, type: :request do
         it "renders json, no cors present" do
           expect(current_user.organizations.last.message_kinds).to be_present
 
-          get base_url, format: :json
+          get base_url, params: { format: :json }
 
           expect(response.status).to eq(200)
           messages = json_result["messages"]
