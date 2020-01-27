@@ -1237,8 +1237,7 @@ RSpec.describe BikesController, type: :controller do
         end
 
         it "marks the bike unhidden" do
-          bike.update_attribute :marked_user_hidden, "1"
-          bike.reload
+          bike.update(marked_user_hidden: "1")
           expect(bike.hidden).to be_truthy
           put :update, params: { id: bike.id, bike: { marked_user_unhidden: "true" } }
           expect(bike.reload.hidden).to be_falsey
