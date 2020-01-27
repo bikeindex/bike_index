@@ -1402,10 +1402,10 @@ RSpec.describe Bike, type: :model do
         # Acts as paranoid
         bike_organization.reload
         expect(bike_organization.deleted_at).to be_within(1.second).of Time.current
-        expect(bike.bike_organization_ids).to eq([])
+        expect(bike.reload.bike_organization_ids).to eq([])
+
         bike.bike_organization_ids = [organization.id]
-        bike.reload
-        expect(bike.bike_organization_ids).to eq([organization.id]) # despite uniqueness validation
+        expect(bike.reload.bike_organization_ids).to eq([organization.id]) # despite uniqueness validation
       end
     end
     context "invalid organization_id" do
@@ -1418,7 +1418,7 @@ RSpec.describe Bike, type: :model do
     context "different organization" do
       it "adds organization and removes existing" do
         bike.bike_organization_ids = "#{organization_2.id}, "
-        expect(bike.bike_organization_ids).to eq([organization_2.id])
+        expect(bike.reload.bike_organization_ids).to eq([organization_2.id])
       end
     end
   end
