@@ -166,19 +166,18 @@ RSpec.describe UsersController, type: :controller do
             session[:passive_organization_id] = "0"
             expect_any_instance_of(AfterUserCreateWorker).to receive(:send_welcoming_email)
             request.env["HTTP_ACCEPT_LANGUAGE"] = "nl,en;q=0.9"
+
             post :create, user: user_attributes, partner: "bikehub"
+
             expect(response).to redirect_to("https://new.bikehub.com/account?reauthenticate_bike_index=true")
             user = User.find_by_email("poo@pile.com")
-            user.perform_create_jobs # TODO: Rails 5 update - this is an after_commit issue
             user.reload
             expect(user.partner_sign_up).to eq "bikehub"
             expect(user.email).to eq "poo@pile.com"
             expect(User.from_auth(cookies.signed[:auth])).to eq user
             expect(user.last_login_at).to be_within(2.seconds).of Time.current
             expect(user.preferred_language).to eq "nl"
-            # TODO: Rails 5 update - this is an after_commit issue
-            # Because of the after_commit issue, we can't track that response redirects correctly :(
-            # expect(session[:passive_organization_id]).to eq membership.organization_id
+            expect(session[:passive_organization_id]).to eq membership.organization_id
           end
         end
         context "with partner session" do
