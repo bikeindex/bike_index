@@ -83,7 +83,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
       end
       it "creates a bike and does not duplicate" do
         expect do
-          post :create, params: bike_hash.as_json, headers: { "Content-Type" => "application/json" }
+          post :create, params: bike_hash.as_json.merge(format: :json)
         end.to change(Ownership, :count).by(1)
         expect(response.code).to eq("200")
         bike = Bike.where(serial_number: "SSOMESERIAL").first
