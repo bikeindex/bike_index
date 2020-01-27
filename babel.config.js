@@ -1,4 +1,4 @@
-module.exports = function(api) {
+module.exports = function (api) {
   var validEnv = ['development', 'test', 'production']
   var currentEnv = api.env()
   var isDevelopmentEnv = api.env('development')
@@ -17,6 +17,7 @@ module.exports = function(api) {
 
   return {
     presets: [
+      "@babel/react",
       isTestEnv && [
         '@babel/preset-env',
         {
@@ -29,10 +30,14 @@ module.exports = function(api) {
         '@babel/preset-env',
         {
           forceAllTransforms: true,
-          useBuiltIns: 'entry',
+          useBuiltIns: 'usage',
           corejs: 3,
-          modules: false,
-          exclude: ['transform-typeof-symbol']
+          modules: 'auto',
+          exclude: ['transform-typeof-symbol'],
+          targets: {
+            "node": "current",
+            "browsers": "> 1%"
+          }
         }
       ]
     ].filter(Boolean),
@@ -44,7 +49,8 @@ module.exports = function(api) {
       [
         '@babel/plugin-proposal-class-properties',
         {
-          loose: true
+          loose: true,
+          spec: true
         }
       ],
       [
