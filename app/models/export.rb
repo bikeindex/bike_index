@@ -105,7 +105,6 @@ class Export < ApplicationRecord
       self.options = options.merge(avery_export: true)
       self.attributes = { file_format: "xlsx", headers: AVERY_HEADERS }
     end
-    true # Legacy concerns, so excited for TODO: Rails 5 update
   end
 
   def bike_code_start=(val)
@@ -184,7 +183,6 @@ class Export < ApplicationRecord
     self.options = validated_options(options)
     errors.add :organization_id, :required if kind == "organization" && organization_id.blank?
     self.progress = calculated_progress
-    true # TODO: Rails 5 update
   end
 
   # Generally, use calculated_progress rather than progress directly for display

@@ -18,7 +18,6 @@ class Ownership < ApplicationRecord
 
   def set_calculated_attributes
     self.owner_email = EmailNormalizer.normalize(owner_email)
-    true # TODO: Rails 5 update
   end
 
   def first?; bike&.ownerships&.reorder(:created_at)&.first&.id == id end

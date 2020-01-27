@@ -41,7 +41,6 @@ class CreationState < ApplicationRecord
     if organization.parent_organization.present? && BikeOrganization.where(bike_id: bike_id, organization_id: organization.parent_organization_id).blank?
       BikeOrganization.create(bike_id: bike_id, organization_id: organization.parent_organization_id, can_edit_claimed: can_edit_claimed)
     end
-    true # Legacy concerns, so excited for TODO: Rails 5 update
   end
 
   def set_reflexive_association

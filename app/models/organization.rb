@@ -254,7 +254,6 @@ class Organization < ApplicationRecord
     set_auto_user
     set_ambassador_organization_defaults if ambassador?
     locations.each { |l| l.save unless l.shown == allowed_show }
-    true # TODO: Rails 5 update
   end
 
   def ensure_auto_user
