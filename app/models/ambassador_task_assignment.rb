@@ -40,7 +40,7 @@ class AmbassadorTaskAssignment < ApplicationRecord
   #
   # Return [AmbassadorTaskAssignment]
   def self.completed_assignments(filters: {}, sort: {})
-    filters = filters.each_pair.map { |col, val| [col.to_s.to_sym, sanitize(val)] }
+    filters = filters.each_pair.map { |col, val| [col.to_s.to_sym, sanitize_sql(val)] }
     sort_col, sort_dir = sort.to_a.first
     sort_col = (sort_col || "").to_sym
 
