@@ -32,7 +32,7 @@ module Organized
           end
         end
       end
-      redirect_to :back
+      redirect_back(fallback_location: root_url)
     end
 
     private

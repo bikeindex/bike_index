@@ -30,10 +30,10 @@ class Admin::BikesController < Admin::BaseController
         Bike.find(bid).update_attributes(manufacturer_id: manufacturer_id, manufacturer_other: nil)
       end
       flash[:success] = "Success. Bikes updated"
-      redirect_to :back and return
+      redirect_back(fallback_location: root_ur) and return
     end
     flash[:notice] = "Sorry, you need to add bikes and a manufacturer"
-    redirect_to :back
+    redirect_back(fallback_location: root_ur)
   end
 
   def duplicates
@@ -52,7 +52,7 @@ class Admin::BikesController < Admin::BaseController
     duplicate_bike_group.ignore = !duplicate_bike_group.ignore
     duplicate_bike_group.save
     flash[:success] = "Successfully marked #{duplicate_bike_group.segment} #{duplicate_bike_group.ignore ? "ignored" : "Un-ignored"}"
-    redirect_to :back
+    redirect_back(fallback_location: root_ur)
   end
 
   def destroy
