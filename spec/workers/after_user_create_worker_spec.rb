@@ -133,12 +133,12 @@ RSpec.describe AfterUserCreateWorker, type: :job do
       expect(user.organizations.count).to eq 2
     end
 
-    # We are processing the first organization inline so we can redirect users to the organization they belong to
+    # We are processing the first organization inline so we can redirect users
+    # to the organization they belong to
     it "non-async processes the first" do
       membership.reload
       expect(membership.claimed?).to be_falsey
       user.save
-      user.perform_create_jobs
       user.reload
       expect(membership.created_at < user.created_at).to be_truthy
       # This is called on create, so we just test that things happen correctly here
