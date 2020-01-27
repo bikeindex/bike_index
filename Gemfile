@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 source "https://rubygems.org"
 
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 git_source(:gitlab) { |repo| "https://gitlab.com/#{repo}.git" }
 
-# If you bump the Ruby version, make sure to update the Vagrantfile appropriately
+# Update Vagrantfile and CircleCI config if Ruby version is bumped
 ruby "2.5.5"
 gem "rails", "4.2.11"
 
