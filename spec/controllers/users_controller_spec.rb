@@ -164,7 +164,7 @@ RSpec.describe UsersController, type: :controller do
 
             expect(response).to redirect_to("https://new.bikehub.com/account?reauthenticate_bike_index=true")
             user = User.find_by_email("poo@pile.com")
-            expect(EmailWelcomeWorker).to have_received(:perform_async).with(user.id).twice
+            expect(EmailWelcomeWorker).to have_received(:perform_async).with(user.id)
             expect(user.partner_sign_up).to eq "bikehub"
             expect(user.email).to eq "poo@pile.com"
 
