@@ -17,7 +17,8 @@ class Export < ApplicationRecord
 
   before_validation :set_calculated_attributes
 
-  attr_accessor :timezone, :avery_export # permit assignment
+  attr_accessor :timezone # permit assignment
+  attr_reader :avery_export
 
   def self.default_headers; DEFAULT_HEADERS end
 
