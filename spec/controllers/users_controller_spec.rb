@@ -99,13 +99,10 @@ RSpec.describe UsersController, type: :controller do
         context "with locale passed" do
           it "creates a user with a preferred_language" do
             request.env["HTTP_CF_CONNECTING_IP"] = "99.99.99.9"
-            post :create, locale: "nl", user: user_attributes
-            # TODO: Rails 5 update - this is an after_commit issue
+
+            post :create, params: { locale: "nl", user: user_attributes }
+
             user = User.order(:created_at).last
-            user.perform_create_jobs
-            # Because of the after_commit issue, we can't track that response redirects correctly :(
-            # expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
-            # expect(session[:passive_organization_id]).to eq organization.id
             expect(User.from_auth(cookies.signed[:auth])).to eq user
             expect(user.partner_sign_up).to be_nil
             expect(user.partner_sign_up).to be_nil
@@ -137,13 +134,11 @@ RSpec.describe UsersController, type: :controller do
             expect do
               request.env["HTTP_CF_CONNECTING_IP"] = "99.99.99.9"
               post :create, user: user_attributes
-              # TODO: Rails 5 update - this is an after_commit issue
               user = User.where(email: email).first
-              user.perform_create_jobs
+              # TODO: Rails 5 update - this is an after_commit issue
               # Because of the after_commit issue, we can't track that response redirects correctly :(
               # expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
               # expect(session[:passive_organization_id]).to eq organization.id
-              user.reload
               expect(user.terms_of_service).to be_truthy
               expect(user.email).to eq email
               expect(User.from_auth(cookies.signed[:auth])).to eq user
@@ -164,16 +159,17 @@ RSpec.describe UsersController, type: :controller do
           let!(:membership) { FactoryBot.create(:membership, invited_email: "poo@pile.com") }
           it "creates a confirmed user, log in, and send welcome, language header" do
             session[:passive_organization_id] = "0"
-            expect_any_instance_of(AfterUserCreateWorker).to receive(:send_welcoming_email)
             request.env["HTTP_ACCEPT_LANGUAGE"] = "nl,en;q=0.9"
+            allow(EmailWelcomeWorker).to receive(:perform_async)
 
             post :create, user: user_attributes, partner: "bikehub"
 
             expect(response).to redirect_to("https://new.bikehub.com/account?reauthenticate_bike_index=true")
             user = User.find_by_email("poo@pile.com")
-            user.reload
+            expect(EmailWelcomeWorker).to have_received(:perform_async).with(user.id).twice
             expect(user.partner_sign_up).to eq "bikehub"
             expect(user.email).to eq "poo@pile.com"
+
             expect(User.from_auth(cookies.signed[:auth])).to eq user
             expect(user.last_login_at).to be_within(2.seconds).of Time.current
             expect(user.preferred_language).to eq "nl"
@@ -546,19 +542,22 @@ RSpec.describe UsersController, type: :controller do
       auth = user.auth_token
       user.email
       set_current_user(user)
-      post :update, id: user.username,
-                    user: {
-                      password_reset_token: user.password_reset_token,
-                      password: "new_pass",
-                      password_confirmation: "new_pass",
+      # TODO: Why are we POSTing to the update route
+      post :update, params: {
+                      id: user.username,
+                      user: {
+                        password_reset_token: user.password_reset_token,
+                        password: "new_pass",
+                        password_confirmation: "new_pass",
+                      },
                     }
       expect(response).to_not redirect_to(my_account_url)
       expect(flash[:error]).to be_present
       user.reload
       expect(user.authenticate("new_pass")).not_to be_truthy
       expect(user.auth_token).to eq(auth)
-      expect(user.password_reset_token).not_to eq("stuff")
-      expect(cookies.signed[:auth]).to_not be_present
+      expect(user.password_reset_token).to_not eq("stuff") # What does this line test?
+      expect(cookies.signed[:auth]).to be_blank # Why?
     end
 
     it "resets users auth if password changed, updates current session" do

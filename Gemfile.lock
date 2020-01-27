@@ -1,12 +1,4 @@
 GIT
-  remote: https://github.com/bikeindex/carrierwave_backgrounder.git
-  revision: 128b22a4c8de0db762ca5f005225c87a944c93e1
-  specs:
-    carrierwave_backgrounder (0.4.2)
-      carrierwave (>= 0.5, < 2.0)
-      mime-types (~> 2.99)
-
-GIT
   remote: https://github.com/bikeindex/swagger-ui_rails.git
   revision: 0377d8ecd0714901351a6bfc68491d255ad86093
   branch: bike_index_0.1.7
@@ -106,6 +98,8 @@ GEM
       json (>= 1.7)
       mime-types (>= 1.16)
       mimemagic (>= 0.3.0)
+    carrierwave_backgrounder (0.4.2)
+      carrierwave (~> 0.5)
     chartkick (3.3.0)
     chunky_png (1.3.11)
     coderay (1.1.2)
@@ -700,8 +694,8 @@ DEPENDENCIES
   bootstrap (= 4.0.0.alpha4)
   bullet
   bundler (>= 1.8.4)
-  carrierwave (= 0.11.2)
-  carrierwave_backgrounder!
+  carrierwave (~> 0.11.2)
+  carrierwave_backgrounder (~> 0.4.2)
   chartkick
   coderay
   coffee-rails
