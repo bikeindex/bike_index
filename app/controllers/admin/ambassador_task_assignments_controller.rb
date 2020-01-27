@@ -23,6 +23,7 @@ class Admin::AmbassadorTaskAssignmentsController < Admin::BaseController
   def filter_params
     params
       .slice(:search_organization_id, :search_ambassador_task_id, :search_ambassador_id)
+      .to_h
       .map { |k, v| [k[/(?<=search_).+/].to_sym, v] }
       .to_h
   end
