@@ -46,5 +46,5 @@
     .row
       .col-md-auto
         = submit_tag "Update chart", class: "btn btn-success mb-4"
-    = line_chart variable_admin_graphs_path(params.except(:controller, :action))
-
+    - query_params = params.except(:controller, :action).permit!.to_h
+    = line_chart variable_admin_graphs_path(query_params)
