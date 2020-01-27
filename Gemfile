@@ -36,7 +36,7 @@ gem "sidekiq-failures"
 gem "soulheart", "~> 0.3.0"
 
 gem "carrierwave"
-gem "carrierwave_backgrounder", github: "leoduquesnel/carrierwave_backgrounder"
+gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder"
 gem "dalli"
 gem "draper", require: false # NB: Draper is deprecated in this project
 gem "eventmachine"
@@ -85,7 +85,7 @@ gem "doorkeeper", "~> 3.1.0"
 gem "grape", "~> 0.19.1"
 gem "grape-active_model_serializers", "~> 1.4.0"
 gem "grape-swagger", "0.11"
-gem "swagger-ui_rails", github: "jmromer/swagger-ui_rails", branch: "bike_index_0.1.7"
+gem "swagger-ui_rails", github: "bikeindex/swagger-ui_rails", branch: "bike_index_0.1.7"
 gem "wine_bouncer"
 
 # Secure things
