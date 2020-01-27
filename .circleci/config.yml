@@ -225,7 +225,7 @@ jobs:
             set -x
             node --version
             bin/webpack
-            # bundle exec rails assets:precompile assets:clean --trace
+            bundle exec rails assets:precompile assets:clean --trace
 
       - type: cache-save
         name: "Assets: cache save"
