@@ -135,10 +135,8 @@ RSpec.describe UsersController, type: :controller do
               request.env["HTTP_CF_CONNECTING_IP"] = "99.99.99.9"
               post :create, params: { user: user_attributes }
               user = User.where(email: email).first
-              # TODO: Rails 5 update - this is an after_commit issue
-              # Because of the after_commit issue, we can't track that response redirects correctly :(
-              # expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
-              # expect(session[:passive_organization_id]).to eq organization.id
+              expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
+              expect(session[:passive_organization_id]).to eq organization.id
               expect(user.terms_of_service).to be_truthy
               expect(user.email).to eq email
               expect(User.from_auth(cookies.signed[:auth])).to eq user
