@@ -67,34 +67,34 @@ jobs:
           - ~/.cache/dockerize
 
 
-      - type: cache-restore
-        name: "Node: cache restore"
-        key: cache-{{ .Environment.CACHE_VERSION }}-node-13.x
+      # - type: cache-restore
+      #   name: "Node: cache restore"
+      #   key: cache-{{ .Environment.CACHE_VERSION }}-node-13.x
 
-      - run:
-          name: "Node: install"
-          command: |
-            node -v
-            node_version='13.x'
+      # - run:
+      #     name: "Node: install"
+      #     command: |
+      #       node -v
+      #       node_version='13.x'
 
-            if [[ ! -f ~/.cache/node/node-${node_version}/nodejs ]]; then
-              curl -sL https://deb.nodesource.com/setup_${node_version} | sudo -E bash -
-              sudo apt-get update
-              sudo apt-get install -y nodejs
+      #       if [[ ! -f ~/.cache/node/node-${node_version}/nodejs ]]; then
+      #         curl -sL https://deb.nodesource.com/setup_${node_version} | sudo -E bash -
+      #         sudo apt-get update
+      #         sudo apt-get install -y nodejs
 
-              rm -rf ~/.cache/node
-              mkdir -p ~/.cache/node/node-${node_version}
-              sudo cp /usr/bin/nodejs ~/.cache/node/node-${node_version}
-            fi
+      #         rm -rf ~/.cache/node
+      #         mkdir -p ~/.cache/node/node-${node_version}
+      #         sudo cp /usr/bin/nodejs ~/.cache/node/node-${node_version}
+      #       fi
 
-            sudo ln -sf ~/.cache/node/node-${node_version}/nodejs /usr/local/bin/node
-            node -v
+      #       sudo ln -sf ~/.cache/node/node-${node_version}/nodejs /usr/local/bin/node
+      #       node -v
 
-      - type: cache-save
-        name: "Node: cache save"
-        key: cache-{{ .Environment.CACHE_VERSION }}-node-13.x
-        paths:
-          - ~/.cache/node/node-13.x
+      # - type: cache-save
+      #   name: "Node: cache save"
+      #   key: cache-{{ .Environment.CACHE_VERSION }}-node-13.x
+      #   paths:
+      #     - ~/.cache/node/node-13.x
 
 
       - type: cache-restore
