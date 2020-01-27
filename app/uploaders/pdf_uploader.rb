@@ -1,8 +1,5 @@
 class PdfUploader < ApplicationUploader
   include ::CarrierWave::Backgrounder::Delay
-  include CarrierWave::MimeTypes
-
-  process :set_content_type
 
   def store_dir
     "#{base_store_dir}/#{model.id}"
