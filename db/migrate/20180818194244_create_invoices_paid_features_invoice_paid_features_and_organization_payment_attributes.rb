@@ -1,6 +1,6 @@
 # Doing all these together because they are all intermingled, and attributes are connected
 # Having one file makes it easier to track
-class CreateInvoicesPaidFeaturesInvoicePaidFeaturesAndOrganizationPaymentAttributes < ActiveRecord::Migration
+class CreateInvoicesPaidFeaturesInvoicePaidFeaturesAndOrganizationPaymentAttributes < ActiveRecord::Migration[4.2]
   def change
     create_table :invoices do |t|
       t.references :organization, index: true

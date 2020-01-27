@@ -1,4 +1,4 @@
-class SwitchUsersToJsonb < ActiveRecord::Migration
+class SwitchUsersToJsonb < ActiveRecord::Migration[4.2]
   def up
     # Pulled from https://stackoverflow.com/questions/28075479/upgrade-postgresql-json-column-to-jsonb
     change_column :users, :partner_data, "jsonb USING CAST(partner_data AS jsonb)"

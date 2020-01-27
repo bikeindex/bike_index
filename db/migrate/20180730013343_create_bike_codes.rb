@@ -1,4 +1,4 @@
-class CreateBikeCodes < ActiveRecord::Migration
+class CreateBikeCodes < ActiveRecord::Migration[4.2]
   def change
     create_table :bike_codes do |t|
       t.integer :kind, default: 0, null: 0

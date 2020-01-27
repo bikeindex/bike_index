@@ -1,4 +1,4 @@
-class CreateAmbassadorTasks < ActiveRecord::Migration
+class CreateAmbassadorTasks < ActiveRecord::Migration[4.2]
   def change
     create_table :ambassador_tasks do |t|
       t.string :description, null: false, default: ""

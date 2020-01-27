@@ -1,4 +1,4 @@
-class AddSenderAndClaimedAtToMemberships < ActiveRecord::Migration
+class AddSenderAndClaimedAtToMemberships < ActiveRecord::Migration[4.2]
   def change
     add_reference :memberships, :sender, index: true
     add_column :memberships, :claimed_at, :datetime

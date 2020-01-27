@@ -1,4 +1,4 @@
-class CreateTwitterAccounts < ActiveRecord::Migration
+class CreateTwitterAccounts < ActiveRecord::Migration[4.2]
   def change
     create_table :twitter_accounts do |t|
       t.boolean :active, default: false, null: false

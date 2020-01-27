@@ -1,4 +1,4 @@
-class AddHandlebarTypeToBikes < ActiveRecord::Migration
+class AddHandlebarTypeToBikes < ActiveRecord::Migration[4.2]
   def up
     add_column :bikes, :handlebar_type, :integer
 

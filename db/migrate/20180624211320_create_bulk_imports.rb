@@ -1,4 +1,4 @@
-class CreateBulkImports < ActiveRecord::Migration
+class CreateBulkImports < ActiveRecord::Migration[4.2]
   def change
     create_table :bulk_imports do |t|
       t.references :organization

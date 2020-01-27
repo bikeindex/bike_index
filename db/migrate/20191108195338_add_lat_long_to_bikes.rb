@@ -1,4 +1,4 @@
-class AddLatLongToBikes < ActiveRecord::Migration
+class AddLatLongToBikes < ActiveRecord::Migration[4.2]
   def change
     change_table :bikes do |t|
       t.string :city

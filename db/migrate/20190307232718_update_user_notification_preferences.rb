@@ -1,4 +1,4 @@
-class UpdateUserNotificationPreferences < ActiveRecord::Migration
+class UpdateUserNotificationPreferences < ActiveRecord::Migration[4.2]
   def change
     rename_column :users, :is_emailable, :notification_newsletters
     add_column :users, :notification_unstolen, :boolean, default: true
