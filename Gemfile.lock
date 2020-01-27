@@ -131,7 +131,7 @@ GEM
       unicode_utils (~> 1.4)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
-    crass (1.0.5)
+    crass (1.0.6)
     css_parser (1.7.1)
       addressable
     dalli (2.7.10)
@@ -270,7 +270,7 @@ GEM
     http_parser.rb (0.6.0)
     httparty (0.16.2)
       multi_xml (>= 0.5.2)
-    i18n (1.7.1)
+    i18n (1.8.2)
       concurrent-ruby (~> 1.0)
     i18n-country-translations (1.4.1)
       i18n (>= 0.9.3, < 2)
@@ -351,7 +351,7 @@ GEM
     mini_magick (4.9.5)
     mini_mime (1.0.2)
     mini_portile2 (2.4.0)
-    minitest (5.13.0)
+    minitest (5.14.0)
     monetize (1.9.2)
       money (~> 6.12)
     money (6.13.6)
@@ -771,6 +771,7 @@ DEPENDENCIES
   premailer-rails
   pry-byebug
   pry-rails
+  rack (= 2.0.8)
   rack-contrib
   rack-mini-profiler
   rack-throttle
