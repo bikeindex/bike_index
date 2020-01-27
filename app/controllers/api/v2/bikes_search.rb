@@ -102,10 +102,10 @@ module API
           use :stolen_search
         end
         get "/count", root: "bikes", each_serializer: BikeV2Serializer do
-          { "declared_params" => declared(params, include_missing: false) }
+          # { "declared_params" => declared(params, include_missing: false) }  # TODO: what is this line doing?
           params[:proximity] = params[:proximity] || "ip"
           set_proximity
-          BikeSearcher.new(params).find_bike_counts
+          BikeSearcher.new(params.except("format")).find_bike_counts
         end
 
         desc "Close serials", {
