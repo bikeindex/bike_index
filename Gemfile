@@ -102,7 +102,7 @@ gem "premailer-rails" # Inline styles for email
 gem "sprockets", "4.0.0"
 gem "sprockets-rails"
 gem "uglifier"
-gem "webpacker", "~> 4.x"
+gem "webpacker"
 
 # Show performance metrics
 gem "flamegraph", require: false
