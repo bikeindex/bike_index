@@ -47,7 +47,7 @@ class Admin::RecoveriesController < Admin::BaseController
 
   def recovery_display_status_searched
     return StolenRecord::RECOVERY_DISPLAY_STATUS_ENUM.values if params[:search_recovery_display_status] == "all"
-    # Legacy enum issue so excited for TODO: Rails 5 update
+    # TODO: Refactor to incorporate Rails 5 enum changes
     recovery_display_status_parameter = (params[:search_recovery_display_status] || "waiting_on_decision").to_sym
     StolenRecord::RECOVERY_DISPLAY_STATUS_ENUM[recovery_display_status_parameter.to_sym] || 1
   end
