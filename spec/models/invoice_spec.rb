@@ -103,22 +103,19 @@ RSpec.describe Invoice, type: :model do
     let(:paid_feature_one_time) { FactoryBot.create(:paid_feature_one_time, name: "one Time Feature") }
     it "adds the paid feature ids and updates amount_due_cents" do
       expect(invoice.amount_due_cents).to be_nil
-      invoice.update_attributes(paid_feature_ids: paid_feature.id)
-      invoice.reload
-      invoice.update_attributes(amount_due_cents: 0)
+
+      invoice.update_attributes(paid_feature_ids: paid_feature.id, amount_due_cents: 0)
       expect(invoice.paid_in_full?).to be_truthy # Because it was just overridden
       expect(invoice.active?).to be_truthy
       expect(invoice.paid_features.pluck(:id)).to eq([paid_feature.id])
+
       invoice.update_attributes(paid_feature_ids: " #{paid_feature.id}, #{paid_feature_one_time.id}, #{paid_feature_one_time.id}, xxxxx,#{paid_feature.id}")
-      invoice.reload
       expect(invoice.paid_features.pluck(:id)).to match_array([paid_feature.id, paid_feature_one_time.id] * 2)
+
       invoice.paid_feature_ids = [paid_feature_one_time.id, paid_feature2.id, "xxxxx"]
-      invoice.reload
       expect(invoice.paid_features.pluck(:id)).to match_array([paid_feature2.id, paid_feature_one_time.id])
-      # TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
-      organization.update_attributes(updated_at: Time.current)
-      # expect(UpdateAssociatedOrganizationsWorker.jobs.count).to eq 1 # TODO: Rails 5 update - after_commit, test enqueue
-      organization.reload
+
+      expect { organization.save }.to change { UpdateAssociatedOrganizationsWorker.jobs.count }.by(1)
       expect(organization.paid_feature_slugs).to eq([])
     end
   end
@@ -131,9 +128,9 @@ RSpec.describe Invoice, type: :model do
     let(:invoice2) { FactoryBot.build(:invoice, amount_due_cents: 0, subscription_start_at: Time.current - 1.day, organization: organization) }
     it "adds the paid features" do
       invoice1.update_attributes(paid_feature_ids: [paid_feature1.id])
-      # TODO: Rails 5 update
-      organization.update_attributes(updated_at: Time.current)
+      organization.save
       expect(organization.paid_feature_slugs).to eq(["bike_search"])
+
       invoice2.save
       invoice2.update_attributes(paid_feature_ids: [paid_feature2.id])
       organization.update_attributes(updated_at: Time.current)
