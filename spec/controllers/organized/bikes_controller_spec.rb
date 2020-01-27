@@ -185,10 +185,12 @@ RSpec.describe Organized::BikesController, type: :controller do
           let(:organization_child) { FactoryBot.create(:organization_child, parent_organization: organization) }
           let!(:partial_registration) { BParam.create(params: { bike: partial_reg_attrs.merge(creation_organization_id: organization_child.id) }, origin: "embed_partial") }
           it "renders" do
-            organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
+            organization.save
             organization.update_columns(is_paid: true, paid_feature_slugs: paid_feature_slugs) # Continue paid feature stubbing
             expect(partial_registration.organization).to eq organization_child
+
             get :incompletes, params: { organization_id: organization.to_param }
+
             expect(response.status).to eq(200)
             expect(response).to render_template :incompletes
             expect(assigns(:b_params).pluck(:id)).to eq([partial_registration.id])
