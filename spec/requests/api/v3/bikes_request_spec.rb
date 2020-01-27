@@ -828,7 +828,7 @@ RSpec.describe "Bikes API V3", type: :request do
       expect(bike.reload.public_images.count).to eq(0)
     end
 
-    it "errors on non whitelisted extensions" do
+    it "errors on non whitelisted file extensions" do
       bike = FactoryBot.create(:ownership, creator_id: user.id).bike
       file = File.open(File.join(Rails.root, "spec", "spec_helper.rb"))
       url = "/api/v3/bikes/#{bike.id}/image?access_token=#{token.token}"

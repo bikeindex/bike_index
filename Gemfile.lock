@@ -100,10 +100,12 @@ GEM
       activesupport (>= 3.0.0)
       uniform_notifier (~> 1.11)
     byebug (11.0.1)
-    carrierwave (1.3.1)
-      activemodel (>= 4.0.0)
-      activesupport (>= 4.0.0)
+    carrierwave (0.11.2)
+      activemodel (>= 3.2.0)
+      activesupport (>= 3.2.0)
+      json (>= 1.7)
       mime-types (>= 1.16)
+      mimemagic (>= 0.3.0)
     chartkick (3.3.0)
     chunky_png (1.3.11)
     coderay (1.1.2)
@@ -697,7 +699,7 @@ DEPENDENCIES
   bootstrap (= 4.0.0.alpha4)
   bullet
   bundler (>= 1.8.4)
-  carrierwave
+  carrierwave (= 0.11.2)
   carrierwave_backgrounder!
   chartkick
   coderay

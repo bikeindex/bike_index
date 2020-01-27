@@ -35,7 +35,7 @@ gem "sidekiq", "~> 5.1.0" # Background processing
 gem "sidekiq-failures"
 gem "soulheart", "~> 0.3.0"
 
-gem "carrierwave"
+gem "carrierwave", "0.11.2"
 gem "carrierwave_backgrounder", github: "bikeindex/carrierwave_backgrounder"
 gem "dalli"
 gem "draper", require: false # NB: Draper is deprecated in this project
