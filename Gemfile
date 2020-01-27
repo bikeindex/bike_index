@@ -150,9 +150,6 @@ group :development do
   gem "guard-rubocop", require: false
   gem "letter_opener"
   gem "rerun"
-  gem "spring"
-  gem "spring-commands-rspec"
-  gem "spring-commands-rubocop"
   gem "terminal-notifier"
 end
 
