@@ -36,7 +36,7 @@ gem "sidekiq-failures"
 gem "soulheart", "~> 0.3.0"
 
 gem "carrierwave"
-gem "carrierwave_backgrounder", github: "lardawge/carrierwave_backgrounder"
+gem "carrierwave_backgrounder", github: "leoduquesnel/carrierwave_backgrounder"
 gem "dalli"
 gem "draper", require: false # NB: Draper is deprecated in this project
 gem "eventmachine"
