@@ -20,8 +20,6 @@ RSpec.describe ExternalImageUrlStoreWorker, type: :job do
         public_image.reload
         expect(public_image.image).to be_present
       end
-      # TODO: Rails 5 update - after commit - jobs should be enqueued automatically, not require calling enqueue_after_commit_jobs
-      public_image.enqueue_after_commit_jobs
       expect(Sidekiq::Worker.jobs.count).to eq 1
       expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
     end

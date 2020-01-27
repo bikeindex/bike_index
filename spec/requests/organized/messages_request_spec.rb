@@ -39,7 +39,10 @@ RSpec.describe Organized::MessagesController, type: :request do
           }
         end
         it "renders json, no cors present" do
+          expect(current_user.organizations.last.message_kinds).to be_present
+
           get base_url, format: :json
+
           expect(response.status).to eq(200)
           messages = json_result["messages"]
           expect(messages.count).to eq 1
