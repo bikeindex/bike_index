@@ -9,7 +9,7 @@
           "node": "current"
         },
         "useBuiltIns": "usage",
-        "corejs": "2"
+        "corejs": "3"
       }
     ],
     "@babel/react"
