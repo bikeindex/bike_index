@@ -4,7 +4,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
   describe "index" do
     it "loads the page and have the correct headers" do
       FactoryBot.create(:bike)
-      get :index, format: :json
+      get :index, params: { format: :json }
       expect(response.code).to eq("200")
     end
   end
@@ -12,7 +12,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
   describe "stolen_ids" do
     it "returns correct code if no org" do
       c = FactoryBot.create(:color)
-      get :stolen_ids, format: :json
+      get :stolen_ids, params: { format: :json }
       expect(response.code).to eq("401")
     end
 
@@ -35,7 +35,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
   describe "show" do
     it "loads the page" do
       bike = FactoryBot.create(:bike)
-      get :show, params: { id: bike.id }, format: :json
+      get :show, params: { id: bike.id, format: :json }
       expect(response.code).to eq("200")
     end
   end
@@ -83,7 +83,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
       end
       it "creates a bike and does not duplicate" do
         expect do
-          post :create, params: bike_hash.as_json, session: { headers: { "Content-Type" => "application/json" } }
+          post :create, params: bike_hash.as_json, headers: { "Content-Type" => "application/json" }
         end.to change(Ownership, :count).by(1)
         expect(response.code).to eq("200")
         bike = Bike.where(serial_number: "SSOMESERIAL").first
