@@ -506,12 +506,10 @@ GEM
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
     rmagick (4.0.0)
-    rqrcode (1.1.2)
+    rqrcode (0.10.1)
       chunky_png (~> 1.0)
-      rqrcode_core (~> 0.1)
     rqrcode-rails3 (0.1.7)
       rqrcode (>= 0.4.2)
-    rqrcode_core (0.1.1)
     rspec (3.9.0)
       rspec-core (~> 3.9.0)
       rspec-expectations (~> 3.9.0)
@@ -781,7 +779,8 @@ DEPENDENCIES
   rerun
   responders (~> 2.0)
   rmagick
-  rqrcode-rails3
+  rqrcode (= 0.10.1)
+  rqrcode-rails3 (= 0.1.7)
   rspec (~> 3.4)
   rspec-rails (~> 3.8)
   rspec-sidekiq

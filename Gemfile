@@ -64,7 +64,8 @@ gem "pg_search"
 gem "rack-contrib"
 gem "redcarpet" # Something to do with swagger? Guess we needed another markdown parser
 gem "rmagick"
-gem "rqrcode-rails3"
+gem "rqrcode", "0.10.1"
+gem "rqrcode-rails3", "0.1.7"
 gem "sitemap_generator", "~> 6"
 gem "stripe", "~> 3.3.2"
 gem "unicorn" # Use Puma as the app server
