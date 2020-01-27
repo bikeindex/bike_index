@@ -30,8 +30,9 @@ RSpec.describe PublicImage, type: :model do
       expect(public_image.save).to eq(false)
       expect(public_image.id).to be_nil
       # Because updated versions of imagemagick respond with different errors
-      error_msg = public_image.errors.full_messages.to_s
-      expect(error_msg).to match(/(too large)|(width exceeds)/)
+      error_msg = public_image.errors.full_messages.to_sentence
+      expect(error_msg).to match(/(too large)|(width exceeds)|(failed to manipulate)/i)
+      large_image.close()
     end
   end
 
