@@ -40,12 +40,11 @@ RSpec.describe Admin::MembershipsController, type: :request do
         ActionMailer::Base.deliveries = []
         Sidekiq::Worker.clear_all
         expect do
-          post base_url, membership: { role: "member", organization_id: organization.id, invited_email: "somebody@stuff.com" }
+          post base_url, params: { membership: { role: "member", organization_id: organization.id, invited_email: "somebody@stuff.com" } }
         end.to change(Membership, :count).by 1
         expect(organization.memberships.count).to eq 1
         existing_user.reload
         membership = Membership.last
-        membership.enqueue_processing_worker #  TODO: Rails 5 update, after_commit
         expect(ProcessMembershipWorker.jobs.count).to eq 1
         ProcessMembershipWorker.drain
         organization.reload
