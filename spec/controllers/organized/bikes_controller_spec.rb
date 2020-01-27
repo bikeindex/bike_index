@@ -105,7 +105,7 @@ RSpec.describe Organized::BikesController, type: :controller do
           let!(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike: bike_with_sticker) }
           it "searches for bikes with stickers" do
             expect(bike_with_sticker.bike_sticker?).to be_truthy
-            get :index, { organization_id: organization.to_param, search_stickers: "none" }
+            get :index, params: { organization_id: organization.to_param, search_stickers: "none" }
             expect(response.status).to eq(200)
             expect(assigns(:current_organization)).to eq organization
             expect(assigns(:search_stickers)).to eq "none"

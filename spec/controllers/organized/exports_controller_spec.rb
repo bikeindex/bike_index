@@ -270,7 +270,7 @@ RSpec.describe Organized::ExportsController, type: :controller do
         expect(export.bike_codes_removed?).to be_falsey
         expect(bike_sticker.claimed?).to be_truthy
         expect(bike_sticker.bike).to eq bike
-        put :update, organization_id: organization.to_param, id: export.id, remove_bike_codes: true
+        put :update, params: { organization_id: organization.to_param, id: export.id, remove_bike_codes: true }
         export.reload
         bike_sticker.reload
         expect(export.assign_bike_codes?).to be_truthy

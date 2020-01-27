@@ -3,7 +3,6 @@ module Organized
     include SortableTable
     before_action :ensure_access_to_bike_stickers!, except: [:create] # Because this checks ensure_admin
     before_action :find_bike_sticker, only: [:edit, :update]
-    rescue_from ActionController::RedirectBackError, with: :redirect_back # Gross. TODO: Rails 5 update
 
     def index
       page = params[:page] || 1
@@ -35,7 +34,7 @@ module Organized
       redirect_back(
         fallback_location: edit_organization_sticker_path(
           organization_id: current_organization.to_param,
-          id: @bike_code.code,
+          id: @bike_sticker.code,
         ),
       )
     end
@@ -73,12 +72,6 @@ module Organized
       return true if current_organization.paid_for?("bike_stickers") || current_user.superuser?
       flash[:error] = translation(:org_does_not_have_access)
       redirect_to organization_bikes_path(organization_id: current_organization.to_param) and return
-    end
-
-    def redirect_back
-      redirect_back_path = @bike_sticker.present? ? edit_organization_sticker_path(organization_id: current_organization.to_param, id: @bike_sticker.code) : organization_stickers_path(organization_id: params[:organization_id])
-      redirect_to redirect_back_path
-      return
     end
   end
 end
