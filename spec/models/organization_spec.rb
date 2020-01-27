@@ -196,7 +196,6 @@ RSpec.describe Organization, type: :model do
       let(:location) { FactoryBot.create(:location) }
       let!(:organization) { location.organization }
       it "is the locations coordinates" do
-        organization.reload # Somehow doesn't pick this up - TODO: Rails 5 update
         expect(organization.map_focus_coordinates).to eq(latitude: 41.9282162, longitude: -87.6327552)
       end
     end
@@ -232,16 +231,17 @@ RSpec.describe Organization, type: :model do
       invoice.update_attributes(paid_feature_ids: [paid_feature.id])
       invoice.update_attributes(child_paid_feature_slugs_string: "csv_exports")
       expect(invoice.feature_slugs).to eq(["csv_exports"])
-      organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
-      # expect(UpdateAssociatedOrganizationsWorker.jobs.count).to eq 1 # TODO: Rails 5 update - after_commit, test enqueue
+
+      expect { organization.save }.to change { UpdateAssociatedOrganizationsWorker.jobs.count }.by(1)
+
       expect(organization.is_paid).to be_truthy
       expect(organization.paid_feature_slugs).to eq(["csv_exports"])
       expect(organization.paid_for?("csv_exports")).to be_truthy
-      organization_child.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
       expect(organization_child.is_paid).to be_falsey
+
       organization_child.update_attributes(parent_organization: organization)
-      organization_child.reload
-      organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
+      organization.save
+
       expect(organization.parent?).to be_truthy
       expect(organization_child.is_paid).to be_truthy
       expect(organization_child.current_invoices.first).to be_blank
@@ -259,8 +259,10 @@ RSpec.describe Organization, type: :model do
         expect(organization.paid_for?("messages")).to be_falsey
         expect(organization.paid_for?("geolocated_messages")).to be_falsey
         expect(user.send_unstolen_notifications?).to be_falsey
+
         invoice.update_attributes(paid_feature_ids: [paid_feature.id, paid_feature2.id])
-        organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
+        organization.save
+
         expect(organization.paid_for?("messages")).to be_truthy
         expect(organization.paid_for?("geolocated_messages")).to be_falsey
         expect(organization.paid_for?("abandoned_bike_messages")).to be_truthy
@@ -269,8 +271,8 @@ RSpec.describe Organization, type: :model do
         expect(organization.paid_for?("weird_type")).to be_falsey
         expect(organization.paid_for?(%w[geolocated abandoned_bike weird_type])).to be_falsey
         expect(Organization.bike_actions.pluck(:id)).to eq([organization.id])
-        user.reload
-        expect(user.send_unstolen_notifications?).to be_truthy
+
+        expect(user.reload.send_unstolen_notifications?).to be_truthy
       end
     end
     context "regional_bike_codes" do
