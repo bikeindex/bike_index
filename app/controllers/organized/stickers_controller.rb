@@ -32,7 +32,12 @@ module Organized
           end
         end
       end
-      redirect_back(fallback_location: root_url)
+      redirect_back(
+        fallback_location: edit_organization_sticker_path(
+          organization_id: current_organization.to_param,
+          id: @bike_code.code,
+        ),
+      )
     end
 
     private
