@@ -10,6 +10,7 @@ class FeedbacksController < ApplicationController
     @feedback = Feedback.new(permitted_parameters)
     @feedback.user_id = current_user.id if current_user.present?
     return true if block_the_spam(@feedback)
+
     if @feedback.save
       if @feedback.lead?
         flash[:success] = translation(:we_will_contact_you)
@@ -23,11 +24,13 @@ class FeedbacksController < ApplicationController
       end
     else
       @page_errors = @feedback.errors
+      render :index and return if request.referer.blank?
+
       re_path = Rails.application.routes.recognize_path(request.referer)
       template = "#{re_path[:controller]}/#{re_path[:action]}"
       @force_landing_page_render = re_path[:controller] == "landing_pages"
-      @recovery_displays = RecoveryDisplay.limit(5) if template == "welcome/index"
       @page_id = [re_path[:controller], re_path[:action]].join("_")
+      @recovery_displays = RecoveryDisplay.limit(5) if template == "welcome/index"
       render template: template
     end
   end

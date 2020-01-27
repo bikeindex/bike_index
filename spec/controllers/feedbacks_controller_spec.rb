@@ -59,14 +59,14 @@ RSpec.describe FeedbacksController, type: :controller do
         request.env["HTTP_REFERER"] = "http://localhost:3000/partyyyyy"
         expect do
           post :create, params: {
-                          feedback: {
-                                          name: "Cool School",
-                                          feedback_type: "lead_for_school",
-                                          email: "example@example.com",
-                                          body: "ffff",
-                                          package_size: "small",
-                                        }
-          }
+                     feedback: {
+                       name: "Cool School",
+                       feedback_type: "lead_for_school",
+                       email: "example@example.com",
+                       body: "ffff",
+                       package_size: "small",
+                     },
+                   }
         end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(1)
         expect(response).to redirect_to "http://localhost:3000/partyyyyy"
         expect(flash[:success]).to be_present
@@ -81,14 +81,14 @@ RSpec.describe FeedbacksController, type: :controller do
           request.env["HTTP_REFERER"] = "http://localhost:3000/cities_packages"
           expect do
             post :create, params: {
-                            feedback: {
-                                            name: "Chicago",
-                                            feedback_type: "lead_for_city",
-                                            email: "example@example.com",
-                                            phone_number: "891024123",
-                                            package_size: "",
-                                          }
-            }
+                       feedback: {
+                         name: "Chicago",
+                         feedback_type: "lead_for_city",
+                         email: "example@example.com",
+                         phone_number: "891024123",
+                         package_size: "",
+                       },
+                     }
           end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(1)
           expect(response).to redirect_to "http://localhost:3000/cities_packages"
           expect(flash[:success]).to be_present
@@ -117,6 +117,7 @@ RSpec.describe FeedbacksController, type: :controller do
           expect do
             post :create, params: { feedback: feedback_attrs.merge(email: "") }
           end.to change(EmailFeedbackNotificationWorker.jobs, :count).by(0)
+
           expect(response).to render_template(:index)
           feedback = assigns(:feedback)
           feedback_attrs.except(:email).each { |k, v| expect(feedback.send(k)).to eq(v) }
