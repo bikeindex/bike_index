@@ -11,14 +11,14 @@ RSpec.describe Api::V1::BikesController, type: :controller do
 
   describe "stolen_ids" do
     it "returns correct code if no org" do
-      c = FactoryBot.create(:color)
+      FactoryBot.create(:color)
       get :stolen_ids, params: { format: :json }
       expect(response.code).to eq("401")
     end
 
     it "should return an array of ids" do
-      bike = FactoryBot.create(:bike)
-      stole1 = FactoryBot.create(:stolen_record)
+      _bike = FactoryBot.create(:bike)
+      _stole1 = FactoryBot.create(:stolen_record)
       stole2 = FactoryBot.create(:stolen_record, approved: true)
       organization = FactoryBot.create(:organization)
       user = FactoryBot.create(:user)
@@ -85,6 +85,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect do
           post :create, params: bike_hash.as_json.merge(format: :json)
         end.to change(Ownership, :count).by(1)
+
         expect(response.code).to eq("200")
         bike = Bike.where(serial_number: "SSOMESERIAL").first
         expect(bike.manufacturer).to eq manufacturer
@@ -215,7 +216,6 @@ RSpec.describe Api::V1::BikesController, type: :controller do
 
       it "creates a photos even if one fails" do
         manufacturer = FactoryBot.create(:manufacturer)
-        f_count = Feedback.count
         bike_attrs = {
           serial_number: "69 photo-test",
           manufacturer_id: manufacturer.id,
@@ -333,7 +333,6 @@ RSpec.describe Api::V1::BikesController, type: :controller do
 
       it "creates a record even if the post is a string" do
         manufacturer = FactoryBot.create(:manufacturer)
-        f_count = Feedback.count
         bike_attrs = {
           serial_number: "69 string",
           manufacturer_id: manufacturer.id,
@@ -358,7 +357,6 @@ RSpec.describe Api::V1::BikesController, type: :controller do
 
       it "does not send an ownership email if it has no_email set" do
         manufacturer = FactoryBot.create(:manufacturer)
-        f_count = Feedback.count
         bike = {
           serial_number: "69 string",
           manufacturer_id: manufacturer.id,
