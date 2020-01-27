@@ -143,7 +143,8 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
           let(:user) { nil }
           context "invalid API token" do
             it "returns JSON message" do
-              request.headers["Authorization"] = "a9s0dfsdf" # Rspec doesn't support headers key here. TODO: Rails 5 update
+              # Rspec doesn't support headers key in controller specs
+              request.headers["Authorization"] = "a9s0dfsdf"
               post :create, params: { organization_id: organization.to_param, file: file }
               expect(response.status).to eq(401)
               expect(json_result["error"]).to be_present
@@ -152,7 +153,8 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
           context "valid" do
             it "returns JSON message" do
               expect(organization.auto_user).to be_present
-              request.headers["Authorization"] = organization.access_token # Rspec doesn't support headers key here. TODO: Rails 5 update
+              # Rspec doesn't support headers key in controller specs
+              request.headers["Authorization"] = organization.access_token
               post :create, params: { organization_id: organization.to_param, file: file }
               expect(response.status).to eq(201)
               expect(json_result["success"]).to be_present
@@ -170,7 +172,8 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
           context "ascend token" do
             before { allow(BulkImport).to receive(:ascend_api_token) { "XXXZZZ" } }
             it "returns JSON message" do
-              request.headers["Authorization"] = "a9s0dfsdf" # Rspec doesn't support headers key here. TODO: Rails 5 update
+              # Rspec doesn't support headers key in controller specs
+              request.headers["Authorization"] = "a9s0dfsdf"
               expect do
                 post :create, params: { organization_id: "ascend", file: file }
               end.to change(BulkImport, :count).by 0
@@ -179,7 +182,8 @@ RSpec.describe Organized::BulkImportsController, type: :controller do
             end
             context "valid ascend token" do
               it "returns JSON message" do
-                request.headers["Authorization"] = "XXXZZZ" # Rspec doesn't support headers key here. TODO: Rails 5 update
+                # Rspec doesn't support headers key in controller specs
+                request.headers["Authorization"] = "XXXZZZ"
                 expect do
                   post :create, params: { organization_id: "ascend", file: file }
                 end.to change(BulkImport, :count).by 1
