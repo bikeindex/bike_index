@@ -66,7 +66,7 @@ gem "redcarpet" # Something to do with swagger? Guess we needed another markdown
 gem "rmagick"
 gem "rqrcode-rails3"
 gem "sitemap_generator", "~> 6"
-gem "stripe"
+gem "stripe", "~> 3.3.2"
 gem "unicorn" # Use Puma as the app server
 gem "unicorn-worker-killer"
 

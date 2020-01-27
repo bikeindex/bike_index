@@ -622,7 +622,8 @@ GEM
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
     stackprof (0.2.14)
-    stripe (5.11.0)
+    stripe (3.3.2)
+      faraday (~> 0.9)
     temple (0.8.2)
     terminal-notifier (2.0.0)
     terminal-table (1.8.0)
@@ -810,7 +811,7 @@ DEPENDENCIES
   sprockets (= 4.0.0)
   sprockets-rails
   stackprof
-  stripe
+  stripe (~> 3.3.2)
   swagger-ui_rails!
   terminal-notifier
   thor
