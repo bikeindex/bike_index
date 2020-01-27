@@ -94,6 +94,8 @@ GEM
       nokogiri (~> 1.8, >= 1.8.2)
       rubyzip (~> 1.2, >= 1.2.1)
     bcrypt (3.1.13)
+    bootsnap (1.4.5)
+      msgpack (~> 1.0)
     bootstrap (4.0.0.alpha4)
       autoprefixer-rails (>= 6.0.3)
       sass (>= 3.4.19)
@@ -359,6 +361,7 @@ GEM
       monetize (~> 1.9.0)
       money (~> 6.13.2)
       railties (>= 3.0)
+    msgpack (1.3.1)
     multi_json (1.14.1)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
@@ -700,6 +703,7 @@ DEPENDENCIES
   api-pagination
   axlsx (~> 3.0.0.pre)
   bcrypt (~> 3.1.7)
+  bootsnap
   bootstrap (= 4.0.0.alpha4)
   bullet
   bundler (>= 1.8.4)

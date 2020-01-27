@@ -11,6 +11,7 @@ gem "rails", "5.2.1"
 
 gem "active_model_serializers", "~> 0.9.3"
 gem "bcrypt", "~> 3.1.7"
+gem "bootsnap"
 gem "jquery-rails"
 gem "pg", "~> 1.0"
 
