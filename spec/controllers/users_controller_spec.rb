@@ -257,7 +257,7 @@ RSpec.describe UsersController, type: :controller do
               it "redirects" do
                 expect(user.confirmed?).to be_falsey
                 set_current_user(user)
-                get :confirm, id: user.id, code: user.confirmation_token, partner: "bikehub"
+                get :confirm, params: { id: user.id, code: user.confirmation_token, partner: "bikehub" }
                 expect(User.from_auth(cookies.signed[:auth])).to eq(user)
                 expect(response).to redirect_to "https://new.bikehub.com/account?reauthenticate_bike_index=true"
                 expect(session[:partner]).to be_nil
@@ -278,7 +278,7 @@ RSpec.describe UsersController, type: :controller do
         include_context :logged_in_as_user
         it "redirects" do
           expect(user.confirmed?).to be_truthy
-          get :confirm, id: user.id, code: user.confirmation_token, partner: "bikehub"
+          get :confirm, params: { id: user.id, code: user.confirmation_token, partner: "bikehub" }
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(response).to redirect_to "https://new.bikehub.com/account?reauthenticate_bike_index=true"
           expect(session[:partner]).to be_nil
@@ -546,9 +546,9 @@ RSpec.describe UsersController, type: :controller do
     it "Doesn't update user if reset_pass token is more than an hour old" do
       user.update_auth_token("password_reset_token", (Time.current - 61.minutes).to_i)
       auth = user.auth_token
-      user.email
       set_current_user(user)
-      # TODO: Why are we POSTing to the update route
+      expect(cookies[:auth]).to be_present
+
       post :update, params: {
                       id: user.username,
                       user: {
@@ -557,13 +557,13 @@ RSpec.describe UsersController, type: :controller do
                         password_confirmation: "new_pass",
                       },
                     }
+
       expect(response).to_not redirect_to(my_account_url)
       expect(flash[:error]).to be_present
-      user.reload
       expect(user.authenticate("new_pass")).not_to be_truthy
       expect(user.auth_token).to eq(auth)
-      expect(user.password_reset_token).to_not eq("stuff") # What does this line test?
-      expect(cookies.signed[:auth]).to be_blank # Why?
+      expect(user.password_reset_token).not_to eq("stuff")
+      expect(response.cookies[:auth]).to eq(nil)
     end
 
     it "resets users auth if password changed, updates current session" do
