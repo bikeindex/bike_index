@@ -8,10 +8,12 @@
 %div{ style: "margin-top: 50px;" }
   = render partial: "/shared/period_select"
 
-- if current_organization.regional?
-  %h3.mt-4.uncap
+%h3.mt-4.uncap
+  - if current_organization.regional?
     Local registrations
-    = humanized_time_range(@time_range)
+  - else
+    Registrations
+  = humanized_time_range(@time_range)
 .full-screen-table.mt-4
   %table.table.table-striped.table-bordered.table-sm
     %tbody
