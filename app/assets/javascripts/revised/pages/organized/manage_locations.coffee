@@ -17,7 +17,6 @@ class BikeIndex.OrganizedManageLocations extends BikeIndex
       event.preventDefault()
       time = new Date().getTime()
       regexp = new RegExp($(this).data('id'), 'g')
-
       $('#fieldsetend').before($(this).data('fields').replace(regexp, time))
       setDefaultCountryAndName()
       loadFancySelects()

@@ -267,6 +267,7 @@ RSpec.describe Organization, type: :model do
         expect(organization.message_kinds).to eq(["abandoned_bike_messages"])
         expect(organization.paid_for?("unstolen_notifications")).to be_truthy
         expect(organization.paid_for?("weird_type")).to be_falsey
+        expect(organization.bike_actions?).to be_truthy
         expect(organization.paid_for?(%w[geolocated abandoned_bike weird_type])).to be_falsey
         expect(Organization.bike_actions.pluck(:id)).to eq([organization.id])
         user.reload

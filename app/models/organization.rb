@@ -194,7 +194,7 @@ class Organization < ApplicationRecord
   end
 
   def bike_actions?
-    message_kinds.any? || paid_for?("unstolen_notifications") || paid_for?("impound_bikes")
+    PaidFeature::BIKE_ACTIONS.detect { |f| paid_for?(f) }.present?
   end
 
   def law_enforcement_missing_verified_features?
