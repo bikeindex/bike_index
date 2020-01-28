@@ -1249,6 +1249,7 @@ en:
       your_full_address_is_required: Your full address is required by %{org_name}
       zipcode: Postal code
     organized_access_panel:
+      abandoned_bike_modal_title: Record %{bike_type} abandoned
       access_panel: Access Panel
       additional_message: Additional message
       address: 'Address:'
@@ -1291,6 +1292,7 @@ en:
       owner_email: Owner email
       owner_name: Owner name
       permission: Permission
+      record_abandoned: Record abandoned
       registered: 'Registered:'
       send: Send
       send_message: Send message
@@ -1304,8 +1306,6 @@ en:
         This user <strong>revoked</strong> permission to contact them prior to their
         bike being marked stolen.
       waiting_on_device_location: Waiting on device location
-      abandoned_bike_modal_title: Record %{bike_type} abandoned
-      record_abandoned: Record abandoned
       where_did_you_see_this_bike: >-
         Where did you see this %{bike_type}? If you're contacting about an ad you
         found online, include a link in the field below
@@ -2075,7 +2075,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -2101,7 +2101,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
