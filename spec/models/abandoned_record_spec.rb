@@ -44,7 +44,7 @@ RSpec.describe AbandonedRecord, type: :model do
         expect(bike.owner_email).to eq "stuff@stuff.com"
         abandoned_record.save
         expect(abandoned_record.valid?).to be_falsey
-        expect(abandoned_record.errors.messages.to_s).to match(/latitude and longitude required/)
+        expect(abandoned_record.errors.messages.to_s).to match(/address/)
       end
     end
     context "no address" do
@@ -68,10 +68,30 @@ RSpec.describe AbandonedRecord, type: :model do
           expect(abandoned_record.longitude).to eq longitude
           expect(abandoned_record.valid?).to be_truthy
           expect(abandoned_record.id).to be_present
-          expect(EmailOrganizationMessageWorker.jobs.count).to eq 1
         end
       end
     end
-  end
+    context "with only one or the other attribute (in case of geocoder fail)" do
+      let(:bike) { FactoryBot.create(:bike) }
+      let(:user) { FactoryBot.create(:user) }
+      let(:abandoned_record_address) { FactoryBot.build(:abandoned_record, bike: bike, user: user, latitude: nil, longitude: nil, address: "Some cool place") }
+      let(:abandoned_record_position) { FactoryBot.build(:abandoned_record, bike: bike, user: user, address: nil) }
+      it "still creates" do
+        allow(Geohelper).to receive(:reverse_geocode) { nil }
+        allow(Geohelper).to receive(:coordinates_for) { nil }
+        expect(abandoned_record_address.save).to be_truthy
+        expect(abandoned_record_position.save).to be_truthy
+        abandoned_record_address.reload
+        abandoned_record_position.reload
 
+        expect(abandoned_record_position.latitude).to be_present
+        expect(abandoned_record_position.longitude).to be_present
+        expect(abandoned_record_position.address).to be_blank
+
+        expect(abandoned_record_address.latitude).to be_blank
+        expect(abandoned_record_address.longitude).to be_blank
+        expect(abandoned_record_address.address).to be_present
+      end
+    end
+  end
 end

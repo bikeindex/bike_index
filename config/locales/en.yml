@@ -769,6 +769,8 @@ en:
           required: required
         impound_record:
           user_not_authorized: does not have permission to impound this bike
+        abandoned_record:
+          address_required: Requires the address (or location) of this bike
         manufacturer:
           cannot_match_a_color_name: cannot be the same as a color name
         organization_message:
@@ -2071,7 +2073,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2097,7 +2099,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March

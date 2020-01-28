@@ -9,9 +9,9 @@ class AbandonedRecord < ActiveRecord::Base
   # has_many :repeat_abandoned_records
 
   validates_presence_of :bike_id, :user_id
+  validate :location_present, on: :create
 
   before_validation :set_calculated_attributes
-  before_validation :validate_requirements_for_kind
   after_commit :update_associations
 
   scope :current, -> { where(retrieved_at: nil, impound_record_id: nil) }
@@ -30,12 +30,23 @@ class AbandonedRecord < ActiveRecord::Base
 
   def repeat_record?; initial_abandoned_record_id.present? end
 
-  def owner_known?
-    bike.present? && bike.created_at < (Time.current - 1.day)
+  def owner_known?; bike.present? && bike.created_at < (Time.current - 1.day) end
+
+  def send_message?; owner_known? end
+
+  def set_calculated_attributes
+    if latitude.present? && longitude.present?
+      self.address ||= Geohelper.reverse_geocode(latitude, longitude)
+    elsif address.present?
+      coordinates = Geohelper.coordinates_for(address)
+      self.attributes = coordinates if coordinates.present?
+    end
   end
 
-  def mark_retrieved
-    update_attributes(retrieved_at: Time.current) if current?
+  def location_present
+    # in case geocoder is failing (which happens sometimes), permit if either is present
+    return true if latitude.present? && longitude.present? || address.present?
+    self.errors.add(:address, :address_required)
   end
 
   def update_associations
