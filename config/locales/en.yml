@@ -759,6 +759,8 @@ en:
           has_many: Cannot delete record because dependent %{record} exist
           has_one: Cannot delete record because a dependent %{record} exists
       models:
+        abandoned_record:
+          address_required: Requires the address (or location) of this bike
         bike:
           not_found: not found
           suspended: suspended and can't be used
@@ -769,8 +771,6 @@ en:
           required: required
         impound_record:
           user_not_authorized: does not have permission to impound this bike
-        abandoned_record:
-          address_required: Requires the address (or location) of this bike
         manufacturer:
           cannot_match_a_color_name: cannot be the same as a color name
         organization_message:
@@ -1304,6 +1304,8 @@ en:
         This user <strong>revoked</strong> permission to contact them prior to their
         bike being marked stolen.
       waiting_on_device_location: Waiting on device location
+      abandoned_bike_modal_title: Record %{bike_type} abandoned
+      record_abandoned: Record abandoned
       where_did_you_see_this_bike: >-
         Where did you see this %{bike_type}? If you're contacting about an ad you
         found online, include a link in the field below

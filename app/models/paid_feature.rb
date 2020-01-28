@@ -14,7 +14,6 @@ class PaidFeature < ApplicationRecord
   ].freeze
   BIKE_ACTIONS = %w[
     abandoned_bikes
-    abandoned_bike_messages
     geolocated_messages
     impound_bikes
     unstolen_notifications

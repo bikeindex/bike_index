@@ -162,8 +162,13 @@ class Organization < ApplicationRecord
   def message_kinds # Matches organization_message kinds
     [
       paid_for?("geolocated_messages") ? "geolocated_messages" : nil,
+      # TODO: make this based on abandoned_bikes
       paid_for?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil,
     ].compact
+  end
+
+  def message_kinds_except_abandoned # abandoned_bike_messages are going to be assigned dynamically and have different behavior
+    message_kinds - ["abandoned_bike_messages"]
   end
 
   def additional_registration_fields
