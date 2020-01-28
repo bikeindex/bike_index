@@ -30,11 +30,13 @@ FactoryBot.define do
       transient do
         paid_feature_slugs { ["csv_export"] }
         paid_feature { FactoryBot.create(:paid_feature, amount_cents: 10_000, feature_slugs: Array(paid_feature_slugs)) }
-        after(:create) do |organization, evaluator|
-          invoice = FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization)
-          invoice.update_attributes(paid_feature_ids: [evaluator.paid_feature.id])
-          organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after commit doesn't run
-        end
+      end
+
+      after(:create) do |organization, evaluator|
+        invoice = FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization)
+        # Force this to be active, even without payments
+        invoice.update_attributes(paid_feature_ids: [evaluator.paid_feature.id], force_active: true)
+        organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after commit doesn't run
       end
 
       factory :organization_with_regional_bike_counts do

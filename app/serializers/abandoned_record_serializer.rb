@@ -1,11 +1,11 @@
 class AbandonedRecordSerializer < ActiveModel::Serializer
-  attributes :id, :created_at, :lat, :lng, :sender_id, :bike
+  attributes :id, :created_at, :lat, :lng, :user_id, :bike
 
   def created_at
     object.created_at.to_i
   end
 
-  def sender_id
+  def user_id
     object.user_id
   end
 

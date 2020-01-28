@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Organized::AbandonedRecordsController, type: :request do
-  include_context :organization_with_geolocated_messages
+  let(:organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: ["abandoned_bikes"]) }
   let(:base_url) { "/o/#{organization.to_param}/abandoned_records" }
 
   include_context :request_spec_logged_in_as_user
@@ -27,11 +27,10 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
         let(:target) do
           {
             id: abandoned_record1.id,
-            kind: "geolocated",
             created_at: abandoned_record1.created_at.to_i,
             lat: abandoned_record1.latitude,
             lng: abandoned_record1.longitude,
-            sender_id: abandoned_record1.sender_id,
+            user_id: abandoned_record1.user_id,
             bike: {
               id: bike.id,
               title: bike.title_string,

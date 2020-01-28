@@ -230,7 +230,6 @@ class Organization < ApplicationRecord
         .map { |name| name.strip.downcase.gsub(/\s/, "_") }
 
     return false unless features.present? && paid_feature_slugs.is_a?(Array)
-
     features.all? do |feature|
       paid_feature_slugs.include?(feature) ||
       (ambassador? && feature == "unstolen_notifications")

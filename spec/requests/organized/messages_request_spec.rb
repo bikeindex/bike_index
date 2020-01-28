@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe Organized::MessagesController, type: :request do
-  include_context :organization_with_geolocated_messages
+  let(:organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: %w[messages geolocated_messages]) }
   let(:base_url) { "/o/#{organization.to_param}/messages" }
 
   include_context :request_spec_logged_in_as_user
