@@ -2,19 +2,19 @@ require "rails_helper"
 
 RSpec.describe BikeCreator do
   context "legacy BikeCreatorBuilder methods"
-  # describe "building" do
-  #   it "returns a new bike object from the params with the b_param_id" do
-  #     bike = Bike.new
-  #     b_param = BParam.new
-  #     allow(b_param).to receive(:id).and_return(9)
-  #     allow(b_param).to receive(:creator_id).and_return(6)
-  #     allow(b_param).to receive(:params).and_return({ bike: { serial_number: "AAAA" } }.as_json)
-  #     bike = BikeCreator.new(b_param).new_bike
-  #     expect(bike.serial_number).to eq("AAAA")
-  #     expect(bike.updator_id).to eq(6)
-  #     expect(bike.b_param_id).to eq(9)
-  #   end
-  # end
+  describe "building" do
+    it "returns a new bike object from the params with the b_param_id" do
+      bike = Bike.new
+      b_param = BParam.new
+      allow(b_param).to receive(:id).and_return(9)
+      allow(b_param).to receive(:creator_id).and_return(6)
+      allow(b_param).to receive(:params).and_return({ bike: { serial_number: "AAAA" } }.as_json)
+      bike = BikeCreator.new(b_param).new_bike
+      expect(bike.serial_number).to eq("AAAA")
+      expect(bike.updator_id).to eq(6)
+      expect(bike.b_param_id).to eq(9)
+    end
+  end
 
   describe "add_front_wheel_size" do
     it "sets the front wheel equal to the rear wheel if it's present" do
@@ -39,16 +39,16 @@ RSpec.describe BikeCreator do
     end
   end
 
-  # describe "build_new" do
-  #   it "calls verified bike on new bike and return the bike" do
-  #     bike = Bike.new
-  #     creator = BikeCreatorBuilder.new
-  #     expect(creator).to receive(:new_bike).and_return(bike)
-  #     expect(creator).to receive(:verified_bike).and_return(bike)
-  #     allow(creator).to receive(:add_required_attributes).and_return(bike)
-  #     expect(creator.build_new).to eq(bike)
-  #   end
-  # end
+  describe "build_new" do
+    it "calls verified bike on new bike and return the bike" do
+      bike = Bike.new
+      creator = BikeCreator.new
+      expect(creator).to receive(:new_bike).and_return(bike)
+      expect_any_instance_of(BikeCreatorVerifier).to receive(:verify).and_return(bike)
+      allow(creator).to receive(:add_required_attributes).and_return(bike)
+      expect(creator.send(:build_bike)).to eq(bike)
+    end
+  end
 
   # describe "build" do
   #   it "returns the b_param bike if one exists" do
@@ -106,30 +106,11 @@ RSpec.describe BikeCreator do
     end
   end
 
-  describe "build_bike" do
-    it "calls creator_builder" do
-      b_param = BParam.new
-      expect_any_instance_of(BikeCreatorBuilder).to receive(:build).and_return(Bike.new)
-      expect(BikeCreator.new(b_param).build_bike).to be_truthy
-    end
-  end
-
-  describe "create_associations" do
-    it "calls creator_associator" do
-      b_param = BParam.new
-      bike = Bike.new
-      allow(b_param).to receive(:bike).and_return(bike)
-      expect_any_instance_of(BikeCreatorAssociator).to receive(:associate).and_return(bike)
-      BikeCreator.new(b_param).create_associations(bike)
-    end
-  end
-
   describe "clear_bike" do
     it "removes the existing bike and transfer the errors to a new active record object" do
       b_param = BParam.new
       bike = FactoryBot.create(:bike)
       bike.errors.add(:rando_error, "LOLZ")
-      expect_any_instance_of(BikeCreatorBuilder).to receive(:build).and_return(Bike.new)
       creator = BikeCreator.new(b_param).clear_bike(bike)
       expect(creator.errors.messages[:rando_error]).not_to be_nil
       expect(Bike.where(id: bike.id)).to be_empty
@@ -226,7 +207,7 @@ RSpec.describe BikeCreator do
         creator = BikeCreator.new(b_param)
         bike = Bike.new
         # allow(bike).to receive(:id).and_return(69)
-        expect(creator).to receive(:create_associations).and_return(bike)
+        expect_any_instance_of(BikeCreatorAssociator).to receive(:associate).and_return(bike)
         expect(creator).to receive(:validate_record).and_return(bike)
         new_bike = Bike.new(
           creation_organization_id: organization.id,
@@ -252,7 +233,7 @@ RSpec.describe BikeCreator do
         b_param = BParam.new
         creator = BikeCreator.new(b_param)
         bike = FactoryBot.create(:bike)
-        expect(creator).to receive(:create_associations).and_return(bike)
+        expect_any_instance_of(BikeCreatorAssociator).to receive(:associate)
         expect(creator).to receive(:validate_record).and_return(bike)
         expect do
           creator.save_bike(bike)

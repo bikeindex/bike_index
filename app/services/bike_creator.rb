@@ -35,14 +35,6 @@ class BikeCreator
     @b_param
   end
 
-  def build_bike
-    @bike = BikeCreatorBuilder.new(@b_param).build
-  end
-
-  def create_associations(bike)
-    @bike = BikeCreatorAssociator.new(@b_param).associate(bike)
-  end
-
   def clear_bike(bike)
     build_bike
     bike.errors.messages.each do |message|
@@ -67,7 +59,7 @@ class BikeCreator
   def save_bike(bike)
     bike.set_location_info(request_location: @location)
     bike.save
-    @bike = create_associations(bike)
+    @bike = BikeCreatorAssociator.new(@b_param).associate(bike)
     validate_record(@bike)
 
     if @bike.present? && @bike.id.present?
@@ -83,8 +75,20 @@ class BikeCreator
   end
 
   def new_bike
-    @bike = build_new_bike
-    @bike
+    bike_attrs =
+      @b_param
+        .bike
+        .map { |k, v| [k, v.presence] }
+        .to_h
+        .except(*BParam.skipped_bike_attrs)
+    bike = Bike.new(bike_attrs)
+    bike.b_param_id = @b_param.id
+    bike.b_param_id_token = @b_param.id_token
+    bike.creator_id = @b_param.creator_id
+    bike.updator_id = bike.creator_id
+    bike = BikeCreatorVerifier.new(@b_param, bike).verify
+    bike = add_required_attributes(bike)
+    @bike = bike
   end
 
   def create_bike
@@ -108,7 +112,17 @@ class BikeCreator
     }
   end
 
-  # These methods were from BikeCreatorBuilder, removed in PR#1477 - can be refactored down for sure
+  # These methods were from BikeCreatorBuilder, or were removed from being public in PR#1477
+  # should be refactored down for sure, but initial pass to make the surface area smaller
+
+  def build_bike
+    if @b_param&.created_bike&.present?
+      return @bike = @b_param.created_bike
+    end
+    @bike = new_bike
+    add_front_wheel_size(@bike)
+    @bike
+  end
 
   def add_front_wheel_size(bike)
     return true unless bike.rear_wheel_size_id.present?
@@ -119,16 +133,6 @@ class BikeCreator
 
   def add_required_attributes(bike)
     bike.propulsion_type ||= "foot-pedal"
-    bike
-  end
-
-  # previously BikeCreatorBuilder#new_bike
-  def creator_build_new_bike
-    bike = Bike.new(@b_param.bike.except(*BParam.skipped_bike_attrs))
-    bike.b_param_id = @b_param.id
-    bike.b_param_id_token = @b_param.id_token
-    bike.creator_id = @b_param.creator_id
-    bike.updator_id = bike.creator_id
     bike
   end
 end
