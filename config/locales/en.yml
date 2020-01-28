@@ -2075,7 +2075,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2101,7 +2101,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March
@@ -3679,6 +3679,7 @@ en:
       org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"
       org_impounded_bikes: "%{org_name} Impounded Bikes"
+      org_abandoned_bikes: "%{org_name} Abandoned Bikes"
       org_locations: "%{org_name} locations"
       org_profile: "%{org_name} profile"
       recoveries: Recoveries
@@ -4956,6 +4957,7 @@ en:
       discuss: Discuss
       exports: Exports
       geomessaging: GeoMessaging
+      abandoned_bikes: Abandoned Bikes
       getting_started: Getting started
       how_integration_works: how the integration works
       impounded_bikes: Impounded Bikes

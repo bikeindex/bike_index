@@ -1,0 +1,26 @@
+- # TODO: organized translation
+
+.organized-page-header
+  %h1 Abandoned Records
+
+.organized-messages
+  #map
+
+  %p#messagesCount.text-right.less-strong
+    %span.number 0
+    Matches
+
+  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border#messages_table
+    %thead.small-header.hidden-md-down
+      %th.map-cell
+      %th
+        Recorded
+        %small.convertTimezone
+      %th Bike
+      %th Sender
+    %tbody
+
+:javascript
+  window.pageInfo = #{@page_data.to_json}
+
+= javascript_pack_tag "application"

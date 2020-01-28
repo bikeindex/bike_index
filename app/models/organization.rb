@@ -35,6 +35,7 @@ class Organization < ApplicationRecord
   has_many :mail_snippets
   has_many :users, through: :memberships
   has_many :organization_messages
+  has_many :abandoned_records
   has_many :bike_organizations
   has_many :bikes, through: :bike_organizations
   has_many :b_params
