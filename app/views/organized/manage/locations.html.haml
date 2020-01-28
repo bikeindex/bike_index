@@ -13,7 +13,7 @@
           = t(".display_org_on_map_html", org_name: @organization.name, map_link: map_link)
 
     .col-sm-4
-      = revised_link_to_add_fields t(".add_location"), f, :locations, class_name: 'btn btn-secondary btn-lg'
+      = link_to_add_fields t(".add_location"), f, :locations, class_name: 'btn btn-secondary btn-lg'
 
   - default_country = @organization.locations.first && @organization.locations.first.country && @organization.locations.first.country.id || Country.united_states.id
   - default_name = @organization.name

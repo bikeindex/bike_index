@@ -17,9 +17,9 @@
         = f.text_field :city, required: true, placeholder: t(".city"), class: 'form-control'
         .row.countrystatezip
           .col-sm-4.location-country-select.fancy-select.unfancy.no-restore-on-backspace
-            = f.select(:country_id, Country.select_options, prompt: t(".choose_country"))
+            = f.select :country_id, Country.select_options, { prompt: t(".choose_country") }, { class: "form-control" }
           .col-sm-4.fancy-select.unfancy.no-restore-on-backspace
-            = f.collection_select(:state_id, State.all, :id, :name, prompt: t(".state"), include_blank: true )
+            = f.collection_select(:state_id, State.all, :id, :name, { prompt: t(".state") }, { include_blank: true, class: "form-control" } )
           .col-sm-4
             = f.text_field :zipcode, placeholder: t(".zipcode"), class: 'form-control'
 

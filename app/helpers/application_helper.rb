@@ -90,13 +90,15 @@ module ApplicationHelper
     (link_to link_text, link_path, class: class_name).html_safe
   end
 
-  def revised_link_to_add_fields(name, f, association, class_name: nil)
-    new_object = f.object.send(association).klass.new
+  def link_to_add_fields(name, f, association, class_name: nil, obj_attrs: {}, filename: nil)
+    new_object = f.object.send(association).klass.new(obj_attrs)
     id = new_object.object_id
+    filename ||= association.to_s.singularize + '_fields'
     fields = f.fields_for(association, new_object, child_index: id) do |builder|
-      render(association.to_s.singularize + "_fields", f: builder)
+      render(filename, f: builder)
     end
-    link_to(name, "#", class: "add_fields #{class_name}", data: { id: id, fields: fields.gsub("\n", "") })
+    link_to name, '#', class: "add_fields #{class_name}",
+                       data: { id: id, fields: fields.delete("\n") }
   end
 
   def revised_link_to_add_components(name, f, association)
