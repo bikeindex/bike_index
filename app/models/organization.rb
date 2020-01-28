@@ -120,6 +120,12 @@ class Organization < ApplicationRecord
         .where.not(impound_records: { id: nil })
   end
 
+  def abandoned_bikes
+    Bike.includes(:abandoned_records)
+        .where(abandoned_records: { retrieved_at: nil, impound_record_id: nil, organization_id: id })
+        .where.not(abandoned_records: { id: nil })
+  end
+
   def to_param; slug end
 
   def sent_invitation_count; memberships.count end
