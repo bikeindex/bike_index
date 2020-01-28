@@ -53,6 +53,15 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
     end
   end
 
+  describe "show" do
+    let(:abandoned_record) { FactoryBot.create(:abandoned_record, organization: organization) }
+    it "renders" do
+      get "#{base_url}/#{abandoned_record.to_param}"
+      expect(response.status).to eq(200)
+      expect(response).to render_template :show
+    end
+  end
+
   describe "create" do
     let(:abandoned_record_params) do
       {
@@ -65,6 +74,46 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
     end
 
     context "geolocated" do
+      it "creates" do
+        expect(organization.paid_for?("abandoned_bikes")).to be_truthy
+        expect do
+          post base_url, organization_id: organization.to_param, abandoned_record: abandoned_record_params
+          expect(response).to redirect_to organization_abandoned_records_path(organization_id: organization.to_param)
+          expect(flash[:success]).to be_present
+        end.to change(AbandonedRecord, :count).by(1)
+        abandoned_record = AbandonedRecord.last
+
+        expect(abandoned_record.user).to eq current_user
+        expect(abandoned_record.organization).to eq organization
+        expect(abandoned_record.bike).to eq bike
+        expect(abandoned_record.notes).to eq abandoned_record_params[:notes]
+        expect(abandoned_record.latitude).to eq abandoned_record_params[:latitude]
+        expect(abandoned_record.longitude).to eq abandoned_record_params[:longitude]
+        expect(abandoned_record.address).to eq default_location[:formatted_address]
+        expect(abandoned_record.accuracy).to eq 12
+      end
+
+      context "user without organization membership" do
+        let(:current_user) { FactoryBot.create(:user_confirmed) }
+        it "does not create" do
+          expect(organization.paid_for?("abandoned_bikes")).to be_truthy
+          expect do
+            post base_url, organization_id: organization.to_param, abandoned_record: abandoned_record_params
+            expect(response).to redirect_to user_root_url
+            expect(flash[:error]).to be_present
+          end.to_not change(AbandonedRecord, :count)
+        end
+      end
+
+      context "without a required param" do
+        it "fails and renders error" do
+          expect do
+            post base_url, organization_id: organization.to_param, abandoned_record: abandoned_record_params.except(:latitude)
+            expect(flash[:error]).to match(/address/i)
+          end.to_not change(AbandonedRecord, :count)
+        end
+      end
+
       context "organization without abandoned_bikes" do
         let(:paid_feature_slugs) { [] }
 
@@ -76,36 +125,10 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
           expect(organization.paid_for?("abandoned_bikes")).to be_falsey
           expect do
             post base_url, organization_id: organization.to_param, abandoned_record: abandoned_record_params
-            expect(response).to redirect_to organization_abandoned_records_path(organization_id: organization.to_param)
+            expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param)
             expect(flash[:error]).to be_present
           end.to_not change(AbandonedRecord, :count)
         end
-      end
-
-      context "organization with abandoned_bikes" do
-        context "user without organization membership" do
-          let(:current_user) { FactoryBot.create(:user_confirmed) }
-          it "does not create" do
-            expect(organization.paid_for?("abandoned_bikes")).to be_truthy
-            expect do
-              post base_url, organization_id: organization.to_param, abandoned_record: abandoned_record_params
-              expect(response).to redirect_to user_home_url
-              expect(flash[:error]).to be_present
-            end.to_not change(AbandonedRecord, :count)
-          end
-        end
-
-        # context "without a required param" do
-        #   it "fails and renders error" do
-        #     # Seth Fix for #1426
-        #     request.env["HTTP_REFERER"] = bike_url(bike)
-        #     expect do
-        #       post base_url, organization_id: organization.to_param, abandoned_record: abandoned_record_params.except(:latitude)
-        #       expect(response).to redirect_to bike_url(bike)
-        #       expect(flash[:error]).to match(/latitude/i)
-        #     end.to_not change(AbandonedRecord, :count)
-        #   end
-        # end
       end
     end
   end

@@ -1,6 +1,7 @@
 module Organized
   class AbandonedRecordsController < Organized::BaseController
     rescue_from ActionController::RedirectBackError, with: :redirect_back # Seth Fix for #1426
+    before_action :ensure_access_to_abandoned_bikes!, only: %i[index create]
 
     def index
       members =
