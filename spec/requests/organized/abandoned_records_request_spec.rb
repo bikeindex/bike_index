@@ -1,13 +1,17 @@
 require "rails_helper"
 
 RSpec.describe Organized::AbandonedRecordsController, type: :request do
-  let(:organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: ["abandoned_bikes"]) }
   let(:base_url) { "/o/#{organization.to_param}/abandoned_records" }
+
+  let(:organization) { FactoryBot.create(:organization_with_paid_features, paid_feature_slugs: paid_feature_slugs) }
+  let(:bike) { FactoryBot.create(:bike) }
+  let(:paid_feature_slugs) { ["abandoned_bikes"] }
 
   include_context :request_spec_logged_in_as_user
 
-  describe "abandoned_records root" do
-    let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+  let(:current_user) { FactoryBot.create(:organization_member, organization: organization) }
+
+  describe "index" do
     it "renders" do
       get base_url, json_headers
       expect(response.status).to eq(200)
@@ -22,8 +26,7 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
         expect(response.headers["Access-Control-Request-Method"]).not_to be_present
       end
       context "with a message" do
-        let!(:abandoned_record1) { FactoryBot.create(:abandoned_record_organized, organization: organization, created_at: Time.current - 1.hour) }
-        let(:bike) { abandoned_record1.bike }
+        let!(:abandoned_record1) { FactoryBot.create(:abandoned_record_organized, organization: organization, bike: bike, created_at: Time.current - 1.hour) }
         let(:target) do
           {
             id: abandoned_record1.id,
@@ -46,6 +49,63 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
           expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
           expect(response.headers["Access-Control-Request-Method"]).not_to be_present
         end
+      end
+    end
+  end
+
+  describe "create" do
+    let(:abandoned_record_params) do
+      {
+        notes: "some details about the abandoned thing",
+        bike_id: bike.to_param,
+        latitude: default_location[:latitude],
+        longitude: default_location[:longitude],
+        accuracy: 12,
+      }
+    end
+
+    context "geolocated" do
+      context "organization without abandoned_bikes" do
+        let(:paid_feature_slugs) { [] }
+
+        it "does not create" do
+          organization.reload
+          invoice = organization.current_invoices.first
+          expect(invoice.paid_in_full?).to be_truthy
+          expect(organization.is_paid).to be_truthy
+          expect(organization.paid_for?("abandoned_bikes")).to be_falsey
+          expect do
+            post base_url, organization_id: organization.to_param, abandoned_record: abandoned_record_params
+            expect(response).to redirect_to organization_abandoned_records_path(organization_id: organization.to_param)
+            expect(flash[:error]).to be_present
+          end.to_not change(AbandonedRecord, :count)
+        end
+      end
+
+      context "organization with abandoned_bikes" do
+        context "user without organization membership" do
+          let(:current_user) { FactoryBot.create(:user_confirmed) }
+          it "does not create" do
+            expect(organization.paid_for?("abandoned_bikes")).to be_truthy
+            expect do
+              post base_url, organization_id: organization.to_param, abandoned_record: abandoned_record_params
+              expect(response).to redirect_to user_home_url
+              expect(flash[:error]).to be_present
+            end.to_not change(AbandonedRecord, :count)
+          end
+        end
+
+        # context "without a required param" do
+        #   it "fails and renders error" do
+        #     # Seth Fix for #1426
+        #     request.env["HTTP_REFERER"] = bike_url(bike)
+        #     expect do
+        #       post base_url, organization_id: organization.to_param, abandoned_record: abandoned_record_params.except(:latitude)
+        #       expect(response).to redirect_to bike_url(bike)
+        #       expect(flash[:error]).to match(/latitude/i)
+        #     end.to_not change(AbandonedRecord, :count)
+        #   end
+        # end
       end
     end
   end
