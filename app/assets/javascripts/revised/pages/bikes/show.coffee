@@ -1,13 +1,13 @@
 # These two functions are required by getCurrentPosition
-window.fillInMessageLocation = (position) ->
-  $("#organizationMessageModal #organization_message_latitude").val(position.coords.latitude)
-  $("#organizationMessageModal #organization_message_longitude").val(position.coords.longitude)
-  $("#organizationMessageModal #organization_message_accuracy").val(position.coords.accuracy)
-  $("#submitMessageBtn").attr("disabled", false)
-  $("#waitingOnLocationText").slideUp()
-window.messageLocationError = (err) ->
+window.fillInModalLocation = (position) ->
+  $(".modalLocation-latitude").val(position.coords.latitude)
+  $(".modalLocation-longitude").val(position.coords.longitude)
+  $(".modalLocation-accuracy").val(position.coords.accuracy)
+  $(".modalLocation-submit-btn").attr("disabled", false)
+  $(".waitingOnLocationText").slideUp()
+window.modalLocationError = (err) ->
   # Not sure what the error will say. Might as well put it in the text to make diagnosing problems easier
-  $("#waitingOnLocationText").text(err)
+  $(".waitingOnLocationText").text(err)
 
 class BikeIndex.BikesShow extends BikeIndex
   constructor: ->
@@ -65,7 +65,11 @@ class BikeIndex.BikesShow extends BikeIndex
     $(".openMessageModal").on "click", (e) ->
       $("#organizationMessageModal").modal("show")
       $("#organizationMessageModal #kind").val($(e.target).attr("data-kind"))
-      navigator.geolocation.getCurrentPosition(window.fillInMessageLocation, window.messageLocationError, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 })
+      navigator.geolocation.getCurrentPosition(window.fillInModalLocation, window.modalLocationError, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 })
+
+    $(".openAbandonedModal").on "click", (e) ->
+      $("#organizationAbandonedModal").modal("show")
+      navigator.geolocation.getCurrentPosition(window.fillInModalLocation, window.modalLocationError, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 })
 
   initializeThumbnailSwitching: ->
     # Set up the template for injecting photos

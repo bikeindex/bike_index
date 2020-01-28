@@ -184,52 +184,80 @@
               %p
                 = support_link = link_to(t(".support_email"), "mailto:#{t('.support_email')}")
                 = t(".email_to_deal_with_this_html", support_link: support_link)
-  - if passive_organization.message_kinds.any? || passive_organization.paid_for?("impound_bikes")
-    .organized-actions-wrap
+
+  - if passive_organization.bike_actions?
+    - if passive_organization.paid_for?("abandoned_bikes")
       .row
-        .col-sm-6
-          - if passive_organization.paid_for?("impound_bikes")
-            - impound_record = @bike.impound_records.current.first
-            - if @bike.impounded?
-              %em
-                = t(".already_impounded", bike_type: @bike.type, organization_name: impound_record.organization.short_name)
-              - if impound_record.organization == passive_organization
-                %br
-                = t(".impounded_by")
+        .col-xs-12.text-center.mb-2
+          %a.btn.btn-warning.openAbandonedModal
+            - # TODO: organized translation
+            Mark abandoned
+
+    - if passive_organization.paid_for?("impound_bikes") || passive_organization.message_kinds_except_abandoned.any?
+      .organized-actions-wrap
+        .row
+          .col-sm-6
+            - if passive_organization.paid_for?("impound_bikes")
+              - impound_record = @bike.impound_records.current.first
+              - if @bike.impounded?
                 %em
-                  #{impound_record.user.display_name},
-                %span.convertTime
-                  = l impound_record.created_at, format: :convert_time
+                  = t(".already_impounded", bike_type: @bike.type, organization_name: impound_record.organization.short_name)
+                - if impound_record.organization == passive_organization
+                  %br
+                  = t(".impounded_by")
+                  %em
+                    #{impound_record.user.display_name},
+                  %span.convertTime
+                    = l impound_record.created_at, format: :convert_time
 
-            - else
-              = link_to t(".impound"), organization_bike_path(@bike.to_param, organization_id: passive_organization.to_param, bike: { impound: true }), method: "PUT", class: "btn btn-outline-warning", data: { confirm: t(".impound_are_you_sure", bike_type: @bike.type) }
+              - else
+                = link_to t(".impound"), organization_bike_path(@bike.to_param, organization_id: passive_organization.to_param, bike: { impound: true }), method: "PUT", class: "btn btn-outline-warning", data: { confirm: t(".impound_are_you_sure", bike_type: @bike.type) }
 
-        .col-sm-6.text-right
-          - if passive_organization.message_kinds.any?
-            %span
-              = t(".send")
-            - passive_organization.message_kinds.each do |kind|
-              %a.btn.btn-secondary.openMessageModal{ "data-kind" => kind }
-                - if kind == "geolocated_messages"
-                  = t(".geomessage")
-                - else
-                  = kind.humanize
+          .col-sm-6.text-right
+            - if passive_organization.message_kinds_except_abandoned.any?
+              %span
+                = t(".send")
+              - passive_organization.message_kinds_except_abandoned.each do |kind|
+                %a.btn.btn-secondary.openMessageModal{ "data-kind" => kind }
+                  - if kind == "geolocated_messages"
+                    = t(".geomessage")
+                  - else
+                    = kind.humanize
 
-- if passive_organization.message_kinds.any?
+- if passive_organization.paid_for?("abandoned_bikes")
   - modal_body = capture_haml do
     .modal-body
       = form_for OrganizationMessage.new(bike_id: @bike.id), url: organization_messages_path(organization_id: passive_organization) do |f|
         = f.hidden_field :bike_id
         = f.hidden_field :kind_slug
-        = f.hidden_field :latitude
-        = f.hidden_field :longitude
-        = f.hidden_field :accuracy
+        = f.hidden_field :latitude, class: "modalLocation-latitude"
+        = f.hidden_field :longitude, class: "modalLocation-longitude"
+        = f.hidden_field :accuracy, class: "modalLocation-accuracy"
         .form-group
           = f.label :body, t(".additional_message")
           = f.text_area :body, class: 'form-control'
         .modal-btn-footer
-          = submit_tag t(".send_message"), class: "btn btn-success", id: "submitMessageBtn", disabled: true
-          %span.less-strong#waitingOnLocationText
+          = submit_tag t(".record_abandoned"), class: "btn btn-success modalLocation-submit-btn", disabled: true
+          %span.less-strong.waitingOnLocationText
+            = t(".waiting_on_device_location")
+
+  = render partial: "shared/modal", locals: { title: t(".abandoned_bike_modal_title", bike_type: @bike.type), modal_body: modal_body, id: "organizationAbandonedModal" }
+
+- if passive_organization.message_kinds_except_abandoned.any?
+  - modal_body = capture_haml do
+    .modal-body
+      = form_for OrganizationMessage.new(bike_id: @bike.id), url: organization_messages_path(organization_id: passive_organization) do |f|
+        = f.hidden_field :bike_id
+        = f.hidden_field :kind_slug
+        = f.hidden_field :latitude, class: "modalLocation-latitude"
+        = f.hidden_field :longitude, class: "modalLocation-longitude"
+        = f.hidden_field :accuracy, class: "modalLocation-accuracy"
+        .form-group
+          = f.label :body, t(".additional_message")
+          = f.text_area :body, class: 'form-control'
+        .modal-btn-footer
+          = submit_tag t(".send_message"), class: "btn btn-success modalLocation-submit-btn", disabled: true
+          %span.less-strong.waitingOnLocationText
             = t(".waiting_on_device_location")
 
   = render partial: "shared/modal", locals: { title: t(".message_owner", bike_type: @bike.type), modal_body: modal_body, id: "organizationMessageModal" }

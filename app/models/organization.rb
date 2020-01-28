@@ -120,6 +120,12 @@ class Organization < ApplicationRecord
         .where.not(impound_records: { id: nil })
   end
 
+  def abandoned_bikes
+    Bike.includes(:abandoned_records)
+        .where(abandoned_records: { retrieved_at: nil, impound_record_id: nil, organization_id: id })
+        .where.not(abandoned_records: { id: nil })
+  end
+
   def to_param; slug end
 
   def sent_invitation_count; memberships.count end
@@ -156,8 +162,13 @@ class Organization < ApplicationRecord
   def message_kinds # Matches organization_message kinds
     [
       paid_for?("geolocated_messages") ? "geolocated_messages" : nil,
+      # TODO: make this based on abandoned_bikes
       paid_for?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil,
     ].compact
+  end
+
+  def message_kinds_except_abandoned # abandoned_bike_messages are going to be assigned dynamically and have different behavior
+    message_kinds - ["abandoned_bike_messages"]
   end
 
   def additional_registration_fields
