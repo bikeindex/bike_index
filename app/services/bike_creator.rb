@@ -35,10 +35,6 @@ class BikeCreator
     @b_param
   end
 
-  def build_new_bike
-    @bike = BikeCreatorBuilder.new(@b_param).build_new
-  end
-
   def build_bike
     @bike = BikeCreatorBuilder.new(@b_param).build
   end
@@ -110,5 +106,29 @@ class BikeCreator
       creator_id: @b_param.creator_id,
       organization_id: @bike.creation_organization_id,
     }
+  end
+
+  # These methods were from BikeCreatorBuilder, removed in PR#1477 - can be refactored down for sure
+
+  def add_front_wheel_size(bike)
+    return true unless bike.rear_wheel_size_id.present?
+    return true if bike.front_wheel_size_id.present?
+    bike.front_wheel_size_id = bike.rear_wheel_size_id
+    bike.front_tire_narrow = bike.rear_tire_narrow
+  end
+
+  def add_required_attributes(bike)
+    bike.propulsion_type ||= "foot-pedal"
+    bike
+  end
+
+  # previously BikeCreatorBuilder#new_bike
+  def creator_build_new_bike
+    bike = Bike.new(@b_param.bike.except(*BParam.skipped_bike_attrs))
+    bike.b_param_id = @b_param.id
+    bike.b_param_id_token = @b_param.id_token
+    bike.creator_id = @b_param.creator_id
+    bike.updator_id = bike.creator_id
+    bike
   end
 end
