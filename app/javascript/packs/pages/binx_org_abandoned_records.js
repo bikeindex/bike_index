@@ -129,7 +129,7 @@ export default class BinxAppOrgAbandonedRecords {
     if (user !== undefined) {
       user = user.name;
     } else {
-      ("unknown");
+      user = "unknown";
     }
     const bikeCellUrl = `/bikes/${record.bike.id}`;
     const bikeLink = `<a href="${bikeCellUrl}">${record.bike.title}</a>`;
@@ -143,15 +143,21 @@ export default class BinxAppOrgAbandonedRecords {
       record.id
     }"><td class="map-cell"><a>↑</a></td><td><a href="${showCellUrl}" class="convertTime">${
       record.created_at
-    }</a> <span class="extended-col-info small">by ${user}</span> <span class="extended-col-info"><br>${bikeLink}</span>
-      </td><td class="hidden-sm-cells">${bikeLink}</td><td class="hidden-sm-cells">${user}</td><td class="hidden-sm-cells">${user}</td><td>${impoundLink}</td>`;
+    }</a> <span class="extended-col-info small"> - <em>${
+      record.kind_humanized
+    }</em> - by ${user}</span> <span class="extended-col-info"><br>${bikeLink}</span>
+      </td><td class="hidden-sm-cells">${bikeLink}</td><td class="hidden-sm-cells"><em>${
+      record.kind_humanized
+    }</em></td><td class="hidden-sm-cells">${user}</td><td class="hidden-sm-cells">${impoundLink}</td>`;
   }
 
   abandonedRecordMapPopup(point) {
     let record = _.find(binxAppOrgAbandonedRecords.records, ["id", point.id]);
     let tableTop =
       '<table class="table table table-striped table-hover table-bordered table-sm"><tbody>';
-    tableTop += $("#records_table thead").clone();
+    tableTop += `<thead class="small-header hidden-md-down">${$(
+      ".list-table thead"
+    ).html()}</thead>`;
     return `${tableTop}${binxAppOrgAbandonedRecords.tableRowForRecord(
       record
     )}</tbody></table>`;

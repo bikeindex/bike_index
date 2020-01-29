@@ -38,11 +38,13 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
           {
             id: abandoned_record1.id,
             kind: "appears_forgotten",
+            kind_humanized: "Appears forgotten",
             created_at: abandoned_record1.created_at.to_i,
             lat: abandoned_record1.latitude,
             lng: abandoned_record1.longitude,
             user_id: abandoned_record1.user_id,
             impound_record_id: impound_record.id,
+            impound_record_at: impound_record.created_at.to_i,
             bike: {
               id: bike.id,
               title: bike.title_string,

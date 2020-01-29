@@ -1,5 +1,14 @@
 class AbandonedRecordSerializer < ActiveModel::Serializer
-  attributes :id, :kind, :created_at, :lat, :lng, :user_id, :bike, :impound_record_id, :impound_record_at
+  attributes :id,
+             :kind,
+             :kind_humanized,
+             :created_at,
+             :lat,
+             :lng,
+             :user_id,
+             :bike,
+             :impound_record_id,
+             :impound_record_at
 
   def created_at
     object.created_at.to_i
@@ -19,6 +28,10 @@ class AbandonedRecordSerializer < ActiveModel::Serializer
 
   def impound_record_at
     object.impound_record&.created_at&.to_i
+  end
+
+  def kind_humanized
+    kind.humanize
   end
 
   def bike

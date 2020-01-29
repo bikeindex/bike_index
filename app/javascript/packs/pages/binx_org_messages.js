@@ -140,8 +140,9 @@ export default class BinxAppOrgMessages {
     let message = _.find(binxAppOrgMessages.messages, ["id", point.id]);
     let tableTop =
       '<table class="table table table-striped table-hover table-bordered table-sm"><tbody>';
-    tableTop +=
-      '<tr><td class="map-cell"></td><td>Sent</td><td>Bike</td><td>Sender</td></tr>';
+    tableTop += `<thead class="small-header hidden-md-down">${$(
+      ".list-table thead"
+    ).html()}</thead>`;
     return `${tableTop}${binxAppOrgMessages.tableRowForMessage(
       message
     )}</tbody></table>`;
