@@ -1249,7 +1249,6 @@ en:
       your_full_address_is_required: Your full address is required by %{org_name}
       zipcode: Postal code
     organized_access_panel:
-      abandoned_bike_kind: Kind
       abandoned_bike_modal_title: Record %{bike_type} abandoned
       abandoned_bike_notes_html: Additional notes <small>not shown to user</small>
       access_panel: Access Panel
