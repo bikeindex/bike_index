@@ -158,7 +158,6 @@ export default class BinxAppOrgAbandonedRecords {
   }
 
   renderRecordsTable(records) {
-    log.debug("rendering table", records);
     let body_html = "";
     for (const record of Array.from(records)) {
       body_html += binxAppOrgAbandonedRecords.tableRowForRecord(record);
@@ -191,10 +190,8 @@ export default class BinxAppOrgAbandonedRecords {
   renderOrganizedRecords(records) {
     // Don't rerender the list if it's already rendered
     if (this.listRendered) {
-      log.debug("exiting, not rerendering");
       return true;
     }
-    log.debug("render records repeat");
     // Store the records on the window class so we have them
     this.records = records;
     // Render the table of records

@@ -9,7 +9,6 @@ RSpec.describe AbandonedRecord, type: :model do
       expect(abandoned_record.id).to be_present
       expect(abandoned_record.owner_known?).to be_falsey
       expect(abandoned_record.send_message?).to be_falsey
-      expect(bike.active_abandoned_records).to eq([abandoned_record])
       expect(bike.current_initial_abandoned_record).to eq abandoned_record
       expect(bike.abandoned_state?).to be_truthy
       expect(bike.state).to eq "abandoned"
