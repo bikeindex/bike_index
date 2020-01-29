@@ -5,7 +5,8 @@
     = stylesheet_link_tag 'revised', media: 'all'
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,400italic,300italic,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-    = javascript_include_tag 'application', skip_pipeline: true
+    = javascript_include_tag 'jquery2'
+    = javascript_pack_tag 'application'
     <!--[if IE]>$('body').prepend("<div id='old-browser-warning'><h4>Your browser is out of date!</h4><p>As a result, Bike Index will not function correctly. <a href=\"http://whatbrowser.com\">Learn more here</a>.</p></div>")<![endif]-->
 
   %body{ id: page_id, class: ('organized-body' if current_page_skeleton == 'organized_skeleton') }
