@@ -1,6 +1,7 @@
 import log from "../utils/log";
 import _ from "lodash";
 
+// BinxAppOrgAbandonedRecords is a better, more generalized version of this
 export default class BinxAppOrgMessages {
   constructor() {
     this.fetchedMessages = false;
@@ -19,7 +20,7 @@ export default class BinxAppOrgMessages {
   fetchMessages(opts) {
     // lazy parameter to query string
     let queryString = opts.map(i => `${i[0]}=${i[1]}`);
-    let url = `${window.pageInfo.message_root_path}?${queryString.join("&")}`;
+    let url = `${window.pageInfo.root_path}?${queryString.join("&")}`;
     // Using ajax here instead of fetch because we're relying on the cookies for auth for now
     $.ajax({
       type: "GET",
@@ -121,7 +122,7 @@ export default class BinxAppOrgMessages {
 
   tableRowForMessage(message) {
     let bikeCellUrl = `/bikes/${message.bike.id}`;
-    let sentCellUrl = `${window.pageInfo.message_root_path}/${message.id}`;
+    let sentCellUrl = `${window.pageInfo.root_path}/${message.id}`;
     let sender = window.pageInfo.members[message.sender_id];
     if (sender !== undefined) {
       sender = sender.name;

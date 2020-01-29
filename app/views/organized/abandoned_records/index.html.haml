@@ -3,14 +3,14 @@
 .organized-page-header
   %h1= t(".abandoned_records")
 
-.organized-messages
+.organized-records
   #map
 
-  %p#messagesCount.text-right.less-strong
+  %p#recordsCount.text-right.less-strong
     %span.number 0
     Matches
 
-  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border#messages_table
+  %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border#records_table
     %thead.small-header.hidden-md-down
       %th.map-cell
       %th
@@ -18,7 +18,7 @@
         %small.convertTimezone
       %th Kind
       %th Bike
-      %th Sender
+      %th Recorder
       %th Impounded
     %tbody
 

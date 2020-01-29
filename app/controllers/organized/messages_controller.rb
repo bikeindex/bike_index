@@ -16,7 +16,7 @@ module Organized
         map_center_lat: current_organization.map_focus_coordinates[:latitude],
         map_center_lng: current_organization.map_focus_coordinates[:longitude],
         members: members,
-        message_root_path: organization_messages_path(organization_id: current_organization.to_param),
+        root_path: organization_messages_path(organization_id: current_organization.to_param),
       }
 
       respond_to do |format|
