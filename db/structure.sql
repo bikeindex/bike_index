@@ -40,6 +40,7 @@ SET default_with_oids = false;
 
 CREATE TABLE public.abandoned_records (
     id integer NOT NULL,
+    kind integer DEFAULT 0,
     bike_id integer,
     user_id integer,
     organization_id integer,

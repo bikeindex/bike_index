@@ -6,7 +6,7 @@ export default class BinxAppOrgMessages {
     this.fetchedMessages = false;
     this.mapReady = false;
     this.messagesListRendered = false;
-    this.messagesMapRendered = false;
+    this.mapRendered = false;
     this.messages = [];
   }
 
@@ -45,8 +45,8 @@ export default class BinxAppOrgMessages {
 
   // this loops and calls itself again if we haven't finished rendering the map and the messages
   mapOrganizedMessages() {
-    // if we have already rendered the messagesMapRendered, then we're done!
-    if (binxAppOrgMessages.messagesMapRendered) {
+    // if we have already rendered the mapRendered, then we're done!
+    if (binxAppOrgMessages.mapRendered) {
       return true;
     }
     if (binxMapping.googleMapsLoaded()) {
@@ -107,7 +107,7 @@ export default class BinxAppOrgMessages {
 
   inititalizeMapMarkers() {
     binxMapping.addMarkers({ fitMap: true });
-    this.messagesMapRendered = true;
+    this.mapRendered = true;
     // Add a trigger to the map when the viewport changes (after it has finished moving)
     google.maps.event.addListener(binxMap, "idle", function() {
       // This is grabbing the markers in viewport and logging the ids for them.

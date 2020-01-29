@@ -285,10 +285,10 @@ class Bike < ApplicationRecord
 
   def impounded?; current_impound_record.present? end
 
-  def current_abandoned_record; current_abandoned_records.initial_record.first end
+  def current_initial_abandoned_record; current_abandoned_records.initial_record.first end
 
-  # Temporary fix because of existing #abandoned attr
-  def abandoned_state?; current_abandoned_record.present? end
+  # Temporary fix because of existing #abandoned attr, will be folded into enum
+  def abandoned_state?; current_abandoned_records.any? end
 
   # Small helper because we call this a lot
   def type; cycle_type && cycle_type_name.downcase end
@@ -818,7 +818,7 @@ class Bike < ApplicationRecord
   def calculated_state
     return "stolen" if current_stolen_record.present?
     return "impounded" if current_impound_record.present?
-    return "abandoned" if current_abandoned_record.present?
+    return "abandoned" if current_abandoned_records.any?
     "with_owner"
   end
 end

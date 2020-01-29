@@ -53,7 +53,7 @@ module Organized
     end
 
     def permitted_parameters
-      params.require(:abandoned_record).permit(:notes, :bike_id, :latitude, :longitude, :accuracy)
+      params.require(:abandoned_record).permit(:notes, :bike_id, :latitude, :longitude, :accuracy, :kind)
             .merge(user_id: current_user.id, organization_id: current_organization.id)
     end
 

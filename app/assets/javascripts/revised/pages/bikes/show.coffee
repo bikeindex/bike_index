@@ -5,6 +5,7 @@ window.fillInModalLocation = (position) ->
   $(".modalLocation-accuracy").val(position.coords.accuracy)
   $(".modalLocation-submit-btn").attr("disabled", false)
   $(".waitingOnLocationText").slideUp()
+
 window.modalLocationError = (err) ->
   # Not sure what the error will say. Might as well put it in the text to make diagnosing problems easier
   $(".waitingOnLocationText").text(err)
@@ -62,13 +63,11 @@ class BikeIndex.BikesShow extends BikeIndex
 
   showOrganizedAccessPanel: ->
     # If it's an organization message modal, clicking the button opens the modal and fills in the kind
-    $(".openMessageModal").on "click", (e) ->
-      $("#organizationMessageModal").modal("show")
-      $("#organizationMessageModal #kind").val($(e.target).attr("data-kind"))
-      navigator.geolocation.getCurrentPosition(window.fillInModalLocation, window.modalLocationError, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 })
-
-    $(".openAbandonedModal").on "click", (e) ->
-      $("#organizationAbandonedModal").modal("show")
+    $(".openOrganizedBikeActionModal").on "click", (e) ->
+      $target = $(e.target)
+      modal_id = $target.attr("data-modalid")
+      $("##{modal_id}").modal("show")
+      $("##{modal_id} .modalLocation-kind").val($target.attr("data-kind"))
       navigator.geolocation.getCurrentPosition(window.fillInModalLocation, window.modalLocationError, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 })
 
   initializeThumbnailSwitching: ->

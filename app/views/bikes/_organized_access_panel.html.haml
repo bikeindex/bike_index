@@ -187,11 +187,41 @@
 
   - if passive_organization.bike_actions?
     - if passive_organization.paid_for?("abandoned_bikes")
-      .row
-        .col-xs-12.text-center.mb-2
-          %a.btn.btn-warning.openAbandonedModal
-            - # TODO: organized translation
-            Mark abandoned
+      .row.mb-4.abandoned-record-wrap
+        - if @bike.abandoned_state?
+          .col-xl-9.ml-md-2
+            %h5
+              Existing Abandoned records for this
+              = @bike.type
+            %table.table.table-sm.table-bordered
+              %thead
+                %th= t(".recorded")
+                %th= t(".kind")
+                %th= t(".recorder")
+                %th
+                  %small Notes
+              %tbody
+                - @bike.current_abandoned_records.each do |abandoned_record|
+                  %tr
+                    %td
+                      %a.convertTime.preciseTime{ href: organization_abandoned_record_path(abandoned_record, organization_id: passive_organization.to_param) }
+                        = l abandoned_record.created_at, format: :convert_time
+                    %td
+                      %small
+                        = abandoned_record.kind.humanize
+                    %td
+                      = abandoned_record.user.display_name
+                    %td
+                      %small
+                        = abandoned_record.notes
+        .col-xl-3.text-center
+          %span= t(".record")
+          - existing_kind = @bike.current_initial_abandoned_record&.kind
+          - abandoned_kinds = existing_kind.present? ? [existing_kind] : AbandonedRecord.kinds
+          - abandoned_kinds.each do |kind|
+            %a.btn.btn-outline-warning.openOrganizedBikeActionModal{ "data-kind" => kind, "data-modalid" => "organizationAbandonedModal" }
+              = kind.humanize
+
 
     - if passive_organization.paid_for?("impound_bikes") || passive_organization.message_kinds_except_abandoned.any?
       .organized-actions-wrap
@@ -218,7 +248,7 @@
               %span
                 = t(".send")
               - passive_organization.message_kinds_except_abandoned.each do |kind|
-                %a.btn.btn-secondary.openMessageModal{ "data-kind" => kind }
+                %a.btn.btn-secondary.openOrganizedBikeActionModal{ "data-kind" => kind, "data-modalid" => "organizationMessageModal" }
                   - if kind == "geolocated_messages"
                     = t(".geomessage")
                   - else
@@ -227,15 +257,15 @@
 - if passive_organization.paid_for?("abandoned_bikes")
   - modal_body = capture_haml do
     .modal-body
-      = form_for OrganizationMessage.new(bike_id: @bike.id), url: organization_messages_path(organization_id: passive_organization) do |f|
+      = form_for AbandonedRecord.new(bike_id: @bike.id), url: organization_abandoned_records_path(organization_id: passive_organization) do |f|
         = f.hidden_field :bike_id
-        = f.hidden_field :kind_slug
+        = f.hidden_field :kind, class: "modalLocation-kind"
         = f.hidden_field :latitude, class: "modalLocation-latitude"
         = f.hidden_field :longitude, class: "modalLocation-longitude"
         = f.hidden_field :accuracy, class: "modalLocation-accuracy"
         .form-group
-          = f.label :body, t(".additional_message")
-          = f.text_area :body, class: 'form-control'
+          = f.label :notes, t(".abandoned_bike_notes_html")
+          = f.text_area :notes, class: 'form-control'
         .modal-btn-footer
           = submit_tag t(".record_abandoned"), class: "btn btn-success modalLocation-submit-btn", disabled: true
           %span.less-strong.waitingOnLocationText
@@ -248,7 +278,7 @@
     .modal-body
       = form_for OrganizationMessage.new(bike_id: @bike.id), url: organization_messages_path(organization_id: passive_organization) do |f|
         = f.hidden_field :bike_id
-        = f.hidden_field :kind_slug
+        = f.hidden_field :kind_slug, class: "modalLocation-kind"
         = f.hidden_field :latitude, class: "modalLocation-latitude"
         = f.hidden_field :longitude, class: "modalLocation-longitude"
         = f.hidden_field :accuracy, class: "modalLocation-accuracy"

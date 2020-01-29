@@ -1250,6 +1250,13 @@ en:
       zipcode: Postal code
     organized_access_panel:
       abandoned_bike_modal_title: Record %{bike_type} abandoned
+      abandoned_bike_notes_html: Additional notes <small>not shown to user</small>
+      abandoned_bike_kind: Kind
+      record: Record
+      recorded: Recorded
+      kind: Kind
+      recorder: Recorder
+      notes: Notes
       access_panel: Access Panel
       additional_message: Additional message
       address: 'Address:'
@@ -2083,7 +2090,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    - 
+    -
     - Jan
     - Feb
     - Mar
@@ -2109,7 +2116,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    - 
+    -
     - January
     - February
     - March

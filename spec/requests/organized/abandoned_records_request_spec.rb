@@ -25,15 +25,24 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
         expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
         expect(response.headers["Access-Control-Request-Method"]).not_to be_present
       end
-      context "with a message" do
-        let!(:abandoned_record1) { FactoryBot.create(:abandoned_record_organized, organization: organization, bike: bike, created_at: Time.current - 1.hour) }
+      context "with an impound_record" do
+        let(:impound_record) { FactoryBot.create(:impound_record) }
+        let!(:abandoned_record1) do
+          FactoryBot.create(:abandoned_record_organized,
+                            organization: organization,
+                            bike: bike,
+                            created_at: Time.current - 1.hour,
+                            impound_record: impound_record)
+        end
         let(:target) do
           {
             id: abandoned_record1.id,
+            kind: "appears_forgotten",
             created_at: abandoned_record1.created_at.to_i,
             lat: abandoned_record1.latitude,
             lng: abandoned_record1.longitude,
             user_id: abandoned_record1.user_id,
+            impound_record_id: impound_record.id,
             bike: {
               id: bike.id,
               title: bike.title_string,
@@ -65,6 +74,7 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
   describe "create" do
     let(:abandoned_record_params) do
       {
+        kind: "parked_incorrectly",
         notes: "some details about the abandoned thing",
         bike_id: bike.to_param,
         latitude: default_location[:latitude],

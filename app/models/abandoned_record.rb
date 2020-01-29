@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
 class AbandonedRecord < ActiveRecord::Base
+  KIND_ENUM = { appears_forgotten: 0, parked_incorrectly: 1 }.freeze
   belongs_to :bike
   belongs_to :user
   belongs_to :organization
-  belongs_to :impounded_record
+  belongs_to :impound_record
   belongs_to :initial_abandoned_record
   # has_many :repeat_abandoned_records
 
@@ -14,11 +15,15 @@ class AbandonedRecord < ActiveRecord::Base
   before_validation :set_calculated_attributes
   after_commit :update_associations
 
+  enum kind: KIND_ENUM
+
   scope :current, -> { where(retrieved_at: nil, impound_record_id: nil) }
   scope :initial_record, -> { where(initial_abandoned_record: nil) }
   scope :repeat_record, -> { where.not(initial_abandoned_record: nil) }
   scope :impounded, -> { where.not(impound_record_id: nil) }
   scope :retrieved, -> { where.not(retrieved_at: nil) }
+
+  def self.kinds; KIND_ENUM.keys.map(&:to_s) end
 
   def current?; !retrieved? && !impounded? end
 
