@@ -295,7 +295,7 @@ class Bike < ApplicationRecord
 
   def user_hidden; hidden && current_ownership&.user_hidden end
 
-  # Currently a stub - this will be turned into an enum in the future, removing #stolen?, #impounded?, etc
+  # Currently dynamic - this will be turned into an enum in the future, removing #stolen?, #impounded?, etc
   def state; calculated_state end
 
   def email_visible_for?(org)

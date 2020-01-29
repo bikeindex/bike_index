@@ -1249,14 +1249,9 @@ en:
       your_full_address_is_required: Your full address is required by %{org_name}
       zipcode: Postal code
     organized_access_panel:
+      abandoned_bike_kind: Kind
       abandoned_bike_modal_title: Record %{bike_type} abandoned
       abandoned_bike_notes_html: Additional notes <small>not shown to user</small>
-      abandoned_bike_kind: Kind
-      record: Record
-      recorded: Recorded
-      kind: Kind
-      recorder: Recorder
-      notes: Notes
       access_panel: Access Panel
       additional_message: Additional message
       address: 'Address:'
@@ -1276,6 +1271,7 @@ en:
       creator: Creator
       edit: Edit
       email_to_deal_with_this_html: Email %{support_link} to deal with this.
+      existing_abandoned_records: Existing abandoned records for this %{bike_type}
       geomessage: GeoMessage
       impound: Impound
       impound_are_you_sure: Are you sure you want to %{bike_type}?
@@ -1284,12 +1280,14 @@ en:
       is_not_registered_html: "<em>not</em> reged with %{org_name}"
       is_registered: reged with %{org_name}
       is_true: 'true'
+      kind: Kind
       link_sticker: Link Sticker
       link_url_for_online_sighting: Link url for online sighting
       mark_bike_recovered: Mark bike recovered
       message_owner: Message %{bike_type} owner
       missing_address: missing address
       missing_owner_name: missing user name
+      notes: Notes
       or_call_owner_html: "<em>Or call</em> <strong>Owner's phone number:</strong>"
       org_can_edit_bike: "%{org_name} can edit this %{bike_type}"
       org_cannot_edit: "%{org_name} can not edit"
@@ -1299,7 +1297,11 @@ en:
       owner_email: Owner email
       owner_name: Owner name
       permission: Permission
+      record: Record
       record_abandoned: Record abandoned
+      record_again: Record again
+      recorded: Recorded
+      recorder: Recorder
       registered: 'Registered:'
       send: Send
       send_message: Send message
@@ -2090,7 +2092,7 @@ en:
     - Fri
     - Sat
     abbr_month_names:
-    -
+    - 
     - Jan
     - Feb
     - Mar
@@ -2116,7 +2118,7 @@ en:
       long: "%B %d, %Y"
       short: "%b %d"
     month_names:
-    -
+    - 
     - January
     - February
     - March
@@ -4085,6 +4087,12 @@ en:
     abandoned_records:
       index:
         abandoned_records: Abandoned Records
+        bike: Bike
+        impounded: Impounded
+        kind: Kind
+        matches: Matches
+        recorded: Recorded
+        recorder: Recorder
       show:
         abandoned_record: Abandoned Record
         additional_text: Additional text

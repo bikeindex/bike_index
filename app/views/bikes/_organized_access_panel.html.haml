@@ -191,15 +191,14 @@
         - if @bike.abandoned_state?
           .col-xl-9.ml-md-2
             %h5
-              Existing Abandoned records for this
-              = @bike.type
+              = t(".existing_abandoned_records", bike_type: @bike.type)
             %table.table.table-sm.table-bordered
               %thead
                 %th= t(".recorded")
                 %th= t(".kind")
                 %th= t(".recorder")
                 %th
-                  %small Notes
+                  %small= t(".notes")
               %tbody
                 - @bike.current_abandoned_records.each do |abandoned_record|
                   %tr
@@ -214,8 +213,12 @@
                     %td
                       %small
                         = abandoned_record.notes
-        .col-xl-3.text-center
-          %span= t(".record")
+        .text-center{ class: @bike.abandoned_state? ? "col-xl-3" : "col-xs-12" }
+          %span
+            - if @bike.abandoned_state?
+              = t(".record_again")
+            - else
+              = t(".record")
           - existing_kind = @bike.current_initial_abandoned_record&.kind
           - abandoned_kinds = existing_kind.present? ? [existing_kind] : AbandonedRecord.kinds
           - abandoned_kinds.each do |kind|

@@ -8,18 +8,19 @@
 
   %p#recordsCount.text-right.less-strong
     %span.number 0
-    Matches
+    = t(".matches")
+
 
   %table.table.table-striped.table-hover.table-bordered.table-sm.without-exterior-border.list-table#records_table
     %thead.small-header.hidden-md-down
       %th.map-cell
       %th
-        Recorded
+        = t(".recorded")
         %small.convertTimezone
-      %th Bike
-      %th Kind
-      %th Recorder
-      %th Impounded
+      %th=t(".bike")
+      %th=t(".kind")
+      %th=t(".recorder")
+      %th=t(".impounded")
     %tbody
 
 :javascript
