@@ -1,5 +1,3 @@
-require "twitter_tweeter_integration"
-
 class ApproveStolenListingWorker < ApplicationWorker
   sidekiq_options queue: "notify"
 
