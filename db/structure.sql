@@ -433,7 +433,8 @@ CREATE TABLE public.bikes (
     deleted_at timestamp without time zone,
     city character varying,
     latitude double precision,
-    longitude double precision
+    longitude double precision,
+    state integer DEFAULT 0
 );
 
 
@@ -695,7 +696,8 @@ CREATE TABLE public.creation_states (
     is_new boolean DEFAULT false NOT NULL,
     creator_id integer,
     bulk_import_id integer,
-    pos_kind integer DEFAULT 0
+    pos_kind integer DEFAULT 0,
+    state integer DEFAULT 0
 );
 
 
@@ -4560,6 +4562,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200107234030'),
 ('20200108232256'),
 ('20200109005657'),
-('20200128144317');
+('20200128144317'),
+('20200130220100');
 
 

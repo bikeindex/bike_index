@@ -824,9 +824,9 @@ class Bike < ApplicationRecord
 
   # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
   def calculated_state
-    return "stolen" if current_stolen_record.present?
-    return "impounded" if current_impound_record.present?
-    return "abandoned" if abandoned? || current_abandoned_records.any?
-    "with_owner"
+    return "state_stolen" if current_stolen_record.present?
+    return "state_impounded" if current_impound_record.present?
+    return "state_abandoned" if abandoned? || current_abandoned_records.any?
+    "state_with_owner"
   end
 end
