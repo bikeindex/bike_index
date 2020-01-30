@@ -1,3 +1,5 @@
+require "bike_book_integration"
+
 class BikeCreator
   def initialize(b_param = nil, location: nil)
     @b_param = b_param
