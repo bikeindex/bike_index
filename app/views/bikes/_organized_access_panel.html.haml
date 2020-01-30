@@ -188,7 +188,7 @@
   - if passive_organization.bike_actions?
     - if passive_organization.paid_for?("abandoned_bikes")
       .row.mb-4.abandoned-record-wrap
-        - if @bike.abandoned_state?
+        - if @bike.state_abandoned?
           .col-xl-9.ml-md-2
             %h5
               = t(".existing_abandoned_records", bike_type: @bike.type)
@@ -213,9 +213,9 @@
                     %td
                       %small
                         = abandoned_record.notes
-        .text-center{ class: @bike.abandoned_state? ? "col-xl-3" : "col-xs-12" }
+        .text-center{ class: @bike.state_abandoned? ? "col-xl-3" : "col-xs-12" }
           %span
-            - if @bike.abandoned_state?
+            - if @bike.state_abandoned?
               = t(".record_again")
             - else
               = t(".record")
