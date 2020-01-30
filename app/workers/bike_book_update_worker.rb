@@ -1,5 +1,3 @@
-require "bike_book_integration"
-
 class BikeBookUpdateWorker < ApplicationWorker
   sidekiq_options queue: "high_priority"
 
