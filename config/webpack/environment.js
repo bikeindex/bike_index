@@ -1,6 +1,7 @@
-const { environment } = require("@rails/webpacker");
+const { environment } = require("@rails/webpacker")
 
 const webpack = require("webpack");
+
 environment.plugins.append(
   "Provide",
   new webpack.ProvidePlugin({
@@ -16,6 +17,8 @@ const ignoreLoader = {
     ]
   }
 };
-environment.config.merge(ignoreLoader)
+environment.config.merge(ignoreLoader);
 
-module.exports = environment;
+environment.loaders.delete('nodeModules');
+
+module.exports = environment

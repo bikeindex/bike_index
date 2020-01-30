@@ -26,6 +26,7 @@ module BikeSearchable
         .merge(searchable_query_items_manufacturer(query_params)) # manufacturer if present
         .merge(searchable_query_items_colors(query_params)) # color if present
         .merge(searchable_query_stolenness(query_params, ip))
+        .to_h
     end
 
     def search(interpreted_params)

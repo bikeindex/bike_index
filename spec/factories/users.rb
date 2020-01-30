@@ -5,7 +5,6 @@ FactoryBot.define do
     password { "testthisthing7$" }
     password_confirmation { "testthisthing7$" }
     terms_of_service { true }
-    after(:create) { |u| u.perform_create_jobs } # TODO: Rails 5 update - this is an after_commit issue
 
     factory :user_confirmed do
       after(:create) { |u| u.confirm(u.confirmation_token) }

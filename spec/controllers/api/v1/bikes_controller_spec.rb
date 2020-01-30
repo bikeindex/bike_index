@@ -4,27 +4,27 @@ RSpec.describe Api::V1::BikesController, type: :controller do
   describe "index" do
     it "loads the page and have the correct headers" do
       FactoryBot.create(:bike)
-      get :index, format: :json
+      get :index, params: { format: :json }
       expect(response.code).to eq("200")
     end
   end
 
   describe "stolen_ids" do
     it "returns correct code if no org" do
-      c = FactoryBot.create(:color)
-      get :stolen_ids, format: :json
+      FactoryBot.create(:color)
+      get :stolen_ids, params: { format: :json }
       expect(response.code).to eq("401")
     end
 
     it "should return an array of ids" do
-      bike = FactoryBot.create(:bike)
-      stole1 = FactoryBot.create(:stolen_record)
+      _bike = FactoryBot.create(:bike)
+      _stole1 = FactoryBot.create(:stolen_record)
       stole2 = FactoryBot.create(:stolen_record, approved: true)
       organization = FactoryBot.create(:organization)
       user = FactoryBot.create(:user)
       FactoryBot.create(:membership_claimed, user: user, organization: organization)
       options = { stolen: true, organization_slug: organization.slug, access_token: organization.access_token }
-      get :stolen_ids, options.as_json
+      get :stolen_ids, params: options.as_json
       expect(response.code).to eq("200")
       bikes = JSON.parse(response.body)["bikes"]
       expect(bikes.count).to eq(1)
@@ -35,7 +35,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
   describe "show" do
     it "loads the page" do
       bike = FactoryBot.create(:bike)
-      get :show, id: bike.id, format: :json
+      get :show, params: { id: bike.id, format: :json }
       expect(response.code).to eq("200")
     end
   end
@@ -83,8 +83,9 @@ RSpec.describe Api::V1::BikesController, type: :controller do
       end
       it "creates a bike and does not duplicate" do
         expect do
-          post :create, bike_hash.as_json, headers: { "Content-Type" => "application/json" }
+          post :create, params: bike_hash.as_json
         end.to change(Ownership, :count).by(1)
+
         expect(response.code).to eq("200")
         bike = Bike.where(serial_number: "SSOMESERIAL").first
         expect(bike.manufacturer).to eq manufacturer
@@ -100,7 +101,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         expect(creation_state.origin).to eq "api_v1"
         expect do
           updated_hash = bike_hash.merge(bike: bike_hash[:bike].merge(no_duplicate: true))
-          post :create, updated_hash.as_json, headers: { "Content-Type" => "application/json" }
+          post :create, params: updated_hash.as_json
         end.to change(Ownership, :count).by 0
       end
     end
@@ -114,20 +115,20 @@ RSpec.describe Api::V1::BikesController, type: :controller do
 
       it "returns correct code if not logged in" do
         c = FactoryBot.create(:color)
-        post :create, { bike: { serial_number: "69", color: c.name } }
+        post :create, params: { bike: { serial_number: "69", color: c.name } }
         expect(response.code).to eq("401")
       end
 
       it "returns correct code if bike has errors" do
         c = FactoryBot.create(:color)
-        post :create, { bike: { serial_number: "69", color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
+        post :create, params: { bike: { serial_number: "69", color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
         expect(response.code).to eq("422")
       end
 
       it "emails us if it can't create a record" do
         c = FactoryBot.create(:color)
         expect do
-          post :create, { bike: { serial_number: "69", color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
+          post :create, params: { bike: { serial_number: "69", color: c.name }, organization_slug: @organization.slug, access_token: @organization.access_token }
         end.to change(Feedback, :count).by(1)
       end
 
@@ -178,8 +179,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         ]
         expect_any_instance_of(OwnershipCreator).to receive(:send_notification_email)
         expect do
-          post :create, bike: bike_attrs, organization_slug: @organization.slug,
-                        access_token: @organization.access_token, components: components, photos: photos
+          post :create, params: { bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, components: components, photos: photos }
         end.to change(Ownership, :count).by(1)
         expect(response.code).to eq("200")
         bike = Bike.where(serial_number: "69 non-example").first
@@ -216,7 +216,6 @@ RSpec.describe Api::V1::BikesController, type: :controller do
 
       it "creates a photos even if one fails" do
         manufacturer = FactoryBot.create(:manufacturer)
-        f_count = Feedback.count
         bike_attrs = {
           serial_number: "69 photo-test",
           manufacturer_id: manufacturer.id,
@@ -232,7 +231,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           "http://i.imgur.com/lybYl1l.jpg",
           "http://bikeindex.org/not_actually_a_thing_404_and_shit",
         ]
-        post :create, bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos
+        post :create, params: { bike: bike_attrs, organization_slug: @organization.slug, access_token: @organization.access_token, photos: photos }
         bike = Bike.where(serial_number: "69 photo-test").first
         expect(bike.public_images.count).to eq(1)
         expect(bike.creation_state.origin).to eq "api_v1"
@@ -274,7 +273,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
           expect_any_instance_of(OwnershipCreator).to receive(:send_notification_email)
 
           expect do
-            post :create, bike: bike_attrs, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token
+            post :create, params: { bike: bike_attrs, stolen_record: stolen_record, organization_slug: @organization.slug, access_token: @organization.access_token }
           end.to change(Ownership, :count).by(1)
           expect(response.code).to eq("200")
           bike = Bike.unscoped.where(serial_number: "69 stolen bike").first
@@ -313,7 +312,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         }
         ActionMailer::Base.deliveries = []
         expect do
-          post :create, bike: bike_attrs, organization_slug: org.slug, access_token: org.access_token
+          post :create, params: { bike: bike_attrs, organization_slug: org.slug, access_token: org.access_token }
         end.to change(Ownership, :count).by(1)
         EmailOwnershipInvitationWorker.drain
         expect(ActionMailer::Base.deliveries).to eq([])
@@ -334,7 +333,6 @@ RSpec.describe Api::V1::BikesController, type: :controller do
 
       it "creates a record even if the post is a string" do
         manufacturer = FactoryBot.create(:manufacturer)
-        f_count = Feedback.count
         bike_attrs = {
           serial_number: "69 string",
           manufacturer_id: manufacturer.id,
@@ -347,7 +345,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         options = { bike: bike_attrs.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
         ActionMailer::Base.deliveries = []
         expect do
-          post :create, options
+          post :create, params: options
         end.to change(Ownership, :count).by(1)
         EmailOwnershipInvitationWorker.drain
         expect(ActionMailer::Base.deliveries.count).to eq 1
@@ -359,7 +357,6 @@ RSpec.describe Api::V1::BikesController, type: :controller do
 
       it "does not send an ownership email if it has no_email set" do
         manufacturer = FactoryBot.create(:manufacturer)
-        f_count = Feedback.count
         bike = {
           serial_number: "69 string",
           manufacturer_id: manufacturer.id,
@@ -373,7 +370,7 @@ RSpec.describe Api::V1::BikesController, type: :controller do
         options = { bike: bike.to_json, organization_slug: @organization.slug, access_token: @organization.access_token }
         ActionMailer::Base.deliveries = []
         expect do
-          post :create, options
+          post :create, params: options
         end.to change(Ownership, :count).by(1)
         EmailOwnershipInvitationWorker.drain
         expect(ActionMailer::Base.deliveries.count).to eq(0)

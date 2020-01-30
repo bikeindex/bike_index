@@ -107,7 +107,7 @@ FactoryBot.define do
   end
 
   factory :blog do
-    user
+    user { FactoryBot.create(:user) }
     body { "Some sweet blog content that everyone loves" }
     sequence(:title) { |n| "Blog title #{n}" }
 

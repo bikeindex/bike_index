@@ -50,7 +50,6 @@ This explanation assumes you're familiar with developing Ruby on Rails applicati
 
 | Toggle in development | command                      | default  |
 | ---------             | -------                      | -------  |
-| Spring                | `bin/rake dev:spring`        | disabled |
 | Caching               | `bin/rake dev:cache`         | disabled |
 | [letter_opener][]     | `bin/rake dev:letter_opener` | enabled  |
 

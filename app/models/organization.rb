@@ -29,11 +29,18 @@ class Organization < ApplicationRecord
   belongs_to :parent_organization, class_name: "Organization"
   belongs_to :auto_user, class_name: "User"
 
+  has_many :bike_organizations
+  has_many :bikes, through: :bike_organizations
   has_many :recovered_records, through: :bikes
-  has_many :locations, inverse_of: :organization, dependent: :destroy
+
   has_many :memberships, dependent: :destroy
-  has_many :mail_snippets
   has_many :users, through: :memberships
+
+  has_many :creation_states
+  has_many :created_bikes, through: :creation_states, source: :bike
+
+  has_many :locations, inverse_of: :organization, dependent: :destroy
+  has_many :mail_snippets
   has_many :organization_messages
   has_many :abandoned_records
   has_many :bike_organizations
@@ -43,8 +50,6 @@ class Organization < ApplicationRecord
   has_many :payments
   has_many :bike_stickers
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
-  has_many :creation_states
-  has_many :created_bikes, through: :creation_states, source: :bike
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other paid features
   accepts_nested_attributes_for :mail_snippets
   accepts_nested_attributes_for :locations, allow_destroy: true
@@ -262,7 +267,6 @@ class Organization < ApplicationRecord
     set_auto_user
     set_ambassador_organization_defaults if ambassador?
     locations.each { |l| l.save unless l.shown == allowed_show }
-    true # TODO: Rails 5 update
   end
 
   def ensure_auto_user

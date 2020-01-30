@@ -31,8 +31,8 @@ class BikeStickerBatch < ApplicationRecord
 
   # Shouldn't occur anymore, but included for legacy diagnostic purposes
   def duplicated_integers
-    bike_code_integers.map do |int|
-      next unless bike_code_integers.count(int) > 1
+    bike_sticker_integers.map do |int|
+      next unless bike_sticker_integers.count(int) > 1
       int
     end.reject(&:blank?)
   end
@@ -41,7 +41,7 @@ class BikeStickerBatch < ApplicationRecord
   def non_sequential_integers
     non_sequential = []
     previous = nil
-    bike_code_integers.uniq.sort.each do |i|
+    bike_sticker_integers.uniq.sort.each do |i|
       # Only run this if previous is present
       if previous.present? && previous + 1 != i
         non_sequential << [previous, i]
@@ -53,7 +53,7 @@ class BikeStickerBatch < ApplicationRecord
 
   private
 
-  def bike_code_integers
-    @bike_code_integers ||= bike_stickers.pluck(:code_integer)
+  def bike_sticker_integers
+    @bike_sticker_integers ||= bike_stickers.pluck(:code_integer)
   end
 end

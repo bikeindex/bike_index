@@ -155,7 +155,6 @@ class Invoice < ApplicationRecord
     end
     self.is_active = !expired? && (force_active || paid_in_full?)
     self.child_paid_feature_slugs ||= []
-    true # TODO: Rails 5 update
   end
 
   def update_organization

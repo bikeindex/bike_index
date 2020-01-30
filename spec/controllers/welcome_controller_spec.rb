@@ -10,7 +10,7 @@ RSpec.describe WelcomeController, type: :controller do
     end
     context "json request format" do
       it "renders revised_layout (ignoring response format)" do
-        get :index, format: :json
+        get :index, params: { format: :json }
         expect(response.status).to eq(200)
         expect(response).to render_template("index")
         expect(flash).to_not be_present
@@ -136,7 +136,7 @@ RSpec.describe WelcomeController, type: :controller do
           end
           it "renders and user things are assigned" do
             session[:passive_organization_id] = organization.id # Even though the user isn't part of the organization, permit it
-            get :user_home, per_page: 1
+            get :user_home, params: { per_page: 1 }
             expect(response.status).to eq(200)
             expect(response).to render_template("user_home")
             expect(assigns(:bikes).count).to eq 1
@@ -151,9 +151,10 @@ RSpec.describe WelcomeController, type: :controller do
           before { user.update_column :has_stolen_bikes_without_locations, true }
           it "renders with show_missing_location_alert" do
             expect(user.has_stolen_bikes_without_locations).to be_truthy
+
             get :user_home
 
-            expect(response).to be_success
+            expect(response).to be_ok
             expect(assigns(:show_missing_location_alert)).to be_truthy
             expect(response).to render_template("user_home")
           end
@@ -164,7 +165,7 @@ RSpec.describe WelcomeController, type: :controller do
     describe "recovery_stories" do
       it "renders recovery stories" do
         FactoryBot.create_list(:recovery_display, 3)
-        get :recovery_stories, per_page: 2
+        get :recovery_stories, params: { per_page: 2 }
         expect(assigns(:recovery_displays).count).to eq 2
         expect(response.status).to eq(200)
         expect(response).to render_template("recovery_stories")
@@ -173,7 +174,7 @@ RSpec.describe WelcomeController, type: :controller do
 
       it "renders no recovery stories if requested page exceeds valid range" do
         FactoryBot.create_list(:recovery_display, 2)
-        get :recovery_stories, per_page: 2, page: 2
+        get :recovery_stories, params: { per_page: 2, page: 2 }
         expect(assigns(:recovery_displays)).to be_empty
         expect(response.status).to eq(200)
         expect(response).to render_template("recovery_stories")

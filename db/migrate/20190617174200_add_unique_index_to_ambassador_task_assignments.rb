@@ -1,4 +1,4 @@
-class AddUniqueIndexToAmbassadorTaskAssignments < ActiveRecord::Migration
+class AddUniqueIndexToAmbassadorTaskAssignments < ActiveRecord::Migration[4.2]
   def change
     add_index :ambassador_task_assignments,
               [:user_id, :ambassador_task_id],

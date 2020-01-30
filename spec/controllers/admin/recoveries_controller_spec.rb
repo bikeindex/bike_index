@@ -5,7 +5,7 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
   describe "index" do
     it "renders" do
       get :index
-      expect(response).to be_success
+      expect(response).to be_ok
       expect(response).to render_template(:index)
       expect(flash).to_not be_present
     end
@@ -18,7 +18,7 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
       expect(stolen_record).to be_present
       bike.destroy
       edit_admin_recovery_path(stolen_record.id)
-      expect(response).to be_success
+      expect(response).to be_ok
       expect(flash).to_not be_present
     end
   end
@@ -28,7 +28,7 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
       let(:params) { { id: stolen_record.id, stolen_record: { is_not_displayable: true } } }
       it "updates waiting_on_decision to not_displayed" do
         expect do
-          put :update, params
+          put :update, params: params
         end.to change(RecoveryDisplay, :count).by 0
         stolen_record.reload
         expect(stolen_record.recovery_display_status).to eq "not_displayed"
@@ -39,7 +39,7 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
         it "updates waiting_on_decision to not_displayed" do
           stolen_record.bike.update_attributes(hidden: true)
           expect do
-            put :update, params
+            put :update, params: params
           end.to change(RecoveryDisplay, :count).by 0
           stolen_record.reload
           expect(stolen_record.recovery_display_status).to eq "not_displayed"
@@ -53,7 +53,7 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
       let(:params) { { id: stolen_record.id, stolen_record: { can_share_recovery: true } } }
       it "updates can_share_recovery" do
         expect do
-          put :update, params
+          put :update, params: params
         end.to change(RecoveryDisplay, :count).by 0
         stolen_record.reload
         expect(stolen_record.can_share_recovery).to be_truthy
@@ -66,7 +66,7 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
       let(:params) { { id: stolen_record.id, stolen_record: { index_helped_recovery: true } } }
       it "updates index_helped_recover" do
         expect do
-          put :update, params
+          put :update, params: params
         end.to change(RecoveryDisplay, :count).by 0
         stolen_record.reload
         expect(stolen_record.index_helped_recovery).to be_truthy
@@ -83,7 +83,7 @@ RSpec.describe Admin::RecoveriesController, type: :controller do
         bike.reload.update_attributes(updated_at: Time.current)
         stolen_record.reload.update_attributes(updated_at: Time.current)
         expect do
-          put :update, params
+          put :update, params: params
         end.to change(RecoveryDisplay, :count).by 0
         stolen_record.reload
         expect(stolen_record.recovery_display_status).to eq "waiting_on_decision"

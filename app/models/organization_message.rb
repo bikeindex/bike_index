@@ -38,7 +38,6 @@ class OrganizationMessage < ApplicationRecord
     self.errors.add(:bike, :required) unless bike.present?
     self.errors.add(:latitude, :latlon_required) unless latitude.present?
     self.errors.add(:longitude, :latlon_required) unless longitude.present?
-    true # Legacy concerns, so excited for TODO: Rails 5 update
   end
 
   def send_email_message

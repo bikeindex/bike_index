@@ -26,7 +26,7 @@ RSpec.describe Admin::AmbassadorTasksController, type: :controller do
 
     describe "#edit" do
       it "renders the edit template with the found ambassador task" do
-        get :edit, id: FactoryBot.create(:ambassador_task).id
+        get :edit, params: { id: FactoryBot.create(:ambassador_task).id }
 
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
@@ -39,7 +39,7 @@ RSpec.describe Admin::AmbassadorTasksController, type: :controller do
         ambassador_task = FactoryBot.attributes_for(:ambassador_task)
         expect(AmbassadorTask.count).to eq(0)
 
-        post :create, ambassador_task: ambassador_task
+        post :create, params: { ambassador_task: ambassador_task }
 
         expect(response).to redirect_to(admin_ambassador_tasks_url)
         expect(flash).to_not be_present
@@ -52,8 +52,10 @@ RSpec.describe Admin::AmbassadorTasksController, type: :controller do
         ambassador_task = FactoryBot.create(:ambassador_task, description: "old text")
 
         patch :update,
-              id: ambassador_task.id,
-              ambassador_task: { description: "new text" }
+              params: {
+                id: ambassador_task.id,
+                ambassador_task: { description: "new text" }
+              }
 
         expect(response).to redirect_to(admin_ambassador_tasks_url)
         expect(flash).to_not be_present
@@ -66,7 +68,7 @@ RSpec.describe Admin::AmbassadorTasksController, type: :controller do
         ambassador_task1 = FactoryBot.create(:ambassador_task)
         ambassador_task2 = FactoryBot.create(:ambassador_task)
 
-        delete :destroy, id: ambassador_task2.id
+        delete :destroy, params: { id: ambassador_task2.id }
 
         expect(response).to redirect_to(admin_ambassador_tasks_url)
         expect(AmbassadorTask.all).to eq([ambassador_task1])
@@ -78,9 +80,9 @@ RSpec.describe Admin::AmbassadorTasksController, type: :controller do
     include_context :logged_in_as_user
     it { expect(get(:index)).to redirect_to(user_home_url) }
     it { expect(get(:new)).to redirect_to(user_home_url) }
-    it { expect(get(:edit, id: 1)).to redirect_to(user_home_url) }
+    it { expect(get(:edit, params: { id: 1 })).to redirect_to(user_home_url) }
     it { expect(post(:create)).to redirect_to(user_home_url) }
-    it { expect(put(:update, id: 1)).to redirect_to(user_home_url) }
-    it { expect(delete(:destroy, id: 1)).to redirect_to(user_home_url) }
+    it { expect(put(:update, params: { id: 1 })).to redirect_to(user_home_url) }
+    it { expect(delete(:destroy, params: { id: 1 })).to redirect_to(user_home_url) }
   end
 end

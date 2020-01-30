@@ -12,12 +12,12 @@ RSpec.describe Admin::GraphsController, type: :controller do
     end
     context "kind" do
       it "renders" do
-        get :index, kind: "users"
+        get :index, params: { kind: "users" }
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
       end
       it "renders" do
-        get :index, kind: "payments"
+        get :index, params: { kind: "payments" }
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
       end
@@ -40,7 +40,7 @@ RSpec.describe Admin::GraphsController, type: :controller do
     end
     context "users" do
       it "returns json" do
-        get :variable, kind: "users", timezone: "America/Los_Angeles"
+        get :variable, params: { kind: "users", timezone: "America/Los_Angeles" }
         expect(response.status).to eq(200)
         expect(json_result.is_a?(Array)).to be_truthy
         expect(assigns(:start_at)).to be_within(1.day).of Time.parse("2007-01-01 1:00")
@@ -51,8 +51,7 @@ RSpec.describe Admin::GraphsController, type: :controller do
         let(:end_at) { "2019-01-22T13:48" }
         let(:start_at) { "2019-01-15T14:48" }
         it "returns json" do
-          get :variable, kind: "users", start_at: start_at,
-                         end_at: end_at, timezone: "America/Los_Angeles"
+          get :variable, params: { kind: "users", start_at: start_at, end_at: end_at, timezone: "America/Los_Angeles" }
           expect(response.status).to eq(200)
           expect(json_result.keys.count).to be > 0
           Time.zone = TimeParser.parse_timezone("America/Los_Angeles")
@@ -64,7 +63,7 @@ RSpec.describe Admin::GraphsController, type: :controller do
       context "payments" do
         let!(:payment) { FactoryBot.create(:payment) }
         it "returns json" do
-          get :variable, kind: "payments", timezone: "America/Los_Angeles"
+          get :variable, params: { kind: "payments", timezone: "America/Los_Angeles" }
           expect(response.status).to eq(200)
           json_result.each do |data_group|
             expect(data_group.keys.count).to be > 0
@@ -80,8 +79,7 @@ RSpec.describe Admin::GraphsController, type: :controller do
           let(:end_at) { "2019-01-22T13:48" }
           let(:start_at) { "2019-01-15T14:48" }
           it "returns json" do
-            get :variable, kind: "users", start_at: start_at,
-                           end_at: end_at, timezone: "America/Los_Angeles"
+            get :variable, params: { kind: "users", start_at: start_at, end_at: end_at, timezone: "America/Los_Angeles" }
             expect(response.status).to eq(200)
             expect(json_result.keys.count).to be > 0
             Time.zone = TimeParser.parse_timezone("America/Los_Angeles")
@@ -117,7 +115,7 @@ RSpec.describe Admin::GraphsController, type: :controller do
     end
     context "start_at passed" do
       it "returns JSON array" do
-        get :bikes, start_at: "past_year"
+        get :bikes, params: { start_at: "past_year" }
         expect(response.status).to eq(200)
         result = JSON.parse(response.body)
         expect(result.is_a?(Array)).to be_truthy

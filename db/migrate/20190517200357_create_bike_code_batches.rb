@@ -1,4 +1,4 @@
-class CreateBikeCodeBatches < ActiveRecord::Migration
+class CreateBikeCodeBatches < ActiveRecord::Migration[4.2]
   def change
     create_table :bike_code_batches do |t|
       t.references :user, index: true

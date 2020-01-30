@@ -12,14 +12,14 @@ RSpec.describe UsersController, type: :controller do
       end
       context "return_to" do
         it "redirects to return_to" do
-          get :new, return_to: "/bikes/12?contact_owner=true"
+          get :new, params: { return_to: "/bikes/12?contact_owner=true" }
           expect(response).to redirect_to "/bikes/12?contact_owner=true"
         end
       end
       context "unconfirmed" do
         let(:user) { FactoryBot.create(:user) }
         it "redirects to please_confirm_email" do
-          get :new, return_to: "/bikes/12?contact_owner=true"
+          get :new, params: { return_to: "/bikes/12?contact_owner=true" }
           expect(response).to redirect_to please_confirm_email_users_path
           expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
         end
@@ -35,7 +35,7 @@ RSpec.describe UsersController, type: :controller do
       end
       context "with partner param" do
         it "actually sets it" do
-          get :new, email: "seth@bikes.com", return_to: "/bikes/12?contact_owner=true", partner: "bikehub"
+          get :new, params: { email: "seth@bikes.com", return_to: "/bikes/12?contact_owner=true", partner: "bikehub" }
           expect(assigns(:user).email).to eq "seth@bikes.com"
           expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
           expect(session[:partner]).to be_nil
@@ -44,7 +44,7 @@ RSpec.describe UsersController, type: :controller do
         context "with partner session" do
           it "actually sets it" do
             session[:partner] = "bikehub"
-            get :new, return_to: "/bikes/12?contact_owner=true"
+            get :new, params: { return_to: "/bikes/12?contact_owner=true" }
             expect(session[:return_to]).to eq "/bikes/12?contact_owner=true"
             session[:partner] = "bikehub"
             expect(response).to render_template("layouts/application_bikehub")
@@ -85,7 +85,7 @@ RSpec.describe UsersController, type: :controller do
       describe "success" do
         it "creates a non-confirmed record, doesn't block on unknown language" do
           expect do
-            post :create, locale: "klingon", user: user_attributes
+            post :create, params: { locale: "klingon", user: user_attributes }
           end.to change(User, :count).by(1)
           expect(flash).to_not be_present
           expect(response).to redirect_to(please_confirm_email_users_path)
@@ -99,13 +99,10 @@ RSpec.describe UsersController, type: :controller do
         context "with locale passed" do
           it "creates a user with a preferred_language" do
             request.env["HTTP_CF_CONNECTING_IP"] = "99.99.99.9"
-            post :create, locale: "nl", user: user_attributes
-            # TODO: Rails 5 update - this is an after_commit issue
+
+            post :create, params: { locale: "nl", user: user_attributes }
+
             user = User.order(:created_at).last
-            user.perform_create_jobs
-            # Because of the after_commit issue, we can't track that response redirects correctly :(
-            # expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
-            # expect(session[:passive_organization_id]).to eq organization.id
             expect(User.from_auth(cookies.signed[:auth])).to eq user
             expect(user.partner_sign_up).to be_nil
             expect(user.partner_sign_up).to be_nil
@@ -136,14 +133,10 @@ RSpec.describe UsersController, type: :controller do
             expect(bike.user).to be_blank
             expect do
               request.env["HTTP_CF_CONNECTING_IP"] = "99.99.99.9"
-              post :create, user: user_attributes
-              # TODO: Rails 5 update - this is an after_commit issue
+              post :create, params: { user: user_attributes }
               user = User.where(email: email).first
-              user.perform_create_jobs
-              # Because of the after_commit issue, we can't track that response redirects correctly :(
-              # expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
-              # expect(session[:passive_organization_id]).to eq organization.id
-              user.reload
+              expect(response).to redirect_to organization_root_path(organization_id: organization.to_param)
+              expect(session[:passive_organization_id]).to eq organization.id
               expect(user.terms_of_service).to be_truthy
               expect(user.email).to eq email
               expect(User.from_auth(cookies.signed[:auth])).to eq user
@@ -164,28 +157,28 @@ RSpec.describe UsersController, type: :controller do
           let!(:membership) { FactoryBot.create(:membership, invited_email: "poo@pile.com") }
           it "creates a confirmed user, log in, and send welcome, language header" do
             session[:passive_organization_id] = "0"
-            expect_any_instance_of(AfterUserCreateWorker).to receive(:send_welcoming_email)
             request.env["HTTP_ACCEPT_LANGUAGE"] = "nl,en;q=0.9"
-            post :create, user: user_attributes, partner: "bikehub"
+            allow(EmailWelcomeWorker).to receive(:perform_async)
+
+            post :create, params: { user: user_attributes, partner: "bikehub" }
+
             expect(response).to redirect_to("https://new.bikehub.com/account?reauthenticate_bike_index=true")
             user = User.find_by_email("poo@pile.com")
-            user.perform_create_jobs # TODO: Rails 5 update - this is an after_commit issue
-            user.reload
+            expect(EmailWelcomeWorker).to have_received(:perform_async).with(user.id)
             expect(user.partner_sign_up).to eq "bikehub"
             expect(user.email).to eq "poo@pile.com"
+
             expect(User.from_auth(cookies.signed[:auth])).to eq user
             expect(user.last_login_at).to be_within(2.seconds).of Time.current
             expect(user.preferred_language).to eq "nl"
-            # TODO: Rails 5 update - this is an after_commit issue
-            # Because of the after_commit issue, we can't track that response redirects correctly :(
-            # expect(session[:passive_organization_id]).to eq membership.organization_id
+            expect(session[:passive_organization_id]).to eq membership.organization_id
           end
         end
         context "with partner session" do
           it "renders parter sign in page" do
             session[:partner] = "bikehub"
             expect do
-              post :create, user: user_attributes
+              post :create, params: { user: user_attributes }
             end.to change(User, :count).by(1)
             expect(flash).to_not be_present
             expect(response).to redirect_to("https://new.bikehub.com/account?reauthenticate_bike_index=true")
@@ -208,13 +201,13 @@ RSpec.describe UsersController, type: :controller do
         it "does not create a user or send a welcome email" do
           expect do
             expect do
-              post :create, user: user_attributes
+              post :create, params: { user: user_attributes }
             end.to_not change(EmailWelcomeWorker.jobs, :count)
           end.to_not change(User, :count)
         end
         context "partner param" do
           it "renders new" do
-            post :create, partner: "bikehub", user: user_attributes
+            post :create, params: { partner: "bikehub", user: user_attributes }
             expect(response).to render_template("new")
             expect(assigns(:page_errors)).to be_present
             expect(response).to render_template("layouts/application_bikehub")
@@ -226,7 +219,7 @@ RSpec.describe UsersController, type: :controller do
     describe "confirm" do
       describe "user exists" do
         it "tells the user to log in when already confirmed" do
-          get :confirm, id: user.id, code: "wtfmate"
+          get :confirm, params: { id: user.id, code: "wtfmate" }
           expect(response).to redirect_to new_session_url
         end
 
@@ -238,7 +231,7 @@ RSpec.describe UsersController, type: :controller do
           end
 
           it "logins and redirect when confirmation succeeds" do
-            get :confirm, id: user.id, code: user.confirmation_token
+            get :confirm, params: { id: user.id, code: user.confirmation_token }
             expect(User.from_auth(cookies.signed[:auth])).to eq(user)
             expect(response).to redirect_to user_home_url
             expect(session[:partner]).to be_nil
@@ -246,7 +239,7 @@ RSpec.describe UsersController, type: :controller do
 
           context "with partner" do
             it "logins and redirect when confirmation succeeds" do
-              get :confirm, id: user.id, code: user.confirmation_token, partner: "bikehub"
+              get :confirm, params: { id: user.id, code: user.confirmation_token, partner: "bikehub" }
               expect(User.from_auth(cookies.signed[:auth])).to eq(user)
               expect(response).to redirect_to "https://new.bikehub.com/account?reauthenticate_bike_index=true"
               expect(session[:partner]).to be_nil
@@ -254,7 +247,7 @@ RSpec.describe UsersController, type: :controller do
             context "in session" do
               it "logins and redirect when confirmation succeeds" do
                 session[:partner] = "bikehub"
-                get :confirm, id: user.id, code: user.confirmation_token
+                get :confirm, params: { id: user.id, code: user.confirmation_token }
                 expect(User.from_auth(cookies.signed[:auth])).to eq(user)
                 expect(response).to redirect_to "https://new.bikehub.com/account?reauthenticate_bike_index=true"
                 expect(session[:partner]).to be_nil
@@ -264,7 +257,7 @@ RSpec.describe UsersController, type: :controller do
               it "redirects" do
                 expect(user.confirmed?).to be_falsey
                 set_current_user(user)
-                get :confirm, id: user.id, code: user.confirmation_token, partner: "bikehub"
+                get :confirm, params: { id: user.id, code: user.confirmation_token, partner: "bikehub" }
                 expect(User.from_auth(cookies.signed[:auth])).to eq(user)
                 expect(response).to redirect_to "https://new.bikehub.com/account?reauthenticate_bike_index=true"
                 expect(session[:partner]).to be_nil
@@ -275,7 +268,7 @@ RSpec.describe UsersController, type: :controller do
 
           it "shows a view when confirmation fails" do
             expect(user).to receive(:confirm).and_return(false)
-            get :confirm, id: user.id, code: "Wtfmate"
+            get :confirm, params: { id: user.id, code: "Wtfmate" }
             expect(response).to render_template :confirm_error_bad_token
           end
         end
@@ -285,7 +278,7 @@ RSpec.describe UsersController, type: :controller do
         include_context :logged_in_as_user
         it "redirects" do
           expect(user.confirmed?).to be_truthy
-          get :confirm, id: user.id, code: user.confirmation_token, partner: "bikehub"
+          get :confirm, params: { id: user.id, code: user.confirmation_token, partner: "bikehub" }
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           expect(response).to redirect_to "https://new.bikehub.com/account?reauthenticate_bike_index=true"
           expect(session[:partner]).to be_nil
@@ -293,7 +286,7 @@ RSpec.describe UsersController, type: :controller do
       end
 
       it "shows an appropriate message when the user is nil" do
-        get :confirm, id: 1234, code: "Wtfmate"
+        get :confirm, params: { id: 1234, code: "Wtfmate" }
         expect(response).to render_template :confirm_error_404
       end
     end
@@ -311,7 +304,7 @@ RSpec.describe UsersController, type: :controller do
       context "create attrs" do
         it "renders" do
           expect do
-            post :create, user: user_attrs
+            post :create, params: { user: user_attrs }
           end.to change(User, :count).by(1)
         end
       end
@@ -323,7 +316,7 @@ RSpec.describe UsersController, type: :controller do
 
     it "enqueues a password reset email job" do
       expect do
-        post :password_reset, email: user.email
+        post :password_reset, params: { email: user.email }
       end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
     end
 
@@ -331,7 +324,7 @@ RSpec.describe UsersController, type: :controller do
       let!(:user_email) { FactoryBot.create(:user_email, user: user) }
       it "enqueues a password reset email job" do
         expect do
-          post :password_reset, email: user_email.email
+          post :password_reset, params: { email: user_email.email }
         end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
         expect(EmailResetPasswordWorker).to have_enqueued_sidekiq_job(user.id)
       end
@@ -341,7 +334,7 @@ RSpec.describe UsersController, type: :controller do
       let(:user) { FactoryBot.create(:user) }
       it "enqueues a password reset email job" do
         expect do
-          post :password_reset, email: user.email
+          post :password_reset, params: { email: user.email }
         end.to change(EmailResetPasswordWorker.jobs, :size).by(1)
       end
     end
@@ -349,7 +342,7 @@ RSpec.describe UsersController, type: :controller do
     describe "token present (update password stage)" do
       before { user.update_auth_token("password_reset_token") }
       it "logs in and redirects" do
-        post :password_reset, token: user.password_reset_token
+        post :password_reset, params: { token: user.password_reset_token }
         expect(User.from_auth(cookies.signed[:auth])).to eq(user)
         expect(response).to render_template :update_password
       end
@@ -359,7 +352,7 @@ RSpec.describe UsersController, type: :controller do
         it "logs in and redirects" do
           expect(user.confirmed?).to be_falsey
           expect(user.password_reset_token).to be_present
-          post :password_reset, token: user.password_reset_token
+          post :password_reset, params: { token: user.password_reset_token }
           expect(response).to render_template :update_password
           expect(User.from_auth(cookies.signed[:auth])).to eq(user)
           # If they are using the correct token, they got the email we sent,
@@ -372,7 +365,7 @@ RSpec.describe UsersController, type: :controller do
       context "get request" do
         it "renders get request" do
           user.update_auth_token("password_reset_token")
-          get :password_reset, token: user.password_reset_token
+          get :password_reset, params: { token: user.password_reset_token }
           expect(response.code).to eq("200")
         end
       end
@@ -380,7 +373,7 @@ RSpec.describe UsersController, type: :controller do
       context "token expired" do
         it "redirects to request password reset" do
           user.update_auth_token("password_reset_token", (Time.current - 61.minutes).to_i)
-          post :password_reset, token: user.password_reset_token
+          post :password_reset, params: { token: user.password_reset_token }
           expect(flash[:error]).to be_present
           expect(cookies.signed[:auth]).to_not be_present
           expect(response).to render_template :request_password_reset
@@ -389,7 +382,7 @@ RSpec.describe UsersController, type: :controller do
 
       context "token invalid" do
         it "does not log in if the token is present and invalid" do
-          post :password_reset, token: "Not Actually a token"
+          post :password_reset, params: { token: "Not Actually a token" }
           expect(response).to render_template :request_password_reset
         end
       end
@@ -400,21 +393,21 @@ RSpec.describe UsersController, type: :controller do
     before { expect(user.confirmed).to be_truthy }
     it "404s if the user doesn't exist" do
       expect do
-        get :show, id: "fake_user extra stuff"
+        get :show, params: { id: "fake_user extra stuff" }
       end.to raise_error(ActionController::RoutingError)
     end
 
     it "redirects to user home url if the user exists but doesn't want to show their page" do
       user.show_bikes = false
       user.save
-      get :show, id: user.username
+      get :show, params: { id: user.username }
       expect(response).to redirect_to user_home_url
     end
 
     it "shows the page if the user exists and wants to show their page" do
       user.show_bikes = true
       user.save
-      get :show, id: user.username, page: 1, per_page: 1
+      get :show, params: { id: user.username, page: 1, per_page: 1 }
       expect(response).to render_template :show
       expect(assigns(:per_page)).to eq "1"
       expect(assigns(:page)).to eq "1"
@@ -444,7 +437,7 @@ RSpec.describe UsersController, type: :controller do
     context "no page given" do
       it "renders root" do
         get :edit
-        expect(response).to be_success
+        expect(response).to be_ok
         expect(assigns(:edit_template)).to eq("root")
         expect(response).to render_template("edit")
         expect(response).to render_template("layouts/application")
@@ -454,8 +447,8 @@ RSpec.describe UsersController, type: :controller do
       %w[root password sharing].each do |template|
         context template do
           it "renders the template" do
-            get :edit, page: template
-            expect(response).to be_success
+            get :edit, params: { page: template }
+            expect(response).to be_ok
             expect(assigns(:edit_template)).to eq(template)
             expect(response).to render_template(partial: "_edit_#{template}")
             expect(response).to render_template("layouts/application")
@@ -472,7 +465,7 @@ RSpec.describe UsersController, type: :controller do
         user.reload
         expect(user.username).to eq "something"
         set_current_user(user)
-        post :update, id: user.username, user: { username: " ", name: "tim" }, page: "sharing"
+        post :update, params: { id: user.username, user: { username: " ", name: "tim" }, page: "sharing" }
         expect(assigns(:edit_template)).to eq("sharing")
         user.reload
         expect(user.username).to eq("something")
@@ -481,22 +474,26 @@ RSpec.describe UsersController, type: :controller do
 
     it "doesn't update user if current password not present" do
       set_current_user(user)
-      post :update, id: user.username,
-                    user: {
-                      password: "new_pass",
-                      password_confirmation: "new_pass",
+      post :update, params: {
+                      id: user.username,
+                      user: {
+                        password: "new_pass",
+                        password_confirmation: "new_pass",
+                      },
                     }
       expect(user.reload.authenticate("new_pass")).to be_falsey
     end
 
     it "doesn't update user if password doesn't match" do
       set_current_user(user)
-      post :update, id: user.username,
-                    user: {
-                      current_password: "old_pass",
-                      password: "new_pass",
-                      name: "Mr. Slick",
-                      password_confirmation: "new_passd",
+      post :update, params: {
+                      id: user.username,
+                      user: {
+                        current_password: "old_pass",
+                        password: "new_pass",
+                        name: "Mr. Slick",
+                        password_confirmation: "new_passd",
+                      },
                     }
       expect(user.reload.authenticate("new_pass")).to be_falsey
       expect(user.name).not_to eq("Mr. Slick")
@@ -508,12 +505,14 @@ RSpec.describe UsersController, type: :controller do
       auth = user.auth_token
       email = user.email
       set_current_user(user)
-      post :update, id: user.username,
-                    user: {
-                      email: "cool_new_email@something.com",
-                      password_reset_token: user.password_reset_token,
-                      password: "new_pass",
-                      password_confirmation: "new_pass",
+      post :update, params: {
+                      id: user.username,
+                      user: {
+                        email: "cool_new_email@something.com",
+                        password_reset_token: user.password_reset_token,
+                        password: "new_pass",
+                        password_confirmation: "new_pass",
+                      },
                     }
       expect(user.reload.authenticate("new_pass")).to be_truthy
       expect(user.email).to eq(email)
@@ -530,11 +529,13 @@ RSpec.describe UsersController, type: :controller do
       user.auth_token
       user.email
       set_current_user(user)
-      post :update, id: user.username,
-                    user: {
-                      password_reset_token: "something_else",
-                      password: "new_pass",
-                      password_confirmation: "new_pass",
+      post :update, params: {
+                      id: user.username,
+                      user: {
+                        password_reset_token: "something_else",
+                        password: "new_pass",
+                        password_confirmation: "new_pass",
+                      },
                     }
       expect(response).to_not redirect_to(my_account_url)
       expect(flash[:error]).to be_present
@@ -545,21 +546,24 @@ RSpec.describe UsersController, type: :controller do
     it "Doesn't update user if reset_pass token is more than an hour old" do
       user.update_auth_token("password_reset_token", (Time.current - 61.minutes).to_i)
       auth = user.auth_token
-      user.email
       set_current_user(user)
-      post :update, id: user.username,
-                    user: {
-                      password_reset_token: user.password_reset_token,
-                      password: "new_pass",
-                      password_confirmation: "new_pass",
+      expect(cookies[:auth]).to be_present
+
+      post :update, params: {
+                      id: user.username,
+                      user: {
+                        password_reset_token: user.password_reset_token,
+                        password: "new_pass",
+                        password_confirmation: "new_pass",
+                      },
                     }
+
       expect(response).to_not redirect_to(my_account_url)
       expect(flash[:error]).to be_present
-      user.reload
       expect(user.authenticate("new_pass")).not_to be_truthy
       expect(user.auth_token).to eq(auth)
       expect(user.password_reset_token).not_to eq("stuff")
-      expect(cookies.signed[:auth]).to_not be_present
+      expect(response.cookies[:auth]).to eq(nil)
     end
 
     it "resets users auth if password changed, updates current session" do
@@ -567,13 +571,15 @@ RSpec.describe UsersController, type: :controller do
       auth = user.auth_token
       email = user.email
       set_current_user(user)
-      post :update, id: user.username,
-                    user: {
-                      email: "cool_new_email@something.com",
-                      current_password: "old_pass",
-                      password: "new_pass",
-                      name: "Mr. Slick",
-                      password_confirmation: "new_pass",
+      post :update, params: {
+                      id: user.username,
+                      user: {
+                        email: "cool_new_email@something.com",
+                        current_password: "old_pass",
+                        password: "new_pass",
+                        name: "Mr. Slick",
+                        password_confirmation: "new_pass",
+                      },
                     }
       expect(response).to redirect_to(my_account_url)
       expect(flash[:error]).to_not be_present
@@ -591,16 +597,18 @@ RSpec.describe UsersController, type: :controller do
       it "sets address, geocodes" do
         set_current_user(user)
         expect(user.notification_newsletters).to be_falsey
-        post :update, id: user.username,
-                      user: {
-                        name: "Mr. Slick",
-                        country_id: country.id,
-                        state_id: state.id,
-                        city: "New York",
-                        street: "278 Broadway",
-                        zipcode: "10007",
-                        notification_newsletters: "1",
-                        phone: "3223232",
+        post :update, params: {
+                        id: user.username,
+                        user: {
+                          name: "Mr. Slick",
+                          country_id: country.id,
+                          state_id: state.id,
+                          city: "New York",
+                          street: "278 Broadway",
+                          zipcode: "10007",
+                          notification_newsletters: "1",
+                          phone: "3223232",
+                        },
                       }
         expect(response).to redirect_to(my_account_url)
         expect(flash[:error]).to_not be_present
@@ -619,7 +627,7 @@ RSpec.describe UsersController, type: :controller do
 
     it "updates the terms of service" do
       set_current_user(user)
-      post :update, id: user.username, user: { terms_of_service: "1" }
+      post :update, params: { id: user.username, user: { terms_of_service: "1" } }
       expect(response).to redirect_to(user_home_url)
       expect(user.reload.terms_of_service).to be_truthy
     end
@@ -628,7 +636,7 @@ RSpec.describe UsersController, type: :controller do
       it "updates if valid" do
         expect(user.preferred_language).to eq(nil)
         set_current_user(user)
-        patch :update, id: user.username, locale: "nl", user: { preferred_language: "en" }
+        patch :update, params: { id: user.username, locale: "nl", user: { preferred_language: "en" } }
         expect(flash[:success]).to match(/succesvol/i)
         expect(response).to redirect_to(my_account_url)
         expect(user.reload.preferred_language).to eq("en")
@@ -637,7 +645,7 @@ RSpec.describe UsersController, type: :controller do
       it "changes from previous if valid" do
         user.update_attribute :preferred_language, "en"
         set_current_user(user)
-        patch :update, id: user.username, locale: "en", user: { preferred_language: "nl" }
+        patch :update, params: { id: user.username, locale: "en", user: { preferred_language: "nl" } }
         expect(flash[:success]).to match(/successfully updated/i)
         expect(response).to redirect_to(my_account_url)
         expect(user.reload.preferred_language).to eq("nl")
@@ -646,7 +654,7 @@ RSpec.describe UsersController, type: :controller do
       it "does not update the preferred_language if invalid" do
         expect(user.preferred_language).to eq(nil)
         set_current_user(user)
-        patch :update, id: user.username, user: { preferred_language: "klingon" }
+        patch :update, params: { id: user.username, user: { preferred_language: "klingon" } }
         expect(flash[:success]).to be_blank
         expect(response).to render_template(:edit)
         expect(user.reload.preferred_language).to eq(nil)
@@ -656,7 +664,7 @@ RSpec.describe UsersController, type: :controller do
     it "updates notification" do
       set_current_user(user)
       expect(user.notification_unstolen).to be_truthy # Because it's set to true by default
-      post :update, id: user.username, user: { notification_newsletters: "1", notification_unstolen: "0" }
+      post :update, params: { id: user.username, user: { notification_newsletters: "1", notification_unstolen: "0" } }
       expect(response).to redirect_to my_account_url
       user.reload
       expect(user.notification_newsletters).to be_truthy
@@ -671,7 +679,7 @@ RSpec.describe UsersController, type: :controller do
       user.reload
       expect(user.default_organization).to eq organization
       set_current_user(user)
-      post :update, id: user.username, user: { vendor_terms_of_service: "1", notification_newsletters: true }
+      post :update, params: { id: user.username, user: { vendor_terms_of_service: "1", notification_newsletters: true } }
       expect(response.code).to eq("302")
       expect(response).to redirect_to organization_root_url(organization_id: organization.to_param)
       expect(user.reload.accepted_vendor_terms_of_service?).to be_truthy
@@ -682,7 +690,7 @@ RSpec.describe UsersController, type: :controller do
     it "enqueues job (it enqueues job whenever update is successful)" do
       set_current_user(user)
       expect do
-        post :update, id: user.username, user: { name: "Cool stuff" }
+        post :update, params: { id: user.username, user: { name: "Cool stuff" } }
       end.to change(AfterUserChangeWorker.jobs, :size).by(1)
       expect(user.reload.name).to eq("Cool stuff")
     end
@@ -690,7 +698,7 @@ RSpec.describe UsersController, type: :controller do
     describe "submit without updating terms" do
       it "redirects to accept the terms" do
         set_current_user(user)
-        post :update, id: user.username, user: { terms_of_service: "0" }
+        post :update, params: { id: user.username, user: { terms_of_service: "0" } }
         expect(response).to redirect_to accept_terms_path
         expect(user.reload.terms_of_service).to be_falsey
       end
@@ -700,7 +708,7 @@ RSpec.describe UsersController, type: :controller do
           expect(user.terms_of_service).to be_truthy
           expect(user.accepted_vendor_terms_of_service?).to be_falsey
           set_current_user(user)
-          post :update, id: user.username, user: { vendor_terms_of_service: "0" }
+          post :update, params: { id: user.username, user: { vendor_terms_of_service: "0" } }
           expect(response).to redirect_to accept_vendor_terms_path
           expect(user.reload.vendor_terms_of_service).to be_falsey
         end
@@ -714,7 +722,7 @@ RSpec.describe UsersController, type: :controller do
       it "updates notification_newsletters" do
         expect(user.notification_newsletters).to be_truthy
         expect(user.confirmed?).to be_falsey
-        get :unsubscribe, id: user.username
+        get :unsubscribe, params: { id: user.username }
         expect(response.code).to eq("302")
         expect(flash[:success]).to be_present
         user.reload
@@ -724,7 +732,7 @@ RSpec.describe UsersController, type: :controller do
     end
     context "user not present" do
       it "does not error, shows same flash success (to prevent email enumeration)" do
-        get :unsubscribe, id: "cvxvxxxxx"
+        get :unsubscribe, params: { id: "cvxvxxxxx" }
         expect(response.code).to eq("302")
         expect(flash[:success]).to be_present
       end
@@ -733,7 +741,7 @@ RSpec.describe UsersController, type: :controller do
       let(:user) { FactoryBot.create(:user_confirmed, notification_newsletters: false) }
       it "does nothing" do
         expect(user.notification_newsletters).to be_falsey
-        get :unsubscribe, id: user.username
+        get :unsubscribe, params: { id: user.username }
         expect(response.code).to eq("302")
         expect(flash[:success]).to be_present
         user.reload

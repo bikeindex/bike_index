@@ -1,4 +1,4 @@
-class CreateImpoundRecords < ActiveRecord::Migration
+class CreateImpoundRecords < ActiveRecord::Migration[4.2]
   def change
     create_table :impound_records do |t|
       t.references :bike, index: true

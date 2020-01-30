@@ -1,4 +1,4 @@
-class AddLocationFieldsToOrganization < ActiveRecord::Migration
+class AddLocationFieldsToOrganization < ActiveRecord::Migration[4.2]
   def change
     change_table :organizations do |t|
       # geocoding for regional organization associations

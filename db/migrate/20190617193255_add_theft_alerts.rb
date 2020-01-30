@@ -1,4 +1,4 @@
-class AddTheftAlerts < ActiveRecord::Migration
+class AddTheftAlerts < ActiveRecord::Migration[4.2]
   def change
     create_table :theft_alerts do |t|
       t.belongs_to :stolen_record, index: true

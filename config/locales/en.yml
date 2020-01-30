@@ -738,7 +738,7 @@ en:
         titanium: Titanium
       handlebar_type:
         bmx: BMX style
-        drop: Drop
+        drop_bar: Drop
         flat: Flat or riser
         forward: Forward facing
         other: Not handlebars

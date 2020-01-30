@@ -1,7 +1,11 @@
+# frozen_string_literal: true
+
 require "soulheart/server"
 require "sidekiq/web"
+
 Sidekiq::Web.set :session_secret, Rails.application.secrets[:secret_key_base]
-Bikeindex::Application.routes.draw do
+
+Rails.application.routes.draw do
   use_doorkeeper do
     controllers applications: "oauth/applications"
     controllers authorizations: "oauth/authorizations"
@@ -146,7 +150,7 @@ Bikeindex::Application.routes.draw do
   resources :locks, except: %[show index]
 
   namespace :admin do
-    root to: "dashboard#index"
+    root to: "dashboard#index", as: :root
     resources :ambassador_tasks, except: :show
     resources :ambassador_task_assignments, only: [:index]
 

@@ -15,21 +15,21 @@ RSpec.describe NewsController, type: :controller do
       let(:blog) { Blog.create(title: "foo title", body: "ummmmm good", user_id: user.id, old_title_slug: "an-older-title") }
       context "title slug" do
         it "renders" do
-          get :show, id: blog.title_slug
+          get :show, params: { id: blog.title_slug }
           expect(response.status).to eq(200)
           expect(response).to render_template("show")
         end
       end
       context "old title slug" do
         it "renders" do
-          get :show, id: blog.old_title_slug
+          get :show, params: { id: blog.old_title_slug }
           expect(response.status).to eq(200)
           expect(response).to render_template("show")
         end
       end
       context "id" do
         it "renders" do
-          get :show, id: blog.id
+          get :show, params: { id: blog.id }
           expect(response.status).to eq(200)
           expect(response).to render_template("show")
         end
@@ -51,7 +51,7 @@ RSpec.describe NewsController, type: :controller do
           FactoryBot.create(:blog, :published)
           FactoryBot.create(:blog, :published, :dutch)
 
-          get :index, language: "nl"
+          get :index, params: { language: "nl" }
 
           expect(response.status).to eq(200)
           expect(response).to render_template("index")
@@ -76,7 +76,7 @@ RSpec.describe NewsController, type: :controller do
       let(:user) { FactoryBot.create(:user) }
       let(:blog) { Blog.create(title: "foo title", body: "ummmmm good", user_id: user.id, old_title_slug: "an-older-title") }
       it "renders" do
-        get :show, id: blog.title_slug
+        get :show, params: { id: blog.title_slug }
         expect(response.status).to eq(200)
         expect(response).to render_template("show")
       end

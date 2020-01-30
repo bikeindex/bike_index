@@ -11,7 +11,7 @@
 
 :ruby
   payments_counts = Payment.kinds.map do |kind|
-    # Legacy enum issue so excited for TODO: Rails 5 update
+    # TODO: Refactor to incorporate Rails 5 enum changes
     payment_enum = Payment::KIND_ENUM[kind.to_sym]
     payments_of_kind = matching_payments.where(kind: payment_enum)
     next unless payments_of_kind.count > 0

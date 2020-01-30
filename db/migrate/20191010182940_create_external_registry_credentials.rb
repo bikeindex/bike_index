@@ -1,4 +1,4 @@
-class CreateExternalRegistryCredentials < ActiveRecord::Migration
+class CreateExternalRegistryCredentials < ActiveRecord::Migration[4.2]
   def change
     create_table :external_registry_credentials do |t|
       t.string :type, null: false, index: true

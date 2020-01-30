@@ -7,7 +7,7 @@ RSpec.describe DiscourseAuthenticationController, type: :controller do
 
     context "not signed in" do
       it "redirects to sign in and sets discourse_redirect" do
-        get :index, discourse_params
+        get :index, params: discourse_params
         expect(Rack::Utils.parse_query(session[:discourse_redirect])).to eq(discourse_params)
         expect(response).to redirect_to(new_session_path)
       end
@@ -27,7 +27,7 @@ RSpec.describe DiscourseAuthenticationController, type: :controller do
       it "redirects signed in user from query string" do
         target_url = sso.to_url("#{ENV["DISCOURSE_URL"]}/session/sso_login")
 
-        get :index, Rack::Utils.parse_query(discourse_query_string)
+        get :index, params: Rack::Utils.parse_query(discourse_query_string)
 
         expect(response).to redirect_to(target_url)
         expect(session[:discourse_redirect]).to be_nil

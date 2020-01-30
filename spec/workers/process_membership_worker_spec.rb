@@ -131,7 +131,6 @@ RSpec.describe ProcessMembershipWorker, type: :job do
           expect(membership.claimed?).to be_falsey
           expect(membership.email_invitation_sent_at).to be_blank
           user.save
-          user.perform_create_jobs # TODO: Rails 5 update - this is an after_commit issue
           user.reload
           membership.reload
           expect(membership.send_invitation_email?).to be_falsey

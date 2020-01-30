@@ -93,7 +93,7 @@ class Bike < ApplicationRecord
 
   before_save :set_calculated_attributes
 
-  include PgSearch
+  include PgSearch::Model
   pg_search_scope :pg_search, against: {
                                 serial_number: "A",
                                 cached_data: "B",
@@ -477,10 +477,16 @@ class Bike < ApplicationRecord
   end
 
   def bike_organization_ids=(val)
-    org_ids = (val.is_a?(Array) ? val : val.split(",").map(&:strip))
-      .map { |id| validated_organization_id(id) }.compact
+    val = val.split(",").map(&:strip) unless val.is_a?(Array)
+
+    org_ids = val.map { |id| validated_organization_id(id) }.compact
+
     org_ids.each { |id| bike_organizations.where(organization_id: id).first_or_create }
-    bike_organizations.each { |bo| bo.destroy unless org_ids.include?(bo.organization_id) }
+
+    bike_organizations
+      .reject { |bo| org_ids.include?(bo.organization_id) }
+      .each(&:destroy)
+
     true
   end
 

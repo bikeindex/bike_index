@@ -69,7 +69,7 @@ class User < ApplicationRecord
   before_validation :normalize_attributes
   validate :ensure_unique_email
   before_create :generate_username_confirmation_and_auth
-  after_commit :perform_create_jobs, on: :create, if: lambda { !self.skip_create_jobs }
+  after_commit :perform_create_jobs, on: :create, unless: lambda { self.skip_create_jobs }
   before_save :set_calculated_attributes
 
   attr_accessor :skip_create_jobs
@@ -134,7 +134,9 @@ class User < ApplicationRecord
 
   def unconfirmed?; !confirmed? end
 
-  def perform_create_jobs; AfterUserCreateWorker.new.perform(id, "new", user: self) end
+  def perform_create_jobs
+    AfterUserCreateWorker.new.perform(id, "new", user: self)
+  end
 
   def superuser?; superuser end
 

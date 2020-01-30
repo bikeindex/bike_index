@@ -6,7 +6,7 @@ RSpec.describe Admin::OwnershipsController, type: :controller do
       ownership = FactoryBot.create(:ownership)
       user = FactoryBot.create(:admin)
       set_current_user(user)
-      get :edit, id: ownership.id
+      get :edit, params: { id: ownership.id }
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)
     end
@@ -23,7 +23,7 @@ RSpec.describe Admin::OwnershipsController, type: :controller do
         creator_email: user.email,
         user_hidden: true,
       }
-      put :update, id: ownership.id, ownership: update_params
+      put :update, params: { id: ownership.id, ownership: update_params }
       ownership.reload
       expect(ownership.user).to eq(og_creator)
       expect(ownership.user_hidden).to be_truthy

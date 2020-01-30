@@ -1,4 +1,4 @@
-class AddAddressToUsers < ActiveRecord::Migration
+class AddAddressToUsers < ActiveRecord::Migration[4.2]
   def change
     add_column :users, :latitude, :float
     add_column :users, :longitude, :float

@@ -10,8 +10,9 @@ class ApplicationDecorator < Draper::Decorator
   end
 
   def ass_name(association, extra = "")
-    ass = object.send(association, name)
-    [ass.name, extra].reject(&:blank?).join(" ") if ass.present?
+    assoc = object.public_send(association)
+    return if assoc.blank?
+    [assoc.name, extra].reject(&:blank?).join(" ")
   end
 
   def attr_list_item(desc = nil, title, with_colon: false)

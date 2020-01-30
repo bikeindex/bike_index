@@ -33,10 +33,12 @@ FactoryBot.define do
       end
 
       after(:create) do |organization, evaluator|
-        invoice = FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization)
-        # Force this to be active, even without payments
-        invoice.update_attributes(paid_feature_ids: [evaluator.paid_feature.id], force_active: true)
-        organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after commit doesn't run
+        Sidekiq::Testing.inline! do
+          invoice = FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization)
+          # !!!! TODO: add in force_active: true here? !!!!!
+          invoice.update_attributes(paid_feature_ids: [evaluator.paid_feature.id])
+          organization.reload
+        end
       end
 
       factory :organization_with_regional_bike_counts do

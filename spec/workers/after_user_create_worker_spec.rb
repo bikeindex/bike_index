@@ -75,7 +75,6 @@ RSpec.describe AfterUserCreateWorker, type: :job do
                         creator: bike.creator,
                         params: { bike: { address: "Pier 15 The Embarcadero, 94111", phone: "(111) 222-3333" } })
     end
-    # We need to manually set the user in this ownership because otherwise rspec can't find it TODO: Rails 5 update maybe
     let(:ownership) { FactoryBot.create(:ownership, user: user, owner_email: "aftercreate@bikeindex.org") }
     let!(:bike) { ownership.bike }
     include_context :geocoder_real
@@ -110,46 +109,41 @@ RSpec.describe AfterUserCreateWorker, type: :job do
   end
 
   describe "associate_membership_invites" do
-    let!(:membership) { FactoryBot.create(:membership, invited_email: " #{user.email.upcase}") }
-    let!(:membership2) { FactoryBot.create(:membership, invited_email: " #{user.email.upcase}") }
-    let(:user) { FactoryBot.build(:user, email: "owner1@A.COM") }
     it "assigns any memberships that match the user email, and mark user confirmed if invited" do
-      membership.reload
-      expect(membership.claimed?).to be_falsey
-      Sidekiq::Testing.inline! do
-        user.save
-        user.perform_create_jobs
-      end
-      user.reload
-      expect(membership.created_at < user.created_at).to be_truthy
+      user = FactoryBot.build(:user, email: "owner1@B.COM")
+      membership1 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
+      membership2 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
+      expect(membership1.claimed?).to be_falsey
+
+      Sidekiq::Testing.inline! { user.save }
+
+      expect(membership1.created_at < user.created_at).to be_truthy
       # This is called on create, so we just test that things happen correctly here
-      membership.reload
-      membership2.reload
       expect(user.confirmed?).to be_truthy
-      expect(membership.claimed?).to be_truthy
-      expect(membership2.claimed?).to be_truthy
-      expect(membership.user).to eq user
+      expect(membership1.reload.claimed?).to be_truthy
+      expect(membership2.reload.claimed?).to be_truthy
+      expect(membership1.user).to eq user
       expect(user.memberships.count).to eq 2
       expect(user.organizations.count).to eq 2
     end
 
-    # We are processing the first organization inline so we can redirect users to the organization they belong to
-    it "non-async processes the first" do
-      membership.reload
-      expect(membership.claimed?).to be_falsey
+    # We are processing the first organization inline so we can
+    # redirect users to the organization they belong to
+    it "synchronously associates the first memberhsip" do
+      user = FactoryBot.build(:user, email: "owner1@B.COM")
+      membership1 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
+      membership2 = FactoryBot.create(:membership, invited_email: " #{user.email.upcase}")
+      expect(membership1).to_not be_claimed
+      expect(membership2).to_not be_claimed
+
       user.save
-      user.perform_create_jobs
-      user.reload
-      expect(membership.created_at < user.created_at).to be_truthy
-      # This is called on create, so we just test that things happen correctly here
-      membership.reload
-      membership2.reload
-      expect(user.confirmed?).to be_truthy
-      expect(membership.claimed?).to be_truthy
-      expect(membership2.claimed?).to be_falsey
-      expect(membership.user).to eq user
-      expect(user.memberships.count).to eq 1
-      expect(user.organizations.count).to eq 1
+
+      expect(membership1.reload.created_at).to be < user.created_at
+      expect(user).to be_confirmed
+      expect(membership1).to be_claimed
+      expect(membership1.user).to eq user
+      expect(user.memberships.count).to eq(1)
+      expect(user.organizations.count).to eq(1)
     end
   end
 

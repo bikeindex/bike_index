@@ -106,7 +106,7 @@ class Admin::OrganizationsController < Admin::BaseController
   end
 
   def kind_for_organizations
-    # Legacy enum issue so excited for TODO: Rails 5 update
+    # TODO: Refactor to incorporate Rails 5 enum changes
     Organization::KIND_ENUM[params[:search_kind].to_sym] || 0
   end
 
@@ -115,7 +115,7 @@ class Admin::OrganizationsController < Admin::BaseController
       # We want to return both no_pos and does_not_need_pos
       return [Organization::POS_KIND_ENUM[:no_pos], Organization::POS_KIND_ENUM[:does_not_need_pos]]
     end
-    # Legacy enum issue so excited for TODO: Rails 5 update
+    # TODO: Refactor to incorporate Rails 5 enum changes
     Organization::POS_KIND_ENUM[params[:search_pos].to_sym] || 0
   end
 

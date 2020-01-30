@@ -10,6 +10,7 @@ class FeedbacksController < ApplicationController
     @feedback = Feedback.new(permitted_parameters)
     @feedback.user_id = current_user.id if current_user.present?
     return true if block_the_spam(@feedback)
+
     if @feedback.save
       if @feedback.lead?
         flash[:success] = translation(:we_will_contact_you)
@@ -17,17 +18,19 @@ class FeedbacksController < ApplicationController
         flash[:success] = translation(:thanks_for_your_message)
       end
       if request.env["HTTP_REFERER"].present? and request.env["HTTP_REFERER"] != request.env["REQUEST_URI"]
-        redirect_to :back
+        redirect_back(fallback_location: help_path)
       else
         redirect_to help_path
       end
     else
       @page_errors = @feedback.errors
+      render :index and return if request.referer.blank?
+
       re_path = Rails.application.routes.recognize_path(request.referer)
       template = "#{re_path[:controller]}/#{re_path[:action]}"
       @force_landing_page_render = re_path[:controller] == "landing_pages"
-      @recovery_displays = RecoveryDisplay.limit(5) if template == "welcome/index"
       @page_id = [re_path[:controller], re_path[:action]].join("_")
+      @recovery_displays = RecoveryDisplay.limit(5) if template == "welcome/index"
       render template: template
     end
   end
@@ -43,7 +46,7 @@ class FeedbacksController < ApplicationController
     # But to make it possible for non-signed in users to generate leads, we're trying this out
     return false unless feedback.looks_like_spam?
     flash[:error] = translation(:please_sign_in)
-    redirect_to :back and return true
+    redirect_back(fallback_location: root_url) and return true
   end
 
   def permitted_parameters

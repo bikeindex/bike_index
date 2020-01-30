@@ -30,7 +30,7 @@ RSpec.describe Admin::BikesController, type: :controller do
     let(:stolen_record) { bike.current_stolen_record }
     context "standard" do
       it "renders" do
-        get :edit, id: FactoryBot.create(:bike).id
+        get :edit, params: { id: FactoryBot.create(:bike).id }
         expect(response.code).to eq("200")
         expect(response).to render_template("edit")
         expect(flash).to_not be_present
@@ -39,7 +39,7 @@ RSpec.describe Admin::BikesController, type: :controller do
     context "with recovery" do
       before { stolen_record.add_recovery_information }
       it "includes recovery" do
-        get :edit, id: bike.id
+        get :edit, params: { id: bike.id }
         expect(response.code).to eq("200")
         expect(response).to render_template("edit")
         expect(flash).to_not be_present
@@ -53,7 +53,7 @@ RSpec.describe Admin::BikesController, type: :controller do
     it "destroys the bike" do
       bike = FactoryBot.create(:bike)
       expect do
-        delete :destroy, id: bike.id
+        delete :destroy, params: { id: bike.id }
       end.to change(Bike, :count).by(-1)
       expect(response).to redirect_to(:admin_bikes)
       expect(flash[:success]).to match(/deleted/i)
@@ -82,7 +82,7 @@ RSpec.describe Admin::BikesController, type: :controller do
             },
           },
         }
-        put :update, id: bike.id, bike: bike_attributes
+        put :update, params: { id: bike.id, bike: bike_attributes }
         expect(flash[:success]).to be_present
         expect(response).to redirect_to(:edit_admin_bike)
         bike.reload
@@ -103,7 +103,7 @@ RSpec.describe Admin::BikesController, type: :controller do
           id: bike.id,
           bike: { serial_number: "ssssssssss" },
         }
-        put :update, opts
+        put :update, params: opts
         bike.reload
         expect(bike.serial_number).to eq("ssssssssss")
         expect(response).to redirect_to "/about"
@@ -119,7 +119,7 @@ RSpec.describe Admin::BikesController, type: :controller do
           id: bike.id,
           bike: { made_without_serial: "1", serial_number: "d" },
         }
-        put :update, opts
+        put :update, params: opts
         bike.reload
         expect(bike.made_without_serial?).to be_truthy
         expect(bike.serial_number).to eq("made_without_serial")
@@ -136,7 +136,7 @@ RSpec.describe Admin::BikesController, type: :controller do
       it "duplicates are ignore" do
         duplicate_bike_group = DuplicateBikeGroup.create
         expect(duplicate_bike_group.ignore).to be_falsey
-        put :ignore_duplicate_toggle, id: duplicate_bike_group.id
+        put :ignore_duplicate_toggle, params: { id: duplicate_bike_group.id }
         duplicate_bike_group.reload
 
         expect(duplicate_bike_group.ignore).to be_truthy
@@ -148,7 +148,7 @@ RSpec.describe Admin::BikesController, type: :controller do
       it "marks a duplicate group unignore" do
         duplicate_bike_group = DuplicateBikeGroup.create(ignore: true)
         expect(duplicate_bike_group.ignore).to be_truthy
-        put :ignore_duplicate_toggle, id: duplicate_bike_group.id
+        put :ignore_duplicate_toggle, params: { id: duplicate_bike_group.id }
         duplicate_bike_group.reload
 
         expect(duplicate_bike_group.ignore).to be_falsey
@@ -170,7 +170,7 @@ RSpec.describe Admin::BikesController, type: :controller do
         manufacturer_id: manufacturer.id,
         bikes_selected: { bike1.id => bike1.id, bike2.id => bike2.id },
       }
-      post :update_manufacturers, update_params
+      post :update_manufacturers, params: update_params
       [bike1, bike2].each do |bike|
         bike.reload
         expect(bike.manufacturer).to eq manufacturer
@@ -194,7 +194,7 @@ RSpec.describe Admin::BikesController, type: :controller do
 
     it "marks unrecovered, without deleting the information about the recovery" do
       og_recover_link_token = recovery_link_token
-      put :unrecover, bike_id: bike.id, stolen_record_id: stolen_record.id
+      put :unrecover, params: { bike_id: bike.id, stolen_record_id: stolen_record.id }
       expect(flash[:success]).to match(/unrecovered/i)
       expect(response).to redirect_to admin_bike_path(bike)
 
@@ -206,7 +206,7 @@ RSpec.describe Admin::BikesController, type: :controller do
     end
     context "not matching stolen_record" do
       it "returns to bike page and renders flash" do
-        put :unrecover, bike_id: bike.id + 10, stolen_record_id: stolen_record.id
+        put :unrecover, params: { bike_id: bike.id + 10, stolen_record_id: stolen_record.id }
         expect(flash[:error]).to match(/contact/i)
         expect(response).to redirect_to admin_bike_path(bike.id + 10)
 
