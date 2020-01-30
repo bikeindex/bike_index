@@ -8,6 +8,14 @@ class Bike < ApplicationRecord
   mount_uploader :pdf, PdfUploader
   process_in_background :pdf, CarrierWaveProcessWorker
 
+  # For now, prefixed with state_ so it doesn't interfere with existing attrs
+  STATE_ENUM = {
+    state_with_owner: 0,
+    state_stolen: 1,
+    state_abandoned: 2,
+    state_impound: 3
+  }
+
   belongs_to :manufacturer
   belongs_to :primary_frame_color, class_name: "Color"
   belongs_to :secondary_frame_color, class_name: "Color"
@@ -69,6 +77,7 @@ class Bike < ApplicationRecord
   enum handlebar_type: HandlebarType::SLUGS
   enum cycle_type: CycleType::SLUGS
   enum propulsion_type: PropulsionType::SLUGS
+  enum state: STATE_ENUM
 
   default_scope {
     includes(:tertiary_frame_color, :secondary_frame_color, :primary_frame_color, :current_stolen_record)
@@ -287,16 +296,10 @@ class Bike < ApplicationRecord
 
   def current_initial_abandoned_record; current_abandoned_records.initial_record.first end
 
-  # Temporary fix because of existing #abandoned attr, will be folded into enum
-  def abandoned_state?; current_abandoned_records.any? end
-
   # Small helper because we call this a lot
   def type; cycle_type && cycle_type_name.downcase end
 
   def user_hidden; hidden && current_ownership&.user_hidden end
-
-  # Currently dynamic - this will be turned into an enum in the future, removing #stolen?, #impounded?, etc
-  def state; calculated_state end
 
   def email_visible_for?(org)
     organizations.include?(org)
@@ -728,6 +731,7 @@ class Bike < ApplicationRecord
 
   def set_calculated_attributes
     self.listing_order = calculated_listing_order
+    self.state = calculated_state
     clean_frame_size
     set_mnfg_name
     set_user_hidden
@@ -819,12 +823,11 @@ class Bike < ApplicationRecord
     geocode_data.present?
   end
 
-  private
-
+  # Should be private. Not for now, because we're migrating (removing #stolen?, #impounded?, etc)
   def calculated_state
-    return "stolen" if current_stolen_record.present?
-    return "impounded" if current_impound_record.present?
-    return "abandoned" if current_abandoned_records.any?
-    "with_owner"
+    return "state_stolen" if current_stolen_record.present?
+    return "state_impounded" if current_impound_record.present?
+    return "state_abandoned" if abandoned? || current_abandoned_records.any?
+    "state_with_owner"
   end
 end
