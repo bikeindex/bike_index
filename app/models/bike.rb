@@ -731,6 +731,7 @@ class Bike < ApplicationRecord
 
   def set_calculated_attributes
     self.listing_order = calculated_listing_order
+    self.state = calculated_state
     clean_frame_size
     set_mnfg_name
     set_user_hidden

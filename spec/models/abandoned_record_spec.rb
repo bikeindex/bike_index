@@ -10,8 +10,8 @@ RSpec.describe AbandonedRecord, type: :model do
       expect(abandoned_record.owner_known?).to be_falsey
       expect(abandoned_record.send_message?).to be_falsey
       expect(bike.current_initial_abandoned_record).to eq abandoned_record
-      expect(bike.abandoned_state?).to be_truthy
-      expect(bike.state).to eq "abandoned"
+      expect(bike.state_abandoned?).to be_truthy
+      expect(bike.state).to eq "state_abandoned"
       expect(abandoned_record.organization).to be_nil
     end
     context "organized record" do
@@ -23,8 +23,8 @@ RSpec.describe AbandonedRecord, type: :model do
         expect(abandoned_record.owner_known?).to be_truthy
         expect(abandoned_record.send_message?).to be_truthy
         expect(bike.current_initial_abandoned_record).to eq abandoned_record
-        expect(bike.abandoned_state?).to be_truthy
-        expect(bike.state).to eq "abandoned"
+        expect(bike.state_abandoned?).to be_truthy
+        expect(bike.state).to eq "state_abandoned"
         expect(abandoned_record.organization).to eq organization
         expect(abandoned_record.user.organizations).to eq([organization])
         # Test that we are just getting the orgs abandoned bikes
