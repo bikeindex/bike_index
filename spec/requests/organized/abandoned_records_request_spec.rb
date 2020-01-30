@@ -13,13 +13,13 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
 
   describe "index" do
     it "renders" do
-      get base_url, json_headers
+      get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
     end
     context "json" do
       it "returns empty" do
-        get base_url, format: :json
+        get base_url, params: { format: :json }
         expect(response.status).to eq(200)
         expect(json_result).to eq("abandoned_records" => [])
         expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
@@ -52,7 +52,7 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
           }
         end
         it "renders json, no cors present" do
-          get base_url, format: :json
+          get base_url, params: { format: :json }
           expect(response.status).to eq(200)
           abandoned_records = json_result["abandoned_records"]
           expect(abandoned_records.count).to eq 1
@@ -89,7 +89,10 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
       it "creates" do
         expect(organization.paid_for?("abandoned_bikes")).to be_truthy
         expect do
-          post base_url, organization_id: organization.to_param, abandoned_record: abandoned_record_params
+          post base_url, params: {
+            organization_id: organization.to_param,
+            abandoned_record: abandoned_record_params,
+          }
           expect(response).to redirect_to organization_abandoned_records_path(organization_id: organization.to_param)
           expect(flash[:success]).to be_present
         end.to change(AbandonedRecord, :count).by(1)
@@ -110,7 +113,10 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
         it "does not create" do
           expect(organization.paid_for?("abandoned_bikes")).to be_truthy
           expect do
-            post base_url, organization_id: organization.to_param, abandoned_record: abandoned_record_params
+            post base_url, params: {
+              organization_id: organization.to_param,
+              abandoned_record: abandoned_record_params,
+            }
             expect(response).to redirect_to user_root_url
             expect(flash[:error]).to be_present
           end.to_not change(AbandonedRecord, :count)
@@ -120,7 +126,10 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
       context "without a required param" do
         it "fails and renders error" do
           expect do
-            post base_url, organization_id: organization.to_param, abandoned_record: abandoned_record_params.except(:latitude)
+            post base_url, params: {
+              organization_id: organization.to_param,
+              abandoned_record: abandoned_record_params.except(:latitude),
+            }
             expect(flash[:error]).to match(/address/i)
           end.to_not change(AbandonedRecord, :count)
         end
@@ -136,7 +145,9 @@ RSpec.describe Organized::AbandonedRecordsController, type: :request do
           expect(organization.is_paid).to be_truthy
           expect(organization.paid_for?("abandoned_bikes")).to be_falsey
           expect do
-            post base_url, organization_id: organization.to_param, abandoned_record: abandoned_record_params
+            post base_url, params: {
+              organization_id: organization.to_param, abandoned_record: abandoned_record_params
+            }
             expect(response).to redirect_to organization_bikes_path(organization_id: organization.to_param)
             expect(flash[:error]).to be_present
           end.to_not change(AbandonedRecord, :count)

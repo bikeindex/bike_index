@@ -1,6 +1,5 @@
 module Organized
   class AbandonedRecordsController < Organized::BaseController
-    rescue_from ActionController::RedirectBackError, with: :redirect_back # Seth Fix for #1426
     before_action :ensure_access_to_abandoned_bikes!, only: %i[index create]
 
     def index
@@ -41,7 +40,7 @@ module Organized
       else
         flash[:error] = translation(:unable_to_record, errors: @abandoned_record.errors.full_messages.to_sentence)
       end
-      redirect_to :back
+       redirect_back(fallback_location: organization_abandoned_records_path(organization_id: current_organization.to_param))
     end
 
     helper_method :abandoned_records
@@ -61,11 +60,6 @@ module Organized
       return true if current_organization.paid_for?("abandoned_bikes")
       flash[:error] = translation(:your_org_does_not_have_access)
       redirect_to organization_bikes_path(organization_id: current_organization.to_param)
-      return
-    end
-
-    def redirect_back
-      redirect_to organization_abandoned_records_path(organization_id: current_organization.to_param)
       return
     end
   end
