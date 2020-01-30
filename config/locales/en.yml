@@ -759,6 +759,8 @@ en:
           has_many: Cannot delete record because dependent %{record} exist
           has_one: Cannot delete record because a dependent %{record} exists
       models:
+        abandoned_record:
+          address_required: "(or location) of this abandoned bike required"
         bike:
           not_found: not found
           suspended: suspended and can't be used
@@ -1247,6 +1249,8 @@ en:
       your_full_address_is_required: Your full address is required by %{org_name}
       zipcode: Postal code
     organized_access_panel:
+      abandoned_bike_modal_title: Record %{bike_type} abandoned
+      abandoned_bike_notes_html: Additional notes <small>not shown to user</small>
       access_panel: Access Panel
       additional_message: Additional message
       address: 'Address:'
@@ -1266,6 +1270,7 @@ en:
       creator: Creator
       edit: Edit
       email_to_deal_with_this_html: Email %{support_link} to deal with this.
+      existing_abandoned_records: Existing abandoned records for this %{bike_type}
       geomessage: GeoMessage
       impound: Impound
       impound_are_you_sure: Are you sure you want to %{bike_type}?
@@ -1274,12 +1279,14 @@ en:
       is_not_registered_html: "<em>not</em> reged with %{org_name}"
       is_registered: reged with %{org_name}
       is_true: 'true'
+      kind: Kind
       link_sticker: Link Sticker
       link_url_for_online_sighting: Link url for online sighting
       mark_bike_recovered: Mark bike recovered
       message_owner: Message %{bike_type} owner
       missing_address: missing address
       missing_owner_name: missing user name
+      notes: Notes
       or_call_owner_html: "<em>Or call</em> <strong>Owner's phone number:</strong>"
       org_can_edit_bike: "%{org_name} can edit this %{bike_type}"
       org_cannot_edit: "%{org_name} can not edit"
@@ -1289,6 +1296,11 @@ en:
       owner_email: Owner email
       owner_name: Owner name
       permission: Permission
+      record: Record
+      record_abandoned: Record abandoned
+      record_again: Record again
+      recorded: Recorded
+      recorder: Recorder
       registered: 'Registered:'
       send: Send
       send_message: Send message
@@ -1592,6 +1604,14 @@ en:
           We're sorry, that organization doesn't have a user set up to register bikes
           through. Email contact@bikeindex.org if this seems like an error.
     organized:
+      abandoned_records:
+        create:
+          abandoned_recorded: Abandoned %{bike_type} recorded
+          unable_to_record: Unable to record - %{errors}
+        ensure_access_to_abandoned_bikes!:
+          your_org_does_not_have_access: >-
+            Your organization doesn't have access to that, please contact Bike Index
+            support.
       ambassador_task_assignments:
         update:
           could_not_update: Could not update activity status. Please try again later.
@@ -3672,6 +3692,7 @@ en:
       log_in: log in
       logout: Logout
       multi_serial_search: Multi serial search
+      org_abandoned_bikes: "%{org_name} Abandoned Bikes"
       org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"
       org_impounded_bikes: "%{org_name} Impounded Bikes"
@@ -4062,6 +4083,22 @@ en:
         Your current account (<strong>%{user_email}</strong>) will be a member of
         the organization you create.
   organized:
+    abandoned_records:
+      index:
+        abandoned_records: Abandoned Records
+        bike: Bike
+        impounded: Impounded
+        kind: Kind
+        matches: Matches
+        recorded: Recorded
+        recorder: Recorder
+      show:
+        abandoned_record: Abandoned Record
+        additional_text: Additional text
+        bike: Bike
+        none: none
+        recorded: Recorded
+        recorder: Recorder
     ambassador_dashboards:
       getting_started:
         10_tips_for_getting_started_in_your_town: 10 tips for getting started in your
@@ -4941,6 +4978,7 @@ en:
       thank_you: Thank you so much for using Bike Index!
       thanks_for_using_bike_index: Thanks for using Bike Index!
     organized_skeleton:
+      abandoned_bikes: Abandoned Bikes
       add_a_bike: Add a bike
       additional_features_html: >-
         Bike Index provides additional features for verified Law Enforcement organizations.

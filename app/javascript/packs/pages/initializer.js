@@ -4,6 +4,7 @@ import BinxMapping from "./binx_mapping.js";
 import BinxAdmin from "./admin/binx_admin.js";
 import BinxAppOrgExport from "./binx_org_export.js";
 import BinxAppOrgMessages from "./binx_org_messages.js";
+import BinxAppOrgAbandonedRecords from "./binx_org_abandoned_records.js";
 import BinxAppOrgBikes from "./binx_org_bikes.js";
 import BinxAppOrgUserForm from "./binx_org_user_form";
 import PeriodSelector from "../utils/period_selector.js";
@@ -48,6 +49,10 @@ $(document).ready(function() {
     window.binxMapping = new BinxMapping("geolocated_messages");
     window.binxAppOrgMessages = new BinxAppOrgMessages();
     binxAppOrgMessages.init();
+  } else if (bodyId === "organized_abandoned_records_index") {
+    window.binxMapping = new BinxMapping("abandoned_records");
+    window.binxAppOrgAbandonedRecords = new BinxAppOrgAbandonedRecords();
+    binxAppOrgAbandonedRecords.init();
   } else if (
     ["organized_exports_show", "organized_exports_new"].includes(bodyId)
   ) {

@@ -12,13 +12,14 @@ class BikeIndex.OrganizedManageLocations extends BikeIndex
       # We don't need to do anything except slide the input up, because the label is on it.
       $(this).closest('fieldset').slideUp()
       # event.preventDefault()
+    loadFancySelects = @loadFancySelects
     $('form').on 'click', '.add_fields', (event) ->
       event.preventDefault()
       time = new Date().getTime()
       regexp = new RegExp($(this).data('id'), 'g')
       $('#fieldsetend').before($(this).data('fields').replace(regexp, time))
       setDefaultCountryAndName()
-      @loadFancySelects()
+      loadFancySelects()
 
 
   setDefaultCountryAndName: ->

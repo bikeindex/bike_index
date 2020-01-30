@@ -1,0 +1,55 @@
+.organized-page-header
+  %h1
+    %em= current_organization.name
+    = t(".abandoned_record")
+
+%table.table-list
+  %tbody
+    %tr
+      %td= t(".recorded")
+      %td
+        %span.convertTime
+          = l(@abandoned_record.created_at, format: :convert_time)
+    %tr
+      %td= t(".recorder")
+      %td= @abandoned_record.user.display_name
+    %tr
+      %td= t(".bike")
+      %td
+        - if @bike.present?
+          = link_to organized_bike_text(@bike), bike_path(@bike)
+    %tr
+      %td= t(".additional_text")
+      %td
+        - if @abandoned_record.notes.present?
+          = @abandoned_record.notes
+        - else
+          %em.less-strong= t(".none")
+
+#map_canvas{ style: "height: 400px;" }
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<script src="https://maps.googleapis.com/maps/api/js?key=#{ENV["GOOGLE_MAPS"]}&sensor=false" type="text/javascript">
+</script>
+
+:plain
+  <script type="text/javascript">
+    var map;
+    function initialize() {
+      var center = new google.maps.LatLng(#{@abandoned_record.latitude}, #{@abandoned_record.longitude});
+      var myOptions = {
+        zoom: 13,
+        center: center,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
+      map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+
+      new google.maps.Marker({
+        position: new google.maps.LatLng(#{@abandoned_record.latitude}, #{@abandoned_record.longitude}),
+        map: map
+      });
+    }
+    $(document).ready(function() {
+      google.maps.event.addDomListener(window, "load", initialize);
+    });
+  </script>

@@ -28,6 +28,49 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
+-- Name: abandoned_records; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.abandoned_records (
+    id integer NOT NULL,
+    kind integer DEFAULT 0,
+    bike_id integer,
+    user_id integer,
+    organization_id integer,
+    retrieved_at timestamp without time zone,
+    impound_record_id integer,
+    initial_abandoned_record_id integer,
+    notes text,
+    address character varying,
+    latitude double precision,
+    longitude double precision,
+    accuracy double precision,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: abandoned_records_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.abandoned_records_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: abandoned_records_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.abandoned_records_id_seq OWNED BY public.abandoned_records.id;
+
+
+--
 -- Name: ads; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2453,6 +2496,13 @@ ALTER SEQUENCE public.wheel_sizes_id_seq OWNED BY public.wheel_sizes.id;
 
 
 --
+-- Name: abandoned_records id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.abandoned_records ALTER COLUMN id SET DEFAULT nextval('public.abandoned_records_id_seq'::regclass);
+
+
+--
 -- Name: ads id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2877,6 +2927,14 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 ALTER TABLE ONLY public.wheel_sizes ALTER COLUMN id SET DEFAULT nextval('public.wheel_sizes_id_seq'::regclass);
+
+
+--
+-- Name: abandoned_records abandoned_records_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.abandoned_records
+    ADD CONSTRAINT abandoned_records_pkey PRIMARY KEY (id);
 
 
 --
@@ -3373,6 +3431,41 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.wheel_sizes
     ADD CONSTRAINT wheel_sizes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: index_abandoned_records_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_abandoned_records_on_bike_id ON public.abandoned_records USING btree (bike_id);
+
+
+--
+-- Name: index_abandoned_records_on_impound_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_abandoned_records_on_impound_record_id ON public.abandoned_records USING btree (impound_record_id);
+
+
+--
+-- Name: index_abandoned_records_on_initial_abandoned_record_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_abandoned_records_on_initial_abandoned_record_id ON public.abandoned_records USING btree (initial_abandoned_record_id);
+
+
+--
+-- Name: index_abandoned_records_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_abandoned_records_on_organization_id ON public.abandoned_records USING btree (organization_id);
+
+
+--
+-- Name: index_abandoned_records_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_abandoned_records_on_user_id ON public.abandoned_records USING btree (user_id);
 
 
 --
@@ -4466,6 +4559,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200101211426'),
 ('20200107234030'),
 ('20200108232256'),
-('20200109005657');
+('20200109005657'),
+('20200128144317');
 
 

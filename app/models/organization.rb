@@ -42,6 +42,7 @@ class Organization < ApplicationRecord
   has_many :locations, inverse_of: :organization, dependent: :destroy
   has_many :mail_snippets
   has_many :organization_messages
+  has_many :abandoned_records
   has_many :b_params
   has_many :invoices
   has_many :payments
@@ -123,6 +124,12 @@ class Organization < ApplicationRecord
         .where.not(impound_records: { id: nil })
   end
 
+  def abandoned_bikes
+    Bike.includes(:abandoned_records)
+        .where(abandoned_records: { retrieved_at: nil, impound_record_id: nil, organization_id: id })
+        .where.not(abandoned_records: { id: nil })
+  end
+
   def to_param; slug end
 
   def sent_invitation_count; memberships.count end
@@ -159,8 +166,13 @@ class Organization < ApplicationRecord
   def message_kinds # Matches organization_message kinds
     [
       paid_for?("geolocated_messages") ? "geolocated_messages" : nil,
+      # TODO: make this based on abandoned_bikes
       paid_for?("abandoned_bike_messages") ? "abandoned_bike_messages" : nil,
     ].compact
+  end
+
+  def message_kinds_except_abandoned # abandoned_bike_messages are going to be assigned dynamically and have different behavior
+    message_kinds - ["abandoned_bike_messages"]
   end
 
   def additional_registration_fields
@@ -197,7 +209,7 @@ class Organization < ApplicationRecord
   end
 
   def bike_actions?
-    message_kinds.any? || paid_for?("unstolen_notifications") || paid_for?("impound_bikes")
+    PaidFeature::BIKE_ACTIONS.detect { |f| paid_for?(f) }.present?
   end
 
   def law_enforcement_missing_verified_features?
@@ -221,7 +233,6 @@ class Organization < ApplicationRecord
         .map { |name| name.strip.downcase.gsub(/\s/, "_") }
 
     return false unless features.present? && paid_feature_slugs.is_a?(Array)
-
     features.all? do |feature|
       paid_feature_slugs.include?(feature) ||
       (ambassador? && feature == "unstolen_notifications")

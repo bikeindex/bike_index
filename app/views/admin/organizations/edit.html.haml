@@ -10,7 +10,7 @@
       = render '/admin/organizations/location_fields', f: builder
 
 
-    = revised_link_to_add_fields "Add a location", f, :locations, class_name: "mx-auto"
+    = link_to_add_fields "Add a location", f, :locations, class_name: "mx-auto"
 
   .mt-4
     = f.submit "Update", class: 'btn-lg btn-success float-right'

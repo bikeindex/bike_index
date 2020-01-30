@@ -3,25 +3,28 @@
     %em= current_organization.name
     Dashboard
 
-- if current_organization.regional?
-  = column_chart organization_dashboard_bikes_graph_data, stacked: true, thousands: ",", defer: true, colors: ["#5cb85c", "#3498db"]
+= column_chart organization_dashboard_bikes_graph_data, stacked: true, thousands: ",", defer: true, colors: ["#5cb85c", "#3498db"]
 
-  %div{ style: "margin-top: 50px;" }
-    = render partial: "/shared/period_select"
+%div{ style: "margin-top: 50px;" }
+  = render partial: "/shared/period_select"
 
-  %h3.mt-4.uncap
+%h3.mt-4.uncap
+  - if current_organization.regional?
     Local registrations
-    = humanized_time_range(@time_range)
-  .full-screen-table.mt-4
-    %table.table.table-striped.table-bordered.table-sm
-      %tbody
+  - else
+    Registrations
+  = humanized_time_range(@time_range)
+.full-screen-table.mt-4
+  %table.table.table-striped.table-bordered.table-sm
+    %tbody
+      %tr
+        %td Registered with #{current_organization.name}
+        %td= number_with_delimiter(@bikes_in_organization_count)
+      - if current_organization.parent?
         %tr
-          %td Registered with #{current_organization.name}
-          %td= number_with_delimiter(@bikes_in_organization_count)
-        - if current_organization.parent?
-          %tr
-            %td Registered by related organizations
-            %td= number_with_delimiter(@bikes_in_child_organizations_count)
+          %td Registered by related organizations
+          %td= number_with_delimiter(@bikes_in_child_organizations_count)
+      - if current_organization.regional?
         - if current_organization.nearby_organizations.any?
           %tr
             %td
@@ -38,23 +41,45 @@
             %strong
               - total_bikes = @bikes_in_organizations.count(:all) + @bikes_not_in_organizations.count(:all)
               = number_with_delimiter(total_bikes)
+  - if current_organization.regional?
     %small.less-strong.d-md-block{ style: "display: none; padding: 0.25rem 0.5rem; margin: -1rem 0 0 0;" }
       %em
         Total registrations
       may be different than the sum of all rows because bikes can be registered with multiple organizations
 
-  - if current_organization.parent?
-    %h3.mt-4.uncap
-      Registrations by related organizations
-      = humanized_time_range(@time_range)
-    .full-screen-table.mt-4
-      %table.table.table-striped.table-bordered.table-sm
-        %thead
-          %th Organization
-          %th.small Signed up
-          %th Bikes
-        %tbody
-          - current_organization.child_organizations.reorder(:name).each do |organization|
+- if current_organization.parent?
+  %h3.mt-4.uncap
+    Registrations by related organizations
+    = humanized_time_range(@time_range)
+  .full-screen-table.mt-4
+    %table.table.table-striped.table-bordered.table-sm
+      %thead
+        %th Organization
+        %th.small Signed up
+        %th Bikes
+      %tbody
+        - current_organization.child_organizations.reorder(:name).each do |organization|
+          %tr
+            %td
+              = organization.name
+            %td
+              %small.convertTime= l(organization.created_at, format: :convert_time)
+            %td
+              = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)
+
+- if current_organization.nearby_organizations.any?
+  %h3.mt-4.uncap
+    Registrations by local bike shops or other organizations
+    = humanized_time_range(@time_range)
+  .full-screen-table.mt-4
+    %table.table.table-striped.table-bordered.table-sm
+      %thead
+        %th Organization
+        %th.small Signed up
+        %th Bikes
+      %tbody
+        - current_organization.nearby_organizations.reorder(:name).each do |organization|
+          %tr
             %tr
               %td
                 = organization.name
@@ -62,26 +87,5 @@
                 %small.convertTime= l(organization.created_at, format: :convert_time)
               %td
                 = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)
-
-  - if current_organization.nearby_organizations.any?
-    %h3.mt-4.uncap
-      Registrations by local bike shops or other organizations
-      = humanized_time_range(@time_range)
-    .full-screen-table.mt-4
-      %table.table.table-striped.table-bordered.table-sm
-        %thead
-          %th Organization
-          %th.small Signed up
-          %th Bikes
-        %tbody
-          - current_organization.nearby_organizations.reorder(:name).each do |organization|
-            %tr
-              %tr
-                %td
-                  = organization.name
-                %td
-                  %small.convertTime= l(organization.created_at, format: :convert_time)
-                %td
-                  = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)
 
 = javascript_pack_tag "application"

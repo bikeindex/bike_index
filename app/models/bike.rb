@@ -44,6 +44,8 @@ class Bike < ApplicationRecord
   has_many :duplicate_bike_groups, through: :normalized_serial_segments
   has_many :recovered_records, -> { recovered }, class_name: "StolenRecord"
   has_many :impound_records
+  has_many :abandoned_records
+  has_many :current_abandoned_records, -> { current }, class_name: "AbandonedRecord"
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :components, allow_destroy: true
@@ -283,10 +285,18 @@ class Bike < ApplicationRecord
 
   def impounded?; current_impound_record.present? end
 
+  def current_initial_abandoned_record; current_abandoned_records.initial_record.first end
+
+  # Temporary fix because of existing #abandoned attr, will be folded into enum
+  def abandoned_state?; current_abandoned_records.any? end
+
   # Small helper because we call this a lot
   def type; cycle_type && cycle_type_name.downcase end
 
   def user_hidden; hidden && current_ownership&.user_hidden end
+
+  # Currently dynamic - this will be turned into an enum in the future, removing #stolen?, #impounded?, etc
+  def state; calculated_state end
 
   def email_visible_for?(org)
     organizations.include?(org)
@@ -807,5 +817,14 @@ class Bike < ApplicationRecord
     return false if skip_geocoding?
     return false if latitude.present? && longitude.present?
     geocode_data.present?
+  end
+
+  private
+
+  def calculated_state
+    return "stolen" if current_stolen_record.present?
+    return "impounded" if current_impound_record.present?
+    return "abandoned" if current_abandoned_records.any?
+    "with_owner"
   end
 end

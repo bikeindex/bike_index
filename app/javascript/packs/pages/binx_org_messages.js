@@ -1,12 +1,13 @@
 import log from "../utils/log";
 import _ from "lodash";
 
+// BinxAppOrgAbandonedRecords is a better, more generalized version of this
 export default class BinxAppOrgMessages {
   constructor() {
     this.fetchedMessages = false;
     this.mapReady = false;
     this.messagesListRendered = false;
-    this.messagesMapRendered = false;
+    this.mapRendered = false;
     this.messages = [];
   }
 
@@ -19,7 +20,7 @@ export default class BinxAppOrgMessages {
   fetchMessages(opts) {
     // lazy parameter to query string
     let queryString = opts.map(i => `${i[0]}=${i[1]}`);
-    let url = `${window.pageInfo.message_root_path}?${queryString.join("&")}`;
+    let url = `${window.pageInfo.root_path}?${queryString.join("&")}`;
     // Using ajax here instead of fetch because we're relying on the cookies for auth for now
     $.ajax({
       type: "GET",
@@ -45,8 +46,8 @@ export default class BinxAppOrgMessages {
 
   // this loops and calls itself again if we haven't finished rendering the map and the messages
   mapOrganizedMessages() {
-    // if we have already rendered the messagesMapRendered, then we're done!
-    if (binxAppOrgMessages.messagesMapRendered) {
+    // if we have already rendered the mapRendered, then we're done!
+    if (binxAppOrgMessages.mapRendered) {
       return true;
     }
     if (binxMapping.googleMapsLoaded()) {
@@ -107,7 +108,7 @@ export default class BinxAppOrgMessages {
 
   inititalizeMapMarkers() {
     binxMapping.addMarkers({ fitMap: true });
-    this.messagesMapRendered = true;
+    this.mapRendered = true;
     // Add a trigger to the map when the viewport changes (after it has finished moving)
     google.maps.event.addListener(binxMap, "idle", function() {
       // This is grabbing the markers in viewport and logging the ids for them.
@@ -121,7 +122,7 @@ export default class BinxAppOrgMessages {
 
   tableRowForMessage(message) {
     let bikeCellUrl = `/bikes/${message.bike.id}`;
-    let sentCellUrl = `${window.pageInfo.message_root_path}/${message.id}`;
+    let sentCellUrl = `${window.pageInfo.root_path}/${message.id}`;
     let sender = window.pageInfo.members[message.sender_id];
     if (sender !== undefined) {
       sender = sender.name;
@@ -139,8 +140,9 @@ export default class BinxAppOrgMessages {
     let message = _.find(binxAppOrgMessages.messages, ["id", point.id]);
     let tableTop =
       '<table class="table table table-striped table-hover table-bordered table-sm"><tbody>';
-    tableTop +=
-      '<tr><td class="map-cell"></td><td>Sent</td><td>Bike</td><td>Sender</td></tr>';
+    tableTop += `<thead class="small-header hidden-md-down">${$(
+      ".list-table thead"
+    ).html()}</thead>`;
     return `${tableTop}${binxAppOrgMessages.tableRowForMessage(
       message
     )}</tbody></table>`;

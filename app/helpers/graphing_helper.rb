@@ -69,11 +69,13 @@ module GraphingHelper
   end
 
   def organization_dashboard_bikes_graph_data
+    org_registrations = {
+      name: "Organization registrations",
+      data: time_range_counts(collection: @bikes_in_organizations, column: "bikes.created_at"),
+    }
+    return [org_registrations] unless current_organization.regional?
     [
-      {
-        name: "Organization registrations",
-        data: time_range_counts(collection: @bikes_in_organizations, column: "bikes.created_at"),
-      },
+      org_registrations,
       {
         name: "Self registrations",
         data: time_range_counts(collection: @bikes_not_in_organizations, column: "bikes.created_at"),

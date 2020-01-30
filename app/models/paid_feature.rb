@@ -6,15 +6,23 @@ class PaidFeature < ApplicationRecord
   # Organizations have paid_feature_slugs as an array attribute to track which features should be enabled
   # Every feature slug that is used in the code should be in this array
   # Only slugs that are used in the code should be in this array
-  REG_FIELDS = %w[reg_affiliation reg_secondary_serial reg_phone reg_address].freeze
+  REG_FIELDS = %w[
+    reg_affiliation
+    reg_secondary_serial
+    reg_phone
+    reg_address
+  ].freeze
+  BIKE_ACTIONS = %w[
+    abandoned_bikes
+    geolocated_messages
+    impound_bikes
+    unstolen_notifications
+  ].freeze
   EXPECTED_SLUGS = (%w[
-    abandoned_bike_messages
     avery_export
     bike_search
     bike_stickers
     csv_exports
-    geolocated_messages
-    impound_bikes
     messages
     passwordless_users
     regional_bike_counts
@@ -24,8 +32,7 @@ class PaidFeature < ApplicationRecord
     show_partial_registrations
     show_recoveries
     skip_ownership_email
-    unstolen_notifications
-  ] + REG_FIELDS).freeze
+  ] + BIKE_ACTIONS + REG_FIELDS).freeze
 
   has_many :invoice_paid_features
   has_many :invoices, through: :invoice_paid_features

@@ -1,6 +1,12 @@
 # Spec helpers that are included in all request specs
 # via Rspec.configure (rails_helper)
 module RequestSpecHelpers
+  # Lame copy of user_root_url - required because of subdomain: false
+  def user_root_url
+    return user_home_url(subdomain: false) if current_user&.confirmed?
+    root_url
+  end
+
   def log_in(current_user = nil)
     current_user ||= FactoryBot.create(:user_confirmed)
     allow(User).to receive(:from_auth) { current_user }
