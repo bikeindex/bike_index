@@ -199,6 +199,8 @@ nl:
         bike_sticker:
           not_found: niet gevonden
           unauthorized_to_claim: hebben geen toestemming om dit te claimen
+        abandoned_record:
+          address_required: "(of locatie) van deze verlaten fiets vereist"
     attributes:
       doorkeeper/application:
         name: Naam
@@ -2017,6 +2019,17 @@ nl:
       impounded_by: Door
       organization_child: Child organisatie
       organization_registered: Organisatie
+      abandoned_bike_modal_title: Record %{bike_type} verlaten
+      abandoned_bike_notes_html: Aanvullende opmerkingen worden <small>niet getoond
+        aan de gebruiker</small>
+      existing_abandoned_records: Bestaande verlaten records voor deze %{bike_type}
+      kind: Soort
+      notes: Notes
+      record: Vermelding
+      record_abandoned: Record verlaten
+      record_again: Neem opnieuw op
+      recorded: opgenomen
+      recorder: opnemer
     pdf:
       bike_description: 'Fiets beschrijving:'
       bike_serial: Bike Serial
@@ -2480,6 +2493,13 @@ nl:
             is.
         update:
           updated_membership: Bijgewerkt lidmaatschap voor %{user_email}.
+      abandoned_records:
+        create:
+          abandoned_recorded: Verlaten %{bike_type} opgenomen
+          unable_to_record: Kan niet opnemen - %{errors}
+        ensure_access_to_abandoned_bikes!:
+          your_org_does_not_have_access: Uw organisatie heeft hier geen toegang toe,
+            neem contact op met Bike Index support.
     bike_stickers:
       find_bike_sticker:
         must_be_signed_in: Je moet aangemeld zijn om dat te doen.
@@ -4129,6 +4149,7 @@ nl:
       users: Gebruikers
       view_org: Bekijk %{org_name}
       your_bikes: Je fietsen
+      org_abandoned_bikes: "%{org_name} Verlaten fietsen"
     application_bikehub:
       contact: contact
       home: Thuis
@@ -4628,6 +4649,22 @@ nl:
         send_invitation: Verstuur uitnodiging
         user: Gebruiker
         you_have_invited_html: 'U heeft uitgenodigd: <strong>%{users_count}</strong>'
+    abandoned_records:
+      index:
+        abandoned_records: Verlaten records
+        bike: Fiets
+        impounded: In beslag genomen bij
+        kind: Soort
+        matches: lucifers
+        recorded: opgenomen
+        recorder: opnemer
+      show:
+        abandoned_record: Verlaten record
+        additional_text: Aanvullende tekst
+        bike: Fiets
+        none: Geen
+        recorded: opgenomen
+        recorder: opnemer
   organized_mailer:
     custom_message:
       subject: "%{org_name} - de locatie van uw %{mnfg_name}"
@@ -5028,6 +5065,7 @@ nl:
       viewing_our_streamlined_page: U bekijkt momenteel onze gestroomlijnde registratiepagina
         voor Bike Shop, die wij aanbevelen te gebruiken
       overview_dashboard: Dashboard
+      abandoned_bikes: Verlaten fietsen
     errors:
       error: Fout
       errors_prevented_this_from_being_saved: "%{errors_count} heeft voorkomen dat
