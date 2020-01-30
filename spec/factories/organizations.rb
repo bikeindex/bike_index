@@ -35,7 +35,6 @@ FactoryBot.define do
       after(:create) do |organization, evaluator|
         Sidekiq::Testing.inline! do
           invoice = FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization)
-          # !!!! TODO: add in force_active: true here? !!!!!
           invoice.update_attributes(paid_feature_ids: [evaluator.paid_feature.id])
           organization.reload
         end

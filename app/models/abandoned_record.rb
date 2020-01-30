@@ -18,8 +18,8 @@ class AbandonedRecord < ActiveRecord::Base
   enum kind: KIND_ENUM
 
   scope :current, -> { where(retrieved_at: nil, impound_record_id: nil) }
-  scope :initial_record, -> { where(initial_abandoned_record: nil) }
-  scope :repeat_record, -> { where.not(initial_abandoned_record: nil) }
+  scope :initial_record, -> { where(initial_abandoned_record_id: nil) }
+  scope :repeat_record, -> { where.not(initial_abandoned_record_id: nil) }
   scope :impounded, -> { where.not(impound_record_id: nil) }
   scope :retrieved, -> { where.not(retrieved_at: nil) }
 
