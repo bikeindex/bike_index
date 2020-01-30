@@ -39,48 +39,31 @@ RSpec.describe BikeCreator do
       end
     end
 
-    describe "build_new" do
+    describe "build_bike" do
       it "calls verified bike on new bike and return the bike" do
         bike = Bike.new
         creator = BikeCreator.new
         expect(creator).to receive(:new_bike).and_return(bike)
-        expect_any_instance_of(BikeCreatorVerifier).to receive(:verify).and_return(bike)
         allow(creator).to receive(:add_required_attributes).and_return(bike)
         expect(creator.send(:build_bike)).to eq(bike)
       end
     end
 
-    # describe "build" do
-    #   it "returns the b_param bike if one exists" do
-    #     b_param = BParam.new
-    #     bike = Bike.new
-    #     allow(b_param).to receive(:bike).and_return(bike)
-    #     allow(b_param).to receive(:created_bike).and_return(bike)
-    #     expect(BikeCreatorBuilder.new(b_param).build).to eq(bike)
-    #   end
-
-    #   it "uses build_new and call other things" do
-    #     b_param = BParam.new
-    #     bike = Bike.new
-    #     allow(b_param).to receive(:created_bike).and_return(nil)
-    #     creator = BikeCreatorBuilder.new(b_param)
-    #     allow(creator).to receive(:build_new).and_return(bike)
-    #     expect(creator).to receive(:add_front_wheel_size).and_return(true)
-    #     expect(creator.build).to eq(bike)
-    #   end
-    # end
+    describe "build" do
+      it "returns the b_param bike if one exists" do
+        b_param = BParam.new
+        bike = Bike.new
+        # allow(b_param).to receive(:bike).and_return(bike)
+        allow(b_param).to receive(:created_bike).and_return(bike)
+        expect(BikeCreator.new(b_param).send(:build_bike)).to eq(bike)
+      end
+    end
   end
-
-
-
-
-
-
 
   describe "include_bike_book" do
     it "returns the bike if stuff isn't present" do
       creator = BikeCreator.new
-      expect(creator.add_bike_book_data).to be_nil
+      expect(creator.send(:add_bike_book_data)).to be_nil
     end
     it "adds se bike data if it exists" do
       manufacturer = FactoryBot.create(:manufacturer, name: "SE Bikes")
@@ -94,7 +77,7 @@ RSpec.describe BikeCreator do
         primary_frame_color_id: color.id,
       }
       b_param = FactoryBot.create(:b_param, params: { bike: bike })
-      BikeCreator.new(b_param).add_bike_book_data
+      BikeCreator.new(b_param).send(:add_bike_book_data)
 
       b_param.reload
       # pp b_param.params
@@ -112,7 +95,7 @@ RSpec.describe BikeCreator do
       b_param = BParam.new
       bike = FactoryBot.create(:bike)
       bike.errors.add(:rando_error, "LOLZ")
-      creator = BikeCreator.new(b_param).clear_bike(bike)
+      creator = BikeCreator.new(b_param).send(:clear_bike, bike)
       expect(creator.errors.messages[:rando_error]).not_to be_nil
       expect(Bike.where(id: bike.id)).to be_empty
     end
@@ -126,7 +109,7 @@ RSpec.describe BikeCreator do
       allow(bike).to receive(:errors).and_return(messages: "some errors")
       creator = BikeCreator.new(b_param)
       expect(creator).to receive(:clear_bike).and_return(bike)
-      creator.validate_record(bike)
+      creator.send(:validate_record, bike)
     end
 
     it "calls delete the already existing bike if one exists" do
@@ -135,7 +118,7 @@ RSpec.describe BikeCreator do
       bike = FactoryBot.create(:bike)
       bike1 = Bike.new
       allow(b_param).to receive(:created_bike).and_return(bike1)
-      expect(BikeCreator.new(b_param).validate_record(bike)).to eq(bike1)
+      expect(BikeCreator.new(b_param).send(:validate_record, bike)).to eq(bike1)
       expect(Bike.where(id: bike1.id)).to be_empty
     end
 
@@ -147,7 +130,7 @@ RSpec.describe BikeCreator do
       allow(bike).to receive(:errors).and_return(nil)
       # b_param.should_receive(:update_attributes).with(created_bike_id: 69)
       expect(b_param).to receive(:update_attributes).with(created_bike_id: 69, bike_errors: nil)
-      BikeCreator.new(b_param).validate_record(bike)
+      BikeCreator.new(b_param).send(:validate_record, bike)
     end
     describe "no_duplicate" do
       let(:existing_bike) { FactoryBot.create(:bike, serial_number: "some serial number", owner_email: email) }
@@ -173,7 +156,7 @@ RSpec.describe BikeCreator do
           expect(b_param.no_duplicate).to be_truthy
           expect(b_param.find_duplicate_bike(new_bike)).to be_truthy
           expect do
-            BikeCreator.new(b_param).validate_record(new_bike)
+            BikeCreator.new(b_param).send(:validate_record, new_bike)
           end.to change(Ownership, :count).by -1
           b_param.reload
           expect(b_param.created_bike_id).to eq existing_bike.id
@@ -187,7 +170,7 @@ RSpec.describe BikeCreator do
           expect(b_param.no_duplicate).to be_truthy
           expect(b_param.find_duplicate_bike(new_bike)).to be_falsey
           expect do
-            BikeCreator.new(b_param).validate_record(new_bike)
+            BikeCreator.new(b_param).send(:validate_record, new_bike)
           end.to change(Ownership, :count).by 0
           b_param.reload
           expect(b_param.created_bike_id).to eq new_bike.id
@@ -207,8 +190,8 @@ RSpec.describe BikeCreator do
         b_param = BParam.new(origin: "api_v1")
         creator = BikeCreator.new(b_param)
         bike = Bike.new
-        # allow(bike).to receive(:id).and_return(69)
-        expect_any_instance_of(BikeCreatorAssociator).to receive(:associate).and_return(bike)
+        # expect_any_instance_of(BikeCreatorAssociator).to receive(:associate).and_return(bike)
+        expect(creator).to receive(:create_associations).and_return(bike) # TODO: remove, replace with above
         expect(creator).to receive(:validate_record).and_return(bike)
         new_bike = Bike.new(
           creation_organization_id: organization.id,
@@ -223,7 +206,7 @@ RSpec.describe BikeCreator do
           "creator" => user,
         )
         expect do
-          saved_bike = creator.save_bike(new_bike)
+          saved_bike = creator.send(:save_bike, new_bike)
         end.to change(Bike, :count).by(1)
       end
     end
@@ -234,10 +217,11 @@ RSpec.describe BikeCreator do
         b_param = BParam.new
         creator = BikeCreator.new(b_param)
         bike = FactoryBot.create(:bike)
-        expect_any_instance_of(BikeCreatorAssociator).to receive(:associate)
+        # expect_any_instance_of(BikeCreatorAssociator).to receive(:associate).and_return(bike)
+        expect(creator).to receive(:create_associations).and_return(bike) # TODO: remove, replace with above
         expect(creator).to receive(:validate_record).and_return(bike)
         expect do
-          creator.save_bike(bike)
+          creator.send(:save_bike, bike)
         end.to change(AfterBikeSaveWorker.jobs, :size).by(1)
       end
     end
