@@ -16,7 +16,7 @@ RSpec.describe StolenNotificationsController, type: :controller do
   describe "create" do
     it "fails without user logged in" do
       expect do
-        post :create, stolen_notification: stolen_notification_attributes
+        post :create, params: { stolen_notification: stolen_notification_attributes }
       end.not_to change(StolenNotification, :count)
     end
 
@@ -30,7 +30,7 @@ RSpec.describe StolenNotificationsController, type: :controller do
         expect(bike.contact_owner?(user)).to be_truthy
         expect do
           expect do
-            post :create, stolen_notification: stolen_notification_attributes
+            post :create, params: { stolen_notification: stolen_notification_attributes }
             expect(flash[:success]).to be_present
           end.to change(StolenNotification, :count).by(1)
         end.to change(EmailStolenNotificationWorker.jobs, :count).by(1)
@@ -46,7 +46,7 @@ RSpec.describe StolenNotificationsController, type: :controller do
         it "fails to create if the user isn't permitted to send a stolen_notification" do
           expect(bike.contact_owner?(user)).to be_falsey
           expect do
-            post :create, stolen_notification: stolen_notification_attributes
+            post :create, params: { stolen_notification: stolen_notification_attributes }
           end.to_not change(StolenNotification, :count)
           expect(flash[:error]).to be_present
         end

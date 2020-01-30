@@ -2,7 +2,8 @@ class AmbassadorTaskAssignment < ApplicationRecord
   belongs_to :ambassador_task
   belongs_to :ambassador,
              class_name: "Ambassador",
-             foreign_key: :user_id
+             foreign_key: :user_id,
+             primary_key: :id
 
   validates :ambassador, presence: true
   validates :ambassador_task, presence: true
@@ -39,7 +40,7 @@ class AmbassadorTaskAssignment < ApplicationRecord
   #
   # Return [AmbassadorTaskAssignment]
   def self.completed_assignments(filters: {}, sort: {})
-    filters = filters.each_pair.map { |col, val| [col.to_s.to_sym, sanitize(val)] }
+    filters = filters.each_pair.map { |col, val| [col.to_s.to_sym, sanitize_sql(val)] }
     sort_col, sort_dir = sort.to_a.first
     sort_col = (sort_col || "").to_sym
 
@@ -79,13 +80,13 @@ class AmbassadorTaskAssignment < ApplicationRecord
 
       case sort_col
       when :organization_name
-        sql << "ORDER BY organizations.name #{sort_dir}\n"
+        sql << "ORDER BY organizations.name #{sort_dir.upcase}\n"
       when :completed_at
-        sql << "ORDER BY ambassador_task_assignments.completed_at #{sort_dir}\n"
+        sql << "ORDER BY ambassador_task_assignments.completed_at #{sort_dir.upcase}\n"
       when :ambassador_task_title
-        sql << "ORDER BY ambassador_tasks.title #{sort_dir}\n"
+        sql << "ORDER BY ambassador_tasks.title #{sort_dir.upcase}\n"
       when :ambassador_name
-        sql << "ORDER BY users.name #{sort_dir}\n"
+        sql << "ORDER BY users.name #{sort_dir.upcase}\n"
       else
         sql << "ORDER BY ambassador_task_assignments.completed_at DESC\n"
       end

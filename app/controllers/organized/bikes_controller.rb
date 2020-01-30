@@ -1,7 +1,6 @@
 module Organized
   class BikesController < Organized::BaseController
     include SortableTable
-    rescue_from ActionController::RedirectBackError, with: :redirect_back # Gross. TODO: Rails 5 update
     skip_before_action :ensure_not_ambassador_organization!, only: [:multi_serial_search]
 
     def index
@@ -53,7 +52,8 @@ module Organized
       else
         flash[:error] = translation(:unknown_update_action)
       end
-      redirect_to :back
+
+      redirect_back(fallback_location: redirect_back_fallback_path)
     end
 
     private
@@ -70,11 +70,11 @@ module Organized
       organization_bikes_path(organization_id: current_organization.to_param)
     end
 
-    def redirect_back
+    def redirect_back_fallback_path
       if params[:id].present?
-        redirect_to bike_path(params[:id]) and return
+        bike_path(params[:id])
       else
-        redirect_to organization_bikes_path and return
+        organization_bikes_path
       end
     end
 

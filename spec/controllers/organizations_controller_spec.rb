@@ -29,7 +29,7 @@ RSpec.describe OrganizationsController, type: :controller do
     end
     it "creates org, membership, filters approved attrs & redirect to org with current_user" do
       expect(Organization.count).to eq(0)
-      post :create, organization: org_attrs
+      post :create, params: { organization: org_attrs }
       expect(Organization.count).to eq(1)
       organization = Organization.where(name: "a new org").first
       expect(response).to redirect_to organization_manage_index_path(organization_id: organization.to_param)
@@ -45,7 +45,7 @@ RSpec.describe OrganizationsController, type: :controller do
       Sidekiq::Testing.inline! do
         expect(Organization.count).to eq(0)
         ActionMailer::Base.deliveries = []
-        post :create, organization: org_attrs.merge(kind: "property_management", approved: false, api_access_approved: true)
+        post :create, params: { organization: org_attrs.merge(kind: "property_management", approved: false, api_access_approved: true) }
         expect(ActionMailer::Base.deliveries).not_to be_empty
         expect(Organization.count).to eq(1)
         organization = Organization.where(name: "a new org").first
@@ -61,9 +61,11 @@ RSpec.describe OrganizationsController, type: :controller do
 
     it "Doesn't xss" do
       expect(Organization.count).to eq(0)
-      post :create, organization: org_attrs.merge(name: "<script>alert(document.cookie)</script>",
+      post :create, params: {
+organization: org_attrs.merge(name: "<script>alert(document.cookie)</script>",
                                                   website: "<script>alert(document.cookie)</script>",
                                                   kind: "cooooooolll_software")
+}
       expect(Organization.count).to eq(1)
       user.reload
       expect(user.organizations.count).to eq 1
@@ -76,7 +78,7 @@ RSpec.describe OrganizationsController, type: :controller do
     context "privileged kinds" do
       Organization.admin_required_kinds.each do |kind|
         it "prevents creating privileged #{kind}" do
-          post :create, organization: org_attrs.merge(kind: kind)
+          post :create, params: { organization: org_attrs.merge(kind: kind) }
 
           expect(Organization.count).to eq(1)
           expect(Organization.last.kind).to eq("other")
@@ -90,7 +92,7 @@ RSpec.describe OrganizationsController, type: :controller do
 
     context "non-stolen" do
       it "renders embed without xframe block" do
-        get :embed, id: organization.slug
+        get :embed, params: { id: organization.slug }
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed)
         expect(response.headers["X-Frame-Options"]).not_to be_present
@@ -101,7 +103,7 @@ RSpec.describe OrganizationsController, type: :controller do
     end
     context "stolen" do
       it "renders embed without xframe block" do
-        get :embed, id: organization.slug, stolen: 1
+        get :embed, params: { id: organization.slug, stolen: 1 }
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed)
         expect(response.headers["X-Frame-Options"]).not_to be_present
@@ -112,7 +114,7 @@ RSpec.describe OrganizationsController, type: :controller do
     end
     context "embed_extended" do
       it "renders embed without xframe block, not stolen" do
-        get :embed_extended, id: organization.slug, email: "something@example.com"
+        get :embed_extended, params: { id: organization.slug, email: "something@example.com" }
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed_extended)
         expect(response.headers["X-Frame-Options"]).not_to be_present
@@ -138,7 +140,7 @@ RSpec.describe OrganizationsController, type: :controller do
       let(:b_param) { FactoryBot.create(:b_param, params: b_param_attrs) }
       it "renders" do
         expect(b_param).to be_present
-        get :embed, id: organization.slug, b_param_id_token: b_param.id_token
+        get :embed, params: { id: organization.slug, b_param_id_token: b_param.id_token }
         expect(response.code).to eq("200")
         expect(response).to render_template(:embed)
         expect(response.headers["X-Frame-Options"]).not_to be_present

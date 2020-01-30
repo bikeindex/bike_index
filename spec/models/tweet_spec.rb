@@ -2,7 +2,9 @@
 require "rails_helper"
 
 RSpec.describe Tweet, type: :model do
-  let(:twitter_response) { File.read(Rails.root.join("spec", "fixtures", "integration_data_tweet.json")) }
+  let(:twitter_response) do
+    JSON.parse File.read Rails.root.join("spec", "fixtures", "integration_data_tweet.json")
+  end
 
   describe "friendly_find" do
     let!(:tweet) { FactoryBot.create(:tweet) }

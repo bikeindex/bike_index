@@ -14,7 +14,7 @@ RSpec.describe DocumentationController, type: :controller do
     let!(:access_grant) { doorkeeper_app.access_grants.create!(resource_owner_id: user.id, redirect_uri: "*", expires_in: 10.minutes) }
     it "renders" do
       set_current_user(user)
-      get :authorize, code: access_grant.token
+      get :authorize, params: { code: access_grant.token }
       expect(assigns(:application)).to eq doorkeeper_app
       expect(response.code).to eq("200")
       expect(response).to render_template("authorize")

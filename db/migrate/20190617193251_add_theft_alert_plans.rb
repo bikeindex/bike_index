@@ -1,4 +1,4 @@
-class AddTheftAlertPlans < ActiveRecord::Migration
+class AddTheftAlertPlans < ActiveRecord::Migration[4.2]
   def change
     create_table :theft_alert_plans do |t|
       t.string :name, null: false, default: ""

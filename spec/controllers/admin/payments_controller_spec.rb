@@ -7,7 +7,16 @@ RSpec.describe Admin::PaymentsController, type: :controller do
   let(:invoice) { FactoryBot.create(:invoice, organization: organization) }
   let(:user2) { FactoryBot.create(:user) }
   let(:create_time) { Time.current - 2.weeks }
-  let(:params) { { organization_id: organization.id, invoice_id: invoice.id, email: user2.email, amount: 222.22, payment_method: "stripe", created_at: create_time.strftime("%FT%T%:z") } }
+  let(:params) do
+    {
+      organization_id: organization.id,
+      invoice_id: invoice.id,
+      email: user2.email,
+      amount: 222.22,
+      payment_method: "stripe",
+      created_at: create_time.strftime("%FT%T%:z"),
+    }
+  end
 
   describe "index" do
     it "renders" do
@@ -19,7 +28,7 @@ RSpec.describe Admin::PaymentsController, type: :controller do
 
   describe "edit" do
     it "renders" do
-      get :edit, id: subject.to_param
+      get :edit, params: { id: subject.to_param }
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)
     end
@@ -39,7 +48,9 @@ RSpec.describe Admin::PaymentsController, type: :controller do
       let(:invoice) { FactoryBot.create(:invoice, organization: organization, updated_at: og_time) }
       it "updates available attributes" do
         expect(subject.invoice).to be_nil
-        put :update, id: subject.to_param, payment: params
+
+        put :update, params: { id: subject.to_param, payment: params }
+
         subject.reload
         expect(subject.organization).to eq organization
         expect(subject.invoice).to eq invoice
@@ -49,14 +60,13 @@ RSpec.describe Admin::PaymentsController, type: :controller do
         expect(subject.user).to eq user
         expect(subject.amount_cents).to_not eq 22_222
         expect(subject.kind).to eq "invoice_payment"
-        # invoice.reload
-        # expect(invoice.updated_at).to be_within(1.second).of Time.current # TODO: Rails 5 update - enable this, rspec doesn't correctly manage after_commit right now
+        expect(invoice.reload.updated_at).to be_within(1.second).of Time.current
       end
     end
     context "check payment" do
       let(:subject) { FactoryBot.create(:payment_check, organization: nil, amount_cents: 55_555, user: user) }
       it "updates available attributes" do
-        put :update, id: subject.to_param, payment: params
+        put :update, params: { id: subject.to_param, payment: params }
         subject.reload
         expect(subject.organization).to eq organization
         expect(subject.invoice).to eq invoice
@@ -69,7 +79,7 @@ RSpec.describe Admin::PaymentsController, type: :controller do
       end
       context "no invoice" do
         it "updates available attributes" do
-          put :update, id: subject.to_param, payment: params.merge(invoice_id: "")
+          put :update, params: { id: subject.to_param, payment: params.merge(invoice_id: "") }
           subject.reload
           expect(subject.organization).to eq organization
           expect(subject.invoice).to be_nil
@@ -87,7 +97,7 @@ RSpec.describe Admin::PaymentsController, type: :controller do
         it "Does not update" do
           expect(invoice.organization).to_not eq organization
           expect(subject.organization).to eq organization
-          put :update, id: subject.to_param, payment: params
+          put :update, params: { id: subject.to_param, payment: params }
           expect(flash[:error]).to match(/#{organization.short_name}/)
           subject.reload
           expect(subject.invoice).to be_nil
@@ -100,16 +110,19 @@ RSpec.describe Admin::PaymentsController, type: :controller do
     context "stripe payment" do
       it "does not create" do
         expect do
-          post :create, payment: params.merge(payment_method: "stripe")
+          post :create, params: { payment: params.merge(payment_method: "stripe") }
           expect(flash[:error]).to match(/stripe/i)
         end.to_not change(Payment, :count)
       end
     end
     context "check payment" do
       it "creates" do
+        payment_attrs = params.merge(payment_method: "check")
+
         expect do
-          post :create, payment: params.merge(payment_method: "check")
+          post :create, params: { payment: payment_attrs }
         end.to change(Payment, :count).by 1
+
         payment = Payment.last
         expect(payment.organization).to eq organization
         expect(payment.invoice).to eq invoice
@@ -121,9 +134,14 @@ RSpec.describe Admin::PaymentsController, type: :controller do
       end
       context "no organization" do
         it "creates" do
+          payment_attrs =
+            params.merge(payment_method: "check",
+                         organization_id: "",
+                         invoice_id: "Invoice ##{invoice.id}")
           expect do
-            post :create, payment: params.merge(payment_method: "check", organization_id: "", invoice_id: "Invoice ##{invoice.id}")
+            post :create, params: { payment: payment_attrs }
           end.to change(Payment, :count).by 1
+
           payment = Payment.last
           expect(payment.organization).to eq organization
           expect(payment.invoice).to eq invoice

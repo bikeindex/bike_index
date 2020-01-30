@@ -1,4 +1,4 @@
-class RemoveDeprecatedTables < ActiveRecord::Migration
+class RemoveDeprecatedTables < ActiveRecord::Migration[4.2]
   def change
     drop_table :frame_materials
     drop_table :handlebar_types

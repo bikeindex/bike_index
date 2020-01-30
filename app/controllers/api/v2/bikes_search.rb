@@ -44,7 +44,6 @@ module API
           use :search_bikes
         end
         get "/", root: "bikes", each_serializer: BikeV2Serializer do
-          { "declared_params" => declared(params, include_missing: false) }
           paginate find_bikes
         end
 
@@ -64,7 +63,6 @@ module API
         end
         get "/stolen", root: "bikes", each_serializer: BikeV2Serializer do
           params[:stolen] = true
-          { "declared_params" => declared(params, include_missing: false) }
           set_proximity
           paginate find_bikes
         end
@@ -76,7 +74,6 @@ module API
         end
         get "/non_stolen", root: "bikes", each_serializer: BikeV2Serializer do
           params[:non_stolen] = true
-          { "declared_params" => declared(params, include_missing: false) }
           paginate find_bikes
         end
 
@@ -102,10 +99,9 @@ module API
           use :stolen_search
         end
         get "/count", root: "bikes", each_serializer: BikeV2Serializer do
-          { "declared_params" => declared(params, include_missing: false) }
           params[:proximity] = params[:proximity] || "ip"
           set_proximity
-          BikeSearcher.new(params).find_bike_counts
+          BikeSearcher.new(params.except("format")).find_bike_counts
         end
 
         desc "Close serials", {

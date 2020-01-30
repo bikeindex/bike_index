@@ -1,4 +1,4 @@
-class AddCycleTypeToBikes < ActiveRecord::Migration
+class AddCycleTypeToBikes < ActiveRecord::Migration[4.2]
   def up
     add_column :bikes, :cycle_type, :integer, default: 0
 

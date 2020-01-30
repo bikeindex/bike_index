@@ -5,7 +5,7 @@ RSpec.describe Organized::UsersController, type: :controller do
     include_context :logged_in_as_organization_member
     describe "index" do
       it "redirects" do
-        get :index, organization_id: organization.to_param
+        get :index, params: { organization_id: organization.to_param }
         expect(response).to redirect_to(organization_root_path)
         expect(flash[:error]).to be_present
       end
@@ -13,7 +13,7 @@ RSpec.describe Organized::UsersController, type: :controller do
 
     describe "new" do
       it "redirects" do
-        get :new, organization_id: organization.to_param
+        get :new, params: { organization_id: organization.to_param }
         expect(response).to redirect_to(organization_root_path)
         expect(flash[:error]).to be_present
       end
@@ -30,12 +30,13 @@ RSpec.describe Organized::UsersController, type: :controller do
           }
         end
         it "does not update" do
-          put :update, organization_id: organization.to_param,
-                       id: membership.id,
-                       membership: membership_params
+          put :update, params: {
+                         organization_id: organization.to_param,
+                         id: membership.id,
+                         membership: membership_params,
+                       }
           expect(response).to redirect_to(organization_root_path)
           expect(flash[:error]).to be_present
-          membership.reload
           expect(membership.role).to eq "member"
         end
       end
@@ -46,7 +47,7 @@ RSpec.describe Organized::UsersController, type: :controller do
     include_context :logged_in_as_organization_admin
     describe "index" do
       it "renders" do
-        get :index, organization_id: organization.to_param
+        get :index, params: { organization_id: organization.to_param }
         expect(response.status).to eq(200)
         expect(response).to render_template :index
         expect(assigns(:current_organization)).to eq organization
@@ -55,7 +56,7 @@ RSpec.describe Organized::UsersController, type: :controller do
 
     describe "new" do
       it "renders the page" do
-        get :new, organization_id: organization.to_param
+        get :new, params: { organization_id: organization.to_param }
         expect(response.code).to eq("200")
         expect(response).to render_template :new
       end
@@ -65,7 +66,7 @@ RSpec.describe Organized::UsersController, type: :controller do
       context "membership" do
         let(:membership) { FactoryBot.create(:membership_claimed, organization: organization) }
         it "renders the page" do
-          get :edit, organization_id: organization.to_param, id: membership.id
+          get :edit, params: { organization_id: organization.to_param, id: membership.id }
           expect(assigns(:membership)).to eq membership
           expect(response.code).to eq("200")
           expect(response).to render_template :edit
@@ -80,8 +81,7 @@ RSpec.describe Organized::UsersController, type: :controller do
           let(:membership_params) { { role: "admin", user_id: 333 } }
           it "updates the role" do
             og_user = membership.user
-            put :update, organization_id: organization.to_param, id: membership.id,
-                         membership: membership_params
+            put :update, params: { organization_id: organization.to_param, id: membership.id, membership: membership_params }
             expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
             expect(flash[:success]).to be_present
             membership.reload
@@ -92,8 +92,7 @@ RSpec.describe Organized::UsersController, type: :controller do
         context "marking self member" do
           let(:membership) { user.memberships.first }
           it "does not update the membership" do
-            put :update, organization_id: organization.to_param, id: membership.id,
-                         membership: { role: "member" }
+            put :update, params: { organization_id: organization.to_param, id: membership.id, membership: { role: "member" } }
             expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
             expect(flash[:error]).to be_present
             membership.reload
@@ -111,8 +110,10 @@ RSpec.describe Organized::UsersController, type: :controller do
           expect(membership.claimed?).to be_falsey
           count = organization.remaining_invitation_count
           expect do
-            delete :destroy, organization_id: organization.to_param,
-                             id: membership.id
+            delete :destroy, params: {
+                               organization_id: organization.to_param,
+                               id: membership.id,
+                             }
           end.to change(Membership, :count).by(-1)
           expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
           expect(flash[:success]).to be_present
@@ -127,7 +128,7 @@ RSpec.describe Organized::UsersController, type: :controller do
             expect(membership.claimed?).to be_truthy
             count = organization.remaining_invitation_count
             expect do
-              delete :destroy, organization_id: organization.to_param, id: membership.id
+              delete :destroy, params: { organization_id: organization.to_param, id: membership.id }
             end.to change(Membership, :count).by(-1)
             expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
             expect(flash[:success]).to be_present
@@ -140,7 +141,7 @@ RSpec.describe Organized::UsersController, type: :controller do
           it "does not destroy" do
             count = organization.remaining_invitation_count
             expect do
-              delete :destroy, organization_id: organization.to_param, id: membership.id
+              delete :destroy, params: { organization_id: organization.to_param, id: membership.id }
             end.to change(Membership, :count).by(0)
             expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
             expect(flash[:error]).to be_present
@@ -162,8 +163,10 @@ RSpec.describe Organized::UsersController, type: :controller do
       context "no email" do
         it "fails" do
           expect do
-            put :create, organization_id: organization.to_param,
-                         membership: membership_params.merge(invited_email: " ")
+            put :create, params: {
+                           organization_id: organization.to_param,
+                           membership: membership_params.merge(invited_email: " "),
+                         }
           end.to change(Membership, :count).by(0)
           expect(assigns(:membership).errors.full_messages).to be_present
         end
@@ -175,16 +178,16 @@ RSpec.describe Organized::UsersController, type: :controller do
             expect(organization.remaining_invitation_count).to eq 4
             expect(User.count).to eq 2
             expect do
-              put :create, organization_id: organization.to_param,
-                           membership: membership_params
+              put :create, params: {
+                             organization_id: organization.to_param,
+                             membership: membership_params,
+                           }
             end.to change(Membership, :count).by(1)
             expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
             expect(flash[:success]).to be_present
             organization.reload
             expect(organization.remaining_invitation_count).to eq 3
             membership = Membership.last
-            membership.enqueue_processing_worker # TODO: Rails 5 update - this is an after_commit issue
-            membership.reload
             expect(membership.role).to eq "member"
             expect(membership.sender).to eq user
             expect(membership.invited_email).to eq "bike_email@bike_shop.com"
@@ -200,7 +203,7 @@ RSpec.describe Organized::UsersController, type: :controller do
         it "does not create a new membership" do
           organization.update_attributes(available_invitation_count: 1)
           expect do
-            put :create, organization_id: organization.to_param, membership: membership_params
+            put :create, params: { organization_id: organization.to_param, membership: membership_params }
           end.to change(Membership, :count).by(0)
           expect(response).to redirect_to organization_users_path(organization_id: organization.to_param)
           expect(flash[:error]).to be_present
@@ -213,9 +216,11 @@ RSpec.describe Organized::UsersController, type: :controller do
             ActionMailer::Base.deliveries = []
             expect(organization.remaining_invitation_count).to eq 4
             expect do
-              put :create, organization_id: organization.to_param,
-                           membership: membership_params,
-                           multiple_emails_invited: multiple_emails_invited.join("\n")
+              put :create, params: {
+                             organization_id: organization.to_param,
+                             membership: membership_params,
+                             multiple_emails_invited: multiple_emails_invited.join("\n"),
+                           }
             end.to_not change(Membership, :count)
           end
         end
@@ -226,20 +231,17 @@ RSpec.describe Organized::UsersController, type: :controller do
         it "invites, dedupes" do
           Sidekiq::Testing.inline! do
             ActionMailer::Base.deliveries = []
-            og_membership_ids = organization.memberships.pluck(:id)
             expect(organization.remaining_invitation_count).to eq 4
             expect do
-              put :create, organization_id: organization.to_param,
-                           membership: membership_params,
-                           multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
+              put :create, params: {
+                             organization_id: organization.to_param,
+                             membership: membership_params,
+                             multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n",
+                           }
             end.to change(Membership, :count).by 4
-            organization.reload
             expect(organization.remaining_invitation_count).to eq 0
             expect(organization.sent_invitation_count).to eq 5
             expect(organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
-            # TODO: Rails 5 update - this is an after_commit issue
-            organization.memberships.where.not(id: og_membership_ids).each { |m| m.enqueue_processing_worker }
-            organization.reload
             expect(organization.users.count).to eq 1
             expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           end
@@ -250,29 +252,27 @@ RSpec.describe Organized::UsersController, type: :controller do
           it "invites whatever" do
             # We have to actually assign the invoice here because membership creation bumps the organization -
             # and the organization needs to have the paid feature after the first membership is created
-            invoice.update_attributes(paid_feature_ids: [paid_feature.id])
-            # TODO: Rails 5 update - this is an after_commit issue
-            organization.update_attributes(updated_at: Time.current)
-            organization.reload
-            expect(organization.paid_feature_slugs).to eq(["passwordless_users"])
             Sidekiq::Testing.inline! do
+              invoice.update_attributes(paid_feature_ids: [paid_feature.id])
+              expect(organization.reload.paid_feature_slugs).to eq(["passwordless_users"])
+
               ActionMailer::Base.deliveries = []
               expect(organization.remaining_invitation_count).to eq 4
               expect(organization.users.count).to eq 1
               expect(organization.users.confirmed.count).to eq 1
-              og_membership_ids = organization.memberships.pluck(:id)
+
               expect do
-                put :create, organization_id: organization.to_param,
-                             membership: membership_params,
-                             multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n"
+                put :create, params: {
+                               organization_id: organization.to_param,
+                               membership: membership_params,
+                               multiple_emails_invited: multiple_emails_invited.join("\n ") + "\n",
+                             }
               end.to change(Membership, :count).by 4
-              organization.reload
+
               expect(organization.remaining_invitation_count).to eq 0
               expect(organization.sent_invitation_count).to eq 5
               expect(organization.memberships.pluck(:invited_email)).to match_array(target_invited_emails)
-              # TODO: Rails 5 update - this is an after_commit issue
-              organization.memberships.where.not(id: og_membership_ids).each { |m| m.enqueue_processing_worker }
-              organization.reload
+
               expect(organization.users.count).to eq 5
               expect(organization.users.confirmed.count).to eq 5
               expect(organization.users.pluck(:email)).to match_array(target_invited_emails)

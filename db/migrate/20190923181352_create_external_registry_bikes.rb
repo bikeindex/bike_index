@@ -1,4 +1,4 @@
-class CreateExternalRegistryBikes < ActiveRecord::Migration
+class CreateExternalRegistryBikes < ActiveRecord::Migration[4.2]
   def change
     create_table :external_registry_bikes do |t|
       t.string :type, null: false, index: true

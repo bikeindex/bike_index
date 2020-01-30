@@ -9,9 +9,11 @@ RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :controller
         assignment = FactoryBot.create(:ambassador_task_assignment, :completed)
 
         patch :update,
-              organization_id: organization,
-              id: assignment,
-              completed: "false"
+              params: {
+                organization_id: organization,
+                id: assignment,
+                completed: "false"
+              }
 
         expect(response).to redirect_to(organization_ambassador_dashboard_url)
         expect(assignment.reload.completed_at).to be_nil
@@ -26,9 +28,11 @@ RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :controller
         expect(assignment.reload.completed_at).to be_nil
 
         patch :update,
-              organization_id: organization,
-              id: assignment,
-              completed: "true"
+              params: {
+                organization_id: organization,
+                id: assignment,
+                completed: "true"
+              }
 
         expect(response).to redirect_to(organization_ambassador_dashboard_url)
         expect(assignment.reload.completed_at).to_not be_nil
@@ -44,9 +48,11 @@ RSpec.describe Organized::AmbassadorTaskAssignmentsController, type: :controller
         allow(AmbassadorTaskAssignment).to receive(:find).and_return(assignment)
 
         patch :update,
-              organization_id: organization,
-              id: assignment,
-              completed: "true"
+              params: {
+                organization_id: organization,
+                id: assignment,
+                completed: "true"
+              }
 
         expect(response).to redirect_to(organization_ambassador_dashboard_url)
         expect(assignment.reload.completed_at).to_not be_present

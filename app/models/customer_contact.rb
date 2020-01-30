@@ -59,7 +59,9 @@ class CustomerContact < ApplicationRecord
   end
 
   def receives_stolen_bike_notifications?
-    return true if bike.current_stolen_record.blank?
+    # Save bike to ensure current_stolen_record is set if it needs to be
+    return true if bike.tap(&:save).current_stolen_record.blank?
+
     bike.current_stolen_record.receive_notifications?
   end
 

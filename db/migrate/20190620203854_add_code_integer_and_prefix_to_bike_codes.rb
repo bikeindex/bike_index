@@ -1,4 +1,4 @@
-class AddCodeIntegerAndPrefixToBikeCodes < ActiveRecord::Migration
+class AddCodeIntegerAndPrefixToBikeCodes < ActiveRecord::Migration[4.2]
   def change
     add_column :bike_codes, :code_integer, :integer
     add_column :bike_codes, :code_prefix, :string

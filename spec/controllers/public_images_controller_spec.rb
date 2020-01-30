@@ -9,17 +9,16 @@ RSpec.describe PublicImagesController, type: :controller do
       context "valid owner" do
         it "creates an image" do
           set_current_user(user)
-          post :create, bike_id: bike.id, public_image: { name: "cool name" }, format: :js
+          post :create, params: { bike_id: bike.id, public_image: { name: "cool name" }, format: :js }
           bike.reload
           expect(bike.public_images.first.name).to eq "cool name"
-          # TODO: Rails 5 update - after commit doesn't run :(, commented out until that change happens
-          # expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
         end
       end
       context "no user" do
         it "does not create an image" do
           expect do
-            post :create, bike_id: bike.id, public_image: { name: "cool name" }, format: :js
+            post :create, params: { bike_id: bike.id, public_image: { name: "cool name" }, format: :js }
             expect(response.code).to eq("401")
           end.to change(PublicImage, :count).by 0
         end
@@ -32,7 +31,7 @@ RSpec.describe PublicImagesController, type: :controller do
         it "creates an image" do
           user = FactoryBot.create(:admin)
           set_current_user(user)
-          post :create, blog_id: blog.id, public_image: { name: "cool name", image: file }, format: :js
+          post :create, params: { blog_id: blog.id, public_image: { name: "cool name", image: file }, format: :js }
           expect(JSON.parse(response.body)).to be_present
           blog.reload
           expect(blog.public_images.first.name).to eq "cool name"
@@ -41,7 +40,7 @@ RSpec.describe PublicImagesController, type: :controller do
           it "creates an image" do
             user = FactoryBot.create(:admin)
             set_current_user(user)
-            post :create, blog_id: blog.id, upload_plugin: "uppy", name: "cool name", image: file, format: :js
+            post :create, params: { blog_id: blog.id, upload_plugin: "uppy", name: "cool name", image: file, format: :js }
             public_image = PublicImage.last
             expect(JSON.parse(response.body)).to be_present
             blog.reload
@@ -55,7 +54,7 @@ RSpec.describe PublicImagesController, type: :controller do
             user = FactoryBot.create(:admin)
             set_current_user(user)
             expect do
-              post :create, blog_id: "", public_image: { name: "cool name", image: file }, format: :js
+              post :create, params: { blog_id: "", public_image: { name: "cool name", image: file }, format: :js }
             end.to change(PublicImage, :count).by 1
             expect(JSON.parse(response.body)).to be_present
           end
@@ -65,7 +64,7 @@ RSpec.describe PublicImagesController, type: :controller do
         it "does not create an image" do
           set_current_user(FactoryBot.create(:user_confirmed))
           expect do
-            post :create, blog_id: blog.id, public_image: { name: "cool name", image: file }, format: :js
+            post :create, params: { blog_id: blog.id, public_image: { name: "cool name", image: file }, format: :js }
             expect(response.code).to eq("401")
           end.to change(PublicImage, :count).by 0
         end
@@ -76,7 +75,7 @@ RSpec.describe PublicImagesController, type: :controller do
       context "admin authorized" do
         include_context :logged_in_as_super_admin
         it "creates an image" do
-          post :create, organization_id: organization.to_param, public_image: { name: "cool name" }, format: :js
+          post :create, params: { organization_id: organization.to_param, public_image: { name: "cool name" }, format: :js }
           organization.reload
           expect(organization.public_images.first.name).to eq "cool name"
         end
@@ -85,7 +84,7 @@ RSpec.describe PublicImagesController, type: :controller do
         include_context :logged_in_as_user
         it "does not create an image" do
           expect do
-            post :create, organization_id: organization.to_param, public_image: { name: "cool name" }, format: :js
+            post :create, params: { organization_id: organization.to_param, public_image: { name: "cool name" }, format: :js }
             expect(response.code).to eq("401")
           end.to change(PublicImage, :count).by 0
         end
@@ -97,7 +96,7 @@ RSpec.describe PublicImagesController, type: :controller do
       context "admin authorized" do
         include_context :logged_in_as_super_admin
         it "creates an image" do
-          post :create, mail_snippet_id: mail_snippet.to_param, public_image: { name: "cool name", image: file }, format: :js
+          post :create, params: { mail_snippet_id: mail_snippet.to_param, public_image: { name: "cool name", image: file }, format: :js }
           mail_snippet.reload
           expect(mail_snippet.public_images.first.name).to eq "cool name"
         end
@@ -105,7 +104,7 @@ RSpec.describe PublicImagesController, type: :controller do
           it "creates an image" do
             user = FactoryBot.create(:admin)
             set_current_user(user)
-            post :create, mail_snippet_id: mail_snippet.id, upload_plugin: "uppy", name: "cool name", image: file, format: :js
+            post :create, params: { mail_snippet_id: mail_snippet.id, upload_plugin: "uppy", name: "cool name", image: file, format: :js }
             public_image = PublicImage.last
             expect(JSON.parse(response.body)).to be_present
             mail_snippet.reload
@@ -118,7 +117,7 @@ RSpec.describe PublicImagesController, type: :controller do
       context "not signed in" do
         it "does not create an image" do
           expect do
-            post :create, organization_id: mail_snippet.to_param, public_image: { name: "cool name" }, format: :js
+            post :create, params: { organization_id: mail_snippet.to_param, public_image: { name: "cool name" }, format: :js }
             expect(response.code).to eq("401")
           end.to change(PublicImage, :count).by 0
         end
@@ -136,7 +135,7 @@ RSpec.describe PublicImagesController, type: :controller do
                                          imageable: mail_snippet)
         public_image.reload
         expect do
-          delete :destroy, id: public_image.id
+          delete :destroy, params: { id: public_image.id }
         end.not_to change(PublicImage, :count)
         expect(flash).to be_present
       end
@@ -150,7 +149,7 @@ RSpec.describe PublicImagesController, type: :controller do
         expect(bike.reload.owner).to eq(user)
         set_current_user(user)
         expect do
-          delete :destroy, id: public_image.id
+          delete :destroy, params: { id: public_image.id }
         end.to change(PublicImage, :count).by(-1)
       end
       context "non owner" do
@@ -161,7 +160,7 @@ RSpec.describe PublicImagesController, type: :controller do
           public_image = FactoryBot.create(:public_image, imageable: bike)
           set_current_user(non_owner)
           expect do
-            delete :destroy, id: public_image.id
+            delete :destroy, params: { id: public_image.id }
           end.not_to change(PublicImage, :count)
         end
       end
@@ -174,7 +173,7 @@ RSpec.describe PublicImagesController, type: :controller do
           expect(bike.reload.owner).to eq(user)
           set_current_user(user)
           expect do
-            delete :destroy, id: public_image.id, page: "redirect_page"
+            delete :destroy, params: { id: public_image.id, page: "redirect_page" }
           end.to change(PublicImage, :count).by(-1)
           expect(response).to redirect_to(edit_bike_path(bike, page: "redirect_page"))
         end
@@ -189,7 +188,7 @@ RSpec.describe PublicImagesController, type: :controller do
         expect(bike.reload.owner).to eq(user)
         set_current_user(user)
         expect do
-          delete :destroy, id: public_image.id, page: "redirect_page"
+          delete :destroy, params: { id: public_image.id, page: "redirect_page" }
         end.to change(PublicImage, :count).by(-1)
         expect(response).to redirect_to(edit_bike_path(bike, page: "redirect_page"))
       end
@@ -199,7 +198,7 @@ RSpec.describe PublicImagesController, type: :controller do
   describe "show" do
     it "renders" do
       image = FactoryBot.create(:public_image)
-      get :show, id: image.id
+      get :show, params: { id: image.id }
       expect(response.code).to eq("200")
       expect(response).to render_template("show")
       expect(flash).to_not be_present
@@ -212,7 +211,7 @@ RSpec.describe PublicImagesController, type: :controller do
       user = ownership.owner
       set_current_user(user)
       image = FactoryBot.create(:public_image, imageable: ownership.bike)
-      get :edit, id: image.id
+      get :edit, params: { id: image.id }
       expect(response.code).to eq("200")
       expect(response).to render_template("edit")
       expect(flash).to_not be_present
@@ -229,7 +228,7 @@ RSpec.describe PublicImagesController, type: :controller do
           public_image = FactoryBot.create(:public_image, imageable: bike)
           expect(bike.reload.owner).to eq(user)
           set_current_user(user)
-          put :update, id: public_image.id, public_image: { name: "Food" }
+          put :update, params: { id: public_image.id, public_image: { name: "Food" } }
           expect(response).to redirect_to(edit_bike_url(bike))
           expect(public_image.reload.name).to eq("Food")
           # ensure enqueueing after this
@@ -242,7 +241,7 @@ RSpec.describe PublicImagesController, type: :controller do
           FactoryBot.create(:ownership, bike: bike)
           public_image = FactoryBot.create(:public_image, imageable: bike, name: "party")
           set_current_user(user)
-          put :update, id: public_image.id, public_image: { name: "Food" }
+          put :update, params: { id: public_image.id, public_image: { name: "Food" } }
           expect(public_image.reload.name).to eq("party")
         end
       end
@@ -259,11 +258,10 @@ RSpec.describe PublicImagesController, type: :controller do
           public_image = FactoryBot.create(:public_image, imageable: bike)
           expect(bike.reload.owner).to eq(user)
           set_current_user(user)
-          post :is_private, id: public_image.id, is_private: "true"
+          post :is_private, params: { id: public_image.id, is_private: "true" }
           public_image.reload
           expect(public_image.is_private).to be_truthy
-          # TODO: Rails 5 update - after commit doesn't run :(, commented out until that is enabled
-          # expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
         end
       end
       context "is_private false" do
@@ -272,11 +270,10 @@ RSpec.describe PublicImagesController, type: :controller do
           public_image = FactoryBot.create(:public_image, imageable: bike, is_private: true)
           expect(bike.reload.owner).to eq(user)
           set_current_user(user)
-          post :is_private, id: public_image.id, is_private: false
+          post :is_private, params: { id: public_image.id, is_private: false }
           public_image.reload
           expect(public_image.is_private).to be_falsey
-          # TODO: Rails 5 update - after commit doesn't run :(, commented out until that is enabled
-          # expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+          expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
         end
       end
     end
@@ -285,7 +282,7 @@ RSpec.describe PublicImagesController, type: :controller do
         FactoryBot.create(:ownership, bike: bike)
         public_image = FactoryBot.create(:public_image, imageable: bike, name: "party")
         set_current_user(user)
-        post :is_private, id: public_image.id, is_private: "true"
+        post :is_private, params: { id: public_image.id, is_private: "true" }
         expect(public_image.is_private).to be_falsey
       end
     end
@@ -303,24 +300,20 @@ RSpec.describe PublicImagesController, type: :controller do
 
     it "updates the listing order" do
       expect([public_image_1, public_image_2, public_image_3, public_image_other]).to be_present
-      public_image_other.reload
       expect(public_image_other.listing_order).to eq 0
       expect(public_image_3.listing_order).to eq 3
       expect(public_image_2.listing_order).to eq 2
       expect(public_image_1.listing_order).to be < 2
       list_order = [public_image_3.id, public_image_1.id, public_image_other.id, public_image_2.id]
       set_current_user(user)
-      post :order, list_of_photos: list_order.map(&:to_s)
-      public_image_1.reload
-      public_image_2.reload
-      public_image_3.reload
-      public_image_other.reload
-      expect(public_image_3.listing_order).to eq 1
-      expect(public_image_2.listing_order).to eq 4
-      expect(public_image_1.listing_order).to eq 2
-      expect(public_image_other.listing_order).to eq 0
-      # TODO: Rails 5 update - after commit doesn't run :(, commented out until that is enabled
-      # expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
+
+      post :order, params: { list_of_photos: list_order.map(&:to_s) }
+
+      expect(public_image_3.reload.listing_order).to eq 1
+      expect(public_image_2.reload.listing_order).to eq 4
+      expect(public_image_1.reload.listing_order).to eq 2
+      expect(public_image_other.reload.listing_order).to eq 0
+      expect(AfterBikeSaveWorker).to have_enqueued_sidekiq_job(bike.id)
     end
   end
 end

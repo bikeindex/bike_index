@@ -2,7 +2,7 @@ class HandlebarType
   include Enumable
 
   SLUGS = {
-    drop: 5,
+    drop_bar: 5,
     forward: 4,
     rearward: 3,
     other: 2,
@@ -11,7 +11,7 @@ class HandlebarType
   }.freeze
 
   NAMES = {
-    drop: "Drop",
+    drop_bar: "Drop",
     forward: "Forward facing",
     rearward: "Rear facing",
     other: "Not handlebars",

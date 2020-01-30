@@ -1,4 +1,4 @@
-class AddTitleToAmbassadorTasks < ActiveRecord::Migration
+class AddTitleToAmbassadorTasks < ActiveRecord::Migration[4.2]
   def change
     change_table :ambassador_tasks do |t|
       t.column :title, :string, null: false, default: ""

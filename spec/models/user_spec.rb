@@ -286,9 +286,7 @@ RSpec.describe User, type: :model do
       # Unmemoize the stolen_bikes_without_locations
       user_id = user.id
       user = User.find(user_id)
-      # TODO: Rails 5 update - after commit
-      user.update_attributes(updated_at: Time.current)
-      user.reload
+      user.save
       expect(user.stolen_bikes_without_locations.map(&:id)).to eq([stolen_record.bike_id])
       expect(user.has_stolen_bikes_without_locations).to be_truthy
       user.update_attributes(superuser: true)
@@ -519,17 +517,15 @@ RSpec.describe User, type: :model do
       let!(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0, organization: organization) }
       let!(:paid_feature) { FactoryBot.create(:paid_feature, name: "unstolen notifications", feature_slugs: ["unstolen_notifications"]) }
       it "is true if the organization has that paid feature" do
-        user.reload
         expect(user.render_donation_request).to be_nil
         expect(user.send_unstolen_notifications?).to be_falsey
+
         invoice.update_attributes(paid_feature_ids: [paid_feature.id])
-        organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update, after_commit
+        organization.save
+
         expect(organization.bike_actions?).to be_truthy
         expect(Organization.bike_actions.pluck(:id)).to eq([organization.id])
-        # Also, it bubbles up. BUT TODO: Rails 5 update - Have to manually deal with updating because rspec doesn't correctly manage after_commit
-        user.update_attributes(updated_at: Time.current)
-        user.reload
-        expect(user.send_unstolen_notifications?).to be_truthy
+        expect(user.reload.send_unstolen_notifications?).to be_truthy
       end
     end
   end
@@ -691,8 +687,7 @@ RSpec.describe User, type: :model do
       let(:organization_child) { FactoryBot.create(:organization, parent_organization: organization) }
       let!(:user_child) { FactoryBot.create(:organization_member, organization: organization_child) }
       it "returns true" do
-        organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
-        organization.reload
+        organization.save
         expect(organization.child_organizations).to eq([organization_child])
         expect(user.member_of?(organization)).to be_truthy
         expect(user.member_of?(organization_child)).to be_falsey

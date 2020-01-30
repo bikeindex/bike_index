@@ -36,7 +36,7 @@ RSpec.describe ApplicationDecorator do
   describe "ass_name" do
     it "grabs the association name" do
       wheel_size = FactoryBot.create(:wheel_size, name: "foobar", iso_bsd: 559)
-      bike = Bike.new(front_wheel_size: wheel_size)
+      bike = FactoryBot.create(:bike, front_wheel_size: wheel_size, name: "some bike")
       expect(ApplicationDecorator.new(bike).ass_name("front_wheel_size")).to eq("foobar")
     end
   end

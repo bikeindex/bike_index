@@ -1,5 +1,4 @@
 class BikeStickersController < ApplicationController
-  rescue_from ActionController::RedirectBackError, with: :redirect_back # Gross. TODO: Rails 5 update
   before_action :find_bike_sticker
 
   def update
@@ -16,7 +15,7 @@ class BikeStickersController < ApplicationController
     else
       flash[:error] = translation(:cannot_update, kind: @bike_sticker.kind)
     end
-    redirect_to :back
+    redirect_back(fallback_location: root_url)
   end
 
   protected
@@ -28,7 +27,7 @@ class BikeStickersController < ApplicationController
   def find_bike_sticker
     unless current_user.present?
       flash[:error] = translation(:must_be_signed_in)
-      redirect_to :back
+      redirect_back(fallback_location: scanned_bike_path(params[:id], organization_id: params[:organization_id]))
       return
     end
     bike_sticker = BikeSticker.lookup_with_fallback(bike_sticker_code, organization_id: passive_organization&.id, user: current_user)
@@ -36,14 +35,6 @@ class BikeStickersController < ApplicationController
     @bike_sticker = bike_sticker if bike_sticker.present? && bike_sticker.claimable_by?(current_user)
     return @bike_sticker if @bike_sticker.present?
     flash[:error] = translation(:unable_to_find_sticker, code: bike_sticker_code)
-    redirect_to :back and return
-  end
-
-  def redirect_back
-    if params[:id].present?
-      redirect_to scanned_bike_path(params[:id], organization_id: params[:organization_id]) and return
-    else
-      redirect_to user_root_url and return
-    end
+    redirect_back(fallback_location: root_url) and return
   end
 end

@@ -1,4 +1,4 @@
-class RemoveUnusedUserPaidAttributes < ActiveRecord::Migration
+class RemoveUnusedUserPaidAttributes < ActiveRecord::Migration[4.2]
   def change
     remove_column :users, :is_paid_member, :boolean
     remove_column :users, :paid_membership_info, :text

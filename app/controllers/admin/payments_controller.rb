@@ -37,6 +37,7 @@ class Admin::PaymentsController < Admin::BaseController
   def create
     @payment = Payment.new(permitted_create_parameters)
     valid_method = Payment.admin_creatable_payment_methods.include?(permitted_create_parameters[:payment_method])
+
     if valid_method && valid_invoice_parameters? && @payment.save
       flash[:success] = "Payment created"
       redirect_to admin_payments_path
@@ -95,7 +96,10 @@ class Admin::PaymentsController < Admin::BaseController
   end
 
   def permitted_create_parameters
-    params.require(:payment).permit(:payment_method, :amount, :email, :currency, :created_at).merge(invoice_parameters)
+    params
+      .require(:payment)
+      .permit(:payment_method, :amount, :email, :currency, :created_at)
+      .merge(invoice_parameters)
   end
 
   def find_payment

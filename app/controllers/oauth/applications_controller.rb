@@ -29,7 +29,7 @@ module Oauth
     private
 
     def ensure_app_owner!
-      return true if @current_user.superuser? || @current_user.id == @application.owner_id
+      return true if @current_user&.superuser? || @current_user&.id == @application&.owner_id
       flash[:error] = translation(:not_your_application)
       redirect_to oauth_applications_url and return
     end

@@ -33,7 +33,7 @@ class BikeDecorator < ApplicationDecorator
 
   def thumb_image
     if object.thumb_path
-      h.image_tag(object.thumb_path, alt: title_string)
+      h.image_tag(object.thumb_path, alt: title_string, skip_pipeline: true)
     elsif object.stock_photo_url.present?
       small = object.stock_photo_url.split("/")
       ext = "/small_" + small.pop

@@ -1,4 +1,4 @@
-class AddCurrencyToPayment < ActiveRecord::Migration
+class AddCurrencyToPayment < ActiveRecord::Migration[4.2]
   def change
     add_column :payments,
                :currency,

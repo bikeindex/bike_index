@@ -1336,12 +1336,10 @@ RSpec.describe Bike, type: :model do
       let(:bike) { FactoryBot.create(:stolen_bike) }
       it "does not get out of integer errors" do
         expect(bike.listing_order).to be < 10000
-        # We protect against this on stolen record now, so manually set this (still doesn't work :/)
-        bike.current_stolen_record.update_attribute :date_stolen, problem_date
-        # TODO: Rails 5 update - enable this, rspec doesn't correctly manage after_commit right now -
-        # but stolen records don't actually have an after_commit hook to update bikes (they probably should though)
-        # This is just checking this is called correctly on save
-        bike.update_attributes(updated_at: Time.current)
+        # stolen records don't actually have an after_commit hook to update
+        # bikes (they probably should though). This is just checking this is
+        # called correctly on save.
+        bike.save
         expect(bike.listing_order).to be > (Time.current - 13.months).to_i
       end
     end
@@ -1402,10 +1400,10 @@ RSpec.describe Bike, type: :model do
         # Acts as paranoid
         bike_organization.reload
         expect(bike_organization.deleted_at).to be_within(1.second).of Time.current
-        expect(bike.bike_organization_ids).to eq([])
+        expect(bike.reload.bike_organization_ids).to eq([])
+
         bike.bike_organization_ids = [organization.id]
-        bike.reload
-        expect(bike.bike_organization_ids).to eq([organization.id]) # despite uniqueness validation
+        expect(bike.reload.bike_organization_ids).to eq([organization.id]) # despite uniqueness validation
       end
     end
     context "invalid organization_id" do
@@ -1418,7 +1416,7 @@ RSpec.describe Bike, type: :model do
     context "different organization" do
       it "adds organization and removes existing" do
         bike.bike_organization_ids = "#{organization_2.id}, "
-        expect(bike.bike_organization_ids).to eq([organization_2.id])
+        expect(bike.reload.bike_organization_ids).to eq([organization_2.id])
       end
     end
   end

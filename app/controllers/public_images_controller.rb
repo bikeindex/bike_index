@@ -36,7 +36,7 @@ class PublicImagesController < ApplicationController
 
   def is_private
     @public_image.update_attribute :is_private, params[:is_private]
-    render nothing: true
+    head :ok
   end
 
   def update
@@ -73,7 +73,7 @@ class PublicImagesController < ApplicationController
         image.update_attribute :listing_order, index + 1 if current_user_image_owner(image)
       end
     end
-    render nothing: true
+    head :ok
   end
 
   protected

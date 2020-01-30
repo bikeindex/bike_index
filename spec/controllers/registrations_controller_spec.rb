@@ -12,7 +12,7 @@ RSpec.describe RegistrationsController, type: :controller do
   describe "new" do
     it "renders with the embeded form, no xframing" do
       set_current_user(user)
-      get :new, organization_id: organization.id, stolen: true
+      get :new, params: { organization_id: organization.id, stolen: true }
       expect(response).to render_template(:new)
       expect(response.status).to eq(200)
       expect(response.headers["X-Frame-Options"]).to be_present
@@ -27,7 +27,7 @@ RSpec.describe RegistrationsController, type: :controller do
     context "no organization" do
       context "no user" do
         it "renders" do
-          get :embed, stolen: true
+          get :embed, params: { stolen: true }
           expect_it_to_render_correctly
           expect(assigns(:stolen)).to be_truthy
           expect(assigns(:creator)).to be_nil
@@ -48,7 +48,7 @@ RSpec.describe RegistrationsController, type: :controller do
     context "with organization" do
       context "no user" do
         it "renders" do
-          get :embed, organization_id: organization.to_param, simple_header: true, select_child_organization: true
+          get :embed, params: { organization_id: organization.to_param, simple_header: true, select_child_organization: true }
           expect_it_to_render_correctly
           expect(assigns(:stolen)).to eq 0
           expect(assigns(:organization)).to eq organization
@@ -66,9 +66,11 @@ RSpec.describe RegistrationsController, type: :controller do
       context "with user" do
         let!(:organization_child) { FactoryBot.create(:organization, parent_organization_id: organization.id) }
         it "renders, testing variables" do
-          organization.update_attributes(updated_at: Time.current) # TODO: Rails 5 update - after_commit
           set_current_user(user)
-          get :embed, organization_id: organization.id, stolen: true, select_child_organization: true
+          expect(organization.save).to eq(true)
+
+          get :embed, params: { organization_id: organization.id, stolen: true, select_child_organization: true }
+
           expect_it_to_render_correctly
           # Since we're creating these in line, actually test the rendered body
           body = response.body
@@ -104,7 +106,7 @@ RSpec.describe RegistrationsController, type: :controller do
             creation_organization_id: 9292,
           }
           expect do
-            post :create, simple_header: true, b_param: attrs
+            post :create, params: { simple_header: true, b_param: attrs }
           end.to change(BParam, :count).by 0
           renders_embed_without_xframe
           expect(response).to render_template(:new) # Because it redirects since unsuccessful
@@ -126,7 +128,7 @@ RSpec.describe RegistrationsController, type: :controller do
       context "nothing except email set - unverified authenticity token" do
         include_context :test_csrf_token
         it "creates a new bparam and renders" do
-          post :create, b_param: { owner_email: "something@stuff.com" }, simple_header: true
+          post :create, params: { b_param: { owner_email: "something@stuff.com" }, simple_header: true }
           expect_it_to_render_correctly
           b_param = BParam.last
           expect(b_param.owner_email).to eq "something@stuff.com"
@@ -146,7 +148,7 @@ RSpec.describe RegistrationsController, type: :controller do
             owner_email: "ks78xxxxxx@stuff.com",
             creation_organization_id: 21,
           }
-          post :create, b_param: attrs
+          post :create, params: { b_param: attrs }
           expect_it_to_render_correctly
           b_param = BParam.last
           attrs.each do |key, value|

@@ -11,7 +11,7 @@ module Bikes
     end
 
     def update
-      if @stolen_record.add_recovery_information(permitted_params)
+      if @stolen_record.add_recovery_information(permitted_params.to_h)
         EmailRecoveredFromLinkWorker.perform_async(@stolen_record.id)
         flash[:success] = translation(:bike_recovered)
         redirect_to bike_path(@bike)

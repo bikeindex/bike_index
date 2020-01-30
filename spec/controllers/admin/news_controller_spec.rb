@@ -15,7 +15,7 @@ RSpec.describe Admin::NewsController, type: :controller do
   describe "edit" do
     context "standard" do
       it "renders" do
-        get :edit, id: subject.to_param
+        get :edit, params: { id: subject.to_param }
         expect(response.status).to eq(200)
         expect(response).to render_template(:edit)
       end
@@ -29,7 +29,7 @@ RSpec.describe Admin::NewsController, type: :controller do
         body: "<p>html</p>",
         language: "en",
       }
-      put :update, id: subject.to_param, blog: blog_attrs
+      put :update, params: { id: subject.to_param, blog: blog_attrs }
       subject.reload
       expect(subject.title).to eq blog_attrs[:title]
       expect(subject.body).to eq blog_attrs[:body]

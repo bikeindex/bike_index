@@ -1,4 +1,4 @@
-class CreateAlertImages < ActiveRecord::Migration
+class CreateAlertImages < ActiveRecord::Migration[4.2]
   def change
     create_table :alert_images do |t|
       t.belongs_to :stolen_record, null: false, index: true, foreign_key: true

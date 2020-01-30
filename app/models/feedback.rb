@@ -21,7 +21,7 @@ class Feedback < ApplicationRecord
 
   def self.feedback_types
     # Quick semi-hack to get a list of types, good enough till it's not ;)
-    @feedback_types ||= pluck("DISTINCT feedback_type").reject(&:blank?)
+    @feedback_types ||= distinct.pluck(:feedback_type).reject(&:blank?)
   end
 
   def package_size=(val)

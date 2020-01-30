@@ -1,4 +1,4 @@
-class CreateOrganizationMessages < ActiveRecord::Migration
+class CreateOrganizationMessages < ActiveRecord::Migration[4.2]
   def change
     create_table :organization_messages do |t|
       t.integer :kind, default: 0, null: 0

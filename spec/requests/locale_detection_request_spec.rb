@@ -17,29 +17,29 @@ RSpec.describe "Locale detection", type: :request do
 
     context "given a valid locale query param" do
       it "renders the homepage in the requested language" do
-        get "/", locale: :en
+        get "/", params: { locale: :en }
         expect(response.body).to match(/bike registration/i)
-        get "/", locale: :nl
+        get "/", params: { locale: :nl }
         expect(response.body).to match(/fietsregistratie/i)
       end
     end
 
     context "given an invalid locale query param" do
       it "renders the homepage in the default language" do
-        get "/", locale: :klingon
+        get "/", params: { locale: :klingon }
         expect(response.body).to match(/bike registration/i)
 
-        get "/", locale: nil
+        get "/", params: { locale: nil }
         expect(response.body).to match(/bike registration/i)
       end
     end
 
     context "given a valid ACCEPT_LANGUAGE header" do
       it "renders the homepage in the requested language" do
-        get "/", {}, { "HTTP_ACCEPT_LANGUAGE" => "en-US,en;q=0.9" }
+        get "/", params: {}, headers: { "HTTP_ACCEPT_LANGUAGE" => "en-US,en;q=0.9" }
         expect(response.body).to match(/bike registration/i)
 
-        get "/", {}, { "HTTP_ACCEPT_LANGUAGE" => "nl,en;q=0.9" }
+        get "/", params: {}, headers: { "HTTP_ACCEPT_LANGUAGE" => "nl,en;q=0.9" }
         expect(response.body).to match(/fietsregistratie/i)
       end
     end
@@ -48,7 +48,7 @@ RSpec.describe "Locale detection", type: :request do
       it "renders the homepage in the default language" do
         unrecognized_locale = :zh
         expect(I18n.available_locales).to_not include(unrecognized_locale)
-        get "/", {}, { "HTTP_ACCEPT_LANGUAGE" => "#{unrecognized_locale};q=0.8" }
+        get "/", params: {}, headers: { "HTTP_ACCEPT_LANGUAGE" => "#{unrecognized_locale};q=0.8" }
         expect(response.body).to match(/bike registration/i)
       end
     end
@@ -58,7 +58,7 @@ RSpec.describe "Locale detection", type: :request do
 
       it "gives highest precedence to query param" do
         current_user.update_attribute :preferred_language, :es
-        get "/", { locale: :nl }, { "HTTP_ACCEPT_LANGUAGE" => "en-US,en;q=0.9" }
+        get "/", params: { locale: :nl }, headers: { "HTTP_ACCEPT_LANGUAGE" => "en-US,en;q=0.9" }
         expect(response.body).to match(/fietsregistratie/i)
         # It doesn't reset users preferences based on request
         expect(current_user.reload.preferred_language).to eq "es"
@@ -66,7 +66,7 @@ RSpec.describe "Locale detection", type: :request do
 
       it "gives secondary precedence to user preference" do
         current_user.update_attribute :preferred_language, :nl
-        get "/", {}, { "HTTP_ACCEPT_LANGUAGE" => "en-US,en;q=0.9" }
+        get "/", params: {}, headers: { "HTTP_ACCEPT_LANGUAGE" => "en-US,en;q=0.9" }
         expect(response.body).to match(/fietsregistratie/i)
         # It doesn't reset users preferences based on request
         expect(current_user.reload.preferred_language).to eq "nl"
@@ -74,7 +74,7 @@ RSpec.describe "Locale detection", type: :request do
 
       it "gives lowest precedence to request headers" do
         current_user.update_attribute :preferred_language, nil
-        get "/", {}, { "HTTP_ACCEPT_LANGUAGE" => "nl,en;q=0.9" }
+        get "/", params: {}, headers: { "HTTP_ACCEPT_LANGUAGE" => "nl,en;q=0.9" }
         expect(response.body).to match(/fietsregistratie/i)
         # It doesn't reset users preferences based on request
         expect(current_user.reload.preferred_language).to eq nil
@@ -84,7 +84,7 @@ RSpec.describe "Locale detection", type: :request do
         allow(I18n).to receive(:default_locale).and_return(:nl)
         current_user.update(preferred_language: nil)
 
-        get "/", { locale: :klingon }, { "HTTP_ACCEPT_LANGUAGE" => "k3" }
+        get "/", params: { locale: :klingon }, headers: { "HTTP_ACCEPT_LANGUAGE" => "k3" }
 
         expect(response.body).to match(/fietsregistratie/i)
         allow(I18n).to receive(:default_locale).and_call_original
@@ -107,18 +107,18 @@ RSpec.describe "Locale detection", type: :request do
 
     context "given a valid locale query param" do
       it "renders the admin dashboard in English" do
-        get "/admin", locale: :nl
+        get "/admin", params: { locale: :nl }
         expect(response.body).to match(/The best bike registry/i)
-        get "/admin/bikes", locale: :nl
+        get "/admin/bikes", params: { locale: :nl }
         expect(response.body).to match(/The best bike registry/i)
       end
     end
 
     context "given a valid ACCEPT_LANGUAGE header" do
       it "renders the homepage in English" do
-        get "/admin", {}, { "HTTP_ACCEPT_LANGUAGE" => "nl,en;q=0.9" }
+        get "/admin", params: {}, headers: { "HTTP_ACCEPT_LANGUAGE" => "nl,en;q=0.9" }
         expect(response.body).to match(/The best bike registry/i)
-        get "/admin/users", {}, { "HTTP_ACCEPT_LANGUAGE" => "nl,en;q=0.9" }
+        get "/admin/users", params: {}, headers: { "HTTP_ACCEPT_LANGUAGE" => "nl,en;q=0.9" }
         expect(response.body).to match(/The best bike registry/i)
       end
     end

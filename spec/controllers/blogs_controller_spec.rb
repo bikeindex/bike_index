@@ -12,7 +12,7 @@ RSpec.describe BlogsController, type: :controller do
     it "redirects" do
       user = FactoryBot.create(:user)
       blog = Blog.create(title: "foo title", body: "ummmmm good", user_id: user.id)
-      get :show, id: blog.title_slug
+      get :show, params: { id: blog.title_slug }
       expect(response).to redirect_to(news_url(blog.title_slug))
     end
   end

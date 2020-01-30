@@ -37,5 +37,5 @@
 //= require external_scripts/jquery.fileupload.js
 
 // Our actual scripts:
-//= require init.coffee
+//= require init
 //= require_tree ./revised

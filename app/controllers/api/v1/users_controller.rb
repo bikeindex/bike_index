@@ -72,7 +72,7 @@ module Api
                                       can_share_recovery: params[:can_share_recovery])
 
         bike.current_stolen_record.add_recovery_information(
-          params.merge(recovered_description: feedback.body)
+          params.merge(recovered_description: feedback.body).permit!.to_h
         )
       end
     end

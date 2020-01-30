@@ -1,4 +1,4 @@
-require File.expand_path("../boot", __FILE__)
+require_relative "boot"
 
 require "rails/all"
 require "rack/throttle"
@@ -9,6 +9,9 @@ Bundler.require(*Rails.groups)
 
 module Bikeindex
   class Application < Rails::Application
+    # Initialize configuration defaults for originally generated Rails version.
+    config.load_defaults 5.2
+
     # Use our custom error pages
     config.exceptions_app = self.routes
     require "draper"
@@ -27,6 +30,9 @@ module Bikeindex
     # Force sql schema use so we get psql extensions
     config.active_record.schema_format = :sql
 
+    # Disable default implicit presence validation for belongs_to relations
+    config.active_record.belongs_to_required_by_default = false
+
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     config.i18n.load_path += Dir[Rails.root.join("config", "locales", "**", "*.{rb,yml}").to_s]
     config.i18n.enforce_available_locales = false
@@ -34,28 +40,27 @@ module Bikeindex
     config.i18n.available_locales = %i[en nl]
     config.i18n.fallbacks = { "en-US": :en, "en-GB": :en }
 
-    # Do not swallow errors in after_commit/after_rollback callbacks.
-    config.active_record.raise_in_transactional_callbacks = true
-
     # Throttle stuff
     config.middleware.use Rack::Throttle::Minute, :max => ENV["MIN_MAX_RATE"].to_i, :cache => Redis.new, :key_prefix => :throttle
 
     # Add middleware to make i18n configuration thread-safe
-    require_relative "../lib/i18n/middleware"
     config.middleware.use I18n::Middleware
 
-    config.to_prepare do
+    ActiveSupport::Reloader.to_prepare do
       Doorkeeper::ApplicationsController.layout "doorkeeper"
       Doorkeeper::AuthorizationsController.layout "doorkeeper"
       Doorkeeper::AuthorizedApplicationsController.layout "doorkeeper"
     end
 
     config.generators do |g|
-      g.factory_bot true
-      g.helper false
-      g.javascripts false
-      g.stylesheets false
+      g.factory_bot "true"
+      g.helper nil
+      g.decorator nil
+      g.javascripts nil
+      g.stylesheets nil
       g.template_engine nil
+      g.serializer nil
+      g.assets nil
       g.test_framework :rspec, view_specs: false, routing_specs: false, controller_specs: false
     end
   end
