@@ -5,7 +5,7 @@ class BikeCreator
     @location = location
   end
 
-  def new_bike
+  def build_bike
     bike_attrs =
       @b_param
         .bike
@@ -17,15 +17,15 @@ class BikeCreator
     bike.b_param_id_token = @b_param.id_token
     bike.creator_id = @b_param.creator_id
     bike.updator_id = bike.creator_id
-    # bike = BikeCreatorVerifier.new(@b_param, bike).verify
-    bike = verified_bike(bike) # Remove and replace with above
+    bike = BikeCreatorVerifier.new(@b_param, bike).verify
     bike = add_required_attributes(bike)
+    bike = add_front_wheel_size(bike)
     bike
   end
 
   def create_bike
     add_bike_book_data
-    @bike = build_bike
+    @bike = find_or_build_bike
     return @bike if @bike.errors.present?
     save_bike(@bike)
   end
@@ -64,14 +64,8 @@ class BikeCreator
     @b_param
   end
 
-  # Remove:
-  def create_associations(bike); @bike = BikeCreatorAssociator.new(@b_param).associate(bike) end
-
-  # Remove:
-  def verified_bike(bike); BikeCreatorVerifier.new(@b_param, bike).verify end
-
   def clear_bike(bike)
-    build_bike
+    find_or_build_bike
     bike.errors.messages.each do |message|
       @bike.errors.add(message[0], message[1][0])
     end
@@ -94,8 +88,7 @@ class BikeCreator
   def save_bike(bike)
     bike.set_location_info(request_location: @location)
     bike.save
-    # @bike = BikeCreatorAssociator.new(@b_param).associate(bike)
-    @bike = create_associations(bike) # Replace with above, remove method
+    @bike = BikeCreatorAssociator.new(@b_param).associate(bike)
     validate_record(@bike)
 
     if @bike.present? && @bike.id.present?
@@ -122,23 +115,19 @@ class BikeCreator
     }
   end
 
-  # These methods were from BikeCreatorBuilder, or were removed from being public in PR#1477
-  # should be refactored down for sure, but initial pass to make the surface area smaller
-
-  def build_bike
+  def find_or_build_bike
     if @b_param&.created_bike&.present?
       return @bike = @b_param.created_bike
     end
-    @bike = new_bike
-    add_front_wheel_size(@bike)
+    @bike = build_bike
     @bike
   end
 
   def add_front_wheel_size(bike)
-    return true unless bike.rear_wheel_size_id.present?
-    return true if bike.front_wheel_size_id.present?
+    return bike unless bike.rear_wheel_size_id.present? && bike.front_wheel_size_id.blank?
     bike.front_wheel_size_id = bike.rear_wheel_size_id
     bike.front_tire_narrow = bike.rear_tire_narrow
+    bike
   end
 
   def add_required_attributes(bike)

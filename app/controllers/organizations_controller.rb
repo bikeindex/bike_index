@@ -38,7 +38,7 @@ class OrganizationsController < ApplicationController
   end
 
   def embed
-    @bike = BikeCreator.new(@b_param).new_bike
+    @bike = BikeCreator.new(@b_param).build_bike
     @bike.owner_email = params[:email] if params[:email].present?
     @stolen_record = built_stolen_record
     if params[:non_stolen]
@@ -50,7 +50,7 @@ class OrganizationsController < ApplicationController
   end
 
   def embed_extended
-    @bike = BikeCreator.new(@b_param).new_bike
+    @bike = BikeCreator.new(@b_param).build_bike
     if params[:email].present?
       @bike.owner_email = params[:email]
       @persist_email = true unless defined?(@persist_email)

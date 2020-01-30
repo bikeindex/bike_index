@@ -9,7 +9,7 @@ RSpec.describe BikeCreator do
         allow(b_param).to receive(:id).and_return(9)
         allow(b_param).to receive(:creator_id).and_return(6)
         allow(b_param).to receive(:params).and_return({ bike: { serial_number: "AAAA" } }.as_json)
-        bike = BikeCreator.new(b_param).new_bike
+        bike = BikeCreator.new(b_param).build_bike
         expect(bike.serial_number).to eq("AAAA")
         expect(bike.updator_id).to eq(6)
         expect(bike.b_param_id).to eq(9)
@@ -39,13 +39,13 @@ RSpec.describe BikeCreator do
       end
     end
 
-    describe "build_bike" do
+    describe "find_or_build_bike" do
       it "calls verified bike on new bike and return the bike" do
         bike = Bike.new
         creator = BikeCreator.new
-        expect(creator).to receive(:new_bike).and_return(bike)
+        expect(creator).to receive(:build_bike).and_return(bike)
         allow(creator).to receive(:add_required_attributes).and_return(bike)
-        expect(creator.send(:build_bike)).to eq(bike)
+        expect(creator.send(:find_or_build_bike)).to eq(bike)
       end
     end
 
@@ -55,7 +55,7 @@ RSpec.describe BikeCreator do
         bike = Bike.new
         # allow(b_param).to receive(:bike).and_return(bike)
         allow(b_param).to receive(:created_bike).and_return(bike)
-        expect(BikeCreator.new(b_param).send(:build_bike)).to eq(bike)
+        expect(BikeCreator.new(b_param).send(:find_or_build_bike)).to eq(bike)
       end
     end
   end
@@ -128,7 +128,6 @@ RSpec.describe BikeCreator do
       allow(b_param).to receive(:id).and_return(42)
       allow(bike).to receive(:id).and_return(69)
       allow(bike).to receive(:errors).and_return(nil)
-      # b_param.should_receive(:update_attributes).with(created_bike_id: 69)
       expect(b_param).to receive(:update_attributes).with(created_bike_id: 69, bike_errors: nil)
       BikeCreator.new(b_param).send(:validate_record, bike)
     end
@@ -190,8 +189,7 @@ RSpec.describe BikeCreator do
         b_param = BParam.new(origin: "api_v1")
         creator = BikeCreator.new(b_param)
         bike = Bike.new
-        # expect_any_instance_of(BikeCreatorAssociator).to receive(:associate).and_return(bike)
-        expect(creator).to receive(:create_associations).and_return(bike) # TODO: remove, replace with above
+        expect_any_instance_of(BikeCreatorAssociator).to receive(:associate).and_return(bike)
         expect(creator).to receive(:validate_record).and_return(bike)
         new_bike = Bike.new(
           creation_organization_id: organization.id,
@@ -217,8 +215,7 @@ RSpec.describe BikeCreator do
         b_param = BParam.new
         creator = BikeCreator.new(b_param)
         bike = FactoryBot.create(:bike)
-        # expect_any_instance_of(BikeCreatorAssociator).to receive(:associate).and_return(bike)
-        expect(creator).to receive(:create_associations).and_return(bike) # TODO: remove, replace with above
+        expect_any_instance_of(BikeCreatorAssociator).to receive(:associate).and_return(bike)
         expect(creator).to receive(:validate_record).and_return(bike)
         expect do
           creator.send(:save_bike, bike)
@@ -234,7 +231,7 @@ RSpec.describe BikeCreator do
         bike = Bike.new
         creator = BikeCreator.new(b_param)
         expect(creator).to receive(:add_bike_book_data).at_least(1).times.and_return(nil)
-        expect(creator).to receive(:build_bike).at_least(1).times.and_return(bike)
+        expect(creator).to receive(:find_or_build_bike).at_least(1).times.and_return(bike)
         expect(bike).to receive(:save).at_least(:once).and_return(true)
         creator.create_bike
       end
@@ -245,7 +242,7 @@ RSpec.describe BikeCreator do
       bike = Bike.new(serial_number: "LOLZ")
       bike.errors.add(:errory, "something")
       creator = BikeCreator.new(b_param)
-      expect(creator).to receive(:build_bike).and_return(bike)
+      expect(creator).to receive(:find_or_build_bike).and_return(bike)
       response = creator.create_bike
       expect(response.errors[:errory]).to eq(["something"])
     end
