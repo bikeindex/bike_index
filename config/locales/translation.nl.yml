@@ -31,7 +31,7 @@ nl:
     - vr
     - za
     month_names:
-    - 
+    -
     - januari
     - februari
     - maart
@@ -45,7 +45,7 @@ nl:
     - november
     - december
     abbr_month_names:
-    - 
+    -
     - jan
     - feb
     - mrt
@@ -126,11 +126,10 @@ nl:
       mini_magick_processing_error: 'Mislukken om te manipuleren met MiniMagick, misschien
         is het geen afbeelding? Oorspronkelijke fout: %{e}'
       record_invalid: 'Validatie mislukt: %{errors}'
-      restrict_dependent_destroy:
-        one: Kan item niet verwijderen omdat %{record} afhankelijk is
-        many: Kan item niet verwijderen omdat afhankelijke %{record} bestaan
       invalid_currency: moet een geldige valuta zijn (bijvoorbeeld '100', '5 %{decimal}
         24' of '123 %{thousands} 456 %{decimal} 78'). Kreeg %{currency}
+      model_invalid: 'Validatie mislukt: %{errors}'
+      required: moet bestaan
     template:
       body: 'Er zijn problemen met de volgende velden:'
       header:
@@ -161,8 +160,6 @@ nl:
       messages:
         record_invalid: 'Validatie mislukt: %{errors}'
         restrict_dependent_destroy:
-          one: Kan item niet verwijderen omdat %{record} afhankelijk is
-          many: Kan item niet verwijderen omdat afhankelijke %{record} bestaan
           has_many: Kan item niet verwijderen omdat afhankelijke %{record} bestaan
           has_one: Kan item niet verwijderen omdat %{record} afhankelijk is
       models:
@@ -173,6 +170,10 @@ nl:
               invalid_uri: moet een geldige URI zijn.
               relative_uri: moet een absolute URI zijn.
               secured_uri: moet een HTTPS/SSL URI zijn.
+              unspecified_scheme: moet een schema specificeren.
+              forbidden_uri: is forbidden by the server.
+            scopes:
+              not_match_configured: doesn't match configured on the server.
         impound_record:
           user_not_authorized: heeft geen toestemming om deze fiets in beslag te nemen
         bike:
@@ -829,11 +830,11 @@ nl:
         titanium: Titanium
       handlebar_type:
         bmx: BMX-stijl
-        drop: Laten vallen
         flat: Plat of riser
         forward: Naar voren gericht
         other: Geen stuur
         rearward: Achterzijde gericht
+        drop_bar: Laten vallen
       propulsion_type:
         electric_assist: Elektrische assist
         electric_throttle: Elektrisch gaspedaal
@@ -1503,7 +1504,6 @@ nl:
     ZA: Zuid-Afrika
     ZM: Zambia
     ZW: Zimbabwe
-    ZZ: onbekend gebied
   views:
     pagination:
       first: "&laquo; Eerste"
@@ -1527,6 +1527,11 @@ nl:
         redirect_uri: 'Gebruik één regel per URI. '
         native_redirect_uri: Gebruik %{native_redirect_uri} voor lokale tests
         scopes: Scheid scopes met spaties. Laat leeg om de standaard scopes te gebruiken.
+        confidential: Application will be used where the client secret can be kept
+          confidential. Native mobile apps and Single Page Apps are considered non-confidential.
+        blank_redirect_uri: Leave it blank if you configured your provider to use
+          Client Credentials, Resource Owner Password Credentials or any other grant
+          type that doesn't require redirect URI.
       edit:
         title: Bewerk applicatie
       index:
@@ -1534,6 +1539,11 @@ nl:
         new: Nieuwe applicatie
         name: Naam
         callback_url: Callback URL
+        confidential: Confidential?
+        actions: Actions
+        confidentiality:
+          'yes': Ja
+          'no': Nee
       new:
         title: Nieuwe applicatie
       show:
@@ -1543,6 +1553,7 @@ nl:
         scopes: Scopes
         callback_urls: Callback urls
         actions: Acties
+        confidential: Confidential
     authorizations:
       buttons:
         authorize: Authoriseren
@@ -1598,6 +1609,12 @@ nl:
           revoked: Het toegangstoken is geweigerd
           expired: Het toegangstoken is verlopen
           unknown: Het toegangstoken is ongeldig
+        invalid_code_challenge_method: The code challenge method must be plain or
+          S256.
+        admin_authenticator_not_configured: Access to admin panel is forbidden due
+          to Doorkeeper.configure.admin_authenticator being unconfigured.
+        revoke:
+          unauthorized: U bent niet bevoegd om dit token in te trekken
     flash:
       applications:
         create:
@@ -1614,6 +1631,8 @@ nl:
         nav:
           oauth2_provider: OAuth2 Provider
           applications: Applicaties
+          home: Home
+        title: Doorkeeper
       application:
         title: OAuth authorisatie vereist
     scopes:
@@ -1631,6 +1650,8 @@ nl:
       write_organizations: Toestemming om * organisaties op Bike Index te * maken
         *
       write_user: Toestemming om * informatie * over u te updaten
+    pre_authorization:
+      status: Pre-authorization
   bikes:
     bike:
       location: Plaats
