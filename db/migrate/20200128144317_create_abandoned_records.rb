@@ -1,4 +1,4 @@
-class CreateAbandonedRecords < ActiveRecord::Migration
+class CreateAbandonedRecords < ActiveRecord::Migration[4.2]
   def change
     create_table :abandoned_records do |t|
       t.integer :kind, default: 0
