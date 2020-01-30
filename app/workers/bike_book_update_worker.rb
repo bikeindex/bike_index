@@ -1,10 +1,12 @@
+require "bike_book_integration"
+
 class BikeBookUpdateWorker < ApplicationWorker
   sidekiq_options queue: "high_priority"
 
   def perform(bike_id)
     bike = Bike.unscoped.where(id: bike_id).first
     if bike.present?
-      bb_data = ::BikeBookIntegration.new.get_model(bike)
+      bb_data = BikeBookIntegration.new.get_model(bike)
 
       if bb_data.present?
         bb_data["components"].each do |bb_comp|
