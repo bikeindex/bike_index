@@ -59,7 +59,5 @@
   .input-group.form-foot
     .submit-registration
       = submit_tag "Record Abandoned", class: "button-submit"
-      %span.what-you-register
-        This
       = select(:bike, :cycle_type, CycleType.select_options, { required: true })
 
