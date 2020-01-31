@@ -30,9 +30,15 @@ module Organized
       @b_params = b_params.order(created_at: :desc).page(@page).per(@per_page)
     end
 
-    def new; end
+    def new
+      @kind = params[:kind] == "abandoned" ? "abandoned" : "normal"
+    end
 
     def new_iframe
+      @organization = current_organization
+      @b_param = find_or_new_b_param
+      @bike = BikeCreator.new(@b_param).build_bike
+      render layout: "embed_layout"
     end
 
     def multi_serial_search; end
