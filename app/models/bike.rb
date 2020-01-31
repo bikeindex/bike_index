@@ -69,7 +69,8 @@ class Bike < ApplicationRecord
   attr_accessor :other_listing_urls, :date_stolen, :receive_notifications, :has_no_serial, # has_no_serial included because legacy b_params, delete 2019-12
                 :image, :b_param_id, :embeded, :embeded_extended, :paint_name,
                 :bike_image_cache, :send_email, :marked_user_hidden, :marked_user_unhidden,
-                :b_param_id_token, :address, :address_city, :address_state, :address_zipcode
+                :b_param_id_token, :address, :address_city, :address_state, :address_zipcode,
+                :abandoned_record_kind, :skip_state_update
 
   attr_writer :phone, :user_name, :organization_affiliation, :external_image_urls # reading is managed by a method
 
@@ -740,7 +741,7 @@ class Bike < ApplicationRecord
 
   def set_calculated_attributes
     self.listing_order = calculated_listing_order
-    self.state = calculated_state
+    self.state = calculated_state unless skip_state_update
     clean_frame_size
     set_mnfg_name
     set_user_hidden
