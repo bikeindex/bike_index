@@ -31,8 +31,21 @@ class BikeCreator
   end
 
   private
+
+  def creation_state_attributes
+    {
+      is_bulk: @b_param.is_bulk,
+      is_pos: @b_param.is_pos,
+      is_new: @b_param.is_new,
+      origin: @b_param.origin,
+      bulk_import_id: @b_param.params["bulk_import_id"],
+      creator_id: @b_param.creator_id,
+      organization_id: @bike.creation_organization_id,
+    }
+  end
+
   # Previously all of this stuff was public.
-  # In an effort to refactor this process, everything that could be made private was (PR#1478)
+  # In an effort to refactor and simplify, anything not accessed outside of this class was explicitly made private (PR#1478)
 
   def add_bike_book_data
     return nil unless @b_param && @b_param.bike.present? && @b_param.manufacturer_id.present?
@@ -101,18 +114,6 @@ class BikeCreator
     end
 
     @bike
-  end
-
-  def creation_state_attributes
-    {
-      is_bulk: @b_param.is_bulk,
-      is_pos: @b_param.is_pos,
-      is_new: @b_param.is_new,
-      origin: @b_param.origin,
-      bulk_import_id: @b_param.params["bulk_import_id"],
-      creator_id: @b_param.creator_id,
-      organization_id: @bike.creation_organization_id,
-    }
   end
 
   def find_or_build_bike
