@@ -32,6 +32,9 @@ module Organized
 
     def new; end
 
+    def new_iframe
+    end
+
     def multi_serial_search; end
 
     def update
@@ -54,6 +57,25 @@ module Organized
       end
 
       redirect_back(fallback_location: redirect_back_fallback_path)
+    end
+
+    def create
+      find_or_new_b_param
+      new_iframe_params = { organization_id: current_organization.to_param }
+      if @b_param.created_bike.present?
+        flash[:success] = "#{@bike.created_bike.type} Created"
+      else
+        @b_param.update_attributes(params: params.as_json) # we handle filtering & coercion in BParam
+        @bike = BikeCreator.new(@b_param).create_bike
+        if @bike.errors.any?
+          @b_param.update_attributes(bike_errors: @bike.cleaned_error_messages)
+          flash[:error] = @b_param.bike_errors.to_sentence
+          new_iframe_params[:b_param_id_token] = @b_param.id_token
+        else
+          flash[:success] = "#{@bike.type} Created"
+        end
+      end
+      redirect_to new_iframe_organization_bikes_path(new_iframe_params)
     end
 
     private
@@ -107,5 +129,16 @@ module Organized
       end
       @selected_query_items_options = Bike.selected_query_items_options(@interpreted_params)
     end
+  end
+
+  # create methods
+
+  def find_or_new_b_param
+    token = params[:b_param_token]
+    token ||= params[:bike] && params[:bike][:b_param_id_token]
+    @b_param = BParam.find_or_new_from_token(token, user_id: current_user && current_user.id)
+  end
+
+  def permitted_bparams
   end
 end

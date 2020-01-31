@@ -313,11 +313,12 @@ Rails.application.routes.draw do
     get "/", to: "dashboard#root", as: :root
     resources :dashboard, only: [:index]
     get "landing", to: "manage#landing", as: :landing
-    resources :bikes, only: %i[index new show update] do
+    resources :bikes, only: %i[index new create show update] do
       collection do
         get :recoveries
         get :incompletes
         get :multi_serial_search
+        get :new_iframe
       end
     end
     resources :exports, except: [:edit]
