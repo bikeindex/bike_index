@@ -1,4 +1,6 @@
 Rails.application.configure do
+  config.require_master_key = true
+
   # Verifies that versions and hashed value of the package contents in the project's package.json
   config.webpacker.check_yarn_integrity = false
 
