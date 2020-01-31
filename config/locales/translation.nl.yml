@@ -4655,9 +4655,10 @@ nl:
         bike: Fiets
         impounded: In beslag genomen bij
         kind: Soort
-        matches: lucifers
         recorded: opgenomen
         recorder: opnemer
+        matches_visible: Zichtbaar
+        retrieved: In beslag genomen bij
       show:
         abandoned_record: Verlaten record
         additional_text: Aanvullende tekst
